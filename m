@@ -1,181 +1,185 @@
-Return-Path: <netdev+bounces-12347-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12348-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96D347372A5
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:22:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ECC7C7372AD
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:25:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CCE9281326
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 17:22:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D5B1E1C20BFF
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 17:25:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 794022AB47;
-	Tue, 20 Jun 2023 17:22:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9242AB4C;
+	Tue, 20 Jun 2023 17:24:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B1DC2AB3F
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 17:22:24 +0000 (UTC)
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 64A0BA3
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 10:22:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687281743; x=1718817743;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=3siVsSuY82pvBt5CxMP5IyvXN6FhQlFjmRo1xwKtSiA=;
-  b=l5VHTnNyKWJlVxajp1IQpe85jtX2v+aw1oOIMbjP2D7pkoWkfGXoIW5x
-   vClvxxn/CgqDEAhNcLbPnhsv1m11F3xlbhGY8orhMVz2xVP31CGtzk3UY
-   4NPMXMTh0q1jaqBGBpxVii5X+Mmmj9ey2k5P/xSZjYDkW4w3fpNIY2pE1
-   nFvg9txvpBzgLKkrQt5c5qSBTGkw5+bwbsqNGAUTYCHlN6ObkBooc8rTJ
-   6tyFMVvuNud19SFqYwsNC+/foA9ufTqmeOKp7PCb5yeQCe9RZawVx1WzZ
-   dRF4nV7ylILYsH4xjPKBfJGQwW7sbYakCQLoz46LKBx6IaXA52GaY/FpF
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="358797636"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="358797636"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 10:22:15 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="708370548"
-X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
-   d="scan'208";a="708370548"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga007.jf.intel.com with ESMTP; 20 Jun 2023 10:22:15 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Tue, 20 Jun 2023 10:22:14 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Tue, 20 Jun 2023 10:22:14 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Tue, 20 Jun 2023 10:22:14 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=RY27cqL0hLvI9G07qfT/5gBFZoyXHCzdxyEqAyA2Ah5nkdj0BD0gowrCh2uxrrX7Yit1qv4/S+L++qwssoZhuWbaF7ZaF6Nfe/5fEc7kO699NRQcNJRZgt3Krp05ZwECe7z3ZomsbsuI5kP6+rGnqWRrJaroGNDg2TuN5hGKf4Zq2IqvTkCBDRCizeGbJ7klPQf8xB4X2tM2VTZgaCmR31+nDUOEgwBI98cUUtMx4O3jI8Jsum7uit8HsPtQj33QHKkNg8Q0dTTtXAACvxMuFVI8fw9HQJLTh6m4XkBBq/Fm1ZUvei1Y5byOv+bHqvjvR6OL73/L0T9wF42gdyCsJA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=IMzYdsQkAjOlWPV77zz7AVQTqRUd8yMFdj4rFoWhqxo=;
- b=muZMEIMJFyiDL/8cDPJjLXQHK10W8UUgh44ZNKEjbHWjr7tALxTp+IOvseJcJrCkrkcOLdivJMI+NFLwNyapF7KExugewagBQpC8kzz1nq6h+5gGGLJkqNLXVys+xx9As6X1cnNsL+VW3nvN1r7MEE/x+kX3sSj+TdiLgRcVZ/imHcmIYzWeLdkGrrXRjn8fmY5/m/SYm4QUDZmQNvZ943sXSE+r0l/mj/nfdEkrk/MaNBP6rd68w/I3RdobyD6dpr4dhO1wy0eU6yaiuoadkOlNtymiiOZH9V249WgoFPun16Ufwjw0ll/Ha3LlhClbmWa2OuG5rNOp5BtnrDmT/w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- CY8PR11MB7195.namprd11.prod.outlook.com (2603:10b6:930:93::19) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6500.36; Tue, 20 Jun 2023 17:22:13 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::9e4f:80cc:e0aa:6809]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::9e4f:80cc:e0aa:6809%2]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
- 17:22:13 +0000
-Date: Tue, 20 Jun 2023 19:22:01 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <magnus.karlsson@intel.com>,
-	<michal.swiatkowski@intel.com>
-Subject: Re: [PATCH iwl-net] ice: add missing napi deletion
-Message-ID: <ZJHgOXXHFjsOjlnA@boxer>
-References: <20230620082454.377001-1-maciej.fijalkowski@intel.com>
- <20230620095335.43504612@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230620095335.43504612@kernel.org>
-X-ClientProxiedBy: DB8P191CA0004.EURP191.PROD.OUTLOOK.COM
- (2603:10a6:10:130::14) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DFAF2AB3A;
+	Tue, 20 Jun 2023 17:24:54 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 03F88C433CA;
+	Tue, 20 Jun 2023 17:24:52 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687281894;
+	bh=Rd2KQT7Sg/jj2vpD/+cypNQq21vO707uBhL4Wt60ONQ=;
+	h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
+	b=qVLzEw3DYllRsW1kHmBV862G6LOZFXc4fKTQnIpsgdD3rkTdoAKKcvq1gRTVFpyy5
+	 XbCuDXOA1g1mZTF7xKYW2DvV4WvN2nArEOEJgYcwd4dfupuNCgrJ1TcrC087JauSrD
+	 bRc/e3gFOmGsVaMU9qcLfWmy5T2ln7Jbkx9hx3XU2mUqramf+q8rMAFYMpM7+uX76N
+	 kL3uRI0aY94qeKbLwAOT9R5Vt7d0a4F/1qUypEQw4GZYFbdsYPH/DlFJM0rqVnm3R6
+	 pFduwHV7iGgrpKWkxEPmXRIlBYyw1sOUEKglC1dG6CWAHw+KOuedQ+eu2dj3ec+4eB
+	 /QpIQ01kgaTbg==
+Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
+	by mailauth.nyi.internal (Postfix) with ESMTP id C920427C005A;
+	Tue, 20 Jun 2023 13:24:51 -0400 (EDT)
+Received: from imap48 ([10.202.2.98])
+  by compute3.internal (MEProxy); Tue, 20 Jun 2023 13:24:51 -0400
+X-ME-Sender: <xms:4uCRZGPuv7m8KaXFojrVeCbfWrMZ7IJoui-4aoDexdm_V34ZG0-I6g>
+    <xme:4uCRZE-OH2xt14uLz-FF7dbdv-gHG5w14JwsdNtUTTBditVKBbvq_q8tXxJx8iDzO
+    WaowhDX_m63-nZ50aI>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeefhedgleduucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    nhguhicunfhuthhomhhirhhskhhifdcuoehluhhtoheskhgvrhhnvghlrdhorhhgqeenuc
+    ggtffrrghtthgvrhhnpeduveffvdegvdefhfegjeejlefgtdffueekudfgkeduvdetvddu
+    ieeluefgjeeggfenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfh
+    hrohhmpegrnhguhidomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidqudduiedu
+    keehieefvddqvdeifeduieeitdekqdhluhhtoheppehkvghrnhgvlhdrohhrgheslhhinh
+    hugidrlhhuthhordhush
+X-ME-Proxy: <xmx:4uCRZNTpfg2cGu-JZbGK0lauKT6LTXTvSpjwrRQTqsoePCHX_VolEg>
+    <xmx:4uCRZGtzcXFiHy54TUV3vETkj3W0NygxpQUty3hSE43wjAfN8bvT-A>
+    <xmx:4uCRZOcK6KfTYx9uY7noUEoncUDShNm2IP8FjLgB4nFv3QpkDL6MpA>
+    <xmx:4-CRZOAOrENLDeV3AOynkkTJ3wDHPyrZf0jxchqFsnzGmPnTrQoXvQ>
+Feedback-ID: ieff94742:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 85C9831A0063; Tue, 20 Jun 2023 13:24:50 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|CY8PR11MB7195:EE_
-X-MS-Office365-Filtering-Correlation-Id: a85ff082-01da-4bfc-1e53-08db71b2e2f5
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: hQniRmCGmxgXPa5rUC9zLFLXT4gcRb/cprplwvpQ5zEQwTtojRWOSwHQNPncIDa+MKCM5zXa8Jy8TghNvFnB9WXiYhgZafLomdZjbZQWqIanI2C9xvRSvSQMvnpKXvdZx7rJCHLmevTYzYyZnxx0wPxyjGbc8DWo93M2RxbUu+8dSvJlqpZipyFlR+8NfrV9GyEo/K75CfQ0pzf5T9f4PNuN2Mbigh9fSNSvD0bkafXJtkzNOkkVlWoRSbcDe2taqfO1hJf1bfTD09aAEDWxIhwQp4vHM3Xz/oSHO/Lp7erqKglULZKm+smJeOYbq5g4Z9yEEEuge6JXNJHPsI4Ia7hFodtQIkEOJF769oZsLQtDpStXRBM+hraV7P6XLLlKS0TE6FS6WN613mq0GLTQaqF3sqqbxxzRaAWbLer8YFBihUyrUCflhRuGynx3KOB6MlQcLtXQwBROuv0kl3v8jxt+OJ+GzVNzIcKagAu5jk+ne2QFcz1Q3hgOlY6wb0jru8aLl8FLMmBmGJY7HY42uyEH52ZZtGnRia3tTaoBViyF/1oxkD2Fbt7EromcDYIo
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(39860400002)(396003)(136003)(376002)(346002)(366004)(451199021)(316002)(2906002)(8936002)(6916009)(4326008)(41300700001)(5660300002)(8676002)(44832011)(66476007)(66556008)(66946007)(478600001)(6666004)(6486002)(82960400001)(107886003)(9686003)(6512007)(6506007)(186003)(26005)(83380400001)(33716001)(38100700002)(86362001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?JwLzYetyt5CWT2L05OI2++JrstCQfEW/6RzAV3l+Brl82tl0ddZpBjv2fekx?=
- =?us-ascii?Q?DDjb1yZ53re8MP8hDUAsqAT7es2ckcnEyhFg7dIopMHwl11XOAAEdQUmhjGK?=
- =?us-ascii?Q?JcCO8VKPysKLzM1mbaQgmfByV3x1uszB78+ZUOsqaHnuFzPUpCFzmcfX9CxC?=
- =?us-ascii?Q?M2QbiS9rGVvb9Y0uWBTvB/0ZolTK+eNYavGYhxUlNmSskmjRXPUq1ziHcFx0?=
- =?us-ascii?Q?V1cIUQSrBca02AjZryfJOn5VsWlc1qcZZJjljvOH3NcgOh7CsOHjZa/6NyR/?=
- =?us-ascii?Q?WEcYeCQwr7XUcnmBxPzJdW+5MiopIp9d0XCYirkANTdiSAvnsQscWgGLXpVK?=
- =?us-ascii?Q?iGaXMtH5a8evyfw7MphCUVPccBT2IAKc4wFX+H+LgRyjB163XpKxfiGJHHvg?=
- =?us-ascii?Q?WlL9jV/fS+j9F7TO3mAIyVRqkXZ05LNlCGW0xfAD/kUIizeGZIMgUIilRmuV?=
- =?us-ascii?Q?5hEPSSp1Cx/AS7FZ25wCUuVRoIRUSBD5yMP9xY4mhS8CdqX5hXdCJy/fd6LU?=
- =?us-ascii?Q?cpKRrv8+gFIqGjT6oMlujWY3Udwi1aLYM0jD6CQDyFFOwIhgHuKRus6EbT9/?=
- =?us-ascii?Q?p0qrjBtP5c9sz6y2fy+VNPLMyWHQCVbl7OyyT9CKdcLNpfLBaT0VE6SEbw41?=
- =?us-ascii?Q?jddHn2FoJ8b/NFSs2j/g4g5rblRvLQI/2d2G3CSqwV7ZtjlWAlzRyQ2VJpfN?=
- =?us-ascii?Q?JKIjby1VkAD3RH85olO8waCCpUtz4BAV6TJQsaoKejeCVbiDddg6F+adBZKa?=
- =?us-ascii?Q?EdhSddp5uR8HJGIAhqFcRYIGVtMO1t2cZmRoFv4j74GifcX5k0lDqJqhUqMt?=
- =?us-ascii?Q?hTbKLl6lOpu+gwXsTAlk2iJduZ5yGhFqT3apiwMt/Q+E7/XHXe9Ifxf5ZMAD?=
- =?us-ascii?Q?/wj23VD+AhqH4+yAAQ2mFKCu6+ibjQTMRg3PSp4Eb2XWuj6RSctiKJZfDOEa?=
- =?us-ascii?Q?3HSkthJz73Rj6kX2itnosy8UCatM//DV8LGtKjI4H9xpsj3Kze/dRxb55sJi?=
- =?us-ascii?Q?RIERzV1XojgyPiiHHFt+fT8quBjXq6lj66cKlZUv1dAyvnnPITrcYmM8J1LQ?=
- =?us-ascii?Q?KvRiWLqDLkP1biiQnRhsGcNGI9Yv+TrBbsdnTXt/SSUueb73sFTk+SRIoV/I?=
- =?us-ascii?Q?dJ+AIVGUvkThei2unCexfYi0WDAJVAAMdfHeR2SIrKSgu5aRBLQ8jRDkiLhb?=
- =?us-ascii?Q?ZXXVBmqaI9k27O9DOk6xPMBekkwCJhBnrk23DWI3A2VMDz7ulC/T3NYeU78G?=
- =?us-ascii?Q?xumvCexWsWkMq0uwC2sQfvmtrwVqy8n44bGEPSvv1pFGodiDbo+N0meptDRl?=
- =?us-ascii?Q?UDE8d2lAagZabC2J637W5wbqA0u1mlJoujeGeTRACAlhoINHZcUyhQ1/ioQL?=
- =?us-ascii?Q?2TQBzeTHufHUOPzUeReYuj5xRsnlZRJfXWsXZ6z+Wy1Z0aZzSBOhFJmMVLq0?=
- =?us-ascii?Q?Lgfh2Q5W5hTdxB9ExgtKMFYcdNDIyEJZwQEKkJqzeu7FIZ7iLnmi0AqLqyFH?=
- =?us-ascii?Q?Y+RhQrlUaiDWsKN1SkwqrfveMhE1bm166ei1tJdYsidFo8BgU72UZyVCP08n?=
- =?us-ascii?Q?8IF3dhFl5cLg60uBgeKk1pf7yA3Q5botCOaYE1A2r9cu4o+FSuXhSjj5ID2C?=
- =?us-ascii?Q?PA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a85ff082-01da-4bfc-1e53-08db71b2e2f5
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 17:22:13.0179
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0Rp51Vb1cb7YxmnH3Km6DYevQo1X7JNvI5ujP1WlqEctZWTEv8TyQ8u7X/e3BoDAOTON7DPrwG98Un2Olne4D4ChhMEaZGmvdKM9tJOOXnI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR11MB7195
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Mime-Version: 1.0
+Message-Id: <6145cabf-d016-4dba-b5d2-0fb793352058@app.fastmail.com>
+In-Reply-To: <7F566E60-C371-449B-992B-0C435AD6016B@gmail.com>
+References: <20230616085038.4121892-1-rppt@kernel.org>
+ <20230616085038.4121892-3-rppt@kernel.org>
+ <f9a7eebe-d36e-4587-b99d-35d4edefdd14@app.fastmail.com>
+ <20230618080027.GA52412@kernel.org>
+ <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com>
+ <7F566E60-C371-449B-992B-0C435AD6016B@gmail.com>
+Date: Tue, 20 Jun 2023 10:24:29 -0700
+From: "Andy Lutomirski" <luto@kernel.org>
+To: "Nadav Amit" <nadav.amit@gmail.com>, "Song Liu" <song@kernel.org>
+Cc: "Mike Rapoport" <rppt@kernel.org>, "Mark Rutland" <mark.rutland@arm.com>,
+ "Kees Cook" <keescook@chromium.org>,
+ "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+ "Andrew Morton" <akpm@linux-foundation.org>,
+ "Catalin Marinas" <catalin.marinas@arm.com>,
+ "Christophe Leroy" <christophe.leroy@csgroup.eu>,
+ "David S. Miller" <davem@davemloft.net>,
+ "Dinh Nguyen" <dinguyen@kernel.org>,
+ "Heiko Carstens" <hca@linux.ibm.com>, "Helge Deller" <deller@gmx.de>,
+ "Huacai Chen" <chenhuacai@kernel.org>,
+ "Kent Overstreet" <kent.overstreet@linux.dev>,
+ "Luis Chamberlain" <mcgrof@kernel.org>,
+ "Michael Ellerman" <mpe@ellerman.id.au>,
+ "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+ "Palmer Dabbelt" <palmer@dabbelt.com>,
+ "Puranjay Mohan" <puranjay12@gmail.com>,
+ "Rick P Edgecombe" <rick.p.edgecombe@intel.com>,
+ "Russell King (Oracle)" <linux@armlinux.org.uk>,
+ "Steven Rostedt" <rostedt@goodmis.org>,
+ "Thomas Bogendoerfer" <tsbogend@alpha.franken.de>,
+ "Thomas Gleixner" <tglx@linutronix.de>, "Will Deacon" <will@kernel.org>,
+ bpf <bpf@vger.kernel.org>, linux-arm-kernel@lists.infradead.org,
+ linux-mips@vger.kernel.org, linux-mm <linux-mm@kvack.org>,
+ linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-s390 <linux-s390@vger.kernel.org>,
+ linux-trace-kernel@vger.kernel.org,
+ linuxppc-dev <linuxppc-dev@lists.ozlabs.org>, loongarch@lists.linux.dev,
+ netdev@vger.kernel.org, sparclinux@vger.kernel.org,
+ "the arch/x86 maintainers" <x86@kernel.org>
+Subject: Re: [PATCH v2 02/12] mm: introduce execmem_text_alloc() and jit_text_alloc()
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
 
-On Tue, Jun 20, 2023 at 09:53:35AM -0700, Jakub Kicinski wrote:
-> On Tue, 20 Jun 2023 10:24:54 +0200 Maciej Fijalkowski wrote:
-> > Error path from ice_probe() is missing ice_napi_del() calls, add it to
-> > ice_deinit_eth() as ice_init_eth() was the one to add napi instances. It
-> > is also a good habit to delete napis when removing driver and this also
-> > addresses that. FWIW ice_napi_del() had no callsites.
-> > 
-> > Fixes: 6624e780a577 ("ice: split ice_vsi_setup into smaller functions")
-> > Signed-off-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-> 
-> Is there user visible impact? I agree that it's a good habit, but
-> since unregister cleans up NAPI instances automatically the patch
-> is not necessarily a fix.
 
-It's rather free_netdev() not unregistering per se, no? I sent this patch
-as I found that cited commit didn't delete napis on ice_probe()'s error
-path - I just saw that as a regression. 
 
-But as you're saying when getting rid of netdev we actually do
-netif_napi_del() - it seems redundant to do explicit napi delete on remove
-path as it is supposed do free the netdev. Does it mean that many drivers
-should be verified against that? Sorta tired so might be missing
-something, pardon. If not, I'll send a v2 that just removes
-ice_napi_del().
+On Mon, Jun 19, 2023, at 1:18 PM, Nadav Amit wrote:
+>> On Jun 19, 2023, at 10:09 AM, Andy Lutomirski <luto@kernel.org> wrote:
+>>=20
+>> But jit_text_alloc() can't do this, because the order of operations d=
+oesn't match.  With jit_text_alloc(), the executable mapping shows up be=
+fore the text is populated, so there is no atomic change from not-there =
+to populated-and-executable.  Which means that there is an opportunity f=
+or CPUs, speculatively or otherwise, to start filling various caches wit=
+h intermediate states of the text, which means that various architecture=
+s (even x86!) may need serialization.
+>>=20
+>> For eBPF- and module- like use cases, where JITting/code gen is quite=
+ coarse-grained, perhaps something vaguely like:
+>>=20
+>> jit_text_alloc() -> returns a handle and an executable virtual addres=
+s, but does *not* map it there
+>> jit_text_write() -> write to that handle
+>> jit_text_map() -> map it and synchronize if needed (no sync needed on=
+ x86, I think)
+>
+> Andy, would you mind explaining why you think a sync is not needed? I=20
+> mean I have a =E2=80=9Cfeeling=E2=80=9D that perhaps TSO can guarantee=
+ something based=20
+> on the order of write and page-table update. Is that the argument?
+
+Sorry, when I say "no sync" I mean no cross-CPU synchronization.  I'm as=
+suming the underlying sequence of events is:
+
+allocate physical pages (jit_text_alloc)
+
+write to them (with MOV, memcpy, whatever), via the direct map or via a =
+temporary mm
+
+do an appropriate *local* barrier (which, on x86, is probably implied by=
+ TSO, as the subsequent pagetable change is at least a release; also, an=
+y any previous temporary mm stuff would have done MOV CR3 afterwards, wh=
+ich is a full "serializing" barrier)
+
+optionally zap the direct map via IPI, assuming the pages are direct map=
+ped (but this could be avoided with a smart enough allocator and tempora=
+ry_mm above)
+
+install the final RX PTE (jit_text_map), which does a MOV or maybe a LOC=
+K CMPXCHG16B.  Note that the virtual address in question was not readabl=
+e or executable before this, and all CPUs have serialized since the last=
+ time it was executable.
+
+either jump to the new text locally, or:
+
+1. Do a store-release to tell other CPUs that the text is mapped
+2. Other CPU does a load-acquire to detect that the text is mapped and j=
+umps to the text
+
+This is all approximately the same thing that plain old mmap(..., PROT_E=
+XEC, ...) does.
+
+>
+> On this regard, one thing that I clearly do not understand is why=20
+> *today* it is ok for users of bpf_arch_text_copy() not to call=20
+> text_poke_sync(). Am I missing something?
+
+I cannot explain this, because I suspect the current code is wrong.  But=
+ it's only wrong across CPUs, because bpf_arch_text_copy goes through te=
+xt_poke_copy, which calls unuse_temporary_mm(), which is serializing.  A=
+nd it's plausible that most eBPF use cases don't actually cause the load=
+ed program to get used on a different CPU without first serializing on t=
+he CPU that ends up using it.  (Context switches and interrupts are seri=
+alizing.)
+
+FRED could make interrupts non-serializing. I sincerely hope that FRED d=
+oesn't cause this all to fall apart.
+
+--Andy
 
