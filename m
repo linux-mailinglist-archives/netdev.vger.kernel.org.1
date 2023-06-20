@@ -1,50 +1,47 @@
-Return-Path: <netdev+bounces-12375-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12376-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABC7E737399
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 20:15:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AC11C73742C
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 20:30:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0EDB2813BD
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 18:15:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DBA72813F6
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 18:30:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3EEF17749;
-	Tue, 20 Jun 2023 18:14:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 920A017AC9;
+	Tue, 20 Jun 2023 18:30:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B7B32AB5D
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 18:14:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 581AFC433C8;
-	Tue, 20 Jun 2023 18:14:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06C2917AB9
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 18:30:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2825CC433C0;
+	Tue, 20 Jun 2023 18:30:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687284897;
-	bh=oS71jJIpPfGeBkc1SVNu2IOd3HxB2C9NjFUUQpei/oc=;
+	s=k20201202; t=1687285822;
+	bh=YzvlpBIJ1S4sFH9+hFPo656i1oKTPdpC6wWZXmsHRWc=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=a+4EnNcNi2GkkACyIYoskSPxqvQ2cvhsc7xaCLyVJi+xL7n/tuFFbNKW/Jk9kDmTu
-	 xCM0qZVnNSy18xpuQm1jdJeVR9KCRM82+vb26KALKa4vjUZ1SHmgLC+fdSnSO2sVRJ
-	 LvZ+iA/zDTJvyUWzWKyDPHlIBuVCZ7VDFgINZBr4TE3XQ6H0oyLXnvj386tPFaFMn6
-	 kgoD8caZDe/2dfmH7Fd/gndraKJPzgzqKnJOIw3TjcotYIgJgxUrSIjj2749zIrl9w
-	 CtP/d46lK0fwyGnp5lsrk2s48cnmzPe77PIUUN99zsm4vMb4ar4Rr2/glyMCGqhDI6
-	 0hIzxCMIWEa1w==
-Date: Tue, 20 Jun 2023 11:14:56 -0700
+	b=PHSUD+Pasa8bpAfIKjED6alVB4e3Fk+TexGxStJYHad3fXhv+ZQgliUhTmGpE51TG
+	 ZUtm4loVwwbhRi7Hgb6xBQomyKemzogSJiGe22RQXiv5dq8n3Dg8StBa2bbqijZ4F7
+	 MYlGWUp88djXdvtWi9GYcZyL+bY9DfJk3hq87jmOmB/x1VidNpaJ6ReeUNNNDvgSv2
+	 4iTUEv05ZOy98hqaFOSjXfhg5Hex3xl/MKo3DDzmadUr0RFhPELaf6Ce9iDmq0a9EN
+	 bGFtU/rUio5mk8/Yvi/JWIR3SCFKXsUrU3gzIhQBOMX8BrHSJtzcbEFWJfWSNkL3Fs
+	 N/hBgi5bPnXJg==
+Date: Tue, 20 Jun 2023 11:30:21 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>,
- Balakrishna Godavarthi <bgodavar@codeaurora.org>, Rocky Liao
- <rjliao@codeaurora.org>, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] dt-bindings: net: bluetooth: qualcomm:
- document VDD_CH1
-Message-ID: <20230620111456.48aae53c@kernel.org>
-In-Reply-To: <20230617165716.279857-1-krzysztof.kozlowski@linaro.org>
-References: <20230617165716.279857-1-krzysztof.kozlowski@linaro.org>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+ <andrew@lunn.ch>, <hkallweit1@gmail.com>, <linux@armlinux.org.uk>,
+ <davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+ <richardcochran@gmail.com>
+Subject: Re: [PATCH net-next v3] net: micrel: Change to receive timestamp in
+ the frame for lan8841
+Message-ID: <20230620113021.01d90f90@kernel.org>
+In-Reply-To: <20230615094740.627051-1-horatiu.vultur@microchip.com>
+References: <20230615094740.627051-1-horatiu.vultur@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,31 +51,30 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sat, 17 Jun 2023 18:57:16 +0200 Krzysztof Kozlowski wrote:
-> WCN3990 comes with two chains - CH0 and CH1 - where each takes VDD
-> regulator.  It seems VDD_CH1 is optional (Linux driver does not care
-> about it), so document it to fix dtbs_check warnings like:
+On Thu, 15 Jun 2023 11:47:40 +0200 Horatiu Vultur wrote:
+> Currently for each timestamp frame, the SW needs to go and read the
+> received timestamp over the MDIO bus. But the HW has the capability
+> to store the received nanoseconds part and the least significant two
+> bits of the seconds in the reserved field of the PTP header. In this
+> way we could save few MDIO transactions (actually a little more
+> transactions because the access to the PTP registers are indirect)
+> for each received frame.
 > 
->   sdm850-lenovo-yoga-c630.dtb: bluetooth: 'vddch1-supply' does not match any of the regexes: 'pinctrl-[0-9]+'
+> Instead of reading the rest of seconds part of the timestamp of the
+> frame using MDIO transactions schedule PTP worker thread to read the
+> seconds part every 500ms and then for each of the received frames use
+> this information. Because if for example running with 512 frames per
+> second, there is no point to read 512 times the second part.
 > 
-> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> Doing all these changes will give a great CPU usage performance.
+> Running ptp4l with logSyncInterval of -9 will give a ~60% CPU
+> improvement.
 
-Hi Luiz, I don't see you CCed here, should we take it directly 
-to net-next?
+Richard, looks good?
 
-> diff --git a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-> index e3a51d66527c..2735c6a4f336 100644
-> --- a/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-> +++ b/Documentation/devicetree/bindings/net/bluetooth/qualcomm-bluetooth.yaml
-> @@ -52,6 +52,9 @@ properties:
->    vddch0-supply:
->      description: VDD_CH0 supply regulator handle
->  
-> +  vddch1-supply:
-> +    description: VDD_CH1 supply regulator handle
-> +
->    vddaon-supply:
->      description: VDD_AON supply regulator handle
->  
-
+I'm not sure if the settime handling is sufficient, some packets may
+still sneak thru both getting stamped with new value of time and use
+old upper bits and get stamped with old bits and use new upper.
+Can we disable timestamping, drain the queue, then change the time
+and enable stamping again?
 
