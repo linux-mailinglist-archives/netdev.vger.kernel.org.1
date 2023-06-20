@@ -1,159 +1,209 @@
-Return-Path: <netdev+bounces-12405-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12406-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA4FE737532
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:41:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1A283737536
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEEBF1C20D73
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:41:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C837428143E
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:42:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDB317FFF;
-	Tue, 20 Jun 2023 19:41:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BBD418007;
+	Tue, 20 Jun 2023 19:42:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A34C2AB55
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:41:49 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2101.outbound.protection.outlook.com [40.107.223.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E430E72;
-	Tue, 20 Jun 2023 12:41:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LrTlHRY1eqBcjNW6FJLZceeoaAln8QtU4FuC7NwdawYjYz0QdrSmN2wG3YyoLE+Bw3Fx8pjiWVcSuEs9mhFdi4/12c5EcoWCKZAad8tKJp/0kEvvb9V5PeGBq63ovp4an4ePBPDCRNCPlTcUMtFLEA12Qf6jE7EEsY1C/2f8ZlZkXWBqD46EiyttaemFv3OcnEJ6AzadNyOXdNZpKw5ZwT5Fn1IYiAZsgwfIsk5MHOayemLOet5MFkZ8CuuNBKFjP9IJl8LAjjHxZUH/lYCZ/x36gy3P4BFqfcZcOXs/kS099TaVN66lw3YyHsZq4IXJOuG7vdB/7QhLBou//TwpRA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=z57AXJ7y0XzIz10jpKRmI87uM7dVb1XO0yHWR0Zc9eg=;
- b=WnfBQOSyHpSbRqFpkCZpLSFlELz9zRnAH8lBy9dNRoN0Kw5CfVbLIZmfGJ9RMzeQUXLEN95Ze4X6403I2oIlvNiTUkJAhzuhJrkPTIYLQr+D8z+uGmoUl1SZMkVuteUeOlJNoC8aqUtFHNutrzzNu2vGvPeMxWahsuQNC07OEIR6B4aCHMtxwqr2zJ+OH2tVQ547cmC+6w9QF5lRQmLYfaynlUAjqO0PzmOUlzxnqYjJJT0C0tXXcJowfGm8lV5uz6KlGoi9Xn9kLmrHz+ydo946ZRiOGH0hN96HP+EHm4nxerR2+e7hfjyUftkEfAnhltmCzQ4W2/CP89xu2wUwEg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0942F17AB5
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:42:43 +0000 (UTC)
+Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05534172B
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 12:42:41 -0700 (PDT)
+Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-666683eb028so2935159b3a.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 12:42:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=z57AXJ7y0XzIz10jpKRmI87uM7dVb1XO0yHWR0Zc9eg=;
- b=AWmCIsUWUvrU1KDuUM3udgOCGxggTHYdhTaFWrvp6+m6h2YospEV8hErdnyvGaSAUNdgtCyJAvjGoj+vsjdnROS6UuSqG967liq+AeJ8+7R9L7HDP1GcentSDguxIekGy8h9Lfjgnv5Py5+nupFSNXv+aHEkig4HRMRgHJnMwGA=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SN4PR13MB5809.namprd13.prod.outlook.com (2603:10b6:806:219::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.19; Tue, 20 Jun
- 2023 19:41:42 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
- 19:41:42 +0000
-Date: Tue, 20 Jun 2023 21:41:35 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Michael Chan <michael.chan@broadcom.com>
-Cc: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org,
+        d=chromium.org; s=google; t=1687290160; x=1689882160;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=QiWvvOkny6Xy7k99OTM/47lHKBPwF83xll3Sw/gFhO4=;
+        b=l/ofDUO2ioSYbR1TO6LuPUUbRDy0vC11XCoCsifV2el/IdJt4NoSmLMeK+aRBZ/cW7
+         WfOljBRisAzd+SJIHj93+Mjo+JcMHx2A/4WQk2ny6HrQYL0Ojju8eyqvWwFvRWMwtlPR
+         TQoKBB/f608TvjluNMh6pM1Vai6wS8pVvGINo=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687290160; x=1689882160;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=QiWvvOkny6Xy7k99OTM/47lHKBPwF83xll3Sw/gFhO4=;
+        b=ki1EsVWKhq841bb64SKaY4pXZdkernmxHPXImp/Xl6QKWSt0WwGHZN4xcy2HABnzzt
+         Ql6Pdc+TFKmFLKXYZGi3nwJnnyyCoJboyIDVCoM8DMTi8VbmooEYB2LrTEqOgIZLo9nP
+         k3pMyF/v+8gurLYMS9UmLRNijymaIsahyr3lCjmZTG2qrJXdCPX1ZZW037czdEQ+hzi6
+         YTT+dpG1RB8eA6rAyzmplXDALZsJPXIC85SXiLP65r5dSnWbHqKiXXhyeMz+0rpqPgvi
+         /MJNszTSsHGEedZFgS0bgkor9ajtMlQa7o2/bYJxciWkefoB3JeG7ZwxrXniJ8xMtSUi
+         BCoA==
+X-Gm-Message-State: AC+VfDxBqsrYnCPByjUPjJNfytqdJccgrFTWEPl9mdZqMk9oFrM/z4Y0
+	x1S4/UgFdW0DnnoIvqfnXFG70+R0vX72CHZYCus=
+X-Google-Smtp-Source: ACHHUZ5dcMRLPvb14TFJ3aCShstrDCBvAOeMdB6aCJH5XgjTeMUt18xvU3iHFGi2xDUBHKl9qzxdpQ==
+X-Received: by 2002:a05:6a20:938b:b0:10d:12a8:c95b with SMTP id x11-20020a056a20938b00b0010d12a8c95bmr10175186pzh.0.1687290160451;
+        Tue, 20 Jun 2023 12:42:40 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id m22-20020aa78a16000000b006635846f3a8sm1695038pfa.91.2023.06.20.12.42.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 20 Jun 2023 12:42:39 -0700 (PDT)
+From: Kees Cook <keescook@chromium.org>
+To: M Chetan Kumar <m.chetan.kumar@intel.com>
+Cc: Kees Cook <keescook@chromium.org>,
+	Florian Klink <flokli@flokli.de>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Intel Corporation <linuxwwan@intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net-next] bnxt_en: Link representors to PCI device
-Message-ID: <ZJIA7y/x7GV1/hfu@corigine.com>
-References: <20230620144855.288443-1-ivecera@redhat.com>
- <CACKFLi=1EV01f=47eDP08mp8OiaBdUHcigrJak-PKx1z8KHUUg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACKFLi=1EV01f=47eDP08mp8OiaBdUHcigrJak-PKx1z8KHUUg@mail.gmail.com>
-X-ClientProxiedBy: AM0PR03CA0093.eurprd03.prod.outlook.com
- (2603:10a6:208:69::34) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: [PATCH] net: wwan: iosm: Convert single instance struct member to flexible array
+Date: Tue, 20 Jun 2023 12:42:38 -0700
+Message-Id: <20230620194234.never.023-kees@kernel.org>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN4PR13MB5809:EE_
-X-MS-Office365-Filtering-Correlation-Id: fd48d108-c48c-4560-24bf-08db71c65f44
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	DwFslHq19zNU3QY9St9vrzIPc6cDeBsF9ioARfCrZiQlq0PCC5W93l3PQAXwElJprODlSKGQKy9UwiEhYox/s7oa7RNOQ2CKSB36q6G3zLTBE2sgDPZrDO1pdzBig7u1L8K1d/8JMfcim2YLYnbjkamDjvSk2T+U4m4j35Owk8IBnIPITn7446nXF7J2d6JWVoOGaPzhxN06koz5alR9dwpJzkHYXAcaSPynrsPLvxwrxKDioMBafGLRFi6Q3weLGhgh6j6noB+h0wk5NBxEN3XCtrNT0tpjAlu4v3J4SSFymRy3cb2PsBSXk7Yx7SBKjsmxkZOS8fSMen/owj4tBMvQTDdDKnHmdnFm4p+/7DryGpb9bSYzztp9gepRAkR+v5CxbKIRtqFrm/EAzkU2Cpvpi1DKXaEAqFl866ohH8AkJHJa85LI0SefrnMxcBurisEzQtxGuBlbE2aDnR0v7S5c4xQ8cM3EcdGMLsq/0SiJ0j0AWKjslZp+wEUlg+TvuSnPNcWkDeqsa4TkV8DyRCEfznP3Dyjo2LK+50dJQXy1UYM8y/9yM/XTIOKCUUys
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(39840400004)(346002)(376002)(396003)(451199021)(86362001)(4326008)(8676002)(66476007)(4744005)(2906002)(54906003)(41300700001)(38100700002)(36756003)(6916009)(44832011)(66946007)(316002)(66556008)(5660300002)(6486002)(6666004)(478600001)(186003)(8936002)(2616005)(6512007)(6506007)(53546011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Tk9nb2VjaW5zbTZxSjhMYzZpeGsrZU9aM2dDNnpBVEh1RWNYM1hOb0ZBYWRB?=
- =?utf-8?B?cUNxcWhXT3RTRC9jOUZualIySnhJa2kwaHNSVVhTMXUzV2dpcTFoU0JyMTRN?=
- =?utf-8?B?N0tKQ0FtYkpkb2M4b2VtNjhZakRCQ3djemVsamxxbVp3Tng3dURmalhzZ1JN?=
- =?utf-8?B?b1c0ZXRCek9YWVhWZzU1TVFxbFRyRXNXK3RwT3pVWWtYamFVU0xmZEJZN0Na?=
- =?utf-8?B?MzdFK2w5d01hU2p2YmdhbUNGVWdMWGQwcjI3MzQvVms0dDVQSGdVTWNiT2RM?=
- =?utf-8?B?Q1duMkw3djZrWDZyZ2VaZ3VYZWVaUlZxUmZidGhlSmhWOUVkdmk0NHdpd3Mw?=
- =?utf-8?B?Z2xHWHpFNnVwNllDaU4ySnVBTnNJdXFnS2l0NkZLalZEbThnaW9Mb2QwYjh2?=
- =?utf-8?B?dEIxYUlINXR2Z1QwSDdILzdtdmdaZm5CTjltSlowUXE3N082MlpRWEU5OFhK?=
- =?utf-8?B?cW1KV3JiL2F4anhJbWE0ZXdRUjlJeEErMFBZWElxRDloTlN2MkxIenBXN01X?=
- =?utf-8?B?akxBVHBzUUViVFo1MVNkRFhKeTJsVGpISjU1NlplVUNBaHF6T25FWUtkWGxX?=
- =?utf-8?B?TUpuYmI2cDQvS2I4Z3g5MnFmRE9JdzJ5bVEwYWRyQmczWXh5SHRkZFNGNUxW?=
- =?utf-8?B?Wi9pVEhCdll3amZ3ZTlxU09LcW0wVStKbkoyRUh1K2FiMDlZbmVWeVc1M2Zt?=
- =?utf-8?B?aHRuZ2Q2SE5naWpGQ3ozWWVhbnZSWjZkUUpOODlpRlFvOEJFTnFWcmRBaTVU?=
- =?utf-8?B?SkRINndkLy9qWEhpZ3dzT04rM1BaOCtTQThDMkhEOWtMSy9RL2pWbkl6TG9u?=
- =?utf-8?B?Z1lDRVFidmtnRWZvOWltM1RvWk5EcW5wK2pPOU4va1JaYi8zM2hkS1BLdGxN?=
- =?utf-8?B?NzdUaWpFUXkvTnRrNWN5c0lZY3BKaUxmL3NjQVpEbVpJTWN6MlMxTmhSeko2?=
- =?utf-8?B?K2hFUk44N3ljT3BjV2djTFNXWVhUMzY2OFcwbG5oYXlYMnRjNktFWklZdUtF?=
- =?utf-8?B?T1hVaEFEcjVDT29NUGdEWXpTUFZmVlVLcUZnYUxLY0RqTThIV0ExQ0hmV1FX?=
- =?utf-8?B?Q1FGMmd1bytaZzcyMTJ5WlBMUWFreUt1NDNrQXFrc0hJZXc3ZEdmaEM1ZUZX?=
- =?utf-8?B?Q1hiaHZZWFFUU0RWaDE0YWY3QnBVamNHbWFUa01uZDR0QVZmTnI5L21mUUdz?=
- =?utf-8?B?Wm90cDNTTG5KbTFOMGFsSDlobjBBZ0dpN3VCaXlZNTJGSzRUWkJNWmk0VVZw?=
- =?utf-8?B?YjBMbDA2MDhBcnR4eGVXVnBVekdubGp5RU52Z3BzQjJQYXBoM29YeG12MVZx?=
- =?utf-8?B?aU02RDJpY1VjUmdtMlRsUFRNWTkwRVFJZWUzanJNcHliTVhuQUt3d2dmTytC?=
- =?utf-8?B?d1MvRmhrQ2NPQ2orbnE4OWc5U0dsSVBHZEg5RVZiMzlRYzNLTkZvbEU1Rjd2?=
- =?utf-8?B?RGdkUE80ZFlpZEpMQWxJU1V6bDB1QWZXQkVoMENqRks5a3ZWbGQwNTg2cTNR?=
- =?utf-8?B?QUpOdExESnk0Z0EzVlNlNlRkMmc4NXdTS1NvbGdoTU5GWk5LSkxCSVk3QmJJ?=
- =?utf-8?B?bnFZWUd6MVhyd1EzQnkyRUNZWFIvOTdiOGdMZkdxSlZzZVQwSG5Ia0RKb0x2?=
- =?utf-8?B?Ni81NkIwM1VhZHAzd2dUcjZRMXNGT25jTVBoYWVsa2szZlpQU2RPd2lVRnhk?=
- =?utf-8?B?T1IrcmJTeTd4aEV3NmY1U3RMaEN0MnNNcnplVUhxVW5oRWZmZ2ZYQjZYRTNs?=
- =?utf-8?B?eFArSVVSa1QvZFNMdU80ZWZTck1TRTR4N0JtU3RkYit2ZVRLRGF4ejdhbGln?=
- =?utf-8?B?TnhjNzBRYXpkV256ckNNVzFYdG01d01vc2NSQVN4RWtrVUUxbStnd3Vtamwy?=
- =?utf-8?B?VlRmYThlMVNxRXBUcVcxVHRyTGMyazREWVk3SjVuRWtNRld2UndXUGpNMVV6?=
- =?utf-8?B?ZVAzWmxFQzB1aElOOUFVRlBMc3psRkhVQ0pySFUva2d0NFNGZExiNmxVcHZk?=
- =?utf-8?B?SHRDazczWjNjbFAwVDA1ZmN6a0UzamFnWEY3cVlZaE5CcWZZdlcvcXJ4VWo2?=
- =?utf-8?B?RkZDQnNhbVJNU3hHTU4wVXF3MFEvb3JTbm1PTFEyZHZaM0cvREtqdXBBd2ZE?=
- =?utf-8?B?RWtnR050eitlcFdla0lURXVmNjhkYytvSEtwYm0rUTBDSHd6TkNpTFl1eXN0?=
- =?utf-8?B?TUpEdEFGT0ZhVXd5Q1FaWU83a3ltK2hDWGF6ZnNHSjBWSndGNlFOc2NPYVVt?=
- =?utf-8?B?cGdkZXI5Mm0xeVA3OFVwSmNWUFdRPT0=?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fd48d108-c48c-4560-24bf-08db71c65f44
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 19:41:42.0091
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yJdXbeYOnYNlPBzPo5m+H2JEAGIKkZljfrSSiolQ9nl+GfgkYoGIQqt8JAg34/ENiQGvphdSRQ73DrPOCQb5Nr/pLROcqJrvixpE87/wzYk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5809
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=4385; h=from:subject:message-id; bh=w0ey3jYVfZj5AHRpJe0rHVawhkI1+aJHT5gZn7Bk6bY=; b=owEBbQKS/ZANAwAKAYly9N/cbcAmAcsmYgBkkgEud9dflp1J5owk+erTI7LBPrYEWOo2lTuP+aEV YViN1HWJAjMEAAEKAB0WIQSlw/aPIp3WD3I+bhOJcvTf3G3AJgUCZJIBLgAKCRCJcvTf3G3AJowYD/ 9BHOnuOGAVdi7mvuOajH4baGnvJFg4KYB8j5QxNsz/5WBJlWQ/qq5kxuONQrUlIIUzzkjuu9XYq5W/ vzhAMkc9zfYQPQcZgWN7pLeLZbPJNJGCXu/dy/rTf2sBOG78PLgFSgjmGAJ0hQ9BvAPr4fx4Eoo0a5 SXM1IqD9ix6qkkaFfVPlaa3RaE4XT4phqF+RJqm8h6XoY+fG38Mk0PiKrepVMXfvFApbHL5x7667mB s+lY048TgwCUTAXsoRmqox+F04TGqAGt8UHyW7PM2qXOa09pF3rt3EIdE6R9YaDqul3aGfhqMDUVv+ 9ZmwVCSDrHFN4G3XytEr3W09oiYXTQhJqGrairSkt4Yi6Or27ThxeI2bHabQ21dITohcWyhH0GKFBW wWyL7kFw/j9eSEbnQvVzEagZOP6hsRMTUxPklJRUiD+iupMibMHHrqz6tt2XJ3p8e3nRx6udINdsKj Pt41jfjyFOQ+Yu3Pehpe0LSYINYhgPZON9svsPDJe+wxfKbmIoLYfqlGFCdmqlDfBWdF4ZQv76hLHc lKvIacBatj9SCJE8hEnq8C44W3S8yKm+k3MA2E7gq3NSjgIVd6GXO8FrSdWb14ah/DwUdnm5L6yX+6 PcQTh9aibawWhD6XyHDL7rNLgj/Xnq3JYVhvAApF669uTSDlgFCztMKzS5qQ==
+X-Developer-Key: i=keescook@chromium.org; a=openpgp; fpr=A5C3F68F229DD60F723E6E138972F4DFDC6DC026
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 20, 2023 at 10:26:21AM -0700, Michael Chan wrote:
-> On Tue, Jun 20, 2023 at 7:52 AM Ivan Vecera <ivecera@redhat.com> wrote:
-> >
-> > Link VF representors to parent PCI device to benefit from
-> > systemd defined naming scheme.
-> >
-> > Without this change the representor is visible as ethN.
-> >
-> > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
-> 
-> Thanks.
-> 
-> Reviewed-by: Michael Chan <michael.chan@broadcon.com>
+struct mux_adth actually ends with multiple struct mux_adth_dg members.
+This is seen both in the comments about the member:
 
-nit:) broadcon -> broadcom
+/**
+ * struct mux_adth - Structure of the Aggregated Datagram Table Header.
+ ...
+ * @dg:		datagramm table with variable length
+ */
 
+and in the preparation for populating it:
+
+                        adth_dg_size = offsetof(struct mux_adth, dg) +
+                                        ul_adb->dg_count[i] * sizeof(*dg);
+			...
+                        adth_dg_size -= offsetof(struct mux_adth, dg);
+                        memcpy(&adth->dg, ul_adb->dg[i], adth_dg_size);
+
+This was reported as a run-time false positive warning:
+
+memcpy: detected field-spanning write (size 16) of single field "&adth->dg" at drivers/net/wwan/iosm/iosm_ipc_mux_codec.c:852 (size 8)
+
+Adjust the struct mux_adth definition and associated sizeof() math; no binary
+output differences are observed in the resulting object file.
+
+Reported-by: Florian Klink <flokli@flokli.de>
+Closes: https://lore.kernel.org/lkml/dbfa25f5-64c8-5574-4f5d-0151ba95d232@gmail.com/
+Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support")
+Cc: M Chetan Kumar <m.chetan.kumar@intel.com>
+Cc: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Intel Corporation <linuxwwan@intel.com>
+Cc: Loic Poulain <loic.poulain@linaro.org>
+Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+Cc: netdev@vger.kernel.org
+Signed-off-by: Kees Cook <keescook@chromium.org>
+---
+ drivers/net/wwan/iosm/iosm_ipc_mux_codec.c | 15 ++++++---------
+ drivers/net/wwan/iosm/iosm_ipc_mux_codec.h |  2 +-
+ 2 files changed, 7 insertions(+), 10 deletions(-)
+
+diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+index d6b166fc5c0e..bff46f7ca59f 100644
+--- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
++++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.c
+@@ -626,14 +626,12 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
+ 		if (adth->signature != cpu_to_le32(IOSM_AGGR_MUX_SIG_ADTH))
+ 			goto adb_decode_err;
+ 
+-		if (le16_to_cpu(adth->table_length) < (sizeof(struct mux_adth) -
+-				sizeof(struct mux_adth_dg)))
++		if (le16_to_cpu(adth->table_length) < sizeof(struct mux_adth))
+ 			goto adb_decode_err;
+ 
+ 		/* Calculate the number of datagrams. */
+ 		nr_of_dg = (le16_to_cpu(adth->table_length) -
+-					sizeof(struct mux_adth) +
+-					sizeof(struct mux_adth_dg)) /
++					sizeof(struct mux_adth)) /
+ 					sizeof(struct mux_adth_dg);
+ 
+ 		/* Is the datagram table empty ? */
+@@ -649,7 +647,7 @@ static void mux_dl_adb_decode(struct iosm_mux *ipc_mux,
+ 		}
+ 
+ 		/* New aggregated datagram table. */
+-		dg = &adth->dg;
++		dg = adth->dg;
+ 		if (mux_dl_process_dg(ipc_mux, adbh, dg, skb, if_id,
+ 				      nr_of_dg) < 0)
+ 			goto adb_decode_err;
+@@ -849,7 +847,7 @@ static void ipc_mux_ul_encode_adth(struct iosm_mux *ipc_mux,
+ 			adth->if_id = i;
+ 			adth->table_length = cpu_to_le16(adth_dg_size);
+ 			adth_dg_size -= offsetof(struct mux_adth, dg);
+-			memcpy(&adth->dg, ul_adb->dg[i], adth_dg_size);
++			memcpy(adth->dg, ul_adb->dg[i], adth_dg_size);
+ 			ul_adb->if_cnt++;
+ 		}
+ 
+@@ -1426,14 +1424,13 @@ static int ipc_mux_get_payload_from_adb(struct iosm_mux *ipc_mux,
+ 
+ 		if (adth->signature == cpu_to_le32(IOSM_AGGR_MUX_SIG_ADTH)) {
+ 			nr_of_dg = (le16_to_cpu(adth->table_length) -
+-					sizeof(struct mux_adth) +
+-					sizeof(struct mux_adth_dg)) /
++					sizeof(struct mux_adth)) /
+ 					sizeof(struct mux_adth_dg);
+ 
+ 			if (nr_of_dg <= 0)
+ 				return payload_size;
+ 
+-			dg = &adth->dg;
++			dg = adth->dg;
+ 
+ 			for (i = 0; i < nr_of_dg; i++, dg++) {
+ 				if (le32_to_cpu(dg->datagram_index) <
+diff --git a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.h b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.h
+index 5d4e3b89542c..f8df88f816c4 100644
+--- a/drivers/net/wwan/iosm/iosm_ipc_mux_codec.h
++++ b/drivers/net/wwan/iosm/iosm_ipc_mux_codec.h
+@@ -161,7 +161,7 @@ struct mux_adth {
+ 	u8 opt_ipv4v6;
+ 	__le32 next_table_index;
+ 	__le32 reserved2;
+-	struct mux_adth_dg dg;
++	struct mux_adth_dg dg[];
+ };
+ 
+ /**
+-- 
+2.34.1
 
 
