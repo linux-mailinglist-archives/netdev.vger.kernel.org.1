@@ -1,245 +1,154 @@
-Return-Path: <netdev+bounces-12354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12369-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 98998737322
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:45:36 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C6D673734D
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:53:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA98A1C20C99
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 17:45:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 165DF28145B
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 17:53:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BCB5B2AB5E;
-	Tue, 20 Jun 2023 17:45:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382AF171A1;
+	Tue, 20 Jun 2023 17:52:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF8052AB5B
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 17:45:33 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-17.smtpout.orange.fr [80.12.242.17])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 48ED51716
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 10:45:31 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id BfPwqBhhGRr8lBfPxqaN3y; Tue, 20 Jun 2023 19:45:29 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1687283129;
-	bh=2/+waEnWzeXtMJOt/78trIu5ZlSU+NbBWG4rUb/r93w=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=PEXJmsHVM3HsE5eoiGCxiZusIAoa9bGMvrAaQlxRo11qisIgoLn3uYvyOowc3PL7E
-	 UuSKuaL8Kfa5Gp03Dq6qLKeLqcBwnq27wyv+a/9Iq7rHtT5bMeVKS5+cOTJHzs4XQv
-	 oGfQ7COcU9u2e16RCPixnJedOPVxnBEO1i+Aw4BxIrYP049kT8hFYwjQnAZeR4ABBK
-	 TOENup196BhnkA+0M54AYCg08IFgkyi77fjIq5xSALfJioevaHxL19gRVGvWSldjdh
-	 AVSamY5b7h4Il3CS4BE6kqtbXmu/Hb4nkW0NtbLjs1FhsyUQk+CaIane+4+2NG92AC
-	 V7bhMzTNyoc+g==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Tue, 20 Jun 2023 19:45:29 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <6f7a5ee4-7ebf-2973-de3f-b72af631f52a@wanadoo.fr>
-Date: Tue, 20 Jun 2023 19:45:24 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D03016424
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 17:52:28 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2A271712
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 10:52:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687283546; x=1718819546;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ulYIcF00BwOYLeM6GI/k7JdX63YqBFs/HgmHj3tOllk=;
+  b=nqAMF29PXgmkJjrVnhFg2vDxVaL297E7AtnrqJyCTCVSP1RZF71+/7Zt
+   boNFy/WWhjKHb+M1ZlEDxw1K3pJCpMYykxIDd6XXSu1olppJlaOlk8JwK
+   vnu1aIf+HSGc9INMgbnkDV1VZhLzGfdV7SE7/1eCtsm9t4rm3YawD6uOz
+   wu5eMn2OrIu1YBCwpieXOEtU5nYmimCoV839cAE/OcmxzIfBAqu4zAjEg
+   rW8zzSevXKAUVisK9ABKB1ETc5X2jElxsHVN4f4GROr5RK5Ii0/1TELKz
+   u523XX0bOupOFx7/TD3+mK6o7o+9Wzojpb7A/VLFd/BCiybr6kmCSj0x1
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="425894404"
+X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
+   d="scan'208";a="425894404"
+Received: from orsmga007.jf.intel.com ([10.7.209.58])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 10:52:25 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="708383378"
+X-IronPort-AV: E=Sophos;i="6.00,257,1681196400"; 
+   d="scan'208";a="708383378"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by orsmga007.jf.intel.com with ESMTP; 20 Jun 2023 10:52:25 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Ying Hsu <yinghsu@chromium.org>,
+	anthony.l.nguyen@intel.com,
+	aleksandr.loktionov@intel.com,
+	Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com>
+Subject: [PATCH net-next] igb: Fix igb_down hung on surprise removal
+Date: Tue, 20 Jun 2023 10:47:32 -0700
+Message-Id: <20230620174732.4145155-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH net-next] net: phy: at803x: Use
- devm_regulator_get_enable_optional()
-Content-Language: fr, en-US
-To: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Liam Girdwood <lgirdwood@gmail.com>, Mark Brown <broonie@kernel.org>
-Cc: linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org,
- netdev@vger.kernel.org
-References: <f5fdf1a50bb164b4f59409d3a70a2689515d59c9.1687011839.git.christophe.jaillet@wanadoo.fr>
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <f5fdf1a50bb164b4f59409d3a70a2689515d59c9.1687011839.git.christophe.jaillet@wanadoo.fr>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 17/06/2023 à 16:24, Christophe JAILLET a écrit :
-> Use devm_regulator_get_enable_optional() instead of hand writing it. It
-> saves some line of code.
-> 
-> Signed-off-by: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-> ---
-> Compile tested-only.
-> 
-> If my reading is correct, regulator_disable() is still called in the same
-> order, should an error occur or the driver be removed.
-> ---
->   drivers/net/phy/at803x.c | 44 +++++++---------------------------------
->   1 file changed, 7 insertions(+), 37 deletions(-)
-> 
-> diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-> index 656136628ffd..c1f307d90518 100644
-> --- a/drivers/net/phy/at803x.c
-> +++ b/drivers/net/phy/at803x.c
-> @@ -304,7 +304,6 @@ struct at803x_priv {
->   	bool is_1000basex;
->   	struct regulator_dev *vddio_rdev;
->   	struct regulator_dev *vddh_rdev;
-> -	struct regulator *vddio;
->   	u64 stats[ARRAY_SIZE(at803x_hw_stats)];
->   };
->   
-> @@ -824,11 +823,11 @@ static int at803x_parse_dt(struct phy_device *phydev)
->   		if (ret < 0)
->   			return ret;
->   
-> -		priv->vddio = devm_regulator_get_optional(&phydev->mdio.dev,
-> -							  "vddio");
-> -		if (IS_ERR(priv->vddio)) {
+From: Ying Hsu <yinghsu@chromium.org>
 
-Hi,
+In a setup where a Thunderbolt hub connects to Ethernet and a display
+through USB Type-C, users may experience a hung task timeout when they
+remove the cable between the PC and the Thunderbolt hub.
+This is because the igb_down function is called multiple times when
+the Thunderbolt hub is unplugged. For example, the igb_io_error_detected
+triggers the first call, and the igb_remove triggers the second call.
+The second call to igb_down will block at napi_synchronize.
+Here's the call trace:
+    __schedule+0x3b0/0xddb
+    ? __mod_timer+0x164/0x5d3
+    schedule+0x44/0xa8
+    schedule_timeout+0xb2/0x2a4
+    ? run_local_timers+0x4e/0x4e
+    msleep+0x31/0x38
+    igb_down+0x12c/0x22a [igb 6615058754948bfde0bf01429257eb59f13030d4]
+    __igb_close+0x6f/0x9c [igb 6615058754948bfde0bf01429257eb59f13030d4]
+    igb_close+0x23/0x2b [igb 6615058754948bfde0bf01429257eb59f13030d4]
+    __dev_close_many+0x95/0xec
+    dev_close_many+0x6e/0x103
+    unregister_netdevice_many+0x105/0x5b1
+    unregister_netdevice_queue+0xc2/0x10d
+    unregister_netdev+0x1c/0x23
+    igb_remove+0xa7/0x11c [igb 6615058754948bfde0bf01429257eb59f13030d4]
+    pci_device_remove+0x3f/0x9c
+    device_release_driver_internal+0xfe/0x1b4
+    pci_stop_bus_device+0x5b/0x7f
+    pci_stop_bus_device+0x30/0x7f
+    pci_stop_bus_device+0x30/0x7f
+    pci_stop_and_remove_bus_device+0x12/0x19
+    pciehp_unconfigure_device+0x76/0xe9
+    pciehp_disable_slot+0x6e/0x131
+    pciehp_handle_presence_or_link_change+0x7a/0x3f7
+    pciehp_ist+0xbe/0x194
+    irq_thread_fn+0x22/0x4d
+    ? irq_thread+0x1fd/0x1fd
+    irq_thread+0x17b/0x1fd
+    ? irq_forced_thread_fn+0x5f/0x5f
+    kthread+0x142/0x153
+    ? __irq_get_irqchip_state+0x46/0x46
+    ? kthread_associate_blkcg+0x71/0x71
+    ret_from_fork+0x1f/0x30
 
-my patch is not broken by itself, but the existing code looks spurious.
+In this case, igb_io_error_detected detaches the network interface
+and requests a PCIE slot reset, however, the PCIE reset callback is
+not being invoked and thus the Ethernet connection breaks down.
+As the PCIE error in this case is a non-fatal one, requesting a
+slot reset can be avoided.
+This patch fixes the task hung issue and preserves Ethernet
+connection by ignoring non-fatal PCIE errors.
 
-If the optional regulator is not found, then -ENODEV is returned, 
-at803x_parse_dt() will return this error and the probe will fail.
+Signed-off-by: Ying Hsu <yinghsu@chromium.org>
+Tested-by: Pucha Himasekhar Reddy <himasekharx.reddy.pucha@intel.com> (A Contingent worker at Intel)
+Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+---
+ drivers/net/ethernet/intel/igb/igb_main.c | 5 +++++
+ 1 file changed, 5 insertions(+)
 
-It looks that the test should be more subtle.
-
-I can send a follow up patch, unless there is a better way to fix the 
-pre-existing issue.
-
-See [1] for a more detailed explanation.
-
-CJ
-
-[1]: https://lore.kernel.org/all/ZJFqCQ8bbBoX3l1g@hovoldconsulting.com/
-
-> +		ret = devm_regulator_get_enable_optional(&phydev->mdio.dev,
-> +							 "vddio");
-> +		if (ret) {
->   			phydev_err(phydev, "failed to get VDDIO regulator\n");
-> -			return PTR_ERR(priv->vddio);
-> +			return ret;
->   		}
->   
->   		/* Only AR8031/8033 support 1000Base-X for SFP modules */
-> @@ -856,12 +855,6 @@ static int at803x_probe(struct phy_device *phydev)
->   	if (ret)
->   		return ret;
->   
-> -	if (priv->vddio) {
-> -		ret = regulator_enable(priv->vddio);
-> -		if (ret < 0)
-> -			return ret;
-> -	}
-> -
->   	if (phydev->drv->phy_id == ATH8031_PHY_ID) {
->   		int ccr = phy_read(phydev, AT803X_REG_CHIP_CONFIG);
->   		int mode_cfg;
-> @@ -869,10 +862,8 @@ static int at803x_probe(struct phy_device *phydev)
->   			.wolopts = 0,
->   		};
->   
-> -		if (ccr < 0) {
-> -			ret = ccr;
-> -			goto err;
-> -		}
-> +		if (ccr < 0)
-> +			return ccr;
->   		mode_cfg = ccr & AT803X_MODE_CFG_MASK;
->   
->   		switch (mode_cfg) {
-> @@ -890,25 +881,11 @@ static int at803x_probe(struct phy_device *phydev)
->   		ret = at803x_set_wol(phydev, &wol);
->   		if (ret < 0) {
->   			phydev_err(phydev, "failed to disable WOL on probe: %d\n", ret);
-> -			goto err;
-> +			return ret;
->   		}
->   	}
->   
->   	return 0;
-> -
-> -err:
-> -	if (priv->vddio)
-> -		regulator_disable(priv->vddio);
-> -
-> -	return ret;
-> -}
-> -
-> -static void at803x_remove(struct phy_device *phydev)
-> -{
-> -	struct at803x_priv *priv = phydev->priv;
-> -
-> -	if (priv->vddio)
-> -		regulator_disable(priv->vddio);
->   }
->   
->   static int at803x_get_features(struct phy_device *phydev)
-> @@ -2021,7 +1998,6 @@ static struct phy_driver at803x_driver[] = {
->   	.name			= "Qualcomm Atheros AR8035",
->   	.flags			= PHY_POLL_CABLE_TEST,
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.config_aneg		= at803x_config_aneg,
->   	.config_init		= at803x_config_init,
->   	.soft_reset		= genphy_soft_reset,
-> @@ -2043,7 +2019,6 @@ static struct phy_driver at803x_driver[] = {
->   	.name			= "Qualcomm Atheros AR8030",
->   	.phy_id_mask		= AT8030_PHY_ID_MASK,
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.config_init		= at803x_config_init,
->   	.link_change_notify	= at803x_link_change_notify,
->   	.set_wol		= at803x_set_wol,
-> @@ -2059,7 +2034,6 @@ static struct phy_driver at803x_driver[] = {
->   	.name			= "Qualcomm Atheros AR8031/AR8033",
->   	.flags			= PHY_POLL_CABLE_TEST,
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.config_init		= at803x_config_init,
->   	.config_aneg		= at803x_config_aneg,
->   	.soft_reset		= genphy_soft_reset,
-> @@ -2082,7 +2056,6 @@ static struct phy_driver at803x_driver[] = {
->   	PHY_ID_MATCH_EXACT(ATH8032_PHY_ID),
->   	.name			= "Qualcomm Atheros AR8032",
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.flags			= PHY_POLL_CABLE_TEST,
->   	.config_init		= at803x_config_init,
->   	.link_change_notify	= at803x_link_change_notify,
-> @@ -2100,7 +2073,6 @@ static struct phy_driver at803x_driver[] = {
->   	PHY_ID_MATCH_EXACT(ATH9331_PHY_ID),
->   	.name			= "Qualcomm Atheros AR9331 built-in PHY",
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.suspend		= at803x_suspend,
->   	.resume			= at803x_resume,
->   	.flags			= PHY_POLL_CABLE_TEST,
-> @@ -2117,7 +2089,6 @@ static struct phy_driver at803x_driver[] = {
->   	PHY_ID_MATCH_EXACT(QCA9561_PHY_ID),
->   	.name			= "Qualcomm Atheros QCA9561 built-in PHY",
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.suspend		= at803x_suspend,
->   	.resume			= at803x_resume,
->   	.flags			= PHY_POLL_CABLE_TEST,
-> @@ -2183,7 +2154,6 @@ static struct phy_driver at803x_driver[] = {
->   	.name			= "Qualcomm QCA8081",
->   	.flags			= PHY_POLL_CABLE_TEST,
->   	.probe			= at803x_probe,
-> -	.remove			= at803x_remove,
->   	.config_intr		= at803x_config_intr,
->   	.handle_interrupt	= at803x_handle_interrupt,
->   	.get_tunable		= at803x_get_tunable,
+diff --git a/drivers/net/ethernet/intel/igb/igb_main.c b/drivers/net/ethernet/intel/igb/igb_main.c
+index 9fcac96022d7..9a2561409b06 100644
+--- a/drivers/net/ethernet/intel/igb/igb_main.c
++++ b/drivers/net/ethernet/intel/igb/igb_main.c
+@@ -9587,6 +9587,11 @@ static pci_ers_result_t igb_io_error_detected(struct pci_dev *pdev,
+ 	struct net_device *netdev = pci_get_drvdata(pdev);
+ 	struct igb_adapter *adapter = netdev_priv(netdev);
+ 
++	if (state == pci_channel_io_normal) {
++		dev_warn(&pdev->dev, "Non-correctable non-fatal error reported.\n");
++		return PCI_ERS_RESULT_CAN_RECOVER;
++	}
++
+ 	netif_device_detach(netdev);
+ 
+ 	if (state == pci_channel_io_perm_failure)
+-- 
+2.38.1
 
 
