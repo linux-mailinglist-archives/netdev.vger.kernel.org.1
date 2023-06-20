@@ -1,113 +1,147 @@
-Return-Path: <netdev+bounces-12413-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12415-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBD3B73760D
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 22:29:13 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A8546737682
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 23:17:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76A9E281312
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 20:29:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63E6A2813CB
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCA2D182C1;
-	Tue, 20 Jun 2023 20:29:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3891117ACF;
+	Tue, 20 Jun 2023 21:17:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C192D17FFF
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 20:29:10 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A37BF1726
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 13:29:08 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b512309d18so26250365ad.3
-        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 13:29:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1687292948; x=1689884948;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZA9dgza1t316m8G0sWpsNY6BE+ynDTHmP6tBl5tH3qA=;
-        b=CMn9j5Qr0xGH6DPGZmJc+8hF5CS7hFNW/AUBWIcKDkQBdJ5uF/Iv6grWO3k2zaFj5R
-         Pcqdzrq3VhdcrvlV/2cztlPSb2r9XJBRdRkJ8sH2KLckg9WUwzrqJmnuo9T18h65CsPj
-         Q/sTtqBKU0QjMuls8JQTtSdsBjlIdAXmJUbvw=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687292948; x=1689884948;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ZA9dgza1t316m8G0sWpsNY6BE+ynDTHmP6tBl5tH3qA=;
-        b=aFMdB/sjbT743K0QEpfyGS5n1QwE7SXl7AcDtLXYoPXlLBUjqeJreDkrfCTcB2BBkm
-         fHhuk59m8gnHnvswBJgzOtJgsTTYmy/70z+rRUfd7/VMdwkOXjd14oWMfIKCYWE2aW/p
-         SAg53UqtEf0hJVqmKBJNpc5qc7NwD/7U5xiLCWe+ee82uXAMd0V2NZ4yGX0pa7Kh+yxE
-         m6M+W7dHHQoXH/NfRAR6Vk2HLD/M9TdUPuU7KRcLbN4S3HMfy79AE73KFzQl/EWsOaWl
-         4544NH0WaGNby7DAYRs+jTj0T3gj6AQaaPFbP7eWsASDaX8USiAdKMX4N+PgqQqp41KH
-         36yQ==
-X-Gm-Message-State: AC+VfDyhm5fVbp8TBIeHvhmJNWjs5ivK+I9uwQxSYrkaFAKLUoZfkqaF
-	zzd6wSCf6QkgSRfqKA1Si9b/+A==
-X-Google-Smtp-Source: ACHHUZ6LzhHQEkbmov28C9WgtfEbYhAG2m29rvQZ0Ua4ICR8aQDGRoXYdt43oeJZee8pqeivB1cpJg==
-X-Received: by 2002:a17:903:2311:b0:1b6:6b18:94ff with SMTP id d17-20020a170903231100b001b66b1894ffmr5114043plh.34.1687292948154;
-        Tue, 20 Jun 2023 13:29:08 -0700 (PDT)
-Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
-        by smtp.gmail.com with ESMTPSA id c2-20020a170903234200b001b6740207d2sm1990746plh.215.2023.06.20.13.29.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 13:29:07 -0700 (PDT)
-From: Kees Cook <keescook@chromium.org>
-To: fw@strlen.de,
-	pablo@netfilter.org,
-	azeemshaikh38@gmail.com,
-	kadlec@netfilter.org
-Cc: Kees Cook <keescook@chromium.org>,
-	netfilter-devel@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	coreteam@netfilter.org,
-	linux-hardening@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfilter: ipset: Replace strlcpy with strscpy
-Date: Tue, 20 Jun 2023 13:28:24 -0700
-Message-Id: <168729290242.455922.9357942903753232037.b4-ty@chromium.org>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230613003437.3538694-1-azeemshaikh38@gmail.com>
-References: <20230613003437.3538694-1-azeemshaikh38@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA8CF174D1;
+	Tue, 20 Jun 2023 21:17:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B1C7CC433C9;
+	Tue, 20 Jun 2023 21:17:04 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687295825;
+	bh=VSt5kV5zA9koKw+yON45/sHrnzDV4SzSWC86WRbHIeY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=KQGv0q9HX7IhJ8yP+50t80IdMhMWRtzzvDXTZEhNbTJH3ZV0WdqcrShRSDg5Bjkwb
+	 BTfnQyNnkTAdD/JNyDqbqt13s6bOKsk62tuunQgHrTk+xC/nfCTIaBRLSkiJxXRAGN
+	 NgJfGtEduvDnd42gkm4qnCjJXNx4dsGlR0ca9gWwldikrLKFCKnzLnP+aXsaoD2Jtw
+	 Jz4VrM7ZNsxFA8G2eUm+xCa4UuUSQnlwsYr2afi+fFcitbgsPR+HoEthmk7IR9eWDO
+	 Z5RXRSQ5lagEeDiSAwmqS3wdbvWGwS4SHLfpc8dxuOA1QIKLZxOGIV6V2N8wCRk0nC
+	 BXhQjK+JT8RDg==
+Date: Tue, 20 Jun 2023 23:16:59 +0200
+From: Lorenzo Bianconi <lorenzo@kernel.org>
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
+	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+	kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Maryam Tahhan <mtahhan@redhat.com>, bpf <bpf@vger.kernel.org>
+Subject: Re: [PATCH net-next v3 3/4] page_pool: introduce page_pool_alloc()
+ API
+Message-ID: <ZJIXSyjxPf7FQQKo@lore-rh-laptop>
+References: <c06f6f59-6c35-4944-8f7a-7f6f0e076649@huawei.com>
+ <CAKgT0UccmDe+CE6=zDYQHi1=3vXf5MptzDo+BsPrKdmP5j9kgQ@mail.gmail.com>
+ <0ba1bf9c-2e45-cd44-60d3-66feeb3268f3@redhat.com>
+ <dcc9db4c-207b-e118-3d84-641677cd3d80@huawei.com>
+ <f8ce176f-f975-af11-641c-b56c53a8066a@redhat.com>
+ <CAKgT0UfzP30OiBQu+YKefLD+=32t+oA6KGzkvsW6k7CMTXU8KA@mail.gmail.com>
+ <699563f5-c4fa-0246-5e79-61a29e1a8db3@redhat.com>
+ <CAKgT0UcNOYwxRP_zkaBaZh-VBL-CriL8dFG-VY7-FUyzxfHDWw@mail.gmail.com>
+ <ZI8dP5+guKdR7IFE@lore-desk>
+ <CAKgT0UfFVFa4zT2DnPZEGaHp0uh5V1u1aGymgdL4Vu8Q1VV8hQ@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="IDE08eaH4RavKRtY"
+Content-Disposition: inline
+In-Reply-To: <CAKgT0UfFVFa4zT2DnPZEGaHp0uh5V1u1aGymgdL4Vu8Q1VV8hQ@mail.gmail.com>
 
-On Tue, 13 Jun 2023 00:34:37 +0000, Azeem Shaikh wrote:
-> strlcpy() reads the entire source buffer first.
-> This read may exceed the destination size limit.
-> This is both inefficient and can lead to linear read
-> overflows if a source string is not NUL-terminated [1].
-> In an effort to remove strlcpy() completely [2], replace
-> strlcpy() here with strscpy().
-> 
-> [...]
 
-Since this got Acked and it's a trivial change, I'll take this via the
-hardening tree. Thanks!
+--IDE08eaH4RavKRtY
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-Applied to for-next/hardening, thanks!
+[...]
 
-[1/1] netfilter: ipset: Replace strlcpy with strscpy
-      https://git.kernel.org/kees/c/0b2fa86361f4
+> > I did some experiments using page_frag_cache/page_frag_alloc() instead =
+of
+> > page_pools in a simple environment I used to test XDP for veth driver.
+> > In particular, I allocate a new buffer in veth_convert_skb_to_xdp_buff(=
+) from
+> > the page_frag_cache in order to copy the full skb in the new one, actua=
+lly
+> > "linearizing" the packet (since we know the original skb length).
+> > I run an iperf TCP connection over a veth pair where the
+> > remote device runs the xdp_rxq_info sample (available in the kernel sou=
+rce
+> > tree, with action XDP_PASS):
+> >
+> > TCP clietn -- v0 =3D=3D=3D v1 (xdp_rxq_info) -- TCP server
+> >
+> > net-next (page_pool):
+> > - MTU 1500B: ~  7.5 Gbps
+> > - MTU 8000B: ~ 15.3 Gbps
+> >
+> > net-next + page_frag_alloc:
+> > - MTU 1500B: ~  8.4 Gbps
+> > - MTU 8000B: ~ 14.7 Gbps
+> >
+> > It seems there is no a clear "win" situation here (at least in this env=
+ironment
+> > and we this simple approach). Moreover:
+>=20
+> For the 1500B packets it is a win, but for 8000B it looks like there
+> is a regression. Any idea what is causing it?
 
--- 
-Kees Cook
+nope, I have not looked into it yet.
 
+>=20
+> > - can the linearization introduce any issue whenever we perform XDP_RED=
+IRECT
+> >   into a destination device?
+>=20
+> It shouldn't. If it does it would probably point to an issue w/ the
+> destination driver rather than an issue with the code doing this.
+
+ack, fine.
+
+>=20
+> > - can the page_frag_cache introduce more memory fragmentation (IIRC we =
+were
+> >   experiencing this issue in mt76 before switching to page_pools).
+>=20
+> I think it largely depends on where the packets are ending up. I know
+> this is the approach we are using for sockets, see
+> skb_page_frag_refill(). If nothing else, if you took a similar
+> approach to it you might be able to bypass the need for the
+> page_frag_cache itself, although you would likely still end up
+> allocating similar structures.
+
+ack.
+
+Regards,
+Lorenzo
+
+--IDE08eaH4RavKRtY
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iHUEABYKAB0WIQTquNwa3Txd3rGGn7Y6cBh0uS2trAUCZJIXSAAKCRA6cBh0uS2t
+rLojAP4vEPyrpT81w5Pjsfhued/eWj+HL/TUK74YFhQg7gHJ7gD/TpqIHLpG45Tn
+cY88letgy76oS6jrFFZlVyzqmkuDXwk=
+=dC3S
+-----END PGP SIGNATURE-----
+
+--IDE08eaH4RavKRtY--
 
