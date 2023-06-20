@@ -1,753 +1,328 @@
-Return-Path: <netdev+bounces-12529-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12570-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09143737F40
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:01:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68F7673824F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:30:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B22032813DF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:01:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BEDC1C20C7A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:30:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1968DDAA;
-	Wed, 21 Jun 2023 10:01:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5409A11CBD;
+	Wed, 21 Jun 2023 11:30:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF837C8D7
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:01:29 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id BEAC51992;
-	Wed, 21 Jun 2023 03:01:25 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 35LA0GzK4021280, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36505.realtek.com.tw[172.21.6.25])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 35LA0GzK4021280
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-	Wed, 21 Jun 2023 18:00:16 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXH36505.realtek.com.tw (172.21.6.25) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.32; Wed, 21 Jun 2023 18:00:37 +0800
-Received: from localhost.localdomain (172.21.132.192) by
- RTEXMBS04.realtek.com.tw (172.21.6.97) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Wed, 21 Jun 2023 18:00:36 +0800
-From: <hildawu@realtek.com>
-To: <marcel@holtmann.org>
-CC: <johan.hedberg@gmail.com>, <luiz.dentz@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux-bluetooth@vger.kernel.org>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>, <apusaka@chromium.org>,
-        <mmandlik@google.com>, <yinghsu@chromium.org>,
-        <simon.horman@corigine.com>, <max.chou@realtek.com>,
-        <alex_lu@realsil.com.cn>, <kidman@realtek.com>
-Subject: [PATCH v5] Bluetooth: msft: Extended monitor tracking by address filter
-Date: Wed, 21 Jun 2023 18:00:31 +0800
-Message-ID: <20230621100031.19477-1-hildawu@realtek.com>
-X-Mailer: git-send-email 2.17.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4671EC147
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:30:04 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D34E72;
+	Wed, 21 Jun 2023 04:30:02 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3f900cd3f96so46052065e9.2;
+        Wed, 21 Jun 2023 04:30:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687347000; x=1689939000;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=dNYM1xDNj8qXOAJl8G0SV3ajmO0s2cTjxjuJEO6+NZ8=;
+        b=Rg8cq3+ialIqpiGV776GWWCrvhlrWrwfypNC0N2/1hU7UrEcY8QvWb6N7bqX//jbwK
+         QetVCLSeUHI9gLHM6o/HgZDtp2M5QUjgFRKkI+UqwwaV+c8n4r3kZ0DQBDoG+2TiWhD8
+         YHt6SGzwWoiQ1jZTm13flc+8J7f1BvESoa126frYnI6WP2O6ITTd1UdGDMxTuHUjTorb
+         p88cHu/FP9YhVI0FDelNQVbVWtrhPMMAUrD/cVN4dafbXu/8TTbvcO/7rMJrQ6drHO7k
+         B4WUj4Q2RyK3JG8EFAiO3Nzb9kdzo51i4jbeuhNh9A694VSc0/9K5RC+IXGC6Gpwn7gf
+         N+Rw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687347000; x=1689939000;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dNYM1xDNj8qXOAJl8G0SV3ajmO0s2cTjxjuJEO6+NZ8=;
+        b=ToIhUdUd7eeN7ABrNeGbUiJ64NMOY+kX1soMQEQCQFYvkbZKO7eMzs5hae3SWaF2bU
+         FU7SqTZf3vy7KApT2b3f3l9qcGToOvhpon31srMjxYkmbkhNF4Gs3FUPyM2h9kpYazYr
+         BB0cPqiLOBWHD3nLLKhLg7Qzx7jVtLJhr7vD6qofdCaOrOT1rUv1ierAsUtyc+NwXIaa
+         SgpPAhBKuAlC84TyyNy4diRlcS4/pRn8BEShZfYDBJYoMq6Z6HUnK7xdXFNNXcnLwdmw
+         0yDTm+x7aKK/YYlYbqltMHgkD5H717GukVZwfj48ysi0AYYiIXAv3eQiTQWVGFaWYWAr
+         J8xg==
+X-Gm-Message-State: AC+VfDxGWeCCpSJNatrEFk3zDR4YALAO8iimKgAwEIEGqgqiFrsPITgc
+	7gS3eZOgDAhbEeIMJJ+0SsE=
+X-Google-Smtp-Source: ACHHUZ6OxfJCGOtXeIp6uUYGHHlUpRiDMpJCG7swWbQhcp3thXjvtLjA0I9e0tjNKaaIDpKaBo2Yyg==
+X-Received: by 2002:a05:600c:295:b0:3f9:c8b2:dfbd with SMTP id 21-20020a05600c029500b003f9c8b2dfbdmr484988wmk.19.1687347000004;
+        Wed, 21 Jun 2023 04:30:00 -0700 (PDT)
+Received: from Ansuel-xps. (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
+        by smtp.gmail.com with ESMTPSA id f9-20020a7bc8c9000000b003f9b0f640b1sm4712216wml.22.2023.06.21.04.29.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 04:29:59 -0700 (PDT)
+Message-ID: <6492df37.7b0a0220.2a67f.9cd7@mx.google.com>
+X-Google-Original-Message-ID: <ZJH1azjleKH/mr9Z@Ansuel-xps.>
+Date: Tue, 20 Jun 2023 20:52:27 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH] net: dsa: qca8k: add support for
+ port_change_master
+References: <20230620063747.19175-1-ansuelsmth@gmail.com>
+ <20230620063747.19175-1-ansuelsmth@gmail.com>
+ <20230620201227.7sdb3zmwutwtmt2e@skbuf>
+ <64921dee.df0a0220.f64e1.72c7@mx.google.com>
+ <20230621102527.f47kmwminkhe7ttt@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [172.21.132.192]
-X-ClientProxiedBy: RTEXH36506.realtek.com.tw (172.21.6.27) To
- RTEXMBS04.realtek.com.tw (172.21.6.97)
-X-KSE-ServerInfo: RTEXMBS04.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-ServerInfo: RTEXH36505.realtek.com.tw, 9
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-KSE-Antivirus-Interceptor-Info: fallback
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621102527.f47kmwminkhe7ttt@skbuf>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Hilda Wu <hildawu@realtek.com>
+On Wed, Jun 21, 2023 at 01:25:27PM +0300, Vladimir Oltean wrote:
+> On Tue, Jun 20, 2023 at 03:04:28PM +0200, Christian Marangi wrote:
+> > > > +			if (dsa_port_is_cpu(dp))
+> > > > +				cpu_port_mask |= BIT(dp->index);
+> > > > +	} else {
+> > > > +		dp = dsa_port_from_netdev(master);
+> > > 
+> > > dsa_port_from_netdev() is implemented by calling:
+> > > 
+> > > static inline struct dsa_port *dsa_slave_to_port(const struct net_device *dev)
+> > > {
+> > > 	struct dsa_slave_priv *p = netdev_priv(dev);
+> > > 
+> > > 	return p->dp;
+> > > }
+> > > 
+> > > The "struct net_device *master" does not have a netdev_priv() of the
+> > > type "struct dsa_slave_priv *". So, this function does not do what you
+> > > want, but instead it messes through the guts of an unrelated private
+> > > structure, treating whatever it finds at offset 16 as a pointer, and
+> > > dereferincing that as a struct dsa_port *. I'm surprised it didn't
+> > > crash, to be frank.
+> > > 
+> > > To find the cpu_dp behind the master, you need to dereference
+> > > master->dsa_ptr (for which we don't have a helper).
+> > > 
+> > 
+> > I was searching for an helper but no luck. Is it safe to access
+> > master->dsa_ptr? In theory the caller of port_change_master should
+> > already check that the passed master is a dsa port?
+> 
+> *that the passed network interface is a master - netdev_uses_dsa()
+> 
+> What is attached to the DSA master through dev->dsa_ptr is the CPU port.
+> 
+> what makes a net_device be a DSA master is dsa_master_setup(), and what
+> makes it stop being that is dsa_master_teardown(). Both are called under
+> rtnl_lock(), so as long as you are in a calling context where that lock
+> is held, you can be sure that the value of netdev_uses_dsa() does not
+> change for a device - and thus the value of dev->dsa_ptr.
+>
+> > I see in other context that master->dsa_ptr is checked if not NULL.
+> > Should I do the same check here?
+> 
+> Nope. DSA takes care of passing a fully set up DSA master as the
+> "master" argument, and the calling convention is that rtnl_lock() is held.
+>
 
-Since limited tracking device per condition, this feature is to support
-tracking multiple devices concurrently.
-When a pattern monitor detects the device, this feature issues an address
-monitor for tracking that device. Let pattern monitor can keep monitor
-new devices.
-This feature adds an address filter when receiving a LE monitor device
-event which monitor handle is for a pattern, and the controller started
-monitoring the device. And this feature also has cancelled the monitor
-advertisement from address filters when receiving a LE monitor device
-event when the controller stopped monitoring the device specified by an
-address and monitor handle.
+Thanks for both clarification!
 
-Below is an example to know the feature adds the address filter.
+> > > > +	/* Assign the new CPU port in LOOKUP MEMBER */
+> > > > +	val |= cpu_port_mask;
+> > > > +
+> > > > +	ret = qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
+> > > > +			QCA8K_PORT_LOOKUP_MEMBER,
+> > > > +			val);
+> > > > +	if (ret)
+> > > > +		return ret;
+> > > > +
+> > > > +	/* Fast Age the port to flush FDB table */
+> > > > +	qca8k_port_fast_age(ds, port);
+> > > 
+> > > Why do you have to fast age the (user) port?
+> > > 
+> > 
+> > The 2 CPU port have a different mac address, is it a problem?
+> 
+> But fast ageing the user port (which is what "port" is, here) gets rid
+> of the FDB entries learned on that port as part of the bridging service,
+> and which have it as a *destination*. So I'm not sure how that operation
+> would help. The MAC address of the DSA masters, if learned at all, would
+> not point towards any user port but towards CPU ports.
+> 
+> FWIW, dsa_port_change_master() takes care of migrating/replaying a lot of
+> configuration, including the MAC addresses for local address filtering -
+> dsa_slave_unsync_ha() and dsa_slave_sync_ha().
+> 
 
-//Add MSFT pattern monitor
-< HCI Command: Vendor (0x3f|0x00f0) plen 14          #142 [hci0] 55.552420
-        03 b8 a4 03 ff 01 01 06 09 05 5f 52 45 46        .........._REF
-> HCI Event: Command Complete (0x0e) plen 6          #143 [hci0] 55.653960
-      Vendor (0x3f|0x00f0) ncmd 2
-        Status: Success (0x00)
-        03 00
+I notice that I require assisted_learning_on_cpu_port to make this
+actually work.
 
-//Got event from the pattern monitor
-> HCI Event: Vendor (0xff) plen 18                   #148 [hci0] 58.384953
-        23 79 54 33 77 88 97 68 02 00 fb c1 29 eb 27 b8  #yT3w..h....).'.
-        00 01                                            ..
+Wth this false, bridge fdb show still had entry with the MAC of the old
+master. With assisted, they gets correctly updated.
 
-//Add MSFT address monitor (Sample address: B8:27:EB:29:C1:FB)
-< HCI Command: Vendor (0x3f|0x00f0) plen 13          #149 [hci0] 58.385067
-        03 b8 a4 03 ff 04 00 fb c1 29 eb 27 b8           .........).'.
+> That being said, those 2 functions are dead code for your switch,
+> because dsa_switch_supports_uc_filtering() and dsa_switch_supports_mc_filtering()
+> both return false.
+> 
+> It would be good to hear from you how do you plan the qca8k driver to
+> send and receive packets. From looking at the code (learning on the CPU
+> port isn't enabled), I guess that the MAC addresses of the ports are
+> never programmed in the FDB and thus, they reach the CPU by flooding,
+> with the usual drawbacks that come with that - packets destined for
+> local termination will also be flooded to other stations in the bridging
+> domain. Getting rid of the reliance on flooding will have its own
+> challenges. You can't enable automatic address learning [ on the CPU
+> ports ] with multiple active CPU ports, because one FDB entry could ping
+> pong from one CPU port to the other, leading to packet loss from certain
+> user ports when the FDB entry points to the CPU port that isn't affine
+> to the inbound port. So you'd probably need to program some sort of
+> "multicast" FDB entries that target all CPU ports, and rely on the
+> PORT_VID_MEMBER field to restrict forwarding to only one of those CPU
+> ports at a time.
+> 
 
-//Report to userspace about found device (ADV Monitor Device Found)
-@ MGMT Event: Unknown (0x002f) plen 38           {0x0003} [hci0] 58.680042
-        01 00 fb c1 29 eb 27 b8 01 ce 00 00 00 00 16 00  ....).'.........
-        0a 09 4b 45 59 42 44 5f 52 45 46 02 01 06 03 19  ..KEYBD_REF.....
-        c1 03 03 03 12 18                                ......
+Eh I really think this is not trivial at all and I would love some help.
 
-//Got event from address monitor
-> HCI Event: Vendor (0xff) plen 18                   #152 [hci0] 58.672956
-        23 79 54 33 77 88 97 68 02 00 fb c1 29 eb 27 b8  #yT3w..h....).'.
-        01 01
+With further testing, to make this actually work I had to operate on the
+GLOBAL_FW_CTRL1 regs that handle how to treat unknown frames of all
+kind.
+They are classified as unknown when the DA is not contained in the ARL
+table and are split in IGMP, BROAD (broadcast), MULTI (multicast) and
+UNI (unicast) and just are just the FLOOD option.
+Saddly in the current configuration to make the secondary CPU port work,
+I had to set the flooding to both CPU port and I guess this is extremely
+wrong since I assume linux would receive double the packet for each
+unknown frame.
 
-Signed-off-by: Alex Lu <alex_lu@realsil.com.cn>
-Signed-off-by: Hilda Wu <hildawu@realtek.com>
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
----
-Changes in v5:
-- Change quirk name and description.
-- Add btmon sample
+And this match what you have theorized about the need of a multicast FDB
+entry I guess? Main problem is that I have some fear the switch doesn't
+support controlling flooding with ARL or ACL (but I have to check this
+better)
 
-Changes in v4:
-- Follow suggested, modification include allocate an address_filter
-  cb and pass to hci_cmd_sync_queue, etc.
+Just for reference this is the current fdb table 
 
-Changes in v3:
-- Added flag for the feature.
-- Modified debug message level.
-- Follow suggested, using reverse xmas tree in new code.
+01:00:5e:00:00:01 dev eth0 self permanent
+33:33:00:00:00:02 dev eth0 self permanent
+33:33:00:00:00:01 dev eth0 self permanent
+33:33:ff:f2:5d:50 dev eth0 self permanent
+33:33:ff:00:00:00 dev eth0 self permanent
+dc:ef:09:f2:5d:4f dev eth1 self permanent
+33:33:00:00:00:01 dev eth1 self permanent
+33:33:00:00:00:02 dev eth1 self permanent
+01:00:5e:00:00:01 dev eth1 self permanent
+33:33:ff:f2:5d:4f dev eth1 self permanent
+33:33:ff:00:00:00 dev eth1 self permanent
+c0:3e:ba:c1:d7:47 dev lan1 master br-lan
+dc:ef:09:f2:5d:4f dev lan1 vlan 1 master br-lan permanent
+dc:ef:09:f2:5d:4f dev lan1 master br-lan permanent
+c0:3e:ba:c1:d7:47 dev lan1 vlan 1 self
+33:33:00:00:00:01 dev wlan0 self permanent
+33:33:00:00:00:02 dev wlan0 self permanent
+33:33:00:00:00:01 dev wlan1 self permanent
+33:33:00:00:00:02 dev wlan1 self permanent
+33:33:00:00:00:01 dev br-lan self permanent
+33:33:00:00:00:02 dev br-lan self permanent
+01:00:5e:00:00:01 dev br-lan self permanent
+33:33:ff:00:00:01 dev br-lan self permanent
+33:33:ff:f2:5d:4f dev br-lan self permanent
+33:33:00:01:00:02 dev br-lan self permanent
+33:33:00:01:00:03 dev br-lan self permanent
+33:33:ff:00:00:00 dev br-lan self permanent
 
-Changes in v2:
-- Fixed build bot warning, removed un-used parameter.
-- Follow suggested, adjust for readability and idiomatic, modified
-  error case, etc.
----
----
- drivers/bluetooth/btrtl.c   |   4 +
- include/net/bluetooth/hci.h |  10 +
- net/bluetooth/msft.c        | 412 ++++++++++++++++++++++++++++++++++--
- 3 files changed, 411 insertions(+), 15 deletions(-)
+> > > > +
+> > > > +	/* Reenable port */
+> > > > +	qca8k_port_set_status(priv, port, 1);
+> > > 
+> > > or disable/enable it, for that matter?
+> > > 
+> > 
+> > The idea is sto stop any traffic flowing to one CPU to another before
+> > doing the change.
+> 
+> Both DSA masters are prepared to handle traffic when port_change_master()
+> is called, so unless there's some limitation in the qca8k driver, there
+> shouldn't be any in DSA.
+> 
 
-diff --git a/drivers/bluetooth/btrtl.c b/drivers/bluetooth/btrtl.c
-index 04399b3c39a0..ddae6524106d 100644
---- a/drivers/bluetooth/btrtl.c
-+++ b/drivers/bluetooth/btrtl.c
-@@ -1269,6 +1269,10 @@ void btrtl_set_quirks(struct hci_dev *hdev, struct btrtl_device_info *btrtl_dev)
- 		if (btrtl_dev->project_id == CHIP_ID_8852C)
- 			btrealtek_set_flag(hdev, REALTEK_ALT6_CONTINUOUS_TX_CHIP);
- 
-+		if (btrtl_dev->project_id == CHIP_ID_8852A ||
-+		    btrtl_dev->project_id == CHIP_ID_8852C)
-+			set_bit(HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER, &hdev->quirks);
-+
- 		hci_set_aosp_capable(hdev);
- 		break;
- 	default:
-diff --git a/include/net/bluetooth/hci.h b/include/net/bluetooth/hci.h
-index ab2f8f1817cf..5723405b833e 100644
---- a/include/net/bluetooth/hci.h
-+++ b/include/net/bluetooth/hci.h
-@@ -309,6 +309,16 @@ enum {
- 	 * to support it.
- 	 */
- 	HCI_QUIRK_BROKEN_SET_RPA_TIMEOUT,
-+
-+	/* When this quirk is set, MSFT extension monitor tracking by
-+	 * address filter is supported. Since tracking quantity of each
-+	 * pattern is limited, this feature supports tracking multiple
-+	 * devices concurrently if controller supports multiple
-+	 * address filters.
-+	 *
-+	 * This quirk must be set before hci_register_dev is called.
-+	 */
-+	HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER,
- };
- 
- /* HCI device flags */
-diff --git a/net/bluetooth/msft.c b/net/bluetooth/msft.c
-index bf5cee48916c..b80a2162a5c3 100644
---- a/net/bluetooth/msft.c
-+++ b/net/bluetooth/msft.c
-@@ -91,6 +91,33 @@ struct msft_ev_le_monitor_device {
- struct msft_monitor_advertisement_handle_data {
- 	__u8  msft_handle;
- 	__u16 mgmt_handle;
-+	__s8 rssi_high;
-+	__s8 rssi_low;
-+	__u8 rssi_low_interval;
-+	__u8 rssi_sampling_period;
-+	__u8 cond_type;
-+	struct list_head list;
-+};
-+
-+enum monitor_addr_filter_state {
-+	AF_STATE_IDLE,
-+	AF_STATE_ADDING,
-+	AF_STATE_ADDED,
-+	AF_STATE_REMOVING,
-+};
-+
-+#define MSFT_MONITOR_ADVERTISEMENT_TYPE_ADDR	0x04
-+struct msft_monitor_addr_filter_data {
-+	__u8     msft_handle;
-+	__u8     pattern_handle; /* address filters pertain to */
-+	__u16    mgmt_handle;
-+	int      state;
-+	__s8     rssi_high;
-+	__s8     rssi_low;
-+	__u8     rssi_low_interval;
-+	__u8     rssi_sampling_period;
-+	__u8     addr_type;
-+	bdaddr_t bdaddr;
- 	struct list_head list;
- };
- 
-@@ -99,9 +126,12 @@ struct msft_data {
- 	__u8  evt_prefix_len;
- 	__u8  *evt_prefix;
- 	struct list_head handle_map;
-+	struct list_head address_filters;
- 	__u8 resuming;
- 	__u8 suspending;
- 	__u8 filter_enabled;
-+	/* To synchronize add/remove address filter and monitor device event.*/
-+	struct mutex filter_lock;
- };
- 
- bool msft_monitor_supported(struct hci_dev *hdev)
-@@ -180,6 +210,24 @@ static struct msft_monitor_advertisement_handle_data *msft_find_handle_data
- 	return NULL;
- }
- 
-+/* This function requires the caller holds msft->filter_lock */
-+static struct msft_monitor_addr_filter_data *msft_find_address_data
-+			(struct hci_dev *hdev, u8 addr_type, bdaddr_t *addr,
-+			 u8 pattern_handle)
-+{
-+	struct msft_monitor_addr_filter_data *entry;
-+	struct msft_data *msft = hdev->msft_data;
-+
-+	list_for_each_entry(entry, &msft->address_filters, list) {
-+		if (entry->pattern_handle == pattern_handle &&
-+		    addr_type == entry->addr_type &&
-+		    !bacmp(addr, &entry->bdaddr))
-+			return entry;
-+	}
-+
-+	return NULL;
-+}
-+
- /* This function requires the caller holds hdev->lock */
- static int msft_monitor_device_del(struct hci_dev *hdev, __u16 mgmt_handle,
- 				   bdaddr_t *bdaddr, __u8 addr_type,
-@@ -240,6 +288,7 @@ static int msft_le_monitor_advertisement_cb(struct hci_dev *hdev, u16 opcode,
- 
- 	handle_data->mgmt_handle = monitor->handle;
- 	handle_data->msft_handle = rp->handle;
-+	handle_data->cond_type   = MSFT_MONITOR_ADVERTISEMENT_TYPE_PATTERN;
- 	INIT_LIST_HEAD(&handle_data->list);
- 	list_add(&handle_data->list, &msft->handle_map);
- 
-@@ -254,6 +303,70 @@ static int msft_le_monitor_advertisement_cb(struct hci_dev *hdev, u16 opcode,
- 	return status;
- }
- 
-+/* This function requires the caller holds hci_req_sync_lock */
-+static void msft_remove_addr_filters_sync(struct hci_dev *hdev, u8 handle)
-+{
-+	struct msft_monitor_addr_filter_data *address_filter, *n;
-+	struct msft_cp_le_cancel_monitor_advertisement cp;
-+	struct msft_data *msft = hdev->msft_data;
-+	struct list_head head;
-+	struct sk_buff *skb;
-+
-+	INIT_LIST_HEAD(&head);
-+
-+	/* Cancel all corresponding address monitors */
-+	mutex_lock(&msft->filter_lock);
-+
-+	list_for_each_entry_safe(address_filter, n, &msft->address_filters,
-+				 list) {
-+		if (address_filter->pattern_handle != handle)
-+			continue;
-+
-+		list_del(&address_filter->list);
-+
-+		/* Keep the address filter and let
-+		 * msft_add_address_filter_sync() remove and free the address
-+		 * filter.
-+		 */
-+		if (address_filter->state == AF_STATE_ADDING) {
-+			address_filter->state = AF_STATE_REMOVING;
-+			continue;
-+		}
-+
-+		/* Keep the address filter and let
-+		 * msft_cancel_address_filter_sync() remove and free the address
-+		 * filter
-+		 */
-+		if (address_filter->state == AF_STATE_REMOVING)
-+			continue;
-+
-+		list_add_tail(&address_filter->list, &head);
-+	}
-+
-+	mutex_unlock(&msft->filter_lock);
-+
-+	list_for_each_entry_safe(address_filter, n, &head, list) {
-+		list_del(&address_filter->list);
-+
-+		cp.sub_opcode = MSFT_OP_LE_CANCEL_MONITOR_ADVERTISEMENT;
-+		cp.handle = address_filter->msft_handle;
-+
-+		skb = __hci_cmd_sync(hdev, hdev->msft_opcode, sizeof(cp), &cp,
-+				     HCI_CMD_TIMEOUT);
-+		if (IS_ERR_OR_NULL(skb)) {
-+			kfree(address_filter);
-+			continue;
-+		}
-+
-+		kfree_skb(skb);
-+
-+		bt_dev_dbg(hdev, "MSFT: Canceled device %pMR address filter",
-+			   &address_filter->bdaddr);
-+
-+		kfree(address_filter);
-+	}
-+}
-+
- static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
- 						   u16 opcode,
- 						   struct adv_monitor *monitor,
-@@ -263,6 +376,7 @@ static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
- 	struct msft_monitor_advertisement_handle_data *handle_data;
- 	struct msft_data *msft = hdev->msft_data;
- 	int status = 0;
-+	u8 msft_handle;
- 
- 	rp = (struct msft_rp_le_cancel_monitor_advertisement *)skb->data;
- 	if (skb->len < sizeof(*rp)) {
-@@ -293,11 +407,17 @@ static int msft_le_cancel_monitor_advertisement_cb(struct hci_dev *hdev,
- 						NULL, 0, false);
- 		}
- 
-+		msft_handle = handle_data->msft_handle;
-+
- 		list_del(&handle_data->list);
- 		kfree(handle_data);
--	}
- 
--	hci_dev_unlock(hdev);
-+		hci_dev_unlock(hdev);
-+
-+		msft_remove_addr_filters_sync(hdev, msft_handle);
-+	} else {
-+		hci_dev_unlock(hdev);
-+	}
- 
- done:
- 	return status;
-@@ -394,12 +514,14 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
- {
- 	struct msft_cp_le_monitor_advertisement *cp;
- 	struct msft_le_monitor_advertisement_pattern_data *pattern_data;
-+	struct msft_monitor_advertisement_handle_data *handle_data;
- 	struct msft_le_monitor_advertisement_pattern *pattern;
- 	struct adv_pattern *entry;
- 	size_t total_size = sizeof(*cp) + sizeof(*pattern_data);
- 	ptrdiff_t offset = 0;
- 	u8 pattern_count = 0;
- 	struct sk_buff *skb;
-+	int err;
- 
- 	if (!msft_monitor_pattern_valid(monitor))
- 		return -EINVAL;
-@@ -436,16 +558,31 @@ static int msft_add_monitor_sync(struct hci_dev *hdev,
- 
- 	skb = __hci_cmd_sync(hdev, hdev->msft_opcode, total_size, cp,
- 			     HCI_CMD_TIMEOUT);
--	kfree(cp);
- 
- 	if (IS_ERR_OR_NULL(skb)) {
--		if (!skb)
--			return -EIO;
--		return PTR_ERR(skb);
-+		err = PTR_ERR(skb);
-+		goto out_free;
- 	}
- 
--	return msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode,
--						monitor, skb);
-+	err = msft_le_monitor_advertisement_cb(hdev, hdev->msft_opcode,
-+					       monitor, skb);
-+	if (err)
-+		goto out_free;
-+
-+	handle_data = msft_find_handle_data(hdev, monitor->handle, true);
-+	if (!handle_data) {
-+		err = -ENODATA;
-+		goto out_free;
-+	}
-+
-+	handle_data->rssi_high	= cp->rssi_high;
-+	handle_data->rssi_low	= cp->rssi_low;
-+	handle_data->rssi_low_interval	  = cp->rssi_low_interval;
-+	handle_data->rssi_sampling_period = cp->rssi_sampling_period;
-+
-+out_free:
-+	kfree(cp);
-+	return err;
- }
- 
- /* This function requires the caller holds hci_req_sync_lock */
-@@ -538,6 +675,7 @@ void msft_do_close(struct hci_dev *hdev)
- {
- 	struct msft_data *msft = hdev->msft_data;
- 	struct msft_monitor_advertisement_handle_data *handle_data, *tmp;
-+	struct msft_monitor_addr_filter_data *address_filter, *n;
- 	struct adv_monitor *monitor;
- 
- 	if (!msft)
-@@ -559,6 +697,14 @@ void msft_do_close(struct hci_dev *hdev)
- 		kfree(handle_data);
- 	}
- 
-+	mutex_lock(&msft->filter_lock);
-+	list_for_each_entry_safe(address_filter, n, &msft->address_filters,
-+				 list) {
-+		list_del(&address_filter->list);
-+		kfree(address_filter);
-+	}
-+	mutex_unlock(&msft->filter_lock);
-+
- 	hci_dev_lock(hdev);
- 
- 	/* Clear any devices that are being monitored and notify device lost */
-@@ -568,6 +714,49 @@ void msft_do_close(struct hci_dev *hdev)
- 	hci_dev_unlock(hdev);
- }
- 
-+static int msft_cancel_address_filter_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct msft_monitor_addr_filter_data *address_filter = data;
-+	struct msft_cp_le_cancel_monitor_advertisement cp;
-+	struct msft_data *msft = hdev->msft_data;
-+	struct sk_buff *skb;
-+	int err = 0;
-+
-+	if (!msft) {
-+		bt_dev_err(hdev, "MSFT: msft data is freed");
-+		return -EINVAL;
-+	}
-+
-+	/* The address filter has been removed by hci dev close */
-+	if (!test_bit(HCI_UP, &hdev->flags))
-+		return 0;
-+
-+	mutex_lock(&msft->filter_lock);
-+	list_del(&address_filter->list);
-+	mutex_unlock(&msft->filter_lock);
-+
-+	cp.sub_opcode = MSFT_OP_LE_CANCEL_MONITOR_ADVERTISEMENT;
-+	cp.handle = address_filter->msft_handle;
-+
-+	skb = __hci_cmd_sync(hdev, hdev->msft_opcode, sizeof(cp), &cp,
-+			     HCI_CMD_TIMEOUT);
-+	if (IS_ERR_OR_NULL(skb)) {
-+		bt_dev_err(hdev, "MSFT: Failed to cancel address (%pMR) filter",
-+			   &address_filter->bdaddr);
-+		err = EIO;
-+		goto done;
-+	}
-+	kfree_skb(skb);
-+
-+	bt_dev_dbg(hdev, "MSFT: Canceled device %pMR address filter",
-+		   &address_filter->bdaddr);
-+
-+done:
-+	kfree(address_filter);
-+
-+	return err;
-+}
-+
- void msft_register(struct hci_dev *hdev)
- {
- 	struct msft_data *msft = NULL;
-@@ -581,7 +770,9 @@ void msft_register(struct hci_dev *hdev)
- 	}
- 
- 	INIT_LIST_HEAD(&msft->handle_map);
-+	INIT_LIST_HEAD(&msft->address_filters);
- 	hdev->msft_data = msft;
-+	mutex_init(&msft->filter_lock);
- }
- 
- void msft_unregister(struct hci_dev *hdev)
-@@ -596,6 +787,7 @@ void msft_unregister(struct hci_dev *hdev)
- 	hdev->msft_data = NULL;
- 
- 	kfree(msft->evt_prefix);
-+	mutex_destroy(&msft->filter_lock);
- 	kfree(msft);
- }
- 
-@@ -645,11 +837,149 @@ static void *msft_skb_pull(struct hci_dev *hdev, struct sk_buff *skb,
- 	return data;
- }
- 
-+static int msft_add_address_filter_sync(struct hci_dev *hdev, void *data)
-+{
-+	struct msft_monitor_addr_filter_data *address_filter = data;
-+	struct msft_rp_le_monitor_advertisement *rp;
-+	struct msft_cp_le_monitor_advertisement *cp;
-+	struct msft_data *msft = hdev->msft_data;
-+	struct sk_buff *skb = NULL;
-+	bool remove = false;
-+	size_t size;
-+
-+	if (!msft) {
-+		bt_dev_err(hdev, "MSFT: msft data is freed");
-+		return -EINVAL;
-+	}
-+
-+	/* The address filter has been removed by hci dev close */
-+	if (!test_bit(HCI_UP, &hdev->flags))
-+		return -ENODEV;
-+
-+	/* We are safe to use the address filter from now on.
-+	 * msft_monitor_device_evt() wouldn't delete this filter because it's
-+	 * not been added by now.
-+	 * And all other functions that requiring hci_req_sync_lock wouldn't
-+	 * touch this filter before this func completes because it's protected
-+	 * by hci_req_sync_lock.
-+	 */
-+
-+	if (address_filter->state == AF_STATE_REMOVING) {
-+		mutex_lock(&msft->filter_lock);
-+		list_del(&address_filter->list);
-+		mutex_unlock(&msft->filter_lock);
-+		kfree(address_filter);
-+		return 0;
-+	}
-+
-+	size = sizeof(*cp) +
-+	       sizeof(address_filter->addr_type) +
-+	       sizeof(address_filter->bdaddr);
-+	cp = kzalloc(size, GFP_KERNEL);
-+	if (!cp) {
-+		bt_dev_err(hdev, "MSFT: Alloc cmd param err");
-+		remove = true;
-+		goto done;
-+	}
-+	cp->sub_opcode           = MSFT_OP_LE_MONITOR_ADVERTISEMENT;
-+	cp->rssi_high		 = address_filter->rssi_high;
-+	cp->rssi_low		 = address_filter->rssi_low;
-+	cp->rssi_low_interval    = address_filter->rssi_low_interval;
-+	cp->rssi_sampling_period = address_filter->rssi_sampling_period;
-+	cp->cond_type            = MSFT_MONITOR_ADVERTISEMENT_TYPE_ADDR;
-+	cp->data[0]              = address_filter->addr_type;
-+	memcpy(&cp->data[1], &address_filter->bdaddr,
-+	       sizeof(address_filter->bdaddr));
-+
-+	skb = __hci_cmd_sync(hdev, hdev->msft_opcode, size, cp,
-+			     HCI_CMD_TIMEOUT);
-+	if (IS_ERR_OR_NULL(skb)) {
-+		bt_dev_err(hdev, "Failed to enable address %pMR filter",
-+			   &address_filter->bdaddr);
-+		skb = NULL;
-+		remove = true;
-+		goto done;
-+	}
-+
-+	rp = skb_pull_data(skb, sizeof(*rp));
-+	if (!rp || rp->sub_opcode != MSFT_OP_LE_MONITOR_ADVERTISEMENT ||
-+	    rp->status)
-+		remove = true;
-+
-+done:
-+	mutex_lock(&msft->filter_lock);
-+
-+	if (remove) {
-+		bt_dev_warn(hdev, "MSFT: Remove address (%pMR) filter",
-+			    &address_filter->bdaddr);
-+		list_del(&address_filter->list);
-+		kfree(address_filter);
-+	} else {
-+		address_filter->state = AF_STATE_ADDED;
-+		address_filter->msft_handle = rp->handle;
-+		bt_dev_dbg(hdev, "MSFT: Address %pMR filter enabled",
-+			   &address_filter->bdaddr);
-+	}
-+	mutex_unlock(&msft->filter_lock);
-+
-+	kfree_skb(skb);
-+
-+	return 0;
-+}
-+
-+/* This function requires the caller holds msft->filter_lock */
-+static struct msft_monitor_addr_filter_data *msft_add_address_filter
-+		(struct hci_dev *hdev, u8 addr_type, bdaddr_t *bdaddr,
-+		 struct msft_monitor_advertisement_handle_data *handle_data)
-+{
-+	struct msft_monitor_addr_filter_data *address_filter = NULL;
-+	struct msft_data *msft = hdev->msft_data;
-+	int err;
-+
-+	address_filter = kzalloc(sizeof(*address_filter), GFP_KERNEL);
-+	if (!address_filter)
-+		return NULL;
-+
-+	address_filter->state             = AF_STATE_ADDING;
-+	address_filter->msft_handle       = 0xff;
-+	address_filter->pattern_handle    = handle_data->msft_handle;
-+	address_filter->mgmt_handle       = handle_data->mgmt_handle;
-+	address_filter->rssi_high         = handle_data->rssi_high;
-+	address_filter->rssi_low          = handle_data->rssi_low;
-+	address_filter->rssi_low_interval = handle_data->rssi_low_interval;
-+	address_filter->rssi_sampling_period = handle_data->rssi_sampling_period;
-+	address_filter->addr_type            = addr_type;
-+	bacpy(&address_filter->bdaddr, bdaddr);
-+
-+	/* With the above AF_STATE_ADDING, duplicated address filter can be
-+	 * avoided when receiving monitor device event (found/lost) frequently
-+	 * for the same device.
-+	 */
-+	list_add_tail(&address_filter->list, &msft->address_filters);
-+
-+	err = hci_cmd_sync_queue(hdev, msft_add_address_filter_sync,
-+				 address_filter, NULL);
-+	if (err < 0) {
-+		bt_dev_err(hdev, "MSFT: Add address %pMR filter err", bdaddr);
-+		list_del(&address_filter->list);
-+		kfree(address_filter);
-+		return NULL;
-+	}
-+
-+	bt_dev_dbg(hdev, "MSFT: Add device %pMR address filter",
-+		   &address_filter->bdaddr);
-+
-+	return address_filter;
-+}
-+
- /* This function requires the caller holds hdev->lock */
- static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
- {
-+	struct msft_monitor_addr_filter_data *n, *address_filter = NULL;
- 	struct msft_ev_le_monitor_device *ev;
- 	struct msft_monitor_advertisement_handle_data *handle_data;
-+	struct msft_data *msft = hdev->msft_data;
-+	u16 mgmt_handle = 0xffff;
- 	u8 addr_type;
- 
- 	ev = msft_skb_pull(hdev, skb, MSFT_EV_LE_MONITOR_DEVICE, sizeof(*ev));
-@@ -662,9 +992,53 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		   ev->monitor_state, &ev->bdaddr);
- 
- 	handle_data = msft_find_handle_data(hdev, ev->monitor_handle, false);
--	if (!handle_data)
-+
-+	if (!test_bit(HCI_QUIRK_USE_MSFT_EXT_ADDRESS_FILTER, &hdev->quirks)) {
-+		if (!handle_data)
-+			return;
-+		mgmt_handle = handle_data->mgmt_handle;
-+		goto report_state;
-+	}
-+
-+	if (handle_data) {
-+		/* Don't report any device found/lost event from pattern
-+		 * monitors. Pattern monitor always has its address filters for
-+		 * tracking devices.
-+		 */
-+
-+		address_filter = msft_find_address_data(hdev, ev->addr_type,
-+							&ev->bdaddr,
-+							handle_data->msft_handle);
-+		if (address_filter)
-+			return;
-+
-+		if (ev->monitor_state && handle_data->cond_type ==
-+				MSFT_MONITOR_ADVERTISEMENT_TYPE_PATTERN)
-+			msft_add_address_filter(hdev, ev->addr_type,
-+						&ev->bdaddr, handle_data);
-+
- 		return;
-+	}
- 
-+	/* This device event is not from pattern monitor.
-+	 * Report it if there is a corresponding address_filter for it.
-+	 */
-+	list_for_each_entry(n, &msft->address_filters, list) {
-+		if (n->state == AF_STATE_ADDED &&
-+		    n->msft_handle == ev->monitor_handle) {
-+			mgmt_handle = n->mgmt_handle;
-+			address_filter = n;
-+			break;
-+		}
-+	}
-+
-+	if (!address_filter) {
-+		bt_dev_warn(hdev, "MSFT: Unexpected device event %pMR, %u, %u",
-+			    &ev->bdaddr, ev->monitor_handle, ev->monitor_state);
-+		return;
-+	}
-+
-+report_state:
- 	switch (ev->addr_type) {
- 	case ADDR_LE_DEV_PUBLIC:
- 		addr_type = BDADDR_LE_PUBLIC;
-@@ -681,12 +1055,18 @@ static void msft_monitor_device_evt(struct hci_dev *hdev, struct sk_buff *skb)
- 		return;
- 	}
- 
--	if (ev->monitor_state)
--		msft_device_found(hdev, &ev->bdaddr, addr_type,
--				  handle_data->mgmt_handle);
--	else
--		msft_device_lost(hdev, &ev->bdaddr, addr_type,
--				 handle_data->mgmt_handle);
-+	if (ev->monitor_state) {
-+		msft_device_found(hdev, &ev->bdaddr, addr_type, mgmt_handle);
-+	} else {
-+		if (address_filter && address_filter->state == AF_STATE_ADDED) {
-+			address_filter->state = AF_STATE_REMOVING;
-+			hci_cmd_sync_queue(hdev,
-+					   msft_cancel_address_filter_sync,
-+					   address_filter,
-+					   NULL);
-+		}
-+		msft_device_lost(hdev, &ev->bdaddr, addr_type, mgmt_handle);
-+	}
- }
- 
- void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
-@@ -724,7 +1104,9 @@ void msft_vendor_evt(struct hci_dev *hdev, void *data, struct sk_buff *skb)
- 
- 	switch (*evt) {
- 	case MSFT_EV_LE_MONITOR_DEVICE:
-+		mutex_lock(&msft->filter_lock);
- 		msft_monitor_device_evt(hdev, skb);
-+		mutex_unlock(&msft->filter_lock);
- 		break;
- 
- 	default:
+This is nice, I will drop all the bloat.
+
+> > > From my notes in commit eca70102cfb1 ("net: dsa: felix: add support for
+> > > changing DSA master"), I recall this:
+> > > 
+> > >     When we change the DSA master to a LAG device, DSA guarantees us that
+> > >     the LAG has at least one lower interface as a physical DSA master.
+> > >     But DSA masters can come and go as lowers of that LAG, and
+> > >     ds->ops->port_change_master() will not get called, because the DSA
+> > >     master is still the same (the LAG). So we need to hook into the
+> > >     ds->ops->port_lag_{join,leave} calls on the CPU ports and update the
+> > >     logical port ID of the LAG that user ports are assigned to.
+> > > 
+> > > Otherwise said:
+> > > 
+> > > $ ip link add bond0 type bond mode balance-xor && ip link set bond0 up
+> > > $ ip link set eth0 down && ip link set eth0 master bond0 # .port_change_master() gets called
+> > > $ ip link set eth1 down && ip link set eth1 master bond0 # .port_change_master() does not get called
+> > > $ ip link set eth0 nomaster # .port_change_master() does not get called
+> > > 
+> > > Unless something has changed, I believe that you need to handle these as well,
+> > > and update the QCA8K_PORT_LOOKUP_MEMBER field. In the case above, your
+> > > CPU port association would remain towards eth0, but the bond's lower interface
+> > > is eth1.
+> > > 
+> > 
+> > Can you better describe this case?
+> > 
+> > In theory from the switch view, with a LAG we just set that an user port
+> > can receive packet from both CPU port.
+> > 
+> > Or you are saying that when an additional memeber is added to the LAG,
+> > port_change_master is not called and we could face a scenario where:
+> > 
+> > - dsa master is LAG
+> > - LAG have the 2 CPU port
+> > - user port have LAG as master but QCA8K_PORT_LOOKUP_MEMBER with only
+> >   one CPU?
+> > 
+> > If I got this right, then I get what you mean with the fact that I
+> > should update the lag_join/leave definition and refresh each
+> > configuration.
+> 
+> In Documentation/networking/dsa/configuration.rst I gave 2 examples of
+> changing the DSA master to be a LAG.
+> 
+> In the list of 4 commands I posted in the previous reply, I assumed that
+> eth0 is the original DSA master, and eth1 is the second (initially inactive)
+> DSA master.
+> 
+> When eth0 joins a LAG, DSA notices that and implicitly migrates all user
+> ports affine to eth0 towards bond0 as the new DSA master. At that time,
+> .port_change_master() will be called for all user ports under eth0, to
+> be notified that the new DSA master is bond0.
+> 
+> Once all user ports have bond0 as a DSA master, .port_change_master()
+> will no longer be called as long as bond0 remains their DSA master.
+> But the lower port configuration of bond0 can still change.
+> 
+> During the command where eth1 also becomes a lower port of bond0, DSA
+> just calls .port_lag_join() for the CPU port attached to eth1, and you
+> need to handle that and update the CPU port mask. Same thing when eth0
+> leaves bond0.
+
+Ok thanks for the clarification, I will implement refresh function in
+lag join and leave.
+
 -- 
-2.17.1
-
+	Ansuel
 
