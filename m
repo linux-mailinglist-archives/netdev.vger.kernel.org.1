@@ -1,100 +1,159 @@
-Return-Path: <netdev+bounces-12404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 397B273751D
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA4FE737532
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:41:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DA5FA281463
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:33:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEEBF1C20D73
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:41:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 283C817FF6;
-	Tue, 20 Jun 2023 19:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7BDB317FFF;
+	Tue, 20 Jun 2023 19:41:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 193AF17AB5
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:33:26 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D16B51704;
-	Tue, 20 Jun 2023 12:33:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=fo/Ob0KLpIGN+a/RSOJyxjLCvbABz+sPt5T9bSGSNJs=; b=zkcJHK3bVcB6Jmw9PV+rGTplAy
-	66NnVtWzwKQZgvVe6VGDg16mALXivovFcINYRPTd5sSWcgLeVsFCtvtuw6uFh2chLVqhBE80Tve/2
-	aRLYSk8DzPVACiNLJdGl4UIho6psg974vtqDiwd2zRg8ebA/d+3vUwaEY2EcYg0H51Qc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qBh6K-00H3Fu-6T; Tue, 20 Jun 2023 21:33:16 +0200
-Date: Tue, 20 Jun 2023 21:33:16 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A34C2AB55
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:41:49 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2101.outbound.protection.outlook.com [40.107.223.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E430E72;
+	Tue, 20 Jun 2023 12:41:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LrTlHRY1eqBcjNW6FJLZceeoaAln8QtU4FuC7NwdawYjYz0QdrSmN2wG3YyoLE+Bw3Fx8pjiWVcSuEs9mhFdi4/12c5EcoWCKZAad8tKJp/0kEvvb9V5PeGBq63ovp4an4ePBPDCRNCPlTcUMtFLEA12Qf6jE7EEsY1C/2f8ZlZkXWBqD46EiyttaemFv3OcnEJ6AzadNyOXdNZpKw5ZwT5Fn1IYiAZsgwfIsk5MHOayemLOet5MFkZ8CuuNBKFjP9IJl8LAjjHxZUH/lYCZ/x36gy3P4BFqfcZcOXs/kS099TaVN66lw3YyHsZq4IXJOuG7vdB/7QhLBou//TwpRA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=z57AXJ7y0XzIz10jpKRmI87uM7dVb1XO0yHWR0Zc9eg=;
+ b=WnfBQOSyHpSbRqFpkCZpLSFlELz9zRnAH8lBy9dNRoN0Kw5CfVbLIZmfGJ9RMzeQUXLEN95Ze4X6403I2oIlvNiTUkJAhzuhJrkPTIYLQr+D8z+uGmoUl1SZMkVuteUeOlJNoC8aqUtFHNutrzzNu2vGvPeMxWahsuQNC07OEIR6B4aCHMtxwqr2zJ+OH2tVQ547cmC+6w9QF5lRQmLYfaynlUAjqO0PzmOUlzxnqYjJJT0C0tXXcJowfGm8lV5uz6KlGoi9Xn9kLmrHz+ydo946ZRiOGH0hN96HP+EHm4nxerR2+e7hfjyUftkEfAnhltmCzQ4W2/CP89xu2wUwEg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=z57AXJ7y0XzIz10jpKRmI87uM7dVb1XO0yHWR0Zc9eg=;
+ b=AWmCIsUWUvrU1KDuUM3udgOCGxggTHYdhTaFWrvp6+m6h2YospEV8hErdnyvGaSAUNdgtCyJAvjGoj+vsjdnROS6UuSqG967liq+AeJ8+7R9L7HDP1GcentSDguxIekGy8h9Lfjgnv5Py5+nupFSNXv+aHEkig4HRMRgHJnMwGA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SN4PR13MB5809.namprd13.prod.outlook.com (2603:10b6:806:219::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6477.19; Tue, 20 Jun
+ 2023 19:41:42 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
+ 19:41:42 +0000
+Date: Tue, 20 Jun 2023 21:41:35 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Michael Chan <michael.chan@broadcom.com>
+Cc: Ivan Vecera <ivecera@redhat.com>, netdev@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	kernel@pengutronix.de, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH v1 1/1] net: phy: dp83td510: fix kernel stall during
- netboot in DP83TD510E PHY driver
-Message-ID: <f2772f0f-31a4-41ba-b1ea-bfe3e5bdc87f@lunn.ch>
-References: <20230620125505.2402497-1-o.rempel@pengutronix.de>
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next] bnxt_en: Link representors to PCI device
+Message-ID: <ZJIA7y/x7GV1/hfu@corigine.com>
+References: <20230620144855.288443-1-ivecera@redhat.com>
+ <CACKFLi=1EV01f=47eDP08mp8OiaBdUHcigrJak-PKx1z8KHUUg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACKFLi=1EV01f=47eDP08mp8OiaBdUHcigrJak-PKx1z8KHUUg@mail.gmail.com>
+X-ClientProxiedBy: AM0PR03CA0093.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::34) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230620125505.2402497-1-o.rempel@pengutronix.de>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN4PR13MB5809:EE_
+X-MS-Office365-Filtering-Correlation-Id: fd48d108-c48c-4560-24bf-08db71c65f44
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	DwFslHq19zNU3QY9St9vrzIPc6cDeBsF9ioARfCrZiQlq0PCC5W93l3PQAXwElJprODlSKGQKy9UwiEhYox/s7oa7RNOQ2CKSB36q6G3zLTBE2sgDPZrDO1pdzBig7u1L8K1d/8JMfcim2YLYnbjkamDjvSk2T+U4m4j35Owk8IBnIPITn7446nXF7J2d6JWVoOGaPzhxN06koz5alR9dwpJzkHYXAcaSPynrsPLvxwrxKDioMBafGLRFi6Q3weLGhgh6j6noB+h0wk5NBxEN3XCtrNT0tpjAlu4v3J4SSFymRy3cb2PsBSXk7Yx7SBKjsmxkZOS8fSMen/owj4tBMvQTDdDKnHmdnFm4p+/7DryGpb9bSYzztp9gepRAkR+v5CxbKIRtqFrm/EAzkU2Cpvpi1DKXaEAqFl866ohH8AkJHJa85LI0SefrnMxcBurisEzQtxGuBlbE2aDnR0v7S5c4xQ8cM3EcdGMLsq/0SiJ0j0AWKjslZp+wEUlg+TvuSnPNcWkDeqsa4TkV8DyRCEfznP3Dyjo2LK+50dJQXy1UYM8y/9yM/XTIOKCUUys
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(39840400004)(346002)(376002)(396003)(451199021)(86362001)(4326008)(8676002)(66476007)(4744005)(2906002)(54906003)(41300700001)(38100700002)(36756003)(6916009)(44832011)(66946007)(316002)(66556008)(5660300002)(6486002)(6666004)(478600001)(186003)(8936002)(2616005)(6512007)(6506007)(53546011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?Tk9nb2VjaW5zbTZxSjhMYzZpeGsrZU9aM2dDNnpBVEh1RWNYM1hOb0ZBYWRB?=
+ =?utf-8?B?cUNxcWhXT3RTRC9jOUZualIySnhJa2kwaHNSVVhTMXUzV2dpcTFoU0JyMTRN?=
+ =?utf-8?B?N0tKQ0FtYkpkb2M4b2VtNjhZakRCQ3djemVsamxxbVp3Tng3dURmalhzZ1JN?=
+ =?utf-8?B?b1c0ZXRCek9YWVhWZzU1TVFxbFRyRXNXK3RwT3pVWWtYamFVU0xmZEJZN0Na?=
+ =?utf-8?B?MzdFK2w5d01hU2p2YmdhbUNGVWdMWGQwcjI3MzQvVms0dDVQSGdVTWNiT2RM?=
+ =?utf-8?B?Q1duMkw3djZrWDZyZ2VaZ3VYZWVaUlZxUmZidGhlSmhWOUVkdmk0NHdpd3Mw?=
+ =?utf-8?B?Z2xHWHpFNnVwNllDaU4ySnVBTnNJdXFnS2l0NkZLalZEbThnaW9Mb2QwYjh2?=
+ =?utf-8?B?dEIxYUlINXR2Z1QwSDdILzdtdmdaZm5CTjltSlowUXE3N082MlpRWEU5OFhK?=
+ =?utf-8?B?cW1KV3JiL2F4anhJbWE0ZXdRUjlJeEErMFBZWElxRDloTlN2MkxIenBXN01X?=
+ =?utf-8?B?akxBVHBzUUViVFo1MVNkRFhKeTJsVGpISjU1NlplVUNBaHF6T25FWUtkWGxX?=
+ =?utf-8?B?TUpuYmI2cDQvS2I4Z3g5MnFmRE9JdzJ5bVEwYWRyQmczWXh5SHRkZFNGNUxW?=
+ =?utf-8?B?Wi9pVEhCdll3amZ3ZTlxU09LcW0wVStKbkoyRUh1K2FiMDlZbmVWeVc1M2Zt?=
+ =?utf-8?B?aHRuZ2Q2SE5naWpGQ3ozWWVhbnZSWjZkUUpOODlpRlFvOEJFTnFWcmRBaTVU?=
+ =?utf-8?B?SkRINndkLy9qWEhpZ3dzT04rM1BaOCtTQThDMkhEOWtMSy9RL2pWbkl6TG9u?=
+ =?utf-8?B?Z1lDRVFidmtnRWZvOWltM1RvWk5EcW5wK2pPOU4va1JaYi8zM2hkS1BLdGxN?=
+ =?utf-8?B?NzdUaWpFUXkvTnRrNWN5c0lZY3BKaUxmL3NjQVpEbVpJTWN6MlMxTmhSeko2?=
+ =?utf-8?B?K2hFUk44N3ljT3BjV2djTFNXWVhUMzY2OFcwbG5oYXlYMnRjNktFWklZdUtF?=
+ =?utf-8?B?T1hVaEFEcjVDT29NUGdEWXpTUFZmVlVLcUZnYUxLY0RqTThIV0ExQ0hmV1FX?=
+ =?utf-8?B?Q1FGMmd1bytaZzcyMTJ5WlBMUWFreUt1NDNrQXFrc0hJZXc3ZEdmaEM1ZUZX?=
+ =?utf-8?B?Q1hiaHZZWFFUU0RWaDE0YWY3QnBVamNHbWFUa01uZDR0QVZmTnI5L21mUUdz?=
+ =?utf-8?B?Wm90cDNTTG5KbTFOMGFsSDlobjBBZ0dpN3VCaXlZNTJGSzRUWkJNWmk0VVZw?=
+ =?utf-8?B?YjBMbDA2MDhBcnR4eGVXVnBVekdubGp5RU52Z3BzQjJQYXBoM29YeG12MVZx?=
+ =?utf-8?B?aU02RDJpY1VjUmdtMlRsUFRNWTkwRVFJZWUzanJNcHliTVhuQUt3d2dmTytC?=
+ =?utf-8?B?d1MvRmhrQ2NPQ2orbnE4OWc5U0dsSVBHZEg5RVZiMzlRYzNLTkZvbEU1Rjd2?=
+ =?utf-8?B?RGdkUE80ZFlpZEpMQWxJU1V6bDB1QWZXQkVoMENqRks5a3ZWbGQwNTg2cTNR?=
+ =?utf-8?B?QUpOdExESnk0Z0EzVlNlNlRkMmc4NXdTS1NvbGdoTU5GWk5LSkxCSVk3QmJJ?=
+ =?utf-8?B?bnFZWUd6MVhyd1EzQnkyRUNZWFIvOTdiOGdMZkdxSlZzZVQwSG5Ia0RKb0x2?=
+ =?utf-8?B?Ni81NkIwM1VhZHAzd2dUcjZRMXNGT25jTVBoYWVsa2szZlpQU2RPd2lVRnhk?=
+ =?utf-8?B?T1IrcmJTeTd4aEV3NmY1U3RMaEN0MnNNcnplVUhxVW5oRWZmZ2ZYQjZYRTNs?=
+ =?utf-8?B?eFArSVVSa1QvZFNMdU80ZWZTck1TRTR4N0JtU3RkYit2ZVRLRGF4ejdhbGln?=
+ =?utf-8?B?TnhjNzBRYXpkV256ckNNVzFYdG01d01vc2NSQVN4RWtrVUUxbStnd3Vtamwy?=
+ =?utf-8?B?VlRmYThlMVNxRXBUcVcxVHRyTGMyazREWVk3SjVuRWtNRld2UndXUGpNMVV6?=
+ =?utf-8?B?ZVAzWmxFQzB1aElOOUFVRlBMc3psRkhVQ0pySFUva2d0NFNGZExiNmxVcHZk?=
+ =?utf-8?B?SHRDazczWjNjbFAwVDA1ZmN6a0UzamFnWEY3cVlZaE5CcWZZdlcvcXJ4VWo2?=
+ =?utf-8?B?RkZDQnNhbVJNU3hHTU4wVXF3MFEvb3JTbm1PTFEyZHZaM0cvREtqdXBBd2ZE?=
+ =?utf-8?B?RWtnR050eitlcFdla0lURXVmNjhkYytvSEtwYm0rUTBDSHd6TkNpTFl1eXN0?=
+ =?utf-8?B?TUpEdEFGT0ZhVXd5Q1FaWU83a3ltK2hDWGF6ZnNHSjBWSndGNlFOc2NPYVVt?=
+ =?utf-8?B?cGdkZXI5Mm0xeVA3OFVwSmNWUFdRPT0=?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: fd48d108-c48c-4560-24bf-08db71c65f44
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 19:41:42.0091
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: yJdXbeYOnYNlPBzPo5m+H2JEAGIKkZljfrSSiolQ9nl+GfgkYoGIQqt8JAg34/ENiQGvphdSRQ73DrPOCQb5Nr/pLROcqJrvixpE87/wzYk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5809
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 20, 2023 at 02:55:05PM +0200, Oleksij Rempel wrote:
-> Fix an issue where the kernel would stall during netboot, showing the
-> "sched: RT throttling activated" message. This stall was triggered by
-> the behavior of the mii_interrupt bit (Bit 7 - DP83TD510E_STS_MII_INT)
-> in the DP83TD510E's PHY_STS Register (Address = 0x10). The DP83TD510E
-> datasheet (2020) states that the bit clears on write, however, in
-> practice, the bit clears on read.
+On Tue, Jun 20, 2023 at 10:26:21AM -0700, Michael Chan wrote:
+> On Tue, Jun 20, 2023 at 7:52 AM Ivan Vecera <ivecera@redhat.com> wrote:
+> >
+> > Link VF representors to parent PCI device to benefit from
+> > systemd defined naming scheme.
+> >
+> > Without this change the representor is visible as ethN.
+> >
+> > Signed-off-by: Ivan Vecera <ivecera@redhat.com>
 > 
-> This discrepancy had significant implications on the driver's interrupt
-> handling. The PHY_STS Register was used by handle_interrupt() to check
-> for pending interrupts and by read_status() to get the current link
-> status. The call to read_status() was unintentionally clearing the
-> mii_interrupt status bit without deasserting the IRQ pin, causing
-> handle_interrupt() to miss other pending interrupts. This issue was most
-> apparent during netboot.
+> Thanks.
 > 
-> The fix refrains from using the PHY_STS Register for interrupt handling.
-> Instead, we now solely rely on the INTERRUPT_REG_1 Register (Address =
-> 0x12) and INTERRUPT_REG_2 Register (Address = 0x13) for this purpose.
-> These registers directly influence the IRQ pin state and are latched
-> high until read.
-> 
-> Note: The INTERRUPT_REG_2 Register (Address = 0x13) exists and can also
-> be used for interrupt handling, specifically for "Aneg page received
-> interrupt" and "Polarity change interrupt". However, these features are
-> currently not supported by this driver.
-> 
-> Fixes: 165cd04fe253 ("net: phy: dp83td510: Add support for the DP83TD510 Ethernet PHY")
-> Signed-off-by: Oleksij Rempel <o.rempel@pengutronix.de>
+> Reviewed-by: Michael Chan <michael.chan@broadcon.com>
 
-It would be good to add a Cc: <stable@vger.kernel.org>. It will
-probably get back ported with it, but the process does require it.
+nit:) broadcon -> broadcom
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
 
-    Andrew
 
