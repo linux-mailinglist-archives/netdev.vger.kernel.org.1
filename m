@@ -1,209 +1,167 @@
-Return-Path: <netdev+bounces-12325-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12326-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6D71737178
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 18:26:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B05A73717C
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 18:27:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA4F41C20CEB
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 16:26:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0CD1C20CDF
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 16:27:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F59B182A1;
-	Tue, 20 Jun 2023 16:25:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31F4817AA0;
+	Tue, 20 Jun 2023 16:26:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3AB4D18019
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 16:25:02 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 903AC170F
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 09:25:00 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f907f31247so30549555e9.2
-        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 09:25:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1687278299; x=1689870299;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Znjz9mhWIkZAzM3bIGR89qxXvHDPKMA75QcoPc3MXbs=;
-        b=fjHkYLbe0be2lmDc2DbzliG3daRP8Cwy06e4lWbBzihbpEvjrLDc4IpnCrklJPm9y/
-         TrVPeC4nxdDD+X9nVbCkLnjfNhQCO4ETgtXMWa7UoMTJy9HgEkfxkjDwQ1CdJeUtsoYS
-         JGzvkldrixNbVNxPNAvFOwqaF/XGy3paO6imJBQZgW9Vora7xJ49Yl3Qa3ii6TZjnbA0
-         um/RD4koPftR93T6D1qFbrFLliTFjM6MUBdRZ2fROywwJ5Ri5/evXYEEpBPGKVaJwNnX
-         CTw2OAEDgYCEaXnQV3KXDzD05oQVevUDcQzXLC5ZCtnrMKkf7hjqc32i88cFWHarU3GN
-         OLiA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687278299; x=1689870299;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Znjz9mhWIkZAzM3bIGR89qxXvHDPKMA75QcoPc3MXbs=;
-        b=Uswl1qM88hWWWEIHVI9vNfv1+L2iZNUp/WuH8R557BdJ6LFEJR4OaLSyuUpRdUaC+g
-         gDnQ03xeROKFRkCGe5R5icmuxpBxwe5S7SqZtLugdtwQDkOl18H6GF7nQxgiNdjPxi7D
-         X5UVir6mEbHEy3sZWjGeAc0rV8Y9D8amJxHXEB8waoWUm3q5ekEEKrWSIW/Df60nLyPD
-         Wms3Hw7otAzlHcYZScz+ox7Hi5oZvjjiiNBzMK/9fBs+Q7+WqPtKPKiHmJ/HjThXux4J
-         hWQGfRZVj+aR5sWlTBmH2cQkWhM24FfMJK4dpuGLobgJ3bPyg+uoaDf8woiwdMS+KZbu
-         LMww==
-X-Gm-Message-State: AC+VfDwEw+bumeIZz6wP4gT7nvsr/GNPY8vFf2KzRkhfFhnVp/0GXwg1
-	ycICkZqIjuEiKnry0EKX2AQm1+bvsNP+Gwbr1pVzbA==
-X-Google-Smtp-Source: ACHHUZ4wiLUY+Cf2Yma1uofHbvwI5tQcGLbRTlxlEi+dJ/ojWLtPbmVMni/kTCWN4E5uhAJojkAVZg==
-X-Received: by 2002:a1c:6a07:0:b0:3f9:b13b:a1cd with SMTP id f7-20020a1c6a07000000b003f9b13ba1cdmr3960518wmc.16.1687278298940;
-        Tue, 20 Jun 2023 09:24:58 -0700 (PDT)
-Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id o19-20020a05600c511300b003f8fe1933e4sm15753056wms.3.2023.06.20.09.24.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 09:24:58 -0700 (PDT)
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Tue, 20 Jun 2023 18:24:23 +0200
-Subject: [PATCH net 6/6] mptcp: ensure listener is unhashed before updating
- the sk status
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BEA91078E
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 16:26:10 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2054.outbound.protection.outlook.com [40.107.92.54])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4CA6E171F
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 09:25:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=khiCnV8DPVe83dSlbW50CurWBHUzlDF1qUo4mhvmv3upGC6wej3YEU2U420KjwPSj2PWN8QBIW8WYjHiWS8wQ9Oglutjb2AwzLWLBr3ZYYKHeRfjho8su4yF8KKB2OQbJ2ORfqBQpSdsfYIY5e8AXorgQwRk3DOUyfvzn5tJeAaA6oqlxA6/1iNRmxofNnenZT2ezmYnMWq0DAaKXGdnRV04ZJWhfwOSc541RMgfqNaS/VUbk40MzEK7NwX6MX3LXUQYwuqECo70s9ZM+mM57F5cvRWabjzpY1c/cjeDM+6hKO8U37j4HR1Rh8I9gXEQIEbCvYMoiUXNpuhPs7xjjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3A6yWobZkUJflvxJiiQe2EghgEc518Gg7h6/KnmGrDA=;
+ b=CATzuQt8QscDmw2NJgGIpkI5wejgwwH1Y/VdIsKPaRp+pmSNpG8mC4TjjA0C1T5qJU8WTuLXGOQng7AHXA6IvXqjRvfn8/k9wTaFQ3QJyMU3Mve605BGaE2cQ0VF5/kqItZVxtluCGWpXgnRjMi850Q5z9i2cxAxua8ZAHpNPR7uYJgu6tCU+bJLhmscMW3OXpEHwmsDubEGnaBG48ep193OPRo7DTej7YfQfWL5GvApN9shB4u1g8+0oNepMcAcNA1FxsHPA2+YlxWP2PSOYK6guSGFJbj7NO7cdQxNXNzw6se1CbHpmpD0Oy+xNOxLPoTy2bHePpk3nIQfK+ME+Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3A6yWobZkUJflvxJiiQe2EghgEc518Gg7h6/KnmGrDA=;
+ b=BPdMwDlkPVDuUh+9hi1hUYA0fkhaJ1ef0TmIC9084TwbCpBwzFpe9oglx1sBBnqrH7lNoTG5C/MZM7F2iAkE0b0kZcLR4oR4lzEYvHykUkqQdAFeJWADHsPJekmFoZvSwut8Q6kh9EocrIL4JaNzfke/qflOceCQVKVh/50WlCQo9P2o0fwSI5i+RKzRKt6wYJbMGuWx+9+ja/LaN1s9ShOpH7lLhHfbVml5qedTFskfm+ULnhohdkW1K1OsRfne7lUwQ16Ar/VWCQbn9+o8lZZj8MoIk0HVgrGcEbtw+q6lwCCZM2PxM/2B7sK8jTwnBYGc151WPhBiBU4K5OQ5ig==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
+ PH8PR12MB6723.namprd12.prod.outlook.com (2603:10b6:510:1ce::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Tue, 20 Jun
+ 2023 16:25:29 +0000
+Received: from DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::12e5:730c:ea20:b402]) by DS7PR12MB6288.namprd12.prod.outlook.com
+ ([fe80::12e5:730c:ea20:b402%4]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
+ 16:25:29 +0000
+Message-ID: <052d2f5a-ffeb-7c5b-814e-0cac4ddf7fa5@nvidia.com>
+Date: Tue, 20 Jun 2023 19:25:20 +0300
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net-next v2 1/3] net: add check for current MAC address in
+ dev_set_mac_address
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Piotr Gardocki <piotrx.gardocki@intel.com>, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, przemyslaw.kitszel@intel.com,
+ michal.swiatkowski@linux.intel.com, pmenzel@molgen.mpg.de,
+ maciej.fijalkowski@intel.com, anthony.l.nguyen@intel.com,
+ simon.horman@corigine.com, aleksander.lobakin@intel.com
+References: <20230613122420.855486-1-piotrx.gardocki@intel.com>
+ <20230613122420.855486-2-piotrx.gardocki@intel.com>
+ <c29c346a-9465-c3cc-1045-272c4eb26c65@nvidia.com>
+ <18b2b4a1-60b8-164f-ea31-5744950e138d@intel.com>
+ <17cc8e10-3b54-7bb7-6245-eba11d049034@nvidia.com>
+ <20230620085919.497c3a03@kernel.org>
+Content-Language: en-US
+From: Gal Pressman <gal@nvidia.com>
+In-Reply-To: <20230620085919.497c3a03@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0031.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:14::18) To DS7PR12MB6288.namprd12.prod.outlook.com
+ (2603:10b6:8:93::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230620-upstream-net-20230620-misc-fixes-for-v6-4-v1-6-f36aa5eae8b9@tessares.net>
-References: <20230620-upstream-net-20230620-misc-fixes-for-v6-4-v1-0-f36aa5eae8b9@tessares.net>
-In-Reply-To: <20230620-upstream-net-20230620-misc-fixes-for-v6-4-v1-0-f36aa5eae8b9@tessares.net>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Florian Westphal <fw@strlen.de>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- Matthieu Baerts <matthieu.baerts@tessares.net>, 
- Christoph Paasch <cpaasch@apple.com>, stable@vger.kernel.org
-X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3462;
- i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=XrTodyZuRWl4/4OQC7pAwj7PljaPvC+0axsjgRjlweQ=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkkdLU59rYoS7PISGtstSFpyCDz13h50kwKhhsz
- UQhglzkRciJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZJHS1AAKCRD2t4JPQmmg
- c85lEADP17RDWFFhZabVkHlxq7xu4jsB18M64f5ecSn1Q1W0UimQtRHq5TqzSexe/LTDZwijN4R
- usgqHa6AAfyU4TzLIu819mQKV0A2apCfVhzOAcMr2JDvez8Jl+UMG6xHBzabivfIECOKeK1Ja8l
- CLqYFWlhghut3N4SU0ue0wTLO6OxkDBr85cz271+DRv3jpGZRbOgQu/g8T9cGEuO8shFUp5OvUI
- Yu3Qjzv/zUM5WGOajxnQc6b5GL2Aj3SZLETNtB+Lj2RVjuDgIp6lT+ftKzUUV4H1LAXZlU5pTuC
- HtprYVd7qZzUcO4xJvkj03Neu42M4AEFL02lu9bM7hRiByklUb5M7hP5HVBqZGGbqdDpSwRnywo
- wp4FyQI/9R0otMK4HyKzc10oOB8rOpOm2vjC9XEJGBEjb7L+SxvgLrzWPE8dRKCJWsD7Dn4sO1U
- n7pGJrs1qPJcBcuBbH98/jBlkrJUCvcGC9901bxlpFgBeVUl+AlBvbgfjSFy7WDx9CVHpk0bEMt
- Wun0sKe5W4/vblO3i8br8uiS7/0wtOlCNft7zQZR1LY2BlTCvfXZqyoDdg8Usg6S9kB8TUZMz7G
- jbRUwOylPsIe2dEyhNjpMUECCsaRE5MRr2yE0xn4V81S1IrPZ9tp2IcP2flYl6fYAaTJQbVKgyq
- PIn8PYetOam3Txg==
-X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|PH8PR12MB6723:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99c8613e-2fe8-4dbb-aec9-08db71aaf608
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	EnDf/4wz78oaJq9TdToPUoapmoGXwv2tLJcQ8B3qVODPeWH/U+VAuEKu6sFWWF5Ntmp5tO+Gc/QuNUsxKpuS5Ou1KZTdsC72+GD36Tzr7Gw6N8kfVHoCb566k1eV3GrIr31jE5gfqGMNG24HuGFv0rE4ChPMeaAVtCfyFIahfhsOYC3yCTScd27RH0nuC1LZ9NWrstL4QTNVruGOzV++6ZEei7uKrVhgg8ucJz9iNNk5def2pCC61H4u+qgo3HGWBSdV3G3LnVXzEjALgrvBZSyHeAHWOM4lIPiPPL4fQPUpoVfxNVb5r3umB9cwQ3rbHXJCcQ+GYiQNBLyQzza3x171erlGEj8/wO98vPBYx02GPLH8QoM7Dr87RInLfBi2cSqsOeqwcS7Qvq4FRY+pcp24vT/JBbVkQUBKwNfgaWnKx1ar/zdwtJFUJgOehYc14bcH0nhDDR1BwxuaE5JOASRmaGTy4mbbDc6QyN0RW7SVXgKGiCrzOVFbmmo0DVa1JnGRtHMXb4D+1OPIsReb/BlW8E5d4rPo2W8vbPe8f0YI0r+cNs1yCLtPkMATx4vNMY6V5CRlxj/rw/GGukqPZVtjRJptEf/yfMtupEtxU4jK+lfJC0BmItg93kROEuIy/Yin3KEo7pOaTQMny0zzjw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(366004)(396003)(39860400002)(136003)(451199021)(6486002)(478600001)(2616005)(6666004)(83380400001)(6512007)(53546011)(26005)(6506007)(2906002)(186003)(4744005)(7416002)(5660300002)(36756003)(38100700002)(66556008)(4326008)(66946007)(31696002)(316002)(86362001)(8936002)(8676002)(41300700001)(6916009)(66476007)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?M0dpSjgzZlA4NHV1YUtQQWtCZHUwNmJsMXV1Wk0rVTZmeXVNMDZ0MkpadWJa?=
+ =?utf-8?B?MmFId2FEclVubEtoRDFyRm5kU2Zua0FUREU3Z2xjd3BHdFBxOWU3bUd5Mi96?=
+ =?utf-8?B?MkowN0Z3NzVockg1aEFLVExaeU1LME1ta0xuNVNncElsUmhVNFJncWNKQTF2?=
+ =?utf-8?B?SFdZRHlGZ3lZSDNHN2xBRVRHOXZXeWhjNWo4d2c2Vk0weEdoc0k2ZjczMTdV?=
+ =?utf-8?B?bFVocmZNWHQrWVlLM1l4TjVVNk5BdmlBVzdoTmI4N1lsY1c3WkVFdXVCaXV5?=
+ =?utf-8?B?WlhES0I2VGhOay9HVXlLRFF3b1dvV0psRi9DWjVKTDFxVXN2Q09BUTkvenNC?=
+ =?utf-8?B?K082K09YTnZvUjlTVWRSaldDUW9WcXNHWlhhUllXZzE5YmI3YUFxZTNBUzdx?=
+ =?utf-8?B?WjZvK2dFelUzaTQwdXJTbFBCSzFjcEtwd3ZFcTRHNkxQUjJWRE5hWXppZkpa?=
+ =?utf-8?B?YjhRdkZ3ZGZ1NUZITTRyTC9iYk1DRnQ5Z3pTYmlTaTl1ZXRBeUVzckFUdUIz?=
+ =?utf-8?B?Q29QVnp0a0NSYlBnT1BsYVRVUjRjZG1QT0FmUVYrSmI0SGU0cnQyZnowVlpa?=
+ =?utf-8?B?UnJpb2hCYndLSmN6MGNxVGNlRFh2WlZNa0hpVU1DcVJXekpmYklnRUtGaDgx?=
+ =?utf-8?B?WTB2bHFZK3g5b3l0R3dOWUtqVFl1YVZKSVlva0lscGhwcjBWdDlrOFYxQW1s?=
+ =?utf-8?B?Uk1qeW9nQ1AzTjlLZ3g4S1J2c3p1dzgvd1BjcFN0TWNQdy95SS9xVkdsU0Zs?=
+ =?utf-8?B?aGFKMWp5Qiszbi9jSVFrbUdXN0h1YVByd2NmeEJQbHlpVFcxTEdubTljU3dK?=
+ =?utf-8?B?S0dsNHBDM1BDd3VJY3YrLzlrVzh6bGpFbFlxVFpwM2NMMDBBUi9HK3NycE9Y?=
+ =?utf-8?B?KzNYVjh4ZXZ1bktRV0pnbXY3aUJjTEhoSWdNWHRUY0JDZFNvb3lLVkdNWFBx?=
+ =?utf-8?B?Qmtqd2dKTlRiRTIxa3cxcjhWWHdzSU9PTzNLNFhkRnp3dEVXVWRCS0c5RmZU?=
+ =?utf-8?B?Zkhka0NMN0NmdGxCeWtLMVB0a1RzcyswanJ6aVFvRUswd1lzZFpudFZVVEo2?=
+ =?utf-8?B?RldiOGFvNTlJNUViYit6aXRYVm5pTUtnOEd6RTFRZGM4SDVCTUR3SGoxSWZp?=
+ =?utf-8?B?cHpra09OeThyaFF0M1NrZXArTHhITDFWQmpMd2o2YlptZUcvWmdSZG9UcnF5?=
+ =?utf-8?B?M3QrejJ2UGlzajBmSzlXU1g5WkpDeTB5SVgvMXdjSldKMWJ4c3djaURRck0w?=
+ =?utf-8?B?OGNLWkFWVzM2RGZTVGd3VkIydFdPdU9RTXppeEVmWDZndjVEWWxhb245YStT?=
+ =?utf-8?B?KzdtVmtPVmo0bDZjN25sS1dBVXFUZnRrS0Ywc01GakwwSnJjR0JGVjFXWThI?=
+ =?utf-8?B?QmoyVTQ0bjBWWDBLVC9YTzVuNHVSMVM4Y1ZjWnZoalBlT0k5Z2NqMGhJQnFk?=
+ =?utf-8?B?YWxadFdHREVCNTNDRVM2WVY5Z0RLZ0V6NWNmZ1dCRHRCTnA4WE9Tbk4yQXhZ?=
+ =?utf-8?B?L3I1dU1ON0xDSHlvd3YrZ0hWWmZ1TVFsMlZRRWpZelIvVFNmdlZSY1YvN2VD?=
+ =?utf-8?B?MWFhSkpKWWh6TEsya0xZdkt1cWdzV3RoQzlQWHovQ1g4QndxQUxHaEtSNDVJ?=
+ =?utf-8?B?ZlhiWVFSU1JScjlqR0JnUVFKdWROdDFYKzZFZXgzN0NOQTFaRlRXSnM2T3hm?=
+ =?utf-8?B?WXJUNlBGdFRLcFBkVGZ2SyttVXdKdFhmTTl0YkJrb0dYZGx3NHFTTEJtN0Y0?=
+ =?utf-8?B?SS9KMjFmRGJHNUpZcUdXK05QRjhLTVRzU21XZ3JhVFZhV3d6V3Y3bkk3S2dE?=
+ =?utf-8?B?cFc4b0EzNnRobXRzdWhhV2szc0czcFFocWRqRVliVCt4Zm9ia040VzN3Q20r?=
+ =?utf-8?B?YzBMVzdxc3ZwTlE0Nlp1NXhFcDgzYXlQWHI2ajZtSjNvZTdVMUk1S0YvUEtu?=
+ =?utf-8?B?OUN6SFVJRS9Yelo4TC9vTGEwRWpyK1BhWjdLb29RTDc0UXN0Q2FNUlFJQ0ZK?=
+ =?utf-8?B?a25Uek9zWDVORXcvRGhta0x3MmFMUlByNzJzQWN3L2xUcEx5ZklHNnRQdnZu?=
+ =?utf-8?B?ZkV1UGI0cElOZEVJeitxcFFMbWk3a1NEdTJZRk8xNXM4aytYL1lSUFhoNkFX?=
+ =?utf-8?Q?r00LOTY52dOUUVA2HdSRsIGnk?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99c8613e-2fe8-4dbb-aec9-08db71aaf608
+X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 16:25:29.1647
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EU+CVe84pk6qGCyCf8yGm4Ia1AILsccyDqPq3qCIEZVB+dusYablno4BAwCwoLGi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR12MB6723
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Paolo Abeni <pabeni@redhat.com>
+On 20/06/2023 18:59, Jakub Kicinski wrote:
+> On Tue, 20 Jun 2023 13:42:14 +0300 Gal Pressman wrote:
+>>> I checked it, you're right. When the addr_assign_type is PERM or RANDOM
+>>> and user or some driver sets the same MAC address the type doesn't change
+>>> to NET_ADDR_SET. In my testing I didn't notice issues with that, but I'm
+>>> sure there are cases I didn't cover. Did you discover any useful cases
+>>> that broke after this patch or did you just notice it in code?  
+>>
+>> This behavior change was caught in our regression tests.
+> 
+> Why was the regression test written this way?
 
-The MPTCP protocol access the listener subflow in a lockless
-manner in a couple of places (poll, diag). That works only if
-the msk itself leaves the listener status only after that the
-subflow itself has been closed/disconnected. Otherwise we risk
-deadlock in diag, as reported by Christoph.
+This test environment is quite good at detecting state/behavior changes.
 
-Address the issue ensuring that the first subflow (the listener
-one) is always disconnected before updating the msk socket status.
-
-Reported-by: Christoph Paasch <cpaasch@apple.com>
-Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/407
-Fixes: b29fcfb54cd7 ("mptcp: full disconnect implementation")
-Cc: stable@vger.kernel.org
-Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
----
- net/mptcp/pm_netlink.c |  1 +
- net/mptcp/protocol.c   | 31 +++++++++++++++++++------------
- 2 files changed, 20 insertions(+), 12 deletions(-)
-
-diff --git a/net/mptcp/pm_netlink.c b/net/mptcp/pm_netlink.c
-index 59f8f3124855..1224dfca5bf3 100644
---- a/net/mptcp/pm_netlink.c
-+++ b/net/mptcp/pm_netlink.c
-@@ -1047,6 +1047,7 @@ static int mptcp_pm_nl_create_listen_socket(struct sock *sk,
- 	if (err)
- 		return err;
- 
-+	inet_sk_state_store(newsk, TCP_LISTEN);
- 	err = kernel_listen(ssock, backlog);
- 	if (err)
- 		return err;
-diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-index a66ec341485e..a6c7f2d24909 100644
---- a/net/mptcp/protocol.c
-+++ b/net/mptcp/protocol.c
-@@ -2368,13 +2368,6 @@ static void __mptcp_close_ssk(struct sock *sk, struct sock *ssk,
- 		kfree_rcu(subflow, rcu);
- 	} else {
- 		/* otherwise tcp will dispose of the ssk and subflow ctx */
--		if (ssk->sk_state == TCP_LISTEN) {
--			tcp_set_state(ssk, TCP_CLOSE);
--			mptcp_subflow_queue_clean(sk, ssk);
--			inet_csk_listen_stop(ssk);
--			mptcp_event_pm_listener(ssk, MPTCP_EVENT_LISTENER_CLOSED);
--		}
--
- 		__tcp_close(ssk, 0);
- 
- 		/* close acquired an extra ref */
-@@ -2902,10 +2895,24 @@ static __poll_t mptcp_check_readable(struct mptcp_sock *msk)
- 	return EPOLLIN | EPOLLRDNORM;
- }
- 
--static void mptcp_listen_inuse_dec(struct sock *sk)
-+static void mptcp_check_listen_stop(struct sock *sk)
- {
--	if (inet_sk_state_load(sk) == TCP_LISTEN)
--		sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-+	struct sock *ssk;
-+
-+	if (inet_sk_state_load(sk) != TCP_LISTEN)
-+		return;
-+
-+	sock_prot_inuse_add(sock_net(sk), sk->sk_prot, -1);
-+	ssk = mptcp_sk(sk)->first;
-+	if (WARN_ON_ONCE(!ssk || inet_sk_state_load(ssk) != TCP_LISTEN))
-+		return;
-+
-+	lock_sock_nested(ssk, SINGLE_DEPTH_NESTING);
-+	mptcp_subflow_queue_clean(sk, ssk);
-+	inet_csk_listen_stop(ssk);
-+	mptcp_event_pm_listener(ssk, MPTCP_EVENT_LISTENER_CLOSED);
-+	tcp_set_state(ssk, TCP_CLOSE);
-+	release_sock(ssk);
- }
- 
- bool __mptcp_close(struct sock *sk, long timeout)
-@@ -2918,7 +2925,7 @@ bool __mptcp_close(struct sock *sk, long timeout)
- 	WRITE_ONCE(sk->sk_shutdown, SHUTDOWN_MASK);
- 
- 	if ((1 << sk->sk_state) & (TCPF_LISTEN | TCPF_CLOSE)) {
--		mptcp_listen_inuse_dec(sk);
-+		mptcp_check_listen_stop(sk);
- 		inet_sk_state_store(sk, TCP_CLOSE);
- 		goto cleanup;
- 	}
-@@ -3035,7 +3042,7 @@ static int mptcp_disconnect(struct sock *sk, int flags)
- 	if (msk->fastopening)
- 		return -EBUSY;
- 
--	mptcp_listen_inuse_dec(sk);
-+	mptcp_check_listen_stop(sk);
- 	inet_sk_state_store(sk, TCP_CLOSE);
- 
- 	mptcp_stop_timer(sk);
-
--- 
-2.40.1
-
+The test isn't written in any specific way, AFAIU we hit this patch flow
+by default when using bonding (bond takes the first slave MAC address
+and then sets the same address to all slaves?), it's not a test that
+tries to set the same MAC address explicitly.
 
