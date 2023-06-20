@@ -1,81 +1,83 @@
-Return-Path: <netdev+bounces-12399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63C5073750C
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:28:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2636737513
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:30:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 17FED281411
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:28:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E42A91C20D84
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:30:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4DF1817AD3;
-	Tue, 20 Jun 2023 19:28:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C5A18007;
+	Tue, 20 Jun 2023 19:30:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4142C17AB5
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:28:41 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A1BB1B6;
-	Tue, 20 Jun 2023 12:28:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wv2H4gRrgWftVHyvUxA7jfonUlGoWajnFkHFHQqMGlc=; b=W9QCZLRUqgLqFaY900qUZFRgLP
-	G/2cXlQYYil53FWS3q0TzUiY+0ZvU9vnZw2Vh1uxkjKrNWdr8i+AqwxMToRZOO6cu4xgOc1Tijuct
-	n8oYO3S+IhZ2mdmu+bOahI/CF7uftZG56SlHZpnGI+GQkKlSdz9sEMmjUcnxdhGY6xz0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qBh1Z-00H3Cq-HA; Tue, 20 Jun 2023 21:28:21 +0200
-Date: Tue, 20 Jun 2023 21:28:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Cc: Woojung Huh <woojung.huh@microchip.com>, UNGLinuxDriver@microchip.com,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 3/3] net: dsa: microchip: fix writes to phy
- registers >= 0x10
-Message-ID: <88474092-70cb-40fc-9c01-1fc8527d5bcb@lunn.ch>
-References: <20230620113855.733526-1-linux@rasmusvillemoes.dk>
- <20230620113855.733526-4-linux@rasmusvillemoes.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD1E17AC8
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:30:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0AA85C433C8;
+	Tue, 20 Jun 2023 19:30:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687289421;
+	bh=nUeCfLB31CaFoKMGKSp295jPG5fUSMkthOYLw6VgpWM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=p2SQcF1CqcIHip21N+TgePwAwGtzZ2voSD1l5mBmw3WVXnePHOxMqOnA2bSPjrw9B
+	 MPymQFWZBuUsjymmtI/Ws/ofAiWsk/7emVR4tjW7zevVFRhp1uX0uCAQaN4smqWbJ6
+	 6g0jiCAC3EMoeCxq4jVq1EEqPTHg/ZKUlUubXdeeKrHxBDHcJx7DDjZFCKFTqrAjmW
+	 5uDKzh01u5UcQ8nXg5uYG3+PaZpLXaDAlFgn+Zn3xiyJVd5PyBJCWCLrLyvmbLoYbt
+	 9vshrN0uNXU8pS+EaPgqPeSzOoge0N5SiXoUKjVcf/V527Q68crL24xS4jwrCpJJoz
+	 svWF+4tDRsRgQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DA686E301FA;
+	Tue, 20 Jun 2023 19:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230620113855.733526-4-linux@rasmusvillemoes.dk>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] wifi: iwlwifi: pcie: Handle SO-F device for PCI id 0x7AF0
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168728942088.14216.9670142240343267380.git-patchwork-notify@kernel.org>
+Date: Tue, 20 Jun 2023 19:30:20 +0000
+References: <20230619150233.461290-2-johannes@sipsolutions.net>
+In-Reply-To: <20230619150233.461290-2-johannes@sipsolutions.net>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
+ mukesh.sisodiya@intel.com
 
-On Tue, Jun 20, 2023 at 01:38:54PM +0200, Rasmus Villemoes wrote:
-> According to the errata sheets for ksz9477 and ksz9567, writes to the
-> PHY registers 0x10-0x1f (i.e. those located at addresses 0xN120 to
-> 0xN13f) must be done as a 32 bit write to the 4-byte aligned address
-> containing the register, hence requires a RMW in order not to change
-> the adjacent PHY register.
+Hello:
 
-ASIC engineers do see to come up with novel ways to break things.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I assume you have not seen real problems with this, which is why it is
-not for net and a Fixes: tag?
+On Mon, 19 Jun 2023 17:02:34 +0200 you wrote:
+> From: Mukesh Sisodiya <mukesh.sisodiya@intel.com>
+> 
+> Add support for AX1690i and AX1690s devices with
+> PCIE id 0x7AF0.
+> 
+> Cc: stable@vger.kernel.org # 6.1+
+> Signed-off-by: Mukesh Sisodiya <mukesh.sisodiya@intel.com>
+> Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
+> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> 
+> [...]
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Here is the summary with links:
+  - [net] wifi: iwlwifi: pcie: Handle SO-F device for PCI id 0x7AF0
+    https://git.kernel.org/netdev/net/c/4e9f0ec38852
 
-    Andrew
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
