@@ -1,184 +1,218 @@
-Return-Path: <netdev+bounces-12340-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24D18737215
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 18:50:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A85B737210
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 18:49:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5AF3281322
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 16:50:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8AE2C1C20C3F
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 16:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246DF2AB2A;
-	Tue, 20 Jun 2023 16:50:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E5992AB2A;
+	Tue, 20 Jun 2023 16:49:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17E5F1549D
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 16:49:59 +0000 (UTC)
-Received: from smtp-fw-2101.amazon.com (smtp-fw-2101.amazon.com [72.21.196.25])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1F4B11729
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 09:49:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30F172AB25
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 16:49:46 +0000 (UTC)
+Received: from mail-yw1-x112c.google.com (mail-yw1-x112c.google.com [IPv6:2607:f8b0:4864:20::112c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DACEC12C
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 09:49:44 -0700 (PDT)
+Received: by mail-yw1-x112c.google.com with SMTP id 00721157ae682-56ff9cc91b4so56122927b3.0
+        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 09:49:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687279798; x=1718815798;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=71oWwvTJJwt/pNK9IxoDk0kqt6GkRX+mWH3TgAjEGiU=;
-  b=UGa4XdKaNKMZkX6NH7Hgb4tJKZOwstEcfNxUXmeEeGhfn8cFyCEdgofx
-   GKWCuQuI8UH6K8NP8x7u3uqvLQN+Ucm+Ou+C8O0p3UgOQrr9IBGn7EkiU
-   +gUVkdCLRsEqXtoWTT7dUnfY6n0wgO9om541+ovH0AKs05yzS3lWdu0aJ
-   Q=;
-X-IronPort-AV: E=Sophos;i="6.00,257,1681171200"; 
-   d="scan'208";a="335133285"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-2101.iad2.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 16:49:56 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
-	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id 176BF46859;
-	Tue, 20 Jun 2023 16:49:53 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 20 Jun 2023 16:49:41 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.48) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 20 Jun 2023 16:49:38 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <brauner@kernel.org>
-CC: <alexander@mihalicyn.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <kuni1840@gmail.com>, <kuniyu@amazon.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <syzkaller@googlegroups.com>
-Subject: Re: [PATCH v1 net] af_unix: Call scm_recv() only after scm_set_cred().
-Date: Tue, 20 Jun 2023 09:49:29 -0700
-Message-ID: <20230620164929.60541-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230620-geeignet-heimgeholt-28beb062e534@brauner>
-References: <20230620-geeignet-heimgeholt-28beb062e534@brauner>
+        d=broadcom.com; s=google; t=1687279784; x=1689871784;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=D8yENK0yi1YbLfe4BBCeswTIaHcVbaRsKHHiO5kelPM=;
+        b=DcHCobUQUzMX+WisPYmdnEAXpX9bpxs987kmIMWS4RbqX9fzH4cGsQd7kdZmcvVqun
+         90NjPO87OZVQlNEQuzfRF3hgKxQSc4oplHgPUpi4PAZq0JWgP0r9NhPUJ2i6x/oRcSzb
+         KSTZtc6676TYRn4xnjCxVdtJxkugc42Y/Tlms=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687279784; x=1689871784;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D8yENK0yi1YbLfe4BBCeswTIaHcVbaRsKHHiO5kelPM=;
+        b=WCGKWAxn+JobmvnnAl6shBzoX2mu9nuoqneYAl3PacxTxRWS42FzUZh78lE3EIofkA
+         2jGE8yfhil8UME86kuf2hcgIawiiKR2lPLHGr2s2OoYNpuD2/MV/hh+gZsRjkwrvQ336
+         0bg500UwrjyLW/ZaF94+irwdyWZfXadNFstSNZvN8IMSuP/7LZhs4uHNLTPfnDrzpD4f
+         +gz/q06feCurd98u8fSCMwaArPw4yc3coMFQkOpREOm/dyvlLp8p15D2RrkEOlVc2XIk
+         aUrJ/4JLoe5gIylvY8x5FPIAp9+JJhw8CpsTfyNfcumn0j8wVkaCWao52Skr+hxOgXwf
+         32kw==
+X-Gm-Message-State: AC+VfDzM2Vzg9u1kFYa7Y8vBZ6XFvYdVufAkAXrnwNKQQVENangULs9J
+	Q3OZg/weeuCuCrA1Odi3/qMUX6QvgQLQAYwlYXhUwZQUqvV22XgJ6RbrJSxKgbdfUe9i62zuuM1
+	L+iHb+n4Dv15ziRmeXd92JcQ=
+X-Google-Smtp-Source: ACHHUZ6mnQvQ5KfcHYBdIvFw/GTnTZqf1l6oOnr5+/lND4gGOCdgUj+DSoonFtCeUJLqntB6a5E1L9QZJBW99jUuDjo=
+X-Received: by 2002:a0d:d611:0:b0:56f:f9c6:3863 with SMTP id
+ y17-20020a0dd611000000b0056ff9c63863mr14429018ywd.48.1687279784031; Tue, 20
+ Jun 2023 09:49:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.48]
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230620144855.288443-1-ivecera@redhat.com>
+In-Reply-To: <20230620144855.288443-1-ivecera@redhat.com>
+From: Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>
+Date: Tue, 20 Jun 2023 22:19:32 +0530
+Message-ID: <CAHHeUGWQihg4bTeaCNwq8_1ZxSfL5hpdw-RQOPK6QkSGSdX0OA@mail.gmail.com>
+Subject: Re: [PATCH net-next] bnxt_en: Link representors to PCI device
+To: Ivan Vecera <ivecera@redhat.com>
+Cc: netdev@vger.kernel.org, Michael Chan <michael.chan@broadcom.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	open list <linux-kernel@vger.kernel.org>, 
+	Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>
+Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
+	boundary="0000000000002e905705fe9270bc"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Christian Brauner <brauner@kernel.org>
-Date: Tue, 20 Jun 2023 12:30:12 +0200
-> On Mon, Jun 19, 2023 at 05:00:09PM -0700, Kuniyuki Iwashima wrote:
-> > syzkaller hit a WARN_ON_ONCE(!scm->pid) in scm_pidfd_recv().
-> > 
-> > In unix_stream_read_generic(), some paths reach scm_recv() without calling
-> > scm_set_cred().
-> > 
-> > Let's say unix_stream_read_generic() is blocked in unix_stream_data_wait().
-> > If a concurrent thread calls shutdown(RCV_SHUTDOWN) for the socket itself
-> > or its peer calls close(), we bail out the while loop without calling
-> > scm_set_cred().
-> > 
-> > If the socket is configured with SO_PASSCRED or SO_PASSPIDFD, scm_recv()
-> > would populate cmsg with garbage.
-> > 
-> > Let's not call scm_recv() unless scm_set_cred() is called.
-> > 
-> > WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_pidfd_recv include/net/scm.h:138 [inline]
-> > WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177
-> > Modules linked in:
-> > CPU: 1 PID: 3245 Comm: syz-executor.1 Not tainted 6.4.0-rc5-01219-gfa0e21fa4443 #2
-> > Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-> > RIP: 0010:scm_pidfd_recv include/net/scm.h:138 [inline]
-> > RIP: 0010:scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177
-> > Code: 67 fd e9 55 fd ff ff e8 4a 70 67 fd e9 7f fd ff ff e8 40 70 67 fd e9 3e fb ff ff e8 36 70 67 fd e9 02 fd ff ff e8 8c 3a 20 fd <0f> 0b e9 fe fb ff ff e8 50 70 67 fd e9 2e f9 ff ff e8 46 70 67 fd
-> > RSP: 0018:ffffc90009af7660 EFLAGS: 00010216
-> > RAX: 00000000000000a1 RBX: ffff888041e58a80 RCX: ffffc90003852000
-> > RDX: 0000000000040000 RSI: ffffffff842675b4 RDI: 0000000000000007
-> > RBP: ffffc90009af7810 R08: 0000000000000007 R09: 0000000000000013
-> > R10: 00000000000000f8 R11: 0000000000000001 R12: ffffc90009af7db0
-> > R13: 0000000000000000 R14: ffff888041e58a88 R15: 1ffff9200135eecc
-> > FS:  00007f6b7113f640(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
-> > CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > CR2: 00007f6b7111de38 CR3: 0000000012a6e002 CR4: 0000000000770ee0
-> > PKRU: 55555554
-> > Call Trace:
-> >  <TASK>
-> >  unix_stream_read_generic+0x5fe/0x1f50 net/unix/af_unix.c:2830
-> >  unix_stream_recvmsg+0x194/0x1c0 net/unix/af_unix.c:2880
-> >  sock_recvmsg_nosec net/socket.c:1019 [inline]
-> >  sock_recvmsg+0x188/0x1d0 net/socket.c:1040
-> >  ____sys_recvmsg+0x210/0x610 net/socket.c:2712
-> >  ___sys_recvmsg+0xff/0x190 net/socket.c:2754
-> >  do_recvmmsg+0x25d/0x6c0 net/socket.c:2848
-> >  __sys_recvmmsg net/socket.c:2927 [inline]
-> >  __do_sys_recvmmsg net/socket.c:2950 [inline]
-> >  __se_sys_recvmmsg net/socket.c:2943 [inline]
-> >  __x64_sys_recvmmsg+0x224/0x290 net/socket.c:2943
-> >  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-> >  do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
-> >  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> > RIP: 0033:0x7f6b71da2e5d
-> > Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
-> > RSP: 002b:00007f6b7113ecc8 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
-> > RAX: ffffffffffffffda RBX: 00000000004bc050 RCX: 00007f6b71da2e5d
-> > RDX: 0000000000000007 RSI: 0000000020006600 RDI: 000000000000000b
-> > RBP: 00000000004bc050 R08: 0000000000000000 R09: 0000000000000000
-> > R10: 0000000000000120 R11: 0000000000000246 R12: 0000000000000000
-> > R13: 000000000000006e R14: 00007f6b71e03530 R15: 0000000000000000
-> >  </TASK>
-> > 
-> > Fixes: 5e2ff6704a27 ("scm: add SO_PASSPIDFD and SCM_PIDFD")
-> > Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> > Reported-by: syzkaller <syzkaller@googlegroups.com>
-> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > ---
-> >  net/unix/af_unix.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-> > index e7728b57a8c7..f1b76e0a8192 100644
-> > --- a/net/unix/af_unix.c
-> > +++ b/net/unix/af_unix.c
-> > @@ -2905,7 +2905,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
-> >  	} while (size);
-> >  
-> >  	mutex_unlock(&u->iolock);
-> > -	if (state->msg)
-> > +	if (state->msg && check_creds)
-> 
-> I think you might need to handle this in scm_recv() as it looks like
-> this would potentially lead to regressions for SOCK_PASSCRED if you skip
-> this here. scm->creds.{gid,uid,pid} should all be set to 0 if
-> scm_set_cred() hasn't been called and would be sent as such through
-> SOCK_PASSCRED and they aren't pointers. Only scm->pid is...
+--0000000000002e905705fe9270bc
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The case where we don't call scm_set_cred() is like
+On Tue, Jun 20, 2023 at 10:00=E2=80=AFPM Ivan Vecera <ivecera@redhat.com> w=
+rote:
+>
+> Link VF representors to parent PCI device to benefit from
+> systemd defined naming scheme.
+>
+> Without this change the representor is visible as ethN.
+>
+> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+Acked-by: Sriharsha Basavapatna <sriharsha.basavapatna@broadcom.com>
+> ---
+>  drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c | 1 +
+>  1 file changed, 1 insertion(+)
+>
+> diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c b/drivers/net/=
+ethernet/broadcom/bnxt/bnxt_vfr.c
+> index 2f1a1f2d2157..1467b94a6427 100644
+> --- a/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
+> +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt_vfr.c
+> @@ -468,6 +468,7 @@ static void bnxt_vf_rep_netdev_init(struct bnxt *bp, =
+struct bnxt_vf_rep *vf_rep,
+>         struct net_device *pf_dev =3D bp->dev;
+>         u16 max_mtu;
+>
+> +       SET_NETDEV_DEV(dev, &bp->pdev->dev);
+>         dev->netdev_ops =3D &bnxt_vf_rep_netdev_ops;
+>         dev->ethtool_ops =3D &bnxt_vf_rep_ethtool_ops;
+>         /* Just inherit all the featues of the parent PF as the VF-R
+> --
+> 2.39.3
+>
+>
 
-  1. No skb in the queue (if skb == NULL scope)
-  2. close() the peer
-       - set SHUTDOWN_MASK to sk_shutdown
-       - set ECONNRESET to sk_err
-    or
-     shutdown(RCV_SHUTDOWN) sk
-    or
-     timeout with -EAGAIN
+--=20
+This electronic communication and the information and any files transmitted=
+=20
+with it, or attached to it, are confidential and are intended solely for=20
+the use of the individual or entity to whom it is addressed and may contain=
+=20
+information that is confidential, legally privileged, protected by privacy=
+=20
+laws, or otherwise restricted from disclosure to anyone else. If you are=20
+not the intended recipient or the person responsible for delivering the=20
+e-mail to the intended recipient, you are hereby notified that any use,=20
+copying, distributing, dissemination, forwarding, printing, or copying of=
+=20
+this e-mail is strictly prohibited. If you received this e-mail in error,=
+=20
+please return the e-mail to the sender, delete it from your computer, and=
+=20
+destroy any printed copy of it.
 
-Under this situation there must be nothing to receive, so I don't think
-this change could cause regression.
+--0000000000002e905705fe9270bc
+Content-Type: application/pkcs7-signature; name="smime.p7s"
+Content-Transfer-Encoding: base64
+Content-Disposition: attachment; filename="smime.p7s"
+Content-Description: S/MIME Cryptographic Signature
 
-If we have one skb at least in the queue, we will call scm_set_cred().
-
-Thanks!
+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
+riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
+QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
+UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
+M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
+Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
+14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
+a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
+XzCCBWcwggRPoAMCAQICDAGseBnUOryiK+cWfTANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
+RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
+UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAwODE3MzRaFw0yNTA5MTAwODE3MzRaMIGg
+MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
+BgNVBAoTDUJyb2FkY29tIEluYy4xHjAcBgNVBAMTFVNyaWhhcnNoYSBCYXNhdmFwYXRuYTExMC8G
+CSqGSIb3DQEJARYic3JpaGFyc2hhLmJhc2F2YXBhdG5hQGJyb2FkY29tLmNvbTCCASIwDQYJKoZI
+hvcNAQEBBQADggEPADCCAQoCggEBANGVy7il6qkWFiW5c4+kohP7xrKuKgQsfDqhhdfOx4FvPMTF
+A9S2FwTdDOPuDNiSdR2+KK3JzqRLtBCSHV80dlEzwnOgLnlKkFQZvASsdXFtP9j56nc/ni7V4q9G
+Ob5RVSl61kWgHXVmZYj+SqUEKdNy1opV5mitkOJHa9zhftMojx+ylauLeBDp7lEjgg5xFPme6KGV
+GkD3dAbV6M4mQWaR6RpcUU4Jk+Og3FCDkG8PIxRKia+tBqfj2IGoR9LIlX8WZ/hhHTmkkwnsfr59
+kjjPMh9o02jAvOzf/CLmWENkxup5gyPmlM8xAVlqZmn0EtlzxEg2YqBHkRb1s1NNPi0CAwEAAaOC
+AeMwggHfMA4GA1UdDwEB/wQEAwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0
+dHA6Ly9zZWN1cmUuZ2xvYmFsc2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2Ey
+MDIwLmNydDBBBggrBgEFBQcwAYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3Bl
+cnNvbmFsc2lnbjJjYTIwMjAwTQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEW
+Jmh0dHBzOi8vd3d3Lmdsb2JhbHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0f
+BEIwQDA+oDygOoY4aHR0cDovL2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
+MmNhMjAyMC5jcmwwLQYDVR0RBCYwJIEic3JpaGFyc2hhLmJhc2F2YXBhdG5hQGJyb2FkY29tLmNv
+bTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAd
+BgNVHQ4EFgQUXHovQBXsYr3/QkkF+EruxqF3ajswDQYJKoZIhvcNAQELBQADggEBAKHfsxL3xirL
+i7ilaAfW67MeZRrOqvgw4nXhuj+QzkDDZ4QCb6IEYs1B783CbRNC0Vohjtesr+GKJyeTTRqP/Ca2
+tPHjp5VJ3mZZ7Vu1Gnwj5kicRlSs3p7UVzpstr/cGn3oRz4Pby+VIbPftHCyUdrUOocITnz17hmR
+JryVxNcbPcjGdGhThv3mdEDg2RCrFR1X0jlSAsLbQn83Agls1OHzBPHuudbspjj3/jJGD8gsIcnx
+dgaqC7WHdB3zZutGigdpsmj/fxrvqbTUW8ZakCTtc8C57oDCeoBI4L+KAaFoHOJjVlWaQ3g9Fefa
+eiXd6ovtpOAc/1MAXvMftuX+mQIxggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQK
+ExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNp
+Z24gMiBDQSAyMDIwAgwBrHgZ1Dq8oivnFn0wDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkE
+MSIEIK1vKlNQs+M7jytqzkcQn55JeDmSFlAOeDNN99/FyjkGMBgGCSqGSIb3DQEJAzELBgkqhkiG
+9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDYyMDE2NDk0NFowaQYJKoZIhvcNAQkPMVwwWjALBglg
+hkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0B
+AQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQAFwYdA7+Ol21s5
+krc4HR10fCQXtcwvjr6qsl5JnfdQcI7nKOROqrKoAJhlAN47J9jjFKmdKNy8SxJ8di3i8ig3ArAr
+nkbUvpvkVXZ9x3PAs1m8gxtObp8+VNwBNKmG068k5DluUza7evB/D24FZSqklQKcw88l4SmPFZhq
+efDGc8NhinrKzGh0wNQW2diwE4sGutn/WX8nCfBc0XiqNmbAM+4VnpI1NIYXrU5jq0VKfqb244Mw
+hqnRPqQ8S9DgsxdXqmQeWMhPa40qancmGyCJOKh7RiK+OmzPvVYcysWm01H0OnJJftrUj0vvrmGo
+i3BeAN+/WuJoth9NOP/7diUh
+--0000000000002e905705fe9270bc--
 
