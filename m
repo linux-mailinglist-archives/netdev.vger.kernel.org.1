@@ -1,176 +1,223 @@
-Return-Path: <netdev+bounces-12350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD2237372C7
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:26:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7AE57372FF
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:34:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DDCB928139A
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 17:26:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D5F21C20CC0
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 17:34:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CAFD2AB50;
-	Tue, 20 Jun 2023 17:26:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB3B2AB5A;
+	Tue, 20 Jun 2023 17:34:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 419C02AB4A
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 17:26:37 +0000 (UTC)
-Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FB41AC
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 10:26:35 -0700 (PDT)
-Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6b58788fc67so1596823a34.3
-        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 10:26:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1687281995; x=1689873995;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=F4jJg47lxB3M4An5400yyMt2KCfxMOKXGkEn890KitU=;
-        b=W0sz9WTgZBik0BQsms8sM8dysOBtyNPX1wsx7DONtrQN2TnPgaE71hpmf7lnolJJEC
-         hRQrwgrTvXs++FqNers+jPFhU2rwjAQDaUZoltQR1bMX2XkDUAOzmyZOAPZuRgB+qYbl
-         rYgHFC8TQkHUqaLPxY9bnLIen6jlwQ0onZV4g=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687281995; x=1689873995;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=F4jJg47lxB3M4An5400yyMt2KCfxMOKXGkEn890KitU=;
-        b=jAZUIMWGUYVMkTiSKoyRWyb7/sjX5fM9nRSXLxmT5dWLbA1rOfE3BMO+V+LUbhF/Rj
-         8MqSaZU6Ud9N7dITyLo/VblWrARtEu4+tXFIb6GNKnENQ07hYzIDE02XL5VmCTGAHixh
-         OTR8qVtCnAhhq6GBYYMCi4xCwySYG5BslKPksdK9SPc7sPa7oj1OfOhjS4YRJszW2/uV
-         alyrJZ/yvu5Kwv+td6IVRt9qxNjDTfm6XYEtzzHMrUXia2esfh7Km0A5ypHX/3DpPKVW
-         YxEIocCmhiqUhzY8gqlP/H/tmjl2tLgwtjAOjUXuXP2PwgefcsCWkKjljX6gK6GFJKbC
-         N9+g==
-X-Gm-Message-State: AC+VfDyTtRPzh7FlECnt5+ntROXtZmKlsVY7RFA922Q5QYoMId3wFNNG
-	Pv5eA74TdzcA9jbLwCyopiKVvuk4IdSvQsLrxF+tz5LFAmTW4zVo
-X-Google-Smtp-Source: ACHHUZ5P6YaxuF1kJoaz/Az2crEzLd9VGKKboKm6F0RVu805j28czqPGXu9kqQGNJTCwSAbUKFkbeHgnIPU7Kp7CNdo=
-X-Received: by 2002:a05:6808:120c:b0:39e:bcdc:4bd7 with SMTP id
- a12-20020a056808120c00b0039ebcdc4bd7mr8467527oil.24.1687281994678; Tue, 20
- Jun 2023 10:26:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ABF72AB20;
+	Tue, 20 Jun 2023 17:34:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C5741C433C8;
+	Tue, 20 Jun 2023 17:34:16 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687282457;
+	bh=8h6z/efvrutubaif8t3pIyVm8J77xaV8rSrSuVWeams=;
+	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
+	b=EcTCqK+1y556YQFHYW389zSnG7SgIefIM9gXsqj8FDZBvN55UllY9ha3hHMhDDvnm
+	 RjanYU9b0QV/rnqckE2CISHPgeuVzODiKwoXeAvzvk0Iyc/4zmiT/UoqwROrJuxRrG
+	 G9FyRDX/dV6V714sVxnGgZO6sb1ky2Pg0m2gN6rsW/LAP1JY4En9+kJo5iqNOHoiQn
+	 ZK70drvjjZDr6cyT/XuAnMl97nbMsPv193faJCAwAkdCyAM131krLiXkxcv5hjkuqC
+	 Y8hqgjEAQebk5PSEDL1JnXKJEejyEUq+GVUIjIlc2kkyE1q+zrBktI5bWguPjTNLfT
+	 VDvrKKMTS/obw==
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 6057CBBF0B4; Tue, 20 Jun 2023 19:34:14 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org
+Cc: netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
+ tirthendu.sarkar@intel.com, maciej.fijalkowski@intel.com,
+ simon.horman@corigine.com
+Subject: Re: [PATCH v4 bpf-next 15/22] xsk: add multi-buffer documentation
+In-Reply-To: <20230615172606.349557-16-maciej.fijalkowski@intel.com>
+References: <20230615172606.349557-1-maciej.fijalkowski@intel.com>
+ <20230615172606.349557-16-maciej.fijalkowski@intel.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Tue, 20 Jun 2023 19:34:14 +0200
+Message-ID: <87zg4uca21.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230620144855.288443-1-ivecera@redhat.com>
-In-Reply-To: <20230620144855.288443-1-ivecera@redhat.com>
-From: Michael Chan <michael.chan@broadcom.com>
-Date: Tue, 20 Jun 2023 10:26:21 -0700
-Message-ID: <CACKFLi=1EV01f=47eDP08mp8OiaBdUHcigrJak-PKx1z8KHUUg@mail.gmail.com>
-Subject: Re: [PATCH net-next] bnxt_en: Link representors to PCI device
-To: Ivan Vecera <ivecera@redhat.com>
-Cc: netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	open list <linux-kernel@vger.kernel.org>
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000f3613705fe92f308"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain
 
---000000000000f3613705fe92f308
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
 
-On Tue, Jun 20, 2023 at 7:52=E2=80=AFAM Ivan Vecera <ivecera@redhat.com> wr=
-ote:
+> From: Magnus Karlsson <magnus.karlsson@intel.com>
 >
-> Link VF representors to parent PCI device to benefit from
-> systemd defined naming scheme.
+> Add AF_XDP multi-buffer support documentation including two
+> pseudo-code samples.
 >
-> Without this change the representor is visible as ethN.
+> Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> ---
+>  Documentation/networking/af_xdp.rst | 177 ++++++++++++++++++++++++++++
+>  1 file changed, 177 insertions(+)
 >
-> Signed-off-by: Ivan Vecera <ivecera@redhat.com>
+> diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
+> index 247c6c4127e9..2b583f58967b 100644
+> --- a/Documentation/networking/af_xdp.rst
+> +++ b/Documentation/networking/af_xdp.rst
+> @@ -453,6 +453,93 @@ XDP_OPTIONS getsockopt
+>  Gets options from an XDP socket. The only one supported so far is
+>  XDP_OPTIONS_ZEROCOPY which tells you if zero-copy is on or not.
+>  
+> +Multi-Buffer Support
+> +--------------------
+> +
+> +With multi-buffer support, programs using AF_XDP sockets can receive
+> +and transmit packets consisting of multiple buffers both in copy and
+> +zero-copy mode. For example, a packet can consist of two
+> +frames/buffers, one with the header and the other one with the data,
+> +or a 9K Ethernet jumbo frame can be constructed by chaining together
+> +three 4K frames.
+> +
+> +Some definitions:
+> +
+> +* A packet consists of one or more frames
+> +
+> +* A descriptor in one of the AF_XDP rings always refers to a single
+> +  frame. In the case the packet consists of a single frame, the
+> +  descriptor refers to the whole packet.
+> +
+> +To enable multi-buffer support for an AF_XDP socket, use the new bind
+> +flag XDP_USE_SG. If this is not provided, all multi-buffer packets
+> +will be dropped just as before. Note that the XDP program loaded also
+> +needs to be in multi-buffer mode. This can be accomplished by using
+> +"xdp.frags" as the section name of the XDP program used.
+> +
+> +To represent a packet consisting of multiple frames, a new flag called
+> +XDP_PKT_CONTD is introduced in the options field of the Rx and Tx
+> +descriptors. If it is true (1) the packet continues with the next
+> +descriptor and if it is false (0) it means this is the last descriptor
+> +of the packet. Why the reverse logic of end-of-packet (eop) flag found
+> +in many NICs? Just to preserve compatibility with non-multi-buffer
+> +applications that have this bit set to false for all packets on Rx,
+> +and the apps set the options field to zero for Tx, as anything else
+> +will be treated as an invalid descriptor.
+> +
+> +These are the semantics for producing packets onto AF_XDP Tx ring
+> +consisting of multiple frames:
+> +
+> +* When an invalid descriptor is found, all the other
+> +  descriptors/frames of this packet are marked as invalid and not
+> +  completed. The next descriptor is treated as the start of a new
+> +  packet, even if this was not the intent (because we cannot guess
+> +  the intent). As before, if your program is producing invalid
+> +  descriptors you have a bug that must be fixed.
+> +
+> +* Zero length descriptors are treated as invalid descriptors.
+> +
+> +* For copy mode, the maximum supported number of frames in a packet is
+> +  equal to CONFIG_MAX_SKB_FRAGS + 1. If it is exceeded, all
+> +  descriptors accumulated so far are dropped and treated as
+> +  invalid. To produce an application that will work on any system
+> +  regardless of this config setting, limit the number of frags to 18,
+> +  as the minimum value of the config is 17.
+> +
+> +* For zero-copy mode, the limit is up to what the NIC HW
+> +  supports. Usually at least five on the NICs we have checked. We
+> +  consciously chose to not enforce a rigid limit (such as
+> +  CONFIG_MAX_SKB_FRAGS + 1) for zero-copy mode, as it would have
+> +  resulted in copy actions under the hood to fit into what limit
+> +  the NIC supports. Kind of defeats the purpose of zero-copy mode.
 
-Thanks.
+How is an application supposed to discover the actual limit for a given
+NIC/driver?
 
-Reviewed-by: Michael Chan <michael.chan@broadcon.com>
+> +* The ZC batch API guarantees that it will provide a batch of Tx
+> +  descriptors that ends with full packet at the end. If not, ZC
+> +  drivers would have to gather the full packet on their side. The
+> +  approach we picked makes ZC drivers' life much easier (at least on
+> +  Tx side).
 
---000000000000f3613705fe92f308
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+This seems like it implies some constraint on how an application can use
+the APIs, but it's not quite clear to me what those constraints are, nor
+what happens if an application does something different. This should
+probably be spelled out...
 
-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
-OnaLEot1MoQO7BIe5S9H4AcCEXXcrJJiAtMCl47ARpyHmvQFQFFTrHgUYEd9V+9bOzY7MBIGSV1N
-/JfsT1sZw6HT0lJkSQefhPGpBniAob62DJP3qr11tu8CAwEAAaOCAdowggHWMA4GA1UdDwEB/wQE
-AwIFoDCBowYIKwYBBQUHAQEEgZYwgZMwTgYIKwYBBQUHMAKGQmh0dHA6Ly9zZWN1cmUuZ2xvYmFs
-c2lnbi5jb20vY2FjZXJ0L2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNydDBBBggrBgEFBQcw
-AYY1aHR0cDovL29jc3AuZ2xvYmFsc2lnbi5jb20vZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAw
-TQYDVR0gBEYwRDBCBgorBgEEAaAyASgKMDQwMgYIKwYBBQUHAgEWJmh0dHBzOi8vd3d3Lmdsb2Jh
-bHNpZ24uY29tL3JlcG9zaXRvcnkvMAkGA1UdEwQCMAAwSQYDVR0fBEIwQDA+oDygOoY4aHR0cDov
-L2NybC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWduMmNhMjAyMC5jcmwwJAYDVR0R
-BB0wG4EZbWljaGFlbC5jaGFuQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggrBgEFBQcDBDAfBgNV
-HSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQU31rAyTdZweIF0tJTFYwfOv2w
-L4QwDQYJKoZIhvcNAQELBQADggEBACcuyaGmk0NSZ7Kio7O7WSZ0j0f9xXcBnLbJvQXFYM7JI5uS
-kw5ozATEN5gfmNIe0AHzqwoYjAf3x8Dv2w7HgyrxWdpjTKQFv5jojxa3A5LVuM8mhPGZfR/L5jSk
-5xc3llsKqrWI4ov4JyW79p0E99gfPA6Waixoavxvv1CZBQ4Stu7N660kTu9sJrACf20E+hdKLoiU
-hd5wiQXo9B2ncm5P3jFLYLBmPltIn/uzdiYpFj+E9kS9XYDd+boBZhN1Vh0296zLQZobLfKFzClo
-E6IFyTTANonrXvCRgodKS+QJEH8Syu2jSKe023aVemkuZjzvPK7o9iU7BKkPG2pzLPgxggJtMIIC
-aQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52LXNhMTEwLwYDVQQD
-EyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgxeQGjDntHGb2iaQkIw
-DQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIJKEhmonjguwEMBFSf7467Jk3fwGOOBe
-oqNtfNyg8nVaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcNAQkFMQ8XDTIzMDYy
-MDE3MjYzNVowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZIAWUDBAEWMAsGCWCG
-SAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEHMAsGCWCGSAFlAwQC
-ATANBgkqhkiG9w0BAQEFAASCAQBJEY5zrRGjVQMU80oBLdUNwCQdcSiPyKF+AAovxzQujCjlBweI
-eKYrOvH+COeNoN9+uUcOCqpxUm5ANJi6n8oI9LRfhyj5jnzkRcNmYZVyfaAyEKtWM16W6/jtBn9t
-EK0ziTogcTMsdX2tRuLYJ9XGmoy7vJ4A20Zb18+L8f2AYmjbVzmrzdvm8yOYWnqduADgWjwtgaT0
-BxgO/pb3b4qFiRk8d63QWdGLooXBVsJwDrtqcFhNVieOMEFznsTJQpt1OSjx1nXqVcF8q2O+WCAk
-nPqdnHjCPsqQnuDDhgTKj37hfkJQCKzeTAZrruTaHUI14oX2bSbZQloGDEcPLLSj
---000000000000f3613705fe92f308--
+> +On the Rx path in copy-mode, the xsk core copies the XDP data into
+> +multiple descriptors, if needed, and sets the XDP_PKT_CONTD flag as
+> +detailed before. Zero-copy mode works the same, though the data is not
+> +copied. When the application gets a descriptor with the XDP_PKT_CONTD
+> +flag set to one, it means that the packet consists of multiple buffers
+> +and it continues with the next buffer in the following
+> +descriptor. When a descriptor with XDP_PKT_CONTD == 0 is received, it
+> +means that this is the last buffer of the packet. AF_XDP guarantees
+> +that only a complete packet (all frames in the packet) is sent to the
+> +application.
+
+In light of the comment on batch size below, I think it would be useful
+to spell out what this means exactly. IIUC correctly, it means that the
+kernel will check the ringbuffer before starting to copy the data, and
+if there are not enough descriptors available, it will drop the packet
+instead of doing a partial copy, right? And this is the case for both ZC
+and copy mode?
+
+> +If application reads a batch of descriptors, using for example the libxdp
+> +interfaces, it is not guaranteed that the batch will end with a full
+> +packet. It might end in the middle of a packet and the rest of the
+> +buffers of that packet will arrive at the beginning of the next batch,
+> +since the libxdp interface does not read the whole ring (unless you
+> +have an enormous batch size or a very small ring size).
+> +
+> +An example program each for Rx and Tx multi-buffer support can be found
+> +later in this document.
+> +
+>  Usage
+>  =====
+>  
+> @@ -532,6 +619,96 @@ like this:
+>  But please use the libbpf functions as they are optimized and ready to
+>  use. Will make your life easier.
+>  
+> +Usage Multi-Buffer Rx
+> +=====================
+> +
+> +Here is a simple Rx path pseudo-code example (using libxdp interfaces
+> +for simplicity). Error paths have been excluded to keep it short:
+> +
+> +.. code-block:: c
+> +
+> +    void rx_packets(struct xsk_socket_info *xsk)
+> +    {
+> +        static bool new_packet = true;
+> +        u32 idx_rx = 0, idx_fq = 0;
+> +        static char *pkt;
+> +
+> +        int rcvd = xsk_ring_cons__peek(&xsk->rx, opt_batch_size, &idx_rx);
+> +
+> +        xsk_ring_prod__reserve(&xsk->umem->fq, rcvd, &idx_fq);
+> +
+> +        for (int i = 0; i < rcvd; i++) {
+> +            struct xdp_desc *desc = xsk_ring_cons__rx_desc(&xsk->rx, idx_rx++);
+> +            char *frag = xsk_umem__get_data(xsk->umem->buffer, desc->addr);
+> +            bool eop = !(desc->options & XDP_PKT_CONTD);
+> +
+> +        if (new_packet)
+> +            pkt = frag;
+> +        else
+> +            add_frag_to_pkt(pkt, frag);
+> +
+> +        if (eop)
+> +            process_pkt(pkt);
+> +
+> +        new_packet = eop;
+> +
+> +        *xsk_ring_prod__fill_addr(&xsk->umem->fq, idx_fq++) = desc->addr;
+
+Indentation is off here...
+
+-Toke
 
