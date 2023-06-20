@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-12401-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B2636737513
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:30:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0760D737512
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:30:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E42A91C20D84
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B4DD11C20D6F
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25C5A18007;
-	Tue, 20 Jun 2023 19:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C21CC17FE0;
+	Tue, 20 Jun 2023 19:30:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BD1E17AC8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8085717AD3
 	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:30:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0AA85C433C8;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 12047C433C9;
 	Tue, 20 Jun 2023 19:30:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687289421;
-	bh=nUeCfLB31CaFoKMGKSp295jPG5fUSMkthOYLw6VgpWM=;
+	bh=LdCourSXugFphSq7Z911ky6/IttVqubZe81OKxkbUOY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=p2SQcF1CqcIHip21N+TgePwAwGtzZ2voSD1l5mBmw3WVXnePHOxMqOnA2bSPjrw9B
-	 MPymQFWZBuUsjymmtI/Ws/ofAiWsk/7emVR4tjW7zevVFRhp1uX0uCAQaN4smqWbJ6
-	 6g0jiCAC3EMoeCxq4jVq1EEqPTHg/ZKUlUubXdeeKrHxBDHcJx7DDjZFCKFTqrAjmW
-	 5uDKzh01u5UcQ8nXg5uYG3+PaZpLXaDAlFgn+Zn3xiyJVd5PyBJCWCLrLyvmbLoYbt
-	 9vshrN0uNXU8pS+EaPgqPeSzOoge0N5SiXoUKjVcf/V527Q68crL24xS4jwrCpJJoz
-	 svWF+4tDRsRgQ==
+	b=Ki3HvOcpEK9oJWfwQKymkHaRYQ8+DooaaL9Pgisl7zOovrudfjPmu1BqXkj5OkkFx
+	 SGzm/b5csGyLLktRxCGnzsIEQ+K0yynOGD08d5sq3JTBF7agGSMX29n2NKgcPJIT+V
+	 ErgGlUuJD63ap8zwVE+BRhlkCP4SN1vcpdfk2vmNFDBGJF3WBDWJ16GG2S0VgaQ6EL
+	 Mp9Er3H3lDXl5e+yoiOOxhbQSocR0p7Ae6EEPs4B6/kZ3tjGEkbCln+8tUX6UO3TMi
+	 zyjoGbtdcagZ/86Ze/c0qvxGtU54qUcKJFJVdEGaJChXpkIXYbSxeQSXEDvLX//4qV
+	 6z981tP6D47Ew==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DA686E301FA;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E4C23E21EDF;
 	Tue, 20 Jun 2023 19:30:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,38 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] wifi: iwlwifi: pcie: Handle SO-F device for PCI id 0x7AF0
+Subject: Re: [PATCH] be2net: Extend xmit workaround to BE3 chip
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168728942088.14216.9670142240343267380.git-patchwork-notify@kernel.org>
+ <168728942093.14216.17570770216519580284.git-patchwork-notify@kernel.org>
 Date: Tue, 20 Jun 2023 19:30:20 +0000
-References: <20230619150233.461290-2-johannes@sipsolutions.net>
-In-Reply-To: <20230619150233.461290-2-johannes@sipsolutions.net>
-To: Johannes Berg <johannes@sipsolutions.net>
-Cc: linux-wireless@vger.kernel.org, netdev@vger.kernel.org,
- mukesh.sisodiya@intel.com
+References: <20230616164549.2863037-1-ross.lagerwall@citrix.com>
+In-Reply-To: <20230616164549.2863037-1-ross.lagerwall@citrix.com>
+To: Ross Lagerwall <ross.lagerwall@citrix.com>
+Cc: netdev@vger.kernel.org, ajit.khaparde@broadcom.com,
+ sriharsha.basavapatna@broadcom.com, somnath.kotur@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 19 Jun 2023 17:02:34 +0200 you wrote:
-> From: Mukesh Sisodiya <mukesh.sisodiya@intel.com>
+On Fri, 16 Jun 2023 17:45:49 +0100 you wrote:
+> We have seen a bug where the NIC incorrectly changes the length in the
+> IP header of a padded packet to include the padding bytes. The driver
+> already has a workaround for this so do the workaround for this NIC too.
+> This resolves the issue.
 > 
-> Add support for AX1690i and AX1690s devices with
-> PCIE id 0x7AF0.
-> 
-> Cc: stable@vger.kernel.org # 6.1+
-> Signed-off-by: Mukesh Sisodiya <mukesh.sisodiya@intel.com>
-> Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
-> Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> The NIC in question identifies itself as follows:
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] wifi: iwlwifi: pcie: Handle SO-F device for PCI id 0x7AF0
-    https://git.kernel.org/netdev/net/c/4e9f0ec38852
+  - be2net: Extend xmit workaround to BE3 chip
+    https://git.kernel.org/netdev/net/c/7580e0a78eb2
 
 You are awesome, thank you!
 -- 
