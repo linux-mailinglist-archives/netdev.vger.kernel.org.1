@@ -1,72 +1,60 @@
-Return-Path: <netdev+bounces-12418-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5F8B57376B3
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 23:35:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 31A4D737754
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 00:17:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67AD01C20B5B
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:35:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6CE482812B8
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 22:17:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AB6C182D0;
-	Tue, 20 Jun 2023 21:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E51118AE5;
+	Tue, 20 Jun 2023 22:17:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3952818AEB
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 21:34:38 +0000 (UTC)
-Received: from mail-yw1-x1130.google.com (mail-yw1-x1130.google.com [IPv6:2607:f8b0:4864:20::1130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 54DFC170D
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 14:34:35 -0700 (PDT)
-Received: by mail-yw1-x1130.google.com with SMTP id 00721157ae682-57015b368c3so45296187b3.3
-        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 14:34:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687296874; x=1689888874;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=F0bYw/z1H3wQUa3Rc414/G+qbH4wS6Dev/oHUSfS4hM=;
-        b=EXpMCEbEJOa9gJV01YvHMjIKCLxnT1AkKonvmru8O9YAr0IyBmBlZQ7dIVTh+wO4nL
-         6WyJQ2Vxm4FU6iyIKZul9OkAS5hOua9FfX0ylJoAHF3bgKRj/IhDDGQz+ed+bKM26FVE
-         vk8RWuJ6C/EROOFg0SwRLmhzt889QYKamdY8zR/Ip5yVjZiU6CT06a/xZ+h0WIdbQqlu
-         5BrfYP8G5AAamlRV6lNt1/b8ZOWv3X99zz2/z/iCA9fUia8916ODxZb85cSPxW16BEG/
-         QRZTXfnvmxh+8ci6iSSuysQXFWXp0fqqtwa0PfoX6XcLo6x39r6W3tw2phN+HtujdudL
-         Au7Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687296874; x=1689888874;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=F0bYw/z1H3wQUa3Rc414/G+qbH4wS6Dev/oHUSfS4hM=;
-        b=j97BLTAnslz0Ln+2RELf01zeXKrTCf3VIvnmjgabi6ht14l3/y3ag/JnkHpnjXoCc1
-         TMSSNf/RP3I2NdKD2fhlwWS7eHRFCFZSm4dSDCZkVYQv+1ZxazbKFtJxixA5VXq3lwvZ
-         xqMxbtdEY6BTICQDpOtU6DnkLQEIYRxGNaTxhvRyuDlXiYjp25nlRrhvoJaPZI1EIWZZ
-         deaQxGTG7+SbqC7RG/cceaTxIjWzPDGsBDQflEQPJdiWduPH1ZPJyUImIsIZ20l32iiE
-         IoKRkUWK3tfkWutUiNnuPzRuFzJxw6bU3Leqiepmzh+LrfPEof6URUQyvOD84ErPBmm9
-         0s0Q==
-X-Gm-Message-State: AC+VfDy2QnJIeucztYKq8qndRtmYzTk3QVxviNW6bqux/lTJGvXj5qMk
-	+725X48fEzE58NX09g2uKGB+5FRK+crfQA==
-X-Google-Smtp-Source: ACHHUZ4c9+NO7LWH7DHhCFa3A3Essdi8M4vz+d2PP3McDRH/V9J5p3Ve+a0O+8yIREpM7gMGxwvuSw==
-X-Received: by 2002:a81:924c:0:b0:56d:2f9d:42cc with SMTP id j73-20020a81924c000000b0056d2f9d42ccmr9352271ywg.51.1687296873530;
-        Tue, 20 Jun 2023 14:34:33 -0700 (PDT)
-Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:eae5:6acd:8444:936b])
-        by smtp.gmail.com with ESMTPSA id s131-20020a815e89000000b0057068c6924esm389521ywb.75.2023.06.20.14.34.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 14:34:33 -0700 (PDT)
-From: Kui-Feng Lee <thinker.li@gmail.com>
-X-Google-Original-From: Kui-Feng Lee <kuifeng@meta.com>
-To: netdev@vger.kernel.org
-Cc: kuba@kernel.org,
-	Kui-Feng Lee <kuifeng@meta.com>
-Subject: [PATCH bpf-next v3 2/2] selftests/bpf: Verify that the cgroup_skb filters receive expected packets.
-Date: Tue, 20 Jun 2023 14:32:27 -0700
-Message-Id: <20230620213227.180421-3-kuifeng@meta.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230620213227.180421-1-kuifeng@meta.com>
-References: <20230620213227.180421-1-kuifeng@meta.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9321B16408
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 22:17:21 +0000 (UTC)
+Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0923F10CE
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 15:17:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687299440; x=1718835440;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Y/bkpUWpe2v3pbY6MM8FcxrxticWewloNX2YnOTTYNc=;
+  b=hDCtYOL7reytswBpMLe2X7P+Mq+z1zCs4HQerc9mSpgI1ld/pD+aXw/5
+   7QC/HK4Dr/JqCHQEqzAQ4NNkVHaFupQVI30Mzx/64aJNeHgAvPoUEHAFJ
+   tW/3zDgNwsjv/GiuoRrRHa/ogAVLoHHGdgKBUxQH7GahxMRSBdgmX4Ccm
+   Cbmo/2yRxdDkhDUT2eQgZopaA4z1VVFEul2TtzNXuhlapiuJ9m9sowXcD
+   kiwBA9bd7BNpPBscCW5c3mkblz2bbpZA+xT37AVSINPAiKfyADJFksN64
+   CdPQMUpGkDNghfrd5xcouWRdfN+ucuwCnfQgijLPFww0QOn8T2yTSKkD0
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="358869089"
+X-IronPort-AV: E=Sophos;i="6.00,258,1681196400"; 
+   d="scan'208";a="358869089"
+Received: from fmsmga001.fm.intel.com ([10.253.24.23])
+  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 15:17:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="858744946"
+X-IronPort-AV: E=Sophos;i="6.00,258,1681196400"; 
+   d="scan'208";a="858744946"
+Received: from dmert-dev.jf.intel.com ([10.166.241.14])
+  by fmsmga001-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 20 Jun 2023 15:17:16 -0700
+From: Dave Ertman <david.m.ertman@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	daniel.machon@microchip.com,
+	simon.horman@corigine.com,
+	bcreeley@amd.com
+Subject: [PATCH iwl-next v6 00/10] Implement support for SRIOV + LAG
+Date: Tue, 20 Jun 2023 15:18:44 -0700
+Message-Id: <20230620221854.848606-1-david.m.ertman@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,908 +62,96 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This test case includes four scenarios:
-1. Connect to the server from outside the cgroup and close the connection
-   from outside the cgroup.
-2. Connect to the server from outside the cgroup and close the connection
-   from inside the cgroup.
-3. Connect to the server from inside the cgroup and close the connection
-   from outside the cgroup.
-4. Connect to the server from inside the cgroup and close the connection
-   from inside the cgroup.
+Implement support for SRIOV VF's on interfaces that are in an
+aggregate interface.
 
-The test case is to verify that cgroup_skb/{egress, ingress} filters
-receive expected packets including SYN, SYN/ACK, ACK, FIN, and FIN/ACK.
+The first interface added into the aggregate will be flagged as
+the primary interface, and this primary interface will be
+responsible for managing the VF's resources.  VF's created on the
+primary are the only VFs that will be supported on the aggregate.
+Only Active-Backup mode will be supported and only aggregates whose
+primary interface is in switchdev mode will be supported.
 
-Signed-off-by: Kui-Feng Lee <kuifeng@meta.com>
----
- tools/testing/selftests/bpf/cgroup_helpers.c  |  12 +
- tools/testing/selftests/bpf/cgroup_helpers.h  |   1 +
- tools/testing/selftests/bpf/cgroup_tcp_skb.h  |  35 ++
- .../selftests/bpf/prog_tests/cgroup_tcp_skb.c | 399 ++++++++++++++++++
- .../selftests/bpf/progs/cgroup_tcp_skb.c      | 382 +++++++++++++++++
- 5 files changed, 829 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/cgroup_tcp_skb.h
- create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_tcp_skb.c
- create mode 100644 tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c
+Additional restrictions on what interfaces can be added to the aggregate
+and still support SRIOV VFs are:
+- interfaces have to all be on the same physical NIC
+- all interfaces have to have the same QoS settings
+- interfaces have to have the FW LLDP agent disabled
+- only the primary interface is to be put into switchdev mode
+- no more than two interfaces in the aggregate
 
-diff --git a/tools/testing/selftests/bpf/cgroup_helpers.c b/tools/testing/selftests/bpf/cgroup_helpers.c
-index 9e95b37a7dff..2caee8423ee0 100644
---- a/tools/testing/selftests/bpf/cgroup_helpers.c
-+++ b/tools/testing/selftests/bpf/cgroup_helpers.c
-@@ -277,6 +277,18 @@ int join_cgroup(const char *relative_path)
- 	return join_cgroup_from_top(cgroup_path);
- }
- 
-+/**
-+ * join_root_cgroup() - Join the root cgroup
-+ *
-+ * This function joins the root cgroup.
-+ *
-+ * On success, it returns 0, otherwise on failure it returns 1.
-+ */
-+int join_root_cgroup(void)
-+{
-+	return join_cgroup_from_top(CGROUP_MOUNT_PATH);
-+}
-+
- /**
-  * join_parent_cgroup() - Join a cgroup in the parent process workdir
-  * @relative_path: The cgroup path, relative to parent process workdir, to join
-diff --git a/tools/testing/selftests/bpf/cgroup_helpers.h b/tools/testing/selftests/bpf/cgroup_helpers.h
-index f099a166c94d..5c2cb9c8b546 100644
---- a/tools/testing/selftests/bpf/cgroup_helpers.h
-+++ b/tools/testing/selftests/bpf/cgroup_helpers.h
-@@ -22,6 +22,7 @@ void remove_cgroup(const char *relative_path);
- unsigned long long get_cgroup_id(const char *relative_path);
- 
- int join_cgroup(const char *relative_path);
-+int join_root_cgroup(void);
- int join_parent_cgroup(const char *relative_path);
- 
- int setup_cgroup_environment(void);
-diff --git a/tools/testing/selftests/bpf/cgroup_tcp_skb.h b/tools/testing/selftests/bpf/cgroup_tcp_skb.h
-new file mode 100644
-index 000000000000..1054b3633983
---- /dev/null
-+++ b/tools/testing/selftests/bpf/cgroup_tcp_skb.h
-@@ -0,0 +1,35 @@
-+/* SPDX-License-Identifier: GPL-2.0 */
-+/* Copyright (c) 2023 Facebook */
-+
-+/* Define states of a socket to tracking messages sending to and from the
-+ * socket.
-+ *
-+ * These states are based on rfc9293 with some modifications to support
-+ * tracking of messages sent out from a socket. For example, when a SYN is
-+ * received, a new socket is transiting to the SYN_RECV state defined in
-+ * rfc9293. But, we put it in SYN_RECV_SENDING_SYN_ACK state and when
-+ * SYN-ACK is sent out, it moves to SYN_RECV state. With this modification,
-+ * we can track the message sent out from a socket.
-+ */
-+
-+#ifndef __CGROUP_TCP_SKB_H__
-+#define __CGROUP_TCP_SKB_H__
-+
-+enum {
-+	INIT,
-+	CLOSED,
-+	SYN_SENT,
-+	SYN_RECV_SENDING_SYN_ACK,
-+	SYN_RECV,
-+	ESTABLISHED,
-+	FIN_WAIT1,
-+	FIN_WAIT2,
-+	CLOSE_WAIT_SENDING_ACK,
-+	CLOSE_WAIT,
-+	CLOSING,
-+	LAST_ACK,
-+	TIME_WAIT_SENDING_ACK,
-+	TIME_WAIT,
-+};
-+
-+#endif /* __CGROUP_TCP_SKB_H__ */
-diff --git a/tools/testing/selftests/bpf/prog_tests/cgroup_tcp_skb.c b/tools/testing/selftests/bpf/prog_tests/cgroup_tcp_skb.c
-new file mode 100644
-index 000000000000..1b78e8ab3f02
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/cgroup_tcp_skb.c
-@@ -0,0 +1,399 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Facebook */
-+#include <test_progs.h>
-+#include <linux/in6.h>
-+#include <sys/socket.h>
-+#include <sched.h>
-+#include <unistd.h>
-+#include "cgroup_helpers.h"
-+#include "testing_helpers.h"
-+#include "cgroup_tcp_skb.skel.h"
-+#include "cgroup_tcp_skb.h"
-+
-+#define CGROUP_TCP_SKB_PATH "/test_cgroup_tcp_skb"
-+
-+static int install_filters(int cgroup_fd,
-+			   struct bpf_link **egress_link,
-+			   struct bpf_link **ingress_link,
-+			   struct bpf_program *egress_prog,
-+			   struct bpf_program *ingress_prog,
-+			   struct cgroup_tcp_skb *skel)
-+{
-+	/* Prepare filters */
-+	skel->bss->g_sock_state = 0;
-+	skel->bss->g_unexpected = 0;
-+	*egress_link =
-+		bpf_program__attach_cgroup(egress_prog,
-+					   cgroup_fd);
-+	if (!ASSERT_NEQ(*egress_link, NULL, "egress_link"))
-+		return -1;
-+	*ingress_link =
-+		bpf_program__attach_cgroup(ingress_prog,
-+					   cgroup_fd);
-+	if (!ASSERT_NEQ(*ingress_link, NULL, "ingress_link"))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static void uninstall_filters(struct bpf_link **egress_link,
-+			      struct bpf_link **ingress_link)
-+{
-+	bpf_link__destroy(*egress_link);
-+	*egress_link = NULL;
-+	bpf_link__destroy(*ingress_link);
-+	*ingress_link = NULL;
-+}
-+
-+static int create_client_sock_v6(void)
-+{
-+	int fd;
-+
-+	fd = socket(AF_INET6, SOCK_STREAM, 0);
-+	if (fd < 0) {
-+		perror("socket");
-+		return -1;
-+	}
-+
-+	return fd;
-+}
-+
-+static int create_server_sock_v6(void)
-+{
-+	struct sockaddr_in6 addr = {
-+		.sin6_family = AF_INET6,
-+		.sin6_port = htons(0),
-+		.sin6_addr = IN6ADDR_LOOPBACK_INIT,
-+	};
-+	int fd, err;
-+
-+	fd = socket(AF_INET6, SOCK_STREAM, 0);
-+	if (fd < 0) {
-+		perror("socket");
-+		return -1;
-+	}
-+
-+	err = bind(fd, (struct sockaddr *)&addr, sizeof(addr));
-+	if (err < 0) {
-+		perror("bind");
-+		return -1;
-+	}
-+
-+	err = listen(fd, 1);
-+	if (err < 0) {
-+		perror("listen");
-+		return -1;
-+	}
-+
-+	return fd;
-+}
-+
-+static int get_sock_port_v6(int fd)
-+{
-+	struct sockaddr_in6 addr;
-+	socklen_t len;
-+	int err;
-+
-+	len = sizeof(addr);
-+	err = getsockname(fd, (struct sockaddr *)&addr, &len);
-+	if (err < 0) {
-+		perror("getsockname");
-+		return -1;
-+	}
-+
-+	return ntohs(addr.sin6_port);
-+}
-+
-+static int connect_client_server_v6(int client_fd, int listen_fd)
-+{
-+	struct sockaddr_in6 addr = {
-+		.sin6_family = AF_INET6,
-+		.sin6_addr = IN6ADDR_LOOPBACK_INIT,
-+	};
-+	int err;
-+
-+	addr.sin6_port = htons(get_sock_port_v6(listen_fd));
-+	if (addr.sin6_port < 0)
-+		return -1;
-+
-+	err = connect(client_fd, (struct sockaddr *)&addr, sizeof(addr));
-+	if (err < 0) {
-+		perror("connect");
-+		return -1;
-+	}
-+
-+	return 0;
-+}
-+
-+/* Connect to the server in a cgroup from the outside of the cgroup. */
-+static int talk_to_cgroup(int *client_fd, int *listen_fd, int *service_fd,
-+			  struct cgroup_tcp_skb *skel)
-+{
-+	int err, cp;
-+	char buf[5];
-+
-+	/* Create client & server socket */
-+	err = join_root_cgroup();
-+	if (!ASSERT_OK(err, "join_root_cgroup"))
-+		return -1;
-+	*client_fd = create_client_sock_v6();
-+	if (!ASSERT_GE(*client_fd, 0, "client_fd"))
-+		return -1;
-+	err = join_cgroup(CGROUP_TCP_SKB_PATH);
-+	if (!ASSERT_OK(err, "join_cgroup"))
-+		return -1;
-+	*listen_fd = create_server_sock_v6();
-+	if (!ASSERT_GE(*listen_fd, 0, "listen_fd"))
-+		return -1;
-+	skel->bss->g_sock_port = get_sock_port_v6(*listen_fd);
-+
-+	/* Connect client to server */
-+	err = connect_client_server_v6(*client_fd, *listen_fd);
-+	if (!ASSERT_OK(err, "connect_client_server_v6"))
-+		return -1;
-+	*service_fd = accept(*listen_fd, NULL, NULL);
-+	if (!ASSERT_GE(*service_fd, 0, "service_fd"))
-+		return -1;
-+	err = join_root_cgroup();
-+	if (!ASSERT_OK(err, "join_root_cgroup"))
-+		return -1;
-+	cp = write(*client_fd, "hello", 5);
-+	if (!ASSERT_EQ(cp, 5, "write"))
-+		return -1;
-+	cp = read(*service_fd, buf, 5);
-+	if (!ASSERT_EQ(cp, 5, "read"))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+/* Connect to the server out of a cgroup from inside the cgroup. */
-+static int talk_to_outside(int *client_fd, int *listen_fd, int *service_fd,
-+			   struct cgroup_tcp_skb *skel)
-+
-+{
-+	int err, cp;
-+	char buf[5];
-+
-+	/* Create client & server socket */
-+	err = join_root_cgroup();
-+	if (!ASSERT_OK(err, "join_root_cgroup"))
-+		return -1;
-+	*listen_fd = create_server_sock_v6();
-+	if (!ASSERT_GE(*listen_fd, 0, "listen_fd"))
-+		return -1;
-+	err = join_cgroup(CGROUP_TCP_SKB_PATH);
-+	if (!ASSERT_OK(err, "join_cgroup"))
-+		return -1;
-+	*client_fd = create_client_sock_v6();
-+	if (!ASSERT_GE(*client_fd, 0, "client_fd"))
-+		return -1;
-+	err = join_root_cgroup();
-+	if (!ASSERT_OK(err, "join_root_cgroup"))
-+		return -1;
-+	skel->bss->g_sock_port = get_sock_port_v6(*listen_fd);
-+
-+	/* Connect client to server */
-+	err = connect_client_server_v6(*client_fd, *listen_fd);
-+	if (!ASSERT_OK(err, "connect_client_server_v6"))
-+		return -1;
-+	*service_fd = accept(*listen_fd, NULL, NULL);
-+	if (!ASSERT_GE(*service_fd, 0, "service_fd"))
-+		return -1;
-+	cp = write(*client_fd, "hello", 5);
-+	if (!ASSERT_EQ(cp, 5, "write"))
-+		return -1;
-+	cp = read(*service_fd, buf, 5);
-+	if (!ASSERT_EQ(cp, 5, "read"))
-+		return -1;
-+
-+	return 0;
-+}
-+
-+static int close_connection(int *closing_fd, int *peer_fd, int *listen_fd,
-+			    struct cgroup_tcp_skb *skel)
-+{
-+	__u32 saved_packet_count = 0;
-+	int err;
-+	int i;
-+
-+	/* Wait for ACKs to be sent */
-+	saved_packet_count = skel->bss->g_packet_count;
-+	usleep(100000);		/* 0.1s */
-+	while (skel->bss->g_packet_count != saved_packet_count) {
-+		saved_packet_count = skel->bss->g_packet_count;
-+		usleep(100000);	/* 0.1s */
-+	}
-+
-+	skel->bss->g_packet_count = 0;
-+	saved_packet_count = 0;
-+
-+	/* Half shutdown to make sure the closing socket having a chance to
-+	 * receive a FIN from the peer.
-+	 */
-+	err = shutdown(*closing_fd, SHUT_WR);
-+	if (!ASSERT_OK(err, "shutdown closing_fd"))
-+		return -1;
-+
-+	/* Wait for FIN and the ACK of the FIN to be observed */
-+	for (i = 0;
-+	     skel->bss->g_packet_count < saved_packet_count + 2 && i < 10;
-+	     i++) {
-+		usleep(100000);	/* 0.1s */
-+	}
-+	if (!ASSERT_GE(skel->bss->g_packet_count, saved_packet_count + 2,
-+		       "packet_count"))
-+		return -1;
-+
-+	saved_packet_count = skel->bss->g_packet_count;
-+
-+	/* Fully shutdown the connection */
-+	err = close(*peer_fd);
-+	if (!ASSERT_OK(err, "close peer_fd"))
-+		return -1;
-+	*peer_fd = -1;
-+
-+	/* Wait for FIN and the ACK of the FIN to be observed */
-+	for (i = 0;
-+	     skel->bss->g_packet_count < saved_packet_count + 2 && i < 10;
-+	     i++) {
-+		usleep(100000);	/* 0.1s */
-+	}
-+	if (!ASSERT_GE(skel->bss->g_packet_count, saved_packet_count + 2,
-+		       "packet_count"))
-+		return -1;
-+
-+	err = close(*closing_fd);
-+	if (!ASSERT_OK(err, "close closing_fd"))
-+		return -1;
-+	*closing_fd = -1;
-+
-+	close(*listen_fd);
-+	*listen_fd = -1;
-+
-+	return 0;
-+}
-+
-+/* This test case includes four scenarios:
-+ * 1. Connect to the server from outside the cgroup and close the connection
-+ *    from outside the cgroup.
-+ * 2. Connect to the server from outside the cgroup and close the connection
-+ *    from inside the cgroup.
-+ * 3. Connect to the server from inside the cgroup and close the connection
-+ *    from outside the cgroup.
-+ * 4. Connect to the server from inside the cgroup and close the connection
-+ *    from inside the cgroup.
-+ *
-+ * The test case is to verify that cgroup_skb/{egress,ingress} filters
-+ * receive expected packets including SYN, SYN/ACK, ACK, FIN, and FIN/ACK.
-+ */
-+void test_cgroup_tcp_skb(void)
-+{
-+	struct bpf_link *ingress_link = NULL;
-+	struct bpf_link *egress_link = NULL;
-+	int client_fd = -1, listen_fd = -1;
-+	struct cgroup_tcp_skb *skel;
-+	int service_fd = -1;
-+	int cgroup_fd = -1;
-+	int err;
-+
-+	skel = cgroup_tcp_skb__open_and_load();
-+	if (!ASSERT_OK(!skel, "skel_open_load"))
-+		return;
-+
-+	err = setup_cgroup_environment();
-+	if (!ASSERT_OK(err, "setup_cgroup_environment"))
-+		goto cleanup;
-+
-+	cgroup_fd = create_and_get_cgroup(CGROUP_TCP_SKB_PATH);
-+	if (!ASSERT_GE(cgroup_fd, 0, "cgroup_fd"))
-+		goto cleanup;
-+
-+	/* Scenario 1 */
-+	err = install_filters(cgroup_fd, &egress_link, &ingress_link,
-+			      skel->progs.server_egress,
-+			      skel->progs.server_ingress,
-+			      skel);
-+	if (!ASSERT_OK(err, "install_filters"))
-+		goto cleanup;
-+
-+	err = talk_to_cgroup(&client_fd, &listen_fd, &service_fd, skel);
-+	if (!ASSERT_OK(err, "talk_to_cgroup"))
-+		goto cleanup;
-+
-+	err = close_connection(&client_fd, &service_fd, &listen_fd, skel);
-+	if (!ASSERT_OK(err, "close_connection"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(skel->bss->g_unexpected, 0, "g_unexpected");
-+	ASSERT_EQ(skel->bss->g_sock_state, CLOSED, "g_sock_state");
-+
-+	uninstall_filters(&egress_link, &ingress_link);
-+
-+	/* Scenario 2 */
-+	err = install_filters(cgroup_fd, &egress_link, &ingress_link,
-+			      skel->progs.server_egress_srv,
-+			      skel->progs.server_ingress_srv,
-+			      skel);
-+
-+	err = talk_to_cgroup(&client_fd, &listen_fd, &service_fd, skel);
-+	if (!ASSERT_OK(err, "talk_to_cgroup"))
-+		goto cleanup;
-+
-+	err = close_connection(&service_fd, &client_fd, &listen_fd, skel);
-+	if (!ASSERT_OK(err, "close_connection"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(skel->bss->g_unexpected, 0, "g_unexpected");
-+	ASSERT_EQ(skel->bss->g_sock_state, TIME_WAIT, "g_sock_state");
-+
-+	uninstall_filters(&egress_link, &ingress_link);
-+
-+	/* Scenario 3 */
-+	err = install_filters(cgroup_fd, &egress_link, &ingress_link,
-+			      skel->progs.client_egress_srv,
-+			      skel->progs.client_ingress_srv,
-+			      skel);
-+
-+	err = talk_to_outside(&client_fd, &listen_fd, &service_fd, skel);
-+	if (!ASSERT_OK(err, "talk_to_outside"))
-+		goto cleanup;
-+
-+	err = close_connection(&service_fd, &client_fd, &listen_fd, skel);
-+	if (!ASSERT_OK(err, "close_connection"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(skel->bss->g_unexpected, 0, "g_unexpected");
-+	ASSERT_EQ(skel->bss->g_sock_state, CLOSED, "g_sock_state");
-+
-+	uninstall_filters(&egress_link, &ingress_link);
-+
-+	/* Scenario 4 */
-+	err = install_filters(cgroup_fd, &egress_link, &ingress_link,
-+			      skel->progs.client_egress,
-+			      skel->progs.client_ingress,
-+			      skel);
-+
-+	err = talk_to_outside(&client_fd, &listen_fd, &service_fd, skel);
-+	if (!ASSERT_OK(err, "talk_to_outside"))
-+		goto cleanup;
-+
-+	err = close_connection(&client_fd, &service_fd, &listen_fd, skel);
-+	if (!ASSERT_OK(err, "close_connection"))
-+		goto cleanup;
-+
-+	ASSERT_EQ(skel->bss->g_unexpected, 0, "g_unexpected");
-+	ASSERT_EQ(skel->bss->g_sock_state, TIME_WAIT, "g_sock_state");
-+
-+	uninstall_filters(&egress_link, &ingress_link);
-+
-+cleanup:
-+	close(client_fd);
-+	close(listen_fd);
-+	close(service_fd);
-+	close(cgroup_fd);
-+	bpf_link__destroy(egress_link);
-+	bpf_link__destroy(ingress_link);
-+	cleanup_cgroup_environment();
-+	cgroup_tcp_skb__destroy(skel);
-+}
-diff --git a/tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c b/tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c
-new file mode 100644
-index 000000000000..372a1548798c
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c
-@@ -0,0 +1,382 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/* Copyright (c) 2023 Facebook */
-+#include <linux/bpf.h>
-+#include <bpf/bpf_endian.h>
-+#include <bpf/bpf_helpers.h>
-+
-+#include <linux/if_ether.h>
-+#include <linux/in.h>
-+#include <linux/in6.h>
-+#include <linux/ipv6.h>
-+#include <linux/tcp.h>
-+
-+#include <sys/types.h>
-+#include <sys/socket.h>
-+
-+#include "cgroup_tcp_skb.h"
-+
-+char _license[] SEC("license") = "GPL";
-+
-+__u16 g_sock_port = 0;
-+__u32 g_sock_state = 0;
-+int g_unexpected = 0;
-+__u32 g_packet_count = 0;
-+
-+int needed_tcp_pkt(struct __sk_buff *skb, struct tcphdr *tcph)
-+{
-+	struct ipv6hdr ip6h;
-+
-+	if (skb->protocol != bpf_htons(ETH_P_IPV6))
-+		return 0;
-+	if (bpf_skb_load_bytes(skb, 0, &ip6h, sizeof(ip6h)))
-+		return 0;
-+
-+	if (ip6h.nexthdr != IPPROTO_TCP)
-+		return 0;
-+
-+	if (bpf_skb_load_bytes(skb, sizeof(ip6h), tcph, sizeof(*tcph)))
-+		return 0;
-+
-+	if (tcph->source != bpf_htons(g_sock_port) &&
-+	    tcph->dest != bpf_htons(g_sock_port))
-+		return 0;
-+
-+	return 1;
-+}
-+
-+/* Run accept() on a socket in the cgroup to receive a new connection. */
-+static int egress_accept(struct tcphdr *tcph)
-+{
-+	if (g_sock_state ==  SYN_RECV_SENDING_SYN_ACK) {
-+		if (tcph->fin || !tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = SYN_RECV;
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ingress_accept(struct tcphdr *tcph)
-+{
-+	switch (g_sock_state) {
-+	case INIT:
-+		if (!tcph->syn || tcph->fin || tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = SYN_RECV_SENDING_SYN_ACK;
-+		break;
-+	case SYN_RECV:
-+		if (tcph->fin || tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = ESTABLISHED;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+/* Run connect() on a socket in the cgroup to start a new connection. */
-+static int egress_connect(struct tcphdr *tcph)
-+{
-+	if (g_sock_state == INIT) {
-+		if (!tcph->syn || tcph->fin || tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = SYN_SENT;
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+static int ingress_connect(struct tcphdr *tcph)
-+{
-+	if (g_sock_state == SYN_SENT) {
-+		if (tcph->fin || !tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = ESTABLISHED;
-+		return 1;
-+	}
-+
-+	return 0;
-+}
-+
-+/* The connection is closed by the peer outside the cgroup. */
-+static int egress_close_remote(struct tcphdr *tcph)
-+{
-+	switch (g_sock_state) {
-+	case ESTABLISHED:
-+		break;
-+	case CLOSE_WAIT_SENDING_ACK:
-+		if (tcph->fin || tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = CLOSE_WAIT;
-+		break;
-+	case CLOSE_WAIT:
-+		if (!tcph->fin)
-+			g_unexpected++;
-+		else
-+			g_sock_state = LAST_ACK;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+static int ingress_close_remote(struct tcphdr *tcph)
-+{
-+	switch (g_sock_state) {
-+	case ESTABLISHED:
-+		if (tcph->fin)
-+			g_sock_state = CLOSE_WAIT_SENDING_ACK;
-+		break;
-+	case LAST_ACK:
-+		if (tcph->fin || tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = CLOSED;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+/* The connection is closed by the endpoint inside the cgroup. */
-+static int egress_close_local(struct tcphdr *tcph)
-+{
-+	switch (g_sock_state) {
-+	case ESTABLISHED:
-+		if (tcph->fin)
-+			g_sock_state = FIN_WAIT1;
-+		break;
-+	case TIME_WAIT_SENDING_ACK:
-+		if (tcph->fin || tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = TIME_WAIT;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+static int ingress_close_local(struct tcphdr *tcph)
-+{
-+	switch (g_sock_state) {
-+	case ESTABLISHED:
-+		break;
-+	case FIN_WAIT1:
-+		if (tcph->fin || tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = FIN_WAIT2;
-+		break;
-+	case FIN_WAIT2:
-+		if (!tcph->fin || tcph->syn || !tcph->ack)
-+			g_unexpected++;
-+		else
-+			g_sock_state = TIME_WAIT_SENDING_ACK;
-+		break;
-+	default:
-+		return 0;
-+	}
-+
-+	return 1;
-+}
-+
-+/* Check the types of outgoing packets of a server socket to make sure they
-+ * are consistent with the state of the server socket.
-+ *
-+ * The connection is closed by the client side.
-+ */
-+SEC("cgroup_skb/egress")
-+int server_egress(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Egress of the server socket. */
-+	if (egress_accept(&tcph) || egress_close_remote(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of incoming packets of a server socket to make sure they
-+ * are consistent with the state of the server socket.
-+ *
-+ * The connection is closed by the client side.
-+ */
-+SEC("cgroup_skb/ingress")
-+int server_ingress(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Ingress of the server socket. */
-+	if (ingress_accept(&tcph) || ingress_close_remote(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of outgoing packets of a server socket to make sure they
-+ * are consistent with the state of the server socket.
-+ *
-+ * The connection is closed by the server side.
-+ */
-+SEC("cgroup_skb/egress")
-+int server_egress_srv(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Egress of the server socket. */
-+	if (egress_accept(&tcph) || egress_close_local(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of incoming packets of a server socket to make sure they
-+ * are consistent with the state of the server socket.
-+ *
-+ * The connection is closed by the server side.
-+ */
-+SEC("cgroup_skb/ingress")
-+int server_ingress_srv(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Ingress of the server socket. */
-+	if (ingress_accept(&tcph) || ingress_close_local(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of outgoing packets of a client socket to make sure they
-+ * are consistent with the state of the client socket.
-+ *
-+ * The connection is closed by the server side.
-+ */
-+SEC("cgroup_skb/egress")
-+int client_egress_srv(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Egress of the server socket. */
-+	if (egress_connect(&tcph) || egress_close_remote(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of incoming packets of a client socket to make sure they
-+ * are consistent with the state of the client socket.
-+ *
-+ * The connection is closed by the server side.
-+ */
-+SEC("cgroup_skb/ingress")
-+int client_ingress_srv(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Ingress of the server socket. */
-+	if (ingress_connect(&tcph) || ingress_close_remote(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of outgoing packets of a client socket to make sure they
-+ * are consistent with the state of the client socket.
-+ *
-+ * The connection is closed by the client side.
-+ */
-+SEC("cgroup_skb/egress")
-+int client_egress(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Egress of the server socket. */
-+	if (egress_connect(&tcph) || egress_close_local(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
-+
-+/* Check the types of incoming packets of a client socket to make sure they
-+ * are consistent with the state of the client socket.
-+ *
-+ * The connection is closed by the client side.
-+ */
-+SEC("cgroup_skb/ingress")
-+int client_ingress(struct __sk_buff *skb)
-+{
-+	struct tcphdr tcph;
-+
-+	if (!needed_tcp_pkt(skb, &tcph))
-+		return 1;
-+
-+	g_packet_count++;
-+
-+	/* Ingress of the server socket. */
-+	if (ingress_connect(&tcph) || ingress_close_local(&tcph))
-+		return 1;
-+
-+	g_unexpected++;
-+	return 1;
-+}
+Changes since v1:
+Fix typo in commit message
+Fix typos in warning messages
+Fix typo in function header
+Use correct bitwise operator instead of boolean
+
+Changes since v2:
+Rebase on current next-queue
+Fix typos in commits
+Fix typos in function headers
+use %u for unsigned values in debug message
+Refactor common code in node moves to subfunction
+
+Changes since v3:
+Fix typos in warning messages
+move refactor of common code to earlier patch
+expand use of refactored code
+move prototype and func call into patch that defines func
+
+Changes since v4:
+Change module_init to use goto unwind approach
+Change function name to be more descriptive
+chagen variable to be more scope specific
+Make sure non-feature specific functions are still performed
+Free correct memory
+Fix typos in warning messages
+added check for invalid TEID in queue cfg
+
+Changes since v5:
+use PF from lag stuct in function
+remove extra blank line
+
+Dave Ertman (9):
+  ice: Add driver support for firmware changes for LAG
+  ice: changes to the interface with the HW and FW for SRIOV_VF+LAG
+  ice: implement lag netdev event handler
+  ice: process events created by lag netdev event handler
+  ice: Flesh out implementation of support for SRIOV on bonded interface
+  ice: support non-standard teardown of bond interface
+  ice: enforce interface eligibility and add messaging for SRIOV LAG
+  ice: enforce no DCB config changing when in bond
+  ice: update reset path for SRIOV LAG support
+
+Jacob Keller (1):
+  ice: Correctly initialize queue context values
+
+ drivers/net/ethernet/intel/ice/ice.h          |    5 +
+ .../net/ethernet/intel/ice/ice_adminq_cmd.h   |   53 +-
+ drivers/net/ethernet/intel/ice/ice_common.c   |   56 +
+ drivers/net/ethernet/intel/ice/ice_common.h   |    4 +
+ drivers/net/ethernet/intel/ice/ice_dcb_nl.c   |   50 +
+ drivers/net/ethernet/intel/ice/ice_lag.c      | 1839 ++++++++++++++++-
+ drivers/net/ethernet/intel/ice/ice_lag.h      |   34 +-
+ drivers/net/ethernet/intel/ice/ice_lib.c      |    2 +-
+ drivers/net/ethernet/intel/ice/ice_lib.h      |    1 +
+ drivers/net/ethernet/intel/ice/ice_main.c     |   36 +-
+ drivers/net/ethernet/intel/ice/ice_sched.c    |   37 +-
+ drivers/net/ethernet/intel/ice/ice_sched.h    |   21 +
+ drivers/net/ethernet/intel/ice/ice_switch.c   |   88 +-
+ drivers/net/ethernet/intel/ice/ice_switch.h   |   29 +
+ drivers/net/ethernet/intel/ice/ice_type.h     |    2 +
+ drivers/net/ethernet/intel/ice/ice_virtchnl.c |    2 +
+ 16 files changed, 2124 insertions(+), 135 deletions(-)
+
 -- 
-2.34.1
+2.40.1
 
 
