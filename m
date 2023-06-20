@@ -1,161 +1,179 @@
-Return-Path: <netdev+bounces-12402-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12393-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61A77737519
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:31:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC34D7374F7
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 21:16:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C3CC281443
-	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:31:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26577281396
+	for <lists+netdev@lfdr.de>; Tue, 20 Jun 2023 19:16:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 665D317FE0;
-	Tue, 20 Jun 2023 19:31:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22DFB17AA3;
+	Tue, 20 Jun 2023 19:16:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 58F31171AA
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:31:54 +0000 (UTC)
-Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222DDEA
-	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 12:31:53 -0700 (PDT)
-Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-988689a5f44so357191266b.1
-        for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 12:31:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 14E332AB55
+	for <netdev@vger.kernel.org>; Tue, 20 Jun 2023 19:16:50 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2096.outbound.protection.outlook.com [40.107.243.96])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B19D1B6;
+	Tue, 20 Jun 2023 12:16:47 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ehBQpzOt8upB+R+jH7OOkhe6MSuNgQC3fG7gVAqRskwQ4jS8JINhiGzJT9fCDjIIJwnVn6ylYcJcmbq/Z/DI3pJfRNrTF2ttl1khzO94kR0M3lmjFICictsH73LgnF4kxW+S/TD6W3ZVSRVyizb72LVxHGQ5hSfbOKcRUVqFcz4onFA4tv4RTLe5OCNL7pTJc2gXFazvmiJWfIDrltNEnaiXCjoeJfj3RvPO0w8LdJDcl3IGh6Ryl6jGCOX09GcXe2Q12oSYh/zhDornrUgrkqrp5R0CS1a/+Wa9/i+KipA++fl5mgTr7+Of+VnBCJXEKID/3SPcwcIC6tjkHuSzvw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=NRiiKXdpUPMWj5qpJW5OPVoS/mqVspDpRG5+wc9gTDs=;
+ b=JpZ5hD5bLXf6tEq60RpwKEbxcq19f7mQ4MtcPWiDgsWvz3rj2W5ov4dpR4pXAS7j9ffRSuzMgsWKPXQTsLcPai52us0aQPinJW/QehgrcBX+nl4zLBiGaNjTdo+51hi0x+Y4C4qpRqIkvrWT+OJCYXOacwWvRAca5biwYHUCjM6dBVfdmx2y8/PoyY1kfoYOisVg23GVQILZfOC/3lxpPS3qX3f1CH9Xs2MxUliS6N+8HD7mIXTQDzIO5yAPO5qgF48d8gVZo81KdOWZRbPQ0iUaocae0ezSD7GxXkVKPpgC1gHzYSf1yStUrZ0rnzrVhM0gw1eqjRDyMktq4EtRvA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=metaspace-dk.20221208.gappssmtp.com; s=20221208; t=1687289511; x=1689881511;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RX3Z8paJOYxAa7WXw3jdtQzgBqer/iLoEtcVAeuC3YM=;
-        b=Jl/MDnobbTeTKDYQ/+lJLlcthc3VY5MU8/9iNseOXvOSlP8TaSJkfOs9RFWvsEpPmV
-         PIB8XKe8wc4GIJq9tCDH4ARtY8MGvwUuDx16rH/pFGHFTOwIpTuFGYAd5yF3fi0gJtKi
-         +V0DC7dyMEoL5X+If4EMEJgPPQdxLzPqNzyDxCbt1pMmNqA9doYRiOctH/aEsnyDbiXo
-         OlbA8EVTiTARKoos1g5JlrobTzdNEsqj6bFVf084Bv5b/1DErLHTnXWRwevZXRHbJFjx
-         Wk9GbM9JvQJ6cot2Xfdd79nkHW7uvyO/nWejiRZ901Cv6L7lDWqnJBPm5cNx+HPak7zR
-         Fd8A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687289511; x=1689881511;
-        h=content-transfer-encoding:mime-version:message-id:in-reply-to:date
-         :subject:cc:to:from:user-agent:references:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RX3Z8paJOYxAa7WXw3jdtQzgBqer/iLoEtcVAeuC3YM=;
-        b=Wb5q/IOhGphyJ4Nid2SJiGz3dFR+BtqOEW2QmtdTxDtdg5m+f2y71ssRkAW8ulovKx
-         XJ1VzicWgfDXrDskvzh6Y2erdowWhzNO3PjMOCAjCaiDpQdH6odsNNimZUZK2pVB5hww
-         WP/4657qTaN7YamNHaPgHPUVAgAi931pHSf/HoSyfJn39xnc377sv8QFYb8GCYW/mnEy
-         ulVnO3lgSR7a7HY4iDRPCSq6irqrGwiVUfeR3oVFhuFzs7cBEhCzIxs1e/7I9tt4dUaY
-         FMfkggOGinaQobzdOJQmed5To9Dr2+mRrBLZNfIgWDuqot25xT/+YSbvGmpv1sScHGFB
-         t+Mg==
-X-Gm-Message-State: AC+VfDy0BdwDs5OaaUp/c39XfJMIfuXiLTI8WyVqLZ1RQQQVZFDjzozu
-	s/rnczCklArbInREvBMxvKaEbw==
-X-Google-Smtp-Source: ACHHUZ5L+0MF7EzDzCXAsW/Xf2b/HOMK0I74qvEnK5wcOfb194+q25Vk1k4g734zImPPtNZzTN4VxA==
-X-Received: by 2002:a17:907:6096:b0:988:9ec1:a8c8 with SMTP id ht22-20020a170907609600b009889ec1a8c8mr7544224ejc.54.1687289511363;
-        Tue, 20 Jun 2023 12:31:51 -0700 (PDT)
-Received: from localhost ([79.142.230.34])
-        by smtp.gmail.com with ESMTPSA id o16-20020a1709064f9000b009890ab4efa9sm1874653eju.32.2023.06.20.12.31.50
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 20 Jun 2023 12:31:50 -0700 (PDT)
-References: <20230614230128.199724bd@kernel.org>
- <8e9e2908-c0da-49ec-86ef-b20fb3bd71c3@lunn.ch>
- <20230615190252.4e010230@kernel.org>
- <20230616.220220.1985070935510060172.ubuntu@gmail.com>
- <f28d6403-d042-4ffb-9872-044388d0f9d9@lunn.ch>
- <CANiq72mMi=7P9OxSH0+ORYDEyxG3+n5uOv_ooxMJ72YRBRZ+PQ@mail.gmail.com>
- <a4bc8847-c668-4cff-9892-663516cf8127@lunn.ch>
- <48a98d0c-bfd1-68a9-5d1f-65c942b7c0ef@crisal.io>
- <CANiq72=x9kEniX78vA7fLu+6wiwDKEr=BYy+aCMZ5S+eSRFf+A@mail.gmail.com>
-User-agent: mu4e 1.10.3; emacs 28.2.50
-From: "Andreas Hindborg (Samsung)" <nmi@metaspace.dk>
-To: Miguel Ojeda <miguel.ojeda.sandonis@gmail.com>
-Cc: Emilio Cobos =?utf-8?Q?=C3=81lvarez?= <emilio@crisal.io>, Andrew Lunn
- <andrew@lunn.ch>,
- FUJITA Tomonori <fujita.tomonori@gmail.com>, kuba@kernel.org,
- netdev@vger.kernel.org, rust-for-linux@vger.kernel.org,
- aliceryhl@google.com
-Subject: Re: [PATCH 0/5] Rust abstractions for network device drivers
-Date: Tue, 20 Jun 2023 21:12:49 +0200
-In-reply-to: <CANiq72=x9kEniX78vA7fLu+6wiwDKEr=BYy+aCMZ5S+eSRFf+A@mail.gmail.com>
-Message-ID: <877cryx74x.fsf@metaspace.dk>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=NRiiKXdpUPMWj5qpJW5OPVoS/mqVspDpRG5+wc9gTDs=;
+ b=P6ZWR27VJBB2k68uBHbsfblKXXQfKObiWmJKnrkaQ3em3aDXh8apJR/niqIDsH05W/sBLqfGpdGDhz8lVUhjMEZR/XnnUpT4g83GQgZ7+ruFnQ+87HuaNjBTLHrhZ7dIMRIir41bBjkuRqLLhIkQHYaaUE/dbiw08YzmITbIf0Q=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SN4PR13MB5693.namprd13.prod.outlook.com (2603:10b6:806:1ec::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.33; Tue, 20 Jun
+ 2023 19:16:44 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6500.036; Tue, 20 Jun 2023
+ 19:16:44 +0000
+Date: Tue, 20 Jun 2023 21:16:35 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Thorsten Winkler <twinkler@linux.ibm.com>,
+	Jules Irenge <jbi.octave@gmail.com>
+Subject: Re: [PATCH net-next 2/4] s390/lcs: Convert sprintf to scnprintf
+Message-ID: <ZJH7E20GZ1YH8HSd@corigine.com>
+References: <20230620083411.508797-1-wintera@linux.ibm.com>
+ <20230620083411.508797-3-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620083411.508797-3-wintera@linux.ibm.com>
+X-ClientProxiedBy: AM3PR07CA0072.eurprd07.prod.outlook.com
+ (2603:10a6:207:4::30) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SN4PR13MB5693:EE_
+X-MS-Office365-Filtering-Correlation-Id: e974f727-4d38-4f4d-495b-08db71c2e1de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1rg7P2PpbRYmkoe9m+E/OgLQFEUwNOCi75CsZoV51R4tc4gynlcF8ZCigRSlms8tLMUEpmIXmX6DMZilVwkqFx9yhlnLleX2MvXFTlwzD7LRLP+57+ewY5cuijb4lriGJkwL4gkOWNpMYq+QJR0kTQkRua6iaHn92TwPdGX21Guhra/QLKHAl/Q7qhnK3ReRgLkCcIJOswtjnD/9CQNpP/SkJhnra3fBMZdvO1lU+o5VKNmUkyfmHuGaDKJ6ORmy7DFF5B9Yrn3L2ocW0mL/sTlH6GvuxC21VyvpcGSmnuQAsBDjxXPyBsPQlcANVuKVm/Wsv2fzVeeMoXSMGW8DdehGfNQhjpOGWCtLvrE3jo413yPUCoQWj+hBl/XCNWmCOuyXrStS95Pm6CcTamHv0PRJOZ6KmLn8Zb87Cbcv0lKjNuaoewkpH9owu4BilxZYVdum8nWlaSmaSWM7FAa8pkKl0kHJZ0OqnsGoDej0ib0LbVGR8jsRbwzyl1EynBuBpHckBz6KbItcAWQrv6ZWtIrIfZlMZsNPEmvMt76Oa8XK5naCVRw+0ZX9TPvWka8R5PG8XDPOYe5LorgR+TvMJXqYF0JOxBwZ0IGBAeKcIGM=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(39840400004)(376002)(366004)(136003)(451199021)(7416002)(6916009)(4326008)(8676002)(66946007)(66476007)(8936002)(66556008)(316002)(5660300002)(41300700001)(54906003)(44832011)(6486002)(478600001)(2616005)(38100700002)(6512007)(2906002)(6506007)(86362001)(186003)(6666004)(83380400001)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WiLEo+Hs3GH2Mk9+xLuAmvgvzuT0my8Ab06W+RQW+X9mLkfwFx9OP8sz7eLB?=
+ =?us-ascii?Q?4NRy3lDHAiqpBQQwnyjSGLWandD1KPhGV7p12muJAFEVyFTE+1qWPMZnL3Vl?=
+ =?us-ascii?Q?85B4VGObUnXmoj/Is6F5mOfvEBXqDR4V2mIHUlS2X4MJJT7B0HJKw4Ctb01U?=
+ =?us-ascii?Q?AKcj3DVJ7A0F9yDPLP/ws/ADrO16thsYdbqmLXpZ2RmbzseCwXjLLIYSxdw5?=
+ =?us-ascii?Q?i6ISC199d3wQ0Wjs3o7ExcwS9VlBNgHl4yxPMgQdeotEyXiLFflpwcPOiT5w?=
+ =?us-ascii?Q?AE/ZSQGJTE+TvmyJe8Y1RBptgA0Y88QSUfpIdFo38q9+qj9xa2GPi8zUWtU2?=
+ =?us-ascii?Q?qDLFCmpT/WnonjFLSH6yofUSkEhGSKt2p7/vdmSsZmioiaGxK2BwAQThG1Tg?=
+ =?us-ascii?Q?bRTeKGUY+RJzkU6FQ1a4bN1vlGTuZl2VrlwRbLLo/TfiGOfM3HEcE7MlYOEP?=
+ =?us-ascii?Q?LaJ9V/OYNJuFZx/sh3z6WbLj8Etvy7KHrHT12QszRVnti2mL9lkKuztQeDdT?=
+ =?us-ascii?Q?pKsP37d6tqNQDXIyfD+gRQzE0KeDSmmpZLkaLw9QFojJOuSCR2YmCzQdwfb2?=
+ =?us-ascii?Q?u3xahNmmgcdw3UWoDV/uULSyUkVcDFCm6n/aUFzheL7bmf3bwm9WwaRM+GOe?=
+ =?us-ascii?Q?z80YcUUPnQOqe1lggvtJhXp3NzV81MG50X5h6lHvbuPrAkIO3gGd23NDIAfK?=
+ =?us-ascii?Q?wd40PHfWUqU18CwGldkLcNHfRUSxWlKc0eoYh9fd1TAkJr01DbcKaxhBm4hF?=
+ =?us-ascii?Q?a7qHPesrJuin7stUf+5o97bIYrGnWHX9bt25VfG9Qe2Fbd8nvcUXlRBrmXhq?=
+ =?us-ascii?Q?cqPLJYVVoCw6LFKb9L6ucLyEJ7iM6cpsFd6QqJbwjjdKRH3aplbEUF0/6isn?=
+ =?us-ascii?Q?dp+PGLR3X73g34tIkgtl7nfkSAthrbp64w8hdGJnyrrgIQNNnl7apkBcepAv?=
+ =?us-ascii?Q?7WU0RoRfjZEJPxcwxzONx+eMlrycqGPsaIr5TI5HUKnKAA2exPY26H+/Wj+/?=
+ =?us-ascii?Q?m6kQ4S3aYAmqFXHrZQXVsV9sjfm9ive/KpFngnfvmVlYBeYTRmu31dmNRrX4?=
+ =?us-ascii?Q?ADxyCEv2MSK8LBLNiEgYbMAzOa+ecwfjYfEuVhf9qYyrQ1KuzhqkBClk1Od5?=
+ =?us-ascii?Q?KqW5syE7Pz1c6qB64UvtRUGGaK/qhyvJSPz1SCNuaJVuhVGRWa0WL8MSi5jh?=
+ =?us-ascii?Q?f1Sfpb5f6Z3eKBY1iD0TnlDHC5vS06fhzkPcmlklJQUqRQCkjuk34M/Adb3c?=
+ =?us-ascii?Q?BXKNMw2msnDB95vM7Qq3iAicHQZbsFuuI421KjicjEA+FNxHb/S2UhcTIyNp?=
+ =?us-ascii?Q?A0gVGin30LTeY6r836xdGOH6xhePl/zE9f858YJiwELo2zEABMHvioHbuts/?=
+ =?us-ascii?Q?61PxjKAcmYlpWNuNdAJQazNCu19qN600OwVwn+N8+9pluPrU9Io9gnIMCvCT?=
+ =?us-ascii?Q?xL0Vs72gPpdD7nuiWlyHROe4fMjKugz2At4iJeTvrMtCLgSLyNj34+wSUwIL?=
+ =?us-ascii?Q?aEA5QGH0moDK/IF6MlmX0ZrUIYjnmnBoCPZcnIlJ9sjkx/eN4PjRLGmjf78Q?=
+ =?us-ascii?Q?Nj3rpZF6DuVNX5hiF4ZlvSwd4Qj3eZsgq8Nf2bGLViRulkTaK/QgBQzzsvvV?=
+ =?us-ascii?Q?9QgBf6z9/0gDrA6yNLAbU+JxF8uBSqLlFF06t2UNZfdymhsPq1+dFjefZ8+7?=
+ =?us-ascii?Q?RQ4ppA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e974f727-4d38-4f4d-495b-08db71c2e1de
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 20 Jun 2023 19:16:43.9409
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: U6uT/qe2oq9BQZ0XkaBF2u2v3Rw7k/o2fxiDdqziG6lBm5Q4MQH1hRkhyIZ1A5qlvvQOhAOw8VgU/t9i1lw3AMikiBKN6mEjP6LCRNUgwaE=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SN4PR13MB5693
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Tue, Jun 20, 2023 at 10:34:09AM +0200, Alexandra Winter wrote:
+> From: Thorsten Winkler <twinkler@linux.ibm.com>
+> 
+> This LWN article explains the rationale for this change
+> https: //lwn.net/Articles/69419/
+> Ie. snprintf() returns what *would* be the resulting length,
+> while scnprintf() returns the actual length.
 
-Hi All,
+Hi Alexandra,
 
-Miguel Ojeda <miguel.ojeda.sandonis@gmail.com> writes:
+Although I agree that it's nice to use scnprintf() the justification given
+seems a bit odd: it talks of the return value but it is ignored both before
+and after this patch.
 
-> On Mon, Jun 19, 2023 at 1:27=E2=80=AFPM Emilio Cobos =C3=81lvarez <emilio=
-@crisal.io> wrote:
->>
->> Hi Andrew, Miguel,
->>
->> On 6/16/23 16:43, Andrew Lunn wrote:
->> > I said in another email, i don't want to suggest premature
->> > optimisation, before profiling is done. But in C, these functions are
->> > inline for a reason. We don't want the cost of a subroutine call. We
->> > want the compiler to be able to inline the code, and the optimiser to
->> > be able to see it and generate the best code it can.
->> >
->> > Can the rust compile inline the binding including the FFI call?
->>
->> This is possible, with cross-language LTO, see:
->>
->>    https://blog.llvm.org/2019/09/closing-gap-cross-language-lto-between.=
-html
->>
->> There are some requirements that need to happen for that to work
->> (mainly, I believe, that the LLVM version used by rustc and clang agree).
->>
->> But in general it is possible. We use it extensively on Firefox. Of
->> course the requirements of Firefox and the kernel might be different.
->>
->> I think we rely heavily on PGO instrumentation to make the linker inline
->> ffi functions, but there might be other ways of forcing the linker to
->> inline particular calls that bindgen could generate or what not.
->
-> Thanks Emilio! It is nice to hear cross-language LTO is working well
-> for Firefox.
->
-> Andreas took a look at cross-language LTO some weeks ago, if I
-> remember correctly (Cc'd).
->
-> I am not sure about the latest status on kernel PGO, though.
+Likewise for some of the changes in patch 4/4.
 
-I hacked it to work a while back for the NVMe and null_blk drivers. You
-need to build the C and Rust parts of the kernel with compatible
-clang/rustc compilers (same major version I believe), and then pass the
-right compiler flags to get rustc and clang to emit llvm bitcode instead
-of ELF files with machine code. As far as I recall, some infrastructure
-is present in kbuild, but I had to add some bits to make it build.
+Also is it intentional that there is a space in the URL immediately
+after 'http:' ? Maybe mangled by something. Not that it really maters
+AFAIC.
 
-Also, I had some issues with LLVM not doing the inline properly and I
-had to use `llvm-link` on the bitcode of my module to link in the
-bitcode of the C code I wanted to inline. Without that step, inlining
-did not happen.
-
-I was able to build and execute in qemu like this, but I was not able to
-boot on bare metal. I think the LTO breaks something in C land. I did
-not investigate that further.
-
-Eventually I paused the work because I did not observe conclusive
-speedups in my benchmarks. I plan to resume the work at some point and
-do more rigorous benchmarking to see if I can observe a statistically
-significant speedup. Not sure when that will happen though.
-
-Best regards,
-Andreas
-
+> Reported-by: Jules Irenge <jbi.octave@gmail.com>
+> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> Signed-off-by: Thorsten Winkler <twinkler@linux.ibm.com>
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+> ---
+>  drivers/s390/net/lcs.h | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/s390/net/lcs.h b/drivers/s390/net/lcs.h
+> index bd52caa3b11b..a2699b70b050 100644
+> --- a/drivers/s390/net/lcs.h
+> +++ b/drivers/s390/net/lcs.h
+> @@ -21,7 +21,7 @@ do { \
+>  #define LCS_DBF_TEXT_(level,name,text...) \
+>  	do { \
+>  		if (debug_level_enabled(lcs_dbf_##name, level)) { \
+> -			sprintf(debug_buffer, text); \
+> +			scnprintf(debug_buffer, sizeof(debug_buffer), text); \
+>  			debug_text_event(lcs_dbf_##name, level, debug_buffer); \
+>  		} \
+>  	} while (0)
+> -- 
+> 2.39.2
+> 
+> 
 
