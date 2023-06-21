@@ -1,77 +1,120 @@
-Return-Path: <netdev+bounces-12497-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12498-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36B72737DBF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:45:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E8B5B737DD1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:50:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E635F2814B8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 08:45:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B3AB81C20E07
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 08:50:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4182DC2FB;
-	Wed, 21 Jun 2023 08:45:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF9CFC8C0;
+	Wed, 21 Jun 2023 08:50:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 372CA5C97
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:45:00 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1669710E6;
-	Wed, 21 Jun 2023 01:44:59 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qBtSL-0005d4-9f; Wed, 21 Jun 2023 10:44:49 +0200
-Date: Wed, 21 Jun 2023 10:44:49 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Sohom <sohomdatta1@gmail.com>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Sohom <sohomdatta1+git@gmail.com>, netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] netfilter: Don't parse CTCP message if shorter than
- minimum length
-Message-ID: <20230621084449.GD3799@breakpoint.cc>
-References: <20230621032953.107143-1-sohomdatta1+git@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34E78BF8
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:50:11 +0000 (UTC)
+Received: from mail-pg1-x52a.google.com (mail-pg1-x52a.google.com [IPv6:2607:f8b0:4864:20::52a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8031C1731;
+	Wed, 21 Jun 2023 01:50:10 -0700 (PDT)
+Received: by mail-pg1-x52a.google.com with SMTP id 41be03b00d2f7-543cc9541feso3097543a12.2;
+        Wed, 21 Jun 2023 01:50:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687337410; x=1689929410;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lFfbVhmX+rRlnfYZflmEzqdlANTovVuTRalq5Bwba3g=;
+        b=gUOgcNgDy6mx9Wys0vaBKGuyhmyiklAP7sAQKRn/l5VGoOm3XUNvFJ8QT6L3gx8uZk
+         +YlexuNp9Pu2Q2obpiBMBPNi/LX+5GnpYYPIPyx4owgYs5Qt8m1wG2lXYddfv5DGP4pe
+         Em7HdmQhWLSlN//gqyu1erJOwpZjOZXrmJu+Do8YqvGCd/Z2gY9Dg/094I12jOZzfTYM
+         dsWFv94O4+QNbYxkRj6Scbqc8XzsJDUhDHWMcZ+mJnLSwCh/I7rPBf8h8RPEHZvBtTyJ
+         WOR0LQq0nuag5RQRS+0q4Tw68z6PKEXzvOdqcsbe82K4I9RVYbp1auUmhZIO3RxM5UUa
+         fVAg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687337410; x=1689929410;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lFfbVhmX+rRlnfYZflmEzqdlANTovVuTRalq5Bwba3g=;
+        b=lgUUv6bsFi1LoKLKZ9iE/w/so9npoolgI1pWkmdheyIT1EkIwu87DXvXRNpFc7n9UL
+         CLJhtwaveu7ksYJA1GlYjLbOeGhPIf+A7C78jR+rbX/0HvWgoKc6KX8bu0qfq3DPmKIL
+         /MLufscaS51nr7iWYSVrLtJ5DgH38oLpFI9SWAj0kI3pkvgxzoY5zcb01z/MJl4Li6nl
+         UiQkgybYILZcaxryG4NhH+iqsYjK+ZEuklMONxYjQv4KhBRzjYxJ6J5FUY1/KYu3ar9T
+         hI4NkDaPeLWAiCzPc9tzGPG+Y5+gvvUWViYYbZKrnBhakvX1miYSPef1OGUvPQCeOMd9
+         +WkA==
+X-Gm-Message-State: AC+VfDwPbAjwy6AfmYVC6P0FlnSXz5GKClHlkxQLIvkdXt+VSpV9WT0b
+	ChtT+RjlIhHU5BsESw9nbJxGlLt4D2FsXct9C2w=
+X-Google-Smtp-Source: ACHHUZ7V6OsQfpEdCg1TMZD1Tx9riuhvSXWOLmE8oQVIwYR42vLRipuKolNWNt5MbQfWxvS0/ztdciV4l6uTfmChAUA=
+X-Received: by 2002:a17:90b:a46:b0:25b:ec0c:bf2 with SMTP id
+ gw6-20020a17090b0a4600b0025bec0c0bf2mr11378446pjb.20.1687337409583; Wed, 21
+ Jun 2023 01:50:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621032953.107143-1-sohomdatta1+git@gmail.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <00000000000051197705fdbc7e54@google.com> <20230621070710.380373-1-astrajoan@yahoo.com>
+In-Reply-To: <20230621070710.380373-1-astrajoan@yahoo.com>
+From: Dongliang Mu <mudongliangabcd@gmail.com>
+Date: Wed, 21 Jun 2023 16:46:14 +0800
+Message-ID: <CAD-N9QXZFMFGp3Vw4449Bx1-ttDVSF3hiwSw=e6+D096UDNfvw@mail.gmail.com>
+Subject: Re: [syzbot] [net?] unregister_netdevice: waiting for DEV to become
+ free (8)
+To: Ziqi Zhao <astrajoan@yahoo.com>
+Cc: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com, arnd@arndb.de, 
+	bridge@lists.linux-foundation.org, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	nikolay@nvidia.com, pabeni@redhat.com, roopa@nvidia.com, 
+	syzkaller-bugs@googlegroups.com, skhan@linuxfoundation.org, 
+	ivan.orlov0322@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Sohom <sohomdatta1@gmail.com> wrote:
-> If the CTCP message is shorter than 10 + 21 + MINMATCHLEN
-> then exit early and don't parse the rest of the message.
+On Wed, Jun 21, 2023 at 3:38=E2=80=AFPM 'Ziqi Zhao' via syzkaller-bugs
+<syzkaller-bugs@googlegroups.com> wrote:
+>
+> Hi all,
+>
+> I'm taking a look at this bug as part of the exercice for the Linux
+> Kernel Bug Fixing Summer 2023 program. Thanks to the help from my
 
-Please send a v2 explaining why, not what.
+This is an interesting program. There are many kernel crashes on the
+syzbot dashboard, which needs help.
 
-> +	if (data >= data_limit - (10 + 21 + MINMATCHLEN)) {
-> +		goto out;
-> +	}
+> mentor, Ivan Orlov and Shuah Khan, I've already obtained a reproduction
+> of the issue using the provided C reproducer, and I should be able to
+> submit a patch by the end of this week to fix the highlighted error. If
+> you have any information or suggestions, please feel free to reply to
+> this thread. Any help would be greatly appreciated!
 
-Please run your patches through scripts/checkpatch.pl,
-we don't use { } for single-line conditional bodies.
+Please carefully read the guidance of submitting patches to linux
+kernel [1]. Be careful about your coding style before sending.
 
->  	/* Skip any whitespace */
-> -	while (data < data_limit - 10) {
-> +	while (data < data_limit) {
+Note that, Syzbot has the feature: patch testing. You can upload and
+test your own patch to confirm that your patch is working properly.
 
-Why this change?
+[1] https://docs.kernel.org/process/submitting-patches.html
+>
+> Best regards,
+> Ziqi
+>
+> --
+> You received this message because you are subscribed to the Google Groups=
+ "syzkaller-bugs" group.
+> To unsubscribe from this group and stop receiving emails from it, send an=
+ email to syzkaller-bugs+unsubscribe@googlegroups.com.
+> To view this discussion on the web visit https://groups.google.com/d/msgi=
+d/syzkaller-bugs/20230621070710.380373-1-astrajoan%40yahoo.com.
 
