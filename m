@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-12638-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12627-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E4EF738566
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:37:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8855F738549
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:34:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58B8E280EDF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:37:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 423E3281B08
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:34:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5621219E59;
-	Wed, 21 Jun 2023 13:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F5619903;
+	Wed, 21 Jun 2023 13:29:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BC2019E4B
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5AEA19900
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:38 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2A201BE5
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:29:39 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DDF701BD3
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:29:31 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qBxtx-000762-Ry
-	for netdev@vger.kernel.org; Wed, 21 Jun 2023 15:29:37 +0200
+	id 1qBxtp-0006mS-Ri
+	for netdev@vger.kernel.org; Wed, 21 Jun 2023 15:29:29 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 6F23E1DE94F
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:22 +0000 (UTC)
+	by bjornoya.blackshift.org (Postfix) with SMTP id F2D401DE90A
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:20 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 6EA101DE891;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id AB0871DE89B;
 	Wed, 21 Jun 2023 13:29:18 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 0cae09eb;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 64168565;
 	Wed, 21 Jun 2023 13:29:16 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -48,9 +48,9 @@ Cc: davem@davemloft.net,
 	Vincent Mailhol <mailhol.vincent@wanadoo.fr>,
 	Thomas Kopp <Thomas.Kopp@microchip.com>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 16/33] can: length: fix bitstuffing count
-Date: Wed, 21 Jun 2023 15:28:57 +0200
-Message-Id: <20230621132914.412546-17-mkl@pengutronix.de>
+Subject: [PATCH net-next 17/33] can: length: fix description of the RRS field
+Date: Wed, 21 Jun 2023 15:28:58 +0200
+Message-Id: <20230621132914.412546-18-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230621132914.412546-1-mkl@pengutronix.de>
 References: <20230621132914.412546-1-mkl@pengutronix.de>
@@ -73,116 +73,68 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 
-The Stuff Bit Count is always coded on 4 bits [1]. Update the Stuff
-Bit Count size accordingly.
+The CAN-FD frames only have one reserved bit. The bit corresponding to
+Classical CAN frame's RTR bit is called the "Remote Request
+Substitution (RRS)" [1].
 
-In addition, the CRC fields of CAN FD Frames contain stuff bits at
-fixed positions called fixed stuff bits [2]. The CRC field starts with
-a fixed stuff bit and then has another fixed stuff bit after each
-fourth bit [2], which allows us to derive this formula:
+N.B. The RRS is not to be confused with the Substitute Remote Request
+(SRR).
 
-  FSB count = 1 + round_down(len(CRC field)/4)
+Fix the description in the CANFD_FRAME_OVERHEAD_SFF/EFF macros.
 
-The length of the CRC field is [1]:
+The total remains unchanged, so this is just a documentation fix.
 
-  len(CRC field) = len(Stuff Bit Count) + len(CRC)
-                 = 4 + len(CRC)
+In addition to the above add myself as copyright owner for 2020 (as
+coauthor of the initial version, c.f. Fixes tag).
 
-with len(CRC) either 17 or 21 bits depending of the payload length.
+[1] ISO 11898-1:2015 paragraph 10.4.2.3 "Arbitration field":
 
-In conclusion, for CRC17:
+  RSS bit [only in FD Frames]
 
-  FSB count = 1 + round_down((4 + 17)/4)
-            = 6
-
-and for CRC 21:
-
-  FSB count = 1 + round_down((4 + 21)/4)
-            = 7
-
-Add a Fixed Stuff bits (FSB) field with above values and update
-CANFD_FRAME_OVERHEAD_SFF and CANFD_FRAME_OVERHEAD_EFF accordingly.
-
-[1] ISO 11898-1:2015 section 10.4.2.6 "CRC field":
-
-  The CRC field shall contain the CRC sequence followed by a recessive
-  CRC delimiter. For FD Frames, the CRC field shall also contain the
-  stuff count.
-
-  Stuff count
-
-  If FD Frames, the stuff count shall be at the beginning of the CRC
-  field. It shall consist of the stuff bit count modulo 8 in a 3-bit
-  gray code followed by a parity bit [...]
-
-[2] ISO 11898-1:2015 paragraph 10.5 "Frame coding":
-
-  In the CRC field of FD Frames, the stuff bits shall be inserted at
-  fixed positions; they are called fixed stuff bits. There shall be a
-  fixed stuff bit before the first bit of the stuff count, even if the
-  last bits of the preceding field are a sequence of five consecutive
-  bits of identical value, there shall be only the fixed stuff bit,
-  there shall not be two consecutive stuff bits. A further fixed stuff
-  bit shall be inserted after each fourth bit of the CRC field [...]
+    The RRS bit shall be transmitted in FD Frames at the position of
+    the RTR bit in Classical Frames. The RRS bit shall be transmitted
+    dominant, but receivers shall accept recessive and dominant RRS
+    bits.
 
 Fixes: 85d99c3e2a13 ("can: length: can_skb_get_frame_len(): introduce function to get data length of frame in data link layer")
-Suggested-by: Thomas Kopp <Thomas.Kopp@microchip.com>
 Signed-off-by: Vincent Mailhol <mailhol.vincent@wanadoo.fr>
 Reviewed-by: Thomas Kopp <Thomas.Kopp@microchip.com>
-Link: https://lore.kernel.org/all/20230611025728.450837-2-mailhol.vincent@wanadoo.fr
+Link: https://lore.kernel.org/all/20230611025728.450837-3-mailhol.vincent@wanadoo.fr
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- include/linux/can/length.h | 14 ++++++++------
- 1 file changed, 8 insertions(+), 6 deletions(-)
+ include/linux/can/length.h | 5 +++--
+ 1 file changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/linux/can/length.h b/include/linux/can/length.h
-index 69336549d24f..b8c12c83bc51 100644
+index b8c12c83bc51..521fdbce2d69 100644
 --- a/include/linux/can/length.h
 +++ b/include/linux/can/length.h
-@@ -72,17 +72,18 @@
-  * Error Status Indicator (ESI)		1
-  * Data length code (DLC)		4
-  * Data field				0...512
-- * Stuff Bit Count (SBC)		0...16: 4 20...64:5
-+ * Stuff Bit Count (SBC)		4
-  * CRC					0...16: 17 20...64:21
-  * CRC delimiter (CD)			1
-+ * Fixed Stuff bits (FSB)		0...16: 6 20...64:7
-  * ACK slot (AS)			1
-  * ACK delimiter (AD)			1
-  * End-of-frame (EOF)			7
-  * Inter frame spacing			3
-  *
-- * assuming CRC21, rounded up and ignoring bitstuffing
-+ * assuming CRC21, rounded up and ignoring dynamic bitstuffing
+@@ -1,6 +1,7 @@
+ /* SPDX-License-Identifier: GPL-2.0 */
+ /* Copyright (C) 2020 Oliver Hartkopp <socketcan@hartkopp.net>
+  * Copyright (C) 2020 Marc Kleine-Budde <kernel@pengutronix.de>
++ * Copyright (C) 2020 Vincent Mailhol <mailhol.vincent@wanadoo.fr>
   */
--#define CANFD_FRAME_OVERHEAD_SFF DIV_ROUND_UP(61, 8)
-+#define CANFD_FRAME_OVERHEAD_SFF DIV_ROUND_UP(67, 8)
  
- /*
-  * Size of a CAN-FD Extended Frame
-@@ -101,17 +102,18 @@
-  * Error Status Indicator (ESI)		1
-  * Data length code (DLC)		4
-  * Data field				0...512
-- * Stuff Bit Count (SBC)		0...16: 4 20...64:5
-+ * Stuff Bit Count (SBC)		4
-  * CRC					0...16: 17 20...64:21
-  * CRC delimiter (CD)			1
-+ * Fixed Stuff bits (FSB)		0...16: 6 20...64:7
-  * ACK slot (AS)			1
-  * ACK delimiter (AD)			1
-  * End-of-frame (EOF)			7
-  * Inter frame spacing			3
-  *
-- * assuming CRC21, rounded up and ignoring bitstuffing
-+ * assuming CRC21, rounded up and ignoring dynamic bitstuffing
-  */
--#define CANFD_FRAME_OVERHEAD_EFF DIV_ROUND_UP(80, 8)
-+#define CANFD_FRAME_OVERHEAD_EFF DIV_ROUND_UP(86, 8)
- 
- /*
-  * Maximum size of a Classical CAN frame
+ #ifndef _CAN_LENGTH_H
+@@ -64,7 +65,7 @@
+  * ---------------------------------------------------------
+  * Start-of-frame			1
+  * Identifier				11
+- * Reserved bit (r1)			1
++ * Remote Request Substitution (RRS)	1
+  * Identifier extension bit (IDE)	1
+  * Flexible data rate format (FDF)	1
+  * Reserved bit (r0)			1
+@@ -95,7 +96,7 @@
+  * Substitute remote request (SRR)	1
+  * Identifier extension bit (IDE)	1
+  * Identifier B				18
+- * Reserved bit (r1)			1
++ * Remote Request Substitution (RRS)	1
+  * Flexible data rate format (FDF)	1
+  * Reserved bit (r0)			1
+  * Bit Rate Switch (BRS)		1
 -- 
 2.40.1
 
