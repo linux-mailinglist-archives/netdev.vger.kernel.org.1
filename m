@@ -1,322 +1,188 @@
-Return-Path: <netdev+bounces-12685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CBE07387BF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:50:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EAE877387E2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:52:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FD841C20CCD
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:50:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27FCE1C20DF2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:52:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4F0E18C20;
-	Wed, 21 Jun 2023 14:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FD6518C21;
+	Wed, 21 Jun 2023 14:52:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78A87F9DE;
-	Wed, 21 Jun 2023 14:50:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D2B7C433C0;
-	Wed, 21 Jun 2023 14:50:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687359018;
-	bh=UjGkh/R6M6s97WmBHUYoIzUz4Kj0pfZWSOmlDakb56A=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=ISOE40fdFmyXRm/TIenvjT5UPIUlRpH8J3VXkqLNmMjonh3PxQUwms01/Yi03EFVs
-	 0Dbmg3MhBXszxfTG8IN5sJUV51G3yzr2l+xEcTv3UxHsR5GZVBA3Pc/bLeaVRh8Fky
-	 mQRivsDIFQLvh7PTD0UhMoUYUsH54SQx4XJdGS1uxlALaEHJ41U4mfrNqDh6Z2e9YU
-	 zstvKFH+ajE4gwTrV3FMYcl2On1Z4hs/04RbZRYmIvx2XCz/kBCMIDiaLQGhT43X6p
-	 101AKLQSNzXS+wnJ9GtxpEAGEEaK20+moMvm0BbrXzcVctbK1xXBMZeGaKBZrhVORb
-	 qMhsmnVxb8r6g==
-From: Jeff Layton <jlayton@kernel.org>
-To: Jeremy Kerr <jk@ozlabs.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	=?UTF-8?q?Arve=20Hj=C3=B8nnev=C3=A5g?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>,
-	Martijn Coenen <maco@android.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Brad Warrum <bwarrum@linux.ibm.com>,
-	Ritu Agarwal <rituagar@linux.ibm.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Ian Kent <raven@themaw.net>,
-	Luis de Bethencourt <luisbg@kernel.org>,
-	Salah Triki <salah.triki@gmail.com>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>,
-	Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>,
-	Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>,
-	Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu,
-	Joel Becker <jlbec@evilplan.org>,
-	Christoph Hellwig <hch@lst.de>,
-	Nicolas Pitre <nico@fluxnic.net>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Tyler Hicks <code@tyhicks.com>,
-	Ard Biesheuvel <ardb@kernel.org>,
-	Gao Xiang <xiang@kernel.org>,
-	Chao Yu <chao@kernel.org>,
-	Yue Hu <huyue2@coolpad.com>,
-	Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>,
-	Jan Kara <jack@suse.com>,
-	"Theodore Ts'o" <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Bob Peterson <rpeterso@redhat.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D498101EA
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:52:11 +0000 (UTC)
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2071d.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e83::71d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65E15193;
+	Wed, 21 Jun 2023 07:51:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Il0QNBZMbzbnPpF+NF4fe0qErmEWRANYmTGS2T+l5yaHfph4Srw2cHfyWn56MQsgVxvG9hBA18Cg0Z4+nFFY2yKCkK+Y7qthGE+TayxUBoTEvXtE/PTU9gYY4HKmZd4oV0Rj6Mvq2PqSiLkeEeSNFI4pRlgm1B3gFi3uEa6z89Q1bYJz+va/6WnWNU62zsf29OSbWcokEsY4xpZaGu6SxrYszKT+J2yxJyAxU2HJulOEKbEc7hqwU+HFpA9/Mat7IqhknFMMpQ/zaJNEnnovbHb7n8M6Q0xcLxgO8XjlsiM67AG7i6Xsa8GSXBq8nO1bL0P7TtNb2IIa5A1rvO01gg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9o8z9/jDb92KQ1+/FU/acDwSNC/MfTbZf15wto/2JR0=;
+ b=NXlsgWBU03771KTB6Krf8h38kl5nzGVyyndF814TJuN9p2qJ7HjnbAStlgJlY0Ls20iILEDBntBHjTSLFeEf2efhkH4Htl77q0Pwk4kbocwSndfMNu87Ek+OvzeuSjZ9qqwceNGzK6Qi9O7IFzLt4dphDBA2ZzJjfWYs01gzZcqxRqwQMZTjf8gz9RUUyUOPFnb3GoQnP5T7MXVmuVsqNf8Lwx6zJ8GVMcWLG0Aml2CyFw/E9sVPmsWCq+2zgVXvEW7N8y21oGFhsTbX+tS0ZeGz1aOYzQh6laCFBe9NwrartHBDHUFh3mwEt2r62CZ1eJgxwbDaNM2WzaseC6rj9A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9o8z9/jDb92KQ1+/FU/acDwSNC/MfTbZf15wto/2JR0=;
+ b=Hb2saJ1YmMzHAESLltNT7gEXaqpVueAlOw24+Uojn6UcNtRJeuUMdEH6te2QRhGlmCT7ah8wX0Vi/jSBDwhSJTOYM192i1covDIBj1O5fie59yi+4zq+E0Q5Th1pB3XrzdWJq7Gb27+ZY43elWvv3IbRpAnJnH7hYgS0dtvK8VM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MW4PR13MB5888.namprd13.prod.outlook.com (2603:10b6:303:1b7::9) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
+ 2023 14:50:06 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 14:50:06 +0000
+Date: Wed, 21 Jun 2023 16:49:58 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Kees Cook <keescook@chromium.org>
+Cc: M Chetan Kumar <m.chetan.kumar@intel.com>,
+	Florian Klink <flokli@flokli.de>,
+	Bagas Sanjaya <bagasdotme@gmail.com>,
+	Intel Corporation <linuxwwan@intel.com>,
+	Loic Poulain <loic.poulain@linaro.org>,
+	Sergey Ryazanov <ryazanov.s.a@gmail.com>,
 	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>,
-	Tejun Heo <tj@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Anton Altaparmakov <anton@tuxera.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Iurii Zaikin <yzaikin@google.com>,
-	Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Anders Larsen <al@alarsen.net>,
-	Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>,
-	Tom Talpey <tom@talpey.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Phillip Lougher <phillip@squashfs.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Evgeniy Dushistov <dushistov@mail.ru>,
-	Hans de Goede <hdegoede@redhat.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>,
-	Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>,
-	Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>,
-	Jiri Olsa <jolsa@kernel.org>,
-	Hugh Dickins <hughd@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>,
-	James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>,
-	Juergen Gross <jgross@suse.com>,
-	Ruihan Li <lrh2000@pku.edu.cn>,
-	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Udipto Goswami <quic_ugoswami@quicinc.com>,
-	Linyu Yuan <quic_linyyuan@quicinc.com>,
-	John Keeping <john@keeping.me.uk>,
-	Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-	Dan Carpenter <error27@gmail.com>,
-	Yuta Hayama <hayama@lineo.co.jp>,
-	Jozef Martiniak <jomajm@gmail.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	ZhangPeng <zhangpeng362@huawei.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Aditya Garg <gargaditya08@live.com>,
-	Erez Zadok <ezk@cs.stonybrook.edu>,
-	Yifei Liu <yifeliu@cs.stonybrook.edu>,
-	Yu Zhe <yuzhe@nfschina.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Oleg Kanatov <okanatov@gmail.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Jiangshan Yi <yijiangshan@kylinos.cn>,
-	xu xin <cgel.zte@gmail.com>,
-	Stefan Roesch <shr@devkernel.io>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	"Liam R. Howlett" <Liam.Howlett@Oracle.com>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Minghao Chi <chi.minghao@zte.com.cn>,
-	Seth Forshee <sforshee@digitalocean.com>,
-	Zeng Jingxiang <linuszeng@tencent.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Zhang Yi <yi.zhang@huawei.com>,
-	Tom Rix <trix@redhat.com>,
-	"Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
-	Chen Zhongjin <chenzhongjin@huawei.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Rik van Riel <riel@surriel.com>,
-	Jingyu Wang <jingyuwang_vip@163.com>,
-	Hangyu Hua <hbh25y@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	autofs@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu,
-	ecryptfs@vger.kernel.org,
-	linux-efi@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	cluster-devel@redhat.com,
-	linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net,
-	ntfs3@lists.linux.dev,
-	ocfs2-devel@oss.oracle.com,
-	linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org,
-	linux-unionfs@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	reiserfs-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org
-Subject: [PATCH 79/79] fs: rename i_ctime field to __i_ctime
-Date: Wed, 21 Jun 2023 10:49:58 -0400
-Message-ID: <20230621144959.57905-1-jlayton@kernel.org>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230621144507.55591-1-jlayton@kernel.org>
-References: <20230621144507.55591-1-jlayton@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"Gustavo A. R. Silva" <gustavoars@kernel.org>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-hardening@vger.kernel.org
+Subject: Re: [PATCH] net: wwan: iosm: Convert single instance struct member
+ to flexible array
+Message-ID: <ZJMOFnpONApGxOKi@corigine.com>
+References: <20230620194234.never.023-kees@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620194234.never.023-kees@kernel.org>
+X-ClientProxiedBy: AM8P251CA0028.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21b::33) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW4PR13MB5888:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61d3916a-1053-4c7f-9071-08db7266cd2b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	o3ABjdjkleM+qB614U0Lt2lwLXmUvz8aqBiKtWdl6EPc29kVE1Yl0FBrow526RMN5/xtYT+l5d0nw17CbZGtGlpI4raSN0EkAU9CgSG9RCMHBg21/ilwmIhNhymRXl/R77x+wg95zGdAqoqqiOULhSTMnTM0BJelS6VEUTKtFJ2x4XpsYsh5NbsUSQtFLxMU+sleMzVPyCT/rBrB/PEuZFoxVL/fm4EYwZlOltw8E64f0Albd2clxWxukhnhZxDEVo/c9evBaG78uJ2jLUXotUiSMSPkVJtHAsbQBBEQLin+Vrdn5fwVPrn5pn3wNRqdYAqhkwgr1s0/QntsWPiqwb9ie06VEL77tMuqmHfu+xM/nhAp3C1TWk/YLGDcaHMpH6VUmcZK4HYhe1165BOiSnpYD+kqP/l6qXVh1YBBFfDkpVAA3Dt8mQVfe9gbkbzswmIWDv53mZaaA1uKaSnITAIBSAiCvWTvObwKw43JM5K7QiM/JthTfXCTGlE6+Mrta0dysi2fHnl/5ctm2RE8jD2UPggnd8gWaHlh5730tWA6/6HWajSxxy5qQ2kbG8XHN2FV4GNMklOLl9e+JWMF4XxGUnSXAaB7CwvZI3NNC7A=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(376002)(396003)(346002)(366004)(136003)(451199021)(4326008)(2906002)(478600001)(54906003)(86362001)(6486002)(38100700002)(966005)(6666004)(41300700001)(83380400001)(316002)(36756003)(6916009)(66946007)(66556008)(66476007)(2616005)(6512007)(6506007)(8676002)(8936002)(7416002)(44832011)(186003)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?wWXByJ4jNgXSv+x61NKyU28QiIAj7frIlLkxDiTLkEOi4v59fM3oVvTRaQJm?=
+ =?us-ascii?Q?fRDq9+4CGFAHeT+/iibd+ZNNxW5ABL/99zE8161g8c5BohMaBtY5aBMoz0tw?=
+ =?us-ascii?Q?L3Xr/KBC7P1NZZfUgClKQSmrdEEo2xzsj0xzazmTNuPwbtPNdIg7TNehNsuG?=
+ =?us-ascii?Q?IFXzsAdI97CPVugE6MQclnNcji57ihBjvR5JD08rqWaRDJdWZTcZMZpDZwAg?=
+ =?us-ascii?Q?DUs8zf8xz1zWthl0S8zZZBsZTojipXusI6qLCAuQ2w7Mimsdf75P4penUFY4?=
+ =?us-ascii?Q?3x4XB6Y1vjT3HZfoAk+40czo+yKL2OmCOr3iTmv/pS9BoKJXe1vrRltTaOm9?=
+ =?us-ascii?Q?2F4tma5KB/wrA/JYMFdxmI9jMx8NrLpIRhSU36F17fPJoza93FZ5lKGSutjT?=
+ =?us-ascii?Q?PD9IYioYJD53WXaMPbu/Mue+q77YoFbEqgeR1teptmu6rrSjmtRvLht9vYU5?=
+ =?us-ascii?Q?kx1W41j0zbR5xwm+FVm8eaz6rSAxNSsfqn+vnkDXD33RJLWKT8n4t+V0kKJi?=
+ =?us-ascii?Q?dRZWXY0a4jYsIlO6nEbJSG0LsbK2RI7hjFhhGPelLYLEphg+OXS5lmr/Za/T?=
+ =?us-ascii?Q?bZi+zKY+Bd2WInq0cVn/vqRRYNW9IeHv6lsNH2xSyk8KCwWoI8qNNPBB+HsH?=
+ =?us-ascii?Q?kBDJEwfL+vGqT5T4hDMzqKaf6sa7M1JbB2kvEK39Fa/7fL00IQkspC9TIaJG?=
+ =?us-ascii?Q?dk+VelmdRv2Q64pipGr/CCzYt5/ieAiFx8TGx/lksfiG5ZkAKm+pGO5bBe75?=
+ =?us-ascii?Q?ssVWla4yRKjh5X33GyF3SIbACeX6m0/OmR+E8TENgJds8RmjpcsFM9X6Adbm?=
+ =?us-ascii?Q?DN4iLJNZRDVA16TN2ZO9zRzNQ6d0qWQOoY8Do/7djP8ofOHe280rHlrt4pe6?=
+ =?us-ascii?Q?GJBTswGwYlOM+pcVleKgOydDDx52ZSJmR/bhA+G6ZvR11Wysb2mVSLAJmnF7?=
+ =?us-ascii?Q?7Bf4unca/QciNge26dnbcQVzB9Exn6987FIh3O2wDVJOY3WUnwpxCh88stEX?=
+ =?us-ascii?Q?O6/riRKewwZsgZamwSPsFS1VqQoIXGyIj+Ns3FYvClz3XhoqgvCORUfWyh/d?=
+ =?us-ascii?Q?o2Ot+ocLqrstftWoMi4j311mQMFtfuM0zASiJk6e8xE3QeeCxzfaK41ThR9d?=
+ =?us-ascii?Q?F1I8G7Js9yEfk7ERct93KIh2maQ85XFmGm14VP5TEADazHUF+g7EIbscfR0A?=
+ =?us-ascii?Q?tCNreDuaLB+fbCGUVa5atdkyxh9bBXIJdI6pQzITM08c8iT1+HgV39GZlV99?=
+ =?us-ascii?Q?hKw7ltq7bC7VLH+cmBlxZYiIVOr0TIRpqV3E7ZqP96j30tjSOstslEDFKYzn?=
+ =?us-ascii?Q?6HqdobleATVeBgeidqNt0QNmLzmJVK63qEPcQ0wQ4bzyDbai/z2dg9BBYGZi?=
+ =?us-ascii?Q?CwZ18zfgqxKhzPWKPvVicerSmFVAxs5LkzAN3li0RmpYxcRkn18bAoHv12C0?=
+ =?us-ascii?Q?r3gUqBpiXB+hMstMBGBgxPpcSJKGBffRxNL2vr1pqhgodufA7t4C5TwX/Vev?=
+ =?us-ascii?Q?LGYgKDvadEePdYOtiMiVsQd1L1+pk/IhBscuTcTgUlaXHWKIqGc8o5AggJP7?=
+ =?us-ascii?Q?2b/Tctb0efMWko4u49N8fXEd54H9JblJrbJ8Pwds/USsgHMe/TaPHJTE3m6e?=
+ =?us-ascii?Q?Arc2L46FaWaUW06is+8qOodUQe3iXgufoM7CYZNklwcbXHNrAQl0Fi/423NO?=
+ =?us-ascii?Q?FL9cVA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61d3916a-1053-4c7f-9071-08db7266cd2b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 14:50:05.9494
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: FlGlPr5oYv+H4y0D9p0J9hevYNQ/oykr/WtopF+lOwpcCjF3JRANHpot10HAdg7CQrnGueOVbT7XnYeyrdw82OJXz+xYA/iOtJKeKtuWrDA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR13MB5888
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Now that everything in-tree is converted to use the accessor functions,
-rename the i_ctime field in the inode to make its accesses more
-self-documenting.
+On Tue, Jun 20, 2023 at 12:42:38PM -0700, Kees Cook wrote:
+> struct mux_adth actually ends with multiple struct mux_adth_dg members.
+> This is seen both in the comments about the member:
+> 
+> /**
+>  * struct mux_adth - Structure of the Aggregated Datagram Table Header.
+>  ...
+>  * @dg:		datagramm table with variable length
+>  */
+> 
+> and in the preparation for populating it:
+> 
+>                         adth_dg_size = offsetof(struct mux_adth, dg) +
+>                                         ul_adb->dg_count[i] * sizeof(*dg);
+> 			...
+>                         adth_dg_size -= offsetof(struct mux_adth, dg);
+>                         memcpy(&adth->dg, ul_adb->dg[i], adth_dg_size);
+> 
+> This was reported as a run-time false positive warning:
+> 
+> memcpy: detected field-spanning write (size 16) of single field "&adth->dg" at drivers/net/wwan/iosm/iosm_ipc_mux_codec.c:852 (size 8)
+> 
+> Adjust the struct mux_adth definition and associated sizeof() math; no binary
+> output differences are observed in the resulting object file.
+> 
+> Reported-by: Florian Klink <flokli@flokli.de>
+> Closes: https://lore.kernel.org/lkml/dbfa25f5-64c8-5574-4f5d-0151ba95d232@gmail.com/
+> Fixes: 1f52d7b62285 ("net: wwan: iosm: Enable M.2 7360 WWAN card support")
+> Cc: M Chetan Kumar <m.chetan.kumar@intel.com>
+> Cc: Bagas Sanjaya <bagasdotme@gmail.com>
+> Cc: Intel Corporation <linuxwwan@intel.com>
+> Cc: Loic Poulain <loic.poulain@linaro.org>
+> Cc: Sergey Ryazanov <ryazanov.s.a@gmail.com>
+> Cc: Johannes Berg <johannes@sipsolutions.net>
+> Cc: "David S. Miller" <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> Cc: "Gustavo A. R. Silva" <gustavoars@kernel.org>
+> Cc: netdev@vger.kernel.org
+> Signed-off-by: Kees Cook <keescook@chromium.org>
+> ---
+>  drivers/net/wwan/iosm/iosm_ipc_mux_codec.c | 15 ++++++---------
+>  drivers/net/wwan/iosm/iosm_ipc_mux_codec.h |  2 +-
+>  2 files changed, 7 insertions(+), 10 deletions(-)
 
-Signed-off-by: Jeff Layton <jlayton@kernel.org>
----
- include/linux/fs.h | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 9afb30606373..2ca46c532b49 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -642,7 +642,7 @@ struct inode {
- 	loff_t			i_size;
- 	struct timespec64	i_atime;
- 	struct timespec64	i_mtime;
--	struct timespec64	i_ctime;
-+	struct timespec64	__i_ctime; /* use inode_ctime_* accessors! */
- 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
- 	unsigned short          i_bytes;
- 	u8			i_blkbits;
-@@ -1485,7 +1485,7 @@ struct timespec64 inode_ctime_set_current(struct inode *inode);
-  */
- static inline struct timespec64 inode_ctime_peek(const struct inode *inode)
- {
--	return inode->i_ctime;
-+	return inode->__i_ctime;
- }
- 
- /**
-@@ -1497,7 +1497,7 @@ static inline struct timespec64 inode_ctime_peek(const struct inode *inode)
-  */
- static inline struct timespec64 inode_ctime_set(struct inode *inode, struct timespec64 ts)
- {
--	inode->i_ctime = ts;
-+	inode->__i_ctime = ts;
- 	return ts;
- }
- 
-@@ -1510,7 +1510,7 @@ static inline struct timespec64 inode_ctime_set(struct inode *inode, struct time
-  */
- static inline time64_t inode_ctime_set_sec(struct inode *inode, time64_t sec)
- {
--	inode->i_ctime.tv_sec = sec;
-+	inode->__i_ctime.tv_sec = sec;
- 	return sec;
- }
- 
-@@ -1523,7 +1523,7 @@ static inline time64_t inode_ctime_set_sec(struct inode *inode, time64_t sec)
-  */
- static inline long inode_ctime_set_nsec(struct inode *inode, long nsec)
- {
--	inode->i_ctime.tv_nsec = nsec;
-+	inode->__i_ctime.tv_nsec = nsec;
- 	return nsec;
- }
- 
--- 
-2.41.0
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
