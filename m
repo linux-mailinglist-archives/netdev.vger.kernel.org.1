@@ -1,365 +1,144 @@
-Return-Path: <netdev+bounces-12727-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12728-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09B31738B65
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:35:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 276C7738B91
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:38:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8C941C20F74
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:35:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 31F6B281682
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:38:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A089217722;
-	Wed, 21 Jun 2023 16:34:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 514D018B07;
+	Wed, 21 Jun 2023 16:38:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C951F9D6
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:34:58 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05130211F;
-	Wed, 21 Jun 2023 09:34:40 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 29F2A21F49;
-	Wed, 21 Jun 2023 16:34:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1687365247; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=83XiFVWYz/09+oGN/3WNfR8rOmdHj8dhtkMP8AULWnA=;
-	b=sc9SdGkVYpy6qJIOp94C8ZTK7+yexSuiuzBBQMmC044LdrYsGTTopVDpXJpirhT8YYUNwr
-	EkZW+2bPiDoUHc1sENxt/GtvO8e+o5cGEB5/qIHjLNWUPiQKx/fex55iHFqqK+cK1B9O2I
-	hTcjZhgE/PAahoI8Eyiz/fHdKLMV9RA=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1687365247;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=83XiFVWYz/09+oGN/3WNfR8rOmdHj8dhtkMP8AULWnA=;
-	b=PrqwLsXYpUHalqAYLIba6BTiYIYYM3iCNT6BT131aBHGuZlOrJnTQ+csCsqt6keBKu3RY2
-	7Ndse7BgJBjAHYAQ==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 10D2113A8E;
-	Wed, 21 Jun 2023 16:34:07 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id P7cIBH8mk2TDQgAAMHmgww
-	(envelope-from <jack@suse.cz>); Wed, 21 Jun 2023 16:34:07 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 74A08A075D; Wed, 21 Jun 2023 18:34:06 +0200 (CEST)
-Date: Wed, 21 Jun 2023 18:34:06 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Jeremy Kerr <jk@ozlabs.org>, Arnd Bergmann <arnd@arndb.de>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Brad Warrum <bwarrum@linux.ibm.com>,
-	Ritu Agarwal <rituagar@linux.ibm.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Ian Kent <raven@themaw.net>,
-	Luis de Bethencourt <luisbg@kernel.org>,
-	Salah Triki <salah.triki@gmail.com>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
-	Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Tyler Hicks <code@tyhicks.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <huyue2@coolpad.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Bob Peterson <rpeterso@redhat.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Anton Altaparmakov <anton@tuxera.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Iurii Zaikin <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Anders Larsen <al@alarsen.net>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Phillip Lougher <phillip@squashfs.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Evgeniy Dushistov <dushistov@mail.ru>,
-	Hans de Goede <hdegoede@redhat.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Hugh Dickins <hughd@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>, Juergen Gross <jgross@suse.com>,
-	Ruihan Li <lrh2000@pku.edu.cn>,
-	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Udipto Goswami <quic_ugoswami@quicinc.com>,
-	Linyu Yuan <quic_linyyuan@quicinc.com>,
-	John Keeping <john@keeping.me.uk>,
-	Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-	Dan Carpenter <error27@gmail.com>, Yuta Hayama <hayama@lineo.co.jp>,
-	Jozef Martiniak <jomajm@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	ZhangPeng <zhangpeng362@huawei.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
-	Aditya Garg <gargaditya08@live.com>,
-	Erez Zadok <ezk@cs.stonybrook.edu>,
-	Yifei Liu <yifeliu@cs.stonybrook.edu>, Yu Zhe <yuzhe@nfschina.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Oleg Kanatov <okanatov@gmail.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin <cgel.zte@gmail.com>,
-	Stefan Roesch <shr@devkernel.io>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	"Liam R. Howlett" <Liam.Howlett@Oracle.com>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Minghao Chi <chi.minghao@zte.com.cn>,
-	Seth Forshee <sforshee@digitalocean.com>,
-	Zeng Jingxiang <linuszeng@tencent.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>,
-	"Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
-	Chen Zhongjin <chenzhongjin@huawei.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Rik van Riel <riel@surriel.com>,
-	Jingyu Wang <jingyuwang_vip@163.com>, Hangyu Hua <hbh25y@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-	autofs@vger.kernel.org, linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	cluster-devel@redhat.com, linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
-	ocfs2-devel@oss.oracle.com, linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
-	linux-hardening@vger.kernel.org, reiserfs-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-trace-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org
-Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
-Message-ID: <20230621163406.udwkxl6tteg6nlcn@quack3>
-References: <20230621144507.55591-1-jlayton@kernel.org>
- <20230621144507.55591-2-jlayton@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43333168C2
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:38:35 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 732721BD0;
+	Wed, 21 Jun 2023 09:38:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=OdFzun0L0/e6r02A+DrKv3kwszx3coOMwNXnVWRuYqM=;
+	t=1687365488; x=1688575088; b=m9p8LdGGk7MFyOmWI+LHZkM2E7doe5Xb/ok4iwGgsLroHFp
+	3JdDqhm9aA5ijUA8EM+AJkyHRFvPxBxeD7+0EZ6nMifeVeK97GlCFZX33Rq+IBdR7OS77Hjo/+Meo
+	OPoKxA/wCkmtOAk8AZ4wPsd2HNUECr55nSCrUuGH9g0jWBUUHrP6+xy+WT4hL43hehPMUzM60ZUcc
+	kf0XGBPIuQpijgY2nlj6zOI3rw/PLukL+FOtnvOq7XhAaTVyOM/0l3YWNgV2cG32uZLsP8EtxCex1
+	Y6dsPJCz5OaPYzyeoRNh/Z0PnRdxkSFEApfF2RXCvns+gyoBe4oSI76w3TuVxdCA==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qC0pt-00Dltw-2s;
+	Wed, 21 Jun 2023 18:37:38 +0200
+Message-ID: <aca10d753183508672739e8b6668d41ce2cdaf80.camel@sipsolutions.net>
+Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
+ mitigations
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Evan Quan <evan.quan@amd.com>, rafael@kernel.org, lenb@kernel.org, 
+ alexander.deucher@amd.com, christian.koenig@amd.com, Xinhui.Pan@amd.com, 
+ airlied@gmail.com, daniel@ffwll.ch, davem@davemloft.net,
+ edumazet@google.com,  kuba@kernel.org, pabeni@redhat.com,
+ mario.limonciello@amd.com, mdaenzer@redhat.com, 
+ maarten.lankhorst@linux.intel.com, tzimmermann@suse.de,
+ hdegoede@redhat.com,  jingyuwang_vip@163.com, lijo.lazar@amd.com,
+ jim.cromie@gmail.com,  bellosilicio@gmail.com, andrealmeid@igalia.com,
+ trix@redhat.com, jsg@jsg.id.au,  arnd@arndb.de,
+ linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org, 
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org, 
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+Date: Wed, 21 Jun 2023 18:37:36 +0200
+In-Reply-To: <d2dba04d-36bf-4d07-bf2b-dd06671c45c6@lunn.ch>
+References: <20230621054603.1262299-1-evan.quan@amd.com>
+	 <20230621054603.1262299-2-evan.quan@amd.com>
+	 <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
+	 <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
+	 <d2dba04d-36bf-4d07-bf2b-dd06671c45c6@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621144507.55591-2-jlayton@kernel.org>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed 21-06-23 10:45:06, Jeff Layton wrote:
-> struct timespec64 has unused bits in the tv_nsec field that can be used
-> for other purposes. In future patches, we're going to change how the
-> inode->i_ctime is accessed in certain inodes in order to make use of
-> them. In order to do that safely though, we'll need to eradicate raw
-> accesses of the inode->i_ctime field from the kernel.
-> 
-> Add new accessor functions for the ctime that we can use to replace them.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+On Wed, 2023-06-21 at 18:14 +0200, Andrew Lunn wrote:
+> > > Do only ACPI based systems have:
+> > >=20
+> > > =C2=A0=C2=A0=C2=A0interference of relatively high-powered harmonics o=
+f the (G-)DDR
+> > > =C2=A0=C2=A0=C2=A0memory clocks with local radio module frequency ban=
+ds used by
+> > > =C2=A0=C2=A0=C2=A0Wifi 6/6e/7."
+> > >=20
+> > > Could Device Tree based systems not experience this problem?
+> >=20
+> > They could, of course, but they'd need some other driver to change
+> > _something_ in the system? I don't even know what this is doing
+> > precisely under the hood in the ACPI BIOS
+>=20
+> If you don't know what it is actually doing, it suggests the API is
+> not very well defined.
 
-Looks good to me. Feel free to add:
+I wouldn't say that. At the level it's defined now, the API is very
+clear: the wifi subsystem tells the other side what channels it's
+operating on right now.
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+> Is there even enough details that ARM64 ACPI
+> BIOS could implement this?=20
 
-								Honza
+This, in itself? No. You'd have to know about the physical
+characteristics of the system, what is actually causing interference and
+at what frequencies and of course what you can actually do to mitigate
+(such as adjusting clock frequencies.)
 
-> ---
->  fs/inode.c         | 16 ++++++++++++++
->  include/linux/fs.h | 53 +++++++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 68 insertions(+), 1 deletion(-)
-> 
-> diff --git a/fs/inode.c b/fs/inode.c
-> index d37fad91c8da..c005e7328fbb 100644
-> --- a/fs/inode.c
-> +++ b/fs/inode.c
-> @@ -2499,6 +2499,22 @@ struct timespec64 current_time(struct inode *inode)
->  }
->  EXPORT_SYMBOL(current_time);
->  
-> +/**
-> + * inode_ctime_set_current - set the ctime to current_time
-> + * @inode: inode
-> + *
-> + * Set the inode->i_ctime to the current value for the inode. Returns
-> + * the current value that was assigned to i_ctime.
-> + */
-> +struct timespec64 inode_ctime_set_current(struct inode *inode)
-> +{
-> +	struct timespec64 now = current_time(inode);
-> +
-> +	inode_set_ctime(inode, now);
-> +	return now;
-> +}
-> +EXPORT_SYMBOL(inode_ctime_set_current);
-> +
->  /**
->   * in_group_or_capable - check whether caller is CAP_FSETID privileged
->   * @idmap:	idmap of the mount @inode was found from
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 6867512907d6..9afb30606373 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -1474,7 +1474,58 @@ static inline bool fsuidgid_has_mapping(struct super_block *sb,
->  	       kgid_has_mapping(fs_userns, kgid);
->  }
->  
-> -extern struct timespec64 current_time(struct inode *inode);
-> +struct timespec64 current_time(struct inode *inode);
-> +struct timespec64 inode_ctime_set_current(struct inode *inode);
-> +
-> +/**
-> + * inode_ctime_peek - fetch the current ctime from the inode
-> + * @inode: inode from which to fetch ctime
-> + *
-> + * Grab the current ctime from the inode and return it.
-> + */
-> +static inline struct timespec64 inode_ctime_peek(const struct inode *inode)
-> +{
-> +	return inode->i_ctime;
-> +}
-> +
-> +/**
-> + * inode_ctime_set - set the ctime in the inode to the given value
-> + * @inode: inode in which to set the ctime
-> + * @ts: timespec value to set the ctime
-> + *
-> + * Set the ctime in @inode to @ts.
-> + */
-> +static inline struct timespec64 inode_ctime_set(struct inode *inode, struct timespec64 ts)
-> +{
-> +	inode->i_ctime = ts;
-> +	return ts;
-> +}
-> +
-> +/**
-> + * inode_ctime_set_sec - set only the tv_sec field in the inode ctime
-> + * @inode: inode in which to set the ctime
-> + * @sec:  value to set the tv_sec field
-> + *
-> + * Set the sec field in the ctime. Returns @sec.
-> + */
-> +static inline time64_t inode_ctime_set_sec(struct inode *inode, time64_t sec)
-> +{
-> +	inode->i_ctime.tv_sec = sec;
-> +	return sec;
-> +}
-> +
-> +/**
-> + * inode_ctime_set_nsec - set only the tv_nsec field in the inode ctime
-> + * @inode: inode in which to set the ctime
-> + * @nsec:  value to set the tv_nsec field
-> + *
-> + * Set the nsec field in the ctime. Returns @nsec.
-> + */
-> +static inline long inode_ctime_set_nsec(struct inode *inode, long nsec)
-> +{
-> +	inode->i_ctime.tv_nsec = nsec;
-> +	return nsec;
-> +}
->  
->  /*
->   * Snapshotting support.
-> -- 
-> 2.41.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+But as an API? I'd think yes, since WiFi can't really move off a
+frequency, other than disconnect, anyway.
+
+
+> > > > +bool wbrf_supported_producer(struct acpi_device *adev);
+> > > > +int wbrf_add_exclusion(struct acpi_device *adev,
+> > > > +		       struct wbrf_ranges_in *in);
+> > > > +int wbrf_remove_exclusion(struct acpi_device *adev,
+> > > > +			  struct wbrf_ranges_in *in);
+> > >=20
+> > > Could struct device be used here, to make the API agnostic to where
+> > > the information is coming from? That would then allow somebody in the
+> > > future to implement a device tree based information provider.
+> >=20
+> > That does make sense, and it wouldn't even be that much harder if we
+> > assume in a given platform there's only one provider
+>=20
+> That seems like a very reasonable assumption. It is theoretically
+> possible to build an ACPI + DT hybrid, but i've never seen it actually
+> done.
+
+OK.
+
+> If an ARM64 ACPI BIOS could implement this, then i would guess the low
+> level bits would be solved, i guess jumping into the EL1
+> firmware. Putting DT on top instead should not be too hard.
+
+Right.
+
+
+Maybe then this really shouldn't be called "wbrf", but maybe naming
+doesn't matter that much :)
+
+johannes
 
