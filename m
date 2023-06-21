@@ -1,80 +1,75 @@
-Return-Path: <netdev+bounces-13037-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 022E173A063
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:02:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81ABD73A08E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:09:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55C70281989
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:02:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6ADE1C210B2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:09:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 215A11E512;
-	Thu, 22 Jun 2023 12:02:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8A781E512;
+	Thu, 22 Jun 2023 12:09:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1140F1E511
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:17 +0000 (UTC)
-Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A827F2709
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:01:56 -0700 (PDT)
-Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3f9189228bcso45355825e9.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:01:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C6791D2DD
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:09:43 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 453CE171C;
+	Thu, 22 Jun 2023 05:09:42 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fa70ec8d17so5614475e9.1;
+        Thu, 22 Jun 2023 05:09:42 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687435312; x=1690027312;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNAeXLliRXJ/Fju8aom0p2nCiliRpCVZGRMXzhoOle4=;
-        b=Eg5P5nkwqggXiAkSQlSXkGdRxJFqB0Y/mKfA979fmkGozdANKi7Nd2fwOa0CSm9mea
-         YOR3tMUyLUPtkm4Q6/4pnN6N3CW/Bk/KQkrA/FgIWNMpQL34lJp+iGqkON4pQ6ZcrXAB
-         /1RkxD+2bjSPHAHyLcEGEikd7By+lZxqKGAb6l6hIPO73dL/2wYmJn80juV0nS5sotUv
-         YTrwY/2Qro+HPwYmtLr/ky0//qErPakpAf5njAl8aMvUBIQU3VX9YU7O4AT+Yu8sk1oE
-         CQKxYuiTn7bFzPdkXy5swITVgc3P4egQBDi8NJSv4d6you8KPxKI75u+tLsNVF4QNQkU
-         Yyeg==
+        d=gmail.com; s=20221208; t=1687435781; x=1690027781;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:from:to:cc:subject:date:message-id:reply-to;
+        bh=LAhK5ptsDBv64jGlJql6+rkKJiLJ8n12yCAtGqe3FGM=;
+        b=aLeAta5Jy97A7BxULGxrE+pm6Crwgr/JVxvKHVrQ0gCCSAc6+UK+NCez7tCi9M++80
+         tAvs/H1xw7drVND1sl+uvWyeqE0nns1Kvv7Tcthg8x3n1cQUzKqhJv3vex6IA3RiF7b9
+         MRSAXxb607ONdUiLsLJ3J7MqK5dmdnK9w+4a07JLUgCvMDKq9TZ3257KzimmEc8bnTJ5
+         rkF2Fk/oYADEDRTGl3m57UGV9Z6emH5ZmGT7oKI2Fmg+rmk821WC4jfXOsOv7xZGqPD8
+         ZmmRRdOaf7L2axbizBq7GW+Q9GO2fYYgwx74/L9KK7uq9ragpFuqVR53SqEFUIvnlshX
+         Y7AA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687435312; x=1690027312;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=pNAeXLliRXJ/Fju8aom0p2nCiliRpCVZGRMXzhoOle4=;
-        b=aoE4mJCxFHFmdvH2XJjYNVn1PXbS7rpIhvx5as02NqlRLltcKPCINaizqerzVz2uX7
-         /HXSBSka+7zPetMWlOVCzLC5zbscHFey744HshV1QSVqEB++CxtgwZT222O1+2mU57Cz
-         FDZKM1cFIBxbGVFlkehmzTDmL4/G2SUJhH7yGMUtgfn+bTVn2IGiy6kfOCZmmAkaVWbY
-         xjIOlJa+1OaW0dm6guE7mU6S92lgV/1swexyWziLbQCOi0QyGoWQ26jO2x0pfHuafcuT
-         hmJIxF8wcCrUr8/E7brdqzEdvgJt/cn0zWopNDptMUEQxNUyjZGY9UmZWXEAXduB1klJ
-         h0Eg==
-X-Gm-Message-State: AC+VfDw+uY+gZY+VMLo2SSQamDdGAk5a3HAld3lKfl+7t31Q9Pvl+kGQ
-	7Ylo7tajMvDqZN1jRyFrivPlGw==
-X-Google-Smtp-Source: ACHHUZ623qSTpv6LHLD0L0z1POeFaDwWSKr0LgOVmSpoH+ZotM8lOmLmmlqstH24oxjFygDatL1GHg==
-X-Received: by 2002:a1c:4c14:0:b0:3f9:b0c2:9ff7 with SMTP id z20-20020a1c4c14000000b003f9b0c29ff7mr8094437wmf.30.1687435312358;
-        Thu, 22 Jun 2023 05:01:52 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:d785:af3e:3bf5:7f36])
-        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm7594296wmo.6.2023.06.22.05.01.51
+        d=1e100.net; s=20221208; t=1687435781; x=1690027781;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LAhK5ptsDBv64jGlJql6+rkKJiLJ8n12yCAtGqe3FGM=;
+        b=d/FVJlYCFw6EuD+T/sxQNtrn77Ir/hv7qlGMhn4yhIRuGEzw5AlSMMNNz7BBmT+poo
+         00HxstdbOq09f+hpXcyXoORPEz+ml1L8LfNjVTIW7PIc5AqcgDxcyGMiZEPEOcsTBV6x
+         lj8vMDZ6wccouW3PaovJHr0n7Ga7hCPGzrlk6ViLK3DzH7SNpNVzJtnqSTu5U7I5CLxE
+         rLo7Oue6QU5rypJE74orpmvmtSb9F6RGmFHjkwbaoyJ6FDxr1Fz72dxUgiqUaCcwpH0A
+         YWWB75mSSENzDjLRyeWyI8gNVVZCSs7prXEgZaAqASHHUbfReQ64nWeI1oeYLMkekgX4
+         b2YQ==
+X-Gm-Message-State: AC+VfDwe9rLPp8aWJovHk/ONfpN13O6I8ZCpxM9bavIY9BLuIN3QlN+X
+	8E4tR/yo1vOEkbJqKyyAaIk=
+X-Google-Smtp-Source: ACHHUZ6aEWn6QX4rcuuun6Fi61ABx2Gxlxx2npNn1gGehrLuBHa2CoR/BIVi2oA8qLwMnW3KRc8QKA==
+X-Received: by 2002:a05:600c:3657:b0:3f6:8ba:6ea2 with SMTP id y23-20020a05600c365700b003f608ba6ea2mr16872598wmq.15.1687435780387;
+        Thu, 22 Jun 2023 05:09:40 -0700 (PDT)
+Received: from localhost.localdomain (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
+        by smtp.googlemail.com with ESMTPSA id o6-20020a05600c378600b003f9c0a7c6bcsm3977773wmr.0.2023.06.22.05.09.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 05:01:51 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
+        Thu, 22 Jun 2023 05:09:40 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Christian Marangi <ansuelsmth@gmail.com>,
+	Pavel Machek <pavel@ucw.cz>,
 	netdev@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [RESEND PATCH v2 1/5] arm64: dts: qcom: sa8775p: add the SGMII PHY node
-Date: Thu, 22 Jun 2023 14:01:38 +0200
-Message-Id: <20230622120142.218055-2-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230622120142.218055-1-brgl@bgdev.pl>
-References: <20230622120142.218055-1-brgl@bgdev.pl>
+	linux-kernel@vger.kernel.org
+Subject: [net-next PATCH] net: dsa: qca8k: add support for additional modes for netdev trigger
+Date: Wed, 21 Jun 2023 11:54:09 +0200
+Message-Id: <20230621095409.25859-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -82,44 +77,70 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+The QCA8K switch supports additional modes that can be handled in
+hardware for the LED netdev trigger.
 
-Add the internal SGMII/SerDes PHY node for sa8775p platforms.
+Add these additional modes to further support the Switch LEDs and
+offload more blink modes.
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
+Add additional modes:
+- link_10
+- link_100
+- link_1000
+- half_duplex
+- full_duplex
+
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
 ---
- arch/arm64/boot/dts/qcom/sa8775p.dtsi | 9 +++++++++
- 1 file changed, 9 insertions(+)
+ drivers/net/dsa/qca/qca8k-leds.c | 20 ++++++++++++++++++++
+ 1 file changed, 20 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/sa8775p.dtsi b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-index b130136acffe..b6d95813c98c 100644
---- a/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sa8775p.dtsi
-@@ -1837,6 +1837,15 @@ adreno_smmu: iommu@3da0000 {
- 				     <GIC_SPI 687 IRQ_TYPE_LEVEL_HIGH>;
- 		};
+diff --git a/drivers/net/dsa/qca/qca8k-leds.c b/drivers/net/dsa/qca/qca8k-leds.c
+index 6f02029b454b..1261e0bb21ef 100644
+--- a/drivers/net/dsa/qca/qca8k-leds.c
++++ b/drivers/net/dsa/qca/qca8k-leds.c
+@@ -68,6 +68,16 @@ qca8k_parse_netdev(unsigned long rules, u32 *offload_trigger)
+ 		*offload_trigger |= QCA8K_LED_TX_BLINK_MASK;
+ 	if (test_bit(TRIGGER_NETDEV_RX, &rules))
+ 		*offload_trigger |= QCA8K_LED_RX_BLINK_MASK;
++	if (test_bit(TRIGGER_NETDEV_LINK_10, &rules))
++		*offload_trigger |= QCA8K_LED_LINK_10M_EN_MASK;
++	if (test_bit(TRIGGER_NETDEV_LINK_100, &rules))
++		*offload_trigger |= QCA8K_LED_LINK_100M_EN_MASK;
++	if (test_bit(TRIGGER_NETDEV_LINK_1000, &rules))
++		*offload_trigger |= QCA8K_LED_LINK_1000M_EN_MASK;
++	if (test_bit(TRIGGER_NETDEV_HALF_DUPLEX, &rules))
++		*offload_trigger |= QCA8K_LED_HALF_DUPLEX_MASK;
++	if (test_bit(TRIGGER_NETDEV_FULL_DUPLEX, &rules))
++		*offload_trigger |= QCA8K_LED_FULL_DUPLEX_MASK;
  
-+		serdes0: phy@8901000 {
-+			compatible = "qcom,sa8775p-dwmac-sgmii-phy";
-+			reg = <0x0 0x08901000 0x0 0xe10>;
-+			clocks = <&gcc GCC_SGMI_CLKREF_EN>;
-+			clock-names = "sgmi_ref";
-+			#phy-cells = <0>;
-+			status = "disabled";
-+		};
-+
- 		pdc: interrupt-controller@b220000 {
- 			compatible = "qcom,sa8775p-pdc", "qcom,pdc";
- 			reg = <0x0 0x0b220000 0x0 0x30000>,
+ 	if (rules && !*offload_trigger)
+ 		return -EOPNOTSUPP;
+@@ -322,6 +332,16 @@ qca8k_cled_hw_control_get(struct led_classdev *ldev, unsigned long *rules)
+ 		set_bit(TRIGGER_NETDEV_TX, rules);
+ 	if (val & QCA8K_LED_RX_BLINK_MASK)
+ 		set_bit(TRIGGER_NETDEV_RX, rules);
++	if (val & QCA8K_LED_LINK_10M_EN_MASK)
++		set_bit(TRIGGER_NETDEV_LINK_10, rules);
++	if (val & QCA8K_LED_LINK_100M_EN_MASK)
++		set_bit(TRIGGER_NETDEV_LINK_100, rules);
++	if (val & QCA8K_LED_LINK_1000M_EN_MASK)
++		set_bit(TRIGGER_NETDEV_LINK_1000, rules);
++	if (val & QCA8K_LED_HALF_DUPLEX_MASK)
++		set_bit(TRIGGER_NETDEV_HALF_DUPLEX, rules);
++	if (val & QCA8K_LED_FULL_DUPLEX_MASK)
++		set_bit(TRIGGER_NETDEV_FULL_DUPLEX, rules);
+ 
+ 	return 0;
+ }
 -- 
-2.39.2
+2.40.1
 
 
