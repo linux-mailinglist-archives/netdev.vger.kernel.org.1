@@ -1,239 +1,205 @@
-Return-Path: <netdev+bounces-12645-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12646-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 81B3B738576
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:40:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C127C738577
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:40:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D0322281649
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:40:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2541C280A16
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:40:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AF4E1800F;
-	Wed, 21 Jun 2023 13:31:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B475E17AB8;
+	Wed, 21 Jun 2023 13:37:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28C3317ACE
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:31:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4282E19B4
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687354243;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=VIp8iVbV+P5Dx+n5TxKVDlGyBK7fZsapXNE0EAOF2Qs=;
-	b=FEfTtckMFmQjCGeX6eh2w2l/DSTByNP2qLSCagxkMyS8wLplFh6tNq3LdQ3pyrcERk0Wme
-	75ivwZbOFdJcZ7f5nBl9TJphvkDTNcLHLJbuKDWPc3RcUIRcU04HRXmRmTyzkO0uCrezvg
-	ktfm/ToX0X8adanAzfDWMV7onpuE0hg=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-80-8fsaHaHePrWCUr-51OcYcw-1; Wed, 21 Jun 2023 09:30:40 -0400
-X-MC-Unique: 8fsaHaHePrWCUr-51OcYcw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b46e0e096aso32356171fa.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:30:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687354238; x=1689946238;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VIp8iVbV+P5Dx+n5TxKVDlGyBK7fZsapXNE0EAOF2Qs=;
-        b=OvijtjUMktixSsH4vWVdBE/o45jMFrTAGgXgjHTy2zvpTo89Lv4TuRZT4oGljYFReO
-         yorFOwp7rOO/X0dftWLn6Sb4qoPKalbEmvdzHJPiQJH02lLpNK2gRV9Kl904Sm0qu5e4
-         dYf1eTkbOgQ6ZozQGXFUsB9V+Tah516r04TBpspeoBzRiF6cd4nc9mKuq1t0AEScuvEr
-         iFdElYnPubh1odYpT7Zh8VdNjXROFVcbJ/Ht3Tqts8qGuzsu99f6B7on9Ctb0otn+GVw
-         WwkZmOcD0BR/rgJ3CEq1m76cYArIWi3Xu9UEhfeEfDcRVO9MvSB4qCOlSUMZi42RBKYF
-         lang==
-X-Gm-Message-State: AC+VfDxBE46anHUJ9q3F6m0khboxRSOYP+WudrF7gAF8WcnhVHkAOY1N
-	57sp+aUeWkfGnBN0AyAKnWyf1KCCwxAbhrzUvdZLoyqsgQGp6N63Zwi7lkk8ujnfjg+k+sbCjm7
-	+TzWoaYzNC43iZPSs
-X-Received: by 2002:a2e:9217:0:b0:2b4:48de:b2cb with SMTP id k23-20020a2e9217000000b002b448deb2cbmr9355983ljg.50.1687354238060;
-        Wed, 21 Jun 2023 06:30:38 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4pDrW0Sog/gf+Q2hMpBSFt0vaGNQ9bb94RQpS0m7tMAHO9YrCXCKt6N5NdCqC389eEbUbOow==
-X-Received: by 2002:a2e:9217:0:b0:2b4:48de:b2cb with SMTP id k23-20020a2e9217000000b002b448deb2cbmr9355964ljg.50.1687354237523;
-        Wed, 21 Jun 2023 06:30:37 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id hk12-20020a170906c9cc00b009659ad1072fsm3149754ejb.113.2023.06.21.06.30.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 06:30:36 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 8371ABBF240; Wed, 21 Jun 2023 15:30:36 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
- ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
- tirthendu.sarkar@intel.com, simon.horman@corigine.com
-Subject: Re: [PATCH v4 bpf-next 15/22] xsk: add multi-buffer documentation
-In-Reply-To: <CAJ8uoz2hfXzu29KEgqm3rNm+hayDtUkJatFVA0n4nZz6F9de0w@mail.gmail.com>
-References: <20230615172606.349557-1-maciej.fijalkowski@intel.com>
- <20230615172606.349557-16-maciej.fijalkowski@intel.com>
- <87zg4uca21.fsf@toke.dk>
- <CAJ8uoz2hfXzu29KEgqm3rNm+hayDtUkJatFVA0n4nZz6F9de0w@mail.gmail.com>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 21 Jun 2023 15:30:36 +0200
-Message-ID: <87o7l9c58j.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A702217747
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:37:50 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2131.outbound.protection.outlook.com [40.107.243.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3CA191
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:37:49 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gYwm8X/zh/SdXOnfBnZV5AM1B5SdJ2w5jRBf3/m4s1FpIz9/ElClt//p6u7BP8V+Iy4x5Wp6vVzDpz6mFiD9kkkoc2O9TXMXfkPFmdJwgKvKfNgmJeSRf4tNQ2bgHfAyqSHnDIhTlzHh9rjuZibgbfRERIAjHtvUrgQVVs/RvUyyvsMSuk9BuxKmFv4eZ3KqT6hRdOvzQCTZPyCZP15xAxPy6/URN1VjFAZo0Ye1gnJXpqK0qjDcmKk329mm9FxjefqEZgQhbh5VnKLCzGpkDkoIfLQ1BBNSYcki5kxqcf+C1Qow2MY3VayOVUN2fVG0F7Ahjj54OeT7TbxsV6y6WA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=JERUHW+GVBKwe2sueT7P+TrMtJ2zdC4MKwKdbFbpUD4=;
+ b=NJ5CF/7YaQ90bFCei5Dw9FIelJ52UiXuL69qQizH7y4ZE8CAValTZWuBCyPBXh2wj34qzBJQA3YOuyC0/N6yA8pjjk++dNqffgojxDAQ77hR/IL7Igu4bcg8YhuipUweXN6rJ2v3jXjM2NNBV8EnQMEwAI53YUM/xm1HBSK7SIW+pDUyMFKBJsU0O+IDEAtP+E6TJwrEaPP7ogYDat/BbzGmDNAHCys2T+X3pn/f6CuhKcITeF8tIH70VPyCSm+Y4+iusoLIez7xGrpqRuQMbeQHoNpufYzBOjzsi/UD3QB2rM2RKmf+PO2b+8oF7VpPjOJ0wrIHkCLjL1nr51aEOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=JERUHW+GVBKwe2sueT7P+TrMtJ2zdC4MKwKdbFbpUD4=;
+ b=WR+iGthT5gkYfc/0UEucWwC1j1J2iep0nQ7V59ZPmr/V3kX7+NzH4IlDC3AHWeGbawkDcVeNvDjSiId+FBk9Zhq57o79wlV5kFmK3tRYmztPFg0vUp9zLvXrYU6N3j6gKd4eTin2WJ7DPQF1wO4Qgn1k/bp5o4uSJ+rDiY7hlm0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY3PR13MB5041.namprd13.prod.outlook.com (2603:10b6:a03:36b::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
+ 2023 13:37:46 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 13:37:44 +0000
+Date: Wed, 21 Jun 2023 15:37:39 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [PATCH net-next v1 1/3] led: trig: netdev: Fix requesting
+ offload device
+Message-ID: <ZJL9I5rQlYFUZWPp@corigine.com>
+References: <20230619215703.4038619-1-andrew@lunn.ch>
+ <20230619215703.4038619-2-andrew@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230619215703.4038619-2-andrew@lunn.ch>
+X-ClientProxiedBy: AM8P190CA0028.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:219::33) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB5041:EE_
+X-MS-Office365-Filtering-Correlation-Id: 97414c70-299d-4204-6283-08db725cb1b8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Nl8cgL2FQ5Xv2WII6opScxAG94e88gFtZy8Z/hf26Q3Jcq8NWuUWYlbicZWZFeKudp/vl+jV3MutOzhdz7mVH8WUx5v6SibrVRn5nB3WzrFiSlxpUSzHVjmvCFWGqURIG12cQlkkp+jBDyrBkW4Idq0cz9RIfzMa8hBO8vy6LBcZXwgHmsCjJGxFe1yl9X1bVYtvbcHHq/ndGCGOaEsYfH0Vgkio2wZGbRwD8aLMcXVyTqkj7m4lJNclYjwjAmvgDTEL30ZatfFGlPyV+xuAFTyQSD3XPSYNo+fQt58EJj7bufTSaNyYDXvGrnvwbF4tyPZvlGz1+DLaAe3tGKb2Z4WXih7wpT9iDeusz4iOgbh1GwaF5x/qwFHV0zwpFAPbClwEIDQt/kqMcEqj0YDwLKQCXB68vPjnbJMWmJSQwtxqPfNwYiCe/xJkg/3WUJoYf05HAHyypH0ZZXaDqfmEQKUXQFT644nhFJqps9dci9WOSfW5mX+pSt7I1VvAA1orcMSFZD9whPUjjPUhgVciSVKYQE+9bjEriM21Qe653irzztI5b/pVUQUM/BDpgXae0jch4wayRu7Eo6AztOiA03fiAIr9g8s001HilO7Nosc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(376002)(136003)(346002)(396003)(366004)(451199021)(478600001)(6486002)(83380400001)(54906003)(6666004)(186003)(2906002)(2616005)(6512007)(6506007)(5660300002)(44832011)(36756003)(6916009)(38100700002)(4326008)(316002)(66946007)(66476007)(86362001)(8936002)(8676002)(41300700001)(66556008);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?SQ/5NfTW7DuJ1JlwgrVgPgjYsmmXeCgh4Lieoid6LX8UmLWPadfFBzGeyaUG?=
+ =?us-ascii?Q?z17DnYBoEZh4NdCmjeshQ2EVWnG+SDuXx6s/+XYuaBc4Vz2nesV6Xm6lMzPo?=
+ =?us-ascii?Q?O5KkUFjVjuGuPsmDKQZR9jmR1c9K44nWCKfO7EpgZCUd1HtAeTbCus3NK+2Z?=
+ =?us-ascii?Q?wsnPCl/RwH/sbTkIIFBYj1pi/0m180vYXmhKvcA3jp4zuQYaPfbexOFaxHjr?=
+ =?us-ascii?Q?ED86427d3hWAlOByvdSbA96iz6yP7zhWem5zgWWCIF3EU/+UM6d+2foLPVQG?=
+ =?us-ascii?Q?QwEsNQAvWD38Ve6ril8AjF2LfhtCAmD0Xw53i3vLDNzCU5pLStIwV0ewXjas?=
+ =?us-ascii?Q?KFyvh7hhBrsW91GII1MK8gXpcEhXXuE/ONi2WvkyhZty7uEOfGXr4joSc9De?=
+ =?us-ascii?Q?8r9Vlwc6DYSiIfefBie71HBjpHiWViJCXylrbEw7JS/VuuymcypS1ss+qV5Z?=
+ =?us-ascii?Q?mzK2L4zaIY03GdlUWB9hQ/uaU+Wt+TZZVsb6zleleQTkED8618Obk6SqhctM?=
+ =?us-ascii?Q?ybNTTtITATFY750cSATb/CQc283Yn50fFS1T4dHMpS0Euynk2h9crIk1xm+R?=
+ =?us-ascii?Q?636WFskAbTBY6uqZoWpodfzCN52h3o4hTtIjkFTOALj/DCn/2a5AZcYkPmyr?=
+ =?us-ascii?Q?Oaj7XO/rRDKlc7k/P3Vc3aWXpv2g+G27UBBXPRb61aQhybckBUHun5C4BtFd?=
+ =?us-ascii?Q?G3Kbvl536GnLJEXoGgD/krI81NBxT5MdR2v9COUR8N/+XpjfaePEaVHQqW9C?=
+ =?us-ascii?Q?pfu+v146b/q93oOj+CkejNTsJG6X45UO9yJ5D1CpKTqohIj6m5lriNzMrdXv?=
+ =?us-ascii?Q?sCE3ZF9JMQY9cS1fgvX0n53VZGzOEWeeK2VVJc3uJRn6FVFmeV1Io83w7BNE?=
+ =?us-ascii?Q?P6ntZHZ4UB2zVexdWJHqEzFy0j888I53PNtduORRnaPE7SKuiLF8aSlh9Zz+?=
+ =?us-ascii?Q?RfEdBZYKlzWyWudB9YZhCFRzvGtr/9nB1/+XIaMkqSXGGlx5k+ZEYZLMzMCQ?=
+ =?us-ascii?Q?/+/jRYqn36cRmgYGnzvFDs+Wx+lWFGWeh3ctc6GtXhamGdFED0fJBMAw7B2k?=
+ =?us-ascii?Q?L8x9Oy5gGZg/XjffmbMtkPxku0v03DQfW+HhlQ6xaLGCdTawfSbNtZeYJbmA?=
+ =?us-ascii?Q?EYIW40oipt/bzlV9BrPe+lN4u7Di450tJOJbKbpnhZRxxBrrIVCr0wp3pDK2?=
+ =?us-ascii?Q?qcB4kYWX7VfhlydhJSCOClnmARLjjM52hdNM9HPqKU8cPI1YZpzK8k3GE/Ag?=
+ =?us-ascii?Q?r9nO3cVDXsVTEtwvyYQpqhXFSp6eJPS3DzSK9VobUyKQJ1+OATeomCPiO0kc?=
+ =?us-ascii?Q?NYXQmIRaab8tcTSAYpywYvcG+YH6H2FmePXlL06HR4AelU88KTeKovSJxQPj?=
+ =?us-ascii?Q?yRGrcDTi1wk4HmgdxlUGKk3Dfr47wH+6HsnJt9xji/WyW5Eyuw4QGjDJWs/m?=
+ =?us-ascii?Q?SYDTd6o9aD/qGr8iZG8iTA384QOdshEb0R/X+58Q/PJnwvUU61//i1TlEbYP?=
+ =?us-ascii?Q?pGJp/aZmWv6ibH7nVX8y0Ia0l/o7EjZJAyn45KBCfa/LNOpDl3K55NyzcXl0?=
+ =?us-ascii?Q?kX9BcZDxT7gS6A0V3AhzEtTaTb3QRdSJsmCGvKXx/oRU7JSPj9XRNx4b4Pe7?=
+ =?us-ascii?Q?yOh8ZV27LtkUTfjmgnebj/LJiuWw3I3arPagiPq4HQyeCtgoJCORGfXG3NHn?=
+ =?us-ascii?Q?dP56OQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 97414c70-299d-4204-6283-08db725cb1b8
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 13:37:44.8638
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: dJhFFNVNqbP4vgMYyrv3pI7YvPL9l6tZ7SNVnuh7LA10WKRmqoHiQcpFb8W4lHUJNrJM1CvWksjy7GA+XsLyOOS2d9qsdmkmiOYXUU4DLrw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB5041
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Magnus Karlsson <magnus.karlsson@gmail.com> writes:
+On Mon, Jun 19, 2023 at 11:57:01PM +0200, Andrew Lunn wrote:
+> When the netdev trigger is activates, it tries to determine what
+> device the LED blinks for, and what the current blink mode is.
+> 
+> The documentation for hw_control_get() says:
+> 
+> 	 * Return 0 on success, a negative error number on failing parsing the
+> 	 * initial mode. Error from this function is NOT FATAL as the device
+> 	 * may be in a not supported initial state by the attached LED trigger.
+> 	 */
+> 
+> For the Marvell PHY and the Armada 370-rd board, the initial LED blink
+> mode is not supported by the trigger, so it returns an error. This
+> resulted in not getting the device the LED is blinking for. As a
+> result, the device is unknown and offloaded is never performed.
+> 
+> Change to condition to always get the device if offloading is
+> supported, and reduce the scope of testing for an error from
+> hw_control_get() to skip setting trigger internal state if there is an
+> error.
+> 
+> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> ---
+>  drivers/leds/trigger/ledtrig-netdev.c | 8 +++++---
+>  1 file changed, 5 insertions(+), 3 deletions(-)
+> 
+> diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
+> index 2311dae7f070..df61977f1fa2 100644
+> --- a/drivers/leds/trigger/ledtrig-netdev.c
+> +++ b/drivers/leds/trigger/ledtrig-netdev.c
+> @@ -471,15 +471,17 @@ static int netdev_trig_activate(struct led_classdev *led_cdev)
+>  	/* Check if hw control is active by default on the LED.
+>  	 * Init already enabled mode in hw control.
+>  	 */
+> -	if (supports_hw_control(led_cdev) &&
+> -	    !led_cdev->hw_control_get(led_cdev, &mode)) {
+> +	if (supports_hw_control(led_cdev)) {
+>  		dev = led_cdev->hw_control_get_device(led_cdev);
 
-> On Tue, 20 Jun 2023 at 19:34, Toke H=C3=B8iland-J=C3=B8rgensen <toke@kern=
-el.org> wrote:
->>
->> Maciej Fijalkowski <maciej.fijalkowski@intel.com> writes:
->>
->> > From: Magnus Karlsson <magnus.karlsson@intel.com>
->> >
->> > Add AF_XDP multi-buffer support documentation including two
->> > pseudo-code samples.
->> >
->> > Signed-off-by: Magnus Karlsson <magnus.karlsson@intel.com>
->> > ---
->> >  Documentation/networking/af_xdp.rst | 177 ++++++++++++++++++++++++++++
->> >  1 file changed, 177 insertions(+)
->> >
->> > diff --git a/Documentation/networking/af_xdp.rst b/Documentation/netwo=
-rking/af_xdp.rst
->> > index 247c6c4127e9..2b583f58967b 100644
->> > --- a/Documentation/networking/af_xdp.rst
->> > +++ b/Documentation/networking/af_xdp.rst
->> > @@ -453,6 +453,93 @@ XDP_OPTIONS getsockopt
->> >  Gets options from an XDP socket. The only one supported so far is
->> >  XDP_OPTIONS_ZEROCOPY which tells you if zero-copy is on or not.
->> >
->> > +Multi-Buffer Support
->> > +--------------------
->> > +
->> > +With multi-buffer support, programs using AF_XDP sockets can receive
->> > +and transmit packets consisting of multiple buffers both in copy and
->> > +zero-copy mode. For example, a packet can consist of two
->> > +frames/buffers, one with the header and the other one with the data,
->> > +or a 9K Ethernet jumbo frame can be constructed by chaining together
->> > +three 4K frames.
->> > +
->> > +Some definitions:
->> > +
->> > +* A packet consists of one or more frames
->> > +
->> > +* A descriptor in one of the AF_XDP rings always refers to a single
->> > +  frame. In the case the packet consists of a single frame, the
->> > +  descriptor refers to the whole packet.
->> > +
->> > +To enable multi-buffer support for an AF_XDP socket, use the new bind
->> > +flag XDP_USE_SG. If this is not provided, all multi-buffer packets
->> > +will be dropped just as before. Note that the XDP program loaded also
->> > +needs to be in multi-buffer mode. This can be accomplished by using
->> > +"xdp.frags" as the section name of the XDP program used.
->> > +
->> > +To represent a packet consisting of multiple frames, a new flag called
->> > +XDP_PKT_CONTD is introduced in the options field of the Rx and Tx
->> > +descriptors. If it is true (1) the packet continues with the next
->> > +descriptor and if it is false (0) it means this is the last descriptor
->> > +of the packet. Why the reverse logic of end-of-packet (eop) flag found
->> > +in many NICs? Just to preserve compatibility with non-multi-buffer
->> > +applications that have this bit set to false for all packets on Rx,
->> > +and the apps set the options field to zero for Tx, as anything else
->> > +will be treated as an invalid descriptor.
->> > +
->> > +These are the semantics for producing packets onto AF_XDP Tx ring
->> > +consisting of multiple frames:
->> > +
->> > +* When an invalid descriptor is found, all the other
->> > +  descriptors/frames of this packet are marked as invalid and not
->> > +  completed. The next descriptor is treated as the start of a new
->> > +  packet, even if this was not the intent (because we cannot guess
->> > +  the intent). As before, if your program is producing invalid
->> > +  descriptors you have a bug that must be fixed.
->> > +
->> > +* Zero length descriptors are treated as invalid descriptors.
->> > +
->> > +* For copy mode, the maximum supported number of frames in a packet is
->> > +  equal to CONFIG_MAX_SKB_FRAGS + 1. If it is exceeded, all
->> > +  descriptors accumulated so far are dropped and treated as
->> > +  invalid. To produce an application that will work on any system
->> > +  regardless of this config setting, limit the number of frags to 18,
->> > +  as the minimum value of the config is 17.
->> > +
->> > +* For zero-copy mode, the limit is up to what the NIC HW
->> > +  supports. Usually at least five on the NICs we have checked. We
->> > +  consciously chose to not enforce a rigid limit (such as
->> > +  CONFIG_MAX_SKB_FRAGS + 1) for zero-copy mode, as it would have
->> > +  resulted in copy actions under the hood to fit into what limit
->> > +  the NIC supports. Kind of defeats the purpose of zero-copy mode.
->>
->> How is an application supposed to discover the actual limit for a given
->> NIC/driver?
->
-> Thanks for your comments Toke. I will add an example here of how to
-> discover this. Basically you can send a packet with N frags (N =3D 2 to
-> start with), check the error stats through the getsockopt. If no
-> invalid_tx_desc error, increase N with one and send this new packet.
-> If you get an error, then the max number of frags is N-1.
+Hi Andrew,
 
-Hmm, okay, that sounds pretty tedious :P
+Not related, and perhaps not important: I think the scope of dev could be
+reduced to this block.
 
-Also, it has side effects (you'll be putting frames on the wire while
-testing, right?), so I guess this is not something you'll do on every
-startup of your application? What are you expecting app developers to do
-here in practice? Run the test while developing and expect the value to
-stay constant for a given driver (does it?), or? Or will most people in
-practice only need a few frags to get up to 9k MTU?
+>  		if (dev) {
+>  			const char *name = dev_name(dev);
 
->> > +* The ZC batch API guarantees that it will provide a batch of Tx
->> > +  descriptors that ends with full packet at the end. If not, ZC
->> > +  drivers would have to gather the full packet on their side. The
->> > +  approach we picked makes ZC drivers' life much easier (at least on
->> > +  Tx side).
->>
->> This seems like it implies some constraint on how an application can use
->> the APIs, but it's not quite clear to me what those constraints are, nor
->> what happens if an application does something different. This should
->> probably be spelled out...
->>
->> > +On the Rx path in copy-mode, the xsk core copies the XDP data into
->> > +multiple descriptors, if needed, and sets the XDP_PKT_CONTD flag as
->> > +detailed before. Zero-copy mode works the same, though the data is not
->> > +copied. When the application gets a descriptor with the XDP_PKT_CONTD
->> > +flag set to one, it means that the packet consists of multiple buffers
->> > +and it continues with the next buffer in the following
->> > +descriptor. When a descriptor with XDP_PKT_CONTD =3D=3D 0 is received=
-, it
->> > +means that this is the last buffer of the packet. AF_XDP guarantees
->> > +that only a complete packet (all frames in the packet) is sent to the
->> > +application.
->>
->> In light of the comment on batch size below, I think it would be useful
->> to spell out what this means exactly. IIUC correctly, it means that the
->> kernel will check the ringbuffer before starting to copy the data, and
->> if there are not enough descriptors available, it will drop the packet
->> instead of doing a partial copy, right? And this is the case for both ZC
->> and copy mode?
->
-> I will make this paragraph and the previous one clearer. And yes, copy
-> mode and zc mode have the same behaviour.
+More related, but also not important: I think the scope of mode could
+be reduced tho this block.
 
-Alright, great!
+>  
+>  			set_device_name(trigger_data, name, strlen(name));
+>  			trigger_data->hw_control = true;
+> -			trigger_data->mode = mode;
+> +
+> +			rc = led_cdev->hw_control_get(led_cdev, &mode);
+> +			if (!rc)
+> +				trigger_data->mode = mode;
 
--Toke
+Is the case where trigger_data->hw_control is set to true
+but trigger_data->mode is not set ok?
 
+I understand that is the whole point is not to return an error in this case.
+But I'm concerned about the value of trigger_data->mode.
+
+Probably it is ok.
+But I feel that it is worth asking.
+
+>  		}
+>  	}
+>  
+> -- 
+> 2.40.1
+> 
 
