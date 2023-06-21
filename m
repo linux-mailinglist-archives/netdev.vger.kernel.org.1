@@ -1,225 +1,320 @@
-Return-Path: <netdev+bounces-12525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12526-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39E83737F21
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:47:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D8FAB737F22
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:48:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E9971281552
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 09:47:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F5692813C4
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 09:48:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8F83D53C;
-	Wed, 21 Jun 2023 09:47:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0126FD53C;
+	Wed, 21 Jun 2023 09:48:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E73C8E2
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 09:47:41 +0000 (UTC)
-Received: from mail-wr1-x42f.google.com (mail-wr1-x42f.google.com [IPv6:2a00:1450:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C29F0197
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:47:37 -0700 (PDT)
-Received: by mail-wr1-x42f.google.com with SMTP id ffacd0b85a97d-311099fac92so6643014f8f.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:47:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687340856; x=1689932856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=W7vaP4COJw7cr7JoMrHnRrsTiKTA9ch4qqT7H54n5KE=;
-        b=G30UblbIXu9IjjMqmFif9BgmLt3Q/wQTHEsMPkfLQ2oBmWTm5RII/sOqRztvRcsWzJ
-         Ah1nQh48mmP5CCrE8aTcUVUSRu13vhQVf2MVFOCvM47xAA/Hiu+J9dk2gnQwl4QC7hes
-         HAP+lqoeyWWN5jjl1ayxKa2WnWgnkphJfGXVAvPgzlV6KAYCB72zEOCUC1Fkgw2LG2RL
-         qFScXp+08lWQ9ZxXHT9Qcij9NKqAiIrz+h+nz7blAAb2hEcKUuX4T5C8U7kkITRkk9FZ
-         XqqvTK/GSalt63Du1qQniW+Vrm4MpysfSqjvspyrrmkcgIBSjkIMw+kflK9hW0VEDDaJ
-         SBLQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687340856; x=1689932856;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=W7vaP4COJw7cr7JoMrHnRrsTiKTA9ch4qqT7H54n5KE=;
-        b=c/++QrbDL8UT+8ZnPyWdeCga16UwWUhFB0DFRVzRB3fBOtpzCGY1hF2AA4pIlJ2cA5
-         Wi3IaGeO7xM0priLs82D3jAvq7QL+9dX6k6sRg05jUGvx0Yt24H/KfhvIswQZO1E+PNc
-         RiSag3JRvop1kHkCG5qIAdCUPLiOzIZu8S1NAUi4ginH/nIfLl7bmgiXzYWp/mE+iNXH
-         trb+p0rWXl3YgFtkfXF/DrJnc3WH9TmLAiBN+scYJfECY/ktuD6hhPWWSAW39qyZghsg
-         LzsWALGnS8FdEzBIRGhryHBmU0X7Gkyo5j1c5ec1MMiZe5DbfAImKdnTvXzJuP4ePfVw
-         xiEQ==
-X-Gm-Message-State: AC+VfDzx32OVxh/esBxS+S5Y0P4Ve3MqC2RfJ9r4CMgPhV96FHnA44i7
-	lVgRFSCE+7bhAlvyNGBRUypQRw==
-X-Google-Smtp-Source: ACHHUZ6ePCYgaia+iVpDq0611OUDvjZTLmyLBYbezvwjToiHn9G9AScJHP32anCsooi+7JwtVK2+aw==
-X-Received: by 2002:adf:f00f:0:b0:30f:c679:793a with SMTP id j15-20020adff00f000000b0030fc679793amr12494668wro.3.1687340856153;
-        Wed, 21 Jun 2023 02:47:36 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id w18-20020a5d6812000000b0030ae69920c9sm3991595wru.53.2023.06.21.02.47.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 02:47:34 -0700 (PDT)
-Date: Wed, 21 Jun 2023 12:47:30 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Joel Granados <j.granados@samsung.com>
-Cc: mcgrof@kernel.org, Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Joerg Reuter <jreuter@yaina.de>, Ralf Baechle <ralf@linux-mips.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
-	Nikolay Aleksandrov <razor@blackwall.org>,
-	Alexander Aring <alex.aring@gmail.com>,
-	Stefan Schmidt <stefan@datenfreihafen.org>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Herbert Xu <herbert@gondor.apana.org.au>,
-	Matthieu Baerts <matthieu.baerts@tessares.net>,
-	Mat Martineau <martineau@kernel.org>,
-	Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
-	Remi Denis-Courmont <courmisch@gmail.com>,
-	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Neil Horman <nhorman@tuxdriver.com>,
-	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
-	Xin Long <lucien.xin@gmail.com>,
-	Karsten Graul <kgraul@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, Jon Maloy <jmaloy@redhat.com>,
-	Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>,
-	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, linux-hams@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	bridge@lists.linux-foundation.org, dccp@vger.kernel.org,
-	linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
-	lvs-devel@vger.kernel.org, rds-devel@oss.oracle.com,
-	linux-afs@lists.infradead.org, linux-sctp@vger.kernel.org,
-	linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
-	linux-x25@vger.kernel.org
-Subject: Re: [PATCH 06/11] sysctl: Add size to register_net_sysctl function
-Message-ID: <dab06c20-f8b0-4e34-b885-f3537e442d54@kadam.mountain>
-References: <20230621091000.424843-1-j.granados@samsung.com>
- <CGME20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa@eucas1p1.samsung.com>
- <20230621091000.424843-7-j.granados@samsung.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E7817D50E
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 09:48:05 +0000 (UTC)
+Received: from smtpbg151.qq.com (smtpbg151.qq.com [18.169.211.239])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 378C9129
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:48:01 -0700 (PDT)
+X-QQ-mid: bizesmtp74t1687340874t2w86hup
+Received: from localhost.localdomain ( [122.235.139.240])
+	by bizesmtp.qq.com (ESMTP) with 
+	id ; Wed, 21 Jun 2023 17:47:45 +0800 (CST)
+X-QQ-SSF: 01400000000000N0Z000000A0000000
+X-QQ-FEAT: 3M0okmaRx3hFsTciBtvdoWPTIvfVRejhTppMB2mvZpWlqPMvQv8W6H+zia8Z1
+	kVrvTGWDdGcE8A8w4cspd1iXk4ur2N/olgztcbS6QMs0R5/u6dhLQbn4njvGYJodWT7IsU+
+	cEwboQgUQDs+lc/akxFfkC5hq/jAE0eBLWgfL6VDy89uC21tHz7lIbzrxL8B3o09GVUwZ5S
+	tz71a34/dwX8pnB7r2H+ZqJfzmAeNLpn1VRXW+LcqssfrPqW4eLkvp1hwfIwAgSIU1jroUQ
+	KfAq2fmUzLIjsmbwummc5+xANAB5AeG9GSqx50M640XCX3A9GqjwjDhrqjrOtJbG1C9lqQy
+	JywVXz6umqG4Ujt0Dbh9ax+nkX1t019dkMc7wSq9i8HQ5m+IyE1N3wqDP2BrpY10dbsqVRQ
+	XjaWF8uBeU8=
+X-QQ-GoodBg: 2
+X-BIZMAIL-ID: 10719074399305392349
+From: Mengyuan Lou <mengyuanlou@net-swift.com>
+To: netdev@vger.kernel.org
+Cc: Mengyuan Lou <mengyuanlou@net-swift.com>
+Subject: [PATCH net-next v2] net: ngbe: add Wake on Lan support
+Date: Wed, 21 Jun 2023 17:47:44 +0800
+Message-ID: <D021CF8344C66466+20230621094744.74032-1-mengyuanlou@net-swift.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621091000.424843-7-j.granados@samsung.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-QQ-SENDSIZE: 520
+Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5a-3
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The patchset doesn't include the actual interesting changes, just a
-bunch of mechanical prep work.
+Implement ethtool_ops get_wol and set_wol.
+Implement Wake-on-LAN support.
 
-On Wed, Jun 21, 2023 at 11:09:55AM +0200, Joel Granados wrote:
-> diff --git a/net/ieee802154/6lowpan/reassembly.c b/net/ieee802154/6lowpan/reassembly.c
-> index a91283d1e5bf..7b717434368c 100644
-> --- a/net/ieee802154/6lowpan/reassembly.c
-> +++ b/net/ieee802154/6lowpan/reassembly.c
-> @@ -379,7 +379,8 @@ static int __net_init lowpan_frags_ns_sysctl_register(struct net *net)
->  	table[1].extra2	= &ieee802154_lowpan->fqdir->high_thresh;
->  	table[2].data	= &ieee802154_lowpan->fqdir->timeout;
->  
-> -	hdr = register_net_sysctl(net, "net/ieee802154/6lowpan", table);
-> +	hdr = register_net_sysctl(net, "net/ieee802154/6lowpan", table,
-> +				  ARRAY_SIZE(lowpan_frags_ns_ctl_table));
+Wol requires hardware board support which use sub id
+to identify.
+Magic packets are checked by fw, for now just support
+WAKE_MAGIC.
 
-For example, in lowpan_frags_ns_sysctl_register() the sentinel is
-sometimes element zero if the user doesn't have enough permissions.  I
-would want to ensure that was handled correctly, but that's going to be
-done later in a completely different patchset.  I'm definitely not going
-to remember to check.
+Signed-off-by: Mengyuan Lou <mengyuanlou@net-swift.com>
+---
+v2:
+- Change flag wol_enbaled to wol_hw_supported in wx.
+- Remove smp_mb__before_atomic() in ngbe_resume.
 
-> diff --git a/net/mpls/af_mpls.c b/net/mpls/af_mpls.c
-> index dc5165d3eec4..6f96aae76537 100644
-> --- a/net/mpls/af_mpls.c
-> +++ b/net/mpls/af_mpls.c
-> @@ -1395,6 +1395,40 @@ static const struct ctl_table mpls_dev_table[] = {
->  	{ }
->  };
->  
-> +static int mpls_platform_labels(struct ctl_table *table, int write,
-> +				void *buffer, size_t *lenp, loff_t *ppos);
-> +#define MPLS_NS_SYSCTL_OFFSET(field)		\
-> +	(&((struct net *)0)->field)
-> +
-> +static const struct ctl_table mpls_table[] = {
-> +	{
-> +		.procname	= "platform_labels",
-> +		.data		= NULL,
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= mpls_platform_labels,
-> +	},
-> +	{
-> +		.procname	= "ip_ttl_propagate",
-> +		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.ip_ttl_propagate),
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ZERO,
-> +		.extra2		= SYSCTL_ONE,
-> +	},
-> +	{
-> +		.procname	= "default_ttl",
-> +		.data		= MPLS_NS_SYSCTL_OFFSET(mpls.default_ttl),
-> +		.maxlen		= sizeof(int),
-> +		.mode		= 0644,
-> +		.proc_handler	= proc_dointvec_minmax,
-> +		.extra1		= SYSCTL_ONE,
-> +		.extra2		= &ttl_max,
-> +	},
-> +	{ }
-> +};
-> +
->  static int mpls_dev_sysctl_register(struct net_device *dev,
->  				    struct mpls_dev *mdev)
->  {
-> @@ -1410,7 +1444,7 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
->  	/* Table data contains only offsets relative to the base of
->  	 * the mdev at this point, so make them absolute.
->  	 */
-> -	for (i = 0; i < ARRAY_SIZE(mpls_dev_table); i++) {
-> +	for (i = 0; i < ARRAY_SIZE(mpls_dev_table) - 1; i++) {
+ drivers/net/ethernet/wangxun/libwx/wx_hw.c    |  3 +-
+ drivers/net/ethernet/wangxun/libwx/wx_hw.h    |  1 +
+ drivers/net/ethernet/wangxun/libwx/wx_type.h  |  6 +-
+ .../net/ethernet/wangxun/ngbe/ngbe_ethtool.c  | 37 +++++++++++
+ drivers/net/ethernet/wangxun/ngbe/ngbe_main.c | 64 +++++++++++++++++--
+ drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c |  1 +
+ 6 files changed, 104 insertions(+), 8 deletions(-)
 
-Adding the " - 1" is just a gratuitous change.  It's not required.
-It makes that patch more confusing to review.  And you're just going
-to have to change it back to how it was if you remove the sentinel.
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+index 39a9aeee7aab..ad09ab1d1209 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
+@@ -1501,7 +1501,7 @@ static void wx_restore_vlan(struct wx *wx)
+  *
+  * Configure the Rx unit of the MAC after a reset.
+  **/
+-static void wx_configure_rx(struct wx *wx)
++void wx_configure_rx(struct wx *wx)
+ {
+ 	u32 psrtype, i;
+ 	int ret;
+@@ -1545,6 +1545,7 @@ static void wx_configure_rx(struct wx *wx)
+ 	wx_enable_rx(wx);
+ 	wx_enable_sec_rx_path(wx);
+ }
++EXPORT_SYMBOL(wx_configure_rx);
+ 
+ static void wx_configure_isb(struct wx *wx)
+ {
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+index 1f93ca32c921..b95090e973ae 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
+@@ -25,6 +25,7 @@ void wx_disable_rx(struct wx *wx);
+ void wx_set_rx_mode(struct net_device *netdev);
+ int wx_change_mtu(struct net_device *netdev, int new_mtu);
+ void wx_disable_rx_queue(struct wx *wx, struct wx_ring *ring);
++void wx_configure_rx(struct wx *wx);
+ void wx_configure(struct wx *wx);
+ void wx_start_hw(struct wx *wx);
+ int wx_disable_pcie_master(struct wx *wx);
+diff --git a/drivers/net/ethernet/wangxun/libwx/wx_type.h b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+index 29dfb561887d..1de88a33a698 100644
+--- a/drivers/net/ethernet/wangxun/libwx/wx_type.h
++++ b/drivers/net/ethernet/wangxun/libwx/wx_type.h
+@@ -160,6 +160,10 @@
+ #define WX_PSR_LAN_FLEX_DW_H(_i)     (0x15C04 + ((_i) * 16))
+ #define WX_PSR_LAN_FLEX_MSK(_i)      (0x15C08 + ((_i) * 16))
+ 
++#define WX_PSR_WKUP_CTL              0x15B80
++/* Wake Up Filter Control Bit */
++#define WX_PSR_WKUP_CTL_MAG          BIT(1) /* Magic Packet Wakeup Enable */
++
+ /* vlan tbl */
+ #define WX_PSR_VLAN_TBL(_i)          (0x16000 + ((_i) * 4))
+ 
+@@ -846,7 +850,7 @@ struct wx {
+ 	int duplex;
+ 	struct phy_device *phydev;
+ 
+-	bool wol_enabled;
++	bool wol_hw_supported;
+ 	bool ncsi_enabled;
+ 	bool gpio_ctrl;
+ 	raw_spinlock_t gpio_lock;
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+index 5b25834baf38..4b0a6fb97f7b 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_ethtool.c
+@@ -6,14 +6,51 @@
+ #include <linux/netdevice.h>
+ 
+ #include "../libwx/wx_ethtool.h"
++#include "../libwx/wx_type.h"
+ #include "ngbe_ethtool.h"
+ 
++static void ngbe_get_wol(struct net_device *netdev,
++			 struct ethtool_wolinfo *wol)
++{
++	struct wx *wx = netdev_priv(netdev);
++
++	if (!wx->wol_hw_supported)
++		return;
++	wol->supported = WAKE_MAGIC;
++	wol->wolopts = 0;
++	if (wx->wol & WX_PSR_WKUP_CTL_MAG)
++		wol->wolopts |= WAKE_MAGIC;
++}
++
++static int ngbe_set_wol(struct net_device *netdev,
++			struct ethtool_wolinfo *wol)
++{
++	struct wx *wx = netdev_priv(netdev);
++	struct pci_dev *pdev = wx->pdev;
++
++	if (!wx->wol_hw_supported)
++		return -EOPNOTSUPP;
++	if (wol->wolopts & WAKE_MAGIC)
++		return -EOPNOTSUPP;
++
++	wx->wol = 0;
++	if (wol->wolopts & WAKE_MAGIC)
++		wx->wol = WX_PSR_WKUP_CTL_MAG;
++	netdev->wol_enabled = !!(wx->wol);
++	wr32(wx, WX_PSR_WKUP_CTL, wx->wol);
++	device_set_wakeup_enable(&pdev->dev, wx->wol);
++
++	return 0;
++}
++
+ static const struct ethtool_ops ngbe_ethtool_ops = {
+ 	.get_drvinfo		= wx_get_drvinfo,
+ 	.get_link		= ethtool_op_get_link,
+ 	.get_link_ksettings	= phy_ethtool_get_link_ksettings,
+ 	.set_link_ksettings	= phy_ethtool_set_link_ksettings,
+ 	.nway_reset		= phy_ethtool_nway_reset,
++	.get_wol		= ngbe_get_wol,
++	.set_wol		= ngbe_set_wol,
+ };
+ 
+ void ngbe_set_ethtool_ops(struct net_device *netdev)
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+index c99a5d3de72e..2b431db6085a 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_main.c
+@@ -62,7 +62,7 @@ static void ngbe_init_type_code(struct wx *wx)
+ 		       em_mac_type_rgmii :
+ 		       em_mac_type_mdi;
+ 
+-	wx->wol_enabled = (wol_mask == NGBE_WOL_SUP) ? 1 : 0;
++	wx->wol_hw_supported = (wol_mask == NGBE_WOL_SUP) ? 1 : 0;
+ 	wx->ncsi_enabled = (ncsi_mask == NGBE_NCSI_MASK ||
+ 			   type_mask == NGBE_SUBID_OCP_CARD) ? 1 : 0;
+ 
+@@ -440,14 +440,26 @@ static void ngbe_dev_shutdown(struct pci_dev *pdev, bool *enable_wake)
+ {
+ 	struct wx *wx = pci_get_drvdata(pdev);
+ 	struct net_device *netdev;
++	u32 wufc = wx->wol;
+ 
+ 	netdev = wx->netdev;
++	rtnl_lock();
+ 	netif_device_detach(netdev);
+ 
+-	rtnl_lock();
+ 	if (netif_running(netdev))
+-		ngbe_down(wx);
++		ngbe_close(netdev);
++	wx_clear_interrupt_scheme(wx);
+ 	rtnl_unlock();
++
++	if (wufc) {
++		wx_set_rx_mode(netdev);
++		wx_configure_rx(wx);
++		wr32(wx, NGBE_PSR_WKUP_CTL, wufc);
++	} else {
++		wr32(wx, NGBE_PSR_WKUP_CTL, 0);
++	}
++	pci_wake_from_d3(pdev, !!wufc);
++	*enable_wake = !!wufc;
+ 	wx_control_hw(wx, false);
+ 
+ 	pci_disable_device(pdev);
+@@ -621,12 +633,11 @@ static int ngbe_probe(struct pci_dev *pdev,
+ 	}
+ 
+ 	wx->wol = 0;
+-	if (wx->wol_enabled)
++	if (wx->wol_hw_supported)
+ 		wx->wol = NGBE_PSR_WKUP_CTL_MAG;
+ 
+-	wx->wol_enabled = !!(wx->wol);
++	netdev->wol_enabled = !!(wx->wol);
+ 	wr32(wx, NGBE_PSR_WKUP_CTL, wx->wol);
+-
+ 	device_set_wakeup_enable(&pdev->dev, wx->wol);
+ 
+ 	/* Save off EEPROM version number and Option Rom version which
+@@ -712,11 +723,52 @@ static void ngbe_remove(struct pci_dev *pdev)
+ 	pci_disable_device(pdev);
+ }
+ 
++static int ngbe_suspend(struct pci_dev *pdev, pm_message_t state)
++{
++	bool wake;
++
++	ngbe_dev_shutdown(pdev, &wake);
++	device_set_wakeup_enable(&pdev->dev, wake);
++
++	return 0;
++}
++
++static int ngbe_resume(struct pci_dev *pdev)
++{
++	struct net_device *netdev;
++	struct wx *wx;
++	u32 err;
++
++	wx = pci_get_drvdata(pdev);
++	netdev = wx->netdev;
++
++	err = pci_enable_device_mem(pdev);
++	if (err) {
++		wx_err(wx, "Cannot enable PCI device from suspend\n");
++		return err;
++	}
++	pci_set_master(pdev);
++	device_wakeup_disable(&pdev->dev);
++
++	ngbe_reset_hw(wx);
++	rtnl_lock();
++	err = wx_init_interrupt_scheme(wx);
++	if (!err && netif_running(netdev))
++		err = ngbe_open(netdev);
++	if (!err)
++		netif_device_attach(netdev);
++	rtnl_unlock();
++
++	return 0;
++}
++
+ static struct pci_driver ngbe_driver = {
+ 	.name     = ngbe_driver_name,
+ 	.id_table = ngbe_pci_tbl,
+ 	.probe    = ngbe_probe,
+ 	.remove   = ngbe_remove,
++	.suspend  = ngbe_suspend,
++	.resume   = ngbe_resume,
+ 	.shutdown = ngbe_shutdown,
+ };
+ 
+diff --git a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+index c9ddbbc3fa4f..cc2f325a52f7 100644
+--- a/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
++++ b/drivers/net/ethernet/wangxun/ngbe/ngbe_mdio.c
+@@ -236,6 +236,7 @@ static void ngbe_phy_fixup(struct wx *wx)
+ 	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_100baseT_Half_BIT);
+ 	phy_remove_link_mode(phydev, ETHTOOL_LINK_MODE_1000baseT_Half_BIT);
+ 
++	phydev->mac_managed_pm = true;
+ 	if (wx->mac_type != em_mac_type_mdi)
+ 		return;
+ 	/* disable EEE, internal phy does not support eee */
+-- 
+2.41.0
 
->  		table[i].data = (char *)mdev + (uintptr_t)table[i].data;
->  		table[i].extra1 = mdev;
->  		table[i].extra2 = net;
-> @@ -1418,7 +1452,8 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
->  
->  	snprintf(path, sizeof(path), "net/mpls/conf/%s", dev->name);
->  
-> -	mdev->sysctl = register_net_sysctl(net, path, table);
-> +	mdev->sysctl = register_net_sysctl(net, path, table,
-> +					   ARRAY_SIZE(mpls_dev_table));
->  	if (!mdev->sysctl)
->  		goto free;
->  
-> @@ -1432,6 +1467,7 @@ static int mpls_dev_sysctl_register(struct net_device *dev,
->  	return -ENOBUFS;
->  }
->  
-> +
-
-Double blank line.
-
->  static void mpls_dev_sysctl_unregister(struct net_device *dev,
->  				       struct mpls_dev *mdev)
->  {
-
-regards,
-dan carpenter
 
