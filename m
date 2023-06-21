@@ -1,222 +1,255 @@
-Return-Path: <netdev+bounces-12765-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12766-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D07FE738D8C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:47:28 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F123A738D9F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:50:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC411C20F23
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:47:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A7381C20F34
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:50:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0FF19E44;
-	Wed, 21 Jun 2023 17:47:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53FB619E4E;
+	Wed, 21 Jun 2023 17:50:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4948819BC6
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:47:25 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0451726
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:47:23 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bc502a721b1so12249334276.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:47:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687369642; x=1689961642;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=56GS3I8zXMeYIkoI8Ihw9R0z8F9Y+QVH5+LYUttrD3A=;
-        b=Dg66ctbrKOi+ONr9YnbE5sjb8AeYlemv4/j5x8vuaLdAgCsfq1T+8Use9Ps5MDwgvC
-         LpqmmcU5ZeYyHjf99Ssnhr2ok9yTjLI6cWuDCdwkt/iaWz3CZEgstU+XbfH6W53c+GBJ
-         WZTpVEtEs3ty2trHcViYrvp4dC2Ad7ONzVsDSxKNVAEmCfzEUsDoBXWVRKXNebsBezAb
-         aroV/C2fgOH4FGLQAMhtF/a6RxfBDvgsODagEaCahHEgVu+fTsogSbSG/YgO3um9pei0
-         dqKE++DaxgEBaBZAXg1pFxTYq7lGuFUpoZZxOxb/xrVLzGpFvkRo2JTzI7g9cZgZrPZm
-         ikkg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687369642; x=1689961642;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=56GS3I8zXMeYIkoI8Ihw9R0z8F9Y+QVH5+LYUttrD3A=;
-        b=gbUGn/LWxZyyjWmKy9mdTco1m3Rrdnj63KVKNil+0L/psPHLPJHOKJSY/0Rona3pDz
-         cmN20MCs9Ilt750nSaBFt4H70GSmrtZXTjUVG7ym68L0JjWNu9SgIYxoMXAM8SxsCje3
-         Pb2z+WLNLQ+z6Ytjv1c//+JL7W7ankxzrW2dnQyZ9H7NNus6cZO8PiAvyRF4V2+avW7M
-         rEfjnCjxVS0FvEi2P/cIMqxQi4nNw7k1Fuf1yGJF1YkmLU4pqMbIQ9SOVpgyoJmXVr3N
-         X7EkMNu9NLlnvi8Gc0CayUw7idH6o9TsTYwSk/Krh023pRydSKO9VFXXBopa7QLitmM6
-         SyYw==
-X-Gm-Message-State: AC+VfDxllSEL2rcXC1h3dG+DNxJBlMugz4lo4IahiTaerKXJl/kXyFJ3
-	JTR5IYP/r6KrweCsf1JizbvwjRRUm/8QIg==
-X-Google-Smtp-Source: ACHHUZ6JS6rv039tSyTlGo4hFySM9p7zDbbyQOysA8S5LPV04TosKGlRJzpOEIOto+Mdz8AiDCj8ZAogz6wy1Q==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a05:6902:92:b0:bc4:a660:528f with SMTP id
- h18-20020a056902009200b00bc4a660528fmr3731017ybs.5.1687369642711; Wed, 21 Jun
- 2023 10:47:22 -0700 (PDT)
-Date: Wed, 21 Jun 2023 17:47:20 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B2FE19E47
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:50:27 +0000 (UTC)
+Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C87511BF4;
+	Wed, 21 Jun 2023 10:50:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687369823; x=1718905823;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=FvgO26ZV8KFkH6De3TQgsHq/u7Q2rPq8oBE4FkR4Q30=;
+  b=MBjXn4Do7KNVo6cskuVkO43oNWEbvuGU/TIYfP4rVFKxQL83L/jJlmqe
+   4L/FqQweTRcYOJfjVY8p0+OQa7p1TP2/JxsIU2Awo/1SMa3i8gfF0jtyB
+   ERVOU3TqrVtKtA2EymkRBM06uRQuc2zVh7sClTIOJlGNyHDa+/nops3NZ
+   IExn69hWfdmbzihLoWK84fdS8CL/Nf1wJaSJjn0OOKoUGa2MjuH3K0WM2
+   /wGcitDFZacgaDCNZhfZgPg+U/mF7OD2I2kK4ESaLREfPHa7oVhuKsgq9
+   ngwsKG9oocTnRLkHGqG6LQRH5I/kfIkdjIeNjebkGe1Vro/Pt4qvzxvB3
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="357753995"
+X-IronPort-AV: E=Sophos;i="6.00,261,1681196400"; 
+   d="scan'208";a="357753995"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 10:50:19 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="664761236"
+X-IronPort-AV: E=Sophos;i="6.00,261,1681196400"; 
+   d="scan'208";a="664761236"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga003.jf.intel.com with ESMTP; 21 Jun 2023 10:50:14 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qC1yA-0006zv-02;
+	Wed, 21 Jun 2023 17:50:14 +0000
+Date: Thu, 22 Jun 2023 01:49:37 +0800
+From: kernel test robot <lkp@intel.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>
+Cc: oe-kbuild-all@lists.linux.dev,
+	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
+	Simon Horman <simon.horman@corigine.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Julien Panis <jpanis@baylibre.com>,
+	Markus Schneider-Pargmann <msp@baylibre.com>
+Subject: Re: [PATCH v4 01/12] can: m_can: Write transmit header and data in
+ one transaction
+Message-ID: <202306220154.20bzOw90-lkp@intel.com>
+References: <20230621092350.3130866-2-msp@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.178.g377b9f9a00-goog
-Message-ID: <20230621174720.1845040-1-edumazet@google.com>
-Subject: [PATCH net] netlink: do not hard code device address lenth in fdb dumps
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621092350.3130866-2-msp@baylibre.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot reports that some netdev devices do not have a six bytes
-address [1]
+Hi Markus,
 
-Replace ETH_ALEN by dev->addr_len.
+kernel test robot noticed the following build warnings:
 
-[1] (Case of a device where dev->addr_len = 4)
+[auto build test WARNING on ac9a78681b921877518763ba0e89202254349d1b]
 
-BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
-BUG: KMSAN: kernel-infoleak in copyout+0xb8/0x100 lib/iov_iter.c:169
-instrument_copy_to_user include/linux/instrumented.h:114 [inline]
-copyout+0xb8/0x100 lib/iov_iter.c:169
-_copy_to_iter+0x6d8/0x1d00 lib/iov_iter.c:536
-copy_to_iter include/linux/uio.h:206 [inline]
-simple_copy_to_iter+0x68/0xa0 net/core/datagram.c:513
-__skb_datagram_iter+0x123/0xdc0 net/core/datagram.c:419
-skb_copy_datagram_iter+0x5c/0x200 net/core/datagram.c:527
-skb_copy_datagram_msg include/linux/skbuff.h:3960 [inline]
-netlink_recvmsg+0x4ae/0x15a0 net/netlink/af_netlink.c:1970
-sock_recvmsg_nosec net/socket.c:1019 [inline]
-sock_recvmsg net/socket.c:1040 [inline]
-____sys_recvmsg+0x283/0x7f0 net/socket.c:2722
-___sys_recvmsg+0x223/0x840 net/socket.c:2764
-do_recvmmsg+0x4f9/0xfd0 net/socket.c:2858
-__sys_recvmmsg net/socket.c:2937 [inline]
-__do_sys_recvmmsg net/socket.c:2960 [inline]
-__se_sys_recvmmsg net/socket.c:2953 [inline]
-__x64_sys_recvmmsg+0x397/0x490 net/socket.c:2953
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+url:    https://github.com/intel-lab-lkp/linux/commits/Markus-Schneider-Pargmann/can-m_can-Write-transmit-header-and-data-in-one-transaction/20230621-173848
+base:   ac9a78681b921877518763ba0e89202254349d1b
+patch link:    https://lore.kernel.org/r/20230621092350.3130866-2-msp%40baylibre.com
+patch subject: [PATCH v4 01/12] can: m_can: Write transmit header and data in one transaction
+config: x86_64-allyesconfig (https://download.01.org/0day-ci/archive/20230622/202306220154.20bzOw90-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230622/202306220154.20bzOw90-lkp@intel.com/reproduce)
 
-Uninit was stored to memory at:
-__nla_put lib/nlattr.c:1009 [inline]
-nla_put+0x1c6/0x230 lib/nlattr.c:1067
-nlmsg_populate_fdb_fill+0x2b8/0x600 net/core/rtnetlink.c:4071
-nlmsg_populate_fdb net/core/rtnetlink.c:4418 [inline]
-ndo_dflt_fdb_dump+0x616/0x840 net/core/rtnetlink.c:4456
-rtnl_fdb_dump+0x14ff/0x1fc0 net/core/rtnetlink.c:4629
-netlink_dump+0x9d1/0x1310 net/netlink/af_netlink.c:2268
-netlink_recvmsg+0xc5c/0x15a0 net/netlink/af_netlink.c:1995
-sock_recvmsg_nosec+0x7a/0x120 net/socket.c:1019
-____sys_recvmsg+0x664/0x7f0 net/socket.c:2720
-___sys_recvmsg+0x223/0x840 net/socket.c:2764
-do_recvmmsg+0x4f9/0xfd0 net/socket.c:2858
-__sys_recvmmsg net/socket.c:2937 [inline]
-__do_sys_recvmmsg net/socket.c:2960 [inline]
-__se_sys_recvmmsg net/socket.c:2953 [inline]
-__x64_sys_recvmmsg+0x397/0x490 net/socket.c:2953
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306220154.20bzOw90-lkp@intel.com/
 
-Uninit was created at:
-slab_post_alloc_hook+0x12d/0xb60 mm/slab.h:716
-slab_alloc_node mm/slub.c:3451 [inline]
-__kmem_cache_alloc_node+0x4ff/0x8b0 mm/slub.c:3490
-kmalloc_trace+0x51/0x200 mm/slab_common.c:1057
-kmalloc include/linux/slab.h:559 [inline]
-__hw_addr_create net/core/dev_addr_lists.c:60 [inline]
-__hw_addr_add_ex+0x2e5/0x9e0 net/core/dev_addr_lists.c:118
-__dev_mc_add net/core/dev_addr_lists.c:867 [inline]
-dev_mc_add+0x9a/0x130 net/core/dev_addr_lists.c:885
-igmp6_group_added+0x267/0xbc0 net/ipv6/mcast.c:680
-ipv6_mc_up+0x296/0x3b0 net/ipv6/mcast.c:2754
-ipv6_mc_remap+0x1e/0x30 net/ipv6/mcast.c:2708
-addrconf_type_change net/ipv6/addrconf.c:3731 [inline]
-addrconf_notify+0x4d3/0x1d90 net/ipv6/addrconf.c:3699
-notifier_call_chain kernel/notifier.c:93 [inline]
-raw_notifier_call_chain+0xe4/0x430 kernel/notifier.c:461
-call_netdevice_notifiers_info net/core/dev.c:1935 [inline]
-call_netdevice_notifiers_extack net/core/dev.c:1973 [inline]
-call_netdevice_notifiers+0x1ee/0x2d0 net/core/dev.c:1987
-bond_enslave+0xccd/0x53f0 drivers/net/bonding/bond_main.c:1906
-do_set_master net/core/rtnetlink.c:2626 [inline]
-rtnl_newlink_create net/core/rtnetlink.c:3460 [inline]
-__rtnl_newlink net/core/rtnetlink.c:3660 [inline]
-rtnl_newlink+0x378c/0x40e0 net/core/rtnetlink.c:3673
-rtnetlink_rcv_msg+0x16a6/0x1840 net/core/rtnetlink.c:6395
-netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2546
-rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6413
-netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
-netlink_unicast+0xf28/0x1230 net/netlink/af_netlink.c:1365
-netlink_sendmsg+0x122f/0x13d0 net/netlink/af_netlink.c:1913
-sock_sendmsg_nosec net/socket.c:724 [inline]
-sock_sendmsg net/socket.c:747 [inline]
-____sys_sendmsg+0x999/0xd50 net/socket.c:2503
-___sys_sendmsg+0x28d/0x3c0 net/socket.c:2557
-__sys_sendmsg net/socket.c:2586 [inline]
-__do_sys_sendmsg net/socket.c:2595 [inline]
-__se_sys_sendmsg net/socket.c:2593 [inline]
-__x64_sys_sendmsg+0x304/0x490 net/socket.c:2593
-do_syscall_x64 arch/x86/entry/common.c:50 [inline]
-do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
-entry_SYSCALL_64_after_hwframe+0x63/0xcd
+All warnings (new ones prefixed by >>):
 
-Bytes 2856-2857 of 3500 are uninitialized
-Memory access of size 3500 starts at ffff888018d99104
-Data copied to user address 0000000020000480
+   drivers/net/can/m_can/m_can.c: In function 'm_can_tx_handler':
+>> drivers/net/can/m_can/m_can.c:1635:27: warning: unused variable 'fifo_header' [-Wunused-variable]
+    1635 |         struct id_and_dlc fifo_header;
+         |                           ^~~~~~~~~~~
 
-Fixes: d83b06036048 ("net: add fdb generic dump routine")
-Reported-by: syzbot <syzkaller@googlegroups.com>
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/core/rtnetlink.c | 8 ++++----
- 1 file changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
-index 41de3a2f29e15a1db04c9fd7f0b723c501fa0256..7776611a14ae4367fe8af1bde0f55b20c5e3507d 100644
---- a/net/core/rtnetlink.c
-+++ b/net/core/rtnetlink.c
-@@ -4090,7 +4090,7 @@ static int nlmsg_populate_fdb_fill(struct sk_buff *skb,
- 	ndm->ndm_ifindex = dev->ifindex;
- 	ndm->ndm_state   = ndm_state;
- 
--	if (nla_put(skb, NDA_LLADDR, ETH_ALEN, addr))
-+	if (nla_put(skb, NDA_LLADDR, dev->addr_len, addr))
- 		goto nla_put_failure;
- 	if (vid)
- 		if (nla_put(skb, NDA_VLAN, sizeof(u16), &vid))
-@@ -4104,10 +4104,10 @@ static int nlmsg_populate_fdb_fill(struct sk_buff *skb,
- 	return -EMSGSIZE;
- }
- 
--static inline size_t rtnl_fdb_nlmsg_size(void)
-+static inline size_t rtnl_fdb_nlmsg_size(const struct net_device *dev)
- {
- 	return NLMSG_ALIGN(sizeof(struct ndmsg)) +
--	       nla_total_size(ETH_ALEN) +	/* NDA_LLADDR */
-+	       nla_total_size(dev->addr_len) +	/* NDA_LLADDR */
- 	       nla_total_size(sizeof(u16)) +	/* NDA_VLAN */
- 	       0;
- }
-@@ -4119,7 +4119,7 @@ static void rtnl_fdb_notify(struct net_device *dev, u8 *addr, u16 vid, int type,
- 	struct sk_buff *skb;
- 	int err = -ENOBUFS;
- 
--	skb = nlmsg_new(rtnl_fdb_nlmsg_size(), GFP_ATOMIC);
-+	skb = nlmsg_new(rtnl_fdb_nlmsg_size(dev), GFP_ATOMIC);
- 	if (!skb)
- 		goto errout;
- 
+vim +/fifo_header +1635 drivers/net/can/m_can/m_can.c
+
+10c1c3975a6663 Mario Huettel             2017-04-08  1627  
+441ac340169b79 Dan Murphy                2019-05-09  1628  static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev)
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1629  {
+441ac340169b79 Dan Murphy                2019-05-09  1630  	struct canfd_frame *cf = (struct canfd_frame *)cdev->tx_skb->data;
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1631  	u8 len_padded = DIV_ROUND_UP(cf->len, 4);
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1632  	struct m_can_fifo_element fifo_element;
+441ac340169b79 Dan Murphy                2019-05-09  1633  	struct net_device *dev = cdev->net;
+441ac340169b79 Dan Murphy                2019-05-09  1634  	struct sk_buff *skb = cdev->tx_skb;
+812270e5445bd1 Matt Kline                2021-08-16 @1635  	struct id_and_dlc fifo_header;
+812270e5445bd1 Matt Kline                2021-08-16  1636  	u32 cccr, fdflags;
+c1eaf8b9bd3145 Markus Schneider-Pargmann 2022-12-06  1637  	u32 txfqs;
+812270e5445bd1 Matt Kline                2021-08-16  1638  	int err;
+10c1c3975a6663 Mario Huettel             2017-04-08  1639  	int putidx;
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1640  
+e04b2cfe61072c Marc Kleine-Budde         2021-05-05  1641  	cdev->tx_skb = NULL;
+e04b2cfe61072c Marc Kleine-Budde         2021-05-05  1642  
+10c1c3975a6663 Mario Huettel             2017-04-08  1643  	/* Generate ID field for TX buffer Element */
+10c1c3975a6663 Mario Huettel             2017-04-08  1644  	/* Common to all supported M_CAN versions */
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1645  	if (cf->can_id & CAN_EFF_FLAG) {
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1646  		fifo_element.id = cf->can_id & CAN_EFF_MASK;
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1647  		fifo_element.id |= TX_BUF_XTD;
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1648  	} else {
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1649  		fifo_element.id = ((cf->can_id & CAN_SFF_MASK) << 18);
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1650  	}
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1651  
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1652  	if (cf->can_id & CAN_RTR_FLAG)
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1653  		fifo_element.id |= TX_BUF_RTR;
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1654  
+441ac340169b79 Dan Murphy                2019-05-09  1655  	if (cdev->version == 30) {
+10c1c3975a6663 Mario Huettel             2017-04-08  1656  		netif_stop_queue(dev);
+10c1c3975a6663 Mario Huettel             2017-04-08  1657  
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1658  		fifo_element.dlc = can_fd_len2dlc(cf->len) << 16;
+80646733f11c2e Dong Aisheng              2014-11-18  1659  
+812270e5445bd1 Matt Kline                2021-08-16  1660  		/* Write the frame ID, DLC, and payload to the FIFO element. */
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1661  		err = m_can_fifo_write(cdev, 0, M_CAN_FIFO_ID, &fifo_element, 2);
+e39381770ec9ca Matt Kline                2021-08-16  1662  		if (err)
+e39381770ec9ca Matt Kline                2021-08-16  1663  			goto out_fail;
+e39381770ec9ca Matt Kline                2021-08-16  1664  
+812270e5445bd1 Matt Kline                2021-08-16  1665  		err = m_can_fifo_write(cdev, 0, M_CAN_FIFO_DATA,
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1666  				       cf->data, len_padded);
+e39381770ec9ca Matt Kline                2021-08-16  1667  		if (err)
+e39381770ec9ca Matt Kline                2021-08-16  1668  			goto out_fail;
+80646733f11c2e Dong Aisheng              2014-11-18  1669  
+441ac340169b79 Dan Murphy                2019-05-09  1670  		if (cdev->can.ctrlmode & CAN_CTRLMODE_FD) {
+441ac340169b79 Dan Murphy                2019-05-09  1671  			cccr = m_can_read(cdev, M_CAN_CCCR);
+20779943a080c5 Torin Cooper-Bennun       2021-05-04  1672  			cccr &= ~CCCR_CMR_MASK;
+80646733f11c2e Dong Aisheng              2014-11-18  1673  			if (can_is_canfd_skb(skb)) {
+80646733f11c2e Dong Aisheng              2014-11-18  1674  				if (cf->flags & CANFD_BRS)
+20779943a080c5 Torin Cooper-Bennun       2021-05-04  1675  					cccr |= FIELD_PREP(CCCR_CMR_MASK,
+20779943a080c5 Torin Cooper-Bennun       2021-05-04  1676  							   CCCR_CMR_CANFD_BRS);
+80646733f11c2e Dong Aisheng              2014-11-18  1677  				else
+20779943a080c5 Torin Cooper-Bennun       2021-05-04  1678  					cccr |= FIELD_PREP(CCCR_CMR_MASK,
+20779943a080c5 Torin Cooper-Bennun       2021-05-04  1679  							   CCCR_CMR_CANFD);
+80646733f11c2e Dong Aisheng              2014-11-18  1680  			} else {
+20779943a080c5 Torin Cooper-Bennun       2021-05-04  1681  				cccr |= FIELD_PREP(CCCR_CMR_MASK, CCCR_CMR_CAN);
+80646733f11c2e Dong Aisheng              2014-11-18  1682  			}
+441ac340169b79 Dan Murphy                2019-05-09  1683  			m_can_write(cdev, M_CAN_CCCR, cccr);
+80646733f11c2e Dong Aisheng              2014-11-18  1684  		}
+441ac340169b79 Dan Murphy                2019-05-09  1685  		m_can_write(cdev, M_CAN_TXBTIE, 0x1);
+2e8e79c416aae1 Marc Kleine-Budde         2022-03-17  1686  
+2e8e79c416aae1 Marc Kleine-Budde         2022-03-17  1687  		can_put_echo_skb(skb, dev, 0, 0);
+2e8e79c416aae1 Marc Kleine-Budde         2022-03-17  1688  
+441ac340169b79 Dan Murphy                2019-05-09  1689  		m_can_write(cdev, M_CAN_TXBAR, 0x1);
+10c1c3975a6663 Mario Huettel             2017-04-08  1690  		/* End of xmit function for version 3.0.x */
+10c1c3975a6663 Mario Huettel             2017-04-08  1691  	} else {
+10c1c3975a6663 Mario Huettel             2017-04-08  1692  		/* Transmit routine for version >= v3.1.x */
+10c1c3975a6663 Mario Huettel             2017-04-08  1693  
+c1eaf8b9bd3145 Markus Schneider-Pargmann 2022-12-06  1694  		txfqs = m_can_read(cdev, M_CAN_TXFQS);
+c1eaf8b9bd3145 Markus Schneider-Pargmann 2022-12-06  1695  
+10c1c3975a6663 Mario Huettel             2017-04-08  1696  		/* Check if FIFO full */
+c1eaf8b9bd3145 Markus Schneider-Pargmann 2022-12-06  1697  		if (_m_can_tx_fifo_full(txfqs)) {
+10c1c3975a6663 Mario Huettel             2017-04-08  1698  			/* This shouldn't happen */
+10c1c3975a6663 Mario Huettel             2017-04-08  1699  			netif_stop_queue(dev);
+10c1c3975a6663 Mario Huettel             2017-04-08  1700  			netdev_warn(dev,
+10c1c3975a6663 Mario Huettel             2017-04-08  1701  				    "TX queue active although FIFO is full.");
+441ac340169b79 Dan Murphy                2019-05-09  1702  
+441ac340169b79 Dan Murphy                2019-05-09  1703  			if (cdev->is_peripheral) {
+f524f829b75a7d Dan Murphy                2019-05-09  1704  				kfree_skb(skb);
+f524f829b75a7d Dan Murphy                2019-05-09  1705  				dev->stats.tx_dropped++;
+f524f829b75a7d Dan Murphy                2019-05-09  1706  				return NETDEV_TX_OK;
+f524f829b75a7d Dan Murphy                2019-05-09  1707  			} else {
+10c1c3975a6663 Mario Huettel             2017-04-08  1708  				return NETDEV_TX_BUSY;
+10c1c3975a6663 Mario Huettel             2017-04-08  1709  			}
+f524f829b75a7d Dan Murphy                2019-05-09  1710  		}
+10c1c3975a6663 Mario Huettel             2017-04-08  1711  
+10c1c3975a6663 Mario Huettel             2017-04-08  1712  		/* get put index for frame */
+c1eaf8b9bd3145 Markus Schneider-Pargmann 2022-12-06  1713  		putidx = FIELD_GET(TXFQS_TFQPI_MASK, txfqs);
+812270e5445bd1 Matt Kline                2021-08-16  1714  
+812270e5445bd1 Matt Kline                2021-08-16  1715  		/* Construct DLC Field, with CAN-FD configuration.
+812270e5445bd1 Matt Kline                2021-08-16  1716  		 * Use the put index of the fifo as the message marker,
+812270e5445bd1 Matt Kline                2021-08-16  1717  		 * used in the TX interrupt for sending the correct echo frame.
+812270e5445bd1 Matt Kline                2021-08-16  1718  		 */
+10c1c3975a6663 Mario Huettel             2017-04-08  1719  
+10c1c3975a6663 Mario Huettel             2017-04-08  1720  		/* get CAN FD configuration of frame */
+10c1c3975a6663 Mario Huettel             2017-04-08  1721  		fdflags = 0;
+10c1c3975a6663 Mario Huettel             2017-04-08  1722  		if (can_is_canfd_skb(skb)) {
+10c1c3975a6663 Mario Huettel             2017-04-08  1723  			fdflags |= TX_BUF_FDF;
+10c1c3975a6663 Mario Huettel             2017-04-08  1724  			if (cf->flags & CANFD_BRS)
+10c1c3975a6663 Mario Huettel             2017-04-08  1725  				fdflags |= TX_BUF_BRS;
+10c1c3975a6663 Mario Huettel             2017-04-08  1726  		}
+10c1c3975a6663 Mario Huettel             2017-04-08  1727  
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1728  		fifo_element.dlc = FIELD_PREP(TX_BUF_MM_MASK, putidx) |
+e39381770ec9ca Matt Kline                2021-08-16  1729  			FIELD_PREP(TX_BUF_DLC_MASK, can_fd_len2dlc(cf->len)) |
+e39381770ec9ca Matt Kline                2021-08-16  1730  			fdflags | TX_BUF_EFC;
+10c1c3975a6663 Mario Huettel             2017-04-08  1731  
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1732  		memcpy_and_pad(fifo_element.data, CANFD_MAX_DLEN, &cf->data,
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1733  			       cf->len, 0);
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1734  
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1735  		err = m_can_fifo_write(cdev, putidx, M_CAN_FIFO_ID,
+9a10b9d9f7e946 Markus Schneider-Pargmann 2023-06-21  1736  				       &fifo_element, 2 + len_padded);
+e39381770ec9ca Matt Kline                2021-08-16  1737  		if (err)
+e39381770ec9ca Matt Kline                2021-08-16  1738  			goto out_fail;
+10c1c3975a6663 Mario Huettel             2017-04-08  1739  
+10c1c3975a6663 Mario Huettel             2017-04-08  1740  		/* Push loopback echo.
+10c1c3975a6663 Mario Huettel             2017-04-08  1741  		 * Will be looped back on TX interrupt based on message marker
+10c1c3975a6663 Mario Huettel             2017-04-08  1742  		 */
+1dcb6e57db8334 Vincent Mailhol           2021-01-11  1743  		can_put_echo_skb(skb, dev, putidx, 0);
+10c1c3975a6663 Mario Huettel             2017-04-08  1744  
+10c1c3975a6663 Mario Huettel             2017-04-08  1745  		/* Enable TX FIFO element to start transfer  */
+441ac340169b79 Dan Murphy                2019-05-09  1746  		m_can_write(cdev, M_CAN_TXBAR, (1 << putidx));
+10c1c3975a6663 Mario Huettel             2017-04-08  1747  
+10c1c3975a6663 Mario Huettel             2017-04-08  1748  		/* stop network queue if fifo full */
+441ac340169b79 Dan Murphy                2019-05-09  1749  		if (m_can_tx_fifo_full(cdev) ||
+10c1c3975a6663 Mario Huettel             2017-04-08  1750  		    m_can_next_echo_skb_occupied(dev, putidx))
+10c1c3975a6663 Mario Huettel             2017-04-08  1751  			netif_stop_queue(dev);
+10c1c3975a6663 Mario Huettel             2017-04-08  1752  	}
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1753  
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1754  	return NETDEV_TX_OK;
+e39381770ec9ca Matt Kline                2021-08-16  1755  
+e39381770ec9ca Matt Kline                2021-08-16  1756  out_fail:
+e39381770ec9ca Matt Kline                2021-08-16  1757  	netdev_err(dev, "FIFO write returned %d\n", err);
+e39381770ec9ca Matt Kline                2021-08-16  1758  	m_can_disable_all_interrupts(cdev);
+e39381770ec9ca Matt Kline                2021-08-16  1759  	return NETDEV_TX_BUSY;
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1760  }
+e0d1f4816f2a7e Dong Aisheng              2014-07-16  1761  
+
 -- 
-2.41.0.178.g377b9f9a00-goog
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
