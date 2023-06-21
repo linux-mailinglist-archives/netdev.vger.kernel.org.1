@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-12805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9BD40738FD7
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:15:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DE9E9738FDA
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:15:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCFC11C20362
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:15:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1BA631C20C77
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 365771B903;
-	Wed, 21 Jun 2023 19:14:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE6C71B911;
+	Wed, 21 Jun 2023 19:14:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 258C819E76
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:14:26 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C15511FCB;
-	Wed, 21 Jun 2023 12:14:17 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-5147e40bbbbso6575641a12.3;
-        Wed, 21 Jun 2023 12:14:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A008B19E76
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:14:29 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41DAF1FE6;
+	Wed, 21 Jun 2023 12:14:20 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-98862e7e3e6so589299466b.0;
+        Wed, 21 Jun 2023 12:14:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687374856; x=1689966856;
+        d=gmail.com; s=20221208; t=1687374858; x=1689966858;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=0OFEEr8CRLhYmuTj5DihLU72iPAQ9ZiHHA571qCsogI=;
-        b=doD9KOMJcKD8cOpR92sSS1frurq3fCa9rRRFRPWBioxhbTviRlaqFc+CuG0mpoaid3
-         MJuzgvLdkctrtU5sY8cb6/HoGA3V0qVpf4npbEzOTYE6CE8E0pPUL8W6A6aIEP2c0g8s
-         uk+5czKWFE3aizqiQMzPSt7HXb2jZYm3Z1SiSy8R+nGzQLqx870Uk5msdVZkedmlTL4K
-         ZwSSx+Nt4+mqoJ/h5/leDsaAwc1uwzzpZHvaP9hNSBODir3gR1pH7wdBrZExxY455wbR
-         c3krhEVwD9t56dEYoXkO/KDVuWEEgHGOkeq9U5icJ/yvMuC9JEaTxz6/yYN/HAPS20d4
-         L5XQ==
+        bh=BdYtgHKZj+ELTXrWmyVhlIH7tFc3MvfFabglOK+p780=;
+        b=WXgkrRpNV56pikPYNbETkpOiv1IcHYuJvW8/KS9rXaLhYXpVRTs6PWx1fAuFZN72Q1
+         HTbGS1e2jMI0pZK66Asq4XV1AF9EUKf/iQyjhQr0eIzu17rYRmk+V0fB7gVsrXUoLxPj
+         sP3YWzUET9wo/mA4jfFp/DH1t3i2kmWfv1I4kHy2mWq+zjMQ7SbPrTHaI8grT1IPtSM9
+         9anmQkDLJulg48sUBYIY+/8+wjT7T9Furh+qdo7ZMRCW1ZsqlNRyFjtojbhNb+UDgSiL
+         sRPSyCg6VDfvFJBLwRT7HH2J2OsU7hi+XrUxJW5D1gz5KAZ68oix8XF3HLhVFYfDsj+P
+         HpAQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687374856; x=1689966856;
+        d=1e100.net; s=20221208; t=1687374858; x=1689966858;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=0OFEEr8CRLhYmuTj5DihLU72iPAQ9ZiHHA571qCsogI=;
-        b=V1FCzkKc3Du7XuDcV7nJMWevFPGkY2hOOvavWEMrCtOJVqli6TDKs1+kEe5H/0OLZ8
-         klZOgW+VfMFXb/7ga6TWZ1YS75PohAWwkYldpXAFkru7lp2bFMgkUqFs3NgVNZ7TzzcY
-         M+16uHtNssarWwtoHDPhOfvwyOxHX2z6Bex8Kha7bfAJqxoLFhz41+4wQalW8/OdQ1if
-         a+ro63vHCqKWM7xdRV4D60+xEDal0iNDniP7/UI5JSIfdGoDkQT0dh08upVgfe1pJud/
-         zqHQvRwleudv6MykTFaXo3CFt2f83Ct36+aPgTOJOHVEa+H//1JeHPMjaUTQhPS4MKdf
-         alMw==
-X-Gm-Message-State: AC+VfDyupB8VjkcD0TlzZiCaVnrAvDow/Z5ALoDfqzTI1xgBbVeKOp9K
-	z98CH5UcetIzeY6vQJvw1dbaxDslxwVBmg==
-X-Google-Smtp-Source: ACHHUZ4SclwO9nDqPe0vpCLLvv9iPwe3xITQAzVvoJBd7NWrcLWLajqw+ubOhiFoqREniPkzJA+GGA==
-X-Received: by 2002:a17:906:974f:b0:989:21e4:6c6e with SMTP id o15-20020a170906974f00b0098921e46c6emr4815550ejy.53.1687374855819;
-        Wed, 21 Jun 2023 12:14:15 -0700 (PDT)
+        bh=BdYtgHKZj+ELTXrWmyVhlIH7tFc3MvfFabglOK+p780=;
+        b=f/MNNErde+ZBpvMSu04Pf3drb5FoSTqBf2llH8hPL84zxUNR3h6zZ9Xynr5hrjsy0y
+         b1LZ7gSrFsAb7ZDBJNnpQBQDeS2/21P2HYjm940xBU+A3GjBI7sJP7qZo9Rbi3e1xC1i
+         mcltblnrZUqcc42lYo5/NZ2tqtAl3j32z4vYU0Blx9bjgOAL6q5Bo7pp13+xGltnZiKI
+         lAuk2OcEuB0zDSNaLW8PnvNXIjpCHp43spmfN/xOS6HqPm/AxqARrcUQEgiZ0TNh5wLy
+         WTv+T6NLjFP/iE5/4h4ziEScCNs59MK9+zE3hD3aQOnBQmV1TJmVn8dvsldBWyrBU/F5
+         MDng==
+X-Gm-Message-State: AC+VfDwTFUAP2V0AuKkqrTDUu8xnfccPXKjWVyMn+UzUqo3Jee2WenhB
+	90abASRImu8ud4oHbgxKRlfU1b3G/qKIPg==
+X-Google-Smtp-Source: ACHHUZ6Zjg8q80fKUCVFrV6eKRynkFRJXjQOIW4s1EuaR8e1mZTQXYXevQkFvsC5u7IJCBH9m0va/w==
+X-Received: by 2002:a17:907:7d86:b0:978:8790:9103 with SMTP id oz6-20020a1709077d8600b0097887909103mr16038144ejc.70.1687374858324;
+        Wed, 21 Jun 2023 12:14:18 -0700 (PDT)
 Received: from WBEC325.dom.local ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id gu1-20020a170906f28100b009829a5ae8b3sm3539562ejb.64.2023.06.21.12.14.15
+        by smtp.gmail.com with ESMTPSA id gu1-20020a170906f28100b009829a5ae8b3sm3539562ejb.64.2023.06.21.12.14.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 12:14:15 -0700 (PDT)
+        Wed, 21 Jun 2023 12:14:18 -0700 (PDT)
 From: Pawel Dembicki <paweldembicki@gmail.com>
 To: netdev@vger.kernel.org
 Cc: linus.walleij@linaro.org,
@@ -68,9 +68,9 @@ Cc: linus.walleij@linaro.org,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH net-next 5/6] net: dsa: vsc73xx: Add vlan filtering
-Date: Wed, 21 Jun 2023 21:13:01 +0200
-Message-Id: <20230621191302.1405623-5-paweldembicki@gmail.com>
+Subject: [PATCH net-next 6/6] net: dsa: vsc73xx: fix MTU configuration
+Date: Wed, 21 Jun 2023 21:13:02 +0200
+Message-Id: <20230621191302.1405623-6-paweldembicki@gmail.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230621191302.1405623-1-paweldembicki@gmail.com>
 References: <20230621191302.1405623-1-paweldembicki@gmail.com>
@@ -88,143 +88,45 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch implement vlan filtering for vsc73xx driver.
+Switch in MAXLEN register store maximum size of data frame.
+MTU size is 18 bytes smaller than frame size.
 
-After vlan filtering start, switch is reconfigured from QinQ to simple
-vlan aware mode. It's required, because VSC73XX chips haven't support
-for inner vlan tag filter.
+Current settings causes problems with packet forwarding.
+This patch fix MTU settings to proper values.
+
+Fixes: fb77ffc6ec86 ("net: dsa: vsc73xx: make the MTU configurable")
 
 Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 ---
- drivers/net/dsa/vitesse-vsc73xx-core.c | 101 +++++++++++++++++++++++++
- 1 file changed, 101 insertions(+)
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 7 ++++---
+ 1 file changed, 4 insertions(+), 3 deletions(-)
 
 diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index 427b6f964811..fcce47cf6da4 100644
+index fcce47cf6da4..a806a263cf08 100644
 --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
 +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -1239,6 +1239,30 @@ static int vsc73xx_port_set_double_vlan_aware(struct dsa_switch *ds, int port)
- 	return ret;
+@@ -992,17 +992,18 @@ static int vsc73xx_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
+ 	struct vsc73xx *vsc = ds->priv;
+ 
+ 	return vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port,
+-			     VSC73XX_MAXLEN, new_mtu);
++			     VSC73XX_MAXLEN, new_mtu + ETH_HLEN + ETH_FCS_LEN);
  }
  
-+static int
-+vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
-+			    bool vlan_filtering, struct netlink_ext_ack *extack)
-+{
-+	int ret, i;
-+
-+	if (vlan_filtering) {
-+		vsc73xx_port_set_vlan_conf(ds, port, VSC73XX_VLAN_AWARE);
-+	} else {
-+		if (port == CPU_PORT)
-+			vsc73xx_port_set_vlan_conf(ds, port, VSC73XX_DOUBLE_VLAN_CPU_AWARE);
-+		else
-+			vsc73xx_port_set_vlan_conf(ds, port, VSC73XX_DOUBLE_VLAN_AWARE);
-+	}
-+
-+	for (i = 0; i <= 3072; i++) {
-+		ret = vsc73xx_port_update_vlan_table(ds, port, i, 0);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	return ret;
-+}
-+
- static int vsc73xx_vlan_set_untagged(struct dsa_switch *ds, int port, u16 vid,
- 				     bool port_vlan)
+ /* According to application not "VSC7398 Jumbo Frames" setting
+- * up the MTU to 9.6 KB does not affect the performance on standard
++ * up the frame size to 9.6 KB does not affect the performance on standard
+  * frames. It is clear from the application note that
+  * "9.6 kilobytes" == 9600 bytes.
+  */
+ static int vsc73xx_get_max_mtu(struct dsa_switch *ds, int port)
  {
-@@ -1317,6 +1341,80 @@ static int vsc73xx_vlan_set_pvid(struct dsa_switch *ds, int port, u16 vid,
- 	return 0;
+-	return 9600;
++	/* max mtu = 9600 - ETH_HLEN - ETH_FCS_LEN */
++	return 9582;
  }
  
-+static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
-+				 const struct switchdev_obj_port_vlan *vlan,
-+				 struct netlink_ext_ack *extack)
-+{
-+	bool untagged = vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
-+	bool pvid = vlan->flags & BRIDGE_VLAN_INFO_PVID;
-+	int ret;
-+
-+	/* Be sure to deny alterations to the configuration done by tag_8021q.
-+	 */
-+	if (vid_is_dsa_8021q(vlan->vid)) {
-+		NL_SET_ERR_MSG_MOD(extack,
-+				   "Range 3072-4095 reserved for dsa_8021q operation");
-+		return -EBUSY;
-+	}
-+
-+	if (untagged && port != CPU_PORT) {
-+		ret = vsc73xx_vlan_set_untagged(ds, port, vlan->vid, true);
-+		if (ret)
-+			return ret;
-+	}
-+	if (pvid && port != CPU_PORT) {
-+		ret = vsc73xx_vlan_set_pvid(ds, port, vlan->vid, true);
-+		if (ret)
-+			return ret;
-+	}
-+
-+	ret = vsc73xx_port_update_vlan_table(ds, port, vlan->vid, 1);
-+
-+	return ret;
-+}
-+
-+static int vsc73xx_port_vlan_del(struct dsa_switch *ds, int port,
-+				 const struct switchdev_obj_port_vlan *vlan)
-+{
-+	struct vsc73xx *vsc = ds->priv;
-+	u16 vlan_no;
-+	int ret;
-+	u32 val;
-+
-+	ret =
-+	    vsc73xx_port_update_vlan_table(ds, port, vlan->vid, 0);
-+	if (ret)
-+		return ret;
-+
-+	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG, &val);
-+
-+	if (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA) {
-+		vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port,
-+			     VSC73XX_TXUPDCFG, &val);
-+		vlan_no = (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID) >>
-+			  VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT;
-+		if (vlan_no == vlan->vid) {
-+			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-+					    VSC73XX_TXUPDCFG,
-+					    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA,
-+					    0);
-+			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-+					    VSC73XX_TXUPDCFG,
-+					    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID, 0);
-+		}
-+	}
-+
-+	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_PORT_VLAN, &val);
-+	vlan_no = val & VSC73XX_CAT_PORT_VLAN_VLAN_VID;
-+	if (vlan_no && vlan_no == vlan->vid) {
-+		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-+				    VSC73XX_CAT_PORT_VLAN,
-+				    VSC73XX_CAT_PORT_VLAN_VLAN_VID, 0);
-+	}
-+
-+	return 0;
-+}
-+
- static void vsc73xx_update_forwarding_map(struct vsc73xx *vsc)
- {
- 	int i;
-@@ -1537,6 +1635,9 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
- 	.port_change_mtu = vsc73xx_change_mtu,
- 	.port_max_mtu = vsc73xx_get_max_mtu,
- 	.port_stp_state_set = vsc73xx_port_stp_state_set,
-+	.port_vlan_filtering = vsc73xx_port_vlan_filtering,
-+	.port_vlan_add = vsc73xx_port_vlan_add,
-+	.port_vlan_del = vsc73xx_port_vlan_del,
- 	.tag_8021q_vlan_add = vsc73xx_tag_8021q_vlan_add,
- 	.tag_8021q_vlan_del = vsc73xx_tag_8021q_vlan_del,
- };
+ static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port,
 -- 
 2.34.1
 
