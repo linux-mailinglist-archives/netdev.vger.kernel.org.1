@@ -1,79 +1,132 @@
-Return-Path: <netdev+bounces-12850-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12851-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 175417391BE
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 23:43:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DB1C739231
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 00:01:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 293511C203A1
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:43:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25436280EA7
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 22:01:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0A411D2B8;
-	Wed, 21 Jun 2023 21:43:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 382A51D2C5;
+	Wed, 21 Jun 2023 22:01:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93A3219E52
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 21:43:47 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4322D1BC
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:43:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9mGUhT/7NxwgE689oqTM9R3LBRaJ3oanHg5oIt2ortA=; b=PMu49/6gjUf+uhSiADJmiDfFmJ
-	hcb3BTQ91r7VgxGU+79RD5/WZEYnZAFfgELmYSwrGMccbj2JIMTRprTGVQ6z7EfZ/XFDHt5fnFD68
-	Jxss7ZpdG6v75VGkBNi7zRxy62OyaFGIjRSNz3mppJIr+BWqcv7rUQhu+NkTMDhnI7vE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qC5c6-00HC85-Dy; Wed, 21 Jun 2023 23:43:42 +0200
-Date: Wed, 21 Jun 2023 23:43:42 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Fabio Estevam <festevam@gmail.com>
-Cc: Vladimir Oltean <olteanv@gmail.com>, netdev <netdev@vger.kernel.org>
-Subject: Re: imx8mn with mv88e6320 fails to retrieve IP address
-Message-ID: <2647dbfe-860d-4a45-94ed-d1d160d9a3be@lunn.ch>
-References: <CAOMZO5AdPZfQQEfSgW-Cgw2GySerc0oxUu4OEcQoxwVeB+wQWg@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E682D19BD9;
+	Wed, 21 Jun 2023 22:01:44 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95364120;
+	Wed, 21 Jun 2023 14:54:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=pRRBqrE3FZEwlFe7ojZoqTLqtWARHj/yvV5QqcS0aMA=; b=jiM3pJ1r7KJlEGJBoZfF5wHyQf
+	VMTgI8zeeuhwKhOM+KfY4nfrBHq9q7OYeica6/Mmd8WkNHSsHDpAwzQLqi33ezoYMZsXoOygmWSOC
+	IoH46+Z9T6FsBl2JnmCybSBhQZuF+9n7Zbfxen9bznppUkefCGcoeTt+70qSFEUQmjXzMT8AbnUk5
+	twy+1smQb5Hy953cd3E38CmWsfH5GDS0V8iazBHphUxnX7TufegLVntDXEI9OQz5DL0U11LC0CaAH
+	SGpIm+qYqNY1igvFeSNIz9QcvDZ1+IxTzTFX47bPHK5PvbcHBu/zkhUQD1QOz9lXOac2oZnKP/2zF
+	3x/luaiw==;
+Received: from sslproxy01.your-server.de ([78.46.139.224])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qC5lu-0004EB-6b; Wed, 21 Jun 2023 23:53:50 +0200
+Received: from [178.197.248.38] (helo=linux.home)
+	by sslproxy01.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qC5lt-000XaG-CL; Wed, 21 Jun 2023 23:53:49 +0200
+Subject: Re: [PATCH bpf,v6 3/4] bpf: fix bpf socket lookup from tc/xdp to
+ respect socket VRF bindings
+To: Gilad Sever <gilad9366@gmail.com>, dsahern@kernel.org,
+ martin.lau@linux.dev, john.fastabend@gmail.com, ast@kernel.org,
+ andrii@kernel.org, song@kernel.org, yhs@fb.com, kpsingh@kernel.org,
+ sdf@google.com, haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mykolal@fb.com,
+ shuah@kernel.org, hawk@kernel.org, joe@wand.net.nz
+Cc: eyal.birger@gmail.com, shmulik.ladkani@gmail.com, bpf@vger.kernel.org,
+ netdev@vger.kernel.org, linux-kselftest@vger.kernel.org
+References: <20230621104211.301902-1-gilad9366@gmail.com>
+ <20230621104211.301902-4-gilad9366@gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <85d41eee-d912-3203-9291-a52326e7c162@iogearbox.net>
+Date: Wed, 21 Jun 2023 23:53:48 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <CAOMZO5AdPZfQQEfSgW-Cgw2GySerc0oxUu4OEcQoxwVeB+wQWg@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20230621104211.301902-4-gilad9366@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26946/Wed Jun 21 09:30:19 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> When the Trendnet switch is used, DHCP fails and ethtool reports just
-> these lines differently:
+On 6/21/23 12:42 PM, Gilad Sever wrote:
+> When calling bpf_sk_lookup_tcp(), bpf_sk_lookup_udp() or
+> bpf_skc_lookup_tcp() from tc/xdp ingress, VRF socket bindings aren't
+> respoected, i.e. unbound sockets are returned, and bound sockets aren't
+> found.
 > 
->         Link partner advertised link modes:  10baseT/Half 10baseT/Full
->                                              100baseT/Half 100baseT/Full
->                                              1000baseT/Half 1000baseT/Full
->         Link partner advertised pause frame use: Symmetric
+> VRF binding is determined by the sdif argument to sk_lookup(), however
+> when called from tc the IP SKB control block isn't initialized and thus
+> inet{,6}_sdif() always returns 0.
+> 
+> Fix by calculating sdif for the tc/xdp flows by observing the device's
+> l3 enslaved state.
+> 
+> The cg/sk_skb hooking points which are expected to support
+> inet{,6}_sdif() pass sdif=-1 which makes __bpf_skc_lookup() use the
+> existing logic.
+> 
+> Fixes: 6acc9b432e67 ("bpf: Add helper to retrieve socket in BPF")
+> Acked-by: Stanislav Fomichev <sdf@google.com>
+> Reviewed-by: Shmulik Ladkani <shmulik.ladkani@gmail.com>
+> Reviewed-by: Eyal Birger <eyal.birger@gmail.com>
+> Signed-off-by: Gilad Sever <gilad9366@gmail.com>
+[...]
+>   static const struct bpf_func_proto bpf_tc_sk_lookup_tcp_proto = {
+> @@ -6776,12 +6788,17 @@ static const struct bpf_func_proto bpf_tc_sk_lookup_tcp_proto = {
+>   BPF_CALL_5(bpf_tc_sk_lookup_udp, struct sk_buff *, skb,
+>   	   struct bpf_sock_tuple *, tuple, u32, len, u64, netns_id, u64, flags)
+>   {
+> -	struct net *caller_net = dev_net(skb->dev);
+> -	int ifindex = skb->dev->ifindex;
+> +	struct net_device *dev = skb->dev;
+> +	struct net *caller_net;
+> +	int ifindex, sdif;
+> +
+> +	caller_net = dev_net(dev);
+> +	ifindex = dev->ifindex;
+> +	sdif = dev_sdif(dev);
+>   
+>   	return (unsigned long)__bpf_sk_lookup(skb, tuple, len, caller_net,
+>   					      ifindex, IPPROTO_UDP, netns_id,
+> -					      flags);
+> +					      flags, sdif);
+>   }
 
-Ah, i read that wrong. What you are saying is the Trendnet additionally
-has 1000BaseT/Half, and symmetric pause.
+Applied, thanks! Btw, the above looks now way uglier than before, so I fixed this
+up wrt how it should have looked like for the submission:
 
-1000BaseT/Half should not be causing the problem, 1000baseT/Full will
-win the election, and 1000baseT/Half is not even supported by
-mv88e6xxx so is not even an option in the election.
+https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git/commit/?id=9a5cb79762e0eda17ca15c2a6eaca4622383c21c
 
-So this is might be down to symmetric pause being negotiated.  You
-might be able to prove this by hacking mv88e6185_phylink_get_caps()
-and remove MAC_SYM_PAUSE. It should then no longer advertise pause,
-and so the resolved auto-neg should not have pause.
-
-    Andrew
+Thanks,
+Daniel
 
