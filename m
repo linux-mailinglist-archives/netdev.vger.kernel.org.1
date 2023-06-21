@@ -1,75 +1,39 @@
-Return-Path: <netdev+bounces-12836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0E8C573912D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 22:56:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3DE70739149
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 23:10:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3172F1C2037C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:56:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75EB71C20F1A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:10:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B39B1C75C;
-	Wed, 21 Jun 2023 20:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 751471C775;
+	Wed, 21 Jun 2023 21:10:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 18C9A19E6E
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 20:56:38 +0000 (UTC)
-Received: from mail-ej1-x631.google.com (mail-ej1-x631.google.com [IPv6:2a00:1450:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDB02114
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:56:10 -0700 (PDT)
-Received: by mail-ej1-x631.google.com with SMTP id a640c23a62f3a-988a2715b8cso713686766b.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:56:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1687380956; x=1689972956;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=M6OOi4ojdfbJx7gDSRwiyI7sNHkXfrNX2nfBVPV3Vds=;
-        b=brDuM3RsfvJ3JMm3jBC/lwclZeWVTjJ/zy8LRE32yTj+DjOUF0wJKL9zNU/WjQrQYK
-         AEo7fXzYZ59GoVrPSsgjMGNQ8gD0DXlzwoB7k037LnLn05AltIulSck8BKnMl5FNrGJX
-         bs9sevo2qDv7CyUxkjjZ3cS3Igyc7srzdBNsBPm5gRx2EGmo+qzR7S592KDhDBIMP3UZ
-         Gy3SlbLq0huodQdZZ9HtMpexGwGlV5rFZ+zNOhBXlgMAGhADL6VKdjE9Gp6NEI3/f6FJ
-         s+jTpcknHtidXnQvtdFWaiwY6nfbZV/e6HATea66fXLE3F60fMHOAD36zpbvkmxHBvus
-         NSPw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687380956; x=1689972956;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=M6OOi4ojdfbJx7gDSRwiyI7sNHkXfrNX2nfBVPV3Vds=;
-        b=a4fUxM/fBkF95Xq7OhlXs0RLl4sQbTWFzhiNIXqaiz/32AdoBuGPR5caEAi3Y1t+z0
-         zdFY13tth9EQAlcBWo4hqqn/YcxYdqY/sd48PbjU1qtyP8ByzrJgRN0c9uIiWm1cDKg4
-         oYpSlKd8CaCQ5GFixeqcg3RUikSS6vhG+l3rgU84MWdDZWS+uZzc6+BDEceUZYIg7nVw
-         yXt9DW21w+FOUfon9rz2liLuCYcShHxKyOUenot7tSSJD1fQ7kQQ5Jy/Tdq/eiwKVm3W
-         CKBrCQznpSbXz7eO7CURSgMln/3Gfb6HOoR2NdqwvtHLqq2B427JKrmqIKYer2fl5zLU
-         YvUw==
-X-Gm-Message-State: AC+VfDwZmcTafPcZF6BqkiQyx6BV51ZhIr3srOBP3TQTQpEpFQQG5lh8
-	AiVWjtWX0VDAaBn+shV1ZpM8Oqc4bKDncQ==
-X-Google-Smtp-Source: ACHHUZ7q70mtWJS0TsGq/qLa9Fyam8x4yYcmhm7gWELUZde/htz4cW/CRs1GfP7Yx/Zj5k6hu7OaQQ==
-X-Received: by 2002:a17:907:7d86:b0:984:25ab:bb2e with SMTP id oz6-20020a1709077d8600b0098425abbb2emr14264791ejc.3.1687380956074;
-        Wed, 21 Jun 2023 13:55:56 -0700 (PDT)
-Received: from localhost.localdomain (p200300c1c74c0400ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c74c:400:ba85:84ff:febf:2b17])
-        by smtp.gmail.com with ESMTPSA id d4-20020a170906640400b00988e2e31550sm3621260ejm.151.2023.06.21.13.55.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 13:55:55 -0700 (PDT)
-Sender: Zahari Doychev <zahari.doychev@googlemail.com>
-From: Zahari Doychev <zahari.doychev@linux.com>
-To: netdev@vger.kernel.org
-Cc: dsahern@gmail.com,
-	stephen@networkplumber.org,
-	hmehrtens@maxlinear.com,
-	aleksander.lobakin@intel.com,
-	simon.horman@corigine.com,
-	idosch@idosch.org,
-	Zahari Doychev <zdoychev@maxlinear.com>,
-	Ido Schimmel <idosch@nvidia.com>
-Subject: [PATCH iproute2-next v3] f_flower: add cfm support
-Date: Wed, 21 Jun 2023 22:55:45 +0200
-Message-ID: <20230621205545.63760-1-zahari.doychev@linux.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07177134A2;
+	Wed, 21 Jun 2023 21:10:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 57E2AC433C9;
+	Wed, 21 Jun 2023 21:10:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687381822;
+	bh=BlZyTydpPU6kMRAOer18QqZvxbUSULvgahvQKVKwZHg=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=UWZ/1vCHd6oNHkZTRTkNl12ROx8DTeAgKOKfiO7+/AL3MpUavw5v2+dfoMplmKscu
+	 2jrFMK8hNxqHuYP0yG/vaw2Zx3/CWhBjGIfHvIZ6m3LWHLXSIrSPOxwd1wrCEFmHai
+	 T653D29GUh7UM8B2F2nZYZLs2ZvGfpCDVuzVQ6rfFnVRBh4g7z5Z3k8G4tc5xZOJ1U
+	 rcY7ofUgnHvMU8nLwfvsme9ghUDuiBWd2Gbaqzoxh0mBiJrPHztZl6ui6/V6pyAthX
+	 tlSWbnpj9UCpeyXmS9w+QG8GsN9ypnMHPTW5Jw7M0NVPJ+w58QKC+c+abPm7q+p3n/
+	 dwDTy9wTAYo6A==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3729EC395FF;
+	Wed, 21 Jun 2023 21:10:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -77,299 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: pull-request: bpf 2023-06-21
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168738182222.695.18332943948329560734.git-patchwork-notify@kernel.org>
+Date: Wed, 21 Jun 2023 21:10:22 +0000
+References: <20230621101116.16122-1-daniel@iogearbox.net>
+In-Reply-To: <20230621101116.16122-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
-From: Zahari Doychev <zdoychev@maxlinear.com>
+Hello:
 
-Add support for matching on CFM Maintenance Domain level and opcode.
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-  # tc filter add dev ens6 ingress pref 1 proto cfm \
-       flower cfm op 1 mdl 5 action ok
+On Wed, 21 Jun 2023 12:11:16 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
+> 
+> The following pull-request contains BPF updates for your *net* tree.
+> 
+> We've added 7 non-merge commits during the last 14 day(s) which contain
+> a total of 7 files changed, 181 insertions(+), 15 deletions(-).
+> 
+> [...]
 
-  # tc filter show dev ens6 ingress
-    filter protocol cfm pref 1 flower chain 0
-    filter protocol cfm pref 1 flower chain 0 handle 0x1
-      eth_type 8902
-      cfm mdl 5 op 1
-      not_in_hw
-            action order 1: gact action pass
-             random type none pass val 0
-             index 1 ref 1 bind 1
+Here is the summary with links:
+  - pull-request: bpf 2023-06-21
+    https://git.kernel.org/netdev/net/c/59bb14bda2f8
 
-  # tc -j -p filter show dev ens6 ingress
-    [ {
-            "protocol": "cfm",
-            "pref": 1,
-            "kind": "flower",
-            "chain": 0
-        },{
-            "protocol": "cfm",
-            "pref": 1,
-            "kind": "flower",
-            "chain": 0,
-            "options": {
-                "handle": 1,
-                "keys": {
-                    "eth_type": "8902",
-                    "cfm": {
-                        "mdl": 5,
-                        "op": 1
-                    }
-                },
-                "not_in_hw": true,
-                "actions": [ {
-                        "order": 1,
-                        "kind": "gact",
-                        "control_action": {
-                            "type": "pass"
-                        },
-                        "prob": {
-                            "random_type": "none",
-                            "control_action": {
-                                "type": "pass"
-                            },
-                            "val": 0
-                        },
-                        "index": 1,
-                        "ref": 1,
-                        "bind": 1
-                    } ]
-            }
-        } ]
-
-Signed-off-by: Zahari Doychev <zdoychev@maxlinear.com>
-Reviewed-by: Ido Schimmel <idosch@nvidia.com>
----
-
-   v1->v2:
-     - replace matches with strcmp
-   v2->v3
-     - don't change uapi header file
-     - remove empty lines
-
- lib/ll_proto.c       |  1 +
- man/man8/tc-flower.8 | 29 ++++++++++++-
- tc/f_flower.c        | 96 +++++++++++++++++++++++++++++++++++++++++++-
- 3 files changed, 124 insertions(+), 2 deletions(-)
-
-diff --git a/lib/ll_proto.c b/lib/ll_proto.c
-index 526e582f..5aacb5b4 100644
---- a/lib/ll_proto.c
-+++ b/lib/ll_proto.c
-@@ -78,6 +78,7 @@ __PF(8021AD,802.1ad)
- __PF(MPLS_UC,mpls_uc)
- __PF(MPLS_MC,mpls_mc)
- __PF(TEB,teb)
-+__PF(CFM,cfm)
- 
- { 0x8100, "802.1Q" },
- { 0x88cc, "LLDP" },
-diff --git a/man/man8/tc-flower.8 b/man/man8/tc-flower.8
-index cd997450..83245813 100644
---- a/man/man8/tc-flower.8
-+++ b/man/man8/tc-flower.8
-@@ -102,7 +102,9 @@ flower \- flow based traffic control filter
- .BR ip_flags
- .IR IP_FLAGS " | "
- .B l2_miss
--.IR L2_MISS " }"
-+.IR L2_MISS " | "
-+.BR cfm
-+.IR CFM_OPTIONS " }"
- 
- .ti -8
- .IR LSE_LIST " := [ " LSE_LIST " ] " LSE
-@@ -120,6 +122,13 @@ flower \- flow based traffic control filter
- .B ttl
- .IR TTL " }"
- 
-+.ti -8
-+.IR CFM " := "
-+.B cfm mdl
-+.IR LEVEL " | "
-+.B op
-+.IR OPCODE "
-+
- .SH DESCRIPTION
- The
- .B flower
-@@ -496,11 +505,29 @@ fragmented packet. firstfrag can be used to indicate the first fragmented
- packet. nofirstfrag can be used to indicates subsequent fragmented packets
- or non-fragmented packets.
- .TP
-+
- .BI l2_miss " L2_MISS"
- Match on layer 2 miss in the bridge driver's FDB / MDB. \fIL2_MISS\fR may be 0
- or 1. When 1, match on packets that encountered a layer 2 miss. When 0, match
- on packets that were forwarded using an FDB / MDB entry. Note that broadcast
- packets do not encounter a miss since a lookup is not performed for them.
-+.TP
-+
-+.BI cfm " CFM_OPTIONS"
-+Match on Connectivity Fault Management (CFM) fields.
-+.I CFM_OPTIONS
-+is a list of options that describe the properties of the CFM information
-+fields to match.
-+.RS
-+.TP
-+.BI mdl " LEVEL "
-+Match on the Maintenance Domain (MD) level field.
-+\fILEVEL\fR is an unsigned 3 bit value in decimal format.
-+.TP
-+.BI op " OPCODE "
-+Match on the CFM opcode field. \fIOPCODE\fR is an unsigned 8 bit value in
-+decimal format.
-+
- .SH NOTES
- As stated above where applicable, matches of a certain layer implicitly depend
- on the matches of the next lower layer. Precisely, layer one and two matches
-diff --git a/tc/f_flower.c b/tc/f_flower.c
-index b9fe6afb..6da5028a 100644
---- a/tc/f_flower.c
-+++ b/tc/f_flower.c
-@@ -96,12 +96,14 @@ static void explain(void)
- 		"			ct_state MASKED_CT_STATE |\n"
- 		"			ct_label MASKED_CT_LABEL |\n"
- 		"			ct_mark MASKED_CT_MARK |\n"
--		"			ct_zone MASKED_CT_ZONE }\n"
-+		"			ct_zone MASKED_CT_ZONE |\n"
-+		"			cfm CFM }\n"
- 		"	LSE-LIST := [ LSE-LIST ] LSE\n"
- 		"	LSE := lse depth DEPTH { label LABEL | tc TC | bos BOS | ttl TTL }\n"
- 		"	FILTERID := X:Y:Z\n"
- 		"	MASKED_LLADDR := { LLADDR | LLADDR/MASK | LLADDR/BITS }\n"
- 		"	MASKED_CT_STATE := combination of {+|-} and flags trk,est,new,rel,rpl,inv\n"
-+		"	CFM := { mdl LEVEL | op OPCODE }\n"
- 		"	ACTION-SPEC := ... look at individual actions\n"
- 		"\n"
- 		"NOTE:	CLASSID, IP-PROTO are parsed as hexadecimal input.\n"
-@@ -1447,6 +1449,57 @@ static int flower_parse_mpls(int *argc_p, char ***argv_p, struct nlmsghdr *nlh)
- 	return 0;
- }
- 
-+static int flower_parse_cfm(int *argc_p, char ***argv_p, __be16 eth_type,
-+			    struct nlmsghdr *n)
-+{
-+	struct rtattr *cfm_attr;
-+	char **argv = *argv_p;
-+	int argc = *argc_p;
-+	int ret;
-+
-+	if (eth_type != htons(ETH_P_CFM)) {
-+		fprintf(stderr,
-+			"Can't set attribute if ethertype isn't CFM\n");
-+		return -1;
-+	}
-+
-+	cfm_attr = addattr_nest(n, MAX_MSG, TCA_FLOWER_KEY_CFM | NLA_F_NESTED);
-+
-+	while (argc > 0) {
-+		if (!strcmp(*argv, "mdl")) {
-+			__u8 val;
-+
-+			NEXT_ARG();
-+			ret = get_u8(&val, *argv, 10);
-+			if (ret < 0) {
-+				fprintf(stderr, "Illegal \"cfm md level\"\n");
-+				return -1;
-+			}
-+			addattr8(n, MAX_MSG, TCA_FLOWER_KEY_CFM_MD_LEVEL, val);
-+		} else if (!strcmp(*argv, "op")) {
-+			__u8 val;
-+
-+			NEXT_ARG();
-+			ret = get_u8(&val, *argv, 10);
-+			if (ret < 0) {
-+				fprintf(stderr, "Illegal \"cfm opcode\"\n");
-+				return -1;
-+			}
-+			addattr8(n, MAX_MSG, TCA_FLOWER_KEY_CFM_OPCODE, val);
-+		} else {
-+			break;
-+		}
-+		argc--; argv++;
-+	}
-+
-+	addattr_nest_end(n, cfm_attr);
-+
-+	*argc_p = argc;
-+	*argv_p = argv;
-+
-+	return 0;
-+}
-+
- static int flower_parse_opt(struct filter_util *qu, char *handle,
- 			    int argc, char **argv, struct nlmsghdr *n)
- {
-@@ -2065,6 +2118,12 @@ static int flower_parse_opt(struct filter_util *qu, char *handle,
- 				return -1;
- 			}
- 			continue;
-+		} else if (!strcmp(*argv, "cfm")) {
-+			NEXT_ARG();
-+			ret = flower_parse_cfm(&argc, &argv, eth_type, n);
-+			if (ret < 0)
-+				return -1;
-+			continue;
- 		} else {
- 			if (strcmp(*argv, "help") != 0)
- 				fprintf(stderr, "What is \"%s\"?\n", *argv);
-@@ -2754,6 +2813,39 @@ static void flower_print_arp_op(const char *name,
- 			       flower_print_arp_op_to_name);
- }
- 
-+static void flower_print_cfm(struct rtattr *attr)
-+{
-+	struct rtattr *tb[TCA_FLOWER_KEY_CFM_OPT_MAX + 1];
-+	struct rtattr *v;
-+	SPRINT_BUF(out);
-+	size_t sz = 0;
-+
-+	if (!attr || !(attr->rta_type & NLA_F_NESTED))
-+		return;
-+
-+	parse_rtattr(tb, TCA_FLOWER_KEY_CFM_OPT_MAX, RTA_DATA(attr),
-+		     RTA_PAYLOAD(attr));
-+
-+	print_nl();
-+	print_string(PRINT_FP, NULL, "  cfm", NULL);
-+	open_json_object("cfm");
-+
-+	v = tb[TCA_FLOWER_KEY_CFM_MD_LEVEL];
-+	if (v) {
-+		sz += sprintf(out, " mdl %u", rta_getattr_u8(v));
-+		print_hhu(PRINT_JSON, "mdl", NULL, rta_getattr_u8(v));
-+	}
-+
-+	v = tb[TCA_FLOWER_KEY_CFM_OPCODE];
-+	if (v) {
-+		sprintf(out + sz, " op %u", rta_getattr_u8(v));
-+		print_hhu(PRINT_JSON, "op", NULL, rta_getattr_u8(v));
-+	}
-+
-+	close_json_object();
-+	print_string(PRINT_FP, "cfm", "%s", out);
-+}
-+
- static int flower_print_opt(struct filter_util *qu, FILE *f,
- 			    struct rtattr *opt, __u32 handle)
- {
-@@ -3010,6 +3102,8 @@ static int flower_print_opt(struct filter_util *qu, FILE *f,
- 	flower_print_ct_label(tb[TCA_FLOWER_KEY_CT_LABELS],
- 			      tb[TCA_FLOWER_KEY_CT_LABELS_MASK]);
- 
-+	flower_print_cfm(tb[TCA_FLOWER_KEY_CFM]);
-+
- 	close_json_object();
- 
- 	if (tb[TCA_FLOWER_FLAGS]) {
+You are awesome, thank you!
 -- 
-2.41.0
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
 
 
