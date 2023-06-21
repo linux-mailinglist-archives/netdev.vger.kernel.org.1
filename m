@@ -1,234 +1,214 @@
-Return-Path: <netdev+bounces-12573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12574-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16C9F73825B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:43:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A16E738262
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:48:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 490C11C20C9C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:43:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C49621C20E13
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5347C134B1;
-	Wed, 21 Jun 2023 11:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9722B134BF;
+	Wed, 21 Jun 2023 11:48:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4644AC147
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:43:53 +0000 (UTC)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5FC1E72
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 04:43:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687347830; x=1718883830;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=YedHb34fdR5B6cOPmb4yAeFVTA/U3qrdjbqMvzQ0Vqk=;
-  b=IohcK724JyFf8OGsnn2wInDwabkFUDeTAADVDd+hFlRxzWoI7XsVXTp+
-   AVfS2k6wH1ZQW2Eyw+eNaYLSPPNeYapSD+ivbZXG6QiU8jq0BkPM/QBoo
-   1YdruQJBt1H3WJaSXzeU2y9s1EZAIO9OxVbhntw/rR9RY43L79EsAHNTN
-   wNaeBijA41DMN4jVz/fC8Mz2AmEZVwRkfQbxwjLk00R4LToEyE1q3pkPw
-   dqy1sahZ3HO1AxlnOliBNFmOZtG+4pQBc7tUJLJkjXY8lFyiCBhEFUpvt
-   Czn6MOyDC0fTdWAC/jddjVjBWEkTPUdKMjijd850oq1k3x0YINLKeegAd
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="446524903"
-X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="446524903"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 04:43:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10747"; a="744146584"
-X-IronPort-AV: E=Sophos;i="6.00,260,1681196400"; 
-   d="scan'208";a="744146584"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga008.jf.intel.com with ESMTP; 21 Jun 2023 04:43:49 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 21 Jun 2023 04:43:49 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 21 Jun 2023 04:43:48 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Wed, 21 Jun 2023 04:43:48 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.102)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Wed, 21 Jun 2023 04:43:48 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=a38gd8SK3PDlme6I1WqPJjCnInemLz0eIIcfQ4kbFdQWaZmfsjf3nqsmRGx72OwkiWc6SNX9BK6TNNaKBej8FZKkWksyWdgCZv5um49JaboToJeZuxpC7i7fnH2a5r8MikS5hVDM2mcAal1XVwUeSRE65PE2tZfcdnk3JHMboG0YPar9WaeO8tGTp94wE9tg5ME7YjG4pPn7Dc67UfbdDVilKPX4Wl/YHiWpqZlPL0vrqYTu/m9l0qLjV8d23R03b2zvFxlPZuhEL5Nrw8u5vRrR5K2zJs5nl06y9xybilUMwSA9hjF9DuNT9nTXJGG0Y8D98J8pe10Im2F3L4XZ3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=pzqThOgPOyuphdLJ170v6qSj+T33XIiywNKoyi+veY8=;
- b=GUeSw3yrwL2fn3mc3Q5iQdJ6tS6Ft58sS8CKVAX62hBbyb34LLKzB2Bm64zL6Ss6anZJfxbg3bWZUq1N4M/rHpkE19mGRnxlMqSOCrjw9YSSdCRQLHONGeJp8GYmk4Sxu0nec1W/Eu/8+ycBMuMg3s7ge0o+nJjJeVDPsRlBG/RYlvHoZj1SRbTI7Fe64DfblbVgRn2idVyxMjjrsT/InzVGkuHL2OlODWXl30p6PKRvc1xFASFVcHD0m4df8bHoJNKg8EN8j6pPW9oNnUwNcIGiQDpAaDoCCyT4slEf7QuBxTWw4D9ZCoOZSDXJAn3keIM0rFQu79VBtTHmvtoJVQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- PH8PR11MB7989.namprd11.prod.outlook.com (2603:10b6:510:258::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
- 2023 11:43:46 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::9e4f:80cc:e0aa:6809]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::9e4f:80cc:e0aa:6809%2]) with mapi id 15.20.6500.036; Wed, 21 Jun 2023
- 11:43:46 +0000
-Date: Wed, 21 Jun 2023 13:43:33 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <intel-wired-lan@lists.osuosl.org>, <netdev@vger.kernel.org>,
-	<anthony.l.nguyen@intel.com>, <magnus.karlsson@intel.com>,
-	<michal.swiatkowski@intel.com>
-Subject: Re: [PATCH iwl-net] ice: add missing napi deletion
-Message-ID: <ZJLiZTl8oeBHqKWd@boxer>
-References: <20230620082454.377001-1-maciej.fijalkowski@intel.com>
- <20230620095335.43504612@kernel.org>
- <ZJHgOXXHFjsOjlnA@boxer>
- <20230620104911.001a7a4a@kernel.org>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230620104911.001a7a4a@kernel.org>
-X-ClientProxiedBy: FR2P281CA0144.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:98::18) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BE24C8CF
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:48:43 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F36CB10E6
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 04:48:39 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-9896216338cso136882366b.3
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 04:48:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687348118; x=1689940118;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=49JH8OGnDIMqyP7BsWOBVVZ6IjoSrpmurdEl4x09KXw=;
+        b=OuokjFYSwhGkHqQzPEf3FXpjmHtIj2t3INCVk/6N5lG2YUrtrnOZABzjT44NTB551X
+         6Oq8bS4JHXbixJKRlLCECU2zYcjz279IiGeeO8zK4GjQpsKFuITaFfi6Mxupw03iM7K4
+         zs9Wt34Y5rU/MG9d4A7PVxLFjtDD7X9VId4lQos3OIIGS7SPEflD7xaCbUGlXKlJpYKE
+         ht20zftK+fNen7ZBSJevVfOlJQmZALU+T3p3pkTKKaIrQhnwxbluuWhbiMfVsVvB/yQ+
+         y0HGcZinsb9fMOuKgAruoxqSX16eO4XiwZ84QNgH4ehitmawQnHv3IY/q6c1yWX8O2l0
+         ZuVA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687348118; x=1689940118;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=49JH8OGnDIMqyP7BsWOBVVZ6IjoSrpmurdEl4x09KXw=;
+        b=DQoHu65OEA2nCeIty77tVr9eilbjDoUVonv7+CRnSko0xKFWduWPJws++UqzR3TUdS
+         0rjbpdDmx+WVE8HLeryx5SrkzrCJZ8DjE2tPHH82VYZ7BIfcF+FMZiOEa15bymyPvomM
+         iARf9YZfnJyjQn0S4GtClUuyF7eJu/EnmlV554JzBTNfa8ETgSjt9Le99+jCMvI3feeX
+         GlTSN9gTo/jr2Rwy8/QtKgX/7MkNRs9WwPjJvPQASbKbdY42gT7TPuJ8PHECQCZWYLAr
+         mRh+KfqyOSROysBWi/IN4ZYhhGqVwR8KvygGOQcPhemCVdtYv05Bx/MhSUfHYwO+UqOD
+         V3Eg==
+X-Gm-Message-State: AC+VfDx1/k4WwUXyZzDT26cFPV+pLDcQWT4U7IH0eaVPmAFjsRDgIbfO
+	V1Do+hqo1dvTa8p9AV6kcx7jAQ==
+X-Google-Smtp-Source: ACHHUZ5wh4PPGjpmAMKWpgHtW0LvKjIwexTYXigNwgxc7EJKtyPpWJ/Mg8j8CxKRvabv97DzFBP4Bg==
+X-Received: by 2002:a17:907:2ce2:b0:98a:ed3d:8917 with SMTP id hz2-20020a1709072ce200b0098aed3d8917mr2163371ejc.9.1687348118282;
+        Wed, 21 Jun 2023 04:48:38 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id qw9-20020a170906fca900b0098963eb0c3dsm1552031ejb.26.2023.06.21.04.48.37
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 04:48:37 -0700 (PDT)
+Date: Wed, 21 Jun 2023 13:48:36 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Ido Schimmel <idosch@nvidia.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com
+Subject: Re: [RFC PATCH net-next 1/2] devlink: Hold a reference on parent
+ device
+Message-ID: <ZJLjlGo+jww6QIAg@nanopsycho>
+References: <20230619125015.1541143-1-idosch@nvidia.com>
+ <20230619125015.1541143-2-idosch@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|PH8PR11MB7989:EE_
-X-MS-Office365-Filtering-Correlation-Id: a39e93f0-7027-4889-ea32-08db724cc5f0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: lE+jw6joRMDi8M6+dsOnSbnGHEcPvszgyoMcI771a81uwH3NzQgwozrco37NkdeKtpsMo6yUW6wClW5CN0DgcX18C0vR98vXpE3yb1vEBA2pCPByom17OORAm89tMhVs1EjhKjJsGkex9rtkVnyEddqbMFsFU7MkfLFW8VvBxNE7G8kErz5kpqJwWGDp5+k3ZiIcc6Bypyz7NI1HNuWDdykim6ULDGOPI3YPSLS65HU1E8e/e4iaxOK544A6yOyXK8ic0Ut+hn2e8H9LhmVuEby7ExpgTbDWpxBWvD5yZ3AMrRPeHhzGlBfYda9JRdO1vXmQvAnYT7Szpph2wNRFBuL45gPTzh//OiOC9p5u7UnfEJbS2gF0n46u+AxtSx533Q5cQckq6nE/g0OCAIUSMLdE71XsrJHSrgg5oOx4T5YI+crXZX98tPm6CQApzpUkbJzlnzPDQPVqZYk7X2K1nS2tWgf0jLzYQbPXcO0C+uivkfMbgFclkCEc++n6mU0Bpa5afgEmacABENLCf9S2yEgyxrdfkoW2ShFCzlM9PgfAIluqcQVdcmfMZkQ+UINQfrE1jxe5HatNDDKH3iqgDzNcGNTSCULxcznHmgBwGRo=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(396003)(346002)(366004)(136003)(376002)(39860400002)(451199021)(6666004)(6486002)(478600001)(83380400001)(26005)(9686003)(186003)(86362001)(38100700002)(107886003)(33716001)(6512007)(6506007)(82960400001)(8676002)(5660300002)(8936002)(316002)(2906002)(41300700001)(4326008)(6916009)(66556008)(66946007)(66476007)(44832011)(21314003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?NCBZthaqcqnGzSkgkde5btBj4dr6I6uN/bB6fxp5Rm4Ofc5uD7Wr3LXioztS?=
- =?us-ascii?Q?enknW8fzF+J+8GEeu8oPNlTN21Aloav80VH1WQEpAcp17lwRuznAZKe8Lh76?=
- =?us-ascii?Q?BiokdfrOlCNbmN5ut6CcWX6dXgYd3mUuiiYNgJnPHcNLqtxdAfvbQca4SUo8?=
- =?us-ascii?Q?6GtaWrYyy9+il8rJkbQY62S77iABZuv2OwklWIpYPO0w1Y2pmqDw44qhOl4+?=
- =?us-ascii?Q?2y3uw73JoIhuU3y+9XaLkUJyd7xO6v2XxIfeT/8WJZ08FJ00UAvEOEYHzDZR?=
- =?us-ascii?Q?o2sqZ4BLnv6n1N+2gtsw/sM9STEbSbh2bvi69qBbTLmypqIV/JlDeb5WiTYe?=
- =?us-ascii?Q?DNtfysVbRFCOzJptFx9ukdHDxPcJCVUXNVc6lGe2eRdWU3X7y8gRsjRNxp7E?=
- =?us-ascii?Q?ee502wNFcVnPMDJ9A6EmofGj3AocPFvOyj2dhjDWXwitlqx5mKkyKbq/HcC3?=
- =?us-ascii?Q?yTJdBbXGNb+gHhTIzkmTyrMjbp5+PKZGoOBNiRkG1EpbdZyw+e4nilj+62Tf?=
- =?us-ascii?Q?7HrXm+UuGQYzAPYhG2aKtNTb7qXrL9cVp9RkTzuRXOGRLzXmFyJPjmMblKHj?=
- =?us-ascii?Q?uVtQO8BIaWQwxAnqpVkzCGKFoOn5aPjjgv3ZZ5UpDbqdKbw9ILQhKzqs4XZa?=
- =?us-ascii?Q?3DEWvxeTEehWWf/Gs7Zj8ATw/7b6OUDpSKFNqhHhg7mZK52sT9ms77S7v56t?=
- =?us-ascii?Q?df3d0ce6cAtKHGEBfhkB2tFEueyoxiNM24JtdZJMoRq9uPZr4xQO/s6M+Nui?=
- =?us-ascii?Q?BbdBiK6fKp/whOiIr95bat2oOrAnMm+yH+hOmEFp9uqQ2Aa5YcltqFqwOsgu?=
- =?us-ascii?Q?UcaRi+5HEDjjgsfsgOGR+AiMCJtbA0RQeJ6w+Fm2yzafItq+NE4+HHBKSu53?=
- =?us-ascii?Q?mWcWSpA9iegokwqFH4RZ/sb5rRIotjWNqQGZCsZAOMYuI1PYKZ2IYw2cdLOd?=
- =?us-ascii?Q?bSFZ6SLATzLQkhUjBb9nKDFUlkGiaGxdUs69Q99bCS6w75rMV7QvQGHgw9+N?=
- =?us-ascii?Q?Mxlr5G07F+TsOnC6CnuoKR/HDKKd4mimWTlV81CksfIYWlJ+vEo5LrKGPH6v?=
- =?us-ascii?Q?WZ/PmZ3CGnvGm0cTKsEuxYTLQObe6OnE2EqxJxiFFCiHuMjYEU2QOXz4Js3w?=
- =?us-ascii?Q?zDEoP0vL73qEp2sOBR/aqRH6dS07TPFuGp5Q7zJclMEVhrrtrs74cGZGCbkz?=
- =?us-ascii?Q?CUmAMU+KdcuYmptrPFdhtMlQj9/U8VHJyj6OKb95TATcI5O+pjgeEbQ/VqH8?=
- =?us-ascii?Q?/YpteG/sFqBiUwrMGAv2wL5NClUrd4Gj+932Xc9m461cuBhdKtm6j4aS8t5M?=
- =?us-ascii?Q?pakPMqniVkRUyfKFm2mUTMSx/zf/4G/9jN4jhwkdgWWbyqkQCcPmp1sBprDP?=
- =?us-ascii?Q?Q9lnXBaR6a8nSv1k3D4jFTQV7siN2dMSSzoMs07ipO3iA2fOGdwCeN2HgvI7?=
- =?us-ascii?Q?OUYVfkg9YCnHTxaq6NwhkIPuhGb9q+8qW9LhvOGfNMa0DeaWlrsE8wPdBHZ+?=
- =?us-ascii?Q?/q3cWmZmVGVD8c5sC+9VyTwvgEDVal0ad5saYVh6oTHzBWsgX7webZGTvnnZ?=
- =?us-ascii?Q?Z++J41aYIloS0Ax26qezrM6IDqfI+iGXEPNgRhJeYviSt/hoDdcyCw5RHgLf?=
- =?us-ascii?Q?qQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a39e93f0-7027-4889-ea32-08db724cc5f0
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 11:43:46.8516
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 6NgmOkI0vF+U5noKzTmIVfxcR2hRqSE/tJ+y0P/AVSt28SWG108Q+dWtsU18aeMULb46Lq4x0pKAa36KTLakh9g1AXLpZQVY4ODv0TmU76w=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7989
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230619125015.1541143-2-idosch@nvidia.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 20, 2023 at 10:49:11AM -0700, Jakub Kicinski wrote:
-> On Tue, 20 Jun 2023 19:22:01 +0200 Maciej Fijalkowski wrote:
-> > On Tue, Jun 20, 2023 at 09:53:35AM -0700, Jakub Kicinski wrote:
-> > > Is there user visible impact? I agree that it's a good habit, but
-> > > since unregister cleans up NAPI instances automatically the patch
-> > > is not necessarily a fix.  
-> > 
-> > It's rather free_netdev() not unregistering per se, no? I sent this patch
-> > as I found that cited commit didn't delete napis on ice_probe()'s error
-> > path - I just saw that as a regression. 
-> > 
-> > But as you're saying when getting rid of netdev we actually do
-> > netif_napi_del() - it seems redundant to do explicit napi delete on remove
-> > path as it is supposed do free the netdev. Does it mean that many drivers
-> > should be verified against that? Sorta tired so might be missing
-> > something, pardon. If not, I'll send a v2 that just removes
-> > ice_napi_del().
+Mon, Jun 19, 2023 at 02:50:14PM CEST, idosch@nvidia.com wrote:
+>Each devlink instance is associated with a parent device and a pointer
+>to this device is stored in the devlink structure, but devlink does not
+>hold a reference on this device.
+>
+>This is going to be a problem in the next patch where - among other
+>things - devlink will acquire the device lock during netns dismantle,
+>before the reload operation. Since netns dismantle is performed
+>asynchronously and since a reference is not held on the parent device,
+>it will be possible to hit a use-after-free.
+>
+>Prepare for the upcoming change by holding a reference on the parent
+>device.
+>
+>Unfortunately, with this patch and this reproducer [1], the following
+>crash can be observed [2]. The last reference is released from the
+>device asynchronously - after an RCU grace period - when the netdevsim
+>module is no longer present. This causes device_release() to invoke a
+>release callback that is no longer present: nsim_bus_dev_release().
+>
+>It's not clear to me if I'm doing something wrong in devlink (I don't
+>think so), if it's a bug in netdevsim or alternatively a bug in core
+>driver code that allows the bus module to go away before all the devices
+>that were connected to it are released.
+>
+>The problem can be solved by devlink holding a reference on the backing
+>module (i.e., dev->driver->owner) or by each netdevsim device holding a
+>reference on the netdevsim module. However, this will prevent the
+>removal of the module when devices are present, something that is
+>possible today.
+>
+>[1]
+>#!/bin/bash
+>
+>for i in $(seq 1 1000); do
+>        echo "$i"
+>        insmod drivers/net/netdevsim/netdevsim.ko
+>        echo "10 0" > /sys/bus/netdevsim/new_device
+>        rmmod netdevsim
+>done
+>
+>[2]
+>BUG: unable to handle page fault for address: ffffffffc0490910
+>#PF: supervisor instruction fetch in kernel mode
+>#PF: error_code(0x0010) - not-present page
+>PGD 12e040067 P4D 12e040067 PUD 12e042067 PMD 100a38067 PTE 0
+>Oops: 0010 [#1] PREEMPT SMP
+>CPU: 0 PID: 138 Comm: kworker/0:2 Not tainted 6.4.0-rc5-custom-g42e05937ca59 #299
+>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS 1.16.2-1.fc37 04/01/2014
+>Workqueue: events devlink_release
+>RIP: 0010:0xffffffffc0490910
+>Code: Unable to access opcode bytes at 0xffffffffc04908e6.
+>RSP: 0018:ffffb487802f3e40 EFLAGS: 00010282
+>RAX: ffffffffc0490910 RBX: ffff92e6c0057800 RCX: 0001020304050608
+>RDX: 0000000000000001 RSI: ffffffff92b7d763 RDI: ffff92e6c0057800
+>RBP: ffff92e6c1ef0a00 R08: ffff92e6c0055158 R09: ffff92e6c2be9134
+>R10: 0000000000000018 R11: fefefefefefefeff R12: ffffffff934c3e80
+>R13: ffff92e6c2a1a740 R14: 0000000000000000 R15: ffff92e7f7c30b05
+>FS:  0000000000000000(0000) GS:ffff92e7f7c00000(0000) knlGS:0000000000000000
+>CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>CR2: ffffffffc04908e6 CR3: 0000000101f1a004 CR4: 0000000000170ef0
+>Call Trace:
+> <TASK>
+> ? __die+0x23/0x70
+> ? page_fault_oops+0x181/0x470
+> ? exc_page_fault+0xa6/0x140
+> ? asm_exc_page_fault+0x26/0x30
+> ? device_release+0x23/0x90
+> ? device_release+0x34/0x90
+> ? kobject_put+0x7d/0x1b0
+> ? devlink_release+0x16/0x30
+> ? process_one_work+0x1e0/0x3d0
+> ? worker_thread+0x4e/0x3b0
+> ? rescuer_thread+0x3a0/0x3a0
+> ? kthread+0xe5/0x120
+> ? kthread_complete_and_exit+0x20/0x20
+> ? ret_from_fork+0x1f/0x30
+> </TASK>
+>Modules linked in: [last unloaded: netdevsim]
+>
+>Signed-off-by: Ido Schimmel <idosch@nvidia.com>
+>---
+> net/devlink/core.c | 3 +++
+> 1 file changed, 3 insertions(+)
+>
+>diff --git a/net/devlink/core.c b/net/devlink/core.c
+>index c23ebabadc52..b191112f57af 100644
+>--- a/net/devlink/core.c
+>+++ b/net/devlink/core.c
+>@@ -4,6 +4,7 @@
+>  * Copyright (c) 2016 Jiri Pirko <jiri@mellanox.com>
+>  */
 > 
-> I personally prefer to keep track of my resources, so I avoid devm_*
-> and delete NAPI instances by hand. It's up to the author and/or
-> maintainer of the driver in question.
-
-Hmm I am not a fan of devm either but I didn't mean that in my response at
-all.
-
-There are quite a few drivers that do this:
-
-net/core/dev.c:
-void free_netdev(struct net_device *dev)
-{
-	(...)
-	list_for_each_entry_safe(p, n, &dev->napi_list, dev_list)
-		netif_napi_del(p);
-	(...)
-}
-
-static inline void netif_napi_del(struct napi_struct *napi)
-{
-	__netif_napi_del(napi);
-	synchronize_net();
-}
-
-drivers/net/ethernet/xxxcorp/xxx/xxx_main.c:
-static void xxx_remove(struct pci_dev *pdev)
-{
-	// retrieve net_device and napi_struct ptrs
-
-	netif_napi_del(napi); // redundant, covered below
-	(...)
-	free_netdev(netdev);
-	(...)
-}
-
-I believe this is what you were referring to originally and I said that
-after a short drivers audit there is a bunch going via flow shown
-above...plus my patch was trying to introduce that :)
-
-Although in such case __netif_napi_del() will exit early as
-NAPI_STATE_LISTED bit was cleared, if driver holds multiple napi instances
-we will be going unnecessarily via synchronize_net() calls.
-
+>+#include <linux/device.h>
+> #include <net/genetlink.h>
 > 
-> My only real ask is to no route this via net and drop the Fixes tag.
-> Whether you prefer to keep the patch as is or drop ice_napi_del() --
-> up to you.
-
-I'll go through -next and remove ice_napi_del(), given the above
-explanation what I meant previously.
-
+> #include "devl_internal.h"
+>@@ -91,6 +92,7 @@ static void devlink_release(struct work_struct *work)
 > 
+> 	mutex_destroy(&devlink->lock);
+> 	lockdep_unregister_key(&devlink->lock_key);
+>+	put_device(devlink->dev);
+
+In this case I think you have to make sure this is called before
+devlink_free() ends. After the caller of devlink_free() returns (most
+probably .remove callback), nothing stops module from being removed.
+
+I don't see other way. Utilize complete() here and wait_for_completion()
+at the end of devlink_free().
+
+If the completion in devlink_put() area rings a bell for you, let me save
+you the trouble looking it up:
+9053637e0da7 ("devlink: remove the registration guarantee of references")
+This commit removed that. But it is a different usage.
+
+
+
+> 	kfree(devlink);
+> }
+> 
+>@@ -204,6 +206,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
+> 	if (ret < 0)
+> 		goto err_xa_alloc;
+> 
+>+	get_device(dev);
+> 	devlink->dev = dev;
+> 	devlink->ops = ops;
+> 	xa_init_flags(&devlink->ports, XA_FLAGS_ALLOC);
+>-- 
+>2.40.1
+>
 
