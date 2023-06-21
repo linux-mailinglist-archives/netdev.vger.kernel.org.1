@@ -1,189 +1,224 @@
-Return-Path: <netdev+bounces-12499-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12501-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C069D737DD3
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:52:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08E14737E06
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:08:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83F812814D7
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 08:52:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E72A51C20C61
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 09:08:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1156C8C7;
-	Wed, 21 Jun 2023 08:52:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95F32C8D9;
+	Wed, 21 Jun 2023 09:08:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5B05A95B
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:52:24 +0000 (UTC)
-Received: from smtpbgau1.qq.com (smtpbgau1.qq.com [54.206.16.166])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9B0D170C
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 01:52:21 -0700 (PDT)
-X-QQ-mid: bizesmtp64t1687337535tvp7sqy9
-Received: from wxdbg.localdomain.com ( [122.235.139.240])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 21 Jun 2023 16:52:05 +0800 (CST)
-X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: D2GZf6M6C/j9o+n1r3Uz2qtEkrscrR41n7nvKpon3IbLlz3/cdPBWe6bMba/q
-	MKm92ItEtRWVAF1zvcqqkNmpKkjpEeKTW66wLn5G9pUaFC2QIcgOPXODGFAaioNeviNXHWx
-	DABCiGjC7l1aogKHqL5Dq+UU2euyseBNbwzYP96ztYbZhhnKZtB/ZimfGDqwwHSHwMczRTs
-	4ITaOA4jtiEQr0pGePUmkvWNY3R+u+jFI7yUEn00PBqjBD7GNaKhxspBmtSR7ZC7/os3Hwy
-	0XhBhI35VXaIUOHer2IEJgK9mgIr9ZmMZBWjmjGQYz8G8j5sMW4aFCeq49C7y+ZSwgPQJXn
-	16wywZFMAR9hujBZVyTtSASPGgGHmAZ6poxAVb38Ae/4IV7KxrVW7MCLiyF0Q==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 3130668812617229589
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net] net: txgbe: change hw reset mode
-Date: Wed, 21 Jun 2023 17:06:45 +0800
-Message-Id: <20230621090645.125466-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A95CC2DE
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 09:08:32 +0000 (UTC)
+Received: from smtp-out1.suse.de (smtp-out1.suse.de [195.135.220.28])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C128F1996
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:08:30 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out1.suse.de (Postfix) with ESMTPS id 79A5521A52;
+	Wed, 21 Jun 2023 09:08:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1687338509; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a6q/P+JsxZ1/FMyKnygNf11cV6ffBMw7VK5hG2JsrKs=;
+	b=A14eNZReUlHloZXdum4ph+Y1XuAqkkZPEZ63idPxqEzc/bZ8qABRCtCiXm4WgMGyjsMUFm
+	Gjx9RbkU3n9s/bbLZ756QBPGXa7mJSC3sX775GGqCzdv/d0TS0ehcFUHzegSPgfVzVMXH6
+	ZzrjqNoe/8nQvHMhxEKCIiP7dmmVv5s=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1687338509;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=a6q/P+JsxZ1/FMyKnygNf11cV6ffBMw7VK5hG2JsrKs=;
+	b=19tSquV/X8hIcTEau2JGn3lH2ms3XDjQ9M3InaHup6Z3IJeNHFCYv/71ab0iI9+Puj5B1U
+	TKulYHO5x0bsvLCQ==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 56860134B1;
+	Wed, 21 Jun 2023 09:08:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id JNCYFA2+kmTpZgAAMHmgww
+	(envelope-from <hare@suse.de>); Wed, 21 Jun 2023 09:08:29 +0000
+Message-ID: <f8d789df-8ca7-9f9a-457d-4c87e2ca6d0a@suse.de>
+Date: Wed, 21 Jun 2023 11:08:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 4/4] net/tls: implement ->read_sock()
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, Jakub Kicinski <kuba@kernel.org>
+Cc: Christoph Hellwig <hch@lst.de>, Keith Busch <kbusch@kernel.org>,
+ linux-nvme@lists.infradead.org, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+ Boris Pismenny <boris.pismenny@gmail.com>
+References: <20230620102856.56074-1-hare@suse.de>
+ <20230620102856.56074-5-hare@suse.de>
+ <5bbb6ce4-a251-a357-3efc-9e899e470b9c@grimberg.me>
+ <20230620100843.19569d60@kernel.org>
+ <bae9a22a-246f-525e-d9a9-72a074d457c5@suse.de>
+ <35f5f82c-0a25-37aa-e017-99e6739fa307@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <35f5f82c-0a25-37aa-e017-99e6739fa307@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The old way to do hardware reset is sending reset command to firmware.
-In order to adapt to the new firmware, driver directly write register
-of LAN reset instead of the old way. And remove the redundant functions
-wx_reset_hostif() and wx_calculate_checksum().
+On 6/21/23 10:39, Sagi Grimberg wrote:
+> 
+>>> On Tue, 20 Jun 2023 16:21:22 +0300 Sagi Grimberg wrote:
+>>>>> +    err = tls_rx_reader_lock(sk, ctx, true);
+>>>>> +    if (err < 0)
+>>>>> +        return err;
+>>>>
+>>>> Unlike recvmsg or splice_read, the caller of read_sock is assumed to
+>>>> have the socket locked, and tls_rx_reader_lock also calls lock_sock,
+>>>> how is this not a deadlock?
+>>>
+>>> Yeah :|
+>>>
+>>>> I'm not exactly clear why the lock is needed here or what is the subtle
+>>>> distinction between tls_rx_reader_lock and what lock_sock provides.
+>>>
+>>> It's a bit of a workaround for the consistency of the data stream.
+>>> There's bunch of state in the TLS ULP and waiting for mem or data
+>>> releases and re-takes the socket lock. So to stop the flow annoying
+>>> corner case races I slapped a lock around all of the reader.
+>>>
+>>> IMHO depending on the socket lock for anything non-trivial and outside
+>>> of the socket itself is a bad idea in general.
+>>>
+>>> The immediate need at the time was that if you did a read() and someone
+>>> else did a peek() at the same time from a stream of A B C D you may read
+>>> A D B C.
+>>
+>> Leaving me ever so confused.
+>>
+>> read_sock() is a generic interface; we cannot require a protocol 
+>> specific lock before calling it.
+>>
+>> What to do now?
+>> Drop the tls_rx_read_lock from read_sock() again?
+> 
+> Probably just need to synchronize the readers by splitting that from
+> tls_rx_reader_lock:
+> -- 
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 53f944e6d8ef..53404c3fdcc6 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1845,13 +1845,10 @@ tls_read_flush_backlog(struct sock *sk, struct 
+> tls_prot_info *prot,
+>          return sk_flush_backlog(sk);
+>   }
+> 
+> -static int tls_rx_reader_lock(struct sock *sk, struct tls_sw_context_rx 
+> *ctx,
+> -                             bool nonblock)
+> +static int tls_rx_reader_acquire(struct sock *sk, struct 
+> tls_sw_context_rx *ctx,
+> +                            bool nonblock)
+>   {
+>          long timeo;
+> -       int err;
+> -
+> -       lock_sock(sk);
+> 
+>          timeo = sock_rcvtimeo(sk, nonblock);
+> 
+> @@ -1865,26 +1862,30 @@ static int tls_rx_reader_lock(struct sock *sk, 
+> struct tls_sw_context_rx *ctx,
+>                                !READ_ONCE(ctx->reader_present), &wait);
+>                  remove_wait_queue(&ctx->wq, &wait);
+> 
+> -               if (timeo <= 0) {
+> -                       err = -EAGAIN;
+> -                       goto err_unlock;
+> -               }
+> -               if (signal_pending(current)) {
+> -                       err = sock_intr_errno(timeo);
+> -                       goto err_unlock;
+> -               }
+> +               if (timeo <= 0)
+> +                       return -EAGAIN;
+> +               if (signal_pending(current))
+> +                       return sock_intr_errno(timeo);
+>          }
+> 
+>          WRITE_ONCE(ctx->reader_present, 1);
+> 
+>          return 0;
+> +}
+> 
+> -err_unlock:
+> -       release_sock(sk);
+> +static int tls_rx_reader_lock(struct sock *sk, struct tls_sw_context_rx 
+> *ctx,
+> +                             bool nonblock)
+> +{
+> +       int err;
+> +
+> +       lock_sock(sk);
+> +       err = tls_rx_reader_acquire(sk, ctx, nonblock);
+> +       if (err)
+> +               release_sock(sk);
+>          return err;
+>   }
+> 
+> -static void tls_rx_reader_unlock(struct sock *sk, struct 
+> tls_sw_context_rx *ctx)
+> +static void tls_rx_reader_release(struct sock *sk, struct 
+> tls_sw_context_rx *ctx)
+>   {
+>          if (unlikely(ctx->reader_contended)) {
+>                  if (wq_has_sleeper(&ctx->wq))
+> @@ -1896,6 +1897,11 @@ static void tls_rx_reader_unlock(struct sock *sk, 
+> struct tls_sw_context_rx *ctx)
+>          }
+> 
+>          WRITE_ONCE(ctx->reader_present, 0);
+> +}
+> +
+> +static void tls_rx_reader_unlock(struct sock *sk, struct 
+> tls_sw_context_rx *ctx)
+> +{
+> +       tls_rx_reader_release(sk, ctx);
+>          release_sock(sk);
+>   }
+> -- 
+> 
+> Then read_sock can just acquire/release.
 
-Fixes: b08012568ebb ("net: txgbe: Reset hardware")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
----
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 65 -------------------
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |  1 -
- drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |  8 +--
- 3 files changed, 4 insertions(+), 70 deletions(-)
+Good suggestion.
+Will be including it in the next round.
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index ca409b4054d0..6cf49db55938 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -431,71 +431,6 @@ int wx_read_ee_hostif_buffer(struct wx *wx,
- }
- EXPORT_SYMBOL(wx_read_ee_hostif_buffer);
- 
--/**
-- *  wx_calculate_checksum - Calculate checksum for buffer
-- *  @buffer: pointer to EEPROM
-- *  @length: size of EEPROM to calculate a checksum for
-- *  Calculates the checksum for some buffer on a specified length.  The
-- *  checksum calculated is returned.
-- **/
--static u8 wx_calculate_checksum(u8 *buffer, u32 length)
--{
--	u8 sum = 0;
--	u32 i;
--
--	if (!buffer)
--		return 0;
--
--	for (i = 0; i < length; i++)
--		sum += buffer[i];
--
--	return (u8)(0 - sum);
--}
--
--/**
-- *  wx_reset_hostif - send reset cmd to fw
-- *  @wx: pointer to hardware structure
-- *
-- *  Sends reset cmd to firmware through the manageability
-- *  block.
-- **/
--int wx_reset_hostif(struct wx *wx)
--{
--	struct wx_hic_reset reset_cmd;
--	int ret_val = 0;
--	int i;
--
--	reset_cmd.hdr.cmd = FW_RESET_CMD;
--	reset_cmd.hdr.buf_len = FW_RESET_LEN;
--	reset_cmd.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
--	reset_cmd.lan_id = wx->bus.func;
--	reset_cmd.reset_type = (u16)wx->reset_type;
--	reset_cmd.hdr.checksum = 0;
--	reset_cmd.hdr.checksum = wx_calculate_checksum((u8 *)&reset_cmd,
--						       (FW_CEM_HDR_LEN +
--							reset_cmd.hdr.buf_len));
--
--	for (i = 0; i <= FW_CEM_MAX_RETRIES; i++) {
--		ret_val = wx_host_interface_command(wx, (u32 *)&reset_cmd,
--						    sizeof(reset_cmd),
--						    WX_HI_COMMAND_TIMEOUT,
--						    true);
--		if (ret_val != 0)
--			continue;
--
--		if (reset_cmd.hdr.cmd_or_resp.ret_status ==
--		    FW_CEM_RESP_STATUS_SUCCESS)
--			ret_val = 0;
--		else
--			ret_val = -EFAULT;
--
--		break;
--	}
--
--	return ret_val;
--}
--EXPORT_SYMBOL(wx_reset_hostif);
--
- /**
-  *  wx_init_eeprom_params - Initialize EEPROM params
-  *  @wx: pointer to hardware structure
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-index c173c56f0ab5..9faacf0c51d1 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-@@ -14,7 +14,6 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
- int wx_read_ee_hostif(struct wx *wx, u16 offset, u16 *data);
- int wx_read_ee_hostif_buffer(struct wx *wx,
- 			     u16 offset, u16 words, u16 *data);
--int wx_reset_hostif(struct wx *wx);
- void wx_init_eeprom_params(struct wx *wx);
- void wx_get_mac_addr(struct wx *wx, u8 *mac_addr);
- void wx_init_rx_addrs(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-index ebc46f3be056..e571f494bb4a 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-@@ -270,16 +270,16 @@ static void txgbe_reset_misc(struct wx *wx)
- int txgbe_reset_hw(struct wx *wx)
- {
- 	int status;
-+	u32 val;
- 
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = wx_stop_adapter(wx);
- 	if (status != 0)
- 		return status;
- 
--	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
--	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP)))
--		wx_reset_hostif(wx);
--
-+	val = WX_MIS_RST_LAN_RST(wx->bus.func);
-+	wr32(wx, WX_MIS_RST, val | rd32(wx, WX_MIS_RST));
-+	WX_WRITE_FLUSH(wx);
- 	usleep_range(10, 100);
- 
- 	status = wx_check_flash_load(wx, TXGBE_SPI_ILDR_STATUS_LAN_SW_RST(wx->bus.func));
--- 
-2.27.0
+Cheers,
+
+Hannes
 
 
