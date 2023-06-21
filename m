@@ -1,163 +1,109 @@
-Return-Path: <netdev+bounces-12492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82B97737C76
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 09:41:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 48C43737C9A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:01:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E80E1C20DF1
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 07:41:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 344022814D7
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 08:01:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47982BE61;
-	Wed, 21 Jun 2023 07:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67FF8C2D6;
+	Wed, 21 Jun 2023 08:01:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 382411C3E
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 07:41:45 +0000 (UTC)
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33A111A8
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 00:41:44 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3f9c0abc876so1817155e9.3
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 00:41:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A32EC15E
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:01:30 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A55C61710
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 01:01:28 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-987341238aeso680033966b.3
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 01:01:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1687333302; x=1689925302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=hNubZGxL9mnAxf2nB2QeV5y6P7eAxnFpZSDeTanD4pY=;
-        b=RdvdaUn6eHY6wzTsUxt0yn3K26iQWe75KSAWwMSuJVXS3SutxpzhfRMXTp0bP9XhBE
-         7C2Mxf0rEesT7qfvmv3yJnFZgq8YLsshcqhAoEKB7UjczN2UsQ1QhHgnqyu/Kxp0p3f0
-         r3SRfzKMyFSLBKwMqMORg6jh9H6vC/jFh4ru2S1kHbY8jnBVUNwA1NV0bItI/TtioGJe
-         DKc8PwTsEWCjxzPBgDQO9XytT51RttGfJbjRKmJwpYNN/u5NnKgqPyt8WvozZUUp0Xfh
-         Ro5q6tGkaOvHA9NoWsfEmsl+5CLgZCHvIhKCCHR873tLBu8eU0Up2Pnrw6wN2o0ZlMha
-         f68Q==
+        d=isovalent.com; s=google; t=1687334487; x=1689926487;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=R/uzmr18bm+TTjaklP1XdaDPfpw9sySrUHmwXE1mODw=;
+        b=e7vij1IPM9/UbQv7lIkfk8Pums7FuQF+Z4+boaRaq/yOmX5bRKsQ0mrPS3Nymz1VBd
+         D5+sCrSIWI15UDJDg3dotNPf8SGLFkWOSu1UaY6atV+NXgkdQTzBpbFcQV7VxSsaJ3XK
+         sPzb826AwJaHlXnRoouS1CGTsh4cJz/T9xQ2q1LJBpEBIkQ0yYZHUI+SkzDsny7n1MKx
+         8j4OZcdBBOPx/MifQDfJLAkUYJtPabtLnY3FxTzDV0Js4uCMarY+tYYns35KlJX7t4Vr
+         6E5qhNN1jySgnuAhgC38rBXoZIRUH+DXXCW8nAGs92odcVULACwpKbPON4RLt2T1EjnU
+         APtw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687333302; x=1689925302;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1687334487; x=1689926487;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hNubZGxL9mnAxf2nB2QeV5y6P7eAxnFpZSDeTanD4pY=;
-        b=PASZgbFk2EwAKOY5O138ge/VkTKA3LB5dd2T2F/2r2xyXrgWYEALkrm8R9dESYdCyK
-         oaONapDbGgKohj/USfJlDEsXWoz9kD7DGQYN4D/J3cd/CDZMBlh3d/cMUIM5/i3zU5Rj
-         XlRPx4gh15h6expAmrqtVF91ejPtOJ//BLmq7WrwozcgCeU1qv9MQeQ37GIFcPta/90a
-         XhKyznoR1kHr6IbtP5Nf30rVlD6vN40rtoR1GzwTWT5dLBQ/6+GBm09fKFCuCaWFNAms
-         DFQ6Yd9zBDTkZtXzpYoJUOzgXqggO0/9qHUturdQTL8qhv6s0Erm8BfkSX8GEdlwLE17
-         +sLw==
-X-Gm-Message-State: AC+VfDyazkP3LZi6z+Ey6KZZC/AijEUkCTfCl0PpZ00lAr645LFykwa3
-	QxHoR8lF1rdC5uLWSaG+s5Q=
-X-Google-Smtp-Source: ACHHUZ6mtgyBVi4Y/3qFv+B8wR/yIruBEJ+XACvo8zxYs+mE9hHGHV5gkdD/fE8uZr4t5pebMx7R7w==
-X-Received: by 2002:a7b:c4d5:0:b0:3f9:c933:c7d3 with SMTP id g21-20020a7bc4d5000000b003f9c933c7d3mr387wmk.19.1687333302429;
-        Wed, 21 Jun 2023 00:41:42 -0700 (PDT)
-Received: from tycho (p200300c1c74c0400ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c74c:400:ba85:84ff:febf:2b17])
-        by smtp.gmail.com with ESMTPSA id 9-20020a05600c240900b003f93c450657sm4156668wmp.38.2023.06.21.00.41.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 00:41:42 -0700 (PDT)
-Sender: Zahari Doychev <zahari.doychev@googlemail.com>
-Date: Wed, 21 Jun 2023 09:41:40 +0200
-From: Zahari Doychev <zahari.doychev@linux.com>
-To: Ido Schimmel <idosch@idosch.org>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org, 
-	hmehrtens@maxlinear.com, aleksander.lobakin@intel.com, simon.horman@corigine.com, 
-	Zahari Doychev <zdoychev@maxlinear.com>
-Subject: Re: [PATCH iproute2-next v2] f_flower: add cfm support
-Message-ID: <7qu4upqp3nm5kmaf2tyvqui4som5sdxzl4w3v6at2ljiikvcfw@kdlyqyftvjpc>
-References: <20230620201036.539994-1-zahari.doychev@linux.com>
- <ZJKSDdC+YNlvCXVv@shredder>
+        bh=R/uzmr18bm+TTjaklP1XdaDPfpw9sySrUHmwXE1mODw=;
+        b=cbfKZ3As9pHrHgPq2z4aetsZaOrW8GpyDWy1rT59yiR72/7HdqXIGcZ8/iaAqum55R
+         IZDZDv5HEiXPDqt8or79HO2rwpTz9i1gf/d2kxsNS25YCXv+T8155OUDOM0DjzeVRkH9
+         YiddwdDc2RbuJmaMqa9pBmmwWwL1xNqLg8F9qrHz679yWjYmdAm0R2JvAx23zFC7jK8Y
+         VLeherIfbLyKtPpX/9YuMTtm75f0qAaW3/ErIAeC8ByqFkbYktbe7MQ920OjM3NN1YrS
+         GXagCmuYKVDDrdXM0+bjw8LIm/LqtSFMRrUBiqNlDCAEf3iyg+9qL1biFKQ3J2l/8+3x
+         ELMA==
+X-Gm-Message-State: AC+VfDxPKCYduJVOQRxqos4T+M4cth5QoS6e2ndtdpknkhLOVLNtqmAB
+	euqL90aV1ShonjjcrkH/x9nBD2KMTV3+RGNEspRgvg==
+X-Google-Smtp-Source: ACHHUZ6zgnnZUzg5X4rETT0LUikk9eZ0usOgOL/ZRXRSJfQR8fNVFL4zwQoeQchY/gMVrgg7I66L8mMB3WJKnc5S+DQ=
+X-Received: by 2002:a17:907:6095:b0:989:1cc5:24a with SMTP id
+ ht21-20020a170907609500b009891cc5024amr4346200ejc.13.1687334486859; Wed, 21
+ Jun 2023 01:01:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJKSDdC+YNlvCXVv@shredder>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+References: <CAN+4W8ge-ZQjins-E1=GHDnsi9myFqt7pwNqMkUQHZOPHQhFvQ@mail.gmail.com>
+ <20230620183123.74585-1-kuniyu@amazon.com>
+In-Reply-To: <20230620183123.74585-1-kuniyu@amazon.com>
+From: Lorenz Bauer <lmb@isovalent.com>
+Date: Wed, 21 Jun 2023 09:01:15 +0100
+Message-ID: <CAN+4W8iSA0Y8iEvYg79=CTNvwkQB5qs_F3vjE7vep-eHR01oJw@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v2 3/6] net: remove duplicate reuseport_lookup functions
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
+	daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, haoluo@google.com, hemanthmalla@gmail.com, 
+	joe@wand.net.nz, john.fastabend@gmail.com, jolsa@kernel.org, 
+	kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-kselftest@vger.kernel.org, martin.lau@linux.dev, mykolal@fb.com, 
+	netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com, shuah@kernel.org, 
+	song@kernel.org, willemdebruijn.kernel@gmail.com, yhs@fb.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 09:00:45AM +0300, Ido Schimmel wrote:
-> On Tue, Jun 20, 2023 at 10:10:36PM +0200, Zahari Doychev wrote:
-> > From: Zahari Doychev <zdoychev@maxlinear.com>
-> > 
-> > Add support for matching on CFM Maintenance Domain level and opcode.
-> 
-> [...]
-> 
-> > 
-> > Signed-off-by: Zahari Doychev <zdoychev@maxlinear.com>
-> 
-> Reviewed-by: Ido Schimmel <idosch@nvidia.com>
-> 
-> Few comments I missed earlier
-> 
-> > ---
-> >  include/uapi/linux/pkt_cls.h |  9 ++++
-> 
-> iproute2 maintainers sync UAPI files using a script and I believe the
-> preference is for submitters to not touch these files or update them in
-> a separate patch that the maintainers can easily discard.
-> 
-> >  lib/ll_proto.c               |  1 +
-> >  man/man8/tc-flower.8         | 29 ++++++++++-
-> >  tc/f_flower.c                | 98 +++++++++++++++++++++++++++++++++++-
-> >  4 files changed, 135 insertions(+), 2 deletions(-)
-> 
-> [...]
-> 
-> > +static void flower_print_cfm(struct rtattr *attr)
-> > +{
-> > +	struct rtattr *tb[TCA_FLOWER_KEY_CFM_OPT_MAX + 1];
-> > +	struct rtattr *v;
-> > +	SPRINT_BUF(out);
-> > +	size_t sz = 0;
-> > +
-> > +	if (!attr || !(attr->rta_type & NLA_F_NESTED))
-> > +		return;
-> > +
-> > +	parse_rtattr(tb, TCA_FLOWER_KEY_CFM_OPT_MAX, RTA_DATA(attr),
-> > +		     RTA_PAYLOAD(attr));
-> > +
-> > +	print_nl();
-> > +	print_string(PRINT_FP, NULL, "  cfm", NULL);
-> > +	open_json_object("cfm");
-> > +
-> > +	v = tb[TCA_FLOWER_KEY_CFM_MD_LEVEL];
-> > +	if (v) {
-> > +		sz += sprintf(out, " mdl %u", rta_getattr_u8(v));
-> > +		print_hhu(PRINT_JSON, "mdl", NULL, rta_getattr_u8(v));
-> > +
-> 
-> Unnecessary blank line
+On Tue, Jun 20, 2023 at 7:31=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> Good point.  This is based on an assumption that all SO_REUSEPORT
+> sockets have the same score, which is wrong for two corner cases
+> if reuseport_has_conns() =3D=3D true :
+>
+>   1) SO_INCOMING_CPU is set
+>      -> selected sk might have +1 score
+>
+>   2) BPF prog returns ESTABLISHED and/or SO_INCOMING_CPU sk
+>      -> selected sk will have more than 8
+>
+> Using the old score could trigger more lookups depending on the
+> order that sockets are created.
 
-somehow I missed that :( I will fix it and resend.
+So the result will still be correct, but it's less performant? Happy
+to fix a perf regression, but if the result is incorrect this might
+need a separate fix?
 
-thanks
-zahari
-
-> 
-> > +	}
-> > +
-> > +	v = tb[TCA_FLOWER_KEY_CFM_OPCODE];
-> > +	if (v) {
-> > +		sprintf(out + sz, " op %u", rta_getattr_u8(v));
-> > +		print_hhu(PRINT_JSON, "op", NULL, rta_getattr_u8(v));
-> > +
-> 
-> Likewise
-> 
-> > +	}
-> > +
-> > +	close_json_object();
-> > +	print_string(PRINT_FP, "cfm", "%s", out);
-> > +}
-> 
+Best
+Lorenz
 
