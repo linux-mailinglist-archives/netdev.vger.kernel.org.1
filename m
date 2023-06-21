@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-12463-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DDA457379D3
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 05:41:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 788D57379D0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 05:41:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D9BE1280E2C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 03:41:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F711C20DB9
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 03:41:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 628626FA9;
-	Wed, 21 Jun 2023 03:40:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D26FA17EF;
+	Wed, 21 Jun 2023 03:40:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10B7023CB
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA1F123AA
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:40:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 79C94C4339A;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 39AFCC433CD;
 	Wed, 21 Jun 2023 03:40:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687318822;
-	bh=5gTtOrQ7jIdE7Jfqb/CAc47MksZY0gHEsCCzq5fyggI=;
+	bh=n7YDp81aRWowmsTNymFRUrAAIAZ3gde9nayJmXXBAiU=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=RJUC2yi4+7/S0IHf2t6/l4SfNPTjhVXW0PO5626Cb/vQjizNkcrnXUM9DzAljPSaV
-	 1436cMeBdSAZn+xIO0BtmqgyFN1EOsJ/0/0K0rKk750Q6MHcGFJkJvHf/Caa7+B9Kh
-	 A1nMDMXfulrteMAOSzIYJWglmFVcRiurs7iGdrgMO5ZCFMLx0ZjqEE2GDKFqrWCpjW
-	 cL1Z+gLShk90dYUfi7zzcisks3jTqGt0T7Kzzp7ckqveDN6xajP1y3r5RwE85XPRQf
-	 5YlgO4sCMKfvlga4+3Nj66ZRFp3UdMtvQA1B+UjsnaBJIT/ON0G6S4ctplP/Klnj5q
-	 W8PEPuiYRRDQg==
+	b=S1J5fp9lzq6jqSG5No0/nxUTDa8ujViXcQEJ1cEd1jdhQsQKP48b1eXnIXB9Vi1Sk
+	 /P1lFml5RkfNoR65ZGE39/BTiY1u39+MQetFGl5DHvpwPDU0eHZgsWG20WkL9r7TD7
+	 N0TIRG9iH/ajvl2e8Gu0t/czHTDxeMuvQQWe06dko4GCLjlnvOr+M3XdTU+jNssmHu
+	 qTdDOQRZwUhrrO+lDpkorQAoZnOPSEkTzGB6ZaPvhG5KUpWMJ5Kcgfr55d5dtN3RGe
+	 waG9QNCAgkwAS2tp0QK7cTkMPytUoNOsBbMazNN/cNwK20iKFHaiXRwnq3rlQ8N7NL
+	 FAziqBphSCZ4A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3E686E2A035;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 1C872E21EDF;
 	Wed, 21 Jun 2023 03:40:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,36 +41,37 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v1] net: phy-c45: Fix genphy_c45_ethtool_set_eee
- description
+Subject: Re: [PATCH net-next] net: remove sk_is_ipmr() and sk_is_icmpv6() helpers
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168731882224.8371.10249351032813840219.git-patchwork-notify@kernel.org>
+ <168731882210.8371.9465260672898488740.git-patchwork-notify@kernel.org>
 Date: Wed, 21 Jun 2023 03:40:22 +0000
-References: <20230619220332.4038924-1-andrew@lunn.ch>
-In-Reply-To: <20230619220332.4038924-1-andrew@lunn.ch>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, rmk+kernel@armlinux.org.uk
+References: <20230619124336.651528-1-edumazet@google.com>
+In-Reply-To: <20230619124336.651528-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ leitao@debian.org, willemb@google.com, dsahern@kernel.org, kuniyu@amazon.com
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Jun 2023 00:03:32 +0200 you wrote:
-> The text has been cut/paste from genphy_c45_ethtool_get_eee but not
-> changed to reflect it performs set.
+On Mon, 19 Jun 2023 12:43:35 +0000 you wrote:
+> Blamed commit added these helpers for sake of detecting RAW
+> sockets specific ioctl.
 > 
-> Additionally, extend the comment. This function implements the logic
-> that eee_enabled has global control over EEE. When eee_enabled is
-> false, no link modes will be advertised, and as a result, the MAC
-> should not transmit LPI.
+> syzbot complained about it [1].
+> 
+> Issue here is that RAW sockets could pretend there was no need
+> to call ipmr_sk_ioctl()
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v1] net: phy-c45: Fix genphy_c45_ethtool_set_eee description
-    https://git.kernel.org/netdev/net-next/c/b7c31ccd60d1
+  - [net-next] net: remove sk_is_ipmr() and sk_is_icmpv6() helpers
+    https://git.kernel.org/netdev/net-next/c/634236b34d7a
 
 You are awesome, thank you!
 -- 
