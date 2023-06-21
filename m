@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-12742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A27F738C41
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:50:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 434FF738C46
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:50:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBB091C20F14
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:50:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750901C20F70
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:50:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBAB11B8EE;
-	Wed, 21 Jun 2023 16:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1356B1B8FD;
+	Wed, 21 Jun 2023 16:46:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04C319E50
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:46:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 010CD19E50
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:46:26 +0000 (UTC)
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 53169E9;
-	Wed, 21 Jun 2023 09:46:15 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33CEE129;
+	Wed, 21 Jun 2023 09:46:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description;
-	bh=jTDGdnu+fG/6kslyclH2srz/sHr6MJEFetnoOEAqThE=; b=J7syLfgLtqZEvF+FaGdNCpIxYK
-	FGrBsHrwiUgwuOgUEvOX2i7PWXG/ZXhqiAhW6CpfyR4l4rDqNGULpmdUDJAIMFqrXnlWMyJuuuQew
-	CRIwuxDz6BodPG9A2vL0dc3r9jSUjJ096kbZOKhyXbwTEF5WnPbOv35W1YxmyI5xeO3eW9SZeu6Ui
-	elEI4SaI8VG431yTXK/Agfd1OvARTxSno98kcl4XPxpk7V8Q46NmOwcGLYx7LMoOCYaku65I0hGaM
-	vfxZSH7R76ZxcVPpw10enxxDEKsn/iEIr1hxmLFS6RNnFgRQiKGzIC7i3HzHCE4ZskLC1FZi9nT0k
-	4UQzvpAA==;
+	bh=eONAo72om3NJJPfeQU98nnaiEyx1girYaBRrJpkgqkU=; b=JXUQqB4dBUOu93/qitkyE97f3Z
+	vicwKtf2V+aPt3Dbg9/7v8WVwzM1uW09KbzEgrV7HoZavbGv57iMq0P8yKRiVHqblH2VN4jJwQ51P
+	3UBOa8B2hu7+kv08AyN/nJEB47YJdT5WmFl8qEnhdI5jyaHNGAsAFAZ1nL/q35cRWiLbB1YToy/e8
+	42a1+W41mg0rHN6jVqxvTZByBSAn9Z9fMtkxjLN56svcogUEoy8anGD/EDPT8G5k/Bd4memePz7s9
+	CrQmO7YpoNGtdgXoNsSSDZ7tXeMZyLnRddcjDjPExN2w8ZnbHBneVjox+kOnqzeVCqXZWHclrs02X
+	NKuWOUMg==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qC0y1-00EjDk-FK; Wed, 21 Jun 2023 16:46:01 +0000
+	id 1qC0y1-00EjDm-IE; Wed, 21 Jun 2023 16:46:01 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: linux-mm@kvack.org,
 	Andrew Morton <akpm@linux-foundation.org>
@@ -44,9 +44,9 @@ Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-nfs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 03/13] scatterlist: Add sg_set_folio()
-Date: Wed, 21 Jun 2023 17:45:47 +0100
-Message-Id: <20230621164557.3510324-4-willy@infradead.org>
+Subject: [PATCH 04/13] i915: Convert shmem_sg_free_table() to use a folio_batch
+Date: Wed, 21 Jun 2023 17:45:48 +0100
+Message-Id: <20230621164557.3510324-5-willy@infradead.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20230621164557.3510324-1-willy@infradead.org>
 References: <20230621164557.3510324-1-willy@infradead.org>
@@ -64,52 +64,139 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This wrapper for sg_set_page() lets drivers add folios to a scatterlist
-more easily.  We could, perhaps, do better by using a different page
-in the folio if offset is larger than UINT_MAX, but let's hope we get
-a better data structure than this before we need to care about such
-large folios.
+Remove a few hidden compound_head() calls by converting the returned
+page to a folio once and using the folio APIs.  We also only increment
+the refcount on the folio once instead of once for each page.  Ideally,
+we would have a for_each_sgt_folio macro, but until then this will do.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- include/linux/scatterlist.h | 24 ++++++++++++++++++++++++
- 1 file changed, 24 insertions(+)
+ drivers/gpu/drm/i915/gem/i915_gem_shmem.c | 55 +++++++++++++----------
+ 1 file changed, 31 insertions(+), 24 deletions(-)
 
-diff --git a/include/linux/scatterlist.h b/include/linux/scatterlist.h
-index ec46d8e8e49d..77df3d7b18a6 100644
---- a/include/linux/scatterlist.h
-+++ b/include/linux/scatterlist.h
-@@ -141,6 +141,30 @@ static inline void sg_set_page(struct scatterlist *sg, struct page *page,
- 	sg->length = len;
+diff --git a/drivers/gpu/drm/i915/gem/i915_gem_shmem.c b/drivers/gpu/drm/i915/gem/i915_gem_shmem.c
+index 33d5d5178103..8f1633c3fb93 100644
+--- a/drivers/gpu/drm/i915/gem/i915_gem_shmem.c
++++ b/drivers/gpu/drm/i915/gem/i915_gem_shmem.c
+@@ -19,13 +19,13 @@
+ #include "i915_trace.h"
+ 
+ /*
+- * Move pages to appropriate lru and release the pagevec, decrementing the
+- * ref count of those pages.
++ * Move folios to appropriate lru and release the batch, decrementing the
++ * ref count of those folios.
+  */
+-static void check_release_pagevec(struct pagevec *pvec)
++static void check_release_folio_batch(struct folio_batch *fbatch)
+ {
+-	check_move_unevictable_pages(pvec);
+-	__pagevec_release(pvec);
++	check_move_unevictable_folios(fbatch);
++	__folio_batch_release(fbatch);
+ 	cond_resched();
  }
  
-+/**
-+ * sg_set_folio - Set sg entry to point at given folio
-+ * @sg:		 SG entry
-+ * @folio:	 The folio
-+ * @len:	 Length of data
-+ * @offset:	 Offset into folio
-+ *
-+ * Description:
-+ *   Use this function to set an sg entry pointing at a folio, never assign
-+ *   the folio directly. We encode sg table information in the lower bits
-+ *   of the folio pointer. See sg_page() for looking up the page belonging
-+ *   to an sg entry.
-+ *
-+ **/
-+static inline void sg_set_folio(struct scatterlist *sg, struct folio *folio,
-+			       size_t len, size_t offset)
-+{
-+	WARN_ON_ONCE(len > UINT_MAX);
-+	WARN_ON_ONCE(offset > UINT_MAX);
-+	sg_assign_page(sg, &folio->page);
-+	sg->offset = offset;
-+	sg->length = len;
-+}
-+
- static inline struct page *sg_page(struct scatterlist *sg)
+@@ -33,24 +33,29 @@ void shmem_sg_free_table(struct sg_table *st, struct address_space *mapping,
+ 			 bool dirty, bool backup)
  {
- #ifdef CONFIG_DEBUG_SG
+ 	struct sgt_iter sgt_iter;
+-	struct pagevec pvec;
++	struct folio_batch fbatch;
++	struct folio *last = NULL;
+ 	struct page *page;
+ 
+ 	mapping_clear_unevictable(mapping);
+ 
+-	pagevec_init(&pvec);
++	folio_batch_init(&fbatch);
+ 	for_each_sgt_page(page, sgt_iter, st) {
+-		if (dirty)
+-			set_page_dirty(page);
++		struct folio *folio = page_folio(page);
+ 
++		if (folio == last)
++			continue;
++		last = folio;
++		if (dirty)
++			folio_mark_dirty(folio);
+ 		if (backup)
+-			mark_page_accessed(page);
++			folio_mark_accessed(folio);
+ 
+-		if (!pagevec_add(&pvec, page))
+-			check_release_pagevec(&pvec);
++		if (!folio_batch_add(&fbatch, folio))
++			check_release_folio_batch(&fbatch);
+ 	}
+-	if (pagevec_count(&pvec))
+-		check_release_pagevec(&pvec);
++	if (fbatch.nr)
++		check_release_folio_batch(&fbatch);
+ 
+ 	sg_free_table(st);
+ }
+@@ -63,8 +68,7 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
+ 	unsigned int page_count; /* restricted by sg_alloc_table */
+ 	unsigned long i;
+ 	struct scatterlist *sg;
+-	struct page *page;
+-	unsigned long last_pfn = 0;	/* suppress gcc warning */
++	unsigned long next_pfn = 0;	/* suppress gcc warning */
+ 	gfp_t noreclaim;
+ 	int ret;
+ 
+@@ -95,6 +99,7 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
+ 	sg = st->sgl;
+ 	st->nents = 0;
+ 	for (i = 0; i < page_count; i++) {
++		struct folio *folio;
+ 		const unsigned int shrink[] = {
+ 			I915_SHRINK_BOUND | I915_SHRINK_UNBOUND,
+ 			0,
+@@ -103,12 +108,12 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
+ 
+ 		do {
+ 			cond_resched();
+-			page = shmem_read_mapping_page_gfp(mapping, i, gfp);
+-			if (!IS_ERR(page))
++			folio = shmem_read_folio_gfp(mapping, i, gfp);
++			if (!IS_ERR(folio))
+ 				break;
+ 
+ 			if (!*s) {
+-				ret = PTR_ERR(page);
++				ret = PTR_ERR(folio);
+ 				goto err_sg;
+ 			}
+ 
+@@ -147,19 +152,21 @@ int shmem_sg_alloc_table(struct drm_i915_private *i915, struct sg_table *st,
+ 
+ 		if (!i ||
+ 		    sg->length >= max_segment ||
+-		    page_to_pfn(page) != last_pfn + 1) {
++		    folio_pfn(folio) != next_pfn) {
+ 			if (i)
+ 				sg = sg_next(sg);
+ 
+ 			st->nents++;
+-			sg_set_page(sg, page, PAGE_SIZE, 0);
++			sg_set_folio(sg, folio, folio_size(folio), 0);
+ 		} else {
+-			sg->length += PAGE_SIZE;
++			/* XXX: could overflow? */
++			sg->length += folio_size(folio);
+ 		}
+-		last_pfn = page_to_pfn(page);
++		next_pfn = folio_pfn(folio) + folio_nr_pages(folio);
++		i += folio_nr_pages(folio) - 1;
+ 
+ 		/* Check that the i965g/gm workaround works. */
+-		GEM_BUG_ON(gfp & __GFP_DMA32 && last_pfn >= 0x00100000UL);
++		GEM_BUG_ON(gfp & __GFP_DMA32 && next_pfn >= 0x00100000UL);
+ 	}
+ 	if (sg) /* loop terminated early; short sg table */
+ 		sg_mark_end(sg);
 -- 
 2.39.2
 
