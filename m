@@ -1,293 +1,166 @@
-Return-Path: <netdev+bounces-12655-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12659-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5CF537385B5
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:50:53 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7D1AA7385BD
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:52:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12F232815DB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:50:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7375281650
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FB0418AF5;
-	Wed, 21 Jun 2023 13:49:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2036B18AED;
+	Wed, 21 Jun 2023 13:50:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D58E18C0A
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:49:40 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE15E1BCA;
-	Wed, 21 Jun 2023 06:49:37 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35LDkl4N021565;
-	Wed, 21 Jun 2023 13:49:34 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
- : date : message-id : in-reply-to : references : content-transfer-encoding
- : mime-version; s=pp1; bh=kH7D5GG6XvXWuo2k9pXAPdNcycrfpNYlhPm8LAAQcmc=;
- b=ohDC16mt2IDeYArdx2qr2GBqFRRyYWiiDtgfD1eeF3OC5BWk9X/EVm195KAz7iFmnOcT
- 8+SkEpbVvIEJBdWBTbM9TEKF5ZMUG4mDMC8i8jd6nLsmqJnVWDhsBjc8Z7ioM9uK09+9
- z5gH58ZZ3i7oxEIPxXS1mjjezKiYdi9rCb+6RzXd3wcXhmRyEiV1VLmGPIWoyXgryo6Q
- l/L2nO9dwcFqSeU0bjD2SWs/iCO6CKVMThwdvcIbSQKtWK9MIlKXd8py7g6YMdIEz8JM
- R/UF/+LvHcSk4GakTmGjqoX0xk+hk3D7l12neiSQ1ZVsBTMmvBzLe2vaWQnUFD7SXlNd 1A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc2ctr25j-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Jun 2023 13:49:34 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35LDlTjq024307;
-	Wed, 21 Jun 2023 13:49:33 GMT
-Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rc2ctr24c-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Jun 2023 13:49:32 +0000
-Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
-	by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35L2SdPC012944;
-	Wed, 21 Jun 2023 13:49:30 GMT
-Received: from smtprelay03.fra02v.mail.ibm.com ([9.218.2.224])
-	by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3r94f5a45w-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 21 Jun 2023 13:49:30 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay03.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35LDnRYJ20710054
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Wed, 21 Jun 2023 13:49:27 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 0B66B2004B;
-	Wed, 21 Jun 2023 13:49:27 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id DA04220043;
-	Wed, 21 Jun 2023 13:49:26 +0000 (GMT)
-Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTPS;
-	Wed, 21 Jun 2023 13:49:26 +0000 (GMT)
-Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
-	id 86E41E13EF; Wed, 21 Jun 2023 15:49:26 +0200 (CEST)
-From: Alexandra Winter <wintera@linux.ibm.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Thorsten Winkler <twinkler@linux.ibm.com>,
-        Alexandra Winter <wintera@linux.ibm.com>
-Subject: [PATCH net-next v2 4/4] s390/ctcm: Convert sprintf/snprintf to scnprintf
-Date: Wed, 21 Jun 2023 15:49:21 +0200
-Message-Id: <20230621134921.904217-5-wintera@linux.ibm.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230621134921.904217-1-wintera@linux.ibm.com>
-References: <20230621134921.904217-1-wintera@linux.ibm.com>
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: aX95AOeXMz4NuzuR9odfHRE7QXzcGY-J
-X-Proofpoint-ORIG-GUID: A_TPtshQUDGSLsXr1RFtMQ9jwUU1ZP7R
-Content-Transfer-Encoding: 8bit
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C65218AE0
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:50:58 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2132.outbound.protection.outlook.com [40.107.220.132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D951719B;
+	Wed, 21 Jun 2023 06:50:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QSKm34Uet1DMqhR+FrdI1Myv7zk8mDHw9tO+We/76kOzc6B3l4JuJ09eI+m7wpPlmp2qgISqHMHYKR7N1Ic9qdEaGPKU8P4PAa7qNgR645vnNAavx6hX+lx3hG2qiRVIvjNtoeDr+/Poub83EIrU2k9VCSBdRp/ZDFhC8VlCZqwulT/6M+pFft/kTxET5VRrORRvWSITBbICAJw0pNNcGR9989mPucs2laX9aby+NFfhj87tzVNEu8otzNtOb1XLGMYF5/bCSvNNQmiKaxZw0PSoEzN0VclTp2s+EWHAtQMfBP9ImvmFQH2qbHeatl4pBvt9uZnHxJpVHsABDu5cng==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=39D6h9Zt5zt8SlABZClFtsBArtpX3/Y/iw3Th0aPvY4=;
+ b=jhcQJroEXY3SPYm5LYoAQlW8Aj4lJpzVFVxPRVf3YJfLc+QYOH7JC8I6FHZ0O6W+0hI9AFmjvlR456B+ckbMMd2m0WXdh0pE/1MjrECbsfVRf+4zEPFhdj8CiFP5aDfai1IJbPFXJCKmqb1K67qkqKu0gQBeuEOkGsMzjdpwrd4TJJMeKqzq1q0ldQyDwDCQdIfC75kt1jX62wmGZb47C/6PGQg936Xf//WPJKi0NrcuRLOAWTlbjAyE4wJpKbKsmgO1E6I2dl0XRxMSnxITcCsA4c3Srhh67o4HSha8/p5H+r3ZIPtOw6nL0ivM8JgVn/R8XmS+00DdoH18unIlOQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=39D6h9Zt5zt8SlABZClFtsBArtpX3/Y/iw3Th0aPvY4=;
+ b=QxGGVOBp6NgGrIOyysmC4o7xzT3kxjptpSXIbLWb9+pTXByYsc/TPIPDGsZCkvyqjXi4n2+j6TVR7TRexdyZKW1eT1ALyUqllJJfxDxp7Nawun2LV3gusPYl6fPxYRReDEh1t9o8RWi2/8/2OmzaKP+8e1kXMs4QYbWF2TVfG8A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CO1PR13MB4902.namprd13.prod.outlook.com (2603:10b6:303:f0::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
+ 2023 13:50:54 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 13:50:54 +0000
+Date: Wed, 21 Jun 2023 15:50:42 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Markus Schneider-Pargmann <msp@baylibre.com>
+Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 13/16] can: m_can: Introduce a tx_fifo_in_flight
+ counter
+Message-ID: <ZJMAMouJBKBzMxN+@corigine.com>
+References: <20230315110546.2518305-1-msp@baylibre.com>
+ <20230315110546.2518305-14-msp@baylibre.com>
+ <ZBSPJHkcLG7gkZ7I@corigine.com>
+ <20230620125354.ipok6i43lvow66t4@blmsp>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620125354.ipok6i43lvow66t4@blmsp>
+X-ClientProxiedBy: AM0PR02CA0014.eurprd02.prod.outlook.com
+ (2603:10a6:208:3e::27) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-21_08,2023-06-16_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 malwarescore=0
- phishscore=0 clxscore=1015 impostorscore=0 bulkscore=0 lowpriorityscore=0
- mlxlogscore=999 priorityscore=1501 adultscore=0 mlxscore=0 suspectscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306210114
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CO1PR13MB4902:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2eb769e7-1672-4855-ce06-08db725e8834
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	a9Ru0ue5euwNCfB5Ny/TtOMYwwLy+1BcOBDUV7CWiZcwtbs1/yzrasOhxLNZJKyzTroxisKUvwq4GFLdWp7QP/QYf9JOnPpc2A8WjPV93km5DpPu0l8y5K8aif4xq3y+uj9vKJz419JW2lEdL+/FApkPJJVSFYzDvJR9r7ReQZVteGacpGt3fzlvKz5a1F9WQ/OccBybg+3T4OagaoEEkZO5UEVTqxJtlU4+3PhX9ZKGDUX3/urHv3E/GGOhJNXQ9g+4o5VI+RnyCKdRIZSNOiqo4JgvTnA7ht/Dt/2bgfm1lPljQ0HW4vLoRmOowiu8hEksIU3D7bF9R5GBrFf3TWtJ2HgjypR5eVnQjYBmxCtGd4dk22pVdqacmV7xwk1P8thUjtAMZGUgcikYnCRRSMP5fBbwYxvH0PagnYvb1NSDOmOaIGRzu88Cw0KgZoBQl+cC5vHd/8j1a8bQaLVMI3bd1S+W3iMYDWSVPedy1mivHiUcxWET9gyxjEPkg7xYbOnQHQ7hr0Bnx0g7oo1ZN4vlWNRUpDQbfiwoOgBebTps/lIjBPthXjSi94JZM4GX8icxH79V9hd/usmEevJkZmOaiyjbVfliIJWLK3ZwJ8U=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(396003)(39840400004)(376002)(451199021)(36756003)(38100700002)(86362001)(6666004)(6486002)(41300700001)(8676002)(478600001)(5660300002)(8936002)(6506007)(44832011)(2616005)(186003)(83380400001)(2906002)(66946007)(316002)(54906003)(4326008)(6916009)(6512007)(66556008)(66476007);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?4qATgXoKaFn8+jSaM+A16y8vVzyGATLm2A1w4iIJ78pzP64uA4gTDC1pwmS9?=
+ =?us-ascii?Q?MVL8yvflJbRsKX2XsEMP+nI0W8DlTwZULaYiyV0bmsixC7YovCQdG8VHZs72?=
+ =?us-ascii?Q?44Tv/k3kCeK83KeU5foVkuQcKLtCoJB1y5JXvveydFcfHlX2JGSzeiO+tqOb?=
+ =?us-ascii?Q?aayEm0iPcvpVDVoGQ8sJQ86QWQadEeKBHK+GmcfkbkSyTOSdjRmVCs4ktL+h?=
+ =?us-ascii?Q?aTHCJEN6sqcfyN2tAmqQ3mCt5wAqC7pY9jJbZb0DGxJeFBw3QJVhWZc+oBxT?=
+ =?us-ascii?Q?LhswrD3gtUmowEcUA6TifenMM76bGF6ObnY0wWoRU/+ziM/ETCSQL143Am/j?=
+ =?us-ascii?Q?yMRO2YLtrA6mfLbDd/lHdxZINrGoNIotBKnhUC9SrL0jypFsKWtQ4zHN/Gmw?=
+ =?us-ascii?Q?oX75YpwwBdEuvbPWLdpiLiGT7kUxSTpHsjLnEqP7lKpoSyITqjmwtTZ4Swge?=
+ =?us-ascii?Q?xp9j9Qvu4ZcjKi6jBDd3ZpJ5ZXgx1TPkDQI04H2r5IPqzEEbrGvREbJV61jr?=
+ =?us-ascii?Q?YISSXe5yWn1IpZyCbzqe19Y5skBmN9V3B55+NRo7QFDe2bmawRIGucIEqz53?=
+ =?us-ascii?Q?9sQmlHomVEq664jOnHJAxxJnJvVEEq9Ej3zM47P9Z0LQoX6CJuZzAw/bqxSX?=
+ =?us-ascii?Q?BnrxZD+YvzcJQ5vpPL81lInViI9SngMqqyUJXpasOJiTMko3PhTUVBoe8Nu+?=
+ =?us-ascii?Q?npBvDZA8mBye53S+131hPedeKD2snfagRY4tOxsnDzo/5RBhmhT78aLSRRKF?=
+ =?us-ascii?Q?boR9qgCzSp2dJzQLXEOyX5otUUmf+Gv7x/9nX4TYZWUwle+4sZydLwK1wOMR?=
+ =?us-ascii?Q?V5xdSdw8e9MBkxI7fk0Arfs4FkM/EM3irjfA5esU+vstjMQMxEF8Mv3GZDWQ?=
+ =?us-ascii?Q?Td7oYt3nfgwTNxEdaIo/ms1qNO7QSoNBw5c100A+gO8L8+lupQQ8xJRoMEac?=
+ =?us-ascii?Q?gvJsBSTq19mO8f22l21wNfXAhGIkPsIJgaRRGPTWzfa/R3uA7pv+cDuy5UA7?=
+ =?us-ascii?Q?iQZs/lMmkeYKWth93lS6me9CpXikJ9dCUNxYz6fZhSrso7CA707DA5DUFyc3?=
+ =?us-ascii?Q?TWLO8jeqsGJ/FTyst1wVwFIsoROqDFgMrSm/MA5FlwSVeEQQDlickHzxYbPE?=
+ =?us-ascii?Q?kAiKFLePpFQ8GlOeqKzMKKI2PFzYSUfmUaGDlNGpDvmqd0Z+Ad/REECyCIKF?=
+ =?us-ascii?Q?GCR622jDXo3plkXsCzlr9buPo/UXNvhFmih9gNeaE4hfX//X4edrOZZCrrLC?=
+ =?us-ascii?Q?/9xi/Fi58DPdWBsjJPdQGxu37a9SRgAKflCZx9yqNHgbkKjsTX4gPLSPKuJN?=
+ =?us-ascii?Q?ssi/xrn2Ste6/5PzJtXu3xAxb6SW0KOEPKrMZBA3k/vZeHPKW72jOfpWyfOS?=
+ =?us-ascii?Q?hIupEUSZvi3+WZkFQ47gpB6hr6q7q4SnlH1ImO4TmJTs8Z3QzaW6QJkF8V0c?=
+ =?us-ascii?Q?4jzfvaytfT9V9UbZt8oxBAwVGfWrL/BVh2QA8OMldZkZfTYiOrs7LwLYCXGd?=
+ =?us-ascii?Q?k/bNImXXIKEhUARUXrTR3lqSaZXteGAzfU/qZB/829npTuHedtz+cge5YQhe?=
+ =?us-ascii?Q?jo8xm5K9UD7j13N/MgaDsNnk6Tk7BKVtVr+ihpU9XJ3mN3BhUrokZjA0ItId?=
+ =?us-ascii?Q?eppWyYe1upgF23sdxDy51145eiAmwe8GMlBbLJXekd28ezGzJcpz20AQ7Dch?=
+ =?us-ascii?Q?2rzFlQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2eb769e7-1672-4855-ce06-08db725e8834
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 13:50:54.2857
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: isXxfCBF8sOs+ND9pUoWa6tcWgPmVgsQH3hW2s0tcqGY56fgTQ6qmFozqBpBR4l7pHSk1k7lKIvUGSMMKfRR75A9KHypWwmBtwT4KSTAC1Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CO1PR13MB4902
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Thorsten Winkler <twinkler@linux.ibm.com>
+On Tue, Jun 20, 2023 at 02:53:54PM +0200, Markus Schneider-Pargmann wrote:
+> Hi Simon,
+> 
+> On Fri, Mar 17, 2023 at 05:02:44PM +0100, Simon Horman wrote:
+> > On Wed, Mar 15, 2023 at 12:05:43PM +0100, Markus Schneider-Pargmann wrote:
+> > > Keep track of the number of transmits in flight.
+> > > 
+> > > This patch prepares the driver to control the network interface queue
+> > > based on this counter. By itself this counter be
+> > > implemented with an atomic, but as we need to do other things in the
+> > > critical sections later I am using a spinlock instead.
+> > > 
+> > > Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
+> 
+> Thank you for all your reviews, very helpful.
+> 
+> > 
+> > Nit, assuming the values are always positive, I think
+> > that unsigned might be a more appropriate type than int
+> > for the tx_fifo_in_flight field, and associated function
+> > parameters and local variables.
+> 
+> I agree that tx_fifo_in_flight is and should always be a positive value.
+> However as the code is operating with ++ and -- exclusively I would
+> personally prefer int here as that shows off-by-one errors much easier
+> in case there are any at some point.
+> 
+> Is that fine for you?
 
-This LWN article explains the why scnprintf is preferred over snprintf
-in general
-https://lwn.net/Articles/69419/
-Ie. snprintf() returns what *would* be the resulting length, while
-scnprintf() returns the actual length.
-
-Note that ctcm_print_statistics() writes the data into the kernel log
-and is therefore not suitable for sysfs_emit(). Observable behavior is
-not changed, as there may be dependencies.
-
-Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-Signed-off-by: Thorsten Winkler <twinkler@linux.ibm.com>
-Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
----
- drivers/s390/net/ctcm_dbug.c  |  2 +-
- drivers/s390/net/ctcm_main.c  |  6 +++---
- drivers/s390/net/ctcm_main.h  |  1 +
- drivers/s390/net/ctcm_mpc.c   | 18 ++++++++++--------
- drivers/s390/net/ctcm_sysfs.c | 36 +++++++++++++++++------------------
- 5 files changed, 33 insertions(+), 30 deletions(-)
-
-diff --git a/drivers/s390/net/ctcm_dbug.c b/drivers/s390/net/ctcm_dbug.c
-index f7ec51db3cd6..b6f0e2f114b4 100644
---- a/drivers/s390/net/ctcm_dbug.c
-+++ b/drivers/s390/net/ctcm_dbug.c
-@@ -70,7 +70,7 @@ void ctcm_dbf_longtext(enum ctcm_dbf_names dbf_nix, int level, char *fmt, ...)
- 	if (!debug_level_enabled(ctcm_dbf[dbf_nix].id, level))
- 		return;
- 	va_start(args, fmt);
--	vsnprintf(dbf_txt_buf, sizeof(dbf_txt_buf), fmt, args);
-+	vscnprintf(dbf_txt_buf, sizeof(dbf_txt_buf), fmt, args);
- 	va_end(args);
- 
- 	debug_text_event(ctcm_dbf[dbf_nix].id, level, dbf_txt_buf);
-diff --git a/drivers/s390/net/ctcm_main.c b/drivers/s390/net/ctcm_main.c
-index e0fdd54bfeb7..79fac5314e67 100644
---- a/drivers/s390/net/ctcm_main.c
-+++ b/drivers/s390/net/ctcm_main.c
-@@ -1340,7 +1340,7 @@ static int add_channel(struct ccw_device *cdev, enum ctcm_channel_types type,
- 					goto nomem_return;
- 
- 	ch->cdev = cdev;
--	snprintf(ch->id, CTCM_ID_SIZE, "ch-%s", dev_name(&cdev->dev));
-+	scnprintf(ch->id, CTCM_ID_SIZE, "ch-%s", dev_name(&cdev->dev));
- 	ch->type = type;
- 
- 	/*
-@@ -1505,8 +1505,8 @@ static int ctcm_new_device(struct ccwgroup_device *cgdev)
- 
- 	type = get_channel_type(&cdev0->id);
- 
--	snprintf(read_id, CTCM_ID_SIZE, "ch-%s", dev_name(&cdev0->dev));
--	snprintf(write_id, CTCM_ID_SIZE, "ch-%s", dev_name(&cdev1->dev));
-+	scnprintf(read_id, CTCM_ID_SIZE, "ch-%s", dev_name(&cdev0->dev));
-+	scnprintf(write_id, CTCM_ID_SIZE, "ch-%s", dev_name(&cdev1->dev));
- 
- 	ret = add_channel(cdev0, type, priv);
- 	if (ret) {
-diff --git a/drivers/s390/net/ctcm_main.h b/drivers/s390/net/ctcm_main.h
-index 90bd7b3f80c3..25164e8bf13d 100644
---- a/drivers/s390/net/ctcm_main.h
-+++ b/drivers/s390/net/ctcm_main.h
-@@ -100,6 +100,7 @@ enum ctcm_channel_types {
- #define CTCM_PROTO_MPC		4
- #define CTCM_PROTO_MAX		4
- 
-+#define CTCM_STATSIZE_LIMIT	64
- #define CTCM_BUFSIZE_LIMIT	65535
- #define CTCM_BUFSIZE_DEFAULT	32768
- #define MPC_BUFSIZE_DEFAULT	CTCM_BUFSIZE_LIMIT
-diff --git a/drivers/s390/net/ctcm_mpc.c b/drivers/s390/net/ctcm_mpc.c
-index 8ac213a55141..64996c86defc 100644
---- a/drivers/s390/net/ctcm_mpc.c
-+++ b/drivers/s390/net/ctcm_mpc.c
-@@ -144,9 +144,9 @@ void ctcmpc_dumpit(char *buf, int len)
- 
- 	for (ct = 0; ct < len; ct++, ptr++, rptr++) {
- 		if (sw == 0) {
--			sprintf(addr, "%16.16llx", (__u64)rptr);
-+			scnprintf(addr, sizeof(addr), "%16.16llx", (__u64)rptr);
- 
--			sprintf(boff, "%4.4X", (__u32)ct);
-+			scnprintf(boff, sizeof(boff), "%4.4X", (__u32)ct);
- 			bhex[0] = '\0';
- 			basc[0] = '\0';
- 		}
-@@ -155,7 +155,7 @@ void ctcmpc_dumpit(char *buf, int len)
- 		if (sw == 8)
- 			strcat(bhex, "	");
- 
--		sprintf(tbuf, "%2.2llX", (__u64)*ptr);
-+		scnprintf(tbuf, sizeof(tbuf), "%2.2llX", (__u64)*ptr);
- 
- 		tbuf[2] = '\0';
- 		strcat(bhex, tbuf);
-@@ -171,8 +171,8 @@ void ctcmpc_dumpit(char *buf, int len)
- 			continue;
- 		if ((strcmp(duphex, bhex)) != 0) {
- 			if (dup != 0) {
--				sprintf(tdup,
--					"Duplicate as above to %s", addr);
-+				scnprintf(tdup, sizeof(tdup),
-+					  "Duplicate as above to %s", addr);
- 				ctcm_pr_debug("		       --- %s ---\n",
- 						tdup);
- 			}
-@@ -197,14 +197,16 @@ void ctcmpc_dumpit(char *buf, int len)
- 			strcat(basc, " ");
- 		}
- 		if (dup != 0) {
--			sprintf(tdup, "Duplicate as above to %s", addr);
-+			scnprintf(tdup, sizeof(tdup),
-+				  "Duplicate as above to %s", addr);
- 			ctcm_pr_debug("		       --- %s ---\n", tdup);
- 		}
- 		ctcm_pr_debug("   %s (+%s) : %s  [%s]\n",
- 					addr, boff, bhex, basc);
- 	} else {
- 		if (dup >= 1) {
--			sprintf(tdup, "Duplicate as above to %s", addr);
-+			scnprintf(tdup, sizeof(tdup),
-+				  "Duplicate as above to %s", addr);
- 			ctcm_pr_debug("		       --- %s ---\n", tdup);
- 		}
- 		if (dup != 0) {
-@@ -291,7 +293,7 @@ static struct net_device *ctcmpc_get_dev(int port_num)
- 	struct net_device *dev;
- 	struct ctcm_priv *priv;
- 
--	sprintf(device, "%s%i", MPC_DEVICE_NAME, port_num);
-+	scnprintf(device, sizeof(device), "%s%i", MPC_DEVICE_NAME, port_num);
- 
- 	dev = __dev_get_by_name(&init_net, device);
- 
-diff --git a/drivers/s390/net/ctcm_sysfs.c b/drivers/s390/net/ctcm_sysfs.c
-index 98680c2cc4e4..0c5d8a3eaa2e 100644
---- a/drivers/s390/net/ctcm_sysfs.c
-+++ b/drivers/s390/net/ctcm_sysfs.c
-@@ -86,24 +86,24 @@ static void ctcm_print_statistics(struct ctcm_priv *priv)
- 		return;
- 	p = sbuf;
- 
--	p += sprintf(p, "  Device FSM state: %s\n",
--		     fsm_getstate_str(priv->fsm));
--	p += sprintf(p, "  RX channel FSM state: %s\n",
--		     fsm_getstate_str(priv->channel[CTCM_READ]->fsm));
--	p += sprintf(p, "  TX channel FSM state: %s\n",
--		     fsm_getstate_str(priv->channel[CTCM_WRITE]->fsm));
--	p += sprintf(p, "  Max. TX buffer used: %ld\n",
--		     priv->channel[WRITE]->prof.maxmulti);
--	p += sprintf(p, "  Max. chained SKBs: %ld\n",
--		     priv->channel[WRITE]->prof.maxcqueue);
--	p += sprintf(p, "  TX single write ops: %ld\n",
--		     priv->channel[WRITE]->prof.doios_single);
--	p += sprintf(p, "  TX multi write ops: %ld\n",
--		     priv->channel[WRITE]->prof.doios_multi);
--	p += sprintf(p, "  Netto bytes written: %ld\n",
--		     priv->channel[WRITE]->prof.txlen);
--	p += sprintf(p, "  Max. TX IO-time: %u\n",
--		     jiffies_to_usecs(priv->channel[WRITE]->prof.tx_time));
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  Device FSM state: %s\n",
-+		       fsm_getstate_str(priv->fsm));
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  RX channel FSM state: %s\n",
-+		       fsm_getstate_str(priv->channel[CTCM_READ]->fsm));
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  TX channel FSM state: %s\n",
-+		       fsm_getstate_str(priv->channel[CTCM_WRITE]->fsm));
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  Max. TX buffer used: %ld\n",
-+		       priv->channel[WRITE]->prof.maxmulti);
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  Max. chained SKBs: %ld\n",
-+		       priv->channel[WRITE]->prof.maxcqueue);
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  TX single write ops: %ld\n",
-+		       priv->channel[WRITE]->prof.doios_single);
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  TX multi write ops: %ld\n",
-+		       priv->channel[WRITE]->prof.doios_multi);
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  Netto bytes written: %ld\n",
-+		       priv->channel[WRITE]->prof.txlen);
-+	p += scnprintf(p, CTCM_STATSIZE_LIMIT, "  Max. TX IO-time: %u\n",
-+		       jiffies_to_usecs(priv->channel[WRITE]->prof.tx_time));
- 
- 	printk(KERN_INFO "Statistics for %s:\n%s",
- 				priv->channel[CTCM_WRITE]->netdev->name, sbuf);
--- 
-2.39.2
-
+Yes, I think so.
 
