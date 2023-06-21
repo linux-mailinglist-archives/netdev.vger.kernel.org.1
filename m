@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-12613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4432738517
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:30:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0000738518
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:30:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24D7E2816AB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:30:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 91C1B1C20E1F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:30:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55E251774D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E18617FFF;
 	Wed, 21 Jun 2023 13:29:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4362517ADA
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7FCDC17FF8
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:27 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 926B61BC3
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E73D19B4
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:29:21 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qBxtf-0006Sc-Mu
+	id 1qBxtf-0006SZ-KX
 	for netdev@vger.kernel.org; Wed, 21 Jun 2023 15:29:19 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id 22FA61DE886
+	by bjornoya.blackshift.org (Postfix) with SMTP id 22D901DE884
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:18 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 3A9E41DE856;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 5E4511DE858;
 	Wed, 21 Jun 2023 13:29:16 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 56b102dd;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 76ba9e4b;
 	Wed, 21 Jun 2023 13:29:15 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -45,11 +45,12 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Marcel Hellwig <git@cookiesoft.de>,
+	Frank Jungclaus <frank.jungclaus@esd.eu>,
+	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
 	Marc Kleine-Budde <mkl@pengutronix.de>
-Subject: [PATCH net-next 02/33] can: dev: add transceiver capabilities to xilinx_can
-Date: Wed, 21 Jun 2023 15:28:43 +0200
-Message-Id: <20230621132914.412546-3-mkl@pengutronix.de>
+Subject: [PATCH net-next 03/33] can: esd_usb: Make use of existing kernel macros
+Date: Wed, 21 Jun 2023 15:28:44 +0200
+Message-Id: <20230621132914.412546-4-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230621132914.412546-1-mkl@pengutronix.de>
 References: <20230621132914.412546-1-mkl@pengutronix.de>
@@ -70,111 +71,133 @@ X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Marcel Hellwig <git@cookiesoft.de>
+From: Frank Jungclaus <frank.jungclaus@esd.eu>
 
-Currently the xilinx_can driver does not support adding a phy like the
-"ti,tcan1043" to its devicetree.
+Make use of existing kernel macros:
+- Use the unit suffixes from linux/units.h for the controller clock
+frequencies
+- Use the BIT() and the GENMASK() macro to set specific bits in some
+  constants
+- Use CAN_MAX_DLEN (instead of directly using the value 8) for the
+maximum CAN payload length
 
-This code makes it possible to add such phy, so that the kernel makes
-sure that the PHY is in operational state, when the link is set to an
-"up" state.
+Additionally:
+- Spend some commenting for the previously changed constants
+- Add the current year to the copyright notice
+- While adding the header linux/units.h to the list of include files
+also sort that list alphabetically
 
-Signed-off-by: Marcel Hellwig <git@cookiesoft.de>
-Link: https://lore.kernel.org/r/20230417085204.179268-1-git@cookiesoft.de
-[mkl: call phy_power_off() after pm_runtime_put()]
-[mkl: remove error message for phy_power_on() failure]
-[mkl: update kernel-doc for struct xcan_priv]
+Suggested-by: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
+Link: https://lore.kernel.org/all/CAMZ6RqLaDNy-fZ2G0+QMhUEckkXLL+ZyELVSDFmqpd++aBzZQg@mail.gmail.com/
+Link: https://lore.kernel.org/all/CAMZ6RqKdg5YBufa0C+ttzJvoG=9yuti-8AmthCi4jBbd08JEtw@mail.gmail.com/
+Suggested-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Link: https://lore.kernel.org/all/20230518-grower-film-ea8b5f853f3e-mkl@pengutronix.de/
+Signed-off-by: Frank Jungclaus <frank.jungclaus@esd.eu>
+Link: https://lore.kernel.org/r/20230519195600.420644-2-frank.jungclaus@esd.eu
+[mkl: remove hex constants in comments after BIT()]
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/xilinx_can.c | 19 +++++++++++++++++++
- 1 file changed, 19 insertions(+)
+ drivers/net/can/usb/esd_usb.c | 40 ++++++++++++++++++-----------------
+ 1 file changed, 21 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/can/xilinx_can.c b/drivers/net/can/xilinx_can.c
-index 797c69a0314d..4d3283db3a13 100644
---- a/drivers/net/can/xilinx_can.c
-+++ b/drivers/net/can/xilinx_can.c
-@@ -28,6 +28,7 @@
- #include <linux/types.h>
+diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
+index d33bac3a6c10..93c2351d1e3c 100644
+--- a/drivers/net/can/usb/esd_usb.c
++++ b/drivers/net/can/usb/esd_usb.c
+@@ -3,18 +3,19 @@
+  * CAN driver for esd electronics gmbh CAN-USB/2 and CAN-USB/Micro
+  *
+  * Copyright (C) 2010-2012 esd electronic system design gmbh, Matthias Fuchs <socketcan@esd.eu>
+- * Copyright (C) 2022 esd electronics gmbh, Frank Jungclaus <frank.jungclaus@esd.eu>
++ * Copyright (C) 2022-2023 esd electronics gmbh, Frank Jungclaus <frank.jungclaus@esd.eu>
+  */
+-#include <linux/ethtool.h>
+-#include <linux/signal.h>
+-#include <linux/slab.h>
+-#include <linux/module.h>
+-#include <linux/netdevice.h>
+-#include <linux/usb.h>
+ 
+ #include <linux/can.h>
  #include <linux/can/dev.h>
  #include <linux/can/error.h>
-+#include <linux/phy/phy.h>
- #include <linux/pm_runtime.h>
++#include <linux/ethtool.h>
++#include <linux/module.h>
++#include <linux/netdevice.h>
++#include <linux/signal.h>
++#include <linux/slab.h>
++#include <linux/units.h>
++#include <linux/usb.h>
  
- #define DRIVER_NAME	"xilinx_can"
-@@ -198,6 +199,7 @@ struct xcan_devtype_data {
-  * @bus_clk:			Pointer to struct clk
-  * @can_clk:			Pointer to struct clk
-  * @devtype:			Device type specific constants
-+ * @transceiver:		Optional pointer to associated CAN transceiver
-  */
- struct xcan_priv {
- 	struct can_priv can;
-@@ -215,6 +217,7 @@ struct xcan_priv {
- 	struct clk *bus_clk;
- 	struct clk *can_clk;
- 	struct xcan_devtype_data devtype;
-+	struct phy *transceiver;
+ MODULE_AUTHOR("Matthias Fuchs <socketcan@esd.eu>");
+ MODULE_AUTHOR("Frank Jungclaus <frank.jungclaus@esd.eu>");
+@@ -27,8 +28,8 @@ MODULE_LICENSE("GPL v2");
+ #define USB_CANUSBM_PRODUCT_ID	0x0011
+ 
+ /* CAN controller clock frequencies */
+-#define ESD_USB2_CAN_CLOCK	60000000
+-#define ESD_USBM_CAN_CLOCK	36000000
++#define ESD_USB2_CAN_CLOCK	(60 * MEGA) /* Hz */
++#define ESD_USBM_CAN_CLOCK	(36 * MEGA) /* Hz */
+ 
+ /* Maximum number of CAN nets */
+ #define ESD_USB_MAX_NETS	2
+@@ -42,20 +43,21 @@ MODULE_LICENSE("GPL v2");
+ #define CMD_IDADD		6 /* also used for IDADD_REPLY */
+ 
+ /* esd CAN message flags - dlc field */
+-#define ESD_RTR			0x10
++#define ESD_RTR	BIT(4)
++
+ 
+ /* esd CAN message flags - id field */
+-#define ESD_EXTID		0x20000000
+-#define ESD_EVENT		0x40000000
+-#define ESD_IDMASK		0x1fffffff
++#define ESD_EXTID	BIT(29)
++#define ESD_EVENT	BIT(30)
++#define ESD_IDMASK	GENMASK(28, 0)
+ 
+ /* esd CAN event ids */
+ #define ESD_EV_CAN_ERROR_EXT	2 /* CAN controller specific diagnostic data */
+ 
+ /* baudrate message flags */
+-#define ESD_USB_UBR		0x80000000
+-#define ESD_USB_LOM		0x40000000
+-#define ESD_USB_NO_BAUDRATE	0x7fffffff
++#define ESD_USB_LOM	BIT(30) /* Listen Only Mode */
++#define ESD_USB_UBR	BIT(31) /* User Bit Rate (controller BTR) in bits 0..27 */
++#define ESD_USB_NO_BAUDRATE	GENMASK(30, 0) /* bit rate unconfigured */
+ 
+ /* bit timing CAN-USB/2 */
+ #define ESD_USB2_TSEG1_MIN	1
+@@ -70,7 +72,7 @@ MODULE_LICENSE("GPL v2");
+ #define ESD_USB2_BRP_MIN	1
+ #define ESD_USB2_BRP_MAX	1024
+ #define ESD_USB2_BRP_INC	1
+-#define ESD_USB2_3_SAMPLES	0x00800000
++#define ESD_USB2_3_SAMPLES	BIT(23)
+ 
+ /* esd IDADD message */
+ #define ESD_ID_ENABLE		0x80
+@@ -128,7 +130,7 @@ struct rx_msg {
+ 	__le32 ts;
+ 	__le32 id; /* upper 3 bits contain flags */
+ 	union {
+-		u8 data[8];
++		u8 data[CAN_MAX_DLEN];
+ 		struct {
+ 			u8 status; /* CAN Controller Status */
+ 			u8 ecc;    /* Error Capture Register */
+@@ -145,7 +147,7 @@ struct tx_msg {
+ 	u8 dlc;
+ 	u32 hnd;	/* opaque handle, not used by device */
+ 	__le32 id; /* upper 3 bits contain flags */
+-	u8 data[8];
++	u8 data[CAN_MAX_DLEN];
  };
  
- /* CAN Bittiming constants as per Xilinx CAN specs */
-@@ -1419,6 +1422,10 @@ static int xcan_open(struct net_device *ndev)
- 	struct xcan_priv *priv = netdev_priv(ndev);
- 	int ret;
- 
-+	ret = phy_power_on(priv->transceiver);
-+	if (ret)
-+		return ret;
-+
- 	ret = pm_runtime_get_sync(priv->dev);
- 	if (ret < 0) {
- 		netdev_err(ndev, "%s: pm_runtime_get failed(%d)\n",
-@@ -1462,6 +1469,7 @@ static int xcan_open(struct net_device *ndev)
- 	free_irq(ndev->irq, ndev);
- err:
- 	pm_runtime_put(priv->dev);
-+	phy_power_off(priv->transceiver);
- 
- 	return ret;
- }
-@@ -1483,6 +1491,7 @@ static int xcan_close(struct net_device *ndev)
- 	close_candev(ndev);
- 
- 	pm_runtime_put(priv->dev);
-+	phy_power_off(priv->transceiver);
- 
- 	return 0;
- }
-@@ -1713,6 +1722,7 @@ static int xcan_probe(struct platform_device *pdev)
- {
- 	struct net_device *ndev;
- 	struct xcan_priv *priv;
-+	struct phy *transceiver;
- 	const struct of_device_id *of_id;
- 	const struct xcan_devtype_data *devtype = &xcan_axi_data;
- 	void __iomem *addr;
-@@ -1843,6 +1853,14 @@ static int xcan_probe(struct platform_device *pdev)
- 		goto err_free;
- 	}
- 
-+	transceiver = devm_phy_optional_get(&pdev->dev, NULL);
-+	if (IS_ERR(transceiver)) {
-+		ret = PTR_ERR(transceiver);
-+		dev_err_probe(&pdev->dev, ret, "failed to get phy\n");
-+		goto err_free;
-+	}
-+	priv->transceiver = transceiver;
-+
- 	priv->write_reg = xcan_write_reg_le;
- 	priv->read_reg = xcan_read_reg_le;
- 
-@@ -1869,6 +1887,7 @@ static int xcan_probe(struct platform_device *pdev)
- 		goto err_disableclks;
- 	}
- 
-+	of_can_transceiver(ndev);
- 	pm_runtime_put(&pdev->dev);
- 
- 	if (priv->devtype.flags & XCAN_FLAG_CANFD_2) {
+ struct tx_done_msg {
 -- 
 2.40.1
 
