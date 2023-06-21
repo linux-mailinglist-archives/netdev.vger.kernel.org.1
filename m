@@ -1,169 +1,230 @@
-Return-Path: <netdev+bounces-12553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B65FF737F90
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:28:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 406D9737F91
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:29:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E7C1D1C20E34
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:28:51 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE881280DDE
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:29:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9FB8FC09;
-	Wed, 21 Jun 2023 10:28:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ECB9FC09;
+	Wed, 21 Jun 2023 10:29:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA353F9C0
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:28:49 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACCB410FF
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:28:38 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9896216338cso127198166b.3
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:28:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687343317; x=1689935317;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=EEz+PLO7wWGAm3nSxnfvXJdbjny/vsgxgeM8/QFXhTw=;
-        b=nwXSgD+j9vxn8vdVFzYjX5g68s41Ln+WQ6I8qVhIun1Pjh9jtH/y9lMZoc7qMjiIwY
-         PqG9JwWwc8imgvcj0W3BQ+jhHVLDVwwbBe5iqFUgxb01TquQYx3Z1m2zSByBylI5Z9/K
-         98TSaDdT78q0SB47m56T8ntCC+HuwwNdh/UP9HPnWIvEdiYhJwQh8NjzmH5YYf8vGJDN
-         DQWrKAWwGCLJnmeIJ3SBfMlI440A+czvQoZX0FK2BXQAXjSRM9OR9B5ax67CEtirUdma
-         ucOLGzStKD1uHzUZrA+lMRGIuiXLo1HvSM1Msh+HRvarK1RcKsO4Aw96p7HGQEdB7HYC
-         m4QQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687343317; x=1689935317;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=EEz+PLO7wWGAm3nSxnfvXJdbjny/vsgxgeM8/QFXhTw=;
-        b=VNGdN8lAjxI3UI1qqv0omZg9/YhF+5IFNDsakUUOaF7r3sV/DwbYIi9bffU3CJ6Swz
-         Q1tdAj/0vBLSeX6Np5I8HyHV2EqK8s+MsaeYrEsg187wJ2Ya74nAHE/TnJjEs/FO5xoL
-         lIreo4DwIca8o+5C3AYF3JnqygPw1yXFd4reRGNzKDl3oN6M7kvGfkCkCmYyChLTwTBf
-         W5T6TBRWE7qx0H1B/eUt7fGNMPyQphxF2iT7QMOw2T2EB3U00Mmr5MEmkACJ7EelwFFW
-         UqhnAlbTmgSvySUg1HU4kgXxpKiMugOoo4nLSWPqnn3sRkmKpzgiKpyN5ZlmekKn8lz2
-         3jPA==
-X-Gm-Message-State: AC+VfDzUn6mcrguF2NlXySo1yb0h1vINnsf4lHFDMLIA5NNRJH6MNGN2
-	upa5c2Ki+hRmNP73SCEWc3c2DA==
-X-Google-Smtp-Source: ACHHUZ6f0/qixc74hYOnLdoHW64xh2szrTHHBWV4AlU08bNCkBFtr/Zv2b9LXR6ZCtDRtFHXDSQIzQ==
-X-Received: by 2002:a17:907:2d28:b0:973:940e:a01b with SMTP id gs40-20020a1709072d2800b00973940ea01bmr16068426ejc.60.1687343317128;
-        Wed, 21 Jun 2023 03:28:37 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id k21-20020a1709065fd500b009886aaeb722sm2915769ejv.137.2023.06.21.03.28.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Jun 2023 03:28:36 -0700 (PDT)
-Message-ID: <32557326-650c-192d-9a82-ca5451b01f70@linaro.org>
-Date: Wed, 21 Jun 2023 12:28:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D07101C2
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:29:07 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C471C1737;
+	Wed, 21 Jun 2023 03:29:04 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 266D621C2043; Wed, 21 Jun 2023 03:29:04 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 266D621C2043
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1687343344;
+	bh=chZwILjB8n5vZjnofE7dyAXFYm12Ys8pfNtbWBPSFg0=;
+	h=From:To:Cc:Subject:Date:From;
+	b=VtCZ45Dj+681XgJ/rY2h8s7WG5WqyExIxJhfSehRcNJQ7Ixa/HwkMlDiba1CXkOge
+	 82oFWc8yJlqQZcOJ1PfnkUHxRGL5TRGAl/cHeJ0/3B0qg9PikYe0vebEuqqSrqf+wi
+	 yGPSkz6mg7CXO0Ma002vvPowWZhbjn4+MVCy7dPw=
+From: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	sharmaajay@microsoft.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: [PATCH] net: mana: Fix MANA VF unload when host is unresponsive
+Date: Wed, 21 Jun 2023 03:29:01 -0700
+Message-Id: <1687343341-10898-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 5/6] can: tcan4x5x: Add support for tcan4552/4553
-Content-Language: en-US
-To: Markus Schneider-Pargmann <msp@baylibre.com>,
- Wolfgang Grandegger <wg@grandegger.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>, Rob Herring <robh+dt@kernel.org>,
- Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
-Cc: "David S . Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Conor Dooley <conor+dt@kernel.org>,
- Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
- Michal Kubiak <michal.kubiak@intel.com>, Vivek Yadav
- <vivek.2311@samsung.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <simon.horman@corigine.com>
-References: <20230621093103.3134655-1-msp@baylibre.com>
- <20230621093103.3134655-6-msp@baylibre.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230621093103.3134655-6-msp@baylibre.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 21/06/2023 11:31, Markus Schneider-Pargmann wrote:
-> tcan4552 and tcan4553 do not have wake or state pins, so they are
-> currently not compatible with the generic driver. The generic driver
-> uses tcan4x5x_disable_state() and tcan4x5x_disable_wake() if the gpios
-> are not defined. These functions use register bits that are not
-> available in tcan4552/4553.
-> 
-> This patch adds support by introducing version information to reflect if
-> the chip has wake and state pins. Also the version is now checked.
-> 
-> Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
-> ---
->  drivers/net/can/m_can/tcan4x5x-core.c | 128 +++++++++++++++++++++-----
->  1 file changed, 104 insertions(+), 24 deletions(-)
-> 
-> diff --git a/drivers/net/can/m_can/tcan4x5x-core.c b/drivers/net/can/m_can/tcan4x5x-core.c
-> index fb9375fa20ec..756acd122075 100644
-> --- a/drivers/net/can/m_can/tcan4x5x-core.c
-> +++ b/drivers/net/can/m_can/tcan4x5x-core.c
-> @@ -7,6 +7,7 @@
->  #define TCAN4X5X_EXT_CLK_DEF 40000000
->  
->  #define TCAN4X5X_DEV_ID1 0x00
-> +#define TCAN4X5X_DEV_ID1_TCAN 0x4e414354 /* ASCII TCAN */
->  #define TCAN4X5X_DEV_ID2 0x04
->  #define TCAN4X5X_REV 0x08
->  #define TCAN4X5X_STATUS 0x0C
-> @@ -103,6 +104,13 @@
->  #define TCAN4X5X_WD_3_S_TIMER BIT(29)
->  #define TCAN4X5X_WD_6_S_TIMER (BIT(28) | BIT(29))
->  
-> +struct tcan4x5x_version_info {
-> +	u32 id2_register;
-> +
-> +	bool has_wake_pin;
-> +	bool has_state_pin;
-> +};
-> +
->  static inline struct tcan4x5x_priv *cdev_to_priv(struct m_can_classdev *cdev)
->  {
->  	return container_of(cdev, struct tcan4x5x_priv, cdev);
-> @@ -254,18 +262,68 @@ static int tcan4x5x_disable_state(struct m_can_classdev *cdev)
->  				  TCAN4X5X_DISABLE_INH_MSK, 0x01);
->  }
->  
-> -static int tcan4x5x_get_gpios(struct m_can_classdev *cdev)
-> +static const struct tcan4x5x_version_info tcan4x5x_generic;
-> +static const struct of_device_id tcan4x5x_of_match[];
-> +
-> +static const struct tcan4x5x_version_info
-> +*tcan4x5x_find_version_info(struct tcan4x5x_priv *priv, u32 id2_value)
-> +{
-> +	for (int i = 0; tcan4x5x_of_match[i].data; ++i) {
-> +		const struct tcan4x5x_version_info *vinfo =
-> +			tcan4x5x_of_match[i].data;
-> +		if (!vinfo->id2_register || id2_value == vinfo->id2_register) {
-> +			dev_warn(&priv->spi->dev, "TCAN device is %s, please use it in DT\n",
-> +				 tcan4x5x_of_match[i].compatible);
-> +			return vinfo;
-> +		}
-> +	}
-> +
-> +	return &tcan4x5x_generic;
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 
-I don't understand what do you want to achieve here. Kernel job is not
-to validate DTB, so if DTB says you have 4552, there is no need to
-double check. On the other hand, you have Id register so entire idea of
-custom compatibles can be dropped and instead you should detect the
-variant based on the ID.
+This patch addresses  the VF unload issue, where mana_dealloc_queues()
+gets stuck in infinite while loop, because of host unresponsiveness.
+It adds a timeout in the while loop, to fix it.
 
-Best regards,
-Krzysztof
+Also this patch adds a new attribute in mana_context, which gets set when
+mana_hwc_send_request() hits a timeout because of host unresponsiveness.
+This flag then helps to avoid the timeouts in successive calls.
+
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+---
+ .../net/ethernet/microsoft/mana/gdma_main.c   |  4 +++-
+ .../net/ethernet/microsoft/mana/hw_channel.c  | 12 ++++++++++-
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 21 +++++++++++++++++--
+ include/net/mana/mana.h                       |  2 ++
+ 4 files changed, 35 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 8f3f78b68592..5cc43ae78334 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -946,10 +946,12 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
+ 	struct gdma_context *gc = gd->gdma_context;
+ 	struct gdma_general_resp resp = {};
+ 	struct gdma_general_req req = {};
++	struct mana_context *ac;
+ 	int err;
+ 
+ 	if (gd->pdid == INVALID_PDID)
+ 		return -EINVAL;
++	ac = (struct mana_context *)gd->driver_data;
+ 
+ 	mana_gd_init_req_hdr(&req.hdr, GDMA_DEREGISTER_DEVICE, sizeof(req),
+ 			     sizeof(resp));
+@@ -957,7 +959,7 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
+ 	req.hdr.dev_id = gd->dev_id;
+ 
+ 	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
+-	if (err || resp.hdr.status) {
++	if ((err || resp.hdr.status) && !ac->vf_unload_timeout) {
+ 		dev_err(gc->dev, "Failed to deregister device: %d, 0x%x\n",
+ 			err, resp.hdr.status);
+ 		if (!err)
+diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+index 9d1507eba5b9..557b890ad0ae 100644
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -1,8 +1,10 @@
+ // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
+ /* Copyright (c) 2021, Microsoft Corporation. */
+ 
++#include "asm-generic/errno.h"
+ #include <net/mana/gdma.h>
+ #include <net/mana/hw_channel.h>
++#include <net/mana/mana.h>
+ 
+ static int mana_hwc_get_msg_index(struct hw_channel_context *hwc, u16 *msg_id)
+ {
+@@ -786,12 +788,19 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 	struct hwc_wq *txq = hwc->txq;
+ 	struct gdma_req_hdr *req_msg;
+ 	struct hwc_caller_ctx *ctx;
++	struct mana_context *ac;
+ 	u32 dest_vrcq = 0;
+ 	u32 dest_vrq = 0;
+ 	u16 msg_id;
+ 	int err;
+ 
+ 	mana_hwc_get_msg_index(hwc, &msg_id);
++	ac = (struct mana_context *)hwc->gdma_dev->driver_data;
++	if (ac->vf_unload_timeout) {
++		dev_err(hwc->dev, "HWC: vport is already unloaded.\n");
++		err = -ETIMEDOUT;
++		goto out;
++	}
+ 
+ 	tx_wr = &txq->msg_buf->reqs[msg_id];
+ 
+@@ -825,9 +834,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
+ 		goto out;
+ 	}
+ 
+-	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
++	if (!wait_for_completion_timeout(&ctx->comp_event, 5 * HZ)) {
+ 		dev_err(hwc->dev, "HWC: Request timed out!\n");
+ 		err = -ETIMEDOUT;
++		ac->vf_unload_timeout = true;
+ 		goto out;
+ 	}
+ 
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index d907727c7b7a..24f5508d2979 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -2330,7 +2330,10 @@ static int mana_dealloc_queues(struct net_device *ndev)
+ 	struct mana_port_context *apc = netdev_priv(ndev);
+ 	struct gdma_dev *gd = apc->ac->gdma_dev;
+ 	struct mana_txq *txq;
++	struct sk_buff *skb;
++	struct mana_cq *cq;
+ 	int i, err;
++	unsigned long timeout;
+ 
+ 	if (apc->port_is_up)
+ 		return -EINVAL;
+@@ -2348,13 +2351,26 @@ static int mana_dealloc_queues(struct net_device *ndev)
+ 	 *
+ 	 * Drain all the in-flight TX packets
+ 	 */
++
++	timeout = jiffies + 120 * HZ;
+ 	for (i = 0; i < apc->num_queues; i++) {
+ 		txq = &apc->tx_qp[i].txq;
+-
+-		while (atomic_read(&txq->pending_sends) > 0)
++		while (atomic_read(&txq->pending_sends) > 0 &&
++		       time_before(jiffies, timeout)) {
+ 			usleep_range(1000, 2000);
++		}
+ 	}
+ 
++	for (i = 0; i < apc->num_queues; i++) {
++		txq = &apc->tx_qp[i].txq;
++		cq = &apc->tx_qp[i].tx_cq;
++		while (atomic_read(&txq->pending_sends)) {
++			skb = skb_dequeue(&txq->pending_skbs);
++			mana_unmap_skb(skb, apc);
++			napi_consume_skb(skb, cq->budget);
++			atomic_sub(1, &txq->pending_sends);
++		}
++	}
+ 	/* We're 100% sure the queues can no longer be woken up, because
+ 	 * we're sure now mana_poll_tx_cq() can't be running.
+ 	 */
+@@ -2605,6 +2621,7 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
+ 		}
+ 	}
+ 
++	ac->vf_unload_timeout = false;
+ 	err = add_adev(gd);
+ out:
+ 	if (err)
+diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
+index 9eef19972845..34f5d8e06ede 100644
+--- a/include/net/mana/mana.h
++++ b/include/net/mana/mana.h
+@@ -361,6 +361,8 @@ struct mana_context {
+ 	struct mana_eq *eqs;
+ 
+ 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
++
++	bool vf_unload_timeout;
+ };
+ 
+ struct mana_port_context {
+-- 
+2.34.1
 
 
