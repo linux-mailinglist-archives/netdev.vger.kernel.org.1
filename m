@@ -1,96 +1,181 @@
-Return-Path: <netdev+bounces-12713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12696-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C421A7389E8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:41:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0AA9C7388A9
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:20:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB18281659
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:41:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACA6C2812C2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:20:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D921952F;
-	Wed, 21 Jun 2023 15:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BEB19504;
+	Wed, 21 Jun 2023 15:19:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B504719E44
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:38:35 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D14749B
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:38:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=NaVrleCmNiIJhauVDjhLqKO0DQ6jZX79IjchG5Pb8O8=; b=MtltV5usPsrBzwMsH04M8iUAAZ
-	2R9rpT+9kegq9b72DZ3qpCK9B9EbB6BFuSE3vvLvEM5U0HNaDNcjF08fIslZCK5ukxcMJ2Ae4Nwjb
-	ov0e+a/c8xcJQN5WUmdumrxdLh4mX1OFaA+TOMfZ6wT4vYXRTlbVsY9E/11t9SidQF+Q=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qBzbp-00H9gW-Hk; Wed, 21 Jun 2023 17:19:01 +0200
-Date: Wed, 21 Jun 2023 17:19:01 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH net-next v1 1/3] led: trig: netdev: Fix requesting
- offload device
-Message-ID: <864bfa14-ab8f-4953-873c-a9ad4721be22@lunn.ch>
-References: <20230619215703.4038619-1-andrew@lunn.ch>
- <20230619215703.4038619-2-andrew@lunn.ch>
- <ZJL9I5rQlYFUZWPp@corigine.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A395C15E;
+	Wed, 21 Jun 2023 15:19:56 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFCE1212F;
+	Wed, 21 Jun 2023 08:19:54 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b46d4e1b0aso63373751fa.2;
+        Wed, 21 Jun 2023 08:19:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687360793; x=1689952793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YFy+7jY3Q/B3fIYTXq5qOshlUqCtAeH0fFjxezMJ7mU=;
+        b=GOBaPld/+7/uckPmlyvUEOrUHbnzb/xeQVb9ttphaPlOVx7SyWpw3q1EZ9lqCOrFr1
+         f8VlC75jrLsv+1oSumRkFGEobcO2HjohE6wMZ/Lkv73OS2pSAfCwpH0uaQ4sE0JSC+Db
+         A14lHcRRcAU/PcHq9jab/BUjltkYhk9zTXsbt4bD2qH/PkTs4Jdwc2JxFcE1SymsO7qs
+         peyVC9iKCNhEfaCkgylo0eYlRMhRaYETf3cPqeXd5Bcjfub2Dq7JSFQXnM5nIrIqv38f
+         Hz8O6R7OtyG1OrGo3a+TncT2DvoDQcNUVfteo64tKc82njjnV2xrFc95C0DCJEDf+UhT
+         RJfg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687360793; x=1689952793;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=YFy+7jY3Q/B3fIYTXq5qOshlUqCtAeH0fFjxezMJ7mU=;
+        b=ZcjmTmzLTeH+JHCtK4DwggY1k1fl1+o6RhPe/68sSSdcKN1/aa/PPjFtPNBAB4w7bN
+         DCyeEL7GK7tQ0VR391LBX/lLE5/fax0algd4wRPlpRcc8s8Xwex+TJ7z/qm32/gzhoct
+         G+cbezmTkx2fgBcia0Cupp58cwXCBZn0plUYa61b7Kvt9P99XchL/7goBa6qHvzxbc2q
+         b+EB+Dt4CbQKdWf2KrHEhY8v4fuEn0Afo8rFofPN3XVLdmYrL3KADzCF+lg+J6G+LR0h
+         0fWGv/gB2+l0Jt7U/2F8qYMj9UqawcNwdn2ztTYoHtKtYVAB6nPMs9wY2uIbzXwHmbaY
+         1vEg==
+X-Gm-Message-State: AC+VfDx46UPcP271zzroK5ty7XfHqPagfN8+MglklxdCEWE4VDkOZRMw
+	Z0yabaAPWIo9l+qt60GQIWaaFJ1E+t7D85M6l54=
+X-Google-Smtp-Source: ACHHUZ7S366xJDGv2BenqM0RSR5nG3v/w66oTeggW0Zt6a61/Wjn/ZeU0yVAL/ODGB0B6G6jG4VWc+DojP3NyAQ/DmI=
+X-Received: by 2002:a2e:80c9:0:b0:2b1:c039:e977 with SMTP id
+ r9-20020a2e80c9000000b002b1c039e977mr9673072ljg.16.1687360792618; Wed, 21 Jun
+ 2023 08:19:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJL9I5rQlYFUZWPp@corigine.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
+ <ZJLzsWsIPD57pDgc@FVFF77S0Q05N> <CA+G9fYvwriD8X+kmDx35PavSv-youSUmYTuYTfQ4oBWnZzVRUQ@mail.gmail.com>
+ <CANk7y0imD3tK1Jox_V_f1vfzFi2tPhUzGOA_mLLkYy-VDHdncg@mail.gmail.com> <CA+G9fYuK4FWaLizcuVyW3ApR6fcgjMccYp3YxdAm61BOedXxzQ@mail.gmail.com>
+In-Reply-To: <CA+G9fYuK4FWaLizcuVyW3ApR6fcgjMccYp3YxdAm61BOedXxzQ@mail.gmail.com>
+From: Puranjay Mohan <puranjay12@gmail.com>
+Date: Wed, 21 Jun 2023 17:19:41 +0200
+Message-ID: <CANk7y0g9Qhe4H+WTbrsEUa_XXn_GkXWDOE4kP1icbxfJyri8XQ@mail.gmail.com>
+Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Alexei Starovoitov <ast@kernel.org>, Song Liu <song@kernel.org>, 
+	Linux ARM <linux-arm-kernel@lists.infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
+	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> >  			set_device_name(trigger_data, name, strlen(name));
-> >  			trigger_data->hw_control = true;
-> > -			trigger_data->mode = mode;
-> > +
-> > +			rc = led_cdev->hw_control_get(led_cdev, &mode);
-> > +			if (!rc)
-> > +				trigger_data->mode = mode;
-> 
-> Is the case where trigger_data->hw_control is set to true
-> but trigger_data->mode is not set ok?
-> 
-> I understand that is the whole point is not to return an error in this case.
-> But I'm concerned about the value of trigger_data->mode.
+Hi,
 
-Yes, its something Christian and I talked about off-list.
-trigger_data->mode is 0 by default due to the kzalloc(). 0 is a valid
-value, it means don't blink for any reason. So in effect the LED
-should be off. And any LED driver which the ledtrig-netdev.c supports
-must support software control of the LED, so does support setting the
-LED off.
+On Wed, Jun 21, 2023 at 4:41=E2=80=AFPM Naresh Kamboju
+<naresh.kamboju@linaro.org> wrote:
+>
+> On Wed, 21 Jun 2023 at 19:46, Puranjay Mohan <puranjay12@gmail.com> wrote=
+:
+> >
+> > Hi,
+> >
+> > On Wed, Jun 21, 2023 at 3:39=E2=80=AFPM Naresh Kamboju
+> > <naresh.kamboju@linaro.org> wrote:
+> > >
+> > > On Wed, 21 Jun 2023 at 18:27, Mark Rutland <mark.rutland@arm.com> wro=
+te:
+> > > >
+> > > > On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
+> > > > > Following boot warnings and crashes noticed on arm64 Rpi4 device =
+running
+> > > > > Linux next-20230621 kernel.
+> > > > >
+> > > > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > > > >
+> > > > > boot log:
+> > > > >
+> > > > > [   22.331748] Kernel text patching generated an invalid instruct=
+ion
+> > > > > at 0xffff8000835d6580!
+> > > > > [   22.340579] Unexpected kernel BRK exception at EL1
+> > > > > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1]=
+ PREEMPT SMP
+> > > >
+> > > > This indicates execution of AARCH64_BREAK_FAULT.
+> > >
+> > > I see kernel panic with kselftest merge configs on Juno-r2 and Rpi4.
+> >
+> > Is there a way to reproduce this setup on Qemu?
+>
+> Not reproducible on Qemu-arm64.
+> I see only on arm64 devices Juno-r2 and Rpi4.
+>
+> >
+> > I am able to build the linux-next kernel with the config given below.
+> > But the bug doesn't reproduce in Qemu with debian rootfs.
+> >
+> > I guess I would need the Rootfs that is being used here to reproduce it=
+.
+> > Can you point me to the rootfs for this?
+>
+> Here is the link for rootfs - OE one.
+> https://storage.tuxsuite.com/public/linaro/lkft/oebuilds/2RVA7dHPf73agY0g=
+DJD6XEdBQBI/images/juno/
 
-In the normal case hw_control_get() returns indicating the current
-blink mode, and the trigger sets its initial state to that. If
-however, it returns an error, it probably means its current state
-cannot be represented by the netdev trigger. PHY vendors do all sort
-of odd things, and we don't want to support all the craziness. So
-setting the LED off and leaving the user to configure the LED how they
-want seems like a reasonable thing to do.
+I tested this rootfs and couldn't reproduce on Qemu. Now, I will try
+to use my raspberry pi and try to reproduce this.
 
-And i tested this because my initial implementation of the Marvell
-driver was FUBAR and it returned an error here.
+Thanks.
 
-     Andrew
+>
+> >
+> > Thanks,
+> > Puranjay
+> >
+> > > metadata:
+> > >   git_ref: master
+> > >   git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+> > >   git_sha: 15e71592dbae49a674429c618a10401d7f992ac3
+> > >   git_describe: next-20230621
+> > >   kernel_version: 6.4.0-rc7
+> > >   kernel-config:
+> > >     https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVAA4lj35=
+ia3YDkqaoV6ztyqdW/config
+> > >   artifact-location:
+> > >     https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVAA4lj35=
+ia3YDkqaoV6ztyqdW/
+> > >   toolchain: gcc-11
+> > >   build_name: gcc-11-lkftconfig-kselftest
+> > >
+> > >
+> > > --
+> > > Linaro LKFT
+> > > https://lkft.linaro.org
+>
+> - Naresh
+
+
+
+--
+Thanks and Regards
+
+Yours Truly,
+
+Puranjay Mohan
 
