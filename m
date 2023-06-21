@@ -1,114 +1,205 @@
-Return-Path: <netdev+bounces-12694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1BE2B738873
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:09:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3140D738882
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:11:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 088491C20E69
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:09:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08CA41C20EEC
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:11:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99F2618C35;
-	Wed, 21 Jun 2023 15:09:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4F918C36;
+	Wed, 21 Jun 2023 15:11:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E08818B08
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:09:20 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66D89272A
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:08:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687360089;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=uMB3ETdHgdD0tMcM81kCwTmy5JB6eW9+tHfNYuJVs80=;
-	b=G3vzzLmbwDsThWUFSy6nleS4J6pIXt0nj00qugSCPcIyimMyYj4aN9bOSqD8SnQSnKZiLO
-	yMnTbI4bDzt97ds8B9JtqEpWufi2jidqDiyOCi5A1fL75N+cPYyY1cgi2JTX8/8EtxRNYh
-	+Aoi28PEAjOuqpAC3aND/acpb17fy8w=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-637-kr9g0FRMMT2iS8qv0De9Yw-1; Wed, 21 Jun 2023 11:04:44 -0400
-X-MC-Unique: kr9g0FRMMT2iS8qv0De9Yw-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2b46e684046so33223821fa.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:04:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F118C21
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:11:34 +0000 (UTC)
+Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1DCD4EF4
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:11:17 -0700 (PDT)
+Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-341d8129ee1so56008695ab.1
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:11:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687359881; x=1689951881;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=uMB3ETdHgdD0tMcM81kCwTmy5JB6eW9+tHfNYuJVs80=;
-        b=RmKMMYnIEqrBHGSFZxggG9Sc+IjLiIphkpCrQjM7GaSFF+g+FYlqMIcqyftjv54W7P
-         ibp14uwUf4z3ZjS1z0C8HsHT0MgkgvWolhB0El1COlrOtRfrWOsWHAqSFvssrvNbZUK7
-         eo4DZVZieG0XbCA3alPWl6MF+L+Co2w2AUe7YP1zQhypXqYoLHHOs/9J1w3zsNmCIXjA
-         EkSldpJOuBB3Ev6h8LK9gr1vOZVu1RYiytHk5IS33LKsuaEkfRRXOqanSTzno6Zm/iPc
-         Eo+w+SZZo7fcvqsEsBveFBOLf0cdc/vQTTLY5yxz+usz2QVdQvzhAEwQZqxU3THsyF+X
-         fpbg==
-X-Gm-Message-State: AC+VfDwC/3QFv4D7uq9+nBll4xU+p57TIq/lOJlPiRoS6qd5LCOCUh9P
-	2Nk6NZk8INH6tx7/yVvpQAjrGGx5b9uDpzwl9nWOoEzowgAbQr7RPgn0u9S4HCSH3TVfgCXbFcL
-	wNTsRT7d7Y+aLxio/
-X-Received: by 2002:a05:651c:8c:b0:2ad:9783:bca with SMTP id 12-20020a05651c008c00b002ad97830bcamr9809842ljq.27.1687359880944;
-        Wed, 21 Jun 2023 08:04:40 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6vuvyyKGk8qVbIbbO2C0uzdA3jUE5LT/K/8MPLqve8CmK2tHPbnZ1hPdf3acB2DVxep5kd3w==
-X-Received: by 2002:a05:651c:8c:b0:2ad:9783:bca with SMTP id 12-20020a05651c008c00b002ad97830bcamr9809823ljq.27.1687359880587;
-        Wed, 21 Jun 2023 08:04:40 -0700 (PDT)
-Received: from redhat.com ([2.52.159.126])
-        by smtp.gmail.com with ESMTPSA id e14-20020a50ec8e000000b0051a5c6a50d4sm2743117edr.51.2023.06.21.08.04.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 08:04:39 -0700 (PDT)
-Date: Wed, 21 Jun 2023 11:04:31 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	edliaw@google.com, lkp@intel.com, martin.roberts@intel.com,
-	mst@redhat.com, suwan.kim027@gmail.com
-Subject: [GIT PULL] virtio: last minute revert
-Message-ID: <20230621110431-mutt-send-email-mst@kernel.org>
+        d=1e100.net; s=20221208; t=1687360265; x=1689952265;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=2nk8zGziA31WDOuvA0aYlNn4pdInQRqMJ/p71b4Na7s=;
+        b=bRS6mNsZ/ml8e+61/joVOrPoWhXlHwrMczpkii1ryCSah2D0eoCfK7NgNmBYCXi1iq
+         ax0qta4YYdLxjdlaVOi3wMrZ2bUkL4N8q1nJE80teR6iwcA83Y8fn8CXZHibN/v8DoXs
+         tbTMllnQlo66OcWv4+z287Q481bit8QS/HEDrreiF8uzjZh54gO9dmqeLzSv4pCSfQ8Y
+         E+ieOHeB1oYpe1/RYlWx8PEBwS9NEXeQI6xeVttAbS5FyXrPNEohSz5tP/VCcVoDpNtD
+         wM/AkJie9D/NSI98ulPjIVtB48mTJ1r1OBZopNbxnEDfh6rNygPmoGExCUq5uhv0wUZk
+         bytw==
+X-Gm-Message-State: AC+VfDxH450I5D0b0nzAOIEPo0x3jN+6YOjgptQxu0DKMmhZdmwCoavA
+	czV6biFm8VLT9/pqA/gogiQghhhG09HZx20O7/JmySgeCzV5
+X-Google-Smtp-Source: ACHHUZ6j3i+8aue6dZr8BsfRhQKrwEUClSXrs3xjVwi9IORjcw+NLtmFVF291c+rd0h0HVphtwF8nH2FGodfjWSb9oqH1IgXSZ2b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Mutt-Fcc: =sent
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:a05:6e02:541:b0:33e:8aa2:4a0a with SMTP id
+ i1-20020a056e02054100b0033e8aa24a0amr5897970ils.4.1687360265045; Wed, 21 Jun
+ 2023 08:11:05 -0700 (PDT)
+Date: Wed, 21 Jun 2023 08:11:05 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000034cf5d05fea52dd4@google.com>
+Subject: [syzbot] [dri?] divide error in drm_mode_vrefresh
+From: syzbot <syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com>
+To: airlied@gmail.com, daniel@ffwll.ch, davem@davemloft.net, 
+	dri-devel@lists.freedesktop.org, dsahern@kernel.org, edumazet@google.com, 
+	jacob.e.keller@intel.com, jiri@nvidia.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, maarten.lankhorst@linux.intel.com, 
+	mripard@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com, tzimmermann@suse.de
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The following changes since commit 45a3e24f65e90a047bef86f927ebdc4c710edaa1:
+Hello,
 
-  Linux 6.4-rc7 (2023-06-18 14:06:27 -0700)
+syzbot found the following issue on:
 
-are available in the Git repository at:
+HEAD commit:    1639fae5132b Merge tag 'drm-fixes-2023-06-17' of git://ano..
+git tree:       upstream
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=153ae86b280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=ac246111fb601aec
+dashboard link: https://syzkaller.appspot.com/bug?extid=622bba18029bcde672e1
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12fcd517280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15de5137280000
 
-  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/ddaf9fb256b7/disk-1639fae5.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/82b7be81b931/vmlinux-1639fae5.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/926a973a103a/bzImage-1639fae5.xz
 
-for you to fetch changes up to afd384f0dbea2229fd11159efb86a5b41051c4a9:
+The issue was bisected to:
 
-  Revert "virtio-blk: support completion batching for the IRQ path" (2023-06-21 04:14:28 -0400)
+commit 565b4824c39fa335cba2028a09d7beb7112f3c9a
+Author: Jiri Pirko <jiri@nvidia.com>
+Date:   Mon Feb 6 09:41:51 2023 +0000
 
-----------------------------------------------------------------
-virtio: bugfix
+    devlink: change port event netdev notifier from per-net to global
 
-A last minute revert to fix a regression.
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1010a337280000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=1210a337280000
+console output: https://syzkaller.appspot.com/x/log.txt?x=1410a337280000
 
-Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
+Fixes: 565b4824c39f ("devlink: change port event netdev notifier from per-net to global")
 
-----------------------------------------------------------------
-Michael S. Tsirkin (1):
-      Revert "virtio-blk: support completion batching for the IRQ path"
+divide error: 0000 [#1] PREEMPT SMP KASAN
+CPU: 1 PID: 5003 Comm: syz-executor375 Not tainted 6.4.0-rc6-syzkaller-00242-g1639fae5132b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+RIP: 0010:drm_mode_vrefresh+0x19d/0x1f0 drivers/gpu/drm/drm_modes.c:1303
+Code: e8 58 3c e3 fc 66 83 fb 01 76 09 e8 4d 40 e3 fc 44 0f af e3 e8 44 40 e3 fc 48 69 ed e8 03 00 00 44 89 e0 31 d2 d1 e8 48 01 e8 <49> f7 f4 49 89 c4 eb 03 45 31 e4 e8 23 40 e3 fc 44 89 e0 5b 5d 41
+RSP: 0018:ffffc90003bdfa00 EFLAGS: 00010206
+RAX: 000000000001f400 RBX: 0000000000000400 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff84a1069c RDI: 0000000000000003
+RBP: 000000000001f400 R08: 0000000000000003 R09: 0000000000000001
+R10: 0000000000000400 R11: ffffffff81d6ebf5 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000008
+FS:  00005555561e3300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005fdeb8 CR3: 000000007b315000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ drm_mode_debug_printmodeline+0x22c/0x2f0 drivers/gpu/drm/drm_modes.c:60
+ drm_mode_setcrtc+0x116b/0x1650 drivers/gpu/drm/drm_crtc.c:794
+ drm_ioctl_kernel+0x281/0x4e0 drivers/gpu/drm/drm_ioctl.c:788
+ drm_ioctl+0x577/0xb30 drivers/gpu/drm/drm_ioctl.c:891
+ vfs_ioctl fs/ioctl.c:51 [inline]
+ __do_sys_ioctl fs/ioctl.c:870 [inline]
+ __se_sys_ioctl fs/ioctl.c:856 [inline]
+ __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fca321fac59
+Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fff9cb913d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
+RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fca321fac59
+RDX: 0000000020000180 RSI: 00000000c06864a2 RDI: 0000000000000003
+RBP: 00007fca321ba4d0 R08: 00000000fffff4e6 R09: 0000000000000000
+R10: 0000000000000003 R11: 0000000000000246 R12: 00007fca321ba560
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:drm_mode_vrefresh+0x19d/0x1f0 drivers/gpu/drm/drm_modes.c:1303
+Code: e8 58 3c e3 fc 66 83 fb 01 76 09 e8 4d 40 e3 fc 44 0f af e3 e8 44 40 e3 fc 48 69 ed e8 03 00 00 44 89 e0 31 d2 d1 e8 48 01 e8 <49> f7 f4 49 89 c4 eb 03 45 31 e4 e8 23 40 e3 fc 44 89 e0 5b 5d 41
+RSP: 0018:ffffc90003bdfa00 EFLAGS: 00010206
+RAX: 000000000001f400 RBX: 0000000000000400 RCX: 0000000000000000
+RDX: 0000000000000000 RSI: ffffffff84a1069c RDI: 0000000000000003
+RBP: 000000000001f400 R08: 0000000000000003 R09: 0000000000000001
+R10: 0000000000000400 R11: ffffffff81d6ebf5 R12: 0000000000000000
+R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000008
+FS:  00005555561e3300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00000000005fdeb8 CR3: 000000007b315000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	e8 58 3c e3 fc       	callq  0xfce33c5d
+   5:	66 83 fb 01          	cmp    $0x1,%bx
+   9:	76 09                	jbe    0x14
+   b:	e8 4d 40 e3 fc       	callq  0xfce3405d
+  10:	44 0f af e3          	imul   %ebx,%r12d
+  14:	e8 44 40 e3 fc       	callq  0xfce3405d
+  19:	48 69 ed e8 03 00 00 	imul   $0x3e8,%rbp,%rbp
+  20:	44 89 e0             	mov    %r12d,%eax
+  23:	31 d2                	xor    %edx,%edx
+  25:	d1 e8                	shr    %eax
+  27:	48 01 e8             	add    %rbp,%rax
+* 2a:	49 f7 f4             	div    %r12 <-- trapping instruction
+  2d:	49 89 c4             	mov    %rax,%r12
+  30:	eb 03                	jmp    0x35
+  32:	45 31 e4             	xor    %r12d,%r12d
+  35:	e8 23 40 e3 fc       	callq  0xfce3405d
+  3a:	44 89 e0             	mov    %r12d,%eax
+  3d:	5b                   	pop    %rbx
+  3e:	5d                   	pop    %rbp
+  3f:	41                   	rex.B
 
- drivers/block/virtio_blk.c | 82 +++++++++++++++++++++-------------------------
- 1 file changed, 37 insertions(+), 45 deletions(-)
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
