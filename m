@@ -1,184 +1,269 @@
-Return-Path: <netdev+bounces-12717-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12718-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07EB0738A01
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:43:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 86A31738A28
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:53:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B15E1C20EDD
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:43:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9F3D01C20B69
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:53:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 251AE19531;
-	Wed, 21 Jun 2023 15:43:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88AD019539;
+	Wed, 21 Jun 2023 15:53:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13FCD19506
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:43:50 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED73110D2
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:43:39 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bfae0f532e4so1981273276.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:43:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A38A18C2E
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:53:16 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2106.outbound.protection.outlook.com [40.107.223.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B49B1BC;
+	Wed, 21 Jun 2023 08:53:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Zmnz7/2GwKVrm2V1vbFMgkmQnPfP0kYeZSsnoJxW01AgFubLVcWMS6b3gjoitR6/qjUUdMg2vQG+06yy1YghB0Zqd3/XMftXLqJ+nbee1/8iXl35PV91/GfE7JXknk4JjLVsyjzHcRn+auSat53PtAZJrJKJLNcgPJn9//p8Eif/2/8BTqElZqDfjll2hfOidGQ3W2M7jzQhiFErJeuE1/lYNCvIPzZMA96GaLU6+rbKcu+o/mEqEdJ6o57sxXhKF9TMUUh32cmWVW6s4y60Srz1Tq3NY25UQ/dGMexAZrgG4xP4vIsBqyqRbRCPcJM+QoIzVo/Kvwb1Ai0UyljKJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Fm9xfioeGlwueCnr+ZMAhfo1VcCcRfPA75BOmUevJwo=;
+ b=MHFc1EMfSQsh5SrLFzEJ+eheXvynD/yKEjUctNuBY7TOIt1lHabw8fYsPPZ4cBk4wm6oGWL40hMf3tOGhAJd+WPIuRD+lPW43j3MZJu7rz8KNIUh2+sDp0N5n+HZymHioOl0uONY+0ANcPW4ObaZWm+hDX7X3Ulv21FiKPDgNRik5MICGTPKmbEADB8gtHyP1KkLRKCURb7r+fdbu0CLR7Y3MJM1woIJcozV4nR7N1P/t+LJ54VjxbEOmHOU3s/CnGaHqAu97bV3b/lwIH7jpRBhZED0Nu68XW4HRKV/eDsunyM+HDTEzBCeBWWEutp9Giskk+GAypqNWFyCgG6hbA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687362219; x=1689954219;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=wx/CGC9gI7K/3rwwMYwD+SoHnBa1DxvZMeVHjqZ+wF4=;
-        b=faGVIt7CWnUBpyA6DsI7Ik5tVApCFPpkO9+1ZB31OSbF2XFXFloxs5Mf2GziSetx36
-         SL4bOvq57kN5/j6GDTI5pOTNJmjUDUkne/45IqjprTd4lHi5Q2OTN2jVygg8j1ZqrCLB
-         aEZlUJVoinHnoTFdh0a8mq2EfWtSqjj1+ZBBQMwcxqC1O9q6TWUSOahUwH2UylBSd1xB
-         HlioW/hxUhfqjBbbfsK0Z8h4iLYf6PCg7KjDmxwI/b43n0V7KjrS3Re8chxG8m9W/QLf
-         yo2b3FJ2PreAbHl6YElAKZWEzRSWgE4hDy7AuwNit3Ul6UqYZ+wYj6UNNvGckzgvXE0Q
-         iqWA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687362219; x=1689954219;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=wx/CGC9gI7K/3rwwMYwD+SoHnBa1DxvZMeVHjqZ+wF4=;
-        b=S7rqUFc6P1t0Qm1cTWdxHmbKLpyOj28hmwmNqqX2Ds6IXSIW3QE3jlNc6fR9R08yh6
-         rjZQVQjEocB59Zc8kJvqtS3uBvQHQqvbUJWlpmuJ6wHWadRNrexleI2u9+0W99YjklWB
-         w395OEeOvn4mMX6foFGS+3VjMTcnh0rCNdLcOW/8o00p0qvXwrSiAEjvsw/9BYrsZUFS
-         7kQuI8iYrTr2yazjW9pagZIvcDEshWS6+R8M3jyl/AwDRplPaAHiR/Wxq2EjDW8J2+/n
-         oobXZW8GybgcNfGz2OOI0nYYJXouwulDCgseq3bL22jKVWgUKuuarw4HLpJ8ydO6ksSq
-         57KQ==
-X-Gm-Message-State: AC+VfDx3gwr/xMYVFQrRytclrbUDzV0aJue3T6RHmmp43CJyh83XMCQR
-	cXRp6AFGiC0atmCOsZh8QW8sjQV3J/c6Xg==
-X-Google-Smtp-Source: ACHHUZ7gS22vXEv21IXlncE6aDe6aUVUmvqh3hW/YiKbXp1tpZ1/NtIExOx6xH4bsFeKVRu9ets8iK6Pr2eRRw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a25:d3c8:0:b0:bac:adb8:a605 with SMTP id
- e191-20020a25d3c8000000b00bacadb8a605mr1862654ybf.2.1687362218977; Wed, 21
- Jun 2023 08:43:38 -0700 (PDT)
-Date: Wed, 21 Jun 2023 15:43:37 +0000
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Fm9xfioeGlwueCnr+ZMAhfo1VcCcRfPA75BOmUevJwo=;
+ b=m5lJiPyB8V4pGkk+qaNNNp0RQc895uosDUz7K4KcEo1z8cTKWdVtWeyyJ0E9NunHAzoToo0JREwCB2H/Y1trsNj0ft9S2Hy8d/f/IB1lQEN6fx+5VCNgF9SygsLSmB53hwrAQesxhz3AjUPpxcWVq2WQeJpCVFSEhRaark/B+DQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by DM8PR13MB5126.namprd13.prod.outlook.com (2603:10b6:8:31::23) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
+ 2023 15:53:11 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 15:53:11 +0000
+Date: Wed, 21 Jun 2023 17:53:02 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>
+Subject: Re: [PATCH] s390/net: lcs: use IS_ENABLED() for kconfig detection
+Message-ID: <ZJMc3oS2nxORPASN@corigine.com>
+References: <20230615222152.13250-1-rdunlap@infradead.org>
+ <ea55623d-d469-ddaf-92ce-3daf1d2d726f@infradead.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ea55623d-d469-ddaf-92ce-3daf1d2d726f@infradead.org>
+X-ClientProxiedBy: AS4P195CA0042.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:20b:65a::16) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.178.g377b9f9a00-goog
-Message-ID: <20230621154337.1668594-1-edumazet@google.com>
-Subject: [PATCH net] netlink: fix potential deadlock in netlink_set_err()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>, syzbot+a7d200a347f912723e5c@syzkaller.appspotmail.com, 
-	Johannes Berg <johannes.berg@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
-	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|DM8PR13MB5126:EE_
+X-MS-Office365-Filtering-Correlation-Id: 85230c69-293a-47fe-dc14-08db726f9ca0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	fA1MBK+ZQXzMiTCimHw7JNQUCSL+c6cHLf3mnl9OkIJsCIbwHhMtjp+r7nrtgfYpEdoZVLg/EzifvkaG1PSTcQF7fBoV0RoPzbUgMBYCPwN+rgw4pmXkWzudQMCoVfRYMVSdnhDTjW4AB6mw0E4C++i2o2WSwgrOur8fIwrmo/rg9bgYG6VjjIGxGnCX2HLble16fh2qp2a1mhObXylYq+C961Vu88QH6n7g8GC9eMySF+uHvx646iOVcYFmtdFXhM62+pNhkJIHn57hNLDFaR1lbZDNiZYtcTM76wSThxWmEG3eQrRQnMkUhtZ0+GLAyeuzE8Oi4W+QdbZf4Kd+zRb7vxDN8jciARTZlksuqVTw1MBu1QKbScM5wNScAmSWn5+pKrxSogz0t7c/kshwZXZIhqyV08qMJ14FUj5K3mbyeWwIdMU9Dvxk1J0IWhBvbVnhXuNOtmSM7zrvHBqS4XPMIxnoO5fIf7osm5QmVOzU1K/ECE9EgUocSmhGCOOx2ELaz8s3l4gsgR1dv0OI/le17bM6puidFQYBgPBo5kYi2JLB+VVG9T5twtsy2m1NP68SnRfW73/ddXse337d2wzroCSK7jQSX8E60ecVAOY=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(376002)(346002)(366004)(136003)(396003)(451199021)(6666004)(478600001)(54906003)(4326008)(83380400001)(2616005)(86362001)(36756003)(38100700002)(2906002)(186003)(53546011)(6506007)(966005)(6512007)(6486002)(316002)(66946007)(6916009)(66556008)(66476007)(8676002)(8936002)(41300700001)(7416002)(5660300002)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?MRV0SVfG2aRGaf2AEFFFPG/xzENec/jlhEqUav+hmqYq4ETeceTtkW1f/XS4?=
+ =?us-ascii?Q?DBYmubUcdvIMCiV+aLrLKAeZGiVT/OuYEBikRJi6Kg6Zq/idO7NwizkMh/t2?=
+ =?us-ascii?Q?5jy0kHidyF7CwMRLXOf4s4ami4grmNdBsfCtPSrz9jHf78wSRDVZtpp03e+k?=
+ =?us-ascii?Q?/aMDteupZDIEndBYSA6MdEiLvNfvcZFWe0cX7Zb4VJKh0+v159hV0ZIomzxt?=
+ =?us-ascii?Q?oW2mPEEfIpg95UjtUh441ljb/L5xm3pVoVzMI/Wb5MLMt1OESTJp6JfHIMHu?=
+ =?us-ascii?Q?HIc0S2LemnG9uqkbtyODPrAg9UfitkSz5NASZuuLrzYf74085QY4EMFULmQC?=
+ =?us-ascii?Q?9eQ8lCdDfDkkLxc4O5FdyR5gzr6iMdNxIRqp3aDz5wo6hNVVUn9ib1+Vm3oq?=
+ =?us-ascii?Q?Qs6fHqhm/V6Bs+fzh5o5steBBWZxoZuIHnEYVai/1VSTOsUg3Aa0NU8NdMVy?=
+ =?us-ascii?Q?W6/1lqEcAKfPO4BrUwazS5apPPro9CUZm598ZROLhQQdjMzOzso8j8IPFX6T?=
+ =?us-ascii?Q?+5fs9OxIlm6ObO8H0SA1hEJRXPBWSM4Bb45VJ/a4bFDncmVLf3T5PJeF8kiJ?=
+ =?us-ascii?Q?mrIbdI41tdHyDOMdvwKUX2dlXJ8DzKVY4mEDT9mq1ufMIN6MU12xNlf7S064?=
+ =?us-ascii?Q?v+49iA23uEcbhew+CWBAppYjFwwkIZm5aJcrAYBWWYfMkHqOLPbKg5aEGGwi?=
+ =?us-ascii?Q?2r3NcCWElPIlEO4DHfKDm4C1z94ZQAMxhqX0LUJE0OWufM/urxYSoT4mTMHt?=
+ =?us-ascii?Q?QZLUzFgKf5c38j8KvOjiyNaLjnKumHVWZ4p3XXV36g3xAsQSnz5uBpzgjzv6?=
+ =?us-ascii?Q?WvBoiwFKjBq5K2AQn/hmwDZhH8pF7uazrsGd0I58nY+/DwbgPmneU0NzSHXw?=
+ =?us-ascii?Q?brrWRu/GuMS+qZiYMLBSQGS2npNyWcYSPW2Vk5V04Lyt6N0L7RG2aje1r1z8?=
+ =?us-ascii?Q?CkvSZ9fjzHAN8t1ml2/THfrGvBdFzsuocbEqf4AZqw3coZuaDKcodMmF8yux?=
+ =?us-ascii?Q?eQALBC7n0wGNEJGqqvy7U/yW7TI9Gi8nMmyQ+8rvLT3tZ0ONPBJC5ZUavzzk?=
+ =?us-ascii?Q?FWx6kV2QokdTp8Y+637FDTxuDbSBEbyXyDJK0j9hbl3LYLzD8vVijbE2+ToN?=
+ =?us-ascii?Q?i8REk/Jb0T1FiB9v8K2kHbQ7abFxjZGuAClQvQS8a6Oz82cBpfWVg+ESpG8l?=
+ =?us-ascii?Q?1BIooQceG+f4zITbQ/ltzqXE07VfoE4WweTUc8daV4WV1/SuFQ5pXm+94FhM?=
+ =?us-ascii?Q?4c9P7wh0kYrn8LcsMlcHqLlt8yN7wnCseu5jlQx4R3/RjL1dtMzU7EJO7xQZ?=
+ =?us-ascii?Q?llBA56MIbybKSNThOELOKYmqaU0trWU59yuRqcjqSp6534O1oMRJLVKKg8Ur?=
+ =?us-ascii?Q?NdA5k1Wb64NrS5hE7IwCjKGetwY851EshHXonkeuVtRzU2hXoahO13cZiGPQ?=
+ =?us-ascii?Q?VPQGuwVSb8ATI/QqHewX6hJ310XVMY6tuT6MwaYeaNrRTSNOH4Z3pCMaR8Yw?=
+ =?us-ascii?Q?YcXMlxbLUSMOaWlVMCh+/v2x2+lAUhtQY0FS3uBqheCemy6XqT4pL8ZdU3Ev?=
+ =?us-ascii?Q?fx1/xQIvcblIW6dwWI8hHyQj5ML6qhu/EOTHpQp0iWM7s7ovZK+M0LPV6uTG?=
+ =?us-ascii?Q?ICs678U5IXZ7WjwT9WBTP1iQQ1lMLSVjJplv9SRXEutL5A+8dpLFtjD9EfAg?=
+ =?us-ascii?Q?5fYCcg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 85230c69-293a-47fe-dc14-08db726f9ca0
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 15:53:10.7466
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: zHX7BUCZqpZf++DJ+QgdAi0eP/gXcweQGz/L0TtW6tGgNe/4aNnjidHyMD3/6gNHGoQl3oy0GRHfriJlHTwNj3S+2e0LsRplyQs4wANS71Q=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR13MB5126
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot reported a possible deadlock in netlink_set_err() [1]
+On Tue, Jun 20, 2023 at 07:35:17PM -0700, Randy Dunlap wrote:
+> Hi,
+> 
+> On 6/15/23 15:21, Randy Dunlap wrote:
+> > When CONFIG_ETHERNET=m or CONFIG_FDDI=m, lcs.s has build errors or
+> > warnings:
+> > 
+> > ../drivers/s390/net/lcs.c:40:2: error: #error Cannot compile lcs.c without some net devices switched on.
+> >    40 | #error Cannot compile lcs.c without some net devices switched on.
+> > ../drivers/s390/net/lcs.c: In function 'lcs_startlan_auto':
+> > ../drivers/s390/net/lcs.c:1601:13: warning: unused variable 'rc' [-Wunused-variable]
+> >  1601 |         int rc;
+> > 
+> > Solve this by using IS_ENABLED(CONFIG_symbol) instead of ifdef
+> > CONFIG_symbol. The latter only works for builtin (=y) values
+> > while IS_ENABLED() works for builtin or modular values.
+> > 
+> > Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> > Cc: Alexandra Winter <wintera@linux.ibm.com>
+> > Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Cc: linux-s390@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Cc: Heiko Carstens <hca@linux.ibm.com>
+> > Cc: Vasily Gorbik <gor@linux.ibm.com>
+> > Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> > Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> > Cc: Sven Schnelle <svens@linux.ibm.com>
+> > ---
+> >  drivers/s390/net/lcs.c |   10 +++++-----
+> >  1 file changed, 5 insertions(+), 5 deletions(-)
+> > 
+> > diff -- a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
+> > --- a/drivers/s390/net/lcs.c
+> > +++ b/drivers/s390/net/lcs.c
+> > @@ -36,7 +36,7 @@
+> >  #include "lcs.h"
+> >  
+> >  
+> > -#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
+> > +#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
+> >  #error Cannot compile lcs.c without some net devices switched on.
+> >  #endif
+> >  
+> > @@ -1601,14 +1601,14 @@ lcs_startlan_auto(struct lcs_card *card)
+> >  	int rc;
+> >  
+> >  	LCS_DBF_TEXT(2, trace, "strtauto");
+> > -#ifdef CONFIG_ETHERNET
+> > +#if IS_ENABLED(CONFIG_ETHERNET)
+> >  	card->lan_type = LCS_FRAME_TYPE_ENET;
+> >  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+> >  	if (rc == 0)
+> >  		return 0;
+> >  
+> >  #endif
+> > -#ifdef CONFIG_FDDI
+> > +#if IS_ENABLED(CONFIG_FDDI)
+> >  	card->lan_type = LCS_FRAME_TYPE_FDDI;
+> >  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+> >  	if (rc == 0)
+> > @@ -2139,13 +2139,13 @@ lcs_new_device(struct ccwgroup_device *c
+> >  		goto netdev_out;
+> >  	}
+> >  	switch (card->lan_type) {
+> > -#ifdef CONFIG_ETHERNET
+> > +#if IS_ENABLED(CONFIG_ETHERNET)
+> >  	case LCS_FRAME_TYPE_ENET:
+> >  		card->lan_type_trans = eth_type_trans;
+> >  		dev = alloc_etherdev(0);
+> >  		break;
+> >  #endif
+> > -#ifdef CONFIG_FDDI
+> > +#if IS_ENABLED(CONFIG_FDDI)
+> >  	case LCS_FRAME_TYPE_FDDI:
+> >  		card->lan_type_trans = fddi_type_trans;
+> >  		dev = alloc_fddidev(0);
+> 
+> 
+> kernel test robot reports build errors from this patch when
+> ETHERNET=y, FDDI=m, LCS=y:
+> 
+>   https://lore.kernel.org/all/202306202129.pl0AqK8G-lkp@intel.com/
+> 
+> Since the code before my patch expected (supported) FDDI=y only
+> (by checking for CONFIG_FDDI only and not checking for CONFIG_FDDI_MODULE),
+> the best solution that I can see is to enforce that expectation in
+> drivers/s390/net/Kconfig:
+> 
+> diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+> --- a/drivers/s390/net/Kconfig
+> +++ b/drivers/s390/net/Kconfig
+> @@ -5,7 +5,7 @@ menu "S/390 network device drivers"
+>  config LCS
+>  	def_tristate m
+>  	prompt "Lan Channel Station Interface"
+> -	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +	depends on CCW && NETDEVICES && (ETHERNET || FDDI = y)
 
-A similar issue was fixed in commit 1d482e666b8e ("netlink: disable IRQs
-for netlink_lock_table()") in netlink_lock_table()
+Hi Randy,
 
-This patch adds IRQ safety to netlink_set_err() and __netlink_diag_dump()
-which were not covered by cited commit.
+Unfortunately I don't think this helps.
+In the config given at the link above, ETHERNET is y.
+And the error regarding fddi_type_trans and alloc_fddidev being undefined
+seems to occur regardless of your change.
 
-[1]
+I did have better luck with this.
 
-WARNING: possible irq lock inversion dependency detected
-6.4.0-rc6-syzkaller-00240-g4e9f0ec38852 #0 Not tainted
+diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+index 9c67b97faba2..303220251495 100644
+--- a/drivers/s390/net/Kconfig
++++ b/drivers/s390/net/Kconfig
+@@ -6,6 +6,7 @@ config LCS
+        def_tristate m
+        prompt "Lan Channel Station Interface"
+        depends on CCW && NETDEVICES && (ETHERNET || FDDI)
++       depends on FDDI=y || FDDI=n
+        help
+          Select this option if you want to use LCS networking on IBM System z.
+          This device driver supports FDDI (IEEE 802.7) and Ethernet.
 
-syz-executor.2/23011 just changed the state of lock:
-ffffffff8e1a7a58 (nl_table_lock){.+.?}-{2:2}, at: netlink_set_err+0x2e/0x3a0 net/netlink/af_netlink.c:1612
-but this lock was taken by another, SOFTIRQ-safe lock in the past:
- (&local->queue_stop_reason_lock){..-.}-{2:2}
+I am assuming that LCS=m and FDDI=m can't work at runtime
+because there is no guarantee that FDDI is loaded before LCS.
+But I could well be wrong here.
 
-and interrupts could create inverse lock ordering between them.
-
-other info that might help us debug this:
- Possible interrupt unsafe locking scenario:
-
-       CPU0                    CPU1
-       ----                    ----
-  lock(nl_table_lock);
-                               local_irq_disable();
-                               lock(&local->queue_stop_reason_lock);
-                               lock(nl_table_lock);
-  <Interrupt>
-    lock(&local->queue_stop_reason_lock);
-
- *** DEADLOCK ***
-
-Fixes: 1d482e666b8e ("netlink: disable IRQs for netlink_lock_table()")
-Reported-by: syzbot+a7d200a347f912723e5c@syzkaller.appspotmail.com
-Link: https://syzkaller.appspot.com/bug?extid=a7d200a347f912723e5c
-Link: https://lore.kernel.org/netdev/000000000000e38d1605fea5747e@google.com/T/#u
-Signed-off-by: Eric Dumazet <edumazet@google.com>
-Cc: Johannes Berg <johannes.berg@intel.com>
----
- net/netlink/af_netlink.c | 5 +++--
- net/netlink/diag.c       | 5 +++--
- 2 files changed, 6 insertions(+), 4 deletions(-)
-
-diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
-index 3a1e0fd5bf149c3ece9e0f004107efe149e3f2c3..5968b6450d828a52a3990d18ea597687ab03170e 100644
---- a/net/netlink/af_netlink.c
-+++ b/net/netlink/af_netlink.c
-@@ -1600,6 +1600,7 @@ static int do_one_set_err(struct sock *sk, struct netlink_set_err_data *p)
- int netlink_set_err(struct sock *ssk, u32 portid, u32 group, int code)
- {
- 	struct netlink_set_err_data info;
-+	unsigned long flags;
- 	struct sock *sk;
- 	int ret = 0;
- 
-@@ -1609,12 +1610,12 @@ int netlink_set_err(struct sock *ssk, u32 portid, u32 group, int code)
- 	/* sk->sk_err wants a positive error value */
- 	info.code = -code;
- 
--	read_lock(&nl_table_lock);
-+	read_lock_irqsave(&nl_table_lock, flags);
- 
- 	sk_for_each_bound(sk, &nl_table[ssk->sk_protocol].mc_list)
- 		ret += do_one_set_err(sk, &info);
- 
--	read_unlock(&nl_table_lock);
-+	read_unlock_irqrestore(&nl_table_lock, flags);
- 	return ret;
- }
- EXPORT_SYMBOL(netlink_set_err);
-diff --git a/net/netlink/diag.c b/net/netlink/diag.c
-index c6255eac305c7b64f6e00f10d3bf8cf42c680c15..4143b2ea4195aeacbd4eb828430c836cfb79d859 100644
---- a/net/netlink/diag.c
-+++ b/net/netlink/diag.c
-@@ -94,6 +94,7 @@ static int __netlink_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 	struct net *net = sock_net(skb->sk);
- 	struct netlink_diag_req *req;
- 	struct netlink_sock *nlsk;
-+	unsigned long flags;
- 	struct sock *sk;
- 	int num = 2;
- 	int ret = 0;
-@@ -152,7 +153,7 @@ static int __netlink_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 	num++;
- 
- mc_list:
--	read_lock(&nl_table_lock);
-+	read_lock_irqsave(&nl_table_lock, flags);
- 	sk_for_each_bound(sk, &tbl->mc_list) {
- 		if (sk_hashed(sk))
- 			continue;
-@@ -173,7 +174,7 @@ static int __netlink_diag_dump(struct sk_buff *skb, struct netlink_callback *cb,
- 		}
- 		num++;
- 	}
--	read_unlock(&nl_table_lock);
-+	read_unlock_irqrestore(&nl_table_lock, flags);
- 
- done:
- 	cb->args[0] = num;
--- 
-2.41.0.178.g377b9f9a00-goog
-
+>  	help
+>  	  Select this option if you want to use LCS networking on IBM System z.
+>  	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+> 
+> What do people think of that change?
+> Any other ideas/suggestions?
+> 
+> thanks.
+> -- 
+> ~Randy
+> 
 
