@@ -1,110 +1,241 @@
-Return-Path: <netdev+bounces-12534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12548-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C64737F5B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:17:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AE03737F79
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:21:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 895331C20E0B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:17:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC7791C20E67
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:21:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD46DF6F;
-	Wed, 21 Jun 2023 10:17:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55422FBF0;
+	Wed, 21 Jun 2023 10:21:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64991C2DE
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:17:22 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8036F1FF6;
-	Wed, 21 Jun 2023 03:17:07 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35L68TN5028452;
-	Wed, 21 Jun 2023 03:16:55 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=5u6BWBK/bo7oif1Y/e08ARqz5El6m4nveuOvMD1hy5U=;
- b=LgzQjzqoYgMeRZbXUOMsSjW7oODOev9Nxjhdfkzkg7REodSgyreBa1arBi/60AOyFTtL
- lBwqhhAoS7e+NonSb9djmLNj6eVdePmGbkrCZ05PskjVDugmpsSlSlA8sOphIyqgTtBx
- u2AUrefzcwasp6nxGIOP99WMVF4qn7NpqiFcnKpFv7Db0aVUearr6ujIcF8x2KXaqC66
- qH2eqs3RHluoo13HfxOU6MnN6lV1+KQKLyf4KTavLoN03tQ4SykGc5afxod4RLR7ZSjx
- MHKghW0wFh2VsiO9CJAwBRTO5lVXHhxgdZ+iMQPKK2Dl1+SdPH+17Sdbvl7P031fjvBf jg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rb5b35n74-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 21 Jun 2023 03:16:55 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 21 Jun
- 2023 03:16:53 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 21 Jun 2023 03:16:53 -0700
-Received: from setup-1.sclab.marvell.com (unknown [10.106.25.74])
-	by maili.marvell.com (Postfix) with ESMTP id 8B00F3F705F;
-	Wed, 21 Jun 2023 03:16:53 -0700 (PDT)
-From: Sathesh Edara <sedara@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <sburla@marvell.com>, <vburru@marvell.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>, <hgani@marvell.com>
-CC: <sedara@marvell.com>
-Subject: [PATCH v2] MAINTAINERS: update email addresses of octeon_ep driver maintainers
-Date: Wed, 21 Jun 2023 03:16:49 -0700
-Message-ID: <20230621101649.43441-1-sedara@marvell.com>
-X-Mailer: git-send-email 2.37.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 436F1DF60
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:21:02 +0000 (UTC)
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5EFD10F0
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:20:56 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-54fba092ef5so4578811a12.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:20:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1687342855; x=1689934855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QMULsX7Dfo5b2zc6PeXXiTXS5XgNxl2nI88lUF+EMtE=;
+        b=hNhaYwhGaP6KI5AaWtX45Uvo6vzdGw+3RgvM2Pc6af5WTt9Xk8YdtgCjYKK1UMfHeO
+         yQZK/ZDfzszD04HEUinydZdKL3xmCg1x5aBYvETc92RxTf3MkKIZXvBvK5u5iUztQWeq
+         AYVf4tlKpqLY5z/5NWWp0z7QyCYO52BLZ2hNw=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687342855; x=1689934855;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=QMULsX7Dfo5b2zc6PeXXiTXS5XgNxl2nI88lUF+EMtE=;
+        b=ASz56js3PxosFRQIk+k6JylfNNg/Ajyf5YQU0TFeaGUvg9Pp/0exzAk6Fk6RgKN7zg
+         YGOaOkVyVTiLzj05qQuCr227WKhfZ2DxyqGGUH2Wm1FQvr1jDh/POUooLJimnnoNqRvJ
+         L6snUuNuLsSBgipXTTr5sdBXGBhrW+zG0deaC5J4JCFd6M8RQNgiv/S5TFmC+kZVdQwP
+         cxroiJABqHlqSj8SpFlsnHdK0nBpG0FO/xLcWQgWPrLmor5gNdK21jOVVymcUOZZWDNx
+         WjUFbAJt/IRCzMUt4pnZwH36grGU4jFM9ME8clOYeu5EPlqDIGG7pySc8tSZC7tvXDQI
+         xm4g==
+X-Gm-Message-State: AC+VfDx7Hew3JffDR0vrLesSO6BAHvtmmAmewCpueQsWzE6I5QZChBXY
+	VktZcQ5aBXxfRQMBrnO4IKRaLTUFadHejbRHd5LGoQ==
+X-Google-Smtp-Source: ACHHUZ7/hNmsWRlrLpNbsJMKJIlg32nbmO1VWpWps6k5fEFwklcOENmUGp7zDOpHSwgP1dAkb1bR7mrJpnwtVIXnF5I=
+X-Received: by 2002:a17:90a:d811:b0:256:87f4:432a with SMTP id
+ a17-20020a17090ad81100b0025687f4432amr14607505pjv.18.1687342855601; Wed, 21
+ Jun 2023 03:20:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: LaiyW7-dh_srrfRSeJaF4dIL3z7PJtvn
-X-Proofpoint-ORIG-GUID: LaiyW7-dh_srrfRSeJaF4dIL3z7PJtvn
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-21_07,2023-06-16_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230615152918.3484699-1-revest@chromium.org> <ZJFIy+oJS+vTGJer@calendula>
+In-Reply-To: <ZJFIy+oJS+vTGJer@calendula>
+From: Florent Revest <revest@chromium.org>
+Date: Wed, 21 Jun 2023 12:20:44 +0200
+Message-ID: <CABRcYmJjv-JoadtzZwU5A+SZwbmbgnzWb27UNZ-UC+9r+JnVxg@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: conntrack: Avoid nf_ct_helper_hash uses
+ after free
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, lirongqing@baidu.com, wangli39@baidu.com, 
+	zhangyu31@baidu.com, daniel@iogearbox.net, ast@kernel.org, kpsingh@kernel.org, 
+	stable@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Update email addresses of Marvell octeon_ep driver maintainers.
-Also remove a former maintainer.
+On Tue, Jun 20, 2023 at 8:35=E2=80=AFAM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
+>
+> On Thu, Jun 15, 2023 at 05:29:18PM +0200, Florent Revest wrote:
+> > If register_nf_conntrack_bpf() fails (for example, if the .BTF section
+> > contains an invalid entry), nf_conntrack_init_start() calls
+> > nf_conntrack_helper_fini() as part of its cleanup path and
+> > nf_ct_helper_hash gets freed.
+> >
+> > Further netfilter modules like netfilter_conntrack_ftp don't check
+> > whether nf_conntrack initialized correctly and call
+> > nf_conntrack_helpers_register() which accesses the freed
+> > nf_ct_helper_hash and causes a uaf.
+> >
+> > This patch guards nf_conntrack_helper_register() from accessing
+> > freed/uninitialized nf_ct_helper_hash maps and fixes a boot-time
+> > use-after-free.
+>
+> How could this possibly happen?
 
-As a maintainer below are the responsibilities:
-- Pushing the bug fixes and new features to upstream.
-- Responsible for reviewing the external changes
-  submitted for the octeon_ep driver.
-- Reply to maintainers questions in a timely manner.
+Here is one way to reproduce this bug:
 
-Signed-off-by: Sathesh Edara <sedara@marvell.com>
----
+  # Use nf/main
+  git clone git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf.git
+  cd nf
 
-v2: added maintainer responsibilities
+  # Start from a minimal config
+  make LLVM=3D1 LLVM_IAS=3D0 defconfig
 
- MAINTAINERS | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+  # Enable KASAN, BTF and nf_conntrack_ftp
+  scripts/config -e KASAN -e BPF_SYSCALL -e DEBUG_INFO -e
+DEBUG_INFO_DWARF_TOOLCHAIN_DEFAULT -e DEBUG_INFO_BTF -e
+NF_CONNTRACK_FTP
+  make LLVM=3D1 LLVM_IAS=3D0 olddefconfig
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 081eb65ef865..23d91becf43a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -12538,7 +12538,7 @@ F:	drivers/mtd/nand/raw/marvell_nand.c
- 
- MARVELL OCTEON ENDPOINT DRIVER
- M:	Veerasenareddy Burru <vburru@marvell.com>
--M:	Abhijit Ayarekar <aayarekar@marvell.com>
-+M:	Sathesh Edara <sedara@marvell.com>
- L:	netdev@vger.kernel.org
- S:	Supported
- F:	drivers/net/ethernet/marvell/octeon_ep
--- 
-2.37.3
+  # Build without the LLVM integrated assembler
+  make LLVM=3D1 LLVM_IAS=3D0 -j `nproc`
 
+(Note that the use of LLVM_IAS=3D0, KASAN and BTF is just to trigger a
+bug in BTF that will be fixed by
+https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git/commit/?id=3D97=
+24160b3942b0a967b91a59f81da5593f28b8ba
+Independently of that specific BTF bug, it shows how an error in
+nf_conntrack_bpf can cause a boot-time uaf in netfilter)
+
+Then, booting gives me:
+
+[    4.624666] BPF: [13893] FUNC asan.module_ctor
+[    4.625611] BPF: type_id=3D1
+[    4.626176] BPF:
+[    4.626601] BPF: Invalid name
+[    4.627208] BPF:
+[    4.627723] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+[    4.628610] BUG: KASAN: slab-use-after-free in
+nf_conntrack_helper_register+0x129/0x2f0
+[    4.628610] Read of size 8 at addr ffff888102d24000 by task swapper/0/1
+[    4.628610]
+[    4.628610] CPU: 1 PID: 1 Comm: swapper/0 Not tainted
+6.4.0-rc4-00244-gab39b113e747 #47
+[    4.628610] Hardware name: QEMU Standard PC (Q35 + ICH9, 2009),
+BIOS 1.16.0-debian-1.16.0-5 04/01/2014
+[    4.628610] Call Trace:
+[    4.628610]  <TASK>
+[    4.636584] i801_smbus 0000:00:1f.3: SMBus using PCI interrupt
+[    4.628610]  dump_stack_lvl+0x97/0xd0
+[    4.638738] i2c i2c-0: 1/1 memory slots populated (from DMI)
+[    4.628610]  print_report+0x17e/0x570
+[    4.640118] i2c i2c-0: Memory type 0x07 not supported yet, not
+instantiating SPD
+[    4.628610]  ? __virt_addr_valid+0xe4/0x160
+[    4.628610]  kasan_report+0x169/0x1a0
+[    4.628610]  ? nf_conntrack_helper_register+0x129/0x2f0
+[    4.628610]  nf_conntrack_helper_register+0x129/0x2f0
+[    4.628610]  nf_conntrack_helpers_register+0x24/0x60
+[    4.628610]  nf_conntrack_ftp_init+0x114/0x140
+[    4.628610]  ? __pfx_nf_conntrack_ftp_init+0x10/0x10
+[    4.628610]  do_one_initcall+0xe6/0x310
+[    4.628610]  ? kasan_set_track+0x61/0x80
+[    4.628610]  ? kasan_set_track+0x4f/0x80
+[    4.628610]  ? __kasan_kmalloc+0x72/0x90
+[    4.628610]  ? __kmalloc+0xa7/0x1a0
+[    4.628610]  ? do_initcalls+0x1b/0x70
+[    4.628610]  ? kernel_init_freeable+0x174/0x1e0
+[    4.628610]  ? kernel_init+0x18/0x1b0
+[    4.628610]  ? ret_from_fork+0x29/0x50
+[    4.628610]  ? sysvec_apic_timer_interrupt+0xe/0x80
+[    4.628610]  ? asm_sysvec_apic_timer_interrupt+0x1a/0x20
+[    4.628610]  ? __pfx_ignore_unknown_bootoption+0x10/0x10
+[    4.628610]  ? next_arg+0x20b/0x250
+[    4.628610]  ? strlen+0x21/0x40
+[    4.628610]  ? parse_args+0xc7/0x5f0
+[    4.628610]  do_initcall_level+0xa6/0x140
+[    4.628610]  do_initcalls+0x3e/0x70
+[    4.628610]  kernel_init_freeable+0x174/0x1e0
+[    4.628610]  ? __pfx_kernel_init+0x10/0x10
+[    4.628610]  kernel_init+0x18/0x1b0
+[    4.628610]  ? __pfx_kernel_init+0x10/0x10
+[    4.628610]  ret_from_fork+0x29/0x50
+[    4.628610]  </TASK>
+[    4.628610]
+[    4.628610] Allocated by task 1:
+[    4.628610]  kasan_set_track+0x4f/0x80
+[    4.628610]  __kasan_kmalloc+0x72/0x90
+[    4.628610]  __kmalloc_node+0xa7/0x190
+[    4.628610]  kvmalloc_node+0x44/0x120
+[    4.628610]  nf_ct_alloc_hashtable+0x5b/0xe0
+[    4.628610]  nf_conntrack_helper_init+0x1f/0x60
+[    4.628610]  nf_conntrack_init_start+0x1c9/0x2d0
+[    4.628610]  nf_conntrack_standalone_init+0xb/0xa0
+[    4.628610]  do_one_initcall+0xe6/0x310
+[    4.628610]  do_initcall_level+0xa6/0x140
+[    4.628610]  do_initcalls+0x3e/0x70
+[    4.628610]  kernel_init_freeable+0x174/0x1e0
+[    4.628610]  kernel_init+0x18/0x1b0
+[    4.628610]  ret_from_fork+0x29/0x50
+[    4.628610]
+[    4.628610] Freed by task 1:
+[    4.628610]  kasan_set_track+0x4f/0x80
+[    4.628610]  kasan_save_free_info+0x2b/0x50
+[    4.628610]  ____kasan_slab_free+0x116/0x1a0
+[    4.628610]  __kmem_cache_free+0xc4/0x200
+[    4.628610]  nf_conntrack_init_start+0x29c/0x2d0
+[    4.628610]  nf_conntrack_standalone_init+0xb/0xa0
+[    4.628610]  do_one_initcall+0xe6/0x310
+[    4.628610]  do_initcall_level+0xa6/0x140
+[    4.628610]  do_initcalls+0x3e/0x70
+[    4.628610]  kernel_init_freeable+0x174/0x1e0
+[    4.628610]  kernel_init+0x18/0x1b0
+[    4.628610]  ret_from_fork+0x29/0x50
+[    4.628610]
+[    4.628610] The buggy address belongs to the object at ffff888102d24000
+[    4.628610]  which belongs to the cache kmalloc-4k of size 4096
+[    4.628610] The buggy address is located 0 bytes inside of
+[    4.628610]  freed 4096-byte region [ffff888102d24000, ffff888102d25000)
+[    4.628610]
+[    4.628610] The buggy address belongs to the physical page:
+[    4.628610] page:000000001eb64ba1 refcount:1 mapcount:0
+mapping:0000000000000000 index:0x0 pfn:0x102d20
+[    4.628610] head:000000001eb64ba1 order:3 entire_mapcount:0
+nr_pages_mapped:0 pincount:0
+[    4.628610] flags: 0x200000000010200(slab|head|node=3D0|zone=3D2)
+[    4.628610] page_type: 0xffffffff()
+[    4.628610] raw: 0200000000010200 ffff888100043040 dead000000000122
+0000000000000000
+[    4.628610] raw: 0000000000000000 0000000000040004 00000001ffffffff
+0000000000000000
+[    4.628610] page dumped because: kasan: bad access detected
+...
+
+> nf_conntrack_ftp depends on nf_conntrack.
+>
+> If nf_conntrack fails to load, how can nf_conntrack_ftp be loaded?
+
+Is this maybe only true of dynamically loaded kmods ? With
+CONFIG_NF_CONNTRACK_FTP=3Dy, it seems to me that nf_conntrack_ftp_init()
+will be called as an __init function, independently of whether
+nf_conntrack_init_start() succeeded or not. Am I missing something ?
 
