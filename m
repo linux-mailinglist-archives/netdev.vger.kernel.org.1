@@ -1,181 +1,145 @@
-Return-Path: <netdev+bounces-12696-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12697-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0AA9C7388A9
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:20:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B91147388D1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:23:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACA6C2812C2
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:20:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 742EB281418
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:23:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BEB19504;
-	Wed, 21 Jun 2023 15:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E08919504;
+	Wed, 21 Jun 2023 15:23:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A395C15E;
-	Wed, 21 Jun 2023 15:19:56 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFCE1212F;
-	Wed, 21 Jun 2023 08:19:54 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b46d4e1b0aso63373751fa.2;
-        Wed, 21 Jun 2023 08:19:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FD2617ABF
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:23:06 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2107.outbound.protection.outlook.com [40.107.237.107])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13CAF198;
+	Wed, 21 Jun 2023 08:23:05 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=E5AHjcQ9okfr+68m9AeKWFMemTeZ57Emg650KL3JMkw3uP5BgB2bMFak1pTTp2wtIBCf2Arm+6ab5KBpc/OW0AUwBOfVEcZQqD0YoWgdNMiax/gXn3TxSFo8uSIQUUwkXSc/9FUK5ZVDB4q97/xiZoZc6jiK4jNLcxduc1LIyb+HjZ4qIq323ObX/8oEjkVRXhsYCPAsEABXZK82BIMv5k7JOycr6f7Q5SlMEhvcHEIodXzQIKG85bL5bzgEcp1l4LaOaIRbH/Z16cgir0hrQz3BSXmRBl8OXWDt9Mcx0kGhxon0O9fJqfR9KiWjbyyzb4JmFwTFo8P6cTyon4FTTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0Eitzhx9ToCCs0EAg+MUu25sXCW+2FnpOznghU1yVAk=;
+ b=d01GO4YoEI3T2lnqYP/lm0hW4SISKaxgfb+qT+ZD/AyZos+QVu/IY7fQGdZGL0AzrErZju7zCawDZZHC9JS94+u13uhAkOkLbIWJC+EJKUir12Dq/dLAvHkM+S1Pi6O01YkJR5hLq5qEvUMlzWUH3O3txVrhGsIXj6O4Jxw5TrFheV5aZTcZQLLuV3vio1dUrQT+NSjoYY1QEtmsvjw4aB2036ErH2vGylCkvfMTxy7nb6hFTxVGxbCFDludE2Q7KezSuC3jFLLhh+tEAAKfB7KZSt32iwHUztigK64app7h6uJtXUFCCgOTOFBj25cz11G3Sg9vOlWm+sZ48HNC/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687360793; x=1689952793;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=YFy+7jY3Q/B3fIYTXq5qOshlUqCtAeH0fFjxezMJ7mU=;
-        b=GOBaPld/+7/uckPmlyvUEOrUHbnzb/xeQVb9ttphaPlOVx7SyWpw3q1EZ9lqCOrFr1
-         f8VlC75jrLsv+1oSumRkFGEobcO2HjohE6wMZ/Lkv73OS2pSAfCwpH0uaQ4sE0JSC+Db
-         A14lHcRRcAU/PcHq9jab/BUjltkYhk9zTXsbt4bD2qH/PkTs4Jdwc2JxFcE1SymsO7qs
-         peyVC9iKCNhEfaCkgylo0eYlRMhRaYETf3cPqeXd5Bcjfub2Dq7JSFQXnM5nIrIqv38f
-         Hz8O6R7OtyG1OrGo3a+TncT2DvoDQcNUVfteo64tKc82njjnV2xrFc95C0DCJEDf+UhT
-         RJfg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687360793; x=1689952793;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YFy+7jY3Q/B3fIYTXq5qOshlUqCtAeH0fFjxezMJ7mU=;
-        b=ZcjmTmzLTeH+JHCtK4DwggY1k1fl1+o6RhPe/68sSSdcKN1/aa/PPjFtPNBAB4w7bN
-         DCyeEL7GK7tQ0VR391LBX/lLE5/fax0algd4wRPlpRcc8s8Xwex+TJ7z/qm32/gzhoct
-         G+cbezmTkx2fgBcia0Cupp58cwXCBZn0plUYa61b7Kvt9P99XchL/7goBa6qHvzxbc2q
-         b+EB+Dt4CbQKdWf2KrHEhY8v4fuEn0Afo8rFofPN3XVLdmYrL3KADzCF+lg+J6G+LR0h
-         0fWGv/gB2+l0Jt7U/2F8qYMj9UqawcNwdn2ztTYoHtKtYVAB6nPMs9wY2uIbzXwHmbaY
-         1vEg==
-X-Gm-Message-State: AC+VfDx46UPcP271zzroK5ty7XfHqPagfN8+MglklxdCEWE4VDkOZRMw
-	Z0yabaAPWIo9l+qt60GQIWaaFJ1E+t7D85M6l54=
-X-Google-Smtp-Source: ACHHUZ7S366xJDGv2BenqM0RSR5nG3v/w66oTeggW0Zt6a61/Wjn/ZeU0yVAL/ODGB0B6G6jG4VWc+DojP3NyAQ/DmI=
-X-Received: by 2002:a2e:80c9:0:b0:2b1:c039:e977 with SMTP id
- r9-20020a2e80c9000000b002b1c039e977mr9673072ljg.16.1687360792618; Wed, 21 Jun
- 2023 08:19:52 -0700 (PDT)
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0Eitzhx9ToCCs0EAg+MUu25sXCW+2FnpOznghU1yVAk=;
+ b=OveGHIj4qM7lJ78JMU2cuHFthrFAyzLnBk+FT+wBw/uQSmjrZ4YbAcO69FPIkq4NndFSQ1/8C6cT0s4zrCh3o9VadYMRm66ldST8vJziE+yXxGmu7J+n9XmZJppL0Ogj77qyNLf15kKeIQxWie34PU7Qyp5DkoOHmbH04Is13zE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH3PR13MB6386.namprd13.prod.outlook.com (2603:10b6:610:19c::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.26; Wed, 21 Jun
+ 2023 15:23:01 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 15:23:01 +0000
+Date: Wed, 21 Jun 2023 17:22:54 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: Marcel Holtmann <marcel@holtmann.org>,
+	Johan Hedberg <johan.hedberg@gmail.com>,
+	Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>, linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to
+ Bluetooth drivers
+Message-ID: <ZJMVznjjsixOSPu2@corigine.com>
+References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+X-ClientProxiedBy: AM0PR01CA0084.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::25) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
- <ZJLzsWsIPD57pDgc@FVFF77S0Q05N> <CA+G9fYvwriD8X+kmDx35PavSv-youSUmYTuYTfQ4oBWnZzVRUQ@mail.gmail.com>
- <CANk7y0imD3tK1Jox_V_f1vfzFi2tPhUzGOA_mLLkYy-VDHdncg@mail.gmail.com> <CA+G9fYuK4FWaLizcuVyW3ApR6fcgjMccYp3YxdAm61BOedXxzQ@mail.gmail.com>
-In-Reply-To: <CA+G9fYuK4FWaLizcuVyW3ApR6fcgjMccYp3YxdAm61BOedXxzQ@mail.gmail.com>
-From: Puranjay Mohan <puranjay12@gmail.com>
-Date: Wed, 21 Jun 2023 17:19:41 +0200
-Message-ID: <CANk7y0g9Qhe4H+WTbrsEUa_XXn_GkXWDOE4kP1icbxfJyri8XQ@mail.gmail.com>
-Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Alexei Starovoitov <ast@kernel.org>, Song Liu <song@kernel.org>, 
-	Linux ARM <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
-	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org, 
-	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, bpf <bpf@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH3PR13MB6386:EE_
+X-MS-Office365-Filtering-Correlation-Id: 942b6e45-dfe7-437a-6e9c-08db726b668b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	hYteki1KWUtXMwqACZKhuEtJptPwQEkvGzvaX1yEMorLOXIq8qZUugpyPH+KF5MN66LpDf6QrQdMoclFbUFAs5v/g4SCa9a5dtkRfAwzRuQlzrHL/FPinfgSJrCDNMKNtvdGk0+CqrzyNrk8Ol6BlhegZ14kPBwyLtKj6sEpOZu944xxzmcoQTtXqb5fbqY9UOn5FyJ9M8uKVk8YJTkx1rSa5mE8uiTwSbLZH7jiY6VzdJX8HguTpss34tiWb6Jj3l7d4EMCUA80w6T2OC2XUdRoe9/KbNsRgIjX3p3AzasG5fa2oyoet2ByfqTBqaXpZ0GA22s8CBYgEUpd7JDAvz1vcpls+inm3aqzr7GWo2ISOx3hOeBwGcqWVrwNUFjpHIQ56pS+HewrWjEiFNTbBhXyOe8WIjbUSwj7rQeCWvhJ+pKxJ8YQkRhOgYdlg5T65kdVpLsRZ18quAHI7RWaiB3r6JRAltSSkuREc4dInPGOcZyStO2rGXVh8/o0VAjDTuYEP6qzLh+f5tzcKhP7BTLqEHsuAcuixX0LzptAlVEbzXaa5aasjqW01t8O6u1iz4pd/nZH5ySCiBjhbMLJj3Y2BQCQPeQVQ+HdjqD+M1w=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(366004)(136003)(39840400004)(376002)(451199021)(4744005)(2906002)(2616005)(36756003)(86362001)(38100700002)(8676002)(8936002)(316002)(6486002)(41300700001)(5660300002)(54906003)(66556008)(66946007)(66476007)(4326008)(6916009)(6666004)(478600001)(186003)(6506007)(6512007)(44832011)(7416002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?uJ3LE65xXS+BxhhETBzxptlN8ZSutfpZqf3K85JD5pnRUSmFCLXOuQES41H+?=
+ =?us-ascii?Q?NTthJPe6Usv5o8sJdCnLBNM1VLozrWV1CYjr2hjk6AdQYGFU+zagFYGo4Iwl?=
+ =?us-ascii?Q?ZfOkDeFn2CCqsPk2+k6G/Vzr9lfz+hSyiqbTSg8eJG6bPafCgQdZewqpK5YY?=
+ =?us-ascii?Q?U3GJZvhRpuEeufQA+u/niXIPYHRcOBHXF30IArcgxsX1Bwe9Mf0XkOLMC2Au?=
+ =?us-ascii?Q?tQ9VKqkSztQC2mMoIT9d/ToPmghsCltGybQkLeaBPKElYzNhyAhzYbcoYcbQ?=
+ =?us-ascii?Q?pF7lZY6ZjNEFvGWTq9iupGt3FifPAQ970PnWNshzwQNWOVTXoJhGNOLObHiP?=
+ =?us-ascii?Q?hGx8/S35oVtAerKiy/MI0HhhDZmV6FLJW1PQa78JDvchukFOF4JWuulGN1eK?=
+ =?us-ascii?Q?0OFSua6UiGA7X3ziTt2TbYdz8JtS+nHj3FZ80FQgBoK55qSZk6jsQe16QOp6?=
+ =?us-ascii?Q?QQZ7jEg7j15WJkaSKwRLv4XxEA5o8qVwVTsPU1HCvxIfaRPR28zCGDpdXvwJ?=
+ =?us-ascii?Q?GvX8NC/GW6iaq1xzqaRPccNE4F4KfNqJ/gEgVk1D99c8TnGeS+USmX4ICU8V?=
+ =?us-ascii?Q?eHWqcE/+sIVdN11VsKr0MwZQ8rEW5EWD6BgFS+LzRGuH3qtgx8eIaicYQljI?=
+ =?us-ascii?Q?9zWCQRAooceXu2jd2Whir7Htn/dueEYIhBP38ENkqlBy31ZBBZKMHRpaI2+V?=
+ =?us-ascii?Q?MAXIDUCzIgFnHBYGlF6IH8zevt3jUSS5LqQvFYraN91BRPcflLWtGBYT9EIW?=
+ =?us-ascii?Q?oMS+QOEH5UPTphHsk6HVYvUXLBgh63s5vqOq/SFpD2B06eNgdES88O3MtoOK?=
+ =?us-ascii?Q?KUx9w5iLLY64OSdRXAaC4H4KJEH+iWhTjtetxLjC2nQ6l0Qi1E5Qw1fNKefI?=
+ =?us-ascii?Q?YeJXFKAj4f4r+E+7S32TFpO0235J1y9EtGOkIgVcG0WCQtsZmjnc5zSM/aZy?=
+ =?us-ascii?Q?7DFaiRd2IgOVDNl0fQJuVVknvmCuV4pdwLyvl+Xqz4Emszi5e9N4aUgG8lEN?=
+ =?us-ascii?Q?a9owCgcz5Q82nao9FjyOIkfgyD72FCsuc685T7qvxl027VoMBzAF9soti5cX?=
+ =?us-ascii?Q?/Z4x1HPR51bas2SAwF34xP92mCJ4zMQneVtBhNHUxbuiAcCZ7CREepNl0Wwg?=
+ =?us-ascii?Q?fUhVGVoDn/dA1OcxWuYqPNaLT7YyVeTa1E0OykuKZOKOX5YOunedIpvvMjpT?=
+ =?us-ascii?Q?UsglPweRHhxVzhy7yewU75syHbwlthA46N77krA4cFO/Mf/njlaEnsVoN9CF?=
+ =?us-ascii?Q?Dls98CUEnDY36gRQB7PURA/EcjPQ7Tu/2vH07AEu3W7ujRZeSfkJhwnHBfxX?=
+ =?us-ascii?Q?wVAkrewMo45QGa0ZkSegBx2zFd7v3cAsx9gKL0s2qSW8x2dBjKbnDtFD2PY6?=
+ =?us-ascii?Q?FDpXEMpvqJvq+7MFZ+mR2U17ZkS1BINygj1JhpzznJjZH3VmsmVRcahuYoHC?=
+ =?us-ascii?Q?DzzACRe3/3COZ0+VmIG6OjMxOgd0o2rDkJJa//wGOXpH8+OGKdijFF3KbXNU?=
+ =?us-ascii?Q?u34CUYbLU9RZciQejaVE1+hkMJRMRyiEsjU2fYsLv3BQXOggQXAzQr/7hsRp?=
+ =?us-ascii?Q?cX/rnZkNEuAVPhRx9ZuQdQsVIbJhqPVbWv91PHtN0paMh3BKjD/6Vsn1JoVl?=
+ =?us-ascii?Q?FpAM1PFmdtdiQLtBhieGruLOzg5eJNfN4kNVGPrnc8+XkqgP3R2EDB9z1X8H?=
+ =?us-ascii?Q?Ty/IXw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 942b6e45-dfe7-437a-6e9c-08db726b668b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 15:23:01.1787
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: UuM7poKzAvOQLx6RofF2lURVpCch1Sr+x+E7HA+CG2gJxU85gck+pl/hLbtC2SFHCglCiF9fwSxl8IzFXIu0DwohMDAm3Uf0gYGWinyZqB0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6386
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Wed, Jun 21, 2023 at 08:09:49AM +0200, Krzysztof Kozlowski wrote:
+> The Devicetree bindings should be picked up by subsystem maintainers,
+> but respective pattern for Bluetooth drivers was missing.
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 
-On Wed, Jun 21, 2023 at 4:41=E2=80=AFPM Naresh Kamboju
-<naresh.kamboju@linaro.org> wrote:
->
-> On Wed, 21 Jun 2023 at 19:46, Puranjay Mohan <puranjay12@gmail.com> wrote=
-:
-> >
-> > Hi,
-> >
-> > On Wed, Jun 21, 2023 at 3:39=E2=80=AFPM Naresh Kamboju
-> > <naresh.kamboju@linaro.org> wrote:
-> > >
-> > > On Wed, 21 Jun 2023 at 18:27, Mark Rutland <mark.rutland@arm.com> wro=
-te:
-> > > >
-> > > > On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
-> > > > > Following boot warnings and crashes noticed on arm64 Rpi4 device =
-running
-> > > > > Linux next-20230621 kernel.
-> > > > >
-> > > > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > > > >
-> > > > > boot log:
-> > > > >
-> > > > > [   22.331748] Kernel text patching generated an invalid instruct=
-ion
-> > > > > at 0xffff8000835d6580!
-> > > > > [   22.340579] Unexpected kernel BRK exception at EL1
-> > > > > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1]=
- PREEMPT SMP
-> > > >
-> > > > This indicates execution of AARCH64_BREAK_FAULT.
-> > >
-> > > I see kernel panic with kselftest merge configs on Juno-r2 and Rpi4.
-> >
-> > Is there a way to reproduce this setup on Qemu?
->
-> Not reproducible on Qemu-arm64.
-> I see only on arm64 devices Juno-r2 and Rpi4.
->
-> >
-> > I am able to build the linux-next kernel with the config given below.
-> > But the bug doesn't reproduce in Qemu with debian rootfs.
-> >
-> > I guess I would need the Rootfs that is being used here to reproduce it=
-.
-> > Can you point me to the rootfs for this?
->
-> Here is the link for rootfs - OE one.
-> https://storage.tuxsuite.com/public/linaro/lkft/oebuilds/2RVA7dHPf73agY0g=
-DJD6XEdBQBI/images/juno/
-
-I tested this rootfs and couldn't reproduce on Qemu. Now, I will try
-to use my raspberry pi and try to reproduce this.
-
-Thanks.
-
->
-> >
-> > Thanks,
-> > Puranjay
-> >
-> > > metadata:
-> > >   git_ref: master
-> > >   git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
-> > >   git_sha: 15e71592dbae49a674429c618a10401d7f992ac3
-> > >   git_describe: next-20230621
-> > >   kernel_version: 6.4.0-rc7
-> > >   kernel-config:
-> > >     https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVAA4lj35=
-ia3YDkqaoV6ztyqdW/config
-> > >   artifact-location:
-> > >     https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVAA4lj35=
-ia3YDkqaoV6ztyqdW/
-> > >   toolchain: gcc-11
-> > >   build_name: gcc-11-lkftconfig-kselftest
-> > >
-> > >
-> > > --
-> > > Linaro LKFT
-> > > https://lkft.linaro.org
->
-> - Naresh
-
-
-
---
-Thanks and Regards
-
-Yours Truly,
-
-Puranjay Mohan
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
