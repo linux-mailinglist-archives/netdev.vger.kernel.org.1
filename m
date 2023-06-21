@@ -1,125 +1,115 @@
-Return-Path: <netdev+bounces-12758-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12759-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAF9C738CD2
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:12:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28EBD738CEF
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:21:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 087371C20EA0
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:12:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43E0928171D
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:21:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F1D719BA9;
-	Wed, 21 Jun 2023 17:12:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 648D919BAE;
+	Wed, 21 Jun 2023 17:20:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 233BF18C35
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:12:45 +0000 (UTC)
-Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 869EF19AD;
-	Wed, 21 Jun 2023 10:12:43 -0700 (PDT)
-Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-4716e4adb14so1642655e0c.0;
-        Wed, 21 Jun 2023 10:12:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687367562; x=1689959562;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=toc9CYTHR42a7NITG1c4cPTSZbY+Re3tZ+t9Dq3HGFE=;
-        b=fyiiAHa5jxKZGC/mYz+m/YkWi0uW5kBWNCwbhwwzzkbQ1bhLgODVVNlgnxtrEM08MG
-         1uolqdZ4FFwC2PH4+ZUnHpC3bXWI0scJfwzZ9GDSa1GpqYULSu3PWHf1ekvKiADalpEx
-         KUEUZ5qOeEdFKsmdXsC9M9/twxasZd72+kzZenKo8q251OnxaZBrieH0HjmZ4JQ2DM2N
-         +rZIjzZTUlEIYxlNvnBLgScq8RMZYrbL7RO0n1u53thf/O0Rfv3memAiEJj4/aHP4e+i
-         dHsrkeLhs9P3HS882PcHUg/0F4yLm+D8I3CDOJUva5qr+auMNx6fFu/HqDdh2wq4oCTc
-         t3Ow==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687367562; x=1689959562;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=toc9CYTHR42a7NITG1c4cPTSZbY+Re3tZ+t9Dq3HGFE=;
-        b=TsaP2ukvljMbGcLJ30sQJ9nuIsugCzHPWQDhCBnWb1w+9YjWBYgTHKvJhknVItFvGE
-         FMfie6BrBQiVavTO9Ra7ZzRRiAjozvmjLiqzQljm9tqtZnjNXCxZV/xbkzA+LUcIr/H6
-         BXFgG+2mWl1MVGBXxE6BwUrm/j8hWJqT+z4V3D3BEKxCLbLoIR/NVkwN1fo0kqozuIKG
-         GKaCjAIKGyesWBC/lgVKggOttmT9xRhxSJPttGvTILJS3NUtzGu8bxafTsLe05fkF3vV
-         1cnmSBGNZViG+CQBAqdKXhbnHkPJDm/zYNKWdW2h3oGxG8Dp5s7Vu7kF5k8aNOAvGi9f
-         LjYw==
-X-Gm-Message-State: AC+VfDx5+yW9MJYitTjy7cvvOIpW4FUAEtgziN5WGnPPZJ7oPNf2kRmf
-	DV9Qh4t2O0H42zXotC1mRy4=
-X-Google-Smtp-Source: ACHHUZ5pgniRmauejbcU6xPbs+ClsZ9PeFtW7Z1YkK+H4JnNlFKyUOvgJdHNjQs1RjhWcKYludl6aA==
-X-Received: by 2002:a1f:5744:0:b0:46e:8084:92be with SMTP id l65-20020a1f5744000000b0046e808492bemr6494712vkb.6.1687367562471;
-        Wed, 21 Jun 2023 10:12:42 -0700 (PDT)
-Received: from [10.178.67.29] ([192.19.248.250])
-        by smtp.gmail.com with ESMTPSA id x5-20020a05620a14a500b00761f635fbf6sm2460957qkj.8.2023.06.21.10.12.41
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 21 Jun 2023 10:12:41 -0700 (PDT)
-Message-ID: <cb3d7ae2-a7f8-537b-3b51-3491265b0e65@gmail.com>
-Date: Wed, 21 Jun 2023 18:12:40 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 572CA1953D
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:20:59 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE8A9132;
+	Wed, 21 Jun 2023 10:20:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=xnUasspDrFh2JWpGqcDGD0SKHtZoehpVCtmFhJIxYiY=; b=aKQt3noraRaWZVrPLRFixFgDyF
+	doLwBueYpIG4MOV+mgf9YgWlBBG2MzoCYzjDCdbHJLL0/GDopxL7uOPzCNq5iT+ghXm25qqhepAkk
+	GZT/IuvRUl0B8HzrNqPhg3sL1OLk/dZE/c7AujarJ1ypiRLAwJUBDPAwkWgEDJfpjNYo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qC1VK-00HAZS-8l; Wed, 21 Jun 2023 19:20:26 +0200
+Date: Wed, 21 Jun 2023 19:20:26 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: "Limonciello, Mario" <mario.limonciello@amd.com>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Evan Quan <evan.quan@amd.com>, rafael@kernel.org, lenb@kernel.org,
+	alexander.deucher@amd.com, christian.koenig@amd.com,
+	Xinhui.Pan@amd.com, airlied@gmail.com, daniel@ffwll.ch,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, mdaenzer@redhat.com,
+	maarten.lankhorst@linux.intel.com, tzimmermann@suse.de,
+	hdegoede@redhat.com, jingyuwang_vip@163.com, lijo.lazar@amd.com,
+	jim.cromie@gmail.com, bellosilicio@gmail.com,
+	andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au,
+	arnd@arndb.de, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
+ mitigations
+Message-ID: <4aad8dfa-2eaa-4268-8c52-f0ec209e18f9@lunn.ch>
+References: <20230621054603.1262299-1-evan.quan@amd.com>
+ <20230621054603.1262299-2-evan.quan@amd.com>
+ <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
+ <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
+ <d2dba04d-36bf-4d07-bf2b-dd06671c45c6@lunn.ch>
+ <98c858e6-fb18-d50f-6eea-eddc63ba136f@amd.com>
+ <9435a928-04c4-442f-89f2-e76713c908a5@lunn.ch>
+ <d1e01e52-df5f-a595-eaa1-95466f7b4ff8@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net] net: phy: Manual remove LEDs to ensure correct
- ordering
-Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: Andrew Lunn <andrew@lunn.ch>, netdev <netdev@vger.kernel.org>,
- Heiner Kallweit <hkallweit1@gmail.com>, ansuelsmth@gmail.com,
- stable@vger.kernel.org
-References: <20230617155500.4005881-1-andrew@lunn.ch>
- <8a41a15a-b832-3e66-d10a-df29f1a4c880@gmail.com>
- <ZJMtrw6zdi2YP7b5@shell.armlinux.org.uk>
-From: Florian Fainelli <f.fainelli@gmail.com>
-In-Reply-To: <ZJMtrw6zdi2YP7b5@shell.armlinux.org.uk>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <d1e01e52-df5f-a595-eaa1-95466f7b4ff8@amd.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Russell,
-
-On 6/21/2023 6:04 PM, Russell King (Oracle) wrote:
-> On Wed, Jun 21, 2023 at 03:04:14PM +0100, Florian Fainelli wrote:
->> Hi Andrew,
->>
->> On 6/17/2023 4:55 PM, Andrew Lunn wrote:
->>> If the core is left to remove the LEDs via devm_, it is performed too
->>> late, after the PHY driver is removed from the PHY. This results in
->>> dereferencing a NULL pointer when the LED core tries to turn the LED
->>> off before destroying the LED.
->>>
->>> Manually unregister the LEDs at a safe point in phy_remove.
->>>
->>> Cc: stable@vger.kernel.org
->>> Reported-by: Florian Fainelli <f.fainelli@gmail.com>
->>> Suggested-by: Florian Fainelli <f.fainelli@gmail.com>
->>> Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
->>> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
->>
->> Thanks for fixing this, this is an improvement, though I can still hit
->> another sort of use after free whereby the GENET driver removes the
->> mdio-bcm-unimac platform device and eventually cuts the clock to the MDIO
->> block thus causing the following:
+> Think a little more about what a non-ACPI implementation
+> would look like:
 > 
-> Hi Florian,
-> 
-> Can you try setting trigger_data->led_cdev to NULL after the
-> cancel_delayed_work_sync() in netdev_trig_deactivate() and see
-> what the effect is?
+> 1) Would producers and consumers still need you to set CONFIG_ACPI_WBRF?
 
-Thanks for the suggestion, getting an identical trace as before with 
-that change.
--- 
-Florian
+I would expect there to be an CONFIG_WBRF, and then under that a
+CONFIG_WBRF_ACPI, CONFIG_WBRF_DT, CONFIG_WBRF_FOOBAR, each indicating
+they are mutual exclusive to the other.
+
+> 2) How would you indicate you need WBRF support?
+
+As far as i understand it, you have something in ACPI which indicates
+it? Could that not also be a DT property?
+
+> 3) How would notifications from one device to another work?
+
+Linux notified chains? This is something which happens a lot in
+networking. A physical interface goes down and needs to tell
+team/bonding interface stack on top of it that its status has
+changed. It just calls a notification chain.
+
+> I don't think those are trivial problems that can be solved by
+> just making the pointer 'struct device' particularly as with the
+> ACPI implementation consumers are expecting the notification from
+> ACPI.
+
+Do consumers really care who the notification is from? Isn't the event
+and its content what matters, not who sent it?
+
+But I agree, i don't expect it is trivial. But it is going to get
+harder and harder to make abstract as more and more users are
+added. So we need to consider, do you want to do that work now, or
+later? Do we want to merge something we know is limited and not using
+the generic kernel abstractions?
+
+     Andrew
 
