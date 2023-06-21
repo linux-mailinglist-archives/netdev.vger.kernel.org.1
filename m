@@ -1,356 +1,186 @@
-Return-Path: <netdev+bounces-12792-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12793-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77C77738F19
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:48:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 08BA1738F27
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:50:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25E1828164D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:48:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3A2F51C20EDB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:50:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6646D1953F;
-	Wed, 21 Jun 2023 18:48:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3DEE319931;
+	Wed, 21 Jun 2023 18:50:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F37D17724;
-	Wed, 21 Jun 2023 18:48:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DB234C433C8;
-	Wed, 21 Jun 2023 18:48:18 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687373315;
-	bh=a5OpkE0TU4uPAvSOWcyUKhr2U/OaDDTahqvZpyNm/D4=;
-	h=Subject:From:To:Date:In-Reply-To:References:From;
-	b=PiPk49g+MFOu/O2ZwDxO/8QAjKIZGlhjql5KOg56o+z0jsrDavO9BiaXOtkYto876
-	 fJ7qYzZ7aATc9kPncdP1kCdlY5wqINNGdYK2LGj2HmV63uWD5NHZ4+OFVQ4t30vFE9
-	 rYDpgx917Jc/lUMtGxdnWxKlhyndYbn3MftPxoStquXW6wJVzxk1ZBM8Z7BTbv2h/U
-	 qJjwHaLWN8lUJ3h6C5OcO+D166wrcNaWoWGX2W/vO7mNHZJIsw6euWqEIeYa7S4lF3
-	 jaX3jg20U9mjcF803nObNGAx9i1QbKIM3FZeyHr6EhjkD9DNtiQVqDSkHfY1GNj8rV
-	 9eRPHwtyQHGGQ==
-Message-ID: <c376703f26442b3310f173219c37c7b7ae4fe61b.camel@kernel.org>
-Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
-From: Jeff Layton <jlayton@kernel.org>
-To: Tom Talpey <tom@talpey.com>, Jeremy Kerr <jk@ozlabs.org>, Arnd Bergmann
- <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin
- <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
- Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>,  Sven Schnelle <svens@linux.ibm.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Arve
- =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>, Todd Kjos
- <tkjos@android.com>, Martijn Coenen <maco@android.com>, Joel Fernandes
- <joel@joelfernandes.org>, Christian Brauner <brauner@kernel.org>, Carlos
- Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>,
- Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason
- Gunthorpe <jgg@ziepe.ca>,  Leon Romanovsky <leon@kernel.org>, Brad Warrum
- <bwarrum@linux.ibm.com>, Ritu Agarwal <rituagar@linux.ibm.com>, Eric Van
- Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
- <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, David Howells
- <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Alexander
- Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>, Luis de
- Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Eric Biederman
- <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>, Chris Mason
- <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Xiubo Li
- <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Jan Harkes
- <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
- Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>,  "Rafael
- J. Wysocki" <rafael@kernel.org>, Tyler Hicks <code@tyhicks.com>, Ard
- Biesheuvel <ardb@kernel.org>, Gao Xiang <xiang@kernel.org>, Chao Yu
- <chao@kernel.org>,  Yue Hu <huyue2@coolpad.com>, Jeffle Xu
- <jefflexu@linux.alibaba.com>, Namjae Jeon <linkinjeon@kernel.org>, Sungjong
- Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>, Theodore Ts'o
- <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Jaegeuk Kim
- <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Miklos
- Szeredi <miklos@szeredi.hu>, Bob Peterson <rpeterso@redhat.com>, Andreas
- Gruenbacher <agruenba@redhat.com>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, Mikulas Patocka
- <mikulas@artax.karlin.mff.cuni.cz>,  Mike Kravetz
- <mike.kravetz@oracle.com>, Muchun Song <muchun.song@linux.dev>, David
- Woodhouse <dwmw2@infradead.org>, Dave Kleikamp <shaggy@kernel.org>, Tejun
- Heo <tj@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>, Anton Altaparmakov
- <anton@tuxera.com>,  Konstantin Komarov
- <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>,
- Joseph Qi <joseph.qi@linux.alibaba.com>, Bob Copeland <me@bobcopeland.com>,
- Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg
- <martin@omnibond.com>, Luis Chamberlain <mcgrof@kernel.org>, Iurii Zaikin
- <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,  "Guilherme G.
- Piccoli" <gpiccoli@igalia.com>, Anders Larsen <al@alarsen.net>, Steve
- French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, Ronnie
- Sahlberg <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Phillip Lougher
- <phillip@squashfs.org.uk>, Steven Rostedt <rostedt@goodmis.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Evgeniy Dushistov <dushistov@mail.ru>,
- Hans de Goede <hdegoede@redhat.com>, "Darrick J. Wong" <djwong@kernel.org>,
- Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>,
- Johannes Thumshirn <jth@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>,  Hugh Dickins <hughd@google.com>, Andrew Morton
- <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, John Johansen <john.johansen@canonical.com>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge
- E. Hallyn" <serge@hallyn.com>, Stephen Smalley
- <stephen.smalley.work@gmail.com>, Eric Paris <eparis@parisplace.org>, 
- Juergen Gross <jgross@suse.com>, Ruihan Li <lrh2000@pku.edu.cn>, Laurent
- Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang
- <wsa+renesas@sang-engineering.com>, Udipto Goswami
- <quic_ugoswami@quicinc.com>,  Linyu Yuan <quic_linyyuan@quicinc.com>, John
- Keeping <john@keeping.me.uk>, Andrzej Pietrasiewicz
- <andrzej.p@collabora.com>, Dan Carpenter <error27@gmail.com>, Yuta Hayama
- <hayama@lineo.co.jp>, Jozef Martiniak <jomajm@gmail.com>, Jens Axboe
- <axboe@kernel.dk>, Alan Stern <stern@rowland.harvard.edu>, Sandeep Dhavale
- <dhavale@google.com>, Dave Chinner <dchinner@redhat.com>, Johannes Weiner
- <hannes@cmpxchg.org>, ZhangPeng <zhangpeng362@huawei.com>, Viacheslav
- Dubeyko <slava@dubeyko.com>, Tetsuo Handa
- <penguin-kernel@I-love.SAKURA.ne.jp>,  Aditya Garg <gargaditya08@live.com>,
- Erez Zadok <ezk@cs.stonybrook.edu>, Yifei Liu <yifeliu@cs.stonybrook.edu>,
- Yu Zhe <yuzhe@nfschina.com>, "Matthew Wilcox (Oracle)"
- <willy@infradead.org>, Oleg Kanatov <okanatov@gmail.com>, "Dr. David Alan
- Gilbert" <linux@treblig.org>, Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin
- <cgel.zte@gmail.com>, Stefan Roesch <shr@devkernel.io>, Zhihao Cheng
- <chengzhihao1@huawei.com>, "Liam R. Howlett" <Liam.Howlett@Oracle.com>, 
- Alexey Dobriyan <adobriyan@gmail.com>, Minghao Chi
- <chi.minghao@zte.com.cn>, Seth Forshee <sforshee@digitalocean.com>, Zeng
- Jingxiang <linuszeng@tencent.com>, Bart Van Assche <bvanassche@acm.org>,
- Mimi Zohar <zohar@linux.ibm.com>, Roberto Sassu <roberto.sassu@huawei.com>,
- Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>, "Fabio M. De
- Francesco" <fmdefrancesco@gmail.com>, Chen Zhongjin
- <chenzhongjin@huawei.com>, Zhengchao Shao <shaozhengchao@huawei.com>, Rik
- van Riel <riel@surriel.com>, Jingyu Wang <jingyuwang_vip@163.com>, Hangyu
- Hua <hbh25y@gmail.com>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org,  linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org,  linux-usb@vger.kernel.org,
- v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-afs@lists.infradead.org, autofs@vger.kernel.org, linux-mm@kvack.org, 
- linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org, 
- codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
- linux-efi@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org,  linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com,  linux-um@lists.infradead.org,
- linux-mtd@lists.infradead.org,  jfs-discussion@lists.sourceforge.net,
- linux-nfs@vger.kernel.org,  linux-nilfs@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net,  ntfs3@lists.linux.dev,
- ocfs2-devel@oss.oracle.com,  linux-karma-devel@lists.sourceforge.net,
- devel@lists.orangefs.org,  linux-unionfs@vger.kernel.org,
- linux-hardening@vger.kernel.org,  reiserfs-devel@vger.kernel.org,
- linux-cifs@vger.kernel.org,  samba-technical@lists.samba.org,
- linux-trace-kernel@vger.kernel.org,  linux-xfs@vger.kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org,  apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org,  selinux@vger.kernel.org
-Date: Wed, 21 Jun 2023 14:48:17 -0400
-In-Reply-To: <e513d856-3a6f-3a32-40fe-6c728e7b5ec8@talpey.com>
-References: <20230621144507.55591-1-jlayton@kernel.org>
-	 <20230621144507.55591-2-jlayton@kernel.org>
-	 <1f97d595-e035-46ce-6269-eebfe922cf35@talpey.com>
-	 <6f4bcd7d79f688120d80e96e86d7c521854d8e84.camel@kernel.org>
-	 <e513d856-3a6f-3a32-40fe-6c728e7b5ec8@talpey.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 301792595
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:50:43 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2075.outbound.protection.outlook.com [40.107.100.75])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAC97185;
+	Wed, 21 Jun 2023 11:50:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=T64V+dMoaV+KQE/EXkEPIYHBf37CTchBSr75y8/emNJwMMkD4hVjRwWYSFMMcJSzpjxGiQARuGZev3cN6FgYQ3GG2myA9osjf4we4aCaZS4in7Pn6g25gG3wpO/b9VHYxjQu8iTE2Z1+9XCdtmaM0F0zdO2bpA6/s7FeXNG1oKD6QcnmnxblLJkypQ9hiixB8lbY60qYf7XDavXaE8Txm9DkwYDg8muAEt2+mYN3j8PH0UV3V1OUWD2qNUalyXMkIx6rE8Gbi+fzeMdsnZeoQaNuYdHAvgiFUTbhY4aoVn2kTHdUqkSGz3gQj0P6YY7p9Do7fOCgcp/L4CMW1I+HSA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9vzajxK6jmcnW0W0LSnPn+KaIU/2VDE6hzkCuIqoNlE=;
+ b=F949O33n8Of+t/Br8UySSs7glSuCl2F57Z7Vgz+Qx9L67/Ia6JUEglBqqRLr/hQwchqlZWOda3N5Bu3+CbcwS+OB3yuU7ypW9i0Lwa3W4CTb7vwhzd+umr6dOWWRbyBW6vI7v7aBWTv66czpAUt0VASooUuqeeyNfziM4e9iWBaEZ9Bfi9w8Vwen9KMKAwtQKGnKLlLEkPU/P6kQLb+KjfJr868uKi8ezIPkFpPEkolm56U+Z8yoztxuc6f6sVviKjBHmWFPslNH1MWG031RbsZjq+getSkcBNLzYi92NJ/aDv/GZHJS352Cr3tjTh93/jhTNQsSFowHLkKe4rmCOg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9vzajxK6jmcnW0W0LSnPn+KaIU/2VDE6hzkCuIqoNlE=;
+ b=ftdAeeUIG70BonAVFJNut7Tgq1VDs/F8xlQrRr6IZMJTAcKj84PiFnhtYpmTG/me4ShE5+TAciqev0bB85d1GxdIXJEFmKXjl0D8BwSWVtsSFAd9AdFyhyNSfpce/OicPJWv1IUBtgFcRMw4ziuqM69uKSBowUdV7UuE33AlFSY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+ by MW5PR12MB5622.namprd12.prod.outlook.com (2603:10b6:303:198::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
+ 2023 18:50:39 +0000
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::dfcf:f53c:c778:6f70]) by MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::dfcf:f53c:c778:6f70%5]) with mapi id 15.20.6521.020; Wed, 21 Jun 2023
+ 18:50:39 +0000
+Message-ID: <07ad6860-8ffb-cc6c-a8e5-e8dc4db4e87a@amd.com>
+Date: Wed, 21 Jun 2023 13:50:34 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
+ mitigations
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Johannes Berg <johannes@sipsolutions.net>, Evan Quan <evan.quan@amd.com>,
+ rafael@kernel.org, lenb@kernel.org, alexander.deucher@amd.com,
+ christian.koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
+ daniel@ffwll.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com,
+ tzimmermann@suse.de, hdegoede@redhat.com, jingyuwang_vip@163.com,
+ lijo.lazar@amd.com, jim.cromie@gmail.com, bellosilicio@gmail.com,
+ andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de,
+ linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+References: <20230621054603.1262299-1-evan.quan@amd.com>
+ <20230621054603.1262299-2-evan.quan@amd.com>
+ <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
+ <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
+ <b1abec47-04df-4481-d680-43c5ff3cbb48@amd.com>
+ <36902dda-9e51-41b3-b5fc-c641edf6f1fb@lunn.ch>
+ <33d80292-e639-91d0-4d0f-3ed973f89e14@amd.com>
+ <9159c3a5-390f-4403-854d-9b5e87b58d8c@lunn.ch>
+ <a80c215a-c1d9-4c76-d4a8-9b5fd320a2b1@amd.com>
+ <8d3340de-34f6-47ad-8024-f6f5ecd9c4bb@lunn.ch>
+From: "Limonciello, Mario" <mario.limonciello@amd.com>
+In-Reply-To: <8d3340de-34f6-47ad-8024-f6f5ecd9c4bb@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1P222CA0170.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:806:3c3::26) To MN0PR12MB6101.namprd12.prod.outlook.com
+ (2603:10b6:208:3cb::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|MW5PR12MB5622:EE_
+X-MS-Office365-Filtering-Correlation-Id: b4fa8b6f-5b7e-4cb7-b909-08db72886811
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PiXe0IPIoZ7T8W83wcG58t3JAu4aCOAFypK4bezP7PBorMLcBurDVPgd2hlpECezhLgVZv5MCQ9ej0PANHPa/iD6QzvLKLAGM2maLZzTqYUXmilGuU8x2nyrhnRKHP+uZvnSjNMCkpeqn69rfg84qKyxmJDdnCwjNGYAutxEtWnGEZXze5wLK+LGh3Oc6V/YXHxCmvg56VRNpnwwzX2E06oes8PolzS19kpPcFMAJP6NKGykaXu6MJo+O+Wcv4ZRIgkZggEVB9Fk2+tAAoQ/zbBGsS93EKS0ojBJFYhQBzCMijjWT5Br8LLCe5ElQCWPu7A8lZJE+LJ+ENsfYt5Cp/cKmizE3oNLg+o1ogGDq8HaRevBrcUa80h3PIsiG8l3Ofm8vIZEOsPj3mRerkiAkBuSnSyh4/a1su0pPWx75v8vl7k223Ifh0JcfzwHllQeg/WXcZJ+zmvF04uGSTpqEnMeqt9wOhiESl+EiStpFuEY1RmlF5gL7zpR5f/w3VYl7izzxynwuiuKcIOg4tyD/ZBoAab3kPPmAX/Qd74U+Papc+1OV3qoJB9R4c25H4HA92LR5FuLDgVQvbCaw1yBZsA8ZuqVxwwLDO2ijep2eWDMCtirKq5EEuZc/XgXIpvAG0YTdDeLPkkX5xVoxJsvug==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(39860400002)(346002)(396003)(136003)(451199021)(5660300002)(7416002)(2906002)(8676002)(8936002)(83380400001)(31696002)(36756003)(86362001)(38100700002)(31686004)(186003)(54906003)(6916009)(66476007)(6666004)(4326008)(6486002)(66946007)(478600001)(66556008)(26005)(6512007)(41300700001)(316002)(2616005)(6506007)(53546011)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?TXJDVHd3WDFCaU9qaEEyVEl1UG5tbEZCN2dudHBtVlRGN3dTN1RDVUNZenJn?=
+ =?utf-8?B?ZzE2dlhuWms4cU9oM2hTQXVuSWxSUVhCTW9JRkM5NmxhV2t2cDB6bDdTY0FX?=
+ =?utf-8?B?UkxFNHZNbzBzd2hPR2lHVkV2T3ZPcUxjdXNkamZwZWNiV3o2QnIzRStWbkJW?=
+ =?utf-8?B?MFcwdXNmcUc5SktSd0R2ZUd0UmoybHNFVkM4eCtsRCtXbTlZZHVtNGhXYWYy?=
+ =?utf-8?B?V2l5YnlPM0wrK0FGOFNmOVBwdlVBN1ZVZ3FPQ1lGR29XMW1jalVBTG1oempX?=
+ =?utf-8?B?TGlzeFV4cFhvMjI4VnNNbzNnK3lPY2xzYzlTYWJUUy9KOFVjRU14SkZYemd6?=
+ =?utf-8?B?ZzhQcXJmckRsRlc0aWRYTGJ1ei9vZDlLVitEcjA1RHR5Zzh5djM3NDZGajRW?=
+ =?utf-8?B?K0t0MEwrREUzR3lDcmx5R2liNTJuckc0cUNEMGluTWtrZSs1UERlQWtLN3Vp?=
+ =?utf-8?B?MlJMK3BpSlVDVGZ4NlFma3BiTW9FTkEwUXJnK0VvMHh4U01pYXpaSkVLcGlH?=
+ =?utf-8?B?Vkx1Yk5ldlY1NThHRGIraTUzZU41MnFTUkh2aURtS1FDaGJJSVd4cjZ0T0RV?=
+ =?utf-8?B?SGozZEZKQ2Z6UXg4SUVuUGlsWGJuRExkZ1VuMno1K0dKUXMxaWFFMTNYdm5L?=
+ =?utf-8?B?WFVlVXdWbFJtMWVsaENKbHdLOG5pdk91TE5Ma091ZWNRdTV6WFFnR0pJVVRp?=
+ =?utf-8?B?bUk3byt2YXZOQW1RWFQ1bnhrUGQ2dkllbFBBQTlLYnEwNHdvR05EN3V3WVFY?=
+ =?utf-8?B?YWV0dVQvaWZxL1MvMVVRZi9XYlRoQ2QzYVlLQytuajRLUDR6dWNnYUM4SzJn?=
+ =?utf-8?B?TVRKOVJLSkVEZTVUMk1Sc3FTTXlsWWNOWk1WOTl1NTg4NFMvQWpDTytCRUQ2?=
+ =?utf-8?B?VDAzR04rQ1lFK3ptUTdJbUx4MFIvQzNHWUZCdng4bXN6bEl1QkkvR0R2QnZG?=
+ =?utf-8?B?aGNFYXNiS0dEc0VJSTArZnlOUEl0SFJzNzhhMlY1VUlQVlFXeStwdnBhSXNL?=
+ =?utf-8?B?ck5vSzVURzlaK1E4ZmZtWEZCdXdvKzdYWWtMSnlwNTUzTEl1NmlSZGxRY2N5?=
+ =?utf-8?B?Y1hzd2E0Rm1UUWJUTzlMZTc4VkEwUmNlZEplNnFtMWJQNUY3SDZmV0R5OWZm?=
+ =?utf-8?B?RGt3SmlzM2JBeUxaZW92VFNETTArdmg3MWNUQWQwS2ZZdC9qaXQ2azRMeHda?=
+ =?utf-8?B?SnI0OU1keUM3L3hCQU8zQVR3UEJtVWphdm83YlRvQWNXYndMekJ1alVrb1RI?=
+ =?utf-8?B?am5TSC9SaUZ2ODFtaTVhcFFYYUtTbUh1MWU2dGlHSWVsM1M5Y3ljeWtBZXdU?=
+ =?utf-8?B?dDdpd0R1aTZMZG1jc3N3Y1RkcCtyRElMV2lJSE9QcXg2OEZlSzY2OG5RL00z?=
+ =?utf-8?B?Y0t4TzNZZ3NvNVFpVXprYlBpT2VadGtmLzRxU0M5Q2FvZUtuU29TY2NrN2hp?=
+ =?utf-8?B?L3VyVys4SGorbzFHTG55bkFKSjBCL2gyVHlMOERZWDdBSVVCSFF5eEpUWGxy?=
+ =?utf-8?B?MXJSVWlpd3lrUGJTR0JWUUJqeWxPZjZidVFCYVQyd00rNi9HMUc0UXZYNjd5?=
+ =?utf-8?B?K1NPMW9iclRqV0VFSmQ1YVdHT1N6UkRybWtOWm14NGViKzIvd0VMdGFpRUJG?=
+ =?utf-8?B?WElIdnFKRnlrZlZNTm1RNCt5dDdINXpkVC8zbGswOXVpWU4vcmdZN3JjeTBN?=
+ =?utf-8?B?U2ZQdmFtSkZLYWVpOE9sTXZBQk1WR2RBSUdXeUlpdlRGbmlkdk1yNFZoZDFF?=
+ =?utf-8?B?NzBNK2lJYVVTTVV0OFdXc1lnNTVqN0U2a1dzc0haYm15dUNEQU1xY3JabW85?=
+ =?utf-8?B?QUpUeExTVGtmZ3RVWW1HbW53QUZLRHFxbmJuaTV4QlRabll1RG5ld2tJUjdk?=
+ =?utf-8?B?TWU1SExhQmhMM2twb0VEYTdQWVc0OTRQUXdocEhDRExXM0tYWFVZMXBSME9X?=
+ =?utf-8?B?QVNpM016ZHN6WGM5K1daNFFLbEVJeC9EQzNQMG9HaklyeE5KVHVQU1Y3YTlL?=
+ =?utf-8?B?cG5rclRvWVRtcnJ1NnQ5ckcyUmYrV3JlTEhaK1AzZjRkR0plcllwNU5qb1ht?=
+ =?utf-8?B?bVBBRVdNRVZHV2RBLzBiNy9xbDJlMGNIT2x4Uk9scFBndmZhU25VVEM4TEk4?=
+ =?utf-8?Q?8hW+xY8WEQ2tPOeGdihVZ5ALz?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b4fa8b6f-5b7e-4cb7-b909-08db72886811
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 18:50:39.1870
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1A3uIbhd/5+NY3IdInUvZx1BeSVfucusEti98y3ow+2styoHtgn7d18PSeYjfsQLMijr1SLgd7jy1OR5qecGjw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW5PR12MB5622
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 2023-06-21 at 14:19 -0400, Tom Talpey wrote:
-> On 6/21/2023 2:01 PM, Jeff Layton wrote:
-> > On Wed, 2023-06-21 at 13:29 -0400, Tom Talpey wrote:
-> > > On 6/21/2023 10:45 AM, Jeff Layton wrote:
-> > > > struct timespec64 has unused bits in the tv_nsec field that can be =
-used
-> > > > for other purposes. In future patches, we're going to change how th=
-e
-> > > > inode->i_ctime is accessed in certain inodes in order to make use o=
-f
-> > > > them. In order to do that safely though, we'll need to eradicate ra=
-w
-> > > > accesses of the inode->i_ctime field from the kernel.
-> > > >=20
-> > > > Add new accessor functions for the ctime that we can use to replace=
- them.
-> > > >=20
-> > > > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > > > ---
-> > > >    fs/inode.c         | 16 ++++++++++++++
-> > > >    include/linux/fs.h | 53 ++++++++++++++++++++++++++++++++++++++++=
-+++++-
-> > > >    2 files changed, 68 insertions(+), 1 deletion(-)
-> > > >=20
-> > > > diff --git a/fs/inode.c b/fs/inode.c
-> > > > index d37fad91c8da..c005e7328fbb 100644
-> > > > --- a/fs/inode.c
-> > > > +++ b/fs/inode.c
-> > > > @@ -2499,6 +2499,22 @@ struct timespec64 current_time(struct inode =
-*inode)
-> > > >    }
-> > > >    EXPORT_SYMBOL(current_time);
-> > > >   =20
-> > > > +/**
-> > > > + * inode_ctime_set_current - set the ctime to current_time
-> > > > + * @inode: inode
-> > > > + *
-> > > > + * Set the inode->i_ctime to the current value for the inode. Retu=
-rns
-> > > > + * the current value that was assigned to i_ctime.
-> > > > + */
-> > > > +struct timespec64 inode_ctime_set_current(struct inode *inode)
-> > > > +{
-> > > > +	struct timespec64 now =3D current_time(inode);
-> > > > +
-> > > > +	inode_set_ctime(inode, now);
-> > > > +	return now;
-> > > > +}
-> > > > +EXPORT_SYMBOL(inode_ctime_set_current);
-> > > > +
-> > > >    /**
-> > > >     * in_group_or_capable - check whether caller is CAP_FSETID priv=
-ileged
-> > > >     * @idmap:	idmap of the mount @inode was found from
-> > > > diff --git a/include/linux/fs.h b/include/linux/fs.h
-> > > > index 6867512907d6..9afb30606373 100644
-> > > > --- a/include/linux/fs.h
-> > > > +++ b/include/linux/fs.h
-> > > > @@ -1474,7 +1474,58 @@ static inline bool fsuidgid_has_mapping(stru=
-ct super_block *sb,
-> > > >    	       kgid_has_mapping(fs_userns, kgid);
-> > > >    }
-> > > >   =20
-> > > > -extern struct timespec64 current_time(struct inode *inode);
-> > > > +struct timespec64 current_time(struct inode *inode);
-> > > > +struct timespec64 inode_ctime_set_current(struct inode *inode);
-> > > > +
-> > > > +/**
-> > > > + * inode_ctime_peek - fetch the current ctime from the inode
-> > > > + * @inode: inode from which to fetch ctime
-> > > > + *
-> > > > + * Grab the current ctime from the inode and return it.
-> > > > + */
-> > > > +static inline struct timespec64 inode_ctime_peek(const struct inod=
-e *inode)
-> > > > +{
-> > > > +	return inode->i_ctime;
-> > > > +}
-> > > > +
-> > > > +/**
-> > > > + * inode_ctime_set - set the ctime in the inode to the given value
-> > > > + * @inode: inode in which to set the ctime
-> > > > + * @ts: timespec value to set the ctime
-> > > > + *
-> > > > + * Set the ctime in @inode to @ts.
-> > > > + */
-> > > > +static inline struct timespec64 inode_ctime_set(struct inode *inod=
-e, struct timespec64 ts)
-> > > > +{
-> > > > +	inode->i_ctime =3D ts;
-> > > > +	return ts;
-> > > > +}
-> > > > +
-> > > > +/**
-> > > > + * inode_ctime_set_sec - set only the tv_sec field in the inode ct=
-ime
-> > >=20
-> > > I'm curious about why you choose to split the tv_sec and tv_nsec
-> > > set_ functions. Do any callers not set them both? Wouldn't a
-> > > single call enable a more atomic behavior someday?
-> > >=20
-> > >     inode_ctime_set_sec_nsec(struct inode *, time64_t, time64_t)
-> > >=20
-> > > (or simply initialize a timespec64 and use inode_ctime_spec() )
-> > >=20
-> >=20
-> > Yes, quite a few places set the fields individually. For example, when
-> > loading a value from disk that doesn't have sufficient granularity to
-> > set the nsecs field to anything but 0.
->=20
-> Well, they still need to set the tv_nsec so they could just pass 0.
-> But ok.
->=20
+So if we go down this path of CONFIG_WBRF and CONFIG_WBRF_ACPI, another
+question would be where should the new "wbrf.c" be stored?  The ACPI only
+version most certainly made sense in drivers/acpi/wbrf.c, but a generic
+version that only has an ACPI implementation right now not so much.
 
-Sure. The difficulty is in trying to do this in an automated way. For
-instance, look at the hfsplus patch; it has separate assignments in
-place already:
+On 6/21/2023 1:30 PM, Andrew Lunn wrote:
+>> And consumer would need to call it, but only if CONFIG_WBRF_ACPI isn't set.
+> Why? How is ACPI special that it does not need notifiers?
+ACPI core does has notifiers that are used, but they don't work the same.
+If you look at patch 4, you'll see amdgpu registers and unregisters using
+both
 
--       result->i_ctime.tv_sec =3D result->i_mtime.tv_sec =3D result->i_ati=
-me.tv_sec =3D local_to_gmt(dir->i_sb, le32_to_cpu(dee.creation_date));
--       result->i_ctime.tv_nsec =3D 0;
-+       inode_ctime_set_sec(result,
-+                           result->i_mtime.tv_sec =3D result->i_atime.tv_s=
-ec =3D local_to_gmt(dir->i_sb, le32_to_cpu(dee.creation_date)));
-+       inode_ctime_set_nsec(result, 0);
+acpi_install_notify_handler()
+and
+acpi_remove_notify_handler()
 
-Granted the new code is pretty ugly, but it compiles!
+If we supported both ACPI notifications and non-ACPI notifications
+all consumers would have to have support to register and use both types.
 
-Transforming that into what you're suggesting is a tougher proposition
-to do with coccinelle. I didn't see a way to conditionally catch cases
-like this, declare a new variable in the appropriate spot and then
-transform two assignments (that may not be next to one another!) into a
-single one.
-
-Maybe it's possible, but my grasp of SMPL is not that great. The docs
-and examples (including Kees' vey helpful ones!) cover fairly simple
-changes well, but I didn't quite grasp how to do that complex an
-evolution.
-
-> > Could I have done it by declaring a local timespec64 variable and just
-> > use the inode_ctime_set function in these places? Absolutely.
-> >=20
-> > That's a bit more difficult to handle with coccinelle though. If someon=
-e
-> > wants to suggest a way to do that without having to change all of these
-> > call sites manually, then I'm open to redoing the set.
-> >=20
-> > That might be better left for a later cleanup though.
->=20
-> Acked-by: Tom Talpey <tom@talpey.com>
->=20
-
-Many thanks!
-
-> > > > + * @inode: inode in which to set the ctime
-> > > > + * @sec:  value to set the tv_sec field
-> > > > + *
-> > > > + * Set the sec field in the ctime. Returns @sec.
-> > > > + */
-> > > > +static inline time64_t inode_ctime_set_sec(struct inode *inode, ti=
-me64_t sec)
-> > > > +{
-> > > > +	inode->i_ctime.tv_sec =3D sec;
-> > > > +	return sec;
-> > > > +}
-> > > > +
-> > > > +/**
-> > > > + * inode_ctime_set_nsec - set only the tv_nsec field in the inode =
-ctime
-> > > > + * @inode: inode in which to set the ctime
-> > > > + * @nsec:  value to set the tv_nsec field
-> > > > + *
-> > > > + * Set the nsec field in the ctime. Returns @nsec.
-> > > > + */
-> > > > +static inline long inode_ctime_set_nsec(struct inode *inode, long =
-nsec)
-> > > > +{
-> > > > +	inode->i_ctime.tv_nsec =3D nsec;
-> > > > +	return nsec;
-> > > > +}
-> > > >   =20
-> > > >    /*
-> > > >     * Snapshotting support.
-> >=20
-
---=20
-Jeff Layton <jlayton@kernel.org>
+>
+>> I don't see why it couldn't be a DT/ACPI hybrid solution for ARM64.
+> As said somewhere else, nobody does hybrid. In fact, turn it
+> around. Why not implement all this in DT, and make X86 hybrid? That
+> will make arm, powerpc, risc-v and mips much simpler :-)
+>
+> 	Andrew
+Doesn't coreboot do something hybrid with device tree?  I thought they
+generate their ACPI tables from a combination of DT and some static ASL.
 
