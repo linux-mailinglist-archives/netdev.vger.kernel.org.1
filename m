@@ -1,134 +1,92 @@
-Return-Path: <netdev+bounces-12819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1AA5739056
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:44:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2739739058
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:45:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC7CB1C20F5F
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:44:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E19C71C20FF2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:45:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9036E1B910;
-	Wed, 21 Jun 2023 19:44:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BAFA1B911;
+	Wed, 21 Jun 2023 19:45:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 858111B908
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:44:51 +0000 (UTC)
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74D021733
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:44:50 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-557224e7716so247750a12.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:44:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687376690; x=1689968690;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=asFgOSXPEXt2YbxEe5L8McfYdmAJwBR5t04QtXkXqXw=;
-        b=Apw8Num2iRogCABfvOJdHsrxAIEq2rlS+DJHClqtBrKZPE2Ye+ht/B4+VosF5o5CPR
-         qyz8mY5uUaAJF20IU/hO6ZpvRb6QiX6h9/tIWmkEO0BfVwJ+o5we4/LJ1VWn2OOzxvh/
-         Dq+9nuy0d51lkIVTvxhOr6wltvir1ihkO8Nmu4a2B4lTa9L5VMM73quLyjrp/C0kUdqu
-         PW05LhTElJ2xwJVy8YtCH2Twt2Sy3WEPisC6auClz9y0ZU2CqPayrgfVTWckQO6w7E1i
-         W6X030oLwE5gbPXZ6aGtF7pHQaiYKZt2Vbcib/zF2I7qjv+12PycQWtAfSbi8CJbprfm
-         xp5Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687376690; x=1689968690;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=asFgOSXPEXt2YbxEe5L8McfYdmAJwBR5t04QtXkXqXw=;
-        b=VixTqTVRo2ZCP2JagUq8+HbS8NkHKG8a5l5U+VsUbgJuBumH6DNdfhLu5Seo8fpaDr
-         vZlJzloxikH3AxELt7lOQ4RtcWZgprGoEHyoQgfqg70SxzfT4fH+/pCCg16wWLA6UlfE
-         rt/zyyhfl7Nndnqbky2Epg6hlgrXdxqCP+aJFSMlZTX84ZBDkYRg8TsVR9AAl4aW+Ed/
-         UjfUYrCBXn0rgn1e8iRfI6NZidpNyIFGLceT0O62I4A5QOv3TBPiIKbCMpe229puV3Wo
-         uQVIMA41DPKQtrXqGP3J2KmpGQ8rm9z8i1jXNOB2cg9Kzx5TFZVTjW0dq4zhnOLzf4TJ
-         eq2Q==
-X-Gm-Message-State: AC+VfDwEet0FnzEvhPx8/f7PR1OzaLQ13T5FKPQ+OnuvKPXY9hgsar7J
-	Zm37ht0E1eHdP5GYNu80IBsW9t29MCrR+NPCppYngZP0QAc=
-X-Google-Smtp-Source: ACHHUZ4Dmbo5gQA1jToNrzlKTfXwj3knRMFrySEzwmSjjlUmAOnRCJfeJELAh1wUv+Z+SSRqxeN9y0dOHD2OM1dUOjU=
-X-Received: by 2002:a17:90b:1c06:b0:25e:9ae8:4693 with SMTP id
- oc6-20020a17090b1c0600b0025e9ae84693mr19476940pjb.4.1687376689832; Wed, 21
- Jun 2023 12:44:49 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10E791B908
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:44:59 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE92B1989
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:44:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=oP/HPVe+zxTbH4Dtzbcu1shnX43lIh/y60JVhfdGIJc=; b=pvzbneRSObOyftZPt+A8kXfZKy
+	p26RoxCLcW1/869VPW9SRY3wpSml1ZXbAN4oM8MwCX3y0D07meLLmEwirzqbWBrGDTzOHDjLoeeJ8
+	6Va+5ciyjSDz42Jyh/rk9XmnzSw6AmDV7Hf89ni7/dyWWtD29WuUBUlmZVivPIz7SfOg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qC3l9-00HBSN-5P; Wed, 21 Jun 2023 21:44:55 +0200
+Date: Wed, 21 Jun 2023 21:44:55 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>, davem@davemloft.net,
+	pabeni@redhat.com, edumazet@google.com, netdev@vger.kernel.org,
+	emil.s.tantilov@intel.com, jesse.brandeburg@intel.com,
+	sridhar.samudrala@intel.com, shiraz.saleem@intel.com,
+	sindhu.devale@intel.com, willemb@google.com, decot@google.com,
+	leon@kernel.org, mst@redhat.com, simon.horman@corigine.com,
+	shannon.nelson@amd.com, stephen@networkplumber.org
+Subject: Re: [PATCH net-next v3 00/15][pull request] Introduce Intel IDPF
+ driver
+Message-ID: <03819ef3-8008-43e9-8618-f37f5bc5160b@lunn.ch>
+References: <20230616231341.2885622-1-anthony.l.nguyen@intel.com>
+ <20230616235651.58b9519c@kernel.org>
+ <1bbbf0ca-4f32-ee62-5d49-b53a07e62055@intel.com>
+ <20230621122853.08d32b8e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Fabio Estevam <festevam@gmail.com>
-Date: Wed, 21 Jun 2023 16:44:38 -0300
-Message-ID: <CAOMZO5AdPZfQQEfSgW-Cgw2GySerc0oxUu4OEcQoxwVeB+wQWg@mail.gmail.com>
-Subject: imx8mn with mv88e6320 fails to retrieve IP address
-To: Andrew Lunn <andrew@lunn.ch>, Vladimir Oltean <olteanv@gmail.com>
-Cc: netdev <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621122853.08d32b8e@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Wed, Jun 21, 2023 at 12:28:53PM -0700, Jakub Kicinski wrote:
+> On Wed, 21 Jun 2023 12:13:06 -0700 Linga, Pavan Kumar wrote:
+> > Thanks for the feedback. Given the timing and type of changes requested 
+> > for the patches, would it be possible to accept this patch series (v3) 
+> > in its current form, as we continue to develop and address all the 
+> > feedback in followup patches?
+> 
+> I think you're asking to be accepted in a Linux-Staging kind of a way?
 
-On an imx8mn-based board with a mv88e6320 switch, an IP address can be
-retrieved just fine in most of the cases.
+Or maybe real staging, driver/staging ? Add a TODO and GregKH might
+accept it.
 
-However, when using an external Trendnet switch, it is not possible to
-retrieve an IP address via DHCP. Using a static IP address works fine
-though.
+    2.5. Staging trees
 
-When DHCP works, ethtool reports:
+    The kernel source tree contains the drivers/staging/ directory,
+    where many sub-directories for drivers or filesystems that are on
+    their way to being added to the kernel tree live. They remain in
+    drivers/staging while they still need more work; once complete,
+    they can be moved into the kernel proper. This is a way to keep
+    track of drivers that aren't up to Linux kernel coding or quality
+    standards, but people may want to use them and track development.
 
-# ethtool  eth1
-Settings for eth1:
-Supported ports: [ TP MII ]
-Supported link modes:   10baseT/Half 10baseT/Full
-                        100baseT/Half 100baseT/Full
-                        1000baseT/Full
-Supported pause frame use: Symmetric
-Supports auto-negotiation: Yes
-Supported FEC modes: Not reported
-Advertised link modes:  10baseT/Half 10baseT/Full
-                        100baseT/Half 100baseT/Full
-                        1000baseT/Full
-Advertised pause frame use: Symmetric
-Advertised auto-negotiation: Yes
-Advertised FEC modes: Not reported
-Link partner advertised link modes:  10baseT/Half 10baseT/Full
-                                     100baseT/Half 100baseT/Full
-                                     1000baseT/Full
-Link partner advertised pause frame use: No
-Link partner advertised auto-negotiation: Yes
-Link partner advertised FEC modes: Not reported
-Speed: 1000Mb/s
-Duplex: Full
-Auto-negotiation: on
-master-slave cfg: preferred master
-master-slave status: slave
-Port: MII
-PHYAD: 3
-Transceiver: external
-Supports Wake-on: d
-Wake-on: d
-Link detected: yes
-
-When the Trendnet switch is used, DHCP fails and ethtool reports just
-these lines differently:
-
-        Link partner advertised link modes:  10baseT/Half 10baseT/Full
-                                             100baseT/Half 100baseT/Full
-                                             1000baseT/Half 1000baseT/Full
-        Link partner advertised pause frame use: Symmetric
-
-Other PCs can retrieve IP addresses via DHCP through the Trendnet
-switch correctly, but the imx8mn board fails.
-
-Would you have any suggestions for debugging this problem?
-
-Thanks,
-
-Fabio Estevam
+Andrew
 
