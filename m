@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-12737-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12741-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AFAB1738C33
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:48:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1512738C3D
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:49:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E111F1C20355
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:48:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 187792816F3
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:49:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D38219E51;
-	Wed, 21 Jun 2023 16:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6CC61B8E1;
+	Wed, 21 Jun 2023 16:46:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 625C819E4F
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:46:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABCFF19E50
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:46:24 +0000 (UTC)
 Received: from casper.infradead.org (casper.infradead.org [IPv6:2001:8b0:10b:1236::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B42721BD3;
-	Wed, 21 Jun 2023 09:46:07 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14F4419BE;
+	Wed, 21 Jun 2023 09:46:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=infradead.org; s=casper.20170209; h=Content-Transfer-Encoding:MIME-Version:
 	References:In-Reply-To:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:
 	Content-Type:Content-ID:Content-Description;
-	bh=V8mDv0EPPLn9jbcc1q5//Yn83nwPOxgWUqrHoyXGI0c=; b=PLRq9KKLTjSuYOK7GHTRrCHMdg
-	05lLjp1ehbCv+052CPARXxvQnb1O43zxj7iURZQn/E1jaN0bwIQW5tu0K45Zbr+3zxWU+wPrVZlCK
-	+QqsOSr6EUqo15LlAazBFikNdb1fRpMqJvFYQgSLPIYQxMIV53HL0n1UNVHnv6JnPh6JKkExbpJ6p
-	J6MYSwHHyE8H5k3lgy2R+EbEeMzUGq7Yt8LNMEzUcWUZ+ExfwFRmFIPsNXNCW5Mk31QYFy5kzCoHz
-	0e5RPgd7Cd8SGsqqWpYTptkDT+lG0sounVV2V2o0EUvc/3O7Y3fLam5B//dQFJa/rpuagffUbR3Pv
-	xw/swJBg==;
+	bh=KFMiCla2naG7Z7vKPwGKVD4TrVn4emFE0PLxxevs+7o=; b=OU4HmcXWzyUGQD65hDOdwkgu0o
+	u74l9DMZxcBXT5V4Z5qLLe5pROXO6krjW5ruc1DT0SkscC1GAv6CUiRHqoT/xZNB+FTYdY7HTZcSC
+	1nPv6XnNmEo7hrUJxM01iosMG8Y0Ym2VcY6jvvzCBkvQC7lZJfWEJjt8YGSGMlqEn7izRDRm51hz1
+	GMTsyqcMH1J1dyYFMGFeU3Saag7AZyuOX2CkLBm+3ksa29C3VbudjYZzIgY5yxIiJcoHDGi0dytI4
+	BSi9r/ik6bNx2dBlS0BKcqh1/yQ1YIwWVl75bC6VUoMpy4h0Khgb2dDFrfbmsM3CyCJYXba2lPTTt
+	z9KQ53Ag==;
 Received: from willy by casper.infradead.org with local (Exim 4.94.2 #2 (Red Hat Linux))
-	id 1qC0y1-00EjDg-9p; Wed, 21 Jun 2023 16:46:01 +0000
+	id 1qC0y1-00EjDi-Cc; Wed, 21 Jun 2023 16:46:01 +0000
 From: "Matthew Wilcox (Oracle)" <willy@infradead.org>
 To: linux-mm@kvack.org,
 	Andrew Morton <akpm@linux-foundation.org>
@@ -44,9 +44,9 @@ Cc: "Matthew Wilcox (Oracle)" <willy@infradead.org>,
 	linux-nfs@vger.kernel.org,
 	linux-fsdevel@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH 01/13] afs: Convert pagevec to folio_batch in afs_extend_writeback()
-Date: Wed, 21 Jun 2023 17:45:45 +0100
-Message-Id: <20230621164557.3510324-2-willy@infradead.org>
+Subject: [PATCH 02/13] mm: Add __folio_batch_release()
+Date: Wed, 21 Jun 2023 17:45:46 +0100
+Message-Id: <20230621164557.3510324-3-willy@infradead.org>
 X-Mailer: git-send-email 2.37.1
 In-Reply-To: <20230621164557.3510324-1-willy@infradead.org>
 References: <20230621164557.3510324-1-willy@infradead.org>
@@ -64,73 +64,35 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Removes a folio->page->folio conversion for each folio that's involved.
-More importantly, removes one of the last few uses of a pagevec.
+This performs the same role as __pagevec_release(), ie skipping the
+check for batch length of 0.
 
 Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
 ---
- fs/afs/write.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ include/linux/pagevec.h | 8 +++++++-
+ 1 file changed, 7 insertions(+), 1 deletion(-)
 
-diff --git a/fs/afs/write.c b/fs/afs/write.c
-index 18ccb613dff8..6e68c70d0b22 100644
---- a/fs/afs/write.c
-+++ b/fs/afs/write.c
-@@ -465,7 +465,7 @@ static void afs_extend_writeback(struct address_space *mapping,
- 				 bool caching,
- 				 unsigned int *_len)
+diff --git a/include/linux/pagevec.h b/include/linux/pagevec.h
+index f582f7213ea5..42aad53e382e 100644
+--- a/include/linux/pagevec.h
++++ b/include/linux/pagevec.h
+@@ -127,9 +127,15 @@ static inline unsigned folio_batch_add(struct folio_batch *fbatch,
+ 	return fbatch_space(fbatch);
+ }
+ 
++static inline void __folio_batch_release(struct folio_batch *fbatch)
++{
++	__pagevec_release((struct pagevec *)fbatch);
++}
++
+ static inline void folio_batch_release(struct folio_batch *fbatch)
  {
--	struct pagevec pvec;
-+	struct folio_batch fbatch;
- 	struct folio *folio;
- 	unsigned long priv;
- 	unsigned int psize, filler = 0;
-@@ -476,7 +476,7 @@ static void afs_extend_writeback(struct address_space *mapping,
- 	unsigned int i;
+-	pagevec_release((struct pagevec *)fbatch);
++	if (folio_batch_count(fbatch))
++		__folio_batch_release(fbatch);
+ }
  
- 	XA_STATE(xas, &mapping->i_pages, index);
--	pagevec_init(&pvec);
-+	folio_batch_init(&fbatch);
- 
- 	do {
- 		/* Firstly, we gather up a batch of contiguous dirty pages
-@@ -535,7 +535,7 @@ static void afs_extend_writeback(struct address_space *mapping,
- 				stop = false;
- 
- 			index += folio_nr_pages(folio);
--			if (!pagevec_add(&pvec, &folio->page))
-+			if (!folio_batch_add(&fbatch, folio))
- 				break;
- 			if (stop)
- 				break;
-@@ -545,14 +545,14 @@ static void afs_extend_writeback(struct address_space *mapping,
- 			xas_pause(&xas);
- 		rcu_read_unlock();
- 
--		/* Now, if we obtained any pages, we can shift them to being
-+		/* Now, if we obtained any folios, we can shift them to being
- 		 * writable and mark them for caching.
- 		 */
--		if (!pagevec_count(&pvec))
-+		if (!folio_batch_count(&fbatch))
- 			break;
- 
--		for (i = 0; i < pagevec_count(&pvec); i++) {
--			folio = page_folio(pvec.pages[i]);
-+		for (i = 0; i < folio_batch_count(&fbatch); i++) {
-+			folio = fbatch.folios[i];
- 			trace_afs_folio_dirty(vnode, tracepoint_string("store+"), folio);
- 
- 			if (!folio_clear_dirty_for_io(folio))
-@@ -565,7 +565,7 @@ static void afs_extend_writeback(struct address_space *mapping,
- 			folio_unlock(folio);
- 		}
- 
--		pagevec_release(&pvec);
-+		folio_batch_release(&fbatch);
- 		cond_resched();
- 	} while (!stop);
- 
+ void folio_batch_remove_exceptionals(struct folio_batch *fbatch);
 -- 
 2.39.2
 
