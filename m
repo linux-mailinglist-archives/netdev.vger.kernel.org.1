@@ -1,205 +1,96 @@
-Return-Path: <netdev+bounces-12695-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12713-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3140D738882
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:11:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C421A7389E8
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:41:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 08CA41C20EEC
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:11:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7EB18281659
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:41:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD4F918C36;
-	Wed, 21 Jun 2023 15:11:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D921952F;
+	Wed, 21 Jun 2023 15:38:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB9F118C21
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:11:34 +0000 (UTC)
-Received: from mail-il1-f206.google.com (mail-il1-f206.google.com [209.85.166.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E1DCD4EF4
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:11:17 -0700 (PDT)
-Received: by mail-il1-f206.google.com with SMTP id e9e14a558f8ab-341d8129ee1so56008695ab.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:11:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687360265; x=1689952265;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2nk8zGziA31WDOuvA0aYlNn4pdInQRqMJ/p71b4Na7s=;
-        b=bRS6mNsZ/ml8e+61/joVOrPoWhXlHwrMczpkii1ryCSah2D0eoCfK7NgNmBYCXi1iq
-         ax0qta4YYdLxjdlaVOi3wMrZ2bUkL4N8q1nJE80teR6iwcA83Y8fn8CXZHibN/v8DoXs
-         tbTMllnQlo66OcWv4+z287Q481bit8QS/HEDrreiF8uzjZh54gO9dmqeLzSv4pCSfQ8Y
-         E+ieOHeB1oYpe1/RYlWx8PEBwS9NEXeQI6xeVttAbS5FyXrPNEohSz5tP/VCcVoDpNtD
-         wM/AkJie9D/NSI98ulPjIVtB48mTJ1r1OBZopNbxnEDfh6rNygPmoGExCUq5uhv0wUZk
-         bytw==
-X-Gm-Message-State: AC+VfDxH450I5D0b0nzAOIEPo0x3jN+6YOjgptQxu0DKMmhZdmwCoavA
-	czV6biFm8VLT9/pqA/gogiQghhhG09HZx20O7/JmySgeCzV5
-X-Google-Smtp-Source: ACHHUZ6j3i+8aue6dZr8BsfRhQKrwEUClSXrs3xjVwi9IORjcw+NLtmFVF291c+rd0h0HVphtwF8nH2FGodfjWSb9oqH1IgXSZ2b
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B504719E44
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:38:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D14749B
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:38:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=NaVrleCmNiIJhauVDjhLqKO0DQ6jZX79IjchG5Pb8O8=; b=MtltV5usPsrBzwMsH04M8iUAAZ
+	2R9rpT+9kegq9b72DZ3qpCK9B9EbB6BFuSE3vvLvEM5U0HNaDNcjF08fIslZCK5ukxcMJ2Ae4Nwjb
+	ov0e+a/c8xcJQN5WUmdumrxdLh4mX1OFaA+TOMfZ6wT4vYXRTlbVsY9E/11t9SidQF+Q=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qBzbp-00H9gW-Hk; Wed, 21 Jun 2023 17:19:01 +0200
+Date: Wed, 21 Jun 2023 17:19:01 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <rmk+kernel@armlinux.org.uk>,
+	Christian Marangi <ansuelsmth@gmail.com>
+Subject: Re: [PATCH net-next v1 1/3] led: trig: netdev: Fix requesting
+ offload device
+Message-ID: <864bfa14-ab8f-4953-873c-a9ad4721be22@lunn.ch>
+References: <20230619215703.4038619-1-andrew@lunn.ch>
+ <20230619215703.4038619-2-andrew@lunn.ch>
+ <ZJL9I5rQlYFUZWPp@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6e02:541:b0:33e:8aa2:4a0a with SMTP id
- i1-20020a056e02054100b0033e8aa24a0amr5897970ils.4.1687360265045; Wed, 21 Jun
- 2023 08:11:05 -0700 (PDT)
-Date: Wed, 21 Jun 2023 08:11:05 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000034cf5d05fea52dd4@google.com>
-Subject: [syzbot] [dri?] divide error in drm_mode_vrefresh
-From: syzbot <syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com>
-To: airlied@gmail.com, daniel@ffwll.ch, davem@davemloft.net, 
-	dri-devel@lists.freedesktop.org, dsahern@kernel.org, edumazet@google.com, 
-	jacob.e.keller@intel.com, jiri@nvidia.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, maarten.lankhorst@linux.intel.com, 
-	mripard@kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com, tzimmermann@suse.de
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJL9I5rQlYFUZWPp@corigine.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+> >  			set_device_name(trigger_data, name, strlen(name));
+> >  			trigger_data->hw_control = true;
+> > -			trigger_data->mode = mode;
+> > +
+> > +			rc = led_cdev->hw_control_get(led_cdev, &mode);
+> > +			if (!rc)
+> > +				trigger_data->mode = mode;
+> 
+> Is the case where trigger_data->hw_control is set to true
+> but trigger_data->mode is not set ok?
+> 
+> I understand that is the whole point is not to return an error in this case.
+> But I'm concerned about the value of trigger_data->mode.
 
-syzbot found the following issue on:
+Yes, its something Christian and I talked about off-list.
+trigger_data->mode is 0 by default due to the kzalloc(). 0 is a valid
+value, it means don't blink for any reason. So in effect the LED
+should be off. And any LED driver which the ledtrig-netdev.c supports
+must support software control of the LED, so does support setting the
+LED off.
 
-HEAD commit:    1639fae5132b Merge tag 'drm-fixes-2023-06-17' of git://ano..
-git tree:       upstream
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=153ae86b280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=ac246111fb601aec
-dashboard link: https://syzkaller.appspot.com/bug?extid=622bba18029bcde672e1
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=12fcd517280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=15de5137280000
+In the normal case hw_control_get() returns indicating the current
+blink mode, and the trigger sets its initial state to that. If
+however, it returns an error, it probably means its current state
+cannot be represented by the netdev trigger. PHY vendors do all sort
+of odd things, and we don't want to support all the craziness. So
+setting the LED off and leaving the user to configure the LED how they
+want seems like a reasonable thing to do.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/ddaf9fb256b7/disk-1639fae5.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/82b7be81b931/vmlinux-1639fae5.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/926a973a103a/bzImage-1639fae5.xz
+And i tested this because my initial implementation of the Marvell
+driver was FUBAR and it returned an error here.
 
-The issue was bisected to:
-
-commit 565b4824c39fa335cba2028a09d7beb7112f3c9a
-Author: Jiri Pirko <jiri@nvidia.com>
-Date:   Mon Feb 6 09:41:51 2023 +0000
-
-    devlink: change port event netdev notifier from per-net to global
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=1010a337280000
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1210a337280000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1410a337280000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+622bba18029bcde672e1@syzkaller.appspotmail.com
-Fixes: 565b4824c39f ("devlink: change port event netdev notifier from per-net to global")
-
-divide error: 0000 [#1] PREEMPT SMP KASAN
-CPU: 1 PID: 5003 Comm: syz-executor375 Not tainted 6.4.0-rc6-syzkaller-00242-g1639fae5132b #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-RIP: 0010:drm_mode_vrefresh+0x19d/0x1f0 drivers/gpu/drm/drm_modes.c:1303
-Code: e8 58 3c e3 fc 66 83 fb 01 76 09 e8 4d 40 e3 fc 44 0f af e3 e8 44 40 e3 fc 48 69 ed e8 03 00 00 44 89 e0 31 d2 d1 e8 48 01 e8 <49> f7 f4 49 89 c4 eb 03 45 31 e4 e8 23 40 e3 fc 44 89 e0 5b 5d 41
-RSP: 0018:ffffc90003bdfa00 EFLAGS: 00010206
-RAX: 000000000001f400 RBX: 0000000000000400 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff84a1069c RDI: 0000000000000003
-RBP: 000000000001f400 R08: 0000000000000003 R09: 0000000000000001
-R10: 0000000000000400 R11: ffffffff81d6ebf5 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000008
-FS:  00005555561e3300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000005fdeb8 CR3: 000000007b315000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- drm_mode_debug_printmodeline+0x22c/0x2f0 drivers/gpu/drm/drm_modes.c:60
- drm_mode_setcrtc+0x116b/0x1650 drivers/gpu/drm/drm_crtc.c:794
- drm_ioctl_kernel+0x281/0x4e0 drivers/gpu/drm/drm_ioctl.c:788
- drm_ioctl+0x577/0xb30 drivers/gpu/drm/drm_ioctl.c:891
- vfs_ioctl fs/ioctl.c:51 [inline]
- __do_sys_ioctl fs/ioctl.c:870 [inline]
- __se_sys_ioctl fs/ioctl.c:856 [inline]
- __x64_sys_ioctl+0x197/0x210 fs/ioctl.c:856
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7fca321fac59
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007fff9cb913d8 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007fca321fac59
-RDX: 0000000020000180 RSI: 00000000c06864a2 RDI: 0000000000000003
-RBP: 00007fca321ba4d0 R08: 00000000fffff4e6 R09: 0000000000000000
-R10: 0000000000000003 R11: 0000000000000246 R12: 00007fca321ba560
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:drm_mode_vrefresh+0x19d/0x1f0 drivers/gpu/drm/drm_modes.c:1303
-Code: e8 58 3c e3 fc 66 83 fb 01 76 09 e8 4d 40 e3 fc 44 0f af e3 e8 44 40 e3 fc 48 69 ed e8 03 00 00 44 89 e0 31 d2 d1 e8 48 01 e8 <49> f7 f4 49 89 c4 eb 03 45 31 e4 e8 23 40 e3 fc 44 89 e0 5b 5d 41
-RSP: 0018:ffffc90003bdfa00 EFLAGS: 00010206
-RAX: 000000000001f400 RBX: 0000000000000400 RCX: 0000000000000000
-RDX: 0000000000000000 RSI: ffffffff84a1069c RDI: 0000000000000003
-RBP: 000000000001f400 R08: 0000000000000003 R09: 0000000000000001
-R10: 0000000000000400 R11: ffffffff81d6ebf5 R12: 0000000000000000
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000008
-FS:  00005555561e3300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00000000005fdeb8 CR3: 000000007b315000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	e8 58 3c e3 fc       	callq  0xfce33c5d
-   5:	66 83 fb 01          	cmp    $0x1,%bx
-   9:	76 09                	jbe    0x14
-   b:	e8 4d 40 e3 fc       	callq  0xfce3405d
-  10:	44 0f af e3          	imul   %ebx,%r12d
-  14:	e8 44 40 e3 fc       	callq  0xfce3405d
-  19:	48 69 ed e8 03 00 00 	imul   $0x3e8,%rbp,%rbp
-  20:	44 89 e0             	mov    %r12d,%eax
-  23:	31 d2                	xor    %edx,%edx
-  25:	d1 e8                	shr    %eax
-  27:	48 01 e8             	add    %rbp,%rax
-* 2a:	49 f7 f4             	div    %r12 <-- trapping instruction
-  2d:	49 89 c4             	mov    %rax,%r12
-  30:	eb 03                	jmp    0x35
-  32:	45 31 e4             	xor    %r12d,%r12d
-  35:	e8 23 40 e3 fc       	callq  0xfce3405d
-  3a:	44 89 e0             	mov    %r12d,%eax
-  3d:	5b                   	pop    %rbx
-  3e:	5d                   	pop    %rbp
-  3f:	41                   	rex.B
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+     Andrew
 
