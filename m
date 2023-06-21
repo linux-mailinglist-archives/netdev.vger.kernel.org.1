@@ -1,39 +1,71 @@
-Return-Path: <netdev+bounces-13016-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D56B1739DF0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:00:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CC48739FF2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:44:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11CCD1C21088
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:00:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDACD1C210C3
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 11:44:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B478BFE;
-	Thu, 22 Jun 2023 10:00:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 908191C75D;
+	Thu, 22 Jun 2023 11:44:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897D25246
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:00:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A75DC43391;
-	Thu, 22 Jun 2023 10:00:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687428021;
-	bh=XZlebLGYDzaKv7QBu6ro1CtVqscjkNN8/jhsW4Qd0rk=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=kNfIVAEQLKyLh2JC1Beb26TvE9JS+5DG6lqJJ3eYcv25Mx1oqIL3jJP9F/2AfrG3L
-	 a6icll4e90ioMgAp75Fxeb8uurGAygGCITlSJkLhcCoDh+dMXbCg1wyou6dds3y0na
-	 l+1G5RT4nW8wCAMlK/E0N0yG9GH1HT6l+rNhnapdxXlk4guAxLXPTzSPezKDCCj08A
-	 CgOSATo3QQyGpHPLJeuWBPHBlklAYJ1GVWZUDoMG5NzYflIDSbUEGaq0Hk9vreYatc
-	 Pa8/VB9coG5QxfunqYaCa31CmFYPK+qyvE9ikHNJvh6ukz6CkP6FM8yogXyWtBfClk
-	 bBYICiusFUzaQ==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E798EC691EF;
-	Thu, 22 Jun 2023 10:00:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83FF115AE4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:44:37 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7EE43D3;
+	Thu, 22 Jun 2023 04:44:35 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b4725e9917so72683211fa.2;
+        Thu, 22 Jun 2023 04:44:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687434274; x=1690026274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=hVmHxQFpvqY7IwmyaWzTBpCtQuGSXHWJX1dpQpAyhE8=;
+        b=mr1/UtQmFba0+SF4mL7YxXD2kU7wnD67Y7ihCEp58x6pohU8w2EVRv7QV4RcEw7+Pw
+         0QkIKpc5PQ2Q7DlM/E7aaonxJjkfEQTdshgg2z9kFTJqcuu1tgpV0WET3HgaXrPIeK97
+         LDMN22d4tuPtdVjLcGlTJeBvgrjemeMas5vQQ0NhH+eSTQwleGUyMhJ1d8c10V1gvWZe
+         TLcp1YF8E7KgWWVJcWDIA+QMqW9pb50fiYBTThBqvsSnyyicpu36X/U6EnbfIlTiwB72
+         tudza0FdoExMRL9yXX8yOr4yQca4ov2aNUOrH+S4wjoYLWKIU/9hQfqx2Ey9X7kQMeou
+         aKyw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687434274; x=1690026274;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=hVmHxQFpvqY7IwmyaWzTBpCtQuGSXHWJX1dpQpAyhE8=;
+        b=QnarrHBgeK/6OIzA2Glu/z3mTnzDybLC6vmiz7VQ0MHHI8lZqWbZxCCjfjvMnBXPXq
+         ynSxoxUMo0hrIaz2Zgk0j14C/2JRI//AYqhRKbh7/3MCH6dfE1L150h4rd8uluFpaVPx
+         4x0mhLIGLvvdI9j9gOXN1BYhAi7cZpaEsVRtIJrDqel/9iFAWlBRY6G3QeLaRPFGPHgq
+         HH9xoO028gulEqVDh1/Uug9tb76z8tC2O7u6BF74tdllDuxMpUJgH/qomkdh0HCKBeSp
+         THKk0ls6IrY4R9Kz9CZXhByGWai4pJGkCLMYrMhDacl/tSuwS905hfeAWCH3o67V7B2+
+         Dfyw==
+X-Gm-Message-State: AC+VfDyFMfqbL28rhyWs/E0FEgnZ8Y7sRrbSb90zw2jl69sQhqB7vBjN
+	jt/IpcqyCg06LlTEsW5fW7g=
+X-Google-Smtp-Source: ACHHUZ42zItZAP+UecMaUptnUBOTycAnlXEP9zRo5USemDhZPUvfJ+/eGkdY7naOacPNeKFf3FceSA==
+X-Received: by 2002:a05:6512:3b23:b0:4f9:6221:8fae with SMTP id f35-20020a0565123b2300b004f962218faemr1632868lfv.49.1687434273224;
+        Thu, 22 Jun 2023 04:44:33 -0700 (PDT)
+Received: from localhost.localdomain (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
+        by smtp.googlemail.com with ESMTPSA id p20-20020a05600c205400b003f9a6f3f240sm11513712wmg.14.2023.06.22.04.44.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 04:44:32 -0700 (PDT)
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Andrew Lunn <andrew@lunn.ch>,
+	Lee Jones <lee@kernel.org>,
+	linux-leds@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: Christian Marangi <ansuelsmth@gmail.com>
+Subject: [net-next PATCH] docs: ABI: sysfs-class-led-trigger-netdev: add new modes and entry
+Date: Wed, 21 Jun 2023 11:26:53 +0200
+Message-Id: <20230621092653.23172-1-ansuelsmth@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,43 +73,145 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] revert "net: align SO_RCVMARK required privileges with
- SO_MARK"
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168742802094.13102.924538048558653206.git-patchwork-notify@kernel.org>
-Date: Thu, 22 Jun 2023 10:00:20 +0000
-References: <20230618103130.51628-1-maze@google.com>
-In-Reply-To: <20230618103130.51628-1-maze@google.com>
-To: =?utf-8?q?Maciej_=C5=BBenczykowski_=3Cmaze=40google=2Ecom=3E?=@codeaurora.org
-Cc: zenczykowski@gmail.com, netdev@vger.kernel.org, larysa.zaremba@intel.com,
- simon.horman@corigine.com, pabeni@redhat.com, eyal.birger@gmail.com,
- kuba@kernel.org, edumazet@google.com, prohr@google.com
+X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DATE_IN_PAST_24_48,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Document newly introduced modes and entry for the LED netdev trigger.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+Add documentation for new modes:
+- link_10
+- link_100
+- link_1000
+- half_duplex
+- full_duplex
 
-On Sun, 18 Jun 2023 03:31:30 -0700 you wrote:
-> This reverts commit 1f86123b9749 ("net: align SO_RCVMARK required
-> privileges with SO_MARK") because the reasoning in the commit message
-> is not really correct:
->   SO_RCVMARK is used for 'reading' incoming skb mark (via cmsg), as such
->   it is more equivalent to 'getsockopt(SO_MARK)' which has no priv check
->   and retrieves the socket mark, rather than 'setsockopt(SO_MARK) which
->   sets the socket mark and does require privs.
-> 
-> [...]
+Add documentation for new entry:
+- hw_control
 
-Here is the summary with links:
-  - [net,v2] revert "net: align SO_RCVMARK required privileges with SO_MARK"
-    https://git.kernel.org/netdev/net/c/a9628e88776e
+Also add additional info for the interval entry and the tx/rx modes with
+the special case of hw_control ON.
 
-You are awesome, thank you!
+Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+---
+ .../testing/sysfs-class-led-trigger-netdev    | 89 +++++++++++++++++++
+ 1 file changed, 89 insertions(+)
+
+diff --git a/Documentation/ABI/testing/sysfs-class-led-trigger-netdev b/Documentation/ABI/testing/sysfs-class-led-trigger-netdev
+index 646540950e38..78b62a23b14a 100644
+--- a/Documentation/ABI/testing/sysfs-class-led-trigger-netdev
++++ b/Documentation/ABI/testing/sysfs-class-led-trigger-netdev
+@@ -13,6 +13,11 @@ Description:
+ 		Specifies the duration of the LED blink in milliseconds.
+ 		Defaults to 50 ms.
+ 
++		With hw_control ON, the interval value MUST be set to the
++		default value and cannot be changed.
++		Trying to set any value in this specific mode will return
++		an EINVAL error.
++
+ What:		/sys/class/leds/<led>/link
+ Date:		Dec 2017
+ KernelVersion:	4.16
+@@ -39,6 +44,9 @@ Description:
+ 		If set to 1, the LED will blink for the milliseconds specified
+ 		in interval to signal transmission.
+ 
++		With hw_control ON, the blink interval is controlled by hardware
++		and won't reflect the value set in interval.
++
+ What:		/sys/class/leds/<led>/rx
+ Date:		Dec 2017
+ KernelVersion:	4.16
+@@ -50,3 +58,84 @@ Description:
+ 
+ 		If set to 1, the LED will blink for the milliseconds specified
+ 		in interval to signal reception.
++
++		With hw_control ON, the blink interval is controlled by hardware
++		and won't reflect the value set in interval.
++
++What:		/sys/class/leds/<led>/hw_control
++Date:		Jun 2023
++KernelVersion:	6.5
++Contact:	linux-leds@vger.kernel.org
++Description:
++		Communicate whether the LED trigger modes are driven by hardware
++		or software fallback is used.
++
++		If 0, the LED is using software fallback to blink.
++
++		If 1, the LED is using hardware control to blink and signal the
++		requested modes.
++
++What:		/sys/class/leds/<led>/link_10
++Date:		Jun 2023
++KernelVersion:	6.5
++Contact:	linux-leds@vger.kernel.org
++Description:
++		Signal the link speed state of 10Mbps of the named network device.
++
++		If set to 0 (default), the LED's normal state is off.
++
++		If set to 1, the LED's normal state reflects the link state
++		speed of 10MBps of the named network device.
++		Setting this value also immediately changes the LED state.
++
++What:		/sys/class/leds/<led>/link_100
++Date:		Jun 2023
++KernelVersion:	6.5
++Contact:	linux-leds@vger.kernel.org
++Description:
++		Signal the link speed state of 100Mbps of the named network device.
++
++		If set to 0 (default), the LED's normal state is off.
++
++		If set to 1, the LED's normal state reflects the link state
++		speed of 100Mbps of the named network device.
++		Setting this value also immediately changes the LED state.
++
++What:		/sys/class/leds/<led>/link_1000
++Date:		Jun 2023
++KernelVersion:	6.5
++Contact:	linux-leds@vger.kernel.org
++Description:
++		Signal the link speed state of 1000Mbps of the named network device.
++
++		If set to 0 (default), the LED's normal state is off.
++
++		If set to 1, the LED's normal state reflects the link state
++		speed of 1000Mbps of the named network device.
++		Setting this value also immediately changes the LED state.
++
++What:		/sys/class/leds/<led>/half_duplex
++Date:		Jun 2023
++KernelVersion:	6.5
++Contact:	linux-leds@vger.kernel.org
++Description:
++		Signal the link half duplex state of the named network device.
++
++		If set to 0 (default), the LED's normal state is off.
++
++		If set to 1, the LED's normal state reflects the link half
++		duplex state of the named network device.
++		Setting this value also immediately changes the LED state.
++
++What:		/sys/class/leds/<led>/full_duplex
++Date:		Jun 2023
++KernelVersion:	6.5
++Contact:	linux-leds@vger.kernel.org
++Description:
++		Signal the link full duplex state of the named network device.
++
++		If set to 0 (default), the LED's normal state is off.
++
++		If set to 1, the LED's normal state reflects the link full
++		duplex state of the named network device.
++		Setting this value also immediately changes the LED state.
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
+2.40.1
 
 
