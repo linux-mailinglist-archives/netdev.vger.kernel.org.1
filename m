@@ -1,71 +1,69 @@
-Return-Path: <netdev+bounces-12699-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12700-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 251D673895D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F8CB73896C
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C42F6280CF8
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:35:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0B278281632
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:35:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3E53B1951B;
-	Wed, 21 Jun 2023 15:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77D661951C;
+	Wed, 21 Jun 2023 15:35:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A91318C2E
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:35:00 +0000 (UTC)
-Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2110.outbound.protection.outlook.com [40.107.100.110])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCA69183
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:34:39 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 650CE19506
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 15:35:26 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2043.outbound.protection.outlook.com [40.107.93.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DCC8C1A4
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 08:35:24 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YaLF2eVfi+TjTEGWbzYMkYE8cu0HKOOEk7C6DYgYMEZgACUNQhuSt9p13fSkiJJKON5wguJpkXzRUpsfyDgURKEpiVsMmPcl6m8QHd1ecOQjoxCc67zZoEpE75iNT6Y7kvF/MQMfPQD7pVUjIrK4WHxbBVVprdoi80KAF55nk/StL9VfXsGRBqbHZZW3jRT504bZL9aW13qyeWoX7vu5Ocb8mpYp6Ipe+wY+hKKwD/qlK9bStNkOUkTDUpY1DJvD1yv3eLm/9uYoONTidum/kh07A35u7/Xjkyz2mkcxsuhkq+rckABifbs0rYTLBt2mSitD1E1WsQDKItePyhi9dw==
+ b=CeCbqxmvuby8JCLRAlc8l9S/xqsbiNX8jzgqpLdnutcufixiImVKRJ8bGVYf50OdVjlyectPMXSVSvRUjwKsJECSNyaEyafgQ4T7EJ+ecVZt/gCJE7RFIkpI0GSCTYPubIaqXzcqvO4l0EAYn5i9pcyxzRAM7qefZZEnNasC5hL83MFkZWolK6lgbP4uiv9VwTAi6reNsTjVE+QfZZaWzF+EJah2ZS/9HvUY/812yKCl+O46Q86tnusNqt475UctK1puIqWPdi40+Z7fY7jhjWTOlw4cAA6PDb/uAYG4kbV0B/c9InXgEafgmocp2fMtXaQ9wuAEb0MGccevjgxDFw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9CzoirVv0oYQHcx2XzLiRQDme+UigXNO1EgZXgu0rEg=;
- b=Mie74yjVjoZXubCTJ9uDia5fCChhOOBJdPTg65JpI+xxnfEeUPEV9NN/ASAakf5ZwVc2+9WEMaRBPV2L2ncEE3PyBRUrzqRYcj7wpcUTkSfSwNzF6PCNbUExTHdtKgWbHoZ8nSvWUne7S4YbVwdjTM+ajcoH5K5Nl3lHiZjnFxzGqenYkGczL8dAMxDTCLPFVHfPAk/7LoS6J26UuTSbzeURMmcpOgSgIlfijtpxE5+E2UUKZrMe2lnChC657zqnh1dgDY5m9OswL8pt8BOaF9yYOpxMO+/RDnlZnNOLCepSJGoYF0uXdYb7H897aAXz7RZ8bdf7Gx8xK7rPVdo64g==
+ bh=/SOh3bVO11DCUcEDH9eq04XlcnthGUN3f3dFQIkXT5E=;
+ b=UnTrkQJCIzmER6mLC3OsfXehgaRPKcPUAevQ55jA8X2S+75bPxoeSKq9Q/Kxuqz1naTm+simBAvpZxYuGfrFcOyV0ZpuvLIWI7OtAfB8/nAfZ1IlKZeMvosD+bjcNUSD11GlfWRoJvb1jVNYC0X7PeTiB2FF3HFHJh/pioHBElbMvX476rAuY1L1zR3kuyytELXwkJxIiXcUvLYJGli4JE/pvUG1qnl2QnIkOkpEozWhyshvedEU4GmEXgWHnjpq7RaiWizjldQLhM8laTzSuYugZdNetwzNd3Jag0ywgEIO+Mrcjtc4bWGFrupVaUJC7VRqttDVaetVpU+kIQ2Fgg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9CzoirVv0oYQHcx2XzLiRQDme+UigXNO1EgZXgu0rEg=;
- b=MBf1EbB+Gb7Gs7Yje7KcxKkmc6/KvQF54DvqCQEdM+0rkNOdnHRFZ4bCxBXhkf5P0gmfseoocmmf6pt5qQe37roZ9ooiFGKgw15FJWoP28NC3RkJkzHB3e4SNZyNZURTmwegM9LosMP1vFv2DuI3X5v8+V7x1UOCJkEqIlBguoI=
+ bh=/SOh3bVO11DCUcEDH9eq04XlcnthGUN3f3dFQIkXT5E=;
+ b=IkUKAyRjWGUqEq/kXiFvWRVQ6aOFKFhDzoUi8IhMiwl3bywb3AZ/IkJMBM+zmEShNVTkhzJvOrTuev6BfZ41pwVrVDjEhSmo65XBDDUPIJbnaYs+dSX2TN4mi6qD3vfsa74dM0qgRKokAPeUbYeR408kM4mPp3Ml+BY973TX9Z6a1E+wFXYauqi1bxaTuzzfs4v+QtUzii2Bxq6Uy7DX6YBlDtUv45ExuDTa01ffl0sjjw/3277zD7C4PnkhzznMP9n5n4E4fLrSMj96MGfcV/NfYdIFxu7iQsnn3mev5u6Qs5c5WNdVf3PqYaGfrOJZPyaKL4AS30DmujrEfQGitA==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH0PR13MB5639.namprd13.prod.outlook.com (2603:10b6:510:12a::14) with
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by SJ0PR12MB6854.namprd12.prod.outlook.com (2603:10b6:a03:47c::13) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.37; Wed, 21 Jun
- 2023 15:34:36 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
- 15:34:36 +0000
-Date: Wed, 21 Jun 2023 17:34:30 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH net-next v1 1/3] led: trig: netdev: Fix requesting
- offload device
-Message-ID: <ZJMYhiZpip8ly8+0@corigine.com>
-References: <20230619215703.4038619-1-andrew@lunn.ch>
- <20230619215703.4038619-2-andrew@lunn.ch>
- <ZJL9I5rQlYFUZWPp@corigine.com>
- <864bfa14-ab8f-4953-873c-a9ad4721be22@lunn.ch>
+ 2023 15:35:22 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::66d8:40d2:14ed:7697]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::66d8:40d2:14ed:7697%5]) with mapi id 15.20.6500.036; Wed, 21 Jun 2023
+ 15:35:22 +0000
+Date: Wed, 21 Jun 2023 18:35:15 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com
+Subject: Re: [RFC PATCH net-next 1/2] devlink: Hold a reference on parent
+ device
+Message-ID: <ZJMYsyw06+jWVR5i@shredder>
+References: <20230619125015.1541143-1-idosch@nvidia.com>
+ <20230619125015.1541143-2-idosch@nvidia.com>
+ <ZJLjlGo+jww6QIAg@nanopsycho>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <864bfa14-ab8f-4953-873c-a9ad4721be22@lunn.ch>
-X-ClientProxiedBy: AM0PR04CA0039.eurprd04.prod.outlook.com
- (2603:10a6:208:1::16) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+In-Reply-To: <ZJLjlGo+jww6QIAg@nanopsycho>
+X-ClientProxiedBy: VI1PR08CA0148.eurprd08.prod.outlook.com
+ (2603:10a6:800:d5::26) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -73,103 +71,103 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5639:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70ca04b0-380c-4b3c-56e5-08db726d04f7
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|SJ0PR12MB6854:EE_
+X-MS-Office365-Filtering-Correlation-Id: c123662c-21ae-4808-861e-08db726d2073
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	MDJzQdQjGInMVnt5Rq3XRn0zF/TmcNIiTcQv5IxW6JwDZQ8vjTAoJNqn88/libyOw0rPZQHq+10xLCisC9d5Z6lZ0TxaP9c3C525bun2hlxwOf8+c0yYLcYW64m227Uji8tLmusiTuaGI2jZNyRMRZRLkg1shXcFs87c/1IFaGxOMiEnvgKup6Z6GObsv1Ffz+ZllFHF+bEghyfGY1a+N3pmWTyAUuLNVtY7X/UQybx/NTVG3sNUcT/hE+gMqkVCho85qTE78ldQWo72afTbHGiSH6UrEyG3lgUVrIMe1z25e5YyBAwY02TwhjKJbe+qNwaKE35/P26XROFOANBwAnnc2SLhBL3nNjP7H5JWWCzwDz8ls2gHhOmzPQJl76/uu/u+yLtORAtN+F6cajceKM/karFMHeKEYzDQHy1tRraKj11dTg+v5kCftqmVkjd+Dy/p3sDeiosikJihD8SiEnsongx+gE19GZl8gk1Kzo+CP75noWeYUDFG39jMSrkmogOKS8rBq5H8w5SUgH/E9bONZxz6oDhqGbeGtEOoCnlt1hkx2E5aquRrjxNH5FzuUAqETSrGCuekNXl10QyJx8fWrxvSwriB6eFF5mkM++sVYhcUOEsKhylE9MM5g8QZe/GR+LjZ+s1kU0xwqH+RlZ0+tiTSYLKBopL5h9MmtqU=
+	/yCN8hp4yw4L+mrEF9R4h/54gMdeYVzQTkhHE/RZUBXXy/vg7A913jin02edkccQv0/3f8Rev/XKS9Vp1kp95LnktUKhnzg1mw/7xw6IlnP720ZlzwvlUXvW5kDgLJF2eGJus5fz3hSRAkPpGx2MpQsdoZ/H/w2seq5ExpgwBsvhrErCxCsY2ATX76Z7nB1caM9e4E6qLNyh07Y9nOGky0l6JsPvAd+9xr0ybHAoH8BdunvXR8UWMba1bh3uicqXi6Dit2V4wGsLTxC4G3Gj4fo3SEYpRsLBYZTYgUle0OXKCGpKwx3Hn7byghTfWddM1d8zQ3aAOaUD7rpF0es70ssxGINpxRat8MhxqMPWlnR7VgAp/npyfPKovc71uZ0/qdAfXg1faGkqPLDGkrYAVGmGs+hbdwg0ppkeMgC28KgaatnoNURVi3g569uEos4mSVbJtuGaGMCzHPolBvBTzo3DdDgOtsR2YDPfTixhLfxGH/xsimiEAkTALXPlTytD/fPtQPb9UpBjMSXKLc4SHbuGkvbID+OJdN8xGw8+AzZaIJ9AELkCKwJKB/f+t5p+C1IPthZ1q/sRaANrU1hsVnH2lZ7oFvQZ0fgY4H2Ze4w=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(366004)(136003)(39840400004)(451199021)(6486002)(478600001)(6666004)(186003)(36756003)(6506007)(86362001)(2616005)(6512007)(38100700002)(6916009)(4326008)(66556008)(66946007)(66476007)(316002)(44832011)(8936002)(8676002)(5660300002)(41300700001)(2906002)(54906003)(67856001);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(366004)(396003)(376002)(39860400002)(136003)(346002)(451199021)(26005)(9686003)(2906002)(6506007)(6512007)(107886003)(186003)(66946007)(41300700001)(66556008)(316002)(4326008)(6916009)(6486002)(83380400001)(6666004)(478600001)(5660300002)(38100700002)(8676002)(66476007)(33716001)(86362001)(8936002)(67856001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?N7XP+bbQqhYO+8F6A3B+Yb7h8E9Wl+Bu0yFNOjcxhpuDVVTCvkcyTFKT1pgk?=
- =?us-ascii?Q?XdY83VF+E86O5+vwXCciyCXMH+nroW4A51yW/PMX8nyb2++A4GCyooSdVwHk?=
- =?us-ascii?Q?V3batmETc+KQNWl5VW19lHZZHOgXAeII+kcaB15xXh8w1wONJX43OglWR5TG?=
- =?us-ascii?Q?rJR/mRal/sPmJvUjhEYVBu5e8836pxYVOxCjPGnCyqqkz4urX5ysXRdAlC2O?=
- =?us-ascii?Q?Xp5w8Oc8N7sLr5qYvXxbeJzecKNVp6LO8glcn66VSymSw0m6fGY7SR2s0cqF?=
- =?us-ascii?Q?OlZY7Kc7phlv2sjzVFa3TETKRr44Hircvpe8/Q+Eie1wXx4RS3OCsrLkMBUt?=
- =?us-ascii?Q?bQ17doimy/qhLFGQqyU10R+wgFs1Oa4k8petQKzKjbDRpT/0DhJZwexv/N20?=
- =?us-ascii?Q?M8EIc8CQnFSix4S03hMhQUQ4CJk17sjP+eqSHDBgM8knVqlUD6MljfzomWl4?=
- =?us-ascii?Q?67DAHyF5kbuLmYctSTzf7fxvl/5Bq5nWQVdNJx0gwGkAiZhSn367Stbg/KEG?=
- =?us-ascii?Q?+GCuVMw8EpdLsnJ34FZ9Qrvt67ROrWO9RVqXo9aXBzIaspP9LL8kHojX+sLW?=
- =?us-ascii?Q?iey1m+yiJ2SRm6g0gNiFm//CJIPW1eHgyqgu8goI7UT4eCIAXjQaFk28zz+e?=
- =?us-ascii?Q?Ecfx5rDGdH/L/Y1kC+RPfdLRbnPacNGGoz3PtOfeJfHr4bQC/CYb380CkUIM?=
- =?us-ascii?Q?2C/1KB1bByuAUUHRH7V2rN32jPu63galGXiLSVRcSPpONi0MhZ/gHh0lHJAP?=
- =?us-ascii?Q?feH84wgyj5gHCpONr7o+0KVzSf5SGz42YzytKpcSzKsFSLWXcFT+1Bl0uzsY?=
- =?us-ascii?Q?gs1Xbp3vAqxqcGEvw6zWmT+uVP+LLlQNUk9EOmpCRzni1cVp/PZtptHL53Nw?=
- =?us-ascii?Q?VTPNxs5i68DBvL1oIh48P+FL+FJS6FS6z63x1YrfYbLq8uuIgY2R3RbQOOeJ?=
- =?us-ascii?Q?NdOXKVaOLiUDF/HQP5ZPAiYgF697/0By2kSMPZVyeXiJgS9P4SiKLSw4r1AY?=
- =?us-ascii?Q?ZWRQb7yQsTaSG/LUB+7n4aGQ4J7V4T6/Qf9TdIpZB1uLrme15M282Pi8YLq3?=
- =?us-ascii?Q?onrWjxOAXVZUbrICFlCp3njw9LE2gg87PlOc2PLJhx0O6aFCHHAkl4PKyvQR?=
- =?us-ascii?Q?CqtRSEIyRIJqNBfcfNAYCUhOPm35m/3yVLjb1R3sDJA/uMOd759L1pJhjJ20?=
- =?us-ascii?Q?4M6abFXsz76BnSfLOzZH9xx2sTwlGvNfGbq5wqqPPJygZggbjdBgf3yjoxBq?=
- =?us-ascii?Q?IfJdSdTw5AJlYLLfPhMvw9xuextm6cLWmJV9XxdBd/RDpB3j0hoWdQsXpC2/?=
- =?us-ascii?Q?qAMd7qd8HMfukp0ZQhzU/22tr/x/ORzYD3xbQLcJ8J2dGnWS43P4x/fW8rGS?=
- =?us-ascii?Q?smaxL6TK1dkJ6TopbvjFfAgXHvcenkWBnBEh2eRvErSN/eeie2+MHft1X3g3?=
- =?us-ascii?Q?32PJQoodpIiUEOl3OhhYwMfrmrXacfbF8BABmo8I+MNoQ3seEQGziAYEPsVJ?=
- =?us-ascii?Q?AuNjKjIF7PzuTjVNa0Xt1oxZ1TUTXZi4o0tei/EPv9ousE4quaGKApNoigiX?=
- =?us-ascii?Q?6trNCKUXGGFNakP10H3PhV1NIgx1RuHboscpmQJJdEY9h2VOOexL/WcSfPCR?=
- =?us-ascii?Q?vRIoZsQFqbLh5gy8Bh5uzpRYDMVUls0jdPZYTUVPcgW7a3lwUZj+a4bsY5+g?=
- =?us-ascii?Q?ql/8dQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70ca04b0-380c-4b3c-56e5-08db726d04f7
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+	=?us-ascii?Q?XNkwt2+C/NftJbhdzjJRcGO647bJy9Fmb4ZYNw2fcUOyMiGKqnAfHZAESPfk?=
+ =?us-ascii?Q?6GilESiurpMlmJJzsW0RJY5tU2qRtBYTuackNTGF28N355EIEs8nds868LgF?=
+ =?us-ascii?Q?nlrnGg5K7j+nXE9nnOxQgMKN2lvJdZD/9OH9WHLo2YXdXURsQB/zMslD0WoU?=
+ =?us-ascii?Q?LvAfIFWqTpRpXUxHupIKhw9UoWBzlAk/WGoUp1La7TV+f/Zw3VtCkpYIERcb?=
+ =?us-ascii?Q?9KJYcBsz/WHufSM36KaekcAoj9Dly2TYQ1c/zEWrbClYL0NSWCSWYJpNfOJv?=
+ =?us-ascii?Q?9f3EUN4bfteq++ICO6Za3pYmcXH+7XOXEZNGSWCFSFSYYqIouKJctJq9Ft/M?=
+ =?us-ascii?Q?qaP1INwfNNx/zTh2bkcBJsEkwvYZu7/JTfrPSiY5BKSlcPKdQnfyNdVWwLya?=
+ =?us-ascii?Q?+FDczC1SrtLU/PhmopWBfKC73h8gkepJ1JL6cNxTpWlGYiY9gVXYJ/vzdJiO?=
+ =?us-ascii?Q?8D9cH8tMuJKDH45TA7MGMyS4IjkeWxf6AIVpkujQis9DJKXKLMWKHIqwJx8H?=
+ =?us-ascii?Q?dFRCoMwXN6LchjdxBYH+AA3ZHJsInwD6Ux4Vl8oJQqhncNM9AG0U/NtxCgqT?=
+ =?us-ascii?Q?6Nm0SD9krGMEprF02wMRKggBTcEFq+ysUZHyWzmrxcEOy+V26B2PGVA2iWb5?=
+ =?us-ascii?Q?09ymSsF0QKb6SZ799ZydudyPZMjwR5MSCDguoMxtIXIz5UZB1qvlc/p1iYE5?=
+ =?us-ascii?Q?Uzhl5lVnNqBY00XJiRkVzGuahreRSUCBZZFN3cRgSIx0cwu6QzWzjxFcmFdV?=
+ =?us-ascii?Q?2q+kBn8iDzz24Bpm3MUXHpQlY483DIpLhpFnBB1oRyTcqakA1ntpKItBMmfE?=
+ =?us-ascii?Q?ltgNsievYr9+ekgdkgruuKVKh/xM9ouZcpQYuRkPx6+gxYwgHk+Dz/qDN4WY?=
+ =?us-ascii?Q?cClz8NxfGWvNLtgQu1eWx2oFnTsZ2IVchCFa8zVUCYDWBVNVfI7L72Eu4FWS?=
+ =?us-ascii?Q?OrrkDUgBSU/nYZYY2RHK6FCx61CZgonvBBLw2rAKBLY6RB9v0OU16qBND0gg?=
+ =?us-ascii?Q?AEzFCMizTXFwMh/qbsdx1iQc2phFXgTiCq66K2jpH2IyA0apCjNA33xwlrTV?=
+ =?us-ascii?Q?/ZqS8UTL7G5R91HVIELHhNeexs4pGR0J7pSVSa/hq9Ng8wqPXCO1Llsjql2E?=
+ =?us-ascii?Q?N+8nBugrCHmFo1HHxY7oGzN3ofDFbetnQrKnpE6dfl4jqyTKIhkAaiu0E9dA?=
+ =?us-ascii?Q?GHe36eEZGKmSxbF2os039lDZwI3UrGbCfW6OyTOVF9xp/ZhBazZarT3aOf0d?=
+ =?us-ascii?Q?WulsAsEBzwKxAnUqadXAT64kx1aHsz+MnF4WlHxE0d7Lt2YuUEqInz+ntW3Q?=
+ =?us-ascii?Q?ApDtwwCuHuqUl5I2J0cBZtJd6vBtAKSDVtCupPpR2SiIQfhNgqddrMiY+xso?=
+ =?us-ascii?Q?g+vozJVHVCqH+zxhU04r7KlEaHyDixuwoSpWZLjJuQDwtniQrf6flzSB1n00?=
+ =?us-ascii?Q?OEoUUw9oULKExMLFkv2qgvmKWXfJVkxYElpF/McCU4FJaQ0jFzeCe4SR0gF9?=
+ =?us-ascii?Q?4zQIAgndlYgaFHnn8OjNuWskRydxPU6DiqhZrdvHVq4tC/+SGYsVY6LGz/wL?=
+ =?us-ascii?Q?HyngVNtXFncrCK40s2c2+CbZ+L9wf29XQ5jxMxZ9?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c123662c-21ae-4808-861e-08db726d2073
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 15:34:36.5044
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 15:35:22.6167
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TPT+omsU24rRXMw1QOhrZS2+SQq7AlBxB5XQpvGAf9nmmQpe+9DtRkx0b0J7Wowq0KXujNUb4cTS119qj0fk+GrWXZ0mRyWSC8if6DjnPG0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5639
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: L8eukfLGvgFGXtWhl8Mu6zfx40Su6dkQSeCZls797Sxwk0YW5+gNM/qnzeAOUZAA2PWeYBAQJBScHLbrUNZFPg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB6854
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 05:19:01PM +0200, Andrew Lunn wrote:
-> > >  			set_device_name(trigger_data, name, strlen(name));
-> > >  			trigger_data->hw_control = true;
-> > > -			trigger_data->mode = mode;
-> > > +
-> > > +			rc = led_cdev->hw_control_get(led_cdev, &mode);
-> > > +			if (!rc)
-> > > +				trigger_data->mode = mode;
+On Wed, Jun 21, 2023 at 01:48:36PM +0200, Jiri Pirko wrote:
+> Mon, Jun 19, 2023 at 02:50:14PM CEST, idosch@nvidia.com wrote:
+> >@@ -91,6 +92,7 @@ static void devlink_release(struct work_struct *work)
 > > 
-> > Is the case where trigger_data->hw_control is set to true
-> > but trigger_data->mode is not set ok?
+> > 	mutex_destroy(&devlink->lock);
+> > 	lockdep_unregister_key(&devlink->lock_key);
+> >+	put_device(devlink->dev);
+> 
+> In this case I think you have to make sure this is called before
+> devlink_free() ends. After the caller of devlink_free() returns (most
+> probably .remove callback), nothing stops module from being removed.
+> 
+> I don't see other way. Utilize complete() here and wait_for_completion()
+> at the end of devlink_free().
+
+I might be missing something, but how can I do something like
+wait_for_completion(&devlink->comp) at the end of devlink_free()? After
+I call devlink_put() the devlink instance can be freed and the
+wait_for_completion() call will result in a UAF.
+
+> 
+> If the completion in devlink_put() area rings a bell for you, let me save
+> you the trouble looking it up:
+> 9053637e0da7 ("devlink: remove the registration guarantee of references")
+> This commit removed that. But it is a different usage.
+> 
+> 
+> 
+> > 	kfree(devlink);
+> > }
 > > 
-> > I understand that is the whole point is not to return an error in this case.
-> > But I'm concerned about the value of trigger_data->mode.
-> 
-> Yes, its something Christian and I talked about off-list.
-> trigger_data->mode is 0 by default due to the kzalloc(). 0 is a valid
-> value, it means don't blink for any reason. So in effect the LED
-> should be off. And any LED driver which the ledtrig-netdev.c supports
-> must support software control of the LED, so does support setting the
-> LED off.
-> 
-> In the normal case hw_control_get() returns indicating the current
-> blink mode, and the trigger sets its initial state to that. If
-> however, it returns an error, it probably means its current state
-> cannot be represented by the netdev trigger. PHY vendors do all sort
-> of odd things, and we don't want to support all the craziness. So
-> setting the LED off and leaving the user to configure the LED how they
-> want seems like a reasonable thing to do.
-> 
-> And i tested this because my initial implementation of the Marvell
-> driver was FUBAR and it returned an error here.
-
-Thanks Andrew,
-
-sounds good to me.
-Especially,
-
-	"we don't want to support all the craziness"
-
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-
+> >@@ -204,6 +206,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
+> > 	if (ret < 0)
+> > 		goto err_xa_alloc;
+> > 
+> >+	get_device(dev);
+> > 	devlink->dev = dev;
+> > 	devlink->ops = ops;
+> > 	xa_init_flags(&devlink->ports, XA_FLAGS_ALLOC);
+> >-- 
+> >2.40.1
+> >
 
