@@ -1,223 +1,142 @@
-Return-Path: <netdev+bounces-12595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0A33A7383EB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:37:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 481C37383FF
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:42:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFDC31C20E6A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:37:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 960F92812E1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:42:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14516FC0C;
-	Wed, 21 Jun 2023 12:37:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A8BE11CA1;
+	Wed, 21 Jun 2023 12:42:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06F64DDA1
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:37:04 +0000 (UTC)
-Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4891CEC
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 05:37:03 -0700 (PDT)
-Received: by mail-ua1-x92c.google.com with SMTP id a1e0cc1a2514c-78f554d4949so1383437241.3
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 05:37:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5A0DDA1
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:42:01 +0000 (UTC)
+Received: from mail-ot1-x32d.google.com (mail-ot1-x32d.google.com [IPv6:2607:f8b0:4864:20::32d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1D8B135
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 05:41:59 -0700 (PDT)
+Received: by mail-ot1-x32d.google.com with SMTP id 46e09a7af769-6b46831fd13so3579440a34.3
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 05:41:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687351022; x=1689943022;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=I8oVZWF8wCPGN0S1a9Q/xn0SWVk6HP6kgHLzae5e7Ws=;
-        b=toY2H7hQGw2mj/nGsagbWBruXoGRDGkUgzlkkt8xagUi8nZYcVsfHSGXxZG4OiWxcw
-         wm8s7CDC4D7icfN6Z+p9MMWQFVFAxFf2Ft20Dsm11I9DBZVP4G2for39pipsRH9/3bTo
-         dm2f9Vjli5f3J9rDRlduVMIMNpKYxNMfYTtOuri3pj9qqaJyEQppGEEilyW9zEnzmJKs
-         BEsUeD24cPbz2OYnzhbagFXAlRcTwMehMpls7gtIbJAF4gtk1Wl9Qf7Uiw1zhcFJvjTu
-         jFk1F8mmvKBiv4xwbfkSTMhcIse0+qI2ja/mLJ6BLrezkX82o0qkLgWS/za+x86PMk8I
-         rywQ==
+        d=chromium.org; s=google; t=1687351319; x=1689943319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=gEnN1eHhs1tN7/Y7t6he6p9VJhq0VBCBjTgHlWlf5vI=;
+        b=HZWfECMgE6MPIaSwTX+cstHxlqQcjci/Cx/EUw7h7RJ21GngIXSeLbaxr1PzBgj/OV
+         xGpGnb2+A6VkoT7tktNpSs1a5xqAxWu51LRmuYqq851vfPliIPKJArYjU8jh+MEv/nKQ
+         1OMcvACGuNQWIWCp3vi0JOtGzQ5TjxoB9VgXU=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687351022; x=1689943022;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=I8oVZWF8wCPGN0S1a9Q/xn0SWVk6HP6kgHLzae5e7Ws=;
-        b=YYpH4nlCGxYj85tnNuoWjlH1onGcpfI8cL5cuY5hEoq4jh+K02FstmOrPTzDpUHE7r
-         qsYaiSqtxao4eGyu7ZYPTRcbzAhrhkLygHuvcIR8y4EMbLupd9eXl2FdsM2SA5mV0XLg
-         7/ao0q0ecVkjqLRK3eS1X9J47ro/3Kav2Fj5shcsvwpngGky4pOrrC7IXdE87xTY1ftE
-         mL3fC5qtdfLJG0dM1hA1N9BiPnqLH0EkHZwKuC4Dv43WYgbsm3PkYm6t3Pme4syI6hFg
-         AzB6rl3gi1D9cwTCja/3CfyrAzUNGLn2wZkJPkQZzgDYV02w+GwJ+3Rn8ardIWLhMhzn
-         HzPg==
-X-Gm-Message-State: AC+VfDxInUkVUttiDqAW8Bz2cJC9ZcI4hTvhUgRc4lvMyxsP3n0VX8ky
-	WaAJkpRmyb0RLLlTlp/O4p1klwF+SLX3I0CTJP+A2A==
-X-Google-Smtp-Source: ACHHUZ5jH2LvLmDSP3KzT6lMMz5OYiVqcBaVA3vnfgB/VYjmBNBNAPag6clE3TO3Tn0qq+TcraZLThobLl7mGOisBJQ=
-X-Received: by 2002:a67:e3a6:0:b0:439:5c28:8ec2 with SMTP id
- j6-20020a67e3a6000000b004395c288ec2mr5606098vsm.35.1687351022184; Wed, 21 Jun
- 2023 05:37:02 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687351319; x=1689943319;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=gEnN1eHhs1tN7/Y7t6he6p9VJhq0VBCBjTgHlWlf5vI=;
+        b=FXKA4LxXoyXAH++dn/P3gd7K4xWqVhOuYgNIPdt6So/uc5bdviz7Eep2xIr8AgdOoX
+         MGwBgVZL8nJ24u2qk6r6htgfmv+cOIQpqAm0raqYLpi9JqJLRtv5IqmdiXk9eLqIrIKm
+         55XeKGR0CFYhIZbJRl7HmADGVQAe8S1UJbjJKfkwZSg51s7lnwXHnPV64yV6HXF33mFC
+         6lWpth32xeYp1elG5KjdyUr2Xkqrm4yCKTSpJN1Iu81PyvL8y5tHYxrkcG5z3+ok+1cp
+         iHHAncFnK+tF8xgOejZ/gJrzdw4sh5G0lTC+wp18AInFk0r60HFTDKePsEwvLWGV7A3w
+         8r0w==
+X-Gm-Message-State: AC+VfDwHnTtSLj0LHXs7l7gFpXhNdvYYvlbpTU6Kz4x6w7ngIC9Fd0/1
+	wWeF4hD4V9gEOFcLMo2qwG6TcfYy1F+RBjIF2sCr4A==
+X-Google-Smtp-Source: ACHHUZ7Lgbb/KL+C7uMlNHS0la3DKKGcJ/COXaSKZuAoRMdzSFtGhs5NNtbL0yuxXHyxxaWj05O6ICB82oBeoWWr5d4=
+X-Received: by 2002:a05:6808:120a:b0:39e:b985:b47e with SMTP id
+ a10-20020a056808120a00b0039eb985b47emr15650678oil.36.1687351319039; Wed, 21
+ Jun 2023 05:41:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Wed, 21 Jun 2023 18:06:51 +0530
-Message-ID: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
-Subject: next: Rpi4: Unexpected kernel BRK exception at EL1
-To: Linux ARM <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
-	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org
-Cc: Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Mark Rutland <mark.rutland@arm.com>, 
-	Anshuman Khandual <anshuman.khandual@arm.com>
+References: <20230615152918.3484699-1-revest@chromium.org> <ZJFIy+oJS+vTGJer@calendula>
+ <CABRcYmJjv-JoadtzZwU5A+SZwbmbgnzWb27UNZ-UC+9r+JnVxg@mail.gmail.com> <ZJLbDiwsQnQkkZvy@calendula>
+In-Reply-To: <ZJLbDiwsQnQkkZvy@calendula>
+From: Florent Revest <revest@chromium.org>
+Date: Wed, 21 Jun 2023 14:41:47 +0200
+Message-ID: <CABRcYmLgOn9=nNA151ibvRFeAGCzORAymmGsppjRPo9jPrF1ag@mail.gmail.com>
+Subject: Re: [PATCH nf] netfilter: conntrack: Avoid nf_ct_helper_hash uses
+ after free
+To: Pablo Neira Ayuso <pablo@netfilter.org>
+Cc: netfilter-devel@vger.kernel.org, coreteam@netfilter.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+	kadlec@netfilter.org, fw@strlen.de, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, lirongqing@baidu.com, wangli39@baidu.com, 
+	zhangyu31@baidu.com, daniel@iogearbox.net, ast@kernel.org, kpsingh@kernel.org, 
+	stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Following boot warnings and crashes noticed on arm64 Rpi4 device running
-Linux next-20230621 kernel.
+On Wed, Jun 21, 2023 at 1:12=E2=80=AFPM Pablo Neira Ayuso <pablo@netfilter.=
+org> wrote:
+>
+> On Wed, Jun 21, 2023 at 12:20:44PM +0200, Florent Revest wrote:
+> > On Tue, Jun 20, 2023 at 8:35=E2=80=AFAM Pablo Neira Ayuso <pablo@netfil=
+ter.org> wrote:
+> > > nf_conntrack_ftp depends on nf_conntrack.
+> > >
+> > > If nf_conntrack fails to load, how can nf_conntrack_ftp be loaded?
+> >
+> > Is this maybe only true of dynamically loaded kmods ? With
+> > CONFIG_NF_CONNTRACK_FTP=3Dy, it seems to me that nf_conntrack_ftp_init(=
+)
+> > will be called as an __init function, independently of whether
+> > nf_conntrack_init_start() succeeded or not. Am I missing something ?
+>
+> No idea, nf_conntrack init path invokes nf_conntrack_helper_init()
+> which initializes the helper hashtable.
 
-Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Yes
 
-boot log:
+> How is it that you can nf_conntrack_helpers_register() call before the
+> initialization path of nf_conntrack is run, that I don't know.
 
-[   22.331748] Kernel text patching generated an invalid instruction
-at 0xffff8000835d6580!
-[   22.340579] Unexpected kernel BRK exception at EL1
-[   22.346141] Internal error: BRK handler: 00000000f2000100 [#1] PREEMPT SMP
-.
-[   22.353814] Modules linked in: hci_uart(+) brcmfmac(+) btqca
-brcmutil btbcm vc4(+) cfg80211 bluetooth reset_raspberrypi
-clk_raspberrypi crct10dif_ce raspberrypi_hwmon snd_soc_hdmi_codec cec
-v3d bcm2711_thermal rfkill drm_display_helper drm_shmem_helper
-pcie_brcmstb drm_dma_helper pwm_bcm2835 i2c_bcm2835 gpu_sched
-drm_kms_helper fuse drm
-[   22.376947] vc4-drm gpu: bound fe004000.txp (ops vc4_txp_ops [vc4])
-[   22.384754] CPU: 3 PID: 159 Comm: systemd-udevd Not tainted
-6.4.0-rc7-next-20230621 #1
-[   22.384769] Hardware name: Raspberry Pi 4 Model B (DT)
-[   22.384776] pstate: 40000005 (nZcv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   22.384789] pc : 0xffff8000835d6580
-[   22.384798] lr : sk_filter_trim_cap+0x80/0x2a0
-[   22.384825] sp : ffff800083cdb9d0
-[   22.384831] x29: ffff800083cdb9d0 x28: 0000000000000000 x27: 0000000000000001
-[   22.384853] x26: ffff000041ece000 x25: ffff0000423ac800 x24: ffff800083468e00
-[   22.384872] x23: 0000000000000000 x22: ffff000044c41300 x21: 0000000000000001
-[   22.384891] x20: ffff800083bed000 x19: ffff000044c41300 x18: 0000000000000000
-[   22.384909] x17: 0000000000000000 x16: 0000000000000000 x15: 0000000015798650
-[   22.384928] x14: 414d003633373832 x13: 3332323d44455a49 x12: 4c414954494e495f
-[   22.384946] x11: 4345535500343331 x10: 343d4d554e514553 x9 : ffff80008124f500
-[   22.384965] x8 : ffff800083cdb7d8 x7 : 0000000000000000 x6 : 0000000000000001
-[   22.384983] x5 : ffff800082def000 x4 : ffff800082def2e8 x3 : 0000000000000000
-[   22.385001] x2 : ffff8000835d657c x1 : ffff800083bed048 x0 : ffff000044c41300
-[   22.385020] Call trace:
-[   22.385025]  0xffff8000835d6580
-[   22.385033]  netlink_broadcast+0x1f0/0x4e8
-[   22.385047]  netlink_sendmsg+0x318/0x420
-[   22.385056]  ____sys_sendmsg+0x1cc/0x2c8
-[   22.385075]  ___sys_sendmsg+0x88/0xf0
-[   22.385084]  __sys_sendmsg+0x70/0xd8
-[   22.385093]  __arm64_sys_sendmsg+0x2c/0x40
-[   22.385102]  invoke_syscall+0x50/0x128
-[   22.385120]  el0_svc_common.constprop.0+0xf4/0x120
-[   22.385136]  do_el0_svc+0x44/0xb8
-[   22.385152]  el0_svc+0x30/0x98
-[   22.385163]  el0t_64_sync_handler+0x13c/0x158
-[   22.385174]  el0t_64_sync+0x190/0x198
-[   22.385190] Code: d4202000 d4202000 d4202000 910003c9 (d503201f)
-[   22.385199] ---[ end trace 0000000000000000 ]---
-[   22.385206] note: systemd-udevd[159] exited with irqs disabled
-[   22.385378] note: systemd-udevd[159] exited with preempt_count 1
-[   22.395083] uart-pl011 fe201000.serial: no DMA platform data
-[   22.427073] vc4-drm gpu: bound fe206000.pixelvalve (ops vc4_crtc_ops [vc4])
-[   22.434295] ------------[ cut here ]------------
-[   22.474787] Bluetooth: HCI UART protocol Marvell registered
-[   22.475105] Voluntary context switch within RCU read-side critical section!
-[   22.475129] WARNING: CPU: 3 PID: 159 at
-kernel/rcu/tree_plugin.h:320 rcu_note_context_switch+0x458/0x530
-[   22.553049] vc4-drm gpu: bound fe207000.pixelvalve (ops vc4_crtc_ops [vc4])
-[   22.555403] Modules linked in: hci_uart(+) brcmfmac(+) btqca
-brcmutil btbcm vc4(+) cfg80211 bluetooth reset_raspberrypi
-clk_raspberrypi crct10dif_ce
-[   22.583877] vc4-drm gpu: bound fe20a000.pixelvalve (ops vc4_crtc_ops [vc4])
-[   22.584920]  raspberrypi_hwmon snd_soc_hdmi_codec
-[   22.614889] vc4-drm gpu: bound fe216000.pixelvalve (ops vc4_crtc_ops [vc4])
-[   22.618972]  cec v3d bcm2711_thermal rfkill drm_display_helper
-drm_shmem_helper pcie_brcmstb drm_dma_helper pwm_bcm2835 i2c_bcm2835
-gpu_sched drm_kms_helper fuse drm
-[   22.666409] CPU: 3 PID: 159 Comm: systemd-udevd Tainted: G      D
-         6.4.0-rc7-next-20230621 #1
-[   22.666424] Hardware name: Raspberry Pi 4 Model B (DT)
-[   22.666431] pstate: 600000c5 (nZCv daIF -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-[   22.666443] pc : rcu_note_context_switch+0x458/0x530
-[   22.666463] lr : rcu_note_context_switch+0x458/0x530
-[   22.666478] sp : ffff800083cdb3a0
-[   22.666483] x29: ffff800083cdb3a0 x28: ffff0000423acc08 x27: 0000000000000000
-[   22.666506] x26: ffff00004205a080 x25: ffff80008146d7c8 x24: 0000000000000000
-[   22.666525] x23: 0000000000000000 x22: ffff00004205a080 x21: ffff80008335dd18
-[   22.666544] x20: ffff80008237d2c0 x19: ffff0000fb5f1140 x18: ffffffffffffffff
-[   22.666562] x17: 3035663432313830 x16: 3030386666666620 x15: 3a20397820333535
-[   22.666581] x14: 3431356534353564 x13: 216e6f6974636573 x12: 206c616369746972
-[   22.666600] x11: 6320656469732d64 x10: 6165722055435220 x9 : ffff80008012b740
-[   22.752425] x8 : 6863746977732074 x7 : 7865746e6f632079 x6 : 7261746e756c6f56
-[   22.759681] x5 : 0000000000000000 x4 : 0000000000000000 x3 : 0000000000000027
-[   22.766935] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff00004205a080
-[   22.774190] Call trace:
-[   22.776668]  rcu_note_context_switch+0x458/0x530
-[   22.781364]  __schedule+0xb8/0xd78
-[   22.784824]  schedule+0x60/0x100
-[   22.788105]  netlink_table_grab.part.0+0x8c/0xf8
-[   22.792801]  netlink_release+0x5dc/0x6d8
-[   22.796782]  __sock_release+0x4c/0xc8
-[   22.800505]  sock_close+0x20/0x38
-[   22.803872]  __fput+0xbc/0x280
-[   22.806979]  ____fput+0x18/0x30
-[   22.810172]  task_work_run+0x78/0xd8
-[   22.813802]  do_exit+0x2f8/0x9a8
-[   22.817085]  make_task_dead+0xa4/0x1a8
-[   22.820896]  die+0x254/0x260
-[   22.823819]  arm64_notify_die+0xbc/0xe0
-[   22.827712]  do_debug_exception+0xe0/0x118
-[   22.831876]  el1_dbg+0x70/0x90
-[   22.834975]  el1h_64_sync_handler+0xc8/0xe8
-[   22.839222]  el1h_64_sync+0x64/0x68
-[   22.842761]  0xffff8000835d6580
-[   22.845949]  netlink_broadcast+0x1f0/0x4e8
-[   22.850105]  netlink_sendmsg+0x318/0x420
-[   22.854084]  ____sys_sendmsg+0x1cc/0x2c8
-[   22.858072]  ___sys_sendmsg+0x88/0xf0
-[   22.861788]  __sys_sendmsg+0x70/0xd8
-[   22.865414]  __arm64_sys_sendmsg+0x2c/0x40
-[   22.869571]  invoke_syscall+0x50/0x128
-[   22.873383]  el0_svc_common.constprop.0+0xf4/0x120
-[   22.878251]  do_el0_svc+0x44/0xb8
-[   22.881621]  el0_svc+0x30/0x98
-[   22.884721]  el0t_64_sync_handler+0x13c/0x158
-[   22.889144]  el0t_64_sync+0x190/0x198
-[   22.892860] ---[ end trace 0000000000000000 ]---
+No, this is not what happens. I tried to describe the problem in the
+following paragraph (I'm open to suggestions on how to explain this
+better!)
 
+> > > On Thu, Jun 15, 2023 at 05:29:18PM +0200, Florent Revest wrote:
+> > > > If register_nf_conntrack_bpf() fails (for example, if the .BTF sect=
+ion
+> > > > contains an invalid entry), nf_conntrack_init_start() calls
+> > > > nf_conntrack_helper_fini() as part of its cleanup path and
+> > > > nf_ct_helper_hash gets freed.
 
-Links:
- - https://lkft.validation.linaro.org/scheduler/job/6531518#L886
- - https://qa-reports.linaro.org/lkft/linux-next-master-sanity/build/next-20230621/testrun/17697990/suite/log-parser-test/tests/
- - https://qa-reports.linaro.org/lkft/linux-next-master-sanity/build/next-20230621/testrun/17697990/suite/log-parser-test/test/check-kernel-warning/log
+Said differently (chronologically, I hope that helps)
 
- metadata:
-  git_ref: master
-  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
-  git_sha: 15e71592dbae49a674429c618a10401d7f992ac3
-  git_describe: next-20230621
-  kernel_version: 6.4.0-rc7
-  kernel-config:
-    https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVA7srTtdxlVq1QVEgrzc0AAKp/config
-  artifact-location:
-    https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVA7srTtdxlVq1QVEgrzc0AAKp/
-  toolchain: gcc-11
+First, nf_conntrack_init_start() runs:
+- it calls nf_conntrack_helper_init() (this succeeds and initializes
+the hashmap)
+- it calls register_nf_conntrack_bpf() (this fails)
+- goto err_kfunc
+- it calls nf_conntrack_helper_fini() (this frees the hashmap and
+leaves a dangling nf_ct_helper_hash pointer)
+- it returns back an error such that nf_conntrack_standalone_init() fails
 
+At this point, the builtin nf_conntrack module failed to load.
 
---
-Linaro LKFT
-https://lkft.linaro.org
+But now, nf_conntrack_ftp_init() also runs:
+- it calls nf_conntrack_helpers_register()
+  - this calls nf_conntrack_helper_register()
+    - this accesses the hashmap pointer even though the hashmap has
+been freed already. That's where the use-after-free is.
+
+I proposed we fix this by not accessing a freed hashmap (using NULL as
+a clear indication that this is now an invalid pointer) but I suppose
+there are other ways one could go about it such as checking if
+nf_conntrack initialized successfully early in nf_conntrack_ftp_init()
+etc... I'm open to suggestions.
 
