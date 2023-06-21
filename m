@@ -1,47 +1,59 @@
-Return-Path: <netdev+bounces-12767-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12768-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 991A4738DAB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:50:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CFF7B738DD1
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:54:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA6DA1C20F2C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:50:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CFF41C20F72
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:54:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7550819E66;
-	Wed, 21 Jun 2023 17:50:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EACEB19E49;
+	Wed, 21 Jun 2023 17:54:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 231F319E4E
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:50:31 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF744C433CC;
-	Wed, 21 Jun 2023 17:50:30 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687369831;
-	bh=cIQE0tqYqde1wQS9/IcLrDtGE0ZwQxHO+6tde8cVt4E=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=AYva0/5W7t0NxIgVeP53vFnVTqwMOS59neZkd9E2R3q/WoNeHdWpSaEZrCBAgnNvZ
-	 OZblVRAyPgDiw5WctBsoo9L3Arvz5mqxj7q/DcmLR0zYNJXbXUEhK4nW6hnlL0Kn0K
-	 EG2tHOVn/uhj4Fgy8ml/PRX+0nixFAdEnAy9IIL8Ej9UeYnn8/cXVNjinfbHefzGrh
-	 FwmwzO5ItB8xnxbnZgy+N/5CBOVLiqLQUXvXdwWvd/RUOaHknzUqB+5I1T8bCU4cnX
-	 4smek8cmnOm6kSHHkKKJui4WQ3aLMV26JdX/MTrOTAtfahzYcKu+6h09EanF26OCHN
-	 cIjisblPWM5vQ==
-Date: Wed, 21 Jun 2023 13:50:28 -0400
-From: Chuck Lever <cel@kernel.org>
-To: "Matthew Wilcox (Oracle)" <willy@infradead.org>
-Cc: linux-mm@kvack.org, Andrew Morton <akpm@linux-foundation.org>,
-	dri-devel@lists.freedesktop.org, linux-kernel@vger.kernel.org,
-	intel-gfx@lists.freedesktop.org, linux-afs@lists.infradead.org,
-	linux-nfs@vger.kernel.org, linux-fsdevel@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH 09/13] net: Convert sunrpc from pagevec to folio_batch
-Message-ID: <ZJM4ZK8cKI4AmOgy@manet.1015granger.net>
-References: <20230621164557.3510324-1-willy@infradead.org>
- <20230621164557.3510324-10-willy@infradead.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFA54F9D6
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:54:17 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02C8826A5;
+	Wed, 21 Jun 2023 10:54:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=xoeWVWevdJefHs6dLVlcOT+MfB0qCI9uaO5SHze2lDA=; b=DTYtZ4gRa6NOcoqIRIuKKxeTb2
+	p2zPTSWDwEVIeiRg2fhmisqXIPXUAF5H8r4JYlDxvQA7GEkAAJcdlkNMNTDb8HH7qnovOyJuc4uxj
+	JydT4uYFVfC+EpNrVSof77CsgXFYD/gdhA0lR6NJWcA9zvLRYeDSaBfULqfq4CbbUlEuRlVvT3H/D
+	fm1MPMlWyIeRBjfxv72GC4QtJXNApTAeVv1yDhANF/9wsMIf9lINuUXQIDrGgtaJb3JGFRHzFhja/
+	rzvCxjQdT3me7CDnNEYXINg+8ilJWMM5zHoCvGDrgiAcBPpflS613a/6BV1DBVM1F876yU7j8bvRB
+	rjgVAdKQ==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:38908)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qC20n-00036t-U9; Wed, 21 Jun 2023 18:52:57 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qC20n-0007x3-0L; Wed, 21 Jun 2023 18:52:57 +0100
+Date: Wed, 21 Jun 2023 18:52:56 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev <netdev@vger.kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>, ansuelsmth@gmail.com,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net] net: phy: Manual remove LEDs to ensure correct
+ ordering
+Message-ID: <ZJM4+PlE5MhQUvW1@shell.armlinux.org.uk>
+References: <20230617155500.4005881-1-andrew@lunn.ch>
+ <8a41a15a-b832-3e66-d10a-df29f1a4c880@gmail.com>
+ <ZJMtrw6zdi2YP7b5@shell.armlinux.org.uk>
+ <cb3d7ae2-a7f8-537b-3b51-3491265b0e65@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,79 +62,54 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230621164557.3510324-10-willy@infradead.org>
+In-Reply-To: <cb3d7ae2-a7f8-537b-3b51-3491265b0e65@gmail.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 05:45:53PM +0100, Matthew Wilcox (Oracle) wrote:
-> Remove the last usage of pagevecs.  There is a slight change here; we
-> now free the folio_batch as soon as it fills up instead of freeing the
-> folio_batch when we try to add a page to a full batch.  This should have
-> no effect in practice.
+On Wed, Jun 21, 2023 at 06:12:40PM +0100, Florian Fainelli wrote:
+> Hi Russell,
 > 
-> Signed-off-by: Matthew Wilcox (Oracle) <willy@infradead.org>
-
-I don't yet have visibility into the folio_batch_* helpers, but this
-looks like a wholly mechanical replacement of pagevec. LGTM.
-
-I assume this is going to be merged via another tree, not nfsd-next,
-so:
-
-Acked-by: Chuck Lever <chuck.lever@oracle.com>
-
-
-> ---
->  include/linux/sunrpc/svc.h |  2 +-
->  net/sunrpc/svc.c           | 10 +++++-----
->  2 files changed, 6 insertions(+), 6 deletions(-)
+> On 6/21/2023 6:04 PM, Russell King (Oracle) wrote:
+> > On Wed, Jun 21, 2023 at 03:04:14PM +0100, Florian Fainelli wrote:
+> > > Hi Andrew,
+> > > 
+> > > On 6/17/2023 4:55 PM, Andrew Lunn wrote:
+> > > > If the core is left to remove the LEDs via devm_, it is performed too
+> > > > late, after the PHY driver is removed from the PHY. This results in
+> > > > dereferencing a NULL pointer when the LED core tries to turn the LED
+> > > > off before destroying the LED.
+> > > > 
+> > > > Manually unregister the LEDs at a safe point in phy_remove.
+> > > > 
+> > > > Cc: stable@vger.kernel.org
+> > > > Reported-by: Florian Fainelli <f.fainelli@gmail.com>
+> > > > Suggested-by: Florian Fainelli <f.fainelli@gmail.com>
+> > > > Fixes: 01e5b728e9e4 ("net: phy: Add a binding for PHY LEDs")
+> > > > Signed-off-by: Andrew Lunn <andrew@lunn.ch>
+> > > 
+> > > Thanks for fixing this, this is an improvement, though I can still hit
+> > > another sort of use after free whereby the GENET driver removes the
+> > > mdio-bcm-unimac platform device and eventually cuts the clock to the MDIO
+> > > block thus causing the following:
+> > 
+> > Hi Florian,
+> > 
+> > Can you try setting trigger_data->led_cdev to NULL after the
+> > cancel_delayed_work_sync() in netdev_trig_deactivate() and see
+> > what the effect is?
 > 
-> diff --git a/include/linux/sunrpc/svc.h b/include/linux/sunrpc/svc.h
-> index c2807e301790..f8751118c122 100644
-> --- a/include/linux/sunrpc/svc.h
-> +++ b/include/linux/sunrpc/svc.h
-> @@ -222,7 +222,7 @@ struct svc_rqst {
->  	struct page *		*rq_next_page; /* next reply page to use */
->  	struct page *		*rq_page_end;  /* one past the last page */
->  
-> -	struct pagevec		rq_pvec;
-> +	struct folio_batch	rq_fbatch;
->  	struct kvec		rq_vec[RPCSVC_MAXPAGES]; /* generally useful.. */
->  	struct bio_vec		rq_bvec[RPCSVC_MAXPAGES];
->  
-> diff --git a/net/sunrpc/svc.c b/net/sunrpc/svc.c
-> index e7c101290425..587811a002c9 100644
-> --- a/net/sunrpc/svc.c
-> +++ b/net/sunrpc/svc.c
-> @@ -640,7 +640,7 @@ svc_rqst_alloc(struct svc_serv *serv, struct svc_pool *pool, int node)
->  	if (!rqstp)
->  		return rqstp;
->  
-> -	pagevec_init(&rqstp->rq_pvec);
-> +	folio_batch_init(&rqstp->rq_fbatch);
->  
->  	__set_bit(RQ_BUSY, &rqstp->rq_flags);
->  	rqstp->rq_server = serv;
-> @@ -851,9 +851,9 @@ bool svc_rqst_replace_page(struct svc_rqst *rqstp, struct page *page)
->  	}
->  
->  	if (*rqstp->rq_next_page) {
-> -		if (!pagevec_space(&rqstp->rq_pvec))
-> -			__pagevec_release(&rqstp->rq_pvec);
-> -		pagevec_add(&rqstp->rq_pvec, *rqstp->rq_next_page);
-> +		if (!folio_batch_add(&rqstp->rq_fbatch,
-> +				page_folio(*rqstp->rq_next_page)))
-> +			__folio_batch_release(&rqstp->rq_fbatch);
->  	}
->  
->  	get_page(page);
-> @@ -887,7 +887,7 @@ void svc_rqst_release_pages(struct svc_rqst *rqstp)
->  void
->  svc_rqst_free(struct svc_rqst *rqstp)
->  {
-> -	pagevec_release(&rqstp->rq_pvec);
-> +	folio_batch_release(&rqstp->rq_fbatch);
->  	svc_release_buffer(rqstp);
->  	if (rqstp->rq_scratch_page)
->  		put_page(rqstp->rq_scratch_page);
-> -- 
-> 2.39.2
-> 
+> Thanks for the suggestion, getting an identical trace as before with that
+> change.
+
+Thanks for trying. I was wondering whether the work was being re-queued
+after the flush_work(), but seemingly not.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
