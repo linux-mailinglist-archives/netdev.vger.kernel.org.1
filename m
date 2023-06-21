@@ -1,176 +1,570 @@
-Return-Path: <netdev+bounces-12605-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 577FC73849E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:14:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E2B7384B0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:17:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E91F1C20E15
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:14:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 104B81C20D2B
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:17:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5731C171BB;
-	Wed, 21 Jun 2023 13:14:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A05C5171CD;
+	Wed, 21 Jun 2023 13:17:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AE88DF4A
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:14:40 +0000 (UTC)
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E2843170F
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:14:38 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-31129591288so4150282f8f.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:14:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687353277; x=1689945277;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=O1U1vCPMp25LN6ApHDbwGudHhQtcWN7h3cd02FiA7mY=;
-        b=OElRUEHuGRh5QBZpt4SvVwcj3hz+lE+By3A3uYVD6P9JWdfk4JpYcYNEShde5EeO+3
-         DDdWKeQf4mKDV8+SbPN4UZWpmMw0jOGbPeNH4ZKmVl1mZkTAgM99evyFOiHn3ZctV378
-         koDn+zF7j3vgokNeGPy9ib1fH/avsVt5eVuo7YYR4g9/lOoguBoc+LQJc6daNUrGyN7r
-         MyRHaSNbkT+XKJ3Zt3+z313mir/mg6rUHbSHn5ke/iTRtDBMMLV/geB/hm+UkAHTqnBU
-         gtJPt4b6x8acpN/TypKKy6A3AiJOLA0LUNnlPjYph9VeP4AGDv+X5LVFi1qD1bWsh4Px
-         BDZA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687353277; x=1689945277;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=O1U1vCPMp25LN6ApHDbwGudHhQtcWN7h3cd02FiA7mY=;
-        b=ZX42LantZSBPD3vSGPfYvPPWcEf/bZrwefqDZX0JnCOVsWiepO7CIee9JXTLNsejK5
-         jK5hTmXKM98Q7w8ldGcxDtYdfmUVzl71a4eBlyQagaL9TbDlKUDLdExBKnsLYmjQcJMy
-         gKe2o6gWGbXZ77a5rz6Zt0we7UJM3rb53ouT5uC3rVc7Qe9qpcZFFq59TMiuH27YnBP7
-         EK6u2tKYt54RctV5PIvmwRnHKxUKkrMVPf9DC1H8DZMe4mBiQ7+MpdGEkqxRyn+VcO9c
-         pFLy9EqzatnQ395uvOnA4tehlf6AlZKFne2rS3Wh58D5+pdFps+OiZk6v+HF4I+dN7IL
-         YlWg==
-X-Gm-Message-State: AC+VfDwxB7WAjFPBVH7/+mi8RK6sWwt+wGkOKjaIubBgy0zge7sdAZ7u
-	02WMo/nNt+DqjgI0OYudK2lt5w==
-X-Google-Smtp-Source: ACHHUZ5IUkSlzsbt4j6AG+re/6Qk/Qju2LbuZ5aGwyE+KoNnbLloDqo7eaQbNFjNtZL+h8XUeFuswQ==
-X-Received: by 2002:a5d:650b:0:b0:30f:b3d1:8f99 with SMTP id x11-20020a5d650b000000b0030fb3d18f99mr10376365wru.38.1687353277234;
-        Wed, 21 Jun 2023 06:14:37 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id d2-20020adfe842000000b0031274a184d5sm4453058wrn.109.2023.06.21.06.14.36
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 06:14:36 -0700 (PDT)
-Date: Wed, 21 Jun 2023 15:14:35 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Saeed Mahameed <saeed@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, Tariq Toukan <tariqt@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>, Moshe Shemesh <moshe@nvidia.com>
-Subject: Re: [net-next 14/15] net/mlx5: Light probe local SFs
-Message-ID: <ZJL3u/6Pg7R2Qy94@nanopsycho>
-References: <20230610014254.343576-15-saeed@kernel.org>
- <20230610000123.04c3a32f@kernel.org>
- <ZIVKfT97Ua0Xo93M@x130>
- <20230612105124.44c95b7c@kernel.org>
- <ZIj8d8UhsZI2BPpR@x130>
- <20230613190552.4e0cdbbf@kernel.org>
- <ZIrtHZ2wrb3ZdZcB@nanopsycho>
- <20230615093701.20d0ad1b@kernel.org>
- <ZItMUwiRD8mAmEz1@nanopsycho>
- <20230615123325.421ec9aa@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9049811CA1
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:17:18 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13ECA1985
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:17:15 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-149-VWOAVoHcN7q2JwBL3BKIjQ-1; Wed, 21 Jun 2023 09:14:50 -0400
+X-MC-Unique: VWOAVoHcN7q2JwBL3BKIjQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 5E8C91C08971;
+	Wed, 21 Jun 2023 13:14:50 +0000 (UTC)
+Received: from hog.localdomain (unknown [10.39.195.41])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8426140462BE;
+	Wed, 21 Jun 2023 13:14:49 +0000 (UTC)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	kuba@kernel.org,
+	simon.horman@corigine.com
+Subject: [PATCH net-next v2] netdevsim: add dummy macsec offload
+Date: Wed, 21 Jun 2023 15:14:46 +0200
+Message-Id: <d6841a34b9d69af9ad5a652d5cabe3927868d3c6.1686920069.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230615123325.421ec9aa@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thu, Jun 15, 2023 at 09:33:25PM CEST, kuba@kernel.org wrote:
->On Thu, 15 Jun 2023 19:37:23 +0200 Jiri Pirko wrote:
->> Thu, Jun 15, 2023 at 06:37:01PM CEST, kuba@kernel.org wrote:
->> >On Thu, 15 Jun 2023 12:51:09 +0200 Jiri Pirko wrote:  
->> >> The problem is scalability. SFs could be activated in parallel, but the
->> >> cmd that is doing that holds devlink instance lock. That serializes it.
->> >> So we need to either:
->> >> 1) change the devlink locking to be able to execute some of the cmds in
->> >>    parallel and leave the activation sync
->> >> 2) change the activation to be async and work with notifications
->> >> 
->> >> I like 2) better, as the 1) maze we just got out of recently :)
->> >> WDYT?  
->> >
->> >I guess we don't need to wait for the full activation. Is the port
->> >creation also async, then, or just the SF devlink instance creation?  
->> 
->> I'm not sure I follow :/
->> The activation is when the SF auxiliary device is created. The driver then
->> probes the SF auxiliary device and instantiates everything, SF devlink,
->> SF netdev, etc.
->
->Sorry, maybe let's look at an example:
->
->$ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 11
->
->needs to print / return the handle of the created port.
+When the kernel is compiled with MACsec support, add the
+NETIF_F_HW_MACSEC feature to netdevsim devices and implement
+macsec_ops.
 
-Yep, that is what happens now.
+To allow easy testing of failure from the device, support is limited
+to 3 SecY's per netdevsim device, and 1 RXSC per SecY.
 
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+---
+v2:
+ - nsim_macsec_add_secy, return -ENOSPC if secy_count isn't full but
+   we can't find an empty slot (Simon Horman)
+ - add sci_to_cpu to make sparse happy (Simon Horman)
+ - remove set but not used secy variable (kernel test robot and Simon Horma=
+n)
 
->
->$ devlink port function set pci/0000:08:00.0/32768 \
->               hw_addr 00:00:00:00:00:11 state active
->
->needs to print / return the handle of the devlink instance
+ drivers/net/netdevsim/Makefile    |   4 +
+ drivers/net/netdevsim/macsec.c    | 356 ++++++++++++++++++++++++++++++
+ drivers/net/netdevsim/netdev.c    |   3 +
+ drivers/net/netdevsim/netdevsim.h |  34 +++
+ 4 files changed, 397 insertions(+)
+ create mode 100644 drivers/net/netdevsim/macsec.c
 
-Right, that makes sense. I will look into adding that. It's a bit
-tricky, as the instance might actually appear on a different host, then,
-there is nothing to return here.
+diff --git a/drivers/net/netdevsim/Makefile b/drivers/net/netdevsim/Makefil=
+e
+index 5735e5b1a2cb..f8de93bc5f5b 100644
+--- a/drivers/net/netdevsim/Makefile
++++ b/drivers/net/netdevsim/Makefile
+@@ -17,3 +17,7 @@ endif
+ ifneq ($(CONFIG_PSAMPLE),)
+ netdevsim-objs +=3D psample.o
+ endif
++
++ifneq ($(CONFIG_MACSEC),)
++netdevsim-objs +=3D macsec.o
++endif
+diff --git a/drivers/net/netdevsim/macsec.c b/drivers/net/netdevsim/macsec.=
+c
+new file mode 100644
+index 000000000000..0d5f50430dd3
+--- /dev/null
++++ b/drivers/net/netdevsim/macsec.c
+@@ -0,0 +1,356 @@
++// SPDX-License-Identifier: GPL-2.0
++
++#include <net/macsec.h>
++#include "netdevsim.h"
++
++static inline u64 sci_to_cpu(sci_t sci)
++{
++=09return be64_to_cpu((__force __be64)sci);
++}
++
++static int nsim_macsec_find_secy(struct netdevsim *ns, sci_t sci)
++{
++=09int i;
++
++=09for (i =3D 0; i < NSIM_MACSEC_MAX_SECY_COUNT; i++) {
++=09=09if (ns->macsec.nsim_secy[i].sci =3D=3D sci)
++=09=09=09return i;
++=09}
++
++=09return -1;
++}
++
++static int nsim_macsec_find_rxsc(struct nsim_secy *ns_secy, sci_t sci)
++{
++=09int i;
++
++=09for (i =3D 0; i < NSIM_MACSEC_MAX_RXSC_COUNT; i++) {
++=09=09if (ns_secy->nsim_rxsc[i].sci =3D=3D sci)
++=09=09=09return i;
++=09}
++
++=09return -1;
++}
++
++static int nsim_macsec_add_secy(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09int idx;
++
++=09if (ns->macsec.nsim_secy_count =3D=3D NSIM_MACSEC_MAX_SECY_COUNT)
++=09=09return -ENOSPC;
++
++=09for (idx =3D 0; idx < NSIM_MACSEC_MAX_SECY_COUNT; idx++) {
++=09=09if (!ns->macsec.nsim_secy[idx].used)
++=09=09=09break;
++=09}
++
++=09if (idx =3D=3D NSIM_MACSEC_MAX_SECY_COUNT) {
++=09=09netdev_err(ctx->netdev, "%s: nsim_secy_count not full but all SecYs =
+used\n",
++=09=09=09   __func__);
++=09=09return -ENOSPC;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: adding new secy with sci %08llx at index %=
+d\n",
++=09=09   __func__, sci_to_cpu(ctx->secy->sci), idx);
++=09ns->macsec.nsim_secy[idx].used =3D true;
++=09ns->macsec.nsim_secy[idx].nsim_rxsc_count =3D 0;
++=09ns->macsec.nsim_secy[idx].sci =3D ctx->secy->sci;
++=09ns->macsec.nsim_secy_count++;
++
++=09return 0;
++}
++
++static int nsim_macsec_upd_secy(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: updating secy with sci %08llx at index %d\=
+n",
++=09=09   __func__, sci_to_cpu(ctx->secy->sci), idx);
++
++=09return 0;
++}
++
++static int nsim_macsec_del_secy(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: removing SecY with SCI %08llx at index %d\=
+n",
++=09=09   __func__, sci_to_cpu(ctx->secy->sci), idx);
++
++=09ns->macsec.nsim_secy[idx].used =3D false;
++=09memset(&ns->macsec.nsim_secy[idx], 0, sizeof(ns->macsec.nsim_secy[idx])=
+);
++=09ns->macsec.nsim_secy_count--;
++
++=09return 0;
++}
++
++static int nsim_macsec_add_rxsc(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09struct nsim_secy *secy;
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++=09secy =3D &ns->macsec.nsim_secy[idx];
++
++=09if (secy->nsim_rxsc_count =3D=3D NSIM_MACSEC_MAX_RXSC_COUNT)
++=09=09return -ENOSPC;
++
++=09for (idx =3D 0; idx < NSIM_MACSEC_MAX_RXSC_COUNT; idx++) {
++=09=09if (!secy->nsim_rxsc[idx].used)
++=09=09=09break;
++=09}
++
++=09if (idx =3D=3D NSIM_MACSEC_MAX_RXSC_COUNT)
++=09=09netdev_err(ctx->netdev, "%s: nsim_rxsc_count not full but all RXSCs =
+used\n",
++=09=09=09   __func__);
++
++=09netdev_dbg(ctx->netdev, "%s: adding new rxsc with sci %08llx at index %=
+d\n",
++=09=09   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
++=09secy->nsim_rxsc[idx].used =3D true;
++=09secy->nsim_rxsc[idx].sci =3D ctx->rx_sc->sci;
++=09secy->nsim_rxsc_count++;
++
++=09return 0;
++}
++
++static int nsim_macsec_upd_rxsc(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09struct nsim_secy *secy;
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++=09secy =3D &ns->macsec.nsim_secy[idx];
++
++=09idx =3D nsim_macsec_find_rxsc(secy, ctx->rx_sc->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->rx_sc->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: updating RXSC with sci %08llx at index %d\=
+n",
++=09=09   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
++
++=09return 0;
++}
++
++static int nsim_macsec_del_rxsc(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09struct nsim_secy *secy;
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++=09secy =3D &ns->macsec.nsim_secy[idx];
++
++=09idx =3D nsim_macsec_find_rxsc(secy, ctx->rx_sc->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->rx_sc->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: removing RXSC with sci %08llx at index %d\=
+n",
++=09=09   __func__, sci_to_cpu(ctx->rx_sc->sci), idx);
++
++=09secy->nsim_rxsc[idx].used =3D false;
++=09memset(&secy->nsim_rxsc[idx], 0, sizeof(secy->nsim_rxsc[idx]));
++=09secy->nsim_rxsc_count--;
++
++=09return 0;
++}
++
++static int nsim_macsec_add_rxsa(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09struct nsim_secy *secy;
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++=09secy =3D &ns->macsec.nsim_secy[idx];
++
++=09idx =3D nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
++=09=09   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
++
++=09return 0;
++}
++
++static int nsim_macsec_upd_rxsa(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09struct nsim_secy *secy;
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++=09secy =3D &ns->macsec.nsim_secy[idx];
++
++=09idx =3D nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
++=09=09   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
++
++=09return 0;
++}
++
++static int nsim_macsec_del_rxsa(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09struct nsim_secy *secy;
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++=09secy =3D &ns->macsec.nsim_secy[idx];
++
++=09idx =3D nsim_macsec_find_rxsc(secy, ctx->sa.rx_sa->sc->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in RXSC table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: RXSC with sci %08llx, AN %u\n",
++=09=09   __func__, sci_to_cpu(ctx->sa.rx_sa->sc->sci), ctx->sa.assoc_num);
++
++=09return 0;
++}
++
++static int nsim_macsec_add_txsa(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
++=09=09   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
++
++=09return 0;
++}
++
++static int nsim_macsec_upd_txsa(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
++=09=09   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
++
++=09return 0;
++}
++
++static int nsim_macsec_del_txsa(struct macsec_context *ctx)
++{
++=09struct netdevsim *ns =3D netdev_priv(ctx->netdev);
++=09int idx;
++
++=09idx =3D nsim_macsec_find_secy(ns, ctx->secy->sci);
++=09if (idx < 0) {
++=09=09netdev_err(ctx->netdev, "%s: sci %08llx not found in secy table\n",
++=09=09=09   __func__, sci_to_cpu(ctx->secy->sci));
++=09=09return -ENOENT;
++=09}
++
++=09netdev_dbg(ctx->netdev, "%s: SECY with sci %08llx, AN %u\n",
++=09=09   __func__, sci_to_cpu(ctx->secy->sci), ctx->sa.assoc_num);
++
++=09return 0;
++}
++
++static const struct macsec_ops nsim_macsec_ops =3D {
++=09.mdo_add_secy =3D nsim_macsec_add_secy,
++=09.mdo_upd_secy =3D nsim_macsec_upd_secy,
++=09.mdo_del_secy =3D nsim_macsec_del_secy,
++=09.mdo_add_rxsc =3D nsim_macsec_add_rxsc,
++=09.mdo_upd_rxsc =3D nsim_macsec_upd_rxsc,
++=09.mdo_del_rxsc =3D nsim_macsec_del_rxsc,
++=09.mdo_add_rxsa =3D nsim_macsec_add_rxsa,
++=09.mdo_upd_rxsa =3D nsim_macsec_upd_rxsa,
++=09.mdo_del_rxsa =3D nsim_macsec_del_rxsa,
++=09.mdo_add_txsa =3D nsim_macsec_add_txsa,
++=09.mdo_upd_txsa =3D nsim_macsec_upd_txsa,
++=09.mdo_del_txsa =3D nsim_macsec_del_txsa,
++};
++
++void nsim_macsec_init(struct netdevsim *ns)
++{
++=09ns->netdev->macsec_ops =3D &nsim_macsec_ops;
++=09ns->netdev->features |=3D NETIF_F_HW_MACSEC;
++=09memset(&ns->macsec, 0, sizeof(ns->macsec));
++}
++
++void nsim_macsec_teardown(struct netdevsim *ns)
++{
++}
+diff --git a/drivers/net/netdevsim/netdev.c b/drivers/net/netdevsim/netdev.=
+c
+index 35fa1ca98671..0c8daeb0d62b 100644
+--- a/drivers/net/netdevsim/netdev.c
++++ b/drivers/net/netdevsim/netdev.c
+@@ -304,6 +304,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+ =09if (err)
+ =09=09goto err_utn_destroy;
+=20
++=09nsim_macsec_init(ns);
+ =09nsim_ipsec_init(ns);
+=20
+ =09err =3D register_netdevice(ns->netdev);
+@@ -314,6 +315,7 @@ static int nsim_init_netdevsim(struct netdevsim *ns)
+=20
+ err_ipsec_teardown:
+ =09nsim_ipsec_teardown(ns);
++=09nsim_macsec_teardown(ns);
+ =09nsim_bpf_uninit(ns);
+ err_utn_destroy:
+ =09rtnl_unlock();
+@@ -374,6 +376,7 @@ void nsim_destroy(struct netdevsim *ns)
+ =09rtnl_lock();
+ =09unregister_netdevice(dev);
+ =09if (nsim_dev_port_is_pf(ns->nsim_dev_port)) {
++=09=09nsim_macsec_teardown(ns);
+ =09=09nsim_ipsec_teardown(ns);
+ =09=09nsim_bpf_uninit(ns);
+ =09}
+diff --git a/drivers/net/netdevsim/netdevsim.h b/drivers/net/netdevsim/netd=
+evsim.h
+index 7d8ed8d8df5c..7be98b7dcca9 100644
+--- a/drivers/net/netdevsim/netdevsim.h
++++ b/drivers/net/netdevsim/netdevsim.h
+@@ -23,6 +23,7 @@
+ #include <net/devlink.h>
+ #include <net/udp_tunnel.h>
+ #include <net/xdp.h>
++#include <net/macsec.h>
+=20
+ #define DRV_NAME=09"netdevsim"
+=20
+@@ -52,6 +53,25 @@ struct nsim_ipsec {
+ =09u32 ok;
+ };
+=20
++#define NSIM_MACSEC_MAX_SECY_COUNT 3
++#define NSIM_MACSEC_MAX_RXSC_COUNT 1
++struct nsim_rxsc {
++=09sci_t sci;
++=09bool used;
++};
++
++struct nsim_secy {
++=09sci_t sci;
++=09struct nsim_rxsc nsim_rxsc[NSIM_MACSEC_MAX_RXSC_COUNT];
++=09u8 nsim_rxsc_count;
++=09bool used;
++};
++
++struct nsim_macsec {
++=09struct nsim_secy nsim_secy[NSIM_MACSEC_MAX_SECY_COUNT];
++=09u8 nsim_secy_count;
++};
++
+ struct nsim_ethtool_pauseparam {
+ =09bool rx;
+ =09bool tx;
+@@ -93,6 +113,7 @@ struct netdevsim {
+=20
+ =09bool bpf_map_accept;
+ =09struct nsim_ipsec ipsec;
++=09struct nsim_macsec macsec;
+ =09struct {
+ =09=09u32 inject_error;
+ =09=09u32 sleep;
+@@ -366,6 +387,19 @@ static inline bool nsim_ipsec_tx(struct netdevsim *ns,=
+ struct sk_buff *skb)
+ }
+ #endif
+=20
++#if IS_ENABLED(CONFIG_MACSEC)
++void nsim_macsec_init(struct netdevsim *ns);
++void nsim_macsec_teardown(struct netdevsim *ns);
++#else
++static inline void nsim_macsec_init(struct netdevsim *ns)
++{
++}
++
++static inline void nsim_macsec_teardown(struct netdevsim *ns)
++{
++}
++#endif
++
+ struct nsim_bus_dev {
+ =09struct device dev;
+ =09struct list_head list;
+--=20
+2.40.1
 
-
->
->> We need wait/notification for 2 reasons
->> 1) to get the auxiliary device name for the activated
->>    SF. It is needed for convenience of the orchestration tools.
->> 2) to get the result of the activation (success/fail)
->>    It is also needed for convenience of the orchestration tools.
->
->Are you saying the activation already waits for the devlink instance to
->be spawned? If so that's great, all we need to do is for the:
-
-Yep.
-
-
->
->$ devlink port function set pci/0000:08:00.0/32768 \
->               hw_addr 00:00:00:00:00:11 state active
->
->to either return sufficient info for the orchestration to know what the
->resulting SF / SF devlink instance is. Most likely indirectly by adding
->that info to the port so that the PORT_NEW notification carries it.
-
-Yeah, we need to add the same info to the GET cmd.
-
-
->
->Did I confuse things even more?
-
-No, no confusion. But, the problem with this is that devlink port function set
-active blocks until the activation is done holding the devlink instance
-lock. That prevents other ports from being activated in parallel. From
-driver/FW/HW perspective, we can do that.
-
-So the question is, how to allow this parallelism?
-
-
-
->
->As a reminder what sparked this convo is that user specifies "sfnum 11"
->in the example, and the sf device gets called "sf.1".
-
-Yeah, will look into that as well.
 
