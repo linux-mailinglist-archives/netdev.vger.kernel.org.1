@@ -1,72 +1,85 @@
-Return-Path: <netdev+bounces-12763-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12764-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5454738D3D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:37:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56752738D7A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:44:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C04621C20F09
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:37:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 123F72815BA
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:44:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB3E19BCE;
-	Wed, 21 Jun 2023 17:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6879419E43;
+	Wed, 21 Jun 2023 17:44:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DA63F9D6
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:37:18 +0000 (UTC)
-Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2101.outbound.protection.outlook.com [40.107.102.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BD00919AB;
-	Wed, 21 Jun 2023 10:37:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DC519BDA
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:44:21 +0000 (UTC)
+Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2045.outbound.protection.outlook.com [40.107.93.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474AF1FE7;
+	Wed, 21 Jun 2023 10:44:01 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Jc91xi3dCjryq11e/mA+Fz85d7LQBextYXBqQZfxIZaSzVAb8/EH/Avenj6EFwlnCSDBxXnGJNE3N+AbJ1IutzPkOlXpWrP2P2A3dAWHuKHYAZNcAnCZ6xDhBcYBqScjfiLdJ0Esw4VTAp4weVgxq+spgFp3kLE13UXt66LE7d28twKbbWvqnzDjIhPH4PnkpWb/1yycqEIk0vQA0Sk2SLlJ2vtyWXvYtqRAUg1He/KwHnQgXilO23ar+YBrpl6F57Q35vWd8QU3f5bc4e478GCcsJCID3lNjtxPE6oXWR1yr5IhspoiLicfyqFfgT/94AzuzGNv9DHjjhO43PGSHA==
+ b=kP+o7w9s79fnNTD0LIJpRWmz43hjD3bNDts3Xm1LIwZlMiAABKkcYGSmAM6qZKs7ImD9OWLGZHn0Sf/uYTFlRCm3Iwk6j1aUsTs+nWeCZI9lPMfEOxlWtDQmizxnHM/k/w+cCqyy7qVu56FdNylyhN2HSeCvmRlVQAyU/dQt/b9f8KHawEk1b+EXhBTD11YOWEfP0CD/w55BX7fEvigZkCaGCNh6XGfMuw+z8EixAjQq7Y76zP4x7cWMkwWaXrwfJljpEVMsgdY9K1zKdRt2qNBVoGG/xo/avFv16U3lzxDPv8PlXpmcBuiWX+6PZHJ//E+3YRlF2sPCVoHeXW6ZHA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ZICNO9UgoYynMg6diZAkp+guVZ57QU3v1aBgTSS80iQ=;
- b=g3j8Jz9EAEbNi5CjCm2LnCnjveQoWc4ren+UMgVjlp2hthfte+jqdUAAphNYizYYNXhpaqFHdtV7tMlf0G6aDtttlfk0YPETSlN7k7L0Qt4TWJRLeeogyUJhitpOd36X7QGh0iA6BxrTwCpwq4yM40ro4Beur6DULpFFvw39kgxiKuv0AIGbykWwqgOKVjoOyNTO5s2Ni1ZXEfhIPKctJ8kYtjrgjojxf6mg7ED1kaZduUHasoRVERyI0IeeiwKl4dkAEUw6w//vc3brOoysnv6wpEh262v6AOix4SUjc6cUG6RTMB6xrMzNGUKXdrhxo8gbfAvrCz+IGCMjm75TLA==
+ bh=dc2ebv2Vb/X+1w8aKHaRw+5fJDZHEiOJTm98vzwSETs=;
+ b=lR98C/x6GENS9d+ixSv9NzmFlwQT58ROwjTo3W+i46Fcgp5K0HJ99YuKLuevTHp4Ef+KBSHtrNl90mZMuMETEZ6B1V2Bl9nDdI5zgmagkgLVJCuB6vgaYApnFvgu1c+/BaKarw8H5amJmK7ouoZ+2UndAH2yEbQf8TZFwaBKpdSelSF4fmyzITW8zBRUSC9WVIWP2yo8CfMcr0t5Kfh2sNbmtAescBdZY5IFm/DerdVUDM9rzKJfCJdEQc0MPPdFLfSqIjUYjm3V2OwEMGiKyLUfmDDx3W1irRDAPFV2b0d0Y6OODQ1qAeWllaIg9QUrAi8DOKd7rZFYuDSVPFNcJg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ZICNO9UgoYynMg6diZAkp+guVZ57QU3v1aBgTSS80iQ=;
- b=WzomL7cnlzwSRN3SbsJaPDvhz09p7FYrvslCMKMYMA9TmhmUvDq2UnBI6IKKesTQa3oyrjTDRscyGXIJ7BijISmlmLHVQtgpoYpRS9SuAGEvr23YC1aoLKq/fFcDBiXQYRQWvCaCVm4joaTUh3c0lrQHvcz5o8e8qm/ICg+5kUA=
+ bh=dc2ebv2Vb/X+1w8aKHaRw+5fJDZHEiOJTm98vzwSETs=;
+ b=lMskbPOsnp9XYXpPZWNJzbmfi09kcCpt+J7p1cy3cL0KBqd9ITf4PMp/IWp9CoXVNAtDBv0toadOl8WflNxX+PmaDJmkbyYSVRVZcUFasMX0S8Jz9HXSo79wccwVppbxqgs21Mykgx6V3mK3XXxuZe52ip6c7VD5vAUUAC4WDbM=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MN2PR13MB3663.namprd13.prod.outlook.com (2603:10b6:208:1ec::8) with
+ header.d=none;dmarc=none action=none header.from=amd.com;
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
+ by BL1PR12MB5804.namprd12.prod.outlook.com (2603:10b6:208:394::5) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
- 2023 17:37:13 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
- 17:37:12 +0000
-Date: Wed, 21 Jun 2023 19:37:05 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Subject: Re: [PATCH] net: mana: Fix MANA VF unload when host is unresponsive
-Message-ID: <ZJM1QcJmUSAiH2q2@corigine.com>
-References: <1687343341-10898-1-git-send-email-schakrabarti@linux.microsoft.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1687343341-10898-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-ClientProxiedBy: AS4PR09CA0007.eurprd09.prod.outlook.com
- (2603:10a6:20b:5e0::8) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+ 2023 17:43:53 +0000
+Received: from MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::dfcf:f53c:c778:6f70]) by MN0PR12MB6101.namprd12.prod.outlook.com
+ ([fe80::dfcf:f53c:c778:6f70%5]) with mapi id 15.20.6521.020; Wed, 21 Jun 2023
+ 17:43:53 +0000
+Message-ID: <a80c215a-c1d9-4c76-d4a8-9b5fd320a2b1@amd.com>
+Date: Wed, 21 Jun 2023 12:43:48 -0500
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
+ mitigations
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Johannes Berg <johannes@sipsolutions.net>, Evan Quan <evan.quan@amd.com>,
+ rafael@kernel.org, lenb@kernel.org, alexander.deucher@amd.com,
+ christian.koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
+ daniel@ffwll.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com,
+ tzimmermann@suse.de, hdegoede@redhat.com, jingyuwang_vip@163.com,
+ lijo.lazar@amd.com, jim.cromie@gmail.com, bellosilicio@gmail.com,
+ andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de,
+ linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
+ amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
+ linux-wireless@vger.kernel.org, netdev@vger.kernel.org
+References: <20230621054603.1262299-1-evan.quan@amd.com>
+ <20230621054603.1262299-2-evan.quan@amd.com>
+ <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
+ <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
+ <b1abec47-04df-4481-d680-43c5ff3cbb48@amd.com>
+ <36902dda-9e51-41b3-b5fc-c641edf6f1fb@lunn.ch>
+ <33d80292-e639-91d0-4d0f-3ed973f89e14@amd.com>
+ <9159c3a5-390f-4403-854d-9b5e87b58d8c@lunn.ch>
+From: "Limonciello, Mario" <mario.limonciello@amd.com>
+In-Reply-To: <9159c3a5-390f-4403-854d-9b5e87b58d8c@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: SA1PR03CA0010.namprd03.prod.outlook.com
+ (2603:10b6:806:2d3::26) To MN0PR12MB6101.namprd12.prod.outlook.com
+ (2603:10b6:208:3cb::10)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,177 +87,179 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3663:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1b799e56-e37b-4422-9ac7-08db727e25a1
+X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|BL1PR12MB5804:EE_
+X-MS-Office365-Filtering-Correlation-Id: 688a88bf-48f9-4bad-06e8-08db727f1432
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	u0YU5KAKo8L/POSSSEAPPooz6XGFsWB8HLM3vMCF3+hmVNNQcuZ8z2cVPDK40371lII8BTJKbaFZ1DbtKQMCiF0smVUd5ucr6FOdm0CTdtf3/c5gA24Q5ddHRxgfUjGTDw1WHCLs9626pmgrxMJ+BLYmRq15RgmZq7k34cw2ptRuBWqCjk8idqA8Itj1sBkDCLpWBuaIfgJg2UsmWve/DlbIoBf859Y0ppzywCHQPYt8djbB8t1Zwn4NEFYs7r7P4OUKA573hCA+4vdkHUEx+oV1gAcNVGLrknAxYJT5QxvYjr5GrOpXCs5gP26/JTH25RQVkzY+db16Z6Apg2gG+w1Tk+qKYmObMexe1Fq4Af0CaGciHIZu6463TRNX0Z+orbwOSd+Q8jUY1W90PTE4BleRuODk1jYKH9e+BWWa5sDK+BKcvOGrTrG0zd7qX8xtxv0zGKVFQZ5beubfPUDg+Mttg40aQR5Z67h9rjBRkBuE9XMjAi7vRQg4RGYIcIln9lRUsZC0ZsCRA9SuD4WEc3dEi/gEGQOXOxqnSPJOEuPMrW8uwyKAPoUTAycrkVhEUXlBEraC6PodRxT7WPLBKgzuyzvm3z5B8oCtX0V2TE18IAo16YDnBFRENyB1cSqjb5CrBRJdR4Jjh2IGTKLZMeDK74KdXb0xVvvOYBghMdo=
+	oMTSCJK3X8Y0NuhA2z9+ls6DLTaI6sxOTVB/OnYk++ebyCkaXwLlv/9Hdv/SalOWVP2rPzgkKVY6r1dFTeK40B03ufYJ6ULaWBz0uUVdJ94sASlwZnKOBxWj2wcOvU+Mbj1k0B0jvpYsm0D8C6Z+9k8l6YbdisgeBSQNupwE+ZGNhBwQ7im65+Hx+Lfp+7wPvmLb5kUZtvg/OgSffZ88QUbNjYqkkYVrpFLT6Zltue7wpryaucgtWEzGI3VljeNZh1n0Mkp722oTR2DnovT9e+HvPjXrvXbxR5alLrFQsXXSTxyQruyxlw/3iu/t3chf9PxcYGrSOHMUwYBHfdLLKpVWiG8F9/JggPqHOPn8zDiUB+Bp+rUDxDgAeMKCKPTJBHxb67LqMswEmzbBOuwgRmuNCYB0ge8ji8Bc0Rdv0q4hOlKOiGxWjydf679zNbONBXG0mkeWbHkJEKtlFdoEuFlmH2DPGq9EPiiBeoFTmm6Cnkhpq5943f6EdUWkgsDQKCEMYaanhTCR+wnfBA4Sb6rSeSUvGMBfYl6ZZJuS6r0ei6k4K8xJBCmIunEARo22pwLNqHp9/UT1Iejr3GKL6KpEtNPsPPN+DimnAIMuBLztQH/AMkyKUxyws0fKipa4LJDtb/IctbKDhBapzmU+sw==
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(366004)(396003)(136003)(376002)(346002)(451199021)(38100700002)(6486002)(83380400001)(6506007)(186003)(2616005)(44832011)(7416002)(8936002)(8676002)(41300700001)(5660300002)(2906002)(6512007)(6666004)(36756003)(45080400002)(478600001)(66556008)(6916009)(66476007)(4326008)(66946007)(316002)(86362001)(66899021)(21314003);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(136003)(366004)(346002)(451199021)(54906003)(6666004)(478600001)(4326008)(26005)(186003)(53546011)(6506007)(6486002)(6512007)(2906002)(41300700001)(7416002)(8936002)(66946007)(6916009)(66556008)(66476007)(8676002)(5660300002)(316002)(2616005)(86362001)(31696002)(36756003)(83380400001)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RFBKsXA2WuDpFTtZgJHVmSi/V2JZ3F8m3cp+X+MXkq6oZaI5Yg82QYpZjp1n?=
- =?us-ascii?Q?7GNdsH3Tj5XuAbYeFr161bz3P9HmBKSc/9uVM9NpbAmXTNWNz9o7u35v5YVv?=
- =?us-ascii?Q?jSgAmlxGbJY/2E5is6z+MidRQQJHIMTfXF4JaTYsju2+3bN8r/8/EaFyFLf2?=
- =?us-ascii?Q?I660kQDrRj5NLV8lqsL9EPBx5YlOzb0vejwBhvv14gr2FGHWQQytbupJ875H?=
- =?us-ascii?Q?1mUc+RsCfsBGFSjJZU5MOplddo0BgCd2Vbtx2v4xjKBbJnUPQv+EA83C/ShM?=
- =?us-ascii?Q?AdJFdkAiMuTAlUz2Unly62WlgqPZyUfrE7qQmohpGf7vklxFdmMqBJsRUFzI?=
- =?us-ascii?Q?oHX70G/N2E8gSKFJy+hhAlUTOs/Oq5KEktBn3+fhSm79gaCuj5eouW15Ytjk?=
- =?us-ascii?Q?R6cEKXMuHzGKlvI4DT1W9NVVB/4O9R5bfqsQLiu+0UNQlEUY1Vtf7N59N+ad?=
- =?us-ascii?Q?DYzbVa3VWODyZ4A7kApJHypCTJ2MGm28xV++163TD8aX1e0EKge9n7D0uelm?=
- =?us-ascii?Q?1Rzm5N7qg6SuxEecYVvjy76KpxyitompdZcVJe0MKehpUF2B7F+VS+0kGl14?=
- =?us-ascii?Q?2u0ui61WfIDisa5wzB7o/NPbxRmJOE7hglwk8pYRmbsyjHummztuUg69as1C?=
- =?us-ascii?Q?NsIQNms5dEdu/toDNgCWTVUxstpP/eXyBu1zNMYPv83IXTUxW9z2hs4+Px9f?=
- =?us-ascii?Q?Iusg5Ywn2gWFehZCaa26C9VzhOUDWsb+kqV+O6+qFSFCxtR2/IVUuzHAYdO2?=
- =?us-ascii?Q?Zl5TvwDGRAjUF6rt4IvDU4E4QcmxBHBa0yEZEiHmbkcjL/JXgn2DYM4GAb1x?=
- =?us-ascii?Q?KlwCpT0pli4DMVC4rg4pi32VwEXlW773wSUQS1lf89FF8r8U3iPyYuEn5U35?=
- =?us-ascii?Q?mYMBdpyI474exIBO2ncwBzoVNYA5ub7DIfRTAcNn/qEUUJM+ZLF06Ro3Ff6I?=
- =?us-ascii?Q?+EUuBrM1WbkQJZ4XvKaKpTM+wbqfI6N8qbXsgLGfwpw2NFBzT0bINekBlABE?=
- =?us-ascii?Q?e0FFkE4GAfgb03YWZn7odLzsS5gxmV9A2givtBU1q94I/pS8ceSDdr6UyOxz?=
- =?us-ascii?Q?7ZQmG6x5lWspL6BQng9V5ffkLJeTFf4DKm/aaprk4FD1Kc5vo46BOkk9B74T?=
- =?us-ascii?Q?egrhFGpI9yx0LyGoyPn09FhloinEghzA6ZqTkeYqx9u9AUgZ11dqaT+b7v0S?=
- =?us-ascii?Q?TtdS2D2NaER3yUuFZJw5fRyNqkxuux6V2ptBdCrgy2h95S6yCnRn1sOEXPBI?=
- =?us-ascii?Q?4GAyZqU9EoUDWevDJ9qNG9F//HjYjDhweqiraS7IT/KLmPscJ/jjQ2jLpCvv?=
- =?us-ascii?Q?811nSGCmqxI67cvTHi8tdAaphoNSLGvJeV4QMoS86dkOQYRb4lcBBfCnEV9g?=
- =?us-ascii?Q?mxS107VnyvlDSgzFmHPPSwZAKOZgJEEEBy6S9b5bAJKLEql1jgCPdUxPqzAF?=
- =?us-ascii?Q?KmBjpYUMNA5E5UDIyZMYIM0QPCj7+aAEeWWCIxldH5sWtOwlSzBLrLk4PQCZ?=
- =?us-ascii?Q?Q+6GXc7kb/5aaDBsxLO2zzaYwy9FJMBnuJGVjJfNRm8TdRuMK5cvsLnzHiCj?=
- =?us-ascii?Q?SCxd2ldFBpxpTxU+cvYWVFE5hXSypwO5ZbkJLHI/6gBdtP3Z9IVPhS4GG645?=
- =?us-ascii?Q?WLiq9xTrVoU1ESG0GBrI1fV+Y9HsQxzj0ukSq6fpNIrTSAQFqkgeK/SxbYA2?=
- =?us-ascii?Q?V5jbOw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1b799e56-e37b-4422-9ac7-08db727e25a1
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+	=?utf-8?B?bTVHRFV5K1h1d0lBK1FiRVdrYXVtTmhWWFFsdUVIZW5PdG02bkZrQ1lES1Zn?=
+ =?utf-8?B?NWFKY3BJT3V2ZDZjTENvSko4WENtVG9BVnduM3g0Sm1vUnRSRUdSTVBUMlI2?=
+ =?utf-8?B?eU5xc1U0YWIwNVd3dlpZcVg1eXpKVHdKY3hjK0NLb0twOFJtTWF4NVZpTHdX?=
+ =?utf-8?B?WnpqSVRJb0Y1VDJncGVTZCtJenlZY1ZDSFZhY3V2bWNwNHdianA2NHQ1NmFH?=
+ =?utf-8?B?QmpTRjkvZFdrdFZCSmRUakQvZ1ZRWGpIR0pJMWZMSllqc2JUMEREMnNoamJu?=
+ =?utf-8?B?cFdvOE1UUk1JWVBMekxyZXA2eEdLeGR3MisybmFYMGowQzlsMXBRbWFjbUJY?=
+ =?utf-8?B?ak84NFZvY3VtRTNlL2ZRMCtvVzc4UTFvdTI1LzJMdkJHbkNjekRrYlJzc0tT?=
+ =?utf-8?B?V0w1TFd2N3FlT3NrblRpWWdRYmF2NWM2b3JROC9CdmwydGZ2aldPelRaRmVw?=
+ =?utf-8?B?eU5PRTJtK3RjQ1FjeldPUmJVUEJqWHYrd0t4R1R4Q1BLSkdJZFRWK20vN2Y5?=
+ =?utf-8?B?OU9TTE5JRTlYSloxS3VuYjJxeUV6bWJOWmthRFZmSGcrT290ZnJiQ3AvUUlI?=
+ =?utf-8?B?eXRGN1ZPYnlQMzRBVmFLZHAxcyt4K012QjY1eXMrdC9UK2U1STdyLzJQTDcy?=
+ =?utf-8?B?bldsWHVYcWd3Sy9IN1VCSk1GM0I2UUhsR3BTOG85VjRxdGJYM2d6ellWWXdU?=
+ =?utf-8?B?K0hoRnJ3MVpYWmZKS2N5YWZiMGZKTXFLTXRQaG1OeDhKSnNHcXNrZm9qV0lG?=
+ =?utf-8?B?UkU4dC9oMWVBMWQ5OVBnejFmVitXdFBCKzMzZFEyYVZkNWh0ZXhXNGFaL3lS?=
+ =?utf-8?B?RklnK2JlbVdHdEtZMk15UC9NK29rY29IcHg3V3A2S0g1ZGUxUXMzRzBIL3lu?=
+ =?utf-8?B?MHV3amdpSUkrU3FHQmFDVW9vOHF6eGNxb2JzM3V6SW53Vm50bWZvcFRyYlh3?=
+ =?utf-8?B?RlFPeUxPbC9TUk1WRTlJZkJjQ3l1UGcrNFBhTFBaUkNBV2h3MU92cUhCMUNK?=
+ =?utf-8?B?TW5sbHR1aGRjSXJjL01LYWhvR1dpUE5LUDVWamVzY1JZMzZ5blhJTG5aU2lp?=
+ =?utf-8?B?RFNaR29JMjArZytwV0lxOWJ2cW01bjVrYlY4WWVaaHY4dlJvQW5RdzF1SG45?=
+ =?utf-8?B?YkxHVDRoNk04NFJSRUtac0RIcElQT1Z2TktaWlRScGp1blByQXBjNUZlb2M4?=
+ =?utf-8?B?Qkt4eTk3RTE1dXlUdGoyaytydEtxcW1KNytUeENPQlhKVUN6S2pNUFc2YUFP?=
+ =?utf-8?B?dG1zbHBHNTg1NnRobjVpOXl6cDR5U0xUdmN2R3htd2Eva3luUHJFMThuQ3Z2?=
+ =?utf-8?B?QW1zUTNoYTFIQmtFOVlmZ3dTRUJPS0k1TUZON0FoVjNvNnVJMGtsSzd6RExS?=
+ =?utf-8?B?ZjU0dC80TDNheURxU1loMGZUemR0bVlFZVg1SFR5SmtWaHR6aUpmZkE3WTdw?=
+ =?utf-8?B?NVRlQ2Y5WEdjN2w2a214b0t0YVpSNk04ZU9YcnZCaUlTNTM4OW5lSG9pbGFh?=
+ =?utf-8?B?V0lzekk3RTdnRnVhWmpYNWJQSmFodzh1V2oyOW1qY1Rsclh2RncxVmI4bTdW?=
+ =?utf-8?B?ZTB3RjBBSG1YRjEwalFPVlNqRzdUQXl3SjZGL1d3L3l6V0pUY2RMSDE2MVBp?=
+ =?utf-8?B?THpvK2VJNlovSldhcGw3YkloTWRnWjlGNkJFNFFrNmFSSW9KK1BodXRYTmlS?=
+ =?utf-8?B?VE5jZTgyUkQ0K1J5ZHR4T0oyYVNkNW40aDdTcmIrYnI3RnM1cHBpMlhFcWxj?=
+ =?utf-8?B?b1VOOEpGQ0VvRkcvdVJmUUNVbXpTYUowaG1rbXp2Ukkxd2ErVGovTk9GcTIv?=
+ =?utf-8?B?SEt4MGZBZ0FPRk9nOUtHUjN4eVNpdXh6dW9zSXorVkUxckRrWnJpNnUxdXIz?=
+ =?utf-8?B?eS8zcUF4S1g2QVFJcVNkQWhzLzBLUHhKVktUQjZNM3BLS1EwZis2am1PY2o2?=
+ =?utf-8?B?TVZJUTljU0dqNGt5Smt6VU5YelIydWtxb29MMGlaanFDWlg3Nzh4dVFEMkVF?=
+ =?utf-8?B?VHQzK01sQ1pRNnc5UlpMRGJUeVpJeW5FQXZOdWNxWk9raVloaEo2cGQ5djRW?=
+ =?utf-8?B?Y2t0eUpmc3h2Zzk5eHB5M0NITTByVDNpR0RmOFg5VFJ5OWRxbWorcUpWRk93?=
+ =?utf-8?Q?5IwETTuwGcygnovam3MpX9aPg?=
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 688a88bf-48f9-4bad-06e8-08db727f1432
+X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 17:37:12.8096
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 17:43:52.9839
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 823aSiMC0zMS4pVQ/UOCoulY4mN/uwXXYQy5LcT6gIGDVq/5LmzXGLQVQesPSmxkly6FP4jTqW3BFKW+nzVe3PSdHryZBtHTcRo2v97LrJ0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3663
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: yIeV8f5e05QJv3DoPHJ/eS3vJwZi2HP+TsRiF2J7p17DhnrszqIUsIoBRwH1UCYtewPdbo0he72P7wMGFjiNXA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5804
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 03:29:01AM -0700, souradeep chakrabarti wrote:
-> From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> 
-> This patch addresses  the VF unload issue, where mana_dealloc_queues()
-> gets stuck in infinite while loop, because of host unresponsiveness.
-> It adds a timeout in the while loop, to fix it.
-> 
-> Also this patch adds a new attribute in mana_context, which gets set when
-> mana_hwc_send_request() hits a timeout because of host unresponsiveness.
-> This flag then helps to avoid the timeouts in successive calls.
-> 
-> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 
-Hi Souradeep,
+On 6/21/2023 12:26 PM, Andrew Lunn wrote:
+>> I think what you're asking for is another layer of indirection
+>> like CONFIG_WBRF in addition to CONFIG_ACPI_WBRF.
+>>
+>> Producers would call functions like wbrf_supported_producer()
+>> where the source file is not guarded behind CONFIG_ACPI_WBRF,
+>> but instead by CONFIG_WBRF and locally use CONFIG_ACPI_WBRF within
+>> it.  So a producer could look like this:
+>>
+>> bool wbrf_supported_producer(struct device *dev)
+>> {
+>> #ifdef CONFIG_ACPI_WBRF
+>>      struct acpi_device *adev = ACPI_COMPANION(dev);
+>>
+>>      if (adev)
+>>          return check_acpi_wbrf(adev->handle,
+>>                         WBRF_REVISION,
+>>                         1ULL << WBRF_RECORD);
+>> #endif
+>>      return -ENODEV;
+>>
+>> }
+>> EXPORT_SYMBOL_GPL(wbrf_supported_producer);
+>>
+>> And then adding/removing could look something like this
+>>
+>> int wbrf_add_exclusion(struct device *dev,
+>>                 struct wbrf_ranges_in *in)
+>> {
+>> #ifdef CONFIG_ACPI_WBRF
+>>      struct acpi_device *adev = ACPI_COMPANION(dev);
+>>
+>>      if (adev)
+>>          return wbrf_record(adev, WBRF_RECORD_ADD, in);
+>> #endif
+>>      return -ENODEV;
+>> }
+>> EXPORT_SYMBOL_GPL(wbrf_add_exclusion);
+>>
+>> int wbrf_remove_exclusion(struct device *dev,
+>>                 struct wbrf_ranges_in *in)
+>> {
+>> #ifdef CONFIG_ACPI_WBRF
+>>      struct acpi_device *adev = ACPI_COMPANION(dev);
+>>
+>>      if (adev)
+>>          return wbrf_record(adev, WBRF_RECORD_REMOVE, in);
+>> #endif
+>>      return -ENODEV;
+>> }
+>> EXPORT_SYMBOL_GPL(wbrf_remove_exclusion);
+> Yes, this looks a lot better.
+>
+> But what about notifications?
+Once you implement this it gets a lot more complex and the driver 
+consumers would need
+to know more about the kernel's implementation.  For example consumers 
+need a
+notifier block like:
 
-thanks for your patch.
-Some minor feedback from my aide.
+diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu.h 
+b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+index e3e2e6e3b485..146fe3c43343 100644
+--- a/drivers/gpu/drm/amd/amdgpu/amdgpu.h
++++ b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
+@@ -1066,6 +1066,8 @@ struct amdgpu_device {
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 8f3f78b68592..5cc43ae78334 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -946,10 +946,12 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
->  	struct gdma_context *gc = gd->gdma_context;
->  	struct gdma_general_resp resp = {};
->  	struct gdma_general_req req = {};
-> +	struct mana_context *ac;
->  	int err;
->  
->  	if (gd->pdid == INVALID_PDID)
->  		return -EINVAL;
-> +	ac = (struct mana_context *)gd->driver_data;
+         bool                            job_hang;
+         bool                            dc_enabled;
++
++       struct notifier_block           wbrf_notifier;
+  };
 
-drive_data is a void *.
-There is no need to cast it to another type of pointer.
+  static inline struct amdgpu_device *drm_to_adev(struct drm_device *ddev)
 
-...
+And then would need matching notifier functions like:
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> index 9d1507eba5b9..557b890ad0ae 100644
-> --- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-> +++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+static int amdgpu_wbrf_frequencies_notifier(struct notifier_block *nb,
+                                     unsigned long action, void *_arg)
 
-...
+And we'd need to set up a chain to be used in this case in the WBRF code:
 
-> @@ -786,12 +788,19 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
->  	struct hwc_wq *txq = hwc->txq;
->  	struct gdma_req_hdr *req_msg;
->  	struct hwc_caller_ctx *ctx;
-> +	struct mana_context *ac;
->  	u32 dest_vrcq = 0;
->  	u32 dest_vrq = 0;
->  	u16 msg_id;
->  	int err;
->  
->  	mana_hwc_get_msg_index(hwc, &msg_id);
-> +	ac = (struct mana_context *)hwc->gdma_dev->driver_data;
+static BLOCKING_NOTIFIER_HEAD(wbrf_chain_head);
 
-Ditto.
+int wbrf_register_notifier(struct notifier_block *nb)
+{
+     return blocking_notifier_chain_register(&wbrf_chain_head, nb);
+}
+EXPORT_SYMBOL_GPL(wbrf_register_notifier);
 
-...
+int wbrf_unregister_notifier(struct notifier_block *nb)
+{
+     return blocking_notifier_chain_unregister(&wbrf_chain_head, nb);
+}
+EXPORT_SYMBOL_GPL(wbrf_unregister_notifier);
 
-> diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> index d907727c7b7a..24f5508d2979 100644
-> --- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-> +++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-> @@ -2330,7 +2330,10 @@ static int mana_dealloc_queues(struct net_device *ndev)
->  	struct mana_port_context *apc = netdev_priv(ndev);
->  	struct gdma_dev *gd = apc->ac->gdma_dev;
->  	struct mana_txq *txq;
-> +	struct sk_buff *skb;
-> +	struct mana_cq *cq;
->  	int i, err;
-> +	unsigned long timeout;
+And consumer would need to call it, but only if CONFIG_WBRF_ACPI isn't set.
 
-Please use reverse xmas tree - longest line to shortest - for
-local variable declarations in Networking code.
+Add/remove functions can easily call something like:
 
-...
+blocking_notifier_call_chain(&wbrf_chain_head, action, data);
 
-> diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-> index 9eef19972845..34f5d8e06ede 100644
-> --- a/include/net/mana/mana.h
-> +++ b/include/net/mana/mana.h
-> @@ -361,6 +361,8 @@ struct mana_context {
->  	struct mana_eq *eqs;
->  
->  	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
-> +
-> +	bool vf_unload_timeout;
+With all of this complexity and (effectively) dead code for ACPI vs non-ACPI
+path I really have to ask why wouldn't a non-AMD implementation be able to
+do this as ACPI?
 
-Perhaps it is not important, but on x86_54 there is a 6 byte hole in the first
-cacheline after num_ports where this could go.
-
-pahole reports:
-
-struct mana_context {
-	struct gdma_dev *          gdma_dev;             /*     0     8 */
-	u16                        num_ports;            /*     8     2 */
-
-	/* XXX 6 bytes hole, try to pack */
-
-	struct mana_eq *           eqs;                  /*    16     8 */
-	struct net_device *        ports[256];           /*    24  2048 */
-	/* --- cacheline 32 boundary (2048 bytes) was 24 bytes ago --- */
-	bool                       vf_unload_timeout;    /*  2072     1 */
-
-	/* size: 2080, cachelines: 33, members: 5 */
-	/* sum members: 2067, holes: 1, sum holes: 6 */
-	/* padding: 7 */
-	/* last cacheline: 32 bytes */
-};
-
--- 
-pw-bot: changes-requested
+I don't see why it couldn't be a DT/ACPI hybrid solution for ARM64.
 
 
