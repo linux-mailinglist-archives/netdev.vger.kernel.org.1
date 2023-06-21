@@ -1,39 +1,57 @@
-Return-Path: <netdev+bounces-12542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E198737F6A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:19:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 22937737F52
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:11:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFC431C20752
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:19:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AD351C20DCD
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:11:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F5C4101D4;
-	Wed, 21 Jun 2023 10:18:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA254DDDF;
+	Wed, 21 Jun 2023 10:11:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 44943101D1
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:18:30 +0000 (UTC)
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C394E1FCD;
-	Wed, 21 Jun 2023 03:18:04 -0700 (PDT)
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9044C8D7;
+	Wed, 21 Jun 2023 10:11:37 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F800210D;
+	Wed, 21 Jun 2023 03:11:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
+	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
+	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
+	:Resent-Message-ID:In-Reply-To:References;
+	bh=UVbv8VVSUNeWoPkXuNSC/yPOTPULonyDYBh7TllQm/0=; b=RHT88/9KV8+k4Gdf59yOAM60r7
+	FoPeKeGhyLbcbR9yq1Q6mF3BwL28LGY+2la/wXw2KR917ItyOwCYTzNV2byQPJUBwKMPFy4PyQYcc
+	9UK2cwzTDNk7PPeVGgGYcSGKEUpyRMfjqDjjUCowcUMQ6YV6f8PQJ/C0scoz2tu9pDoWmR/xQRkpu
+	Wo/k9YEGpHOqG0Yu9sG8iwEURTbfxuOfKTAvdyo34SwVngMPEfUDH0iMqBLPlov50yK6ngX63e6TD
+	r5VIcg+vKq61+5Tljuwph3GPQ7PBKK9YDuNYen0tYzwhtIcjq5ZtBCZuru6pgTP+OWE30/mwDAd4Q
+	ytCnUojg==;
+Received: from 44.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.44] helo=localhost)
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qBuo1-000Fcr-2N; Wed, 21 Jun 2023 12:11:17 +0200
+From: Daniel Borkmann <daniel@iogearbox.net>
+To: davem@davemloft.net
+Cc: kuba@kernel.org,
 	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net 14/14] netfilter: nf_tables: Fix for deleting base chains with payload
-Date: Wed, 21 Jun 2023 12:07:31 +0200
-Message-Id: <20230621100731.68068-15-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230621100731.68068-1-pablo@netfilter.org>
-References: <20230621100731.68068-1-pablo@netfilter.org>
+	edumazet@google.com,
+	daniel@iogearbox.net,
+	ast@kernel.org,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: pull-request: bpf 2023-06-21
+Date: Wed, 21 Jun 2023 12:11:16 +0200
+Message-Id: <20230621101116.16122-1-daniel@iogearbox.net>
+X-Mailer: git-send-email 2.21.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,71 +59,91 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26946/Wed Jun 21 09:30:19 2023)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Phil Sutter <phil@nwl.cc>
+Hi David, hi Jakub, hi Paolo, hi Eric,
 
-When deleting a base chain, iptables-nft simply submits the whole chain
-to the kernel, including the NFTA_CHAIN_HOOK attribute. The new code
-added by fixed commit then turned this into a chain update, destroying
-the hook but not the chain itself. Detect the situation by checking if
-the chain type is either netdev or inet/ingress.
+The following pull-request contains BPF updates for your *net* tree.
 
-Fixes: 7d937b107108f ("netfilter: nf_tables: support for deleting devices in an existing netdev chain")
-Signed-off-by: Phil Sutter <phil@nwl.cc>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nf_tables_api.c | 16 +++++++++-------
- 1 file changed, 9 insertions(+), 7 deletions(-)
+We've added 7 non-merge commits during the last 14 day(s) which contain
+a total of 7 files changed, 181 insertions(+), 15 deletions(-).
 
-diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index c1db2f4b2aa4..4c7937fd803f 100644
---- a/net/netfilter/nf_tables_api.c
-+++ b/net/netfilter/nf_tables_api.c
-@@ -2811,21 +2811,18 @@ static int nf_tables_newchain(struct sk_buff *skb, const struct nfnl_info *info,
- 	return nf_tables_addchain(&ctx, family, genmask, policy, flags, extack);
- }
- 
--static int nft_delchain_hook(struct nft_ctx *ctx, struct nft_chain *chain,
-+static int nft_delchain_hook(struct nft_ctx *ctx,
-+			     struct nft_base_chain *basechain,
- 			     struct netlink_ext_ack *extack)
- {
-+	const struct nft_chain *chain = &basechain->chain;
- 	const struct nlattr * const *nla = ctx->nla;
- 	struct nft_chain_hook chain_hook = {};
--	struct nft_base_chain *basechain;
- 	struct nft_hook *this, *hook;
- 	LIST_HEAD(chain_del_list);
- 	struct nft_trans *trans;
- 	int err;
- 
--	if (!nft_is_base_chain(chain))
--		return -EOPNOTSUPP;
--
--	basechain = nft_base_chain(chain);
- 	err = nft_chain_parse_hook(ctx->net, basechain, nla, &chain_hook,
- 				   ctx->family, chain->flags, extack);
- 	if (err < 0)
-@@ -2910,7 +2907,12 @@ static int nf_tables_delchain(struct sk_buff *skb, const struct nfnl_info *info,
- 		if (chain->flags & NFT_CHAIN_HW_OFFLOAD)
- 			return -EOPNOTSUPP;
- 
--		return nft_delchain_hook(&ctx, chain, extack);
-+		if (nft_is_base_chain(chain)) {
-+			struct nft_base_chain *basechain = nft_base_chain(chain);
-+
-+			if (nft_base_chain_netdev(table->family, basechain->ops.hooknum))
-+				return nft_delchain_hook(&ctx, basechain, extack);
-+		}
- 	}
- 
- 	if (info->nlh->nlmsg_flags & NLM_F_NONREC &&
--- 
-2.30.2
+The main changes are:
 
+1) Fix a verifier id tracking issue with scalars upon spill, from Maxim Mikityanskiy.
+
+2) Fix NULL dereference if an exception is generated while a BPF subprogram is running,
+   from Krister Johansen.
+
+3) Fix a BTF verification failure when compiling kernel with LLVM_IAS=0, from Florent Revest.
+
+4) Fix expected_attach_type enforcement for kprobe_multi link, from Jiri Olsa.
+
+5) Fix a bpf_jit_dump issue for x86_64 to pick the correct JITed image, from Yonghong Song.
+
+Please consider pulling these changes from:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+Thanks a lot!
+
+Also thanks to reporters, reviewers and testers of commits in this pull-request:
+
+Andrii Nakryiko, Ilya Leoshkevich, Song Liu, Yonghong Song
+
+----------------------------------------------------------------
+
+The following changes since commit 182620ab3660c5a9098ffaa0e8a898e41b164987:
+
+  Merge tag 'batadv-net-pullrequest-20230607' of git://git.open-mesh.org/linux-merge (2023-06-07 21:56:01 -0700)
+
+are available in the Git repository at:
+
+  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
+
+for you to fetch changes up to db8eae6bc5c702d8e3ab2d0c6bb5976c131576eb:
+
+  bpf: Force kprobe multi expected_attach_type for kprobe_multi link (2023-06-21 10:40:26 +0200)
+
+----------------------------------------------------------------
+bpf-for-netdev
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'bpf: fix NULL dereference during extable search'
+
+Florent Revest (1):
+      bpf/btf: Accept function names that contain dots
+
+Jiri Olsa (1):
+      bpf: Force kprobe multi expected_attach_type for kprobe_multi link
+
+Krister Johansen (2):
+      bpf: ensure main program has an extable
+      selftests/bpf: add a test for subprogram extables
+
+Maxim Mikityanskiy (2):
+      bpf: Fix verifier id tracking of scalars on spill
+      selftests/bpf: Add test cases to assert proper ID tracking on spill
+
+Yonghong Song (1):
+      bpf: Fix a bpf_jit_dump issue for x86_64 with sysctl bpf_jit_enable.
+
+ arch/x86/net/bpf_jit_comp.c                        |  2 +-
+ kernel/bpf/btf.c                                   | 20 +++---
+ kernel/bpf/syscall.c                               |  5 ++
+ kernel/bpf/verifier.c                              | 10 ++-
+ .../selftests/bpf/prog_tests/subprogs_extable.c    | 29 ++++++++
+ .../selftests/bpf/progs/test_subprogs_extable.c    | 51 ++++++++++++++
+ .../selftests/bpf/progs/verifier_spill_fill.c      | 79 ++++++++++++++++++++++
+ 7 files changed, 181 insertions(+), 15 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/subprogs_extable.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_subprogs_extable.c
 
