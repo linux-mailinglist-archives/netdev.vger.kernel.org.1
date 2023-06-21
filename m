@@ -1,149 +1,231 @@
-Return-Path: <netdev+bounces-12532-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12533-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 22937737F52
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:11:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6EFE737F57
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2AD351C20DCD
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:11:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98EC71C20DFB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:15:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA254DDDF;
-	Wed, 21 Jun 2023 10:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FC2FDF58;
+	Wed, 21 Jun 2023 10:15:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9044C8D7;
-	Wed, 21 Jun 2023 10:11:37 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F800210D;
-	Wed, 21 Jun 2023 03:11:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:MIME-Version:
-	Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=UVbv8VVSUNeWoPkXuNSC/yPOTPULonyDYBh7TllQm/0=; b=RHT88/9KV8+k4Gdf59yOAM60r7
-	FoPeKeGhyLbcbR9yq1Q6mF3BwL28LGY+2la/wXw2KR917ItyOwCYTzNV2byQPJUBwKMPFy4PyQYcc
-	9UK2cwzTDNk7PPeVGgGYcSGKEUpyRMfjqDjjUCowcUMQ6YV6f8PQJ/C0scoz2tu9pDoWmR/xQRkpu
-	Wo/k9YEGpHOqG0Yu9sG8iwEURTbfxuOfKTAvdyo34SwVngMPEfUDH0iMqBLPlov50yK6ngX63e6TD
-	r5VIcg+vKq61+5Tljuwph3GPQ7PBKK9YDuNYen0tYzwhtIcjq5ZtBCZuru6pgTP+OWE30/mwDAd4Q
-	ytCnUojg==;
-Received: from 44.248.197.178.dynamic.dsl-lte-bonding.zhbmb00p-msn.res.cust.swisscom.ch ([178.197.248.44] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qBuo1-000Fcr-2N; Wed, 21 Jun 2023 12:11:17 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf 2023-06-21
-Date: Wed, 21 Jun 2023 12:11:16 +0200
-Message-Id: <20230621101116.16122-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41220C8D7
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:15:43 +0000 (UTC)
+Received: from mail-wr1-f44.google.com (mail-wr1-f44.google.com [209.85.221.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 605D819AD;
+	Wed, 21 Jun 2023 03:15:21 -0700 (PDT)
+Received: by mail-wr1-f44.google.com with SMTP id ffacd0b85a97d-3110f94915eso1276962f8f.0;
+        Wed, 21 Jun 2023 03:15:21 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687342520; x=1689934520;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=ufw3XdlG8f50ui3w7eQOIJRzxVEkWkebHT8qYe+C8qE=;
+        b=Tb3kTekwJ4StJ0epSuxZl3xeTnKYnxAUCCi6T3lMRRlXtnT5Cel7ZOVxdmpboMHFMw
+         H/w4NTatvgTSC8ORl4aSxPsw574J/BqHzU/jN7Z1X2esVxLoS2N+I+ucQhggxQzJdP+v
+         pYM1p5C07ZWGhbAXrLagL33pZSAsijIz/EJqb8GfoRgth97OIoTpZgHrIragdGkzZH06
+         BCuPZwgK6i2gvwK12nLfUrPKlWvNX7zyMdhxsemAZdteF44CKtImheLSi0NNRj3shrqz
+         l8kYyjmu2AEKVHdGt8N6sb7I5GupBeG79yXEGNEE3IYJVW7qRilz44VF3xe7gdiatPAh
+         L0pg==
+X-Gm-Message-State: AC+VfDxFMvRkrHVgf3cyVJpoRl9kbeN6LZta2bkA8v2GA4ls+d7bbvNx
+	Ho8J2EmhCus4KL4CIYkxD+U=
+X-Google-Smtp-Source: ACHHUZ4tsTabGuEP0pusOoHjithDqeGTXPlhvE5IPuJ0eWoLH8lfxNjVcT1Icfws8enUiCQS9OC42A==
+X-Received: by 2002:a5d:468d:0:b0:30a:d0a0:266e with SMTP id u13-20020a5d468d000000b0030ad0a0266emr14265990wrq.2.1687342519535;
+        Wed, 21 Jun 2023 03:15:19 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id p9-20020adfcc89000000b003113f0ba414sm4082968wrj.65.2023.06.21.03.15.16
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 21 Jun 2023 03:15:18 -0700 (PDT)
+Message-ID: <87f547b0-7826-b232-cd01-c879b6829951@grimberg.me>
+Date: Wed, 21 Jun 2023 13:15:15 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26946/Wed Jun 21 09:30:19 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net-next v3 10/18] nvme/host: Use
+ sendmsg(MSG_SPLICE_PAGES) rather then sendpage
+Content-Language: en-US
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Alexander Duyck <alexander.duyck@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
+ Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+ Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+ linux-nvme@lists.infradead.org
+References: <20230620145338.1300897-1-dhowells@redhat.com>
+ <20230620145338.1300897-11-dhowells@redhat.com>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230620145338.1300897-11-dhowells@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
+One comment:
 
-The following pull-request contains BPF updates for your *net* tree.
+format for title in nvme-tcp is:
 
-We've added 7 non-merge commits during the last 14 day(s) which contain
-a total of 7 files changed, 181 insertions(+), 15 deletions(-).
+"nvme-tcp: ..." for host patches, and
+"nvmet-tcp: ..." for target patches.
 
-The main changes are:
+But this can be fixed up when applying the patch set.
 
-1) Fix a verifier id tracking issue with scalars upon spill, from Maxim Mikityanskiy.
+Other than that, for both nvme patches:
+Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
 
-2) Fix NULL dereference if an exception is generated while a BPF subprogram is running,
-   from Krister Johansen.
+What tree will this be going from btw?
 
-3) Fix a BTF verification failure when compiling kernel with LLVM_IAS=0, from Florent Revest.
-
-4) Fix expected_attach_type enforcement for kprobe_multi link, from Jiri Olsa.
-
-5) Fix a bpf_jit_dump issue for x86_64 to pick the correct JITed image, from Yonghong Song.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrii Nakryiko, Ilya Leoshkevich, Song Liu, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit 182620ab3660c5a9098ffaa0e8a898e41b164987:
-
-  Merge tag 'batadv-net-pullrequest-20230607' of git://git.open-mesh.org/linux-merge (2023-06-07 21:56:01 -0700)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf.git tags/for-netdev
-
-for you to fetch changes up to db8eae6bc5c702d8e3ab2d0c6bb5976c131576eb:
-
-  bpf: Force kprobe multi expected_attach_type for kprobe_multi link (2023-06-21 10:40:26 +0200)
-
-----------------------------------------------------------------
-bpf-for-netdev
-
-----------------------------------------------------------------
-Alexei Starovoitov (1):
-      Merge branch 'bpf: fix NULL dereference during extable search'
-
-Florent Revest (1):
-      bpf/btf: Accept function names that contain dots
-
-Jiri Olsa (1):
-      bpf: Force kprobe multi expected_attach_type for kprobe_multi link
-
-Krister Johansen (2):
-      bpf: ensure main program has an extable
-      selftests/bpf: add a test for subprogram extables
-
-Maxim Mikityanskiy (2):
-      bpf: Fix verifier id tracking of scalars on spill
-      selftests/bpf: Add test cases to assert proper ID tracking on spill
-
-Yonghong Song (1):
-      bpf: Fix a bpf_jit_dump issue for x86_64 with sysctl bpf_jit_enable.
-
- arch/x86/net/bpf_jit_comp.c                        |  2 +-
- kernel/bpf/btf.c                                   | 20 +++---
- kernel/bpf/syscall.c                               |  5 ++
- kernel/bpf/verifier.c                              | 10 ++-
- .../selftests/bpf/prog_tests/subprogs_extable.c    | 29 ++++++++
- .../selftests/bpf/progs/test_subprogs_extable.c    | 51 ++++++++++++++
- .../selftests/bpf/progs/verifier_spill_fill.c      | 79 ++++++++++++++++++++++
- 7 files changed, 181 insertions(+), 15 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/subprogs_extable.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_subprogs_extable.c
+On 6/20/23 17:53, David Howells wrote:
+> When transmitting data, call down into TCP using a single sendmsg with
+> MSG_SPLICE_PAGES to indicate that content should be spliced rather than
+> performing several sendmsg and sendpage calls to transmit header, data
+> pages and trailer.
+> 
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> Tested-by: Sagi Grimberg <sagi@grimberg.me>
+> Acked-by: Willem de Bruijn <willemb@google.com>
+> cc: Keith Busch <kbusch@kernel.org>
+> cc: Jens Axboe <axboe@fb.com>
+> cc: Christoph Hellwig <hch@lst.de>
+> cc: Chaitanya Kulkarni <kch@nvidia.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: linux-nvme@lists.infradead.org
+> cc: netdev@vger.kernel.org
+> ---
+> 
+> Notes:
+>      ver #2)
+>       - Wrap lines at 80.
+>      
+>      ver #3)
+>       - Split nvme/host from nvme/target changes.
+> 
+>   drivers/nvme/host/tcp.c | 46 +++++++++++++++++++++--------------------
+>   1 file changed, 24 insertions(+), 22 deletions(-)
+> 
+> diff --git a/drivers/nvme/host/tcp.c b/drivers/nvme/host/tcp.c
+> index bf0230442d57..6f31cdbb696a 100644
+> --- a/drivers/nvme/host/tcp.c
+> +++ b/drivers/nvme/host/tcp.c
+> @@ -997,25 +997,25 @@ static int nvme_tcp_try_send_data(struct nvme_tcp_request *req)
+>   	u32 h2cdata_left = req->h2cdata_left;
+>   
+>   	while (true) {
+> +		struct bio_vec bvec;
+> +		struct msghdr msg = {
+> +			.msg_flags = MSG_DONTWAIT | MSG_SPLICE_PAGES,
+> +		};
+>   		struct page *page = nvme_tcp_req_cur_page(req);
+>   		size_t offset = nvme_tcp_req_cur_offset(req);
+>   		size_t len = nvme_tcp_req_cur_length(req);
+>   		bool last = nvme_tcp_pdu_last_send(req, len);
+>   		int req_data_sent = req->data_sent;
+> -		int ret, flags = MSG_DONTWAIT;
+> +		int ret;
+>   
+>   		if (last && !queue->data_digest && !nvme_tcp_queue_more(queue))
+> -			flags |= MSG_EOR;
+> +			msg.msg_flags |= MSG_EOR;
+>   		else
+> -			flags |= MSG_MORE | MSG_SENDPAGE_NOTLAST;
+> +			msg.msg_flags |= MSG_MORE;
+>   
+> -		if (sendpage_ok(page)) {
+> -			ret = kernel_sendpage(queue->sock, page, offset, len,
+> -					flags);
+> -		} else {
+> -			ret = sock_no_sendpage(queue->sock, page, offset, len,
+> -					flags);
+> -		}
+> +		bvec_set_page(&bvec, page, len, offset);
+> +		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, len);
+> +		ret = sock_sendmsg(queue->sock, &msg);
+>   		if (ret <= 0)
+>   			return ret;
+>   
+> @@ -1054,22 +1054,24 @@ static int nvme_tcp_try_send_cmd_pdu(struct nvme_tcp_request *req)
+>   {
+>   	struct nvme_tcp_queue *queue = req->queue;
+>   	struct nvme_tcp_cmd_pdu *pdu = nvme_tcp_req_cmd_pdu(req);
+> +	struct bio_vec bvec;
+> +	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_SPLICE_PAGES, };
+>   	bool inline_data = nvme_tcp_has_inline_data(req);
+>   	u8 hdgst = nvme_tcp_hdgst_len(queue);
+>   	int len = sizeof(*pdu) + hdgst - req->offset;
+> -	int flags = MSG_DONTWAIT;
+>   	int ret;
+>   
+>   	if (inline_data || nvme_tcp_queue_more(queue))
+> -		flags |= MSG_MORE | MSG_SENDPAGE_NOTLAST;
+> +		msg.msg_flags |= MSG_MORE;
+>   	else
+> -		flags |= MSG_EOR;
+> +		msg.msg_flags |= MSG_EOR;
+>   
+>   	if (queue->hdr_digest && !req->offset)
+>   		nvme_tcp_hdgst(queue->snd_hash, pdu, sizeof(*pdu));
+>   
+> -	ret = kernel_sendpage(queue->sock, virt_to_page(pdu),
+> -			offset_in_page(pdu) + req->offset, len,  flags);
+> +	bvec_set_virt(&bvec, (void *)pdu + req->offset, len);
+> +	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, len);
+> +	ret = sock_sendmsg(queue->sock, &msg);
+>   	if (unlikely(ret <= 0))
+>   		return ret;
+>   
+> @@ -1093,6 +1095,8 @@ static int nvme_tcp_try_send_data_pdu(struct nvme_tcp_request *req)
+>   {
+>   	struct nvme_tcp_queue *queue = req->queue;
+>   	struct nvme_tcp_data_pdu *pdu = nvme_tcp_req_data_pdu(req);
+> +	struct bio_vec bvec;
+> +	struct msghdr msg = { .msg_flags = MSG_DONTWAIT | MSG_MORE, };
+>   	u8 hdgst = nvme_tcp_hdgst_len(queue);
+>   	int len = sizeof(*pdu) - req->offset + hdgst;
+>   	int ret;
+> @@ -1101,13 +1105,11 @@ static int nvme_tcp_try_send_data_pdu(struct nvme_tcp_request *req)
+>   		nvme_tcp_hdgst(queue->snd_hash, pdu, sizeof(*pdu));
+>   
+>   	if (!req->h2cdata_left)
+> -		ret = kernel_sendpage(queue->sock, virt_to_page(pdu),
+> -				offset_in_page(pdu) + req->offset, len,
+> -				MSG_DONTWAIT | MSG_MORE | MSG_SENDPAGE_NOTLAST);
+> -	else
+> -		ret = sock_no_sendpage(queue->sock, virt_to_page(pdu),
+> -				offset_in_page(pdu) + req->offset, len,
+> -				MSG_DONTWAIT | MSG_MORE);
+> +		msg.msg_flags |= MSG_SPLICE_PAGES;
+> +
+> +	bvec_set_virt(&bvec, (void *)pdu + req->offset, len);
+> +	iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bvec, 1, len);
+> +	ret = sock_sendmsg(queue->sock, &msg);
+>   	if (unlikely(ret <= 0))
+>   		return ret;
+>   
+> 
 
