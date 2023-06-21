@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-12786-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12787-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 29546738ECB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:29:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8EB91738ECF
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:30:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D82B22816BF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:29:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA2241C20F40
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:30:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 254461C767;
-	Wed, 21 Jun 2023 18:26:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24DA51D2BF;
+	Wed, 21 Jun 2023 18:26:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1AC441ACA3
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:26:32 +0000 (UTC)
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D7A91BFD
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:28 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-31109cd8d8cso6182413f8f.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 134D11ACA3
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:26:33 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E922E1FC8
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:29 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-312863a983fso1347503f8f.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687371987; x=1689963987;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687371988; x=1689963988;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=QwyUb1LcLxFuKvlYDOLM+hUXxmW+mTunlzrn4iVWnOo=;
-        b=boN5Wecqu/zA+UEwtUa4Aoml/2yCbwhKRxRfb5rOLyKwLaoKa58ptvFtU3Qx2jCceU
-         3+8vDuDuUrQZJ06Vu1speeZqUAVDwwGO6lyhuOaAbUGhDUL6yqpkqJB1Pf5TmA0eOpWz
-         eRnwmany7hYV7wAV5ktHqY+Q1Kvoe+ZNHdyNLPYphC77shw4bYJw3thFnfmxfYeonCWq
-         hT9oD2Q9IOZCHKcig9cw1VvBkfOx/AAI96BNjF7SW6HMEXp8KZZZ14fvOHRgapia2ksj
-         O9fzy5zhPYJg246QedmUb2UbqjplFaF3rK8ryeZRjPKoieB04ifPgQv5ScK353VxSYQy
-         5XDQ==
+        bh=/ds8NiiaWx7S6UP8O9D/ooCMxtDTCkVYtSDsiDSpfu8=;
+        b=HL85Tufcp3fRrygkYMd0TVOflu/rc70QpIsmTi6ffrRAQyZbi4wqOz8kH8us4ieUHr
+         Hu6SIvmaFDT+2zQ7cJWGJXPq/sFTXjEM7EXfuopbvY6WZ9nij1MwKB4UsI1O7bG4JA9V
+         j0jM8Qbh0JEFgIbDY/dqUhjwBz3BjNJ0LkEKz1MsC4wTOcmQhsdex7nSA//2ZWUlVfyU
+         /PiU1dQVxsJF+CMrQpsNulRf1DPoramDDii2FlRcI/fe5Tyvdm/vhvk65w2pWjjxpKNh
+         dpPnVVZNM4cbWVYtWmOX0gcOssUw7nZdVG4uyKl3PQ1MbTieo64ihbQibdCqjc9l0Qzl
+         VuLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687371987; x=1689963987;
+        d=1e100.net; s=20221208; t=1687371988; x=1689963988;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=QwyUb1LcLxFuKvlYDOLM+hUXxmW+mTunlzrn4iVWnOo=;
-        b=KCpSXvyVto9vpxIVEnemjF0hhE//AyN0llR/caytITNY/ZtIOr4Jb6WVsUQx03KzqX
-         hAolxkU2nVZUEjg2M7NKolfcNcPCsmqR6uRXLlyA0do0RDEoIV/P/PiLufO9/2bHNadj
-         RW7j9A2WDlm5cxRw/NI+VC0kRnW9nZGP2n0J9xvCtJwUb2vE8qkJnW9K9Ya94ZUoY6Y9
-         dlvVuEMLRlV1oNUqP+stsKmUNlMBAlE55ViR0EvWrzOo+l/LiY4rG9oOTcdats+9m7y9
-         RivmHEdgB8GORHFR1wS/Tl6+9CciEH++jeHm4XQUwBBwT6Q2IGoYGG0f+EAQf+/zDJOl
-         0Myw==
-X-Gm-Message-State: AC+VfDydvy7qSeQRMaeyp0Z+zKxIjY6F0YNwFXKe2VGIuqyKWWS/Hn0Z
-	eclf/vBboXoNdYZJr3Z+XXqi1A==
-X-Google-Smtp-Source: ACHHUZ4fDyzUF2+3iPLY0BziOFpFgzjxW7uoq1bB0cyrCC50xRJ1EXO/ysLqYUgmuqATxsM3yuLRoQ==
-X-Received: by 2002:adf:f406:0:b0:30f:c933:49b2 with SMTP id g6-20020adff406000000b0030fc93349b2mr13223537wro.24.1687371986863;
-        Wed, 21 Jun 2023 11:26:26 -0700 (PDT)
+        bh=/ds8NiiaWx7S6UP8O9D/ooCMxtDTCkVYtSDsiDSpfu8=;
+        b=a08kvoZfr78sv6KMFT3AVjfqaP5ep7LMv9VgfNsRb+NVc6wmbwAuM/sgtMsLfL0BNi
+         4HOZWHvvIvwjuo1pFsEeCZkPLVTnP4m6lt3mkH08q/cAE+scskl216i1tcEIZuLY+kuc
+         OEyeOVgikTE+wSO0/Ecj8VVSQKbkYFfnmZu+Q1NnKQvKsYisq+NnOJpLKT53pHFBKGgm
+         riheAoL0oa21h8N4GpIjGIg3s81Csk29tvReXktsI9FWWINeVzF/ZtmWKUgJJH7R3xyr
+         ydo6fPJSUkAechfsCHCwpLecr6x2r6zIVv2Yt9vHroxQkqBJJp03sC/f1CQPu+Bfc8hE
+         npng==
+X-Gm-Message-State: AC+VfDwmSvNYEWM1iKhfWKsp2kD0iSGdiy/jchEm5ZpFnDMuK5LkN0K/
+	qYssSS6aqeH2FK58494g7dncRg==
+X-Google-Smtp-Source: ACHHUZ4lLdaAdUOFO06bSwskKbze5TICqWInKMtVygi44QZUdBPafa+94OQU2ihmZOLwJTfHpXjiyA==
+X-Received: by 2002:a5d:6685:0:b0:30f:bc92:a537 with SMTP id l5-20020a5d6685000000b0030fbc92a537mr10988495wru.33.1687371988168;
+        Wed, 21 Jun 2023 11:26:28 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:a69f:8ee3:6907:ccdf])
-        by smtp.gmail.com with ESMTPSA id z13-20020adff74d000000b0030af15d7e41sm5176994wrp.4.2023.06.21.11.26.25
+        by smtp.gmail.com with ESMTPSA id z13-20020adff74d000000b0030af15d7e41sm5176994wrp.4.2023.06.21.11.26.27
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 11:26:26 -0700 (PDT)
+        Wed, 21 Jun 2023 11:26:27 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -83,9 +83,9 @@ Cc: netdev@vger.kernel.org,
 	linux-tegra@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH net-next 11/12] net: stmmac: replace the rx_clk_runs_in_lpi field with a flag
-Date: Wed, 21 Jun 2023 20:25:57 +0200
-Message-Id: <20230621182558.544417-12-brgl@bgdev.pl>
+Subject: [PATCH net-next 12/12] net: stmmac: replace the en_tx_lpi_clockgating field with a flag
+Date: Wed, 21 Jun 2023 20:25:58 +0200
+Message-Id: <20230621182558.544417-13-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230621182558.544417-1-brgl@bgdev.pl>
 References: <20230621182558.544417-1-brgl@bgdev.pl>
@@ -110,55 +110,56 @@ simple bitfield flag.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 ---
- drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 2 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac_main.c       | 3 ++-
- include/linux/stmmac.h                                  | 2 +-
- 3 files changed, 4 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c     | 2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c | 4 ++--
+ include/linux/stmmac.h                                | 2 +-
+ 3 files changed, 4 insertions(+), 4 deletions(-)
 
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index 79e196397aea..743f2261b964 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -790,7 +790,7 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 	if (of_property_read_bool(np, "snps,tso"))
- 		plat_dat->flags |= STMMAC_FLAG_TSO_EN;
- 	if (of_device_is_compatible(np, "qcom,qcs404-ethqos"))
--		plat_dat->rx_clk_runs_in_lpi = 1;
-+		plat_dat->flags |= STMMAC_FLAG_RX_CLK_RUNS_IN_LPI;
- 	if (data->has_integrated_pcs)
- 		plat_dat->flags |= STMMAC_FLAG_HAS_INTEGRATED_PCS;
- 
 diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-index ebe82e7b50fc..2d68a6e84b0e 100644
+index 2d68a6e84b0e..efe85b086abe 100644
 --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
 +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-@@ -1085,7 +1085,8 @@ static void stmmac_mac_link_up(struct phylink_config *config,
- 	stmmac_mac_set(priv, priv->ioaddr, true);
- 	if (phy && priv->dma_cap.eee) {
- 		priv->eee_active =
--			phy_init_eee(phy, !priv->plat->rx_clk_runs_in_lpi) >= 0;
-+			phy_init_eee(phy, !(priv->plat->flags &
-+				STMMAC_FLAG_RX_CLK_RUNS_IN_LPI)) >= 0;
- 		priv->eee_enabled = stmmac_eee_init(priv);
- 		priv->tx_lpi_enabled = priv->eee_enabled;
- 		stmmac_set_eee_pls(priv, priv->hw, true);
+@@ -421,7 +421,7 @@ static int stmmac_enable_eee_mode(struct stmmac_priv *priv)
+ 	/* Check and enter in LPI mode */
+ 	if (!priv->tx_path_in_lpi_mode)
+ 		stmmac_set_eee_mode(priv, priv->hw,
+-				priv->plat->en_tx_lpi_clockgating);
++			priv->plat->flags & STMMAC_FLAG_EN_TX_LPI_CLOCKGATING);
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+index 5a67af4526c7..0be3113197b1 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_platform.c
+@@ -465,8 +465,8 @@ stmmac_probe_config_dt(struct platform_device *pdev, u8 *mac)
+ 	plat->force_sf_dma_mode =
+ 		of_property_read_bool(np, "snps,force_sf_dma_mode");
+ 
+-	plat->en_tx_lpi_clockgating =
+-		of_property_read_bool(np, "snps,en-tx-lpi-clockgating");
++	if (of_property_read_bool(np, "snps,en-tx-lpi-clockgating"))
++		plat->flags |= STMMAC_FLAG_EN_TX_LPI_CLOCKGATING;
+ 
+ 	/* Set the maxmtu to a default of JUMBO_LEN in case the
+ 	 * parameter is not present in the device tree.
 diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
-index 47708ddd57fd..c3769dad8238 100644
+index c3769dad8238..ef67dba775d0 100644
 --- a/include/linux/stmmac.h
 +++ b/include/linux/stmmac.h
-@@ -214,6 +214,7 @@ struct dwmac4_addrs {
- #define STMMAC_FLAG_MULTI_MSI_EN		BIT(7)
+@@ -215,6 +215,7 @@ struct dwmac4_addrs {
  #define STMMAC_FLAG_EXT_SNAPSHOT_EN		BIT(8)
  #define STMMAC_FLAG_INT_SNAPSHOT_EN		BIT(9)
-+#define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
+ #define STMMAC_FLAG_RX_CLK_RUNS_IN_LPI		BIT(10)
++#define STMMAC_FLAG_EN_TX_LPI_CLOCKGATING	BIT(11)
  
  struct plat_stmmacenet_data {
  	int bus_id;
 @@ -280,7 +281,6 @@ struct plat_stmmacenet_data {
+ 	int has_gmac4;
  	int rss_en;
  	int mac_port_sel_speed;
- 	bool en_tx_lpi_clockgating;
--	bool rx_clk_runs_in_lpi;
+-	bool en_tx_lpi_clockgating;
  	int has_xgmac;
  	u8 vlan_fail_q;
  	unsigned int eee_usecs_rate;
