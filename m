@@ -1,197 +1,122 @@
-Return-Path: <netdev+bounces-12569-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12576-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E7C6738248
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:21:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2505E738269
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:51:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1A8028157C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:21:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D44A6281510
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:51:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06B3C11CB4;
-	Wed, 21 Jun 2023 11:21:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3D38134D7;
+	Wed, 21 Jun 2023 11:51:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5104C2F0
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:21:27 +0000 (UTC)
-Received: from mail-vk1-xa33.google.com (mail-vk1-xa33.google.com [IPv6:2607:f8b0:4864:20::a33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346A310D5
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 04:21:18 -0700 (PDT)
-Received: by mail-vk1-xa33.google.com with SMTP id 71dfb90a1353d-47560c8e057so247800e0c.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 04:21:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1687346477; x=1689938477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zicZyLnS1reU8dn+e8y3aZCUsBuI2pk4J/AOSJ4Fj70=;
-        b=tlo6FfXwpoWbQGMC/nTahJCIZuKCDP44BRTERwhgfGvSvghMuJkXeW95Bk27dXw4Lr
-         pDZJxws/1XyBqY0J3w+McbxLUpbRgSY6ysUzF9q/zRPcWkXD4YqFo4LU60RT0MbIVcJ9
-         +HigaRIbxEXjXMvMqg8ji+mI2l6bIFliIaNLa7cz0CZQlDm7UFLqjXTLbRF/FH5bEns9
-         2WUjHzBXhYLG7IvIaHI/Hz6GLLv1olYKlnX+iuOqONRCguOPPco31sJKqmmNqCUWeVLS
-         5X996QAAKm0/0/8JId1cvXMXdbmLCJGNIds+10BarI03sOuwUSMqvfu3Po69l/9g0xLx
-         uv1g==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687346477; x=1689938477;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=zicZyLnS1reU8dn+e8y3aZCUsBuI2pk4J/AOSJ4Fj70=;
-        b=AMjyy6tPrjQb86HEq+noToH/IxueLZK/cl1nPchRgCsO4ALR2O3iIPWjLQT/aQM9je
-         cNU/TMgonMHbnNurioV0ow4SaHS0ku6I30T7CLKW9KVx28bgPRx6TpKGKWjxWpDWZX2L
-         BCzc8Yyb8LL6EGIKCUgQXtx3kPqOaLmp7MH8dzFDt65hCigpl7uBkwIr7Szyh45jsYJL
-         p15esG0ICSqh5okrTxJh85g9elcwCOw8pD1PB02/N0hcSIv149b018Tg1zOQ6zKWIfc9
-         JAZyUQZ8TvmPtIPFVY/8+dAA1VKgRLB/Vkq2PC1aROzD5lXL65DRl8/UVcpCqjs5akNS
-         /+mg==
-X-Gm-Message-State: AC+VfDxqreRjJXFh6T2ktcbbwvXCDIRIu2Fn5u3eIYnB96VFR4pPJ+Ym
-	ARg6T7aIeHpl/eWE67QQyHYoCE/5YmtvLpF4i0d3yg==
-X-Google-Smtp-Source: ACHHUZ5zh7zzLsz3XZd9uyuugVpB8yJrdbo0pdJh/b0zLL0aBk99WsJZsNhBkBpyh++aQrovpgTRrucUS/ebboC+7BA=
-X-Received: by 2002:a1f:60cf:0:b0:471:6e65:576 with SMTP id
- u198-20020a1f60cf000000b004716e650576mr4063766vkb.3.1687346477306; Wed, 21
- Jun 2023 04:21:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E39B8C8CF
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:51:07 +0000 (UTC)
+X-Greylist: delayed 1440 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Wed, 21 Jun 2023 04:51:05 PDT
+Received: from fallback2.i.mail.ru (fallback2.i.mail.ru [79.137.243.68])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 346AF10E6;
+	Wed, 21 Jun 2023 04:51:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=inbox.ru; s=mail4;
+	h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=JdWgFEyvsv2csKxKfs0FCohIrTsdr/3DiIZZEszXHmE=;
+	t=1687348265;x=1687438265; 
+	b=E0vXwcb7BfbWZvmoUbuzpy/+W9zrws2wDOMYY+bnjZ7JmY3+3xm/rBhbVAuOGa+yDCDUSf03lSPPccchUlfL8gT9OmJfvtrRvISLxIrlKgMWLbLsUuJJH0H5TNc5NEtE8j936AWNhclY4crvC1BeB3cI2GKCijDWZwJACRKjvtjZ2pz6c/G89rLGiV8SWxWYpxXEP9n64coR1et/CQaB45U+eG+MYD5ZdgnUuNQ0xKRyJ5/SAr5/KDazGZ/QrwtIs+Esd2x/ZumpBf7KXr6hJWL/SyWLZJMehXvULk9+yCZCvT6sQ5C+S7Qtd9PVRaOWJEpxeAaCsc7+9Xr1s0Vw6g==;
+Received: from [10.161.55.49] (port=45888 helo=smtpng1.i.mail.ru)
+	by fallback2.i.mail.ru with esmtp (envelope-from <fido_max@inbox.ru>)
+	id 1qBvzL-00C1CV-2Q; Wed, 21 Jun 2023 14:27:03 +0300
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=inbox.ru; s=mail4;
+	h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=JdWgFEyvsv2csKxKfs0FCohIrTsdr/3DiIZZEszXHmE=;
+	t=1687346823;x=1687436823; 
+	b=kIxNiHQhXrN19GJcgqGq7J2LGexyvROXakpXU3Mi2wRdkBzOBqEJkIw5kUXgF0dvRg7LLO9h2hGuoqyVfp3HaAhYJMWIQmQr7NaSTSmo6kJHCORv7A0aChKP2lekEnbb9PSVBiX5Qq9njsOofSsvVvL7y5E3PP5BjwkyCivviWXpUxaJzdXPUkP00FhL7GC26GP5unOle8q8Q2fkOJORg0C5tOvFqsHCXWl/5AXEo0GNe1gK2fytcsBiVPLK3slbpE0Dm0Fezzm6NZZQvnWHw46NM/Fh9cX0e+1Y9HpMHm3Z2xa1mvNyudyQuGf0wHcSxC4U1xDaySzbzVTF5JDlPg==;
+Received: by smtpng1.m.smailru.net with esmtpa (envelope-from <fido_max@inbox.ru>)
+	id 1qBvz5-00068f-9O; Wed, 21 Jun 2023 14:26:47 +0300
+From: Maxim Kochetkov <fido_max@inbox.ru>
+To: netdev@vger.kernel.org
+Cc: Maxim Kochetkov <fido_max@inbox.ru>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/1] net: axienet: Move reset before DMA detection
+Date: Wed, 21 Jun 2023 14:26:30 +0300
+Message-Id: <20230621112630.154373-1-fido_max@inbox.ru>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230620184425.1179809-1-edumazet@google.com>
-In-Reply-To: <20230620184425.1179809-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Wed, 21 Jun 2023 07:21:06 -0400
-Message-ID: <CAM0EoM=Jbjod+bdKexkcBxpzvGfsbT1gb_wU+uRjTcPHH_SJKQ@mail.gmail.com>
-Subject: Re: [PATCH net] sch_netem: acquire qdisc lock in netem_change()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Cong Wang <xiyou.wangcong@gmail.com>, Jiri Pirko <jiri@resnulli.us>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Mailru-Src: smtp
+X-7564579A: EEAE043A70213CC8
+X-77F55803: 4F1203BC0FB41BD9978DF295B1C9A8BB9D84323826A48A4E6979DC33E17B8123182A05F5380850404C228DA9ACA6FE2718CDE42291E1BEF24F7F798CEE9A6143C2A7D04A29770631C1FAE79B3CD02C1C
+X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7922E451CE6E839B1EA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F790063745D431239A8C7DA08638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D88166C0AFA8F60B1B5CB1B6839C6649FC6F9789CCF6C18C3F8528715B7D10C86878DA827A17800CE77FFCE1C639F4728C9FA2833FD35BB23D9E625A9149C048EE26055571C92BF10FF6B57BC7E64490618DEB871D839B7333395957E7521B51C2DFABB839C843B9C08941B15DA834481F8AA50765F790063780B3000F7A6F2D7A389733CBF5DBD5E9B5C8C57E37DE458B9E9CE733340B9D5F3BBE47FD9DD3FB595F5C1EE8F4F765FC72CEEB2601E22B093A03B725D353964B0B7D0EA88DDEDAC722CA9DD8327EE4930A3850AC1BE2E73557739F23D657EF2BB5C8C57E37DE458BEDA766A37F9254B7
+X-C1DE0DAB: 0D63561A33F958A5039A3253B420BE8278B99395EBDC0501FAAD44C10F72E43BF87CCE6106E1FC07E67D4AC08A07B9B01DAA61796BF5227B9C5DF10A05D560A950611B66E3DA6D700B0A020F03D25A092FFDA4F57982C5F4CB5012B2E24CD356
+X-C8649E89: 1C3962B70DF3F0ADE00A9FD3E00BEEDF77DD89D51EBB7742D3581295AF09D3DF87807E0823442EA2ED31085941D9CD0AF7F820E7B07EA4CFC23662B37B557434663459EC48228DFD0FB7B98632BF9915B77A11FB90BECA9A245B1B6CBED8166AC17492877F82D9B8193AE7FE20AFF8D4140E9F220E5C2EC16E346BF9FA413E554C41F94D744909CEE921556F0E976A29E6EC0772259F8F8F8815B87D7EC76CB9
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojw7uTMtz3/lymtcgsLQrc0Q==
+X-Mailru-Sender: 689FA8AB762F73930F533AC2B33E986BE07CCC33A5272471D04C4951FF70F75B98CC072019C18A892CA7F8C7C9492E1F2F5E575105D0B01ADBE2EF17B331888EEAB4BC95F72C04283CDA0F3B3F5B9367
+X-Mras: Ok
+X-7564579A: 646B95376F6C166E
+X-77F55803: 6242723A09DB00B4E9028C5D3AAACA543326910168EF65999CF76EE81467C5E9B647ED114AB003ACE7E3040B4183954EC0AC3294C82D8AB1BE4A5DA2DF66D6CAACDAE828A7DFF3B8
+X-7FA49CB5: 0D63561A33F958A585B1B4DDE8AEA9363C3D52CEEB6AD0795DED24E97496E442CACD7DF95DA8FC8BD5E8D9A59859A8B6045ADF271E14A4E1
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5xhPKz0ZEsZ5k6NOOPWz5QAiZSCXKGQRq3/7KxbCLSB2ESzQkaOXqCBFZPLWFrEGlV1shfWe2EVcxl5toh0c/aCGOghz/frdRhzMe95NxDFdGZgddNfoakPgEQlcWJjaIQ==
+X-Mailru-MI: C000000000000800
+X-Mras: Ok
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 20, 2023 at 2:44=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> syzbot managed to trigger a divide error [1] in netem.
->
-> It could happen if q->rate changes while netem_enqueue()
-> is running, since q->rate is read twice.
->
-> It turns out netem_change() always lacked proper synchronization.
->
-> [1]
-> divide error: 0000 [#1] SMP KASAN
-> CPU: 1 PID: 7867 Comm: syz-executor.1 Not tainted 6.1.30-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
-oogle 05/25/2023
-> RIP: 0010:div64_u64 include/linux/math64.h:69 [inline]
-> RIP: 0010:packet_time_ns net/sched/sch_netem.c:357 [inline]
-> RIP: 0010:netem_enqueue+0x2067/0x36d0 net/sched/sch_netem.c:576
-> Code: 89 e2 48 69 da 00 ca 9a 3b 42 80 3c 28 00 4c 8b a4 24 88 00 00 00 7=
-4 0d 4c 89 e7 e8 c3 4f 3b fd 48 8b 4c 24 18 48 89 d8 31 d2 <49> f7 34 24 49=
- 01 c7 4c 8b 64 24 48 4d 01 f7 4c 89 e3 48 c1 eb 03
-> RSP: 0018:ffffc9000dccea60 EFLAGS: 00010246
-> RAX: 000001a442624200 RBX: 000001a442624200 RCX: ffff888108a4f000
-> RDX: 0000000000000000 RSI: 000000000000070d RDI: 000000000000070d
-> RBP: ffffc9000dcceb90 R08: ffffffff849c5e26 R09: fffffbfff10e1297
-> R10: 0000000000000000 R11: dffffc0000000001 R12: ffff888108a4f358
-> R13: dffffc0000000000 R14: 0000001a8cd9a7ec R15: 0000000000000000
-> FS: 00007fa73fe18700(0000) GS:ffff8881f6b00000(0000) knlGS:00000000000000=
-00
-> CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> CR2: 00007fa73fdf7718 CR3: 000000011d36e000 CR4: 0000000000350ee0
-> Call Trace:
-> <TASK>
-> [<ffffffff84714385>] __dev_xmit_skb net/core/dev.c:3931 [inline]
-> [<ffffffff84714385>] __dev_queue_xmit+0xcf5/0x3370 net/core/dev.c:4290
-> [<ffffffff84d22df2>] dev_queue_xmit include/linux/netdevice.h:3030 [inlin=
-e]
-> [<ffffffff84d22df2>] neigh_hh_output include/net/neighbour.h:531 [inline]
-> [<ffffffff84d22df2>] neigh_output include/net/neighbour.h:545 [inline]
-> [<ffffffff84d22df2>] ip_finish_output2+0xb92/0x10d0 net/ipv4/ip_output.c:=
-235
-> [<ffffffff84d21e63>] __ip_finish_output+0xc3/0x2b0
-> [<ffffffff84d10a81>] ip_finish_output+0x31/0x2a0 net/ipv4/ip_output.c:323
-> [<ffffffff84d10f14>] NF_HOOK_COND include/linux/netfilter.h:298 [inline]
-> [<ffffffff84d10f14>] ip_output+0x224/0x2a0 net/ipv4/ip_output.c:437
-> [<ffffffff84d123b5>] dst_output include/net/dst.h:444 [inline]
-> [<ffffffff84d123b5>] ip_local_out net/ipv4/ip_output.c:127 [inline]
-> [<ffffffff84d123b5>] __ip_queue_xmit+0x1425/0x2000 net/ipv4/ip_output.c:5=
-42
-> [<ffffffff84d12fdc>] ip_queue_xmit+0x4c/0x70 net/ipv4/ip_output.c:556
->
-> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Stephen Hemminger <stephen@networkplumber.org>
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Cong Wang <xiyou.wangcong@gmail.com>
-> Cc: Jiri Pirko <jiri@resnulli.us>
+DMA detection will fail if axinet was started before (by boot loader,
+boot ROM, etc). In this state axinet will not start properly.
+So move axinet reset before DMA detection.
 
-Reviewed-by: Jamal Hadi Salim <jhs@mojatatu.com>
+Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
+---
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-cheers,
-jamal
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 3e310b55bce2..734822321e0a 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2042,6 +2042,11 @@ static int axienet_probe(struct platform_device *pdev)
+ 		goto cleanup_clk;
+ 	}
+ 
++	/* Reset core now that clocks are enabled, prior to accessing MDIO */
++	ret = __axienet_device_reset(lp);
++	if (ret)
++		goto cleanup_clk;
++
+ 	/* Autodetect the need for 64-bit DMA pointers.
+ 	 * When the IP is configured for a bus width bigger than 32 bits,
+ 	 * writing the MSB registers is mandatory, even if they are all 0.
+@@ -2096,11 +2101,6 @@ static int axienet_probe(struct platform_device *pdev)
+ 	lp->coalesce_count_tx = XAXIDMA_DFT_TX_THRESHOLD;
+ 	lp->coalesce_usec_tx = XAXIDMA_DFT_TX_USEC;
+ 
+-	/* Reset core now that clocks are enabled, prior to accessing MDIO */
+-	ret = __axienet_device_reset(lp);
+-	if (ret)
+-		goto cleanup_clk;
+-
+ 	ret = axienet_mdio_setup(lp);
+ 	if (ret)
+ 		dev_warn(&pdev->dev,
+-- 
+2.40.1
 
-> ---
->  net/sched/sch_netem.c | 8 ++++++--
->  1 file changed, 6 insertions(+), 2 deletions(-)
->
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index 6ef3021e1169a376494d610ac8c3f1c04fb911c5..e79be1b3e74da3c154f7ee23e=
-16cc9e8da8f7106 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -966,6 +966,7 @@ static int netem_change(struct Qdisc *sch, struct nla=
-ttr *opt,
->         if (ret < 0)
->                 return ret;
->
-> +       sch_tree_lock(sch);
->         /* backup q->clg and q->loss_model */
->         old_clg =3D q->clg;
->         old_loss_model =3D q->loss_model;
-> @@ -974,7 +975,7 @@ static int netem_change(struct Qdisc *sch, struct nla=
-ttr *opt,
->                 ret =3D get_loss_clg(q, tb[TCA_NETEM_LOSS]);
->                 if (ret) {
->                         q->loss_model =3D old_loss_model;
-> -                       return ret;
-> +                       goto unlock;
->                 }
->         } else {
->                 q->loss_model =3D CLG_RANDOM;
-> @@ -1041,6 +1042,8 @@ static int netem_change(struct Qdisc *sch, struct n=
-lattr *opt,
->         /* capping jitter to the range acceptable by tabledist() */
->         q->jitter =3D min_t(s64, abs(q->jitter), INT_MAX);
->
-> +unlock:
-> +       sch_tree_unlock(sch);
->         return ret;
->
->  get_table_failure:
-> @@ -1050,7 +1053,8 @@ static int netem_change(struct Qdisc *sch, struct n=
-lattr *opt,
->          */
->         q->clg =3D old_clg;
->         q->loss_model =3D old_loss_model;
-> -       return ret;
-> +
-> +       goto unlock;
->  }
->
->  static int netem_init(struct Qdisc *sch, struct nlattr *opt,
-> --
-> 2.41.0.178.g377b9f9a00-goog
->
 
