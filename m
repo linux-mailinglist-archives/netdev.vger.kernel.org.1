@@ -1,310 +1,222 @@
-Return-Path: <netdev+bounces-12770-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12771-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E281C738DFB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:01:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 55E14738E2E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FED52816A1
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:01:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 09E0228163E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A6A119E57;
-	Wed, 21 Jun 2023 18:01:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3BB2819E5A;
+	Wed, 21 Jun 2023 18:08:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6D1619BC6;
-	Wed, 21 Jun 2023 18:01:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 994ABC433C8;
-	Wed, 21 Jun 2023 18:01:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687370487;
-	bh=f6MfE+OwYlooIGk6bzrRy2nMoaF6fYVrxR9rt/b+wHA=;
-	h=Subject:From:To:Date:In-Reply-To:References:From;
-	b=bVcrCvUx5qUKiFKoGoCpRU9cOdPpOKYso9mJvg46pEjfpa5HrNdfQIs+z6jHr5sux
-	 dlx89O00OX+JFXaZsV1aqCsQCXMgGUPun8gG0+O63APDuieKF+NHNtURapcBRt6lwA
-	 XUSZY7Lxndjjm0Guu7ABZsDoRASFWxW9NDkbTecnzII3k7EzTCDZqTBAfGwPJVYC9o
-	 4y1h+nwRvjsJy2OJKNcBHeZcxgyGTH5ATcgrCrgxjm4t9FpTdCYfY2dSxFdgqaYmjq
-	 McRt37g4zUkhYaqSUzhLnP9BOtEXfLTVHkZOUz8jt6fW2f8bh/uJnCW9nUVVVNS/3d
-	 grPvoD0B9Xewg==
-Message-ID: <6f4bcd7d79f688120d80e96e86d7c521854d8e84.camel@kernel.org>
-Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
-From: Jeff Layton <jlayton@kernel.org>
-To: Tom Talpey <tom@talpey.com>, Jeremy Kerr <jk@ozlabs.org>, Arnd Bergmann
- <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas Piggin
- <npiggin@gmail.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, Heiko
- Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander
- Gordeev <agordeev@linux.ibm.com>, Christian Borntraeger
- <borntraeger@linux.ibm.com>,  Sven Schnelle <svens@linux.ibm.com>, Greg
- Kroah-Hartman <gregkh@linuxfoundation.org>, Arve
- =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>, Todd Kjos
- <tkjos@android.com>, Martijn Coenen <maco@android.com>, Joel Fernandes
- <joel@joelfernandes.org>, Christian Brauner <brauner@kernel.org>, Carlos
- Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>,
- Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason
- Gunthorpe <jgg@ziepe.ca>,  Leon Romanovsky <leon@kernel.org>, Brad Warrum
- <bwarrum@linux.ibm.com>, Ritu Agarwal <rituagar@linux.ibm.com>, Eric Van
- Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>,
- Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
- <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, David Howells
- <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Alexander
- Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>, Luis de
- Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
- "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Eric Biederman
- <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>, Chris Mason
- <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Xiubo Li
- <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Jan Harkes
- <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
- Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>,  "Rafael
- J. Wysocki" <rafael@kernel.org>, Tyler Hicks <code@tyhicks.com>, Ard
- Biesheuvel <ardb@kernel.org>, Gao Xiang <xiang@kernel.org>, Chao Yu
- <chao@kernel.org>,  Yue Hu <huyue2@coolpad.com>, Jeffle Xu
- <jefflexu@linux.alibaba.com>, Namjae Jeon <linkinjeon@kernel.org>, Sungjong
- Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>, Theodore Ts'o
- <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Jaegeuk Kim
- <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Miklos
- Szeredi <miklos@szeredi.hu>, Bob Peterson <rpeterso@redhat.com>, Andreas
- Gruenbacher <agruenba@redhat.com>, Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg
- <johannes@sipsolutions.net>, Mikulas Patocka
- <mikulas@artax.karlin.mff.cuni.cz>,  Mike Kravetz
- <mike.kravetz@oracle.com>, Muchun Song <muchun.song@linux.dev>, David
- Woodhouse <dwmw2@infradead.org>, Dave Kleikamp <shaggy@kernel.org>, Tejun
- Heo <tj@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>,
- Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>, Anton Altaparmakov
- <anton@tuxera.com>,  Konstantin Komarov
- <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>,
- Joseph Qi <joseph.qi@linux.alibaba.com>, Bob Copeland <me@bobcopeland.com>,
- Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg
- <martin@omnibond.com>, Luis Chamberlain <mcgrof@kernel.org>, Iurii Zaikin
- <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,  "Guilherme G.
- Piccoli" <gpiccoli@igalia.com>, Anders Larsen <al@alarsen.net>, Steve
- French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, Ronnie
- Sahlberg <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>, Phillip Lougher
- <phillip@squashfs.org.uk>, Steven Rostedt <rostedt@goodmis.org>, Masami
- Hiramatsu <mhiramat@kernel.org>, Evgeniy Dushistov <dushistov@mail.ru>,
- Hans de Goede <hdegoede@redhat.com>, "Darrick J. Wong" <djwong@kernel.org>,
- Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>,
- Johannes Thumshirn <jth@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
- Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
- <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
- <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
- Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
- <jolsa@kernel.org>,  Hugh Dickins <hughd@google.com>, Andrew Morton
- <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
- Abeni <pabeni@redhat.com>, John Johansen <john.johansen@canonical.com>,
- Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge
- E. Hallyn" <serge@hallyn.com>, Stephen Smalley
- <stephen.smalley.work@gmail.com>, Eric Paris <eparis@parisplace.org>, 
- Juergen Gross <jgross@suse.com>, Ruihan Li <lrh2000@pku.edu.cn>, Laurent
- Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang
- <wsa+renesas@sang-engineering.com>, Udipto Goswami
- <quic_ugoswami@quicinc.com>,  Linyu Yuan <quic_linyyuan@quicinc.com>, John
- Keeping <john@keeping.me.uk>, Andrzej Pietrasiewicz
- <andrzej.p@collabora.com>, Dan Carpenter <error27@gmail.com>, Yuta Hayama
- <hayama@lineo.co.jp>, Jozef Martiniak <jomajm@gmail.com>, Jens Axboe
- <axboe@kernel.dk>, Alan Stern <stern@rowland.harvard.edu>, Sandeep Dhavale
- <dhavale@google.com>, Dave Chinner <dchinner@redhat.com>, Johannes Weiner
- <hannes@cmpxchg.org>, ZhangPeng <zhangpeng362@huawei.com>, Viacheslav
- Dubeyko <slava@dubeyko.com>, Tetsuo Handa
- <penguin-kernel@I-love.SAKURA.ne.jp>,  Aditya Garg <gargaditya08@live.com>,
- Erez Zadok <ezk@cs.stonybrook.edu>, Yifei Liu <yifeliu@cs.stonybrook.edu>,
- Yu Zhe <yuzhe@nfschina.com>, "Matthew Wilcox (Oracle)"
- <willy@infradead.org>, Oleg Kanatov <okanatov@gmail.com>, "Dr. David Alan
- Gilbert" <linux@treblig.org>, Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin
- <cgel.zte@gmail.com>, Stefan Roesch <shr@devkernel.io>, Zhihao Cheng
- <chengzhihao1@huawei.com>, "Liam R. Howlett" <Liam.Howlett@Oracle.com>, 
- Alexey Dobriyan <adobriyan@gmail.com>, Minghao Chi
- <chi.minghao@zte.com.cn>, Seth Forshee <sforshee@digitalocean.com>, Zeng
- Jingxiang <linuszeng@tencent.com>, Bart Van Assche <bvanassche@acm.org>,
- Mimi Zohar <zohar@linux.ibm.com>, Roberto Sassu <roberto.sassu@huawei.com>,
- Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>, "Fabio M. De
- Francesco" <fmdefrancesco@gmail.com>, Chen Zhongjin
- <chenzhongjin@huawei.com>, Zhengchao Shao <shaozhengchao@huawei.com>, Rik
- van Riel <riel@surriel.com>, Jingyu Wang <jingyuwang_vip@163.com>, Hangyu
- Hua <hbh25y@gmail.com>, linuxppc-dev@lists.ozlabs.org,
- linux-kernel@vger.kernel.org,  linux-s390@vger.kernel.org,
- linux-rdma@vger.kernel.org,  linux-usb@vger.kernel.org,
- v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
- linux-afs@lists.infradead.org, autofs@vger.kernel.org, linux-mm@kvack.org, 
- linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org, 
- codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
- linux-efi@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
- linux-ext4@vger.kernel.org,  linux-f2fs-devel@lists.sourceforge.net,
- cluster-devel@redhat.com,  linux-um@lists.infradead.org,
- linux-mtd@lists.infradead.org,  jfs-discussion@lists.sourceforge.net,
- linux-nfs@vger.kernel.org,  linux-nilfs@vger.kernel.org,
- linux-ntfs-dev@lists.sourceforge.net,  ntfs3@lists.linux.dev,
- ocfs2-devel@oss.oracle.com,  linux-karma-devel@lists.sourceforge.net,
- devel@lists.orangefs.org,  linux-unionfs@vger.kernel.org,
- linux-hardening@vger.kernel.org,  reiserfs-devel@vger.kernel.org,
- linux-cifs@vger.kernel.org,  samba-technical@lists.samba.org,
- linux-trace-kernel@vger.kernel.org,  linux-xfs@vger.kernel.org,
- bpf@vger.kernel.org, netdev@vger.kernel.org,  apparmor@lists.ubuntu.com,
- linux-security-module@vger.kernel.org,  selinux@vger.kernel.org
-Date: Wed, 21 Jun 2023 14:01:09 -0400
-In-Reply-To: <1f97d595-e035-46ce-6269-eebfe922cf35@talpey.com>
-References: <20230621144507.55591-1-jlayton@kernel.org>
-	 <20230621144507.55591-2-jlayton@kernel.org>
-	 <1f97d595-e035-46ce-6269-eebfe922cf35@talpey.com>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DB1C19BAC
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:08:07 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72AFCBA;
+	Wed, 21 Jun 2023 11:08:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=IIwqpnF5nUxznVeQBpFVXnkGF99tYzm0MtTw7j1XHA0=; b=I7H/6crWG+HaCjRpz85NIZnxWx
+	5iL5UZjVejhw+9oo0ly/q80MTm9373J8OKnMA6jyZm9DHEKT2WbYFy8n7gE/h9NzDLY3biNE1R5HI
+	1xxHhOzlvPQ63jxNW262Vl+8BcKR20vOVUHmxHFdrz03B5JR77Jx0MpITlerNsynjw0zFF36wV1RL
+	iQyRrakyF07AoW22y1VrUCexqRmxlvApE9pszL3cZaepBovBSXVd9DTo/D8Y84vrdy87hFRS53fAe
+	tiMBtBk1AJqun9N4OvCf4AwcPPM+nCLW70qpdQ0d/KFUUHBuwe3fjPC5Yf/xbX0zUjlsmFKoKkhIY
+	S3n7374Q==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qC2FS-00FLJr-0T;
+	Wed, 21 Jun 2023 18:08:06 +0000
+Message-ID: <66fd6106-16a5-d61a-4202-02ff99b84f76@infradead.org>
+Date: Wed, 21 Jun 2023 11:08:05 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] s390/net: lcs: use IS_ENABLED() for kconfig detection
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>
+Cc: linux-kernel@vger.kernel.org, Alexandra Winter <wintera@linux.ibm.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>
+References: <20230615222152.13250-1-rdunlap@infradead.org>
+ <ea55623d-d469-ddaf-92ce-3daf1d2d726f@infradead.org>
+ <ZJMc3oS2nxORPASN@corigine.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <ZJMc3oS2nxORPASN@corigine.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 2023-06-21 at 13:29 -0400, Tom Talpey wrote:
-> On 6/21/2023 10:45 AM, Jeff Layton wrote:
-> > struct timespec64 has unused bits in the tv_nsec field that can be used
-> > for other purposes. In future patches, we're going to change how the
-> > inode->i_ctime is accessed in certain inodes in order to make use of
-> > them. In order to do that safely though, we'll need to eradicate raw
-> > accesses of the inode->i_ctime field from the kernel.
-> >=20
-> > Add new accessor functions for the ctime that we can use to replace the=
-m.
-> >=20
-> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
-> > ---
-> >   fs/inode.c         | 16 ++++++++++++++
-> >   include/linux/fs.h | 53 +++++++++++++++++++++++++++++++++++++++++++++=
--
-> >   2 files changed, 68 insertions(+), 1 deletion(-)
-> >=20
-> > diff --git a/fs/inode.c b/fs/inode.c
-> > index d37fad91c8da..c005e7328fbb 100644
-> > --- a/fs/inode.c
-> > +++ b/fs/inode.c
-> > @@ -2499,6 +2499,22 @@ struct timespec64 current_time(struct inode *ino=
-de)
-> >   }
-> >   EXPORT_SYMBOL(current_time);
-> >  =20
-> > +/**
-> > + * inode_ctime_set_current - set the ctime to current_time
-> > + * @inode: inode
-> > + *
-> > + * Set the inode->i_ctime to the current value for the inode. Returns
-> > + * the current value that was assigned to i_ctime.
-> > + */
-> > +struct timespec64 inode_ctime_set_current(struct inode *inode)
-> > +{
-> > +	struct timespec64 now =3D current_time(inode);
-> > +
-> > +	inode_set_ctime(inode, now);
-> > +	return now;
-> > +}
-> > +EXPORT_SYMBOL(inode_ctime_set_current);
-> > +
-> >   /**
-> >    * in_group_or_capable - check whether caller is CAP_FSETID privilege=
-d
-> >    * @idmap:	idmap of the mount @inode was found from
-> > diff --git a/include/linux/fs.h b/include/linux/fs.h
-> > index 6867512907d6..9afb30606373 100644
-> > --- a/include/linux/fs.h
-> > +++ b/include/linux/fs.h
-> > @@ -1474,7 +1474,58 @@ static inline bool fsuidgid_has_mapping(struct s=
-uper_block *sb,
-> >   	       kgid_has_mapping(fs_userns, kgid);
-> >   }
-> >  =20
-> > -extern struct timespec64 current_time(struct inode *inode);
-> > +struct timespec64 current_time(struct inode *inode);
-> > +struct timespec64 inode_ctime_set_current(struct inode *inode);
-> > +
-> > +/**
-> > + * inode_ctime_peek - fetch the current ctime from the inode
-> > + * @inode: inode from which to fetch ctime
-> > + *
-> > + * Grab the current ctime from the inode and return it.
-> > + */
-> > +static inline struct timespec64 inode_ctime_peek(const struct inode *i=
-node)
-> > +{
-> > +	return inode->i_ctime;
-> > +}
-> > +
-> > +/**
-> > + * inode_ctime_set - set the ctime in the inode to the given value
-> > + * @inode: inode in which to set the ctime
-> > + * @ts: timespec value to set the ctime
-> > + *
-> > + * Set the ctime in @inode to @ts.
-> > + */
-> > +static inline struct timespec64 inode_ctime_set(struct inode *inode, s=
-truct timespec64 ts)
-> > +{
-> > +	inode->i_ctime =3D ts;
-> > +	return ts;
-> > +}
-> > +
-> > +/**
-> > + * inode_ctime_set_sec - set only the tv_sec field in the inode ctime
->=20
-> I'm curious about why you choose to split the tv_sec and tv_nsec
-> set_ functions. Do any callers not set them both? Wouldn't a
-> single call enable a more atomic behavior someday?
->=20
->    inode_ctime_set_sec_nsec(struct inode *, time64_t, time64_t)
->=20
-> (or simply initialize a timespec64 and use inode_ctime_spec() )
->=20
+Hi Simon,
 
-Yes, quite a few places set the fields individually. For example, when
-loading a value from disk that doesn't have sufficient granularity to
-set the nsecs field to anything but 0.
 
-Could I have done it by declaring a local timespec64 variable and just
-use the inode_ctime_set function in these places? Absolutely.
+On 6/21/23 08:53, Simon Horman wrote:
+> On Tue, Jun 20, 2023 at 07:35:17PM -0700, Randy Dunlap wrote:
+>> Hi,
+>>
+>> On 6/15/23 15:21, Randy Dunlap wrote:
+>>> When CONFIG_ETHERNET=m or CONFIG_FDDI=m, lcs.s has build errors or
+>>> warnings:
+>>>
+>>> ../drivers/s390/net/lcs.c:40:2: error: #error Cannot compile lcs.c without some net devices switched on.
+>>>    40 | #error Cannot compile lcs.c without some net devices switched on.
+>>> ../drivers/s390/net/lcs.c: In function 'lcs_startlan_auto':
+>>> ../drivers/s390/net/lcs.c:1601:13: warning: unused variable 'rc' [-Wunused-variable]
+>>>  1601 |         int rc;
+>>>
+>>> Solve this by using IS_ENABLED(CONFIG_symbol) instead of ifdef
+>>> CONFIG_symbol. The latter only works for builtin (=y) values
+>>> while IS_ENABLED() works for builtin or modular values.
+>>>
+>>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>>> Cc: Alexandra Winter <wintera@linux.ibm.com>
+>>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+>>> Cc: linux-s390@vger.kernel.org
+>>> Cc: netdev@vger.kernel.org
+>>> Cc: Heiko Carstens <hca@linux.ibm.com>
+>>> Cc: Vasily Gorbik <gor@linux.ibm.com>
+>>> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+>>> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+>>> Cc: Sven Schnelle <svens@linux.ibm.com>
+>>> ---
+>>>  drivers/s390/net/lcs.c |   10 +++++-----
+>>>  1 file changed, 5 insertions(+), 5 deletions(-)
+>>>
+>>> diff -- a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
+>>> --- a/drivers/s390/net/lcs.c
+>>> +++ b/drivers/s390/net/lcs.c
+>>> @@ -36,7 +36,7 @@
+>>>  #include "lcs.h"
+>>>  
+>>>  
+>>> -#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
+>>> +#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
+>>>  #error Cannot compile lcs.c without some net devices switched on.
+>>>  #endif
+>>>  
+>>> @@ -1601,14 +1601,14 @@ lcs_startlan_auto(struct lcs_card *card)
+>>>  	int rc;
+>>>  
+>>>  	LCS_DBF_TEXT(2, trace, "strtauto");
+>>> -#ifdef CONFIG_ETHERNET
+>>> +#if IS_ENABLED(CONFIG_ETHERNET)
+>>>  	card->lan_type = LCS_FRAME_TYPE_ENET;
+>>>  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+>>>  	if (rc == 0)
+>>>  		return 0;
+>>>  
+>>>  #endif
+>>> -#ifdef CONFIG_FDDI
+>>> +#if IS_ENABLED(CONFIG_FDDI)
+>>>  	card->lan_type = LCS_FRAME_TYPE_FDDI;
+>>>  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+>>>  	if (rc == 0)
+>>> @@ -2139,13 +2139,13 @@ lcs_new_device(struct ccwgroup_device *c
+>>>  		goto netdev_out;
+>>>  	}
+>>>  	switch (card->lan_type) {
+>>> -#ifdef CONFIG_ETHERNET
+>>> +#if IS_ENABLED(CONFIG_ETHERNET)
+>>>  	case LCS_FRAME_TYPE_ENET:
+>>>  		card->lan_type_trans = eth_type_trans;
+>>>  		dev = alloc_etherdev(0);
+>>>  		break;
+>>>  #endif
+>>> -#ifdef CONFIG_FDDI
+>>> +#if IS_ENABLED(CONFIG_FDDI)
+>>>  	case LCS_FRAME_TYPE_FDDI:
+>>>  		card->lan_type_trans = fddi_type_trans;
+>>>  		dev = alloc_fddidev(0);
+>>
+>>
+>> kernel test robot reports build errors from this patch when
+>> ETHERNET=y, FDDI=m, LCS=y:
+>>
+>>   https://lore.kernel.org/all/202306202129.pl0AqK8G-lkp@intel.com/
+>>
+>> Since the code before my patch expected (supported) FDDI=y only
+>> (by checking for CONFIG_FDDI only and not checking for CONFIG_FDDI_MODULE),
+>> the best solution that I can see is to enforce that expectation in
+>> drivers/s390/net/Kconfig:
+>>
+>> diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+>> --- a/drivers/s390/net/Kconfig
+>> +++ b/drivers/s390/net/Kconfig
+>> @@ -5,7 +5,7 @@ menu "S/390 network device drivers"
+>>  config LCS
+>>  	def_tristate m
+>>  	prompt "Lan Channel Station Interface"
+>> -	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+>> +	depends on CCW && NETDEVICES && (ETHERNET || FDDI = y)
+> 
+> Hi Randy,
+> 
+> Unfortunately I don't think this helps.
+> In the config given at the link above, ETHERNET is y.
+> And the error regarding fddi_type_trans and alloc_fddidev being undefined
+> seems to occur regardless of your change.
 
-That's a bit more difficult to handle with coccinelle though. If someone
-wants to suggest a way to do that without having to change all of these
-call sites manually, then I'm open to redoing the set.
+Hmph, somehow I missed that. :(
 
-That might be better left for a later cleanup though.
+> I did have better luck with this.
+> 
+> diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+> index 9c67b97faba2..303220251495 100644
+> --- a/drivers/s390/net/Kconfig
+> +++ b/drivers/s390/net/Kconfig
+> @@ -6,6 +6,7 @@ config LCS
+>         def_tristate m
+>         prompt "Lan Channel Station Interface"
+>         depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +       depends on FDDI=y || FDDI=n
+>         help
+>           Select this option if you want to use LCS networking on IBM System z.
+>           This device driver supports FDDI (IEEE 802.7) and Ethernet.
+> 
+> I am assuming that LCS=m and FDDI=m can't work at runtime
+> because there is no guarantee that FDDI is loaded before LCS.
+> But I could well be wrong here.
 
-> > + * @inode: inode in which to set the ctime
-> > + * @sec:  value to set the tv_sec field
-> > + *
-> > + * Set the sec field in the ctime. Returns @sec.
-> > + */
-> > +static inline time64_t inode_ctime_set_sec(struct inode *inode, time64=
-_t sec)
-> > +{
-> > +	inode->i_ctime.tv_sec =3D sec;
-> > +	return sec;
-> > +}
-> > +
-> > +/**
-> > + * inode_ctime_set_nsec - set only the tv_nsec field in the inode ctim=
-e
-> > + * @inode: inode in which to set the ctime
-> > + * @nsec:  value to set the tv_nsec field
-> > + *
-> > + * Set the nsec field in the ctime. Returns @nsec.
-> > + */
-> > +static inline long inode_ctime_set_nsec(struct inode *inode, long nsec=
-)
-> > +{
-> > +	inode->i_ctime.tv_nsec =3D nsec;
-> > +	return nsec;
-> > +}
-> >  =20
-> >   /*
-> >    * Snapshotting support.
+There's probably some way to make that work, but I don't know.
 
---=20
-Jeff Layton <jlayton@kernel.org>
+I think that your patch is acceptable.
+I would prefer to also add to the help text that if FDDI is used,
+it must be builtin (=y).
+
+>>  	help
+>>  	  Select this option if you want to use LCS networking on IBM System z.
+>>  	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+>>
+>> What do people think of that change?
+>> Any other ideas/suggestions?
+>>
+>> thanks.
+>> -- 
+>> ~Randy
+>>
+
+Thanks for your help.
+-- 
+~Randy
 
