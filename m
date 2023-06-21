@@ -1,159 +1,198 @@
-Return-Path: <netdev+bounces-12610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12611-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DA597384F5
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:27:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A7C4738505
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:29:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13870281463
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:27:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 18ACE281606
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:29:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 38EE2174F0;
-	Wed, 21 Jun 2023 13:27:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 77BEE174F7;
+	Wed, 21 Jun 2023 13:29:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26D8717AB3
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:27:34 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2083.outbound.protection.outlook.com [40.107.244.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47A1191;
-	Wed, 21 Jun 2023 06:27:33 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=P2jrIh+biNWOEn1KKLrEf3EOn93JyAS+nGEsOWdgxrUCKs8rxOpBdP8LE4zf2LdyFjQ4dK2/4sZ/2xcPuAwnTEXg1/dMA+yjBodvHEx34PJPELCxMl7VAIrP1cRO6A0vbY4jgtpFnebrhBp5G6lo4DjN0GLO+mlHtpPCbn6wkoLD7pg6c2CUczyT94gAUi9byXWNlIHbt06MjkvIqYzrD1vvBkNLptfZQOQVeZW6z3QS1DTWtVS3NGlqr/WonsXFnxef0xWZ3dSzddgndc0PSiImuWz32ZB9SXRspU2Bo0WODaiKeQQrgggYaZoMd/mD987xJcV8NRxQY/zezduE0Q==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=vjL3vZzj4mgdljtPilx0yTHUVFs9mp7ChmXFJzOVAms=;
- b=ai74gNLRCCk90WLJsDmN+DA0FTo+krrvzYLTljdq6p9VQd5nzMYq8KvPqNK7NZjtWrKpk2fJrXFfFjkaXKoLo8vtdKQQ52YoEap1RbklpACyaK+aSrcPYZNxFdHb1zY3jXET9g25NjUodEZPaRom2xtgJJu6imr0megTm/cl+65IvJuJAhzC9HI1dR7RbuAAMS6j7Mm/37AIA8lv1hpNbkgqLRq+fHYkdYa8ZfZV71mZr1cd9R3zn3zC/QWOUEOfVvucaG08uGo892QStqaJWB1HYH2PNMKSTVibKzZIDfYygptZXslxarkQ7eth/EWdc+HwErREEajOrp5CcqJx9Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=vjL3vZzj4mgdljtPilx0yTHUVFs9mp7ChmXFJzOVAms=;
- b=hr/49rRSet7FbvepxY0TTGyKC/kknXLp1cRLUuU4tlezgumoMFwV1tDiB0tz0DNzIcpX7RYFVjVpTnbjRFXhZmgLjaFUtG5UBxzydSkno1QR4pAiFgxNvH5wuU7gnC6VzfKn5+YEvvUxMMr9Udsl5E8Deh8txmv6zAsBSZ0VZaBU3wRdRWmP8siwuDePlr4OLfcUNJjeHg35tMr7uApcTtXPeyl9Plple8psvwfZbBaKGrJQu+NZqawq0CryX8aiIcXAobzUEaR3LR3svj5mscXfRmFFaBfBTOf56e7JWI7Fs68SbBQW6y1FY66XhF92JZ9Z+KpuSFx7nhHJ01ks6w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by MN0PR12MB6031.namprd12.prod.outlook.com (2603:10b6:208:3cd::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
- 2023 13:27:31 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6500.031; Wed, 21 Jun 2023
- 13:27:31 +0000
-Date: Wed, 21 Jun 2023 10:27:28 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Brett Creeley <brett.creeley@amd.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Message-ID: <ZJL6wHiXHc1eBj/R@nvidia.com>
-References: <20230602220318.15323-1-brett.creeley@amd.com>
- <20230602220318.15323-5-brett.creeley@amd.com>
- <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJBONrx5LOgpTr1U@nvidia.com>
- <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJGcCF2hBGERGUBZ@nvidia.com>
- <BN9PR11MB52763F3D4F18DAB867D146458C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52763F3D4F18DAB867D146458C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BYAPR01CA0021.prod.exchangelabs.com (2603:10b6:a02:80::34)
- To LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C75311CA1
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:25 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D7ECC19AD
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:29:19 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qBxte-0006Ra-BR
+	for netdev@vger.kernel.org; Wed, 21 Jun 2023 15:29:18 +0200
+Received: from dspam.blackshift.org (localhost [127.0.0.1])
+	by bjornoya.blackshift.org (Postfix) with SMTP id 32B3F1DE86D
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:17 +0000 (UTC)
+Received: from hardanger.blackshift.org (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 02E911DE853;
+	Wed, 21 Jun 2023 13:29:16 +0000 (UTC)
+Received: from blackshift.org (localhost [::1])
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 0c105877;
+	Wed, 21 Jun 2023 13:29:15 +0000 (UTC)
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: netdev@vger.kernel.org
+Cc: davem@davemloft.net,
+	kuba@kernel.org,
+	linux-can@vger.kernel.org,
+	kernel@pengutronix.de
+Subject: [PATCH net-next 0/33] pull-request: can-next 2023-06-21
+Date: Wed, 21 Jun 2023 15:28:41 +0200
+Message-Id: <20230621132914.412546-1-mkl@pengutronix.de>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|MN0PR12MB6031:EE_
-X-MS-Office365-Filtering-Correlation-Id: 07ce200a-352e-4eea-e00d-08db725b43fd
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	nsdeVNuUD47LZYfuwDkRREIiwCVsMbPna5y2MvEGAlfjs2baYW1E8Xj7nF3XLlPEHJDqpnpPbO7SO8uRgtDrIFbX/WKipdVdxVfEqVz8S2n2loKaVihFHzBktIj8SDXXikHW/O6gX8MHvOG68wzlHNshiEZhIdU18fR2LYI7DQ6hLLmXlAzjPNL+7q8jkDPztL0XxgNIVi99fcb45vgtcw3BAEWKgGn2H6to2jYFQPO9D/yo0bDoNlo2h3sVlYVvBwITsEZnHrB+r2mcYUPJtHGvLUlTmgBsBXRx6LI3SMz8QzzuSGxv7nVUFiNuP5+kJ6JTp0b+qL0IwsCeBjbDBYtBkTUfM2P13TBHwZQzlIyrjVG27PvFodj/fJEyZVxEg4PDXPrsfiWlCRE/fO84qLSpNdeBr/2rcCk3r0xNNnOZjZgqG+rUoOWTjQM+hc4O8+OwXHtOY5k8cxFR8rpyU2YfOQFeXAS+lEyUFUlgFg3/V/qP2xId8iJMyB6Z+cMdquER9MnkYHs/ABdLW+1NMfNTwWA+KzYS2SkeGhTY4xNbM2eQjFVMO/z2Ifr5K95F
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(366004)(346002)(396003)(376002)(451199021)(38100700002)(4744005)(2906002)(36756003)(86362001)(2616005)(6506007)(6512007)(26005)(186003)(6486002)(6666004)(54906003)(478600001)(66946007)(66556008)(66476007)(6916009)(316002)(8676002)(8936002)(5660300002)(41300700001)(4326008);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?i/s3MzxfZtYUeeAPgV7BcZPwkXGitgI7oxIXpK+RFX+zd83HLh9cKNJX+D5V?=
- =?us-ascii?Q?x9hx+Z4mHtE1UNY8BPD+jigQcXQ/rzOvi4vDhqrCzqXnjTJ63EufNSVWObTE?=
- =?us-ascii?Q?yftBPyBBej2lvJmgjAs1SO0j+Q1ZMj8LeLNeScwHWiqjL+lA33cJ6riS59Rt?=
- =?us-ascii?Q?BVRoZo7aan6+senmKOcr1+v5gvKnfNmWa08trVP/rEtwuS1jtrlyJTE2Q5d6?=
- =?us-ascii?Q?KsqjRlMcxAX96MX3NBf/PgLYFKqDcU8p9N7eHlviTGKsPFa8DUXj/lq1HZyi?=
- =?us-ascii?Q?FS+ml2uv+8XOxtsymUVKS+/uiYHym/pomr8tbmlmSbx7oLB185EntDLNSRoR?=
- =?us-ascii?Q?EZNNysV9A65JLVPxDkA50xNkS+htCyE2a4iCJnoO5KQxulki50GA8JJpkNWy?=
- =?us-ascii?Q?pbHRL7anJ18HuF8s3fId5ZqHF5FP8Rd0+Cdv6UXv58xbcKXf3DxTmCls1Ck2?=
- =?us-ascii?Q?fAvdkIFkaJcoGZHgY9PP1qI4Lz3wfYTPAqDjMzN8h7borG2Bh96n21jCRkPv?=
- =?us-ascii?Q?RBLXT0ClbqS5iWle4226ZZ6wEXQIIf0zHUPA8ULpEqZrTKgXId5zjGXjvX5X?=
- =?us-ascii?Q?8bPyQCMlohnA+NGZmjk+Q2jOvrxedJCJKIDhjUqK8Sdk2/14RoYqb6/vyM79?=
- =?us-ascii?Q?gVbO+aSE6E7Bb4yR35EzpOuFWYWcZMazT95meqyHsL/JKLA+Wr7X7iubAiWw?=
- =?us-ascii?Q?unw/3F0Oxgs8UNr5TtvMPBt4VTavolKo8XCdP0jVT2p/Xl4ZxaBJjFR/6DvF?=
- =?us-ascii?Q?l351kRJ5b1HJO15pokpqXb9YZc8UZ6w3X51Z2n/QPEH6dkF+lCgqpqNkxvlf?=
- =?us-ascii?Q?4ibacn0+RoOd8gfSdXCmR2RxTQ5TYKRlImllTM6Xvucgz42B6+NO4uJRq2As?=
- =?us-ascii?Q?qBBLP1z5Wi93M3xr3k/YrIho8fuxVbaZ01jNax1ZLAsPnkDJptorRfP0O3Tt?=
- =?us-ascii?Q?xZSuR4CDbWPUlHFvm4tg4cEXXP8SygawbGYJv6tC5jBYv/BKVHVPEvWuFRU7?=
- =?us-ascii?Q?IJwQFng3uZV4FZZra1JvgwskXfVyS6F+31+YiQWCZLHz5c/XET/GbmD7hgWY?=
- =?us-ascii?Q?NLV+zlDBvB8IHkDsjF2yF6+Hw5ydIkrBXNR0o+mbRLR9Pdu4v4KwYhu3cOfh?=
- =?us-ascii?Q?vNtowRxZFEHh4RDxVEDO/4GorUU3RNkdptzCSuTWVFzfvKOFCIWrst0sKg6j?=
- =?us-ascii?Q?K2FJ3GBYBnFTWbKj7vtpzyPrjH4f3hHOKQfLYzDCqmkNbWLV193vRsGGB2QZ?=
- =?us-ascii?Q?eHlEST2aqGMjPu20kvYFpJ4U6JVFv1Gxr4/ZjhHVzUwE7ab6M0nKVzxCIQEN?=
- =?us-ascii?Q?u+SsbST1Z2og9emmjb1IY8LgGqWVXiUSs1gtsRwxH9E14N0Pz/cTwgvUTm2Q?=
- =?us-ascii?Q?qHClXmzA23YW0uaK07qeA5I8mxDaAoyLfSLimwK/ngAfjUuoMRKbSS7OdbE7?=
- =?us-ascii?Q?1Taztpj2xUQ9SycWeYsN6HM3+JzECEY03V0fQiKmOcMg9Jz9tlsPBJ0Hai+9?=
- =?us-ascii?Q?GjOjD2uHsQNtaubY81s2+BvqOOjkUTH2DcP5dSUPbquyk5ET5Bva8lF6rIz8?=
- =?us-ascii?Q?61I3ww8mJsAfd5XCxjkFF+apBQf/E8vcBc9teFC+?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 07ce200a-352e-4eea-e00d-08db725b43fd
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 13:27:31.3596
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 9tnKT557Vd5517eqQSPC/F2/D99qhcGOQN+udRaEkaVA8FdQ/03skug/VAp+b+LQ
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR12MB6031
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 06:49:12AM +0000, Tian, Kevin wrote:
+Hello netdev-team,
 
-> What is the criteria for 'reasonable'? How does CSPs judge that such
-> device can guarantee a *reliable* reasonable window so live migration
-> can be enabled in the production environment?
+this is a pull request of 33 patches for net-next/master.
 
-The CSP needs to work with the device vendor to understand how it fits
-into their system, I don't see how we can externalize this kind of
-detail in a general way.
- 
-> I'm afraid that we are hiding a non-deterministic factor in current protocol.
+The first patch is by Carsten Schmidt, targets the kvaser_usb driver
+and adds len8_dlc support.
 
-Yes
+Marcel Hellwig's patch for the xilinx_can driver adds support for CAN
+transceivers via the PHY framework.
 
-> But still I don't think it's a good situation where the user has ZERO
-> knowledge about the non-negligible time in the stopping path...
+Frank Jungclaus contributes 6 patches for the esd_usb driver in
+preparation for the upcoming CAN-USB/3 support.
 
-In any sane device design this will be a small period of time. These
-timeouts should be to protect against a device that has gone wild.
+A patch by me fixes the coding style in the m_can driver.
 
-Jason
+Frank Jungclaus contributes 2 more patches for the esd_usb driver,
+again in preparation for the upcoming CAN-USB/3 support.
+
+The 2 patches by Miquel Raynal for the sja1000 driver work around
+overruns stalls on the Renesas SoCs.
+
+2 patches by me fix the coding style in the rx-offload helper and the
+ti_hecc driver.
+
+Vincent Mailhol contributes 3 patches to fix and update the
+calculation of the length of CAN frames on the wire.
+
+Oliver Hartkopp's patch moves the CAN_RAW_FILTER_MAX definition into
+the correct header.
+
+The remaining 14 patches are by Jimmy Assarsson, target the
+kvaser_pciefd driver and bring various updates and improvements.
+
+regards,
+Marc
+
+---
+
+The following changes since commit d49b9b07725f5dfa3344dc3eed59b8ccc0a0ddbc:
+
+  Merge branch '100GbE' of git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue (2023-05-22 12:44:44 +0100)
+
+are available in the Git repository at:
+
+  git://git.kernel.org/pub/scm/linux/kernel/git/mkl/linux-can-next.git tags/linux-can-next-for-6.5-20230621
+
+for you to fetch changes up to 36f404dc6825db5fdb818235b0af502e24ce3331:
+
+  Merge patch series "can: kvaser_pciefd: Fixes and improvements" (2023-06-20 15:38:53 +0200)
+
+----------------------------------------------------------------
+linux-can-next-for-6.5-20230621
+
+----------------------------------------------------------------
+Carsten Schmidt (1):
+      can: kvaser_usb: Add len8_dlc support
+
+Frank Jungclaus (8):
+      can: esd_usb: Make use of existing kernel macros
+      can: esd_usb: Replace initializer macros used for struct can_bittiming_const
+      can: esd_usb: Use consistent prefixes for macros
+      can: esd_usb: Prefix all structures with the device name
+      can: esd_usb: Replace hardcoded message length given to USB commands
+      can: esd_usb: Don't bother the user with nonessential log message
+      can: esd_usb: Make use of kernel macros BIT() and GENMASK()
+      can: esd_usb: Use consistent prefix ESD_USB_ for macros
+
+Jimmy Assarsson (14):
+      can: kvaser_pciefd: Remove useless write to interrupt register
+      can: kvaser_pciefd: Remove handler for unused KVASER_PCIEFD_PACK_TYPE_EFRAME_ACK
+      can: kvaser_pciefd: Add function to set skb hwtstamps
+      can: kvaser_pciefd: Set hardware timestamp on transmitted packets
+      can: kvaser_pciefd: Define unsigned constants with type suffix 'U'
+      can: kvaser_pciefd: Remove SPI flash parameter read functionality
+      can: kvaser_pciefd: Sort includes in alphabetic order
+      can: kvaser_pciefd: Rename device ID defines
+      can: kvaser_pciefd: Change return type for kvaser_pciefd_{receive,transmit,set_tx}_irq()
+      can: kvaser_pciefd: Sort register definitions
+      can: kvaser_pciefd: Use FIELD_{GET,PREP} and GENMASK where appropriate
+      can: kvaser_pciefd: Add len8_dlc support
+      can: kvaser_pciefd: Refactor code
+      can: kvaser_pciefd: Use TX FIFO size read from CAN controller
+
+Marc Kleine-Budde (9):
+      Merge patch series "can: esd_usb: More preparation before supporting esd CAN-USB/3"
+      can: m_can: fix coding style
+      Merge patch series "can: esd_usb: More preparation before supporting esd CAN-USB/3 (addendum)"
+      Merge patch series "can: sja1000: Prepare the use of a threaded handler"
+      can: rx-offload: fix coding style
+      can: ti_hecc: fix coding style
+      Merge patch series "can: fix coding style"
+      Merge patch series "can: length: fix definitions and add bit length calculation"
+      Merge patch series "can: kvaser_pciefd: Fixes and improvements"
+
+Marcel Hellwig (1):
+      can: dev: add transceiver capabilities to xilinx_can
+
+Miquel Raynal (2):
+      can: sja1000: Prepare the use of a threaded handler
+      can: sja1000: Prevent overrun stalls with a soft reset on Renesas SoCs
+
+Oliver Hartkopp (1):
+      can: uapi: move CAN_RAW_FILTER_MAX definition to raw.h
+
+Vincent Mailhol (3):
+      can: length: fix bitstuffing count
+      can: length: fix description of the RRS field
+      can: length: refactor frame lengths definition to add size in bits
+
+ drivers/net/can/Kconfig                           |   3 +-
+ drivers/net/can/dev/length.c                      |  15 +-
+ drivers/net/can/dev/rx-offload.c                  |   2 +-
+ drivers/net/can/kvaser_pciefd.c                   | 945 ++++++++--------------
+ drivers/net/can/m_can/m_can.c                     |   4 +-
+ drivers/net/can/sja1000/sja1000.c                 |  40 +-
+ drivers/net/can/sja1000/sja1000.h                 |   1 +
+ drivers/net/can/sja1000/sja1000_platform.c        |   5 +-
+ drivers/net/can/ti_hecc.c                         |   2 +-
+ drivers/net/can/usb/esd_usb.c                     | 350 ++++----
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_core.c  |   2 +-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_hydra.c |  13 +-
+ drivers/net/can/usb/kvaser_usb/kvaser_usb_leaf.c  |   6 +-
+ drivers/net/can/xilinx_can.c                      |  19 +
+ include/linux/can/length.h                        | 315 +++++---
+ include/uapi/linux/can.h                          |   1 -
+ include/uapi/linux/can/raw.h                      |   2 +
+ 17 files changed, 811 insertions(+), 914 deletions(-)
+
+
 
