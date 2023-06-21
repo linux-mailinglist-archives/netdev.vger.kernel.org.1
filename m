@@ -1,230 +1,199 @@
-Return-Path: <netdev+bounces-12721-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12722-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F8ED738A9A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:15:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7EBB6738AB6
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 30ADE1C20EDA
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:15:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A17DF1C20E85
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 16:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F1C21990B;
-	Wed, 21 Jun 2023 16:15:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6AD2019911;
+	Wed, 21 Jun 2023 16:18:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F7F519904
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:15:09 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2053.outbound.protection.outlook.com [40.107.223.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C1BF186;
-	Wed, 21 Jun 2023 09:15:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D14B19509
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 16:18:36 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2042.outbound.protection.outlook.com [40.107.22.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDEA1E41;
+	Wed, 21 Jun 2023 09:18:34 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E1xmLpc+1ef5weZFgu6kVmIkGRPu/NsuOH9Ttd8AAVy5ZFHULy7Ctr2SXqBn0hJhaY8Z9sQiVspGd6duGWDqtEvVvtQOpw2Jiq7RgqfJcrCVzKRGAHGnfJByw3tsm3HHJKx/G4pO47OGegOfHRbUKCGGXH8nxWFXzzNjJy8b7VITEyINiTe1tizQMaNLXfXf1dJcMqB1g+PjZJOhntRSvnjuA51221buVpX8aBZQTCI+IfvBkLiXBvi4rKF8VHCTEElE8cuD9OAcAIYssNRz943Y9ZtkRdQ3CiE8y4Q5OCJZtp7xBWwxCxmFDnRDHk/B0wS4aHK14MBJ11FEN4lYmA==
+ b=l/MCXpt/9UM89E+gL28beh9XrNXeFzjHBtyaC9DZRKgJKD5SWT4jtLhkBqqWLpZdnQUFUdh24Y93bmQ2Iin1j0FriqbbOGkGrtlhAnubvjF0qzhA736f19X+RMvm362AyUrUayIEj4ykMtilUROb396q8B0yRnopNZN0aFhPnft66ChxZbbkGw3U/OYW0a16O47s8GtB+T2kWmPGamWlOgqRnY+ZYNdMfhJxV/3bI37G1okQldArqHEPyFdrMLdFWQlpil6+Vfs1Ey4KR10tv5nMurTH6ma8aDcdON8929Zi7bX/MqqfPNYNMY/AjGeczQp4c0YS9R+8bpVjP7p1pA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2XuIkuVB09s2z0EXoibkagIFTtxAv4WP2pPDyyxrThI=;
- b=WoRnwhqT2Esd8RNktcLsIpNARcs/Jm23ypTAMlfqGRJ5pmKK+cna8MzCm+muOYQ/NqYPvdg0x2J40mc+eJKR6fqc2MiT+B2z2e26BtKpOIGq9DwGGgqL+fS/SnYlWUZl4gRUgd5mBrgfGgICw7rrFpuvov2zkoq8RUWQ3+z4QPLnl79LEMZ6qBV4XPjP1V04Q0Ep3/d9ZxYcpypwKpEDWq9Nr7rHUEkvwvE09p7iJnr//MjS5GyhM+EZh10qW3OqTX32UfVb9CN36zBPZUjENXwHVXStDok93l0EFsDNfbPC0+ZF25P7JnvmeZ8RqSWY9z1bphjtdOCI3W78YCZj4A==
+ bh=9oQeTMoDq3KCwbOT3ek6TC7AqmS4vcKI6ZWPThDzRjM=;
+ b=mBJQl+WIhfoHbR7HC4c7wrQRCqNi70UXxCCEnY/tZACDjZwvG146j9siXIoKd7OTcaUZHD1jeLPX6QDV+9L2H/GDhrHPbIEVXxw2D5iYq2iTSkDAzPo3Bb9vGj8FL620vbW93mLnU2TTafLbSg8+x7tRd0yHetTn1R7hOqP1jwtBZt8FYnTpQJbsYgqckZFkMZZRSYm7JJ74fjByop4FUmWH9drk7l1MRJ8tCCkaVfmBz8v087S/od0BUlnnNxzYEbessY9UO01gBShcumsNkv+VX90c7fbinyxSVeEr6olocUpRu/AAU0ynaT2/4YzG9+lSpbUyv1wJ09mEZN3NNQ==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2XuIkuVB09s2z0EXoibkagIFTtxAv4WP2pPDyyxrThI=;
- b=wSwpo+F0gqG87cDBUm4gI5LwnqC2UYoCbiq+XapIEpYXslzegdcBThn/OVeYMXEBBSiv9VgrmNEArJgC9CYgfRqjUk/TzQDU4nOX/+of/y/YVdvTCiHA8C+cPhL4HjcoF1GEADgAkochIqP7WBBViPxhauRl30PSq9OaNhaU6jU=
+ bh=9oQeTMoDq3KCwbOT3ek6TC7AqmS4vcKI6ZWPThDzRjM=;
+ b=RIE9M6u9xzy02Q0tby4hDe77P43GZrV86h9H6B9sAyIeDfHAVyxUl6S3AmQ9oleHPXXYZgHGdbrkqCi1aFcmrwJ7vyoi7mQCH2tObso/G4gvGiYA5cF9Ac1D5pPj7/DHdQBy3ibNGZ4hqlmSeq0ai1wlOjOvszMb/Ei2QUK0A/o=
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
- by MW4PR12MB5602.namprd12.prod.outlook.com (2603:10b6:303:169::20) with
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by DB9PR04MB9449.eurprd04.prod.outlook.com (2603:10a6:10:36a::11) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
- 2023 16:15:05 +0000
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::dfcf:f53c:c778:6f70]) by MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::dfcf:f53c:c778:6f70%5]) with mapi id 15.20.6521.020; Wed, 21 Jun 2023
- 16:15:05 +0000
-Message-ID: <b1abec47-04df-4481-d680-43c5ff3cbb48@amd.com>
-Date: Wed, 21 Jun 2023 11:15:00 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
- mitigations
+ 2023 16:18:31 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::5356:c79f:ef9f:dc29]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::5356:c79f:ef9f:dc29%4]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
+ 16:18:31 +0000
+Message-ID: <b7365082-55e4-44c4-88d7-3d5c65de8406@oss.nxp.com>
+Date: Wed, 21 Jun 2023 19:18:28 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net v3 1/1] net: phy: nxp-c45-tja11xx: fix the PTP
+ interrupt enablig/disabling
 Content-Language: en-US
-To: Johannes Berg <johannes@sipsolutions.net>, Andrew Lunn <andrew@lunn.ch>,
- Evan Quan <evan.quan@amd.com>
-Cc: rafael@kernel.org, lenb@kernel.org, alexander.deucher@amd.com,
- christian.koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
- daniel@ffwll.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com,
- tzimmermann@suse.de, hdegoede@redhat.com, jingyuwang_vip@163.com,
- lijo.lazar@amd.com, jim.cromie@gmail.com, bellosilicio@gmail.com,
- andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de,
- linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-References: <20230621054603.1262299-1-evan.quan@amd.com>
- <20230621054603.1262299-2-evan.quan@amd.com>
- <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
- <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
-From: "Limonciello, Mario" <mario.limonciello@amd.com>
-In-Reply-To: <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, sebastian.tobuschat@nxp.com,
+ stable@vger.kernel.org
+References: <20230619132851.233976-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230620203145.2da7c958@kernel.org>
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <20230620203145.2da7c958@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA0PR11CA0193.namprd11.prod.outlook.com
- (2603:10b6:806:1bc::18) To MN0PR12MB6101.namprd12.prod.outlook.com
- (2603:10b6:208:3cb::10)
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: VI1PR06CA0087.eurprd06.prod.outlook.com
+ (2603:10a6:803:8c::16) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|MW4PR12MB5602:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c70935e-48eb-4e8f-026f-08db7272ac8d
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|DB9PR04MB9449:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6054e20b-5c85-44f7-b872-08db72732765
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	kNj8/xhpnNQTd3MFZcv99BwPIF296qlnDlLXS5NC+GIqnb0HE9pjgTc1jBVIh+gUvCSIHsiuDMYuZKSmXmE/P+XGJBzk6rHKIVigotKDAcd7yQWi/Tw5YuvLbhmuMcWCpsqwB02x0PKuNAd9zZoqeAyjGhqwZYESvSyO6gbHSF1EfqO15JF6BqMVzb2vpHfvXPCYhUz8lgb7qtH1YHIxCmwRqrUBMTr1Vl2VKNt1cuMuS4+vfSmT1kqOrJ8MVPYVLJcyEeRQR+4llXHmiECTdu2d598YZcXM0me6Xk433xUqCL+A/mwTXwvCsk1sYwIgQpqaLsiDjPL/LR4w6rsax15r1ubbP4DCEotqO6XW9akaIJ55BJxs/d7mgZbBvxTOMK/3UXxO+ll+7KL/ReyDiOqZkSl/VpzNU9SUJK/8oJZx4BxymzHWoUqRFi/Ao5CEbmsKXXpRjSgrVHkqtO8OHgJfwt1uulPL9QR0dVnmjn4zTPRLcdsOMDHrSBL+/qrXyBTSo7ILk6aTZ/xOdlpUWh2i+UPZQzLJUjaHwV9VuAkMFDmKSxcaUMNBhulclbeu8DOdh73Eul6ihJSFxkWvhfA5iKyYmdYHuYDFnebx8bvud28A4ogmfqzlhTzmzK47hmzdqwz2xovv3Ke060aU+A==
+	oTx+fWA1G9xbdJSDXmMuxGukp0c9qjwgsD98oz0DOS09XN4yTaoil9BlxFvu1JAY24wS4ziSigSAbAihAyN3o9KV48NdZQsVbLrma7PFpGYSAb1gHjjVI250KZgvz20lPHeOBde31EHKcxz2qZkgo++JrcpDUizSbhaR5CXCQGPu54RwB7ZandBVYy1JUGZPlDXc6UhCGacng2CQGP0/0WssF2ozYUaoPxwRHqCdcnq2h9iQzk/cl+Be4AZvaq2BNiixNdC4PA+qsFpQAzW0jU9p4nUg570eHaTiNBgZeHQpTz/1FTuGXMydOiIOXXZHOij6CEL2wpKeLaW/tQTqQNS82ogAlQSwcGwr1Yb4SXLgX54vHkIbEx1gdeLp/GPc0hpgDwjAazA/b9FKPGWAINc5/g3GL1TFChbrVc7jXR84HJswf+c+uBuhmpCuIWBRTL6j4s7dyiHfh1qSIqk1NLsEE9yJptPSogWqH7fYc2YweANfzP3G4UC+NNtARjLNCXHX1b5pll/W+Ouw0we/Ia2vg15f3YYs35tXmhwLtarc3mhdGk7xRqi9Tjvy6gXgBGScvCIvY7e047IootFvY4eowqFb2Hj+K6XQKM6e9TdBh6b/HZx+jA8BAlObwAqYouianCIiAUIO8k0KH1yzmATd4x0dMdXK3E2s8s21rhc=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(136003)(39860400002)(396003)(376002)(451199021)(38100700002)(5660300002)(53546011)(26005)(6512007)(6506007)(83380400001)(186003)(2616005)(7416002)(41300700001)(2906002)(8676002)(8936002)(36756003)(6666004)(478600001)(6486002)(4326008)(6636002)(66476007)(66556008)(66946007)(316002)(31696002)(86362001)(110136005)(31686004)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(39860400002)(346002)(376002)(396003)(451199021)(6666004)(2906002)(8676002)(8936002)(316002)(41300700001)(7416002)(31686004)(5660300002)(6916009)(4326008)(66556008)(66946007)(66476007)(6486002)(478600001)(38100700002)(86362001)(31696002)(2616005)(186003)(83380400001)(966005)(53546011)(6512007)(6506007)(26005)(45980500001)(43740500002);DIR:OUT;SFP:1101;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?Y2plNGpaeUxlRmNrOGFVcFVKYWNoeWJyZHJGay83eVYxNXNQaFV0aVRhd05K?=
- =?utf-8?B?ak9jY2preXg4Vm9UMVUxSWVtUkdtbFV2d29DVm01cTlJZnVoREdWY3pjSUVT?=
- =?utf-8?B?c0Z4dmRacnkyQnIzcHVLc2I5K1V1US8xb1NXK3czZUxtSUx3bk55eStadmN5?=
- =?utf-8?B?Nnlub3NlK1NDTkp0L1o5cHIyU3lvQUFHU1Q5dEEyeWFxNXJ5ZnMwbDBtUjFh?=
- =?utf-8?B?Z1Y3UUNwRU1FUnRFYWtZdWJHVTZjVHlsQURydG5GQjgreCtobS8xMmpBd2Rw?=
- =?utf-8?B?KzRJNjF5d1hvZDJjWVpRTnVqRnN6VFJ2SThXNmhHaHJwL1J5elBwRktnTDhN?=
- =?utf-8?B?KytjK0s2QnA1bGQ4MjNIaytYdTZuUHB5MjQvL3QxbmtPSldRbFhnRW5sdzN5?=
- =?utf-8?B?VDJmU284NHh5SGVCdEdGTVd4MDdFZDF5L2d4UWx5eldXVmRLd2p1QWZnNWUr?=
- =?utf-8?B?dXJ1OWpMRWc4OW5TTkxRQ04zc01XVzhkOWRHaWJHdzJacTB1WVBYeXp5Qkxa?=
- =?utf-8?B?NTZuUlR0b0tjNzkzY1lIMWUrMU12MzNrcVcvSDRLcGg5RTJyVFRRUjBNNkY1?=
- =?utf-8?B?MXlkL3NpMURzWERHUjJIZkViazQzTlRCZ01wRnE4NCs5d2ZsdUFiUEhjWlZm?=
- =?utf-8?B?ZUxXdmZvYnZ6K2xjVmVQYjZENGdLdFFmQWwyVjdjZzcybzZSOW1kV0Q2Z0Rt?=
- =?utf-8?B?eDRqcmlPbUNibCtlVU1OVUtDa1RaTDFZTFdhYklQamw0dWVXWWxHbDZtWisz?=
- =?utf-8?B?c2pHOTFFT1E5YmdtdHZKbTRkclJpQUhiblEyL2hYWTd4cEhiWTJWYjlaQW1Y?=
- =?utf-8?B?NUJEV1ArMnBIQ0QrWG5yV0o3aTNHS3AyL25GMThrMVR5UE9nN2tGcEEwM3Vo?=
- =?utf-8?B?SXl0MHYxZldCWFdBR1RSbTFoZWc0dEdidXU2dy9JSGNXUWcrSEZDZ21XRCtt?=
- =?utf-8?B?bDJCN2RnNnYzc21MMk8wN05ZUnZoU0JCempLTWVpZThjZlRxRmthaXl2MG9F?=
- =?utf-8?B?YWtSUExlUDlLVG5pOW8vZVRLTExjbXhhOGZEekV6UytZczlmeXAvU2o3YnYr?=
- =?utf-8?B?aS9JTjRrT2xJT2VVRUhFdmgya0EzMGJoeVdtdlNVSVZjalFGS25zZUp5bmhh?=
- =?utf-8?B?bW1xUGQvZ3BpaFVVWk55eVVzNkVRcktBTzhuVGdNSnUyZWFkYjkyVTR2YUJG?=
- =?utf-8?B?MGhuZzNLTjlFUmpJQlU5bkc2UG1lT0tScVArRGE3N2gwSjFwMjcwVXNwRk5D?=
- =?utf-8?B?R21XT0JsWG9sQkJ2T2xxUWh1cTAya2RDejVjbzFGL21EREpiamd0bzZ4OU5D?=
- =?utf-8?B?andyNmNTeEw5cTQvQkRuZ0t2ZTc3STVLS0xxc1pnZnFnRHhOL2lsN29BWllZ?=
- =?utf-8?B?QjBHQ0NCcWpLVUp0WGpPOTE0LzdDdi9DZk05WFZmUUpIN1JNS3ZjOU9CeWJm?=
- =?utf-8?B?ZXVOM2g2YXJtK3ZweWdFYlQwY1NvUWtnS1BQZm5yREttcnU1c2VPSWo5T0Np?=
- =?utf-8?B?bEhWK0hocGlSdEtJbTJUdGs3M2dqRGN2VTg1aTMyd0Z5UEVRNHpwUkFvRzls?=
- =?utf-8?B?NGNBRmJYUS9iM1Y5THlia0pKKzZqclEyUU5aNTRBOFl6dmthWnR3emxZSTcy?=
- =?utf-8?B?THg4ZzhYSms3MFp1dExCWEJRZGdlbU1vZXV0Y2U0SFEzV1pQaE92L2U3cU8z?=
- =?utf-8?B?WHJyUHU5UzFPNjVEcmNkeTFrZ05pRFVYNVlvWGo0MnR3KzRiZk1XVXNicWVB?=
- =?utf-8?B?UnRleEZNdDE1TnU2dy8xSXZQTmxFU0RyRTRXc2NzTFBXYkNjbFMyT0crU1Vp?=
- =?utf-8?B?RVpwV1NROXJUcXpMaVdGaTN4eWNPb3J0MHpRSHVsZWhHTDhPRUZMOU9FeGVD?=
- =?utf-8?B?dEhLWSsrTXh0U1JPMnZkY3VscmZrRzY3MmFqMnMyc1ZWaVRCT2tNOHRIVzBp?=
- =?utf-8?B?cHFLT3ArTi9IMUhHTGpUY0hnajBZc3VGMEZvbWtiY3p6WkFWT2Jla1RpSERZ?=
- =?utf-8?B?MG1QMDJpSk9sbkxPNG83S21RQk1neStFZTNnY014TlhBWjQzVzQrSFNuVWhH?=
- =?utf-8?B?cDNyNUhOOVZHTzJBV0ZsN3loL2MzTmNUNUhMWDBBU0h4T0w5VlJNSytrTnJr?=
- =?utf-8?Q?3k+8C/2FQKzWb5hwJlMrWKC/q?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c70935e-48eb-4e8f-026f-08db7272ac8d
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
+	=?utf-8?B?NzdXVEU0eXNyZlFVS3FkdmZZd3RRWlN6d0RLNDNrTCtmK20rTXAvTDhuN0pz?=
+ =?utf-8?B?N1lkVUpNQ0IybkFRUENGNTk4UmJ1MWtHVTRSbnpjb0NGZTYxaTR0c1A3ODk1?=
+ =?utf-8?B?VXVuakZmY0NWRTNmZ3lRandXK1N1OEErVC9IMVBNeExDWFJqYkNZNFYzQUhR?=
+ =?utf-8?B?ajJmOFlITTVobWRuUzYyRlU1alI5ZXhUY1lIUHhqVExOU3piRlBrK1puTUMv?=
+ =?utf-8?B?eUxsSmVzMU9pMlh0K0trZ3IwdjdsWG55Rm11YnVnWEd0aG1hRU50K1JnbnRF?=
+ =?utf-8?B?LzBZRStRQXpLRkxic2NwVHNNemdZWGc4KzBZOXNNYmtSZ0pZc3M5c1oycEZW?=
+ =?utf-8?B?VDR0dS9iSUFrcENRaGVSeDJaVldCOUs1YXIvY2NUZUVCYzhNem82bWR5Tlpj?=
+ =?utf-8?B?bnBLSDIvQ3AxaDdQMldDY1hOdDVWR282N1ExaGlwNUovejlYbWpvNit3QTJx?=
+ =?utf-8?B?RE52djUyemRPYm9rSXB4MGYzK3RYS045ZDY3a1RhNThpZFhyM2ZobWNhTlNi?=
+ =?utf-8?B?TUJwK2txbTVlYUZ3cEFuZ1FRdnFQVlk4SUZGbE8va29DbmF5azN3Q0p2NEw5?=
+ =?utf-8?B?UVljazFHbjViaU9VVnovdDRrd0hvbWRUUUgySW1rYyszZUtLRkQ5OVRuN2Vs?=
+ =?utf-8?B?bVhDZ1g4SFZaeXVnaE1kZTFHSnkyRWdEZVJtcmNWYVI3YkhyZkNNTzhvZXB5?=
+ =?utf-8?B?T0JabDRGaEVQOVZQdHRJUHNLNnFCTDIwUkFMVG5kLy9nTmNkL1U0Qi90NmY3?=
+ =?utf-8?B?NElGMEYrdHdmb3YwQVVLeE40cnRXakhrSUhqZUEyRWpPSElxM0pxOXlhYVI0?=
+ =?utf-8?B?K2F6dDV4VTUzeUNYcGJpS0dUN3pSU241TS9zTTNzWSsyalBjMDJxOFg3VXQx?=
+ =?utf-8?B?VlpZK3lzSDU0a2ZuK3M4ejdoMnM2SUZCTmZwci9oUVRVR2Y0clBFUUREeTVh?=
+ =?utf-8?B?ZldsbE9LOU96MDRXT2tLRXQwNStKUWRCR3dZWndTNFBhUWE3ZnN0dEl6bmxp?=
+ =?utf-8?B?dUZoelVYMGE3Q2I1d0dLeVlkamJxeU9ncmIwcDZLbVRiRXpYYmRFdm5VUHp3?=
+ =?utf-8?B?RkVOaExmTisxT0ppYnM1TEZlVERzZkdQVUFmc3VLZktUcEE3Ykp0UjFrZk5I?=
+ =?utf-8?B?Znd2dUF5VnJzMGh4YkdiR0RhSDVrVTAvb3h3NENhYWpVd29ZdGc4YXU4ZjZy?=
+ =?utf-8?B?cjRvbWtsWGQ4dzBsMjRPbWRoUEZsZk40NHZoWExzL3NkdlA4dXJTU05rSzlk?=
+ =?utf-8?B?dUFwa1pENlZ3ZzBBMHcwQWw3TVBZMDR6SFY5aVc5K2MwZTZiQTVZM3dGOG5i?=
+ =?utf-8?B?THFYZE4xS3QxTWFDWThjd05IclY5TXN6cm5lYUtsT3Nvd3Q1ZzVZRkNOQzAz?=
+ =?utf-8?B?Vmw1cUxZVk0wRzIvYU1zbHl4NGNvR1VwcnVMVXVUMFFGOWhIb01wQThDTFJC?=
+ =?utf-8?B?UXdBZUc4TVM5RXE5ZWF5akIwZWtucFBOT3ZlbER2TE5lcWJCcVBsZDloWW9O?=
+ =?utf-8?B?M00xejNPeEZrRUo3anhMcnlNRDZRdS9yUXFTc2pYYmZFU01XZGFpNjBjNkJO?=
+ =?utf-8?B?a3c2WlhYY1hxcHZnVitjWUNjN3pzR29lMkl0ZTZkRE1OOGdkak0wWHFrQ2pn?=
+ =?utf-8?B?aFRwc09yQUxNcFpaZ2pZS242MFU5aS94MjVsVmcrZzQ4MFlXYzk5YS9tdnhl?=
+ =?utf-8?B?L0l0UlBncUVCSVRBdEdVRDg1ZG03OC9nRnZXM1NxcEF1UWc2OUR1Y3ZrNE1y?=
+ =?utf-8?B?RUZiVUUwUmZ0c0xwZTBLa24wMGdrOU01T0lBdWllZ1lCNTlnNk1sT29YT1Zp?=
+ =?utf-8?B?YUg2cUdPcXMvK2VjM3BLam5QVkdPTDJITGhrb3NuRnptOWhPSGJGRXFRcjJU?=
+ =?utf-8?B?Q2x6dXdvWnlOcjZUd3BoZC90Mk9qZTNhVGJKNzhVVm52K2x1WnArZml5L1Uv?=
+ =?utf-8?B?dWs3MzBLeUg4YzN1cGRBMGd0TUtKc2pvc0ZvdnA1M1R1Q3hqU1FhaW96djFE?=
+ =?utf-8?B?ZFVpQkFEL3o3eGpQUzBlYzRNc1Ard0lNTkhvNHdqR210V2ZUbFRZTWRqaTNS?=
+ =?utf-8?B?K1RheHZIVms0Sk1Lcnk3Q2F0ajlmc2NLVDVuN3MwRG9Dc01WWUNrMVdHYlli?=
+ =?utf-8?B?emh1dHovR1YrUmM2VDdaMmI3UjR2NUt2RDFuMlB2SHVrNk9waVBUbGxCYXBa?=
+ =?utf-8?B?akE9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6054e20b-5c85-44f7-b872-08db72732765
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 16:15:05.1658
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 16:18:31.3182
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: aCcOnNKscodZcJZ3WJUzqWYGQI1IEtArbgmYSfl+Uf0qqlHf1iyRsMTcNs4PSfXqWv6fCVGaH9RcZhE4WeZbDA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR12MB5602
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: hm77dqEOCWyHFYXCFckKrJn1ekBL21Oy9JPQI4qggcfx/oW1R4mKj1c6OYLWDL2sJR7DogSP2OCR9SLJAIshgp2jh6kVA6pfx8i5fuDSdP4=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB9449
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Jakub,
 
-On 6/21/2023 10:39 AM, Johannes Berg wrote:
-> On Wed, 2023-06-21 at 17:36 +0200, Andrew Lunn wrote:
->> On Wed, Jun 21, 2023 at 01:45:56PM +0800, Evan Quan wrote:
->>> From: Mario Limonciello <mario.limonciello@amd.com>
->>>
->>> Due to electrical and mechanical constraints in certain platform designs
->>> there may be likely interference of relatively high-powered harmonics of
->>> the (G-)DDR memory clocks with local radio module frequency bands used
->>> by Wifi 6/6e/7.
->>>
->>> To mitigate this, AMD has introduced an ACPI based mechanism that
->>> devices can use to notify active use of particular frequencies so
->>> that devices can make relative internal adjustments as necessary
->>> to avoid this resonance.
->> Do only ACPI based systems have:
+On 21.06.2023 06:31, Jakub Kicinski wrote:
+> On Mon, 19 Jun 2023 16:28:51 +0300 Radu Pirea (NXP OSS) wrote:
+>> Subject: [PATCH net v3 1/1] net: phy: nxp-c45-tja11xx: fix the PTP interrupt enablig/disabling
+> 
+> typo: enablig -> enabling
+> 
+>> .config_intr() handles only the link event interrupt and should
+>> disable/enable the PTP interrupt also.
+> 
+> I don't understand this sentence, TBH, could you rephrase? >
+>> Fixes: 514def5dd339 ("phy: nxp-c45-tja11xx: add timestamping support")
+> 
+> For a fix we really need to commit message to say what the problem is,
+> in terms which will be understood by the user. User visible behavior.
+
+If tools like ptp4l are killed, will leave egress timestamp interrupt 
+enabled. And I would like to say that I was able to trigger any bug 
+related to this, but I wasn't. So, I don't have any bad behaviour to 
+describe :)
+
+However, now I realize that disabling all the PTP IRQs is not a smart 
+way to fix this virtual pseudo issue.
+
+> 
+>> CC: stable@vger.kernel.org # 5.15+
+>> Signed-off-by: Radu Pirea (NXP OSS) <radu-nicolae.pirea@oss.nxp.com>
+>> ---
 >>
->>     interference of relatively high-powered harmonics of the (G-)DDR
->>     memory clocks with local radio module frequency bands used by
->>     Wifi 6/6e/7."
+>> Where is V1?
+>> https://patchwork.kernel.org/project/netdevbpf/patch/20230410124856.287753-1-radu-nicolae.pirea@oss.nxp.com/
 >>
->> Could Device Tree based systems not experience this problem?
-> They could, of course, but they'd need some other driver to change
-> _something_ in the system? I don't even know what this is doing
-> precisely under the hood in the ACPI BIOS, perhaps it adjusts the DDR
-> memory clock frequency in response to WiFi using a frequency that will
-> cause interference with harmonics.
+>> Where is V2?
+>> https://patchwork.kernel.org/project/netdevbpf/patch/20230616135323
+> 
+> This link looks cut off.
 
-The way that WBRF has been architected, it's intended to be able
-to scale to any type of device pair that has harmonic issues.
+https://patchwork.kernel.org/project/netdevbpf/patch/20230616135323.98215-2-radu-nicolae.pirea@oss.nxp.com/
 
-In the first use (Wifi 6e + specific AMD dGPUs) that matches this
-series BIOS has the following purposes:
+> 
+>> +     /* 0x807A register is not present on SJA1110 PHYs. */
+> 
+> Meaning? It's safe because the operation will be ignored?
 
-1) The existence of _DSM indicates that the system may not have
-adequate shielding and should be using these mitigations.
+Yes. The PHY will ignore the writes and will return 0 on reads.
 
-2) Notification mechanism of frequency use.
+> --
+> pw-bot: cr
 
-For the first problematic devices we *could* have done notifications
-entirely in native Linux kernel code with notifier chains.
-However that still means you need a hint from the platform that the
-functionality is needed like a _DSD bit.
-
-It's also done this way so that AML could do some of the notifications
-directly to applicable devices in the future without needing "consumer"
-driver participation.
-
->>> +/**
->>> + * APIs needed by drivers/subsystems for contributing frequencies:
->>> + * During probe, check `wbrf_supported_producer` to see if WBRF is supported.
->>> + * If adding frequencies, then call `wbrf_add_exclusion` with the
->>> + * start and end points specified for the frequency ranges added.
->>> + * If removing frequencies, then call `wbrf_remove_exclusion` with
->>> + * start and end points specified for the frequency ranges added.
->>> + */
->>> +bool wbrf_supported_producer(struct acpi_device *adev);
->>> +int wbrf_add_exclusion(struct acpi_device *adev,
->>> +		       struct wbrf_ranges_in *in);
->>> +int wbrf_remove_exclusion(struct acpi_device *adev,
->>> +			  struct wbrf_ranges_in *in);
->> Could struct device be used here, to make the API agnostic to where
->> the information is coming from? That would then allow somebody in the
->> future to implement a device tree based information provider.
-> That does make sense, and it wouldn't even be that much harder if we
-> assume in a given platform there's only one provider - but once you go
-> beyond that these would need to call function pointers I guess? Though
-> that could be left for "future improvement" too.
->
-> johannes
-
-There's more to it than just sending in the frequency that is
-added or removed.  The notification path comes from ACPI as well.
-
-This first implementation only has one provider and consumer
-but yes, we envision that there could be multiple of each party
-and that AML may be the mechanism for some consumers to react.
-
+-- 
+Radu P.
 
