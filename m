@@ -1,82 +1,83 @@
-Return-Path: <netdev+bounces-12517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12518-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9650B737EF9
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:28:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F6D737EFE
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 11:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BA09F1C20E1D
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 09:28:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 20B4D1C20BC0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 09:31:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48579125AF;
-	Wed, 21 Jun 2023 09:24:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 01899D2F3;
+	Wed, 21 Jun 2023 09:31:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D386134BF
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 09:24:29 +0000 (UTC)
-Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 261F31BD9
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:24:10 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-3112f2b9625so4059057f8f.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:24:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5971C8DA
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 09:31:11 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AE7C4170C
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:31:09 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-3110a5f2832so5359899f8f.1
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:31:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1687339449; x=1689931449;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tSaqA2+LFEta6gdn/o/4wTZ/gzZyVMVxUFSu8tBDIgo=;
-        b=PIgwGsjqRRBnD4wUED0zMgDd90izGj+VUDD9EgoqqxSaxj/EA/sixV9j0Puhbj6yvd
-         i1Ac0Rlms2EVdNwTS5h1sPCi/JjPPAK6m66f+HEwmgOh8D8uZMrVbGn/biLYxZI+BECq
-         XpkAWKQlObsxZ/I51tzMmRbncT39WnbXS+8nl9N5uTZhSuuTZfacrHmIfwjzyHlPZsKB
-         aNAtUdSAbjgLFLrTvaE0GMxn4YiN0CZOBqxzkMr3lFGuEwx9aqn/Vg5a3G+9ZUchNjL+
-         Yk0OrNCbOU/PGc9uO3FRpdu9urD98t0PRfv23kLIMGEvZ9KcdBruuqTU7Y9EsBjTkh72
-         YvtA==
+        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1687339868; x=1689931868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FnoYzlqcpbqIFDX/QCzP0DM0XYhA9I/O0wRSd0b2d80=;
+        b=OKCgz0VaMI1Fv6yd2XldHp/3Alw1/cS1VYDm4ECvg32UV+E10/b7GlASd5Luv4QTDe
+         gl7+Y2+pMX7ebU1ik0S+/Bfjt+amyNuaVDzBp9q1dQm8nFS470hJzdR7tZXyr6Q4x5fN
+         yy4l8FtsayAy/qYIK/O4ngS4Z8pBog+1eRV8Um2eyVNWrMK0IbXKS858U0IWVV4eTRw9
+         sr7aBZXPzwDkEI7pzvxZQqaGXD45sobVdOJ+U7xJMGNTAwX13i+wjEefT/9ctkCN8KjB
+         7ZStrac+Cl8yc2N9adH9Rcz9ni7eoCebFDY12q/U9V52Id688qhVzmdepEW+oLWS+tbE
+         n0OQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687339449; x=1689931449;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=tSaqA2+LFEta6gdn/o/4wTZ/gzZyVMVxUFSu8tBDIgo=;
-        b=K4eR6K6TsZu8rW7SXVgufCT3y4mpz67ZH3OFBo7rJ7Wcg11/u/dnf1R4DFvOyX3Eqb
-         mcB2ux3oCONqFi5+f+d9UZupyciAN930KUA7W9Z5sCoRIlQBFqv6JPszwbi0XQGXBoSd
-         Y6QCD0D/XH9gjA68xbSiX6siOtuX+3eLg45wsOBB31MgC47T8NIg8nSgi+Cx6shR/O9p
-         6EKlg4Kgupxz+v4NV/1Yi6j7Fcfh/LQDpxXFBRa3HBS3Jrmo+DCedkBvMjfPFAu9o40J
-         P+JRGflideaLLHjLDPDXEo3bJYHVySfyPr5JmExeHsO0GMjrqeiYJLJy56TEKhYW4vAk
-         K8aQ==
-X-Gm-Message-State: AC+VfDzwnrg57gCmzRh2QpCItzdeNl8DimWaWHf/F8nLwXYDaeKE6kG/
-	BOsrrh+P45vFOfbwQ4kICUx5cg==
-X-Google-Smtp-Source: ACHHUZ5eMijZ66B67qzvTYMfOslqJVRgfNlBhd2Q6VbMh1hl/bA8gcUR75BYlVUAvnnZHPXYM8lJ+Q==
-X-Received: by 2002:adf:f203:0:b0:30f:ca58:39ca with SMTP id p3-20020adff203000000b0030fca5839camr11486248wro.31.1687339449246;
-        Wed, 21 Jun 2023 02:24:09 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687339868; x=1689931868;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FnoYzlqcpbqIFDX/QCzP0DM0XYhA9I/O0wRSd0b2d80=;
+        b=ZOv72kEPcR44r08LZolty2fRdnYZIH7TIdl1Xt6HllOZZveYRstHNj/l8jiQUcZnjS
+         ULFQFqeaPNMmbpGWpNhwZpPiVqsnEBfK5lj2WxG8/ZWtef4oZKpHN8zq43tb3NIwEnnw
+         cF+5THo1v1DjoyP+vhhC3g+WA5JqBwnpYmVJTgLvsYYNoK4GtL/1QrgLPcisfx56b5WD
+         oAB7woNx5RkQtV0OgEO8YUNDj32As3Y2g6jsmPKrhXOEUtBnOkPtyeI04wbXRWZgGmyG
+         6wQBcv0tp4poVUt7YGoALsOZWWyP9EHuSqMknmLOZLWROKaM//+ev5TT0EzM7z+UzYcD
+         7Bpg==
+X-Gm-Message-State: AC+VfDyK+O4zkfsGur+icISB+K6oU40fED9jsU5jQTmpjJAJHquCvMEN
+	hASVaBgOewQfAcFWt6yev15O7Q==
+X-Google-Smtp-Source: ACHHUZ6wNggPJlaWNtBCFb85tB2zyBb3w5c/2/L22CBkW3973Qtp0kgzE6fLsZu8EOuufjAe/NANWQ==
+X-Received: by 2002:a5d:4203:0:b0:311:1107:9aba with SMTP id n3-20020a5d4203000000b0031111079abamr13408111wrq.19.1687339868152;
+        Wed, 21 Jun 2023 02:31:08 -0700 (PDT)
 Received: from blmsp.fritz.box ([2001:4091:a247:82fa:b762:4f68:e1ed:5041])
-        by smtp.gmail.com with ESMTPSA id i11-20020adffdcb000000b002fda1b12a0bsm4022115wrs.2.2023.06.21.02.24.08
+        by smtp.gmail.com with ESMTPSA id t10-20020a5d49ca000000b002fe96f0b3acsm3977344wrs.63.2023.06.21.02.31.06
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 02:24:08 -0700 (PDT)
+        Wed, 21 Jun 2023 02:31:07 -0700 (PDT)
 From: Markus Schneider-Pargmann <msp@baylibre.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Wolfgang Grandegger <wg@grandegger.com>
-Cc: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
-	Simon Horman <simon.horman@corigine.com>,
-	"David S . Miller" <davem@davemloft.net>,
+To: Wolfgang Grandegger <wg@grandegger.com>,
+	Marc Kleine-Budde <mkl@pengutronix.de>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>
+Cc: "David S . Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
 	Paolo Abeni <pabeni@redhat.com>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Vivek Yadav <vivek.2311@samsung.com>,
 	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Julien Panis <jpanis@baylibre.com>,
+	Simon Horman <simon.horman@corigine.com>,
 	Markus Schneider-Pargmann <msp@baylibre.com>
-Subject: [PATCH v4 12/12] can: m_can: Implement transmit submission coalescing
-Date: Wed, 21 Jun 2023 11:23:50 +0200
-Message-Id: <20230621092350.3130866-13-msp@baylibre.com>
+Subject: [PATCH v2 0/6] can: tcan4x5x: Introduce tcan4552/4553
+Date: Wed, 21 Jun 2023 11:30:57 +0200
+Message-Id: <20230621093103.3134655-1-msp@baylibre.com>
 X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230621092350.3130866-1-msp@baylibre.com>
-References: <20230621092350.3130866-1-msp@baylibre.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -86,202 +87,54 @@ MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-m_can supports submitting multiple transmits with one register write.
-This is an interesting option to reduce the number of SPI transfers for
-peripheral chips.
+Hi everyone,
 
-The m_can_tx_op is extended with a bool that signals if it is the last
-transmission and the submit should be executed immediately.
+This series introduces two new chips tcan-4552 and tcan-4553. The
+generic driver works in general but needs a few small changes. These are
+caused by the removal of wake and state pins.
 
-The worker then writes the skb to the FIFO and submits it only if the
-submit bool is set. If it isn't set, the worker will write the next skb
-which is waiting in the workqueue to the FIFO, etc.
+In v2 I updated the bindings to use tcan4x5x always as a fallback. The
+driver now uses the first more specific binding if available. If the
+given binding does not match the chip that is present, a warning is
+printed and the correct driver data is loaded instead.
 
-Signed-off-by: Markus Schneider-Pargmann <msp@baylibre.com>
----
+Based on v6.4-rc1.
 
-Notes:
-    Notes:
-    - I ran into lost messages in the receive FIFO when using this
-      implementation. I guess this only shows up with my test setup in
-      loopback mode and maybe not enough CPU power.
-    - I put this behind the tx-frames ethtool coalescing option as we do
-      wait before submitting packages but it is something different than the
-      tx-frames-irq option. I am not sure if this is the correct option,
-      please let me know.
+Best,
+Markus
 
- drivers/net/can/m_can/m_can.c | 55 ++++++++++++++++++++++++++++++++---
- drivers/net/can/m_can/m_can.h |  6 ++++
- 2 files changed, 57 insertions(+), 4 deletions(-)
+Changes in v2:
+- Update the binding documentation to specify tcan4552 and tcan4553 with
+  the tcan4x5x as fallback
+- Update the driver to use auto detection as well. If compatible differs
+  from the ID2 register, use the ID2 register and print a warning.
+- Small style changes
 
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index 62e275c87c29..50909b9c0e7c 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -1515,6 +1515,9 @@ static int m_can_start(struct net_device *dev)
- 	if (ret)
- 		return ret;
- 
-+	netdev_queue_set_dql_min_limit(netdev_get_tx_queue(cdev->net, 0),
-+				       cdev->tx_max_coalesced_frames);
-+
- 	cdev->can.state = CAN_STATE_ERROR_ACTIVE;
- 
- 	m_can_enable_all_interrupts(cdev);
-@@ -1812,8 +1815,13 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev,
- 		 */
- 		can_put_echo_skb(skb, dev, putidx, frame_len);
- 
--		/* Enable TX FIFO element to start transfer  */
--		m_can_write(cdev, M_CAN_TXBAR, (1 << putidx));
-+		if (cdev->is_peripheral) {
-+			/* Delay enabling TX FIFO element */
-+			cdev->tx_peripheral_submit |= BIT(putidx);
-+		} else {
-+			/* Enable TX FIFO element to start transfer  */
-+			m_can_write(cdev, M_CAN_TXBAR, BIT(putidx));
-+		}
- 		cdev->tx_fifo_putidx = (++cdev->tx_fifo_putidx >= cdev->can.echo_skb_max ?
- 					0 : cdev->tx_fifo_putidx);
- 	}
-@@ -1826,6 +1834,17 @@ static netdev_tx_t m_can_tx_handler(struct m_can_classdev *cdev,
- 	return NETDEV_TX_BUSY;
- }
- 
-+static void m_can_tx_submit(struct m_can_classdev *cdev)
-+{
-+	if (cdev->version == 30)
-+		return;
-+	if (!cdev->is_peripheral)
-+		return;
-+
-+	m_can_write(cdev, M_CAN_TXBAR, cdev->tx_peripheral_submit);
-+	cdev->tx_peripheral_submit = 0;
-+}
-+
- static void m_can_tx_work_queue(struct work_struct *ws)
- {
- 	struct m_can_tx_op *op = container_of(ws, struct m_can_tx_op, work);
-@@ -1834,11 +1853,15 @@ static void m_can_tx_work_queue(struct work_struct *ws)
- 
- 	op->skb = NULL;
- 	m_can_tx_handler(cdev, skb);
-+	if (op->submit)
-+		m_can_tx_submit(cdev);
- }
- 
--static void m_can_tx_queue_skb(struct m_can_classdev *cdev, struct sk_buff *skb)
-+static void m_can_tx_queue_skb(struct m_can_classdev *cdev, struct sk_buff *skb,
-+			       bool submit)
- {
- 	cdev->tx_ops[cdev->next_tx_op].skb = skb;
-+	cdev->tx_ops[cdev->next_tx_op].submit = submit;
- 	queue_work(cdev->tx_wq, &cdev->tx_ops[cdev->next_tx_op].work);
- 
- 	++cdev->next_tx_op;
-@@ -1850,6 +1873,7 @@ static netdev_tx_t m_can_start_peripheral_xmit(struct m_can_classdev *cdev,
- 					       struct sk_buff *skb)
- {
- 	netdev_tx_t err;
-+	bool submit;
- 
- 	if (cdev->can.state == CAN_STATE_BUS_OFF) {
- 		m_can_clean(cdev->net);
-@@ -1860,7 +1884,15 @@ static netdev_tx_t m_can_start_peripheral_xmit(struct m_can_classdev *cdev,
- 	if (err != NETDEV_TX_OK)
- 		return err;
- 
--	m_can_tx_queue_skb(cdev, skb);
-+	++cdev->nr_txs_without_submit;
-+	if (cdev->nr_txs_without_submit >= cdev->tx_max_coalesced_frames ||
-+	    !netdev_xmit_more()) {
-+		cdev->nr_txs_without_submit = 0;
-+		submit = true;
-+	} else {
-+		submit = false;
-+	}
-+	m_can_tx_queue_skb(cdev, skb, submit);
- 
- 	return NETDEV_TX_OK;
- }
-@@ -1992,6 +2024,7 @@ static int m_can_get_coalesce(struct net_device *dev,
- 
- 	ec->rx_max_coalesced_frames_irq = cdev->rx_max_coalesced_frames_irq;
- 	ec->rx_coalesce_usecs_irq = cdev->rx_coalesce_usecs_irq;
-+	ec->tx_max_coalesced_frames = cdev->tx_max_coalesced_frames;
- 	ec->tx_max_coalesced_frames_irq = cdev->tx_max_coalesced_frames_irq;
- 	ec->tx_coalesce_usecs_irq = cdev->tx_coalesce_usecs_irq;
- 
-@@ -2036,6 +2069,18 @@ static int m_can_set_coalesce(struct net_device *dev,
- 		netdev_err(dev, "tx-frames-irq and tx-usecs-irq can only be set together\n");
- 		return -EINVAL;
- 	}
-+	if (ec->tx_max_coalesced_frames > cdev->mcfg[MRAM_TXE].num) {
-+		netdev_err(dev, "tx-frames %u greater than the TX event FIFO %u\n",
-+			   ec->tx_max_coalesced_frames,
-+			   cdev->mcfg[MRAM_TXE].num);
-+		return -EINVAL;
-+	}
-+	if (ec->tx_max_coalesced_frames > cdev->mcfg[MRAM_TXB].num) {
-+		netdev_err(dev, "tx-frames %u greater than the TX FIFO %u\n",
-+			   ec->tx_max_coalesced_frames,
-+			   cdev->mcfg[MRAM_TXB].num);
-+		return -EINVAL;
-+	}
- 	if (ec->rx_coalesce_usecs_irq != 0 && ec->tx_coalesce_usecs_irq != 0 &&
- 	    ec->rx_coalesce_usecs_irq != ec->tx_coalesce_usecs_irq) {
- 		netdev_err(dev, "rx-usecs-irq %u needs to be equal to tx-usecs-irq %u if both are enabled\n",
-@@ -2046,6 +2091,7 @@ static int m_can_set_coalesce(struct net_device *dev,
- 
- 	cdev->rx_max_coalesced_frames_irq = ec->rx_max_coalesced_frames_irq;
- 	cdev->rx_coalesce_usecs_irq = ec->rx_coalesce_usecs_irq;
-+	cdev->tx_max_coalesced_frames = ec->tx_max_coalesced_frames;
- 	cdev->tx_max_coalesced_frames_irq = ec->tx_max_coalesced_frames_irq;
- 	cdev->tx_coalesce_usecs_irq = ec->tx_coalesce_usecs_irq;
- 
-@@ -2063,6 +2109,7 @@ static const struct ethtool_ops m_can_ethtool_ops = {
- 	.supported_coalesce_params = ETHTOOL_COALESCE_RX_USECS_IRQ |
- 		ETHTOOL_COALESCE_RX_MAX_FRAMES_IRQ |
- 		ETHTOOL_COALESCE_TX_USECS_IRQ |
-+		ETHTOOL_COALESCE_TX_MAX_FRAMES |
- 		ETHTOOL_COALESCE_TX_MAX_FRAMES_IRQ,
- 	.get_ts_info = ethtool_op_get_ts_info,
- 	.get_coalesce = m_can_get_coalesce,
-diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
-index 5c182aece15c..54af26a94042 100644
---- a/drivers/net/can/m_can/m_can.h
-+++ b/drivers/net/can/m_can/m_can.h
-@@ -74,6 +74,7 @@ struct m_can_tx_op {
- 	struct m_can_classdev *cdev;
- 	struct work_struct work;
- 	struct sk_buff *skb;
-+	bool submit;
- };
- 
- struct m_can_classdev {
-@@ -103,6 +104,7 @@ struct m_can_classdev {
- 	u32 active_interrupts;
- 	u32 rx_max_coalesced_frames_irq;
- 	u32 rx_coalesce_usecs_irq;
-+	u32 tx_max_coalesced_frames;
- 	u32 tx_max_coalesced_frames_irq;
- 	u32 tx_coalesce_usecs_irq;
- 
-@@ -117,6 +119,10 @@ struct m_can_classdev {
- 	int tx_fifo_size;
- 	int next_tx_op;
- 
-+	int nr_txs_without_submit;
-+	/* bitfield of fifo elements that will be submitted together */
-+	u32 tx_peripheral_submit;
-+
- 	struct mram_cfg mcfg[MRAM_CFG_NUM];
- };
- 
+Previous versions:
+v1 - https://lore.kernel.org/lkml/20230314151201.2317134-1-msp@baylibre.com
+
+Markus Schneider-Pargmann (6):
+  dt-bindings: can: tcan4x5x: Add tcan4552 and tcan4553 variants
+  can: tcan4x5x: Remove reserved register 0x814 from writable table
+  can: tcan4x5x: Check size of mram configuration
+  can: tcan4x5x: Rename ID registers to match datasheet
+  can: tcan4x5x: Add support for tcan4552/4553
+  can: tcan4x5x: Add error messages in probe
+
+ .../devicetree/bindings/net/can/tcan4x5x.txt  |  11 +-
+ drivers/net/can/m_can/m_can.c                 |  16 ++
+ drivers/net/can/m_can/m_can.h                 |   1 +
+ drivers/net/can/m_can/tcan4x5x-core.c         | 161 ++++++++++++++----
+ drivers/net/can/m_can/tcan4x5x-regmap.c       |   1 -
+ 5 files changed, 155 insertions(+), 35 deletions(-)
+
+
+base-commit: ac9a78681b921877518763ba0e89202254349d1b
 -- 
 2.40.1
 
