@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-12775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01D5C738E96
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:26:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DA449738EA9
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:26:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E22CF1C20F32
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:26:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95D2C281694
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:26:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A2F19E76;
-	Wed, 21 Jun 2023 18:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B1701ACDA;
+	Wed, 21 Jun 2023 18:26:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B98C19E6C
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:26:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E9D519E62
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:26:17 +0000 (UTC)
 Received: from mail-wr1-x434.google.com (mail-wr1-x434.google.com [IPv6:2a00:1450:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3183B1731
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:13 -0700 (PDT)
-Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-312863a983fso1347292f8f.2
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:13 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B827A1988
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:14 -0700 (PDT)
+Received: by mail-wr1-x434.google.com with SMTP id ffacd0b85a97d-31129591288so4505746f8f.1
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 11:26:14 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687371971; x=1689963971;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=9YRCkfxlgVhLag2qZdreYDwQ2ugrCPfdILJ7ghjkiVg=;
-        b=u8ZAQRyJzdnE2piUbuVRCJwKkURKjchpnXy+eFI1urxv6Cd5d3XsXcG66xfVnGnxon
-         XDt32nCwF3aUUMgkmVUyFjUEM9VwRuNlkR3pcnz9eWy/Q5ZQK8v+G41ZrPc9qD9pZU3g
-         RZ0HcmroxwkfHdkQ/EkPDf/v5z98rhagKx57MVxw79caWc0Fb+f93WtwduDRjZs+NGa2
-         cxWgGQRrXI6MC/TtWBuNdmTxbcygfzeUVkYYs5f1NVZU02WReLQSCZSO52HASJvEo/B+
-         N5o0ao2itbeBnosegCy7tG8QlsBdbiJq/mgUjDBaFT3ZokQvbaYFB6+CIWNRcx+rxYnw
-         v/QQ==
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687371973; x=1689963973;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=XnVUt9Dh0UjANbDqrVAk/dG3mwlxSAljXxYJAiOkMWs=;
+        b=SXR+1CSaVc/VFj+6YyiQh1YfTC4kn5BznGOyTgzxQH4zAhHphmy7po2zKWk8QcZbOu
+         uWcQrBJ/d3s9qeBl6IcPLErvFClyqACulScbO2UCePcPAmvCucD/Oo6Yh5FqBOMaOgx0
+         24/vR0PkWZpbjYqaxpB9nQlLSUkT8ZiGdt/2QkaCSYum8BFIdcMJREM6AXxRCnYBaMjN
+         x0C/R5puQNCsI4KdE3WlBtlgWAPScneLteaKr92fOVyeZwmI+ZhY/pEFc5t+CJQH/ghT
+         6272GWWWVSRWw+Rq6mI9FRaKPmY7rA44K0XrGdOrEdfGQ5Rd39ZX+AOH1DqWgCvXUlad
+         ok9A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687371971; x=1689963971;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=9YRCkfxlgVhLag2qZdreYDwQ2ugrCPfdILJ7ghjkiVg=;
-        b=jJtjRDx7IpHmGiHnE8yJ7DH7PKZgpNugVCaK9IDQCUFCIIcitFtxZ4lebjckfZ2pBX
-         aI6eyWKwHiYO9Oft5yJKqP/h9MOfgqzr1tuQkNJg8VzKgb+sWo5RooqlA47E1+iEd1Sy
-         2+350WHYQSyCqsvtmTYCqTCRgK1Mbo+8M1E6vsBGCpCkHdIciMtYIA/4nR8llb7nX6MT
-         e01udBzBmfvOO4dUIUFGRTgp5u3qV3EoZp8hhaqlBZZKA1iFUJbHYeLucIMwjWDHLn3B
-         stQ1rdWIqJE4/nLK8ZmHBLWRmkGBRw35qSdyqvjvuZB7seE86Ap+yH9CoGmCVE8X3vaq
-         b6nw==
-X-Gm-Message-State: AC+VfDypksKhyeN4q3wLFMGDUk2gjKmYorm6CnpHbolbDdMryvA2mvYP
-	5vG9/NiJpdW9aGsa5C9YNHwXHB/JCvZzzqUNVRY=
-X-Google-Smtp-Source: ACHHUZ7AU0YR6t8YRNVDFi1hgZ+p3KaefWogW+t3JyVHWxfXMFp6sDeW7fgBuhh/aFdqIV4RQ9+IGw==
-X-Received: by 2002:adf:e4cd:0:b0:30e:3d5a:b2be with SMTP id v13-20020adfe4cd000000b0030e3d5ab2bemr12500462wrm.44.1687371971502;
-        Wed, 21 Jun 2023 11:26:11 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687371973; x=1689963973;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=XnVUt9Dh0UjANbDqrVAk/dG3mwlxSAljXxYJAiOkMWs=;
+        b=Vhe5YU4QEqLG4qx66YJSq4rcl3vthUK7SalhgLj5yd2vAw1DfGw4LxroMpYi2hvlFT
+         ZawVURgvjFo2JhBdfppn6Cjh9khbHN2nS0ajhQC1WxQdi8BDJa2QssgJ7YRUXsgMGZ35
+         kAQKEnVUbvMOpCpNlBpPnB52oyHWeEgl0I5nuT/XlVP5P7Pj7Z7uCCclayc9miAShR8Y
+         nhoj6lJWvCfTzOUerflEqFtxYryNo/zCsqqu++JTpAoWMfTJeyUbSFfAkqQg3c51TbdI
+         7LE94shGUW3P5ZHSw8JVKNQv/NeRKaOCwlTaiCM0YTiRgIuLXeC/gV7S2UkYaKWV3iBT
+         MrJQ==
+X-Gm-Message-State: AC+VfDxtxu0yGlp5hQ6aokVaMwZbhHJp8hVNq0UrDBNBm+bBFyIcu0x7
+	sBN5sJU37nOn01iFREo4UsP0IQ==
+X-Google-Smtp-Source: ACHHUZ5wc2omPscouYvz8DXPPf0DQRTfXe9e5VD4Xmi19o6SIopsk/LXIsSG0qcRyRKpqh2wCqn2mA==
+X-Received: by 2002:a5d:6a91:0:b0:2fe:e137:dbad with SMTP id s17-20020a5d6a91000000b002fee137dbadmr11044573wru.51.1687371972834;
+        Wed, 21 Jun 2023 11:26:12 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:a69f:8ee3:6907:ccdf])
-        by smtp.gmail.com with ESMTPSA id z13-20020adff74d000000b0030af15d7e41sm5176994wrp.4.2023.06.21.11.26.10
+        by smtp.gmail.com with ESMTPSA id z13-20020adff74d000000b0030af15d7e41sm5176994wrp.4.2023.06.21.11.26.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 11:26:11 -0700 (PDT)
+        Wed, 21 Jun 2023 11:26:12 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -82,10 +83,12 @@ Cc: netdev@vger.kernel.org,
 	linux-tegra@vger.kernel.org,
 	linux-mediatek@lists.infradead.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [PATCH net-next 00/12] net: stmmac: replace boolean fields in plat_stmmacenet_data with flags
-Date: Wed, 21 Jun 2023 20:25:46 +0200
-Message-Id: <20230621182558.544417-1-brgl@bgdev.pl>
+Subject: [PATCH net-next 01/12] net: stmmac: replace has_integrated_pcs field with a flag
+Date: Wed, 21 Jun 2023 20:25:47 +0200
+Message-Id: <20230621182558.544417-2-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230621182558.544417-1-brgl@bgdev.pl>
+References: <20230621182558.544417-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -101,37 +104,67 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-As suggested by Jose Abreu: let's drop all 12 boolean fields in
-plat_stmmacenet_data and replace them with a common bitfield.
+struct plat_stmmacenet_data contains several boolean fields that could be
+easily replaced with a common integer 'flags' bitfield and bit defines.
 
-Bartosz Golaszewski (12):
-  net: stmmac: replace has_integrated_pcs field with a flag
-  net: stmmac: replace the sph_disable field with a flag
-  net: stmmac: replace the use_phy_wol field with a flag
-  net: stmmac: replace the has_sun8i field with a flag
-  net: stmmac: replace the tso_en field with a flag
-  net: stmmac: replace the serdes_up_after_phy_linkup field with a flag
-  net: stmmac: replace the vlan_fail_q_en field with a flag
-  net: stmmac: replace the multi_msi_en field with a flag
-  net: stmmac: replace the ext_snapshot_en field with a flag
-  net: stmmac: replace the int_snapshot_en field with a flag
-  net: stmmac: replace the rx_clk_runs_in_lpi field with a flag
-  net: stmmac: replace the en_tx_lpi_clockgating field with a flag
+Start the process with the has_integrated_pcs field.
 
- .../stmicro/stmmac/dwmac-dwc-qos-eth.c        |  4 +-
- .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 23 +++++------
- .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  5 ++-
- .../stmicro/stmmac/dwmac-qcom-ethqos.c        |  8 ++--
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
- .../net/ethernet/stmicro/stmmac/dwmac-tegra.c |  4 +-
- .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c |  4 +-
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 40 +++++++++++--------
- .../net/ethernet/stmicro/stmmac/stmmac_pci.c  |  2 +-
- .../ethernet/stmicro/stmmac/stmmac_platform.c | 10 +++--
- .../net/ethernet/stmicro/stmmac/stmmac_ptp.c  |  5 ++-
- include/linux/stmmac.h                        | 26 ++++++------
- 12 files changed, 76 insertions(+), 57 deletions(-)
+Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+---
+ drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c | 3 ++-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c       | 3 ++-
+ include/linux/stmmac.h                                  | 4 +++-
+ 3 files changed, 7 insertions(+), 3 deletions(-)
 
+diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+index fa0fc53c56a3..44151e69f9ce 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
++++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
+@@ -790,7 +790,8 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
+ 	plat_dat->tso_en = of_property_read_bool(np, "snps,tso");
+ 	if (of_device_is_compatible(np, "qcom,qcs404-ethqos"))
+ 		plat_dat->rx_clk_runs_in_lpi = 1;
+-	plat_dat->has_integrated_pcs = data->has_integrated_pcs;
++	if (data->has_integrated_pcs)
++		plat_dat->flags |= STMMAC_FLAG_HAS_INTEGRATED_PCS;
+ 
+ 	if (ethqos->serdes_phy) {
+ 		plat_dat->serdes_powerup = qcom_ethqos_serdes_powerup;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 4727f7be4f86..38b6cbd8a133 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -5798,7 +5798,8 @@ static void stmmac_common_interrupt(struct stmmac_priv *priv)
+ 		}
+ 
+ 		/* PCS link status */
+-		if (priv->hw->pcs && !priv->plat->has_integrated_pcs) {
++		if (priv->hw->pcs &&
++		    !(priv->plat->flags & STMMAC_FLAG_HAS_INTEGRATED_PCS)) {
+ 			if (priv->xstats.pcs_link)
+ 				netif_carrier_on(priv->dev);
+ 			else
+diff --git a/include/linux/stmmac.h b/include/linux/stmmac.h
+index 06090538fe2d..8e7511071ef1 100644
+--- a/include/linux/stmmac.h
++++ b/include/linux/stmmac.h
+@@ -204,6 +204,8 @@ struct dwmac4_addrs {
+ 	u32 mtl_low_cred_offset;
+ };
+ 
++#define STMMAC_FLAG_HAS_INTEGRATED_PCS		BIT(0)
++
+ struct plat_stmmacenet_data {
+ 	int bus_id;
+ 	int phy_addr;
+@@ -293,6 +295,6 @@ struct plat_stmmacenet_data {
+ 	bool sph_disable;
+ 	bool serdes_up_after_phy_linkup;
+ 	const struct dwmac4_addrs *dwmac4_addrs;
+-	bool has_integrated_pcs;
++	unsigned int flags;
+ };
+ #endif
 -- 
 2.39.2
 
