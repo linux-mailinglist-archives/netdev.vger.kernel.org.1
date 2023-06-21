@@ -1,45 +1,47 @@
-Return-Path: <netdev+bounces-12436-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12437-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DCEB7378FF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 04:19:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C178273790F
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 04:23:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7C6328142B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 02:19:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04E691C20D71
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 02:23:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 067CA15BC;
-	Wed, 21 Jun 2023 02:19:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113DE15BE;
+	Wed, 21 Jun 2023 02:23:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE7F15B1
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:19:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2B465C433C8;
-	Wed, 21 Jun 2023 02:19:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0379315B1
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:23:14 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48409C433C0;
+	Wed, 21 Jun 2023 02:23:14 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687313948;
-	bh=p8Q8r4aZhiSiJbdIqmN/Pz1WZl07k8vqIfS3U6C+MPE=;
+	s=k20201202; t=1687314194;
+	bh=U1t8y2o+4DilbMZCVXTVXaO4HA6npnBe2I6NhhKYhtk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=L2w0Kpopcb8BCSVb/gO9i9A9Uc8cNEQfhQ4HzzDZDnu4kg2w7SRCU8sPm8GnUohHb
-	 IyskLgwHtapceBiUkHmFLd9KIraQWVeiE2axQiMl9ngj9lJtGuCVqANrVuj0fG0v31
-	 SUA5YgB3N3xPQqQl0Uzz3PEU1PMNqzpJJKyLhTyn2rpWkIauPtq/LhJFlWykmxNXo4
-	 pQqwEpQMLscQI4pUaSOjcACr2bL9nJ4daIm9inSy4KHvSRDacs2KJg6DWqWWVAF8Ks
-	 WZmC7/8NmTbPadehe3Wb60XiFK7k2pzb5uqYMZ7qEBn05cSowvEe1uslgkLNSl42NF
-	 DGrpmfvabpXcA==
-Date: Tue, 20 Jun 2023 19:19:07 -0700
+	b=DRdptX3/5QiVzn7Dju9Fm9BPxEUuvVD9fSsFt9PtD6bBiJcwgdKQ/YzE4xsc2bDxX
+	 dlR6g+JjNT05oJknIbf7V/CBwsLksymSiJVQVOmo28lyqc6YEyluGZ9rctrpPxmohb
+	 qVEYgFGf5xVWLlowcku8vp/TGCx0958kGTzyeb6knCkh0okkTkNPLDpH2LBS3hsBFZ
+	 yE5EvrYjSQQRN44ejeCBT3pKoSX2aS6XH7EWeHM1jQWRU8tCWDQy5g0IvMyth5Ffzp
+	 TTxVLpBUtsZfEWf+SJjIcw3ehX45PXv2Q97bkdQychVjbg6AbsVpIbya09i80F8Sau
+	 nHdOQd/ysWg/w==
+Date: Tue, 20 Jun 2023 19:23:13 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Dave Ertman <david.m.ertman@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
- daniel.machon@microchip.com, simon.horman@corigine.com, bcreeley@amd.com,
- anthony.l.nguyen@intel.com
-Subject: Re: [PATCH iwl-next v6 00/10] Implement support for SRIOV + LAG
-Message-ID: <20230620191907.3a812399@kernel.org>
-In-Reply-To: <20230620221854.848606-1-david.m.ertman@intel.com>
-References: <20230620221854.848606-1-david.m.ertman@intel.com>
+To: Maxim Georgiev <glipus@gmail.com>
+Cc: kory.maincent@bootlin.com, netdev@vger.kernel.org,
+ maxime.chevallier@bootlin.com, vladimir.oltean@nxp.com,
+ vadim.fedorenko@linux.dev, richardcochran@gmail.com,
+ gerhard@engleder-embedded.com, liuhangbin@gmail.com
+Subject: Re: [RFC PATCH net-next v6 0/5] New NDO methods
+ ndo_hwtstamp_get/set
+Message-ID: <20230620192313.02df5db3@kernel.org>
+In-Reply-To: <20230502043150.17097-1-glipus@gmail.com>
+References: <20230502043150.17097-1-glipus@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,21 +51,15 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Tue, 20 Jun 2023 15:18:44 -0700 Dave Ertman wrote:
-> Implement support for SRIOV VF's on interfaces that are in an
-> aggregate interface.
-> 
-> The first interface added into the aggregate will be flagged as
-> the primary interface, and this primary interface will be
-> responsible for managing the VF's resources.  VF's created on the
-> primary are the only VFs that will be supported on the aggregate.
-> Only Active-Backup mode will be supported and only aggregates whose
-> primary interface is in switchdev mode will be supported.
+On Mon,  1 May 2023 22:31:45 -0600 Maxim Georgiev wrote:
+> This stack of patches introduces a couple of new NDO methods,
+> ndo_hwtstamp_get and ndo_hwtstamp_set. These new methods can be
+> implemented by NIC drivers to allow setting and querying HW
+> timestamp settings. Drivers implementing these methods will
+> not need to handle SIOCGHWTSTAMP/SIOCSHWTSTAMP IOCTLs.
+> The new NDO methods will handle copying request parameters
+> between user address space and kernel space.
 
-If you're CCing netdev you need to obey netdev rules:
-
-https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#resending-after-review
-
-You have sent two version of this today (and there weren't even 
-any replies).
+Maxim, any ETA on the next version? Should we let someone take over?
+It's been over a month since v6 posting.
 
