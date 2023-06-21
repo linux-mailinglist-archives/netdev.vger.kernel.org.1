@@ -1,66 +1,48 @@
-Return-Path: <netdev+bounces-12790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 15248738ED7
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F37CC738F14
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 20:48:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C606428171B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:31:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7A4728164D
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 18:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A6EE1F939;
-	Wed, 21 Jun 2023 18:30:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ECE918C3E;
+	Wed, 21 Jun 2023 18:47:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F6E723C99
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:30:58 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D55198;
-	Wed, 21 Jun 2023 11:30:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=wbqS0dqLdsnGgfOnL91hu55tI6N00q9JeL9Dt8+bbtk=; b=y9Y5o9ZOPVdyNd0f/8z8mo1CWF
-	XkhXM+i69HTv3SFPqxk6v7EmMBdE5flxZ9WQanyW/HrM7W28qVJ66H0vtH7C9pz49swW5KNMWcCL+
-	3Zwgc4Ge14YT7QZNlatyjc9AHoer54a6qwK7h7cC0GTMQO2OPRl1KgAcCIRDo5mjB+uc=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qC2az-00HB0y-DN; Wed, 21 Jun 2023 20:30:21 +0200
-Date: Wed, 21 Jun 2023 20:30:21 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: "Limonciello, Mario" <mario.limonciello@amd.com>
-Cc: Johannes Berg <johannes@sipsolutions.net>,
-	Evan Quan <evan.quan@amd.com>, rafael@kernel.org, lenb@kernel.org,
-	alexander.deucher@amd.com, christian.koenig@amd.com,
-	Xinhui.Pan@amd.com, airlied@gmail.com, daniel@ffwll.ch,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, mdaenzer@redhat.com,
-	maarten.lankhorst@linux.intel.com, tzimmermann@suse.de,
-	hdegoede@redhat.com, jingyuwang_vip@163.com, lijo.lazar@amd.com,
-	jim.cromie@gmail.com, bellosilicio@gmail.com,
-	andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au,
-	arnd@arndb.de, linux-kernel@vger.kernel.org,
-	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
-	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
-	netdev@vger.kernel.org
-Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
- mitigations
-Message-ID: <8d3340de-34f6-47ad-8024-f6f5ecd9c4bb@lunn.ch>
-References: <20230621054603.1262299-1-evan.quan@amd.com>
- <20230621054603.1262299-2-evan.quan@amd.com>
- <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
- <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
- <b1abec47-04df-4481-d680-43c5ff3cbb48@amd.com>
- <36902dda-9e51-41b3-b5fc-c641edf6f1fb@lunn.ch>
- <33d80292-e639-91d0-4d0f-3ed973f89e14@amd.com>
- <9159c3a5-390f-4403-854d-9b5e87b58d8c@lunn.ch>
- <a80c215a-c1d9-4c76-d4a8-9b5fd320a2b1@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FA4D2595;
+	Wed, 21 Jun 2023 18:47:54 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC7079B;
+	Wed, 21 Jun 2023 11:47:52 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qC2ri-0001Xx-27; Wed, 21 Jun 2023 20:47:38 +0200
+Date: Wed, 21 Jun 2023 20:47:38 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Florent Revest <revest@chromium.org>
+Cc: Florian Westphal <fw@strlen.de>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	bpf@vger.kernel.org, kadlec@netfilter.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	lirongqing@baidu.com, daniel@iogearbox.net, ast@kernel.org,
+	kpsingh@kernel.org, stable@vger.kernel.org
+Subject: Re: [PATCH nf] netfilter: conntrack: Avoid nf_ct_helper_hash uses
+ after free
+Message-ID: <20230621184738.GG24035@breakpoint.cc>
+References: <20230615152918.3484699-1-revest@chromium.org>
+ <ZJFIy+oJS+vTGJer@calendula>
+ <CABRcYmJjv-JoadtzZwU5A+SZwbmbgnzWb27UNZ-UC+9r+JnVxg@mail.gmail.com>
+ <20230621111454.GB24035@breakpoint.cc>
+ <CABRcYmKeo6A+3dmZd9bRp8W3tO9M5cHDpQ13b8aeMkhYr4L64Q@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,23 +51,38 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <a80c215a-c1d9-4c76-d4a8-9b5fd320a2b1@amd.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <CABRcYmKeo6A+3dmZd9bRp8W3tO9M5cHDpQ13b8aeMkhYr4L64Q@mail.gmail.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> And consumer would need to call it, but only if CONFIG_WBRF_ACPI isn't set.
+Florent Revest <revest@chromium.org> wrote:
+> > in this case an initcall is failing and I think panic is preferrable
+> > to a kernel that behaves like NF_CONNTRACK_FTP=n.
+> 
+> In that case, it seems like what you'd want is
+> nf_conntrack_standalone_init() to BUG() instead of returning an error
+> then ? (so you'd never get to NF_CONNTRACK_FTP or any other if
+> nf_conntrack failed to initialize) If this is the prefered behavior,
+> then sure, why not.
+> 
+> > AFAICS this problem is specific to NF_CONNTRACK_FTP=y
+> > (or any other helper module, for that matter).
+> 
+> Even with NF_CONNTRACK_FTP=m, the initialization failure in
+> nf_conntrack_standalone_init() still happens. Therefore, the helper
+> hashtable gets freed and when the nf_conntrack_ftp.ko module gets
+> insmod-ed, it calls nf_conntrack_helpers_register() and this still
+> causes a use-after-free.
 
-Why? How is ACPI special that it does not need notifiers?
+Can you send a v2 with a slightly reworded changelog?
 
-> I don't see why it couldn't be a DT/ACPI hybrid solution for ARM64.
+It should mention that one needs NF_CONNTRACK=y, so that when
+the failure happens during the initcall (as oposed to module insertion),
+nf_conntrack_helpers_register() can fail cleanly without followup splat?
 
-As said somewhere else, nobody does hybrid. In fact, turn it
-around. Why not implement all this in DT, and make X86 hybrid? That
-will make arm, powerpc, risc-v and mips much simpler :-)
-
-	Andrew
+Thanks.
 
