@@ -1,70 +1,70 @@
-Return-Path: <netdev+bounces-12844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 866E673917C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 23:28:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 674F473918E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 23:32:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 153492816F2
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:28:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 98CC21C20E15
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:32:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80F631C77D;
-	Wed, 21 Jun 2023 21:28:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6891F1D2A7;
+	Wed, 21 Jun 2023 21:32:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 75C7119E52
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 21:28:24 +0000 (UTC)
-Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 79B561BC
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:28:23 -0700 (PDT)
-Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-bff4f1e93caso986133276.0
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:28:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59D1D1C77C
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 21:32:26 +0000 (UTC)
+Received: from mail-yb1-xb2e.google.com (mail-yb1-xb2e.google.com [IPv6:2607:f8b0:4864:20::b2e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 047B91BC
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:32:25 -0700 (PDT)
+Received: by mail-yb1-xb2e.google.com with SMTP id 3f1490d57ef6-bd0a359ca35so5169016276.3
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:32:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687382902; x=1689974902;
+        d=linaro.org; s=google; t=1687383144; x=1689975144;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=I23QwpbRVC93I2xN0J8C9PPNt1nuyTNz6gUJBDkbm84=;
-        b=copINrrPigwq5XhYM0SrXJMptbcqpEzn+RkQM4XMh3yKWGKY9ONl1YvTPhC3Z+Ikxp
-         YQqob2hF6oFAB5uT1bjoNbOK4Q+vd1uk0a0mvxrjoULfEfq4ubxQBg258ewBeDabFQfp
-         TJKjbcbMYiTJtrSlXGCDgCyl5FlfqU3K5Qf2Y3IgViEbAFAGET4dMKTuC3ivF8GmNl1D
-         OzmWfUPRqYLq4g/f24oe5CkcEZwzlcYtqUSHVDU24tyK2iuSDszNSEfYI2uzXXqpNjoL
-         ptR+ptbrjuZ8l22N0ShYP5Tp05IfhKVRGe+2yy1BOavGWypIoS7gQ81kpsd+zj6RJaM5
-         cw7g==
+        bh=8pU1mAMfIYrrV/zE8Re8kOdWl7lW0D3T201ge+UaFck=;
+        b=Ik11VblBlSOMYQQNi+QzzjQS/OQZ1aRSLSvA4m1sj3DFlGMS0yTLkhu1iuz8OIl+AM
+         JMDceKxLl+nR5gFkoONVzmgYKWMUD9pkbiiU7K6rdUoMOun812SPDUn3KGGSno6CTVXq
+         ga4SqOTXVE5SbGDULGvH92xzn4fKzs7Ls5qEVZVQVCMO8eWnpd3Rr5/IPb0nNPU4TRRG
+         bHvSgv3F7fKiuUyt5f4yoEpwlb4js6nkFkJDZc9KYFvPG+zkDDSZrzXLdFP62z77vkBz
+         mVzntB0W4hgjW2oPkYZcxQv2KZdAYeKQ/4V2nzAMxP9iIu2FDGnALVT/kPOYhsrNCnWy
+         7LiQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687382902; x=1689974902;
+        d=1e100.net; s=20221208; t=1687383144; x=1689975144;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=I23QwpbRVC93I2xN0J8C9PPNt1nuyTNz6gUJBDkbm84=;
-        b=f3pHquAgYeiofi1pxr/4jj5BzflwVJujcMGHl8UApfM3hZuoBWppCCcNhA2medrhos
-         gIgrtm+Go4ELxi/J6hQU3a8+wLc6adUedTS7JVedF3FaC5dNzE3Wy3q3gPi15je1k9UJ
-         ggkauKiCxZ0jZWJTgtqGNV0cGkCVjREU4Qli0Rsmudd1YBzydtaOH/qPTCSo3tTlHc8n
-         835fTNmXSevqyfasEQlsiU1tgCZKHju4TuwsSRrhc9QsUKB+uTwGYTrP3SFxfEQSu268
-         kPp5s/hPrr8hF+q9kwEZeHGGYfMOdq6BvPGaRdomTFlYjstGCYyrKrpRx/pRn7r32tjs
-         apuw==
-X-Gm-Message-State: AC+VfDy//aEdElskKddjL8EgW5yu5qpghBY95FpceGWcmnysPPWrNvx2
-	8tBlZYXe3b77HeRivrZu/COx4umROQlU3Fji+r9EKQ==
-X-Google-Smtp-Source: ACHHUZ4yERI5vFsl4RR99IkTQFRJT6kLO4bTKnqG2lAKzNozcmaIEuZz/O0vXYKegBPiwDcRHCIDPhtvjxixs6ZIqCc=
-X-Received: by 2002:a25:df84:0:b0:bcc:f2cc:73e with SMTP id
- w126-20020a25df84000000b00bccf2cc073emr13862828ybg.22.1687382902657; Wed, 21
- Jun 2023 14:28:22 -0700 (PDT)
+        bh=8pU1mAMfIYrrV/zE8Re8kOdWl7lW0D3T201ge+UaFck=;
+        b=HjLu8ZXvwVGrZ/xtyKPZ1+RxFnjUatuh+FhU6WSCJflYBN0L3IzdGnFbDFP0uzZb/J
+         IlJ1riM3Mk36dwu/+/t+KDkZGXTZAuyHpNqw2wnfO8WXkC6ndVBDL55N/wdcX1QkpY1L
+         zaNigqQrPBpCncw1lGNp+ZxoU7cm8xSsChFbYTR1yu8UdKJ+jcInbsp4uWcaCVXPFgRL
+         KrjCTdmLWqOHeZcwCLrp+eXywBzE7yNXg/hWF/StF0zmm9agnCY1nsCYdH+2sO9QYfmX
+         Xd0rI4IvWpHOMSTkj4T9BCgu045klpBLjKM1U/TrQJV4Sc5AGW6cP29neDQTCYNPOZQD
+         kw7g==
+X-Gm-Message-State: AC+VfDy7uC7MWu+mE/lXVRSz1ALaUzahWJLAHPzB4GKdIGUaFNN2kqBt
+	guJo5yk6xsamzCrEvIGe3zjwi//MjQJ5YIR+faPIfw==
+X-Google-Smtp-Source: ACHHUZ6G/0prVJxe9tzmmIsm6hY7wbKnUzbja9dYcN3jPGmB15a3wAU5ScWlFR8rpPu3DCRpMq8aYCYow+SD2sKDn3k=
+X-Received: by 2002:a25:2102:0:b0:bc8:914b:c83a with SMTP id
+ h2-20020a252102000000b00bc8914bc83amr9233735ybh.22.1687383144183; Wed, 21 Jun
+ 2023 14:32:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621191302.1405623-1-paweldembicki@gmail.com> <20230621191302.1405623-2-paweldembicki@gmail.com>
-In-Reply-To: <20230621191302.1405623-2-paweldembicki@gmail.com>
+References: <20230621191302.1405623-1-paweldembicki@gmail.com> <20230621191302.1405623-3-paweldembicki@gmail.com>
+In-Reply-To: <20230621191302.1405623-3-paweldembicki@gmail.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 21 Jun 2023 23:28:11 +0200
-Message-ID: <CACRpkdaAgW+ya50AHTi7QZqLe_HzFDZD7km5ieViruv-GCCHtQ@mail.gmail.com>
-Subject: Re: [PATCH net-next 2/6] net: dsa: vsc73xx: add port_stp_state_set function
+Date: Wed, 21 Jun 2023 23:32:13 +0200
+Message-ID: <CACRpkdbYzXcw6dbt2YpkOOuYiEqGgOM_+K0t+HmwPtHzowOhZA@mail.gmail.com>
+Subject: Re: [PATCH net-next 3/6] net: dsa: vsc73xx: Add dsa tagging based on 8021q
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
 	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -79,18 +79,29 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 9:13=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
+On Wed, Jun 21, 2023 at 9:14=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
 .com> wrote:
 
-> This isn't fully functional implementation of 802.1D, but
-> port_stp_state_set is required for future tag8021q operations.
+> This patch is simple implementation of 8021q tagging in vsc73xx driver.
+> At this moment devices with DSA_TAG_PROTO_NONE are useless. VSC73XX
+> family doesn't provide any tag support for external ethernet ports.
 >
-> This implementation handle properly all states, but vsc 73xx don't
-> forward STP packets.
+> The only way is vlan-based tagging. It require constant hardware vlan
+> filtering. VSC73XX family support provider bridging but QinQ only without
+> fully implemented 802.1AD. It allow only doubled 0x8100 TPID.
+>
+> In simple port mode QinQ is enabled to preserve forwarding vlan tagged
+> frames.
+>
+> Tag driver introduce most simple funcionality required for proper taging
+> support.
 >
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-I think it is a best effort and should be merged.
+From my point of view it is the best we can do.
+Admittedly I do not understand the implications of using the 802.1
+tagging for this, so I leave that to the experts to review.
+
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
 Yours,
