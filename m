@@ -1,205 +1,198 @@
-Return-Path: <netdev+bounces-12646-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12647-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C127C738577
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:40:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E85AA73857C
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2541C280A16
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:40:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4BE528168E
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B475E17AB8;
-	Wed, 21 Jun 2023 13:37:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 237AC18AED;
+	Wed, 21 Jun 2023 13:39:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A702217747
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:37:50 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2131.outbound.protection.outlook.com [40.107.243.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4B3CA191
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:37:49 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gYwm8X/zh/SdXOnfBnZV5AM1B5SdJ2w5jRBf3/m4s1FpIz9/ElClt//p6u7BP8V+Iy4x5Wp6vVzDpz6mFiD9kkkoc2O9TXMXfkPFmdJwgKvKfNgmJeSRf4tNQ2bgHfAyqSHnDIhTlzHh9rjuZibgbfRERIAjHtvUrgQVVs/RvUyyvsMSuk9BuxKmFv4eZ3KqT6hRdOvzQCTZPyCZP15xAxPy6/URN1VjFAZo0Ye1gnJXpqK0qjDcmKk329mm9FxjefqEZgQhbh5VnKLCzGpkDkoIfLQ1BBNSYcki5kxqcf+C1Qow2MY3VayOVUN2fVG0F7Ahjj54OeT7TbxsV6y6WA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JERUHW+GVBKwe2sueT7P+TrMtJ2zdC4MKwKdbFbpUD4=;
- b=NJ5CF/7YaQ90bFCei5Dw9FIelJ52UiXuL69qQizH7y4ZE8CAValTZWuBCyPBXh2wj34qzBJQA3YOuyC0/N6yA8pjjk++dNqffgojxDAQ77hR/IL7Igu4bcg8YhuipUweXN6rJ2v3jXjM2NNBV8EnQMEwAI53YUM/xm1HBSK7SIW+pDUyMFKBJsU0O+IDEAtP+E6TJwrEaPP7ogYDat/BbzGmDNAHCys2T+X3pn/f6CuhKcITeF8tIH70VPyCSm+Y4+iusoLIez7xGrpqRuQMbeQHoNpufYzBOjzsi/UD3QB2rM2RKmf+PO2b+8oF7VpPjOJ0wrIHkCLjL1nr51aEOQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 174C517747
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:39:13 +0000 (UTC)
+Received: from mail-ua1-x92a.google.com (mail-ua1-x92a.google.com [IPv6:2607:f8b0:4864:20::92a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 024871712
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:39:10 -0700 (PDT)
+Received: by mail-ua1-x92a.google.com with SMTP id a1e0cc1a2514c-7919957602aso1131243241.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:39:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=JERUHW+GVBKwe2sueT7P+TrMtJ2zdC4MKwKdbFbpUD4=;
- b=WR+iGthT5gkYfc/0UEucWwC1j1J2iep0nQ7V59ZPmr/V3kX7+NzH4IlDC3AHWeGbawkDcVeNvDjSiId+FBk9Zhq57o79wlV5kFmK3tRYmztPFg0vUp9zLvXrYU6N3j6gKd4eTin2WJ7DPQF1wO4Qgn1k/bp5o4uSJ+rDiY7hlm0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY3PR13MB5041.namprd13.prod.outlook.com (2603:10b6:a03:36b::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
- 2023 13:37:46 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 21 Jun 2023
- 13:37:44 +0000
-Date: Wed, 21 Jun 2023 15:37:39 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: netdev <netdev@vger.kernel.org>, Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <rmk+kernel@armlinux.org.uk>,
-	Christian Marangi <ansuelsmth@gmail.com>
-Subject: Re: [PATCH net-next v1 1/3] led: trig: netdev: Fix requesting
- offload device
-Message-ID: <ZJL9I5rQlYFUZWPp@corigine.com>
-References: <20230619215703.4038619-1-andrew@lunn.ch>
- <20230619215703.4038619-2-andrew@lunn.ch>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230619215703.4038619-2-andrew@lunn.ch>
-X-ClientProxiedBy: AM8P190CA0028.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:219::33) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=linaro.org; s=google; t=1687354749; x=1689946749;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=HkLY4acLLjF0A3xk0LZgmQ+TO1EiwpzKoMSwjPDVWZc=;
+        b=k/88j7JjShr9vImgDPEUIWiHbk24HJrF3XhtdRJTjNVM+TtI3njFjpQ8zzVD/yZI3V
+         5Ljhgo6HfkbhkkzX8KzGpRSb45sYiox9wHY7EIePx8JcsbH7g+JKP4Zk1ML7BAGCD2Ki
+         tTjzMbXKxqUSUfoMn9qmnnES1ZHHY55rFpuLzKit8v3J4W8rKuRtBulpsIxZ6SCQ3Ik1
+         jfsT2oPw+Kqghonzvkzi+2jrtF87eaEXqdti3NnSX+UhZ2PO4L0COsDd5o6cuONbwjrp
+         KETQLWsBR3fxDG8eNYeM2gua+sQXhtl1O6fFITE53Ph84DpuczuByFPKrMuakgiorUWz
+         LMYw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687354749; x=1689946749;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=HkLY4acLLjF0A3xk0LZgmQ+TO1EiwpzKoMSwjPDVWZc=;
+        b=FlMfE25eMSwh6hi6N3CGt0AVj8ZYURu2PWkj2/LuZGHTxAg7ktWPRdh5AYLbRMuSSC
+         SL6vuGOBfe9nA02x+uMJsBYghdFOOfyYLbK/D67N9+K12Q4SGDZkjUYihCJasOwSKP7W
+         00v0eHRf2O+CcGm8QFbZJxxs9GlI3/W6uAxlzJHIxTSzh8vkK6v01bBWAlrbe3So4VtO
+         VcVloJpwKUB+Uci8XvkeBqoxxLtlDKjIgZRAxo/e6bvD4Db72ySzA5gcFo0wwczprzMV
+         TIpojvqZ5HRn3+ywpOpz2htlBs1Sp8qI/G3Yjnan2YGj6EpS6Fhl+2S786+H6Ch4rRTO
+         ipBg==
+X-Gm-Message-State: AC+VfDwrYhTJ2eS+5s+ZZugLIZlYEvvwClUzJO0W5r+3dWU44UhC2mgE
+	1m1j1eJw2MW/ipAcAe6u42QfFwP1vm2w0qHILHC8yQ==
+X-Google-Smtp-Source: ACHHUZ7fcrBNIO3CGgjLEKdIkYbKMTvL7QMNQqJfTkKqwlHIaMaK7I3JdmLhKFbk6WgAJIn79mGez/9/1yvhNajnKCQ=
+X-Received: by 2002:a05:6102:2f8:b0:440:a341:b45b with SMTP id
+ j24-20020a05610202f800b00440a341b45bmr5884538vsj.10.1687354748953; Wed, 21
+ Jun 2023 06:39:08 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB5041:EE_
-X-MS-Office365-Filtering-Correlation-Id: 97414c70-299d-4204-6283-08db725cb1b8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Nl8cgL2FQ5Xv2WII6opScxAG94e88gFtZy8Z/hf26Q3Jcq8NWuUWYlbicZWZFeKudp/vl+jV3MutOzhdz7mVH8WUx5v6SibrVRn5nB3WzrFiSlxpUSzHVjmvCFWGqURIG12cQlkkp+jBDyrBkW4Idq0cz9RIfzMa8hBO8vy6LBcZXwgHmsCjJGxFe1yl9X1bVYtvbcHHq/ndGCGOaEsYfH0Vgkio2wZGbRwD8aLMcXVyTqkj7m4lJNclYjwjAmvgDTEL30ZatfFGlPyV+xuAFTyQSD3XPSYNo+fQt58EJj7bufTSaNyYDXvGrnvwbF4tyPZvlGz1+DLaAe3tGKb2Z4WXih7wpT9iDeusz4iOgbh1GwaF5x/qwFHV0zwpFAPbClwEIDQt/kqMcEqj0YDwLKQCXB68vPjnbJMWmJSQwtxqPfNwYiCe/xJkg/3WUJoYf05HAHyypH0ZZXaDqfmEQKUXQFT644nhFJqps9dci9WOSfW5mX+pSt7I1VvAA1orcMSFZD9whPUjjPUhgVciSVKYQE+9bjEriM21Qe653irzztI5b/pVUQUM/BDpgXae0jch4wayRu7Eo6AztOiA03fiAIr9g8s001HilO7Nosc=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(376002)(136003)(346002)(396003)(366004)(451199021)(478600001)(6486002)(83380400001)(54906003)(6666004)(186003)(2906002)(2616005)(6512007)(6506007)(5660300002)(44832011)(36756003)(6916009)(38100700002)(4326008)(316002)(66946007)(66476007)(86362001)(8936002)(8676002)(41300700001)(66556008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?SQ/5NfTW7DuJ1JlwgrVgPgjYsmmXeCgh4Lieoid6LX8UmLWPadfFBzGeyaUG?=
- =?us-ascii?Q?z17DnYBoEZh4NdCmjeshQ2EVWnG+SDuXx6s/+XYuaBc4Vz2nesV6Xm6lMzPo?=
- =?us-ascii?Q?O5KkUFjVjuGuPsmDKQZR9jmR1c9K44nWCKfO7EpgZCUd1HtAeTbCus3NK+2Z?=
- =?us-ascii?Q?wsnPCl/RwH/sbTkIIFBYj1pi/0m180vYXmhKvcA3jp4zuQYaPfbexOFaxHjr?=
- =?us-ascii?Q?ED86427d3hWAlOByvdSbA96iz6yP7zhWem5zgWWCIF3EU/+UM6d+2foLPVQG?=
- =?us-ascii?Q?QwEsNQAvWD38Ve6ril8AjF2LfhtCAmD0Xw53i3vLDNzCU5pLStIwV0ewXjas?=
- =?us-ascii?Q?KFyvh7hhBrsW91GII1MK8gXpcEhXXuE/ONi2WvkyhZty7uEOfGXr4joSc9De?=
- =?us-ascii?Q?8r9Vlwc6DYSiIfefBie71HBjpHiWViJCXylrbEw7JS/VuuymcypS1ss+qV5Z?=
- =?us-ascii?Q?mzK2L4zaIY03GdlUWB9hQ/uaU+Wt+TZZVsb6zleleQTkED8618Obk6SqhctM?=
- =?us-ascii?Q?ybNTTtITATFY750cSATb/CQc283Yn50fFS1T4dHMpS0Euynk2h9crIk1xm+R?=
- =?us-ascii?Q?636WFskAbTBY6uqZoWpodfzCN52h3o4hTtIjkFTOALj/DCn/2a5AZcYkPmyr?=
- =?us-ascii?Q?Oaj7XO/rRDKlc7k/P3Vc3aWXpv2g+G27UBBXPRb61aQhybckBUHun5C4BtFd?=
- =?us-ascii?Q?G3Kbvl536GnLJEXoGgD/krI81NBxT5MdR2v9COUR8N/+XpjfaePEaVHQqW9C?=
- =?us-ascii?Q?pfu+v146b/q93oOj+CkejNTsJG6X45UO9yJ5D1CpKTqohIj6m5lriNzMrdXv?=
- =?us-ascii?Q?sCE3ZF9JMQY9cS1fgvX0n53VZGzOEWeeK2VVJc3uJRn6FVFmeV1Io83w7BNE?=
- =?us-ascii?Q?P6ntZHZ4UB2zVexdWJHqEzFy0j888I53PNtduORRnaPE7SKuiLF8aSlh9Zz+?=
- =?us-ascii?Q?RfEdBZYKlzWyWudB9YZhCFRzvGtr/9nB1/+XIaMkqSXGGlx5k+ZEYZLMzMCQ?=
- =?us-ascii?Q?/+/jRYqn36cRmgYGnzvFDs+Wx+lWFGWeh3ctc6GtXhamGdFED0fJBMAw7B2k?=
- =?us-ascii?Q?L8x9Oy5gGZg/XjffmbMtkPxku0v03DQfW+HhlQ6xaLGCdTawfSbNtZeYJbmA?=
- =?us-ascii?Q?EYIW40oipt/bzlV9BrPe+lN4u7Di450tJOJbKbpnhZRxxBrrIVCr0wp3pDK2?=
- =?us-ascii?Q?qcB4kYWX7VfhlydhJSCOClnmARLjjM52hdNM9HPqKU8cPI1YZpzK8k3GE/Ag?=
- =?us-ascii?Q?r9nO3cVDXsVTEtwvyYQpqhXFSp6eJPS3DzSK9VobUyKQJ1+OATeomCPiO0kc?=
- =?us-ascii?Q?NYXQmIRaab8tcTSAYpywYvcG+YH6H2FmePXlL06HR4AelU88KTeKovSJxQPj?=
- =?us-ascii?Q?yRGrcDTi1wk4HmgdxlUGKk3Dfr47wH+6HsnJt9xji/WyW5Eyuw4QGjDJWs/m?=
- =?us-ascii?Q?SYDTd6o9aD/qGr8iZG8iTA384QOdshEb0R/X+58Q/PJnwvUU61//i1TlEbYP?=
- =?us-ascii?Q?pGJp/aZmWv6ibH7nVX8y0Ia0l/o7EjZJAyn45KBCfa/LNOpDl3K55NyzcXl0?=
- =?us-ascii?Q?kX9BcZDxT7gS6A0V3AhzEtTaTb3QRdSJsmCGvKXx/oRU7JSPj9XRNx4b4Pe7?=
- =?us-ascii?Q?yOh8ZV27LtkUTfjmgnebj/LJiuWw3I3arPagiPq4HQyeCtgoJCORGfXG3NHn?=
- =?us-ascii?Q?dP56OQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 97414c70-299d-4204-6283-08db725cb1b8
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 13:37:44.8638
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dJhFFNVNqbP4vgMYyrv3pI7YvPL9l6tZ7SNVnuh7LA10WKRmqoHiQcpFb8W4lHUJNrJM1CvWksjy7GA+XsLyOOS2d9qsdmkmiOYXUU4DLrw=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB5041
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
+ <ZJLzsWsIPD57pDgc@FVFF77S0Q05N>
+In-Reply-To: <ZJLzsWsIPD57pDgc@FVFF77S0Q05N>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Wed, 21 Jun 2023 19:08:57 +0530
+Message-ID: <CA+G9fYvwriD8X+kmDx35PavSv-youSUmYTuYTfQ4oBWnZzVRUQ@mail.gmail.com>
+Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
+To: Mark Rutland <mark.rutland@arm.com>, Puranjay Mohan <puranjay12@gmail.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Song Liu <song@kernel.org>
+Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
+	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, bpf <bpf@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jun 19, 2023 at 11:57:01PM +0200, Andrew Lunn wrote:
-> When the netdev trigger is activates, it tries to determine what
-> device the LED blinks for, and what the current blink mode is.
-> 
-> The documentation for hw_control_get() says:
-> 
-> 	 * Return 0 on success, a negative error number on failing parsing the
-> 	 * initial mode. Error from this function is NOT FATAL as the device
-> 	 * may be in a not supported initial state by the attached LED trigger.
-> 	 */
-> 
-> For the Marvell PHY and the Armada 370-rd board, the initial LED blink
-> mode is not supported by the trigger, so it returns an error. This
-> resulted in not getting the device the LED is blinking for. As a
-> result, the device is unknown and offloaded is never performed.
-> 
-> Change to condition to always get the device if offloading is
-> supported, and reduce the scope of testing for an error from
-> hw_control_get() to skip setting trigger internal state if there is an
-> error.
-> 
-> Signed-off-by: Andrew Lunn <andrew@lunn.ch>
-> ---
->  drivers/leds/trigger/ledtrig-netdev.c | 8 +++++---
->  1 file changed, 5 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/leds/trigger/ledtrig-netdev.c b/drivers/leds/trigger/ledtrig-netdev.c
-> index 2311dae7f070..df61977f1fa2 100644
-> --- a/drivers/leds/trigger/ledtrig-netdev.c
-> +++ b/drivers/leds/trigger/ledtrig-netdev.c
-> @@ -471,15 +471,17 @@ static int netdev_trig_activate(struct led_classdev *led_cdev)
->  	/* Check if hw control is active by default on the LED.
->  	 * Init already enabled mode in hw control.
->  	 */
-> -	if (supports_hw_control(led_cdev) &&
-> -	    !led_cdev->hw_control_get(led_cdev, &mode)) {
-> +	if (supports_hw_control(led_cdev)) {
->  		dev = led_cdev->hw_control_get_device(led_cdev);
+On Wed, 21 Jun 2023 at 18:27, Mark Rutland <mark.rutland@arm.com> wrote:
+>
+> On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
+> > Following boot warnings and crashes noticed on arm64 Rpi4 device running
+> > Linux next-20230621 kernel.
+> >
+> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> >
+> > boot log:
+> >
+> > [   22.331748] Kernel text patching generated an invalid instruction
+> > at 0xffff8000835d6580!
+> > [   22.340579] Unexpected kernel BRK exception at EL1
+> > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1] PREEMPT SMP
+>
+> This indicates execution of AARCH64_BREAK_FAULT.
 
-Hi Andrew,
+I see kernel panic with kselftest merge configs on Juno-r2 and Rpi4.
 
-Not related, and perhaps not important: I think the scope of dev could be
-reduced to this block.
+>
+> That could be from dodgy arguments to aarch64_insn_gen_*(), or elsewhere, and
+> given this is in the networking code I suspect this'll be related to BPF.
+>
+> Looking at next-20230621 I see commit:
+>
+>   49703aa2adfaff28 ("bpf, arm64: use bpf_jit_binary_pack_alloc")
+>
+> ... which changed the way BPF allocates memory, and has code that pads memory
+> with a bunch of AARCH64_BREAK_FAULT, so it looks like that *might* be related.
+>
+> Are you able to bisect this?
 
->  		if (dev) {
->  			const char *name = dev_name(dev);
+I have not started bisection on this issue yet.
+Let me give it a try.
 
-More related, but also not important: I think the scope of mode could
-be reduced tho this block.
+>
+> In the mean time, I've Cc'd the relevant BPF people to give them a heads-up.
 
->  
->  			set_device_name(trigger_data, name, strlen(name));
->  			trigger_data->hw_control = true;
-> -			trigger_data->mode = mode;
-> +
-> +			rc = led_cdev->hw_control_get(led_cdev, &mode);
-> +			if (!rc)
-> +				trigger_data->mode = mode;
+Thanks.
 
-Is the case where trigger_data->hw_control is set to true
-but trigger_data->mode is not set ok?
+Extra information from boot failures.
+This is always reproducible on Juno-r2 and Rpi4 devices.
 
-I understand that is the whole point is not to return an error in this case.
-But I'm concerned about the value of trigger_data->mode.
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
 
-Probably it is ok.
-But I feel that it is worth asking.
+Boot crash log:
+[    3.605232] Kernel text patching generated an invalid instruction
+at bpf_prog_99a0cd861b84ee07___loader.prog+0x0/0x728!
+[    3.616052] Unexpected kernel BRK exception at EL1
+[    3.620849] Internal error: BRK handler: 00000000f2000100 [#1] PREEMPT SMP
+[    3.627736] Modules linked in:
+[    3.630796] CPU: 1 PID: 1 Comm: swapper/0 Not tainted
+6.4.0-rc7-next-20230621 #1
+[    3.638140] hub 1-1:1.0: USB hub found
+[    3.638206] Hardware name: ARM Juno development board (r2) (DT)
+[    3.638210] pstate: 60000005 (nZCv daif -PAN -UAO -TCO -DIT -SSBS BTYPE=--)
+[    3.642431] hub 1-1:1.0: 4 ports detected
+[    3.647879] pc : bpf_prog_99a0cd861b84ee07___loader.prog+0x0/0x728
+[    3.647891] lr : kern_sys_bpf+0x130/0x218
+[    3.669061] sp : ffff80008391bc10
+[    3.672376] x29: ffff80008391bc10 x28: ffff8000826e70d8 x27: ffff800082450110
+[    3.679533] x26: ffff8000820ed948 x25: ffff800082427b10 x24: 0000000000000289
+[    3.686687] x23: ffff000800acfa00 x22: ffff8000837f8000 x21: ffff000823dbc240
+[    3.693841] x20: ffff8000839b1000 x19: ffff80008391bca8 x18: 000000001d03406d
+[    3.700995] x17: ffff800080464204 x16: ffff8000804640b4 x15: ffff8000803f8af0
+[    3.708149] x14: ffff8000803f88f8 x13: ffff800081717720 x12: ffff8000824514b4
+[    3.715302] x11: ffff800080015788 x10: ffff800082470304 x9 : ffff8000800f3338
+[    3.722456] x8 : ffff80008391bcf8 x7 : 0000000000000000 x6 : 0000000000000001
+[    3.729609] x5 : 0000000000000001 x4 : ffff8000831f0000 x3 : ffff8008fc63d000
+[    3.736763] x2 : ffff800083b6d88c x1 : ffff8000839b1048 x0 : ffff000823dbc240
+[    3.743917] Call trace:
+[    3.746362]  bpf_prog_99a0cd861b84ee07___loader.prog+0x0/0x728
+[    3.752210]  bpf_load_and_run.constprop.0+0x120/0x1d8
+[    3.757270]  load+0xf4/0x278
+[    3.760159]  do_one_initcall+0x50/0x2f0
+[    3.764001]  kernel_init_freeable+0x224/0x438
+[    3.768368]  kernel_init+0x30/0x200
+[    3.771862]  ret_from_fork+0x10/0x20
+[    3.775447] Code: d4202000 00000780 d4202000 d4202000 (910003c9)
+[    3.781550] ---[ end trace 0000000000000000 ]---
+[    3.786172] note: swapper/0[1] exited with irqs disabled
+[    3.791526] note: swapper/0[1] exited with preempt_count 1
+[    3.797043] Kernel panic - not syncing: Attempted to kill init!
+exitcode=0x0000000b
+[    3.804711] SMP: stopping secondary CPUs
+[    3.808843] Kernel Offset: disabled
+[    3.812331] CPU features: 0x40000106,1e010000,0000421b
+[    3.817476] Memory Limit: none
+[    3.820536] ---[ end Kernel panic - not syncing: Attempted to kill
+init! exitcode=0x0000000b ]---
 
->  		}
->  	}
->  
-> -- 
-> 2.40.1
-> 
+Links:
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230621/testrun/17701148/suite/log-parser-test/tests/
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230621/testrun/17701148/suite/log-parser-test/test/check-kernel-panic/log
+https://qa-reports.linaro.org/lkft/linux-next-master/build/next-20230621/testrun/17701148/suite/log-parser-test/test/check-kernel-panic/details/
+
+
+metadata:
+  git_ref: master
+  git_repo: https://gitlab.com/Linaro/lkft/mirrors/next/linux-next
+  git_sha: 15e71592dbae49a674429c618a10401d7f992ac3
+  git_describe: next-20230621
+  kernel_version: 6.4.0-rc7
+  kernel-config:
+    https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVAA4lj35ia3YDkqaoV6ztyqdW/config
+  artifact-location:
+    https://storage.tuxsuite.com/public/linaro/lkft/builds/2RVAA4lj35ia3YDkqaoV6ztyqdW/
+  toolchain: gcc-11
+  build_name: gcc-11-lkftconfig-kselftest
+
+
+--
+Linaro LKFT
+https://lkft.linaro.org
 
