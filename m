@@ -1,43 +1,43 @@
-Return-Path: <netdev+bounces-12620-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12619-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7712073852E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:31:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4650E738530
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 15:31:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4749281877
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:31:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 403C31C20E45
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 13:31:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3AB118C0A;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF67318C09;
 	Wed, 21 Jun 2023 13:29:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CDC018B1E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9CD9618B1C
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:33 +0000 (UTC)
 Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4AEE319B5
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E9911BCD
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 06:29:26 -0700 (PDT)
 Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
 	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
 	(Exim 4.92)
 	(envelope-from <mkl@pengutronix.de>)
-	id 1qBxtk-0006bQ-Bk
+	id 1qBxtk-0006bf-G5
 	for netdev@vger.kernel.org; Wed, 21 Jun 2023 15:29:24 +0200
 Received: from dspam.blackshift.org (localhost [127.0.0.1])
-	by bjornoya.blackshift.org (Postfix) with SMTP id D6F211DE8D4
+	by bjornoya.blackshift.org (Postfix) with SMTP id ED05A1DE8D7
 	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 13:29:19 +0000 (UTC)
 Received: from hardanger.blackshift.org (unknown [172.20.34.65])
 	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
 	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
 	(Client did not present a certificate)
-	by bjornoya.blackshift.org (Postfix) with ESMTPS id 2CAF31DE86C;
+	by bjornoya.blackshift.org (Postfix) with ESMTPS id 55C581DE871;
 	Wed, 21 Jun 2023 13:29:17 +0000 (UTC)
 Received: from blackshift.org (localhost [::1])
-	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id 1ce4bd59;
+	by hardanger.blackshift.org (OpenSMTPD) with ESMTP id f332ce77;
 	Wed, 21 Jun 2023 13:29:16 +0000 (UTC)
 From: Marc Kleine-Budde <mkl@pengutronix.de>
 To: netdev@vger.kernel.org
@@ -45,11 +45,11 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	linux-can@vger.kernel.org,
 	kernel@pengutronix.de,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
-	Judith Mendez <jm@ti.com>
-Subject: [PATCH net-next 09/33] can: m_can: fix coding style
-Date: Wed, 21 Jun 2023 15:28:50 +0200
-Message-Id: <20230621132914.412546-10-mkl@pengutronix.de>
+	Frank Jungclaus <frank.jungclaus@esd.eu>,
+	Marc Kleine-Budde <mkl@pengutronix.de>
+Subject: [PATCH net-next 10/33] can: esd_usb: Make use of kernel macros BIT() and GENMASK()
+Date: Wed, 21 Jun 2023 15:28:51 +0200
+Message-Id: <20230621132914.412546-11-mkl@pengutronix.de>
 X-Mailer: git-send-email 2.40.1
 In-Reply-To: <20230621132914.412546-1-mkl@pengutronix.de>
 References: <20230621132914.412546-1-mkl@pengutronix.de>
@@ -65,45 +65,82 @@ X-SA-Exim-Mail-From: mkl@pengutronix.de
 X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
 X-PTX-Original-Recipient: netdev@vger.kernel.org
 X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch aligns code to match open parenthesis and removes a
-trailing whitespace.
+From: Frank Jungclaus <frank.jungclaus@esd.eu>
 
-Fixes: eb38c2053b67 ("can: rx-offload: rename can_rx_offload_queue_sorted() -> can_rx_offload_queue_timestamp()")
-Fixes: f5071d9e729d ("can: m_can: m_can_handle_bus_errors(): add support for handling DLEC error on CAN-FD frames")
-Reported-by: Judith Mendez <jm@ti.com>
-Link: https://lore.kernel.org/all/20230523062410.1984098-1-mkl@pengutronix.de
+Make use of kernel macros BIT() and GENMASK().
+
+Signed-off-by: Frank Jungclaus <frank.jungclaus@esd.eu>
+Link: https://lore.kernel.org/r/20230523173105.3175086-2-frank.jungclaus@esd.eu
 Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
 ---
- drivers/net/can/m_can/m_can.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/can/usb/esd_usb.c | 28 ++++++++++++++--------------
+ 1 file changed, 14 insertions(+), 14 deletions(-)
 
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index a5003435802b..c5af92bcc9c9 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -469,7 +469,7 @@ static void m_can_receive_skb(struct m_can_classdev *cdev,
- 		int err;
+diff --git a/drivers/net/can/usb/esd_usb.c b/drivers/net/can/usb/esd_usb.c
+index 1399b832ea3f..d40a04db7458 100644
+--- a/drivers/net/can/usb/esd_usb.c
++++ b/drivers/net/can/usb/esd_usb.c
+@@ -67,23 +67,23 @@ MODULE_LICENSE("GPL v2");
+ #define ESD_USB_TRIPLE_SAMPLES	BIT(23)
  
- 		err = can_rx_offload_queue_timestamp(&cdev->offload, skb,
--						  timestamp);
-+						     timestamp);
- 		if (err)
- 			stats->rx_fifo_errors++;
- 	} else {
-@@ -895,7 +895,7 @@ static int m_can_handle_bus_errors(struct net_device *dev, u32 irqstatus,
- 			netdev_dbg(dev, "Arbitration phase error detected\n");
- 			work_done += m_can_handle_lec_err(dev, lec);
- 		}
--		
-+
- 		if (is_lec_err(dlec)) {
- 			netdev_dbg(dev, "Data phase error detected\n");
- 			work_done += m_can_handle_lec_err(dev, dlec);
+ /* esd IDADD message */
+-#define ESD_USB_ID_ENABLE	0x80
++#define ESD_USB_ID_ENABLE	BIT(7)
+ #define ESD_USB_MAX_ID_SEGMENT	64
+ 
+ /* SJA1000 ECC register (emulated by usb firmware) */
+-#define ESD_USB_SJA1000_ECC_SEG		0x1F
+-#define ESD_USB_SJA1000_ECC_DIR		0x20
+-#define ESD_USB_SJA1000_ECC_ERR		0x06
++#define ESD_USB_SJA1000_ECC_SEG		GENMASK(4, 0)
++#define ESD_USB_SJA1000_ECC_DIR		BIT(5)
++#define ESD_USB_SJA1000_ECC_ERR		BIT(2, 1)
+ #define ESD_USB_SJA1000_ECC_BIT		0x00
+-#define ESD_USB_SJA1000_ECC_FORM	0x40
+-#define ESD_USB_SJA1000_ECC_STUFF	0x80
+-#define ESD_USB_SJA1000_ECC_MASK	0xc0
++#define ESD_USB_SJA1000_ECC_FORM	BIT(6)
++#define ESD_USB_SJA1000_ECC_STUFF	BIT(7)
++#define ESD_USB_SJA1000_ECC_MASK	GENMASK(7, 6)
+ 
+ /* esd bus state event codes */
+-#define ESD_USB_BUSSTATE_MASK	0xc0
+-#define ESD_USB_BUSSTATE_WARN	0x40
+-#define ESD_USB_BUSSTATE_ERRPASSIVE	0x80
+-#define ESD_USB_BUSSTATE_BUSOFF	0xc0
++#define ESD_USB_BUSSTATE_MASK	GENMASK(7, 6)
++#define ESD_USB_BUSSTATE_WARN	BIT(6)
++#define ESD_USB_BUSSTATE_ERRPASSIVE	BIT(7)
++#define ESD_USB_BUSSTATE_BUSOFF	GENMASK(7, 6)
+ 
+ #define ESD_USB_RX_BUFFER_SIZE		1024
+ #define ESD_USB_MAX_RX_URBS		4
+@@ -652,9 +652,9 @@ static int esd_usb_start(struct esd_usb_net_priv *priv)
+ 	msg->filter.net = priv->index;
+ 	msg->filter.option = ESD_USB_ID_ENABLE; /* start with segment 0 */
+ 	for (i = 0; i < ESD_USB_MAX_ID_SEGMENT; i++)
+-		msg->filter.mask[i] = cpu_to_le32(0xffffffff);
++		msg->filter.mask[i] = cpu_to_le32(GENMASK(31, 0));
+ 	/* enable 29bit extended IDs */
+-	msg->filter.mask[ESD_USB_MAX_ID_SEGMENT] = cpu_to_le32(0x00000001);
++	msg->filter.mask[ESD_USB_MAX_ID_SEGMENT] = cpu_to_le32(BIT(0));
+ 
+ 	err = esd_usb_send_msg(dev, msg);
+ 	if (err)
+@@ -796,7 +796,7 @@ static netdev_tx_t esd_usb_start_xmit(struct sk_buff *skb,
+ 	context->echo_index = i;
+ 
+ 	/* hnd must not be 0 - MSB is stripped in txdone handling */
+-	msg->tx.hnd = 0x80000000 | i; /* returned in TX done message */
++	msg->tx.hnd = BIT(31) | i; /* returned in TX done message */
+ 
+ 	usb_fill_bulk_urb(urb, dev->udev, usb_sndbulkpipe(dev->udev, 2), buf,
+ 			  msg->hdr.len * sizeof(u32), /* convert to # of bytes */
 -- 
 2.40.1
 
