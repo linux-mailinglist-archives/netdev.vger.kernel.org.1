@@ -1,398 +1,518 @@
-Return-Path: <netdev+bounces-12586-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DD937383B5
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:26:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F39277383C0
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:28:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22E1D280BDB
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:26:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F2FE7280BDB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:28:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5C9168AA;
-	Wed, 21 Jun 2023 12:26:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 25EA3168AA;
+	Wed, 21 Jun 2023 12:28:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68ADC147;
-	Wed, 21 Jun 2023 12:26:42 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492781712;
-	Wed, 21 Jun 2023 05:26:38 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QmN606SpTz4f468s;
-	Wed, 21 Jun 2023 20:26:32 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP1 (Coremail) with SMTP id cCh0CgAHKDJ27JJk6J4qLg--.12588S2;
-	Wed, 21 Jun 2023 20:26:33 +0800 (CST)
-Subject: Re: [PATCH bpf-next 11/12] bpf: Introduce bpf_mem_free_rcu() similar
- to kfree_rcu().
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, kernel-team@fb.com, daniel@iogearbox.net,
- andrii@kernel.org, void@manifault.com, paulmck@kernel.org
-References: <20230621023238.87079-1-alexei.starovoitov@gmail.com>
- <20230621023238.87079-12-alexei.starovoitov@gmail.com>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <eee33106-21ef-9f0b-86e7-137deefc6f50@huaweicloud.com>
-Date: Wed, 21 Jun 2023 20:26:30 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13903156E9
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:28:45 +0000 (UTC)
+Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1F541718
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 05:28:41 -0700 (PDT)
+Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3f9002a1a39so41961595e9.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 05:28:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687350520; x=1689942520;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=JY6qu40VU0iOU+uQjSN/rpx66RGcpmW4WoflmnS71Xs=;
+        b=QJYEvSQGMsdga3Sw+LEwbmfVCv51FFTfe+zTbbvvLwPUJ0LE4ezg0a9FAPbbtvS79j
+         ldxilCxXfk/qb7MqAy+ESNd212YZxzqu3oycOTPossmGxj/+Lb2eOqOOf9lcPEMGXAEN
+         PiEYqFDWetWK8ZfRYfrmZm/9P89sNnGCcrKh+GQE86nDsP6EGdk29TuwFXKUxE/dT5c4
+         kUzlr7iP+NMAGevxrG3+JX0+3jlshbVy1oEq1ZHpEdLRStJDOrBcIv/hLMaGbpLbE0oh
+         XBXCRXJpf4jxbClgVqR/q8D15/odn7mAE5hds9N3YLjCa841c6Sp0r20lDZIHsSQdQ6S
+         NwWg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687350520; x=1689942520;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JY6qu40VU0iOU+uQjSN/rpx66RGcpmW4WoflmnS71Xs=;
+        b=kc5CBdDbbpmUcKdGKPpWmWI81pgBDo8fji1Y6pV6Hpj9a9YG0uOztkPjLjSs9Bkt6/
+         vENYJp5qoVdiuVR2mROW1IReXDoKbgv/hxep62he+oXQ4dWK6zdI9cTzE8jF3zyV1s/w
+         HkuNhVwfJqVk8ftiwp5GMrolNgqBdw8A/vJs0BLg6X2Oefxam5Zv4Mn0vyiqkAP5xk1t
+         5s5OQtAwFmSy57Lkgnwm7UGJ7K8Iuk/MU2TkGk8V48cbjYLFwMSyQvolqyS/mFrnkYWA
+         lAXmqx66Q00a7yKmkzDMwco1nJml05jem6mMykwcCtPOSa91ePvuvF3jdA47Zgiztp1u
+         mwlQ==
+X-Gm-Message-State: AC+VfDxEyydsMqCxdX0jIRa95NNW0A7I7pHu2Kok0ICiQ3e3R0dChmOk
+	r/WXNoIgFfXpEYxxVwu9JaTztQ==
+X-Google-Smtp-Source: ACHHUZ60rXBng2He7vOU89dbQRdYFpRJqDtQ+N0XHlr2RIF8GRtfIJ4xQCwrAe/ejPJeeSMNSO3pmQ==
+X-Received: by 2002:a05:600c:2315:b0:3f9:b02:9103 with SMTP id 21-20020a05600c231500b003f90b029103mr6786163wmo.29.1687350520103;
+        Wed, 21 Jun 2023 05:28:40 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id 9-20020a05600c240900b003f93c450657sm4835029wmp.38.2023.06.21.05.28.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 05:28:39 -0700 (PDT)
+Date: Wed, 21 Jun 2023 14:28:38 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>,
+	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
+	"airlied@redhat.com" <airlied@redhat.com>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"idosch@nvidia.com" <idosch@nvidia.com>,
+	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
+	"phil@nwl.cc" <phil@nwl.cc>,
+	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v8 08/10] ice: implement dpll interface to control cgu
+Message-ID: <ZJLs9np6CgKOtrWN@nanopsycho>
+References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
+ <20230609121853.3607724-9-arkadiusz.kubalewski@intel.com>
+ <ZIRI+/YDZMQJVs3i@nanopsycho>
+ <DM6PR11MB4657C07B0DA46408BDD957CD9B5FA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230621023238.87079-12-alexei.starovoitov@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:cCh0CgAHKDJ27JJk6J4qLg--.12588S2
-X-Coremail-Antispam: 1UD129KBjvAXoW3KFWrGr1DAryUXr48tF4fKrg_yoW8JFW5uo
-	WfCr15JF1rJF1xCw1qkryUCFnxKF1jg34DArs5Gry3Za4jqrW5t3yIyFW5J3y7WF18GFs8
-	Z3WUta1UGFW8JFy3n29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
-	AaLaJ3UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK
-	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4
-	AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF
-	7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-	9x07UWE__UUUUU=
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
-	NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB4657C07B0DA46408BDD957CD9B5FA@DM6PR11MB4657.namprd11.prod.outlook.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+Mon, Jun 19, 2023 at 08:08:11PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Saturday, June 10, 2023 11:57 AM
+>>
+>>Fri, Jun 09, 2023 at 02:18:51PM CEST, arkadiusz.kubalewski@intel.com wrote:
 
-On 6/21/2023 10:32 AM, Alexei Starovoitov wrote:
-> From: Alexei Starovoitov <ast@kernel.org>
+[...]
+
+
+>>>+/**
+>>>+ * ice_dpll_cb_lock - lock dplls mutex in callback context
+>>>+ * @pf: private board structure
+>>>+ *
+>>>+ * Lock the mutex from the callback operations invoked by dpll subsystem.
+>>>+ * Prevent dead lock caused by `rmmod ice` when dpll callbacks are under
+>>>stress
+>>
+>>"dead lock", really? Which one? Didn't you want to write "livelock"?
+>>
 >
-> Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
-> Unlike bpf_mem_[cache_]free() that links objects for immediate reuse into
-> per-cpu free list the _rcu() flavor waits for RCU grace period and then moves
-> objects into free_by_rcu_ttrace list where they are waiting for RCU
-> task trace grace period to be freed into slab.
+>As explained, rmmod takes and destroys lock, it can happen that
+>netlink request/ops hangs on trying to lock when rmmod started deinit.
+
+Yeah, don't take the lock in rmmod, see below.
+
+
 >
-> The life cycle of objects:
-> alloc: dequeue free_llist
-> free: enqeueu free_llist
-> free_rcu: enqueue free_by_rcu -> waiting_for_gp
-> free_llist above high watermark -> free_by_rcu_ttrace
-> after RCU GP waiting_for_gp -> free_by_rcu_ttrace
-> free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
+>>If this is livelock prevention, is this something you really see or
+>>just an assumption? Seems to me unlikely.
+>>
+>>Plus, see my note in ice_dpll_init(). If you remove taking the lock from
+>>ice_dpll_init() and ice_dpll_deinit(), do you still need this? I don't
+>>think so.
+>>
 >
-> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-> ---
->  include/linux/bpf_mem_alloc.h |   2 +
->  kernel/bpf/memalloc.c         | 118 ++++++++++++++++++++++++++++++++--
->  2 files changed, 116 insertions(+), 4 deletions(-)
+>I won't remove it from there, as the lock shall serialize the access to ice dpll
+>data, so it must be held on init until everything is ready for netlink access,
+
+Before you register the dpll device/pin, no netlink cmd can happen. So
+do whatever you want in the init, no lock needed, register at the and
+when you are ready. Same on deinit. After you unregister, no call can
+happen, no need to lock anything in deinit.
+
+Either I'm missing something really odd, or your locking scheme is very
+wrong.
+
+If this locking here is needed, could you please present an example of a
+race it solves here?
+
+
+
+>or when deinit takes place, until everything is released.
 >
-> diff --git a/include/linux/bpf_mem_alloc.h b/include/linux/bpf_mem_alloc.h
-> index 3929be5743f4..d644bbb298af 100644
-> --- a/include/linux/bpf_mem_alloc.h
-> +++ b/include/linux/bpf_mem_alloc.h
-> @@ -27,10 +27,12 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma);
->  /* kmalloc/kfree equivalent: */
->  void *bpf_mem_alloc(struct bpf_mem_alloc *ma, size_t size);
->  void bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr);
-> +void bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
->  
->  /* kmem_cache_alloc/free equivalent: */
->  void *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma);
->  void bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr);
-> +void bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
->  void bpf_mem_cache_raw_free(void *ptr);
->  void *bpf_mem_cache_alloc_flags(struct bpf_mem_alloc *ma, gfp_t flags);
->  
-> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
-> index 10d027674743..4d1002e7b4b5 100644
-> --- a/kernel/bpf/memalloc.c
-> +++ b/kernel/bpf/memalloc.c
-> @@ -100,6 +100,15 @@ struct bpf_mem_cache {
->  	int percpu_size;
->  	struct bpf_mem_cache *tgt;
->  
-> +	/* list of objects to be freed after RCU GP */
-> +	struct llist_head free_by_rcu;
-> +	struct llist_node *free_by_rcu_tail;
-> +	struct llist_head waiting_for_gp;
-> +	struct llist_node *waiting_for_gp_tail;
-> +	struct rcu_head rcu;
-> +	atomic_t call_rcu_in_progress;
-> +	struct llist_head free_llist_extra_rcu;
-> +
->  	/* list of objects to be freed after RCU tasks trace GP */
->  	struct llist_head free_by_rcu_ttrace;
->  	struct llist_node *free_by_rcu_ttrace_tail;
-> @@ -340,6 +349,56 @@ static void free_bulk(struct bpf_mem_cache *c)
->  	do_call_rcu_ttrace(tgt);
->  }
->  
-> +static void __free_by_rcu(struct rcu_head *head)
-> +{
-> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
-> +	struct bpf_mem_cache *tgt = c->tgt;
-> +	struct llist_node *llnode = llist_del_all(&c->waiting_for_gp);
-> +
-> +	if (!llnode)
-> +		goto out;
-> +
-> +	if (llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace))
-> +		tgt->free_by_rcu_ttrace_tail = c->waiting_for_gp_tail;
-> +
-> +	/* Objects went through regular RCU GP. Send them to RCU tasks trace */
-> +	do_call_rcu_ttrace(tgt);
-> +out:
-> +	atomic_set(&c->call_rcu_in_progress, 0);
-> +}
-> +
-> +static void check_free_by_rcu(struct bpf_mem_cache *c)
-> +{
-> +	struct llist_node *llnode, *t;
-> +
-> +	if (llist_empty(&c->free_by_rcu) && llist_empty(&c->free_llist_extra_rcu))
-> +		return;
-> +
-> +	/* drain free_llist_extra_rcu */
-> +	llist_for_each_safe(llnode, t, llist_del_all(&c->free_llist_extra_rcu))
-> +		if (__llist_add(llnode, &c->free_by_rcu))
-> +			c->free_by_rcu_tail = llnode;
-> +
-> +	if (atomic_xchg(&c->call_rcu_in_progress, 1)) {
-> +		/*
-> +		 * Instead of kmalloc-ing new rcu_head and triggering 10k
-> +		 * call_rcu() to hit rcutree.qhimark and force RCU to notice
-> +		 * the overload just ask RCU to hurry up. There could be many
-> +		 * objects in free_by_rcu list.
-> +		 * This hint reduces memory consumption for an artifical
-> +		 * benchmark from 2 Gbyte to 150 Mbyte.
-> +		 */
-> +		rcu_request_urgent_qs_task(current);
-> +		return;
-> +	}
-> +
-> +	WARN_ON_ONCE(!llist_empty(&c->waiting_for_gp));
-> +
-> +	WRITE_ONCE(c->waiting_for_gp.first, __llist_del_all(&c->free_by_rcu));
-> +	c->waiting_for_gp_tail = c->free_by_rcu_tail;
-> +	call_rcu_hurry(&c->rcu, __free_by_rcu);
-> +}
-> +
->  static void bpf_mem_refill(struct irq_work *work)
->  {
->  	struct bpf_mem_cache *c = container_of(work, struct bpf_mem_cache, refill_work);
-> @@ -354,6 +413,8 @@ static void bpf_mem_refill(struct irq_work *work)
->  		alloc_bulk(c, c->batch, NUMA_NO_NODE);
->  	else if (cnt > c->high_watermark)
->  		free_bulk(c);
-> +
-> +	check_free_by_rcu(c);
->  }
->  
->  static void notrace irq_work_raise(struct bpf_mem_cache *c)
-> @@ -482,6 +543,9 @@ static void drain_mem_cache(struct bpf_mem_cache *c)
->  	free_all(llist_del_all(&c->waiting_for_gp_ttrace), percpu);
->  	free_all(__llist_del_all(&c->free_llist), percpu);
->  	free_all(__llist_del_all(&c->free_llist_extra), percpu);
-> +	free_all(__llist_del_all(&c->free_by_rcu), percpu);
-> +	free_all(__llist_del_all(&c->free_llist_extra_rcu), percpu);
-> +	free_all(llist_del_all(&c->waiting_for_gp), percpu);
->  }
->  
->  static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
-> @@ -494,8 +558,8 @@ static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
->  
->  static void free_mem_alloc(struct bpf_mem_alloc *ma)
->  {
-> -	/* waiting_for_gp_ttrace lists was drained, but __free_rcu might
-> -	 * still execute. Wait for it now before we freeing percpu caches.
-> +	/* waiting_for_gp[_ttrace] lists were drained, but RCU callbacks
-> +	 * might still execute. Wait for them.
->  	 *
->  	 * rcu_barrier_tasks_trace() doesn't imply synchronize_rcu_tasks_trace(),
->  	 * but rcu_barrier_tasks_trace() and rcu_barrier() below are only used
-> @@ -504,9 +568,10 @@ static void free_mem_alloc(struct bpf_mem_alloc *ma)
->  	 * rcu_trace_implies_rcu_gp(), it will be OK to skip rcu_barrier() by
->  	 * using rcu_trace_implies_rcu_gp() as well.
->  	 */
-> -	rcu_barrier_tasks_trace();
-> +	rcu_barrier(); /* wait for __free_by_rcu() */
-> +	rcu_barrier_tasks_trace(); /* wait for __free_rcu() via call_rcu_tasks_trace */
-Using rcu_barrier_tasks_trace and rcu_barrier() is not enough, the
-objects in c->free_by_rcu_ttrace may be leaked as shown below. We may
-need to add an extra variable to notify __free_by_rcu() to free these
-elements directly instead of trying to move it into
-waiting_for_gp_ttrace as I did before. Or we can just drain
-free_by_rcu_ttrace twice.
+>>
+>>>+ * tests.
+>>>+ *
+>>>+ * Return:
+>>>+ * 0 - if lock acquired
+>>>+ * negative - lock not acquired or dpll was deinitialized
+>>>+ */
+>>>+static int ice_dpll_cb_lock(struct ice_pf *pf)
+>>>+{
+>>>+	int i;
+>>>+
+>>>+	for (i = 0; i < ICE_DPLL_LOCK_TRIES; i++) {
+>>>+		if (mutex_trylock(&pf->dplls.lock))
+>>>+			return 0;
+>>>+		usleep_range(100, 150);
+>>>+		if (!test_bit(ICE_FLAG_DPLL, pf->flags))
+>>
+>>How exactly could this happen? I don't think it can. Drop it.
+>>
+>
+>Asynchronously called deinit, and kworker tries to update at the same time.
 
-destroy process       __free_by_rcu
+Could you provide an example please?
+Because I see 2 possible paths:
+1) dpll op call
+2) periodic work
 
-llist_del_all(&c->free_by_rcu_ttrace)
+But when ICE_FLAG_DPLL is cleared in ice_dpll_deinit(), no dpll op call
+can happen anymore and no periodic work is scheduled.
 
-                        // add to free_by_rcu_ttrace again
-                        llist_add_batch(..., &tgt->free_by_rcu_ttrace)
-                            do_call_rcu_ttrace()
-                                // call_rcu_ttrace_in_progress is 1, so
-xchg return 1
-                                // and it will not be moved to
-waiting_for_gp_ttrace
-                               
-atomic_xchg(&c->call_rcu_ttrace_in_progress, 1)
+Is this another "just in case" situation? If yes, please remove.
+If no, please provide an example of a race this solves.
 
-// got 1
-atomic_read(&c->call_rcu_ttrace_in_progress)
->  	if (!rcu_trace_implies_rcu_gp())
-> -		rcu_barrier();
-> +		rcu_barrier(); /* wait for __free_rcu() via call_rcu */
->  	free_mem_alloc_no_barrier(ma);
->  }
->  
-> @@ -565,6 +630,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
->  			irq_work_sync(&c->refill_work);
->  			drain_mem_cache(c);
->  			rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
-> +			rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
->  		}
->  		/* objcg is the same across cpus */
->  		if (c->objcg)
-> @@ -580,6 +646,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
->  				irq_work_sync(&c->refill_work);
->  				drain_mem_cache(c);
->  				rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
-> +				rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
-I got a oops in rcu_tasks_invoke_cbs() during stressing test and it
-seems we should do atomic_read(&call_rcu_in_progress) first, then do
-atomic_read(&call_rcu_ttrace_in_progress) to fix the problem. And to
-prevent memory reordering in non-x86 host, a memory barrier (e.g.,
-smp_mb__before_atomic) is also needed between these two reads. Otherwise
-it is possible there are inflight RCU callbacks, but we don't wait for
-these callbacks as shown in the scenario below:
 
-destroy process     __free_by_rcu
+>
+>>
+>>>+			return -EFAULT;
+>>>+	}
+>>>+
+>>>+	return -EBUSY;
+>>>+}
 
-// got  0
-atomic_read(&c->call_rcu_ttrace_in_progress)
-                    do_call_rcu_ttrace()                                  
-                        atomic_xchg(&c->call_rcu_ttrace_in_progress, 1)
-                       
-                    atomic_set(&c->call_rcu_in_progress, 0)
-// also got 0
-atomic_read(&c->call_rcu_in_progress)
+[...]
 
-The introduction of c->tgt make the destroy procedure more complicated.
-Even with the proposed fix above, there is still oops in
-rcu_tasks_invoke_cbs() and I think it happens as follows:
 
-bpf_mem_alloc_destroy           free_by_rcu for c1
+>>>+static void ice_dpll_periodic_work(struct kthread_work *work)
+>>>+{
+>>>+	struct ice_dplls *d = container_of(work, struct ice_dplls,
+>>>work.work);
+>>>+	struct ice_pf *pf = container_of(d, struct ice_pf, dplls);
+>>>+	struct ice_dpll *de = &pf->dplls.eec;
+>>>+	struct ice_dpll *dp = &pf->dplls.pps;
+>>>+	int ret = 0;
+>>>+
+>>>+	if (!test_bit(ICE_FLAG_DPLL, pf->flags))
+>>
+>>How exactly could this happen? I don't think it can. Drop it.
+>>
+>
+>I will change a bit here, ice_dpll_cb_lock returns an error
+>if that flag was already down, so will use it instead.
 
-// both of in_progress counter is 0
-read c0->call_rcu_in_progress
-read c0->call_rcu_ttrace_in_progress
+Yeah, I believe that this simply cannot happen as when the bit is
+cleared, no work is scheduled anymore. See above.
 
-                                // c1->tgt = c0
-                                // c1->call_rcu_in_progress == 1
-                                add c0->free_by_rcu_ttrace
-                                xchg(c0->call_rcu_ttrace_in_progress, 1)
-                                call_rcu_tasks_trace(c0)
-                                c1->call_rcu_in_progress = 0
 
-// both of in_progress counter is 0
-read c1->call_rcu_in_progress
-read c1->call_rcu_ttrace_in_progress
+>
+>>
+>>>+		return;
+>>>+	ret = ice_dpll_cb_lock(pf);
+>>>+	if (ret) {
+>>>+		d->lock_err_num++;
+>>
 
-// BAD! There is still inflight tasks trace RCU callback
-free_mem_alloc_no_barrier()
+[...]
 
-My original though is trying to do "rcu_in_progress +=
-atomic_read(c->tgt->call_rcu_ttrace_in_progress)" after "rcu_in_progress
-+= atomic_read(&c->call_rcu_ttrace_in_progress)" in
-bpf_mem_alloc_destroy(), but c->tgt is changed in unit_free(), so c->tgt
-may have been changed to B after the setting of
-A->call_rcu_ttrace_in_progress. I think we could read 
-c->call_rcu_ttrace_in_progress for all bpf_mem_cache again when the
-summary of c->call_rcu_in_progress and c->call_rcu_ttrace_in_progress
-for all bpf_mem_cache is 0, because when rcu_in_progress is zero, it
-means the setting of c->tgt->call_rcu_ttrace_in_progress must have been
-completed.
->  			}
->  		}
->  		if (c->objcg)
-> @@ -664,6 +731,27 @@ static void notrace unit_free(struct bpf_mem_cache *c, void *ptr)
->  		irq_work_raise(c);
->  }
->  
-> +static void notrace unit_free_rcu(struct bpf_mem_cache *c, void *ptr)
-> +{
-> +	struct llist_node *llnode = ptr - LLIST_NODE_SZ;
-> +	unsigned long flags;
-> +
-> +	c->tgt = *(struct bpf_mem_cache **)llnode;
-> +
-> +	local_irq_save(flags);
-> +	if (local_inc_return(&c->active) == 1) {
-> +		if (__llist_add(llnode, &c->free_by_rcu))
-> +			c->free_by_rcu_tail = llnode;
-> +	} else {
-> +		llist_add(llnode, &c->free_llist_extra_rcu);
-> +	}
-> +	local_dec(&c->active);
-> +	local_irq_restore(flags);
-> +
-> +	if (!atomic_read(&c->call_rcu_in_progress))
-> +		irq_work_raise(c);
-> +}
-> +
->  /* Called from BPF program or from sys_bpf syscall.
->   * In both cases migration is disabled.
->   */
-> @@ -697,6 +785,20 @@ void notrace bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr)
->  	unit_free(this_cpu_ptr(ma->caches)->cache + idx, ptr);
->  }
->  
-> +void notrace bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
-> +{
-> +	int idx;
-> +
-> +	if (!ptr)
-> +		return;
-> +
-> +	idx = bpf_mem_cache_idx(ksize(ptr - LLIST_NODE_SZ));
-> +	if (idx < 0)
-> +		return;
-> +
-> +	unit_free_rcu(this_cpu_ptr(ma->caches)->cache + idx, ptr);
-> +}
-> +
->  void notrace *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma)
->  {
->  	void *ret;
-> @@ -713,6 +815,14 @@ void notrace bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr)
->  	unit_free(this_cpu_ptr(ma->cache), ptr);
->  }
->  
-> +void notrace bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
-> +{
-> +	if (!ptr)
-> +		return;
-> +
-> +	unit_free_rcu(this_cpu_ptr(ma->cache), ptr);
-> +}
-> +
->  /* Directly does a kfree() without putting 'ptr' back to the free_llist
->   * for reuse and without waiting for a rcu_tasks_trace gp.
->   * The caller must first go through the rcu_tasks_trace gp for 'ptr'
 
+>
+>>>+		mutex_lock(&pf->dplls.lock);
+>>
+>>Related to my question in ice_dpll_init(), why do you need to lock the
+>>mutex
+>>here?
+>
+>Because before deinit takes place on driver unload the user can still ask
+>for the info from the dpll subsystem or kworker can try to alter the status.
+
+When you unregister dpll and stop the kworker, you can't see anything
+like that. No need to take this lock.
+
+
+>
+>>
+>>
+>>>+		ice_dpll_deinit_pins(pf, cgu);
+>>>+		ice_dpll_deinit_info(pf);
+>>>+		ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu);
+>>>+		ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu);
+>>
+>>Please reorder to match error path in ice_dpll_init()
+>>
+>
+>Fixed.
+>
+>>>+		if (cgu)
+>>
+>>In ice_dpll_init() you call this "cgu_present". Please be consistent in
+>>naming.
+>>
+>
+>Fixed.
+>
+>>
+>>>+			ice_dpll_deinit_worker(pf);
+>>>+		clear_bit(ICE_FLAG_DPLL, pf->flags);
+>>>+		mutex_unlock(&pf->dplls.lock);
+>>>+		mutex_destroy(&pf->dplls.lock);
+>>>+	}
+>>>+}
+>>>+
+>>>+/**
+>>>+ * ice_dpll_init_info_direct_pins - initializes direct pins info
+>>>+ * @pf: board private structure
+>>>+ * @pin_type: type of pins being initialized
+>>>+ *
+>>>+ * Init information for directly connected pins, cache them in pf's pins
+>>>+ * structures.
+>>>+ *
+>>>+ * Context: Function initializes and holds pf->dplls.lock mutex.
+>>>+ * Return:
+>>>+ * * 0 - success
+>>>+ * * negative - init failure reason
+>>>+ */
+>>>+static int
+>>>+ice_dpll_init_info_direct_pins(struct ice_pf *pf,
+>>>+			       enum ice_dpll_pin_type pin_type)
+>>>+{
+>>>+	struct ice_dpll *de = &pf->dplls.eec, *dp = &pf->dplls.pps;
+>>>+	int num_pins, i, ret = -EINVAL;
+>>>+	struct ice_hw *hw = &pf->hw;
+>>>+	struct ice_dpll_pin *pins;
+>>>+	u8 freq_supp_num;
+>>>+	bool input;
+>>>+
+>>>+	switch (pin_type) {
+>>>+	case ICE_DPLL_PIN_TYPE_INPUT:
+>>>+		pins = pf->dplls.inputs;
+>>>+		num_pins = pf->dplls.num_inputs;
+>>>+		input = true;
+>>>+		break;
+>>>+	case ICE_DPLL_PIN_TYPE_OUTPUT:
+>>>+		pins = pf->dplls.outputs;
+>>>+		num_pins = pf->dplls.num_outputs;
+>>>+		input = false;
+>>>+		break;
+>>>+	default:
+>>>+		return ret;
+>>>+	}
+>>>+
+>>>+	for (i = 0; i < num_pins; i++) {
+>>>+		pins[i].idx = i;
+>>>+		pins[i].prop.board_label = ice_cgu_get_pin_name(hw, i, input);
+>>>+		pins[i].prop.type = ice_cgu_get_pin_type(hw, i, input);
+>>>+		if (input) {
+>>>+			ret = ice_aq_get_cgu_ref_prio(hw, de->dpll_idx, i,
+>>>+						      &de->input_prio[i]);
+>>>+			if (ret)
+>>>+				return ret;
+>>>+			ret = ice_aq_get_cgu_ref_prio(hw, dp->dpll_idx, i,
+>>>+						      &dp->input_prio[i]);
+>>>+			if (ret)
+>>>+				return ret;
+>>>+			pins[i].prop.capabilities |=
+>>>+				DPLL_PIN_CAPS_PRIORITY_CAN_CHANGE;
+>>>+		}
+>>>+		pins[i].prop.capabilities |= DPLL_PIN_CAPS_STATE_CAN_CHANGE;
+>>>+		ret = ice_dpll_pin_state_update(pf, &pins[i], pin_type);
+>>>+		if (ret)
+>>>+			return ret;
+>>>+		pins[i].prop.freq_supported =
+>>>+			ice_cgu_get_pin_freq_supp(hw, i, input, &freq_supp_num);
+>>>+		pins[i].prop.freq_supported_num = freq_supp_num;
+>>>+		pins[i].pf = pf;
+>>>+	}
+>>>+
+>>>+	return ret;
+>>>+}
+>>>+
+>>>+/**
+>>>+ * ice_dpll_init_rclk_pin - initializes rclk pin information
+>>>+ * @pf: board private structure
+>>>+ * @pin_type: type of pins being initialized
+>>>+ *
+>>>+ * Init information for rclk pin, cache them in pf->dplls.rclk.
+>>>+ *
+>>>+ * Return:
+>>>+ * * 0 - success
+>>>+ * * negative - init failure reason
+>>>+ */
+>>>+static int ice_dpll_init_rclk_pin(struct ice_pf *pf)
+>>>+{
+>>>+	struct ice_dpll_pin *pin = &pf->dplls.rclk;
+>>>+	struct device *dev = ice_pf_to_dev(pf);
+>>>+
+>>>+	pin->prop.board_label = dev_name(dev);
+>>
+>>What??? Must be some sort of joke, correct?
+>>"board_label" should be an actual writing on a board. For syncE, I don't
+>>think it makes sense to fill any label. The connection to the netdev
+>>should be enough. That is what I do in mlx5.
+>>
+>>Please drop this.
+>>
+>
+>No, we want a label, as this is recovered clock, will change it to
+
+Okay, so it is recovered clock, so what? I want a lot of things, that
+does not make them meaningful.
+
+
+>package_label but the name will stay for now, this is much more meaningful
+>then i.e. "phy0" or "RCLK".
+
+No, dev_name() here is total non-sense!
+The label should contain the actual label as for example a writing on a
+front panel, board, etc.
+
+Why exactly do you need this? Why a link from netdev to this dpll pin is
+not enough for you.
+
+Please describe exactly what you need the label for. Usecases, examples,
+etc.
+
+Jakub, if you read this, this is very nice example of a misuse that even
+very precisely defined netlink attribute cannot prevent :/
+
+
+>
+>>
+>>
+>>>+	pin->prop.type = DPLL_PIN_TYPE_SYNCE_ETH_PORT;
+>>>+	pin->prop.capabilities |= DPLL_PIN_CAPS_STATE_CAN_CHANGE;
+>>>+	pin->pf = pf;
+>>>+
+
+[...]
+
+
+>>>+int ice_dpll_init(struct ice_pf *pf)
+>>>+{
+>>>+	bool cgu_present = ice_is_feature_supported(pf, ICE_F_CGU);
+>>>+	struct ice_dplls *d = &pf->dplls;
+>>>+	int err = 0;
+>>>+
+>>>+	mutex_init(&d->lock);
+>>>+	mutex_lock(&d->lock);
+>>
+>>Seeing pattern like this always triggers questions.
+>>Why exactly do you need to lock the mutex here?
+>>
+>
+>Could do it few lines below before the dplls are inited,
+>but this would make error path confusing.
+
+See above, you don't need to do this if you register dpll and start the
+periodic work only after everything is ready. I believe that you
+actually have it like this now.
+
+
+>
+>>
+>>>+	err = ice_dpll_init_info(pf, cgu_present);
+>>>+	if (err)
+>>>+		goto err_exit;
+>>>+	err = ice_dpll_init_dpll(pf, &pf->dplls.eec, cgu_present,
+>>>+				 DPLL_TYPE_EEC);
+>>>+	if (err)
+>>>+		goto deinit_info;
+>>>+	err = ice_dpll_init_dpll(pf, &pf->dplls.pps, cgu_present,
+>>>+				 DPLL_TYPE_PPS);
+>>>+	if (err)
+>>>+		goto deinit_eec;
+>>>+	err = ice_dpll_init_pins(pf, cgu_present);
+>>>+	if (err)
+>>>+		goto deinit_pps;
+>>>+	set_bit(ICE_FLAG_DPLL, pf->flags);
+>>>+	if (cgu_present) {
+>>>+		err = ice_dpll_init_worker(pf);
+>>>+		if (err)
+>>>+			goto deinit_pins;
+>>>+	}
+>>>+	mutex_unlock(&d->lock);
+>>>+	dev_info(ice_pf_to_dev(pf), "DPLLs init successful\n");
+>>
+>>What is this good for? Please avoid polluting dmesg and drop this.
+>>
+>
+>Sure, removed.
+>
+>>
+>>>+
+>>>+	return err;
+>>>+
+>>>+deinit_pins:
+>>>+	ice_dpll_deinit_pins(pf, cgu_present);
+>>>+deinit_pps:
+>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.pps, cgu_present);
+>>>+deinit_eec:
+>>>+	ice_dpll_deinit_dpll(pf, &pf->dplls.eec, cgu_present);
+>>>+deinit_info:
+>>>+	ice_dpll_deinit_info(pf);
+>>>+err_exit:
+>>>+	clear_bit(ICE_FLAG_DPLL, pf->flags);
+>>>+	mutex_unlock(&d->lock);
+>>>+	mutex_destroy(&d->lock);
+>>>+	dev_warn(ice_pf_to_dev(pf), "DPLLs init failure err:\n");
+>>
+>>You are missing the err. But why do you need the message?
+>>
+>
+>To give a clue that something went wrong on dpll init.
+
+Yeah, you ignore the err in the caller. That makes sense.
+Don't forget to add the "err" :)
+
+
+>
+>>
+>>>+
+>>>+	return err;
+
+
+[...]
 
