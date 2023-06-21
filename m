@@ -1,70 +1,69 @@
-Return-Path: <netdev+bounces-12847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2F847739197
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 23:34:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ACDA6739198
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 23:35:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 18BA31C20F88
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:34:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 692892815BF
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:35:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C91331D2AA;
-	Wed, 21 Jun 2023 21:34:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2DF11D2AB;
+	Wed, 21 Jun 2023 21:35:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8FB619E52
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 21:34:41 +0000 (UTC)
-Received: from mail-ua1-x931.google.com (mail-ua1-x931.google.com [IPv6:2607:f8b0:4864:20::931])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 527969B
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:34:40 -0700 (PDT)
-Received: by mail-ua1-x931.google.com with SMTP id a1e0cc1a2514c-784205f0058so2059878241.1
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:34:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C618D19E52
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 21:35:37 +0000 (UTC)
+Received: from mail-yb1-xb36.google.com (mail-yb1-xb36.google.com [IPv6:2607:f8b0:4864:20::b36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E779B
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:35:36 -0700 (PDT)
+Received: by mail-yb1-xb36.google.com with SMTP id 3f1490d57ef6-bc43a73ab22so9436589276.0
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 14:35:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687383279; x=1689975279;
+        d=linaro.org; s=google; t=1687383335; x=1689975335;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ERhjKrk8uNuT8fJftN6Wzv13k5nYu7dMLPTKhrBK3z4=;
-        b=aYGnvnNXHBjMNbmulhIQhX8SaBIFKZ7yqzr1tKO4nLxmy8HFg6SE992IK7obG5rzCX
-         jCUPt3cDMPKNPy5VyNefi/qW8u6xg8+lwSNyuf4nD6xlaeNRYlVPiiI/RtQFnIoHu5E1
-         XzubqUR3Dl/e3+ExdXUqdvmi++G3kxt9ABtmRHD6WSP7WSuCtnGSwmBCW/HLnLqQDmPu
-         P6UEpiMLCtflVbUnB7RSeZMSB2skbjC+L7XwusnWiBOxWUZCFJrrOzd2A8ciwEi0EyeN
-         pm1DS4rka5jemYVxM8jUxmFZwMdUMJ5XI5goq5HOt8i67BUbRf4IDhhdvwFxIg7KRzma
-         XPfw==
+        bh=8a9oVKOS3hKiaurU+C8B/jf21qpSFSdbTRfDL8gXf+M=;
+        b=QyXdhBwxRQYaHsD8caUiTbIkKW2bksY1ZMBQROy87n8W67UkkMRKDyO/w8J1+cItRX
+         u9h9HbgEZEdBNKmUZZytziB+ZWsC8WFpb+2xQmchnbGd3k5w6KylfhE++iW2n9WzrUo/
+         sRZCGi6dkk7pai/citsVzqIqionwaSwUFCxWitNy8soIMhTO0vAL26YMdWD9K7rNDZj3
+         Kuf+GlRAjtz8pJ9woo86PwBVUA61y6JufkEURLHDwWUhk/VC9NE0V2OCLcb1VEq7y2bt
+         fOiCqGzMi8wTi4KOYvg8nRomJ0v41XFZ1ZnpKzgKbGYtyJQiVKB5jWxqBbkqgPyEHb7/
+         7BsA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687383279; x=1689975279;
+        d=1e100.net; s=20221208; t=1687383335; x=1689975335;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ERhjKrk8uNuT8fJftN6Wzv13k5nYu7dMLPTKhrBK3z4=;
-        b=gv0Em7C8oMqWrkNDZKyMxdviRsiKkztqQsIGG2bLcMT0hOl98eFzGEdI470XglcCpg
-         o+8D0VwxRyOXXnPO7nYjlY1YBXEiY8sB7y5zF5QIoaul/TonCqs6l9OyXieI2il++Zs0
-         l+4QwdLx7PMTnYCTsY+pt3hujk7EK/Lxj7FagLNSKRapwquGCl5eFgKk3DY7ZGJjPvvh
-         HsvZ73A4s+aSMsOVNNNC978gF5LzKinphjb7445pEJWOj34xqxgf4iC3ppC6JI6NZOY/
-         EN2RzEcOuvu+Ja7ZH2oFR0Z1C7nR81HTjNDF2vHvIN1iwQCFX3dxkTFkNVj3ZhGDi0Bu
-         n7Nw==
-X-Gm-Message-State: AC+VfDxJMxZqJOzKpsMwrn32EoEWpHVExzKTi8uTCglXce6AHi2pf85t
-	0aJMNmcbNLHb+mtI2Dcxm2/wS4zlDRblXurjqiZtFcOag5MES3F4QV4=
-X-Google-Smtp-Source: ACHHUZ46aDuspJOarRL79lYzMGYqEwkTT5JRnSSANc5yEURsqqhVLj46v6MxmEOQjpuP2GHM1lq45BhbCoWHJISjTgk=
-X-Received: by 2002:a67:f6c2:0:b0:43f:58a1:b22c with SMTP id
- v2-20020a67f6c2000000b0043f58a1b22cmr6794552vso.16.1687383279464; Wed, 21 Jun
- 2023 14:34:39 -0700 (PDT)
+        bh=8a9oVKOS3hKiaurU+C8B/jf21qpSFSdbTRfDL8gXf+M=;
+        b=RfJoAZyRIz8ynCzj8PyXMLBxkP6JS+9wH8WcjYMDLmSzJgTOZr9k/Hv2tTcHKV4qzT
+         eWYwvNaRdlRv5BouS3Ngv00rKTU/nIDlTD76AWfzapWlNlEYmj8MOIixYvLyRNRAAkk/
+         DC2GsTh9JiSLKT+XrEmUf5jNj66Ea+Rq0WhSeZmQ6Q/7sXij4woHASVh94COArwfBxc3
+         ti0pVrHT6qkmfyP2wiyHK/P7ZdfwQDCjnReQ58Z3Q2QsG74PebmjlGH1zM54I/Rb3l/Q
+         0yDgQ4pDWHNpvvhmBCB9LWpBrUgXU9FZaJb1H2nKr0VuVKIeBOPvPa3ZxOpmHHEZZp6a
+         r2Fg==
+X-Gm-Message-State: AC+VfDyCF6XO13Au/un6LF99HRHeBNPVovRLwMl8Ctxkgx3pm2ilbFvu
+	rk9ooP+Zwglc6FmKMaXD2ct51+INFdgJMi4liwCPUA==
+X-Google-Smtp-Source: ACHHUZ73Y7ww5KI7+S1wZpvD/2S7BPuJld4uWbQgfQLvmOJfdP1VL9ryh8Il7M0BRloVqM1kbxjhL04BYBQ8SjeJD5U=
+X-Received: by 2002:a25:42:0:b0:ba1:6bad:9270 with SMTP id 63-20020a250042000000b00ba16bad9270mr15933237yba.27.1687383335686;
+ Wed, 21 Jun 2023 14:35:35 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621191302.1405623-1-paweldembicki@gmail.com> <20230621191302.1405623-5-paweldembicki@gmail.com>
-In-Reply-To: <20230621191302.1405623-5-paweldembicki@gmail.com>
+References: <20230621191302.1405623-1-paweldembicki@gmail.com> <20230621191302.1405623-6-paweldembicki@gmail.com>
+In-Reply-To: <20230621191302.1405623-6-paweldembicki@gmail.com>
 From: Linus Walleij <linus.walleij@linaro.org>
-Date: Wed, 21 Jun 2023 23:34:28 +0200
-Message-ID: <CACRpkdaZC9AWRMv-=sQH4DghD3H6WO_9JTdJ4jg+EbM+WAEeKg@mail.gmail.com>
-Subject: Re: [PATCH net-next 5/6] net: dsa: vsc73xx: Add vlan filtering
+Date: Wed, 21 Jun 2023 23:35:24 +0200
+Message-ID: <CACRpkdafXbhW3=6kAS0h6YjiOCcDa_zwhRVVRcun-GNPbroasw@mail.gmail.com>
+Subject: Re: [PATCH net-next 6/6] net: dsa: vsc73xx: fix MTU configuration
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, 
 	Florian Fainelli <f.fainelli@gmail.com>, Vladimir Oltean <olteanv@gmail.com>, 
@@ -82,14 +81,17 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 On Wed, Jun 21, 2023 at 9:14=E2=80=AFPM Pawel Dembicki <paweldembicki@gmail=
 .com> wrote:
 
-> This patch implement vlan filtering for vsc73xx driver.
+> Switch in MAXLEN register store maximum size of data frame.
+> MTU size is 18 bytes smaller than frame size.
 >
-> After vlan filtering start, switch is reconfigured from QinQ to simple
-> vlan aware mode. It's required, because VSC73XX chips haven't support
-> for inner vlan tag filter.
+> Current settings causes problems with packet forwarding.
+> This patch fix MTU settings to proper values.
+>
+> Fixes: fb77ffc6ec86 ("net: dsa: vsc73xx: make the MTU configurable")
 >
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
+Ooops my bad. Thanks for finding this.
 Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 
 Yours,
