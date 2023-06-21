@@ -1,175 +1,212 @@
-Return-Path: <netdev+bounces-12451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8B404737948
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 04:38:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2854E737973
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 05:03:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD05C1C2040C
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 02:38:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0B4C61C20C2A
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 03:03:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E52C915BE;
-	Wed, 21 Jun 2023 02:35:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66BA17C6;
+	Wed, 21 Jun 2023 03:03:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D947C136D
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 02:35:19 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B1066F1;
-	Tue, 20 Jun 2023 19:35:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=5QVde+aCtkyeO9PhvNS7dvhtdA2REJAUQtT0F17oHaM=; b=l/6hFWRYwykPTVQI99vIiBeIDC
-	JabZgEyC9JZtOXI9aMkLciMaVL5v2v5PF9jTZ4E4E2xf/6AcjuFs3Ydi1+VmJwAJNsD1PfRiKwtFW
-	+FhjG2lMD7PXe5IQKUFhzmo7eggcW3MFvLyQwjAUubCsOufg0/NzTV31g+50jhVi+5OJ9AmB0iC0x
-	AAdK3POkVRB6sfOdhkLn0iLPQ+g3LQVmW1RIbqnGbpCupMN/RcWQfpU7INH6gyIfgqySH0TqOdgs1
-	T5RO8U38FH7gNuDrcIXlapadFpVBuylxpjVbN6nu9V7buxnKOsXXeqiKJGR1YIARAh4aRNHteaELA
-	fRs5zR6w==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qBngk-00CxNp-1S;
-	Wed, 21 Jun 2023 02:35:18 +0000
-Message-ID: <ea55623d-d469-ddaf-92ce-3daf1d2d726f@infradead.org>
-Date: Tue, 20 Jun 2023 19:35:17 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2413915BE
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:03:08 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id F03ACC433C8;
+	Wed, 21 Jun 2023 03:03:07 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687316588;
+	bh=w2ndax/dIn8hHqRy2GYj3R5SQpIQobIRN1xdBilDOAM=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ulEKOqncD0TzcZAJbJ/bKEu3UGhtRJ68LnvzU2rdEgAlY4m2qNoaukYimvt50gHTL
+	 mR9TVB/BQ1gQwEITI57SurXEBr+om25sVGUA5lDNZxM5BUezSNGWOhR1lsaKCFiXBb
+	 PrSZsFQ852f+SitMqZ5GqufLr6KTa6SPGUIze1w4FqWNeNQubVC9S731GYSTIlzu0p
+	 mZNgRmCpom3RU42zpSaSk880Fx9isrnlM8jPvO4NkEApP06FjkowmrStJoXq2LUUGd
+	 1Wn9tp7cn2Smqi9wTcknL8yOytiUNYz5yr/oi7ivAbsVyGp3SAW+fWbm7CbN1zZHSm
+	 bM+7GXzA9YHAQ==
+Date: Tue, 20 Jun 2023 20:03:06 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Justin Chen <justin.chen@broadcom.com>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+ bcm-kernel-feedback-list@broadcom.com, florian.fainelli@broadcom.com,
+ davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ opendmb@gmail.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ linux@armlinux.org.uk, richardcochran@gmail.com, sumit.semwal@linaro.org,
+ christian.koenig@amd.com, simon.horman@corigine.com
+Subject: Re: [PATCH net-next v8 03/11] net: bcmasp: Add support for ASP2.0
+ Ethernet controller
+Message-ID: <20230620200306.48781299@kernel.org>
+In-Reply-To: <1686953664-17498-4-git-send-email-justin.chen@broadcom.com>
+References: <1686953664-17498-1-git-send-email-justin.chen@broadcom.com>
+	<1686953664-17498-4-git-send-email-justin.chen@broadcom.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH] s390/net: lcs: use IS_ENABLED() for kconfig detection
-Content-Language: en-US
-To: linux-kernel@vger.kernel.org
-Cc: Alexandra Winter <wintera@linux.ibm.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>
-References: <20230615222152.13250-1-rdunlap@infradead.org>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230615222152.13250-1-rdunlap@infradead.org>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi,
+On Fri, 16 Jun 2023 15:14:16 -0700 Justin Chen wrote:
+> Add support for the Broadcom ASP 2.0 Ethernet controller which is first
+> introduced with 72165. This controller features two distinct Ethernet
+> ports that can be independently operated.
 
-On 6/15/23 15:21, Randy Dunlap wrote:
-> When CONFIG_ETHERNET=m or CONFIG_FDDI=m, lcs.s has build errors or
-> warnings:
-> 
-> ../drivers/s390/net/lcs.c:40:2: error: #error Cannot compile lcs.c without some net devices switched on.
->    40 | #error Cannot compile lcs.c without some net devices switched on.
-> ../drivers/s390/net/lcs.c: In function 'lcs_startlan_auto':
-> ../drivers/s390/net/lcs.c:1601:13: warning: unused variable 'rc' [-Wunused-variable]
->  1601 |         int rc;
-> 
-> Solve this by using IS_ENABLED(CONFIG_symbol) instead of ifdef
-> CONFIG_symbol. The latter only works for builtin (=y) values
-> while IS_ENABLED() works for builtin or modular values.
-> 
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Cc: Alexandra Winter <wintera@linux.ibm.com>
-> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> Cc: linux-s390@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> ---
->  drivers/s390/net/lcs.c |   10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
-> 
-> diff -- a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
-> --- a/drivers/s390/net/lcs.c
-> +++ b/drivers/s390/net/lcs.c
-> @@ -36,7 +36,7 @@
->  #include "lcs.h"
->  
->  
-> -#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
-> +#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
->  #error Cannot compile lcs.c without some net devices switched on.
->  #endif
->  
-> @@ -1601,14 +1601,14 @@ lcs_startlan_auto(struct lcs_card *card)
->  	int rc;
->  
->  	LCS_DBF_TEXT(2, trace, "strtauto");
-> -#ifdef CONFIG_ETHERNET
-> +#if IS_ENABLED(CONFIG_ETHERNET)
->  	card->lan_type = LCS_FRAME_TYPE_ENET;
->  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
->  	if (rc == 0)
->  		return 0;
->  
->  #endif
-> -#ifdef CONFIG_FDDI
-> +#if IS_ENABLED(CONFIG_FDDI)
->  	card->lan_type = LCS_FRAME_TYPE_FDDI;
->  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
->  	if (rc == 0)
-> @@ -2139,13 +2139,13 @@ lcs_new_device(struct ccwgroup_device *c
->  		goto netdev_out;
->  	}
->  	switch (card->lan_type) {
-> -#ifdef CONFIG_ETHERNET
-> +#if IS_ENABLED(CONFIG_ETHERNET)
->  	case LCS_FRAME_TYPE_ENET:
->  		card->lan_type_trans = eth_type_trans;
->  		dev = alloc_etherdev(0);
->  		break;
->  #endif
-> -#ifdef CONFIG_FDDI
-> +#if IS_ENABLED(CONFIG_FDDI)
->  	case LCS_FRAME_TYPE_FDDI:
->  		card->lan_type_trans = fddi_type_trans;
->  		dev = alloc_fddidev(0);
+First of all - thanks for splitting the patches up.
+This one is still a bit big but much better and good enough.
 
+> +	/* Probe each interface (Initialization should continue even if
+> +	 * interfaces are unable to come up)
+> +	 */
+> +	i = 0;
+> +	for_each_available_child_of_node(ports_node, intf_node) {
+> +		priv->intfs[i] = bcmasp_interface_create(priv, intf_node, i);
+> +		i++;
+> +	}
+> +
+> +	/* Drop the clock reference count now and let ndo_open()/ndo_close()
+> +	 * manage it for us from now on.
+> +	 */
+> +	bcmasp_core_clock_set(priv, 0, ASP_CTRL_CLOCK_CTRL_ASP_ALL_DISABLE);
+> +
+> +	clk_disable_unprepare(priv->clk);
+> +
+> +	/* Now do the registration of the network ports which will take care
+> +	 * of managing the clock properly.
+> +	 */
+> +	for (i = 0; i < priv->intf_count; i++) {
+> +		intf = priv->intfs[i];
+> +		if (!intf)
+> +			continue;
+> +
+> +		ret = register_netdev(intf->ndev);
+> +		if (ret) {
+> +			netdev_err(intf->ndev,
+> +				   "failed to register net_device: %d\n", ret);
+> +			bcmasp_interface_destroy(intf, false);
+> +			continue;
 
-kernel test robot reports build errors from this patch when
-ETHERNET=y, FDDI=m, LCS=y:
+Did you mean to clear the priv->intfs[i] pointer after destroy?
+Otherwise remove will try to free it again.
 
-  https://lore.kernel.org/all/202306202129.pl0AqK8G-lkp@intel.com/
+> +		}
+> +		count++;
+> +	}
+> +
+> +	dev_info(dev, "Initialized %d port(s)\n", count);
+> +
+> +of_put_exit:
+> +	of_node_put(ports_node);
+> +	return ret;
 
-Since the code before my patch expected (supported) FDDI=y only
-(by checking for CONFIG_FDDI only and not checking for CONFIG_FDDI_MODULE),
-the best solution that I can see is to enforce that expectation in
-drivers/s390/net/Kconfig:
+And in case the last register_netdev() fails .probe will return an
+error, meaning that .remove will never get called.
 
-diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
---- a/drivers/s390/net/Kconfig
-+++ b/drivers/s390/net/Kconfig
-@@ -5,7 +5,7 @@ menu "S/390 network device drivers"
- config LCS
- 	def_tristate m
- 	prompt "Lan Channel Station Interface"
--	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-+	depends on CCW && NETDEVICES && (ETHERNET || FDDI = y)
- 	help
- 	  Select this option if you want to use LCS networking on IBM System z.
- 	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+Why are you trying to gracefully handle the case where only some ports
+were registered? It's error prone, why not fail probe if any netdev
+fails to register?
 
-What do people think of that change?
-Any other ideas/suggestions?
+> +}
+> +
+> +static int bcmasp_remove(struct platform_device *pdev)
+> +{
+> +	struct bcmasp_priv *priv = dev_get_drvdata(&pdev->dev);
+> +	struct bcmasp_intf *intf;
+> +	int i;
+> +
 
-thanks.
+since .shutdown is defined this callback should probably clear the priv
+pointer and check whether priv != NULL before proceeding. It's a bit
+unclear whether both .remove and .shutdown may get called for the same
+device..
+
+> +	for (i = 0; i < priv->intf_count; i++) {
+> +		intf = priv->intfs[i];
+> +		if (!intf)
+> +			continue;
+> +
+> +		bcmasp_interface_destroy(intf, true);
+> +	}
+> +
+> +	return 0;
+> +}
+
+> +MODULE_AUTHOR("Broadcom");
+
+Companies cannot be authors. MODULE_AUTHOR() is not required,
+you can drop it if you don't want to put your name there.
+
+> +	if (unlikely(skb_headroom(skb) < sizeof(*offload))) {
+> +		new_skb = skb_realloc_headroom(skb, sizeof(*offload));
+
+That's not right, you can't push to an tx skb just because there's
+headroom. Use skb_cow_head().
+
+> +	if (tx_spb_ring_full(intf, nr_frags + 1)) {
+> +		netif_stop_queue(dev);
+> +		netdev_err(dev, "Tx Ring Full!\n");
+
+rate limit this one, please
+
+> +		/* Calculate virt addr by offsetting from physical addr */
+> +		data = intf->rx_ring_cpu +
+> +			(DESC_ADDR(desc->buf) - intf->rx_ring_dma);
+> +
+> +		flags = DESC_FLAGS(desc->buf);
+> +		if (unlikely(flags & (DESC_CRC_ERR | DESC_RX_SYM_ERR))) {
+> +			netif_err(intf, rx_status, intf->ndev, "flags=0x%llx\n",
+> +				  flags);
+
+ditto
+
+> +			u64_stats_update_begin(&stats->syncp);
+> +			if (flags & DESC_CRC_ERR)
+> +				u64_stats_inc(&stats->rx_crc_errs);
+> +			if (flags & DESC_RX_SYM_ERR)
+> +				u64_stats_inc(&stats->rx_sym_errs);
+> +			u64_stats_inc(&stats->rx_dropped);
+
+Not right, please see the documentation on struct rtnl_link_stats64
+These are errors not drops. Please read that comment and double
+check all your stats.
+
+> +			u64_stats_update_end(&stats->syncp);
+> +
+> +			goto next;
+> +		}
+> +
+> +		dma_sync_single_for_cpu(kdev, DESC_ADDR(desc->buf), desc->size,
+> +					DMA_FROM_DEVICE);
+> +
+> +		len = desc->size;
+> +
+> +		skb = __netdev_alloc_skb(intf->ndev, len,
+> +					 GFP_ATOMIC | __GFP_NOWARN);
+
+maybe napi_alloc_skb()? 
+
+> +		if (!skb) {
+> +			u64_stats_update_begin(&stats->syncp);
+> +			u64_stats_inc(&stats->rx_errors);
+> +			u64_stats_update_end(&stats->syncp);
+> +
+> +			netif_warn(intf, rx_err, intf->ndev,
+> +				   "SKB alloc failed\n");
+
+error counter is enough for allocations, OOMs are common
+
+> +			goto next;
+> +		}
+
 -- 
-~Randy
+pw-bot: cr
 
