@@ -1,265 +1,222 @@
-Return-Path: <netdev+bounces-12764-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12765-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56752738D7A
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:44:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D07FE738D8C
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:47:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 123F72815BA
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:44:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8DC411C20F23
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 17:47:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6879419E43;
-	Wed, 21 Jun 2023 17:44:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E0FF19E44;
+	Wed, 21 Jun 2023 17:47:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53DC519BDA
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:44:21 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2045.outbound.protection.outlook.com [40.107.93.45])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 474AF1FE7;
-	Wed, 21 Jun 2023 10:44:01 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kP+o7w9s79fnNTD0LIJpRWmz43hjD3bNDts3Xm1LIwZlMiAABKkcYGSmAM6qZKs7ImD9OWLGZHn0Sf/uYTFlRCm3Iwk6j1aUsTs+nWeCZI9lPMfEOxlWtDQmizxnHM/k/w+cCqyy7qVu56FdNylyhN2HSeCvmRlVQAyU/dQt/b9f8KHawEk1b+EXhBTD11YOWEfP0CD/w55BX7fEvigZkCaGCNh6XGfMuw+z8EixAjQq7Y76zP4x7cWMkwWaXrwfJljpEVMsgdY9K1zKdRt2qNBVoGG/xo/avFv16U3lzxDPv8PlXpmcBuiWX+6PZHJ//E+3YRlF2sPCVoHeXW6ZHA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=dc2ebv2Vb/X+1w8aKHaRw+5fJDZHEiOJTm98vzwSETs=;
- b=lR98C/x6GENS9d+ixSv9NzmFlwQT58ROwjTo3W+i46Fcgp5K0HJ99YuKLuevTHp4Ef+KBSHtrNl90mZMuMETEZ6B1V2Bl9nDdI5zgmagkgLVJCuB6vgaYApnFvgu1c+/BaKarw8H5amJmK7ouoZ+2UndAH2yEbQf8TZFwaBKpdSelSF4fmyzITW8zBRUSC9WVIWP2yo8CfMcr0t5Kfh2sNbmtAescBdZY5IFm/DerdVUDM9rzKJfCJdEQc0MPPdFLfSqIjUYjm3V2OwEMGiKyLUfmDDx3W1irRDAPFV2b0d0Y6OODQ1qAeWllaIg9QUrAi8DOKd7rZFYuDSVPFNcJg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=dc2ebv2Vb/X+1w8aKHaRw+5fJDZHEiOJTm98vzwSETs=;
- b=lMskbPOsnp9XYXpPZWNJzbmfi09kcCpt+J7p1cy3cL0KBqd9ITf4PMp/IWp9CoXVNAtDBv0toadOl8WflNxX+PmaDJmkbyYSVRVZcUFasMX0S8Jz9HXSo79wccwVppbxqgs21Mykgx6V3mK3XXxuZe52ip6c7VD5vAUUAC4WDbM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com (2603:10b6:208:3cb::10)
- by BL1PR12MB5804.namprd12.prod.outlook.com (2603:10b6:208:394::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 21 Jun
- 2023 17:43:53 +0000
-Received: from MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::dfcf:f53c:c778:6f70]) by MN0PR12MB6101.namprd12.prod.outlook.com
- ([fe80::dfcf:f53c:c778:6f70%5]) with mapi id 15.20.6521.020; Wed, 21 Jun 2023
- 17:43:53 +0000
-Message-ID: <a80c215a-c1d9-4c76-d4a8-9b5fd320a2b1@amd.com>
-Date: Wed, 21 Jun 2023 12:43:48 -0500
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF
- mitigations
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Johannes Berg <johannes@sipsolutions.net>, Evan Quan <evan.quan@amd.com>,
- rafael@kernel.org, lenb@kernel.org, alexander.deucher@amd.com,
- christian.koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
- daniel@ffwll.ch, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com,
- tzimmermann@suse.de, hdegoede@redhat.com, jingyuwang_vip@163.com,
- lijo.lazar@amd.com, jim.cromie@gmail.com, bellosilicio@gmail.com,
- andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de,
- linux-kernel@vger.kernel.org, linux-acpi@vger.kernel.org,
- amd-gfx@lists.freedesktop.org, dri-devel@lists.freedesktop.org,
- linux-wireless@vger.kernel.org, netdev@vger.kernel.org
-References: <20230621054603.1262299-1-evan.quan@amd.com>
- <20230621054603.1262299-2-evan.quan@amd.com>
- <3a7c8ffa-de43-4795-ae76-5cd9b00c52b5@lunn.ch>
- <216f3c5aa1299100a0009ddf4e95b019855a32be.camel@sipsolutions.net>
- <b1abec47-04df-4481-d680-43c5ff3cbb48@amd.com>
- <36902dda-9e51-41b3-b5fc-c641edf6f1fb@lunn.ch>
- <33d80292-e639-91d0-4d0f-3ed973f89e14@amd.com>
- <9159c3a5-390f-4403-854d-9b5e87b58d8c@lunn.ch>
-From: "Limonciello, Mario" <mario.limonciello@amd.com>
-In-Reply-To: <9159c3a5-390f-4403-854d-9b5e87b58d8c@lunn.ch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: SA1PR03CA0010.namprd03.prod.outlook.com
- (2603:10b6:806:2d3::26) To MN0PR12MB6101.namprd12.prod.outlook.com
- (2603:10b6:208:3cb::10)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4948819BC6
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 17:47:25 +0000 (UTC)
+Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A0451726
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:47:23 -0700 (PDT)
+Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bc502a721b1so12249334276.1
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:47:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687369642; x=1689961642;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=56GS3I8zXMeYIkoI8Ihw9R0z8F9Y+QVH5+LYUttrD3A=;
+        b=Dg66ctbrKOi+ONr9YnbE5sjb8AeYlemv4/j5x8vuaLdAgCsfq1T+8Use9Ps5MDwgvC
+         LpqmmcU5ZeYyHjf99Ssnhr2ok9yTjLI6cWuDCdwkt/iaWz3CZEgstU+XbfH6W53c+GBJ
+         WZTpVEtEs3ty2trHcViYrvp4dC2Ad7ONzVsDSxKNVAEmCfzEUsDoBXWVRKXNebsBezAb
+         aroV/C2fgOH4FGLQAMhtF/a6RxfBDvgsODagEaCahHEgVu+fTsogSbSG/YgO3um9pei0
+         dqKE++DaxgEBaBZAXg1pFxTYq7lGuFUpoZZxOxb/xrVLzGpFvkRo2JTzI7g9cZgZrPZm
+         ikkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687369642; x=1689961642;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=56GS3I8zXMeYIkoI8Ihw9R0z8F9Y+QVH5+LYUttrD3A=;
+        b=gbUGn/LWxZyyjWmKy9mdTco1m3Rrdnj63KVKNil+0L/psPHLPJHOKJSY/0Rona3pDz
+         cmN20MCs9Ilt750nSaBFt4H70GSmrtZXTjUVG7ym68L0JjWNu9SgIYxoMXAM8SxsCje3
+         Pb2z+WLNLQ+z6Ytjv1c//+JL7W7ankxzrW2dnQyZ9H7NNus6cZO8PiAvyRF4V2+avW7M
+         rEfjnCjxVS0FvEi2P/cIMqxQi4nNw7k1Fuf1yGJF1YkmLU4pqMbIQ9SOVpgyoJmXVr3N
+         X7EkMNu9NLlnvi8Gc0CayUw7idH6o9TsTYwSk/Krh023pRydSKO9VFXXBopa7QLitmM6
+         SyYw==
+X-Gm-Message-State: AC+VfDxllSEL2rcXC1h3dG+DNxJBlMugz4lo4IahiTaerKXJl/kXyFJ3
+	JTR5IYP/r6KrweCsf1JizbvwjRRUm/8QIg==
+X-Google-Smtp-Source: ACHHUZ6JS6rv039tSyTlGo4hFySM9p7zDbbyQOysA8S5LPV04TosKGlRJzpOEIOto+Mdz8AiDCj8ZAogz6wy1Q==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a05:6902:92:b0:bc4:a660:528f with SMTP id
+ h18-20020a056902009200b00bc4a660528fmr3731017ybs.5.1687369642711; Wed, 21 Jun
+ 2023 10:47:22 -0700 (PDT)
+Date: Wed, 21 Jun 2023 17:47:20 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MN0PR12MB6101:EE_|BL1PR12MB5804:EE_
-X-MS-Office365-Filtering-Correlation-Id: 688a88bf-48f9-4bad-06e8-08db727f1432
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	oMTSCJK3X8Y0NuhA2z9+ls6DLTaI6sxOTVB/OnYk++ebyCkaXwLlv/9Hdv/SalOWVP2rPzgkKVY6r1dFTeK40B03ufYJ6ULaWBz0uUVdJ94sASlwZnKOBxWj2wcOvU+Mbj1k0B0jvpYsm0D8C6Z+9k8l6YbdisgeBSQNupwE+ZGNhBwQ7im65+Hx+Lfp+7wPvmLb5kUZtvg/OgSffZ88QUbNjYqkkYVrpFLT6Zltue7wpryaucgtWEzGI3VljeNZh1n0Mkp722oTR2DnovT9e+HvPjXrvXbxR5alLrFQsXXSTxyQruyxlw/3iu/t3chf9PxcYGrSOHMUwYBHfdLLKpVWiG8F9/JggPqHOPn8zDiUB+Bp+rUDxDgAeMKCKPTJBHxb67LqMswEmzbBOuwgRmuNCYB0ge8ji8Bc0Rdv0q4hOlKOiGxWjydf679zNbONBXG0mkeWbHkJEKtlFdoEuFlmH2DPGq9EPiiBeoFTmm6Cnkhpq5943f6EdUWkgsDQKCEMYaanhTCR+wnfBA4Sb6rSeSUvGMBfYl6ZZJuS6r0ei6k4K8xJBCmIunEARo22pwLNqHp9/UT1Iejr3GKL6KpEtNPsPPN+DimnAIMuBLztQH/AMkyKUxyws0fKipa4LJDtb/IctbKDhBapzmU+sw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB6101.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(376002)(136003)(366004)(346002)(451199021)(54906003)(6666004)(478600001)(4326008)(26005)(186003)(53546011)(6506007)(6486002)(6512007)(2906002)(41300700001)(7416002)(8936002)(66946007)(6916009)(66556008)(66476007)(8676002)(5660300002)(316002)(2616005)(86362001)(31696002)(36756003)(83380400001)(38100700002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?bTVHRFV5K1h1d0lBK1FiRVdrYXVtTmhWWFFsdUVIZW5PdG02bkZrQ1lES1Zn?=
- =?utf-8?B?NWFKY3BJT3V2ZDZjTENvSko4WENtVG9BVnduM3g0Sm1vUnRSRUdSTVBUMlI2?=
- =?utf-8?B?eU5xc1U0YWIwNVd3dlpZcVg1eXpKVHdKY3hjK0NLb0twOFJtTWF4NVZpTHdX?=
- =?utf-8?B?WnpqSVRJb0Y1VDJncGVTZCtJenlZY1ZDSFZhY3V2bWNwNHdianA2NHQ1NmFH?=
- =?utf-8?B?QmpTRjkvZFdrdFZCSmRUakQvZ1ZRWGpIR0pJMWZMSllqc2JUMEREMnNoamJu?=
- =?utf-8?B?cFdvOE1UUk1JWVBMekxyZXA2eEdLeGR3MisybmFYMGowQzlsMXBRbWFjbUJY?=
- =?utf-8?B?ak84NFZvY3VtRTNlL2ZRMCtvVzc4UTFvdTI1LzJMdkJHbkNjekRrYlJzc0tT?=
- =?utf-8?B?V0w1TFd2N3FlT3NrblRpWWdRYmF2NWM2b3JROC9CdmwydGZ2aldPelRaRmVw?=
- =?utf-8?B?eU5PRTJtK3RjQ1FjeldPUmJVUEJqWHYrd0t4R1R4Q1BLSkdJZFRWK20vN2Y5?=
- =?utf-8?B?OU9TTE5JRTlYSloxS3VuYjJxeUV6bWJOWmthRFZmSGcrT290ZnJiQ3AvUUlI?=
- =?utf-8?B?eXRGN1ZPYnlQMzRBVmFLZHAxcyt4K012QjY1eXMrdC9UK2U1STdyLzJQTDcy?=
- =?utf-8?B?bldsWHVYcWd3Sy9IN1VCSk1GM0I2UUhsR3BTOG85VjRxdGJYM2d6ellWWXdU?=
- =?utf-8?B?K0hoRnJ3MVpYWmZKS2N5YWZiMGZKTXFLTXRQaG1OeDhKSnNHcXNrZm9qV0lG?=
- =?utf-8?B?UkU4dC9oMWVBMWQ5OVBnejFmVitXdFBCKzMzZFEyYVZkNWh0ZXhXNGFaL3lS?=
- =?utf-8?B?RklnK2JlbVdHdEtZMk15UC9NK29rY29IcHg3V3A2S0g1ZGUxUXMzRzBIL3lu?=
- =?utf-8?B?MHV3amdpSUkrU3FHQmFDVW9vOHF6eGNxb2JzM3V6SW53Vm50bWZvcFRyYlh3?=
- =?utf-8?B?RlFPeUxPbC9TUk1WRTlJZkJjQ3l1UGcrNFBhTFBaUkNBV2h3MU92cUhCMUNK?=
- =?utf-8?B?TW5sbHR1aGRjSXJjL01LYWhvR1dpUE5LUDVWamVzY1JZMzZ5blhJTG5aU2lp?=
- =?utf-8?B?RFNaR29JMjArZytwV0lxOWJ2cW01bjVrYlY4WWVaaHY4dlJvQW5RdzF1SG45?=
- =?utf-8?B?YkxHVDRoNk04NFJSRUtac0RIcElQT1Z2TktaWlRScGp1blByQXBjNUZlb2M4?=
- =?utf-8?B?Qkt4eTk3RTE1dXlUdGoyaytydEtxcW1KNytUeENPQlhKVUN6S2pNUFc2YUFP?=
- =?utf-8?B?dG1zbHBHNTg1NnRobjVpOXl6cDR5U0xUdmN2R3htd2Eva3luUHJFMThuQ3Z2?=
- =?utf-8?B?QW1zUTNoYTFIQmtFOVlmZ3dTRUJPS0k1TUZON0FoVjNvNnVJMGtsSzd6RExS?=
- =?utf-8?B?ZjU0dC80TDNheURxU1loMGZUemR0bVlFZVg1SFR5SmtWaHR6aUpmZkE3WTdw?=
- =?utf-8?B?NVRlQ2Y5WEdjN2w2a214b0t0YVpSNk04ZU9YcnZCaUlTNTM4OW5lSG9pbGFh?=
- =?utf-8?B?V0lzekk3RTdnRnVhWmpYNWJQSmFodzh1V2oyOW1qY1Rsclh2RncxVmI4bTdW?=
- =?utf-8?B?ZTB3RjBBSG1YRjEwalFPVlNqRzdUQXl3SjZGL1d3L3l6V0pUY2RMSDE2MVBp?=
- =?utf-8?B?THpvK2VJNlovSldhcGw3YkloTWRnWjlGNkJFNFFrNmFSSW9KK1BodXRYTmlS?=
- =?utf-8?B?VE5jZTgyUkQ0K1J5ZHR4T0oyYVNkNW40aDdTcmIrYnI3RnM1cHBpMlhFcWxj?=
- =?utf-8?B?b1VOOEpGQ0VvRkcvdVJmUUNVbXpTYUowaG1rbXp2Ukkxd2ErVGovTk9GcTIv?=
- =?utf-8?B?SEt4MGZBZ0FPRk9nOUtHUjN4eVNpdXh6dW9zSXorVkUxckRrWnJpNnUxdXIz?=
- =?utf-8?B?eS8zcUF4S1g2QVFJcVNkQWhzLzBLUHhKVktUQjZNM3BLS1EwZis2am1PY2o2?=
- =?utf-8?B?TVZJUTljU0dqNGt5Smt6VU5YelIydWtxb29MMGlaanFDWlg3Nzh4dVFEMkVF?=
- =?utf-8?B?VHQzK01sQ1pRNnc5UlpMRGJUeVpJeW5FQXZOdWNxWk9raVloaEo2cGQ5djRW?=
- =?utf-8?B?Y2t0eUpmc3h2Zzk5eHB5M0NITTByVDNpR0RmOFg5VFJ5OWRxbWorcUpWRk93?=
- =?utf-8?Q?5IwETTuwGcygnovam3MpX9aPg?=
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 688a88bf-48f9-4bad-06e8-08db727f1432
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB6101.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 17:43:52.9839
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: yIeV8f5e05QJv3DoPHJ/eS3vJwZi2HP+TsRiF2J7p17DhnrszqIUsIoBRwH1UCYtewPdbo0he72P7wMGFjiNXA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5804
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.178.g377b9f9a00-goog
+Message-ID: <20230621174720.1845040-1-edumazet@google.com>
+Subject: [PATCH net] netlink: do not hard code device address lenth in fdb dumps
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+syzbot reports that some netdev devices do not have a six bytes
+address [1]
 
-On 6/21/2023 12:26 PM, Andrew Lunn wrote:
->> I think what you're asking for is another layer of indirection
->> like CONFIG_WBRF in addition to CONFIG_ACPI_WBRF.
->>
->> Producers would call functions like wbrf_supported_producer()
->> where the source file is not guarded behind CONFIG_ACPI_WBRF,
->> but instead by CONFIG_WBRF and locally use CONFIG_ACPI_WBRF within
->> it.  So a producer could look like this:
->>
->> bool wbrf_supported_producer(struct device *dev)
->> {
->> #ifdef CONFIG_ACPI_WBRF
->>      struct acpi_device *adev = ACPI_COMPANION(dev);
->>
->>      if (adev)
->>          return check_acpi_wbrf(adev->handle,
->>                         WBRF_REVISION,
->>                         1ULL << WBRF_RECORD);
->> #endif
->>      return -ENODEV;
->>
->> }
->> EXPORT_SYMBOL_GPL(wbrf_supported_producer);
->>
->> And then adding/removing could look something like this
->>
->> int wbrf_add_exclusion(struct device *dev,
->>                 struct wbrf_ranges_in *in)
->> {
->> #ifdef CONFIG_ACPI_WBRF
->>      struct acpi_device *adev = ACPI_COMPANION(dev);
->>
->>      if (adev)
->>          return wbrf_record(adev, WBRF_RECORD_ADD, in);
->> #endif
->>      return -ENODEV;
->> }
->> EXPORT_SYMBOL_GPL(wbrf_add_exclusion);
->>
->> int wbrf_remove_exclusion(struct device *dev,
->>                 struct wbrf_ranges_in *in)
->> {
->> #ifdef CONFIG_ACPI_WBRF
->>      struct acpi_device *adev = ACPI_COMPANION(dev);
->>
->>      if (adev)
->>          return wbrf_record(adev, WBRF_RECORD_REMOVE, in);
->> #endif
->>      return -ENODEV;
->> }
->> EXPORT_SYMBOL_GPL(wbrf_remove_exclusion);
-> Yes, this looks a lot better.
->
-> But what about notifications?
-Once you implement this it gets a lot more complex and the driver 
-consumers would need
-to know more about the kernel's implementation.  For example consumers 
-need a
-notifier block like:
+Replace ETH_ALEN by dev->addr_len.
 
-diff --git a/drivers/gpu/drm/amd/amdgpu/amdgpu.h 
-b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
-index e3e2e6e3b485..146fe3c43343 100644
---- a/drivers/gpu/drm/amd/amdgpu/amdgpu.h
-+++ b/drivers/gpu/drm/amd/amdgpu/amdgpu.h
-@@ -1066,6 +1066,8 @@ struct amdgpu_device {
+[1] (Case of a device where dev->addr_len = 4)
 
-         bool                            job_hang;
-         bool                            dc_enabled;
-+
-+       struct notifier_block           wbrf_notifier;
-  };
+BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+BUG: KMSAN: kernel-infoleak in copyout+0xb8/0x100 lib/iov_iter.c:169
+instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+copyout+0xb8/0x100 lib/iov_iter.c:169
+_copy_to_iter+0x6d8/0x1d00 lib/iov_iter.c:536
+copy_to_iter include/linux/uio.h:206 [inline]
+simple_copy_to_iter+0x68/0xa0 net/core/datagram.c:513
+__skb_datagram_iter+0x123/0xdc0 net/core/datagram.c:419
+skb_copy_datagram_iter+0x5c/0x200 net/core/datagram.c:527
+skb_copy_datagram_msg include/linux/skbuff.h:3960 [inline]
+netlink_recvmsg+0x4ae/0x15a0 net/netlink/af_netlink.c:1970
+sock_recvmsg_nosec net/socket.c:1019 [inline]
+sock_recvmsg net/socket.c:1040 [inline]
+____sys_recvmsg+0x283/0x7f0 net/socket.c:2722
+___sys_recvmsg+0x223/0x840 net/socket.c:2764
+do_recvmmsg+0x4f9/0xfd0 net/socket.c:2858
+__sys_recvmmsg net/socket.c:2937 [inline]
+__do_sys_recvmmsg net/socket.c:2960 [inline]
+__se_sys_recvmmsg net/socket.c:2953 [inline]
+__x64_sys_recvmmsg+0x397/0x490 net/socket.c:2953
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-  static inline struct amdgpu_device *drm_to_adev(struct drm_device *ddev)
+Uninit was stored to memory at:
+__nla_put lib/nlattr.c:1009 [inline]
+nla_put+0x1c6/0x230 lib/nlattr.c:1067
+nlmsg_populate_fdb_fill+0x2b8/0x600 net/core/rtnetlink.c:4071
+nlmsg_populate_fdb net/core/rtnetlink.c:4418 [inline]
+ndo_dflt_fdb_dump+0x616/0x840 net/core/rtnetlink.c:4456
+rtnl_fdb_dump+0x14ff/0x1fc0 net/core/rtnetlink.c:4629
+netlink_dump+0x9d1/0x1310 net/netlink/af_netlink.c:2268
+netlink_recvmsg+0xc5c/0x15a0 net/netlink/af_netlink.c:1995
+sock_recvmsg_nosec+0x7a/0x120 net/socket.c:1019
+____sys_recvmsg+0x664/0x7f0 net/socket.c:2720
+___sys_recvmsg+0x223/0x840 net/socket.c:2764
+do_recvmmsg+0x4f9/0xfd0 net/socket.c:2858
+__sys_recvmmsg net/socket.c:2937 [inline]
+__do_sys_recvmmsg net/socket.c:2960 [inline]
+__se_sys_recvmmsg net/socket.c:2953 [inline]
+__x64_sys_recvmmsg+0x397/0x490 net/socket.c:2953
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-And then would need matching notifier functions like:
+Uninit was created at:
+slab_post_alloc_hook+0x12d/0xb60 mm/slab.h:716
+slab_alloc_node mm/slub.c:3451 [inline]
+__kmem_cache_alloc_node+0x4ff/0x8b0 mm/slub.c:3490
+kmalloc_trace+0x51/0x200 mm/slab_common.c:1057
+kmalloc include/linux/slab.h:559 [inline]
+__hw_addr_create net/core/dev_addr_lists.c:60 [inline]
+__hw_addr_add_ex+0x2e5/0x9e0 net/core/dev_addr_lists.c:118
+__dev_mc_add net/core/dev_addr_lists.c:867 [inline]
+dev_mc_add+0x9a/0x130 net/core/dev_addr_lists.c:885
+igmp6_group_added+0x267/0xbc0 net/ipv6/mcast.c:680
+ipv6_mc_up+0x296/0x3b0 net/ipv6/mcast.c:2754
+ipv6_mc_remap+0x1e/0x30 net/ipv6/mcast.c:2708
+addrconf_type_change net/ipv6/addrconf.c:3731 [inline]
+addrconf_notify+0x4d3/0x1d90 net/ipv6/addrconf.c:3699
+notifier_call_chain kernel/notifier.c:93 [inline]
+raw_notifier_call_chain+0xe4/0x430 kernel/notifier.c:461
+call_netdevice_notifiers_info net/core/dev.c:1935 [inline]
+call_netdevice_notifiers_extack net/core/dev.c:1973 [inline]
+call_netdevice_notifiers+0x1ee/0x2d0 net/core/dev.c:1987
+bond_enslave+0xccd/0x53f0 drivers/net/bonding/bond_main.c:1906
+do_set_master net/core/rtnetlink.c:2626 [inline]
+rtnl_newlink_create net/core/rtnetlink.c:3460 [inline]
+__rtnl_newlink net/core/rtnetlink.c:3660 [inline]
+rtnl_newlink+0x378c/0x40e0 net/core/rtnetlink.c:3673
+rtnetlink_rcv_msg+0x16a6/0x1840 net/core/rtnetlink.c:6395
+netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2546
+rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6413
+netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+netlink_unicast+0xf28/0x1230 net/netlink/af_netlink.c:1365
+netlink_sendmsg+0x122f/0x13d0 net/netlink/af_netlink.c:1913
+sock_sendmsg_nosec net/socket.c:724 [inline]
+sock_sendmsg net/socket.c:747 [inline]
+____sys_sendmsg+0x999/0xd50 net/socket.c:2503
+___sys_sendmsg+0x28d/0x3c0 net/socket.c:2557
+__sys_sendmsg net/socket.c:2586 [inline]
+__do_sys_sendmsg net/socket.c:2595 [inline]
+__se_sys_sendmsg net/socket.c:2593 [inline]
+__x64_sys_sendmsg+0x304/0x490 net/socket.c:2593
+do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+entry_SYSCALL_64_after_hwframe+0x63/0xcd
 
-static int amdgpu_wbrf_frequencies_notifier(struct notifier_block *nb,
-                                     unsigned long action, void *_arg)
+Bytes 2856-2857 of 3500 are uninitialized
+Memory access of size 3500 starts at ffff888018d99104
+Data copied to user address 0000000020000480
 
-And we'd need to set up a chain to be used in this case in the WBRF code:
+Fixes: d83b06036048 ("net: add fdb generic dump routine")
+Reported-by: syzbot <syzkaller@googlegroups.com>
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/core/rtnetlink.c | 8 ++++----
+ 1 file changed, 4 insertions(+), 4 deletions(-)
 
-static BLOCKING_NOTIFIER_HEAD(wbrf_chain_head);
-
-int wbrf_register_notifier(struct notifier_block *nb)
-{
-     return blocking_notifier_chain_register(&wbrf_chain_head, nb);
-}
-EXPORT_SYMBOL_GPL(wbrf_register_notifier);
-
-int wbrf_unregister_notifier(struct notifier_block *nb)
-{
-     return blocking_notifier_chain_unregister(&wbrf_chain_head, nb);
-}
-EXPORT_SYMBOL_GPL(wbrf_unregister_notifier);
-
-And consumer would need to call it, but only if CONFIG_WBRF_ACPI isn't set.
-
-Add/remove functions can easily call something like:
-
-blocking_notifier_call_chain(&wbrf_chain_head, action, data);
-
-With all of this complexity and (effectively) dead code for ACPI vs non-ACPI
-path I really have to ask why wouldn't a non-AMD implementation be able to
-do this as ACPI?
-
-I don't see why it couldn't be a DT/ACPI hybrid solution for ARM64.
+diff --git a/net/core/rtnetlink.c b/net/core/rtnetlink.c
+index 41de3a2f29e15a1db04c9fd7f0b723c501fa0256..7776611a14ae4367fe8af1bde0f55b20c5e3507d 100644
+--- a/net/core/rtnetlink.c
++++ b/net/core/rtnetlink.c
+@@ -4090,7 +4090,7 @@ static int nlmsg_populate_fdb_fill(struct sk_buff *skb,
+ 	ndm->ndm_ifindex = dev->ifindex;
+ 	ndm->ndm_state   = ndm_state;
+ 
+-	if (nla_put(skb, NDA_LLADDR, ETH_ALEN, addr))
++	if (nla_put(skb, NDA_LLADDR, dev->addr_len, addr))
+ 		goto nla_put_failure;
+ 	if (vid)
+ 		if (nla_put(skb, NDA_VLAN, sizeof(u16), &vid))
+@@ -4104,10 +4104,10 @@ static int nlmsg_populate_fdb_fill(struct sk_buff *skb,
+ 	return -EMSGSIZE;
+ }
+ 
+-static inline size_t rtnl_fdb_nlmsg_size(void)
++static inline size_t rtnl_fdb_nlmsg_size(const struct net_device *dev)
+ {
+ 	return NLMSG_ALIGN(sizeof(struct ndmsg)) +
+-	       nla_total_size(ETH_ALEN) +	/* NDA_LLADDR */
++	       nla_total_size(dev->addr_len) +	/* NDA_LLADDR */
+ 	       nla_total_size(sizeof(u16)) +	/* NDA_VLAN */
+ 	       0;
+ }
+@@ -4119,7 +4119,7 @@ static void rtnl_fdb_notify(struct net_device *dev, u8 *addr, u16 vid, int type,
+ 	struct sk_buff *skb;
+ 	int err = -ENOBUFS;
+ 
+-	skb = nlmsg_new(rtnl_fdb_nlmsg_size(), GFP_ATOMIC);
++	skb = nlmsg_new(rtnl_fdb_nlmsg_size(dev), GFP_ATOMIC);
+ 	if (!skb)
+ 		goto errout;
+ 
+-- 
+2.41.0.178.g377b9f9a00-goog
 
 
