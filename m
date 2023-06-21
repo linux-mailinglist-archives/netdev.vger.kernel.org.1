@@ -1,229 +1,356 @@
-Return-Path: <netdev+bounces-12799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12801-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1757D738FAA
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:09:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 41029738FC2
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48E541C20445
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:09:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 641E61C20F36
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:13:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 361A319E61;
-	Wed, 21 Jun 2023 19:09:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A47019E76;
+	Wed, 21 Jun 2023 19:13:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22DB2846D
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:09:16 +0000 (UTC)
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 227091710
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:09:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687374555; x=1718910555;
-  h=message-id:date:from:subject:to:cc:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=6lVc0QjG8tKK63l0d9oGQyE+4tdxwjqN5MBtX0YKGe0=;
-  b=ZrMQkJFVdX7Y7H7dWwjj64W+7D60T59nZFHtE3etWGuoJOxPy8InhYMH
-   UTuXatWDZcPr7RGq4lEXYCPbr9Rk2dRbIut+AceerpQh8wJB8J8TKJ6VF
-   LCE3MmL1K5YponV7I7PQLISTleirXiEKRWQB048Igs9GqDh5TpyBjI4Ta
-   Um0H+LZCrYR1rtgGBJAmlIWWn+lZelMoHDH/SLnN6XQQEsUHd5iLF2wgS
-   ynl+dcRK7E4cCm7H/O3UDJIyUfpcDdVXsS7NUmcu7lNwtjJZKlFeJBRZm
-   uUMDEzoijwEPVWmOJIOpp6oVxT/fZK1yrqYYBm83Q8D00FS2uO8Ym8bwv
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="389858620"
-X-IronPort-AV: E=Sophos;i="6.00,261,1681196400"; 
-   d="scan'208";a="389858620"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 12:09:14 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="664775089"
-X-IronPort-AV: E=Sophos;i="6.00,261,1681196400"; 
-   d="scan'208";a="664775089"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga003.jf.intel.com with ESMTP; 21 Jun 2023 12:09:13 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Wed, 21 Jun 2023 12:09:12 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Wed, 21 Jun 2023 12:09:12 -0700
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.108)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Wed, 21 Jun 2023 12:09:12 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LevV5i++sqGWfp5QUhZtNvDzG8hG4qnKHKOca8GImiIcORyZdaW0QZ2bV/ZiHtyNqof6D8p8U6zz2IpEvOS1eTYWvuDHg9IAQHr5CkkVTVJVyhJbOr5/npdn/bhyRtAsUFpZk3mkt6C2WvT1boXnbWXXgcY1bD3Lz0zik3PxqUKPk9quxO+hocwoL8q5YuHp3Y3oQ5UvjiiYKR3tteQOVbnu9ahBk0ZgugLYRUFKkFnhpsYdP+xFwaLAqusuvh1SXTlmuKyvreJVeVo0OdqWDKwgl7f2vjfskp5XPZ+3WCYkoX8dRxRyLYL6U4IbaFSV9eHJZJFxMsB6Vx4hWtOs5A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=StJ/P5Z63ttk/c8uzb59aOh8qF98YELcxgusfT75fTU=;
- b=BnivBZbrcSu9CgKqPJnQecr9rlNa3IZuN9KjnO+541yLphI57sfw4ScN/k29PSvMCQCzsPI8Ue0D/xyKn/ob1smpuMEFXmiWDX3zAX4iPPzdDr7wa+/yNUjx1qYWiBGvwOAnM/hBfvw3kmzl5UHAf81UDeooH7OsO2nsl+FtEYaoj7Dhty+ExO7j0BBNKreX6L25yU1wlAVFgSM6hrRx5B75VeqQeru9YA2pxq1oac2IIHJ3V0ooTuXIWXA0nQkJeH4QB2bEYxOd1fAzbCGxa2QQbdJA/QNPsul3wHhP6Obf6c5Aoo/pC1FWLZhaBUC4bBizbswqCVfS2FY2gCiw6g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from BYAPR11MB2599.namprd11.prod.outlook.com (2603:10b6:a02:c6::20)
- by DS0PR11MB8205.namprd11.prod.outlook.com (2603:10b6:8:162::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Wed, 21 Jun
- 2023 19:09:11 +0000
-Received: from BYAPR11MB2599.namprd11.prod.outlook.com
- ([fe80::ab9d:1251:6349:37ce]) by BYAPR11MB2599.namprd11.prod.outlook.com
- ([fe80::ab9d:1251:6349:37ce%4]) with mapi id 15.20.6500.036; Wed, 21 Jun 2023
- 19:09:11 +0000
-Message-ID: <9528682b-93bb-2797-6bd5-0f40710d306c@intel.com>
-Date: Wed, 21 Jun 2023 12:09:07 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.12.0
-From: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
-Subject: Re: [PATCH net-next v2 12/15] idpf: add RX splitq napi poll support
-To: Jakub Kicinski <kuba@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>
-CC: <davem@davemloft.net>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<netdev@vger.kernel.org>, Alan Brady <alan.brady@intel.com>,
-	<emil.s.tantilov@intel.com>, <jesse.brandeburg@intel.com>,
-	<sridhar.samudrala@intel.com>, <shiraz.saleem@intel.com>,
-	<sindhu.devale@intel.com>, <willemb@google.com>, <decot@google.com>,
-	<andrew@lunn.ch>, <leon@kernel.org>, <mst@redhat.com>,
-	<simon.horman@corigine.com>, <shannon.nelson@amd.com>,
-	<stephen@networkplumber.org>, Joshua Hay <joshua.a.hay@intel.com>, "Madhu
- Chittim" <madhu.chittim@intel.com>, Phani Burra <phani.r.burra@intel.com>
-References: <20230614171428.1504179-1-anthony.l.nguyen@intel.com>
- <20230614171428.1504179-13-anthony.l.nguyen@intel.com>
- <20230617000101.191ea52c@kernel.org>
-Content-Language: en-US
-In-Reply-To: <20230617000101.191ea52c@kernel.org>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR03CA0071.namprd03.prod.outlook.com
- (2603:10b6:303:b6::16) To BYAPR11MB2599.namprd11.prod.outlook.com
- (2603:10b6:a02:c6::20)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 385F819E6B
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:13:22 +0000 (UTC)
+Received: from mail-ej1-x62e.google.com (mail-ej1-x62e.google.com [IPv6:2a00:1450:4864:20::62e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F1FF1726;
+	Wed, 21 Jun 2023 12:13:20 -0700 (PDT)
+Received: by mail-ej1-x62e.google.com with SMTP id a640c23a62f3a-98802908fedso622081666b.1;
+        Wed, 21 Jun 2023 12:13:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687374798; x=1689966798;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ly5NA5faFK7hsekbAil9PR1Mb1J+eZ8ww8EYkdUuAYk=;
+        b=ohIV+xcvhtJ9V+bFsY1G8VvtTVHiVBSKjRnyfLLldHlU0RV8XAnNH6Vr5LikovoGjC
+         GaIJYiV8k7xZT3PAk7Cl88wvmnu9xTqRLRTT1mAMdyAv2+4BxVvtI0/nuSsFqz2BTpPA
+         5zGJDYl+ndXNkCdJVXp1dOMXjWYs49y8VdPZBeEAS0VKJf9TmO4X2+3pI/nzt1m7/zE9
+         Xc84NnXkofMiT3mYXpgSG436JwIQOl9LdAVOf5ZG3Gk8U6FDquUVjS7oBDQUw6850z21
+         HYO30dtb2hJ+lT3Jp/9/rO/betmmiF5534Wh9BDkc0buTo4ilACj+78RXL1bikS9mu96
+         Nd8A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687374798; x=1689966798;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ly5NA5faFK7hsekbAil9PR1Mb1J+eZ8ww8EYkdUuAYk=;
+        b=H++saNbZ3hUziCMPtkdvfAqrxvXLe/VlwlzKYqHkEhlKF+610N4l6Rqn16Zn3It5ap
+         ZHEIhyPZS/RQiPKqp29e7J4F3kO7Y2luDLTveiKbRFmpIgHBUX7MGHJuweB4kVjlKVtS
+         I1Nnys9Ajvcn/Gwxy7cPz3UmFIBcVBf2Xl5+vOelnRzdBtB3UW6mwhX3fZfJdZY8PjEs
+         pgh3nqql7EhBVyGAN2zXX+MxXQYD5S3FmfjuG1UBQ+LSLr36nRStLsapeeNUZuiSytzd
+         e6O5chUC1v17tp4xR5BXE9HRSU0XlyXS48lwJEPRnoCa9CNAjlePKwVEbaEqNkVpeNnb
+         LLvg==
+X-Gm-Message-State: AC+VfDy9GQWgc8Qwxz6O7FKVA0BNh4NGkhaGTbYcXVl1LobCdEdo5zu/
+	InkVtPoWg+94WOXO9WXGtBUQIPG2amQr2w==
+X-Google-Smtp-Source: ACHHUZ691yKcyWe84w2PlnciF6EL1FZ6aFiD1OErHCXPDghGzybmoA8JdwIYQ+uYHnXHcIlOzYLjww==
+X-Received: by 2002:a17:907:9283:b0:986:d833:3cf9 with SMTP id bw3-20020a170907928300b00986d8333cf9mr12146225ejc.39.1687374798208;
+        Wed, 21 Jun 2023 12:13:18 -0700 (PDT)
+Received: from WBEC325.dom.local ([185.188.71.122])
+        by smtp.gmail.com with ESMTPSA id gu1-20020a170906f28100b009829a5ae8b3sm3539562ejb.64.2023.06.21.12.13.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 12:13:17 -0700 (PDT)
+From: Pawel Dembicki <paweldembicki@gmail.com>
+To: netdev@vger.kernel.org
+Cc: linus.walleij@linaro.org,
+	Pawel Dembicki <paweldembicki@gmail.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next 1/6] net: dsa: vsc73xx: convert to PHYLINK
+Date: Wed, 21 Jun 2023 21:12:56 +0200
+Message-Id: <20230621191302.1405623-1-paweldembicki@gmail.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR11MB2599:EE_|DS0PR11MB8205:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09d7a151-9c01-432a-6599-08db728afeb4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: saBJRteQ0MfQ7EwRp3qZrZKtTByHmEEojQlBtLlrQFY01sHDMx9AOSUSq7qZc4n+LROnPyAkwB5jCVzyJEKrWQEPuUnIVP+Eiszmpi7xZhQ94p4m6OrlPDOyCXhvsLhCdsmHQPTrCbMk9oFTXjEwd4iU4c2Ck6AWKkZ2t39cGd5CMnFSeb9za3od4e17q85H7ITq6pGtgpklVKZJBFc1Hax93kWv3g9xsk4oz0UIZbUyxP7OixFXVTwYFaY0pnJEG3NSpBtSP87ubSwf6cJHLQCaYLantjC0av1rTP2/Ux+eE64TdlKyNks8b0757mTDD2rvm+Rli/UYfTYFb6vepcd9T57YS0/eWjM82ngCa94Y2p1ZXnPByKeZOYgnDGS4cZSd2Fj4m0lCCRzmwDtHAxvVfppC6n1aqByt08nhjNPtF0JuOQF6QXGELbQV10XKa2UxPyhumUZ5HY2cAg2VgyPVLPIRMStNFaO3AHkaMbS8y93JB+7qgI9cKAk4yztkA+eOEI+AS4bDzBMFITU40YuuRN3aoN4bd1jUVbEAMu2NYZ7tV5JqhuEfxHiLRjm3j0mTjuXdFq5C30bW6crTnfWcVPlOC96WGCeKK5GqzDr/p/FEyNXQS75gtG8ROlrp1Djq2hpqmuUWNXNmzz5oTg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR11MB2599.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(396003)(39860400002)(346002)(136003)(376002)(451199021)(31686004)(36756003)(66476007)(5660300002)(7416002)(41300700001)(38100700002)(8936002)(66556008)(86362001)(8676002)(4326008)(6636002)(316002)(82960400001)(31696002)(66946007)(6486002)(107886003)(26005)(6512007)(2616005)(6506007)(53546011)(186003)(2906002)(6666004)(478600001)(110136005)(83380400001)(54906003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?V1JlVUtwSE9CZTJyRU9tRU16c2M3aWZTbXdGdERncTZEZkdsYThvT213bFpV?=
- =?utf-8?B?TDBiQjBVdlp4KzRBenZyamFyUlh5RWszVThucnpyNEYvcXpUMVFCNFhTUlJI?=
- =?utf-8?B?UmtJajljM2RZSmhHb002MTVRVFVnSVJrR2xWK00ydXFJZFBwOFBuc0ZnaFh0?=
- =?utf-8?B?T0d4dURqQmtKVXIySnpsbTZrdTdIbmw3dE5LV0twUWdPS1pPQXZnT3Jub1NQ?=
- =?utf-8?B?a1NJYUpmeEF5WWZGNXdwMWlFL0VlV1o5UTFFQWtwenFYRmJTSlp1LzQvRlBw?=
- =?utf-8?B?QlIzWHhVSFFBYlVBd3k4Nno3RVZrd3cxTkU5U1dSY1FaUnB5aDFRUndSRTl3?=
- =?utf-8?B?alRVbFBoR2FFeVJPdXdhampiaDZMcGpyNFBRQUo5bEVMTDVpNzRWNll6REZi?=
- =?utf-8?B?U0ptYkFQaVMxME0rcFMzcEJ4bU1ZeXhEQnBraGpLdmtGSWlYTFZDZ3pURTFr?=
- =?utf-8?B?MmQyUStpMHJVemFxKytzZkcyN0hrN3ZNcnkxQ29Ca3ViL0puWkkycCtyWEdn?=
- =?utf-8?B?UnlkSU1ZYVJNaFZFOG9tN3E2ZU9TMkFERklLKzZhdmNYOFJObWQwUHhOR0RM?=
- =?utf-8?B?UzkwOTdTMG5MVzNPcGtxUGVwNnZmaHpxT0dWYW9VMENLOWdCMnJVR2FnTUtP?=
- =?utf-8?B?R2wyYnhnNXZmclZHM0ZJU2M2M3ExTFVFZSsyeTZhcXNtUm96OUdaNGMxWG5Y?=
- =?utf-8?B?dk5wVW1OeXpxNnlOUUozRHd4STZQWVRvaU0yYWJyK1R0eUJGT24wd2pJZFg1?=
- =?utf-8?B?UGltbG5YdHFkY3dCa1NiTHlsMjQvcTZyWU1RRDd3bDBuQkk1NDRhQjF6SHlU?=
- =?utf-8?B?Kzlib2R4SXNtREc1V1UxbzRvN2JwNGtuaXRmeEFiWkQ1amViNURmcnNINlZF?=
- =?utf-8?B?SllaQmV4ZUdkWmlWb0tCYVJ1RmU4bUxyN1ZFMVM1Y01lQVZqVUFaSkV4U1M1?=
- =?utf-8?B?S3JuU3FDaDNDQTJlMDlvMWZmZzVFMzZCQU41QlJrK1ZCeXB3YjVYVitEZzJX?=
- =?utf-8?B?M1prTklUTUxtaUVEWU44V3dDYVo4MjRjYUtFRGM0cFcvUWlQaVV4OVhSaVMv?=
- =?utf-8?B?R2tNK3ZYRjdsRStubXh4T1U1Z1NjT1UycnJvTXJiV0FjKzNGWE53bU9lUWho?=
- =?utf-8?B?c3hteTRYcEtNT3JTa2J4eWdoMlZzZzNYQ2xXaE1RQ0hVc1dqaDdaellqaE4w?=
- =?utf-8?B?UHNpdy94V1RhMHAxUVU0blFLWDFiYkxvNWZwOEhXdU1iRTVBQ25sZndyeUJM?=
- =?utf-8?B?OFhoeW9rbXhwaDRuZ1JHVUcwU3IvYmptQzlQRERVYzRJTEhYRTgyMHpoNkZT?=
- =?utf-8?B?ajh6NCs0TjVsaDVmOHM1a1lGejJTYlVhZFlhQWxwZG9wY1ZsUmc2VVF0a0ti?=
- =?utf-8?B?RFFnYk8rV0ZzYjB6OGRFaGdSTGFmQzNpd1hDUFAySTNVVTBxY3MxdkdSWEVD?=
- =?utf-8?B?T1Z5S0Z3cEJhMi8yd0dJSisrTnJEZzRSUnBRRnExRkpGL3pVUm0zb1JsRUps?=
- =?utf-8?B?Wm9SUHgrU3BXSDdQZENJRXlKL2YzZTFibWVsSGovVUw0Q3RYSEdyWnZncXB6?=
- =?utf-8?B?Wmc0cFRTSFp0R3lJcDgySDNLc0xEcHRYWU40dE8yWWtTNnlBZ3VpY2tTNEdV?=
- =?utf-8?B?Y0RJZVhIWUxSaFQ2anVhdU16V255dkU3UnFHWVRjZm9SaFN2dHFFeE9EcDEw?=
- =?utf-8?B?d1Jsb1VVdi9LUk1acTFUVmFCc2g2aGVHNnJZZys3YWRDZEdiSjBXVnp1dXRn?=
- =?utf-8?B?ZFpQaFQreldGakFaMG9kWE4vdFZSZmVNZnc5bGRuelloZWRaRG5HUWxzaG5t?=
- =?utf-8?B?WGY5R3RHb2ZZbHRnU2ZmZHQ3VVNiSEhScFVRTXN2Z1BqWERWQzJ4ZkQ5OHoy?=
- =?utf-8?B?UUM2Sy9lYUV3M0RtNGpPT0J6RE9TOW1DNWZlaWdQTEUwY2JVblNaY2JTS0Jq?=
- =?utf-8?B?bUZOYlh5cDNmQm55QWxmZVFCajhSUFFrb1hNUVIvYitLNlpPbGxmRHFqOHV1?=
- =?utf-8?B?bkRlZDExVENqUzFublhicGY1NGNCTWkxOU5GR21mY1hjZjVtY3J4YzFNUlNG?=
- =?utf-8?B?Vzg4cTdZUG1VVnNTSTA3UXFpKzBVYkcwRDhweFBtWUFSZlg1RmZPL2dHSHhK?=
- =?utf-8?B?bG90aEFNVC9JUFRKNCtYMVpybXlUb3JPYTFJYVlSV1AzYkEzbWFZc1Myd0NE?=
- =?utf-8?B?UGc9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09d7a151-9c01-432a-6599-08db728afeb4
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR11MB2599.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 21 Jun 2023 19:09:11.0066
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ko+7bcqr+lJQtF1uhCTEMXDRhAyXeF+5ewiiGIOhPqTbt6kZdW4oVSl0e+MVOQGSkNirulBhEBRRoFa1e3yxnXh2ibUKp9Ked0eugHXP7GQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8205
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+This patch replaces the adjust_link api with the phylink apis that provide
+equivalent functionality.
 
+The remaining functionality from the adjust_link is now covered in the
+phylink_mac_link_* and phylink_mac_config.
 
-On 6/17/2023 12:01 AM, Jakub Kicinski wrote:
-> On Wed, 14 Jun 2023 10:14:25 -0700 Tony Nguyen wrote:
->> +static bool idpf_rx_can_reuse_page(struct idpf_rx_buf *rx_buf)
->> +{
->> +	unsigned int last_offset = PAGE_SIZE - rx_buf->buf_size;
->> +	struct idpf_page_info *pinfo;
->> +	unsigned int pagecnt_bias;
->> +	struct page *page;
->> +
->> +	pinfo = &rx_buf->page_info[rx_buf->page_indx];
->> +	pagecnt_bias = pinfo->pagecnt_bias;
->> +	page = pinfo->page;
->> +
->> +	if (unlikely(!dev_page_is_reusable(page)))
->> +		return false;
->> +
->> +	if (PAGE_SIZE < 8192) {
->> +		/* For 2K buffers, we can reuse the page if we are the
->> +		 * owner. For 4K buffers, we can reuse the page if there are
->> +		 * no other others.
->> +		 */
->> +		if (unlikely((page_count(page) - pagecnt_bias) >
->> +			     pinfo->reuse_bias))
->> +			return false;
->> +	} else if (pinfo->page_offset > last_offset) {
->> +		return false;
->> +	}
->> +
->> +	/* If we have drained the page fragment pool we need to update
->> +	 * the pagecnt_bias and page count so that we fully restock the
->> +	 * number of references the driver holds.
->> +	 */
->> +	if (unlikely(pagecnt_bias == 1)) {
->> +		page_ref_add(page, USHRT_MAX - 1);
->> +		pinfo->pagecnt_bias = USHRT_MAX;
->> +	}
->> +
->> +	return true;
->> +}
-> 
-> If you want to do local recycling you must use the page pool first,
-> and then share the analysis of how much and why the recycling helps.
+Removes:
+.adjust_link
+Adds:
+.phylink_get_caps
+.phylink_mac_link_down
+.phylink_mac_link_up
+.phylink_mac_link_down
 
-We are working on refactoring all the Intel drivers to use the page pool 
-API in a unified way and our plan is to update IDPF driver as well, as 
-part of that effort.
+Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+---
+ drivers/net/dsa/vitesse-vsc73xx-core.c | 179 ++++++++++++++-----------
+ 1 file changed, 99 insertions(+), 80 deletions(-)
 
-Thanks,
-Pavan
+diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+index ae55167ce0a6..e853b57b0bc8 100644
+--- a/drivers/net/dsa/vitesse-vsc73xx-core.c
++++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+@@ -39,6 +39,7 @@
+ #define VSC73XX_BLOCK_SYSTEM	0x7 /* Only subblock 0 */
+ 
+ #define CPU_PORT	6 /* CPU port */
++#define VSC73XX_TABLE_ATTEMPTS	10
+ 
+ /* MAC Block registers */
+ #define VSC73XX_MAC_CFG		0x00
+@@ -715,8 +716,7 @@ static void vsc73xx_init_port(struct vsc73xx *vsc, int port)
+ }
+ 
+ static void vsc73xx_adjust_enable_port(struct vsc73xx *vsc,
+-				       int port, struct phy_device *phydev,
+-				       u32 initval)
++				       int port, u32 initval)
+ {
+ 	u32 val = initval;
+ 	u8 seed;
+@@ -754,12 +754,40 @@ static void vsc73xx_adjust_enable_port(struct vsc73xx *vsc,
+ 			    VSC73XX_MAC_CFG_TX_EN | VSC73XX_MAC_CFG_RX_EN);
+ }
+ 
+-static void vsc73xx_adjust_link(struct dsa_switch *ds, int port,
+-				struct phy_device *phydev)
++static void vsc73xx_phylink_get_caps(struct dsa_switch *ds, int port,
++				     struct phylink_config *config)
+ {
+-	struct vsc73xx *vsc = ds->priv;
+-	u32 val;
++	/* This switch only supports full-duplex at 1Gbps */
++	config->mac_capabilities = MAC_10 | MAC_100 | MAC_1000FD |
++				   MAC_ASYM_PAUSE | MAC_SYM_PAUSE;
+ 
++	if (port == CPU_PORT) {
++		__set_bit(PHY_INTERFACE_MODE_RGMII,
++			  config->supported_interfaces);
++		__set_bit(PHY_INTERFACE_MODE_GMII,
++			  config->supported_interfaces);
++	} else {
++		__set_bit(PHY_INTERFACE_MODE_INTERNAL,
++			  config->supported_interfaces);
++		/* Compatibility for phylib's default interface type when the
++		 * phy-mode property is absent
++		 */
++		__set_bit(PHY_INTERFACE_MODE_GMII,
++			  config->supported_interfaces);
++	}
++
++	/* This driver does not make use of the speed, duplex, pause or the
++	 * advertisement in its mac_config, so it is safe to mark this driver
++	 * as non-legacy.
++	 */
++	config->legacy_pre_march2020 = false;
++}
++
++static void vsc73xx_phylink_mac_config(struct dsa_switch *ds, int port,
++				       unsigned int mode,
++				       const struct phylink_link_state *state)
++{
++	struct vsc73xx *vsc = ds->priv;
+ 	/* Special handling of the CPU-facing port */
+ 	if (port == CPU_PORT) {
+ 		/* Other ports are already initialized but not this one */
+@@ -775,104 +803,92 @@ static void vsc73xx_adjust_link(struct dsa_switch *ds, int port,
+ 			      VSC73XX_ADVPORTM_ENA_GTX |
+ 			      VSC73XX_ADVPORTM_DDR_MODE);
+ 	}
++}
+ 
+-	/* This is the MAC confiuration that always need to happen
+-	 * after a PHY or the CPU port comes up or down.
+-	 */
+-	if (!phydev->link) {
+-		int maxloop = 10;
++static void vsc73xx_phylink_mac_link_down(struct dsa_switch *ds, int port,
++					  unsigned int mode,
++					  phy_interface_t interface)
++{
++	struct vsc73xx *vsc = ds->priv;
++	u32 val;
+ 
+-		dev_dbg(vsc->dev, "port %d: went down\n",
+-			port);
++	int maxloop = VSC73XX_TABLE_ATTEMPTS;
+ 
+-		/* Disable RX on this port */
+-		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+-				    VSC73XX_MAC_CFG,
+-				    VSC73XX_MAC_CFG_RX_EN, 0);
++	dev_dbg(vsc->dev, "port %d: went down\n",
++		port);
+ 
+-		/* Discard packets */
+-		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
+-				    VSC73XX_ARBDISC, BIT(port), BIT(port));
++	/* Disable RX on this port */
++	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
++			    VSC73XX_MAC_CFG,
++			    VSC73XX_MAC_CFG_RX_EN, 0);
++
++	/* Discard packets */
++	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
++			    VSC73XX_ARBDISC, BIT(port), BIT(port));
+ 
+-		/* Wait until queue is empty */
++	/* Wait until queue is empty */
++	vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
++		     VSC73XX_ARBEMPTY, &val);
++	while (!(val & BIT(port))) {
++		msleep(1);
+ 		vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
+ 			     VSC73XX_ARBEMPTY, &val);
+-		while (!(val & BIT(port))) {
+-			msleep(1);
+-			vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
+-				     VSC73XX_ARBEMPTY, &val);
+-			if (--maxloop == 0) {
+-				dev_err(vsc->dev,
+-					"timeout waiting for block arbiter\n");
+-				/* Continue anyway */
+-				break;
+-			}
++		if (--maxloop == 0) {
++			dev_err(vsc->dev,
++				"timeout waiting for block arbiter\n");
++			/* Continue anyway */
++			break;
+ 		}
++	}
+ 
+-		/* Put this port into reset */
+-		vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MAC_CFG,
+-			      VSC73XX_MAC_CFG_RESET);
+-
+-		/* Accept packets again */
+-		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
+-				    VSC73XX_ARBDISC, BIT(port), 0);
++	/* Put this port into reset */
++	vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_MAC_CFG,
++		      VSC73XX_MAC_CFG_RESET);
+ 
+-		/* Allow backward dropping of frames from this port */
+-		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
+-				    VSC73XX_SBACKWDROP, BIT(port), BIT(port));
++	/* Accept packets again */
++	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
++			    VSC73XX_ARBDISC, BIT(port), 0);
+ 
+-		/* Receive mask (disable forwarding) */
+-		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+-				    VSC73XX_RECVMASK, BIT(port), 0);
++	/* Allow backward dropping of frames from this port */
++	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
++			    VSC73XX_SBACKWDROP, BIT(port), BIT(port));
+ 
+-		return;
+-	}
++	/* Receive mask (disable forwarding) */
++	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
++			    VSC73XX_RECVMASK, BIT(port), 0);
++}
+ 
+-	/* Figure out what speed was negotiated */
+-	if (phydev->speed == SPEED_1000) {
+-		dev_dbg(vsc->dev, "port %d: 1000 Mbit mode full duplex\n",
+-			port);
++static void vsc73xx_phylink_mac_link_up(struct dsa_switch *ds, int port,
++					unsigned int mode,
++					phy_interface_t interface,
++					struct phy_device *phydev,
++					int speed, int duplex,
++					bool tx_pause, bool rx_pause)
++{
++	struct vsc73xx *vsc = ds->priv;
++	u32 val;
+ 
++	switch (speed) {
++	case SPEED_1000:
+ 		/* Set up default for internal port or external RGMII */
+-		if (phydev->interface == PHY_INTERFACE_MODE_RGMII)
++		if (interface == PHY_INTERFACE_MODE_RGMII)
+ 			val = VSC73XX_MAC_CFG_1000M_F_RGMII;
+ 		else
+ 			val = VSC73XX_MAC_CFG_1000M_F_PHY;
+-		vsc73xx_adjust_enable_port(vsc, port, phydev, val);
+-	} else if (phydev->speed == SPEED_100) {
+-		if (phydev->duplex == DUPLEX_FULL) {
+-			val = VSC73XX_MAC_CFG_100_10M_F_PHY;
+-			dev_dbg(vsc->dev,
+-				"port %d: 100 Mbit full duplex mode\n",
+-				port);
+-		} else {
+-			val = VSC73XX_MAC_CFG_100_10M_H_PHY;
+-			dev_dbg(vsc->dev,
+-				"port %d: 100 Mbit half duplex mode\n",
+-				port);
+-		}
+-		vsc73xx_adjust_enable_port(vsc, port, phydev, val);
+-	} else if (phydev->speed == SPEED_10) {
+-		if (phydev->duplex == DUPLEX_FULL) {
++		break;
++	case SPEED_100:
++	case SPEED_10:
++		if (duplex == DUPLEX_FULL)
+ 			val = VSC73XX_MAC_CFG_100_10M_F_PHY;
+-			dev_dbg(vsc->dev,
+-				"port %d: 10 Mbit full duplex mode\n",
+-				port);
+-		} else {
++		else
+ 			val = VSC73XX_MAC_CFG_100_10M_H_PHY;
+-			dev_dbg(vsc->dev,
+-				"port %d: 10 Mbit half duplex mode\n",
+-				port);
+-		}
+-		vsc73xx_adjust_enable_port(vsc, port, phydev, val);
+-	} else {
+-		dev_err(vsc->dev,
+-			"could not adjust link: unknown speed\n");
++		break;
+ 	}
+ 
+ 	/* Enable port (forwarding) in the receieve mask */
+ 	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+ 			    VSC73XX_RECVMASK, BIT(port), BIT(port));
++	vsc73xx_adjust_enable_port(vsc, port, val);
+ }
+ 
+ static int vsc73xx_port_enable(struct dsa_switch *ds, int port,
+@@ -1043,7 +1059,10 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+ 	.setup = vsc73xx_setup,
+ 	.phy_read = vsc73xx_phy_read,
+ 	.phy_write = vsc73xx_phy_write,
+-	.adjust_link = vsc73xx_adjust_link,
++	.phylink_get_caps = vsc73xx_phylink_get_caps,
++	.phylink_mac_config = vsc73xx_phylink_mac_config,
++	.phylink_mac_link_down = vsc73xx_phylink_mac_link_down,
++	.phylink_mac_link_up = vsc73xx_phylink_mac_link_up,
+ 	.get_strings = vsc73xx_get_strings,
+ 	.get_ethtool_stats = vsc73xx_get_ethtool_stats,
+ 	.get_sset_count = vsc73xx_get_sset_count,
+-- 
+2.34.1
+
 
