@@ -1,54 +1,149 @@
-Return-Path: <netdev+bounces-12809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7938C738FEF
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:21:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 33EFC738FF5
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 21:22:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24FAE28174B
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:21:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E4266281751
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 19:22:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46DF21ACDA;
-	Wed, 21 Jun 2023 19:21:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AB951B8F1;
+	Wed, 21 Jun 2023 19:22:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EEDF9D6
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 19:21:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 85FDEC433C8;
-	Wed, 21 Jun 2023 19:21:07 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687375268;
-	bh=Umi/WQ5JaYPeZNJQnUl5tcXK++EHRReY9kyGcep6i50=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=P3L+ynThoam9C4GlaWJrz20dDnRkL92AOH5H2Znm+7q3OPpUvyWSGhUpyEhpDG/Js
-	 s+/LaPM8W5jdtm5jq8JkQcPN4MeT1Dn3nSqda+sv7rDVo0cmMEf3PDLJfRSnwRGuZb
-	 DHW3c8AqLPrcioYbBkdWusuA8UV82qT4XfkxePgdOeX3xRtXTUYUl5nmrHj1eu52Hg
-	 TNbVc4W39JvpB4Hqjiusby3xqjbSTUkMQUnIc4JUBoQ0Y3iasIK7k22Anakyp8uSlq
-	 SpzZjtIEwy/s4bb86ltda3bDypHFQNFI1JUEyYguMrkZOF12qoPbROnjOTkbeo39zd
-	 mQ+/U9V7W8kKg==
-Date: Wed, 21 Jun 2023 12:21:06 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "Linga, Pavan Kumar" <pavan.kumar.linga@intel.com>
-Cc: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
- <pabeni@redhat.com>, <edumazet@google.com>, <netdev@vger.kernel.org>, Alan
- Brady <alan.brady@intel.com>, <emil.s.tantilov@intel.com>,
- <jesse.brandeburg@intel.com>, <sridhar.samudrala@intel.com>,
- <shiraz.saleem@intel.com>, <sindhu.devale@intel.com>, <willemb@google.com>,
- <decot@google.com>, <andrew@lunn.ch>, <leon@kernel.org>, <mst@redhat.com>,
- <simon.horman@corigine.com>, <shannon.nelson@amd.com>,
- <stephen@networkplumber.org>, Joshua Hay <joshua.a.hay@intel.com>, "Madhu
- Chittim" <madhu.chittim@intel.com>, Phani Burra <phani.r.burra@intel.com>
-Subject: Re: [PATCH net-next v2 12/15] idpf: add RX splitq napi poll support
-Message-ID: <20230621122106.56cb5bf1@kernel.org>
-In-Reply-To: <9528682b-93bb-2797-6bd5-0f40710d306c@intel.com>
-References: <20230614171428.1504179-1-anthony.l.nguyen@intel.com>
-	<20230614171428.1504179-13-anthony.l.nguyen@intel.com>
-	<20230617000101.191ea52c@kernel.org>
-	<9528682b-93bb-2797-6bd5-0f40710d306c@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C8D4819E6B;
+	Wed, 21 Jun 2023 19:22:04 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7D03C433C0;
+	Wed, 21 Jun 2023 19:21:43 +0000 (UTC)
+Date: Wed, 21 Jun 2023 15:21:41 -0400
+From: Steven Rostedt <rostedt@goodmis.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Jeremy Kerr <jk@ozlabs.org>, Arnd Bergmann <arnd@arndb.de>, Michael
+ Ellerman <mpe@ellerman.id.au>, Nicholas Piggin <npiggin@gmail.com>,
+ Christophe Leroy <christophe.leroy@csgroup.eu>, Heiko Carstens
+ <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger
+ <borntraeger@linux.ibm.com>, Sven Schnelle <svens@linux.ibm.com>, Greg
+ Kroah-Hartman <gregkh@linuxfoundation.org>, Arve =?UTF-8?B?SGrDuG5uZXY=?=
+ =?UTF-8?B?w6Vn?= <arve@android.com>, Todd Kjos <tkjos@android.com>, Martijn
+ Coenen <maco@android.com>, Joel Fernandes <joel@joelfernandes.org>,
+ Christian Brauner <brauner@kernel.org>, Carlos Llamas
+ <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>, Dennis
+ Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason Gunthorpe
+ <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Brad Warrum
+ <bwarrum@linux.ibm.com>, Ritu Agarwal <rituagar@linux.ibm.com>, Eric Van
+ Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>,
+ Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
+ <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, David Howells
+ <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Alexander
+ Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>, Luis de
+ Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Eric Biederman
+ <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>, Chris Mason
+ <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Xiubo Li
+ <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Jan Harkes
+ <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
+ Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>, "Rafael
+ J. Wysocki" <rafael@kernel.org>, Tyler Hicks <code@tyhicks.com>, Ard
+ Biesheuvel <ardb@kernel.org>, Gao Xiang <xiang@kernel.org>, Chao Yu
+ <chao@kernel.org>, Yue Hu <huyue2@coolpad.com>, Jeffle Xu
+ <jefflexu@linux.alibaba.com>, Namjae Jeon <linkinjeon@kernel.org>, Sungjong
+ Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>, "Theodore Ts'o"
+ <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Jaegeuk Kim
+ <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Miklos
+ Szeredi <miklos@szeredi.hu>, Bob Peterson <rpeterso@redhat.com>, Andreas
+ Gruenbacher <agruenba@redhat.com>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Mikulas Patocka
+ <mikulas@artax.karlin.mff.cuni.cz>, Mike Kravetz <mike.kravetz@oracle.com>,
+ Muchun Song <muchun.song@linux.dev>, David Woodhouse <dwmw2@infradead.org>,
+ Dave Kleikamp <shaggy@kernel.org>, Tejun Heo <tj@kernel.org>, Trond
+ Myklebust <trond.myklebust@hammerspace.com>, Anna Schumaker
+ <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>, Ryusuke Konishi
+ <konishi.ryusuke@gmail.com>, Anton Altaparmakov <anton@tuxera.com>,
+ Konstantin Komarov <almaz.alexandrovich@paragon-software.com>, Mark Fasheh
+ <mark@fasheh.com>, Joseph Qi <joseph.qi@linux.alibaba.com>, Bob Copeland
+ <me@bobcopeland.com>, Mike Marshall <hubcap@omnibond.com>, Martin
+ Brandenburg <martin@omnibond.com>, Luis Chamberlain <mcgrof@kernel.org>,
+ Iurii Zaikin <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,
+ "Guilherme G. Piccoli" <gpiccoli@igalia.com>, Anders Larsen
+ <al@alarsen.net>, Steve French <sfrench@samba.org>, Paulo Alcantara
+ <pc@manguebit.com>, Ronnie Sahlberg <lsahlber@redhat.com>, Shyam Prasad N
+ <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>, Sergey Senozhatsky
+ <senozhatsky@chromium.org>, Phillip Lougher <phillip@squashfs.org.uk>,
+ Masami Hiramatsu <mhiramat@kernel.org>, Evgeniy Dushistov
+ <dushistov@mail.ru>, Hans de Goede <hdegoede@redhat.com>, "Darrick J. Wong"
+ <djwong@kernel.org>, Damien Le Moal <dlemoal@kernel.org>, Naohiro Aota
+ <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>, Alexei
+ Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
+ <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
+ <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh
+ <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Hugh Dickins
+ <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>, "David S.
+ Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
+ Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, John Johansen
+ <john.johansen@canonical.com>, Paul Moore <paul@paul-moore.com>, James
+ Morris <jmorris@namei.org>, "Serge E. Hallyn" <serge@hallyn.com>, Stephen
+ Smalley <stephen.smalley.work@gmail.com>, Eric Paris
+ <eparis@parisplace.org>, Juergen Gross <jgross@suse.com>, Ruihan Li
+ <lrh2000@pku.edu.cn>, Laurent Pinchart
+ <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang
+ <wsa+renesas@sang-engineering.com>, Udipto Goswami
+ <quic_ugoswami@quicinc.com>, Linyu Yuan <quic_linyyuan@quicinc.com>, John
+ Keeping <john@keeping.me.uk>, Andrzej Pietrasiewicz
+ <andrzej.p@collabora.com>, Dan Carpenter <error27@gmail.com>, Yuta Hayama
+ <hayama@lineo.co.jp>, Jozef Martiniak <jomajm@gmail.com>, Jens Axboe
+ <axboe@kernel.dk>, Alan Stern <stern@rowland.harvard.edu>, Sandeep Dhavale
+ <dhavale@google.com>, Dave Chinner <dchinner@redhat.com>, Johannes Weiner
+ <hannes@cmpxchg.org>, ZhangPeng <zhangpeng362@huawei.com>, Viacheslav
+ Dubeyko <slava@dubeyko.com>, Tetsuo Handa
+ <penguin-kernel@I-love.SAKURA.ne.jp>, Aditya Garg <gargaditya08@live.com>,
+ Erez Zadok <ezk@cs.stonybrook.edu>, Yifei Liu <yifeliu@cs.stonybrook.edu>,
+ Yu Zhe <yuzhe@nfschina.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Oleg Kanatov <okanatov@gmail.com>, "Dr. David Alan
+ Gilbert" <linux@treblig.org>, Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin
+ <cgel.zte@gmail.com>, Stefan Roesch <shr@devkernel.io>, Zhihao Cheng
+ <chengzhihao1@huawei.com>, "Liam R. Howlett" <Liam.Howlett@Oracle.com>,
+ Alexey Dobriyan <adobriyan@gmail.com>, Minghao Chi
+ <chi.minghao@zte.com.cn>, Seth Forshee <sforshee@digitalocean.com>, Zeng
+ Jingxiang <linuszeng@tencent.com>, Bart Van Assche <bvanassche@acm.org>,
+ Mimi Zohar <zohar@linux.ibm.com>, Roberto Sassu <roberto.sassu@huawei.com>,
+ Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>, "Fabio M. De
+ Francesco" <fmdefrancesco@gmail.com>, Chen Zhongjin
+ <chenzhongjin@huawei.com>, Zhengchao Shao <shaozhengchao@huawei.com>, Rik
+ van Riel <riel@surriel.com>, Jingyu Wang <jingyuwang_vip@163.com>, Hangyu
+ Hua <hbh25y@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org, linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org, linux-usb@vger.kernel.org,
+ v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org,
+ linux-afs@lists.infradead.org, autofs@vger.kernel.org, linux-mm@kvack.org,
+ linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+ codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+ linux-efi@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com, linux-um@lists.infradead.org,
+ linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+ linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
+ ocfs2-devel@oss.oracle.com, linux-karma-devel@lists.sourceforge.net,
+ devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+ linux-hardening@vger.kernel.org, reiserfs-devel@vger.kernel.org,
+ linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+ linux-trace-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org, apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org, selinux@vger.kernel.org
+Subject: Re: [PATCH 00/79] fs: new accessors for inode->i_ctime
+Message-ID: <20230621152141.5961cf5f@gandalf.local.home>
+In-Reply-To: <20230621144507.55591-1-jlayton@kernel.org>
+References: <20230621144507.55591-1-jlayton@kernel.org>
+X-Mailer: Claws Mail 3.17.8 (GTK+ 2.24.33; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,14 +153,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 21 Jun 2023 12:09:07 -0700 Linga, Pavan Kumar wrote:
-> > If you want to do local recycling you must use the page pool first,
-> > and then share the analysis of how much and why the recycling helps.  
-> 
-> We are working on refactoring all the Intel drivers to use the page pool 
-> API in a unified way and our plan is to update IDPF driver as well, as 
-> part of that effort.
+On Wed, 21 Jun 2023 10:45:05 -0400
+Jeff Layton <jlayton@kernel.org> wrote:
 
-It's a new driver from the upstream perspective, it needs to be brought
-up to date before it gets accepted.
+> Most of this conversion was done via coccinelle, with a few of the more
+> non-standard accesses done by hand. There should be no behavioral
+> changes with this set. That will come later, as we convert individual
+> filesystems to use multigrain timestamps.
+
+BTW, Linus has suggested to me that whenever a conccinelle script is used,
+it should be included in the change log.
+
+-- Steve
 
