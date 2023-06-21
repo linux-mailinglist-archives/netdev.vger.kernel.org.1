@@ -1,200 +1,398 @@
-Return-Path: <netdev+bounces-12585-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12586-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94AE97383A7
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:23:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DD937383B5
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 14:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 459781C20E46
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:23:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22E1D280BDB
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FDCF156FE;
-	Wed, 21 Jun 2023 12:23:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0F5C9168AA;
+	Wed, 21 Jun 2023 12:26:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3D36CC147
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 12:23:46 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2073.outbound.protection.outlook.com [40.107.94.73])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D56381718;
-	Wed, 21 Jun 2023 05:23:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nlkw69kpA2qT4UBcM/El02MqDpxgRwIOqNcF6hoBfKqBlMaGH9qVyBBmPVun+SyjSwwW06pYQJGKzNapnYf4uMWQLooC77ODKLgcd5quXrPkrhE8SHqyvzVMPurB4fqsalgHMl3dxLAQqT3o+DkI6ig8qB2BgdIAPP51EO0gUSCXkuppFvXIARHnL/0jG7fX3lHYg27WxV7RdZG+f/kSUHV3QPFUoIjCdSDtpy7p+blGfOs11GJ91PZ+IlIAHxc44l5ZSpPyjp2xSLM3OmkbHOroyo2HgBAq2xEJbY8TRjTGcFT+xxhwdIMUMCtDkmVBOOuzgDXbK+E9J6l9K6ahQw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UZvuNX65CYgLpxYT48+dITYmOysmTNlO7yWEvVyT57w=;
- b=HDY843jD1jeRs1FXDiMf4cc7+zSd2fuHCGOokOvhF8QVkVknKiBNz2ER6wwmxkeCXjtr5wgEA4laaMIZInoCzb1bN1GScMeJJuHThveX/eQxafab9S61WnHEjT5lW/LWgFOFANltwRMmKWE60gys554ApkefEOoUays80JLs3ptzfzNmt0fkTO2Xrqxx2PJNz1zVH/CZ6Ok4Lbj8X1VxyYRqaw0L7X3/Nf/87smc6/9SZbkVFyNQV0+oCJ0vF/gNdoUSSvZgx6+SuDYW2HrjUVrxMetUb3V3PljAMxs6jyzpTyCUVBVtegjl8WKvPK0JM3vjnzcSWl2U0tulKD/fqg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UZvuNX65CYgLpxYT48+dITYmOysmTNlO7yWEvVyT57w=;
- b=JfP8UmpEPWSQi5rf1EL/EXSLZ6tgIEvAN8riuzm4Ro7Yn8coiZGlPRKJYsCMcR2AlkxBYm7bwj9znnhfbeotGxZe2QuoK5F2Il484TjRiCBPug6M62E/18YLYFyTjgLCXvl+B5Oobw1x8QdJpjVLJeDaPpoDbmeZIWmUkeToweU=
-Received: from MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15)
- by SJ2PR12MB7941.namprd12.prod.outlook.com (2603:10b6:a03:4d3::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.39; Wed, 21 Jun
- 2023 12:23:34 +0000
-Received: from MN0PR12MB5953.namprd12.prod.outlook.com
- ([fe80::8368:23:db50:8f88]) by MN0PR12MB5953.namprd12.prod.outlook.com
- ([fe80::8368:23:db50:8f88%5]) with mapi id 15.20.6521.020; Wed, 21 Jun 2023
- 12:23:34 +0000
-From: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
-To: Maxim Kochetkov <fido_max@inbox.ru>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Simek, Michal" <michal.simek@amd.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH 1/1] net: axienet: Move reset before DMA detection
-Thread-Topic: [PATCH 1/1] net: axienet: Move reset before DMA detection
-Thread-Index: AQHZpDNISCde3I6gbkWQWU09f2/31q+VLImw
-Date: Wed, 21 Jun 2023 12:23:34 +0000
-Message-ID:
- <MN0PR12MB5953C2C8784514E9270787DAB75DA@MN0PR12MB5953.namprd12.prod.outlook.com>
-References: <20230621112630.154373-1-fido_max@inbox.ru>
-In-Reply-To: <20230621112630.154373-1-fido_max@inbox.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR12MB5953:EE_|SJ2PR12MB7941:EE_
-x-ms-office365-filtering-correlation-id: 979f8cc7-3180-4d8c-93f4-08db725254fb
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- yp7kYLfEvysAj99+YAB8Xh5Sdj84DaYYH0zwCYgjOjeh9YLVXMpWvXfUYY4NZakJKxBEZgqcQr2GoDjlVaWW4IearmWwYxhVFXuvmNo2NkxtJ9uf1iDQVjvDjW9+hoiLaZU+v8wjYuCMhkx6UEVJ7bpXerAOT6sj4IAZitQy9lrtmuZqID95qUD1ilkbeDbWteVKMLrCRAPv2gIKs9ZPMgkTCsitX4q3sp3Fp/WCxB5mDjppR8cpTqG1CVHZVTkRv118Th1AFLnPq5NTEfHvDvAkw3SO3n7j092fTPk7l3msmLtWzd363rALfydkednQeG7BwthR4UnUeyuJjwtL2uWmimzBSjQB+I8dQez6RD1P3DtO56lqRJGAMy71jpOM0M+U8AfMXGwm6NfxYQ8KZbyf5gfnlke9SgnjVtBUrZk1ErRgz0+Ah7OZhzLbTwKPnsov1m5HXfv+fr9UNgKNeyJOTA674q3we/WlLNtmTKpHnIroVb170aTKTUtymDh3xXlqAu/m+Hc5QWSDbVgoa32gZhyO4FY8OKm2++cYk4ABc3K9sLeMhXFymg7ggOweqyPTVI7WwCXx+1VFSpg4dnknOUyHidapziCK1Qaq94VjzXpDGqx9Whum7dHgzGXt
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5953.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(396003)(376002)(136003)(39860400002)(451199021)(38100700002)(122000001)(9686003)(53546011)(6506007)(83380400001)(186003)(55016003)(52536014)(2906002)(33656002)(41300700001)(5660300002)(8676002)(8936002)(71200400001)(7696005)(38070700005)(478600001)(4326008)(64756008)(66476007)(66556008)(66946007)(76116006)(66446008)(316002)(54906003)(110136005)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?uGRrsFaJb3RJVbm1359z8BvZVT/pQqFZJ6ny+a313M5/sILX0Hun5CG1ru3i?=
- =?us-ascii?Q?aTqc7w/zmpnQGMitkcp/AHK1rzaSaPu6fn1uuM4Eh3ceU7mMZ47OI+jU3vph?=
- =?us-ascii?Q?04fPZ68LUlT/HVu5zDZ8iHOAyaDpt/6cCUSRkzzbd+VTp6HsZo2gjaO1djJ0?=
- =?us-ascii?Q?fq3/Jf1FKf0XmGoBHITC4PmwoTY1ZQIWJEnRWQgeHpLjenZBySHyRf/wP4p+?=
- =?us-ascii?Q?SPtkbnmTg5dd9P6SEx7k9/gNJeVhCab0pAmdv/1bX4vF/xZyVhCELKP744D3?=
- =?us-ascii?Q?6gEhVpYWb5+JsbqraC8AbtKmT304XQwhhX/ig9gbmiPfpM2FYAYAobxJeGDF?=
- =?us-ascii?Q?fnHNLd/sYi3GxO+IBCMM2Bang5HL3ATDPES2AsxTHjhnrcLPG5RArD79jQ4T?=
- =?us-ascii?Q?UA7G59ZbnxZlRm0IPSnA6yjYuAp5ZNmuj0sZ/wmWL490R7ASXW+q+N5xylZV?=
- =?us-ascii?Q?r8+DuWvpLnTUv2jHQA8Vd4Ca9rQgtREDlhjbyvKVDROIiI79D4jqNooPrdgF?=
- =?us-ascii?Q?yKU3uu1Z5yvmNTRbPXFMKCRXd48MhQeLMr1uc38RdhqY2defke0vFKSFf4Ct?=
- =?us-ascii?Q?/NDp/5ii4Ll7Ua+SKgMydxSJuoIxXYvd+DBMK956klgnKlm81OBB9OAP06Y8?=
- =?us-ascii?Q?JXDinT3RmeMiCLrY5DHQGg9xARPWuOHC6czbrnhm8TeD4jdSX8lEcDiwNSdY?=
- =?us-ascii?Q?GLdeQ5X/MIi48cFG/2mxUYJEoHdq6O7ATA4QY9uDSfesTOIYdV61JOCUZ/8t?=
- =?us-ascii?Q?5pqVtKQHw0bPIAoF2grGSQ/GAYJBoViw7nIKA0OxJzsjISxRVHYHu8FYi4nk?=
- =?us-ascii?Q?qYw43whdsD2TB5J+4CUDkVZ8vcvwy9bHC/e8MyZvfPTdJ6Rtijtwpz4yaWwz?=
- =?us-ascii?Q?Q80JA2bUXKadiqHMfc17UPXjml3ueot6pfYuWFYsY91f3ziwIq9T/5m9n/w0?=
- =?us-ascii?Q?glzh8B7NWKuH7Vn5aDhk2PNp8aLG2lemUGjvil+HHIzANGRiQciXDPitW+n1?=
- =?us-ascii?Q?ibNhU2L7grMl/BrsA+q79XeYjGu0l8kkSiJZWAUic6eVByl4t8yALMK0ATXq?=
- =?us-ascii?Q?CXSmaENzL+JEZfGBZhgtg2XBEydBtK9vgR2oobI6oM0mBGMVLkKzRJJGdEPA?=
- =?us-ascii?Q?+msel2l3mwNGqa3SRpB2JeW5k6RWKxvGpJcPoOFpLGbNItSQ2q16bYays95Y?=
- =?us-ascii?Q?6HpkVqCZdosvCcv3sNRUtUpMMy5nqkjHfZI26V6kos6+4Myl4t4Fe1OMbRtr?=
- =?us-ascii?Q?lXmo/R6hMQNFhPqUo0e2TV73IXn0Y7tb4445BwQcIXdPSpmo5efpcI3UAFnC?=
- =?us-ascii?Q?bhq6B0Il17ZJIZv4LIkpOXcpxNWWn7SouIBbvSxcr2abFp6AwUkXqBkecvhK?=
- =?us-ascii?Q?5gZai1X0LIfa3fu9b9k+/5aiHmiJrDblIpbVL6sSZud67Qq0MULGUMFTCmeE?=
- =?us-ascii?Q?x23CrWjubWrtQRIO3SbMscQHjb6WC+Wc024TIhZHS038A69QH4YHH8FCKkLh?=
- =?us-ascii?Q?BTA5Pbc38eflV5xYmKZvto2mUT0xTUUNaHgCgEFrCTBYPmi24zY3S4hNIsq6?=
- =?us-ascii?Q?+GGuuwMgGyEebL830bHnjhSyvF47TYCEMZONcZPqjh2N67vuxSllBIDb91cJ?=
- =?us-ascii?Q?WIITlJrwaXM4GxcTWdz5NUA=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E68ADC147;
+	Wed, 21 Jun 2023 12:26:42 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (unknown [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 492781712;
+	Wed, 21 Jun 2023 05:26:38 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QmN606SpTz4f468s;
+	Wed, 21 Jun 2023 20:26:32 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP1 (Coremail) with SMTP id cCh0CgAHKDJ27JJk6J4qLg--.12588S2;
+	Wed, 21 Jun 2023 20:26:33 +0800 (CST)
+Subject: Re: [PATCH bpf-next 11/12] bpf: Introduce bpf_mem_free_rcu() similar
+ to kfree_rcu().
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, kernel-team@fb.com, daniel@iogearbox.net,
+ andrii@kernel.org, void@manifault.com, paulmck@kernel.org
+References: <20230621023238.87079-1-alexei.starovoitov@gmail.com>
+ <20230621023238.87079-12-alexei.starovoitov@gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <eee33106-21ef-9f0b-86e7-137deefc6f50@huaweicloud.com>
+Date: Wed, 21 Jun 2023 20:26:30 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5953.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 979f8cc7-3180-4d8c-93f4-08db725254fb
-X-MS-Exchange-CrossTenant-originalarrivaltime: 21 Jun 2023 12:23:34.1447
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: Y+7e1Q0YGx12xmQi/5wKhP52estyJyiJjl0DBgb177Crdio6OMRMCa475bVLeHy2
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB7941
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+In-Reply-To: <20230621023238.87079-12-alexei.starovoitov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:cCh0CgAHKDJ27JJk6J4qLg--.12588S2
+X-Coremail-Antispam: 1UD129KBjvAXoW3KFWrGr1DAryUXr48tF4fKrg_yoW8JFW5uo
+	WfCr15JF1rJF1xCw1qkryUCFnxKF1jg34DArs5Gry3Za4jqrW5t3yIyFW5J3y7WF18GFs8
+	Z3WUta1UGFW8JFy3n29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73VFW2AGmfu7bjvjm3
+	AaLaJ3UjIYCTnIWjp_UUUYx7kC6x804xWl14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK
+	8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4
+	AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26F1j6w1UM28EF7xvwVC0I7IYx2IY6xkF
+	7I0E14v26F4j6r4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
+	NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Maxim Kochetkov <fido_max@inbox.ru>
-> Sent: Wednesday, June 21, 2023 4:57 PM
-> To: netdev@vger.kernel.org
-> Cc: Maxim Kochetkov <fido_max@inbox.ru>; Pandey, Radhey Shyam
-> <radhey.shyam.pandey@amd.com>; David S. Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simek,
-> Michal <michal.simek@amd.com>; linux-arm-kernel@lists.infradead.org;
-> linux-kernel@vger.kernel.org
-> Subject: [PATCH 1/1] net: axienet: Move reset before DMA detection
->=20
-> DMA detection will fail if axinet was started before (by boot loader, boo=
-t
-> ROM, etc). In this state axinet will not start properly.
-> So move axinet reset before DMA detection.
+Hi,
 
-Please provide more detail on the failing testcase. In which scenario we ar=
-e=20
-seeing DMA detection failure? What is error log . Is it random?
-
->=20
-> Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
+On 6/21/2023 10:32 AM, Alexei Starovoitov wrote:
+> From: Alexei Starovoitov <ast@kernel.org>
+>
+> Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
+> Unlike bpf_mem_[cache_]free() that links objects for immediate reuse into
+> per-cpu free list the _rcu() flavor waits for RCU grace period and then moves
+> objects into free_by_rcu_ttrace list where they are waiting for RCU
+> task trace grace period to be freed into slab.
+>
+> The life cycle of objects:
+> alloc: dequeue free_llist
+> free: enqeueu free_llist
+> free_rcu: enqueue free_by_rcu -> waiting_for_gp
+> free_llist above high watermark -> free_by_rcu_ttrace
+> after RCU GP waiting_for_gp -> free_by_rcu_ttrace
+> free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
+>
+> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
 > ---
->  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> index 3e310b55bce2..734822321e0a 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> @@ -2042,6 +2042,11 @@ static int axienet_probe(struct platform_device
-> *pdev)
->  		goto cleanup_clk;
->  	}
->=20
-> +	/* Reset core now that clocks are enabled, prior to accessing MDIO
-> */
-> +	ret =3D __axienet_device_reset(lp);
-> +	if (ret)
-> +		goto cleanup_clk;
+>  include/linux/bpf_mem_alloc.h |   2 +
+>  kernel/bpf/memalloc.c         | 118 ++++++++++++++++++++++++++++++++--
+>  2 files changed, 116 insertions(+), 4 deletions(-)
+>
+> diff --git a/include/linux/bpf_mem_alloc.h b/include/linux/bpf_mem_alloc.h
+> index 3929be5743f4..d644bbb298af 100644
+> --- a/include/linux/bpf_mem_alloc.h
+> +++ b/include/linux/bpf_mem_alloc.h
+> @@ -27,10 +27,12 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma);
+>  /* kmalloc/kfree equivalent: */
+>  void *bpf_mem_alloc(struct bpf_mem_alloc *ma, size_t size);
+>  void bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr);
+> +void bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
+>  
+>  /* kmem_cache_alloc/free equivalent: */
+>  void *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma);
+>  void bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr);
+> +void bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
+>  void bpf_mem_cache_raw_free(void *ptr);
+>  void *bpf_mem_cache_alloc_flags(struct bpf_mem_alloc *ma, gfp_t flags);
+>  
+> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
+> index 10d027674743..4d1002e7b4b5 100644
+> --- a/kernel/bpf/memalloc.c
+> +++ b/kernel/bpf/memalloc.c
+> @@ -100,6 +100,15 @@ struct bpf_mem_cache {
+>  	int percpu_size;
+>  	struct bpf_mem_cache *tgt;
+>  
+> +	/* list of objects to be freed after RCU GP */
+> +	struct llist_head free_by_rcu;
+> +	struct llist_node *free_by_rcu_tail;
+> +	struct llist_head waiting_for_gp;
+> +	struct llist_node *waiting_for_gp_tail;
+> +	struct rcu_head rcu;
+> +	atomic_t call_rcu_in_progress;
+> +	struct llist_head free_llist_extra_rcu;
 > +
->  	/* Autodetect the need for 64-bit DMA pointers.
->  	 * When the IP is configured for a bus width bigger than 32 bits,
->  	 * writing the MSB registers is mandatory, even if they are all 0.
-> @@ -2096,11 +2101,6 @@ static int axienet_probe(struct platform_device
-> *pdev)
->  	lp->coalesce_count_tx =3D XAXIDMA_DFT_TX_THRESHOLD;
->  	lp->coalesce_usec_tx =3D XAXIDMA_DFT_TX_USEC;
->=20
-> -	/* Reset core now that clocks are enabled, prior to accessing MDIO
-> */
-> -	ret =3D __axienet_device_reset(lp);
-> -	if (ret)
-> -		goto cleanup_clk;
-> -
->  	ret =3D axienet_mdio_setup(lp);
->  	if (ret)
->  		dev_warn(&pdev->dev,
-> --
-> 2.40.1
+>  	/* list of objects to be freed after RCU tasks trace GP */
+>  	struct llist_head free_by_rcu_ttrace;
+>  	struct llist_node *free_by_rcu_ttrace_tail;
+> @@ -340,6 +349,56 @@ static void free_bulk(struct bpf_mem_cache *c)
+>  	do_call_rcu_ttrace(tgt);
+>  }
+>  
+> +static void __free_by_rcu(struct rcu_head *head)
+> +{
+> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
+> +	struct bpf_mem_cache *tgt = c->tgt;
+> +	struct llist_node *llnode = llist_del_all(&c->waiting_for_gp);
+> +
+> +	if (!llnode)
+> +		goto out;
+> +
+> +	if (llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace))
+> +		tgt->free_by_rcu_ttrace_tail = c->waiting_for_gp_tail;
+> +
+> +	/* Objects went through regular RCU GP. Send them to RCU tasks trace */
+> +	do_call_rcu_ttrace(tgt);
+> +out:
+> +	atomic_set(&c->call_rcu_in_progress, 0);
+> +}
+> +
+> +static void check_free_by_rcu(struct bpf_mem_cache *c)
+> +{
+> +	struct llist_node *llnode, *t;
+> +
+> +	if (llist_empty(&c->free_by_rcu) && llist_empty(&c->free_llist_extra_rcu))
+> +		return;
+> +
+> +	/* drain free_llist_extra_rcu */
+> +	llist_for_each_safe(llnode, t, llist_del_all(&c->free_llist_extra_rcu))
+> +		if (__llist_add(llnode, &c->free_by_rcu))
+> +			c->free_by_rcu_tail = llnode;
+> +
+> +	if (atomic_xchg(&c->call_rcu_in_progress, 1)) {
+> +		/*
+> +		 * Instead of kmalloc-ing new rcu_head and triggering 10k
+> +		 * call_rcu() to hit rcutree.qhimark and force RCU to notice
+> +		 * the overload just ask RCU to hurry up. There could be many
+> +		 * objects in free_by_rcu list.
+> +		 * This hint reduces memory consumption for an artifical
+> +		 * benchmark from 2 Gbyte to 150 Mbyte.
+> +		 */
+> +		rcu_request_urgent_qs_task(current);
+> +		return;
+> +	}
+> +
+> +	WARN_ON_ONCE(!llist_empty(&c->waiting_for_gp));
+> +
+> +	WRITE_ONCE(c->waiting_for_gp.first, __llist_del_all(&c->free_by_rcu));
+> +	c->waiting_for_gp_tail = c->free_by_rcu_tail;
+> +	call_rcu_hurry(&c->rcu, __free_by_rcu);
+> +}
+> +
+>  static void bpf_mem_refill(struct irq_work *work)
+>  {
+>  	struct bpf_mem_cache *c = container_of(work, struct bpf_mem_cache, refill_work);
+> @@ -354,6 +413,8 @@ static void bpf_mem_refill(struct irq_work *work)
+>  		alloc_bulk(c, c->batch, NUMA_NO_NODE);
+>  	else if (cnt > c->high_watermark)
+>  		free_bulk(c);
+> +
+> +	check_free_by_rcu(c);
+>  }
+>  
+>  static void notrace irq_work_raise(struct bpf_mem_cache *c)
+> @@ -482,6 +543,9 @@ static void drain_mem_cache(struct bpf_mem_cache *c)
+>  	free_all(llist_del_all(&c->waiting_for_gp_ttrace), percpu);
+>  	free_all(__llist_del_all(&c->free_llist), percpu);
+>  	free_all(__llist_del_all(&c->free_llist_extra), percpu);
+> +	free_all(__llist_del_all(&c->free_by_rcu), percpu);
+> +	free_all(__llist_del_all(&c->free_llist_extra_rcu), percpu);
+> +	free_all(llist_del_all(&c->waiting_for_gp), percpu);
+>  }
+>  
+>  static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
+> @@ -494,8 +558,8 @@ static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
+>  
+>  static void free_mem_alloc(struct bpf_mem_alloc *ma)
+>  {
+> -	/* waiting_for_gp_ttrace lists was drained, but __free_rcu might
+> -	 * still execute. Wait for it now before we freeing percpu caches.
+> +	/* waiting_for_gp[_ttrace] lists were drained, but RCU callbacks
+> +	 * might still execute. Wait for them.
+>  	 *
+>  	 * rcu_barrier_tasks_trace() doesn't imply synchronize_rcu_tasks_trace(),
+>  	 * but rcu_barrier_tasks_trace() and rcu_barrier() below are only used
+> @@ -504,9 +568,10 @@ static void free_mem_alloc(struct bpf_mem_alloc *ma)
+>  	 * rcu_trace_implies_rcu_gp(), it will be OK to skip rcu_barrier() by
+>  	 * using rcu_trace_implies_rcu_gp() as well.
+>  	 */
+> -	rcu_barrier_tasks_trace();
+> +	rcu_barrier(); /* wait for __free_by_rcu() */
+> +	rcu_barrier_tasks_trace(); /* wait for __free_rcu() via call_rcu_tasks_trace */
+Using rcu_barrier_tasks_trace and rcu_barrier() is not enough, the
+objects in c->free_by_rcu_ttrace may be leaked as shown below. We may
+need to add an extra variable to notify __free_by_rcu() to free these
+elements directly instead of trying to move it into
+waiting_for_gp_ttrace as I did before. Or we can just drain
+free_by_rcu_ttrace twice.
+
+destroy process       __free_by_rcu
+
+llist_del_all(&c->free_by_rcu_ttrace)
+
+                        // add to free_by_rcu_ttrace again
+                        llist_add_batch(..., &tgt->free_by_rcu_ttrace)
+                            do_call_rcu_ttrace()
+                                // call_rcu_ttrace_in_progress is 1, so
+xchg return 1
+                                // and it will not be moved to
+waiting_for_gp_ttrace
+                               
+atomic_xchg(&c->call_rcu_ttrace_in_progress, 1)
+
+// got 1
+atomic_read(&c->call_rcu_ttrace_in_progress)
+>  	if (!rcu_trace_implies_rcu_gp())
+> -		rcu_barrier();
+> +		rcu_barrier(); /* wait for __free_rcu() via call_rcu */
+>  	free_mem_alloc_no_barrier(ma);
+>  }
+>  
+> @@ -565,6 +630,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
+>  			irq_work_sync(&c->refill_work);
+>  			drain_mem_cache(c);
+>  			rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
+> +			rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
+>  		}
+>  		/* objcg is the same across cpus */
+>  		if (c->objcg)
+> @@ -580,6 +646,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
+>  				irq_work_sync(&c->refill_work);
+>  				drain_mem_cache(c);
+>  				rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
+> +				rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
+I got a oops in rcu_tasks_invoke_cbs() during stressing test and it
+seems we should do atomic_read(&call_rcu_in_progress) first, then do
+atomic_read(&call_rcu_ttrace_in_progress) to fix the problem. And to
+prevent memory reordering in non-x86 host, a memory barrier (e.g.,
+smp_mb__before_atomic) is also needed between these two reads. Otherwise
+it is possible there are inflight RCU callbacks, but we don't wait for
+these callbacks as shown in the scenario below:
+
+destroy process     __free_by_rcu
+
+// got  0
+atomic_read(&c->call_rcu_ttrace_in_progress)
+                    do_call_rcu_ttrace()                                  
+                        atomic_xchg(&c->call_rcu_ttrace_in_progress, 1)
+                       
+                    atomic_set(&c->call_rcu_in_progress, 0)
+// also got 0
+atomic_read(&c->call_rcu_in_progress)
+
+The introduction of c->tgt make the destroy procedure more complicated.
+Even with the proposed fix above, there is still oops in
+rcu_tasks_invoke_cbs() and I think it happens as follows:
+
+bpf_mem_alloc_destroy           free_by_rcu for c1
+
+// both of in_progress counter is 0
+read c0->call_rcu_in_progress
+read c0->call_rcu_ttrace_in_progress
+
+                                // c1->tgt = c0
+                                // c1->call_rcu_in_progress == 1
+                                add c0->free_by_rcu_ttrace
+                                xchg(c0->call_rcu_ttrace_in_progress, 1)
+                                call_rcu_tasks_trace(c0)
+                                c1->call_rcu_in_progress = 0
+
+// both of in_progress counter is 0
+read c1->call_rcu_in_progress
+read c1->call_rcu_ttrace_in_progress
+
+// BAD! There is still inflight tasks trace RCU callback
+free_mem_alloc_no_barrier()
+
+My original though is trying to do "rcu_in_progress +=
+atomic_read(c->tgt->call_rcu_ttrace_in_progress)" after "rcu_in_progress
++= atomic_read(&c->call_rcu_ttrace_in_progress)" in
+bpf_mem_alloc_destroy(), but c->tgt is changed in unit_free(), so c->tgt
+may have been changed to B after the setting of
+A->call_rcu_ttrace_in_progress. I think we could read 
+c->call_rcu_ttrace_in_progress for all bpf_mem_cache again when the
+summary of c->call_rcu_in_progress and c->call_rcu_ttrace_in_progress
+for all bpf_mem_cache is 0, because when rcu_in_progress is zero, it
+means the setting of c->tgt->call_rcu_ttrace_in_progress must have been
+completed.
+>  			}
+>  		}
+>  		if (c->objcg)
+> @@ -664,6 +731,27 @@ static void notrace unit_free(struct bpf_mem_cache *c, void *ptr)
+>  		irq_work_raise(c);
+>  }
+>  
+> +static void notrace unit_free_rcu(struct bpf_mem_cache *c, void *ptr)
+> +{
+> +	struct llist_node *llnode = ptr - LLIST_NODE_SZ;
+> +	unsigned long flags;
+> +
+> +	c->tgt = *(struct bpf_mem_cache **)llnode;
+> +
+> +	local_irq_save(flags);
+> +	if (local_inc_return(&c->active) == 1) {
+> +		if (__llist_add(llnode, &c->free_by_rcu))
+> +			c->free_by_rcu_tail = llnode;
+> +	} else {
+> +		llist_add(llnode, &c->free_llist_extra_rcu);
+> +	}
+> +	local_dec(&c->active);
+> +	local_irq_restore(flags);
+> +
+> +	if (!atomic_read(&c->call_rcu_in_progress))
+> +		irq_work_raise(c);
+> +}
+> +
+>  /* Called from BPF program or from sys_bpf syscall.
+>   * In both cases migration is disabled.
+>   */
+> @@ -697,6 +785,20 @@ void notrace bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr)
+>  	unit_free(this_cpu_ptr(ma->caches)->cache + idx, ptr);
+>  }
+>  
+> +void notrace bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
+> +{
+> +	int idx;
+> +
+> +	if (!ptr)
+> +		return;
+> +
+> +	idx = bpf_mem_cache_idx(ksize(ptr - LLIST_NODE_SZ));
+> +	if (idx < 0)
+> +		return;
+> +
+> +	unit_free_rcu(this_cpu_ptr(ma->caches)->cache + idx, ptr);
+> +}
+> +
+>  void notrace *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma)
+>  {
+>  	void *ret;
+> @@ -713,6 +815,14 @@ void notrace bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr)
+>  	unit_free(this_cpu_ptr(ma->cache), ptr);
+>  }
+>  
+> +void notrace bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
+> +{
+> +	if (!ptr)
+> +		return;
+> +
+> +	unit_free_rcu(this_cpu_ptr(ma->cache), ptr);
+> +}
+> +
+>  /* Directly does a kfree() without putting 'ptr' back to the free_llist
+>   * for reuse and without waiting for a rcu_tasks_trace gp.
+>   * The caller must first go through the rcu_tasks_trace gp for 'ptr'
 
 
