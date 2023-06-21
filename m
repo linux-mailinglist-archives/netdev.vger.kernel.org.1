@@ -1,87 +1,180 @@
-Return-Path: <netdev+bounces-12556-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2FF6737F9E
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:39:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B517F737FB4
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 12:50:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 00D7C1C20E27
-	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:39:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6F491C20DE4
+	for <lists+netdev@lfdr.de>; Wed, 21 Jun 2023 10:50:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B24AD45;
-	Wed, 21 Jun 2023 10:39:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C05B2D304;
+	Wed, 21 Jun 2023 10:50:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A7DC1C3E
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:39:33 +0000 (UTC)
-Received: from tretyak2.mcst.ru (tretyak2.mcst.ru [212.5.119.215])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D62062101;
-	Wed, 21 Jun 2023 03:39:15 -0700 (PDT)
-Received: from tretyak2.mcst.ru (localhost [127.0.0.1])
-	by tretyak2.mcst.ru (Postfix) with ESMTP id 8B30710239C;
-	Wed, 21 Jun 2023 13:39:10 +0300 (MSK)
-Received: from frog.lab.sun.mcst.ru (frog.lab.sun.mcst.ru [176.16.4.50])
-	by tretyak2.mcst.ru (Postfix) with ESMTP id 81FED102390;
-	Wed, 21 Jun 2023 13:38:15 +0300 (MSK)
-Received: from [172.16.7.18] (gang [172.16.7.18])
-	by frog.lab.sun.mcst.ru (8.13.4/8.12.11) with ESMTP id 35LAcEJg022490;
-	Wed, 21 Jun 2023 13:38:14 +0300
-Message-ID: <f687fe6f-3330-a9c5-4760-f753638c7b03@mcst.ru>
-Date: Wed, 21 Jun 2023 13:49:28 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4ABAD2FE
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 10:50:04 +0000 (UTC)
+Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B67B19AC
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:50:02 -0700 (PDT)
+Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3f900cd3f96so45663635e9.2
+        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 03:50:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687344600; x=1689936600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fSRkwHLFq+2I9Xiyi/hU6wMpRwozZdsPaoeIOTE25yg=;
+        b=AIsj2vEdz+Fc9Jy19U2Q4+7jk5CdnnBRAq8EU0/qgIBKasDy/i9F7ZXwuxvu/FIk+V
+         e/sUJHlgDgR4Qx2Oh1t5R17vdDFqF/9Ly0AVSK9zUVBFtxeRPEJfGRY1Ks9BJsa7NWkf
+         GXQKQBgxImLcLHozIYWaaIqJ2GrVDZ8vDZMAG4ZNWlYOBv1zbniTnw6kcMxllyCdLRPM
+         ZQ4LPyPa8TOuuqU/g5NEtzVey08OWckHaORybMu3dXpLsx3EAMUOJp98YetCTODsSvBK
+         UGnxHZVFuD2xpLdXg7xgTBB0HXflRT1SIPGFL3SgcodXnvQYRGYsUcq+78aAj0lpxCAJ
+         /6yw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687344600; x=1689936600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fSRkwHLFq+2I9Xiyi/hU6wMpRwozZdsPaoeIOTE25yg=;
+        b=JmDwKDpFOfUoJePzmUI4fhWn2Aej+3QPwRfUo1AAMRwdyv6d3Qhu3d8BNws0x836gH
+         5QB1cT2didWKWeTUygF3oDtsyFm367Y6N0Ab9/I5s/hemJgka1BSWgTx5LTBFUHNUIF5
+         h3OBLcuLW4A6PO7dCGE0yg+h2nX5hYicRLFYY9mNAQaJopiSSm126ptMf3ML0na4OqhP
+         PmuX29vRon0geFE6jxRPGveUWDe936ngkC30BOBsufujESBEHQMfwVe+pHVvwiKQ6Yr/
+         GFs+QT+Bj4Y7NeYUJiylGOyn5V8pTiUdxtnyHD4tmjasVckh9RXf7f6TLUlGQAw3mYIp
+         IJOA==
+X-Gm-Message-State: AC+VfDz+s6mS8vNXi8/Zo5dpPdkSOQbmDaOHvTH+ibfn9goW9rA+RA/g
+	v6X6XOm5qEmB4pGOYgnbfYV3MQ==
+X-Google-Smtp-Source: ACHHUZ4kGH8qImQSxaCquFokOidLojUiduGNeN6yC7xlAN8t9enaJAidhtFzyKegekb0YEbNp5wSRg==
+X-Received: by 2002:a05:600c:a39f:b0:3f9:8da:bb4b with SMTP id hn31-20020a05600ca39f00b003f908dabb4bmr8183476wmb.37.1687344600642;
+        Wed, 21 Jun 2023 03:50:00 -0700 (PDT)
+Received: from localhost ([102.36.222.112])
+        by smtp.gmail.com with ESMTPSA id c9-20020a05600c0ac900b003f7eeec829asm4670229wmr.10.2023.06.21.03.49.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 21 Jun 2023 03:49:58 -0700 (PDT)
+Date: Wed, 21 Jun 2023 13:49:54 +0300
+From: Dan Carpenter <dan.carpenter@linaro.org>
+To: Joel Granados <j.granados@samsung.com>
+Cc: mcgrof@kernel.org, Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>, David Ahern <dsahern@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Joerg Reuter <jreuter@yaina.de>, Ralf Baechle <ralf@linux-mips.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>, Roopa Prabhu <roopa@nvidia.com>,
+	Nikolay Aleksandrov <razor@blackwall.org>,
+	Alexander Aring <alex.aring@gmail.com>,
+	Stefan Schmidt <stefan@datenfreihafen.org>,
+	Miquel Raynal <miquel.raynal@bootlin.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Herbert Xu <herbert@gondor.apana.org.au>,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	Mat Martineau <martineau@kernel.org>,
+	Simon Horman <horms@verge.net.au>, Julian Anastasov <ja@ssi.bg>,
+	Remi Denis-Courmont <courmisch@gmail.com>,
+	Santosh Shilimkar <santosh.shilimkar@oracle.com>,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Marcelo Ricardo Leitner <marcelo.leitner@gmail.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Karsten Graul <kgraul@linux.ibm.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>,
+	Jan Karcher <jaka@linux.ibm.com>, Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>, Martin Schiller <ms@dev.tdt.de>,
+	linux-rdma@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org, linux-hams@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	bridge@lists.linux-foundation.org, dccp@vger.kernel.org,
+	linux-wpan@vger.kernel.org, mptcp@lists.linux.dev,
+	lvs-devel@vger.kernel.org, rds-devel@oss.oracle.com,
+	linux-afs@lists.infradead.org, linux-sctp@vger.kernel.org,
+	linux-s390@vger.kernel.org, tipc-discussion@lists.sourceforge.net,
+	linux-x25@vger.kernel.org
+Subject: Re: [PATCH 06/11] sysctl: Add size to register_net_sysctl function
+Message-ID: <f95b7489-8654-435c-bc74-da1eac479fba@kadam.mountain>
+References: <20230621091000.424843-1-j.granados@samsung.com>
+ <CGME20230621091022eucas1p1c097da50842b23e902e1a674e117e1aa@eucas1p1.samsung.com>
+ <20230621091000.424843-7-j.granados@samsung.com>
+ <dab06c20-f8b0-4e34-b885-f3537e442d54@kadam.mountain>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.5.0
-From: "Igor A. Artemiev" <Igor.A.Artemiev@mcst.ru>
-Subject: Re: [lvc-project] [PATCH] netfilter: ebtables: remove unnecessary
- NULL check
-To: Florian Westphal <fw@strlen.de>
-Cc: Pablo Neira Ayuso <pablo@netfilter.org>,
-        Jozsef Kadlecsik <kadlec@netfilter.org>,
-        "David S . Miller" <davem@davemloft.net>,
-        Paolo Abeni <pabeni@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
-        netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-        lvc-project@linuxtesting.org
-References: <20230620152549.2109063-1-Igor.A.Artemiev@mcst.ru>
- <20230620163806.GB3799@breakpoint.cc>
-Content-Language: en-US
-In-Reply-To: <20230620163806.GB3799@breakpoint.cc>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Anti-Virus: Kaspersky Anti-Virus for Linux Mail Server 5.6.39/RELEASE,
-	 bases: 20111107 #2745587, check: 20230621 notchecked
-X-AV-Checked: ClamAV using ClamSMTP
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: multipart/mixed; boundary="ZFMDZBc9cnLbyP1u"
+Content-Disposition: inline
+In-Reply-To: <dab06c20-f8b0-4e34-b885-f3537e442d54@kadam.mountain>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/20/23 19:38, Florian Westphal wrote:
-> Igor Artemiev <Igor.A.Artemiev@mcst.ru> wrote:
->> In ebt_do_table() 'private->chainstack' cannot be NULL
->> and the 'cs' pointer is dereferenced below, so it does not make
->> sense to compare 'private->chainstack' with NULL.
-> ?  Why do you think that?
->
-The 'cs' pointer is dereferenced below without checking, as it is 
-assumed to always be initialized with 
-'private->chainstack[smp_processor_id()]'.
->> +	cs = private->chainstack[smp_processor_id()];
-> Looks like NULL deref to me.  Did you test this?
->
-No, I didn't test this.
 
-Thanks,
-Igor
+--ZFMDZBc9cnLbyP1u
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
 
+On Wed, Jun 21, 2023 at 12:47:30PM +0300, Dan Carpenter wrote:
+> The patchset doesn't include the actual interesting changes, just a
+> bunch of mechanical prep work.
+> 
+
+I was wrong here, the patchset just hadn't all hit the mailing lists.
+I can't apply this patchset to anything.  I tried linux-next, net, and
+net-next.  So it's hard to review.
+
+It looks like ensure_safe_net_sysctl() never got update to use
+table_size...
+
+You could easily write a static checker test to print a warning any time
+that ->procname is checked for NULL.  I have attached a Smatch check.
+You would need to added to check_list.h and recompile.
+
+net/sysctl_net.c:130 ensure_safe_net_sysctl() warn: checking ->procname 'ent->procname'
+
+regards,
+dan carpenter
+
+
+--ZFMDZBc9cnLbyP1u
+Content-Type: text/x-csrc; charset=us-ascii
+Content-Disposition: attachment; filename="check_checking_procname.c"
+
+#include "smatch.h"
+#include "smatch_slist.h"
+
+static int my_id;
+
+static void match_condition(struct expression *expr)
+{
+	char *member_name;
+
+	if (expr->type == EXPR_COMPARE)
+		return;
+
+	member_name = get_member_name(expr);
+	if (!member_name)
+		return;
+
+	if (strcmp(member_name, "(struct ctl_table)->procname") == 0)
+		sm_warning("checking ->procname '%s'", expr_to_str(expr));
+}
+
+void check_checking_procname(int id)
+{
+	my_id = id;
+
+	add_hook(&match_condition, CONDITION_HOOK);
+}
+
+--ZFMDZBc9cnLbyP1u--
 
