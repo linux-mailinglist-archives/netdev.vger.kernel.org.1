@@ -1,133 +1,95 @@
-Return-Path: <netdev+bounces-13197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13198-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 777B173A93F
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:58:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C506373A94A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 22:03:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 785861C2115B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:58:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 025CF1C2117E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:03:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6219021086;
-	Thu, 22 Jun 2023 19:58:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15AC21087;
+	Thu, 22 Jun 2023 20:03:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4C212200C6;
-	Thu, 22 Jun 2023 19:58:05 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 101832116;
-	Thu, 22 Jun 2023 12:58:01 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b52864b701so58103015ad.3;
-        Thu, 22 Jun 2023 12:58:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687463880; x=1690055880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=N+x18MbPYs9V+rBoSKHWH+hb3PjBj/UOGiK88eF8YxM=;
-        b=KAfRwXKfbJhgepD4hlRzoOwmY1p9Qt33QHKLP7ZU+EjZV+9whhs/ZE8XfjXuc7Pqcu
-         88rG2trZ1F+x0w/+GCzhm9VKTMG82romdey6VTjgjmzBSSBBw6K5pc0pWlxDDkh2Mlca
-         3oxupctNT9iUMT7tseTJxExy5niMs9e6Rl40lGlf2crSyxF+SllN9jNGtMXbJtGU010u
-         C92eN60EaRXWsrEu29KaZBLjOylTXizsaYPS760WcLWPlrvGavX4Y0PZV9wl/7djLo0Q
-         ahhAQ6omiuHsCAWsjw6/Fhazl2NzZ8ejZ9Hjd7x9xuOQnpwKw0omFyeTcJcEV8qgCXeI
-         PmbQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687463880; x=1690055880;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=N+x18MbPYs9V+rBoSKHWH+hb3PjBj/UOGiK88eF8YxM=;
-        b=M4Yg9dNaU/7kZlgsmi35vWO5Qkhz+LPNR40JmugpFua/gt3yVw9v8kJKk4P924yjVd
-         YQ+lRsWvtlZ1QMrg+dFdw9QfNFWSateTxD2vaH5bzuOipGlUQJ9ds7W5d9yUZf3WGxR2
-         iY3YGheG4hIJgAFSGCkkLYHLN+hLxLGEWNsdqDFJ2r75iozIu7UUSV8vPgBAPMpL62tH
-         DbCfsfExUqdHZPOKriQkOvM3QouO71g8ixnK9upNF3b4revTB35gQJsHfJsP8tGA4Mt6
-         iYa+VXWDEerUJuq2kQlEIhrTBrpJnUakYR+l6K0arvN0QVTU8nsynf8R7Msi3llOl+hT
-         yQ3w==
-X-Gm-Message-State: AC+VfDzxsAR950cVA8PHD7W/48G3KKTmLXLzdssN+2SWe1szsjzcBUt9
-	vsZdoaOtRo3AokCqj3OKkUA=
-X-Google-Smtp-Source: ACHHUZ7k2HkJNhodANf5mrluDeQGdXuDea+QD9+qf8ZuWGXquHlpyc1kciYrUmiLWwV47kLxIFdhvQ==
-X-Received: by 2002:a17:902:d2c2:b0:1b6:9551:e2b8 with SMTP id n2-20020a170902d2c200b001b69551e2b8mr7977005plc.34.1687463880351;
-        Thu, 22 Jun 2023 12:58:00 -0700 (PDT)
-Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:500::4:95b5])
-        by smtp.gmail.com with ESMTPSA id c2-20020a170903234200b001b6740207d2sm5718364plh.215.2023.06.22.12.57.58
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 12:57:59 -0700 (PDT)
-Date: Thu, 22 Jun 2023 12:57:57 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org,
-	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
-	haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-Message-ID: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
-References: <20230621170244.1283336-1-sdf@google.com>
- <20230621170244.1283336-12-sdf@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C578220690
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 20:03:37 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF3E1FED
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:03:34 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-497-YH5G9RGsOf6YXa3DPHP2Gw-1; Thu, 22 Jun 2023 16:03:16 -0400
+X-MC-Unique: YH5G9RGsOf6YXa3DPHP2Gw-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0C25858EED;
+	Thu, 22 Jun 2023 20:02:44 +0000 (UTC)
+Received: from hog (unknown [10.39.195.41])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3143E200A3AD;
+	Thu, 22 Jun 2023 20:02:44 +0000 (UTC)
+Date: Thu, 22 Jun 2023 22:02:42 +0200
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, simon.horman@corigine.com
+Subject: Re: [PATCH net-next v2] netdevsim: add dummy macsec offload
+Message-ID: <ZJSo4lmt58B_66-3@hog>
+References: <d6841a34b9d69af9ad5a652d5cabe3927868d3c6.1686920069.git.sd@queasysnail.net>
+ <20230621131834.345f4f60@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+In-Reply-To: <20230621131834.345f4f60@kernel.org>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Type: text/plain; charset=UTF-8
 Content-Disposition: inline
-In-Reply-To: <20230621170244.1283336-12-sdf@google.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 10:02:44AM -0700, Stanislav Fomichev wrote:
-> WIP, not tested, only to show the overall idea.
-> Non-AF_XDP paths are marked with 'false' for now.
-> 
-> Cc: netdev@vger.kernel.org
-> Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> ---
->  .../net/ethernet/mellanox/mlx5/core/en/txrx.h | 11 +++
->  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 96 ++++++++++++++++++-
->  .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  9 +-
->  .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  3 +
->  .../net/ethernet/mellanox/mlx5/core/en_tx.c   | 16 ++++
->  .../net/ethernet/mellanox/mlx5/core/main.c    | 26 ++++-
->  6 files changed, 156 insertions(+), 5 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-> index 879d698b6119..e4509464e0b1 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-> @@ -6,6 +6,7 @@
->  
->  #include "en.h"
->  #include <linux/indirect_call_wrapper.h>
-> +#include <net/devtx.h>
->  
->  #define MLX5E_TX_WQE_EMPTY_DS_COUNT (sizeof(struct mlx5e_tx_wqe) / MLX5_SEND_WQE_DS)
->  
-> @@ -506,4 +507,14 @@ static inline struct mlx5e_mpw_info *mlx5e_get_mpw_info(struct mlx5e_rq *rq, int
->  
->  	return (struct mlx5e_mpw_info *)((char *)rq->mpwqe.info + array_size(i, isz));
->  }
-> +
-> +struct mlx5e_devtx_frame {
-> +	struct devtx_frame frame;
-> +	struct mlx5_cqe64 *cqe; /* tx completion */
+2023-06-21, 13:18:34 -0700, Jakub Kicinski wrote:
+> On Wed, 21 Jun 2023 15:14:46 +0200 Sabrina Dubroca wrote:
+> > When the kernel is compiled with MACsec support, add the
+> > NETIF_F_HW_MACSEC feature to netdevsim devices and implement
+> > macsec_ops.
+> >=20
+> > To allow easy testing of failure from the device, support is limited
+> > to 3 SecY's per netdevsim device, and 1 RXSC per SecY.
+>=20
+> Quoting documentation:
+>=20
+>   netdevsim
+>   ~~~~~~~~~
+>  =20
+>   [...]
+>  =20
+>   ``netdevsim`` is reserved for use by upstream tests only, so any
+>   new ``netdevsim`` features must be accompanied by selftests under
+>   ``tools/testing/selftests/``.
+>  =20
+> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#=
+netdevsim
 
-cqe is only valid at completion.
+Ugh, sorry. I'll repost as a series with a selftest.
 
-> +	struct mlx5e_tx_wqe *wqe; /* tx */
+> --=20
+> pw-bot: cr
 
-wqe is only valid at submission.
+--=20
+Sabrina
 
-imo that's a very clear sign that this is not a generic datastructure.
-The code is trying hard to make 'frame' part of it look common,
-but it won't help bpf prog to be 'generic'.
-It is still going to precisely coded for completion vs submission.
-Similarly a bpf prog for completion in veth will be different than bpf prog for completion in mlx5.
-As I stated earlier this 'generalization' and 'common' datastructure only adds code complexity.
 
