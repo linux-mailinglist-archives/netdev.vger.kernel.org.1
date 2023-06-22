@@ -1,219 +1,189 @@
-Return-Path: <netdev+bounces-12944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EF68573988A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:53:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43E1B73988C
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:54:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 354AB1C20FE6
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:53:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EC74F28184A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:54:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11683A933;
-	Thu, 22 Jun 2023 07:53:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745DEC8CF;
+	Thu, 22 Jun 2023 07:54:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C0763A4
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:53:47 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2093.outbound.protection.outlook.com [40.107.223.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33581BF5;
-	Thu, 22 Jun 2023 00:53:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LCgm1A2SqpZaDEWGOFifYmbzQ8pki1vKnrCXXcXP57oGf/+nP7KjkBx1Gj+QEvgWORyz4o9UBBxy5gFxQ/kevnpYS1hK5yqC9a1uSM6wZfQjbxApyRxF1nY3baVRMkaE++7ZNOJpM45y259KVIYt4f1i7VDpIe9LCQd013NqStWCrBy2Xg0DRLBY7sYAboO2xC5o1vgfplbhN0OALQAgT66A16w0iISdwWfddpCDXbacNqn9wc43fuWemReQbuLWQy5edd7So/UEaXIyEwNqD8mnQ3KTByWYozNsYiZpKiIXRhUuOa6LO9+yTn4bAoF2Tzu07Og0tebHOy7NUwxIUQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PL/DBYEYAc2al9q683ws/N5Mfdn1mq2wCKAUpM7uRG4=;
- b=En4sSutNXNbuy2NA8L/XXIj05R/yY9NTLnEPOt1wJJhzz+XN/tlcd1xbFAwcCAgpAuT0Y7lJ1szaTt6r/aruTgDOA/Kt3KSliDPnpRKUD2HATCG8nr8XBRs9NNhtZbHdUskGGWyiJKfpsfQUkb9Ho75IHpHa88NWjCFbVTBzDDRm53pVcBHCFW9Av3x8jS8KA3TfKpNIWIkJ1DVvS7mfW9vJhJP+DhE8TPos4U4pBIisNNxpWlzYU7x02V03nNEB8wCDgXolF6m2laxwDlO+asRa4tbA8ocrDrzmGPstKw2RF4fhQKm0vdAfDb9LoVYu/KLe3Pe66a+1W09MOuIbww==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63F3A1FB4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:54:07 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 451B21BEA
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:54:02 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3fa0253b9e7so3250785e9.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:54:02 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PL/DBYEYAc2al9q683ws/N5Mfdn1mq2wCKAUpM7uRG4=;
- b=oxXmOFwE1aLoUpUtzQ9eC+gxLilZYZy9RBIJcHzi/JL/nHbLQPiyhTQRTtn5Vrog86GK+4ABPV0MMdQ7sRPu0zVl26ascmrSjAvahom3UtJND54lEvSIVVh9ZEPN63CgHHU8kFnHmEHcih1Hu10Qt1Y+SKH19zh5Z+RO+UNkip0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MW3PR13MB4042.namprd13.prod.outlook.com (2603:10b6:303:54::22) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
- 2023 07:53:33 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 22 Jun 2023
- 07:53:33 +0000
-Date: Thu, 22 Jun 2023 09:53:26 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
-	kernel test robot <lkp@intel.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
- module
-Message-ID: <ZJP99hSRt5MakBXC@corigine.com>
-References: <20230621213742.8245-1-rdunlap@infradead.org>
- <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
-X-ClientProxiedBy: AM9P193CA0007.EURP193.PROD.OUTLOOK.COM
- (2603:10a6:20b:21e::12) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687420441; x=1690012441;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ndYuoLRAungaQNM3WlRcQ8kWCknXQfpIkiZNzQBmdoE=;
+        b=vVvB8f65QLihTkCr7Nwavpho2FBe3DZTh1aYpQnrXLJWRnSppL2Bmy0Sg7+GL6YAza
+         m/LE6L0ePE7NfIAu+uuS1Gb/g7YnxamjRDQbuXnX+uuGSyrNeii3Rbb1S/JHoQqz/Gw3
+         Dp9+QQLaHNgttkriY4bhR5SUl8MFDExGf2A44kwqwgNc/mYvFEV9roA5kGmQ/iDkS8K6
+         xjk4VRlUhDc9/vb6CReXv3os+xaaW1CEFaK04VAuCX5ZygdZjiksfpeLYblxCtFX8Hhd
+         IbruPwGSe0+L+VH5SQ6peKeWRt6wqs3hIP+0oF8MSbumOY3qZd1ipRaoGe6m0fDPPfkf
+         9Etw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687420441; x=1690012441;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=ndYuoLRAungaQNM3WlRcQ8kWCknXQfpIkiZNzQBmdoE=;
+        b=AN/G389ugcN3O+PuHrHFgjN+ArfML+KV+B+hZcY0oIBLuNCwY98lLo1rajykwhtuRO
+         q5ai+ysHEUIMF9haMzbCK2lV9IOGa9lKeLa6jI/3nFwVdwok8fq5m1olbiMEjqO8mW2S
+         aZiSs4LBBABGT72xmnbcr/5oX+mvD+nqzOmthT6sGdOOor6nUREHodMUVSc8s/cxQ9E2
+         Ox+WRou8+yx/dGk5Yr3imxTfFvXeKDgcGdUqpmVRDeP4Q8AEeJ2Ey+64sbpILR2NjIgx
+         N6+9medKhZR+bnJ2kfEH8rpHZwlgvh/gAUB8m5fgNU09CibiMnSVJYCucWgNk92wI9TP
+         rZpA==
+X-Gm-Message-State: AC+VfDwHoZaBggOHxkQKvEKSMcN06tqWKjWylPk+syyIa1G2sEHCUJXw
+	7tOAknKgn6NAEkxtMeTHy7By0w==
+X-Google-Smtp-Source: ACHHUZ5FmIT7oWc5lc4G2eh4MxHWEJTZSMrh9J4jAl3Z7pV0E8IFS1jQO/QBGtwD/ABvdYp8hXYGuw==
+X-Received: by 2002:a1c:7203:0:b0:3f6:774:fdc with SMTP id n3-20020a1c7203000000b003f607740fdcmr16313502wmc.18.1687420440765;
+        Thu, 22 Jun 2023 00:54:00 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id y10-20020a05600c20ca00b003f9b29ba838sm6976475wmm.35.2023.06.22.00.54.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 00:54:00 -0700 (PDT)
+Date: Thu, 22 Jun 2023 09:53:59 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Eric Dumazet <edumazet@google.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, eric.dumazet@gmail.com,
+	syzbot <syzkaller@googlegroups.com>
+Subject: Re: [PATCH net] netlink: do not hard code device address lenth in
+ fdb dumps
+Message-ID: <ZJP+F9cX8KP3M6Eh@nanopsycho>
+References: <20230621174720.1845040-1-edumazet@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW3PR13MB4042:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7187d197-c102-4d82-e73c-08db72f5c729
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	fkK2Ec4gSluXJ6WtBYGgxS7UIxjBcat2BB1gCW43Af9auCSXXzvL09DfhdBcp4MzyOvNJPeNLGEsr6JjGTGAueNQimlZujd2k8mhJA3cxKYIAt54dsPK8hWeSyevoux6D7OJEBXa7T72ZOWXWUcetXvlJ2r5uth6EnJEm+9q0gDUvaFeEtM1iNwOmXRfAYJ7/244T0zi1rkd75NVIwBn1JzfdBPEsDGuYC7vhIoQHdMBViMhP9OQsbhiGvXGlI9O2SVPybKlLvOLqniP2dZIsuazY44aucFLznGkiZcb6hmTxsSZ+NXYIDdnXq7sTFMoChqTYGsaWL1QV50yXlqGBTDBNzdRhU/c/+hZ3Cn0WkhL+9c8nBwNsQTny+/kiZwyONK4oj15Eq4mJdPQ54euM1udQdTDZ3brth9nKGfQCjSw9WJSN9Mi8HPQst0m8cPBLgE2zBI6o4otxS86ghxpobrTGTIOguU4bRzaXXGw9yaD9rqHHuvuq3v6VJ38uaLlV6k+sd2C6W/dayFQzMQ5oIQykczTeq+7H/ag1dKoFWZjn43UcFfS1RtM9eaJXHfmkUTakIG9/kSE/YB4YOHDpt6FSjzpJPouHjyiLlSSijI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(136003)(376002)(39840400004)(396003)(451199021)(2906002)(8936002)(8676002)(7416002)(86362001)(44832011)(316002)(6916009)(4326008)(66476007)(66946007)(84970400001)(66556008)(478600001)(41300700001)(54906003)(5660300002)(83380400001)(6666004)(38100700002)(6486002)(2616005)(186003)(6512007)(6506007)(36756003)(53546011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?I9M5UUS5je4wTT7ov5gpRhsjlZkOzu2xMa20oR9gWFCuTrW1uq95R8EKD41n?=
- =?us-ascii?Q?Sy4+9/yz8P6y8PiBriS9klT9RAyY0XRUCMsrua0u45TC1uhTmlvzpdsn2a3d?=
- =?us-ascii?Q?9cjVhjtPQhOekscWMGj7P0q50pJgMKSoQqXjG4M9GvxTi3au9EtutgaxDIzy?=
- =?us-ascii?Q?kbDhu+efaEpjDq2iBR/swFVu52NBmw7PfvH0UynBxx+pr3W+wW4pjhjE8ya6?=
- =?us-ascii?Q?jXVEvKIyq0olO/DJ7zloBcl3izTjlxWtUXg8XciVuHEPhnb6gojU57aOZSzl?=
- =?us-ascii?Q?O8YGqM56OoeJD9O5G5zVmfh0WifosEKFDVlbhAIJXLzUCxHi7LKkD4UvN4vN?=
- =?us-ascii?Q?vCEZThL4KFUKx3k+QItUVBLLAnvuHSiu8RwKh3GzFJnTD4XJKJQ+etulyKr0?=
- =?us-ascii?Q?mJELVqcfZUJweSsjxX4m6FyJxA7nFCOed8ymjUolofb6UVVbEGWI24xYOi8w?=
- =?us-ascii?Q?JN/HA5Ji0+zxr4cOWMh2sQJ9jzJzpw5BYq8ExA0jYjOGeuGntdIjAwsKlQS/?=
- =?us-ascii?Q?bCEgW9I7dozWqdzYbuPToxbKlq4zTBwbLUvak5m+g02HgLxw0r30qHnZIdKE?=
- =?us-ascii?Q?j/GLQIqF8eMpa83R63gqnYOtj60OUeuw7uMz/ppaVAmcqdbWP8jWYutKwWec?=
- =?us-ascii?Q?mgz4SQ69gSbKazzfELGU3OLTxpoWpUbsWNanJ/oT+Q1vSjM2gO3Ja0nt+pt5?=
- =?us-ascii?Q?x8HaZboR3YHhtodaLUPFlDJ3cubJINhKZ2TZe7rmUfq/XU3wey+SzeLd4KHW?=
- =?us-ascii?Q?nYFkl8NLSGKAeDaKrmz4ghbJCknb8Iq6zrJVMDLG/XYOeUtQBKvk//bfc8zv?=
- =?us-ascii?Q?sqZwlGnpvmSGWvo638QIBq0zR6wn7L9szYdDEHdFEtsjoIyiNdLX2VTqdsLp?=
- =?us-ascii?Q?7h8lljN+IIvygrrRCqKJ9nH+0qE+4hmj26w8zi2C5Pxd1zLm9fd4GgQbfnoH?=
- =?us-ascii?Q?eIifyQGuwHY9Irgsfg+VJzuMjGTku4/90KTwkJ8Yzc1i3fsa5FRpa/lMHUqR?=
- =?us-ascii?Q?w3XxDzef7aLI7HyOCLOclpnvwYtFza/S5i1b/5rp28rOhSIl41jCsHuvDZgI?=
- =?us-ascii?Q?JSLomg+Xigtd36x17LIe/Zv5VWdPvg02RbYgyxwW9nD2lwHmIPzy3UE6zKMM?=
- =?us-ascii?Q?Eh5e/JGIAqebI35uePEn1ZTlHc2knOv45h3xXxYAJKvE8jiWfQqLr/OtXsf5?=
- =?us-ascii?Q?83DJzLyvEV6ZWj59MtCq4WpYzCILvNiSNQTmjsjeshTO7Cben+n1y1HUBwZs?=
- =?us-ascii?Q?fHMNbb2Nj/4ig/vbmTt0iGpyGjZTlTccCW9auwlXvmomsHBa1g9m/kOSZYRG?=
- =?us-ascii?Q?j6AS+nH23L5wiLu39FrYVwvQCuA1CoLaMc2d/zJq0qS3QjBIJ+e3OS9ipIUb?=
- =?us-ascii?Q?Hx3FU+zGi91Ia8vNv/vWs5+tibabN2HDt75lQrZaEE8kS4ZUbD/5o0m/fhuE?=
- =?us-ascii?Q?hzMgoskmOhlDAs9mK/7GEej1ojtO0phMfcCHuJq6xTunJnVfOLTwC5UBZOa1?=
- =?us-ascii?Q?naNYBCMI3QNgm7gRWjvgAld9N0OwFGVch6ODe7V2n1DsxXeMTLy0v090Gy6Z?=
- =?us-ascii?Q?a/MaRO6ZvbO4th9Du6OtLLnEmpNZM513kWfZHRM1mpa4CduxvDTkHlnfzwcb?=
- =?us-ascii?Q?8JU9oxOuNkav9I/ThjmdPO0L0zT2myPMm8/bvJCBYEk+ID0LS5Sj6A8b6KtI?=
- =?us-ascii?Q?23TbWg=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7187d197-c102-4d82-e73c-08db72f5c729
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 07:53:33.8053
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: sfvScSGposxMTonAi9E8ypSnWm4QDE9Ym4wuj8kodUB5tXMromE86pXgflDXokGvSRAB8npVtlCZOMQBgM/GvUehmrrBUMJCeYlK/ABAzco=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR13MB4042
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621174720.1845040-1-edumazet@google.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
-> 
-> 
-> On 21.06.23 23:37, Randy Dunlap wrote:
-> > Require FDDI to be built-in if it is used. LCS needs FDDI to be
-> > built-in to build without errors.
-> > 
-> > Prevents these build errors:
-> > s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
-> > drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
-> > s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
-> > 
-> > This FDDI requirement effectively restores the previous condition
-> > before the blamed patch, when #ifdef CONFIG_FDDI was used, without
-> > testing for CONFIG_FDDI_MODULE.
-> > 
-> > Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-> > Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> > Reported-by: kernel test robot <lkp@intel.com>
-> > Link: lore.kernel.org/r/202306202129.pl0AqK8G-lkp@intel.com
-> > Suggested-by: Simon Horman <simon.horman@corigine.com>
-> > Cc: Alexandra Winter <wintera@linux.ibm.com>
-> > Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> > Cc: linux-s390@vger.kernel.org
-> > Cc: netdev@vger.kernel.org
-> > Cc: Heiko Carstens <hca@linux.ibm.com>
-> > Cc: Vasily Gorbik <gor@linux.ibm.com>
-> > Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> > Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> > Cc: Sven Schnelle <svens@linux.ibm.com>
-> > Cc: David S. Miller <davem@davemloft.net>
-> > Cc: Eric Dumazet <edumazet@google.com>
-> > Cc: Jakub Kicinski <kuba@kernel.org>
-> > Cc: Paolo Abeni <pabeni@redhat.com>
-> > ---
-> >  drivers/s390/net/Kconfig |    2 ++
-> >  1 file changed, 2 insertions(+)
-> > 
-> > diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
-> > --- a/drivers/s390/net/Kconfig
-> > +++ b/drivers/s390/net/Kconfig
-> > @@ -6,11 +6,13 @@ config LCS
-> >  	def_tristate m
-> >  	prompt "Lan Channel Station Interface"
-> >  	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-> > +	depends on FDDI=y || FDDI=n
-> >  	help
-> >  	  Select this option if you want to use LCS networking on IBM System z.
-> >  	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
-> >  	  To compile as a module, choose M. The module name is lcs.
-> >  	  If you do not know what it is, it's safe to choose Y.
-> > +	  If FDDI is used, it must be built-in (=y).
-> >  
-> >  config CTCM
-> >  	def_tristate m
-> > 
-> 
-> 
-> Wow Randy and Simon, you are reacting faster than I was able to evaluate this yesterday.
-> 2 thoughts:
-> 
-> 1) As ETHERNET cannot be a module and this patch prevents FDDI from being a module, then 
-> 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-> is kind of pointless and can as well be reverted instead of doing this fix.
-> Or am I missing something?
+Wed, Jun 21, 2023 at 07:47:20PM CEST, edumazet@google.com wrote:
+>syzbot reports that some netdev devices do not have a six bytes
+>address [1]
+>
+>Replace ETH_ALEN by dev->addr_len.
+>
+>[1] (Case of a device where dev->addr_len = 4)
+>
+>BUG: KMSAN: kernel-infoleak in instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+>BUG: KMSAN: kernel-infoleak in copyout+0xb8/0x100 lib/iov_iter.c:169
+>instrument_copy_to_user include/linux/instrumented.h:114 [inline]
+>copyout+0xb8/0x100 lib/iov_iter.c:169
+>_copy_to_iter+0x6d8/0x1d00 lib/iov_iter.c:536
+>copy_to_iter include/linux/uio.h:206 [inline]
+>simple_copy_to_iter+0x68/0xa0 net/core/datagram.c:513
+>__skb_datagram_iter+0x123/0xdc0 net/core/datagram.c:419
+>skb_copy_datagram_iter+0x5c/0x200 net/core/datagram.c:527
+>skb_copy_datagram_msg include/linux/skbuff.h:3960 [inline]
+>netlink_recvmsg+0x4ae/0x15a0 net/netlink/af_netlink.c:1970
+>sock_recvmsg_nosec net/socket.c:1019 [inline]
+>sock_recvmsg net/socket.c:1040 [inline]
+>____sys_recvmsg+0x283/0x7f0 net/socket.c:2722
+>___sys_recvmsg+0x223/0x840 net/socket.c:2764
+>do_recvmmsg+0x4f9/0xfd0 net/socket.c:2858
+>__sys_recvmmsg net/socket.c:2937 [inline]
+>__do_sys_recvmmsg net/socket.c:2960 [inline]
+>__se_sys_recvmmsg net/socket.c:2953 [inline]
+>__x64_sys_recvmmsg+0x397/0x490 net/socket.c:2953
+>do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+>entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+>Uninit was stored to memory at:
+>__nla_put lib/nlattr.c:1009 [inline]
+>nla_put+0x1c6/0x230 lib/nlattr.c:1067
+>nlmsg_populate_fdb_fill+0x2b8/0x600 net/core/rtnetlink.c:4071
+>nlmsg_populate_fdb net/core/rtnetlink.c:4418 [inline]
+>ndo_dflt_fdb_dump+0x616/0x840 net/core/rtnetlink.c:4456
+>rtnl_fdb_dump+0x14ff/0x1fc0 net/core/rtnetlink.c:4629
+>netlink_dump+0x9d1/0x1310 net/netlink/af_netlink.c:2268
+>netlink_recvmsg+0xc5c/0x15a0 net/netlink/af_netlink.c:1995
+>sock_recvmsg_nosec+0x7a/0x120 net/socket.c:1019
+>____sys_recvmsg+0x664/0x7f0 net/socket.c:2720
+>___sys_recvmsg+0x223/0x840 net/socket.c:2764
+>do_recvmmsg+0x4f9/0xfd0 net/socket.c:2858
+>__sys_recvmmsg net/socket.c:2937 [inline]
+>__do_sys_recvmmsg net/socket.c:2960 [inline]
+>__se_sys_recvmmsg net/socket.c:2953 [inline]
+>__x64_sys_recvmmsg+0x397/0x490 net/socket.c:2953
+>do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+>entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+>Uninit was created at:
+>slab_post_alloc_hook+0x12d/0xb60 mm/slab.h:716
+>slab_alloc_node mm/slub.c:3451 [inline]
+>__kmem_cache_alloc_node+0x4ff/0x8b0 mm/slub.c:3490
+>kmalloc_trace+0x51/0x200 mm/slab_common.c:1057
+>kmalloc include/linux/slab.h:559 [inline]
+>__hw_addr_create net/core/dev_addr_lists.c:60 [inline]
+>__hw_addr_add_ex+0x2e5/0x9e0 net/core/dev_addr_lists.c:118
+>__dev_mc_add net/core/dev_addr_lists.c:867 [inline]
+>dev_mc_add+0x9a/0x130 net/core/dev_addr_lists.c:885
+>igmp6_group_added+0x267/0xbc0 net/ipv6/mcast.c:680
+>ipv6_mc_up+0x296/0x3b0 net/ipv6/mcast.c:2754
+>ipv6_mc_remap+0x1e/0x30 net/ipv6/mcast.c:2708
+>addrconf_type_change net/ipv6/addrconf.c:3731 [inline]
+>addrconf_notify+0x4d3/0x1d90 net/ipv6/addrconf.c:3699
+>notifier_call_chain kernel/notifier.c:93 [inline]
+>raw_notifier_call_chain+0xe4/0x430 kernel/notifier.c:461
+>call_netdevice_notifiers_info net/core/dev.c:1935 [inline]
+>call_netdevice_notifiers_extack net/core/dev.c:1973 [inline]
+>call_netdevice_notifiers+0x1ee/0x2d0 net/core/dev.c:1987
+>bond_enslave+0xccd/0x53f0 drivers/net/bonding/bond_main.c:1906
+>do_set_master net/core/rtnetlink.c:2626 [inline]
+>rtnl_newlink_create net/core/rtnetlink.c:3460 [inline]
+>__rtnl_newlink net/core/rtnetlink.c:3660 [inline]
+>rtnl_newlink+0x378c/0x40e0 net/core/rtnetlink.c:3673
+>rtnetlink_rcv_msg+0x16a6/0x1840 net/core/rtnetlink.c:6395
+>netlink_rcv_skb+0x371/0x650 net/netlink/af_netlink.c:2546
+>rtnetlink_rcv+0x34/0x40 net/core/rtnetlink.c:6413
+>netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+>netlink_unicast+0xf28/0x1230 net/netlink/af_netlink.c:1365
+>netlink_sendmsg+0x122f/0x13d0 net/netlink/af_netlink.c:1913
+>sock_sendmsg_nosec net/socket.c:724 [inline]
+>sock_sendmsg net/socket.c:747 [inline]
+>____sys_sendmsg+0x999/0xd50 net/socket.c:2503
+>___sys_sendmsg+0x28d/0x3c0 net/socket.c:2557
+>__sys_sendmsg net/socket.c:2586 [inline]
+>__do_sys_sendmsg net/socket.c:2595 [inline]
+>__se_sys_sendmsg net/socket.c:2593 [inline]
+>__x64_sys_sendmsg+0x304/0x490 net/socket.c:2593
+>do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>do_syscall_64+0x41/0xc0 arch/x86/entry/common.c:80
+>entry_SYSCALL_64_after_hwframe+0x63/0xcd
+>
+>Bytes 2856-2857 of 3500 are uninitialized
+>Memory access of size 3500 starts at ffff888018d99104
+>Data copied to user address 0000000020000480
+>
+>Fixes: d83b06036048 ("net: add fdb generic dump routine")
+>Reported-by: syzbot <syzkaller@googlegroups.com>
+>Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-I'll leave that one to Randy at this point.
-
-> 2) I wonder whether
-> 
->   	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
->  +	depends on FDDI || FDDI=n
-> 
-> would do what we want here:
-> When FDDI is a loadable module, LCS mustn't be built-in.
-> 
-> I will do some experiments and let you know.
-
-It does seem to on my side.
-But checking would be much appreciated.
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
