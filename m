@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-12906-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12907-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7A577396F5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:48:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA9897396F6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:48:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7628A1C2102B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 05:48:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 058AF1C209D3
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 05:48:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46954436;
-	Thu, 22 Jun 2023 05:47:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBBCB539E;
+	Thu, 22 Jun 2023 05:47:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D4323C3E
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:47:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 207FBC433C0;
-	Thu, 22 Jun 2023 05:47:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0C0E522B
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:47:49 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 530C2C433C8;
+	Thu, 22 Jun 2023 05:47:49 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687412868;
-	bh=OMxI9C4wnPWos1znjk/0iYqGr6DfIFAyPBnPTZxFukU=;
+	s=k20201202; t=1687412869;
+	bh=XuuEFtPCzRB0txD69pRvJTvvGshaxQzao88XY/tszso=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=hiRGAxm92Xu8WF31Kx3HmmVvzvHwUvmyX5Pr1rqJW88gdNQKRQajqKUj1yiFxqER8
-	 sgU/0SabpIpdFtoKn5DAqGTPC7feTzInJA+vI2IcXa4bZFV7qhlfQevj3EJCgoUNs8
-	 FeTgrS00jRy/CMDneEEznNf47wsNXbsMa3PrOVURnqdqksu4jlquKBtyS+Egp4/+jn
-	 baJH2BtyIpDeZxuUlnC7Onxs8iBCzdE3w3oB6OMCyDY8u4P6BWK9Z/EKqCTb2HcC3r
-	 8I4my+H/rX1FLQUU0B9EvtibmiWY5T/MzzO1Zk0p6O9goqoTyAXi/rLOKtCTWdWQcn
-	 F8oGkDo6PaTkA==
+	b=JD66o/fQLNcavL542byK98MRpJIy+WDJiJEiVzHzfIU72dRG0e8A6h8P/Y4IHmtq+
+	 c85SkqefWj3Z2Hxs7BD4zAYXo4XNCHv/1MX/HoIKttHMW+Z38/1kBiFL0hBOtxZaFo
+	 0K3MIJoYoFrrm+Lcm7ne4y8xyxuk1+3eHXpD+94LQalwUNcDkeuYbz47dqSfd5fUGG
+	 +4BpBcBlIzRnSmcfRseC+rsYxXZN+lbVBqFJRAYkcHH1Ipwz+e52YO2Dlt98ulD/mv
+	 /LBdIUnnrEN9n7DJOwH8s63U2vqYpYPDkUexATzpFGgFfPa/qGSQEfb4983RN4nhuF
+	 NknNfcvazmF8w==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,14 +38,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>,
-	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>,
-	Automatic Verification <verifier@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>
-Subject: [net-next 02/15] net/mlx5: Fix SFs kernel documentation error
-Date: Wed, 21 Jun 2023 22:47:22 -0700
-Message-ID: <20230622054735.46790-3-saeed@kernel.org>
+	Lama Kayal <lkayal@nvidia.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: [net-next 03/15] net/mlx5: Fix reserved at offset in hca_cap register
+Date: Wed, 21 Jun 2023 22:47:23 -0700
+Message-ID: <20230622054735.46790-4-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230622054735.46790-1-saeed@kernel.org>
 References: <20230622054735.46790-1-saeed@kernel.org>
@@ -57,60 +54,36 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Shay Drory <shayd@nvidia.com>
+From: Lama Kayal <lkayal@nvidia.com>
 
-Indent SFs probe code example in order to fix the below error:
+A member of struct mlx5_ifc_cmd_hca_cap_bits has been mistakenly
+assigned the wrong reserved_at offset value. Correct it to align to the
+right value, thus avoid future miscalculation.
 
-Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst:57: ERROR: Unexpected indentation.
-Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst:61: ERROR: Unexpected indentation.
-
-Fixes: e71383fb9cd1 ("net/mlx5: Light probe local SFs")
-Signed-off-by: Shay Drory <shayd@nvidia.com>
+Signed-off-by: Lama Kayal <lkayal@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Reviewed-by: Automatic Verification <verifier@nvidia.com>
-Reviewed-by: Gal Pressman <gal@nvidia.com>
 ---
- .../ethernet/mellanox/mlx5/switchdev.rst      | 22 ++++++++++---------
- 1 file changed, 12 insertions(+), 10 deletions(-)
+ include/linux/mlx5/mlx5_ifc.h | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
-index db62187eebce..6e3f5ee8b0d0 100644
---- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
-+++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
-@@ -51,19 +51,21 @@ This will allow user to configure the SF before the SF have been fully probed,
- which will save time.
+diff --git a/include/linux/mlx5/mlx5_ifc.h b/include/linux/mlx5/mlx5_ifc.h
+index 354c7e326eab..33344a71c3e3 100644
+--- a/include/linux/mlx5/mlx5_ifc.h
++++ b/include/linux/mlx5/mlx5_ifc.h
+@@ -1710,9 +1710,9 @@ struct mlx5_ifc_cmd_hca_cap_bits {
+ 	u8         regexp_params[0x1];
+ 	u8         uar_sz[0x6];
+ 	u8         port_selection_cap[0x1];
+-	u8         reserved_at_248[0x1];
++	u8         reserved_at_251[0x1];
+ 	u8         umem_uid_0[0x1];
+-	u8         reserved_at_250[0x5];
++	u8         reserved_at_253[0x5];
+ 	u8         log_pg_sz[0x8];
  
- Usage example:
--Create SF:
--$ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 11
--$ devlink port function set pci/0000:08:00.0/32768 \
--               hw_addr 00:00:00:00:00:11 state active
- 
--Enable ETH auxiliary device:
--$ devlink dev param set auxiliary/mlx5_core.sf.1 \
--              name enable_eth value true cmode driverinit
-+- Create SF::
- 
--Now, in order to fully probe the SF, use devlink reload:
--$ devlink dev reload auxiliary/mlx5_core.sf.1
-+    $ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 11
-+    $ devlink port function set pci/0000:08:00.0/32768 hw_addr 00:00:00:00:00:11 state active
- 
--mlx5 supports ETH,rdma and vdpa (vnet) auxiliary devices devlink params (see :ref:`Documentation/networking/devlink/devlink-params.rst`)
-+- Enable ETH auxiliary device::
-+
-+    $ devlink dev param set auxiliary/mlx5_core.sf.1 name enable_eth value true cmode driverinit
-+
-+- Now, in order to fully probe the SF, use devlink reload::
-+
-+    $ devlink dev reload auxiliary/mlx5_core.sf.1
-+
-+mlx5 supports ETH,rdma and vdpa (vnet) auxiliary devices devlink params (see :ref:`Documentation/networking/devlink/devlink-params.rst <devlink_params_generic>`).
- 
- mlx5 supports subfunction management using devlink port (see :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>`) interface.
- 
+ 	u8         bf[0x1];
 -- 
 2.41.0
 
