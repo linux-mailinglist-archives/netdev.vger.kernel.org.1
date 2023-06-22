@@ -1,148 +1,134 @@
-Return-Path: <netdev+bounces-13167-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13169-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27C8A73A885
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:46:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEBAD73A894
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:50:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCD7B280EEE
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:46:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9519F1C20B2B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D608920696;
-	Thu, 22 Jun 2023 18:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CF622069D;
+	Thu, 22 Jun 2023 18:50:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A391F923;
-	Thu, 22 Jun 2023 18:46:37 +0000 (UTC)
-Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A5B2103;
-	Thu, 22 Jun 2023 11:46:30 -0700 (PDT)
-Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f8fb0e7709so75151545e9.2;
-        Thu, 22 Jun 2023 11:46:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687459589; x=1690051589;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=bPXpGa9jfvplqLyUF1fKF2LVSy/7Wa6tdzEbo3m24+4=;
-        b=nuZ6XntxCEqRkeej37RLEv64b5NxPJAhPbyionQG1zuttFqIw4iqd6bAyZS4CvBhM2
-         Tu8VCWPjrufKrBLybTXIJvxFM334JkE0VmLo+bBjlKFAfm31bDOGQOVWlKxE+HJ1VgD6
-         e9xRtbtLnRzoat4eRtyifWvBUcYOkEpTTYLPgRA03cuczlnb80SdUMLD5XJqStD3dtN1
-         8pyrBfNIbnwYaStG6CPLAgNUiHbvyVWI6WB//qTPRSzTSaF38HKsh6YI8Xwag3hh9vOm
-         haMIgsF1a3LR9gpScqWKobKRNUZG5Mm42J3z9HaD0aR6gYqlZZhLJQ6j8LIecle/H8Z+
-         WHvA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687459589; x=1690051589;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bPXpGa9jfvplqLyUF1fKF2LVSy/7Wa6tdzEbo3m24+4=;
-        b=O4O0I5XxjyYWFSYwuCCS37L8gzUHKQ7eVX2fmH5b2ew/YUC67GnRg2ekBHk33aqL+K
-         bU8D9+Bw0fEGW1hKU++ecYRalnPUQRlI+xgvAE0XjHuMZ+Pmp+XWUi28Yjjk2C/qdM/q
-         jNycz0nQT5ya8Wm4FVOEcxUS3Wpr95ZgxE/cuYEA3+kigMTVh1LBGvl2ZuCDm6kX42Sh
-         WwTZSDRQTypc54Krxybh8bJ045vU66KVxV9oJku97Yd0oPbqylJXXuBjePJLjRjm06Tr
-         nMzD/651olEg872ZcHXecys+dxtUxTRQVlRJylRsbn/73pinvRlQcXU8lKDiLMAqXgRB
-         DMRA==
-X-Gm-Message-State: AC+VfDypH3nAn71lCNzqlVg9geH3OcFDMkfOOI45HKfwAScnrHglBB50
-	Y3JWVHD0G90o/xk5WI/xn/uPFpNMyb6wqQ==
-X-Google-Smtp-Source: ACHHUZ7wH9qHBX81FAbtBvr0POaf7xSsPESlkJ3r2wQNrXUPW6zbsx0ZYaHHpcBIUBjThvYl1O5Tdw==
-X-Received: by 2002:adf:ef12:0:b0:306:3912:a7f0 with SMTP id e18-20020adfef12000000b003063912a7f0mr14197642wro.50.1687459588851;
-        Thu, 22 Jun 2023 11:46:28 -0700 (PDT)
-Received: from [192.168.0.112] ([77.220.140.242])
-        by smtp.gmail.com with ESMTPSA id x14-20020adfec0e000000b0030aee3da084sm7627849wrn.49.2023.06.22.11.46.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 22 Jun 2023 11:46:28 -0700 (PDT)
-Message-ID: <9f0b6bba-701c-a95d-d326-bb207e319f2a@gmail.com>
-Date: Thu, 22 Jun 2023 21:46:26 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81DAC1F923
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:50:01 +0000 (UTC)
+X-Greylist: delayed 61 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Jun 2023 11:49:58 PDT
+Received: from smtpcmd0642.aruba.it (smtpcmd0642.aruba.it [62.149.156.42])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E8A7186
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:49:58 -0700 (PDT)
+Received: from localhost.localdomain ([146.241.96.150])
+	by Aruba Outgoing Smtp  with ESMTPSA
+	id CPMRqVUdKoNFCCPMRqpqyA; Thu, 22 Jun 2023 20:48:53 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1687459733; bh=zJtpFBlzWk1ZS1ZtblEKyuxmBEYkKm450YWAO4rklz0=;
+	h=From:To:Subject:Date:MIME-Version;
+	b=i+Gd4A8/0DnY9VnzFNPFpf5UTVc9Wa/avbpw3796KnZUToSU76jJmCHks8Nb8w+dA
+	 2avDZYIfwaeRG6+DzbVWkU01xvdbjZvqlcljerCqeRC9dJ+V1bNibu/z8bDUo681r9
+	 UcADbZy+YHGTFS4K/9pyX/v40PrlfgTFU623EHaWEt0Q6Apxxe1od6odsQmZJVm51q
+	 VK8V5kLKUTIcSFN9aiaA5YG6MWejvJUsSlEv/49weiDYSlmoZLLOxha9AQCTkcBUjN
+	 erACfpn+Ser9+YP2qugSJZtq50qCTliWfK4tLE+ySKBR+IQB2LHQFxWHLQtXKmz1ge
+	 WI03A7YrNCYPA==
+From: Giulio Benetti <giulio.benetti@benettiengineering.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Simon Horman <simon.horman@corigine.com>,
+	Giulio Benetti <giulio.benetti@benettiengineering.com>
+Subject: [PATCH net-next v2] net: phy: broadcom: drop brcm_phy_setbits() and use phy_set_bits() instead
+Date: Thu, 22 Jun 2023 20:47:21 +0200
+Message-Id: <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
+X-Mailer: git-send-email 2.34.1
+In-Reply-To: <ZJRqMLepCTPqvCD9@corigine.com>
+References: <ZJRqMLepCTPqvCD9@corigine.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.4.2
-Subject: Re: [PATCH RFC net-next v4 6/8] virtio/vsock: support dgrams
-Content-Language: en-US
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>,
- Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin"
- <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
- Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- "K. Y. Srinivasan" <kys@microsoft.com>,
- Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryantan@vmware.com>,
- Vishnu Dasa <vdasa@vmware.com>,
- VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
- virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
- bpf@vger.kernel.org
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-6-0cebbb2ae899@bytedance.com>
- <92b3a6df-ded3-6470-39d1-fe0939441abc@gmail.com>
- <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
-From: Arseniy Krasnov <oxffffaa@gmail.com>
-In-Reply-To: <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
-	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfA47KHPQ+3VK5+xnxuA//l8ONlMRqkhsU6gSpgBYA5KtR9yOjLrnq707eHgEyL4be4ghoSu7Peoj+b69HVOA+wh2WFbSjHymKCdL1zISGO5KeEaRbmQe
+ hOR5eBaARQ1OZisyyMbp2E9nz3S4FR4HuEmEgNSHNYt020EAMX/Kh7Gcv4H2t0keD6zi4J2P+e4Wl7pKfTABnRGkoOeSfvTwskROCbbKHlvrhmAqgqE2/bGH
+ XEolM1GACCVx4Uap8nR7J9DDgPGaHqCKzyeDzD/GiKxHgWHbw/PUxw/Am64wCn9KagdAagdTftIf1yKb21uK8v1XJZVuFY7ihoat6YyfBt+Nct0YdSQ5D5Lh
+ ynzkvP9Wq2ByFitm9/XADjzqO25qMqS5UvVmfu7tRuMGy+oVS1jZnQlocEM29Vv2zFa8ubx9Wfo3zdM0mWoqpN8EK7zGEHAtIdOTqbl/Rbe+zmPK26Y5W3oU
+ oa1PjCrUVeNEATO7YYgU0Yo401pLxD/tLbOwx6rDDjJs/AoRvioNvlA9XCaGx0FGLFxyt+3RBo9vsFmJB006eBD6FqnunGRDHsLryN4X/Dxd+hmQYnkZzAsa
+ /j4DAtI3/pR+n7sdnpak9yovA8uPxkjN6rlZU97t1tH299KloEet9r6YPRIJ+Wec6m0=
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Linux provides phy_set_bits() helper so let's drop brcm_phy_setbits() and
+use phy_set_bits() in its place.
 
+Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+---
+V1->V2:
+* fix code style and add branch net-next to subject as suggested by Simon
+  Horman
+---
+ drivers/net/phy/broadcom.c | 19 ++++---------------
+ 1 file changed, 4 insertions(+), 15 deletions(-)
 
-On 22.06.2023 19:09, Stefano Garzarella wrote:
-> On Sun, Jun 11, 2023 at 11:49:02PM +0300, Arseniy Krasnov wrote:
->> Hello Bobby!
->>
->> On 10.06.2023 03:58, Bobby Eshleman wrote:
->>> This commit adds support for datagrams over virtio/vsock.
->>>
->>> Message boundaries are preserved on a per-skb and per-vq entry basis.
->>
->> I'm a little bit confused about the following case: let vhost sends 4097 bytes
->> datagram to the guest. Guest uses 4096 RX buffers in it's virtio queue, each
->> buffer has attached empty skb to it. Vhost places first 4096 bytes to the first
->> buffer of guests RX queue, and 1 last byte to the second buffer. Now IIUC guest
->> has two skb in it rx queue, and user in guest wants to read data - does it read
->> 4097 bytes, while guest has two skb - 4096 bytes and 1 bytes? In seqpacket there is
->> special marker in header which shows where message ends, and how it works here?
-> 
-> I think the main difference is that DGRAM is not connection-oriented, so
-> we don't have a stream and we can't split the packet into 2 (maybe we
-> could, but we have no guarantee that the second one for example will be
-> not discarded because there is no space).
-> 
-> So I think it is acceptable as a restriction to keep it simple.
+diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
+index e81868d1830b..38a6615deaf7 100644
+--- a/drivers/net/phy/broadcom.c
++++ b/drivers/net/phy/broadcom.c
+@@ -608,17 +608,6 @@ static int bcm54616s_read_status(struct phy_device *phydev)
+ 	return err;
+ }
+ 
+-static int brcm_phy_setbits(struct phy_device *phydev, int reg, int set)
+-{
+-	int val;
+-
+-	val = phy_read(phydev, reg);
+-	if (val < 0)
+-		return val;
+-
+-	return phy_write(phydev, reg, val | set);
+-}
+-
+ static int brcm_fet_config_init(struct phy_device *phydev)
+ {
+ 	int reg, err, err2, brcmtest;
+@@ -689,15 +678,15 @@ static int brcm_fet_config_init(struct phy_device *phydev)
+ 		goto done;
+ 
+ 	/* Enable auto MDIX */
+-	err = brcm_phy_setbits(phydev, MII_BRCM_FET_SHDW_MISCCTRL,
+-				       MII_BRCM_FET_SHDW_MC_FAME);
++	err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_MISCCTRL,
++			   MII_BRCM_FET_SHDW_MC_FAME);
+ 	if (err < 0)
+ 		goto done;
+ 
+ 	if (phydev->dev_flags & PHY_BRCM_AUTO_PWRDWN_ENABLE) {
+ 		/* Enable auto power down */
+-		err = brcm_phy_setbits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
+-					       MII_BRCM_FET_SHDW_AS2_APDE);
++		err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
++				   MII_BRCM_FET_SHDW_AS2_APDE);
+ 	}
+ 
+ done:
+-- 
+2.34.1
 
-Ah, I see, idea is that any "corruptions" of data could be considered as
-"DGRAM is not reliable anyway, so that's it" :)
-
-> 
-> My only doubt is, should we make the RX buffer size configurable,
-> instead of always using 4k?
-
-I guess this is useful only for DGRAM usage, when we want to tune buffers
-for some specific case - may be for exact length of messages (for example if we have
-4096 buffers, while senders wants to send 5000 bytes always by each 'send()' - I think it
-will be really strange that reader ALWAYS dequeues 4096 and 4 bytes as two packets).
-For stream types of socket I think size of rx buffers is not big deal in most of cases.
-
-Thanks, Arseniy
-
-> 
-> Thanks,
-> Stefano
-> 
 
