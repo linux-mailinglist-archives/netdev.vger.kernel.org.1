@@ -1,124 +1,167 @@
-Return-Path: <netdev+bounces-13052-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13053-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5285D73A0BC
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:20:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 93D6973A0C0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:21:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 831AF1C210A3
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:20:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E9C5280C0B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:21:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BF31E523;
-	Thu, 22 Jun 2023 12:20:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A22851E52A;
+	Thu, 22 Jun 2023 12:21:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3558A1E516
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:20:25 +0000 (UTC)
-Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4625610F2
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:20:24 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.west.internal (Postfix) with ESMTP id 67315320098C;
-	Thu, 22 Jun 2023 08:20:20 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Thu, 22 Jun 2023 08:20:21 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm1; t=1687436420; x=1687522820; bh=Wa
-	qtPwQLyDZ2YLvIHgDIDSRwGDbuVFe58X1mf01iQzY=; b=lzWy4dLg/g0UOEuNqE
-	OngWCLrHZgn+dayizs10Bcis+QAanPD9RPEvjvxnNKF803JIcDyWQlORqAPuED3h
-	FCoHHvl+DO3N5att7r26uHdhm8MiVT+BmdhUl7vmyPSt6Kw63Y62aFX7+f2DEBMl
-	VMMB3qPQXvNZjolrDLhEJc2MHFqBMU5NgulsaWo/U4fF4Z4iaVqisk8Vr1W68Kqb
-	me30hYkMfdg1puU4OhGRgs8ZM0Fmi4JV6oUprEJQLLyx6tagsb0bQFR/Fw7wf8KS
-	IkPDlLd0Bk0tyQbXGdN9vuumbWh7AZ9FhuSzl/xECQCudGpqRe6F3eHxSKBIuZwv
-	lZXQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1687436420; x=1687522820; bh=WaqtPwQLyDZ2Y
-	LvIHgDIDSRwGDbuVFe58X1mf01iQzY=; b=itPudElv8krK/C4yEzeDJPfnANeFB
-	YxFlDFXBsrEwuM9Ax4j2utWEuGQumvA7R1pUp0VSUNspuV9RSDXCvwHjihrpQCjs
-	o8mBtgH35cfo3di9uUpxHf4gyplWhoTd8fyMUTGZYgRaxfgSob8uSYgH0qD50sBo
-	Q88DYPGL1HisWmj6w1OI5HRd87JfdoSLjKAl2YGH2krRotr21tb23gtMC/SyrqbM
-	oswUCNS/DRImsSbLq6ImpkhGdgVMj+VFXiAbfuwcXELFlhQaGWBSEl5TT2FPExGj
-	K9NFswsALBDVfzkKKdd+UxPsLutv6k/dcbAFlsDXxntEzS8vCA+Es72fQ==
-X-ME-Sender: <xms:gzyUZAxQs3uVQWzOEA2QvgzmsA7SErvdgvBv6mI10ZDz1rROHckuaA>
-    <xme:gzyUZET5SUBKExDWv54BxjBZOf2l6jnIeifFmODspgCZrPwb_QOxY4PuHZ4EtcfwH
-    CpcaCpjdW7XOAhqdC0>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeeguddghedtucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
-    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
-    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
-    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
-    hrnhgusegrrhhnuggsrdguvg
-X-ME-Proxy: <xmx:gzyUZCWSgo9_g4H1ZdJmap_48pX3Di_zi0gcodfd6rdkVBO506CBmQ>
-    <xmx:gzyUZOjj5H5-GiB-CApLWx05fMJR9KenmTQaGl9c7QgzDi_rzPkGBA>
-    <xmx:gzyUZCA-WzIRWGSgVZVUc3t9E4PaYf0wH46TuSfNMAWar8Uo5gtiwQ>
-    <xmx:hDyUZE3QBEAS7iXNKs-LpHnoh4nF7H0cAILQ0jboIScs3eSecTsG6g>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 6A782B60086; Thu, 22 Jun 2023 08:20:19 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9444C15AE4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:21:42 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2058.outbound.protection.outlook.com [40.107.21.58])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFEA110F2;
+	Thu, 22 Jun 2023 05:21:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=fOOU3mpPZvcULR7amGDZlGq7Qka4ubk7BSGYsqZcPbgAypQNWyjoQ8VXtKb8j3G4ReSCnr+j7mEmtXokwP0nj0DR/EeQNy5lK9M0/NG0TfRioXygxrEW/1tEowlq/KSUlB2Rld7cEiEw+Nt7zNbrR7f4QNGyOndW8D+Duieb360WTmrBUcAfoNqLHBMXVDVWfuCWDBfk/tgDQ6svYsBUOEYd2mXXq+OtCPMvOXxzt6sfofl+COZMYFPjjRBK0P6oH1wnhMk/Im1ERbRchGz+Lx4rnVHcpVs1ksCZD4LaAbrEqpaubPSqDYOvkrufpCId19O3yfgbmt/cWAcJeM8TCw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sHG2R3fqM7ZyySYD0bGSf/Pr26QKEsVMEmNbx3I/eLE=;
+ b=MGmfyIy8c956xtlAXuxPjme9uuXQq6KVekwBlOU3dfVQv0ei1+pNqQcX5l6DG0NdBmdrfqvu/mgZRvEpWGDkxz8jpKC6tLX2cx79IGA0ANb9oVwc71lR85OI/6GEr2c3fqIkQpkqrthmnsy545O4SUgGlFcK6FZfGVRGoQfGmNgge5zk1cVJK7mHAvkBhB42Ry/MbT4GYz6PReBG/UPevie3cVpMfM/pWMjM+0GloCpiTHuET+CWmrEW9dGbv4z2rhWZVIX+xanrjG6uIzCxxIkSNlYdnZ1akxj9zF7IW8Xr6dwPuxy7sYj5hTYpnVbhjeSVcpminCalXFUeqNbmpw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oss.nxp.com; dmarc=pass action=none header.from=oss.nxp.com;
+ dkim=pass header.d=oss.nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=NXP1.onmicrosoft.com;
+ s=selector2-NXP1-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=sHG2R3fqM7ZyySYD0bGSf/Pr26QKEsVMEmNbx3I/eLE=;
+ b=cJhJ7e7aZhCjxTbW9cYFMlBBo4s/TMJaW1wM66sRfD5pfekXu5MOIg4eYbGSVndCt9j+dtZbaUxqFQu185joKnv9jw18h174eOLIk2MyC8lECo7YOETyc9K6VIXCeJmfWrwey7tLWfyZjVHncEluI8OdzEHBl+rrrnRRxk9YpzE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=oss.nxp.com;
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com (2603:10a6:20b:409::7)
+ by AS1PR04MB9407.eurprd04.prod.outlook.com (2603:10a6:20b:4d9::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Thu, 22 Jun
+ 2023 12:21:36 +0000
+Received: from AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::5356:c79f:ef9f:dc29]) by AM9PR04MB8954.eurprd04.prod.outlook.com
+ ([fe80::5356:c79f:ef9f:dc29%4]) with mapi id 15.20.6521.024; Thu, 22 Jun 2023
+ 12:21:34 +0000
+Message-ID: <39388ce8-44d8-8869-965c-a66f855fb4ab@oss.nxp.com>
+Date: Thu, 22 Jun 2023 15:21:32 +0300
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net-next v1 03/14] net: phy: nxp-c45-tja11xx: remove RX
+ BIST frame counters
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: hkallweit1@gmail.com, linux@armlinux.org.uk, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ richardcochran@gmail.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, sebastian.tobuschat@nxp.com
+References: <20230616135323.98215-1-radu-nicolae.pirea@oss.nxp.com>
+ <20230616135323.98215-4-radu-nicolae.pirea@oss.nxp.com>
+ <e77a1ddc-feec-4de8-972f-4929e0bf2fc6@lunn.ch>
+Content-Language: en-US
+From: "Radu Pirea (OSS)" <radu-nicolae.pirea@oss.nxp.com>
+In-Reply-To: <e77a1ddc-feec-4de8-972f-4929e0bf2fc6@lunn.ch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: AS4PR10CA0012.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dc::15) To AM9PR04MB8954.eurprd04.prod.outlook.com
+ (2603:10a6:20b:409::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-Id: <6f87fdf5-1844-4633-b4fe-6b247bc6ab49@app.fastmail.com>
-In-Reply-To: <342903aa-ceb5-4412-f5b9-93413d413079@gmail.com>
-References: <cover.1687427930.git.ecree.xilinx@gmail.com>
- <441f4c197394bdeddb47aefa0bc854ee1960df27.1687427930.git.ecree.xilinx@gmail.com>
- <c16273f9-f6e9-492d-a902-64604f3e40c2@app.fastmail.com>
- <342903aa-ceb5-4412-f5b9-93413d413079@gmail.com>
-Date: Thu, 22 Jun 2023 14:19:58 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Edward Cree" <ecree.xilinx@gmail.com>,
- "edward.cree" <edward.cree@amd.com>, linux-net-drivers@amd.com,
- "David S . Miller" <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>,
- "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>
-Cc: Netdev <netdev@vger.kernel.org>,
- "Martin Habets" <habetsm.xilinx@gmail.com>
-Subject: Re: [PATCH net-next 1/3] sfc: use padding to fix alignment in loopback test
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM9PR04MB8954:EE_|AS1PR04MB9407:EE_
+X-MS-Office365-Filtering-Correlation-Id: 51a4a5ab-4af9-4c8e-b7d9-08db731b3817
+X-MS-Exchange-SharedMailbox-RoutingAgent-Processed: True
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	WXrAgwPc9zmZ7sAFfaY8fJ83NDiAoGfX84ZQ6uTmvc42QMfzfUeg2+/ozG1W4i+QZGGsB1W+o+u3jSNdh1ISQLmTWOwJo1C6MfBHD+vI33qdbhfLWAtFL3QuMvXPDJe8k8wUTUaRC0noABOq8dD7n61a55ud8fc+kqsASgeImEwGFmD0jgXI24VGt/VKlFbMe8l2MN4eEfs+3oGwCPVgb3mGbQ9IrksHzbz7y8O4+zMbUD+GQ5zQnZRoSeidqUG4X6b3WzeAKTf1MS0ckozUioi19rXkM0JpV2NSntDr2R0waKGcaqw3El3CGllWliR+ABo0MqaXCdbaK4JqWS5EgVtifVgbosEurR+oUf83fW9aid4zkxxYgDIZUZxyj54uquT6gA0KbxQTl9GGSwioacIl1FtUCFC3Phax/+Zy2h0c2c589EmqJ2Rq8jTtww+ungI6syk3Etr12frZNhHTbNbTe+xnDkD/TSbNbgs/TeOrHkSd/uRWT7QxUDPxVnV8zLbbvcUBg9GUhOqia1dSxiTziVZRxMaH2Y0FoJS+AwGSKQ0y5GTedq2CRCyxObIMH9SMzHy0tLYVQpcABna0y7t4iWz9CGeoxGkbt/MwJGY4cVXEaqScfIsefl9yeOJzBRiCbQqsNKHpZ0QkUmehUQ==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM9PR04MB8954.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(39860400002)(136003)(376002)(396003)(451199021)(8676002)(8936002)(316002)(6486002)(186003)(26005)(41300700001)(7416002)(6512007)(6506007)(53546011)(478600001)(31686004)(66946007)(66476007)(66556008)(6916009)(4326008)(31696002)(4744005)(2906002)(2616005)(38100700002)(5660300002)(86362001)(45980500001)(43740500002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SEQ2SnpvNmNCMEo2Z1pLdi9XeFQ3bWJjd3lDUHd5djgzVlpsMDlQOVRrYXo5?=
+ =?utf-8?B?ZlpXRkVQVjhpWm1CWkJVNUtxQTd0UU9GdmZqb0hUa3RTWUhZMEJyRk5UZTBR?=
+ =?utf-8?B?YnNHVFpCYXpHNnY3UGlGOW5HN0JWZGVjbWgzY29UZCt0OHhyNmlHQ01qeXU3?=
+ =?utf-8?B?SlpiUnFwa2lXVWVYQlcxQklDUnRzeXBvU0pKcnk0VnFBK3JkSU1iYjlJbk9p?=
+ =?utf-8?B?Qy9pamtocnJIVldHS3p5UzBlY3pockJhdUFRM3VkeFBKMUphVEkwOUhQeW9a?=
+ =?utf-8?B?Zk5WUjlJY2NTdGZrVGtrZzhCR1JuSlZONEFIWnozalF3NkZGT3IxMDZCVHhP?=
+ =?utf-8?B?S2g1NHkxS1I1bGE0WG5CUG9PWVZ1TWFWZ2JRTUtQK1E0bFQ1dzgvM05qWWlY?=
+ =?utf-8?B?UFBLTlhnclNPeW9jcFlHeEMxK3V4M0tyV2hOV3ZXWHE5Z25rWVNVVnIvakpB?=
+ =?utf-8?B?K3U2dndrWjdFZ3FTNnNnd21xanhTZlpqLyswNjVBamkzOTZPY0JhV1RmWWU5?=
+ =?utf-8?B?OUYyOGlSM1I4dUc2dWN0NXE5OWhmTkFiQ0VGYmdIWmpERnI0K01obHZUSSt4?=
+ =?utf-8?B?cmMyQWU1WGQ0YUVSNjBycnUyMHNLT3dJNjlTSFp5U2FEb3R6a0pGTDE1QkJz?=
+ =?utf-8?B?TjQ5UmNDMW01UmdMVzd4dHBNcUxldkc5UHdUNHIxMHB5NW5OVWdWMUZ3cmlZ?=
+ =?utf-8?B?OXdHRHloMmNWd0lrR2ZEYVFTSTZtN1p4WGNkZFFXazk5bmVZdEc4Nm4xbFI0?=
+ =?utf-8?B?cFlaWlZQY0xVNGYrVDR6dkFtWDlyWE5WV3J3UDZOQXJkbTlKSnZ0aVkwOXYy?=
+ =?utf-8?B?azEvV3ozbHpBUUlpaE5YbEtZRUN0Q081eUVPWkEyVzRvejJLYVFia3NrNCtu?=
+ =?utf-8?B?SG1CUlNDenJyRnhadHdqMDFoMURSRWR5ZndweGpnVmdNL1dBenFvS0J1SWNj?=
+ =?utf-8?B?RTNjN1dWekVYOHphemJWUWJkWEFISDcvM3I5R3JKRzk4RkpIeVpseWdJMFB1?=
+ =?utf-8?B?bklDeVFLb20zMWVrMkV5MlVsTW5rYmdUVERlejNPUjdWMzFvWlNvckwvamJB?=
+ =?utf-8?B?M29Rby9xTWNoSmQ0KytsdTBJTGJSdjZOL2RzcWlod2tzOWNjeE1tME05VjNJ?=
+ =?utf-8?B?ZFdENVROUUdUNWdBSS91VS9aSW5BQjNJOHoxSU9NZm1Kd1JrWEYrenZxY0FE?=
+ =?utf-8?B?MWJPc0Voa1dhWkVIUkxTMFpTcVRGdEhnOW90djU1RkMzdGNsdlNEVENBUFJC?=
+ =?utf-8?B?NG03SG5KMGZjMXVROVk3OW82MTlSUStSMGFHUktpYWl3TkZlTFVabUt0QWNh?=
+ =?utf-8?B?R3JxZEN6cklEQldWQlBFT3lTTU95eS92WHNCSCszYnRiOVFNNFZGdDZKRHhx?=
+ =?utf-8?B?elJ3T3JTcktGYmpoMDZpazlsY2pOU0FFRjhXUFhmQXArakw4RXNVTGx0bkk1?=
+ =?utf-8?B?Sys1Q2FMN1BYUU03ditIYjZMR0lid2RrNE1heEFtRGEwdzNsZzRxSjdGUW9U?=
+ =?utf-8?B?ZmVQOTFZUHNQYml2SWhWS1lQRzZNSnNLSzRNc3dXaC93T1B3OEYyZVoyUmJr?=
+ =?utf-8?B?QU93OHo1YVpDVEtmbHliZTlzMGY0OFdDT2h5SjBwbWFIWVZZeFVBMHpscU5Z?=
+ =?utf-8?B?QWVjMEs1MFhja1pHanBSTHdKMWt6QTc3WTNzOHkrdzlJNGxBdGc5VWVockdO?=
+ =?utf-8?B?eXBuTzBBWStJeGV4disvb1JyVExQMnhrd0hQa1o1UGkvYlBBSmc1MlNjU09R?=
+ =?utf-8?B?aXBqUis0QVJGOERVUVg1MnRjREg5cmRPa0NyTGhKZjRodVlXUTZwbWR0bTlu?=
+ =?utf-8?B?UGFqTkdJUjJiWmh0WnRGdXdVYmhINk9FUC9vK2h1ekJycGd3Y3BnWFQ0WXBI?=
+ =?utf-8?B?UTRFamp0NWxXdmZLL3Z1ZmZ5a3h4M0cwOFMzeEU5aVdPcnBnOU9ZRjZ5dW5n?=
+ =?utf-8?B?SFdMM1hmaXBNNjd6RnlXNXJoMDN3UXRxMGNMZE9DTXN4QTMwTzJCMkltWWhV?=
+ =?utf-8?B?QTFIeTB2VCtUdy9HT0pEd0pMWG4zWU56eGdXaEkwVkFUR3JWK0dBYkZKYlBv?=
+ =?utf-8?B?ZUFCSFQ1S1lLb1BteHowYWZ1UVFZWCtkOEhoR1piWjU5TnRHVkhvUCtJeGNS?=
+ =?utf-8?B?eFBkZlVSak9WQThBdWp6SlhXaCt4ZGFqTkF2dHEzM2JTTW84YWJUbTdWb0wr?=
+ =?utf-8?B?REE9PQ==?=
+X-OriginatorOrg: oss.nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 51a4a5ab-4af9-4c8e-b7d9-08db731b3817
+X-MS-Exchange-CrossTenant-AuthSource: AM9PR04MB8954.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 12:21:34.8163
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: SdxcIrnWb56N7Y0iwz0oxKMsNG3Cb0GfosANeelo+eQKgkodUr1f2YRCqzKtV+0T8YfZZEhpTnQ+7J7FnuIxHUReIgArR/D3Sp+FZqXIqGY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS1PR04MB9407
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023, at 14:02, Edward Cree wrote:
-> On 22/06/2023 12:38, Arnd Bergmann wrote:
->> On Thu, Jun 22, 2023, at 12:18, edward.cree@amd.com wrote:
->> 
->> There should probably be an extra __aligned(4) after the __packed,
->> so that the compiler knows the start of the structure is aligned,
->> otherwise (depending on the architecture and compiler), any access
->> to a member can still turn into multiple single-byte accesses.
->
-> Ok, will add that in v2.
->
->> I would also expect to still see a warning without that extra
->> attribute. Aside from this, the patch looks good to me.
-> My compiler (gcc 8.3.1) doesn't reproduce the original warning, so
->  I'm flying slightly blind here :(  If you could build-test this on
->  your setup with/without the __aligned(4), I'd be very grateful.
+On 16.06.2023 23:39, Andrew Lunn wrote:
+> On Fri, Jun 16, 2023 at 04:53:12PM +0300, Radu Pirea (NXP OSS) wrote:
+>> RX BIST frame counters can be used only when the PHY is in test mode. In
+>> production mode, the counters will be always read as 0. So, they don't
+>> provide any useful information and are removed from the statistics.
+> 
+> Hummm
+> 
+> I wounder if this would be considered an ABI change?
+> 
+>          Andrew
 
-I can confirm that your patch addresses the warning for me
-with any version of clang I have installed, and that the __aligned(4)
-is not needed for the warning, though it is still a good idea for
-code generation.
+It can be considered an ABI change, but will not break the userspace 
+compilation. A functional change will be introduced anyway because these 
+counters will not be reported, but they don't provide useful 
+information. These counters will always be 0. In the worst-case 
+scenario, we can add them back.
 
-     Arnd
+-- 
+Radu P.
 
