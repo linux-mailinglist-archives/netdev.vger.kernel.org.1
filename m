@@ -1,120 +1,116 @@
-Return-Path: <netdev+bounces-12887-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12888-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E7D8739547
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 04:09:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49FB5739596
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 04:49:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CACDC281793
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 02:09:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 805B92817CD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 02:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A62B17E0;
-	Thu, 22 Jun 2023 02:09:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B46B917F6;
+	Thu, 22 Jun 2023 02:49:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECE917D8
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 02:09:29 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95449AC;
-	Wed, 21 Jun 2023 19:09:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=Jh+sIBjTdpmN4bUdroe5Mom352UKBoihFU0ru+h1MFo=; b=ZnGaFtAYOb+yMjydAZycuQNc1U
-	Zc4s8vsOkWTz+/q7mdsTMXCu71SKCsIO2C4RRIK9Jqb8h6H9wc+Y/8ZVCdhYcy4rHFr5CWT6BhFmc
-	HnNoX4D+KWjgPf6r5FY8rX7JGdvUE4dgRR9bzvS8OKD2hVn6PeqmMCpW7WhtI3HAeS7EqsIYH9qv8
-	6fnxNk1UUA7f92Ik2vFbd7Fsu+OL4K1FL30ECew9m11Y4NDPUSxeFsAAP8jUZsY+yFFcD2X+xU3rY
-	/MCLzV9g7CsJrEyPZwt5r7y4xWa+nkaz78HRCGGdiGeuqL46/HppiVpnxNErSXh0Q11CjH/3wEl4N
-	H3rScSlA==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qC9l6-00GWGA-0w;
-	Thu, 22 Jun 2023 02:09:16 +0000
-Message-ID: <9860cb6c-8fd4-79c6-a64b-ea855298e339@infradead.org>
-Date: Wed, 21 Jun 2023 19:09:15 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A5E1D17F3
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 02:49:23 +0000 (UTC)
+Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 834FA1BE3;
+	Wed, 21 Jun 2023 19:49:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687402161; x=1718938161;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=tt3wX80eeUJQMUKZ5re8uDuyu//FG7twtLDZz+jjnVo=;
+  b=bTEp3xGNcqgazI1fyX8xh9EDWfXO9pnXM+eOqtJ+SbAJnPWwZAkxzMNA
+   9rmgqcNzRdqEImcToVMR0ypXLSHSpvneew+dqf0cDVxqM4XfK1Im1hTDU
+   YokWO3hpVaOlWfcnXnrAL2mQLLsKrImwCbCcOD0ZFWi7SCrJgkeF91YNv
+   y4bcErlZkb6KD5grmEOmOjAxnDc+98r9wLY5CsvnGLZSiBLfvloQeJ2FZ
+   SmSbVURswuiIUJI11o/kRSFGGUrJktaoLVag06dKx6WbXDK9XaVi3AFx7
+   dIue9YTFQ5In16Fu1xft4RzKwy5Dw+O2KgaihDgmp4OHJ/drwIU/QWZbT
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="446747569"
+X-IronPort-AV: E=Sophos;i="6.00,262,1681196400"; 
+   d="scan'208";a="446747569"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 21 Jun 2023 19:48:32 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="744432432"
+X-IronPort-AV: E=Sophos;i="6.00,262,1681196400"; 
+   d="scan'208";a="744432432"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga008.jf.intel.com with ESMTP; 21 Jun 2023 19:48:27 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qCAN0-0007HO-2b;
+	Thu, 22 Jun 2023 02:48:26 +0000
+Date: Thu, 22 Jun 2023 10:48:12 +0800
+From: kernel test robot <lkp@intel.com>
+To: Bartosz Golaszewski <brgl@bgdev.pl>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Junxiao Chang <junxiao.chang@intel.com>,
+	Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>
+Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net-next 08/11] net: stmmac: platform: provide
+ devm_stmmac_probe_config_dt()
+Message-ID: <202306221025.K6fKRmj7-lkp@intel.com>
+References: <20230621153650.440350-9-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH 8/8] scripts/spelling.txt: Add "transmit" patterns
-Content-Language: en-US
-To: Yueh-Shun Li <shamrocklee@posteo.net>, Jason Gunthorpe <jgg@ziepe.ca>,
- Leon Romanovsky <leon@kernel.org>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Kalle Valo <kvalo@kernel.org>,
- "James E . J . Bottomley" <jejb@linux.ibm.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Andy Whitcroft <apw@canonical.com>, Joe Perches <joe@perches.com>
-Cc: linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
- linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
- mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230622012627.15050-1-shamrocklee@posteo.net>
- <20230622012627.15050-9-shamrocklee@posteo.net>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230622012627.15050-9-shamrocklee@posteo.net>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621153650.440350-9-brgl@bgdev.pl>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
 	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Bartosz,
 
+kernel test robot noticed the following build errors:
 
-On 6/21/23 18:26, Yueh-Shun Li wrote:
-> Add "transmit"-related patterns misspelled with the first "s" missing.
-> 
-> Signed-off-by: Yueh-Shun Li <shamrocklee@posteo.net>
+[auto build test ERROR on net-next/main]
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+url:    https://github.com/intel-lab-lkp/linux/commits/Bartosz-Golaszewski/net-stmmac-platform-provide-stmmac_pltfr_init/20230621-234133
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/20230621153650.440350-9-brgl%40bgdev.pl
+patch subject: [PATCH net-next 08/11] net: stmmac: platform: provide devm_stmmac_probe_config_dt()
+config: x86_64-kexec (https://download.01.org/0day-ci/archive/20230622/202306221025.K6fKRmj7-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230622/202306221025.K6fKRmj7-lkp@intel.com/reproduce)
 
-Thanks.
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306221025.K6fKRmj7-lkp@intel.com/
 
-> ---
->  scripts/spelling.txt | 11 +++++++++++
->  1 file changed, 11 insertions(+)
-> 
-> diff --git a/scripts/spelling.txt b/scripts/spelling.txt
-> index f8bd6178d17b..c81e489ba4cf 100644
-> --- a/scripts/spelling.txt
-> +++ b/scripts/spelling.txt
-> @@ -1319,6 +1319,12 @@ ressource||resource
->  ressources||resources
->  restesting||retesting
->  resumbmitting||resubmitting
-> +retranmission||retransmission
-> +retranmissions||retransmissions
-> +retranmit||retransmit
-> +retranmits||retransmits
-> +retranmitted||retransmitted
-> +retranmitting||retransmitting
->  retransmited||retransmitted
->  retreived||retrieved
->  retreive||retrieve
-> @@ -1553,6 +1559,11 @@ tranasction||transaction
->  tranceiver||transceiver
->  tranfer||transfer
->  tranmission||transmission
-> +tranmissions||transmissions
-> +tranmit||transmit
-> +tranmits||transmits
-> +tranmitted||transmitted
-> +tranmitting||transmitting
->  transcevier||transceiver
->  transciever||transceiver
->  transferd||transferred
+All errors (new ones prefixed by >>):
+
+   ld: vmlinux.o: in function `__ksymtab_devm_stmmac_probe_config_dt':
+>> stmmac_platform.c:(___ksymtab_gpl+devm_stmmac_probe_config_dt+0x0): undefined reference to `devm_stmmac_probe_config_dt'
 
 -- 
-~Randy
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
