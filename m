@@ -1,107 +1,83 @@
-Return-Path: <netdev+bounces-13015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 09A07739D99
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 11:42:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D56B1739DF0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:00:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA37928189B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:42:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11CCD1C21088
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1D023AAB9;
-	Thu, 22 Jun 2023 09:42:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12B478BFE;
+	Thu, 22 Jun 2023 10:00:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5F303AA8D
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 09:42:22 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 46BD955A4;
-	Thu, 22 Jun 2023 02:42:17 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id E8EF51042;
-	Thu, 22 Jun 2023 02:43:00 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.25.249])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B98963F663;
-	Thu, 22 Jun 2023 02:42:14 -0700 (PDT)
-Date: Thu, 22 Jun 2023 10:42:12 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Naresh Kamboju <naresh.kamboju@linaro.org>
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	linux-rpi-kernel@lists.infradead.org,
-	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org,
-	Arnd Bergmann <arnd@arndb.de>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Will Deacon <will@kernel.org>,
-	Anshuman Khandual <anshuman.khandual@arm.com>,
-	Puranjay Mohan <puranjay12@gmail.com>, Song Liu <song@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>
-Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
-Message-ID: <ZJQXdFxoBNUdutYx@FVFF77S0Q05N>
-References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
- <ZJLzsWsIPD57pDgc@FVFF77S0Q05N>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897D25246
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 0A75DC43391;
+	Thu, 22 Jun 2023 10:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687428021;
+	bh=XZlebLGYDzaKv7QBu6ro1CtVqscjkNN8/jhsW4Qd0rk=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=kNfIVAEQLKyLh2JC1Beb26TvE9JS+5DG6lqJJ3eYcv25Mx1oqIL3jJP9F/2AfrG3L
+	 a6icll4e90ioMgAp75Fxeb8uurGAygGCITlSJkLhcCoDh+dMXbCg1wyou6dds3y0na
+	 l+1G5RT4nW8wCAMlK/E0N0yG9GH1HT6l+rNhnapdxXlk4guAxLXPTzSPezKDCCj08A
+	 CgOSATo3QQyGpHPLJeuWBPHBlklAYJ1GVWZUDoMG5NzYflIDSbUEGaq0Hk9vreYatc
+	 Pa8/VB9coG5QxfunqYaCa31CmFYPK+qyvE9ikHNJvh6ukz6CkP6FM8yogXyWtBfClk
+	 bBYICiusFUzaQ==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id E798EC691EF;
+	Thu, 22 Jun 2023 10:00:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJLzsWsIPD57pDgc@FVFF77S0Q05N>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v2] revert "net: align SO_RCVMARK required privileges with
+ SO_MARK"
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168742802094.13102.924538048558653206.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Jun 2023 10:00:20 +0000
+References: <20230618103130.51628-1-maze@google.com>
+In-Reply-To: <20230618103130.51628-1-maze@google.com>
+To: =?utf-8?q?Maciej_=C5=BBenczykowski_=3Cmaze=40google=2Ecom=3E?=@codeaurora.org
+Cc: zenczykowski@gmail.com, netdev@vger.kernel.org, larysa.zaremba@intel.com,
+ simon.horman@corigine.com, pabeni@redhat.com, eyal.birger@gmail.com,
+ kuba@kernel.org, edumazet@google.com, prohr@google.com
 
-On Wed, Jun 21, 2023 at 01:57:21PM +0100, Mark Rutland wrote:
-> On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
-> > Following boot warnings and crashes noticed on arm64 Rpi4 device running
-> > Linux next-20230621 kernel.
-> > 
-> > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > 
-> > boot log:
-> > 
-> > [   22.331748] Kernel text patching generated an invalid instruction
-> > at 0xffff8000835d6580!
-> > [   22.340579] Unexpected kernel BRK exception at EL1
-> > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1] PREEMPT SMP
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Sun, 18 Jun 2023 03:31:30 -0700 you wrote:
+> This reverts commit 1f86123b9749 ("net: align SO_RCVMARK required
+> privileges with SO_MARK") because the reasoning in the commit message
+> is not really correct:
+>   SO_RCVMARK is used for 'reading' incoming skb mark (via cmsg), as such
+>   it is more equivalent to 'getsockopt(SO_MARK)' which has no priv check
+>   and retrieves the socket mark, rather than 'setsockopt(SO_MARK) which
+>   sets the socket mark and does require privs.
 > 
-> This indicates execution of AARCH64_BREAK_FAULT.
-> 
-> That could be from dodgy arguments to aarch64_insn_gen_*(), or elsewhere, and
-> given this is in the networking code I suspect this'll be related to BPF.
-> 
-> Looking at next-20230621 I see commit:
-> 
->   49703aa2adfaff28 ("bpf, arm64: use bpf_jit_binary_pack_alloc")
-> 
-> ... which changed the way BPF allocates memory, and has code that pads memory
-> with a bunch of AARCH64_BREAK_FAULT, so it looks like that *might* be related.
+> [...]
 
-For the benefit of those just looknig at this thread, there has been some
-discussion in the original thread for this commit. Summary and links below.
+Here is the summary with links:
+  - [net,v2] revert "net: align SO_RCVMARK required privileges with SO_MARK"
+    https://git.kernel.org/netdev/net/c/a9628e88776e
 
-We identified a potential issue with missing cache maintenance:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  https://lore.kernel.org/linux-arm-kernel/ZJMXqTffB22LSOkd@FVFF77S0Q05N/
 
-Puranjay verified that was causing the problem seen here:
-
-  https://lore.kernel.org/linux-arm-kernel/CANk7y0h5ucxmMz4K8sGx7qogFyx6PRxYxmFtwTRO7=0Y=B4ugw@mail.gmail.com/
-
-Alexei has dropped this commit for now:
-
-  https://lore.kernel.org/linux-arm-kernel/CAADnVQJqDOMABEx8JuU6r_Dehyf=SkDfRNChx1oNfqPoo7pSrw@mail.gmail.com/
-
-Thanks,
-Mark.
 
