@@ -1,83 +1,148 @@
-Return-Path: <netdev+bounces-13115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0836E73A532
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:37:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 918F173A52F
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:37:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BBE1C28184A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:37:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4FFDE281972
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:36:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44A071F94B;
-	Thu, 22 Jun 2023 15:37:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A63F81F94A;
+	Thu, 22 Jun 2023 15:36:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A25A1DCB0
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 15:37:05 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173AF118;
-	Thu, 22 Jun 2023 08:37:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=4lUNPdzeGRfvUv6WjT+IRwoZNLTeUVrgSIo14geZN8U=; b=rT+/pP0BC4mmt62uwzA4v1uCpj
-	w3HdtFaJRe54kWXL6Dqf/7+4PgtV7oTVZg7JJ8Zp7KxuXEc1ikzrkm89gMzgObPTgJX5HdBueDsr2
-	sdRmqmTvEWW3U2L7l9u3nKQIJys+wFMkCUOU6eIidiVgFILQxwxTwcrmwKA9hSo1PKFI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qCMMS-00HHKJ-Mz; Thu, 22 Jun 2023 17:36:40 +0200
-Date: Thu, 22 Jun 2023 17:36:40 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Florian Fainelli <florian.fainelli@broadcom.com>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, ansuelsmth@gmail.com,
-	rmk+kernel@armlinux.org.uk, Doug Berger <opendmb@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH net] net: bcmgenet: Ensure MDIO unregistration has clocks
- enabled
-Message-ID: <533872e1-b323-4bca-aacc-4d3cfbed53bd@lunn.ch>
-References: <20230622103107.1760280-1-florian.fainelli@broadcom.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99E401DCB0
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 15:36:57 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E8EA118;
+	Thu, 22 Jun 2023 08:36:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=hR/gHK5Osq4DM/s3OZoGTc7hEAA7J9aSxxw3XlwfbaI=; b=VWYq5eFIEnerNIsnZU192fVY6g
+	RBaNgpQ9ovQ0SIcO9hNZDgzQCiiQ70Da+xmcINoETINVaM7NFPCbXAGdMEB3yDTKp9O43HqDapJSf
+	zmwegLlz/XpjAuJrVjCiD7Lz28vlKeAuMt7KGo3+067yAOC/1MirZq79rmoo7TsIVMiFloY8QT3lz
+	OeALNH4c6td82X/7QYzNkFPedIQWjRtQD1RsVbs3QbOfA6CAfGE5GOXpQjHU6ik3JWZgtO57mD9tw
+	WOvtgPpegy5E9sQ/bF52QQHgitCQL+jzvBNW3X1Gm/Gcy/SE9zF8HaoxYwas619lgU/kX9bp/HTfd
+	Ty74sRNg==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qCMMh-0018x8-18;
+	Thu, 22 Jun 2023 15:36:55 +0000
+Message-ID: <0b59dcd8-e730-588b-a627-216c4453065d@infradead.org>
+Date: Thu, 22 Jun 2023 08:36:54 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230622103107.1760280-1-florian.fainelli@broadcom.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+Content-Language: en-US
+To: Alexandra Winter <wintera@linux.ibm.com>, linux-kernel@vger.kernel.org
+Cc: kernel test robot <lkp@intel.com>,
+ Simon Horman <simon.horman@corigine.com>, Wenjia Zhang
+ <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+ Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+ Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+ <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 03:31:07AM -0700, Florian Fainelli wrote:
-> With support for Ethernet PHY LEDs having been added, while
-> unregistering a MDIO bus and its child device liks PHYs there may be
-> "late" accesses to the MDIO bus. One typical use case is setting the PHY
-> LEDs brightness to OFF for instance.
+
+
+On 6/22/23 00:15, Alexandra Winter wrote:
 > 
-> We need to ensure that the MDIO bus controller remains entirely
-> functional since it runs off the main GENET adapter clock.
+> 
+> On 21.06.23 23:37, Randy Dunlap wrote:
+>> Require FDDI to be built-in if it is used. LCS needs FDDI to be
+>> built-in to build without errors.
+>>
+>> Prevents these build errors:
+>> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
+>> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
+>> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
+>>
+>> This FDDI requirement effectively restores the previous condition
+>> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
+>> testing for CONFIG_FDDI_MODULE.
+>>
+>> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+>> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+>> Reported-by: kernel test robot <lkp@intel.com>
+>> Link: lore.kernel.org/r/202306202129.pl0AqK8G-lkp@intel.com
+>> Suggested-by: Simon Horman <simon.horman@corigine.com>
+>> Cc: Alexandra Winter <wintera@linux.ibm.com>
+>> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+>> Cc: linux-s390@vger.kernel.org
+>> Cc: netdev@vger.kernel.org
+>> Cc: Heiko Carstens <hca@linux.ibm.com>
+>> Cc: Vasily Gorbik <gor@linux.ibm.com>
+>> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+>> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+>> Cc: Sven Schnelle <svens@linux.ibm.com>
+>> Cc: David S. Miller <davem@davemloft.net>
+>> Cc: Eric Dumazet <edumazet@google.com>
+>> Cc: Jakub Kicinski <kuba@kernel.org>
+>> Cc: Paolo Abeni <pabeni@redhat.com>
+>> ---
+>>  drivers/s390/net/Kconfig |    2 ++
+>>  1 file changed, 2 insertions(+)
+>>
+>> diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+>> --- a/drivers/s390/net/Kconfig
+>> +++ b/drivers/s390/net/Kconfig
+>> @@ -6,11 +6,13 @@ config LCS
+>>  	def_tristate m
+>>  	prompt "Lan Channel Station Interface"
+>>  	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+>> +	depends on FDDI=y || FDDI=n
+>>  	help
+>>  	  Select this option if you want to use LCS networking on IBM System z.
+>>  	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+>>  	  To compile as a module, choose M. The module name is lcs.
+>>  	  If you do not know what it is, it's safe to choose Y.
+>> +	  If FDDI is used, it must be built-in (=y).
+>>  
+>>  config CTCM
+>>  	def_tristate m
+>>
+> 
+> 
+> Wow Randy and Simon, you are reacting faster than I was able to evaluate this yesterday.
+> 2 thoughts:
+> 
+> 1) As ETHERNET cannot be a module and this patch prevents FDDI from being a module, then 
+> 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+> is kind of pointless and can as well be reverted instead of doing this fix.
+> Or am I missing something?
 
-So this clock is enabled in bcmgenet_open() and disabled in
-bcmgenet_close(). The assumption being, the MDIO bus is only used when
-the interface is up.
+Hi,
+I'll just send a revert for now and then work on the next step(s).
 
-How does this work when there is an MDIO based switch attached? I had
-similar problems with the FEC and mv88e6xxx. DSA would try to talk to
-the switch with the master interface down, and MDIO would time out. I
-needed to add runtime PM support to the MDIO bus ops.
-
-       Andrew
+thanks.
+-- 
+~Randy
 
