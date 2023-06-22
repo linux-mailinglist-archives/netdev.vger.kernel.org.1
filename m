@@ -1,172 +1,113 @@
-Return-Path: <netdev+bounces-12934-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12935-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 305AE7397CB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:06:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC03C7397D2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:07:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 286E71C21029
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:06:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F69728181E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:07:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA5953AC;
-	Thu, 22 Jun 2023 07:06:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0742B567C;
+	Thu, 22 Jun 2023 07:07:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F1B1FB4
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:06:13 +0000 (UTC)
-Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6751BD5
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:05:59 -0700 (PDT)
-Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f9b258f3a2so43844875e9.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:05:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD8C33CD
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:07:29 +0000 (UTC)
+Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773CB1BD1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:07:27 -0700 (PDT)
+Received: by mail-ua1-x930.google.com with SMTP id a1e0cc1a2514c-78a3e1ed1deso2271951241.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:07:27 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687417557; x=1690009557;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=VIhSOYk52hVuqfcboW85OQLI0NHly7jy25hrkyJ2YAw=;
-        b=WZQ2qdOUncD9AsxUeqky0Sv9plZI/2WtRmFLj/vUPrLspAKtFdJAjDNBfRiM90Wl6l
-         Bu52No9UiIMeNp5vJfqV4tdzKNy4gqSSkZZgdTA2tEhX9UhJ0VFvTD1WUjcyZjBnxsqM
-         CY6kI+W0r2aC0t58Ot4ae4EkJpbEUxEO+qU0IzQugmgTpIX9f4Vdc6bAsBsmzf0/VZPu
-         oMD/OCT9ypK+CBaNDZaMdjjZbvVgK6KKjigdSYdUY6tPiNMyp/u8BcNpj7C6Q76VkPqd
-         cFeXbCEhZGKbNKcefxvBWXoomyu9ZEWY69AGbsxFJ97j4shY74xka5Cdz8D7NjEiYYcZ
-         YJOw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687417557; x=1690009557;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687417646; x=1690009646;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=VIhSOYk52hVuqfcboW85OQLI0NHly7jy25hrkyJ2YAw=;
-        b=NxhzpKoBxvPEGQXyvpP4DsJeDsWGKvWlh+r71Sq+xIPUtwGNQbDbl5KwEKt9/mOLRk
-         FM0BM3I+tFlTQKmWP7m1Yi+vniCBerZUxJKVfWL+AmNJ/mRGHszQbrneclv0OrNlBshm
-         Wye0T3pgJocekQHgvyFaNWHrbx6xGcFc9a9aD+E1BMVUHqD7Dvm5CjQVGckrxqJW6IwJ
-         OymZHmPK3pf1/uR0yT2TPsidTuZs+4luyyZ2ts1/jaIZ2cvdqL5ppYM2Jna8qPihnxeM
-         j3Xv/4hHso5zX7Wih/b5PQnuSBLbQbX0FvONK7kAQAECLtKLJxhgolovtYN3qjS5pa4u
-         wyFg==
-X-Gm-Message-State: AC+VfDztXqBu5dDzjx1UllMqJ7+lmJunZtjLgc6McRp0/Sinm9h6cE4B
-	hNE8v/8T19l/6+fg4PDNmMTKeA==
-X-Google-Smtp-Source: ACHHUZ47nqUaHErWDVz/sLK5UcH8SW19SUG16keT/oe5Rk5/giZmsiFYSgziHOgHrlK6XzxNNrCLiA==
-X-Received: by 2002:a1c:7415:0:b0:3fa:77c8:6724 with SMTP id p21-20020a1c7415000000b003fa77c86724mr51349wmc.10.1687417557595;
-        Thu, 22 Jun 2023 00:05:57 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm6919930wmo.6.2023.06.22.00.05.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 00:05:57 -0700 (PDT)
-Date: Thu, 22 Jun 2023 09:05:56 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: "kuba@kernel.org" <kuba@kernel.org>,
-	"vadfed@meta.com" <vadfed@meta.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"vadfed@fb.com" <vadfed@fb.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"sj@kernel.org" <sj@kernel.org>,
-	"javierm@redhat.com" <javierm@redhat.com>,
-	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
-	"airlied@redhat.com" <airlied@redhat.com>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux@zary.sk" <linux@zary.sk>,
-	"masahiroy@kernel.org" <masahiroy@kernel.org>,
-	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
-	"geert+renesas@glider.be" <geert+renesas@glider.be>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"idosch@nvidia.com" <idosch@nvidia.com>,
-	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
-	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
-	"phil@nwl.cc" <phil@nwl.cc>,
-	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
-Subject: Re: [RFC PATCH v8 03/10] dpll: core: Add DPLL framework base
- functions
-Message-ID: <ZJPy1FBvMC4z5SG2@nanopsycho>
-References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
- <20230609121853.3607724-4-arkadiusz.kubalewski@intel.com>
- <ZIS1FX0QAqDSvVUK@nanopsycho>
- <DM6PR11MB46570B50A01D81F54F1068369B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
+        bh=17q09EU5IzKoL+3uRvcJRVxW9WzlvX1kABapaCMfUac=;
+        b=0+Y6V7m9AwJTXt46LgUkmYfim0kFMAgmEx1WMAnwXRm9h0dDSj503PWiVpc80KV24O
+         KTY8IXnHqev0sM8Wb5C+Cl0yjpi/6y19OHSQMukXaniD2YHOOOVUOTvKYtXhPZVMbcpM
+         ulOevy0MmWgkN2XDTVz7bDCuntnRsnSDLmlbJi3KPdwPaQYvuClYduSlqeaikjIct1gi
+         nGZZui1U3Hb8LmO4j9X0yqNFX1575QQuY9mOWj4iwYVZEbvHZNK5qc/og9iqmwvh5Dfo
+         ASu0KGaBHmPs30hpp3a/u77l10PYqSUOZbg60pLMKAsdHShEZ5PMbtIS1OZfJZpaQ2oW
+         HOxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687417646; x=1690009646;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=17q09EU5IzKoL+3uRvcJRVxW9WzlvX1kABapaCMfUac=;
+        b=BP+/kXktGediHewjI4UHJW6wz8l8mAK+Dzh9eaSyQIFZjw8vEimGOTX6VFjWu5I3Xp
+         PeEe1oDOell2zjuXmfBmrW2TBpY/s65V6HzNWXr06zPFbsXlykl9x83Jk/o6nFXwSjPV
+         F2TVW9FMvA/2CFbRf7ZFLjsqNGBX1ykC0iSa+UhO/lgTPUp8bgg/Jw88xk0DWrITvz6q
+         sfIi/PeeoHMzWClL+/P30Psemrr/dTscVfkrWSNkGcSrGizTtO/H5if5PrmXze8xtvsE
+         n38YxRHW6udzoPy3wH3kpXMT2p8dxnEzHIOcBNfaksCdM3DJTtNhFDU2lLcsdiotmNUy
+         qN5g==
+X-Gm-Message-State: AC+VfDz8BMnhrzv7rx/p6UAmmibxxuv3h31cu+Z9V51FUIgyqYqnruf/
+	aNOL+cgqg1A1sbtFnsEId8/se9yc8qZgev/qBvtHWw==
+X-Google-Smtp-Source: ACHHUZ7kZNJcPPkpnbMNtbJXqOpZWeAzoHNc+qihd4tsRK7miMwwfvPuvxGMJdu+kyR+2dT9AG50FXasvP9ps+v0mWc=
+X-Received: by 2002:a67:f256:0:b0:43f:5036:677e with SMTP id
+ y22-20020a67f256000000b0043f5036677emr7745188vsm.6.1687417646581; Thu, 22 Jun
+ 2023 00:07:26 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB46570B50A01D81F54F1068369B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230621182558.544417-1-brgl@bgdev.pl> <20230621131222.071b9fc3@kernel.org>
+In-Reply-To: <20230621131222.071b9fc3@kernel.org>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Thu, 22 Jun 2023 09:07:15 +0200
+Message-ID: <CAMRc=MddPhRq9aR3ebeEqWs6O_G50TZqBMtCtpDxo8KcRMoiww@mail.gmail.com>
+Subject: Re: [PATCH net-next 00/12] net: stmmac: replace boolean fields in
+ plat_stmmacenet_data with flags
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Vinod Koul <vkoul@kernel.org>, 
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Chen-Yu Tsai <wens@csie.org>, 
+	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
+	Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
+	Richard Cochran <richardcochran@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
+	linux-mediatek@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Jun 21, 2023 at 08:55:35PM CEST, arkadiusz.kubalewski@intel.com wrote:
->>From: Jiri Pirko <jiri@resnulli.us>
->>Sent: Saturday, June 10, 2023 7:38 PM
->>
->>Fri, Jun 09, 2023 at 02:18:46PM CEST, arkadiusz.kubalewski@intel.com wrote:
->>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>
->>>DPLL framework is used to represent and configure DPLL devices
->>>in systems. Each device that has DPLL and can configure inputs
->>>and outputs can use this framework.
->>>
->>>Implement core framework functions for further interactions
->>>with device drivers implementing dpll subsystem, as well as for
->>>interactions of DPLL netlink framework part with the subsystem
->>>itself.
->>>
->>>Co-developed-by: Milena Olech <milena.olech@intel.com>
->>>Signed-off-by: Milena Olech <milena.olech@intel.com>
->>>Co-developed-by: Michal Michalik <michal.michalik@intel.com>
->>>Signed-off-by: Michal Michalik <michal.michalik@intel.com>
->>>Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->>>Co-developed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
->>>---
->>> drivers/dpll/dpll_core.c | 953 +++++++++++++++++++++++++++++++++++++++
->>> drivers/dpll/dpll_core.h | 104 +++++
->>
->>Overall, looks very good! I pinpointed couple of nits below, nothing big.
->>General question: Why do you put documentation comment to every static
->>function? Does not make any sense to me. Even for non-exported functions
->>I think it is overkill. Most of them (if not all) give the reader no
->>additional information and only make the code a bit harder to read.
->>Care to drop them?
->>
+On Wed, Jun 21, 2023 at 10:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
+rote:
 >
->I forgot to respond here.. I would rather leave it, but if the others think
->the same way, we could remove them.
+> On Wed, 21 Jun 2023 20:25:46 +0200 Bartosz Golaszewski wrote:
+> > As suggested by Jose Abreu: let's drop all 12 boolean fields in
+> > plat_stmmacenet_data and replace them with a common bitfield.
+>
+> Is that what Jose meant, or:
+>
+> -       bool has_integrated_pcs;
+> +       u32 has_integrated_pcs:1;
+>
+> ?
 
-Could you explain what is the benefit of leaving them? What are they
-good for. From what I see, they are obvious and only add blank LOC.
+For that to work all fields would need to be gathered together (unless
+the structure is __packed - not a good idea) and all future fields
+would need to be added in a specific place in the structure definition
+as well. I think a bit field is clearer and harder to get wrong here.
+
+Bart
 
