@@ -1,205 +1,136 @@
-Return-Path: <netdev+bounces-13025-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADFD1739E92
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:31:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3458739F0E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:57:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 69CF02818DE
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:31:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75950281936
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:57:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAAB33AA9A;
-	Thu, 22 Jun 2023 10:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A552679EE;
+	Thu, 22 Jun 2023 10:57:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB87C1DDD8
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:31:26 +0000 (UTC)
-Received: from mail-qv1-xf35.google.com (mail-qv1-xf35.google.com [IPv6:2607:f8b0:4864:20::f35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33C1CDD
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:31:25 -0700 (PDT)
-Received: by mail-qv1-xf35.google.com with SMTP id 6a1803df08f44-62ff6cf5af0so61544636d6.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:31:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=broadcom.com; s=google; t=1687429884; x=1690021884;
-        h=mime-version:message-id:date:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=2WwZvskzszM94kPPJ2VwvQaYwPeNbrtdo40BlBksq5A=;
-        b=fSYkmbaAk/BURnMiqDo9M7xxAG+3n02b/ly6+eD6KBJ433EXTqVjpHmlmOLdNLM8ma
-         RMnr5O7zTX4a5fNYXgVgeyQXUZIylZ3EM65mRjWfHMvkB130txehUdtdGxPJp/2IcQnm
-         YFspktl9kGnH/GHKxkO7IPxHlvvKxRgApAyPg=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97F8E5CA1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:57:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7DB551BE5
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:56:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687431395;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mtEvNEEfEgE6y0Va09/K93RbhGC9WjVk1y92ey2SXIQ=;
+	b=W5eJyI+mWrXx2msmqElS8j/biYCHvY5XNep6DHuhwuVPzazfpHSryY2/0NKPLKTbp3Xc5Q
+	8uQOcQkeCzRDKKQEOcgSRGg2D/Bv7G5zItr1B3gbpqbQFm5tf5DpkNW17YXlEfgCElysPE
+	vY2gtqObE5CPqISLpj6gdl1ZdnVJYYE=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-207-YKH_Nn-pPuyo39iyMAWZ7Q-1; Thu, 22 Jun 2023 06:56:34 -0400
+X-MC-Unique: YKH_Nn-pPuyo39iyMAWZ7Q-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3129750e403so350274f8f.3
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:56:33 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687429884; x=1690021884;
-        h=mime-version:message-id:date:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=2WwZvskzszM94kPPJ2VwvQaYwPeNbrtdo40BlBksq5A=;
-        b=NZH41NysN9U/77JoyrW5SD49mxZAsB+RupOKZg994BTxleCrx7ufPqN/PFILWUvgax
-         3XeFK5E33BQG8BWIXub7cATO+dImggew1YZBHnoodYgWFmSekA2fnHdjiuE7qM9XiwVD
-         /pAs/BnFaD7tSRGiVbRurieca/E/b4UdzEFUsf/U5lCwSWBpdksfiCAuVthnTst62/7n
-         PwVSUc8K+41LGoe0H3aiW33T+d9LWVX2MjtvsA6/kaoQ0yIdbQb2Tnj4xsESB9wG+5Ul
-         lCh/cxkqbce8o7kcGaewFlyRScY8NZwkr9kHR4TAtiwdiMcArgQ9BsZZxcEaBd1hGSb0
-         s5vQ==
-X-Gm-Message-State: AC+VfDwszDph+Bf2E9McybMysVpUmHf2LaQW0qD+zCKPvJj62Fk+XHgR
-	mwNIaz6R9KEuswFUtGjYef74Iz1Eq3sMKbneDPj0j+JRUpdHT4uc3SnRCIM/Mvd7pwsiZezcgI1
-	mDrKGhN+Ag4j7fhLFmU+LUS3zK3gsMAqBY3p7onrZxCzuBCiopFi+1ca0yRYgEfOIuSSTspqhex
-	h6J0xYi0/uwC89
-X-Google-Smtp-Source: ACHHUZ56ffB6zYKu8ckGo7BS94w/z2e1VoYo6aH59bRYiHrnjyXl2rGZZvaCQZnPhBafTfsfxW4xyQ==
-X-Received: by 2002:a05:6214:1c85:b0:623:8494:9946 with SMTP id ib5-20020a0562141c8500b0062384949946mr18779649qvb.45.1687429883773;
-        Thu, 22 Jun 2023 03:31:23 -0700 (PDT)
-Received: from fainelli-desktop.igp.broadcom.net ([192.19.223.252])
-        by smtp.gmail.com with ESMTPSA id g13-20020a0ce4cd000000b00631f40503cbsm3660627qvm.12.2023.06.22.03.31.20
+        d=1e100.net; s=20221208; t=1687431393; x=1690023393;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=mtEvNEEfEgE6y0Va09/K93RbhGC9WjVk1y92ey2SXIQ=;
+        b=lZOlsRqsng4jtostNmEefJ7Hw2eqna7V068/QbwLpONQzYCVzlpD4YImN96r1WSxxG
+         E443oo4u7Y+4hTsw+wPOHXiuU7Xgo74slkzv0DI6vzVLxXUqFbKY9zR64GwoS1kT2VrX
+         gpiLLtJXJuVzYcACVD88lZYccBslT4mkKJMg6bd3dC62SZ+zVSjXhQDwsatGMrKdh2A8
+         Oe7L+CHJ4/QVciM04JrbSNGw4tCmFdJFgZ3rR2IXxwRdHWYP18uX5yxf18rNZpIny6FA
+         9fjYQR1TQeMdgWmbVoG3/9DXqLVwVWn2k7YVI9G4FSB7BdnaKwNkGyOc5sD5t9HJ46aI
+         5tnQ==
+X-Gm-Message-State: AC+VfDwbO1DpXny4nWW4mbIqMfbMTkJzGk7Pww6PGiRAPTcFSMQ+H21s
+	g5COVEmMVq3TExAVQCcPy9yhR1OSEYLk1j8kgOFwo1wde5oP1hHAsz969gAbzTU3YgnQb8dL1HS
+	YwZnzjAJl1j7Vv2+x
+X-Received: by 2002:a5d:480c:0:b0:30a:e5f1:eedd with SMTP id l12-20020a5d480c000000b0030ae5f1eeddmr14834298wrq.67.1687431392885;
+        Thu, 22 Jun 2023 03:56:32 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7WSbvfGBCj5qQ17kuyaXgylgYoEA5grBw2s5jWMUBakMcarcNSS8Brg4cC/lzosHZN0RzjcA==
+X-Received: by 2002:a5d:480c:0:b0:30a:e5f1:eedd with SMTP id l12-20020a5d480c000000b0030ae5f1eeddmr14834283wrq.67.1687431392412;
+        Thu, 22 Jun 2023 03:56:32 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
+        by smtp.gmail.com with ESMTPSA id p7-20020a056000018700b003095bd71159sm6805634wrx.7.2023.06.22.03.56.31
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 03:31:22 -0700 (PDT)
-From: Florian Fainelli <florian.fainelli@broadcom.com>
-To: netdev@vger.kernel.org
-Cc: andrew@lunn.ch,
-	hkallweit1@gmail.com,
-	ansuelsmth@gmail.com,
-	rmk+kernel@armlinux.org.uk,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Doug Berger <opendmb@gmail.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org (open list)
-Subject: [PATCH net] net: bcmgenet: Ensure MDIO unregistration has clocks enabled
-Date: Thu, 22 Jun 2023 03:31:07 -0700
-Message-Id: <20230622103107.1760280-1-florian.fainelli@broadcom.com>
-X-Mailer: git-send-email 2.34.1
+        Thu, 22 Jun 2023 03:56:31 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 3DD89BBF45D; Thu, 22 Jun 2023 12:56:31 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Magnus Karlsson <magnus.karlsson@gmail.com>, Jakub Kicinski
+ <kuba@kernel.org>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, bpf@vger.kernel.org,
+ ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
+ netdev@vger.kernel.org, magnus.karlsson@intel.com, bjorn@kernel.org,
+ tirthendu.sarkar@intel.com, simon.horman@corigine.com
+Subject: Re: [PATCH v4 bpf-next 15/22] xsk: add multi-buffer documentation
+In-Reply-To: <CAJ8uoz3N1EVZAJZpe_R7rOQGpab4_yoWGPU7PB8PeKP9tvQWHg@mail.gmail.com>
+References: <20230615172606.349557-1-maciej.fijalkowski@intel.com>
+ <20230615172606.349557-16-maciej.fijalkowski@intel.com>
+ <87zg4uca21.fsf@toke.dk>
+ <CAJ8uoz2hfXzu29KEgqm3rNm+hayDtUkJatFVA0n4nZz6F9de0w@mail.gmail.com>
+ <87o7l9c58j.fsf@toke.dk>
+ <CAJ8uoz1j9t=yO6mrMEseRYDQQkn0vf1gWbwOv7z9X0qX0O0LVw@mail.gmail.com>
+ <20230621133424.0294f2a3@kernel.org>
+ <CAJ8uoz3N1EVZAJZpe_R7rOQGpab4_yoWGPU7PB8PeKP9tvQWHg@mail.gmail.com>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 22 Jun 2023 12:56:31 +0200
+Message-ID: <875y7flq8w.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; protocol="application/pkcs7-signature"; micalg=sha-256;
-	boundary="000000000000d399d605feb56272"
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,MIME_NO_TEXT,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---000000000000d399d605feb56272
-Content-Transfer-Encoding: 8bit
+Magnus Karlsson <magnus.karlsson@gmail.com> writes:
 
-With support for Ethernet PHY LEDs having been added, while
-unregistering a MDIO bus and its child device liks PHYs there may be
-"late" accesses to the MDIO bus. One typical use case is setting the PHY
-LEDs brightness to OFF for instance.
+> On Wed, 21 Jun 2023 at 22:34, Jakub Kicinski <kuba@kernel.org> wrote:
+>>
+>> On Wed, 21 Jun 2023 16:15:32 +0200 Magnus Karlsson wrote:
+>> > > Hmm, okay, that sounds pretty tedious :P
+>> >
+>> > Indeed if you had to do it manually ;-). Do not think this max is
+>> > important though, see next answer.
+>>
+>> Can't we add max segs to Lorenzo's XDP info?
+>> include/uapi/linux/netdev.h
+>
+> That should be straight forward. I am just reluctant to add a user
+> interface that might not be necessary.
 
-We need to ensure that the MDIO bus controller remains entirely
-functional since it runs off the main GENET adapter clock.
+Yeah, that was why I was asking what the expectations were before
+suggesting adding this to the feature bits :)
 
-Link: https://lore.kernel.org/all/20230617155500.4005881-1-andrew@lunn.ch/
-Fixes: 9a4e79697009 ("net: bcmgenet: utilize generic Broadcom UniMAC MDIO controller driver")
-Signed-off-by: Florian Fainelli <florian.fainelli@broadcom.com>
----
- drivers/net/ethernet/broadcom/genet/bcmmii.c | 2 ++
- 1 file changed, 2 insertions(+)
+However, given that the answer seems to be "it varies"...
 
-diff --git a/drivers/net/ethernet/broadcom/genet/bcmmii.c b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-index be042905ada2..c1d670c92958 100644
---- a/drivers/net/ethernet/broadcom/genet/bcmmii.c
-+++ b/drivers/net/ethernet/broadcom/genet/bcmmii.c
-@@ -668,5 +668,7 @@ void bcmgenet_mii_exit(struct net_device *dev)
- 	if (of_phy_is_fixed_link(dn))
- 		of_phy_deregister_fixed_link(dn);
- 	of_node_put(priv->phy_dn);
-+	clk_prepare_enable(priv->clk);
- 	platform_device_unregister(priv->mii_pdev);
-+	clk_disable_unprepare(priv->clk);
- }
--- 
-2.34.1
+> Maciej, how about changing your patch #13 so that we do not add a flag
+> for zc_mb supported or not, but instead we add a flag that gives the
+> user the max number of frags supported in zc mode? A 1 returned would
+> mean that max 1 frag is supported, i.e. mb is not supported. Any
+> number >1 would mean that mb is supported in zc mode for this device
+> and the returned number is the max number of frags supported. This way
+> we would not have to add one more user interface solely for getting
+> the max number of frags supported. What do you think?
 
+...I think it's a good idea to add the field, and this sounds like a
+reasonable way of dealing with it (although it may need a bit more
+plumbing on the netlink side?)
 
---000000000000d399d605feb56272
-Content-Type: application/pkcs7-signature; name="smime.p7s"
-Content-Transfer-Encoding: base64
-Content-Disposition: attachment; filename="smime.p7s"
-Content-Description: S/MIME Cryptographic Signature
+-Toke
 
-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
-riBJ/K1AFUjRAjFhGV64l++td7dkmnq/X8ET75ti+w1s4FRpFqkD2m7pg5NxdsZphYIXAgMBAAGj
-QjBAMA4GA1UdDwEB/wQEAwIBBjAPBgNVHRMBAf8EBTADAQH/MB0GA1UdDgQWBBSP8Et/qC5FJK5N
-UPpjmove4t0bvDANBgkqhkiG9w0BAQsFAAOCAQEAS0DbwFCq/sgM7/eWVEVJu5YACUGssxOGhigH
-M8pr5nS5ugAtrqQK0/Xx8Q+Kv3NnSoPHRHt44K9ubG8DKY4zOUXDjuS5V2yq/BKW7FPGLeQkbLmU
-Y/vcU2hnVj6DuM81IcPJaP7O2sJTqsyQiunwXUaMld16WCgaLx3ezQA3QY/tRG3XUyiXfvNnBB4V
-14qWtNPeTCekTBtzc3b0F5nCH3oO4y0IrQocLP88q1UOD5F+NuvDV0m+4S4tfGCLw0FREyOdzvcy
-a5QBqJnnLDMfOjsl0oZAzjsshnjJYS8Uuu7bVW/fhO4FCU29KNhyztNiUGUe65KXgzHZs7XKR1g/
-XzCCBVgwggRAoAMCAQICDBP8P9hKRVySg3Qv5DANBgkqhkiG9w0BAQsFADBbMQswCQYDVQQGEwJC
-RTEZMBcGA1UEChMQR2xvYmFsU2lnbiBudi1zYTExMC8GA1UEAxMoR2xvYmFsU2lnbiBHQ0MgUjMg
-UGVyc29uYWxTaWduIDIgQ0EgMjAyMDAeFw0yMjA5MTAxMjE4MTFaFw0yNTA5MTAxMjE4MTFaMIGW
-MQswCQYDVQQGEwJJTjESMBAGA1UECBMJS2FybmF0YWthMRIwEAYDVQQHEwlCYW5nYWxvcmUxFjAU
-BgNVBAoTDUJyb2FkY29tIEluYy4xGTAXBgNVBAMTEEZsb3JpYW4gRmFpbmVsbGkxLDAqBgkqhkiG
-9w0BCQEWHWZsb3JpYW4uZmFpbmVsbGlAYnJvYWRjb20uY29tMIIBIjANBgkqhkiG9w0BAQEFAAOC
-AQ8AMIIBCgKCAQEA+oi3jMmHltY4LMUy8Up5+1zjd1iSgUBXhwCJLj1GJQF+GwP8InemBbk5rjlC
-UwbQDeIlOfb8xGqHoQFGSW8p9V1XUw+cthISLkycex0AJ09ufePshLZygRLREU0H4ecNPMejxCte
-KdtB4COST4uhBkUCo9BSy1gkl8DJ8j/BQ1KNUx6oYe0CntRag+EnHv9TM9BeXBBLfmMRnWNhvOSk
-nSmRX0J3d9/G2A3FIC6WY2XnLW7eAZCQPa1Tz3n2B5BGOxwqhwKLGLNu2SRCPHwOdD6e0drURF7/
-Vax85/EqkVnFNlfxtZhS0ugx5gn2pta7bTdBm1IG4TX+A3B1G57rVwIDAQABo4IB3jCCAdowDgYD
-VR0PAQH/BAQDAgWgMIGjBggrBgEFBQcBAQSBljCBkzBOBggrBgEFBQcwAoZCaHR0cDovL3NlY3Vy
-ZS5nbG9iYWxzaWduLmNvbS9jYWNlcnQvZ3NnY2NyM3BlcnNvbmFsc2lnbjJjYTIwMjAuY3J0MEEG
-CCsGAQUFBzABhjVodHRwOi8vb2NzcC5nbG9iYWxzaWduLmNvbS9nc2djY3IzcGVyc29uYWxzaWdu
-MmNhMjAyMDBNBgNVHSAERjBEMEIGCisGAQQBoDIBKAowNDAyBggrBgEFBQcCARYmaHR0cHM6Ly93
-d3cuZ2xvYmFsc2lnbi5jb20vcmVwb3NpdG9yeS8wCQYDVR0TBAIwADBJBgNVHR8EQjBAMD6gPKA6
-hjhodHRwOi8vY3JsLmdsb2JhbHNpZ24uY29tL2dzZ2NjcjNwZXJzb25hbHNpZ24yY2EyMDIwLmNy
-bDAoBgNVHREEITAfgR1mbG9yaWFuLmZhaW5lbGxpQGJyb2FkY29tLmNvbTATBgNVHSUEDDAKBggr
-BgEFBQcDBDAfBgNVHSMEGDAWgBSWM9HmWBdbNHWKgVZk1b5I3qGPzzAdBgNVHQ4EFgQUUwwfJ6/F
-KL0fRdVROal/Lp4lAF0wDQYJKoZIhvcNAQELBQADggEBAKBgfteDc1mChZjKBY4xAplC6uXGyBrZ
-kNGap1mHJ+JngGzZCz+dDiHRQKGpXLxkHX0BvEDZLW6LGOJ83ImrW38YMOo3ZYnCYNHA9qDOakiw
-2s1RH00JOkO5SkYdwCHj4DB9B7KEnLatJtD8MBorvt+QxTuSh4ze96Jz3kEIoHMvwGFkgObWblsc
-3/YcLBmCgaWpZ3Ksev1vJPr5n8riG3/N4on8gO5qinmmr9Y7vGeuf5dmZrYMbnb+yCBalkUmZQwY
-NxADYvcRBA0ySL6sZpj8BIIhWiXiuusuBmt2Mak2eEv0xDbovE6Z6hYyl/ZnRadbgK/ClgbY3w+O
-AfUXEZ0xggJtMIICaQIBATBrMFsxCzAJBgNVBAYTAkJFMRkwFwYDVQQKExBHbG9iYWxTaWduIG52
-LXNhMTEwLwYDVQQDEyhHbG9iYWxTaWduIEdDQyBSMyBQZXJzb25hbFNpZ24gMiBDQSAyMDIwAgwT
-/D/YSkVckoN0L+QwDQYJYIZIAWUDBAIBBQCggdQwLwYJKoZIhvcNAQkEMSIEIOUFcEZKS0wzT7T0
-lSt8imG5fSZNEAQFA7u+WTb44vIaMBgGCSqGSIb3DQEJAzELBgkqhkiG9w0BBwEwHAYJKoZIhvcN
-AQkFMQ8XDTIzMDYyMjEwMzEyNFowaQYJKoZIhvcNAQkPMVwwWjALBglghkgBZQMEASowCwYJYIZI
-AWUDBAEWMAsGCWCGSAFlAwQBAjAKBggqhkiG9w0DBzALBgkqhkiG9w0BAQowCwYJKoZIhvcNAQEH
-MAsGCWCGSAFlAwQCATANBgkqhkiG9w0BAQEFAASCAQBs3/wKvS6HTIQ6VXVnGkvi5sh1thCF45Th
-E91TxLMJpiETUaJbUqDtu38jdxDY/2pGiK9G/rgFMxKLw24f6GtqFCDfCDF3UvcgXFSOCrm0jWwa
-tIhf+MZrAB0IdskfUppTSpuBEVSMGlGYU0CU0GLLgVn7HgG3U02LX2hwgYjWIgtWkShcr6SSLYBo
-ChJrAZWEmJ2phKbSaB7T8JDx/57byMX0V4FikB8dl7LAfoMhCYvHPoCi+goJ8JAmfydfWXiPuW2Q
-XjinN8zgTgd+kADuN9MsRtnZuc25qffDv3GU56yxiUIANa7ndDB6qIGIHYnbRCgCaC69QtPC1Vpq
-B5tE
---000000000000d399d605feb56272--
 
