@@ -1,295 +1,111 @@
-Return-Path: <netdev+bounces-13035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2328473A023
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:56:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7060D73A05D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:02:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1E551C210A4
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 11:56:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B3461C210DF
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:02:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C3501DCC2;
-	Thu, 22 Jun 2023 11:56:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6D81E505;
+	Thu, 22 Jun 2023 12:02:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AA9D1DCB0
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:56:00 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B161172C;
-	Thu, 22 Jun 2023 04:55:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=chq/0WFUGMcJxHzwHjN+29QiZq5EhUi5n3GREJ64QVs=; b=WPkIO3BJW3qj80J3BvBPQPaMl3
-	SGIqsHqpMC70S/ksn6IwogvFTrfKEYJOe2+MRNCUCSO0vJ3I3D3idY2NwF0adOh2GAZIr17vI4PfS
-	a6KdnuOXizlZzCDvW2/WBkpBCZtNrzKyi+QFe9LQBx/2Km/Wkk2D7lZ17wxBmJRQPrnoSNYNPUKGR
-	IRP82ZAsK3rIEW9akTLlC/u0BOqMdjj9GPWUo518qjLqsNVLgBBDd5XOHtEgWUEwkOyv2uwxBt0Fv
-	cDOiYrnZPeD7iMYS46DDJ5ADyeI/9IoKetZ46DQiJrnM9resrzFZqbgCxZ1rb8kleUoPLKulaNKqA
-	UD16ezzA==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:35498)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qCIuo-0004AX-OJ; Thu, 22 Jun 2023 12:55:54 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qCIum-0000Pu-9A; Thu, 22 Jun 2023 12:55:52 +0100
-Date: Thu, 22 Jun 2023 12:55:52 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Pawel Dembicki <paweldembicki@gmail.com>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next 1/6] net: dsa: vsc73xx: convert to PHYLINK
-Message-ID: <ZJQ2yBX16gAg+n0L@shell.armlinux.org.uk>
-References: <20230621191302.1405623-1-paweldembicki@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFC8B171BA
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:15 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D16A2680
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:01:53 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3f90a1aa204so67139545e9.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:01:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687435311; x=1690027311;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=wCOTNZfhd7+agr1wxdRguQNnip7k7RN73PzCcqk8bM4=;
+        b=OleKPyhN3R4wczfN+QHAWvvG1WL9/mN+I/K+mCIcYDknUObAItercHBRDw+AYq5bdO
+         rxVUFw4luQrnSpDFIYfIsD5LZo7ebRoAnNVqjZ4oS2gzThWzSX3Ubftwhkfdecfzvvoy
+         gDuFBbgfvVU7pQ79DU46SdQ+Wzd+KEeeogBxIOXbxgjBfVMQZfcp5pfrQTRc3+urPClw
+         BOr7IJ0iygFHiZiGjHtCOhj5gLEytQexoPD8Q9ejTB5+ToE0yLW0aWKVdUuToLth6JC4
+         E4+nvFoQBaulTAhf4W/eV/8vRs2xMKS9gIbh31HPeaJ/OCFIrONsjALpdTSloLsRcg2D
+         LKBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687435311; x=1690027311;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=wCOTNZfhd7+agr1wxdRguQNnip7k7RN73PzCcqk8bM4=;
+        b=ZOYhAnj72HKlGoeAhlNN5qYX+PvW0gW983fVkJr8o+K6BUNL+R+U53IdVLVeOoo2KK
+         8P+gpf6KGgy2pfT7qQZeiTfkQ9ym16BkkuEQx748HM2dhxR5/jxveCpnCCHzCObNGSJS
+         Tgr+qPeRgHd1gFGwEWNtHuNnsy9Jb6DB+v1JLYd6kz/5SP3vTrktWYr6OgPq1I+QEoea
+         AX8DyoKHrDcPIhy5aCksR4iQph7ThSZxj/FzptwgnRqk339otD+eZ5e+g27asQdGvTj7
+         iqjlqAWXdzYcq43oppVg4ksrps8XJkSbozw0HbLQNGIStzdnbxDTMm116voHGmTNFCu/
+         T0wA==
+X-Gm-Message-State: AC+VfDyL4QjR8SnYCOrki3wRAD0BF5Se4qJr/56PUHxm6HK6t4Vnmd94
+	mhDOIR4c6kmhyq+UybcD+2X/tg==
+X-Google-Smtp-Source: ACHHUZ4q83MzrTYI5PC+sT3pKo1MxOyPmpZ1Le9Xh/MjC5lBvY/oPQVeLRdZlgcujE9VQ5+gnSMz6Q==
+X-Received: by 2002:a1c:7914:0:b0:3f9:eaf6:1760 with SMTP id l20-20020a1c7914000000b003f9eaf61760mr3172664wme.3.1687435311108;
+        Thu, 22 Jun 2023 05:01:51 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:d785:af3e:3bf5:7f36])
+        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm7594296wmo.6.2023.06.22.05.01.50
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 05:01:50 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Richard Cochran <richardcochran@gmail.com>
+Cc: linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [RESEND PATCH v2 0/5] arm64: dts: qcom: enable ethernet on sa8775p-ride
+Date: Thu, 22 Jun 2023 14:01:37 +0200
+Message-Id: <20230622120142.218055-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621191302.1405623-1-paweldembicki@gmail.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 09:12:56PM +0200, Pawel Dembicki wrote:
-> +	/* This driver does not make use of the speed, duplex, pause or the
-> +	 * advertisement in its mac_config, so it is safe to mark this driver
-> +	 * as non-legacy.
-> +	 */
-> +	config->legacy_pre_march2020 = false;
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Great stuff, thanks!
+Bjorn,
 
-> +static void vsc73xx_phylink_mac_config(struct dsa_switch *ds, int port,
-> +				       unsigned int mode,
-> +				       const struct phylink_link_state *state)
-> +{
-> +	struct vsc73xx *vsc = ds->priv;
+Now that all other bits and pieces are in next, I'm resending the reviewed
+DTS patches for pick up. This enables one of the 1Gb ethernet ports on
+sa8775p-ride.
 
-Nit: normally have a blank line between function variable declarations
-and the rest of the function body.
+Bartosz Golaszewski (5):
+  arm64: dts: qcom: sa8775p: add the SGMII PHY node
+  arm64: dts: qcom: sa8775p: add the first 1Gb ethernet interface
+  arm64: dts: qcom: sa8775p-ride: enable the SerDes PHY
+  arm64: dts: qcom: sa8775p-ride: add pin functions for ethernet0
+  arm64: dts: qcom: sa8775p-ride: enable ethernet0
 
->  	/* Special handling of the CPU-facing port */
->  	if (port == CPU_PORT) {
->  		/* Other ports are already initialized but not this one */
-> @@ -775,104 +803,92 @@ static void vsc73xx_adjust_link(struct dsa_switch *ds, int port,
->  			      VSC73XX_ADVPORTM_ENA_GTX |
->  			      VSC73XX_ADVPORTM_DDR_MODE);
->  	}
-> +}
->  
-> -	/* This is the MAC confiuration that always need to happen
-> -	 * after a PHY or the CPU port comes up or down.
-> -	 */
-> -	if (!phydev->link) {
-> -		int maxloop = 10;
-> +static void vsc73xx_phylink_mac_link_down(struct dsa_switch *ds, int port,
-> +					  unsigned int mode,
-> +					  phy_interface_t interface)
-> +{
-> +	struct vsc73xx *vsc = ds->priv;
-> +	u32 val;
->  
-> -		dev_dbg(vsc->dev, "port %d: went down\n",
-> -			port);
-> +	int maxloop = VSC73XX_TABLE_ATTEMPTS;
-
-Reverse christmas-tree for variable declarations, and there shouldn't
-be a blank line between them. In any case, I don't think you need
-"maxloop" if you adopt my suggestion below.
-
->  
-> -		/* Disable RX on this port */
-> -		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> -				    VSC73XX_MAC_CFG,
-> -				    VSC73XX_MAC_CFG_RX_EN, 0);
-> +	dev_dbg(vsc->dev, "port %d: went down\n",
-> +		port);
->  
-> -		/* Discard packets */
-> -		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> -				    VSC73XX_ARBDISC, BIT(port), BIT(port));
-> +	/* Disable RX on this port */
-> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> +			    VSC73XX_MAC_CFG,
-> +			    VSC73XX_MAC_CFG_RX_EN, 0);
-> +
-> +	/* Discard packets */
-> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> +			    VSC73XX_ARBDISC, BIT(port), BIT(port));
->  
-> -		/* Wait until queue is empty */
-> +	/* Wait until queue is empty */
-> +	vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> +		     VSC73XX_ARBEMPTY, &val);
-> +	while (!(val & BIT(port))) {
-> +		msleep(1);
->  		vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
->  			     VSC73XX_ARBEMPTY, &val);
-> -		while (!(val & BIT(port))) {
-> -			msleep(1);
-> -			vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> -				     VSC73XX_ARBEMPTY, &val);
-> -			if (--maxloop == 0) {
-> -				dev_err(vsc->dev,
-> -					"timeout waiting for block arbiter\n");
-> -				/* Continue anyway */
-> -				break;
-> -			}
-> +		if (--maxloop == 0) {
-> +			dev_err(vsc->dev,
-> +				"timeout waiting for block arbiter\n");
-> +			/* Continue anyway */
-> +			break;
->  		}
-> +	}
-
-I know you're only moving this code, but I think it would be good to
-_first_ have a patch that fixes this polling function:
-
-	int ret, err;
-...
-		ret = read_poll_timeout(vsc73xx_read, err,
-					err < 0 || (val & BIT(port)),
-					1000, 10000, false,
-					vsc, VSC73XX_BLOCK_ARBITER, 0,
-					VSC73XX_ARBEMPTY, &val);
-		if (ret != 0)
-			dev_err(vsc->dev,
-				"timeout waiting for block arbiter\n");
-		else if (err < 0)
-			dev_err(vsc->dev,
-				"error reading arbiter\n");
-
-This avoids the issue that on the last iteration, the code reads the
-register, test it, find the condition that's being waiting for is
-false, _then_ waits and end up printing the error message - that last
-wait is rather useless, and as the arbiter state isn't checked after
-waiting, it could be that we had success during the last wait.
-
-> +static void vsc73xx_phylink_mac_link_up(struct dsa_switch *ds, int port,
-> +					unsigned int mode,
-> +					phy_interface_t interface,
-> +					struct phy_device *phydev,
-> +					int speed, int duplex,
-> +					bool tx_pause, bool rx_pause)
-> +{
-> +	struct vsc73xx *vsc = ds->priv;
-> +	u32 val;
->  
-> +	switch (speed) {
-> +	case SPEED_1000:
->  		/* Set up default for internal port or external RGMII */
-> -		if (phydev->interface == PHY_INTERFACE_MODE_RGMII)
-> +		if (interface == PHY_INTERFACE_MODE_RGMII)
->  			val = VSC73XX_MAC_CFG_1000M_F_RGMII;
->  		else
->  			val = VSC73XX_MAC_CFG_1000M_F_PHY;
-> -		vsc73xx_adjust_enable_port(vsc, port, phydev, val);
-> -	} else if (phydev->speed == SPEED_100) {
-> -		if (phydev->duplex == DUPLEX_FULL) {
-> -			val = VSC73XX_MAC_CFG_100_10M_F_PHY;
-> -			dev_dbg(vsc->dev,
-> -				"port %d: 100 Mbit full duplex mode\n",
-> -				port);
-> -		} else {
-> -			val = VSC73XX_MAC_CFG_100_10M_H_PHY;
-> -			dev_dbg(vsc->dev,
-> -				"port %d: 100 Mbit half duplex mode\n",
-> -				port);
-> -		}
-> -		vsc73xx_adjust_enable_port(vsc, port, phydev, val);
-> -	} else if (phydev->speed == SPEED_10) {
-> -		if (phydev->duplex == DUPLEX_FULL) {
-> +		break;
-> +	case SPEED_100:
-> +	case SPEED_10:
-> +		if (duplex == DUPLEX_FULL)
->  			val = VSC73XX_MAC_CFG_100_10M_F_PHY;
-> -			dev_dbg(vsc->dev,
-> -				"port %d: 10 Mbit full duplex mode\n",
-> -				port);
-> -		} else {
-> +		else
->  			val = VSC73XX_MAC_CFG_100_10M_H_PHY;
-> -			dev_dbg(vsc->dev,
-> -				"port %d: 10 Mbit half duplex mode\n",
-> -				port);
-> -		}
-> -		vsc73xx_adjust_enable_port(vsc, port, phydev, val);
-> -	} else {
-> -		dev_err(vsc->dev,
-> -			"could not adjust link: unknown speed\n");
-> +		break;
->  	}
-
-Do the dev_dbg() add anything useful over what phylink prints when the
-link comes up?
-
-I don't think moving to a switch() statement for this is a good idea.
-Given that "val" may be uninitialised, I suspect the following may be
-a better solution:
-
-	if (speed == SPEED_1000 || speed == SPEED_100 || speed == SPEED_10) {
-		if (speed == SPEED_1000) {
-			...
-		} else {
-			...
-		}
-
-		... set VSC73XX_BLOCK_ANALYZER and call
-		vsc73xx_adjust_enable_port ...
-	}
-
-However, looking at the definitions of the various macros, it seems we
-can do a little better by not using the VSC73XX_MAC_CFG_*M_[FH]_*
-definitions:
-
-		if (speed == SPEED_1000) {
-			val = VSC73XX_MAC_CFG_GIGA_MODE |
-			      VSC73XX_MAC_CFG_TX_IPG_1000M;
-
-			if (interface == PHY_INTERFACE_MODE_RGMII)
-				val |= VSC73XX_MAC_CFG_CLK_SEL_1000M;
-			else
-				val |= VSC73XX_MAC_CFG_CLK_SEL_EXT;
-		} else {
-			val = VSC73XX_MAC_CFG_TX_IPG_100_10M |
-			      VSC73XX_MAC_CFG_CLK_SEL_EXT;
-		}
-
-		if (duplex == DUPLEX_FULL)
-			val |= VSC73XX_MAC_CFG_FDX;
-
-Now, this reveals a question: when operating in RGMII mode, why do we
-need VSC73XX_MAC_CFG_CLK_SEL_1000M for 1G, and
-VSC73XX_MAC_CFG_CLK_SEL_EXT for 10M and 100M, whereas "PHY" mode always
-uses CLK_SEL_EXT ?
-
-Thanks.
+ arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 109 ++++++++++++++++++++++
+ arch/arm64/boot/dts/qcom/sa8775p.dtsi     |  42 +++++++++
+ 2 files changed, 151 insertions(+)
 
 -- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+2.39.2
+
 
