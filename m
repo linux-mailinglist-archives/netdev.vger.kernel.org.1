@@ -1,118 +1,120 @@
-Return-Path: <netdev+bounces-13147-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13148-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C1CC73A7BC
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:52:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E58F473A7CB
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:55:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF8BF281A1E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:52:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C263C1C21156
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:55:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32D53200D0;
-	Thu, 22 Jun 2023 17:52:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE810200DF;
+	Thu, 22 Jun 2023 17:55:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 20E62200A8
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 17:52:20 +0000 (UTC)
-X-Greylist: delayed 109523 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Jun 2023 10:52:14 PDT
-Received: from smtpng1.i.mail.ru (smtpng1.i.mail.ru [94.100.181.251])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFD2B210E;
-	Thu, 22 Jun 2023 10:52:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=inbox.ru; s=mail4;
-	h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=zXjoDRbVXMU6vb06CWzK6yq3hVHeHFiXaIRJZFK7fbU=;
-	t=1687456334;x=1687546334; 
-	b=A3bRCrGZSyaU7yTanXj5jsWR+IfCFg8tLOheLqAz273Y3RzSEfFAywU19wI42cyovTy2EICll3tpwthFw5K2uJZ6NLyXMSZwQxBIgto4QZT+smueWfRnCJlS02OA46lJW239p0RLvPV7PEvTM3Ghx/rBmjobosWwXcTjukLUCL70U2t5vPq9u4UEGjuQ7chsK7jhM5aRwKgqeJ7n1LXFr2c0u5glXbOz9ZhzBNrW8eY1iz7TngehpYaHWNX3seW2svu/VEI/J0y0d9/C2ca/nCYdj5ovfZ5L3iaiz2oePwlgE5VtPDoe9RSqVd/7kpEk+uIz48w415sBLpTHaxDikg==;
-Received: by smtpng1.m.smailru.net with esmtpa (envelope-from <fido_max@inbox.ru>)
-	id 1qCOTa-0007nX-6I; Thu, 22 Jun 2023 20:52:10 +0300
-From: Maxim Kochetkov <fido_max@inbox.ru>
-To: netdev@vger.kernel.org
-Cc: Maxim Kochetkov <fido_max@inbox.ru>,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Michal Simek <michal.simek@amd.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Robert Hancock <robert.hancock@calian.com>,
-	linux-arm-kernel@lists.infradead.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 1/1] net: axienet: Move reset before DMA detection
-Date: Thu, 22 Jun 2023 20:52:00 +0300
-Message-Id: <20230622175200.74033-1-fido_max@inbox.ru>
-X-Mailer: git-send-email 2.40.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B04AD200D8
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 17:55:29 +0000 (UTC)
+Received: from mail-pj1-x102d.google.com (mail-pj1-x102d.google.com [IPv6:2607:f8b0:4864:20::102d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6A41FF1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:55:26 -0700 (PDT)
+Received: by mail-pj1-x102d.google.com with SMTP id 98e67ed59e1d1-25eb3db3004so3614398a91.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687456526; x=1690048526;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Jp48nVtGyA7Br8JQvoHipeg5lrmuPTRf+zZ/Ox3/D1Q=;
+        b=hyuLl0aOwBk06RO/KCeKwpeASbRRuwk+J8d/SapksEOFoivhOssFweFwx6v6if4gAx
+         WhgI3RAANIA6zZeriPODW8jQW2VK98pVKgEkawYkKJ2AUUekakUtz04V24oGGLO02Bdx
+         Uw89ZbLnXPXdQtwTeEPYX782hHML9gnLfQBOBGEpeFIe4hZ/4VNvGLyFxxSej2C168VP
+         4EsLh23xpe5+fGM8xZPfiMVNbKlsFpggYZW45VDlm9q2p9wmSZvDrIDdfdwMj1SCnvD5
+         ZPtwNdEgTv/dBAJeyTWijby0if7eyivywp/XrheMYBkZPtWRur/mkSPyus8xQf6ZcPF9
+         hkbg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687456526; x=1690048526;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Jp48nVtGyA7Br8JQvoHipeg5lrmuPTRf+zZ/Ox3/D1Q=;
+        b=CZH/5uCPNGYtBkZPvTVrjodpQqbyyceEhI2ad+tLoYNtCpF7DJTjU3i2DQnNMkmpBZ
+         TAg8fmfcYGzuaTLwP44DjToG7AhJpe+f2mk4OeXCjE8d+OqQplI2xFjtplLdZRAeab9F
+         xshQw+aoruHMQtLj0J4IBxNa/x8FG7k3ZUQlSWQdwDb/0xt4fjxMNLP6p+UZQclGQbSl
+         hwsd17IemOnQtJCElE28Mih9Notf5NlL6U7SNwmmp4w8u+Y6hJaAymLxJz1zFfg9oRKC
+         alxQYz8kUoSmS6gmUdFRJOR1RIxLiNd2S8YkTuNeECYBDJ1NDe0iwF3Cz67O/SB5VZfQ
+         5sPA==
+X-Gm-Message-State: AC+VfDw7BgGRZJ8zy2lUHyCGsPavoEtKLTJVHjsNLBUgvSmQY+GPjRmL
+	aqV8FxYahBc2gn2KsqN65/4z11MhjpJnqDZGsldvXA==
+X-Google-Smtp-Source: ACHHUZ7FtQbcRUc8WTLtjIXwmhf0dP4E0sMApQm7RE+yKIgq4QNlnxIanJNTRDZhTsnXNaRQmz1bVKfp83v4/d6NFV4=
+X-Received: by 2002:a17:90b:3141:b0:259:548b:d394 with SMTP id
+ ip1-20020a17090b314100b00259548bd394mr13787062pjb.28.1687456525795; Thu, 22
+ Jun 2023 10:55:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Authentication-Results: smtpng1.m.smailru.net; auth=pass smtp.auth=fido_max@inbox.ru smtp.mailfrom=fido_max@inbox.ru
-X-Mailru-Src: smtp
-X-7564579A: B8F34718100C35BD
-X-77F55803: 4F1203BC0FB41BD95D99986233CC4DDC426F77D841B18B42694044EA105F6AAD182A05F5380850400B44E5DFD61226C9C164A172F770E7E1DA5BCD2A2C70F13C704E025EC0715AAF
-X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7BB17EE3498E810FEEA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F7900637AAEFEF2B38A4D0058638F802B75D45FF36EB9D2243A4F8B5A6FCA7DBDB1FC311F39EFFDF887939037866D6147AF826D8D42730F99B4A620FC0CB81695E71B88E6F9789CCF6C18C3F8528715B7D10C86878DA827A17800CE71AE4D56B06699BBC9FA2833FD35BB23D9E625A9149C048EE1E561CDFBCA1751FF04B652EEC242312D2E47CDBA5A96583BD4B6F7A4D31EC0BC014FD901B82EE079FA2833FD35BB23D27C277FBC8AE2E8B3238885582065B7B389733CBF5DBD5E9B5C8C57E37DE458B9E9CE733340B9D5F3BBE47FD9DD3FB595F5C1EE8F4F765FC72CEEB2601E22B093A03B725D353964B0B7D0EA88DDEDAC722CA9DD8327EE4930A3850AC1BE2E735D2D576BCF940C736C4224003CC83647689D4C264860C145E
-X-C1DE0DAB: 0D63561A33F958A5AD745CCC44C3CF219B89CBA18E19EEEC570D8D2E4A392975F87CCE6106E1FC07E67D4AC08A07B9B062B3BD3CC35DA5889C5DF10A05D560A950611B66E3DA6D700B0A020F03D25A0997E3FB2386030E77
-X-C8649E89: 1C3962B70DF3F0ADE00A9FD3E00BEEDF77DD89D51EBB7742D3581295AF09D3DF87807E0823442EA2ED31085941D9CD0AF7F820E7B07EA4CFC1113EE3D37281C80ABCF84072D8F5A13505A1F3356E4527FD752AB42C1274D4F85183ADB301C8A8B05B57073EAFDF970A0C62A06E3D37BB78FE44A23B5A427121BEC6C0C71ED4F84C41F94D744909CEE921556F0E976A29E6EC0772259F8F8F8815B87D7EC76CB9
-X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojB41c+mu8Ac+/kSHgJhDwrg==
-X-Mailru-Sender: 689FA8AB762F73930F533AC2B33E986B862EE9EDEFF493C6A39EF55076659A0A98CC072019C18A892CA7F8C7C9492E1F2F5E575105D0B01ADBE2EF17B331888EEAB4BC95F72C04283CDA0F3B3F5B9367
-X-Mras: Ok
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+References: <20230621170244.1283336-1-sdf@google.com> <20230621170244.1283336-6-sdf@google.com>
+ <00c76c9d-cce8-f3a7-2eda-1c4cc6f36d93@brouer.com>
+In-Reply-To: <00c76c9d-cce8-f3a7-2eda-1c4cc6f36d93@brouer.com>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Thu, 22 Jun 2023 10:55:14 -0700
+Message-ID: <CAKH8qBthYBKdxGs8idSXwM6VRpv4-sQH+j9N_QD9eXDmrAnmEA@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 05/11] bpf: Implement devtx timestamp kfunc
+To: "Jesper D. Brouer" <netdev@brouer.com>
+Cc: bpf@vger.kernel.org, brouer@redhat.com, ast@kernel.org, 
+	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, 
+	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org, 
+	haoluo@google.com, jolsa@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-DMA detection will fail if axinet was started before (by boot loader,
-boot ROM, etc). In this state axinet will not start properly.
-XAXIDMA_TX_CDESC_OFFSET + 4 register (MM2S_CURDESC_MSB) is used to detect
-64 DMA capability here. But datasheet says: When DMACR.RS is 1
-(axinet is in enabled state), CURDESC_PTR becomes Read Only (RO) and
-is used to fetch the first descriptor. So iowrite32()/ioread32() trick
-to this register to detect DMA will not work.
-So move axinet reset before DMA detection.
+On Thu, Jun 22, 2023 at 5:07=E2=80=AFAM Jesper D. Brouer <netdev@brouer.com=
+> wrote:
+>
+>
+>
+> On 21/06/2023 19.02, Stanislav Fomichev wrote:
+> > Two kfuncs, one per hook point:
+> >
+> > 1. at submit time - bpf_devtx_sb_request_timestamp - to request HW
+> >     to put TX timestamp into TX completion descriptors
+> >
+> > 2. at completion time - bpf_devtx_cp_timestamp - to read out
+> >     TX timestamp
+> >
+> [...]
+> >
+> > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > index 08fbd4622ccf..2fdb0731eb67 100644
+> > --- a/include/linux/netdevice.h
+> > +++ b/include/linux/netdevice.h
+> [...]
+> >   struct xdp_metadata_ops {
+> >       int     (*xmo_rx_timestamp)(const struct xdp_md *ctx, u64 *timest=
+amp);
+> >       int     (*xmo_rx_hash)(const struct xdp_md *ctx, u32 *hash,
+> >                              enum xdp_rss_hash_type *rss_type);
+> > +     int     (*xmo_sb_request_timestamp)(const struct devtx_frame *ctx=
+);
+> > +     int     (*xmo_cp_timestamp)(const struct devtx_frame *ctx, u64 *t=
+imestamp);
+> >   };
+>
+> The "sb" and "cp" abbreviations, what do they stand for?
 
-Fixes: 04cc2da39698 ("net: axienet: reset core on initialization prior to MDIO access")
-Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
----
- drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-index 3e310b55bce2..734822321e0a 100644
---- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-@@ -2042,6 +2042,11 @@ static int axienet_probe(struct platform_device *pdev)
- 		goto cleanup_clk;
- 	}
- 
-+	/* Reset core now that clocks are enabled, prior to accessing MDIO */
-+	ret = __axienet_device_reset(lp);
-+	if (ret)
-+		goto cleanup_clk;
-+
- 	/* Autodetect the need for 64-bit DMA pointers.
- 	 * When the IP is configured for a bus width bigger than 32 bits,
- 	 * writing the MSB registers is mandatory, even if they are all 0.
-@@ -2096,11 +2101,6 @@ static int axienet_probe(struct platform_device *pdev)
- 	lp->coalesce_count_tx = XAXIDMA_DFT_TX_THRESHOLD;
- 	lp->coalesce_usec_tx = XAXIDMA_DFT_TX_USEC;
- 
--	/* Reset core now that clocks are enabled, prior to accessing MDIO */
--	ret = __axienet_device_reset(lp);
--	if (ret)
--		goto cleanup_clk;
--
- 	ret = axienet_mdio_setup(lp);
- 	if (ret)
- 		dev_warn(&pdev->dev,
--- 
-2.40.1
-
+SuBmit and ComPlete. Should I spell them out? Or any other suitable
+abbreviation?
 
