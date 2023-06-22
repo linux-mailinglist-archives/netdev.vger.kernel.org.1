@@ -1,129 +1,194 @@
-Return-Path: <netdev+bounces-13063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C79DD73A122
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:45:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7ECBA73A12E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A96F2819F0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:45:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B2918281AA1
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:48:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8271F1E536;
-	Thu, 22 Jun 2023 12:45:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 172841EA72;
+	Thu, 22 Jun 2023 12:48:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72D901E527
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:45:31 +0000 (UTC)
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28A119AF
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:45:29 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-471b1ba1a7dso1891521e0c.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:45:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687437929; x=1690029929;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0IAa9QbAg6mMlY1K9iZzo0KBKDVgETeE7PvH1uKY77A=;
-        b=ncXLWJal2QgP96Sk787g47rL08o41YhaHQkUsKss+1kCC6ddUpEN3L55GGmCxBJq7F
-         jhLgPPCkkFrxAovoz0yCGZOurSHBbjZJH7RTzW+o4/SBHJeLrmyEgvRhOG9c7vjH+l1f
-         tIh2gE6ytKG8pXPhioIiUFU/Lkjy5DkK5Ql9cI5UUQry8f/0GwgCxeJXcG+HIFEJIayN
-         pz139igKWI9WVrCMytz7bSK8HDx7gV5r0ezX23fP4R99kw9787UalhuapCb+AsqCn5mi
-         WVQ8HPq8DJx0GHz5crnpzn51ahg5tzD/M6mR3ElNs3vw9LF8DwH8fy6plHGKinBHQH9V
-         yanw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687437929; x=1690029929;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0IAa9QbAg6mMlY1K9iZzo0KBKDVgETeE7PvH1uKY77A=;
-        b=K5Hy8DMlIc4v5Uls5/icxQy1YxifAZblULZNpDtS9giFfdoucKuJiqIU6Ve/W/zVZM
-         yjODc9FJ+/21SKyArDFzBvxbixp/EQzuZtbdz/NfYughq9H2YrkXdxTU6wZBM7gncIb7
-         6peyRgdzDyPDRzqInLQTyR5kL/a/RRGnD4lwhLiv9+C46DcqIWdt9zc87EYocvfpAlpJ
-         qeZunZbznqQSvk/277C6qYY/RZGkIH5OFJw8KYgOEUSYb1G2cVgzA7MOvjB/imjBatqL
-         9atCMxB/aNBoxJq8Kvx2a96rhFoTKubE2rdqHNDbrPZH9zI3dLuLWmDoxHElsdZqR/hE
-         M74g==
-X-Gm-Message-State: AC+VfDyOvuhFNbOLfoyOghworKlH7yex/0kI9okmiZYvS7YKq69V/1ZV
-	4LuXHv2yfhjwiVBxqPrfbjMqUKNg/bQXRBLXIilZJQ==
-X-Google-Smtp-Source: ACHHUZ5/jzxo/ijO8rlAjptGql3tzGDgmPaiskSoOAANtplM754UorQOZnV5cX2QhyZ4FbjKszM2FRZhAFgxM5gtNns=
-X-Received: by 2002:a1f:d103:0:b0:471:5cb5:11f8 with SMTP id
- i3-20020a1fd103000000b004715cb511f8mr7797350vkg.15.1687437928832; Thu, 22 Jun
- 2023 05:45:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04A9D1E532
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:48:16 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E54B5193;
+	Thu, 22 Jun 2023 05:48:14 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35MCCCVs028146;
+	Thu, 22 Jun 2023 12:47:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=ZnXKwDJCmpNLo0BVLBFTTmnOcdUdxoUTDz2INcncd5s=;
+ b=Em6+nFh6MIADfcFTsYAwUj4mpD0xvsl0kNY28ypt8NaenRkq6OTTVMvUPipBBiOuLY9A
+ UepsZsQCnvzXvFmrXOAyoB354SEMfaaDs+bfOczJhFAkM6u9UW8ey61htjq51RKln7pe
+ YFINu+0e7CkcfQEC0k7KS0WawK4669dVyIyDwsuoIopGDW2F6Fln+nEYs5u4LGpbhV4c
+ MDbTRnVoBOSgPglVkrxvx8JbgdLfGiafA56Pep+knwqYub6SFQjg1mpjKtHYY4sx1Eo2
+ GHQ4cnCr1neHEP0pWlfDIFQFgGSRAdyeKK8S/ZblZnpgYhGwyq+JIepnUwc2j16YRhbN ug== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcp3k151v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 12:47:29 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35MCCF4p028899;
+	Thu, 22 Jun 2023 12:47:28 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcp3k150m-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 12:47:28 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+	by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35M3Pbbp023319;
+	Thu, 22 Jun 2023 12:47:25 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3r94f53f9w-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 12:47:25 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35MClKer17302058
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 Jun 2023 12:47:20 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id CD5A620040;
+	Thu, 22 Jun 2023 12:47:20 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 7E07020043;
+	Thu, 22 Jun 2023 12:47:18 +0000 (GMT)
+Received: from [9.171.1.190] (unknown [9.171.1.190])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 22 Jun 2023 12:47:18 +0000 (GMT)
+Message-ID: <2bd0da80754331e00f66c724138d9bbf157e1565.camel@linux.ibm.com>
+Subject: Re: [PATCH v10 5/6] iommu/dma: Allow a single FQ in addition to
+ per-CPU FQs
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Joerg Roedel <joro@8bytes.org>, Matthew Rosato <mjrosato@linux.ibm.com>,
+        Will Deacon <will@kernel.org>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        Robin
+ Murphy <robin.murphy@arm.com>, Jason Gunthorpe <jgg@ziepe.ca>
+Cc: Gerd Bayer <gbayer@linux.ibm.com>, Julian Ruess <julianr@linux.ibm.com>,
+        Pierre Morel <pmorel@linux.ibm.com>,
+        Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik
+ <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian
+ Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle
+ <svens@linux.ibm.com>,
+        Suravee Suthikulpanit
+ <suravee.suthikulpanit@amd.com>,
+        Hector Martin <marcan@marcan.st>, Sven
+ Peter <sven@svenpeter.dev>,
+        Alyssa Rosenzweig <alyssa@rosenzweig.io>,
+        David
+ Woodhouse <dwmw2@infradead.org>,
+        Lu Baolu <baolu.lu@linux.intel.com>, Andy
+ Gross <agross@kernel.org>,
+        Bjorn Andersson <andersson@kernel.org>,
+        Konrad
+ Dybcio <konrad.dybcio@linaro.org>,
+        Yong Wu <yong.wu@mediatek.com>,
+        Matthias
+ Brugger <matthias.bgg@gmail.com>,
+        AngeloGioacchino Del Regno
+ <angelogioacchino.delregno@collabora.com>,
+        Gerald Schaefer
+ <gerald.schaefer@linux.ibm.com>,
+        Orson Zhai <orsonzhai@gmail.com>,
+        Baolin
+ Wang <baolin.wang@linux.alibaba.com>,
+        Chunyan Zhang <zhang.lyra@gmail.com>, Chen-Yu Tsai <wens@csie.org>,
+        Jernej Skrabec <jernej.skrabec@gmail.com>,
+        Samuel Holland <samuel@sholland.org>,
+        Thierry Reding
+ <thierry.reding@gmail.com>,
+        Krishna Reddy <vdumpa@nvidia.com>,
+        Jonathan
+ Hunter <jonathanh@nvidia.com>,
+        Jonathan Corbet <corbet@lwn.net>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+        iommu@lists.linux.dev, asahi@lists.linux.dev,
+        linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+        linux-mediatek@lists.infradead.org, linux-sunxi@lists.linux.dev,
+        linux-tegra@vger.kernel.org, linux-doc@vger.kernel.org
+Date: Thu, 22 Jun 2023 14:47:18 +0200
+In-Reply-To: <20230310-dma_iommu-v10-5-f1fbd8310854@linux.ibm.com>
+References: <20230310-dma_iommu-v10-0-f1fbd8310854@linux.ibm.com>
+	 <20230310-dma_iommu-v10-5-f1fbd8310854@linux.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: -L5DK6LIKNXBkDMbv58a_9My2c2n4j5V
+X-Proofpoint-ORIG-GUID: Kvl6x-pcaGo5ydQSLF0ieEdnFokEMGpS
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621153650.440350-9-brgl@bgdev.pl> <202306221025.K6fKRmj7-lkp@intel.com>
-In-Reply-To: <202306221025.K6fKRmj7-lkp@intel.com>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 22 Jun 2023 14:45:17 +0200
-Message-ID: <CAMRc=MeWBh-uWDJTLwg5uzE=-Q2jTnSg4Gw9ogh-9N+WUntSwg@mail.gmail.com>
-Subject: Re: [PATCH net-next 08/11] net: stmmac: platform: provide devm_stmmac_probe_config_dt()
-To: kernel test robot <lkp@intel.com>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Junxiao Chang <junxiao.chang@intel.com>, 
-	Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, 
-	oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-22_08,2023-06-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 impostorscore=0 adultscore=0
+ mlxscore=0 clxscore=1011 spamscore=0 lowpriorityscore=0 malwarescore=0
+ priorityscore=1501 phishscore=0 suspectscore=0 mlxlogscore=897 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306220105
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 4:49=E2=80=AFAM kernel test robot <lkp@intel.com> w=
-rote:
->
-> Hi Bartosz,
->
-> kernel test robot noticed the following build errors:
->
-> [auto build test ERROR on net-next/main]
->
-> url:    https://github.com/intel-lab-lkp/linux/commits/Bartosz-Golaszewsk=
-i/net-stmmac-platform-provide-stmmac_pltfr_init/20230621-234133
-> base:   net-next/main
-> patch link:    https://lore.kernel.org/r/20230621153650.440350-9-brgl%40b=
-gdev.pl
-> patch subject: [PATCH net-next 08/11] net: stmmac: platform: provide devm=
-_stmmac_probe_config_dt()
-> config: x86_64-kexec (https://download.01.org/0day-ci/archive/20230622/20=
-2306221025.K6fKRmj7-lkp@intel.com/config)
-> compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-> reproduce: (https://download.01.org/0day-ci/archive/20230622/202306221025=
-.K6fKRmj7-lkp@intel.com/reproduce)
->
-> If you fix the issue in a separate patch/commit (i.e. not just a new vers=
-ion of
-> the same patch/commit), kindly add following tags
-> | Reported-by: kernel test robot <lkp@intel.com>
-> | Closes: https://lore.kernel.org/oe-kbuild-all/202306221025.K6fKRmj7-lkp=
-@intel.com/
->
-> All errors (new ones prefixed by >>):
->
->    ld: vmlinux.o: in function `__ksymtab_devm_stmmac_probe_config_dt':
-> >> stmmac_platform.c:(___ksymtab_gpl+devm_stmmac_probe_config_dt+0x0): un=
-defined reference to `devm_stmmac_probe_config_dt'
->
-> --
-> 0-DAY CI Kernel Test Service
-> https://github.com/intel/lkp-tests/wiki
+On Wed, 2023-05-24 at 16:53 +0200, Niklas Schnelle wrote:
+> In some virtualized environments, including s390 paged memory guests,
+> IOTLB flushes are used to update IOMMU shadow tables. Due to this, they
+> are much more expensive than in typical bare metal environments or
+> non-paged s390 guests. In addition they may parallelize poorly in
+> virtualized environments. This changes the trade off for flushing IOVAs
+> such that minimizing the number of IOTLB flushes trumps any benefit of
+> cheaper queuing operations or increased paralellism.
+>=20
+> In this scenario per-CPU flush queues pose several problems. Firstly
+> per-CPU memory is often quite limited prohibiting larger queues.
+> Secondly collecting IOVAs per-CPU but flushing via a global timeout
+> reduces the number of IOVAs flushed for each timeout especially on s390
+> where PCI interrupts may not be bound to a specific CPU.
+>=20
+> Let's introduce a single flush queue mode that reuses the same queue
+> logic but only allocates a single global queue. This mode is selected by
+> dma-iommu if a newly introduced .shadow_on_flush flag is set in struct
+> dev_iommu. As a first user the s390 IOMMU driver sets this flag during
+> probe_device. With the unchanged small FQ size and timeouts this setting
+> is worse than per-CPU queues but a follow up patch will make the FQ size
+> and timeout variable. Together this allows the common IOVA flushing code
+> to more closely resemble the global flush behavior used on s390's
+> previous internal DMA API implementation.
+>=20
+> Link: https://lore.kernel.org/linux-iommu/3e402947-61f9-b7e8-1414-fde0062=
+57b6f@arm.com/
+> Reviewed-by: Matthew Rosato <mjrosato@linux.ibm.com> #s390
+> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> ---
 
-I added the missing stub for !CONFIG_OF to v2.
+Gentle ping. As stated in the cover letter this version aimed to
+resolve the only outstanding feedback of removing the .tune_dma_iommu()
+op in favor of a .shadow_on_flush flag in struct dev_iommu. This then
+let's the dma-iommu choose a single queue and larger timeouts and IOVA
+counts. This leaves the dma-iommu  with full responsibility for the
+settings.
 
-Bart
+Thanks,
+Niklas
 
