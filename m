@@ -1,204 +1,127 @@
-Return-Path: <netdev+bounces-13041-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13042-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEDCC73A077
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:03:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A52773A07A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ED9551C209F5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:03:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAC6D1C2112D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:04:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2A5F1EA7D;
-	Thu, 22 Jun 2023 12:02:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E1E11EA94;
+	Thu, 22 Jun 2023 12:02:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E69B01EA7C
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:25 +0000 (UTC)
-Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87970210A
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:05 -0700 (PDT)
-Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3f90a1aa204so67140815e9.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 531001E509
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:29 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D2B3C212F
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:10 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fa71db41b6so6262155e9.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687435316; x=1690027316;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ehfVzvQExF8A0HC8WC/ILIhv/WTmHbal1y8W4TeN1es=;
-        b=ZpJlE94aIfdZ9blu2+e25WvPl8E39qqcqv4OIVo9dcwtr02ZZPnabvhB6ySYT1BSvw
-         ETcVMk0WKIXLkk2VIzg4qbrJ5ibZ0fZa367vc1GgCC2cP/rWtmaNWjRI5u+bLebeKm6D
-         jEj1SShT6AdDF4NUSmVUOv8yXLBUk4AiuBnwehuZn0aNh4sEveOJv7IcHdjNEoQnj4Zl
-         q4D7hHxRwyfBpFCZWPtjeGYQDUxbQq92/eFlHwXdCD0Ib7HWc1iU6sjyf7/8Q5/1OGgl
-         BjR9e4xabZljgBBLYoAQ2L3IRq/cLZhktBx91P1TxVnJJIeatGpjdV6rCC/gGya1WxWk
-         QGIw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687435316; x=1690027316;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=gmail.com; s=20221208; t=1687435329; x=1690027329;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=ehfVzvQExF8A0HC8WC/ILIhv/WTmHbal1y8W4TeN1es=;
-        b=FdHsmsFebm9KVDjbCzDlhj8maQM4a4f5Qs3AwQVQ85j5cJzazIyeMR7XmGKCbCmBWF
-         71XUnWwx51DXErzaqDhVPdGwPTjcemDPoA51LL45ET9skPZAZ4XJCTTXqIuBMe4Ps7S2
-         QcmLXuz4eoFxB5OIa5b+tj5s7hTwI4OngwxVTCV45nixXYIbiZsYAdph2HxH19pk5q+G
-         fCE5Iq4ZvjKgRIEPnuNptfnGp1Frgr5NUIlyfP94l76UwKftyKSh+afRCZuqWfYK7a9c
-         8osnHBs4fBxPEl08hU+M4lf9OugGcm6d3tKmHkwOxl4IBlSHChX6givRPL1fAPiekzd6
-         k/rQ==
-X-Gm-Message-State: AC+VfDxknXjKzWi81w4zXD6pENAaxc7qiJEDRAQfPWFtgOnwiwL3rhZH
-	gvsA61q+jbVx0cfqCksOsfRoXw==
-X-Google-Smtp-Source: ACHHUZ7FpEJIjzvQwxNwPUBwmllXRykV33/rRLw9bzvXYHni/kpzPOKVm3FCkT6F91vdGlY1pyzwxg==
-X-Received: by 2002:a05:600c:2206:b0:3f9:515:ccfb with SMTP id z6-20020a05600c220600b003f90515ccfbmr16742469wml.12.1687435316511;
-        Thu, 22 Jun 2023 05:01:56 -0700 (PDT)
-Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:d785:af3e:3bf5:7f36])
-        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm7594296wmo.6.2023.06.22.05.01.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 05:01:56 -0700 (PDT)
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-To: Andy Gross <agross@kernel.org>,
-	Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>
-Cc: linux-arm-msm@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [RESEND PATCH v2 5/5] arm64: dts: qcom: sa8775p-ride: enable ethernet0
-Date: Thu, 22 Jun 2023 14:01:42 +0200
-Message-Id: <20230622120142.218055-6-brgl@bgdev.pl>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230622120142.218055-1-brgl@bgdev.pl>
-References: <20230622120142.218055-1-brgl@bgdev.pl>
+        bh=RSYUGLJ7equSoB6ZSZMDNfWldfc/oPEVeTrLP83740o=;
+        b=kK1RWocwHe/X3yonqu8ZW2MXlcxFXY71vaaEn6I2JUfQvgqSCXkVM1351+MA5qLAKb
+         l29M8SAT9HlkvbuqWAKoTUkFtsOXKZ3HGiLprcMB7kdrDi98zC9OfTTYeG4Tprl3/A9g
+         KNUjEoQ8/HMK+5a5CR6LZl8oIo3cRzABdGyJgFR5moFHWiho8CvSVRspkLxquPI1D07X
+         oVtyv68W5I0+nI8uNsaGrdOStRhv59Nx/yt87KSfrnRM4a2ZWD8VHOzkH9hbJLJuENpT
+         fh4Q1xj5FhmKnA4C/Y7GmYiOlzf+7tuU0uGAZy+JQkH1N0kqClZCb89OI0eMyLhqtn3w
+         uj6g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687435329; x=1690027329;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RSYUGLJ7equSoB6ZSZMDNfWldfc/oPEVeTrLP83740o=;
+        b=EcgyzpyFrY/MhaIZZ0LwgKvZSIOdQejzibTqHWf7jl1xFnHHsU+ciACYe+sLFs+mC+
+         M9xKLuHF+d+w2zEFnAz11tzmEpfv+RW0jgScgAnZrIpQF6WWdBtcMwq34OF61eGWMZMC
+         SbpVbftQAZOJ5ruIlJqJSqOUUeEnY71B86IJA7vxItqbsUuPEyEXH/BwScu5VUL8/IrW
+         Fb+CLuyGgS+yIoOevPsNIImZl7nfF0HLBG52pFx6QF1gFl0lEIiWwAwsckPeOSiIFSae
+         GoW3GGEX+eNW0idIqp3gTxAO8tn4XhaLakhpo2lLdHuTf9zpD1my+QTfjo5TtUdNwqvI
+         IxrQ==
+X-Gm-Message-State: AC+VfDwJ7V5FkhI0kMP1K76oh8eXG/5pgEczTV1mRkjayyOgBYgl2Fp4
+	xaElr7+Dd788BVH4vsnim+I=
+X-Google-Smtp-Source: ACHHUZ6j2y3zi04dbGWKoEOYQSW9PUbTt+u+CfePjM8QeujJyl/zp9NATpVrcHWE05fHhnd4CFZtLg==
+X-Received: by 2002:a5d:5259:0:b0:309:303b:3dc5 with SMTP id k25-20020a5d5259000000b00309303b3dc5mr12362279wrc.7.1687435328651;
+        Thu, 22 Jun 2023 05:02:08 -0700 (PDT)
+Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
+        by smtp.gmail.com with ESMTPSA id z17-20020a5d6551000000b00307bc4e39e5sm6833865wrv.117.2023.06.22.05.02.07
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jun 2023 05:02:08 -0700 (PDT)
+Subject: Re: [PATCH net-next 1/3] sfc: use padding to fix alignment in
+ loopback test
+To: Arnd Bergmann <arnd@arndb.de>, edward.cree@amd.com,
+ linux-net-drivers@amd.com, "David S . Miller" <davem@davemloft.net>,
+ Jakub Kicinski <kuba@kernel.org>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Netdev <netdev@vger.kernel.org>, Martin Habets <habetsm.xilinx@gmail.com>
+References: <cover.1687427930.git.ecree.xilinx@gmail.com>
+ <441f4c197394bdeddb47aefa0bc854ee1960df27.1687427930.git.ecree.xilinx@gmail.com>
+ <c16273f9-f6e9-492d-a902-64604f3e40c2@app.fastmail.com>
+From: Edward Cree <ecree.xilinx@gmail.com>
+Message-ID: <342903aa-ceb5-4412-f5b9-93413d413079@gmail.com>
+Date: Thu, 22 Jun 2023 13:02:06 +0100
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
+ Thunderbird/78.14.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+In-Reply-To: <c16273f9-f6e9-492d-a902-64604f3e40c2@app.fastmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+On 22/06/2023 12:38, Arnd Bergmann wrote:
+> On Thu, Jun 22, 2023, at 12:18, edward.cree@amd.com wrote:
+>>  drivers/net/ethernet/sfc/selftest.c | 45 +++++++++++++++++------------
+>>  1 file changed, 27 insertions(+), 18 deletions(-)
+>>
+>> diff --git a/drivers/net/ethernet/sfc/selftest.c 
+>> b/drivers/net/ethernet/sfc/selftest.c
+>> index 3c5227afd497..74b42efe7267 100644
+>> --- a/drivers/net/ethernet/sfc/selftest.c
+>> +++ b/drivers/net/ethernet/sfc/selftest.c
+>> @@ -42,12 +42,16 @@
+>>   * Falcon only performs RSS on TCP/UDP packets.
+>>   */
+>>  struct efx_loopback_payload {
+>> +	char pad[2]; /* Ensures ip is 4-byte aligned */
+>>  	struct ethhdr header;
+>>  	struct iphdr ip;
+>>  	struct udphdr udp;
+>>  	__be16 iteration;
+>>  	char msg[64];
+>>  } __packed;
+> 
+> There should probably be an extra __aligned(4) after the __packed,
+> so that the compiler knows the start of the structure is aligned,
+> otherwise (depending on the architecture and compiler), any access
+> to a member can still turn into multiple single-byte accesses.
 
-Enable the first 1Gb ethernet port on sa8775p-ride development board.
+Ok, will add that in v2.
 
-Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
----
- arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 88 +++++++++++++++++++++++
- 1 file changed, 88 insertions(+)
+> I would also expect to still see a warning without that extra
+> attribute. Aside from this, the patch looks good to me.
+My compiler (gcc 8.3.1) doesn't reproduce the original warning, so
+ I'm flying slightly blind here :(  If you could build-test this on
+ your setup with/without the __aligned(4), I'd be very grateful.
 
-diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-index bf90f825ff67..b2aa16037707 100644
---- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-+++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-@@ -261,6 +261,94 @@ vreg_l8e: ldo8 {
- 	};
- };
- 
-+&ethernet0 {
-+	phy-mode = "sgmii";
-+	phy-handle = <&sgmii_phy>;
-+
-+	pinctrl-0 = <&ethernet0_default>;
-+	pinctrl-names = "default";
-+
-+	snps,mtl-rx-config = <&mtl_rx_setup>;
-+	snps,mtl-tx-config = <&mtl_tx_setup>;
-+	snps,ps-speed = <1000>;
-+
-+	status = "okay";
-+
-+	mdio {
-+		compatible = "snps,dwmac-mdio";
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+
-+		reset-gpios = <&pmm8654au_2_gpios 8 GPIO_ACTIVE_LOW>;
-+		reset-delay-us = <11000>;
-+		reset-post-delay-us = <70000>;
-+
-+		sgmii_phy: phy@8 {
-+			reg = <0x8>;
-+			device_type = "ethernet-phy";
-+		};
-+	};
-+
-+	mtl_rx_setup: rx-queues-config {
-+		snps,rx-queues-to-use = <4>;
-+		snps,rx-sched-sp;
-+
-+		queue0 {
-+			snps,dcb-algorithm;
-+			snps,map-to-dma-channel = <0x0>;
-+			snps,route-up;
-+			snps,priority = <0x1>;
-+		};
-+
-+		queue1 {
-+			snps,dcb-algorithm;
-+			snps,map-to-dma-channel = <0x1>;
-+			snps,route-ptp;
-+		};
-+
-+		queue2 {
-+			snps,avb-algorithm;
-+			snps,map-to-dma-channel = <0x2>;
-+			snps,route-avcp;
-+		};
-+
-+		queue3 {
-+			snps,avb-algorithm;
-+			snps,map-to-dma-channel = <0x3>;
-+			snps,priority = <0xc>;
-+		};
-+	};
-+
-+	mtl_tx_setup: tx-queues-config {
-+		snps,tx-queues-to-use = <4>;
-+		snps,tx-sched-sp;
-+
-+		queue0 {
-+			snps,dcb-algorithm;
-+		};
-+
-+		queue1 {
-+			snps,dcb-algorithm;
-+		};
-+
-+		queue2 {
-+			snps,avb-algorithm;
-+			snps,send_slope = <0x1000>;
-+			snps,idle_slope = <0x1000>;
-+			snps,high_credit = <0x3e800>;
-+			snps,low_credit = <0xffc18000>;
-+		};
-+
-+		queue3 {
-+			snps,avb-algorithm;
-+			snps,send_slope = <0x1000>;
-+			snps,idle_slope = <0x1000>;
-+			snps,high_credit = <0x3e800>;
-+			snps,low_credit = <0xffc18000>;
-+		};
-+	};
-+};
-+
- &i2c11 {
- 	clock-frequency = <400000>;
- 	pinctrl-0 = <&qup_i2c11_default>;
--- 
-2.39.2
-
+-ed
 
