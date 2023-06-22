@@ -1,201 +1,211 @@
-Return-Path: <netdev+bounces-13017-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13018-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39CC7739E0D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:10:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF813739E1F
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:14:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0EEF281907
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:10:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D3C81C21093
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:14:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ACCC8BFE;
-	Thu, 22 Jun 2023 10:10:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5FD115AE5;
+	Thu, 22 Jun 2023 10:14:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BFCA3AA8D
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:10:32 +0000 (UTC)
-Received: from mail-qt1-x834.google.com (mail-qt1-x834.google.com [IPv6:2607:f8b0:4864:20::834])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8AF67DE
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:10:31 -0700 (PDT)
-Received: by mail-qt1-x834.google.com with SMTP id d75a77b69052e-3fde9bfb3c8so104321cf.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:10:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687428630; x=1690020630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xkgsASzwNg72Z4flD/BJsv7lo2gLpLer9JEuetW15B8=;
-        b=nWjlx0BqGuGWM4YnKTiAEHHNKWnxzaW57koF1m/lDUc3iM5ilPMdwR5Hr8lECOFH9K
-         ja163HlBF6zc+5zHq9u2ToGCc9Rdimj5sh0OKaDlbOJnxDeRT0axNUQUQQIX1PcDlcVJ
-         ODw9sp1TDOVwJcxWw7InZA4QQtbBIbtlnrHIXbLWOVaSyzexkFMKGB3eMGzWZ4S7eCPM
-         1WWygFFxZY0hHpj6o73cHLErp1eOaN3G40uak9jUEzTNkwjkjOJtezcm7D5zbQlIl4/J
-         G3r97jHKVTCZo3/o1aojI39GmgaS1DXigO3oJsGfVi2MuMHjXdnlo34D0Ym0PK45nCp1
-         X6jg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687428630; x=1690020630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xkgsASzwNg72Z4flD/BJsv7lo2gLpLer9JEuetW15B8=;
-        b=jol15u4yUr9nx8WWUNMwp2/4UnkpUFku+u210R3FLSN3y50h/UBxQOW2vgh3DAV/TU
-         RN1mcs9/ucZMG4+K98A2J2ztl6Bd5vKG5lD7KErqLCHIW4kYRn/UYXYkBldIt7gVuDJz
-         mdLOD7wjCohBIw6I7giE4c5Dgb9yRVc5Ha/6D3ptcsOU4PdHpu2rJA3aMty+qeioD/r7
-         1lnC/aBwGlTrDQ8DknkIM/OZDp7fr90aUPl9QHe5rslICxBb3fIGMrZHDL5gWNe1cVN5
-         y7DhY+2icolEindc/kRoW7dLR/fmhT6jFy6jpSR/0VW0m45spl1KAilvfGkqbK6H8VyZ
-         0DxA==
-X-Gm-Message-State: AC+VfDyk7mlpRQtNor2RuUXzXnkwmerHzxO4KYljNaUnMCpogQYTXJxL
-	vBH0JArtitDD245RoPo+S6AV/JN2qo/lu2YsG2XzPg==
-X-Google-Smtp-Source: ACHHUZ6Q1QcBAYct77Mou1FTkmW7Ny6SP5E4ENYRGZuu77uLgIom4hh9ZTzjmE3i8oGrQ793EsKARYXdxva/xRZ1+uQ=
-X-Received: by 2002:a05:622a:85:b0:3f8:5b2:aeed with SMTP id
- o5-20020a05622a008500b003f805b2aeedmr1503046qtw.21.1687428630458; Thu, 22 Jun
- 2023 03:10:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A1D3AA8C;
+	Thu, 22 Jun 2023 10:14:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C2888C433C9;
+	Thu, 22 Jun 2023 10:14:31 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687428888;
+	bh=7+cabg86v1cYpPv8vDJOW5RfunjhlSEWXfJLwIkmtqs=;
+	h=Subject:From:To:Date:In-Reply-To:References:From;
+	b=bash4qEoN8ysoF4HTnLUBoIb4R/VvEf+WW/D9VIwZ7IkIbfsRZHAuo5DrHgU3mESQ
+	 YV3L6vJlJ5RLoTi5/71VkN5rQAydrP7yy38zcSGGfwasNdQxjqfQEDJO2KhRfaS72P
+	 L3pOkZCMNStmacczTh8Bxts4KstAt3iUVQoAzfNq5O0qEkTp/AQ/ZxnvFiOtuM8Rrh
+	 hGFigQvIDdzAyY8j4H2gTF58blmQ8XCJxFBrtJ8bp21DHjiO/HINP7f4QOOgCaaZnm
+	 wPOh/3PFD9MITyv48Pm3mcErp57QuFgfhsUJhmJROqlUtadgwIZDzlw31/avwVXFpE
+	 VwFt0TPP5toFA==
+Message-ID: <ad4bfb630128709588164db6f1fd2ef39c31d2a5.camel@kernel.org>
+Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
+From: Jeff Layton <jlayton@kernel.org>
+To: Damien Le Moal <dlemoal@kernel.org>, Jeremy Kerr <jk@ozlabs.org>, Arnd
+ Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>, Nicholas
+ Piggin <npiggin@gmail.com>,  Christophe Leroy
+ <christophe.leroy@csgroup.eu>, Heiko Carstens <hca@linux.ibm.com>, Vasily
+ Gorbik <gor@linux.ibm.com>,  Alexander Gordeev <agordeev@linux.ibm.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>, Sven Schnelle
+ <svens@linux.ibm.com>, Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+ Arve =?ISO-8859-1?Q?Hj=F8nnev=E5g?= <arve@android.com>, Todd Kjos
+ <tkjos@android.com>, Martijn Coenen <maco@android.com>, Joel Fernandes
+ <joel@joelfernandes.org>, Christian Brauner <brauner@kernel.org>, Carlos
+ Llamas <cmllamas@google.com>, Suren Baghdasaryan <surenb@google.com>,
+ Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>, Jason
+ Gunthorpe <jgg@ziepe.ca>,  Leon Romanovsky <leon@kernel.org>, Brad Warrum
+ <bwarrum@linux.ibm.com>, Ritu Agarwal <rituagar@linux.ibm.com>, Eric Van
+ Hensbergen <ericvh@kernel.org>, Latchesar Ionkov <lucho@ionkov.net>,
+ Dominique Martinet <asmadeus@codewreck.org>, Christian Schoenebeck
+ <linux_oss@crudebyte.com>, David Sterba <dsterba@suse.com>, David Howells
+ <dhowells@redhat.com>, Marc Dionne <marc.dionne@auristor.com>, Alexander
+ Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>, Luis de
+ Bethencourt <luisbg@kernel.org>, Salah Triki <salah.triki@gmail.com>,
+ "Tigran A. Aivazian" <aivazian.tigran@gmail.com>, Eric Biederman
+ <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>, Chris Mason
+ <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>, Xiubo Li
+ <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>, Jan Harkes
+ <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
+ Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>,  "Rafael
+ J. Wysocki" <rafael@kernel.org>, Tyler Hicks <code@tyhicks.com>, Ard
+ Biesheuvel <ardb@kernel.org>, Gao Xiang <xiang@kernel.org>, Chao Yu
+ <chao@kernel.org>,  Yue Hu <huyue2@coolpad.com>, Jeffle Xu
+ <jefflexu@linux.alibaba.com>, Namjae Jeon <linkinjeon@kernel.org>, Sungjong
+ Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>, Theodore Ts'o
+ <tytso@mit.edu>, Andreas Dilger <adilger.kernel@dilger.ca>, Jaegeuk Kim
+ <jaegeuk@kernel.org>, OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>, Miklos
+ Szeredi <miklos@szeredi.hu>, Bob Peterson <rpeterso@redhat.com>, Andreas
+ Gruenbacher <agruenba@redhat.com>, Richard Weinberger <richard@nod.at>,
+ Anton Ivanov <anton.ivanov@cambridgegreys.com>, Johannes Berg
+ <johannes@sipsolutions.net>, Mikulas Patocka
+ <mikulas@artax.karlin.mff.cuni.cz>,  Mike Kravetz
+ <mike.kravetz@oracle.com>, Muchun Song <muchun.song@linux.dev>, David
+ Woodhouse <dwmw2@infradead.org>, Dave Kleikamp <shaggy@kernel.org>, Tejun
+ Heo <tj@kernel.org>, Trond Myklebust <trond.myklebust@hammerspace.com>,
+ Anna Schumaker <anna@kernel.org>, Chuck Lever <chuck.lever@oracle.com>,
+ Ryusuke Konishi <konishi.ryusuke@gmail.com>, Anton Altaparmakov
+ <anton@tuxera.com>,  Konstantin Komarov
+ <almaz.alexandrovich@paragon-software.com>, Mark Fasheh <mark@fasheh.com>,
+ Joseph Qi <joseph.qi@linux.alibaba.com>, Bob Copeland <me@bobcopeland.com>,
+ Mike Marshall <hubcap@omnibond.com>, Martin Brandenburg
+ <martin@omnibond.com>, Luis Chamberlain <mcgrof@kernel.org>, Iurii Zaikin
+ <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,  "Guilherme G.
+ Piccoli" <gpiccoli@igalia.com>, Anders Larsen <al@alarsen.net>, Steve
+ French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>, Ronnie
+ Sahlberg <lsahlber@redhat.com>, Shyam Prasad N <sprasad@microsoft.com>, Tom
+ Talpey <tom@talpey.com>, Sergey Senozhatsky <senozhatsky@chromium.org>,
+ Phillip Lougher <phillip@squashfs.org.uk>, Steven Rostedt
+ <rostedt@goodmis.org>, Masami Hiramatsu <mhiramat@kernel.org>, Evgeniy
+ Dushistov <dushistov@mail.ru>, Hans de Goede <hdegoede@redhat.com>,
+ "Darrick J. Wong" <djwong@kernel.org>, Naohiro Aota <naohiro.aota@wdc.com>,
+ Johannes Thumshirn <jth@kernel.org>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
+ <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu
+ <song@kernel.org>, Yonghong Song <yhs@fb.com>, John Fastabend
+ <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, Stanislav
+ Fomichev <sdf@google.com>, Hao Luo <haoluo@google.com>, Jiri Olsa
+ <jolsa@kernel.org>,  Hugh Dickins <hughd@google.com>, Andrew Morton
+ <akpm@linux-foundation.org>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo
+ Abeni <pabeni@redhat.com>, John Johansen <john.johansen@canonical.com>,
+ Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>, "Serge
+ E. Hallyn" <serge@hallyn.com>, Stephen Smalley
+ <stephen.smalley.work@gmail.com>, Eric Paris <eparis@parisplace.org>, 
+ Juergen Gross <jgross@suse.com>, Ruihan Li <lrh2000@pku.edu.cn>, Laurent
+ Pinchart <laurent.pinchart+renesas@ideasonboard.com>, Wolfram Sang
+ <wsa+renesas@sang-engineering.com>, Udipto Goswami
+ <quic_ugoswami@quicinc.com>,  Linyu Yuan <quic_linyyuan@quicinc.com>, John
+ Keeping <john@keeping.me.uk>, Andrzej Pietrasiewicz
+ <andrzej.p@collabora.com>, Dan Carpenter <error27@gmail.com>, Yuta Hayama
+ <hayama@lineo.co.jp>, Jozef Martiniak <jomajm@gmail.com>, Jens Axboe
+ <axboe@kernel.dk>, Alan Stern <stern@rowland.harvard.edu>, Sandeep Dhavale
+ <dhavale@google.com>, Dave Chinner <dchinner@redhat.com>, Johannes Weiner
+ <hannes@cmpxchg.org>, ZhangPeng <zhangpeng362@huawei.com>, Viacheslav
+ Dubeyko <slava@dubeyko.com>, Tetsuo Handa
+ <penguin-kernel@I-love.SAKURA.ne.jp>,  Aditya Garg <gargaditya08@live.com>,
+ Erez Zadok <ezk@cs.stonybrook.edu>, Yifei Liu <yifeliu@cs.stonybrook.edu>,
+ Yu Zhe <yuzhe@nfschina.com>, "Matthew Wilcox (Oracle)"
+ <willy@infradead.org>, Oleg Kanatov <okanatov@gmail.com>, "Dr. David Alan
+ Gilbert" <linux@treblig.org>, Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin
+ <cgel.zte@gmail.com>, Stefan Roesch <shr@devkernel.io>, Zhihao Cheng
+ <chengzhihao1@huawei.com>, "Liam R. Howlett" <Liam.Howlett@Oracle.com>, 
+ Alexey Dobriyan <adobriyan@gmail.com>, Minghao Chi
+ <chi.minghao@zte.com.cn>, Seth Forshee <sforshee@digitalocean.com>, Zeng
+ Jingxiang <linuszeng@tencent.com>, Bart Van Assche <bvanassche@acm.org>,
+ Mimi Zohar <zohar@linux.ibm.com>, Roberto Sassu <roberto.sassu@huawei.com>,
+ Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>, "Fabio M. De
+ Francesco" <fmdefrancesco@gmail.com>, Chen Zhongjin
+ <chenzhongjin@huawei.com>, Zhengchao Shao <shaozhengchao@huawei.com>, Rik
+ van Riel <riel@surriel.com>, Jingyu Wang <jingyuwang_vip@163.com>, Hangyu
+ Hua <hbh25y@gmail.com>, linuxppc-dev@lists.ozlabs.org,
+ linux-kernel@vger.kernel.org,  linux-s390@vger.kernel.org,
+ linux-rdma@vger.kernel.org,  linux-usb@vger.kernel.org,
+ v9fs@lists.linux.dev, linux-fsdevel@vger.kernel.org, 
+ linux-afs@lists.infradead.org, autofs@vger.kernel.org, linux-mm@kvack.org, 
+ linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org, 
+ codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+ linux-efi@vger.kernel.org,  linux-erofs@lists.ozlabs.org,
+ linux-ext4@vger.kernel.org,  linux-f2fs-devel@lists.sourceforge.net,
+ cluster-devel@redhat.com,  linux-um@lists.infradead.org,
+ linux-mtd@lists.infradead.org,  jfs-discussion@lists.sourceforge.net,
+ linux-nfs@vger.kernel.org,  linux-nilfs@vger.kernel.org,
+ linux-ntfs-dev@lists.sourceforge.net,  ntfs3@lists.linux.dev,
+ ocfs2-devel@oss.oracle.com,  linux-karma-devel@lists.sourceforge.net,
+ devel@lists.orangefs.org,  linux-unionfs@vger.kernel.org,
+ linux-hardening@vger.kernel.org,  reiserfs-devel@vger.kernel.org,
+ linux-cifs@vger.kernel.org,  samba-technical@lists.samba.org,
+ linux-trace-kernel@vger.kernel.org,  linux-xfs@vger.kernel.org,
+ bpf@vger.kernel.org, netdev@vger.kernel.org,  apparmor@lists.ubuntu.com,
+ linux-security-module@vger.kernel.org,  selinux@vger.kernel.org
+Date: Thu, 22 Jun 2023 06:14:30 -0400
+In-Reply-To: <99b3c749-23d9-6f09-fb75-6a84f3d1b066@kernel.org>
+References: <20230621144507.55591-1-jlayton@kernel.org>
+	 <20230621144507.55591-2-jlayton@kernel.org>
+	 <99b3c749-23d9-6f09-fb75-6a84f3d1b066@kernel.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621154337.1668594-1-edumazet@google.com> <ZJQAdLSkRi2s1FUv@nanopsycho>
- <CANn89iLeU+pBrcHZyQoSRa-X_3G-Y8cjF6FJy4XwkJc7ronqMA@mail.gmail.com>
- <ZJQGTnqo6IgMGZ4j@nanopsycho> <CANn89iK8p7SuGE7rrOKZ6bxoZZhQXBHufj8+YnbNoE-ivKopiw@mail.gmail.com>
- <ZJQT4/SZJN7qGUHI@nanopsycho>
-In-Reply-To: <ZJQT4/SZJN7qGUHI@nanopsycho>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 22 Jun 2023 12:10:19 +0200
-Message-ID: <CANn89iLio4+ik5qAQwd7SKr8ihS+y7fvkYYc=ZuuGqJ4BVfgdQ@mail.gmail.com>
-Subject: Re: [PATCH net] netlink: fix potential deadlock in netlink_set_err()
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot+a7d200a347f912723e5c@syzkaller.appspotmail.com, 
-	Johannes Berg <johannes.berg@intel.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 11:27=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wrot=
-e:
->
-> Thu, Jun 22, 2023 at 10:42:34AM CEST, edumazet@google.com wrote:
-> >On Thu, Jun 22, 2023 at 10:29=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> w=
-rote:
-> >>
-> >> Thu, Jun 22, 2023 at 10:14:56AM CEST, edumazet@google.com wrote:
-> >> >On Thu, Jun 22, 2023 at 10:04=E2=80=AFAM Jiri Pirko <jiri@resnulli.us=
-> wrote:
-> >> >>
-> >> >> Wed, Jun 21, 2023 at 05:43:37PM CEST, edumazet@google.com wrote:
-> >> >> >syzbot reported a possible deadlock in netlink_set_err() [1]
-> >> >> >
-> >> >> >A similar issue was fixed in commit 1d482e666b8e ("netlink: disabl=
-e IRQs
-> >> >> >for netlink_lock_table()") in netlink_lock_table()
-> >> >> >
-> >> >> >This patch adds IRQ safety to netlink_set_err() and __netlink_diag=
-_dump()
-> >> >> >which were not covered by cited commit.
-> >> >> >
-> >> >> >[1]
-> >> >> >
-> >> >> >WARNING: possible irq lock inversion dependency detected
-> >> >> >6.4.0-rc6-syzkaller-00240-g4e9f0ec38852 #0 Not tainted
-> >> >> >
-> >> >> >syz-executor.2/23011 just changed the state of lock:
-> >> >> >ffffffff8e1a7a58 (nl_table_lock){.+.?}-{2:2}, at: netlink_set_err+=
-0x2e/0x3a0 net/netlink/af_netlink.c:1612
-> >> >> >but this lock was taken by another, SOFTIRQ-safe lock in the past:
-> >> >> > (&local->queue_stop_reason_lock){..-.}-{2:2}
-> >> >> >
-> >> >> >and interrupts could create inverse lock ordering between them.
-> >> >> >
-> >> >> >other info that might help us debug this:
-> >> >> > Possible interrupt unsafe locking scenario:
-> >> >> >
-> >> >> >       CPU0                    CPU1
-> >> >> >       ----                    ----
-> >> >> >  lock(nl_table_lock);
-> >> >> >                               local_irq_disable();
-> >> >> >                               lock(&local->queue_stop_reason_lock=
-);
-> >> >> >                               lock(nl_table_lock);
-> >> >> >  <Interrupt>
-> >> >> >    lock(&local->queue_stop_reason_lock);
-> >> >> >
-> >> >> > *** DEADLOCK ***
-> >> >> >
-> >> >> >Fixes: 1d482e666b8e ("netlink: disable IRQs for netlink_lock_table=
-()")
-> >> >>
-> >> >> I don't think that this "fixes" tag is correct. The referenced comm=
-it
-> >> >> is a fix to the same issue on a different codepath, not the one who
-> >> >> actually introduced the issue.
-> >> >>
-> >> >> The code itself looks fine to me.
-> >> >
-> >> >Note that the 1d482e666b8e had no Fixes: tag, otherwise I would have =
-taken it.
-> >>
-> >> I'm aware it didn't. But that does not implicate this patch should hav=
-e
-> >> that commit as a "Fixes:" tag. Either have the correct one pointing ou=
-t
-> >> which commit introduced the issue or omit the "Fixes:" tag entirely.
-> >> That's my point.
-> >
-> >My point is that the cited commit should have fixed all points
-> >where the nl_table_lock was read locked.
->
-> Yeah, it was incomplete. I agree. I don't argue with that.
->
-> >
-> >When we do locking changes, we have to look at the whole picture,
-> >not the precise point where lockdep complained.
-> >
-> >For instance, this is the reason this patch also changes  __netlink_diag=
-_dump(),
-> >even if the report had nothing to do about it yet.
-> >
-> >So this Fixes: tag is fine, thank you.
->
-> Then we have to agree to disagree I guess. It is not fine.
->
-> Quoting from Documentation/process/handling-regressions.rst:
->   Add a "Fixes:" tag to specify the commit causing the regression.
->
-> Quoting from Documentation/process/submitting-patches.rst:
->   A Fixes: tag indicates that the patch fixes an issue in a previous comm=
-it. It
->   is used to make it easy to determine where a bug originated, which can =
-help
->   review a bug fix.
+On Thu, 2023-06-22 at 09:46 +0900, Damien Le Moal wrote:
+> On 6/21/23 23:45, Jeff Layton wrote:
+> > struct timespec64 has unused bits in the tv_nsec field that can be used
+> > for other purposes. In future patches, we're going to change how the
+> > inode->i_ctime is accessed in certain inodes in order to make use of
+> > them. In order to do that safely though, we'll need to eradicate raw
+> > accesses of the inode->i_ctime field from the kernel.
+> >=20
+> > Add new accessor functions for the ctime that we can use to replace the=
+m.
+> >=20
+> > Signed-off-by: Jeff Layton <jlayton@kernel.org>
+>=20
+> [...]
+>=20
+> > +/**
+> > + * inode_ctime_peek - fetch the current ctime from the inode
+> > + * @inode: inode from which to fetch ctime
+> > + *
+> > + * Grab the current ctime from the inode and return it.
+> > + */
+> > +static inline struct timespec64 inode_ctime_peek(const struct inode *i=
+node)
+>=20
+> To be consistent with inode_ctime_set(), why not call this one inode_ctim=
+e_get()
 
-The previous commit definitely had an issue, because it was not complete.
+In later patches fetching the ctime for presentation may have side
+effects on certain filesystems. Using "peek" here is a hint that we want
+to avoid those side effects in these calls.
 
-We have many other cases of commits that complete the work started earlier.
+> ? Also, inode_set_ctime() & inode_get_ctime() may be a little more natura=
+l. But
+> no strong opinion about that though.
+>=20
 
-I will continue doing so, and I will continue writing changelogs that
-displease you.
+I like the consistency of the inode_ctime_* prefix. It makes it simpler
+to find these calls when grepping, etc.
 
->
-> 1d482e666b8e is not causing any regression (to be known of), definitelly
-> not the one this patch is fixing.
-
->
-> Misusing "Fixes" tag like this only adds unnecessary confusion.
-> That is my point from the beginning. I don't understand your resistance
-> to be honest.
-
-To be honest, I do not understand you either, I suggest we move on,
-we obviously are not on the same page.
+That said, my opinions on naming are pretty loosely-held, so if the
+consensus is that the names should as you suggest, I'll go along with
+it.
+--=20
+Jeff Layton <jlayton@kernel.org>
 
