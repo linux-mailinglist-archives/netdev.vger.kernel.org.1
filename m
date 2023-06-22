@@ -1,115 +1,159 @@
-Return-Path: <netdev+bounces-13057-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13058-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB77673A0E5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:28:26 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6E1D573A0F8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:33:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3737E28193E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:28:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266172819BA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:33:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E091E536;
-	Thu, 22 Jun 2023 12:28:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8838D174FA;
+	Thu, 22 Jun 2023 12:33:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A6D715AE4
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:28:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70D5E199E
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:28:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687436901;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=5pmHwEzAPicyH88XD8XeXekL+O3YOK5f/E4/IhyQwRg=;
-	b=YLSt3EX8N6obAmjyI2Jdcxn7uA7S/MKUhGjZYK+Yghcr5sWsdiaM6hAVIC0gzhDYB6RRl8
-	uDJ4NVRXcI1BC88qwtAD827T1ZcSa+2vFHXNvMuDXhvhynjMpGOnnB+umCbR0Iq5zPAoma
-	aLP1ACAak0zi/462OHpgXVhZIcUD4/g=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-138-9QwWQNv4P6i-qvlW89URWA-1; Thu, 22 Jun 2023 08:28:18 -0400
-X-MC-Unique: 9QwWQNv4P6i-qvlW89URWA-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-763dcfe8c92so216935985a.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:28:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687436897; x=1690028897;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5pmHwEzAPicyH88XD8XeXekL+O3YOK5f/E4/IhyQwRg=;
-        b=AWhHUUMzM5xpvgf4p/mwANst2ZhNHbX2OqlfKM+kvJCDIFZUcBjVScExhbxgjwoTPw
-         VpakZVQDJsHqk1ZaQ34scW1foEFtlrZozW7mYfkbkN7s+XDa/WCz+B4fKWl9PL/qxWfw
-         omOfuDX1XB26PWibP6wCjDakE/Xico6Q0XyjmzaThk4vlHZCrSm3UskbF5ivm7dLLF1r
-         BXEofxSu039ppCRQuHxNgrcNK1te/xFK2wNIplFNwethC7B98+pYqnjtx+8SL/cSzrp0
-         HiJyp7VZMnrxiq6Wf/ePBW8/mW99GjdZHQnCME2pag1jkXhk8sCAeYUE4J0PWljF1G9M
-         yv1w==
-X-Gm-Message-State: AC+VfDygNiev2SiUOHxNMSzA+lP7f6jP60N9uiKj/B9jlgUDaXLz0knq
-	RXs2enfjMSkp2OV3mQ6MvuSEuh9C1FJKNGxmpCxT9mxifGxM2ho3StzCPYUTqTyTiFuCb5P2ovC
-	FYA6gEs+qYEPbUo6U
-X-Received: by 2002:a05:620a:4d4:b0:765:25be:36e4 with SMTP id 20-20020a05620a04d400b0076525be36e4mr2203241qks.6.1687436897372;
-        Thu, 22 Jun 2023 05:28:17 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6+Pf7PlnZxl+iDCZchQ2oSl5E1RwIAB5qxqHpnM5zKpM+NYgKOaaF1kJ1Jxjl6Kghb8vQT2Q==
-X-Received: by 2002:a05:620a:4d4:b0:765:25be:36e4 with SMTP id 20-20020a05620a04d400b0076525be36e4mr2203223qks.6.1687436897080;
-        Thu, 22 Jun 2023 05:28:17 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id s16-20020a05620a031000b0075f13bda351sm3301106qkm.115.2023.06.22.05.28.14
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 05:28:16 -0700 (PDT)
-Date: Thu, 22 Jun 2023 14:28:11 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	Jason Wang <jasowang@redhat.com>, Eugenio =?utf-8?B?UMOpcmV6?= <eperezma@redhat.com>, 
-	Tiwei Bie <tiwei.bie@intel.com>, kvm@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH] vhost-vdpa: filter VIRTIO_F_RING_PACKED feature
-Message-ID: <6culpnuswqq4fh7r5iqqtvwrpnsapn4jhx3heorfctztc2miem@hscigltkix5d>
-References: <20230605110644.151211-1-sgarzare@redhat.com>
- <20230622073625-mutt-send-email-mst@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA513AAA0
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:33:33 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15178DE;
+	Thu, 22 Jun 2023 05:33:32 -0700 (PDT)
+Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35MCSA1e026800;
+	Thu, 22 Jun 2023 12:33:12 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=8JPSv3Evs3XhJvxRrV6qa8ynRzMaIEfed2QAdtCFvYo=;
+ b=ec+nfDmLYT7jZYWjL292D7sBlG4KWzsgVu3CYMHcx1pggCdvXaGO3qHGl7MnA5E4vOHU
+ ziSfK/RaK2KfjxHCquVsjvyvHC79J64BGnOBHPpac7urvX30kZNee4HeT+gZfFxR0Ptg
+ BehdE+JcJ4pwYwW2YH9lbmW0jlINZskd2CihRFg7OtabNPMBDViBO86XGAe5SGMqEEy0
+ DfcudZbKy6mg5VEgAz8ojI7TNbsuTHqSCKGt4gwySysMzdVsv0SHTrvsdeu5iiBKCC0t
+ x2Dd+Zq8rR9RY2CzO+sscHAQaPmbrlzAfyqhsoxaPHYudBdcxj/V3CYlYvkgC3aLX9bq 6A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcpb3r4rf-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 12:33:11 +0000
+Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35MCTMkU029556;
+	Thu, 22 Jun 2023 12:33:11 GMT
+Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcpb3r4n4-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 12:33:11 +0000
+Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
+	by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35M8P6Gs030863;
+	Thu, 22 Jun 2023 12:33:08 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3r94f52mbu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 12:33:08 +0000
+Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35MCX4Il46858694
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 Jun 2023 12:33:04 GMT
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id A6AAC20040;
+	Thu, 22 Jun 2023 12:33:04 +0000 (GMT)
+Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id B911720043;
+	Thu, 22 Jun 2023 12:33:03 +0000 (GMT)
+Received: from [9.171.62.26] (unknown [9.171.62.26])
+	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 22 Jun 2023 12:33:03 +0000 (GMT)
+Message-ID: <55764773-bf9a-94c9-ad2b-1c6e63879798@linux.ibm.com>
+Date: Thu, 22 Jun 2023 14:33:03 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230622073625-mutt-send-email-mst@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+To: Alexandra Winter <wintera@linux.ibm.com>,
+        Simon Horman <simon.horman@corigine.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
+        kernel test robot <lkp@intel.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
+        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+ <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+ <ZJP99hSRt5MakBXC@corigine.com>
+ <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
+Content-Language: en-US
+From: Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: uc70g-gBitPGOyV0dLNCzj0bYDxXYfsQ
+X-Proofpoint-GUID: 2Za_iKiyqFQ94YDnoSKL1EWtFi7br6Lc
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-22_08,2023-06-22_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
+ impostorscore=0 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
+ suspectscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306220105
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 07:37:08AM -0400, Michael S. Tsirkin wrote:
->On Mon, Jun 05, 2023 at 01:06:44PM +0200, Stefano Garzarella wrote:
->> vhost-vdpa IOCTLs (eg. VHOST_GET_VRING_BASE, VHOST_SET_VRING_BASE)
->> don't support packed virtqueue well yet, so let's filter the
->> VIRTIO_F_RING_PACKED feature for now in vhost_vdpa_get_features().
+Am 22.06.23 um 14:16 schrieb Alexandra Winter:
+> 
+> 
+> On 22.06.23 09:53, Simon Horman wrote:
+>> On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
+>>>
+>>>
+>>> On 21.06.23 23:37, Randy Dunlap wrote:
+>>>> Require FDDI to be built-in if it is used. LCS needs FDDI to be
+>>>> built-in to build without errors.
+>>>>
+>>>> Prevents these build errors:
+>>>> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
+>>>> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
+>>>> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
+>>>>
+>>>> This FDDI requirement effectively restores the previous condition
+>>>> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
+>>>> testing for CONFIG_FDDI_MODULE.
+>>>>
+>>>> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+> [...]
 >>
->> This way, even if the device supports it, we don't risk it being
->> negotiated, then the VMM is unable to set the vring state properly.
+>>> 2) I wonder whether
+>>>
+>>>    	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+>>>   +	depends on FDDI || FDDI=n
+>>>
+>>> would do what we want here:
+>>> When FDDI is a loadable module, LCS mustn't be built-in.
+>>>
+>>> I will do some experiments and let you know.
 >>
->> Fixes: 4c8cf31885f6 ("vhost: introduce vDPA-based backend")
->> Cc: stable@vger.kernel.org
->> Signed-off-by: Stefano Garzarella <sgarzare@redhat.com>
->
->OK so for now I dropped this, we have a better fix upstream.
->
+>> It does seem to on my side.
+>> But checking would be much appreciated.
+>   
+> 
+> Here are my experiments:
 
-Yep, I agree.
-
-Maybe we can reuse this patch in the stable branches where the backport
-is not easy. Although as Jason said, maybe we don't need it.
-
-Thanks,
-Stefano
-
+Another suggestion. Why not remove the FDDI part of the lcs driver? This seems unused
+without hardware for years now.Longterm we could even remove the whole lcs driver.
 
