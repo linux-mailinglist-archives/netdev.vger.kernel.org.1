@@ -1,213 +1,107 @@
-Return-Path: <netdev+bounces-12874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12875-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 476A073940B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 02:46:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 07CB6739481
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 03:29:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE471281782
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 00:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 397DA1C20FFB
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 01:29:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1AEECC;
-	Thu, 22 Jun 2023 00:46:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A92F15DA;
+	Thu, 22 Jun 2023 01:29:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D40CE816;
-	Thu, 22 Jun 2023 00:46:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9A7C8C433C0;
-	Thu, 22 Jun 2023 00:46:13 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687394795;
-	bh=rnAvPLn1sCs7GGwULNlh7vfJWhCgmoE6J+kuAdW07eg=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=OKJ2boTqeHZMsToMs1/n2lzwwGVbU+I2GYoijjuRh9SVeHfTSB1H+xyFQwyAFX7gH
-	 /vyxfg2IKPw1xJaHjaP8DFfddUEEk8PpeVXJ0+PVhDflO3qbvKQQI9gg2+QYLwO5s8
-	 7RdM/94Dzx+hUObnhR05qpfqd0np7iM7DbNnG1PYspXU6CzNR2GHI+w68+F/UNiAvI
-	 xFMWzHCJLXizYOftbvGh5G8E/rfFzaZBSJhjqQBlrMVQgwlWHoRl/ilVMdm4h9iQIc
-	 xbVrb5SDTY2AyvfHzces3r+mtB2lxqGprTaDvGj1GvW5UryRveoRMwl/iNrb8xoLWk
-	 lKxccXW186khg==
-Message-ID: <99b3c749-23d9-6f09-fb75-6a84f3d1b066@kernel.org>
-Date: Thu, 22 Jun 2023 09:46:12 +0900
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDAE15CC
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:29:36 +0000 (UTC)
+Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557A31BD4
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:29:33 -0700 (PDT)
+Received: from submission (posteo.de [185.67.36.169]) 
+	by mout02.posteo.de (Postfix) with ESMTPS id 4A3CD240106
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:29:31 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
+	t=1687397371; bh=D4Csd5WfGqhnig4L4X+fLUt56k9ygxpxQWLQs8PeNuI=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:
+	 Content-Transfer-Encoding:From;
+	b=mKMXtX4rHbJ8BeDf4HadpoLOj/M7gHT/VtkFQRJX1+PCs1gWNlDtsV4r4y+Z7fLww
+	 /TzWkBg/APDT22KiYMTJ2r8Q7ATdK2i89v1M72QYEU8prnFyBQe2IzhpZCrZTf2JO7
+	 gBDTbbSBRx75z4qRaXkjbh0vTmJG+Z453C5FojiNl3d4xBwSyvx9xiATpqSxaUDrHE
+	 7ElAgfla+K/MiV1LPWYJXBC0kRCcTKpwzptmBAxhXJ/HN3ayLSM/QyN8bRAhGEjABA
+	 PpdDayrGpIJ+huAIyvbwulvDTX+5w/eQSDfsWUzIbPxxdK64AJ3yvblMRukWR21RUp
+	 6BcPj8hL+LaSQ==
+Received: from customer (localhost [127.0.0.1])
+	by submission (posteo.de) with ESMTPSA id 4QmjTH2RS3z6tvh;
+	Thu, 22 Jun 2023 03:29:23 +0200 (CEST)
+From: Yueh-Shun Li <shamrocklee@posteo.net>
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Tony Nguyen <anthony.l.nguyen@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Kalle Valo <kvalo@kernel.org>,
+	"James E . J . Bottomley" <jejb@linux.ibm.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Andy Whitcroft <apw@canonical.com>,
+	Joe Perches <joe@perches.com>
+Cc: linux-rdma@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	linux-scsi@vger.kernel.org,
+	mptcp@lists.linux.dev,
+	linux-kselftest@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yueh-Shun Li <shamrocklee@posteo.net>
+Subject: [PATCH 0/8] Fix comment typos about "transmit"
+Date: Thu, 22 Jun 2023 01:26:21 +0000
+Message-Id: <20230622012627.15050-1-shamrocklee@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
-To: Jeff Layton <jlayton@kernel.org>, Jeremy Kerr <jk@ozlabs.org>,
- Arnd Bergmann <arnd@arndb.de>, Michael Ellerman <mpe@ellerman.id.au>,
- Nicholas Piggin <npiggin@gmail.com>,
- Christophe Leroy <christophe.leroy@csgroup.eu>,
- Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
- Alexander Gordeev <agordeev@linux.ibm.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>,
- Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
- =?UTF-8?Q?Arve_Hj=c3=b8nnev=c3=a5g?= <arve@android.com>,
- Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
- Joel Fernandes <joel@joelfernandes.org>,
- Christian Brauner <brauner@kernel.org>, Carlos Llamas <cmllamas@google.com>,
- Suren Baghdasaryan <surenb@google.com>,
- Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
- Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
- Brad Warrum <bwarrum@linux.ibm.com>, Ritu Agarwal <rituagar@linux.ibm.com>,
- Eric Van Hensbergen <ericvh@kernel.org>, Latchesar Ionkov
- <lucho@ionkov.net>, Dominique Martinet <asmadeus@codewreck.org>,
- Christian Schoenebeck <linux_oss@crudebyte.com>,
- David Sterba <dsterba@suse.com>, David Howells <dhowells@redhat.com>,
- Marc Dionne <marc.dionne@auristor.com>,
- Alexander Viro <viro@zeniv.linux.org.uk>, Ian Kent <raven@themaw.net>,
- Luis de Bethencourt <luisbg@kernel.org>, Salah Triki
- <salah.triki@gmail.com>, "Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
- Eric Biederman <ebiederm@xmission.com>, Kees Cook <keescook@chromium.org>,
- Chris Mason <clm@fb.com>, Josef Bacik <josef@toxicpanda.com>,
- Xiubo Li <xiubli@redhat.com>, Ilya Dryomov <idryomov@gmail.com>,
- Jan Harkes <jaharkes@cs.cmu.edu>, coda@cs.cmu.edu,
- Joel Becker <jlbec@evilplan.org>, Christoph Hellwig <hch@lst.de>,
- Nicolas Pitre <nico@fluxnic.net>, "Rafael J. Wysocki" <rafael@kernel.org>,
- Tyler Hicks <code@tyhicks.com>, Ard Biesheuvel <ardb@kernel.org>,
- Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
- Yue Hu <huyue2@coolpad.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
- Namjae Jeon <linkinjeon@kernel.org>, Sungjong Seo <sj1557.seo@samsung.com>,
- Jan Kara <jack@suse.com>, Theodore Ts'o <tytso@mit.edu>,
- Andreas Dilger <adilger.kernel@dilger.ca>, Jaegeuk Kim <jaegeuk@kernel.org>,
- OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
- Miklos Szeredi <miklos@szeredi.hu>, Bob Peterson <rpeterso@redhat.com>,
- Andreas Gruenbacher <agruenba@redhat.com>,
- Richard Weinberger <richard@nod.at>,
- Anton Ivanov <anton.ivanov@cambridgegreys.com>,
- Johannes Berg <johannes@sipsolutions.net>,
- Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
- Mike Kravetz <mike.kravetz@oracle.com>, Muchun Song <muchun.song@linux.dev>,
- David Woodhouse <dwmw2@infradead.org>, Dave Kleikamp <shaggy@kernel.org>,
- Tejun Heo <tj@kernel.org>, Trond Myklebust
- <trond.myklebust@hammerspace.com>, Anna Schumaker <anna@kernel.org>,
- Chuck Lever <chuck.lever@oracle.com>,
- Ryusuke Konishi <konishi.ryusuke@gmail.com>,
- Anton Altaparmakov <anton@tuxera.com>,
- Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
- Mark Fasheh <mark@fasheh.com>, Joseph Qi <joseph.qi@linux.alibaba.com>,
- Bob Copeland <me@bobcopeland.com>, Mike Marshall <hubcap@omnibond.com>,
- Martin Brandenburg <martin@omnibond.com>,
- Luis Chamberlain <mcgrof@kernel.org>, Iurii Zaikin <yzaikin@google.com>,
- Tony Luck <tony.luck@intel.com>, "Guilherme G. Piccoli"
- <gpiccoli@igalia.com>, Anders Larsen <al@alarsen.net>,
- Steve French <sfrench@samba.org>, Paulo Alcantara <pc@manguebit.com>,
- Ronnie Sahlberg <lsahlber@redhat.com>, Shyam Prasad N
- <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
- Sergey Senozhatsky <senozhatsky@chromium.org>,
- Phillip Lougher <phillip@squashfs.org.uk>,
- Steven Rostedt <rostedt@goodmis.org>, Masami Hiramatsu
- <mhiramat@kernel.org>, Evgeniy Dushistov <dushistov@mail.ru>,
- Hans de Goede <hdegoede@redhat.com>, "Darrick J. Wong" <djwong@kernel.org>,
- Naohiro Aota <naohiro.aota@wdc.com>, Johannes Thumshirn <jth@kernel.org>,
- Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau
- <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
- Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>,
- KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
- Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
- Hugh Dickins <hughd@google.com>, Andrew Morton <akpm@linux-foundation.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- John Johansen <john.johansen@canonical.com>, Paul Moore
- <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
- "Serge E. Hallyn" <serge@hallyn.com>,
- Stephen Smalley <stephen.smalley.work@gmail.com>,
- Eric Paris <eparis@parisplace.org>, Juergen Gross <jgross@suse.com>,
- Ruihan Li <lrh2000@pku.edu.cn>,
- Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
- Wolfram Sang <wsa+renesas@sang-engineering.com>,
- Udipto Goswami <quic_ugoswami@quicinc.com>,
- Linyu Yuan <quic_linyyuan@quicinc.com>, John Keeping <john@keeping.me.uk>,
- Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
- Dan Carpenter <error27@gmail.com>, Yuta Hayama <hayama@lineo.co.jp>,
- Jozef Martiniak <jomajm@gmail.com>, Jens Axboe <axboe@kernel.dk>,
- Alan Stern <stern@rowland.harvard.edu>, Sandeep Dhavale
- <dhavale@google.com>, Dave Chinner <dchinner@redhat.com>,
- Johannes Weiner <hannes@cmpxchg.org>, ZhangPeng <zhangpeng362@huawei.com>,
- Viacheslav Dubeyko <slava@dubeyko.com>,
- Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
- Aditya Garg <gargaditya08@live.com>, Erez Zadok <ezk@cs.stonybrook.edu>,
- Yifei Liu <yifeliu@cs.stonybrook.edu>, Yu Zhe <yuzhe@nfschina.com>,
- "Matthew Wilcox (Oracle)" <willy@infradead.org>,
- Oleg Kanatov <okanatov@gmail.com>, "Dr. David Alan Gilbert"
- <linux@treblig.org>, Jiangshan Yi <yijiangshan@kylinos.cn>,
- xu xin <cgel.zte@gmail.com>, Stefan Roesch <shr@devkernel.io>,
- Zhihao Cheng <chengzhihao1@huawei.com>,
- "Liam R. Howlett" <Liam.Howlett@Oracle.com>,
- Alexey Dobriyan <adobriyan@gmail.com>, Minghao Chi <chi.minghao@zte.com.cn>,
- Seth Forshee <sforshee@digitalocean.com>,
- Zeng Jingxiang <linuszeng@tencent.com>, Bart Van Assche
- <bvanassche@acm.org>, Mimi Zohar <zohar@linux.ibm.com>,
- Roberto Sassu <roberto.sassu@huawei.com>, Zhang Yi <yi.zhang@huawei.com>,
- Tom Rix <trix@redhat.com>, "Fabio M. De Francesco"
- <fmdefrancesco@gmail.com>, Chen Zhongjin <chenzhongjin@huawei.com>,
- Zhengchao Shao <shaozhengchao@huawei.com>, Rik van Riel <riel@surriel.com>,
- Jingyu Wang <jingyuwang_vip@163.com>, Hangyu Hua <hbh25y@gmail.com>,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
- autofs@vger.kernel.org, linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
- linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
- jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
- linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
- ntfs3@lists.linux.dev, ocfs2-devel@oss.oracle.com,
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org,
- reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org,
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org
-References: <20230621144507.55591-1-jlayton@kernel.org>
- <20230621144507.55591-2-jlayton@kernel.org>
-Content-Language: en-US
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230621144507.55591-2-jlayton@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On 6/21/23 23:45, Jeff Layton wrote:
-> struct timespec64 has unused bits in the tv_nsec field that can be used
-> for other purposes. In future patches, we're going to change how the
-> inode->i_ctime is accessed in certain inodes in order to make use of
-> them. In order to do that safely though, we'll need to eradicate raw
-> accesses of the inode->i_ctime field from the kernel.
-> 
-> Add new accessor functions for the ctime that we can use to replace them.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+Fix typos about "transmit" missing the first "s"
+found by searching with keyword "tram" in the first 7
+patches.
 
-[...]
+Add related patterns to "scripts/spelling.txt" in the
+last patch.
 
-> +/**
-> + * inode_ctime_peek - fetch the current ctime from the inode
-> + * @inode: inode from which to fetch ctime
-> + *
-> + * Grab the current ctime from the inode and return it.
-> + */
-> +static inline struct timespec64 inode_ctime_peek(const struct inode *inode)
+Yueh-Shun Li (8):
+  RDMA/rxe: fix comment typo
+  i40e, xsk: fix comment typo
+  zd1211rw: fix comment typo
+  scsi: fix comment typo
+  tcp: fix comment typo
+  net/tls: fix comment typo
+  selftests: mptcp: connect: fix comment typo
+  scripts/spelling.txt: Add "transmit" patterns
 
-To be consistent with inode_ctime_set(), why not call this one inode_ctime_get()
-? Also, inode_set_ctime() & inode_get_ctime() may be a little more natural. But
-no strong opinion about that though.
+ drivers/infiniband/sw/rxe/rxe_verbs.h              |  2 +-
+ drivers/net/ethernet/intel/i40e/i40e_xsk.c         |  2 +-
+ drivers/net/wireless/zydas/zd1211rw/zd_usb.c       |  2 +-
+ drivers/scsi/isci/scu_task_context.h               |  2 +-
+ net/ipv4/tcp_input.c                               |  2 +-
+ net/tls/tls_device_fallback.c                      |  2 +-
+ scripts/spelling.txt                               | 11 +++++++++++
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh |  2 +-
+ 8 files changed, 18 insertions(+), 7 deletions(-)
 
 -- 
-Damien Le Moal
-Western Digital Research
+2.38.1
 
 
