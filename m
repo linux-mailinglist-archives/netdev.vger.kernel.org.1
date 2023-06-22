@@ -1,42 +1,42 @@
-Return-Path: <netdev+bounces-12875-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07CB6739481
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 03:29:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23B2973948B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 03:31:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 397DA1C20FFB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 01:29:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AA24A1C21001
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 01:31:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A92F15DA;
-	Thu, 22 Jun 2023 01:29:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC2FB17C8;
+	Thu, 22 Jun 2023 01:31:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CDAE15CC
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE7D815DA
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:31:00 +0000 (UTC)
 Received: from mout02.posteo.de (mout02.posteo.de [185.67.36.66])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 557A31BD4
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:29:33 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EFB3C1BD8
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 18:30:58 -0700 (PDT)
 Received: from submission (posteo.de [185.67.36.169]) 
-	by mout02.posteo.de (Postfix) with ESMTPS id 4A3CD240106
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:29:31 +0200 (CEST)
+	by mout02.posteo.de (Postfix) with ESMTPS id 72C2A240108
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:30:57 +0200 (CEST)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=posteo.net; s=2017;
-	t=1687397371; bh=D4Csd5WfGqhnig4L4X+fLUt56k9ygxpxQWLQs8PeNuI=;
+	t=1687397457; bh=09XlL1/vCcPG0ljTp3PwBDMDDpta1CZKydZBQ7XpElA=;
 	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version:
 	 Content-Transfer-Encoding:From;
-	b=mKMXtX4rHbJ8BeDf4HadpoLOj/M7gHT/VtkFQRJX1+PCs1gWNlDtsV4r4y+Z7fLww
-	 /TzWkBg/APDT22KiYMTJ2r8Q7ATdK2i89v1M72QYEU8prnFyBQe2IzhpZCrZTf2JO7
-	 gBDTbbSBRx75z4qRaXkjbh0vTmJG+Z453C5FojiNl3d4xBwSyvx9xiATpqSxaUDrHE
-	 7ElAgfla+K/MiV1LPWYJXBC0kRCcTKpwzptmBAxhXJ/HN3ayLSM/QyN8bRAhGEjABA
-	 PpdDayrGpIJ+huAIyvbwulvDTX+5w/eQSDfsWUzIbPxxdK64AJ3yvblMRukWR21RUp
-	 6BcPj8hL+LaSQ==
+	b=lORN+8euUeR65leU70KFB+GzuyC2mG9G1lWZj6VxVqQrqjtPfe7uox1tDXML8/kLm
+	 MqYL76DjhUw5q64r9OcfvbYB7u5lKRVuef17z4zdPW+6l3UtNWSKD9N8MX3azYjI7z
+	 McsiG5Ho9HLWEUfpkEBTa0qs8L4KHoQ/gTyt7AqiSx4oNiMFIMe6sEn/xsqZItTd7y
+	 NUqwLKpvf8dBH8zsB6c3y4Zv3BOfLq3PEX0E7j4UY8HnA7Pn1Wb57nfwLJzKSlZmA4
+	 xJz7rYQ9Pa83IwrRuWYg63QKSjaBNU/PZj48dG0g0lTnRpRc/EDN9rtE/pQNHs9/U+
+	 sKxIKVftt+uTA==
 Received: from customer (localhost [127.0.0.1])
-	by submission (posteo.de) with ESMTPSA id 4QmjTH2RS3z6tvh;
-	Thu, 22 Jun 2023 03:29:23 +0200 (CEST)
+	by submission (posteo.de) with ESMTPSA id 4QmjVy0jmWz6tx4;
+	Thu, 22 Jun 2023 03:30:49 +0200 (CEST)
 From: Yueh-Shun Li <shamrocklee@posteo.net>
 To: Jason Gunthorpe <jgg@ziepe.ca>,
 	Leon Romanovsky <leon@kernel.org>,
@@ -56,9 +56,11 @@ Cc: linux-rdma@vger.kernel.org,
 	linux-kselftest@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	Yueh-Shun Li <shamrocklee@posteo.net>
-Subject: [PATCH 0/8] Fix comment typos about "transmit"
-Date: Thu, 22 Jun 2023 01:26:21 +0000
-Message-Id: <20230622012627.15050-1-shamrocklee@posteo.net>
+Subject: [PATCH 1/8] RDMA/rxe: fix comment typo
+Date: Thu, 22 Jun 2023 01:26:23 +0000
+Message-Id: <20230622012627.15050-2-shamrocklee@posteo.net>
+In-Reply-To: <20230622012627.15050-1-shamrocklee@posteo.net>
+References: <20230622012627.15050-1-shamrocklee@posteo.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -74,33 +76,28 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fix typos about "transmit" missing the first "s"
-found by searching with keyword "tram" in the first 7
-patches.
+Spell "retransmitting" properly.
 
-Add related patterns to "scripts/spelling.txt" in the
-last patch.
+Found by searching for keyword "tranm".
 
-Yueh-Shun Li (8):
-  RDMA/rxe: fix comment typo
-  i40e, xsk: fix comment typo
-  zd1211rw: fix comment typo
-  scsi: fix comment typo
-  tcp: fix comment typo
-  net/tls: fix comment typo
-  selftests: mptcp: connect: fix comment typo
-  scripts/spelling.txt: Add "transmit" patterns
+Signed-off-by: Yueh-Shun Li <shamrocklee@posteo.net>
+---
+ drivers/infiniband/sw/rxe/rxe_verbs.h | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
- drivers/infiniband/sw/rxe/rxe_verbs.h              |  2 +-
- drivers/net/ethernet/intel/i40e/i40e_xsk.c         |  2 +-
- drivers/net/wireless/zydas/zd1211rw/zd_usb.c       |  2 +-
- drivers/scsi/isci/scu_task_context.h               |  2 +-
- net/ipv4/tcp_input.c                               |  2 +-
- net/tls/tls_device_fallback.c                      |  2 +-
- scripts/spelling.txt                               | 11 +++++++++++
- tools/testing/selftests/net/mptcp/mptcp_connect.sh |  2 +-
- 8 files changed, 18 insertions(+), 7 deletions(-)
-
+diff --git a/drivers/infiniband/sw/rxe/rxe_verbs.h b/drivers/infiniband/sw/rxe/rxe_verbs.h
+index 26a20f088692..aca0f4c7a5cd 100644
+--- a/drivers/infiniband/sw/rxe/rxe_verbs.h
++++ b/drivers/infiniband/sw/rxe/rxe_verbs.h
+@@ -237,7 +237,7 @@ struct rxe_qp {
+ 	atomic_t		skb_out;
+ 	int			need_req_skb;
+ 
+-	/* Timer for retranmitting packet when ACKs have been lost. RC
++	/* Timer for retransmitting packet when ACKs have been lost. RC
+ 	 * only. The requester sets it when it is not already
+ 	 * started. The responder resets it whenever an ack is
+ 	 * received.
 -- 
 2.38.1
 
