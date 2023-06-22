@@ -1,242 +1,165 @@
-Return-Path: <netdev+bounces-12936-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12937-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 879957397D8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:10:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E78287397DF
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:11:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1F2628183A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:10:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6F211C2107A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:11:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A897567C;
-	Thu, 22 Jun 2023 07:10:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E98F6567E;
+	Thu, 22 Jun 2023 07:11:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0459D5242
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:10:01 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5341BD6
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:09:58 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-31126037f41so6635933f8f.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:09:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687417796; x=1690009796;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=mPyXOzxLtxEjY9cBPcsaRIns0EAEb4Nt/6W8EsU3ga8=;
-        b=3iouDSVugUMNcys+i697SLnTvuKCQCDU18RQuMxLJV54x1bnilfa2bLr1aadMiQh1g
-         UItDYY8rMfETP4FeqIVWSeabeT9AuFOTAO2aUWdKuLg84/CdT7qzIiwweS4Gx3GVX1P8
-         4bBATic4ICWKlQpgqYwOyZIg4yeumq7IFyMtmwFoUFt4NXiXBCo3DNhJZkMc01ZTBRaW
-         ek+bbOOoFMHEBQqk1J0jBtWot+LCXVC45zM6x5Dl0Kk8ybD9Cafa8DoJ6GiSDoMY3ro7
-         6A1iZr2yMlshPSuQUwe9k+ophGjpUKdwBA35Aey0t6Ccp+bFNAOoqgp2gLV3leZxIgP/
-         d1Gg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687417796; x=1690009796;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mPyXOzxLtxEjY9cBPcsaRIns0EAEb4Nt/6W8EsU3ga8=;
-        b=KdG1Pj1coeq80NlKuVMDR8bpoyUnP3sW0/kDNIKrz9rE2F9rnAGQe5PhaADOnJ3P77
-         I8jzrZi2W6zGuMo19U7Z1Q1bVxHgUvVSJag/ZNI5O1PrbO3HQF+AgaD+tnFKxrg1oJC8
-         m87zcgnnoexulI+/nw/Vg3VkEgaO5NrogucdH3rVBFedQrB6j/XBdYJyGqSflQX6pfsI
-         9+JT6eLcOoyhDNDtCEYgEqprDmARkpo26ZGyNeffHpRA0Raz1x8PNYlOGRCler6ova88
-         LHUQjMHVJt6hzOS4frylEdEp9Wq1rQNwuYTOSGNZYexJ4m5tVC18H/vXRVlLl8szvtu8
-         n2jw==
-X-Gm-Message-State: AC+VfDzKAt98EoORVWaylVdk9RBqnF41zdiEpJl3MyrEhbtk2ze8sJqc
-	RB/vbzVr79+50RWmtiXcjBjoRA==
-X-Google-Smtp-Source: ACHHUZ7BfDfYg8tVKSO/1MGIhgM7knp4bxE9BjLvWPQmvpgYpkpg9XkXMIy4VKk2fcxV+HKp1ykuJA==
-X-Received: by 2002:a5d:468d:0:b0:30a:f2a0:64fa with SMTP id u13-20020a5d468d000000b0030af2a064famr15527240wrq.10.1687417796496;
-        Thu, 22 Jun 2023 00:09:56 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id f12-20020a5d58ec000000b00309382eb047sm6207885wrd.112.2023.06.22.00.09.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 00:09:55 -0700 (PDT)
-Date: Thu, 22 Jun 2023 09:09:54 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, "vadfed@meta.com" <vadfed@meta.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"vadfed@fb.com" <vadfed@fb.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"sj@kernel.org" <sj@kernel.org>,
-	"javierm@redhat.com" <javierm@redhat.com>,
-	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
-	"airlied@redhat.com" <airlied@redhat.com>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux@zary.sk" <linux@zary.sk>,
-	"masahiroy@kernel.org" <masahiroy@kernel.org>,
-	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
-	"geert+renesas@glider.be" <geert+renesas@glider.be>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"idosch@nvidia.com" <idosch@nvidia.com>,
-	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
-	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
-	"phil@nwl.cc" <phil@nwl.cc>,
-	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
-	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
-Subject: Re: [RFC PATCH v8 03/10] dpll: core: Add DPLL framework base
- functions
-Message-ID: <ZJPzwj1odaC8fFzO@nanopsycho>
-References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
- <20230609121853.3607724-4-arkadiusz.kubalewski@intel.com>
- <20230612164515.6eacefb1@kernel.org>
- <DM6PR11MB4657FED589F5922BBAC5D9059B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE5641FB4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:11:10 +0000 (UTC)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E50761BD3
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:11:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687417868; x=1718953868;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=zNrM5EfILa+8jAwJ05BuJylyicgAwiZFdn0B+Akn36w=;
+  b=HsMGxoTz81yq6Z6/MWryidTlBFzgaGM25/Yg4rkmdpDLVQ+SzzTuX/cd
+   r1Zcc47Yczl9S7FWY8kOnrjEzfyYKA/x+p/nIynM+zpA2h9mXIreg1X0H
+   9f/0Ov9QIW9reNlPzQ+tRjt7XaYUeuk8L8iD+n4Keg7lSt5/Wl/cRIFIu
+   8eolS5qgHb6i3q0K3kDSZfilaJE/69Eraa7MvQEczASCYVKFH3nzvKhVD
+   uU+4fwarepL992b3I2LYFkml+nhtQBIWkFaj2PZPmMD8W7LkERvxmgi50
+   XryoQSC7SevQdAF1oKDYDo6NtpktrK+NJw4ok4FcZVox5F/OwyhydbiBI
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="350147580"
+X-IronPort-AV: E=Sophos;i="6.00,262,1681196400"; 
+   d="scan'208";a="350147580"
+Received: from fmsmga005.fm.intel.com ([10.253.24.32])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 00:11:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="1045061619"
+X-IronPort-AV: E=Sophos;i="6.00,262,1681196400"; 
+   d="scan'208";a="1045061619"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by fmsmga005.fm.intel.com with ESMTP; 22 Jun 2023 00:11:06 -0700
+Received: from rozewie.igk.intel.com (rozewie.igk.intel.com [10.211.8.69])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id DB317333DF;
+	Thu, 22 Jun 2023 08:11:05 +0100 (IST)
+From: Wojciech Drewek <wojciech.drewek@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	david.m.ertman@intel.com,
+	michal.swiatkowski@linux.intel.com,
+	marcin.szycik@linux.intel.com,
+	simon.horman@corigine.com
+Subject: [PATCH iwl-next] ice: Accept LAG netdevs in bridge offloads
+Date: Thu, 22 Jun 2023 09:09:56 +0200
+Message-Id: <20230622070956.357404-1-wojciech.drewek@intel.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <DM6PR11MB4657FED589F5922BBAC5D9059B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Jun 21, 2023 at 11:17:26PM CEST, arkadiusz.kubalewski@intel.com wrote:
->>From: Jakub Kicinski <kuba@kernel.org>
->>Sent: Tuesday, June 13, 2023 1:45 AM
->>
->>On Fri,  9 Jun 2023 14:18:46 +0200 Arkadiusz Kubalewski wrote:
->>> +	xa_for_each(xa_pins, i, ref) {
->>> +		if (ref->pin != pin)
->>> +			continue;
->>> +		reg = dpll_pin_registration_find(ref, ops, priv);
->>> +		if (reg) {
->>> +			refcount_inc(&ref->refcount);
->>> +			return 0;
->>> +		}
->>> +		ref_exists = true;
->>> +		break;
->>> +	}
->>> +
->>> +	if (!ref_exists) {
->>> +		ref = kzalloc(sizeof(*ref), GFP_KERNEL);
->>> +		if (!ref)
->>> +			return -ENOMEM;
->>> +		ref->pin = pin;
->>> +		INIT_LIST_HEAD(&ref->registration_list);
->>> +		ret = xa_insert(xa_pins, pin->pin_idx, ref, GFP_KERNEL);
->>> +		if (ret) {
->>> +			kfree(ref);
->>> +			return ret;
->>> +		}
->>> +		refcount_set(&ref->refcount, 1);
->>> +	}
->>> +
->>> +	reg = kzalloc(sizeof(*reg), GFP_KERNEL);
->>
->>Why do we have two structures - ref and reg?
->>
->
->Thank to Jiri and reg struct we solved a pin/dpll association
->with multiple device drivers..
+Allow LAG interfaces to be used in bridge offload using
+netif_is_lag_master. In this case, search for ice netdev in
+the list of LAG's lower devices.
 
-Multiple instances of the same driver.
+Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+---
+Note for Tony: This patch needs to go with Dave's LAG
+patchset:
+https://lore.kernel.org/netdev/20230615162932.762756-1-david.m.ertman@intel.com/
+---
+ .../net/ethernet/intel/ice/ice_eswitch_br.c   | 47 +++++++++++++++++--
+ 1 file changed, 42 insertions(+), 5 deletions(-)
 
+diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+index 1e57ce7b22d3..81b69ba9e939 100644
+--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
++++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+@@ -15,8 +15,23 @@ static const struct rhashtable_params ice_fdb_ht_params = {
+ 
+ static bool ice_eswitch_br_is_dev_valid(const struct net_device *dev)
+ {
+-	/* Accept only PF netdev and PRs */
+-	return ice_is_port_repr_netdev(dev) || netif_is_ice(dev);
++	/* Accept only PF netdev, PRs and LAG */
++	return ice_is_port_repr_netdev(dev) || netif_is_ice(dev) ||
++		netif_is_lag_master(dev);
++}
++
++static struct net_device *
++ice_eswitch_br_get_uplnik_from_lag(struct net_device *lag_dev)
++{
++	struct net_device *lower;
++	struct list_head *iter;
++
++	netdev_for_each_lower_dev(lag_dev, lower, iter) {
++		if (netif_is_ice(lower))
++			return lower;
++	}
++
++	return NULL;
+ }
+ 
+ static struct ice_esw_br_port *
+@@ -26,8 +41,19 @@ ice_eswitch_br_netdev_to_port(struct net_device *dev)
+ 		struct ice_repr *repr = ice_netdev_to_repr(dev);
+ 
+ 		return repr->br_port;
+-	} else if (netif_is_ice(dev)) {
+-		struct ice_pf *pf = ice_netdev_to_pf(dev);
++	} else if (netif_is_ice(dev) || netif_is_lag_master(dev)) {
++		struct net_device *ice_dev;
++		struct ice_pf *pf;
++
++		if (netif_is_lag_master(dev))
++			ice_dev = ice_eswitch_br_get_uplnik_from_lag(dev);
++		else
++			ice_dev = dev;
++
++		if (!ice_dev)
++			return NULL;
++
++		pf = ice_netdev_to_pf(ice_dev);
+ 
+ 		return pf->br_port;
+ 	}
+@@ -712,7 +738,18 @@ ice_eswitch_br_port_link(struct ice_esw_br_offloads *br_offloads,
+ 
+ 		err = ice_eswitch_br_vf_repr_port_init(bridge, repr);
+ 	} else {
+-		struct ice_pf *pf = ice_netdev_to_pf(dev);
++		struct net_device *ice_dev;
++		struct ice_pf *pf;
++
++		if (netif_is_lag_master(dev))
++			ice_dev = ice_eswitch_br_get_uplnik_from_lag(dev);
++		else
++			ice_dev = dev;
++
++		if (!ice_dev)
++			return 0;
++
++		pf = ice_netdev_to_pf(ice_dev);
+ 
+ 		err = ice_eswitch_br_uplink_port_init(bridge, pf);
+ 	}
+-- 
+2.40.1
 
->I.e. for pin:
->
->struct dpll_pin_registration {
->	struct list_head list;
->	const struct dpll_pin_ops *ops;
->	void *priv;
->};
->
->struct dpll_pin_ref {
->	union {
->		struct dpll_device *dpll;
->		struct dpll_pin *pin;
->	};
->	struct list_head registration_list;
->	refcount_t refcount;
->};
->
->struct dpll_pin {
->	u32 id;
->	u32 pin_idx;
->	u64 clock_id;
->	struct module *module;
->	struct xarray dpll_refs;
->	struct xarray parent_refs;
->	const struct dpll_pin_properties *prop;
->	char *rclk_dev_name;
->	refcount_t refcount;
->};
->
->Basically, a pin or a device can be registered from multiple drivers,
-
-Again, multiple instances of the same driver.
-
-
->where each driver has own priv and ops.
-
-Each instance/device.
-
-
->A single dpll_pin has references to dplls or pins (dpll_refs/parent_refs)
->it is connected with, and thanks to registration list single reference can
->have multiple drivers being attached with a particular dpll/pin.
-
-Multiple instances/devices.
-
-
-In case of mlx5, the same dpll device and same dpll pin could be shared
-among two PFs but also among multiple VFs and SFs. They all share the
-same clock, same dpll device.
-
-
->
->The same scheme is for a dpll_device struct and associated pins.
->
->
->>> +	if (!reg) {
->>> +		if (!ref_exists)
->>> +			kfree(ref);
->>
->>ref has already been inserted into xa_pins
->>
->
->True, seems like a bug, will fix it.
->
->Thank you,
->Arkadiusz
->
->>> +		return -ENOMEM;
 
