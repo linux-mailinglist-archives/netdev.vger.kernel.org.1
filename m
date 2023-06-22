@@ -1,149 +1,82 @@
-Return-Path: <netdev+bounces-13010-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13011-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60F4E739B7A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 11:02:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D3585739C87
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 11:20:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92BAF1C20C40
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:02:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BA9A1C20FBE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:20:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 238DD80C;
-	Thu, 22 Jun 2023 09:02:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CF280C;
+	Thu, 22 Jun 2023 09:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10D8C3AA92
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 09:02:26 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDD83C3B
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 02:02:09 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fa7512e599so2334705e9.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 02:02:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=baylibre-com.20221208.gappssmtp.com; s=20221208; t=1687424528; x=1690016528;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=FNA1YL50Xe6xIWLWDbv/5+owKWV0B11hHH1r7HBWhJQ=;
-        b=MgwAvf6ErqDqXvFqlTHH+VdQgYRKVikpI7RfA1KVMYaNdmdGKV1HgoQ4A779PIIoX2
-         ko8jojCsTVVOu3k/CwAJKJlOVq3baneWs+wurW2rUSBs1hjJQgssg2YVfztcTGRp1KFG
-         ef9cf0jcppd52qYVyslcLJPJ4GFtYzN8WZBGtEnOcs06AShqefslylE8LN/AgSWp8nhT
-         2u4atoEyw7zL/ckd/Fc6zfJWfkPTaFa2oL2XGFcs0sAvcK448xEZl+K5NU3XtVzbQ/6H
-         B26IiSFbDZ+0b/TqHS1vN4z3ul6Dp86JAFQNsVz63muCMoHHOYPOCXY5yIso6pSQ0CsX
-         LYrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687424528; x=1690016528;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=FNA1YL50Xe6xIWLWDbv/5+owKWV0B11hHH1r7HBWhJQ=;
-        b=lN457ES+vY/60GlheUxv+C9WRfpPeVJ56gDbl8CWky4hspsrMtjmU/J+Hrr2lhDbDa
-         poosmmnV865uWvAqkeup1WLWyDAjdhSKy3Hkqitm1BnUzcL+UXGgp040BZcTozcPL/W4
-         iRyyuVZsWDAbzegEsBwNTQUekC9Sv/dOcQRuRJSJ3ItrfOcfuSX3qLM8/ert9RcrJLIm
-         FzApLoGTpJLSGKR71iII3z2WuU5UQMSougPAWePlYjvlpFp4S/hnH/isD25qloUC0v8K
-         U+D9tvQURh+Vt8K3cxf3sc9FdOjaDSa7V8JzOz+wg5x6m943rTJaCG22DLY6Qr1TSMjW
-         yEAw==
-X-Gm-Message-State: AC+VfDzBvlGguiLoaJorV4aRmXVKK65gPzc8W12odA6fcPv3FyY+9MO3
-	xF3lpbDGkl4/9XWLh6dNoxLMAQ==
-X-Google-Smtp-Source: ACHHUZ6ULGTZVS356/YkGIuUHehLy8QCjNnTymSxu6WJeiQC839ut9fvHVvZsBmjcD0sdyahKdGqNA==
-X-Received: by 2002:a05:600c:3799:b0:3fa:6fc:679f with SMTP id o25-20020a05600c379900b003fa06fc679fmr1475598wmr.25.1687424528163;
-        Thu, 22 Jun 2023 02:02:08 -0700 (PDT)
-Received: from blmsp ([2001:4091:a247:82fa:b762:4f68:e1ed:5041])
-        by smtp.gmail.com with ESMTPSA id f9-20020a7bc8c9000000b003f9b0f640b1sm7074125wml.22.2023.06.22.02.02.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 02:02:07 -0700 (PDT)
-Date: Thu, 22 Jun 2023 11:02:06 +0200
-From: Markus Schneider-Pargmann <msp@baylibre.com>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Marc Kleine-Budde <mkl@pengutronix.de>,
-	Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-	Wolfgang Grandegger <wg@grandegger.com>,
-	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-can@vger.kernel.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, Julien Panis <jpanis@baylibre.com>
-Subject: Re: [PATCH v4 04/12] can: m_can: Add rx coalescing ethtool support
-Message-ID: <20230622090206.qkzts2qlbqeiukhs@blmsp>
-References: <20230621092350.3130866-1-msp@baylibre.com>
- <20230621092350.3130866-5-msp@baylibre.com>
- <ZJMHlIp9x8HL97qT@corigine.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3D21FDF
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 09:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id ECC75C433C0;
+	Thu, 22 Jun 2023 09:20:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687425621;
+	bh=mvjP+yi/+cJL9XucgVcxXqllTe6acnPF19TTxhjTeYo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=AOGdELPdDmcwZoR5UUZ3OjJY1Kuoc6EMEbEHDDqk3NaBjcNjwMCZoD1GBSvU7xs3l
+	 yDNLF6VW7UPblxduV8KvKwGhegjka38vgSXd+EOovugzpRxGY+G9WsNrvcNSyQo1hq
+	 Me4r3cGoNBn/CRb9Jh/OLBh0o9yquHetlF25ru2ufDxiPxgz3VuMM0Os2Q4AQ4gF/b
+	 krYDzBxkX3zt3/ZfVxX1pA5bNM7sCzCT6BemaXVE9p3H7uSuItxGA/K536oJBKhwNJ
+	 jW9BldT51l4F0rqOBtAzoFn4OKsB+0zKZjWfiZQu04SBgdBNNc1wYYEqy0gJWVMDO9
+	 u3TDJHkNknlmg==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D0239C395FF;
+	Thu, 22 Jun 2023 09:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-In-Reply-To: <ZJMHlIp9x8HL97qT@corigine.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] sch_netem: acquire qdisc lock in netem_change()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168742562084.21100.5779776053254524891.git-patchwork-notify@kernel.org>
+Date: Thu, 22 Jun 2023 09:20:20 +0000
+References: <20230620184425.1179809-1-edumazet@google.com>
+In-Reply-To: <20230620184425.1179809-1-edumazet@google.com>
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, eric.dumazet@gmail.com, syzkaller@googlegroups.com,
+ stephen@networkplumber.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+ jiri@resnulli.us
 
-Hi Simon,
+Hello:
 
-On Wed, Jun 21, 2023 at 04:22:12PM +0200, Simon Horman wrote:
-> On Wed, Jun 21, 2023 at 11:23:42AM +0200, Markus Schneider-Pargmann wrote:
-> 
-> ...
-> 
-> > +static int m_can_set_coalesce(struct net_device *dev,
-> > +			      struct ethtool_coalesce *ec,
-> > +			      struct kernel_ethtool_coalesce *kec,
-> > +			      struct netlink_ext_ack *ext_ack)
-> > +{
-> > +	struct m_can_classdev *cdev = netdev_priv(dev);
-> > +
-> > +	if (cdev->can.state != CAN_STATE_STOPPED) {
-> > +		netdev_err(dev, "Device is in use, please shut it down first\n");
-> > +		return -EBUSY;
-> > +	}
-> > +
-> > +	if (ec->rx_max_coalesced_frames_irq > cdev->mcfg[MRAM_RXF0].num) {
-> > +		netdev_err(dev, "rx-frames-irq %u greater than the RX FIFO %u\n",
-> > +			   ec->rx_max_coalesced_frames_irq,
-> > +			   cdev->mcfg[MRAM_RXF0].num);
-> > +		return -EINVAL;
-> > +	}
-> > +	if (ec->rx_max_coalesced_frames_irq == 0 != ec->rx_coalesce_usecs_irq == 0) {
-> 
-> Hi Markus,
-> 
-> For a W=1 build GCC 12.3.0 suggests, rather forcefully, that it would like
-> some more parentheses here.
-> 
->  drivers/net/can/m_can/m_can.c: In function 'm_can_set_coalesce':
->  drivers/net/can/m_can/m_can.c:1978:45: warning: suggest parentheses around comparison in operand of '!=' [-Wparentheses]
->   1978 |         if (ec->rx_max_coalesced_frames_irq == 0 != ec->rx_coalesce_usecs_irq == 0) {
->        |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~
->  drivers/net/can/m_can/m_can.c:1978:50: warning: suggest parentheses around comparison in operand of '==' [-Wparentheses]
->   1978 |         if (ec->rx_max_coalesced_frames_irq == 0 != ec->rx_coalesce_usecs_irq == 0) {
->        |             ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~^~~~~~~~~~~~~~~~~~~~~~~~~~~~
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Thanks, yes I just changed it because checkpatch doesn't like it the
-other way. I am going to change it back. Also I am wondering why clang
-doesn't complain at this point.
-
-Best,
-Markus
-
+On Tue, 20 Jun 2023 18:44:25 +0000 you wrote:
+> syzbot managed to trigger a divide error [1] in netem.
 > 
-> > +		netdev_err(dev, "rx-frames-irq and rx-usecs-irq can only be set together\n");
-> > +		return -EINVAL;
-> > +	}
-> > +
-> > +	cdev->rx_max_coalesced_frames_irq = ec->rx_max_coalesced_frames_irq;
-> > +	cdev->rx_coalesce_usecs_irq = ec->rx_coalesce_usecs_irq;
-> > +
-> > +	return 0;
-> > +}
+> It could happen if q->rate changes while netem_enqueue()
+> is running, since q->rate is read twice.
 > 
-> ...
+> It turns out netem_change() always lacked proper synchronization.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] sch_netem: acquire qdisc lock in netem_change()
+    https://git.kernel.org/netdev/net/c/2174a08db80d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
