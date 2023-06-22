@@ -1,220 +1,124 @@
-Return-Path: <netdev+bounces-13051-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13052-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E0F673A0AD
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:16:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5285D73A0BC
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:20:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 76A0A1C210F1
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:16:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 831AF1C210A3
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:20:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 605771E522;
-	Thu, 22 Jun 2023 12:16:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43BF31E523;
+	Thu, 22 Jun 2023 12:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4DE15AE4
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:16:27 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3F93199D;
-	Thu, 22 Jun 2023 05:16:25 -0700 (PDT)
-Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35MCFmk6014384;
-	Thu, 22 Jun 2023 12:16:11 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=phZ/ewYB2rSE60dhAYjcOXnd6Amu92ryCcWXav1bxsY=;
- b=lZUeXEE0WhHpHYrFFiiFz6ZMphFhWFCopTtNTwzy4lSoW2VkbsvvcWA3GEblXGqdB4ag
- hhw5sRUOEm67UVZek9zDoUQEeGwAC3Rdc4ignAxoYNoCEIoMnMaGiGazajAnfcSGTXS7
- T9yc6dT2MjBfi9EzOZzzaEHbYeizg5c4+bYrA9eGbrH7bEwhATL7djlRApl5YqdgfzPe
- qAEx6xqjZnn0aNfZRmtm72t9CGYPss+UU1gy5sYKc781y0c5oVR/lPXtykOQ10nRbSWd
- +Do1hZr1LVcxmbtXTYBQYJPt6c2x41M4od6Id7RpubQbibYL8qWO0bbkqmK8J1nKAFlq yA== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcp5c80gt-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Jun 2023 12:16:11 +0000
-Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35MCG8SB015704;
-	Thu, 22 Jun 2023 12:16:10 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcp5c80fr-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Jun 2023 12:16:10 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-	by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35MAtjqb025362;
-	Thu, 22 Jun 2023 12:16:08 GMT
-Received: from smtprelay05.fra02v.mail.ibm.com ([9.218.2.225])
-	by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3r943e2m5m-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Jun 2023 12:16:08 +0000
-Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
-	by smtprelay05.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35MCG5aG19399216
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Jun 2023 12:16:05 GMT
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id EBC4B2004B;
-	Thu, 22 Jun 2023 12:16:04 +0000 (GMT)
-Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 7EB4420040;
-	Thu, 22 Jun 2023 12:16:04 +0000 (GMT)
-Received: from [9.152.224.35] (unknown [9.152.224.35])
-	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 Jun 2023 12:16:04 +0000 (GMT)
-Message-ID: <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
-Date: Thu, 22 Jun 2023 14:16:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3558A1E516
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:20:25 +0000 (UTC)
+Received: from wout5-smtp.messagingengine.com (wout5-smtp.messagingengine.com [64.147.123.21])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4625610F2
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:20:24 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.west.internal (Postfix) with ESMTP id 67315320098C;
+	Thu, 22 Jun 2023 08:20:20 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Thu, 22 Jun 2023 08:20:21 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-type:content-type:date:date:from:from:in-reply-to
+	:in-reply-to:message-id:mime-version:references:reply-to:sender
+	:subject:subject:to:to; s=fm1; t=1687436420; x=1687522820; bh=Wa
+	qtPwQLyDZ2YLvIHgDIDSRwGDbuVFe58X1mf01iQzY=; b=lzWy4dLg/g0UOEuNqE
+	OngWCLrHZgn+dayizs10Bcis+QAanPD9RPEvjvxnNKF803JIcDyWQlORqAPuED3h
+	FCoHHvl+DO3N5att7r26uHdhm8MiVT+BmdhUl7vmyPSt6Kw63Y62aFX7+f2DEBMl
+	VMMB3qPQXvNZjolrDLhEJc2MHFqBMU5NgulsaWo/U4fF4Z4iaVqisk8Vr1W68Kqb
+	me30hYkMfdg1puU4OhGRgs8ZM0Fmi4JV6oUprEJQLLyx6tagsb0bQFR/Fw7wf8KS
+	IkPDlLd0Bk0tyQbXGdN9vuumbWh7AZ9FhuSzl/xECQCudGpqRe6F3eHxSKBIuZwv
+	lZXQ==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-type:content-type:date:date
+	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
+	:message-id:mime-version:references:reply-to:sender:subject
+	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
+	:x-sasl-enc; s=fm2; t=1687436420; x=1687522820; bh=WaqtPwQLyDZ2Y
+	LvIHgDIDSRwGDbuVFe58X1mf01iQzY=; b=itPudElv8krK/C4yEzeDJPfnANeFB
+	YxFlDFXBsrEwuM9Ax4j2utWEuGQumvA7R1pUp0VSUNspuV9RSDXCvwHjihrpQCjs
+	o8mBtgH35cfo3di9uUpxHf4gyplWhoTd8fyMUTGZYgRaxfgSob8uSYgH0qD50sBo
+	Q88DYPGL1HisWmj6w1OI5HRd87JfdoSLjKAl2YGH2krRotr21tb23gtMC/SyrqbM
+	oswUCNS/DRImsSbLq6ImpkhGdgVMj+VFXiAbfuwcXELFlhQaGWBSEl5TT2FPExGj
+	K9NFswsALBDVfzkKKdd+UxPsLutv6k/dcbAFlsDXxntEzS8vCA+Es72fQ==
+X-ME-Sender: <xms:gzyUZAxQs3uVQWzOEA2QvgzmsA7SErvdgvBv6mI10ZDz1rROHckuaA>
+    <xme:gzyUZET5SUBKExDWv54BxjBZOf2l6jnIeifFmODspgCZrPwb_QOxY4PuHZ4EtcfwH
+    CpcaCpjdW7XOAhqdC0>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeeguddghedtucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtsehttdertderredtnecuhfhrohhmpedftehr
+    nhguuceuvghrghhmrghnnhdfuceorghrnhgusegrrhhnuggsrdguvgeqnecuggftrfgrth
+    htvghrnhepffehueegteeihfegtefhjefgtdeugfegjeelheejueethfefgeeghfektdek
+    teffnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprg
+    hrnhgusegrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:gzyUZCWSgo9_g4H1ZdJmap_48pX3Di_zi0gcodfd6rdkVBO506CBmQ>
+    <xmx:gzyUZOjj5H5-GiB-CApLWx05fMJR9KenmTQaGl9c7QgzDi_rzPkGBA>
+    <xmx:gzyUZCA-WzIRWGSgVZVUc3t9E4PaYf0wH46TuSfNMAWar8Uo5gtiwQ>
+    <xmx:hDyUZE3QBEAS7iXNKs-LpHnoh4nF7H0cAILQ0jboIScs3eSecTsG6g>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id 6A782B60086; Thu, 22 Jun 2023 08:20:19 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
- module
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
-        kernel test robot <lkp@intel.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "David S . Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-References: <20230621213742.8245-1-rdunlap@infradead.org>
- <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
- <ZJP99hSRt5MakBXC@corigine.com>
-From: Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <ZJP99hSRt5MakBXC@corigine.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: YRNhdc74ZTrGB_DNBcX-HWGl-XOywLXD
-X-Proofpoint-GUID: DUbnREwnHO1FB1BjuyjMLfh5GDkSCDeE
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-22_08,2023-06-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- bulkscore=0 mlxlogscore=647 priorityscore=1501 malwarescore=0 mlxscore=0
- adultscore=0 spamscore=0 impostorscore=0 phishscore=0 suspectscore=0
- clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306220100
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Message-Id: <6f87fdf5-1844-4633-b4fe-6b247bc6ab49@app.fastmail.com>
+In-Reply-To: <342903aa-ceb5-4412-f5b9-93413d413079@gmail.com>
+References: <cover.1687427930.git.ecree.xilinx@gmail.com>
+ <441f4c197394bdeddb47aefa0bc854ee1960df27.1687427930.git.ecree.xilinx@gmail.com>
+ <c16273f9-f6e9-492d-a902-64604f3e40c2@app.fastmail.com>
+ <342903aa-ceb5-4412-f5b9-93413d413079@gmail.com>
+Date: Thu, 22 Jun 2023 14:19:58 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: "Edward Cree" <ecree.xilinx@gmail.com>,
+ "edward.cree" <edward.cree@amd.com>, linux-net-drivers@amd.com,
+ "David S . Miller" <davem@davemloft.net>, "Jakub Kicinski" <kuba@kernel.org>,
+ "Eric Dumazet" <edumazet@google.com>, "Paolo Abeni" <pabeni@redhat.com>
+Cc: Netdev <netdev@vger.kernel.org>,
+ "Martin Habets" <habetsm.xilinx@gmail.com>
+Subject: Re: [PATCH net-next 1/3] sfc: use padding to fix alignment in loopback test
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Jun 22, 2023, at 14:02, Edward Cree wrote:
+> On 22/06/2023 12:38, Arnd Bergmann wrote:
+>> On Thu, Jun 22, 2023, at 12:18, edward.cree@amd.com wrote:
+>> 
+>> There should probably be an extra __aligned(4) after the __packed,
+>> so that the compiler knows the start of the structure is aligned,
+>> otherwise (depending on the architecture and compiler), any access
+>> to a member can still turn into multiple single-byte accesses.
+>
+> Ok, will add that in v2.
+>
+>> I would also expect to still see a warning without that extra
+>> attribute. Aside from this, the patch looks good to me.
+> My compiler (gcc 8.3.1) doesn't reproduce the original warning, so
+>  I'm flying slightly blind here :(  If you could build-test this on
+>  your setup with/without the __aligned(4), I'd be very grateful.
 
+I can confirm that your patch addresses the warning for me
+with any version of clang I have installed, and that the __aligned(4)
+is not needed for the warning, though it is still a good idea for
+code generation.
 
-On 22.06.23 09:53, Simon Horman wrote:
-> On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
->>
->>
->> On 21.06.23 23:37, Randy Dunlap wrote:
->>> Require FDDI to be built-in if it is used. LCS needs FDDI to be
->>> built-in to build without errors.
->>>
->>> Prevents these build errors:
->>> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
->>> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
->>> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
->>>
->>> This FDDI requirement effectively restores the previous condition
->>> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
->>> testing for CONFIG_FDDI_MODULE.
->>>
->>> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-[...]
-> 
->> 2) I wonder whether
->>
->>   	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
->>  +	depends on FDDI || FDDI=n
->>
->> would do what we want here:
->> When FDDI is a loadable module, LCS mustn't be built-in.
->>
->> I will do some experiments and let you know.
-> 
-> It does seem to on my side.
-> But checking would be much appreciated.
- 
-
-Here are my experiments:
-
-Current net-next:
------------------
-if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
-
-drivers/s390/net/KConfig:
-config LCS
-	def_tristate m
-	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-
-.config:
-ETHERNET  |  FDDI | LCS choices | LCS | compile
---------------------------------------------------------
-n		m	m,n	  m	success (failed before Randy's fix)
-y		m	y,m,n	  m	success (failed before Randy's fix)
-y		m		  y	fails: undefined reference to `fddi_type_trans'
-
-
-Simon's proposal:
------------------
-        depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-+       depends on FDDI=y || FDDI=n
-
-ETHERNET  |  FDDI | LCS choices | LCS | compile
---------------------------------------------------------
-n		m	-
-y		m	-
-y		m	-
-y		n	y,m,n	  y	success
-y		n	y,m,n	  m	success
-y		y	y,m,n	  m	success
-
-
-Alexandra's proposal:
----------------------
-        depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-+       depends on FDDI || FDDI=n
-
-ETHERNET  |  FDDI | LCS choices | LCS | compile
---------------------------------------------------------
-n		m	m,n	  m	success
-y		m	m,n	  m	success
-y		n	y,m,n	  y	success
-y		n	y,m,n	  m	success
-y		y	y,m,n	  m	success
-
------------------------------------------------------------
-
-Seems that 
-	A[tristate] depends on B[tristate]
-means that A cannot be 'higher' than B.
-Meaning, if B=n -> A= must be n
-	if B=m -> A can be m or n
-	if B=y -> A can be y or m or n
-
-Although I did not find documentation confirming that.
-
-
-@Randy, do you want give a v2 a try with that?
-
-I guess then it is safe to delete from drivers/s390/net/lcs.c
--#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
--#error Cannot compile lcs.c without some net devices switched on.
--#endif
-
-
+     Arnd
 
