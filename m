@@ -1,139 +1,124 @@
-Return-Path: <netdev+bounces-13059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B9DF873A104
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:35:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B9AB273A113
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:38:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68A892819AD
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:35:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6FC5E281990
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:38:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862161C760;
-	Thu, 22 Jun 2023 12:35:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0E281C763;
+	Thu, 22 Jun 2023 12:38:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745B63AAA0
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:35:56 +0000 (UTC)
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536E51BC1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:35:53 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-47147ebb849so1945388e0c.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:35:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687437352; x=1690029352;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=BwL1XXFpB7Juc23gGcrmpmP3rd5YyIO3kgOAyPIlzcM=;
-        b=CqGj2E1L8WAGd6HSmOq2ffig5DVss6jWELqzntl3GKlXUEYm5evoPvavsg0cZPdyUG
-         uVYi/gfibC8xVIb/UDtPwlUBdDgsGbxguuycXjG2YxnCEy6H8kcNelG4AmVpMpuckiFA
-         eyEowBgxCKXjLiR8L0kyDyIwgAAsE6ldsvwGIJ3f6rUlNWz3fc1ZPRn8DOTpQsHvf9U3
-         rCVWH3iloZlCntq1nkRIF3PZgXJe73H9ULOZzTrIaIObG/zpStYEiw4JdcsdNwNBIaPh
-         qAF5aEyVo3tt/zl56/6m0CiD/OPH7Vi4QYEnxzx/YEwhml9wARWBRGCZwE5R0GDgcGQY
-         E3NA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687437352; x=1690029352;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BwL1XXFpB7Juc23gGcrmpmP3rd5YyIO3kgOAyPIlzcM=;
-        b=boCM+ghypY2JxI4ZF+hPzwJD7HRU9C4puXrVBVg0IagZbOO3eoI6BbyF+6h06LyNRL
-         gEcOrfQSqMl+spIXw9WlNBTUnQyPoDiLTp0jP+h0/VMUZIQi1vQSoSDsNSeVFnJ1lPnc
-         tMzUksqZHZoy+NiyO+kKwbQvRgTuONXiHI83AbZze2VesHZEuPsGVsdsGtuXEjOCtMCz
-         eN7BmPXcMDTUt9NUJHnasO7cxd9L0XJeb337xDcGqW35K7hS+br6NOjVoBI1LRe9MoN9
-         WzIMZ5vDb9Q3f8IWMxwcb1GQL8B/I3Th3DtEQ01EAZoFruQWE3D8cLm9adoRyd+W6L+F
-         FLyA==
-X-Gm-Message-State: AC+VfDyMxRdLzwumRGog0XKNhkgtzpHQInwEwRR2qUBnmavMsKiNEyfQ
-	QzzGywukFR44wZEk8I0T/abfmKQmT08CunqGtGpigQ==
-X-Google-Smtp-Source: ACHHUZ4bpL2T9bnI4qregSI95k/VcQbvtJLdxgrvfNu5HuW8eTOaNzhJ0fgEC/46fMtfm/dxsGD0owYkxtdDBTEbKLI=
-X-Received: by 2002:a1f:e201:0:b0:471:4ceb:675f with SMTP id
- z1-20020a1fe201000000b004714ceb675fmr5066318vkg.9.1687437352169; Thu, 22 Jun
- 2023 05:35:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9596B3AAA0
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:38:46 +0000 (UTC)
+X-Greylist: delayed 60 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Jun 2023 05:38:44 PDT
+Received: from smtpdh20-1.aruba.it (smtpdh20-1.aruba.it [62.149.155.164])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C750DE
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:38:44 -0700 (PDT)
+Received: from localhost.localdomain ([151.79.164.54])
+	by Aruba Outgoing Smtp  with ESMTPSA
+	id CJZEqf8KC1xz6CJZEqE7my; Thu, 22 Jun 2023 14:37:42 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
+	t=1687437462; bh=g03OJMjrBbsiPap55M8C8/eh3feEmOWxGVwXp3EGFpY=;
+	h=From:To:Subject:Date:MIME-Version;
+	b=eNW2RDBrrahovjFeZYjyVuvgwITFcUflLImIHBwPRNH9Upd1xJu5xag4yMSbQ829i
+	 WJyFarH57K33ffFtTxfWtKM+2+kbHF80bwpkm5qCLSzYHQSxiB5bHkrd89X4sInQGH
+	 JVTqE1ldzEuaMJHYXEtL5CYqbNfVQ7oJw29ibNza8id1sqgudEY4pAFS6VueATpOya
+	 84cBolwYe4KjcdyW7tlzvHFVls31tFfn+g8dyGw3gN4crIpV0v1zMCmpQHHxlCMSeD
+	 0tQHyTH9kQW5aTMkmf1FNwhve2NB45L+DzH0rl7mQ+7THBwC87/psqaZ/UoxbbGeoC
+	 IhsLzFppiKoNA==
+From: Giulio Benetti <giulio.benetti@benettiengineering.com>
+To: Florian Fainelli <f.fainelli@gmail.com>
+Cc: Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Giulio Benetti <giulio.benetti@benettiengineering.com>
+Subject: [PATCH] net: phy: broadcom: drop brcm_phy_setbits() and use phy_set_bits() instead
+Date: Thu, 22 Jun 2023 14:37:37 +0200
+Message-Id: <20230622123737.8649-1-giulio.benetti@benettiengineering.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
- <ZJLzsWsIPD57pDgc@FVFF77S0Q05N> <ZJQXdFxoBNUdutYx@FVFF77S0Q05N>
-In-Reply-To: <ZJQXdFxoBNUdutYx@FVFF77S0Q05N>
-From: Naresh Kamboju <naresh.kamboju@linaro.org>
-Date: Thu, 22 Jun 2023 18:05:40 +0530
-Message-ID: <CA+G9fYtAutjL3KpZsQyJuk4WqS=Ydi2iyVb5jdecZ-SOuzKCmA@mail.gmail.com>
-Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
-To: Mark Rutland <mark.rutland@arm.com>
-Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>, 
-	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
-	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org, 
-	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
-	Will Deacon <will@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
-	Puranjay Mohan <puranjay12@gmail.com>, Song Liu <song@kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+Content-Transfer-Encoding: 8bit
+X-CMAE-Envelope: MS4xfHJyd/ZEh28BATS8DEkFR2WqXze3wFY5EaNI9gpZ4M9ewFj4saI/IPlanEGmVHTBGnqhO9SLMg0TvAzgIQ1Pf2nsrjngHOJXlr3LVID+EEgwyss0ApMi
+ QzwxBMw7JexINdQp6yqOLGLh1f4MrMLEsMuL1dTQPicgScYCZsOd+01Ncma+tdvkjvab2lSdLNMS31/nsW6c1AYgZLR/u9DsE592KZ5bdYurNIByQUy14J2k
+ Fi/NbH/YAu0Cl61EJvHNsy7+C7zboB38KW7JuDHGl2LQP0s+4ZcZEL/EAR7taZ654Mtpgn6TfuxY6twCjkBIoLHnoRhPEdm1GfIcsZyECMqI06NTBVJ9/ZI3
+ jqREXWN8zBxD5CJdbufGIf9zC4bdxxPJZ3XwRe/KBTc12kPhSVKUsWovzWJ/j9AJSSter4tt3UG7EJezXG3TWHSwl9VB5gYCwdr1LjeiqnyHUIOTyTjozSuk
+ OqhrNCaPSbIasDz8iUs+u4EfcVOYLp6awLV7wye4d9vOckgbJlZWXTHzQOZrcH6jH3pIm/BExN8A4gbeg8IX2MP7kCcgeueJyHZsTKMdJK26avUNx1dbyeos
+ t7PTdiCUDoQXjimyxd2fGxt2
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Mark,
+Linux provides phy_set_bits() helper so let's drop brcm_phy_setbits() and
+use phy_set_bits() in its place.
 
-On Thu, 22 Jun 2023 at 15:12, Mark Rutland <mark.rutland@arm.com> wrote:
->
-> On Wed, Jun 21, 2023 at 01:57:21PM +0100, Mark Rutland wrote:
-> > On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
-> > > Following boot warnings and crashes noticed on arm64 Rpi4 device running
-> > > Linux next-20230621 kernel.
-> > >
-> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
-> > >
-> > > boot log:
-> > >
-> > > [   22.331748] Kernel text patching generated an invalid instruction
-> > > at 0xffff8000835d6580!
-> > > [   22.340579] Unexpected kernel BRK exception at EL1
-> > > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1] PREEMPT SMP
-> >
-> > This indicates execution of AARCH64_BREAK_FAULT.
-> >
-> > That could be from dodgy arguments to aarch64_insn_gen_*(), or elsewhere, and
-> > given this is in the networking code I suspect this'll be related to BPF.
-> >
-> > Looking at next-20230621 I see commit:
-> >
-> >   49703aa2adfaff28 ("bpf, arm64: use bpf_jit_binary_pack_alloc")
-> >
-> > ... which changed the way BPF allocates memory, and has code that pads memory
-> > with a bunch of AARCH64_BREAK_FAULT, so it looks like that *might* be related.
->
-> For the benefit of those just looknig at this thread, there has been some
-> discussion in the original thread for this commit. Summary and links below.
->
-> We identified a potential issue with missing cache maintenance:
->
->   https://lore.kernel.org/linux-arm-kernel/ZJMXqTffB22LSOkd@FVFF77S0Q05N/
->
-> Puranjay verified that was causing the problem seen here:
->
->   https://lore.kernel.org/linux-arm-kernel/CANk7y0h5ucxmMz4K8sGx7qogFyx6PRxYxmFtwTRO7=0Y=B4ugw@mail.gmail.com/
->
-> Alexei has dropped this commit for now:
->
->   https://lore.kernel.org/linux-arm-kernel/CAADnVQJqDOMABEx8JuU6r_Dehyf=SkDfRNChx1oNfqPoo7pSrw@mail.gmail.com/
+Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+---
+ drivers/net/phy/broadcom.c | 15 ++-------------
+ 1 file changed, 2 insertions(+), 13 deletions(-)
 
-Thanks for the detailed information.
-I am happy to test any proposed fix patches.
+diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
+index ad71c88c87e7..d684c5be529a 100644
+--- a/drivers/net/phy/broadcom.c
++++ b/drivers/net/phy/broadcom.c
+@@ -608,17 +608,6 @@ static int bcm54616s_read_status(struct phy_device *phydev)
+ 	return err;
+ }
+ 
+-static int brcm_phy_setbits(struct phy_device *phydev, int reg, int set)
+-{
+-	int val;
+-
+-	val = phy_read(phydev, reg);
+-	if (val < 0)
+-		return val;
+-
+-	return phy_write(phydev, reg, val | set);
+-}
+-
+ static int brcm_fet_config_init(struct phy_device *phydev)
+ {
+ 	int reg, err, err2, brcmtest;
+@@ -689,14 +678,14 @@ static int brcm_fet_config_init(struct phy_device *phydev)
+ 		goto done;
+ 
+ 	/* Enable auto MDIX */
+-	err = brcm_phy_setbits(phydev, MII_BRCM_FET_SHDW_MISCCTRL,
++	err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_MISCCTRL,
+ 				       MII_BRCM_FET_SHDW_MC_FAME);
+ 	if (err < 0)
+ 		goto done;
+ 
+ 	if (phydev->dev_flags & PHY_BRCM_AUTO_PWRDWN_ENABLE) {
+ 		/* Enable auto power down */
+-		err = brcm_phy_setbits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
++		err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
+ 					       MII_BRCM_FET_SHDW_AS2_APDE);
+ 	}
+ 
+-- 
+2.34.1
 
-
->
-> Thanks,
-> Mark.
-
-- Naresh
 
