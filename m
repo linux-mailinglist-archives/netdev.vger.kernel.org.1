@@ -1,120 +1,196 @@
-Return-Path: <netdev+bounces-12938-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12939-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1657397F8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:15:21 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E3E937397FA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:15:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E9FFC1C21060
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:15:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 26F73281839
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:15:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AAE3C5689;
-	Thu, 22 Jun 2023 07:15:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93FED568F;
+	Thu, 22 Jun 2023 07:15:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9BE021FB4
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:15:18 +0000 (UTC)
-Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 511B3E69
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:15:17 -0700 (PDT)
-Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
-	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <mkl@pengutronix.de>)
-	id 1qCEX7-0008Qg-Ep; Thu, 22 Jun 2023 09:15:09 +0200
-Received: from pengutronix.de (unknown [172.20.34.65])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	(Authenticated sender: mkl-all@blackshift.org)
-	by smtp.blackshift.org (Postfix) with ESMTPSA id 944DB1DF249;
-	Thu, 22 Jun 2023 07:15:07 +0000 (UTC)
-Date: Thu, 22 Jun 2023 09:15:06 +0200
-From: Marc Kleine-Budde <mkl@pengutronix.de>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	linux-can@vger.kernel.org, kernel@pengutronix.de,
-	Frank Jungclaus <frank.jungclaus@esd.eu>,
-	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Subject: Re: [PATCH net-next 04/33] can: esd_usb: Replace initializer macros
- used for struct can_bittiming_const
-Message-ID: <20230622-batboy-roulette-f94e1ad087a2-mkl@pengutronix.de>
-References: <20230621132914.412546-1-mkl@pengutronix.de>
- <20230621132914.412546-5-mkl@pengutronix.de>
- <ZJPytAFaG3UFaw3i@corigine.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 897E133CD
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:15:50 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89A84E69;
+	Thu, 22 Jun 2023 00:15:47 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35M75nW4022900;
+	Thu, 22 Jun 2023 07:15:31 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=pp1;
+ bh=LDHaapSVWvbIG0L5Ay14IB3K+j+a/r4eE/xCCjB5YdU=;
+ b=HA3MVg/sgFNQXA6d15zutPP7LY3BoVrQjoqDkDl3w8e/yhZhjJIZB22/aMeg/nwpzZYM
+ 5fy27OOiRpEeEfhJdlQ7N12+M5B/bgea42niSXFtHu4A4mUFH/dLEP0BFiPikYyFFXY+
+ R3Y0u0OOilRbQk75AbP6nHL0gDjHdaRI6xW0nYT2+mES5b+zV5Qf0vh5Mu+W2Pv/JB5r
+ pmiGQCfCAqxhFULLNST9RL5dsS/hNODo+JL4tgbuectIFU5zQ7WM3z9UXXRgbaMVNI6v
+ tZ4ajrBfV+AD2DJFixgjDfC1SFbirY3rq7cPwTfMbvFNuiBpw/PP5870QQv2R+JYpLqD qQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rchep0ca8-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 07:15:31 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35M76P2o027008;
+	Thu, 22 Jun 2023 07:15:30 GMT
+Received: from ppma05fra.de.ibm.com (6c.4a.5195.ip4.static.sl-reverse.com [149.81.74.108])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rchep0c9g-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 07:15:30 +0000
+Received: from pps.filterd (ppma05fra.de.ibm.com [127.0.0.1])
+	by ppma05fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35M2t6Du017857;
+	Thu, 22 Jun 2023 07:15:28 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma05fra.de.ibm.com (PPS) with ESMTPS id 3r94f52gcp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 22 Jun 2023 07:15:28 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35M7FPNd42336864
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 Jun 2023 07:15:25 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 1578A2004B;
+	Thu, 22 Jun 2023 07:15:25 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id C39CE20043;
+	Thu, 22 Jun 2023 07:15:24 +0000 (GMT)
+Received: from [9.152.224.35] (unknown [9.152.224.35])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 22 Jun 2023 07:15:24 +0000 (GMT)
+Message-ID: <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+Date: Thu, 22 Jun 2023 09:15:24 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="btpfdpaa6xyqcbfy"
-Content-Disposition: inline
-In-Reply-To: <ZJPytAFaG3UFaw3i@corigine.com>
-X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
-X-SA-Exim-Mail-From: mkl@pengutronix.de
-X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
-X-PTX-Original-Recipient: netdev@vger.kernel.org
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+Content-Language: en-US
+To: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org
+Cc: kernel test robot <lkp@intel.com>,
+        Simon Horman <simon.horman@corigine.com>,
+        Wenjia Zhang
+ <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+        Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "David S . Miller"
+ <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <20230621213742.8245-1-rdunlap@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: GOC3sp2yjV-PtfW51iFc-kKLnElSNJ5g
+X-Proofpoint-GUID: Os9Pko7AHpcTwayR_5Q8NJ1gz5T5P4-r
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-22_04,2023-06-16_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ clxscore=1011 suspectscore=0 mlxlogscore=999 bulkscore=0 impostorscore=0
+ priorityscore=1501 mlxscore=0 malwarescore=0 lowpriorityscore=0
+ adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306220057
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
---btpfdpaa6xyqcbfy
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
 
-On 22.06.2023 09:05:24, Simon Horman wrote:
-> Hi Marc and Frank,
->=20
-> it seems that something might have got mixed up here,
-> because GCC complains that:
->=20
->  drivers/net/can/usb/esd_usb.c:916:43: error: use of undeclared identifie=
-r 'esd_usb_2_bittiming_const'; did you mean 'esd_usb2_bittiming_const'?
->          const struct can_bittiming_const *btc =3D &esd_usb_2_bittiming_c=
-onst;
->                                                   ^~~~~~~~~~~~~~~~~~~~~~~=
-~~
->                                                   esd_usb2_bittiming_const
->  drivers/net/can/usb/esd_usb.c:902:41: note: 'esd_usb2_bittiming_const' d=
-eclared here
->  static const struct can_bittiming_const esd_usb2_bittiming_const =3D {
->                                         ^
-> --=20
+On 21.06.23 23:37, Randy Dunlap wrote:
+> Require FDDI to be built-in if it is used. LCS needs FDDI to be
+> built-in to build without errors.
+> 
+> Prevents these build errors:
+> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
+> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
+> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
+> 
+> This FDDI requirement effectively restores the previous condition
+> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
+> testing for CONFIG_FDDI_MODULE.
+> 
+> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> Reported-by: kernel test robot <lkp@intel.com>
+> Link: lore.kernel.org/r/202306202129.pl0AqK8G-lkp@intel.com
+> Suggested-by: Simon Horman <simon.horman@corigine.com>
+> Cc: Alexandra Winter <wintera@linux.ibm.com>
+> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> Cc: linux-s390@vger.kernel.org
+> Cc: netdev@vger.kernel.org
+> Cc: Heiko Carstens <hca@linux.ibm.com>
+> Cc: Vasily Gorbik <gor@linux.ibm.com>
+> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> Cc: Sven Schnelle <svens@linux.ibm.com>
+> Cc: David S. Miller <davem@davemloft.net>
+> Cc: Eric Dumazet <edumazet@google.com>
+> Cc: Jakub Kicinski <kuba@kernel.org>
+> Cc: Paolo Abeni <pabeni@redhat.com>
+> ---
+>  drivers/s390/net/Kconfig |    2 ++
+>  1 file changed, 2 insertions(+)
+> 
+> diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+> --- a/drivers/s390/net/Kconfig
+> +++ b/drivers/s390/net/Kconfig
+> @@ -6,11 +6,13 @@ config LCS
+>  	def_tristate m
+>  	prompt "Lan Channel Station Interface"
+>  	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +	depends on FDDI=y || FDDI=n
+>  	help
+>  	  Select this option if you want to use LCS networking on IBM System z.
+>  	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+>  	  To compile as a module, choose M. The module name is lcs.
+>  	  If you do not know what it is, it's safe to choose Y.
+> +	  If FDDI is used, it must be built-in (=y).
+>  
+>  config CTCM
+>  	def_tristate m
+> 
 
-Doh! Will fix.
 
-Marc
+Wow Randy and Simon, you are reacting faster than I was able to evaluate this yesterday.
+2 thoughts:
 
---=20
-Pengutronix e.K.                 | Marc Kleine-Budde          |
-Embedded Linux                   | https://www.pengutronix.de |
-Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
-Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+1) As ETHERNET cannot be a module and this patch prevents FDDI from being a module, then 
+128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+is kind of pointless and can as well be reverted instead of doing this fix.
+Or am I missing something?
 
---btpfdpaa6xyqcbfy
-Content-Type: application/pgp-signature; name="signature.asc"
+2) I wonder whether
 
------BEGIN PGP SIGNATURE-----
+  	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+ +	depends on FDDI || FDDI=n
 
-iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmST9PgACgkQvlAcSiqK
-BOiAUQf/UIYykb6K2z+OnJ0sZHRoshvH3D8TS3+Bm//zDKdfYG6INE2lD2yoSHIQ
-EC7MTrbycsAd4NgGgNm8+wzkcJyGoQF1FeZ6APx5If7YCVhhKuNg9v5QO+UXm6Mx
-AAX356lCkRWZiI+FKz6p8XJdjKqpZin50aDYIlaLmKMr2IuaKmvxgJoO90PAeLk8
-O/AZ4eRxUhP/ekBJM9fMePNULxbU4lyrVertyiJwlvpp6/p0OiGwpFXok12CsUse
-M/rGC3MSagGxpAuio6b4DyFB7zkYjGVi9nVYPx7ouIoTZe8u+wd/w1kziyovDloG
-irUsz3aLza7NzbgS8G3YGmEQkng+1w==
-=V52t
------END PGP SIGNATURE-----
+would do what we want here:
+When FDDI is a loadable module, LCS mustn't be built-in.
 
---btpfdpaa6xyqcbfy--
+I will do some experiments and let you know.
+
+Alexandra
+
+
+
 
