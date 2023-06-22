@@ -1,102 +1,116 @@
-Return-Path: <netdev+bounces-13196-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B88D373A936
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:55:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B62C573A933
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:55:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F343E1C21195
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:55:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 73A80281AB2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:55:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF3D21081;
-	Thu, 22 Jun 2023 19:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 180BA21080;
+	Thu, 22 Jun 2023 19:55:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E27A8200C6
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:55:26 +0000 (UTC)
-X-Greylist: delayed 110408 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Jun 2023 12:55:19 PDT
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C8B11BC1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:55:19 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-311-ABNjBXxtP72N4mZmt67qWQ-1; Thu, 22 Jun 2023 15:55:00 -0400
-X-MC-Unique: ABNjBXxtP72N4mZmt67qWQ-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A8D64856506;
-	Thu, 22 Jun 2023 19:54:55 +0000 (UTC)
-Received: from hog (unknown [10.39.195.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 9FBCE2166B25;
-	Thu, 22 Jun 2023 19:54:54 +0000 (UTC)
-Date: Thu, 22 Jun 2023 21:54:53 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Carlos Fernandez <carlos.fernandez@technica-engineering.de>
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v3] net: macsec SCI assignment for ES = 0
-Message-ID: <ZJSnDZL-0hLxbDje@hog>
-References: <20230620091301.21981-1-carlos.fernandez@technica-engineering.de>
- <20230621173429.18348fc8@kernel.org>
- <AM9PR08MB67880BD6AC346558D62C92C8DB22A@AM9PR08MB6788.eurprd08.prod.outlook.com>
- <AM9PR08MB67887483EDDF2AB7B11BF14FDB22A@AM9PR08MB6788.eurprd08.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7E46200C6
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:55:02 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id EE8A4C433C8;
+	Thu, 22 Jun 2023 19:54:59 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687463702;
+	bh=/Y3hDobY50UVjtDFqg+IraerI8qLf+JHDe3DFP5DZNY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=FHO5bqdKzTmfFARCy6yMYqX9cFKuDjqxGHm77u9dM/S/d6ZigzqGEKIKSmZS6+dKj
+	 IIVJQiytOhSdzOJIvZlM/TCOex53Vsw/t5AeksiOyYJvrl7U0TQifGsnJ1X7+P4v3Z
+	 5iHdlaGEzxgs0ISDke4AOS0i1YyLmgfoMN8FOhrCzYpXK9Jdn9/YLsxW8cpfSyty/2
+	 yZOtOeM+5trESt1nnk1+1JqokAcvHfgOgJ1MHaMxVBZlHJch69tlYSiFdlS5NiGfaF
+	 eT0qs5/KAUjsj23kbJ9qS5Y87DXfU1YUvre67z3vErEHZIM9LcrSYmOPbFJo5gnORL
+	 Xx1Tcb6AfNCzQ==
+Date: Thu, 22 Jun 2023 20:54:57 +0100
+From: Conor Dooley <conor@kernel.org>
+To: Rob Herring <robh@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Maxime Chevallier <maxime.chevallier@bootlin.com>,
+	netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next] dt-bindings: net: altr,tse: Fix error in
+ "compatible" conditional schema
+Message-ID: <20230622-germless-unless-02d29924ddf2@spud>
+References: <20230621231012.3816139-1-robh@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: multipart/signed; micalg=pgp-sha256;
+	protocol="application/pgp-signature"; boundary="a/Cjr6/h5jMrqHAk"
 Content-Disposition: inline
-In-Reply-To: <AM9PR08MB67887483EDDF2AB7B11BF14FDB22A@AM9PR08MB6788.eurprd08.prod.outlook.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
-
-Hi Carlos,
-
-2023-06-22, 11:49:44 +0000, Carlos Fernandez wrote:
-> Hi Jakub,
-> 
-> Also, about the double look up:
-> I know it's there, but I tried to only change the function that returns the correct SCI in every case. Also, it should be a 1 and only item list. I do not think this should be dangerous or slow.
-
-Why is it a 1 item list? Even if that was guaranteed to be true in
-normal conditions, we could have a situation where lots of MACsec
-SecYs and RXSCs are set up, and packets start hitting this loop.
+In-Reply-To: <20230621231012.3816139-1-robh@kernel.org>
 
 
-And could you quote the correct section of 802.1AE? I can't find the
-reference for the behavior you're implementing in this patch. All I
-can find is (from section 9.5):
+--a/Cjr6/h5jMrqHAk
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-    The ES bit is clear if the Source Address is not used to determine the SCI.
+Hey Rob,
 
-    The SC bit shall be clear if an SCI is not present in the SecTAG.
+On Wed, Jun 21, 2023 at 05:10:12PM -0600, Rob Herring wrote:
+> The conditional if/then schema has an error as the "enum" values have
+> "const" in them. Drop the "const".
+>=20
+> Signed-off-by: Rob Herring <robh@kernel.org>
 
-which doesn't say anything about how to interpret both bits being
-clear.
+Reviewed-by: Conor Dooley <conor.dooley@microchip.com>
 
+You waiting for some of these to land before updating dt-schema?
 
-(and please don't top-post)
+Cheers,
+Conor.
 
+> ---
+>  Documentation/devicetree/bindings/net/altr,tse.yaml | 4 ++--
+>  1 file changed, 2 insertions(+), 2 deletions(-)
+>=20
+> diff --git a/Documentation/devicetree/bindings/net/altr,tse.yaml b/Docume=
+ntation/devicetree/bindings/net/altr,tse.yaml
+> index 9d02af468906..f5d3b70af07a 100644
+> --- a/Documentation/devicetree/bindings/net/altr,tse.yaml
+> +++ b/Documentation/devicetree/bindings/net/altr,tse.yaml
+> @@ -72,8 +72,8 @@ allOf:
+>          compatible:
+>            contains:
+>              enum:
+> -              - const: altr,tse-1.0
+> -              - const: ALTR,tse-1.0
+> +              - altr,tse-1.0
+> +              - ALTR,tse-1.0
+>      then:
+>        properties:
+>          reg:
+> --=20
+> 2.40.1
+>=20
 
-Thanks,
+--a/Cjr6/h5jMrqHAk
+Content-Type: application/pgp-signature; name="signature.asc"
 
--- 
-Sabrina
+-----BEGIN PGP SIGNATURE-----
 
+iHUEABYIAB0WIQRh246EGq/8RLhDjO14tDGHoIJi0gUCZJSnEQAKCRB4tDGHoIJi
+0ms8AQCmtnDqlu3WQfbAKGmFyABvaTBCVbHGQ5/+gOrtZoyTDQD/Scy8/gY7sVIA
+Y9M1+ImUvdMHcOEcNeAR4HeOFR+CiAM=
+=V1Bu
+-----END PGP SIGNATURE-----
+
+--a/Cjr6/h5jMrqHAk--
 
