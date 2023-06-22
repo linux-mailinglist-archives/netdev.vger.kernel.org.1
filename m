@@ -1,188 +1,276 @@
-Return-Path: <netdev+bounces-13094-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13095-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA23973A2AB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:09:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1880173A2D5
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:15:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9851C2113B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:09:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8CA22819AD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:15:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246FE1F175;
-	Thu, 22 Jun 2023 14:09:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 423A61F18B;
+	Thu, 22 Jun 2023 14:15:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B5D15AE5
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 14:09:20 +0000 (UTC)
-Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E13118;
-	Thu, 22 Jun 2023 07:09:19 -0700 (PDT)
-Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
-	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230622140917euoutp0209c3af71a8e555075da71adff50e22be~rAG37Z84v1834418344euoutp02o;
-	Thu, 22 Jun 2023 14:09:17 +0000 (GMT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230622140917euoutp0209c3af71a8e555075da71adff50e22be~rAG37Z84v1834418344euoutp02o
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
-	s=mail20170921; t=1687442957;
-	bh=zaMeOOgNTUhWbrl//bfN8EJTtzCzEfB12QbiW80G2f4=;
-	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
-	b=fyMYAsX7SWYCvC721YkuDao9t6T+v9dW0/DNO3irMb5N3/+7mY+XC7PBmdIBgaAvs
-	 nwu4XyzztDaaiEJ4vpcLtdpxEmzEo+NC19qsW+0/HbTJr2EWYbhVKkuOS3DdtZRY7b
-	 95cqTsi+l2A2Sq2OBC3R9D8F7pdOR0ihbUkSZEHY=
-Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
-	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
-	20230622140917eucas1p28dc98c293572df0d551587904d58fff1~rAG3sfKOA1958219582eucas1p2p;
-	Thu, 22 Jun 2023 14:09:17 +0000 (GMT)
-Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
-	eusmges1new.samsung.com (EUCPMTA) with SMTP id DC.B9.42423.D0654946; Thu, 22
-	Jun 2023 15:09:17 +0100 (BST)
-Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
-	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
-	20230622140916eucas1p122166fa1c1ee8fc1498c76af15e4ce52~rAG3Opb-I1423914239eucas1p1o;
-	Thu, 22 Jun 2023 14:09:16 +0000 (GMT)
-Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
-	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
-	20230622140916eusmtrp1d20955f9b396aea7c60d7cdcf79f38fd~rAG3N_8ml1843218432eusmtrp1R;
-	Thu, 22 Jun 2023 14:09:16 +0000 (GMT)
-X-AuditID: cbfec7f2-a51ff7000002a5b7-61-6494560d374d
-Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
-	eusmgms2.samsung.com (EUCPMTA) with SMTP id 21.D2.14344.C0654946; Thu, 22
-	Jun 2023 15:09:16 +0100 (BST)
-Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
-	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
-	20230622140916eusmtip283cc06318a6e5b54077056f6bb1dd63f~rAG3DqvTB0784507845eusmtip2C;
-	Thu, 22 Jun 2023 14:09:16 +0000 (GMT)
-Received: from localhost (106.110.32.133) by CAMSVWEXC02.scsc.local
-	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
-	Thu, 22 Jun 2023 15:09:16 +0100
-Date: Thu, 22 Jun 2023 16:09:15 +0200
-From: Joel Granados <j.granados@samsung.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>, Iurii Zaikin
-	<yzaikin@google.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
-	<netdev@vger.kernel.org>
-Subject: Re: [PATCH 05/11] sysctl: Add a size arg to __register_sysctl_table
-Message-ID: <20230622140915.top2p467qfd7slez@localhost>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 350F51F186
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 14:15:43 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 468A92100
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:15:19 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b543f7e53aso47300355ad.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:15:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687443302; x=1690035302;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=QdciB8cBXbF3HOfRChPi09/xGSPduZce8TS92lT1i1g=;
+        b=mq85+RB3mZTWLEtStsSpClAWerZ0jcbIQ+EA8OQa7thefpv8At+Q/XFJ7CxVoY+yGj
+         bxgnw8T6ISoU9OMsHrefE9VPw8YGI0RzQvBcQXwiqEI+1WaECGWpwrcrqqg6D0bIQSk5
+         JcaOoHSo/WTWe787yS2pk2wTvNuIgrRU80Kf2K2tCVcdBF2xy+vbGaErNlntYToEgapF
+         T1kwC33KgYOEwVIPLq5Y7NFedYeUsvKf86coo6g29NBuuvLuz4yFUzu7S6rhB8NcOkcR
+         rZsAo8dPJy0J3yT1lWPAawEBoOXCrDsVKT5PYo719Zi2NFsK1N99bm4f4QGIPlVPtmOa
+         7h7g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687443302; x=1690035302;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=QdciB8cBXbF3HOfRChPi09/xGSPduZce8TS92lT1i1g=;
+        b=UPxfRFACykv0Fx7H/whBaGkF1Yd2nh8cyWdz5DwRDZaDd4+TJmmfhhoZEdyzHk5ukZ
+         amy3ymsopSdVSgcqTjGwAKsVZAgffaKkH8ifh7Gz01ESLwJerhTsxb4nDhQojlbhgoNJ
+         iLcpm+A9KOwEJefX0PYlGBlKyjIZC2DrImALxwx9cOfzhPU95K4OiGWylCt79rKvfqUa
+         v2fLE/0BQ3zSeuC7FnvR2zj4/pLG28+8Q3xFyzbANQ176LTFHwvt40hYMsR8Bra49sD7
+         Gof78aIsNR6Wg4o0nC1yI/rGQcxBBSsYWzhYBmdFScyxF4KlFsNLhzOLMwqGdi2OrWvZ
+         wgmw==
+X-Gm-Message-State: AC+VfDynBIInyfdZbIKvGIDPw/UYpW5UidByP/uz3S5hRYQikLGzL9VM
+	AsDQaTStlQCGa/KbUL+6dxw=
+X-Google-Smtp-Source: ACHHUZ6wXFev3FOKDtZLXkM7PxvI2QSUX9gvHiKVPQmEdxpcKDjRpyjan4AbMPM4ILUd/wwiRY2zNQ==
+X-Received: by 2002:a17:902:8214:b0:1aa:d971:4623 with SMTP id x20-20020a170902821400b001aad9714623mr17169274pln.38.1687443301552;
+        Thu, 22 Jun 2023 07:15:01 -0700 (PDT)
+Received: from debian.me (subs28-116-206-12-32.three.co.id. [116.206.12.32])
+        by smtp.gmail.com with ESMTPSA id 4-20020a170902e9c400b001b3d7205401sm5433304plk.303.2023.06.22.07.15.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 07:15:01 -0700 (PDT)
+Received: by debian.me (Postfix, from userid 1000)
+	id 78E118C1AAA9; Thu, 22 Jun 2023 21:14:58 +0700 (WIB)
+Date: Thu, 22 Jun 2023 21:14:58 +0700
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Tobias Klausmann <tobias.klausmann@freenet.de>, hkallweit1@gmail.com,
+	nic_swsd@realtek.com, netdev@vger.kernel.org
+Cc: Kai-Heng Feng <kai.heng.feng@canonical.com>,
+	Holger =?utf-8?Q?Hoffst=C3=A4tte?= <holger@applied-asynchrony.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Linux Regressions <regressions@lists.linux.dev>
+Subject: Re: r8169: transmit transmit queue timed out - v6.4 cycle
+Message-ID: <ZJRXYtfY4jFi934A@debian.me>
+References: <c3465166-f04d-fcf5-d284-57357abb3f99@freenet.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg="pgp-sha512";
-	protocol="application/pgp-signature"; boundary="o5zo77jvou4wd4u7"
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="+d9E7qC/pAv6xDBF"
 Content-Disposition: inline
-In-Reply-To: <20230621135322.06b0ba2c@kernel.org>
-X-Originating-IP: [106.110.32.133]
-X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
-	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHKsWRmVeSWpSXmKPExsWy7djPc7q8YVNSDL7MlLCYc76FxeLpsUfs
-	Fme6cy0ubOtjtdiz9ySLxeVdc9gsbkx4ymhxbIGYxbfTbxgtlu30c+DymN1wkcVjy8qbTB4L
-	NpV6bFrVyebxft9VNo/Pm+QC2KK4bFJSczLLUov07RK4Mg6e+8Fc8EmgovfUc8YGxqN8XYyc
-	HBICJhJNmxeydjFycQgJrGCUOP1vDwtIQkjgC6NE98ogiMRnRol5vdNZYTr2v7vFCJFYzigx
-	9cxEVriqsx8b2CGcLYwSCz73s4G0sAioSnSvOc4OYrMJ6Eicf3OHGcQWEVCRaNk8kwWkgVlg
-	HZPE7uYdQEUcHMICPhJrF6mD1PAKmEss+nyMBcIWlDg58wmYzSxQIXF5+iQmkHJmAWmJ5f84
-	QMKcAoYSfZcvsENcqiTx9U0v1NW1Eqe23GICWSUhsJlT4kPzYiaIhIvE9a7fzBC2sMSr41ug
-	mmUkTk/uYYFomMwosf/fB3YIZzWjxLLGr1Dd1hItV55AdThKnLm/mRHkIgkBPokbbwUhDuWT
-	mLRtOjNEmFeio00IolpNYvW9NywTGJVnIXltFpLXZiG8BhHWkViw+xMbhrC2xLKFr5khbFuJ
-	devesyxgZF/FKJ5aWpybnlpsmJdarlecmFtcmpeul5yfu4kRmOxO/zv+aQfj3Fcf9Q4xMnEw
-	HmJUAWp+tGH1BUYplrz8vFQlEV7ZTZNShHhTEiurUovy44tKc1KLDzFKc7AoifNq255MFhJI
-	TyxJzU5NLUgtgskycXBKNTC1s1/6klgdPelZbK3st1syasbV9yaEJouGMHnsjy5l3rJ4aurV
-	7122maecbh7yP+3msX66IP+a2Y0Sk1sspN4f/rUyK2WT28aa7cuj7lSftDkZs+/hn2vRogIT
-	JVVsFm30Ngt9YCXikD3NM2yPaSjftV0/tjYt3aL+Rfzcm0MbF5/8v/F2CNePwNPaRYe/XGKu
-	OuryeMeaQGbVn+ec5HUmLNB+ZGq8z6rt9uE44UDvZcz7z25SUJ29eN1fgfWF4u2KVkfXTbX7
-	JjfHyX6/7prta6Y8OHzezM53++cmpf8xJ5c03HvZFZp6TulZ+bxijt4uzr/z8z6HbUwMTjSU
-	0Yus6uNT+BKVNoPJUbGCp2udEktxRqKhFnNRcSIAY2gQl/EDAAA=
-X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsVy+t/xe7o8YVNSDBZvtbCYc76FxeLpsUfs
-	Fme6cy0ubOtjtdiz9ySLxeVdc9gsbkx4ymhxbIGYxbfTbxgtlu30c+DymN1wkcVjy8qbTB4L
-	NpV6bFrVyebxft9VNo/Pm+QC2KL0bIryS0tSFTLyi0tslaINLYz0DC0t9IxMLPUMjc1jrYxM
-	lfTtbFJSczLLUov07RL0Mlaffc1e8EGg4sirVYwNjIf5uhg5OSQETCT2v7vF2MXIxSEksJRR
-	oqv5MxNEQkZi45errBC2sMSfa11sEEUfgYpWv2SHcLYwSjy5uwWsg0VAVaJ7zXF2EJtNQEfi
-	/Js7zCC2iICKRMvmmSwgDcwC65gkdjfvACri4BAW8JFYu0gdpIZXwFxi0edjLBBDXzFK9O+7
-	zAqREJQ4OfMJC4jNLFAmceTxHUaQXmYBaYnl/zhAwpwChhJ9ly+wQ1yqJPH1TS/U1bUSn/8+
-	Y5zAKDwLyaRZSCbNQpgEEdaSuPHvJROGsLbEsoWvmSFsW4l1696zLGBkX8UoklpanJueW2yk
-	V5yYW1yal66XnJ+7iREY89uO/dyyg3Hlq496hxiZOBgPMaoAdT7asPoCoxRLXn5eqpIIr+ym
-	SSlCvCmJlVWpRfnxRaU5qcWHGE2BoTiRWUo0OR+YjPJK4g3NDEwNTcwsDUwtzYyVxHk9CzoS
-	hQTSE0tSs1NTC1KLYPqYODilGpiE03YZhJ6YeCGxJYNLsXDPPNEtYSx7maJkPzZMehjPIMp+
-	6jyHEHehRhhzQaZivfF1Ro66CouNXh+fhv3I3jwr/cK0q1XuDz/cX/eq6shBu4UFau0CWwN3
-	b/n7cIdl8zaOj9+mRqotSyn06Zm89kjWtZ08O2VrKw4mzrjb99HMINl15ec9000XZv0MyP/m
-	oZH1JsNY4uydSd1Np7muVz1b180wRUB3jvZPb9/wryyG/T8OML6frF2SM31u8vk1nR/iJXWq
-	Ji40kHzzIkkiysenOXcv55Ld29YcXLLs2pE1AuULZ/ub2PBcnKrC+Ev88YT8j+55WZ+KDl/8
-	aiR38GhOLF8skyO748Km1kN3NXuVWIozEg21mIuKEwGi6m7QjgMAAA==
-X-CMS-MailID: 20230622140916eucas1p122166fa1c1ee8fc1498c76af15e4ce52
-X-Msg-Generator: CA
-X-RootMTR: 20230621091014eucas1p1a30430568d0f7fec5ccbed31cab73aa0
-X-EPHeader: CA
-CMS-TYPE: 201P
-X-CMS-RootMailID: 20230621091014eucas1p1a30430568d0f7fec5ccbed31cab73aa0
-References: <20230621091000.424843-1-j.granados@samsung.com>
-	<CGME20230621091014eucas1p1a30430568d0f7fec5ccbed31cab73aa0@eucas1p1.samsung.com>
-	<20230621091000.424843-6-j.granados@samsung.com>
-	<20230621135322.06b0ba2c@kernel.org>
-X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <c3465166-f04d-fcf5-d284-57357abb3f99@freenet.de>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---o5zo77jvou4wd4u7
-Content-Type: text/plain; charset="us-ascii"
+
+--+d9E7qC/pAv6xDBF
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
 Content-Transfer-Encoding: quoted-printable
 
-On Wed, Jun 21, 2023 at 01:53:22PM -0700, Jakub Kicinski wrote:
-> On Wed, 21 Jun 2023 11:09:54 +0200 Joel Granados wrote:
-> > In order to remove the end element from the ctl_table struct arrays, we
-> > explicitly define the size when registering the targets.
-> > __register_sysctl_table is the first function to grow a size argument.
-> > For this commit to focus only on that function, we temporarily implement
-> > a size calculation in register_net_sysctl, which is an indirection call
-> > for all the network register calls.
->=20
-> You didn't CC the cover letter to netdev so replying here.
->=20
-> Is the motivation just the size change? Does it conflict with changes
-> queued to other trees?
-I will clarify the motivation in V2. But I have sent out this
-https://lore.kernel.org/all/20230622135922.xtvaiy3isvq576hw@localhost/
-to give some perspective.
+[also Cc: all people in the SoB chain of culprit]
 
+On Thu, Jun 22, 2023 at 03:46:48PM +0200, Tobias Klausmann wrote:
+> Hello all,
 >=20
-> It'd be much better if you could figure out a way to push prep into=20
-> 6.5 and then convert subsystems separately.
-One of my objectives for V2 is to reduce the amount of subsystems that
-the patch actually touches. So this might not even be an issue.
-I'll keep that separation possibility in mind; thx for the idea.
+> introduced in the 6.4 cycle r8169 show transmit queue timeouts [1].
+> Bisecting the problem brought me to the following commit:
+>=20
+> 2ab19de62d67e403105ba860971e5ff0d511ad15 is the first bad commit
+> commit 2ab19de62d67e403105ba860971e5ff0d511ad15
+> Author: Heiner Kallweit <hkallweit1@gmail.com>
+> Date:=C2=A0=C2=A0 Mon Mar 6 22:28:06 2023 +0100
+>=20
+> =C2=A0=C2=A0=C2=A0 r8169: remove ASPM restrictions now that ASPM is disab=
+led during NAPI
+> poll
+>=20
+> =C2=A0=C2=A0=C2=A0 Now that=C2=A0 ASPM is disabled during NAPI poll, we c=
+an remove all ASPM
+> =C2=A0=C2=A0=C2=A0 restrictions. This allows for higher power savings if =
+the network
+> =C2=A0=C2=A0=C2=A0 isn't fully loaded.
+>=20
+> =C2=A0=C2=A0=C2=A0 Reviewed-by: Simon Horman <simon.horman@corigine.com>
+> =C2=A0=C2=A0=C2=A0 Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+> =C2=A0=C2=A0=C2=A0 Tested-by: Holger Hoffst=C3=A4tte <holger@applied-asyn=
+chrony.com>
+> =C2=A0=C2=A0=C2=A0 Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+> =C2=A0=C2=A0=C2=A0 Signed-off-by: David S. Miller <davem@davemloft.net>
+>=20
+> =C2=A0drivers/net/ethernet/realtek/r8169_main.c | 27 +-------------------=
+-------
+> =C2=A01 file changed, 1 insertion(+), 26 deletions(-)
+>=20
+>=20
+> With this commit reverted on top of v6.4-rc6, the timeouts are gone.
+>=20
+> The NIC identifies as "03:00.0 Ethernet controller: Realtek Semiconductor
+> Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet Controller (rev
+> 15)"
+>=20
+> Greetings,
+>=20
+> Tobias Klausmann
+>=20
+>=20
+> [1]:
+>=20
+> [ 2070.918700] ------------[ cut here ]------------
+> [ 2070.918708] NETDEV WATCHDOG: enp3s0 (r8169): transmit queue 0 timed out
+> 5317 ms
+> [ 2070.918719] WARNING: CPU: 4 PID: 0 at net/sched/sch_generic.c:525
+> dev_watchdog+0x1c9/0x1d0
+> [ 2070.918726] Modules linked in: rfcomm(E) af_packet(E) cmac(E)
+> algif_hash(E) algif_skcipher(E) af_alg(E) bnep(E) btusb(E) btrtl(E)
+> uvcvideo(E) btbcm(E) uvc(E) btintel(E) videobuf2_vmalloc(E) btmtk(E)
+> videobuf2_memops(E) rtsx_usb_sdmmc(E) videobuf2_v4l2(E) bluetooth(E)
+> rtsx_usb_ms(E) mmc_core(E) ecdh_generic(E) memstick(E) ecc(E) videodev(E)
+> videobuf2_common(E) mc(E) rtsx_usb(E) qrtr(E) nls_iso8859_1(E) nls_cp437(=
+E)
+> vfat(E) fat(E) joydev(E) snd_hda_codec_realtek(E) snd_hda_codec_generic(E)
+> ledtrig_audio(E) snd_hda_codec_hdmi(E) ath10k_pci(E) ath10k_core(E)
+> hid_multitouch(E) ath(E) snd_hda_intel(E) snd_intel_dspcfg(E) iTCO_wdt(E)
+> ee1004(E) intel_rapl_msr(E) snd_intel_sdw_acpi(E) intel_pmc_bxt(E)
+> snd_hda_codec(E) mac80211(E) iTCO_vendor_support(E) r8169(E)
+> intel_rapl_common(E) snd_hda_core(E) intel_tcc_cooling(E) mei_hdcp(E)
+> x86_pkg_temp_thermal(E) acer_wmi(E) intel_powerclamp(E) cfg80211(E)
+> snd_hwdep(E) sparse_keymap(E) coretemp(E) snd_pcm(E) realtek(E) i2c_i801(=
+E)
+> wmi_bmof(E) intel_wmi_thunderbolt(E)
+> [ 2070.918794]=C2=A0 snd_timer(E) rfkill(E) mdio_devres(E) libphy(E) liba=
+rc4(E)
+> efi_pstore(E) snd(E) i2c_smbus(E) soundcore(E) mei_me(E) intel_lpss_pci(E)
+> intel_lpss(E) mei(E) idma64(E) intel_pch_thermal(E) thermal(E) battery(E)
+> ac(E) acpi_pad(E) tiny_power_button(E) fuse(E) configfs(E) dmi_sysfs(E)
+> ip_tables(E) x_tables(E) hid_generic(E) usbhid(E) crct10dif_pclmul(E)
+> nouveau(E) crc32_pclmul(E) crc32c_intel(E) i915(E) polyval_clmulni(E)
+> drm_ttm_helper(E) polyval_generic(E) ghash_clmulni_intel(E) mxm_wmi(E)
+> drm_buddy(E) sha512_ssse3(E) i2c_algo_bit(E) aesni_intel(E)
+> drm_display_helper(E) crypto_simd(E) drm_kms_helper(E) syscopyarea(E)
+> sysfillrect(E) cryptd(E) sysimgblt(E) cec(E) xhci_pci(E) ttm(E) xhci_hcd(=
+E)
+> usbcore(E) drm(E) usb_common(E) i2c_hid_acpi(E) i2c_hid(E) video(E) wmi(E)
+> pinctrl_sunrisepoint(E) button(E) serio_raw(E) sg(E) dm_multipath(E)
+> dm_mod(E) scsi_dh_rdac(E) scsi_dh_emc(E) scsi_dh_alua(E) msr(E) efivarfs(=
+E)
+> [ 2070.918862] CPU: 4 PID: 0 Comm: swapper/4 Tainted: G=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 E=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0
+> 6.4.0-rc1-desktop-debug+ #51
+> [ 2070.918864] Hardware name: Acer Aspire VN7-593G/Pluto_KLS, BIOS V1.11
+> 08/01/2018
+> [ 2070.918866] RIP: 0010:dev_watchdog+0x1c9/0x1d0
+> [ 2070.918869] Code: d5 eb 92 48 89 ef c6 05 5a 34 96 00 01 e8 2f d0 fb ff
+> 45 89 f8 44 89 f1 48 89 ee 48 89 c2 48 c7 c7 58 5c f2 91 e8 07 c6 83 ff <=
+0f>
+> 0b e9 74 ff ff ff 41 55 41 54 55 53 48 8b 47 50 4c 8b 28 48 85
+> [ 2070.918872] RSP: 0018:ffffbcec00220eb8 EFLAGS: 00010286
+> [ 2070.918875] RAX: 0000000000000000 RBX: ffff94f0104843dc RCX:
+> 000000000000083f
+> [ 2070.918877] RDX: 0000000000000000 RSI: 00000000000000f6 RDI:
+> 000000000000003f
+> [ 2070.918878] RBP: ffff94f010484000 R08: 0000000000000001 R09:
+> 0000000000000000
+> [ 2070.918880] R10: ffff94f1b6aa0000 R11: ffff94f1b6aa0000 R12:
+> ffff94f010484488
+> [ 2070.918881] R13: ffff94f0031a0600 R14: 0000000000000000 R15:
+> 00000000000014c5
+> [ 2070.918883] FS:=C2=A0 0000000000000000(0000) GS:ffff94f1b6d00000(0000)
+> knlGS:0000000000000000
+> [ 2070.918885] CS:=C2=A0 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [ 2070.918887] CR2: 00007f8eea510000 CR3: 000000023322e005 CR4:
+> 00000000003706e0
+> [ 2070.918889] Call Trace:
+> [ 2070.918891]=C2=A0 <IRQ>
+> [ 2070.918893]=C2=A0 ? mq_change_real_num_tx+0xe0/0xe0
+> [ 2070.918897]=C2=A0 ? mq_change_real_num_tx+0xe0/0xe0
+> [ 2070.918899]=C2=A0 call_timer_fn.isra.0+0x17/0x70
+> [ 2070.918903]=C2=A0 __run_timers.part.0+0x1b2/0x200
+> [ 2070.918907]=C2=A0 ? tick_sched_do_timer+0x80/0x80
+> [ 2070.918910]=C2=A0 ? hw_breakpoint_pmu_read+0x10/0x10
+> [ 2070.918913]=C2=A0 ? ktime_get+0x33/0xa0
+> [ 2070.918915]=C2=A0 run_timer_softirq+0x21/0x50
+> [ 2070.918918]=C2=A0 __do_softirq+0xb8/0x1ea
+> [ 2070.918923]=C2=A0 irq_exit_rcu+0x75/0xa0
+> [ 2070.918926]=C2=A0 sysvec_apic_timer_interrupt+0x66/0x80
+> [ 2070.918929]=C2=A0 </IRQ>
+> [ 2070.918930]=C2=A0 <TASK>
+> [ 2070.918932]=C2=A0 asm_sysvec_apic_timer_interrupt+0x16/0x20
+> [ 2070.918935] RIP: 0010:cpuidle_enter_state+0xa7/0x2a0
+> [ 2070.918938] Code: 45 40 40 0f 84 9f 01 00 00 e8 65 00 6e ff e8 10 f8 ff
+> ff 31 ff 49 89 c5 e8 66 64 6d ff 45 84 ff 0f 85 76 01 00 00 fb 45 85 f6 <=
+0f>
+> 88 be 00 00 00 49 63 ce 48 8b 04 24 48 6b d1 68 49 29 c5 48 89
+> [ 2070.918939] RSP: 0018:ffffbcec0012fe90 EFLAGS: 00000202
+> [ 2070.918942] RAX: ffff94f1b6d25d80 RBX: 0000000000000008 RCX:
+> 0000000000000000
+> [ 2070.918943] RDX: 000001e22c5f9004 RSI: fffffffdc849289f RDI:
+> 0000000000000000
+> [ 2070.918945] RBP: ffff94f1b6d2fa00 R08: 0000000000000002 R09:
+> 000000002d959839
+> [ 2070.918946] R10: ffff94f1b6d24904 R11: 00000000000018c7 R12:
+> ffffffff92155720
+> [ 2070.918948] R13: 000001e22c5f9004 R14: 0000000000000008 R15:
+> 0000000000000000
+> [ 2070.918951]=C2=A0 cpuidle_enter+0x24/0x40
+> [ 2070.918954]=C2=A0 do_idle+0x1c0/0x220
+> [ 2070.918958]=C2=A0 cpu_startup_entry+0x14/0x20
+> [ 2070.918960]=C2=A0 start_secondary+0x109/0x130
+> [ 2070.918963]=C2=A0 secondary_startup_64_no_verify+0xf4/0xfb
+> [ 2070.918966]=C2=A0 </TASK>
+> [ 2070.918968] ---[ end trace 0000000000000000 ]---
+> [ 2072.163726] pcieport 0000:00:1c.3: Data Link Layer Link Active not set=
+ in
+> 1000 msec
+> [ 2072.165868] r8169 0000:03:00.0 enp3s0: Can't reset secondary PCI bus,
+> detach NIC
+>=20
 
-Best
+Thanks for the bug report. To be sure it doesn't get fallen through the
+cracks unnoticed, I'm adding it to regzbot:
+
+#regzbot ^introduced: 2ab19de62d67e4
+#regzbot title: transmit queue timeout on r8169
+
+Bye!
 
 --=20
+An old man doll... just what I always wanted! - Clara
 
-Joel Granados
-
---o5zo77jvou4wd4u7
+--+d9E7qC/pAv6xDBF
 Content-Type: application/pgp-signature; name="signature.asc"
 
 -----BEGIN PGP SIGNATURE-----
 
-iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmSUVgoACgkQupfNUreW
-QU/wFwv+I8rMRjL5RDsrOsrUjqzDKtrDPejfagT1jhJAcwL4IvU3nVVGwTFqxkvO
-cnZKV1OObDzEXv5igpdn86TvJbvDYYh3Ad+6zi0tO4qRI1o0xjb5CFLty3YJwzw3
-UU2aT3yXyhdiOqLiaaorTVrq5sdyEZ9slJxHJIZiVisfHiEQKjC1nnxA/M7RKwfA
-iKuQlfADEDAbuI5eDcJ0RZHeYi2wzgMNms7OaprSbrNG/UgmZWFEnYVpeHZpaPoJ
-DI83GtQHBSHjobRqkYBscDWA9CP3JwpeZBSvo8UIiBnYukgm+aNR5SROaCxm/nce
-TPjW3zmWx174Ld/akYZtrxkCsqLHzwDJW+kL36xVTnGTgFZ9JBqNHW/2jMJ5Nr6q
-kzo85lXqPUjLSflhAq+Rw6Am8+NLXx4RfXjKow+YYJEvvtWNC5uIDv/1dmHmGMyM
-YaQRAfXnbwNSMkSlioBD5BymBUeGR50GVUoOSlAZKJENS5ddU7fjU7n5pd1/Tfy5
-pAyKSHHf
-=xBkN
+iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZJRXXgAKCRD2uYlJVVFO
+ozyaAQCtrUXCrPunBbcFZcQPH1lMLoPYgARQYPNxMDLWUjHWiQD9GB8EdzHFjeac
+W2VTfAS9928h3hV/nj/tqkC2F5662gA=
+=R7+9
 -----END PGP SIGNATURE-----
 
---o5zo77jvou4wd4u7--
+--+d9E7qC/pAv6xDBF--
 
