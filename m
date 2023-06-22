@@ -1,86 +1,90 @@
-Return-Path: <netdev+bounces-13202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E18F073A982
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 22:32:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0713F73AB3F
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 23:12:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07C8F1C211C0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:32:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7E6A2818AF
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:12:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA9522544;
-	Thu, 22 Jun 2023 20:32:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D1BDC22556;
+	Thu, 22 Jun 2023 21:11:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F5EA2254D
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 20:32:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B66DEC433C8;
-	Thu, 22 Jun 2023 20:32:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687465926;
-	bh=UIN7vbEVF4QwHSBcKRVm9rZeEKOWGNBryfxnm2JqxHc=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=VfzrcJNDTADNxZLzWKciLQRYu+9nq1/G4islfOdNF43uWQdxT0kHF3tQn9mCixHWV
-	 xZTEn3AWgWdN4D/DB+CFPlVlwmLV3DRAVex3AkpjMh5zJoxWP6nHE0SW80Qe0Kgza+
-	 ZJP8xwy2+AR/jv9XxjkMYN+jy48KK83wZAW4YLbTPfk5Cl9PpWhFov9dzd6wQ8DHMb
-	 i2liKBmsuV0ZGkdNCWEP08f9OnIYIhkDiAsHtFtPqU+mSE3gOFsZ1HhsBVF/y6jdce
-	 NeKzNaf3EJQfx8sThzuALfLD5h04GAVz4kw8ZOmCPRR+sGgFdSWInuoElCE5RKW8uj
-	 NSfvuvNQVY51g==
-Date: Thu, 22 Jun 2023 13:32:04 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Maxim Kochetkov <fido_max@inbox.ru>
-Cc: netdev@vger.kernel.org, Robert Hancock <robert.hancock@calian.com>,
- Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Michal Simek <michal.simek@amd.com>, Andre Przywara
- <andre.przywara@arm.com>, linux-arm-kernel@lists.infradead.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v4 1/1] net: axienet: Move reset before 64-bit DMA
- detection
-Message-ID: <20230622133204.2ba95c21@kernel.org>
-In-Reply-To: <20230622192245.116864-1-fido_max@inbox.ru>
-References: <20230622192245.116864-1-fido_max@inbox.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2E6820690
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 21:11:58 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FF032101
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 14:11:27 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-550-mQt2dRz0POGbOCPVH27HiQ-1; Thu, 22 Jun 2023 17:04:49 -0400
+X-MC-Unique: mQt2dRz0POGbOCPVH27HiQ-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0C2A58FE620;
+	Thu, 22 Jun 2023 21:04:49 +0000 (UTC)
+Received: from hog.localdomain (unknown [10.39.195.41])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D72A1200A3AD;
+	Thu, 22 Jun 2023 21:04:47 +0000 (UTC)
+From: Sabrina Dubroca <sd@queasysnail.net>
+To: netdev@vger.kernel.org
+Cc: Sabrina Dubroca <sd@queasysnail.net>,
+	Jiri Pirko <jiri@resnulli.us>,
+	Shuah Khan <shuah@kernel.org>,
+	linux-kselftest@vger.kernel.org
+Subject: [PATCH net] selftests: rtnetlink: remove netdevsim device after ipsec offload test
+Date: Thu, 22 Jun 2023 23:03:34 +0200
+Message-Id: <e1cb94f4f82f4eca4a444feec4488a1323396357.1687466906.git.sd@queasysnail.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: queasysnail.net
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
+X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 22 Jun 2023 22:22:45 +0300 Maxim Kochetkov wrote:
-> 64-bit DMA detection will fail if axienet was started before (by boot
-> loader, boot ROM, etc). In this state axienet will not start properly.
-> XAXIDMA_TX_CDESC_OFFSET + 4 register (MM2S_CURDESC_MSB) is used to detect
-> 64-bit DMA capability here. But datasheet says: When DMACR.RS is 1
-> (axienet is in enabled state), CURDESC_PTR becomes Read Only (RO) and
-> is used to fetch the first descriptor. So iowrite32()/ioread32() trick
-> to this register to detect 64-bit DMA will not work.
-> So move axienet reset before 64-bit DMA detection.
-> 
-> Fixes: f735c40ed93c ("net: axienet: Autodetect 64-bit DMA capability")
-> Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
-> Reviewed-by: Robert Hancock <robert.hancock@calian.com>
-> Reviewed-by: Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>
+On systems where netdevsim is built-in or loaded before the test
+starts, kci_test_ipsec_offload doesn't remove the netdevsim device it
+created during the test.
 
-Quoting documentation:
+Fixes: e05b2d141fef ("netdevsim: move netdev creation/destruction to dev pr=
+obe")
+Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+---
+ tools/testing/selftests/net/rtnetlink.sh | 1 +
+ 1 file changed, 1 insertion(+)
 
-  Resending after review
-  ~~~~~~~~~~~~~~~~~~~~~~
-  
-  Allow at least 24 hours to pass between postings. This will ensure reviewers
-  from all geographical locations have a chance to chime in. Do not wait
-  too long (weeks) between postings either as it will make it harder for reviewers
-  to recall all the context.
-  
-  Make sure you address all the feedback in your new posting. Do not post a new
-  version of the code if the discussion about the previous version is still
-  ongoing, unless directly instructed by a reviewer.
-  
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#resending-after-review
+diff --git a/tools/testing/selftests/net/rtnetlink.sh b/tools/testing/selft=
+ests/net/rtnetlink.sh
+index 383ac6fc037d..ba286d680fd9 100755
+--- a/tools/testing/selftests/net/rtnetlink.sh
++++ b/tools/testing/selftests/net/rtnetlink.sh
+@@ -860,6 +860,7 @@ EOF
+ =09fi
+=20
+ =09# clean up any leftovers
++=09echo 0 > /sys/bus/netdevsim/del_device
+ =09$probed && rmmod netdevsim
+=20
+ =09if [ $ret -ne 0 ]; then
+--=20
+2.40.1
+
 
