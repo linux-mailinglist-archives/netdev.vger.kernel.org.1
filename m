@@ -1,134 +1,342 @@
-Return-Path: <netdev+bounces-13190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7A72E73A8FF
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:31:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2695573A906
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:36:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A43471C21031
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:31:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 528C11C2102D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:36:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B2821071;
-	Thu, 22 Jun 2023 19:31:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1489D2107A;
+	Thu, 22 Jun 2023 19:36:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B24820690
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:31:48 +0000 (UTC)
-Received: from smtp-relay-internal-0.canonical.com (smtp-relay-internal-0.canonical.com [185.125.188.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 840DA1713
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:31:46 -0700 (PDT)
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-0.canonical.com (Postfix) with ESMTPS id C1AD142458
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:31:41 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1687462301;
-	bh=myW0bOwzrP+zdsiC16uuM6w7aJuKjyogFwiBpraHSys=;
-	h=From:To:cc:Subject:In-reply-to:References:MIME-Version:
-	 Content-Type:Date:Message-ID;
-	b=WvABjilZdHBYqzLzxPDlxVTy2CdiLLdP23+qqhiDitE2DoFbmKyWNZISEIV82y3Yo
-	 ehFFv9v/6iKdmqkSfo7d/rqKYAe7Ds/mVMQ5QrV7M4BLUyGBkJuTk88ermIVmDwaXl
-	 9ayQxIjJ3EXXb0BAD0KbrHmDJfd4IhdhYQAKp3fUly/GXa4MPb6r3CsmImnEGfh5/h
-	 KtI3TzRsJsYcFWBI0teehLQpncdwUcULGzh+42FlJOrNchu9r8JEd3vGVtiLemNamy
-	 E3SopTN3iuBtyp4Vie+FD8yYB9UkH+at6R2odADI/DTLfrAIh6BaWmT9VOMZLcG808
-	 MwFDKBiW75OaQ==
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1b511b1b660so37361155ad.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:31:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05F4521072
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:36:53 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 51E9B13E
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:36:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687462611;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Xomtdkpx+OSXN9zGfziQJLruZyJHAVV/laO4mRJwrJc=;
+	b=RMeF3O/TKuYLt0BGylMAs5j2vNccnhuvZ5DU4BPwEhzHJOO5xH9sY9YohaGj9ikK2j1xBI
+	hgFRZuJAqRzaaoDuseHM9+qVWB32F0hwQF10miEK7MK5Av6xJzMC/eAst0H4ICET+uegaW
+	zJulBmGsCdrNor+I2TeKp8K+eDuVbIA=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-18-kMcJilZ6Ntypi-Ad8FpFDQ-1; Thu, 22 Jun 2023 15:36:49 -0400
+X-MC-Unique: kMcJilZ6Ntypi-Ad8FpFDQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fa714fa27aso6826295e9.2
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:36:47 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687462300; x=1690054300;
-        h=message-id:date:content-transfer-encoding:mime-version:comments
-         :references:in-reply-to:subject:cc:to:from:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=myW0bOwzrP+zdsiC16uuM6w7aJuKjyogFwiBpraHSys=;
-        b=QyiLA3PLj9OT9v+js7sBINKpDrKO4OeLEjGj/2utXAYKVZ+SwzauHGBi3o2ATnIqYd
-         1YVCEuOvpYStNeOafW8zjI1lJNSVCJUCKNq1IjvaUbo63cu0bL4/2ArrBJy2tJmgw4rV
-         bPXHw/UR+/E1HTj/pdyBFWQctv5tgmoiJoSZHyebHf1tXuRyyzscOlEFZcc0BjpGVFQw
-         i+fbNvHHaOuaWuGrPjgU779MMkx+YkYyQLgRGDQoKhkPHQIof+5/nFWIonOuc2oxNvky
-         ffIX2j7tTqmCBoT/1nhlpNRGNKah0qU28/pCdvlZYQF7xjtRHiZ5373k29dhWjmPS/Um
-         Q6DA==
-X-Gm-Message-State: AC+VfDxVy1cIfKe+hjKNFCMYHiPv92/uDOU07SnzWVTkr40HL0TEM6po
-	mHaDnih4MlRO9qAMWoYem46wsjn1bId5EwL98GH5iaE49ukrI5RPCh1+aCxvu28TcN+WAyaPwPn
-	5jn00CU9i7D6RP/bIgEvsHNsrPHOOWltDqw==
-X-Received: by 2002:a17:903:1109:b0:1b0:3637:384e with SMTP id n9-20020a170903110900b001b03637384emr15875814plh.25.1687462300169;
-        Thu, 22 Jun 2023 12:31:40 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7QAr+uEK2OdOmrgeENE4OTP/yD6xv3SRTujObawz3NhKI7tqXyUECy5ph/8UAR5KxGKZTD+w==
-X-Received: by 2002:a17:903:1109:b0:1b0:3637:384e with SMTP id n9-20020a170903110900b001b03637384emr15875796plh.25.1687462299917;
-        Thu, 22 Jun 2023 12:31:39 -0700 (PDT)
-Received: from famine.localdomain ([50.125.80.253])
-        by smtp.gmail.com with ESMTPSA id jc19-20020a17090325d300b001b3ab80381csm5755054plb.301.2023.06.22.12.31.39
-        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
-        Thu, 22 Jun 2023 12:31:39 -0700 (PDT)
-Received: by famine.localdomain (Postfix, from userid 1000)
-	id 2BED75FEAC; Thu, 22 Jun 2023 12:31:39 -0700 (PDT)
-Received: from famine (localhost [127.0.0.1])
-	by famine.localdomain (Postfix) with ESMTP id 24B519FAF8;
-	Thu, 22 Jun 2023 12:31:39 -0700 (PDT)
-From: Jay Vosburgh <jay.vosburgh@canonical.com>
-To: Eric Dumazet <edumazet@google.com>
-cc: "David S . Miller" <davem@davemloft.net>,
-    Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-    netdev@vger.kernel.org, eric.dumazet@gmail.com,
-    syzbot <syzkaller@googlegroups.com>, Jarod Wilson <jarod@redhat.com>,
-    Moshe Tal <moshet@nvidia.com>, Jussi Maki <joamaki@gmail.com>,
-    Andy Gospodarek <andy@greyhouse.net>,
-    Vladimir Oltean <vladimir.oltean@nxp.com>
-Subject: Re: [PATCH net] bonding: do not assume skb mac_header is set
-In-reply-to: <CANn89iL3kLondF3ETBui8ik3sJW+1NR8SZFYWqw7FY4H5gcUjw@mail.gmail.com>
-References: <20230622152304.2137482-1-edumazet@google.com> <22643.1687456107@famine> <CANn89iJSmS_B1q=oG_e-RxtWkOuj0x0eqhsp5BeuCn-TuS0W5w@mail.gmail.com> <26275.1687460144@famine> <CANn89i+Vcwp9o59Fzy+epqS+YSxjrStNjBRX-5GSie_TdiMbVg@mail.gmail.com> <CANn89iL3kLondF3ETBui8ik3sJW+1NR8SZFYWqw7FY4H5gcUjw@mail.gmail.com>
-Comments: In-reply-to Eric Dumazet <edumazet@google.com>
-   message dated "Thu, 22 Jun 2023 21:01:52 +0200."
-X-Mailer: MH-E 8.6+git; nmh 1.6; Emacs 29.0.50
+        d=1e100.net; s=20221208; t=1687462607; x=1690054607;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Xomtdkpx+OSXN9zGfziQJLruZyJHAVV/laO4mRJwrJc=;
+        b=RPDlK4kpjY7Jr456ObHQ5jOi+vIOknTUai2nyv2qq69I3FB2R87KO/C1F5uvTcZW63
+         j9C6iQvBS7PN+nuVVlx8K6uFQZW2u6RoJG42B6tJ4BxanMWNhy/K8cbcaQyN9rj75BHr
+         B1ftZhmo3eYKGHZ7ntp6AfJskwUmdiZYiTgig7tG3+4MrTHJzPqoaCyqbTCZaijIFKfC
+         YyMZ5wpo5azvOWM/cfxsfmBdX9fuNz2GzNmuDCF6Xqcpqf0gj8Z235h2MaJ4V9xWlEmb
+         WHm10DxrIX1LB83Bff7NT0eD7JSAZnQrbO1+SKgvIHLFSoRC14aznR6cxLXiraVqZf2k
+         PFyg==
+X-Gm-Message-State: AC+VfDwZulvR5ExynFNMX4Ah4Q/JYwDzMGmrQMyfB4u4Xuk+e/byW1/8
+	pGvW+2s79+umSaMwQsSMG9dhF9MEeLH4/yxgDb5fuu2Z4jk+WvAxGlB5+xqBHbE2yV0g8CXLdYZ
+	qbUxwLhpoVC8OaDOQ
+X-Received: by 2002:a7b:cc8d:0:b0:3f7:3937:f5f2 with SMTP id p13-20020a7bcc8d000000b003f73937f5f2mr18244254wma.22.1687462606705;
+        Thu, 22 Jun 2023 12:36:46 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6ffZmX/D2AmBX/0MjjySgMwN2Bt3XcGhIPrKbhVjFlueINY+ObTbza8dbbywFD++ptZXDnhw==
+X-Received: by 2002:a7b:cc8d:0:b0:3f7:3937:f5f2 with SMTP id p13-20020a7bcc8d000000b003f73937f5f2mr18244241wma.22.1687462606355;
+        Thu, 22 Jun 2023 12:36:46 -0700 (PDT)
+Received: from redhat.com ([2.52.149.110])
+        by smtp.gmail.com with ESMTPSA id v14-20020a1cf70e000000b003f9b2c602c0sm291066wmh.37.2023.06.22.12.36.43
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 12:36:45 -0700 (PDT)
+Date: Thu, 22 Jun 2023 15:36:41 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Cc: virtualization@lists.linux-foundation.org,
+	Jason Wang <jasowang@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH vhost v10 05/10] virtio_ring: split-detach: support
+ return dma info to driver
+Message-ID: <20230622153111-mutt-send-email-mst@kernel.org>
+References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
+ <20230602092206.50108-6-xuanzhuo@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Thu, 22 Jun 2023 12:31:39 -0700
-Message-ID: <27955.1687462299@famine>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230602092206.50108-6-xuanzhuo@linux.alibaba.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Eric Dumazet <edumazet@google.com> wrote:
+On Fri, Jun 02, 2023 at 05:22:01PM +0800, Xuan Zhuo wrote:
+> Under the premapped mode, the driver needs to unmap the DMA address
+> after receiving the buffer. The virtio core records the DMA address,
+> so the driver needs a way to get the dma info from the virtio core.
+> 
+> A straightforward approach is to pass an array to the virtio core when
+> calling virtqueue_get_buf(). However, it is not feasible when there are
+> multiple DMA addresses in the descriptor chain, and the array size is
+> unknown.
+> 
+> To solve this problem, a helper be introduced. After calling
+> virtqueue_get_buf(), the driver can call the helper to
+> retrieve a dma info. If the helper function returns -EAGAIN, it means
+> that there are more DMA addresses to be processed, and the driver should
+> call the helper function again. To keep track of the current position in
+> the chain, a cursor must be passed to the helper function, which is
+> initialized by virtqueue_get_buf().
+> 
+> Some processes are done inside this helper, so this helper MUST be
+> called under the premapped mode.
+> 
+> Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> ---
+>  drivers/virtio/virtio_ring.c | 118 ++++++++++++++++++++++++++++++++---
+>  include/linux/virtio.h       |  11 ++++
+>  2 files changed, 119 insertions(+), 10 deletions(-)
+> 
+> diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> index dc109fbc05a5..cdc4349f6066 100644
+> --- a/drivers/virtio/virtio_ring.c
+> +++ b/drivers/virtio/virtio_ring.c
+> @@ -754,8 +754,95 @@ static bool virtqueue_kick_prepare_split(struct virtqueue *_vq)
+>  	return needs_kick;
+>  }
+>  
+> -static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
+> -			     void **ctx)
+> +static void detach_cursor_init_split(struct vring_virtqueue *vq,
+> +				     struct virtqueue_detach_cursor *cursor, u16 head)
+> +{
+> +	struct vring_desc_extra *extra;
+> +
+> +	extra = &vq->split.desc_extra[head];
+> +
+> +	/* Clear data ptr. */
+> +	vq->split.desc_state[head].data = NULL;
+> +
+> +	cursor->head = head;
+> +	cursor->done = 0;
+> +
+> +	if (extra->flags & VRING_DESC_F_INDIRECT) {
+> +		cursor->num = extra->len / sizeof(struct vring_desc);
+> +		cursor->indirect = true;
+> +		cursor->pos = 0;
+> +
+> +		vring_unmap_one_split(vq, head);
+> +
+> +		extra->next = vq->free_head;
+> +
+> +		vq->free_head = head;
+> +
+> +		/* Plus final descriptor */
+> +		vq->vq.num_free++;
+> +
+> +	} else {
+> +		cursor->indirect = false;
+> +		cursor->pos = head;
+> +	}
+> +}
+> +
+> +static int virtqueue_detach_split(struct virtqueue *_vq, struct virtqueue_detach_cursor *cursor,
+> +				  dma_addr_t *addr, u32 *len, enum dma_data_direction *dir)
+> +{
 
->On Thu, Jun 22, 2023 at 9:00=E2=80=AFPM Eric Dumazet <edumazet@google.com>=
- wrote:
->>
->
->> Ah right, I will send another patch to remove it then.
->>
->> I think it makes sense to keep the first patch small for backports.
->>
->> History of relevant patches :
->>
->> from 5.17
->>
->> 429e3d123d9a50cc9882402e40e0ac912d88cfcf bonding: Fix extraction of
->> ports from the packet headers
->>
->> from 5.15
->>
->> a815bde56b15ce626caaacc952ab12501671e45d net, bonding: Refactor
->> bond_xmit_hash for use with xdp_buff
->
->If this is ok for you, I will cook this cleanup patch for net-next.
+I don't get it. This is generic split vq code? Why is it unconditionally
+wasting time with cursors etc? Poking at split.desc_extra when not
+necessary is also not really nice, will cause lots of cache misses.
 
-	Yes, this sounds fine to me.
+And it looks like we duplicated a bunch of logic?
 
-	-J
 
----
-	-Jay Vosburgh, jay.vosburgh@canonical.com
+> +	struct vring_virtqueue *vq = to_vvq(_vq);
+> +	__virtio16 nextflag = cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F_NEXT);
+> +	int rc = -EAGAIN;
+> +
+> +	if (unlikely(cursor->done))
+> +		return -EINVAL;
+> +
+> +	if (!cursor->indirect) {
+> +		struct vring_desc_extra *extra;
+> +		unsigned int i;
+> +
+> +		i = cursor->pos;
+> +
+> +		extra = &vq->split.desc_extra[i];
+> +
+> +		if (vq->split.vring.desc[i].flags & nextflag) {
+> +			cursor->pos = extra->next;
+> +		} else {
+> +			extra->next = vq->free_head;
+> +			vq->free_head = cursor->head;
+> +			cursor->done = true;
+> +			rc = 0;
+> +		}
+> +
+> +		*addr = extra->addr;
+> +		*len = extra->len;
+> +		*dir = (extra->flags & VRING_DESC_F_WRITE) ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+> +
+> +		vq->vq.num_free++;
+> +
+> +	} else {
+> +		struct vring_desc *indir_desc, *desc;
+> +		u16 flags;
+> +
+> +		indir_desc = vq->split.desc_state[cursor->head].indir_desc;
+> +		desc = &indir_desc[cursor->pos];
+> +
+> +		flags = virtio16_to_cpu(vq->vq.vdev, desc->flags);
+> +		*addr = virtio64_to_cpu(vq->vq.vdev, desc->addr);
+> +		*len = virtio32_to_cpu(vq->vq.vdev, desc->len);
+> +		*dir = (flags & VRING_DESC_F_WRITE) ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+> +
+> +		if (++cursor->pos == cursor->num) {
+> +			kfree(indir_desc);
+> +			cursor->done = true;
+> +			return 0;
+> +		}
+> +	}
+> +
+> +	return rc;
+> +}
+> +
+> +static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head)
+>  {
+>  	unsigned int i, j;
+>  	__virtio16 nextflag = cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F_NEXT);
+> @@ -799,8 +886,6 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
+>  
+>  		kfree(indir_desc);
+>  		vq->split.desc_state[head].indir_desc = NULL;
+> -	} else if (ctx) {
+> -		*ctx = vq->split.desc_state[head].indir_desc;
+>  	}
+>  }
+>  
+> @@ -812,7 +897,8 @@ static bool more_used_split(const struct vring_virtqueue *vq)
+>  
+>  static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+>  					 unsigned int *len,
+> -					 void **ctx)
+> +					 void **ctx,
+> +					 struct virtqueue_detach_cursor *cursor)
+>  {
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+>  	void *ret;
+> @@ -852,7 +938,15 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+>  
+>  	/* detach_buf_split clears data, so grab it now. */
+>  	ret = vq->split.desc_state[i].data;
+> -	detach_buf_split(vq, i, ctx);
+> +
+> +	if (!vq->indirect && ctx)
+> +		*ctx = vq->split.desc_state[i].indir_desc;
+> +
+> +	if (vq->premapped)
+> +		detach_cursor_init_split(vq, cursor, i);
+> +	else
+> +		detach_buf_split(vq, i);
+> +
+>  	vq->last_used_idx++;
+>  	/* If we expect an interrupt for the next entry, tell host
+>  	 * by writing event index and flush out the write before
+> @@ -961,7 +1055,8 @@ static bool virtqueue_enable_cb_delayed_split(struct virtqueue *_vq)
+>  	return true;
+>  }
+>  
+> -static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
+> +static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq,
+> +					       struct virtqueue_detach_cursor *cursor)
+>  {
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+>  	unsigned int i;
+> @@ -974,7 +1069,10 @@ static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
+>  			continue;
+>  		/* detach_buf_split clears data, so grab it now. */
+>  		buf = vq->split.desc_state[i].data;
+> -		detach_buf_split(vq, i, NULL);
+> +		if (vq->premapped)
+> +			detach_cursor_init_split(vq, cursor, i);
+> +		else
+> +			detach_buf_split(vq, i);
+>  		vq->split.avail_idx_shadow--;
+>  		vq->split.vring.avail->idx = cpu_to_virtio16(_vq->vdev,
+>  				vq->split.avail_idx_shadow);
+> @@ -2361,7 +2459,7 @@ void *virtqueue_get_buf_ctx(struct virtqueue *_vq, unsigned int *len,
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+>  
+>  	return vq->packed_ring ? virtqueue_get_buf_ctx_packed(_vq, len, ctx) :
+> -				 virtqueue_get_buf_ctx_split(_vq, len, ctx);
+> +				 virtqueue_get_buf_ctx_split(_vq, len, ctx, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(virtqueue_get_buf_ctx);
+>  
+> @@ -2493,7 +2591,7 @@ void *virtqueue_detach_unused_buf(struct virtqueue *_vq)
+>  	struct vring_virtqueue *vq = to_vvq(_vq);
+>  
+>  	return vq->packed_ring ? virtqueue_detach_unused_buf_packed(_vq) :
+> -				 virtqueue_detach_unused_buf_split(_vq);
+> +				 virtqueue_detach_unused_buf_split(_vq, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(virtqueue_detach_unused_buf);
+>  
+> diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> index 1fc0e1023bd4..eb4a4e4329aa 100644
+> --- a/include/linux/virtio.h
+> +++ b/include/linux/virtio.h
+> @@ -38,6 +38,17 @@ struct virtqueue {
+>  	void *priv;
+>  };
+>  
+> +struct virtqueue_detach_cursor {
+> +	unsigned indirect:1;
+> +	unsigned done:1;
+> +	unsigned hole:14;
+> +
+> +	/* for split head */
+> +	unsigned head:16;
+> +	unsigned num:16;
+> +	unsigned pos:16;
+> +};
+> +
+
+is cursor ever stored somewhere? If not don't use bitfields,
+they cause many gcc versions to generate atrocious code.
+
+
+>  int virtqueue_add_outbuf(struct virtqueue *vq,
+>  			 struct scatterlist sg[], unsigned int num,
+>  			 void *data,
+> -- 
+> 2.32.0.3.g01195cf9f
+
 
