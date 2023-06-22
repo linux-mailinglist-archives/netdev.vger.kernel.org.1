@@ -1,248 +1,636 @@
-Return-Path: <netdev+bounces-13043-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13046-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7AAE773A07B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:04:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C68773A083
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:07:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D4DB1C21133
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:04:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 501F71C20A9E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:07:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7FEC91E50A;
-	Thu, 22 Jun 2023 12:04:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4090A1E512;
+	Thu, 22 Jun 2023 12:07:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1571B8FC
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:04:32 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2102.outbound.protection.outlook.com [40.107.223.102])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A50E19BF;
-	Thu, 22 Jun 2023 05:04:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC141D2DD
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:07:36 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2061e.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::61e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04FCD171C
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:07:34 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jmdPYziSqncs+wQ/2VsHTeFvu64gQ2Laxc3TowuBmoTbvnAM36rnnjZC1ikP8buBR+UEGaB7Rb0O7lL/eF9kC9Ucv0w1+Y4RUdN3lnSTAJfgq89IP/KQ7U2j+l9IPyQOuBP3Nijom9FRLAOhogSnTfDGcEg9fJgeZc62DvAOzt6n/esdKhOJ1Ho7XHPeixHqIS0oyhTI3PeMUO2NLt2NuvwlND06kaMJD6vUkhY0pmg5lYNUAC1T/C3eK7VprQbAzkB4kVFrgRMmcWgcuM+TnT4skuGd2VWKrhI8ysEJ+Ii/jzjLfysQOHCfWhm4WeO0j/cSBZV9FlXczvKhlu59hw==
+ b=RppEnMqepDTpZfs8sGUQRuaiv//D5LSkvrFRmbyNA67jY559p7nh9E/gdZlH+LJmsK7Ob1eUHjJ5BVfwUZ+BX6YZbrQv4k6gvjpLgPRjV04ZIwi08mAGje2j0Pe5t5YnTcUcueeVPYd+0+FfyvaThbJKnuZl+WXvQ1UQTmIJ0Ry6jvi6SRj2j/RDQsIey2RtAms48qbO1FRcuAP70gtc9GFZMm2g+E4mB9Xrq5rN5399pr7ZV7b6j3DkVHL2Icql11WZB3GPskoHduR3J56MRYeU63A2ZW4drGFkOs5/qhWIFru94sOD4CKLb0UGtzEOhquILUZqVEgPUUBmxJXUuw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=NEpRwbGBlTga8FlYx/wRem031kpGZkeYvYIuFRG+GXg=;
- b=l5dEP0zbmEgChFrg573we69yVg0htiNSIodkyNa4P7iaKrayP+8OKElgdzj6OFdUonL5MZVzIYm3nc4xuJ1Mz8opW4AbMExuNUfLK1TPWaDyun7rSdsQv3VEf/dz9htbsongo+Czc9XSktKbl6U4taLrjw/hC9/6wx78K4Jt/VSoUP+21sWYHj0LpVoiUKGxkTj/j1gedk3a64TuOOXyUPtgFY7w7q1G7/Yf5OGLKkFHKmF5PsW1o1YVwDDsOuroyMo0fKZcrC/5ex7eARTg883yn8jTDhcAQN5Asq47+wOuFgmGQSjeHOp+JMMqH8u9DheQSgDFTi8zMp3ynELAZw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ bh=FkxXil0yPFH8CnHKyuSSG8cO1Qptv3BdqHl0QMRgWTM=;
+ b=RHF8HKWySwwDZcygj14dT/fIbFI1YhrMr7CbS+0whRDHAqfg2E9OcDUnVVXVck4SKSCDwQEET554QjhTvr4dWK1eIWOJE+7BmW3l6usyRQQBj9SpJkod8c7TGXRvmddqnIN1yNlW71NbiB+6bVZgUNix/5rfYb2erwAHiJfqq5ul1gcmdD09GSAfZyxRlgoihcn09YUBxqUhNHq0jGMqBiBGmBMhUsHAFMoM/CqaDHIdRfPU5wpN9zTwPk+UrwXAKAfa9C11DNyTDvTnMLW02+Tmm9Fmvk6bDnhpoDe9PMmFOnSxbd3PeMawaeYAHx9PEzbFywsbW9U0BTu6Mlga+w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 216.228.117.160) smtp.rcpttodomain=intel.com smtp.mailfrom=nvidia.com;
+ dmarc=pass (p=reject sp=reject pct=100) action=none header.from=nvidia.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=NEpRwbGBlTga8FlYx/wRem031kpGZkeYvYIuFRG+GXg=;
- b=LAXmoPxSC12gBzwGBa8PW3KVFK/EUYIQW6cxoK/8HpF0RR4BogZFFWqcCa86jGIkL0XfRwps0UO9XF3S2wKL7Jothawsg+RdioE2LEjd6B/KeMgmjKMgFVPOnmLQnHFUo8e5XG97oveLI4MX52KnDsonPKepL76hqy4BzPTk75A=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MN2PR13MB3902.namprd13.prod.outlook.com (2603:10b6:208:1e8::18) with
+ bh=FkxXil0yPFH8CnHKyuSSG8cO1Qptv3BdqHl0QMRgWTM=;
+ b=aboqyfEfOKtJJINaCwvbGxieFWXa30NbwxLR7LqIwEOJ26z3ZbtQTypRLX1lKDGBqYcMVsYId5x3O/Lrla+LyUQx+wwrDvot9thkfM5hadkP86fcGFXKksFaxLFQiqox5pz0OlCrNxjSblYVd17IO/7vbqTAQpXdWEld2BLBvAKVHTnpLSOeSgf2RogT87WDM4Tx3Tvp+10CIan0mYiZHq63jUTI/jvTsD7Lv+xIml+vpzid9Htnj7FB0/4PiMStXmij84+Cif1TOqE5tGQtjJa/z/UXkHUnVUtopeYAp68FC5Ibr/wPQe9dsNfD9b8F+61cQM6nWsRYy6XQttiq5w==
+Received: from MW4PR04CA0120.namprd04.prod.outlook.com (2603:10b6:303:83::35)
+ by CH3PR12MB8307.namprd12.prod.outlook.com (2603:10b6:610:12f::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Thu, 22 Jun
- 2023 12:03:28 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 22 Jun 2023
- 12:03:27 +0000
-Date: Thu, 22 Jun 2023 14:03:20 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Chen-Yu Tsai <wens@csie.org>,
-	Jernej Skrabec <jernej.skrabec@gmail.com>,
-	Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	linux-sunxi@lists.linux.dev
-Subject: Re: [PATCH net-next v3 2/2] net: stmmac: use pcpu 64 bit statistics
- where necessary
-Message-ID: <ZJQ4iONJwezOs2CZ@corigine.com>
-References: <20230619165220.2501-1-jszhang@kernel.org>
- <20230619165220.2501-3-jszhang@kernel.org>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230619165220.2501-3-jszhang@kernel.org>
-X-ClientProxiedBy: AM0PR10CA0114.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:e6::31) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
+ 2023 12:07:28 +0000
+Received: from CO1PEPF000042A9.namprd03.prod.outlook.com
+ (2603:10b6:303:83:cafe::33) by MW4PR04CA0120.outlook.office365.com
+ (2603:10b6:303:83::35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24 via Frontend
+ Transport; Thu, 22 Jun 2023 12:07:28 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 216.228.117.160)
+ smtp.mailfrom=nvidia.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=nvidia.com;
+Received-SPF: Pass (protection.outlook.com: domain of nvidia.com designates
+ 216.228.117.160 as permitted sender) receiver=protection.outlook.com;
+ client-ip=216.228.117.160; helo=mail.nvidia.com; pr=C
+Received: from mail.nvidia.com (216.228.117.160) by
+ CO1PEPF000042A9.mail.protection.outlook.com (10.167.243.38) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.17 via Frontend Transport; Thu, 22 Jun 2023 12:07:28 +0000
+Received: from rnnvmail201.nvidia.com (10.129.68.8) by mail.nvidia.com
+ (10.129.200.66) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.5; Thu, 22 Jun 2023
+ 05:07:10 -0700
+Received: from fedora.nvidia.com (10.126.230.35) by rnnvmail201.nvidia.com
+ (10.129.68.8) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.986.37; Thu, 22 Jun
+ 2023 05:07:07 -0700
+References: <20230620174423.4144938-1-anthony.l.nguyen@intel.com>
+ <20230620174423.4144938-10-anthony.l.nguyen@intel.com>
+User-agent: mu4e 1.8.11; emacs 28.2
+From: Vlad Buslov <vladbu@nvidia.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<edumazet@google.com>, <netdev@vger.kernel.org>, Marcin Szycik
+	<marcin.szycik@intel.com>, <jiri@resnulli.us>, <ivecera@redhat.com>,
+	<simon.horman@corigine.com>, Wojciech Drewek <wojciech.drewek@intel.com>,
+	Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+Subject: Re: [PATCH net-next 09/12] ice: Add VLAN FDB support in switchdev mode
+Date: Thu, 22 Jun 2023 15:03:39 +0300
+In-Reply-To: <20230620174423.4144938-10-anthony.l.nguyen@intel.com>
+Message-ID: <87a5wrvgyf.fsf@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain
+X-Originating-IP: [10.126.230.35]
+X-ClientProxiedBy: rnnvmail202.nvidia.com (10.129.68.7) To
+ rnnvmail201.nvidia.com (10.129.68.8)
+X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3902:EE_
-X-MS-Office365-Filtering-Correlation-Id: 70badf84-5a90-46d7-365a-08db7318b038
+X-MS-TrafficTypeDiagnostic: CO1PEPF000042A9:EE_|CH3PR12MB8307:EE_
+X-MS-Office365-Filtering-Correlation-Id: 0791d00c-1709-4144-62ca-08db73193ff6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	xO9OiFtkwGdlPtBFN9JQrm8Bx6ksIDXHGAvA/+qGpQdoZZu6pVvWLBygj+igbsVTihjxN7RmBnAjghaV+08knPyQsBSgWEsEiBacH07HXC+BylMGYAUNPB9+S3/H5LDzamMssKP7EMHDszqroODhLxjfeBVjsBZ45lmHgZZ2FeS3tkbhLae6/hniYfLRyATIR4RO9Y7XfXXCCWw6+0eNTkHce6f2kiamGTpb0LPF5PKf+qcks3jhk1Eeh/NAOwBJZSRFRzYZsCNjrXHjPxq7385sVExP7Ss8u1lMKTvrjWeTvFl78pVCvmTIjJ3F2gFGHOru2x9rXd3jVVYV3TLSa6PTvNSFz2soU3DfG/Et6PjgCw7WYfZ4bRSK6wSLAzHVXbWpMGjfX4LMq1d2d8TR72+0iZ4LqW9mujYN6inL075LHMZqtcnF0iDI+ED2gVELSEDL8Y6JEf0OZC5luGY/UR3MsQnMoaKdJYh23e4mSLhrbmt8DdLi9lf21qtn6BWwSkTjXa0Yjwpq5+JkjbmQOFdMVMqM/C2XL8b20wBkLHoCCpphqW0wKWiBHrBDtnHR9Ff3Z4NHlHNIBqOqcDfR1gEt+NC/sMbQGiCY73cquCo=
+	B47TEYeuJNH0cW6az2diS5+hmr5EuR0CAXuJ+VZYMOAElBMdo8OClIC5an7E+Fek5zmkudoUm47j6KTALCixGOQ6F72aiL7GOtn+Vo0lNWqQMnx/hsN7yEzbEdKNKkeRfi/HFo+SfnJ2hznVZICvwJPYxsiabM3iH3IBj2Q69hBSxe62O/yROCNoDrplQppdi3TyLtk2ykbjdTpx4NThYU52F8XjKExqs7jzpv4o8WsVBYmOEtuHmUNvPrqVRchsOgz2BUu7ObYlt5sJo3aLWdO+eAMwL4CZuyfw473GLPnibY9x8x7tK1Svm0cCXrYA1uE3qkcVIEaNPQeLqBlOHWSWoMXJWijxKzLwiEPPV+Myc/H6MS20029r71zaR3I0csgfNgPRDXssJF2W5bftfLJCWw82A1tm89WNC/dANJ1GuhSntb1UeVdsSHtUMQa5vyBc5ZRWamkAXB5ZhPHVkNuA8Ox+qRJjVlC6APbvfeh/ZNiggPZ5i8hCAc6HktMXgTOg7lFnitgueQmugC2Uorg3MuPC1WJLaN41P90OEWu9AKZST1kXI2ypk2b5zZad8J5kwbgAJW/QZQUr8bBxa7HoRi10zsoyss4Jqo/D380hvVdb5EQy/u0gL8ISy+DcaI4B0Zp6RT5uSwEHjtJoWzXG71CZ/orz061sot9ssGPdPS6ZJIL5z3FmMhlP0hQSPSbsUhgUSXXnSDn+YmYrn/ArgR1Q2DutqjpWtoMXF+M=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(346002)(136003)(366004)(396003)(376002)(451199021)(6512007)(6506007)(186003)(2616005)(4326008)(316002)(6486002)(6666004)(36756003)(6916009)(2906002)(66556008)(66946007)(66476007)(86362001)(41300700001)(38100700002)(83380400001)(54906003)(478600001)(5660300002)(7416002)(8676002)(8936002)(44832011);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?MFta2fTNENuj7XJFFMxI2HKGLRmqqzvU7mnXq3ZfGmJIexha58NdtGb3zxYL?=
- =?us-ascii?Q?f3Lsw7WpIPt//kPTkh/PwrEE7KBqU+1v71A8E0weJ8FMOR9sfSaGuzF2GmvU?=
- =?us-ascii?Q?yKVRpy5uh3bGis40QhXBk9BV4Uz02QvJqrVHXoO0bmci67y93CIZ90tDhpsA?=
- =?us-ascii?Q?KsqdbxTvUyDz3l7QtjZa0wg5hCCvjHxX+NtlKFpjCXrZD289RYQqI+ItZNqX?=
- =?us-ascii?Q?V9j+0Zk2Ot9zl1S3YwXMu64vXdlyd6hmIX9i1lLro6UryOZmGqUYd0ekRAyF?=
- =?us-ascii?Q?fwU1RMb0YLg5gVcF8j7rj5B7+DEQhG/4roNNWz/UVoqZUK+TBQZ7YVtWKqUx?=
- =?us-ascii?Q?ruJ8pIlzSRiHGKRqhJDYRtQOJAK6+6bEOdnn3huyAE9Gd2L1Lw/ADf57/waZ?=
- =?us-ascii?Q?Jg2I320AgjEHdrh2CF57/AOvmILkrYdFzXHRhUaxRNIVY82WZZl8EKjwkc/U?=
- =?us-ascii?Q?5GD1AVkkm8E/zgvpd+QExDUKyqEOAzK3gLJqfAqiZr0iV11/9IJR73SGJiR1?=
- =?us-ascii?Q?jcOKLrCgoI3XItUErusM39RpCvC/TUAMrF0vt1GBUGzDUlEUbJ4ZjwpAeq3S?=
- =?us-ascii?Q?i4bnzz4RHW3AUNi7WSwKfPC7ZmS7vSvTjaJbV0AGDG9uUvHKQQeHabKNCSqk?=
- =?us-ascii?Q?v+R0BZauGbSMTiue1WS3r+CRDoLR/QE0+gKQQzrVer6i1HGhvuX9MpzGGKfY?=
- =?us-ascii?Q?w1KbtxfkEmvuubIGW4pRIzOPah4qIsCBYroVigTSId0MEbOh6cJGEfyPjaGA?=
- =?us-ascii?Q?WR0pf0Fe9Zyu1xbvHJNTi6O0S++/Xm4RUGgxDtzVJr65wJ6HBfyz9fadf/kZ?=
- =?us-ascii?Q?wAIexnx5YOUYdVywGCKIrQk6FB1nzoQ/oX+4MWBH0AVq+19ltTyf4Ky513wf?=
- =?us-ascii?Q?g+GV8W1ltJ6uMsPI31/hmL7e+1BGFhrlWzSaY2VvoqUN2/Dx/MZXOG9z8LOI?=
- =?us-ascii?Q?IJsnI6batCGdQ7burYgwboQDv4jCiER2r27hbpFn23QLypLaEQWScdDrvGMJ?=
- =?us-ascii?Q?C2L0jAzFt1bSUTfLUYZhuhVC97JR6fI80BtvngqPJdX7m5zewgnwvJEPIUT4?=
- =?us-ascii?Q?nRio29j1QnNbgO/I6zH2wag8QG85vIxrSwlC6+2GIvHykqfHIqgQOFdC4sqM?=
- =?us-ascii?Q?sPStDBHNZJurZb0ka2IXkgptqEH4ukV4j4cAD/fVi3Fhnxa9dUGs5Pc0ITRa?=
- =?us-ascii?Q?oXTZyOn8+MU0QR5r1AlyveAClvsctOa60qMyDiGz6kWeC8mXuP/1ReavwJ5P?=
- =?us-ascii?Q?dOi4aumFk2LVEkVXwOGF6JoT9auDRobZbyic4PvX5dMMgyyXN9LRqzG9nbR5?=
- =?us-ascii?Q?jf8Qxad8AJGMuqegV9V9WKO1nEh5uaqf1LRxa4OKWg0HiBrjYNrMUNnuwn6G?=
- =?us-ascii?Q?2dUIfL3nqoqlmYvYPPvIOxUrgjP6iD08C6imvGt/CYoUb4xTLWqJdAgqj90q?=
- =?us-ascii?Q?Qf8ac3tkmhKDwtThGJ9zZNo3r6FTkwGgfBcYleVnGjYM4AJwtfU2nQPicz94?=
- =?us-ascii?Q?j0L68BZTRewBhQqc0/Ad3gT6UKEWgTi3Aowtj/+lT8TpQIaov43y14IHP1rZ?=
- =?us-ascii?Q?EO5SePERzXF4qGwo1NnBGok34ZZrhOwMfKHcpbvVBdN/3i3r5PxxRaWl3vMn?=
- =?us-ascii?Q?/VVjKKAMWGGqOVBigjusIbN+bjJkxyY32f7+uVOhlXHcd1jPQ3o21SaFZ0cV?=
- =?us-ascii?Q?u7kcyQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 70badf84-5a90-46d7-365a-08db7318b038
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 12:03:27.7435
+	CIP:216.228.117.160;CTRY:US;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:mail.nvidia.com;PTR:dc6edge1.nvidia.com;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(376002)(136003)(346002)(451199021)(40470700004)(46966006)(36840700001)(70586007)(54906003)(7696005)(478600001)(6666004)(70206006)(16526019)(26005)(82310400005)(30864003)(2906002)(186003)(8676002)(316002)(6916009)(86362001)(4326008)(8936002)(5660300002)(7416002)(41300700001)(356005)(82740400003)(7636003)(36756003)(40460700003)(47076005)(336012)(83380400001)(2616005)(36860700001)(40480700001)(426003);DIR:OUT;SFP:1101;
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 12:07:28.6451
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Dup04i3r4WVVloPaWveG1aVo+nSdmG4O6NZcv/HluCbBvYBaAhEeplHqNs9EdqomNwDnykYFU0hnLsgFjCOAyEyv0Xd2ij0X6L0agXIN65o=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3902
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-Network-Message-Id: 0791d00c-1709-4144-62ca-08db73193ff6
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=43083d15-7273-40c1-b7db-39efd9ccc17a;Ip=[216.228.117.160];Helo=[mail.nvidia.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000042A9.namprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8307
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 20, 2023 at 12:52:20AM +0800, Jisheng Zhang wrote:
-
-...
-
-Hi Jisheng Zhang,
-
-some minor feedback from my side, as it seems there will be a v4 anyway.
-
-> @@ -535,23 +548,37 @@ static void stmmac_get_per_qstats(struct stmmac_priv *priv, u64 *data)
->  {
->  	u32 tx_cnt = priv->plat->tx_queues_to_use;
->  	u32 rx_cnt = priv->plat->rx_queues_to_use;
-> -	int q, stat;
-> +	unsigned int start;
-> +	int q, stat, cpu;
->  	char *p;
-> -
-> -	for (q = 0; q < tx_cnt; q++) {
-> -		p = (char *)priv + offsetof(struct stmmac_priv,
-> -					    xstats.txq_stats[q].tx_pkt_n);
-> -		for (stat = 0; stat < STMMAC_TXQ_STATS; stat++) {
-> -			*data++ = (*(unsigned long *)p);
-> -			p += sizeof(unsigned long);
-> +	u64 *pos;
-
-Please use reverse xmas tree - longest line to shortest - for local
-variable declarations in new Networking code.
-
-...
-
-> @@ -563,7 +590,8 @@ static void stmmac_get_ethtool_stats(struct net_device *dev,
->  	u32 rx_queues_count = priv->plat->rx_queues_to_use;
->  	u32 tx_queues_count = priv->plat->tx_queues_to_use;
->  	unsigned long count;
-> -	int i, j = 0, ret;
-> +	unsigned int start;
-> +	int i, j = 0, pos, ret, cpu;
-
-Ditto.
-
-...
-
-> @@ -606,6 +633,22 @@ static void stmmac_get_ethtool_stats(struct net_device *dev,
->  		data[j++] = (stmmac_gstrings_stats[i].sizeof_stat ==
->  			     sizeof(u64)) ? (*(u64 *)p) : (*(u32 *)p);
->  	}
-> +	pos = j;
-> +	for_each_possible_cpu(cpu) {
-> +		struct stmmac_pcpu_stats *stats, snapshot;
-> +
-> +		stats = per_cpu_ptr(priv->xstats.pstats, cpu);
-> +		j = pos;
-> +		do {
-> +			start = u64_stats_fetch_begin(&stats->syncp);
-> +			snapshot = *stats;
-> +		} while (u64_stats_fetch_retry(&stats->syncp, start));
-> +
-> +		for (i = 0; i < STMMAC_PCPU_STATS_LEN; i++) {
-> +			char *p = (char *)&snapshot + stmmac_gstrings_pcpu_stats[i].stat_offset;
-
-Blank line here please.
-
-> +			data[j++] += *(u64 *)p;
-> +		}
-> +	}
->  	stmmac_get_per_qstats(priv, &data[j]);
+On Tue 20 Jun 2023 at 10:44, Tony Nguyen <anthony.l.nguyen@intel.com> wrote:
+> From: Marcin Szycik <marcin.szycik@intel.com>
+>
+> Add support for matching on VLAN tag in bridge offloads.
+> Currently only trunk mode is supported.
+>
+> To enable VLAN filtering (existing FDB entries will be deleted):
+> ip link set $BR type bridge vlan_filtering 1
+>
+> To add VLANs to bridge in trunk mode:
+> bridge vlan add dev $PF1 vid 110-111
+> bridge vlan add dev $VF1_PR vid 110-111
+>
+> Signed-off-by: Marcin Szycik <marcin.szycik@intel.com>
+> Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
+> Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  .../net/ethernet/intel/ice/ice_eswitch_br.c   | 296 +++++++++++++++++-
+>  .../net/ethernet/intel/ice/ice_eswitch_br.h   |  21 ++
+>  2 files changed, 309 insertions(+), 8 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+> index 1e57ce7b22d3..805a6b2fd965 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
+> @@ -70,16 +70,34 @@ ice_eswitch_br_rule_delete(struct ice_hw *hw, struct ice_rule_query_data *rule)
+>  	return err;
 >  }
 >  
-
-...
-
-> @@ -695,6 +738,11 @@ static void stmmac_get_strings(struct net_device *dev, u32 stringset, u8 *data)
->  				ETH_GSTRING_LEN);
->  			p += ETH_GSTRING_LEN;
->  		}
-> +		for (i = 0; i < STMMAC_PCPU_STATS_LEN; i++) {
-> +			memcpy(p, stmmac_gstrings_pcpu_stats[i].stat_string,
-> +				ETH_GSTRING_LEN);
-
-The indentation of the line above isn't quite right: it should align
-with the inside of the opening parentheses on the previous line.
-
-			memcpy(p, stmmac_gstrings_pcpu_stats[i].stat_string,
-			       ETH_GSTRING_LEN);
-
-> +			p += ETH_GSTRING_LEN;
-> +		}
->  		stmmac_get_qstats_string(priv, p);
->  		break;
->  	case ETH_SS_TEST:
-
-...
-
-> @@ -5015,8 +5042,10 @@ static struct stmmac_xdp_buff *xsk_buff_to_stmmac_ctx(struct xdp_buff *xdp)
->  
->  static int stmmac_rx_zc(struct stmmac_priv *priv, int limit, u32 queue)
+> +static u16
+> +ice_eswitch_br_get_lkups_cnt(u16 vid)
+> +{
+> +	return ice_eswitch_br_is_vid_valid(vid) ? 2 : 1;
+> +}
+> +
+> +static void
+> +ice_eswitch_br_add_vlan_lkup(struct ice_adv_lkup_elem *list, u16 vid)
+> +{
+> +	if (ice_eswitch_br_is_vid_valid(vid)) {
+> +		list[1].type = ICE_VLAN_OFOS;
+> +		list[1].h_u.vlan_hdr.vlan = cpu_to_be16(vid & VLAN_VID_MASK);
+> +		list[1].m_u.vlan_hdr.vlan = cpu_to_be16(0xFFFF);
+> +	}
+> +}
+> +
+>  static struct ice_rule_query_data *
+>  ice_eswitch_br_fwd_rule_create(struct ice_hw *hw, int vsi_idx, int port_type,
+> -			       const unsigned char *mac)
+> +			       const unsigned char *mac, u16 vid)
 >  {
-> +	struct stmmac_pcpu_stats *stats = this_cpu_ptr(priv->xstats.pstats);
->  	struct stmmac_rx_queue *rx_q = &priv->dma_conf.rx_queue[queue];
->  	unsigned int count = 0, error = 0, len = 0;
-> +	u32 rx_errors = 0, rx_dropped = 0;
->  	int dirty = stmmac_rx_dirty(priv, queue);
->  	unsigned int next_entry = rx_q->cur_rx;
->  	unsigned int desc_size;
+>  	struct ice_adv_rule_info rule_info = { 0 };
+>  	struct ice_rule_query_data *rule;
+>  	struct ice_adv_lkup_elem *list;
+> -	u16 lkups_cnt = 1;
+> +	u16 lkups_cnt;
+>  	int err;
+>  
+> +	lkups_cnt = ice_eswitch_br_get_lkups_cnt(vid);
+> +
+>  	rule = kzalloc(sizeof(*rule), GFP_KERNEL);
+>  	if (!rule)
+>  		return ERR_PTR(-ENOMEM);
+> @@ -107,6 +125,8 @@ ice_eswitch_br_fwd_rule_create(struct ice_hw *hw, int vsi_idx, int port_type,
+>  	ether_addr_copy(list[0].h_u.eth_hdr.dst_addr, mac);
+>  	eth_broadcast_addr(list[0].m_u.eth_hdr.dst_addr);
+>  
+> +	ice_eswitch_br_add_vlan_lkup(list, vid);
+> +
+>  	rule_info.need_pass_l2 = true;
+>  
+>  	rule_info.sw_act.fltr_act = ICE_FWD_TO_VSI;
+> @@ -129,13 +149,15 @@ ice_eswitch_br_fwd_rule_create(struct ice_hw *hw, int vsi_idx, int port_type,
+>  
+>  static struct ice_rule_query_data *
+>  ice_eswitch_br_guard_rule_create(struct ice_hw *hw, u16 vsi_idx,
+> -				 const unsigned char *mac)
+> +				 const unsigned char *mac, u16 vid)
+>  {
+>  	struct ice_adv_rule_info rule_info = { 0 };
+>  	struct ice_rule_query_data *rule;
+>  	struct ice_adv_lkup_elem *list;
+> -	const u16 lkups_cnt = 1;
+>  	int err = -ENOMEM;
+> +	u16 lkups_cnt;
+> +
+> +	lkups_cnt = ice_eswitch_br_get_lkups_cnt(vid);
+>  
+>  	rule = kzalloc(sizeof(*rule), GFP_KERNEL);
+>  	if (!rule)
+> @@ -149,6 +171,8 @@ ice_eswitch_br_guard_rule_create(struct ice_hw *hw, u16 vsi_idx,
+>  	ether_addr_copy(list[0].h_u.eth_hdr.src_addr, mac);
+>  	eth_broadcast_addr(list[0].m_u.eth_hdr.src_addr);
+>  
+> +	ice_eswitch_br_add_vlan_lkup(list, vid);
+> +
+>  	rule_info.allow_pass_l2 = true;
+>  	rule_info.sw_act.vsi_handle = vsi_idx;
+>  	rule_info.sw_act.fltr_act = ICE_NOP;
+> @@ -172,7 +196,7 @@ ice_eswitch_br_guard_rule_create(struct ice_hw *hw, u16 vsi_idx,
+>  
+>  static struct ice_esw_br_flow *
+>  ice_eswitch_br_flow_create(struct device *dev, struct ice_hw *hw, int vsi_idx,
+> -			   int port_type, const unsigned char *mac)
+> +			   int port_type, const unsigned char *mac, u16 vid)
+>  {
+>  	struct ice_rule_query_data *fwd_rule, *guard_rule;
+>  	struct ice_esw_br_flow *flow;
+> @@ -182,7 +206,8 @@ ice_eswitch_br_flow_create(struct device *dev, struct ice_hw *hw, int vsi_idx,
+>  	if (!flow)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> -	fwd_rule = ice_eswitch_br_fwd_rule_create(hw, vsi_idx, port_type, mac);
+> +	fwd_rule = ice_eswitch_br_fwd_rule_create(hw, vsi_idx, port_type, mac,
+> +						  vid);
+>  	err = PTR_ERR_OR_ZERO(fwd_rule);
+>  	if (err) {
+>  		dev_err(dev, "Failed to create eswitch bridge %sgress forward rule, err: %d\n",
+> @@ -191,7 +216,7 @@ ice_eswitch_br_flow_create(struct device *dev, struct ice_hw *hw, int vsi_idx,
+>  		goto err_fwd_rule;
+>  	}
+>  
+> -	guard_rule = ice_eswitch_br_guard_rule_create(hw, vsi_idx, mac);
+> +	guard_rule = ice_eswitch_br_guard_rule_create(hw, vsi_idx, mac, vid);
+>  	err = PTR_ERR_OR_ZERO(guard_rule);
+>  	if (err) {
+>  		dev_err(dev, "Failed to create eswitch bridge %sgress guard rule, err: %d\n",
+> @@ -245,6 +270,30 @@ ice_eswitch_br_flow_delete(struct ice_pf *pf, struct ice_esw_br_flow *flow)
+>  	kfree(flow);
+>  }
+>  
+> +static struct ice_esw_br_vlan *
+> +ice_esw_br_port_vlan_lookup(struct ice_esw_br *bridge, u16 vsi_idx, u16 vid)
+> +{
+> +	struct ice_pf *pf = bridge->br_offloads->pf;
+> +	struct device *dev = ice_pf_to_dev(pf);
+> +	struct ice_esw_br_port *port;
+> +	struct ice_esw_br_vlan *vlan;
+> +
+> +	port = xa_load(&bridge->ports, vsi_idx);
+> +	if (!port) {
+> +		dev_info(dev, "Bridge port lookup failed (vsi=%u)\n", vsi_idx);
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	vlan = xa_load(&port->vlans, vid);
+> +	if (!vlan) {
+> +		dev_info(dev, "Bridge port vlan metadata lookup failed (vsi=%u)\n",
+> +			 vsi_idx);
+> +		return ERR_PTR(-EINVAL);
+> +	}
+> +
+> +	return vlan;
+> +}
+> +
+>  static void
+>  ice_eswitch_br_fdb_entry_delete(struct ice_esw_br *bridge,
+>  				struct ice_esw_br_fdb_entry *fdb_entry)
+> @@ -314,10 +363,25 @@ ice_eswitch_br_fdb_entry_create(struct net_device *netdev,
+>  	struct device *dev = ice_pf_to_dev(pf);
+>  	struct ice_esw_br_fdb_entry *fdb_entry;
+>  	struct ice_esw_br_flow *flow;
+> +	struct ice_esw_br_vlan *vlan;
+>  	struct ice_hw *hw = &pf->hw;
+>  	unsigned long event;
+>  	int err;
+>  
+> +	/* untagged filtering is not yet supported */
+> +	if (!(bridge->flags & ICE_ESWITCH_BR_VLAN_FILTERING) && vid)
+> +		return;
+> +
+> +	if ((bridge->flags & ICE_ESWITCH_BR_VLAN_FILTERING)) {
+> +		vlan = ice_esw_br_port_vlan_lookup(bridge, br_port->vsi_idx,
+> +						   vid);
+> +		if (IS_ERR(vlan)) {
+> +			dev_err(dev, "Failed to find vlan lookup, err: %ld\n",
+> +				PTR_ERR(vlan));
+> +			return;
+> +		}
+> +	}
+> +
+>  	fdb_entry = ice_eswitch_br_fdb_find(bridge, mac, vid);
+>  	if (fdb_entry)
+>  		ice_eswitch_br_fdb_entry_notify_and_cleanup(bridge, fdb_entry);
+> @@ -329,7 +393,7 @@ ice_eswitch_br_fdb_entry_create(struct net_device *netdev,
+>  	}
+>  
+>  	flow = ice_eswitch_br_flow_create(dev, hw, br_port->vsi_idx,
+> -					  br_port->type, mac);
+> +					  br_port->type, mac, vid);
+>  	if (IS_ERR(flow)) {
+>  		err = PTR_ERR(flow);
+>  		goto err_add_flow;
+> @@ -488,6 +552,207 @@ ice_eswitch_br_switchdev_event(struct notifier_block *nb,
+>  	return NOTIFY_DONE;
+>  }
+>  
+> +static void ice_eswitch_br_fdb_flush(struct ice_esw_br *bridge)
+> +{
+> +	struct ice_esw_br_fdb_entry *entry, *tmp;
+> +
+> +	list_for_each_entry_safe(entry, tmp, &bridge->fdb_list, list)
+> +		ice_eswitch_br_fdb_entry_notify_and_cleanup(bridge, entry);
+> +}
+> +
+> +static void
+> +ice_eswitch_br_vlan_filtering_set(struct ice_esw_br *bridge, bool enable)
+> +{
+> +	if (enable == !!(bridge->flags & ICE_ESWITCH_BR_VLAN_FILTERING))
+> +		return;
+> +
+> +	ice_eswitch_br_fdb_flush(bridge);
+> +	if (enable)
+> +		bridge->flags |= ICE_ESWITCH_BR_VLAN_FILTERING;
+> +	else
+> +		bridge->flags &= ~ICE_ESWITCH_BR_VLAN_FILTERING;
+> +}
+> +
+> +static void
+> +ice_eswitch_br_vlan_cleanup(struct ice_esw_br_port *port,
+> +			    struct ice_esw_br_vlan *vlan)
+> +{
+> +	xa_erase(&port->vlans, vlan->vid);
+> +	kfree(vlan);
+> +}
+> +
+> +static void ice_eswitch_br_port_vlans_flush(struct ice_esw_br_port *port)
+> +{
+> +	struct ice_esw_br_vlan *vlan;
+> +	unsigned long index;
+> +
+> +	xa_for_each(&port->vlans, index, vlan)
+> +		ice_eswitch_br_vlan_cleanup(port, vlan);
+> +}
+> +
+> +static struct ice_esw_br_vlan *
+> +ice_eswitch_br_vlan_create(u16 vid, u16 flags, struct ice_esw_br_port *port)
+> +{
+> +	struct ice_esw_br_vlan *vlan;
+> +	int err;
+> +
+> +	vlan = kzalloc(sizeof(*vlan), GFP_KERNEL);
+> +	if (!vlan)
+> +		return ERR_PTR(-ENOMEM);
+> +
+> +	vlan->vid = vid;
+> +	vlan->flags = flags;
+> +
+> +	err = xa_insert(&port->vlans, vlan->vid, vlan, GFP_KERNEL);
+> +	if (err) {
+> +		kfree(vlan);
+> +		return ERR_PTR(err);
+> +	}
+> +
+> +	return vlan;
+> +}
+> +
+> +static int
+> +ice_eswitch_br_port_vlan_add(struct ice_esw_br *bridge, u16 vsi_idx, u16 vid,
+> +			     u16 flags, struct netlink_ext_ack *extack)
+> +{
+> +	struct ice_esw_br_port *port;
+> +	struct ice_esw_br_vlan *vlan;
+> +
+> +	port = xa_load(&bridge->ports, vsi_idx);
+> +	if (!port)
+> +		return -EINVAL;
+> +
+> +	vlan = xa_load(&port->vlans, vid);
+> +	if (vlan) {
+> +		if (vlan->flags == flags)
+> +			return 0;
+> +
+> +		ice_eswitch_br_vlan_cleanup(port, vlan);
+> +	}
+> +
+> +	vlan = ice_eswitch_br_vlan_create(vid, flags, port);
+> +	if (IS_ERR(vlan)) {
+> +		NL_SET_ERR_MSG_FMT_MOD(extack, "Failed to create VLAN entry, vid: %u, vsi: %u",
+> +				       vid, vsi_idx);
+> +		return PTR_ERR(vlan);
+> +	}
+> +
+> +	return 0;
+> +}
+> +
+> +static void
+> +ice_eswitch_br_port_vlan_del(struct ice_esw_br *bridge, u16 vsi_idx, u16 vid)
+> +{
+> +	struct ice_esw_br_port *port;
+> +	struct ice_esw_br_vlan *vlan;
+> +
+> +	port = xa_load(&bridge->ports, vsi_idx);
+> +	if (!port)
+> +		return;
+> +
+> +	vlan = xa_load(&port->vlans, vid);
+> +	if (!vlan)
+> +		return;
+> +
 
-Reverse xmas tree here too.
+Don't you also need to cleanup all FDBs on the port matching the vid
+being deleted here?
 
-...
+> +	ice_eswitch_br_vlan_cleanup(port, vlan);
+> +}
+> +
+> +static int
+> +ice_eswitch_br_port_obj_add(struct net_device *netdev, const void *ctx,
+> +			    const struct switchdev_obj *obj,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	struct ice_esw_br_port *br_port = ice_eswitch_br_netdev_to_port(netdev);
+> +	struct switchdev_obj_port_vlan *vlan;
+> +	int err;
+> +
+> +	if (!br_port)
+> +		return -EINVAL;
+> +
+> +	switch (obj->id) {
+> +	case SWITCHDEV_OBJ_ID_PORT_VLAN:
+> +		vlan = SWITCHDEV_OBJ_PORT_VLAN(obj);
+> +		err = ice_eswitch_br_port_vlan_add(br_port->bridge,
+> +						   br_port->vsi_idx, vlan->vid,
+> +						   vlan->flags, extack);
+> +		return err;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +
+> +static int
+> +ice_eswitch_br_port_obj_del(struct net_device *netdev, const void *ctx,
+> +			    const struct switchdev_obj *obj)
+> +{
+> +	struct ice_esw_br_port *br_port = ice_eswitch_br_netdev_to_port(netdev);
+> +	struct switchdev_obj_port_vlan *vlan;
+> +
+> +	if (!br_port)
+> +		return -EINVAL;
+> +
+> +	switch (obj->id) {
+> +	case SWITCHDEV_OBJ_ID_PORT_VLAN:
+> +		vlan = SWITCHDEV_OBJ_PORT_VLAN(obj);
+> +		ice_eswitch_br_port_vlan_del(br_port->bridge, br_port->vsi_idx,
+> +					     vlan->vid);
+> +		return 0;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +
+> +static int
+> +ice_eswitch_br_port_obj_attr_set(struct net_device *netdev, const void *ctx,
+> +				 const struct switchdev_attr *attr,
+> +				 struct netlink_ext_ack *extack)
+> +{
+> +	struct ice_esw_br_port *br_port = ice_eswitch_br_netdev_to_port(netdev);
+> +
+> +	if (!br_port)
+> +		return -EINVAL;
+> +
+> +	switch (attr->id) {
+> +	case SWITCHDEV_ATTR_ID_BRIDGE_VLAN_FILTERING:
+> +		ice_eswitch_br_vlan_filtering_set(br_port->bridge,
+> +						  attr->u.vlan_filtering);
+> +		return 0;
+> +	default:
+> +		return -EOPNOTSUPP;
+> +	}
+> +}
+> +
+> +static int
+> +ice_eswitch_br_event_blocking(struct notifier_block *nb, unsigned long event,
+> +			      void *ptr)
+> +{
+> +	struct net_device *dev = switchdev_notifier_info_to_dev(ptr);
+> +	int err;
+> +
+> +	switch (event) {
+> +	case SWITCHDEV_PORT_OBJ_ADD:
+> +		err = switchdev_handle_port_obj_add(dev, ptr,
+> +						    ice_eswitch_br_is_dev_valid,
+> +						    ice_eswitch_br_port_obj_add);
+> +		break;
+> +	case SWITCHDEV_PORT_OBJ_DEL:
+> +		err = switchdev_handle_port_obj_del(dev, ptr,
+> +						    ice_eswitch_br_is_dev_valid,
+> +						    ice_eswitch_br_port_obj_del);
+> +		break;
+> +	case SWITCHDEV_PORT_ATTR_SET:
+> +		err = switchdev_handle_port_attr_set(dev, ptr,
+> +						     ice_eswitch_br_is_dev_valid,
+> +						     ice_eswitch_br_port_obj_attr_set);
+> +		break;
+> +	default:
+> +		err = 0;
+> +	}
+> +
+> +	return notifier_from_errno(err);
+> +}
+> +
+>  static void
+>  ice_eswitch_br_port_deinit(struct ice_esw_br *bridge,
+>  			   struct ice_esw_br_port *br_port)
+> @@ -506,6 +771,7 @@ ice_eswitch_br_port_deinit(struct ice_esw_br *bridge,
+>  		vsi->vf->repr->br_port = NULL;
+>  
+>  	xa_erase(&bridge->ports, br_port->vsi_idx);
+> +	ice_eswitch_br_port_vlans_flush(br_port);
+>  	kfree(br_port);
+>  }
+>  
+> @@ -518,6 +784,8 @@ ice_eswitch_br_port_init(struct ice_esw_br *bridge)
+>  	if (!br_port)
+>  		return ERR_PTR(-ENOMEM);
+>  
+> +	xa_init(&br_port->vlans);
+> +
+>  	br_port->bridge = bridge;
+>  
+>  	return br_port;
+> @@ -817,6 +1085,7 @@ ice_eswitch_br_offloads_deinit(struct ice_pf *pf)
+>  		return;
+>  
+>  	unregister_netdevice_notifier(&br_offloads->netdev_nb);
+> +	unregister_switchdev_blocking_notifier(&br_offloads->switchdev_blk);
+>  	unregister_switchdev_notifier(&br_offloads->switchdev_nb);
+>  	destroy_workqueue(br_offloads->wq);
+>  	/* Although notifier block is unregistered just before,
+> @@ -860,6 +1129,15 @@ ice_eswitch_br_offloads_init(struct ice_pf *pf)
+>  		goto err_reg_switchdev_nb;
+>  	}
+>  
+> +	br_offloads->switchdev_blk.notifier_call =
+> +		ice_eswitch_br_event_blocking;
+> +	err = register_switchdev_blocking_notifier(&br_offloads->switchdev_blk);
+> +	if (err) {
+> +		dev_err(dev,
+> +			"Failed to register bridge blocking switchdev notifier\n");
+> +		goto err_reg_switchdev_blk;
+> +	}
+> +
+>  	br_offloads->netdev_nb.notifier_call = ice_eswitch_br_port_event;
+>  	err = register_netdevice_notifier(&br_offloads->netdev_nb);
+>  	if (err) {
+> @@ -871,6 +1149,8 @@ ice_eswitch_br_offloads_init(struct ice_pf *pf)
+>  	return 0;
+>  
+>  err_reg_netdev_nb:
+> +	unregister_switchdev_blocking_notifier(&br_offloads->switchdev_blk);
+> +err_reg_switchdev_blk:
+>  	unregister_switchdev_notifier(&br_offloads->switchdev_nb);
+>  err_reg_switchdev_nb:
+>  	destroy_workqueue(br_offloads->wq);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+> index 7afd00cdea9a..dd49b273451a 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.h
+> @@ -42,6 +42,11 @@ struct ice_esw_br_port {
+>  	struct ice_vsi *vsi;
+>  	enum ice_esw_br_port_type type;
+>  	u16 vsi_idx;
+> +	struct xarray vlans;
+> +};
+> +
+> +enum {
+> +	ICE_ESWITCH_BR_VLAN_FILTERING = BIT(0),
+>  };
+>  
+>  struct ice_esw_br {
+> @@ -52,12 +57,14 @@ struct ice_esw_br {
+>  	struct list_head fdb_list;
+>  
+>  	int ifindex;
+> +	u32 flags;
+>  };
+>  
+>  struct ice_esw_br_offloads {
+>  	struct ice_pf *pf;
+>  	struct ice_esw_br *bridge;
+>  	struct notifier_block netdev_nb;
+> +	struct notifier_block switchdev_blk;
+>  	struct notifier_block switchdev_nb;
+>  
+>  	struct workqueue_struct *wq;
+> @@ -71,6 +78,11 @@ struct ice_esw_br_fdb_work {
+>  	unsigned long event;
+>  };
+>  
+> +struct ice_esw_br_vlan {
+> +	u16 vid;
+> +	u16 flags;
+> +};
+> +
+>  #define ice_nb_to_br_offloads(nb, nb_name) \
+>  	container_of(nb, \
+>  		     struct ice_esw_br_offloads, \
+> @@ -81,6 +93,15 @@ struct ice_esw_br_fdb_work {
+>  		     struct ice_esw_br_fdb_work, \
+>  		     work)
+>  
+> +static inline bool ice_eswitch_br_is_vid_valid(u16 vid)
+> +{
+> +	/* In trunk VLAN mode, for untagged traffic the bridge sends requests
+> +	 * to offload VLAN 1 with pvid and untagged flags set. Since these
+> +	 * flags are not supported, add a MAC filter instead.
+> +	 */
+> +	return vid > 1;
+> +}
+> +
+>  void
+>  ice_eswitch_br_offloads_deinit(struct ice_pf *pf);
+>  int
+
 
