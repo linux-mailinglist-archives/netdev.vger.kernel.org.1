@@ -1,110 +1,107 @@
-Return-Path: <netdev+bounces-13179-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13180-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0BB9A73A8B9
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:01:53 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 95B2673A8BD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:02:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D4F21C211D8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:01:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ACDA91C2118A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:02:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37F8F206B4;
-	Thu, 22 Jun 2023 19:01:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B3D91206B5;
+	Thu, 22 Jun 2023 19:02:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29D191F923
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:01:49 +0000 (UTC)
-Received: from mail-wr1-f46.google.com (mail-wr1-f46.google.com [209.85.221.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A4659B;
-	Thu, 22 Jun 2023 12:01:48 -0700 (PDT)
-Received: by mail-wr1-f46.google.com with SMTP id ffacd0b85a97d-31121494630so8626255f8f.3;
-        Thu, 22 Jun 2023 12:01:48 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687460506; x=1690052506;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72AE1F923
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:02:12 +0000 (UTC)
+Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACA631FE3
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:04 -0700 (PDT)
+Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-40079b6fc56so37401cf.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687460524; x=1690052524;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=JQKzGLLngarWVhVTw2URKzbQiX5Xh0ThcGjikbK/29A=;
-        b=UDaogkxedFUKrLBbokO3Ju1XWzQsshU4NzizhE111YxjVL/KNgAdifnWs3aZVyEqnh
-         vZLqxNQG2p5Z41RNyZ2k1HYP7KJToFUID1byUceENvRpFn2nmR/Fk/3WzleWGvlOzZBg
-         cbtsILSaBxvPwgt6bsmd3HEx6TR2HX3bnAuRa0OHGTEDRRUKAYhbmcvyN+XtUXdS/smy
-         TqIuucLOcep/obdp00dn2uafwYJ/S4an7+fCBuCNKM4VQh2n7V5rQ5kAexgk9ST+XZnL
-         BsB9yEtdUnp3AvAw+5NPltZEX4Znv66aHgXRugSSkasJa4s8vfAHsOaoVqBv/jNSCYWT
-         wHaw==
-X-Gm-Message-State: AC+VfDzUGonVeZqp2rk4tW0X5cz5cCvSnqP0udUDlT/eVoGBUMoR85aJ
-	NuctXn7FZLyWZHinSTcAZt0=
-X-Google-Smtp-Source: ACHHUZ4Fm507H6gAfhlPKOCV3A52LQqvUW+RMQ+AjS6G760+nRpx0UGIk5+/UcW36fRpV4dsuqghUA==
-X-Received: by 2002:a5d:67cd:0:b0:2ef:b052:1296 with SMTP id n13-20020a5d67cd000000b002efb0521296mr17148852wrw.22.1687460506529;
-        Thu, 22 Jun 2023 12:01:46 -0700 (PDT)
-Received: from gmail.com (fwdproxy-cln-004.fbsv.net. [2a03:2880:31ff:4::face:b00c])
-        by smtp.gmail.com with ESMTPSA id j11-20020a5d604b000000b003078681a1e8sm7680789wrt.54.2023.06.22.12.01.45
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 12:01:46 -0700 (PDT)
-Date: Thu, 22 Jun 2023 12:01:44 -0700
-From: Breno Leitao <leitao@debian.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	leit@meta.com, Arnd Bergmann <arnd@arndb.de>,
-	Steve French <stfrench@microsoft.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Simon Ser <contact@emersion.fr>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:IO_URING" <io-uring@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] io_uring: Add io_uring command support for sockets
-Message-ID: <ZJSamAduIRJ3b/TX@gmail.com>
-References: <20230621232129.3776944-1-leitao@debian.org>
- <2023062231-tasting-stranger-8882@gregkh>
- <ZJRijTDv5lUsVo+j@gmail.com>
- <2023062208-animosity-squabble-c1ba@gregkh>
- <ZJR49xji1zmISlTs@gmail.com>
- <2023062228-cloak-wish-ec12@gregkh>
- <20230622103948.33cbb0dd@kernel.org>
+        bh=p4j6GBW8CPe32/PBQSI1ckzLQb8w73S2ei6XzaYvDcs=;
+        b=Lrt0ifuVH1LFnFqXjD9E/Bv6D1weSeqtC/YeU5AXKPOYFsMBEM79e89U0CY0V53HPu
+         ZImnivVmEszSgpcrQoBJ+chtqznsdVFVzcRzKKSi0C4DE/PyDwEkBu2srVMpVw6YkCJZ
+         ydm+G4+tKrs2/YBPwVenUxyoaxewDzfQcYl0W4yZSnggbwgOuPteQx1tLiCigO+tuuGW
+         V7k7juGHWCkzPy58mFNJeT0JitQ9RHNctb1v5I1iOWi3QhADoM9ndg0m6Ssrc/OkgHWS
+         dSEXi072/ohWYqNfrtO1IxQWkSl5fvg6iy7wktsvW3D2/C43185kzGIAEnL/t01KPztk
+         xU9w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687460524; x=1690052524;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=p4j6GBW8CPe32/PBQSI1ckzLQb8w73S2ei6XzaYvDcs=;
+        b=eTRAPsaz1cHSAYQj9rRj/8hb6p2i/EkAoRby6xz9SZ1L2zuDlO3/nFjohriKmlWyKe
+         imx237A2Gqgr3G8aRVtrgnXZeOdqQcXhmjMYzQP8M7Ug8Tl4RDKK27f7TIXXrYdeHHzb
+         2BhZ8kb/ldUvDNY28WCpO0TaGlgQB0e/PuhtB6L3bbCz98CIvP5JUR3Tl/bliGKWk3C3
+         oMJhC7ba7ie0e98AkNh7skbE6H/xYAgzOYd8g96x00jINceHnfpApO7yNNUXm7yY7BJs
+         WVX+zGsRNUIIlnACaWyEic68FDQyGNvdFIsPZ+WAAm0ITxV98j9fyHM5er3KbY1m9XjW
+         nHng==
+X-Gm-Message-State: AC+VfDzV6HjlAob+sFAbEcAXWtY/8kYjcVOFr06Z6C3AabBIs4pf8Mm2
+	cfV669PHsfZH7mH4VeIXE/hixI7qOvFRZIdYheNaNw==
+X-Google-Smtp-Source: ACHHUZ53KKV7hEw/mYkQC65Q1LGR2HU7F8fuP6k7U6TecILeF2t5h66hJ+PKoEjEtnVTCSxJmQTy1LWfOckw82uwuqE=
+X-Received: by 2002:a05:622a:196:b0:3fa:45ab:22a5 with SMTP id
+ s22-20020a05622a019600b003fa45ab22a5mr2216098qtw.27.1687460523597; Thu, 22
+ Jun 2023 12:02:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230622103948.33cbb0dd@kernel.org>
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+References: <20230622152304.2137482-1-edumazet@google.com> <22643.1687456107@famine>
+ <CANn89iJSmS_B1q=oG_e-RxtWkOuj0x0eqhsp5BeuCn-TuS0W5w@mail.gmail.com>
+ <26275.1687460144@famine> <CANn89i+Vcwp9o59Fzy+epqS+YSxjrStNjBRX-5GSie_TdiMbVg@mail.gmail.com>
+In-Reply-To: <CANn89i+Vcwp9o59Fzy+epqS+YSxjrStNjBRX-5GSie_TdiMbVg@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 22 Jun 2023 21:01:52 +0200
+Message-ID: <CANn89iL3kLondF3ETBui8ik3sJW+1NR8SZFYWqw7FY4H5gcUjw@mail.gmail.com>
+Subject: Re: [PATCH net] bonding: do not assume skb mac_header is set
+To: Jay Vosburgh <jay.vosburgh@canonical.com>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	syzbot <syzkaller@googlegroups.com>, Jarod Wilson <jarod@redhat.com>, 
+	Moshe Tal <moshet@nvidia.com>, Jussi Maki <joamaki@gmail.com>, 
+	Andy Gospodarek <andy@greyhouse.net>, Vladimir Oltean <vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 10:39:48AM -0700, Jakub Kicinski wrote:
-> On Thu, 22 Jun 2023 19:03:04 +0200 Greg Kroah-Hartman wrote:
-> > > Correct. For now we are just using 0xa0 and 0xa1, and eventually we
-> > > might need more ioctls numbers.
-> > > 
-> > > I got these numbers finding a unused block and having some room for
-> > > expansion, as suggested by Documentation/userspace-api/ioctl/ioctl-number.rst,
-> > > that says:
-> > > 
-> > > 	If you are writing a driver for a new device and need a letter, pick an
-> > > 	unused block with enough room for expansion: 32 to 256 ioctl commands.  
-> > 
-> > So is this the first io_uring ioctl?  If so, why is this an ioctl and
-> > not just a "normal" io_uring call?
-> 
-> +1, the mixing with classic ioctl seems confusing and I'm not sure 
-> if it buys us anything.
+On Thu, Jun 22, 2023 at 9:00=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
 
-Sure, let me remove the dependency on ioctl()s then.
+> Ah right, I will send another patch to remove it then.
+>
+> I think it makes sense to keep the first patch small for backports.
+>
+> History of relevant patches :
+>
+> from 5.17
+>
+> 429e3d123d9a50cc9882402e40e0ac912d88cfcf bonding: Fix extraction of
+> ports from the packet headers
+>
+> from 5.15
+>
+> a815bde56b15ce626caaacc952ab12501671e45d net, bonding: Refactor
+> bond_xmit_hash for use with xdp_buff
+
+If this is ok for you, I will cook this cleanup patch for net-next.
 
