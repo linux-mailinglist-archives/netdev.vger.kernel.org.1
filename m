@@ -1,182 +1,391 @@
-Return-Path: <netdev+bounces-13105-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13106-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0D66B73A456
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:08:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12C2E73A492
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:17:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E91F21C21179
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:07:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFF78281970
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 659F31F19F;
-	Thu, 22 Jun 2023 15:07:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3B711F929;
+	Thu, 22 Jun 2023 15:17:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4611E526;
-	Thu, 22 Jun 2023 15:07:55 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C07391731;
-	Thu, 22 Jun 2023 08:07:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=8TPy4M/IgqT8baUzBBF1Ot9HCGGq63OZ2dRMS9U2qEs=; b=hr+LCn33yjNicFl80hCKAgwrYa
-	93pDGSYl0/5FwW8xGbJb8Bzwztin6lA17hYELqtlfCGcjrfacnkQeDW1Lnhs4p6Yp9NR9LNSd0rby
-	dueuqWRwCA/tDevppb+kFIH3iP5TedRM6dFD9YtjJX/8Ws4z3nGPQtt/kPtZ3e1NnRrVf76+qMMas
-	62BEzt/rZsSylnXlBn0qSGDCDDv9NEhrrUizNFGFJRep32eCpFzYECJyP8A5b3s7RW+cRqYqeWdnp
-	VDJTdWx8a7knGFAp2YasyuIJXY4IANgHDg2DsKL018BtVc64glMoFn4kujqH487kklA3eYmyQy7u1
-	E9hIGVdw==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:43762)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qCLtO-0004OW-29; Thu, 22 Jun 2023 16:06:38 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qCLtH-0000Wx-N7; Thu, 22 Jun 2023 16:06:31 +0100
-Date: Thu, 22 Jun 2023 16:06:31 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Choong Yong Liang <yong.liang.choong@linux.intel.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@intel.com>,
-	Hans de Goede <hdegoede@redhat.com>,
-	Mark Gross <markgross@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Andrey Konovalov <andrey.konovalov@linaro.org>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
-	"Tan, Tee Min" <tee.min.tan@linux.intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Subject: Re: [PATCH net-next 3/6] net: phy: update in-band AN mode when
- changing interface by PHY driver
-Message-ID: <ZJRjd0oqj95U0nHc@shell.armlinux.org.uk>
-References: <20230622041905.629430-1-yong.liang.choong@linux.intel.com>
- <20230622041905.629430-4-yong.liang.choong@linux.intel.com>
- <ZJReJ2yxqKGQx1BU@corigine.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE96F1E526
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 15:17:40 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8684A193
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 08:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687447057;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=vfQ6quAmY6zsqtXluePc7kqeM9cJ8q//kXYeofi4FPg=;
+	b=FQmGDT12CvEtxSrV8UpvIAMHVHCX6lmA9JO2uLZrdUM4qDllS46qzJ0XKT34wZz2zCgg+R
+	dwlzTTQix/H0hNZ59rghZDiICVe2iglQRLxe8NNpumWJH3D93/C9uLjG9hu9a8W7lnyRqF
+	C7tNHQ9sKypyeUGp+FMTx8mSbhi0Cmg=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-673-onAN7T07POq-gREoJ5-BHg-1; Thu, 22 Jun 2023 11:17:33 -0400
+X-MC-Unique: onAN7T07POq-gREoJ5-BHg-1
+Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 260B9185A7BA;
+	Thu, 22 Jun 2023 15:17:08 +0000 (UTC)
+Received: from gerbillo.redhat.com (unknown [10.45.225.128])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id E17C841EF82;
+	Thu, 22 Jun 2023 15:17:06 +0000 (UTC)
+From: Paolo Abeni <pabeni@redhat.com>
+To: torvalds@linux-foundation.org
+Cc: kuba@kernel.org,
+	davem@davemloft.net,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [GIT PULL] Networking for 6.4-rc8
+Date: Thu, 22 Jun 2023 17:16:56 +0200
+Message-Id: <20230622151656.54164-1-pabeni@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJReJ2yxqKGQx1BU@corigine.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 04:43:51PM +0200, Simon Horman wrote:
-> On Thu, Jun 22, 2023 at 12:19:02PM +0800, Choong Yong Liang wrote:
-> > From: "Tan, Tee Min" <tee.min.tan@linux.intel.com>
-> > 
-> > Add cur_link_an_mode into phy_device struct for PHY drivers to
-> > communicate the in-band AN mode setting with phylink framework.
-> > 
-> > As there is a mechanism in PHY drivers to switch the PHY interface
-> > between SGMII and 2500BaseX according to link speed. In this case,
-> > the in-band AN mode should be switching based on the PHY interface
-> > as well, if the PHY interface has been changed/updated by PHY driver.
-> > 
-> > For e.g., disable in-band AN in 2500BaseX mode, or enable in-band AN
-> > back for SGMII mode (10/100/1000Mbps).
-> > 
-> > Signed-off-by: Tan, Tee Min <tee.min.tan@linux.intel.com>
-> > Signed-off-by: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-> 
-> ...
-> 
-> > diff --git a/include/linux/phy.h b/include/linux/phy.h
-> > index 11c1e91563d4..c685b526e307 100644
-> > --- a/include/linux/phy.h
-> > +++ b/include/linux/phy.h
-> > @@ -756,6 +756,8 @@ struct phy_device {
-> >  	/* MACsec management functions */
-> >  	const struct macsec_ops *macsec_ops;
-> >  #endif
-> > +	/* For communicate the AN mode setting with phylink framework. */
-> > +	u8 cur_link_an_mode;
-> >  };
-> 
-> Hi Choong Yong Liang,
-> 
-> Please consider adding cur_link_an_mode to the kernel doc
-> for struct phy_device - which is above the definition of struct phy_device.
+Hi Linus!
 
-This looks like it's grabbing something from phylink and stuffing it
-into phylib.  However, I have no idea, because I don't seem to have
-received the original patches. I'm guessing the reason is:
+This contains a last minute, slightly bigger than usual, series from
+the netfilter subtree: it's mainly to address the recent issue you
+have been CC-ed. I guess we want such fix included in 6.4.
 
-2023-06-22 05:21:24 1qCBoy-0003ji-G9 H=mga03.intel.com
-[134.134.136.65]:57703 I=[78.32.30.218]:25
-X=TLS1.2:ECDHE_SECP521R1__RSA_SHA512__AES_256_GCM:256
-F=<yong.liang.choong@linux.intel.com> rejected after DATA: unqualified
-address not permitted: failing address in "Cc:" header is: Tan
+There are no known issues pending.
 
-Which I suspect came from:
+The following changes since commit 40f71e7cd3c6ac04293556ab0504a372393838ff:
 
-	Tan, Tee Min <tee.min.tan@linux.intel.com>
+  Merge tag 'net-6.4-rc7' of git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net (2023-06-15 21:11:17 -0700)
 
-and someone doesn't realise that a "," in the display-name part of
-an address *must* be quoted, otherwise "," is taken to be a separator
-in the address list.
+are available in the Git repository at:
 
-Consequently, it has now become:
+  git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.4-rc8
 
-	Tan@web.codeaurora.org, Tee Min <tee.min.tan@linux.intel.com>,
+for you to fetch changes up to 2ba7e7ebb6a71407cbe25cd349c9b05d40520bf0:
 
-It should have been:
+  Merge tag 'nf-23-06-21' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf (2023-06-22 14:39:06 +0200)
 
-	"Tan, Tee Min" <tee.min.tan@linux.intel.com>
+----------------------------------------------------------------
+Networking fixes for 6.4-rc8, including fixes from ipsec, bpf,
+mptcp and netfilter.
 
-with the double-quotes.
+Current release - regressions:
 
-Please do not review this series further, but instead, please can the
-author repost it forthwith with correct conformant headers so that a
-proper review can be undertaken by all?
+  - netfilter: add NFT_TRANS_PREPARE_ERROR to deal with bound set/chain
 
-Thanks.
+  - eth: mlx5e:
+    - fix scheduling of IPsec ASO query while in atomic
+    - free IRQ rmap and notifier on kernel shutdown
 
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Current release - new code bugs:
+
+  - phy: manual remove LEDs to ensure correct ordering
+
+Previous releases - regressions:
+
+  - mptcp: fix possible divide by zero in recvmsg()
+
+  - dsa: revert "net: phy: dp83867: perform soft reset and retain established link"
+
+Previous releases - always broken:
+
+  - sched: netem: acquire qdisc lock in netem_change()
+
+  - bpf:
+    - fix verifier id tracking of scalars on spill
+    - fix NULL dereference on exceptions
+    - accept function names that contain dots
+
+  - netfilter: disallow element updates of bound anonymous sets
+
+  - mptcp: ensure listener is unhashed before updating the sk status
+
+  - xfrm:
+    - add missed call to delete offloaded policies
+    - fix inbound ipv4/udp/esp packets to UDPv6 dualstack sockets
+
+  - selftests: fixes for FIPS mode
+
+  - dsa: mt7530: fix multiple CPU ports, BPDU and LLDP handling
+
+  - eth: sfc: use budget for TX completions
+
+Misc:
+
+  - wifi: iwlwifi: add support for SO-F device with PCI id 0x7AF0
+
+Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+
+----------------------------------------------------------------
+Alexei Starovoitov (1):
+      Merge branch 'bpf: fix NULL dereference during extable search'
+
+Andrew Lunn (1):
+      net: phy: Manual remove LEDs to ensure correct ordering
+
+Arınç ÜNAL (5):
+      net: dsa: mt7530: set all CPU ports in MT7531_CPU_PMAP
+      net: dsa: mt7530: fix trapping frames on non-MT7621 SoC MT7530 switch
+      net: dsa: mt7530: fix handling of BPDUs on MT7530 switch
+      net: dsa: mt7530: fix handling of LLDP frames
+      MAINTAINERS: add me as maintainer of MEDIATEK SWITCH DRIVER
+
+Azeem Shaikh (1):
+      ieee802154: Replace strlcpy with strscpy
+
+Benedict Wong (2):
+      xfrm: Treat already-verified secpath entries as optional
+      xfrm: Ensure policies always checked on XFRM-I input path
+
+Benjamin Berg (1):
+      wifi: mac80211: report all unusable beacon frames
+
+Chen Aotian (1):
+      ieee802154: hwsim: Fix possible memory leaks
+
+Chris Mi (2):
+      net/mlx5e: TC, Add null pointer check for hardware miss support
+      net/mlx5e: TC, Cleanup ct resources for nic flow
+
+Danielle Ratson (1):
+      selftests: forwarding: Fix race condition in mirror installation
+
+David S. Miller (4):
+      Merge tag 'mlx5-fixes-2023-06-16' of git://git.kernel.org/pub/scm/linux/kernel/git/saeed/linux
+      Merge tag 'ieee802154-for-net-2023-06-19' of git://git.kernel.org/pub/scm/linux/kernel/git/wpan/wpan
+      Merge branch 'dsa-mt7530-fixes'
+      Merge tag 'ipsec-2023-06-20' of git://git.kernel.org/pub/scm/linux/kernel/git/klassert/ipsec
+
+Eli Cohen (1):
+      net/mlx5: Fix driver load with single msix vector
+
+Eric Dumazet (1):
+      sch_netem: acquire qdisc lock in netem_change()
+
+Florent Revest (1):
+      bpf/btf: Accept function names that contain dots
+
+Francesco Dolcini (1):
+      Revert "net: phy: dp83867: perform soft reset and retain established link"
+
+Herbert Xu (1):
+      xfrm: Use xfrm_state selector for BEET input
+
+Jakub Kicinski (3):
+      Merge branch 'check-if-fips-mode-is-enabled-when-running-selftests'
+      Merge tag 'for-netdev' of https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf
+      Merge branch 'mptcp-fixes-for-6-4'
+
+Jiawen Wu (1):
+      net: mdio: fix the wrong parameters
+
+Jiri Olsa (1):
+      bpf: Force kprobe multi expected_attach_type for kprobe_multi link
+
+Josua Mayer (1):
+      net: dpaa2-mac: add 25gbase-r support
+
+Juerg Haefliger (2):
+      ieee802154/adf7242: Add MODULE_FIRMWARE macro
+      nfc: fdp: Add MODULE_FIRMWARE macros
+
+Kees Cook (1):
+      net: wwan: iosm: Convert single instance struct member to flexible array
+
+Krister Johansen (2):
+      bpf: ensure main program has an extable
+      selftests/bpf: add a test for subprogram extables
+
+Leon Romanovsky (4):
+      xfrm: add missed call to delete offloaded policies
+      net/mlx5e: Don't delay release of hardware objects
+      net/mlx5e: Drop XFRM state lock when modifying flow steering
+      net/mlx5e: Fix scheduling of IPsec ASO query while in atomic
+
+Maciej Żenczykowski (2):
+      xfrm: fix inbound ipv4/udp/esp packets to UDPv6 dualstack sockets
+      revert "net: align SO_RCVMARK required privileges with SO_MARK"
+
+Magali Lemes (4):
+      selftests/harness: allow tests to be skipped during setup
+      selftests: net: tls: check if FIPS mode is enabled
+      selftests: net: vrf-xfrm-tests: change authentication and encryption algos
+      selftests: net: fcnal-test: check if FIPS mode is enabled
+
+Maxim Mikityanskiy (4):
+      bpf: Fix verifier id tracking of scalars on spill
+      selftests/bpf: Add test cases to assert proper ID tracking on spill
+      net/mlx5e: XDP, Allow growing tail for XDP multi buffer
+      net/mlx5e: xsk: Set napi_id to support busy polling on XSK RQ
+
+Miquel Raynal (2):
+      MAINTAINERS: Update wpan tree
+      MAINTAINERS: Add wpan patchwork
+
+Mukesh Sisodiya (1):
+      wifi: iwlwifi: pcie: Handle SO-F device for PCI id 0x7AF0
+
+Pablo Neira Ayuso (12):
+      netfilter: nf_tables: fix chain binding transaction logic
+      netfilter: nf_tables: add NFT_TRANS_PREPARE_ERROR to deal with bound set/chain
+      netfilter: nf_tables: drop map element references from preparation phase
+      netfilter: nft_set_pipapo: .walk does not deal with generations
+      netfilter: nf_tables: fix underflow in object reference counter
+      netfilter: nf_tables: disallow element updates of bound anonymous sets
+      netfilter: nf_tables: reject unbound anonymous set before commit phase
+      netfilter: nf_tables: reject unbound chain set before commit phase
+      netfilter: nf_tables: disallow updates of anonymous sets
+      netfilter: nf_tables: disallow timeout for anonymous sets
+      netfilter: nf_tables: drop module reference after updating chain
+      netfilter: nfnetlink_osf: fix module autoload
+
+Paolo Abeni (7):
+      mptcp: handle correctly disconnect() failures
+      mptcp: fix possible divide by zero in recvmsg()
+      mptcp: fix possible list corruption on passive MPJ
+      mptcp: consolidate fallback and non fallback state machine
+      mptcp: drop legacy code around RX EOF
+      mptcp: ensure listener is unhashed before updating the sk status
+      Merge tag 'nf-23-06-21' of git://git.kernel.org/pub/scm/linux/kernel/git/netfilter/nf
+
+Patrisious Haddad (1):
+      net/mlx5e: Fix ESN update kernel panic
+
+Phil Sutter (1):
+      netfilter: nf_tables: Fix for deleting base chains with payload
+
+Ross Lagerwall (1):
+      be2net: Extend xmit workaround to BE3 chip
+
+Saeed Mahameed (1):
+      net/mlx5: Free IRQ rmap and notifier on kernel shutdown
+
+Sebastian Andrzej Siewior (1):
+      xfrm: Linearize the skb after offloading if needed.
+
+Stefan Wahren (1):
+      net: qca_spi: Avoid high load if QCA7000 is not available
+
+Terin Stock (1):
+      ipvs: align inner_mac_header for encapsulation
+
+Vladimir Oltean (1):
+      net: dsa: introduce preferred_default_local_cpu_port and use on MT7530
+
+Yevgeny Kliteynik (2):
+      net/mlx5: DR, Support SW created encap actions for FW table
+      net/mlx5: DR, Fix wrong action data allocation in decap action
+
+Yonghong Song (1):
+      bpf: Fix a bpf_jit_dump issue for x86_64 with sysctl bpf_jit_enable.
+
+Íñigo Huguet (1):
+      sfc: use budget for TX completions
+
+ MAINTAINERS                                        |  10 +-
+ arch/x86/net/bpf_jit_comp.c                        |   2 +-
+ drivers/net/dsa/mt7530.c                           |  48 ++-
+ drivers/net/dsa/mt7530.h                           |   6 +
+ drivers/net/ethernet/emulex/benet/be_main.c        |   4 +-
+ drivers/net/ethernet/freescale/dpaa2/dpaa2-mac.c   |   7 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.c    |   8 +-
+ .../net/ethernet/mellanox/mlx5/core/en/params.h    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c |   2 +
+ .../net/ethernet/mellanox/mlx5/core/en/xsk/setup.c |   2 +-
+ .../ethernet/mellanox/mlx5/core/en_accel/ipsec.c   |  22 +-
+ .../mellanox/mlx5/core/en_accel/ipsec_offload.c    |  17 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_main.c  |   7 +-
+ drivers/net/ethernet/mellanox/mlx5/core/en_tc.c    |   1 +
+ drivers/net/ethernet/mellanox/mlx5/core/fs_cmd.c   |  50 ++-
+ drivers/net/ethernet/mellanox/mlx5/core/fs_core.h  |   7 +
+ drivers/net/ethernet/mellanox/mlx5/core/pci_irq.c  |  33 +-
+ .../mellanox/mlx5/core/steering/dr_action.c        |  13 +-
+ .../ethernet/mellanox/mlx5/core/steering/fs_dr.c   |  27 +-
+ .../ethernet/mellanox/mlx5/core/steering/fs_dr.h   |   7 +
+ .../ethernet/mellanox/mlx5/core/steering/mlx5dr.h  |   2 +
+ drivers/net/ethernet/qualcomm/qca_spi.c            |   3 +-
+ drivers/net/ethernet/sfc/ef10.c                    |  25 +-
+ drivers/net/ethernet/sfc/ef100_nic.c               |   7 +-
+ drivers/net/ethernet/sfc/ef100_tx.c                |   4 +-
+ drivers/net/ethernet/sfc/ef100_tx.h                |   2 +-
+ drivers/net/ethernet/sfc/tx_common.c               |   4 +-
+ drivers/net/ethernet/sfc/tx_common.h               |   2 +-
+ drivers/net/ieee802154/adf7242.c                   |   2 +
+ drivers/net/ieee802154/mac802154_hwsim.c           |   6 +-
+ drivers/net/phy/dp83867.c                          |   2 +-
+ drivers/net/phy/mdio_bus.c                         |   2 +-
+ drivers/net/phy/phy_device.c                       |  15 +-
+ drivers/net/wireless/intel/iwlwifi/pcie/drv.c      |   2 +
+ drivers/net/wwan/iosm/iosm_ipc_mux_codec.c         |  15 +-
+ drivers/net/wwan/iosm/iosm_ipc_mux_codec.h         |   2 +-
+ drivers/nfc/fdp/fdp.c                              |   3 +
+ include/net/dsa.h                                  |   8 +
+ include/net/netfilter/nf_tables.h                  |  31 +-
+ include/net/xfrm.h                                 |   1 +
+ kernel/bpf/btf.c                                   |  20 +-
+ kernel/bpf/syscall.c                               |   5 +
+ kernel/bpf/verifier.c                              |  10 +-
+ net/core/sock.c                                    |   6 -
+ net/dsa/dsa.c                                      |  24 +-
+ net/ieee802154/trace.h                             |   2 +-
+ net/ipv4/esp4_offload.c                            |   3 +
+ net/ipv4/xfrm4_input.c                             |   1 +
+ net/ipv6/esp6_offload.c                            |   3 +
+ net/ipv6/xfrm6_input.c                             |   3 +
+ net/mac80211/rx.c                                  |   2 +-
+ net/mac802154/trace.h                              |   2 +-
+ net/mptcp/pm_netlink.c                             |   1 +
+ net/mptcp/protocol.c                               | 160 ++++-----
+ net/mptcp/protocol.h                               |   5 +-
+ net/mptcp/subflow.c                                |  17 +-
+ net/netfilter/ipvs/ip_vs_xmit.c                    |   2 +
+ net/netfilter/nf_tables_api.c                      | 366 +++++++++++++++++----
+ net/netfilter/nfnetlink_osf.c                      |   1 +
+ net/netfilter/nft_immediate.c                      |  90 ++++-
+ net/netfilter/nft_set_bitmap.c                     |   5 +-
+ net/netfilter/nft_set_hash.c                       |  23 +-
+ net/netfilter/nft_set_pipapo.c                     |  20 +-
+ net/netfilter/nft_set_rbtree.c                     |   5 +-
+ net/netfilter/xt_osf.c                             |   1 -
+ net/sched/sch_netem.c                              |   8 +-
+ net/xfrm/xfrm_input.c                              |   8 +-
+ net/xfrm/xfrm_interface_core.c                     |  54 ++-
+ net/xfrm/xfrm_policy.c                             |  14 +
+ .../selftests/bpf/prog_tests/subprogs_extable.c    |  29 ++
+ .../selftests/bpf/progs/test_subprogs_extable.c    |  51 +++
+ .../selftests/bpf/progs/verifier_spill_fill.c      |  79 +++++
+ tools/testing/selftests/kselftest_harness.h        |   6 +-
+ tools/testing/selftests/net/fcnal-test.sh          |  27 +-
+ .../net/forwarding/mirror_gre_bridge_1d.sh         |   4 +
+ .../net/forwarding/mirror_gre_bridge_1q.sh         |   4 +
+ tools/testing/selftests/net/tls.c                  |  24 +-
+ tools/testing/selftests/net/vrf-xfrm-tests.sh      |  32 +-
+ 78 files changed, 1178 insertions(+), 351 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/subprogs_extable.c
+ create mode 100644 tools/testing/selftests/bpf/progs/test_subprogs_extable.c
+
 
