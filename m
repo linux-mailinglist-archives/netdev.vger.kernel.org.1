@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-12913-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5C8A7739701
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:50:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB39E739704
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:50:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8900281838
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 05:50:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67AEE281871
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 05:50:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 05C80101EE;
-	Thu, 22 Jun 2023 05:47:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 167AD15ADC;
+	Thu, 22 Jun 2023 05:48:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD87C14A90
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:47:57 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 15CD0C433C9;
-	Thu, 22 Jun 2023 05:47:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D333B14AAE
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:47:58 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 80FB1C433C0;
+	Thu, 22 Jun 2023 05:47:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687412877;
-	bh=Gk8y4OKeeQK+QK8EDke/WczfriAFm8OyPteNoasVnJ0=;
+	s=k20201202; t=1687412878;
+	bh=HqrvWx2R+TezNLWMHGY8ND7dcInmsr5SqXUqZ3+TF/s=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=BW/UicpNB5Xaw4lEWtQOorFBGxRLqV6l/zcWp2arC45CNJdyEXwQElUPE+B3V/Yuq
-	 LCDFOMO60LptZAcjdf6y+TVmJBlBL5xkIJsCOSEniWD4p/wvTqYTOOp4TYrf+72+m3
-	 wS+1bv3eRb7DbQrVraNynAkWZ/JDGRgmVHWojjyQPiWim3f8clX7Vg8y8kE3Talwt8
-	 yYQh6kRPF/OpdOqdAh3X4h7971I4rhe38B9WS3kP/VC/HFQtnxUnLxo8K9ZPwGMuvq
-	 JrINh/BUSNmmPprhQUbScKFJmPjbX8l7/upTroampAmoPegmluxK2aHxCr74eiz48+
-	 Oxe4n/Mv58Z/g==
+	b=XF98QQ+eyoD/nPrGAD3s8lY7qrYFIOdc2biRxvklkzHMmZr/ycWRYhTOnOOZbeGAq
+	 +cwkAQWlFkyS5a6Q/iOTDfC1sf676CP62jMaNS0P8ViBifKEFb5zpSNZo2YccTLrcv
+	 Tttet1QnJ7ZcgoFx4zU7HSfwYl02wyoNDqt/MM9cwoAc0nGf6zRBRT/kZPPjuo8mDM
+	 1I3/H3A/NIZI5B7YmJmd53BoYs9Ou7YDTMfTPFgQCyY2253gF10Iox3l4IXwcQM0vU
+	 imsTmvhagDFMmuiK66nt+2pSHNLazwDlmjy+pSP3TOXfotYBXeAUUpjOEyCpUHjtzA
+	 n8yozkiN5j06A==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,9 +40,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Roi Dayan <roid@nvidia.com>,
 	Shay Drory <shayd@nvidia.com>
-Subject: [net-next 09/15] net/mlx5e: E-Switch, Pass other_vport flag if vport is not 0
-Date: Wed, 21 Jun 2023 22:47:29 -0700
-Message-ID: <20230622054735.46790-10-saeed@kernel.org>
+Subject: [net-next 10/15] net/mlx5e: Remove redundant comment
+Date: Wed, 21 Jun 2023 22:47:30 -0700
+Message-ID: <20230622054735.46790-11-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230622054735.46790-1-saeed@kernel.org>
 References: <20230622054735.46790-1-saeed@kernel.org>
@@ -56,56 +56,28 @@ Content-Transfer-Encoding: 8bit
 
 From: Roi Dayan <roid@nvidia.com>
 
-When creating flow table for shared fdb resources, there is
-only need to pass other_vport flag if vport is not 0 or
-if the port is ECPF in BlueField.
+The function comment says what it is and the comment
+is redundant.
 
 Signed-off-by: Roi Dayan <roid@nvidia.com>
 Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c   | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 1 -
+ 1 file changed, 1 deletion(-)
 
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 6f3b7d5eb6a4..ee507b12e908 100644
+index ee507b12e908..612be82a8ad5 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -2551,13 +2551,13 @@ static int __esw_set_master_egress_rule(struct mlx5_core_dev *master,
- 	return err;
- }
- 
--static int esw_master_egress_create_resources(struct mlx5_flow_namespace *egress_ns,
-+static int esw_master_egress_create_resources(struct mlx5_eswitch *esw,
-+					      struct mlx5_flow_namespace *egress_ns,
- 					      struct mlx5_vport *vport, size_t count)
- {
- 	int inlen = MLX5_ST_SZ_BYTES(create_flow_group_in);
- 	struct mlx5_flow_table_attr ft_attr = {
- 		.max_fte = count, .prio = 0, .level = 0,
--		.flags = MLX5_FLOW_TABLE_OTHER_VPORT,
- 	};
- 	struct mlx5_flow_table *acl;
- 	struct mlx5_flow_group *g;
-@@ -2572,6 +2572,9 @@ static int esw_master_egress_create_resources(struct mlx5_flow_namespace *egress
+@@ -1904,7 +1904,6 @@ static int esw_create_vport_rx_group(struct mlx5_eswitch *esw)
  	if (!flow_group_in)
  		return -ENOMEM;
  
-+	if (vport->vport || mlx5_core_is_ecpf(esw->dev))
-+		ft_attr.flags = MLX5_FLOW_TABLE_OTHER_VPORT;
-+
- 	acl = mlx5_create_vport_flow_table(egress_ns, &ft_attr, vport->vport);
- 	if (IS_ERR(acl)) {
- 		err = PTR_ERR(acl);
-@@ -2642,7 +2645,7 @@ static int esw_set_master_egress_rule(struct mlx5_core_dev *master,
- 	if (vport->egress.acl && vport->egress.type != VPORT_EGRESS_ACL_TYPE_SHARED_FDB)
- 		return 0;
+-	/* create vport rx group */
+ 	mlx5_esw_set_flow_group_source_port(esw, flow_group_in, 0);
  
--	err = esw_master_egress_create_resources(egress_ns, vport, count);
-+	err = esw_master_egress_create_resources(esw, egress_ns, vport, count);
- 	if (err)
- 		return err;
- 
+ 	MLX5_SET(create_flow_group_in, flow_group_in, start_flow_index, 0);
 -- 
 2.41.0
 
