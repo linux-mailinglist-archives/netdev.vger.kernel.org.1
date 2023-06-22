@@ -1,240 +1,140 @@
-Return-Path: <netdev+bounces-13174-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13175-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 654B473A8A5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:57:16 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2993D73A8A8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:58:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 90FB11C20831
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:57:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 145BD1C20AD9
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:57:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B949206AC;
-	Thu, 22 Jun 2023 18:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD856206AE;
+	Thu, 22 Jun 2023 18:57:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FB721F923
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:57:11 +0000 (UTC)
-Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79C710F2
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:57:08 -0700 (PDT)
-Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-56ffd7d7fedso79139937b3.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:57:08 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1687460228; x=1690052228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WbvWQ3oVVmBg4Jc9F4GgvW3+1dPSj8SPi0vOl+Ekl2s=;
-        b=F+OcuocKslR9lFX4/fEaymtIEfn+9YT7xAMrHrGjDhYm4fFWgD9dTjk7F4UHcIibQD
-         CT45i33a41jWhCHsdHn5Xl/CnbBf458914xX2pG68lV2FDBlpQX4xaAmgc7RPiw3g1is
-         /ebglh38ZTrBXZ8U79lhY4Z9Z8SqzJ+O1A/KRiH5uxXxecZqSRc5VRXJ28WtvjqlfoLD
-         wmRFr0OZEElnS9SatkdzEZ90tA+ycKSqwFkYBfY0fbOslt+ob23btFsggTDY7XaB56fs
-         E44VZP3k+8ZBjnRTG1t+jSKmWGYbcQA2Ac8ukGwAq59fh0oSNGzDIkVfCebNOpm+n/g/
-         Jssw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A23A91F923
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:57:56 +0000 (UTC)
+Received: from mail-wr1-f45.google.com (mail-wr1-f45.google.com [209.85.221.45])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 83BAC9B;
+	Thu, 22 Jun 2023 11:57:54 -0700 (PDT)
+Received: by mail-wr1-f45.google.com with SMTP id ffacd0b85a97d-3113dabc549so6373464f8f.1;
+        Thu, 22 Jun 2023 11:57:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687460228; x=1690052228;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WbvWQ3oVVmBg4Jc9F4GgvW3+1dPSj8SPi0vOl+Ekl2s=;
-        b=AGMO/UrsoWD/FiCTyOcQSIKHUpY0wy9Nq4+PNv2R5IcAd2SwPGC3A0EU4iQJvM15B2
-         Jlj+NLVGsiDIBHSEFQqWPKxmI0cm1IVVcFr/Slu3wcDnzOh6bRCu/bRHLT9nbn7Pz0Ff
-         qos83qGBypYhyOOHdwm8HJdDVfJRWJb1fvav6SjwbNvhpaexG6pDDkrfapivbqLxCpAl
-         sfJwLrStaMJcXl/UThuJ06rPOjDpBan4G1PvJppRs5/boD37V5ESCcOGA64tptiiNQxD
-         RvAA+US+4nGHOkzShgiiqDRBzC2MMIuJM71NAeXNOnHZU+NW61prHuHGQTBEzcpLF31j
-         px5A==
-X-Gm-Message-State: AC+VfDzCJh+/MxY2W//PQMZf2TjOcn7cWg8Wc8gDk50eUhyqtSp/Ix1/
-	HBKGdbtkURx+qYZMjiug62kGOyyH+KUnP4LDsQPyIg==
-X-Google-Smtp-Source: ACHHUZ5at3tSbad/YFpz9VeEdB9zpwBon7aWOANrt58+KQ5ijmLFlmetBuhaUr6k0bQHTkAcY0FRc6+B9LUYFxJKSRk=
-X-Received: by 2002:a0d:cb88:0:b0:570:7bb3:77e with SMTP id
- n130-20020a0dcb88000000b005707bb3077emr17285624ywd.33.1687460227860; Thu, 22
- Jun 2023 11:57:07 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687460272; x=1690052272;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=+D7IxMvZiNc4XLA71ABTPWob0+kv7MAt7f1wzI5iIVk=;
+        b=iZ/UfTaOiB84bHYkRP8lgxCMFXL2DnnjP0dYt7uh8xnsz37f+pbDUsGPE25VXIPSio
+         sLqnLAK4NGzhoaHXVU5pdfniRsh3E01SqcVGCMrLerKabWbwrTMJq8iUklm9T7Jy7Fld
+         qjWUGDRR8St1rcjnJ//NsvGVwgquT74CAD4Hry+Qpsro/6Jc81i3sR+LnftPERbaQIms
+         sBl0TEZUUuOKDP4cenx3BL12kjLd+ZCqUEwrXRsgaX8QpNXpeCqpyWIzA1Vl+W1ATSEK
+         UJ4sxaVtVsHYyKf+v7G/gSQgcgB6RANPEXCe7J5A36nO29YJmcwuTE+ZNNLu9gyAYffE
+         TUCQ==
+X-Gm-Message-State: AC+VfDwaCT6mbRbODzzla/jebSR0oqIbD7wHuRqJJkhvIQZEVChPT3AY
+	s/27+a7llhCOY6uhoxEtjt8=
+X-Google-Smtp-Source: ACHHUZ7OEfuZDffKcXnV2k9Ljlw9v13ArnjKZS8lTi7RuFnPrVLeqPw8N/wH+jjpvea8d6UmNYVxsg==
+X-Received: by 2002:a5d:530f:0:b0:311:14ab:5621 with SMTP id e15-20020a5d530f000000b0031114ab5621mr20128451wrv.30.1687460272341;
+        Thu, 22 Jun 2023 11:57:52 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-120.fbsv.net. [2a03:2880:31ff:78::face:b00c])
+        by smtp.gmail.com with ESMTPSA id e25-20020a5d5959000000b003063db8f45bsm7660178wri.23.2023.06.22.11.57.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 11:57:51 -0700 (PDT)
+Date: Thu, 22 Jun 2023 11:57:49 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	leit@meta.com, Arnd Bergmann <arnd@arndb.de>,
+	Steve French <stfrench@microsoft.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Simon Ser <contact@emersion.fr>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:IO_URING" <io-uring@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH] io_uring: Add io_uring command support for sockets
+Message-ID: <ZJSZrXrzPXT9j4sr@gmail.com>
+References: <20230621232129.3776944-1-leitao@debian.org>
+ <2023062231-tasting-stranger-8882@gregkh>
+ <ZJRijTDv5lUsVo+j@gmail.com>
+ <2023062208-animosity-squabble-c1ba@gregkh>
+ <ZJR49xji1zmISlTs@gmail.com>
+ <2023062228-cloak-wish-ec12@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230622181503.2327695-1-edumazet@google.com>
-In-Reply-To: <20230622181503.2327695-1-edumazet@google.com>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 22 Jun 2023 14:56:56 -0400
-Message-ID: <CAM0EoM=uBjgBYdF7rPhk--L2n+_6858cNu8SON2_ZDRUSsOn6A@mail.gmail.com>
-Subject: Re: [PATCH net] sch_netem: fix issues in netem_change() vs get_dist_table()
-To: Eric Dumazet <edumazet@google.com>
-Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	syzbot <syzkaller@googlegroups.com>, Stephen Hemminger <stephen@networkplumber.org>, 
-	Simon Horman <simon.horman@corigine.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <2023062228-cloak-wish-ec12@gregkh>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 2:15=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> In blamed commit, I missed that get_dist_table() was allocating
-> memory using GFP_KERNEL, and acquiring qdisc lock to perform
-> the swap of newly allocated table with current one.
->
-> In this patch, get_dist_table() is allocating memory and
-> copy user data before we acquire the qdisc lock.
->
-> Then we perform swap operations while being protected by the lock.
->
-> Note that after this patch netem_change() no longer can do partial change=
-s.
-> If an error is returned, qdisc conf is left unchanged.
->
-> Fixes: 2174a08db80d ("sch_netem: acquire qdisc lock in netem_change()")
-> Reported-by: syzbot <syzkaller@googlegroups.com>
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> Cc: Stephen Hemminger <stephen@networkplumber.org>
-> Cc: Jamal Hadi Salim <jhs@mojatatu.com>
-> Cc: Simon Horman <simon.horman@corigine.com>
+On Thu, Jun 22, 2023 at 07:03:04PM +0200, Greg Kroah-Hartman wrote:
+> On Thu, Jun 22, 2023 at 09:38:15AM -0700, Breno Leitao wrote:
+> > On Thu, Jun 22, 2023 at 06:10:00PM +0200, Greg Kroah-Hartman wrote:
+> > > On Thu, Jun 22, 2023 at 08:02:37AM -0700, Breno Leitao wrote:
+> > > > On Thu, Jun 22, 2023 at 07:20:48AM +0200, Greg Kroah-Hartman wrote:
+> > > > > On Wed, Jun 21, 2023 at 04:21:26PM -0700, Breno Leitao wrote:
+> > > > > > --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
+> > > > > > +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> > > > > > @@ -361,6 +361,7 @@ Code  Seq#    Include File                                           Comments
+> > > > > >  0xCB  00-1F                                                          CBM serial IEC bus in development:
+> > > > > >                                                                       <mailto:michael.klein@puffin.lb.shuttle.de>
+> > > > > >  0xCC  00-0F  drivers/misc/ibmvmc.h                                   pseries VMC driver
+> > > > > > +0xCC  A0-BF  uapi/linux/io_uring.h                                   io_uring cmd subsystem
+> > > > > 
+> > > > > This change is nice, but not totally related to this specific one,
+> > > > > shouldn't it be separate?
+> > > > 
+> > > > This is related to this patch, since I am using it below, in the
+> > > > following part:
+> > > > 
+> > > > 	+#define SOCKET_URING_OP_SIOCINQ _IOR(0xcc, 0xa0, int)
+> > > > 	+#define SOCKET_URING_OP_SIOCOUTQ _IOR(0xcc, 0xa1, int)
+> > > > 
+> > > > Should I have a different patch, even if they are related?
+> > > 
+> > > Yes, as you are not using the 0xa2-0xbf range that you just carved out
+> > > here, right?  Where did those numbers come from?
+> > 
+> > Correct. For now we are just using 0xa0 and 0xa1, and eventually we
+> > might need more ioctls numbers.
+> > 
+> > I got these numbers finding a unused block and having some room for
+> > expansion, as suggested by Documentation/userspace-api/ioctl/ioctl-number.rst,
+> > that says:
+> > 
+> > 	If you are writing a driver for a new device and need a letter, pick an
+> > 	unused block with enough room for expansion: 32 to 256 ioctl commands.
+> 
+> So is this the first io_uring ioctl?  If so, why is this an ioctl and
+> not just a "normal" io_uring call?
 
-LGTM.
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+This is a way to pass a generic command to file. This is not a ioctl per
+se (not called through ioctl). I am leveraging the ioctl to embedded the
+"direction" and "size" information in the command itself.
 
-cheers,
-jamal
-> ---
->  net/sched/sch_netem.c | 59 ++++++++++++++++++-------------------------
->  1 file changed, 25 insertions(+), 34 deletions(-)
->
-> diff --git a/net/sched/sch_netem.c b/net/sched/sch_netem.c
-> index e79be1b3e74da3c154f7ee23e16cc9e8da8f7106..b93ec2a3454ebceea559299f9=
-0533cbf1c0f7c26 100644
-> --- a/net/sched/sch_netem.c
-> +++ b/net/sched/sch_netem.c
-> @@ -773,12 +773,10 @@ static void dist_free(struct disttable *d)
->   * signed 16 bit values.
->   */
->
-> -static int get_dist_table(struct Qdisc *sch, struct disttable **tbl,
-> -                         const struct nlattr *attr)
-> +static int get_dist_table(struct disttable **tbl, const struct nlattr *a=
-ttr)
->  {
->         size_t n =3D nla_len(attr)/sizeof(__s16);
->         const __s16 *data =3D nla_data(attr);
-> -       spinlock_t *root_lock;
->         struct disttable *d;
->         int i;
->
-> @@ -793,13 +791,7 @@ static int get_dist_table(struct Qdisc *sch, struct =
-disttable **tbl,
->         for (i =3D 0; i < n; i++)
->                 d->table[i] =3D data[i];
->
-> -       root_lock =3D qdisc_root_sleeping_lock(sch);
-> -
-> -       spin_lock_bh(root_lock);
-> -       swap(*tbl, d);
-> -       spin_unlock_bh(root_lock);
-> -
-> -       dist_free(d);
-> +       *tbl =3D d;
->         return 0;
->  }
->
-> @@ -956,6 +948,8 @@ static int netem_change(struct Qdisc *sch, struct nla=
-ttr *opt,
->  {
->         struct netem_sched_data *q =3D qdisc_priv(sch);
->         struct nlattr *tb[TCA_NETEM_MAX + 1];
-> +       struct disttable *delay_dist =3D NULL;
-> +       struct disttable *slot_dist =3D NULL;
->         struct tc_netem_qopt *qopt;
->         struct clgstate old_clg;
->         int old_loss_model =3D CLG_RANDOM;
-> @@ -966,6 +960,18 @@ static int netem_change(struct Qdisc *sch, struct nl=
-attr *opt,
->         if (ret < 0)
->                 return ret;
->
-> +       if (tb[TCA_NETEM_DELAY_DIST]) {
-> +               ret =3D get_dist_table(&delay_dist, tb[TCA_NETEM_DELAY_DI=
-ST]);
-> +               if (ret)
-> +                       goto table_free;
-> +       }
-> +
-> +       if (tb[TCA_NETEM_SLOT_DIST]) {
-> +               ret =3D get_dist_table(&slot_dist, tb[TCA_NETEM_SLOT_DIST=
-]);
-> +               if (ret)
-> +                       goto table_free;
-> +       }
-> +
->         sch_tree_lock(sch);
->         /* backup q->clg and q->loss_model */
->         old_clg =3D q->clg;
-> @@ -975,26 +981,17 @@ static int netem_change(struct Qdisc *sch, struct n=
-lattr *opt,
->                 ret =3D get_loss_clg(q, tb[TCA_NETEM_LOSS]);
->                 if (ret) {
->                         q->loss_model =3D old_loss_model;
-> +                       q->clg =3D old_clg;
->                         goto unlock;
->                 }
->         } else {
->                 q->loss_model =3D CLG_RANDOM;
->         }
->
-> -       if (tb[TCA_NETEM_DELAY_DIST]) {
-> -               ret =3D get_dist_table(sch, &q->delay_dist,
-> -                                    tb[TCA_NETEM_DELAY_DIST]);
-> -               if (ret)
-> -                       goto get_table_failure;
-> -       }
-> -
-> -       if (tb[TCA_NETEM_SLOT_DIST]) {
-> -               ret =3D get_dist_table(sch, &q->slot_dist,
-> -                                    tb[TCA_NETEM_SLOT_DIST]);
-> -               if (ret)
-> -                       goto get_table_failure;
-> -       }
-> -
-> +       if (delay_dist)
-> +               swap(q->delay_dist, delay_dist);
-> +       if (slot_dist)
-> +               swap(q->slot_dist, slot_dist);
->         sch->limit =3D qopt->limit;
->
->         q->latency =3D PSCHED_TICKS2NS(qopt->latency);
-> @@ -1044,17 +1041,11 @@ static int netem_change(struct Qdisc *sch, struct=
- nlattr *opt,
->
->  unlock:
->         sch_tree_unlock(sch);
-> -       return ret;
->
-> -get_table_failure:
-> -       /* recover clg and loss_model, in case of
-> -        * q->clg and q->loss_model were modified
-> -        * in get_loss_clg()
-> -        */
-> -       q->clg =3D old_clg;
-> -       q->loss_model =3D old_loss_model;
-> -
-> -       goto unlock;
-> +table_free:
-> +       dist_free(delay_dist);
-> +       dist_free(slot_dist);
-> +       return ret;
->  }
->
->  static int netem_init(struct Qdisc *sch, struct nlattr *opt,
-> --
-> 2.41.0.178.g377b9f9a00-goog
->
+I can defintely do something as the following, if it is a better
+implementation:
+
+	#define SOCKET_URING_OP_SIOCINQ 0
+	#define SOCKET_URING_OP_SIOCOUTQ 1
 
