@@ -1,291 +1,108 @@
-Return-Path: <netdev+bounces-13140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2EDF673A6F0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:06:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 96FB173A6E1
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CBE1F281A9F
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:06:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7CA9D1C20BE0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:03:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79B74200CD;
-	Thu, 22 Jun 2023 17:05:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E8DC200B0;
+	Thu, 22 Jun 2023 17:03:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68B92200AC
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 17:05:51 +0000 (UTC)
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EDD2D1713
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:05:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687453546; x=1718989546;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7W5lJRhbL7mbs5ObUfi8ucnyWBQ8AqdDxVnqriElMXQ=;
-  b=fUGCOdUBvslsKFxtnWZBpcrTv4lX0R1ciIdfbJv17SxBTed4r21/oGtM
-   V7iXGAnpTBDR6JQDhqlKSKU+PTHVj6p7RtKk8wMuu+XM70TOcmAsEhk/i
-   RMw65ErJu/1mBrQmVe00I3QcOnp5g4Y7eYcwyHegcQ2fKirwVyfK5e+3u
-   WcDc6Gcq9x2IXbWdqFcyrOaKHoa+iu8hgK9L4xe1Q2mBLIy21udo7m21v
-   0ho6K+HxVJjMMVPZpNmbYc24nr/cNBqdh9bjDPB/IiynaYQqBwsz2dGxj
-   f6JPeYUGcMo+zl+rYL8hO83JY4tIatNKaEY/R1A5lbEApqIozLZsihC8T
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="390353118"
-X-IronPort-AV: E=Sophos;i="6.01,149,1684825200"; 
-   d="scan'208";a="390353118"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 10:04:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="714971006"
-X-IronPort-AV: E=Sophos;i="6.01,149,1684825200"; 
-   d="scan'208";a="714971006"
-Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
-  by orsmga002.jf.intel.com with ESMTP; 22 Jun 2023 10:04:10 -0700
-From: Tony Nguyen <anthony.l.nguyen@intel.com>
-To: davem@davemloft.net,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	netdev@vger.kernel.org
-Cc: Przemek Kitszel <przemyslaw.kitszel@intel.com>,
-	anthony.l.nguyen@intel.com,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Subject: [PATCH net-next 3/3] iavf: make functions static where possible
-Date: Thu, 22 Jun 2023 09:59:14 -0700
-Message-Id: <20230622165914.2203081-4-anthony.l.nguyen@intel.com>
-X-Mailer: git-send-email 2.38.1
-In-Reply-To: <20230622165914.2203081-1-anthony.l.nguyen@intel.com>
-References: <20230622165914.2203081-1-anthony.l.nguyen@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C694B200A7
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 17:03:07 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id AFC32C433C0;
+	Thu, 22 Jun 2023 17:03:06 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1687453387;
+	bh=bTPWSed6ATavN9U5OfmHvXOmtlfLENbeNFQ2nEWL28k=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=cqgTLammDQGkc9nRI3L+FPR4xD/n/+LA+BC7NUMTKssxHlmUTQkbZn3zzlij2wg8K
+	 q8rKPbqVl34LFlKDbmsSubW9/ucihWzklC8Sq6rRs2p0Jx8TZMcYD65vEma9W0I3ip
+	 t9h1OX2xT/Ngwu+fvgTjdThlK0T3lqetXfJ71rr8=
+Date: Thu, 22 Jun 2023 19:03:04 +0200
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	leit@meta.com, Arnd Bergmann <arnd@arndb.de>,
+	Steve French <stfrench@microsoft.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Simon Ser <contact@emersion.fr>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:IO_URING" <io-uring@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH] io_uring: Add io_uring command support for sockets
+Message-ID: <2023062228-cloak-wish-ec12@gregkh>
+References: <20230621232129.3776944-1-leitao@debian.org>
+ <2023062231-tasting-stranger-8882@gregkh>
+ <ZJRijTDv5lUsVo+j@gmail.com>
+ <2023062208-animosity-squabble-c1ba@gregkh>
+ <ZJR49xji1zmISlTs@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJR49xji1zmISlTs@gmail.com>
 
-From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+On Thu, Jun 22, 2023 at 09:38:15AM -0700, Breno Leitao wrote:
+> On Thu, Jun 22, 2023 at 06:10:00PM +0200, Greg Kroah-Hartman wrote:
+> > On Thu, Jun 22, 2023 at 08:02:37AM -0700, Breno Leitao wrote:
+> > > On Thu, Jun 22, 2023 at 07:20:48AM +0200, Greg Kroah-Hartman wrote:
+> > > > On Wed, Jun 21, 2023 at 04:21:26PM -0700, Breno Leitao wrote:
+> > > > > --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
+> > > > > +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> > > > > @@ -361,6 +361,7 @@ Code  Seq#    Include File                                           Comments
+> > > > >  0xCB  00-1F                                                          CBM serial IEC bus in development:
+> > > > >                                                                       <mailto:michael.klein@puffin.lb.shuttle.de>
+> > > > >  0xCC  00-0F  drivers/misc/ibmvmc.h                                   pseries VMC driver
+> > > > > +0xCC  A0-BF  uapi/linux/io_uring.h                                   io_uring cmd subsystem
+> > > > 
+> > > > This change is nice, but not totally related to this specific one,
+> > > > shouldn't it be separate?
+> > > 
+> > > This is related to this patch, since I am using it below, in the
+> > > following part:
+> > > 
+> > > 	+#define SOCKET_URING_OP_SIOCINQ _IOR(0xcc, 0xa0, int)
+> > > 	+#define SOCKET_URING_OP_SIOCOUTQ _IOR(0xcc, 0xa1, int)
+> > > 
+> > > Should I have a different patch, even if they are related?
+> > 
+> > Yes, as you are not using the 0xa2-0xbf range that you just carved out
+> > here, right?  Where did those numbers come from?
+> 
+> Correct. For now we are just using 0xa0 and 0xa1, and eventually we
+> might need more ioctls numbers.
+> 
+> I got these numbers finding a unused block and having some room for
+> expansion, as suggested by Documentation/userspace-api/ioctl/ioctl-number.rst,
+> that says:
+> 
+> 	If you are writing a driver for a new device and need a letter, pick an
+> 	unused block with enough room for expansion: 32 to 256 ioctl commands.
 
-Make all possible functions static.
+So is this the first io_uring ioctl?  If so, why is this an ioctl and
+not just a "normal" io_uring call?
 
-Move iavf_force_wb() up to avoid forward declaration.
+thanks,
 
-Suggested-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
----
- drivers/net/ethernet/intel/iavf/iavf.h      | 10 -----
- drivers/net/ethernet/intel/iavf/iavf_main.c | 14 +++----
- drivers/net/ethernet/intel/iavf/iavf_txrx.c | 43 ++++++++++-----------
- drivers/net/ethernet/intel/iavf/iavf_txrx.h |  4 --
- 4 files changed, 28 insertions(+), 43 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/iavf/iavf.h b/drivers/net/ethernet/intel/iavf/iavf.h
-index 39d0fe76a38f..f80f2735e688 100644
---- a/drivers/net/ethernet/intel/iavf/iavf.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf.h
-@@ -523,9 +523,6 @@ void iavf_schedule_request_stats(struct iavf_adapter *adapter);
- void iavf_reset(struct iavf_adapter *adapter);
- void iavf_set_ethtool_ops(struct net_device *netdev);
- void iavf_update_stats(struct iavf_adapter *adapter);
--void iavf_reset_interrupt_capability(struct iavf_adapter *adapter);
--int iavf_init_interrupt_scheme(struct iavf_adapter *adapter);
--void iavf_irq_enable_queues(struct iavf_adapter *adapter);
- void iavf_free_all_tx_resources(struct iavf_adapter *adapter);
- void iavf_free_all_rx_resources(struct iavf_adapter *adapter);
- 
-@@ -579,17 +576,10 @@ void iavf_enable_vlan_stripping_v2(struct iavf_adapter *adapter, u16 tpid);
- void iavf_disable_vlan_stripping_v2(struct iavf_adapter *adapter, u16 tpid);
- void iavf_enable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid);
- void iavf_disable_vlan_insertion_v2(struct iavf_adapter *adapter, u16 tpid);
--int iavf_replace_primary_mac(struct iavf_adapter *adapter,
--			     const u8 *new_mac);
--void
--iavf_set_vlan_offload_features(struct iavf_adapter *adapter,
--			       netdev_features_t prev_features,
--			       netdev_features_t features);
- void iavf_add_fdir_filter(struct iavf_adapter *adapter);
- void iavf_del_fdir_filter(struct iavf_adapter *adapter);
- void iavf_add_adv_rss_cfg(struct iavf_adapter *adapter);
- void iavf_del_adv_rss_cfg(struct iavf_adapter *adapter);
- struct iavf_mac_filter *iavf_add_filter(struct iavf_adapter *adapter,
- 					const u8 *macaddr);
--int iavf_lock_timeout(struct mutex *lock, unsigned int msecs);
- #endif /* _IAVF_H_ */
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_main.c b/drivers/net/ethernet/intel/iavf/iavf_main.c
-index f83720a72cc0..a483eb185c99 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_main.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_main.c
-@@ -245,7 +245,7 @@ void iavf_free_virt_mem(struct iavf_hw *hw, struct iavf_virt_mem *mem)
-  *
-  * Returns 0 on success, negative on failure
-  **/
--int iavf_lock_timeout(struct mutex *lock, unsigned int msecs)
-+static int iavf_lock_timeout(struct mutex *lock, unsigned int msecs)
- {
- 	unsigned int wait, delay = 10;
- 
-@@ -354,7 +354,7 @@ static void iavf_irq_disable(struct iavf_adapter *adapter)
-  * iavf_irq_enable_queues - Enable interrupt for all queues
-  * @adapter: board private structure
-  **/
--void iavf_irq_enable_queues(struct iavf_adapter *adapter)
-+static void iavf_irq_enable_queues(struct iavf_adapter *adapter)
- {
- 	struct iavf_hw *hw = &adapter->hw;
- 	int i;
-@@ -995,8 +995,8 @@ struct iavf_mac_filter *iavf_add_filter(struct iavf_adapter *adapter,
-  *
-  * Do not call this with mac_vlan_list_lock!
-  **/
--int iavf_replace_primary_mac(struct iavf_adapter *adapter,
--			     const u8 *new_mac)
-+static int iavf_replace_primary_mac(struct iavf_adapter *adapter,
-+				    const u8 *new_mac)
- {
- 	struct iavf_hw *hw = &adapter->hw;
- 	struct iavf_mac_filter *new_f;
-@@ -1851,7 +1851,7 @@ static void iavf_free_q_vectors(struct iavf_adapter *adapter)
-  * @adapter: board private structure
-  *
-  **/
--void iavf_reset_interrupt_capability(struct iavf_adapter *adapter)
-+static void iavf_reset_interrupt_capability(struct iavf_adapter *adapter)
- {
- 	if (!adapter->msix_entries)
- 		return;
-@@ -1866,7 +1866,7 @@ void iavf_reset_interrupt_capability(struct iavf_adapter *adapter)
-  * @adapter: board private structure to initialize
-  *
-  **/
--int iavf_init_interrupt_scheme(struct iavf_adapter *adapter)
-+static int iavf_init_interrupt_scheme(struct iavf_adapter *adapter)
- {
- 	int err;
- 
-@@ -2164,7 +2164,7 @@ static int iavf_process_aq_command(struct iavf_adapter *adapter)
-  * the watchdog if any changes are requested to expedite the request via
-  * virtchnl.
-  **/
--void
-+static void
- iavf_set_vlan_offload_features(struct iavf_adapter *adapter,
- 			       netdev_features_t prev_features,
- 			       netdev_features_t features)
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-index e989feda133c..8c5f6096b002 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
-@@ -54,7 +54,7 @@ static void iavf_unmap_and_free_tx_resource(struct iavf_ring *ring,
-  * iavf_clean_tx_ring - Free any empty Tx buffers
-  * @tx_ring: ring to be cleaned
-  **/
--void iavf_clean_tx_ring(struct iavf_ring *tx_ring)
-+static void iavf_clean_tx_ring(struct iavf_ring *tx_ring)
- {
- 	unsigned long bi_size;
- 	u16 i;
-@@ -110,7 +110,7 @@ void iavf_free_tx_resources(struct iavf_ring *tx_ring)
-  * Since there is no access to the ring head register
-  * in XL710, we need to use our local copies
-  **/
--u32 iavf_get_tx_pending(struct iavf_ring *ring, bool in_sw)
-+static u32 iavf_get_tx_pending(struct iavf_ring *ring, bool in_sw)
- {
- 	u32 head, tail;
- 
-@@ -127,6 +127,24 @@ u32 iavf_get_tx_pending(struct iavf_ring *ring, bool in_sw)
- 	return 0;
- }
- 
-+/**
-+ * iavf_force_wb - Issue SW Interrupt so HW does a wb
-+ * @vsi: the VSI we care about
-+ * @q_vector: the vector on which to force writeback
-+ **/
-+static void iavf_force_wb(struct iavf_vsi *vsi, struct iavf_q_vector *q_vector)
-+{
-+	u32 val = IAVF_VFINT_DYN_CTLN1_INTENA_MASK |
-+		  IAVF_VFINT_DYN_CTLN1_ITR_INDX_MASK | /* set noitr */
-+		  IAVF_VFINT_DYN_CTLN1_SWINT_TRIG_MASK |
-+		  IAVF_VFINT_DYN_CTLN1_SW_ITR_INDX_ENA_MASK
-+		  /* allow 00 to be written to the index */;
-+
-+	wr32(&vsi->back->hw,
-+	     IAVF_VFINT_DYN_CTLN1(q_vector->reg_idx),
-+	     val);
-+}
-+
- /**
-  * iavf_detect_recover_hung - Function to detect and recover hung_queues
-  * @vsi:  pointer to vsi struct with tx queues
-@@ -352,25 +370,6 @@ static void iavf_enable_wb_on_itr(struct iavf_vsi *vsi,
- 	q_vector->arm_wb_state = true;
- }
- 
--/**
-- * iavf_force_wb - Issue SW Interrupt so HW does a wb
-- * @vsi: the VSI we care about
-- * @q_vector: the vector  on which to force writeback
-- *
-- **/
--void iavf_force_wb(struct iavf_vsi *vsi, struct iavf_q_vector *q_vector)
--{
--	u32 val = IAVF_VFINT_DYN_CTLN1_INTENA_MASK |
--		  IAVF_VFINT_DYN_CTLN1_ITR_INDX_MASK | /* set noitr */
--		  IAVF_VFINT_DYN_CTLN1_SWINT_TRIG_MASK |
--		  IAVF_VFINT_DYN_CTLN1_SW_ITR_INDX_ENA_MASK
--		  /* allow 00 to be written to the index */;
--
--	wr32(&vsi->back->hw,
--	     IAVF_VFINT_DYN_CTLN1(q_vector->reg_idx),
--	     val);
--}
--
- static inline bool iavf_container_is_rx(struct iavf_q_vector *q_vector,
- 					struct iavf_ring_container *rc)
- {
-@@ -687,7 +686,7 @@ int iavf_setup_tx_descriptors(struct iavf_ring *tx_ring)
-  * iavf_clean_rx_ring - Free Rx buffers
-  * @rx_ring: ring to be cleaned
-  **/
--void iavf_clean_rx_ring(struct iavf_ring *rx_ring)
-+static void iavf_clean_rx_ring(struct iavf_ring *rx_ring)
- {
- 	unsigned long bi_size;
- 	u16 i;
-diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-index 2624bf6d009e..7e6ee32d19b6 100644
---- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-+++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
-@@ -442,15 +442,11 @@ static inline unsigned int iavf_rx_pg_order(struct iavf_ring *ring)
- 
- bool iavf_alloc_rx_buffers(struct iavf_ring *rxr, u16 cleaned_count);
- netdev_tx_t iavf_xmit_frame(struct sk_buff *skb, struct net_device *netdev);
--void iavf_clean_tx_ring(struct iavf_ring *tx_ring);
--void iavf_clean_rx_ring(struct iavf_ring *rx_ring);
- int iavf_setup_tx_descriptors(struct iavf_ring *tx_ring);
- int iavf_setup_rx_descriptors(struct iavf_ring *rx_ring);
- void iavf_free_tx_resources(struct iavf_ring *tx_ring);
- void iavf_free_rx_resources(struct iavf_ring *rx_ring);
- int iavf_napi_poll(struct napi_struct *napi, int budget);
--void iavf_force_wb(struct iavf_vsi *vsi, struct iavf_q_vector *q_vector);
--u32 iavf_get_tx_pending(struct iavf_ring *ring, bool in_sw);
- void iavf_detect_recover_hung(struct iavf_vsi *vsi);
- int __iavf_maybe_stop_tx(struct iavf_ring *tx_ring, int size);
- bool __iavf_chk_linearize(struct sk_buff *skb);
--- 
-2.38.1
-
+greg k-h
 
