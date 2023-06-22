@@ -1,318 +1,133 @@
-Return-Path: <netdev+bounces-13020-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13021-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 37C99739E42
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:18:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AB679739E51
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:20:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7B6B281908
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:18:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C61CA1C210A7
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:19:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED10171BA;
-	Thu, 22 Jun 2023 10:18:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF01E174FA;
+	Thu, 22 Jun 2023 10:19:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D0E15AE5
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:18:25 +0000 (UTC)
-Received: from smtp-42ad.mail.infomaniak.ch (smtp-42ad.mail.infomaniak.ch [IPv6:2001:1600:3:17::42ad])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8932210A
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:18:21 -0700 (PDT)
-Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QmxCY6bYCzMpxDH;
-	Thu, 22 Jun 2023 10:18:17 +0000 (UTC)
-Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4QmxCY0HH8zMppDP;
-	Thu, 22 Jun 2023 12:18:16 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1687429097;
-	bh=TKvVDRK40pmL3DAdWUP/FN4uWV05D4Vkf67P6sywwMo=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=HKXNXsEHnWLQhZK6/UNpjqzPeVCRqCrG6Vx3192qU1vIk9DQreCq8jgHCEGxduAlo
-	 D9qEvGd1H3snHZ/BGM8+LO///8TdV3Eiap9YGW2N33M8O2iSdvZfS2Mvc1lYD7u+Gn
-	 jC4bayJH46Gu9D/4NpCJiV1Kr889VOBIDgjGWMwQ=
-Message-ID: <1ee25561-96b8-67a6-77ca-475d12ea244d@digikod.net>
-Date: Thu, 22 Jun 2023 12:18:15 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6FF3AA8D
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 10:19:57 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on20609.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::609])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 694A6DD
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:19:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PT6S4Di5Psl/byPmsoMYq9gCXG+F/EYJB9cVavgUME5rLaLTw0SD0poG7xnngsDru6JV5dQGDPNPlMWISMiyIG3FuJjy2Nl7trvX6oaonbOf97evSHYlHQf74ff1sh91eA/41VmBbBi/Nx1SrNY6mBE/9ke8Xxp65zrcP+YmgZjO5sYTTccrZhi1ip6F1V0tmIrbg43vSZ+d2Yb7Iov+bEjJ9vGfmASh4oP/tGH+GUKGE6luSIRtObi8K9blYpsWxyCnhlGv04e02ntMIDAu4MjWZ+I0+WSUHPQl2hisaTsJrawtISCMLqNFWAGe7pd7vE2jE9dSp7qn76z2lPqODg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ql7QHXyvScLJAKnpNd5i3eCiwxfL41IbMEj9w/kxFZw=;
+ b=EzRz+x1J0A2Y7cZKGP+YV+84woGCVMR37hUXRDDLALk6SgMmlDLHZb1jdPXy5NwzI4UlrnUHpBNh+2yPSVQtAXSRKJQu5dHT4qBx57AdEziNqg5YFO6CZ+OLVHGYzNaJCKkFmULQNJKYnPphzpfJqYV7vm3XLM99iteanKVGat/g+XC5MYnEfsby30ailNDUPhNtEVQw6oE3Rds18TymgEvcmkpZI/DvXUGm4ucGiTNTiPYAanVOvjFlplEqVpPEdd3igtIt8XyMGxldu9q1iNL5j8b2KdZDiBj1dwbnOTCffqVapnszg0JrbY5zLhglqVkN9DZbpHsJohMiqFTRNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ql7QHXyvScLJAKnpNd5i3eCiwxfL41IbMEj9w/kxFZw=;
+ b=xi1JQkTt0+cvhFzgcFsGus+3Ly9zq5wtQBkzRkGZYM1r1L369Ygpc+lAsJ4ijhtHkdbnEx2mID5Onp04UXmVm/uCO0ANqbkG/wQjaEFZe1Rj1ckegtLrGduDoqK9f/JFNJMHyDz5HqhRwPryB98aavo3OBSwBFjU7Kf2pMizF1E=
+Received: from MW4PR03CA0209.namprd03.prod.outlook.com (2603:10b6:303:b8::34)
+ by CH3PR12MB8545.namprd12.prod.outlook.com (2603:10b6:610:163::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Thu, 22 Jun
+ 2023 10:19:51 +0000
+Received: from CO1PEPF000044F7.namprd21.prod.outlook.com
+ (2603:10b6:303:b8:cafe::8c) by MW4PR03CA0209.outlook.office365.com
+ (2603:10b6:303:b8::34) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24 via Frontend
+ Transport; Thu, 22 Jun 2023 10:19:51 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1PEPF000044F7.mail.protection.outlook.com (10.167.241.197) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6544.4 via Frontend Transport; Thu, 22 Jun 2023 10:19:51 +0000
+Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 22 Jun
+ 2023 05:19:50 -0500
+Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23 via Frontend
+ Transport; Thu, 22 Jun 2023 05:19:49 -0500
+From: <edward.cree@amd.com>
+To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>
+CC: <arnd@arndb.de>, Edward Cree <ecree.xilinx@gmail.com>,
+	<netdev@vger.kernel.org>, <habetsm.xilinx@gmail.com>
+Subject: [PATCH net-next 0/3] sfc: fix unaligned access in loopback selftests
+Date: Thu, 22 Jun 2023 11:18:55 +0100
+Message-ID: <cover.1687427930.git.ecree.xilinx@gmail.com>
+X-Mailer: git-send-email 2.27.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v11 11/12] samples/landlock: Add network demo
-Content-Language: en-US
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>,
- =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack@google.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, yusongping@huawei.com,
- artem.kuzin@huawei.com
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-12-konstantin.meskhidze@huawei.com>
- <ZH9OFyWZ1njI7VG9@google.com>
- <d9f07165-f589-13d4-6484-1272704f1de0@huawei.com>
- <8c09fc5a-e3a5-4792-65a8-b84c6044128a@digikod.net>
- <c0713bf1-a65e-c4cd-08b9-c60bd79fc86f@huawei.com>
- <fb1d9351-355c-feb8-c2a2-419e24000049@digikod.net>
- <60e5f0ea-39fa-9f76-35bd-ec88fc489922@huawei.com>
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <60e5f0ea-39fa-9f76-35bd-ec88fc489922@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PEPF000044F7:EE_|CH3PR12MB8545:EE_
+X-MS-Office365-Filtering-Correlation-Id: f8f7e645-ec57-42bd-e5db-08db730a3702
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	eNhNFatfdgsMMoB3CM+Nd4depYlO+B4AAdfdoPjWMdZJXt6PESI1E/GkiRy9ubErw2DcBovTYT4X54xjijYJ/Fn6Wm/bqkhom+OdHRepatFAv94uI6yAHhcI1lOHD9lp/cBR33gXpHaxw7GSN3D0VVN7R3TCIXSymGWf3fO03UFfmMCtjOVpPiXe1YxHynfxR+/OhLHcdB2lw1URs4p7GXULquQTfB3h8GCVIMlMCw9EfVRELn+mLr2DFyiQxWfQB1hELoC/Xiv/tqa7bRAoiKkC1eGSD4R2t1MYAR61JEBf5jILq5o3mn4zR8KWrsJW0ouHxIfb0SHuZ8DLoJovRMP9rQ1c3WDZATMIK+jaA6C0eFDwHL9pbwYRhrbEwFNbTQG5UAxX6hh89VuL4vnco7vfZ0u1zcbPM1L44kcHgRrK24mwljqgPNog3XvFlpY+Dg7Ff2IZYEruOTOkpp4SwtSh27DeJbJ5TNaVugNSKV+ZyfHk4MCIrte1qpEc09ncCU1JT1cOxVjzEWFGmJ49bKK6zBvQInLcZx32646ZvV9+Ho6KdI0730sjxI740ftvcEOgDE80jNVtvQTv+TgbD034+XpA7bxOkahXw7dNLX2JvKM9Add9t0oDRXzkqjYiVGpD8i79dC6ktOeFZ/tvZHyAxIIRU2JGDkKkijZVsHwbRVDxobBMW25kJgXIH+goiYhChwQOp9POxyd3IBcqdP3b5aifevdX37cxe5dvZIACMv94KtpifNwCK/V5iw30wfDAmz+n6cJC0T2TNio/fQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(346002)(396003)(136003)(451199021)(40470700004)(46966006)(36840700001)(40460700003)(186003)(9686003)(26005)(47076005)(36860700001)(8676002)(336012)(83380400001)(426003)(5660300002)(41300700001)(8936002)(70206006)(70586007)(316002)(4744005)(2876002)(2906002)(6666004)(478600001)(40480700001)(4326008)(110136005)(54906003)(86362001)(55446002)(36756003)(82740400003)(356005)(82310400005)(81166007)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 10:19:51.0517
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: f8f7e645-ec57-42bd-e5db-08db730a3702
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1PEPF000044F7.namprd21.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB8545
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: Edward Cree <ecree.xilinx@gmail.com>
 
-On 22/06/2023 10:00, Konstantin Meskhidze (A) wrote:
-> 
-> 
-> 6/19/2023 9:19 PM, Mickaël Salaün пишет:
->>
->> On 19/06/2023 16:24, Konstantin Meskhidze (A) wrote:
->>>
->>>
->>> 6/13/2023 11:38 PM, Mickaël Salaün пишет:
->>>>
->>>> On 13/06/2023 12:54, Konstantin Meskhidze (A) wrote:
->>>>>
->>>>>
->>>>> 6/6/2023 6:17 PM, Günther Noack пишет:
->>>>>> Hi Konstantin!
->>>>>>
->>>>>> Apologies if some of this was discussed before, in this case,
->>>>>> Mickaël's review overrules my opinions from the sidelines ;)
->>>>>>
->>>>>> On Tue, May 16, 2023 at 12:13:38AM +0800, Konstantin Meskhidze wrote:
->>>>>>> This commit adds network demo. It's possible to allow a sandboxer to
->>>>>>> bind/connect to a list of particular ports restricting network
->>>>>>> actions to the rest of ports.
->>>>>>>
->>>>>>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->>>>>>
->>>>>>
->>>>>>> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
->>>>>>> index e2056c8b902c..b0250edb6ccb 100644
->>>>>>> --- a/samples/landlock/sandboxer.c
->>>>>>> +++ b/samples/landlock/sandboxer.c
->>>>>>
->>>>>> ...
->>>>>>
->>>>>>> +static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>>>>>> +				const __u64 allowed_access)
->>>>>>> +{
->>>>>>> +	int num_ports, i, ret = 1;
->>>>>>
->>>>>> I thought the convention was normally to set ret = 0 initially and to
->>>>>> override it in case of error, rather than the other way around?
->>>>
->>>> Which convention? In this case, by default the return code is an error.
->>>>
->>>>
->>>>>>
->>>>>       Well, I just followed Mickaёl's way of logic here. >
->>>>>
->>>>>>> +	char *env_port_name;
->>>>>>> +	struct landlock_net_service_attr net_service = {
->>>>>>> +		.allowed_access = allowed_access,
->>>>>>> +		.port = 0,
->>>>>>> +	};
->>>>>>> +
->>>>>>> +	env_port_name = getenv(env_var);
->>>>>>> +	if (!env_port_name)
->>>>>>> +		return 0;
->>>>>>> +	env_port_name = strdup(env_port_name);
->>>>>>> +	unsetenv(env_var);
->>>>>>> +	num_ports = parse_port_num(env_port_name);
->>>>>>> +
->>>>>>> +	if (num_ports == 1 && (strtok(env_port_name, ENV_PATH_TOKEN) == NULL)) {
->>>>>>> +		ret = 0;
->>>>>>> +		goto out_free_name;
->>>>>>> +	}
->>>>>>
->>>>>> I don't understand why parse_port_num and strtok are necessary in this
->>>>>> program. The man-page for strsep(3) describes it as a replacement to
->>>>>> strtok(3) (in the HISTORY section), and it has a very short example
->>>>>> for how it is used.
->>>>>>
->>>>>> Wouldn't it work like this as well?
->>>>>>
->>>>>> while ((strport = strsep(&env_port_name, ":"))) {
->>>>>>       net_service.port = atoi(strport);
->>>>>>       /* etc */
->>>>>> }
->>>>>
->>>>>       Thanks for a tip. I think it's a better solution here. Now this
->>>>> commit is in Mickaёl's -next branch. I could send a one-commit patch later.
->>>>> Mickaёl, what do you think?
->>>>
->>>> I removed this series from -next because there is some issues (see the
->>>> bot's emails), but anyway, this doesn't mean these patches don't need to
->>>> be changed, they do. The goal of -next is to test more widely a patch
->>>> series and get more feedbacks, especially from bots. When this series
->>>> will be fully ready (and fuzzed with syzkaller), I'll push it to Linus
->>>> Torvalds.
->>>>
->>>> I'll review the remaining tests and sample code this week, but you can
->>>> still take into account the documentation review.
->>>
->>>     Hi, Mickaёl.
->>>
->>>     I have a few quetions?
->>>      - Are you going to fix warnings for bots, meanwhile I run syzcaller?
->>
->> No, you need to fix that with the next series (except the Signed-off-by
->> warnings).
-> 
->    Hi, Mickaёl.
->     As I understand its possible to check bots warnings just after you
-> push the next V12 series again into your -next branch???
+Arnd reported that the sfc drivers each define a packed loopback_payload
+ structure with an ethernet header followed by an IP header, whereas the
+ kernel definition of iphdr specifies that this is 4-byte aligned,
+ causing a W=1 warning.
+Fix this in each case by adding two bytes of leading padding to the
+ struct, taking care that these are not sent on the wire.
+Tested on EF10; build-tested on Siena and Falcon.
 
-Yes, we get bot warnings on the -next tree, but the command that 
-generate it should be reproducible.
+Edward Cree (3):
+  sfc: use padding to fix alignment in loopback test
+  sfc: siena: use padding to fix alignment in loopback test
+  sfc: falcon: use padding to fix alignment in loopback test
 
+ drivers/net/ethernet/sfc/falcon/selftest.c | 45 +++++++++++++---------
+ drivers/net/ethernet/sfc/selftest.c        | 45 +++++++++++++---------
+ drivers/net/ethernet/sfc/siena/selftest.c  | 45 +++++++++++++---------
+ 3 files changed, 81 insertions(+), 54 deletions(-)
 
-> 
->>
->> What is your status on syzkaller? Do you need some help? I can write the
->> tests if it's too much.
->>
->     Sorry. To be honest I'm busy with another project. I dont know how
-> much time it will take for me to set up and run syzkaller. I need your
-> help here please, how you do this, some roadmap.
-
-Ok, no worries, I have it set up so I'll take care of it and keep you in 
-the loop with your GitHub account.
-
-
->>
->>>      - I will fix documentation and sandbox demo and sent patch v12?
->>
->> Yes please. Let me a few days to send more reviews.
->>
->     Ok. Sure.
->>>
->>>>
->>>>
->>>>>
->>>>>>
->>>>>>> +
->>>>>>> +	for (i = 0; i < num_ports; i++) {
->>>>>>> +		net_service.port = atoi(strsep(&env_port_name, ENV_PATH_TOKEN));
->>>>>>
->>>>>> Naming of ENV_PATH_TOKEN:
->>>>>> This usage is not related to paths, maybe rename the variable?
->>>>>> It's also technically not the token, but the delimiter.
->>>>>>
->>>>>      What do you think of ENV_PORT_TOKEN or ENV_PORT_DELIMITER???
->>>>
->>>> You can rename ENV_PATH_TOKEN to ENV_DELIMITER for the FS and network parts.
->>>>
->>>       Ok. Got it.
->>>>
->>>>>
->>>>>>> +		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
->>>>>>> +				      &net_service, 0)) {
->>>>>>> +			fprintf(stderr,
->>>>>>> +				"Failed to update the ruleset with port \"%lld\": %s\n",
->>>>>>> +				net_service.port, strerror(errno));
->>>>>>> +			goto out_free_name;
->>>>>>> +		}
->>>>>>> +	}
->>>>>>> +	ret = 0;
->>>>>>> +
->>>>>>> +out_free_name:
->>>>>>> +	free(env_port_name);
->>>>>>> +	return ret;
->>>>>>> +}
->>>>>>
->>>>>>
->>>>>>>     		fprintf(stderr,
->>>>>>>     			"Launch a command in a restricted environment.\n\n");
->>>>>>> -		fprintf(stderr, "Environment variables containing paths, "
->>>>>>> -				"each separated by a colon:\n");
->>>>>>> +		fprintf(stderr,
->>>>>>> +			"Environment variables containing paths and ports "
->>>>>>> +			"each separated by a colon:\n");
->>>>>>>     		fprintf(stderr,
->>>>>>>     			"* %s: list of paths allowed to be used in a read-only way.\n",
->>>>>>>     			ENV_FS_RO_NAME);
->>>>>>>     		fprintf(stderr,
->>>>>>> -			"* %s: list of paths allowed to be used in a read-write way.\n",
->>>>>>> +			"* %s: list of paths allowed to be used in a read-write way.\n\n",
->>>>>>>     			ENV_FS_RW_NAME);
->>>>>>> +		fprintf(stderr,
->>>>>>> +			"Environment variables containing ports are optional "
->>>>>>> +			"and could be skipped.\n");
->>>>>>
->>>>>> As it is, I believe the program does something different when I'm
->>>>>> setting these to the empty string (ENV_TCP_BIND_NAME=""), compared to
->>>>>> when I'm unsetting them?
->>>>>>
->>>>>> I think the case where we want to forbid all handle-able networking is
->>>>>> a legit and very common use case - it could be clearer in the
->>>>>> documentation how this is done with the tool. (And maybe the interface
->>>>>> could be something more explicit than setting the environment variable
->>>>>> to empty?)
->>>>
->>>> I'd like to keep it simple, and it should be seen as an example code,
->>>> not a full-feature sandboxer, but still a consistent and useful one.
->>>> What would you suggest?
->>>>
->>>> This sandboxer tool relies on environment variables for its
->>>> configuration. This is definitely not a good fit for all use cases, but
->>>> I think it is simple and flexible enough. One use case might be to
->>>> export a set of environment variables and simply call this tool. I'd
->>>> prefer to not deal with argument parsing, but maybe that was too
->>>> simplistic? We might want to revisit this approach but probably not with
->>>> this series.
->>>>
->>>>
->>>>>>
->>>>>>
->>>>>>> +	/* Removes bind access attribute if not supported by a user. */
->>>>>>> +	env_port_name = getenv(ENV_TCP_BIND_NAME);
->>>>>>> +	if (!env_port_name) {
->>>>>>> +		ruleset_attr.handled_access_net &=
->>>>>>> +			~LANDLOCK_ACCESS_NET_BIND_TCP;
->>>>>>> +	}
->>>>>>> +	/* Removes connect access attribute if not supported by a user. */
->>>>>>> +	env_port_name = getenv(ENV_TCP_CONNECT_NAME);
->>>>>>> +	if (!env_port_name) {
->>>>>>> +		ruleset_attr.handled_access_net &=
->>>>>>> +			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->>>>>>> +	}
->>>>>>
->>>>>> This is the code where the program does not restrict network usage,
->>>>>> if the corresponding environment variable is not set.
->>>>>
->>>>>       Yep. Right.
->>>>>>
->>>>>> It's slightly inconsistent with what this tool does for filesystem
->>>>>> paths. - If you don't specify any file paths, it will still restrict
->>>>>> file operations there, independent of whether that env variable was
->>>>>> set or not.  (Apologies if it was discussed before.)
->>>>>
->>>>>      Mickaёl wanted to make network ports optional here.
->>>>>      Please check:
->>>>>     
->>>>> https://lore.kernel.org/linux-security-module/179ac2ee-37ff-92da-c381-c2c716725045@digikod.net/
->>>>
->>>> Right, the rationale is for compatibility with the previous version of
->>>> this tool. We should not break compatibility when possible. A comment
->>>> should explain the rationale though.
->>>>
->>>>>
->>>>> https://lore.kernel.org/linux-security-module/fe3bc928-14f8-5e2b-359e-9a87d6cf5b01@digikod.net/
->>>>>>
->>>>>> —Günther
->>>>>>
->>>> .
->> .
 
