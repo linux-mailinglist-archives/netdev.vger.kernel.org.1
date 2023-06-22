@@ -1,278 +1,148 @@
-Return-Path: <netdev+bounces-13166-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13167-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1ABC873A879
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:44:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 27C8A73A885
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:46:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E4C251C211A5
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:44:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCD7B280EEE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:46:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FC8420690;
-	Thu, 22 Jun 2023 18:44:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D608920696;
+	Thu, 22 Jun 2023 18:46:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A7F11E536
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:44:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E3F61FF9
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:44:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687459469;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=90xtq2DpQNgaWvX2FSvn2ErlpVQgwDlyMDGGEqzIOfQ=;
-	b=buWhnkUIlB3WlbB3W22TJ5fz1DsMrsdlGI/r/PMlJRWbzzVM7v7JvicXQwaC40DuLhyr84
-	fSNu/co6jv05GHzPJi2qlT7M6fA3Yq57kRKlMVlh1ACp+QWZJNS34C6RjOFaC/M+w3QKlc
-	XJrPGV3UAjuKBaoW/QChWQT+68Kcjec=
-Received: from mail-oi1-f200.google.com (mail-oi1-f200.google.com
- [209.85.167.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-445-S7b3OzR0P-eM8YOsSDkkUQ-1; Thu, 22 Jun 2023 14:44:26 -0400
-X-MC-Unique: S7b3OzR0P-eM8YOsSDkkUQ-1
-Received: by mail-oi1-f200.google.com with SMTP id 5614622812f47-3a0311f04c6so3864845b6e.2
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:44:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B8A391F923;
+	Thu, 22 Jun 2023 18:46:37 +0000 (UTC)
+Received: from mail-wm1-x335.google.com (mail-wm1-x335.google.com [IPv6:2a00:1450:4864:20::335])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7A5B2103;
+	Thu, 22 Jun 2023 11:46:30 -0700 (PDT)
+Received: by mail-wm1-x335.google.com with SMTP id 5b1f17b1804b1-3f8fb0e7709so75151545e9.2;
+        Thu, 22 Jun 2023 11:46:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687459589; x=1690051589;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=bPXpGa9jfvplqLyUF1fKF2LVSy/7Wa6tdzEbo3m24+4=;
+        b=nuZ6XntxCEqRkeej37RLEv64b5NxPJAhPbyionQG1zuttFqIw4iqd6bAyZS4CvBhM2
+         Tu8VCWPjrufKrBLybTXIJvxFM334JkE0VmLo+bBjlKFAfm31bDOGQOVWlKxE+HJ1VgD6
+         e9xRtbtLnRzoat4eRtyifWvBUcYOkEpTTYLPgRA03cuczlnb80SdUMLD5XJqStD3dtN1
+         8pyrBfNIbnwYaStG6CPLAgNUiHbvyVWI6WB//qTPRSzTSaF38HKsh6YI8Xwag3hh9vOm
+         haMIgsF1a3LR9gpScqWKobKRNUZG5Mm42J3z9HaD0aR6gYqlZZhLJQ6j8LIecle/H8Z+
+         WHvA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687459465; x=1690051465;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=90xtq2DpQNgaWvX2FSvn2ErlpVQgwDlyMDGGEqzIOfQ=;
-        b=OXHischkwpPgdW3xFNIS95IJFXIhKjEVMxTjQQRI5U5LF1YTqyVv/hUnPT3fEkQHxv
-         vDf54y3pENs4k3cUTwj38VMMOrsWs9wWk37i8wjoW9FysoaE5svdVmjjbrvluFMhIA4h
-         ydATG7SoC9MKI72BJAlijRZjaN4Urp/xw/li3VQhsbvKU7ZgyphrUxU15Zgtp09GQl1e
-         DzLrDlXIYuxPtQC6Rfj54HPVjUBnZ+G+ICjZayUvXoDLoK6jYr5Xj1UBFuxZFD1HA9+C
-         ING8nqkz37QL4OjU+NWcN91RVI7+Xgcb5uZ2c/5Vf9nnzr0Zgf/Kt2uPDXchB0bC12Xb
-         3Iiw==
-X-Gm-Message-State: AC+VfDz7pa7dHr3QKtGVfN9nBGgRwpwCrEMY5RhlelxvaOaOB0hvIzXj
-	LyQ1JGFyrPJsy0kwCdjaRAJrMrRuQFrisYEK6YAunE4jQZyWthF7Nx6xrcQNZ0sAC2zpbt34dYt
-	SGDHKA2vsmayClk14
-X-Received: by 2002:a05:6808:220d:b0:39e:db80:b7fb with SMTP id bd13-20020a056808220d00b0039edb80b7fbmr13787372oib.10.1687459465544;
-        Thu, 22 Jun 2023 11:44:25 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5uBmDku1D7bVUS1j7y42y/lZBDMjw1PD7CSH2JQYElqmtLzVCaGHmHGzMHwReGfkMLaxyXwQ==
-X-Received: by 2002:a05:6808:220d:b0:39e:db80:b7fb with SMTP id bd13-20020a056808220d00b0039edb80b7fbmr13787355oib.10.1687459465252;
-        Thu, 22 Jun 2023 11:44:25 -0700 (PDT)
-Received: from halaney-x13s ([2600:1700:1ff0:d0e0::f])
-        by smtp.gmail.com with ESMTPSA id q14-20020a056808200e00b003896e31867esm3398479oiw.49.2023.06.22.11.44.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 11:44:24 -0700 (PDT)
-Date: Thu, 22 Jun 2023 13:44:22 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>,
-	Konrad Dybcio <konrad.dybcio@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Richard Cochran <richardcochran@gmail.com>,
-	linux-arm-msm@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: Re: [RESEND PATCH v2 0/5] arm64: dts: qcom: enable ethernet on
- sa8775p-ride
-Message-ID: <20230622184422.4e72vtqk53nnx42g@halaney-x13s>
-References: <20230622120142.218055-1-brgl@bgdev.pl>
+        d=1e100.net; s=20221208; t=1687459589; x=1690051589;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bPXpGa9jfvplqLyUF1fKF2LVSy/7Wa6tdzEbo3m24+4=;
+        b=O4O0I5XxjyYWFSYwuCCS37L8gzUHKQ7eVX2fmH5b2ew/YUC67GnRg2ekBHk33aqL+K
+         bU8D9+Bw0fEGW1hKU++ecYRalnPUQRlI+xgvAE0XjHuMZ+Pmp+XWUi28Yjjk2C/qdM/q
+         jNycz0nQT5ya8Wm4FVOEcxUS3Wpr95ZgxE/cuYEA3+kigMTVh1LBGvl2ZuCDm6kX42Sh
+         WwTZSDRQTypc54Krxybh8bJ045vU66KVxV9oJku97Yd0oPbqylJXXuBjePJLjRjm06Tr
+         nMzD/651olEg872ZcHXecys+dxtUxTRQVlRJylRsbn/73pinvRlQcXU8lKDiLMAqXgRB
+         DMRA==
+X-Gm-Message-State: AC+VfDypH3nAn71lCNzqlVg9geH3OcFDMkfOOI45HKfwAScnrHglBB50
+	Y3JWVHD0G90o/xk5WI/xn/uPFpNMyb6wqQ==
+X-Google-Smtp-Source: ACHHUZ7wH9qHBX81FAbtBvr0POaf7xSsPESlkJ3r2wQNrXUPW6zbsx0ZYaHHpcBIUBjThvYl1O5Tdw==
+X-Received: by 2002:adf:ef12:0:b0:306:3912:a7f0 with SMTP id e18-20020adfef12000000b003063912a7f0mr14197642wro.50.1687459588851;
+        Thu, 22 Jun 2023 11:46:28 -0700 (PDT)
+Received: from [192.168.0.112] ([77.220.140.242])
+        by smtp.gmail.com with ESMTPSA id x14-20020adfec0e000000b0030aee3da084sm7627849wrn.49.2023.06.22.11.46.26
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 22 Jun 2023 11:46:28 -0700 (PDT)
+Message-ID: <9f0b6bba-701c-a95d-d326-bb207e319f2a@gmail.com>
+Date: Thu, 22 Jun 2023 21:46:26 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230622120142.218055-1-brgl@bgdev.pl>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.4.2
+Subject: Re: [PATCH RFC net-next v4 6/8] virtio/vsock: support dgrams
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>,
+ Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin"
+ <mst@redhat.com>, Jason Wang <jasowang@redhat.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ Dexuan Cui <decui@microsoft.com>, Bryan Tan <bryantan@vmware.com>,
+ Vishnu Dasa <vdasa@vmware.com>,
+ VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+ Dan Carpenter <dan.carpenter@linaro.org>,
+ Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+ virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
+ <20230413-b4-vsock-dgram-v4-6-0cebbb2ae899@bytedance.com>
+ <92b3a6df-ded3-6470-39d1-fe0939441abc@gmail.com>
+ <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
+From: Arseniy Krasnov <oxffffaa@gmail.com>
+In-Reply-To: <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 02:01:37PM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+
+On 22.06.2023 19:09, Stefano Garzarella wrote:
+> On Sun, Jun 11, 2023 at 11:49:02PM +0300, Arseniy Krasnov wrote:
+>> Hello Bobby!
+>>
+>> On 10.06.2023 03:58, Bobby Eshleman wrote:
+>>> This commit adds support for datagrams over virtio/vsock.
+>>>
+>>> Message boundaries are preserved on a per-skb and per-vq entry basis.
+>>
+>> I'm a little bit confused about the following case: let vhost sends 4097 bytes
+>> datagram to the guest. Guest uses 4096 RX buffers in it's virtio queue, each
+>> buffer has attached empty skb to it. Vhost places first 4096 bytes to the first
+>> buffer of guests RX queue, and 1 last byte to the second buffer. Now IIUC guest
+>> has two skb in it rx queue, and user in guest wants to read data - does it read
+>> 4097 bytes, while guest has two skb - 4096 bytes and 1 bytes? In seqpacket there is
+>> special marker in header which shows where message ends, and how it works here?
 > 
-> Bjorn,
+> I think the main difference is that DGRAM is not connection-oriented, so
+> we don't have a stream and we can't split the packet into 2 (maybe we
+> could, but we have no guarantee that the second one for example will be
+> not discarded because there is no space).
 > 
-> Now that all other bits and pieces are in next, I'm resending the reviewed
-> DTS patches for pick up. This enables one of the 1Gb ethernet ports on
-> sa8775p-ride.
+> So I think it is acceptable as a restriction to keep it simple.
+
+Ah, I see, idea is that any "corruptions" of data could be considered as
+"DGRAM is not reliable anyway, so that's it" :)
+
 > 
-> Bartosz Golaszewski (5):
->   arm64: dts: qcom: sa8775p: add the SGMII PHY node
->   arm64: dts: qcom: sa8775p: add the first 1Gb ethernet interface
->   arm64: dts: qcom: sa8775p-ride: enable the SerDes PHY
->   arm64: dts: qcom: sa8775p-ride: add pin functions for ethernet0
->   arm64: dts: qcom: sa8775p-ride: enable ethernet0
+> My only doubt is, should we make the RX buffer size configurable,
+> instead of always using 4k?
+
+I guess this is useful only for DGRAM usage, when we want to tune buffers
+for some specific case - may be for exact length of messages (for example if we have
+4096 buffers, while senders wants to send 5000 bytes always by each 'send()' - I think it
+will be really strange that reader ALWAYS dequeues 4096 and 4 bytes as two packets).
+For stream types of socket I think size of rx buffers is not big deal in most of cases.
+
+Thanks, Arseniy
+
 > 
->  arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 109 ++++++++++++++++++++++
->  arch/arm64/boot/dts/qcom/sa8775p.dtsi     |  42 +++++++++
->  2 files changed, 151 insertions(+)
+> Thanks,
+> Stefano
 > 
-> -- 
-> 2.39.2
-> 
-
-Tested-by: Andrew Halaney <ahalaney@redhat.com>
-
-note, I did uncover a bug in stmmac (imo) wrt unbalanced calls to
-serdes_powerup/serdes_powerdown() which I plan on trying to fix shortly.
-
-Not really related to any of the Qualcomm specific bits though. This
-looks good to me.
-
-You can trigger the bug I mentioned by removing the dwmac-qcom-ethqos module:
-
-    [  174.893710] ------------[ cut here ]------------
-    [  174.898459] unbalanced disables for vreg_l5a
-    [  174.902868] WARNING: CPU: 5 PID: 584 at drivers/regulator/core.c:2996 _regulator_disable+0xe8/0x1c8
-    [  174.912150] Modules linked in: r8152 rfkill marvell dwmac_qcom_ethqos(-) stmmac_platform stmmac qcom_pon crct10dif_ce spi_geni_qcom i2c_qcom_geni phy_qcom_qmp_usb pcs_xpcs phy_qcom_snps_femto_v2 qcom_wdt socinfo fuse ufs_qcom phy_qcom_qmp_ufs
-    [  174.934171] CPU: 5 PID: 584 Comm: modprobe Not tainted 6.4.0-rc7-next-20230622-00006-gb4d4b58e3c81-dirty #29
-    [  174.944250] Hardware name: Qualcomm SA8775P Ride (DT)
-    [  174.949438] pstate: 60400005 (nZCv daif +PAN -UAO -TCO -DIT -SSBS BTYPE=--)
-    [  174.956578] pc : _regulator_disable+0xe8/0x1c8
-    [  174.961143] lr : _regulator_disable+0xe8/0x1c8
-    [  174.965709] sp : ffff800082c13b50
-    [  174.969114] x29: ffff800082c13b50 x28: ffff592b4c692d00 x27: 0000000000000000
-    [  174.976431] x26: 0000000000000000 x25: 0000000000000000 x24: 0000000000000000
-    [  174.983750] x23: ffff592b40dd8c90 x22: ffff592b40f47490 x21: ffff592b41a72000
-    [  174.991067] x20: ffff592b409c6900 x19: ffff592b409c6900 x18: 0000000000000006
-    [  174.998385] x17: 3630333230322d74 x16: ffffcc489c71e6f8 x15: ffff800082c135d0
-    [  175.005702] x14: 0000000000000000 x13: 61356c5f67657276 x12: 20726f662073656c
-    [  175.013019] x11: fffffffffffe0000 x10: ffffcc489ea33488 x9 : ffffcc489c27aa10
-    [  175.020336] x8 : 00000000ffffefff x7 : ffffcc489ea33488 x6 : 80000000fffff000
-    [  175.027654] x5 : ffff5939bb92acc8 x4 : 0000000000000000 x3 : 0000000000000000
-    [  175.034971] x2 : 0000000000000000 x1 : 0000000000000000 x0 : ffff592b4c692d00
-    [  175.042289] Call trace:
-    [  175.044802]  _regulator_disable+0xe8/0x1c8
-    [  175.049010]  regulator_disable+0x4c/0x98
-    [  175.053040]  phy_power_off+0x90/0xe0
-    [  175.056714]  qcom_ethqos_serdes_powerdown+0x28/0x48 [dwmac_qcom_ethqos]
-    [  175.063510]  stmmac_dvr_remove+0xa0/0x178 [stmmac]
-    [  175.068440]  stmmac_pltfr_remove+0x2c/0x80 [stmmac_platform]
-    [  175.074255]  platform_remove+0x34/0x80
-    [  175.078107]  device_remove+0x54/0x90
-    [  175.081783]  device_release_driver_internal+0x1dc/0x240
-    [  175.087150]  driver_detach+0x58/0xa8
-    [  175.090824]  bus_remove_driver+0x74/0xd0
-    [  175.094856]  driver_unregister+0x38/0x70
-    [  175.098887]  platform_driver_unregister+0x1c/0x30
-    [  175.103721]  qcom_ethqos_driver_exit+0x18/0x1b8 [dwmac_qcom_ethqos]
-    [  175.110160]  __arm64_sys_delete_module+0x1a8/0x298
-    [  175.115082]  invoke_syscall+0x50/0x128
-    [  175.118936]  el0_svc_common.constprop.0+0xcc/0xf8
-    [  175.123770]  do_el0_svc+0x40/0xa8
-    [  175.127178]  el0_svc+0x2c/0x88
-    [  175.130318]  el0t_64_sync_handler+0x100/0x130
-    [  175.134795]  el0t_64_sync+0x190/0x198
-    [  175.138560] ---[ end trace 0000000000000000 ]---
-    [root@dhcp19-243-249 ~]# 
-
-Just dumping the stack on serdes_powerdown/up calls you get the
-following:
-
-    [    6.179584] qcom-ethqos 23040000.ethernet eth0: PHY [stmmac-0:08] driver [Marvell 88E1510] (irq=POLL)
-    [    6.189571] CPU: 0 PID: 323 Comm: NetworkManager Not tainted 6.4.0-rc7-next-20230622-00006-gb4d4b58e3c81-dirty #29
-    [    6.200192] Hardware name: Qualcomm SA8775P Ride (DT)
-    [    6.205373] Call trace:
-    [    6.207896]  dump_backtrace+0x9c/0x100
-    [    6.211752]  show_stack+0x20/0x38
-    [    6.215160]  dump_stack_lvl+0x48/0x60
-    [    6.218929]  dump_stack+0x18/0x28
-    [    6.222335]  qcom_ethqos_serdes_powerup+0x20/0x70 [dwmac_qcom_ethqos]
-    [    6.228957]  __stmmac_open+0x138/0x488 [stmmac]
-    [    6.233634]  stmmac_open+0x4c/0xe8 [stmmac]
-    [    6.237948]  __dev_open+0x108/0x1e8
-    [    6.241535]  __dev_change_flags+0x194/0x218
-    [    6.245834]  dev_change_flags+0x2c/0x80
-    [    6.249778]  do_setlink+0x2b0/0xef8
-    [    6.253363]  __rtnl_newlink+0x514/0x870
-    [    6.257305]  rtnl_newlink+0x58/0x90
-    [    6.260891]  rtnetlink_rcv_msg+0x134/0x390
-    [    6.265100]  netlink_rcv_skb+0x64/0x138
-    [    6.269046]  rtnetlink_rcv+0x20/0x38
-    [    6.272721]  netlink_unicast+0x2f0/0x350
-    [    6.276755]  netlink_sendmsg+0x1b0/0x430
-    [    6.280789]  ____sys_sendmsg+0x1d8/0x2c8
-    [    6.284826]  ___sys_sendmsg+0xb4/0x110
-    [    6.288680]  __sys_sendmsg+0x8c/0xf0
-    [    6.292357]  __arm64_sys_sendmsg+0x2c/0x40
-    [    6.296570]  invoke_syscall+0x50/0x128
-    [    6.300424]  el0_svc_common.constprop.0+0xcc/0xf8
-    [    6.305253]  do_el0_svc+0x40/0xa8
-    [    6.308662]  el0_svc+0x2c/0x88
-    [    6.311804]  el0t_64_sync_handler+0x100/0x130
-    [    6.316285]  el0t_64_sync+0x190/0x198
-    <snip>
-    [root@dhcp19-243-249 ~]# modprobe -r dwmac_qcom_ethqos
-    [  174.562075] qcom-ethqos 23040000.ethernet eth0: stmmac_dvr_remove: removing driver
-    [  174.570660] stmmac_pcs: Link Down
-    [  174.580082] CPU: 5 PID: 584 Comm: modprobe Not tainted 6.4.0-rc7-next-20230622-00006-gb4d4b58e3c81-dirty #29
-    [  174.590176] Hardware name: Qualcomm SA8775P Ride (DT)
-    [  174.595363] Call trace:
-    [  174.597881]  dump_backtrace+0x9c/0x100
-    [  174.601744]  show_stack+0x20/0x38
-    [  174.605154]  dump_stack_lvl+0x48/0x60
-    [  174.608926]  dump_stack+0x18/0x28
-    [  174.612339]  qcom_ethqos_serdes_powerdown+0x20/0x48 [dwmac_qcom_ethqos]
-    [  174.619138]  stmmac_release+0x234/0x2e0 [stmmac]
-    [  174.623893]  __dev_close_many+0xb4/0x160
-    [  174.627920]  dev_close_many+0x8c/0x140
-    [  174.631777]  unregister_netdevice_many_notify+0x140/0x7a0
-    [  174.637320]  unregister_netdevice_queue+0xa0/0xe8
-    [  174.642151]  unregister_netdev+0x2c/0x48
-    [  174.646179]  stmmac_dvr_remove+0x88/0x178 [stmmac]
-    [  174.651109]  stmmac_pltfr_remove+0x2c/0x80 [stmmac_platform]
-    [  174.656925]  platform_remove+0x34/0x80
-    [  174.660786]  device_remove+0x54/0x90
-    [  174.664468]  device_release_driver_internal+0x1dc/0x240
-    [  174.669834]  driver_detach+0x58/0xa8
-    [  174.673514]  bus_remove_driver+0x74/0xd0
-    [  174.677552]  driver_unregister+0x38/0x70
-    [  174.681578]  platform_driver_unregister+0x1c/0x30
-    [  174.686408]  qcom_ethqos_driver_exit+0x18/0x1b8 [dwmac_qcom_ethqos]
-    [  174.692847]  __arm64_sys_delete_module+0x1a8/0x298
-    [  174.697767]  invoke_syscall+0x50/0x128
-    [  174.701617]  el0_svc_common.constprop.0+0xcc/0xf8
-    [  174.706449]  do_el0_svc+0x40/0xa8
-    [  174.709864]  el0_svc+0x2c/0x88
-    [  174.713009]  el0t_64_sync_handler+0x100/0x130
-    [  174.717482]  el0t_64_sync+0x190/0x198
-    [  174.721919] qcom-ethqos 23040000.ethernet eth0: FPE workqueue stop
-    [  174.779478] CPU: 5 PID: 584 Comm: modprobe Not tainted 6.4.0-rc7-next-20230622-00006-gb4d4b58e3c81-dirty #29
-    [  174.789565] Hardware name: Qualcomm SA8775P Ride (DT)
-    [  174.794754] Call trace:
-    [  174.797267]  dump_backtrace+0x9c/0x100
-    [  174.801123]  show_stack+0x20/0x38
-    [  174.804528]  dump_stack_lvl+0x48/0x60
-    [  174.808295]  dump_stack+0x18/0x28
-    [  174.811700]  qcom_ethqos_serdes_powerdown+0x20/0x48 [dwmac_qcom_ethqos]
-    [  174.818497]  stmmac_dvr_remove+0xa0/0x178 [stmmac]
-    [  174.823429]  stmmac_pltfr_remove+0x2c/0x80 [stmmac_platform]
-    [  174.829245]  platform_remove+0x34/0x80
-    [  174.833097]  device_remove+0x54/0x90
-    [  174.836772]  device_release_driver_internal+0x1dc/0x240
-    [  174.842138]  driver_detach+0x58/0xa8
-    [  174.845810]  bus_remove_driver+0x74/0xd0
-    [  174.849841]  driver_unregister+0x38/0x70
-    [  174.853870]  platform_driver_unregister+0x1c/0x30
-    [  174.858702]  qcom_ethqos_driver_exit+0x18/0x1b8 [dwmac_qcom_ethqos]
-    [  174.865140]  __arm64_sys_delete_module+0x1a8/0x298
-    [  174.870061]  invoke_syscall+0x50/0x128
-    [  174.873913]  el0_svc_common.constprop.0+0xcc/0xf8
-    [  174.878745]  do_el0_svc+0x40/0xa8
-    [  174.882153]  el0_svc+0x2c/0x88
-    [  174.885292]  el0t_64_sync_handler+0x100/0x130
-    [  174.889768]  el0t_64_sync+0x190/0x198
-
-Need to figure out which one of those serdes_powerdown() calls to undo.
-
-Thanks,
-Andrew
-
 
