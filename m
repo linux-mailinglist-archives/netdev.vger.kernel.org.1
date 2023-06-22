@@ -1,192 +1,172 @@
-Return-Path: <netdev+bounces-12933-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12934-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C29A7397C4
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:05:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 305AE7397CB
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:06:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E7BD1C21029
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:05:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 286E71C21029
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:06:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F19E6539E;
-	Thu, 22 Jun 2023 07:05:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2EA5953AC;
+	Thu, 22 Jun 2023 07:06:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD52C2F45
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:05:38 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2131.outbound.protection.outlook.com [40.107.220.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 442BB1BD1;
-	Thu, 22 Jun 2023 00:05:37 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QYWBogu/nHfSMdymu+pgHgoYw0E8rchN823zGtF7+6/03Y+iH9PWxFOyoAlN09IZEpxFIs1jmkEeWZi69DmFbW1C4LzBe8ItRjsIIiLCnKhRNlB3RgIzvtbfFNb2wGRfH4D1LaZAx0s85Xu6NGBgXCWGmg15MawSntLCerNs2AOP0v3dxuhsJ8LkLAU25Kv2B6bACW1R8e8GDGvhMg4HMhCn5+FEhUf8US6z+S7aKzQ/ZenxjJkazuty4vpV3D6Aa29juKWwMqYuERBSUi+5XWGn0FgCXInMbMLULd3psYYw0+MrAvBI30wEEaqrnSu3OmEfLyYnporUZk3Q/ePaww==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KTqXagykzy3ued5EeX7NGEh9/C/D08S1E5v1b1a6Etk=;
- b=PR9cDMBDhYxwXLdq9mE3HvD4ldg9z8jfzozD1ZLHvjPqDYlcfV//H6jQvp8c9UL9vuPX5VRO94xaRwc14CUYBWuDslucZX8eSjV5LqBWPVUxp99PM3MfVbp8ckgbMBaNQPu/pFH0R8jaJRgmm5sZVrVp4yhqILpsLs2OrjqSHxhu53gVKLbdZV+cKxYcqvJ6ea+hYjJoMQ02CZFtnk0x2JR7RUNVuz1ajoIm/M0PsBy5D/8HIPZQis1DVS4EnGyVxJj/eJMf+JCG/2CwomFu7HRLH0KIMs8hhtULLqX9Jo6XlVdRc9m/CU50t1auCxD0/eAI1oBLpf8VNyqiHmw9Yw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F1B1FB4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:06:13 +0000 (UTC)
+Received: from mail-wm1-x32f.google.com (mail-wm1-x32f.google.com [IPv6:2a00:1450:4864:20::32f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C6751BD5
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:05:59 -0700 (PDT)
+Received: by mail-wm1-x32f.google.com with SMTP id 5b1f17b1804b1-3f9b258f3a2so43844875e9.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:05:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=KTqXagykzy3ued5EeX7NGEh9/C/D08S1E5v1b1a6Etk=;
- b=CorXqmKx2MtJLuLL4wJgC0ynC4sUc5cLX+mJujc9vmEl0g02vmAKNUdWnqLM7s6cG5EIn9fW8afZ4hCfUl3sHgnIPy7xM1heO5d8vOg78PbWyfpv135tP1RTjoZlHPFgl985kK7cUVCEencJinMR0/vTddm6K4ZuEqepQ7FoqYU=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SJ2PR13MB6331.namprd13.prod.outlook.com (2603:10b6:a03:562::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
- 2023 07:05:32 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 22 Jun 2023
- 07:05:32 +0000
-Date: Thu, 22 Jun 2023 09:05:24 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	linux-can@vger.kernel.org, kernel@pengutronix.de,
-	Frank Jungclaus <frank.jungclaus@esd.eu>,
-	Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-Subject: Re: [PATCH net-next 04/33] can: esd_usb: Replace initializer macros
- used for struct can_bittiming_const
-Message-ID: <ZJPytAFaG3UFaw3i@corigine.com>
-References: <20230621132914.412546-1-mkl@pengutronix.de>
- <20230621132914.412546-5-mkl@pengutronix.de>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621132914.412546-5-mkl@pengutronix.de>
-X-ClientProxiedBy: AS4PR10CA0007.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:20b:5dc::9) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687417557; x=1690009557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=VIhSOYk52hVuqfcboW85OQLI0NHly7jy25hrkyJ2YAw=;
+        b=WZQ2qdOUncD9AsxUeqky0Sv9plZI/2WtRmFLj/vUPrLspAKtFdJAjDNBfRiM90Wl6l
+         Bu52No9UiIMeNp5vJfqV4tdzKNy4gqSSkZZgdTA2tEhX9UhJ0VFvTD1WUjcyZjBnxsqM
+         CY6kI+W0r2aC0t58Ot4ae4EkJpbEUxEO+qU0IzQugmgTpIX9f4Vdc6bAsBsmzf0/VZPu
+         oMD/OCT9ypK+CBaNDZaMdjjZbvVgK6KKjigdSYdUY6tPiNMyp/u8BcNpj7C6Q76VkPqd
+         cFeXbCEhZGKbNKcefxvBWXoomyu9ZEWY69AGbsxFJ97j4shY74xka5Cdz8D7NjEiYYcZ
+         YJOw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687417557; x=1690009557;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VIhSOYk52hVuqfcboW85OQLI0NHly7jy25hrkyJ2YAw=;
+        b=NxhzpKoBxvPEGQXyvpP4DsJeDsWGKvWlh+r71Sq+xIPUtwGNQbDbl5KwEKt9/mOLRk
+         FM0BM3I+tFlTQKmWP7m1Yi+vniCBerZUxJKVfWL+AmNJ/mRGHszQbrneclv0OrNlBshm
+         Wye0T3pgJocekQHgvyFaNWHrbx6xGcFc9a9aD+E1BMVUHqD7Dvm5CjQVGckrxqJW6IwJ
+         OymZHmPK3pf1/uR0yT2TPsidTuZs+4luyyZ2ts1/jaIZ2cvdqL5ppYM2Jna8qPihnxeM
+         j3Xv/4hHso5zX7Wih/b5PQnuSBLbQbX0FvONK7kAQAECLtKLJxhgolovtYN3qjS5pa4u
+         wyFg==
+X-Gm-Message-State: AC+VfDztXqBu5dDzjx1UllMqJ7+lmJunZtjLgc6McRp0/Sinm9h6cE4B
+	hNE8v/8T19l/6+fg4PDNmMTKeA==
+X-Google-Smtp-Source: ACHHUZ47nqUaHErWDVz/sLK5UcH8SW19SUG16keT/oe5Rk5/giZmsiFYSgziHOgHrlK6XzxNNrCLiA==
+X-Received: by 2002:a1c:7415:0:b0:3fa:77c8:6724 with SMTP id p21-20020a1c7415000000b003fa77c86724mr51349wmc.10.1687417557595;
+        Thu, 22 Jun 2023 00:05:57 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm6919930wmo.6.2023.06.22.00.05.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 00:05:57 -0700 (PDT)
+Date: Thu, 22 Jun 2023 09:05:56 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: "kuba@kernel.org" <kuba@kernel.org>,
+	"vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>,
+	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
+	"airlied@redhat.com" <airlied@redhat.com>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"idosch@nvidia.com" <idosch@nvidia.com>,
+	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
+	"phil@nwl.cc" <phil@nwl.cc>,
+	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v8 03/10] dpll: core: Add DPLL framework base
+ functions
+Message-ID: <ZJPy1FBvMC4z5SG2@nanopsycho>
+References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
+ <20230609121853.3607724-4-arkadiusz.kubalewski@intel.com>
+ <ZIS1FX0QAqDSvVUK@nanopsycho>
+ <DM6PR11MB46570B50A01D81F54F1068369B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ2PR13MB6331:EE_
-X-MS-Office365-Filtering-Correlation-Id: a910130b-8bf3-4cda-46f4-08db72ef1165
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	UkxJzuZjpZDX248wnZgIVxOW8oINdK5WQoR1jq3/Dyw0zfwCF9PjkIXCwy7JXg5cRM5fPjUzRfDM+5JqUXGAK1df3GtrgXWzHo5tiKwgUBjLo/oAIqNfHMbn85x2xHQN9/7tLk7ZR4WEhHq5Msd1sc7mKuAi14YA+enEi8PZ6Z8kYPx2WG7wa/rY6qtFEDZ+2XFnONm/0Evr9o/+3tbqc0Ovf3qa+WVOxs3QnTGc64Lt6IpzanVrSYjiQm2tuf7i0bEWKzRYjyn8+2jMISQ/fXpQjLCAHsqqEzB1EBOSO/AXunxBKhruAh12oj6bJpdFSTb5iAxEHpXNFGMNrZ4JCVwaSnaKFjTpLjxNAdlCPjVWZmYB1A54vN+LpSeTTMZilRLaUXD3b7TazUpi10FT6E6ro75RX/PvffGY1IHt02kQSRsBW58b9QTya1zETnXsleR7AdUE80rjVSJVoX8aQn4vknl67ycaHHVNTDgrHbLzeFJuVay6p3arHt38U009KvE+afvPUauWn2i+oLMYbCm8Ee0WtGYS8F/jamLTakLnI9/u6InP6Ulct0wsEqDcj3caUhGJ7XmDZv3zt0MlSp4gIq6ooduUMz70cmcHoHddgXABw7PDQfNBW58oZmVA
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(39840400004)(376002)(396003)(451199021)(5660300002)(8676002)(8936002)(186003)(2616005)(966005)(316002)(6506007)(6512007)(2906002)(44832011)(36756003)(38100700002)(6666004)(83380400001)(6486002)(66574015)(41300700001)(4326008)(6916009)(66946007)(66556008)(86362001)(66476007)(478600001)(54906003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?LEU6dihSnF2c0uPZYePSJMjplpZQ+FS7j/8+mO/OZ1G3wQfTH3fYwfl4Q3qC?=
- =?us-ascii?Q?ukrByGfKWq0/Ep0ROgNvxlx1aDrzPd4JLpV/+MuS1ZbQb5IVQKPEEhR4Y46j?=
- =?us-ascii?Q?mCmzk8RmQ3Phr5gbg01keRm4RDWWTMY87pjFZpYDXJb8RYmQY/dCjBmFfoZ2?=
- =?us-ascii?Q?LwHfmTz9GfCsbYEo7P/4D7ZSalZOfMjEoTNQveh856fHSawv4pvaVLpqO6xg?=
- =?us-ascii?Q?6WQX2qW6QTYJUKgU251DF/5JOQrWKKKtJ4ME3r0lgRKtQZHmXvml3s+rtSdZ?=
- =?us-ascii?Q?JToNm12SuSGh7k0IzDZ1DEPJpHTVBmmqmhCsxlQy2+AWIrt+Vlenidut/YhC?=
- =?us-ascii?Q?jdlqheAi4NxYW6fDjevSOUOgM+IBa3EGvg6Aqzvg/aSD/DOV5TbUcSpBRKqQ?=
- =?us-ascii?Q?bgCsnURpZJVPEeCLwb6x9J/hFtCJXexSfp+PelJK5ly2yWzyaYBQBHzXdwCF?=
- =?us-ascii?Q?9I0469X0maqLu0e35djjYg1LtaA9V6voNF2koa0OHaUQB6dARvMuDkLlc/aG?=
- =?us-ascii?Q?U3q+PI2d352xVaLHm5IfWniDuZfl3lB1dL5MSqexZqC3yujmhSiGWwURdYbK?=
- =?us-ascii?Q?mGQVZajXv3DyQFZkZetLRpAzwaWYRxmmIM8PuCM9yw2yzxauut098GLnZ5Zv?=
- =?us-ascii?Q?K27F+2Idz6/gvUQNPJND1SloWRLuywx3C9/50kpikQjKGQ3eyII7/70I9CLd?=
- =?us-ascii?Q?8HS8WKhhLBHvfQtTLPxYMPHM56X7Bt/G2xKb/0adLfzj9jff8mumvlbZUMXp?=
- =?us-ascii?Q?EHDR93dahFUfuDpuJ+bwsOXSJhJFRNioAyR8U8BGhKE4GQASXGkTy2JSGhTp?=
- =?us-ascii?Q?SASYX6pFt5hR6i4vmheXf7LoiEL1vwVuMpP9N/26+CuSdAU8mkk12N6RR/xq?=
- =?us-ascii?Q?jAavbhjXluyNmg3PS0xc6vxyPA2XeW6P/CBPu7HqMzFRmNu2Vbjfb4PFnVAW?=
- =?us-ascii?Q?8lFIcqAl3N60THAUbVg4JXWEBB7iayQfykh58lyE966wzPiYO6tiRVLMk3rE?=
- =?us-ascii?Q?MaVJ/p/06zYPNF3MuDY80oiAzquz5IvWx0OsejsTRwlAn1t6gKhvtMtUCLBw?=
- =?us-ascii?Q?tOHmPgn59afK3DlQc0lisvfwwv1fUoEMILKQ5YrPC00RXwx0rwgXIcjuT7Ay?=
- =?us-ascii?Q?vswIM4xDEmW7SX9yc+dycAM6/UGv+yt2Gya0f1CoSZmtGq2YN9uo7YD/MkkF?=
- =?us-ascii?Q?AIbkgif1ccTYHk0uehv+dTKt/6DfK1G6IN3WjcHiPfDN/gSCOVFuPhlMDhMA?=
- =?us-ascii?Q?JBOXOv52W8IjOtNGQxMCBVix35OnLiKvSYyaWUfZ8x0OreIWa+t4M5ophAst?=
- =?us-ascii?Q?WddkUVdYLKm+QIZacVhktW4PjCknGhH+rOGlCzG1txKEGDbSXeRCzIWlp9Wi?=
- =?us-ascii?Q?CjJnMFZGh0mGD1AsZ6jFqhf5U0Bnf4aDhGsaRmwC4/PG7/fw9O27+6kx+D/6?=
- =?us-ascii?Q?F3o6SD0Uh61kR5AZdSi9Nigf30kY1iPri7t6sS0HK83Z20GQRHmqCOorgfvf?=
- =?us-ascii?Q?9LISlz8p1Ntj71c6cWKUPBKatz944eEiGlkANPV01ZWAtaeI7154t8i2kMhV?=
- =?us-ascii?Q?ZOAXsQIztjCsI0aGEX1jVg+5MjxMh7hv91J4jHht4sE4PmSQxnQE3lvX3H/H?=
- =?us-ascii?Q?dkiZFGGap/kRPBCD9hom5kC6B0lykgikdklxZVrSmI8QnTGj4XJ6MMsUpJYD?=
- =?us-ascii?Q?vMypJw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: a910130b-8bf3-4cda-46f4-08db72ef1165
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 07:05:32.1941
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: PILsSmODDg8GZODhaR0LGm+pUj+1wphDAj4yyT1nj72ExEe8cMbAcbzpw8+ldp+vpNfjQeplqj51NZMDd34nnXL4PZbQw2FKHLSRFP/e/dA=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR13MB6331
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB46570B50A01D81F54F1068369B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 03:28:45PM +0200, Marc Kleine-Budde wrote:
-> From: Frank Jungclaus <frank.jungclaus@esd.eu>
-> 
-> Replace the macros used to initialize the members of struct
-> can_bittiming_const with direct values. Then also use those struct
-> members to do the calculations in esd_usb2_set_bittiming().
-> 
-> Link: https://lore.kernel.org/all/CAMZ6RqLaDNy-fZ2G0+QMhUEckkXLL+ZyELVSDFmqpd++aBzZQg@mail.gmail.com/
-> Suggested-by: Vincent MAILHOL <mailhol.vincent@wanadoo.fr>
-> Signed-off-by: Frank Jungclaus <frank.jungclaus@esd.eu>
-> Link: https://lore.kernel.org/r/20230519195600.420644-3-frank.jungclaus@esd.eu
-> [mkl: esd_usb2_set_bittiming() use esd_usb_2_bittiming_const instead of priv->can.bittiming_const]
-> Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Wed, Jun 21, 2023 at 08:55:35PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Saturday, June 10, 2023 7:38 PM
+>>
+>>Fri, Jun 09, 2023 at 02:18:46PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>>From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>
+>>>DPLL framework is used to represent and configure DPLL devices
+>>>in systems. Each device that has DPLL and can configure inputs
+>>>and outputs can use this framework.
+>>>
+>>>Implement core framework functions for further interactions
+>>>with device drivers implementing dpll subsystem, as well as for
+>>>interactions of DPLL netlink framework part with the subsystem
+>>>itself.
+>>>
+>>>Co-developed-by: Milena Olech <milena.olech@intel.com>
+>>>Signed-off-by: Milena Olech <milena.olech@intel.com>
+>>>Co-developed-by: Michal Michalik <michal.michalik@intel.com>
+>>>Signed-off-by: Michal Michalik <michal.michalik@intel.com>
+>>>Signed-off-by: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>Co-developed-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>Signed-off-by: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
+>>>---
+>>> drivers/dpll/dpll_core.c | 953 +++++++++++++++++++++++++++++++++++++++
+>>> drivers/dpll/dpll_core.h | 104 +++++
+>>
+>>Overall, looks very good! I pinpointed couple of nits below, nothing big.
+>>General question: Why do you put documentation comment to every static
+>>function? Does not make any sense to me. Even for non-exported functions
+>>I think it is overkill. Most of them (if not all) give the reader no
+>>additional information and only make the code a bit harder to read.
+>>Care to drop them?
+>>
+>
+>I forgot to respond here.. I would rather leave it, but if the others think
+>the same way, we could remove them.
 
-...
-
-> @@ -909,18 +901,19 @@ static const struct ethtool_ops esd_usb_ethtool_ops = {
->  
->  static const struct can_bittiming_const esd_usb2_bittiming_const = {
->  	.name = "esd_usb2",
-> -	.tseg1_min = ESD_USB2_TSEG1_MIN,
-> -	.tseg1_max = ESD_USB2_TSEG1_MAX,
-> -	.tseg2_min = ESD_USB2_TSEG2_MIN,
-> -	.tseg2_max = ESD_USB2_TSEG2_MAX,
-> -	.sjw_max = ESD_USB2_SJW_MAX,
-> -	.brp_min = ESD_USB2_BRP_MIN,
-> -	.brp_max = ESD_USB2_BRP_MAX,
-> -	.brp_inc = ESD_USB2_BRP_INC,
-> +	.tseg1_min = 1,
-> +	.tseg1_max = 16,
-> +	.tseg2_min = 1,
-> +	.tseg2_max = 8,
-> +	.sjw_max = 4,
-> +	.brp_min = 1,
-> +	.brp_max = 1024,
-> +	.brp_inc = 1,
->  };
->  
->  static int esd_usb2_set_bittiming(struct net_device *netdev)
->  {
-> +	const struct can_bittiming_const *btc = &esd_usb_2_bittiming_const;
->  	struct esd_usb_net_priv *priv = netdev_priv(netdev);
->  	struct can_bittiming *bt = &priv->can.bittiming;
->  	union esd_usb_msg *msg;
-
-Hi Marc and Frank,
-
-it seems that something might have got mixed up here,
-because GCC complains that:
-
- drivers/net/can/usb/esd_usb.c:916:43: error: use of undeclared identifier 'esd_usb_2_bittiming_const'; did you mean 'esd_usb2_bittiming_const'?
-         const struct can_bittiming_const *btc = &esd_usb_2_bittiming_const;
-                                                  ^~~~~~~~~~~~~~~~~~~~~~~~~
-                                                  esd_usb2_bittiming_const
- drivers/net/can/usb/esd_usb.c:902:41: note: 'esd_usb2_bittiming_const' declared here
- static const struct can_bittiming_const esd_usb2_bittiming_const = {
-                                        ^
--- 
-pw-bot: changes-requested
-
+Could you explain what is the benefit of leaving them? What are they
+good for. From what I see, they are obvious and only add blank LOC.
 
