@@ -1,133 +1,144 @@
-Return-Path: <netdev+bounces-12960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id EC38A73996D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:25:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BD394739973
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:26:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B17102817FC
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 08:25:47 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A1D1281882
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 08:26:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04EFD15AFE;
-	Thu, 22 Jun 2023 08:25:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E719616406;
+	Thu, 22 Jun 2023 08:26:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED23313AEB
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 08:25:45 +0000 (UTC)
-Received: from mail-wr1-x433.google.com (mail-wr1-x433.google.com [IPv6:2a00:1450:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AC7E1BE1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:25:44 -0700 (PDT)
-Received: by mail-wr1-x433.google.com with SMTP id ffacd0b85a97d-30fcda210cfso6864319f8f.3
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:25:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687422342; x=1690014342;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=tj5C+I7HeG1vpL6n+8jLNCbj2isj+XEX8Di7Bm48+qw=;
-        b=oKdr2pCRPDWXIy1kqKz+GQzoNsep5MGxpbwUXovmfx7o029cboskRdzrXQzPMfSeA2
-         gx7/SZCfNdlfBudmGdfJ7DYMBHxXzxk1RezMw7RAQYtSViRXJQkHltzIg0e7kNaiU3XQ
-         thR/x9sBIit/GsueiK1NR6+hqZ6gShTC76vtaDqDULqp4rLFT5xRAdh2AGp081IAyROv
-         +d6e69NzMiEa+l++Af+5acj3vDtpbsY+dJcX9Mv7GxhCRkH2zSdLlcoqfNyrDC5lfVDl
-         jddCuoJcbp9QgyS93vgfXanQFiyrpHiaht5lq13lC6/PVMd8rF93uP/4zATEdilZGrcb
-         fZCQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687422342; x=1690014342;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=tj5C+I7HeG1vpL6n+8jLNCbj2isj+XEX8Di7Bm48+qw=;
-        b=INyvjXqjJAt35PEoLAhU1dfReL2HviCSQDhE2OfxZ46Y8HpC4FxmGbggScl2Aqknct
-         2Hcm65MlsrMMSkFwsps0Zija4z2I9mnl6bxiDyzdzYAdMpXOM4RlYud5/r7EavXo0sqz
-         QJGscScxpx3sLsgCJMFBW0hVb4xj4YBUzE/F0OuOdVt4ktG5w2h9bczLC25nxTx6czyu
-         DxIqXxilUgMAplRKvYcaDiYDTLzuLVQ9m6T8a+i6LACKNGHVdoQRPPLyTxgFAUKEftp7
-         PNTKtak8U0a7ai4VN8bbaF6c4f7te+tQK7ckus43t+CF0QAae6wh79mEFGHCntJsqqku
-         cq+g==
-X-Gm-Message-State: AC+VfDzmsZuR+Om/To4lMW28C8ciNryRyGyvJVpAhfFn2HF5TYmFv4/I
-	VNXVQ6fr19Q2srymaIeY8X+c8A==
-X-Google-Smtp-Source: ACHHUZ7XFfsYPuPByW/01qxDBsnw6NFSD2C7skL84s9Wdwc3Ow8C/fjvbrY7Uw7P/Gg+U/HeyjusyQ==
-X-Received: by 2002:a5d:518a:0:b0:30c:5e52:5bad with SMTP id k10-20020a5d518a000000b0030c5e525badmr12585022wrv.18.1687422342565;
-        Thu, 22 Jun 2023 01:25:42 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id z13-20020adff74d000000b0030af15d7e41sm6561594wrp.4.2023.06.22.01.25.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 01:25:41 -0700 (PDT)
-Date: Thu, 22 Jun 2023 10:25:41 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Maxim Kochetkov <fido_max@inbox.ru>
-Cc: netdev@vger.kernel.org,
-	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Michal Simek <michal.simek@amd.com>,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 1/1] net: axienet: Move reset before DMA detection
-Message-ID: <ZJQFhYGeYATpZB6B@nanopsycho>
-References: <20230621112630.154373-1-fido_max@inbox.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D556413ADF
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 08:26:15 +0000 (UTC)
+Received: from sipsolutions.net (s3.sipsolutions.net [IPv6:2a01:4f8:191:4433::2])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E0C571FC1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:26:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=sipsolutions.net; s=mail; h=MIME-Version:Content-Transfer-Encoding:
+	Content-Type:References:In-Reply-To:Date:Cc:To:From:Subject:Message-ID:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:Resent-To:
+	Resent-Cc:Resent-Message-ID; bh=BThcAkpoygWCU/efkGXPT7nC3qwkRpDfOklWc3qAs0Q=;
+	t=1687422373; x=1688631973; b=x1R9nuF8es7D3ahvLE2RyMPgUu25KAMI58Z7y59ZdRXc2RP
+	P2NG1RwssPRtHPBDWifi2mUmzxB52qLp3KprpensqaOrfl3WrS0SKHVp3Q4ROzRRUCv2n1qtbVBd7
+	7NxjzwYOK5jB5qPku9MtfuuqlWcFNmSXOkiGKWQMS4YJNXKq05M0aizBYOqkmEwAOv6EX9lOzrUCZ
+	jxc49TMMI/gg/xnfTANqRDpjXlezDkt3emlosp0HcSnchyipdtj2ZWoh7pyMlUxDkxyoxBI+vtLtX
+	J5z/KixOz2vz3/F4reqzwbAx2JqAZhxPWpO9Nrba96OWgCcmerUmsNk8RjhJsH7w==;
+Received: by sipsolutions.net with esmtpsa (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_256_GCM:256)
+	(Exim 4.96)
+	(envelope-from <johannes@sipsolutions.net>)
+	id 1qCFdf-00EatV-0H;
+	Thu, 22 Jun 2023 10:25:59 +0200
+Message-ID: <ad471e9fe6a9b3812497c40456cba6e0c8a152ee.camel@sipsolutions.net>
+Subject: Re: [PATCH net] netlink: fix potential deadlock in netlink_set_err()
+From: Johannes Berg <johannes@sipsolutions.net>
+To: Eric Dumazet <edumazet@google.com>, Jiri Pirko <jiri@resnulli.us>
+Cc: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski
+ <kuba@kernel.org>,  Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "eric.dumazet@gmail.com" <eric.dumazet@gmail.com>, 
+ "syzbot+a7d200a347f912723e5c@syzkaller.appspotmail.com"
+ <syzbot+a7d200a347f912723e5c@syzkaller.appspotmail.com>
+Date: Thu, 22 Jun 2023 10:25:57 +0200
+In-Reply-To: <CANn89iLeU+pBrcHZyQoSRa-X_3G-Y8cjF6FJy4XwkJc7ronqMA@mail.gmail.com>
+References: <20230621154337.1668594-1-edumazet@google.com>
+	 <ZJQAdLSkRi2s1FUv@nanopsycho>
+	 <CANn89iLeU+pBrcHZyQoSRa-X_3G-Y8cjF6FJy4XwkJc7ronqMA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621112630.154373-1-fido_max@inbox.ru>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+X-malware-bazaar: not-scanned
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Jun 21, 2023 at 01:26:30PM CEST, fido_max@inbox.ru wrote:
->DMA detection will fail if axinet was started before (by boot loader,
->boot ROM, etc). In this state axinet will not start properly.
->So move axinet reset before DMA detection.
->
->Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
+On Thu, 2023-06-22 at 08:14 +0000, Eric Dumazet wrote:
+> On Thu, Jun 22, 2023 at 10:04=E2=80=AFAM Jiri Pirko <jiri@resnulli.us> wr=
+ote:
+> >=20
+> > Wed, Jun 21, 2023 at 05:43:37PM CEST, edumazet@google.com wrote:
+> > > syzbot reported a possible deadlock in netlink_set_err() [1]
+> > >=20
+> > > A similar issue was fixed in commit 1d482e666b8e ("netlink: disable I=
+RQs
+> > > for netlink_lock_table()") in netlink_lock_table()
+> > >=20
+> > > This patch adds IRQ safety to netlink_set_err() and __netlink_diag_du=
+mp()
+> > > which were not covered by cited commit.
+> > >=20
+> > > [1]
+> > >=20
+> > > WARNING: possible irq lock inversion dependency detected
+> > > 6.4.0-rc6-syzkaller-00240-g4e9f0ec38852 #0 Not tainted
+> > >=20
+> > > syz-executor.2/23011 just changed the state of lock:
+> > > ffffffff8e1a7a58 (nl_table_lock){.+.?}-{2:2}, at: netlink_set_err+0x2=
+e/0x3a0 net/netlink/af_netlink.c:1612
+> > > but this lock was taken by another, SOFTIRQ-safe lock in the past:
+> > > (&local->queue_stop_reason_lock){..-.}-{2:2}
+> > >=20
+> > > and interrupts could create inverse lock ordering between them.
+> > >=20
+> > > other info that might help us debug this:
+> > > Possible interrupt unsafe locking scenario:
+> > >=20
+> > >       CPU0                    CPU1
+> > >       ----                    ----
+> > >  lock(nl_table_lock);
+> > >                               local_irq_disable();
+> > >                               lock(&local->queue_stop_reason_lock);
+> > >                               lock(nl_table_lock);
+> > >  <Interrupt>
+> > >    lock(&local->queue_stop_reason_lock);
+> > >=20
+> > > *** DEADLOCK ***
+> > >=20
+> > > Fixes: 1d482e666b8e ("netlink: disable IRQs for netlink_lock_table()"=
+)
+> >=20
+> > I don't think that this "fixes" tag is correct. The referenced commit
+> > is a fix to the same issue on a different codepath, not the one who
+> > actually introduced the issue.
+> >=20
+> > The code itself looks fine to me.
+>=20
+> Note that the 1d482e666b8e had no Fixes: tag, otherwise I would have take=
+n it.
+>=20
+> I presume that it would make no sense to backport my patch on stable bran=
+ches
+> if the cited commit was not backported yet.
 
-You are missing a "Fixes:" tag here pointing out to the patch that
-introduced the issue.
+I'd tend to even say it doesn't make sense to backport this at all, it's
+very unlikely to happen in practice since that code path ...
 
+> Now, if you think we can be more precise, I will let Johannes do the
+> archeology in ieee80211 code.
 
->---
-> drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 +++++-----
-> 1 file changed, 5 insertions(+), 5 deletions(-)
->
->diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->index 3e310b55bce2..734822321e0a 100644
->--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->+++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
->@@ -2042,6 +2042,11 @@ static int axienet_probe(struct platform_device *pdev)
-> 		goto cleanup_clk;
-> 	}
-> 
->+	/* Reset core now that clocks are enabled, prior to accessing MDIO */
->+	ret = __axienet_device_reset(lp);
->+	if (ret)
->+		goto cleanup_clk;
->+
-> 	/* Autodetect the need for 64-bit DMA pointers.
-> 	 * When the IP is configured for a bus width bigger than 32 bits,
-> 	 * writing the MSB registers is mandatory, even if they are all 0.
->@@ -2096,11 +2101,6 @@ static int axienet_probe(struct platform_device *pdev)
-> 	lp->coalesce_count_tx = XAXIDMA_DFT_TX_THRESHOLD;
-> 	lp->coalesce_usec_tx = XAXIDMA_DFT_TX_USEC;
-> 
->-	/* Reset core now that clocks are enabled, prior to accessing MDIO */
->-	ret = __axienet_device_reset(lp);
->-	if (ret)
->-		goto cleanup_clk;
->-
-> 	ret = axienet_mdio_setup(lp);
-> 	if (ret)
-> 		dev_warn(&pdev->dev,
->-- 
->2.40.1
->
->
+I first thought that'd be commit d4fa14cd62bd ("mac80211: use
+ieee80211_free_txskb in a few more places") then, but that didn't call
+to netlink yet ... so commit 8a2fbedcdc9b ("mac80211: combine
+status/drop reporting"), but that's almost as old (and really old too,
+kernel 3.8).
+
+But again, I'm not sure it's worth worrying about ... Actually I'm
+pretty sure it's _not_ worth worrying about :)
+
+johannes
 
