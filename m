@@ -1,118 +1,168 @@
-Return-Path: <netdev+bounces-13181-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13182-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4086873A8C0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:02:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 037A073A8C2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:03:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3549281AEF
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:02:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27BE31C211E2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:03:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B125206BA;
-	Thu, 22 Jun 2023 19:02:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44CD6206BC;
+	Thu, 22 Jun 2023 19:03:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED9C31F923;
-	Thu, 22 Jun 2023 19:02:25 +0000 (UTC)
-Received: from mail-qk1-x733.google.com (mail-qk1-x733.google.com [IPv6:2607:f8b0:4864:20::733])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9A491FF2;
-	Thu, 22 Jun 2023 12:02:23 -0700 (PDT)
-Received: by mail-qk1-x733.google.com with SMTP id af79cd13be357-763c997ee0aso203651685a.3;
-        Thu, 22 Jun 2023 12:02:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687460543; x=1690052543;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=rUKVqpAkvwcAkqRbgPqSJCnjEmHwpCRiTBM6V9Wl0JI=;
-        b=NFMjkIPQ8n5THqXlJ3GBdHE9pkALJhyaCi25q3wcypdND5JeqRRgBH+hLOalXh2zHo
-         pIp1kOG3fM2Q9MDgAPqQAtVGHvOOjlJTOL8TJa55415jsSjFgkjJo2WkV7UDpoeoh3je
-         9ZJ6Kyw1ljjo/req3uf37Bk9sAw2MEqtMKvCpje0rIrzXUWQQFuBtmeeC78Ccp3Q5/jw
-         zwzVPI7Z2cArK+KdK9PZpFQ45G2sjmPUuwqmdgvcOe3R07+fVyNED0lygxzegm8D9eFu
-         z7XOKZtQrX4JZoXg/BubrG5uo68ORY9f/RJpsLufL03AZLIDMsS/APOfS0IIhtLwyBpo
-         T2jA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687460543; x=1690052543;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=rUKVqpAkvwcAkqRbgPqSJCnjEmHwpCRiTBM6V9Wl0JI=;
-        b=OYr7TMqaim5B7yIVIYgMTJRS7Re2ZIBwOLmGBfQhtaKSSbvZbYZhKKphzGmhYR7TqV
-         MCT0gxLUt9MGsjIkOzHBs0qq/rBfZX2qQx/eVGk4TuEZ7P90hBQzyNvQCYAthqx5QwXv
-         52VxAon/xzKh704Xy6iv5MUwY/5Yr6rCWXkT7qGgGVYxwfQAzP9zX6NReyKgHodVI1Wx
-         w0aEttP/mp+Sv757nYamNJsjMFGLAxG/xw9IV5lsqtb8/S19/Pvv1wq5fXHDr/45g0lg
-         av2+tddQAYWh4pBSTMVhOdF+w3+mxt0KnD0ba59lHIlou8SpRt8GyyBzrPz5iWyx8FdE
-         lN5w==
-X-Gm-Message-State: AC+VfDyoos+kvi44L13w7FCHZq+dWf09oulQvJR8BEdcd6FI+S576K7v
-	XkOTPMjji03xlOZckgVrBzx8DdoJwTlxfs4g
-X-Google-Smtp-Source: ACHHUZ5CoD5bFfxw3o+JrwBisUgD4pIRoMw0clbbU+tXPVo0sEN48tKJ8OQ+/roTw9WcJG2RXowD5g==
-X-Received: by 2002:a05:620a:6846:b0:75d:54fc:47b1 with SMTP id ru6-20020a05620a684600b0075d54fc47b1mr22804244qkn.54.1687460542955;
-        Thu, 22 Jun 2023 12:02:22 -0700 (PDT)
-Received: from localhost (modemcable065.128-200-24.mc.videotron.ca. [24.200.128.65])
-        by smtp.gmail.com with ESMTPSA id p6-20020a0cf546000000b00623819de804sm4115104qvm.127.2023.06.22.12.02.22
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 12:02:22 -0700 (PDT)
-Date: Thu, 22 Jun 2023 15:02:21 -0400
-From: Benjamin Poirier <benjamin.poirier@gmail.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
-	andrii@kernel.org, netdev@vger.kernel.org,
-	magnus.karlsson@intel.com, bjorn@kernel.org,
-	tirthendu.sarkar@intel.com, simon.horman@corigine.com,
-	toke@kernel.org
-Subject: Re: [PATCH v4 bpf-next 01/22] xsk: prepare 'options' in xdp_desc for
- multi-buffer use
-Message-ID: <ZJSavRFNNvSvoATt@d3>
-References: <20230615172606.349557-1-maciej.fijalkowski@intel.com>
- <20230615172606.349557-2-maciej.fijalkowski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 375111F923
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:03:43 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9790C9B
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:03:42 -0700 (PDT)
+Received: from pps.filterd (m0353723.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35MIxF97028343
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:03:41 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=pkZAoD5L3xBStAbkZ8c4g5Y7FjKkfK+8rWJAJWYdkpo=;
+ b=gGrxiurbSORPmQz7u3dBas9NEB6BkcGz7anbOEniGcPnZogXrW3yjuodiiLVgHD2A1eL
+ 5yPopCOABNyE6aBOsqE5S6pzzJdKgjNRaUUQIn2kXGutBGKBoIW4T0WKAe44XLN1i4ot
+ Is1i/ZaLioh5FxBet77PYdNrb3KCw83Nx2T5qiE4BxzQoDYPECwOg8AE/11vWrMV5oji
+ tvOBUDjdIHMeDwpgm/3sIv8Yt49uBKGcLgxcpQLvSmfS938TS5xpyT0FbLoaOhMIvLy6
+ BOJUth910NSRG0XNjgk59/66qSdxoC4HxefkrUgLkqYg4hx2tN4rQxBc2KZlEyDObyrm Pg== 
+Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcum4rp2v-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:03:41 +0000
+Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
+	by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35MGwMAK009539
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:03:40 GMT
+Received: from smtprelay07.wdc07v.mail.ibm.com ([9.208.129.116])
+	by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3r94f71xk1-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT)
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:03:40 +0000
+Received: from smtpav01.wdc07v.mail.ibm.com (smtpav01.wdc07v.mail.ibm.com [10.39.53.228])
+	by smtprelay07.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35MJ3cf550200892
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 22 Jun 2023 19:03:38 GMT
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 8277B5805B;
+	Thu, 22 Jun 2023 19:03:38 +0000 (GMT)
+Received: from smtpav01.wdc07v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3B6415804B;
+	Thu, 22 Jun 2023 19:03:38 +0000 (GMT)
+Received: from li-8d37cfcc-31b9-11b2-a85c-83226d7135c9.austin.ibm.com (unknown [9.24.4.46])
+	by smtpav01.wdc07v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 22 Jun 2023 19:03:38 +0000 (GMT)
+From: Nick Child <nnac123@linux.ibm.com>
+To: netdev@vger.kernel.org
+Cc: haren@linux.ibm.com, ricklind@us.ibm.com,
+        Nick Child <nnac123@linux.ibm.com>
+Subject: [PATCH net] ibmvnic: Do not reset dql stats on NON_FATAL err
+Date: Thu, 22 Jun 2023 14:03:32 -0500
+Message-Id: <20230622190332.29223-1-nnac123@linux.ibm.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230615172606.349557-2-maciej.fijalkowski@intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: cFY7ehC2iG4ljlUTxgPS1M4hO69p_HcD
+X-Proofpoint-ORIG-GUID: cFY7ehC2iG4ljlUTxgPS1M4hO69p_HcD
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-22_14,2023-06-22_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 malwarescore=0 suspectscore=0
+ clxscore=1011 spamscore=0 bulkscore=0 mlxscore=0 adultscore=0
+ impostorscore=0 mlxlogscore=922 lowpriorityscore=0 priorityscore=1501
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306220158
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023-06-15 19:25 +0200, Maciej Fijalkowski wrote:
-> From: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
-> 
-> Use the 'options' field in xdp_desc as a packet continuity marker. Since
-> 'options' field was unused till now and was expected to be set to 0, the
-> 'eop' descriptor will have it set to 0, while the non-eop descriptors
-> will have to set it to 1. This ensures legacy applications continue to
-> work without needing any change for single-buffer packets.
-> 
-> Add helper functions and extend xskq_prod_reserve_desc() to use the
-> 'options' field.
-> 
-> Signed-off-by: Tirthendu Sarkar <tirthendu.sarkar@intel.com>
-> ---
->  include/uapi/linux/if_xdp.h |  7 +++++++
->  net/xdp/xsk.c               |  8 ++++----
->  net/xdp/xsk_queue.h         | 12 +++++++++---
->  3 files changed, 20 insertions(+), 7 deletions(-)
-> 
-[...]
-> diff --git a/net/xdp/xsk_queue.h b/net/xdp/xsk_queue.h
-> index 6d40a77fccbe..ad81b19e6fdf 100644
-> --- a/net/xdp/xsk_queue.h
-> +++ b/net/xdp/xsk_queue.h
-> @@ -130,6 +130,11 @@ static inline bool xskq_cons_read_addr_unchecked(struct xsk_queue *q, u64 *addr)
->  	return false;
->  }
->  
-> +static inline bool xp_unused_options_set(u16 options)
-                                            ^
-To match struct xdp_desc, this should be u32, no?
+All ibmvnic resets, make a call to netdev_tx_reset_queue() when
+re-opening the device. netdev_tx_reset_queue() resets the num_queued
+and num_completed byte counters. These stats are used in Byte Queue
+Limit (BQL) algorithms. The difference between these two stats tracks
+the number of bytes currently sitting on the physical NIC. ibmvnic
+increases the number of queued bytes though calls to
+netdev_tx_sent_queue() in the drivers xmit function. When, VIOS reports
+that it is done transmitting bytes, the ibmvnic device increases the
+number of completed bytes through calls to netdev_tx_completed_queue().
+It is important to note that the driver batches its transmit calls and
+num_queued is increased every time that an skb is added to the next
+batch, not necessarily when the batch is sent to VIOS for transmission.
+
+Unlike other reset types, a NON FATAL reset will not flush the sub crq
+tx buffers. Therefore, it is possible for the batched skb array to be
+partially full. So if there is call to netdev_tx_reset_queue() when
+re-opening the device, the value of num_queued (0) would not account
+for the skb's that are currently batched. Eventually, when the batch
+is sent to VIOS, the call to netdev_tx_completed_queue() would increase
+num_completed to a value greater than the num_queued. This causes a
+BUG_ON crash:
+
+ibmvnic 30000002: Firmware reports error, cause: adapter problem.
+Starting recovery...
+ibmvnic 30000002: tx error 600
+ibmvnic 30000002: tx error 600
+ibmvnic 30000002: tx error 600
+ibmvnic 30000002: tx error 600
+------------[ cut here ]------------
+kernel BUG at lib/dynamic_queue_limits.c:27!
+Oops: Exception in kernel mode, sig: 5
+[....]
+NIP dql_completed+0x28/0x1c0
+LR ibmvnic_complete_tx.isra.0+0x23c/0x420 [ibmvnic]
+Call Trace:
+ibmvnic_complete_tx.isra.0+0x3f8/0x420 [ibmvnic] (unreliable)
+ibmvnic_interrupt_tx+0x40/0x70 [ibmvnic]
+__handle_irq_event_percpu+0x98/0x270
+---[ end trace ]---
+
+Therefore, do not reset the dql stats when performing a NON_FATAL reset.
+Simply clearing the queues off bit is sufficient.
+
+Fixes: 0d973388185d ("ibmvnic: Introduce xmit_more support using batched subCRQ hcalls")
+Signed-off-by: Nick Child <nnac123@linux.ibm.com>
+---
+ drivers/net/ethernet/ibm/ibmvnic.c | 13 ++++++++++++-
+ 1 file changed, 12 insertions(+), 1 deletion(-)
+
+diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
+index c63d3ec9d328..5523ab52ff2b 100644
+--- a/drivers/net/ethernet/ibm/ibmvnic.c
++++ b/drivers/net/ethernet/ibm/ibmvnic.c
+@@ -1816,7 +1816,18 @@ static int __ibmvnic_open(struct net_device *netdev)
+ 		if (prev_state == VNIC_CLOSED)
+ 			enable_irq(adapter->tx_scrq[i]->irq);
+ 		enable_scrq_irq(adapter, adapter->tx_scrq[i]);
+-		netdev_tx_reset_queue(netdev_get_tx_queue(netdev, i));
++		/* netdev_tx_reset_queue will reset dql stats and set the stacks
++		 * flag for queue status. During NON_FATAL resets, just
++		 * clear the bit, don't reset the stats because there could
++		 * be batched skb's waiting to be sent. If we reset dql stats,
++		 * we risk num_completed being greater than num_queued.
++		 * This will cause a BUG_ON in dql_completed().
++		 */
++		if (adapter->reset_reason == VNIC_RESET_NON_FATAL)
++			clear_bit(__QUEUE_STATE_STACK_XOFF,
++				  &netdev_get_tx_queue(netdev, i)->state);
++		else
++			netdev_tx_reset_queue(netdev_get_tx_queue(netdev, i));
+ 	}
+ 
+ 	rc = set_link_state(adapter, IBMVNIC_LOGICAL_LNK_UP);
+-- 
+2.31.1
+
 
