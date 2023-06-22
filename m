@@ -1,59 +1,59 @@
-Return-Path: <netdev+bounces-13039-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13040-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5FF8173A075
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:03:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C0DB873A076
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:03:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 904EB1C210C3
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:03:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F0EEE1C210B6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:03:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D241E511;
-	Thu, 22 Jun 2023 12:02:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98B931E508;
+	Thu, 22 Jun 2023 12:02:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A4921E505
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:22 +0000 (UTC)
-Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C68E41FF0
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:02 -0700 (PDT)
-Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fa71e253f2so5652405e9.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D6E61E505
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:02:25 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE7912101
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:04 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b470330145so75431601fa.3
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:02:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687435315; x=1690027315;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=KVlJCvybdeYjvv8ryzmcQEkNwtr78sKz5e8xX8tuWYs=;
-        b=C8BowXKmNG6ia2Wm3UtQT/5cWilxo2PodO7vNltAYIv52xh7T8IDrvCpJLHhLuw8Gl
-         8qgtNfK3Rx3OZ9ggP2XkDDrJzmwbJpE/IPMx6mvtrCkQQDJg7m/AFmu4VgUb3/vHDCwO
-         m0VVA3PnOWbZqSvStMGdItjm7lVYHVz5TPCDolF7MIED5mXRUn7VHgiXHYKzUwX8zN81
-         TjKxoObpL0gtfkBwC4ffzWpyU87onzD3xwUcqQL5HW3hqM2chihrSGRl5Xe+nYIei4NX
-         seYiC8DOGWFzTt5tNKY+bTHm6LnuP5vRVArtFdKT9oY+2fo3ttcsMxd2Hw4wSZiEl0IG
-         Gn5Q==
+        bh=u1Al/KG8NWTXmmsHWuavPIHFHpGDFDNwIi35fFm7FN0=;
+        b=U9P0aS+UztwhUk4ABb5ZDvNcBVmCIgBCsV8VfNfDtitYmRWYQET7J5c0DFMOw+d7dZ
+         zvTNvXhuxAabHZzHm4QafkgiMgBBxpINh2zvWgOJpWTJmJb4rGspsxLQheIL66LUFXHj
+         Yt+U787FTEzp/b8uTCnLVFffAki7u/kEjGsTRHclJ9ASoiQgh7r/oouajARq5zLE5TYW
+         LDmbjlvV0YUebsvgddD6E1Hgm5LhB3tvmZe2XYXyzpb2bqv1WwAcvOSJ691qY+/XSZut
+         bq6J0Zevrrc09SxaZqrsEdSBgAvge5RdBwjdXUkuH4zKW2iRSSD/esQGuTffrMG9+YGc
+         mseQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1687435315; x=1690027315;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=KVlJCvybdeYjvv8ryzmcQEkNwtr78sKz5e8xX8tuWYs=;
-        b=RZe/Mx7Ko4gXtsAKYUn8ixSDlsObMPkTTP4OKNmPf29aKeSaiOrieZ28RLfCNFfydZ
-         bYfuY0f/m/aZJRDcxc+s4wmgE/KmpxeFyO9+c9YP2Cj/65MWNZA5X/X3czyohfh4OizJ
-         /DioQqRPNvnujUwWdRLpyYysqNUy+uqgSyfGoFOsWU8N9FmjvlQ5QGu0nPbHevzHopTK
-         EB0c4MjF1HZfdelndKxzS2umqoDYZIf5AGoPAUWWUkoi3vkS4d/EPbxZTckGoVKqL8ce
-         +ZjHYNXYYOI8kuF8y+OPxnUSRZpTVJdcGqhmwrOOG94xyZKZYmxvJpaDJVZ9+avmrrmj
-         RLvQ==
-X-Gm-Message-State: AC+VfDzwyRj3A6y3ndAhkyehbznfAxMlKjsQHfuOwhRsJpfFLbGWC/2a
-	3yMTWFftusriqfTfhSMlPdU+hA==
-X-Google-Smtp-Source: ACHHUZ6g2/qEcVS4UCzFHdCuPd1cab6E0b6lt6uXUOmWx9zVx49N7XM28BkCdrJ23x/f4uyw3i0m9g==
-X-Received: by 2002:a05:600c:4f96:b0:3f7:f302:161 with SMTP id n22-20020a05600c4f9600b003f7f3020161mr22362886wmq.8.1687435314389;
-        Thu, 22 Jun 2023 05:01:54 -0700 (PDT)
+        bh=u1Al/KG8NWTXmmsHWuavPIHFHpGDFDNwIi35fFm7FN0=;
+        b=CGubl/LyGpmrFZZj8VapRa/5bL10TWJ3N33DPmg1N07mpqdiX78xHfLTrgaR20P9FG
+         BX6XgMDDR64WurWA9HtGAg/4RKETmmfoiniX8frsdgB4JZqL7s0fi2IY+rrcO7stG/WE
+         94P6FECyiOfLxrYrwWk20A+BE2PA+2YBLunEoyZRCm0WLPcXlscSTRS/K1+U8GX7FBc5
+         MlbiBKKT4l2faPssWb6noESoGQdZ3uPAE5RxkvV4wubs7GtuQVob4TZojTnpifYiBMk+
+         OooLJYKTXPJizOUWhF+060cfPLx0VHk31Hpw7Q4b4rw2QuFXfrtotnQlgxW/yhDgp3wB
+         X+ig==
+X-Gm-Message-State: AC+VfDyIPqpuz2nJzuN5OMFewP0at3J/iF/VkxeD8j9WPjjy69znt3T6
+	AlO5BvOYSss6fPlOqw3OLa4gTw==
+X-Google-Smtp-Source: ACHHUZ5Iw3ceu0CeLPuoLzLk3WrUr2o7YGVcOMhEUkPE6fCCm+zDhYFvaATSM07vU182TfL5QYBVgQ==
+X-Received: by 2002:a05:6512:44c:b0:4f8:7803:5559 with SMTP id y12-20020a056512044c00b004f878035559mr5862309lfk.6.1687435315353;
+        Thu, 22 Jun 2023 05:01:55 -0700 (PDT)
 Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:d785:af3e:3bf5:7f36])
-        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm7594296wmo.6.2023.06.22.05.01.53
+        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm7594296wmo.6.2023.06.22.05.01.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
         Thu, 22 Jun 2023 05:01:54 -0700 (PDT)
 From: Bartosz Golaszewski <brgl@bgdev.pl>
@@ -69,9 +69,9 @@ Cc: linux-arm-msm@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	netdev@vger.kernel.org,
 	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Subject: [RESEND PATCH v2 3/5] arm64: dts: qcom: sa8775p-ride: enable the SerDes PHY
-Date: Thu, 22 Jun 2023 14:01:40 +0200
-Message-Id: <20230622120142.218055-4-brgl@bgdev.pl>
+Subject: [RESEND PATCH v2 4/5] arm64: dts: qcom: sa8775p-ride: add pin functions for ethernet0
+Date: Thu, 22 Jun 2023 14:01:41 +0200
+Message-Id: <20230622120142.218055-5-brgl@bgdev.pl>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230622120142.218055-1-brgl@bgdev.pl>
 References: <20230622120142.218055-1-brgl@bgdev.pl>
@@ -91,30 +91,41 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-Enable the internal PHY on sa8775p-ride.
+Add the MDC and MDIO pin functions for ethernet0 on sa8775p-ride.
 
 Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 Reviewed-by: Konrad Dybcio <konrad.dybcio@linaro.org>
 ---
- arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 5 +++++
- 1 file changed, 5 insertions(+)
+ arch/arm64/boot/dts/qcom/sa8775p-ride.dts | 16 ++++++++++++++++
+ 1 file changed, 16 insertions(+)
 
 diff --git a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-index ab767cfa51ff..9f39ab59c283 100644
+index 9f39ab59c283..bf90f825ff67 100644
 --- a/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
 +++ b/arch/arm64/boot/dts/qcom/sa8775p-ride.dts
-@@ -355,6 +355,11 @@ &qupv3_id_2 {
- 	status = "okay";
+@@ -371,6 +371,22 @@ &spi16 {
  };
  
-+&serdes0 {
-+	phy-supply = <&vreg_l5a>;
-+	status = "okay";
-+};
+ &tlmm {
++	ethernet0_default: ethernet0-default-state {
++		ethernet0_mdc: ethernet0-mdc-pins {
++			pins = "gpio8";
++			function = "emac0_mdc";
++			drive-strength = <16>;
++			bias-pull-up;
++		};
 +
- &sleep_clk {
- 	clock-frequency = <32764>;
- };
++		ethernet0_mdio: ethernet0-mdio-pins {
++			pins = "gpio9";
++			function = "emac0_mdio";
++			drive-strength = <16>;
++			bias-pull-up;
++		};
++	};
++
+ 	qup_uart10_default: qup-uart10-state {
+ 		pins = "gpio46", "gpio47";
+ 		function = "qup1_se3";
 -- 
 2.39.2
 
