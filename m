@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-12866-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12867-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC598739370
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 02:00:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 341F4739371
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 02:00:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EDD261C21008
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 00:00:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 26FB31C20FBA
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 00:00:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80689DDAB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98DE8DF63;
 	Thu, 22 Jun 2023 00:00:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C88DC2CA6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB4F3DDA2
 	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:00:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 652D6C433CB;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 568A3C433CA;
 	Thu, 22 Jun 2023 00:00:21 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687392021;
-	bh=WiZVeloMcs/+JOHqbX05hM3ZHPzrGrw8JH39DpSMMvE=;
+	bh=C5BkJXS6Vgw04VtsKDnyCQbmDTblMR1v9dWpWQr/0uY=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=q3OWDtV8fw9ec6/Y+K54ko4tza46/AVwMqjJD5/9iO+ScEMY6zStf817uL+/M/VPA
-	 OcRapSLq4/xH5EU2/1Hc34F3XwcalxKFxfWG3v9om0tKUZ+G1Aghv5HPawPqHNG2N7
-	 lPUgN1r+yIGR5XHDzziKT91JUCJ5i51WAZl0ubuzHTHZXhN4slpdDjCfgz47MCNWhW
-	 SVoF4qybf7o1XRzgxc86kj8g/rgFH1Pq8LXNKiLuxmHQ+X8HIasu/eMajcwOSI9TFq
-	 uiBo58czkKvU0QqhpYdvENw7PGH1zQObqEKlZfxL0voAsAbXcjauDwDfg0ZH59dSRg
-	 YWWqvnrTYHJ2A==
+	b=cIHRsngolwud2asdbOkq6gslIDQe9iPWOypw3fAtQLCqFWdqdNo68S+7OWGJnOKoR
+	 x0LyBxRkRNWjtot7fHzqXH+isRfhNVo4Dks19oWl42QpoKyv73sQSorNDwxRBFCwCi
+	 AL1s132ehdOKABA4SRVCeSpjQWyyagcBnmVFxTPkXME4EFcENg4hrCyrceUAMHTI4V
+	 UoMmOP5sk9Xlu8KyU4fq/freTy483x4B/gnPtDrg/7a1YgwShRvqHXkmzGb76fkKeT
+	 FqLTnIy/A+024/3dBVUpvtEF8jIdjCOrGjuLxJs9OpbeMeL7bC5BJmpMH8SCgLd8tU
+	 SpuQAbJn0rNvA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3F748E4F14A;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 34BA8C395F1;
 	Thu, 22 Jun 2023 00:00:21 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,39 +41,40 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] selftests: tc-testing: add one test for flushing
- explicitly created chain
+Subject: Re: [PATCH net-next] dt-bindings: net: bluetooth: qualcomm: document
+ VDD_CH1
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168739202125.22621.9173578727280562724.git-patchwork-notify@kernel.org>
+ <168739202121.22621.9813816851269923496.git-patchwork-notify@kernel.org>
 Date: Thu, 22 Jun 2023 00:00:21 +0000
-References: <20230620014939.2034054-1-renmingshuai@huawei.com>
-In-Reply-To: <20230620014939.2034054-1-renmingshuai@huawei.com>
-To: renmingshuai <renmingshuai@huawei.com>
-Cc: pctammela@mojatatu.com, vladbu@nvidia.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
- jiri@resnulli.us, davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, liaichun@huawei.com, caowangbao@huawei.com,
- yanan@huawei.com, liubo335@huawei.com
+References: <20230617165716.279857-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230617165716.279857-1-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+ conor+dt@kernel.org, bgodavar@codeaurora.org, rjliao@codeaurora.org,
+ netdev@vger.kernel.org, devicetree@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 20 Jun 2023 09:49:39 +0800 you wrote:
-> Add the test for additional reference to chains that are explicitly created
->  by RTM_NEWCHAIN message.
-> The test result:
-> 1..1
-> ok 1 c2b4 - soft lockup alarm will be not generated after delete the prio 0
->  filter of the chain
+On Sat, 17 Jun 2023 18:57:16 +0200 you wrote:
+> WCN3990 comes with two chains - CH0 and CH1 - where each takes VDD
+> regulator.  It seems VDD_CH1 is optional (Linux driver does not care
+> about it), so document it to fix dtbs_check warnings like:
+> 
+>   sdm850-lenovo-yoga-c630.dtb: bluetooth: 'vddch1-supply' does not match any of the regexes: 'pinctrl-[0-9]+'
+> 
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2] selftests: tc-testing: add one test for flushing explicitly created chain
-    https://git.kernel.org/netdev/net-next/c/ca4fa8743537
+  - [net-next] dt-bindings: net: bluetooth: qualcomm: document VDD_CH1
+    https://git.kernel.org/netdev/net-next/c/6a0a6dd8df9b
 
 You are awesome, thank you!
 -- 
