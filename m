@@ -1,88 +1,127 @@
-Return-Path: <netdev+bounces-12935-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12936-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DC03C7397D2
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:07:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 879957397D8
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:10:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F69728181E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:07:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1F2628183A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:10:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0742B567C;
-	Thu, 22 Jun 2023 07:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A897567C;
+	Thu, 22 Jun 2023 07:10:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EFD8C33CD
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:07:29 +0000 (UTC)
-Received: from mail-ua1-x930.google.com (mail-ua1-x930.google.com [IPv6:2607:f8b0:4864:20::930])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 773CB1BD1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:07:27 -0700 (PDT)
-Received: by mail-ua1-x930.google.com with SMTP id a1e0cc1a2514c-78a3e1ed1deso2271951241.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:07:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0459D5242
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:10:01 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5341BD6
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:09:58 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-31126037f41so6635933f8f.2
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:09:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687417646; x=1690009646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=17q09EU5IzKoL+3uRvcJRVxW9WzlvX1kABapaCMfUac=;
-        b=0+Y6V7m9AwJTXt46LgUkmYfim0kFMAgmEx1WMAnwXRm9h0dDSj503PWiVpc80KV24O
-         KTY8IXnHqev0sM8Wb5C+Cl0yjpi/6y19OHSQMukXaniD2YHOOOVUOTvKYtXhPZVMbcpM
-         ulOevy0MmWgkN2XDTVz7bDCuntnRsnSDLmlbJi3KPdwPaQYvuClYduSlqeaikjIct1gi
-         nGZZui1U3Hb8LmO4j9X0yqNFX1575QQuY9mOWj4iwYVZEbvHZNK5qc/og9iqmwvh5Dfo
-         ASu0KGaBHmPs30hpp3a/u77l10PYqSUOZbg60pLMKAsdHShEZ5PMbtIS1OZfJZpaQ2oW
-         HOxQ==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687417796; x=1690009796;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=mPyXOzxLtxEjY9cBPcsaRIns0EAEb4Nt/6W8EsU3ga8=;
+        b=3iouDSVugUMNcys+i697SLnTvuKCQCDU18RQuMxLJV54x1bnilfa2bLr1aadMiQh1g
+         UItDYY8rMfETP4FeqIVWSeabeT9AuFOTAO2aUWdKuLg84/CdT7qzIiwweS4Gx3GVX1P8
+         4bBATic4ICWKlQpgqYwOyZIg4yeumq7IFyMtmwFoUFt4NXiXBCo3DNhJZkMc01ZTBRaW
+         ek+bbOOoFMHEBQqk1J0jBtWot+LCXVC45zM6x5Dl0Kk8ybD9Cafa8DoJ6GiSDoMY3ro7
+         6A1iZr2yMlshPSuQUwe9k+ophGjpUKdwBA35Aey0t6Ccp+bFNAOoqgp2gLV3leZxIgP/
+         d1Gg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687417646; x=1690009646;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=17q09EU5IzKoL+3uRvcJRVxW9WzlvX1kABapaCMfUac=;
-        b=BP+/kXktGediHewjI4UHJW6wz8l8mAK+Dzh9eaSyQIFZjw8vEimGOTX6VFjWu5I3Xp
-         PeEe1oDOell2zjuXmfBmrW2TBpY/s65V6HzNWXr06zPFbsXlykl9x83Jk/o6nFXwSjPV
-         F2TVW9FMvA/2CFbRf7ZFLjsqNGBX1ykC0iSa+UhO/lgTPUp8bgg/Jw88xk0DWrITvz6q
-         sfIi/PeeoHMzWClL+/P30Psemrr/dTscVfkrWSNkGcSrGizTtO/H5if5PrmXze8xtvsE
-         n38YxRHW6udzoPy3wH3kpXMT2p8dxnEzHIOcBNfaksCdM3DJTtNhFDU2lLcsdiotmNUy
-         qN5g==
-X-Gm-Message-State: AC+VfDz8BMnhrzv7rx/p6UAmmibxxuv3h31cu+Z9V51FUIgyqYqnruf/
-	aNOL+cgqg1A1sbtFnsEId8/se9yc8qZgev/qBvtHWw==
-X-Google-Smtp-Source: ACHHUZ7kZNJcPPkpnbMNtbJXqOpZWeAzoHNc+qihd4tsRK7miMwwfvPuvxGMJdu+kyR+2dT9AG50FXasvP9ps+v0mWc=
-X-Received: by 2002:a67:f256:0:b0:43f:5036:677e with SMTP id
- y22-20020a67f256000000b0043f5036677emr7745188vsm.6.1687417646581; Thu, 22 Jun
- 2023 00:07:26 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687417796; x=1690009796;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mPyXOzxLtxEjY9cBPcsaRIns0EAEb4Nt/6W8EsU3ga8=;
+        b=KdG1Pj1coeq80NlKuVMDR8bpoyUnP3sW0/kDNIKrz9rE2F9rnAGQe5PhaADOnJ3P77
+         I8jzrZi2W6zGuMo19U7Z1Q1bVxHgUvVSJag/ZNI5O1PrbO3HQF+AgaD+tnFKxrg1oJC8
+         m87zcgnnoexulI+/nw/Vg3VkEgaO5NrogucdH3rVBFedQrB6j/XBdYJyGqSflQX6pfsI
+         9+JT6eLcOoyhDNDtCEYgEqprDmARkpo26ZGyNeffHpRA0Raz1x8PNYlOGRCler6ova88
+         LHUQjMHVJt6hzOS4frylEdEp9Wq1rQNwuYTOSGNZYexJ4m5tVC18H/vXRVlLl8szvtu8
+         n2jw==
+X-Gm-Message-State: AC+VfDzKAt98EoORVWaylVdk9RBqnF41zdiEpJl3MyrEhbtk2ze8sJqc
+	RB/vbzVr79+50RWmtiXcjBjoRA==
+X-Google-Smtp-Source: ACHHUZ7BfDfYg8tVKSO/1MGIhgM7knp4bxE9BjLvWPQmvpgYpkpg9XkXMIy4VKk2fcxV+HKp1ykuJA==
+X-Received: by 2002:a5d:468d:0:b0:30a:f2a0:64fa with SMTP id u13-20020a5d468d000000b0030af2a064famr15527240wrq.10.1687417796496;
+        Thu, 22 Jun 2023 00:09:56 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id f12-20020a5d58ec000000b00309382eb047sm6207885wrd.112.2023.06.22.00.09.55
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 00:09:55 -0700 (PDT)
+Date: Thu, 22 Jun 2023 09:09:54 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, "vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>,
+	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
+	"airlied@redhat.com" <airlied@redhat.com>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"idosch@nvidia.com" <idosch@nvidia.com>,
+	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
+	"phil@nwl.cc" <phil@nwl.cc>,
+	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v8 03/10] dpll: core: Add DPLL framework base
+ functions
+Message-ID: <ZJPzwj1odaC8fFzO@nanopsycho>
+References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
+ <20230609121853.3607724-4-arkadiusz.kubalewski@intel.com>
+ <20230612164515.6eacefb1@kernel.org>
+ <DM6PR11MB4657FED589F5922BBAC5D9059B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621182558.544417-1-brgl@bgdev.pl> <20230621131222.071b9fc3@kernel.org>
-In-Reply-To: <20230621131222.071b9fc3@kernel.org>
-From: Bartosz Golaszewski <brgl@bgdev.pl>
-Date: Thu, 22 Jun 2023 09:07:15 +0200
-Message-ID: <CAMRc=MddPhRq9aR3ebeEqWs6O_G50TZqBMtCtpDxo8KcRMoiww@mail.gmail.com>
-Subject: Re: [PATCH net-next 00/12] net: stmmac: replace boolean fields in
- plat_stmmacenet_data with flags
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
-	Jose Abreu <joabreu@synopsys.com>, "David S . Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>, Vinod Koul <vkoul@kernel.org>, 
-	Bhupesh Sharma <bhupesh.sharma@linaro.org>, Chen-Yu Tsai <wens@csie.org>, 
-	Jernej Skrabec <jernej.skrabec@gmail.com>, Samuel Holland <samuel@sholland.org>, 
-	Thierry Reding <thierry.reding@gmail.com>, Jonathan Hunter <jonathanh@nvidia.com>, 
-	Richard Cochran <richardcochran@gmail.com>, Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, netdev@vger.kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, 
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
-	linux-sunxi@lists.linux.dev, linux-tegra@vger.kernel.org, 
-	linux-mediatek@lists.infradead.org, 
-	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <DM6PR11MB4657FED589F5922BBAC5D9059B5DA@DM6PR11MB4657.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
@@ -90,24 +129,114 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 10:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+Wed, Jun 21, 2023 at 11:17:26PM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jakub Kicinski <kuba@kernel.org>
+>>Sent: Tuesday, June 13, 2023 1:45 AM
+>>
+>>On Fri,  9 Jun 2023 14:18:46 +0200 Arkadiusz Kubalewski wrote:
+>>> +	xa_for_each(xa_pins, i, ref) {
+>>> +		if (ref->pin != pin)
+>>> +			continue;
+>>> +		reg = dpll_pin_registration_find(ref, ops, priv);
+>>> +		if (reg) {
+>>> +			refcount_inc(&ref->refcount);
+>>> +			return 0;
+>>> +		}
+>>> +		ref_exists = true;
+>>> +		break;
+>>> +	}
+>>> +
+>>> +	if (!ref_exists) {
+>>> +		ref = kzalloc(sizeof(*ref), GFP_KERNEL);
+>>> +		if (!ref)
+>>> +			return -ENOMEM;
+>>> +		ref->pin = pin;
+>>> +		INIT_LIST_HEAD(&ref->registration_list);
+>>> +		ret = xa_insert(xa_pins, pin->pin_idx, ref, GFP_KERNEL);
+>>> +		if (ret) {
+>>> +			kfree(ref);
+>>> +			return ret;
+>>> +		}
+>>> +		refcount_set(&ref->refcount, 1);
+>>> +	}
+>>> +
+>>> +	reg = kzalloc(sizeof(*reg), GFP_KERNEL);
+>>
+>>Why do we have two structures - ref and reg?
+>>
 >
-> On Wed, 21 Jun 2023 20:25:46 +0200 Bartosz Golaszewski wrote:
-> > As suggested by Jose Abreu: let's drop all 12 boolean fields in
-> > plat_stmmacenet_data and replace them with a common bitfield.
->
-> Is that what Jose meant, or:
->
-> -       bool has_integrated_pcs;
-> +       u32 has_integrated_pcs:1;
->
-> ?
+>Thank to Jiri and reg struct we solved a pin/dpll association
+>with multiple device drivers..
 
-For that to work all fields would need to be gathered together (unless
-the structure is __packed - not a good idea) and all future fields
-would need to be added in a specific place in the structure definition
-as well. I think a bit field is clearer and harder to get wrong here.
+Multiple instances of the same driver.
 
-Bart
+
+>I.e. for pin:
+>
+>struct dpll_pin_registration {
+>	struct list_head list;
+>	const struct dpll_pin_ops *ops;
+>	void *priv;
+>};
+>
+>struct dpll_pin_ref {
+>	union {
+>		struct dpll_device *dpll;
+>		struct dpll_pin *pin;
+>	};
+>	struct list_head registration_list;
+>	refcount_t refcount;
+>};
+>
+>struct dpll_pin {
+>	u32 id;
+>	u32 pin_idx;
+>	u64 clock_id;
+>	struct module *module;
+>	struct xarray dpll_refs;
+>	struct xarray parent_refs;
+>	const struct dpll_pin_properties *prop;
+>	char *rclk_dev_name;
+>	refcount_t refcount;
+>};
+>
+>Basically, a pin or a device can be registered from multiple drivers,
+
+Again, multiple instances of the same driver.
+
+
+>where each driver has own priv and ops.
+
+Each instance/device.
+
+
+>A single dpll_pin has references to dplls or pins (dpll_refs/parent_refs)
+>it is connected with, and thanks to registration list single reference can
+>have multiple drivers being attached with a particular dpll/pin.
+
+Multiple instances/devices.
+
+
+In case of mlx5, the same dpll device and same dpll pin could be shared
+among two PFs but also among multiple VFs and SFs. They all share the
+same clock, same dpll device.
+
+
+>
+>The same scheme is for a dpll_device struct and associated pins.
+>
+>
+>>> +	if (!reg) {
+>>> +		if (!ref_exists)
+>>> +			kfree(ref);
+>>
+>>ref has already been inserted into xa_pins
+>>
+>
+>True, seems like a bug, will fix it.
+>
+>Thank you,
+>Arkadiusz
+>
+>>> +		return -ENOMEM;
 
