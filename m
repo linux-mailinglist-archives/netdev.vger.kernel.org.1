@@ -1,115 +1,139 @@
-Return-Path: <netdev+bounces-13123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80EDA73A5AB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:10:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6766573A5FD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:22:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3AFA22819DE
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:10:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 007F51C21163
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:22:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A51A4200A5;
-	Thu, 22 Jun 2023 16:10:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5308200A2;
+	Thu, 22 Jun 2023 16:22:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 064CF1F95C
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 16:10:04 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D8138C433C8;
-	Thu, 22 Jun 2023 16:10:03 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1687450204;
-	bh=xLyXvexgDPhNaQNSn+EFSDO6E/yJrPCxAprammFlvbQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=BnXgHjpi2MOfptfmTAtE/YPjGIuBTYzlKRUp7fENW/t9oQhN2Xrrt73Twhx75Hn7C
-	 gr4CxvjVQBjaREfgJZ5Nef/HZ4D3NIdLzoJf0HgA8jE1lsD3372UNRGhhtBy5ZqDvv
-	 A7jW+W2Xlc2fbpFJvEfeBL4UEM8NxIgJSRpd7iGc=
-Date: Thu, 22 Jun 2023 18:10:00 +0200
-From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 965918494
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 16:22:43 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 0F2141FE8;
+	Thu, 22 Jun 2023 09:22:42 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+	id 2637D21C20A2; Thu, 22 Jun 2023 09:22:41 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2637D21C20A2
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1687450961;
+	bh=bpRMX3RMcGhusT5aTzmC87ILJ8BKTaQbhSuw8yFpVNw=;
+	h=From:To:Cc:Subject:Date:From;
+	b=Gg655xF/W9QuTA6iSWGzMfa5Y88+NWxxT7CxBWMTLltOohhrLituO8sn8cLto9Dk6
+	 30D4NeQsfwrBTpt87SSf2MbgvhMp2ohNQKMf7pl/qFiz5KazqQ1UwR77ZMXVIxhYtz
+	 PHtjkgh1X3mUVQ9UYhvIlrIOuV40neEgq7+iMQhI=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	leit@meta.com, Arnd Bergmann <arnd@arndb.de>,
-	Steve French <stfrench@microsoft.com>,
-	Lu Baolu <baolu.lu@linux.intel.com>,
-	Jiri Slaby <jirislaby@kernel.org>,
-	Stephen Hemminger <stephen@networkplumber.org>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Simon Ser <contact@emersion.fr>,
-	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>,
-	"open list:IO_URING" <io-uring@vger.kernel.org>,
-	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
-Subject: Re: [PATCH] io_uring: Add io_uring command support for sockets
-Message-ID: <2023062208-animosity-squabble-c1ba@gregkh>
-References: <20230621232129.3776944-1-leitao@debian.org>
- <2023062231-tasting-stranger-8882@gregkh>
- <ZJRijTDv5lUsVo+j@gmail.com>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Long Li <longli@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [PATCH v2] net: mana: Batch ringing RX queue doorbell on receiving packets
+Date: Thu, 22 Jun 2023 09:22:36 -0700
+Message-Id: <1687450956-6407-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-11.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJRijTDv5lUsVo+j@gmail.com>
 
-On Thu, Jun 22, 2023 at 08:02:37AM -0700, Breno Leitao wrote:
-> On Thu, Jun 22, 2023 at 07:20:48AM +0200, Greg Kroah-Hartman wrote:
-> > On Wed, Jun 21, 2023 at 04:21:26PM -0700, Breno Leitao wrote:
-> > > Enable io_uring commands on network sockets. Create two new
-> > > SOCKET_URING_OP commands that will operate on sockets. Since these
-> > > commands are similar to ioctl, uses the _IO{R,W} helpers to embedded the
-> > > argument size and operation direction. Also allocates a unused ioctl
-> > > chunk for uring command usage.
-> > > 
-> > > In order to call ioctl on sockets, use the file_operations->uring_cmd
-> > > callbacks, and map it to a uring socket function, which handles the
-> > > SOCKET_URING_OP accordingly, and calls socket ioctls.
-> > > 
-> > > This patches was tested by creating a new test case in liburing.
-> > > Link: https://github.com/leitao/liburing/commit/3340908b742c6a26f662a0679c4ddf9df84ef431
-> > > 
-> > > Signed-off-by: Breno Leitao <leitao@debian.org>
-> > > ---
-> > 
-> > Isn't this a new version of an older patch?
-> 
-> Yes, this should have tagged as V2.
-> 
-> [1] https://lore.kernel.org/lkml/20230406144330.1932798-1-leitao@debian.org/#r
+From: Long Li <longli@microsoft.com>
 
-Great, also add what changed below the --- line please.
+It's inefficient to ring the doorbell page every time a WQE is posted to
+the received queue.
 
-> > > --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
-> > > +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
-> > > @@ -361,6 +361,7 @@ Code  Seq#    Include File                                           Comments
-> > >  0xCB  00-1F                                                          CBM serial IEC bus in development:
-> > >                                                                       <mailto:michael.klein@puffin.lb.shuttle.de>
-> > >  0xCC  00-0F  drivers/misc/ibmvmc.h                                   pseries VMC driver
-> > > +0xCC  A0-BF  uapi/linux/io_uring.h                                   io_uring cmd subsystem
-> > 
-> > This change is nice, but not totally related to this specific one,
-> > shouldn't it be separate?
-> 
-> This is related to this patch, since I am using it below, in the
-> following part:
-> 
-> 	+#define SOCKET_URING_OP_SIOCINQ _IOR(0xcc, 0xa0, int)
-> 	+#define SOCKET_URING_OP_SIOCOUTQ _IOR(0xcc, 0xa1, int)
-> 
-> Should I have a different patch, even if they are related?
+Move the code for ringing doorbell page to where after we have posted all
+WQEs to the receive queue during a callback from napi_poll().
 
-Yes, as you are not using the 0xa2-0xbf range that you just carved out
-here, right?  Where did those numbers come from?
+Tests showed no regression in network latency benchmarks.
 
-thanks,
+Cc: stable@vger.kernel.org
+Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+Change log:
+v2:
+Check for comp_read > 0 as it might be negative on completion error.
+Set rq.wqe_cnt to 0 according to BNIC spec.
 
-greg k-h
+ drivers/net/ethernet/microsoft/mana/gdma_main.c |  5 ++++-
+ drivers/net/ethernet/microsoft/mana/mana_en.c   | 10 ++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 8f3f78b68592..ef11d09a3655 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -300,8 +300,11 @@ static void mana_gd_ring_doorbell(struct gdma_context *gc, u32 db_index,
+ 
+ void mana_gd_wq_ring_doorbell(struct gdma_context *gc, struct gdma_queue *queue)
+ {
++	/* BNIC Spec specifies that client should set 0 for rq.wqe_cnt
++	 * This value is not used in sq
++	 */
+ 	mana_gd_ring_doorbell(gc, queue->gdma_dev->doorbell, queue->type,
+-			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 1);
++			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 0);
+ }
+ 
+ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index cd4d5ceb9f2d..1d8abe63fcb8 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1383,8 +1383,8 @@ static void mana_post_pkt_rxq(struct mana_rxq *rxq)
+ 
+ 	recv_buf_oob = &rxq->rx_oobs[curr_index];
+ 
+-	err = mana_gd_post_and_ring(rxq->gdma_rq, &recv_buf_oob->wqe_req,
+-				    &recv_buf_oob->wqe_inf);
++	err = mana_gd_post_work_request(rxq->gdma_rq, &recv_buf_oob->wqe_req,
++					&recv_buf_oob->wqe_inf);
+ 	if (WARN_ON_ONCE(err))
+ 		return;
+ 
+@@ -1654,6 +1654,12 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
+ 		mana_process_rx_cqe(rxq, cq, &comp[i]);
+ 	}
+ 
++	if (comp_read > 0) {
++		struct gdma_context *gc = rxq->gdma_rq->gdma_dev->gdma_context;
++
++		mana_gd_wq_ring_doorbell(gc, rxq->gdma_rq);
++	}
++
+ 	if (rxq->xdp_flush)
+ 		xdp_do_flush();
+ }
+-- 
+2.34.1
+
 
