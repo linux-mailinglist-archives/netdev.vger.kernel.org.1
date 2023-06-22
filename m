@@ -1,139 +1,104 @@
-Return-Path: <netdev+bounces-13090-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13088-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2146073A22D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:49:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 56E5F73A1F6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:38:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1F0C281996
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:49:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 861401C21130
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:37:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDEE1F175;
-	Thu, 22 Jun 2023 13:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D29F1ED52;
+	Thu, 22 Jun 2023 13:37:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F287A1D2D1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:49:01 +0000 (UTC)
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F651994
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:49:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687441740; x=1718977740;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=2U8ba/PFFG8NcXM4ie8ydtVJGrdtthQJRmmJQI+Koik=;
-  b=VhAS9XjcorueQPPqjXSMQOyYT/XziI6sAVpm3L7Rpc03Bz0AZBSYBjv0
-   VHYmRzFPpnOvcL+CtGuqbAc0TFjYsXMF8GLjxfwZo4L0CPFO7Gu4qWeq7
-   y8Y+dCRwuMoEQ9RC5+n8xz174b6ULgpjQIdbRrw9gSapfZio7aLkC+SFa
-   QV2+VnpqhIcqkM6mlCQbmm0woSAs9DySGvISsX/U7+Lt4k15HMzZARdaR
-   GYQN8uuKmllfDwEJzQ1EGz+GEASL6HFVQ7HXL+iyfuzMffFDwZUeUqsb1
-   fAfDrWKoEkGXB4oYX3z/3iBSmqdH6YsDrvejEpUSjQLJNL2OiLQgzxus1
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="390234096"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="390234096"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 06:49:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="804791814"
-X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="804791814"
-Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2023 06:48:59 -0700
-Received: from giewont.igk.intel.com (giewont.igk.intel.com [10.211.8.15])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6C3FC34947;
-	Thu, 22 Jun 2023 14:48:58 +0100 (IST)
-From: Marcin Szycik <marcin.szycik@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH iwl-next 2/2] ice: Rename enum ice_pkt_flags values
-Date: Thu, 22 Jun 2023 15:35:13 +0200
-Message-Id: <20230622133513.28551-3-marcin.szycik@linux.intel.com>
-X-Mailer: git-send-email 2.31.1
-In-Reply-To: <20230622133513.28551-1-marcin.szycik@linux.intel.com>
-References: <20230622133513.28551-1-marcin.szycik@linux.intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61DC71D2D1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:37:56 +0000 (UTC)
+Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73E5C1997
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:37:54 -0700 (PDT)
+Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-987341238aeso860083166b.3
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:37:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687441073; x=1690033073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fRg50miuqVjqdD4FkG2Hv1AXDgRWbP1CoJvjVBr+cDM=;
+        b=2FUUfDJpabB+LcdeeugWcASPhmrC4HKr4zPHmmUG9Vf2c39jQsvCddzRTWGZ/G6IQo
+         FHOk38NW9G4lFfODgeV8JhKlbWzxlCDha5XOTFK9GUe3v5kzGKQOj9BnHVpDJsnk34nm
+         C4ZNV3Ubq0qAudjnzw5KOshBuZPg+b3BY7aTLHvDLIjxpbFRLjZk2kg6cxjQ2V/QSPzT
+         /kSxGuFkiaGd19k+gLQ219a6NNZ78WP3BMpbwUH5g7iXZtAAl3CkVKGKmfvtn32bSUIX
+         U4EUWGWdtmcDaMpFeq7nQHJZ+SBAdxCMPekbiQxhslh8MjIqMrpq1LQXONjPPYHqKhJT
+         AGQA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687441073; x=1690033073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fRg50miuqVjqdD4FkG2Hv1AXDgRWbP1CoJvjVBr+cDM=;
+        b=kybukjzSwBr4AEFse6h2Eipb3xG9xJxfMPySLUFhlbsCI1S7ECs4NK6dgNGMYX+U+O
+         6uTm1Id/bdIeAhsDF4DbkcTqRuwf/QhIixzyuwG1wpRiA5T1hJqTz8ChZIcDHKzBlLxm
+         rx7FhGMnc2izJPvb3E3VeNJeBFqzIYKmbNc5seNCvhWYojZ9tdqA/gxD/Sx0N/e/pgC5
+         8eFwlwNpx5yUymakyB0GkXqKJd8GvIeSHHHbmUIgiLP3uJg69G/gahEQM/xGDSJzrRQ2
+         RG8YaHNMeiKglLV8qFWF37R7GorHnIeZy1haPEZiXnYIVRyLihcL6AtykAnbZOoQKD3/
+         OIJQ==
+X-Gm-Message-State: AC+VfDydB5RN7cxVgHDis2FzjCAVWzU3DE1WxGbgIJrzsdWYcmeRy7KO
+	xga3Djy2hVyTZpZyyDKjuo9pIQ==
+X-Google-Smtp-Source: ACHHUZ5KDB5bJM/SVgDEl6LcPqOSWN5RVVQyzWixdBKUCHQHXYkFtqN5jCFzh3LjkP9Aby8SWO1mAw==
+X-Received: by 2002:a17:907:86ac:b0:98c:ed39:3617 with SMTP id qa44-20020a17090786ac00b0098ced393617mr2822177ejc.46.1687441072790;
+        Thu, 22 Jun 2023 06:37:52 -0700 (PDT)
+Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
+        by smtp.gmail.com with ESMTPSA id cb14-20020a170906a44e00b0098d295d5908sm946156ejb.46.2023.06.22.06.37.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 06:37:52 -0700 (PDT)
+Date: Thu, 22 Jun 2023 15:37:50 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Piotr Gardocki <piotrx.gardocki@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	przemyslaw.kitszel@intel.com, michal.swiatkowski@linux.intel.com,
+	pmenzel@molgen.mpg.de, kuba@kernel.org,
+	maciej.fijalkowski@intel.com, anthony.l.nguyen@intel.com,
+	simon.horman@corigine.com, aleksander.lobakin@intel.com,
+	gal@nvidia.com
+Subject: Re: [PATCH net-next] net: fix net device address assign type
+Message-ID: <ZJROrq1c4eO7cLUB@nanopsycho>
+References: <20230621132106.991342-1-piotrx.gardocki@intel.com>
+ <ZJQE4ieud5Mf8iGi@nanopsycho>
+ <a5ab1ef6-1bc1-3e98-7f8b-5c5a3678ca8b@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <a5ab1ef6-1bc1-3e98-7f8b-5c5a3678ca8b@intel.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-enum ice_pkt_flags contains values such as ICE_PKT_FLAGS_VLAN and
-ICE_PKT_FLAGS_TUNNEL, but actually the flags words which they refer to
-contain a range of unrelated values - e.g. word 0 (ICE_PKT_FLAGS_VLAN)
-contains fields such as from_network and ucast, which have nothing to do
-with VLAN. Rename each enum value to ICE_PKT_FLAGS_MDID<number>, so it's
-clear in which flags word does some value reside.
+Thu, Jun 22, 2023 at 02:42:53PM CEST, piotrx.gardocki@intel.com wrote:
+>On 22.06.2023 10:22, Jiri Pirko wrote:
+>> Wed, Jun 21, 2023 at 03:21:06PM CEST, piotrx.gardocki@intel.com wrote:
+>>> Commit ad72c4a06acc introduced optimization to return from function
+>> 
+>> Out of curiosity, what impact does this optimization have? Is it worth
+>> it to have such optimization at all? Wouldn't simple revert of the fixes
+>> commit do the trick? If not, see below.
+>
+>Thanks for review. My main goal originally was to skip call to ndo_set_mac_address.
+>The benefit of this depends on how given driver handles such request. Some drivers
+>notify their hardware about the "change", iavf for example sends a request to PF
+>driver (and awaits for response). i40e and ice already had this check (I removed
+>them in previous patch set) and we wanted to also introduce it in iavf. But it
+>was suggested to move this check to core to have benefit for all drivers.
 
-Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_protocol_type.h | 8 ++++----
- drivers/net/ethernet/intel/ice/ice_switch.c        | 6 +++---
- 2 files changed, 7 insertions(+), 7 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_protocol_type.h b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-index 82491f6af6d0..755a9c55267c 100644
---- a/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-+++ b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-@@ -404,10 +404,10 @@ enum ice_hw_metadata_offset {
- };
- 
- enum ice_pkt_flags {
--	ICE_PKT_FLAGS_VLAN = 0,
--	ICE_PKT_FLAGS_TUNNEL = 1,
--	ICE_PKT_FLAGS_TCP = 2,
--	ICE_PKT_FLAGS_ERROR = 3,
-+	ICE_PKT_FLAGS_MDID20 = 0,
-+	ICE_PKT_FLAGS_MDID21 = 1,
-+	ICE_PKT_FLAGS_MDID22 = 2,
-+	ICE_PKT_FLAGS_MDID23 = 3,
- };
- 
- struct ice_hw_metadata {
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 28fb175f0fe4..f962d3350332 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.c
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -6143,21 +6143,21 @@ ice_adv_add_update_vsi_list(struct ice_hw *hw,
- void ice_rule_add_tunnel_metadata(struct ice_adv_lkup_elem *lkup)
- {
- 	lkup->type = ICE_HW_METADATA;
--	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_TUNNEL] |=
-+	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_MDID21] |=
- 		cpu_to_be16(ICE_PKT_TUNNEL_MASK);
- }
- 
- void ice_rule_add_direction_metadata(struct ice_adv_lkup_elem *lkup)
- {
- 	lkup->type = ICE_HW_METADATA;
--	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] |=
-+	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_MDID20] |=
- 		cpu_to_be16(ICE_PKT_FROM_NETWORK);
- }
- 
- void ice_rule_add_vlan_metadata(struct ice_adv_lkup_elem *lkup)
- {
- 	lkup->type = ICE_HW_METADATA;
--	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] |=
-+	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_MDID20] |=
- 		cpu_to_be16(ICE_PKT_VLAN_MASK);
- }
- 
--- 
-2.31.1
-
+Okay. Makes sense.
 
