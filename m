@@ -1,237 +1,179 @@
-Return-Path: <netdev+bounces-12890-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12891-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43C877395CA
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 05:23:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0DA9E7395E2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 05:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 64F351C21046
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 03:23:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A1E72817C0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 03:48:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CA38B1844;
-	Thu, 22 Jun 2023 03:23:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2274B1844;
+	Thu, 22 Jun 2023 03:48:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B15A2188;
-	Thu, 22 Jun 2023 03:23:35 +0000 (UTC)
-Received: from mail-pl1-x634.google.com (mail-pl1-x634.google.com [IPv6:2607:f8b0:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F03151A4;
-	Wed, 21 Jun 2023 20:23:33 -0700 (PDT)
-Received: by mail-pl1-x634.google.com with SMTP id d9443c01a7336-1b516978829so52244575ad.1;
-        Wed, 21 Jun 2023 20:23:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C71C17D0
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 03:48:25 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E38D1BD4;
+	Wed, 21 Jun 2023 20:48:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1687405704; x=1718941704;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-id:content-transfer-encoding:
+   mime-version;
+  bh=FymOEy3uBRhsxAj17eH+2MvBJTfdX5oLX79mZSGP8sU=;
+  b=zjSUBKBqAWSVRKVyf4HxGA2K2AYEYFmoQtNkt6adw6ektT2wNBOhsxa+
+   BkzMk4yMV9ZABJ3Oq3SwhP2KgHFtDL89xdsnVhEWba3GX1ScEEMrzvA6d
+   qbucBt3f3qFvSxrhBLGrN8E3zqvyrdRIORWravblGCmPFGEZV9GMh9xpb
+   NY+AXquO4T8K4BFe5TKTB7ZaplwksWN0N6pf5Px+lFpeHNs74Ip++7/J0
+   jaFutkXAxYrlfBDytReDf3jrzNwLGbTh5BZ+eAyKAjNGwsZ+y7orpGLpU
+   3f3/k25DOpi/4maax0ed5B+EsW/ctRbbPscPslIeMAqmmL/ZvgNB+VxWM
+   w==;
+X-IronPort-AV: E=Sophos;i="6.00,262,1681196400"; 
+   d="scan'208";a="219182980"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 21 Jun 2023 20:48:23 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Wed, 21 Jun 2023 20:48:15 -0700
+Received: from NAM02-DM3-obe.outbound.protection.outlook.com (10.10.215.89) by
+ email.microchip.com (10.10.87.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21 via Frontend Transport; Wed, 21 Jun 2023 20:48:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=MXNf1sIOdSXXVXvVIdNTmN0J22vYfM5kUZ6YO9oZkTQ6wSYXM6Mu4w3NOkyJSoM5ksxay3Ij0G9lbFUz5i5yNeMF5ubY1yR1iVInYBRLACIBD7lnybN4rl6dKP38wcySWYySq06ICPkSD2/znhTKUAXu5m0OIJZ+NHLDsktB2lk7Ae8L1M1jIFmHy1V2PrisTuKnLgjHG0BpLzslK3k1DN66T/ZvxnxdrK3+hRRBjyxrJrwA5fmxILgm7NcMNMOFbs16PR6Bf4wHGI3TW0xkd0gp05TIWUHtcx8B/kamxzzAhxAjMBUb7NUE1O+2QcPyzO2NdY5tx9wW3/nPcZrxsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=FymOEy3uBRhsxAj17eH+2MvBJTfdX5oLX79mZSGP8sU=;
+ b=C665qKzAx7KdXNbr10ZnNtJOOvYgk6RysixoXACw7FJPEn/9maweAQgRQwKMUN4y8C2Xu9oh6ND8jrY57q2WsWRLRn4mFaBudS0qJcW52OBVKkYhfvY1GOxYknH5PMnJF2lIO6h+i/89qbZ329Isgw/wl8n3dAerUH+Y6baPxpqGUD6/krFD1xQU86yL/3K3uQjcq+uQHqPcBH1AfBzznawHE5POI8Gls1EtOAE/1hI7KgP/CTsKKFUnClIHvCKS3ZpqwkgoXfn2RkV2BTkcrp5jFWFAIpfHU8qonsyEnUflp2YlwoO3AjqLW1maD/Jkp0Aa2r7ZhNJattSFPUeE/A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=microchip.com; dmarc=pass action=none
+ header.from=microchip.com; dkim=pass header.d=microchip.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687404213; x=1689996213;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=MYF9HAnCDgmsFnN2M7Gvz17JQGRKfkP7N+Wg3WPKfTk=;
-        b=Q9uPlXL31uhzzmpJnLFP1hSPhXQ7/9aBLlDdtU4kMbgZuJzLK14QcpBNZfhZmuwu2Y
-         DkQMVaE0H4l3eV5FwVTelkSxwDTL1bXnvA7Akv2shpo6l/MSsOapahGJYroD64SM6Djm
-         DMPVeDWUHqG2pbCR7rMajebMqIMAKXOWmS15Zp4kLv3yP2xZZkjLL6U709xUWjm72a+l
-         6klJKrLhvZhwz1I69v372EIOdp9js2TEoUdCOWUJN7XyHnAQTQWCRkNOdlOmgc/wB9Eq
-         0S+zrASNYNPMzq6ZdkG4cXKQ2VQfQaxG2QXdHIjE2Zkstox7pHEbrG1/rWuKzRY2gMh3
-         +Gng==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687404213; x=1689996213;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MYF9HAnCDgmsFnN2M7Gvz17JQGRKfkP7N+Wg3WPKfTk=;
-        b=ACx128ViPp3LjYe8Uj6MmqFRNy0QlOHiEdoHgNeEpHox1IaKadbUoT7bfSPQhEnUi/
-         AGs1ZfPYNR6V2N69wcSgCdRddqVvwCMWRGlezPoiDsYswOxoUIRVQgEXy2siYLAB6icB
-         9qrzibO/v2BN+PTqRgTiCONQ/yQfomw71Q9JXbw3e4Nx7G2KYC9iOBK2zxAFD6oA+yot
-         hiln6SMyeOD9biHkkTmXbQg9BcjBcNiS0QA6PfnUBSp/L9NXPRBTraKfezukbZ8LYCH6
-         kI8rSYaL76qSATJSIcL119oIv41gHC3Op8sYOwoRwryfhGst1fZ1/sFMwWbVkU+Mya9D
-         V/Aw==
-X-Gm-Message-State: AC+VfDxcMbmOlMlhEZT/fj/7qs3mljFf6rPsZ89vI6z7FDgKAHRj8C9i
-	27vEGQiP9gcYiEgyzAqG8rzq45E0zdc=
-X-Google-Smtp-Source: ACHHUZ6ubv5SAI46LgQYM3rq2aMd/eU77d+5fQTD56vFciI6SvGfMNj113LSEuRbuZhUNICUfNWZdg==
-X-Received: by 2002:a17:902:ce91:b0:1b6:68bb:6ad0 with SMTP id f17-20020a170902ce9100b001b668bb6ad0mr11035062plg.55.1687404213250;
-        Wed, 21 Jun 2023 20:23:33 -0700 (PDT)
-Received: from macbook-pro-8.dhcp.thefacebook.com ([2620:10d:c090:400::5:c6c4])
-        by smtp.gmail.com with ESMTPSA id jw9-20020a170903278900b001b3f809e7e4sm4220596plb.36.2023.06.21.20.23.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 20:23:32 -0700 (PDT)
-Date: Wed, 21 Jun 2023 20:23:30 -0700
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-To: Hou Tao <houtao@huaweicloud.com>
-Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
-	bpf@vger.kernel.org, kernel-team@fb.com, daniel@iogearbox.net,
-	andrii@kernel.org, void@manifault.com, paulmck@kernel.org
-Subject: Re: [PATCH bpf-next 11/12] bpf: Introduce bpf_mem_free_rcu() similar
- to kfree_rcu().
-Message-ID: <20230622032330.3allcf7legl6vhp5@macbook-pro-8.dhcp.thefacebook.com>
-References: <20230621023238.87079-1-alexei.starovoitov@gmail.com>
- <20230621023238.87079-12-alexei.starovoitov@gmail.com>
- <eee33106-21ef-9f0b-86e7-137deefc6f50@huaweicloud.com>
+ d=microchiptechnology.onmicrosoft.com;
+ s=selector2-microchiptechnology-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=FymOEy3uBRhsxAj17eH+2MvBJTfdX5oLX79mZSGP8sU=;
+ b=iX8YgmDDS4fnGqZAazbuNELRL52u2TAaF4yP7epPLwizsVTOwvyrZWEIb0IgUcdsjqrOOuqaL+r+EyZTVKEWfspNSj8VbiOhM3vErV8+3MV4bsFPY6GhJbHDWDeFkdzlDpwjxGtHoHXE2qWCjMa3Q9Vn2fD2NQatcxcyQnrGFbA=
+Received: from DM5PR11MB0076.namprd11.prod.outlook.com (2603:10b6:4:6b::28) by
+ CH3PR11MB7771.namprd11.prod.outlook.com (2603:10b6:610:125::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.23; Thu, 22 Jun 2023 03:48:13 +0000
+Received: from DM5PR11MB0076.namprd11.prod.outlook.com
+ ([fe80::3e10:f478:aa80:b431]) by DM5PR11MB0076.namprd11.prod.outlook.com
+ ([fe80::3e10:f478:aa80:b431%3]) with mapi id 15.20.6521.020; Thu, 22 Jun 2023
+ 03:48:13 +0000
+From: <Arun.Ramadoss@microchip.com>
+To: <olteanv@gmail.com>, <UNGLinuxDriver@microchip.com>, <andrew@lunn.ch>,
+	<linux@rasmusvillemoes.dk>, <f.fainelli@gmail.com>, <kuba@kernel.org>,
+	<edumazet@google.com>, <pabeni@redhat.com>, <Woojung.Huh@microchip.com>,
+	<davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH net-next 1/3] net: dsa: microchip: simplify ksz_prmw8()
+Thread-Topic: [PATCH net-next 1/3] net: dsa: microchip: simplify ksz_prmw8()
+Thread-Index: AQHZo2wmntuaMZaRIUqZoguRiYMibK+WMhoA
+Date: Thu, 22 Jun 2023 03:48:13 +0000
+Message-ID: <b8cc405d4f8a907040af68cd52387188aca80d34.camel@microchip.com>
+References: <20230620113855.733526-1-linux@rasmusvillemoes.dk>
+	 <20230620113855.733526-2-linux@rasmusvillemoes.dk>
+In-Reply-To: <20230620113855.733526-2-linux@rasmusvillemoes.dk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-mailer: Evolution 3.28.5-0ubuntu0.18.04.2 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=microchip.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM5PR11MB0076:EE_|CH3PR11MB7771:EE_
+x-ms-office365-filtering-correlation-id: b456d181-0576-4404-cdfb-08db72d38117
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2tl+qxXMFGBf8LIqpYMREVVn930dn/1MHa4Aq71MDdCx4BQNdY5Sf+zT82x1DsAVvjJp/aXCAc/YnMND0HHTwtGM8UVPLTk0OVhuI29J+eIoYLksIlzR8axRgPw36t07Jg6twbTrarJWxcJ5xXHAqpFY5HNvSc07HgqYyazNjgacrIoSLBQEbZcTKeI1tTVr/8zJ/pxhjIIxGgPmvDIp3ppI1/jKYj7iKSejFkopPnM8PEkbBpnyP5kyLuDpmNozIWvuIgAm6mwycpvnnFiuPXRmd1t1HpW5uqHtbx9jgA0IDBQZjvnZe1cK5GEfhuqkqohOIa+26eElYAJ4JqXfYm3EqV+UCsYu2nDuHwvlfMb2G/j5eGRMXXmydS5T3CdhmN+vYG/MalX7YoY994MMdKULPJ+5BOcLAnd/KMVBXsn3bWxMELIj5g82emfuFPnmNHTD3EaJtx6IxEKhg9PcGNdVJxAqxgij6VxDTaH51wtpCheIqq3vYX5I235YXeoZJ5dyp75wF+4GqWjiFNTxKgUAtvR7gNIh1UeKjOtLto+k7tNeBL6jusMp2Hz5BjvqsnDtrnsxnTLWUsFHiZTvLYVrvvz8t7VaY80M8MGsyXQAmvA/5u/hCCKwXHwYCFEQ+nzGsp4+WDaV/DJCCKVmjleCiQydScMS2K/FOfUWou8=
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM5PR11MB0076.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(396003)(39860400002)(366004)(346002)(451199021)(4326008)(66446008)(6486002)(38070700005)(66946007)(76116006)(64756008)(66556008)(478600001)(66476007)(36756003)(71200400001)(91956017)(316002)(54906003)(110136005)(86362001)(83380400001)(26005)(6512007)(6506007)(186003)(2616005)(38100700002)(966005)(921005)(5660300002)(122000001)(2906002)(41300700001)(4744005)(8676002)(8936002)(7416002)(99106002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?Y0M5d3lvQVJkWTV5anozWmVOdWVZZWVaYmhIRW5tZUpqa21UUXVmWkNla0V5?=
+ =?utf-8?B?eE9EZWR6QTFubHI1WUt5QkltZnFuM3lPUjFDSE16MG9CbXVVeVplVTFqa0J5?=
+ =?utf-8?B?WlUyWUxkcmpiaHVmemtBclgzbEFLOGY2K0JBTmF1Mmh3cXZJMUtvSFZBdmJN?=
+ =?utf-8?B?YmhTWmp6RHE5MW9WbVVseUNiL3FoZ21PNGJDakJpOFpzTVBpaU13ZzdmVnBV?=
+ =?utf-8?B?NHN6NitmOUFrd3g0T1hwSU5mUlpuT3R2MWlqamx5cUZ5NEZ2R004OTI1bncz?=
+ =?utf-8?B?VWxQQWh1TUoraUhsY3lDYzhaMzlmb3JzbnArVlBZeldGUGVhYzNwUVRoNEZz?=
+ =?utf-8?B?ZWNTWkx2MHB6dTBhMEVMbGhvbGdZS1NwQVczendodVlBeDU0OUVLS0YrMUVl?=
+ =?utf-8?B?aVdXc1pEZ1g3WGcxaGxnVnJFVzRrcTlxMVpRaUo5aURNeEIvWmhBKzZtU0dJ?=
+ =?utf-8?B?cCtJTndlVTZCWE1PWmpiYTczS29vVWx1OFExd3JMWXMzaWlrenhIN0ozYWxw?=
+ =?utf-8?B?OXh3azVIVXV0THdVdnpVRjNZcTF2MXFzM1lQYzdQOEpNNHpsaHdjWUJXU1Ey?=
+ =?utf-8?B?SDF1SC9YdmJUVXdQZzlJMG5TVEZjSllkbWltVHc3Q3pweGtmNHFRdFBFSVg1?=
+ =?utf-8?B?UGZOWThYMDFyQkdYZFZvUlpuRzM5QVl4L1ptRm9WRlc4ZVZxNkRnU0NncnQy?=
+ =?utf-8?B?VjR1QjZMeFlLcXpOUi9BQWVpY1lCTFVyRExOWFp3MllwM0FBZzNOekFoQjdl?=
+ =?utf-8?B?MmN2OTBoa2xvTFdOUW96TE9MMEo4V3RsL01JNVAvMkY4OWpHTVFHQkNXd1dm?=
+ =?utf-8?B?cXNLL051NWNYN0xnTEgvNkltWTVxUjBibkU4NFliUUs3aWw3ejhsK0pGV3pS?=
+ =?utf-8?B?WFZTMlhLWSthaHJMbXgzd0hSYWtOK3NXT05RWDlEQlhxNFRBeGJsUHJ3N1pS?=
+ =?utf-8?B?OC9xVUFRRlYraXg0cWwxY2J3dkdDYTN5aW9mVWlKK2p3L1RLM0E1VXQ4cW9u?=
+ =?utf-8?B?VlhSNnVPSjVlRWwydG9lT3ZWT09zc0FZVm9FeUJlV0U3cjQvdVVjU0tXdjAy?=
+ =?utf-8?B?MHE4WlIwOE5IR3gwRDFZQUFhQmVrL1BMd0hzUUZOMlRQVEZVbkhUZTRFWjZn?=
+ =?utf-8?B?di8vdjlBcVhpRGJMbmFPWDd0bzVpSVNkNWhpZlp5MXVHNXVVUUFNZXk3NUtE?=
+ =?utf-8?B?VlRYREFLSExtdmV6UXlmWVEzaERQMFpwd2NIemE4STJRRWc3Q3cyQ3VyWlBj?=
+ =?utf-8?B?WDNDbzQ0QUcyMURWWFdodDNJZk90N3pYVlBTckVXZmU4ZjVDaWN1QWwzcEJo?=
+ =?utf-8?B?ZDVGNk5OSjlUUW9lS3g4cUpBRjh0NXZYMDRNZHFTNWViRm5mNzdhRFNIczVJ?=
+ =?utf-8?B?a0lMcGV1UmJqNzREbzR6d1FnOUFvUU5LUUJDcGlSd0d0ZWRHZ085QWlSUk82?=
+ =?utf-8?B?TGUySnVMMnJ0OVdFekg5VEZONFdibnM4ZFoyd0tGNityNXZycVVlaVVwb0du?=
+ =?utf-8?B?RUZrbGNJenJCOUFSSGt2bGtRdThYYXFVOWFpVEYzM01ZRld2MTZ1ZjJKTEd5?=
+ =?utf-8?B?NXl0MnQ0ZSsvelFvT2dtR3lha09rZW03U3BBdE02MG5FU3lxbW5xcjE5ajRB?=
+ =?utf-8?B?NThFMnJuYzY2aGhoRWZZb0xId1ArZzlVdStEdEJESlZHd2NpdUN5K1crUGo5?=
+ =?utf-8?B?RTZlNFFVMGxyUU5EUFdMajlTdXNMT0xUM2d1aXpBcnlEdjVFUmkyZFIwMjQx?=
+ =?utf-8?B?V0YwTlpsRkRGaEpDNzBraW9ydElzL2d1eVdUZVJwSU1FL3hNZkRHbnExeC90?=
+ =?utf-8?B?aE9qRDFwUG54Wk1SaVdSTUV3Qm00UGF6S2Eva2hlcnYrN3daOUxUZEZvMDJu?=
+ =?utf-8?B?Rm5iaXppU2dXU0MvMHluNmc2Y2g2TWtybHR1emRsa0w3STM3dTJYMG4rTzMx?=
+ =?utf-8?B?ejBMTWRHT3N2bFlabU9ZU0Z2YmtURXdIL1lsRmlWZHFiY2MrMFhYOG84cVVU?=
+ =?utf-8?B?akdMNWp4dkRrdEVlQWZ0QTJOQy9EaTE2MjZRdWdjSEdhNjlmSllIVVplSFRV?=
+ =?utf-8?B?OUZ0aUFnVHEzRVNiRG1nWG80Z1lnRmdlNHlpek5tWlBtRjZCRVJQWDBIbzhw?=
+ =?utf-8?B?cVc4cWxMTzU2Rko3Y1hqQjhtWXcyVnJpS2FybnA2bjRQQVYvOVZOUGdkNm9O?=
+ =?utf-8?B?dUE9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <0270C7749EC91E4E97B7FF3533EF9FC9@namprd11.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <eee33106-21ef-9f0b-86e7-137deefc6f50@huaweicloud.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM5PR11MB0076.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b456d181-0576-4404-cdfb-08db72d38117
+X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2023 03:48:13.2383
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3f4057f3-b418-4d4e-ba84-d55b4e897d88
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ZverF/ce7+GHkGOKw6FX24Fpx74J5WWVsj6mszJNHFtMvmp2R0zQbdNsa/jst+nuq9ggPZv2sqpVesl+eOEVffn9GV8SD29410RNOZ29E+M=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR11MB7771
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 08:26:30PM +0800, Hou Tao wrote:
-> >  	 */
-> > -	rcu_barrier_tasks_trace();
-> > +	rcu_barrier(); /* wait for __free_by_rcu() */
-> > +	rcu_barrier_tasks_trace(); /* wait for __free_rcu() via call_rcu_tasks_trace */
-> Using rcu_barrier_tasks_trace and rcu_barrier() is not enough, the
-> objects in c->free_by_rcu_ttrace may be leaked as shown below. We may
-> need to add an extra variable to notify __free_by_rcu() to free these
-> elements directly instead of trying to move it into
-> waiting_for_gp_ttrace as I did before. Or we can just drain
-> free_by_rcu_ttrace twice.
-> 
-> destroy process       __free_by_rcu
-> 
-> llist_del_all(&c->free_by_rcu_ttrace)
-> 
->                         // add to free_by_rcu_ttrace again
->                         llist_add_batch(..., &tgt->free_by_rcu_ttrace)
->                             do_call_rcu_ttrace()
->                                 // call_rcu_ttrace_in_progress is 1, so
-> xchg return 1
->                                 // and it will not be moved to
-> waiting_for_gp_ttrace
->                                
-> atomic_xchg(&c->call_rcu_ttrace_in_progress, 1)
-> 
-> // got 1
-> atomic_read(&c->call_rcu_ttrace_in_progress)
-
-The formatting is off, but I think I got the idea.
-Yes. It's a race.
-
-> >  				rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
-> > +				rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
-> I got a oops in rcu_tasks_invoke_cbs() during stressing test and it
-> seems we should do atomic_read(&call_rcu_in_progress) first, then do
-> atomic_read(&call_rcu_ttrace_in_progress) to fix the problem. And to
-
-yes. it's a race. As you find out yourself changing the order won't fix it.
-
-> The introduction of c->tgt make the destroy procedure more complicated.
-> Even with the proposed fix above, there is still oops in
-> rcu_tasks_invoke_cbs() and I think it happens as follows:
-
-Right. That's another issue.
-
-Please send bench htab test and your special stress test,
-so we can have a common ground to reason about.
-Also please share your bench htab numbers before/after.
-
-I'm thinking to fix the races in the following way.
-Could you please test it with your stress test?
-The idea is to set 'draining' first everywhere that it will make all rcu
-callbacks a nop.
-Then drain all link lists. At this point nothing races with them.
-And then wait for single rcu_barrier_tasks_trace() that will make sure
-all callbcaks done. At this point the only thing they will do is
-if (c->draining) goto out;
-The barriers are needed to make 'c' access not uaf.
-
-...
-
-From e20782160166d4327c76b57af160c4973396e0d0 Mon Sep 17 00:00:00 2001
-From: Alexei Starovoitov <ast@kernel.org>
-Date: Wed, 21 Jun 2023 20:11:33 -0700
-Subject: [PATCH bpf-next] bpf: Fix races.
-
-Signed-off-by: Alexei Starovoitov <ast@kernel.org>
----
- kernel/bpf/memalloc.c | 25 +++++++++++++++++++++----
- 1 file changed, 21 insertions(+), 4 deletions(-)
-
-diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
-index 4d1002e7b4b5..75c553b15deb 100644
---- a/kernel/bpf/memalloc.c
-+++ b/kernel/bpf/memalloc.c
-@@ -99,6 +99,7 @@ struct bpf_mem_cache {
- 	int low_watermark, high_watermark, batch;
- 	int percpu_size;
- 	struct bpf_mem_cache *tgt;
-+	bool draining;
- 
- 	/* list of objects to be freed after RCU GP */
- 	struct llist_head free_by_rcu;
-@@ -264,7 +265,10 @@ static void __free_rcu(struct rcu_head *head)
- {
- 	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu_ttrace);
- 
-+	if (unlikely(c->draining))
-+		goto out;
- 	free_all(llist_del_all(&c->waiting_for_gp_ttrace), !!c->percpu_size);
-+out:
- 	atomic_set(&c->call_rcu_ttrace_in_progress, 0);
- }
- 
-@@ -353,8 +357,11 @@ static void __free_by_rcu(struct rcu_head *head)
- {
- 	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
- 	struct bpf_mem_cache *tgt = c->tgt;
--	struct llist_node *llnode = llist_del_all(&c->waiting_for_gp);
-+	struct llist_node *llnode;
- 
-+	if (unlikely(c->draining))
-+		goto out;
-+	llnode = llist_del_all(&c->waiting_for_gp);
- 	if (!llnode)
- 		goto out;
- 
-@@ -568,10 +575,9 @@ static void free_mem_alloc(struct bpf_mem_alloc *ma)
- 	 * rcu_trace_implies_rcu_gp(), it will be OK to skip rcu_barrier() by
- 	 * using rcu_trace_implies_rcu_gp() as well.
- 	 */
--	rcu_barrier(); /* wait for __free_by_rcu() */
--	rcu_barrier_tasks_trace(); /* wait for __free_rcu() via call_rcu_tasks_trace */
-+	rcu_barrier_tasks_trace();
- 	if (!rcu_trace_implies_rcu_gp())
--		rcu_barrier(); /* wait for __free_rcu() via call_rcu */
-+		rcu_barrier();
- 	free_mem_alloc_no_barrier(ma);
- }
- 
-@@ -616,6 +622,10 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
- 
- 	if (ma->cache) {
- 		rcu_in_progress = 0;
-+		for_each_possible_cpu(cpu) {
-+			c = per_cpu_ptr(ma->cache, cpu);
-+			c->draining = true;
-+		}
- 		for_each_possible_cpu(cpu) {
- 			c = per_cpu_ptr(ma->cache, cpu);
- 			/*
-@@ -639,6 +649,13 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
- 	}
- 	if (ma->caches) {
- 		rcu_in_progress = 0;
-+		for_each_possible_cpu(cpu) {
-+			cc = per_cpu_ptr(ma->caches, cpu);
-+			for (i = 0; i < NUM_CACHES; i++) {
-+				c = &cc->cache[i];
-+				c->draining = true;
-+			}
-+		}
- 		for_each_possible_cpu(cpu) {
- 			cc = per_cpu_ptr(ma->caches, cpu);
- 			for (i = 0; i < NUM_CACHES; i++) {
--- 
-2.34.1
-
+T24gVHVlLCAyMDIzLTA2LTIwIGF0IDEzOjM4ICswMjAwLCBSYXNtdXMgVmlsbGVtb2VzIHdyb3Rl
+Og0KPiBbU29tZSBwZW9wbGUgd2hvIHJlY2VpdmVkIHRoaXMgbWVzc2FnZSBkb24ndCBvZnRlbiBn
+ZXQgZW1haWwgZnJvbQ0KPiBsaW51eEByYXNtdXN2aWxsZW1vZXMuZGsuIExlYXJuIHdoeSB0aGlz
+IGlzIGltcG9ydGFudCBhdCANCj4gaHR0cHM6Ly9ha2EubXMvTGVhcm5BYm91dFNlbmRlcklkZW50
+aWZpY2F0aW9uIF0NCj4gDQo+IEVYVEVSTkFMIEVNQUlMOiBEbyBub3QgY2xpY2sgbGlua3Mgb3Ig
+b3BlbiBhdHRhY2htZW50cyB1bmxlc3MgeW91DQo+IGtub3cgdGhlIGNvbnRlbnQgaXMgc2FmZQ0K
+PiANCj4gSW1wbGVtZW50IGtzel9wcm13OCgpIGluIHRlcm1zIG9mIGtzel9ybXc4KCksIGp1c3Qg
+YXMgYWxsIHRoZSBvdGhlcg0KPiBrc3pfcFggYXJlIGltcGxlbWVudGVkIGluIHRlcm1zIG9mIGtz
+el9YLiBObyBmdW5jdGlvbmFsIGNoYW5nZS4NCj4gDQo+IFNpZ25lZC1vZmYtYnk6IFJhc211cyBW
+aWxsZW1vZXMgPGxpbnV4QHJhc211c3ZpbGxlbW9lcy5kaz4NCg0KQWNrZWQtYnk6IEFydW4gUmFt
+YWRvc3MgPGFydW4ucmFtYWRvc3NAbWljcm9jaGlwLmNvbT4NCg0KPiANCg==
 
