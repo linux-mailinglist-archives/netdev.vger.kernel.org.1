@@ -1,95 +1,162 @@
-Return-Path: <netdev+bounces-13198-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13199-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C506373A94A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 22:03:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60E4173A95C
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 22:13:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 025CF1C2117E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:03:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1E850281AD9
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:13:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D15AC21087;
-	Thu, 22 Jun 2023 20:03:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5306221093;
+	Thu, 22 Jun 2023 20:13:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C578220690
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 20:03:37 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (unknown [207.211.30.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDF3E1FED
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:03:34 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-497-YH5G9RGsOf6YXa3DPHP2Gw-1; Thu, 22 Jun 2023 16:03:16 -0400
-X-MC-Unique: YH5G9RGsOf6YXa3DPHP2Gw-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C0C25858EED;
-	Thu, 22 Jun 2023 20:02:44 +0000 (UTC)
-Received: from hog (unknown [10.39.195.41])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 3143E200A3AD;
-	Thu, 22 Jun 2023 20:02:44 +0000 (UTC)
-Date: Thu, 22 Jun 2023 22:02:42 +0200
-From: Sabrina Dubroca <sd@queasysnail.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, simon.horman@corigine.com
-Subject: Re: [PATCH net-next v2] netdevsim: add dummy macsec offload
-Message-ID: <ZJSo4lmt58B_66-3@hog>
-References: <d6841a34b9d69af9ad5a652d5cabe3927868d3c6.1686920069.git.sd@queasysnail.net>
- <20230621131834.345f4f60@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45DF320690
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 20:13:45 +0000 (UTC)
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D44BD1BD8
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:13:43 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-51b4ef5378bso6007306a12.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:13:43 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687464823; x=1690056823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=f4s7Xb1mFKjZORtZXFmNM1Jj59hKU38cNm71OLPfccM=;
+        b=CY0b2DGUimY4gE2KMnjbMx/01/6J/ljAQ0DyVTXFaG+QFQhtG6NkGdrXbdqL7d8zkQ
+         Ddf6577+arcSIwnLZNxaxWsBwaQbR5TUf1hSKg4GGvqkgBXXJKuv0sMMdX03Ldcw/RYW
+         34HOqKzuclT/6CR/HsRo0MvHcHNubWA27OV2rkPvovUmIFi1lTSpTwaDncLSL3Bbb/IY
+         MIfOwya73/N2XbaT7HuD6ai3zv017V9EzEb/c5gJBeax1Ni6zAnmMQwtl90NZmHIn9TR
+         o+kgKIG2wRilCy7w07x32t3D2CdoIHBrrIZ9an6PnN7fzWOQfXD1oOSKzI8WRqMtB8Qg
+         1wtg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687464823; x=1690056823;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=f4s7Xb1mFKjZORtZXFmNM1Jj59hKU38cNm71OLPfccM=;
+        b=MbCJqmpmb5x83pTi7pcXszhjByL5/l2VVJgjJ8E8BamCpfgRNaMBuDMMGjXcvD5wvj
+         y+rilAaF1lJKsCgkdnbppS8F7ENYfyIHvpxOrpe2/FnIxuKvvpGT1sAwlB5gL0HbI2VT
+         +NHLVl5vvonDeBhp/1Mwsjwfk2aE1RCEb9kl1BB5jVuNIEKsP1BxrnyZI76m2M8u7Gns
+         2Q4Y/8ZTNU0E3LFUnFIzfHU+BH3pjEzvMjCGs+nyhZzW4hm72lM0IHo9jmjdyLrcuMz6
+         5VR/l2YZ26yPye3IbWidCbRcfF9tE2T+7Z8C/yB+NXLUAZWdZlZZiYErsqUb6aOCstjm
+         j5LQ==
+X-Gm-Message-State: AC+VfDyn4A2u5Dhtc0FYynIfHED6xEBaPJD/H5gjybzr02I345BkWiP0
+	OcDzw/k6G9QFDtNKKuud7bll3Wmrb4HqZ+wKHm6YcA==
+X-Google-Smtp-Source: ACHHUZ7hd2SuUXpCuYfbdCmfpqSroTeZ6cF/XbD2idLp3R8X0T5yTZLAIstTU+aC8zfiyU27ahYbya7gBcVxQoF7msc=
+X-Received: by 2002:a05:6a20:5495:b0:122:5ed2:b521 with SMTP id
+ i21-20020a056a20549500b001225ed2b521mr11020337pzk.59.1687464823122; Thu, 22
+ Jun 2023 13:13:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230621131834.345f4f60@kernel.org>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: queasysnail.net
-Content-Type: text/plain; charset=UTF-8
-Content-Disposition: inline
+References: <20230621170244.1283336-1-sdf@google.com> <20230621170244.1283336-12-sdf@google.com>
+ <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+In-Reply-To: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Thu, 22 Jun 2023 13:13:31 -0700
+Message-ID: <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-0.5 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_VALIDITY_RPBL,RDNS_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-2023-06-21, 13:18:34 -0700, Jakub Kicinski wrote:
-> On Wed, 21 Jun 2023 15:14:46 +0200 Sabrina Dubroca wrote:
-> > When the kernel is compiled with MACsec support, add the
-> > NETIF_F_HW_MACSEC feature to netdevsim devices and implement
-> > macsec_ops.
-> >=20
-> > To allow easy testing of failure from the device, support is limited
-> > to 3 SecY's per netdevsim device, and 1 RXSC per SecY.
->=20
-> Quoting documentation:
->=20
->   netdevsim
->   ~~~~~~~~~
->  =20
->   [...]
->  =20
->   ``netdevsim`` is reserved for use by upstream tests only, so any
->   new ``netdevsim`` features must be accompanied by selftests under
->   ``tools/testing/selftests/``.
->  =20
-> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#=
-netdevsim
+On Thu, Jun 22, 2023 at 12:58=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Wed, Jun 21, 2023 at 10:02:44AM -0700, Stanislav Fomichev wrote:
+> > WIP, not tested, only to show the overall idea.
+> > Non-AF_XDP paths are marked with 'false' for now.
+> >
+> > Cc: netdev@vger.kernel.org
+> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
+> > ---
+> >  .../net/ethernet/mellanox/mlx5/core/en/txrx.h | 11 +++
+> >  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 96 ++++++++++++++++++-
+> >  .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  9 +-
+> >  .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  3 +
+> >  .../net/ethernet/mellanox/mlx5/core/en_tx.c   | 16 ++++
+> >  .../net/ethernet/mellanox/mlx5/core/main.c    | 26 ++++-
+> >  6 files changed, 156 insertions(+), 5 deletions(-)
+> >
+> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h b/driver=
+s/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> > index 879d698b6119..e4509464e0b1 100644
+> > --- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
+> > @@ -6,6 +6,7 @@
+> >
+> >  #include "en.h"
+> >  #include <linux/indirect_call_wrapper.h>
+> > +#include <net/devtx.h>
+> >
+> >  #define MLX5E_TX_WQE_EMPTY_DS_COUNT (sizeof(struct mlx5e_tx_wqe) / MLX=
+5_SEND_WQE_DS)
+> >
+> > @@ -506,4 +507,14 @@ static inline struct mlx5e_mpw_info *mlx5e_get_mpw=
+_info(struct mlx5e_rq *rq, int
+> >
+> >       return (struct mlx5e_mpw_info *)((char *)rq->mpwqe.info + array_s=
+ize(i, isz));
+> >  }
+> > +
+> > +struct mlx5e_devtx_frame {
+> > +     struct devtx_frame frame;
+> > +     struct mlx5_cqe64 *cqe; /* tx completion */
+>
+> cqe is only valid at completion.
+>
+> > +     struct mlx5e_tx_wqe *wqe; /* tx */
+>
+> wqe is only valid at submission.
+>
+> imo that's a very clear sign that this is not a generic datastructure.
+> The code is trying hard to make 'frame' part of it look common,
+> but it won't help bpf prog to be 'generic'.
+> It is still going to precisely coded for completion vs submission.
+> Similarly a bpf prog for completion in veth will be different than bpf pr=
+og for completion in mlx5.
+> As I stated earlier this 'generalization' and 'common' datastructure only=
+ adds code complexity.
 
-Ugh, sorry. I'll repost as a series with a selftest.
+The reason I went with this abstract context is to allow the programs
+to be attached to the different devices.
+For example, the xdp_hw_metadata we currently have is not really tied
+down to the particular implementation.
+If every hook declaration looks different, it seems impossible to
+create portable programs.
 
-> --=20
-> pw-bot: cr
+The frame part is not really needed, we can probably rename it to ctx
+and pass data/frags over the arguments?
 
---=20
-Sabrina
+struct devtx_ctx {
+  struct net_device *netdev;
+  /* the devices will be able to create wrappers to stash descriptor pointe=
+rs */
+};
+void veth_devtx_submit(struct devtx_ctx *ctx, void *data, u16 len, u8
+meta_len, struct skb_shared_info *sinfo);
 
+But striving to have a similar hook declaration seems useful to
+program portability sake?
 
