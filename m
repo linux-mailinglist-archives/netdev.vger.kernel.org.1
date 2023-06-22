@@ -1,134 +1,144 @@
-Return-Path: <netdev+bounces-12928-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12929-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52002739776
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 08:29:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 416DD739781
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 08:37:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF2E12816B4
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 06:29:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 75F961C20EBE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 06:37:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 166C05239;
-	Thu, 22 Jun 2023 06:29:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2582E23CF;
+	Thu, 22 Jun 2023 06:37:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 088671C05
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:29:38 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E2CD199E
-	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 23:29:35 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b474dac685so66154641fa.3
-        for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 23:29:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 144001FB4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:37:26 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2111.outbound.protection.outlook.com [40.107.244.111])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAF031BCA
+	for <netdev@vger.kernel.org>; Wed, 21 Jun 2023 23:37:21 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=jveP72q5/A3M/istdQT7utEo9XAmxw0AERfMwcPUIds6LWIo6o6BTxU0M1krCvxLGKBthQYO4Ilr2OOUw23pMOmf4Dx99ldtg4S85N+HdPszgMXI8e0GJjnugznBt6LQ32UsLJiRDakoHkWMzvUjYjaomiyOvITKwChWLY7D8iMj9p2Ubof6TS5SFDQDj2dJbfl2xCB+eZcNoKCex1zLrp6tPt6LQRwYmcHZVs4O3VppO/eGlrFI9NTP+9Xd3gWk1Wwj30GumfXg+Xjnon0aEBYn5J5B8C6tkL4uS4zTo+pjure7DDg11QGoT2EcbENxgKEt4NTI/gcuakGimvoNEA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=73EQ7jM7t/pazJJ+HdworyKc38eum6VZhL0KSrHWiF0=;
+ b=SE+q+6+qKfB6b5UG8qpVASTMTcvjjUY6AfkxdHDBKcJPusU2Xn0XYE4r+LrfWkMn6T7r457irjGkr5CVLVjsxKBIkbyJl4uClfifrPnjSJtDT7B1ahYc9Kp25WoJU0MgIBZLMdfNQ4WtDww0hHO2lM4GvFQu3Ow61W58ZJ+O0MRdSOXsbn240UWgX5VMvx0fyAxUNijvZGpI6Olm5YMUgZ3w02dSKUh4nTmF4X3zutO9OtE1tK/9XS1/d/Sak//YcTmdOXxC8rpEoE8V4bLeQBWN/SnvhCvEezuo2pR/Fh8P99sBtUbpHJebKjn5HTqjl02LVChV91+N5dljGJEGKQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687415374; x=1690007374;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=e2gbJaM97+TGyDFUFCPcPpHHFTQUtUYwV1I+Dgy+Y/E=;
-        b=0bYKXoF9X/e4i7t1QztHMs7tKvxb0WcBEf1KXU1//3Qe4c9hjiPP3t0HVzxOtdpCvw
-         FfOesQGGjBVWV8k9Hjn4Tnkce6k2Ummj3gP5LiPlC7pK9Zew7ButqhLo6SKNAPa94xhX
-         WykZylJcW2ozA1fgFeScz3Hp6BfP22ci3iRKf33wH8txBKnxyReMyFAFT02se5Z1oiCo
-         IfZg2AN23YEIlZnILrS398evuJK0lgrD+RSLDVM0J75e+zONav5Qiglm/wEXHbZm6cyO
-         MX3JrU1uOT3fBGAa0VQneiSJCUs6ZUK2ImhYDYBHCw66R+UAMazDW8B4VZlp/7w0muXW
-         s/0A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687415374; x=1690007374;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=e2gbJaM97+TGyDFUFCPcPpHHFTQUtUYwV1I+Dgy+Y/E=;
-        b=H4n+w45d6Vm1xqLCa2+pxL9J3HWlnrZ4cxQZhp4ngWUxXfReMTQ6uxP3u+R79gKbZY
-         sgTkmKRnyF5LAshV0hVqjAdbyIVz/CkWbKfdy10Oxhrj4Go135M9c/KlvooTTAqoLfbP
-         lnCMyMy7cASqWQ5avIzYke7MD0mvTig1W5EecjkDJBvrLzOsMg3P58LrGmIODfoliZNL
-         haasGTPP8vcNBCaqutXgKR80cbcpO9LVm25y1jFEGitx3WhkZed1txGbwsx0NKHmI3rE
-         iPAiS7EI8gybUJgI5BSzPs9LcGFVdszbISDcWp/sSbeKDqbauAGiTh8TYfwR6ZBoCI2C
-         QUSQ==
-X-Gm-Message-State: AC+VfDzJ+7FW7ianX84mw3/uOayzFyGSkEtPHohTZhV3Kq7lA6T8y1NY
-	mqNbqTH+MUHsvr0jsi3i8VqWNFhAyYL6BHhWoSD6nA==
-X-Google-Smtp-Source: ACHHUZ5+0dBtLdu7/18vqP/HL8mrnEWsoHw4A3UeXPjTRbS/F+2eOqbh3lXijKKcHTIYQoXv/Miccw==
-X-Received: by 2002:a2e:8017:0:b0:2b4:5cbf:cb9d with SMTP id j23-20020a2e8017000000b002b45cbfcb9dmr11064342ljg.20.1687415373677;
-        Wed, 21 Jun 2023 23:29:33 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id y7-20020a1c4b07000000b003f17848673fsm6773961wma.27.2023.06.21.23.29.32
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 21 Jun 2023 23:29:32 -0700 (PDT)
-Date: Thu, 22 Jun 2023 08:29:31 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Ido Schimmel <idosch@nvidia.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com
-Subject: Re: [RFC PATCH net-next 1/2] devlink: Hold a reference on parent
- device
-Message-ID: <ZJPqS0Di6Cg9JT3D@nanopsycho>
-References: <20230619125015.1541143-1-idosch@nvidia.com>
- <20230619125015.1541143-2-idosch@nvidia.com>
- <ZJLjlGo+jww6QIAg@nanopsycho>
- <ZJMYsyw06+jWVR5i@shredder>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=73EQ7jM7t/pazJJ+HdworyKc38eum6VZhL0KSrHWiF0=;
+ b=a2OJyPdDTXV+WEuIKkilRwGKKgpezg4W206ZQMO65kD89rXe8/kzLykTNTSuuyQGKu0LTB3nFtHIf81OFel5dBlRXuefReZKCOuiKOM5IrI88GaVH51pfT2TEuLL5wx2aDX5sQO7tf7BQvaaczYxaCrWI3SVncLa/wzT3DuFJZY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH2PR13MB3672.namprd13.prod.outlook.com (2603:10b6:610:9f::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
+ 2023 06:37:18 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 22 Jun 2023
+ 06:37:17 +0000
+Date: Thu, 22 Jun 2023 08:37:10 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Piotr Gardocki <piotrx.gardocki@intel.com>
+Cc: netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+	przemyslaw.kitszel@intel.com, michal.swiatkowski@linux.intel.com,
+	pmenzel@molgen.mpg.de, kuba@kernel.org,
+	maciej.fijalkowski@intel.com, anthony.l.nguyen@intel.com,
+	aleksander.lobakin@intel.com, gal@nvidia.com
+Subject: Re: [PATCH net-next] net: fix net device address assign type
+Message-ID: <ZJPsFjXtuam5J6Rs@corigine.com>
+References: <20230621132106.991342-1-piotrx.gardocki@intel.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621132106.991342-1-piotrx.gardocki@intel.com>
+X-ClientProxiedBy: AS4P189CA0033.EURP189.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5dd::6) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJMYsyw06+jWVR5i@shredder>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB3672:EE_
+X-MS-Office365-Filtering-Correlation-Id: 1ae46d03-d420-40a0-90df-08db72eb1f9f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Y6/oPjh7X0MpFRPtG2f+UtKBAaA9oIWyxZt3TzHpOoslcURwWwmtPGVCALGKdKNPWHQ/eNRy1P8UkjmIsD/KMAH6gACFsIFge18m2F+SUG06tZ5vEAmAEEkGCg01FhV6hDyAbijrV9wvD0sggGTTsTZMRQzIGbO1c1vXr2aYGDfVJVPdu1PYhdFrQStXFn/WPCEWsjnBuQRxIVYmioJeivd4rLXI49GzURigfu7KznbyNEeqIZaSw8Q68AtAeGrzl8a6OCMtz2HZ0yAtrPdnOb+9Nc5kb/V2FAtV+wGtte+TpRUEHcoOFatQ975981qypZdrDRBk7AUpmowI3rRVFUQl/liGkCPja+RDpEuyE8KPd0LhYfbZ1AHT0g3vZB2vLk8KZnSLRgr92UTNSSN6i0IJF2RENla1bWpQyamTjIpRr2ZZ5cwvEzXYSogLEKKqSIiOxnYvseC0T8HMmWjcwVMXR3Ake3NbEQN3C/Pp4nL8ih3bq1uqjvkazdhejZn0xWSnHyGU0g12hEYG54SRfK8QkrYMuavGk2GxJZ7STT476gRM4kxdEkt22B1BLKkmApCYaBYEAi8kw/pvoNHVbgDKy9PmdjyNi9HkayaLaBw=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(39830400003)(346002)(366004)(451199021)(66946007)(66556008)(66476007)(6916009)(4326008)(2616005)(186003)(38100700002)(6506007)(6512007)(83380400001)(86362001)(36756003)(478600001)(6486002)(6666004)(7416002)(8676002)(8936002)(41300700001)(5660300002)(2906002)(4744005)(44832011)(316002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?yQRGYLDopyUsNOEFtJ4u5QgorZX2V3STbM4lWFp0UhjkGDyBdinC4ixu48qf?=
+ =?us-ascii?Q?2NYp+EBFRLR69YzDYvk+6VTSNlgBr+KzNgY9kRIWcP+1T9oHJm9jQSRiUGQy?=
+ =?us-ascii?Q?oVEBU53Y9xJiUFAeQg0vbLraq/T0K+3dk3WacBC4nbCAmASMwcxEnU1zINQH?=
+ =?us-ascii?Q?anrjYdFZmxlBfZA4fgIqNmfBrv6JcKhx81m+fFngDeJI5yYoJ+/POYzDHegx?=
+ =?us-ascii?Q?Fxn9ybFnr9aa6UdMsnhRzkqMMyPGpQPuJneopZB098xWErOjZB1S9B3I6f9h?=
+ =?us-ascii?Q?MVLepKISMuUZaRe5cwNz5711ktElg9oQgfmVB3OMIWdadESdX2fT3TQL/uov?=
+ =?us-ascii?Q?XkSed/jJdZkUvyRAECFESc9eHTcvOmQkE2Rnvmo2pLRSk+lXJdDXsK3XrMtz?=
+ =?us-ascii?Q?BipmKH0lLHdNeprIQJa9Deakz5DWQd9Ii984w7BNyMasLP5bdAzu2fnnZSvS?=
+ =?us-ascii?Q?zGinNl5uh3/n3v9poRdtiKggfTFFR10THIBO7IyIRermnu1cOqPfX/HSdf3J?=
+ =?us-ascii?Q?cZ0mtGz9Zbj7DroQ9Uh5ZQBBPYfL9K2Ei/idZSMzdv/11ZiJwtt9jNvBrBcR?=
+ =?us-ascii?Q?xitDZsT8fKnDdWD9immtQXdkL+092CIMEWk8ZfVdaldnR32OULZMBcRw7D9v?=
+ =?us-ascii?Q?EMBISWdMl9ZHuER4BBDduuo+wGAv8EbU6mVdxNy5MRrw4CSyOgWRJEYvNnNX?=
+ =?us-ascii?Q?R8fnndydgOqdoGSKm0BRv/tfVPjLpA+uDcd5aC7LoIB9zJqcvJviX75+kBpn?=
+ =?us-ascii?Q?4hu5TB3gmd5Csaq0taPsaAI7tO7qxtd4qFRhWrt1T3LuvLVO4vkIme1HzLm8?=
+ =?us-ascii?Q?QBBcyr87O4ZVznF8RRy9JyK8ytwVuTTlw4asSw3k08tYlRol8HLGHBxi7Awy?=
+ =?us-ascii?Q?3S9Vg4E//Ok0yc3nLUTLi7Tx3+ljGcfiZRTth7CNyvJmuah4ZDnKhMUnnIRx?=
+ =?us-ascii?Q?TvTPRKEgcmlwpZDCVxEUcopjI3knP1N5ghjGEVJ3nZJShfyYfWtZy/wtIyWG?=
+ =?us-ascii?Q?5OkwX2j2fntfXU0+wWQvJAOdPLLN5F/qYBJEDRzDM5jOTyaTpp4gWJRU+Lub?=
+ =?us-ascii?Q?WW9VF+EAhS466Drme1l/M2LDY7jAPAMITeZT5d4HGyZkae87zFp50oho3wmM?=
+ =?us-ascii?Q?vf1sIR6TB2HJQRHZ/m1s0nr7QdFFRgXDSpMXBRyQS1s/rzIESW6GtDIC4HWF?=
+ =?us-ascii?Q?uFlFutxQzWLPuszOrS/L4WkBdvrqBv6ai5Im//IZdQZOnAbgS5x4jkp+ifU7?=
+ =?us-ascii?Q?PB4gI3Oxfb8My9ZNC/65DDt7IGm6D8CuEZ3qfSMapWyO7Rh1uszdwoOQ1zej?=
+ =?us-ascii?Q?wr5kzk5TRhTDxJ/OtJ89yHzZ4HJtmG/mI9hLnpKYhbtPED4FOyHhVJw5vzTv?=
+ =?us-ascii?Q?ldB3zA+KJOg3dbYl3We5nwV/ftOpOHv7rKCUYElXpccQa29xOOYJgCrcq5Z7?=
+ =?us-ascii?Q?rlytJGp5clRpGi1LYGlf/pKvIfGunjxThJzN2N2S8y+gNMnDxb37H40iwoKt?=
+ =?us-ascii?Q?Q+93ltLBmlhHiwUKuFyPKXGK3yqxAw8oi8FHVR3IXWZDlvEouz5R0G9hakBP?=
+ =?us-ascii?Q?gPqinn+L0MtW31reP0BRb1C7rpqBMl6u00xywyLZtiS+74TTj3RM9j4S3WSG?=
+ =?us-ascii?Q?7i93Y0asg3BsogJpaFYalGlrvSRxFOsCW7c0qFOIXRu36vwsuwuVXHS1i+Kt?=
+ =?us-ascii?Q?l4zQTQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 1ae46d03-d420-40a0-90df-08db72eb1f9f
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 06:37:17.8929
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 7Tt+jme7bNf4Ve7pk4RT3xhU5RLKm1P7qwY1Tp9SxtiEleyZdIhQyteWM6jgRRxz2TnuXvkj2Y4hYFWo79gi16a03i/npX5WT6kAnnXG6kA=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3672
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Wed, Jun 21, 2023 at 05:35:15PM CEST, idosch@nvidia.com wrote:
->On Wed, Jun 21, 2023 at 01:48:36PM +0200, Jiri Pirko wrote:
->> Mon, Jun 19, 2023 at 02:50:14PM CEST, idosch@nvidia.com wrote:
->> >@@ -91,6 +92,7 @@ static void devlink_release(struct work_struct *work)
->> > 
->> > 	mutex_destroy(&devlink->lock);
->> > 	lockdep_unregister_key(&devlink->lock_key);
->> >+	put_device(devlink->dev);
->> 
->> In this case I think you have to make sure this is called before
->> devlink_free() ends. After the caller of devlink_free() returns (most
->> probably .remove callback), nothing stops module from being removed.
->> 
->> I don't see other way. Utilize complete() here and wait_for_completion()
->> at the end of devlink_free().
->
->I might be missing something, but how can I do something like
->wait_for_completion(&devlink->comp) at the end of devlink_free()? After
->I call devlink_put() the devlink instance can be freed and the
->wait_for_completion() call will result in a UAF.
+On Wed, Jun 21, 2023 at 03:21:06PM +0200, Piotr Gardocki wrote:
+> Commit ad72c4a06acc introduced optimization to return from function
+> quickly if the MAC address is not changing at all. It was reported
+> that such change causes dev->addr_assign_type to not change
+> to NET_ADDR_SET from _PERM or _RANDOM.
+> Restore the old behavior and skip only call to ndo_set_mac_address.
+> 
+> Fixes: ad72c4a06acc ("net: add check for current MAC address in dev_set_mac_address")
+> Reported-by: Gal Pressman <gal@nvidia.com>
+> Signed-off-by: Piotr Gardocki <piotrx.gardocki@intel.com>
 
-You have to move the free() to devlink_free()
-Basically, all the things done in devlink_put that are symmetrical to
-the initialization done in devlink_alloc() should be moved there.
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-
->
->> 
->> If the completion in devlink_put() area rings a bell for you, let me save
->> you the trouble looking it up:
->> 9053637e0da7 ("devlink: remove the registration guarantee of references")
->> This commit removed that. But it is a different usage.
->> 
->> 
->> 
->> > 	kfree(devlink);
->> > }
->> > 
->> >@@ -204,6 +206,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
->> > 	if (ret < 0)
->> > 		goto err_xa_alloc;
->> > 
->> >+	get_device(dev);
->> > 	devlink->dev = dev;
->> > 	devlink->ops = ops;
->> > 	xa_init_flags(&devlink->ports, XA_FLAGS_ALLOC);
->> >-- 
->> >2.40.1
->> >
 
