@@ -1,181 +1,219 @@
-Return-Path: <netdev+bounces-12943-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12944-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ADCC73986C
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:51:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id EF68573988A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 09:53:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7BD932817F8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:51:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 354AB1C20FE6
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 07:53:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 96A838830;
-	Thu, 22 Jun 2023 07:51:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11683A933;
+	Thu, 22 Jun 2023 07:53:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 882681FB4
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:51:46 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD9601A1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:51:42 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3094910b150so6994021f8f.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 00:51:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 03C0763A4
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:53:47 +0000 (UTC)
+Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2093.outbound.protection.outlook.com [40.107.223.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A33581BF5;
+	Thu, 22 Jun 2023 00:53:37 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LCgm1A2SqpZaDEWGOFifYmbzQ8pki1vKnrCXXcXP57oGf/+nP7KjkBx1Gj+QEvgWORyz4o9UBBxy5gFxQ/kevnpYS1hK5yqC9a1uSM6wZfQjbxApyRxF1nY3baVRMkaE++7ZNOJpM45y259KVIYt4f1i7VDpIe9LCQd013NqStWCrBy2Xg0DRLBY7sYAboO2xC5o1vgfplbhN0OALQAgT66A16w0iISdwWfddpCDXbacNqn9wc43fuWemReQbuLWQy5edd7So/UEaXIyEwNqD8mnQ3KTByWYozNsYiZpKiIXRhUuOa6LO9+yTn4bAoF2Tzu07Og0tebHOy7NUwxIUQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PL/DBYEYAc2al9q683ws/N5Mfdn1mq2wCKAUpM7uRG4=;
+ b=En4sSutNXNbuy2NA8L/XXIj05R/yY9NTLnEPOt1wJJhzz+XN/tlcd1xbFAwcCAgpAuT0Y7lJ1szaTt6r/aruTgDOA/Kt3KSliDPnpRKUD2HATCG8nr8XBRs9NNhtZbHdUskGGWyiJKfpsfQUkb9Ho75IHpHa88NWjCFbVTBzDDRm53pVcBHCFW9Av3x8jS8KA3TfKpNIWIkJ1DVvS7mfW9vJhJP+DhE8TPos4U4pBIisNNxpWlzYU7x02V03nNEB8wCDgXolF6m2laxwDlO+asRa4tbA8ocrDrzmGPstKw2RF4fhQKm0vdAfDb9LoVYu/KLe3Pe66a+1W09MOuIbww==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687420301; x=1690012301;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=LeKOG3SmthWv0DbuStt/suDJPACQGhMHBNxKdIDAJr0=;
-        b=F/B0S0cVmfFVgc+PS/ic2JPtiHtm74v61KY4nNAKpZfbuPTZP7BhP2/4Bi6pfPxqIL
-         VW4jw+mp9Tv761uy2WPNZXG6aviAAqSpsU7s7656aXwhLnAap+D9Wes9O8ll3mrMu57L
-         waQ+UiaXFIRgq1R0lBajep4fAr4rZ7Iv1tvZYnWGztMgohySrxdYAEe388MQt+Hw90pj
-         V9uSr9hVqZmNI7yPGS93T3uAud+5kB2SsXJqnIxt4Sa1GUroVornUW5tRXZD8dK5Rmlh
-         YN4m/zlK/lgkvS4RJ9SqjM5RbtB/W3Ln5Ic6srBpw6PGflw5hxJhTLCkUXoDwd4JRzM6
-         kmsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687420301; x=1690012301;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=LeKOG3SmthWv0DbuStt/suDJPACQGhMHBNxKdIDAJr0=;
-        b=kQrkQMuLl4t0vFw6CF8FO/oS+vZP3n0BHiiEf5KVC+UHLZKAZHMy/7jZG2wAPe7tHo
-         mbTt91mM5f6pwxp01DVoGr3A5IuC00mEj1FlU6tGyX/bE6Tv2h0NGOfybMjN0oKgzFJb
-         o4mf1vaBJQ6wbuR4wEnjuW820YR4iRYuahoLXPomxqzSNo1XwMunFesUxG0OwdlthGv7
-         KYb7nxfOrnbm0iGxNIsLyiwslGMm1tmC2v8ThljMoFSnCvX4GQF9jUAf21sjnnuokSQO
-         bcRJhVfkZ08BXxQhlLtlanwXpr9Qc11/vaHIXTWpotNExLWkB6VYKMczq2CTry5dN+A2
-         my+g==
-X-Gm-Message-State: AC+VfDxOduCgMmEth5cc+bEFy3T8z8XWg362NvrUbhAYHyYK0Plm8rXI
-	dZ5DG1G40C/8LrwPAOzRJ/bBzA==
-X-Google-Smtp-Source: ACHHUZ4BUFYu97t9mdfYA5KV6YA2C+Bz9BHAJiOYXmHN9/MPJdGw/NAIAIyFZinwusV1ZnTFyAqvNg==
-X-Received: by 2002:a5d:5255:0:b0:30e:4714:bc93 with SMTP id k21-20020a5d5255000000b0030e4714bc93mr14177214wrc.5.1687420301108;
-        Thu, 22 Jun 2023 00:51:41 -0700 (PDT)
-Received: from localhost ([86.61.181.4])
-        by smtp.gmail.com with ESMTPSA id p16-20020a5d6390000000b003113943bb66sm6283824wru.110.2023.06.22.00.51.40
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 00:51:40 -0700 (PDT)
-Date: Thu, 22 Jun 2023 09:51:39 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Wojciech Drewek <wojciech.drewek@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	david.m.ertman@intel.com, michal.swiatkowski@linux.intel.com,
-	marcin.szycik@linux.intel.com, simon.horman@corigine.com
-Subject: Re: [PATCH iwl-next] ice: Accept LAG netdevs in bridge offloads
-Message-ID: <ZJP9i6DLPOfJkUyB@nanopsycho>
-References: <20230622070956.357404-1-wojciech.drewek@intel.com>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PL/DBYEYAc2al9q683ws/N5Mfdn1mq2wCKAUpM7uRG4=;
+ b=oxXmOFwE1aLoUpUtzQ9eC+gxLilZYZy9RBIJcHzi/JL/nHbLQPiyhTQRTtn5Vrog86GK+4ABPV0MMdQ7sRPu0zVl26ascmrSjAvahom3UtJND54lEvSIVVh9ZEPN63CgHHU8kFnHmEHcih1Hu10Qt1Y+SKH19zh5Z+RO+UNkip0=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MW3PR13MB4042.namprd13.prod.outlook.com (2603:10b6:303:54::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
+ 2023 07:53:33 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 22 Jun 2023
+ 07:53:33 +0000
+Date: Thu, 22 Jun 2023 09:53:26 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
+	kernel test robot <lkp@intel.com>,
+	Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+	netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+Message-ID: <ZJP99hSRt5MakBXC@corigine.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+ <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+X-ClientProxiedBy: AM9P193CA0007.EURP193.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21e::12) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230622070956.357404-1-wojciech.drewek@intel.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MW3PR13MB4042:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7187d197-c102-4d82-e73c-08db72f5c729
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	fkK2Ec4gSluXJ6WtBYGgxS7UIxjBcat2BB1gCW43Af9auCSXXzvL09DfhdBcp4MzyOvNJPeNLGEsr6JjGTGAueNQimlZujd2k8mhJA3cxKYIAt54dsPK8hWeSyevoux6D7OJEBXa7T72ZOWXWUcetXvlJ2r5uth6EnJEm+9q0gDUvaFeEtM1iNwOmXRfAYJ7/244T0zi1rkd75NVIwBn1JzfdBPEsDGuYC7vhIoQHdMBViMhP9OQsbhiGvXGlI9O2SVPybKlLvOLqniP2dZIsuazY44aucFLznGkiZcb6hmTxsSZ+NXYIDdnXq7sTFMoChqTYGsaWL1QV50yXlqGBTDBNzdRhU/c/+hZ3Cn0WkhL+9c8nBwNsQTny+/kiZwyONK4oj15Eq4mJdPQ54euM1udQdTDZ3brth9nKGfQCjSw9WJSN9Mi8HPQst0m8cPBLgE2zBI6o4otxS86ghxpobrTGTIOguU4bRzaXXGw9yaD9rqHHuvuq3v6VJ38uaLlV6k+sd2C6W/dayFQzMQ5oIQykczTeq+7H/ag1dKoFWZjn43UcFfS1RtM9eaJXHfmkUTakIG9/kSE/YB4YOHDpt6FSjzpJPouHjyiLlSSijI=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(136003)(376002)(39840400004)(396003)(451199021)(2906002)(8936002)(8676002)(7416002)(86362001)(44832011)(316002)(6916009)(4326008)(66476007)(66946007)(84970400001)(66556008)(478600001)(41300700001)(54906003)(5660300002)(83380400001)(6666004)(38100700002)(6486002)(2616005)(186003)(6512007)(6506007)(36756003)(53546011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?I9M5UUS5je4wTT7ov5gpRhsjlZkOzu2xMa20oR9gWFCuTrW1uq95R8EKD41n?=
+ =?us-ascii?Q?Sy4+9/yz8P6y8PiBriS9klT9RAyY0XRUCMsrua0u45TC1uhTmlvzpdsn2a3d?=
+ =?us-ascii?Q?9cjVhjtPQhOekscWMGj7P0q50pJgMKSoQqXjG4M9GvxTi3au9EtutgaxDIzy?=
+ =?us-ascii?Q?kbDhu+efaEpjDq2iBR/swFVu52NBmw7PfvH0UynBxx+pr3W+wW4pjhjE8ya6?=
+ =?us-ascii?Q?jXVEvKIyq0olO/DJ7zloBcl3izTjlxWtUXg8XciVuHEPhnb6gojU57aOZSzl?=
+ =?us-ascii?Q?O8YGqM56OoeJD9O5G5zVmfh0WifosEKFDVlbhAIJXLzUCxHi7LKkD4UvN4vN?=
+ =?us-ascii?Q?vCEZThL4KFUKx3k+QItUVBLLAnvuHSiu8RwKh3GzFJnTD4XJKJQ+etulyKr0?=
+ =?us-ascii?Q?mJELVqcfZUJweSsjxX4m6FyJxA7nFCOed8ymjUolofb6UVVbEGWI24xYOi8w?=
+ =?us-ascii?Q?JN/HA5Ji0+zxr4cOWMh2sQJ9jzJzpw5BYq8ExA0jYjOGeuGntdIjAwsKlQS/?=
+ =?us-ascii?Q?bCEgW9I7dozWqdzYbuPToxbKlq4zTBwbLUvak5m+g02HgLxw0r30qHnZIdKE?=
+ =?us-ascii?Q?j/GLQIqF8eMpa83R63gqnYOtj60OUeuw7uMz/ppaVAmcqdbWP8jWYutKwWec?=
+ =?us-ascii?Q?mgz4SQ69gSbKazzfELGU3OLTxpoWpUbsWNanJ/oT+Q1vSjM2gO3Ja0nt+pt5?=
+ =?us-ascii?Q?x8HaZboR3YHhtodaLUPFlDJ3cubJINhKZ2TZe7rmUfq/XU3wey+SzeLd4KHW?=
+ =?us-ascii?Q?nYFkl8NLSGKAeDaKrmz4ghbJCknb8Iq6zrJVMDLG/XYOeUtQBKvk//bfc8zv?=
+ =?us-ascii?Q?sqZwlGnpvmSGWvo638QIBq0zR6wn7L9szYdDEHdFEtsjoIyiNdLX2VTqdsLp?=
+ =?us-ascii?Q?7h8lljN+IIvygrrRCqKJ9nH+0qE+4hmj26w8zi2C5Pxd1zLm9fd4GgQbfnoH?=
+ =?us-ascii?Q?eIifyQGuwHY9Irgsfg+VJzuMjGTku4/90KTwkJ8Yzc1i3fsa5FRpa/lMHUqR?=
+ =?us-ascii?Q?w3XxDzef7aLI7HyOCLOclpnvwYtFza/S5i1b/5rp28rOhSIl41jCsHuvDZgI?=
+ =?us-ascii?Q?JSLomg+Xigtd36x17LIe/Zv5VWdPvg02RbYgyxwW9nD2lwHmIPzy3UE6zKMM?=
+ =?us-ascii?Q?Eh5e/JGIAqebI35uePEn1ZTlHc2knOv45h3xXxYAJKvE8jiWfQqLr/OtXsf5?=
+ =?us-ascii?Q?83DJzLyvEV6ZWj59MtCq4WpYzCILvNiSNQTmjsjeshTO7Cben+n1y1HUBwZs?=
+ =?us-ascii?Q?fHMNbb2Nj/4ig/vbmTt0iGpyGjZTlTccCW9auwlXvmomsHBa1g9m/kOSZYRG?=
+ =?us-ascii?Q?j6AS+nH23L5wiLu39FrYVwvQCuA1CoLaMc2d/zJq0qS3QjBIJ+e3OS9ipIUb?=
+ =?us-ascii?Q?Hx3FU+zGi91Ia8vNv/vWs5+tibabN2HDt75lQrZaEE8kS4ZUbD/5o0m/fhuE?=
+ =?us-ascii?Q?hzMgoskmOhlDAs9mK/7GEej1ojtO0phMfcCHuJq6xTunJnVfOLTwC5UBZOa1?=
+ =?us-ascii?Q?naNYBCMI3QNgm7gRWjvgAld9N0OwFGVch6ODe7V2n1DsxXeMTLy0v090Gy6Z?=
+ =?us-ascii?Q?a/MaRO6ZvbO4th9Du6OtLLnEmpNZM513kWfZHRM1mpa4CduxvDTkHlnfzwcb?=
+ =?us-ascii?Q?8JU9oxOuNkav9I/ThjmdPO0L0zT2myPMm8/bvJCBYEk+ID0LS5Sj6A8b6KtI?=
+ =?us-ascii?Q?23TbWg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7187d197-c102-4d82-e73c-08db72f5c729
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 22 Jun 2023 07:53:33.8053
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sfvScSGposxMTonAi9E8ypSnWm4QDE9Ym4wuj8kodUB5tXMromE86pXgflDXokGvSRAB8npVtlCZOMQBgM/GvUehmrrBUMJCeYlK/ABAzco=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR13MB4042
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thu, Jun 22, 2023 at 09:09:56AM CEST, wojciech.drewek@intel.com wrote:
->Allow LAG interfaces to be used in bridge offload using
->netif_is_lag_master. In this case, search for ice netdev in
->the list of LAG's lower devices.
->
->Reviewed-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
->Signed-off-by: Wojciech Drewek <wojciech.drewek@intel.com>
->---
->Note for Tony: This patch needs to go with Dave's LAG
->patchset:
->https://lore.kernel.org/netdev/20230615162932.762756-1-david.m.ertman@intel.com/
->---
-> .../net/ethernet/intel/ice/ice_eswitch_br.c   | 47 +++++++++++++++++--
-> 1 file changed, 42 insertions(+), 5 deletions(-)
->
->diff --git a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
->index 1e57ce7b22d3..81b69ba9e939 100644
->--- a/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
->+++ b/drivers/net/ethernet/intel/ice/ice_eswitch_br.c
->@@ -15,8 +15,23 @@ static const struct rhashtable_params ice_fdb_ht_params = {
+On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
 > 
-> static bool ice_eswitch_br_is_dev_valid(const struct net_device *dev)
-> {
->-	/* Accept only PF netdev and PRs */
->-	return ice_is_port_repr_netdev(dev) || netif_is_ice(dev);
->+	/* Accept only PF netdev, PRs and LAG */
->+	return ice_is_port_repr_netdev(dev) || netif_is_ice(dev) ||
->+		netif_is_lag_master(dev);
->+}
->+
->+static struct net_device *
->+ice_eswitch_br_get_uplnik_from_lag(struct net_device *lag_dev)
-
-s/uplnik/uplink/
-
-
->+{
->+	struct net_device *lower;
->+	struct list_head *iter;
->+
->+	netdev_for_each_lower_dev(lag_dev, lower, iter) {
->+		if (netif_is_ice(lower))
->+			return lower;
-
-What if there are 2 ice Nics in the same lag?
-
-
->+	}
->+
->+	return NULL;
-> }
 > 
-> static struct ice_esw_br_port *
->@@ -26,8 +41,19 @@ ice_eswitch_br_netdev_to_port(struct net_device *dev)
-> 		struct ice_repr *repr = ice_netdev_to_repr(dev);
+> On 21.06.23 23:37, Randy Dunlap wrote:
+> > Require FDDI to be built-in if it is used. LCS needs FDDI to be
+> > built-in to build without errors.
+> > 
+> > Prevents these build errors:
+> > s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
+> > drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
+> > s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
+> > 
+> > This FDDI requirement effectively restores the previous condition
+> > before the blamed patch, when #ifdef CONFIG_FDDI was used, without
+> > testing for CONFIG_FDDI_MODULE.
+> > 
+> > Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+> > Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+> > Reported-by: kernel test robot <lkp@intel.com>
+> > Link: lore.kernel.org/r/202306202129.pl0AqK8G-lkp@intel.com
+> > Suggested-by: Simon Horman <simon.horman@corigine.com>
+> > Cc: Alexandra Winter <wintera@linux.ibm.com>
+> > Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Cc: linux-s390@vger.kernel.org
+> > Cc: netdev@vger.kernel.org
+> > Cc: Heiko Carstens <hca@linux.ibm.com>
+> > Cc: Vasily Gorbik <gor@linux.ibm.com>
+> > Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+> > Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+> > Cc: Sven Schnelle <svens@linux.ibm.com>
+> > Cc: David S. Miller <davem@davemloft.net>
+> > Cc: Eric Dumazet <edumazet@google.com>
+> > Cc: Jakub Kicinski <kuba@kernel.org>
+> > Cc: Paolo Abeni <pabeni@redhat.com>
+> > ---
+> >  drivers/s390/net/Kconfig |    2 ++
+> >  1 file changed, 2 insertions(+)
+> > 
+> > diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+> > --- a/drivers/s390/net/Kconfig
+> > +++ b/drivers/s390/net/Kconfig
+> > @@ -6,11 +6,13 @@ config LCS
+> >  	def_tristate m
+> >  	prompt "Lan Channel Station Interface"
+> >  	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> > +	depends on FDDI=y || FDDI=n
+> >  	help
+> >  	  Select this option if you want to use LCS networking on IBM System z.
+> >  	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+> >  	  To compile as a module, choose M. The module name is lcs.
+> >  	  If you do not know what it is, it's safe to choose Y.
+> > +	  If FDDI is used, it must be built-in (=y).
+> >  
+> >  config CTCM
+> >  	def_tristate m
+> > 
 > 
-> 		return repr->br_port;
->-	} else if (netif_is_ice(dev)) {
->-		struct ice_pf *pf = ice_netdev_to_pf(dev);
->+	} else if (netif_is_ice(dev) || netif_is_lag_master(dev)) {
->+		struct net_device *ice_dev;
->+		struct ice_pf *pf;
->+
->+		if (netif_is_lag_master(dev))
->+			ice_dev = ice_eswitch_br_get_uplnik_from_lag(dev);
->+		else
->+			ice_dev = dev;
->+
->+		if (!ice_dev)
->+			return NULL;
->+
->+		pf = ice_netdev_to_pf(ice_dev);
 > 
-> 		return pf->br_port;
-> 	}
->@@ -712,7 +738,18 @@ ice_eswitch_br_port_link(struct ice_esw_br_offloads *br_offloads,
+> Wow Randy and Simon, you are reacting faster than I was able to evaluate this yesterday.
+> 2 thoughts:
 > 
-> 		err = ice_eswitch_br_vf_repr_port_init(bridge, repr);
-> 	} else {
->-		struct ice_pf *pf = ice_netdev_to_pf(dev);
->+		struct net_device *ice_dev;
->+		struct ice_pf *pf;
->+
->+		if (netif_is_lag_master(dev))
->+			ice_dev = ice_eswitch_br_get_uplnik_from_lag(dev);
->+		else
->+			ice_dev = dev;
->+
->+		if (!ice_dev)
->+			return 0;
->+
->+		pf = ice_netdev_to_pf(ice_dev);
+> 1) As ETHERNET cannot be a module and this patch prevents FDDI from being a module, then 
+> 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+> is kind of pointless and can as well be reverted instead of doing this fix.
+> Or am I missing something?
+
+I'll leave that one to Randy at this point.
+
+> 2) I wonder whether
 > 
-> 		err = ice_eswitch_br_uplink_port_init(bridge, pf);
-> 	}
->-- 
->2.40.1
->
->
+>   	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+>  +	depends on FDDI || FDDI=n
+> 
+> would do what we want here:
+> When FDDI is a loadable module, LCS mustn't be built-in.
+> 
+> I will do some experiments and let you know.
+
+It does seem to on my side.
+But checking would be much appreciated.
 
