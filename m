@@ -1,70 +1,105 @@
-Return-Path: <netdev+bounces-12951-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-12952-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC6BF7398FB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:06:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B17BA739914
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 10:13:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC8611C20F3D
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 08:06:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E259E1C2107A
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 08:13:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09F9913AE4;
-	Thu, 22 Jun 2023 08:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95E4315AC7;
+	Thu, 22 Jun 2023 08:13:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEA0F613A
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 08:06:01 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqumte4.icoremail.net (zg8tmtyylji0my4xnjqumte4.icoremail.net [162.243.164.118])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 91349198
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:05:58 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [118.248.134.152] ) by
- ajax-webmail-mail-app2 (Coremail) ; Thu, 22 Jun 2023 16:04:39 +0800
- (GMT+08:00)
-X-Originating-IP: [118.248.134.152]
-Date: Thu, 22 Jun 2023 16:04:39 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Paolo Abeni" <pabeni@redhat.com>
-Cc: krzysztof.kozlowski@linaro.org, avem@davemloft.net, edumazet@google.com, 
-	kuba@kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v1] net: nfc: Fix use-after-free in
- nfc_genl_llc_{{get/set}_params/sdreq}
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <746941b24732655c51dee68ed442bfc14a82e303.camel@redhat.com>
-References: <20230620025350.4034422-1-linma@zju.edu.cn>
- <746941b24732655c51dee68ed442bfc14a82e303.camel@redhat.com>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A58AEACC
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 08:13:23 +0000 (UTC)
+Received: from mail-wm1-x331.google.com (mail-wm1-x331.google.com [IPv6:2a00:1450:4864:20::331])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0162A1BC3
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:13:21 -0700 (PDT)
+Received: by mail-wm1-x331.google.com with SMTP id 5b1f17b1804b1-3fa70ec8d17so3290385e9.1
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 01:13:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687421600; x=1690013600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=IxLUdJmVd0ETDzeyKPn7SZFc1uqf2kKlnDi3sO0D5bA=;
+        b=m6S/1aChLob1kPwjzOxRWbVw6phKHvBwUuMbKgJXFUUDIVeEMYZwHU0JRSddKN/F9T
+         X0gPncN2Cr00y6wzOB0ZoQ34oYQYjz+3bMSV5rpBfJABPcSCwjCrEl6wvvfjv/65ObHj
+         gonKAPHtf+BWGYyRppoeSQEF2iNhfiiVS/e4tF8CxFx1Yugub1I7Bj3p+S80Chi0S8Zd
+         wgmTZf+AM+pg3bZpsuzSdDdbSbijID5YA6/+ZLkBxQbwrvBO6c7uZP+KyGJzKTqpgFrK
+         WkrWDBUOVpsUJ9gn0QkU1WpWys6Y+OZmIqUYX7aqPtUEhANDwtePae81z5QuG9Tk4nkb
+         MVgA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687421600; x=1690013600;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=IxLUdJmVd0ETDzeyKPn7SZFc1uqf2kKlnDi3sO0D5bA=;
+        b=I/UB046DOO/nPUO8A3ZXqc/Wv1NhUeR4nS4ciqAs1VDHPC2VDEruVys3lIW0QnZaZ9
+         ZX0YNciFsGzqJnxbdHPWCUGquKLLN8u3zDBa0a/QXTENmXQY7yHqTPYgL2/tuPSam9JI
+         rQwON2y0ly/6iQZGmZDktVD8hG+dv4iiFbHE+unO4oa5I5PYdib2EXiaHgokHU6QOkRW
+         eKNgH+1L/848CL+EzQlmrNQotUCpmuuQw6P6LvYf0pmfi3xqC8y7AXb3j97xJ3LQAI36
+         rEq9wJkK8gxiMpCKYSyPqi7phwSWotAixcDBs3qGur9jGXezgcJK7LJa9oCIF18IN8n5
+         FWqA==
+X-Gm-Message-State: AC+VfDzUgARJY43jgqMJlobiQQtAT1JUY+xfio2hT+HVvEq/ecUcjx6u
+	1/cyagYJdjGW77VbOxUSLXQICg==
+X-Google-Smtp-Source: ACHHUZ5/yVN8oCoK0xe5hZIq6nL4aj3WkftYMpUVpR0rf2ivexC2SAnBmK0FQvOJ5tZxjRcF7e/i4A==
+X-Received: by 2002:a05:600c:4e92:b0:3fa:7515:902e with SMTP id f18-20020a05600c4e9200b003fa7515902emr625228wmq.16.1687421600301;
+        Thu, 22 Jun 2023 01:13:20 -0700 (PDT)
+Received: from localhost ([86.61.181.4])
+        by smtp.gmail.com with ESMTPSA id 17-20020a05600c231100b003f8ec58995fsm7070435wmo.6.2023.06.22.01.13.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 22 Jun 2023 01:13:19 -0700 (PDT)
+Date: Thu, 22 Jun 2023 10:13:18 +0200
+From: Jiri Pirko <jiri@resnulli.us>
+To: Bartosz Golaszewski <brgl@bgdev.pl>
+Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Junxiao Chang <junxiao.chang@intel.com>, netdev@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: Re: [PATCH net] net: stmmac: fix double serdes powerdown
+Message-ID: <ZJQCnny4pLY3qpYQ@nanopsycho>
+References: <20230621135537.376649-1-brgl@bgdev.pl>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <34066cf0.998bd.188e2224e93.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:by_KCgBnEZyYAJRkPGh+Bw--.12323W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwULEmSQbuIB3QAPs0
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VWUJw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230621135537.376649-1-brgl@bgdev.pl>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGkgUGFvbG8sCgo+IAo+IEl0IGxvb2tzIGxpa2UgdGhlIG1lbnRpb25lZCByYWNlIGNvbmRpdGlv
-biBjb3VsZCBhcHBseSB0byBhbnkgY2FsbGVycwo+IG9mIG5mY19sbGNwX2ZpbmRfbG9jYWwoKSwg
-aXMgdGhlcmUgYW55IHNwZWNpYWwgcmVhc29uIHRvIG5vdCBhZGQgdGhlCj4gbmV3IGNoZWNrIGRp
-cmVjdGx5IGluc2lkZSBuZmNfbGxjcF9maW5kX2xvY2FsKCk/Cj4gCgpPb29wcywgSSBhY3R1YWxs
-eSBoYXZlbid0IGNvbnNpZGVyIHRob3NlIGNhc2VzLiBJIHdpbGwgZG8gYSBxdWljayBjaGVjawpm
-b3IgdGhhdC4KCj4gVGhhbmtzIQo+IAo+IFBhb2xvCgpSZWdhcmRzCkxpbg==
+Wed, Jun 21, 2023 at 03:55:37PM CEST, brgl@bgdev.pl wrote:
+>From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+>Commit 49725ffc15fc ("net: stmmac: power up/down serdes in
+>stmmac_open/release") correctly added a call to the serdes_powerdown()
+>callback to stmmac_release() but did not remove the one from
+>stmmac_remove() which leads to a doubled call to serdes_powerdown().
+>
+>This can lead to all kinds of problems: in the case of the qcom ethqos
+>driver, it caused an unbalanced regulator disable splat.
+>
+>Fixes: 49725ffc15fc ("net: stmmac: power up/down serdes in stmmac_open/release")
+>Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+
+Reviewed-by: Jiri Pirko <jiri@nvidia.com>
 
