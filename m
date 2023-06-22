@@ -1,149 +1,119 @@
-Return-Path: <netdev+bounces-13170-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13171-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0ECB73A898
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:50:54 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D2B8573A89C
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:51:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D25891C209FB
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:50:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1E7D1C203A2
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:51:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A775C206A0;
-	Thu, 22 Jun 2023 18:50:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E2DB8206A3;
+	Thu, 22 Jun 2023 18:51:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A7591F923
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:50:51 +0000 (UTC)
-Received: from smtpcmd02101.aruba.it (smtpcmd02101.aruba.it [62.149.158.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16D5F9B
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:50:49 -0700 (PDT)
-Received: from [192.168.50.162] ([146.241.96.150])
-	by Aruba Outgoing Smtp  with ESMTPSA
-	id CPOJqUQ4W7skLCPOJqI8Pq; Thu, 22 Jun 2023 20:50:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=aruba.it; s=a1;
-	t=1687459848; bh=NiL5KJY63hJ4jA23FuSWyQhcwnYWpVK+f6seEcG9u6o=;
-	h=Date:MIME-Version:Subject:To:From:Content-Type;
-	b=AAOPqMmunz1BKpXzVO0l7wO8cXRPc4XnCeUZqacKrZZIoRiBFLuqU5ji7G++xkuXL
-	 ezJQPQVZu5hi2LpJ2ZH/K+dydL8bMSD+JQQeD4fFu/LiKrUOjY+LA5iXKtGD3JMjvs
-	 EGCcVeXa981EtexBs8U7eHKdMJXWLAY7SewP2CA22Ttkocsd8lsFlqhGOEV3reApvC
-	 2GC3dbsiIX5E0g3mU0wWQT/smXyR7AsRiB/W/rTkibYjd5hpFaE9TcD+Awv5ScAnBW
-	 ZfCkJXLde7CDXyw30vYbV6qJh+UqQsN2IzvECIBfnrpBy+xxnxRt6Gl6axgyd/OJbW
-	 VaptUwg3BQAuw==
-Message-ID: <ec6fbaae-323e-5986-3930-a62fa365193a@benettiengineering.com>
-Date: Thu, 22 Jun 2023 20:50:47 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D10B21F923
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:51:38 +0000 (UTC)
+X-Greylist: delayed 106886 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Jun 2023 11:51:35 PDT
+Received: from smtpng3.i.mail.ru (smtpng3.i.mail.ru [94.100.177.149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E07B71FF9;
+	Thu, 22 Jun 2023 11:51:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=inbox.ru; s=mail4;
+	h=Content-Transfer-Encoding:MIME-Version:Message-Id:Date:Subject:Cc:To:From:From:Subject:Content-Type:Content-Transfer-Encoding:To:Cc; bh=p+iWB5jlHu8J5NVdgbBRkf4lseuIbdgeu4gKikNjj+w=;
+	t=1687459896;x=1687549896; 
+	b=DqEAMuLs+a39CC9dXXG2F7NHOXOJf3Bxcq3LODyw9XXpdMFrdDJ3BKFbp4zfATYvPVUcXng8iWHKq7FtZRCtpZL7QpSLKHTR2dcAbWgPiJsSP6ExqrAD7Ip7sqxLynULGOLfcF4M0zIP/g0kLu0/F9NfboB3faMKa+eaXU8KE/RSsD81wF7Zs0QqDL5qPszM7eDGbytRbv0OlDjoaa972LAPbFsI0A2GlZ0fXph1kmwZknj2htbI8HvgPI7rOIv0ZKjbZW6EYhLlv3SYu3tOAV8xUOB3OhXsmVtW5nZy+2ttNMcHbbXGPaErtNJsxnpa5GXOB55u/6HGGnbRTAUNaA==;
+Received: by smtpng3.m.smailru.net with esmtpa (envelope-from <fido_max@inbox.ru>)
+	id 1qCPP3-0001CL-7p; Thu, 22 Jun 2023 21:51:33 +0300
+From: Maxim Kochetkov <fido_max@inbox.ru>
+To: netdev@vger.kernel.org
+Cc: Maxim Kochetkov <fido_max@inbox.ru>,
+	Robert Hancock <robert.hancock@calian.com>,
+	Radhey Shyam Pandey <radhey.shyam.pandey@amd.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>,
+	Andre Przywara <andre.przywara@arm.com>,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH v3 1/1] net: axienet: Move reset before DMA detection
+Date: Thu, 22 Jun 2023 21:51:30 +0300
+Message-Id: <20230622185131.113717-1-fido_max@inbox.ru>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] net: phy: broadcom: drop brcm_phy_setbits() and use
- phy_set_bits() instead
-Content-Language: en-US
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, Andrew Lunn <andrew@lunn.ch>,
- Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230622123737.8649-1-giulio.benetti@benettiengineering.com>
- <12d3d3e7-da90-cc73-57e6-1aa7859dce90@benettiengineering.com>
- <ZJRqMLepCTPqvCD9@corigine.com>
-From: Giulio Benetti <giulio.benetti@benettiengineering.com>
-In-Reply-To: <ZJRqMLepCTPqvCD9@corigine.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-CMAE-Envelope: MS4xfPgOOi/LCA4VeUvKOAH9MIyz0KRj9UZKaH5rDQXASx+NILAQrSp/XoIyKQzSdzqn2+3Rfmn3+rJPP5nCDVJv5sR/ye1UVAW0WkX4OIKcBbFaLmRUV9w8
- m4z+JLokFSIvd4o9oVhp9oNdYS3bmIxdMH6nlw0DvpAInymiHku8ALzCKFsvdXKLYXDG82JTtGglwXwenaF4dXOZgWSVLyio95ddILby+xV194rTyserouU7
- P828/F0nS141CL1eCVJTI5HKYMSCr/wIQiHI/JSJg8eV7r1CIYa3Wqqys66BeQe8Zq+FRqm23v5mEMP3UnQ19eB2WLzcJwu0Ohoc772CmTjEGTUsNhXX/N38
- 0fxNGPtU09RY7kU3ntgPCYfqV9Z/vt+oJHrlDma4ackjGPt54pvC6G7rfUV6v0TgNDX2Y6kge4HJydiAAgIugdqlh2CxiMnE9y7d3lEahndrJwvC2Ri7UDEQ
- YMbnMpUbYrJ1tBn/7W/AmdoChAaVN4kz53WiQP22rg2zqC2RKLNIyN+DQym23OSuWUQtutLa6bFTv9o0VwOtFBP32bIUzrRL4L+ojV1X4+rY0qBCdITrdpbB
- TLU=
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Authentication-Results: smtpng3.m.smailru.net; auth=pass smtp.auth=fido_max@inbox.ru smtp.mailfrom=fido_max@inbox.ru
+X-Mailru-Src: smtp
+X-7564579A: 646B95376F6C166E
+X-77F55803: 4F1203BC0FB41BD95D99986233CC4DDCD825FF3AA070ECA3C2EE242F31DB0C21182A05F538085040F499278726E560259E7EC9ACB4612EF05270372DAF44CC04427632CD680C1B4E
+X-7FA49CB5: FF5795518A3D127A4AD6D5ED66289B5278DA827A17800CE7CC84CC3AD347B910EA1F7E6F0F101C67BD4B6F7A4D31EC0BCC500DACC3FED6E28638F802B75D45FF8AA50765F79006371005780D56A98C20EA1F7E6F0F101C6723150C8DA25C47586E58E00D9D99D84E1BDDB23E98D2D38BE5CCB53A13BC8DBA7860F8D68D0323F857C18BE58FF1278D20879F7C8C5043D14489FFFB0AA5F4BFA417C69337E82CC2CC7F00164DA146DAFE8445B8C89999728AA50765F790063741F7343E26298569389733CBF5DBD5E9C8A9BA7A39EFB766F5D81C698A659EA7CC7F00164DA146DA9985D098DBDEAEC8CE4AEF6198D26326F6B57BC7E6449061A352F6E88A58FB86F5D81C698A659EA7E827F84554CEF5019E625A9149C048EE9ECD01F8117BC8BEE2021AF6380DFAD18AA50765F790063735872C767BF85DA227C277FBC8AE2E8B08F9A42B2210255C75ECD9A6C639B01B4E70A05D1297E1BBCB5012B2E24CD356
+X-C1DE0DAB: 0D63561A33F958A5F843997C76389857B97932DC439E4282D4C195A55BD471C6F87CCE6106E1FC07E67D4AC08A07B9B01DAA61796BF5227B9C5DF10A05D560A950611B66E3DA6D700B0A020F03D25A0997E3FB2386030E77
+X-C8649E89: 1C3962B70DF3F0ADE00A9FD3E00BEEDF77DD89D51EBB7742D3581295AF09D3DF87807E0823442EA2ED31085941D9CD0AF7F820E7B07EA4CF8925DAA191E1713318F85A81DA1558E22CCEAEED2076469D72E08A9CF3BB8FE8422E0C78D0E15355B05B57073EAFDF971B30CF38DA3B874AF2E539E16A78A81621BEC6C0C71ED4F84C41F94D744909CEE921556F0E976A29E6EC0772259F8F8F8815B87D7EC76CB9
+X-D57D3AED: 3ZO7eAau8CL7WIMRKs4sN3D3tLDjz0dLbV79QFUyzQ2Ujvy7cMT6pYYqY16iZVKkSc3dCLJ7zSJH7+u4VD18S7Vl4ZUrpaVfd2+vE6kuoey4m4VkSEu530nj6fImhcD4MUrOEAnl0W826KZ9Q+tr5ycPtXkTV4k65bRjmOUUP8cvGozZ33TWg5HZplvhhXbhDGzqmQDTd6OAevLeAnq3Ra9uf7zvY2zzsIhlcp/Y7m53TZgf2aB4JOg4gkr2biojB41c+mu8Ac+Sc30P1oorFA==
+X-Mailru-Sender: 689FA8AB762F73930F533AC2B33E986B70B89E82614EDFD7B35E749CAF57FC7598CC072019C18A892CA7F8C7C9492E1F2F5E575105D0B01ADBE2EF17B331888EEAB4BC95F72C04283CDA0F3B3F5B9367
+X-Mras: Ok
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Simon,
+DMA detection will fail if axienet was started before (by boot loader,
+boot ROM, etc). In this state axienet will not start properly.
+XAXIDMA_TX_CDESC_OFFSET + 4 register (MM2S_CURDESC_MSB) is used to detect
+64 DMA capability here. But datasheet says: When DMACR.RS is 1
+(axienet is in enabled state), CURDESC_PTR becomes Read Only (RO) and
+is used to fetch the first descriptor. So iowrite32()/ioread32() trick
+to this register to detect DMA will not work.
+So move axienet reset before DMA detection.
 
-On 22/06/23 17:35, Simon Horman wrote:
-> On Thu, Jun 22, 2023 at 02:48:46PM +0200, Giulio Benetti wrote:
->> Pardon,
->>
->> On 22/06/23 14:37, Giulio Benetti wrote:
->>> Linux provides phy_set_bits() helper so let's drop brcm_phy_setbits() and
->>> use phy_set_bits() in its place.
->>>
->>> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
->>> ---
->>>    drivers/net/phy/broadcom.c | 15 ++-------------
->>>    1 file changed, 2 insertions(+), 13 deletions(-)
->>>
->>> diff --git a/drivers/net/phy/broadcom.c b/drivers/net/phy/broadcom.c
->>> index ad71c88c87e7..d684c5be529a 100644
->>> --- a/drivers/net/phy/broadcom.c
->>> +++ b/drivers/net/phy/broadcom.c
->>> @@ -608,17 +608,6 @@ static int bcm54616s_read_status(struct phy_device *phydev)
->>>    	return err;
->>>    }
->>> -static int brcm_phy_setbits(struct phy_device *phydev, int reg, int set)
->>> -{
->>> -	int val;
->>> -
->>> -	val = phy_read(phydev, reg);
->>> -	if (val < 0)
->>> -		return val;
->>> -
->>> -	return phy_write(phydev, reg, val | set);
->>> -}
->>> -
->>>    static int brcm_fet_config_init(struct phy_device *phydev)
->>>    {
->>>    	int reg, err, err2, brcmtest;
->>> @@ -689,14 +678,14 @@ static int brcm_fet_config_init(struct phy_device *phydev)
->>>    		goto done;
->>>    	/* Enable auto MDIX */
->>> -	err = brcm_phy_setbits(phydev, MII_BRCM_FET_SHDW_MISCCTRL,
->>> +	err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_MISCCTRL,
->>>    				       MII_BRCM_FET_SHDW_MC_FAME);
->>
->> I've missed to checkpatch.pl and there is a style error ^^^
->>
->>>    	if (err < 0)
->>>    		goto done;
->>>    	if (phydev->dev_flags & PHY_BRCM_AUTO_PWRDWN_ENABLE) {
->>>    		/* Enable auto power down */
->>> -		err = brcm_phy_setbits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
->>> +		err = phy_set_bits(phydev, MII_BRCM_FET_SHDW_AUXSTAT2,
->>>    					       MII_BRCM_FET_SHDW_AS2_APDE);
->>
->>                                        and here ^^^
->>
->> I wait some time for any feedback and then I send a V2.
-> 
-> Hi Giulio,
-> 
-> Please include the target tree, net-next, when you send v2:
-> 
-> 	Subject: [PATCH net-next v2] ...
+Fixes: f735c40ed93c ("net: axienet: Autodetect 64-bit DMA capability")
+Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
+Reviewed-by: Robert Hancock <robert.hancock@calian.com>
+---
+ drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 +++++-----
+ 1 file changed, 5 insertions(+), 5 deletions(-)
 
-Thank you,
-
-I've just sent the v2 in reply to this.
-
-Best regards
+diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+index 3e310b55bce2..734822321e0a 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
++++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
+@@ -2042,6 +2042,11 @@ static int axienet_probe(struct platform_device *pdev)
+ 		goto cleanup_clk;
+ 	}
+ 
++	/* Reset core now that clocks are enabled, prior to accessing MDIO */
++	ret = __axienet_device_reset(lp);
++	if (ret)
++		goto cleanup_clk;
++
+ 	/* Autodetect the need for 64-bit DMA pointers.
+ 	 * When the IP is configured for a bus width bigger than 32 bits,
+ 	 * writing the MSB registers is mandatory, even if they are all 0.
+@@ -2096,11 +2101,6 @@ static int axienet_probe(struct platform_device *pdev)
+ 	lp->coalesce_count_tx = XAXIDMA_DFT_TX_THRESHOLD;
+ 	lp->coalesce_usec_tx = XAXIDMA_DFT_TX_USEC;
+ 
+-	/* Reset core now that clocks are enabled, prior to accessing MDIO */
+-	ret = __axienet_device_reset(lp);
+-	if (ret)
+-		goto cleanup_clk;
+-
+ 	ret = axienet_mdio_setup(lp);
+ 	if (ret)
+ 		dev_warn(&pdev->dev,
 -- 
-Giulio Benetti
-CEO&CTO@Benetti Engineering sas
+2.40.1
+
 
