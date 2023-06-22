@@ -1,206 +1,136 @@
-Return-Path: <netdev+bounces-13192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A60C473A90A
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:38:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C807E73A910
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 21:41:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 624B0281ABC
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:38:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFFED1C20A3E
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 19:41:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF0E02107D;
-	Thu, 22 Jun 2023 19:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7885F2107C;
+	Thu, 22 Jun 2023 19:41:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B1CA720690
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:38:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5AA20690
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 19:41:10 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718F5199B
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:38:21 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1788A1FE6
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:41:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687462700;
+	s=mimecast20190719; t=1687462868;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=uf7v6utVhvB9SDThVRGOmHwhlWU7bpbJmJ9KRenSJLo=;
-	b=O02tEC+Wn9li4fFD+mCZgVbJyCQccCflu8ZCHxPwykvYyFv8XVK1ncZ8Kyfqdepg+fBRjt
-	ysco3WFKSTIesRUtCBW8cnoqz+LkfooL3G+X4s3pBpJcQfrFlkM7zKTGDTp/qgKeGtPkoA
-	nZnk7UU8eicuTtGStS4ngzTQXp2eQHg=
-Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
- [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-aqYgR5dMO5O-mjTHNt3zyg-1; Thu, 22 Jun 2023 15:38:17 -0400
-X-MC-Unique: aqYgR5dMO5O-mjTHNt3zyg-1
-Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-98933d4d4c1so231902066b.0
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:38:16 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687462696; x=1690054696;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uf7v6utVhvB9SDThVRGOmHwhlWU7bpbJmJ9KRenSJLo=;
-        b=KoNXh9CkaI9ijJHyCjCxGryoWdRv3+f2HS4WGlp1IcSUczkePcGtxXpb9SLa7iOKML
-         qVFp1BmYHH776FrXotah1VfOU6OiIMcq3NwS/3aLrILn3iwwQsE7cLmRfvMnmsW7cGnW
-         /TNrMvYhvUF4EL5cd6KJBgPPYChRKZqSuU2LYkSfEkSHV9CbslTu9kQRjQpTZkKXJDy1
-         IDihAj5TyC7r2eOpiOj3diUbW4cPsOev/N5wuayxn44JT+jYiOsyB8RHMS2HiwG+XZtP
-         CwNVFOfdk4FrmhhDKaRZ4SAz5j6BKlkjwOKtO/9ajjkI2AYILfsf8ILrcMS9rUBIC86E
-         Zfeg==
-X-Gm-Message-State: AC+VfDzJLaPRJiuR6vws8nd236ifqsk7RFr9D6Y5Us281DbEK8BzZuEv
-	Ar0ouTS5jiyq935ESLMq+YDzTIMsbbucnYpPOPCmP4jQHZVhMb1wgLQjVr/qXnGXFjEJwCG+IbS
-	rmESF6jt7lHVc5WYf
-X-Received: by 2002:a17:907:e87:b0:989:1cc5:24c with SMTP id ho7-20020a1709070e8700b009891cc5024cmr8386392ejc.16.1687462695941;
-        Thu, 22 Jun 2023 12:38:15 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5Tcekwjt1TlaynLe0SBmlVyxRwtPA1ExOLueATh4jy/8kBynHnMzbZSusq5Pw1XgWlW0F1Vw==
-X-Received: by 2002:a17:907:e87:b0:989:1cc5:24c with SMTP id ho7-20020a1709070e8700b009891cc5024cmr8386370ejc.16.1687462695588;
-        Thu, 22 Jun 2023 12:38:15 -0700 (PDT)
-Received: from redhat.com ([2.52.149.110])
-        by smtp.gmail.com with ESMTPSA id a14-20020a170906368e00b009829dc0f2a0sm5040174ejc.111.2023.06.22.12.38.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 12:38:15 -0700 (PDT)
-Date: Thu, 22 Jun 2023 15:38:11 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: virtualization@lists.linux-foundation.org,
-	Jason Wang <jasowang@redhat.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH vhost v10 00/10] virtio core prepares for AF_XDP
-Message-ID: <20230622153730-mutt-send-email-mst@kernel.org>
-References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
+	bh=QZ2Xje2ved2ulckSwXdjtr8v/wsld5XIT0hNVNJkMSk=;
+	b=AdyH59HZDmDGL5mvCdreRQMOZcZq/yWm2oW1p0A0h491edVMe3W1Qg0iaQ56EZdma0dVFq
+	0zooN7EPQWc3CAYpw8baKJv8lsFb0ywPoSzv3SELOcPpaiMh1xxNR3Nuj2s/dV9qThGoS7
+	FWBBsiWDHJJPrwTID3wDKBSzqTJGYYU=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-460-zM8z2jPxM6Ge_eoEK0X5CQ-1; Thu, 22 Jun 2023 15:41:03 -0400
+X-MC-Unique: zM8z2jPxM6Ge_eoEK0X5CQ-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2762A282380B;
+	Thu, 22 Jun 2023 19:40:46 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id C1AEC492B01;
+	Thu, 22 Jun 2023 19:40:43 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230622111234.23aadd87@kernel.org>
+References: <20230622111234.23aadd87@kernel.org> <20230620145338.1300897-1-dhowells@redhat.com> <20230620145338.1300897-2-dhowells@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Alexander Duyck <alexander.duyck@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    David Ahern <dsahern@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+    Menglong Dong <imagedong@tencent.com>
+Subject: Re: [PATCH net-next v3 01/18] net: Copy slab data for sendmsg(MSG_SPLICE_PAGES)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1952673.1687462843.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 22 Jun 2023 20:40:43 +0100
+Message-ID: <1952674.1687462843@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 02, 2023 at 05:21:56PM +0800, Xuan Zhuo wrote:
-> ## About DMA APIs
-> 
-> Now, virtio may can not work with DMA APIs when virtio features do not have
-> VIRTIO_F_ACCESS_PLATFORM.
-> 
-> 1. I tried to let DMA APIs return phy address by virtio-device. But DMA APIs just
->    work with the "real" devices.
-> 2. I tried to let xsk support callballs to get phy address from virtio-net
->    driver as the dma address. But the maintainers of xsk may want to use dma-buf
->    to replace the DMA APIs. I think that may be a larger effort. We will wait
->    too long.
-> 
-> So rethinking this, firstly, we can support premapped-dma only for devices with
-> VIRTIO_F_ACCESS_PLATFORM. In the case of af-xdp, if the users want to use it,
-> they have to update the device to support VIRTIO_F_RING_RESET, and they can also
-> enable the device's VIRTIO_F_ACCESS_PLATFORM feature.
-> 
-> Thanks for the help from Christoph.
-> 
-> =================
-> 
-> XDP socket(AF_XDP) is an excellent bypass kernel network framework. The zero
-> copy feature of xsk (XDP socket) needs to be supported by the driver. The
-> performance of zero copy is very good.
-> 
-> ENV: Qemu with vhost.
-> 
->                    vhost cpu | Guest APP CPU |Guest Softirq CPU | PPS
-> -----------------------------|---------------|------------------|------------
-> xmit by sockperf:     90%    |   100%        |                  |  318967
-> xmit by xsk:          100%   |   30%         |   33%            | 1192064
-> recv by sockperf:     100%   |   68%         |   100%           |  692288
-> recv by xsk:          100%   |   33%         |   43%            |  771670
-> 
-> Before achieving the function of Virtio-Net, we also have to let virtio core
-> support these features:
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-So by itself, this doesn't do this. But what effect does all this
-overhead have on performance?
+> > If sendmsg() is passed MSG_SPLICE_PAGES and is given a buffer that con=
+tains
+> > some data that's resident in the slab, copy it rather than returning E=
+IO.
+> =
 
-> 1. virtio core support premapped
-> 2. virtio core support reset per-queue
-> 3. introduce DMA APIs to virtio core
-> 
-> Please review.
-> 
-> Thanks.
-> 
-> v10:
->  1. support to set vq to premapped mode, then the vq just handles the premapped request.
->  2. virtio-net support to do dma mapping in advance
-> 
-> v9:
->  1. use flag to distinguish the premapped operations. no do judgment by sg.
-> 
-> v8:
->  1. vring_sg_address: check by sg_page(sg) not dma_address. Because 0 is a valid dma address
->  2. remove unused code from vring_map_one_sg()
-> 
-> v7:
->  1. virtqueue_dma_dev() return NULL when virtio is without DMA API.
-> 
-> v6:
->  1. change the size of the flags to u32.
-> 
-> v5:
->  1. fix for error handler
->  2. add flags to record internal dma mapping
-> 
-> v4:
->  1. rename map_inter to dma_map_internal
->  2. fix: Excess function parameter 'vq' description in 'virtqueue_dma_dev'
-> 
-> v3:
->  1. add map_inter to struct desc state to reocrd whether virtio core do dma map
-> 
-> v2:
->  1. based on sgs[0]->dma_address to judgment is premapped
->  2. based on extra.addr to judgment to do unmap for no-indirect desc
->  3. based on indir_desc to judgment to do unmap for indirect desc
->  4. rename virtqueue_get_dma_dev to virtqueue_dma_dev
-> 
-> v1:
->  1. expose dma device. NO introduce the api for dma and sync
->  2. split some commit for review.
-> 
-> 
-> 
-> 
-> Xuan Zhuo (10):
->   virtio_ring: put mapping error check in vring_map_one_sg
->   virtio_ring: introduce virtqueue_set_premapped()
->   virtio_ring: split: support add premapped buf
->   virtio_ring: packed: support add premapped buf
->   virtio_ring: split-detach: support return dma info to driver
->   virtio_ring: packed-detach: support return dma info to driver
->   virtio_ring: introduce helpers for premapped
->   virtio_ring: introduce virtqueue_dma_dev()
->   virtio_ring: introduce virtqueue_add_sg()
->   virtio_net: support dma premapped
-> 
->  drivers/net/virtio_net.c     | 163 ++++++++++--
->  drivers/virtio/virtio_ring.c | 493 +++++++++++++++++++++++++++++++----
->  include/linux/virtio.h       |  34 +++
->  3 files changed, 612 insertions(+), 78 deletions(-)
-> 
-> --
-> 2.32.0.3.g01195cf9f
+> How did that happen? I thought MSG_SPLICE_PAGES comes from former
+> sendpage users and sendpage can't operate on slab pages.
+
+Some of my patches, take the siw one for example, now aggregate all the bi=
+ts
+that make up a message into a single sendmsg() call, including any protoco=
+l
+header and trailer in the same bio_vec[] as the payload where before it wo=
+uld
+have to do, say, sendmsg+sendpage+sendpage+...+sendpage+sendmsg.
+
+I'm trying to make it so that I make the minimum number of sendmsg calls
+(ie. 1 where possible) and the loop that processes the data is inside of t=
+hat.
+This offers the opportunity, at least in the future, to append slab data t=
+o an
+already-existing private fragment in the skbuff.
+
+> The locking is to local_bh_disable(). Does the milliont^w new frag
+> allocator have any additional benefits?
+
+It is shareable because it does locking.  Multiple sockets of multiple
+protocols can share the pages it has reserved.  It drops the lock around c=
+alls
+to the page allocator so that GFP_KERNEL/GFP_NOFS can be used with it.
+
+Without this, the page fragment allocator would need to be per-socket, I
+think, or be done further up the stack where the higher level drivers woul=
+d
+have to have a fragment bucket per whatever unit they use to deal with the
+lack of locking.
+
+Doing it here makes cleanup simpler since I just transfer my ref on the
+fragment to the skbuff frag list and it will automatically be cleaned up w=
+ith
+the skbuff.
+
+Willy suggested that I just allocate a page for each thing I want to copy,=
+ but
+I would rather not do that for, say, an 8-byte bit of protocol data.
+
+David
 
 
