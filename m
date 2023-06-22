@@ -1,159 +1,139 @@
-Return-Path: <netdev+bounces-13058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E1D573A0F8
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:33:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B9DF873A104
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:35:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 266172819BA
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:33:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 68A892819AD
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 12:35:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8838D174FA;
-	Thu, 22 Jun 2023 12:33:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 862161C760;
+	Thu, 22 Jun 2023 12:35:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BA513AAA0
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:33:33 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 15178DE;
-	Thu, 22 Jun 2023 05:33:32 -0700 (PDT)
-Received: from pps.filterd (m0353727.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35MCSA1e026800;
-	Thu, 22 Jun 2023 12:33:12 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=8JPSv3Evs3XhJvxRrV6qa8ynRzMaIEfed2QAdtCFvYo=;
- b=ec+nfDmLYT7jZYWjL292D7sBlG4KWzsgVu3CYMHcx1pggCdvXaGO3qHGl7MnA5E4vOHU
- ziSfK/RaK2KfjxHCquVsjvyvHC79J64BGnOBHPpac7urvX30kZNee4HeT+gZfFxR0Ptg
- BehdE+JcJ4pwYwW2YH9lbmW0jlINZskd2CihRFg7OtabNPMBDViBO86XGAe5SGMqEEy0
- DfcudZbKy6mg5VEgAz8ojI7TNbsuTHqSCKGt4gwySysMzdVsv0SHTrvsdeu5iiBKCC0t
- x2Dd+Zq8rR9RY2CzO+sscHAQaPmbrlzAfyqhsoxaPHYudBdcxj/V3CYlYvkgC3aLX9bq 6A== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcpb3r4rf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Jun 2023 12:33:11 +0000
-Received: from m0353727.ppops.net (m0353727.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35MCTMkU029556;
-	Thu, 22 Jun 2023 12:33:11 GMT
-Received: from ppma01fra.de.ibm.com (46.49.7a9f.ip4.static.sl-reverse.com [159.122.73.70])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rcpb3r4n4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Jun 2023 12:33:11 +0000
-Received: from pps.filterd (ppma01fra.de.ibm.com [127.0.0.1])
-	by ppma01fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35M8P6Gs030863;
-	Thu, 22 Jun 2023 12:33:08 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma01fra.de.ibm.com (PPS) with ESMTPS id 3r94f52mbu-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 22 Jun 2023 12:33:08 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35MCX4Il46858694
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 22 Jun 2023 12:33:04 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id A6AAC20040;
-	Thu, 22 Jun 2023 12:33:04 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id B911720043;
-	Thu, 22 Jun 2023 12:33:03 +0000 (GMT)
-Received: from [9.171.62.26] (unknown [9.171.62.26])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 22 Jun 2023 12:33:03 +0000 (GMT)
-Message-ID: <55764773-bf9a-94c9-ad2b-1c6e63879798@linux.ibm.com>
-Date: Thu, 22 Jun 2023 14:33:03 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 745B63AAA0
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 12:35:56 +0000 (UTC)
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 536E51BC1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:35:53 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-47147ebb849so1945388e0c.3
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 05:35:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687437352; x=1690029352;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=BwL1XXFpB7Juc23gGcrmpmP3rd5YyIO3kgOAyPIlzcM=;
+        b=CqGj2E1L8WAGd6HSmOq2ffig5DVss6jWELqzntl3GKlXUEYm5evoPvavsg0cZPdyUG
+         uVYi/gfibC8xVIb/UDtPwlUBdDgsGbxguuycXjG2YxnCEy6H8kcNelG4AmVpMpuckiFA
+         eyEowBgxCKXjLiR8L0kyDyIwgAAsE6ldsvwGIJ3f6rUlNWz3fc1ZPRn8DOTpQsHvf9U3
+         rCVWH3iloZlCntq1nkRIF3PZgXJe73H9ULOZzTrIaIObG/zpStYEiw4JdcsdNwNBIaPh
+         qAF5aEyVo3tt/zl56/6m0CiD/OPH7Vi4QYEnxzx/YEwhml9wARWBRGCZwE5R0GDgcGQY
+         E3NA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687437352; x=1690029352;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=BwL1XXFpB7Juc23gGcrmpmP3rd5YyIO3kgOAyPIlzcM=;
+        b=boCM+ghypY2JxI4ZF+hPzwJD7HRU9C4puXrVBVg0IagZbOO3eoI6BbyF+6h06LyNRL
+         gEcOrfQSqMl+spIXw9WlNBTUnQyPoDiLTp0jP+h0/VMUZIQi1vQSoSDsNSeVFnJ1lPnc
+         tMzUksqZHZoy+NiyO+kKwbQvRgTuONXiHI83AbZze2VesHZEuPsGVsdsGtuXEjOCtMCz
+         eN7BmPXcMDTUt9NUJHnasO7cxd9L0XJeb337xDcGqW35K7hS+br6NOjVoBI1LRe9MoN9
+         WzIMZ5vDb9Q3f8IWMxwcb1GQL8B/I3Th3DtEQ01EAZoFruQWE3D8cLm9adoRyd+W6L+F
+         FLyA==
+X-Gm-Message-State: AC+VfDyMxRdLzwumRGog0XKNhkgtzpHQInwEwRR2qUBnmavMsKiNEyfQ
+	QzzGywukFR44wZEk8I0T/abfmKQmT08CunqGtGpigQ==
+X-Google-Smtp-Source: ACHHUZ4bpL2T9bnI4qregSI95k/VcQbvtJLdxgrvfNu5HuW8eTOaNzhJ0fgEC/46fMtfm/dxsGD0owYkxtdDBTEbKLI=
+X-Received: by 2002:a1f:e201:0:b0:471:4ceb:675f with SMTP id
+ z1-20020a1fe201000000b004714ceb675fmr5066318vkg.9.1687437352169; Thu, 22 Jun
+ 2023 05:35:52 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
- module
-To: Alexandra Winter <wintera@linux.ibm.com>,
-        Simon Horman <simon.horman@corigine.com>
-Cc: Randy Dunlap <rdunlap@infradead.org>, linux-kernel@vger.kernel.org,
-        kernel test robot <lkp@intel.com>, Wenjia Zhang <wenjia@linux.ibm.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "David S . Miller"
- <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-References: <20230621213742.8245-1-rdunlap@infradead.org>
- <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
- <ZJP99hSRt5MakBXC@corigine.com>
- <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
-Content-Language: en-US
-From: Christian Borntraeger <borntraeger@linux.ibm.com>
-In-Reply-To: <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: uc70g-gBitPGOyV0dLNCzj0bYDxXYfsQ
-X-Proofpoint-GUID: 2Za_iKiyqFQ94YDnoSKL1EWtFi7br6Lc
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-22_08,2023-06-22_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 clxscore=1011
- impostorscore=0 phishscore=0 mlxscore=0 bulkscore=0 malwarescore=0
- suspectscore=0 mlxlogscore=999 priorityscore=1501 adultscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306220105
+References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
+ <ZJLzsWsIPD57pDgc@FVFF77S0Q05N> <ZJQXdFxoBNUdutYx@FVFF77S0Q05N>
+In-Reply-To: <ZJQXdFxoBNUdutYx@FVFF77S0Q05N>
+From: Naresh Kamboju <naresh.kamboju@linaro.org>
+Date: Thu, 22 Jun 2023 18:05:40 +0530
+Message-ID: <CA+G9fYtAutjL3KpZsQyJuk4WqS=Ydi2iyVb5jdecZ-SOuzKCmA@mail.gmail.com>
+Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
+To: Mark Rutland <mark.rutland@arm.com>
+Cc: Linux ARM <linux-arm-kernel@lists.infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
+	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, 
+	Puranjay Mohan <puranjay12@gmail.com>, Song Liu <song@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Am 22.06.23 um 14:16 schrieb Alexandra Winter:
-> 
-> 
-> On 22.06.23 09:53, Simon Horman wrote:
->> On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
->>>
->>>
->>> On 21.06.23 23:37, Randy Dunlap wrote:
->>>> Require FDDI to be built-in if it is used. LCS needs FDDI to be
->>>> built-in to build without errors.
->>>>
->>>> Prevents these build errors:
->>>> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
->>>> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
->>>> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
->>>>
->>>> This FDDI requirement effectively restores the previous condition
->>>> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
->>>> testing for CONFIG_FDDI_MODULE.
->>>>
->>>> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-> [...]
->>
->>> 2) I wonder whether
->>>
->>>    	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
->>>   +	depends on FDDI || FDDI=n
->>>
->>> would do what we want here:
->>> When FDDI is a loadable module, LCS mustn't be built-in.
->>>
->>> I will do some experiments and let you know.
->>
->> It does seem to on my side.
->> But checking would be much appreciated.
->   
-> 
-> Here are my experiments:
+Hi Mark,
 
-Another suggestion. Why not remove the FDDI part of the lcs driver? This seems unused
-without hardware for years now.Longterm we could even remove the whole lcs driver.
+On Thu, 22 Jun 2023 at 15:12, Mark Rutland <mark.rutland@arm.com> wrote:
+>
+> On Wed, Jun 21, 2023 at 01:57:21PM +0100, Mark Rutland wrote:
+> > On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
+> > > Following boot warnings and crashes noticed on arm64 Rpi4 device running
+> > > Linux next-20230621 kernel.
+> > >
+> > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > >
+> > > boot log:
+> > >
+> > > [   22.331748] Kernel text patching generated an invalid instruction
+> > > at 0xffff8000835d6580!
+> > > [   22.340579] Unexpected kernel BRK exception at EL1
+> > > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1] PREEMPT SMP
+> >
+> > This indicates execution of AARCH64_BREAK_FAULT.
+> >
+> > That could be from dodgy arguments to aarch64_insn_gen_*(), or elsewhere, and
+> > given this is in the networking code I suspect this'll be related to BPF.
+> >
+> > Looking at next-20230621 I see commit:
+> >
+> >   49703aa2adfaff28 ("bpf, arm64: use bpf_jit_binary_pack_alloc")
+> >
+> > ... which changed the way BPF allocates memory, and has code that pads memory
+> > with a bunch of AARCH64_BREAK_FAULT, so it looks like that *might* be related.
+>
+> For the benefit of those just looknig at this thread, there has been some
+> discussion in the original thread for this commit. Summary and links below.
+>
+> We identified a potential issue with missing cache maintenance:
+>
+>   https://lore.kernel.org/linux-arm-kernel/ZJMXqTffB22LSOkd@FVFF77S0Q05N/
+>
+> Puranjay verified that was causing the problem seen here:
+>
+>   https://lore.kernel.org/linux-arm-kernel/CANk7y0h5ucxmMz4K8sGx7qogFyx6PRxYxmFtwTRO7=0Y=B4ugw@mail.gmail.com/
+>
+> Alexei has dropped this commit for now:
+>
+>   https://lore.kernel.org/linux-arm-kernel/CAADnVQJqDOMABEx8JuU6r_Dehyf=SkDfRNChx1oNfqPoo7pSrw@mail.gmail.com/
+
+Thanks for the detailed information.
+I am happy to test any proposed fix patches.
+
+
+>
+> Thanks,
+> Mark.
+
+- Naresh
 
