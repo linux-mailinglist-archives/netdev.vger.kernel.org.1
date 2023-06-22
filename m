@@ -1,143 +1,95 @@
-Return-Path: <netdev+bounces-13120-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13121-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6E4FD73A568
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:54:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 88C5673A58B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:08:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A73292819CA
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:54:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0E2972819DE
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:08:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA0371F955;
-	Thu, 22 Jun 2023 15:54:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9D481F959;
+	Thu, 22 Jun 2023 16:08:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE8F03AA98
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 15:54:15 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 888FD10F8;
-	Thu, 22 Jun 2023 08:54:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	MIME-Version:Message-ID:Date:Subject:Cc:To:From:Sender:Reply-To:Content-Type:
-	Content-ID:Content-Description:In-Reply-To:References;
-	bh=xyLbNzZ/cBspjKpPk46G3AEQd+aThHsA32OlsyTI2uY=; b=z1nNxx71rlhpqa2DBWP5mZ3LMv
-	68WRdxR+w6RcUjAX5uM6xXewmBngVeMOIfBjnQchk42q77qWQDnD3RFrw86YUrgTVIIxU1jqqhuW5
-	YUac2edCy4RNDSGoVZL716AJIPzw/+fpCZNuY+7bbDbmjhCV+EZNb2aVy+jzXkVitBez5AdsVmEf+
-	dauMnuxi62mi79HjlJ34nS4teh3hLCImCqKNcmANLw1FjqGqW/K3XmPs46peEhQBccNhde1rkqRqj
-	epMoVTOEb88FMv2PB0BAWuRkXztaetsGm5471a9TU1Fv205BWS3wRWQazPyhUOmnxcsGZ7mGT1gNi
-	a/oNe5kw==;
-Received: from [2601:1c2:980:9ec0::2764] (helo=bombadil.infradead.org)
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qCMdP-001AeD-24;
-	Thu, 22 Jun 2023 15:54:11 +0000
-From: Randy Dunlap <rdunlap@infradead.org>
-To: linux-kernel@vger.kernel.org
-Cc: Randy Dunlap <rdunlap@infradead.org>,
-	kernel test robot <lkp@intel.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH] revert "s390/net: lcs: use IS_ENABLED() for kconfig detection"
-Date: Thu, 22 Jun 2023 08:54:09 -0700
-Message-ID: <20230622155409.27311-1-rdunlap@infradead.org>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAE993AA98
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 16:08:30 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2795199E
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 09:08:29 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6664ac3be47so1405992b3a.0
+        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 09:08:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687450109; x=1690042109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pHrAtr63CDFrvYf0AIAGl5pyNC5ZfXwpcGvrXF7zcyI=;
+        b=SL4BbeC8SiZr06bXNGLsW9Otclfx93ba9ROrRtCenWhyk91HS+UT5Q5QDldFFWQ2Pq
+         tCvtovQ1zMc3ROXLgFfStAICxHu88Pd0MsX4mC8RYCAPTnvfAh592Nl/nHNDGYWJeJEm
+         3JW8cJrOqk+hGvurcSZCgKpOC72/dQRM8a7y3o0nL8iMnmXX/lA2VYmuz6VtZIHYfdYR
+         7jRsRV2C108Ah2yKtv9PW7lvBoGdbdUUGN8xouWv91AXTfzMl5B7reRr5N/nrzT7vnpJ
+         SGyaSSlHHitIZFYstLxd1p9I336CCQ926fV9M4QEE4lrAJ8nog5U1QDkLgChy8nLc7Y6
+         1fGw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687450109; x=1690042109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=pHrAtr63CDFrvYf0AIAGl5pyNC5ZfXwpcGvrXF7zcyI=;
+        b=GWPqEFxOzeMqVcSrPK9ObPqrL+n23/ll5RzIDZQRmVyoq3BZA9ldIcXyzbBE3RvEM0
+         YFVg0cyHmx1ZzB+Me5Wd5Lc68H41J9jcEMqwcKSyVWWUZw8KE2TIJmrRZnO0hFU/3Ydr
+         l+LrrwgI8WZiYCLdfIfP/KezB9VrFu/Fmyy/Dfhzg5Q7nWtiUhbq03xoIrqi+RSssne5
+         5q2YiJKdEEUauUK5A9af2RxDHneAhFGvb5XJZ0SXeh8kahJ7hmciS4smLnNgLRFNRm4i
+         LGySblJcyOkJzPwwed8RUL+/8h5/vVocLpaUA3m61c0P4wyX2C5Q/iO0aM27qlq1sD5n
+         yTZQ==
+X-Gm-Message-State: AC+VfDyKMvkh0cf6ZK0IIs3kIJ8Bm4t8z2t6qk+gs4mA0L52rKKgliqO
+	EHDob1KIpLmVDCIH/YUDVMXmmc+TAXfiEQoh5kCj7v4H9AY=
+X-Google-Smtp-Source: ACHHUZ6zR7WFYj5oFZciOo1azDwneNEf1CVfTyYTfTpVbKgAXNGD8iyZ6ISiqUOYPMwJBqCBUyGjAdMYuPgTBQck/9w=
+X-Received: by 2002:a05:6a00:3985:b0:668:683e:a3f6 with SMTP id
+ fi5-20020a056a00398500b00668683ea3f6mr15603802pfb.2.1687450109017; Thu, 22
+ Jun 2023 09:08:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <CAOMZO5AdPZfQQEfSgW-Cgw2GySerc0oxUu4OEcQoxwVeB+wQWg@mail.gmail.com>
+ <2647dbfe-860d-4a45-94ed-d1d160d9a3be@lunn.ch>
+In-Reply-To: <2647dbfe-860d-4a45-94ed-d1d160d9a3be@lunn.ch>
+From: Fabio Estevam <festevam@gmail.com>
+Date: Thu, 22 Jun 2023 13:08:17 -0300
+Message-ID: <CAOMZO5DvxFLxmzKzKBVdJkyeLgAJDDGu6aCT9dUY=coNFGXXuw@mail.gmail.com>
+Subject: Re: imx8mn with mv88e6320 fails to retrieve IP address
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Vladimir Oltean <olteanv@gmail.com>, netdev <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The referenced patch is causing build errors when ETHERNET=y and
-FDDI=m. While we work out the preferred patch(es), revert this patch
-to make the pain go away.
+Hi Andrew,
 
-Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-Reported-by: kernel test robot <lkp@intel.com>
-Link: lore.kernel.org/r/202306202129.pl0AqK8G-lkp@intel.com
-Cc: Alexandra Winter <wintera@linux.ibm.com>
-Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-Cc: linux-s390@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Cc: Heiko Carstens <hca@linux.ibm.com>
-Cc: Vasily Gorbik <gor@linux.ibm.com>
-Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-Cc: Sven Schnelle <svens@linux.ibm.com>
-Cc: David S. Miller <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Paolo Abeni <pabeni@redhat.com>
----
- drivers/s390/net/lcs.c |   10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
+On Wed, Jun 21, 2023 at 6:43=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
 
-diff -- a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
---- a/drivers/s390/net/lcs.c
-+++ b/drivers/s390/net/lcs.c
-@@ -36,7 +36,7 @@
- #include "lcs.h"
- 
- 
--#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
-+#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
- #error Cannot compile lcs.c without some net devices switched on.
- #endif
- 
-@@ -1601,14 +1601,14 @@ lcs_startlan_auto(struct lcs_card *card)
- 	int rc;
- 
- 	LCS_DBF_TEXT(2, trace, "strtauto");
--#if IS_ENABLED(CONFIG_ETHERNET)
-+#ifdef CONFIG_ETHERNET
- 	card->lan_type = LCS_FRAME_TYPE_ENET;
- 	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
- 	if (rc == 0)
- 		return 0;
- 
- #endif
--#if IS_ENABLED(CONFIG_FDDI)
-+#ifdef CONFIG_FDDI
- 	card->lan_type = LCS_FRAME_TYPE_FDDI;
- 	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
- 	if (rc == 0)
-@@ -2139,13 +2139,13 @@ lcs_new_device(struct ccwgroup_device *c
- 		goto netdev_out;
- 	}
- 	switch (card->lan_type) {
--#if IS_ENABLED(CONFIG_ETHERNET)
-+#ifdef CONFIG_ETHERNET
- 	case LCS_FRAME_TYPE_ENET:
- 		card->lan_type_trans = eth_type_trans;
- 		dev = alloc_etherdev(0);
- 		break;
- #endif
--#if IS_ENABLED(CONFIG_FDDI)
-+#ifdef CONFIG_FDDI
- 	case LCS_FRAME_TYPE_FDDI:
- 		card->lan_type_trans = fddi_type_trans;
- 		dev = alloc_fddidev(0);
+> So this is might be down to symmetric pause being negotiated.  You
+> might be able to prove this by hacking mv88e6185_phylink_get_caps()
+> and remove MAC_SYM_PAUSE. It should then no longer advertise pause,
+> and so the resolved auto-neg should not have pause.
+
+Thanks for your input.
+
+Just upgraded to the latest 6.1.35 and the DHCP issue does not happen anymo=
+re.
+
+Thanks
 
