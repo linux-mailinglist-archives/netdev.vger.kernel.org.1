@@ -1,150 +1,188 @@
-Return-Path: <netdev+bounces-13093-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13094-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6B0E573A240
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:55:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BA23973A2AB
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:09:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EEEA1C21136
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:55:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9851C2113B
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:09:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB14C1F166;
-	Thu, 22 Jun 2023 13:55:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 246FE1F175;
+	Thu, 22 Jun 2023 14:09:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94D7168DC
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:55:32 +0000 (UTC)
-Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D771BF6;
-	Thu, 22 Jun 2023 06:55:26 -0700 (PDT)
-Received: from mx0.infotecs-nt (localhost [127.0.0.1])
-	by mx0.infotecs.ru (Postfix) with ESMTP id 041CE10F4874;
-	Thu, 22 Jun 2023 16:55:23 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 041CE10F4874
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
-	t=1687442123; bh=4n0/HOa8GcSzSv0ccDtNa+JBp10/ttCJkrIJGTCvlBU=;
-	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
-	b=kHhFfhWWEBFs4xMaoIib8LP+3Swn1yh0P52ShIUncCSo5kch5jNeyUKoOKaxqCO8p
-	 Mb1Pj/ATMB7MqsgNBTVb1QoEv2S2SyY0G3y+/jgIzkTd5cvhiRYr7GX6U7sRFrR4S1
-	 X7lkaTFRwjTAWBJwWUSwznw1gPXnYy+OPi5wB58Q=
-Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
-	by mx0.infotecs-nt (Postfix) with ESMTP id 0102230D12EB;
-	Thu, 22 Jun 2023 16:55:23 +0300 (MSK)
-From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
-To: Simon Horman <simon.horman@corigine.com>
-CC: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
-	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Patrick McHardy
-	<kaber@trash.net>, "netfilter-devel@vger.kernel.org"
-	<netfilter-devel@vger.kernel.org>, "coreteam@netfilter.org"
-	<coreteam@netfilter.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
-Subject: Re: [PATCH] netfilter: nf_conntrack_sip: fix the
- ct_sip_parse_numerical_param() return value.
-Thread-Topic: [PATCH] netfilter: nf_conntrack_sip: fix the
- ct_sip_parse_numerical_param() return value.
-Thread-Index: AQHZpREwousYyJT2d0KPXYKYnJV5Dg==
-Date: Thu, 22 Jun 2023 13:55:22 +0000
-Message-ID: <6f2b5c12-82b5-2496-23a3-05ab22d7b14b@infotecs.ru>
-References: <20230426150414.2768070-1-Ilia.Gavrilov@infotecs.ru>
- <ZEwdd7Xj4fQtCXoe@corigine.com>
- <d0a92686-acc4-4fd8-0505-60a8394d05d8@infotecs.ru>
- <ZFEYpNsp/hBEJAGU@corigine.com>
- <f9d9ac80-704a-91d7-b120-449b921e8bb0@infotecs.ru>
- <ZFEuazEvNWHfEH93@corigine.com>
-In-Reply-To: <ZFEuazEvNWHfEH93@corigine.com>
-Accept-Language: ru-RU, en-US
-Content-Language: ru-RU
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [10.17.0.10]
-x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <10FD4159AF211947B84172ACF6576E05@infotecs.ru>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 17B5D15AE5
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 14:09:20 +0000 (UTC)
+Received: from mailout2.w1.samsung.com (mailout2.w1.samsung.com [210.118.77.12])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66E13118;
+	Thu, 22 Jun 2023 07:09:19 -0700 (PDT)
+Received: from eucas1p1.samsung.com (unknown [182.198.249.206])
+	by mailout2.w1.samsung.com (KnoxPortal) with ESMTP id 20230622140917euoutp0209c3af71a8e555075da71adff50e22be~rAG37Z84v1834418344euoutp02o;
+	Thu, 22 Jun 2023 14:09:17 +0000 (GMT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mailout2.w1.samsung.com 20230622140917euoutp0209c3af71a8e555075da71adff50e22be~rAG37Z84v1834418344euoutp02o
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=samsung.com;
+	s=mail20170921; t=1687442957;
+	bh=zaMeOOgNTUhWbrl//bfN8EJTtzCzEfB12QbiW80G2f4=;
+	h=Date:From:To:CC:Subject:In-Reply-To:References:From;
+	b=fyMYAsX7SWYCvC721YkuDao9t6T+v9dW0/DNO3irMb5N3/+7mY+XC7PBmdIBgaAvs
+	 nwu4XyzztDaaiEJ4vpcLtdpxEmzEo+NC19qsW+0/HbTJr2EWYbhVKkuOS3DdtZRY7b
+	 95cqTsi+l2A2Sq2OBC3R9D8F7pdOR0ihbUkSZEHY=
+Received: from eusmges1new.samsung.com (unknown [203.254.199.242]) by
+	eucas1p2.samsung.com (KnoxPortal) with ESMTP id
+	20230622140917eucas1p28dc98c293572df0d551587904d58fff1~rAG3sfKOA1958219582eucas1p2p;
+	Thu, 22 Jun 2023 14:09:17 +0000 (GMT)
+Received: from eucas1p1.samsung.com ( [182.198.249.206]) by
+	eusmges1new.samsung.com (EUCPMTA) with SMTP id DC.B9.42423.D0654946; Thu, 22
+	Jun 2023 15:09:17 +0100 (BST)
+Received: from eusmtrp1.samsung.com (unknown [182.198.249.138]) by
+	eucas1p1.samsung.com (KnoxPortal) with ESMTPA id
+	20230622140916eucas1p122166fa1c1ee8fc1498c76af15e4ce52~rAG3Opb-I1423914239eucas1p1o;
+	Thu, 22 Jun 2023 14:09:16 +0000 (GMT)
+Received: from eusmgms2.samsung.com (unknown [182.198.249.180]) by
+	eusmtrp1.samsung.com (KnoxPortal) with ESMTP id
+	20230622140916eusmtrp1d20955f9b396aea7c60d7cdcf79f38fd~rAG3N_8ml1843218432eusmtrp1R;
+	Thu, 22 Jun 2023 14:09:16 +0000 (GMT)
+X-AuditID: cbfec7f2-a51ff7000002a5b7-61-6494560d374d
+Received: from eusmtip2.samsung.com ( [203.254.199.222]) by
+	eusmgms2.samsung.com (EUCPMTA) with SMTP id 21.D2.14344.C0654946; Thu, 22
+	Jun 2023 15:09:16 +0100 (BST)
+Received: from CAMSVWEXC02.scsc.local (unknown [106.1.227.72]) by
+	eusmtip2.samsung.com (KnoxPortal) with ESMTPA id
+	20230622140916eusmtip283cc06318a6e5b54077056f6bb1dd63f~rAG3DqvTB0784507845eusmtip2C;
+	Thu, 22 Jun 2023 14:09:16 +0000 (GMT)
+Received: from localhost (106.110.32.133) by CAMSVWEXC02.scsc.local
+	(2002:6a01:e348::6a01:e348) with Microsoft SMTP Server (TLS) id 15.0.1497.2;
+	Thu, 22 Jun 2023 15:09:16 +0100
+Date: Thu, 22 Jun 2023 16:09:15 +0200
+From: Joel Granados <j.granados@samsung.com>
+To: Jakub Kicinski <kuba@kernel.org>
+CC: <mcgrof@kernel.org>, Kees Cook <keescook@chromium.org>, Iurii Zaikin
+	<yzaikin@google.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	<linux-kernel@vger.kernel.org>, <linux-fsdevel@vger.kernel.org>,
+	<netdev@vger.kernel.org>
+Subject: Re: [PATCH 05/11] sysctl: Add a size arg to __register_sysctl_table
+Message-ID: <20230622140915.top2p467qfd7slez@localhost>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KLMS-Rule-ID: 1
-X-KLMS-Message-Action: clean
-X-KLMS-AntiSpam-Lua-Profiles: 178188 [Jun 22 2023]
-X-KLMS-AntiSpam-Version: 5.9.59.0
-X-KLMS-AntiSpam-Envelope-From: Ilia.Gavrilov@infotecs.ru
-X-KLMS-AntiSpam-Rate: 0
-X-KLMS-AntiSpam-Status: not_detected
-X-KLMS-AntiSpam-Method: none
-X-KLMS-AntiSpam-Auth: dkim=none
-X-KLMS-AntiSpam-Info: LuaCore: 517 517 b0056c19d8e10afbb16cb7aad7258dedb0179a79, {Tracking_msgid_8}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;infotecs.ru:7.1.1, FromAlignment: s
-X-MS-Exchange-Organization-SCL: -1
-X-KLMS-AntiSpam-Interceptor-Info: scan successful
-X-KLMS-AntiPhishing: Clean, bases: 2023/06/22 12:25:00
-X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/06/22 09:26:00 #21554371
-X-KLMS-AntiVirus-Status: Clean, skipped
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+Content-Type: multipart/signed; micalg="pgp-sha512";
+	protocol="application/pgp-signature"; boundary="o5zo77jvou4wd4u7"
+Content-Disposition: inline
+In-Reply-To: <20230621135322.06b0ba2c@kernel.org>
+X-Originating-IP: [106.110.32.133]
+X-ClientProxiedBy: CAMSVWEXC01.scsc.local (2002:6a01:e347::6a01:e347) To
+	CAMSVWEXC02.scsc.local (2002:6a01:e348::6a01:e348)
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFrrHKsWRmVeSWpSXmKPExsWy7djPc7q8YVNSDL7MlLCYc76FxeLpsUfs
+	Fme6cy0ubOtjtdiz9ySLxeVdc9gsbkx4ymhxbIGYxbfTbxgtlu30c+DymN1wkcVjy8qbTB4L
+	NpV6bFrVyebxft9VNo/Pm+QC2KK4bFJSczLLUov07RK4Mg6e+8Fc8EmgovfUc8YGxqN8XYyc
+	HBICJhJNmxeydjFycQgJrGCUOP1vDwtIQkjgC6NE98ogiMRnRol5vdNZYTr2v7vFCJFYzigx
+	9cxEVriqsx8b2CGcLYwSCz73s4G0sAioSnSvOc4OYrMJ6Eicf3OHGcQWEVCRaNk8kwWkgVlg
+	HZPE7uYdQEUcHMICPhJrF6mD1PAKmEss+nyMBcIWlDg58wmYzSxQIXF5+iQmkHJmAWmJ5f84
+	QMKcAoYSfZcvsENcqiTx9U0v1NW1Eqe23GICWSUhsJlT4kPzYiaIhIvE9a7fzBC2sMSr41ug
+	mmUkTk/uYYFomMwosf/fB3YIZzWjxLLGr1Dd1hItV55AdThKnLm/mRHkIgkBPokbbwUhDuWT
+	mLRtOjNEmFeio00IolpNYvW9NywTGJVnIXltFpLXZiG8BhHWkViw+xMbhrC2xLKFr5khbFuJ
+	devesyxgZF/FKJ5aWpybnlpsmJdarlecmFtcmpeul5yfu4kRmOxO/zv+aQfj3Fcf9Q4xMnEw
+	HmJUAWp+tGH1BUYplrz8vFQlEV7ZTZNShHhTEiurUovy44tKc1KLDzFKc7AoifNq255MFhJI
+	TyxJzU5NLUgtgskycXBKNTC1s1/6klgdPelZbK3st1syasbV9yaEJouGMHnsjy5l3rJ4aurV
+	7122maecbh7yP+3msX66IP+a2Y0Sk1sspN4f/rUyK2WT28aa7cuj7lSftDkZs+/hn2vRogIT
+	JVVsFm30Ngt9YCXikD3NM2yPaSjftV0/tjYt3aL+Rfzcm0MbF5/8v/F2CNePwNPaRYe/XGKu
+	OuryeMeaQGbVn+ec5HUmLNB+ZGq8z6rt9uE44UDvZcz7z25SUJ29eN1fgfWF4u2KVkfXTbX7
+	JjfHyX6/7prta6Y8OHzezM53++cmpf8xJ5c03HvZFZp6TulZ+bxijt4uzr/z8z6HbUwMTjSU
+	0Yus6uNT+BKVNoPJUbGCp2udEktxRqKhFnNRcSIAY2gQl/EDAAA=
+X-Brightmail-Tracker: H4sIAAAAAAAAA+NgFvrNIsWRmVeSWpSXmKPExsVy+t/xe7o8YVNSDBZvtbCYc76FxeLpsUfs
+	Fme6cy0ubOtjtdiz9ySLxeVdc9gsbkx4ymhxbIGYxbfTbxgtlu30c+DymN1wkcVjy8qbTB4L
+	NpV6bFrVyebxft9VNo/Pm+QC2KL0bIryS0tSFTLyi0tslaINLYz0DC0t9IxMLPUMjc1jrYxM
+	lfTtbFJSczLLUov07RL0Mlaffc1e8EGg4sirVYwNjIf5uhg5OSQETCT2v7vF2MXIxSEksJRR
+	oqv5MxNEQkZi45errBC2sMSfa11sEEUfgYpWv2SHcLYwSjy5uwWsg0VAVaJ7zXF2EJtNQEfi
+	/Js7zCC2iICKRMvmmSwgDcwC65gkdjfvACri4BAW8JFYu0gdpIZXwFxi0edjLBBDXzFK9O+7
+	zAqREJQ4OfMJC4jNLFAmceTxHUaQXmYBaYnl/zhAwpwChhJ9ly+wQ1yqJPH1TS/U1bUSn/8+
+	Y5zAKDwLyaRZSCbNQpgEEdaSuPHvJROGsLbEsoWvmSFsW4l1696zLGBkX8UoklpanJueW2yk
+	V5yYW1yal66XnJ+7iREY89uO/dyyg3Hlq496hxiZOBgPMaoAdT7asPoCoxRLXn5eqpIIr+ym
+	SSlCvCmJlVWpRfnxRaU5qcWHGE2BoTiRWUo0OR+YjPJK4g3NDEwNTcwsDUwtzYyVxHk9CzoS
+	hQTSE0tSs1NTC1KLYPqYODilGpiE03YZhJ6YeCGxJYNLsXDPPNEtYSx7maJkPzZMehjPIMp+
+	6jyHEHehRhhzQaZivfF1Ro66CouNXh+fhv3I3jwr/cK0q1XuDz/cX/eq6shBu4UFau0CWwN3
+	b/n7cIdl8zaOj9+mRqotSyn06Zm89kjWtZ08O2VrKw4mzrjb99HMINl15ec9000XZv0MyP/m
+	oZH1JsNY4uydSd1Np7muVz1b180wRUB3jvZPb9/wryyG/T8OML6frF2SM31u8vk1nR/iJXWq
+	Ji40kHzzIkkiysenOXcv55Ld29YcXLLs2pE1AuULZ/ub2PBcnKrC+Ev88YT8j+55WZ+KDl/8
+	aiR38GhOLF8skyO748Km1kN3NXuVWIozEg21mIuKEwGi6m7QjgMAAA==
+X-CMS-MailID: 20230622140916eucas1p122166fa1c1ee8fc1498c76af15e4ce52
+X-Msg-Generator: CA
+X-RootMTR: 20230621091014eucas1p1a30430568d0f7fec5ccbed31cab73aa0
+X-EPHeader: CA
+CMS-TYPE: 201P
+X-CMS-RootMailID: 20230621091014eucas1p1a30430568d0f7fec5ccbed31cab73aa0
+References: <20230621091000.424843-1-j.granados@samsung.com>
+	<CGME20230621091014eucas1p1a30430568d0f7fec5ccbed31cab73aa0@eucas1p1.samsung.com>
+	<20230621091000.424843-6-j.granados@samsung.com>
+	<20230621135322.06b0ba2c@kernel.org>
+X-Spam-Status: No, score=-7.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_HI,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gNS8yLzIzIDE4OjM4LCBTaW1vbiBIb3JtYW4gd3JvdGU6DQo+IE9uIFR1ZSwgTWF5IDAyLCAy
-MDIzIGF0IDAyOjE2OjA5UE0gKzAwMDAsIEdhdnJpbG92IElsaWEgd3JvdGU6DQo+PiBPbiA1LzIv
-MjMgMTc6MDUsIFNpbW9uIEhvcm1hbiB3cm90ZToNCj4+PiBPbiBUdWUsIE1heSAwMiwgMjAyMyBh
-dCAxMTo0MzoxOUFNICswMDAwLCBHYXZyaWxvdiBJbGlhIHdyb3RlOg0KPj4+PiBPbiA0LzI4LzIz
-IDIyOjI0LCBTaW1vbiBIb3JtYW4gd3JvdGU6DQo+Pj4+PiBPbiBXZWQsIEFwciAyNiwgMjAyMyBh
-dCAwMzowNDozMVBNICswMDAwLCBHYXZyaWxvdiBJbGlhIHdyb3RlOg0KPj4+Pj4+IGN0X3NpcF9w
-YXJzZV9udW1lcmljYWxfcGFyYW0oKSByZXR1cm5zIG9ubHkgMCBvciAxIG5vdy4NCj4+Pj4+PiBC
-dXQgcHJvY2Vzc19yZWdpc3Rlcl9yZXF1ZXN0KCkgYW5kIHByb2Nlc3NfcmVnaXN0ZXJfcmVzcG9u
-c2UoKSBpbXBseQ0KPj4+Pj4+IGNoZWNraW5nIGZvciBhIG5lZ2F0aXZlIHZhbHVlIGlmIHBhcnNp
-bmcgb2YgYSBudW1lcmljYWwgaGVhZGVyIHBhcmFtZXRlcg0KPj4+Pj4+IGZhaWxlZC4gTGV0J3Mg
-Zml4IGl0Lg0KPj4+Pj4+DQo+Pj4+Pj4gRm91bmQgYnkgSW5mb1RlQ1Mgb24gYmVoYWxmIG9mIExp
-bnV4IFZlcmlmaWNhdGlvbiBDZW50ZXINCj4+Pj4+PiAobGludXh0ZXN0aW5nLm9yZykgd2l0aCBT
-VkFDRS4NCj4+Pj4+Pg0KPj4+Pj4+IEZpeGVzOiAwZjMyYTQwZmM5MWEgKCJbTkVURklMVEVSXTog
-bmZfY29ubnRyYWNrX3NpcDogY3JlYXRlIHNpZ25hbGxpbmcgZXhwZWN0YXRpb25zIikNCj4+Pj4+
-PiBTaWduZWQtb2ZmLWJ5OiBJbGlhLkdhdnJpbG92IDxJbGlhLkdhdnJpbG92QGluZm90ZWNzLnJ1
-Pg0KPj4+Pj4NCj4+Pj4+IEhpIEdhdnJpbG92LA0KPj4+Pj4NCj4+Pj4NCj4+Pj4gSGkgU2ltb24s
-IHRoYW5rIHlvdSBmb3IgeW91ciBhbnN3ZXIuDQo+Pj4+DQo+Pj4+PiBhbHRob3VnaCBpdCBpcyBh
-IHNsaWdodGx5IHVudXN1YWwgY29udmVudGlvbiBmb3Iga2VybmVsIGNvZGUsDQo+Pj4+PiBJIGJl
-bGlldmUgdGhlIGludGVudGlvbiBpcyB0aGF0IHRoaXMgZnVuY3Rpb24gcmV0dXJucyAwIHdoZW4N
-Cj4+Pj4+IGl0IGZhaWxzICh0byBwYXJzZSkgYW5kIDEgb24gc3VjY2Vzcy4gU28gSSB0aGluayB0
-aGF0IHBhcnQgaXMgZmluZS4NCj4+Pj4+DQo+Pj4+PiBXaGF0IHNlZW1zIGEgYml0IGJyb2tlbiBp
-cyB0aGUgd2F5IHRoYXQgY2FsbGVycyB1c2UgdGhlIHJldHVybiB2YWx1ZS4NCj4+Pj4+DQo+Pj4+
-PiAxLiBUaGUgY2FsbCBpbiBwcm9jZXNzX3JlZ2lzdGVyX3Jlc3BvbnNlKCkgbG9va3MgbGlrZSB0
-aGlzOg0KPj4+Pj4NCj4+Pj4+IAlyZXQgPSBjdF9zaXBfcGFyc2VfbnVtZXJpY2FsX3BhcmFtKC4u
-LikNCj4+Pj4+IAlpZiAocmV0IDwgMCkgew0KPj4+Pj4gCQluZl9jdF9oZWxwZXJfbG9nKHNrYiwg
-Y3QsICJjYW5ub3QgcGFyc2UgZXhwaXJlcyIpOw0KPj4+Pj4gCQlyZXR1cm4gTkZfRFJPUDsNCj4+
-Pj4+IAl9DQo+Pj4+Pg0KPj4+Pj4gICAgICAgIEJ1dCByZXQgY2FuIG9ubHkgYmUgMCBvciAxLCBz
-byB0aGUgZXJyb3IgaGFuZGxpbmcgaXMgbmV2ZXIgaW5va2VkLA0KPj4+Pj4gICAgICAgIGFuZCBh
-IGZhaWx1cmUgdG8gcGFyc2UgaXMgaWdub3JlZC4gSSBndWVzcyBmYWlsdXJlIGRvZXNuJ3Qgb2Nj
-dXIgaW4NCj4+Pj4+ICAgICAgICBwcmFjdGljZS4NCj4+Pj4+DQo+Pj4+PiAgICAgICAgSSBzdXNw
-ZWN0IHRoaXMgc2hvdWxkIGJlOg0KPj4+Pj4NCj4+Pj4+IAlyZXQgPSBjdF9zaXBfcGFyc2VfbnVt
-ZXJpY2FsX3BhcmFtKC4uLikNCj4+Pj4+IAlpZiAoIXJldCkgew0KPj4+Pj4gCQluZl9jdF9oZWxw
-ZXJfbG9nKHNrYiwgY3QsICJjYW5ub3QgcGFyc2UgZXhwaXJlcyIpOw0KPj4+Pj4gCQlyZXR1cm4g
-TkZfRFJPUDsNCj4+Pj4+IAl9DQo+Pj4+Pg0KPj4+Pg0KPj4+PiBjdF9zaXBfcGFyc2VfbnVtZXJp
-Y2FsX3BhcmFtKCkgcmV0dXJucyAwIGluIHRvIGNhc2VzIDEpIHdoZW4gdGhlDQo+Pj4+IHBhcmFt
-ZXRlciAnZXhwaXJlcz0nIGlzbid0IGZvdW5kIGluIHRoZSBoZWFkZXIgb3IgMikgaXQncyBpbmNv
-cnJlY3RseSBzZXQuDQo+Pj4+IEluIHRoZSBmaXJzdCBjYXNlLCB0aGUgcmV0dXJuIHZhbHVlIHNo
-b3VsZCBiZSBpZ25vcmVkLCBzaW5jZSB0aGlzIGlzIGENCj4+Pj4gbm9ybWFsIHNpdHVhdGlvbg0K
-Pj4+PiBJbiB0aGUgc2Vjb25kIGNhc2UsIGl0J3MgYmV0dGVyIHRvIHdyaXRlIHRvIHRoZSBsb2cg
-YW5kIHJldHVybiBORl9EUk9QLA0KPj4+PiBvciBpZ25vcmUgaXQgdG9vLCB0aGVuIGNoZWNraW5n
-IHRoZSByZXR1cm4gdmFsdWUgY2FuIGJlIHJlbW92ZWQgYXMNCj4+Pj4gdW5uZWNlc3NhcnkuDQo+
-Pj4NCj4+PiBTb3JyeSwgSSB0aGluayBJIG1pc3VuZGVyc3Rvb2QgdGhlIGludGVudGlvbiBvZiB5
-b3VyIHBhdGNoIGVhcmxpZXIuDQo+Pj4NCj4+PiBEbyBJIChub3cpIHVuZGVyc3RhbmQgY29ycmVj
-dGx5IHRoYXQgeW91IGFyZSBwcm9wb3NpbmcgYSB0cmlzdGF0ZT8NCj4+Pg0KPj4+IGEpIHJldHVy
-biAxIGlmIHZhbHVlIGlzIGZvdW5kOyAqdmFsIGlzIHNldA0KPj4+IGIpIHJldHVybiAwIGlmIHZh
-bHVlIGlzIG5vdCBmb3VuZDsgKnZhbCBpcyB1bmNoYW5nZWQNCj4+PiBjKSByZXR1cm4gLTEgb24g
-ZXJyb3I7ICp2YWwgaXMgdW5kZWZpbmVkDQo+Pg0KPj4gWWVzLCBpdCBzZWVtcyB0byBtZSB0aGF0
-IHRoaXMgd2FzIG9yaWdpbmFsbHkgaW50ZW5kZWQuDQo+IA0KPiBUaGFua3MuIFdpdGggbXkgbmV3
-IGZvdW5kIHVuZGVyc3RhbmRpbmcsIHRoaXMgbG9va3MgZ29vZCB0byBtZS4NCj4gDQo+IFJldmll
-d2VkLWJ5OiBTaW1vbiBIb3JtYW4gPHNpbW9uLmhvcm1hbkBjb3JpZ2luZS5jb20+DQo+IA0KDQpI
-aSwgU2ltb24uDQpJJ20gc29ycnkgdG8gYm90aGVyIHlvdS4NCldpbGwgdGhpcyBwYXRjaCBiZSBh
-cHBsaWVkIG9yIHJlamVjdGVkPw0KDQrQkmVzdCByZWdhcmRzLCBJbHlhLg0KDQoNCg==
+--o5zo77jvou4wd4u7
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
+
+On Wed, Jun 21, 2023 at 01:53:22PM -0700, Jakub Kicinski wrote:
+> On Wed, 21 Jun 2023 11:09:54 +0200 Joel Granados wrote:
+> > In order to remove the end element from the ctl_table struct arrays, we
+> > explicitly define the size when registering the targets.
+> > __register_sysctl_table is the first function to grow a size argument.
+> > For this commit to focus only on that function, we temporarily implement
+> > a size calculation in register_net_sysctl, which is an indirection call
+> > for all the network register calls.
+>=20
+> You didn't CC the cover letter to netdev so replying here.
+>=20
+> Is the motivation just the size change? Does it conflict with changes
+> queued to other trees?
+I will clarify the motivation in V2. But I have sent out this
+https://lore.kernel.org/all/20230622135922.xtvaiy3isvq576hw@localhost/
+to give some perspective.
+
+>=20
+> It'd be much better if you could figure out a way to push prep into=20
+> 6.5 and then convert subsystems separately.
+One of my objectives for V2 is to reduce the amount of subsystems that
+the patch actually touches. So this might not even be an issue.
+I'll keep that separation possibility in mind; thx for the idea.
+
+Best
+
+--=20
+
+Joel Granados
+
+--o5zo77jvou4wd4u7
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQGzBAABCgAdFiEErkcJVyXmMSXOyyeQupfNUreWQU8FAmSUVgoACgkQupfNUreW
+QU/wFwv+I8rMRjL5RDsrOsrUjqzDKtrDPejfagT1jhJAcwL4IvU3nVVGwTFqxkvO
+cnZKV1OObDzEXv5igpdn86TvJbvDYYh3Ad+6zi0tO4qRI1o0xjb5CFLty3YJwzw3
+UU2aT3yXyhdiOqLiaaorTVrq5sdyEZ9slJxHJIZiVisfHiEQKjC1nnxA/M7RKwfA
+iKuQlfADEDAbuI5eDcJ0RZHeYi2wzgMNms7OaprSbrNG/UgmZWFEnYVpeHZpaPoJ
+DI83GtQHBSHjobRqkYBscDWA9CP3JwpeZBSvo8UIiBnYukgm+aNR5SROaCxm/nce
+TPjW3zmWx174Ld/akYZtrxkCsqLHzwDJW+kL36xVTnGTgFZ9JBqNHW/2jMJ5Nr6q
+kzo85lXqPUjLSflhAq+Rw6Am8+NLXx4RfXjKow+YYJEvvtWNC5uIDv/1dmHmGMyM
+YaQRAfXnbwNSMkSlioBD5BymBUeGR50GVUoOSlAZKJENS5ddU7fjU7n5pd1/Tfy5
+pAyKSHHf
+=xBkN
+-----END PGP SIGNATURE-----
+
+--o5zo77jvou4wd4u7--
 
