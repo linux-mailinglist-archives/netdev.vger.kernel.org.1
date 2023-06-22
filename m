@@ -1,60 +1,60 @@
-Return-Path: <netdev+bounces-13091-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AD33173A22E
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:49:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2146073A22D
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:49:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6A1E9281979
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:49:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D1F0C281996
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:49:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C8501F188;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BDEE1F175;
 	Thu, 22 Jun 2023 13:49:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D1491F185
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:49:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F287A1D2D1
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:49:01 +0000 (UTC)
 Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A50761997
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 70F651994
 	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:49:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
   t=1687441740; x=1718977740;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=KoEbaJaJlFkTKNWuKnd6OPQcY1PNUaTLxJoAu2/HF1U=;
-  b=cwJQhmIrkq8II+lFGa+OP3I2bWe2Orc+qZACPLgrUK0/0iZ4yQVA72Fu
-   +JB0xZOqD9vroeOh9e8/At5mmhEks6QPvr6irMziARSczA3SsCtQQGcAs
-   MzV12AarOC9wfth4h40XCqyDlMLCrSR0k+6V3UMwVZPEvCUp3zWmE2j1z
-   NCqoOuVzXS4Wogw3mJUvUiMy4YbJ+yGIyl+s3q/Asq26lqvH4oLh5EAjJ
-   cqo8EQheXd0cYk98SujrVtJVsGcfYj2SQGaAhLh1uf7PaANHEKLaDDt+c
-   U6iR4AnL63iE/LCI9E/vOeUZ4QLZ/a/ObSqfvv9+BtSJKevAQ1fcWzbF1
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="390234099"
+  bh=2U8ba/PFFG8NcXM4ie8ydtVJGrdtthQJRmmJQI+Koik=;
+  b=VhAS9XjcorueQPPqjXSMQOyYT/XziI6sAVpm3L7Rpc03Bz0AZBSYBjv0
+   VHYmRzFPpnOvcL+CtGuqbAc0TFjYsXMF8GLjxfwZo4L0CPFO7Gu4qWeq7
+   y8Y+dCRwuMoEQ9RC5+n8xz174b6ULgpjQIdbRrw9gSapfZio7aLkC+SFa
+   QV2+VnpqhIcqkM6mlCQbmm0woSAs9DySGvISsX/U7+Lt4k15HMzZARdaR
+   GYQN8uuKmllfDwEJzQ1EGz+GEASL6HFVQ7HXL+iyfuzMffFDwZUeUqsb1
+   fAfDrWKoEkGXB4oYX3z/3iBSmqdH6YsDrvejEpUSjQLJNL2OiLQgzxus1
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="390234096"
 X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="390234099"
+   d="scan'208";a="390234096"
 Received: from fmsmga003.fm.intel.com ([10.253.24.29])
   by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 06:49:00 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="804791813"
+X-IronPort-AV: E=McAfee;i="6600,9927,10748"; a="804791814"
 X-IronPort-AV: E=Sophos;i="6.01,263,1684825200"; 
-   d="scan'208";a="804791813"
+   d="scan'208";a="804791814"
 Received: from irvmail002.ir.intel.com ([10.43.11.120])
-  by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2023 06:48:58 -0700
+  by FMSMGA003.fm.intel.com with ESMTP; 22 Jun 2023 06:48:59 -0700
 Received: from giewont.igk.intel.com (giewont.igk.intel.com [10.211.8.15])
-	by irvmail002.ir.intel.com (Postfix) with ESMTP id 161293493B;
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6C3FC34947;
 	Thu, 22 Jun 2023 14:48:58 +0100 (IST)
 From: Marcin Szycik <marcin.szycik@linux.intel.com>
 To: intel-wired-lan@lists.osuosl.org
 Cc: netdev@vger.kernel.org,
 	Marcin Szycik <marcin.szycik@linux.intel.com>
-Subject: [PATCH iwl-next 1/2] ice: Add direction metadata
-Date: Thu, 22 Jun 2023 15:35:12 +0200
-Message-Id: <20230622133513.28551-2-marcin.szycik@linux.intel.com>
+Subject: [PATCH iwl-next 2/2] ice: Rename enum ice_pkt_flags values
+Date: Thu, 22 Jun 2023 15:35:13 +0200
+Message-Id: <20230622133513.28551-3-marcin.szycik@linux.intel.com>
 X-Mailer: git-send-email 2.31.1
 In-Reply-To: <20230622133513.28551-1-marcin.szycik@linux.intel.com>
 References: <20230622133513.28551-1-marcin.szycik@linux.intel.com>
@@ -72,187 +72,67 @@ X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Currently it is possible to create a filter which breaks TX traffic, e.g.:
-
-tc filter add dev $PF1 ingress protocol ip prio 1 flower ip_proto udp
-dst_port $PORT action mirred egress redirect dev $VF1_PR
-
-This adds a rule which might match both TX and RX traffic, and in TX path
-the PF will actually receive the traffic, which breaks communication.
-
-To fix this, add a match on direction metadata flag when adding a tc rule.
-
-Because of the way metadata is currently handled, a duplicate lookup word
-would appear if VLAN metadata is also added. The lookup would still work
-correctly, but one word would be wasted. To prevent it, lookup 0 now always
-contains all metadata. When any metadata needs to be added, it is added to
-lookup 0 and lookup count is not incremented. This way, two flags residing
-in the same word will take up one word, instead of two.
-
-Note: the drop action is also affected, i.e. it will now only work in one
-direction.
+enum ice_pkt_flags contains values such as ICE_PKT_FLAGS_VLAN and
+ICE_PKT_FLAGS_TUNNEL, but actually the flags words which they refer to
+contain a range of unrelated values - e.g. word 0 (ICE_PKT_FLAGS_VLAN)
+contains fields such as from_network and ucast, which have nothing to do
+with VLAN. Rename each enum value to ICE_PKT_FLAGS_MDID<number>, so it's
+clear in which flags word does some value reside.
 
 Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
 ---
- .../ethernet/intel/ice/ice_protocol_type.h    |  1 +
- drivers/net/ethernet/intel/ice/ice_switch.c   | 11 ++++--
- drivers/net/ethernet/intel/ice/ice_switch.h   |  1 +
- drivers/net/ethernet/intel/ice/ice_tc_lib.c   | 34 +++++++++----------
- 4 files changed, 28 insertions(+), 19 deletions(-)
+ drivers/net/ethernet/intel/ice/ice_protocol_type.h | 8 ++++----
+ drivers/net/ethernet/intel/ice/ice_switch.c        | 6 +++---
+ 2 files changed, 7 insertions(+), 7 deletions(-)
 
 diff --git a/drivers/net/ethernet/intel/ice/ice_protocol_type.h b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-index a1543e995fa1..82491f6af6d0 100644
+index 82491f6af6d0..755a9c55267c 100644
 --- a/drivers/net/ethernet/intel/ice/ice_protocol_type.h
 +++ b/drivers/net/ethernet/intel/ice/ice_protocol_type.h
-@@ -298,6 +298,7 @@ struct ice_nvgre_hdr {
-  * M = EVLAN (0x8100) - Outer L2 header has EVLAN (ethernet type 0x8100)
-  * N = EVLAN (0x9100) - Outer L2 header has EVLAN (ethernet type 0x9100)
-  */
-+#define ICE_PKT_FROM_NETWORK	BIT(3)
- #define ICE_PKT_VLAN_STAG	BIT(12)
- #define ICE_PKT_VLAN_ITAG	BIT(13)
- #define ICE_PKT_VLAN_EVLAN	(BIT(14) | BIT(15))
+@@ -404,10 +404,10 @@ enum ice_hw_metadata_offset {
+ };
+ 
+ enum ice_pkt_flags {
+-	ICE_PKT_FLAGS_VLAN = 0,
+-	ICE_PKT_FLAGS_TUNNEL = 1,
+-	ICE_PKT_FLAGS_TCP = 2,
+-	ICE_PKT_FLAGS_ERROR = 3,
++	ICE_PKT_FLAGS_MDID20 = 0,
++	ICE_PKT_FLAGS_MDID21 = 1,
++	ICE_PKT_FLAGS_MDID22 = 2,
++	ICE_PKT_FLAGS_MDID23 = 3,
+ };
+ 
+ struct ice_hw_metadata {
 diff --git a/drivers/net/ethernet/intel/ice/ice_switch.c b/drivers/net/ethernet/intel/ice/ice_switch.c
-index 87d5ce0c8cb3..28fb175f0fe4 100644
+index 28fb175f0fe4..f962d3350332 100644
 --- a/drivers/net/ethernet/intel/ice/ice_switch.c
 +++ b/drivers/net/ethernet/intel/ice/ice_switch.c
-@@ -6143,14 +6143,21 @@ ice_adv_add_update_vsi_list(struct ice_hw *hw,
+@@ -6143,21 +6143,21 @@ ice_adv_add_update_vsi_list(struct ice_hw *hw,
  void ice_rule_add_tunnel_metadata(struct ice_adv_lkup_elem *lkup)
  {
  	lkup->type = ICE_HW_METADATA;
--	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_TUNNEL] =
-+	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_TUNNEL] |=
+-	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_TUNNEL] |=
++	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_MDID21] |=
  		cpu_to_be16(ICE_PKT_TUNNEL_MASK);
  }
  
-+void ice_rule_add_direction_metadata(struct ice_adv_lkup_elem *lkup)
-+{
-+	lkup->type = ICE_HW_METADATA;
-+	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] |=
-+		cpu_to_be16(ICE_PKT_FROM_NETWORK);
-+}
-+
+ void ice_rule_add_direction_metadata(struct ice_adv_lkup_elem *lkup)
+ {
+ 	lkup->type = ICE_HW_METADATA;
+-	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] |=
++	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_MDID20] |=
+ 		cpu_to_be16(ICE_PKT_FROM_NETWORK);
+ }
+ 
  void ice_rule_add_vlan_metadata(struct ice_adv_lkup_elem *lkup)
  {
  	lkup->type = ICE_HW_METADATA;
--	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] =
-+	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] |=
+-	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_VLAN] |=
++	lkup->m_u.metadata.flags[ICE_PKT_FLAGS_MDID20] |=
  		cpu_to_be16(ICE_PKT_VLAN_MASK);
  }
  
-diff --git a/drivers/net/ethernet/intel/ice/ice_switch.h b/drivers/net/ethernet/intel/ice/ice_switch.h
-index f2ff8fbfe9b6..ee24707071a1 100644
---- a/drivers/net/ethernet/intel/ice/ice_switch.h
-+++ b/drivers/net/ethernet/intel/ice/ice_switch.h
-@@ -361,6 +361,7 @@ int ice_share_res(struct ice_hw *hw, u16 type, u8 shared, u16 res_id);
- 
- /* Switch/bridge related commands */
- void ice_rule_add_tunnel_metadata(struct ice_adv_lkup_elem *lkup);
-+void ice_rule_add_direction_metadata(struct ice_adv_lkup_elem *lkup);
- void ice_rule_add_vlan_metadata(struct ice_adv_lkup_elem *lkup);
- void ice_rule_add_src_vsi_metadata(struct ice_adv_lkup_elem *lkup);
- int
-diff --git a/drivers/net/ethernet/intel/ice/ice_tc_lib.c b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-index 6bbf99b5e112..c4a14eaacc5c 100644
---- a/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-+++ b/drivers/net/ethernet/intel/ice/ice_tc_lib.c
-@@ -7,6 +7,8 @@
- #include "ice_lib.h"
- #include "ice_protocol_type.h"
- 
-+#define ICE_TC_METADATA_LKUP_IDX 0
-+
- /**
-  * ice_tc_count_lkups - determine lookup count for switch filter
-  * @flags: TC-flower flags
-@@ -19,7 +21,13 @@ static int
- ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
- 		   struct ice_tc_flower_fltr *fltr)
- {
--	int lkups_cnt = 0;
-+	int lkups_cnt = 1; /* 0th lookup is metadata */
-+
-+	/* Always add metadata as the 0th lookup. Included elements:
-+	 * - Direction flag (always present)
-+	 * - ICE_TC_FLWR_FIELD_VLAN_TPID (present if specified)
-+	 * - Tunnel flag (present if tunnel)
-+	 */
- 
- 	if (flags & ICE_TC_FLWR_FIELD_TENANT_ID)
- 		lkups_cnt++;
-@@ -57,10 +65,6 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
- 	if (flags & (ICE_TC_FLWR_FIELD_VLAN | ICE_TC_FLWR_FIELD_VLAN_PRIO))
- 		lkups_cnt++;
- 
--	/* is VLAN TPID specified */
--	if (flags & ICE_TC_FLWR_FIELD_VLAN_TPID)
--		lkups_cnt++;
--
- 	/* is CVLAN specified? */
- 	if (flags & (ICE_TC_FLWR_FIELD_CVLAN | ICE_TC_FLWR_FIELD_CVLAN_PRIO))
- 		lkups_cnt++;
-@@ -87,10 +91,6 @@ ice_tc_count_lkups(u32 flags, struct ice_tc_flower_lyr_2_4_hdrs *headers,
- 		     ICE_TC_FLWR_FIELD_SRC_L4_PORT))
- 		lkups_cnt++;
- 
--	/* matching for tunneled packets in metadata */
--	if (fltr->tunnel_type != TNL_LAST)
--		lkups_cnt++;
--
- 	return lkups_cnt;
- }
- 
-@@ -183,10 +183,9 @@ static u16 ice_check_supported_vlan_tpid(u16 vlan_tpid)
- 
- static int
- ice_tc_fill_tunnel_outer(u32 flags, struct ice_tc_flower_fltr *fltr,
--			 struct ice_adv_lkup_elem *list)
-+			 struct ice_adv_lkup_elem *list, int i)
- {
- 	struct ice_tc_flower_lyr_2_4_hdrs *hdr = &fltr->outer_headers;
--	int i = 0;
- 
- 	if (flags & ICE_TC_FLWR_FIELD_TENANT_ID) {
- 		u32 tenant_id;
-@@ -351,8 +350,7 @@ ice_tc_fill_tunnel_outer(u32 flags, struct ice_tc_flower_fltr *fltr,
- 	}
- 
- 	/* always fill matching on tunneled packets in metadata */
--	ice_rule_add_tunnel_metadata(&list[i]);
--	i++;
-+	ice_rule_add_tunnel_metadata(&list[ICE_TC_METADATA_LKUP_IDX]);
- 
- 	return i;
- }
-@@ -380,13 +378,16 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
- 	struct ice_tc_flower_lyr_2_4_hdrs *headers = &tc_fltr->outer_headers;
- 	bool inner = false;
- 	u16 vlan_tpid = 0;
--	int i = 0;
-+	int i = 1; /* 0th lookup is metadata */
- 
- 	rule_info->vlan_type = vlan_tpid;
- 
-+	/* Always add direction metadata */
-+	ice_rule_add_direction_metadata(&list[ICE_TC_METADATA_LKUP_IDX]);
-+
- 	rule_info->tun_type = ice_sw_type_from_tunnel(tc_fltr->tunnel_type);
- 	if (tc_fltr->tunnel_type != TNL_LAST) {
--		i = ice_tc_fill_tunnel_outer(flags, tc_fltr, list);
-+		i = ice_tc_fill_tunnel_outer(flags, tc_fltr, list, i);
- 
- 		/* PFCP is considered non-tunneled - don't swap headers. */
- 		if (tc_fltr->tunnel_type != TNL_PFCP) {
-@@ -456,8 +457,7 @@ ice_tc_fill_rules(struct ice_hw *hw, u32 flags,
- 		rule_info->vlan_type =
- 				ice_check_supported_vlan_tpid(vlan_tpid);
- 
--		ice_rule_add_vlan_metadata(&list[i]);
--		i++;
-+		ice_rule_add_vlan_metadata(&list[ICE_TC_METADATA_LKUP_IDX]);
- 	}
- 
- 	if (flags & (ICE_TC_FLWR_FIELD_CVLAN | ICE_TC_FLWR_FIELD_CVLAN_PRIO)) {
 -- 
 2.31.1
 
