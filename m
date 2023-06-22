@@ -1,161 +1,136 @@
-Return-Path: <netdev+bounces-13102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3620973A3D0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 16:57:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C1C673A429
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 17:03:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 458D42818D0
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 14:57:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2CB9B2818D0
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:03:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 414431F192;
-	Thu, 22 Jun 2023 14:57:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F3C1F196;
+	Thu, 22 Jun 2023 15:03:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F0791E526
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 14:57:35 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBBA519A1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:57:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687445851;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=StWTcZ4+l9QPhbORn1PrY5bDL4InPF3vO5n1F8OE0xo=;
-	b=IxWqeDrXnLCRseigg1Smfucg6doMAZ2GsUNeZrzSI+68mgzK1CarYFG0b03nt5IUbq3O3m
-	RBexMhJHYFDfUXZIa4YiKrRATdSPPPefnWrpyNMSt+5gVfWiQiJ9csmh9ql+wjszqB265+
-	M4YF1AYM7BpVnHklAsCmn0vc6sNBkiE=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-27-2OIqxhc5O-CqZpWTh0v0XA-1; Thu, 22 Jun 2023 10:57:28 -0400
-X-MC-Unique: 2OIqxhc5O-CqZpWTh0v0XA-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-312a08e70e3so601325f8f.1
-        for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 07:57:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E1D61E526
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 15:03:36 +0000 (UTC)
+Received: from mail-wr1-f41.google.com (mail-wr1-f41.google.com [209.85.221.41])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29C26268F;
+	Thu, 22 Jun 2023 08:03:17 -0700 (PDT)
+Received: by mail-wr1-f41.google.com with SMTP id ffacd0b85a97d-311099fac92so8393016f8f.0;
+        Thu, 22 Jun 2023 08:03:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687445846; x=1690037846;
+        d=1e100.net; s=20221208; t=1687446160; x=1690038160;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=StWTcZ4+l9QPhbORn1PrY5bDL4InPF3vO5n1F8OE0xo=;
-        b=W3VTB8KIejmhgosX1i/FQba7vSss9iKD5iDWmSi3vucxsgddTf1oeDc9jgE0KixM0H
-         YGR7xYeT7JyBWHdmyABOhRkimqTdqzCqhB1+2irJYCEoeOy4EczCiNcWIVa7uo9G50sI
-         ffq8fwwIJ7QeY7cWFrFTZ4Ibv0NHoobHQsqXuf8v4hHmTOOD4oJ/Uu/AVSwLZC1GrUbr
-         7nyXe3h5ajl0kWoWvJzB5NVyCQsZpPPvoEpL/1GY1/Hbr4skKVrOJNQcH6zGNdqTaAvL
-         g/SweiuyF9dZzvSmPqgPv7tiOqRYV80G3gxV3Lis7u8AP3uatkyJbUB50P0MVPquMn43
-         xOSw==
-X-Gm-Message-State: AC+VfDzNWr2JDZ5k8x1cLDnAdyb+1YeRs28rSV1+2kiVIzijPxriHFiK
-	wt6NDCxEaS7j/19vKLYY3j0PqF8Y5LsA5+0bPCQ6p6ZG4K0X3Roy+06mkdRvWwX+6YJ/9zOQqjc
-	IAGrlbrmZur3KL0in
-X-Received: by 2002:adf:cf11:0:b0:30a:e435:63a6 with SMTP id o17-20020adfcf11000000b0030ae43563a6mr19252145wrj.4.1687445846766;
-        Thu, 22 Jun 2023 07:57:26 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6buBbyxIEJzfQL6PgRyTGWSK7AHMk6+0fjAWJPeOmyomH1eoQU5jcnnNJ9NYA+HxSgqoL/xA==
-X-Received: by 2002:adf:cf11:0:b0:30a:e435:63a6 with SMTP id o17-20020adfcf11000000b0030ae43563a6mr19252133wrj.4.1687445846476;
-        Thu, 22 Jun 2023 07:57:26 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id e10-20020a5d65ca000000b002f28de9f73bsm7231665wrw.55.2023.06.22.07.57.24
+        bh=t/n7cyBQWBJrKRj8jxj2QgN2B2DXg9ROG/UR9O3ggiI=;
+        b=a4j/5BRe6ikbuTRZI5Ze/gfo7/DAUTTt/Asv4VPS1uMJMnPhnmuh7vFI2flJapVr4c
+         UC+yvK8fb+aDyyZvCRQqGDk+z6C2DKUUyx3wBFeXmEI9B0wmB5U9DE2jqY5GiagcJfrP
+         L8dbVkdFYlUXouFhKkFgQHP98vaipyQbb6tfM+JyUloqgfELr3LX9nXtijiuJAKg4IUy
+         bGq8hnjoDEAGee1IoRlEYtX8GaYpNcyfn+3JaDGggBdTUd/YydevihI5Qxys3woJHATZ
+         XJt4sFYP7WCONzGr3yDRDr7jzQStv5iZj3SNvu2G8J9O9dIuzKIOIs/NTwXlcElan5hc
+         NuOw==
+X-Gm-Message-State: AC+VfDyPcTNW4Dm1Yd08cbR4TKzHn8kKo3+YFCQJsXm9gb0Kn6EbXh3a
+	iWdghonOgUchIPWqbhymzMs=
+X-Google-Smtp-Source: ACHHUZ4+rOnjnE4sQgtZcmXX9Fey6w9aB4HaOV5Uy8o85WMhvf0KHxeyaE5uZbAjbZTWnWK8B5SjBw==
+X-Received: by 2002:adf:f34f:0:b0:30f:b1ee:5cd0 with SMTP id e15-20020adff34f000000b0030fb1ee5cd0mr16382265wrp.50.1687446159714;
+        Thu, 22 Jun 2023 08:02:39 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-021.fbsv.net. [2a03:2880:31ff:15::face:b00c])
+        by smtp.gmail.com with ESMTPSA id n15-20020a5d4c4f000000b003111025ec67sm7266818wrt.25.2023.06.22.08.02.38
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 22 Jun 2023 07:57:25 -0700 (PDT)
-Date: Thu, 22 Jun 2023 16:57:22 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobby.eshleman@bytedance.com>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, "K. Y. Srinivasan" <kys@microsoft.com>, 
-	Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryantan@vmware.com>, Vishnu Dasa <vdasa@vmware.com>, 
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Simon Horman <simon.horman@corigine.com>, Krasnov Arseniy <oxffffaa@gmail.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v4 2/8] vsock: refactor transport lookup code
-Message-ID: <ytlovggd6p6m5i3ye2y7qgtdhss57lqnohgkixp5z3imh6trv7@jnfdvnhstgyf>
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-2-0cebbb2ae899@bytedance.com>
+        Thu, 22 Jun 2023 08:02:39 -0700 (PDT)
+Date: Thu, 22 Jun 2023 08:02:37 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+Cc: Jonathan Corbet <corbet@lwn.net>, Jens Axboe <axboe@kernel.dk>,
+	Pavel Begunkov <asml.silence@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	leit@meta.com, Arnd Bergmann <arnd@arndb.de>,
+	Steve French <stfrench@microsoft.com>,
+	Lu Baolu <baolu.lu@linux.intel.com>,
+	Jiri Slaby <jirislaby@kernel.org>,
+	Stephen Hemminger <stephen@networkplumber.org>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Simon Ser <contact@emersion.fr>,
+	"open list:DOCUMENTATION" <linux-doc@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>,
+	"open list:IO_URING" <io-uring@vger.kernel.org>,
+	"open list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>
+Subject: Re: [PATCH] io_uring: Add io_uring command support for sockets
+Message-ID: <ZJRijTDv5lUsVo+j@gmail.com>
+References: <20230621232129.3776944-1-leitao@debian.org>
+ <2023062231-tasting-stranger-8882@gregkh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230413-b4-vsock-dgram-v4-2-0cebbb2ae899@bytedance.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+In-Reply-To: <2023062231-tasting-stranger-8882@gregkh>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jun 10, 2023 at 12:58:29AM +0000, Bobby Eshleman wrote:
->Introduce new reusable function vsock_connectible_lookup_transport()
->that performs the transport lookup logic.
->
->No functional change intended.
->
->Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->---
-> net/vmw_vsock/af_vsock.c | 25 ++++++++++++++++++-------
-> 1 file changed, 18 insertions(+), 7 deletions(-)
+On Thu, Jun 22, 2023 at 07:20:48AM +0200, Greg Kroah-Hartman wrote:
+> On Wed, Jun 21, 2023 at 04:21:26PM -0700, Breno Leitao wrote:
+> > Enable io_uring commands on network sockets. Create two new
+> > SOCKET_URING_OP commands that will operate on sockets. Since these
+> > commands are similar to ioctl, uses the _IO{R,W} helpers to embedded the
+> > argument size and operation direction. Also allocates a unused ioctl
+> > chunk for uring command usage.
+> > 
+> > In order to call ioctl on sockets, use the file_operations->uring_cmd
+> > callbacks, and map it to a uring socket function, which handles the
+> > SOCKET_URING_OP accordingly, and calls socket ioctls.
+> > 
+> > This patches was tested by creating a new test case in liburing.
+> > Link: https://github.com/leitao/liburing/commit/3340908b742c6a26f662a0679c4ddf9df84ef431
+> > 
+> > Signed-off-by: Breno Leitao <leitao@debian.org>
+> > ---
+> 
+> Isn't this a new version of an older patch?
 
-Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
+Yes, this should have tagged as V2.
 
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index ffb4dd8b6ea7..74358f0b47fa 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -422,6 +422,22 @@ static void vsock_deassign_transport(struct vsock_sock *vsk)
-> 	vsk->transport = NULL;
-> }
->
->+static const struct vsock_transport *
->+vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
->+{
->+	const struct vsock_transport *transport;
->+
->+	if (vsock_use_local_transport(cid))
->+		transport = transport_local;
->+	else if (cid <= VMADDR_CID_HOST || !transport_h2g ||
->+		 (flags & VMADDR_FLAG_TO_HOST))
->+		transport = transport_g2h;
->+	else
->+		transport = transport_h2g;
->+
->+	return transport;
->+}
->+
-> /* Assign a transport to a socket and call the .init transport callback.
->  *
->  * Note: for connection oriented socket this must be called when vsk->remote_addr
->@@ -462,13 +478,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> 		break;
-> 	case SOCK_STREAM:
-> 	case SOCK_SEQPACKET:
->-		if (vsock_use_local_transport(remote_cid))
->-			new_transport = transport_local;
->-		else if (remote_cid <= VMADDR_CID_HOST || !transport_h2g ||
->-			 (remote_flags & VMADDR_FLAG_TO_HOST))
->-			new_transport = transport_g2h;
->-		else
->-			new_transport = transport_h2g;
->+		new_transport = vsock_connectible_lookup_transport(remote_cid,
->+								   remote_flags);
-> 		break;
-> 	default:
-> 		return -ESOCKTNOSUPPORT;
->
->-- 
->2.30.2
->
+[1] https://lore.kernel.org/lkml/20230406144330.1932798-1-leitao@debian.org/#r
 
+> > --- a/Documentation/userspace-api/ioctl/ioctl-number.rst
+> > +++ b/Documentation/userspace-api/ioctl/ioctl-number.rst
+> > @@ -361,6 +361,7 @@ Code  Seq#    Include File                                           Comments
+> >  0xCB  00-1F                                                          CBM serial IEC bus in development:
+> >                                                                       <mailto:michael.klein@puffin.lb.shuttle.de>
+> >  0xCC  00-0F  drivers/misc/ibmvmc.h                                   pseries VMC driver
+> > +0xCC  A0-BF  uapi/linux/io_uring.h                                   io_uring cmd subsystem
+> 
+> This change is nice, but not totally related to this specific one,
+> shouldn't it be separate?
+
+This is related to this patch, since I am using it below, in the
+following part:
+
+	+#define SOCKET_URING_OP_SIOCINQ _IOR(0xcc, 0xa0, int)
+	+#define SOCKET_URING_OP_SIOCOUTQ _IOR(0xcc, 0xa1, int)
+
+Should I have a different patch, even if they are related?
+
+> > +EXPORT_SYMBOL_GPL(uring_sock_cmd);
+> 
+> Did you forget the "io_" prefix?
+
+Yes, I will rename the function.
+
+Thanks for the review.
 
