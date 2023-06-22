@@ -1,211 +1,174 @@
-Return-Path: <netdev+bounces-13164-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13165-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C70173A86C
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:43:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4285973A875
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 20:44:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2C050280D84
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:43:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02507281A37
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 18:44:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 510DE200B8;
-	Thu, 22 Jun 2023 18:43:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4646720681;
+	Thu, 22 Jun 2023 18:44:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EA7B1E536
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:43:07 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2046.outbound.protection.outlook.com [40.107.244.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D99BC1FF2;
-	Thu, 22 Jun 2023 11:43:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kDeumnMobiZ6Pcol0fsK6Vxt8rdT7KqaCXevpIoV+UWQLIxQzNdb4Kw4nCueMuxZiIBUjh+pp0ewG98Jrvl+BboP8sqwqJTDATWEzT5y35mc5E2Rn4cE9FJ9U+jZzaBmZV4rHuVa+1xNvvTMmWBJM+M0yYoaa5mdedm36kZuxEnYp7+C6HxRHTG0+qlnJpMOkvVxP2SfEQVMnF11FxsJ4qrMCb8T9VH1enfjrP74BYJoDQgYNTEdSbly7zybxLoiDSTt1+YSiP8zDMou+IAWF6EbNZpwhj97OMSytCKcqcsqMez+Pic3TeLWBWQVLQf/rrpaBGOMqR4PbXUrDKbHYA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=uEvECoNC55ZVS1zTHfyboNmzZMpWU8e6bXe0QY+7xHY=;
- b=nWIi8iAnoYmIKsiU17MFpxlKRx+EMXxPI9srIgjkALJDDxRi/xS1OfFmLJ9z/nrpgII8bmsV8yZsF3xNJqolSWTHK/DTkKI+H4q2TJy64s7iS03ZvA3UjnKB0WyYvNnvfJAMGFAppKvhIprQjMyM3h0bYS3dXGNQ/vTPcDlTRHrK8UIslEKob/NHTzW5M4vCrGoky6LpJfco4M1KK3EaxqrEdhCRtDaCg7ZZAE8vKDs7p1+YRJkwLhOMLUCZ7iStxzLQ5paz/xXyXol65FclmopmPc67QET0BaMtOlJtfuPicatP9Ka5Lhkt0+xbSymjn6WIHDyLdtdPZmmZ5vqRDw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=uEvECoNC55ZVS1zTHfyboNmzZMpWU8e6bXe0QY+7xHY=;
- b=mvdkIK1b1aKpQP0HZ4zDU4hExKMsPTfL+OLw3+CXg8vQJ4SA2gQAFNb7ANS4WbLc7WAytFTmpYh0nPv/QVxNk0tOheo5lISsofQ9BmIbMCoZpDXvov6u7F0yBxw7ecx3hdYuU1cHFq5pJLlaIAm4UFRVzNZn+paaPhSjQ0SFLAU=
-Received: from MN0PR12MB5953.namprd12.prod.outlook.com (2603:10b6:208:37c::15)
- by PH7PR12MB9221.namprd12.prod.outlook.com (2603:10b6:510:2e8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 22 Jun
- 2023 18:43:02 +0000
-Received: from MN0PR12MB5953.namprd12.prod.outlook.com
- ([fe80::8368:23:db50:8f88]) by MN0PR12MB5953.namprd12.prod.outlook.com
- ([fe80::8368:23:db50:8f88%5]) with mapi id 15.20.6521.020; Thu, 22 Jun 2023
- 18:43:02 +0000
-From: "Pandey, Radhey Shyam" <radhey.shyam.pandey@amd.com>
-To: Maxim Kochetkov <fido_max@inbox.ru>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 343121E536
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 18:44:16 +0000 (UTC)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1569212B
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 11:44:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1687459449; x=1718995449;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=AgBQefGFwiZppyqLjlVGIe0EPvM5IvzMlgy2UaXiFAo=;
+  b=AMctFRuM8/TmK0cRWQHdAZUVxEXE5j7w07JBEONWdjT1nd4+BJwTJcDg
+   LFJJtn9u6xFqWxA/9C9ZyiUgJXw6qqFlmpTzCwfGx02h1xsUn7fRqVGUZ
+   uOC7/jObJBIYiEQV++NjKGZSV2goIrfillFr4hb3nDoffIv19XvWnGY2k
+   Y=;
+X-IronPort-AV: E=Sophos;i="6.01,149,1684800000"; 
+   d="scan'208";a="340487259"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 18:44:06 +0000
+Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2a-m6i4x-d47337e0.us-west-2.amazon.com (Postfix) with ESMTPS id 7DDC060B83;
+	Thu, 22 Jun 2023 18:44:04 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 22 Jun 2023 18:44:04 +0000
+Received: from 88665a182662.ant.amazon.com (10.111.86.59) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 22 Jun 2023 18:44:01 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
 	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, "Simek, Michal" <michal.simek@amd.com>, Andrew Lunn
-	<andrew@lunn.ch>, Robert Hancock <robert.hancock@calian.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH v2 1/1] net: axienet: Move reset before DMA detection
-Thread-Topic: [PATCH v2 1/1] net: axienet: Move reset before DMA detection
-Thread-Index: AQHZpTJJf5eUflWxuUSsEXI/drOhL6+XJ29Q
-Date: Thu, 22 Jun 2023 18:43:02 +0000
-Message-ID:
- <MN0PR12MB59539C6540FA6B673A1A7FF8B722A@MN0PR12MB5953.namprd12.prod.outlook.com>
-References: <20230622175200.74033-1-fido_max@inbox.ru>
-In-Reply-To: <20230622175200.74033-1-fido_max@inbox.ru>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: MN0PR12MB5953:EE_|PH7PR12MB9221:EE_
-x-ms-office365-filtering-correlation-id: 0e43f27f-af55-4cb2-a9e4-08db73508236
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- hQWpzn5cQkNK4nMfei0jrIa7byHFdCEvyKgnc30LIkpWFQwEVpknNa8++5ooeAwBDYN4qD8r+538EjqDGHhLWmVqBB4B/mVnozklb2vb+muSEgWcFK4a0MkDAKtGAvXvBXMNypngvh/3Do+PMQvNa1H4FO88c7nJj7xj/ozDi0KbyMpic2Xavknj+yYYTFTCNwheNbLL7yMUi5ES5RJ/n83BL5rQlMsqKkNEOKibb8N6TGcjzbCjGn5Lz4q1VAk6Cvquq2r5c04DlExZfY+e0I35122hr+jZOVZ/hE1ta3l1pma+XK0DXfW3L7C/FxtBa1anWqdzJc5yPQ28R8EaeHOPiDrpdpbEJlkPBWlD5JJRJMVmgXqzshg3yE2lTghpmF/iH1pyeDbpq5S/8vl6Deqaq7GUxjqh0A/EgjuidaqBLBjJiM26rnUZkRXL9NNd0Ne4PiWh8v9rQ7ratnPEoifrp6yUsIXKpdmq05D3wLxcjzRPS/rl2/cIL4pi4umJTKfXVDO5F5HGRpzoWpSOWyXn4V48bO4YHEBYsZlqiXe2d1ehPI/rKzmJYzYi5ElqAV6o7nIaFto0biuV3gZKJ7/H3vB1WBOSjODJU1GRkT3Z9Eb3rXdfksCxd9tN9HpU
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MN0PR12MB5953.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(346002)(376002)(39860400002)(136003)(451199021)(7696005)(71200400001)(478600001)(83380400001)(38100700002)(186003)(122000001)(86362001)(38070700005)(55016003)(33656002)(53546011)(6506007)(9686003)(8676002)(8936002)(41300700001)(7416002)(52536014)(5660300002)(2906002)(110136005)(54906003)(66946007)(66476007)(66556008)(66446008)(316002)(64756008)(4326008)(76116006);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?70CfoE4y/TvUWzSuG8fWYEJWpBd3r+MxbKwoCmsj4KfzLNe3P5xQkHxOdsfw?=
- =?us-ascii?Q?o7B2UuCbhump8E4Uq9H/8Y1Shf4Oen2eQaCu6vMLUgPMsGl8VuKOO1EwLhHW?=
- =?us-ascii?Q?WcKiOkIx0dYOt3aVbHTA8Yqi5ZHKSpukj3kN3/nsAALEaZvbbSrSJCmJa8n1?=
- =?us-ascii?Q?e8SV+G1RuuPcBm8uv5T+XR1GEqhFsOozjmv0pgTg/iUi1tG8M5mNnWiYVhgv?=
- =?us-ascii?Q?e/4ykO4r1XsfUmA9xTNl73FF3brCaDpbtLY6q0bsXOXl193/jl/LhwPXbKD2?=
- =?us-ascii?Q?hd9aNE/FygWGIOX3otWT1mEuiUqeetd1uhJjz7yX7s1hl30Q8uvG7L+H2Qot?=
- =?us-ascii?Q?dWh34N2O86oJqp0Wl7ERl/bYJd47pM3tO4JsoXq/DD3HDWpLarHB7iYvdKbk?=
- =?us-ascii?Q?FndR3xQusCmyq4PVq8p2umJq7i2wweakJiuak2vZWMBZRm7akhAMqrXh7bwZ?=
- =?us-ascii?Q?kj6FS3qx1y95/tOP/p6Bqud5yKVQdNFkOsVTUE8tdrMYTsqbDZP99j6E9qBU?=
- =?us-ascii?Q?/9naL0pVRmbTWTILlyqVD5lzUE2pxWdr+wbj2zFUM3xq7mq3ihMH0YwLGXRP?=
- =?us-ascii?Q?/Sh/XZN1oxDk6/TpAyUHp9qw2R4mwDVx/fJbsZWiylwcIV1KgAUwI8w6Qpqp?=
- =?us-ascii?Q?ftpsaMMBH37vOb4v0tzh0W8dwmPTPXM0IcnRVmAr56X+K19go4DQmIwYcFXc?=
- =?us-ascii?Q?SkcNo6VbORJKcQgsUBMUJ+5U77doIbR3rl2FisA5S8amtKJGWYO2m6cHVNn8?=
- =?us-ascii?Q?NwnbCJSvhEh6+xirH6LheR8rsjK8C4/GNgH3FBDBmWo0CWEGQLy9hcCyQ69t?=
- =?us-ascii?Q?ibmbAgf8/JYdCdzxWc/eGXQHPicZZK6QQUzbvJsPC5FU3r6xUKHKzq2u1YtY?=
- =?us-ascii?Q?V4IV9JtGkVsUyQHETPx0EO1KnOiU/OHegMyaTFohdETCLKTdHNCufyzhHknv?=
- =?us-ascii?Q?MF9hkovpEvtOlzdGzpjgHLMNigmfh1I7zvxnSeFM2LP46DQjAW8javbeAdGe?=
- =?us-ascii?Q?lK8DrjxfrDKfBXXbRQdtsFVDybDNPviYqmhGnaW1g6yfFvU+MWAF+EO42X57?=
- =?us-ascii?Q?0KbK+M+91GWBqxDF+5BKjWxZl0kp1YxKf3gZA+zJ/jpM8Xgx539sAoJ2Sw7l?=
- =?us-ascii?Q?rGufYVHIvR9k1Wc+RIUZ/UbcV1IbbBKaiKjNmbOOpNL5ZU2KACSQAAHgcOjT?=
- =?us-ascii?Q?fvN7+M4Y0+Zd/xYM5UXohXOUEcICuWkcpsKFfF5Kj0tpnqWex6uO5CoBBZaV?=
- =?us-ascii?Q?9wH24We4y5/Y38PTcd+rcxyY1lHwNcH4/BIHnAQtlJfgJo8Zeqg7itj0TiXB?=
- =?us-ascii?Q?QMc4SYtyVZHm8jy93hykH1TnlZpcpZX5tzft9LwgBdKMHcZPzG/kH9JSjRZg?=
- =?us-ascii?Q?jIdkfUltpoyxFXH7L5NCoNqknpSfk8CHl1vD5ItIbnmomctlwTgXQikWROME?=
- =?us-ascii?Q?Cl9uCUDlXmBETwUZoCO5uszgltYUHlSZzCBa3I7MD1PX7Gj0Rz3icMZvGsi9?=
- =?us-ascii?Q?uOlGci6But0Jibjt/p5bSqj6fBDgkGAsnJOHWQfYoCWv3s+bpuLOhfWQtQjb?=
- =?us-ascii?Q?iyaNfZCbw/jsUnK6eOI1mMoQrmXmIu7qlb3td55+HJfZvyXRyK25kYreMCW1?=
- =?us-ascii?Q?soHpQpGcw7/B1anBGHgjQCk=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	<pabeni@redhat.com>
+CC: Christian Brauner <brauner@kernel.org>, Alexander Mikhalitsyn
+	<alexander@mihalicyn.com>, Kuniyuki Iwashima <kuniyu@amazon.com>, "Kuniyuki
+ Iwashima" <kuni1840@gmail.com>, <netdev@vger.kernel.org>, syzkaller
+	<syzkaller@googlegroups.com>
+Subject: [PATCH v2 net-next] af_unix: Call scm_recv() only after scm_set_cred().
+Date: Thu, 22 Jun 2023 11:43:51 -0700
+Message-ID: <20230622184351.91544-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: MN0PR12MB5953.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0e43f27f-af55-4cb2-a9e4-08db73508236
-X-MS-Exchange-CrossTenant-originalarrivaltime: 22 Jun 2023 18:43:02.2120
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: MWkfcAHU/wAx9qs2FylIXSgCaLJbXxSFl5JZtxgtlmzw5Ru5GNGSGPQnSIxO/u4L
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR12MB9221
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.111.86.59]
+X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> -----Original Message-----
-> From: Maxim Kochetkov <fido_max@inbox.ru>
-> Sent: Thursday, June 22, 2023 11:22 PM
-> To: netdev@vger.kernel.org
-> Cc: Maxim Kochetkov <fido_max@inbox.ru>; Pandey, Radhey Shyam
-> <radhey.shyam.pandey@amd.com>; David S. Miller
-> <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub
-> Kicinski <kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Simek,
-> Michal <michal.simek@amd.com>; Andrew Lunn <andrew@lunn.ch>; Robert
-> Hancock <robert.hancock@calian.com>; linux-arm-
-> kernel@lists.infradead.org; linux-kernel@vger.kernel.org
-> Subject: [PATCH v2 1/1] net: axienet: Move reset before DMA detection
->=20
-> DMA detection will fail if axinet was started before (by boot loader,
+syzkaller hit a WARN_ON_ONCE(!scm->pid) in scm_pidfd_recv().
 
-:%s/axinet/axienet/g
+In unix_stream_read_generic(), if there is no skb in the queue, we could
+bail out the do-while loop without calling scm_set_cred():
 
-> boot ROM, etc). In this state axinet will not start properly.
-> XAXIDMA_TX_CDESC_OFFSET + 4 register (MM2S_CURDESC_MSB) is used to
-> detect
-> 64 DMA capability here. But datasheet says: When DMACR.RS is 1
-> (axinet is in enabled state), CURDESC_PTR becomes Read Only (RO) and
-> is used to fetch the first descriptor. So iowrite32()/ioread32() trick
-> to this register to detect DMA will not work.
-> So move axinet reset before DMA detection.
->=20
-> Fixes: 04cc2da39698 ("net: axienet: reset core on initialization prior to=
- MDIO
+  1. No skb in the queue
+  2. sk is non-blocking
+       or
+     shutdown(sk, RCV_SHUTDOWN) is called concurrently
+       or
+     peer calls close()
 
-Is this fixes tag correct ? I think the failure is introduced after=20
-f735c40ed93c net: axienet: Autodetect 64-bit DMA capability?
+If the socket is configured with SO_PASSCRED or SO_PASSPIDFD, scm_recv()
+would populate cmsg with garbage.
 
-> access")
-> Signed-off-by: Maxim Kochetkov <fido_max@inbox.ru>
-> ---
->  drivers/net/ethernet/xilinx/xilinx_axienet_main.c | 10 +++++-----
->  1 file changed, 5 insertions(+), 5 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> index 3e310b55bce2..734822321e0a 100644
-> --- a/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> +++ b/drivers/net/ethernet/xilinx/xilinx_axienet_main.c
-> @@ -2042,6 +2042,11 @@ static int axienet_probe(struct platform_device
-> *pdev)
->  		goto cleanup_clk;
->  	}
->=20
-> +	/* Reset core now that clocks are enabled, prior to accessing MDIO
-> */
-> +	ret =3D __axienet_device_reset(lp);
-> +	if (ret)
-> +		goto cleanup_clk;
-> +
->  	/* Autodetect the need for 64-bit DMA pointers.
->  	 * When the IP is configured for a bus width bigger than 32 bits,
->  	 * writing the MSB registers is mandatory, even if they are all 0.
-> @@ -2096,11 +2101,6 @@ static int axienet_probe(struct platform_device
-> *pdev)
->  	lp->coalesce_count_tx =3D XAXIDMA_DFT_TX_THRESHOLD;
->  	lp->coalesce_usec_tx =3D XAXIDMA_DFT_TX_USEC;
->=20
-> -	/* Reset core now that clocks are enabled, prior to accessing MDIO
-> */
-> -	ret =3D __axienet_device_reset(lp);
-> -	if (ret)
-> -		goto cleanup_clk;
-> -
->  	ret =3D axienet_mdio_setup(lp);
->  	if (ret)
->  		dev_warn(&pdev->dev,
-> --
-> 2.40.1
+Let's not call scm_recv() unless there is skb to receive.
+
+WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_pidfd_recv include/net/scm.h:138 [inline]
+WARNING: CPU: 1 PID: 3245 at include/net/scm.h:138 scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177
+Modules linked in:
+CPU: 1 PID: 3245 Comm: syz-executor.1 Not tainted 6.4.0-rc5-01219-gfa0e21fa4443 #2
+Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+RIP: 0010:scm_pidfd_recv include/net/scm.h:138 [inline]
+RIP: 0010:scm_recv.constprop.0+0x754/0x850 include/net/scm.h:177
+Code: 67 fd e9 55 fd ff ff e8 4a 70 67 fd e9 7f fd ff ff e8 40 70 67 fd e9 3e fb ff ff e8 36 70 67 fd e9 02 fd ff ff e8 8c 3a 20 fd <0f> 0b e9 fe fb ff ff e8 50 70 67 fd e9 2e f9 ff ff e8 46 70 67 fd
+RSP: 0018:ffffc90009af7660 EFLAGS: 00010216
+RAX: 00000000000000a1 RBX: ffff888041e58a80 RCX: ffffc90003852000
+RDX: 0000000000040000 RSI: ffffffff842675b4 RDI: 0000000000000007
+RBP: ffffc90009af7810 R08: 0000000000000007 R09: 0000000000000013
+R10: 00000000000000f8 R11: 0000000000000001 R12: ffffc90009af7db0
+R13: 0000000000000000 R14: ffff888041e58a88 R15: 1ffff9200135eecc
+FS:  00007f6b7113f640(0000) GS:ffff88806cf00000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f6b7111de38 CR3: 0000000012a6e002 CR4: 0000000000770ee0
+PKRU: 55555554
+Call Trace:
+ <TASK>
+ unix_stream_read_generic+0x5fe/0x1f50 net/unix/af_unix.c:2830
+ unix_stream_recvmsg+0x194/0x1c0 net/unix/af_unix.c:2880
+ sock_recvmsg_nosec net/socket.c:1019 [inline]
+ sock_recvmsg+0x188/0x1d0 net/socket.c:1040
+ ____sys_recvmsg+0x210/0x610 net/socket.c:2712
+ ___sys_recvmsg+0xff/0x190 net/socket.c:2754
+ do_recvmmsg+0x25d/0x6c0 net/socket.c:2848
+ __sys_recvmmsg net/socket.c:2927 [inline]
+ __do_sys_recvmmsg net/socket.c:2950 [inline]
+ __se_sys_recvmmsg net/socket.c:2943 [inline]
+ __x64_sys_recvmmsg+0x224/0x290 net/socket.c:2943
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x72/0xdc
+RIP: 0033:0x7f6b71da2e5d
+Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
+RSP: 002b:00007f6b7113ecc8 EFLAGS: 00000246 ORIG_RAX: 000000000000012b
+RAX: ffffffffffffffda RBX: 00000000004bc050 RCX: 00007f6b71da2e5d
+RDX: 0000000000000007 RSI: 0000000020006600 RDI: 000000000000000b
+RBP: 00000000004bc050 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000120 R11: 0000000000000246 R12: 0000000000000000
+R13: 000000000000006e R14: 00007f6b71e03530 R15: 0000000000000000
+ </TASK>
+
+Fixes: 5e2ff6704a27 ("scm: add SO_PASSPIDFD and SCM_PIDFD")
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Reported-by: syzkaller <syzkaller@googlegroups.com>
+Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+---
+v2:
+  * Target to net-next (v1 was marked as ChangesRequested maybe
+    due to one of the blamed commits is not in net.git)
+
+  * Update changelog to clarify skb is not in the queue
+
+v1: https://lore.kernel.org/netdev/20230620000009.9675-1-kuniyu@amazon.com/
+---
+ net/unix/af_unix.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index 73c61a010b01..f9d196439b49 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2826,7 +2826,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 	} while (size);
+ 
+ 	mutex_unlock(&u->iolock);
+-	if (state->msg)
++	if (state->msg && check_creds)
+ 		scm_recv(sock, state->msg, &scm, flags);
+ 	else
+ 		scm_destroy(&scm);
+-- 
+2.30.2
 
 
