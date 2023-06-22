@@ -1,210 +1,150 @@
-Return-Path: <netdev+bounces-13092-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13093-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C6C473A234
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:52:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B0E573A240
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 15:55:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DE3621C2110B
-	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:52:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9EEEA1C21136
+	for <lists+netdev@lfdr.de>; Thu, 22 Jun 2023 13:55:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83F5C1F164;
-	Thu, 22 Jun 2023 13:52:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB14C1F166;
+	Thu, 22 Jun 2023 13:55:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7518A1D2D1
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:52:13 +0000 (UTC)
-X-Greylist: delayed 317 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 22 Jun 2023 06:52:11 PDT
-Received: from mout2.freenet.de (mout2.freenet.de [IPv6:2001:748:100:40::2:4])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A5DCA1AC
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 06:52:11 -0700 (PDT)
-Received: from [195.4.92.125] (helo=sub6.freenet.de)
-	by mout2.freenet.de with esmtpa (ID tobias.klausmann@freenet.de) (port 25) (Exim 4.94.2 #2)
-	id 1qCKeA-002tMo-83; Thu, 22 Jun 2023 15:46:50 +0200
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=freenet.de;
-	s=mjaymdexmjqk; h=Content-Transfer-Encoding:Content-Type:To:Subject:From:
-	MIME-Version:Date:Message-ID:Sender:Reply-To:Cc:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References:List-Id:List-Help:List-Unsubscribe:
-	List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=xC78NmrfesOdMAq1u1RN34rGRQrQD8Mauu1uJf/YTMo=; b=SQmOiqqnS0Uz84kejlNnYI80g1
-	y8IqODJnUXzTvBpdQTJtiZe6B4bPKjQ5ZIe2p+gQyTB/8VrLY0UCvdhYdgFrsVhibUpzm0+EkUXXJ
-	mHZFgtP41nKdqtlg4zYUxXDLmdCkIEPC9fBCmyoX6+UTEnwz5VSf2WF5ZAhLBPY/QshA8xgXNYKZP
-	/1mHsHq6Ff3722qWqla8NxNKlUrFWLl24x8BNIX+k94LU8rtbEq0H9hJqsuqWvZQelQgp5ZJ8CXPW
-	2s5fkMK+nyDmSLb6OAVyif4y5JUIBU6p4WciC++zuo9wzwj53gut1UDbRRvSf1PXYUIOYtajchY2i
-	N9IdonhQ==;
-Received: from p200300c7ff368200e5067a8d21d0d539.dip0.t-ipconnect.de ([2003:c7:ff36:8200:e506:7a8d:21d0:d539]:52562)
-	by sub6.freenet.de with esmtpsa (ID tobias.klausmann@freenet.de) (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (port 465) (Exim 4.94.2 #2)
-	id 1qCKe9-00AMOh-Qg; Thu, 22 Jun 2023 15:46:50 +0200
-Message-ID: <c3465166-f04d-fcf5-d284-57357abb3f99@freenet.de>
-Date: Thu, 22 Jun 2023 15:46:48 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A94D7168DC
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 13:55:32 +0000 (UTC)
+Received: from mx0.infotecs.ru (mx0.infotecs.ru [91.244.183.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3D771BF6;
+	Thu, 22 Jun 2023 06:55:26 -0700 (PDT)
+Received: from mx0.infotecs-nt (localhost [127.0.0.1])
+	by mx0.infotecs.ru (Postfix) with ESMTP id 041CE10F4874;
+	Thu, 22 Jun 2023 16:55:23 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx0.infotecs.ru 041CE10F4874
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=infotecs.ru; s=mx;
+	t=1687442123; bh=4n0/HOa8GcSzSv0ccDtNa+JBp10/ttCJkrIJGTCvlBU=;
+	h=From:To:CC:Subject:Date:References:In-Reply-To:From;
+	b=kHhFfhWWEBFs4xMaoIib8LP+3Swn1yh0P52ShIUncCSo5kch5jNeyUKoOKaxqCO8p
+	 Mb1Pj/ATMB7MqsgNBTVb1QoEv2S2SyY0G3y+/jgIzkTd5cvhiRYr7GX6U7sRFrR4S1
+	 X7lkaTFRwjTAWBJwWUSwznw1gPXnYy+OPi5wB58Q=
+Received: from msk-exch-01.infotecs-nt (msk-exch-01.infotecs-nt [10.0.7.191])
+	by mx0.infotecs-nt (Postfix) with ESMTP id 0102230D12EB;
+	Thu, 22 Jun 2023 16:55:23 +0300 (MSK)
+From: Gavrilov Ilia <Ilia.Gavrilov@infotecs.ru>
+To: Simon Horman <simon.horman@corigine.com>
+CC: Pablo Neira Ayuso <pablo@netfilter.org>, Jozsef Kadlecsik
+	<kadlec@netfilter.org>, Florian Westphal <fw@strlen.de>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Patrick McHardy
+	<kaber@trash.net>, "netfilter-devel@vger.kernel.org"
+	<netfilter-devel@vger.kernel.org>, "coreteam@netfilter.org"
+	<coreteam@netfilter.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"lvc-project@linuxtesting.org" <lvc-project@linuxtesting.org>
+Subject: Re: [PATCH] netfilter: nf_conntrack_sip: fix the
+ ct_sip_parse_numerical_param() return value.
+Thread-Topic: [PATCH] netfilter: nf_conntrack_sip: fix the
+ ct_sip_parse_numerical_param() return value.
+Thread-Index: AQHZpREwousYyJT2d0KPXYKYnJV5Dg==
+Date: Thu, 22 Jun 2023 13:55:22 +0000
+Message-ID: <6f2b5c12-82b5-2496-23a3-05ab22d7b14b@infotecs.ru>
+References: <20230426150414.2768070-1-Ilia.Gavrilov@infotecs.ru>
+ <ZEwdd7Xj4fQtCXoe@corigine.com>
+ <d0a92686-acc4-4fd8-0505-60a8394d05d8@infotecs.ru>
+ <ZFEYpNsp/hBEJAGU@corigine.com>
+ <f9d9ac80-704a-91d7-b120-449b921e8bb0@infotecs.ru>
+ <ZFEuazEvNWHfEH93@corigine.com>
+In-Reply-To: <ZFEuazEvNWHfEH93@corigine.com>
+Accept-Language: ru-RU, en-US
+Content-Language: ru-RU
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+x-originating-ip: [10.17.0.10]
+x-exclaimer-md-config: 208ac3cd-1ed4-4982-a353-bdefac89ac0a
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <10FD4159AF211947B84172ACF6576E05@infotecs.ru>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Thunderbird Daily
-Content-Language: en-US
-From: Tobias Klausmann <tobias.klausmann@freenet.de>
-Subject: r8169: transmit transmit queue timed out - v6.4 cycle
-To: hkallweit1@gmail.com, nic_swsd@realtek.com, netdev@vger.kernel.org
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-FN-MUUID: 168744160973339370DDBCO
-X-Originated-At: 2003:c7:ff36:8200:e506:7a8d:21d0:d539!52562
-X-Scan-TS: Thu, 22 Jun 2023 15:46:49 +0200
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-KLMS-Rule-ID: 1
+X-KLMS-Message-Action: clean
+X-KLMS-AntiSpam-Lua-Profiles: 178188 [Jun 22 2023]
+X-KLMS-AntiSpam-Version: 5.9.59.0
+X-KLMS-AntiSpam-Envelope-From: Ilia.Gavrilov@infotecs.ru
+X-KLMS-AntiSpam-Rate: 0
+X-KLMS-AntiSpam-Status: not_detected
+X-KLMS-AntiSpam-Method: none
+X-KLMS-AntiSpam-Auth: dkim=none
+X-KLMS-AntiSpam-Info: LuaCore: 517 517 b0056c19d8e10afbb16cb7aad7258dedb0179a79, {Tracking_msgid_8}, {Tracking_from_domain_doesnt_match_to}, d41d8cd98f00b204e9800998ecf8427e.com:7.1.1;127.0.0.199:7.1.2;infotecs.ru:7.1.1, FromAlignment: s
+X-MS-Exchange-Organization-SCL: -1
+X-KLMS-AntiSpam-Interceptor-Info: scan successful
+X-KLMS-AntiPhishing: Clean, bases: 2023/06/22 12:25:00
+X-KLMS-AntiVirus: Kaspersky Security for Linux Mail Server, version 8.0.3.30, bases: 2023/06/22 09:26:00 #21554371
+X-KLMS-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello all,
-
-introduced in the 6.4 cycle r8169 show transmit queue timeouts [1]. 
-Bisecting the problem brought me to the following commit:
-
-2ab19de62d67e403105ba860971e5ff0d511ad15 is the first bad commit
-commit 2ab19de62d67e403105ba860971e5ff0d511ad15
-Author: Heiner Kallweit <hkallweit1@gmail.com>
-Date:   Mon Mar 6 22:28:06 2023 +0100
-
-     r8169: remove ASPM restrictions now that ASPM is disabled during 
-NAPI poll
-
-     Now that  ASPM is disabled during NAPI poll, we can remove all ASPM
-     restrictions. This allows for higher power savings if the network
-     isn't fully loaded.
-
-     Reviewed-by: Simon Horman <simon.horman@corigine.com>
-     Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
-     Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
-     Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
-     Signed-off-by: David S. Miller <davem@davemloft.net>
-
-  drivers/net/ethernet/realtek/r8169_main.c | 27 +--------------------------
-  1 file changed, 1 insertion(+), 26 deletions(-)
-
-
-With this commit reverted on top of v6.4-rc6, the timeouts are gone.
-
-The NIC identifies as "03:00.0 Ethernet controller: Realtek 
-Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit Ethernet 
-Controller (rev 15)"
-
-Greetings,
-
-Tobias Klausmann
-
-
-[1]:
-
-[ 2070.918700] ------------[ cut here ]------------
-[ 2070.918708] NETDEV WATCHDOG: enp3s0 (r8169): transmit queue 0 timed 
-out 5317 ms
-[ 2070.918719] WARNING: CPU: 4 PID: 0 at net/sched/sch_generic.c:525 
-dev_watchdog+0x1c9/0x1d0
-[ 2070.918726] Modules linked in: rfcomm(E) af_packet(E) cmac(E) 
-algif_hash(E) algif_skcipher(E) af_alg(E) bnep(E) btusb(E) btrtl(E) 
-uvcvideo(E) btbcm(E) uvc(E) btintel(E) videobuf2_vmalloc(E) btmtk(E) 
-videobuf2_memops(E) rtsx_usb_sdmmc(E) videobuf2_v4l2(E) bluetooth(E) 
-rtsx_usb_ms(E) mmc_core(E) ecdh_generic(E) memstick(E) ecc(E) 
-videodev(E) videobuf2_common(E) mc(E) rtsx_usb(E) qrtr(E) 
-nls_iso8859_1(E) nls_cp437(E) vfat(E) fat(E) joydev(E) 
-snd_hda_codec_realtek(E) snd_hda_codec_generic(E) ledtrig_audio(E) 
-snd_hda_codec_hdmi(E) ath10k_pci(E) ath10k_core(E) hid_multitouch(E) 
-ath(E) snd_hda_intel(E) snd_intel_dspcfg(E) iTCO_wdt(E) ee1004(E) 
-intel_rapl_msr(E) snd_intel_sdw_acpi(E) intel_pmc_bxt(E) 
-snd_hda_codec(E) mac80211(E) iTCO_vendor_support(E) r8169(E) 
-intel_rapl_common(E) snd_hda_core(E) intel_tcc_cooling(E) mei_hdcp(E) 
-x86_pkg_temp_thermal(E) acer_wmi(E) intel_powerclamp(E) cfg80211(E) 
-snd_hwdep(E) sparse_keymap(E) coretemp(E) snd_pcm(E) realtek(E) 
-i2c_i801(E) wmi_bmof(E) intel_wmi_thunderbolt(E)
-[ 2070.918794]  snd_timer(E) rfkill(E) mdio_devres(E) libphy(E) 
-libarc4(E) efi_pstore(E) snd(E) i2c_smbus(E) soundcore(E) mei_me(E) 
-intel_lpss_pci(E) intel_lpss(E) mei(E) idma64(E) intel_pch_thermal(E) 
-thermal(E) battery(E) ac(E) acpi_pad(E) tiny_power_button(E) fuse(E) 
-configfs(E) dmi_sysfs(E) ip_tables(E) x_tables(E) hid_generic(E) 
-usbhid(E) crct10dif_pclmul(E) nouveau(E) crc32_pclmul(E) crc32c_intel(E) 
-i915(E) polyval_clmulni(E) drm_ttm_helper(E) polyval_generic(E) 
-ghash_clmulni_intel(E) mxm_wmi(E) drm_buddy(E) sha512_ssse3(E) 
-i2c_algo_bit(E) aesni_intel(E) drm_display_helper(E) crypto_simd(E) 
-drm_kms_helper(E) syscopyarea(E) sysfillrect(E) cryptd(E) sysimgblt(E) 
-cec(E) xhci_pci(E) ttm(E) xhci_hcd(E) usbcore(E) drm(E) usb_common(E) 
-i2c_hid_acpi(E) i2c_hid(E) video(E) wmi(E) pinctrl_sunrisepoint(E) 
-button(E) serio_raw(E) sg(E) dm_multipath(E) dm_mod(E) scsi_dh_rdac(E) 
-scsi_dh_emc(E) scsi_dh_alua(E) msr(E) efivarfs(E)
-[ 2070.918862] CPU: 4 PID: 0 Comm: swapper/4 Tainted: G            
-E      6.4.0-rc1-desktop-debug+ #51
-[ 2070.918864] Hardware name: Acer Aspire VN7-593G/Pluto_KLS, BIOS V1.11 
-08/01/2018
-[ 2070.918866] RIP: 0010:dev_watchdog+0x1c9/0x1d0
-[ 2070.918869] Code: d5 eb 92 48 89 ef c6 05 5a 34 96 00 01 e8 2f d0 fb 
-ff 45 89 f8 44 89 f1 48 89 ee 48 89 c2 48 c7 c7 58 5c f2 91 e8 07 c6 83 
-ff <0f> 0b e9 74 ff ff ff 41 55 41 54 55 53 48 8b 47 50 4c 8b 28 48 85
-[ 2070.918872] RSP: 0018:ffffbcec00220eb8 EFLAGS: 00010286
-[ 2070.918875] RAX: 0000000000000000 RBX: ffff94f0104843dc RCX: 
-000000000000083f
-[ 2070.918877] RDX: 0000000000000000 RSI: 00000000000000f6 RDI: 
-000000000000003f
-[ 2070.918878] RBP: ffff94f010484000 R08: 0000000000000001 R09: 
-0000000000000000
-[ 2070.918880] R10: ffff94f1b6aa0000 R11: ffff94f1b6aa0000 R12: 
-ffff94f010484488
-[ 2070.918881] R13: ffff94f0031a0600 R14: 0000000000000000 R15: 
-00000000000014c5
-[ 2070.918883] FS:  0000000000000000(0000) GS:ffff94f1b6d00000(0000) 
-knlGS:0000000000000000
-[ 2070.918885] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[ 2070.918887] CR2: 00007f8eea510000 CR3: 000000023322e005 CR4: 
-00000000003706e0
-[ 2070.918889] Call Trace:
-[ 2070.918891]  <IRQ>
-[ 2070.918893]  ? mq_change_real_num_tx+0xe0/0xe0
-[ 2070.918897]  ? mq_change_real_num_tx+0xe0/0xe0
-[ 2070.918899]  call_timer_fn.isra.0+0x17/0x70
-[ 2070.918903]  __run_timers.part.0+0x1b2/0x200
-[ 2070.918907]  ? tick_sched_do_timer+0x80/0x80
-[ 2070.918910]  ? hw_breakpoint_pmu_read+0x10/0x10
-[ 2070.918913]  ? ktime_get+0x33/0xa0
-[ 2070.918915]  run_timer_softirq+0x21/0x50
-[ 2070.918918]  __do_softirq+0xb8/0x1ea
-[ 2070.918923]  irq_exit_rcu+0x75/0xa0
-[ 2070.918926]  sysvec_apic_timer_interrupt+0x66/0x80
-[ 2070.918929]  </IRQ>
-[ 2070.918930]  <TASK>
-[ 2070.918932]  asm_sysvec_apic_timer_interrupt+0x16/0x20
-[ 2070.918935] RIP: 0010:cpuidle_enter_state+0xa7/0x2a0
-[ 2070.918938] Code: 45 40 40 0f 84 9f 01 00 00 e8 65 00 6e ff e8 10 f8 
-ff ff 31 ff 49 89 c5 e8 66 64 6d ff 45 84 ff 0f 85 76 01 00 00 fb 45 85 
-f6 <0f> 88 be 00 00 00 49 63 ce 48 8b 04 24 48 6b d1 68 49 29 c5 48 89
-[ 2070.918939] RSP: 0018:ffffbcec0012fe90 EFLAGS: 00000202
-[ 2070.918942] RAX: ffff94f1b6d25d80 RBX: 0000000000000008 RCX: 
-0000000000000000
-[ 2070.918943] RDX: 000001e22c5f9004 RSI: fffffffdc849289f RDI: 
-0000000000000000
-[ 2070.918945] RBP: ffff94f1b6d2fa00 R08: 0000000000000002 R09: 
-000000002d959839
-[ 2070.918946] R10: ffff94f1b6d24904 R11: 00000000000018c7 R12: 
-ffffffff92155720
-[ 2070.918948] R13: 000001e22c5f9004 R14: 0000000000000008 R15: 
-0000000000000000
-[ 2070.918951]  cpuidle_enter+0x24/0x40
-[ 2070.918954]  do_idle+0x1c0/0x220
-[ 2070.918958]  cpu_startup_entry+0x14/0x20
-[ 2070.918960]  start_secondary+0x109/0x130
-[ 2070.918963]  secondary_startup_64_no_verify+0xf4/0xfb
-[ 2070.918966]  </TASK>
-[ 2070.918968] ---[ end trace 0000000000000000 ]---
-[ 2072.163726] pcieport 0000:00:1c.3: Data Link Layer Link Active not 
-set in 1000 msec
-[ 2072.165868] r8169 0000:03:00.0 enp3s0: Can't reset secondary PCI bus, 
-detach NIC
-
+T24gNS8yLzIzIDE4OjM4LCBTaW1vbiBIb3JtYW4gd3JvdGU6DQo+IE9uIFR1ZSwgTWF5IDAyLCAy
+MDIzIGF0IDAyOjE2OjA5UE0gKzAwMDAsIEdhdnJpbG92IElsaWEgd3JvdGU6DQo+PiBPbiA1LzIv
+MjMgMTc6MDUsIFNpbW9uIEhvcm1hbiB3cm90ZToNCj4+PiBPbiBUdWUsIE1heSAwMiwgMjAyMyBh
+dCAxMTo0MzoxOUFNICswMDAwLCBHYXZyaWxvdiBJbGlhIHdyb3RlOg0KPj4+PiBPbiA0LzI4LzIz
+IDIyOjI0LCBTaW1vbiBIb3JtYW4gd3JvdGU6DQo+Pj4+PiBPbiBXZWQsIEFwciAyNiwgMjAyMyBh
+dCAwMzowNDozMVBNICswMDAwLCBHYXZyaWxvdiBJbGlhIHdyb3RlOg0KPj4+Pj4+IGN0X3NpcF9w
+YXJzZV9udW1lcmljYWxfcGFyYW0oKSByZXR1cm5zIG9ubHkgMCBvciAxIG5vdy4NCj4+Pj4+PiBC
+dXQgcHJvY2Vzc19yZWdpc3Rlcl9yZXF1ZXN0KCkgYW5kIHByb2Nlc3NfcmVnaXN0ZXJfcmVzcG9u
+c2UoKSBpbXBseQ0KPj4+Pj4+IGNoZWNraW5nIGZvciBhIG5lZ2F0aXZlIHZhbHVlIGlmIHBhcnNp
+bmcgb2YgYSBudW1lcmljYWwgaGVhZGVyIHBhcmFtZXRlcg0KPj4+Pj4+IGZhaWxlZC4gTGV0J3Mg
+Zml4IGl0Lg0KPj4+Pj4+DQo+Pj4+Pj4gRm91bmQgYnkgSW5mb1RlQ1Mgb24gYmVoYWxmIG9mIExp
+bnV4IFZlcmlmaWNhdGlvbiBDZW50ZXINCj4+Pj4+PiAobGludXh0ZXN0aW5nLm9yZykgd2l0aCBT
+VkFDRS4NCj4+Pj4+Pg0KPj4+Pj4+IEZpeGVzOiAwZjMyYTQwZmM5MWEgKCJbTkVURklMVEVSXTog
+bmZfY29ubnRyYWNrX3NpcDogY3JlYXRlIHNpZ25hbGxpbmcgZXhwZWN0YXRpb25zIikNCj4+Pj4+
+PiBTaWduZWQtb2ZmLWJ5OiBJbGlhLkdhdnJpbG92IDxJbGlhLkdhdnJpbG92QGluZm90ZWNzLnJ1
+Pg0KPj4+Pj4NCj4+Pj4+IEhpIEdhdnJpbG92LA0KPj4+Pj4NCj4+Pj4NCj4+Pj4gSGkgU2ltb24s
+IHRoYW5rIHlvdSBmb3IgeW91ciBhbnN3ZXIuDQo+Pj4+DQo+Pj4+PiBhbHRob3VnaCBpdCBpcyBh
+IHNsaWdodGx5IHVudXN1YWwgY29udmVudGlvbiBmb3Iga2VybmVsIGNvZGUsDQo+Pj4+PiBJIGJl
+bGlldmUgdGhlIGludGVudGlvbiBpcyB0aGF0IHRoaXMgZnVuY3Rpb24gcmV0dXJucyAwIHdoZW4N
+Cj4+Pj4+IGl0IGZhaWxzICh0byBwYXJzZSkgYW5kIDEgb24gc3VjY2Vzcy4gU28gSSB0aGluayB0
+aGF0IHBhcnQgaXMgZmluZS4NCj4+Pj4+DQo+Pj4+PiBXaGF0IHNlZW1zIGEgYml0IGJyb2tlbiBp
+cyB0aGUgd2F5IHRoYXQgY2FsbGVycyB1c2UgdGhlIHJldHVybiB2YWx1ZS4NCj4+Pj4+DQo+Pj4+
+PiAxLiBUaGUgY2FsbCBpbiBwcm9jZXNzX3JlZ2lzdGVyX3Jlc3BvbnNlKCkgbG9va3MgbGlrZSB0
+aGlzOg0KPj4+Pj4NCj4+Pj4+IAlyZXQgPSBjdF9zaXBfcGFyc2VfbnVtZXJpY2FsX3BhcmFtKC4u
+LikNCj4+Pj4+IAlpZiAocmV0IDwgMCkgew0KPj4+Pj4gCQluZl9jdF9oZWxwZXJfbG9nKHNrYiwg
+Y3QsICJjYW5ub3QgcGFyc2UgZXhwaXJlcyIpOw0KPj4+Pj4gCQlyZXR1cm4gTkZfRFJPUDsNCj4+
+Pj4+IAl9DQo+Pj4+Pg0KPj4+Pj4gICAgICAgIEJ1dCByZXQgY2FuIG9ubHkgYmUgMCBvciAxLCBz
+byB0aGUgZXJyb3IgaGFuZGxpbmcgaXMgbmV2ZXIgaW5va2VkLA0KPj4+Pj4gICAgICAgIGFuZCBh
+IGZhaWx1cmUgdG8gcGFyc2UgaXMgaWdub3JlZC4gSSBndWVzcyBmYWlsdXJlIGRvZXNuJ3Qgb2Nj
+dXIgaW4NCj4+Pj4+ICAgICAgICBwcmFjdGljZS4NCj4+Pj4+DQo+Pj4+PiAgICAgICAgSSBzdXNw
+ZWN0IHRoaXMgc2hvdWxkIGJlOg0KPj4+Pj4NCj4+Pj4+IAlyZXQgPSBjdF9zaXBfcGFyc2VfbnVt
+ZXJpY2FsX3BhcmFtKC4uLikNCj4+Pj4+IAlpZiAoIXJldCkgew0KPj4+Pj4gCQluZl9jdF9oZWxw
+ZXJfbG9nKHNrYiwgY3QsICJjYW5ub3QgcGFyc2UgZXhwaXJlcyIpOw0KPj4+Pj4gCQlyZXR1cm4g
+TkZfRFJPUDsNCj4+Pj4+IAl9DQo+Pj4+Pg0KPj4+Pg0KPj4+PiBjdF9zaXBfcGFyc2VfbnVtZXJp
+Y2FsX3BhcmFtKCkgcmV0dXJucyAwIGluIHRvIGNhc2VzIDEpIHdoZW4gdGhlDQo+Pj4+IHBhcmFt
+ZXRlciAnZXhwaXJlcz0nIGlzbid0IGZvdW5kIGluIHRoZSBoZWFkZXIgb3IgMikgaXQncyBpbmNv
+cnJlY3RseSBzZXQuDQo+Pj4+IEluIHRoZSBmaXJzdCBjYXNlLCB0aGUgcmV0dXJuIHZhbHVlIHNo
+b3VsZCBiZSBpZ25vcmVkLCBzaW5jZSB0aGlzIGlzIGENCj4+Pj4gbm9ybWFsIHNpdHVhdGlvbg0K
+Pj4+PiBJbiB0aGUgc2Vjb25kIGNhc2UsIGl0J3MgYmV0dGVyIHRvIHdyaXRlIHRvIHRoZSBsb2cg
+YW5kIHJldHVybiBORl9EUk9QLA0KPj4+PiBvciBpZ25vcmUgaXQgdG9vLCB0aGVuIGNoZWNraW5n
+IHRoZSByZXR1cm4gdmFsdWUgY2FuIGJlIHJlbW92ZWQgYXMNCj4+Pj4gdW5uZWNlc3NhcnkuDQo+
+Pj4NCj4+PiBTb3JyeSwgSSB0aGluayBJIG1pc3VuZGVyc3Rvb2QgdGhlIGludGVudGlvbiBvZiB5
+b3VyIHBhdGNoIGVhcmxpZXIuDQo+Pj4NCj4+PiBEbyBJIChub3cpIHVuZGVyc3RhbmQgY29ycmVj
+dGx5IHRoYXQgeW91IGFyZSBwcm9wb3NpbmcgYSB0cmlzdGF0ZT8NCj4+Pg0KPj4+IGEpIHJldHVy
+biAxIGlmIHZhbHVlIGlzIGZvdW5kOyAqdmFsIGlzIHNldA0KPj4+IGIpIHJldHVybiAwIGlmIHZh
+bHVlIGlzIG5vdCBmb3VuZDsgKnZhbCBpcyB1bmNoYW5nZWQNCj4+PiBjKSByZXR1cm4gLTEgb24g
+ZXJyb3I7ICp2YWwgaXMgdW5kZWZpbmVkDQo+Pg0KPj4gWWVzLCBpdCBzZWVtcyB0byBtZSB0aGF0
+IHRoaXMgd2FzIG9yaWdpbmFsbHkgaW50ZW5kZWQuDQo+IA0KPiBUaGFua3MuIFdpdGggbXkgbmV3
+IGZvdW5kIHVuZGVyc3RhbmRpbmcsIHRoaXMgbG9va3MgZ29vZCB0byBtZS4NCj4gDQo+IFJldmll
+d2VkLWJ5OiBTaW1vbiBIb3JtYW4gPHNpbW9uLmhvcm1hbkBjb3JpZ2luZS5jb20+DQo+IA0KDQpI
+aSwgU2ltb24uDQpJJ20gc29ycnkgdG8gYm90aGVyIHlvdS4NCldpbGwgdGhpcyBwYXRjaCBiZSBh
+cHBsaWVkIG9yIHJlamVjdGVkPw0KDQrQkmVzdCByZWdhcmRzLCBJbHlhLg0KDQoNCg==
 
