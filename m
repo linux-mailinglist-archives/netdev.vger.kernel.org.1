@@ -1,148 +1,87 @@
-Return-Path: <netdev+bounces-13255-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13256-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8550573AEE3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 05:04:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 997E073AEF1
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 05:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B680B1C20F4E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 03:04:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 543AC2818B2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 03:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B6A4339B;
-	Fri, 23 Jun 2023 03:04:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A431038C;
+	Fri, 23 Jun 2023 03:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AA08C38C
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 03:04:50 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2646C2135;
-	Thu, 22 Jun 2023 20:04:49 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4QnMXs5dMSz4wjB;
-	Fri, 23 Jun 2023 13:04:45 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1687489487;
-	bh=r2ZwcIFT4HlwJjAj+VisO/XGPwfJvpYrACK4BtmNfhY=;
-	h=Date:From:To:Cc:Subject:From;
-	b=TJd1L/eQg1XgkXP9LOYB6VQ2T1YqBm0OuFJM0pc/r4TCOFy4DClv7TmUylR4Af+GR
-	 xjxKvyYZ6dtjKZolUQhLZtwGLJQanHtHBq8WDW+o8upCyX6P7bO/jv+ZpzkWRWbRVm
-	 aCg1IDamyE+dD7/4oe7ufWjPmQ2BdthmYLBf8MTihF4QANBdR7AjV+66ghIHJbVH4T
-	 Zb3TjwLNfM7WJtEwva4NANAeWTAw4NL7iwlYHPdgrWy3wc4RiOaxkNQ+UVi/iwQpgS
-	 JYMVT8delOY3IjxF9hyYeqrUA36kVXJYKRnXElqibS/RjT1/G4x1YkM+t8Tx5q2r8e
-	 UOXjU9KfzyqIA==
-Date: Fri, 23 Jun 2023 13:04:43 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: "Michael S. Tsirkin" <mst@redhat.com>, David Miller
- <davem@davemloft.net>
-Cc: Jakub Kicinski <kuba@kernel.org>, Networking <netdev@vger.kernel.org>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
- Mailing List <linux-next@vger.kernel.org>, Xuan Zhuo
- <xuanzhuo@linux.alibaba.com>
-Subject: linux-next: manual merge of the vhost tree with the net-next tree
-Message-ID: <20230623130443.6c9a481e@canb.auug.org.au>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E399C7E0
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 03:10:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 767B9C433CD;
+	Fri, 23 Jun 2023 03:10:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687489821;
+	bh=iaaUecfmjsyxg1Xzi58aBuLGBUafPHjOTk7jbDJm+as=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Lefg7V6ja/xfjLwlV0+KupLDjkVgELyTJH2SSntVUryfymZJ8OJZFYF+5SXSyzPpA
+	 970lPkmeWdz6XIS0QsRo16AzTMRmp+SAcTpOuTmjcqmVHpUkwE+MPuTaL/ebG78U7q
+	 HM2sGDcWENJF5TRRL+GHqLXFioIN4bD0uQtTXQx7wDY1QT+QKa08QrUZmng4Yz2OHl
+	 auUlvVNfnoYjCQf2tXTgrWEXQY8r6P2m0CW4cGykpcZ9nxzGwnuepERI0uLocbTnbW
+	 /klR2FJYqUzQUtT1ewt35Sr/6l8d11nhVSVRPwUT2R8H/A768VQh7qjPJ1DYUjOqTX
+	 2Lqs4EKuY3t+Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 598F7C395FF;
+	Fri, 23 Jun 2023 03:10:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/Sq/s683MbuDhTPbsFIgzDlo";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] can: isotp: isotp_sendmsg(): fix return error fix on TX
+ path
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168748982135.10729.12075135784970212786.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Jun 2023 03:10:21 +0000
+References: <20230622090122.574506-2-mkl@pengutronix.de>
+In-Reply-To: <20230622090122.574506-2-mkl@pengutronix.de>
+To: Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+ linux-can@vger.kernel.org, kernel@pengutronix.de, socketcan@hartkopp.net,
+ carsten.schmidt-achim@t-online.de, stable@vger.kernel.org
 
---Sig_/Sq/s683MbuDhTPbsFIgzDlo
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Hello:
 
-Hi all,
+This patch was applied to netdev/net.git (main)
+by Marc Kleine-Budde <mkl@pengutronix.de>:
 
-Today's linux-next merge of the vhost tree got a conflict in:
+On Thu, 22 Jun 2023 11:01:22 +0200 you wrote:
+> From: Oliver Hartkopp <socketcan@hartkopp.net>
+> 
+> With commit d674a8f123b4 ("can: isotp: isotp_sendmsg(): fix return
+> error on FC timeout on TX path") the missing correct return value in
+> the case of a protocol error was introduced.
+> 
+> But the way the error value has been read and sent to the user space
+> does not follow the common scheme to clear the error after reading
+> which is provided by the sock_error() function. This leads to an error
+> report at the following write() attempt although everything should be
+> working.
+> 
+> [...]
 
-  drivers/net/virtio_net.c
+Here is the summary with links:
+  - [net] can: isotp: isotp_sendmsg(): fix return error fix on TX path
+    https://git.kernel.org/netdev/net/c/e38910c0072b
 
-between commit:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-  80f50f918c6e ("virtio_net: separate the logic of freeing the rest mergeab=
-le buf")
 
-from the net-next tree and commit:
-
-  21081476b808 ("virtio_net: support dma premapped")
-
-from the vhost tree.
-
-I fixed it up (see below) and can carry the fix as necessary. This
-is now fixed as far as linux-next is concerned, but any non trivial
-conflicts should be mentioned to your upstream maintainer when your tree
-is submitted for merging.  You may also want to consider cooperating
-with the maintainer of the conflicting tree to minimise any particularly
-complex conflicts.
-
---=20
-Cheers,
-Stephen Rothwell
-
-diff --cc drivers/net/virtio_net.c
-index 0db14f6b87d3,d67b36fdba0d..000000000000
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@@ -1128,28 -1136,6 +1233,28 @@@ err
-  	return NULL;
-  }
- =20
- +static void mergeable_buf_free(struct receive_queue *rq, int num_buf,
- +			       struct net_device *dev,
- +			       struct virtnet_rq_stats *stats)
- +{
- +	struct page *page;
- +	void *buf;
- +	int len;
- +
- +	while (num_buf-- > 1) {
-- 		buf =3D virtqueue_get_buf(rq->vq, &len);
-++		buf =3D virtnet_rq_get_buf(rq, &len, NULL);
- +		if (unlikely(!buf)) {
- +			pr_debug("%s: rx error: %d buffers missing\n",
- +				 dev->name, num_buf);
- +			dev->stats.rx_length_errors++;
- +			break;
- +		}
- +		stats->bytes +=3D len;
- +		page =3D virt_to_head_page(buf);
- +		put_page(page);
- +	}
- +}
- +
-  /* Why not use xdp_build_skb_from_frame() ?
-   * XDP core assumes that xdp frags are PAGE_SIZE in length, while in
-   * virtio-net there are 2 points that do not match its requirements:
-
---Sig_/Sq/s683MbuDhTPbsFIgzDlo
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEyBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSVC8sACgkQAVBC80lX
-0GxbWAf2I4Ddy8m9IViYJOw9ulRJ1xTRB4eS69zxg4ddrmyNDuXd7RovOT6PyTbe
-u+CZBM60EPl8RgBoXBRUG0iq/GOSaemiizccOLMH8OVcz7/GSwUeZJbboFQjHEgV
-HWUv6gIkQePtsIh8SQPl8ouuKGiXYeIJlC7UHyAeuQX1IAaHq9yohOJVIPpuwiaB
-mExe34icoqh4unAr3EmAvZ64cfy+sfZy7mh5XgfpSGdCkSsDdBhn+ITJMJJZKKvO
-kcQcBAx3ii547fJ5QQxKG/FQabIwi+jK3KanXVnnXWe3DejCvF92TxkxdO8ApdBW
-Q1cGn7j3wP9e6zzf9bJi8YTZTLzp
-=SIiz
------END PGP SIGNATURE-----
-
---Sig_/Sq/s683MbuDhTPbsFIgzDlo--
 
