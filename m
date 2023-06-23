@@ -1,347 +1,370 @@
-Return-Path: <netdev+bounces-13457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0EFD73BA59
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:40:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2F6B73BA5F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:41:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5D1B281C90
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:40:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB24281BD3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:41:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FDA93D9C;
-	Fri, 23 Jun 2023 14:40:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C0A8486;
+	Fri, 23 Jun 2023 14:41:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A6DA23101
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:40:39 +0000 (UTC)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 239AAA1
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:40:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687531235; x=1719067235;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=mM3dvBu0GbtL5mJuLHb6mTjZ90dTNygEhKPDRSl0NWo=;
-  b=OrP4p9xybwmVxtHXsT0vvoo/rua0PZwyWk0Rwkpq5GIHpgpCzSLHDauR
-   kSwbxAopjUYrggb66a3nPpCmgqHZsheNPDC98AYU0/z7/IlGUG9C0arSd
-   mfVCPWlFVI+lb1CfkX5EGlZ8r/L5A2By/jW7auFlIn5bAYSNcuIa0SbYS
-   yk+CkywByOHCrwhWlzCdbpubiyL6lfT3EUA0ZZtdxQpzAzVZ3YpN08tER
-   Pf5N15M/bYd2RZZa06P07aITPbol3hCzJqokB6d8pGiEHEcpLZDjyJxpY
-   3qSWhiRvSpp9OGeGi1AVz62CzA7roPtOmRwGRwxWdTTKV6lYi0DDUNf8Q
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10750"; a="341118046"
-X-IronPort-AV: E=Sophos;i="6.01,152,1684825200"; 
-   d="scan'208";a="341118046"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 07:40:34 -0700
-X-IronPort-AV: E=McAfee;i="6600,9927,10750"; a="749878936"
-X-IronPort-AV: E=Sophos;i="6.01,152,1684825200"; 
-   d="scan'208";a="749878936"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga001.jf.intel.com with ESMTP; 23 Jun 2023 07:40:34 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Fri, 23 Jun 2023 07:40:34 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 23 Jun 2023 07:40:33 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 23 Jun 2023 07:40:33 -0700
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (104.47.58.106)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Fri, 23 Jun 2023 07:40:33 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=hFgBiLf8hdf8zc+3/zRwoWM1Rg04wV6k5Rap3nbDbB7e8jCKGr508RlOpPPyxbCpk6x75OUjqBmmLI8A2e2O3TtOd8/YqDTrDSX2Kgj303kg5AruFJmLGIpy3d4lvBe9Miez7J3XmXobA/d3FX8EUkXL80DBdOSwKsQOqyI5YZHCMAoE3KImtiK8RmPJ78AFyC9xNW4j7/lWQBR3V51ZqbBZkjeL5Li3gz1WfzkDoFd3Rb2R3Vcsdh1P11AwpV8o8bp+FF4IigoXSCyoVIr8UcSVEr+zJSFONQsZsnwEB/ME4BLJIDpkLRWTp9c0UgQjlwhvGt05EmuaWY2m23VkoA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v05dblSnnilrm1LRd6/hBqwt1KG040wge94lZnkzBB8=;
- b=C/q1EhPdSrRWSRugKb2blvUahTpRMOYsV+qPWA80jzLnOHaQ4NnElcDMPsNNzg/0ffW39Qj0QCXCOSwsgx+Ro3GgqGmJGn+nwrHzJVpvWpl+Kv2sqXZpN/0HbfXdoFabt5rFLyuFRw0f2CNnA2YxPUcmBOAxOn5wwO4UMXyfM2WY1CcSzuNE+ZpZxU8WW21ncMy+1JQjce38+5bB87FoFrcuTgkg/J80I1zVsLyhiNjKgAzZAwe5uvk+nnpbSvcbtHd7v1fZQnrz9a0EwVgcjHWulWbRDjx53NXzMYonegnz0GVIeWPDtu9BnizA/bbCDW4xZ5Y/pmzFrkhBqRgs7w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com (2603:10b6:8:b3::19) by
- DS0PR11MB8206.namprd11.prod.outlook.com (2603:10b6:8:166::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6521.23; Fri, 23 Jun 2023 14:40:31 +0000
-Received: from DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::9e4f:80cc:e0aa:6809]) by DM4PR11MB6117.namprd11.prod.outlook.com
- ([fe80::9e4f:80cc:e0aa:6809%2]) with mapi id 15.20.6521.024; Fri, 23 Jun 2023
- 14:40:30 +0000
-Date: Fri, 23 Jun 2023 16:40:22 +0200
-From: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-To: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-CC: Tony Nguyen <anthony.l.nguyen@intel.com>, <davem@davemloft.net>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <edumazet@google.com>,
-	<netdev@vger.kernel.org>, Michal Swiatkowski
-	<michal.swiatkowski@linux.intel.com>, Michal Wilczynski
-	<michal.wilczynski@intel.com>, Simon Horman <simon.horman@corigine.com>,
-	Arpana Arland <arpanax.arland@intel.com>
-Subject: Re: [PATCH net-next 4/6] ice: remove null checks before devm_kfree()
- calls
-Message-ID: <ZJWu1hbpZOxRz3fe@boxer>
-References: <20230622183601.2406499-1-anthony.l.nguyen@intel.com>
- <20230622183601.2406499-5-anthony.l.nguyen@intel.com>
- <ZJVyiOwdVQ6btr53@boxer>
- <ffe3bbdf-eb26-5223-c1ed-1bdbaf577d84@intel.com>
- <ZJV+dUvm4Mg1QNeR@boxer>
- <4278f944-57fe-6382-132d-728fa8c8f582@intel.com>
- <ZJWdP+RPaF+mYYPM@boxer>
- <0e9ae896-82c1-6ddb-c1a0-e233f8a9d7f0@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <0e9ae896-82c1-6ddb-c1a0-e233f8a9d7f0@intel.com>
-X-ClientProxiedBy: BE1P281CA0341.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:7d::18) To DM4PR11MB6117.namprd11.prod.outlook.com
- (2603:10b6:8:b3::19)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6752323101
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:41:15 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C662107
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:41:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687531267;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=sqYSUw7QzPfprFmPveFR/00tu6i/Fm8VFN1BravdvaE=;
+	b=R6ClH6kE5BcINT99eOH/EYNsfNaFrsNPqvl1GYSjbPVIsGTR8SCAf8fVvKfwWcEEAWxjH0
+	lr6aX0GNY5/HnYw+Lhgh/smwQiRf4Y0WSZROUwSvSBRTex9cuQUt5VIlGR31HOWqEJ5dfi
+	4SWORiGHvBmQqJxGShQ62vF2BPfIt44=
+Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
+ [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-383-VsPnkpeROquzkYGU7Uctjw-1; Fri, 23 Jun 2023 10:41:06 -0400
+X-MC-Unique: VsPnkpeROquzkYGU7Uctjw-1
+Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-76077669a5aso17966785a.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:41:06 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687531266; x=1690123266;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=sqYSUw7QzPfprFmPveFR/00tu6i/Fm8VFN1BravdvaE=;
+        b=VniQ35p/f/YlcCVwTMhha9MXSwTIJnZZn39PK3mD/sfqpxfKHUuBLar4cMBUSvtiG/
+         qpQxSSV8Hte3mSGWSpxoFusJFxYljmNuN2sv+QrgOtJ8dCiJPn6W0SpGTuHJGpJZWKdH
+         8ii/ORJJCq1GJV0Ez7DTiuKdJAaPanw8MchwdnXtiDgaivi8Kjfr575iutf1QJkUI+LD
+         94MtB+Xt/A8dy/ZGeyvO+qz0UUsvAtJE0txR1rfT10zZSrFFe+/nqJsdryrl/52inI7U
+         Nar5nUQZUvt7Ulf8R8zES3m06Z3lCrI62EymXRHhfarFzfwfoMhLF3DP6MkQLV+nrMrC
+         4PRA==
+X-Gm-Message-State: AC+VfDyFBfShwdxZtXWxHLumsOgmhKryPwzwlUS4c9r/moOoD+QrOJJr
+	Hh6mnxsCeTqOvpVCIZTdYde9X4LGLyIDwLYeoqbTP8s8GJ+VtDErLX/Ye9PhaTpEGdJaq15PuKL
+	maKcRrFlBPIu9+529c+4h27CH
+X-Received: by 2002:a05:620a:c45:b0:75b:23a1:69e4 with SMTP id u5-20020a05620a0c4500b0075b23a169e4mr24288354qki.4.1687531265882;
+        Fri, 23 Jun 2023 07:41:05 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5N/IMdXrvX1b4+X6A/rHUywM2Pf2WsjHR+/tW1JW7belWg0QfWf7CK3sJH3AqiEPVgUJjNLQ==
+X-Received: by 2002:a05:620a:c45:b0:75b:23a1:69e4 with SMTP id u5-20020a05620a0c4500b0075b23a169e4mr24288332qki.4.1687531265552;
+        Fri, 23 Jun 2023 07:41:05 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
+        by smtp.gmail.com with ESMTPSA id r6-20020a05620a03c600b00761fc8a7bc4sm4585785qkm.22.2023.06.23.07.41.03
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 07:41:05 -0700 (PDT)
+Message-ID: <55a98e578c8654fec32bef22e811336b3c59ed68.camel@redhat.com>
+Subject: Re: [PATCH net-next 2/9] mptcp: track some aggregate data counters
+From: Paolo Abeni <pabeni@redhat.com>
+To: Eric Dumazet <edumazet@google.com>, Matthieu Baerts
+	 <matthieu.baerts@tessares.net>
+Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, "David S.
+ Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Shuah Khan
+ <shuah@kernel.org>,  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org
+Date: Fri, 23 Jun 2023 16:41:01 +0200
+In-Reply-To: <CANn89iK+yWD8jKwvRO_4-Kz7Qumk5WwmtwJDWMKDU2oLyDdGxA@mail.gmail.com>
+References: 
+	<20230620-upstream-net-next-20230620-mptcp-expose-more-info-and-misc-v1-0-62b9444bfd48@tessares.net>
+	 <20230620-upstream-net-next-20230620-mptcp-expose-more-info-and-misc-v1-2-62b9444bfd48@tessares.net>
+	 <CANn89iK+yWD8jKwvRO_4-Kz7Qumk5WwmtwJDWMKDU2oLyDdGxA@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM4PR11MB6117:EE_|DS0PR11MB8206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9d016a9f-9dd5-4f17-2a16-08db73f7caf4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: X/EbPPoFcwo7sXQXZJ2zrQkRt93McJLnMBp5bH90QRwDajC8ltF/Pzrwg8Adf1ctPG8dW7CFl+xw9mkYyAG5hKl6iyhEhciAluJqV0+sGdBmvBkK02X1SBQ6s6sU4oneDvb6099puZlGerTjUAif3tun9HfbTQkfg9OpPmH0EyIMqwd1qggYf5tnE2wAZsEp8fQ0P9Ek7lRAjK0uPegugrBlVZxvUVhzKnejsWamtlNeAk/UEvZMGDMUBC7OLgkHNDPRMBJ8K4at3cLKZd0XVdy6gLay1Y7d6ZVgUP+SYpdLmMvN1LR4HHfi/y5ZcPv9s2lW169pVO+sYsyi8iNy9EJ2yYNZj6cXIrJ9kASn9M16OCSHDaOP0JInlhxw4rWt0unwRTH9r4KBrqI44NuJP/FMKi3JdOB4URmu2N0EbR1AKSMYDvlY6Dqf1hYYTsl3M3elu0W6/9c8kx3QTAmd0ujQ7Hi7r6uNUTeUPJ4BedqnyIbzdw2BSccEqnJZ/UcZc2HhFoI+Nz3sbWpVuAxo04Fm21wBj6pKrT3YA2WVSqmAZhHtDdznwXfng7dN3mzOICP5lNbIN7vfhcoG1NYc3w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM4PR11MB6117.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(39860400002)(346002)(376002)(366004)(396003)(136003)(451199021)(86362001)(82960400001)(38100700002)(33716001)(66899021)(8676002)(6486002)(6862004)(966005)(41300700001)(26005)(53546011)(8936002)(44832011)(5660300002)(478600001)(6506007)(186003)(2906002)(83380400001)(316002)(54906003)(66556008)(4326008)(6636002)(66476007)(6666004)(9686003)(6512007)(66946007);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?r0raDK4vNZnyLfHnbNxpAO1YkU/HtgX8gyUACy+JbgoD8ltho/hEeJWuEEbc?=
- =?us-ascii?Q?AJgEURnyFxxBh0alQHM3/fRyEDZs7B7Muqt5IuRHcs1bIGpmahBHqnFsmXA2?=
- =?us-ascii?Q?iRlsNEWKK1bTZ9aYAnVmG782wIyz0RYFOrfnhQsU63qN2aCkozpMYBmpjS0e?=
- =?us-ascii?Q?4DM80gzGUP/bzI/LqnRXQj7xZrLsfDvFB+NlHzA7t2I+F3+kEoeg1X2awGu2?=
- =?us-ascii?Q?AleoWaYqMeFU29hXpVgm51ifm+rSXwX8yC156vVqpJAErltRUoymf6fdP+Ws?=
- =?us-ascii?Q?CBthnpa69KhVP69PVBoSU8zlbGXzRDvyZhGmDvP5l7NVoJC4xEgXSwGisCFZ?=
- =?us-ascii?Q?oAgR4Qae2tlwXNCBwcOHT+gegDAGOy2OzvELVRWfNG5gdusn0HllBljkO9CR?=
- =?us-ascii?Q?5dhcr8ZcLJjhs5cI9KIbz6uhGYoJGjsa/J5TbB+WJB/uQbosD/3pKc0a9QKw?=
- =?us-ascii?Q?EcQbsNyELRwpJE6/JOdOHu2ksU7IprLJF9kKeKizNeVbxH9hc7dlxv+Rgksp?=
- =?us-ascii?Q?gqINoUGJE0nVZ4dGjSrgkGzqmLuMeV0yqKs34X7I1NBAqu6SsvVNjIIblyrt?=
- =?us-ascii?Q?oX6GhDb5eEgiKL0IYYl2Dq/fdyZY41J1IAaX+ygOT1yWC9TpHUdy21DNNFMC?=
- =?us-ascii?Q?GRmFk/oNXLQqOtjRWTrWjIGmM4p7fg3JCqkh6VyE6+Vo7HCxRuo6OpWhLVui?=
- =?us-ascii?Q?qQ2+06UBKPNGZiFiqhnIzfnK+rdRV1vkGS4SYdJwk2WJDLtCc+vMThAogBC6?=
- =?us-ascii?Q?OoyF4o3mWE93fIUtBGOeuahaUKZ6TFSXg03nuPohywCOx9cPxS0dG11cSn+k?=
- =?us-ascii?Q?7VuchOpghctBHuPMNorQjUFCMp9h8ZNzil7RzMoWCBsywjNafn6vHbboCKA6?=
- =?us-ascii?Q?IyoNSRbVu4VlEAAcrWucS5b6AS5lfQ1pdIpw/XEq8l3dJncLK0LuTdI3LWgK?=
- =?us-ascii?Q?vkWIRBlXsAMwJqAxB/5TVRhhdIYHjQluh8l0OxfqAlEEP9pttyF96r8NlJ3S?=
- =?us-ascii?Q?8jU2V0dpc1phZAujsLhRBu6glWpA++HDd9PYxFalf1xk/gpSV9BsYLmWrApj?=
- =?us-ascii?Q?Prem7jhK9DVdMUqwahDCLFo1jfAq4TIDH2XkJtJpwRzLr1lICxEFzokBNvQD?=
- =?us-ascii?Q?L75EJtbNWFWknD8P/t8JBeM3HeMKxQEwcIZnY4bWW9vjB5SmN2YnQus3gu0L?=
- =?us-ascii?Q?M+y42Wg8VOsCkBRygxX9rrx6np0b5tX3Xyc8IB7Vg8wVDccvENrmZgxFB5Dj?=
- =?us-ascii?Q?kfCCED0ObMGCdlnSHzCtFWC+XUj3SoNaZI9lABjQme+xtWATDqx8LaTSTQiu?=
- =?us-ascii?Q?NKMDfWaaCawvpII/bBZyuCZSxgoj8ruRkqjTgBk81yAdGj8HPu3tYWpx8ZNe?=
- =?us-ascii?Q?6tD/gcgQkJsv0oRulOkHtcZS5u05Q8V+uvKjH29qEXUOEBAWIEWkUwsnu+VI?=
- =?us-ascii?Q?1y4QOkSm98q2dXd7QPaToIZEDwfveUR57pTvsJHZ5/PtOREXVaDNmeqj2XE3?=
- =?us-ascii?Q?s9rxx4tWoTQf2/TXdGt2r0+Z7jF1JwCiusCNL8+Y3Uq46yw5fZGpNZs/A4PA?=
- =?us-ascii?Q?VHwDWyhZz7iw5FYNEH0SGuBejUbTwb//04HHJ4LlOo7NCif4RDBEYYA/K6Yc?=
- =?us-ascii?Q?kg=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9d016a9f-9dd5-4f17-2a16-08db73f7caf4
-X-MS-Exchange-CrossTenant-AuthSource: DM4PR11MB6117.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 14:40:30.3912
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m5ntI/gyXrN2+BsWH8Pgk22E7hRmUCgzgUzFaf8ghd1TQdIJH9FboJRaB9vE7x36SIUnHfPk+/LpSW27CsvLK7tnO9TSbpjvqjzWZ18r374=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8206
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 04:28:08PM +0200, Przemek Kitszel wrote:
-> On 6/23/23 15:25, Maciej Fijalkowski wrote:
-> > On Fri, Jun 23, 2023 at 03:21:30PM +0200, Przemek Kitszel wrote:
-> > > On 6/23/23 13:13, Maciej Fijalkowski wrote:
-> > > > On Fri, Jun 23, 2023 at 12:44:29PM +0200, Przemek Kitszel wrote:
-> > > > > On 6/23/23 12:23, Maciej Fijalkowski wrote:
-> > > > > > On Thu, Jun 22, 2023 at 11:35:59AM -0700, Tony Nguyen wrote:
-> > > > > > > From: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > > > > > > 
-> > > > > > > We all know they are redundant.
-> > > > > > 
-> > > > > > Przemek,
-> > > > > > 
-> > > > > > Ok, they are redundant, but could you also audit the driver if these devm_
-> > > > > > allocations could become a plain kzalloc/kfree calls?
-> > > > > 
-> > > > > Olek was also motivating such audit :)
-> > > > > 
-> > > > > I have some cases collected with intention to send in bulk for next window,
-> > > > > list is not exhaustive though.
-> > > > 
-> > > > When rev-by count tag would be considered too much? I have a mixed
-> > > > feelings about providing yet another one, however...
-> > > > 
-> > > > > 
-> > > > > > 
-> > > > > > > 
-> > > > > > > Reviewed-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> > > > > > > Reviewed-by: Michal Wilczynski <michal.wilczynski@intel.com>
-> > > > > > > Reviewed-by: Simon Horman <simon.horman@corigine.com>
-> > > > > > > Signed-off-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > > > > > > Tested-by: Arpana Arland <arpanax.arland@intel.com> (A Contingent worker at Intel)
-> > > > > > > Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
-> > > > > > > ---
-> > > > > > >     drivers/net/ethernet/intel/ice/ice_common.c   |  6 +--
-> > > > > > >     drivers/net/ethernet/intel/ice/ice_controlq.c |  3 +-
-> > > > > > >     drivers/net/ethernet/intel/ice/ice_flow.c     | 23 ++--------
-> > > > > > >     drivers/net/ethernet/intel/ice/ice_lib.c      | 42 +++++++------------
-> > > > > > >     drivers/net/ethernet/intel/ice/ice_sched.c    | 11 ++---
-> > > > > > >     drivers/net/ethernet/intel/ice/ice_switch.c   | 19 +++------
-> > > > > > >     6 files changed, 29 insertions(+), 75 deletions(-)
-> > > > > > > 
-> > > > > > > diff --git a/drivers/net/ethernet/intel/ice/ice_common.c b/drivers/net/ethernet/intel/ice/ice_common.c
-> > > > > > > index eb2dc0983776..6acb40f3c202 100644
-> > > > > > > --- a/drivers/net/ethernet/intel/ice/ice_common.c
-> > > > > > > +++ b/drivers/net/ethernet/intel/ice/ice_common.c
-> > > > > > > @@ -814,8 +814,7 @@ static void ice_cleanup_fltr_mgmt_struct(struct ice_hw *hw)
-> > > > > > >     				devm_kfree(ice_hw_to_dev(hw), lst_itr);
-> > > > > > >     			}
-> > > > > > >     		}
-> > > > > > > -		if (recps[i].root_buf)
-> > > > > > > -			devm_kfree(ice_hw_to_dev(hw), recps[i].root_buf);
-> > > > > > > +		devm_kfree(ice_hw_to_dev(hw), recps[i].root_buf);
-> > > > > > >     	}
-> > > > > > >     	ice_rm_all_sw_replay_rule_info(hw);
-> > > > > > >     	devm_kfree(ice_hw_to_dev(hw), sw->recp_list);
-> > > > > > > @@ -1011,8 +1010,7 @@ static int ice_cfg_fw_log(struct ice_hw *hw, bool enable)
-> > > > > > >     	}
-> > > > > > >     out:
-> > > > > > > -	if (data)
-> > > > > > > -		devm_kfree(ice_hw_to_dev(hw), data);
-> > > > > > > +	devm_kfree(ice_hw_to_dev(hw), data);
-> > > > > > >     	return status;
-> > > > > > >     }
-> > > > > > > diff --git a/drivers/net/ethernet/intel/ice/ice_controlq.c b/drivers/net/ethernet/intel/ice/ice_controlq.c
-> > > > > > > index 385fd88831db..e7d2474c431c 100644
-> > > > > > > --- a/drivers/net/ethernet/intel/ice/ice_controlq.c
-> > > > > > > +++ b/drivers/net/ethernet/intel/ice/ice_controlq.c
-> > > > > > > @@ -339,8 +339,7 @@ do {									\
-> > > > > > >     		}							\
-> > > > > > >     	}								\
-> > > > > > >     	/* free the buffer info list */					\
-> > > > > > > -	if ((qi)->ring.cmd_buf)						\
-> > > > > > > -		devm_kfree(ice_hw_to_dev(hw), (qi)->ring.cmd_buf);	\
-> > > > > > > +	devm_kfree(ice_hw_to_dev(hw), (qi)->ring.cmd_buf);		\
-> > > > > > >     	/* free DMA head */						\
-> > > > > > >     	devm_kfree(ice_hw_to_dev(hw), (qi)->ring.dma_head);		\
-> > > > > > >     } while (0)
-> > > > > > > diff --git a/drivers/net/ethernet/intel/ice/ice_flow.c b/drivers/net/ethernet/intel/ice/ice_flow.c
-> > > > > > > index ef103e47a8dc..85cca572c22a 100644
-> > > > > > > --- a/drivers/net/ethernet/intel/ice/ice_flow.c
-> > > > > > > +++ b/drivers/net/ethernet/intel/ice/ice_flow.c
-> > > > > > > @@ -1303,23 +1303,6 @@ ice_flow_find_prof_id(struct ice_hw *hw, enum ice_block blk, u64 prof_id)
-> > > > > > >     	return NULL;
-> > > > > > >     }
-> > > > > > > -/**
-> > > > > > > - * ice_dealloc_flow_entry - Deallocate flow entry memory
-> > > > > > > - * @hw: pointer to the HW struct
-> > > > > > > - * @entry: flow entry to be removed
-> > > > > > > - */
-> > > > > > > -static void
-> > > > > > > -ice_dealloc_flow_entry(struct ice_hw *hw, struct ice_flow_entry *entry)
-> > > > > > > -{
-> > > > > > > -	if (!entry)
-> > > > > > > -		return;
-> > > > > > > -
-> > > > > > > -	if (entry->entry)
-> > > > 
-> > > > ...would you be able to point me to the chunk of code that actually sets
-> > > > ice_flow_entry::entry? because from a quick glance I can't seem to find
-> > > > it.
-> > > 
-> > > Simon was asking very similar question [1],
-> > > albeit "where is the *check* for entry not being null?" (not set),
-> > > and it is just above the default three lines of context provided by git
-> > > (pasted below for your convenience, [3])
-> > > 
-> > > To answer, "where it's set?", see ice_flow_add_entry(), [2].
-> > 
-> > I was referring to 'entry' member from ice_flow_entry struct. You're
-> > pointing me to init of whole ice_flow_entry.
-> > 
-> > I am trying to say that if ice_flow_entry::entry is never set, then
-> > probably it could be removed from struct.
-> 
-> You are totally right, I have compile-checked it and that's good idea.
-> I will post a followup patch for that.
+Hi,
 
-Good, then let's push another entry to rev-by stack tags:
-Reviewed-by: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+On Fri, 2023-06-23 at 16:25 +0200, Eric Dumazet wrote:
+> On Tue, Jun 20, 2023 at 6:30=E2=80=AFPM Matthieu Baerts
+> <matthieu.baerts@tessares.net> wrote:
+> >=20
+> > From: Paolo Abeni <pabeni@redhat.com>
+> >=20
+> > Currently there are no data transfer counters accounting for all
+> > the subflows used by a given MPTCP socket. The user-space can compute
+> > such figures aggregating the subflow info, but that is inaccurate
+> > if any subflow is closed before the MPTCP socket itself.
+> >=20
+> > Add the new counters in the MPTCP socket itself and expose them
+> > via the existing diag and sockopt. While touching mptcp_diag_fill_info(=
+),
+> > acquire the relevant locks before fetching the msk data, to ensure
+> > better data consistency
+> >=20
+> > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/385
+> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
+> > Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+> > Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+> > ---
+> >  include/uapi/linux/mptcp.h |  5 +++++
+> >  net/mptcp/options.c        | 10 ++++++++--
+> >  net/mptcp/protocol.c       | 11 ++++++++++-
+> >  net/mptcp/protocol.h       |  4 ++++
+> >  net/mptcp/sockopt.c        | 25 ++++++++++++++++++++-----
+> >  5 files changed, 47 insertions(+), 8 deletions(-)
+> >=20
+> > diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
+> > index 32af2d278cb4..a124be6ebbba 100644
+> > --- a/include/uapi/linux/mptcp.h
+> > +++ b/include/uapi/linux/mptcp.h
+> > @@ -123,6 +123,11 @@ struct mptcp_info {
+> >         __u8    mptcpi_local_addr_used;
+> >         __u8    mptcpi_local_addr_max;
+> >         __u8    mptcpi_csum_enabled;
+> > +       __u32   mptcpi_retransmits;
+> > +       __u64   mptcpi_bytes_retrans;
+> > +       __u64   mptcpi_bytes_sent;
+> > +       __u64   mptcpi_bytes_received;
+> > +       __u64   mptcpi_bytes_acked;
+> >  };
+> >=20
+> >  /*
+> > diff --git a/net/mptcp/options.c b/net/mptcp/options.c
+> > index 4bdcd2b326bd..c254accb14de 100644
+> > --- a/net/mptcp/options.c
+> > +++ b/net/mptcp/options.c
+> > @@ -1026,6 +1026,12 @@ u64 __mptcp_expand_seq(u64 old_seq, u64 cur_seq)
+> >         return cur_seq;
+> >  }
+> >=20
+> > +static void __mptcp_snd_una_update(struct mptcp_sock *msk, u64 new_snd=
+_una)
+> > +{
+> > +       msk->bytes_acked +=3D new_snd_una - msk->snd_una;
+> > +       msk->snd_una =3D new_snd_una;
+> > +}
+> > +
+> >  static void ack_update_msk(struct mptcp_sock *msk,
+> >                            struct sock *ssk,
+> >                            struct mptcp_options_received *mp_opt)
+> > @@ -1057,7 +1063,7 @@ static void ack_update_msk(struct mptcp_sock *msk=
+,
+> >                 __mptcp_check_push(sk, ssk);
+> >=20
+> >         if (after64(new_snd_una, old_snd_una)) {
+> > -               msk->snd_una =3D new_snd_una;
+> > +               __mptcp_snd_una_update(msk, new_snd_una);
+> >                 __mptcp_data_acked(sk);
+> >         }
+> >         mptcp_data_unlock(sk);
+> > @@ -1123,7 +1129,7 @@ bool mptcp_incoming_options(struct sock *sk, stru=
+ct sk_buff *skb)
+> >                 /* on fallback we just need to ignore the msk-level snd=
+_una, as
+> >                  * this is really plain TCP
+> >                  */
+> > -               msk->snd_una =3D READ_ONCE(msk->snd_nxt);
+> > +               __mptcp_snd_una_update(msk, READ_ONCE(msk->snd_nxt));
+> >=20
+> >                 __mptcp_data_acked(subflow->conn);
+> >                 mptcp_data_unlock(subflow->conn);
+> > diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
+> > index 9c756d675d4d..d5b8e488bce1 100644
+> > --- a/net/mptcp/protocol.c
+> > +++ b/net/mptcp/protocol.c
+> > @@ -377,6 +377,7 @@ static bool __mptcp_move_skb(struct mptcp_sock *msk=
+, struct sock *ssk,
+> >=20
+> >         if (MPTCP_SKB_CB(skb)->map_seq =3D=3D msk->ack_seq) {
+> >                 /* in sequence */
+> > +               msk->bytes_received +=3D copy_len;
+> >                 WRITE_ONCE(msk->ack_seq, msk->ack_seq + copy_len);
+> >                 tail =3D skb_peek_tail(&sk->sk_receive_queue);
+> >                 if (tail && mptcp_try_coalesce(sk, tail, skb))
+> > @@ -760,6 +761,7 @@ static bool __mptcp_ofo_queue(struct mptcp_sock *ms=
+k)
+> >                         MPTCP_SKB_CB(skb)->map_seq +=3D delta;
+> >                         __skb_queue_tail(&sk->sk_receive_queue, skb);
+> >                 }
+> > +               msk->bytes_received +=3D end_seq - msk->ack_seq;
+> >                 msk->ack_seq =3D end_seq;
+> >                 moved =3D true;
+> >         }
+> > @@ -1531,8 +1533,10 @@ static void mptcp_update_post_push(struct mptcp_=
+sock *msk,
+> >          * that has been handed to the subflow for transmission
+> >          * and skip update in case it was old dfrag.
+> >          */
+> > -       if (likely(after64(snd_nxt_new, msk->snd_nxt)))
+> > +       if (likely(after64(snd_nxt_new, msk->snd_nxt))) {
+> > +               msk->bytes_sent +=3D snd_nxt_new - msk->snd_nxt;
+> >                 msk->snd_nxt =3D snd_nxt_new;
+> > +       }
+> >  }
+> >=20
+> >  void mptcp_check_and_set_pending(struct sock *sk)
+> > @@ -2590,6 +2594,7 @@ static void __mptcp_retrans(struct sock *sk)
+> >         }
+> >         if (copied) {
+> >                 dfrag->already_sent =3D max(dfrag->already_sent, info.s=
+ent);
+> > +               msk->bytes_retrans +=3D copied;
+> >                 tcp_push(ssk, 0, info.mss_now, tcp_sk(ssk)->nonagle,
+> >                          info.size_goal);
+> >                 WRITE_ONCE(msk->allow_infinite_fallback, false);
+> > @@ -3102,6 +3107,10 @@ static int mptcp_disconnect(struct sock *sk, int=
+ flags)
+> >         WRITE_ONCE(msk->csum_enabled, mptcp_is_checksum_enabled(sock_ne=
+t(sk)));
+> >         mptcp_pm_data_reset(msk);
+> >         mptcp_ca_reset(sk);
+> > +       msk->bytes_acked =3D 0;
+> > +       msk->bytes_received =3D 0;
+> > +       msk->bytes_sent =3D 0;
+> > +       msk->bytes_retrans =3D 0;
+> >=20
+> >         WRITE_ONCE(sk->sk_shutdown, 0);
+> >         sk_error_report(sk);
+> > diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
+> > index 47b46602870e..27adfcc5aaa2 100644
+> > --- a/net/mptcp/protocol.h
+> > +++ b/net/mptcp/protocol.h
+> > @@ -262,10 +262,13 @@ struct mptcp_sock {
+> >         u64             local_key;
+> >         u64             remote_key;
+> >         u64             write_seq;
+> > +       u64             bytes_sent;
+> >         u64             snd_nxt;
+> > +       u64             bytes_received;
+> >         u64             ack_seq;
+> >         atomic64_t      rcv_wnd_sent;
+> >         u64             rcv_data_fin_seq;
+> > +       u64             bytes_retrans;
+> >         int             rmem_fwd_alloc;
+> >         struct sock     *last_snd;
+> >         int             snd_burst;
+> > @@ -274,6 +277,7 @@ struct mptcp_sock {
+> >                                                  * recovery related fie=
+lds are under data_lock
+> >                                                  * protection
+> >                                                  */
+> > +       u64             bytes_acked;
+> >         u64             snd_una;
+> >         u64             wnd_end;
+> >         unsigned long   timer_ival;
+> > diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
+> > index e172a5848b0d..fa5055d5b029 100644
+> > --- a/net/mptcp/sockopt.c
+> > +++ b/net/mptcp/sockopt.c
+> > @@ -889,7 +889,9 @@ static int mptcp_getsockopt_first_sf_only(struct mp=
+tcp_sock *msk, int level, int
+> >=20
+> >  void mptcp_diag_fill_info(struct mptcp_sock *msk, struct mptcp_info *i=
+nfo)
+> >  {
+> > +       struct sock *sk =3D (struct sock *)msk;
+> >         u32 flags =3D 0;
+> > +       bool slow;
+> >=20
+> >         memset(info, 0, sizeof(*info));
+> >=20
+> > @@ -898,6 +900,9 @@ void mptcp_diag_fill_info(struct mptcp_sock *msk, s=
+truct mptcp_info *info)
+> >         info->mptcpi_add_addr_accepted =3D READ_ONCE(msk->pm.add_addr_a=
+ccepted);
+> >         info->mptcpi_local_addr_used =3D READ_ONCE(msk->pm.local_addr_u=
+sed);
+> >=20
+> > +       if (inet_sk_state_load(sk) =3D=3D TCP_LISTEN)
+> > +               return;
+> > +
+> >         /* The following limits only make sense for the in-kernel PM */
+> >         if (mptcp_pm_is_kernel(msk)) {
+> >                 info->mptcpi_subflows_max =3D
+> > @@ -915,11 +920,21 @@ void mptcp_diag_fill_info(struct mptcp_sock *msk,=
+ struct mptcp_info *info)
+> >         if (READ_ONCE(msk->can_ack))
+> >                 flags |=3D MPTCP_INFO_FLAG_REMOTE_KEY_RECEIVED;
+> >         info->mptcpi_flags =3D flags;
+> > -       info->mptcpi_token =3D READ_ONCE(msk->token);
+> > -       info->mptcpi_write_seq =3D READ_ONCE(msk->write_seq);
+> > -       info->mptcpi_snd_una =3D READ_ONCE(msk->snd_una);
+> > -       info->mptcpi_rcv_nxt =3D READ_ONCE(msk->ack_seq);
+> > -       info->mptcpi_csum_enabled =3D READ_ONCE(msk->csum_enabled);
+> > +       mptcp_data_lock(sk);
+> > +       info->mptcpi_snd_una =3D msk->snd_una;
+> > +       info->mptcpi_rcv_nxt =3D msk->ack_seq;
+> > +       info->mptcpi_bytes_acked =3D msk->bytes_acked;
+> > +       mptcp_data_unlock(sk);
+> > +
+> > +       slow =3D lock_sock_fast(sk);
+>=20
+> This causes a lockdep issue.
+>=20
+> lock_sock_fast(sk) could sleep, if socket lock is owned by another proces=
+s.
+>=20
+> But we are called from a context where both a spin lock and
+> rcu_read_lock() are held.
+>=20
+> BUG: sleeping function called from invalid context at net/core/sock.c:354=
+9
+> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 316, name: syz-exe=
+cutor.4
+> preempt_count: 1, expected: 0
+> RCU nest depth: 1, expected: 0
+> 7 locks held by syz-executor.4/316:
+> #0: ffffffff8e125408 (sock_diag_mutex){+.+.}-{3:3}, at:
+> sock_diag_rcv+0x1b/0x40 net/core/sock_diag.c:279
+> #1: ffffffff8e125588 (sock_diag_table_mutex){+.+.}-{3:3}, at:
+> sock_diag_rcv_msg net/core/sock_diag.c:259 [inline]
+> #1: ffffffff8e125588 (sock_diag_table_mutex){+.+.}-{3:3}, at:
+> sock_diag_rcv_msg+0x2d2/0x440 net/core/sock_diag.c:248
+> #2: ffff8880232bb688 (nlk_cb_mutex-SOCK_DIAG){+.+.}-{3:3}, at:
+> netlink_dump+0xbe/0xc50 net/netlink/af_netlink.c:2215
+> #3: ffffffff8e29a628 (inet_diag_table_mutex){+.+.}-{3:3}, at:
+> inet_diag_lock_handler+0x6e/0x100 net/ipv4/inet_diag.c:63
+> #4: ffffffff8c7990c0 (rcu_read_lock){....}-{1:2}, at:
+> mptcp_diag_dump_listeners net/mptcp/mptcp_diag.c:95 [inline]
+> #4: ffffffff8c7990c0 (rcu_read_lock){....}-{1:2}, at:
+> mptcp_diag_dump+0x7c8/0x1330 net/mptcp/mptcp_diag.c:197
+> #5: ffffc90001316bf0 (&h->lhash2[i].lock){+.+.}-{2:2}, at: spin_lock
+> include/linux/spinlock.h:350 [inline]
+> #5: ffffc90001316bf0 (&h->lhash2[i].lock){+.+.}-{2:2}, at:
+> mptcp_diag_dump_listeners net/mptcp/mptcp_diag.c:98 [inline]
+> #5: ffffc90001316bf0 (&h->lhash2[i].lock){+.+.}-{2:2}, at:
+> mptcp_diag_dump+0x838/0x1330 net/mptcp/mptcp_diag.c:197
+> #6: ffff88802c42a5f0 (msk_lock-AF_INET){+.+.}-{0:0}, at:
+> mptcp_diag_get_info+0x1ae/0x380 net/mptcp/mptcp_diag.c:224
+> Preemption disabled at:
+> [<0000000000000000>] 0x0
 
-> 
-> The field itself originates from One Of The our internal demo drivers (:T)
+Thank you for the report.
 
-:)
+out-of-order patches here. "mptcp: track some aggregate data counters"
+should have landed to net-next only after:
 
-> 
-> > 
-> > > 
-> > > [1] https://lore.kernel.org/netdev/ZHb5AIgL5SzBa5FA@corigine.com/
-> > > [2] https://elixir.bootlin.com/linux/v6.4-rc7/source/drivers/net/ethernet/intel/ice/ice_flow.c#L1632
-> > > 
-> > > --
-> > > 
-> > > BTW, is there any option to add some of patch generation options (like,
-> > > context size, anchored lines, etc), that there are my disposal locally, but
-> > > in a way, that it would not be lost after patch is applied to one tree
-> > > (Tony's) and then send again (here)?
-> > > (My assumption is that Tony is (re)generating patches from git (opposed to
-> > > copy-pasting+decorating of what he has received from me).
-> > > 
-> > > 
-> > > 
-> > > > 
-> > > > > > > -		devm_kfree(ice_hw_to_dev(hw), entry->entry);
-> > > > > > > -
-> > > > > > > -	devm_kfree(ice_hw_to_dev(hw), entry);
-> > > > > > > -}
-> > > > > > > -
-> > > > > > >     /**
-> > > > > > >      * ice_flow_rem_entry_sync - Remove a flow entry
-> > > > > > >      * @hw: pointer to the HW struct
-> > > > > > > @@ -1335,7 +1318,8 @@ ice_flow_rem_entry_sync(struct ice_hw *hw, enum ice_block __always_unused blk,
-> > > 
-> > > [3] More context would include following:
-> > > 
-> > >           if (!entry)
-> > >                   return -EINVAL;
-> > > 
-> > > > > > >     	list_del(&entry->l_entry);
-> > > > > > > -	ice_dealloc_flow_entry(hw, entry);
-> > > > > > > +	devm_kfree(ice_hw_to_dev(hw), entry->entry);
-> > > > > > > +	devm_kfree(ice_hw_to_dev(hw), entry);
-> > > > > > >     	return 0;
-> > > > > > >     }
-> > > > > > > @@ -1662,8 +1646,7 @@ ice_flow_add_entry(struct ice_hw *hw, enum ice_block blk, u64 prof_id,
-> > > > > > >     out:
-> > > > > > >     	if (status && e) {
-> > > > > > > -		if (e->entry)
-> > > > > > > -			devm_kfree(ice_hw_to_dev(hw), e->entry);
-> > > > > > > +		devm_kfree(ice_hw_to_dev(hw), e->entry);
-> > > > > > >     		devm_kfree(ice_hw_to_dev(hw), e);
-> > > > > > >     	}
-> > > > 
-> > > > (...)
-> > > 
-> 
+57fc0f1ceaa4 mptcp: ensure listener is unhashed before updating the sk
+status
+
+The latter should explicitly avoid the critical scenario above. Anyhow
+the current net-next tree (after merging back net) should be ok (at
+least I can't repro the issue here).
+
+Thanks,
+
+Paolo
+
 
