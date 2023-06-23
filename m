@@ -1,91 +1,96 @@
-Return-Path: <netdev+bounces-13298-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13299-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11FEE73B259
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:09:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3647F73B272
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:14:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A9F1C20F75
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 08:09:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 568EF1C21003
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 08:14:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA34F1C14;
-	Fri, 23 Jun 2023 08:09:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24F841FA4;
+	Fri, 23 Jun 2023 08:14:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84941C04
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:09:04 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1046E1FE9
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:09:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0DFC51C14
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:14:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB370211D
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:14:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687507742;
+	s=mimecast20190719; t=1687508049;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=XRsrloG5XK9IUekWqHBCtRBKWd5yuNn8Erowenhh7uo=;
-	b=CIey83TTLyIkN+iTaaMstTQ96JMC8GoJqT7S81NEz0S/peD6ffCd8DB1hg9OvndA6aSS/q
-	hp5FwTQU8mZDv/TQUI8cG5TTbWU9JKmUyHwH7r3Er/3tPnwLhKzMxdjYs03oQ2VZFOEjuR
-	5lXEe1zKcHU17e952xCZLpTECHNNvvg=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=JeBlVZM+vk7VXLRaLbx1OUJTp+51gYAZJZ/CNxFsOXc=;
+	b=EDfOulLQB9fqqGeU/OaullVy30uwO//hVmgNEbevVqUqWha93XsPC1FpTQ54TectyZ+Jjz
+	JjDCvg4EPVG1lcrh1dZvB2vis5AhQR9GlfVwR1vYhQX8N4KgH3E/xOzv3cktfYA21W5mJf
+	IA81ifG8ZVaYqhEQb1+6ZHsgraRcyns=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-452-2jz_KTXANZSib13IOdbV1Q-1; Fri, 23 Jun 2023 04:08:54 -0400
-X-MC-Unique: 2jz_KTXANZSib13IOdbV1Q-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-62fea7a5de9so924606d6.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:08:54 -0700 (PDT)
+ us-mta-631-50U7WxThMBm4GqmFDMz94g-1; Fri, 23 Jun 2023 04:14:07 -0400
+X-MC-Unique: 50U7WxThMBm4GqmFDMz94g-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-987accb96dbso24112066b.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:14:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687507733; x=1690099733;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=XRsrloG5XK9IUekWqHBCtRBKWd5yuNn8Erowenhh7uo=;
-        b=S6cuK77noCV3K223O2ji8ZnAfRKjjEiqJ9MBqMgMMN2ALi/koWg2M/PV9XIE+RMWVt
-         BC8x1RTf72A6vZ04a4QC5Kij9HCqhjckGYmRZV9k9MugIfkGYgc54x73OUWCrj8GrPd3
-         J9BTc+f0XJqjK+Tt6vRWR2h58+8pIR6u3Tx5Lp5/d9pQTYebjl0bR6pwmjFTWSCc7pBb
-         +hBlPudofUMU5WG5+5VBeZExsJqMba+mfkAyt8q5+fpEeTprf1N1O+9boxuCGv5QugoC
-         4k1vGCzv2BAuoZLgNLh6o1DvyM+hIYXUSKDDkCEiaAynUcWJZBDg/fggZMIQrXC4AKSZ
-         mpTA==
-X-Gm-Message-State: AC+VfDxo4440RXJTPKp6hJERD4xp02kEO0qRwckHnG6slRE1qgl7xOwU
-	x/ppvy8zkqg3gziGR00Xz0HiYc1lld/hi6MBNwpOqmal9Y1JycPeExCp66xJyYAmTytkDQcN83/
-	V7oLkc8W0DDJY8BNO
-X-Received: by 2002:ad4:5945:0:b0:625:aa48:e50f with SMTP id eo5-20020ad45945000000b00625aa48e50fmr23823145qvb.6.1687507733605;
-        Fri, 23 Jun 2023 01:08:53 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4np55509X5SjvvyV/z6p3nBJkRmzoebgMoA+uLUJVCIrabJOfi5M325Mt3d67PAMUYklxL7Q==
-X-Received: by 2002:ad4:5945:0:b0:625:aa48:e50f with SMTP id eo5-20020ad45945000000b00625aa48e50fmr23823134qvb.6.1687507733324;
-        Fri, 23 Jun 2023 01:08:53 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
-        by smtp.gmail.com with ESMTPSA id y1-20020a0ce041000000b005dd8b9345b4sm4748746qvk.76.2023.06.23.01.08.50
+        d=1e100.net; s=20221208; t=1687508046; x=1690100046;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=JeBlVZM+vk7VXLRaLbx1OUJTp+51gYAZJZ/CNxFsOXc=;
+        b=jNU3MtmQFKDHpPKAUdOzC+bQFTUT1AVDFKRw59eTdSqYvmMqU1pkFjHRUCjtsHzSv+
+         ijIPSA+ruxSPNxD4e9fUJLNRXbghACqmcjRm7pNhzLfYQ0mhJSaO6PrcKnGHDRDt3Hgh
+         rBGpiRW/GjxUk+zMYzxedkqsss6WPWiDPw80k2cOYeiV5FUFL/LDpX2gjjVHnU2t5Jws
+         JB/MFE3tpKUV7eze6LMOjOn7AVGd8+vuq0rLNY27icFinpSsVRMrifA86lBVCge8mmup
+         ZWkaFl+i6Dfs2pbp8R+G2tneSoV3PG43j3um2m2lg1jHGl5fK8iuM21vtfyfZ1qv3swX
+         5DAQ==
+X-Gm-Message-State: AC+VfDyOILuDDzUMdncW0g5Z3XVYwseCA15Mx40ILVHzLq7Fr6LLYSKe
+	m4JqyKXwWEKnEAmzGPGckVQ+ukpVkApVOJLKh13ilirpzienxj3avRHk+eLtLAcfFUIL7AuOd0k
+	YqQ3gIFmgw693I7U6
+X-Received: by 2002:a17:906:da82:b0:978:ae78:a77f with SMTP id xh2-20020a170906da8200b00978ae78a77fmr16237975ejb.21.1687508046637;
+        Fri, 23 Jun 2023 01:14:06 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4HDzIUYL3ZcY6yWc9wfXCTAhoCdzZJYjzJRHdkWLqyNhxtqeQIHBVsXF+PJMK2/7/DgNfiIg==
+X-Received: by 2002:a17:906:da82:b0:978:ae78:a77f with SMTP id xh2-20020a170906da8200b00978ae78a77fmr16237948ejb.21.1687508046315;
+        Fri, 23 Jun 2023 01:14:06 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
+        by smtp.gmail.com with ESMTPSA id gu1-20020a170906f28100b009829a5ae8b3sm5704966ejb.64.2023.06.23.01.14.04
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 01:08:53 -0700 (PDT)
-Message-ID: <634c885ccfb2e49e284aedc60e157bb12e5f3530.camel@redhat.com>
-Subject: Re: [PATCH net-next v3 01/18] net: Copy slab data for
- sendmsg(MSG_SPLICE_PAGES)
-From: Paolo Abeni <pabeni@redhat.com>
-To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Jens Axboe <axboe@kernel.dk>,  linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Menglong Dong <imagedong@tencent.com>
-Date: Fri, 23 Jun 2023 10:08:48 +0200
-In-Reply-To: <20230620145338.1300897-2-dhowells@redhat.com>
-References: <20230620145338.1300897-1-dhowells@redhat.com>
-	 <20230620145338.1300897-2-dhowells@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        Fri, 23 Jun 2023 01:14:05 -0700 (PDT)
+Date: Fri, 23 Jun 2023 10:14:03 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Bobby Eshleman <bobbyeshleman@gmail.com>
+Cc: Arseniy Krasnov <oxffffaa@gmail.com>, linux-hyperv@vger.kernel.org, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>, 
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Simon Horman <simon.horman@corigine.com>, 
+	virtualization@lists.linux-foundation.org, Eric Dumazet <edumazet@google.com>, 
+	Dan Carpenter <dan.carpenter@linaro.org>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
+	Bryan Tan <bryantan@vmware.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Stefan Hajnoczi <stefanha@redhat.com>, Vishnu Dasa <vdasa@vmware.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, bpf@vger.kernel.org, "David S. Miller" <davem@davemloft.net>
+Subject: Re: [PATCH RFC net-next v4 1/8] vsock/dgram: generalize recvmsg and
+ drop transport->dgram_dequeue
+Message-ID: <vqocs2hgezf77nvaj3wb7qjrtkanxjp6ethk3jw5cnkwdwmgqv@wfbqx3xi2s27>
+References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
+ <20230413-b4-vsock-dgram-v4-1-0cebbb2ae899@bytedance.com>
+ <3eb6216b-a3d2-e1ef-270c-8a0032a4a8a5@gmail.com>
+ <63ko2n5fwjdefot6rzcxdftfh6pilg6vmqn66v4ue5dgf4oz53@tntmdijw4ghr>
+ <ZJTbRsU5kQfLEV9c@bullseye>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <ZJTbRsU5kQfLEV9c@bullseye>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -94,286 +99,139 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Thu, Jun 22, 2023 at 11:37:42PM +0000, Bobby Eshleman wrote:
+>On Thu, Jun 22, 2023 at 04:51:41PM +0200, Stefano Garzarella wrote:
+>> On Sun, Jun 11, 2023 at 11:43:15PM +0300, Arseniy Krasnov wrote:
+>> > Hello Bobby! Thanks for this patchset! Small comment below:
+>> >
+>> > On 10.06.2023 03:58, Bobby Eshleman wrote:
+>> > > This commit drops the transport->dgram_dequeue callback and makes
+>> > > vsock_dgram_recvmsg() generic. It also adds additional transport
+>> > > callbacks for use by the generic vsock_dgram_recvmsg(), such as for
+>> > > parsing skbs for CID/port which vary in format per transport.
+>> > >
+>> > > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
+>> > > ---
+>> > >  drivers/vhost/vsock.c                   |  4 +-
+>> > >  include/linux/virtio_vsock.h            |  3 ++
+>> > >  include/net/af_vsock.h                  | 13 ++++++-
+>> > >  net/vmw_vsock/af_vsock.c                | 51 ++++++++++++++++++++++++-
+>> > >  net/vmw_vsock/hyperv_transport.c        | 17 +++++++--
+>> > >  net/vmw_vsock/virtio_transport.c        |  4 +-
+>> > >  net/vmw_vsock/virtio_transport_common.c | 18 +++++++++
+>> > >  net/vmw_vsock/vmci_transport.c          | 68 +++++++++++++--------------------
+>> > >  net/vmw_vsock/vsock_loopback.c          |  4 +-
+>> > >  9 files changed, 132 insertions(+), 50 deletions(-)
+>> > >
+>> > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>> > > index 6578db78f0ae..c8201c070b4b 100644
+>> > > --- a/drivers/vhost/vsock.c
+>> > > +++ b/drivers/vhost/vsock.c
+>> > > @@ -410,9 +410,11 @@ static struct virtio_transport vhost_transport = {
+>> > >  		.cancel_pkt               = vhost_transport_cancel_pkt,
+>> > >
+>> > >  		.dgram_enqueue            = virtio_transport_dgram_enqueue,
+>> > > -		.dgram_dequeue            = virtio_transport_dgram_dequeue,
+>> > >  		.dgram_bind               = virtio_transport_dgram_bind,
+>> > >  		.dgram_allow              = virtio_transport_dgram_allow,
+>> > > +		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
+>> > > +		.dgram_get_port		  = virtio_transport_dgram_get_port,
+>> > > +		.dgram_get_length	  = virtio_transport_dgram_get_length,
+>> > >
+>> > >  		.stream_enqueue           = virtio_transport_stream_enqueue,
+>> > >  		.stream_dequeue           = virtio_transport_stream_dequeue,
+>> > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
+>> > > index c58453699ee9..23521a318cf0 100644
+>> > > --- a/include/linux/virtio_vsock.h
+>> > > +++ b/include/linux/virtio_vsock.h
+>> > > @@ -219,6 +219,9 @@ bool virtio_transport_stream_allow(u32 cid, u32 port);
+>> > >  int virtio_transport_dgram_bind(struct vsock_sock *vsk,
+>> > >  				struct sockaddr_vm *addr);
+>> > >  bool virtio_transport_dgram_allow(u32 cid, u32 port);
+>> > > +int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid);
+>> > > +int virtio_transport_dgram_get_port(struct sk_buff *skb, unsigned int *port);
+>> > > +int virtio_transport_dgram_get_length(struct sk_buff *skb, size_t *len);
+>> > >
+>> > >  int virtio_transport_connect(struct vsock_sock *vsk);
+>> > >
+>> > > diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
+>> > > index 0e7504a42925..7bedb9ee7e3e 100644
+>> > > --- a/include/net/af_vsock.h
+>> > > +++ b/include/net/af_vsock.h
+>> > > @@ -120,11 +120,20 @@ struct vsock_transport {
+>> > >
+>> > >  	/* DGRAM. */
+>> > >  	int (*dgram_bind)(struct vsock_sock *, struct sockaddr_vm *);
+>> > > -	int (*dgram_dequeue)(struct vsock_sock *vsk, struct msghdr *msg,
+>> > > -			     size_t len, int flags);
+>> > >  	int (*dgram_enqueue)(struct vsock_sock *, struct sockaddr_vm *,
+>> > >  			     struct msghdr *, size_t len);
+>> > >  	bool (*dgram_allow)(u32 cid, u32 port);
+>> > > +	int (*dgram_get_cid)(struct sk_buff *skb, unsigned int *cid);
+>> > > +	int (*dgram_get_port)(struct sk_buff *skb, unsigned int *port);
+>> > > +	int (*dgram_get_length)(struct sk_buff *skb, size_t *length);
+>> > > +
+>> > > +	/* The number of bytes into the buffer at which the payload starts, as
+>> > > +	 * first seen by the receiving socket layer. For example, if the
+>> > > +	 * transport presets the skb pointers using skb_pull(sizeof(header))
+>> > > +	 * than this would be zero, otherwise it would be the size of the
+>> > > +	 * header.
+>> > > +	 */
+>> > > +	const size_t dgram_payload_offset;
+>> > >
+>> > >  	/* STREAM. */
+>> > >  	/* TODO: stream_bind() */
+>> > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
+>> > > index efb8a0937a13..ffb4dd8b6ea7 100644
+>> > > --- a/net/vmw_vsock/af_vsock.c
+>> > > +++ b/net/vmw_vsock/af_vsock.c
+>> > > @@ -1271,11 +1271,15 @@ static int vsock_dgram_connect(struct socket *sock,
+>> > >  int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>> > >  			size_t len, int flags)
+>> > >  {
+>> > > +	const struct vsock_transport *transport;
+>> > >  #ifdef CONFIG_BPF_SYSCALL
+>> > >  	const struct proto *prot;
+>> > >  #endif
+>> > >  	struct vsock_sock *vsk;
+>> > > +	struct sk_buff *skb;
+>> > > +	size_t payload_len;
+>> > >  	struct sock *sk;
+>> > > +	int err;
+>> > >
+>> > >  	sk = sock->sk;
+>> > >  	vsk = vsock_sk(sk);
+>> > > @@ -1286,7 +1290,52 @@ int vsock_dgram_recvmsg(struct socket *sock, struct msghdr *msg,
+>> > >  		return prot->recvmsg(sk, msg, len, flags, NULL);
+>> > >  #endif
+>> > >
+>> > > -	return vsk->transport->dgram_dequeue(vsk, msg, len, flags);
+>> > > +	if (flags & MSG_OOB || flags & MSG_ERRQUEUE)
+>> > > +		return -EOPNOTSUPP;
+>> > > +
+>> > > +	transport = vsk->transport;
+>> > > +
+>> > > +	/* Retrieve the head sk_buff from the socket's receive queue. */
+>> > > +	err = 0;
+>> > > +	skb = skb_recv_datagram(sk_vsock(vsk), flags, &err);
+>> > > +	if (!skb)
+>> > > +		return err;
+>> > > +
+>> > > +	err = transport->dgram_get_length(skb, &payload_len);
+>>
+>> What about ssize_t return value here?
+>>
+>> Or maybe a single callback that return both length and offset?
+>>
+>> .dgram_get_payload_info(skb, &payload_len, &payload_off)
+>>
+>
+>What are your thoughts on Arseniy's idea of using skb->len and adding a
+>skb_pull() just before vmci adds the skb to the sk receive queue?
 
-First thing first, I'm sorry for the delayed feedback. I was traveling.
+Yep, I agree on that!
 
-On Tue, 2023-06-20 at 15:53 +0100, David Howells wrote:
-> If sendmsg() is passed MSG_SPLICE_PAGES and is given a buffer that contai=
-ns
-> some data that's resident in the slab, copy it rather than returning EIO.
-> This can be made use of by a number of drivers in the kernel, including:
-> iwarp, ceph/rds, dlm, nvme, ocfs2, drdb.  It could also be used by iscsi,
-> rxrpc, sunrpc, cifs and probably others.
->=20
-> skb_splice_from_iter() is given it's own fragment allocator as
-> page_frag_alloc_align() can't be used because it does no locking to preve=
-nt
-> parallel callers from racing.  alloc_skb_frag() uses a separate folio for
-> each cpu and locks to the cpu whilst allocating, reenabling cpu migration
-> around folio allocation.
->=20
-> This could allocate a whole page instead for each fragment to be copied, =
-as
-> alloc_skb_with_frags() would do instead, but that would waste a lot of
-> space (most of the fragments look like they're going to be small).
->=20
-> This allows an entire message that consists of, say, a protocol header or
-> two, a number of pages of data and a protocol footer to be sent using a
-> single call to sock_sendmsg().
->=20
-> The callers could be made to copy the data into fragments before calling
-> sendmsg(), but that then penalises them if MSG_SPLICE_PAGES gets ignored.
->=20
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Alexander Duyck <alexander.duyck@gmail.com>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: David Ahern <dsahern@kernel.org>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: Menglong Dong <imagedong@tencent.com>
-> cc: netdev@vger.kernel.org
-> ---
->=20
-> Notes:
->     ver #3)
->      - Remove duplicate decl of skb_splice_from_iter().
->    =20
->     ver #2)
->      - Fix parameter to put_cpu_ptr() to have an '&'.
->=20
->  include/linux/skbuff.h |   2 +
->  net/core/skbuff.c      | 171 ++++++++++++++++++++++++++++++++++++++++-
->  2 files changed, 170 insertions(+), 3 deletions(-)
->=20
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 91ed66952580..5f53bd5d375d 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -5037,6 +5037,8 @@ static inline void skb_mark_for_recycle(struct sk_b=
-uff *skb)
->  #endif
->  }
-> =20
-> +void *alloc_skb_frag(size_t fragsz, gfp_t gfp);
-> +void *copy_skb_frag(const void *s, size_t len, gfp_t gfp);
->  ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
->  			     ssize_t maxsize, gfp_t gfp);
-> =20
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index fee2b1c105fe..d962c93a429d 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -6755,6 +6755,145 @@ nodefer:	__kfree_skb(skb);
->  		smp_call_function_single_async(cpu, &sd->defer_csd);
->  }
-> =20
-> +struct skb_splice_frag_cache {
-> +	struct folio	*folio;
-> +	void		*virt;
-> +	unsigned int	offset;
-> +	/* we maintain a pagecount bias, so that we dont dirty cache line
-> +	 * containing page->_refcount every time we allocate a fragment.
-> +	 */
-> +	unsigned int	pagecnt_bias;
-> +	bool		pfmemalloc;
-> +};
-> +
-> +static DEFINE_PER_CPU(struct skb_splice_frag_cache, skb_splice_frag_cach=
-e);
-> +
-> +/**
-> + * alloc_skb_frag - Allocate a page fragment for using in a socket
-> + * @fragsz: The size of fragment required
-> + * @gfp: Allocation flags
-> + */
-> +void *alloc_skb_frag(size_t fragsz, gfp_t gfp)
-> +{
-> +	struct skb_splice_frag_cache *cache;
-> +	struct folio *folio, *spare =3D NULL;
-> +	size_t offset, fsize;
-> +	void *p;
-> +
-> +	if (WARN_ON_ONCE(fragsz =3D=3D 0))
-> +		fragsz =3D 1;
-> +
-> +	cache =3D get_cpu_ptr(&skb_splice_frag_cache);
-> +reload:
-> +	folio =3D cache->folio;
-> +	offset =3D cache->offset;
-> +try_again:
-> +	if (fragsz > offset)
-> +		goto insufficient_space;
-> +
-> +	/* Make the allocation. */
-> +	cache->pagecnt_bias--;
-> +	offset =3D ALIGN_DOWN(offset - fragsz, SMP_CACHE_BYTES);
-> +	cache->offset =3D offset;
-> +	p =3D cache->virt + offset;
-> +	put_cpu_ptr(&skb_splice_frag_cache);
-> +	if (spare)
-> +		folio_put(spare);
-> +	return p;
-> +
-> +insufficient_space:
-> +	/* See if we can refurbish the current folio. */
-> +	if (!folio || !folio_ref_sub_and_test(folio, cache->pagecnt_bias))
-> +		goto get_new_folio;
-> +	if (unlikely(cache->pfmemalloc)) {
-> +		__folio_put(folio);
-> +		goto get_new_folio;
-> +	}
-> +
-> +	fsize =3D folio_size(folio);
-> +	if (unlikely(fragsz > fsize))
-> +		goto frag_too_big;
-> +
-> +	/* OK, page count is 0, we can safely set it */
-> +	folio_set_count(folio, PAGE_FRAG_CACHE_MAX_SIZE + 1);
-> +
-> +	/* Reset page count bias and offset to start of new frag */
-> +	cache->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> +	offset =3D fsize;
-> +	goto try_again;
-
-IMHO this function uses a bit too much labels and would be more easy to
-read, e.g. moving the above chunk of code in conditional branch.
-
-Even without such change, I think the above 'goto try_again;'
-introduces an unneeded conditional, as at this point we know 'fragsz <=3D
-fsize'.
-
-> +
-> +get_new_folio:
-> +	if (!spare) {
-> +		cache->folio =3D NULL;
-> +		put_cpu_ptr(&skb_splice_frag_cache);
-> +
-> +#if PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE
-> +		spare =3D folio_alloc(gfp | __GFP_NOWARN | __GFP_NORETRY |
-> +				    __GFP_NOMEMALLOC,
-> +				    PAGE_FRAG_CACHE_MAX_ORDER);
-> +		if (!spare)
-> +#endif
-> +			spare =3D folio_alloc(gfp, 0);
-> +		if (!spare)
-> +			return NULL;
-> +
-> +		cache =3D get_cpu_ptr(&skb_splice_frag_cache);
-> +		/* We may now be on a different cpu and/or someone else may
-> +		 * have refilled it
-> +		 */
-> +		cache->pfmemalloc =3D folio_is_pfmemalloc(spare);
-> +		if (cache->folio)
-> +			goto reload;
-
-I think there is some problem with the above.
-
-If cache->folio is !=3D NULL, and cache->folio was not pfmemalloc-ed
-while the spare one is, it looks like the wrong policy will be used.
-And should be even worse if folio was pfmemalloc-ed while spare is not.
-
-I think moving 'cache->pfmemalloc' initialization...
-
-> +	}
-> +
-
-... here should fix the above.
-
-> +	cache->folio =3D spare;
-> +	cache->virt  =3D folio_address(spare);
-> +	folio =3D spare;
-> +	spare =3D NULL;
-> +
-> +	/* Even if we own the page, we do not use atomic_set().  This would
-> +	 * break get_page_unless_zero() users.
-> +	 */
-> +	folio_ref_add(folio, PAGE_FRAG_CACHE_MAX_SIZE);
-> +
-> +	/* Reset page count bias and offset to start of new frag */
-> +	cache->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> +	offset =3D folio_size(folio);
-> +	goto try_again;
-
-What if fragsz > PAGE_SIZE, we are consistently unable to allocate an
-high order page, but order-0, pfmemalloc-ed page allocation is
-successful? It looks like this could become an unbounded loop?
-
-> +
-> +frag_too_big:
-> +	/* The caller is trying to allocate a fragment with fragsz > PAGE_SIZE
-> +	 * but the cache isn't big enough to satisfy the request, this may
-> +	 * happen in low memory conditions.  We don't release the cache page
-> +	 * because it could make memory pressure worse so we simply return NULL
-> +	 * here.
-> +	 */
-> +	cache->offset =3D offset;
-> +	put_cpu_ptr(&skb_splice_frag_cache);
-> +	if (spare)
-> +		folio_put(spare);
-> +	return NULL;
-> +}
-> +EXPORT_SYMBOL(alloc_skb_frag);
-> +
-> +/**
-> + * copy_skb_frag - Copy data into a page fragment.
-> + * @s: The data to copy
-> + * @len: The size of the data
-> + * @gfp: Allocation flags
-> + */
-> +void *copy_skb_frag(const void *s, size_t len, gfp_t gfp)
-> +{
-> +	void *p;
-> +
-> +	p =3D alloc_skb_frag(len, gfp);
-> +	if (!p)
-> +		return NULL;
-> +
-> +	return memcpy(p, s, len);
-> +}
-> +EXPORT_SYMBOL(copy_skb_frag);
-> +
->  static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
->  				 size_t offset, size_t len)
->  {
-> @@ -6808,17 +6947,43 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb,=
- struct iov_iter *iter,
->  			break;
->  		}
-> =20
-> +		if (space =3D=3D 0 &&
-> +		    !skb_can_coalesce(skb, skb_shinfo(skb)->nr_frags,
-> +				      pages[0], off)) {
-> +			iov_iter_revert(iter, len);
-> +			break;
-> +		}
-> +
->  		i =3D 0;
->  		do {
->  			struct page *page =3D pages[i++];
->  			size_t part =3D min_t(size_t, PAGE_SIZE - off, len);
-> -
-> -			ret =3D -EIO;
-> -			if (WARN_ON_ONCE(!sendpage_ok(page)))
-> +			bool put =3D false;
-> +
-> +			if (PageSlab(page)) {
-
-I'm a bit concerned from the above. If I read correctly, tcp 0-copy
-will go through that for every page, even if the expected use-case is
-always !PageSlub(page). compound_head() could be costly if the head
-page is not hot on cache and I'm not sure if that could be the case for
-tcp 0-copy. The bottom line is that I fear a possible regression here.
-
-Given all the above, and the late stage of the current devel cycle,
-would you consider slicing down this series to just kill
-MSG_SENDPAGE_NOTLAST, as Jakub suggested?
-
-Thanks!
-
-Paolo
+Thanks,
+Stefano
 
 
