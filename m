@@ -1,142 +1,251 @@
-Return-Path: <netdev+bounces-13608-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13609-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B842173C3E1
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 00:17:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6335773C449
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 00:55:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 810AB281D2A
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:17:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6511D1C20D89
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:55:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39E315AE4;
-	Fri, 23 Jun 2023 22:17:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80FBC5258;
+	Fri, 23 Jun 2023 22:55:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9892C156DF;
-	Fri, 23 Jun 2023 22:17:13 +0000 (UTC)
-Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8D82723;
-	Fri, 23 Jun 2023 15:17:04 -0700 (PDT)
-Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666e5f0d60bso729707b3a.3;
-        Fri, 23 Jun 2023 15:17:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687558623; x=1690150623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=RDXYsfJvatym3Oy6lMJ56GZiSfJfyD1pGvE3gJmovG0=;
-        b=L8ikNoet7AueB84+izwdPzlfcYNFwgQKo+7BjsVjRF9Ijxy21C5kmod2iBlrnqsfoO
-         rqnKMVCUvBtxkZNYdE+TujU40V7ZQFjnip3OeAzI5HGyq6WexVkUG2AMTC/cnshoFlp/
-         UIIeRunkh68jjS5N5s6WQfqRfNha0sFcVGZVXqVrB9bnZgizo0VlcDORdeH3O5fAl1jj
-         UfOkvdN3cYVzlcZonnwGwDIWKO8U0X1Sn49gRGd0hrRtFb+8mhQoGqaj4MpqndYrkgtN
-         p70+V34SDXgL2INwqzzq27jZNw9y0PAmbPOwTSDr3MlyX+lon6zL409E73eQPRaor0Hq
-         Cg1A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687558623; x=1690150623;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RDXYsfJvatym3Oy6lMJ56GZiSfJfyD1pGvE3gJmovG0=;
-        b=EflEisZ6B7iZMaiBOb1WSsr+fw3P8R2ONhO4+/P4bEMkfq3fxNARJ0Q4R4DOvafjeC
-         AjBd4OWzW3ZrvYpdJGycKRSEiSe7he+ofa5+2oG1kseEZ3nWa0TWBr4SZELIJ4I71OPD
-         kc0KRElZ3glvTQFON+KBn6R/PR4XiybdHf//m0GaXKHnJl9HhlqcfwUX32B5AXj4oVFA
-         Me5etTQilKK9n0pmvWFCNnHvnyjvAXO1tiQeKwLXpbKFitbIJDNyPLo+QskFa3d1kW2A
-         Fhzfj32ANQOq1weVbdqfY6rLVZgoTYisLslAgs6/27y/WNBcVagpB6M2ot1JoFC3g3+5
-         RhQA==
-X-Gm-Message-State: AC+VfDx4eHMyAQ7yAiPrw+8ZCc9DHD4+D/6mp7KpypS5muX7Z2Jnma+D
-	0Pp9qaMy9Us6dMxHFnl/kbg=
-X-Google-Smtp-Source: ACHHUZ5Y+RtHqXU4NMHz285kJfLSNyqkgbN9BZZYhRTOm2uTdD0KHCxzDaboiI9we/f/7iS9PtKX9A==
-X-Received: by 2002:a05:6a20:7353:b0:11f:a611:324 with SMTP id v19-20020a056a20735300b0011fa6110324mr14473957pzc.10.1687558623447;
-        Fri, 23 Jun 2023 15:17:03 -0700 (PDT)
-Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
-        by smtp.gmail.com with ESMTPSA id a16-20020aa780d0000000b00666e2dac482sm24016pfn.124.2023.06.23.15.17.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 15:17:03 -0700 (PDT)
-Date: Fri, 23 Jun 2023 04:37:55 +0000
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Arseniy Krasnov <oxffffaa@gmail.com>,
-	Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 70C3223109
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 22:55:27 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 713D42709
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:55:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687560924;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=Lnk851ZNfo0Idwkr5i4HxCBOGpBtRFemmiN2QMFj1eg=;
+	b=YypR+obSiywfDcYltY8PwBOJHYwe5nwl75MTLCrjTU0CZszNb1ALGI69wDYwXS2AXSXJre
+	56JiCRBM/1n70EyWZCbzatrQR6/L9ytkl94mxh7R1uUpnoxDsIbAMmhl/6bTiIjohmsZfA
+	foRoDID88QCs7RkRANRNFdRJj58MXho=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-151-BTDQB3dlNQeBDkoYbn5RNw-1; Fri, 23 Jun 2023 18:55:19 -0400
+X-MC-Unique: BTDQB3dlNQeBDkoYbn5RNw-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B4A7C800962;
+	Fri, 23 Jun 2023 22:55:18 +0000 (UTC)
+Received: from warthog.procyon.org.com (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 36ADB4087C6D;
+	Fri, 23 Jun 2023 22:55:17 +0000 (UTC)
+From: David Howells <dhowells@redhat.com>
+To: netdev@vger.kernel.org
+Cc: David Howells <dhowells@redhat.com>,
+	Alexander Duyck <alexander.duyck@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryantan@vmware.com>, Vishnu Dasa <vdasa@vmware.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v4 6/8] virtio/vsock: support dgrams
-Message-ID: <ZJUho6NbpCgGatap@bullseye>
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-6-0cebbb2ae899@bytedance.com>
- <92b3a6df-ded3-6470-39d1-fe0939441abc@gmail.com>
- <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Matthew Wilcox <willy@infradead.org>,
+	Jens Axboe <axboe@kernel.dk>,
+	linux-mm@kvack.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net-next v5 00/16] splice, net: Switch over users of sendpage() and remove it
+Date: Fri, 23 Jun 2023 23:54:57 +0100
+Message-ID: <20230623225513.2732256-1-dhowells@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 06:09:12PM +0200, Stefano Garzarella wrote:
-> On Sun, Jun 11, 2023 at 11:49:02PM +0300, Arseniy Krasnov wrote:
-> > Hello Bobby!
-> > 
-> > On 10.06.2023 03:58, Bobby Eshleman wrote:
-> > > This commit adds support for datagrams over virtio/vsock.
-> > > 
-> > > Message boundaries are preserved on a per-skb and per-vq entry basis.
-> > 
-> > I'm a little bit confused about the following case: let vhost sends 4097 bytes
-> > datagram to the guest. Guest uses 4096 RX buffers in it's virtio queue, each
-> > buffer has attached empty skb to it. Vhost places first 4096 bytes to the first
-> > buffer of guests RX queue, and 1 last byte to the second buffer. Now IIUC guest
-> > has two skb in it rx queue, and user in guest wants to read data - does it read
-> > 4097 bytes, while guest has two skb - 4096 bytes and 1 bytes? In seqpacket there is
-> > special marker in header which shows where message ends, and how it works here?
-> 
-> I think the main difference is that DGRAM is not connection-oriented, so
-> we don't have a stream and we can't split the packet into 2 (maybe we
-> could, but we have no guarantee that the second one for example will be
-> not discarded because there is no space).
-> 
-> So I think it is acceptable as a restriction to keep it simple.
-> 
-> My only doubt is, should we make the RX buffer size configurable,
-> instead of always using 4k?
-> 
-I think that is a really good idea. What mechanism do you imagine?
+Here's the final set of patches towards the removal of sendpage.  All the
+drivers that use sendpage() get switched over to using sendmsg() with
+MSG_SPLICE_PAGES.
 
-For sendmsg() with buflen > VQ_BUF_SIZE, I think I'd like -ENOBUFS
-returned even though it is uncharacteristic of Linux sockets.
-Alternatively, silently dropping is okay... but seems needlessly
-unhelpful.
+The following changes are made:
 
-FYI, this patch is broken for h2g because it requeues partially sent
-skbs, so probably doesn't need much code review until we decided on the
-policy.
+ (1) Make the protocol drivers behave according to MSG_MORE, not
+     MSG_SENDPAGE_NOTLAST.  The latter is restricted to turning on MSG_MORE
+     in the sendpage() wrappers.
 
-Best,
-Bobby
+ (2) Fix ocfs2 to allocate its global protocol buffers with folio_alloc()
+     rather than kzalloc() so as not to invoke the !sendpage_ok warning in
+     skb_splice_from_iter().
+
+ (3) Make ceph/rds, skb_send_sock, dlm, nvme, smc, ocfs2, drbd and iscsi
+     use sendmsg(), not sendpage and make them specify MSG_MORE instead of
+     MSG_SENDPAGE_NOTLAST.
+
+ (4) Kill off sendpage and clean up MSG_SENDPAGE_NOTLAST.
+
+I've pushed the patches here also:
+
+	https://git.kernel.org/pub/scm/linux/kernel/git/dhowells/linux-fs.git/log/?h=sendpage-3-killsb
+
+David
+
+Changes
+=======
+ver #5)
+ - Switch condition for setting MSG_MORE in write_partial_message_data()
+ - Split iscsi changes into client and target patches
+
+ver #4)
+ - Drop the copy-slab-to-fragment code from skb_splice_from_iter().
+ - Slim down the driver changes to only do one page at a time.
+ - Drop the siw and drbd page aggregation single-sendmsg patches.
+ - Make nvme/host cancel MSG_SPLICE_PAGES if !sendpage_ok.
+ - Break out the ocfs2 protocol buffer allocation fix into its own patch.
+ - Simplify the ocfs2 protocol data transmission.
+
+ver #3)
+ - Remove duplicate decl of skb_splice_from_iter().
+ - In tcp_bpf, reset msg_flags on each iteration to clear MSG_MORE.
+ - In tcp_bpf, set MSG_MORE if there's more data in the sk_msg.
+ - Split the nvme patch into host and target patches.
+
+ver #2)
+ - Wrapped some lines at 80.
+ - Fixed parameter to put_cpu_ptr() to have an '&'.
+ - Use "unsigned int" rather than "unsigned".
+ - Removed duplicate word in comment.
+ - Filled in the commit message on the last patch.
+
+Link: https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=51c78a4d532efe9543a4df019ff405f05c6157f6 # part 1
+Link: https://lore.kernel.org/r/20230616161301.622169-1-dhowells@redhat.com/ # v1
+Link: https://lore.kernel.org/r/20230617121146.716077-1-dhowells@redhat.com/ # v2
+Link: https://lore.kernel.org/r/20230620145338.1300897-1-dhowells@redhat.com/ # v3
+
+
+
+
+
+David Howells (16):
+  tcp_bpf, smc, tls, espintcp, siw: Reduce MSG_SENDPAGE_NOTLAST usage
+  net: Use sendmsg(MSG_SPLICE_PAGES) not sendpage in skb_send_sock()
+  ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage
+  ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage()
+  rds: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage
+  dlm: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage
+  nvme-tcp: Use sendmsg(MSG_SPLICE_PAGES) rather then sendpage
+  nvmet-tcp: Use sendmsg(MSG_SPLICE_PAGES) rather then sendpage
+  smc: Drop smc_sendpage() in favour of smc_sendmsg() + MSG_SPLICE_PAGES
+  drbd: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage()
+  scsi: iscsi_tcp: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage
+  scsi: target: iscsi: Use sendmsg(MSG_SPLICE_PAGES) rather than
+    sendpage
+  ocfs2: Fix use of slab data with sendpage
+  ocfs2: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage()
+  sock: Remove ->sendpage*() in favour of sendmsg(MSG_SPLICE_PAGES)
+  net: Kill MSG_SENDPAGE_NOTLAST
+
+ Documentation/bpf/map_sockmap.rst             | 10 +-
+ Documentation/filesystems/locking.rst         |  2 -
+ Documentation/filesystems/vfs.rst             |  1 -
+ Documentation/networking/scaling.rst          |  4 +-
+ crypto/af_alg.c                               | 28 ------
+ crypto/algif_aead.c                           | 22 +----
+ crypto/algif_rng.c                            |  2 -
+ crypto/algif_skcipher.c                       | 14 ---
+ drivers/block/drbd/drbd_main.c                | 12 ++-
+ drivers/infiniband/sw/siw/siw_qp_tx.c         |  5 +-
+ .../chelsio/inline_crypto/chtls/chtls.h       |  2 -
+ .../chelsio/inline_crypto/chtls/chtls_io.c    | 14 ---
+ .../chelsio/inline_crypto/chtls/chtls_main.c  |  1 -
+ drivers/nvme/host/tcp.c                       | 49 +++++-----
+ drivers/nvme/target/tcp.c                     | 46 ++++++----
+ drivers/scsi/iscsi_tcp.c                      | 26 ++----
+ drivers/scsi/iscsi_tcp.h                      |  2 -
+ drivers/target/iscsi/iscsi_target_util.c      | 15 +--
+ fs/dlm/lowcomms.c                             | 10 +-
+ fs/nfsd/vfs.c                                 |  2 +-
+ fs/ocfs2/cluster/tcp.c                        | 38 ++++----
+ include/crypto/if_alg.h                       |  2 -
+ include/linux/net.h                           |  8 --
+ include/linux/socket.h                        |  4 +-
+ include/net/inet_common.h                     |  2 -
+ include/net/sock.h                            |  6 --
+ include/net/tcp.h                             |  4 -
+ net/appletalk/ddp.c                           |  1 -
+ net/atm/pvc.c                                 |  1 -
+ net/atm/svc.c                                 |  1 -
+ net/ax25/af_ax25.c                            |  1 -
+ net/caif/caif_socket.c                        |  2 -
+ net/can/bcm.c                                 |  1 -
+ net/can/isotp.c                               |  1 -
+ net/can/j1939/socket.c                        |  1 -
+ net/can/raw.c                                 |  1 -
+ net/ceph/messenger_v1.c                       | 60 ++++--------
+ net/ceph/messenger_v2.c                       | 91 ++++---------------
+ net/core/skbuff.c                             | 50 +++++-----
+ net/core/sock.c                               | 35 +------
+ net/dccp/ipv4.c                               |  1 -
+ net/dccp/ipv6.c                               |  1 -
+ net/ieee802154/socket.c                       |  2 -
+ net/ipv4/af_inet.c                            | 21 -----
+ net/ipv4/tcp.c                                | 43 +--------
+ net/ipv4/tcp_bpf.c                            | 28 +-----
+ net/ipv4/tcp_ipv4.c                           |  1 -
+ net/ipv4/udp.c                                | 15 ---
+ net/ipv4/udp_impl.h                           |  2 -
+ net/ipv4/udplite.c                            |  1 -
+ net/ipv6/af_inet6.c                           |  3 -
+ net/ipv6/raw.c                                |  1 -
+ net/ipv6/tcp_ipv6.c                           |  1 -
+ net/kcm/kcmsock.c                             | 20 ----
+ net/key/af_key.c                              |  1 -
+ net/l2tp/l2tp_ip.c                            |  1 -
+ net/l2tp/l2tp_ip6.c                           |  1 -
+ net/llc/af_llc.c                              |  1 -
+ net/mctp/af_mctp.c                            |  1 -
+ net/mptcp/protocol.c                          |  2 -
+ net/netlink/af_netlink.c                      |  1 -
+ net/netrom/af_netrom.c                        |  1 -
+ net/packet/af_packet.c                        |  2 -
+ net/phonet/socket.c                           |  2 -
+ net/qrtr/af_qrtr.c                            |  1 -
+ net/rds/af_rds.c                              |  1 -
+ net/rds/tcp_send.c                            | 23 ++---
+ net/rose/af_rose.c                            |  1 -
+ net/rxrpc/af_rxrpc.c                          |  1 -
+ net/sctp/protocol.c                           |  1 -
+ net/smc/af_smc.c                              | 29 ------
+ net/smc/smc_stats.c                           |  2 +-
+ net/smc/smc_stats.h                           |  1 -
+ net/smc/smc_tx.c                              | 19 +---
+ net/smc/smc_tx.h                              |  2 -
+ net/socket.c                                  | 48 ----------
+ net/tipc/socket.c                             |  3 -
+ net/tls/tls.h                                 |  6 --
+ net/tls/tls_device.c                          | 24 +----
+ net/tls/tls_main.c                            |  9 +-
+ net/tls/tls_sw.c                              | 37 +-------
+ net/unix/af_unix.c                            | 19 ----
+ net/vmw_vsock/af_vsock.c                      |  3 -
+ net/x25/af_x25.c                              |  1 -
+ net/xdp/xsk.c                                 |  1 -
+ net/xfrm/espintcp.c                           | 10 +-
+ .../perf/trace/beauty/include/linux/socket.h  |  1 -
+ tools/perf/trace/beauty/msg_flags.c           |  5 +-
+ 88 files changed, 230 insertions(+), 748 deletions(-)
+
 
