@@ -1,241 +1,177 @@
-Return-Path: <netdev+bounces-13624-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9A87673C49B
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:00:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86DBB73C4A7
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:07:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC1AE1C21370
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:00:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39F5E281E88
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:07:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C685E6D18;
-	Fri, 23 Jun 2023 22:56:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 357A46138;
+	Fri, 23 Jun 2023 23:07:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53166AAA
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 22:56:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EBCFF2968
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:56:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687560969;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xQVg0pnXVfTxPUpA8yd29SmocczyZN6S+xS0BIA8ljI=;
-	b=egn52Y3iCc4T0jlkJXlN7JGbq84m7ec2h/QiterIF+76BA64CPcxAL/YUq63+B6hETzQQW
-	Y23Nv3JgKm3XXjvwgRx1rpg8w9PHpB/JNV1Dxt/2Z3zjpGTcG6DYPahiRCM1PBT0nSPfLw
-	IOpZNh1wPBkJqAqvVq9KVgceB6tOI9U=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-392-ui08z6zkOsOzsb7oEUVtzw-1; Fri, 23 Jun 2023 18:56:05 -0400
-X-MC-Unique: ui08z6zkOsOzsb7oEUVtzw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2C7B7185A78B;
-	Fri, 23 Jun 2023 22:56:04 +0000 (UTC)
-Received: from warthog.procyon.org.com (unknown [10.42.28.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 240AF492C13;
-	Fri, 23 Jun 2023 22:56:01 +0000 (UTC)
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org
-Cc: David Howells <dhowells@redhat.com>,
-	Alexander Duyck <alexander.duyck@gmail.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22FA7611C
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 23:07:11 +0000 (UTC)
+Received: from mail-pg1-x52f.google.com (mail-pg1-x52f.google.com [IPv6:2607:f8b0:4864:20::52f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99E8210C
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 16:07:10 -0700 (PDT)
+Received: by mail-pg1-x52f.google.com with SMTP id 41be03b00d2f7-543ae674f37so785121a12.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 16:07:10 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1687561630; x=1690153630;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=9ZwjebhS8oSjOepMrPEN3qEWu5LXm96X6EngyxGqz5U=;
+        b=HSxQqYcZPyZyotv/USqu+1+c3VOhQaYEACXvG8GsJmY3fFsmhhy05m7xb9JZ0TIwjc
+         h0bKF1P9ob29gmZaGk/taEcnoi/rubps701VKrScS8mVMNDjZhGYEeTJEcwn3IZ7JsTu
+         2elvlABFLX/7od9P2UOn3vUKIR+DYi+whX4dI=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687561630; x=1690153630;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9ZwjebhS8oSjOepMrPEN3qEWu5LXm96X6EngyxGqz5U=;
+        b=DbkyvztwrMZQ356Vd3RkGCSsDz8hYyAAzk7+MrAidjSQMJO9ZZM/pIThh923sA7TkY
+         oV5gtLjLBS8kCdUROdiqde7ARKE8D16FMWvI9JmqLyaLsCARY8bwPGNsu8ZMCN63K3vX
+         qVeNF+7f7b816/9yn0T1Y88qKD0MAU3nkaeaOLEBfGR9xTJHtueoij29NZvi4wfLiT88
+         SqC2/LKQcbzrwS85A3zZ2Btq84dQawWqCEXMbLLh2vOQCf4gXbfLXiTyYhd08yCotsIk
+         QLKdxcZG4U1UTOXVhXiu53zXZZACQe6RGodK3ABL147xbFSNprU81qSvD5i4hyQjXcTa
+         sDxw==
+X-Gm-Message-State: AC+VfDz338nERSNeJW7xgEFQEbKyQgCh7ZyGhHcHsNaxoGGNDxMToWds
+	XCWlJvx5AyeqNGF7yxcLRbFFjQ==
+X-Google-Smtp-Source: ACHHUZ4IKOjqORw3yAofmWeRs2DFniNkRHfGIjXvl8mC28hI/xc2A8BRRpPGb4YGHK+0amfW7QYZzA==
+X-Received: by 2002:a17:902:8487:b0:1b6:7031:d22c with SMTP id c7-20020a170902848700b001b67031d22cmr377127plo.38.1687561630059;
+        Fri, 23 Jun 2023 16:07:10 -0700 (PDT)
+Received: from www.outflux.net (198-0-35-241-static.hfc.comcastbusiness.net. [198.0.35.241])
+        by smtp.gmail.com with ESMTPSA id s13-20020a170902988d00b001b680aab2f0sm84020plp.121.2023.06.23.16.07.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 16:07:09 -0700 (PDT)
+Date: Fri, 23 Jun 2023 16:07:08 -0700
+From: Kees Cook <keescook@chromium.org>
+To: Arnd Bergmann <arnd@kernel.org>
+Cc: Johannes Berg <johannes@sipsolutions.net>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Christian Lamparter <chunkeey@googlemail.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>,
-	Jens Axboe <axboe@kernel.dk>,
-	linux-mm@kvack.org,
-	linux-kernel@vger.kernel.org,
-	bpf@vger.kernel.org,
-	dccp@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	linux-arm-msm@vger.kernel.org,
-	linux-can@vger.kernel.org,
-	linux-crypto@vger.kernel.org,
-	linux-doc@vger.kernel.org,
-	linux-hams@vger.kernel.org,
-	linux-perf-users@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-sctp@vger.kernel.org,
-	linux-wpan@vger.kernel.org,
-	linux-x25@vger.kernel.org,
-	mptcp@lists.linux.dev,
-	rds-devel@oss.oracle.com,
-	tipc-discussion@lists.sourceforge.net,
-	virtualization@lists.linux-foundation.org
-Subject: [PATCH net-next v5 16/16] net: Kill MSG_SENDPAGE_NOTLAST
-Date: Fri, 23 Jun 2023 23:55:13 +0100
-Message-ID: <20230623225513.2732256-17-dhowells@redhat.com>
-In-Reply-To: <20230623225513.2732256-1-dhowells@redhat.com>
-References: <20230623225513.2732256-1-dhowells@redhat.com>
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Ryder Lee <ryder.lee@mediatek.com>, Ilan Peer <ilan.peer@intel.com>,
+	Felix Fietkau <nbd@nbd.name>, Aloka Dixit <quic_alokad@quicinc.com>,
+	Avraham Stern <avraham.stern@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH 2/2] mac80211: make ieee80211_tx_info padding explicit
+Message-ID: <202306231604.1D327AFE9@keescook>
+References: <20230623152443.2296825-1-arnd@kernel.org>
+ <20230623152443.2296825-2-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230623152443.2296825-2-arnd@kernel.org>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Now that ->sendpage() has been removed, MSG_SENDPAGE_NOTLAST can be cleaned
-up.  Things were converted to use MSG_MORE instead, but the protocol
-sendpage stubs still convert MSG_SENDPAGE_NOTLAST to MSG_MORE, which is now
-unnecessary.
+On Fri, Jun 23, 2023 at 05:24:00PM +0200, Arnd Bergmann wrote:
+> From: Arnd Bergmann <arnd@arndb.de>
+> 
+> While looking at a bug, I got rather confused by the layout of the
+> 'status' field in ieee80211_tx_info. Apparently, the intention is that
+> status_driver_data[] is used for driver specific data, and fills up the
+> size of the union to 40 bytes, just like the other ones.
+> 
+> This is indeed what actually happens, but only because of the
+> combination of two mistakes:
+> 
+>  - "void *status_driver_data[18 / sizeof(void *)];" is intended
+>    to be 18 bytes long but is actually two bytes shorter because of
+>    rounding-down in the division, to a multiple of the pointer
+>    size (4 bytes or 8 bytes).
+> 
+>  - The other fields combined are intended to be 22 bytes long, but
+>    are actually 24 bytes because of padding in front of the
+>    unaligned tx_time member, and in front of the pointer array.
+> 
+> The two mistakes cancel out. so the size ends up fine, but it seems
+> more helpful to make this explicit, by having a multiple of 8 bytes
+> in the size calculation and explicitly describing the padding.
+> 
+> Fixes: ea5907db2a9cc ("mac80211: fix struct ieee80211_tx_info size")
+> Fixes: 02219b3abca59 ("mac80211: add WMM admission control support")
+> Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+> ---
+>  include/net/mac80211.h | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+> 
+> diff --git a/include/net/mac80211.h b/include/net/mac80211.h
+> index 3a8a2d2c58c38..ca4dc8a14f1bb 100644
+> --- a/include/net/mac80211.h
+> +++ b/include/net/mac80211.h
+> @@ -1192,9 +1192,11 @@ struct ieee80211_tx_info {
+>  			u8 ampdu_ack_len;
+>  			u8 ampdu_len;
+>  			u8 antenna;
+> +			u8 pad;
+>  			u16 tx_time;
+>  			u8 flags;
+> -			void *status_driver_data[18 / sizeof(void *)];
+> +			u8 pad2;
+> +			void *status_driver_data[16 / sizeof(void *)];
+>  		} status;
 
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: Jens Axboe <axboe@kernel.dk>
-cc: Matthew Wilcox <willy@infradead.org>
-cc: bpf@vger.kernel.org
-cc: dccp@vger.kernel.org
-cc: linux-afs@lists.infradead.org
-cc: linux-arm-msm@vger.kernel.org
-cc: linux-can@vger.kernel.org
-cc: linux-crypto@vger.kernel.org
-cc: linux-doc@vger.kernel.org
-cc: linux-hams@vger.kernel.org
-cc: linux-perf-users@vger.kernel.org
-cc: linux-rdma@vger.kernel.org
-cc: linux-sctp@vger.kernel.org
-cc: linux-wpan@vger.kernel.org
-cc: linux-x25@vger.kernel.org
-cc: mptcp@lists.linux.dev
-cc: netdev@vger.kernel.org
-cc: rds-devel@oss.oracle.com
-cc: tipc-discussion@lists.sourceforge.net
-cc: virtualization@lists.linux-foundation.org
----
+pahole agrees with your assessment. :)
 
-Notes:
-    ver #3)
-     - tcp_bpf is now handled by an earlier patch.
+struct ieee80211_tx_info {
+	...
+        union {
+		...
+                struct {
+                        struct ieee80211_tx_rate rates[4]; /*     8    12 */
+                        s32        ack_signal;           /*    20     4 */
+                        u8         ampdu_ack_len;        /*    24     1 */
+                        u8         ampdu_len;            /*    25     1 */
+                        u8         antenna;              /*    26     1 */
 
- include/linux/socket.h                         | 4 +---
- net/tls/tls_device.c                           | 3 +--
- net/tls/tls_main.c                             | 2 +-
- net/tls/tls_sw.c                               | 2 +-
- tools/perf/trace/beauty/include/linux/socket.h | 1 -
- tools/perf/trace/beauty/msg_flags.c            | 5 +----
- 6 files changed, 5 insertions(+), 12 deletions(-)
+                        /* XXX 1 byte hole, try to pack */
 
-diff --git a/include/linux/socket.h b/include/linux/socket.h
-index 58204700018a..39b74d83c7c4 100644
---- a/include/linux/socket.h
-+++ b/include/linux/socket.h
-@@ -319,7 +319,6 @@ struct ucred {
- #define MSG_MORE	0x8000	/* Sender will send more */
- #define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
- #define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
--#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
- #define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
- #define MSG_EOF         MSG_FIN
- #define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
-@@ -341,8 +340,7 @@ struct ucred {
- 
- /* Flags to be cleared on entry by sendmsg and sendmmsg syscalls */
- #define MSG_INTERNAL_SENDMSG_FLAGS \
--	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_NOTLAST | \
--	 MSG_SENDPAGE_DECRYPTED)
-+	(MSG_SPLICE_PAGES | MSG_SENDPAGE_NOPOLICY | MSG_SENDPAGE_DECRYPTED)
- 
- /* Setsockoptions(2) level. Thanks to BSD these must match IPPROTO_xxx */
- #define SOL_IP		0
-diff --git a/net/tls/tls_device.c b/net/tls/tls_device.c
-index 840ee06f1708..2021fe557e50 100644
---- a/net/tls/tls_device.c
-+++ b/net/tls/tls_device.c
-@@ -441,8 +441,7 @@ static int tls_push_data(struct sock *sk,
- 	long timeo;
- 
- 	if (flags &
--	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SENDPAGE_NOTLAST |
--	      MSG_SPLICE_PAGES))
-+	    ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL | MSG_SPLICE_PAGES))
- 		return -EOPNOTSUPP;
- 
- 	if (unlikely(sk->sk_err))
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index d5ed4d47b16e..b6896126bb92 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -127,7 +127,7 @@ int tls_push_sg(struct sock *sk,
- {
- 	struct bio_vec bvec;
- 	struct msghdr msg = {
--		.msg_flags = MSG_SENDPAGE_NOTLAST | MSG_SPLICE_PAGES | flags,
-+		.msg_flags = MSG_SPLICE_PAGES | flags,
- 	};
- 	int ret = 0;
- 	struct page *p;
-diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-index 9b3aa89a4292..53f944e6d8ef 100644
---- a/net/tls/tls_sw.c
-+++ b/net/tls/tls_sw.c
-@@ -1194,7 +1194,7 @@ int tls_sw_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)
- 
- 	if (msg->msg_flags & ~(MSG_MORE | MSG_DONTWAIT | MSG_NOSIGNAL |
- 			       MSG_CMSG_COMPAT | MSG_SPLICE_PAGES |
--			       MSG_SENDPAGE_NOTLAST | MSG_SENDPAGE_NOPOLICY))
-+			       MSG_SENDPAGE_NOPOLICY))
- 		return -EOPNOTSUPP;
- 
- 	ret = mutex_lock_interruptible(&tls_ctx->tx_lock);
-diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/trace/beauty/include/linux/socket.h
-index 13c3a237b9c9..3bef212a24d7 100644
---- a/tools/perf/trace/beauty/include/linux/socket.h
-+++ b/tools/perf/trace/beauty/include/linux/socket.h
-@@ -318,7 +318,6 @@ struct ucred {
- #define MSG_MORE	0x8000	/* Sender will send more */
- #define MSG_WAITFORONE	0x10000	/* recvmmsg(): block until 1+ packets avail */
- #define MSG_SENDPAGE_NOPOLICY 0x10000 /* sendpage() internal : do no apply policy */
--#define MSG_SENDPAGE_NOTLAST 0x20000 /* sendpage() internal : not the last page */
- #define MSG_BATCH	0x40000 /* sendmmsg(): more messages coming */
- #define MSG_EOF         MSG_FIN
- #define MSG_NO_SHARED_FRAGS 0x80000 /* sendpage() internal : page frags are not shared */
-diff --git a/tools/perf/trace/beauty/msg_flags.c b/tools/perf/trace/beauty/msg_flags.c
-index ea68db08b8e7..5cdebd7ece7e 100644
---- a/tools/perf/trace/beauty/msg_flags.c
-+++ b/tools/perf/trace/beauty/msg_flags.c
-@@ -8,9 +8,6 @@
- #ifndef MSG_WAITFORONE
- #define MSG_WAITFORONE		   0x10000
- #endif
--#ifndef MSG_SENDPAGE_NOTLAST
--#define MSG_SENDPAGE_NOTLAST	   0x20000
--#endif
- #ifndef MSG_FASTOPEN
- #define MSG_FASTOPEN		0x20000000
- #endif
-@@ -50,7 +47,7 @@ static size_t syscall_arg__scnprintf_msg_flags(char *bf, size_t size,
- 	P_MSG_FLAG(NOSIGNAL);
- 	P_MSG_FLAG(MORE);
- 	P_MSG_FLAG(WAITFORONE);
--	P_MSG_FLAG(SENDPAGE_NOTLAST);
-+	P_MSG_FLAG(SPLICE_PAGES);
- 	P_MSG_FLAG(FASTOPEN);
- 	P_MSG_FLAG(CMSG_CLOEXEC);
- #undef P_MSG_FLAG
+                        u16        tx_time;              /*    28     2 */
+                        u8         flags;                /*    30     1 */
 
+                        /* XXX 1 byte hole, try to pack */
+
+                        void *     status_driver_data[2]; /*    32    16 */
+                } status;                                /*     8    40 */
+                struct {
+                        struct ieee80211_tx_rate driver_rates[4]; /*     8    12 */
+                        u8         pad[4];               /*    20     4 */
+                        void *     rate_driver_data[3];  /*    24    24 */
+                };                                       /*     8    40 */
+                void *             driver_data[5];       /*     8    40 */
+        };                                               /*     8    40 */
+	...
+};
+
+Reviewed-by: Kees Cook <keescook@chromium.org>
+
+-- 
+Kees Cook
 
