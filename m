@@ -1,104 +1,137 @@
-Return-Path: <netdev+bounces-13538-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13539-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0371C73BF18
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:55:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321E873BF27
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:00:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B326B281CDE
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:55:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B3E81C21290
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:00:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C69A51094A;
-	Fri, 23 Jun 2023 19:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08DA51094B;
+	Fri, 23 Jun 2023 20:00:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B74F4107B7
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:55:02 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B9A3D2718;
-	Fri, 23 Jun 2023 12:55:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=3yUvbEaHrJkA8XbZDfQ/ylYjxcIAanKTgTqlC0IpYvE=; b=MQKqpkPFfyHz70xQiCygxCrRfQ
-	PKtLjCRhnnwwWlL0fc/94ba/Tg7QUFP16vx+WCv/qilHIV/gpOs1SfBhvJesRBXPtZNnDtIyIvvuM
-	/Lco+SLjWfqY72z6DMoWrZW5l5PdlqUjG8IvWhZMni1kgN6gTLx4PkbfdN0DWgXbDPO8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qCmra-00HO1V-PP; Fri, 23 Jun 2023 21:54:34 +0200
-Date: Fri, 23 Jun 2023 21:54:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Walle <mwalle@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 04/10] net: phy: replace is_c45 with
- phy_accces_mode
-Message-ID: <6fcd887a-c731-4c31-bb43-e8d14071524e@lunn.ch>
-References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
- <20230620-feature-c45-over-c22-v2-4-def0ab9ccee2@kernel.org>
- <52cdebe9-0f94-430d-93ff-11f26d2e3c5b@lunn.ch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA77E1094A
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 20:00:32 +0000 (UTC)
+Received: from mail-vs1-xe36.google.com (mail-vs1-xe36.google.com [IPv6:2607:f8b0:4864:20::e36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 848B62720
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 13:00:30 -0700 (PDT)
+Received: by mail-vs1-xe36.google.com with SMTP id ada2fe7eead31-440ce11f80fso359426137.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 13:00:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687550429; x=1690142429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=m1M1xaiNrSMz3C3bpTzsCCZISH1fndbXxP2b6AYA7P8=;
+        b=25Kx93HWxGNrW7i8PiktSOxdVI0xb3gbLHu/eSh/j7KcjQodThxWFZuBF6WKG7vUNS
+         fYGM58rw15YqtrfK2oWLKC89wNDMbmfUK8+JUWu7fId3vSV6WvME2X6LNspLodF8+Gzk
+         JeGZfAvppULZbqGu0aJaAxlUxXk+SBbxfbERd5XMyCmMiMWuNJUgw4blEMn28OAKgq5x
+         g57zEZlB4IiEhm4455u2ZGEzB8LTZ/xNmtAKaKdOAlIvBBzUBx/DuWC9ZSunGwJEHezU
+         6t9WGtZdYGDquTmuZk1GnP1yKTKRpGH0LGW7iszsplwh/aOwdfaW5wDh3OjguCw5FfAN
+         +Rmg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687550429; x=1690142429;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=m1M1xaiNrSMz3C3bpTzsCCZISH1fndbXxP2b6AYA7P8=;
+        b=gq1v7eSKqIctZ0AZTCCAqGDK9p2GZSsL3tEhxpQL9jWKmrOo+BZ2kQMGMPhVlkvwno
+         kJCXrXapnaylqxxLSdxdI1ZZ70DjUTDPbinxlFalorcwGAmSjDqgYR1Y8NjzbxluMxjs
+         hcLNbSINhCI2h+4utjqZjonYJerFKlMHzbDrIrQauTvnGl5oXn23b4Ix+J6fejaDLVxX
+         LIoGq6fi9cRiLgsdUi9jO8IFc/WxsqDHKCUZI7NbdMFoWViu+khUItwqvBLuQ3qTMTOJ
+         hj/yQ+4supA8QiMRkRdLUtGpZ7EH2gfPlFmHVF9hJ0xANwAS6y25X7HsUoZsYx1IEkWF
+         M+4g==
+X-Gm-Message-State: AC+VfDwDp6GV9HM5qcCnHDdDI6iQcrSXTvRwV9L5c+9w+kP7q3u1yln+
+	N0fbWhgXU1YMq3Xc/pZ2Xt/fAuhyZ+ll/T2OaF/NpA==
+X-Google-Smtp-Source: ACHHUZ4dgCpqMi4ZlVuTYZHeFbBd4fFXdHkx89qsxKlJ0GOPlCr0eVv4RzmW7IXVicUlGnXnteN3dR3IFwrJ2sBV24Y=
+X-Received: by 2002:a05:6102:2453:b0:440:d2f5:e36d with SMTP id
+ g19-20020a056102245300b00440d2f5e36dmr5548679vss.14.1687550429626; Fri, 23
+ Jun 2023 13:00:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <52cdebe9-0f94-430d-93ff-11f26d2e3c5b@lunn.ch>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+References: <20230623100845.114085-1-brgl@bgdev.pl> <20230623100845.114085-3-brgl@bgdev.pl>
+ <ZJXw+92ee7CGtnCS@corigine.com>
+In-Reply-To: <ZJXw+92ee7CGtnCS@corigine.com>
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+Date: Fri, 23 Jun 2023 22:00:18 +0200
+Message-ID: <CAMRc=MeXtK8kNbNo0u7onz3vmKS1eHWdok7vGFRMr41S2Aehvg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 02/12] net: stmmac: replace the sph_disable
+ field with a flag
+To: Simon Horman <simon.horman@corigine.com>
+Cc: Vinod Koul <vkoul@kernel.org>, Bhupesh Sharma <bhupesh.sharma@linaro.org>, 
+	Andy Gross <agross@kernel.org>, Bjorn Andersson <andersson@kernel.org>, 
+	Konrad Dybcio <konrad.dybcio@linaro.org>, "David S . Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Rob Herring <robh+dt@kernel.org>, 
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, 
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue <alexandre.torgue@foss.st.com>, 
+	Jose Abreu <joabreu@synopsys.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>, 
+	Andrew Halaney <ahalaney@redhat.com>, netdev@vger.kernel.org, linux-arm-msm@vger.kernel.org, 
+	devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, 
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 07:34:22PM +0200, Andrew Lunn wrote:
-> > @@ -131,9 +131,11 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
-> >  
-> >  	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
-> >  	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
-> > -		phy = get_phy_device(bus, addr, is_c45);
-> > +		phy = get_phy_device(bus, addr,
-> > +				     is_c45 ? PHY_ACCESS_C45 : PHY_ACCESS_C22);
-> >  	else
-> > -		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
-> > +		phy = phy_device_create(bus, addr, phy_id, PHY_ACCESS_C22,
-> > +					NULL);
-> 
-> Documentation/devicetree/bindings/net/ethernet-phy.yaml says:
-> 
->   compatible:
->     oneOf:
->       - const: ethernet-phy-ieee802.3-c22
->         description: PHYs that implement IEEE802.3 clause 22
->       - const: ethernet-phy-ieee802.3-c45
->         description: PHYs that implement IEEE802.3 clause 45
-> 
-> It would be nice to make this documentation more specific. It now
-> refers to 'bus transaction', so maybe we want to append that to these
-> lines?
+On Fri, Jun 23, 2023 at 9:22=E2=80=AFPM Simon Horman <simon.horman@corigine=
+.com> wrote:
+>
+> On Fri, Jun 23, 2023 at 12:08:35PM +0200, Bartosz Golaszewski wrote:
+> > From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+> >
+> > Drop the boolean field of the plat_stmmacenet_data structure in favor o=
+f a
+> > simple bitfield flag.
+> >
+> > Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+>
+> ...
+>
+> > diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c b/driver=
+s/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > index ab9f876b6df7..70e91bbef2a6 100644
+> > --- a/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > +++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-intel.c
+> > @@ -459,7 +459,7 @@ static int intel_mgbe_common_data(struct pci_dev *p=
+dev,
+> >       plat->has_gmac4 =3D 1;
+> >       plat->force_sf_dma_mode =3D 0;
+> >       plat->tso_en =3D 1;
+> > -     plat->sph_disable =3D 1;
+> > +     data->flags |=3D STMMAC_FLAG_SPH_DISABLE;
+>
+> Hi Bartosz,
+>
+> I think something must have got mixed-up here.
+> An x86_64 allmodconfig reports that data is undeclared here.
+>
 
-Humm, looking at patch 9, maybe i got this wrong. Patch 9 seems to
-suggest ethernet-phy-ieee802.3-c45 means c45 register space, and it is
-upto the core to figure out how to access that register space, either
-using c45 transactions, or C45 over C22.
+Cr*p, I thought I build-tested everything...
 
-	 Andrew
+My bad, I'll resend a v3 after the merge window.
+
+Bart
+
+> ...
+>
+> --
+> pw-bot: changes-requested
+>
 
