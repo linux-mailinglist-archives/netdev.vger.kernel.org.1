@@ -1,238 +1,106 @@
-Return-Path: <netdev+bounces-13310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13311-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DE3473B3C5
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:37:58 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7000873B3CF
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:41:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A26BC2819EA
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:37:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9D152819DB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:40:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C51D13D78;
-	Fri, 23 Jun 2023 09:37:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECF1A3D78;
+	Fri, 23 Jun 2023 09:40:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B485A3D6E
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:37:54 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 904FA2693
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:37:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687513039;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fxg71GwonJ2lLdj/TmXZbBE8jlv4yQXpkQ99x3iYdD8=;
-	b=ELfYJOkIBDIZA2ETjDaY2BEjWoY0eJsYQ8M8XNWpxEk154fGoXiny/7c4H5dLwwtvUrLJH
-	mM75dc/sjPTSQqxIonuj3cfFL6AAwXtLJEcIbl7phE9RuwblvAoHWq4hxiUzzphRecfDoe
-	/dmyJbXHnKImmEuvcnwIP8YmvHfDY2o=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-135-chTLVqnXMaer68i7kRDvwA-1; Fri, 23 Jun 2023 05:37:17 -0400
-X-MC-Unique: chTLVqnXMaer68i7kRDvwA-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-62dd79f63e0so1151196d6.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:37:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687513037; x=1690105037;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Fxg71GwonJ2lLdj/TmXZbBE8jlv4yQXpkQ99x3iYdD8=;
-        b=ksnLGOQoN5OX7iPcBgoQGcKBXly6NIsFab2Qe0IM7PkIvYsAar5OB4t3/VVxv4pGrf
-         b2/VloAVfhYHJP3F8NgT0TzAceL9BWrF8CS9d4Rgwf2xUeWAOvudKyTfezshLbWL7lBM
-         U22z/ihZSJHZaWltoDMHS/wT3XjgiiMZg6Db8UIFLnl6UbZpI+s+oRdsDe0s0pmBuMfV
-         MBzUzxbksw945R5l+1QZrTZGnRZ+wqlz1SENAyKi9BFMwByp8lXwh4dbSphAn/ad7gVj
-         tcdrgOG3UysFzCTgp+ZOTLU65wrhgfwBhhKxIiFCfSYZ0zxkW3mrhQf94Hx6N4LsgzGD
-         /wag==
-X-Gm-Message-State: AC+VfDzHV+l+pH8YcU9Fq42WrPuqw8O+BamEdRYJd/6I2Ezf8gmp2dn1
-	M3yi+nGqyR5Jp4cEcaAczYBiadGDaMMXVAjSETm/q+lQ72BV/20GULxwaNHi/uOioZBrVv0c+fr
-	2c1DsDsZo0cr5Fe9FrceTlgb9
-X-Received: by 2002:ad4:5c83:0:b0:62e:ffc3:a9cb with SMTP id o3-20020ad45c83000000b0062effc3a9cbmr26280150qvh.2.1687513036723;
-        Fri, 23 Jun 2023 02:37:16 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4emjXvyu0vwC95mriQSkKhIcdBJ/xzwdwdd4nlnQZQIG6kdrN0Z5ZQRmuqh25MRMSlZcnC0A==
-X-Received: by 2002:ad4:5c83:0:b0:62e:ffc3:a9cb with SMTP id o3-20020ad45c83000000b0062effc3a9cbmr26280128qvh.2.1687513036400;
-        Fri, 23 Jun 2023 02:37:16 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
-        by smtp.gmail.com with ESMTPSA id u10-20020a0c8dca000000b0060530c942f4sm4883219qvb.46.2023.06.23.02.37.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 02:37:15 -0700 (PDT)
-Message-ID: <6cf2ea121c4fdbd04682224c5acf6c73cc47f2f7.camel@redhat.com>
-Subject: Re: [PATCH net-next v3 01/18] net: Copy slab data for
- sendmsg(MSG_SPLICE_PAGES)
-From: Paolo Abeni <pabeni@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexander.duyck@gmail.com>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
- linux-mm@kvack.org,  linux-kernel@vger.kernel.org, Menglong Dong
- <imagedong@tencent.com>
-Date: Fri, 23 Jun 2023 11:37:12 +0200
-In-Reply-To: <1969720.1687511219@warthog.procyon.org.uk>
-References: <634c885ccfb2e49e284aedc60e157bb12e5f3530.camel@redhat.com>
-	 <20230620145338.1300897-1-dhowells@redhat.com>
-	 <20230620145338.1300897-2-dhowells@redhat.com>
-	 <1969720.1687511219@warthog.procyon.org.uk>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC0513FDC
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:40:56 +0000 (UTC)
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4886ADC;
+	Fri, 23 Jun 2023 02:40:55 -0700 (PDT)
+Received: from [78.40.148.178] (helo=webmail.codethink.co.uk)
+	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1qCdHf-00DbgG-8Z; Fri, 23 Jun 2023 10:40:52 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Date: Fri, 23 Jun 2023 10:40:52 +0100
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, linux-kernel@vger.kernel.org,
+ claudiu.beznea@microchip.com, nicolas.ferre@microchip.com
+Subject: Re: [PATCH 1/3] net: macb: check constant to define and fix __be32
+ warnings
+In-Reply-To: <ZJRtinvcu2PAf+Cc@corigine.com>
+References: <20230622130507.606713-1-ben.dooks@codethink.co.uk>
+ <20230622130507.606713-2-ben.dooks@codethink.co.uk>
+ <ZJRtinvcu2PAf+Cc@corigine.com>
+Message-ID: <f13928be3aa5b14908104993979df6f7@codethink.co.uk>
+X-Sender: ben.dooks@codethink.co.uk
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 2023-06-23 at 10:06 +0100, David Howells wrote:
-> Paolo Abeni <pabeni@redhat.com> wrote:
->=20
-> > IMHO this function uses a bit too much labels and would be more easy to
-> > read, e.g. moving the above chunk of code in conditional branch.
->=20
-> Maybe.  I was trying to put the fast path up at the top without the slow =
-path
-> bits in it, but I can put the "insufficient_space" bit there.
 
-I *think* you could move the insufficient_space in a separate helped,
-that should achieve your goal with fewer labels and hopefully no
-additional complexity.
 
->=20
-> > Even without such change, I think the above 'goto try_again;'
-> > introduces an unneeded conditional, as at this point we know 'fragsz <=
-=3D
-> > fsize'.
->=20
-> Good point.
->=20
-> > > +		cache->pfmemalloc =3D folio_is_pfmemalloc(spare);
-> > > +		if (cache->folio)
-> > > +			goto reload;
-> >=20
-> > I think there is some problem with the above.
-> >=20
-> > If cache->folio is !=3D NULL, and cache->folio was not pfmemalloc-ed
-> > while the spare one is, it looks like the wrong policy will be used.
-> > And should be even worse if folio was pfmemalloc-ed while spare is not.
-> >=20
-> > I think moving 'cache->pfmemalloc' initialization...
-> >=20
-> > > +	}
-> > > +
-> >=20
-> > ... here should fix the above.
->=20
-> Yeah.  We might have raced with someone else or been moved to another cpu=
- and
-> there might now be a folio we can allocate from.
->=20
-> > > +	/* Reset page count bias and offset to start of new frag */
-> > > +	cache->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
-> > > +	offset =3D folio_size(folio);
-> > > +	goto try_again;
-> >=20
-> > What if fragsz > PAGE_SIZE, we are consistently unable to allocate an
-> > high order page, but order-0, pfmemalloc-ed page allocation is
-> > successful? It looks like this could become an unbounded loop?
->=20
-> It shouldn't.  It should go:
->=20
-> 	try_again:
-> 		if (fragsz > offset)
-> 			goto insufficient_space;
-> 	insufficient_space:
-> 		/* See if we can refurbish the current folio. */
-> 		...
+On 2023-06-22 16:49, Simon Horman wrote:
+> On Thu, Jun 22, 2023 at 02:05:05PM +0100, Ben Dooks wrote:
+>> The checks on ipv4 addresses in the filtering code check against
+>> a constant of 0xFFFFFFFF, so replace it with MACB_IPV4_MASK and
+>> then make sure it is of __be32 type to avoid the following
+>> sparse warnigns:
+>> 
+>> drivers/net/ethernet/cadence/macb_main.c:3448:39: warning: restricted 
+>> __be32 degrades to integer
+>> drivers/net/ethernet/cadence/macb_main.c:3453:39: warning: restricted 
+>> __be32 degrades to integer
+>> drivers/net/ethernet/cadence/macb_main.c:3483:20: warning: restricted 
+>> __be32 degrades to integer
+>> drivers/net/ethernet/cadence/macb_main.c:3497:20: warning: restricted 
+>> __be32 degrades to integer
+>> 
+>> Signed-off-by: Ben Dooks <ben.dooks@codethink.co.uk>
+>> ---
+>>  drivers/net/ethernet/cadence/macb_main.c | 10 ++++++----
+>>  1 file changed, 6 insertions(+), 4 deletions(-)
+>> 
+>> diff --git a/drivers/net/ethernet/cadence/macb_main.c 
+>> b/drivers/net/ethernet/cadence/macb_main.c
+>> index f20ec0d5260b..538d4c7e023b 100644
+>> --- a/drivers/net/ethernet/cadence/macb_main.c
+>> +++ b/drivers/net/ethernet/cadence/macb_main.c
+>> @@ -3418,6 +3418,8 @@ static int macb_get_ts_info(struct net_device 
+>> *netdev,
+>>  	return ethtool_op_get_ts_info(netdev, info);
+>>  }
+>> 
+>> +#define MACB_IPV4_MASK htonl(0xFFFFFFFF)
+>> +
+> 
+> Hi Ben,
+> 
+> according to a recent thread, it seems that the preferred approach 
+> might be
+> ~(__le32)0.
+> 
+> https://lore.kernel.org/netdev/20230522153615.247577-1-minhuadotchen@gmail.com/
 
-I think the critical path is with pfmemalloc-ed pages:
+Out of interest, should we keep the define then or simply go through 
+changing
+all the places where change is needed?
 
-		if (unlikely(cache->pfmemalloc)) {
-			__folio_put(folio);
-			goto get_new_folio;
-		}
-
-just before the following.
-
-> 		fsize =3D folio_size(folio);
-> 		if (unlikely(fragsz > fsize))
-> 			goto frag_too_big;
-> 	frag_too_big:
-> 		...
-> 		return NULL;
->=20
-> Though for safety's sake, it would make sense to put in a size check in t=
-he
-> case we fail to allocate a larger-order folio.
->=20
-> > >  		do {
-> > >  			struct page *page =3D pages[i++];
-> > >  			size_t part =3D min_t(size_t, PAGE_SIZE - off, len);
-> > > -
-> > > -			ret =3D -EIO;
-> > > -			if (WARN_ON_ONCE(!sendpage_ok(page)))
-> > > +			bool put =3D false;
-> > > +
-> > > +			if (PageSlab(page)) {
-> >=20
-> > I'm a bit concerned from the above. If I read correctly, tcp 0-copy
->=20
-> Well, splice()-to-tcp will; MSG_ZEROCOPY is unaffected.
-
-Ah right! I got lost in some 'if' branch.
-
-> > will go through that for every page, even if the expected use-case is
-> > always !PageSlub(page). compound_head() could be costly if the head
-> > page is not hot on cache and I'm not sure if that could be the case for
-> > tcp 0-copy. The bottom line is that I fear a possible regression here.
->=20
-> I can put the PageSlab() check inside the sendpage_ok() so the page flag =
-is
-> only checked once. =C2=A0
-
-Perhaps I'm lost again, but AFAICS:
-
-__PAGEFLAG(Slab, slab, PF_NO_TAIL)
-
-// ...
-#define __PAGEFLAG(uname, lname, policy)			\
-	TESTPAGEFLAG(uname, lname, policy)			\
-// ...
-
-#define TESTPAGEFLAG(uname, lname, policy)				\
-static __always_inline bool folio_test_##lname(struct folio *folio)	\
-{ return test_bit(PG_##lname, folio_flags(folio, FOLIO_##policy));}	\
-static __always_inline int Page##uname(struct page *page)               \
-{ return test_bit(PG_##lname, &policy(page, 0)->flags); }
-// ... 'policy' is PF_NO_TAIL here
-
-#define PF_NO_TAIL(page, enforce) ({                                    \
-                VM_BUG_ON_PGFLAGS(enforce && PageTail(page), page);	\
-                PF_POISONED_CHECK(compound_head(page)); })
-
-It looks at compound_head in the end ?!?
-
-> But PageSlab() doesn't check the headpage, only the page
-> it is given.  sendpage_ok() is more the problem as it also calls
-> page_count().  I could drop the check.
-
-Once the head page is hot on cache due to the previous check, it should
-be cheap?
-
-Cheers,
-
-Paolo
-
+-- 
+Ben
 
