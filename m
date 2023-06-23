@@ -1,173 +1,163 @@
-Return-Path: <netdev+bounces-13300-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13301-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 99DCC73B27E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:15:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0AD173B28C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:18:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B9362818CF
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 08:15:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E198E1C20C40
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 08:18:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E6191FA4;
-	Fri, 23 Jun 2023 08:15:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88EA20E6;
+	Fri, 23 Jun 2023 08:18:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0324B2102
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:15:36 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC4F4270D
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:15:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC5AA20E4
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:18:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6F012112
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:18:31 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687508134;
+	s=mimecast20190719; t=1687508311;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=vvP94iL0b14tTM53kZ2sYxqnmPo54a4UlF6JdzA9tVs=;
-	b=efL7g6x2ADRgZNmOmVkJLGe5gPMItyclVy/AZ8UMGvD4yrDKYdMhe/3HciqxrVw0n+895i
-	81nwQaE87b211b6O6fls3JE4AETr+7YAqrMXG8GeodC9ddDA+Vu8z4TvUV1JX3rU1hL+nB
-	WZmTtcy/f6zkqG9xa+9vsZ4zRbJ3P/U=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=PkaQxx+Y1hANa87C64UPOn1w6sw0j2xvZ0R3DPOEvLI=;
+	b=Ymn5rdV8Ttuqn+YcSDBP7LmhvFicFmTOcwATFa8iTys3DMaY1ENRPASnla6DKbizfPEkPt
+	YumWlm+OL61kndLlfZVuTMvym5rQcB5b1UE1cvjqR+v7lGdJ4jLS0QiiELcX1j0/4uzEzO
+	gIuktqJZx0rSXwfOVp+Twuie50NgvYM=
+Received: from mail-qv1-f72.google.com (mail-qv1-f72.google.com
+ [209.85.219.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-160-tAx3dPb6OUy7dm6N78RACA-1; Fri, 23 Jun 2023 04:15:28 -0400
-X-MC-Unique: tAx3dPb6OUy7dm6N78RACA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-94a355cf318so27712566b.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:15:27 -0700 (PDT)
+ us-mta-591-sB9sE1_ZP-ax0jmLRTAqng-1; Fri, 23 Jun 2023 04:18:29 -0400
+X-MC-Unique: sB9sE1_ZP-ax0jmLRTAqng-1
+Received: by mail-qv1-f72.google.com with SMTP id 6a1803df08f44-62ff7a8b9aeso928196d6.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:18:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687508127; x=1690100127;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vvP94iL0b14tTM53kZ2sYxqnmPo54a4UlF6JdzA9tVs=;
-        b=RczeAvMqu9dy2DqJDp0PpkLkF/YFUX6/v3k+VxHaPI1Cmctab8LM3ilSiClfqrkP9a
-         MfqBGjYJnEGNfDwhXnt8ejbVoRtzIiTZPAGnuoslrpt6Dz5llLLVyIjEeJkuK5QiZOnp
-         nWYXrGhNIkRbT6AMuoKg+jum+5PCgl0yoXSj1lfkd8nQhHYq8wHdbxjYvGesVpP1uKVt
-         sp/kNDNLg2tbIbhh1aT/T/0TN5fNEM1SRJvKC3h4R/FHNwEScji+wVr3REtCO1LE99EN
-         YkN6XTRKtHdc3wXbceiHuhnpe2EG1y3g5ID4MFJxd9JDmhKOWXUU5NjI3ES2yycmbyGa
-         04VA==
-X-Gm-Message-State: AC+VfDxM5Tv0CcxrPXyh6SWPAzXJ/t9rUzhLaB8kjP/yuKazUtG1wGhc
-	wiwy2l6raqjXIddQZFOfvWA/uTny1g1+qsBuCGxz5px5Z+hNYnCM3KdefUE25X+0K9DZ0eqat04
-	jAvi297iNHXGSNJrb
-X-Received: by 2002:a17:907:969f:b0:947:335f:5a0d with SMTP id hd31-20020a170907969f00b00947335f5a0dmr18564029ejc.62.1687508127034;
-        Fri, 23 Jun 2023 01:15:27 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7sG50KKcb8/4d0k9Sa5DNa+zxv2rKJ2E9yej3gVqMAjHzgkvZGHjdevsBGJ9oYHGKr3rl2Pw==
-X-Received: by 2002:a17:907:969f:b0:947:335f:5a0d with SMTP id hd31-20020a170907969f00b00947335f5a0dmr18563999ejc.62.1687508126768;
-        Fri, 23 Jun 2023 01:15:26 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id o11-20020a17090608cb00b00985ed2f1584sm5635492eje.187.2023.06.23.01.15.25
+        d=1e100.net; s=20221208; t=1687508309; x=1690100309;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=PkaQxx+Y1hANa87C64UPOn1w6sw0j2xvZ0R3DPOEvLI=;
+        b=Dv5dn5o5Hghb9pwlJwbGxGs0R4y1qxP3q30PFSFqlf6+/iezp2CpliyA6FUWvidu9f
+         H8NMwLaeM2BxR+qyi0tYSfXrojAQ0pP0ZMYX1lELIMjuypjGN5v/f+5PiVuMdtTlAsFk
+         v1aHH8jPO437GHIq9s3ofV9+ZVt2m4VK+aRLN3G7BYRzIROooJS/wWmfya9u5tRGBfBX
+         +EwJScuXbBbsxajqoMDhb6bfMSGc/7S7QFgH8+a8UgpSuuSZKVKzYp8m3l+iZ3onBLOz
+         JDWczddbUsPlA75YcPQrwepvl8B6SlX831e7uYe88TUkZIJi8vCnsRtnmYKsfUbuRlMA
+         r8Pw==
+X-Gm-Message-State: AC+VfDymYW7iQm6LLmVfTJkd5HB6hY3mBo0y/3tRKB9G8fIBvAH7lGG0
+	6E1hhYOi/XI63romki4JNiFlkuxmH0aZDO6jEkXr5mxYb4lB9Wk59F1iB7A1mOrXyR/llLxGcD1
+	AlQ3bmoro2eNIu7QY
+X-Received: by 2002:a05:6214:2426:b0:62f:e386:1e45 with SMTP id gy6-20020a056214242600b0062fe3861e45mr23780096qvb.1.1687508308657;
+        Fri, 23 Jun 2023 01:18:28 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4FUnG3bG8uHAhc8j3r/ENi0CHUWTQvEeqCtObZFm1IgXCwU67fCwyZEOd9Nuyxm4AXcz667w==
+X-Received: by 2002:a05:6214:2426:b0:62f:e386:1e45 with SMTP id gy6-20020a056214242600b0062fe3861e45mr23780085qvb.1.1687508308351;
+        Fri, 23 Jun 2023 01:18:28 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
+        by smtp.gmail.com with ESMTPSA id m1-20020a0ce6e1000000b006238b37fb05sm4759922qvn.119.2023.06.23.01.18.26
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 01:15:26 -0700 (PDT)
-Date: Fri, 23 Jun 2023 10:15:23 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Bobby Eshleman <bobbyeshleman@gmail.com>
-Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>, 
-	Stefan Hajnoczi <stefanha@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
-	Jason Wang <jasowang@redhat.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>, 
-	Bryan Tan <bryantan@vmware.com>, Vishnu Dasa <vdasa@vmware.com>, 
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>, Dan Carpenter <dan.carpenter@linaro.org>, 
-	Simon Horman <simon.horman@corigine.com>, Krasnov Arseniy <oxffffaa@gmail.com>, kvm@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-hyperv@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH RFC net-next v4 4/8] vsock: make vsock bind reusable
-Message-ID: <oq5c2c4snksklko6tmq44g73d6ihrbnqjyugsvfbhtdsnlrioi@hklfspvyjmad>
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-4-0cebbb2ae899@bytedance.com>
- <p2tgn3wczd3t3dodyicczetr2nqnqpwcadz6ql5hpvg2cd2dxa@phheksxhxfna>
- <ZJTTx0XJ2LeITNh0@bullseye>
+        Fri, 23 Jun 2023 01:18:28 -0700 (PDT)
+Message-ID: <2ee000f803bd1a099aa8fb02ef79c7b25e5f5b08.camel@redhat.com>
+Subject: Re: [PATCH net-next v3 02/18] net: Display info about
+ MSG_SPLICE_PAGES memory handling in proc
+From: Paolo Abeni <pabeni@redhat.com>
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>,  linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Menglong Dong <imagedong@tencent.com>
+Date: Fri, 23 Jun 2023 10:18:24 +0200
+In-Reply-To: <20230620145338.1300897-3-dhowells@redhat.com>
+References: <20230620145338.1300897-1-dhowells@redhat.com>
+	 <20230620145338.1300897-3-dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <ZJTTx0XJ2LeITNh0@bullseye>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 11:05:43PM +0000, Bobby Eshleman wrote:
->On Thu, Jun 22, 2023 at 05:25:55PM +0200, Stefano Garzarella wrote:
->> On Sat, Jun 10, 2023 at 12:58:31AM +0000, Bobby Eshleman wrote:
->> > This commit makes the bind table management functions in vsock usable
->> > for different bind tables. For use by datagrams in a future patch.
->> >
->> > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
->> > ---
->> > net/vmw_vsock/af_vsock.c | 33 ++++++++++++++++++++++++++-------
->> > 1 file changed, 26 insertions(+), 7 deletions(-)
->> >
->> > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->> > index ef86765f3765..7a3ca4270446 100644
->> > --- a/net/vmw_vsock/af_vsock.c
->> > +++ b/net/vmw_vsock/af_vsock.c
->> > @@ -230,11 +230,12 @@ static void __vsock_remove_connected(struct vsock_sock *vsk)
->> > 	sock_put(&vsk->sk);
->> > }
->> >
->> > -static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->> > +struct sock *vsock_find_bound_socket_common(struct sockaddr_vm *addr,
->> > +					    struct list_head *bind_table)
->> > {
->> > 	struct vsock_sock *vsk;
->> >
->> > -	list_for_each_entry(vsk, vsock_bound_sockets(addr), bound_table) {
->> > +	list_for_each_entry(vsk, bind_table, bound_table) {
->> > 		if (vsock_addr_equals_addr(addr, &vsk->local_addr))
->> > 			return sk_vsock(vsk);
->> >
->> > @@ -247,6 +248,11 @@ static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->> > 	return NULL;
->> > }
->> >
->> > +static struct sock *__vsock_find_bound_socket(struct sockaddr_vm *addr)
->> > +{
->> > +	return vsock_find_bound_socket_common(addr, vsock_bound_sockets(addr));
->> > +}
->> > +
->> > static struct sock *__vsock_find_connected_socket(struct sockaddr_vm *src,
->> > 						  struct sockaddr_vm *dst)
->> > {
->> > @@ -646,12 +652,17 @@ static void vsock_pending_work(struct work_struct *work)
->> >
->> > /**** SOCKET OPERATIONS ****/
->> >
->> > -static int __vsock_bind_connectible(struct vsock_sock *vsk,
->> > -				    struct sockaddr_vm *addr)
->> > +static int vsock_bind_common(struct vsock_sock *vsk,
->> > +			     struct sockaddr_vm *addr,
->> > +			     struct list_head *bind_table,
->> > +			     size_t table_size)
->> > {
->> > 	static u32 port;
->> > 	struct sockaddr_vm new_addr;
->> >
->> > +	if (table_size < VSOCK_HASH_SIZE)
->> > +		return -1;
->>
->> Why we need this check now?
->>
->
->If the table_size is not at least VSOCK_HASH_SIZE then the
->VSOCK_HASH(addr) used later could overflow the table.
->
->Maybe this really deserves a WARN() and a comment?
+On Tue, 2023-06-20 at 15:53 +0100, David Howells wrote:
+> Display information about the memory handling MSG_SPLICE_PAGES does to co=
+py
+> slabbed data into page fragments.
+>=20
+> For each CPU that has a cached folio, it displays the folio pfn, the offs=
+et
+> pointer within the folio and the size of the folio.
+>=20
+> It also displays the number of pages refurbished and the number of pages
+> replaced.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Alexander Duyck <alexander.duyck@gmail.com>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: David Ahern <dsahern@kernel.org>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Menglong Dong <imagedong@tencent.com>
+> cc: netdev@vger.kernel.org
+> ---
+>  net/core/skbuff.c | 42 +++++++++++++++++++++++++++++++++++++++---
+>  1 file changed, 39 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index d962c93a429d..36605510a76d 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -83,6 +83,7 @@
+>  #include <linux/user_namespace.h>
+>  #include <linux/indirect_call_wrapper.h>
+>  #include <linux/textsearch.h>
+> +#include <linux/proc_fs.h>
+> =20
+>  #include "dev.h"
+>  #include "sock_destructor.h"
+> @@ -6758,6 +6759,7 @@ nodefer:	__kfree_skb(skb);
+>  struct skb_splice_frag_cache {
+>  	struct folio	*folio;
+>  	void		*virt;
+> +	unsigned int	fsize;
+>  	unsigned int	offset;
+>  	/* we maintain a pagecount bias, so that we dont dirty cache line
+>  	 * containing page->_refcount every time we allocate a fragment.
+> @@ -6767,6 +6769,26 @@ struct skb_splice_frag_cache {
+>  };
+> =20
+>  static DEFINE_PER_CPU(struct skb_splice_frag_cache, skb_splice_frag_cach=
+e);
+> +static atomic_t skb_splice_frag_replaced, skb_splice_frag_refurbished;
 
-Yes, please WARN_ONCE() should be enough.
+(in case we don't agree to restrict this series to just remove
+MSG_SENDPAGE_NOTLAST)
 
-Stefano
+Have you considered percpu counters instead of the above atomics?
+
+I think the increments are in not so unlikely code-paths, and the
+contention there could possibly hurt performances.
+
+Thanks,
+
+Paolo
+
 
 
