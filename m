@@ -1,164 +1,427 @@
-Return-Path: <netdev+bounces-13514-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F24F373BEA1
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:57:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC85273BEBC
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:21:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17E521C212B2
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:57:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6834281CD7
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:21:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE026101CB;
-	Fri, 23 Jun 2023 18:57:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C09FD101EB;
+	Fri, 23 Jun 2023 19:21:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9E8FA93B;
-	Fri, 23 Jun 2023 18:57:38 +0000 (UTC)
-Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E9781FDF;
-	Fri, 23 Jun 2023 11:57:37 -0700 (PDT)
-Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-763d415bd94so51748785a.0;
-        Fri, 23 Jun 2023 11:57:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9399A93B
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:21:07 +0000 (UTC)
+Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BFF4026A5
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:21:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687546656; x=1690138656;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=QTEzk8KxQBuNuPAdkmA38KyChYKwlVchD92bIetqW9E=;
-        b=NQsaSi3XMkHD6aGKyo1ptQIcYKA8MXPS0/41xdAmoTFoHc8Lyg2HzqNradKRLfdtTt
-         e66LEWk7sCtJ4lYVlQCqTiIDaOqpISZjeb+zp9DBdJ1ege3pA2sm5VThSyOKtm2LtH3Z
-         UlXl+JsgvEItSGJLLhwB7pVVPNDZKQSlWDrHAgCSqSc72WMrwzCSMcthxqY6halIu0ol
-         mOK7ZtZshEhON9bvwz46Zr6KlYa9p6i7W0KWcquqES+MJB440MkXfFMFBi5KzYrH+kTI
-         EyRXuxRa1bk8hVRQW91bLcrm6b2RNVNbYKVYaxGrFWy2gTgWY9QTwWVodnUjOA8kHFnb
-         hXtg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687546656; x=1690138656;
-        h=content-transfer-encoding:mime-version:user-agent:references
-         :message-id:date:in-reply-to:subject:cc:to:from:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=QTEzk8KxQBuNuPAdkmA38KyChYKwlVchD92bIetqW9E=;
-        b=HavtD1Mis9BCNfb3y2aBeOPBN0PcWpvAMbjCMKrBLwxJ61eUvGriraC6Ocg+iXzSmQ
-         ONcyysv1Nl188b9Hzm87RQB7cUACYBr6q+RGHdHGSW4BUyGhhuvYkYmBME1UN95U0Hws
-         iNtO+G2ugDY+1pik1dC3yvRygsF1onrvERAApCQKnGZ8QEDZM8tuy46dWTFDC0/O2WUK
-         sHWgZmE73WlDHrmltR6Y3nJjqIzdhvK54fNI/YIJ5sFQdlrNjGmHFABamHQpP3r9FYz9
-         G3ataFMu49jSeH+RoOyZ8wLI5H0oJHg6xVH6PZ1FqKjz4wN7e/i0PTOhCoLgrTc07L5U
-         tprA==
-X-Gm-Message-State: AC+VfDzCxZ9lrl3weeX2LC4capz+/MCEZWqcItOdvRUjoO/SLA2ffm0a
-	Pfm0vex22aFd4xA5fFtTxChvZeTETndmrw==
-X-Google-Smtp-Source: ACHHUZ4UD06DJmMOwYIAQbqX9y2MUiorDlwklwdOIkJqInFS/5DIt3f8xxmq3Z9ZFS2U2bPmOkBGxw==
-X-Received: by 2002:a05:620a:21ce:b0:763:d145:b03c with SMTP id h14-20020a05620a21ce00b00763d145b03cmr7230902qka.3.1687546655832;
-        Fri, 23 Jun 2023 11:57:35 -0700 (PDT)
-Received: from imac ([88.97.103.74])
-        by smtp.gmail.com with ESMTPSA id h10-20020a05620a10aa00b0074411b03972sm1121255qkk.51.2023.06.23.11.57.33
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 11:57:35 -0700 (PDT)
-From: Donald Hunter <donald.hunter@gmail.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Stanislav Fomichev <sdf@google.com>,  bpf <bpf@vger.kernel.org>,  Alexei
- Starovoitov <ast@kernel.org>,  Daniel Borkmann <daniel@iogearbox.net>,
-  Andrii Nakryiko <andrii@kernel.org>,  Martin KaFai Lau
- <martin.lau@linux.dev>,  Song Liu <song@kernel.org>,  Yonghong Song
- <yhs@fb.com>,  John Fastabend <john.fastabend@gmail.com>,  KP Singh
- <kpsingh@kernel.org>,  Hao Luo <haoluo@google.com>,  Jiri Olsa
- <jolsa@kernel.org>,  Network Development <netdev@vger.kernel.org> 
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-In-Reply-To: <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
-	(Alexei Starovoitov's message of "Thu, 22 Jun 2023 19:35:51 -0700")
-Date: Fri, 23 Jun 2023 19:57:10 +0100
-Message-ID: <m2bkh69fcp.fsf@gmail.com>
-References: <20230621170244.1283336-1-sdf@google.com>
-	<20230621170244.1283336-12-sdf@google.com>
-	<20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
-	<CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
-	<CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
-	<CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
-	<CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
-User-Agent: Gnus/5.13 (Gnus v5.13)
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1687548063; x=1719084063;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=geSPaDsxxez3TZHcJAdEufSaO2f7J2MS19PJXxQCY2c=;
+  b=s6SFebSicgO0p7i1prNeyyNlOBvKNt9qEOFCNtBLe9ZJ7P7Ku8ggcUya
+   wZ2q09BMd2xxUndASzoRiTyX5bO/e0jbWhckMZcnb1wQ4c180GYemAzTM
+   wHlQNDMx7heqyIjk7jIx4zbz623cFkRMmjcs91I07/eO66XyQNBD4H5aY
+   o=;
+X-IronPort-AV: E=Sophos;i="6.01,152,1684800000"; 
+   d="scan'208";a="138822573"
+Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-83883bdb.us-west-2.amazon.com) ([10.43.8.2])
+  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 19:21:00 +0000
+Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
+	by email-inbound-relay-pdx-2a-m6i4x-83883bdb.us-west-2.amazon.com (Postfix) with ESMTPS id 780C5609D2;
+	Fri, 23 Jun 2023 19:20:59 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 23 Jun 2023 19:20:59 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.187.171.23) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.26;
+ Fri, 23 Jun 2023 19:20:56 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <wangyufen@huawei.com>
+CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
+	<edumazet@google.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <kuniyu@amazon.com>
+Subject: Re: [PATCH v2 net] ipv6: rpl: Fix Route of Death.
+Date: Fri, 23 Jun 2023 12:20:47 -0700
+Message-ID: <20230623192047.85787-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230623005223.61341-1-kuniyu@amazon.com>
+References: <20230623005223.61341-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.187.171.23]
+X-ClientProxiedBy: EX19D036UWB003.ant.amazon.com (10.13.139.172) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Thu, 22 Jun 2023 17:52:23 -0700
+> From: Kuniyuki Iwashima <kuniyu@amazon.com>
+> Date: Tue, 20 Jun 2023 21:25:13 -0700
+> > From: wangyufen <wangyufen@huawei.com>
+> > Date: Wed, 21 Jun 2023 09:55:13 +0800
+> > > 在 2023/6/20 17:10, Kuniyuki Iwashima 写道:
+> > > > From: wangyufen <wangyufen@huawei.com>
+> > > > Date: Tue, 20 Jun 2023 16:12:26 +0800
+> > > >> 在 2023/6/6 2:06, Kuniyuki Iwashima 写道:
+> > > >>> A remote DoS vulnerability of RPL Source Routing is assigned CVE-2023-2156.
+> > > >>>
+> > > >>> The Source Routing Header (SRH) has the following format:
+> > > >>>
+> > > >>>     0                   1                   2                   3
+> > > >>>     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+> > > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > > >>>     |  Next Header  |  Hdr Ext Len  | Routing Type  | Segments Left |
+> > > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > > >>>     | CmprI | CmprE |  Pad  |               Reserved                |
+> > > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > > >>>     |                                                               |
+> > > >>>     .                                                               .
+> > > >>>     .                        Addresses[1..n]                        .
+> > > >>>     .                                                               .
+> > > >>>     |                                                               |
+> > > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > > >>>
+> > > >>> The originator of an SRH places the first hop's IPv6 address in the IPv6
+> > > >>> header's IPv6 Destination Address and the second hop's IPv6 address as
+> > > >>> the first address in Addresses[1..n].
+> > > >>>
+> > > >>> The CmprI and CmprE fields indicate the number of prefix octets that are
+> > > >>> shared with the IPv6 Destination Address.  When CmprI or CmprE is not 0,
+> > > >>> Addresses[1..n] are compressed as follows:
+> > > >>>
+> > > >>>     1..n-1 : (16 - CmprI) bytes
+> > > >>>          n : (16 - CmprE) bytes
+> > > >>>
+> > > >>> Segments Left indicates the number of route segments remaining.  When the
+> > > >>> value is not zero, the SRH is forwarded to the next hop.  Its address
+> > > >>> is extracted from Addresses[n - Segment Left + 1] and swapped with IPv6
+> > > >>> Destination Address.
+> > > >>>
+> > > >>> When Segment Left is greater than or equal to 2, the size of SRH is not
+> > > >>> changed because Addresses[1..n-1] are decompressed and recompressed with
+> > > >>> CmprI.
+> > > >>>
+> > > >>> OTOH, when Segment Left changes from 1 to 0, the new SRH could have a
+> > > >>> different size because Addresses[1..n-1] are decompressed with CmprI and
+> > > >>> recompressed with CmprE.
+> > > >>>
+> > > >>> Let's say CmprI is 15 and CmprE is 0.  When we receive SRH with Segment
+> > > >>> Left >= 2, Addresses[1..n-1] have 1 byte for each, and Addresses[n] has
+> > > >>> 16 bytes.  When Segment Left is 1, Addresses[1..n-1] is decompressed to
+> > > >>> 16 bytes and not recompressed.  Finally, the new SRH will need more room
+> > > >>> in the header, and the size is (16 - 1) * (n - 1) bytes.
+> > > >>>
+> > > >>> Here the max value of n is 255 as Segment Left is u8, so in the worst case,
+> > > >>> we have to allocate 3825 bytes in the skb headroom.  However, now we only
+> > > >>> allocate a small fixed buffer that is IPV6_RPL_SRH_WORST_SWAP_SIZE (16 + 7
+> > > >>> bytes).  If the decompressed size overflows the room, skb_push() hits BUG()
+> > > >>> below [0].
+> > > >>>
+> > > >>> Instead of allocating the fixed buffer for every packet, let's allocate
+> > > >>> enough headroom only when we receive SRH with Segment Left 1.
+> > > >>>
+> > > >>> [0]:
+> > > >>>
+> > > >>> Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+> > > >>> Reported-by: Max VA
+> > > >>> Closes: https://www.interruptlabs.co.uk/articles/linux-ipv6-route-of-death
+> > > >>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > > >>> ---
+> > > >>> To maintainers:
+> > > >>> Please complement the Reported-by address from the security@ mailing list
+> > > >>> if possible, which checkpatch will complain about.
+> > > >>>
+> > > >>> v2:
+> > > >>>     * Reload oldhdr@ after pskb_expand_head() (Eric Dumazet)
+> > > >>>
+> > > >>> v1: https://lore.kernel.org/netdev/20230605144040.39871-1-kuniyu@amazon.com/
+> > > >>> ---
+> > > >>
+> > > >> When I tested the linux-ipv6-route-of-death issue on Linux 6.4-rc7, I
+> > > >> got the following panic:
+> > > >>
+> > > >> [ 2046.147186] BUG: kernel NULL pointer dereference, address:
+> > > >> 0000000000000000
+> > > >> [ 2046.147978] #PF: supervisor read access in kernel mode
+> > > >> [ 2046.148522] #PF: error_code(0x0000) - not-present page
+> > > >> [ 2046.149082] PGD 8000000187886067 P4D 8000000187886067 PUD 187887067
+> > > >> PMD 0
+> > > >> [ 2046.149788] Oops: 0000 [#1] PREEMPT SMP PTI
+> > > >> [ 2046.150233] CPU: 4 PID: 2093 Comm: python3 Not tainted 6.4.0-rc7 #15
+> > > >> [ 2046.150964] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+> > > >> [ 2046.151566] RIP: 0010:icmp6_send+0x691/0x910
+> > > >> [ 2046.152029] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
+> > > >> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
+> > > >> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
+> > > >> [ 2046.153892] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
+> > > >> [ 2046.154432] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
+> > > >> 0000000000000000
+> > > >> [ 2046.155160] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
+> > > >> 0000000000000001
+> > > >> [ 2046.155881] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
+> > > >> 0000000000000040
+> > > >> [ 2046.156611] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
+> > > >> ffff907d21a28888
+> > > >> [ 2046.157340] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
+> > > >> ffffffff97b03d00
+> > > >> [ 2046.158064] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
+> > > >> knlGS:0000000000000000
+> > > >> [ 2046.158895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > >> [ 2046.159483] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
+> > > >> 00000000000006e0
+> > > >> [ 2046.160205] Call Trace:
+> > > >> [ 2046.160467]  <IRQ>
+> > > >> [ 2046.160693]  ? __die_body+0x1b/0x60
+> > > >> [ 2046.161059]  ? page_fault_oops+0x15b/0x470
+> > > >> [ 2046.161488]  ? fixup_exception+0x22/0x330
+> > > >> [ 2046.161901]  ? exc_page_fault+0x65/0x150
+> > > >> [ 2046.162318]  ? asm_exc_page_fault+0x22/0x30
+> > > >> [ 2046.162750]  ? icmp6_send+0x691/0x910
+> > > >> [ 2046.163137]  ? ip6_route_input+0x187/0x210
+> > > >> [ 2046.163560]  ? __pfx_free_object_rcu+0x10/0x10
+> > > >> [ 2046.164019]  ? __call_rcu_common.constprop.0+0x10a/0x5a0
+> > > >> [ 2046.164568]  ? _raw_spin_lock_irqsave+0x19/0x50
+> > > >> [ 2046.165034]  ? __pfx_free_object_rcu+0x10/0x10
+> > > >> [ 2046.165499]  ? ip6_pkt_drop+0xf2/0x1c0
+> > > >> [ 2046.165890]  ip6_pkt_drop+0xf2/0x1c0
+> > > >> [ 2046.166269]  ipv6_rthdr_rcv+0x122d/0x1310
+> > > >> [ 2046.166684]  ip6_protocol_deliver_rcu+0x4bc/0x630
+> > > >> [ 2046.167173]  ip6_input_finish+0x40/0x60
+> > > >> [ 2046.167568]  ip6_input+0x3b/0xd0
+> > > >> [ 2046.167905]  ? ip6_rcv_core.isra.0+0x2cb/0x5e0
+> > > >> [ 2046.168368]  ipv6_rcv+0x53/0x100
+> > > >> [ 2046.168706]  __netif_receive_skb_one_core+0x63/0xa0
+> > > >> [ 2046.169231]  process_backlog+0xa8/0x150
+> > > >> [ 2046.169626]  __napi_poll+0x2c/0x1b0
+> > > >> [ 2046.169991]  net_rx_action+0x260/0x330
+> > > >> [ 2046.170385]  ? kvm_sched_clock_read+0x5/0x20
+> > > >> [ 2046.170824]  ? kvm_clock_read+0x14/0x30
+> > > >> [ 2046.171226]  __do_softirq+0xe6/0x2d1
+> > > >> [ 2046.171596]  do_softirq+0x80/0xa0
+> > > >> [ 2046.171944]  </IRQ>
+> > > >> [ 2046.172178]  <TASK>
+> > > >> [ 2046.172406]  __local_bh_enable_ip+0x73/0x80
+> > > >> [ 2046.172829]  __dev_queue_xmit+0x331/0xd40
+> > > >> [ 2046.173246]  ? __local_bh_enable_ip+0x37/0x80
+> > > >> [ 2046.173692]  ? ___neigh_create+0x60b/0x8d0
+> > > >> [ 2046.174114]  ? eth_header+0x26/0xc0
+> > > >> [ 2046.174489]  ip6_finish_output2+0x1e7/0x680
+> > > >> [ 2046.174916]  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+> > > >> [ 2046.175462]  ip6_finish_output+0x1df/0x350
+> > > >> [ 2046.175881]  ? nf_hook_slow+0x40/0xc0
+> > > >> [ 2046.176274]  ip6_output+0x6e/0x140
+> > > >> [ 2046.176627]  ? __pfx_ip6_finish_output+0x10/0x10
+> > > >> [ 2046.177096]  rawv6_sendmsg+0x6f9/0x1210
+> > > >> [ 2046.177497]  ? dl_cpu_busy+0x2f3/0x300
+> > > >> [ 2046.177886]  ? __pfx_dst_output+0x10/0x10
+> > > >> [ 2046.178305]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
+> > > >> [ 2046.178825]  ? __wake_up_common_lock+0x91/0xd0
+> > > >> [ 2046.179339]  ? sock_sendmsg+0x8b/0xa0
+> > > >> [ 2046.179791]  ? __pfx_rawv6_sendmsg+0x10/0x10
+> > > >> [ 2046.180246]  sock_sendmsg+0x8b/0xa0
+> > > >> [ 2046.180610]  __sys_sendto+0xfa/0x170
+> > > >> [ 2046.180983]  ? __bitmap_weight+0x4b/0x60
+> > > >> [ 2046.181399]  ? task_mm_cid_work+0x183/0x200
+> > > >> [ 2046.181827]  __x64_sys_sendto+0x25/0x30
+> > > >> [ 2046.182228]  do_syscall_64+0x3b/0x90
+> > > >> [ 2046.182599]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> > > >> [ 2046.183109] RIP: 0033:0x7ff3344a668a
+> > > >> [ 2046.183493] Code: 48 c7 c0 ff ff ff ff eb bc 0f 1f 80 00 00 00 00 f3
+> > > >> 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f
+> > > >> 05 <48> 3d 00 f0 ff ff 77 76 c3 0f 1f 44 00 00 55 48 83 ec 30 44 89 4c
+> > > >> [ 2046.185326] RSP: 002b:00007ffc82a34658 EFLAGS: 00000246 ORIG_RAX:
+> > > >> 000000000000002c
+> > > >> [ 2046.186083] RAX: ffffffffffffffda RBX: 00007ffc82a346f0 RCX:
+> > > >> 00007ff3344a668a
+> > > >> [ 2046.186799] RDX: 0000000000000060 RSI: 00007ff33112db00 RDI:
+> > > >> 0000000000000003
+> > > >> [ 2046.187515] RBP: 000000000159cd90 R08: 00007ffc82a34770 R09:
+> > > >> 000000000000001c
+> > > >> [ 2046.188230] R10: 0000000000000000 R11: 0000000000000246 R12:
+> > > >> 0000000000000000
+> > > >> [ 2046.188958] R13: 0000000000000000 R14: 00007ffc82a346f0 R15:
+> > > >> 0000000000451072
+> > > >> [ 2046.189675]  </TASK>
+> > > >> [ 2046.189909] Modules linked in: fuse rfkill binfmt_misc cirrus
+> > > >> drm_shmem_helper joydev drm_kms_helper sg syscopyarea sysfillrect
+> > > >> sysimgblt virtio_balloon serio_raw squashfs parport_pc ppdev lp parport
+> > > >> ramoops reed_solomon drm ip_tables x_tables xfs sd_mod t10_pi
+> > > >> crc64_rocksoft crc64 ata_generic ata_piix virtio_net net_failover
+> > > >> failover libata e1000 i2c_piix4
+> > > >> [ 2046.193039] CR2: 0000000000000000
+> > > >> [ 2046.193400] ---[ end trace 0000000000000000 ]---
+> > > >> [ 2046.193870] RIP: 0010:icmp6_send+0x691/0x910
+> > > >> [ 2046.194315] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
+> > > >> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
+> > > >> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
+> > > >> [ 2046.196146] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
+> > > >> [ 2046.196672] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
+> > > >> 0000000000000000
+> > > >> [ 2046.197388] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
+> > > >> 0000000000000001
+> > > >> [ 2046.198096] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
+> > > >> 0000000000000040
+> > > >> [ 2046.198825] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
+> > > >> ffff907d21a28888
+> > > >> [ 2046.199537] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
+> > > >> ffffffff97b03d00
+> > > >> [ 2046.200253] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
+> > > >> knlGS:0000000000000000
+> > > >> [ 2046.201044] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > >> [ 2046.201624] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
+> > > >> 00000000000006e0
+> > > >> [ 2046.202340] Kernel panic - not syncing: Fatal exception in interrupt
+> > > >> [ 2046.203655] Kernel Offset: 0x12e00000 from 0xffffffff81000000
+> > > >> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > > >> [ 2046.204731] ---[ end Kernel panic - not syncing: Fatal exception in
+> > > >> interrupt ]---
+> > > > 
+> > > > Please decode the stack trace.
+> > > > 
+> > > > $ cat <<EOF | ./scripts/decode_stacktrace.sh vmlinux
+> > > > PASTE YOUR TRACE HERE
+> > > > EOF
+> > > > 
+> > > > 
+> > > >>
+> > > >>
+> > > >> The test procedure is as follows:
+> > > >> # sysctl -a | grep -i rpl_seg_enabled
+> > > >> net.ipv6.conf.all.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.default.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.dummy0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.ens3.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.ens4.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.erspan0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.gre0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.gretap0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.ip6_vti0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.ip6gre0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.ip6tnl0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.ip_vti0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.lo.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.sit0.rpl_seg_enabled = 1
+> > > >> net.ipv6.conf.tunl0.rpl_seg_enabled = 1
+> > > >>
+> > > >> # python3
+> > > >> Python 3.8.10 (default, Nov 14 2022, 12:59:47)
+> > > >> [GCC 9.4.0] on linux
+> > > >> Type "help", "copyright", "credits" or "license" for more information.
+> > > >>   >>> from scapy.all import *
+> > > >>   >>> import socket
+> > > >>   >>> DST_ADDR = "fe80::266:88ff:fe99:7419"
+> > > >>   >>> SRC_ADDR = DST_ADDR
+> > > >>   >>> sockfd = socket.socket(socket.AF_INET6, socket.SOCK_RAW,
+> > > >> socket.IPPROTO_RAW)
+> > > >>   >>> p = IPv6(src=SRC_ADDR, dst=DST_ADDR) /
+> > > >> IPv6ExtHdrSegmentRouting(type=3, addresses=["a8::", "a7::", "a6::"],
+> > > >> segleft=1, lastentry=0xf0)
+> > > >>   >>> sockfd.sendto(bytes(p), (DST_ADDR, 0))
+> > > >>
+> > > >> Is this a new issue?
+> > > > 
+> > > > Can you test this ?  I couldn't reproduce the issue on my setup...
+> > > > 
+> > > > ---8<---
+> > > > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+> > > > index 202fc3aaa83c..f2890c391e3b 100644
+> > > > --- a/net/ipv6/exthdrs.c
+> > > > +++ b/net/ipv6/exthdrs.c
+> > > > @@ -587,7 +587,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+> > > >   	skb_pull(skb, ((hdr->hdrlen + 1) << 3));
+> > > >   	skb_postpull_rcsum(skb, oldhdr,
+> > > >   			   sizeof(struct ipv6hdr) + ((hdr->hdrlen + 1) << 3));
+> > > > -	if (unlikely(!hdr->segments_left)) {
+> > > > +	if (unlikely(!hdr->segments_left) || skb_cloned(skb)) {
+> > > >   		if (pskb_expand_head(skb, sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3), 0,
+> > > >   				     GFP_ATOMIC)) {
+> > > >   			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_OUTDISCARDS);
+> > > > ---8<---
+> > > 
+> > > I tested it and the problem persisted, and attached the config I used.
+> > > 
+> > > Also,the DST_ADDR = "fe80::266:88ff:fe99:7419" I used the  the 
+> > > link-local address of the local NIC ens4.
+> > > 
+> > > # ip addr show dev ens4
+> > > 12: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel 
+> > > state UP group default qlen 1000
+> > >      link/ether 00:66:88:99:74:19 brd ff:ff:ff:ff:ff:ff
+> > >      altname enp0s4
+> > >      inet 169.254.6.143/16 brd 169.254.255.255 scope link ens4:avahi
+> > >         valid_lft forever preferred_lft forever
+> > >      inet6 fe80::266:88ff:fe99:7419/64 scope link
+> > >         valid_lft forever preferred_lft forever
+> > > 
+> > > The test machine is an Ubuntu 20.04.4 LTS VM.
+> > 
+> > Could you provide your decoded stack trace ?
+> > 
+> > It seems the packet is dropped.  I'd like to know where it happens.
+> 
+> Ok, I think I reproduced your issue by forcibly calling
+> ip6_pkt_discard_out() for the skb.
 
-> On Thu, Jun 22, 2023 at 3:13=E2=80=AFPM Stanislav Fomichev <sdf@google.co=
-m> wrote:
->>
->> We want to provide common sane interfaces/abstractions via kfuncs.
->> That will make most BPF programs portable from mlx to brcm (for
->> example) without doing a rewrite.
->> We're also exposing raw (readonly) descriptors (via that get_ctx
->> helper) to the users who know what to do with them.
->> Most users don't know what to do with raw descriptors;
->
-> Why do you think so?
-> Who are those users?
-> I see your proposal and thumbs up from onlookers.
-> afaict there are zero users for rx side hw hints too.
+I just forgot to "return -1" after this, that leads to null-ptr-deref
+in ipv6_rthdr_rcv(), not icmp6_send().
 
-We have customers in various sectors that want to use rx hw timestamps.
+So, I didn't reproduce the issue.
 
-There are several use cases especially in Telco where they use DPDK
-today and want to move to AF_XDP but they need to be able to benefit
-from the hw capabilities of the NICs they purchase. Not having access to
-hw offloads on rx and tx is a barrier to AF_XDP adoption.
+Also, I should have used ip6_pkt_discard().  Neither didn't reproduce
+it with return -1 though.
 
-The most notable gaps in AF_XDP are checksum offloads and multi buffer
-support.
+Could you provide these info ?
 
->> the specs are
->> not public; things can change depending on fw version/etc/etc.
->> So the progs that touch raw descriptors are not the primary use-case.
->> (that was the tl;dr for rx part, seems like it applies here?)
->>
->> Let's maybe discuss that mlx5 example? Are you proposing to do
->> something along these lines?
->>
->> void mlx5e_devtx_submit(struct mlx5e_tx_wqe *wqe);
->> void mlx5e_devtx_complete(struct mlx5_cqe64 *cqe);
->>
->> If yes, I'm missing how we define the common kfuncs in this case. The
->> kfuncs need to have some common context. We're defining them with:
->> bpf_devtx_<kfunc>(const struct devtx_frame *ctx);
->
-> I'm looking at xdp_metadata and wondering who's using it.
-> I haven't seen a single bug report.
-> No bugs means no one is using it. There is zero chance that we managed
-> to implement it bug-free on the first try.
+* the log of skb_dump() with the diff below
+* decoded stack trace
+* the output of
+  * ip -d rule
+  * ip -d route (for all tables)
+  * ip -d neigh
 
-Nobody is using xdp_metadata today, not because they don't want to, but
-because there was no consensus for how to use it. We have internal POCs
-that use xdp_metadata and are still trying to build the foundations
-needed to support it consistently across different hardware. Jesper
-Brouer proposed a way to describe xdp_metadata with BTF and it was
-rejected. The current plan to use kfuncs for xdp hints is the most
-recent attempt to find a solution.
-
-> So new tx side things look like a feature creep to me.
-> rx side is far from proven to be useful for anything.
-> Yet you want to add new things.
-
-We have telcos and large enterprises that either use DPDK or use
-proprietary solutions for getting traffic to user space. They want to
-move to AF_XDP but without at least RX and TX checksum offloads they are
-paying a CPU tax for using AF_XDP. One customer is also waiting for
-multi-buffer support to land before they can adopt AF_XDP.
-
-So, no it's not feature creep, it's a set of required features to reach
-minimum viable product to be able to move out of a lab and replace
-legacy in production.
+---8<---
+diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+index 5fa0e37305d9..41e9256cb81e 100644
+--- a/net/ipv6/exthdrs.c
++++ b/net/ipv6/exthdrs.c
+@@ -642,6 +642,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+ 	ip6_route_input(skb);
+ 
+ 	if (skb_dst(skb)->error) {
++		skb_dump(KERN_ERR, skb, true);
+ 		dst_input(skb);
+ 		return -1;
+ 	}
+@@ -660,6 +661,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+ 		goto looped_back;
+ 	}
+ 
++	skb_dump(KERN_ERR, skb, true);
+ 	dst_input(skb);
+ 
+ 	return -1;
+---8<---
 
