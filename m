@@ -1,469 +1,202 @@
-Return-Path: <netdev+bounces-13601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13553-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0126173C2B1
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:23:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D79973C00D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:36:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 955BD1C209C7
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:23:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0BD50281D1A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:36:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3447B15496;
-	Fri, 23 Jun 2023 21:23:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2541610964;
+	Fri, 23 Jun 2023 20:36:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 282E114AA5
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 21:23:35 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 174BB2727;
-	Fri, 23 Jun 2023 14:23:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687555414; x=1719091414;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=xGfpaAWl8R4dQq8aTwhQbc9JaUMdQXtgHMiT4gghfgE=;
-  b=i1hCY247AvSFVemOpLofOpT8imf4xbubZbe0f6QMjbSQ7xcqXM8ws11G
-   P9CQHmPXB3Pzk6PbBogpz+wEVjJ06wVegOviBRDzNbcinpeNipXCztdzU
-   2duRwC7BoZRrwIDwORGr5qLQXNUW6IqTyhEYCTVGbjZB0GfnHdgndmbr5
-   Bii8xeYJtF4g5Whmiyvjl5NtbX8T73yhhs5g6RdUOzERsdxTOMepLN2V9
-   h4tKODnAgrchtiTpMsEdaHossr3cwmcdNcP7ThHpLSLbqzDUxZFHXiZZr
-   PF9spGBWscuBs51fpXpWLvXZkjBf1XZ8cMCI4YWyZagl9+hZ41XWtXi1Q
-   g==;
-X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="219557463"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:23:32 -0700
-Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:53:26 -0700
-Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:52:57 -0700
-From: Varshini Rajendran <varshini.rajendran@microchip.com>
-To: <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
-	<alexandre.belloni@bootlin.com>, <claudiu.beznea@microchip.com>,
-	<mturquette@baylibre.com>, <sboyd@kernel.org>, <herbert@gondor.apana.org.au>,
-	<davem@davemloft.net>, <vkoul@kernel.org>, <tglx@linutronix.de>,
-	<maz@kernel.org>, <lee@kernel.org>, <ulf.hansson@linaro.org>,
-	<tudor.ambarus@linaro.org>, <miquel.raynal@bootlin.com>, <richard@nod.at>,
-	<vigneshr@ti.com>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <linus.walleij@linaro.org>, <p.zabel@pengutronix.de>,
-	<olivia@selenic.com>, <a.zummo@towertech.it>, <radu_nicolae.pirea@upb.ro>,
-	<richard.genoud@gmail.com>, <gregkh@linuxfoundation.org>,
-	<lgirdwood@gmail.com>, <broonie@kernel.org>, <wim@linux-watchdog.org>,
-	<linux@roeck-us.net>, <arnd@arndb.de>, <olof@lixom.net>, <soc@kernel.org>,
-	<linux@armlinux.org.uk>, <sre@kernel.org>, <jerry.ray@microchip.com>,
-	<horatiu.vultur@microchip.com>, <durai.manickamkr@microchip.com>,
-	<varshini.rajendran@microchip.com>, <andrew@lunn.ch>,
-	<alain.volmat@foss.st.com>, <neil.armstrong@linaro.org>,
-	<mihai.sain@microchip.com>, <eugen.hristev@collabora.com>,
-	<devicetree@vger.kernel.org>, <linux-arm-kernel@lists.infradead.org>,
-	<linux-kernel@vger.kernel.org>, <linux-clk@vger.kernel.org>,
-	<linux-crypto@vger.kernel.org>, <dmaengine@vger.kernel.org>,
-	<linux-i2c@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-	<linux-mtd@lists.infradead.org>, <netdev@vger.kernel.org>,
-	<linux-gpio@vger.kernel.org>, <linux-rtc@vger.kernel.org>,
-	<linux-spi@vger.kernel.org>, <linux-serial@vger.kernel.org>,
-	<alsa-devel@alsa-project.org>, <linux-usb@vger.kernel.org>,
-	<linux-watchdog@vger.kernel.org>, <linux-pm@vger.kernel.org>
-CC: <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
-	<balamanikandan.gunasundar@microchip.com>, <manikandan.m@microchip.com>,
-	<dharma.b@microchip.com>, <nayabbasha.sayed@microchip.com>,
-	<balakrishnan.s@microchip.com>
-Subject: [PATCH v2 45/45] ARM: dts: at91: sam9x75_curiosity: add device tree for sam9x75 curiosity board
-Date: Sat, 24 Jun 2023 02:00:56 +0530
-Message-ID: <20230623203056.689705-46-varshini.rajendran@microchip.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
-References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 117D9111A0
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 20:36:19 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2137.outbound.protection.outlook.com [40.107.220.137])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B72492728;
+	Fri, 23 Jun 2023 13:35:48 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bj5INSm+hVQFY2BXP1OEtvI4DGWU5c33Wa+tbhMI1QBJAgRqesCO1h9W1YqHTbMJtGffKvELLPaNCHJJZzd2prmQSWkEVA7gA6tMU+43UireIV4ymQbpEr3IajvsLnuJIwGvo4hR5I2cAsCgP0hemWlSk5OQVL3G6YxbBwThFZit9o5EKTL4T/qNgDLqmYXPBkZ4f+1IYZ79pIo06KibtmWkCsZaPI1pIz9WzKNjQY7V6/Mr3rw2tjSZu/mmqrcAn2RO/TgDO4en4DF5mnOGdwN2pSf9NKv6R51PQecTVv6nMtZeWV59uBRhMbIKwEBL3oC05If6HnAy/iARVmGtbA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2MWAnSCtg2nZ+ZiOCxtfm+6oQoUOHmnAw7aohQcR9cc=;
+ b=AN26NWxeTkG9+5j9zuoLYfYjDXtSrEQi3ydKeYJqyzLbwvH8ZOL1TfbmCGmEIEB1d9rXDiiXzyIcS5h8qmZNxE689E2a3I9eZDsfg59NJeNVC10JTnudaDA5RfneLNXBRnq8O/Gh5FIFoThDfsiRCGx53Ad93e/FFoPy1NtuvdDE/S6+nBEDdMQveBKVzlGkPCJORCQn2wFrfq6NZmrNUQXMMRdK7+A5Z/L0A190w7F7nILq22chdewbDUcVavF0FKvI/Xuam//9Af6DLjupfSGLVoumYxT3HRKE62WB9ovgT/qRte9qEk0FPFbiKUJFCoKJUprpN+/LwnCulu+hSg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2MWAnSCtg2nZ+ZiOCxtfm+6oQoUOHmnAw7aohQcR9cc=;
+ b=YiB/lQ1C78DPE6iFA+uJ4WnfUO4J6yGcmsYJFgPm2o/kmXKg1nQbCV3zIoB9xLNgTLyOW/5Inv/6nfDXLIA0Af82OO9IbIclUnrhwhVs5FRZ6TZNpKuALPZaqAIt20F8IwgcS7jiblAQZY5IOq0gllIN/86/nX3QGdBkYUvcEms=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY3PR13MB5028.namprd13.prod.outlook.com (2603:10b6:a03:360::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Fri, 23 Jun
+ 2023 20:35:24 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Fri, 23 Jun 2023
+ 20:35:24 +0000
+Date: Fri, 23 Jun 2023 22:35:17 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Michael Walle <mwalle@kernel.org>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 06/10] net: phy: print an info if a broken
+ C45 bus is found
+Message-ID: <ZJYCBeKdXBot/9Xd@corigine.com>
+References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
+ <20230620-feature-c45-over-c22-v2-6-def0ab9ccee2@kernel.org>
+ <af166ce6-b9b2-44e0-9f45-2b2aa001fd6b@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <af166ce6-b9b2-44e0-9f45-2b2aa001fd6b@lunn.ch>
+X-ClientProxiedBy: AS4PR10CA0020.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d8::10) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB5028:EE_
+X-MS-Office365-Filtering-Correlation-Id: 59a92630-3c9c-4219-fdbb-08db74295f4d
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1KRxLjhpUupTlXGrWyxbqYozHzRjgRlTn+USPPQ49Og/nppSnkeO6EzJDwr4gWEDoYMG7sJNhmSH7705GFtx6cNVSzGvMQCvYK2IAgQMRIh2Z/Y/UPyLGgptrjEHX8TPWXeb4gmqwea/vM+8L3COUP/gzEwvWjhgtgBeUr3zZEXRvGRvC6PKRsa2hIo72k2S4dlrI3CjQPRmQQ4LYm7sbnfqG8y7Hp/KVVkgOahFkOMlQJs+0tKrC7eYCcb40JBNplz9ipymN+lg8nkbf5kWEl0FftaoWun6v2QSzrx9pVTz/O8pM4434dByYsjGpWAaxAe2+P5Fq4Pdj65Wvxhiyi/mifOYR7utXKHMQ9hAI2GU7FtmJRg7Szsa16SnzSLnHv/q1lFnURiw2iHY07/WrrU+t84XZjL0YzKkPldZByIk6KHXD9PAEZXvlZjdFwJJOXU2cQeNKwILNfNIQOXGqmJnPTviMSs2jPM9YX+g2vcOStvU2mhvhWvP8R5ZYl6V9rLuXoK5BuJUdUhOGXjOwPBkHSZaeAGnmgCqOCNXHVKyfhW8nriq290MoaJwKODxYpuTJ/1x53mF48mTbgb8QSwEWXeRCD3Dc9OhPngH5nE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(376002)(39840400004)(366004)(451199021)(2906002)(6486002)(83380400001)(6666004)(38100700002)(2616005)(6506007)(6512007)(186003)(41300700001)(86362001)(54906003)(316002)(478600001)(66946007)(66556008)(66476007)(36756003)(6916009)(4326008)(5660300002)(7416002)(8936002)(8676002)(44832011);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?dnYU5Q2GRDSkkCaJkxjSYErkZFsN0PEWaAfaTuj5cD+dvzJPcFKkDTC+TSRO?=
+ =?us-ascii?Q?1SR+cTqaXrGLgMtfr93f5GHZ/L2tSP1jQCz89hrkD+4YXAwbn6nbJVkeMiU9?=
+ =?us-ascii?Q?E+BXT1xD5HUtQCiPIWdXnTycyqxEqJGOMX4lIulzFuLaozKDJ1GahrxJqdn1?=
+ =?us-ascii?Q?ssoia8AjfBanqkWdBQcYLCHOtanf3qIZtlGxdY3KdHt1xxsf1lGoXVswNWcg?=
+ =?us-ascii?Q?ymdLcpuNuBtzb3YcJyHUHogYe6DkZYWyVre5hZj7TqOD1r4loFDFobupqM5A?=
+ =?us-ascii?Q?PmHkeaiR/DqlaIZlRH5i2NNrqPSsYdizGT15Nf3SPThnms/YfoJyLdoe5idD?=
+ =?us-ascii?Q?8BGvyagBhxALgwxkMlgn3PIV/W5XUmCf8TwjpzPE/ZvdAO3m1cpEb3R+Laxr?=
+ =?us-ascii?Q?/zLL6ldZS4t4gFznnv0hL1aFTJKXI8uu9h3L/m7HCAfLPTUswaKccBccShI4?=
+ =?us-ascii?Q?VKRt3XcOKY1jIjAbHSZrna1TmPwI5L4/zr0iD5/GEt4Mdw7Pqt2XqTpEKeSO?=
+ =?us-ascii?Q?/eu5MdBtpE0z2qa6krOqVWzMpReGXp7IE9NC5x6yNPl2wArQoERNQH4tLAp5?=
+ =?us-ascii?Q?plYdxAngT1UXyJfU16idvDmQO4FohHLFMUKUVLRD3PVbgVJ6+iUSPFV91bl9?=
+ =?us-ascii?Q?tA0tddDLyOsA+OGc1nCyTmzKGFmtHZFkuW34B61sPTP/KXGhPCOgIeJbt6gB?=
+ =?us-ascii?Q?J96OnFs5fnZFcTTsEeSghpOtQsmoKFarBELzzARdsd/mTwH4DHW9LhEC5/4t?=
+ =?us-ascii?Q?eryxqYKeoG01QzHvsdCq8epmnH9kmrIUrGvzFv95oh1Tkdf7+yKM0AAWBhDw?=
+ =?us-ascii?Q?RnCK5Lwyg4ud8pUS2ParLsxy2OJ+X9L+l0PHFXqVd+snCiXGIOrIqJVicsjn?=
+ =?us-ascii?Q?xiZ7WcII1BykLrixqerrtReJiJXoDtKA3vA9gBj2xaJYrKOKpWH1qwG2Ez84?=
+ =?us-ascii?Q?VdoMYKVeXbhB7ojtcW2fD9BEIclxGh0dmEhXQquCBJwI3Cc27rq8w70jm6sI?=
+ =?us-ascii?Q?5RVNZimAymVP7Zy36+2mzcboYonhjnbxkRCefZ1YLXEB2jS6eeVSzJg6LjFc?=
+ =?us-ascii?Q?+SiqhwkYFBntOyBGGAzAZHXQm0OEa5qUuvWjwU8kKIUSiyyWdSMfbpzMyuLY?=
+ =?us-ascii?Q?si37eMPSoy7ixd/PXxEFdE5E1O/Ha6n2SWe8QInOvgRlPY5th7MY661hEKa5?=
+ =?us-ascii?Q?Gt+mxHAWZC/eEC/5VSovYZUXN1pSLhsW0Glp7Xgi1vmy8RO262Pi/0B1PwHz?=
+ =?us-ascii?Q?btK1N3APH8+5yuNiQHJflxwVTybIC5V5xfx0+zXX9D/yzGrhZ9xSELXT0hyM?=
+ =?us-ascii?Q?mBwQd2tENdhSqVDED3cewrhRDDf4gVMn8sFPhAaaWYd2h46GsEoTnLXdR4Iz?=
+ =?us-ascii?Q?izyFACpIiOAUf1NPhkwlcfyScd8E25/LNMKsKOWpIpMk+V2zmhOKb0zJftDp?=
+ =?us-ascii?Q?bzBwU4ljnpTVU9whodIFDs3L5P3st5JuhDiRgJFdKV1pr5ZnmlPdti/yUgay?=
+ =?us-ascii?Q?dT2Wd+YEhLNAhtcAZH8vPAgy/pqKMT2Qq6jYQfN22G5IFLd1NFhmIb7Y7exL?=
+ =?us-ascii?Q?8FqCa/rjRfAM+3bJ7MHfb8GyGWgMCJzQlntxhyI3nYwTVgkFJLuNWe9eYb5x?=
+ =?us-ascii?Q?i8iChoKh+yKAsWb0xAAICcw3GrUYtQ13emRrq9Auo/F3GjelI6xR7BZ97sIk?=
+ =?us-ascii?Q?xxgWzQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 59a92630-3c9c-4219-fdbb-08db74295f4d
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 20:35:24.5922
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cue6vw3SReiGC/sPLFYz1wIdc/XQTd5QmgDEz4GCrCFgPJR1V90ss8Umo9skkocYA/rnQG7ppINWpvcqDhnGkLXd03ivGIZknZOveV5r4TU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB5028
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add device tree file for sam9x75 curiosity board.
+On Fri, Jun 23, 2023 at 07:42:08PM +0200, Andrew Lunn wrote:
+> On Fri, Jun 23, 2023 at 12:29:15PM +0200, Michael Walle wrote:
+> > If there is an PHY which gets confused by C45 transactions on the MDIO
+> > bus, print an info together with the PHY identifier of the offending
+> > one.
+> > 
+> > Signed-off-by: Michael Walle <mwalle@kernel.org>
+> > 
+> > ---
+> > I wasn't sure if this should be phydev_dbg() or phydev_info(). I mainly
+> > see this as an info to a user why some PHYs might not be probed (or
+> > c45-over-c22 is used later).
+> 
+> The information is useful to the DT writer, not the 'user'. I would
+> assume the DT writer has a bit more kernel knowledge and can debug
+> prints on. So i would suggest phydev_dbg().
+> 
+> > @@ -617,10 +617,10 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
+> >   */
+> >  void mdiobus_scan_for_broken_c45_access(struct mii_bus *bus)
+> >  {
+> > +	struct phy_device *phydev;
+> >  	int i;
+> >  
+> >  	for (i = 0; i < PHY_MAX_ADDR; i++) {
+> > -		struct phy_device *phydev;
+> >  		u32 oui;
+> 
+> It is not clear why you changed the scope of phydev. I guess another
+> version used phydev_info(), where as now you have dev_info()?
 
-Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
----
- arch/arm/boot/dts/Makefile                   |   2 +
- arch/arm/boot/dts/at91-sam9x75_curiosity.dts | 336 +++++++++++++++++++
- 2 files changed, 338 insertions(+)
- create mode 100644 arch/arm/boot/dts/at91-sam9x75_curiosity.dts
+I think it is so it can be used in the dev_info() call below.
+However Smatch has it's doubts that it is always initialised there.
 
-diff --git a/arch/arm/boot/dts/Makefile b/arch/arm/boot/dts/Makefile
-index 59829fc90315..31f357f8e947 100644
---- a/arch/arm/boot/dts/Makefile
-+++ b/arch/arm/boot/dts/Makefile
-@@ -53,6 +53,8 @@ dtb-$(CONFIG_SOC_AT91SAM9) += \
- dtb-$(CONFIG_SOC_SAM9X60) += \
- 	at91-sam9x60_curiosity.dtb \
- 	at91-sam9x60ek.dtb
-+dtb-$(CONFIG_SOC_SAM9X7) += \
-+	at91-sam9x75_curiosity.dtb
- dtb-$(CONFIG_SOC_SAM_V7) += \
- 	at91-kizbox2-2.dtb \
- 	at91-kizbox3-hs.dtb \
-diff --git a/arch/arm/boot/dts/at91-sam9x75_curiosity.dts b/arch/arm/boot/dts/at91-sam9x75_curiosity.dts
-new file mode 100644
-index 000000000000..56d3af549201
---- /dev/null
-+++ b/arch/arm/boot/dts/at91-sam9x75_curiosity.dts
-@@ -0,0 +1,336 @@
-+// SPDX-License-Identifier: (GPL-2.0+ OR MIT)
-+/*
-+ * at91-sam9x75_curiosity.dts - Device Tree file for Microchip SAM9X75 Curiosity board
-+ *
-+ * Copyright (C) 2023 Microchip Technology Inc. and its subsidiaries
-+ *
-+ * Author: Varshini Rajendran <varshini.rajendran@microchip.com>
-+ */
-+/dts-v1/;
-+#include "sam9x7.dtsi"
-+#include <dt-bindings/input/input.h>
-+
-+/ {
-+	model = "Microchip SAM9X75 Curiosity";
-+	compatible = "microchip,sam9x75-curiosity", "microchip,sam9x7", "atmel,at91sam9";
-+
-+	aliases {
-+		i2c0 = &i2c6;
-+		i2c1 = &i2c7;
-+	};
-+
-+	chosen {
-+		stdout-path = "serial0:115200n8";
-+	};
-+
-+	clocks {
-+		clock-slowxtal {
-+			clock-frequency = <32768>;
-+		};
-+
-+		clock-mainxtal {
-+			clock-frequency = <24000000>;
-+		};
-+	};
-+
-+	gpio-keys {
-+		compatible = "gpio-keys";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_key_gpio_default>;
-+		status = "okay";
-+
-+		button-user {
-+			label = "USER";
-+			gpios = <&pioC 9 GPIO_ACTIVE_LOW>;
-+			linux,code = <KEY_PROG1>;
-+			wakeup-source;
-+		};
-+	};
-+
-+	leds {
-+		compatible = "gpio-leds";
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_led_gpio_default>;
-+		status = "okay";
-+
-+		led-0 {
-+			label = "red";
-+			gpios = <&pioC 19 GPIO_ACTIVE_HIGH>;
-+		};
-+
-+		led-1 {
-+			label = "green";
-+			gpios = <&pioC 21 GPIO_ACTIVE_HIGH>;
-+		};
-+
-+		led-2 {
-+			label = "blue";
-+			gpios = <&pioC 20 GPIO_ACTIVE_HIGH>;
-+			linux,default-trigger = "heartbeat";
-+		};
-+	};
-+
-+	memory@20000000 {
-+		device_type = "memory";
-+		reg = <0x20000000 0x10000000>;
-+	};
-+};
-+
-+&dbgu {
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_dbgu>;
-+	status = "okay";
-+};
-+
-+&dma0 {
-+	status = "okay";
-+};
-+
-+&ehci0 {
-+	status = "okay";
-+};
-+
-+&flx6 {
-+	atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_TWI>;
-+	status = "okay";
-+
-+	i2c6: i2c@600 {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_flx6_default>;
-+		i2c-analog-filter;
-+		i2c-digital-filter;
-+		i2c-digital-filter-width-ns = <35>;
-+		status = "okay";
-+
-+		mcp16502@5b {
-+			compatible = "microchip,mcp16502";
-+			reg = <0x5b>;
-+			status = "okay";
-+
-+			regulators {
-+				vdd_3v3: VDD_IO {
-+					regulator-name = "VDD_IO";
-+					regulator-min-microvolt = <3000000>;
-+					regulator-max-microvolt = <3600000>;
-+					regulator-initial-mode = <2>;
-+					regulator-allowed-modes = <2>, <4>;
-+					regulator-always-on;
-+
-+					regulator-state-standby {
-+						regulator-on-in-suspend;
-+						regulator-mode = <4>;
-+					};
-+
-+					regulator-state-mem {
-+						regulator-mode = <4>;
-+					};
-+				};
-+
-+				vddioddr: VDD_DDR {
-+					regulator-name = "VDD_DDR";
-+					regulator-min-microvolt = <1283000>;
-+					regulator-max-microvolt = <1450000>;
-+					regulator-initial-mode = <2>;
-+					regulator-allowed-modes = <2>, <4>;
-+					regulator-always-on;
-+
-+					regulator-state-standby {
-+						regulator-on-in-suspend;
-+						regulator-mode = <4>;
-+					};
-+
-+					regulator-state-mem {
-+						regulator-on-in-suspend;
-+						regulator-mode = <4>;
-+					};
-+				};
-+
-+				vddcore: VDD_CORE {
-+					regulator-name = "VDD_CORE";
-+					regulator-min-microvolt = <500000>;
-+					regulator-max-microvolt = <1210000>;
-+					regulator-initial-mode = <2>;
-+					regulator-allowed-modes = <2>, <4>;
-+					regulator-always-on;
-+
-+					regulator-state-standby {
-+						regulator-on-in-suspend;
-+						regulator-mode = <4>;
-+					};
-+
-+					regulator-state-mem {
-+						regulator-mode = <4>;
-+					};
-+				};
-+
-+				vddcpu: VDD_OTHER {
-+					regulator-name = "VDD_OTHER";
-+					regulator-min-microvolt = <1700000>;
-+					regulator-max-microvolt = <3600000>;
-+					regulator-initial-mode = <2>;
-+					regulator-allowed-modes = <2>, <4>;
-+					regulator-ramp-delay = <3125>;
-+					regulator-always-on;
-+
-+					regulator-state-standby {
-+						regulator-on-in-suspend;
-+						regulator-mode = <4>;
-+					};
-+
-+					regulator-state-mem {
-+						regulator-mode = <4>;
-+					};
-+				};
-+
-+				vldo1: LDO1 {
-+					regulator-name = "LDO1";
-+					regulator-min-microvolt = <1200000>;
-+					regulator-max-microvolt = <3700000>;
-+					regulator-always-on;
-+
-+					regulator-state-standby {
-+						regulator-on-in-suspend;
-+					};
-+				};
-+
-+				vldo2: LDO2 {
-+					regulator-name = "LDO2";
-+					regulator-min-microvolt = <1200000>;
-+					regulator-max-microvolt = <3700000>;
-+
-+					regulator-state-standby {
-+						regulator-on-in-suspend;
-+					};
-+				};
-+			};
-+		};
-+	};
-+};
-+
-+&flx7 {
-+	atmel,flexcom-mode = <ATMEL_FLEXCOM_MODE_TWI>;
-+	status = "okay";
-+
-+	i2c7: i2c@600 {
-+		#address-cells = <1>;
-+		#size-cells = <0>;
-+		pinctrl-names = "default";
-+		pinctrl-0 = <&pinctrl_flx7_default>;
-+		i2c-analog-filter;
-+		i2c-digital-filter;
-+		i2c-digital-filter-width-ns = <35>;
-+		status = "okay";
-+	};
-+};
-+
-+&ohci0 {
-+	num-ports = <3>;
-+	atmel,vbus-gpio = <0
-+			   &pioC 27 GPIO_ACTIVE_HIGH
-+			   &pioB 18 GPIO_ACTIVE_HIGH>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_usb_default>;
-+	status = "okay";
-+};
-+
-+&pinctrl {
-+
-+	dbgu {
-+		pinctrl_dbgu: dbgu-0 {
-+			atmel,pins = <AT91_PIOA 26 AT91_PERIPH_A AT91_PINCTRL_PULL_UP
-+				      AT91_PIOA 27 AT91_PERIPH_A AT91_PINCTRL_NONE>;
-+		};
-+	};
-+
-+	flexcom {
-+		pinctrl_flx6_default: flx6_twi {
-+			atmel,pins =
-+				<AT91_PIOA 24 AT91_PERIPH_A AT91_PINCTRL_PULL_UP
-+				 AT91_PIOA 25 AT91_PERIPH_A AT91_PINCTRL_PULL_UP>;
-+		};
-+
-+		pinctrl_flx7_default: flx7_twi {
-+			atmel,pins =
-+				<AT91_PIOC 0 AT91_PERIPH_C AT91_PINCTRL_PULL_UP
-+				 AT91_PIOC 1 AT91_PERIPH_C AT91_PINCTRL_PULL_UP>;
-+		};
-+	};
-+
-+	gpio_keys {
-+		pinctrl_key_gpio_default: pinctrl_key_gpio {
-+			atmel,pins = <AT91_PIOC 9 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
-+		};
-+	};
-+
-+	leds {
-+		pinctrl_led_gpio_default: pinctrl_led_gpio {
-+			atmel,pins = <AT91_PIOC 19 AT91_PERIPH_GPIO AT91_PINCTRL_NONE
-+				      AT91_PIOC 21 AT91_PERIPH_GPIO AT91_PINCTRL_NONE
-+				      AT91_PIOC 20 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
-+		};
-+	};
-+
-+	ohci0 {
-+		pinctrl_usb_default: usb_default {
-+			atmel,pins = <AT91_PIOC 27 AT91_PERIPH_GPIO AT91_PINCTRL_NONE
-+				      AT91_PIOB 18 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
-+		};
-+	};
-+
-+	sdmmc0 {
-+		pinctrl_sdmmc0_default: sdmmc0 {
-+			atmel,pins =
-+				<AT91_PIOA 2 AT91_PERIPH_A (AT91_PINCTRL_DRIVE_STRENGTH_HI | AT91_PINCTRL_SLEWRATE_DIS)					/* PA2 CK  periph A with pullup */
-+				 AT91_PIOA 1 AT91_PERIPH_A (AT91_PINCTRL_PULL_UP | AT91_PINCTRL_DRIVE_STRENGTH_HI | AT91_PINCTRL_SLEWRATE_DIS)		/* PA1 CMD periph A with pullup */
-+				 AT91_PIOA 0 AT91_PERIPH_A (AT91_PINCTRL_PULL_UP | AT91_PINCTRL_DRIVE_STRENGTH_HI | AT91_PINCTRL_SLEWRATE_DIS)		/* PA0 DAT0 periph A */
-+				 AT91_PIOA 3 AT91_PERIPH_A (AT91_PINCTRL_PULL_UP | AT91_PINCTRL_DRIVE_STRENGTH_HI | AT91_PINCTRL_SLEWRATE_DIS)		/* PA3 DAT1 periph A with pullup */
-+				 AT91_PIOA 4 AT91_PERIPH_A (AT91_PINCTRL_PULL_UP | AT91_PINCTRL_DRIVE_STRENGTH_HI | AT91_PINCTRL_SLEWRATE_DIS)		/* PA4 DAT2 periph A with pullup */
-+				 AT91_PIOA 5 AT91_PERIPH_A (AT91_PINCTRL_PULL_UP | AT91_PINCTRL_DRIVE_STRENGTH_HI | AT91_PINCTRL_SLEWRATE_DIS)>;	/* PA5 DAT3 periph A with pullup */
-+		};
-+	};
-+
-+	usb0 {
-+		pinctrl_usba_vbus: usba_vbus {
-+			atmel,pins = <AT91_PIOC 8 AT91_PERIPH_GPIO AT91_PINCTRL_NONE>;
-+		};
-+	};
-+}; /* pinctrl */
-+
-+&rtt {
-+	atmel,rtt-rtc-time-reg = <&gpbr 0x0>;
-+};
-+
-+&sdmmc0 {
-+	bus-width = <4>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_sdmmc0_default>;
-+	cd-gpios = <&pioA 23 GPIO_ACTIVE_LOW>;
-+	disable-wp;
-+	status = "okay";
-+};
-+
-+&shutdown_controller {
-+	atmel,shdwc-debouncer = <976>;
-+	status = "okay";
-+
-+	input@0 {
-+		reg = <0>;
-+	};
-+};
-+
-+&trng {
-+	status = "okay";
-+};
-+
-+&usb0 {
-+	atmel,vbus-gpio = <&pioC 8 GPIO_ACTIVE_HIGH>;
-+	pinctrl-names = "default";
-+	pinctrl-0 = <&pinctrl_usba_vbus>;
-+	status = "okay";
-+};
-+
-+&watchdog {
-+	status = "okay";
-+};
--- 
-2.25.1
+  .../mdio_bus.c:638 mdiobus_scan_for_broken_c45_access() error: we previously assumed 'phydev' could be null (see line 627)
 
+> >  		phydev = mdiobus_get_phy(bus, i);
+
+Line 627 immediately follows the line above, like this:
+
+		if (!phydev)
+			continue;
+
+> > @@ -633,6 +633,11 @@ void mdiobus_scan_for_broken_c45_access(struct mii_bus *bus)
+> >  			break;
+> >  		}
+> >  	}
+> > +
+> > +	if (bus->prevent_c45_access)
+> > +		dev_info(&bus->dev,
+> > +			 "Detected broken PHY (ID %08lx). Disabling C45 bus transactions.\n",
+> > +			 (unsigned long)phydev->phy_id);
+> >  }
+> >  
+> >  /**
+> > 
+> > -- 
+> > 2.39.2
+> > 
+> 
 
