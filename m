@@ -1,393 +1,243 @@
-Return-Path: <netdev+bounces-13225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6E4B73ADFB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:52:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E28D73AE03
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:56:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41E9C2817FA
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 00:52:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 718E21C20BD4
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 00:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A7E363;
-	Fri, 23 Jun 2023 00:52:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48A17369;
+	Fri, 23 Jun 2023 00:56:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212E719D
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:52:49 +0000 (UTC)
-Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4960F210B
-	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 17:52:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687481566; x=1719017566;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=5ETPy7U0aaq23zU3h32hK3uZ8UBH+BjFm6aOsj0bFAs=;
-  b=N2thV0JiyTKfjSi8OkwBHSxdl8bRu2ddOo3hVlNYPfSFjJN63Tv0csNI
-   GNE6J2nhnx4sznu8irAGm9zgX7TchG7dBtBJVlZoRH+iE7QxAypuHc9Y8
-   FionyCqynCSrF7Uww/3Ogek6EAGz9C8jTlSG3+MTFsttFWdCg3HlcR3Hj
-   g=;
-X-IronPort-AV: E=Sophos;i="6.01,150,1684800000"; 
-   d="scan'208";a="1139143334"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 00:52:39 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com (Postfix) with ESMTPS id 99A21A9374;
-	Fri, 23 Jun 2023 00:52:36 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31619363
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:56:34 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 22B5C2107;
+	Thu, 22 Jun 2023 17:56:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687481792; x=1719017792;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=jihsa3Zm59DiAVICVxoD+owYwcbfdI7N2oO0iqEpCLY=;
+  b=BT+xy9ZSy9z5YewgUM45yVr/ElRh0ECOBIbvnPjOwuBKNkd+6h5+/8es
+   vPAn71yaXc5GeOsjec/w0m7RDfTZc3jB2a/66rrYkspXyuiH/9Fhw5wtT
+   G3Vb6PBQJm2lE1iX6MyuENKYCjlLjyw/Cdx86lvMhPqflotAajLWrHh9O
+   dYY6H5TjhLKk6T8quDA0MWWyo8fywvxq7dGQQGqxx2090g3GRxiEEfeBk
+   UKMBUye4vflu+LHcp3mSaIeBcRhP4qHjAJHm6unwSiDv5r6A4QZ0jtONK
+   ixifvwDHH4z0gIH+EQQz6gwFrP88VhzLh9cDGbC1BbMCUtWpuu5024y+F
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="424341411"
+X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
+   d="scan'208";a="424341411"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 17:56:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="828181978"
+X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
+   d="scan'208";a="828181978"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by fmsmga002.fm.intel.com with ESMTP; 22 Jun 2023 17:56:29 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 22 Jun 2023 17:56:28 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23; Thu, 22 Jun 2023 17:56:28 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.23 via Frontend Transport; Thu, 22 Jun 2023 17:56:28 -0700
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (104.47.70.103)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 23 Jun 2023 00:52:34 +0000
-Received: from 88665a182662.ant.amazon.com (10.111.86.59) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 23 Jun 2023 00:52:31 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <wangyufen@huawei.com>
-CC: <kuniyu@amazon.com>, <alex.aring@gmail.com>, <davem@davemloft.net>,
-	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
-Subject: Re: [PATCH v2 net] ipv6: rpl: Fix Route of Death.
-Date: Thu, 22 Jun 2023 17:52:23 -0700
-Message-ID: <20230623005223.61341-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230621042513.64987-1-kuniyu@amazon.com>
-References: <20230621042513.64987-1-kuniyu@amazon.com>
+ 15.1.2507.23; Thu, 22 Jun 2023 17:56:27 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TietTqy8jR+Qc5p4PpxhVbcgY4LewIPTjgJrS+lUhnPdZjQsKPfkdNECuI1w3+JDwePEWARgAK8jeQWfDYBwORltWW+JVB+7Xvk2LN7E2E/5QU2WYZlG1upgd9Kkai5wRB4F3pNSR51d2sROmcoyZEB51J4FBVfQIM+Nl3LYG3ImkY/wNmSkN1xnnIDEWcHOURN94mJ20Jx1Un2oz3oMlFbVLnF+KixveZcarGVfse6WnC/AA7qcJdN0BrawwC1oPqLQbe+3OmAD3kJ4LgrmTlUqqCuhWJokmhdOdUiSZwLRyI2kgKhKkZDmPoUhC9+Zi1bTKdhdOpQjvo9dwcATmw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jihsa3Zm59DiAVICVxoD+owYwcbfdI7N2oO0iqEpCLY=;
+ b=HAoKBDHgftofspkEvpGr3NiO0m5VaDIQH2aPie/6rtmuvfRCiMt7Y3T2+WMCBVLQIzjcoZSQVdVW0QBv9hemxw96RW5sPAJC6Jy19q34tsi0g0FBoDJO/gbS39UhM3LhJv6FMRX9qvoiw2whdVWcNZAnRRLXUNwiTI+IutVi5el7FMdwctKvrU2Q55EnjKZ6nDccbXRqTM90Q6Pyy4RuaTqu0WTdocx4+NHrD5JCUw/vPDOE2kORHHKpaFJsiQQBY/pSSHmoQ8UBd9roHDRtGPordwcauRXbQgjpQK+kv6Lq1R/zkuM9hrGngNNgnLDQGPgjg9EFUCxo553xSN0D3w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com (2603:10b6:5:2a6::7) by
+ DM6PR11MB4721.namprd11.prod.outlook.com (2603:10b6:5:2a3::14) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.26; Fri, 23 Jun 2023 00:56:25 +0000
+Received: from DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::24bd:974b:5c01:83d6]) by DM6PR11MB4657.namprd11.prod.outlook.com
+ ([fe80::24bd:974b:5c01:83d6%3]) with mapi id 15.20.6521.024; Fri, 23 Jun 2023
+ 00:56:24 +0000
+From: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+To: Jiri Pirko <jiri@resnulli.us>, poros <poros@redhat.com>
+CC: "kuba@kernel.org" <kuba@kernel.org>, "vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>, "pabeni@redhat.com"
+	<pabeni@redhat.com>, "corbet@lwn.net" <corbet@lwn.net>, "davem@davemloft.net"
+	<davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>, "Brandeburg, Jesse"
+	<jesse.brandeburg@intel.com>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>, "M, Saeed" <saeedm@nvidia.com>,
+	"leon@kernel.org" <leon@kernel.org>, "richardcochran@gmail.com"
+	<richardcochran@gmail.com>, "sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>, "ricardo.canuelo@collabora.com"
+	<ricardo.canuelo@collabora.com>, "mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>, "Michalik, Michal"
+	<michal.michalik@intel.com>, "gregkh@linuxfoundation.org"
+	<gregkh@linuxfoundation.org>, "jacek.lawrynowicz@linux.intel.com"
+	<jacek.lawrynowicz@linux.intel.com>, "airlied@redhat.com"
+	<airlied@redhat.com>, "ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>, "nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>, "linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>, "Olech, Milena"
+	<milena.olech@intel.com>, "kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>, "hkallweit1@gmail.com"
+	<hkallweit1@gmail.com>, "andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>, "idosch@nvidia.com"
+	<idosch@nvidia.com>, "lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>, "phil@nwl.cc"
+	<phil@nwl.cc>, "claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>, mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: RE: [RFC PATCH v8 04/10] dpll: netlink: Add DPLL framework base
+ functions
+Thread-Topic: [RFC PATCH v8 04/10] dpll: netlink: Add DPLL framework base
+ functions
+Thread-Index: AQHZmsz8U3VH1egT4ECXATo1u6TwOK+VLr+AgAAJngCAABTBgIACV7Sw
+Date: Fri, 23 Jun 2023 00:56:24 +0000
+Message-ID: <DM6PR11MB46578CD80F96AB11AF2F81F49B23A@DM6PR11MB4657.namprd11.prod.outlook.com>
+References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
+ <20230609121853.3607724-5-arkadiusz.kubalewski@intel.com>
+ <c7480d0a71fb8d62108624878f549c0d91d4c9e6.camel@redhat.com>
+ <ZJLktA6RJaVo3BdH@nanopsycho> <ZJL2HUkAtHEw5rq+@nanopsycho>
+In-Reply-To: <ZJL2HUkAtHEw5rq+@nanopsycho>
+Accept-Language: pl-PL, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR11MB4657:EE_|DM6PR11MB4721:EE_
+x-ms-office365-filtering-correlation-id: d1e3bff7-3736-4b1e-069c-08db7384ab11
+x-ld-processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: USx6XOt6dF05o6bajM9y+3zWb58H0u2p0VVbMHYb6F59JeWgalKhls1KEGIWk5aiE22hdqBtcyNokWJK1J0gob69iwoXZpI9vmGWoAAnGohkbD/ZUzM+rafPN0w9Q4s5DORMfc6mu6dCm1QCVskUS5Q1D644ZFHGmsPQYzVSYS//vdMayGXK+PXvwyLkyeaPypfVLQVZKFhsD/UxogWZfBT4CiGWj8s5kbgtRswo6tUzMtQIMaNiEeUQegBIe1NYobJ/vBQqglXRo5evj5m6pRN6LDnFOloM7uS/KTO2ERhWysxWJF6B8qr+6EAGz1/XX4qFRJneQ28J2Qup9iFID7XkRvTSExhlh6BKlBV+PT4Cl0RrrfNZbzt6rXZpqFib8PdoMTcjz7/gKy3qYMY9nTAk0Bh5CgdUUHlIH0E9YQl9c3mD/6q2MjceXdNWgjZZmzwJFlS3soc7tfm0BvKQQs+rSqFrkbPnyK42F+0C8PhvGFtdXIHijLFZkaEGWbYXu/Vb1gZ/bEhiY3ZQDYiUqqtuwukmlQUkfIZ/HFlOAtfvpNxNQBQOtYpcIxpOAdjGWztOebqhRq82EOgcy8oK64gmpIewKg3E7cNZQ0y108LFvsoN98mzL/xOUtscgwmS
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB4657.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(136003)(366004)(346002)(39860400002)(396003)(451199021)(8676002)(41300700001)(52536014)(8936002)(316002)(186003)(82960400001)(38070700005)(122000001)(38100700002)(6506007)(7696005)(26005)(9686003)(71200400001)(54906003)(110136005)(478600001)(55016003)(76116006)(66446008)(86362001)(4326008)(66946007)(64756008)(66556008)(66476007)(7406005)(7416002)(2906002)(33656002)(5660300002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MXFXMmRWTGxGOEhXTFk3T0xPMVl1a3dYTndGTCtkZ0dVUmViRml0WUtxbjVT?=
+ =?utf-8?B?YWhhbUxpWkNMUGFLV2JPV0U2a2JoemRsSnJzV3BJNWwybURDNEhwQ3RldEZn?=
+ =?utf-8?B?NmYremtzclhMOGFwOVZNcnV3Y0dudFZzeU9CQ0JQL3VVYnhvREhKSitGdFMr?=
+ =?utf-8?B?SEhCSjFoYmpIemExbnlRNTVuUXhmRUJQZ29xYWxOSGdTRDRETjl2VWVYM2dO?=
+ =?utf-8?B?bzY2ZWZaVTlXUWQ3S3hUVWpOUHZvd1d3c1A4SXlJVVhNV2xmWDZWbmg1ZFRL?=
+ =?utf-8?B?b1VmYlRHbkFXdjNvRDFxb2hlM0pZbHFxaDNMbTJEMC9RTitnNGV3Si9ialRI?=
+ =?utf-8?B?NTdIVFQwTk1uMSs1bzV2ZUZ5ZWoxS28yL0REYUhBbFhBU3dCcUdBMTBEeDZB?=
+ =?utf-8?B?K0I3V3lLbEExL21IMm5tNkE0UlhXQi9ZOGZnK3RWUVk4OG1keG9NWktjNnFZ?=
+ =?utf-8?B?YWF1SVV1NnhsTm1NQVkwa2NReUI0QkpLMXlRVnZ2UE5RV0NzTFp2aWtoNUFq?=
+ =?utf-8?B?Zm9VK1lpQmFtSHFJcG9BOUV3WDh5QkpSR09rcmZRWkhtYnBjMTNBaVRUN1Yr?=
+ =?utf-8?B?cjBvQXUrbTFMS1V2TFFRU3J3SmNVMGEwS0FyQWl2NFp2VkVNOVdqaitxYW0v?=
+ =?utf-8?B?MUNnQ1RuNlkwWG5iYmtUaEx6Rnc1QkpNbEE0cTNIWEV0Y3JMUXhIaVRLOTVo?=
+ =?utf-8?B?U0xBZFIySFZBcTB5YW5MT0I2allETFJBOE9VTU1zU0xRZUU3STRFRE0yWW1F?=
+ =?utf-8?B?bm9ET0k0RFhSNjdtdUtSYW1kUmhrNC92WWRMSkVKVzI2QzU1ZTQ4U3FHeGJB?=
+ =?utf-8?B?dkF5Q0VlWU54eUpKanp6NGw0WFQzL0J2QTl3TGQ5dDk5TjJBUXMvb3hsRVdR?=
+ =?utf-8?B?N2VMaGtVMm05YmVKTnNwMzN1eTNOYVduSkYzUXJZb2d0NmRLVWc5NlFIbHM3?=
+ =?utf-8?B?N0hvVkRLQ1MzNUtSQm5SbStwYzlGM1ZLZkVubGVvTXl1YUQ4ZEoxYkdrK2FJ?=
+ =?utf-8?B?K0luaG1Ed0xGNlhZVjh6MDlMcitHS0l4Zml0NzY2ZVJJeXZkN1JpbmZUN1c2?=
+ =?utf-8?B?WG01VDdLL1FTclh0ZUdMWGxkanRqRXVHN3QvcFhkWmw1MFhSWCtwT3ZFVzdy?=
+ =?utf-8?B?WFM3SVdkRUVSYXlWdjdwczZsWEpSbXlBbWpxbUZKRzF4Lzg2WXlEajZNTmhr?=
+ =?utf-8?B?cnJkWHR1UVNRb1VqQ2pLbXFIQ0dua0YydlI2WDVvcjVTd2dNVDBYUEQzN3ZY?=
+ =?utf-8?B?aDZkRUZJT3VUY0pxemU0S1VXZ3dnK1Yxc1poRWxMNnpOL2Y5T1djNnY2a01O?=
+ =?utf-8?B?K2E4akpBQmZtSkF2L2hVQUk2NkJmT01jdW5rK1ZUbmFDa0NxVkplZ3NtSU5a?=
+ =?utf-8?B?MXJTRUxxdnFXZXpJR3V2bkY3dU9rZVZpSmpEam9aY05rcFRVR0NVaEUrK0hI?=
+ =?utf-8?B?QXVoVStuREJPQythSDNoSnBtRFVXQ09HYmFyS3VLa2RIUnFUcEUrdmFoYjZp?=
+ =?utf-8?B?RXlWcElpQmJGM3RJcDErME1ZT3plZ3lHUXZsZ1lTTVI0SWxrclBQWUVYV1hP?=
+ =?utf-8?B?WHRSNzh6WEszR0c4b0VnUFN1U2dsK1l0VmhwKy9XUG5Sa29GbjFuNHdoU3JN?=
+ =?utf-8?B?WmFIa3l2blB1U2dPNGcvYVpOSUh5QXdVL3IxTXJWS3gzL0I4SkxWeXUwd3lT?=
+ =?utf-8?B?RU0yY3lXVGZ3akZHa09KcFBzbGdUeE55MGxYeVdSMVpzM1E4OGUyZWlZYUdp?=
+ =?utf-8?B?RWpFWHI0NU5RU0N2UDd5T20zNnkrSW9lTXVabzdLRnBOaGZoa3p3NEt0S3VD?=
+ =?utf-8?B?T3VDdmx4a29OQ2w0Q3F0UmFFVjN2ajlpbStJbWUra0ViemxDV3IyenJxRFp5?=
+ =?utf-8?B?NWNyZ1Z2UmREYU9FOVp5US9iY3F2dGFaTjJSVm5DMkhrd2JNYy9JcHdxeFhs?=
+ =?utf-8?B?d3FMakw1R09IOWRValhCOHhvdWNEQ0tKZFg1c1gyQ28wdHlBUkFOT0t1ZEdk?=
+ =?utf-8?B?V3g0MWtFUjhtcFppUm9UTlVvWGRoVmhVYzk3bXlEQVk3WWVvNmFmcG5ySUJi?=
+ =?utf-8?B?anVrc3lwUjJBUTZodm42WTNGK3lYR0ZnQlRON3Vva0FFNEdhWHpwOHczNzZh?=
+ =?utf-8?B?ckVDcEpwck1GWmJzZ3NiaHY1bHpQYTdYNkxxSWV5aERPY1VJckx2cU9yVmFN?=
+ =?utf-8?B?Zmc9PQ==?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.111.86.59]
-X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB4657.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d1e3bff7-3736-4b1e-069c-08db7384ab11
+X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2023 00:56:24.5629
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: cNsHv7j9lh4px9MKuyEUjK2J+Hx0XZXgeFwOl2fax5pYKLWtWCWDmb3pe3rUtGCQyoblrZqLHuSLLNRCo2U0gLR6lzJQZDDVg5eG0ElkE3A=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4721
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-Date: Tue, 20 Jun 2023 21:25:13 -0700
-> From: wangyufen <wangyufen@huawei.com>
-> Date: Wed, 21 Jun 2023 09:55:13 +0800
-> > 在 2023/6/20 17:10, Kuniyuki Iwashima 写道:
-> > > From: wangyufen <wangyufen@huawei.com>
-> > > Date: Tue, 20 Jun 2023 16:12:26 +0800
-> > >> 在 2023/6/6 2:06, Kuniyuki Iwashima 写道:
-> > >>> A remote DoS vulnerability of RPL Source Routing is assigned CVE-2023-2156.
-> > >>>
-> > >>> The Source Routing Header (SRH) has the following format:
-> > >>>
-> > >>>     0                   1                   2                   3
-> > >>>     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
-> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> > >>>     |  Next Header  |  Hdr Ext Len  | Routing Type  | Segments Left |
-> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> > >>>     | CmprI | CmprE |  Pad  |               Reserved                |
-> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> > >>>     |                                                               |
-> > >>>     .                                                               .
-> > >>>     .                        Addresses[1..n]                        .
-> > >>>     .                                                               .
-> > >>>     |                                                               |
-> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
-> > >>>
-> > >>> The originator of an SRH places the first hop's IPv6 address in the IPv6
-> > >>> header's IPv6 Destination Address and the second hop's IPv6 address as
-> > >>> the first address in Addresses[1..n].
-> > >>>
-> > >>> The CmprI and CmprE fields indicate the number of prefix octets that are
-> > >>> shared with the IPv6 Destination Address.  When CmprI or CmprE is not 0,
-> > >>> Addresses[1..n] are compressed as follows:
-> > >>>
-> > >>>     1..n-1 : (16 - CmprI) bytes
-> > >>>          n : (16 - CmprE) bytes
-> > >>>
-> > >>> Segments Left indicates the number of route segments remaining.  When the
-> > >>> value is not zero, the SRH is forwarded to the next hop.  Its address
-> > >>> is extracted from Addresses[n - Segment Left + 1] and swapped with IPv6
-> > >>> Destination Address.
-> > >>>
-> > >>> When Segment Left is greater than or equal to 2, the size of SRH is not
-> > >>> changed because Addresses[1..n-1] are decompressed and recompressed with
-> > >>> CmprI.
-> > >>>
-> > >>> OTOH, when Segment Left changes from 1 to 0, the new SRH could have a
-> > >>> different size because Addresses[1..n-1] are decompressed with CmprI and
-> > >>> recompressed with CmprE.
-> > >>>
-> > >>> Let's say CmprI is 15 and CmprE is 0.  When we receive SRH with Segment
-> > >>> Left >= 2, Addresses[1..n-1] have 1 byte for each, and Addresses[n] has
-> > >>> 16 bytes.  When Segment Left is 1, Addresses[1..n-1] is decompressed to
-> > >>> 16 bytes and not recompressed.  Finally, the new SRH will need more room
-> > >>> in the header, and the size is (16 - 1) * (n - 1) bytes.
-> > >>>
-> > >>> Here the max value of n is 255 as Segment Left is u8, so in the worst case,
-> > >>> we have to allocate 3825 bytes in the skb headroom.  However, now we only
-> > >>> allocate a small fixed buffer that is IPV6_RPL_SRH_WORST_SWAP_SIZE (16 + 7
-> > >>> bytes).  If the decompressed size overflows the room, skb_push() hits BUG()
-> > >>> below [0].
-> > >>>
-> > >>> Instead of allocating the fixed buffer for every packet, let's allocate
-> > >>> enough headroom only when we receive SRH with Segment Left 1.
-> > >>>
-> > >>> [0]:
-> > >>>
-> > >>> Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
-> > >>> Reported-by: Max VA
-> > >>> Closes: https://www.interruptlabs.co.uk/articles/linux-ipv6-route-of-death
-> > >>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> > >>> ---
-> > >>> To maintainers:
-> > >>> Please complement the Reported-by address from the security@ mailing list
-> > >>> if possible, which checkpatch will complain about.
-> > >>>
-> > >>> v2:
-> > >>>     * Reload oldhdr@ after pskb_expand_head() (Eric Dumazet)
-> > >>>
-> > >>> v1: https://lore.kernel.org/netdev/20230605144040.39871-1-kuniyu@amazon.com/
-> > >>> ---
-> > >>
-> > >> When I tested the linux-ipv6-route-of-death issue on Linux 6.4-rc7, I
-> > >> got the following panic:
-> > >>
-> > >> [ 2046.147186] BUG: kernel NULL pointer dereference, address:
-> > >> 0000000000000000
-> > >> [ 2046.147978] #PF: supervisor read access in kernel mode
-> > >> [ 2046.148522] #PF: error_code(0x0000) - not-present page
-> > >> [ 2046.149082] PGD 8000000187886067 P4D 8000000187886067 PUD 187887067
-> > >> PMD 0
-> > >> [ 2046.149788] Oops: 0000 [#1] PREEMPT SMP PTI
-> > >> [ 2046.150233] CPU: 4 PID: 2093 Comm: python3 Not tainted 6.4.0-rc7 #15
-> > >> [ 2046.150964] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
-> > >> [ 2046.151566] RIP: 0010:icmp6_send+0x691/0x910
-> > >> [ 2046.152029] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
-> > >> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
-> > >> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
-> > >> [ 2046.153892] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
-> > >> [ 2046.154432] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
-> > >> 0000000000000000
-> > >> [ 2046.155160] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
-> > >> 0000000000000001
-> > >> [ 2046.155881] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
-> > >> 0000000000000040
-> > >> [ 2046.156611] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
-> > >> ffff907d21a28888
-> > >> [ 2046.157340] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
-> > >> ffffffff97b03d00
-> > >> [ 2046.158064] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
-> > >> knlGS:0000000000000000
-> > >> [ 2046.158895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > >> [ 2046.159483] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
-> > >> 00000000000006e0
-> > >> [ 2046.160205] Call Trace:
-> > >> [ 2046.160467]  <IRQ>
-> > >> [ 2046.160693]  ? __die_body+0x1b/0x60
-> > >> [ 2046.161059]  ? page_fault_oops+0x15b/0x470
-> > >> [ 2046.161488]  ? fixup_exception+0x22/0x330
-> > >> [ 2046.161901]  ? exc_page_fault+0x65/0x150
-> > >> [ 2046.162318]  ? asm_exc_page_fault+0x22/0x30
-> > >> [ 2046.162750]  ? icmp6_send+0x691/0x910
-> > >> [ 2046.163137]  ? ip6_route_input+0x187/0x210
-> > >> [ 2046.163560]  ? __pfx_free_object_rcu+0x10/0x10
-> > >> [ 2046.164019]  ? __call_rcu_common.constprop.0+0x10a/0x5a0
-> > >> [ 2046.164568]  ? _raw_spin_lock_irqsave+0x19/0x50
-> > >> [ 2046.165034]  ? __pfx_free_object_rcu+0x10/0x10
-> > >> [ 2046.165499]  ? ip6_pkt_drop+0xf2/0x1c0
-> > >> [ 2046.165890]  ip6_pkt_drop+0xf2/0x1c0
-> > >> [ 2046.166269]  ipv6_rthdr_rcv+0x122d/0x1310
-> > >> [ 2046.166684]  ip6_protocol_deliver_rcu+0x4bc/0x630
-> > >> [ 2046.167173]  ip6_input_finish+0x40/0x60
-> > >> [ 2046.167568]  ip6_input+0x3b/0xd0
-> > >> [ 2046.167905]  ? ip6_rcv_core.isra.0+0x2cb/0x5e0
-> > >> [ 2046.168368]  ipv6_rcv+0x53/0x100
-> > >> [ 2046.168706]  __netif_receive_skb_one_core+0x63/0xa0
-> > >> [ 2046.169231]  process_backlog+0xa8/0x150
-> > >> [ 2046.169626]  __napi_poll+0x2c/0x1b0
-> > >> [ 2046.169991]  net_rx_action+0x260/0x330
-> > >> [ 2046.170385]  ? kvm_sched_clock_read+0x5/0x20
-> > >> [ 2046.170824]  ? kvm_clock_read+0x14/0x30
-> > >> [ 2046.171226]  __do_softirq+0xe6/0x2d1
-> > >> [ 2046.171596]  do_softirq+0x80/0xa0
-> > >> [ 2046.171944]  </IRQ>
-> > >> [ 2046.172178]  <TASK>
-> > >> [ 2046.172406]  __local_bh_enable_ip+0x73/0x80
-> > >> [ 2046.172829]  __dev_queue_xmit+0x331/0xd40
-> > >> [ 2046.173246]  ? __local_bh_enable_ip+0x37/0x80
-> > >> [ 2046.173692]  ? ___neigh_create+0x60b/0x8d0
-> > >> [ 2046.174114]  ? eth_header+0x26/0xc0
-> > >> [ 2046.174489]  ip6_finish_output2+0x1e7/0x680
-> > >> [ 2046.174916]  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
-> > >> [ 2046.175462]  ip6_finish_output+0x1df/0x350
-> > >> [ 2046.175881]  ? nf_hook_slow+0x40/0xc0
-> > >> [ 2046.176274]  ip6_output+0x6e/0x140
-> > >> [ 2046.176627]  ? __pfx_ip6_finish_output+0x10/0x10
-> > >> [ 2046.177096]  rawv6_sendmsg+0x6f9/0x1210
-> > >> [ 2046.177497]  ? dl_cpu_busy+0x2f3/0x300
-> > >> [ 2046.177886]  ? __pfx_dst_output+0x10/0x10
-> > >> [ 2046.178305]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
-> > >> [ 2046.178825]  ? __wake_up_common_lock+0x91/0xd0
-> > >> [ 2046.179339]  ? sock_sendmsg+0x8b/0xa0
-> > >> [ 2046.179791]  ? __pfx_rawv6_sendmsg+0x10/0x10
-> > >> [ 2046.180246]  sock_sendmsg+0x8b/0xa0
-> > >> [ 2046.180610]  __sys_sendto+0xfa/0x170
-> > >> [ 2046.180983]  ? __bitmap_weight+0x4b/0x60
-> > >> [ 2046.181399]  ? task_mm_cid_work+0x183/0x200
-> > >> [ 2046.181827]  __x64_sys_sendto+0x25/0x30
-> > >> [ 2046.182228]  do_syscall_64+0x3b/0x90
-> > >> [ 2046.182599]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> > >> [ 2046.183109] RIP: 0033:0x7ff3344a668a
-> > >> [ 2046.183493] Code: 48 c7 c0 ff ff ff ff eb bc 0f 1f 80 00 00 00 00 f3
-> > >> 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f
-> > >> 05 <48> 3d 00 f0 ff ff 77 76 c3 0f 1f 44 00 00 55 48 83 ec 30 44 89 4c
-> > >> [ 2046.185326] RSP: 002b:00007ffc82a34658 EFLAGS: 00000246 ORIG_RAX:
-> > >> 000000000000002c
-> > >> [ 2046.186083] RAX: ffffffffffffffda RBX: 00007ffc82a346f0 RCX:
-> > >> 00007ff3344a668a
-> > >> [ 2046.186799] RDX: 0000000000000060 RSI: 00007ff33112db00 RDI:
-> > >> 0000000000000003
-> > >> [ 2046.187515] RBP: 000000000159cd90 R08: 00007ffc82a34770 R09:
-> > >> 000000000000001c
-> > >> [ 2046.188230] R10: 0000000000000000 R11: 0000000000000246 R12:
-> > >> 0000000000000000
-> > >> [ 2046.188958] R13: 0000000000000000 R14: 00007ffc82a346f0 R15:
-> > >> 0000000000451072
-> > >> [ 2046.189675]  </TASK>
-> > >> [ 2046.189909] Modules linked in: fuse rfkill binfmt_misc cirrus
-> > >> drm_shmem_helper joydev drm_kms_helper sg syscopyarea sysfillrect
-> > >> sysimgblt virtio_balloon serio_raw squashfs parport_pc ppdev lp parport
-> > >> ramoops reed_solomon drm ip_tables x_tables xfs sd_mod t10_pi
-> > >> crc64_rocksoft crc64 ata_generic ata_piix virtio_net net_failover
-> > >> failover libata e1000 i2c_piix4
-> > >> [ 2046.193039] CR2: 0000000000000000
-> > >> [ 2046.193400] ---[ end trace 0000000000000000 ]---
-> > >> [ 2046.193870] RIP: 0010:icmp6_send+0x691/0x910
-> > >> [ 2046.194315] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
-> > >> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
-> > >> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
-> > >> [ 2046.196146] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
-> > >> [ 2046.196672] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
-> > >> 0000000000000000
-> > >> [ 2046.197388] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
-> > >> 0000000000000001
-> > >> [ 2046.198096] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
-> > >> 0000000000000040
-> > >> [ 2046.198825] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
-> > >> ffff907d21a28888
-> > >> [ 2046.199537] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
-> > >> ffffffff97b03d00
-> > >> [ 2046.200253] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
-> > >> knlGS:0000000000000000
-> > >> [ 2046.201044] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > >> [ 2046.201624] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
-> > >> 00000000000006e0
-> > >> [ 2046.202340] Kernel panic - not syncing: Fatal exception in interrupt
-> > >> [ 2046.203655] Kernel Offset: 0x12e00000 from 0xffffffff81000000
-> > >> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> > >> [ 2046.204731] ---[ end Kernel panic - not syncing: Fatal exception in
-> > >> interrupt ]---
-> > > 
-> > > Please decode the stack trace.
-> > > 
-> > > $ cat <<EOF | ./scripts/decode_stacktrace.sh vmlinux
-> > > PASTE YOUR TRACE HERE
-> > > EOF
-> > > 
-> > > 
-> > >>
-> > >>
-> > >> The test procedure is as follows:
-> > >> # sysctl -a | grep -i rpl_seg_enabled
-> > >> net.ipv6.conf.all.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.default.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.dummy0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.ens3.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.ens4.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.erspan0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.gre0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.gretap0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.ip6_vti0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.ip6gre0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.ip6tnl0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.ip_vti0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.lo.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.sit0.rpl_seg_enabled = 1
-> > >> net.ipv6.conf.tunl0.rpl_seg_enabled = 1
-> > >>
-> > >> # python3
-> > >> Python 3.8.10 (default, Nov 14 2022, 12:59:47)
-> > >> [GCC 9.4.0] on linux
-> > >> Type "help", "copyright", "credits" or "license" for more information.
-> > >>   >>> from scapy.all import *
-> > >>   >>> import socket
-> > >>   >>> DST_ADDR = "fe80::266:88ff:fe99:7419"
-> > >>   >>> SRC_ADDR = DST_ADDR
-> > >>   >>> sockfd = socket.socket(socket.AF_INET6, socket.SOCK_RAW,
-> > >> socket.IPPROTO_RAW)
-> > >>   >>> p = IPv6(src=SRC_ADDR, dst=DST_ADDR) /
-> > >> IPv6ExtHdrSegmentRouting(type=3, addresses=["a8::", "a7::", "a6::"],
-> > >> segleft=1, lastentry=0xf0)
-> > >>   >>> sockfd.sendto(bytes(p), (DST_ADDR, 0))
-> > >>
-> > >> Is this a new issue?
-> > > 
-> > > Can you test this ?  I couldn't reproduce the issue on my setup...
-> > > 
-> > > ---8<---
-> > > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> > > index 202fc3aaa83c..f2890c391e3b 100644
-> > > --- a/net/ipv6/exthdrs.c
-> > > +++ b/net/ipv6/exthdrs.c
-> > > @@ -587,7 +587,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
-> > >   	skb_pull(skb, ((hdr->hdrlen + 1) << 3));
-> > >   	skb_postpull_rcsum(skb, oldhdr,
-> > >   			   sizeof(struct ipv6hdr) + ((hdr->hdrlen + 1) << 3));
-> > > -	if (unlikely(!hdr->segments_left)) {
-> > > +	if (unlikely(!hdr->segments_left) || skb_cloned(skb)) {
-> > >   		if (pskb_expand_head(skb, sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3), 0,
-> > >   				     GFP_ATOMIC)) {
-> > >   			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_OUTDISCARDS);
-> > > ---8<---
-> > 
-> > I tested it and the problem persisted, and attached the config I used.
-> > 
-> > Also,the DST_ADDR = "fe80::266:88ff:fe99:7419" I used the  the 
-> > link-local address of the local NIC ens4.
-> > 
-> > # ip addr show dev ens4
-> > 12: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel 
-> > state UP group default qlen 1000
-> >      link/ether 00:66:88:99:74:19 brd ff:ff:ff:ff:ff:ff
-> >      altname enp0s4
-> >      inet 169.254.6.143/16 brd 169.254.255.255 scope link ens4:avahi
-> >         valid_lft forever preferred_lft forever
-> >      inet6 fe80::266:88ff:fe99:7419/64 scope link
-> >         valid_lft forever preferred_lft forever
-> > 
-> > The test machine is an Ubuntu 20.04.4 LTS VM.
-> 
-> Could you provide your decoded stack trace ?
-> 
-> It seems the packet is dropped.  I'd like to know where it happens.
-
-Ok, I think I reproduced your issue by forcibly calling
-ip6_pkt_discard_out() for the skb.
-
-It seems the route to the final dst is marked as RTF_REJECT on your
-setup.
-
-Will start working on the fix.
-
-Thanks!
+PkZyb206IEppcmkgUGlya28gPGppcmlAcmVzbnVsbGkudXM+DQo+U2VudDogV2VkbmVzZGF5LCBK
+dW5lIDIxLCAyMDIzIDM6MDggUE0NCj4NCj5XZWQsIEp1biAyMSwgMjAyMyBhdCAwMTo1MzoyNFBN
+IENFU1QsIGppcmlAcmVzbnVsbGkudXMgd3JvdGU6DQo+PldlZCwgSnVuIDIxLCAyMDIzIGF0IDAx
+OjE4OjU5UE0gQ0VTVCwgcG9yb3NAcmVkaGF0LmNvbSB3cm90ZToNCj4+PkFya2FkaXVzeiBLdWJh
+bGV3c2tpIHDDrcWhZSB2IFDDoSAwOS4gMDYuIDIwMjMgdiAxNDoxOCArMDIwMDoNCj4+Pj4gRnJv
+bTogVmFkaW0gRmVkb3JlbmtvIDx2YWRpbS5mZWRvcmVua29AbGludXguZGV2Pg0KPj4NCj4+Wy4u
+Ll0NCj4+DQo+PkNvdWxkIHlvdSBwZXJoYXBzIGN1dCBvdXQgdGhlIHRleHQgeW91IGRvbid0IGNv
+bW1lbnQ/IFNhdmVzIHNvbWUgdGltZQ0KPj5maW5kaW5nIHlvdXIgcmVwbHkuDQo+Pg0KPj4NCj4+
+Pj4gK3N0YXRpYyBpbnQNCj4+Pj4gK2RwbGxfc2V0X2Zyb21fbmxhdHRyKHN0cnVjdCBkcGxsX2Rl
+dmljZSAqZHBsbCwgc3RydWN0IGdlbmxfaW5mbw0KPj4+PiAqaW5mbykNCj4+Pj4gK3sNCj4+Pj4g
+K8KgwqDCoMKgwqDCoMKgY29uc3Qgc3RydWN0IGRwbGxfZGV2aWNlX29wcyAqb3BzID0gZHBsbF9k
+ZXZpY2Vfb3BzKGRwbGwpOw0KPj4+PiArwqDCoMKgwqDCoMKgwqBzdHJ1Y3QgbmxhdHRyICp0YltE
+UExMX0FfTUFYICsgMV07DQo+Pj4+ICvCoMKgwqDCoMKgwqDCoGludCByZXQgPSAwOw0KPj4+PiAr
+DQo+Pj4+ICvCoMKgwqDCoMKgwqDCoG5sYV9wYXJzZSh0YiwgRFBMTF9BX01BWCwgZ2VubG1zZ19k
+YXRhKGluZm8tPmdlbmxoZHIpLA0KPj4+PiArwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKgwqDCoMKg
+wqAgZ2VubG1zZ19sZW4oaW5mby0+Z2VubGhkciksIE5VTEwsIGluZm8tPmV4dGFjayk7DQo+Pj4+
+ICvCoMKgwqDCoMKgwqDCoGlmICh0YltEUExMX0FfTU9ERV0pIHsNCj4+PkhpLA0KPj4+DQo+Pj5I
+ZXJlIHNob3VsZCBiZSBzb21ldGhpbmcgbGlrZToNCj4+PiAgICAgICAgICAgICAgIGlmICghb3Bz
+LT5tb2RlX3NldCkNCj4+PiAgICAgICAgICAgICAgICAgICAgICAgcmV0dXJuIC1FT1BOT1RTVVBQ
+Ow0KPj4NCj4+V2h5PyBBbGwgZHJpdmVycyBpbXBsZW1lbnQgdGhhdC4NCj4+SSBiZWxpZXZlIHRo
+YXQgaXQncyBhY3R1bGxhbHkgYmV0dGVyIHRoYXQgd2F5LiBGb3IgYSBjYWxsZWQgc2V0dGluZyB1
+cA0KPj50aGUgc2FtZSBtb2RlIGl0IGlzIHRoZSBkcGxsIGluLCB0aGVyZSBzaG91bGQgYmUgMCBy
+ZXR1cm4gYnkgdGhlIGRyaXZlci4NCj4+Tm90ZSB0aGF0IGRyaXZlciBob2xkcyB0aGlzIHZhbHVl
+LiBJJ2QgbGlrZSB0byBrZWVwIHRoaXMgY29kZSBhcyBpdCBpcy4NCj4NCj5BY3R1YWxseSwgeW91
+IGFyZSBjb3JyZWN0IFBldHIsIG15IG1pc3Rha2UuIEFjdHVhbGx5LCBubyBkcml2ZXINCj5pbXBs
+ZW1lbnRzIHRoaXMuIEFya2FkaXVzeiwgY291bGQgeW91IHBsZWFzZSByZW1vdmUgdGhpcyBvcCBh
+bmQNCj5wb3NzaWJseSBhbnkgb3RoZXIgdW51c2VkICBvcD8gSXQgd2lsbCBiZSBhZGRlZCB3aGVu
+IG5lZWRlZC4NCj4NCj5UaGFua3MhDQo+DQoNClNvcnJ5LCBkaWRuJ3QgaGF2ZSB0aW1lIGZvciBz
+dWNoIGNoYW5nZSwgYWRkZWQgb25seSBjaGVjayBhcyBzdWdnZXN0ZWQgYnkNClBldHIuDQpJZiB5
+b3UgdGhpbmsgdGhpcyBpcyBhIGJpZyBpc3N1ZSwgd2UgY291bGQgY2hhbmdlIGl0IGZvciBuZXh0
+IHZlcnNpb24uDQoNClRoYW5rIHlvdSENCkFya2FkaXVzeg0KDQo+DQo+Pg0KPj5bLi4uXQ0K
 
