@@ -1,46 +1,46 @@
-Return-Path: <netdev+bounces-13441-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6798673B9F2
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:21:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 30C4773B9F3
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:22:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5300281C0A
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:21:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DF0C9281C3D
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:22:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 927FB100CE;
-	Fri, 23 Jun 2023 14:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A3E2FDDD4;
+	Fri, 23 Jun 2023 14:18:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7F900100D3
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:17:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 987D59449
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:18:01 +0000 (UTC)
 Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B4DC10C
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:17:54 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6CC7310C
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:18:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
 	d=armlinux.org.uk; s=pandora-2019; h=Date:Sender:Message-Id:Content-Type:
 	Content-Transfer-Encoding:MIME-Version:Subject:Cc:To:From:References:
 	In-Reply-To:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
 	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:
 	List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=fp+iPXGU+ofGNpuw4c7q87rA9G9GeDdX/yYLpvLpTl4=; b=WHRw5Qi2qlPDANyVmarm93ycPX
-	OJ2mAY2Lc/xTtwZFCxZBAgB5FPt0Bk7sDr9RioNu5a0mGzdtNlGNT3CTYoXb4ppuw6Z/z7If753VQ
-	UYcHh2sSE+Cm/F+bVJJNoAn93hRBzkMtxtIGeXnU4GjXum71JAnPJkzB7PzIEdQv2JSwCsxO2kWxa
-	CF2qtzBC9BUi6kiFyszW1tTYWE2iRem+evP/ivEpscVmSlVeOHlmTFh3mW8gaskpcdoLCEQddmrTv
-	HKNGch0eLKx5c8F9NaLBB+sFsxlYthxzHrAOK9McYqqgQIJa5RJqEXJQv8gFjUMJtGy3s6XeMoXqE
-	IZSdhshA==;
-Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36598 helo=rmk-PC.armlinux.org.uk)
+	bh=NlZP1JUME6lmh3boAXDtmqR+0jcuRq9BKPuFbovC6dg=; b=i0yxq5YU0TeqgDuL8Hk2dYKFJT
+	FbgNlReBzRzo0azoOOYlcaYMSegqJrm6zmm/EaX/ehKqkp4Ci6LG8og78nNdXVObRWGBKY6ZwCMSm
+	ngrQ3dMsPCmKPfwpskEJCFAJQov3ldYPo+sRQuK6XXUdcZZNWdlt6yadf9PH/7tRShATg9QjDEig8
+	HiwiJccJOAkDEKwktflwPacv474CcaR3zppdSYQNFjBT7NMWlXx7ZuGthQb94UReSCtF2QU6e8GVh
+	z8J1i/dq07CK5uB9MRchTeAlNp/sN1cgVRhIjvbTh/iv1X9bSPdC1T6+jtc8mTTRZ3nAluztKg4a/
+	nZA6ziNw==;
+Received: from e0022681537dd.dyn.armlinux.org.uk ([fd8f:7570:feb6:1:222:68ff:fe15:37dd]:36602 helo=rmk-PC.armlinux.org.uk)
 	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
 	(Exim 4.94.2)
 	(envelope-from <rmk@armlinux.org.uk>)
-	id 1qChbd-0005RW-Tf; Fri, 23 Jun 2023 15:17:45 +0100
+	id 1qChbj-0005Rt-0S; Fri, 23 Jun 2023 15:17:51 +0100
 Received: from rmk by rmk-PC.armlinux.org.uk with local (Exim 4.94.2)
 	(envelope-from <rmk@rmk-PC.armlinux.org.uk>)
-	id 1qChbd-00FmsS-9h; Fri, 23 Jun 2023 15:17:45 +0100
+	id 1qChbi-00Fmsa-DL; Fri, 23 Jun 2023 15:17:50 +0100
 In-Reply-To: <ZJWpGCtIZ06jiBsO@shell.armlinux.org.uk>
 References: <ZJWpGCtIZ06jiBsO@shell.armlinux.org.uk>
 From: "Russell King (Oracle)" <rmk+kernel@armlinux.org.uk>
@@ -65,8 +65,8 @@ Cc: Alexandre Belloni <alexandre.belloni@bootlin.com>,
 	Sean Wang <sean.wang@mediatek.com>,
 	UNGLinuxDriver@microchip.com,
 	Vladimir Oltean <olteanv@gmail.com>
-Subject: [PATCH RFC net-next 11/14] net: dsa: mv88e6xxx: cleanup after
- phylink_pcs conversion
+Subject: [PATCH RFC net-next 12/14] net: dsa: remove legacy_pre_march2020
+ detection
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,9 +76,9 @@ MIME-Version: 1.0
 Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
 Content-Type: text/plain; charset="utf-8"
-Message-Id: <E1qChbd-00FmsS-9h@rmk-PC.armlinux.org.uk>
+Message-Id: <E1qChbi-00Fmsa-DL@rmk-PC.armlinux.org.uk>
 Sender: Russell King <rmk@armlinux.org.uk>
-Date: Fri, 23 Jun 2023 15:17:45 +0100
+Date: Fri, 23 Jun 2023 15:17:50 +0100
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
 	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
@@ -86,481 +86,118 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Now that mv88e6xxx is completely converted to using phylink_pcs
-support, we have no need for the serdes methods. Remove all this
-infrastructure. Also remove the __maybe_unused from
-mv88e6xxx_pcs_select().
+All drivers are now updated for the March 2020 changes, and no longer
+make use of the mac_pcs_get_state() or mac_an_restart() operations,
+which are now NULL across all DSA drivers. All DSA drivers don't look
+at speed, duplex, pause or advertisement in their phylink_mac_config()
+method either.
+
+Remove support for these operations from DSA, and stop marking DSA as
+a legacy driver by default.
 
 Signed-off-by: Russell King (Oracle) <rmk+kernel@armlinux.org.uk>
 ---
- drivers/net/dsa/mv88e6xxx/chip.c   | 238 +----------------------------
- drivers/net/dsa/mv88e6xxx/chip.h   |  21 ---
- drivers/net/dsa/mv88e6xxx/port.c   |  30 ----
- drivers/net/dsa/mv88e6xxx/serdes.h |  45 ------
- 4 files changed, 2 insertions(+), 332 deletions(-)
+ include/net/dsa.h |  3 ---
+ net/dsa/port.c    | 41 -----------------------------------------
+ 2 files changed, 44 deletions(-)
 
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
-index a1ca82715714..6174855188d9 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.c
-+++ b/drivers/net/dsa/mv88e6xxx/chip.c
-@@ -492,81 +492,6 @@ static int mv88e6xxx_port_ppu_updates(struct mv88e6xxx_chip *chip, int port)
- 	return !!(reg & MV88E6XXX_PORT_STS_PHY_DETECT);
+diff --git a/include/net/dsa.h b/include/net/dsa.h
+index 90bba1ce5899..7f603fc0baab 100644
+--- a/include/net/dsa.h
++++ b/include/net/dsa.h
+@@ -865,8 +865,6 @@ struct dsa_switch_ops {
+ 	struct phylink_pcs *(*phylink_mac_select_pcs)(struct dsa_switch *ds,
+ 						      int port,
+ 						      phy_interface_t iface);
+-	int	(*phylink_mac_link_state)(struct dsa_switch *ds, int port,
+-					  struct phylink_link_state *state);
+ 	int	(*phylink_mac_prepare)(struct dsa_switch *ds, int port,
+ 				       unsigned int mode,
+ 				       phy_interface_t interface);
+@@ -876,7 +874,6 @@ struct dsa_switch_ops {
+ 	int	(*phylink_mac_finish)(struct dsa_switch *ds, int port,
+ 				      unsigned int mode,
+ 				      phy_interface_t interface);
+-	void	(*phylink_mac_an_restart)(struct dsa_switch *ds, int port);
+ 	void	(*phylink_mac_link_down)(struct dsa_switch *ds, int port,
+ 					 unsigned int mode,
+ 					 phy_interface_t interface);
+diff --git a/net/dsa/port.c b/net/dsa/port.c
+index 0ce8fd311c78..c63cbfbe6489 100644
+--- a/net/dsa/port.c
++++ b/net/dsa/port.c
+@@ -1568,27 +1568,6 @@ static void dsa_port_phylink_validate(struct phylink_config *config,
+ 		phylink_generic_validate(config, supported, state);
  }
  
--static int mv88e6xxx_serdes_pcs_get_state(struct dsa_switch *ds, int port,
--					  struct phylink_link_state *state)
+-static void dsa_port_phylink_mac_pcs_get_state(struct phylink_config *config,
+-					       struct phylink_link_state *state)
 -{
--	struct mv88e6xxx_chip *chip = ds->priv;
--	int lane;
+-	struct dsa_port *dp = container_of(config, struct dsa_port, pl_config);
+-	struct dsa_switch *ds = dp->ds;
 -	int err;
 -
--	mv88e6xxx_reg_lock(chip);
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane >= 0 && chip->info->ops->serdes_pcs_get_state)
--		err = chip->info->ops->serdes_pcs_get_state(chip, port, lane,
--							    state);
--	else
--		err = -EOPNOTSUPP;
--	mv88e6xxx_reg_unlock(chip);
--
--	return err;
--}
--
--static int mv88e6xxx_serdes_pcs_config(struct mv88e6xxx_chip *chip, int port,
--				       unsigned int mode,
--				       phy_interface_t interface,
--				       const unsigned long *advertise)
--{
--	const struct mv88e6xxx_ops *ops = chip->info->ops;
--	int lane;
--
--	if (ops->serdes_pcs_config) {
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane >= 0)
--			return ops->serdes_pcs_config(chip, port, lane, mode,
--						      interface, advertise);
+-	/* Only called for inband modes */
+-	if (!ds->ops->phylink_mac_link_state) {
+-		state->link = 0;
+-		return;
 -	}
 -
--	return 0;
--}
--
--static void mv88e6xxx_serdes_pcs_an_restart(struct dsa_switch *ds, int port)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--	const struct mv88e6xxx_ops *ops;
--	int err = 0;
--	int lane;
--
--	ops = chip->info->ops;
--
--	if (ops->serdes_pcs_an_restart) {
--		mv88e6xxx_reg_lock(chip);
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane >= 0)
--			err = ops->serdes_pcs_an_restart(chip, port, lane);
--		mv88e6xxx_reg_unlock(chip);
--
--		if (err)
--			dev_err(ds->dev, "p%d: failed to restart AN\n", port);
+-	err = ds->ops->phylink_mac_link_state(ds, dp->index, state);
+-	if (err < 0) {
+-		dev_err(ds->dev, "p%d: phylink_mac_link_state() failed: %d\n",
+-			dp->index, err);
+-		state->link = 0;
 -	}
 -}
 -
--static int mv88e6xxx_serdes_pcs_link_up(struct mv88e6xxx_chip *chip, int port,
--					unsigned int mode,
--					int speed, int duplex)
--{
--	const struct mv88e6xxx_ops *ops = chip->info->ops;
--	int lane;
--
--	if (!phylink_autoneg_inband(mode) && ops->serdes_pcs_link_up) {
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane >= 0)
--			return ops->serdes_pcs_link_up(chip, port, lane,
--						       speed, duplex);
--	}
--
--	return 0;
--}
--
- static const u8 mv88e6185_phy_interface_modes[] = {
- 	[MV88E6185_PORT_STS_CMODE_GMII_FD]	 = PHY_INTERFACE_MODE_GMII,
- 	[MV88E6185_PORT_STS_CMODE_MII_100_FD_PS] = PHY_INTERFACE_MODE_MII,
-@@ -845,15 +770,8 @@ static void mv88e6xxx_get_caps(struct dsa_switch *ds, int port,
- 			  config->supported_interfaces);
- 	}
- 
--	/* If we have a .pcs_ops, or don't have a .serdes_pcs_get_state,
--	 * serdes_pcs_config, serdes_pcs_an_restart, or serdes_pcs_link_up,
--	 * we are not legacy.
--	 */
--	if (chip->info->ops->pcs_ops ||
--	    (!chip->info->ops->serdes_pcs_get_state &&
--	     !chip->info->ops->serdes_pcs_config &&
--	     !chip->info->ops->serdes_pcs_an_restart &&
--	     !chip->info->ops->serdes_pcs_link_up))
-+	/* If we have a .pcs_init, we are not legacy. */
-+	if (chip->info->ops->pcs_ops)
- 		config->legacy_pre_march2020 = false;
+ static struct phylink_pcs *
+ dsa_port_phylink_mac_select_pcs(struct phylink_config *config,
+ 				phy_interface_t interface)
+@@ -1646,17 +1625,6 @@ static int dsa_port_phylink_mac_finish(struct phylink_config *config,
+ 	return err;
  }
  
-@@ -907,16 +825,6 @@ static void mv88e6xxx_mac_config(struct dsa_switch *ds, int port,
- 						      state->interface);
- 		if (err && err != -EOPNOTSUPP)
- 			goto err_unlock;
--
--		err = mv88e6xxx_serdes_pcs_config(chip, port, mode,
--						  state->interface,
--						  state->advertising);
--		/* FIXME: we should restart negotiation if something changed -
--		 * which is something we get if we convert to using phylinks
--		 * PCS operations.
--		 */
--		if (err > 0)
--			err = 0;
- 	}
- 
- err_unlock:
-@@ -1000,17 +908,6 @@ static void mv88e6xxx_mac_link_up(struct dsa_switch *ds, int port,
- 	 */
- 	if (!mv88e6xxx_port_ppu_updates(chip, port) ||
- 	    mode == MLO_AN_FIXED) {
--		/* FIXME: for an automedia port, should we force the link
--		 * down here - what if the link comes up due to "other" media
--		 * while we're bringing the port up, how is the exclusivity
--		 * handled in the Marvell hardware? E.g. port 2 on 88E6390
--		 * shared between internal PHY and Serdes.
--		 */
--		err = mv88e6xxx_serdes_pcs_link_up(chip, port, mode, speed,
--						   duplex);
--		if (err)
--			goto error;
--
- 		if (ops->port_set_speed_duplex) {
- 			err = ops->port_set_speed_duplex(chip, port,
- 							 speed, duplex);
-@@ -3181,102 +3078,6 @@ static int mv88e6xxx_setup_egress_floods(struct mv88e6xxx_chip *chip, int port)
- 	return 0;
- }
- 
--static irqreturn_t mv88e6xxx_serdes_irq_thread_fn(int irq, void *dev_id)
+-static void dsa_port_phylink_mac_an_restart(struct phylink_config *config)
 -{
--	struct mv88e6xxx_port *mvp = dev_id;
--	struct mv88e6xxx_chip *chip = mvp->chip;
--	irqreturn_t ret = IRQ_NONE;
--	int port = mvp->port;
--	int lane;
+-	struct dsa_port *dp = container_of(config, struct dsa_port, pl_config);
+-	struct dsa_switch *ds = dp->ds;
 -
--	mv88e6xxx_reg_lock(chip);
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane >= 0)
--		ret = mv88e6xxx_serdes_irq_status(chip, port, lane);
--	mv88e6xxx_reg_unlock(chip);
--
--	return ret;
--}
--
--static int mv88e6xxx_serdes_irq_request(struct mv88e6xxx_chip *chip, int port,
--					int lane)
--{
--	struct mv88e6xxx_port *dev_id = &chip->ports[port];
--	unsigned int irq;
--	int err;
--
--	/* Nothing to request if this SERDES port has no IRQ */
--	irq = mv88e6xxx_serdes_irq_mapping(chip, port);
--	if (!irq)
--		return 0;
--
--	snprintf(dev_id->serdes_irq_name, sizeof(dev_id->serdes_irq_name),
--		 "mv88e6xxx-%s-serdes-%d", dev_name(chip->dev), port);
--
--	/* Requesting the IRQ will trigger IRQ callbacks, so release the lock */
--	mv88e6xxx_reg_unlock(chip);
--	err = request_threaded_irq(irq, NULL, mv88e6xxx_serdes_irq_thread_fn,
--				   IRQF_ONESHOT, dev_id->serdes_irq_name,
--				   dev_id);
--	mv88e6xxx_reg_lock(chip);
--	if (err)
--		return err;
--
--	dev_id->serdes_irq = irq;
--
--	return mv88e6xxx_serdes_irq_enable(chip, port, lane);
--}
--
--static int mv88e6xxx_serdes_irq_free(struct mv88e6xxx_chip *chip, int port,
--				     int lane)
--{
--	struct mv88e6xxx_port *dev_id = &chip->ports[port];
--	unsigned int irq = dev_id->serdes_irq;
--	int err;
--
--	/* Nothing to free if no IRQ has been requested */
--	if (!irq)
--		return 0;
--
--	err = mv88e6xxx_serdes_irq_disable(chip, port, lane);
--
--	/* Freeing the IRQ will trigger IRQ callbacks, so release the lock */
--	mv88e6xxx_reg_unlock(chip);
--	free_irq(irq, dev_id);
--	mv88e6xxx_reg_lock(chip);
--
--	dev_id->serdes_irq = 0;
--
--	return err;
--}
--
--static int mv88e6xxx_serdes_power(struct mv88e6xxx_chip *chip, int port,
--				  bool on)
--{
--	int lane;
--	int err;
--
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane < 0)
--		return 0;
--
--	if (on) {
--		err = mv88e6xxx_serdes_power_up(chip, port, lane);
--		if (err)
--			return err;
--
--		err = mv88e6xxx_serdes_irq_request(chip, port, lane);
--	} else {
--		err = mv88e6xxx_serdes_irq_free(chip, port, lane);
--		if (err)
--			return err;
--
--		err = mv88e6xxx_serdes_power_down(chip, port, lane);
--	}
--
--	return err;
--}
--
- static int mv88e6xxx_set_egress_port(struct mv88e6xxx_chip *chip,
- 				     enum mv88e6xxx_egress_direction direction,
- 				     int port)
-@@ -3601,37 +3402,6 @@ static int mv88e6xxx_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
- 	return ret;
- }
- 
--static int mv88e6xxx_port_enable(struct dsa_switch *ds, int port,
--				 struct phy_device *phydev)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--	int err;
--
--	/* Do not control power or request irqs if using PCS */
--	if (chip->info->ops->pcs_ops)
--		return 0;
--
--	mv88e6xxx_reg_lock(chip);
--	err = mv88e6xxx_serdes_power(chip, port, true);
--	mv88e6xxx_reg_unlock(chip);
--
--	return err;
--}
--
--static void mv88e6xxx_port_disable(struct dsa_switch *ds, int port)
--{
--	struct mv88e6xxx_chip *chip = ds->priv;
--
--	/* Do not control power or request irqs if using PCS */
--	if (chip->info->ops->pcs_ops)
+-	if (!ds->ops->phylink_mac_an_restart)
 -		return;
 -
--	mv88e6xxx_reg_lock(chip);
--	if (mv88e6xxx_serdes_power(chip, port, false))
--		dev_err(chip->dev, "failed to power off SERDES\n");
--	mv88e6xxx_reg_unlock(chip);
+-	ds->ops->phylink_mac_an_restart(ds, dp->index);
 -}
 -
- static int mv88e6xxx_set_ageing_time(struct dsa_switch *ds,
- 				     unsigned int ageing_time)
- {
-@@ -7013,18 +6783,14 @@ static const struct dsa_switch_ops mv88e6xxx_switch_ops = {
- 	.port_teardown		= mv88e6xxx_port_teardown,
- 	.phylink_get_caps	= mv88e6xxx_get_caps,
- 	.phylink_mac_select_pcs	= mv88e6xxx_mac_select_pcs,
--	.phylink_mac_link_state	= mv88e6xxx_serdes_pcs_get_state,
- 	.phylink_mac_prepare	= mv88e6xxx_mac_prepare,
- 	.phylink_mac_config	= mv88e6xxx_mac_config,
- 	.phylink_mac_finish	= mv88e6xxx_mac_finish,
--	.phylink_mac_an_restart	= mv88e6xxx_serdes_pcs_an_restart,
- 	.phylink_mac_link_down	= mv88e6xxx_mac_link_down,
- 	.phylink_mac_link_up	= mv88e6xxx_mac_link_up,
- 	.get_strings		= mv88e6xxx_get_strings,
- 	.get_ethtool_stats	= mv88e6xxx_get_ethtool_stats,
- 	.get_sset_count		= mv88e6xxx_get_sset_count,
--	.port_enable		= mv88e6xxx_port_enable,
--	.port_disable		= mv88e6xxx_port_disable,
- 	.port_max_mtu		= mv88e6xxx_get_max_mtu,
- 	.port_change_mtu	= mv88e6xxx_change_mtu,
- 	.get_mac_eee		= mv88e6xxx_get_mac_eee,
-diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
-index 1dd310a3c41f..44383a03ef2f 100644
---- a/drivers/net/dsa/mv88e6xxx/chip.h
-+++ b/drivers/net/dsa/mv88e6xxx/chip.h
-@@ -286,8 +286,6 @@ struct mv88e6xxx_port {
- 	u8 cmode;
- 	bool mirror_ingress;
- 	bool mirror_egress;
--	unsigned int serdes_irq;
--	char serdes_irq_name[64];
- 	struct devlink_region *region;
- 	void *pcs_private;
+ static void dsa_port_phylink_mac_link_down(struct phylink_config *config,
+ 					   unsigned int mode,
+ 					   phy_interface_t interface)
+@@ -1700,11 +1668,9 @@ static void dsa_port_phylink_mac_link_up(struct phylink_config *config,
+ static const struct phylink_mac_ops dsa_port_phylink_mac_ops = {
+ 	.validate = dsa_port_phylink_validate,
+ 	.mac_select_pcs = dsa_port_phylink_mac_select_pcs,
+-	.mac_pcs_get_state = dsa_port_phylink_mac_pcs_get_state,
+ 	.mac_prepare = dsa_port_phylink_mac_prepare,
+ 	.mac_config = dsa_port_phylink_mac_config,
+ 	.mac_finish = dsa_port_phylink_mac_finish,
+-	.mac_an_restart = dsa_port_phylink_mac_an_restart,
+ 	.mac_link_down = dsa_port_phylink_mac_link_down,
+ 	.mac_link_up = dsa_port_phylink_mac_link_up,
+ };
+@@ -1720,13 +1686,6 @@ int dsa_port_phylink_create(struct dsa_port *dp)
+ 	if (err)
+ 		mode = PHY_INTERFACE_MODE_NA;
  
-@@ -592,31 +590,12 @@ struct mv88e6xxx_ops {
+-	/* Presence of phylink_mac_link_state or phylink_mac_an_restart is
+-	 * an indicator of a legacy phylink driver.
+-	 */
+-	if (ds->ops->phylink_mac_link_state ||
+-	    ds->ops->phylink_mac_an_restart)
+-		dp->pl_config.legacy_pre_march2020 = true;
+-
+ 	if (ds->ops->phylink_get_caps)
+ 		ds->ops->phylink_get_caps(ds, dp->index, &dp->pl_config);
  
- 	int (*mgmt_rsvd2cpu)(struct mv88e6xxx_chip *chip);
- 
--	/* Power on/off a SERDES interface */
--	int (*serdes_power)(struct mv88e6xxx_chip *chip, int port, int lane,
--			    bool up);
--
- 	/* SERDES lane mapping */
- 	int (*serdes_get_lane)(struct mv88e6xxx_chip *chip, int port);
- 
--	int (*serdes_pcs_get_state)(struct mv88e6xxx_chip *chip, int port,
--				    int lane, struct phylink_link_state *state);
--	int (*serdes_pcs_config)(struct mv88e6xxx_chip *chip, int port,
--				 int lane, unsigned int mode,
--				 phy_interface_t interface,
--				 const unsigned long *advertise);
--	int (*serdes_pcs_an_restart)(struct mv88e6xxx_chip *chip, int port,
--				     int lane);
--	int (*serdes_pcs_link_up)(struct mv88e6xxx_chip *chip, int port,
--				  int lane, int speed, int duplex);
--
- 	/* SERDES interrupt handling */
- 	unsigned int (*serdes_irq_mapping)(struct mv88e6xxx_chip *chip,
- 					   int port);
--	int (*serdes_irq_enable)(struct mv88e6xxx_chip *chip, int port, int lane,
--				 bool enable);
--	irqreturn_t (*serdes_irq_status)(struct mv88e6xxx_chip *chip, int port,
--					 int lane);
- 
- 	/* Statistics from the SERDES interface */
- 	int (*serdes_get_sset_count)(struct mv88e6xxx_chip *chip, int port);
-diff --git a/drivers/net/dsa/mv88e6xxx/port.c b/drivers/net/dsa/mv88e6xxx/port.c
-index dd66ec902d4c..5394a8cf7bf1 100644
---- a/drivers/net/dsa/mv88e6xxx/port.c
-+++ b/drivers/net/dsa/mv88e6xxx/port.c
-@@ -524,7 +524,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 				    phy_interface_t mode, bool force)
- {
- 	u16 cmode;
--	int lane;
- 	u16 reg;
- 	int err;
- 
-@@ -577,19 +576,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 	if (cmode == chip->ports[port].cmode && !force)
- 		return 0;
- 
--	lane = mv88e6xxx_serdes_get_lane(chip, port);
--	if (lane >= 0) {
--		if (chip->ports[port].serdes_irq) {
--			err = mv88e6xxx_serdes_irq_disable(chip, port, lane);
--			if (err)
--				return err;
--		}
--
--		err = mv88e6xxx_serdes_power_down(chip, port, lane);
--		if (err)
--			return err;
--	}
--
- 	chip->ports[port].cmode = 0;
- 
- 	if (cmode) {
-@@ -605,22 +591,6 @@ static int mv88e6xxx_port_set_cmode(struct mv88e6xxx_chip *chip, int port,
- 			return err;
- 
- 		chip->ports[port].cmode = cmode;
--
--		lane = mv88e6xxx_serdes_get_lane(chip, port);
--		if (lane == -ENODEV)
--			return 0;
--		if (lane < 0)
--			return lane;
--
--		err = mv88e6xxx_serdes_power_up(chip, port, lane);
--		if (err)
--			return err;
--
--		if (chip->ports[port].serdes_irq) {
--			err = mv88e6xxx_serdes_irq_enable(chip, port, lane);
--			if (err)
--				return err;
--		}
- 	}
- 
- 	return 0;
-diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
-index 67584cb1fdb9..aac95cab46e3 100644
---- a/drivers/net/dsa/mv88e6xxx/serdes.h
-+++ b/drivers/net/dsa/mv88e6xxx/serdes.h
-@@ -153,24 +153,6 @@ static inline int mv88e6xxx_serdes_get_lane(struct mv88e6xxx_chip *chip,
- 	return chip->info->ops->serdes_get_lane(chip, port);
- }
- 
--static inline int mv88e6xxx_serdes_power_up(struct mv88e6xxx_chip *chip,
--					    int port, int lane)
--{
--	if (!chip->info->ops->serdes_power)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_power(chip, port, lane, true);
--}
--
--static inline int mv88e6xxx_serdes_power_down(struct mv88e6xxx_chip *chip,
--					      int port, int lane)
--{
--	if (!chip->info->ops->serdes_power)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_power(chip, port, lane, false);
--}
--
- static inline unsigned int
- mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
- {
-@@ -180,33 +162,6 @@ mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
- 	return chip->info->ops->serdes_irq_mapping(chip, port);
- }
- 
--static inline int mv88e6xxx_serdes_irq_enable(struct mv88e6xxx_chip *chip,
--					      int port, int lane)
--{
--	if (!chip->info->ops->serdes_irq_enable)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_irq_enable(chip, port, lane, true);
--}
--
--static inline int mv88e6xxx_serdes_irq_disable(struct mv88e6xxx_chip *chip,
--					       int port, int lane)
--{
--	if (!chip->info->ops->serdes_irq_enable)
--		return -EOPNOTSUPP;
--
--	return chip->info->ops->serdes_irq_enable(chip, port, lane, false);
--}
--
--static inline irqreturn_t
--mv88e6xxx_serdes_irq_status(struct mv88e6xxx_chip *chip, int port, int lane)
--{
--	if (!chip->info->ops->serdes_irq_status)
--		return IRQ_NONE;
--
--	return chip->info->ops->serdes_irq_status(chip, port, lane);
--}
--
- extern const struct mv88e6xxx_pcs_ops mv88e6185_pcs_ops;
- extern const struct mv88e6xxx_pcs_ops mv88e6352_pcs_ops;
- extern const struct mv88e6xxx_pcs_ops mv88e6390_pcs_ops;
 -- 
 2.30.2
 
