@@ -1,277 +1,245 @@
-Return-Path: <netdev+bounces-13492-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13493-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A5AD173BDC2
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:24:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9FB1273BDD0
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:30:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BAEBB1C21310
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:24:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78E331C212E0
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5781A100CF;
-	Fri, 23 Jun 2023 17:24:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9110C100CD;
+	Fri, 23 Jun 2023 17:30:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41A7A100CA
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 17:24:49 +0000 (UTC)
-Received: from mail-pg1-x531.google.com (mail-pg1-x531.google.com [IPv6:2607:f8b0:4864:20::531])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 42EC9172C
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 10:24:47 -0700 (PDT)
-Received: by mail-pg1-x531.google.com with SMTP id 41be03b00d2f7-5535efe37b7so601553a12.3
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 10:24:47 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687541087; x=1690133087;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=a4M9Bl7dXhZ6Jxoy+pKZRXzkgBLpWGzM2r3wz56MQkg=;
-        b=VZbhMtlhg3Gm/WM/VFxnnTvKD3mAhx3fhs5jV+RoADOtRoUuiUCdUix7BoS9c4C8/w
-         ozYRo9spei2krmC0NAQYjwzEwtfBECZV6HlO0kAWkyukcvziQFt4isgrX/QVhADTX/LE
-         ut+RKFfdklmlfgR/LYDomIOzmGOwRxJFAg/iNSqLBRFXaJkYugtJRCiMgqqutqMuy/6B
-         nHbmMYGXZom/TbveGfmIEY691qsANf4+2Ivuuermz49bp6ffdoihBTs3BQy29hf3G1ai
-         +WgRm8uWg80EHzqZLQBkq9tlg1BWiIscO2m6FulaffMMfunX4B3MVJ2+1qoWZw/kmBp/
-         trhg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687541087; x=1690133087;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=a4M9Bl7dXhZ6Jxoy+pKZRXzkgBLpWGzM2r3wz56MQkg=;
-        b=WeJY7FYhezQtRwq8V9nW8IM1ChBt6QaeTxUsHSdEsiB9uhwYRKfgrrU03fCkt8RV+B
-         wCFLFeuFnsONA5urtgBGUFl+U2inRPrSa0hsdAt3aVcf5koc81F0Pf/lkfcT4t/Hl/ID
-         YkoKrFJEExQJJaO4lBXtWvHNp8XPhclJEtdYj6vUnj1pvDmdgNJT/VGYFTv0RRe3l/2O
-         umOEO98CxEd91wtwKKUFld91O2wmbsKF7R8nvca32t2VvirjpZBgKlISKGsqxheOccpm
-         +fsOCRCw0eLEIvYIpvZ7vzo0AY1yb0Agi7KOLMt6TwnezM9n/+bXcwjkkiMwHAhk3XRp
-         bnjw==
-X-Gm-Message-State: AC+VfDwaotsPSyYQYsOsjtnikORPff52zj8sCfJTuKog/N5ze8YDkia/
-	imWeH/xuNQhMVdaq15p8Iq/qGZBBpAjYTG3NmjLaYw==
-X-Google-Smtp-Source: ACHHUZ6+JUxu2/ENZUjNLq7Nh+eL1eC6+HdZ0vfMWME7LvCKQPk23oBNeRc6wncBLkcND6nTBK9Cy9aMq7SzdDCpx6Y=
-X-Received: by 2002:a17:90a:b895:b0:25e:8169:1b44 with SMTP id
- o21-20020a17090ab89500b0025e81691b44mr14793361pjr.15.1687541086502; Fri, 23
- Jun 2023 10:24:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8402C100B8
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 17:30:46 +0000 (UTC)
+Received: from mout2.freenet.de (mout2.freenet.de [IPv6:2001:748:100:40::2:4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44A112728
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 10:30:44 -0700 (PDT)
+Received: from [195.4.92.122] (helo=sub3.freenet.de)
+	by mout2.freenet.de with esmtpa (ID tobias.klausmann@freenet.de) (port 25) (Exim 4.94.2 #2)
+	id 1qCkcK-006JKc-1y; Fri, 23 Jun 2023 19:30:40 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=freenet.de;
+	s=mjaymdexmjqk; h=Content-Transfer-Encoding:Content-Type:In-Reply-To:From:
+	References:Cc:To:Subject:MIME-Version:Date:Message-ID:Sender:Reply-To:
+	Content-ID:Content-Description:Resent-Date:Resent-From:Resent-Sender:
+	Resent-To:Resent-Cc:Resent-Message-ID:List-Id:List-Help:List-Unsubscribe:
+	List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=nU+UFaJeiRw7+/TIz/zgCDFFZ5jmVCHngMpHCDhwb20=; b=kdpQdcDCwZr1rZ7i6PdwX9z2Sq
+	vZOPYL5apDSKQPCfMYoypmFJz17xKK3FkeYiYdDwY/FreVeDEVC/hvomtl5N4EVvW/4O2Gi9SCY7R
+	FDWhvzomyqnXToCiKg5dILaa8CKUUZHhdnmfqUFqE0cFE/o/8jv47wlKMyENuY7rDFyNTWYuh7B4G
+	NTxYBs40jxNuTRFQCgyyaX6a01foscjUaiw3+HKdMFx4U5VLjxy76tdmGSOay1s4v52USBXfIfC+d
+	lea57Ppxl+uX5g+fGURHd0I0pGYtVj/Jc0H3epWwWR3efrDcEVMMnTqfYONBQLKDJv4bakxWv+ZF4
+	f+Mzm9NQ==;
+Received: from p200300c7ff368200e5067a8d21d0d539.dip0.t-ipconnect.de ([2003:c7:ff36:8200:e506:7a8d:21d0:d539]:45430)
+	by sub3.freenet.de with esmtpsa (ID tobias.klausmann@freenet.de) (TLS1.3:ECDHE_X25519__RSA_PSS_RSAE_SHA256__AES_128_GCM:128) (port 465) (Exim 4.94.2 #2)
+	id 1qCkcJ-00EJtu-NH; Fri, 23 Jun 2023 19:30:39 +0200
+Message-ID: <e47bac0d-e802-65e1-b311-6acb26d5cf10@freenet.de>
+Date: Fri, 23 Jun 2023 19:30:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621170244.1283336-1-sdf@google.com> <20230621170244.1283336-12-sdf@google.com>
- <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
- <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
- <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
- <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com> <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
-In-Reply-To: <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Fri, 23 Jun 2023 10:24:30 -0700
-Message-ID: <CAKH8qBvJjtSb+80cNEJ_3qBR-smcc5mBAH4rTiWhckxVeZWxLA@mail.gmail.com>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song <yhs@fb.com>, 
-	John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Thunderbird Daily
+Subject: Re: r8169: transmit transmit queue timed out - v6.4 cycle
+To: Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ netdev@vger.kernel.org
+References: <c3465166-f04d-fcf5-d284-57357abb3f99@freenet.de>
+ <CAFSsGVtiXSK_0M_TQm_38LabiRX7E5vR26x=cKags4ZQBqfXPQ@mail.gmail.com>
+Content-Language: en-US
+From: Tobias Klausmann <tobias.klausmann@freenet.de>
+In-Reply-To: <CAFSsGVtiXSK_0M_TQm_38LabiRX7E5vR26x=cKags4ZQBqfXPQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-FN-MUUID: 1687541439AED0F538E25EO
+X-Originated-At: 2003:c7:ff36:8200:e506:7a8d:21d0:d539!45430
+X-Scan-TS: Fri, 23 Jun 2023 19:30:39 +0200
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 7:36=E2=80=AFPM Alexei Starovoitov
-<alexei.starovoitov@gmail.com> wrote:
+Hello,
+
+ASPM is not available as per
+
+"r8169 0000:03:00.0: can't disable ASPM; OS doesn't have ASPMcontrol", 
+the problem is triggered by "no-load" to ~100MBit/s load on a 1GBit/s 
+connection.
+
+
+On 23.06.23 00:10, Heiner Kallweit wrote:
+> Same chip version works fine for me even with ASPM L1.2. So your board 
+> may have  broken ASPM support. Any special load pattern that triggers 
+> the issue?  Can you work around the issue by disabling ASPM sub-states 
+> via sysfs attributes, starting with L1.2?
 >
-> On Thu, Jun 22, 2023 at 3:13=E2=80=AFPM Stanislav Fomichev <sdf@google.co=
-m> wrote:
-> >
-> > On Thu, Jun 22, 2023 at 2:47=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Thu, Jun 22, 2023 at 1:13=E2=80=AFPM Stanislav Fomichev <sdf@googl=
-e.com> wrote:
-> > > >
-> > > > On Thu, Jun 22, 2023 at 12:58=E2=80=AFPM Alexei Starovoitov
-> > > > <alexei.starovoitov@gmail.com> wrote:
-> > > > >
-> > > > > On Wed, Jun 21, 2023 at 10:02:44AM -0700, Stanislav Fomichev wrot=
-e:
-> > > > > > WIP, not tested, only to show the overall idea.
-> > > > > > Non-AF_XDP paths are marked with 'false' for now.
-> > > > > >
-> > > > > > Cc: netdev@vger.kernel.org
-> > > > > > Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> > > > > > ---
-> > > > > >  .../net/ethernet/mellanox/mlx5/core/en/txrx.h | 11 +++
-> > > > > >  .../net/ethernet/mellanox/mlx5/core/en/xdp.c  | 96 +++++++++++=
-+++++++-
-> > > > > >  .../net/ethernet/mellanox/mlx5/core/en/xdp.h  |  9 +-
-> > > > > >  .../ethernet/mellanox/mlx5/core/en/xsk/tx.c   |  3 +
-> > > > > >  .../net/ethernet/mellanox/mlx5/core/en_tx.c   | 16 ++++
-> > > > > >  .../net/ethernet/mellanox/mlx5/core/main.c    | 26 ++++-
-> > > > > >  6 files changed, 156 insertions(+), 5 deletions(-)
-> > > > > >
-> > > > > > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h =
-b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-> > > > > > index 879d698b6119..e4509464e0b1 100644
-> > > > > > --- a/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-> > > > > > +++ b/drivers/net/ethernet/mellanox/mlx5/core/en/txrx.h
-> > > > > > @@ -6,6 +6,7 @@
-> > > > > >
-> > > > > >  #include "en.h"
-> > > > > >  #include <linux/indirect_call_wrapper.h>
-> > > > > > +#include <net/devtx.h>
-> > > > > >
-> > > > > >  #define MLX5E_TX_WQE_EMPTY_DS_COUNT (sizeof(struct mlx5e_tx_wq=
-e) / MLX5_SEND_WQE_DS)
-> > > > > >
-> > > > > > @@ -506,4 +507,14 @@ static inline struct mlx5e_mpw_info *mlx5e=
-_get_mpw_info(struct mlx5e_rq *rq, int
-> > > > > >
-> > > > > >       return (struct mlx5e_mpw_info *)((char *)rq->mpwqe.info +=
- array_size(i, isz));
-> > > > > >  }
-> > > > > > +
-> > > > > > +struct mlx5e_devtx_frame {
-> > > > > > +     struct devtx_frame frame;
-> > > > > > +     struct mlx5_cqe64 *cqe; /* tx completion */
-> > > > >
-> > > > > cqe is only valid at completion.
-> > > > >
-> > > > > > +     struct mlx5e_tx_wqe *wqe; /* tx */
-> > > > >
-> > > > > wqe is only valid at submission.
-> > > > >
-> > > > > imo that's a very clear sign that this is not a generic datastruc=
-ture.
-> > > > > The code is trying hard to make 'frame' part of it look common,
-> > > > > but it won't help bpf prog to be 'generic'.
-> > > > > It is still going to precisely coded for completion vs submission=
-.
-> > > > > Similarly a bpf prog for completion in veth will be different tha=
-n bpf prog for completion in mlx5.
-> > > > > As I stated earlier this 'generalization' and 'common' datastruct=
-ure only adds code complexity.
-> > > >
-> > > > The reason I went with this abstract context is to allow the progra=
-ms
-> > > > to be attached to the different devices.
-> > > > For example, the xdp_hw_metadata we currently have is not really ti=
-ed
-> > > > down to the particular implementation.
-> > > > If every hook declaration looks different, it seems impossible to
-> > > > create portable programs.
-> > > >
-> > > > The frame part is not really needed, we can probably rename it to c=
-tx
-> > > > and pass data/frags over the arguments?
-> > > >
-> > > > struct devtx_ctx {
-> > > >   struct net_device *netdev;
-> > > >   /* the devices will be able to create wrappers to stash descripto=
-r pointers */
-> > > > };
-> > > > void veth_devtx_submit(struct devtx_ctx *ctx, void *data, u16 len, =
-u8
-> > > > meta_len, struct skb_shared_info *sinfo);
-> > > >
-> > > > But striving to have a similar hook declaration seems useful to
-> > > > program portability sake?
-> > >
-> > > portability across what ?
-> > > 'timestamp' on veth doesn't have a real use. It's testing only.
-> > > Even testing is a bit dubious.
-> > > I can see a need for bpf prog to run in the datacenter on mlx, brcm
-> > > and whatever other nics, but they will have completely different
-> > > hw descriptors. timestamp kfuncs to request/read can be common,
-> > > but to read the descriptors bpf prog authors would need to write
-> > > different code anyway.
-> > > So kernel code going out its way to present somewhat common devtx_ctx
-> > > just doesn't help. It adds code to the kernel, but bpf prog still
-> > > has to be tailored for mlx and brcm differently.
-> >
-> > Isn't it the same discussion/arguments we had during the RX series?
+> Tobias Klausmann <tobias.klausmann@freenet.de> schrieb am Do., 22. 
+> Juni 2023, 15:46:
 >
-> Right, but there we already have xdp_md as an abstraction.
-> Extra kfuncs don't change that.
-> Here is the whole new 'ctx' being proposed with assumption that
-> it will be shared between completion and submission and will be
-> useful in both.
+>     Hello all,
 >
-> But there is skb at submission time and no skb at completion.
-> xdp_frame is there, but it's the last record of what was sent on the wire=
-.
-> Parsing it with bpf is like examining steps in a sand. They are gone.
-> Parsing at submission makes sense, not at completion
-> and the driver has a way to associate wqe with cqe.
-
-Right, and I'm not exposing neither skb nor xdp_md/frame, so we're on
-the same page?
-Or are you suggesting to further split devtx_frame into two contexts?
-One for submit and another for complete?
-And don't expose the payload at the complete time?
-Having payload at complete might still be useful though, at least the heade=
-r.
-In case the users want only to inspect completion based on some marker/flow=
-.
-
-> > We want to provide common sane interfaces/abstractions via kfuncs.
-> > That will make most BPF programs portable from mlx to brcm (for
-> > example) without doing a rewrite.
-> > We're also exposing raw (readonly) descriptors (via that get_ctx
-> > helper) to the users who know what to do with them.
-> > Most users don't know what to do with raw descriptors;
+>     introduced in the 6.4 cycle r8169 show transmit queue timeouts [1].
+>     Bisecting the problem brought me to the following commit:
 >
-> Why do you think so?
-> Who are those users?
-> I see your proposal and thumbs up from onlookers.
-> afaict there are zero users for rx side hw hints too.
-
-My bias comes from the point of view of our internal use-cases where
-we'd like to have rx/tx timestamps in the device-agnostic fashion.
-I'm happy to incorporate other requirements as I did with exposing raw
-descriptors at rx using get_ctx helper.
-Regarding the usage: for the external ones I'm assuming it will take
-time until it all percolates through the distros...
-
-> > the specs are
-> > not public; things can change depending on fw version/etc/etc.
-> > So the progs that touch raw descriptors are not the primary use-case.
-> > (that was the tl;dr for rx part, seems like it applies here?)
-> >
-> > Let's maybe discuss that mlx5 example? Are you proposing to do
-> > something along these lines?
-> >
-> > void mlx5e_devtx_submit(struct mlx5e_tx_wqe *wqe);
-> > void mlx5e_devtx_complete(struct mlx5_cqe64 *cqe);
-> >
-> > If yes, I'm missing how we define the common kfuncs in this case. The
-> > kfuncs need to have some common context. We're defining them with:
-> > bpf_devtx_<kfunc>(const struct devtx_frame *ctx);
+>     2ab19de62d67e403105ba860971e5ff0d511ad15 is the first bad commit
+>     commit 2ab19de62d67e403105ba860971e5ff0d511ad15
+>     Author: Heiner Kallweit <hkallweit1@gmail.com>
+>     Date:   Mon Mar 6 22:28:06 2023 +0100
 >
-> I'm looking at xdp_metadata and wondering who's using it.
-> I haven't seen a single bug report.
-> No bugs means no one is using it. There is zero chance that we managed
-> to implement it bug-free on the first try.
-> So new tx side things look like a feature creep to me.
-> rx side is far from proven to be useful for anything.
-> Yet you want to add new things.
-
-I've been talking about both tx and rx timestamps right from the
-beginning, so it's not really a new feature.
-But what's the concern here? IIUC, the whole point of it being
-kfunc-based is that we can wipe it all if/when it becomes a dead
-weight.
-
-Regarding the users, there is also a bit of a chicken and egg problem:
-We have some internal interest in using AF_XDP, but it lacks multibuf
-(which is in the review) and the offloads (which I'm trying to move
-forward for both rx/tx).
+>          r8169: remove ASPM restrictions now that ASPM is disabled during
+>     NAPI poll
+>
+>          Now that  ASPM is disabled during NAPI poll, we can remove
+>     all ASPM
+>          restrictions. This allows for higher power savings if the network
+>          isn't fully loaded.
+>
+>          Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>          Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>          Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+>          Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>          Signed-off-by: David S. Miller <davem@davemloft.net>
+>
+>       drivers/net/ethernet/realtek/r8169_main.c | 27
+>     +--------------------------
+>       1 file changed, 1 insertion(+), 26 deletions(-)
+>
+>
+>     With this commit reverted on top of v6.4-rc6, the timeouts are gone.
+>
+>     The NIC identifies as "03:00.0 Ethernet controller: Realtek
+>     Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit
+>     Ethernet
+>     Controller (rev 15)"
+>
+>     Greetings,
+>
+>     Tobias Klausmann
+>
+>
+>     [1]:
+>
+>     [ 2070.918700] ------------[ cut here ]------------
+>     [ 2070.918708] NETDEV WATCHDOG: enp3s0 (r8169): transmit queue 0
+>     timed
+>     out 5317 ms
+>     [ 2070.918719] WARNING: CPU: 4 PID: 0 at net/sched/sch_generic.c:525
+>     dev_watchdog+0x1c9/0x1d0
+>     [ 2070.918726] Modules linked in: rfcomm(E) af_packet(E) cmac(E)
+>     algif_hash(E) algif_skcipher(E) af_alg(E) bnep(E) btusb(E) btrtl(E)
+>     uvcvideo(E) btbcm(E) uvc(E) btintel(E) videobuf2_vmalloc(E) btmtk(E)
+>     videobuf2_memops(E) rtsx_usb_sdmmc(E) videobuf2_v4l2(E) bluetooth(E)
+>     rtsx_usb_ms(E) mmc_core(E) ecdh_generic(E) memstick(E) ecc(E)
+>     videodev(E) videobuf2_common(E) mc(E) rtsx_usb(E) qrtr(E)
+>     nls_iso8859_1(E) nls_cp437(E) vfat(E) fat(E) joydev(E)
+>     snd_hda_codec_realtek(E) snd_hda_codec_generic(E) ledtrig_audio(E)
+>     snd_hda_codec_hdmi(E) ath10k_pci(E) ath10k_core(E) hid_multitouch(E)
+>     ath(E) snd_hda_intel(E) snd_intel_dspcfg(E) iTCO_wdt(E) ee1004(E)
+>     intel_rapl_msr(E) snd_intel_sdw_acpi(E) intel_pmc_bxt(E)
+>     snd_hda_codec(E) mac80211(E) iTCO_vendor_support(E) r8169(E)
+>     intel_rapl_common(E) snd_hda_core(E) intel_tcc_cooling(E) mei_hdcp(E)
+>     x86_pkg_temp_thermal(E) acer_wmi(E) intel_powerclamp(E) cfg80211(E)
+>     snd_hwdep(E) sparse_keymap(E) coretemp(E) snd_pcm(E) realtek(E)
+>     i2c_i801(E) wmi_bmof(E) intel_wmi_thunderbolt(E)
+>     [ 2070.918794]  snd_timer(E) rfkill(E) mdio_devres(E) libphy(E)
+>     libarc4(E) efi_pstore(E) snd(E) i2c_smbus(E) soundcore(E) mei_me(E)
+>     intel_lpss_pci(E) intel_lpss(E) mei(E) idma64(E) intel_pch_thermal(E)
+>     thermal(E) battery(E) ac(E) acpi_pad(E) tiny_power_button(E) fuse(E)
+>     configfs(E) dmi_sysfs(E) ip_tables(E) x_tables(E) hid_generic(E)
+>     usbhid(E) crct10dif_pclmul(E) nouveau(E) crc32_pclmul(E)
+>     crc32c_intel(E)
+>     i915(E) polyval_clmulni(E) drm_ttm_helper(E) polyval_generic(E)
+>     ghash_clmulni_intel(E) mxm_wmi(E) drm_buddy(E) sha512_ssse3(E)
+>     i2c_algo_bit(E) aesni_intel(E) drm_display_helper(E) crypto_simd(E)
+>     drm_kms_helper(E) syscopyarea(E) sysfillrect(E) cryptd(E)
+>     sysimgblt(E)
+>     cec(E) xhci_pci(E) ttm(E) xhci_hcd(E) usbcore(E) drm(E) usb_common(E)
+>     i2c_hid_acpi(E) i2c_hid(E) video(E) wmi(E) pinctrl_sunrisepoint(E)
+>     button(E) serio_raw(E) sg(E) dm_multipath(E) dm_mod(E)
+>     scsi_dh_rdac(E)
+>     scsi_dh_emc(E) scsi_dh_alua(E) msr(E) efivarfs(E)
+>     [ 2070.918862] CPU: 4 PID: 0 Comm: swapper/4 Tainted: G
+>     E      6.4.0-rc1-desktop-debug+ #51
+>     [ 2070.918864] Hardware name: Acer Aspire VN7-593G/Pluto_KLS, BIOS
+>     V1.11
+>     08/01/2018
+>     [ 2070.918866] RIP: 0010:dev_watchdog+0x1c9/0x1d0
+>     [ 2070.918869] Code: d5 eb 92 48 89 ef c6 05 5a 34 96 00 01 e8 2f
+>     d0 fb
+>     ff 45 89 f8 44 89 f1 48 89 ee 48 89 c2 48 c7 c7 58 5c f2 91 e8 07
+>     c6 83
+>     ff <0f> 0b e9 74 ff ff ff 41 55 41 54 55 53 48 8b 47 50 4c 8b 28 48 85
+>     [ 2070.918872] RSP: 0018:ffffbcec00220eb8 EFLAGS: 00010286
+>     [ 2070.918875] RAX: 0000000000000000 RBX: ffff94f0104843dc RCX:
+>     000000000000083f
+>     [ 2070.918877] RDX: 0000000000000000 RSI: 00000000000000f6 RDI:
+>     000000000000003f
+>     [ 2070.918878] RBP: ffff94f010484000 R08: 0000000000000001 R09:
+>     0000000000000000
+>     [ 2070.918880] R10: ffff94f1b6aa0000 R11: ffff94f1b6aa0000 R12:
+>     ffff94f010484488
+>     [ 2070.918881] R13: ffff94f0031a0600 R14: 0000000000000000 R15:
+>     00000000000014c5
+>     [ 2070.918883] FS:  0000000000000000(0000) GS:ffff94f1b6d00000(0000)
+>     knlGS:0000000000000000
+>     [ 2070.918885] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>     [ 2070.918887] CR2: 00007f8eea510000 CR3: 000000023322e005 CR4:
+>     00000000003706e0
+>     [ 2070.918889] Call Trace:
+>     [ 2070.918891]  <IRQ>
+>     [ 2070.918893]  ? mq_change_real_num_tx+0xe0/0xe0
+>     [ 2070.918897]  ? mq_change_real_num_tx+0xe0/0xe0
+>     [ 2070.918899]  call_timer_fn.isra.0+0x17/0x70
+>     [ 2070.918903]  __run_timers.part.0+0x1b2/0x200
+>     [ 2070.918907]  ? tick_sched_do_timer+0x80/0x80
+>     [ 2070.918910]  ? hw_breakpoint_pmu_read+0x10/0x10
+>     [ 2070.918913]  ? ktime_get+0x33/0xa0
+>     [ 2070.918915]  run_timer_softirq+0x21/0x50
+>     [ 2070.918918]  __do_softirq+0xb8/0x1ea
+>     [ 2070.918923]  irq_exit_rcu+0x75/0xa0
+>     [ 2070.918926]  sysvec_apic_timer_interrupt+0x66/0x80
+>     [ 2070.918929]  </IRQ>
+>     [ 2070.918930]  <TASK>
+>     [ 2070.918932]  asm_sysvec_apic_timer_interrupt+0x16/0x20
+>     [ 2070.918935] RIP: 0010:cpuidle_enter_state+0xa7/0x2a0
+>     [ 2070.918938] Code: 45 40 40 0f 84 9f 01 00 00 e8 65 00 6e ff e8
+>     10 f8
+>     ff ff 31 ff 49 89 c5 e8 66 64 6d ff 45 84 ff 0f 85 76 01 00 00 fb
+>     45 85
+>     f6 <0f> 88 be 00 00 00 49 63 ce 48 8b 04 24 48 6b d1 68 49 29 c5 48 89
+>     [ 2070.918939] RSP: 0018:ffffbcec0012fe90 EFLAGS: 00000202
+>     [ 2070.918942] RAX: ffff94f1b6d25d80 RBX: 0000000000000008 RCX:
+>     0000000000000000
+>     [ 2070.918943] RDX: 000001e22c5f9004 RSI: fffffffdc849289f RDI:
+>     0000000000000000
+>     [ 2070.918945] RBP: ffff94f1b6d2fa00 R08: 0000000000000002 R09:
+>     000000002d959839
+>     [ 2070.918946] R10: ffff94f1b6d24904 R11: 00000000000018c7 R12:
+>     ffffffff92155720
+>     [ 2070.918948] R13: 000001e22c5f9004 R14: 0000000000000008 R15:
+>     0000000000000000
+>     [ 2070.918951]  cpuidle_enter+0x24/0x40
+>     [ 2070.918954]  do_idle+0x1c0/0x220
+>     [ 2070.918958]  cpu_startup_entry+0x14/0x20
+>     [ 2070.918960]  start_secondary+0x109/0x130
+>     [ 2070.918963]  secondary_startup_64_no_verify+0xf4/0xfb
+>     [ 2070.918966]  </TASK>
+>     [ 2070.918968] ---[ end trace 0000000000000000 ]---
+>     [ 2072.163726] pcieport 0000:00:1c.3: Data Link Layer Link Active not
+>     set in 1000 msec
+>     [ 2072.165868] r8169 0000:03:00.0 enp3s0: Can't reset secondary
+>     PCI bus,
+>     detach NIC
+>
 
