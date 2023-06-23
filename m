@@ -1,106 +1,379 @@
-Return-Path: <netdev+bounces-13319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13298-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3838073B42E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:55:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 11FEE73B259
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 690BE1C21025
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:55:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 34A9F1C20F75
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 08:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 769505249;
-	Fri, 23 Jun 2023 09:55:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA34F1C14;
+	Fri, 23 Jun 2023 08:09:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6A5115246
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:55:20 +0000 (UTC)
-Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8014DE75;
-	Fri, 23 Jun 2023 02:55:17 -0700 (PDT)
-Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-31297125334so447611f8f.0;
-        Fri, 23 Jun 2023 02:55:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687514116; x=1690106116;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
-        bh=Qmh+oFPupR7SMi0EW4fghuDVJJeW4dIxynImVpI7xdU=;
-        b=eGa/V89BwHHOjZt+jUypN4x4W6+lXA0YeYl0gdt3wuqwV+MubBWHcTdwxBKdzJK87u
-         qdWZ8u4s3KEIoC+Ru/iRTVRB13quL8hwLjT1Dh3PRH9PFnn3x9P2d6J5SsiY3AzfYm9S
-         rWHHP//2EVNgLZPkofKWuOiq2wOaLhexpYpZt3qpebJ6EbvMEKPEcb7Pa3XOv7nL2krq
-         EZ+F1jvL8aGBx7LxhHPJWMFRrZxrHs2RjmPthTsvqXma5GSMoXzVfZmyEY8fvR5y4gbb
-         lGrSnWnge4NRg6OgLYxYcxy1tNwrWAhj/ok5KXtrUnzlLMJCvILSESNjwCTTewHf9ZZ9
-         zkwQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D84941C04
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:09:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1046E1FE9
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:09:02 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687507742;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=XRsrloG5XK9IUekWqHBCtRBKWd5yuNn8Erowenhh7uo=;
+	b=CIey83TTLyIkN+iTaaMstTQ96JMC8GoJqT7S81NEz0S/peD6ffCd8DB1hg9OvndA6aSS/q
+	hp5FwTQU8mZDv/TQUI8cG5TTbWU9JKmUyHwH7r3Er/3tPnwLhKzMxdjYs03oQ2VZFOEjuR
+	5lXEe1zKcHU17e952xCZLpTECHNNvvg=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-452-2jz_KTXANZSib13IOdbV1Q-1; Fri, 23 Jun 2023 04:08:54 -0400
+X-MC-Unique: 2jz_KTXANZSib13IOdbV1Q-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-62fea7a5de9so924606d6.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 01:08:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687514116; x=1690106116;
-        h=in-reply-to:content-disposition:mime-version:references:subject:cc
-         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Qmh+oFPupR7SMi0EW4fghuDVJJeW4dIxynImVpI7xdU=;
-        b=gKrKqgkOiOeQ17crO8hvpB8uUvxolTixlVURghnNRfw1ExHD4hHH6ljKnYjO1V19RD
-         EiKE1OKcK9sLmJpPiiL2Q4ZqXtcGLpYne7aLoIkO6R/Uc11lGLzoel30OoPxABGnq8ym
-         mLvXjboZ4c8Tfls9b7moAV6hV2ZpxLIR9YY0f7NRBWu8jec8HgQ/gRq9r5eo2IXErkOC
-         2vbfolnl6IUJohAatquxug8UXhwGaQPYE/ip1wuzsW1N3q0HCRLpN/fNcrILzJxwQPgK
-         tVZIuBw5KSqH8heSbqTW4ZKDgsqZy4wstjDZ/Yv5KIKDJl2WJ+KtrD05X+lmJGpD53iW
-         e7rA==
-X-Gm-Message-State: AC+VfDxS3VgSda93ODR8GAp7W9rj/71CbPRMJtxeK9cCtckngJ+IWCRw
-	DRTcStC3j6WLuLl7k70a9ws=
-X-Google-Smtp-Source: ACHHUZ4OSLVmtKTfKtcWCsrjtypAdFc6GlY7TFfwJHa8LbuQj2pKhDsE5iflF0+tykCL2iX3uLTbTQ==
-X-Received: by 2002:a5d:591c:0:b0:30f:bd4f:8f00 with SMTP id v28-20020a5d591c000000b0030fbd4f8f00mr18563321wrd.28.1687514115444;
-        Fri, 23 Jun 2023 02:55:15 -0700 (PDT)
-Received: from Ansuel-xps. (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
-        by smtp.gmail.com with ESMTPSA id o16-20020a5d6850000000b003047ae72b14sm9171536wrw.82.2023.06.23.02.55.13
+        d=1e100.net; s=20221208; t=1687507733; x=1690099733;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=XRsrloG5XK9IUekWqHBCtRBKWd5yuNn8Erowenhh7uo=;
+        b=S6cuK77noCV3K223O2ji8ZnAfRKjjEiqJ9MBqMgMMN2ALi/koWg2M/PV9XIE+RMWVt
+         BC8x1RTf72A6vZ04a4QC5Kij9HCqhjckGYmRZV9k9MugIfkGYgc54x73OUWCrj8GrPd3
+         J9BTc+f0XJqjK+Tt6vRWR2h58+8pIR6u3Tx5Lp5/d9pQTYebjl0bR6pwmjFTWSCc7pBb
+         +hBlPudofUMU5WG5+5VBeZExsJqMba+mfkAyt8q5+fpEeTprf1N1O+9boxuCGv5QugoC
+         4k1vGCzv2BAuoZLgNLh6o1DvyM+hIYXUSKDDkCEiaAynUcWJZBDg/fggZMIQrXC4AKSZ
+         mpTA==
+X-Gm-Message-State: AC+VfDxo4440RXJTPKp6hJERD4xp02kEO0qRwckHnG6slRE1qgl7xOwU
+	x/ppvy8zkqg3gziGR00Xz0HiYc1lld/hi6MBNwpOqmal9Y1JycPeExCp66xJyYAmTytkDQcN83/
+	V7oLkc8W0DDJY8BNO
+X-Received: by 2002:ad4:5945:0:b0:625:aa48:e50f with SMTP id eo5-20020ad45945000000b00625aa48e50fmr23823145qvb.6.1687507733605;
+        Fri, 23 Jun 2023 01:08:53 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4np55509X5SjvvyV/z6p3nBJkRmzoebgMoA+uLUJVCIrabJOfi5M325Mt3d67PAMUYklxL7Q==
+X-Received: by 2002:ad4:5945:0:b0:625:aa48:e50f with SMTP id eo5-20020ad45945000000b00625aa48e50fmr23823134qvb.6.1687507733324;
+        Fri, 23 Jun 2023 01:08:53 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
+        by smtp.gmail.com with ESMTPSA id y1-20020a0ce041000000b005dd8b9345b4sm4748746qvk.76.2023.06.23.01.08.50
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 02:55:14 -0700 (PDT)
-Message-ID: <64956c02.5d0a0220.ed611.6b79@mx.google.com>
-X-Google-Original-Message-ID: <ZJUNN0RXrUnV8o96@Ansuel-xps.>
-Date: Fri, 23 Jun 2023 05:10:47 +0200
-From: Christian Marangi <ansuelsmth@gmail.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Pavel Machek <pavel@ucw.cz>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH] net: dsa: qca8k: add support for additional
- modes for netdev trigger
-References: <20230621095409.25859-1-ansuelsmth@gmail.com>
- <20230622193120.5cc09fc3@kernel.org>
+        Fri, 23 Jun 2023 01:08:53 -0700 (PDT)
+Message-ID: <634c885ccfb2e49e284aedc60e157bb12e5f3530.camel@redhat.com>
+Subject: Re: [PATCH net-next v3 01/18] net: Copy slab data for
+ sendmsg(MSG_SPLICE_PAGES)
+From: Paolo Abeni <pabeni@redhat.com>
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Alexander Duyck <alexander.duyck@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+ David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
+ Jens Axboe <axboe@kernel.dk>,  linux-mm@kvack.org,
+ linux-kernel@vger.kernel.org, Menglong Dong <imagedong@tencent.com>
+Date: Fri, 23 Jun 2023 10:08:48 +0200
+In-Reply-To: <20230620145338.1300897-2-dhowells@redhat.com>
+References: <20230620145338.1300897-1-dhowells@redhat.com>
+	 <20230620145338.1300897-2-dhowells@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230622193120.5cc09fc3@kernel.org>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DATE_IN_PAST_06_12,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 07:31:20PM -0700, Jakub Kicinski wrote:
-> On Wed, 21 Jun 2023 11:54:09 +0200 Christian Marangi wrote:
-> > The QCA8K switch supports additional modes that can be handled in
-> > hardware for the LED netdev trigger.
-> > 
-> > Add these additional modes to further support the Switch LEDs and
-> > offload more blink modes.
-> 
-> Something may be funny with the date on your system, FWIW, because your
-> patches seem to arrive almost a day in the past.
+Hi,
 
-Lovely WSL istance (Windows Subsystem for Linux) that goes out of sync with
-the host machine sometimes. Does the time cause any problem? I will
-check that in the future before sending patches...
+First thing first, I'm sorry for the delayed feedback. I was traveling.
 
--- 
-	Ansuel
+On Tue, 2023-06-20 at 15:53 +0100, David Howells wrote:
+> If sendmsg() is passed MSG_SPLICE_PAGES and is given a buffer that contai=
+ns
+> some data that's resident in the slab, copy it rather than returning EIO.
+> This can be made use of by a number of drivers in the kernel, including:
+> iwarp, ceph/rds, dlm, nvme, ocfs2, drdb.  It could also be used by iscsi,
+> rxrpc, sunrpc, cifs and probably others.
+>=20
+> skb_splice_from_iter() is given it's own fragment allocator as
+> page_frag_alloc_align() can't be used because it does no locking to preve=
+nt
+> parallel callers from racing.  alloc_skb_frag() uses a separate folio for
+> each cpu and locks to the cpu whilst allocating, reenabling cpu migration
+> around folio allocation.
+>=20
+> This could allocate a whole page instead for each fragment to be copied, =
+as
+> alloc_skb_with_frags() would do instead, but that would waste a lot of
+> space (most of the fragments look like they're going to be small).
+>=20
+> This allows an entire message that consists of, say, a protocol header or
+> two, a number of pages of data and a protocol footer to be sent using a
+> single call to sock_sendmsg().
+>=20
+> The callers could be made to copy the data into fragments before calling
+> sendmsg(), but that then penalises them if MSG_SPLICE_PAGES gets ignored.
+>=20
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Alexander Duyck <alexander.duyck@gmail.com>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: David Ahern <dsahern@kernel.org>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: Menglong Dong <imagedong@tencent.com>
+> cc: netdev@vger.kernel.org
+> ---
+>=20
+> Notes:
+>     ver #3)
+>      - Remove duplicate decl of skb_splice_from_iter().
+>    =20
+>     ver #2)
+>      - Fix parameter to put_cpu_ptr() to have an '&'.
+>=20
+>  include/linux/skbuff.h |   2 +
+>  net/core/skbuff.c      | 171 ++++++++++++++++++++++++++++++++++++++++-
+>  2 files changed, 170 insertions(+), 3 deletions(-)
+>=20
+> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
+> index 91ed66952580..5f53bd5d375d 100644
+> --- a/include/linux/skbuff.h
+> +++ b/include/linux/skbuff.h
+> @@ -5037,6 +5037,8 @@ static inline void skb_mark_for_recycle(struct sk_b=
+uff *skb)
+>  #endif
+>  }
+> =20
+> +void *alloc_skb_frag(size_t fragsz, gfp_t gfp);
+> +void *copy_skb_frag(const void *s, size_t len, gfp_t gfp);
+>  ssize_t skb_splice_from_iter(struct sk_buff *skb, struct iov_iter *iter,
+>  			     ssize_t maxsize, gfp_t gfp);
+> =20
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index fee2b1c105fe..d962c93a429d 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -6755,6 +6755,145 @@ nodefer:	__kfree_skb(skb);
+>  		smp_call_function_single_async(cpu, &sd->defer_csd);
+>  }
+> =20
+> +struct skb_splice_frag_cache {
+> +	struct folio	*folio;
+> +	void		*virt;
+> +	unsigned int	offset;
+> +	/* we maintain a pagecount bias, so that we dont dirty cache line
+> +	 * containing page->_refcount every time we allocate a fragment.
+> +	 */
+> +	unsigned int	pagecnt_bias;
+> +	bool		pfmemalloc;
+> +};
+> +
+> +static DEFINE_PER_CPU(struct skb_splice_frag_cache, skb_splice_frag_cach=
+e);
+> +
+> +/**
+> + * alloc_skb_frag - Allocate a page fragment for using in a socket
+> + * @fragsz: The size of fragment required
+> + * @gfp: Allocation flags
+> + */
+> +void *alloc_skb_frag(size_t fragsz, gfp_t gfp)
+> +{
+> +	struct skb_splice_frag_cache *cache;
+> +	struct folio *folio, *spare =3D NULL;
+> +	size_t offset, fsize;
+> +	void *p;
+> +
+> +	if (WARN_ON_ONCE(fragsz =3D=3D 0))
+> +		fragsz =3D 1;
+> +
+> +	cache =3D get_cpu_ptr(&skb_splice_frag_cache);
+> +reload:
+> +	folio =3D cache->folio;
+> +	offset =3D cache->offset;
+> +try_again:
+> +	if (fragsz > offset)
+> +		goto insufficient_space;
+> +
+> +	/* Make the allocation. */
+> +	cache->pagecnt_bias--;
+> +	offset =3D ALIGN_DOWN(offset - fragsz, SMP_CACHE_BYTES);
+> +	cache->offset =3D offset;
+> +	p =3D cache->virt + offset;
+> +	put_cpu_ptr(&skb_splice_frag_cache);
+> +	if (spare)
+> +		folio_put(spare);
+> +	return p;
+> +
+> +insufficient_space:
+> +	/* See if we can refurbish the current folio. */
+> +	if (!folio || !folio_ref_sub_and_test(folio, cache->pagecnt_bias))
+> +		goto get_new_folio;
+> +	if (unlikely(cache->pfmemalloc)) {
+> +		__folio_put(folio);
+> +		goto get_new_folio;
+> +	}
+> +
+> +	fsize =3D folio_size(folio);
+> +	if (unlikely(fragsz > fsize))
+> +		goto frag_too_big;
+> +
+> +	/* OK, page count is 0, we can safely set it */
+> +	folio_set_count(folio, PAGE_FRAG_CACHE_MAX_SIZE + 1);
+> +
+> +	/* Reset page count bias and offset to start of new frag */
+> +	cache->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> +	offset =3D fsize;
+> +	goto try_again;
+
+IMHO this function uses a bit too much labels and would be more easy to
+read, e.g. moving the above chunk of code in conditional branch.
+
+Even without such change, I think the above 'goto try_again;'
+introduces an unneeded conditional, as at this point we know 'fragsz <=3D
+fsize'.
+
+> +
+> +get_new_folio:
+> +	if (!spare) {
+> +		cache->folio =3D NULL;
+> +		put_cpu_ptr(&skb_splice_frag_cache);
+> +
+> +#if PAGE_SIZE < PAGE_FRAG_CACHE_MAX_SIZE
+> +		spare =3D folio_alloc(gfp | __GFP_NOWARN | __GFP_NORETRY |
+> +				    __GFP_NOMEMALLOC,
+> +				    PAGE_FRAG_CACHE_MAX_ORDER);
+> +		if (!spare)
+> +#endif
+> +			spare =3D folio_alloc(gfp, 0);
+> +		if (!spare)
+> +			return NULL;
+> +
+> +		cache =3D get_cpu_ptr(&skb_splice_frag_cache);
+> +		/* We may now be on a different cpu and/or someone else may
+> +		 * have refilled it
+> +		 */
+> +		cache->pfmemalloc =3D folio_is_pfmemalloc(spare);
+> +		if (cache->folio)
+> +			goto reload;
+
+I think there is some problem with the above.
+
+If cache->folio is !=3D NULL, and cache->folio was not pfmemalloc-ed
+while the spare one is, it looks like the wrong policy will be used.
+And should be even worse if folio was pfmemalloc-ed while spare is not.
+
+I think moving 'cache->pfmemalloc' initialization...
+
+> +	}
+> +
+
+... here should fix the above.
+
+> +	cache->folio =3D spare;
+> +	cache->virt  =3D folio_address(spare);
+> +	folio =3D spare;
+> +	spare =3D NULL;
+> +
+> +	/* Even if we own the page, we do not use atomic_set().  This would
+> +	 * break get_page_unless_zero() users.
+> +	 */
+> +	folio_ref_add(folio, PAGE_FRAG_CACHE_MAX_SIZE);
+> +
+> +	/* Reset page count bias and offset to start of new frag */
+> +	cache->pagecnt_bias =3D PAGE_FRAG_CACHE_MAX_SIZE + 1;
+> +	offset =3D folio_size(folio);
+> +	goto try_again;
+
+What if fragsz > PAGE_SIZE, we are consistently unable to allocate an
+high order page, but order-0, pfmemalloc-ed page allocation is
+successful? It looks like this could become an unbounded loop?
+
+> +
+> +frag_too_big:
+> +	/* The caller is trying to allocate a fragment with fragsz > PAGE_SIZE
+> +	 * but the cache isn't big enough to satisfy the request, this may
+> +	 * happen in low memory conditions.  We don't release the cache page
+> +	 * because it could make memory pressure worse so we simply return NULL
+> +	 * here.
+> +	 */
+> +	cache->offset =3D offset;
+> +	put_cpu_ptr(&skb_splice_frag_cache);
+> +	if (spare)
+> +		folio_put(spare);
+> +	return NULL;
+> +}
+> +EXPORT_SYMBOL(alloc_skb_frag);
+> +
+> +/**
+> + * copy_skb_frag - Copy data into a page fragment.
+> + * @s: The data to copy
+> + * @len: The size of the data
+> + * @gfp: Allocation flags
+> + */
+> +void *copy_skb_frag(const void *s, size_t len, gfp_t gfp)
+> +{
+> +	void *p;
+> +
+> +	p =3D alloc_skb_frag(len, gfp);
+> +	if (!p)
+> +		return NULL;
+> +
+> +	return memcpy(p, s, len);
+> +}
+> +EXPORT_SYMBOL(copy_skb_frag);
+> +
+>  static void skb_splice_csum_page(struct sk_buff *skb, struct page *page,
+>  				 size_t offset, size_t len)
+>  {
+> @@ -6808,17 +6947,43 @@ ssize_t skb_splice_from_iter(struct sk_buff *skb,=
+ struct iov_iter *iter,
+>  			break;
+>  		}
+> =20
+> +		if (space =3D=3D 0 &&
+> +		    !skb_can_coalesce(skb, skb_shinfo(skb)->nr_frags,
+> +				      pages[0], off)) {
+> +			iov_iter_revert(iter, len);
+> +			break;
+> +		}
+> +
+>  		i =3D 0;
+>  		do {
+>  			struct page *page =3D pages[i++];
+>  			size_t part =3D min_t(size_t, PAGE_SIZE - off, len);
+> -
+> -			ret =3D -EIO;
+> -			if (WARN_ON_ONCE(!sendpage_ok(page)))
+> +			bool put =3D false;
+> +
+> +			if (PageSlab(page)) {
+
+I'm a bit concerned from the above. If I read correctly, tcp 0-copy
+will go through that for every page, even if the expected use-case is
+always !PageSlub(page). compound_head() could be costly if the head
+page is not hot on cache and I'm not sure if that could be the case for
+tcp 0-copy. The bottom line is that I fear a possible regression here.
+
+Given all the above, and the late stage of the current devel cycle,
+would you consider slicing down this series to just kill
+MSG_SENDPAGE_NOTLAST, as Jakub suggested?
+
+Thanks!
+
+Paolo
+
 
