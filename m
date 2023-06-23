@@ -1,48 +1,49 @@
-Return-Path: <netdev+bounces-13397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D14E073B6FD
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:20:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8DCF273B6FE
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:20:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 076AD1C21221
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:20:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778DE1C211C1
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:20:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0351D23118;
-	Fri, 23 Jun 2023 12:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C8B32311C;
+	Fri, 23 Jun 2023 12:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB3A4211F
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EBDD211F
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:20:25 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C90A31BE4
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 05:20:22 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB5971BE4
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 05:20:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687522821;
+	s=mimecast20190719; t=1687522824;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=g+YLjgQG+mnsMl5jt1EwmR0auNXs/ucKGgshILNvFCM=;
-	b=NQoF7H5WU4A78vMw1P4JDzIcXzhKamkS8j+b7saDmuS/k/1g2m8d7P5e/qWQ2gWD9c9g1h
-	QHAtv5/9M59fzMgXbwv0sGrFpWuVLSIapmvwp7FDEEzHuUsBbOhvPnxZ2bfowNqST86FRA
-	xtlyWY69Vo8CfRxNpR+j11HFvcSlZKw=
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mX02EQjfhnvNS52lhiZUHESdDzM2wywpph+bQHFJGEw=;
+	b=MJ3l5OBqNNqfkQIYemXKX/XaL9JsE51oTfxfP3jiabwcyrbORqLG8nVoKuTr8fJDesxf7i
+	CPaS8RiCaHc+x1PGy9SOGtQUOjoKPaOfvC2soLYNUOFxgkedBiMavQckHI6Kf7zdQINy3S
+	eKfvkARV1IRpOco7rBKONRUX1ngU2UQ=
 Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
  [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-184-15FJr4JFOou1mthlFi653Q-1; Fri, 23 Jun 2023 08:20:16 -0400
-X-MC-Unique: 15FJr4JFOou1mthlFi653Q-1
+ us-mta-500-ic0HvJDqMSC6QC2RFc0Bxg-1; Fri, 23 Jun 2023 08:20:19 -0400
+X-MC-Unique: ic0HvJDqMSC6QC2RFc0Bxg-1
 Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
 	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 475341C06EE8;
-	Fri, 23 Jun 2023 12:20:16 +0000 (UTC)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8C7141C06EE2;
+	Fri, 23 Jun 2023 12:20:18 +0000 (UTC)
 Received: from renaissance-vector.redhat.com (unknown [10.39.194.186])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2D5A0422B0;
-	Fri, 23 Jun 2023 12:20:14 +0000 (UTC)
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 9E3E3422B0;
+	Fri, 23 Jun 2023 12:20:16 +0000 (UTC)
 From: Andrea Claudi <aclaudi@redhat.com>
 To: netdev@vger.kernel.org,
 	davem@davemloft.net,
@@ -53,9 +54,11 @@ Cc: mptcp@lists.linux.dev,
 	matthieu.baerts@tessares.net,
 	martineau@kernel.org,
 	geliang.tang@suse.com
-Subject: [PATCH net 0/2] selftests: fix mptcp_join test
-Date: Fri, 23 Jun 2023 14:19:50 +0200
-Message-ID: <cover.1687522138.git.aclaudi@redhat.com>
+Subject: [PATCH net 1/2] selftests: mptcp: join: fix 'delete and re-add' test
+Date: Fri, 23 Jun 2023 14:19:51 +0200
+Message-ID: <927493b7ba79d647668e95a34007f48e87c0992a.1687522138.git.aclaudi@redhat.com>
+In-Reply-To: <cover.1687522138.git.aclaudi@redhat.com>
+References: <cover.1687522138.git.aclaudi@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -71,24 +74,37 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This series fixes two mptcp_join testcases.
-- '001 implicit EP' fails because of:
-  - missing iproute support for mptcp 'implicit' flag, fixed with
-    iproute2-next commit 3a2535a41854 ("mptcp: add support for implicit
-    flag")
-  - pm_nl_check_endpoint expecting two ip addresses, while only one is
-    present in the iproute output;
-- '002 delete and re-add' fails because the endpoint delete command
-  provide both id and ip address, while address should be provided only
-  if id is 0.
+mptcp_join '002 delete and re-add' test currently fails in the 'after
+delete' testcase.
 
-Andrea Claudi (2):
-  selftests: mptcp: join: fix 'delete and re-add' test
-  selftests: mptcp: join: fix 'implicit EP' test
+This happens because endpoint delete includes an ip address while id is
+not 0, contrary to what is indicated in the ip mptcp man page:
 
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
+"When used with the delete id operation, an IFADDR is only included when
+the ID is 0."
 
+This fixes the issue simply not using the $addr variable in
+pm_nl_del_endpoint().
+
+Fixes: 34aa6e3bccd8 ("selftests: mptcp: add ip mptcp wrappers")
+Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
+---
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
+index 0ae8cafde439..5424dcacfffa 100755
+--- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
++++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
+@@ -678,7 +678,7 @@ pm_nl_del_endpoint()
+ 	local addr=$3
+ 
+ 	if [ $ip_mptcp -eq 1 ]; then
+-		ip -n $ns mptcp endpoint delete id $id $addr
++		ip -n $ns mptcp endpoint delete id $id
+ 	else
+ 		ip netns exec $ns ./pm_nl_ctl del $id $addr
+ 	fi
 -- 
 2.41.0
 
