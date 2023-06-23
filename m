@@ -1,161 +1,143 @@
-Return-Path: <netdev+bounces-13428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E22E573B8E7
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:43:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 650E273B92A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:55:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1ECD91C21230
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 13:43:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A3977281BD5
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 13:55:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D34A8C03;
-	Fri, 23 Jun 2023 13:43:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03D7F8F5D;
+	Fri, 23 Jun 2023 13:55:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EA3A8BF5
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 13:43:34 +0000 (UTC)
-Received: from mail-ed1-x532.google.com (mail-ed1-x532.google.com [IPv6:2a00:1450:4864:20::532])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1ED401FE1
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 06:43:33 -0700 (PDT)
-Received: by mail-ed1-x532.google.com with SMTP id 4fb4d7f45d1cf-51bdf83a513so667767a12.2
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 06:43:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687527811; x=1690119811;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=FasrEHhJIpaosfdkZQMTOlxj/Ad2x8oxOpc436FO1rM=;
-        b=YeYAu5VFr1Ph5iq6WizR9YB83448kJpL5uBAeqBMohokQPHh5RewltDfCYK+S38oIW
-         z5T5Zz+PvK6AIHy/smVEy0Rf7UkToFTQqGUiAR9y4n+4YTPq9vBCXER1RE/gIgUN9+mg
-         dT13IuFYjU4KoC09QFoAm62eyfmTRwF+nh9QfDEqe2fUQ+pfv57qf0Tx1XsluIWrA1PR
-         dyTgmZUSkiKL6Ou4wBKg3uh7Ifm/B4BsLZdY0SPKZ7GX1doJ74mDojg2W/VnNNTCUaIy
-         /UyFbg5dD+xJXrMMpEZaMIxFU+W7m7VkIGBDpO2KOk8mEOx8zfw3koZf08ncRy8Eo4ee
-         gUxw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687527811; x=1690119811;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=FasrEHhJIpaosfdkZQMTOlxj/Ad2x8oxOpc436FO1rM=;
-        b=b+sqDEx2hjlDpmkz6qkOGzAA3FAT7zzJ8vX3myOT6lLgsh+MvfrxOqO2Shi4aqE+n9
-         4tMyziseH7Q1FSbjx8NrEkoTShZgYRs4tvE4B6KXPZTbOogfowNKv+gL9A30D/fNvgm+
-         4VhCNegCyCV3wL1vSEg1dtMcpkQratk1xdrM58VYV2rs4+zLgTjCWt0NGUpwcOuU7S2g
-         M6La2PScMPWNiz6FrrPpheHU9COVtek3ERe2NT9BINumw46GbBIj51lQcQRHiEM+/SHc
-         pvbCatFjTig5mCWK8YOcQorHkzV540wc1iCZXmmwjALNZnHyARgWHlV2XYmUjk2CjWpP
-         lGDw==
-X-Gm-Message-State: AC+VfDye23LWdOxE6IGnmBhAwKP1JWGrDteqP5zxUplqMOIaTL9jT7PS
-	b61HbcoBDAVFih/u6SVPM865+kJ9b7I=
-X-Google-Smtp-Source: ACHHUZ7t+DOfBITiyoydepxxrCXfShBVqbkXJDy9DX1Xg2GFdH8/AwbNqzk7PJomxjuyQiOCjRYikA==
-X-Received: by 2002:a17:907:7da7:b0:989:2a82:fb0a with SMTP id oz39-20020a1709077da700b009892a82fb0amr9028318ejc.71.1687527811331;
-        Fri, 23 Jun 2023 06:43:31 -0700 (PDT)
-Received: from ?IPV6:2620:10d:c096:310::26ef? ([2620:10d:c092:600::2:7d95])
-        by smtp.gmail.com with ESMTPSA id a14-20020a170906368e00b009829dc0f2a0sm6013006ejc.111.2023.06.23.06.43.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jun 2023 06:43:31 -0700 (PDT)
-Message-ID: <14ce6ee2-922a-93c2-0d6e-5778822ca5d6@gmail.com>
-Date: Fri, 23 Jun 2023 14:42:21 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB4BA8F4A
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 13:55:34 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9A60C83;
+	Fri, 23 Jun 2023 06:55:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=ZmHKaPZANja9gMDDIDUivy8OiBcMC9KZ3mP0QZjw4Fw=; b=d4IxQE7UMriFZv3z/q1y023/SZ
+	9/oPfozKGCXr6tGYHOV1QsJBfh2TBf1zRlHWahqSJn2KcmNne0itT4+9QU9yHOF8ksJiYWBo1UjOz
+	DDGpIKJcW8w7x3Kom4qncjnSxXBVvRHryPzRVOO7Xjs2E4VsAOVgp67euRIcweGJBQOHImDcKeSle
+	BM/+At20brqeYe08bif//nGBS0PFs4OHPIinv4s8DsPYXUxkAH+GAnFDaDYpqXYKA/jXwjfeepYK6
+	vsZu+zCVHNoOmrmkFVbYlbRTXz0a2TB5t8fGBVVKL3A5XGHrbPI3vdZcNd3hf+49Wxgfx/tXLy5vW
+	jAdLBtzg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:34550)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qChG3-0005MV-46; Fri, 23 Jun 2023 14:55:27 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qChG1-0001Vs-QF; Fri, 23 Jun 2023 14:55:25 +0100
+Date: Fri, 23 Jun 2023 14:55:25 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Andrew Lunn <andrew@lunn.ch>, Revanth Kumar Uppala <ruppala@nvidia.com>,
+	Narayan Reddy <narayanr@nvidia.com>
+Cc: "hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-tegra@vger.kernel.org" <linux-tegra@vger.kernel.org>
+Subject: Re: [PATCH] net: phy: Enhance fixed PHY to support 10G and 5G
+Message-ID: <ZJWkTTI5CY8rJmhT@shell.armlinux.org.uk>
+References: <20230621165853.52273-1-ruppala@nvidia.com>
+ <f6e20ec1-37a7-4aae-8c9b-3c82590678f6@lunn.ch>
+ <DS0PR12MB6464B3A556B045BB35B293BBC323A@DS0PR12MB6464.namprd12.prod.outlook.com>
+ <9cd7f2bd-20e5-4c4e-8901-3913e4ce5e30@lunn.ch>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Subject: Re: [PATCH net-next 1/2] net/tcp: optimise locking for blocking
- splice
-Content-Language: en-US
-To: Eric Dumazet <edumazet@google.com>
-Cc: Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org
-References: <cover.1684501922.git.asml.silence@gmail.com>
- <a6838ca891ccff2c2407d9232ccd2a46fa3f8989.1684501922.git.asml.silence@gmail.com>
- <c025952ddc527f0b60b2c476bb30bd45e9863d41.camel@redhat.com>
- <5b93b626-df9a-6f8f-edc3-32a4478b8f00@gmail.com>
- <e972fc86-b884-3600-4e16-c9dbb53c6464@gmail.com>
- <CANn89iLU0BWxWrh1a3cfh+vOhRuyU5UJ8d5oD7ZW_GLfkMtvAQ@mail.gmail.com>
-From: Pavel Begunkov <asml.silence@gmail.com>
-In-Reply-To: <CANn89iLU0BWxWrh1a3cfh+vOhRuyU5UJ8d5oD7ZW_GLfkMtvAQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <9cd7f2bd-20e5-4c4e-8901-3913e4ce5e30@lunn.ch>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/19/23 11:59, Eric Dumazet wrote:
-> On Mon, Jun 19, 2023 at 11:27 AM Pavel Begunkov <asml.silence@gmail.com> wrote:
->>
->> On 5/24/23 13:51, Pavel Begunkov wrote:
->>> On 5/23/23 14:52, Paolo Abeni wrote:
->>>> On Fri, 2023-05-19 at 14:33 +0100, Pavel Begunkov wrote:
->>>>> Even when tcp_splice_read() reads all it was asked for, for blocking
->>>>> sockets it'll release and immediately regrab the socket lock, loop
->>>>> around and break on the while check.
->>>>>
->>>>> Check tss.len right after we adjust it, and return if we're done.
->>>>> That saves us one release_sock(); lock_sock(); pair per successful
->>>>> blocking splice read.
->>>>>
->>>>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
->>>>> ---
->>>>>    net/ipv4/tcp.c | 8 +++++---
->>>>>    1 file changed, 5 insertions(+), 3 deletions(-)
->>>>>
->>>>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
->>>>> index 4d6392c16b7a..bf7627f37e69 100644
->>>>> --- a/net/ipv4/tcp.c
->>>>> +++ b/net/ipv4/tcp.c
->>>>> @@ -789,13 +789,15 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
->>>>>         */
->>>>>        if (unlikely(*ppos))
->>>>>            return -ESPIPE;
->>>>> +    if (unlikely(!tss.len))
->>>>> +        return 0;
->>>>>        ret = spliced = 0;
->>>>>        lock_sock(sk);
->>>>>        timeo = sock_rcvtimeo(sk, sock->file->f_flags & O_NONBLOCK);
->>>>> -    while (tss.len) {
->>>>> +    while (true) {
->>>>>            ret = __tcp_splice_read(sk, &tss);
->>>>>            if (ret < 0)
->>>>>                break;
->>>>> @@ -835,10 +837,10 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
->>>>>                }
->>>>>                continue;
->>>>>            }
->>>>> -        tss.len -= ret;
->>>>>            spliced += ret;
->>>>> +        tss.len -= ret;
->>>>
->>>> The patch LGTM. The only minor thing that I note is that the above
->>>> chunk is not needed. Perhaps avoiding unneeded delta could be worthy.
->>>
->>> It keeps it closer to the tss.len test, so I'd leave it for that reason,
->>> but on the other hand the compiler should be perfectly able to optimise it
->>> regardless (i.e. sub;cmp;jcc; vs sub;jcc;). I don't have a hard feeling
->>> on that, can change if you want.
->>
->> Is there anything I can do to help here? I think the patch is
->> fine, but can amend the change per Paolo's suggestion if required.
->>
+On Fri, Jun 23, 2023 at 03:29:13PM +0200, Andrew Lunn wrote:
+> On Fri, Jun 23, 2023 at 12:28:49PM +0000, Revanth Kumar Uppala wrote:
+> > 
+> > 
+> > > -----Original Message-----
+> > > From: Andrew Lunn <andrew@lunn.ch>
+> > > Sent: Wednesday, June 21, 2023 11:00 PM
+> > > To: Revanth Kumar Uppala <ruppala@nvidia.com>
+> > > Cc: hkallweit1@gmail.com; netdev@vger.kernel.org; linux-
+> > > tegra@vger.kernel.org; Narayan Reddy <narayanr@nvidia.com>
+> > > Subject: Re: [PATCH] net: phy: Enhance fixed PHY to support 10G and 5G
+> > > 
+> > > External email: Use caution opening links or attachments
+> > > 
+> > > 
+> > > On Wed, Jun 21, 2023 at 10:28:53PM +0530, Revanth Kumar Uppala wrote:
+> > > > Add 10G and 5G speed entries for fixed PHY framework.These are needed
+> > > > for the platforms which doesn't have a PHY driver.
+> > > >
+> > > > Signed-off-by: Revanth Kumar Uppala <ruppala@nvidia.com>
+> > > > Signed-off-by: Narayan Reddy <narayanr@nvidia.com>
+> > > 
+> > > This is the second time you have sent me this patch. You have failed to answer
+> > > the questions i asked you the last time.....
+> > Apologies for sending twice.
+> > C45 registers are not defined in the kernel as of now. But, we need to display the speed as 5G/10G when the same is configured as fixed link in DT node.
+> > It will be great if you can share any data for handling this.
+> > As of now, with this change we have taken care of providing proper speed log in kernel when 5G/10G is added as fixed links in DT node.
 > 
-> We prefer seeing patches focusing on the change, instead of also doing
-> arbitrary changes
-> making future backports more likely to conflict.
+> This is architecturally wrong. As i said, swphy emulates a C22 PHY,
+> and a C22 PHY does not support speeds greater than 1G. To make swphy
+> really support 5G and 10G, you would need to add C45 support, and then
+> extend the default genphy driver to look at the C45 registers as well.
+> 
+> However, that is all pointless. As i said, phylink fixed-link is not
+> limited to 1G speeds. Given what i see in Cc: i assume this is for a
+> tegre SoC? And that uses a Synopsys MAC? So you probably want to
+> modify the dwc driver to use phylink.
 
-Thank you for taking a look! I cut it down and resent.
+Absolutely correct. I seem to recall having had this come up before,
+and I think it was explained at the time, but I don't seem to find
+anything in my "sent" mailboxes for the start of 2022 to present.
 
-I don't agree it's arbitrary, it's a clean up related to the
-change. I'm just trying to not make the death by a thousand cuts
-problem worse for networking, but I guess I'm worried for nothing.
+(To nvidia)
+
+The classical swphy/fixed-phy offers a software emulated clause 22 PHY
+so that phylib can be re-used to make a fixed link work without needing
+special code paths in phylib nor in MAC drivers.
+
+However, clause 22 PHYs do not support speeds in excess of 1G, so this
+places a hard ceiling on the speed that can be supported with this
+method. PHYLIB's clause 45 support is specific to vendor PHYs, and
+the "generic" implementation only supports 10G speed. Emulating a
+specific vendor PHY to achieve this old way of supporting fixed links
+when we have a better way is really a waste of effort.
+
+The "better way" is phylink, which makes fixed links work without
+needing to resort to PHY emulation, and thus it can support any speed
+that a MAC happens to support. This is the modern way.
+
+We (the phylib and phylink maintainers) will not entertain extending
+the old now legacy method using swphy/fixed-phy for fixed links to
+include any faster speeds.
+
+Thanks.
 
 -- 
-Pavel Begunkov
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
 
