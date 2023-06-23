@@ -1,39 +1,39 @@
-Return-Path: <netdev+bounces-13496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13495-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E8B073BDDD
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:35:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B359073BDDC
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:34:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20EE281CEF
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:34:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3AEB1C21286
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:34:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD52D101F1;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87676101D8;
 	Fri, 23 Jun 2023 17:34:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 47F88100D1;
-	Fri, 23 Jun 2023 17:34:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A20BC433CB;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86E50100D2;
+	Fri, 23 Jun 2023 17:34:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CCF1AC433CA;
 	Fri, 23 Jun 2023 17:34:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687541656;
-	bh=d6pKZ+SkU7uhwd1msSz2Mj63BV+SnwupQiYWOytGZYM=;
+	s=k20201202; t=1687541657;
+	bh=xnhNQTbdaLg0oa0Bye/Mc1559cQpu4SInzxc6ZKQltA=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=k3aQUTEzMwZfudnhvCiiUiZtHexfLwiEnPTKipz4wFRspO1b5GTzb+nTFXdU8RMiA
-	 pLuSAB7cmWJtBnI4GWmHRuZf40TBRSQpI3fFGZ6yhx/vkc7A3esDVWBk/JrOpTuilf
-	 XI8LMsCFgKp7ZaskksKr5AxAWnMnNiSXOqXX5vp8jHrvSNSiijky8TrUHOmA0wq0VM
-	 oVh5PyqSGMu2NCrHtUfW/I2FZUy9F2skQEIDgaV4GLvHvF+RYceTvYY0xGz9+9j/w7
-	 1d9RuUd2zWGlDbO4+rEnDrGVbHLLm/Oh/U0Im5S6vBfTkDo7POEPMV4WnP3Yvp7wjm
-	 s6DVWwBQoF+mA==
+	b=g/bdkIedtPkInWs6XJrjUPs+KsRKgIlQmgZBpWb9Q111gBNx6/S3pcgUHeK6uNIOr
+	 /fKXCVN/aaB7oHBe1Kvi0bIJERyrAJw0MTsPyLSDYaWeaNDgDvL0MOJdTxQ/zZObh9
+	 +2nDE0JbgZdgUR/SOQR/IV8kVp5jx3CffpW85L4w8yiUORDcAQIecJesfRgsKRYcig
+	 IDop+eOQi7wZTQs/DO38cBULM0V2CEmjd7yC42YE4eOlFDuGi3J1KekDOmlqNXbqzy
+	 xZBdp1BznKUE7yng+CrF4HFPDzjGIhAsitHwKO/2Iz6gOO9bJEsc8z2DwtWC3vx/r1
+	 cuRGqXBI/VlrQ==
 From: Mat Martineau <martineau@kernel.org>
-Date: Fri, 23 Jun 2023 10:34:07 -0700
-Subject: [PATCH net-next 1/8] selftests: mptcp: test userspace pm out of
- transfer
+Date: Fri, 23 Jun 2023 10:34:08 -0700
+Subject: [PATCH net-next 2/8] selftests: mptcp: check subflow and addr
+ infos
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -42,7 +42,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230623-send-net-next-20230623-v1-1-a883213c8ba9@kernel.org>
+Message-Id: <20230623-send-net-next-20230623-v1-2-a883213c8ba9@kernel.org>
 References: <20230623-send-net-next-20230623-v1-0-a883213c8ba9@kernel.org>
 In-Reply-To: <20230623-send-net-next-20230623-v1-0-a883213c8ba9@kernel.org>
 To: Matthieu Baerts <matthieu.baerts@tessares.net>, 
@@ -54,252 +54,124 @@ X-Mailer: b4 0.12.2
 
 From: Geliang Tang <geliang.tang@suse.com>
 
-This patch moves userspace pm tests out of do_transfer(). Move add address
-test into a new function userspace_pm_add_addr(), and remove address test
-into userspace_pm_rm_sf_addr_ns1(). Move add subflow test into
-userspace_pm_add_sf() and remove subflow into
-userspace_pm_rm_sf_addr_ns2().
+New MPTCP info are being checked in multiple places to improve the code
+coverage when using the userspace PM.
+
+This patch makes chk_mptcp_info() more generic to be able to check
+subflows, add_addr_signal and add_addr_accepted info (and even more
+later). New arguments are now required to get different infos from the
+two namespaces because some counters are specific to the client or the
+server.
 
 Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 145 ++++++++++++++++--------
- 1 file changed, 99 insertions(+), 46 deletions(-)
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 44 +++++++++++++------------
+ 1 file changed, 23 insertions(+), 21 deletions(-)
 
 diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index a7973d6a40a0..3baa6ac3b03e 100755
+index 3baa6ac3b03e..95a56384294f 100755
 --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
 +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -589,6 +589,26 @@ wait_rm_addr()
- 	done
- }
+@@ -1832,31 +1832,26 @@ chk_subflow_nr()
  
-+rm_sf_count()
-+{
-+	get_counter "${1}" "MPTcpExtRmSubflow"
-+}
-+
-+# $1: ns, $2: old rm_sf counter in $ns
-+wait_rm_sf()
-+{
-+	local ns="${1}"
-+	local old_cnt="${2}"
-+	local cnt
-+
-+	local i
-+	for i in $(seq 10); do
-+		cnt=$(rm_sf_count ${ns})
-+		[ "$cnt" = "${old_cnt}" ] || break
-+		sleep 0.1
-+	done
-+}
-+
- wait_mpj()
+ chk_mptcp_info()
  {
- 	local ns="${1}"
-@@ -813,7 +833,6 @@ do_transfer()
+-	local nr_info=$1
+-	local info
++	local info1=$1
++	local exp1=$2
++	local info2=$3
++	local exp2=$4
+ 	local cnt1
+ 	local cnt2
+ 	local dump_stats
  
- 	local port=$((10000 + TEST_COUNT - 1))
- 	local cappid
--	local userspace_pm=0
- 
- 	:> "$cout"
- 	:> "$sout"
-@@ -850,11 +869,6 @@ do_transfer()
- 		extra_args="-r ${speed:6}"
- 	fi
- 
--	if [[ "${addr_nr_ns1}" = "userspace_"* ]]; then
--		userspace_pm=1
--		addr_nr_ns1=${addr_nr_ns1:10}
+-	if [[ $nr_info = "subflows_"* ]]; then
+-		info="subflows"
+-		nr_info=${nr_info:9}
+-	else
+-		echo "[fail] unsupported argument: $nr_info"
+-		fail_test
+-		return 1
 -	fi
 -
- 	local flags="subflow"
- 	local extra_cl_args=""
- 	local extra_srv_args=""
-@@ -882,9 +896,6 @@ do_transfer()
- 			return 1
- 		fi
- 		addr_nr_ns2=0
--	elif [[ "${addr_nr_ns2}" = "userspace_"* ]]; then
--		userspace_pm=1
--		addr_nr_ns2=${addr_nr_ns2:10}
- 	elif [[ "${addr_nr_ns2}" = "fullmesh_"* ]]; then
- 		flags="${flags},fullmesh"
- 		addr_nr_ns2=${addr_nr_ns2:9}
-@@ -938,7 +949,6 @@ do_transfer()
- 		local counter=2
- 		local add_nr_ns1=${addr_nr_ns1}
- 		local id=10
--		local tk
- 		while [ $add_nr_ns1 -gt 0 ]; do
- 			local addr
- 			if is_v6 "${connect_addr}"; then
-@@ -946,24 +956,7 @@ do_transfer()
- 			else
- 				addr="10.0.$counter.1"
- 			fi
--			if [ $userspace_pm -eq 0 ]; then
--				pm_nl_add_endpoint $ns1 $addr flags signal
--			else
--				tk=$(grep "type:1," "$evts_ns1" |
--				     sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q')
--				ip netns exec ${listener_ns} ./pm_nl_ctl ann $addr token $tk id $id
--				sleep 1
--				sp=$(grep "type:10" "$evts_ns1" |
--				     sed -n 's/.*\(sport:\)\([[:digit:]]*\).*$/\2/p;q')
--				da=$(grep "type:10" "$evts_ns1" |
--				     sed -n 's/.*\(daddr6:\)\([0-9a-f:.]*\).*$/\2/p;q')
--				dp=$(grep "type:10" "$evts_ns1" |
--				     sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q')
--				ip netns exec ${listener_ns} ./pm_nl_ctl rem token $tk id $id
--				ip netns exec ${listener_ns} ./pm_nl_ctl dsf lip "::ffff:$addr" \
--							lport $sp rip $da rport $dp token $tk
--			fi
--
-+			pm_nl_add_endpoint $ns1 $addr flags signal
- 			counter=$((counter + 1))
- 			add_nr_ns1=$((add_nr_ns1 - 1))
- 			id=$((id + 1))
-@@ -1008,7 +1001,6 @@ do_transfer()
- 		local add_nr_ns2=${addr_nr_ns2}
- 		local counter=3
- 		local id=20
--		local tk da dp sp
- 		while [ $add_nr_ns2 -gt 0 ]; do
- 			local addr
- 			if is_v6 "${connect_addr}"; then
-@@ -1016,21 +1008,7 @@ do_transfer()
- 			else
- 				addr="10.0.$counter.2"
- 			fi
--			if [ $userspace_pm -eq 0 ]; then
--				pm_nl_add_endpoint $ns2 $addr flags $flags
--			else
--				tk=$(sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
--				da=$(sed -n 's/.*\(daddr4:\)\([0-9.]*\).*$/\2/p;q' "$evts_ns2")
--				dp=$(sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
--				ip netns exec ${connector_ns} ./pm_nl_ctl csf lip $addr lid $id \
--									rip $da rport $dp token $tk
--				sleep 1
--				sp=$(grep "type:10" "$evts_ns2" |
--				     sed -n 's/.*\(sport:\)\([[:digit:]]*\).*$/\2/p;q')
--				ip netns exec ${connector_ns} ./pm_nl_ctl rem token $tk id $id
--				ip netns exec ${connector_ns} ./pm_nl_ctl dsf lip $addr lport $sp \
--									rip $da rport $dp token $tk
--			fi
-+			pm_nl_add_endpoint $ns2 $addr flags $flags
- 			counter=$((counter + 1))
- 			add_nr_ns2=$((add_nr_ns2 - 1))
- 			id=$((id + 1))
-@@ -3205,6 +3183,71 @@ fail_tests()
- 	fi
- }
+-	printf "%-${nr_blank}s %-30s" " " "mptcp_info $info=$nr_info"
++	printf "%-${nr_blank}s %-30s" " " "mptcp_info $info1:$info2=$exp1:$exp2"
  
-+userspace_pm_add_addr()
-+{
-+	local addr=$1
-+	local id=$2
-+	local tk
+-	cnt1=$(ss -N $ns1 -inmHM | grep "$info:" |
+-		sed -n 's/.*\('"$info"':\)\([[:digit:]]*\).*$/\2/p;q')
++	cnt1=$(ss -N $ns1 -inmHM | grep "$info1:" |
++	       sed -n 's/.*\('"$info1"':\)\([[:digit:]]*\).*$/\2/p;q')
++	cnt2=$(ss -N $ns2 -inmHM | grep "$info2:" |
++	       sed -n 's/.*\('"$info2"':\)\([[:digit:]]*\).*$/\2/p;q')
++	# 'ss' only display active connections and counters that are not 0.
+ 	[ -z "$cnt1" ] && cnt1=0
+-	cnt2=$(ss -N $ns2 -inmHM | grep "$info:" |
+-		sed -n 's/.*\('"$info"':\)\([[:digit:]]*\).*$/\2/p;q')
+ 	[ -z "$cnt2" ] && cnt2=0
+-	if [ "$cnt1" != "$nr_info" ] || [ "$cnt2" != "$nr_info" ]; then
+-		echo "[fail] got $cnt1:$cnt2 $info expected $nr_info"
 +
-+	tk=$(grep "type:1," "$evts_ns1" |
-+	     sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q')
-+	ip netns exec $ns1 ./pm_nl_ctl ann $addr token $tk id $id
-+	sleep 1
-+}
-+
-+userspace_pm_rm_sf_addr_ns1()
-+{
-+	local addr=$1
-+	local id=$2
-+	local tk sp da dp
-+
-+	tk=$(grep "type:1," "$evts_ns1" |
-+	     sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q')
-+	sp=$(grep "type:10" "$evts_ns1" |
-+	     sed -n 's/.*\(sport:\)\([[:digit:]]*\).*$/\2/p;q')
-+	da=$(grep "type:10" "$evts_ns1" |
-+	     sed -n 's/.*\(daddr6:\)\([0-9a-f:.]*\).*$/\2/p;q')
-+	dp=$(grep "type:10" "$evts_ns1" |
-+	     sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q')
-+	ip netns exec $ns1 ./pm_nl_ctl rem token $tk id $id
-+	ip netns exec $ns1 ./pm_nl_ctl dsf lip "::ffff:$addr" \
-+				lport $sp rip $da rport $dp token $tk
-+	wait_rm_addr $ns1 1
-+	wait_rm_sf $ns1 1
-+}
-+
-+userspace_pm_add_sf()
-+{
-+	local addr=$1
-+	local id=$2
-+	local tk da dp
-+
-+	tk=$(sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
-+	da=$(sed -n 's/.*\(daddr4:\)\([0-9.]*\).*$/\2/p;q' "$evts_ns2")
-+	dp=$(sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
-+	ip netns exec $ns2 ./pm_nl_ctl csf lip $addr lid $id \
-+				rip $da rport $dp token $tk
-+	sleep 1
-+}
-+
-+userspace_pm_rm_sf_addr_ns2()
-+{
-+	local addr=$1
-+	local id=$2
-+	local tk da dp sp
-+
-+	tk=$(sed -n 's/.*\(token:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
-+	da=$(sed -n 's/.*\(daddr4:\)\([0-9.]*\).*$/\2/p;q' "$evts_ns2")
-+	dp=$(sed -n 's/.*\(dport:\)\([[:digit:]]*\).*$/\2/p;q' "$evts_ns2")
-+	sp=$(grep "type:10" "$evts_ns2" |
-+	     sed -n 's/.*\(sport:\)\([[:digit:]]*\).*$/\2/p;q')
-+	ip netns exec $ns2 ./pm_nl_ctl rem token $tk id $id
-+	ip netns exec $ns2 ./pm_nl_ctl dsf lip $addr lport $sp \
-+				rip $da rport $dp token $tk
-+	wait_rm_addr $ns2 1
-+	wait_rm_sf $ns2 1
-+}
-+
- userspace_tests()
- {
- 	# userspace pm type prevents add_addr
-@@ -3283,11 +3326,16 @@ userspace_tests()
- 	   continue_if mptcp_lib_has_file '/proc/sys/net/mptcp/pm_type'; then
- 		set_userspace_pm $ns1
- 		pm_nl_set_limits $ns2 1 1
--		run_tests $ns1 $ns2 10.0.1.1 0 userspace_1 0 slow
-+		run_tests $ns1 $ns2 10.0.1.1 0 0 0 speed_10 &
-+		local tests_pid=$!
-+		wait_mpj $ns1
-+		userspace_pm_add_addr 10.0.2.1 10
++	if [ "$cnt1" != "$exp1" ] || [ "$cnt2" != "$exp2" ]; then
++		echo "[fail] got $cnt1:$cnt2 $info1:$info2 expected $exp1:$exp2"
+ 		fail_test
+ 		dump_stats=1
+ 	else
+@@ -3332,8 +3327,11 @@ userspace_tests()
+ 		userspace_pm_add_addr 10.0.2.1 10
  		chk_join_nr 1 1 1
  		chk_add_nr 1 1
-+		userspace_pm_rm_sf_addr_ns1 10.0.2.1 10
++		chk_mptcp_info subflows 1 subflows 1
++		chk_mptcp_info add_addr_signal 1 add_addr_accepted 1
+ 		userspace_pm_rm_sf_addr_ns1 10.0.2.1 10
  		chk_rm_nr 1 1 invert
++		chk_mptcp_info subflows 0 subflows 0
  		kill_events_pids
-+		wait $tests_pid
+ 		wait $tests_pid
  	fi
- 
- 	# userspace pm create destroy subflow
-@@ -3295,10 +3343,15 @@ userspace_tests()
- 	   continue_if mptcp_lib_has_file '/proc/sys/net/mptcp/pm_type'; then
- 		set_userspace_pm $ns2
- 		pm_nl_set_limits $ns1 0 1
--		run_tests $ns1 $ns2 10.0.1.1 0 0 userspace_1 slow
-+		run_tests $ns1 $ns2 10.0.1.1 0 0 0 speed_10 &
-+		local tests_pid=$!
-+		wait_mpj $ns2
-+		userspace_pm_add_sf 10.0.3.2 20
+@@ -3348,8 +3346,10 @@ userspace_tests()
+ 		wait_mpj $ns2
+ 		userspace_pm_add_sf 10.0.3.2 20
  		chk_join_nr 1 1 1
-+		userspace_pm_rm_sf_addr_ns2 10.0.3.2 20
++		chk_mptcp_info subflows 1 subflows 1
+ 		userspace_pm_rm_sf_addr_ns2 10.0.3.2 20
  		chk_rm_nr 1 1
++		chk_mptcp_info subflows 0 subflows 0
  		kill_events_pids
-+		wait $tests_pid
+ 		wait $tests_pid
+ 	fi
+@@ -3369,6 +3369,8 @@ endpoint_tests()
+ 		wait_mpj $ns1
+ 		pm_nl_check_endpoint 1 "creation" \
+ 			$ns2 10.0.2.2 id 1 flags implicit
++		chk_mptcp_info subflows 1 subflows 1
++		chk_mptcp_info add_addr_signal 1 add_addr_accepted 1
+ 
+ 		pm_nl_add_endpoint $ns2 10.0.2.2 id 33
+ 		pm_nl_check_endpoint 0 "ID change is prevented" \
+@@ -3389,17 +3391,17 @@ endpoint_tests()
+ 
+ 		wait_mpj $ns2
+ 		chk_subflow_nr needtitle "before delete" 2
+-		chk_mptcp_info subflows_1
++		chk_mptcp_info subflows 1 subflows 1
+ 
+ 		pm_nl_del_endpoint $ns2 2 10.0.2.2
+ 		sleep 0.5
+ 		chk_subflow_nr "" "after delete" 1
+-		chk_mptcp_info subflows_0
++		chk_mptcp_info subflows 0 subflows 0
+ 
+ 		pm_nl_add_endpoint $ns2 10.0.2.2 dev ns2eth2 flags subflow
+ 		wait_mpj $ns2
+ 		chk_subflow_nr "" "after re-add" 2
+-		chk_mptcp_info subflows_1
++		chk_mptcp_info subflows 1 subflows 1
+ 		kill_tests_wait
  	fi
  }
- 
 
 -- 
 2.41.0
