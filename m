@@ -1,99 +1,84 @@
-Return-Path: <netdev+bounces-13472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D84AB73BBA3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:28:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3812973BBA6
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:29:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E53EE1C21198
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:28:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 692EB1C2122B
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:29:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F2771C2C7;
-	Fri, 23 Jun 2023 15:28:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ADF12C2C7;
+	Fri, 23 Jun 2023 15:29:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8AE3AC2C4
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:28:46 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2CCFDC433C0;
-	Fri, 23 Jun 2023 15:28:46 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687534126;
-	bh=nqzu5MzFAMFgo2gxn4whtKY9kdbIt2Qku0qZB6aiZiM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:From;
-	b=KGdopXQg9ELwWuL3DToADYRfaobpN9foyUQQSXFt2qlWiBK7li5JSWLiZYgVHr8aG
-	 8UTZkunr2AWJWkg2oyMAZnzFoFCiX/++b8sm6huqrTIyYBcBrtUXhjo3Y4na3kfkSo
-	 fQZM4ThL2nz2lSe1ACNCF7Ta8/SbuySKUfEVp+SdevUBhcNZxg39vwIAD/uIAzSRZG
-	 YqL7fGTmyKrs77ltsHeQIYBZnhQFvAUAS4GqN0miFgksMd5HV2+R9pKqjv3iqHp3Sq
-	 uxCn31dfIx8Sabh2GJF1ZwvhWjplwMIlorEyPcrUGgL0kB7mf1tVHOnjYXzVgE1CdC
-	 kUyAZLg4rBWRQ==
-Date: Fri, 23 Jun 2023 10:28:44 -0500
-From: Bjorn Helgaas <helgaas@kernel.org>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: bjorn.helgaas@gmail.com, Jinjian.Song@fibocom.com, Reid.he@fibocom.com,
-	bjorn@helgaas.com, haijun.liu@mediatek.com, kuba@kernel.org,
-	netdev@vger.kernel.org, rafael.wang@fibocom.com,
-	somashekhar.puttagangaiah@intel.com
-Subject: Re: [v5,net-next]net: wwan: t7xx : V5 ptach upstream work
-Message-ID: <20230623152844.GA174017@bhelgaas>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A18FCC8C6
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:29:24 +0000 (UTC)
+Received: from mail-io1-f69.google.com (mail-io1-f69.google.com [209.85.166.69])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 956091FE3
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:29:22 -0700 (PDT)
+Received: by mail-io1-f69.google.com with SMTP id ca18e2360f4ac-76c6c1b16d2so49479239f.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:29:22 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687534162; x=1690126162;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zBrsp/L8LBbY13kpCjVb8ARrn73n9NBhpEUWG/fTsCo=;
+        b=QnTUptRUNfgb1hymsK3T/tLgSvgaPnMoPUtqATG91328rdEpxtHv4j7ZShNLlb/0EP
+         ygEwSudatskj19gERJp4hKORyhUhjfA5ZRO4v9LAUaYLpnX2C86qm6OjAb/0gIQ/TM15
+         7KaUr/ThOYFdMlHefStucxc/KSfw/zjZ0SDQEUGwXkDP1x4+C7QDMcHFDZsOlzUWzPtR
+         xfl7BQsaoxgoYfpvbbaoaxAIcrthAY9BRN1Tm7DLxvlB3Rsd/pHPLXNyIHuOPueUlExj
+         ztq1CAkAGTtT0ehJB74WKIdaWPd20F+XW2uPNAXNHCbC6FRsFts2MOcn+T7aL0XXDp6g
+         04Eg==
+X-Gm-Message-State: AC+VfDw64j1N9jvfBEFzOsHNJbiBOk+ivZHp4FP3zoVi8zfLQwLv399S
+	YBpE3jpH2jvBh2ZzQpRtz9VSMHJW7iMFBSxz0bptDDzuAMbc
+X-Google-Smtp-Source: ACHHUZ5s4AxZGy5IkdfIF5CHenFw6Jv1FrcGeoKc+TSkvorT6RmNJB+KZsAlt7cYmNfsYhwRWXrGY0pg01T/p+aODwSow+udbhCe
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230623150142.292838-1-jtornosm@redhat.com>
+X-Received: by 2002:a92:cd41:0:b0:341:d428:7bcd with SMTP id
+ v1-20020a92cd41000000b00341d4287bcdmr8114863ilq.1.1687534161912; Fri, 23 Jun
+ 2023 08:29:21 -0700 (PDT)
+Date: Fri, 23 Jun 2023 08:29:21 -0700
+In-Reply-To: <2370718.1687532181@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000446b0805fecdaaf4@google.com>
+Subject: Re: [syzbot] [crypto?] general protection fault in shash_async_update
+From: syzbot <syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com>
+To: davem@davemloft.net, dhowells@redhat.com, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 05:01:42PM +0200, Jose Ignacio Tornos Martinez wrote:
-> I have a proposal because at this moment with the current status, t7xx is not
-> functional due to problems like this if there is no activity:
-> [   57.370534] mtk_t7xx 0000:72:00.0: [PM] SAP suspend error: -110
-> [   57.370581] mtk_t7xx 0000:72:00.0: can't suspend
->     (t7xx_pci_pm_runtime_suspend [mtk_t7xx] returned -110)
-> and after this the traffic is not working.
-> 
-> As yu know the situation was stalled and it seems that the final solution for
-> the complete series can take longer, so in order to have at least the modem
-> working, it would be enough if just the first commit of the series is
-> re-applied (d20ef656f994 net: wwan: t7xx: Add AP CLDMA). With that, the
-> Application Processor would be controlled, correctly suspended and the
-> commented problems would be fixed (I am testing here like this with no related
-> issue).
-> 
-> I think the first commit of the series is independent of the others and it can
-> be re-applied cleanly. Later on, the other commits related to fw flashing and 
-> coredump collection new features could be added taking into account Bjorn's 
-> comments (and of course updated doc if needed).
+Hello,
 
-Please just post your proposal the usual way: send a patch that can be
-directly applied, and send it to the maintainers of the file and the
-relevant mailing lists.
+syzbot has tested the proposed patch and the reproducer did not trigger any issue:
 
-Since d20ef656f994 affects drivers/net/wwan, this would be handled by
-the WWAN folks.  From get_maintainers.pl:
+Reported-and-tested-by: syzbot+0bc501b7bf9e1bc09958@syzkaller.appspotmail.com
 
-  Loic Poulain <loic.poulain@linaro.org> (maintainer:WWAN DRIVERS)
-  Sergey Ryazanov <ryazanov.s.a@gmail.com> (maintainer:WWAN DRIVERS)
-  Johannes Berg <johannes@sipsolutions.net> (reviewer:WWAN DRIVERS)
-  "David S. Miller" <davem@davemloft.net> (maintainer:NETWORKING DRIVERS)
-  Eric Dumazet <edumazet@google.com> (maintainer:NETWORKING DRIVERS)
-  Jakub Kicinski <kuba@kernel.org> (maintainer:NETWORKING DRIVERS)
-  Paolo Abeni <pabeni@redhat.com> (maintainer:NETWORKING DRIVERS)
-  netdev@vger.kernel.org (open list:WWAN DRIVERS)
-  linux-kernel@vger.kernel.org (open list)
+Tested on:
 
-I'm confused about what happened with d20ef656f994 [1].  Git claims it
-appeared in v6.1, and I don't see a revert of it, but I don't see the
-code changes it made, e.g., the changes to t7xx_hw_info_init() [2].
+commit:         faaa5fd3 dt-bindings: net: altr,tse: Fix error in "com..
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git main
+console output: https://syzkaller.appspot.com/x/log.txt?x=14f7e723280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=a78c5a35ccd7ceb0
+dashboard link: https://syzkaller.appspot.com/bug?extid=0bc501b7bf9e1bc09958
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Bjorn
-
-[1] https://git.kernel.org/linus/d20ef656f994
-[2] https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/drivers/net/wwan/t7xx/t7xx_hif_cldma.c?id=v6.4-rc7#n1063
-
+Note: no patches were applied.
+Note: testing is done by a robot and is best-effort only.
 
