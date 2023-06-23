@@ -1,76 +1,75 @@
-Return-Path: <netdev+bounces-13315-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375F273B3E4
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:44:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38C2773B415
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:48:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3837D1C20355
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:44:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B3C82819DF
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:48:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9774434;
-	Fri, 23 Jun 2023 09:44:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3816443B;
+	Fri, 23 Jun 2023 09:48:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C3213D9E
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:44:06 +0000 (UTC)
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57CAC2100
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:44:01 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3111cb3dda1so681901f8f.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:44:01 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1A4B4434
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:48:12 +0000 (UTC)
+Received: from mail-ej1-x632.google.com (mail-ej1-x632.google.com [IPv6:2a00:1450:4864:20::632])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADE9E1997
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:48:09 -0700 (PDT)
+Received: by mail-ej1-x632.google.com with SMTP id a640c23a62f3a-98934f000a5so44461366b.2
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:48:09 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687513440; x=1690105440;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687513688; x=1690105688;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=pcy5cyjz7F8/6l0R/EBOM5X+Qzp4ddDgR685z6/Mzss=;
-        b=ok4Ft78NCIBjvhxW6+v7MQjB26wxgcCwNpE1Ml0e0dES5zZCq7apHWlDFflAKjDAyc
-         h99BcsaBrDSYbom6kNsNjhUDrV14INYkboViGd7fIqL3q7IB+ZPqawgGMT4ekZA7STgx
-         IViXmHCmEnAUn9oVFg9sioxPx2fEWXgsC7E6WJ27QCwNSfaG7Af+tV7QzRFqdCQrlLLB
-         RozewenzHz1pqcTU64hm3p6EDzwQNHwYwy/uD4FiRPYvUsCvhIsM3eym3p0h5Au+PJQA
-         BsfvNGWOI4rk+dvwRD53tzJRxJP9FUrrVDXCSQWqJ262Ub+4UgQ2ELAwJhgG9cyDZDNZ
-         SgWQ==
+        bh=xvX8E3LbUWmxzPJ5nWpFakhQiLvgFkJ51a8uwH4tDNY=;
+        b=NlAkrnNGQg8bl7TCC2bQawpFhEqUWUeVKf4KhkfmQrGoyJyGffcdvH5hAiG045N0xJ
+         BnSuwLjIBVF2euKBskxi7DUnfBO36iNDFdZltPlqAlt0F9Wbi4bWKhLM/78mUK37VnrN
+         0RJjrKUiRsfGxPseiCOh/BRDKihYp6oH033xJ1WPneT7VZQ4iki7PuUSh1PCB5E8MvcP
+         2RVyT1nnbaMR28P+iCTlyfM7atMouUTfgReFj4l43Vv8P062PUPFKSB2O3NhkVwU7R7o
+         ch/tQbTF+Faui7QV+qK5aPOeRhB9T1X78IT1msRevIHb9juEEW2df6Z/NJAprRfbIdrS
+         p6aA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687513440; x=1690105440;
+        d=1e100.net; s=20221208; t=1687513688; x=1690105688;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=pcy5cyjz7F8/6l0R/EBOM5X+Qzp4ddDgR685z6/Mzss=;
-        b=SUnjoEQGgo5HToJqT1JRnQcXtiFcXgs3XZzDqhYE17PqtBi0C8bYMPCrFK5idnzoAI
-         gv/c+rnY27NcuDbnOgdGt2DnwAisA0/A7V2PrAYoIfiSfnnv9IDy0pa4FPz2S8f/27yg
-         JDVFqiOPADvf0g6hLTam7Qn+chxUXxqd9DalTUUTtkFNs8ePvQXGPHqzW2HqyYL2f2tI
-         mNQTOQ6NCerds88rLtZcWbM+WtGU2FTxTyrpNTB4Alg2fSX36C5V1Ldgq1jnm2doVC27
-         xBchGMimOj+yATNBxKivSW9/iBw9deFhK+FYNgeiiBDOwQu4isne++6f6wf9qgtWSXVp
-         UeJQ==
-X-Gm-Message-State: AC+VfDwHqXyFfXCNvIEA1egJU8qxkufZZUSKvBtb/9q8lqDj+2Pk3nmp
-	W33hFnUO5BTKPGV3d0SfCaitkg==
-X-Google-Smtp-Source: ACHHUZ7DMQ7qm38AjWRARvBdOxeZdZfTwYAdbda1YDLhCgkTQvc+wurTdcmndV+S22IzJxbEHx6UJA==
-X-Received: by 2002:a5d:58ea:0:b0:30f:bafb:2478 with SMTP id f10-20020a5d58ea000000b0030fbafb2478mr19835564wrd.42.1687513439618;
-        Fri, 23 Jun 2023 02:43:59 -0700 (PDT)
+        bh=xvX8E3LbUWmxzPJ5nWpFakhQiLvgFkJ51a8uwH4tDNY=;
+        b=eVyJkMEmPNeguYM/SxWO3W1NMg/IzjnHx+yP3K59/AV+bs0yuODBNdYEW7GCvAbo94
+         Vmg01F8722ea3K1k5w5wLeJIaj4pBBeh1lJ8ifh3AOFMpVQSUfkDPlWS1seEXDMLWqj9
+         fXpb6ZqySG69c6HvxNUM+RPKmCDY8EMfQvelZHRKxzrjC7hop+mtAkJG0LssEK4L1ztp
+         Epp3fN5sdUXTJNKXDkA9sjUca1nvaHr5qlBKBixwk70u3vYl+NiNEOKx8FZnz/6zcyvW
+         DBY1QcgztoqY1BZOIthgRf+c/jbyV6Guq0ttH50NaZ0hKKLX9rXJ9i2SgUMsLXpO06lp
+         /yWA==
+X-Gm-Message-State: AC+VfDx7c3oG5ZcE5us74HogkrNv4JGRU3XpGamoIsMntEAVp9GzV7ak
+	ETD+O+54Wg/QmiO8E5JclLk7iw==
+X-Google-Smtp-Source: ACHHUZ4Pg3p3Zhi7IkuDcGLVX4Xba/2U/WgOrG+VCRj8573vr1wPLZE5mnJ+SnjOx9NEOBwbayZyuw==
+X-Received: by 2002:a17:907:6d1a:b0:988:6193:29d8 with SMTP id sa26-20020a1709076d1a00b00988619329d8mr13494552ejc.57.1687513688130;
+        Fri, 23 Jun 2023 02:48:08 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id o8-20020a5d4a88000000b003068f5cca8csm9069659wrq.94.2023.06.23.02.43.58
+        by smtp.gmail.com with ESMTPSA id n17-20020a17090625d100b00988c6ac6b86sm5823194ejb.186.2023.06.23.02.48.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 02:43:58 -0700 (PDT)
-Date: Fri, 23 Jun 2023 11:43:57 +0200
+        Fri, 23 Jun 2023 02:48:07 -0700 (PDT)
+Date: Fri, 23 Jun 2023 11:48:06 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
-Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
-	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
-	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com, vkuznets@redhat.com,
-	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org, stable@vger.kernel.org,
-	schakrabarti@microsoft.com
-Subject: Re: [PATCH V2 net] net: mana: Fix MANA VF unload when host is
- unresponsive
-Message-ID: <ZJVpXR52RQxdYRY+@nanopsycho>
-References: <1687505355-29212-1-git-send-email-schakrabarti@linux.microsoft.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Harald Welte <laforge@gnumonks.org>,
+	Taehee Yoo <ap420073@gmail.com>,
+	Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org,
+	osmocom-net-gprs@lists.osmocom.org,
+	syzkaller <syzkaller@googlegroups.com>
+Subject: Re: [PATCH v1 net] gtp: Fix use-after-free in __gtp_encap_destroy().
+Message-ID: <ZJVqVsUccEABIXSO@nanopsycho>
+References: <20230622213231.24651-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,196 +78,197 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <1687505355-29212-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <20230622213231.24651-1-kuniyu@amazon.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Jun 23, 2023 at 09:29:15AM CEST, schakrabarti@linux.microsoft.com wrote:
->From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Thu, Jun 22, 2023 at 11:32:31PM CEST, kuniyu@amazon.com wrote:
+>syzkaller reported use-after-free in __gtp_encap_destroy(). [0]
 >
->This patch addresses  the VF unload issue, where mana_dealloc_queues()
-
-double space here    ^^
-
->gets stuck in infinite while loop, because of host unresponsiveness.
->It adds a timeout in the while loop, to fix it.
+>It shows the same process freed sk and touched it illegally.
 >
->Also this patch adds a new attribute in mana_context, which gets set when
->mana_hwc_send_request() hits a timeout because of host unresponsiveness.
->This flag then helps to avoid the timeouts in successive calls.
-
-You aparently combine 2 patches together. Please split.
-
-
+>Commit e198987e7dd7 ("gtp: fix suspicious RCU usage") added lock_sock()
+>and release_sock() in __gtp_encap_destroy() to protect sk->sk_user_data,
+>but release_sock() is called after sock_put() releases the last refcnt.
 >
->Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+>[0]:
+>BUG: KASAN: slab-use-after-free in instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+>BUG: KASAN: slab-use-after-free in atomic_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:541 [inline]
+>BUG: KASAN: slab-use-after-free in queued_spin_lock include/asm-generic/qspinlock.h:111 [inline]
+>BUG: KASAN: slab-use-after-free in do_raw_spin_lock include/linux/spinlock.h:186 [inline]
+>BUG: KASAN: slab-use-after-free in __raw_spin_lock_bh include/linux/spinlock_api_smp.h:127 [inline]
+>BUG: KASAN: slab-use-after-free in _raw_spin_lock_bh+0x75/0xe0 kernel/locking/spinlock.c:178
+>Write of size 4 at addr ffff88800dbef398 by task syz-executor.2/2401
+>
+>CPU: 1 PID: 2401 Comm: syz-executor.2 Not tainted 6.4.0-rc5-01219-gfa0e21fa4443 #2
+>Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
+>Call Trace:
+> <TASK>
+> __dump_stack lib/dump_stack.c:88 [inline]
+> dump_stack_lvl+0x72/0xa0 lib/dump_stack.c:106
+> print_address_description mm/kasan/report.c:351 [inline]
+> print_report+0xcc/0x620 mm/kasan/report.c:462
+> kasan_report+0xb2/0xe0 mm/kasan/report.c:572
+> check_region_inline mm/kasan/generic.c:181 [inline]
+> kasan_check_range+0x39/0x1c0 mm/kasan/generic.c:187
+> instrument_atomic_read_write include/linux/instrumented.h:96 [inline]
+> atomic_try_cmpxchg_acquire include/linux/atomic/atomic-instrumented.h:541 [inline]
+> queued_spin_lock include/asm-generic/qspinlock.h:111 [inline]
+> do_raw_spin_lock include/linux/spinlock.h:186 [inline]
+> __raw_spin_lock_bh include/linux/spinlock_api_smp.h:127 [inline]
+> _raw_spin_lock_bh+0x75/0xe0 kernel/locking/spinlock.c:178
+> spin_lock_bh include/linux/spinlock.h:355 [inline]
+> release_sock+0x1f/0x1a0 net/core/sock.c:3526
+> gtp_encap_disable_sock drivers/net/gtp.c:651 [inline]
+> gtp_encap_disable+0xb9/0x220 drivers/net/gtp.c:664
+> gtp_dev_uninit+0x19/0x50 drivers/net/gtp.c:728
+> unregister_netdevice_many_notify+0x97e/0x1520 net/core/dev.c:10841
+> rtnl_delete_link net/core/rtnetlink.c:3216 [inline]
+> rtnl_dellink+0x3c0/0xb30 net/core/rtnetlink.c:3268
+> rtnetlink_rcv_msg+0x450/0xb10 net/core/rtnetlink.c:6423
+> netlink_rcv_skb+0x15d/0x450 net/netlink/af_netlink.c:2548
+> netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+> netlink_unicast+0x700/0x930 net/netlink/af_netlink.c:1365
+> netlink_sendmsg+0x91c/0xe30 net/netlink/af_netlink.c:1913
+> sock_sendmsg_nosec net/socket.c:724 [inline]
+> sock_sendmsg+0x1b7/0x200 net/socket.c:747
+> ____sys_sendmsg+0x75a/0x990 net/socket.c:2493
+> ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2547
+> __sys_sendmsg+0xfe/0x1d0 net/socket.c:2576
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x72/0xdc
+>RIP: 0033:0x7f1168b1fe5d
+>Code: ff c3 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 8b 0d 73 9f 1b 00 f7 d8 64 89 01 48
+>RSP: 002b:00007f1167edccc8 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
+>RAX: ffffffffffffffda RBX: 00000000004bbf80 RCX: 00007f1168b1fe5d
+>RDX: 0000000000000000 RSI: 00000000200002c0 RDI: 0000000000000003
+>RBP: 00000000004bbf80 R08: 0000000000000000 R09: 0000000000000000
+>R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+>R13: 000000000000000b R14: 00007f1168b80530 R15: 0000000000000000
+> </TASK>
+>
+>Allocated by task 1483:
+> kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+> kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+> __kasan_slab_alloc+0x59/0x70 mm/kasan/common.c:328
+> kasan_slab_alloc include/linux/kasan.h:186 [inline]
+> slab_post_alloc_hook mm/slab.h:711 [inline]
+> slab_alloc_node mm/slub.c:3451 [inline]
+> slab_alloc mm/slub.c:3459 [inline]
+> __kmem_cache_alloc_lru mm/slub.c:3466 [inline]
+> kmem_cache_alloc+0x16d/0x340 mm/slub.c:3475
+> sk_prot_alloc+0x5f/0x280 net/core/sock.c:2073
+> sk_alloc+0x34/0x6c0 net/core/sock.c:2132
+> inet6_create net/ipv6/af_inet6.c:192 [inline]
+> inet6_create+0x2c7/0xf20 net/ipv6/af_inet6.c:119
+> __sock_create+0x2a1/0x530 net/socket.c:1535
+> sock_create net/socket.c:1586 [inline]
+> __sys_socket_create net/socket.c:1623 [inline]
+> __sys_socket_create net/socket.c:1608 [inline]
+> __sys_socket+0x137/0x250 net/socket.c:1651
+> __do_sys_socket net/socket.c:1664 [inline]
+> __se_sys_socket net/socket.c:1662 [inline]
+> __x64_sys_socket+0x72/0xb0 net/socket.c:1662
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x72/0xdc
+>
+>Freed by task 2401:
+> kasan_save_stack+0x22/0x50 mm/kasan/common.c:45
+> kasan_set_track+0x25/0x30 mm/kasan/common.c:52
+> kasan_save_free_info+0x2e/0x50 mm/kasan/generic.c:521
+> ____kasan_slab_free mm/kasan/common.c:236 [inline]
+> ____kasan_slab_free mm/kasan/common.c:200 [inline]
+> __kasan_slab_free+0x10c/0x1b0 mm/kasan/common.c:244
+> kasan_slab_free include/linux/kasan.h:162 [inline]
+> slab_free_hook mm/slub.c:1781 [inline]
+> slab_free_freelist_hook mm/slub.c:1807 [inline]
+> slab_free mm/slub.c:3786 [inline]
+> kmem_cache_free+0xb4/0x490 mm/slub.c:3808
+> sk_prot_free net/core/sock.c:2113 [inline]
+> __sk_destruct+0x500/0x720 net/core/sock.c:2207
+> sk_destruct+0xc1/0xe0 net/core/sock.c:2222
+> __sk_free+0xed/0x3d0 net/core/sock.c:2233
+> sk_free+0x7c/0xa0 net/core/sock.c:2244
+> sock_put include/net/sock.h:1981 [inline]
+> __gtp_encap_destroy+0x165/0x1b0 drivers/net/gtp.c:634
+> gtp_encap_disable_sock drivers/net/gtp.c:651 [inline]
+> gtp_encap_disable+0xb9/0x220 drivers/net/gtp.c:664
+> gtp_dev_uninit+0x19/0x50 drivers/net/gtp.c:728
+> unregister_netdevice_many_notify+0x97e/0x1520 net/core/dev.c:10841
+> rtnl_delete_link net/core/rtnetlink.c:3216 [inline]
+> rtnl_dellink+0x3c0/0xb30 net/core/rtnetlink.c:3268
+> rtnetlink_rcv_msg+0x450/0xb10 net/core/rtnetlink.c:6423
+> netlink_rcv_skb+0x15d/0x450 net/netlink/af_netlink.c:2548
+> netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+> netlink_unicast+0x700/0x930 net/netlink/af_netlink.c:1365
+> netlink_sendmsg+0x91c/0xe30 net/netlink/af_netlink.c:1913
+> sock_sendmsg_nosec net/socket.c:724 [inline]
+> sock_sendmsg+0x1b7/0x200 net/socket.c:747
+> ____sys_sendmsg+0x75a/0x990 net/socket.c:2493
+> ___sys_sendmsg+0x11d/0x1c0 net/socket.c:2547
+> __sys_sendmsg+0xfe/0x1d0 net/socket.c:2576
+> do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+> do_syscall_64+0x3f/0x90 arch/x86/entry/common.c:80
+> entry_SYSCALL_64_after_hwframe+0x72/0xdc
+>
+>The buggy address belongs to the object at ffff88800dbef300
+> which belongs to the cache UDPv6 of size 1344
+>The buggy address is located 152 bytes inside of
+> freed 1344-byte region [ffff88800dbef300, ffff88800dbef840)
+>
+>The buggy address belongs to the physical page:
+>page:00000000d31bfed5 refcount:1 mapcount:0 mapping:0000000000000000 index:0xffff88800dbeed40 pfn:0xdbe8
+>head:00000000d31bfed5 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
+>memcg:ffff888008ee0801
+>flags: 0x100000000010200(slab|head|node=0|zone=1)
+>page_type: 0xffffffff()
+>raw: 0100000000010200 ffff88800c7a3000 dead000000000122 0000000000000000
+>raw: ffff88800dbeed40 0000000080160015 00000001ffffffff ffff888008ee0801
+>page dumped because: kasan: bad access detected
+>
+>Memory state around the buggy address:
+> ffff88800dbef280: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> ffff88800dbef300: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>>ffff88800dbef380: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>                            ^
+> ffff88800dbef400: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+> ffff88800dbef480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
+>
 
-Please provide a "Fixes" tag with pointer to the commit that introduced
-the problem.
+In the patch desctiption you say what is wrong and why, yet you don't
+describe what to do in order to fix the problem. Could please
+extend the patch description by that?
 
 
+>Fixes: e198987e7dd7 ("gtp: fix suspicious RCU usage")
+>Reported-by: syzkaller <syzkaller@googlegroups.com>
+>Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
 >---
->V1 -> V2:
->* Added net branch
->* Removed the typecasting to (struct mana_context*) of void pointer
->* Repositioned timeout variable in mana_dealloc_queues()
->* Repositioned vf_unload_timeout in mana_context struct, to utilise the
->  6 bytes hole
->---
-> .../net/ethernet/microsoft/mana/gdma_main.c   |  4 +++-
-> .../net/ethernet/microsoft/mana/hw_channel.c  | 12 ++++++++++-
-> drivers/net/ethernet/microsoft/mana/mana_en.c | 21 +++++++++++++++++--
-> include/net/mana/mana.h                       |  2 ++
-> 4 files changed, 35 insertions(+), 4 deletions(-)
+> drivers/net/gtp.c | 2 ++
+> 1 file changed, 2 insertions(+)
 >
->diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
->index 8f3f78b68592..6411f01be0d9 100644
->--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
->+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
->@@ -946,10 +946,12 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
-> 	struct gdma_context *gc = gd->gdma_context;
-> 	struct gdma_general_resp resp = {};
-> 	struct gdma_general_req req = {};
->+	struct mana_context *ac;
-> 	int err;
-> 
-> 	if (gd->pdid == INVALID_PDID)
-> 		return -EINVAL;
->+	ac = gd->driver_data;
-> 
-> 	mana_gd_init_req_hdr(&req.hdr, GDMA_DEREGISTER_DEVICE, sizeof(req),
-> 			     sizeof(resp));
->@@ -957,7 +959,7 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
-> 	req.hdr.dev_id = gd->dev_id;
-> 
-> 	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
->-	if (err || resp.hdr.status) {
->+	if ((err || resp.hdr.status) && !ac->vf_unload_timeout) {
-> 		dev_err(gc->dev, "Failed to deregister device: %d, 0x%x\n",
-> 			err, resp.hdr.status);
-> 		if (!err)
->diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
->index 9d1507eba5b9..492cb2c6e2cb 100644
->--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
->+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
->@@ -1,8 +1,10 @@
-> // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
-> /* Copyright (c) 2021, Microsoft Corporation. */
-> 
->+#include "asm-generic/errno.h"
-> #include <net/mana/gdma.h>
-> #include <net/mana/hw_channel.h>
->+#include <net/mana/mana.h>
-> 
-> static int mana_hwc_get_msg_index(struct hw_channel_context *hwc, u16 *msg_id)
-> {
->@@ -786,12 +788,19 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
-> 	struct hwc_wq *txq = hwc->txq;
-> 	struct gdma_req_hdr *req_msg;
-> 	struct hwc_caller_ctx *ctx;
->+	struct mana_context *ac;
-> 	u32 dest_vrcq = 0;
-> 	u32 dest_vrq = 0;
-> 	u16 msg_id;
-> 	int err;
-> 
-> 	mana_hwc_get_msg_index(hwc, &msg_id);
->+	ac = hwc->gdma_dev->driver_data;
->+	if (ac->vf_unload_timeout) {
->+		dev_err(hwc->dev, "HWC: vport is already unloaded.\n");
->+		err = -ETIMEDOUT;
->+		goto out;
->+	}
-> 
-> 	tx_wr = &txq->msg_buf->reqs[msg_id];
-> 
->@@ -825,9 +834,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
-> 		goto out;
+>diff --git a/drivers/net/gtp.c b/drivers/net/gtp.c
+>index 15c7dc82107f..acb20ad4e37e 100644
+>--- a/drivers/net/gtp.c
+>+++ b/drivers/net/gtp.c
+>@@ -631,7 +631,9 @@ static void __gtp_encap_destroy(struct sock *sk)
+> 			gtp->sk1u = NULL;
+> 		udp_sk(sk)->encap_type = 0;
+> 		rcu_assign_sk_user_data(sk, NULL);
+>+		release_sock(sk);
+> 		sock_put(sk);
+>+		return;
 > 	}
-> 
->-	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
->+	if (!wait_for_completion_timeout(&ctx->comp_event, 5 * HZ)) {
-> 		dev_err(hwc->dev, "HWC: Request timed out!\n");
-> 		err = -ETIMEDOUT;
->+		ac->vf_unload_timeout = true;
-> 		goto out;
-> 	}
-> 
->diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
->index d907727c7b7a..cb2080b3a00c 100644
->--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
->+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
->@@ -2329,7 +2329,10 @@ static int mana_dealloc_queues(struct net_device *ndev)
-> {
-> 	struct mana_port_context *apc = netdev_priv(ndev);
-> 	struct gdma_dev *gd = apc->ac->gdma_dev;
->+	unsigned long timeout;
-> 	struct mana_txq *txq;
->+	struct sk_buff *skb;
->+	struct mana_cq *cq;
-> 	int i, err;
-> 
-> 	if (apc->port_is_up)
->@@ -2348,13 +2351,26 @@ static int mana_dealloc_queues(struct net_device *ndev)
-> 	 *
-> 	 * Drain all the in-flight TX packets
-> 	 */
->+
->+	timeout = jiffies + 120 * HZ;
-> 	for (i = 0; i < apc->num_queues; i++) {
-> 		txq = &apc->tx_qp[i].txq;
->-
->-		while (atomic_read(&txq->pending_sends) > 0)
->+		while (atomic_read(&txq->pending_sends) > 0 &&
->+		       time_before(jiffies, timeout)) {
-> 			usleep_range(1000, 2000);
->+		}
-> 	}
-> 
->+	for (i = 0; i < apc->num_queues; i++) {
->+		txq = &apc->tx_qp[i].txq;
->+		cq = &apc->tx_qp[i].tx_cq;
->+		while (atomic_read(&txq->pending_sends)) {
->+			skb = skb_dequeue(&txq->pending_skbs);
->+			mana_unmap_skb(skb, apc);
->+			napi_consume_skb(skb, cq->budget);
->+			atomic_sub(1, &txq->pending_sends);
->+		}
->+	}
-> 	/* We're 100% sure the queues can no longer be woken up, because
-> 	 * we're sure now mana_poll_tx_cq() can't be running.
-> 	 */
->@@ -2605,6 +2621,7 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
-> 		}
-> 	}
-> 
->+	ac->vf_unload_timeout = false;
-
-Pointless init. You have the struct zeroed during allocation.
-
-
-> 	err = add_adev(gd);
-> out:
-> 	if (err)
->diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
->index 9eef19972845..5f5affdca1eb 100644
->--- a/include/net/mana/mana.h
->+++ b/include/net/mana/mana.h
->@@ -358,6 +358,8 @@ struct mana_context {
-> 
-> 	u16 num_ports;
-> 
->+	bool vf_unload_timeout;
->+
-> 	struct mana_eq *eqs;
-> 
-> 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
+> 	release_sock(sk);
+> }
 >-- 
->2.34.1
+>2.30.2
 >
 >
 
