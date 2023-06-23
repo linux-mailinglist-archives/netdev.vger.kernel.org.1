@@ -1,56 +1,88 @@
-Return-Path: <netdev+bounces-13604-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A129D73C304
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:41:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B842173C3E1
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 00:17:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7954281E3B
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:41:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 810AB281D2A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:17:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E69F6154AC;
-	Fri, 23 Jun 2023 21:41:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B39E315AE4;
+	Fri, 23 Jun 2023 22:17:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6D2214A97
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 21:41:26 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6849BE8;
-	Fri, 23 Jun 2023 14:41:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=WQCx5S2rzLd7RjvqC6LDqFRCoPVDdf+dtn8GX4ji/qw=; b=JnnXEtIGu6tZGGHN5/q8q6daj3
-	7lBAOb+CZlE8Q8ycc8GwVRgXk2p5SW/8zk5uR06Ebrvv8fPzn4pbEM7NfokWIbXNqWEAaso9EPvob
-	/yJ/ldkkKHwdzyzIceh8iTNtqB+yzfWatxdFxzOFidPd6JkhuMjQnA0zMB0no+tb5Ts0=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qCoWk-00HOhO-4M; Fri, 23 Jun 2023 23:41:10 +0200
-Date: Fri, 23 Jun 2023 23:41:10 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jeroen Hofstee <jhofstee@victronenergy.com>
-Cc: Simon Horman <simon.horman@corigine.com>,
-	=?iso-8859-1?Q?M=E5ns_Rullg=E5rd?= <mans@mansr.com>,
-	Tony Lindgren <tony@atomide.com>, netdev@vger.kernel.org,
-	Mugunthan V N <mugunthanvnm@ti.com>,
-	Grygorii Strashko <grygorii.strashko@ti.com>,
-	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>,
-	open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] net: cpsw: fix obtaining mac address for am3517
-Message-ID: <675a346b-faed-4e86-87e7-b332da540055@lunn.ch>
-References: <1477668756-2651-1-git-send-email-jhofstee@victronenergy.com>
- <20161028155213.2t3nwwe3lqaynaer@atomide.com>
- <d8ad5cab-5183-cddf-fa9a-4e7b9b8c9377@victronenergy.com>
- <20161028181914.mskebckucukzhxhz@atomide.com>
- <yw1x7cru445g.fsf@mansr.com>
- <ZJX9FBBvOTv10IO4@corigine.com>
- <de546232-0638-318a-535f-169184933a20@victronenergy.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9892C156DF;
+	Fri, 23 Jun 2023 22:17:13 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F8D82723;
+	Fri, 23 Jun 2023 15:17:04 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666e5f0d60bso729707b3a.3;
+        Fri, 23 Jun 2023 15:17:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687558623; x=1690150623;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=RDXYsfJvatym3Oy6lMJ56GZiSfJfyD1pGvE3gJmovG0=;
+        b=L8ikNoet7AueB84+izwdPzlfcYNFwgQKo+7BjsVjRF9Ijxy21C5kmod2iBlrnqsfoO
+         rqnKMVCUvBtxkZNYdE+TujU40V7ZQFjnip3OeAzI5HGyq6WexVkUG2AMTC/cnshoFlp/
+         UIIeRunkh68jjS5N5s6WQfqRfNha0sFcVGZVXqVrB9bnZgizo0VlcDORdeH3O5fAl1jj
+         UfOkvdN3cYVzlcZonnwGwDIWKO8U0X1Sn49gRGd0hrRtFb+8mhQoGqaj4MpqndYrkgtN
+         p70+V34SDXgL2INwqzzq27jZNw9y0PAmbPOwTSDr3MlyX+lon6zL409E73eQPRaor0Hq
+         Cg1A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687558623; x=1690150623;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RDXYsfJvatym3Oy6lMJ56GZiSfJfyD1pGvE3gJmovG0=;
+        b=EflEisZ6B7iZMaiBOb1WSsr+fw3P8R2ONhO4+/P4bEMkfq3fxNARJ0Q4R4DOvafjeC
+         AjBd4OWzW3ZrvYpdJGycKRSEiSe7he+ofa5+2oG1kseEZ3nWa0TWBr4SZELIJ4I71OPD
+         kc0KRElZ3glvTQFON+KBn6R/PR4XiybdHf//m0GaXKHnJl9HhlqcfwUX32B5AXj4oVFA
+         Me5etTQilKK9n0pmvWFCNnHvnyjvAXO1tiQeKwLXpbKFitbIJDNyPLo+QskFa3d1kW2A
+         Fhzfj32ANQOq1weVbdqfY6rLVZgoTYisLslAgs6/27y/WNBcVagpB6M2ot1JoFC3g3+5
+         RhQA==
+X-Gm-Message-State: AC+VfDx4eHMyAQ7yAiPrw+8ZCc9DHD4+D/6mp7KpypS5muX7Z2Jnma+D
+	0Pp9qaMy9Us6dMxHFnl/kbg=
+X-Google-Smtp-Source: ACHHUZ5Y+RtHqXU4NMHz285kJfLSNyqkgbN9BZZYhRTOm2uTdD0KHCxzDaboiI9we/f/7iS9PtKX9A==
+X-Received: by 2002:a05:6a20:7353:b0:11f:a611:324 with SMTP id v19-20020a056a20735300b0011fa6110324mr14473957pzc.10.1687558623447;
+        Fri, 23 Jun 2023 15:17:03 -0700 (PDT)
+Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
+        by smtp.gmail.com with ESMTPSA id a16-20020aa780d0000000b00666e2dac482sm24016pfn.124.2023.06.23.15.17.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 15:17:03 -0700 (PDT)
+Date: Fri, 23 Jun 2023 04:37:55 +0000
+From: Bobby Eshleman <bobbyeshleman@gmail.com>
+To: Stefano Garzarella <sgarzare@redhat.com>
+Cc: Arseniy Krasnov <oxffffaa@gmail.com>,
+	Bobby Eshleman <bobby.eshleman@bytedance.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	Bryan Tan <bryantan@vmware.com>, Vishnu Dasa <vdasa@vmware.com>,
+	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
+	Dan Carpenter <dan.carpenter@linaro.org>,
+	Simon Horman <simon.horman@corigine.com>, kvm@vger.kernel.org,
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH RFC net-next v4 6/8] virtio/vsock: support dgrams
+Message-ID: <ZJUho6NbpCgGatap@bullseye>
+References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
+ <20230413-b4-vsock-dgram-v4-6-0cebbb2ae899@bytedance.com>
+ <92b3a6df-ded3-6470-39d1-fe0939441abc@gmail.com>
+ <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,29 +91,52 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <de546232-0638-318a-535f-169184933a20@victronenergy.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+In-Reply-To: <ppx75eomyyb354knfkwbwin3il2ot7hf5cefwrt6ztpcbc3pps@q736cq5v4bdh>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > I feel like I am missing something here.
+On Thu, Jun 22, 2023 at 06:09:12PM +0200, Stefano Garzarella wrote:
+> On Sun, Jun 11, 2023 at 11:49:02PM +0300, Arseniy Krasnov wrote:
+> > Hello Bobby!
+> > 
+> > On 10.06.2023 03:58, Bobby Eshleman wrote:
+> > > This commit adds support for datagrams over virtio/vsock.
+> > > 
+> > > Message boundaries are preserved on a per-skb and per-vq entry basis.
+> > 
+> > I'm a little bit confused about the following case: let vhost sends 4097 bytes
+> > datagram to the guest. Guest uses 4096 RX buffers in it's virtio queue, each
+> > buffer has attached empty skb to it. Vhost places first 4096 bytes to the first
+> > buffer of guests RX queue, and 1 last byte to the second buffer. Now IIUC guest
+> > has two skb in it rx queue, and user in guest wants to read data - does it read
+> > 4097 bytes, while guest has two skb - 4096 bytes and 1 bytes? In seqpacket there is
+> > special marker in header which shows where message ends, and how it works here?
 > 
-> That is a weird response, you feel like something is missing
+> I think the main difference is that DGRAM is not connection-oriented, so
+> we don't have a stream and we can't split the packet into 2 (maybe we
+> could, but we have no guarantee that the second one for example will be
+> not discarded because there is no space).
+> 
+> So I think it is acceptable as a restriction to keep it simple.
+> 
+> My only doubt is, should we make the RX buffer size configurable,
+> instead of always using 4k?
+> 
+I think that is a really good idea. What mechanism do you imagine?
 
-There is. The patch.
+For sendmsg() with buflen > VQ_BUF_SIZE, I think I'd like -ENOBUFS
+returned even though it is uncharacteristic of Linux sockets.
+Alternatively, silently dropping is okay... but seems needlessly
+unhelpful.
 
-Maintainers have a slightly better memory than a goldfish, but given
-the high volume of patches, we don't remember threads from 2016. Also,
-all our infrastructure has limited memory, this patch is not in lore,
-and it is not in patchworks. So in terms of getting merged, it does
-not exist.
+FYI, this patch is broken for h2g because it requeues partially sent
+skbs, so probably doesn't need much code review until we decided on the
+policy.
 
-We do however recommend that if a patch has not been merged within 2
-weeks, it is rebased, any Acked-by: etc tags are added and the patch
-reposted.
-
-	Andrew
+Best,
+Bobby
 
