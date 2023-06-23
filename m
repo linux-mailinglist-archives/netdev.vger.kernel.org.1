@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-13582-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13606-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DD2DB73C1B2
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:03:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C142273C335
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:48:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A62E1C20EBF
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:03:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C033281E31
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:48:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18F6125D6;
-	Fri, 23 Jun 2023 21:03:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC13B156D9;
+	Fri, 23 Jun 2023 21:48:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13D1101E7
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 21:03:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF037156CC
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 21:48:49 +0000 (UTC)
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D717F212C;
-	Fri, 23 Jun 2023 14:03:07 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9344826A8;
+	Fri, 23 Jun 2023 14:48:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687554187; x=1719090187;
+  t=1687556928; x=1719092928;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=JbsGFsYlFyr7Htiazu4hc2TYcucQMiz4ks01lMK9mTI=;
-  b=qBZKtutK+JuAGdynbyYdpkkEqqBXjg/STPOo76xe7V7VHBrVZHK1S+H/
-   mNNdmeMvuAycV3vOg4di57QRXaQaR36ok060xw6CQMN0VVBuxPy09MTKP
-   fuQ4mGwuAKckg8wzJmcKjra5lGcAjvVQSDdu7mjUdwofwG5+xmBqy5Nw9
-   pF4nqPa5s2U1uTuJyb4vuEhJof+yFHRwrniVAhwHFa9lygyNChbLFrEQK
-   DFesI3Rq7ZHVTf2iiBf2hW68joMBDSDMs1/ZT4HDD3SoLC0yi12j6AOla
-   bVWlU9jKBVYMVJ5L+9150QO/buWJd+meSu82SE1qxdHcVvaWArfgpo4WU
-   g==;
+  bh=u41uDSsShsOX7lrg63ThimIL0DyW286ZAkuuqw+kc7g=;
+  b=aWsEtirVPc15l80dy3b7mcojojxt356WY4/qg6n27GBbQCh57KNVLSWr
+   Acu2qkXuWjmXQAZUD1dEcQRMH0EXZlYsErXVzYjlYFscB9XKBt/r4SSxr
+   NfCuT+sU82NtCIAfxrWQqBIoeJG01Y6IocaYIRImBEd/nIW3gDES4Ad2g
+   3iuorCX/d0/9ySktgsGGIXVK2wmKo/fmDYIp2JxvoAtLAZun/Eu5rQZaa
+   IiZszKFIP+qJwi7oFdR41Q0IxmIGq1975WquHEvtApR6CBI/1HBnnGhnV
+   15D5+vpFEqOeeo50xpSXcEuFSIHmgSEspNOlbmBjk8K8qx6QyT2j+2vcr
+   A==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="231893588"
+   d="scan'208";a="231899483"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:03:06 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:48:46 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
- chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:48:02 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:48:30 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:47:32 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:48:02 -0700
 From: Varshini Rajendran <varshini.rajendran@microchip.com>
 To: <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
 	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -78,9 +78,9 @@ CC: <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
 	<balamanikandan.gunasundar@microchip.com>, <manikandan.m@microchip.com>,
 	<dharma.b@microchip.com>, <nayabbasha.sayed@microchip.com>,
 	<balakrishnan.s@microchip.com>
-Subject: [PATCH v2 34/45] dt-bindings: watchdog: sama5d4-wdt: add compatible for sam9x7-wdt
-Date: Sat, 24 Jun 2023 02:00:45 +0530
-Message-ID: <20230623203056.689705-35-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 35/45] dt-bindings: irqchip/atmel-aic5: Add support for sam9x7 aic
+Date: Sat, 24 Jun 2023 02:00:46 +0530
+Message-ID: <20230623203056.689705-36-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -99,25 +99,27 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add compatible microchip,sam9x7-wdt to DT bindings documentation.
+Document the support added for the Advanced interrupt controller(AIC)
+chip in the sam9x7 SoC family.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- .../devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml          | 1 +
- 1 file changed, 1 insertion(+)
+ .../devicetree/bindings/interrupt-controller/atmel,aic.txt      | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml b/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
-index 816f85ee2c77..216e64dfddb2 100644
---- a/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
-+++ b/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
-@@ -17,6 +17,7 @@ properties:
-     enum:
-       - atmel,sama5d4-wdt
-       - microchip,sam9x60-wdt
-+      - microchip,sam9x7-wdt
-       - microchip,sama7g5-wdt
+diff --git a/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt b/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt
+index 7079d44bf3ba..2c267a66a3ea 100644
+--- a/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt
++++ b/Documentation/devicetree/bindings/interrupt-controller/atmel,aic.txt
+@@ -4,7 +4,7 @@ Required properties:
+ - compatible: Should be:
+     - "atmel,<chip>-aic" where  <chip> can be "at91rm9200", "sama5d2",
+       "sama5d3" or "sama5d4"
+-    - "microchip,<chip>-aic" where <chip> can be "sam9x60"
++    - "microchip,<chip>-aic" where <chip> can be "sam9x60", "sam9x7"
  
-   reg:
+ - interrupt-controller: Identifies the node as an interrupt controller.
+ - #interrupt-cells: The number of cells to define the interrupts. It should be 3.
 -- 
 2.25.1
 
