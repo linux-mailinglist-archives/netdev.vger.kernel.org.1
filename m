@@ -1,133 +1,356 @@
-Return-Path: <netdev+bounces-13416-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13418-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A70BF73B7FA
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:46:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D002173B837
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:53:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64484281BA9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:46:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 84E3D281A9C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:53:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 077CF613F;
-	Fri, 23 Jun 2023 12:45:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A4CF9749A;
+	Fri, 23 Jun 2023 12:53:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED43E568B;
-	Fri, 23 Jun 2023 12:45:38 +0000 (UTC)
-Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 893D52130;
-	Fri, 23 Jun 2023 05:45:07 -0700 (PDT)
-Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-666e6541c98so418205b3a.2;
-        Fri, 23 Jun 2023 05:45:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 930F723109
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:53:13 +0000 (UTC)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 44FBD271E
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 05:52:36 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-311167ba376so632083f8f.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 05:52:36 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687524307; x=1690116307;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=2sk22LSjhy08WjBidsivSikrImU390NZZ49H7BXVoJQ=;
-        b=dgy9ZZ/B/vzCfojJVvZFlMcbLu3U6AgURT7rc5FqQVNQ1ELPMyoJgnhNKdbnnSvKHw
-         4ed/xa08bzusVTq2xsiDkJz8HAbslFeisfotHSzb6BROJQgM8Lhk3T/hvBq8jzvYlKcq
-         27lIJ13qyy2Q+8VUVrDZwzgW44vlG4VhrBgv3yIyS9GDwH/KFZdjU9yBQyC0r6Nsa2xm
-         GZa6mWGhu9Wi7yv1VnipgVBE9u3228i3fyfJeTHBRpxcYLyyjjef2luCa/bWKz+X2kSd
-         En6B81JiqQtZmTiVcTuYkZdw7Ht1YzZDb4TjLongLYNkUAgS7hNxC5LOKFlNfYrA9/I2
-         IrPA==
+        d=linaro.org; s=google; t=1687524753; x=1690116753;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:from:user-agent:mime-version:date
+         :message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=E608wQQ3NuR5N+ldihF+0RecIdJUPrb2WsqabYtDHvk=;
+        b=PY+7C3++RTxYyAAUzqw3iUpPOVwbwp4jskWG2DCqWonjXOMSibVhGJlTHGNOHUGUkd
+         YhzqNkjSw9+rSEpg7C012r7TbxvpzrQfDwHF+oI9Yf9CdeAba3Ks/xBr12zMTKCmn+74
+         kqBPAlCIisEvS0BgBFZeyx0vk/7WomsCvjfboi5iFoLKQvYEBKqdC/GBalp2hKWxw88G
+         FyZo9EGL7eHmmBva593ljWU2rjY6eo9ndOzl1fu7jUsGkUKwLcKQpx7dUFbJ35/34UZF
+         SIaGb9/IIAkAan8hYQ2ndKEd41ETK4J+1bufsxHL2LK+jBz4K8Y7wWWqdHBpd0vDIoRg
+         0A0A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687524307; x=1690116307;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2sk22LSjhy08WjBidsivSikrImU390NZZ49H7BXVoJQ=;
-        b=Nrm863dTY6S/l2y1nc4DXSlRCavc56OMMTx8U4pAAw8i8U8JpQFLHsyf+GL5Eit6Zq
-         IGjdWzTO3FCeZ56flzRpoRCOLHoxOgDQ92+Vv0CH8zC6bXBNcB9az58zObP74Nd8x/x7
-         35+kNhJq+zY6wl+Ufyc+1RFU+zUj6rcxETV6rzNIzXei8ZlimrrrlzbEoPafYuH158RU
-         CvyYOqSb9pDIsQBRDYg7QtDp35Cfei0h5mfHug33ejjFok2eLghCszv2QdRwSmhIATB9
-         hnhhRNg4GeJa1434XAdH29LHTQDKFakpNZocRLJh9F43jme7S0TSFzKaer1uCDyt0ewl
-         ey8w==
-X-Gm-Message-State: AC+VfDyk8ihSxJUEQrPWhifPZeG8nV//iwBay908+A+jNSPaCaS3+LqX
-	KHN6BBhFAnZHe3ICByYHAPg=
-X-Google-Smtp-Source: ACHHUZ6yh1r1E1jdJMamk8/pwcIqXZFbn5z9Z4TX1FSYCK9sWTPK/gmdJAqZ5PY9Qy0QovhJWcDbvw==
-X-Received: by 2002:a05:6a20:54aa:b0:112:2843:b546 with SMTP id i42-20020a056a2054aa00b001122843b546mr26730950pzk.58.1687524306826;
-        Fri, 23 Jun 2023 05:45:06 -0700 (PDT)
-Received: from VkUbuntu ([150.117.130.6])
-        by smtp.gmail.com with ESMTPSA id y20-20020a1709027c9400b001b53c8659fesm7120300pll.30.2023.06.23.05.44.56
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 05:45:06 -0700 (PDT)
-Date: Fri, 23 Jun 2023 20:44:54 +0800
-From: Wong Vee Khee <veekhee@gmail.com>
-To: Choong Yong Liang <yong.liang.choong@linux.intel.com>
-Cc: Hans de Goede <hdegoede@redhat.com>,
-	Rajneesh Bhardwaj <irenic.rajneesh@gmail.com>,
-	David E Box <david.e.box@intel.com>,
-	Mark Gross <markgross@kernel.org>,
-	Jose Abreu <Jose.Abreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Jean Delvare <jdelvare@suse.com>,
-	Guenter Roeck <linux@roeck-us.net>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Philipp Zabel <p.zabel@pengutronix.de>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>,
-	Wong Vee Khee <veekhee@apple.com>,
-	Jon Hunter <jonathanh@nvidia.com>,
-	Jesse Brandeburg <jesse.brandeburg@intel.com>,
-	Revanth Kumar Uppala <ruppala@nvidia.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>,
-	Andrey Konovalov <andrey.konovalov@linaro.org>,
-	Jochen Henneberg <jh@henneberg-systemdesign.com>,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	platform-driver-x86@vger.kernel.org, linux-hwmon@vger.kernel.org,
-	bpf@vger.kernel.org, Voon Wei Feng <weifeng.voon@intel.com>,
-	Tee Min <tee.min.tan@linux.intel.com>,
-	Michael Sit Wei Hong <michael.wei.hong.sit@intel.com>,
-	Lai Peter Jun Ann <jun.ann.lai@intel.com>
-Subject: Re: [PATCH net-next 1/6] platform/x86: intel_pmc_core: Add IPC
- mailbox accessor function and add SoC register access
-Message-ID: <ZJWTxiJA4Z028/2G@VkUbuntu>
-References: <20230622041905.629430-1-yong.liang.choong@linux.intel.com>
- <20230622041905.629430-2-yong.liang.choong@linux.intel.com>
- <0652c9c8-27ee-0af9-9aa8-a2909142d405@redhat.com>
- <1599dd7a-f297-577b-7f5c-295a660c0c9c@linux.intel.com>
+        d=1e100.net; s=20221208; t=1687524753; x=1690116753;
+        h=content-transfer-encoding:in-reply-to:organization:content-language
+         :references:cc:to:subject:reply-to:from:user-agent:mime-version:date
+         :message-id:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=E608wQQ3NuR5N+ldihF+0RecIdJUPrb2WsqabYtDHvk=;
+        b=ZS6rE12W2XjreOSSbEF/V0PIcrd36mYz7JBgiH9WxaQ+fKg6dx7pcVJuEwSZ+D5Vz1
+         2Q9jUZ3t+1o9aq+VCBW0sNnp2wysL1dcRZra8g02M84PYeLjpP5IwwWQh9x/dEqhEDdC
+         cT0ORQGcHdJMJoZ2m3uHT4bsAiO+QuIZo/uSfptXPHVMqm0r87dasOx/pdvUIkT87h49
+         2eoVpxHATY8TDxhcam2QaAo9n/4PgxodQ6f8oNqtx1XRUir9T2pp78imxKUtM+GJlWN6
+         ZD/mVJNsoQ4Ad8d+CNlZ+2urgWZv1e2hYJtmu2GIbRHIxvVbMXngv5m3Ner3EfzuZUSX
+         wudw==
+X-Gm-Message-State: AC+VfDyOuDbfBgW1YJxPgZC2rRzOb0fUIUkrON+ZyacyBiRMr5cT2NP/
+	9NmB05gDsEkAPfThj2X5MDLAUg==
+X-Google-Smtp-Source: ACHHUZ5hI0uNaFZGooNoKoHdqHFOV87aKEgGlpwpoD7zhafRG/kt0kvIfA5VFxpRcpjwCLNvl9uMSA==
+X-Received: by 2002:adf:db47:0:b0:311:1a6f:289e with SMTP id f7-20020adfdb47000000b003111a6f289emr17381361wrj.25.1687524752711;
+        Fri, 23 Jun 2023 05:52:32 -0700 (PDT)
+Received: from ?IPV6:2a01:e0a:982:cbb0:ad0e:ec08:3cf4:d907? ([2a01:e0a:982:cbb0:ad0e:ec08:3cf4:d907])
+        by smtp.gmail.com with ESMTPSA id y14-20020a5d470e000000b0030647449730sm9623996wrq.74.2023.06.23.05.52.31
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jun 2023 05:52:32 -0700 (PDT)
+Message-ID: <fb00719f-26f2-38d0-b91e-7a49e94f52b8@linaro.org>
+Date: Fri, 23 Jun 2023 14:52:31 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <1599dd7a-f297-577b-7f5c-295a660c0c9c@linux.intel.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+From: Neil Armstrong <neil.armstrong@linaro.org>
+Reply-To: neil.armstrong@linaro.org
+Subject: Re: [PATCH 2/4] bluetooth: qca: add support for WCN7850
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>,
+ Konrad Dybcio <konrad.dybcio@linaro.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Rob Herring <robh+dt@kernel.org>,
+ Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+ Conor Dooley <conor+dt@kernel.org>,
+ Balakrishna Godavarthi <bgodavar@codeaurora.org>,
+ Rocky Liao <rjliao@codeaurora.org>, Marcel Holtmann <marcel@holtmann.org>,
+ Johan Hedberg <johan.hedberg@gmail.com>, Andy Gross <agross@kernel.org>,
+ Bjorn Andersson <andersson@kernel.org>, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-arm-msm@vger.kernel.org
+References: <20230620-topic-sm8550-upstream-bt-v1-0-4728564f8872@linaro.org>
+ <20230620-topic-sm8550-upstream-bt-v1-2-4728564f8872@linaro.org>
+ <b56bdd22-7d68-8a48-4207-ca6b83ec2644@linaro.org>
+ <CABBYNZ+JRbvOKnup0dH8V7YBpYcGuSn00i7zPhKP=3M3rEfF7Q@mail.gmail.com>
+Content-Language: en-US
+Organization: Linaro Developer Services
+In-Reply-To: <CABBYNZ+JRbvOKnup0dH8V7YBpYcGuSn00i7zPhKP=3M3rEfF7Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 01:52:49PM +0800, Choong Yong Liang wrote:
-> Hi Hans,
+Hi Luiz,
+
+On 22/06/2023 21:54, Luiz Augusto von Dentz wrote:
+> Hi Neil
 > 
-> I will discuss it with David but currently he is on vacation. It might take
-> some time to get the final output. Thank you.
->
+> On Tue, Jun 20, 2023 at 8:43 AM Konrad Dybcio <konrad.dybcio@linaro.org> wrote:
+>>
+>> On 20.06.2023 17:19, Neil Armstrong wrote:
+>>> Add support for the WCN7850 Bluetooth chipset.
+>>>
+>>> Tested on the SM8550 QRD platform.
+>>>
+>>> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
+>>> ---
+>> I don't have comments for this patch specifically, but:
+>>
+>>
+>>>   drivers/bluetooth/btqca.c   |  7 +++++++
+>>>   drivers/bluetooth/btqca.h   | 10 ++++++++++
+>>>   drivers/bluetooth/hci_qca.c | 48 ++++++++++++++++++++++++++++++++++-----------
+>>>   3 files changed, 54 insertions(+), 11 deletions(-)
+>>>
+>>> diff --git a/drivers/bluetooth/btqca.c b/drivers/bluetooth/btqca.c
+>>> index e7e58a956d15..037146b476ff 100644
+>>> --- a/drivers/bluetooth/btqca.c
+>>> +++ b/drivers/bluetooth/btqca.c
+>>> @@ -617,6 +617,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>        } else if (soc_type == QCA_WCN6855) {
+>>>                snprintf(config.fwname, sizeof(config.fwname),
+>>>                         "qca/hpbtfw%02x.tlv", rom_ver);
+>>> +     } else if (soc_type == QCA_WCN7850) {
+>>> +             snprintf(config.fwname, sizeof(config.fwname),
+>>> +                      "qca/hmtbtfw%02x.tlv", rom_ver);
+>>>        } else {
+>>>                snprintf(config.fwname, sizeof(config.fwname),
+>>>                         "qca/rampatch_%08x.bin", soc_ver);
+>>> @@ -654,6 +657,9 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>        else if (soc_type == QCA_WCN6855)
+>>>                snprintf(config.fwname, sizeof(config.fwname),
+>>>                         "qca/hpnv%02x.bin", rom_ver);
+>>> +     else if (soc_type == QCA_WCN7850)
+>>> +             snprintf(config.fwname, sizeof(config.fwname),
+>>> +                      "qca/hmtnv%02x.bin", rom_ver);
+>>>        else
+>>>                snprintf(config.fwname, sizeof(config.fwname),
+>>>                         "qca/nvm_%08x.bin", soc_ver);
+>> The above changes should probably be made switch statements as well
+>>
+>>> @@ -695,6 +701,7 @@ int qca_uart_setup(struct hci_dev *hdev, uint8_t baudrate,
+>>>        case QCA_WCN3991:
+>>>        case QCA_WCN6750:
+>>>        case QCA_WCN6855:
+>>> +     case QCA_WCN7850:
+>>>                /* get fw build info */
+>>>                err = qca_read_fw_build_info(hdev);
+>>>                if (err < 0)
+>>> diff --git a/drivers/bluetooth/btqca.h b/drivers/bluetooth/btqca.h
+>>> index b884095bcd9d..ff1850e984fe 100644
+>>> --- a/drivers/bluetooth/btqca.h
+>>> +++ b/drivers/bluetooth/btqca.h
+>>> @@ -148,6 +148,7 @@ enum qca_btsoc_type {
+>>>        QCA_QCA6390,
+>>>        QCA_WCN6750,
+>>>        QCA_WCN6855,
+>>> +     QCA_WCN7850,
+>>>   };
+>>>
+>>>   #if IS_ENABLED(CONFIG_BT_QCA)
+>>> @@ -173,6 +174,10 @@ static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
+>>>   {
+>>>        return soc_type == QCA_WCN6855;
+>>>   }
+>>> +static inline bool qca_is_wcn7850(enum qca_btsoc_type soc_type)
+>>> +{
+>>> +     return soc_type == QCA_WCN7850;
+>>> +}
+>>>
+>>>   #else
+>>>
+>>> @@ -216,6 +221,11 @@ static inline bool qca_is_wcn6855(enum qca_btsoc_type soc_type)
+>>>        return false;
+>>>   }
+>>>
+>>> +static inline bool qca_is_wcn7850(enum qca_btsoc_type soc_type)
+>>> +{
+>>> +     return false;
+>>> +}
+>>> +
+>>>   static inline int qca_send_pre_shutdown_cmd(struct hci_dev *hdev)
+>>>   {
+>>>        return -EOPNOTSUPP;
+>>> diff --git a/drivers/bluetooth/hci_qca.c b/drivers/bluetooth/hci_qca.c
+>>> index e30c979535b1..49b8d75d271e 100644
+>>> --- a/drivers/bluetooth/hci_qca.c
+>>> +++ b/drivers/bluetooth/hci_qca.c
+>>> @@ -1322,7 +1322,8 @@ static int qca_set_baudrate(struct hci_dev *hdev, uint8_t baudrate)
+>>>        /* Give the controller time to process the request */
+>>>        if (qca_is_wcn399x(qca_soc_type(hu)) ||
+>>>            qca_is_wcn6750(qca_soc_type(hu)) ||
+>>> -         qca_is_wcn6855(qca_soc_type(hu)))
+>>> +         qca_is_wcn6855(qca_soc_type(hu)) ||
+>>> +         qca_is_wcn7850(qca_soc_type(hu)))
+>>>                usleep_range(1000, 10000);
+>> Separate topic, but I see usages of the helper and raw comparisons
+>> everywhere.. I'd vote for switch everywhere
+> 
+> +1, most of the time it is preferable to go with switches which makes
+> the code cleaner/more readable, Im fine not requiring it in this set
+> but I hope someone looks into doing some cleanup in this code.
 
-Please remember not to top post on ML.
+Since we have time until the end of the v6.5 merge window I'll add an intermediate
+change adding switch/case for v2.
 
-Regards,
- Vee Khee
+Thanks,
+Neil
+
+> 
+>> Konrad
+>>>        else
+>>>                msleep(300);
+>>> @@ -1400,7 +1401,8 @@ static int qca_check_speeds(struct hci_uart *hu)
+>>>   {
+>>>        if (qca_is_wcn399x(qca_soc_type(hu)) ||
+>>>            qca_is_wcn6750(qca_soc_type(hu)) ||
+>>> -         qca_is_wcn6855(qca_soc_type(hu))) {
+>>> +         qca_is_wcn6855(qca_soc_type(hu)) ||
+>>> +         qca_is_wcn7850(qca_soc_type(hu))) {
+>>>                if (!qca_get_speed(hu, QCA_INIT_SPEED) &&
+>>>                    !qca_get_speed(hu, QCA_OPER_SPEED))
+>>>                        return -EINVAL;
+>>> @@ -1435,7 +1437,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>>>                 */
+>>>                if (qca_is_wcn399x(soc_type) ||
+>>>                    qca_is_wcn6750(soc_type) ||
+>>> -                 qca_is_wcn6855(soc_type))
+>>> +                 qca_is_wcn6855(soc_type) ||
+>>> +                 qca_is_wcn7850(soc_type))
+>>>                        hci_uart_set_flow_control(hu, true);
+>>>
+>>>                if (soc_type == QCA_WCN3990) {
+>>> @@ -1454,7 +1457,8 @@ static int qca_set_speed(struct hci_uart *hu, enum qca_speed_type speed_type)
+>>>   error:
+>>>                if (qca_is_wcn399x(soc_type) ||
+>>>                    qca_is_wcn6750(soc_type) ||
+>>> -                 qca_is_wcn6855(soc_type))
+>>> +                 qca_is_wcn6855(soc_type) ||
+>>> +                 qca_is_wcn7850(soc_type))
+>>>                        hci_uart_set_flow_control(hu, false);
+>>>
+>>>                if (soc_type == QCA_WCN3990) {
+>>> @@ -1691,7 +1695,8 @@ static int qca_power_on(struct hci_dev *hdev)
+>>>
+>>>        if (qca_is_wcn399x(soc_type) ||
+>>>            qca_is_wcn6750(soc_type) ||
+>>> -         qca_is_wcn6855(soc_type)) {
+>>> +         qca_is_wcn6855(soc_type) ||
+>>> +         qca_is_wcn7850(soc_type)) {
+>>>                ret = qca_regulator_init(hu);
+>>>        } else {
+>>>                qcadev = serdev_device_get_drvdata(hu->serdev);
+>>> @@ -1733,7 +1738,8 @@ static int qca_setup(struct hci_uart *hu)
+>>>        bt_dev_info(hdev, "setting up %s",
+>>>                qca_is_wcn399x(soc_type) ? "wcn399x" :
+>>>                (soc_type == QCA_WCN6750) ? "wcn6750" :
+>>> -             (soc_type == QCA_WCN6855) ? "wcn6855" : "ROME/QCA6390");
+>>> +             (soc_type == QCA_WCN6855) ? "wcn6855" :
+>>> +             (soc_type == QCA_WCN7850) ? "wcn7850" : "ROME/QCA6390");
+>>>
+>>>        qca->memdump_state = QCA_MEMDUMP_IDLE;
+>>>
+>>> @@ -1746,7 +1752,8 @@ static int qca_setup(struct hci_uart *hu)
+>>>
+>>>        if (qca_is_wcn399x(soc_type) ||
+>>>            qca_is_wcn6750(soc_type) ||
+>>> -         qca_is_wcn6855(soc_type)) {
+>>> +         qca_is_wcn6855(soc_type) ||
+>>> +         qca_is_wcn7850(soc_type)) {
+>>>                set_bit(HCI_QUIRK_USE_BDADDR_PROPERTY, &hdev->quirks);
+>>>                hci_set_aosp_capable(hdev);
+>>>
+>>> @@ -1769,7 +1776,8 @@ static int qca_setup(struct hci_uart *hu)
+>>>
+>>>        if (!(qca_is_wcn399x(soc_type) ||
+>>>              qca_is_wcn6750(soc_type) ||
+>>> -           qca_is_wcn6855(soc_type))) {
+>>> +           qca_is_wcn6855(soc_type) ||
+>>> +           qca_is_wcn7850(soc_type))) {
+>>>                /* Get QCA version information */
+>>>                ret = qca_read_soc_version(hdev, &ver, soc_type);
+>>>                if (ret)
+>>> @@ -1909,6 +1917,20 @@ static const struct qca_device_data qca_soc_data_wcn6855 __maybe_unused = {
+>>>        .capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
+>>>   };
+>>>
+>>> +static const struct qca_device_data qca_soc_data_wcn7850 __maybe_unused = {
+>>> +     .soc_type = QCA_WCN7850,
+>>> +     .vregs = (struct qca_vreg []) {
+>>> +             { "vddio", 5000 },
+>>> +             { "vddaon", 26000 },
+>>> +             { "vdddig", 126000 },
+>>> +             { "vddrfa0p8", 102000 },
+>>> +             { "vddrfa1p2", 257000 },
+>>> +             { "vddrfa1p9", 302000 },
+>>> +     },
+>>> +     .num_vregs = 6,
+>>> +     .capabilities = QCA_CAP_WIDEBAND_SPEECH | QCA_CAP_VALID_LE_STATES,
+>>> +};
+>>> +
+>>>   static void qca_power_shutdown(struct hci_uart *hu)
+>>>   {
+>>>        struct qca_serdev *qcadev;
+>>> @@ -2074,7 +2096,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>>>        if (data &&
+>>>            (qca_is_wcn399x(data->soc_type) ||
+>>>             qca_is_wcn6750(data->soc_type) ||
+>>> -          qca_is_wcn6855(data->soc_type))) {
+>>> +          qca_is_wcn6855(data->soc_type) ||
+>>> +          qca_is_wcn7850(data->soc_type))) {
+>>>                qcadev->btsoc_type = data->soc_type;
+>>>                qcadev->bt_power = devm_kzalloc(&serdev->dev,
+>>>                                                sizeof(struct qca_power),
+>>> @@ -2105,7 +2128,8 @@ static int qca_serdev_probe(struct serdev_device *serdev)
+>>>                                               GPIOD_IN);
+>>>                if (IS_ERR_OR_NULL(qcadev->sw_ctrl) &&
+>>>                    (data->soc_type == QCA_WCN6750 ||
+>>> -                  data->soc_type == QCA_WCN6855))
+>>> +                  data->soc_type == QCA_WCN6855 ||
+>>> +                  data->soc_type == QCA_WCN7850))
+>>>                        dev_warn(&serdev->dev, "failed to acquire SW_CTRL gpio\n");
+>>>
+>>>                qcadev->susclk = devm_clk_get_optional(&serdev->dev, NULL);
+>>> @@ -2182,7 +2206,8 @@ static void qca_serdev_remove(struct serdev_device *serdev)
+>>>
+>>>        if ((qca_is_wcn399x(qcadev->btsoc_type) ||
+>>>             qca_is_wcn6750(qcadev->btsoc_type) ||
+>>> -          qca_is_wcn6855(qcadev->btsoc_type)) &&
+>>> +          qca_is_wcn6855(qcadev->btsoc_type) ||
+>>> +          qca_is_wcn7850(qcadev->btsoc_type)) &&
+>>>            power->vregs_on)
+>>>                qca_power_shutdown(&qcadev->serdev_hu);
+>>>        else if (qcadev->susclk)
+>>> @@ -2368,6 +2393,7 @@ static const struct of_device_id qca_bluetooth_of_match[] = {
+>>>        { .compatible = "qcom,wcn3998-bt", .data = &qca_soc_data_wcn3998},
+>>>        { .compatible = "qcom,wcn6750-bt", .data = &qca_soc_data_wcn6750},
+>>>        { .compatible = "qcom,wcn6855-bt", .data = &qca_soc_data_wcn6855},
+>>> +     { .compatible = "qcom,wcn7850-bt", .data = &qca_soc_data_wcn7850},
+>>>        { /* sentinel */ }
+>>>   };
+>>>   MODULE_DEVICE_TABLE(of, qca_bluetooth_of_match);
+>>>
+> 
+> 
+> 
+
 
