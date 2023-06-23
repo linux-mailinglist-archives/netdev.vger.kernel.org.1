@@ -1,60 +1,61 @@
-Return-Path: <netdev+bounces-13455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13453-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1803373BA51
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:37:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95A0873BA4C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5B0C281C6A
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:37:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C6C2F1C212AD
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:36:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1468AD23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 939008C02;
 	Fri, 23 Jun 2023 14:36:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1776AD2E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7CC9623113
 	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:36:47 +0000 (UTC)
-Received: from mail-io1-f77.google.com (mail-io1-f77.google.com [209.85.166.77])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6D4F11987
+Received: from mail-il1-f207.google.com (mail-il1-f207.google.com [209.85.166.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 208DB1706
 	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:36:45 -0700 (PDT)
-Received: by mail-io1-f77.google.com with SMTP id ca18e2360f4ac-77b257b9909so45232439f.0
+Received: by mail-il1-f207.google.com with SMTP id e9e14a558f8ab-3426ee45975so4594515ab.0
         for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:36:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
         d=1e100.net; s=20221208; t=1687531004; x=1690123004;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=2dX/Y1bjDXjyX46L6txVItpNuZgpzzZS0TxSILPuB2A=;
-        b=dMnsZOpMQ1n1HrXKYf5cbr9oUwQpZhjKjDDHhXb9Svty/40KjrteYMRqaOaRE31KMP
-         NXcw5Nx9yWyHPsi0BdNJxMBz1gCoRRrJPCKnIja/53zNkdoNdGnw3Cw/qMykMB22UR9i
-         IyxgNODsrNJ7QD0CzgGmrTt/6G821keGRAD/6sR4sh6Jv29yf6zIN8jwHIuyNexRFmuO
-         sZvrx0Z7x5xMiP7DRucajU2uxTQSabMbwBG21CEO1IXb5K5LANDrsniNvhSfs+v0artU
-         f0Gftkx//4V2suQsY9WRb31ljqog2QrOe/MsQJxkt7IewCx/gwekbmX3AC5xDYig5BLE
-         BLfA==
-X-Gm-Message-State: AC+VfDxL4QRR760apsy32Ge3s6dkdK7qdbM4l9Ch0mpXuTOASX+kOc3y
-	halZk6QyizL35gY74AeEcKAj0HUag1QvMwqtaXQFAXTbNkBl
-X-Google-Smtp-Source: ACHHUZ5bzPUMk2q7EX21GYAtLzNTsNn2tTQhouSYh63nqmq0fMOaGs/YubGcFB9COnSaRggyFgBio7cWxA5d+iWQXGdz8M1Crbkd
+        bh=GZBDt3VSlZMCbOtP38Q983YuZEFJ3hM8P/mKOfrYCJQ=;
+        b=bQfWV5i18alxwKrASucDl68F8qDWFLigR6UoQSS4xeJyYHV/Ch7MxCSnzN75B5gXQr
+         WyFi+ZvIQcTN83GIi51btKMAaEL1M3N6dFqLZ1TbJHJ9uQcpKXwCoJMRVACt2bbnReWm
+         heM1etWOBMxIw0qtHyDVjfAqSkfUXiLAuaYwvm2DHHaUIbMG2VeFdqiuhIfDFm9haHKW
+         e1EYC+fnB0mURAP1sqeXesLN7w46FZZoS3puFQW5xKysZ82AyVWhIhMZaxj5JT4/WNqI
+         6bvmFPC7GOsqtKuy+sdOzDg06CJrgqm8V4Oogd2hNuZM1uojJIr/GuJorkCVbH9h1oBZ
+         RsEQ==
+X-Gm-Message-State: AC+VfDwUM7gbXMq3n9rqVk/QBecNmYLAsAVaBhD0ouZGKb9RENMfH02p
+	KkOnPT0MCmqy7rOEbsc+3RpaYFunXIBqbTZJq6pby+GHBj+9
+X-Google-Smtp-Source: ACHHUZ6GklxOJotBu/I9XgXKouxBmNr5XKHhpiiyUqdj5d+Oca3tSFdoNTo6XTtaZWv52Xj0JFqOxlKXfXS54jOBaNoWfEGOZHc+
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a02:95a2:0:b0:420:f404:40b6 with SMTP id
- b31-20020a0295a2000000b00420f40440b6mr7186337jai.1.1687531004603; Fri, 23 Jun
+X-Received: by 2002:a92:c0c8:0:b0:33e:6d38:8f7b with SMTP id
+ t8-20020a92c0c8000000b0033e6d388f7bmr8359179ilf.1.1687531004374; Fri, 23 Jun
  2023 07:36:44 -0700 (PDT)
 Date: Fri, 23 Jun 2023 07:36:44 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000013b7a605feccee01@google.com>
-Subject: [syzbot] [net?] WARNING in sock_i_ino
-From: syzbot <syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	syzkaller-bugs@googlegroups.com
+Message-ID: <00000000000010353a05fecceea0@google.com>
+Subject: [syzbot] [net?] WARNING in inet_sock_destruct (4)
+From: syzbot <syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com>
+To: bpf@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org, 
+	edumazet@google.com, jacob.e.keller@intel.com, jiri@nvidia.com, 
+	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	pabeni@redhat.com, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
@@ -67,74 +68,117 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    6f68fc395f49 Merge tag 'linux-can-fixes-for-6.4-20230622' ..
-git tree:       net
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=1665dc57280000
+HEAD commit:    45a3e24f65e9 Linux 6.4-rc7
+git tree:       upstream
+console output: https://syzkaller.appspot.com/x/log.txt?x=160cc82f280000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=2cbd298d0aff1140
-dashboard link: https://syzkaller.appspot.com/bug?extid=5da61cf6a9bc1902d422
+dashboard link: https://syzkaller.appspot.com/bug?extid=de6565462ab540f50e47
 compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15e35733280000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12064b33280000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=160aacb7280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c115d3280000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/0b8a4c4a2083/disk-6f68fc39.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/c8f50d314bb1/vmlinux-6f68fc39.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/b4b6929c2933/bzImage-6f68fc39.xz
+disk image: https://storage.googleapis.com/syzbot-assets/c09bcd4ec365/disk-45a3e24f.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/03549b639718/vmlinux-45a3e24f.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/91f203e5f63e/bzImage-45a3e24f.xz
+
+The issue was bisected to:
+
+commit 565b4824c39fa335cba2028a09d7beb7112f3c9a
+Author: Jiri Pirko <jiri@nvidia.com>
+Date:   Mon Feb 6 09:41:51 2023 +0000
+
+    devlink: change port event netdev notifier from per-net to global
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=110a1a5b280000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=130a1a5b280000
+console output: https://syzkaller.appspot.com/x/log.txt?x=150a1a5b280000
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
+Reported-by: syzbot+de6565462ab540f50e47@syzkaller.appspotmail.com
+Fixes: 565b4824c39f ("devlink: change port event netdev notifier from per-net to global")
 
 ------------[ cut here ]------------
-WARNING: CPU: 0 PID: 5012 at kernel/softirq.c:376 __local_bh_enable_ip+0xbe/0x130 kernel/softirq.c:376
+WARNING: CPU: 0 PID: 5025 at net/ipv4/af_inet.c:154 inet_sock_destruct+0x6df/0x8a0 net/ipv4/af_inet.c:154
 Modules linked in:
-CPU: 0 PID: 5012 Comm: syz-executor487 Not tainted 6.4.0-rc7-syzkaller-00202-g6f68fc395f49 #0
+CPU: 0 PID: 5025 Comm: syz-executor250 Not tainted 6.4.0-rc7-syzkaller #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-RIP: 0010:__local_bh_enable_ip+0xbe/0x130 kernel/softirq.c:376
-Code: 45 bf 01 00 00 00 e8 91 5b 0a 00 e8 3c 15 3d 00 fb 65 8b 05 ec e9 b5 7e 85 c0 74 58 5b 5d c3 65 8b 05 b2 b6 b4 7e 85 c0 75 a2 <0f> 0b eb 9e e8 89 15 3d 00 eb 9f 48 89 ef e8 6f 49 18 00 eb a8 0f
-RSP: 0018:ffffc90003a1f3d0 EFLAGS: 00010046
-RAX: 0000000000000000 RBX: 0000000000000201 RCX: 1ffffffff1cf5996
-RDX: 0000000000000000 RSI: 0000000000000201 RDI: ffffffff8805c6f3
-RBP: ffffffff8805c6f3 R08: 0000000000000001 R09: ffff8880152b03a3
-R10: ffffed1002a56074 R11: 0000000000000005 R12: 00000000000073e4
-R13: dffffc0000000000 R14: 0000000000000002 R15: 0000000000000000
-FS:  0000555556726300(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+RIP: 0010:inet_sock_destruct+0x6df/0x8a0 net/ipv4/af_inet.c:154
+Code: ff e8 c5 9f e0 f8 0f 0b e9 07 fe ff ff e8 b9 9f e0 f8 0f 0b e9 3f fe ff ff e8 ad 9f e0 f8 0f 0b e9 95 fd ff ff e8 a1 9f e0 f8 <0f> 0b e9 9f fe ff ff e8 d5 6a 33 f9 e9 7a fc ff ff 4c 89 e7 e8 08
+RSP: 0018:ffffc90000007de8 EFLAGS: 00010246
+RAX: 0000000000000000 RBX: 00000000fffff000 RCX: 0000000000000100
+RDX: ffff8880792f8000 RSI: ffffffff88a3a73f RDI: 0000000000000005
+RBP: ffff88814aa99980 R08: 0000000000000005 R09: 0000000000000000
+R10: 00000000fffff000 R11: 0000000000094001 R12: ffff88814aa999a8
+R13: ffff88814aa99bf4 R14: ffffc90000007ed8 R15: 0000000000000004
+FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
 CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 000000000045ad50 CR3: 000000007c646000 CR4: 00000000003506f0
+CR2: 00007f579b4f6ec8 CR3: 000000000c571000 CR4: 00000000003506f0
 DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
 DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
+ <IRQ>
+ __sk_destruct+0x4d/0x770 net/core/sock.c:2130
+ rcu_do_batch kernel/rcu/tree.c:2115 [inline]
+ rcu_core+0x806/0x1ad0 kernel/rcu/tree.c:2377
+ __do_softirq+0x1d4/0x905 kernel/softirq.c:571
+ invoke_softirq kernel/softirq.c:445 [inline]
+ __irq_exit_rcu+0x114/0x190 kernel/softirq.c:650
+ irq_exit_rcu+0x9/0x20 kernel/softirq.c:662
+ sysvec_apic_timer_interrupt+0x97/0xc0 arch/x86/kernel/apic/apic.c:1106
+ </IRQ>
  <TASK>
- sock_i_ino+0x83/0xa0 net/core/sock.c:2559
- __netlink_diag_dump+0x45c/0x790 net/netlink/diag.c:171
- netlink_diag_dump+0xd6/0x230 net/netlink/diag.c:207
- netlink_dump+0x570/0xc50 net/netlink/af_netlink.c:2269
- __netlink_dump_start+0x64b/0x910 net/netlink/af_netlink.c:2374
- netlink_dump_start include/linux/netlink.h:329 [inline]
- netlink_diag_handler_dump+0x1ae/0x250 net/netlink/diag.c:238
- __sock_diag_cmd net/core/sock_diag.c:238 [inline]
- sock_diag_rcv_msg+0x31e/0x440 net/core/sock_diag.c:269
- netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2547
- sock_diag_rcv+0x2a/0x40 net/core/sock_diag.c:280
- netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
- netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
- netlink_sendmsg+0x925/0xe30 net/netlink/af_netlink.c:1914
- sock_sendmsg_nosec net/socket.c:724 [inline]
- sock_sendmsg+0xde/0x190 net/socket.c:747
- ____sys_sendmsg+0x71c/0x900 net/socket.c:2503
- ___sys_sendmsg+0x110/0x1b0 net/socket.c:2557
- __sys_sendmsg+0xf7/0x1c0 net/socket.c:2586
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ asm_sysvec_apic_timer_interrupt+0x1a/0x20 arch/x86/include/asm/idtentry.h:645
+RIP: 0010:write_comp_data+0x3c/0x90 kernel/kcov.c:236
+Code: 01 00 00 49 89 f8 65 48 8b 14 25 c0 bb 03 00 a9 00 01 ff 00 74 0e 85 f6 74 59 8b 82 0c 16 00 00 85 c0 74 4f 8b 82 e8 15 00 00 <83> f8 03 75 44 48 8b 82 f0 15 00 00 8b 92 ec 15 00 00 48 8b 38 48
+RSP: 0018:ffffc90003a7fbf8 EFLAGS: 00000246
+RAX: 0000000000000000 RBX: ffffc90003a7b020 RCX: ffffffff814d76d1
+RDX: ffff8880792f8000 RSI: 0000000000000000 RDI: 0000000000000007
+RBP: ffff8880792f8000 R08: 0000000000000007 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000094001 R12: 0000000000000000
+R13: ffffc90003a78000 R14: dffffc0000000000 R15: ffff8880792f85f8
+ stack_not_used include/linux/sched/task_stack.h:107 [inline]
+ check_stack_usage kernel/exit.c:776 [inline]
+ do_exit+0x17f1/0x29b0 kernel/exit.c:918
+ do_group_exit+0xd4/0x2a0 kernel/exit.c:1024
+ get_signal+0x2318/0x25b0 kernel/signal.c:2876
+ arch_do_signal_or_restart+0x79/0x5c0 arch/x86/kernel/signal.c:306
+ exit_to_user_mode_loop kernel/entry/common.c:168 [inline]
+ exit_to_user_mode_prepare+0x11f/0x240 kernel/entry/common.c:204
+ __syscall_exit_to_user_mode_work kernel/entry/common.c:286 [inline]
+ syscall_exit_to_user_mode+0x1d/0x50 kernel/entry/common.c:297
+ do_syscall_64+0x46/0xb0 arch/x86/entry/common.c:86
  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f5303aaabb9
-Code: 28 c3 e8 2a 14 00 00 66 2e 0f 1f 84 00 00 00 00 00 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 c0 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007ffc7506e548 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-RAX: ffffffffffffffda RBX: 0000000000000000 RCX: 00007f5303aaabb9
-RDX: 0000000000000000 RSI: 0000000020000180 RDI: 0000000000000003
-RBP: 00007f5303a6ed60 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 00007f5303a6edf0
-R13: 0000000000000000 R14: 0000000000000000 R15: 0000000000000000
+RIP: 0033:0x7f579b4a1d39
+Code: Unable to access opcode bytes at 0x7f579b4a1d0f.
+RSP: 002b:00007f579b431308 EFLAGS: 00000246 ORIG_RAX: 00000000000000ca
+RAX: fffffffffffffe00 RBX: 00007f579b52a4d8 RCX: 00007f579b4a1d39
+RDX: 0000000000000000 RSI: 0000000000000080 RDI: 00007f579b52a4d8
+RBP: 00007f579b52a4d0 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 00007f579b4f72c0
+R13: 00007f579b52a4dc R14: 00007f579b431400 R15: 0000000000022000
  </TASK>
+----------------
+Code disassembly (best guess):
+   0:	01 00                	add    %eax,(%rax)
+   2:	00 49 89             	add    %cl,-0x77(%rcx)
+   5:	f8                   	clc
+   6:	65 48 8b 14 25 c0 bb 	mov    %gs:0x3bbc0,%rdx
+   d:	03 00
+   f:	a9 00 01 ff 00       	test   $0xff0100,%eax
+  14:	74 0e                	je     0x24
+  16:	85 f6                	test   %esi,%esi
+  18:	74 59                	je     0x73
+  1a:	8b 82 0c 16 00 00    	mov    0x160c(%rdx),%eax
+  20:	85 c0                	test   %eax,%eax
+  22:	74 4f                	je     0x73
+  24:	8b 82 e8 15 00 00    	mov    0x15e8(%rdx),%eax
+* 2a:	83 f8 03             	cmp    $0x3,%eax <-- trapping instruction
+  2d:	75 44                	jne    0x73
+  2f:	48 8b 82 f0 15 00 00 	mov    0x15f0(%rdx),%rax
+  36:	8b 92 ec 15 00 00    	mov    0x15ec(%rdx),%edx
+  3c:	48 8b 38             	mov    (%rax),%rdi
+  3f:	48                   	rex.W
 
 
 ---
@@ -144,6 +188,7 @@ syzbot engineers can be reached at syzkaller@googlegroups.com.
 
 syzbot will keep track of this issue. See:
 https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
 If the bug is already fixed, let syzbot know by replying with:
 #syz fix: exact-commit-title
