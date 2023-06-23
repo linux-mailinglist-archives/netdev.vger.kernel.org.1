@@ -1,97 +1,140 @@
-Return-Path: <netdev+bounces-13334-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13335-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E61D773B490
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:08:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A11773B497
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:08:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 232341C21179
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:08:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B9A91C20FEC
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 10:08:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 875F65665;
-	Fri, 23 Jun 2023 10:08:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68CDC5681;
+	Fri, 23 Jun 2023 10:08:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79EBB8BE0
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 10:08:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82D143595
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 03:07:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687514822;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a8zctNHXPgKBvwmbSrMZOmVOWXmFLWvtXxUTrnOkd+k=;
-	b=BXul0+ZqIJ/Y/bUYtaA3aOT6kk+k5n1ua+XwFjHs/CbjrfHybHpcBTr9bDo11rf5F2s2QM
-	2c9hEayAM287CWsOxEqbIj9txURZhjQy0BaMiAB8KjaPo7DNXiZwk3DriNguZ5eyDqb/78
-	PW6Q+Ql01mPoSNg5lJIDx6jybxw4CC4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-140-kstXw8CJPgO8BATJTV0qIA-1; Fri, 23 Jun 2023 06:06:56 -0400
-X-MC-Unique: kstXw8CJPgO8BATJTV0qIA-1
-Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 42DE11C07257;
-	Fri, 23 Jun 2023 10:06:54 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id CB61E2166B25;
-	Fri, 23 Jun 2023 10:06:52 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <ccf93f92b2539c9dddd1c45fcfa037bb21ccd808.camel@redhat.com>
-References: <ccf93f92b2539c9dddd1c45fcfa037bb21ccd808.camel@redhat.com> <20230622191134.54d5cb0b@kernel.org> <20230622132835.3c4e38ea@kernel.org> <20230622111234.23aadd87@kernel.org> <20230620145338.1300897-1-dhowells@redhat.com> <20230620145338.1300897-2-dhowells@redhat.com> <1952674.1687462843@warthog.procyon.org.uk> <1958077.1687474471@warthog.procyon.org.uk> <1969749.1687511298@warthog.procyon.org.uk>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
-    Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org,
-    Alexander Duyck <alexander.duyck@gmail.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-    David Ahern <dsahern@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-    Menglong Dong <imagedong@tencent.com>
-Subject: Re: [PATCH net-next v3 01/18] net: Copy slab data for sendmsg(MSG_SPLICE_PAGES)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5C6485665
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 10:08:53 +0000 (UTC)
+Received: from mail-wm1-x32a.google.com (mail-wm1-x32a.google.com [IPv6:2a00:1450:4864:20::32a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3CF82D5F
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 03:08:50 -0700 (PDT)
+Received: by mail-wm1-x32a.google.com with SMTP id 5b1f17b1804b1-3f9c0abc8b1so5937455e9.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 03:08:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=bgdev-pl.20221208.gappssmtp.com; s=20221208; t=1687514929; x=1690106929;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=fDzo5p1mZFBjmKSvhuFKJUtPJvnlJYcgbu3Ka9Hgxzg=;
+        b=LveZnjMCCP6/fpLmRtKGNhRIBVmVK8oK/2H6vqKNdprxDvC+pY1VSdVbkOKJTvvbeh
+         HAkpEq2O+8Ih/1+l7K/hMvqY7rl1E+km397snNYReBh684dv2IA+Gg0TxACACoVd0x1U
+         K0avKe8Yg2bXKN8LZZPJFbYrRZemip/M1Q+5QFfl2NpRD1KdtE4Mt2XJTceKYZr+DVLI
+         BCyUILxBK8ac65/zzcIWnljpVK6Ih3fAnp95R60fB2wPiwh3wY9uFQqN6pjPu76/5dzP
+         Iz+P9QuFEVVQz1pZdtdHTIA1crTylPnUmO9ubd8DNDyMv8W+S703s78z05Q/Nyn8RREA
+         cLEw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687514929; x=1690106929;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=fDzo5p1mZFBjmKSvhuFKJUtPJvnlJYcgbu3Ka9Hgxzg=;
+        b=ZUmbEX3itwdrlo/vRyRynWWixuHFsoGn6XC99Qqa7gHxZhOFJ+gypE0Py+1tmlLkNZ
+         hRMGtnPJoflCMZMyJrOohNlNZGyJWL+s5LF2Pbv43snm04ZwVlvDRwXB+Cx4JAeJct/2
+         3VpWpTiCjcOp3n8UnXgTaS7U+AKxTfto67GP1qn/oz3p7kLa/v29ng+L5NOM4hLp+Y3e
+         jYIQHOOd8tCjUpAnBlK0PNC3DMw/1G4U2G/Lz3voeWdg0R9kUWtkHkVNsyvalsYDh7hd
+         /Zp99ov1w5LSqszcyrn9vIm1t7mLHmlJaINB/RrDkQmPQvuj7RPzR7BiWztprao5IyRq
+         yoDw==
+X-Gm-Message-State: AC+VfDxWOMZfQtH5XNsUckUdHKA0ZKUBK7T/8aBcjk25gMHQ7db7LgEm
+	O1dVzk2c36YoUjgq1aZcDVvonA==
+X-Google-Smtp-Source: ACHHUZ68lFgy+5quSvGjq6/o294si3N8IqybkvRXb9VA4ggHvddBsyRaC/PDXNVdHtbL1mYT0kS3XQ==
+X-Received: by 2002:a05:600c:22cf:b0:3f9:b358:8197 with SMTP id 15-20020a05600c22cf00b003f9b3588197mr10247113wmg.11.1687514929338;
+        Fri, 23 Jun 2023 03:08:49 -0700 (PDT)
+Received: from brgl-uxlite.home ([2a01:cb1d:334:ac00:ddc2:ce92:1ed6:27bd])
+        by smtp.gmail.com with ESMTPSA id k18-20020adfe8d2000000b0030ae3a6be4asm9278100wrn.72.2023.06.23.03.08.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 03:08:48 -0700 (PDT)
+From: Bartosz Golaszewski <brgl@bgdev.pl>
+To: Vinod Koul <vkoul@kernel.org>,
+	Bhupesh Sharma <bhupesh.sharma@linaro.org>,
+	Andy Gross <agross@kernel.org>,
+	Bjorn Andersson <andersson@kernel.org>,
+	Konrad Dybcio <konrad.dybcio@linaro.org>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	Conor Dooley <conor+dt@kernel.org>,
+	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Andrew Halaney <ahalaney@redhat.com>
+Cc: netdev@vger.kernel.org,
+	linux-arm-msm@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-stm32@st-md-mailman.stormreply.com,
+	linux-arm-kernel@lists.infradead.org,
+	Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+Subject: [PATCH net-next v2 00/12] net: stmmac: replace boolean fields in plat_stmmacenet_data with flags
+Date: Fri, 23 Jun 2023 12:08:33 +0200
+Message-Id: <20230623100845.114085-1-brgl@bgdev.pl>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <2048547.1687514811.1@warthog.procyon.org.uk>
-Date: Fri, 23 Jun 2023 11:06:51 +0100
-Message-ID: <2048548.1687514811@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Paolo Abeni <pabeni@redhat.com> wrote:
+From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
 
-> I'm unsure I follow the above ?!? I *thought* sendpage could be killed
-> even without patch 1/18 and 2/18, leaving some patches in this series
-> unmodified, and mangling those explicitly leveraging 1/18 to use
-> multiple sendmsg()s with different flags?
+As suggested by Jose Abreu: let's drop all 12 boolean fields in
+plat_stmmacenet_data and replace them with a common bitfield.
 
-That's what I meant.
+v1 -> v2:
+- fix build on intel platforms
 
-With the example, I was showing the minimum needed replacement for a call to
-sendpage.
+Bartosz Golaszewski (12):
+  net: stmmac: replace the has_integrated_pcs field with a flag
+  net: stmmac: replace the sph_disable field with a flag
+  net: stmmac: replace the use_phy_wol field with a flag
+  net: stmmac: replace the has_sun8i field with a flag
+  net: stmmac: replace the tso_en field with a flag
+  net: stmmac: replace the serdes_up_after_phy_linkup field with a flag
+  net: stmmac: replace the vlan_fail_q_en field with a flag
+  net: stmmac: replace the multi_msi_en field with a flag
+  net: stmmac: replace the ext_snapshot_en field with a flag
+  net: stmmac: replace the int_snapshot_en field with a flag
+  net: stmmac: replace the rx_clk_runs_in_lpi field with a flag
+  net: stmmac: replace the en_tx_lpi_clockgating field with a flag
 
-David
+ .../stmicro/stmmac/dwmac-dwc-qos-eth.c        |  4 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-intel.c | 23 +++++------
+ .../ethernet/stmicro/stmmac/dwmac-mediatek.c  |  5 ++-
+ .../stmicro/stmmac/dwmac-qcom-ethqos.c        |  8 ++--
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  2 +-
+ .../net/ethernet/stmicro/stmmac/dwmac-tegra.c |  4 +-
+ .../ethernet/stmicro/stmmac/stmmac_hwtstamp.c |  4 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 40 +++++++++++--------
+ .../net/ethernet/stmicro/stmmac/stmmac_pci.c  |  2 +-
+ .../ethernet/stmicro/stmmac/stmmac_platform.c | 10 +++--
+ .../net/ethernet/stmicro/stmmac/stmmac_ptp.c  |  5 ++-
+ include/linux/stmmac.h                        | 26 ++++++------
+ 12 files changed, 76 insertions(+), 57 deletions(-)
+
+-- 
+2.39.2
 
 
