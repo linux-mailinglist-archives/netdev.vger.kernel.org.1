@@ -1,239 +1,152 @@
-Return-Path: <netdev+bounces-13273-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13274-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4F92073B1A8
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:29:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6952A73B1B2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:31:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08B00281909
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 07:29:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A3BB61C20F3B
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 07:31:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22E2310F5;
-	Fri, 23 Jun 2023 07:29:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D31610F5;
+	Fri, 23 Jun 2023 07:31:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CACA17C2
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:29:53 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6734F269E;
-	Fri, 23 Jun 2023 00:29:30 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id DAE5821C252A; Fri, 23 Jun 2023 00:29:29 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com DAE5821C252A
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1687505369;
-	bh=WxxAPKNGl0H+WTQ0UDLQ32a7/6XvpGgl1O/Ni4g9HfY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=Eap/hEPhjwd5yosGaSuaJOIxVroA3M7faq1C9kS+rybdNoQP4FlLYAfS5x9fkrnL+
-	 u5GtbHklLVumy8lRUXL4QKATNzsNWRCg83h9p17A12l3eoh4n3n2e2D8cHZB+kdzEv
-	 tOWXns2Xy1e8Kei4Z2AMsV6Y5cCgaBS4Wgmk1xJQ=
-From: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	sharmaajay@microsoft.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	schakrabarti@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH V2 net] net: mana: Fix MANA VF unload when host is unresponsive
-Date: Fri, 23 Jun 2023 00:29:15 -0700
-Message-Id: <1687505355-29212-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB9B17C2
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:31:22 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2114.outbound.protection.outlook.com [40.107.220.114])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E76CB19BF;
+	Fri, 23 Jun 2023 00:31:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=NTPbuCwiaybkkt8wDzlPU2Xt644SWxGjp3i+P2ymfFQz+w1mYAalCuZ2Ny9bk45SpT5OK97oHx4DOgFZCiEVBgyBHsvej5cEO9VM2W84N5SsUu4Xxl1bxl0NBiQJOVvYKm+Yb2AO7Ua9jMXP6MVsXGmPrS5e1vHkf/jPjziigN3lo3fXG6+CoO+Oyio+NKtQGnZdOIBQlwdSTwo521pul5mavb75zDJQZ3DKmj0wiLIRP03ePa108ToqkLasbCty+M9bu3/906mDGTV5iayegfli0Ica9q/x7gZRKzjI58LQRrLi1bp0QIe5baWA7BobPJa8/Y6+d0XjLHhg5XG8og==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=3Xr3v0/zgPMquinjdsIgXYyC7PBzNaSE1ok7BmfGdrM=;
+ b=VGB8aLgFjFXlzWOaovXD+MZqLHBWdEdySG09kXH6HHVsqLS1L/ph2qatjM0YDJBw6AJO8w7ZXUySxDp/mJFuevjyJpWxNo0csSMxi8LZPH88ICsWVDLaBXO6PJncqxkewrecptQiSCbaMKGQeu8jiwdEy6kq4JNThWpoVKXfX/IqBIkx9FOKW4JX+u77jGDkWL9p5e7ov1DLUb5PoVJQQ5w11hNECVt2jCRRyn7BS3+o/rPlARy5BdoSYKUFVkwh9Pax/KLC4qcv5RYkRTFOmd8egU5ej2bXvmD8wkSFTA/XB8uGYV4bEGBi6R8KdbEc9Z15JoDUVgrExQ2IYAfsQg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=3Xr3v0/zgPMquinjdsIgXYyC7PBzNaSE1ok7BmfGdrM=;
+ b=gLtzD6xcZZj0Nv3n5uLAXUTXbWUH5eiHLI05I3qjzmFiWS+5hxR/D0Bez9e/3CcJhhYqUmA3xZ3cq95nqv2VVXcXydTOOcX79a8LtqHxys/54aUdaBEa510dbscHO04+F5uRJIZ1F7eaHolehRe2KbubS54TO26VEHvaseWQEKU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by DM6PR13MB3754.namprd13.prod.outlook.com (2603:10b6:5:24a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 23 Jun
+ 2023 07:31:17 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Fri, 23 Jun 2023
+ 07:31:17 +0000
+Date: Fri, 23 Jun 2023 09:31:10 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Giulio Benetti <giulio.benetti@benettiengineering.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2] net: phy: broadcom: drop brcm_phy_setbits()
+ and use phy_set_bits() instead
+Message-ID: <ZJVKPuuSikoGGKOm@corigine.com>
+References: <ZJRqMLepCTPqvCD9@corigine.com>
+ <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
+X-ClientProxiedBy: AM0PR04CA0133.eurprd04.prod.outlook.com
+ (2603:10a6:208:55::38) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|DM6PR13MB3754:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4cdbfd77-1a13-40a7-d0f6-08db73bbd4ed
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	A8Jlas9Ib1rc+wNsA70XQ4IMBKS7BE7RAR3KC6JJGrfjyQB0cR7RmAsqQcov/dOQ7Acc9fTvvB1DvQvgDQjDelHDpRyRYd/61rxq4rOPkzoYY8dyCGB4iP4hGhVWobfzxay+hxttXg3O49nYZ0u0+uauCPnd4GGPXn0Tswg1ZlZ/JqjkDklmv2kQmtUhkoVZXSDrBuOWmJEtsbLBolMZ9CMc4hhF4UPpj+R/hfgrxjUYJQai8dEq9N7HjGxWeJkLq/cwBNYJ86JB7c+h/xQryZbew2pbXSubSc/koylbF2USc3vHtIXv36iWFcCDZ1MYfh8UeLKNDuY/eh7f+iCLe5m8jZHPAu7R/XqERUhNOFGzB2iNsKIVL/EhptYzL8bHgTEnUimj+H5urHuL2ZRdbBIH1FV2xrNobDHy/83HCg+eQKLWKYMnxLAvSntX+GFAwdfNG8In8HZ5Y5K+AbV0PazPFCzktVLFxHV3OY+5QI4SiK7mcQ5hR9BcseeyiCzNpdkxdq2+HX8tCuV7IQD78TLPy7qfP/D4V+THTetB791hwOCBpRPgzOKh/yachXbhpv3otLknFUsAh2ghhQhc86RO9jnEUYx9U9eW4ZNl6oE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(39830400003)(136003)(346002)(396003)(451199021)(38100700002)(86362001)(316002)(2616005)(8676002)(6916009)(66556008)(66476007)(8936002)(41300700001)(4326008)(66946007)(44832011)(4744005)(7416002)(5660300002)(6506007)(6486002)(478600001)(6666004)(54906003)(83380400001)(6512007)(186003)(36756003)(2906002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?FVAecTMojzPrCh2kmFOeC9GobQC3GgUw4Ej1RKIKH+rOTN5YqwqSXCFar4TJ?=
+ =?us-ascii?Q?4EnJj4L0M9Y9hfDKPTBvtOHEg46SPmIaYciTQ3Chz5dTywch230qAdrX516/?=
+ =?us-ascii?Q?xG0Wby8ZTMMyik6x01qHAMCL9wFjH2v1qkF9Ieed/wF1c6Dr/BHzF2bOvznw?=
+ =?us-ascii?Q?sro82tX/IgtnB7zQgRm1ndOqDqEpHCo+NMT8e2dhNjePFmosDh7V0sqisXZB?=
+ =?us-ascii?Q?ejoaOdMDy5SF2/4wGP7z+5LfedmOy+LvXKo3P/Ub4TxW2XS/bvtxCHebWlP4?=
+ =?us-ascii?Q?igw6d/b4Wv76Ge55FBWj/F7qj2q3tqBXf0XTJY+Zi19ONkWDmqxlk4U0BSxs?=
+ =?us-ascii?Q?l+h4ewLYZs0x6xC6C5thYKtZ6FyYhJiI+M6viBbQAXkYHIT6WUA2YK9EnJWE?=
+ =?us-ascii?Q?Im3GrLZEKXJg/5ywaNf+cwSCxFZn2aCTwhDcqecD6jlh0lR4IspReY98CwCU?=
+ =?us-ascii?Q?Jtj/7KzttPXbsATrzO2ApknSpDg9ndbIWF0/Klj6YRqlwlx4DfrySI4MaQqU?=
+ =?us-ascii?Q?UB92sszmKaSyMbZGRLoE3OjENJ1FNVN8ZX/FUDeb7biEX+yX9S/fNbBUZ6wu?=
+ =?us-ascii?Q?9zDso6PFnWfNpfXCM1fK9uVcBGRoro8KxOh6Srlnfy4MM5rWEwZubeu7ppkZ?=
+ =?us-ascii?Q?DM0k6tKHxCk7stkFnFwKd5wgjAzUgeIbtefKAazqy3GT+0E+CgwUw06Ler1o?=
+ =?us-ascii?Q?i75/BDEdizPcqa2cBaLPcSIALYO4VMC7sOBOT2NJtOITsbJe+aqrBDTSh45M?=
+ =?us-ascii?Q?fpAH06PmX2PEFQLUWahHjbGEzTVdDokRlt7VwfyQAisjvjca4jwhfks/VdB/?=
+ =?us-ascii?Q?HeCj+uUVW4ejue4yTOL4wjbcEsU0iG4v6U7jRrp5fP+1wsk1KaExNdKSGlJc?=
+ =?us-ascii?Q?lSHAW24Cr+6D/c30M9Qv63qVtx3+fLWfXHqRznZ7EPOgRCq1Dlkolti5EicM?=
+ =?us-ascii?Q?8QSmIC+8Ibb88AaYYMaP8DTYbrEVldIaFKGhw24A+a8lkkNvi6SnE3rHVZtL?=
+ =?us-ascii?Q?iroHC4l/U91mYnRtN7/TMmXP4Nh9tr46N2DuML3fryaGHrr3BImBZgWMTOg4?=
+ =?us-ascii?Q?wPMBxAyzyd9iFdgt817ptsgSE63N/G+P8bUDs8Na3hTw6tLO3Zg7rp4WFApq?=
+ =?us-ascii?Q?pv7iP2pNZ8si0VjYjwnMJoBdA08s02ArBkyy18sGqgJ0AYEfeybi87WwOYUU?=
+ =?us-ascii?Q?Kon9RV9RT0ldT314glgBRNvzHkChlxejcv8w90peTb+9ueUA+AvGh+OmS0kn?=
+ =?us-ascii?Q?twTlnxMZ/D9YNyS61dO16Go8ifqLoUtTfNEANEm4sjQhgC6ZtTYxl9jUvZSV?=
+ =?us-ascii?Q?Ws7EhwqKGGMV6hHwKKY6plOsEwhKVc7FBOsCGwX2E0cvDpsQ8o7CV5tSELYG?=
+ =?us-ascii?Q?vadteH4GK6qWHw5L0Vj6TRtmSn9M7AuLE/RnLQDkPySMwBp0j7kFn2ytKhEw?=
+ =?us-ascii?Q?ZOcbBI48mG2NFE9R19F/OGxWPeWB9ITFTI21hjHimG7kWeJmzUrnOr7s7Z/b?=
+ =?us-ascii?Q?uVJOswl0zRb47UNE80bHFxQyOV1IEWBNe2PUEVa+E/L2XCxAuzGb633MNxsZ?=
+ =?us-ascii?Q?RlSY2WO+Ecjj2KHNa0UniSZuUKfMjtk/gbJScRmbrHpBwggRlUDtXiNYu3Qa?=
+ =?us-ascii?Q?+fIimWZAGHAVp4gNP8MkYldZFlNxh1FSx9IrpJKmyUM91eK4+IwcELQPtuSu?=
+ =?us-ascii?Q?4u6ZeA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4cdbfd77-1a13-40a7-d0f6-08db73bbd4ed
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 07:31:17.2449
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: sLGwKhouWE32zoPUsU7FNHOid1S7vPzsQvM+OTUa4q5pvHWblIdpe36SVHWLGWLBrxLOKHVy4+3qWXZk8pPJtvX9Fw+M/U5xlwXN91CNgWM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR13MB3754
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+On Thu, Jun 22, 2023 at 08:47:21PM +0200, Giulio Benetti wrote:
+> Linux provides phy_set_bits() helper so let's drop brcm_phy_setbits() and
+> use phy_set_bits() in its place.
+> 
+> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+> ---
+> V1->V2:
+> * fix code style and add branch net-next to subject as suggested by Simon
+>   Horman
+> ---
+>  drivers/net/phy/broadcom.c | 19 ++++---------------
+>  1 file changed, 4 insertions(+), 15 deletions(-)
 
-This patch addresses  the VF unload issue, where mana_dealloc_queues()
-gets stuck in infinite while loop, because of host unresponsiveness.
-It adds a timeout in the while loop, to fix it.
-
-Also this patch adds a new attribute in mana_context, which gets set when
-mana_hwc_send_request() hits a timeout because of host unresponsiveness.
-This flag then helps to avoid the timeouts in successive calls.
-
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
----
-V1 -> V2:
-* Added net branch
-* Removed the typecasting to (struct mana_context*) of void pointer
-* Repositioned timeout variable in mana_dealloc_queues()
-* Repositioned vf_unload_timeout in mana_context struct, to utilise the
-  6 bytes hole
----
- .../net/ethernet/microsoft/mana/gdma_main.c   |  4 +++-
- .../net/ethernet/microsoft/mana/hw_channel.c  | 12 ++++++++++-
- drivers/net/ethernet/microsoft/mana/mana_en.c | 21 +++++++++++++++++--
- include/net/mana/mana.h                       |  2 ++
- 4 files changed, 35 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 8f3f78b68592..6411f01be0d9 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -946,10 +946,12 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
- 	struct gdma_context *gc = gd->gdma_context;
- 	struct gdma_general_resp resp = {};
- 	struct gdma_general_req req = {};
-+	struct mana_context *ac;
- 	int err;
- 
- 	if (gd->pdid == INVALID_PDID)
- 		return -EINVAL;
-+	ac = gd->driver_data;
- 
- 	mana_gd_init_req_hdr(&req.hdr, GDMA_DEREGISTER_DEVICE, sizeof(req),
- 			     sizeof(resp));
-@@ -957,7 +959,7 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
- 	req.hdr.dev_id = gd->dev_id;
- 
- 	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
--	if (err || resp.hdr.status) {
-+	if ((err || resp.hdr.status) && !ac->vf_unload_timeout) {
- 		dev_err(gc->dev, "Failed to deregister device: %d, 0x%x\n",
- 			err, resp.hdr.status);
- 		if (!err)
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 9d1507eba5b9..492cb2c6e2cb 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -1,8 +1,10 @@
- // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /* Copyright (c) 2021, Microsoft Corporation. */
- 
-+#include "asm-generic/errno.h"
- #include <net/mana/gdma.h>
- #include <net/mana/hw_channel.h>
-+#include <net/mana/mana.h>
- 
- static int mana_hwc_get_msg_index(struct hw_channel_context *hwc, u16 *msg_id)
- {
-@@ -786,12 +788,19 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 	struct hwc_wq *txq = hwc->txq;
- 	struct gdma_req_hdr *req_msg;
- 	struct hwc_caller_ctx *ctx;
-+	struct mana_context *ac;
- 	u32 dest_vrcq = 0;
- 	u32 dest_vrq = 0;
- 	u16 msg_id;
- 	int err;
- 
- 	mana_hwc_get_msg_index(hwc, &msg_id);
-+	ac = hwc->gdma_dev->driver_data;
-+	if (ac->vf_unload_timeout) {
-+		dev_err(hwc->dev, "HWC: vport is already unloaded.\n");
-+		err = -ETIMEDOUT;
-+		goto out;
-+	}
- 
- 	tx_wr = &txq->msg_buf->reqs[msg_id];
- 
-@@ -825,9 +834,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 		goto out;
- 	}
- 
--	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
-+	if (!wait_for_completion_timeout(&ctx->comp_event, 5 * HZ)) {
- 		dev_err(hwc->dev, "HWC: Request timed out!\n");
- 		err = -ETIMEDOUT;
-+		ac->vf_unload_timeout = true;
- 		goto out;
- 	}
- 
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index d907727c7b7a..cb2080b3a00c 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -2329,7 +2329,10 @@ static int mana_dealloc_queues(struct net_device *ndev)
- {
- 	struct mana_port_context *apc = netdev_priv(ndev);
- 	struct gdma_dev *gd = apc->ac->gdma_dev;
-+	unsigned long timeout;
- 	struct mana_txq *txq;
-+	struct sk_buff *skb;
-+	struct mana_cq *cq;
- 	int i, err;
- 
- 	if (apc->port_is_up)
-@@ -2348,13 +2351,26 @@ static int mana_dealloc_queues(struct net_device *ndev)
- 	 *
- 	 * Drain all the in-flight TX packets
- 	 */
-+
-+	timeout = jiffies + 120 * HZ;
- 	for (i = 0; i < apc->num_queues; i++) {
- 		txq = &apc->tx_qp[i].txq;
--
--		while (atomic_read(&txq->pending_sends) > 0)
-+		while (atomic_read(&txq->pending_sends) > 0 &&
-+		       time_before(jiffies, timeout)) {
- 			usleep_range(1000, 2000);
-+		}
- 	}
- 
-+	for (i = 0; i < apc->num_queues; i++) {
-+		txq = &apc->tx_qp[i].txq;
-+		cq = &apc->tx_qp[i].tx_cq;
-+		while (atomic_read(&txq->pending_sends)) {
-+			skb = skb_dequeue(&txq->pending_skbs);
-+			mana_unmap_skb(skb, apc);
-+			napi_consume_skb(skb, cq->budget);
-+			atomic_sub(1, &txq->pending_sends);
-+		}
-+	}
- 	/* We're 100% sure the queues can no longer be woken up, because
- 	 * we're sure now mana_poll_tx_cq() can't be running.
- 	 */
-@@ -2605,6 +2621,7 @@ int mana_probe(struct gdma_dev *gd, bool resuming)
- 		}
- 	}
- 
-+	ac->vf_unload_timeout = false;
- 	err = add_adev(gd);
- out:
- 	if (err)
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 9eef19972845..5f5affdca1eb 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -358,6 +358,8 @@ struct mana_context {
- 
- 	u16 num_ports;
- 
-+	bool vf_unload_timeout;
-+
- 	struct mana_eq *eqs;
- 
- 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
--- 
-2.34.1
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
