@@ -1,137 +1,137 @@
-Return-Path: <netdev+bounces-13485-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13486-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 192A573BC89
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:28:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B30B273BC98
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:32:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 532D61C212AF
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:28:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5DF8281CCB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:32:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55DB7100B4;
-	Fri, 23 Jun 2023 16:28:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6C48BE1;
+	Fri, 23 Jun 2023 16:32:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A6BA100A6
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 16:28:16 +0000 (UTC)
-Received: from mail-lj1-f173.google.com (mail-lj1-f173.google.com [209.85.208.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5099270E;
-	Fri, 23 Jun 2023 09:28:14 -0700 (PDT)
-Received: by mail-lj1-f173.google.com with SMTP id 38308e7fff4ca-2b5910c231bso2895911fa.0;
-        Fri, 23 Jun 2023 09:28:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D80100B5;
+	Fri, 23 Jun 2023 16:32:33 +0000 (UTC)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9EC26A9;
+	Fri, 23 Jun 2023 09:32:31 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b477e9d396so13976211fa.3;
+        Fri, 23 Jun 2023 09:32:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687537950; x=1690129950;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2I3GjaHedd8UwqHCD/cICvG+HnMoaDQVwpMURCXNbWM=;
+        b=ioRCSav5i/KJc6UheQJQp+/pherHS7TJA4doFCMudjZ8PyA1SimcloaNAtx2HKwNKR
+         2uJ0GhR3m2EvzA+dMm9b3EBqvPwqWcPR3R09OyP57WYVE4ASK8WhrTwXCXDFEbiswmN2
+         I7zqDO2u84i5sHByXZidl4KnXxUcAfkMCccUPunTW5VUz9P7fG6Xipln3g79oABQsxC0
+         +x3WzKnUH8d3MwRigN888G4Blfbjg8+6HvPT3xMxP+HRvDMJ9Ofx2QAP83AmaTSiVjMY
+         bgCnjvQ1p1gkG8II2AlFg3aCSjKehJs6H4itiQ5MF6sgONbXZYf6R/xIg+kJGHTwGevQ
+         swxA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687537693; x=1690129693;
+        d=1e100.net; s=20221208; t=1687537950; x=1690129950;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=kvgeaWwow5dQzFM6Uw8ojK5T7WjFQWYGvDt1Izr/8jk=;
-        b=j1eDX+rfTascQewMT2R8wt077pwLqnl3/fHykK9weg+VTC5KosdoIuB3zkzwR8IbOS
-         zvycxikFdqCQrAFXyinBgS6VtwRUPIYDJmHT3WEAyY3h+eTR5DrO6qeNEeLc2zsAJUIA
-         l1fySydLjAUM2cOffkZKTzJsk/jQSx/uXVuAI8IgFvbLFnpnq79LCiLs197N43BePVbo
-         KFSmfEUTU+5hSX/d9lIiStR9EMAjb5sgc0pg/YOYZ3Drxp2oKRcVSQdzjooW29X63mKa
-         /m45mGkJ+ZlzoQS1f6eFUSxI8JOabddWQWis+NJBzR4q6I+6JVTgQACj6eaXib+tWd74
-         DeVA==
-X-Gm-Message-State: AC+VfDx9wxskLyjZy3Z7uFCMal1z4aDHi7gSVzqOpz1QXtLcqKdjfDUs
-	IQcBHcu+GfVOcvpOukI3xmSgJm3EFqwnup38i0w=
-X-Google-Smtp-Source: ACHHUZ7MZE3zsM6gspBvAbI6j3yhuhxSNyO7LoHURailwc+M8lU+tu/GWJJ/M+xF6Lk75Dt+elliEUR2HeQhtX0eK54=
-X-Received: by 2002:a2e:a492:0:b0:2b4:6d9a:2222 with SMTP id
- h18-20020a2ea492000000b002b46d9a2222mr9575407lji.0.1687537692753; Fri, 23 Jun
- 2023 09:28:12 -0700 (PDT)
+        bh=2I3GjaHedd8UwqHCD/cICvG+HnMoaDQVwpMURCXNbWM=;
+        b=h0sQT5j39+mvo/EHHCmthLtncVXMM1JkZOOnb9XTND5U/yU4sDCfuReYGxbcAD6YA0
+         x3l+0XNFLMWy5+ZHZQOhLx7UHabebbpg28DNT9C6zNq6I/SMIzsD47gfljI6vBkAwkEB
+         TC+PyEG3KiRMFVJLSD/oYjlLhnfcOJuKJKrvgEKaPuXK4GjnYr5f6IC9VeFkhxAEp22t
+         LnPgPd7Ktc9pTK8jWXIXOocQJVM9bHJjCyO2kYebesIqekjXSqQ29vDriykTQuMUJ0hI
+         jc7jN22KV4yrXJvA4uGTVapJZX9C1qiQiNBa/XzISavsFAIkhhR1BKS74TmRu6YS+L6B
+         BKTQ==
+X-Gm-Message-State: AC+VfDwRFPuTDukuoWS3RpuIPInco5JfKl/OwQSvglHzqumexRBtl6aT
+	mohQaacUTkSbKFY1270e1z/qnUDCc9hwLXywFfk=
+X-Google-Smtp-Source: ACHHUZ5S/at/i6kLM6YR/JIGPMDyIJU3E/zSkDUpsnv9G/W9xjd6SC9GiIKxbnpztpujI9hS3uL4Mm4qrHOdd1w8QUw=
+X-Received: by 2002:a2e:9105:0:b0:2b5:910c:ecda with SMTP id
+ m5-20020a2e9105000000b002b5910cecdamr4867354ljg.44.1687537949658; Fri, 23 Jun
+ 2023 09:32:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621054603.1262299-1-evan.quan@amd.com> <20230621054603.1262299-2-evan.quan@amd.com>
- <CAJZ5v0iqy0yMJP5H7ub67R8R6i42=TcS_6+VF-+fWrM-9tYFQA@mail.gmail.com> <c518da2a-5ba5-af7e-e26d-1973db7b4c9e@amd.com>
-In-Reply-To: <c518da2a-5ba5-af7e-e26d-1973db7b4c9e@amd.com>
-From: "Rafael J. Wysocki" <rafael@kernel.org>
-Date: Fri, 23 Jun 2023 18:28:01 +0200
-Message-ID: <CAJZ5v0gnTt0pV4nF+jcYCyZuZXDNuRn3mS0bDoAv-ZDpetyxVg@mail.gmail.com>
-Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF mitigations
-To: "Limonciello, Mario" <mario.limonciello@amd.com>
-Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Evan Quan <evan.quan@amd.com>, lenb@kernel.org, 
-	alexander.deucher@amd.com, christian.koenig@amd.com, Xinhui.Pan@amd.com, 
-	airlied@gmail.com, daniel@ffwll.ch, johannes@sipsolutions.net, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com, tzimmermann@suse.de, 
-	hdegoede@redhat.com, jingyuwang_vip@163.com, lijo.lazar@amd.com, 
-	jim.cromie@gmail.com, bellosilicio@gmail.com, andrealmeid@igalia.com, 
-	trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de, linux-kernel@vger.kernel.org, 
-	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
-	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <20230621170244.1283336-1-sdf@google.com> <20230621170244.1283336-12-sdf@google.com>
+ <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+ <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
+ <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
+ <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
+ <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com> <4c592016-5b5e-9670-2231-b44642091d46@redhat.com>
+In-Reply-To: <4c592016-5b5e-9670-2231-b44642091d46@redhat.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Fri, 23 Jun 2023 09:32:18 -0700
+Message-ID: <CAADnVQKT06t=-4zrHQobSpL06JpQh90vMfPpcYvXs8881GxMWg@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+To: Maryam Tahhan <mtahhan@redhat.com>
+Cc: Stanislav Fomichev <sdf@google.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+	Network Development <netdev@vger.kernel.org>, "Wiles, Keith" <keith.wiles@intel.com>, 
+	Jesper Brouer <jbrouer@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 5:57=E2=80=AFPM Limonciello, Mario
-<mario.limonciello@amd.com> wrote:
+On Fri, Jun 23, 2023 at 3:16=E2=80=AFAM Maryam Tahhan <mtahhan@redhat.com> =
+wrote:
 >
->
-> On 6/23/2023 9:52 AM, Rafael J. Wysocki wrote:
-> > On Wed, Jun 21, 2023 at 7:47=E2=80=AFAM Evan Quan <evan.quan@amd.com> w=
-rote:
-> >> From: Mario Limonciello <mario.limonciello@amd.com>
-> >>
-> >> Due to electrical and mechanical constraints in certain platform desig=
-ns
-> >> there may be likely interference of relatively high-powered harmonics =
-of
-> >> the (G-)DDR memory clocks with local radio module frequency bands used
-> >> by Wifi 6/6e/7.
-> >>
-> >> To mitigate this, AMD has introduced an ACPI based mechanism that
-> >> devices can use to notify active use of particular frequencies so
-> >> that devices can make relative internal adjustments as necessary
-> >> to avoid this resonance.
-> >>
-> >> In order for a device to support this, the expected flow for device
-> >> driver or subsystems:
-> >>
-> >> Drivers/subsystems contributing frequencies:
-> >>
-> >> 1) During probe, check `wbrf_supported_producer` to see if WBRF suppor=
-ted
-> > The prefix should be acpi_wbrf_ or acpi_amd_wbrf_ even, so it is clear
-> > that this uses ACPI and is AMD-specific.
->
-> I guess if we end up with an intermediary library approach
-> wbrf_supported_producer makes sense and that could call acpi_wbrf_*.
->
-> But with no intermediate library your suggestion makes sense.
->
-> I would prefer not to make it acpi_amd as there is no reason that
-> this exact same problem couldn't happen on an
-> Wifi 6e + Intel SOC + AMD dGPU design too and OEMs could use the
-> same mitigation mechanism as Wifi6e + AMD SOC + AMD dGPU too.
-
-The mitigation mechanism might be the same, but the AML interface very
-well may be different.
-
-My point is that this particular interface is AMD-specific ATM and I'm
-not aware of any plans to make it "standard" in some way.
-
-Also if the given interface is specified somewhere, it would be good
-to have a pointer to that place.
-
+> On 23/06/2023 03:35, Alexei Starovoitov wrote:
+> > Why do you think so?
+> > Who are those users?
+> > I see your proposal and thumbs up from onlookers.
+> > afaict there are zero users for rx side hw hints too.
 > >
-> > Whether or not there needs to be an intermediate library wrapped
-> > around this is a different matter.
+> >> the specs are
+> >> not public; things can change depending on fw version/etc/etc.
+> >> So the progs that touch raw descriptors are not the primary use-case.
+> >> (that was the tl;dr for rx part, seems like it applies here?)
+> >>
+> >> Let's maybe discuss that mlx5 example? Are you proposing to do
+> >> something along these lines?
+> >>
+> >> void mlx5e_devtx_submit(struct mlx5e_tx_wqe *wqe);
+> >> void mlx5e_devtx_complete(struct mlx5_cqe64 *cqe);
+> >>
+> >> If yes, I'm missing how we define the common kfuncs in this case. The
+> >> kfuncs need to have some common context. We're defining them with:
+> >> bpf_devtx_<kfunc>(const struct devtx_frame *ctx);
+> > I'm looking at xdp_metadata and wondering who's using it.
+> > I haven't seen a single bug report.
+> > No bugs means no one is using it. There is zero chance that we managed
+> > to implement it bug-free on the first try.
+> > So new tx side things look like a feature creep to me.
+> > rx side is far from proven to be useful for anything.
+> > Yet you want to add new things.
+> >
+>
+> Hi folks
+>
+> We in CNDP (https://github.com/CloudNativeDataPlane/cndp) have been
 
-IMO individual drivers should not be expected to use this interface
-directly, as that would add to boilerplate code and overall bloat.
+with TCP stack in user space over af_xdp...
 
-Also whoever uses it, would first need to check if the device in
-question has an ACPI companion.
+> looking to use xdp_metadata to relay receive side offloads from the NIC
+> to our AF_XDP applications. We see this is a key feature that is
+> essential for the viability of AF_XDP in the real world. We would love
+> to see something adopted for the TX side alongside what's on the RX
+> side. We don't want to waste cycles do everything in software when the
+> NIC HW supports many features that we need.
+
+Please specify "many features". If that means HW TSO to accelerate
+your TCP in user space, then sorry, but no.
 
