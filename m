@@ -1,55 +1,43 @@
-Return-Path: <netdev+bounces-13233-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13234-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DFF573AE7D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 04:11:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F2B9073AE81
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 04:22:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E6F39281817
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:11:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11BCE1C20D23
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:22:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 31D39383;
-	Fri, 23 Jun 2023 02:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCDE8384;
+	Fri, 23 Jun 2023 02:22:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9EC7363
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:11:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id AC2FCC433C9;
-	Fri, 23 Jun 2023 02:11:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A2DE363
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:21:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 535E9C433C8;
+	Fri, 23 Jun 2023 02:21:59 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687486296;
-	bh=ZGne4zj9CsGJycq2UzIiziKr2jVISNHV9G2s8oY3T0w=;
+	s=k20201202; t=1687486919;
+	bh=tnJ8MJYmGsXhm9WvK8f4ApXNR1tUYJh3XJM+dv+ULCI=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=W0+Na6VIE5e9qEtp3Iw5o2+JnUz7ML9MeTL5L5dv4nHrgCds/5mbiypeU8fINlxbS
-	 4x3mhFwo9JrNJmY97S4wC1Ni+2JoFU7QhQ/jmawOu9qV9IATatO3KF4781zWqCS/vb
-	 b9cSd5Pr+VBSFGtiNAAxga7SEIrXhJFnGuj0q7i/1JrWVp+nPyDvCpEAOM2dq6j4ZN
-	 m7VYqX9Dnp+tBjURpxNrHOimQhwCGMpF0zTOdWdKG2TCPLrUtmx8YksTo+3Mp/cDQ4
-	 hNaMCs2rr6p/b2WhyzsGuzctQXD2mM6WTQzyfXWRZ3YEsrX2Q5iPu7UWvz1vZIb4ob
-	 tjLGVCUVbt4Jw==
-Date: Thu, 22 Jun 2023 19:11:34 -0700
+	b=Dmgg8BenMVw7uet0WiYa2h4+ev68iCiglfgP7dOFtQ3YgQYq6fNhdQal+0cMkFek0
+	 2sMyvuFBa/HpuSyGqxPsxcPT3/ZM1n0SYuMTmQi572UjBSD6VsZu6BkD2ISzYslfoq
+	 2iU/reKpIjJLMBlDtX63TxyofRNw1XCNdacb70xOtS7rlgWMM55PkXmtdkpj7YoI8m
+	 iqJrmuSnZs8Ro6BnjBksTWSZ9V8rQtskiEqZKyTeXOKotugcqk5jdS0rVVyfm/zLLF
+	 C2138oC4dlLQAH4VyOIKv3zlP6on1xHJn8VaN8MBqUHiL+7RS0g31oWzjpb5geA3Iz
+	 TTkqxDyDX7CQg==
+Date: Thu, 22 Jun 2023 19:21:58 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: David Howells <dhowells@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Alexander
- Duyck <alexander.duyck@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Paolo Abeni <pabeni@redhat.com>, Willem de Bruijn
- <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>,
- Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
- linux-mm@kvack.org, linux-kernel@vger.kernel.org, Menglong Dong
- <imagedong@tencent.com>
-Subject: Re: [PATCH net-next v3 01/18] net: Copy slab data for
- sendmsg(MSG_SPLICE_PAGES)
-Message-ID: <20230622191134.54d5cb0b@kernel.org>
-In-Reply-To: <1958077.1687474471@warthog.procyon.org.uk>
-References: <20230622132835.3c4e38ea@kernel.org>
-	<20230622111234.23aadd87@kernel.org>
-	<20230620145338.1300897-1-dhowells@redhat.com>
-	<20230620145338.1300897-2-dhowells@redhat.com>
-	<1952674.1687462843@warthog.procyon.org.uk>
-	<1958077.1687474471@warthog.procyon.org.uk>
+To: Jiawen Wu <jiawenwu@trustnetic.com>
+Cc: netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net] net: txgbe: change hw reset mode
+Message-ID: <20230622192158.50da604e@kernel.org>
+In-Reply-To: <20230621090645.125466-1-jiawenwu@trustnetic.com>
+References: <20230621090645.125466-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,69 +47,23 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 22 Jun 2023 23:54:31 +0100 David Howells wrote:
-> > Maybe it's just me but I'd prefer to keep the clear rule that splice
-> > operates on pages not slab objects.  
-> 
-> sendpage isn't only being used for splice().  Or were you referring to
-> splicing pages into socket buffers more generally?
+On Wed, 21 Jun 2023 17:06:45 +0800 Jiawen Wu wrote:
+> The old way to do hardware reset is sending reset command to firmware.
+> In order to adapt to the new firmware, driver directly write register
+> of LAN reset instead of the old way.
 
-Yes, sorry, any sort of "zero-copy attachment of data onto a socket
-queue".
+Which versions of the FW use one method vs the other? Why is it okay 
+to change the driver for new FW, are there no devices running old FW
+in the wild? Or the new method is safe for both?
 
-> > SIW is the software / fake implementation of RDMA, right? You couldn't have
-> > picked a less important user :(  
-> 
-> ISCSI and sunrpc could both make use of this, as could ceph and others.  I
-> have patches for sunrpc to make it condense into a single bio_vec[] and
-> sendmsg() in the server code (ie. nfsd) but for the moment, Chuck wanted me to
-> just do the xdr payload.
+We need more information, we had a number of reports recently about
+drivers breaking backwards compatibility and causing regressions for
+users.
 
-But to be clear (and I'm not implying that it's not a strong enough
-reason) - the only benefit from letting someone pass headers in a slab
-object is that the code already uses kmalloc(), right? IOW it could be
-changed to use frags without much of a LoC bloat?
+> And remove the redundant functions
+> wx_reset_hostif() and wx_calculate_checksum().
 
-> > Maybe we can get Eric to comment. The ability to identify "frag type"
-> > seems cool indeed, but I haven't thought about using it to attach
-> > slab objects.  
-> 
-> Unfortunately, you can't attach slab objects.  Their lifetime isn't controlled
-> by put_page() or folio_put().  kmalloc()/kfree() doesn't refcount them -
-> they're recycled immediately.  Hence why I was copying them.  (Well, you
-> could attach, but then you need a callback mechanism).
-
-Right, right, I thought you were saying that _in the future_ we may try
-to attach the slab objects as frags (and presumably copy when someone
-tries to ref them). Maybe I over-interpreted.
-
-> What I'm trying to do is make it so that the process of calling sock_sendmsg()
-> with MSG_SPLICE_PAGES looks exactly the same as without: You fill in a
-> bio_vec[] pointing to your protocol header, the payload and the trailer,
-> pointing as appropriate to bits of slab, static, stack data or ref'able pages,
-> and call sendmsg and then the data will get copied or spliced as appropriate
-> to the page type, whether the MSG_SPLICE_PAGES flag is supplied and whether
-> the flag is supported.
-> 
-> There are a couple of things I'd like to avoid: (1) having to call
-> sock_sendmsg() more than once per message and (2) having sendmsg allocate more
-> space and make a copy of data that you had to copy into a frag before calling
-> sendmsg.
-
-If we're not planning to attach the slab objects as frags, then surely
-doing kmalloc() + free() in the caller, and then allocating a frag and
-copying the data over in the skb / socket code is also inefficient.
-Fixing the caller gives all the benefits you want, and then some.
-
-Granted some form of alloc_skb_frag() needs to be added so that callers
-don't curse us, I'd start with something based on sk_page_frag().
-
-Or we could pull the coping out into an intermediate helper which
-first replaces all slab objects in the iovec with page frags and then
-calls sock_sendmsg()? Maybe that's stupid...
-
-Let's hear what others think. If we can't reach instant agreement --
-can you strategically separate out the minimal set of changes required
-to just kill MSG_SENDPAGE_NOTLAST. IMHO it's worth getting that into
-6.5.
+You don't have to say that, it's a natural part of the change.
+-- 
+pw-bot: cr
 
