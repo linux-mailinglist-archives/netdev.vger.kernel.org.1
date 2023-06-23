@@ -1,38 +1,39 @@
-Return-Path: <netdev+bounces-13500-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13502-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C173873BDE6
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:35:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53B4373BDEA
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C58C1C212E9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:35:53 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 079D828106B
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48E6C1095C;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08B8101CF;
 	Fri, 23 Jun 2023 17:34:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDCF2101CF;
-	Fri, 23 Jun 2023 17:34:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 48F76C433CC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE57101F5;
+	Fri, 23 Jun 2023 17:34:19 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A7BC2C433B8;
 	Fri, 23 Jun 2023 17:34:18 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687541658;
-	bh=W2fdyA4RdEQXA1/jIZkMTm630uJU1gM3Og9vKfmlgTQ=;
+	bh=FlFir1IlJvtujfBonYE0PPa5EpGA6MvQ58C1Dnn2Rfs=;
 	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=dBkTamGaSlnNEjG7HR21+++a+BLvPPp9Cyov7fMAO0BhTDfXMq3yOFuMo0T9rBTka
-	 Jtgp3zJsObCct0CNQTIv6Gt56/fKmDweD4QgpbF2SpfndvMx3ziBvQmn+HCDgtWvww
-	 E1cjocPmfOJfZppFt31uPOhBG2sFnTPT9lzxTScdNpqJ90CAyZ6dohPf+38kgmVINn
-	 X9z6AUfBK/fbK3CR+CGjBAVqVRKspX+R8p0M3g0qRp9ZQGVCwAk6tVkJOl/qhk21w7
-	 g6RjDUv32DbwVgdh4f8zZW/Ervz2bYEYjDLv9oZ2G2Nc5Sba2Zf9vZcXlJ3M6/8TZZ
-	 hSv7Gqx37jkFQ==
+	b=TFniLIRpbPoFGB3nwXWfKvpn1ucDaJyfGlEpRLnI8I6JmJAfK8L7XtBseqkxyVeDE
+	 geTZD9MoagJh6/FUPsbaicDftXHP0Mckg4bNXa9w2WznOAO6yAKOXHoan83kZMX+2u
+	 H0EOwjGXEgeG/L8dP26WoXzjkn/+oMA/jbhISDo6htjtJyYIzSX++zl2YAzzZQk2Af
+	 lsof0FQz8IUaRYJ9E5ZzeMUSyqlxhfyvm3PFP/867tcrYpECOQlnTmF2dnjFfQSrEx
+	 1W5wr46Nc2Z08nGsxU3uMIil8nTk7MelD119EDPrrMzNstRqP5QjtsWJSZwLMykEna
+	 ULtR5GPuVku1w==
 From: Mat Martineau <martineau@kernel.org>
-Date: Fri, 23 Jun 2023 10:34:12 -0700
-Subject: [PATCH net-next 6/8] selftests: mptcp: drop sflags parameter
+Date: Fri, 23 Jun 2023 10:34:13 -0700
+Subject: [PATCH net-next 7/8] selftests: mptcp: add pm_nl_set_endpoint
+ helper
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -41,7 +42,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230623-send-net-next-20230623-v1-6-a883213c8ba9@kernel.org>
+Message-Id: <20230623-send-net-next-20230623-v1-7-a883213c8ba9@kernel.org>
 References: <20230623-send-net-next-20230623-v1-0-a883213c8ba9@kernel.org>
 In-Reply-To: <20230623-send-net-next-20230623-v1-0-a883213c8ba9@kernel.org>
 To: Matthieu Baerts <matthieu.baerts@tessares.net>, 
@@ -53,169 +54,273 @@ X-Mailer: b4 0.12.2
 
 From: Geliang Tang <geliang.tang@suse.com>
 
-run_tests() accepts too many optional parameters. Before this modification,
-it was required to set all of then when only the last one had to be
-changed. That's not clear to see all these 0 and it makes the maintenance
-harder:
-
-      run_tests $ns1 $ns2 10.0.1.1 1 2 3 slow
-
-Instead, the parameter can be set as an env var with a limited scope:
-
-      foo=1 bar=2 next=3 \
-            run_tests $ns1 $ns2 10.0.1.1 slow
-
-This patch switches to key/value "sflags=*" instead of positional parameter
-sflags of do_transfer() and run_tests().
+This patch moves endpoint settings out of do_transfer() into a new
+helper pm_nl_set_endpoint(). And invoke this helper in do_transfer().
+This makes the code much more clearer.
 
 Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 Signed-off-by: Geliang Tang <geliang.tang@suse.com>
 Signed-off-by: Mat Martineau <martineau@kernel.org>
 ---
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 39 ++++++++++++++-----------
- 1 file changed, 22 insertions(+), 17 deletions(-)
+ tools/testing/selftests/net/mptcp/mptcp_join.sh | 235 ++++++++++++------------
+ 1 file changed, 122 insertions(+), 113 deletions(-)
 
 diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 93f941fd51f2..5cb66f85c88f 100755
+index 5cb66f85c88f..e6c9d5451c5b 100755
 --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
 +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -53,6 +53,7 @@ export FAILING_LINKS=""
- export test_linkfail=0
- export addr_nr_ns1=0
- export addr_nr_ns2=0
-+export sflags=""
- 
- # generated using "nfbpf_compile '(ip && (ip[54] & 0xf0) == 0x30) ||
- #				  (ip6 && (ip6[74] & 0xf0) == 0x30)'"
-@@ -829,7 +830,6 @@ do_transfer()
- 	local srv_proto="$4"
- 	local connect_addr="$5"
- 	local speed="$6"
--	local sflags="${7}"
- 
- 	local port=$((10000 + TEST_COUNT - 1))
- 	local cappid
-@@ -1147,7 +1147,6 @@ run_tests()
- 	local connector_ns="$2"
- 	local connect_addr="$3"
- 	local speed="${4:-fast}"
--	local sflags="${5:-""}"
- 
- 	local size
- 
-@@ -1191,8 +1190,7 @@ run_tests()
- 		make_file "$sinfail" "server" $size
+@@ -822,122 +822,11 @@ pm_nl_check_endpoint()
  	fi
- 
--	do_transfer ${listener_ns} ${connector_ns} MPTCP MPTCP ${connect_addr} \
--		${speed} ${sflags}
-+	do_transfer ${listener_ns} ${connector_ns} MPTCP MPTCP ${connect_addr} ${speed}
  }
  
- dump_stats()
-@@ -2687,7 +2685,8 @@ backup_tests()
- 		pm_nl_set_limits $ns1 0 1
- 		pm_nl_set_limits $ns2 0 1
- 		pm_nl_add_endpoint $ns2 10.0.3.2 flags subflow,backup
--		run_tests $ns1 $ns2 10.0.1.1 slow nobackup
-+		sflags=nobackup \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 1 1 1
- 		chk_prio_nr 0 1
+-do_transfer()
++pm_nl_set_endpoint()
+ {
+ 	local listener_ns="$1"
+ 	local connector_ns="$2"
+-	local cl_proto="$3"
+-	local srv_proto="$4"
+-	local connect_addr="$5"
+-	local speed="$6"
+-
+-	local port=$((10000 + TEST_COUNT - 1))
+-	local cappid
+-
+-	:> "$cout"
+-	:> "$sout"
+-	:> "$capout"
+-
+-	if [ $capture -eq 1 ]; then
+-		local capuser
+-		if [ -z $SUDO_USER ] ; then
+-			capuser=""
+-		else
+-			capuser="-Z $SUDO_USER"
+-		fi
+-
+-		capfile=$(printf "mp_join-%02u-%s.pcap" "$TEST_COUNT" "${listener_ns}")
+-
+-		echo "Capturing traffic for test $TEST_COUNT into $capfile"
+-		ip netns exec ${listener_ns} tcpdump -i any -s 65535 -B 32768 $capuser -w $capfile > "$capout" 2>&1 &
+-		cappid=$!
+-
+-		sleep 1
+-	fi
+-
+-	NSTAT_HISTORY=/tmp/${listener_ns}.nstat ip netns exec ${listener_ns} \
+-		nstat -n
+-	NSTAT_HISTORY=/tmp/${connector_ns}.nstat ip netns exec ${connector_ns} \
+-		nstat -n
+-
+-	local extra_args
+-	if [ $speed = "fast" ]; then
+-		extra_args="-j"
+-	elif [ $speed = "slow" ]; then
+-		extra_args="-r 50"
+-	elif [[ $speed = "speed_"* ]]; then
+-		extra_args="-r ${speed:6}"
+-	fi
+-
+-	local flags="subflow"
+-	local extra_cl_args=""
+-	local extra_srv_args=""
+-	local trunc_size=""
+-	if [[ "${addr_nr_ns2}" = "fastclose_"* ]]; then
+-		if [ ${test_linkfail} -le 1 ]; then
+-			echo "fastclose tests need test_linkfail argument"
+-			fail_test
+-			return 1
+-		fi
+-
+-		# disconnect
+-		trunc_size=${test_linkfail}
+-		local side=${addr_nr_ns2:10}
+-
+-		if [ ${side} = "client" ]; then
+-			extra_cl_args="-f ${test_linkfail}"
+-			extra_srv_args="-f -1"
+-		elif [ ${side} = "server" ]; then
+-			extra_srv_args="-f ${test_linkfail}"
+-			extra_cl_args="-f -1"
+-		else
+-			echo "wrong/unknown fastclose spec ${side}"
+-			fail_test
+-			return 1
+-		fi
+-		addr_nr_ns2=0
+-	elif [[ "${addr_nr_ns2}" = "fullmesh_"* ]]; then
+-		flags="${flags},fullmesh"
+-		addr_nr_ns2=${addr_nr_ns2:9}
+-	fi
+-
+-	extra_srv_args="$extra_args $extra_srv_args"
+-	if [ "$test_linkfail" -gt 1 ];then
+-		timeout ${timeout_test} \
+-			ip netns exec ${listener_ns} \
+-				./mptcp_connect -t ${timeout_poll} -l -p $port -s ${srv_proto} \
+-					$extra_srv_args "::" < "$sinfail" > "$sout" &
+-	else
+-		timeout ${timeout_test} \
+-			ip netns exec ${listener_ns} \
+-				./mptcp_connect -t ${timeout_poll} -l -p $port -s ${srv_proto} \
+-					$extra_srv_args "::" < "$sin" > "$sout" &
+-	fi
+-	local spid=$!
+-
+-	wait_local_port_listen "${listener_ns}" "${port}"
+-
+-	extra_cl_args="$extra_args $extra_cl_args"
+-	if [ "$test_linkfail" -eq 0 ];then
+-		timeout ${timeout_test} \
+-			ip netns exec ${connector_ns} \
+-				./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
+-					$extra_cl_args $connect_addr < "$cin" > "$cout" &
+-	elif [ "$test_linkfail" -eq 1 ] || [ "$test_linkfail" -eq 2 ];then
+-		( cat "$cinfail" ; sleep 2; link_failure $listener_ns ; cat "$cinfail" ) | \
+-			tee "$cinsent" | \
+-			timeout ${timeout_test} \
+-				ip netns exec ${connector_ns} \
+-					./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
+-						$extra_cl_args $connect_addr > "$cout" &
+-	else
+-		tee "$cinsent" < "$cinfail" | \
+-			timeout ${timeout_test} \
+-				ip netns exec ${connector_ns} \
+-					./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
+-						$extra_cl_args $connect_addr > "$cout" &
+-	fi
+-	local cpid=$!
++	local connect_addr="$3"
+ 
+ 	# let the mptcp subflow be established in background before
+ 	# do endpoint manipulation
+@@ -1077,6 +966,126 @@ do_transfer()
+ 			done
+ 		done
  	fi
-@@ -2698,7 +2697,8 @@ backup_tests()
- 		pm_nl_set_limits $ns1 0 1
- 		pm_nl_add_endpoint $ns1 10.0.2.1 flags signal
- 		pm_nl_set_limits $ns2 1 1
--		run_tests $ns1 $ns2 10.0.1.1 slow backup
-+		sflags=backup \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 1 1 1
- 		chk_add_nr 1 1
- 		chk_prio_nr 1 1
-@@ -2710,7 +2710,8 @@ backup_tests()
- 		pm_nl_set_limits $ns1 0 1
- 		pm_nl_add_endpoint $ns1 10.0.2.1 flags signal port 10100
- 		pm_nl_set_limits $ns2 1 1
--		run_tests $ns1 $ns2 10.0.1.1 slow backup
-+		sflags=backup \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 1 1 1
- 		chk_add_nr 1 1
- 		chk_prio_nr 1 1
-@@ -2736,7 +2737,8 @@ backup_tests()
- 	if reset "mpc switch to backup" &&
- 	   continue_if mptcp_lib_kallsyms_doesnt_have "mptcp_subflow_send_ack$"; then
- 		pm_nl_add_endpoint $ns2 10.0.1.2 flags subflow
--		run_tests $ns1 $ns2 10.0.1.1 slow backup
-+		sflags=backup \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 0 0 0
- 		chk_prio_nr 0 1
- 	fi
-@@ -2745,7 +2747,8 @@ backup_tests()
- 	   continue_if mptcp_lib_kallsyms_doesnt_have "mptcp_subflow_send_ack$"; then
- 		pm_nl_add_endpoint $ns1 10.0.1.1 flags subflow
- 		pm_nl_add_endpoint $ns2 10.0.1.2 flags subflow
--		run_tests $ns1 $ns2 10.0.1.1 slow backup
-+		sflags=backup \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 0 0 0
- 		chk_prio_nr 1 1
- 	fi
-@@ -3120,8 +3123,8 @@ fullmesh_tests()
- 		pm_nl_set_limits $ns1 4 4
- 		pm_nl_add_endpoint $ns1 10.0.2.1 flags subflow
- 		pm_nl_set_limits $ns2 4 4
--		addr_nr_ns2=1 \
--			run_tests $ns1 $ns2 10.0.1.1 slow fullmesh
-+		addr_nr_ns2=1 sflags=fullmesh \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 2 2 2
- 		chk_rm_nr 0 1
- 	fi
-@@ -3132,8 +3135,8 @@ fullmesh_tests()
- 		pm_nl_set_limits $ns1 4 4
- 		pm_nl_add_endpoint $ns1 10.0.2.1 flags subflow,fullmesh
- 		pm_nl_set_limits $ns2 4 4
--		addr_nr_ns2=fullmesh_1 \
--			run_tests $ns1 $ns2 10.0.1.1 slow nofullmesh
-+		addr_nr_ns2=fullmesh_1 sflags=nofullmesh \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 2 2 2
- 		chk_rm_nr 0 1
- 	fi
-@@ -3144,8 +3147,8 @@ fullmesh_tests()
- 		pm_nl_set_limits $ns1 4 4
- 		pm_nl_add_endpoint $ns1 10.0.2.1 flags subflow
- 		pm_nl_set_limits $ns2 4 4
--		addr_nr_ns2=1 run_tests \
--			$ns1 $ns2 10.0.1.1 slow backup,fullmesh
-+		addr_nr_ns2=1 sflags=backup,fullmesh \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 2 2 2
- 		chk_prio_nr 0 1
- 		chk_rm_nr 0 1
-@@ -3157,7 +3160,8 @@ fullmesh_tests()
- 		pm_nl_set_limits $ns1 4 4
- 		pm_nl_set_limits $ns2 4 4
- 		pm_nl_add_endpoint $ns2 10.0.2.2 flags subflow,backup,fullmesh
--		run_tests $ns1 $ns2 10.0.1.1 slow nobackup,nofullmesh
-+		sflags=nobackup,nofullmesh \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 2 2 2
- 		chk_prio_nr 0 1
- 		chk_rm_nr 0 1
-@@ -3332,7 +3336,8 @@ userspace_tests()
- 		pm_nl_set_limits $ns1 1 1
- 		pm_nl_set_limits $ns2 1 1
- 		pm_nl_add_endpoint $ns2 10.0.3.2 flags subflow
--		run_tests $ns1 $ns2 10.0.1.1 slow backup
-+		sflags=backup \
-+			run_tests $ns1 $ns2 10.0.1.1 slow
- 		chk_join_nr 1 1 0
- 		chk_prio_nr 0 0
- 	fi
++}
++
++do_transfer()
++{
++	local listener_ns="$1"
++	local connector_ns="$2"
++	local cl_proto="$3"
++	local srv_proto="$4"
++	local connect_addr="$5"
++	local speed="$6"
++
++	local port=$((10000 + TEST_COUNT - 1))
++	local cappid
++
++	:> "$cout"
++	:> "$sout"
++	:> "$capout"
++
++	if [ $capture -eq 1 ]; then
++		local capuser
++		if [ -z $SUDO_USER ] ; then
++			capuser=""
++		else
++			capuser="-Z $SUDO_USER"
++		fi
++
++		capfile=$(printf "mp_join-%02u-%s.pcap" "$TEST_COUNT" "${listener_ns}")
++
++		echo "Capturing traffic for test $TEST_COUNT into $capfile"
++		ip netns exec ${listener_ns} tcpdump -i any -s 65535 -B 32768 $capuser -w $capfile > "$capout" 2>&1 &
++		cappid=$!
++
++		sleep 1
++	fi
++
++	NSTAT_HISTORY=/tmp/${listener_ns}.nstat ip netns exec ${listener_ns} \
++		nstat -n
++	NSTAT_HISTORY=/tmp/${connector_ns}.nstat ip netns exec ${connector_ns} \
++		nstat -n
++
++	local extra_args
++	if [ $speed = "fast" ]; then
++		extra_args="-j"
++	elif [ $speed = "slow" ]; then
++		extra_args="-r 50"
++	elif [[ $speed = "speed_"* ]]; then
++		extra_args="-r ${speed:6}"
++	fi
++
++	local flags="subflow"
++	local extra_cl_args=""
++	local extra_srv_args=""
++	local trunc_size=""
++	if [[ "${addr_nr_ns2}" = "fastclose_"* ]]; then
++		if [ ${test_linkfail} -le 1 ]; then
++			echo "fastclose tests need test_linkfail argument"
++			fail_test
++			return 1
++		fi
++
++		# disconnect
++		trunc_size=${test_linkfail}
++		local side=${addr_nr_ns2:10}
++
++		if [ ${side} = "client" ]; then
++			extra_cl_args="-f ${test_linkfail}"
++			extra_srv_args="-f -1"
++		elif [ ${side} = "server" ]; then
++			extra_srv_args="-f ${test_linkfail}"
++			extra_cl_args="-f -1"
++		else
++			echo "wrong/unknown fastclose spec ${side}"
++			fail_test
++			return 1
++		fi
++		addr_nr_ns2=0
++	elif [[ "${addr_nr_ns2}" = "fullmesh_"* ]]; then
++		flags="${flags},fullmesh"
++		addr_nr_ns2=${addr_nr_ns2:9}
++	fi
++
++	extra_srv_args="$extra_args $extra_srv_args"
++	if [ "$test_linkfail" -gt 1 ];then
++		timeout ${timeout_test} \
++			ip netns exec ${listener_ns} \
++				./mptcp_connect -t ${timeout_poll} -l -p $port -s ${srv_proto} \
++					$extra_srv_args "::" < "$sinfail" > "$sout" &
++	else
++		timeout ${timeout_test} \
++			ip netns exec ${listener_ns} \
++				./mptcp_connect -t ${timeout_poll} -l -p $port -s ${srv_proto} \
++					$extra_srv_args "::" < "$sin" > "$sout" &
++	fi
++	local spid=$!
++
++	wait_local_port_listen "${listener_ns}" "${port}"
++
++	extra_cl_args="$extra_args $extra_cl_args"
++	if [ "$test_linkfail" -eq 0 ];then
++		timeout ${timeout_test} \
++			ip netns exec ${connector_ns} \
++				./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
++					$extra_cl_args $connect_addr < "$cin" > "$cout" &
++	elif [ "$test_linkfail" -eq 1 ] || [ "$test_linkfail" -eq 2 ];then
++		( cat "$cinfail" ; sleep 2; link_failure $listener_ns ; cat "$cinfail" ) | \
++			tee "$cinsent" | \
++			timeout ${timeout_test} \
++				ip netns exec ${connector_ns} \
++					./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
++						$extra_cl_args $connect_addr > "$cout" &
++	else
++		tee "$cinsent" < "$cinfail" | \
++			timeout ${timeout_test} \
++				ip netns exec ${connector_ns} \
++					./mptcp_connect -t ${timeout_poll} -p $port -s ${cl_proto} \
++						$extra_cl_args $connect_addr > "$cout" &
++	fi
++	local cpid=$!
++
++	pm_nl_set_endpoint $listener_ns $connector_ns $connect_addr
+ 
+ 	wait $cpid
+ 	local retc=$?
 
 -- 
 2.41.0
