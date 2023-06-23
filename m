@@ -1,137 +1,475 @@
-Return-Path: <netdev+bounces-13486-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13487-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B30B273BC98
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:32:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A1CB73BCC4
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:38:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5DF8281CCB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:32:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9834B281C98
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:38:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F6C48BE1;
-	Fri, 23 Jun 2023 16:32:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5FFFF8C16;
+	Fri, 23 Jun 2023 16:38:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78D80100B5;
-	Fri, 23 Jun 2023 16:32:33 +0000 (UTC)
-Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CE9EC26A9;
-	Fri, 23 Jun 2023 09:32:31 -0700 (PDT)
-Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b477e9d396so13976211fa.3;
-        Fri, 23 Jun 2023 09:32:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687537950; x=1690129950;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=2I3GjaHedd8UwqHCD/cICvG+HnMoaDQVwpMURCXNbWM=;
-        b=ioRCSav5i/KJc6UheQJQp+/pherHS7TJA4doFCMudjZ8PyA1SimcloaNAtx2HKwNKR
-         2uJ0GhR3m2EvzA+dMm9b3EBqvPwqWcPR3R09OyP57WYVE4ASK8WhrTwXCXDFEbiswmN2
-         I7zqDO2u84i5sHByXZidl4KnXxUcAfkMCccUPunTW5VUz9P7fG6Xipln3g79oABQsxC0
-         +x3WzKnUH8d3MwRigN888G4Blfbjg8+6HvPT3xMxP+HRvDMJ9Ofx2QAP83AmaTSiVjMY
-         bgCnjvQ1p1gkG8II2AlFg3aCSjKehJs6H4itiQ5MF6sgONbXZYf6R/xIg+kJGHTwGevQ
-         swxA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48E698463
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 16:38:55 +0000 (UTC)
+Received: from mail-lj1-f171.google.com (mail-lj1-f171.google.com [209.85.208.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD039270E;
+	Fri, 23 Jun 2023 09:38:52 -0700 (PDT)
+Received: by mail-lj1-f171.google.com with SMTP id 38308e7fff4ca-2b57b4e95a8so2868621fa.1;
+        Fri, 23 Jun 2023 09:38:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687537950; x=1690129950;
+        d=1e100.net; s=20221208; t=1687538331; x=1690130331;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2I3GjaHedd8UwqHCD/cICvG+HnMoaDQVwpMURCXNbWM=;
-        b=h0sQT5j39+mvo/EHHCmthLtncVXMM1JkZOOnb9XTND5U/yU4sDCfuReYGxbcAD6YA0
-         x3l+0XNFLMWy5+ZHZQOhLx7UHabebbpg28DNT9C6zNq6I/SMIzsD47gfljI6vBkAwkEB
-         TC+PyEG3KiRMFVJLSD/oYjlLhnfcOJuKJKrvgEKaPuXK4GjnYr5f6IC9VeFkhxAEp22t
-         LnPgPd7Ktc9pTK8jWXIXOocQJVM9bHJjCyO2kYebesIqekjXSqQ29vDriykTQuMUJ0hI
-         jc7jN22KV4yrXJvA4uGTVapJZX9C1qiQiNBa/XzISavsFAIkhhR1BKS74TmRu6YS+L6B
-         BKTQ==
-X-Gm-Message-State: AC+VfDwRFPuTDukuoWS3RpuIPInco5JfKl/OwQSvglHzqumexRBtl6aT
-	mohQaacUTkSbKFY1270e1z/qnUDCc9hwLXywFfk=
-X-Google-Smtp-Source: ACHHUZ5S/at/i6kLM6YR/JIGPMDyIJU3E/zSkDUpsnv9G/W9xjd6SC9GiIKxbnpztpujI9hS3uL4Mm4qrHOdd1w8QUw=
-X-Received: by 2002:a2e:9105:0:b0:2b5:910c:ecda with SMTP id
- m5-20020a2e9105000000b002b5910cecdamr4867354ljg.44.1687537949658; Fri, 23 Jun
- 2023 09:32:29 -0700 (PDT)
+        bh=Mx2hGcoM9nMJ5B1yumLCPQFaFEylVPn0NXtUazu6c7s=;
+        b=EGaSFIyR/oGiUfZOXP+O2iddCVw2EMKw36NJ43+qn2CvuMt/B9UvOuXu1HYXry8ns/
+         mc6DJT/5ukEf3ffi/VIqDLomfZujMPU6ccI9aNqGA5UAhWjGihHCWnjCDrlXVmvc5sLE
+         zXIKF+HczRJRlu5onc4JpGjNJ2lwbh76U2C9EQe6u/++at8SBauPOT37yvm3dr8HmLfu
+         cE9HmQvJ2lHHb/sGAQrIDBb4GOp2mhyitDewY8Qf4gFAxy3MZuhftqNLnvXdvrerwz7m
+         XjoTBEwLdj5zDKuapH2v/4eWWfgbf3SuqVRO/2vlkWoADTAW93CPDCnI/OafGUI1Zpux
+         GKSA==
+X-Gm-Message-State: AC+VfDxhh0Y9KO/2IO/4RdC/xcY4YQ6v4GeVanjgn6hsj7jAvS6MtVCY
+	NdJ5MMwwALFu9FM8KFQmWenlfPjETY7lD2ZTIFY=
+X-Google-Smtp-Source: ACHHUZ69XDB4QsWg7aegIqf61bPD9nYqJdOwGBQjGBmh6nChdsk7tSQhI88TrGx8aR//M9ebB5ty7XYUZiU8BU/4D1U=
+X-Received: by 2002:a2e:b80f:0:b0:2b4:67bd:4367 with SMTP id
+ u15-20020a2eb80f000000b002b467bd4367mr9886059ljo.5.1687538330589; Fri, 23 Jun
+ 2023 09:38:50 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621170244.1283336-1-sdf@google.com> <20230621170244.1283336-12-sdf@google.com>
- <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
- <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
- <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
- <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
- <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com> <4c592016-5b5e-9670-2231-b44642091d46@redhat.com>
-In-Reply-To: <4c592016-5b5e-9670-2231-b44642091d46@redhat.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Fri, 23 Jun 2023 09:32:18 -0700
-Message-ID: <CAADnVQKT06t=-4zrHQobSpL06JpQh90vMfPpcYvXs8881GxMWg@mail.gmail.com>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-To: Maryam Tahhan <mtahhan@redhat.com>
-Cc: Stanislav Fomichev <sdf@google.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, KP Singh <kpsingh@kernel.org>, 
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
-	Network Development <netdev@vger.kernel.org>, "Wiles, Keith" <keith.wiles@intel.com>, 
-	Jesper Brouer <jbrouer@redhat.com>
+References: <20230621054603.1262299-1-evan.quan@amd.com> <20230621054603.1262299-2-evan.quan@amd.com>
+In-Reply-To: <20230621054603.1262299-2-evan.quan@amd.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Fri, 23 Jun 2023 18:38:39 +0200
+Message-ID: <CAJZ5v0gDCa0fC5V6NRg2c4MPvS70fYZg9x+K=TiQi033_G9Caw@mail.gmail.com>
+Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF mitigations
+To: Evan Quan <evan.quan@amd.com>
+Cc: rafael@kernel.org, lenb@kernel.org, alexander.deucher@amd.com, 
+	christian.koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com, 
+	daniel@ffwll.ch, johannes@sipsolutions.net, davem@davemloft.net, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mario.limonciello@amd.com, mdaenzer@redhat.com, 
+	maarten.lankhorst@linux.intel.com, tzimmermann@suse.de, hdegoede@redhat.com, 
+	jingyuwang_vip@163.com, lijo.lazar@amd.com, jim.cromie@gmail.com, 
+	bellosilicio@gmail.com, andrealmeid@igalia.com, trix@redhat.com, 
+	jsg@jsg.id.au, arnd@arndb.de, linux-kernel@vger.kernel.org, 
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 3:16=E2=80=AFAM Maryam Tahhan <mtahhan@redhat.com> =
-wrote:
+On Wed, Jun 21, 2023 at 7:47=E2=80=AFAM Evan Quan <evan.quan@amd.com> wrote=
+:
 >
-> On 23/06/2023 03:35, Alexei Starovoitov wrote:
-> > Why do you think so?
-> > Who are those users?
-> > I see your proposal and thumbs up from onlookers.
-> > afaict there are zero users for rx side hw hints too.
-> >
-> >> the specs are
-> >> not public; things can change depending on fw version/etc/etc.
-> >> So the progs that touch raw descriptors are not the primary use-case.
-> >> (that was the tl;dr for rx part, seems like it applies here?)
-> >>
-> >> Let's maybe discuss that mlx5 example? Are you proposing to do
-> >> something along these lines?
-> >>
-> >> void mlx5e_devtx_submit(struct mlx5e_tx_wqe *wqe);
-> >> void mlx5e_devtx_complete(struct mlx5_cqe64 *cqe);
-> >>
-> >> If yes, I'm missing how we define the common kfuncs in this case. The
-> >> kfuncs need to have some common context. We're defining them with:
-> >> bpf_devtx_<kfunc>(const struct devtx_frame *ctx);
-> > I'm looking at xdp_metadata and wondering who's using it.
-> > I haven't seen a single bug report.
-> > No bugs means no one is using it. There is zero chance that we managed
-> > to implement it bug-free on the first try.
-> > So new tx side things look like a feature creep to me.
-> > rx side is far from proven to be useful for anything.
-> > Yet you want to add new things.
-> >
+> From: Mario Limonciello <mario.limonciello@amd.com>
 >
-> Hi folks
+> Due to electrical and mechanical constraints in certain platform designs
+> there may be likely interference of relatively high-powered harmonics of
+> the (G-)DDR memory clocks with local radio module frequency bands used
+> by Wifi 6/6e/7.
 >
-> We in CNDP (https://github.com/CloudNativeDataPlane/cndp) have been
+> To mitigate this, AMD has introduced an ACPI based mechanism that
+> devices can use to notify active use of particular frequencies so
+> that devices can make relative internal adjustments as necessary
+> to avoid this resonance.
+>
+> In order for a device to support this, the expected flow for device
+> driver or subsystems:
+>
+> Drivers/subsystems contributing frequencies:
+>
+> 1) During probe, check `wbrf_supported_producer` to see if WBRF supported
+>    for the device.
+> 2) If adding frequencies, then call `wbrf_add_exclusion` with the
+>    start and end ranges of the frequencies.
+> 3) If removing frequencies, then call `wbrf_remove_exclusion` with
+>    start and end ranges of the frequencies.
+>
+> Drivers/subsystems responding to frequencies:
+>
+> 1) During probe, check `wbrf_supported_consumer` to see if WBRF is suppor=
+ted
+>    for the device.
+> 2) Call the `wbrf_retrieve_exclusions` to retrieve the current
+>    exclusions on receiving an ACPI notification for a new frequency
+>    change.
+>
+> Signed-off-by: Mario Limonciello <mario.limonciello@amd.com>
+> Co-developed-by: Evan Quan <evan.quan@amd.com>
+> Signed-off-by: Evan Quan <evan.quan@amd.com>
+> --
+> v1->v2:
+>   - move those wlan specific implementations to net/mac80211(Mario)
+> ---
+>  drivers/acpi/Kconfig     |   7 ++
+>  drivers/acpi/Makefile    |   2 +
+>  drivers/acpi/acpi_wbrf.c | 215 +++++++++++++++++++++++++++++++++++++++
+>  include/linux/wbrf.h     |  55 ++++++++++
+>  4 files changed, 279 insertions(+)
+>  create mode 100644 drivers/acpi/acpi_wbrf.c
+>  create mode 100644 include/linux/wbrf.h
+>
+> diff --git a/drivers/acpi/Kconfig b/drivers/acpi/Kconfig
+> index ccbeab9500ec..0276c1487fa2 100644
+> --- a/drivers/acpi/Kconfig
+> +++ b/drivers/acpi/Kconfig
+> @@ -611,3 +611,10 @@ config X86_PM_TIMER
+>
+>           You should nearly always say Y here because many modern
+>           systems require this timer.
+> +
+> +config ACPI_WBRF
+> +       bool "ACPI Wifi band RF mitigation mechanism"
+> +       help
+> +         Wifi band RF mitigation mechanism allows multiple drivers from
+> +         different domains to notify the frequencies in use so that hard=
+ware
+> +         can be reconfigured to avoid harmonic conflicts.
+> diff --git a/drivers/acpi/Makefile b/drivers/acpi/Makefile
+> index feb36c0b9446..14863b0c619f 100644
+> --- a/drivers/acpi/Makefile
+> +++ b/drivers/acpi/Makefile
+> @@ -131,3 +131,5 @@ obj-y                               +=3D dptf/
+>  obj-$(CONFIG_ARM64)            +=3D arm64/
+>
+>  obj-$(CONFIG_ACPI_VIOT)                +=3D viot.o
+> +
+> +obj-$(CONFIG_ACPI_WBRF)                +=3D acpi_wbrf.o
+> diff --git a/drivers/acpi/acpi_wbrf.c b/drivers/acpi/acpi_wbrf.c
+> new file mode 100644
+> index 000000000000..8c275998ac29
+> --- /dev/null
+> +++ b/drivers/acpi/acpi_wbrf.c
+> @@ -0,0 +1,215 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/*
+> + * AMD Wifi Band Exclusion Interface
 
-with TCP stack in user space over af_xdp...
+Where is the AML interface for this defined and how does it work?
 
-> looking to use xdp_metadata to relay receive side offloads from the NIC
-> to our AF_XDP applications. We see this is a key feature that is
-> essential for the viability of AF_XDP in the real world. We would love
-> to see something adopted for the TX side alongside what's on the RX
-> side. We don't want to waste cycles do everything in software when the
-> NIC HW supports many features that we need.
+> + * Copyright (C) 2023 Advanced Micro Devices
+> + *
+> + */
+> +
+> +#include <linux/wbrf.h>
+> +
+> +/* functions */
+> +#define WBRF_RECORD            0x1
+> +#define WBRF_RETRIEVE          0x2
+> +
+> +/* record actions */
+> +#define WBRF_RECORD_ADD                0x0
+> +#define WBRF_RECORD_REMOVE     0x1
+> +
+> +#define WBRF_REVISION          0x1
+> +
+> +static const guid_t wifi_acpi_dsm_guid =3D
+> +       GUID_INIT(0x7b7656cf, 0xdc3d, 0x4c1c,
+> +                 0x83, 0xe9, 0x66, 0xe7, 0x21, 0xde, 0x30, 0x70);
+> +
+> +static int wbrf_dsm(struct acpi_device *adev, u8 fn,
+> +                   union acpi_object *argv4,
+> +                   union acpi_object **out)
+> +{
+> +       union acpi_object *obj;
+> +       int rc;
+> +
+> +       obj =3D acpi_evaluate_dsm(adev->handle, &wifi_acpi_dsm_guid,
+> +                               WBRF_REVISION, fn, argv4);
+> +       if (!obj)
+> +               return -ENXIO;
+> +
+> +       switch (obj->type) {
+> +       case ACPI_TYPE_BUFFER:
+> +               if (!*out) {
+> +                       rc =3D -EINVAL;
+> +                       break;
 
-Please specify "many features". If that means HW TSO to accelerate
-your TCP in user space, then sorry, but no.
+I'm not sure why you want to return an error in this case.  Did you
+really mean !out?
+
+> +               }
+> +               *out =3D obj;
+> +               return 0;
+> +
+> +       case ACPI_TYPE_INTEGER:
+> +               rc =3D  obj->integer.value ? -EINVAL : 0;
+> +               break;
+
+An empty line here, please, as you added one after the return statement abo=
+ve.
+
+> +       default:
+> +               rc =3D -EOPNOTSUPP;
+> +       }
+> +       ACPI_FREE(obj);
+> +
+> +       return rc;
+
+How does the caller know whether or not they need to free the out
+object after calling this function?
+
+> +}
+> +
+> +static int wbrf_record(struct acpi_device *adev, uint8_t action,
+> +                      struct wbrf_ranges_in *in)
+> +{
+> +       union acpi_object *argv4;
+> +       uint32_t num_of_ranges =3D 0;
+> +       uint32_t arg_idx =3D 0;
+> +       uint32_t loop_idx;
+> +       int ret;
+> +
+> +       if (!in)
+> +               return -EINVAL;
+> +
+> +       for (loop_idx =3D 0; loop_idx < ARRAY_SIZE(in->band_list);
+> +            loop_idx++)
+> +               if (in->band_list[loop_idx].start &&
+> +                   in->band_list[loop_idx].end)
+> +                       num_of_ranges++;
+> +
+> +       argv4 =3D kzalloc(sizeof(*argv4) * (2 * num_of_ranges + 2 + 1), G=
+FP_KERNEL);
+> +       if (!argv4)
+> +               return -ENOMEM;
+> +
+> +       argv4[arg_idx].package.type =3D ACPI_TYPE_PACKAGE;
+> +       argv4[arg_idx].package.count =3D 2 + 2 * num_of_ranges;
+> +       argv4[arg_idx++].package.elements =3D &argv4[1];
+> +       argv4[arg_idx].integer.type =3D ACPI_TYPE_INTEGER;
+> +       argv4[arg_idx++].integer.value =3D num_of_ranges;
+> +       argv4[arg_idx].integer.type =3D ACPI_TYPE_INTEGER;
+> +       argv4[arg_idx++].integer.value =3D action;
+> +
+> +       for (loop_idx =3D 0; loop_idx < ARRAY_SIZE(in->band_list);
+> +            loop_idx++) {
+> +               if (!in->band_list[loop_idx].start ||
+> +                   !in->band_list[loop_idx].end)
+> +                       continue;
+> +
+> +               argv4[arg_idx].integer.type =3D ACPI_TYPE_INTEGER;
+> +               argv4[arg_idx++].integer.value =3D in->band_list[loop_idx=
+].start;
+> +               argv4[arg_idx].integer.type =3D ACPI_TYPE_INTEGER;
+> +               argv4[arg_idx++].integer.value =3D in->band_list[loop_idx=
+].end;
+> +       }
+> +
+> +       ret =3D wbrf_dsm(adev, WBRF_RECORD, argv4, NULL);
+> +
+> +       kfree(argv4);
+> +
+> +       return ret;
+> +}
+> +
+> +int wbrf_add_exclusion(struct acpi_device *adev,
+> +                      struct wbrf_ranges_in *in)
+> +{
+> +       return wbrf_record(adev, WBRF_RECORD_ADD, in);
+> +}
+> +EXPORT_SYMBOL_GPL(wbrf_add_exclusion);
+> +
+> +int wbrf_remove_exclusion(struct acpi_device *adev,
+> +                         struct wbrf_ranges_in *in)
+> +{
+> +       return wbrf_record(adev, WBRF_RECORD_REMOVE, in);
+> +}
+> +EXPORT_SYMBOL_GPL(wbrf_remove_exclusion);
+> +
+> +bool wbrf_supported_producer(struct acpi_device *adev)
+> +{
+> +       return acpi_check_dsm(adev->handle, &wifi_acpi_dsm_guid,
+> +                             WBRF_REVISION,
+> +                             (1ULL << WBRF_RECORD) | (1ULL << WBRF_RETRI=
+EVE));
+
+I'm wondering if the BIT() macro would work here (and below).
+
+> +}
+> +EXPORT_SYMBOL_GPL(wbrf_supported_producer);
+> +
+> +static union acpi_object *
+> +acpi_evaluate_wbrf(acpi_handle handle, u64 rev, u64 func)
+> +{
+> +       acpi_status ret;
+> +       struct acpi_buffer buf =3D {ACPI_ALLOCATE_BUFFER, NULL};
+> +       union acpi_object params[4];
+> +       struct acpi_object_list input =3D {
+> +               .count =3D 4,
+> +               .pointer =3D params,
+> +       };
+> +
+> +       params[0].type =3D ACPI_TYPE_INTEGER;
+> +       params[0].integer.value =3D rev;
+> +       params[1].type =3D ACPI_TYPE_INTEGER;
+> +       params[1].integer.value =3D func;
+> +       params[2].type =3D ACPI_TYPE_PACKAGE;
+> +       params[2].package.count =3D 0;
+> +       params[2].package.elements =3D NULL;
+> +       params[3].type =3D ACPI_TYPE_STRING;
+> +       params[3].string.length =3D 0;
+> +       params[3].string.pointer=3D NULL;
+> +
+> +       ret =3D acpi_evaluate_object(handle, "WBRF", &input, &buf);
+> +       if (ACPI_SUCCESS(ret))
+> +               return (union acpi_object *)buf.pointer;
+> +
+> +       if (ret !=3D AE_NOT_FOUND)
+> +               acpi_handle_warn(handle,
+> +                                "failed to evaluate WBRF(0x%x)\n", ret);
+
+Why _warn()?
+
+> +
+> +       return NULL;
+> +}
+> +
+> +static bool check_acpi_wbrf(acpi_handle handle, u64 rev, u64 funcs)
+> +{
+> +       int i;
+> +       u64 mask =3D 0;
+> +       union acpi_object *obj;
+> +
+> +       if (funcs =3D=3D 0)
+> +               return false;
+> +
+> +       obj =3D acpi_evaluate_wbrf(handle, rev, 0);
+> +       if (!obj)
+> +               return false;
+> +
+> +       if (obj->type !=3D ACPI_TYPE_BUFFER)
+> +               return false;
+> +
+> +       for (i =3D 0; i < obj->buffer.length && i < 8; i++)
+> +               mask |=3D (((u64)obj->buffer.pointer[i]) << (i * 8));
+
+What is going on here?  Any comment to explain it?
+
+> +       ACPI_FREE(obj);
+> +
+> +       /*
+> +        * Bit 0 indicates whether there's support for any functions othe=
+r than
+> +        * function 0.
+> +        */
+> +       if ((mask & 0x1) && (mask & funcs) =3D=3D funcs)
+> +               return true;
+> +
+> +       return false;
+> +}
+> +
+> +bool wbrf_supported_consumer(struct acpi_device *adev)
+> +{
+> +       return check_acpi_wbrf(adev->handle,
+> +                              WBRF_REVISION,
+> +                              1ULL << WBRF_RETRIEVE);
+> +}
+> +EXPORT_SYMBOL_GPL(wbrf_supported_consumer);
+> +
+> +int wbrf_retrieve_exclusions(struct acpi_device *adev,
+> +                            struct wbrf_ranges_out *exclusions_out)
+> +{
+> +       union acpi_object *obj;
+> +
+> +       obj =3D acpi_evaluate_wbrf(adev->handle,
+> +                                WBRF_REVISION,
+> +                                WBRF_RETRIEVE);
+> +       if (!obj)
+> +               return -EINVAL;
+> +
+> +       memcpy(exclusions_out, obj->buffer.pointer, obj->buffer.length);
+
+How is it guaranteed that the length of the buffer will not exceed the
+size of memory allocated by the caller for the data?
+
+> +
+> +       ACPI_FREE(obj);
+> +
+> +       return 0;
+> +}
+> +EXPORT_SYMBOL_GPL(wbrf_retrieve_exclusions);
+> diff --git a/include/linux/wbrf.h b/include/linux/wbrf.h
+> new file mode 100644
+> index 000000000000..e4c99b69f1d2
+> --- /dev/null
+> +++ b/include/linux/wbrf.h
+> @@ -0,0 +1,55 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/*
+> + * AMD Wifi Band Exclusion Interface
+> + * Copyright (C) 2023 Advanced Micro Devices
+> + */
+> +
+> +#ifndef _LINUX_WBRF_H
+> +#define _LINUX_WBRF_H
+> +
+> +#include <linux/acpi.h>
+> +
+> +/* Maximum number of wbrf ranges */
+> +#define MAX_NUM_OF_WBRF_RANGES         11
+> +
+> +struct exclusion_range {
+> +       /* start and end point of the frequency range in Hz */
+> +       uint64_t        start;
+> +       uint64_t        end;
+> +};
+> +
+> +struct wbrf_ranges_in {
+> +       /* valid entry: `start` and `end` filled with non-zero values */
+> +       struct exclusion_range  band_list[MAX_NUM_OF_WBRF_RANGES];
+> +};
+> +
+> +struct wbrf_ranges_out {
+> +       uint32_t                num_of_ranges;
+> +       struct exclusion_range  band_list[MAX_NUM_OF_WBRF_RANGES];
+> +} __attribute__((packed));
+> +
+> +/**
+> + * APIs needed by drivers/subsystems for contributing frequencies:
+> + * During probe, check `wbrf_supported_producer` to see if WBRF is suppo=
+rted.
+> + * If adding frequencies, then call `wbrf_add_exclusion` with the
+> + * start and end points specified for the frequency ranges added.
+> + * If removing frequencies, then call `wbrf_remove_exclusion` with
+> + * start and end points specified for the frequency ranges added.
+> + */
+> +bool wbrf_supported_producer(struct acpi_device *adev);
+> +int wbrf_add_exclusion(struct acpi_device *adev,
+> +                      struct wbrf_ranges_in *in);
+> +int wbrf_remove_exclusion(struct acpi_device *adev,
+> +                         struct wbrf_ranges_in *in);
+> +
+> +/**
+> + * APIs needed by drivers/subsystems responding to frequencies:
+> + * During probe, check `wbrf_supported_consumer` to see if WBRF is suppo=
+rted.
+> + * When receiving an ACPI notification for some frequencies change, run
+> + * `wbrf_retrieve_exclusions` to retrieve the latest frequencies ranges.
+> + */
+> +int wbrf_retrieve_exclusions(struct acpi_device *adev,
+> +                            struct wbrf_ranges_out *out);
+> +bool wbrf_supported_consumer(struct acpi_device *adev);
+> +
+> +#endif /* _LINUX_WBRF_H */
+> --
+> 2.34.1
+>
 
