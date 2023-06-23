@@ -1,215 +1,241 @@
-Return-Path: <netdev+bounces-13410-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13411-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38B9A73B7C3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:43:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3BA0F73B7CC
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:43:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E885B281BD7
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:43:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF9EA28180A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:43:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DCFB568B;
-	Fri, 23 Jun 2023 12:41:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A6257488;
+	Fri, 23 Jun 2023 12:42:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 484208BEF
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:41:45 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2070f.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eab::70f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2E2CA271E
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 05:41:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YwGZmcnSrEg6+Cnu6ixdEl6Y2JII83qTWJFIAG5OjFWw7hBssqeyRHw9oQHurmlFGc8j6D04Z5yj1yPsp6IZn22tvgMWhYN1PtSKqvGAXBMbo9EtvOjumMIpsTobEy3u+NUGlMJ4y74jMIL5gy7IXwuhrmvOU9Kwrr+9T9DjJX41GavIgHMDVScNxAaB6/0V7XsNefnvPGdAzOghbqSqJw6rkikyVv5KkzRI1ucAeNcKIJH8S5EzfZQXtSYFNBcN+6jcoBDVgd3vCq3JOHBwMa7KERd05oXGDyZF8Gvqu64aTxXmBLIcsza/H6QMcDskPEQQuYnq15uJ/Cv2yLQ+Lw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=HUC+rgPKwQe4ZDtNkf0qJiI1kevFBQlwJ2R3g3biXdQ=;
- b=YvQ1FUmFEW3L08Aom+FijlwblODN45MILP3DlUBcl6O/G9nrgbDMiRgA3KOi45ZkXFeRoCqMOecI/A7UnDVB/P+O5EYMVs3aoebYYsrCk3VXz1sxQm5GP/vMdDfbJPYhPxiUvwe8I0Ns5HDMygcwZPfv7/6yf/jCg3ttl6Q+WJ4mI11Qe6RFIyUEYNuns+nZE1IINQxwXDuLf3U/Y8T4sF0TsXMZAVMNwFmRl9brjqj4lxX7PrnUFLfyhVDEhpXmfI/5wqYnOCZg0Rw7H/TagGj0VFajyYa5itYiK8cwov92SRUBfCX1/7BSdYES70hK8fLUEyU5i9Fev8RIrdw/Ng==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=HUC+rgPKwQe4ZDtNkf0qJiI1kevFBQlwJ2R3g3biXdQ=;
- b=JEcQnBdHewsDNYcEeDspCwppy2jr2AUOSds0lzO5mAFa3AhEkFxAWbyPT9UDemA/Rmkpp7i0TeG0Ku8xc+cRr4p7MX1MW0cNriqDiFT67HfDI5mej2YSQn7lv0jD6Nf6zXK67EHegGEYd3stqUWGpUo+oeoW2I2/hf+U18vQkQg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SA1PR13MB5467.namprd13.prod.outlook.com (2603:10b6:806:232::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 23 Jun
- 2023 12:41:28 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Fri, 23 Jun 2023
- 12:41:28 +0000
-Date: Fri, 23 Jun 2023 14:41:21 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Nick Child <nnac123@linux.ibm.com>
-Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com,
-	mpe@ellerman.id.au, kuba@kernel.org, tlfalcon@linux.ibm.com,
-	danymadden@us.ibm.com, npiggin@gmail.com,
-	christophe.leroy@csgroup.eu, davem@davemloft.net, pabeni@redhat.com,
-	edumazet@google.com, linuxppc-dev@lists.ozlabs.org
-Subject: Re: [PATCH net] ibmvnic: Do not reset dql stats on NON_FATAL err
-Message-ID: <ZJWS8coDN71C/oeE@corigine.com>
-References: <20230622190332.29223-1-nnac123@linux.ibm.com>
- <ZJVPMyO/gBkk1OT0@corigine.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJVPMyO/gBkk1OT0@corigine.com>
-X-ClientProxiedBy: AS4P190CA0021.EURP190.PROD.OUTLOOK.COM
- (2603:10a6:20b:5d0::6) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 718198F46;
+	Fri, 23 Jun 2023 12:42:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9DB4BC433C8;
+	Fri, 23 Jun 2023 12:41:45 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687524146;
+	bh=ljQRDIRYG4TydFhjD0LuSn8BREerPmb4Ipkpa2QAq6Q=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=apfm6xvoeO6UvUfxPwNSOl0FaLWJ7ShkzzPeuSOb0bank70626+jFCCnlqxUCd2NX
+	 mV+Eb3SlbyeKtShM0cPnGoccCVrProiQPYgaM4HyeW5epsbNbu8US+O9nrIP4r+ghW
+	 Y8FmG2CVOdPNZ1eNovI71PsOzsGS/p5EOkEcjtA4zTWfFdhpQkNKBq1hEMuzxsWytK
+	 w9zTBeB4xmhiyjllhLtRaoNC8lgBTTH19xNIsLsgb+18yFVUlxxLoSku7XQ5A1i1lR
+	 WF4IRekFC21BVGIj1AxyqNGVCxMph3jwY74VjiaGchsSc5v31PlBNGYvRkbk2aFmu+
+	 9KQZIm3JpdS0g==
+Date: Fri, 23 Jun 2023 14:41:42 +0200
+From: Christian Brauner <brauner@kernel.org>
+To: Jeff Layton <jlayton@kernel.org>
+Cc: Steven Rostedt <rostedt@goodmis.org>, Jeremy Kerr <jk@ozlabs.org>,
+	Arnd Bergmann <arnd@arndb.de>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nicholas Piggin <npiggin@gmail.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Christian Borntraeger <borntraeger@linux.ibm.com>,
+	Sven Schnelle <svens@linux.ibm.com>,
+	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	Arve =?utf-8?B?SGrDuG5uZXbDpWc=?= <arve@android.com>,
+	Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
+	Joel Fernandes <joel@joelfernandes.org>,
+	Carlos Llamas <cmllamas@google.com>,
+	Suren Baghdasaryan <surenb@google.com>,
+	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Brad Warrum <bwarrum@linux.ibm.com>,
+	Ritu Agarwal <rituagar@linux.ibm.com>,
+	Eric Van Hensbergen <ericvh@kernel.org>,
+	Latchesar Ionkov <lucho@ionkov.net>,
+	Dominique Martinet <asmadeus@codewreck.org>,
+	Christian Schoenebeck <linux_oss@crudebyte.com>,
+	David Sterba <dsterba@suse.com>,
+	David Howells <dhowells@redhat.com>,
+	Marc Dionne <marc.dionne@auristor.com>,
+	Alexander Viro <viro@zeniv.linux.org.uk>,
+	Ian Kent <raven@themaw.net>,
+	Luis de Bethencourt <luisbg@kernel.org>,
+	Salah Triki <salah.triki@gmail.com>,
+	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
+	Eric Biederman <ebiederm@xmission.com>,
+	Kees Cook <keescook@chromium.org>, Chris Mason <clm@fb.com>,
+	Josef Bacik <josef@toxicpanda.com>, Xiubo Li <xiubli@redhat.com>,
+	Ilya Dryomov <idryomov@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
+	coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
+	Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Tyler Hicks <code@tyhicks.com>, Ard Biesheuvel <ardb@kernel.org>,
+	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
+	Yue Hu <huyue2@coolpad.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
+	Namjae Jeon <linkinjeon@kernel.org>,
+	Sungjong Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>,
+	Theodore Ts'o <tytso@mit.edu>,
+	Andreas Dilger <adilger.kernel@dilger.ca>,
+	Jaegeuk Kim <jaegeuk@kernel.org>,
+	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
+	Miklos Szeredi <miklos@szeredi.hu>,
+	Bob Peterson <rpeterso@redhat.com>,
+	Andreas Gruenbacher <agruenba@redhat.com>,
+	Richard Weinberger <richard@nod.at>,
+	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
+	Mike Kravetz <mike.kravetz@oracle.com>,
+	Muchun Song <muchun.song@linux.dev>,
+	David Woodhouse <dwmw2@infradead.org>,
+	Dave Kleikamp <shaggy@kernel.org>, Tejun Heo <tj@kernel.org>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
+	Anton Altaparmakov <anton@tuxera.com>,
+	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
+	Mark Fasheh <mark@fasheh.com>,
+	Joseph Qi <joseph.qi@linux.alibaba.com>,
+	Bob Copeland <me@bobcopeland.com>,
+	Mike Marshall <hubcap@omnibond.com>,
+	Martin Brandenburg <martin@omnibond.com>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Iurii Zaikin <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,
+	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
+	Anders Larsen <al@alarsen.net>, Steve French <sfrench@samba.org>,
+	Paulo Alcantara <pc@manguebit.com>,
+	Ronnie Sahlberg <lsahlber@redhat.com>,
+	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
+	Sergey Senozhatsky <senozhatsky@chromium.org>,
+	Phillip Lougher <phillip@squashfs.org.uk>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Evgeniy Dushistov <dushistov@mail.ru>,
+	Hans de Goede <hdegoede@redhat.com>,
+	"Darrick J. Wong" <djwong@kernel.org>,
+	Damien Le Moal <dlemoal@kernel.org>,
+	Naohiro Aota <naohiro.aota@wdc.com>,
+	Johannes Thumshirn <jth@kernel.org>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Andrii Nakryiko <andrii@kernel.org>,
+	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+	Yonghong Song <yhs@fb.com>,
+	John Fastabend <john.fastabend@gmail.com>,
+	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
+	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
+	Hugh Dickins <hughd@google.com>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	John Johansen <john.johansen@canonical.com>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Stephen Smalley <stephen.smalley.work@gmail.com>,
+	Eric Paris <eparis@parisplace.org>, Juergen Gross <jgross@suse.com>,
+	Ruihan Li <lrh2000@pku.edu.cn>,
+	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
+	Wolfram Sang <wsa+renesas@sang-engineering.com>,
+	Udipto Goswami <quic_ugoswami@quicinc.com>,
+	Linyu Yuan <quic_linyyuan@quicinc.com>,
+	John Keeping <john@keeping.me.uk>,
+	Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
+	Dan Carpenter <error27@gmail.com>, Yuta Hayama <hayama@lineo.co.jp>,
+	Jozef Martiniak <jomajm@gmail.com>, Jens Axboe <axboe@kernel.dk>,
+	Alan Stern <stern@rowland.harvard.edu>,
+	Sandeep Dhavale <dhavale@google.com>,
+	Dave Chinner <dchinner@redhat.com>,
+	Johannes Weiner <hannes@cmpxchg.org>,
+	ZhangPeng <zhangpeng362@huawei.com>,
+	Viacheslav Dubeyko <slava@dubeyko.com>,
+	Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>,
+	Aditya Garg <gargaditya08@live.com>,
+	Erez Zadok <ezk@cs.stonybrook.edu>,
+	Yifei Liu <yifeliu@cs.stonybrook.edu>, Yu Zhe <yuzhe@nfschina.com>,
+	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
+	Oleg Kanatov <okanatov@gmail.com>,
+	"Dr. David Alan Gilbert" <linux@treblig.org>,
+	Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin <cgel.zte@gmail.com>,
+	Stefan Roesch <shr@devkernel.io>,
+	Zhihao Cheng <chengzhihao1@huawei.com>,
+	"Liam R. Howlett" <Liam.Howlett@Oracle.com>,
+	Alexey Dobriyan <adobriyan@gmail.com>,
+	Minghao Chi <chi.minghao@zte.com.cn>,
+	Seth Forshee <sforshee@digitalocean.com>,
+	Zeng Jingxiang <linuszeng@tencent.com>,
+	Bart Van Assche <bvanassche@acm.org>,
+	Mimi Zohar <zohar@linux.ibm.com>,
+	Roberto Sassu <roberto.sassu@huawei.com>,
+	Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>,
+	"Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
+	Chen Zhongjin <chenzhongjin@huawei.com>,
+	Zhengchao Shao <shaozhengchao@huawei.com>,
+	Rik van Riel <riel@surriel.com>,
+	Jingyu Wang <jingyuwang_vip@163.com>, Hangyu Hua <hbh25y@gmail.com>,
+	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
+	linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
+	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
+	autofs@vger.kernel.org, linux-mm@kvack.org,
+	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
+	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
+	linux-efi@vger.kernel.org, linux-erofs@lists.ozlabs.org,
+	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
+	cluster-devel@redhat.com, linux-um@lists.infradead.org,
+	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
+	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
+	linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
+	ocfs2-devel@oss.oracle.com, linux-karma-devel@lists.sourceforge.net,
+	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
+	linux-hardening@vger.kernel.org, reiserfs-devel@vger.kernel.org,
+	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
+	linux-trace-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
+	selinux@vger.kernel.org
+Subject: Re: [PATCH 00/79] fs: new accessors for inode->i_ctime
+Message-ID: <20230623-wegelagerei-kanzlei-45cdcf5da157@brauner>
+References: <20230621144507.55591-1-jlayton@kernel.org>
+ <20230621152141.5961cf5f@gandalf.local.home>
+ <2a5a069572b46b59dd16fe8d54e549a9b5bbb6eb.camel@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA1PR13MB5467:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4f27aecf-ed38-4d6e-d07c-08db73e72a2a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	y0s6zhhvidxiBu9bXCXJYXeNSp7ihQWqypHqBzDxLsEWBDvh5UNBoRFoHKYNnGtFalMBu1QTzJlosZyH56Ofd37C/BF06paXB5cj46lq6xU9mtVC3b49cV77r7lf1XbuM/Epk3/DhLiAKaN1RKcr/19mQs5bwFAANIbky3/lJTJhQolgY82b/Su9wqa/4rbU80KANmFS1/a5rpTNPCu+hpi+P+A1h+aY+fMf1JWivgXdlYDvKRMHLsY34lkirXDEA1XhlCs1husq3V93kVvs6eR9Jk5RR2Tfwl0s8dI6oCoPwAdIG7hwgIpflWFz0/LeeKwTc4/4mUllwEIr8UrbrNpIxRReA4EZkot/hHA4VbhkkhE1H0jzcHp4wSfC6L/1IhGCLSCK4HxCEUHBXkdb0KSmNWaCmuuoF1Tf6/kZCJCN9I19iYfj47+Rt8UkSXJLEMkPcD4HGsonEvummM2LMk7AxZw23dopXeouYGBzZMEzx/fxEX24J/WovooDjITluqK2glcBJMTQOmFD0SFrSMaAgli+oSt/3uQBYPLfWDo5UyqmD5LC+3PU7c6tslQZiEN2Zk3+rtqpND2INoYhKhY6gttvskiLELj5NOcQFM8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(136003)(39840400004)(366004)(451199021)(8676002)(7416002)(5660300002)(36756003)(44832011)(8936002)(38100700002)(2906002)(478600001)(6486002)(186003)(6666004)(2616005)(86362001)(6506007)(6512007)(66556008)(66946007)(6916009)(66476007)(83380400001)(316002)(41300700001)(4326008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Vgfz2q5Dzn1gUmPw6GZBmJHnxc58vq1LZ8RmXlhSXRUleQb/nVRaDV6ZltaP?=
- =?us-ascii?Q?WNaLHtwF6AnByE6YRPv5UQ53/+YUTdDZRUwmNNJSBpvZ/kVDfsHx7gyNjSev?=
- =?us-ascii?Q?myznYfw78vsROaKM8WJK6QLMoX9U5H7ucT20CyR1DFLEhtOZXPG/WPjva+mn?=
- =?us-ascii?Q?xgtjl/KZbVcvs4jWEleYuXJcEP+P26GF6xJp7/SaPNuHoiTDvo66fItdeUmw?=
- =?us-ascii?Q?Fhcztt491le8ozjSD8DfdP5FZ08Kx52220tLJ9MaBS7ymHwGJ+Fsx1tYfGBE?=
- =?us-ascii?Q?ZHjEEbLUxQguOK7WFM4y4QDUMUE1YR3SFLOyNHLKoZF9S5Wdp6vUtYZpXkoS?=
- =?us-ascii?Q?EBulCfzR1amd1ZVZwDIWLGIoUTRHW2eqNVlMChdTshRWdObDoHIyX6Y9CTHz?=
- =?us-ascii?Q?Wdd02Vc+GD5WdFGNNy5BGuu1LxzKC4/tZqyaazd/hQufyZpy6ew5tl8nr5r/?=
- =?us-ascii?Q?C9UK/Tuamz5HFU/AE/42QwxAmxhHch4UNxEKNId3GcMkPvsrs8ZJDICKLjxG?=
- =?us-ascii?Q?iqdA2ucdeGP1okxsKQLBtz3W07X3OAKjARLpnjH0eiyUI4vYzw2uriOsxOUi?=
- =?us-ascii?Q?w1xr746cl2ZLDG2qpksRTniWMuFR7QdPqYMft0DLsn3wBmzYgR/8+a2GkrHm?=
- =?us-ascii?Q?UH0J1V8fLrjPfefIToMh3Wc9o+A2ixnRHeRIc03p3cZqsNLhfSsQwQ9MCl3b?=
- =?us-ascii?Q?RpD5a4OMyXmavTUY+AXAcxZgxZf7V35f1mo1GDuzgk0yvN3PIPrAU1787uDt?=
- =?us-ascii?Q?iV6AzDa9Sagr++23HDM+LqIgeyAHgUlgpt4Dvpk8AnytCaSZCw4uC5/GKudE?=
- =?us-ascii?Q?6glS/Z0qyatb2qv2BP3gt/voVN/fNtlWXJdtgZzix8RGTxqhCmU6JiDdwY4o?=
- =?us-ascii?Q?LRoPjZEhifSVsvjIBY0uuPxNiqo2gE9AY+0LvW8yl1RtJsABsVTdxW9rlFOb?=
- =?us-ascii?Q?S86hPm4GSGaMp0K+2O7U6myC15Zol/JhSlAP/xhV6peZCb2cRBNNG6vXNjbS?=
- =?us-ascii?Q?lO576xkOejnfxSSytkCIJAoBlkwWCg7hkqwNI/hjmrH0lAcGFCr/RiidFKcz?=
- =?us-ascii?Q?VZXg57kOGgGC69nE/LO8bfSbWzJtWcvRBbQXZvFXbw9hzaTaLNR10qf0/SpR?=
- =?us-ascii?Q?K0mtViJyZV3NFuVZqTsiEz7KD8rrdV217XccUbLmnRiZvanu0wJhUH7gQcrL?=
- =?us-ascii?Q?1J6+qf34AtFLiQZ5UfmLcacAxtSzl2W+a+Qdirv+a+5VSVLqBX7iemrsZy3z?=
- =?us-ascii?Q?pQ/Sse5l4LW8PWQYs42B1JWskmA2oAsWNQbv1I9p2n52j6qPV4TM/jGKEvXq?=
- =?us-ascii?Q?HCaT8ol923wbfVzYL145/TbJMCgp8bruU5hHEVYd1WGTwjLZOBduuEhZbQCp?=
- =?us-ascii?Q?/wXlxnw9qRWhgyaWaJElyDAK/0rRG5s3LwpwsXforMPedv24aQYZWFOYxJuu?=
- =?us-ascii?Q?qQ3fflf+cnpdkdoueXOo78br6nVM4VWgNApSY7v0HtxJSCKRPiN3ly4mXeoB?=
- =?us-ascii?Q?POtiLu6/8YGaNMydiU8QPfVmvQo0wwNiR3c4fLBBm2nUgljUelIS2ZDcRFMQ?=
- =?us-ascii?Q?nTlexYdDjsrORQtncxUl1mEVi38CnX/w838a/OROo+l4/qT7XzsRUEOInps6?=
- =?us-ascii?Q?vv2MimaTAwpH5bRSRvnZ6Q4e65DZk/SnOg6EDKVh8Gacztqe2TIcllwAAE/e?=
- =?us-ascii?Q?1FYDJw=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4f27aecf-ed38-4d6e-d07c-08db73e72a2a
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 12:41:28.6354
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2t43w4o4ThBsQuQlacUNvI0w79zfHqvrB61kORr7p39v61iU/v9O6MsgSuV51/FFasLpy/pmxtJHpk0Xlaz+oZb7ZnBgYeTs/79kAkTXA88=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR13MB5467
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <2a5a069572b46b59dd16fe8d54e549a9b5bbb6eb.camel@kernel.org>
 
-On Fri, Jun 23, 2023 at 09:52:26AM +0200, Simon Horman wrote:
-> + maintainers and blamed authors
+On Wed, Jun 21, 2023 at 03:52:27PM -0400, Jeff Layton wrote:
+> On Wed, 2023-06-21 at 15:21 -0400, Steven Rostedt wrote:
+> > On Wed, 21 Jun 2023 10:45:05 -0400
+> > Jeff Layton <jlayton@kernel.org> wrote:
+> > 
+> > > Most of this conversion was done via coccinelle, with a few of the more
+> > > non-standard accesses done by hand. There should be no behavioral
+> > > changes with this set. That will come later, as we convert individual
+> > > filesystems to use multigrain timestamps.
+> > 
+> > BTW, Linus has suggested to me that whenever a conccinelle script is used,
+> > it should be included in the change log.
+> > 
+> 
+> Ok, here's what I have. I note again that my usage of coccinelle is
+> pretty primitive, so I ended up doing a fair bit of by-hand fixing after
+> applying these.
+> 
+> Given the way that this change is broken up into 77 patches by
+> subsystem, to which changelogs should I add it? I could add it to the
+> "infrastructure" patch, but that's the one where I _didn't_ use it. 
+> 
+> Maybe to patch #79 (the one that renames i_ctime)?
 
-A second time, because something went wrong with the first attempt.
-
-> On Thu, Jun 22, 2023 at 02:03:32PM -0500, Nick Child wrote:
-> > All ibmvnic resets, make a call to netdev_tx_reset_queue() when
-> > re-opening the device. netdev_tx_reset_queue() resets the num_queued
-> > and num_completed byte counters. These stats are used in Byte Queue
-> > Limit (BQL) algorithms. The difference between these two stats tracks
-> > the number of bytes currently sitting on the physical NIC. ibmvnic
-> > increases the number of queued bytes though calls to
-> > netdev_tx_sent_queue() in the drivers xmit function. When, VIOS reports
-> > that it is done transmitting bytes, the ibmvnic device increases the
-> > number of completed bytes through calls to netdev_tx_completed_queue().
-> > It is important to note that the driver batches its transmit calls and
-> > num_queued is increased every time that an skb is added to the next
-> > batch, not necessarily when the batch is sent to VIOS for transmission.
-> > 
-> > Unlike other reset types, a NON FATAL reset will not flush the sub crq
-> > tx buffers. Therefore, it is possible for the batched skb array to be
-> > partially full. So if there is call to netdev_tx_reset_queue() when
-> > re-opening the device, the value of num_queued (0) would not account
-> > for the skb's that are currently batched. Eventually, when the batch
-> > is sent to VIOS, the call to netdev_tx_completed_queue() would increase
-> > num_completed to a value greater than the num_queued. This causes a
-> > BUG_ON crash:
-> > 
-> > ibmvnic 30000002: Firmware reports error, cause: adapter problem.
-> > Starting recovery...
-> > ibmvnic 30000002: tx error 600
-> > ibmvnic 30000002: tx error 600
-> > ibmvnic 30000002: tx error 600
-> > ibmvnic 30000002: tx error 600
-> > ------------[ cut here ]------------
-> > kernel BUG at lib/dynamic_queue_limits.c:27!
-> > Oops: Exception in kernel mode, sig: 5
-> > [....]
-> > NIP dql_completed+0x28/0x1c0
-> > LR ibmvnic_complete_tx.isra.0+0x23c/0x420 [ibmvnic]
-> > Call Trace:
-> > ibmvnic_complete_tx.isra.0+0x3f8/0x420 [ibmvnic] (unreliable)
-> > ibmvnic_interrupt_tx+0x40/0x70 [ibmvnic]
-> > __handle_irq_event_percpu+0x98/0x270
-> > ---[ end trace ]---
-> > 
-> > Therefore, do not reset the dql stats when performing a NON_FATAL reset.
-> > Simply clearing the queues off bit is sufficient.
-> > 
-> > Fixes: 0d973388185d ("ibmvnic: Introduce xmit_more support using batched subCRQ hcalls")
-> > Signed-off-by: Nick Child <nnac123@linux.ibm.com>
-> > ---
-> >  drivers/net/ethernet/ibm/ibmvnic.c | 13 ++++++++++++-
-> >  1 file changed, 12 insertions(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/ibm/ibmvnic.c b/drivers/net/ethernet/ibm/ibmvnic.c
-> > index c63d3ec9d328..5523ab52ff2b 100644
-> > --- a/drivers/net/ethernet/ibm/ibmvnic.c
-> > +++ b/drivers/net/ethernet/ibm/ibmvnic.c
-> > @@ -1816,7 +1816,18 @@ static int __ibmvnic_open(struct net_device *netdev)
-> >  		if (prev_state == VNIC_CLOSED)
-> >  			enable_irq(adapter->tx_scrq[i]->irq);
-> >  		enable_scrq_irq(adapter, adapter->tx_scrq[i]);
-> > -		netdev_tx_reset_queue(netdev_get_tx_queue(netdev, i));
-> > +		/* netdev_tx_reset_queue will reset dql stats and set the stacks
-> > +		 * flag for queue status. During NON_FATAL resets, just
-> > +		 * clear the bit, don't reset the stats because there could
-> > +		 * be batched skb's waiting to be sent. If we reset dql stats,
-> > +		 * we risk num_completed being greater than num_queued.
-> > +		 * This will cause a BUG_ON in dql_completed().
-> > +		 */
-> > +		if (adapter->reset_reason == VNIC_RESET_NON_FATAL)
-> > +			clear_bit(__QUEUE_STATE_STACK_XOFF,
-> > +				  &netdev_get_tx_queue(netdev, i)->state);
-> > +		else
-> > +			netdev_tx_reset_queue(netdev_get_tx_queue(netdev, i));
-> >  	}
-> >  
-> >  	rc = set_link_state(adapter, IBMVNIC_LOGICAL_LNK_UP);
-> > -- 
-> > 2.31.1
-> > 
-> > 
+That works. I can also put this into a merge commit or pr message.
 
