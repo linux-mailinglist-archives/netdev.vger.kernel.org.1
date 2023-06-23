@@ -1,221 +1,100 @@
-Return-Path: <netdev+bounces-13535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4964573BEED
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:36:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5925973BF08
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:44:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 791831C21290
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:36:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADBD61C20992
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:43:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 905331078A;
-	Fri, 23 Jun 2023 19:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B74CA107B2;
+	Fri, 23 Jun 2023 19:43:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83CE4100D8
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:36:08 +0000 (UTC)
-Received: from smtp-fw-52004.amazon.com (smtp-fw-52004.amazon.com [52.119.213.154])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F6892701;
-	Fri, 23 Jun 2023 12:36:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687548966; x=1719084966;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=dNuGXLt0we9p+hFppdMGSMyPfBu4liJLrmYKjCSYNz8=;
-  b=cMe5GvGw7kk89ZjxYNC5nfJ0mIf65rdhw/f35LSzU4vPuId325tKY4W3
-   u8+K+eXewNOZ3iR+fpWJIyWLXOZv+gl7HCeP8M4QXPDItKAbSt66luzap
-   PEqf4cZjnITqOaDWq0PUWsiBeafvju2Fa954JVisl3z+EF56YkokNUuZr
-   o=;
-X-IronPort-AV: E=Sophos;i="6.01,152,1684800000"; 
-   d="scan'208";a="138824582"
-Received: from iad12-co-svc-p1-lb1-vlan2.amazon.com (HELO email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com) ([10.43.8.2])
-  by smtp-border-fw-52004.iad7.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 19:36:05 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2c-m6i4x-e7094f15.us-west-2.amazon.com (Postfix) with ESMTPS id B9F1240DB4;
-	Fri, 23 Jun 2023 19:35:59 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Fri, 23 Jun 2023 19:35:44 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.171.23) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.26;
- Fri, 23 Jun 2023 19:35:41 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <leitao@debian.org>
-CC: <asml.silence@gmail.com>, <axboe@kernel.dk>, <davem@davemloft.net>,
-	<edumazet@google.com>, <gregkh@linuxfoundation.org>,
-	<io-uring@vger.kernel.org>, <kuba@kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <kuniyu@amazon.com>
-Subject: [PATCH v3] io_uring: Add io_uring command support for sockets
-Date: Fri, 23 Jun 2023 12:35:32 -0700
-Message-ID: <20230623193532.88760-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230622215915.2565207-1-leitao@debian.org>
-References: <20230622215915.2565207-1-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ABF29100D8
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:43:56 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 967C12706
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:43:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687549434;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=BybjfG9PIBiqP0H/EMXr01t+EtZxTWT+jQSFanPQg3I=;
+	b=PdhDg3oszTLnnAsVzhy/DzfztBp0SYaPuPUPdTbBuXGXtGO15DZ620u46jAJZ6XtRwRthF
+	3aJbjgoIXkTLEJiSVwzf4AY/YzVkMXKcyVmwTdT0LZa5fSdOmp11sz4Zy+MQtz7H3diHiD
+	yj2w7k792SItMhAQVaGiuUjLRd3BdTk=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-124-QaxqV_GGPc-UL_KKq1DTLg-1; Fri, 23 Jun 2023 15:43:46 -0400
+X-MC-Unique: QaxqV_GGPc-UL_KKq1DTLg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 9BDBF835262;
+	Fri, 23 Jun 2023 19:43:28 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id CF0B4207B2BC;
+	Fri, 23 Jun 2023 19:43:26 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230623100040.4ebbeeb2@kernel.org>
+References: <20230623100040.4ebbeeb2@kernel.org> <20230623114425.2150536-1-dhowells@redhat.com> <20230623114425.2150536-4-dhowells@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>, Ilya Dryomov <idryomov@gmail.com>,
+    Xiubo Li <xiubli@redhat.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Alexander Duyck <alexander.duyck@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    David Ahern <dsahern@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+    Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org
+Subject: Re: [PATCH net-next v4 03/15] ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.171.23]
-X-ClientProxiedBy: EX19D045UWC003.ant.amazon.com (10.13.139.198) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-2.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2611114.1687549406.1@warthog.procyon.org.uk>
+Date: Fri, 23 Jun 2023 20:43:26 +0100
+Message-ID: <2611115.1687549406@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Breno Leitao <leitao@debian.org>
-Date: Thu, 22 Jun 2023 14:59:14 -0700
-> Enable io_uring commands on network sockets. Create two new
-> SOCKET_URING_OP commands that will operate on sockets.
-> 
-> In order to call ioctl on sockets, use the file_operations->io_uring_cmd
-> callbacks, and map it to a uring socket function, which handles the
-> SOCKET_URING_OP accordingly, and calls socket ioctls.
-> 
-> This patches was tested by creating a new test case in liburing.
-> Link: https://github.com/leitao/liburing/tree/io_uring_cmd
-> 
-> Signed-off-by: Breno Leitao <leitao@debian.org>
-> ---
-> V1 -> V2:
-> 	* Keep uring code outside of network core subsystem
-> 	* Uses ioctl to define uring operation
-> 	* Use a generic ioctl function, instead of copying it over
-> V2 -> V3:
-> 	* Do not use ioctl() helpers to create uring operations
-> 	* Rename uring_sock_cmd to io_uring_cmd_sock
-> ---
->  include/linux/io_uring.h      |  6 ++++++
->  include/uapi/linux/io_uring.h |  8 ++++++++
->  io_uring/uring_cmd.c          | 27 +++++++++++++++++++++++++++
->  net/socket.c                  |  2 ++
->  4 files changed, 43 insertions(+)
-> 
-> diff --git a/include/linux/io_uring.h b/include/linux/io_uring.h
-> index 7fe31b2cd02f..f00baf2929ff 100644
-> --- a/include/linux/io_uring.h
-> +++ b/include/linux/io_uring.h
-> @@ -71,6 +71,7 @@ static inline void io_uring_free(struct task_struct *tsk)
->  	if (tsk->io_uring)
->  		__io_uring_free(tsk);
->  }
-> +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags);
->  #else
->  static inline int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
->  			      struct iov_iter *iter, void *ioucmd)
-> @@ -102,6 +103,11 @@ static inline const char *io_uring_get_opcode(u8 opcode)
->  {
->  	return "";
->  }
-> +static inline int io_uring_cmd_sock(struct io_uring_cmd *cmd,
-> +				    unsigned int issue_flags)
-> +{
-> +	return -EOPNOTSUPP;
-> +}
->  #endif
->  
->  #endif
-> diff --git a/include/uapi/linux/io_uring.h b/include/uapi/linux/io_uring.h
-> index 0716cb17e436..5c25f8c98aa8 100644
-> --- a/include/uapi/linux/io_uring.h
-> +++ b/include/uapi/linux/io_uring.h
-> @@ -703,6 +703,14 @@ struct io_uring_recvmsg_out {
->  	__u32 flags;
->  };
->  
-> +/*
-> + * Argument for IORING_OP_URING_CMD when file is a socket
-> + */
-> +enum {
-> +	SOCKET_URING_OP_SIOCINQ		= 0,
-> +	SOCKET_URING_OP_SIOCOUTQ,
-> +};
-> +
->  #ifdef __cplusplus
->  }
->  #endif
-> diff --git a/io_uring/uring_cmd.c b/io_uring/uring_cmd.c
-> index 5e32db48696d..31ce59567295 100644
-> --- a/io_uring/uring_cmd.c
-> +++ b/io_uring/uring_cmd.c
-> @@ -7,6 +7,7 @@
->  #include <linux/nospec.h>
->  
->  #include <uapi/linux/io_uring.h>
-> +#include <uapi/asm-generic/ioctls.h>
->  
->  #include "io_uring.h"
->  #include "rsrc.h"
-> @@ -156,3 +157,29 @@ int io_uring_cmd_import_fixed(u64 ubuf, unsigned long len, int rw,
->  	return io_import_fixed(rw, iter, req->imu, ubuf, len);
->  }
->  EXPORT_SYMBOL_GPL(io_uring_cmd_import_fixed);
-> +
-> +int io_uring_cmd_sock(struct io_uring_cmd *cmd, unsigned int issue_flags)
-> +{
-> +	struct socket *sock = cmd->file->private_data;
-> +	struct sock *sk = sock->sk;
-> +	int ret, arg = 0;
+Jakub Kicinski <kuba@kernel.org> wrote:
 
-Please cache READ_ONCE(sk->sk_prot) here and reuse it.
+> >  		if (length == cursor->total_resid)
+> > -			more = MSG_MORE;
+> > -		ret = ceph_tcp_sendpage(con->sock, page, page_offset, length,
+> > -					more);
+> > +			msghdr.msg_flags |= MSG_MORE;
+> 
+> Should the condition also be flipped here, like you did below?
+> (can be a follow up if so)
 
-Thanks.
+Yeah - the "==" in the if-statement needs flipping to "!=".  I can send a
+follow-up patch for it or respin if you prefer.
 
-> +
-> +	if (!sk->sk_prot || !sk->sk_prot->ioctl)
-> +		return -EOPNOTSUPP;
-> +
-> +	switch (cmd->sqe->cmd_op) {
-> +	case SOCKET_URING_OP_SIOCINQ:
-> +		ret = sk->sk_prot->ioctl(sk, SIOCINQ, &arg);
-> +		if (ret)
-> +			return ret;
-> +		return arg;
-> +	case SOCKET_URING_OP_SIOCOUTQ:
-> +		ret = sk->sk_prot->ioctl(sk, SIOCOUTQ, &arg);
-> +		if (ret)
-> +			return ret;
-> +		return arg;
-> +	default:
-> +		return -EOPNOTSUPP;
-> +	}
-> +}
-> +EXPORT_SYMBOL_GPL(io_uring_cmd_sock);
-> diff --git a/net/socket.c b/net/socket.c
-> index b778fc03c6e0..09b105d00445 100644
-> --- a/net/socket.c
-> +++ b/net/socket.c
-> @@ -88,6 +88,7 @@
->  #include <linux/xattr.h>
->  #include <linux/nospec.h>
->  #include <linux/indirect_call_wrapper.h>
-> +#include <linux/io_uring.h>
->  
->  #include <linux/uaccess.h>
->  #include <asm/unistd.h>
-> @@ -159,6 +160,7 @@ static const struct file_operations socket_file_ops = {
->  #ifdef CONFIG_COMPAT
->  	.compat_ioctl = compat_sock_ioctl,
->  #endif
-> +	.uring_cmd =    io_uring_cmd_sock,
->  	.mmap =		sock_mmap,
->  	.release =	sock_close,
->  	.fasync =	sock_fasync,
-> -- 
-> 2.34.1
+David
+
 
