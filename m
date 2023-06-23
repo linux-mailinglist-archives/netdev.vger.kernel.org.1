@@ -1,103 +1,106 @@
-Return-Path: <netdev+bounces-13468-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13469-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02B9873BB82
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:21:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A77073BB8F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:24:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB6E1281BA8
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:21:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B80B1C2129E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:24:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D707CAD4F;
-	Fri, 23 Jun 2023 15:21:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D02CC151;
+	Fri, 23 Jun 2023 15:23:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90EF9AD4A
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:21:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 0CC9CC433C8;
-	Fri, 23 Jun 2023 15:21:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687533669;
-	bh=D+wwQ3+bHnykFGVXD+dgrnJVEACzOcRqV/6S0i66dhU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=FUqWYMwDIq6t9pJ5EOyBrul5YscdOcoX5YbC7VXoWWoMHvxCF1tz8B4x9CSNyhzTe
-	 nh03ExC8nq/JoAfZSvgHT7v2V/CCNORq1zmtIgf37rmAvESDqsO9Riu/bnd2lRo8OQ
-	 1dgblLAjnPGY7HMBl63VfxOyan9ntXVpfeLyPbw3yUh28ISHGhHOMD2hyJPoxbnj8z
-	 vLrdgeVrnmMgrAHvGnJ/wCgaTHY2TfoF7s6DlDXRrQb7NrE/OE/U1pN/YZJKKRsOMJ
-	 TocrLCaZ6p5TMnt7ExYxngcTCA8bBty2dE6TYKv2RrFQGZCJezsIa2CSs1Q/HMernj
-	 wX6UW0fx81QYQ==
-Date: Fri, 23 Jun 2023 08:21:08 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: Saeed Mahameed <saeed@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
- "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
- Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Tariq Toukan
- <tariqt@nvidia.com>, Shay Drory <shayd@nvidia.com>, Moshe Shemesh
- <moshe@nvidia.com>
-Subject: Re: [net-next 14/15] net/mlx5: Light probe local SFs
-Message-ID: <20230623082108.7a4973cc@kernel.org>
-In-Reply-To: <ZJVlbmR9bJknznPM@nanopsycho>
-References: <20230612105124.44c95b7c@kernel.org>
-	<ZIj8d8UhsZI2BPpR@x130>
-	<20230613190552.4e0cdbbf@kernel.org>
-	<ZIrtHZ2wrb3ZdZcB@nanopsycho>
-	<20230615093701.20d0ad1b@kernel.org>
-	<ZItMUwiRD8mAmEz1@nanopsycho>
-	<20230615123325.421ec9aa@kernel.org>
-	<ZJL3u/6Pg7R2Qy94@nanopsycho>
-	<ZJPsTVKUj/hCUozU@nanopsycho>
-	<20230622093523.18993f44@kernel.org>
-	<ZJVlbmR9bJknznPM@nanopsycho>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516CF8F4A
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:23:58 +0000 (UTC)
+Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id DE1451AC
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:23:54 -0700 (PDT)
+Received: (qmail 753372 invoked by uid 1000); 23 Jun 2023 11:23:53 -0400
+Date: Fri, 23 Jun 2023 11:23:53 -0400
+From: Alan Stern <stern@rowland.harvard.edu>
+To: syzbot <syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com>
+Cc: andreyknvl@google.com, davem@davemloft.net, dvyukov@google.com,
+  edumazet@google.com, gregkh@linuxfoundation.org, kbuild-all@lists.01.org,
+  kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
+  lkp@intel.com, netdev@vger.kernel.org, nogikh@google.com, oneukum@suse.com,
+  pabeni@redhat.com, syzkaller-bugs@googlegroups.com, troels@connectedcars.dk
+Subject: Re: [syzbot] [usb?] WARNING in usbnet_start_xmit/usb_submit_urb
+Message-ID: <0f685f2f-06df-4cf2-9387-34f5e3c8b7b7@rowland.harvard.edu>
+References: <000000000000a56e9105d0cec021@google.com>
+ <000000000000e298cd05fecc07d4@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <000000000000e298cd05fecc07d4@google.com>
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,SORTED_RECIPS,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 23 Jun 2023 11:27:10 +0200 Jiri Pirko wrote:
-> Thu, Jun 22, 2023 at 06:35:23PM CEST, kuba@kernel.org wrote:
-> >SG. For the IPU case when spawning from within the IPU can we still
-> >figure out what the auxdev id is going to be? If not maybe we should  
+On Fri, Jun 23, 2023 at 06:32:22AM -0700, syzbot wrote:
+> syzbot has bisected this issue to:
 > 
-> Yeah, the driver is assigning the auxdev id. I'm now trying to figure
-> out how to pass that to devlink code/user nicely. The devlink instance
-> for the SF does not exist yet, but we know what the handle is going to
-> be. Perhaps some sort of place holder instance would do. IDK.
+> commit 45bf39f8df7f05efb83b302c65ae3b9bc92b7065
+> Author: Alan Stern <stern@rowland.harvard.edu>
+> Date:   Tue Jan 31 20:49:04 2023 +0000
 > 
-> >add some form of UUID on both the port and the sf devlink instance?  
+>     USB: core: Don't hold device lock while reading the "descriptors" sysfs file
 > 
-> What about the MAC?
+> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124b5877280000
+> start commit:   692b7dc87ca6 Merge tag 'hyperv-fixes-signed-20230619' of g..
+> git tree:       upstream
+> final oops:     https://syzkaller.appspot.com/x/report.txt?x=114b5877280000
+> console output: https://syzkaller.appspot.com/x/log.txt?x=164b5877280000
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=2cbd298d0aff1140
+> dashboard link: https://syzkaller.appspot.com/bug?extid=63ee658b9a100ffadbe2
+> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1760094b280000
+> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1359cdf3280000
 > 
-> $ sudo devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 102
-> pci/0000:08:00.0/32769: type eth netdev eth8 flavour pcisf controller 0 pfnum 0 sfnum 102 splittable false
->   function:
->     hw_addr 00:00:00:00:00:00 state inactive opstate detached
-> $ sudo devlink port function set pci/0000:08:00.0/32769 hw_addr AA:22:33:44:55:66
-> $ sudo devlink port function set pci/0000:08:00.0/32769 state active
-> $ ip link show eth9
-> 15: eth9: <BROADCAST,MULTICAST> mtu 1500 qdisc noop state DOWN mode DEFAULT group default qlen 1000
->     link/ether aa:22:33:44:55:66 brd ff:ff:ff:ff:ff:ff
+> Reported-by: syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com
+> Fixes: 45bf39f8df7f ("USB: core: Don't hold device lock while reading the "descriptors" sysfs file")
 > 
-> There are 2 issues with this:
-> 1) If the hw_addr stays zeroed for activation, random MAC is generated
-> 2) On the SF side, the MAC is only seen for netdev. That is problematic
->    for SFs without netdev. However, I don't see why we cannot add
->    devlink port attr to expose hw_addr on the SF.
+> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
 
-Yeah, the fact that mac add of zero has special meaning could be
-problematic. Other vendors may get "inspired" by the legacy SR-IOV
-semantics of MAC addr of zero == user can decide, or whatnot.
-The value on the port is the admin-set MAC, not the current MAC
-of the SF after all, right? Probably best to find another way...
+The bisection result is wrong, but the issue still needs to be fixed.
 
-> >Maybe there's already some UUID in the vfio world we can co-opt?  
-> 
-> Let me check that out.
+Alan Stern
+
+#syz test: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/ v6.4-rc7
+
+Index: usb-devel/drivers/net/usb/usbnet.c
+===================================================================
+--- usb-devel.orig/drivers/net/usb/usbnet.c
++++ usb-devel/drivers/net/usb/usbnet.c
+@@ -1775,6 +1775,9 @@ usbnet_probe (struct usb_interface *udev
+ 	} else if (!info->in || !info->out)
+ 		status = usbnet_get_endpoints (dev, udev);
+ 	else {
++		u8		ep_addrs[3] = {
++			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0};
++
+ 		dev->in = usb_rcvbulkpipe (xdev, info->in);
+ 		dev->out = usb_sndbulkpipe (xdev, info->out);
+ 		if (!(info->flags & FLAG_NO_SETINT))
+@@ -1784,6 +1787,8 @@ usbnet_probe (struct usb_interface *udev
+ 		else
+ 			status = 0;
+ 
++		if (status == 0 && !usb_check_bulk_endpoints(udev, ep_addrs))
++			status = -EINVAL;
+ 	}
+ 	if (status >= 0 && dev->status)
+ 		status = init_status (dev, udev);
 
