@@ -1,102 +1,151 @@
-Return-Path: <netdev+bounces-13462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13464-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 94C2073BAF5
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:01:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E7EA873BB02
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:05:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCC06281B50
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:01:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21D191C21198
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:05:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAF7BAD24;
-	Fri, 23 Jun 2023 15:01:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3CC2CAD2E;
+	Fri, 23 Jun 2023 15:05:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE44DA95C
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:01:54 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38E4E170E
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:01:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687532512;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=paD23SqRCU3BAdfpZjI8QvlQvDMOZz4QBerkLVpXRi4=;
-	b=RB+FY97znSlnCaXuvGyUCkNLErdY8/UGS1FCXFp0kup9eNEGRVi9zvasXUQmPUh7rsYmUx
-	gY90Vyj+Jzw/+gOCMh2aoZ2/WxcSon7X0qe77Gx2A1z80yjBJe2Cjy/k1xqYolRuDI++8/
-	j0jOOrE83idFQPknvG8AxRRROALXWYg=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-669-cxKtgx3-Pd-7gJE_V0m8qA-1; Fri, 23 Jun 2023 11:01:47 -0400
-X-MC-Unique: cxKtgx3-Pd-7gJE_V0m8qA-1
-Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id E60573C108EB;
-	Fri, 23 Jun 2023 15:01:46 +0000 (UTC)
-Received: from fedora.redhat.com (unknown [10.39.192.62])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C8CF0492B01;
-	Fri, 23 Jun 2023 15:01:43 +0000 (UTC)
-From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-To: bjorn.helgaas@gmail.com
-Cc: Jinjian.Song@fibocom.com,
-	Reid.he@fibocom.com,
-	bjorn@helgaas.com,
-	haijun.liu@mediatek.com,
-	helgaas@kernel.org,
-	kuba@kernel.org,
-	netdev@vger.kernel.org,
-	rafael.wang@fibocom.com,
-	somashekhar.puttagangaiah@intel.com,
-	jtornosm@redhat.com
-Subject: Re: [v5,net-next]net: wwan: t7xx : V5 ptach upstream work
-Date: Fri, 23 Jun 2023 17:01:42 +0200
-Message-ID: <20230623150142.292838-1-jtornosm@redhat.com>
-In-Reply-To: <CABhMZUXyY6-cnxPcU5MFy2-RoVuCx65PUVwMKsM5gqhgtdNy2Q@mail.gmail.com>
-References: <CABhMZUXyY6-cnxPcU5MFy2-RoVuCx65PUVwMKsM5gqhgtdNy2Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2F5DAAD24
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:05:12 +0000 (UTC)
+Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D971510F6
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:05:06 -0700 (PDT)
+Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-312826ffedbso816481f8f.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:05:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687532705; x=1690124705;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=cs1KSJ9UrnFd8QnDhZFxPHhGj3XIdiVqhL8dVMT6b48=;
+        b=O/9duzCX3a0RpOyFDZxgj++rg5Jdve3OxQLiNTQLRfJ2C5bz12RbEHwQj/V6s/eyis
+         I7LQy2tS7SxrJOhtCKJZUI+FQS3/kdgF5clHG/FW0c1QxSBdD4DN/E8CeapWqy1QHrv7
+         cfl5hOEsSutdTqH9ORco7BrESTPOHdy7ygpjvqn9L/qcDdkevc8SU0qNsb2U4dhiLBbN
+         gvYu9TK5HdPnAK2Ir7wSYPoHV+t018WdeFOSRgvOYMSEq3kE/8/g+PUrxbE/nkzGsOEu
+         Oaed7WHXlEppNi4sb0Vseuzg2qmIL7mZw3XPqxQJK2s+g6cLMT7V3PEzPb9cPBFOhW9A
+         vaxw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687532705; x=1690124705;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=cs1KSJ9UrnFd8QnDhZFxPHhGj3XIdiVqhL8dVMT6b48=;
+        b=AA0guiMOWsfe+AV0A5Y5c9QQ4yxj8G0nCiVbyvwpDbnd0jLpKuEtXIPFAbAAgtT+0j
+         Dq4WRAcm9uFjcKiYICmG+Q1g7+yOFEc/oMT27+rKjQhq83KhL77ZE6EiKhri6LYGxBp4
+         s0RVxeU0JB8MxE1gWs09M+Z+zlANsjXTFmkN39iaOPAx6ILpR3yll5ii3MaEsgnj+Lm4
+         8Hjfwr+oktC/3iHjQt46RSGkrMuXha/1yImBODEN6QlcLSqn0YPNgfyJejSByBwJL48v
+         tNwekHQo0D1HF7kv84roKtDFT39hG9J0zWPE5NQN9hoXhp01+aokFIntDDUj9DEqaj7G
+         7kfw==
+X-Gm-Message-State: AC+VfDxMLZrIPzVkmEfGDK3lAbqlHZGEIXxnPPyto8N1cDxbRax7bIeJ
+	v9xYK+MY7b+sCSfN5yeJCFU=
+X-Google-Smtp-Source: ACHHUZ5j/rNKo5dkgHLwSXu1rz+mxJ6TZviQ9SX6LcxpKg2hCuAHznTf+oym0nDNZUq3ZKRQL3Z4Qw==
+X-Received: by 2002:a5d:5546:0:b0:30f:c042:95e3 with SMTP id g6-20020a5d5546000000b0030fc04295e3mr15884587wrw.11.1687532705068;
+        Fri, 23 Jun 2023 08:05:05 -0700 (PDT)
+Received: from [192.168.43.77] (82-132-230-75.dab.02.net. [82.132.230.75])
+        by smtp.gmail.com with ESMTPSA id f15-20020a5d4dcf000000b0030ae53550f5sm9761018wru.51.2023.06.23.08.05.04
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jun 2023 08:05:04 -0700 (PDT)
+Message-ID: <f3427348-41ee-e0bf-79b6-9ff5120e8110@gmail.com>
+Date: Fri, 23 Jun 2023 16:03:46 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH net-next v2] net/tcp: optimise locking for blocking splice
+Content-Language: en-US
+To: Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, dsahern@kernel.org,
+ pabeni@redhat.com, kuba@kernel.org
+References: <80736a2cc6d478c383ea565ba825eaf4d1abd876.1687523671.git.asml.silence@gmail.com>
+ <CANn89i+fhE76=i2J0VFacQoOqqA_iJNLazjbcHFGpu4JA6+1BQ@mail.gmail.com>
+From: Pavel Begunkov <asml.silence@gmail.com>
+In-Reply-To: <CANn89i+fhE76=i2J0VFacQoOqqA_iJNLazjbcHFGpu4JA6+1BQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-I have a proposal because at this moment with the current status, t7xx is not
-functional due to problems like this if there is no activity:
-[   57.370534] mtk_t7xx 0000:72:00.0: [PM] SAP suspend error: -110
-[   57.370581] mtk_t7xx 0000:72:00.0: can't suspend
-    (t7xx_pci_pm_runtime_suspend [mtk_t7xx] returned -110)
-and after this the traffic is not working.
+On 6/23/23 15:17, Eric Dumazet wrote:
+> On Fri, Jun 23, 2023 at 2:40 PM Pavel Begunkov <asml.silence@gmail.com> wrote:
+>>
+>> Even when tcp_splice_read() reads all it was asked for, for blocking
+>> sockets it'll release and immediately regrab the socket lock, loop
+>> around and break on the while check.
+>>
+>> Check tss.len right after we adjust it, and return if we're done.
+>> That saves us one release_sock(); lock_sock(); pair per successful
+>> blocking splice read.
+>>
+>> Signed-off-by: Pavel Begunkov <asml.silence@gmail.com>
+>> ---
+>>
+>> v2: go with Paolo's suggestion
+>>      aggressively shrink the patch
+>>
+>>   net/ipv4/tcp.c | 2 +-
+>>   1 file changed, 1 insertion(+), 1 deletion(-)
+>>
+>> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+>> index 71b42eef9dbf..d56edc2c885f 100644
+>> --- a/net/ipv4/tcp.c
+>> +++ b/net/ipv4/tcp.c
+>> @@ -839,7 +839,7 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
+>>                  tss.len -= ret;
+>>                  spliced += ret;
+>>
+>> -               if (!timeo)
+>> +               if (!tss.len || !timeo)
+>>                          break;
+>>                  release_sock(sk);
+>>                  lock_sock(sk);
+> 
+> SGTM, thanks.
+> 
+> Reviewed-by: Eric Dumazet <edumazet@google.com>
+> 
+> I wonder if the "release_sock();sock_lock();"  could be replaced by
+> sk_flush_backlog() anyway ?
+> Or is there any other reason for this dance ?
 
-As yu know the situation was stalled and it seems that the final solution for
-the complete series can take longer, so in order to have at least the modem
-working, it would be enough if just the first commit of the series is
-re-applied (d20ef656f994 net: wwan: t7xx: Add AP CLDMA). With that, the
-Application Processor would be controlled, correctly suspended and the
-commented problems would be fixed (I am testing here like this with no related
-issue).
+Now as you mentioned, it definitely sounds like that. And the code
+is 15 years old, perhaps nobody was paying attention.
 
-I think the first commit of the series is independent of the others and it can
-be re-applied cleanly. Later on, the other commits related to fw flashing and 
-coredump collection new features could be added taking into account Bjorn's 
-comments (and of course updated doc if needed).
 
-Thanks
-Jose Ignacio
+> diff --git a/net/ipv4/tcp.c b/net/ipv4/tcp.c
+> index 71b42eef9dbf527098963bc03deecf55042e2021..d03d38060944d63d2728a7bf90a5c117b7852d8b
+> 100644
+> --- a/net/ipv4/tcp.c
+> +++ b/net/ipv4/tcp.c
+> @@ -841,8 +841,7 @@ ssize_t tcp_splice_read(struct socket *sock, loff_t *ppos,
+> 
+>                  if (!timeo)
+>                          break;
+> -               release_sock(sk);
+> -               lock_sock(sk);
+> +               sk_flush_backlog();
+> 
+>                  if (sk->sk_err || sk->sk_state == TCP_CLOSE ||
+>                      (sk->sk_shutdown & RCV_SHUTDOWN) ||
 
+-- 
+Pavel Begunkov
 
