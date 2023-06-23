@@ -1,82 +1,78 @@
-Return-Path: <netdev+bounces-13458-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13459-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A2F6B73BA5F
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:41:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 033DE73BA99
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5CB24281BD3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:41:17 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6297281C85
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:50:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79C0A8486;
-	Fri, 23 Jun 2023 14:41:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84E02AD25;
+	Fri, 23 Jun 2023 14:49:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6752323101
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:41:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5C662107
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:41:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78920AD24
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:49:53 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 126EAE42
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:49:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687531267;
+	s=mimecast20190719; t=1687531790;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 to:to:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=sqYSUw7QzPfprFmPveFR/00tu6i/Fm8VFN1BravdvaE=;
-	b=R6ClH6kE5BcINT99eOH/EYNsfNaFrsNPqvl1GYSjbPVIsGTR8SCAf8fVvKfwWcEEAWxjH0
-	lr6aX0GNY5/HnYw+Lhgh/smwQiRf4Y0WSZROUwSvSBRTex9cuQUt5VIlGR31HOWqEJ5dfi
-	4SWORiGHvBmQqJxGShQ62vF2BPfIt44=
-Received: from mail-qk1-f200.google.com (mail-qk1-f200.google.com
- [209.85.222.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=sa4vlkVpSuIcMxiE6ScAPKNIum7CDC6DiEwC59Fl7QI=;
+	b=AEBqP2N2Yr2pNr83sS/FsdAraVvvlj4LavWgxwHWJuzCXG9pxl1qDdWWG4JZqH4tWDEPDD
+	BYwvtozu4xxKWOpVc+BvDglKECFa1WExvBjwoq2Y2tm0fCPfGbzQbvpHCDGMHmLNp4T/e0
+	J3ELBC+cRmgCCk4dp5dxKjz/b9obJ6A=
+Received: from mail-ua1-f70.google.com (mail-ua1-f70.google.com
+ [209.85.222.70]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-383-VsPnkpeROquzkYGU7Uctjw-1; Fri, 23 Jun 2023 10:41:06 -0400
-X-MC-Unique: VsPnkpeROquzkYGU7Uctjw-1
-Received: by mail-qk1-f200.google.com with SMTP id af79cd13be357-76077669a5aso17966785a.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:41:06 -0700 (PDT)
+ us-mta-610-ZJH-Wq14NWSsudqQGo1UJg-1; Fri, 23 Jun 2023 10:49:48 -0400
+X-MC-Unique: ZJH-Wq14NWSsudqQGo1UJg-1
+Received: by mail-ua1-f70.google.com with SMTP id a1e0cc1a2514c-78f229d2217so31224241.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:49:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687531266; x=1690123266;
+        d=1e100.net; s=20221208; t=1687531788; x=1690123788;
         h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=sqYSUw7QzPfprFmPveFR/00tu6i/Fm8VFN1BravdvaE=;
-        b=VniQ35p/f/YlcCVwTMhha9MXSwTIJnZZn39PK3mD/sfqpxfKHUuBLar4cMBUSvtiG/
-         qpQxSSV8Hte3mSGWSpxoFusJFxYljmNuN2sv+QrgOtJ8dCiJPn6W0SpGTuHJGpJZWKdH
-         8ii/ORJJCq1GJV0Ez7DTiuKdJAaPanw8MchwdnXtiDgaivi8Kjfr575iutf1QJkUI+LD
-         94MtB+Xt/A8dy/ZGeyvO+qz0UUsvAtJE0txR1rfT10zZSrFFe+/nqJsdryrl/52inI7U
-         Nar5nUQZUvt7Ulf8R8zES3m06Z3lCrI62EymXRHhfarFzfwfoMhLF3DP6MkQLV+nrMrC
-         4PRA==
-X-Gm-Message-State: AC+VfDyFBfShwdxZtXWxHLumsOgmhKryPwzwlUS4c9r/moOoD+QrOJJr
-	Hh6mnxsCeTqOvpVCIZTdYde9X4LGLyIDwLYeoqbTP8s8GJ+VtDErLX/Ye9PhaTpEGdJaq15PuKL
-	maKcRrFlBPIu9+529c+4h27CH
-X-Received: by 2002:a05:620a:c45:b0:75b:23a1:69e4 with SMTP id u5-20020a05620a0c4500b0075b23a169e4mr24288354qki.4.1687531265882;
-        Fri, 23 Jun 2023 07:41:05 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5N/IMdXrvX1b4+X6A/rHUywM2Pf2WsjHR+/tW1JW7belWg0QfWf7CK3sJH3AqiEPVgUJjNLQ==
-X-Received: by 2002:a05:620a:c45:b0:75b:23a1:69e4 with SMTP id u5-20020a05620a0c4500b0075b23a169e4mr24288332qki.4.1687531265552;
-        Fri, 23 Jun 2023 07:41:05 -0700 (PDT)
+         :in-reply-to:date:to:from:subject:message-id:x-gm-message-state:from
+         :to:cc:subject:date:message-id:reply-to;
+        bh=sa4vlkVpSuIcMxiE6ScAPKNIum7CDC6DiEwC59Fl7QI=;
+        b=Aw2E5vcEMne7egtO2UiY9UQRP+2T+ewoJ221XDiUZpMifXbONpLQildr6p4ehpjTda
+         Q194B79tDXb600IJQyprU/xZB2l8hDSlCD+CtI5d9PovxyDHlWW7sLxML/2GesWybeXy
+         oJRf6BR0NSpw6Xdk2S7A0+HDN2zTPeFepuHzBlkAapofNUU9B3xHStPTjTurzsFsSdHK
+         7WSko3wRM88wJFjxRaMNCZ8h2asnojRGtGw/QxPjfaUTVl1aJFabbyZtnfJu83yf9RTk
+         bXLmIKAOgfjK6BKaSchi5ex412FuR74dX19eKATnhU/Dknjb4DiVOmKu9VPuj8cNeXEJ
+         7D7w==
+X-Gm-Message-State: AC+VfDwz6Y2ZA2o3j/SQXDt6iZhBCkInRGt48Gx/Qt3brBYZvU0CTWbU
+	97R0OjKtyOzedvfv/wHr5njZevdUtgSKhktURaLzQSOpqHhpB2+Lfifefe/oXVPqF6PH7+f9GmT
+	h4Ygp8dtCMzA30TKS
+X-Received: by 2002:a05:6102:10c9:b0:440:9332:dc3d with SMTP id t9-20020a05610210c900b004409332dc3dmr9319053vsr.0.1687531787893;
+        Fri, 23 Jun 2023 07:49:47 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ47g/cMFGitkPreu/12ViEE/tTIHcui6yOL1l8vVTNojDwsaM1rCmqd5kLJmMgbAJF9NFz2gQ==
+X-Received: by 2002:a05:6102:10c9:b0:440:9332:dc3d with SMTP id t9-20020a05610210c900b004409332dc3dmr9319044vsr.0.1687531787591;
+        Fri, 23 Jun 2023 07:49:47 -0700 (PDT)
 Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
-        by smtp.gmail.com with ESMTPSA id r6-20020a05620a03c600b00761fc8a7bc4sm4585785qkm.22.2023.06.23.07.41.03
+        by smtp.gmail.com with ESMTPSA id y17-20020a0cf151000000b0062629cbff10sm5079280qvl.114.2023.06.23.07.49.45
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 07:41:05 -0700 (PDT)
-Message-ID: <55a98e578c8654fec32bef22e811336b3c59ed68.camel@redhat.com>
-Subject: Re: [PATCH net-next 2/9] mptcp: track some aggregate data counters
+        Fri, 23 Jun 2023 07:49:47 -0700 (PDT)
+Message-ID: <4057c9829b3b018d64190c8b43d3db938c40358c.camel@redhat.com>
+Subject: Re: [syzbot] [net?] BUG: sleeping function called from invalid
+ context in __lock_sock_fast
 From: Paolo Abeni <pabeni@redhat.com>
-To: Eric Dumazet <edumazet@google.com>, Matthieu Baerts
-	 <matthieu.baerts@tessares.net>
-Cc: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, "David S.
- Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Shuah Khan
- <shuah@kernel.org>,  netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Date: Fri, 23 Jun 2023 16:41:01 +0200
-In-Reply-To: <CANn89iK+yWD8jKwvRO_4-Kz7Qumk5WwmtwJDWMKDU2oLyDdGxA@mail.gmail.com>
-References: 
-	<20230620-upstream-net-next-20230620-mptcp-expose-more-info-and-misc-v1-0-62b9444bfd48@tessares.net>
-	 <20230620-upstream-net-next-20230620-mptcp-expose-more-info-and-misc-v1-2-62b9444bfd48@tessares.net>
-	 <CANn89iK+yWD8jKwvRO_4-Kz7Qumk5WwmtwJDWMKDU2oLyDdGxA@mail.gmail.com>
+To: syzbot <syzbot+c54a9e997982d1a7dc11@syzkaller.appspotmail.com>, 
+ bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org,  linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+ syzkaller-bugs@googlegroups.com
+Date: Fri, 23 Jun 2023 16:49:43 +0200
+In-Reply-To: <0000000000009f59f005feccf27e@google.com>
+References: <0000000000009f59f005feccf27e@google.com>
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
@@ -89,282 +85,137 @@ MIME-Version: 1.0
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-
-On Fri, 2023-06-23 at 16:25 +0200, Eric Dumazet wrote:
-> On Tue, Jun 20, 2023 at 6:30=E2=80=AFPM Matthieu Baerts
-> <matthieu.baerts@tessares.net> wrote:
-> >=20
-> > From: Paolo Abeni <pabeni@redhat.com>
-> >=20
-> > Currently there are no data transfer counters accounting for all
-> > the subflows used by a given MPTCP socket. The user-space can compute
-> > such figures aggregating the subflow info, but that is inaccurate
-> > if any subflow is closed before the MPTCP socket itself.
-> >=20
-> > Add the new counters in the MPTCP socket itself and expose them
-> > via the existing diag and sockopt. While touching mptcp_diag_fill_info(=
-),
-> > acquire the relevant locks before fetching the msk data, to ensure
-> > better data consistency
-> >=20
-> > Closes: https://github.com/multipath-tcp/mptcp_net-next/issues/385
-> > Signed-off-by: Paolo Abeni <pabeni@redhat.com>
-> > Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-> > Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-> > ---
-> >  include/uapi/linux/mptcp.h |  5 +++++
-> >  net/mptcp/options.c        | 10 ++++++++--
-> >  net/mptcp/protocol.c       | 11 ++++++++++-
-> >  net/mptcp/protocol.h       |  4 ++++
-> >  net/mptcp/sockopt.c        | 25 ++++++++++++++++++++-----
-> >  5 files changed, 47 insertions(+), 8 deletions(-)
-> >=20
-> > diff --git a/include/uapi/linux/mptcp.h b/include/uapi/linux/mptcp.h
-> > index 32af2d278cb4..a124be6ebbba 100644
-> > --- a/include/uapi/linux/mptcp.h
-> > +++ b/include/uapi/linux/mptcp.h
-> > @@ -123,6 +123,11 @@ struct mptcp_info {
-> >         __u8    mptcpi_local_addr_used;
-> >         __u8    mptcpi_local_addr_max;
-> >         __u8    mptcpi_csum_enabled;
-> > +       __u32   mptcpi_retransmits;
-> > +       __u64   mptcpi_bytes_retrans;
-> > +       __u64   mptcpi_bytes_sent;
-> > +       __u64   mptcpi_bytes_received;
-> > +       __u64   mptcpi_bytes_acked;
-> >  };
-> >=20
-> >  /*
-> > diff --git a/net/mptcp/options.c b/net/mptcp/options.c
-> > index 4bdcd2b326bd..c254accb14de 100644
-> > --- a/net/mptcp/options.c
-> > +++ b/net/mptcp/options.c
-> > @@ -1026,6 +1026,12 @@ u64 __mptcp_expand_seq(u64 old_seq, u64 cur_seq)
-> >         return cur_seq;
-> >  }
-> >=20
-> > +static void __mptcp_snd_una_update(struct mptcp_sock *msk, u64 new_snd=
-_una)
-> > +{
-> > +       msk->bytes_acked +=3D new_snd_una - msk->snd_una;
-> > +       msk->snd_una =3D new_snd_una;
-> > +}
-> > +
-> >  static void ack_update_msk(struct mptcp_sock *msk,
-> >                            struct sock *ssk,
-> >                            struct mptcp_options_received *mp_opt)
-> > @@ -1057,7 +1063,7 @@ static void ack_update_msk(struct mptcp_sock *msk=
-,
-> >                 __mptcp_check_push(sk, ssk);
-> >=20
-> >         if (after64(new_snd_una, old_snd_una)) {
-> > -               msk->snd_una =3D new_snd_una;
-> > +               __mptcp_snd_una_update(msk, new_snd_una);
-> >                 __mptcp_data_acked(sk);
-> >         }
-> >         mptcp_data_unlock(sk);
-> > @@ -1123,7 +1129,7 @@ bool mptcp_incoming_options(struct sock *sk, stru=
-ct sk_buff *skb)
-> >                 /* on fallback we just need to ignore the msk-level snd=
-_una, as
-> >                  * this is really plain TCP
-> >                  */
-> > -               msk->snd_una =3D READ_ONCE(msk->snd_nxt);
-> > +               __mptcp_snd_una_update(msk, READ_ONCE(msk->snd_nxt));
-> >=20
-> >                 __mptcp_data_acked(subflow->conn);
-> >                 mptcp_data_unlock(subflow->conn);
-> > diff --git a/net/mptcp/protocol.c b/net/mptcp/protocol.c
-> > index 9c756d675d4d..d5b8e488bce1 100644
-> > --- a/net/mptcp/protocol.c
-> > +++ b/net/mptcp/protocol.c
-> > @@ -377,6 +377,7 @@ static bool __mptcp_move_skb(struct mptcp_sock *msk=
-, struct sock *ssk,
-> >=20
-> >         if (MPTCP_SKB_CB(skb)->map_seq =3D=3D msk->ack_seq) {
-> >                 /* in sequence */
-> > +               msk->bytes_received +=3D copy_len;
-> >                 WRITE_ONCE(msk->ack_seq, msk->ack_seq + copy_len);
-> >                 tail =3D skb_peek_tail(&sk->sk_receive_queue);
-> >                 if (tail && mptcp_try_coalesce(sk, tail, skb))
-> > @@ -760,6 +761,7 @@ static bool __mptcp_ofo_queue(struct mptcp_sock *ms=
-k)
-> >                         MPTCP_SKB_CB(skb)->map_seq +=3D delta;
-> >                         __skb_queue_tail(&sk->sk_receive_queue, skb);
-> >                 }
-> > +               msk->bytes_received +=3D end_seq - msk->ack_seq;
-> >                 msk->ack_seq =3D end_seq;
-> >                 moved =3D true;
-> >         }
-> > @@ -1531,8 +1533,10 @@ static void mptcp_update_post_push(struct mptcp_=
-sock *msk,
-> >          * that has been handed to the subflow for transmission
-> >          * and skip update in case it was old dfrag.
-> >          */
-> > -       if (likely(after64(snd_nxt_new, msk->snd_nxt)))
-> > +       if (likely(after64(snd_nxt_new, msk->snd_nxt))) {
-> > +               msk->bytes_sent +=3D snd_nxt_new - msk->snd_nxt;
-> >                 msk->snd_nxt =3D snd_nxt_new;
-> > +       }
-> >  }
-> >=20
-> >  void mptcp_check_and_set_pending(struct sock *sk)
-> > @@ -2590,6 +2594,7 @@ static void __mptcp_retrans(struct sock *sk)
-> >         }
-> >         if (copied) {
-> >                 dfrag->already_sent =3D max(dfrag->already_sent, info.s=
-ent);
-> > +               msk->bytes_retrans +=3D copied;
-> >                 tcp_push(ssk, 0, info.mss_now, tcp_sk(ssk)->nonagle,
-> >                          info.size_goal);
-> >                 WRITE_ONCE(msk->allow_infinite_fallback, false);
-> > @@ -3102,6 +3107,10 @@ static int mptcp_disconnect(struct sock *sk, int=
- flags)
-> >         WRITE_ONCE(msk->csum_enabled, mptcp_is_checksum_enabled(sock_ne=
-t(sk)));
-> >         mptcp_pm_data_reset(msk);
-> >         mptcp_ca_reset(sk);
-> > +       msk->bytes_acked =3D 0;
-> > +       msk->bytes_received =3D 0;
-> > +       msk->bytes_sent =3D 0;
-> > +       msk->bytes_retrans =3D 0;
-> >=20
-> >         WRITE_ONCE(sk->sk_shutdown, 0);
-> >         sk_error_report(sk);
-> > diff --git a/net/mptcp/protocol.h b/net/mptcp/protocol.h
-> > index 47b46602870e..27adfcc5aaa2 100644
-> > --- a/net/mptcp/protocol.h
-> > +++ b/net/mptcp/protocol.h
-> > @@ -262,10 +262,13 @@ struct mptcp_sock {
-> >         u64             local_key;
-> >         u64             remote_key;
-> >         u64             write_seq;
-> > +       u64             bytes_sent;
-> >         u64             snd_nxt;
-> > +       u64             bytes_received;
-> >         u64             ack_seq;
-> >         atomic64_t      rcv_wnd_sent;
-> >         u64             rcv_data_fin_seq;
-> > +       u64             bytes_retrans;
-> >         int             rmem_fwd_alloc;
-> >         struct sock     *last_snd;
-> >         int             snd_burst;
-> > @@ -274,6 +277,7 @@ struct mptcp_sock {
-> >                                                  * recovery related fie=
-lds are under data_lock
-> >                                                  * protection
-> >                                                  */
-> > +       u64             bytes_acked;
-> >         u64             snd_una;
-> >         u64             wnd_end;
-> >         unsigned long   timer_ival;
-> > diff --git a/net/mptcp/sockopt.c b/net/mptcp/sockopt.c
-> > index e172a5848b0d..fa5055d5b029 100644
-> > --- a/net/mptcp/sockopt.c
-> > +++ b/net/mptcp/sockopt.c
-> > @@ -889,7 +889,9 @@ static int mptcp_getsockopt_first_sf_only(struct mp=
-tcp_sock *msk, int level, int
-> >=20
-> >  void mptcp_diag_fill_info(struct mptcp_sock *msk, struct mptcp_info *i=
-nfo)
-> >  {
-> > +       struct sock *sk =3D (struct sock *)msk;
-> >         u32 flags =3D 0;
-> > +       bool slow;
-> >=20
-> >         memset(info, 0, sizeof(*info));
-> >=20
-> > @@ -898,6 +900,9 @@ void mptcp_diag_fill_info(struct mptcp_sock *msk, s=
-truct mptcp_info *info)
-> >         info->mptcpi_add_addr_accepted =3D READ_ONCE(msk->pm.add_addr_a=
-ccepted);
-> >         info->mptcpi_local_addr_used =3D READ_ONCE(msk->pm.local_addr_u=
-sed);
-> >=20
-> > +       if (inet_sk_state_load(sk) =3D=3D TCP_LISTEN)
-> > +               return;
-> > +
-> >         /* The following limits only make sense for the in-kernel PM */
-> >         if (mptcp_pm_is_kernel(msk)) {
-> >                 info->mptcpi_subflows_max =3D
-> > @@ -915,11 +920,21 @@ void mptcp_diag_fill_info(struct mptcp_sock *msk,=
- struct mptcp_info *info)
-> >         if (READ_ONCE(msk->can_ack))
-> >                 flags |=3D MPTCP_INFO_FLAG_REMOTE_KEY_RECEIVED;
-> >         info->mptcpi_flags =3D flags;
-> > -       info->mptcpi_token =3D READ_ONCE(msk->token);
-> > -       info->mptcpi_write_seq =3D READ_ONCE(msk->write_seq);
-> > -       info->mptcpi_snd_una =3D READ_ONCE(msk->snd_una);
-> > -       info->mptcpi_rcv_nxt =3D READ_ONCE(msk->ack_seq);
-> > -       info->mptcpi_csum_enabled =3D READ_ONCE(msk->csum_enabled);
-> > +       mptcp_data_lock(sk);
-> > +       info->mptcpi_snd_una =3D msk->snd_una;
-> > +       info->mptcpi_rcv_nxt =3D msk->ack_seq;
-> > +       info->mptcpi_bytes_acked =3D msk->bytes_acked;
-> > +       mptcp_data_unlock(sk);
-> > +
-> > +       slow =3D lock_sock_fast(sk);
+On Fri, 2023-06-23 at 07:38 -0700, syzbot wrote:
+> Hello,
 >=20
-> This causes a lockdep issue.
+> syzbot found the following issue on:
 >=20
-> lock_sock_fast(sk) could sleep, if socket lock is owned by another proces=
-s.
+> HEAD commit:    98e95872f2b8 Merge branch 'mptcp-expose-more-info-and-sma=
+l..
+> git tree:       net-next
+> console output: https://syzkaller.appspot.com/x/log.txt?x=3D109c5c1b28000=
+0
+> kernel config:  https://syzkaller.appspot.com/x/.config?x=3Da4a7d74e6a7c3=
+211
+> dashboard link: https://syzkaller.appspot.com/bug?extid=3Dc54a9e997982d1a=
+7dc11
+> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binuti=
+ls for Debian) 2.35.2
 >=20
-> But we are called from a context where both a spin lock and
-> rcu_read_lock() are held.
+> Unfortunately, I don't have any reproducer for this issue yet.
+>=20
+> Downloadable assets:
+> disk image: https://storage.googleapis.com/syzbot-assets/9846b6358605/dis=
+k-98e95872.raw.xz
+> vmlinux: https://storage.googleapis.com/syzbot-assets/c2ebfcba122e/vmlinu=
+x-98e95872.xz
+> kernel image: https://storage.googleapis.com/syzbot-assets/c5c7c23565e4/b=
+zImage-98e95872.xz
+>=20
+> IMPORTANT: if you fix the issue, please add the following tag to the comm=
+it:
+> Reported-by: syzbot+c54a9e997982d1a7dc11@syzkaller.appspotmail.com
 >=20
 > BUG: sleeping function called from invalid context at net/core/sock.c:354=
 9
-> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 316, name: syz-exe=
-cutor.4
+> in_atomic(): 1, irqs_disabled(): 0, non_block: 0, pid: 10350, name: syz-e=
+xecutor.3
 > preempt_count: 1, expected: 0
 > RCU nest depth: 1, expected: 0
-> 7 locks held by syz-executor.4/316:
-> #0: ffffffff8e125408 (sock_diag_mutex){+.+.}-{3:3}, at:
-> sock_diag_rcv+0x1b/0x40 net/core/sock_diag.c:279
-> #1: ffffffff8e125588 (sock_diag_table_mutex){+.+.}-{3:3}, at:
-> sock_diag_rcv_msg net/core/sock_diag.c:259 [inline]
-> #1: ffffffff8e125588 (sock_diag_table_mutex){+.+.}-{3:3}, at:
-> sock_diag_rcv_msg+0x2d2/0x440 net/core/sock_diag.c:248
-> #2: ffff8880232bb688 (nlk_cb_mutex-SOCK_DIAG){+.+.}-{3:3}, at:
-> netlink_dump+0xbe/0xc50 net/netlink/af_netlink.c:2215
-> #3: ffffffff8e29a628 (inet_diag_table_mutex){+.+.}-{3:3}, at:
-> inet_diag_lock_handler+0x6e/0x100 net/ipv4/inet_diag.c:63
-> #4: ffffffff8c7990c0 (rcu_read_lock){....}-{1:2}, at:
-> mptcp_diag_dump_listeners net/mptcp/mptcp_diag.c:95 [inline]
-> #4: ffffffff8c7990c0 (rcu_read_lock){....}-{1:2}, at:
-> mptcp_diag_dump+0x7c8/0x1330 net/mptcp/mptcp_diag.c:197
-> #5: ffffc90001316bf0 (&h->lhash2[i].lock){+.+.}-{2:2}, at: spin_lock
-> include/linux/spinlock.h:350 [inline]
-> #5: ffffc90001316bf0 (&h->lhash2[i].lock){+.+.}-{2:2}, at:
-> mptcp_diag_dump_listeners net/mptcp/mptcp_diag.c:98 [inline]
-> #5: ffffc90001316bf0 (&h->lhash2[i].lock){+.+.}-{2:2}, at:
-> mptcp_diag_dump+0x838/0x1330 net/mptcp/mptcp_diag.c:197
-> #6: ffff88802c42a5f0 (msk_lock-AF_INET){+.+.}-{0:0}, at:
-> mptcp_diag_get_info+0x1ae/0x380 net/mptcp/mptcp_diag.c:224
+> 7 locks held by syz-executor.3/10350:
+>  #0: ffffffff8e125408 (sock_diag_mutex){+.+.}-{3:3}, at: sock_diag_rcv+0x=
+1b/0x40 net/core/sock_diag.c:279
+>  #1: ffffffff8e125588 (sock_diag_table_mutex){+.+.}-{3:3}, at: sock_diag_=
+rcv_msg net/core/sock_diag.c:259 [inline]
+>  #1: ffffffff8e125588 (sock_diag_table_mutex){+.+.}-{3:3}, at: sock_diag_=
+rcv_msg+0x2d2/0x440 net/core/sock_diag.c:248
+>  #2: ffff88802f311688 (nlk_cb_mutex-SOCK_DIAG){+.+.}-{3:3}, at: netlink_d=
+ump+0xbe/0xc50 net/netlink/af_netlink.c:2215
+>  #3: ffffffff8e29a628 (inet_diag_table_mutex){+.+.}-{3:3}, at: inet_diag_=
+lock_handler+0x6e/0x100 net/ipv4/inet_diag.c:63
+>  #4: ffffffff8c7990c0 (rcu_read_lock){....}-{1:2}, at: mptcp_diag_dump_li=
+steners net/mptcp/mptcp_diag.c:95 [inline]
+>  #4: ffffffff8c7990c0 (rcu_read_lock){....}-{1:2}, at: mptcp_diag_dump+0x=
+7c8/0x1330 net/mptcp/mptcp_diag.c:197
+>  #5: ffffc9000130c330 (&h->lhash2[i].lock){+.+.}-{2:2}, at: spin_lock inc=
+lude/linux/spinlock.h:350 [inline]
+>  #5: ffffc9000130c330 (&h->lhash2[i].lock){+.+.}-{2:2}, at: mptcp_diag_du=
+mp_listeners net/mptcp/mptcp_diag.c:98 [inline]
+>  #5: ffffc9000130c330 (&h->lhash2[i].lock){+.+.}-{2:2}, at: mptcp_diag_du=
+mp+0x838/0x1330 net/mptcp/mptcp_diag.c:197
+>  #6: ffff88805c820cf0 (msk_lock-AF_INET){+.+.}-{0:0}, at: mptcp_diag_get_=
+info+0x1ae/0x380 net/mptcp/mptcp_diag.c:224
 > Preemption disabled at:
 > [<0000000000000000>] 0x0
+> CPU: 1 PID: 10350 Comm: syz-executor.3 Not tainted 6.4.0-rc6-syzkaller-01=
+415-g98e95872f2b8 #0
+> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS G=
+oogle 05/27/2023
+> Call Trace:
+>  <TASK>
+>  __dump_stack lib/dump_stack.c:88 [inline]
+>  dump_stack_lvl+0x136/0x150 lib/dump_stack.c:106
+>  __might_resched+0x358/0x580 kernel/sched/core.c:10153
+>  __lock_sock_fast+0x25/0xe0 net/core/sock.c:3549
+>  lock_sock_fast include/net/sock.h:1744 [inline]
+>  mptcp_diag_fill_info+0x45c/0x9c0 net/mptcp/sockopt.c:930
+>  mptcp_diag_get_info+0x1ae/0x380 net/mptcp/mptcp_diag.c:224
+>  inet_sk_diag_fill+0x1258/0x1fd0 net/ipv4/inet_diag.c:342
+>  sk_diag_dump net/mptcp/mptcp_diag.c:24 [inline]
+>  sk_diag_dump net/mptcp/mptcp_diag.c:16 [inline]
+>  mptcp_diag_dump_listeners net/mptcp/mptcp_diag.c:125 [inline]
+>  mptcp_diag_dump+0xc5e/0x1330 net/mptcp/mptcp_diag.c:197
+>  __inet_diag_dump+0x114/0x2e0 net/ipv4/inet_diag.c:1179
+>  inet_diag_dump_compat+0x209/0x290 net/ipv4/inet_diag.c:1287
+>  netlink_dump+0x570/0xc50 net/netlink/af_netlink.c:2268
+>  __netlink_dump_start+0x6c0/0x9b0 net/netlink/af_netlink.c:2375
+>  netlink_dump_start include/linux/netlink.h:330 [inline]
+>  inet_diag_rcv_msg_compat+0x26d/0x2d0 net/ipv4/inet_diag.c:1321
+>  __sock_diag_cmd net/core/sock_diag.c:240 [inline]
+>  sock_diag_rcv_msg+0x2eb/0x440 net/core/sock_diag.c:269
+>  netlink_rcv_skb+0x165/0x440 net/netlink/af_netlink.c:2548
+>  sock_diag_rcv+0x2a/0x40 net/core/sock_diag.c:280
+>  netlink_unicast_kernel net/netlink/af_netlink.c:1339 [inline]
+>  netlink_unicast+0x547/0x7f0 net/netlink/af_netlink.c:1365
+>  netlink_sendmsg+0x925/0xe30 net/netlink/af_netlink.c:1913
+>  sock_sendmsg_nosec net/socket.c:724 [inline]
+>  sock_sendmsg+0xde/0x190 net/socket.c:747
+>  splice_to_socket+0x964/0xee0 fs/splice.c:915
+>  do_splice_from fs/splice.c:967 [inline]
+>  direct_splice_actor+0x114/0x180 fs/splice.c:1155
+>  splice_direct_to_actor+0x34a/0x9c0 fs/splice.c:1101
+>  do_splice_direct+0x1ad/0x280 fs/splice.c:1207
+>  do_sendfile+0xb19/0x12c0 fs/read_write.c:1254
+>  __do_sys_sendfile64 fs/read_write.c:1322 [inline]
+>  __se_sys_sendfile64 fs/read_write.c:1308 [inline]
+>  __x64_sys_sendfile64+0x1d0/0x210 fs/read_write.c:1308
+>  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+>  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+>  entry_SYSCALL_64_after_hwframe+0x63/0xcd
+> RIP: 0033:0x7fa74588c389
+> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f=
+7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff=
+ ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+> RSP: 002b:00007fa7443fe168 EFLAGS: 00000246 ORIG_RAX: 0000000000000028
+> RAX: ffffffffffffffda RBX: 00007fa7459ac050 RCX: 00007fa74588c389
+> RDX: 0000000000000000 RSI: 0000000000000006 RDI: 0000000000000009
+> RBP: 00007fa7458d7493 R08: 0000000000000000 R09: 0000000000000000
+> R10: 0000000021fd1ee9 R11: 0000000000000246 R12: 0000000000000000
+> R13: 00007ffca549394f R14: 00007fa7443fe300 R15: 0000000000022000
+>  </TASK>
+>=20
+>=20
+> ---
 
-Thank you for the report.
+#syz fix: mptcp: ensure listener is unhashed before updating the sk status
 
-out-of-order patches here. "mptcp: track some aggregate data counters"
-should have landed to net-next only after:
+Sorry for noise,
 
-57fc0f1ceaa4 mptcp: ensure listener is unhashed before updating the sk
-status
-
-The latter should explicitly avoid the critical scenario above. Anyhow
-the current net-next tree (after merging back net) should be ok (at
-least I can't repro the issue here).
-
-Thanks,
-
-Paolo
+/P
 
 
