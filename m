@@ -1,87 +1,208 @@
-Return-Path: <netdev+bounces-13490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D58473BD97
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:15:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8717073BD9E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:16:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 78BD01C212DE
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:15:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82A80281C85
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:16:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1779100C4;
-	Fri, 23 Jun 2023 17:15:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C9C07100C5;
+	Fri, 23 Jun 2023 17:16:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95ABE944B
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 17:15:31 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AD56D1993;
-	Fri, 23 Jun 2023 10:15:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=SeZTfRboSph8q/9PONDYfM5X/v8kIxHGYo8hlYw/b/Y=; b=meYin7AxcWQF4kyiUAioa1rkH1
-	z+2iBH71xpT8KAa5S0W3LvLOCrjWqT6SOBi9bx1MNbBW1xqVJEooaKLqesJ81ZiC6l84Et5IuBgvT
-	UGX/OpMWWR/h2kCH2P/loqD/7o4e5ekOU+rguSW/maUHm7P5soIeRPtYshhYZfwegkNs=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qCkNE-00HNVL-So; Fri, 23 Jun 2023 19:15:04 +0200
-Date: Fri, 23 Jun 2023 19:15:04 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Michael Walle <mwalle@kernel.org>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Yisen Zhuang <yisen.zhuang@huawei.com>,
-	Salil Mehta <salil.mehta@huawei.com>,
-	Florian Fainelli <florian.fainelli@broadcom.com>,
-	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
-	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
-	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 03/10] net: phy: introduce phy_is_c45()
-Message-ID: <583f9636-74ca-411b-80aa-87574a20a7a7@lunn.ch>
-References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
- <20230620-feature-c45-over-c22-v2-3-def0ab9ccee2@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B7327100C4
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 17:16:15 +0000 (UTC)
+Received: from mail-ej1-f47.google.com (mail-ej1-f47.google.com [209.85.218.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5256E26B0;
+	Fri, 23 Jun 2023 10:16:11 -0700 (PDT)
+Received: by mail-ej1-f47.google.com with SMTP id a640c23a62f3a-97ea801b0d0so18431166b.1;
+        Fri, 23 Jun 2023 10:16:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687540570; x=1690132570;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=++I0bwtrHbKq/ScVaI2y/wuFflAnqwfHn5bGDDiyGlI=;
+        b=jXXi2SdYecLvzVElNuZwoNI1N03atft4Xnx6F7tlW9k2s37WyP4sgcd3LkOqB/VYYh
+         72mrftUIQpN6kzY/vTG+XNBpK1QLu0q8cvHB2ej601wPQspgmKFJMRrRvL3eCPu+f843
+         CMm+BBd36D5MJzDa5KcQZdTKRUy07jdPwMIUFhh/hdXN6qxiE/4MOz82Qja8VbD5NUwB
+         OVMZeAcZrZW3LsE83cycD6CuLbPjid7y4Mx8ffkYwI3mnl1zMyZbAzmqEiM2PAEkEyrd
+         kaBRpLz3ZZGd4+Dk9eJduD9J6SEnZ1PRq4l4TsBjWYPXO5UEYMc8+BN9nvCvOSARDUB/
+         v40w==
+X-Gm-Message-State: AC+VfDxoxrOWDfeKeFjPwenlSlR1PaY/GFq/xDS06eXxalsdAA5SPJIK
+	xM7h04r4MEMv8vzvib2Fw5Z/6s5Bvsxz3PgO/XA=
+X-Google-Smtp-Source: ACHHUZ5US9J/ZgCAFTh5AYOguizpGxZnLeJHo3AK7Wd3X9ovii63C+dm6Qk1WKxgnt2LMEl9QMec3C8Z8RMvEXNgmWA=
+X-Received: by 2002:a17:906:73dd:b0:989:1ed3:d00b with SMTP id
+ n29-20020a17090673dd00b009891ed3d00bmr9073854ejl.4.1687540569572; Fri, 23 Jun
+ 2023 10:16:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230620-feature-c45-over-c22-v2-3-def0ab9ccee2@kernel.org>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230621054603.1262299-1-evan.quan@amd.com> <20230621054603.1262299-2-evan.quan@amd.com>
+ <CAJZ5v0iqy0yMJP5H7ub67R8R6i42=TcS_6+VF-+fWrM-9tYFQA@mail.gmail.com>
+ <c518da2a-5ba5-af7e-e26d-1973db7b4c9e@amd.com> <CAJZ5v0gnTt0pV4nF+jcYCyZuZXDNuRn3mS0bDoAv-ZDpetyxVg@mail.gmail.com>
+ <5d6f6a89-1c7f-3763-8616-b80fdc301603@amd.com>
+In-Reply-To: <5d6f6a89-1c7f-3763-8616-b80fdc301603@amd.com>
+From: "Rafael J. Wysocki" <rafael@kernel.org>
+Date: Fri, 23 Jun 2023 19:15:57 +0200
+Message-ID: <CAJZ5v0iwPqD5PhQ8OcXO_xncFwH824h=U7W50pyPMBqtPSpP=g@mail.gmail.com>
+Subject: Re: [PATCH V4 1/8] drivers/acpi: Add support for Wifi band RF mitigations
+To: "Limonciello, Mario" <mario.limonciello@amd.com>
+Cc: "Rafael J. Wysocki" <rafael@kernel.org>, Evan Quan <evan.quan@amd.com>, lenb@kernel.org, 
+	alexander.deucher@amd.com, christian.koenig@amd.com, Xinhui.Pan@amd.com, 
+	airlied@gmail.com, daniel@ffwll.ch, johannes@sipsolutions.net, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com, tzimmermann@suse.de, 
+	hdegoede@redhat.com, jingyuwang_vip@163.com, lijo.lazar@amd.com, 
+	jim.cromie@gmail.com, bellosilicio@gmail.com, andrealmeid@igalia.com, 
+	trix@redhat.com, jsg@jsg.id.au, arnd@arndb.de, linux-kernel@vger.kernel.org, 
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org, 
+	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 12:29:12PM +0200, Michael Walle wrote:
-> Provide a helper to determine if the PHY is a C45 one. This is a
-> preparation patch to remove the is_c45 field. No functional change.
+On Fri, Jun 23, 2023 at 6:48=E2=80=AFPM Limonciello, Mario
+<mario.limonciello@amd.com> wrote:
+>
+>
+> On 6/23/2023 11:28 AM, Rafael J. Wysocki wrote:
+> > On Fri, Jun 23, 2023 at 5:57=E2=80=AFPM Limonciello, Mario
+> > <mario.limonciello@amd.com> wrote:
+> >>
+> >> On 6/23/2023 9:52 AM, Rafael J. Wysocki wrote:
+> >>> On Wed, Jun 21, 2023 at 7:47=E2=80=AFAM Evan Quan <evan.quan@amd.com>=
+ wrote:
+> >>>> From: Mario Limonciello <mario.limonciello@amd.com>
+> >>>>
+> >>>> Due to electrical and mechanical constraints in certain platform des=
+igns
+> >>>> there may be likely interference of relatively high-powered harmonic=
+s of
+> >>>> the (G-)DDR memory clocks with local radio module frequency bands us=
+ed
+> >>>> by Wifi 6/6e/7.
+> >>>>
+> >>>> To mitigate this, AMD has introduced an ACPI based mechanism that
+> >>>> devices can use to notify active use of particular frequencies so
+> >>>> that devices can make relative internal adjustments as necessary
+> >>>> to avoid this resonance.
+> >>>>
+> >>>> In order for a device to support this, the expected flow for device
+> >>>> driver or subsystems:
+> >>>>
+> >>>> Drivers/subsystems contributing frequencies:
+> >>>>
+> >>>> 1) During probe, check `wbrf_supported_producer` to see if WBRF supp=
+orted
+> >>> The prefix should be acpi_wbrf_ or acpi_amd_wbrf_ even, so it is clea=
+r
+> >>> that this uses ACPI and is AMD-specific.
+> >> I guess if we end up with an intermediary library approach
+> >> wbrf_supported_producer makes sense and that could call acpi_wbrf_*.
+> >>
+> >> But with no intermediate library your suggestion makes sense.
+> >>
+> >> I would prefer not to make it acpi_amd as there is no reason that
+> >> this exact same problem couldn't happen on an
+> >> Wifi 6e + Intel SOC + AMD dGPU design too and OEMs could use the
+> >> same mitigation mechanism as Wifi6e + AMD SOC + AMD dGPU too.
+> > The mitigation mechanism might be the same, but the AML interface very
+> > well may be different.
+>
+>
+> Right.  I suppose right now we should keep it prefixed as "amd",
+> and if it later is promoted as a standard it can be renamed.
+>
+>
+> >
+> > My point is that this particular interface is AMD-specific ATM and I'm
+> > not aware of any plans to make it "standard" in some way.
+>
+>
+> Yeah; this implementation is currently AMD specific AML, but I
+> expect the exact same AML would be delivered to OEMs using the
+> dGPUs.
+>
+>
+> >
+> > Also if the given interface is specified somewhere, it would be good
+> > to have a pointer to that place.
+>
+>
+> It's a code first implementation.  I'm discussing with the
+> owners when they will release it.
+>
+>
+> >
+> >>> Whether or not there needs to be an intermediate library wrapped
+> >>> around this is a different matter.
+> > IMO individual drivers should not be expected to use this interface
+> > directly, as that would add to boilerplate code and overall bloat.
+>
+> The thing is the ACPI method is not a platform method.  It's
+> a function of the device (_DSM).
 
-Part of the problem you are addressing in this patchset is the mix up
-between the c45 register space and the access method to the c45
-register space.
+_DSM is an interface to the platform like any other AML, so I'm not
+really sure what you mean.
 
-> +static inline bool phy_is_c45(struct phy_device *phydev)
-> +{
-> +	return phydev->is_c45;
-> +}
+> The reason for having acpi_wbrf.c in the first place is to
+> avoid the boilerplate of the _DSM implementation across multiple
+> drivers.
 
-This helper, in the end, is about c45 registers. It is a bit wordy,
-but how about calling it phy_has_c45_registers()?
+Absolutely, drivers should not be bothered with having to use _DSM in
+any case.  However, they may not even realize that they are running on
+a system using ACPI and I'm not sure if they really should care.
 
-    Andrew
+> >
+> > Also whoever uses it, would first need to check if the device in
+> > question has an ACPI companion.
+>
+>
+> Which comes back to Andrew's point.
+> Either we:
+>
+> Have a generic wbrf_ helper that takes struct *device and
+> internally checks if there is an ACPI companion and support.
+>
+> or
+>
+> Do the check for support in mac80211 + applicable drivers
+> and only call the AMD WBRF ACPI method in those drivers in
+> those cases.
+
+Either of the above has problems IMO.
+
+The problem with the wbrf_ helper approach is that it adds
+(potentially) several pieces of interaction with the platform,
+potentially for every driver, in places where drivers don't do such
+things as a rule.
+
+The problem with the other approach is that the drivers in question
+now need to be aware of ACPI in general and the AMD WBRF interface in
+particular and if other similar interfaces are added by other vendors,
+they will have to learn about those as well.
+
+I think that we need to start over with a general problem statement
+that in some cases the platform needs to be consulted regarding radio
+frequencies that drivers would like to use, because it may need to
+adjust or simply say which ranges are "noisy" (or even completely
+unusable for that matter).  That should allow us to figure out how the
+interface should look like from the driver side and it should be
+possible to hook up the existing platform interface to that.
 
