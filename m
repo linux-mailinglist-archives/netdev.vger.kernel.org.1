@@ -1,310 +1,197 @@
-Return-Path: <netdev+bounces-13591-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13592-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F1ED773C234
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:13:08 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C86E073C236
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:13:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C7B61C213AE
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:13:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC6461C213D4
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:13:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7B69134C4;
-	Fri, 23 Jun 2023 21:13:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB317134CB;
+	Fri, 23 Jun 2023 21:13:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 95420134A0;
-	Fri, 23 Jun 2023 21:13:02 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 361C483;
-	Fri, 23 Jun 2023 14:13:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	MIME-Version:Message-Id:Date:Subject:Cc:To:From:Sender:Reply-To:Content-ID:
-	Content-Description:Resent-Date:Resent-From:Resent-Sender:Resent-To:Resent-Cc
-	:Resent-Message-ID:In-Reply-To:References;
-	bh=iM6XiYzcOvYvmJY1x36fh/FcKP0wY71gqcBtL3f0WTI=; b=jaTled3nUisRZQ7NLYEC62IV21
-	7Wr0puaAB7QlUmAh/bP3h4gl8qqfvJouQ/oL0eQd/vBnNlu645gMB7XmnLS+81x6835L4FFeubo6E
-	a3hD0Fd3mN5+gvzaGsuzaUK696RYWu3H4bgdqJMhP3ik/p1bYOebrEve+ZeKCp+yI88EgvalCoLAd
-	XqLRC6uixlLiKTThIwrAuuA5wQ7qhhUHMj95JwuSlZeWkXF+Ge4VmdFYji76I5jSe5/PVvIMQWUe2
-	uYeS43nAn1O7wm3B1QZ97CpD5KiImca9ZFXdGgpylkOmMv71SKD3ZVk8+xXWBcRb02b4xy5AASOu9
-	Ddk1wJZg==;
-Received: from 226.206.1.85.dynamic.wline.res.cust.swisscom.ch ([85.1.206.226] helo=localhost)
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qCo5R-0002ef-6C; Fri, 23 Jun 2023 23:12:57 +0200
-From: Daniel Borkmann <daniel@iogearbox.net>
-To: davem@davemloft.net
-Cc: kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com,
-	daniel@iogearbox.net,
-	ast@kernel.org,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: pull-request: bpf-next 2023-06-23
-Date: Fri, 23 Jun 2023 23:12:56 +0200
-Message-Id: <20230623211256.8409-1-daniel@iogearbox.net>
-X-Mailer: git-send-email 2.21.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D6FA711C98
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 21:13:29 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2103.outbound.protection.outlook.com [40.107.22.103])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E7542189;
+	Fri, 23 Jun 2023 14:13:26 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BsZ3pAMtDlZM1X4vvxziwS8KKof6/rFy7GvE/pNI6gl2O8CFjBYb5ZdRubheefMVRy0x9zoS+gp8lHb+52yrJXA1ySYdtcmK//Qloh3a6JnyNzxiCC6jOZM7um/I7T+FShJw4x5nvLhR0Ge5kl3eGbATr432GLCPDQOmIgStm3lb4MsB7vEO+wDaGhm7XeoEHUYGu+OlLRbBwO7mFUd5ipg/cLoxRDGRVPmkkRdsgyBpHJFJVhiphikv8JlOs6ksY2ELUhir009D/v+gAe+4gX6obQ9e7HU39YSLUbp+tUfItA76+jal2X3FOYz7NqAX/TS3MyvVwGkb5O5cklXxvA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tv82/JG2yYj1NUniIrwiSwP7xS6yGsoUSaEkMcQUtuU=;
+ b=MCZ9Bl/cBWqduWV1Lvoa7H6O5UmNJa0/B0UpSENSGddFd1WCSACqRp+tIMVuAWttTTu9nQVKNSj+f/GZ8rhu1McPvVXzNTl6Vgb56bZB4THsTB5fvXDtIvLwAlS1s1HX9bXr+v/Dgm+cJNXiXnFkNP1Z/uoK7PsN09z8S+aDdWI32TZLPrm6w+/XoigKvLoM5YBDPhjk57lHKGX7+QKlgRm80vqlDfpu1SA+WeoVgTWisdcAJjeChUjDRvRkDx435PBu8htuFX06XxtS3m+/OP3Vh4XRLcsmRbr83MR8c+eTI1w+nQlrHh5wt/yFYAKu9pgeeiaQFPa+W9ko3y2EjA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=victronenergy.com; dmarc=pass action=none
+ header.from=victronenergy.com; dkim=pass header.d=victronenergy.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=victronenergy.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Tv82/JG2yYj1NUniIrwiSwP7xS6yGsoUSaEkMcQUtuU=;
+ b=cJEkM8aT8aEEsJajSu/JL8vOwYY+roVL+dLeiVAbOmpiUKXrN84MqRnDhTHlb4M3H3EagwYSBlk0OVFJCJvmgPmjP3VT1DkdFp+S9WeV4kFEzwMpPiXtAFV3GswDKFW4+60L5TvyMSfrjmCGvE+yhndymbj+G6hikSAwsiLHtwU=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=victronenergy.com;
+Received: from DB9PR07MB8679.eurprd07.prod.outlook.com (2603:10a6:10:30e::14)
+ by DB9PR07MB9365.eurprd07.prod.outlook.com (2603:10a6:10:456::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 23 Jun
+ 2023 21:13:24 +0000
+Received: from DB9PR07MB8679.eurprd07.prod.outlook.com
+ ([fe80::8013:d5b9:e8ef:36c1]) by DB9PR07MB8679.eurprd07.prod.outlook.com
+ ([fe80::8013:d5b9:e8ef:36c1%3]) with mapi id 15.20.6521.026; Fri, 23 Jun 2023
+ 21:13:24 +0000
+Message-ID: <de546232-0638-318a-535f-169184933a20@victronenergy.com>
+Date: Fri, 23 Jun 2023 23:13:22 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v2] net: cpsw: fix obtaining mac address for am3517
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>, =?UTF-8?B?TcOlbnMgUnVsbGfDpXJk?=
+ <mans@mansr.com>
+Cc: Tony Lindgren <tony@atomide.com>, netdev@vger.kernel.org,
+ Mugunthan V N <mugunthanvnm@ti.com>,
+ Grygorii Strashko <grygorii.strashko@ti.com>,
+ "open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>,
+ open list <linux-kernel@vger.kernel.org>
+References: <1477668756-2651-1-git-send-email-jhofstee@victronenergy.com>
+ <20161028155213.2t3nwwe3lqaynaer@atomide.com>
+ <d8ad5cab-5183-cddf-fa9a-4e7b9b8c9377@victronenergy.com>
+ <20161028181914.mskebckucukzhxhz@atomide.com> <yw1x7cru445g.fsf@mansr.com>
+ <ZJX9FBBvOTv10IO4@corigine.com>
+From: Jeroen Hofstee <jhofstee@victronenergy.com>
+In-Reply-To: <ZJX9FBBvOTv10IO4@corigine.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: AS4P251CA0008.EURP251.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d2::16) To DB9PR07MB8679.eurprd07.prod.outlook.com
+ (2603:10a6:10:30e::14)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26948/Fri Jun 23 09:28:15 2023)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DB9PR07MB8679:EE_|DB9PR07MB9365:EE_
+X-MS-Office365-Filtering-Correlation-Id: a999b888-0a41-4fc7-e89c-08db742eae2a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Sq6rd2Hs2zc+hijuZKh2McTl2hIs7nKsb9/MtD8Zt16SGm7fGFHlsGneVaS/3b28RP6OxvLrSOITf/zZTkOdQU5xzOWOawE4Sv1rM7PVtVC6MRaaRkr2PxC6MBzAiBWWkDxy8iYrIxt4oXRxh9OrpAwNkOtDUzvBgoRSI+VmsNI3cTitBreDEkFaMR13D3q7y1+jMtOy1RdMOS33SX7JVJUpFl/+Bpul5Bsi0F3PMDTr5/Zr3QXm3rOq8PHbSC92rpDgdw3+5WVNdKUTPfLGH9krGROWSZAavHGwdKQDA0EORyguawUYGU/tXgvGRHGIvESQuZqJY8QMEeuEbGxITGOPHDOl9JWdkJeHhDBR+lT+pVL+AdJVOKDst2EHdI5VcY/utR9ZxJ6wvQbKVVbEjCOgsc3JzUoRgFCsHJBPpigtkZUTQS+lHV9JWskPLJtwPqqj3BmUxdqSbtQOkRuoAKkDZjj4IzJNR9MmW86SiEpBQ2beG2Y6+0VTRKB7wiZOCvwGYfUChactOYUb4VeA8kapX40exHO5K8DWQPIYe0CcVuPkQTrTR5iSKyr9rbAAdbd5v9NHr/9LwRyO31XgQ4qbPaEWX6t2NMxTuvo4r52adf0czjoIZLTq+2vTo+bPGhGwhOHNW5vNTjkDLlfu/QKtNhs3UmUG0G1mLdVE3sos8z7IPwAIru+dlqWkk224Go5Hl566uRYZv9kHNrdRsg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR07MB8679.eurprd07.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(39850400004)(136003)(396003)(346002)(451199021)(31686004)(53546011)(6512007)(186003)(6486002)(478600001)(110136005)(54906003)(2616005)(86362001)(31696002)(66476007)(66946007)(4326008)(66556008)(6506007)(41300700001)(66574015)(316002)(38100700002)(5660300002)(2906002)(8936002)(8676002)(36756003)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?SEcydldZZDZhZUo1KzVKUithcjExVzNPeDlUWWowa2pOQkV3MldvbFlFTXhV?=
+ =?utf-8?B?SWd6YzZVaXh6b3ZZU2tEbW02UEh5OXI4cmhGbmZkWHE2eFhZN2Z0WXpNTndF?=
+ =?utf-8?B?YXZPRHBMdkhZRG1uTk52NnQ5azUrMHhSdjF6c3BSTy9jQ205ZUxTV2prNGJw?=
+ =?utf-8?B?RmlINGZnNk9nMUI3cExaUTNhejczUjJOK1NXR2V1Y0hkR0UzbVI5Qm5ZNkJH?=
+ =?utf-8?B?MmM0ZTBUNEloRUtPYlpvWVVlNkVkVWZjelk1NTdjSnM3dXV0Y1dMaWVyTm9q?=
+ =?utf-8?B?cXk2TzdKVWtWLzIwQWZZckJaZ1ozUUNxYmo4THJodUNlbTdXWHBIR2JicTZo?=
+ =?utf-8?B?RGxpZVJUaFhsaWNoZDJLVWdJSUhqNU5ZcExOS0ZuUFVoOHJ6ZmVMMXRHT0NT?=
+ =?utf-8?B?UkpJQms1U2QrZzN2MGhTU2FzSlM4MHNvRkhZNHVFTGZhaWFFK3NCNUI1U3hC?=
+ =?utf-8?B?MFdFRjZDWFlHdFNCRDlUK2lBYWNNU2FSUVVrelBxR2FPcmkxVWt2bVJWdy8y?=
+ =?utf-8?B?NmxXT2lXQWIrdmh5MGlxNFoyUjlFK1JMWURaYjcrUmVId1RmTWMzOSs3c3Fk?=
+ =?utf-8?B?Y3BQeVJDZW9PcXFNYWpibjVvTmMvNVdNaklnNXdMdjB1UEhTa0hMS1JXczVo?=
+ =?utf-8?B?c3c3R1dlS2E1Snd6UVE4dW9hSFh2cVgwMGtJZXRXYWlMZEJCbUFWWDBaYXV3?=
+ =?utf-8?B?MlpRaUdSbmJDa3dURXV6aGxrR0hmeHdaT0ZiVjN5N05ac1kxNm54b3Y4UTVt?=
+ =?utf-8?B?RWxQNXMrMGdhR3IwS2ZzVVRydVJPUWRlRHFUdG1wTWw0Q3pkUzBRaUxLbFNk?=
+ =?utf-8?B?RENHK3hVYnBnL2k2UGhGeTZSUFJnTld4K0dBckNnOXFpVnRQTXdnZ291ckI3?=
+ =?utf-8?B?OVZ5Q0tCanJXZUlDMmFhRUNhdmlpdms3Q3o3cXFFK3UyRVl1cHJ5K3RyRVl1?=
+ =?utf-8?B?K09rd2hDUmt0RFZJbGRjUHJnRXZBdTBVZFVFcEtYVWt5ZCsxQ2UxL1ZaUS96?=
+ =?utf-8?B?NndEMFIySTR4QlNNRTU4Sm00RmFNS2gxeTFXWG5oK2xtOVY4WXVSTVFvb2s0?=
+ =?utf-8?B?Y1E0Yk91REUybkFDWk9IK2c4NXVDWjNNaWZmYmk4RkRRMnIwWm1SR2JYampj?=
+ =?utf-8?B?Ri9ac1Z3RFRpdTBjYm1WRW8rcnFsVTE0aFFURExUdDhBclY0Y1pZZktsRmJC?=
+ =?utf-8?B?dUJwQzFZcENQS1N0L1NPcG14c0Vza0tvSi9URGJwbTBZa0lMeGxtQ1M5K282?=
+ =?utf-8?B?dG80c2hGMUZlcSsxcXZ2QjFsVUJVVit5Q2o5enJVQkRzVEMwSlVvbUZuaUh2?=
+ =?utf-8?B?TEovQVM2RTduR3JCeFZUUlkrdFc4b0RRcEVsWUJ6czFVZk1RaEdsNnJTdk5U?=
+ =?utf-8?B?UEZyTGl3K2Nqb2JUQ254Y0ZDTG1IY0hBM0FhZCtneXcvcGNUMzJNeGlVSFRp?=
+ =?utf-8?B?Zk9yZXVDanBiSVVVTzdjV295d011VUJZdnBpRTdwYVRPWm1vSDZPdVZydlpW?=
+ =?utf-8?B?Q08rMFcyNVljV2FRYWNPUGt1a1ZVbFZCYXBVcVQ1M1B2QmJNdFVieTRkNXVD?=
+ =?utf-8?B?QU1zdmp4V1cvb3J3OGtWL2dPUytVTUhNemtsOTB2c085ZCszZEVRZmJ1cUIy?=
+ =?utf-8?B?SFBjdkFLTWpMdUdaQnVQa1dNR3hsWnRxZ1h5N2RlN21HbE1uazJMUkF5YnRD?=
+ =?utf-8?B?SFNmWjhwbklveGc2b1lGSllRdW96SG1VUytGMlRxcWJnN01SZmxwbExlZzZh?=
+ =?utf-8?B?NUlva1Q4eGtLYUwybmo1YXdyZnZGOFVwSUlZcWdFbVJwWk5yaXlXWENOeVFK?=
+ =?utf-8?B?aU1OL1ovRW02L1pWdFRsaU1BZWFwa3dQYTlvNGtycU9YcG41QjlBR3M2ajRU?=
+ =?utf-8?B?cklkcHNEekd6MmZvVW9NWFp5WVhubkNOYTVaaUJ3WEdSOTFkTnRQYm5BZ1Yr?=
+ =?utf-8?B?bGhqc3FZZTBBODdJcVVxR1dsaDBoQU5JTTh2MXJZODBWenUySHhWUmE2bzZi?=
+ =?utf-8?B?ZzBVRk1KYnhGWm5sMC80V2hqVndwTXRQYmV0eTdBakV5VkxRRE85aGZValpO?=
+ =?utf-8?B?STdPc1d2SE9Ta3Q4eElBSW5IMUE0NFF2Y1BuWGVsSm1nazIzeEZaUVcrY3Mw?=
+ =?utf-8?B?Y2owNXhrdEdjNHZnTU9VS2Y0TjFtTEIyZnpEN0p3U1JtOU5jemh2dFdkQ09V?=
+ =?utf-8?B?OW1KeHlCTnU4S29qbWtwSk1FT2djQ1hrdG1jeTk2YUNXcXdHczJQdjBCLzJq?=
+ =?utf-8?B?ZVN0VTg1cUt0SXhKRzRQZWNOZWd3PT0=?=
+X-OriginatorOrg: victronenergy.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a999b888-0a41-4fc7-e89c-08db742eae2a
+X-MS-Exchange-CrossTenant-AuthSource: DB9PR07MB8679.eurprd07.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 21:13:24.4108
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 60b95f08-3558-4e94-b0f8-d690c498e225
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: afz5icBFQbGlqReWReiVrAI1rM2CNpltMgwW+cBAp08VAp2WXUoP4n/yVlLrxdyAnBjyW9E+QY1ifJPbb4rvruIvtJbbsV9Nv7bIvlM9NqY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR07MB9365
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi David, hi Jakub, hi Paolo, hi Eric,
 
-The following pull-request contains BPF updates for your *net-next* tree.
+On 23-06-2023 22:14, Simon Horman wrote:
+> On Fri, Jun 23, 2023 at 03:58:03PM +0100, Måns Rullgård wrote:
+>> Tony Lindgren <tony@atomide.com> writes:
+>>
+>>> * Jeroen Hofstee <jhofstee@victronenergy.com> [161028 11:19]:
+>>>> Hello Tony,
+>>>>
+>>>> On 28-10-16 17:52, Tony Lindgren wrote:
+>>>>> * Jeroen Hofstee <jhofstee@victronenergy.com> [161028 08:33]:
+>>>>>> Commit b6745f6e4e63 ("drivers: net: cpsw: davinci_emac: move reading mac
+>>>>>> id to common file") did not only move the code for an am3517, it also
+>>>>>> added the slave parameter, resulting in an invalid (all zero) mac address
+>>>>>> being returned for an am3517, since it only has a single emac and the slave
+>>>>>> parameter is pointing to the second. So simply always read the first and
+>>>>>> valid mac-address for a ti,am3517-emac.
+>>>>> And others davinci_emac.c users can have more than one. So is the
+>>>>> reason the slave parameter points to the second instance because
+>>>>> of the location in the hardware?
+>>>> Sort of, the slave parameter gets determined by the fact if there is one
+>>>> or two register range(s) associated with the davinci_emac. In davinci_emac.c
+>>>>
+>>>>      res_ctrl = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+>>>>      ...
+>>>>      rc = davinci_emac_try_get_mac(pdev, res_ctrl ? 0 : 1,
+>>>>                            priv->mac_addr);
+>>>>
+>>>> So it there are two ranges, the slave param becomes 0. It there is only one,
+>>>> it
+>>>> will be 1. Since the am3517 only has a single regs entry it ends up with
+>>>> slave 1,
+>>>> while there is only a single davinci_emac.
+>>> OK thanks for clarifying it:
+>>>
+>>> Acked-by: Tony Lindgren <tony@atomide.com>
+>> Is there some reason this patch was never picked up, or was it simply
+>> forgotten?
+> I feel like I am missing something here.
 
-We've added 49 non-merge commits during the last 24 day(s) which contain
-a total of 70 files changed, 1935 insertions(+), 442 deletions(-).
+That is a weird response, you feel like something is missing, while
+it is a recognized bug, acknowledged by the maintainer at that time
+and apparently still not fixed and Måns simply asked it there is a
+reason for that.
 
-The main changes are:
+This is not a really helpful response,
 
-1) Extend bpf_fib_lookup helper to allow passing the route table ID, from Louis DeLosSantos.
+Jeroen
 
-2) Fix regsafe() in verifier to call check_ids() for scalar registers, from Eduard Zingerman.
-
-3) Extend the set of cpumask kfuncs with bpf_cpumask_first_and() and a rework of
-   bpf_cpumask_any*() kfuncs. Additionally, add selftests, from David Vernet.
-
-4) Fix socket lookup BPF helpers for tc/XDP to respect VRF bindings, from Gilad Sever.
-
-5) Change bpf_link_put() to use workqueue unconditionally to fix it under PREEMPT_RT,
-   from Sebastian Andrzej Siewior.
-
-6) Follow-ups to address issues in the bpf_refcount shared ownership implementation,
-   from Dave Marchevsky.
-
-7) A few general refactorings to BPF map and program creation permissions checks which
-   were part of the BPF token series, from Andrii Nakryiko.
-
-8) Various fixes for benchmark framework and add a new benchmark for BPF memory
-   allocator to BPF selftests, from Hou Tao.
-
-9) Documentation improvements around iterators and trusted pointers, from Anton Protopopov.
-
-10) Small cleanup in verifier to improve allocated object check, from Daniel T. Lee.
-
-11) Improve performance of bpf_xdp_pointer() by avoiding access to shared_info when
-    XDP packet does not have frags, from Jesper Dangaard Brouer.
-
-12) Silence a harmless syzbot-reported warning in btf_type_id_size(), from Yonghong Song.
-
-13) Remove duplicate bpfilter_umh_cleanup in favor of umd_cleanup_helper, from Jarkko Sakkinen.
-
-14) Fix BPF selftests build for resolve_btfids under custom HOSTCFLAGS, from Viktor Malik.
-
-Please consider pulling these changes from:
-
-  git://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-Thanks a lot!
-
-Also thanks to reporters, reviewers and testers of commits in this pull-request:
-
-Andrii Nakryiko, Dan Carpenter, Eyal Birger, Jiri Olsa, Kees Cook, 
-kernel test robot, Kumar Kartikeya Dwivedi, Lorenzo Bianconi, Maciej 
-Fijalkowski, Shmulik Ladkani, Simon Horman, Stanislav Fomichev, Tariq 
-Toukan, Toke Høiland-Jørgensen, Yonghong Song
-
-----------------------------------------------------------------
-
-The following changes since commit bc590b47549225a03c6b36bbc1aede75c917767b:
-
-  r8169: check for PCI read error in probe (2023-05-30 13:14:53 +0200)
-
-are available in the Git repository at:
-
-  https://git.kernel.org/pub/scm/linux/kernel/git/bpf/bpf-next.git tags/for-netdev
-
-for you to fetch changes up to fbc5669de62a452fb3a26a4560668637d5c9e7b5:
-
-  bpf, docs: Document existing macros instead of deprecated (2023-06-22 19:47:32 +0200)
-
-----------------------------------------------------------------
-bpf-next-for-netdev
-
-----------------------------------------------------------------
-Andrii Nakryiko (5):
-      Merge branch 'verify scalar ids mapping in regsafe()'
-      bpf: Move unprivileged checks into map_create() and bpf_prog_load()
-      bpf: Inline map creation logic in map_create() function
-      bpf: Centralize permissions checks for all BPF map types
-      bpf: Keep BPF_PROG_LOAD permission checks clear of validations
-
-Anton Protopopov (2):
-      bpf, docs: BPF Iterator Document
-      bpf, docs: Document existing macros instead of deprecated
-
-Arnd Bergmann (1):
-      bpf: Hide unused bpf_patch_call_args
-
-Azeem Shaikh (1):
-      bpf: Replace all non-returning strlcpy with strscpy
-
-Daniel T. Lee (1):
-      bpf: Replace open code with for allocated object check
-
-Dave Marchevsky (3):
-      bpf: Set kptr_struct_meta for node param to list and rbtree insert funcs
-      bpf: Fix __bpf_{list,rbtree}_add's beginning-of-node calculation
-      bpf: Make bpf_refcount_acquire fallible for non-owning refs
-
-David Vernet (8):
-      bpf: Teach verifier that trusted PTR_TO_BTF_ID pointers are non-NULL
-      selftests/bpf: Add test for non-NULLable PTR_TO_BTF_IDs
-      selftests/bpf: Add missing selftests kconfig options
-      bpf: Add bpf_cpumask_first_and() kfunc
-      selftests/bpf: Add test for new bpf_cpumask_first_and() kfunc
-      bpf: Replace bpf_cpumask_any* with bpf_cpumask_any_distribute*
-      selftests/bpf: Update bpf_cpumask_any* tests to use bpf_cpumask_any_distribute*
-      bpf/docs: Update documentation for new cpumask kfuncs
-
-Eduard Zingerman (5):
-      selftests/bpf: Fix invalid pointer check in get_xlated_program()
-      bpf: Use scalar ids in mark_chain_precision()
-      selftests/bpf: Check if mark_chain_precision() follows scalar ids
-      bpf: Verify scalar ids mapping in regsafe() using check_ids()
-      selftests/bpf: Verify that check_ids() is used for scalars in regsafe()
-
-Gilad Sever (4):
-      bpf: Factor out socket lookup functions for the TC hookpoint.
-      bpf: Call __bpf_sk_lookup()/__bpf_skc_lookup() directly via TC hookpoint
-      bpf: Fix bpf socket lookup from tc/xdp to respect socket VRF bindings
-      selftests/bpf: Add vrf_socket_lookup tests
-
-Hou Tao (5):
-      bpf: Factor out a common helper free_all()
-      selftests/bpf: Use producer_cnt to allocate local counter array
-      selftests/bpf: Output the correct error code for pthread APIs
-      selftests/bpf: Ensure that next_cpu() returns a valid CPU number
-      selftests/bpf: Set the default value of consumer_cnt as 0
-
-Jarkko Sakkinen (1):
-      net: Use umd_cleanup_helper()
-
-Jesper Dangaard Brouer (3):
-      samples/bpf: xdp1 and xdp2 reduce XDPBUFSIZE to 60
-      bpf/xdp: optimize bpf_xdp_pointer to avoid reading sinfo
-      selftests/bpf: Fix check_mtu using wrong variable type
-
-Jiri Olsa (1):
-      selftests/bpf: Add missing prototypes for several test kfuncs
-
-Louis DeLosSantos (2):
-      bpf: Add table ID to bpf_fib_lookup BPF helper
-      selftests/bpf: Test table ID fib lookup BPF helper
-
-Ruiqi Gong (1):
-      bpf: Cleanup unused function declaration
-
-Sebastian Andrzej Siewior (1):
-      bpf: Remove in_atomic() from bpf_link_put().
-
-Su Hui (1):
-      bpf/tests: Use struct_size()
-
-Viktor Malik (1):
-      tools/resolve_btfids: Fix setting HOSTCFLAGS
-
-Yonghong Song (3):
-      bpf: Silence a warning in btf_type_id_size()
-      selftests/bpf: Add a test where map key_type_id with decl_tag type
-      selftests/bpf: Fix compilation failure for prog vrf_socket_lookup
-
-YueHaibing (1):
-      xsk: Remove unused inline function xsk_buff_discard()
-
- Documentation/bpf/bpf_iterators.rst                |   7 +-
- Documentation/bpf/cpumasks.rst                     |   5 +-
- Documentation/bpf/kfuncs.rst                       |  38 +-
- include/linux/bpf_verifier.h                       |  25 +-
- include/linux/bpfilter.h                           |   1 -
- include/linux/filter.h                             |   1 -
- include/linux/netdevice.h                          |   9 +
- include/net/xdp_sock_drv.h                         |   4 -
- include/uapi/linux/bpf.h                           |  21 +-
- kernel/bpf/bloom_filter.c                          |   3 -
- kernel/bpf/bpf_local_storage.c                     |   3 -
- kernel/bpf/bpf_struct_ops.c                        |   3 -
- kernel/bpf/btf.c                                   |  19 +-
- kernel/bpf/core.c                                  |   8 +-
- kernel/bpf/cpumap.c                                |   4 -
- kernel/bpf/cpumask.c                               |  38 +-
- kernel/bpf/devmap.c                                |   3 -
- kernel/bpf/hashtab.c                               |   6 -
- kernel/bpf/helpers.c                               |  12 +-
- kernel/bpf/lpm_trie.c                              |   3 -
- kernel/bpf/memalloc.c                              |  31 +-
- kernel/bpf/preload/bpf_preload_kern.c              |   4 +-
- kernel/bpf/queue_stack_maps.c                      |   4 -
- kernel/bpf/reuseport_array.c                       |   3 -
- kernel/bpf/stackmap.c                              |   3 -
- kernel/bpf/syscall.c                               | 184 +++---
- kernel/bpf/verifier.c                              | 248 ++++++--
- lib/test_bpf.c                                     |   3 +-
- net/bpfilter/bpfilter_kern.c                       |   2 +-
- net/core/filter.c                                  | 147 ++++-
- net/core/sock_map.c                                |   4 -
- net/ipv4/bpfilter/sockopt.c                        |  11 +-
- net/xdp/xskmap.c                                   |   4 -
- samples/bpf/xdp1_kern.c                            |   2 +-
- samples/bpf/xdp2_kern.c                            |   2 +-
- tools/bpf/resolve_btfids/Makefile                  |   4 +-
- tools/include/uapi/linux/bpf.h                     |  21 +-
- tools/testing/selftests/bpf/bench.c                |  15 +-
- tools/testing/selftests/bpf/bench.h                |   1 +
- .../selftests/bpf/benchs/bench_bloom_filter_map.c  |  14 +-
- .../bpf/benchs/bench_bpf_hashmap_full_update.c     |  10 +-
- .../bpf/benchs/bench_bpf_hashmap_lookup.c          |  10 +-
- .../testing/selftests/bpf/benchs/bench_bpf_loop.c  |  10 +-
- tools/testing/selftests/bpf/benchs/bench_count.c   |  14 +-
- .../selftests/bpf/benchs/bench_local_storage.c     |  12 +-
- .../bpf/benchs/bench_local_storage_create.c        |   8 +-
- .../benchs/bench_local_storage_rcu_tasks_trace.c   |  10 +-
- tools/testing/selftests/bpf/benchs/bench_rename.c  |  15 +-
- .../testing/selftests/bpf/benchs/bench_ringbufs.c  |   2 +-
- tools/testing/selftests/bpf/benchs/bench_strncmp.c |  11 +-
- tools/testing/selftests/bpf/benchs/bench_trigger.c |  21 +-
- .../selftests/bpf/benchs/run_bench_ringbufs.sh     |  26 +-
- .../selftests/bpf/bpf_testmod/bpf_testmod.c        |  16 +-
- .../selftests/bpf/bpf_testmod/bpf_testmod_kfunc.h  |   7 +
- tools/testing/selftests/bpf/config                 |   4 +
- tools/testing/selftests/bpf/prog_tests/btf.c       |  40 ++
- tools/testing/selftests/bpf/prog_tests/check_mtu.c |   2 +-
- tools/testing/selftests/bpf/prog_tests/cpumask.c   |   2 +
- .../testing/selftests/bpf/prog_tests/fib_lookup.c  |  61 +-
- .../selftests/bpf/prog_tests/unpriv_bpf_disabled.c |   6 +-
- tools/testing/selftests/bpf/prog_tests/verifier.c  |   2 +
- .../selftests/bpf/prog_tests/vrf_socket_lookup.c   | 312 ++++++++++
- tools/testing/selftests/bpf/progs/cpumask_common.h |   6 +-
- .../testing/selftests/bpf/progs/cpumask_success.c  |  64 +-
- .../testing/selftests/bpf/progs/refcounted_kptr.c  |   2 +
- .../selftests/bpf/progs/refcounted_kptr_fail.c     |   4 +-
- .../selftests/bpf/progs/verifier_scalar_ids.c      | 659 +++++++++++++++++++++
- .../selftests/bpf/progs/vrf_socket_lookup.c        |  89 +++
- tools/testing/selftests/bpf/test_verifier.c        |  24 +-
- tools/testing/selftests/bpf/verifier/precise.c     |   8 +-
- 70 files changed, 1935 insertions(+), 442 deletions(-)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/vrf_socket_lookup.c
- create mode 100644 tools/testing/selftests/bpf/progs/verifier_scalar_ids.c
- create mode 100644 tools/testing/selftests/bpf/progs/vrf_socket_lookup.c
 
