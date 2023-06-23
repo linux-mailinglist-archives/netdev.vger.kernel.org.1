@@ -1,81 +1,81 @@
-Return-Path: <netdev+bounces-13510-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13512-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D47E673BE8D
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:39:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7049C73BE8F
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:40:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D33A11C212EB
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:39:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926151C212CC
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 18:40:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B147BAD5E;
-	Fri, 23 Jun 2023 18:39:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353A110782;
+	Fri, 23 Jun 2023 18:39:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A448EAD30
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 18:39:36 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2082.outbound.protection.outlook.com [40.107.95.82])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8349BC6
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 11:39:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2734110780
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 18:39:39 +0000 (UTC)
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2053.outbound.protection.outlook.com [40.107.244.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B31C2C6
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 11:39:37 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=R1fHZx5W42p9E3cvCXAIRQqgWVhSG3WyN2oYsf2LaEnhhgs+pKulusP3LWSQVNIhzsXhSPX90GO1L4mM2A4hGA1LD+7I9bEYIxMAg0Zmkt8XhtlbymraNYxKOqK5vRyIRE7QGgFD+vap5d+Nahl6DfHWBIVs0P939C/DYrvJ1yxRdHF9K+LwqtFfBAiJr4dsIcn5JIsU4TheGFDSOgi5oJ8BRRU2mKNMZt8ygVbKA82CpnUKls/afDNfOGkqrhARMB0hSlvIgVZ+d8leleEcaIwe4XTRp8/34QoQReH/ru5zhMsqY0SmcZwZGNAB6tB9QNZjSlsRxz7ksl2diPBXCA==
+ b=S7C854P6dROIbOepwRjxl5JMOt4YP6ClxBfKIGS3DV1J4glWiRSyz1IKWh2Qic1MWw2MjVFndp+KxacivCq9rcVYlHFUysDIT0aPUmnY7fkYqBUKLBFnO8JqEkKM7t9/YAYHELYmO8Z+Yd/sD1EzYL5iEgW0t3wkK3HyUe3seVEC3UZB874DfkuF0BOzc1s3g10DRtKNnM8TnFi800tlbmBXFrRnokpJntdItADqxXkyN03VClgCzzNfBXUl1ycEWlcqt1G5Lq8ccVOHEPfIUaBCgOh2AswtJwuV5/DOQeLT7spFQ798QFi7q6TZvgreHPlmtKj8nF55eXSQ5owxNg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Q2oDJM8a69Dyi46bVVuV/uj9zRgEBuvJBhUPmEmHPGw=;
- b=T64tJz9DmedkWOm62w7x+VHY5zB/ocV0QMKjiXVUFBip+nqakowDVW1+8WoDTqJ5tT8eUo75ywpDRhvWvzRTFJBzx0QRSKmsIJfYnR6KCk5Hkknfz9RHeaWMroj2h4g6/DDM5OqVud5rH9598SmSoI1aKHFcu2mM08hgpX8o7+G6muWMMvvOmAlsWJ0CScCSmpj2voCFRuZ+UVTL9+gS0/rWj/o7t74nCk2O3/RgdoJCGWaM2RKc6DW7FmvvA99aG243lg51SZxuk6IJiyZYtH7peWvubzjdcyjTrIdJKKC8gO8IAGJ6yujLDpRagxTHjXrcSrXO9K0dS/qbNzeY/w==
+ bh=j5rlO4qElz5Tox1VEqCLcQ0AeRncKEtEEA5uwbPAwlU=;
+ b=HzS1EN8B8tp2HDG2uOI+JpFKfXTHojiz8FEamigPxwaseb5D/eE5MsBetW4PDCfhOPCTsGj+D68WaflPS860dxBg8CPglv21gm0RL5VtDd5xj4ltC0qz7+mne/ig5VZ9JNo/LaH531KbiC0SaCQ2q3w6nKbJW5e0Ik442xsWPOp4tg4kqvijdSf1fFbKB1FjgpOM+RcaZQbGgFwjYeHDboFTX+GOma2CCZFFxU5MO46AAr9IBzqth7RlIcJ7Uu7ZCfpLmF5+7dfDmbWwGCa4nD7onLtChiyKxHAxChNBHkDRW8H4jjpx5DoT+Mxeo0uGJ9GN4tuSg/+LTY6I7ph9mA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
  165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
  dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
  header.from=amd.com; dkim=none (message not signed); arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Q2oDJM8a69Dyi46bVVuV/uj9zRgEBuvJBhUPmEmHPGw=;
- b=5bMbHheBpyVnE1pK7kLw+xE1pYIcYaJeMaMjexu7CAhrVfGpDio95o07jedcy0v4vHwOFbh/SSMqs2j7Kin+eA1fEIJOlDlaEsFjYK6eSqllNHtnROdIfbJYUatNTns8IGHKd3kgf2z/UHXa1SEBqTG0o5bSBqA9dDbgKL5xvzo=
-Received: from BN0PR04CA0132.namprd04.prod.outlook.com (2603:10b6:408:ed::17)
- by DM4PR12MB5152.namprd12.prod.outlook.com (2603:10b6:5:393::16) with
+ bh=j5rlO4qElz5Tox1VEqCLcQ0AeRncKEtEEA5uwbPAwlU=;
+ b=dUc2tTPSZzZfnIDksWlT+rfM45wKXYgkhdYbbwdN8ZfZe/U+Xx2mjSluN9jKdgKCq8YSgzXXx5m7SqV0VGeK32cG4NL+dQfy2ktYiHDHezHIExS8QN96cOCvjyPK3T7ap6wbJ7TlHoTtNpGv4anF8LnC8lp+jvkvAiNqu4pgXvs=
+Received: from MW2PR16CA0068.namprd16.prod.outlook.com (2603:10b6:907:1::45)
+ by BY5PR12MB4097.namprd12.prod.outlook.com (2603:10b6:a03:213::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Fri, 23 Jun
- 2023 18:39:30 +0000
-Received: from BL02EPF000145B9.namprd05.prod.outlook.com
- (2603:10b6:408:ed:cafe::2e) by BN0PR04CA0132.outlook.office365.com
- (2603:10b6:408:ed::17) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Fri, 23 Jun
+ 2023 18:39:32 +0000
+Received: from MWH0EPF000971E7.namprd02.prod.outlook.com
+ (2603:10b6:907:1:cafe::eb) by MW2PR16CA0068.outlook.office365.com
+ (2603:10b6:907:1::45) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26 via Frontend
- Transport; Fri, 23 Jun 2023 18:39:30 +0000
+ Transport; Fri, 23 Jun 2023 18:39:32 +0000
 X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
  smtp.mailfrom=amd.com; dkim=none (message not signed)
  header.d=none;dmarc=pass action=none header.from=amd.com;
 Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
  165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- BL02EPF000145B9.mail.protection.outlook.com (10.167.241.209) with Microsoft
+ client-ip=165.204.84.17; helo=SATLEXMB03.amd.com; pr=C
+Received: from SATLEXMB03.amd.com (165.204.84.17) by
+ MWH0EPF000971E7.mail.protection.outlook.com (10.167.243.75) with Microsoft
  SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6521.19 via Frontend Transport; Fri, 23 Jun 2023 18:39:30 +0000
-Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ 15.20.6544.11 via Frontend Transport; Fri, 23 Jun 2023 18:39:32 +0000
+Received: from SATLEXMB06.amd.com (10.181.40.147) by SATLEXMB03.amd.com
+ (10.181.40.144) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Fri, 23 Jun
- 2023 13:39:30 -0500
+ 2023 13:39:31 -0500
 Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB06.amd.com
  (10.181.40.147) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Fri, 23 Jun
- 2023 13:39:29 -0500
+ 2023 13:39:31 -0500
 Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
  (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23 via Frontend
- Transport; Fri, 23 Jun 2023 13:39:28 -0500
+ Transport; Fri, 23 Jun 2023 13:39:29 -0500
 From: <edward.cree@amd.com>
 To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
 	<edumazet@google.com>, <pabeni@redhat.com>
 CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
 	<habetsm.xilinx@gmail.com>, <arnd@arndb.de>
-Subject: [PATCH v2 net-next 1/3] sfc: use padding to fix alignment in loopback test
-Date: Fri, 23 Jun 2023 19:38:04 +0100
-Message-ID: <dfe2eb3d6ad3204079df63ae123b82d49b0c90e2.1687545312.git.ecree.xilinx@gmail.com>
+Subject: [PATCH v2 net-next 2/3] sfc: siena: use padding to fix alignment in loopback test
+Date: Fri, 23 Jun 2023 19:38:05 +0100
+Message-ID: <b95b30118af62b7041b140f67cab31fd7a3beff4.1687545312.git.ecree.xilinx@gmail.com>
 X-Mailer: git-send-email 2.27.0
 In-Reply-To: <cover.1687545312.git.ecree.xilinx@gmail.com>
 References: <cover.1687545312.git.ecree.xilinx@gmail.com>
@@ -89,26 +89,26 @@ Content-Transfer-Encoding: 8bit
 Content-Type: text/plain
 X-EOPAttributedMessage: 0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL02EPF000145B9:EE_|DM4PR12MB5152:EE_
-X-MS-Office365-Filtering-Correlation-Id: c4654183-489a-445f-2540-08db74192e61
+X-MS-TrafficTypeDiagnostic: MWH0EPF000971E7:EE_|BY5PR12MB4097:EE_
+X-MS-Office365-Filtering-Correlation-Id: a20910f5-8d55-465c-6a2e-08db74192f83
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	ehS1Gpvrx/mNxE9oyHH8UIJ5cC8+B6BbTOWapmA4cDp5u0pKEeqk7m9atfCgjcPtpuejPamn0jSnPehhSOM0/PJwLGBfOjzP9R6HB4kMJRaWqmrLpl0U2Hd6cltvXc5GOeOIPLSRfy2SvOatE72j42DM1qthT8YjVNyRy7RlcSDUZz62Klo2ERlwPgRwu9Grhb9qeSWGMuoScr4kSFFpgw4RbMEXFh+aT5UJrroDcMIZRupEfM9StsamKh4IYfZz2+zcboFecuF7+pp8dXJVwXTi6FvFMtv0NTD1R0Kj21u77bA27ZH0x6M5Yb9sNDr2bqVnWs9FDdikEOPg1vwzZ/WfNwxzUKg6li3JXSY+ukgDtVIIvWPCSuMvgPi5QWohfKuNns/JUK1/tEdm+I64kmfh+FH9Dsepgkx5DP22Hlh77rX6QEGzaVp19noNbP/t4ySto61Ri5hlEXqTIJzXAKC9nIp26IVpYOOFubft7FefJ934z2eKIOeP+7GD5mAvCbEEs09gqNCmfy109ASlRzbZddXb5tQFybOIiowd7RnyDQSgTyXMYg+QeMNCF+ijRU9a94Db46SFwll4P67Oygwv3e9K0R103M/A2hbiTl3TRX9B2fiEo0D5Pc3HKfZiOjbcK5M09LaDH0XNBNbjpdr5N97VckEK/3eqop0UvQ/oubW+QuANQoW0EkJrtklow83ADvjliYKw9s1250anOATSBOTLmlgyPfhwlEphEUdgia4FqLadq9dwhVCAQAoNFKf6MtuRaFWr1fIwn5iCgQ==
+	3NiANSSX1LwF16Xu9DDIaKIpaq6GH/N3v/F2S9h97bD7ty09xY1JBT80toTxDsIthTSv+tx6VLXIyyS4J36iFBhzNRNljHkQyP1YzSzynvkRunQ2rRvYN8Ji9b+ctHf3e/WXPnFKqO9WC4KGtBPig4i7vrV5aW4EcSsi0X+ibN5BVoOMTW66uCI+1c52B4ziDPJQS4sovRmLgA5aIOqCSrBfxZppX5ibk3FmGNvAG6BaAH1op4H5K10Xtq6Ahyh2wRX/uZ4z9f3ni9CYOyOV3Cbt3dmQCcQktGZfeexACi1TbC7NlpqRWsZWIjYPn9xpnngRKqqPkme+GV3zApNjVP+zFEQ96EOBwgkMaUQoIZpiyv2Uv7fP5uV/4TkD3zfAPPcdy8tPKBnU1EDJO/aJebAPqvseHqacNM8jGD7zN6CDbMXgbIgVcYzniM+Dskjtvu261oeviC696INzARdGgqtNVZBtCueS+iK5JByBn3DL5e8Pt58+/QvlESGHF7Gx+PXb8EosdGFBiMP6dYf/nGhZ8V3v9blkupVW25y/fjLPzNQ5f/EOn4MrtImdxiA6gcie6w7Y9niwzYShMSH3knEuK7Eb/rcP3xKi7B4rtSmFKWMhbhuV8S04QQVCKHTUyvea1vA+CgaBiqy+ZDAZH7AyTj/FdcsZecm1ekJYWpF2e/BbWwRr+MemdBQ+3ZM8hay1OtOHRM+WUB36LuTuTntoIvnvnzQ5CFRzL1CJa3+msU3E3StyoRNcQWCwJfv6Ums4s1fRuS1OrC45G8juTw==
 X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(346002)(376002)(39860400002)(136003)(451199021)(40470700004)(46966006)(36840700001)(40460700003)(70586007)(70206006)(81166007)(356005)(55446002)(86362001)(82310400005)(9686003)(82740400003)(54906003)(36860700001)(26005)(110136005)(47076005)(83380400001)(186003)(4326008)(426003)(478600001)(36756003)(336012)(6666004)(40480700001)(2906002)(8676002)(8936002)(5660300002)(316002)(2876002)(41300700001)(36900700001);DIR:OUT;SFP:1101;
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB03.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(346002)(39860400002)(376002)(451199021)(46966006)(36840700001)(40470700004)(54906003)(110136005)(478600001)(40480700001)(9686003)(26005)(6666004)(40460700003)(5660300002)(2876002)(2906002)(82310400005)(36756003)(55446002)(4326008)(70586007)(70206006)(86362001)(41300700001)(8936002)(8676002)(47076005)(336012)(83380400001)(316002)(426003)(82740400003)(356005)(81166007)(36860700001)(186003)(36900700001);DIR:OUT;SFP:1101;
 X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 18:39:30.3711
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 18:39:32.1640
  (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: c4654183-489a-445f-2540-08db74192e61
+X-MS-Exchange-CrossTenant-Network-Message-Id: a20910f5-8d55-465c-6a2e-08db74192f83
 X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB03.amd.com]
 X-MS-Exchange-CrossTenant-AuthSource:
-	BL02EPF000145B9.namprd05.prod.outlook.com
+	MWH0EPF000971E7.namprd02.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Anonymous
 X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5152
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR12MB4097
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
 	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
@@ -122,19 +122,19 @@ From: Edward Cree <ecree.xilinx@gmail.com>
 Add two bytes of padding to the start of struct efx_loopback_payload,
  which are not sent on the wire.  This ensures the 'ip' member is
  4-byte aligned, preventing the following W=1 warning:
-net/ethernet/sfc/selftest.c:46:15: error: field ip within 'struct efx_loopback_payload' is less aligned than 'struct iphdr' and is usually due to 'struct efx_loopback_payload' being packed, which can lead to unaligned accesses [-Werror,-Wunaligned-access]
+net/ethernet/sfc/siena/selftest.c:46:15: error: field ip within 'struct efx_loopback_payload' is less aligned than 'struct iphdr' and is usually due to 'struct efx_loopback_payload' being packed, which can lead to unaligned accesses [-Werror,-Wunaligned-access]
         struct iphdr ip;
 
 Reported-by: Arnd Bergmann <arnd@arndb.de>
 Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
 ---
- drivers/net/ethernet/sfc/selftest.c | 47 +++++++++++++++++------------
+ drivers/net/ethernet/sfc/siena/selftest.c | 47 ++++++++++++++---------
  1 file changed, 28 insertions(+), 19 deletions(-)
 
-diff --git a/drivers/net/ethernet/sfc/selftest.c b/drivers/net/ethernet/sfc/selftest.c
-index 3c5227afd497..96d856b9043c 100644
---- a/drivers/net/ethernet/sfc/selftest.c
-+++ b/drivers/net/ethernet/sfc/selftest.c
+diff --git a/drivers/net/ethernet/sfc/siena/selftest.c b/drivers/net/ethernet/sfc/siena/selftest.c
+index 07715a3d6bea..111ac17194a5 100644
+--- a/drivers/net/ethernet/sfc/siena/selftest.c
++++ b/drivers/net/ethernet/sfc/siena/selftest.c
 @@ -42,12 +42,16 @@
   * Falcon only performs RSS on TCP/UDP packets.
   */
@@ -153,8 +153,8 @@ index 3c5227afd497..96d856b9043c 100644
  
  /* Loopback test source MAC address */
  static const u8 payload_source[ETH_ALEN] __aligned(2) = {
-@@ -282,7 +286,7 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
- 			    const char *buf_ptr, int pkt_len)
+@@ -282,7 +286,7 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
+ 				  const char *buf_ptr, int pkt_len)
  {
  	struct efx_loopback_state *state = efx->loopback_selftest;
 -	struct efx_loopback_payload *received;
@@ -162,7 +162,7 @@ index 3c5227afd497..96d856b9043c 100644
  	struct efx_loopback_payload *payload;
  
  	BUG_ON(!buf_ptr);
-@@ -293,13 +297,14 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
+@@ -293,13 +297,14 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
  
  	payload = &state->payload;
  
@@ -181,7 +181,7 @@ index 3c5227afd497..96d856b9043c 100644
  		netif_err(efx, drv, efx->net_dev,
  			  "saw runt RX packet (length %d) in %s loopback "
  			  "test\n", pkt_len, LOOPBACK_MODE(efx));
-@@ -307,7 +312,7 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
+@@ -307,7 +312,7 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
  	}
  
  	/* Check that the ethernet header exists */
@@ -190,7 +190,7 @@ index 3c5227afd497..96d856b9043c 100644
  		netif_err(efx, drv, efx->net_dev,
  			  "saw non-loopback RX packet in %s loopback test\n",
  			  LOOPBACK_MODE(efx));
-@@ -315,16 +320,16 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
+@@ -315,16 +320,16 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
  	}
  
  	/* Check packet length */
@@ -211,7 +211,7 @@ index 3c5227afd497..96d856b9043c 100644
  		netif_err(efx, drv, efx->net_dev,
  			  "saw corrupted IP header in %s loopback test\n",
  			  LOOPBACK_MODE(efx));
-@@ -332,7 +337,7 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
+@@ -332,7 +337,7 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
  	}
  
  	/* Check that msg and padding matches */
@@ -220,7 +220,7 @@ index 3c5227afd497..96d856b9043c 100644
  		netif_err(efx, drv, efx->net_dev,
  			  "saw corrupted RX packet in %s loopback test\n",
  			  LOOPBACK_MODE(efx));
-@@ -340,10 +345,10 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
+@@ -340,10 +345,10 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
  	}
  
  	/* Check that iteration matches */
@@ -233,7 +233,7 @@ index 3c5227afd497..96d856b9043c 100644
  			  ntohs(payload->iteration), LOOPBACK_MODE(efx));
  		goto err;
  	}
-@@ -363,7 +368,8 @@ void efx_loopback_rx_packet(struct efx_nic *efx,
+@@ -363,7 +368,8 @@ void efx_siena_loopback_rx_packet(struct efx_nic *efx,
  			       buf_ptr, pkt_len, 0);
  		netif_err(efx, drv, efx->net_dev, "expected packet:\n");
  		print_hex_dump(KERN_ERR, "", DUMP_PREFIX_OFFSET, 0x10, 1,
