@@ -1,240 +1,158 @@
-Return-Path: <netdev+bounces-13564-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13569-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D83C073C0A8
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:42:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id F275773C0E2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:44:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96B3B28035B
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:42:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AFA7E281D58
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:44:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6938E11C94;
-	Fri, 23 Jun 2023 20:41:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E39D311CA6;
+	Fri, 23 Jun 2023 20:44:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5661311C80
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 20:41:57 +0000 (UTC)
-Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 872C235AE;
-	Fri, 23 Jun 2023 13:41:23 -0700 (PDT)
-Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-780d179ffddso38386139f.1;
-        Fri, 23 Jun 2023 13:41:23 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687552818; x=1690144818;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ot8TQl0fG1cRM0UPfyPtiV0P85KVORof9aumFFE+MAo=;
-        b=S5oVMK7IxFpLzCkUt5LuyzDIMo/VIl9BURGW29Yklrzbpyk787VoGRmiDctgvvj3qs
-         RmM0SayT+a/xg6jYO4ArNXouwU5/+yCymyggUHzpotmUP2l7O/5vi0kqmov22IQruyKw
-         x82+1MoizaWoQQvol8Jk/ZukfzdTJlgKB0eZTAvULITmgzoN/pvAdAfrWDHNwc4lUJw5
-         Nk4CQyqkbqb3j/qMkqT0rZ9zgmsx3bToG4VhB+7mTNgwV9+6UgOzOLu4HiFJVROw9F74
-         G8b0DHAcqlYTsaGLQnu2L2BoJLyZfQPC12MlT4m12/U7EAvqYp/cOAT05uUQ+5mCtauk
-         U3jA==
-X-Gm-Message-State: AC+VfDzUPOoflS63qmL63RLkXY2WttbWtMLoVCI+yZGyJGdTK6U6vxKd
-	8JQgxXEZGM7nULZ99GFdiA==
-X-Google-Smtp-Source: ACHHUZ4ySz/gaJTt2dhyNcDp+w1NwFoIO+PkHghv/0UHyNCmJBxMCEOz3chGGoIVtZ2bUXQIPwCg5Q==
-X-Received: by 2002:a5d:96c1:0:b0:76f:1664:672 with SMTP id r1-20020a5d96c1000000b0076f16640672mr20422866iol.13.1687552818624;
-        Fri, 23 Jun 2023 13:40:18 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id ep22-20020a0566384e1600b00411b8c1813asm2809539jab.159.2023.06.23.13.40.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 13:40:17 -0700 (PDT)
-Received: (nullmailer pid 1082374 invoked by uid 1000);
-	Fri, 23 Jun 2023 20:40:16 -0000
-Date: Fri, 23 Jun 2023 14:40:16 -0600
-From: Rob Herring <robh@kernel.org>
-To: =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-Cc: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Conor Dooley <conor+dt@kernel.org>, Miquel Raynal <miquel.raynal@bootlin.com>, Christian Marangi <ansuelsmth@gmail.com>, devicetree@vger.kernel.org, linux-mtd@lists.infradead.org, linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>
-Subject: Re: [PATCH] dt-bindings: nvmem: fixed-cell: add compatibles for MAC
- cells
-Message-ID: <20230623204016.GA1060715-robh@kernel.org>
-References: <20230616213033.8451-1-zajec5@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D072F11CA3
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 20:44:47 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on20726.outbound.protection.outlook.com [IPv6:2a01:111:f400:7eab::726])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C5291E41;
+	Fri, 23 Jun 2023 13:44:15 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Q8znEKYc0+cw1T7oRCMbVQfE4LjBcH+S0M0rO60ZG0CH1/xcWrivJImqXQFd2GY11jhqeuV2qRLXJW0uo8cLDGmRqJiEzltXqLoG5qPM3ECo3RoWsQD5YZSIgW8tCOfbKk6ZAIUpTzHMLuG2d9gnjLnVD2Yz0SDD10haYkGKzHbYXF9XKA1kmg5riEO5uzP0q84YiIabDPhXqnRBvh0pu783ZFlveI6Px5gNYiDFVgPqR/tSR6JcpoG9sr3WW7WpEHRPr95vwx8GtwhZyiOeH5fEg4tMNf/8WCN/E4i8NCnexHP6j+riE89+Sw3ehFkmxBEd4Tqh6Phm8Y5asmgjsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=hlUJtFg1gFrJ6yoIuKEu/sjTK6MZjar7frfENvSZOCQ=;
+ b=iVAoh1wlRAnhWdlK3qLWPCzQk11MDG+xNufeHH1HZLcYy1VmAVZrAh6O+U29Vecv5QdncRFgFQM7dtBvnt6MJhRnv/GpNAJBGCJP6TUbnnP+XsHZEOzP0hiJitSAIhDpdcWnaa4oLUaG1c3Kl62OIE6UYY6UPdN2en7HYymEw1PtySN3NKYCTXFHumEmuW6tlU6gSrxioI6+/cE6V+txxeIdNY2Stv5ScGAej/kHzRsPt7InihY/4QReXgHV+93YgLofmlIO8Pkz6WfDCdX+fyN13JEQKpT4BzenE/qPoy8EkowzoAy0oMXqOgr1M+WYrHDZB2ZrzkNO/LGScG9Jng==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=hlUJtFg1gFrJ6yoIuKEu/sjTK6MZjar7frfENvSZOCQ=;
+ b=CmK6EGDZhU0T9zttgSdnUeBdrN0OM48YO9onWYVT5kJtMaeIPCGhacOvkVe7/rABnY5Dt73hKBfaBlhP+T5LdqAAZB6IVaLdV0TcK8xd26rixT9gkyX7dEqRV6a6Zfh4uixtopzHovAV+l+mue2EC+MHmFR1DUQvA84lbGkTn/8=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY5PR13MB4487.namprd13.prod.outlook.com (2603:10b6:a03:1d4::20) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 23 Jun
+ 2023 20:43:58 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Fri, 23 Jun 2023
+ 20:43:58 +0000
+Date: Fri, 23 Jun 2023 22:43:51 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Michael Walle <mwalle@kernel.org>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?utf-8?B?QmVow7pu?= <kabel@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 07/10] net: phy: add support for C45-over-C22
+ transfers
+Message-ID: <ZJYEBwks5x3WMqyH@corigine.com>
+References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
+ <20230620-feature-c45-over-c22-v2-7-def0ab9ccee2@kernel.org>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620-feature-c45-over-c22-v2-7-def0ab9ccee2@kernel.org>
+X-ClientProxiedBy: AS4PR10CA0028.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d8::13) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230616213033.8451-1-zajec5@gmail.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB4487:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c9c9237-d8ab-41d7-d487-08db742a917e
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	pK5z8ocZxhqaRGsSYUG7etGXfbmxVmtktFLenZtZ35LuhY0L/OejrqZ83xJTwCQYBNMcPwHFJpG3KE3wd/z2tGYO7ITLUCHjtCZVdlQ6VgS8ZSbsBaK/Q46u/Gtj37fJQVMEB4NKA96NVrijcTv4wyRc4Mud5NoZqvGtbYsBpKTILD5cqikEw7C5D/CManB3Se9/EjPhXOyCUu+fRsfqI6n+AgO6tYS9DN4qaju80ucSEkxnmnagXm412RaB8ayOkeGTpm2bL6rwICY1v10G/Sw7rEp/bXl1VVfLUyfmkg+D6boeWchEDCYuEX2aNd06Ww6mmJARtMdkd9+mBLY+fC4an2gMIwepMOIgU2XXzNm//ilnwjkQUvwnI2ZgHJzqS5IMmwzNW0ihDIrfbADfnG6/DTy2H0YF6uFij/FOwRLObtdYLBA6UQBxVv4IprqyhtqC6wp2KgqpgNXGHeLGWXGI8o6m9a/lyuOw7+t66E59Vv+dxzNLx8J1Err+wf3uyIIx3g66f8BoJXA0Q8Tkw26u8sHTcKNemTfnieojBmc98pQ4vbYKr9KtyCd6wt36fSQs/6Bt3HPBeUuMGR7phwkoD/lg/GbcEs3mdnW2vE4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(366004)(346002)(39830400003)(396003)(136003)(451199021)(478600001)(186003)(8676002)(8936002)(6512007)(41300700001)(38100700002)(316002)(54906003)(2616005)(66946007)(66556008)(66476007)(4326008)(6916009)(36756003)(6666004)(6506007)(44832011)(5660300002)(6486002)(86362001)(2906002)(4744005)(7416002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?P1/UBssX10j0XEmpOj7j0qjNaMudvuSCMgULZrzEuK5j4Yjjfz2wlJQNEKv1?=
+ =?us-ascii?Q?UjChDK8DlHWIjCIKNZ1NEzxRMhApOBCJKjZrqF99sOEzNLAmYfMyFNHenZU5?=
+ =?us-ascii?Q?bl2JF1Rq7GtqDhTiooFX+NxJAs410Ew51zGef54t0qIUZhdpNv9ySXo2WsTr?=
+ =?us-ascii?Q?hcsA2Qz4243z/LDVjaLQ6J56DlvYjBM68w6nzjFZYtzk+qwukTIUUIN6rGGr?=
+ =?us-ascii?Q?7soG/qzNoOlTPvIIyzCyvrCi38xDWwIANblTjTohHmaBBxUu3Pqe1hwyu9ur?=
+ =?us-ascii?Q?ZOGIvLQrBMBXn8fV2iRIxX8xhX5Q0vwrntvXxhjYlej2dtroTkaB0pkBQ1Qu?=
+ =?us-ascii?Q?J+wBJdv44b3R8WH5In8/VVnQYWy3FSwGfVMj/eSr8dylyiBIOjl9uzDyaknY?=
+ =?us-ascii?Q?nTsJrK7adx8ps3efVPNSwX4tV88bmy7ls9lzrLnt0s2f+2EdQDcK921fG28v?=
+ =?us-ascii?Q?Wmt3632UYlJbTpcKpFaQjvicrMejmOttmwQ+gVnB/NfN4cCG5H/jL8lXB4ig?=
+ =?us-ascii?Q?rOOOPAGf4TghmkkxZiFBopfD/73ZbH0VBWSF9KuIt6nfha9Smd0+5idjhaRZ?=
+ =?us-ascii?Q?pgrNqm50ORvvdmWy0uNj8ar/sbew2xTmAZugJhTTBnqsY9em2eY9/SLjDGog?=
+ =?us-ascii?Q?4rpRHZ9otZk0Al1URNYS4kLPTFnDCN4X7rV5RgBjqd23ihUJOd0/ofyM6EMI?=
+ =?us-ascii?Q?byG5GOnoaXBxIonwPCM0coyLzB3byOomdn6eORcV/nG88VmnD01TSua+92n9?=
+ =?us-ascii?Q?zhwCJwnmj4ResgtiDeHC2A6xwnYau+ZcCmTXB9oobpqERVPIn8ITZKpRSVi2?=
+ =?us-ascii?Q?GuVV/qfk4cClNUEGF9EGUeJfjDs5gsRJalmb8CbvQu5BfiYtGbZxr5DYhwMa?=
+ =?us-ascii?Q?/vkW6gEfKEPPIXbLfs73QXKGL9LIJqPBgaeAMwytZX6VEqWQyKZJYOiQeIto?=
+ =?us-ascii?Q?8IuC1fc9f2N3dXj8KozECMheELs9c6BpfN8YphKldl5fwMvdT+ywYyfHXykC?=
+ =?us-ascii?Q?oQdPkPMKsBQ8QrZUi7QeaLjshklZPDWR+xIu6htT+iQJ1BCyhh+FJvEnayfh?=
+ =?us-ascii?Q?u6r2Pm5Xbm10D/prhWSBr+IS3u3BcqDsipTsnAFp3xiBnPxNm/GFg9ci4gmG?=
+ =?us-ascii?Q?LwHqZ5nvNigTkm91Zua7YcQD3APAVPPnLdr+ESrQrGbs1nwYymMd9Qx3X4Iw?=
+ =?us-ascii?Q?fNjDUGvveNL/oTh/3ZQQ+EAzg6vUmP6fbYb3fFD8pmfYLp3ngfnUhBfLWjmf?=
+ =?us-ascii?Q?seD1O4Li2EzLy8zPmJg7wBAJS0/A/lQX+mMtAfiqU44u+63QFcUrDY1XYb8g?=
+ =?us-ascii?Q?ROzCGFwN1KSEMYMUww1wQRv6sdAUnghRCPyBVQKdgsY1RGqnSYEHkPdq94bc?=
+ =?us-ascii?Q?0Jh1tYzDuxfzWWMdG8tn5NEBI6Xrcb1ve+6s8cbSnqTCTyNCKVDFE6OnQ31X?=
+ =?us-ascii?Q?DXiNk557hZsQPy1i41Bt3GdGCGceasKIduT9ZR0XZlqKeAC4pN0mL5gG2Jxy?=
+ =?us-ascii?Q?1M89UqH/++EgDSpmMYyevObVAHXr04voz77Ams98n6EXmLh4MiGdVo90ECqo?=
+ =?us-ascii?Q?2nop8+UAYiezsruXlTED5Dgl6aQ/0G6lVG0sdeQZmP36ZZKQld30i26GpSwW?=
+ =?us-ascii?Q?J//8Oeqi2RBTZ4NsjpmYIIkDVGXQGPj6XLLfBLrFd60wajyaUDWGn9gkMNYU?=
+ =?us-ascii?Q?YmWDCQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c9c9237-d8ab-41d7-d487-08db742a917e
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 20:43:58.2556
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C97otJmz0J/4pr9mq6JLxUA3GUZOfARWTJqXjtV0Romr8N2s4deTk+tTP08TvTQwoiKc3yX4T/RytueUkldfnob4kAc+8aq8N8+GA5HHLi0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB4487
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 16, 2023 at 11:30:33PM +0200, Rafał Miłecki wrote:
-> From: Rafał Miłecki <rafal@milecki.pl>
-> 
-> A lot of home routers have NVMEM fixed cells containing MAC address that
-> need some further processing. In ~99% cases MAC needs to be:
-> 1. Optionally parsed from ASCII format
-> 2. Increased by a vendor-picked value
-> 
-> There was already an attempt to design a binding for that at NVMEM
-> device level in the past. It wasn't accepted though as it didn't really
-> fit NVMEM device layer.
-> 
-> The introduction of NVMEM fixed-cells layout seems to be an opportunity
-> to provide a relevant binding in a clean way.
-> 
-> This commit adds two *generic* compatible strings: "mac-base" and
-> "mac-ascii". As always those need to be carefully reviewed.
-> 
-> OpenWrt project currently supports ~300 home routers that would benefit
-> from the "mac-base" binding. Those devices are manufactured by multiple
-> vendors. There are TP-Link devices (76 of them), Netgear (19),
-> D-Link (11), OpenMesh (9), EnGenius (8), GL.iNet (8), ZTE (7),
-> Xiaomi (5), Ubiquiti (6) and more. Those devices don't share an
-> architecture or SoC.
-> 
-> Amount of devices to benefit from the "mac-ascii" is hard to determine
-> as not all of them were converted to DT yet. There are at least 200 of
-> such devices.
-> 
-> It would be impractical to provide unique "compatible" strings for NVMEM
-> layouts of all those devices. It seems like a valid case for allowing a
-> generic binding instead. Even if this binding will not be sufficient for
-> some further devices it seems to be useful enough as it is.
+On Fri, Jun 23, 2023 at 12:29:16PM +0200, Michael Walle wrote:
 
-I'm generally okay with this approach as it's not trying to handle all 
-permutations with properties. Anything odd can have a specific 
-compatible easily.
+...
 
-> 
-> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
-> ---
-> If this binding gets approved I will still need a minor help with YAML.
-> 
-> For some reason my conditions in fixed-cell.yaml don't seem to work as
-> expected. I tried to make "#nvmem-cell-cells" required only for the
-> "mac-base" but it seems it got required for all cells:
+> @@ -780,7 +806,8 @@ static int get_phy_c45_devs_in_pkg(struct mii_bus *bus, int addr, int dev_addr,
+>   * the "devices in package" is invalid.
+>   */
+>  static int get_phy_c45_ids(struct mii_bus *bus, int addr,
+> -			   struct phy_c45_device_ids *c45_ids)
+> +			   struct phy_c45_device_ids *c45_ids,
+> +			   bool c45_over_c22)
 
-Answer below.
+Hi Michael,
 
->   DTC_CHK Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.example.dtb
-> Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.example.dtb: nvmem-layout: calibration@4000: '#nvmem-cell-cells' is a required property
->         From schema: Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-> 
-> Cell "calibration" doesn't have any "compatible" so it shouldn't require
-> "#nvmem-cell-cells".
-> Can someone hint me what I did wrong, please?
-> ---
->  .../bindings/nvmem/layouts/fixed-cell.yaml    | 35 +++++++++++++++++++
->  .../bindings/nvmem/layouts/fixed-layout.yaml  | 12 +++++++
->  .../devicetree/bindings/nvmem/nvmem.yaml      |  5 ++-
->  3 files changed, 51 insertions(+), 1 deletion(-)
-> 
-> diff --git a/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml b/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml
-> index e698098450e1..047e42438a4f 100644
-> --- a/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml
-> +++ b/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml
-> @@ -11,6 +11,17 @@ maintainers:
->    - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
->  
->  properties:
-> +  compatible:
-> +    oneOf:
-> +      - const: mac-base
-> +        description: >
-> +          Cell with base MAC address to be used for calculating extra relative
-> +          addresses.
-> +      - const: mac-ascii
-> +        description: >
-> +          Cell with base MAC address stored in an ASCII format (like
-> +          "00:11:22:33:44:55").
+Please consider adding c45_over_c22 to the kernel doc for get_phy_c45_ids,
+which appears a few lines above.
 
-Isn't ASCII detectable? Just look at the length or that all values are 
-0x3?. Though I can't make sense of the lengths your examples have.
-
-> +
->    reg:
->      maxItems: 1
->  
-> @@ -25,6 +36,30 @@ properties:
->          description:
->            Size in bit within the address range specified by reg.
->  
-> +allOf:
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: mac-base
-
-This will be true with no compatible property. You need 'required: [ 
-compatible ]' in addition.
-
-> +    then:
-> +      properties:
-> +        "#nvmem-cell-cells":
-> +          description: The first argument is a MAC address offset.
-> +          const: 1
-> +      required:
-> +        - "#nvmem-cell-cells"
-> +  - if:
-> +      properties:
-> +        compatible:
-> +          contains:
-> +            const: mac-ascii
-> +    then:
-> +      properties:
-> +        "#nvmem-cell-cells":
-> +          description: The first argument is a MAC address offset.
-> +          const: 1
-> +
->  required:
->    - reg
->  
-> diff --git a/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml b/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-> index c271537d0714..05b8230cd18c 100644
-> --- a/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-> +++ b/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-> @@ -44,6 +44,18 @@ examples:
->          #address-cells = <1>;
->          #size-cells = <1>;
->  
-> +        mac@100 {
-> +            compatible = "mac-base";
-> +            reg = <0x100 0xc>;
-> +            #nvmem-cell-cells = <1>;
-> +        };
-> +
-> +        mac@110 {
-> +            compatible = "mac-ascii";
-> +            reg = <0x110 0x11>;
-> +            #nvmem-cell-cells = <1>;
-> +        };
-> +
->          calibration@4000 {
->              reg = <0x4000 0x100>;
->          };
-> diff --git a/Documentation/devicetree/bindings/nvmem/nvmem.yaml b/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-> index 980244100690..9f921d940142 100644
-> --- a/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-> +++ b/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-> @@ -49,7 +49,10 @@ properties:
->  patternProperties:
->    "@[0-9a-f]+(,[0-7])?$":
->      type: object
-> -    $ref: layouts/fixed-cell.yaml
-> +    allOf:
-> +      - $ref: layouts/fixed-cell.yaml
-> +      - properties:
-> +          compatible: false
->      deprecated: true
->  
->  additionalProperties: true
-> -- 
-> 2.35.3
-> 
+...
 
