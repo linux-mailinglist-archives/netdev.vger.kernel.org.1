@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-13519-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13525-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 098BB73BEC9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:29:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2831273BED5
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:31:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 87ABA281D03
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:29:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 555681C21324
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:31:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D0D510947;
-	Fri, 23 Jun 2023 19:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F60710965;
+	Fri, 23 Jun 2023 19:29:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7BB64101F5
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:29:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id C86BFC433C9;
-	Fri, 23 Jun 2023 19:29:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6226F101F7
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:29:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C35AEC433CA;
+	Fri, 23 Jun 2023 19:29:16 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687548555;
-	bh=xhDHSDbjlKMsWK2KnWbFnQ8wZZ48VsGkNTXf+pLJmm4=;
+	s=k20201202; t=1687548556;
+	bh=OMxI9C4wnPWos1znjk/0iYqGr6DfIFAyPBnPTZxFukU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=PD/zD1WsqiSEgQ5bnWRsRhShHJ9/CmkUFJeVdjM5jVFz0AzI7EJU9uTvbw7Z80/QB
-	 VAZm/cK/mREBCj6Glay5UEwVu1L7Pp0qpQ1Pnu0hjHozj8PVjeDq3u2op1oe6KAFwu
-	 FQ3rICeyFB0xHPSyO694xt0EbXyOw2ab2E4vTNUB40SCaxP4wmBPgV8fPcqq+D60a4
-	 Tk0LMpBeyUdIi+1QQNkaqk1OZERN3y/1NsWcuHdq+PX3wJF0HO4ENhz1lIYNVk77r6
-	 sTqUsiR9LZoEYOni+M1H+bne8WJb/z1BXFfWaJ2dg+9PGmrnDoMjFB6om2Wkpz2tnG
-	 shXxl2O2MXm+A==
+	b=a+Bv0ylzvLX/rEuzs+IG2kq8T9N+OliK629f+46yieEaC83BVVBxz3R1D+3xBCArc
+	 f1NHWkJtr1P+RRzUOEOQ3nmLW9UsIwhO/BTmB27ZhdNZIsgaU0+3o8pgIz+6lE/Z2k
+	 kYLm1k+xbQFvjL7EU+nUj1KyzRK3h8AWCuX0LtreVuebIKoyiirzN+GPiqbpdHvUu5
+	 eEm4Ybg0LngSGx36bBjZsrVDeTVkLtOvWa5B+5iLBrbN1o/fCwoM51kAGAbzrfXLKP
+	 7X5k/WHTXkHQwUb9CbxMficwE6t/0lM9roz/85sgqgd8vdfN3LjQNg0dLAhisbIEJw
+	 UKABGXOLgmrjg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -39,13 +39,13 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Shay Drory <shayd@nvidia.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Moshe Shemesh <moshe@nvidia.com>,
 	Automatic Verification <verifier@nvidia.com>,
-	Gal Pressman <gal@nvidia.com>,
-	Moshe Shemesh <moshe@nvidia.com>
-Subject: [net-next V2 01/15] net/mlx5: Fix UAF in mlx5_eswitch_cleanup()
-Date: Fri, 23 Jun 2023 12:28:53 -0700
-Message-ID: <20230623192907.39033-2-saeed@kernel.org>
+	Gal Pressman <gal@nvidia.com>
+Subject: [net-next V2 02/15] net/mlx5: Fix SFs kernel documentation error
+Date: Fri, 23 Jun 2023 12:28:54 -0700
+Message-ID: <20230623192907.39033-3-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230623192907.39033-1-saeed@kernel.org>
 References: <20230623192907.39033-1-saeed@kernel.org>
@@ -59,72 +59,58 @@ Content-Transfer-Encoding: 8bit
 
 From: Shay Drory <shayd@nvidia.com>
 
-mlx5_eswitch_cleanup() is using esw right after freeing it for
-releasing devlink_param.
-Fix it by releasing the devlink_param before freeing the esw, and
-adjust the create function accordingly.
+Indent SFs probe code example in order to fix the below error:
 
-Fixes: 3f90840305e2 ("net/mlx5: Move esw multiport devlink param to eswitch code")
-Reported-by: Dan Carpenter <dan.carpenter@linaro.org>
+Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst:57: ERROR: Unexpected indentation.
+Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst:61: ERROR: Unexpected indentation.
+
+Fixes: e71383fb9cd1 ("net/mlx5: Light probe local SFs")
 Signed-off-by: Shay Drory <shayd@nvidia.com>
+Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
+Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
 Reviewed-by: Automatic Verification <verifier@nvidia.com>
 Reviewed-by: Gal Pressman <gal@nvidia.com>
-Reviewed-by: Moshe Shemesh <moshe@nvidia.com>
-Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/eswitch.c  | 18 ++++++++----------
- 1 file changed, 8 insertions(+), 10 deletions(-)
+ .../ethernet/mellanox/mlx5/switchdev.rst      | 22 ++++++++++---------
+ 1 file changed, 12 insertions(+), 10 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-index 5aaedbf71783..b4e465856127 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-@@ -1751,16 +1751,14 @@ int mlx5_eswitch_init(struct mlx5_core_dev *dev)
- 	if (!MLX5_VPORT_MANAGER(dev) && !MLX5_ESWITCH_MANAGER(dev))
- 		return 0;
+diff --git a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
+index db62187eebce..6e3f5ee8b0d0 100644
+--- a/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
++++ b/Documentation/networking/device_drivers/ethernet/mellanox/mlx5/switchdev.rst
+@@ -51,19 +51,21 @@ This will allow user to configure the SF before the SF have been fully probed,
+ which will save time.
  
-+	esw = kzalloc(sizeof(*esw), GFP_KERNEL);
-+	if (!esw)
-+		return -ENOMEM;
+ Usage example:
+-Create SF:
+-$ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 11
+-$ devlink port function set pci/0000:08:00.0/32768 \
+-               hw_addr 00:00:00:00:00:11 state active
+ 
+-Enable ETH auxiliary device:
+-$ devlink dev param set auxiliary/mlx5_core.sf.1 \
+-              name enable_eth value true cmode driverinit
++- Create SF::
+ 
+-Now, in order to fully probe the SF, use devlink reload:
+-$ devlink dev reload auxiliary/mlx5_core.sf.1
++    $ devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 11
++    $ devlink port function set pci/0000:08:00.0/32768 hw_addr 00:00:00:00:00:11 state active
+ 
+-mlx5 supports ETH,rdma and vdpa (vnet) auxiliary devices devlink params (see :ref:`Documentation/networking/devlink/devlink-params.rst`)
++- Enable ETH auxiliary device::
 +
- 	err = devl_params_register(priv_to_devlink(dev), mlx5_eswitch_params,
- 				   ARRAY_SIZE(mlx5_eswitch_params));
- 	if (err)
--		return err;
--
--	esw = kzalloc(sizeof(*esw), GFP_KERNEL);
--	if (!esw) {
--		err = -ENOMEM;
--		goto unregister_param;
--	}
-+		goto free_esw;
++    $ devlink dev param set auxiliary/mlx5_core.sf.1 name enable_eth value true cmode driverinit
++
++- Now, in order to fully probe the SF, use devlink reload::
++
++    $ devlink dev reload auxiliary/mlx5_core.sf.1
++
++mlx5 supports ETH,rdma and vdpa (vnet) auxiliary devices devlink params (see :ref:`Documentation/networking/devlink/devlink-params.rst <devlink_params_generic>`).
  
- 	esw->dev = dev;
- 	esw->manager_vport = mlx5_eswitch_manager_vport(dev);
-@@ -1821,10 +1819,10 @@ int mlx5_eswitch_init(struct mlx5_core_dev *dev)
- 	if (esw->work_queue)
- 		destroy_workqueue(esw->work_queue);
- 	debugfs_remove_recursive(esw->debugfs_root);
--	kfree(esw);
--unregister_param:
- 	devl_params_unregister(priv_to_devlink(dev), mlx5_eswitch_params,
- 			       ARRAY_SIZE(mlx5_eswitch_params));
-+free_esw:
-+	kfree(esw);
- 	return err;
- }
+ mlx5 supports subfunction management using devlink port (see :ref:`Documentation/networking/devlink/devlink-port.rst <devlink_port>`) interface.
  
-@@ -1848,9 +1846,9 @@ void mlx5_eswitch_cleanup(struct mlx5_eswitch *esw)
- 	esw_offloads_cleanup(esw);
- 	mlx5_esw_vports_cleanup(esw);
- 	debugfs_remove_recursive(esw->debugfs_root);
--	kfree(esw);
- 	devl_params_unregister(priv_to_devlink(esw->dev), mlx5_eswitch_params,
- 			       ARRAY_SIZE(mlx5_eswitch_params));
-+	kfree(esw);
- }
- 
- /* Vport Administration */
 -- 
 2.41.0
 
