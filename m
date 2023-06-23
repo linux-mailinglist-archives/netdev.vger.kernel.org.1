@@ -1,137 +1,82 @@
-Return-Path: <netdev+bounces-13629-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13630-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0F29873C4D7
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:43:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B7A9573C4ED
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:50:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C1922281E81
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:43:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 723FE281E2E
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:50:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCC606FD0;
-	Fri, 23 Jun 2023 23:43:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 947486FD3;
+	Fri, 23 Jun 2023 23:50:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0A88443C
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 23:43:18 +0000 (UTC)
-Received: from mail-io1-f46.google.com (mail-io1-f46.google.com [209.85.166.46])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34EF02703;
-	Fri, 23 Jun 2023 16:43:17 -0700 (PDT)
-Received: by mail-io1-f46.google.com with SMTP id ca18e2360f4ac-78333585d28so32790139f.1;
-        Fri, 23 Jun 2023 16:43:17 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687563796; x=1690155796;
-        h=date:subject:message-id:references:in-reply-to:cc:to:from
-         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fTiyezCl+ncjMsIOOS0sUB9bYyrGCDjIJOvndxohyZs=;
-        b=JsAIoLHPQR83cIFWCg7WWq9dOFpHwbGPHK2yoY125gC8xVqx2+ttlxJX+sxoETmQlV
-         0nzPjnhz39qU6o87QsXUo3XE8rc8xVe1tCFq0v/HUv/SqKNKfCrP1E1R7lgXcGuOx6y2
-         Ye3G6ypunxQdjQzz2ukdGGZuVQNU006TpPpL8MAHc+uIiGpnV85+2gp/WvADNQ/2sRCU
-         AoLsbcQUu6qTlfBlobD2G6x4CJs0P6/7LAU5AFlr+R6jVOZVLv1PoQKKkeOqS1a/I5G5
-         iHh6o5EBG3JC2u0sVTRVWCc72uLnf7/POT8WGjwChV0ytJvnTeM9K3NQ4zI7JypbiFa8
-         xFfg==
-X-Gm-Message-State: AC+VfDw5DExrdMCkSqQcgXx602OXDOFT2Gsg8bbCY0m4jzAMeRS+bMz2
-	HjkFdCKixSxi9ODyQ8CMJA==
-X-Google-Smtp-Source: ACHHUZ704nUo/Qe+1L5BBq/vh9K03eeZluxsw6d51akGW3mbLVGxB1UGHdSEiXEdc5xMZV7l5fDOHg==
-X-Received: by 2002:a5d:9483:0:b0:760:e308:107e with SMTP id v3-20020a5d9483000000b00760e308107emr15001057ioj.0.1687563796356;
-        Fri, 23 Jun 2023 16:43:16 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id r27-20020a02c85b000000b0041407c67451sm72416jao.165.2023.06.23.16.43.10
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 16:43:15 -0700 (PDT)
-Received: (nullmailer pid 1606691 invoked by uid 1000);
-	Fri, 23 Jun 2023 23:43:09 -0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D08A6FD0
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 23:50:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E376EC433C0;
+	Fri, 23 Jun 2023 23:50:19 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687564219;
+	bh=Y3bxkp5SbGztYo+DA97inEbwJ5wiO6xnII5XqYNbLA4=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Z6ZY3cLgoeFWol9ToU5WqrssIX5nNJRCvONVYP0A9ynn6l1YhO9T8kp9zjMy5CqYd
+	 S/zyY/P6VZth74TmN2uVsFxRslP9irbL8WyRbp1chc2F3WRWLKcw2sWcCXg7sOlNB9
+	 pSdUYzoIoADNrN012MckCKtC/7w7kQBYIWU4UPeK8sXtl4tXeoXVrfxJxTDXb3Jf72
+	 u/0igCmI+TiIURrqlZ8SGMjV4AO+Ulbdc6Cl6aPImdpcX8xR5iNF+J7RSFRkgxF8DS
+	 hLn7HM2x3b+E8B9oh/BqXoC+v+vttBGrUYQPHT0aKOgXNnmzpv6OX9v8V+QYx3K7Ap
+	 cMI7rRJlGo70g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id BC3D4C395D9;
+	Fri, 23 Jun 2023 23:50:19 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Rob Herring <robh@kernel.org>
-To: Varshini Rajendran <varshini.rajendran@microchip.com>
-Cc: ulf.hansson@linaro.org, krzysztof.kozlowski+dt@linaro.org, 
-	edumazet@google.com, broonie@kernel.org, arnd@arndb.de, maz@kernel.org, 
-	lgirdwood@gmail.com, alexandre.belloni@bootlin.com, alain.volmat@foss.st.com, 
-	p.zabel@pengutronix.de, mihai.sain@microchip.com, soc@kernel.org, 
-	linux-mtd@lists.infradead.org, cristian.birsan@microchip.com, 
-	jerry.ray@microchip.com, tudor.ambarus@linaro.org, miquel.raynal@bootlin.com, 
-	richard@nod.at, gregkh@linuxfoundation.org, linux-usb@vger.kernel.org, 
-	balamanikandan.gunasundar@microchip.com, lee@kernel.org, olivia@selenic.com, 
-	sboyd@kernel.org, mturquette@baylibre.com, kuba@kernel.org, 
-	Hari.PrasathGE@microchip.com, linux-kernel@vger.kernel.org, 
-	balakrishnan.s@microchip.com, alsa-devel@alsa-project.org, 
-	durai.manickamkr@microchip.com, sre@kernel.org, vkoul@kernel.org, 
-	linux-rtc@vger.kernel.org, linux-serial@vger.kernel.org, andrew@lunn.ch, 
-	devicetree@vger.kernel.org, nayabbasha.sayed@microchip.com, 
-	linux-gpio@vger.kernel.org, nicolas.ferre@microchip.com, davem@davemloft.net, 
-	pabeni@redhat.com, linux-arm-kernel@lists.infradead.org, linux@roeck-us.net, 
-	wim@linux-watchdog.org, tglx@linutronix.de, horatiu.vultur@microchip.com, 
-	radu_nicolae.pirea@upb.ro, dharma.b@microchip.com, a.zummo@towertech.it, 
-	linux-mmc@vger.kernel.org, richard.genoud@gmail.com, 
-	claudiu.beznea@microchip.com, linus.walleij@linaro.org, conor+dt@kernel.org, 
-	herbert@gondor.apana.org.au, eugen.hristev@collabora.com, 
-	dmaengine@vger.kernel.org, netdev@vger.kernel.org, linux-spi@vger.kernel.org, 
-	linux@armlinux.org.uk, linux-watchdog@vger.kernel.org, 
-	linux-pm@vger.kernel.org, robh+dt@kernel.org, linux-i2c@vger.kernel.org, 
-	linux-crypto@vger.kernel.org, neil.armstrong@linaro.org, vigneshr@ti.com, 
-	manikandan.m@microchip.com, linux-clk@vger.kernel.org, olof@lixom.net
-In-Reply-To: <20230623203056.689705-32-varshini.rajendran@microchip.com>
-References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
- <20230623203056.689705-32-varshini.rajendran@microchip.com>
-Message-Id: <168756378936.1606652.14221929175769628362.robh@kernel.org>
-Subject: Re: [PATCH v2 31/45] dt-bindings: atmel-classd: add sam9x7
- compatible
-Date: Fri, 23 Jun 2023 17:43:09 -0600
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH iproute2-next v3] f_flower: add cfm support
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168756421976.20790.10672968376612738306.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Jun 2023 23:50:19 +0000
+References: <20230621205545.63760-1-zahari.doychev@linux.com>
+In-Reply-To: <20230621205545.63760-1-zahari.doychev@linux.com>
+To: Zahari Doychev <zahari.doychev@linux.com>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org,
+ hmehrtens@maxlinear.com, aleksander.lobakin@intel.com,
+ simon.horman@corigine.com, idosch@idosch.org, zdoychev@maxlinear.com,
+ idosch@nvidia.com
 
+Hello:
 
-On Sat, 24 Jun 2023 02:00:42 +0530, Varshini Rajendran wrote:
-> Add sam9x7 compatible to DT bindings documentation.
+This patch was applied to iproute2/iproute2-next.git (main)
+by David Ahern <dsahern@kernel.org>:
+
+On Wed, 21 Jun 2023 22:55:45 +0200 you wrote:
+> From: Zahari Doychev <zdoychev@maxlinear.com>
 > 
-> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-> ---
->  .../devicetree/bindings/sound/atmel,sama5d2-classd.yaml      | 5 ++++-
->  1 file changed, 4 insertions(+), 1 deletion(-)
+> Add support for matching on CFM Maintenance Domain level and opcode.
 > 
+>   # tc filter add dev ens6 ingress pref 1 proto cfm \
+>        flower cfm op 1 mdl 5 action ok
+> 
+> [...]
 
-My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
-on your patch (DT_CHECKER_FLAGS is new in v5.13):
+Here is the summary with links:
+  - [iproute2-next,v3] f_flower: add cfm support
+    https://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git/commit/?id=5295b8f38e31
 
-yamllint warnings/errors:
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
-dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/sound/atmel,sama5d2-classd.example.dtb: sound@fc048000: compatible: 'oneOf' conditional failed, one must be fixed:
-	['atmel,sama5d2-classd'] is too short
-	from schema $id: http://devicetree.org/schemas/sound/atmel,sama5d2-classd.yaml#
-
-doc reference errors (make refcheckdocs):
-
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230623203056.689705-32-varshini.rajendran@microchip.com
-
-The base for the series is generally the latest rc1. A different dependency
-should be noted in *this* patch.
-
-If you already ran 'make dt_binding_check' and didn't see the above
-error(s), then make sure 'yamllint' is installed and dt-schema is up to
-date:
-
-pip3 install dtschema --upgrade
-
-Please check and re-submit after running the above command yourself. Note
-that DT_SCHEMA_FILES can be set to your schema file to speed up checking
-your schema. However, it must be unset to test all examples with your schema.
 
 
