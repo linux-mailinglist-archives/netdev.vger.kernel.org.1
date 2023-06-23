@@ -1,172 +1,211 @@
-Return-Path: <netdev+bounces-13451-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13452-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B5D673BA45
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:35:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B2ACB73BA49
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 16:36:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 19EE2281CA3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:35:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CEA41C212F2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:36:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FD42230F5;
-	Fri, 23 Jun 2023 14:35:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A31EA23101;
+	Fri, 23 Jun 2023 14:35:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D00D8BED
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:35:43 +0000 (UTC)
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (mail-dm3nam02on2061b.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e83::61b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49F7A1706
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:35:36 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=QFdC9uMMdydjbuAHrtR+ShMxqkS1DgBQS2jQYy1gTBghE8qSO6FkdSGrVO8wlkyKYdwfpfliwcy1DwWyF2Uw7TDYvoJnYB02pGxq7Yie6IBh9tNsL3Qm2ghp31tIfIaUv/+FtLxOu8+RKtwK5QbhWvPJUA+P23DyusAce5MO/A7GQ/NkRfook3cnK0mhZep1638STFoLjB11/rpP5F1XubzwhIR16ITJOh/Aksg3Hr0hb3YeZ7oAy6pMq4yDs8FlyKQRg1Xo+XS9i8Nk83XgNNgkM/ByXoseII/amsyGVaU825J/JXFa12e5KAJ7B1bfaWZCaYaSddc9vXoXl0IkVw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=OUg28XA1teom6NjS4fyN6eT7imEf9twK0PJ1zMqYu5k=;
- b=DsmHstZhnSffCBHRWwGQBYtymj1ZPHHNXJi99WW1Fzqij1xsoEJWUJKD1O0knFDtjmcWb83rvfB/t0FrwOWjgns/n/x/AgYR62J/kxOXgNiRWrNtflvgggFCjPkVP3v278VueI01/A/tPJldbNvmPFnX8KdpjdVC4eLFsLGQc+stt8lS/hB8u5djDLECznrOpu/g3OFRdEU3oSZkrLGdYgcwyTBi4E05rXlojiuIPvh7OeBfEFCA9RDZBb7F/llRVwVNsgonc9ANgvPYiuk9lL4H3+m/zRXBJP4Dv8OD617gPICX9JaVWDw9MXQDUXGWfo7U9gVD7QECgRIx0xKMgA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=davemloft.net smtp.mailfrom=amd.com;
- dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
- header.from=amd.com; dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=OUg28XA1teom6NjS4fyN6eT7imEf9twK0PJ1zMqYu5k=;
- b=4grLxiRNhxCJe8k8SH/ohWexyqrDpXyvmpEqq1Q+aFHorNKX1n6BWldQExUNOCuYRxobmqybPAhhGhAUihei7/Xel5YPVp5rZBjibQ+ZcfOZ1DTPcJIBoy/PL1R+y6Qnh2BtZagL9MPA9KyFDVM6IVUdq4xxNOuUD6KC6PrDacA=
-Received: from SA9PR13CA0118.namprd13.prod.outlook.com (2603:10b6:806:24::33)
- by BL1PR12MB5109.namprd12.prod.outlook.com (2603:10b6:208:309::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Fri, 23 Jun
- 2023 14:35:33 +0000
-Received: from SN1PEPF00026368.namprd02.prod.outlook.com
- (2603:10b6:806:24:cafe::59) by SA9PR13CA0118.outlook.office365.com
- (2603:10b6:806:24::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.10 via Frontend
- Transport; Fri, 23 Jun 2023 14:35:33 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- SN1PEPF00026368.mail.protection.outlook.com (10.167.241.133) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6544.11 via Frontend Transport; Fri, 23 Jun 2023 14:35:32 +0000
-Received: from SATLEXMB04.amd.com (10.181.40.145) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Fri, 23 Jun
- 2023 09:35:32 -0500
-Received: from xcbecree41x.xilinx.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23 via Frontend
- Transport; Fri, 23 Jun 2023 09:35:30 -0500
-From: <edward.cree@amd.com>
-To: <linux-net-drivers@amd.com>, <davem@davemloft.net>, <kuba@kernel.org>,
-	<edumazet@google.com>, <pabeni@redhat.com>
-CC: Edward Cree <ecree.xilinx@gmail.com>, <netdev@vger.kernel.org>,
-	<habetsm.xilinx@gmail.com>, Pieter Jansen van Vuuren
-	<pieter.jansen-van-vuuren@amd.com>
-Subject: [PATCH net] sfc: fix crash when reading stats while NIC is resetting
-Date: Fri, 23 Jun 2023 15:34:48 +0100
-Message-ID: <20230623143448.47159-1-edward.cree@amd.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C8A9A93B
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 14:35:54 +0000 (UTC)
+Received: from mail-oa1-x31.google.com (mail-oa1-x31.google.com [IPv6:2001:4860:4864:20::31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3207F269F
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:35:44 -0700 (PDT)
+Received: by mail-oa1-x31.google.com with SMTP id 586e51a60fabf-1a9d57f8f9fso550873fac.3
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:35:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=chromium.org; s=google; t=1687530943; x=1690122943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=2SEBPStKVcWuK0U9+o4k9p1pZNT3HD7OxhCSF6G1cNQ=;
+        b=lBwO2RYXA1FbofoshpI3lj93tY3ca60z4/PmDkydo4xoYcFMNeuPHdNBF1PhvE7mF5
+         x+B9+fyQaWDspUByK4Dd38a763lzJM93zzmupkYVMv8Qtrs8STGdUMpu3gwqKlRdO4zf
+         mDjg+/i0MeO7gX8VsR37GE7UxxozyYayG5JOk=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687530943; x=1690122943;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=2SEBPStKVcWuK0U9+o4k9p1pZNT3HD7OxhCSF6G1cNQ=;
+        b=YaPHFqVZLW0FuX3A37vFhJ3BKDfz2abkNaTAtqdLJEE5TOBQ05j3NwymSU6XPOR1iz
+         P9CWY1AWIEZXsWpX3H2hmGvA8slXe3kwyuafe8MmcrRqCPhw7vP1IBw1TgtYpuSDoq32
+         /zjRSUQ2V+ruiqMNKtndpO5PcK5Y/EmbI5dXWoGtqwCbVabv/qUIX4SftXnUGcL8idbg
+         agFpfVAhXmnxDtjhJ/5yr9++wMos87Oetug7ngShmVpJAyJ9f/jnGOYMVZ5AdTo9Dn9z
+         VuPv+DYL4Xq9Xy7ALMIWEx8mgepmLoTipR0hQN1C9BHJt129qJn/UHW9ZYnDaZYZ1Bbr
+         LgsA==
+X-Gm-Message-State: AC+VfDz34B1bFBo+kOSst/wY3RDRoU5kanshp8TpHhIwhM9a6TcCY+Dy
+	8fOQtDHQ47NZRl9f4ZKvY5cZuA+Fm1hZ/JDRUgdgxQ==
+X-Google-Smtp-Source: ACHHUZ41ySHwYAnHtH61CA+4dnkZdBqUtd5tQsOOy4llzFrD6Whs2u9HXzuxuQst1L9jHxAm1lQplvzBBmykSYenq/w=
+X-Received: by 2002:a05:6870:e896:b0:196:8dc3:4e16 with SMTP id
+ q22-20020a056870e89600b001968dc34e16mr17947005oan.39.1687530943485; Fri, 23
+ Jun 2023 07:35:43 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN1PEPF00026368:EE_|BL1PR12MB5109:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8483eb04-a137-4797-0e81-08db73f719a9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mVxEde/U0GvtDCtvkUImE7PInl1W3S3nKyKMOPGPhulkbIPQA4U/eABiA4ttIPyPsEf//qZ4vF9tFreSjsSdmOdi3IkL+kkL9iweJNi51Mx0Dsd1a6vsSNPxrLA+RHz40siGkmRr5xTGTmdwDkkAHFtRKCKh4Uc+DeuBiDin8sVJ87fTsd3PzlB4MIB97OtqQbbQz8GeTmKTjaCLooOsjGA6+TD6BThFHaNiA4NAGJA3P0nf+ID/H9ElHPxRENzV7vqrGMlg1SDAHUvsRi+K4GzOuKCEHmogj6+nPZlHhYv//ypXdEr7qYzE3p4762odB7Xfd5sYCgcNwHdrvO3Bw5YwCqFAXdCY/4c4I1Wegi2CvGQ+3LgE2PsxzziE+gJEQNaouws3cPa8mqaJsZfWE9oMKaf+Y4Xh05iD8tY2tEhIqQSaooYNlgUjhn2+C0l8CBXE0Y5zNSgZAg/Cd6bWel3p8J6ec0LzcdmcrXVxYD1okH8z8YfW+e9KcafdnChAKdLgWgnRMjNI9g8/e82Pf2eueHfXYDP8ei6mboaa05LE6ITtoFqpYRhbi8qtzB5Bm/7VaINEcabz+o7gZ6WF31+r0obeOWPFkblzaRA1MXBYL+DWjNzDZsmtngw60fNvph46XSex6+4tpPDq27SCHbv2vaO0TSAInBVLpg+PauCYneofGVtUYteS5wOtDTmVwsB5XJU98xtnLh9Ygu2rAncYAEWcU/Io1PvU8Psd1+romGMBgkiF+5ygPW3Boh96PHDo9SIBNozCSNrrNOrGDg==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(376002)(136003)(346002)(451199021)(46966006)(36840700001)(40470700004)(426003)(83380400001)(8936002)(8676002)(41300700001)(81166007)(356005)(336012)(316002)(82740400003)(2616005)(36860700001)(47076005)(186003)(1076003)(40460700003)(6666004)(26005)(54906003)(478600001)(110136005)(40480700001)(36756003)(4326008)(86362001)(70206006)(70586007)(82310400005)(2876002)(2906002)(5660300002)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 14:35:32.7058
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8483eb04-a137-4797-0e81-08db73f719a9
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	SN1PEPF00026368.namprd02.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL1PR12MB5109
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,SPF_HELO_PASS,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-13-konstantin.meskhidze@huawei.com>
+ <ZH89Pi1QAqNW2QgG@google.com> <CABi2SkWqHeLkmqONbmavcp2SCiwe6YeH_3dkBLZwSsk7neyPMw@mail.gmail.com>
+ <86108314-de87-5342-e0fb-a07feee457a5@huawei.com> <97c15e23-8a89-79f2-4413-580153827ade@digikod.net>
+ <00a03f2c-892d-683e-96a0-c0ba8f293831@digikod.net>
+In-Reply-To: <00a03f2c-892d-683e-96a0-c0ba8f293831@digikod.net>
+From: Jeff Xu <jeffxu@chromium.org>
+Date: Fri, 23 Jun 2023 07:35:33 -0700
+Message-ID: <CABi2SkWJT5xmjBvudEc725uN8iAMCKf5BBOppzgmRJRc2M4nrg@mail.gmail.com>
+Subject: Re: [PATCH v11 12/12] landlock: Document Landlock's network support
+To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
+Cc: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
+	willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com, 
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
+	artem.kuzin@huawei.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Edward Cree <ecree.xilinx@gmail.com>
+On Thu, Jun 22, 2023 at 9:50=E2=80=AFAM Micka=C3=ABl Sala=C3=BCn <mic@digik=
+od.net> wrote:
+>
+>
+> On 13/06/2023 22:12, Micka=C3=ABl Sala=C3=BCn wrote:
+> >
+> > On 13/06/2023 12:13, Konstantin Meskhidze (A) wrote:
+> >>
+> >>
+> >> 6/7/2023 8:46 AM, Jeff Xu =D0=BF=D0=B8=D1=88=D0=B5=D1=82:
+> >>> On Tue, Jun 6, 2023 at 7:09=E2=80=AFAM G=C3=BCnther Noack <gnoack@goo=
+gle.com> wrote:
+> >>>>
+> >>>> On Tue, May 16, 2023 at 12:13:39AM +0800, Konstantin Meskhidze wrote=
+:
+> >>>>> Describe network access rules for TCP sockets. Add network access
+> >>>>> example in the tutorial. Add kernel configuration support for netwo=
+rk.
+> >>>>>
+> >>>>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.co=
+m>
+>
+> [...]
+>
+> >>>>> @@ -28,20 +28,24 @@ appropriately <kernel_support>`.
+> >>>>>    Landlock rules
+> >>>>>    =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> >>>>>
+> >>>>> -A Landlock rule describes an action on an object.  An object is cu=
+rrently a
+> >>>>> -file hierarchy, and the related filesystem actions are defined wit=
+h `access
+> >>>>> -rights`_.  A set of rules is aggregated in a ruleset, which can th=
+en restrict
+> >>>>> -the thread enforcing it, and its future children.
+> >>>>> +A Landlock rule describes an action on a kernel object.  Filesyste=
+m
+> >>>>> +objects can be defined with a file hierarchy.  Since the fourth AB=
+I
+> >>>>> +version, TCP ports enable to identify inbound or outbound connecti=
+ons.
+> >>>>> +Actions on these kernel objects are defined according to `access
+> >>>>> +rights`_.  A set of rules is aggregated in a ruleset, which
+> >>>>> +can then restrict the thread enforcing it, and its future children=
+.
+> >>>>
+> >>>> I feel that this paragraph is a bit long-winded to read when the
+> >>>> additional networking aspect is added on top as well.  Maybe it woul=
+d
+> >>>> be clearer if we spelled it out in a more structured way, splitting =
+up
+> >>>> the filesystem/networking aspects?
+> >>>>
+> >>>> Suggestion:
+> >>>>
+> >>>>     A Landlock rule describes an action on an object which the proce=
+ss
+> >>>>     intends to perform.  A set of rules is aggregated in a ruleset,
+> >>>>     which can then restrict the thread enforcing it, and its future
+> >>>>     children.
+> >>>>
+> >>>>     The two existing types of rules are:
+> >>>>
+> >>>>     Filesystem rules
+> >>>>         For these rules, the object is a file hierarchy,
+> >>>>         and the related filesystem actions are defined with
+> >>>>         `filesystem access rights`.
+> >>>>
+> >>>>     Network rules (since ABI v4)
+> >>>>         For these rules, the object is currently a TCP port,
+> >>> Remote port or local port ?
+> >>>
+> >>      Both ports - remote or local.
+> >
+> > Hmm, at first I didn't think it was worth talking about remote or local=
+,
+> > but I now think it could be less confusing to specify a bit:
+> > "For these rules, the object is the socket identified with a TCP (bind
+> > or connect) port according to the related `network access rights`."
+> >
+> > A port is not a kernel object per see, so I tried to tweak a bit the
+> > sentence. I'm not sure such detail (object vs. data) would not confuse
+> > users. Any thought?
+>
+> Well, here is a more accurate and generic definition (using "scope"):
+>
+> A Landlock rule describes a set of actions intended by a task on a scope
+> of objects.  A set of rules is aggregated in a ruleset, which can then
+> restrict the thread enforcing it, and its future children.
+>
+> The two existing types of rules are:
+>
+> Filesystem rules
+>      For these rules, the scope of objects is a file hierarchy,
+>      and the related filesystem actions are defined with
+>      `filesystem access rights`.
+>
+> Network rules (since ABI v4)
+>      For these rules, the scope of objects is the sockets identified
+>      with a TCP (bind or connect) port according to the related
+>      `network access rights`.
+>
+>
+> What do you think?
+>
+I found this is clearer to me (mention of bind/connect port).
 
-efx_net_stats() (.ndo_get_stats64) can be called during an ethtool
- selftest, during which time nic_data->mc_stats is NULL as the NIC has
- been fini'd.  In this case do not attempt to fetch the latest stats
- from the hardware, else we will crash on a NULL dereference:
-    BUG: kernel NULL pointer dereference, address: 0000000000000038
-    RIP efx_nic_update_stats
-    abridged calltrace:
-    efx_ef10_update_stats_pf
-    efx_net_stats
-    dev_get_stats
-    dev_seq_printf_stats
-Skipping the read is safe, we will simply give out stale stats.
-To ensure that the free in efx_ef10_fini_nic() does not race against
- efx_ef10_update_stats_pf(), which could cause a TOCTTOU bug, take the
- efx->stats_lock in fini_nic (it is already held across update_stats).
+In networking, "5-tuple" is a well-known term for connection, which is
+src/dest ip, src/dest port, protocol. That is why I asked about
+src/dest port.  It seems that we only support src/dest port at this
+moment, right ?
 
-Fixes: d3142c193dca ("sfc: refactor EF10 stats handling")
-Reviewed-by: Pieter Jansen van Vuuren <pieter.jansen-van-vuuren@amd.com>
-Signed-off-by: Edward Cree <ecree.xilinx@gmail.com>
----
- drivers/net/ethernet/sfc/ef10.c | 13 ++++++++++---
- 1 file changed, 10 insertions(+), 3 deletions(-)
+Another feature we could consider is restricting a process to "no
+network access, allow out-going , allow incoming", this might overlap
+with seccomp, but I think it is convenient to have it in Landlock.
 
-diff --git a/drivers/net/ethernet/sfc/ef10.c b/drivers/net/ethernet/sfc/ef10.c
-index b63e47af6365..8c019f382a7f 100644
---- a/drivers/net/ethernet/sfc/ef10.c
-+++ b/drivers/net/ethernet/sfc/ef10.c
-@@ -1297,8 +1297,10 @@ static void efx_ef10_fini_nic(struct efx_nic *efx)
- {
- 	struct efx_ef10_nic_data *nic_data = efx->nic_data;
- 
-+	spin_lock_bh(&efx->stats_lock);
- 	kfree(nic_data->mc_stats);
- 	nic_data->mc_stats = NULL;
-+	spin_unlock_bh(&efx->stats_lock);
- }
- 
- static int efx_ef10_init_nic(struct efx_nic *efx)
-@@ -1852,9 +1854,14 @@ static size_t efx_ef10_update_stats_pf(struct efx_nic *efx, u64 *full_stats,
- 
- 	efx_ef10_get_stat_mask(efx, mask);
- 
--	efx_nic_copy_stats(efx, nic_data->mc_stats);
--	efx_nic_update_stats(efx_ef10_stat_desc, EF10_STAT_COUNT,
--			     mask, stats, nic_data->mc_stats, false);
-+	/* If NIC was fini'd (probably resetting), then we can't read
-+	 * updated stats right now.
-+	 */
-+	if (nic_data->mc_stats) {
-+		efx_nic_copy_stats(efx, nic_data->mc_stats);
-+		efx_nic_update_stats(efx_ef10_stat_desc, EF10_STAT_COUNT,
-+				     mask, stats, nic_data->mc_stats, false);
-+	}
- 
- 	/* Update derived statistics */
- 	efx_nic_fix_nodesc_drop_stat(efx,
+Adding protocol restriction is a low hanging fruit also, for example,
+a process might be restricted to UDP only (for RTP packet), and
+another process for TCP (for signaling) , etc.
+
+Thanks!
+-Jeff Xu
+
+>
+> >>>
+> >>>>         and the related actions are defined with `network access rig=
+hts`.
 
