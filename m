@@ -1,78 +1,132 @@
-Return-Path: <netdev+bounces-13294-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13295-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7684373B1FF
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:47:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6B7373B209
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:48:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A79DA1C2104E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 07:47:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BFC2D1C21021
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 07:48:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E47A17F7;
-	Fri, 23 Jun 2023 07:46:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECC0917FC;
+	Fri, 23 Jun 2023 07:48:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4336917D3
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:46:28 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B3FC42736
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:46:06 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-98862e7e3e6so33886766b.0
-        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:46:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D903E17D3
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 07:48:06 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5CECD1988
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:48:04 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b47bfd4e45so5740881fa.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:48:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687506364; x=1690098364;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=+iQJZz9hEg89sqi4PWoni97EtVUqEhCuQI2ITf4HAXA=;
-        b=2TvXFALf689o+kg1n/BoUwKWd/3XYQin0SBUbtKYKNgUhCzzbJ+zHnhiPm5dgZWZAx
-         QOV/GJ86Rl2FDFDbDPni5ZM0BkL37FEMoYPwXMiER9Sh9mD5ES/THtN/j9IgbyCSFV3e
-         ef8aWCcaO4aza0Hid7+CB9HASZE3Y9IV1lpJPLMqLGErRJVeEuvHVQ3AGNST32knIj/s
-         zLsnBn3JqlZw10Xqokx03IWjwM4pAI9pZJx+J/CwDEu+M+drvk3uudoNTX7B0xdkf6x8
-         yEqmKo6VvFbXwWM6U0zfiTfV68+g8Eait/IWtuqpT0BnIAUkejeY9cOZSOOQfHLly9Jk
-         MwqA==
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687506482; x=1690098482;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=afzpoupdHBz4t80yeY68UW7BcSr6J0mUzcvK1xv8c1M=;
+        b=y839S9kxd09ThLEfxmxC6oII3nMiQTOEHF9PojI9kiub9AcAU9VwNCWsdUi79zoGrL
+         I53edaB4DcMZQQ0qflpJAUkvrrMC34ACSDUt0ujxI5pBdzcViBCk6n9FKsQqZhEr33/O
+         VvEBWTcxrI6FtHpJuHeokazRCXKF4vksYk5o+OAae6lurukOLI6tXHVLSfb+Q+V7FEV/
+         sf8imt+RlLt6Lat5yCvrtngprbPt26rUBnApAtbvCEbqlIgaWoDJC9mFHQOn0JbF41dG
+         AZbWjTZ98aLp9MgUn+gURDvYq4bO/7X5+p/tQDFnf5y1CNMOL2mMEGQ/vOQjVcpXlF7u
+         UTbQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687506364; x=1690098364;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+iQJZz9hEg89sqi4PWoni97EtVUqEhCuQI2ITf4HAXA=;
-        b=bqeAlLvpXBoQzgPmCZEqrmW7RDIYYfyOMdKqJgo7WSuwHStr6blODtbizeFipBOzZR
-         ERcyRe4l8Qea0j1ssfkl7FraWED5GAr9glpVH51DjTOKVSwkzFHg7/NO4JuQsIbS9S2d
-         a6x+PwnVZryKdQLcRizlsIU/waOvJzMPM6UC6USIjb/vs7ZNhW9VCoyqw3xtCPnCXg96
-         kRJyc7vgT+bQTMAWdwF7sQESIqgCa0sOhXRd1kPcI2kJRy2ePAtgurn2xkZKnrxyfW9D
-         FOsg8EJM80Rz69kUeJM2qXVs71PnPhbGn8AYN+7RQxbJY9Tey337G34T2F5//mz56Sea
-         SNWg==
-X-Gm-Message-State: AC+VfDy5D6SNu1Ave4hny4Wec3kNVeq42zJ9bwyVh2A+l8HXaRmCzqID
-	txNvCj0a8JTxGD+Bzq7Y2aJiIQ==
-X-Google-Smtp-Source: ACHHUZ5Uu/KXy31dWeHa3Pa3sMiSVMIOiEa5B6VK+4dppa1hGkleBn/K+E+EPKZ82KnSXCt3aO8F+Q==
-X-Received: by 2002:a17:907:94c8:b0:987:33c3:e288 with SMTP id dn8-20020a17090794c800b0098733c3e288mr17120210ejc.29.1687506364243;
-        Fri, 23 Jun 2023 00:46:04 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687506482; x=1690098482;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=afzpoupdHBz4t80yeY68UW7BcSr6J0mUzcvK1xv8c1M=;
+        b=aRjwkDmvr9PFna2vxfxAe3GzirYx1oVM3qs4SOPLAa0EXii5aJd8LUQbW1yKktmibS
+         7ZQLNIVsyeuaP13j97XEIH/AtUoCdNSCv+lKiOUhGoEjCjHfMhfOs+IF5u8qqmnJv3DW
+         MiS6PF3ur/KzFvn9wE40iaXZYApQhnBHXA5Xi/TwMdwvBpDmEey0Gv+QqKB3rWYZgyy0
+         HIp7X1zzDDTVsbpmI2HAcOuF0vUQLw87/9XWtNH+adz0Mgnl5JwjGngZMKKF1yvoh3Bu
+         OvGTtoQpDFvD1VS5zKjQusac0DhWkDIYleXMnlpZT3Pcb4l6PD/eSDCFtD7GZxzddB5n
+         WdpQ==
+X-Gm-Message-State: AC+VfDwMc5mZRcroqqvmINb5hSrTzkHqhvGhB6cQsMVjlx1Kg7N/JrtE
+	edE7gm7NI33RDjhOLnPcPAoMCA==
+X-Google-Smtp-Source: ACHHUZ60rNJlS88ekBpJsTiP/YnYc408Z0GlUIj/k7KV/RQOAUp7f7ExOF4ZyFZ2IcPQ5FADHxaxYg==
+X-Received: by 2002:a2e:9944:0:b0:2b4:6a20:f12b with SMTP id r4-20020a2e9944000000b002b46a20f12bmr13920987ljj.22.1687506482431;
+        Fri, 23 Jun 2023 00:48:02 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id l17-20020a170906939100b0096f67b55b0csm5596839ejx.115.2023.06.23.00.46.03
+        by smtp.gmail.com with ESMTPSA id b18-20020aa7cd12000000b0051bf49e258bsm666413edw.22.2023.06.23.00.48.01
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 00:46:03 -0700 (PDT)
-Date: Fri, 23 Jun 2023 09:46:02 +0200
+        Fri, 23 Jun 2023 00:48:01 -0700 (PDT)
+Date: Fri, 23 Jun 2023 09:48:00 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, Shuah Khan <shuah@kernel.org>,
-	linux-kselftest@vger.kernel.org
-Subject: Re: [PATCH net] selftests: rtnetlink: remove netdevsim device after
- ipsec offload test
-Message-ID: <ZJVNutrYRNFBe33L@nanopsycho>
-References: <e1cb94f4f82f4eca4a444feec4488a1323396357.1687466906.git.sd@queasysnail.net>
+To: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>
+Cc: poros <poros@redhat.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"vadfed@meta.com" <vadfed@meta.com>,
+	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"corbet@lwn.net" <corbet@lwn.net>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"vadfed@fb.com" <vadfed@fb.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
+	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	"sj@kernel.org" <sj@kernel.org>,
+	"javierm@redhat.com" <javierm@redhat.com>,
+	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
+	"mst@redhat.com" <mst@redhat.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>,
+	"Michalik, Michal" <michal.michalik@intel.com>,
+	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
+	"airlied@redhat.com" <airlied@redhat.com>,
+	"ogabbay@kernel.org" <ogabbay@kernel.org>,
+	"arnd@arndb.de" <arnd@arndb.de>,
+	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
+	"axboe@kernel.dk" <axboe@kernel.dk>,
+	"linux@zary.sk" <linux@zary.sk>,
+	"masahiroy@kernel.org" <masahiroy@kernel.org>,
+	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
+	"geert+renesas@glider.be" <geert+renesas@glider.be>,
+	"Olech, Milena" <milena.olech@intel.com>,
+	"kuniyu@amazon.com" <kuniyu@amazon.com>,
+	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
+	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
+	"andy.ren@getcruise.com" <andy.ren@getcruise.com>,
+	"razor@blackwall.org" <razor@blackwall.org>,
+	"idosch@nvidia.com" <idosch@nvidia.com>,
+	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
+	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
+	"phil@nwl.cc" <phil@nwl.cc>,
+	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
+	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
+	mschmidt <mschmidt@redhat.com>,
+	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>,
+	"vadim.fedorenko@linux.dev" <vadim.fedorenko@linux.dev>
+Subject: Re: [RFC PATCH v8 04/10] dpll: netlink: Add DPLL framework base
+ functions
+Message-ID: <ZJVOMPQ1RHx5mapG@nanopsycho>
+References: <20230609121853.3607724-1-arkadiusz.kubalewski@intel.com>
+ <20230609121853.3607724-5-arkadiusz.kubalewski@intel.com>
+ <c7480d0a71fb8d62108624878f549c0d91d4c9e6.camel@redhat.com>
+ <ZJLktA6RJaVo3BdH@nanopsycho>
+ <ZJL2HUkAtHEw5rq+@nanopsycho>
+ <DM6PR11MB46578CD80F96AB11AF2F81F49B23A@DM6PR11MB4657.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <e1cb94f4f82f4eca4a444feec4488a1323396357.1687466906.git.sd@queasysnail.net>
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <DM6PR11MB46578CD80F96AB11AF2F81F49B23A@DM6PR11MB4657.namprd11.prod.outlook.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
 	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
@@ -80,15 +134,63 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thu, Jun 22, 2023 at 11:03:34PM CEST, sd@queasysnail.net wrote:
->On systems where netdevsim is built-in or loaded before the test
->starts, kci_test_ipsec_offload doesn't remove the netdevsim device it
->created during the test.
+Fri, Jun 23, 2023 at 02:56:24AM CEST, arkadiusz.kubalewski@intel.com wrote:
+>>From: Jiri Pirko <jiri@resnulli.us>
+>>Sent: Wednesday, June 21, 2023 3:08 PM
+>>
+>>Wed, Jun 21, 2023 at 01:53:24PM CEST, jiri@resnulli.us wrote:
+>>>Wed, Jun 21, 2023 at 01:18:59PM CEST, poros@redhat.com wrote:
+>>>>Arkadiusz Kubalewski píše v Pá 09. 06. 2023 v 14:18 +0200:
+>>>>> From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
+>>>
+>>>[...]
+>>>
+>>>Could you perhaps cut out the text you don't comment? Saves some time
+>>>finding your reply.
+>>>
+>>>
+>>>>> +static int
+>>>>> +dpll_set_from_nlattr(struct dpll_device *dpll, struct genl_info
+>>>>> *info)
+>>>>> +{
+>>>>> +       const struct dpll_device_ops *ops = dpll_device_ops(dpll);
+>>>>> +       struct nlattr *tb[DPLL_A_MAX + 1];
+>>>>> +       int ret = 0;
+>>>>> +
+>>>>> +       nla_parse(tb, DPLL_A_MAX, genlmsg_data(info->genlhdr),
+>>>>> +                 genlmsg_len(info->genlhdr), NULL, info->extack);
+>>>>> +       if (tb[DPLL_A_MODE]) {
+>>>>Hi,
+>>>>
+>>>>Here should be something like:
+>>>>               if (!ops->mode_set)
+>>>>                       return -EOPNOTSUPP;
+>>>
+>>>Why? All drivers implement that.
+>>>I believe that it's actullaly better that way. For a called setting up
+>>>the same mode it is the dpll in, there should be 0 return by the driver.
+>>>Note that driver holds this value. I'd like to keep this code as it is.
+>>
+>>Actually, you are correct Petr, my mistake. Actually, no driver
+>>implements this. Arkadiusz, could you please remove this op and
+>>possibly any other unused  op? It will be added when needed.
+>>
+>>Thanks!
+>>
 >
->Fixes: e05b2d141fef ("netdevsim: move netdev creation/destruction to dev probe")
->Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+>Sorry, didn't have time for such change, added only check as suggested by
+>Petr.
+>If you think this is a big issue, we could change it for next version.
 
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
+It's odd to carry on ops which are unused. I would prefer that to be
+removed now and only introduced when they are actually needed.
 
-Thanks!
+
+>
+>Thank you!
+>Arkadiusz
+>
+>>
+>>>
+>>>[...]
 
