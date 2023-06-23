@@ -1,84 +1,143 @@
-Return-Path: <netdev+bounces-13501-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13503-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74D1273BDE7
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:36:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3927C73BDEB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C618A281C65
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:36:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7E4E2809D9
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B44010965;
-	Fri, 23 Jun 2023 17:34:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB7D8100D8;
+	Fri, 23 Jun 2023 17:34:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECE28101F2;
-	Fri, 23 Jun 2023 17:34:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05F45C433C0;
-	Fri, 23 Jun 2023 17:34:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687541659;
-	bh=soa/C2iIrBJik+8b5QHNWDFlga5q5rvhVTxev/CII60=;
-	h=From:Date:Subject:References:In-Reply-To:To:Cc:From;
-	b=mNUCTRdc50fy5FH/FSYKco77cfWcGdun4Otey0BIBIJQV1s6yNlB8fvrIUVfCaSgZ
-	 i/OFvTqhh0XN9eVnGBgsVFQzlpQNp7QA5Wkd/3fzQK+hSO6xoGQOKKrts/GnRPClb+
-	 R8VhE9F3T6jYMKMUFKzO7nTWEiLI8p6R0T/iqk7OqRboo6CbplfBGjKViExBD4qU8k
-	 aMGTMj6eIOY96u1n4+FyovLbbp0zd4NZt1hH7BSm+B86IJ0KGwPJAumq5q0pM41I1j
-	 5PmMVu7pAXG+RwbElb7PD0QlFYak7QYhDJcXoSIm59N+dGbd3+E7uPrDn36OaCetBo
-	 DXl++QgkW6+hw==
-From: Mat Martineau <martineau@kernel.org>
-Date: Fri, 23 Jun 2023 10:34:14 -0700
-Subject: [PATCH net-next 8/8] selftests: mptcp: connect: fix comment typo
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB7FC11C92
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 17:34:54 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3786F2701;
+	Fri, 23 Jun 2023 10:34:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=Zc0pviPRoqlN0cN6TV+6Rt9skeFLXDyuOF3LOxVbwzY=; b=cH5aPWaEQ3Ue/RSs66k9jgPZdH
+	jWAECdkbd8oLhP90xTpGfsjlUhG2SbM74YRZ41+4apP9G3dyxR/0uG4+8ZaNZ/ChLTTkHgNGzRXY8
+	6X9JOZLQhIWVHKKHMUmT4kZaXX/Z5fRhPtgvnDEcjXXXmb7dic8gO2/3NKk5TBJmAlqM=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qCkfu-00HNYx-Bx; Fri, 23 Jun 2023 19:34:22 +0200
+Date: Fri, 23 Jun 2023 19:34:22 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Michael Walle <mwalle@kernel.org>
+Cc: Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Florian Fainelli <florian.fainelli@broadcom.com>,
+	Broadcom internal kernel review list <bcm-kernel-feedback-list@broadcom.com>,
+	Marek =?iso-8859-1?Q?Beh=FAn?= <kabel@kernel.org>,
+	Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 04/10] net: phy: replace is_c45 with
+ phy_accces_mode
+Message-ID: <52cdebe9-0f94-430d-93ff-11f26d2e3c5b@lunn.ch>
+References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
+ <20230620-feature-c45-over-c22-v2-4-def0ab9ccee2@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230623-send-net-next-20230623-v1-8-a883213c8ba9@kernel.org>
-References: <20230623-send-net-next-20230623-v1-0-a883213c8ba9@kernel.org>
-In-Reply-To: <20230623-send-net-next-20230623-v1-0-a883213c8ba9@kernel.org>
-To: Matthieu Baerts <matthieu.baerts@tessares.net>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, mptcp@lists.linux.dev, 
- Mat Martineau <martineau@kernel.org>, Yueh-Shun Li <shamrocklee@posteo.net>
-X-Mailer: b4 0.12.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230620-feature-c45-over-c22-v2-4-def0ab9ccee2@kernel.org>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Yueh-Shun Li <shamrocklee@posteo.net>
+> @@ -131,9 +131,11 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
+>  
+>  	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
+>  	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
+> -		phy = get_phy_device(bus, addr, is_c45);
+> +		phy = get_phy_device(bus, addr,
+> +				     is_c45 ? PHY_ACCESS_C45 : PHY_ACCESS_C22);
+>  	else
+> -		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
+> +		phy = phy_device_create(bus, addr, phy_id, PHY_ACCESS_C22,
+> +					NULL);
 
-Spell "transmissions" properly.
+Documentation/devicetree/bindings/net/ethernet-phy.yaml says:
 
-Found by searching for keyword "tranm".
+  compatible:
+    oneOf:
+      - const: ethernet-phy-ieee802.3-c22
+        description: PHYs that implement IEEE802.3 clause 22
+      - const: ethernet-phy-ieee802.3-c45
+        description: PHYs that implement IEEE802.3 clause 45
 
-Reviewed-by: Matthieu Baerts <matthieu.baerts@tessares.net>
-Signed-off-by: Yueh-Shun Li <shamrocklee@posteo.net>
-Signed-off-by: Mat Martineau <martineau@kernel.org>
----
- tools/testing/selftests/net/mptcp/mptcp_connect.sh | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+It would be nice to make this documentation more specific. It now
+refers to 'bus transaction', so maybe we want to append that to these
+lines?
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index 773dd770a567..13561e5bc0cd 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -809,7 +809,7 @@ run_tests_disconnect()
- 
- 	cat $cin $cin $cin > "$cin".disconnect
- 
--	# force do_transfer to cope with the multiple tranmissions
-+	# force do_transfer to cope with the multiple transmissions
- 	sin="$cin.disconnect"
- 	cin="$cin.disconnect"
- 	cin_disconnect="$old_cin"
+> -static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr, bool c45)
+> +static struct phy_device *mdiobus_scan(struct mii_bus *bus, int addr,
+> +				       enum phy_access_mode mode)
 
--- 
-2.41.0
+> +/**
+> + * enum phy_access_mode - PHY register access mode definitions
+> + *
+> + * @PHY_ACCESS_C22: use 802.3 c22 MDIO transactions
+> + * @PHY_ACCESS_C45: use 802.3 c45 MDIO transactions
+> + */
+> +enum phy_access_mode {
+> +	PHY_ACCESS_C22,
+> +	PHY_ACCESS_C45,
+> +};
 
+Was the change from bool to enum enough to make the compiler warn when
+passed the wrong type? i.e. a true/false? not PHY_ACCESS_C22 and
+PHY_ACCESS_C45? Maybe we could set these enum values to 22 and 45?
+true/false would then not match, and we get some sort of error, like
+-EIO from the switch statement?
+
+>  /**
+>   * struct phy_device - An instance of a PHY
+>   *
+> @@ -539,8 +550,8 @@ struct macsec_ops;
+>   * @devlink: Create a link between phy dev and mac dev, if the external phy
+>   *           used by current mac interface is managed by another mac interface.
+>   * @phy_id: UID for this device found during discovery
+> - * @c45_ids: 802.3-c45 Device Identifiers if is_c45.
+> - * @is_c45:  Set to true if this PHY uses clause 45 addressing.
+> + * @access_mode:  MDIO access mode of the PHY.
+> + * @c45_ids: 802.3-c45 Device Identifiers if it's an C45 PHY.
+>   * @is_internal: Set to true if this PHY is internal to a MAC.
+>   * @is_pseudo_fixed_link: Set to true if this PHY is an Ethernet switch, etc.
+>   * @is_gigabit_capable: Set to true if PHY supports 1000Mbps
+> @@ -637,8 +648,9 @@ struct phy_device {
+>  
+>  	u32 phy_id;
+>  
+> +	enum phy_access_mode access_mode;
+> +
+
+This enum might not pad too well between a u32 and struct? If you put
+it after the bitfields, or maybe next to the enum phy_state the
+compiler might make both a u16 and put them together?
+
+	 Andrew
 
