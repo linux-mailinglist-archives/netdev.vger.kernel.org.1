@@ -1,106 +1,119 @@
-Return-Path: <netdev+bounces-13469-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13470-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3A77073BB8F
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:24:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id ADAFE73BB9A
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 17:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6B80B1C2129E
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:24:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6160281C35
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:25:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5D02CC151;
-	Fri, 23 Jun 2023 15:23:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B732C153;
+	Fri, 23 Jun 2023 15:25:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 516CF8F4A
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:23:58 +0000 (UTC)
-Received: from netrider.rowland.org (netrider.rowland.org [192.131.102.5])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id DE1451AC
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 08:23:54 -0700 (PDT)
-Received: (qmail 753372 invoked by uid 1000); 23 Jun 2023 11:23:53 -0400
-Date: Fri, 23 Jun 2023 11:23:53 -0400
-From: Alan Stern <stern@rowland.harvard.edu>
-To: syzbot <syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com>
-Cc: andreyknvl@google.com, davem@davemloft.net, dvyukov@google.com,
-  edumazet@google.com, gregkh@linuxfoundation.org, kbuild-all@lists.01.org,
-  kuba@kernel.org, linux-kernel@vger.kernel.org, linux-usb@vger.kernel.org,
-  lkp@intel.com, netdev@vger.kernel.org, nogikh@google.com, oneukum@suse.com,
-  pabeni@redhat.com, syzkaller-bugs@googlegroups.com, troels@connectedcars.dk
-Subject: Re: [syzbot] [usb?] WARNING in usbnet_start_xmit/usb_submit_urb
-Message-ID: <0f685f2f-06df-4cf2-9387-34f5e3c8b7b7@rowland.harvard.edu>
-References: <000000000000a56e9105d0cec021@google.com>
- <000000000000e298cd05fecc07d4@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A04ED8F4A
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 15:25:46 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D02DBC433C0;
+	Fri, 23 Jun 2023 15:25:41 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687533946;
+	bh=NvWgTGjsHRqDtvBYDx/2FZ7WiFRdFqxIOJ2GEgQdP5s=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=jjSV3khYn7DQtMsuDg9EoNpKhthnIYHAR3qxDpF7Arr09pVBiSIRwUoI5OImA8F3s
+	 qmlveYBP11wTA/VaTOeOK/7UPuOJpMlPgbxtyOfpAb7MCX8PGdeVw8AX2mWpyCMGL/
+	 pkngpeZ4JGYxGMlzpLK1o860FrlWOZPNVFSi7u08r2V15VEqmBbkab00TOFCACUWYH
+	 qtq0Jf3f/vajbOgUJdUm+WzWV7Ycb5rkdLKbMJIkjBXxGD5sCB3mTP3mKs5YT28mI7
+	 8dwmjH+dAP0xRobOCLzn27EAfNnGTez82/9NOZJ5i1Hx9WiBXLPIU4DNp17r5a4SQV
+	 4BuY8MkMhjXJg==
+From: Arnd Bergmann <arnd@kernel.org>
+To: Johannes Berg <johannes@sipsolutions.net>
+Cc: Arnd Bergmann <arnd@arndb.de>,
+	Christian Lamparter <chunkeey@googlemail.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Johannes Berg <johannes.berg@intel.com>,
+	Kees Cook <keescook@chromium.org>,
+	linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Gregory Greenman <gregory.greenman@intel.com>,
+	Benjamin Berg <benjamin.berg@intel.com>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Ilan Peer <ilan.peer@intel.com>,
+	Felix Fietkau <nbd@nbd.name>,
+	Aloka Dixit <quic_alokad@quicinc.com>,
+	Avraham Stern <avraham.stern@intel.com>,
+	Emmanuel Grumbach <emmanuel.grumbach@intel.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 2/2] mac80211: make ieee80211_tx_info padding explicit
+Date: Fri, 23 Jun 2023 17:24:00 +0200
+Message-Id: <20230623152443.2296825-2-arnd@kernel.org>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230623152443.2296825-1-arnd@kernel.org>
+References: <20230623152443.2296825-1-arnd@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000e298cd05fecc07d4@google.com>
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,SORTED_RECIPS,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Fri, Jun 23, 2023 at 06:32:22AM -0700, syzbot wrote:
-> syzbot has bisected this issue to:
-> 
-> commit 45bf39f8df7f05efb83b302c65ae3b9bc92b7065
-> Author: Alan Stern <stern@rowland.harvard.edu>
-> Date:   Tue Jan 31 20:49:04 2023 +0000
-> 
->     USB: core: Don't hold device lock while reading the "descriptors" sysfs file
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=124b5877280000
-> start commit:   692b7dc87ca6 Merge tag 'hyperv-fixes-signed-20230619' of g..
-> git tree:       upstream
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=114b5877280000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=164b5877280000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=2cbd298d0aff1140
-> dashboard link: https://syzkaller.appspot.com/bug?extid=63ee658b9a100ffadbe2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1760094b280000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=1359cdf3280000
-> 
-> Reported-by: syzbot+63ee658b9a100ffadbe2@syzkaller.appspotmail.com
-> Fixes: 45bf39f8df7f ("USB: core: Don't hold device lock while reading the "descriptors" sysfs file")
-> 
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+From: Arnd Bergmann <arnd@arndb.de>
 
-The bisection result is wrong, but the issue still needs to be fixed.
+While looking at a bug, I got rather confused by the layout of the
+'status' field in ieee80211_tx_info. Apparently, the intention is that
+status_driver_data[] is used for driver specific data, and fills up the
+size of the union to 40 bytes, just like the other ones.
 
-Alan Stern
+This is indeed what actually happens, but only because of the
+combination of two mistakes:
 
-#syz test: https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/ v6.4-rc7
+ - "void *status_driver_data[18 / sizeof(void *)];" is intended
+   to be 18 bytes long but is actually two bytes shorter because of
+   rounding-down in the division, to a multiple of the pointer
+   size (4 bytes or 8 bytes).
 
-Index: usb-devel/drivers/net/usb/usbnet.c
-===================================================================
---- usb-devel.orig/drivers/net/usb/usbnet.c
-+++ usb-devel/drivers/net/usb/usbnet.c
-@@ -1775,6 +1775,9 @@ usbnet_probe (struct usb_interface *udev
- 	} else if (!info->in || !info->out)
- 		status = usbnet_get_endpoints (dev, udev);
- 	else {
-+		u8		ep_addrs[3] = {
-+			info->in + USB_DIR_IN, info->out + USB_DIR_OUT, 0};
-+
- 		dev->in = usb_rcvbulkpipe (xdev, info->in);
- 		dev->out = usb_sndbulkpipe (xdev, info->out);
- 		if (!(info->flags & FLAG_NO_SETINT))
-@@ -1784,6 +1787,8 @@ usbnet_probe (struct usb_interface *udev
- 		else
- 			status = 0;
- 
-+		if (status == 0 && !usb_check_bulk_endpoints(udev, ep_addrs))
-+			status = -EINVAL;
- 	}
- 	if (status >= 0 && dev->status)
- 		status = init_status (dev, udev);
+ - The other fields combined are intended to be 22 bytes long, but
+   are actually 24 bytes because of padding in front of the
+   unaligned tx_time member, and in front of the pointer array.
+
+The two mistakes cancel out. so the size ends up fine, but it seems
+more helpful to make this explicit, by having a multiple of 8 bytes
+in the size calculation and explicitly describing the padding.
+
+Fixes: ea5907db2a9cc ("mac80211: fix struct ieee80211_tx_info size")
+Fixes: 02219b3abca59 ("mac80211: add WMM admission control support")
+Signed-off-by: Arnd Bergmann <arnd@arndb.de>
+---
+ include/net/mac80211.h | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
+
+diff --git a/include/net/mac80211.h b/include/net/mac80211.h
+index 3a8a2d2c58c38..ca4dc8a14f1bb 100644
+--- a/include/net/mac80211.h
++++ b/include/net/mac80211.h
+@@ -1192,9 +1192,11 @@ struct ieee80211_tx_info {
+ 			u8 ampdu_ack_len;
+ 			u8 ampdu_len;
+ 			u8 antenna;
++			u8 pad;
+ 			u16 tx_time;
+ 			u8 flags;
+-			void *status_driver_data[18 / sizeof(void *)];
++			u8 pad2;
++			void *status_driver_data[16 / sizeof(void *)];
+ 		} status;
+ 		struct {
+ 			struct ieee80211_tx_rate driver_rates[
+-- 
+2.39.2
+
 
