@@ -1,471 +1,196 @@
-Return-Path: <netdev+bounces-13573-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13540-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B1C6573C103
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:46:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C80673BF41
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:14:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61620281DFD
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:46:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 713DC1C21290
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:14:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D0DF11CAD;
-	Fri, 23 Jun 2023 20:46:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5236810965;
+	Fri, 23 Jun 2023 20:14:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 592BB125A0;
-	Fri, 23 Jun 2023 20:46:31 +0000 (UTC)
-Received: from mail-pj1-x1034.google.com (mail-pj1-x1034.google.com [IPv6:2607:f8b0:4864:20::1034])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 240D2269F;
-	Fri, 23 Jun 2023 13:46:09 -0700 (PDT)
-Received: by mail-pj1-x1034.google.com with SMTP id 98e67ed59e1d1-25eb3db3004so581765a91.0;
-        Fri, 23 Jun 2023 13:46:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C7071094B
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 20:14:23 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2100.outbound.protection.outlook.com [40.107.94.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 994132726;
+	Fri, 23 Jun 2023 13:14:22 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=OnvcqRziGUuV1DHNTj1D7Pjo4bGk61HdAQ3yPK/tH8gwpOatpIfhZWRrXNbnkdNpeCmvwmdUlEsxck40mHivjTqTfH09/iot/A6bK/1bHF78oQnrzFGUlvL6n8Pptm5lCX2Q6rEC/rVZkExGaR06C6L3P67N2cFK7SpMPsQ0JPrVy917uE3lcT7WhjKT0j3PvbcB+IOAHv3exu+dWMFr3xx9NX5O7O2mD6Qi3YGA++N8QGELQ9IZre4KFkhyNKuyQOi+qKmlcSdm0UVo4LynZMlc0fDrhEnyEAkicPNlu4rjD4wRGLFwLG+oX+LzMDrMiM/DIScDTIZJnxo6o6EGGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=c5l9RZcOUkUw8aQxrfzMmUk9+bpk/jDDHQ2EbRl/Cl0=;
+ b=PbooH4aZIp4fOlsja5mn2axfkrAtqTJUuGYYGj6WMHylFk4AP0mxu6i7+sKCykO6HU5KR9+MeQRSWSCT3Sp1PkqlAdrPaPK1HbN5lgY0+QqlLnO95YZ6EhaSzFbXQofKebt/4Jf5DWIWZEzx+aHh5ttOcqdUtGUY3jn1WFCxcAXjIiZrfQHe1YU5Fl1NNcVOdeU1jQ8GpGPeoslBRpJXQ0Fp34KxGDkU11NWmH/1LUoeFD2ftXbiVLF3LjkELbAbvjfheZo/kRlJyDoHg80KU7SIxhBO+nyr5mIctlNtGJvmO868XzY/Mp1evaJKRLih35WSzfqJ4wzgRc3NJzDDQw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687553166; x=1690145166;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=MqtXAI+GLLnmMoFplI8FBOa7S4md/3B3tS2XXiqiaPc=;
-        b=IWLoPaiByeeVz95pFswuN4iG50HcJHGbYYCRZUwJ48ZZ7+mFKLqj0IlX6r3/sG39D+
-         cw9Qawl/KAuFBSowgsFamwBkHyEWWAzbpsvBtJSesyZjuxieX/+yOmRquRNGA2dgT/Wh
-         TR9Zh+zS14ugiORsm7RDmm4q9/HHLQ9coq2gPZDC+hz+dPCKw8gVdql0O5G21qEXZEPm
-         e8EyIMUQVkkp1Knsn+eWPwCctn63t0YL/mwoduRvF2k1GFU/EOjMdjnaRrvO7wmXph8G
-         481e4/VP6BH2qdFoKTsKwd0NGngd/m0d4OcOOTn8pD2a4zmVHwgF9q8xUDr1fEq1vOOj
-         unjw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687553166; x=1690145166;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MqtXAI+GLLnmMoFplI8FBOa7S4md/3B3tS2XXiqiaPc=;
-        b=ltKBVTtkVcEXApk/BvXvXmApOHPp3spBRupQX4HMO19nwadzPQxKyfYk4ull6RVyUG
-         H6+ZvbYir8bbgq3tGKHIOawpMuvuQ5AwY45DYug+ThiYp9oJ0kK4G1aK+H8EiJfWOdCY
-         xx1lgCXKxtJJvPj2BXpptRRZTs//GvVezyfrvhLRMgidNNWDEkAarpWmh1ic1I52CsQk
-         rlsmdggG7Ai8R9nsKkdOUnwA+fVWUAd0UPYyWeOfbrI1wsph/PV7CsUwmOKR6EhfRfBi
-         4GHSAm/4XYnO5HnuCEQBYiSXfiTpqSrXvZpp3c43rb9pQjbUGBEEIxYO/eoKK8ACmDiG
-         FdUg==
-X-Gm-Message-State: AC+VfDzGjh5BeRF/EZFr3xAJ2E/7TkRe6qG838qObVbxfWMk3kXm6FxS
-	3+crFTzxQkgvtWGJLfPTD7A=
-X-Google-Smtp-Source: ACHHUZ4/Pc655NL2Fp6bHunoF7dUR87TDP+T/gP/n+JQCxoHIkKqbBoVCpZ03aiZjWHUKLYEUoalQw==
-X-Received: by 2002:a17:90a:d583:b0:262:c414:e0af with SMTP id v3-20020a17090ad58300b00262c414e0afmr240306pju.31.1687553166226;
-        Fri, 23 Jun 2023 13:46:06 -0700 (PDT)
-Received: from localhost (ec2-54-67-115-33.us-west-1.compute.amazonaws.com. [54.67.115.33])
-        by smtp.gmail.com with ESMTPSA id 19-20020a17090a1a1300b0023fcece8067sm155310pjk.2.2023.06.23.13.46.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 13:46:05 -0700 (PDT)
-Date: Fri, 23 Jun 2023 02:59:23 +0000
-From: Bobby Eshleman <bobbyeshleman@gmail.com>
-To: Stefano Garzarella <sgarzare@redhat.com>
-Cc: Bobby Eshleman <bobby.eshleman@bytedance.com>,
-	linux-hyperv@vger.kernel.org, Stefan Hajnoczi <stefanha@redhat.com>,
-	kvm@vger.kernel.org, "Michael S. Tsirkin" <mst@redhat.com>,
-	VMware PV-Drivers Reviewers <pv-drivers@vmware.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	virtualization@lists.linux-foundation.org,
-	Eric Dumazet <edumazet@google.com>,
-	Dan Carpenter <dan.carpenter@linaro.org>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	Bryan Tan <bryantan@vmware.com>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Krasnov Arseniy <oxffffaa@gmail.com>,
-	Vishnu Dasa <vdasa@vmware.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>
-Subject: Re: [PATCH RFC net-next v4 3/8] vsock: support multi-transport
- datagrams
-Message-ID: <ZJUKi+NtOajbplQg@bullseye>
-References: <20230413-b4-vsock-dgram-v4-0-0cebbb2ae899@bytedance.com>
- <20230413-b4-vsock-dgram-v4-3-0cebbb2ae899@bytedance.com>
- <tngyeva5by3aldrhlixajjin2hqmcl6uruvuoed7hyrndlesfd@bbv7aphqye2q>
- <ZJUIWcgg13F7DNBm@bullseye>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=c5l9RZcOUkUw8aQxrfzMmUk9+bpk/jDDHQ2EbRl/Cl0=;
+ b=TbNDaQDQLeuGdc14HzEW7+hMPR41WAO5Gd5o8kROMjUeuHp1ZHmerYlGc/27q5c0NS/FWzROnlH/rylolNXMIpddg8FeWB3rL8MxNz003D8WTqi8dVKdM3ymmChjO/BNhq9gVUYFKSlJig7zMfU8BxKP/mwwJx2OS6uc4BuBHaQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH0PR13MB5315.namprd13.prod.outlook.com (2603:10b6:510:f9::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 23 Jun
+ 2023 20:14:18 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Fri, 23 Jun 2023
+ 20:14:18 +0000
+Date: Fri, 23 Jun 2023 22:14:12 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: =?utf-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>
+Cc: Tony Lindgren <tony@atomide.com>,
+	Jeroen Hofstee <jhofstee@victronenergy.com>, netdev@vger.kernel.org,
+	Mugunthan V N <mugunthanvnm@ti.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: cpsw: fix obtaining mac address for am3517
+Message-ID: <ZJX9FBBvOTv10IO4@corigine.com>
+References: <1477668756-2651-1-git-send-email-jhofstee@victronenergy.com>
+ <20161028155213.2t3nwwe3lqaynaer@atomide.com>
+ <d8ad5cab-5183-cddf-fa9a-4e7b9b8c9377@victronenergy.com>
+ <20161028181914.mskebckucukzhxhz@atomide.com>
+ <yw1x7cru445g.fsf@mansr.com>
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <yw1x7cru445g.fsf@mansr.com>
+X-ClientProxiedBy: AS4P190CA0037.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5d1::18) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJUIWcgg13F7DNBm@bullseye>
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH0PR13MB5315:EE_
+X-MS-Office365-Filtering-Correlation-Id: 9b825153-bd1e-42b6-bc98-08db74266ca6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PP06zi9zUwm/fZhqSUUhKNASoT/ZfWZxars2H8EEZBqowhrFa4zQFxL5RfCd/Z90WDFGmYmuopuSGXVHdPPZhSGQNxfTIhFVj/SA3s0DLG6/wKaSpbS7pnfptDnCKffNaOkdFveBVKX8vZ3i9+PRcJ+BvyArCCSifVknCVgpGuxEpBs2+SdjCc8F3MHv/XYcc2o2QkV6WttE8jpvPOhUS4t+N1wZaz0MWmCI3j2Uz0VqYieollywvnw8f0CtBRc5nlWNCPY7eltRV2HsP+zjbIELinw0VAbmrlRLNwtv4OpUuM5v73k11+z6Yddl8krF+Vclhgvto4zn6mUncDrVNv244HXNGODHJKxfguKjj21rf2hkAHh5uB2l7aa7qBKIpS5cyHQITCPojGnMbjMveTiqim9QNVRnj54xuHYo9KrwqlVGEGW2A1GMuDHBfff7byjnT988fS3Hjarye2inx0+SrDkVnoLywdZ9MEyBX4pf9GoHmC6fciV/zdT7Ckk1H7FtkCrhx982fZq+jf7yZbWOkjQbm4VqpniePiKQgiEdocHCG7ElbW9yGv+XCJutkQkOkDMdszTmln31ZVlUUIZJkANafdmlXDWVfF2z1Bc=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(39830400003)(136003)(346002)(366004)(451199021)(54906003)(6512007)(4326008)(6666004)(966005)(186003)(36756003)(2906002)(478600001)(86362001)(2616005)(316002)(44832011)(8936002)(66946007)(6916009)(66476007)(66556008)(5660300002)(53546011)(6506007)(6486002)(38100700002)(8676002)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?WjBZQmhXS1Y3REtLS25QQ3NxbitxSkl6U3lZTUU5WnYrQVFtQ3d2dDBKV2Nj?=
+ =?utf-8?B?QW5iUVRDenI3TUVLUFo5ZmJNMlpxYUJiaXFqYXM5eXRSVHZkOXc3ZVJrYUgy?=
+ =?utf-8?B?bXBkeGRHWDlkN2RKRk82NTRubkhKdFFJOHdaQW1MTmx4a3dKMVZVdzRFOFNS?=
+ =?utf-8?B?bjJXRXlKTVoyRVZiTHV6T2dNdTh4cG5sY1pWSkJpL25rZjNOWHhhTE9QSEJR?=
+ =?utf-8?B?a2hXWWk0REVidTYreEhwcHNlSDJOZTFleVJ3Y29aTEYyUFg5dTA1MXBQOVBv?=
+ =?utf-8?B?MFhSTk1BQ09BdHg0aDRyQjBBaXhsQi95MlJuaUVaL1VPM0NBSHJlekpnbUFu?=
+ =?utf-8?B?czI3YmV3S1poL2NrZXhDbjBiM3VnTE5TZ0pzNGJQSnN1Uk4rWnFpa3FraFhv?=
+ =?utf-8?B?YThIU29WRitJejAvTWJjNWcrcEk2N203VEVNSEpYVmlTdjU4b215dWNVdzVR?=
+ =?utf-8?B?MWlWbEZRb1lpeXBPQ3VRbXN4aWpDTlJVa3FVdy9sVUQvdkdIUG5vRkpVY0tq?=
+ =?utf-8?B?alFaR1htcjBhVkp2UGFQSEgwbnhxeEFpK1pJSGNZbHRwTlB6M211aytiY3ov?=
+ =?utf-8?B?MmFUK1NMaHdSQUJQU0daSHR6OVY1OHp4OEprZEM3cTZYQzVIWmYrSlAvL0ky?=
+ =?utf-8?B?RTAwalJCNUlPUkg2bTlGYk1iTzFjcEZ4dXhGakZwbkVKN3Y4UGc4ZDBSMWMz?=
+ =?utf-8?B?MWNRWXJOM2RFKzJLTFNLQ0lSN29xMDdYZE5icnpCNVcvZXFVTzNrZzlzSllZ?=
+ =?utf-8?B?eTl2YktMaDh0N2l6UnRKMWhNQ0VwTVlMOW4wYjRQYVd6ZUVZdHoxSGRid2Rr?=
+ =?utf-8?B?c3prSmlTUG1aOERpQ2x0SktsaHRaVjJlaGFFWUt3cTZIaVY0OHRMRUMzanlE?=
+ =?utf-8?B?SnIyNysrMU9aZGloeVMwKy9SNHFoNGlXZVZ2ZUZoNVkxTmxsSEgzSFBtTWlG?=
+ =?utf-8?B?TTRtdGFoNEJPOEE0NTZvNGEvbTRmRk01NjFMWE5vRmNiMHZHb3Y4dTJUbWpy?=
+ =?utf-8?B?b1NZUnMrQjhMaHJ6SkMwNEM4SjJLYjZKbU9BcUd3Vyt5bjJidWZWYnlydml2?=
+ =?utf-8?B?R2ZLU3cxMWFzRWdkR3pLVXgxZW5kUUNvVENwZXNON1FnSUlKVitnbDMzdWxx?=
+ =?utf-8?B?VVl4bmZhVW9YeDhBQlk4eW1KcE9oZU5lZmR4bU5yRWlPUjJRK0JYR2tiSXJi?=
+ =?utf-8?B?enpyWHNrSzQxb3QyV1hldno5Nis5WFo2NGFYWWVHU0pyN2RKSUZHQXFwaTEw?=
+ =?utf-8?B?NlJyTGQxUlBRZkhrS1N6bHFuYXk1amNMWDBjL0crNlhOS3lGNmJELzhyeVRK?=
+ =?utf-8?B?d2ZWUHAxL3pheHZEQzFLL0xKU09nQk4yR2FPTXpFQzZrMk9XWUp6U3VFaVRS?=
+ =?utf-8?B?Mm9taTA1MUttRDV3OThPRWJ3b2lpU1ZYTEJuYzJ4WHBSdVRacFlJd1BZcXlq?=
+ =?utf-8?B?TzNlZ2ZZTFVkVVplTEgvbUpRTkdFQlFXUTRVd0I5Y251cW45dnpHVlhKNW1q?=
+ =?utf-8?B?bTh5Rm5rUGJtOUhmQ3ErYi9OTmxoTkdldk1mUW95TkhzRDF3T2hoZTI4ajBI?=
+ =?utf-8?B?eFJNc0VDZEdIcEJYWU5pLzZZNjQ5WGlDVCtJMTJwaHhYZjZiTmZkanpYam1R?=
+ =?utf-8?B?WW9wZXFxM1cxa0M5a0k0MjU0b0JIUW5VOFYzTFgyVU1PQ3N3aWsvUkVnRlhX?=
+ =?utf-8?B?bVJsRmI2R1lPZzJRYWZmS0RRNDdwVWhxWjVWNzVFSXZWeURCSFdlMUdLMmo0?=
+ =?utf-8?B?ZzFBUE1sZDcwYkdWckdyRWMwQUNJZ0xsbVQrQTQwamZqOFVNdWhaRU1KcFVh?=
+ =?utf-8?B?SFB1Y3ZZRllDeTBaYkNaKzU3SkwzR0JTWWxpOHBmcVdRNndSQlBxOVA3ajJo?=
+ =?utf-8?B?UU1VUkhnbGRjY1JkenpKbFlXcERxM1djQUdQbzZkR1FmOVlOa0RSS2JJeW1k?=
+ =?utf-8?B?YUJ6Z2NzNktveGdxeC8vQ0pNaHVMWlJQWjg2WXRiYjhVamJCdDNDaXZ0TER4?=
+ =?utf-8?B?WUpkTmsvUnJEQm5FK1pIdURBV3ltSGgzR0Q0MGFKUUhWZFNiZE1JaUtUU1J2?=
+ =?utf-8?B?ZngyMHNrU2ltRjV6MERqU1pVKzkzUmVzOGplczVzYURtRzlabi8wS3FJMGo5?=
+ =?utf-8?B?ck9yV1pxUjRLVkFpYzFZaVF1RlpmREEzUW1xVU1OT0JoeG9seU0yeTBKdGpK?=
+ =?utf-8?B?Y1hpT3krMHZMVC83UVQvdzFFRnZkTVI2dzRDOW01V2lpOGZDbllPUTNLWXhl?=
+ =?utf-8?B?NmludSsxSlZZOWtnRWRlaXZUdjFBPT0=?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 9b825153-bd1e-42b6-bc98-08db74266ca6
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 23 Jun 2023 20:14:18.5930
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1PYXjbicyM3yAENlC3NPj18QoG6BQfNdpfy/gILI+7jA6syrCdpEqFY+eANyi8WxDVkiOKsNTsJwHXVu40O0KhNaqeS6rw+tMKBH6bhv80E=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR13MB5315
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 02:50:01AM +0000, Bobby Eshleman wrote:
-> On Thu, Jun 22, 2023 at 05:19:08PM +0200, Stefano Garzarella wrote:
-> > On Sat, Jun 10, 2023 at 12:58:30AM +0000, Bobby Eshleman wrote:
-> > > This patch adds support for multi-transport datagrams.
-> > > 
-> > > This includes:
-> > > - Per-packet lookup of transports when using sendto(sockaddr_vm)
-> > > - Selecting H2G or G2H transport using VMADDR_FLAG_TO_HOST and CID in
-> > >  sockaddr_vm
-> > > 
-> > > To preserve backwards compatibility with VMCI, some important changes
-> > > were made. The "transport_dgram" / VSOCK_TRANSPORT_F_DGRAM is changed to
-> > > be used for dgrams iff there is not yet a g2h or h2g transport that has
-> > 
-> > s/iff/if
-> > 
-> > > been registered that can transmit the packet. If there is a g2h/h2g
-> > > transport for that remote address, then that transport will be used and
-> > > not "transport_dgram". This essentially makes "transport_dgram" a
-> > > fallback transport for when h2g/g2h has not yet gone online, which
-> > > appears to be the exact use case for VMCI.
-> > > 
-> > > This design makes sense, because there is no reason that the
-> > > transport_{g2h,h2g} cannot also service datagrams, which makes the role
-> > > of transport_dgram difficult to understand outside of the VMCI context.
-> > > 
-> > > The logic around "transport_dgram" had to be retained to prevent
-> > > breaking VMCI:
-> > > 
-> > > 1) VMCI datagrams appear to function outside of the h2g/g2h
-> > >   paradigm. When the vmci transport becomes online, it registers itself
-> > >   with the DGRAM feature, but not H2G/G2H. Only later when the
-> > >   transport has more information about its environment does it register
-> > >   H2G or G2H. In the case that a datagram socket becomes active
-> > >   after DGRAM registration but before G2H/H2G registration, the
-> > >   "transport_dgram" transport needs to be used.
-> > 
-> > IIRC we did this, because at that time only VMCI supported DGRAM. Now that
-> > there are more transports, maybe DGRAM can follow the h2g/g2h paradigm.
-> > 
+On Fri, Jun 23, 2023 at 03:58:03PM +0100, Måns Rullgård wrote:
+> Tony Lindgren <tony@atomide.com> writes:
 > 
-> Totally makes sense. I'll add the detail above that the prior design was
-> a result of chronology.
+> > * Jeroen Hofstee <jhofstee@victronenergy.com> [161028 11:19]:
+> >> Hello Tony,
+> >> 
+> >> On 28-10-16 17:52, Tony Lindgren wrote:
+> >> > * Jeroen Hofstee <jhofstee@victronenergy.com> [161028 08:33]:
+> >> > > Commit b6745f6e4e63 ("drivers: net: cpsw: davinci_emac: move reading mac
+> >> > > id to common file") did not only move the code for an am3517, it also
+> >> > > added the slave parameter, resulting in an invalid (all zero) mac address
+> >> > > being returned for an am3517, since it only has a single emac and the slave
+> >> > > parameter is pointing to the second. So simply always read the first and
+> >> > > valid mac-address for a ti,am3517-emac.
+> >> > And others davinci_emac.c users can have more than one. So is the
+> >> > reason the slave parameter points to the second instance because
+> >> > of the location in the hardware?
+> >> 
+> >> Sort of, the slave parameter gets determined by the fact if there is one
+> >> or two register range(s) associated with the davinci_emac. In davinci_emac.c
+> >> 
+> >>     res_ctrl = platform_get_resource(pdev, IORESOURCE_MEM, 1);
+> >>     ...
+> >>     rc = davinci_emac_try_get_mac(pdev, res_ctrl ? 0 : 1,
+> >>                           priv->mac_addr);
+> >> 
+> >> So it there are two ranges, the slave param becomes 0. It there is only one,
+> >> it
+> >> will be 1. Since the am3517 only has a single regs entry it ends up with
+> >> slave 1,
+> >> while there is only a single davinci_emac.
+> >
+> > OK thanks for clarifying it:
+> >
+> > Acked-by: Tony Lindgren <tony@atomide.com>
 > 
-> > > 
-> > > 2) VMCI seems to require special message be sent by the transport when a
-> > >   datagram socket calls bind(). Under the h2g/g2h model, the transport
-> > >   is selected using the remote_addr which is set by connect(). At
-> > >   bind time there is no remote_addr because often no connect() has been
-> > >   called yet: the transport is null. Therefore, with a null transport
-> > >   there doesn't seem to be any good way for a datagram socket a tell the
-> > >   VMCI transport that it has just had bind() called upon it.
-> > 
-> > @Vishnu, @Bryan do you think we can avoid this in some way?
-> > 
-> > > 
-> > > Only transports with a special datagram fallback use-case such as VMCI
-> > > need to register VSOCK_TRANSPORT_F_DGRAM.
-> > 
-> > Maybe we should rename it in VSOCK_TRANSPORT_F_DGRAM_FALLBACK or
-> > something like that.
-> > 
-> > In any case, we definitely need to update the comment in
-> > include/net/af_vsock.h on top of VSOCK_TRANSPORT_F_DGRAM mentioning
-> > this.
-> > 
-> 
-> Agreed. I'll rename to VSOCK_TRANSPORT_F_DGRAM_FALLBACK, unless we find
-> there is a better way altogether.
-> 
-> > > 
-> > > Signed-off-by: Bobby Eshleman <bobby.eshleman@bytedance.com>
-> > > ---
-> > > drivers/vhost/vsock.c                   |  1 -
-> > > include/linux/virtio_vsock.h            |  2 -
-> > > net/vmw_vsock/af_vsock.c                | 78 +++++++++++++++++++++++++--------
-> > > net/vmw_vsock/hyperv_transport.c        |  6 ---
-> > > net/vmw_vsock/virtio_transport.c        |  1 -
-> > > net/vmw_vsock/virtio_transport_common.c |  7 ---
-> > > net/vmw_vsock/vsock_loopback.c          |  1 -
-> > > 7 files changed, 60 insertions(+), 36 deletions(-)
-> > > 
-> > > diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
-> > > index c8201c070b4b..8f0082da5e70 100644
-> > > --- a/drivers/vhost/vsock.c
-> > > +++ b/drivers/vhost/vsock.c
-> > > @@ -410,7 +410,6 @@ static struct virtio_transport vhost_transport = {
-> > > 		.cancel_pkt               = vhost_transport_cancel_pkt,
-> > > 
-> > > 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
-> > > -		.dgram_bind               = virtio_transport_dgram_bind,
-> > > 		.dgram_allow              = virtio_transport_dgram_allow,
-> > > 		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
-> > > 		.dgram_get_port		  = virtio_transport_dgram_get_port,
-> > > diff --git a/include/linux/virtio_vsock.h b/include/linux/virtio_vsock.h
-> > > index 23521a318cf0..73afa09f4585 100644
-> > > --- a/include/linux/virtio_vsock.h
-> > > +++ b/include/linux/virtio_vsock.h
-> > > @@ -216,8 +216,6 @@ void virtio_transport_notify_buffer_size(struct vsock_sock *vsk, u64 *val);
-> > > u64 virtio_transport_stream_rcvhiwat(struct vsock_sock *vsk);
-> > > bool virtio_transport_stream_is_active(struct vsock_sock *vsk);
-> > > bool virtio_transport_stream_allow(u32 cid, u32 port);
-> > > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
-> > > -				struct sockaddr_vm *addr);
-> > > bool virtio_transport_dgram_allow(u32 cid, u32 port);
-> > > int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid);
-> > > int virtio_transport_dgram_get_port(struct sk_buff *skb, unsigned int *port);
-> > > diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-> > > index 74358f0b47fa..ef86765f3765 100644
-> > > --- a/net/vmw_vsock/af_vsock.c
-> > > +++ b/net/vmw_vsock/af_vsock.c
-> > > @@ -438,6 +438,18 @@ vsock_connectible_lookup_transport(unsigned int cid, __u8 flags)
-> > > 	return transport;
-> > > }
-> > > 
-> > > +static const struct vsock_transport *
-> > > +vsock_dgram_lookup_transport(unsigned int cid, __u8 flags)
-> > > +{
-> > > +	const struct vsock_transport *transport;
-> > > +
-> > > +	transport = vsock_connectible_lookup_transport(cid, flags);
-> > > +	if (transport)
-> > > +		return transport;
-> > > +
-> > > +	return transport_dgram;
-> > > +}
-> > > +
-> > > /* Assign a transport to a socket and call the .init transport callback.
-> > >  *
-> > >  * Note: for connection oriented socket this must be called when vsk->remote_addr
-> > > @@ -474,7 +486,8 @@ int vsock_assign_transport(struct vsock_sock *vsk, struct vsock_sock *psk)
-> > > 
-> > > 	switch (sk->sk_type) {
-> > > 	case SOCK_DGRAM:
-> > > -		new_transport = transport_dgram;
-> > > +		new_transport = vsock_dgram_lookup_transport(remote_cid,
-> > > +							     remote_flags);
-> > > 		break;
-> > > 	case SOCK_STREAM:
-> > > 	case SOCK_SEQPACKET:
-> > > @@ -691,6 +704,9 @@ static int __vsock_bind_connectible(struct vsock_sock *vsk,
-> > > static int __vsock_bind_dgram(struct vsock_sock *vsk,
-> > > 			      struct sockaddr_vm *addr)
-> > > {
-> > > +	if (!vsk->transport || !vsk->transport->dgram_bind)
-> > > +		return -EINVAL;
-> > > +
-> > > 	return vsk->transport->dgram_bind(vsk, addr);
-> > > }
-> > > 
-> > > @@ -1172,19 +1188,24 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
-> > > 
-> > > 	lock_sock(sk);
-> > > 
-> > > -	transport = vsk->transport;
-> > > -
-> > > -	err = vsock_auto_bind(vsk);
-> > > -	if (err)
-> > > -		goto out;
-> > > -
-> > > -
-> > > 	/* If the provided message contains an address, use that.  Otherwise
-> > > 	 * fall back on the socket's remote handle (if it has been connected).
-> > > 	 */
-> > > 	if (msg->msg_name &&
-> > > 	    vsock_addr_cast(msg->msg_name, msg->msg_namelen,
-> > > 			    &remote_addr) == 0) {
-> > > +		transport = vsock_dgram_lookup_transport(remote_addr->svm_cid,
-> > > +							 remote_addr->svm_flags);
-> > > +		if (!transport) {
-> > > +			err = -EINVAL;
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > +		if (!try_module_get(transport->module)) {
-> > > +			err = -ENODEV;
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > 		/* Ensure this address is of the right type and is a valid
-> > > 		 * destination.
-> > > 		 */
-> > > @@ -1193,11 +1214,27 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
-> > > 			remote_addr->svm_cid = transport->get_local_cid();
-> > > 
-> > 
-> > From here ...
-> > 
-> > > 		if (!vsock_addr_bound(remote_addr)) {
-> > > +			module_put(transport->module);
-> > > +			err = -EINVAL;
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > +		if (!transport->dgram_allow(remote_addr->svm_cid,
-> > > +					    remote_addr->svm_port)) {
-> > > +			module_put(transport->module);
-> > > 			err = -EINVAL;
-> > > 			goto out;
-> > > 		}
-> > > +
-> > > +		err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
-> > 
-> > ... to here, looks like duplicate code, can we get it out of the if block?
-> > 
-> 
-> Yes, I think using something like this:
-> 
-> [...]
-> 	bool module_got = false;
-> 
-> [...]
-> 		if (!try_module_get(transport->module)) {
-> 			err = -ENODEV;
-> 			goto out;
-> 		}
-> 		module_got = true;
-> 
-> [...]
-> 
-> out:
-> 	if (likely(transport && !err && module_got))
+> Is there some reason this patch was never picked up, or was it simply
+> forgotten?
 
-Actually, just...
+I feel like I am missing something here.
 
-	if (module_got)
+The patch possibly dates back to 2016 - but I can't tell because
+lore.kernel.org doesn't know either.
 
-> 		module_put(transport->module)
-> 
-> > > +		module_put(transport->module);
-> > > 	} else if (sock->state == SS_CONNECTED) {
-> > > 		remote_addr = &vsk->remote_addr;
-> > > +		transport = vsk->transport;
-> > > +
-> > > +		err = vsock_auto_bind(vsk);
-> > > +		if (err)
-> > > +			goto out;
-> > > 
-> > > 		if (remote_addr->svm_cid == VMADDR_CID_ANY)
-> > > 			remote_addr->svm_cid = transport->get_local_cid();
-> > > @@ -1205,23 +1242,23 @@ static int vsock_dgram_sendmsg(struct socket *sock, struct msghdr *msg,
-> > > 		/* XXX Should connect() or this function ensure remote_addr is
-> > > 		 * bound?
-> > > 		 */
-> > > -		if (!vsock_addr_bound(&vsk->remote_addr)) {
-> > > +		if (!vsock_addr_bound(remote_addr)) {
-> > > 			err = -EINVAL;
-> > > 			goto out;
-> > > 		}
-> > > -	} else {
-> > > -		err = -EINVAL;
-> > > -		goto out;
-> > > -	}
-> > > 
-> > > -	if (!transport->dgram_allow(remote_addr->svm_cid,
-> > > -				    remote_addr->svm_port)) {
-> > > +		if (!transport->dgram_allow(remote_addr->svm_cid,
-> > > +					    remote_addr->svm_port)) {
-> > > +			err = -EINVAL;
-> > > +			goto out;
-> > > +		}
-> > > +
-> > > +		err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
-> > > +	} else {
-> > > 		err = -EINVAL;
-> > > 		goto out;
-> > > 	}
-> > > 
-> > > -	err = transport->dgram_enqueue(vsk, remote_addr, msg, len);
-> > > -
-> > > out:
-> > > 	release_sock(sk);
-> > > 	return err;
-> > > @@ -1255,13 +1292,18 @@ static int vsock_dgram_connect(struct socket *sock,
-> > > 	if (err)
-> > > 		goto out;
-> > > 
-> > > +	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
-> > > +
-> > > +	err = vsock_assign_transport(vsk, NULL);
-> > > +	if (err)
-> > > +		goto out;
-> > > +
-> > > 	if (!vsk->transport->dgram_allow(remote_addr->svm_cid,
-> > > 					 remote_addr->svm_port)) {
-> > > 		err = -EINVAL;
-> > > 		goto out;
-> > > 	}
-> > > 
-> > > -	memcpy(&vsk->remote_addr, remote_addr, sizeof(vsk->remote_addr));
-> > > 	sock->state = SS_CONNECTED;
-> > > 
-> > > 	/* sock map disallows redirection of non-TCP sockets with sk_state !=
-> > > diff --git a/net/vmw_vsock/hyperv_transport.c b/net/vmw_vsock/hyperv_transport.c
-> > > index ff6e87e25fa0..c00bc5da769a 100644
-> > > --- a/net/vmw_vsock/hyperv_transport.c
-> > > +++ b/net/vmw_vsock/hyperv_transport.c
-> > > @@ -551,11 +551,6 @@ static void hvs_destruct(struct vsock_sock *vsk)
-> > > 	kfree(hvs);
-> > > }
-> > > 
-> > > -static int hvs_dgram_bind(struct vsock_sock *vsk, struct sockaddr_vm *addr)
-> > > -{
-> > > -	return -EOPNOTSUPP;
-> > > -}
-> > > -
-> > > static int hvs_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
-> > > {
-> > > 	return -EOPNOTSUPP;
-> > > @@ -841,7 +836,6 @@ static struct vsock_transport hvs_transport = {
-> > > 	.connect                  = hvs_connect,
-> > > 	.shutdown                 = hvs_shutdown,
-> > > 
-> > > -	.dgram_bind               = hvs_dgram_bind,
-> > > 	.dgram_get_cid		  = hvs_dgram_get_cid,
-> > > 	.dgram_get_port		  = hvs_dgram_get_port,
-> > > 	.dgram_get_length	  = hvs_dgram_get_length,
-> > > diff --git a/net/vmw_vsock/virtio_transport.c b/net/vmw_vsock/virtio_transport.c
-> > > index 5763cdf13804..1b7843a7779a 100644
-> > > --- a/net/vmw_vsock/virtio_transport.c
-> > > +++ b/net/vmw_vsock/virtio_transport.c
-> > > @@ -428,7 +428,6 @@ static struct virtio_transport virtio_transport = {
-> > > 		.shutdown                 = virtio_transport_shutdown,
-> > > 		.cancel_pkt               = virtio_transport_cancel_pkt,
-> > > 
-> > > -		.dgram_bind               = virtio_transport_dgram_bind,
-> > > 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
-> > > 		.dgram_allow              = virtio_transport_dgram_allow,
-> > > 		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
-> > > diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
-> > > index e6903c719964..d5a3c8efe84b 100644
-> > > --- a/net/vmw_vsock/virtio_transport_common.c
-> > > +++ b/net/vmw_vsock/virtio_transport_common.c
-> > > @@ -790,13 +790,6 @@ bool virtio_transport_stream_allow(u32 cid, u32 port)
-> > > }
-> > > EXPORT_SYMBOL_GPL(virtio_transport_stream_allow);
-> > > 
-> > > -int virtio_transport_dgram_bind(struct vsock_sock *vsk,
-> > > -				struct sockaddr_vm *addr)
-> > > -{
-> > > -	return -EOPNOTSUPP;
-> > > -}
-> > > -EXPORT_SYMBOL_GPL(virtio_transport_dgram_bind);
-> > > -
-> > > int virtio_transport_dgram_get_cid(struct sk_buff *skb, unsigned int *cid)
-> > > {
-> > > 	return -EOPNOTSUPP;
-> > > diff --git a/net/vmw_vsock/vsock_loopback.c b/net/vmw_vsock/vsock_loopback.c
-> > > index 2f3cabc79ee5..e9de45a26fbd 100644
-> > > --- a/net/vmw_vsock/vsock_loopback.c
-> > > +++ b/net/vmw_vsock/vsock_loopback.c
-> > > @@ -61,7 +61,6 @@ static struct virtio_transport loopback_transport = {
-> > > 		.shutdown                 = virtio_transport_shutdown,
-> > > 		.cancel_pkt               = vsock_loopback_cancel_pkt,
-> > > 
-> > > -		.dgram_bind               = virtio_transport_dgram_bind,
-> > > 		.dgram_enqueue            = virtio_transport_dgram_enqueue,
-> > > 		.dgram_allow              = virtio_transport_dgram_allow,
-> > > 		.dgram_get_cid		  = virtio_transport_dgram_get_cid,
-> > > 
-> > > -- 
-> > > 2.30.2
-> > > 
-> > 
-> > The rest LGTM!
-> > 
-> > Stefano
-> 
-> Thanks,
-> Bobby
+https://lore.kernel.org/netdev/20161028155213.2t3nwwe3lqaynaer@atomide.com/
+
+And I see you asked almost the same question in 2019.
+
+If it is still relevant, perhaps it would be good to repost it
+for review.
 
