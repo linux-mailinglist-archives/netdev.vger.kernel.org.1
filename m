@@ -1,117 +1,103 @@
-Return-Path: <netdev+bounces-13399-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13400-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D15773B700
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:21:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BC43073B711
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:24:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BC8B5281B33
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:21:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECEB91C21193
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:24:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 396A579CF;
-	Fri, 23 Jun 2023 12:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF8E42311C;
+	Fri, 23 Jun 2023 12:24:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A33F847D
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:20:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 213361BE4
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 05:20:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687522826;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7w28TmyVUkzxBrhSnDkK83nu5AG7TtMwzVrLBGQioEg=;
-	b=jQixV3sKSfMAKX+0UaJ+vQcR9AnKxBDCsGhMCUe4kiTarCzqZdpqb6ZKAmFkCwm5kucRbz
-	Iy7Js6aNcnVc0GDX5RI9L88oF7BvTzxvdox5z4uu6wBXi521rBvjS+q/xa1mUR7gLjLupI
-	6Cnfd4TokEAkbwg68NXdiNub3hb786I=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-124-3cnU_LpROiOZ9NZwEaM36Q-1; Fri, 23 Jun 2023 08:20:22 -0400
-X-MC-Unique: 3cnU_LpROiOZ9NZwEaM36Q-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 6D1BC29A9D35;
-	Fri, 23 Jun 2023 12:20:21 +0000 (UTC)
-Received: from renaissance-vector.redhat.com (unknown [10.39.194.186])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 1B5ABF41C8;
-	Fri, 23 Jun 2023 12:20:18 +0000 (UTC)
-From: Andrea Claudi <aclaudi@redhat.com>
-To: netdev@vger.kernel.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: mptcp@lists.linux.dev,
-	matthieu.baerts@tessares.net,
-	martineau@kernel.org,
-	geliang.tang@suse.com
-Subject: [PATCH net 2/2] selftests: mptcp: join: fix 'implicit EP' test
-Date: Fri, 23 Jun 2023 14:19:52 +0200
-Message-ID: <70e1c8044096af86ed19ee5b4068dd8ce15aad30.1687522138.git.aclaudi@redhat.com>
-In-Reply-To: <cover.1687522138.git.aclaudi@redhat.com>
-References: <cover.1687522138.git.aclaudi@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B3B0323119
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:24:13 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 100BB1FCE;
+	Fri, 23 Jun 2023 05:24:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=s29768273; t=1687523033; x=1688127833; i=markus.elfring@web.de;
+ bh=Wlv+XOhNkQT3fz051q7kVZTnAzFjg8f6i61p7Es+b/o=;
+ h=X-UI-Sender-Class:Date:To:References:Subject:From:Cc:In-Reply-To;
+ b=rxI1jJkS7O8wbQtAYraaxDP2gTD2agpuM2XnEhdumeO7EQBh6oK6hOtzq6LMUKnEcjSD0pN
+ 5HjISyyJzt9U93evRKSg9j4FSBYedwXCEVncD9aTNHrUCrIkMe0tG45HSjXQW3FulLh61yak8
+ SEg4Y3jahn6EJvatYdEVN2RF6xXD79zNI7iKBdKrRm6pYByzZ2awsH7f3bIrPdIo4bnlU/+k+
+ PqRhCmpedsFCR2O2lLmNUyB4CL6AWYeWsXQiNPo0PIMxz3RDF41EQIytxWx8T0uyF43zKgzS+
+ 1uL1GTHOzrKV+vpSVLgfnVmqmaE9a+tDUoVtpC+sS+dI7atA55aQ==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.84.83]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1M1JF8-1qFPeN1QmA-002wg0; Fri, 23
+ Jun 2023 14:23:53 +0200
+Message-ID: <1bfe9150-d27b-9541-adcc-70d2095addc3@web.de>
+Date: Fri, 23 Jun 2023 14:23:48 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+To: Radu Pirea <radu-nicolae.pirea@oss.nxp.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+References: <20230623074123.152931-3-radu-nicolae.pirea@oss.nxp.com>
+Subject: Re: [PATCH v2 02/13] net: phy: nxp-c45-tja11xx: remove RX BIST frame
+ counters
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+Cc: LKML <linux-kernel@vger.kernel.org>, cocci@inria.fr,
+ Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Richard Cochran <richardcochran@gmail.com>,
+ Russell King <linux@armlinux.org.uk>,
+ Sebastian Tobuschat <sebastian.tobuschat@nxp.com>
+In-Reply-To: <20230623074123.152931-3-radu-nicolae.pirea@oss.nxp.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:aOBHyxsKrS352E2mDrJvmpxbgfJGLgaMiyWGnR5B8JZhZznDEAM
+ X2we3i8a/ycxQVXGlJp1ll5zJLRex2w9VjXVyDqIJmc5SM/4pqReCaA4xfXS9XBnefJ3/Ri
+ LG/q+4NMllHAzAd3ruROEV/JTxeIgxZ7F1yRHeMnMMtStRpKcrvXrF/hpG3hxJJW5Y1SxcY
+ MYM0w3j69fsDCjfNjh/Bw==
+UI-OutboundReport: notjunk:1;M01:P0:RgxsYWCoLeo=;19zlArWw7IQcb4Bq5EqtzGlcgAc
+ UIZKVCWnxMCDt1HEW3ECAZrvy2ac0Z9Euu8FschZcO3E26Pp5qMXpkXE7h31LE+rXkwNiDtAt
+ XoJenxZMSSVHzwKrSlKh9FqV60fiVjKEpRAeFwB6UxXAwfHuhxrT73UMZrL1MVJOt0zl6eXgk
+ PMQQTpofV9DaszgyKAcDdx1mV5hVv+rZGYrn6Ie/+bkoMfBLN0NLRbxhf2iND1mRpfO+pcRQZ
+ RMUodVOcFmK0oV5omOdEJWandO1qG9L2vrk9hFKj4BUmrTtmYMUsQ3rdlhdnncDkvk/A0ue1j
+ FpgL3IygXIubCdfdqhLQvamc/Bb1UPjsUvhTvs/P76ECnzyC5YKuRZTZu+D0Zbu5n0Pg469eV
+ mfk312oqIaAGXfT7NH4xVI3ryjeI3dlBvNWRk+XhXqr4/adKZNdWSlaZiPhrwpJLUswd2H7Qb
+ WCyVmTqDpJfBEaV4ozYsXXCJq57CNriGJLd7iHdnbgu3J7O8YsNIqnlYW5PbkPq5+S3P5ZgrN
+ f/GGJwt9uMSols11dcyV1qH7Abc/vetdoeAbjg9Ih3W/Jh0KLSVCRkuYPddZa9ayPavcVEi0J
+ cCL9RN4W79BotWvBkmYVu2+Y5NmaWrH//dSoMCMWFfimJS/ljC/ORWZgA5zm1YA6m+5Y/u0Cj
+ infnYurRzgstatFaA4wZVpIVDhNzAzeXWLjOKRjyQyZkmkvKGfqu2jB4EOj715yjR8NY80b96
+ VkppYDnupHKA0XldSQkLkgNxk0wZ3nXeqbn5YsFucHMJPal1GVruIkm7laT8KwHIPppk2O7Lo
+ C5cxcReyOBzYrYGtjiptTHCG3Cm0AaI3X1sIcHDg2iwEEEZowuQuP1KvJLhF07Inq7sJT9a2T
+ zThmeomzK6uA977OA1mChuQnwMSvKJoJ4YB6y083njKLiAWKeDaa9MoQAXtHLMS6OBiR46pGb
+ R1qdIMnW6MpJ9tLu4qxpeF7gVVM=
+X-Spam-Status: No, score=0.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,RCVD_IN_SBL_CSS,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-mptcp_join '001 implicit EP' test currently fails because of two
-reasons:
+>                                                       =E2=80=A6 So, they=
+ don't
+> provide any useful information and are removed from the statistics.
 
-- iproute v6.3.0 does not support the implicit flag, fixed with
-  iproute2-next commit 3a2535a41854 ("mptcp: add support for implicit
-  flag")
-- pm_nl_check_endpoint wrongly expects the ip address to be repeated two
-  times in iproute output, and does not account for a final whitespace
-  in it.
+Please choose imperative change suggestions.
 
-This fixes the issue trimming the whitespace in the output string and
-removing the double address in the expected string.
+See also:
+https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
+cumentation/process/submitting-patches.rst?h=3Dv6.4-rc7#n94
 
-Fixes: 69c6ce7b6eca ("selftests: mptcp: add implicit endpoint test case")
-Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
----
- tools/testing/selftests/net/mptcp/mptcp_join.sh | 5 +++--
- 1 file changed, 3 insertions(+), 2 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-index 5424dcacfffa..6c3525e42273 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
-@@ -768,10 +768,11 @@ pm_nl_check_endpoint()
- 	fi
- 
- 	if [ $ip_mptcp -eq 1 ]; then
-+		# get line and trim trailing whitespace
- 		line=$(ip -n $ns mptcp endpoint show $id)
-+		line="${line% }"
- 		# the dump order is: address id flags port dev
--		expected_line="$addr"
--		[ -n "$addr" ] && expected_line="$expected_line $addr"
-+		[ -n "$addr" ] && expected_line="$addr"
- 		expected_line="$expected_line $id"
- 		[ -n "$_flags" ] && expected_line="$expected_line ${_flags//","/" "}"
- 		[ -n "$dev" ] && expected_line="$expected_line $dev"
--- 
-2.41.0
-
+Regards,
+Markus
 
