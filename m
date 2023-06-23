@@ -1,110 +1,120 @@
-Return-Path: <netdev+bounces-13419-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13420-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D776173B84C
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 14:57:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EA0B673B858
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 15:01:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6513B281B62
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 12:57:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68C0C1C21268
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 13:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1E6A749B;
-	Fri, 23 Jun 2023 12:57:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A17479CF;
+	Fri, 23 Jun 2023 13:01:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F2CF23109
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 12:57:43 +0000 (UTC)
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E7D61BC6;
-	Fri, 23 Jun 2023 05:57:42 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-311367a3e12so708473f8f.2;
-        Fri, 23 Jun 2023 05:57:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687525060; x=1690117060;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xBGlu4mVjSZIVkmyT63GiSTJi1xsdDVdh6nA4KVczZk=;
-        b=Da3PZ42WRVj068XKjsp7ChqeSKc42ke+gcHYN+e/OmoJZICNLD82oBSwzKYYWkgcG6
-         79G3SFLUoDLsqHvF1YhE/GkvfU8XkJGEz5+lazPJUBMxqS6yBplsrwa9S2ZqnuAWR+Lr
-         jwdAqvZj4S8p+Wx+xxPZzX65nhVmfOh2PyzGNLt2kLidzCvchgVbstihvLmZLA9Heksm
-         gj7DVGJttCNANj4xtkAMx0Nqy/tIq2hqJZg6f5V84d5ikeo7lEOuXUYECVNccJ7QosY0
-         zFOmwBiz7DCu/lEh4eLLEZq56HdB3bFCO3+RLPHJjdP6m8XMvQwgd2ydmoMA2z9Y+y3e
-         gruA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09DA24439
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 13:01:21 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9074F1BDF
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 06:01:19 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687525278;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Vcu9IDO2pMlCXuz9+9dp8wFxn2b0ImO0mUp8HiDtyZ0=;
+	b=PSSdhVQqZTpV5XaDBhiNhP9jORj/pQvxX7/eoMB+tXVeVqUZGKiRmEHj2t/ZltT1jUnzPV
+	DFaLyBxeYeKSZltF5gmYzNEsXlWaue36BsvKtXq2V/ql23doI24j2V+9QfgZfI5iDm+lVp
+	e8zXpnc9ENdzHtaL6NbVY1aIpLXaiOs=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-361-b7iKh07NNSC-gN9Ag8nRwg-1; Fri, 23 Jun 2023 09:01:16 -0400
+X-MC-Unique: b7iKh07NNSC-gN9Ag8nRwg-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-76545dc12ebso11128085a.1
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 06:01:15 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687525060; x=1690117060;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=xBGlu4mVjSZIVkmyT63GiSTJi1xsdDVdh6nA4KVczZk=;
-        b=QYV/YCuphtcgKaT0OTdh/ogMNxHkyY6xLCEFARgZlxPg3gSwNpj5W5rVgEmtZQc76A
-         hq5owNQg/DW6oCv9cVgbV5aE2ekuYt9Fieeipmqy0hhmXAZBpxezKjDAyM5NJokPS8LU
-         vtt3+XPxpTUYyLYuqqoWqZCUHl9M486ltTWW63VckQ7FCKwXIoT2wTfeDLvaLFC67XyF
-         dPGNczDkjujA1SNjmHyWeTuXNC0EO/UkD5e+N/NYbZTLIYnCrZ5egABEec/6eN0IiV3v
-         NTgJM+pLixYWr33Ssyxm4Ch6RYGMhvGtFkSLov/UfQ5qku8nTY0NtfLV2B7Zdojz0xgN
-         1SWg==
-X-Gm-Message-State: AC+VfDwqKE59tlUeS4nbelnlOFU0Kms3w4a0iv55CK+iSqpaPxLJdF+q
-	TNYA5oZcGNERo+4ERC4rgcOa7fpFnAU=
-X-Google-Smtp-Source: ACHHUZ7Hvj6grFzKGnMkHJahttoaVl+DK1eSiQN1i3nG8Pn0uM6L6bQypkWXGd3UwyOchyCI+r3ZlQ==
-X-Received: by 2002:adf:cc90:0:b0:311:ffc:f54d with SMTP id p16-20020adfcc90000000b003110ffcf54dmr18450756wrj.66.1687525060520;
-        Fri, 23 Jun 2023 05:57:40 -0700 (PDT)
-Received: from [192.168.1.122] (cpc159313-cmbg20-2-0-cust161.5-4.cable.virginm.net. [82.0.78.162])
-        by smtp.gmail.com with ESMTPSA id y10-20020adff6ca000000b0030f9c3219aasm9450567wrp.47.2023.06.23.05.57.39
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jun 2023 05:57:40 -0700 (PDT)
-Subject: Re: [PATCH 3/3] sfc: selftest: fix struct packing
-To: David Laight <David.Laight@ACULAB.COM>, Arnd Bergmann <arnd@kernel.org>,
- Martin Habets <habetsm.xilinx@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-Cc: Arnd Bergmann <arnd@arndb.de>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "linux-net-drivers@amd.com" <linux-net-drivers@amd.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-References: <20230619091215.2731541-1-arnd@kernel.org>
- <20230619091215.2731541-3-arnd@kernel.org>
- <7c448f02-4031-0a90-97e2-0cc663b0cff9@gmail.com>
- <ee0cf01638074abfbddda7edd3074d2c@AcuMS.aculab.com>
-From: Edward Cree <ecree.xilinx@gmail.com>
-Message-ID: <0f12f612-7fad-59c6-c7dd-dea49721842b@gmail.com>
-Date: Fri, 23 Jun 2023 13:57:39 +0100
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:78.0) Gecko/20100101
- Thunderbird/78.14.0
+        d=1e100.net; s=20221208; t=1687525275; x=1690117275;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Vcu9IDO2pMlCXuz9+9dp8wFxn2b0ImO0mUp8HiDtyZ0=;
+        b=Um+kSYWTUEE9Ex7caRMVHKjqeYi+eExhWluvEifAWNeIWtYwnPAr1WQTCNMedKpuL/
+         dV8DqYG5yUbha+AYUKlM8hWnMWi2otzROAbDcPVGaw4sTjX+VEqs5IdAI3OVQaHzDHwq
+         RlMaXkkvq/wbfl0theISaIcUIUZjPCsA3GFsPhSjrvZBK6W67fs50w4Mz4XnufyUkHS8
+         J9EOMFE5eBh3vjpiSVEs13VF3G3TsOY6qpFKAoNcvAFUUTuHZsFzQqZCUSEq3FLfDNNa
+         WKo4ZLsXsaFOmLSk+y/X/8sj/iqNavcbIAtJcIZc6cGkITCgIV1Y6ykNitthAOHFc2rt
+         kmqw==
+X-Gm-Message-State: AC+VfDwqSNghkFVaAQaOCf1hJJz+6Jo4ux3epRdn/z5LG/Lu9YXNG5ko
+	vXWh0aDqczC8XsuejXeKr+p+QI67AX1+gyGUXD6QFOB0EErivGvl8I9tw4Ce1zfqH5Df1gbdr9s
+	XYqZEwBS6cVA26WKT
+X-Received: by 2002:a05:620a:8fcc:b0:763:a95d:b578 with SMTP id rj12-20020a05620a8fcc00b00763a95db578mr10429916qkn.3.1687525275373;
+        Fri, 23 Jun 2023 06:01:15 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ65g/cWwRlDyAd07dNn5XZg3kkI+SKLStX6DcSCzrFYWBvpxMBMZ2eh/zC2N+DFadQpxllzww==
+X-Received: by 2002:a05:620a:8fcc:b0:763:a95d:b578 with SMTP id rj12-20020a05620a8fcc00b00763a95db578mr10429856qkn.3.1687525274650;
+        Fri, 23 Jun 2023 06:01:14 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-243.dyn.eolo.it. [146.241.231.243])
+        by smtp.gmail.com with ESMTPSA id c18-20020a05620a165200b00763a3e5f80dsm4526927qko.15.2023.06.23.06.01.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 06:01:14 -0700 (PDT)
+Message-ID: <71f51047892001e6cdac1de4a6f7c2b9f97c7c8b.camel@redhat.com>
+Subject: Re: [net-next Patch 1/3] octeontx2-pf: implement transmit schedular
+ allocation algorithm
+From: Paolo Abeni <pabeni@redhat.com>
+To: Hariprasad Kelam <hkelam@marvell.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Cc: kuba@kernel.org, davem@davemloft.net, willemdebruijn.kernel@gmail.com, 
+ andrew@lunn.ch, sgoutham@marvell.com, lcherian@marvell.com,
+ gakula@marvell.com,  jerinj@marvell.com, sbhatta@marvell.com,
+ naveenm@marvell.com, edumazet@google.com,  jhs@mojatatu.com,
+ xiyou.wangcong@gmail.com, jiri@resnulli.us, maxtram95@gmail.com, 
+ corbet@lwn.net, linux-doc@vger.kernel.org
+Date: Fri, 23 Jun 2023 15:01:09 +0200
+In-Reply-To: <20230622085638.3509-2-hkelam@marvell.com>
+References: <20230622085638.3509-1-hkelam@marvell.com>
+	 <20230622085638.3509-2-hkelam@marvell.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ee0cf01638074abfbddda7edd3074d2c@AcuMS.aculab.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 23/06/2023 11:52, David Laight wrote:
-> Maybe you can get away with adding a 16bit pad before the ethernet
-> header so that the IP header is actually aligned.
+On Thu, 2023-06-22 at 14:26 +0530, Hariprasad Kelam wrote:
+> diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.h b/drivers/n=
+et/ethernet/marvell/octeontx2/nic/qos.h
+> index 19773284be27..0c5d2f79dc15 100644
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
+> @@ -35,6 +35,7 @@ struct otx2_qos_cfg {
+>  	int dwrr_node_pos[NIX_TXSCH_LVL_CNT];
+>  	u16 schq_contig_list[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
+>  	u16 schq_list[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
+> +	u16 schq_used_index[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
 
-That's what I ended up doing, because my original idea was
- overcomplicated and turned out super ugly.
-See https://lore.kernel.org/netdev/6f87fdf5-1844-4633-b4fe-6b247bc6ab49@app.fastmail.com/T/
+This struct is already quite big, and you use schq_used_index[x][y] as
+a bool. I think you will be better off changing the used type
+accordingly.
 
-> (Then fight all the stuff that stops you doing a memcpy()
-> that runs into a second field of a structure.)
+Side note 'schq_index_used' sounds a little more clear to me, but could
+be simply ENONATIVELANG here ;)
 
-Yeah, I don't know how you're meant to annotate that stuff.
-I guess I'll have to wait until Kees shouts at me and tells
- me what to do :S
+Cheers,
 
--ed
+Paolo
+
 
