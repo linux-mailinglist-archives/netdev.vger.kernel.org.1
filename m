@@ -1,89 +1,141 @@
-Return-Path: <netdev+bounces-13306-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13307-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43EA673B346
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:10:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E543E73B35C
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 11:19:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 069B02819FC
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:10:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5460281986
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 09:19:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C86D184E;
-	Fri, 23 Jun 2023 09:10:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2D7D23D6C;
+	Fri, 23 Jun 2023 09:19:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB6C33D6C
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 65EADC433C0;
-	Fri, 23 Jun 2023 09:10:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687511422;
-	bh=9qt3NpXo6vZh6lvewEfm58QYAoaKHCqno0C2Cxrw2BI=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eB0kCe4EwvLlBVC5068iUtCE3f8T/w93+i7aeo4K6RK8l72jf0xz5hEPwZTVAPoaH
-	 lahRqk/UDiHsEhX1NjZNg7nIq0ucZWkorWg/OfMeNMBqyF8G/r1zijGENJn8xsAr5L
-	 ORJt4G8VMwQu0+L4J5wILVANY+zU379sScrYhcTFU7Tdy94amZTnJA3bzB4vsf0unh
-	 v1+kTRi8iiA8zimSZLo6xLIeI4unDIVMsrVSteyj0oeoHHSMstC8Ubaq563oM11cdH
-	 3hO2ZVndr/Q9NEKHX9lzTZnUG1DlcGCv3Mg8KcF9hO+bHnsORnIAEnPE+JMiapurNb
-	 nI7lwqp8HG0Yg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 45464C43169;
-	Fri, 23 Jun 2023 09:10:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F750210B
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 09:19:49 +0000 (UTC)
+Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D3021BFA
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:19:46 -0700 (PDT)
+Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-988a5383fd4so90078266b.0
+        for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:19:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares.net; s=google; t=1687511985; x=1690103985;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=pQ6QabPlq4SG93YlN4F2ainKra0lJ4TZXEDEZJ3pyxA=;
+        b=0axuMEg5f03qoxYkBU39Y6B7dmYmm4FMYEjsO8GOkZG74Jr2yt8GLFBXoWG3KVoOV1
+         BB49AvFjfeXy7pOh+ot0as7u3Hg2BNMDaK2Xv620QO06T4fTDhCFa4w8YezTRhKIrs51
+         mpAgBD5mkh6h014AHUFSASh2NIYisKH6JqgyuF9fUD/AgsdYYw3G+T8ql+ginJ2VJzf6
+         ge3We9/1tRYYE0+VUf6bH/G1YKEdWlz8CcSrTxHu4sfyKkgKfAjcfyn6urGlKS4FlHhk
+         JN2/j/omQBhqgCNZVjNCgqaPg4Tp6YpB7McC3ulIwA79Vz8Y5OrVwvbc5cmPTij8GJRu
+         5KdQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687511985; x=1690103985;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=pQ6QabPlq4SG93YlN4F2ainKra0lJ4TZXEDEZJ3pyxA=;
+        b=FOcoaeq/+uZPInIo2FUW36gC96Zsla2Ve6BF1lc9cquoNekjI4MeIVL9MwRU6+mUPe
+         NX6pyVmljb5WJx5jvqYUfCWL/RA0BIEvpySV+3V38Moa/REtHRx+xnkG1NwzyUiXhoM0
+         XnhpuiONAq1fwnGEtlseRa/OaQK58x7ddcBnH8empb0Xd3r8Dz95m+kZxgJvloINRPH0
+         o4UyhCqDVXKxQcDvLeU23Rt6QXBpe1QY1AaYn7bkcV/2TY3cVEC87zqdqfDKL/FFsFms
+         pVf/XJ+U71j+m0v//pjR5pNENlgL7Vp/QFa8EEF7mRLl9zfRme52OzlMx0PpqtsqYlJg
+         eMjw==
+X-Gm-Message-State: AC+VfDwMIeuOvrBC7psWHkvGOr3GnNIhLWjIlnxBvRqjMQ/Mkp2aMbRp
+	fIUTPcmup13Qz38YEPwFepVFag==
+X-Google-Smtp-Source: ACHHUZ52Fo1SOMyS9PnfNxeqPNIhe3ZVZpvWYLfgZDAsHyINH0WiPBBtpaP7I3qzkw0JoKFz3v5MXg==
+X-Received: by 2002:a17:907:6d26:b0:988:2037:c687 with SMTP id sa38-20020a1709076d2600b009882037c687mr14620975ejc.37.1687511984570;
+        Fri, 23 Jun 2023 02:19:44 -0700 (PDT)
+Received: from ?IPV6:2a02:578:8593:1200:7733:4d95:422b:f164? ([2a02:578:8593:1200:7733:4d95:422b:f164])
+        by smtp.gmail.com with ESMTPSA id j24-20020a170906279800b00986d8722e46sm5879974ejc.17.2023.06.23.02.19.43
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jun 2023 02:19:44 -0700 (PDT)
+Message-ID: <e228646e-bd41-d6fd-b43d-11d3f9d3c029@tessares.net>
+Date: Fri, 23 Jun 2023 11:19:42 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 0/8] Fix comment typos about "transmit"
+Content-Language: en-GB
+To: Yueh-Shun Li <shamrocklee@posteo.net>, Jakub Kicinski <kuba@kernel.org>
+Cc: jgg@ziepe.ca, leon@kernel.org, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, kvalo@kernel.org, jejb@linux.ibm.com,
+ pabeni@redhat.com, apw@canonical.com, joe@perches.com,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
+References: <20230622012627.15050-1-shamrocklee@posteo.net>
+ <168748862634.32034.1394302200661050543.git-patchwork-notify@kernel.org>
+ <50a88781b9e2a80588438c315167bbec@posteo.net>
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+In-Reply-To: <50a88781b9e2a80588438c315167bbec@posteo.net>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3 0/3] net: hns3: There are some cleanup for the
- HNS3 ethernet driver
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168751142227.25488.10355722983066462058.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Jun 2023 09:10:22 +0000
-References: <20230621123309.34381-1-lanhao@huawei.com>
-In-Reply-To: <20230621123309.34381-1-lanhao@huawei.com>
-To: Hao Lan <lanhao@huawei.com>
-Cc: netdev@vger.kernel.org, yisen.zhuang@huawei.com, salil.mehta@huawei.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- richardcochran@gmail.com, wangpeiyang1@huawei.com, shenjian15@huawei.com,
- chenhao418@huawei.com, simon.horman@corigine.com, wangjie125@huawei.com,
- yuanjilin@cdjrlc.com, cai.huoqing@linux.dev, xiujianfeng@huawei.com
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi,
 
-This series was applied to netdev/net-next.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
-
-On Wed, 21 Jun 2023 20:33:06 +0800 you wrote:
-> There are some cleanup for the HNS3 ethernet driver.
+On 23/06/2023 10:51, Yueh-Shun Li wrote:
+> Dear Maintainer,
 > 
-> Hao Chen (1):
->   net: hns3: fix strncpy() not using dest-buf length as length issue
-> 
-> Jian Shen (1):
->   net: hns3: refine the tcam key convert handle
-> 
-> [...]
+> On 23.06.2023 04:50, patchwork-bot+netdevbpf@kernel.org wrote:
+>> Hello:
+>>
+>> This series was applied to netdev/net-next.git (main)
+>> by Jakub Kicinski <kuba@kernel.org>:
+>>
+>> On Thu, 22 Jun 2023 01:26:21 +0000 you wrote:
+>>> Fix typos about "transmit" missing the first "s"
+>>> found by searching with keyword "tram" in the first 7
+>>> patches.
+>>>
+>>> Add related patterns to "scripts/spelling.txt" in the
+>>> last patch.
 
-Here is the summary with links:
-  - [net-next,v3,1/3] net: hns3: refine the tcam key convert handle
-    https://git.kernel.org/netdev/net-next/c/9b476494da1a
-  - [net-next,v3,2/3] net: hns3: fix strncpy() not using dest-buf length as length issue
-    https://git.kernel.org/netdev/net-next/c/1cf3d5567f27
-  - [net-next,v3,3/3] net: hns3: clear hns unused parameter alarm
-    https://git.kernel.org/netdev/net-next/c/ed1c6f35b73e
+(...)
 
-You are awesome, thank you!
+>>   - [7/8] selftests: mptcp: connect: fix comment typo
+>>     (no matching commit)
+
+I just applied this patch 7/8 in MPTCP tree (features for net-next), no
+need to send it again elsewhere.
+
+New patches for t/upstream:
+- ba8a625a062a: selftests: mptcp: connect: fix comment typo
+- Results: e16a005b0d79..f186e81ff99c (export)
+
+>>   - [8/8] scripts/spelling.txt: Add "transmit" patterns
+>>     (no matching commit)
+>>
+>> You are awesome, thank you!
+> 
+> Should I rebase the local branch onto netdev/net-next/main
+> and send the "no matching commit" patches again?
+
+For the other ones, you might have to send them separately to the
+appropriated maintainers according to the MAINTAINERS file, not all of
+them in the same series I guess.
+
+Cheers,
+Matt
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
 
