@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-13524-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13530-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1AC6B73BED3
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:31:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 58C2273BEE1
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:33:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C68A1C21322
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:31:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7AA541C212C2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 19:33:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E973011C94;
-	Fri, 23 Jun 2023 19:29:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89C611C82;
+	Fri, 23 Jun 2023 19:29:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F102C10965
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:29:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B00E6C433C9;
-	Fri, 23 Jun 2023 19:29:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F8C710966
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 19:29:22 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A99D8C433A9;
+	Fri, 23 Jun 2023 19:29:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687548561;
-	bh=+mesCMhbH61ywaQwLk84Q5m8471XrPZIc3broOlOtPc=;
+	s=k20201202; t=1687548562;
+	bh=c0iYPlMcBNlCmWjQXap5TVdOiYxdgWpllsfylHLZpRw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=cTPjiu1XwRnBlIjyVkopYcoN7aGBgnxKMWBmythR0E8p188gl1ugNzUau1sZ99UI/
-	 5ogRdRnoH3sDz4VKBcjVqtMSrnMoaXhTKq+7jU5j3RXyPacI2hYOWNJsAjn7D/BZ91
-	 JonkIvxGW5PHT+L2iITu0PwaV0toB2esLmGdmkggBskAmPp/uOdx8d0dTJa87hS/mb
-	 VNsTv+6yPIPLgNvjt6jx8F/V/JIsQXiz+L74za4bLRmU1I4oWRI68Soh7F7Ha5Hf8a
-	 QK3ApARTGRqWvoLZsfs+fUTgzqEYX600sVwyccelMv6mqV+NbbzIm4R7tKeesJMNOO
-	 8q2ElGkvv1iAg==
+	b=NZJstPejAC0xAjpfk6OpSNQelptZBSI2JnkkSlu2dm9w+VX6YJ1fGFvf4uFL2kLKs
+	 CgvGmCtFKeF0wGjUhaNqL5TbgWoY/4OkWPOFPWKRod2jnBh9GIzZtGJq+l9f2txmzX
+	 vtv1GOb8Dfi3I/xl9xKVtGBfiYIknOjLI5db0kIWlXn5xI+S3Y8dajz9TYeo6a8iVB
+	 Hm1ynlwIb849IIDcp58jUQpsL6EPF9/pfp0+v7/ApbtANyDAlIctr+oSdNzKovSwzk
+	 2nMgj90tFYzhLMslyuJdU7VNjiz5iawu5ioDw83LW47S9l0XBN7zXd9FYnoCTtU0Ee
+	 3ZNqd/A7b1nJg==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -40,9 +40,9 @@ Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	Tariq Toukan <tariqt@nvidia.com>,
 	Roi Dayan <roid@nvidia.com>,
 	Shay Drory <shayd@nvidia.com>
-Subject: [net-next V2 07/15] net/mlx5e: E-Switch, Add peer fdb miss rules for vport manager or ecpf
-Date: Fri, 23 Jun 2023 12:28:59 -0700
-Message-ID: <20230623192907.39033-8-saeed@kernel.org>
+Subject: [net-next V2 08/15] net/mlx5e: E-Switch, Use xarray for devcom paired device index
+Date: Fri, 23 Jun 2023 12:29:00 -0700
+Message-ID: <20230623192907.39033-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230623192907.39033-1-saeed@kernel.org>
 References: <20230623192907.39033-1-saeed@kernel.org>
@@ -56,56 +56,120 @@ Content-Transfer-Encoding: 8bit
 
 From: Roi Dayan <roid@nvidia.com>
 
-Add peer fdb rules for E-Switch that are vport managers or ecpf device.
-It is not needed for other devices.
+To allow devcom events on E-Switch that is not a vport group manager,
+use vhca id as an index instead of device index which might be shared
+between several E-Switches. for example SF and its PF.
 
 Signed-off-by: Roi Dayan <roid@nvidia.com>
 Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- .../net/ethernet/mellanox/mlx5/core/eswitch_offloads.c | 10 +++++++++-
- 1 file changed, 9 insertions(+), 1 deletion(-)
+ .../net/ethernet/mellanox/mlx5/core/eswitch.h |  2 +-
+ .../mellanox/mlx5/core/eswitch_offloads.c     | 30 +++++++++++++++----
+ 2 files changed, 25 insertions(+), 7 deletions(-)
 
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+index 7064609f4998..ae0dc8a3060d 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.h
+@@ -353,7 +353,7 @@ struct mlx5_eswitch {
+ 		u32             large_group_num;
+ 	}  params;
+ 	struct blocking_notifier_head n_head;
+-	bool paired[MLX5_MAX_PORTS];
++	struct xarray paired;
+ };
+ 
+ void esw_offloads_disable(struct mlx5_eswitch *esw);
 diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-index 9056b0b014f6..ed986d1c9e90 100644
+index ed986d1c9e90..6f3b7d5eb6a4 100644
 --- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
 +++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch_offloads.c
-@@ -1069,6 +1069,9 @@ static int esw_add_fdb_peer_miss_rules(struct mlx5_eswitch *esw,
- 	void *misc;
+@@ -2807,15 +2807,21 @@ static int mlx5_esw_offloads_devcom_event(int event,
+ 	struct mlx5_eswitch *esw = my_data;
+ 	struct mlx5_devcom *devcom = esw->dev->priv.devcom;
+ 	struct mlx5_eswitch *peer_esw = event_data;
++	u16 esw_i, peer_esw_i;
++	bool esw_paired;
  	int err;
  
-+	if (!MLX5_VPORT_MANAGER(esw->dev) && !mlx5_core_is_ecpf_esw_manager(esw->dev))
-+		return 0;
++	peer_esw_i = MLX5_CAP_GEN(peer_esw->dev, vhca_id);
++	esw_i = MLX5_CAP_GEN(esw->dev, vhca_id);
++	esw_paired = !!xa_load(&esw->paired, peer_esw_i);
 +
- 	spec = kvzalloc(sizeof(*spec), GFP_KERNEL);
- 	if (!spec)
- 		return -ENOMEM;
-@@ -1177,11 +1180,14 @@ static int esw_add_fdb_peer_miss_rules(struct mlx5_eswitch *esw,
- static void esw_del_fdb_peer_miss_rules(struct mlx5_eswitch *esw,
- 					struct mlx5_core_dev *peer_dev)
- {
-+	u16 peer_index = mlx5_get_dev_index(peer_dev);
- 	struct mlx5_flow_handle **flows;
- 	struct mlx5_vport *vport;
- 	unsigned long i;
+ 	switch (event) {
+ 	case ESW_OFFLOADS_DEVCOM_PAIR:
+ 		if (mlx5_eswitch_vport_match_metadata_enabled(esw) !=
+ 		    mlx5_eswitch_vport_match_metadata_enabled(peer_esw))
+ 			break;
  
--	flows = esw->fdb_table.offloads.peer_miss_rules[mlx5_get_dev_index(peer_dev)];
-+	flows = esw->fdb_table.offloads.peer_miss_rules[peer_index];
-+	if (!flows)
-+		return;
+-		if (esw->paired[mlx5_get_dev_index(peer_esw->dev)])
++		if (esw_paired)
+ 			break;
  
- 	if (mlx5_core_ec_sriov_enabled(esw->dev)) {
- 		mlx5_esw_for_each_ec_vf_vport(esw, i, vport, mlx5_core_max_ec_vfs(esw->dev)) {
-@@ -1206,7 +1212,9 @@ static void esw_del_fdb_peer_miss_rules(struct mlx5_eswitch *esw,
- 		vport = mlx5_eswitch_get_vport(esw, MLX5_VPORT_PF);
- 		mlx5_del_flow_rules(flows[vport->index]);
- 	}
+ 		err = mlx5_esw_offloads_set_ns_peer(esw, peer_esw, true);
+@@ -2829,23 +2835,29 @@ static int mlx5_esw_offloads_devcom_event(int event,
+ 		if (err)
+ 			goto err_pair;
+ 
+-		esw->paired[mlx5_get_dev_index(peer_esw->dev)] = true;
+-		peer_esw->paired[mlx5_get_dev_index(esw->dev)] = true;
++		err = xa_insert(&esw->paired, peer_esw_i, peer_esw, GFP_KERNEL);
++		if (err)
++			goto err_xa;
 +
- 	kvfree(flows);
-+	esw->fdb_table.offloads.peer_miss_rules[peer_index] = NULL;
++		err = xa_insert(&peer_esw->paired, esw_i, esw, GFP_KERNEL);
++		if (err)
++			goto err_peer_xa;
++
+ 		esw->num_peers++;
+ 		peer_esw->num_peers++;
+ 		mlx5_devcom_comp_set_ready(devcom, MLX5_DEVCOM_ESW_OFFLOADS, true);
+ 		break;
+ 
+ 	case ESW_OFFLOADS_DEVCOM_UNPAIR:
+-		if (!esw->paired[mlx5_get_dev_index(peer_esw->dev)])
++		if (!esw_paired)
+ 			break;
+ 
+ 		peer_esw->num_peers--;
+ 		esw->num_peers--;
+ 		if (!esw->num_peers && !peer_esw->num_peers)
+ 			mlx5_devcom_comp_set_ready(devcom, MLX5_DEVCOM_ESW_OFFLOADS, false);
+-		esw->paired[mlx5_get_dev_index(peer_esw->dev)] = false;
+-		peer_esw->paired[mlx5_get_dev_index(esw->dev)] = false;
++		xa_erase(&peer_esw->paired, esw_i);
++		xa_erase(&esw->paired, peer_esw_i);
+ 		mlx5_esw_offloads_unpair(peer_esw, esw);
+ 		mlx5_esw_offloads_unpair(esw, peer_esw);
+ 		mlx5_esw_offloads_set_ns_peer(esw, peer_esw, false);
+@@ -2854,6 +2866,10 @@ static int mlx5_esw_offloads_devcom_event(int event,
+ 
+ 	return 0;
+ 
++err_peer_xa:
++	xa_erase(&esw->paired, peer_esw_i);
++err_xa:
++	mlx5_esw_offloads_unpair(peer_esw, esw);
+ err_pair:
+ 	mlx5_esw_offloads_unpair(esw, peer_esw);
+ err_peer:
+@@ -2879,6 +2895,7 @@ void mlx5_esw_offloads_devcom_init(struct mlx5_eswitch *esw)
+ 	if (!mlx5_lag_is_supported(esw->dev))
+ 		return;
+ 
++	xa_init(&esw->paired);
+ 	mlx5_devcom_register_component(devcom,
+ 				       MLX5_DEVCOM_ESW_OFFLOADS,
+ 				       mlx5_esw_offloads_devcom_event,
+@@ -2906,6 +2923,7 @@ void mlx5_esw_offloads_devcom_cleanup(struct mlx5_eswitch *esw)
+ 			       ESW_OFFLOADS_DEVCOM_UNPAIR, esw);
+ 
+ 	mlx5_devcom_unregister_component(devcom, MLX5_DEVCOM_ESW_OFFLOADS);
++	xa_destroy(&esw->paired);
  }
  
- static int esw_add_fdb_miss_rule(struct mlx5_eswitch *esw)
+ bool mlx5_esw_vport_match_metadata_supported(const struct mlx5_eswitch *esw)
 -- 
 2.41.0
 
