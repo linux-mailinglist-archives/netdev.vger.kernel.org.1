@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-13243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13247-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91AEC73AEBC
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 04:50:25 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEC5573AEC8
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 04:51:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7608A1C20DE9
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:50:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EEBE91C20E00
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:51:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4A67B38A;
-	Fri, 23 Jun 2023 02:50:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02DFA17D3;
+	Fri, 23 Jun 2023 02:50:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 142F619B
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 02:50:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 50123C433C9;
-	Fri, 23 Jun 2023 02:50:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1062D801;
+	Fri, 23 Jun 2023 02:50:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 6FCC6C433C9;
+	Fri, 23 Jun 2023 02:50:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687488620;
-	bh=nil53usVHzZEl98eGBgwg8grEDlY3XKRAjW/MwQOux0=;
+	s=k20201202; t=1687488626;
+	bh=9EiFCNHJdUpB+XW1zu/aSkMUksAqJahEysCGpYwwpD4=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=VX+fA4ahPQV2gOe12mGyaYILTu/CEGUPSFwCfnX072+QSJ44QLrmbFR9b5/oTWB61
-	 oSX/Fo4LVWAtW6k8zC3aXWHy5+aABHTMZx9ovjmu/oGwqaOAk1IbmfC4RSHSSQtO2N
-	 80o6sJ8FWX0KQiF4WYUo91YoegYRAg2IvO3jnofWgIah8auvX9djj7+bYRFrWlivdJ
-	 P9UTU0BZVGqRuzPYD16b3H2qUIVJS2X3nN++Pfj3MWOgt7Bu9mUYCtsIlHuqAQcKhd
-	 Xfnuqtyd5/XiFMmtu35lSNhB3mtpYOF3YVwFS4IsSXNN5676CwJ0vfoNYELrVO94UQ
-	 4WLEkI5F8z6Hg==
+	b=mOVmqgTDkzxHjY/uKaDRNHHy7gKk4xXwchepy/RBKuwnGRuz8kKXVdUGZvFxDmzPz
+	 8e28RgQQzGfDmaHmJ5CZIUCEHWy8MOIs+IGJq54kKbkqCmo8kcZfnlWHfCG/cpQ7t/
+	 MQl6UoXAIgGTFsYgoL5gyRtlpZiGoohwjv+gRsfU/oCd7QyvEIMzl+kpunI8vRDcou
+	 RExwmgEqUX0YrOnw+RosZ3PVJDdq13xLqhoxRRTw/6SK+Sa1GgONnFaEuv/177fnz4
+	 7vybmUpQMpWQ80Qg4SZ4AcFQB/b9h8coL/lrQOZgmgniG12C6Si1Ql29RqDwSeNqzH
+	 l+5pDpsclDNKw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2C76DC395F1;
-	Fri, 23 Jun 2023 02:50:20 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 54D53C395F1;
+	Fri, 23 Jun 2023 02:50:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,38 +41,54 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 1/1] net: phy: dp83td510: fix kernel stall during netboot
- in DP83TD510E PHY driver
+Subject: Re: [PATCH 0/8] Fix comment typos about "transmit"
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168748862017.32034.11932493767244915559.git-patchwork-notify@kernel.org>
-Date: Fri, 23 Jun 2023 02:50:20 +0000
-References: <20230621043848.3806124-1-o.rempel@pengutronix.de>
-In-Reply-To: <20230621043848.3806124-1-o.rempel@pengutronix.de>
-To: Oleksij Rempel <o.rempel@pengutronix.de>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- stable@vger.kernel.org, kernel@pengutronix.de, linux-kernel@vger.kernel.org,
- netdev@vger.kernel.org
+ <168748862634.32034.1394302200661050543.git-patchwork-notify@kernel.org>
+Date: Fri, 23 Jun 2023 02:50:26 +0000
+References: <20230622012627.15050-1-shamrocklee@posteo.net>
+In-Reply-To: <20230622012627.15050-1-shamrocklee@posteo.net>
+To: Yueh-Shun Li <shamrocklee@posteo.net>
+Cc: jgg@ziepe.ca, leon@kernel.org, anthony.l.nguyen@intel.com,
+ davem@davemloft.net, kvalo@kernel.org, jejb@linux.ibm.com, kuba@kernel.org,
+ pabeni@redhat.com, apw@canonical.com, joe@perches.com,
+ linux-rdma@vger.kernel.org, netdev@vger.kernel.org,
+ linux-wireless@vger.kernel.org, linux-scsi@vger.kernel.org,
+ mptcp@lists.linux.dev, linux-kselftest@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
+This series was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed, 21 Jun 2023 06:38:48 +0200 you wrote:
-> Fix an issue where the kernel would stall during netboot, showing the
-> "sched: RT throttling activated" message. This stall was triggered by
-> the behavior of the mii_interrupt bit (Bit 7 - DP83TD510E_STS_MII_INT)
-> in the DP83TD510E's PHY_STS Register (Address = 0x10). The DP83TD510E
-> datasheet (2020) states that the bit clears on write, however, in
-> practice, the bit clears on read.
+On Thu, 22 Jun 2023 01:26:21 +0000 you wrote:
+> Fix typos about "transmit" missing the first "s"
+> found by searching with keyword "tram" in the first 7
+> patches.
+> 
+> Add related patterns to "scripts/spelling.txt" in the
+> last patch.
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,1/1] net: phy: dp83td510: fix kernel stall during netboot in DP83TD510E PHY driver
-    https://git.kernel.org/netdev/net/c/fc0649395dca
+  - [1/8] RDMA/rxe: fix comment typo
+    (no matching commit)
+  - [2/8] i40e, xsk: fix comment typo
+    https://git.kernel.org/netdev/net-next/c/b028813ac973
+  - [3/8] zd1211rw: fix comment typo
+    (no matching commit)
+  - [4/8] scsi: fix comment typo
+    (no matching commit)
+  - [5/8] tcp: fix comment typo
+    https://git.kernel.org/netdev/net-next/c/304b1875ba02
+  - [6/8] net/tls: fix comment typo
+    https://git.kernel.org/netdev/net-next/c/a0e128ef88e4
+  - [7/8] selftests: mptcp: connect: fix comment typo
+    (no matching commit)
+  - [8/8] scripts/spelling.txt: Add "transmit" patterns
+    (no matching commit)
 
 You are awesome, thank you!
 -- 
