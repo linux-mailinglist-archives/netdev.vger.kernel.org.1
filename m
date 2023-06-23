@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-13577-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13582-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83AA373C136
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 22:48:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DD2DB73C1B2
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 23:03:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7C341C20933
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 20:48:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A62E1C20EBF
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 21:03:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A82E211CBC;
-	Fri, 23 Jun 2023 20:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F18F6125D6;
+	Fri, 23 Jun 2023 21:03:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96E661FB0
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 20:48:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13D1101E7
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 21:03:08 +0000 (UTC)
 Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A89B4239;
-	Fri, 23 Jun 2023 13:48:05 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D717F212C;
+	Fri, 23 Jun 2023 14:03:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687553285; x=1719089285;
+  t=1687554187; x=1719090187;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=blhyJaBG9pAvmN8wTYuGwuXwRrYHv3oqHCwBY9ZWXns=;
-  b=c52N0ZPzSzMMJxT0uhfgFJqJ3atuswnao4hPFerrD3Cf7iaVAeScSOXe
-   aFJF+XB1K0Rr98RHga2wrcDJmTr13t6ZIePVF9kw4gBUaJKCFHd3A1xq0
-   0nBQorwO5AaihWvNeSWSanDvxDvy782LvUN8QGp6Nfb8sQhZalONC4NL1
-   ypQy8Ujzl/EQt83qmvFT44QBA70PCVjPbYlW+OIsk6d8IgWE3h3iR3OfP
-   VWUdSRLgmiGFkGq65QoPPcS2DvwlC4liS8HKFOUWURXMmB8bLeaZkhybz
-   SxYLbXLL5arMBNXBJnkIyhh7J5bFnlJarbgEsk794yW49pYLjZPdQ46MX
-   Q==;
+  bh=JbsGFsYlFyr7Htiazu4hc2TYcucQMiz4ks01lMK9mTI=;
+  b=qBZKtutK+JuAGdynbyYdpkkEqqBXjg/STPOo76xe7V7VHBrVZHK1S+H/
+   mNNdmeMvuAycV3vOg4di57QRXaQaR36ok060xw6CQMN0VVBuxPy09MTKP
+   fuQ4mGwuAKckg8wzJmcKjra5lGcAjvVQSDdu7mjUdwofwG5+xmBqy5Nw9
+   pF4nqPa5s2U1uTuJyb4vuEhJof+yFHRwrniVAhwHFa9lygyNChbLFrEQK
+   DFesI3Rq7ZHVTf2iiBf2hW68joMBDSDMs1/ZT4HDD3SoLC0yi12j6AOla
+   bVWlU9jKBVYMVJ5L+9150QO/buWJd+meSu82SE1qxdHcVvaWArfgpo4WU
+   g==;
 X-IronPort-AV: E=Sophos;i="6.01,153,1684825200"; 
-   d="scan'208";a="219552217"
+   d="scan'208";a="231893588"
 X-Amp-Result: SKIPPED(no attachment in message)
 Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa3.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 13:47:33 -0700
+  by esa1.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 23 Jun 2023 14:03:06 -0700
 Received: from chn-vm-ex04.mchp-main.com (10.10.85.152) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Fri, 23 Jun 2023 13:47:31 -0700
+ 15.1.2507.21; Fri, 23 Jun 2023 13:48:02 -0700
 Received: from che-lt-i67070.amer.actel.com (10.10.115.15) by
  chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:47:04 -0700
+ 15.1.2507.21 via Frontend Transport; Fri, 23 Jun 2023 13:47:32 -0700
 From: Varshini Rajendran <varshini.rajendran@microchip.com>
 To: <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
 	<conor+dt@kernel.org>, <nicolas.ferre@microchip.com>,
@@ -78,9 +78,9 @@ CC: <Hari.PrasathGE@microchip.com>, <cristian.birsan@microchip.com>,
 	<balamanikandan.gunasundar@microchip.com>, <manikandan.m@microchip.com>,
 	<dharma.b@microchip.com>, <nayabbasha.sayed@microchip.com>,
 	<balakrishnan.s@microchip.com>
-Subject: [PATCH v2 33/45] dt-bindings: usb: atmel: Update DT bindings documentation for sam9x7
-Date: Sat, 24 Jun 2023 02:00:44 +0530
-Message-ID: <20230623203056.689705-34-varshini.rajendran@microchip.com>
+Subject: [PATCH v2 34/45] dt-bindings: watchdog: sama5d4-wdt: add compatible for sam9x7-wdt
+Date: Sat, 24 Jun 2023 02:00:45 +0530
+Message-ID: <20230623203056.689705-35-varshini.rajendran@microchip.com>
 X-Mailer: git-send-email 2.25.1
 In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
@@ -99,47 +99,25 @@ X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add sam9x7 bindings.
+Add compatible microchip,sam9x7-wdt to DT bindings documentation.
 
 Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 ---
- Documentation/devicetree/bindings/usb/atmel-usb.txt | 9 +++++----
- 1 file changed, 5 insertions(+), 4 deletions(-)
+ .../devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml          | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/Documentation/devicetree/bindings/usb/atmel-usb.txt b/Documentation/devicetree/bindings/usb/atmel-usb.txt
-index 12183ef47ee4..6359af0123bf 100644
---- a/Documentation/devicetree/bindings/usb/atmel-usb.txt
-+++ b/Documentation/devicetree/bindings/usb/atmel-usb.txt
-@@ -3,8 +3,8 @@ Atmel SOC USB controllers
- OHCI
+diff --git a/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml b/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
+index 816f85ee2c77..216e64dfddb2 100644
+--- a/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
++++ b/Documentation/devicetree/bindings/watchdog/atmel,sama5d4-wdt.yaml
+@@ -17,6 +17,7 @@ properties:
+     enum:
+       - atmel,sama5d4-wdt
+       - microchip,sam9x60-wdt
++      - microchip,sam9x7-wdt
+       - microchip,sama7g5-wdt
  
- Required properties:
-- - compatible: Should be "atmel,at91rm9200-ohci" for USB controllers
--   used in host mode.
-+ - compatible: Should be "atmel,at91rm9200-ohci" or "microchip,sam9x7-ohci"
-+   for USB controllers used in host mode.
-  - reg: Address and length of the register set for the device
-  - interrupts: Should contain ohci interrupt
-  - clocks: Should reference the peripheral, host and system clocks
-@@ -30,8 +30,8 @@ usb0: ohci@500000 {
- EHCI
- 
- Required properties:
-- - compatible: Should be "atmel,at91sam9g45-ehci" for USB controllers
--   used in host mode.
-+ - compatible: Should be "atmel,at91sam9g45-ehci" or "microchip,sam9x7-ehci"
-+   for USB controllers used in host mode.
-  - reg: Address and length of the register set for the device
-  - interrupts: Should contain ehci interrupt
-  - clocks: Should reference the peripheral and the UTMI clocks
-@@ -87,6 +87,7 @@ Required properties:
- 	       "atmel,at91sam9g45-udc"
- 	       "atmel,sama5d3-udc"
- 	       "microchip,sam9x60-udc"
-+	       "microchip,sam9x7-udc"
- 	       "microchip,lan9662-udc"
- 	       For "microchip,lan9662-udc" the fallback "atmel,sama5d3-udc"
- 	       is required.
+   reg:
 -- 
 2.25.1
 
