@@ -1,228 +1,393 @@
-Return-Path: <netdev+bounces-13224-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D73D473AD98
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:05:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B6E4B73ADFB
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 02:52:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3287D281795
-	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 00:05:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 41E9C2817FA
+	for <lists+netdev@lfdr.de>; Fri, 23 Jun 2023 00:52:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 45C9A160;
-	Fri, 23 Jun 2023 00:05:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36A7E363;
+	Fri, 23 Jun 2023 00:52:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EA767F
-	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:05:43 +0000 (UTC)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C060CE2;
-	Thu, 22 Jun 2023 17:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687478742; x=1719014742;
-  h=from:to:cc:subject:date:message-id:references:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ytVeTQHD8/qPr9FYaYtPaxrlyv9LXJFr5D1OeY/LU+E=;
-  b=ZvSTmKUJRzpx/4CMPHZD+bLds+BX5veilHajr68USSD3U6lIQJCJdwZy
-   QczDU8XRAXsi1gRoTcCiKEbXVb4VcnLH7C8s5Voodb8z4SAnkYD5C0YIx
-   G7yEigqeaWVN1nhK6xOxkrIU8O48S/ppjRSgnpL1S4RHtz/EYeqwJNmut
-   eFaiL0MuLA45HRtdvS8op15ij0BhxwAJurze5KezAskX+3DumvjWENyTJ
-   fQ97fjD33/GSsbd5AY8vL5KWWvWhO0IVAsMv7yGpxFv8ogdHd95Yj3LFM
-   S8cGSz2yav6xnVh6YAvcptHxEQbZ4/B6RXSWDQkgOG1ISrrO90kDXFHhr
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="364092713"
-X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
-   d="scan'208";a="364092713"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 22 Jun 2023 17:05:41 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10749"; a="859655338"
-X-IronPort-AV: E=Sophos;i="6.01,150,1684825200"; 
-   d="scan'208";a="859655338"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga001.fm.intel.com with ESMTP; 22 Jun 2023 17:05:40 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Thu, 22 Jun 2023 17:05:40 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Thu, 22 Jun 2023 17:05:40 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.48) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 212E719D
+	for <netdev@vger.kernel.org>; Fri, 23 Jun 2023 00:52:49 +0000 (UTC)
+Received: from smtp-fw-9103.amazon.com (smtp-fw-9103.amazon.com [207.171.188.200])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4960F210B
+	for <netdev@vger.kernel.org>; Thu, 22 Jun 2023 17:52:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1687481566; x=1719017566;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=5ETPy7U0aaq23zU3h32hK3uZ8UBH+BjFm6aOsj0bFAs=;
+  b=N2thV0JiyTKfjSi8OkwBHSxdl8bRu2ddOo3hVlNYPfSFjJN63Tv0csNI
+   GNE6J2nhnx4sznu8irAGm9zgX7TchG7dBtBJVlZoRH+iE7QxAypuHc9Y8
+   FionyCqynCSrF7Uww/3Ogek6EAGz9C8jTlSG3+MTFsttFWdCg3HlcR3Hj
+   g=;
+X-IronPort-AV: E=Sophos;i="6.01,150,1684800000"; 
+   d="scan'208";a="1139143334"
+Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com) ([10.25.36.214])
+  by smtp-border-fw-9103.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 23 Jun 2023 00:52:39 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1e-m6i4x-0aba4706.us-east-1.amazon.com (Postfix) with ESMTPS id 99A21A9374;
+	Fri, 23 Jun 2023 00:52:36 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Thu, 22 Jun 2023 17:05:39 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=NnBTPHytlWysPamKUWsh4WYex75TJrugIiOTE5vjyBSX1wL/uz1qgthyImszO/vBo0mz3RwkqWpv2+WKF6Fx3t/k4lGhnGthLgwfKOVyZ/36Idi8C+tb70UosAAn7+UXRkZ6vghbRsgYDnyFklHi9bFachnbVOIGu/9Of0RqBZFVeefkGMVg24wM8GePMjbgvkDT+Ec38JleDNDLV/wz0OymXyfgFwJWZgDd6DvV5o8lCwtdIpoXKW6yVLvHYdZzqAY3LtbsrlukxmT4C7rZTO1kc97W2MX5188gF/X/O3WR1n/IOYQddAPA3Yk7Ijyo6V6nfDcAOAUYE7TDoNgGtg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=O9rqbi2iQug28C1J+Lf6rAcQ5lg1zK7qRT5qlweonJ8=;
- b=nwOEwaQeAQ8JnlHFCrNG9lY6UHwhtg0oY59IOrJo82P4aMkw2QdRp4uhupVZ3aYC/96W4g/3wX+klzt9Oqqtd8fnCPB0kXnhAzr9ZHEm1vo9XkcS35Ex7DG3hE4AXhqVXEpfE+PiTqCg3oev9U+WeD6/surfmEtlwx5EnD4FsobtUfGvAMdbcbSduOL5vkeHTWZzUartS4VFZxA5HWbZurrNsJb6yWnzZqaXJgaZIdJ06J3W8yvmEETbVzvXDsFp1Jrzkdk1ayi0aPRwRFUgJJ57sFm2cRjaZU6f10V1e/JZMs6J8W4+AZIPePkW2eXcrkrJ/MCpOWrPd9vhBEUxNQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Received: from BN9PR11MB5370.namprd11.prod.outlook.com (2603:10b6:408:11b::8)
- by SA2PR11MB4922.namprd11.prod.outlook.com (2603:10b6:806:111::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 23 Jun
- 2023 00:05:33 +0000
-Received: from BN9PR11MB5370.namprd11.prod.outlook.com
- ([fe80::cf82:c4e7:8e5f:750d]) by BN9PR11MB5370.namprd11.prod.outlook.com
- ([fe80::cf82:c4e7:8e5f:750d%4]) with mapi id 15.20.6521.024; Fri, 23 Jun 2023
- 00:05:33 +0000
-From: "Chang, Junxiao" <junxiao.chang@intel.com>
-To: Andrew Halaney <ahalaney@redhat.com>, Bartosz Golaszewski <brgl@bgdev.pl>
-CC: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue
-	<alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S .
- Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, "Jakub
- Kicinski" <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Maxime Coquelin
-	<mcoquelin.stm32@gmail.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-stm32@st-md-mailman.stormreply.com"
-	<linux-stm32@st-md-mailman.stormreply.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, Bartosz Golaszewski
-	<bartosz.golaszewski@linaro.org>
-Subject: RE: [PATCH net] net: stmmac: fix double serdes powerdown
-Thread-Topic: [PATCH net] net: stmmac: fix double serdes powerdown
-Thread-Index: AQHZpEgvZv2rokUmVk+XS3HYZ85FKK+XLV2AgABWhrA=
-Date: Fri, 23 Jun 2023 00:05:32 +0000
-Message-ID: <BN9PR11MB5370CEFCA9D23A48015AF78CEC23A@BN9PR11MB5370.namprd11.prod.outlook.com>
-References: <20230621135537.376649-1-brgl@bgdev.pl>
- <20230622185425.vfewm2qgxqpndfyf@halaney-x13s>
-In-Reply-To: <20230622185425.vfewm2qgxqpndfyf@halaney-x13s>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BN9PR11MB5370:EE_|SA2PR11MB4922:EE_
-x-ms-office365-filtering-correlation-id: c779af50-d811-4495-40dd-08db737d8ff8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info: pE/9vwtr0Fvjpywb9tXvSYXrZiZNNNnpDYTcxOe31eHU7R6sD7nI2OwCqlcmFPQDgEhXZFj7ACoIacNI9X4U3190cHDohyVK+N0O0wNaBZkyY0A4U16ydJFBXzZxgdrYxOjc6FrIYvGwr4aeHHMloYt/hcvbtzz8j/4cKxYJXr2pOOaRvuh0d/wEjIL2ZLUCkZL6fyXFO+0m1au7/UMpgMcwuVTevlvSOe0Ho5m1iG1BRv0Dv9dpmLWkGnARW/eukB/i9PZmFVvC4qcoi0hzVvy297lpo/5Z2uU89IqNxmNZGbOSfEe1hIqA73L82HL6Nty7z9N82XGhxu/wwF7ytC2StWIXKLst4MbTAI4PYMvsS0HfH780Qt5qSwF/aZ3qdNwWXK26WWA1nM4gw446nzJeSYrHMt/3AzYqyOlnwXqHLDfToBiqA1AQ/URyD4AlbV/rHdv1l1t2MNcp6fPpnqxSTZzpu+lM7HvEoKcPC9NSAtqCHS3aPq6XDS4NVYGhmfDcCySROk6DfQCYKi4KKukpjk6a9mAmwHh+uSQS42zUbgTt51YbV1EkOk+FnLCS4zOGNh4KOyIE/tFNEAdquRHLjEFCfwE0MSdeuRj5uZTAB2eQsciZvafuCXaT9oUB
-x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5370.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(136003)(39860400002)(346002)(376002)(396003)(451199021)(86362001)(54906003)(110136005)(478600001)(55016003)(7696005)(71200400001)(186003)(4326008)(41300700001)(76116006)(316002)(53546011)(33656002)(66476007)(83380400001)(64756008)(66446008)(9686003)(26005)(66946007)(6506007)(66556008)(52536014)(8936002)(8676002)(7416002)(5660300002)(38100700002)(2906002)(38070700005)(122000001)(82960400001);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?AazT9l7lV25YIRn6N7FBhv5Sv7gPFDA0LgZMN43iNAusaZvxAg6OCAFewBvV?=
- =?us-ascii?Q?SlufJPAOLVdozapIPQPyb776YHs4oUubx6690GH0skNd7sFi84pBwfJQ7k0G?=
- =?us-ascii?Q?xaalWKBlUJ1POHQB+rbvLpVGPQWVmMvSTb08AZHMa1W1qnefIS9wuvST+s/R?=
- =?us-ascii?Q?0kWBENyg4EGHP4HHZ3X4omq0ieiYZZZq/uSCkN2V0bHgc1Z1nB8sj5qqIxvN?=
- =?us-ascii?Q?3B7UHQGksB305D1rAcomIjsptRGnaUpcpYgSAmFwOSJTIgcO24zUDos7RwHT?=
- =?us-ascii?Q?AUf1wOalQ0fKEK0fFGGF+fzZLSlqFo2DGREjm2uYbqMcOAdobSMV7PhSXA/j?=
- =?us-ascii?Q?99iahQhy23925CP+o5VHdT2et5Ce3tritDaUVJCDk9S/yID3gjudORTfIGPA?=
- =?us-ascii?Q?LUoX5+IjCfZlVayIJ/D9vc/Qul7OhprEv3tHI1WaEFjEusJt+N833PgyQfar?=
- =?us-ascii?Q?Swl0HYwjKbJsYWUfwTuZ7CkkemAXvzQSMs0Be5mOpDtgbnZ5Erh8knmaTSLp?=
- =?us-ascii?Q?yX87JWbTmw2Vk5KshKQEQ0r4xFdShs/1MYEv/jCjcSwWZ9JkimOC5vqPXpps?=
- =?us-ascii?Q?d1zTNPARK5PdinbuYlDKk0rlZ4X+mFZvJHMvgp2FxWFBfy3TI3pZiah/Fn7k?=
- =?us-ascii?Q?MXyZSq0evCnmvvn7dSjr41F474FGQJHpsKvgZGOyfUEqQHTw3IXRIPCmTIfa?=
- =?us-ascii?Q?23/821wR+uZW3tw6uxXb99jFz0H3pULPrqYZBUuK4aWEEYt8beM0Rshu1PBO?=
- =?us-ascii?Q?m1cFALN36m2nyOPOCurDwK9bwE+4Kzz1RhJlkPSG2T+xfWayLdLOvJPOvY87?=
- =?us-ascii?Q?vefD92LOYRitjebms5K3jbFwRxYWnaoSd1CRGgTxuHhL7nm+d9eAr0sDvVFx?=
- =?us-ascii?Q?ZbiGNPBgqDaUS4Z7ssZe7fQAHOLioRlLAXJIROBVlYcGpCEf5BvyHasAyovX?=
- =?us-ascii?Q?6cJUtm6+gpi/xSJ+ck/zRaYPTO96bZFQzckTxV9HejxWc1dzDVo7WxLvf8qg?=
- =?us-ascii?Q?HUsBqBjWRDk0YCfXhDep3jfwcbROZnsXPgoMkhPZYCnD5b5oaRIf2jDsnoYP?=
- =?us-ascii?Q?c7RG+SZvs3CDPeKcSf2ajES7MVAp2SCibAhFUY1oUSVQO8t4A/z/OIWCUooK?=
- =?us-ascii?Q?MheiZ9JNdOhlLsFbYjl97HBRzIBg5E5U3keBZjY384PsAXkBJZ9RDWhpDQf2?=
- =?us-ascii?Q?jxhW8EKkuikocis4Bq2jiEDheQnTNNXqpvVs65j3SLzMjNwcbM1jhsTjxw5E?=
- =?us-ascii?Q?jsXsAX3hYEyi+2NHCBG2V8vHQ9zOJdJt9ltIDmNOJgmwVYdrmtWAOtUPWB/N?=
- =?us-ascii?Q?OfYWlVNAys32UpDvhgIKtBBZ3YQ278HEOGnBdWSwI7HjL0KPJfk/gPYEHm+D?=
- =?us-ascii?Q?9FIWyXoTRyFqy6U81mJvksq//NyPjuq8L/52M6pewiF+bhxKLnqMYKFqQDTy?=
- =?us-ascii?Q?MhJppWMg/EBl9tSzwr4Xt3WYzBSVGCJCeFh4Oo3AzZGcS1X5OmvcTbtWL152?=
- =?us-ascii?Q?xBJOdg/CtJZUpZZ+X1nZV6POe0s7tHAgbcFFTJKdjK2DQCG3IBK/AtpHPaxj?=
- =?us-ascii?Q?eZBxiXfwjo9RiUe9e0H0UQ1BXDcJ1rOk/r10FPtN?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+ 15.2.1118.26; Fri, 23 Jun 2023 00:52:34 +0000
+Received: from 88665a182662.ant.amazon.com (10.111.86.59) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Fri, 23 Jun 2023 00:52:31 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <wangyufen@huawei.com>
+CC: <kuniyu@amazon.com>, <alex.aring@gmail.com>, <davem@davemloft.net>,
+	<dsahern@kernel.org>, <edumazet@google.com>, <kuba@kernel.org>,
+	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>
+Subject: Re: [PATCH v2 net] ipv6: rpl: Fix Route of Death.
+Date: Thu, 22 Jun 2023 17:52:23 -0700
+Message-ID: <20230623005223.61341-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230621042513.64987-1-kuniyu@amazon.com>
+References: <20230621042513.64987-1-kuniyu@amazon.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5370.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: c779af50-d811-4495-40dd-08db737d8ff8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 23 Jun 2023 00:05:32.6217
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: BrLhdMY1/XBnCR93xr0BCTL3IqACv51DgBKuZhuBQccsFQJMCSYZBHA/H2HXNJLm320ZD98IeG8hvKmOTRprZw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA2PR11MB4922
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.111.86.59]
+X-ClientProxiedBy: EX19D044UWB003.ant.amazon.com (10.13.139.168) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Acked-by: Junxiao Chang <junxiao.chang@intel.com>
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+Date: Tue, 20 Jun 2023 21:25:13 -0700
+> From: wangyufen <wangyufen@huawei.com>
+> Date: Wed, 21 Jun 2023 09:55:13 +0800
+> > 在 2023/6/20 17:10, Kuniyuki Iwashima 写道:
+> > > From: wangyufen <wangyufen@huawei.com>
+> > > Date: Tue, 20 Jun 2023 16:12:26 +0800
+> > >> 在 2023/6/6 2:06, Kuniyuki Iwashima 写道:
+> > >>> A remote DoS vulnerability of RPL Source Routing is assigned CVE-2023-2156.
+> > >>>
+> > >>> The Source Routing Header (SRH) has the following format:
+> > >>>
+> > >>>     0                   1                   2                   3
+> > >>>     0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
+> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > >>>     |  Next Header  |  Hdr Ext Len  | Routing Type  | Segments Left |
+> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > >>>     | CmprI | CmprE |  Pad  |               Reserved                |
+> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > >>>     |                                                               |
+> > >>>     .                                                               .
+> > >>>     .                        Addresses[1..n]                        .
+> > >>>     .                                                               .
+> > >>>     |                                                               |
+> > >>>     +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
+> > >>>
+> > >>> The originator of an SRH places the first hop's IPv6 address in the IPv6
+> > >>> header's IPv6 Destination Address and the second hop's IPv6 address as
+> > >>> the first address in Addresses[1..n].
+> > >>>
+> > >>> The CmprI and CmprE fields indicate the number of prefix octets that are
+> > >>> shared with the IPv6 Destination Address.  When CmprI or CmprE is not 0,
+> > >>> Addresses[1..n] are compressed as follows:
+> > >>>
+> > >>>     1..n-1 : (16 - CmprI) bytes
+> > >>>          n : (16 - CmprE) bytes
+> > >>>
+> > >>> Segments Left indicates the number of route segments remaining.  When the
+> > >>> value is not zero, the SRH is forwarded to the next hop.  Its address
+> > >>> is extracted from Addresses[n - Segment Left + 1] and swapped with IPv6
+> > >>> Destination Address.
+> > >>>
+> > >>> When Segment Left is greater than or equal to 2, the size of SRH is not
+> > >>> changed because Addresses[1..n-1] are decompressed and recompressed with
+> > >>> CmprI.
+> > >>>
+> > >>> OTOH, when Segment Left changes from 1 to 0, the new SRH could have a
+> > >>> different size because Addresses[1..n-1] are decompressed with CmprI and
+> > >>> recompressed with CmprE.
+> > >>>
+> > >>> Let's say CmprI is 15 and CmprE is 0.  When we receive SRH with Segment
+> > >>> Left >= 2, Addresses[1..n-1] have 1 byte for each, and Addresses[n] has
+> > >>> 16 bytes.  When Segment Left is 1, Addresses[1..n-1] is decompressed to
+> > >>> 16 bytes and not recompressed.  Finally, the new SRH will need more room
+> > >>> in the header, and the size is (16 - 1) * (n - 1) bytes.
+> > >>>
+> > >>> Here the max value of n is 255 as Segment Left is u8, so in the worst case,
+> > >>> we have to allocate 3825 bytes in the skb headroom.  However, now we only
+> > >>> allocate a small fixed buffer that is IPV6_RPL_SRH_WORST_SWAP_SIZE (16 + 7
+> > >>> bytes).  If the decompressed size overflows the room, skb_push() hits BUG()
+> > >>> below [0].
+> > >>>
+> > >>> Instead of allocating the fixed buffer for every packet, let's allocate
+> > >>> enough headroom only when we receive SRH with Segment Left 1.
+> > >>>
+> > >>> [0]:
+> > >>>
+> > >>> Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
+> > >>> Reported-by: Max VA
+> > >>> Closes: https://www.interruptlabs.co.uk/articles/linux-ipv6-route-of-death
+> > >>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > >>> ---
+> > >>> To maintainers:
+> > >>> Please complement the Reported-by address from the security@ mailing list
+> > >>> if possible, which checkpatch will complain about.
+> > >>>
+> > >>> v2:
+> > >>>     * Reload oldhdr@ after pskb_expand_head() (Eric Dumazet)
+> > >>>
+> > >>> v1: https://lore.kernel.org/netdev/20230605144040.39871-1-kuniyu@amazon.com/
+> > >>> ---
+> > >>
+> > >> When I tested the linux-ipv6-route-of-death issue on Linux 6.4-rc7, I
+> > >> got the following panic:
+> > >>
+> > >> [ 2046.147186] BUG: kernel NULL pointer dereference, address:
+> > >> 0000000000000000
+> > >> [ 2046.147978] #PF: supervisor read access in kernel mode
+> > >> [ 2046.148522] #PF: error_code(0x0000) - not-present page
+> > >> [ 2046.149082] PGD 8000000187886067 P4D 8000000187886067 PUD 187887067
+> > >> PMD 0
+> > >> [ 2046.149788] Oops: 0000 [#1] PREEMPT SMP PTI
+> > >> [ 2046.150233] CPU: 4 PID: 2093 Comm: python3 Not tainted 6.4.0-rc7 #15
+> > >> [ 2046.150964] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
+> > >> [ 2046.151566] RIP: 0010:icmp6_send+0x691/0x910
+> > >> [ 2046.152029] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
+> > >> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
+> > >> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
+> > >> [ 2046.153892] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
+> > >> [ 2046.154432] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
+> > >> 0000000000000000
+> > >> [ 2046.155160] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
+> > >> 0000000000000001
+> > >> [ 2046.155881] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
+> > >> 0000000000000040
+> > >> [ 2046.156611] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
+> > >> ffff907d21a28888
+> > >> [ 2046.157340] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
+> > >> ffffffff97b03d00
+> > >> [ 2046.158064] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
+> > >> knlGS:0000000000000000
+> > >> [ 2046.158895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > >> [ 2046.159483] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
+> > >> 00000000000006e0
+> > >> [ 2046.160205] Call Trace:
+> > >> [ 2046.160467]  <IRQ>
+> > >> [ 2046.160693]  ? __die_body+0x1b/0x60
+> > >> [ 2046.161059]  ? page_fault_oops+0x15b/0x470
+> > >> [ 2046.161488]  ? fixup_exception+0x22/0x330
+> > >> [ 2046.161901]  ? exc_page_fault+0x65/0x150
+> > >> [ 2046.162318]  ? asm_exc_page_fault+0x22/0x30
+> > >> [ 2046.162750]  ? icmp6_send+0x691/0x910
+> > >> [ 2046.163137]  ? ip6_route_input+0x187/0x210
+> > >> [ 2046.163560]  ? __pfx_free_object_rcu+0x10/0x10
+> > >> [ 2046.164019]  ? __call_rcu_common.constprop.0+0x10a/0x5a0
+> > >> [ 2046.164568]  ? _raw_spin_lock_irqsave+0x19/0x50
+> > >> [ 2046.165034]  ? __pfx_free_object_rcu+0x10/0x10
+> > >> [ 2046.165499]  ? ip6_pkt_drop+0xf2/0x1c0
+> > >> [ 2046.165890]  ip6_pkt_drop+0xf2/0x1c0
+> > >> [ 2046.166269]  ipv6_rthdr_rcv+0x122d/0x1310
+> > >> [ 2046.166684]  ip6_protocol_deliver_rcu+0x4bc/0x630
+> > >> [ 2046.167173]  ip6_input_finish+0x40/0x60
+> > >> [ 2046.167568]  ip6_input+0x3b/0xd0
+> > >> [ 2046.167905]  ? ip6_rcv_core.isra.0+0x2cb/0x5e0
+> > >> [ 2046.168368]  ipv6_rcv+0x53/0x100
+> > >> [ 2046.168706]  __netif_receive_skb_one_core+0x63/0xa0
+> > >> [ 2046.169231]  process_backlog+0xa8/0x150
+> > >> [ 2046.169626]  __napi_poll+0x2c/0x1b0
+> > >> [ 2046.169991]  net_rx_action+0x260/0x330
+> > >> [ 2046.170385]  ? kvm_sched_clock_read+0x5/0x20
+> > >> [ 2046.170824]  ? kvm_clock_read+0x14/0x30
+> > >> [ 2046.171226]  __do_softirq+0xe6/0x2d1
+> > >> [ 2046.171596]  do_softirq+0x80/0xa0
+> > >> [ 2046.171944]  </IRQ>
+> > >> [ 2046.172178]  <TASK>
+> > >> [ 2046.172406]  __local_bh_enable_ip+0x73/0x80
+> > >> [ 2046.172829]  __dev_queue_xmit+0x331/0xd40
+> > >> [ 2046.173246]  ? __local_bh_enable_ip+0x37/0x80
+> > >> [ 2046.173692]  ? ___neigh_create+0x60b/0x8d0
+> > >> [ 2046.174114]  ? eth_header+0x26/0xc0
+> > >> [ 2046.174489]  ip6_finish_output2+0x1e7/0x680
+> > >> [ 2046.174916]  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
+> > >> [ 2046.175462]  ip6_finish_output+0x1df/0x350
+> > >> [ 2046.175881]  ? nf_hook_slow+0x40/0xc0
+> > >> [ 2046.176274]  ip6_output+0x6e/0x140
+> > >> [ 2046.176627]  ? __pfx_ip6_finish_output+0x10/0x10
+> > >> [ 2046.177096]  rawv6_sendmsg+0x6f9/0x1210
+> > >> [ 2046.177497]  ? dl_cpu_busy+0x2f3/0x300
+> > >> [ 2046.177886]  ? __pfx_dst_output+0x10/0x10
+> > >> [ 2046.178305]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
+> > >> [ 2046.178825]  ? __wake_up_common_lock+0x91/0xd0
+> > >> [ 2046.179339]  ? sock_sendmsg+0x8b/0xa0
+> > >> [ 2046.179791]  ? __pfx_rawv6_sendmsg+0x10/0x10
+> > >> [ 2046.180246]  sock_sendmsg+0x8b/0xa0
+> > >> [ 2046.180610]  __sys_sendto+0xfa/0x170
+> > >> [ 2046.180983]  ? __bitmap_weight+0x4b/0x60
+> > >> [ 2046.181399]  ? task_mm_cid_work+0x183/0x200
+> > >> [ 2046.181827]  __x64_sys_sendto+0x25/0x30
+> > >> [ 2046.182228]  do_syscall_64+0x3b/0x90
+> > >> [ 2046.182599]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> > >> [ 2046.183109] RIP: 0033:0x7ff3344a668a
+> > >> [ 2046.183493] Code: 48 c7 c0 ff ff ff ff eb bc 0f 1f 80 00 00 00 00 f3
+> > >> 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f
+> > >> 05 <48> 3d 00 f0 ff ff 77 76 c3 0f 1f 44 00 00 55 48 83 ec 30 44 89 4c
+> > >> [ 2046.185326] RSP: 002b:00007ffc82a34658 EFLAGS: 00000246 ORIG_RAX:
+> > >> 000000000000002c
+> > >> [ 2046.186083] RAX: ffffffffffffffda RBX: 00007ffc82a346f0 RCX:
+> > >> 00007ff3344a668a
+> > >> [ 2046.186799] RDX: 0000000000000060 RSI: 00007ff33112db00 RDI:
+> > >> 0000000000000003
+> > >> [ 2046.187515] RBP: 000000000159cd90 R08: 00007ffc82a34770 R09:
+> > >> 000000000000001c
+> > >> [ 2046.188230] R10: 0000000000000000 R11: 0000000000000246 R12:
+> > >> 0000000000000000
+> > >> [ 2046.188958] R13: 0000000000000000 R14: 00007ffc82a346f0 R15:
+> > >> 0000000000451072
+> > >> [ 2046.189675]  </TASK>
+> > >> [ 2046.189909] Modules linked in: fuse rfkill binfmt_misc cirrus
+> > >> drm_shmem_helper joydev drm_kms_helper sg syscopyarea sysfillrect
+> > >> sysimgblt virtio_balloon serio_raw squashfs parport_pc ppdev lp parport
+> > >> ramoops reed_solomon drm ip_tables x_tables xfs sd_mod t10_pi
+> > >> crc64_rocksoft crc64 ata_generic ata_piix virtio_net net_failover
+> > >> failover libata e1000 i2c_piix4
+> > >> [ 2046.193039] CR2: 0000000000000000
+> > >> [ 2046.193400] ---[ end trace 0000000000000000 ]---
+> > >> [ 2046.193870] RIP: 0010:icmp6_send+0x691/0x910
+> > >> [ 2046.194315] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
+> > >> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
+> > >> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
+> > >> [ 2046.196146] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
+> > >> [ 2046.196672] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
+> > >> 0000000000000000
+> > >> [ 2046.197388] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
+> > >> 0000000000000001
+> > >> [ 2046.198096] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
+> > >> 0000000000000040
+> > >> [ 2046.198825] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
+> > >> ffff907d21a28888
+> > >> [ 2046.199537] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
+> > >> ffffffff97b03d00
+> > >> [ 2046.200253] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
+> > >> knlGS:0000000000000000
+> > >> [ 2046.201044] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > >> [ 2046.201624] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
+> > >> 00000000000006e0
+> > >> [ 2046.202340] Kernel panic - not syncing: Fatal exception in interrupt
+> > >> [ 2046.203655] Kernel Offset: 0x12e00000 from 0xffffffff81000000
+> > >> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > >> [ 2046.204731] ---[ end Kernel panic - not syncing: Fatal exception in
+> > >> interrupt ]---
+> > > 
+> > > Please decode the stack trace.
+> > > 
+> > > $ cat <<EOF | ./scripts/decode_stacktrace.sh vmlinux
+> > > PASTE YOUR TRACE HERE
+> > > EOF
+> > > 
+> > > 
+> > >>
+> > >>
+> > >> The test procedure is as follows:
+> > >> # sysctl -a | grep -i rpl_seg_enabled
+> > >> net.ipv6.conf.all.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.default.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.dummy0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.ens3.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.ens4.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.erspan0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.gre0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.gretap0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.ip6_vti0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.ip6gre0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.ip6tnl0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.ip_vti0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.lo.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.sit0.rpl_seg_enabled = 1
+> > >> net.ipv6.conf.tunl0.rpl_seg_enabled = 1
+> > >>
+> > >> # python3
+> > >> Python 3.8.10 (default, Nov 14 2022, 12:59:47)
+> > >> [GCC 9.4.0] on linux
+> > >> Type "help", "copyright", "credits" or "license" for more information.
+> > >>   >>> from scapy.all import *
+> > >>   >>> import socket
+> > >>   >>> DST_ADDR = "fe80::266:88ff:fe99:7419"
+> > >>   >>> SRC_ADDR = DST_ADDR
+> > >>   >>> sockfd = socket.socket(socket.AF_INET6, socket.SOCK_RAW,
+> > >> socket.IPPROTO_RAW)
+> > >>   >>> p = IPv6(src=SRC_ADDR, dst=DST_ADDR) /
+> > >> IPv6ExtHdrSegmentRouting(type=3, addresses=["a8::", "a7::", "a6::"],
+> > >> segleft=1, lastentry=0xf0)
+> > >>   >>> sockfd.sendto(bytes(p), (DST_ADDR, 0))
+> > >>
+> > >> Is this a new issue?
+> > > 
+> > > Can you test this ?  I couldn't reproduce the issue on my setup...
+> > > 
+> > > ---8<---
+> > > diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
+> > > index 202fc3aaa83c..f2890c391e3b 100644
+> > > --- a/net/ipv6/exthdrs.c
+> > > +++ b/net/ipv6/exthdrs.c
+> > > @@ -587,7 +587,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
+> > >   	skb_pull(skb, ((hdr->hdrlen + 1) << 3));
+> > >   	skb_postpull_rcsum(skb, oldhdr,
+> > >   			   sizeof(struct ipv6hdr) + ((hdr->hdrlen + 1) << 3));
+> > > -	if (unlikely(!hdr->segments_left)) {
+> > > +	if (unlikely(!hdr->segments_left) || skb_cloned(skb)) {
+> > >   		if (pskb_expand_head(skb, sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3), 0,
+> > >   				     GFP_ATOMIC)) {
+> > >   			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_OUTDISCARDS);
+> > > ---8<---
+> > 
+> > I tested it and the problem persisted, and attached the config I used.
+> > 
+> > Also,the DST_ADDR = "fe80::266:88ff:fe99:7419" I used the  the 
+> > link-local address of the local NIC ens4.
+> > 
+> > # ip addr show dev ens4
+> > 12: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel 
+> > state UP group default qlen 1000
+> >      link/ether 00:66:88:99:74:19 brd ff:ff:ff:ff:ff:ff
+> >      altname enp0s4
+> >      inet 169.254.6.143/16 brd 169.254.255.255 scope link ens4:avahi
+> >         valid_lft forever preferred_lft forever
+> >      inet6 fe80::266:88ff:fe99:7419/64 scope link
+> >         valid_lft forever preferred_lft forever
+> > 
+> > The test machine is an Ubuntu 20.04.4 LTS VM.
+> 
+> Could you provide your decoded stack trace ?
+> 
+> It seems the packet is dropped.  I'd like to know where it happens.
 
------Original Message-----
-From: Andrew Halaney <ahalaney@redhat.com>=20
-Sent: Friday, June 23, 2023 2:54 AM
-To: Bartosz Golaszewski <brgl@bgdev.pl>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>; Alexandre Torgue <alexandr=
-e.torgue@foss.st.com>; Jose Abreu <joabreu@synopsys.com>; David S . Miller =
-<davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Jakub Kicinski <=
-kuba@kernel.org>; Paolo Abeni <pabeni@redhat.com>; Maxime Coquelin <mcoquel=
-in.stm32@gmail.com>; Chang, Junxiao <junxiao.chang@intel.com>; netdev@vger.=
-kernel.org; linux-stm32@st-md-mailman.stormreply.com; linux-arm-kernel@list=
-s.infradead.org; linux-kernel@vger.kernel.org; Bartosz Golaszewski <bartosz=
-.golaszewski@linaro.org>
-Subject: Re: [PATCH net] net: stmmac: fix double serdes powerdown
+Ok, I think I reproduced your issue by forcibly calling
+ip6_pkt_discard_out() for the skb.
 
-On Wed, Jun 21, 2023 at 03:55:37PM +0200, Bartosz Golaszewski wrote:
-> From: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
->=20
-> Commit 49725ffc15fc ("net: stmmac: power up/down serdes in
-> stmmac_open/release") correctly added a call to the serdes_powerdown()=20
-> callback to stmmac_release() but did not remove the one from
-> stmmac_remove() which leads to a doubled call to serdes_powerdown().
->=20
-> This can lead to all kinds of problems: in the case of the qcom ethqos=20
-> driver, it caused an unbalanced regulator disable splat.
->=20
-> Fixes: 49725ffc15fc ("net: stmmac: power up/down serdes in=20
-> stmmac_open/release")
-> Signed-off-by: Bartosz Golaszewski <bartosz.golaszewski@linaro.org>
+It seems the route to the final dst is marked as RTF_REJECT on your
+setup.
 
-Reviewed-by: Andrew Halaney <ahalaney@redhat.com>
-Tested-by: Andrew Halaney <ahalaney@redhat.com>
+Will start working on the fix.
 
-> ---
->  drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 ------
->  1 file changed, 6 deletions(-)
->=20
-> diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c=20
-> b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> index 10e8a5606ba6..4727f7be4f86 100644
-> --- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> +++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
-> @@ -7461,12 +7461,6 @@ void stmmac_dvr_remove(struct device *dev)
->  	netif_carrier_off(ndev);
->  	unregister_netdev(ndev);
-> =20
-> -	/* Serdes power down needs to happen after VLAN filter
-> -	 * is deleted that is triggered by unregister_netdev().
-> -	 */
-> -	if (priv->plat->serdes_powerdown)
-> -		priv->plat->serdes_powerdown(ndev, priv->plat->bsp_priv);
-> -
->  #ifdef CONFIG_DEBUG_FS
->  	stmmac_exit_fs(ndev);
->  #endif
-> --
-> 2.39.2
->=20
-
+Thanks!
 
