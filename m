@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-13748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13749-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6A7873CD31
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:10:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E0C5673CD37
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:11:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D91372810F7
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:10:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0121281140
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:11:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACA6DDDD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E40F4F9E0;
 	Sat, 24 Jun 2023 22:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC0FEAFA
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:10:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id BFA51C433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 80F36EAF0;
+	Sat, 24 Jun 2023 22:10:27 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id CEC07C433CA;
 	Sat, 24 Jun 2023 22:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687644626;
-	bh=Af1wluoPesxzfC6tKSmwNEv1detWSwXXYbav1TrsDwA=;
+	bh=pJDzN3XhfgJ2p8vuelj5067dgROIrmsrN7/0++fvr3k=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=mh/fzCZcwqpyIeqjker9f2jPAVerk0DNhYcqeTejx//Fd3adpYJZPYA3REXj4jw2Z
-	 e8Chl6qu+5m9z9wym14l6m3te9WoAQkPi/8qAl8jpKO3QpBfnu229OV9rrVxxCq1TG
-	 2Ns2hK/IGLSIGRigP95uS9CtJXERnm+xRIgDOMb30Alot5Xc1hYzmjdl1FFD6Kon1N
-	 bflR1fXCpkHCgsGzyc/C1KHHF5mt2Q2uJHHdjoT130t2fk+zj0TZ+5t+7YWUT5hrND
-	 dl8i1AAmylMO/ud2zhYABP0TKTEjU5lui0WrV/pAYHQRyrRLOFVaKYj+XQyphZXQMN
-	 UIt4OA4yBg3fA==
+	b=t5jo2TaFpp6n1a4J5Tt+Z7AFQAAkMmFuX1YywSrkWpe2EtsPKK5bYj838v7kB9gO2
+	 S2jsVA0mgrL/k99nhwUUx7AqGot9i67r2LGpNsCnMNqDONaxuhJtGGf1xuslzTeYg0
+	 ttLieEtskiMXaPmtb7rtFcmFBoz77zkgtOs60uSitHy+lLS/DFTu4qAE/7lXYh+4yr
+	 KpYIlpYvqQfzy4sF0BfWRm/ciSoYIgQf3s/Ut6GEbh4NMaGr4RQIz0aETSIdf6YKxi
+	 6F7eTG8fwy7tNZTYKcHYgL5mjUMojBvrcpxZWjanDzKTkA/XX2qBCktKUFHWPL9t67
+	 /qzdou23abNvQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4544C395F1;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B0603E26D3E;
 	Sat, 24 Jun 2023 22:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,41 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v2] net: phy: broadcom: drop brcm_phy_setbits() and
- use phy_set_bits() instead
+Subject: Re: pull-request: bpf-next 2023-06-23
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168764462666.18414.17822935967545944021.git-patchwork-notify@kernel.org>
+ <168764462671.18414.5117739342403837116.git-patchwork-notify@kernel.org>
 Date: Sat, 24 Jun 2023 22:10:26 +0000
-References: <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
-In-Reply-To: <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
-To: Giulio Benetti <giulio.benetti@benettiengineering.com>
-Cc: f.fainelli@gmail.com, bcm-kernel-feedback-list@broadcom.com,
- andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- simon.horman@corigine.com
+References: <20230623211256.8409-1-daniel@iogearbox.net>
+In-Reply-To: <20230623211256.8409-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net-next.git (main)
+This pull request was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 22 Jun 2023 20:47:21 +0200 you wrote:
-> Linux provides phy_set_bits() helper so let's drop brcm_phy_setbits() and
-> use phy_set_bits() in its place.
+On Fri, 23 Jun 2023 23:12:56 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
-> ---
-> V1->V2:
-> * fix code style and add branch net-next to subject as suggested by Simon
->   Horman
+> The following pull-request contains BPF updates for your *net-next* tree.
+> 
+> We've added 49 non-merge commits during the last 24 day(s) which contain
+> a total of 70 files changed, 1935 insertions(+), 442 deletions(-).
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v2] net: phy: broadcom: drop brcm_phy_setbits() and use phy_set_bits() instead
-    https://git.kernel.org/netdev/net-next/c/28e219aea0b9
+  - pull-request: bpf-next 2023-06-23
+    https://git.kernel.org/netdev/net-next/c/a685d0df75b0
 
 You are awesome, thank you!
 -- 
