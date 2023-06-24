@@ -1,204 +1,161 @@
-Return-Path: <netdev+bounces-13716-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13717-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1D0973CB6E
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 16:44:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9244373CB7A
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 16:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95D0D281186
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 14:44:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C391C1C20947
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 14:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4675566B;
-	Sat, 24 Jun 2023 14:44:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60AD6566E;
+	Sat, 24 Jun 2023 14:55:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DE3846B0;
-	Sat, 24 Jun 2023 14:44:38 +0000 (UTC)
-Received: from mail-pg1-x542.google.com (mail-pg1-x542.google.com [IPv6:2607:f8b0:4864:20::542])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B673818E;
-	Sat, 24 Jun 2023 07:44:36 -0700 (PDT)
-Received: by mail-pg1-x542.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so1347357a12.1;
-        Sat, 24 Jun 2023 07:44:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B9414433
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 14:55:45 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C002E7D;
+	Sat, 24 Jun 2023 07:55:40 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aoVLnOxxWRIN69f7nKkS3l1/kzBrin0qtMmnHvURK0BBiuULXh49ix5m1Hr9dQCrqcd4w8Qm1psjakKtVWMcXBhHD4txpHkzbYHHysWtOHVmlDxSNFm8kAhg++w/fJGKz4iTF7rNS9JNlz3B307V2RfZcz93Pb1zYv1vvTdWUbwOsM4/H3cUN6IuaKL4NXGKoM8RJxs1s1YG3CPvcZr+0jhNU4RkyD9+uV7zdNhEgSD6Z3YlyHsA9r1VZxLG2fT6K7IzrLQ0zRIAmjxzYHveCwqPkNEnO8FOnoocDgu32s0FHR2be/vo/KXJJgaw4+yNf8+J9XuGEvU7rDTZ7GK65A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=4gbmVkoGzWRDCDzyhIXnKxTclnpx0hTMqKywvet4Wpg=;
+ b=FR9U87s/QWq1quU/4CLgu0YQ0MnauOtimhXIGp0VNUXE4R7BnDm/O2wurj4YuOfXhLIEOZpLjC2NlO7wNZwoyLRirmhOPLTb2TWLICnqIAhq9c2ulL1G4OlA/4r04sWDcgePtCGu/Z+W4rQz4IkSEUZ5vneMhb1lYX0aJL2cLGDNyBYyzb8EZO6smZ3clmEzksCReUTNWJObma2F0SPsYQMla3/tN1pLBp4OitHbf9OKU04NrEP6Ig7qTS4LB2j/0OfLtMTpdaVAgCBtCtwUUaI8ZhSYborUCUf9eVZTldwQ1mnbl78t0UALhFeM9BXfneFH9qhNQ5HdASlFvYcO1A==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687617876; x=1690209876;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=3vJmDaKU4Ib4pJXRd1yORA65Rzqd159XVS7SbpIKack=;
-        b=R+YZN6sCYnkNmfLbovLwWUQwPShZrJnInzBwM1/U6Pcex/G+vwiGdSe2U6rNWIxY7l
-         xEY4Q3xhjhPBlX1yMJgiPxxmfEhMuLBpNW5WHlzB4kYP9ZsR/gpUNttdFj35Xp39dSxb
-         +367SYkL0eqIriiUgNxiUKQjjwPczy/gyao1VTHzdy2LwKyq29Tmw87LM6woAeCB4qTe
-         E0IBQd0uRgp1Tkl1HPGj0CxrIYIC7MvvLuqXeWYctvFIZbzFk+7o9eC7YGbyNpJeA+o8
-         QyyiD1q1zGxGsFWFzvupor1byEZvzAAJt6KBj0k/H8VGrLSHi4Hb72dgWFvQKfrdr2er
-         xt4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687617876; x=1690209876;
-        h=content-transfer-encoding:content-language:in-reply-to:mime-version
-         :user-agent:date:message-id:from:references:cc:to:subject
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3vJmDaKU4Ib4pJXRd1yORA65Rzqd159XVS7SbpIKack=;
-        b=iRWuUEgk/CSijKsbuAUdmBD1KNGSjitFd7xb8DPoLpV5M+ejQlt3NKW9RXZ55V1poE
-         EGJwwz9XBre0gNZkK+v3IFV/BqHiCQSderLl7xGHvv+kuwq6umd7d5/gBHZk2TTXgjT+
-         HGk9LAFDzF16ZlT8tbNuJzoPxh+//AS8DIcUQu0tutqQ0KR/WpE3S9g5dizS1GUhKHCk
-         MI+IHCLZzblhlYBGQLT5ghW7+/vh3f8zk34s7xQDlypwzSfchLh39tPuSuuXN2QKjGiE
-         Y0sGPgGdVUPe3bt+Bx6Qk4L26yFBaNvoP9cjRA97LY0cwDBZE8qSDiKDHpI4/FeVNGIq
-         q0fQ==
-X-Gm-Message-State: AC+VfDyDhgq2mbcDhI/Va4jCSb3svar9y9q9CCHHOPXcyM7FaIoP0ljV
-	XjAHps0+TGzJNVbl29j13bBav5arGxEc3Jn+8wo=
-X-Google-Smtp-Source: ACHHUZ7CP0TUiEYRNEhB+Q/AnZCddjvg/nUlVf6D2r9b0dEkDcWeQYwnqajmoL5F0mwMxKlJLk5GBA==
-X-Received: by 2002:a17:90a:e60d:b0:25e:8326:488e with SMTP id j13-20020a17090ae60d00b0025e8326488emr24028485pjy.17.1687617875824;
-        Sat, 24 Jun 2023 07:44:35 -0700 (PDT)
-Received: from ?IPv6:2409:8a55:301b:e120:5d8f:b0cc:e645:f4d? ([2409:8a55:301b:e120:5d8f:b0cc:e645:f4d])
-        by smtp.gmail.com with ESMTPSA id o6-20020a63e346000000b00553b9e0510esm1333096pgj.60.2023.06.24.07.44.30
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 07:44:35 -0700 (PDT)
-Subject: Re: [PATCH net-next v3 3/4] page_pool: introduce page_pool_alloc()
- API
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>,
- Lorenzo Bianconi <lorenzo@kernel.org>,
- Alexander Duyck <alexander.duyck@gmail.com>
-Cc: brouer@redhat.com, Yunsheng Lin <linyunsheng@huawei.com>,
- davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jesper Dangaard Brouer <hawk@kernel.org>,
- Ilias Apalodimas <ilias.apalodimas@linaro.org>,
- Eric Dumazet <edumazet@google.com>, Maryam Tahhan <mtahhan@redhat.com>,
- bpf <bpf@vger.kernel.org>
-References: <c06f6f59-6c35-4944-8f7a-7f6f0e076649@huawei.com>
- <CAKgT0UccmDe+CE6=zDYQHi1=3vXf5MptzDo+BsPrKdmP5j9kgQ@mail.gmail.com>
- <0ba1bf9c-2e45-cd44-60d3-66feeb3268f3@redhat.com>
- <dcc9db4c-207b-e118-3d84-641677cd3d80@huawei.com>
- <f8ce176f-f975-af11-641c-b56c53a8066a@redhat.com>
- <CAKgT0UfzP30OiBQu+YKefLD+=32t+oA6KGzkvsW6k7CMTXU8KA@mail.gmail.com>
- <699563f5-c4fa-0246-5e79-61a29e1a8db3@redhat.com>
- <CAKgT0UcNOYwxRP_zkaBaZh-VBL-CriL8dFG-VY7-FUyzxfHDWw@mail.gmail.com>
- <ZI8dP5+guKdR7IFE@lore-desk>
- <CAKgT0UfFVFa4zT2DnPZEGaHp0uh5V1u1aGymgdL4Vu8Q1VV8hQ@mail.gmail.com>
- <ZJIXSyjxPf7FQQKo@lore-rh-laptop>
- <3e6c191a-3be3-d6ff-92a2-2685bade2e66@redhat.com>
-From: Yunsheng Lin <yunshenglin0825@gmail.com>
-Message-ID: <8d93fbf0-43bb-7a9c-9470-0085cf25a228@gmail.com>
-Date: Sat, 24 Jun 2023 22:44:23 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.10.2
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=4gbmVkoGzWRDCDzyhIXnKxTclnpx0hTMqKywvet4Wpg=;
+ b=H3vHo42E8h4NFJwO4YAWJDiznYrVDZh8pJ+Az1Ub5b880Rf3dicvPKkY5x/Bu7WWL3Ss0eJnFHikYIow+PBmzhWfW2dTMj+k9Re3DHEdfWDVL1OzarAmhCXGhdLXY/dKHZqcOwkzPmBKEBmUqF9AAMDDcNwZW7hbbBKRMXGeZ+Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BY3PR13MB4993.namprd13.prod.outlook.com (2603:10b6:a03:36d::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Sat, 24 Jun
+ 2023 14:55:37 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Sat, 24 Jun 2023
+ 14:55:37 +0000
+Date: Sat, 24 Jun 2023 16:55:30 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Jeroen Hofstee <jhofstee@victronenergy.com>,
+	=?utf-8?B?TcOlbnMgUnVsbGfDpXJk?= <mans@mansr.com>,
+	Tony Lindgren <tony@atomide.com>, netdev@vger.kernel.org,
+	Mugunthan V N <mugunthanvnm@ti.com>,
+	Grygorii Strashko <grygorii.strashko@ti.com>,
+	"open list:TI ETHERNET SWITCH DRIVER (CPSW)" <linux-omap@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH v2] net: cpsw: fix obtaining mac address for am3517
+Message-ID: <ZJcD4sqqzZCq7Fww@corigine.com>
+References: <1477668756-2651-1-git-send-email-jhofstee@victronenergy.com>
+ <20161028155213.2t3nwwe3lqaynaer@atomide.com>
+ <d8ad5cab-5183-cddf-fa9a-4e7b9b8c9377@victronenergy.com>
+ <20161028181914.mskebckucukzhxhz@atomide.com>
+ <yw1x7cru445g.fsf@mansr.com>
+ <ZJX9FBBvOTv10IO4@corigine.com>
+ <de546232-0638-318a-535f-169184933a20@victronenergy.com>
+ <675a346b-faed-4e86-87e7-b332da540055@lunn.ch>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <675a346b-faed-4e86-87e7-b332da540055@lunn.ch>
+X-ClientProxiedBy: AM0PR04CA0102.eurprd04.prod.outlook.com
+ (2603:10a6:208:be::43) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <3e6c191a-3be3-d6ff-92a2-2685bade2e66@redhat.com>
-Content-Type: text/plain; charset=utf-8
-Content-Language: en-GB
-Content-Transfer-Encoding: 8bit
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY3PR13MB4993:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3df61491-daab-460d-6009-08db74c311de
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1VrFm7t/cwc5OmeW0rbLJSGjdUl8uuFuqsZpaDxw24g7lct4ctRPxheqBgL6HaHDKkv+8ErU0fOfIluT5O1QhvdnCscS8X8K3qM7ouPjKJSJ4ILNJC6+iNdNI4EKT40keQ7RmYaah0KATLwBx1HX2wpimEy+XOkIOt3W7beVlzP1hPsH0JaHhDuspKcMOKLUIhRvuc4cn74UX4R5yxVGen2PTGpqxN5Ppa1oiXsTwJ4Kld0zlepHXCiSILrp2ZFTKjlOdlgavqxucqExG4LM2Dbdn9J7QbWhJJ8zq2EPniSEn5jYsoSoOwWWzvgE+ZARpodl1qoVqhzY6+bjdWrogQ+PVUJczgJYfptlh0zIbSNcfWFDGk2THsxObohRAaRaU+xXJw8tmXdPGhKwFh6SoSsj4iphw2LNvBagkGjWZOwVMcGZVMXsdTKFN85DEpjKLWtBacDlxee8TKYAZF+Gr7+1LrROUF5UMfq0VDr/OFjmH9n/tcioTq/XVvFqJLfSvM5OQPA1PNCMie+QwozXoLUzu/2TA0GaAoXryG9EGCI4qmle4uRmwPwe44wNq52A5i589UEDnhcZL3YEFxIvozytAq6ssebHmsfW+IDbLqE=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39840400004)(136003)(376002)(366004)(451199021)(36756003)(5660300002)(44832011)(41300700001)(316002)(86362001)(66476007)(6916009)(8936002)(8676002)(66556008)(4326008)(38100700002)(66946007)(6486002)(6512007)(6506007)(186003)(4744005)(2906002)(6666004)(478600001)(54906003)(83380400001)(2616005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?V0ieJQ8S0XRjcJG5iAIF8S74+lZMc9M6VkEt7HN07HI+vp/RlHeUynAgSuLk?=
+ =?us-ascii?Q?ShBImX6XgXPBZR+tGhmR/rqMV3a0XiWYRM+jcqveJlM0I3eG+EH/TQreVn7+?=
+ =?us-ascii?Q?5dJnG0OitdZAUwpn7d+niCiwnXyokSO9f36le3AA0P/tvt7/MJ/+p9zbVG5q?=
+ =?us-ascii?Q?y53m3+3b4peWPTpsqnONu9ANMpbofFd48PWayF7rCzPUfwrEZDxz29B870bz?=
+ =?us-ascii?Q?QaL5HH77zdDEIWan5z+ITmJPe2C8X/HZG+3cNt6MXGMRd3abXO/FtVfpWAIm?=
+ =?us-ascii?Q?mMUhL2j3cRRyV/IuinfYqEE9aqNeyGDiLDcLQDizZjTxcb3xw93X3DsmAH5W?=
+ =?us-ascii?Q?HgSWbp4HC1EOqasrns2/twgTtq2cQ+8GTe4Zq+kaTmINfR4GeWi0O7SJbP/m?=
+ =?us-ascii?Q?d4t7mf82XjDIlYefTJ3iaAEEBc7lmgYKWl4dMBiNH64D/FOeFa2DuHCPLDbs?=
+ =?us-ascii?Q?jauHAgML4T7zPytqxLiZ2jTA7C5q7Re/6LT5i7LHWiCUHosQwzU01usXLYuu?=
+ =?us-ascii?Q?rAMoXv9cen+vAldfkkJsHGFiOJx4YhD89MUaDolUpBf59bsyzVyZ7dGBdAqk?=
+ =?us-ascii?Q?1gJ7mt+dy63V9StkcmqCYySlxw/F6gX3i2Mw9GmC0CY1whblin9HMDoM2fNH?=
+ =?us-ascii?Q?xzK51BgaAMTDgyG25x+tpdvyV4blIOH6qkrAyvXMtZYHyO7XgQAVdjhsDqGW?=
+ =?us-ascii?Q?foqHumvKgWWrktvJ8+R77nIsYKccVSS5gZF2M0xi6rBXGFuCwFRLDWrCdKtU?=
+ =?us-ascii?Q?vcH/87jSf96XiFfatk8kksWvqGtDc8YkATW0oWluM6bwqGt0MN0EplVrmIdY?=
+ =?us-ascii?Q?rkJxuqa0tVB3ZL6PbaMTD+A2EdCTL4jocgtKYHdP0AvowDlds51XNA3onUM1?=
+ =?us-ascii?Q?LlteNcEDLraleQ8YS/q9D1sScQP4ezMvohMOfuC8pG+vlmPJ+j7BwqL+fAwx?=
+ =?us-ascii?Q?kLmEJE1zB5AqbrjgrDL+78IpqcRFOmQk8blA2sS1CKQJHyGOSh2HrkNsxkQh?=
+ =?us-ascii?Q?1dVW38J5z92yPZhhto3wS/uaO6Amqkiqu1FT/jToirXp8c1MrNx5z11qFfYb?=
+ =?us-ascii?Q?z+CWZZztoOPxaVWvLdiUJ4xcUuyoLsqIkBXOvVGbpjyDdeSbQsH//EXDdtVI?=
+ =?us-ascii?Q?pEppF2jOmVQmPdO+WpaFm0w3iUhH5knV74tne7DbhbD+vTpR0lV1YKraSM1B?=
+ =?us-ascii?Q?TILWueYxxhgapvfQQ//51zw9DULl6+jYVtHybvMIYvf4hyGDhy6/FTfAQbMp?=
+ =?us-ascii?Q?XGWyyeZJjAA3boNQnmaT5CwpS/7s+i7ErJdBIs/MmwKf5a83ZKxNAsqgPcbE?=
+ =?us-ascii?Q?5Ws02RqJSkC9Mj4TsfVCaQjtrOoQXbCPZVtSUPKxMH9XaQVTFpk+P5Qb2jMu?=
+ =?us-ascii?Q?bV/eAhmwwYnIcP6LYj/wgxi7NQRbLGh+j8XlABabCtWvGHanzVthcaJUKyja?=
+ =?us-ascii?Q?4fQlkDxQMfK7t5fbIjPIQgi0mutZeDg5Le8QHbE2fC3iIvrHZzawIjqKN8J+?=
+ =?us-ascii?Q?O/eHG6sE4btpGNvRJefnWz1sQiPHC83JkxUcBCffcVMec+ruuXbXEGOEUlFN?=
+ =?us-ascii?Q?z37cN0TDcRdbEdGdyf5sp/lIjKKxOUR4pEKUZraEi+vagPF3gkZ+m+eogNqb?=
+ =?us-ascii?Q?1dA56un7lu767XC2PBIrStLUsgwkEOyN8NfuRg9QoWjtW2n/IDOIvtOV4pQn?=
+ =?us-ascii?Q?J9FTgg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3df61491-daab-460d-6009-08db74c311de
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 24 Jun 2023 14:55:37.2263
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: iWoLvGJwr6E1WsVyZuWQAv0TSMwXiF/Gh6w/moXmGv8HNpt3Vux3urg2nKP3uj0895GTDcgncolZl8DWZhcPSjFncZ2UvyWaOGBY0bd7Kl0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY3PR13MB4993
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/6/21 19:55, Jesper Dangaard Brouer wrote:
+On Fri, Jun 23, 2023 at 11:41:10PM +0200, Andrew Lunn wrote:
+> > > I feel like I am missing something here.
+> > 
+> > That is a weird response, you feel like something is missing
 > 
+> There is. The patch.
 > 
-> On 20/06/2023 23.16, Lorenzo Bianconi wrote:
->> [...]
->>
->>>> I did some experiments using page_frag_cache/page_frag_alloc() instead of
->>>> page_pools in a simple environment I used to test XDP for veth driver.
->>>> In particular, I allocate a new buffer in veth_convert_skb_to_xdp_buff() from
->>>> the page_frag_cache in order to copy the full skb in the new one, actually
->>>> "linearizing" the packet (since we know the original skb length).
->>>> I run an iperf TCP connection over a veth pair where the
->>>> remote device runs the xdp_rxq_info sample (available in the kernel source
->>>> tree, with action XDP_PASS):
->>>>
->>>> TCP clietn -- v0 === v1 (xdp_rxq_info) -- TCP server
->>>>
->>>> net-next (page_pool):
->>>> - MTU 1500B: ~  7.5 Gbps
->>>> - MTU 8000B: ~ 15.3 Gbps
->>>>
->>>> net-next + page_frag_alloc:
->>>> - MTU 1500B: ~  8.4 Gbps
->>>> - MTU 8000B: ~ 14.7 Gbps
->>>>
->>>> It seems there is no a clear "win" situation here (at least in this environment
->>>> and we this simple approach). Moreover:
->>>
->>> For the 1500B packets it is a win, but for 8000B it looks like there
->>> is a regression. Any idea what is causing it?
->>
->> nope, I have not looked into it yet.
->>
+> Maintainers have a slightly better memory than a goldfish, but given
+> the high volume of patches, we don't remember threads from 2016. Also,
+> all our infrastructure has limited memory, this patch is not in lore,
+> and it is not in patchworks. So in terms of getting merged, it does
+> not exist.
 > 
-> I think I can explain via using micro-benchmark numbers.
-> (Lorenzo and I have discussed this over IRC, so this is our summary)
-> 
-> *** MTU 1500***
-> 
-> * The MTU 1500 case, where page_frag_alloc is faster than PP (page_pool):
-> 
-> The PP alloc a 4K page for MTU 1500. The cost of alloc + recycle via
-> ptr_ring cost 48 cycles (page_pool02_ptr_ring Per elem: 48 cycles(tsc)).
-> 
-> The page_frag_alloc API allocates a 32KB order-3 page, and chops it up
-> for packets.  The order-3 alloc + free cost 514 cycles (page_bench01:
-> alloc_pages order:3(32768B) 514 cycles). The MTU 1500 needs alloc size
-> 1514+320+256 = 2090 bytes.  In 32KB we can fit 15 packets.  Thus, the
-> amortized cost per packet is only 34.3 cycles (514/15).
-> 
-> Thus, this explains why page_frag_alloc API have an advantage here, as
-> amortized cost per packet is lower (for page_frag_alloc).
-> 
-> 
-> *** MTU 8000 ***
-> 
-> * The MTU 8000 case, where PP is faster than page_frag_alloc.
-> 
-> The page_frag_alloc API cannot slice the same 32KB into as many packets.
-> The MTU 8000 needs alloc size 8000+14+256+320 = 8590 bytes.  This is can
-> only store 3 full packets (32768/8590 = 3.81).
-> Thus, cost is 514/3 = 171 cycles.
-> 
-> The PP is actually challenged at MTU 8000, because it unfortunately
-> leads to allocating 3 full pages (12KiB), due to needed alloc size 8590
-> bytes. Thus cost is 3x 48 cycles = 144 cycles.
-> (There is also a chance of Jakubs "allow_direct" optimization in page_pool_return_skb_page to increase performance for PP).
-> 
-> Thus, this explains why PP is fastest in this case.
+> We do however recommend that if a patch has not been merged within 2
+> weeks, it is rebased, any Acked-by: etc tags are added and the patch
+> reposted.
 
-Great analysis.
-So the problem seems to be: can we optimize the page fragment cache
-implementation so that it can at least match the performance of PP
-for the above case? As Alexander seems to be against using PP for
-the veth case without involving DMA mapping.
+Thanks Andrew, that is also my position.
 
-> 
-> 
-> *** Surprising insights ***
-> 
-> My (maybe) surprising conclusion is that we should combine the two
-> approaches.  Which is basically what Lin's patchset is doing!
-> Thus, I'm actually suddenly become a fan of this patchset...
-> 
-> The insight is that PP can also work with higher-order pages and the
-> cost of PP recycles via ptr_ring will be the same, regardless of page
-> order size.  Thus, we can reduced the order-3 cost 514 cycles to
-> basically 48 cycles, and fit 15 packets (MTU 1500) resulting is
-> amortized allocator cost 48/15 = 3.2 cycles.
-> 
-> On the PP alloc-side this will be amazingly fast. When PP recycles frags
-> side, see page_pool_defrag_page() there is an atomic_sub operation.
-> I've measured atomic_inc to cost 17 cycles (for optimal non-contended
-> case), thus 3+17 = 20 cycles, it should still be a win.
-> 
-> 
-> --Jesper
-> 
-> 
+A ping for a multi-year old patch is unusual (for me).
+I was wondering if there was a back story. I guess not.
 
