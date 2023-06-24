@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-13694-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13695-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E4D2A73C929
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 10:25:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1D7F573C92D
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 10:26:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 223FC1C214A3
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 08:25:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9E5A1281FED
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 08:26:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 182AE3D8A;
-	Sat, 24 Jun 2023 08:25:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C277920FA;
+	Sat, 24 Jun 2023 08:25:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BD2C4409
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 08:25:20 +0000 (UTC)
-Received: from mail-ej1-x634.google.com (mail-ej1-x634.google.com [IPv6:2a00:1450:4864:20::634])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6B9E93AA9
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:24:57 -0700 (PDT)
-Received: by mail-ej1-x634.google.com with SMTP id a640c23a62f3a-987c932883bso182589266b.0
-        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:24:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B65A746B5
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 08:25:24 +0000 (UTC)
+Received: from mail-ej1-x629.google.com (mail-ej1-x629.google.com [IPv6:2a00:1450:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63EC1297C
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:25:05 -0700 (PDT)
+Received: by mail-ej1-x629.google.com with SMTP id a640c23a62f3a-98746d7f35dso191185066b.2
+        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:25:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687595064; x=1690187064;
+        d=linaro.org; s=google; t=1687595076; x=1690187076;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=Yae1xwiE1cf9aPKATRkJstBDOT3q8TFXp4hszvxUyq4=;
-        b=YvJo2eOgRjp7Nu6HhZ0Ly7NiVzudeerZDZdvpLCxauEGIQLTSmWoGvQYvBao1wZScz
-         DwypTBLhATAp1xYtmvvzrbepVybavA2kDJIZ6OTCfaeU2DqzJhIi0sDHRrUf9mgIi7vt
-         SNMmUaSx0RBVeYcEjuVRwUWagYFtzUOCiEnkVCXkQZdFMgK62kOMU0thxzRYXOfOKFUA
-         N+AFT++jOCSod/PyCezzloQ+RuTZWKMUi+cvqeAa/1dHRMe+yc1Co/n21k/VpmGf3OMy
-         4qgUMaYkuVxnOjNeBetr+cQ8NtkB6O7vMGVqjD2g2tS9xyBdAaGervXpA6OT+7fSJbe0
-         eyaw==
+        bh=9m88tdrjltI5afqB2y4W0GvMxnga3YhkyI5zgzVbcGE=;
+        b=Xq63fn/XWemDzkx3c0aeAAWnkqQM+vMTmqJyDMM+c8xqtOklqM5UVjx/QJRBSnWaqw
+         jrvpmmv7+n1h1fwYvqTDppb7q3v4CxpcBFLat2c8scG7YJTYn2RmymqLDDJsDvPD7ylE
+         rE42LjjD4p8GfEZlnyuM6Y+bxAwhLcTrcE5m6SXqpdYJPckhjxHR3sa7nsmPaHTOo4bo
+         QG1MD5s2ZYzijyxmfTee6mNrCmD3Uj2fs3fB+ZiZj7XCg9jNuU7jC6SzGnlAVZ1GVS9s
+         eCF8jLAK5vJGcqxv1zMzR0xfIlnd31mZdDJeDioTtl88mW/oLVOMCuZtZlIjCR83PEas
+         8/MA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687595064; x=1690187064;
+        d=1e100.net; s=20221208; t=1687595076; x=1690187076;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Yae1xwiE1cf9aPKATRkJstBDOT3q8TFXp4hszvxUyq4=;
-        b=TQdGl5ax3uM/sl63bRZAbx/WhVbuZTgZX2OY9PsZ3U7VFieNkdqX/tdXWxlV3aw/Y9
-         YaPMRvaeoMakOJQsCPEq/xu03XmR4lFWjXGzmK4hFBUXiO3/kMY5l4+OvWDY22y7poAQ
-         dsVT74N99grgCLpOxlVMN1guUTqxikSzsEkqsFYall2UtMUY6Fq5TLkAVBOSZdeBUCfb
-         +vqmdLWtB8mAcijzJMEqYkRtdDSefTA2dbeWJ9MWGv9hlnl7KNMQ7TKsPoje8yDSAGY8
-         KDZ78f4415bD3N/yb5Js4w4tO40dLQ9HWxvVplCjAUZrtPWt1IJVwXOtjpBGr73m031X
-         whjA==
-X-Gm-Message-State: AC+VfDzjvXEIQ/jZLGfs4GhufG3ORJ+RWiGyV7znLN7BdfEsI1piY8Z5
-	Z8aRQ3dk4OEmNPxN8WvK3uPKUg==
-X-Google-Smtp-Source: ACHHUZ4jx/P2g1ir+gWmRrIWZy7IcsqiuMUVodKxODs+k03Uhx0DKtj4fioGTzgljiuR+pyFa4GrWg==
-X-Received: by 2002:a17:906:da84:b0:988:9856:9bef with SMTP id xh4-20020a170906da8400b0098898569befmr16424749ejb.30.1687595064307;
-        Sat, 24 Jun 2023 01:24:24 -0700 (PDT)
+        bh=9m88tdrjltI5afqB2y4W0GvMxnga3YhkyI5zgzVbcGE=;
+        b=GRSmRFKlN6y0nhkiqTdxHapdEYFjto4QLkeM4r77hwEFRn/LwngL0TD0tOHEFj7hUa
+         HlI32FJd6CYhLSlWtDrUH8GWDVwlrDGWmRn9aqt1n8GdVEwsJLR246JxxqGHogyEJv4S
+         oTCRS/3TCJSlJuAs1JtFMlIUY+dImFmIpCllu/47jvuiosDGPh2cKHprnPjjnp25op++
+         sR2xeURQ4fJav0CeFuIdtUSYJ8QP/yiICi0B4XjslfPkc+j6wgwg9IB5VeACNaCbGY/O
+         HXAwwTLnqudIZZiRXAFd4FP8kTqi9M74DQp6XnZuh/CJWIeBMbSzp+W/U4LkR9aI131R
+         hQ0Q==
+X-Gm-Message-State: AC+VfDwryWHLD7qZLN9Wkitf66ye21hjvAJYRlKwpSViXN8BH5jhqP8C
+	GZxwpFQSgN+sUl9A4jnp6+IkcQ==
+X-Google-Smtp-Source: ACHHUZ4kfvWWOU4PQnvhhihUyXC/j4nl3PRhbWc6xuByephTLC+3tBRktkXGlK7+K+j6XrtjsNoPmg==
+X-Received: by 2002:a17:907:3e16:b0:978:a186:464f with SMTP id hp22-20020a1709073e1600b00978a186464fmr23817557ejc.39.1687595075771;
+        Sat, 24 Jun 2023 01:24:35 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id bu2-20020a170906a14200b009829dc0f2a0sm617775ejb.111.2023.06.24.01.24.18
+        by smtp.gmail.com with ESMTPSA id u7-20020a170906654700b009875a6d28b0sm626289ejn.51.2023.06.24.01.24.30
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 01:24:23 -0700 (PDT)
-Message-ID: <b8dbe86a-7b95-6839-a1d7-069d0dfa6a45@linaro.org>
-Date: Sat, 24 Jun 2023 10:24:17 +0200
+        Sat, 24 Jun 2023 01:24:35 -0700 (PDT)
+Message-ID: <769b5cf3-0182-d046-a56d-c3a076249c57@linaro.org>
+Date: Sat, 24 Jun 2023 10:24:29 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,8 +66,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v2 24/45] dt-bindings: sdhci-of-at91: add
- microchip,sam9x7-sdhci
+Subject: Re: [PATCH v2 25/45] dt-bindings: atmel-nand: add
+ microchip,sam9x7-pmecc
 Content-Language: en-US
 To: Varshini Rajendran <varshini.rajendran@microchip.com>,
  robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
@@ -100,9 +100,9 @@ Cc: Hari.PrasathGE@microchip.com, cristian.birsan@microchip.com,
  dharma.b@microchip.com, nayabbasha.sayed@microchip.com,
  balakrishnan.s@microchip.com
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
- <20230623203056.689705-25-varshini.rajendran@microchip.com>
+ <20230623203056.689705-26-varshini.rajendran@microchip.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230623203056.689705-25-varshini.rajendran@microchip.com>
+In-Reply-To: <20230623203056.689705-26-varshini.rajendran@microchip.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -113,24 +113,22 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 23/06/2023 22:30, Varshini Rajendran wrote:
-> Add microchip,sam9x7-sdhci to DT bindings documentation.
+> Add microchip,sam9x7-pmecc to DT bindings documentation.
 > 
 > Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
 > ---
->  Documentation/devicetree/bindings/mmc/sdhci-atmel.txt | 4 +++-
->  1 file changed, 3 insertions(+), 1 deletion(-)
+>  Documentation/devicetree/bindings/mtd/atmel-nand.txt | 1 +
+>  1 file changed, 1 insertion(+)
 > 
-> diff --git a/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt b/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt
-> index 69edfd4d3922..b8df78fbc00f 100644
-> --- a/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt
-> +++ b/Documentation/devicetree/bindings/mmc/sdhci-atmel.txt
-> @@ -5,11 +5,13 @@ Documentation/devicetree/bindings/mmc/mmc.txt and the properties used by the
->  sdhci-of-at91 driver.
->  
->  Required properties:
-> -- compatible:		Must be "atmel,sama5d2-sdhci" or "microchip,sam9x60-sdhci".
-> +- compatible:		Must be "atmel,sama5d2-sdhci" or "microchip,sam9x60-sdhci"
-> +			or "microchip,sam9x7-sdhci"
+> diff --git a/Documentation/devicetree/bindings/mtd/atmel-nand.txt b/Documentation/devicetree/bindings/mtd/atmel-nand.txt
+> index 50645828ac20..9c9dfab38fdf 100644
+> --- a/Documentation/devicetree/bindings/mtd/atmel-nand.txt
+> +++ b/Documentation/devicetree/bindings/mtd/atmel-nand.txt
+> @@ -56,6 +56,7 @@ Required properties:
+>  	"atmel,sama5d4-pmecc"
+>  	"atmel,sama5d2-pmecc"
+>  	"microchip,sam9x60-pmecc"
+> +	"microchip,sam9x7-pmecc"
 
 That's not what your DTS is saying. NAK.
 
