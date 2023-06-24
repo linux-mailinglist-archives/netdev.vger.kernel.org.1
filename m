@@ -1,63 +1,63 @@
-Return-Path: <netdev+bounces-13697-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13698-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FCEF73C960
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 10:27:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AA0B973C98A
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 10:28:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D309328204D
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 08:27:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63637282058
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 08:28:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D87B211A;
-	Sat, 24 Jun 2023 08:27:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A83C211A;
+	Sat, 24 Jun 2023 08:28:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 114C12117
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 08:27:23 +0000 (UTC)
-Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91C514221
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:27:12 -0700 (PDT)
-Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-9883123260fso151874666b.0
-        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:27:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896814409
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 08:28:55 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF104C12
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:28:22 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-51d804c7d14so279366a12.3
+        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:28:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687595231; x=1690187231;
+        d=linaro.org; s=google; t=1687595293; x=1690187293;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=gJlPeAcJkflrsYHeqhAxG1xpnKkKctKx9VK4XOcUSNU=;
-        b=Kkt2tu0fZVyjdnIT+9aWz+2dC0xTVD3lu4yLwV0kQqZHuhz8Ro07GQdKqy6N1bU9f6
-         pQSHbTPMPW6t676hrqq5z5c4/jC1zAayJMvQIsQvygTbtQ1Ast7+Cs+Sp/qYXZDLJHWw
-         XBE4dYbEQtIeIRkumTncrrM+RY7bqG5QLJTYAogks8em7F36iQZDlMeHdRvWBibNfJyB
-         5GEQ4ZMC7udapD1WxMM6AWpT4cPZ2HWl0da/r/wrXgxUiY6gz4DHtTZ2kx7RHe9LGGjI
-         QKd+aWA5QHSnmV6Qgt2UIMZ5Ylb44sRp4CxcC3kLBCXNXnUnEVR8y9x1idlk9Lr31Gd9
-         XPIQ==
+        bh=/GIkG+tRxlPhRtm7YOpXeJRcJeLkXqLt09OeZ1Nh1Q4=;
+        b=DkiglpMjfjZCyxhWBqFcrR4RkmF6xYeIJhZq2bOE8/tpFTboyhHRBzqMweLVJwZdse
+         Po5v9VUAlVpzETIWlBeTSQ/MOOvNBADP10/6rUf8cTK/xsSxgq1hO5ZM9vc4292Kwd83
+         VTdWBdvUwwEOS+VqFVyBMZUM6hlNddUzTKFQc1w5NukZTFWumAXPj6zYaXxUMWoU/DSy
+         XQel7bucUiZ+Ngsaptd6xqTY94Y066kVJS9WhWDC0jZ5rzUsfBkGryZ36kc7qmVLWyeh
+         wthERO5PoF7uGlAF2OMarb6r+LyNXoKbb+5cj2mZ36KhHU2OJG0uneADkVzgtHgvzaZM
+         aiVA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687595231; x=1690187231;
+        d=1e100.net; s=20221208; t=1687595293; x=1690187293;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gJlPeAcJkflrsYHeqhAxG1xpnKkKctKx9VK4XOcUSNU=;
-        b=g9F5dWfv5pwuaKky8II95HgyYEXESqbI0imiA+fapjzK2SLEAGvQPzRK7VQgGqWE9G
-         I67+YNVYxJhj0DHhk2+CMxeSBeDhXjep78+RpJvYZ+HZc8L54wbeLaSQ4hQWKoL64w9t
-         nAsIc1TW/6btsboZjq9Q8aRcUw1vYiiH06nE++x8gCHmzIeAH9pr6JyOAI1CdkuzGIaW
-         IG/awUAfoZ2KrqbJcqg+V9apY74aaRkg7Of3OwjNVqSDqpp5Sd1m8RbfjPOVMDA2yRXr
-         I73FEzR0gUO+7MwnHz5SDfAmOzuEHDLZpKjOEkYSgIJYNH3bjaEKib6FjiVCaH8HQP0g
-         VU/Q==
-X-Gm-Message-State: AC+VfDz26+z1wFCezzNhT6mBsf/FzFUCycMwtXO3hW7kLPrGfaxy81/F
-	m/H6Ovi4myYhUf5L3sVj6Y3FbA==
-X-Google-Smtp-Source: ACHHUZ5t7epZFC28S4hxtPyy+RCHfLvODV3nPC4aL8/psJFMdpVy5ABk2SDosvlu0zr3308+wJnq2w==
-X-Received: by 2002:a17:907:8a03:b0:988:acb4:f63 with SMTP id sc3-20020a1709078a0300b00988acb40f63mr12986422ejc.74.1687595230874;
-        Sat, 24 Jun 2023 01:27:10 -0700 (PDT)
+        bh=/GIkG+tRxlPhRtm7YOpXeJRcJeLkXqLt09OeZ1Nh1Q4=;
+        b=AR8/E1rTHYKEPoXN3Hupr79MP8bCPXHoR+d2dfNbBDxQjgUr/bzavdWz3OZJ+CFL3k
+         N5Sul3JB8n1ZfVmMSETG8IhsxXp+kzii9wReodClo0hd2uOWBSHlffEwwf9HbtScO30E
+         2ubhPUSBlZajAT/rQIVWjbliR1KukC5Zt+KynN/Yduoytcj4NwuVo2XyMcDxrx/n9Q6M
+         1qQzBqAJhQLbw9UJFH3RzfJI8h26DE+PgO8fplMlA+TzRONH/SR+Mbi9VgiykBc+HE9v
+         O+vc2hOZCwFvj1DOhoA4FQLMW/ytYC6hgpf4fNZ3cb5GvyK2tWS5plpG8aa1+GJQo8yw
+         Lhnw==
+X-Gm-Message-State: AC+VfDw0vY9kaJkBNjI3GW/NPPmiRsB1F5LS9y/44DGejqQdFz6RYiuv
+	RsIANtXJTPJ8scYbnq23SaGJbQ==
+X-Google-Smtp-Source: ACHHUZ4ujAlY65iLeyuRh50Ps6Pp7ng1jowk6gt0zzaeZKnGL1gJBg6GDgqsvIKWUupAOCVYBEqBCQ==
+X-Received: by 2002:a17:907:3e8e:b0:987:88eb:2416 with SMTP id hs14-20020a1709073e8e00b0098788eb2416mr19943130ejc.61.1687595293178;
+        Sat, 24 Jun 2023 01:28:13 -0700 (PDT)
 Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id t6-20020a1709060c4600b0098654d3c270sm635400ejf.52.2023.06.24.01.27.05
+        by smtp.gmail.com with ESMTPSA id kq2-20020a170906abc200b009887bb956e0sm620186ejb.103.2023.06.24.01.28.07
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 01:27:10 -0700 (PDT)
-Message-ID: <caff28bc-8824-f173-99ea-267dd26e5cbc@linaro.org>
-Date: Sat, 24 Jun 2023 10:27:04 +0200
+        Sat, 24 Jun 2023 01:28:12 -0700 (PDT)
+Message-ID: <36a6ba38-d01e-96ad-c89f-7e2c860e0a88@linaro.org>
+Date: Sat, 24 Jun 2023 10:28:06 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,8 +66,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH v2 17/45] dt-bindings: dmaengine: at_xdmac: add compatible
- with microchip,sam9x7
+Subject: Re: [PATCH v2 00/45] Add support for sam9x7 SoC family
 Content-Language: en-US
 To: Varshini Rajendran <varshini.rajendran@microchip.com>,
  robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
@@ -100,9 +99,8 @@ Cc: Hari.PrasathGE@microchip.com, cristian.birsan@microchip.com,
  dharma.b@microchip.com, nayabbasha.sayed@microchip.com,
  balakrishnan.s@microchip.com
 References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
- <20230623203056.689705-18-varshini.rajendran@microchip.com>
 From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230623203056.689705-18-varshini.rajendran@microchip.com>
+In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -113,27 +111,32 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 On 23/06/2023 22:30, Varshini Rajendran wrote:
-> Add compatible for sam9x7.
+> This patch series adds support for the new SoC family - sam9x7.
+>  - The device tree, configs and drivers are added
+>  - Clock driver for sam9x7 is added
+>  - Support for basic peripherals is added
+>  - Target board SAM9X75 Curiosity is added
 > 
-> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
-> ---
->  Documentation/devicetree/bindings/dma/atmel-xdma.txt | 4 ++--
->  1 file changed, 2 insertions(+), 2 deletions(-)
+>  Changes in v2:
+>  --------------
 > 
-> diff --git a/Documentation/devicetree/bindings/dma/atmel-xdma.txt b/Documentation/devicetree/bindings/dma/atmel-xdma.txt
-> index 510b7f25ba24..f672556ea715 100644
-> --- a/Documentation/devicetree/bindings/dma/atmel-xdma.txt
-> +++ b/Documentation/devicetree/bindings/dma/atmel-xdma.txt
-> @@ -2,8 +2,8 @@
->  
->  * XDMA Controller
->  Required properties:
-> -- compatible: Should be "atmel,sama5d4-dma", "microchip,sam9x60-dma" or
-> -  "microchip,sama7g5-dma".
-> +- compatible: Should be "atmel,sama5d4-dma", "microchip,sam9x60-dma",
-> +  "microchip,sam9x7-dma" or "microchip,sama7g5-dma".
+>  - Added sam9x7 specific compatibles in DT with fallbacks
+>  - Documented all the newly added DT compatible strings
+>  - Added device tree for the target board sam9x75 curiosity and
+>    documented the same in the DT bindings documentation
+>  - Removed the dt nodes that are not supported at the moment
+>  - Removed the configs added by previous version that are not supported
+>    at the moment
+>  - Fixed all the corrections in the commit message
+>  - Changed all the instances of copyright year to 2023
+>  - Added sam9x7 flag in PIT64B configuration
+>  - Moved macro definitions to header file
+>  - Added another divider in mck characteristics in the pmc driver
+>  - Fixed the memory leak in the pmc driver
+>  - Dropped patches that are no longer needed
+>  - Picked up Acked-by and Reviewed-by tags
 
-That's not what your DTS is saying. NAK.
+Where did you pick them up? Can you point me to the patches?
 
 Best regards,
 Krzysztof
