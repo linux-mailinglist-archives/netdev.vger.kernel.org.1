@@ -1,99 +1,128 @@
-Return-Path: <netdev+bounces-13663-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13664-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0B08073C73A
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 09:09:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 86D3573C78B
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 09:53:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B81C0281F64
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 07:09:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 679C01C2134A
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 07:53:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE88181E;
-	Sat, 24 Jun 2023 07:09:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 15C68A52;
+	Sat, 24 Jun 2023 07:53:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE9E7818;
-	Sat, 24 Jun 2023 07:09:42 +0000 (UTC)
-Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5911F269F;
-	Sat, 24 Jun 2023 00:09:40 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.169])
-	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qp4wt6n50z4f3jYp;
-	Sat, 24 Jun 2023 15:09:34 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP3 (Coremail) with SMTP id _Ch0CgCXfQuslpZkLHMDLg--.8380S2;
-	Sat, 24 Jun 2023 15:09:35 +0800 (CST)
-Subject: Re: [PATCH v2 bpf-next 00/13] bpf: Introduce
- bpf_mem_cache_free_rcu().
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, daniel@iogearbox.net,
- andrii@kernel.org, void@manifault.com, paulmck@kernel.org
-Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, kernel-team@fb.com
-References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <a22325f8-b64c-6c46-4a84-72b418ec92de@huaweicloud.com>
-Date: Sat, 24 Jun 2023 15:09:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A433A45
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 07:53:17 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A8729273F
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 00:53:14 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-51bec86b9c9so1499733a12.2
+        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 00:53:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=linaro.org; s=google; t=1687593192; x=1690185192;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=hr9nrGlYrxN00jEwRxs6PYBUQxgnGyvMLv6d+S+IyFk=;
+        b=LQEc0yoJm0GslpUZYCjcHtwoTCvu+59CHRYP/sGpmh7IIEWYyKbcmwOTWkHIAk5amo
+         GW/7Gpe870PqzwscCvwhvS2tRdD4lIO92N5a+9t0YvyTUExmCh3G/ey+cNZCCGzcBTPJ
+         6yPMwkjqsKsodsXDqWTZBNezjTKe+7X8fdEpM8mYCN9NPvWn/peXOWQ5kyvKsBiKcO44
+         1nn5gapVl7Ro8gQLfw1L+9piaUTX+p6FPVZZ1/ijnscvD92eH3mJCbstLfuZt0gY2UUX
+         +QldvphwJQ8glfg3JyKVOgSk3y2EQry5UIdVnMeV03t88wxPGoe0khhNc6S3VhqB4zja
+         Bt8Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687593192; x=1690185192;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=hr9nrGlYrxN00jEwRxs6PYBUQxgnGyvMLv6d+S+IyFk=;
+        b=h/Sx0p8wnPxHy8kXGLAWlrOGw6gclhrjThU5qrmyVrUq57ZR8Q1l/GajCaLKAqhSf0
+         EtXVtEgSErmnCGKX42iIWA0h2gCO+N71tMZjDuAF+R9NO14X5BWzu8ilM4/n+FQgn+7f
+         2fpjxSxL4/d2ekgQ+yNgAeu6XJnc8p2BUSTJBmNvaZNHE3td/MA5AcfcYNJD6HmvcN2e
+         fM2AGdfKqKxyVnus6BweUOuW4TSmYaH5SBNPmI+YAfr5z5UE1dzmTwuvBa34ocNxn6SV
+         KhDuyT+9JMPNClxqmkKkQ5WFLumbm/9/aMBP4vC/ZscbgSPabsZwoq6StXmg5Xfzb+3n
+         RAyg==
+X-Gm-Message-State: AC+VfDw0FBM/PVHNjjFyKtD+gbf6Gd58/RGKr4Ux9+QtG2khwdaoG5as
+	2AV3aYmfArEaC9/hBiOw1TvP2g==
+X-Google-Smtp-Source: ACHHUZ522CJYVOfO8kVotsUuEt+wtHkNFHrIi0PS6ACNcKvYFOPHzOCYWLySAcxpXgHfsNodLNJqrA==
+X-Received: by 2002:a50:ef12:0:b0:51a:f6de:bb81 with SMTP id m18-20020a50ef12000000b0051af6debb81mr10804337eds.28.1687593192613;
+        Sat, 24 Jun 2023 00:53:12 -0700 (PDT)
+Received: from [192.168.1.20] ([178.197.219.26])
+        by smtp.gmail.com with ESMTPSA id m5-20020aa7d345000000b0051495ce23absm404938edr.10.2023.06.24.00.53.06
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Jun 2023 00:53:12 -0700 (PDT)
+Message-ID: <074048a2-5153-e013-3562-b5cad2ba0954@linaro.org>
+Date: Sat, 24 Jun 2023 09:53:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v2 01/45] dt-bindings: microchip: atmel,at91rm9200-tcb:
+ add sam9x60, sam9x7 compatible
 Content-Language: en-US
-X-CM-TRANSID:_Ch0CgCXfQuslpZkLHMDLg--.8380S2
-X-Coremail-Antispam: 1UD129KBjvdXoWrZw4rArWfXF48KFW3WFyUKFg_yoW3Grb_ZF
-	WjgrW7Ww17KF1kWFWFkF4Ikw4kC39aq3Zag3yrWrn3JFyft393KFs8WFySya4fG3yxKFyD
-	JaykXrZ0vrnFgjkaLaAFLSUrUUUUUb8apTn2vfkv8UJUUUU8Yxn0WfASr-VFAUDa7-sFnT
-	9fnUUIcSsGvfJTRUUUbI8YFVCjjxCrM7AC8VAFwI0_Gr0_Xr1l1xkIjI8I6I8E6xAIw20E
-	Y4v20xvaj40_Wr0E3s1l1IIY67AEw4v_Jr0_Jr4l8cAvFVAK0II2c7xJM28CjxkF64kEwV
-	A0rcxSw2x7M28EF7xvwVC0I7IYx2IY67AKxVW5JVW7JwA2z4x0Y4vE2Ix0cI8IcVCY1x02
-	67AKxVW8JVWxJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267
-	AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80
-	ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4
-	AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IEe2xF
-	o4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
-	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
-	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
-	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv67AK
-	xVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvj
-	xUrR6zUUUUU
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+To: Varshini Rajendran <varshini.rajendran@microchip.com>,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
+ claudiu.beznea@microchip.com, mturquette@baylibre.com, sboyd@kernel.org,
+ herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
+ tglx@linutronix.de, maz@kernel.org, lee@kernel.org, ulf.hansson@linaro.org,
+ tudor.ambarus@linaro.org, miquel.raynal@bootlin.com, richard@nod.at,
+ vigneshr@ti.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linus.walleij@linaro.org, p.zabel@pengutronix.de, olivia@selenic.com,
+ a.zummo@towertech.it, radu_nicolae.pirea@upb.ro, richard.genoud@gmail.com,
+ gregkh@linuxfoundation.org, lgirdwood@gmail.com, broonie@kernel.org,
+ wim@linux-watchdog.org, linux@roeck-us.net, arnd@arndb.de, olof@lixom.net,
+ soc@kernel.org, linux@armlinux.org.uk, sre@kernel.org,
+ jerry.ray@microchip.com, horatiu.vultur@microchip.com,
+ durai.manickamkr@microchip.com, andrew@lunn.ch, alain.volmat@foss.st.com,
+ neil.armstrong@linaro.org, mihai.sain@microchip.com,
+ eugen.hristev@collabora.com, devicetree@vger.kernel.org,
+ linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
+ linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
+ dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
+ linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
+ netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
+ linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
+ linux-serial@vger.kernel.org, alsa-devel@alsa-project.org,
+ linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
+ linux-pm@vger.kernel.org
+Cc: Hari.PrasathGE@microchip.com, cristian.birsan@microchip.com,
+ balamanikandan.gunasundar@microchip.com, manikandan.m@microchip.com,
+ dharma.b@microchip.com, nayabbasha.sayed@microchip.com,
+ balakrishnan.s@microchip.com
+References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
+ <20230623203056.689705-2-varshini.rajendran@microchip.com>
+From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230623203056.689705-2-varshini.rajendran@microchip.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On 23/06/2023 22:30, Varshini Rajendran wrote:
+> Add sam9x60, sam9x7 compatible string support in the schema file.
+> 
+> Signed-off-by: Varshini Rajendran <varshini.rajendran@microchip.com>
+> ---
+>  .../devicetree/bindings/soc/microchip/atmel,at91rm9200-tcb.yaml | 
 
-On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
-> From: Alexei Starovoitov <ast@kernel.org>
->
-> v1->v2:
-> - Fixed race condition spotted by Hou. Patch 7.
->
-> v1:
->
-> Introduce bpf_mem_cache_free_rcu() that is similar to kfree_rcu except
-> the objects will go through an additional RCU tasks trace grace period
-> before being freed into slab.
->
-> Patches 1-9 - a bunch of prep work
-> Patch 10 - a patch from Paul that exports rcu_request_urgent_qs_task().
-> Patch 12 - the main bpf_mem_cache_free_rcu patch.
-> Patch 13 - use it in bpf_cpumask.
-Should we allow mixed use of bpf_mem_cache_free() and bpf_mem_free_rcu()
-? From the implementation, it seems the mixed use is allowed, right ? I
-will try to hack htab to test such use case.
+
+Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+
+Best regards,
+Krzysztof
 
 
