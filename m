@@ -1,114 +1,80 @@
-Return-Path: <netdev+bounces-13711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7BF3F73CB3A
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 16:00:39 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5D99973CB43
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 16:17:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E51D5281350
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 14:00:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0D8932810C9
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 14:17:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 42BCC53AD;
-	Sat, 24 Jun 2023 14:00:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2158053B7;
+	Sat, 24 Jun 2023 14:17:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 33FED53AB
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 14:00:35 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8339011F;
-	Sat, 24 Jun 2023 07:00:34 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qD3oU-0002F4-Q1; Sat, 24 Jun 2023 16:00:30 +0200
-Message-ID: <08ea34c8-7194-eafb-98f4-1e0b52ca7e81@leemhuis.info>
-Date: Sat, 24 Jun 2023 16:00:30 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 121A053B4
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 14:17:50 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A409E1997;
+	Sat, 24 Jun 2023 07:17:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=njhQ6LetGVTfkUp4632v4/5dEbyHLtyZRQxQCuse0SA=; b=lAVprTVksf2J+vDdKRIYjAYQvG
+	8nNVXicVECiTa0iaAP07yEjPnd6MEYqUfz2Duw9IMi2COcETYtd+e/zbUa0/vDoQW+AwjxN40TwSh
+	vA8VxNR0RQvuJlfTB8IzW5rgji2/OlzHAiT7TQp9KM4RNrqraj9/Hvn86bFKkMbOiOHU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qD44z-00HQrZ-39; Sat, 24 Jun 2023 16:17:33 +0200
+Date: Sat, 24 Jun 2023 16:17:33 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Mans Rullgard <mans@mansr.com>
+Cc: Grygorii Strashko <grygorii.strashko@ti.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-omap@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jeroen Hofstee <jhofstee@victronenergy.com>,
+	Tony Lindgren <tony@atomide.com>
+Subject: Re: [RESEND][PATCH] net: cpsw: fix obtaining mac address for am3517
+Message-ID: <ad0ec6ac-2760-4a03-8cee-0d933aea98eb@lunn.ch>
+References: <20230624121211.19711-1-mans@mansr.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Subject: Re: After kernel 6.3.7 or 6.3.8 b43 driver fails
-Content-Language: en-US, de-DE
-To: Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Michael_B=c3=bcsch?=
- <m@bues.ch>, Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>, kernel test robot <lkp@intel.com>,
- Simon Horman <simon.horman@corigine.com>,
- Larry Finger <Larry.Finger@lwfinger.net>, Kalle Valo <kvalo@kernel.org>,
- sardonimous@hotmail.com
-References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
- <20230624105023.146d99e0@barney>
- <d33a248c-c7ac-43d3-b602-3c801d697922@app.fastmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-In-Reply-To: <d33a248c-c7ac-43d3-b602-3c801d697922@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1687615234;ca01182a;
-X-HE-SMSGID: 1qD3oU-0002F4-Q1
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230624121211.19711-1-mans@mansr.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 24.06.23 11:29, Arnd Bergmann wrote:
-> On Sat, Jun 24, 2023, at 10:50, Michael Büsch wrote:
->> On Sat, 24 Jun 2023 08:44:15 +0700
->> Bagas Sanjaya <bagasdotme@gmail.com> wrote:
->>>> I suspect change introduced when addressing a compiler warning
->>>> cased the error.
->>>>
->>>> https://patchwork.kernel.org/project/linux-wireless/patch/20230516183442.536589-1-arnd%40kernel.org/
->>
->> I doubt it.
->> This patch affects the device initialization code. But the crash is in
->> the transmit path.
->> Can you please double check by manually reverting the patch?
+On Sat, Jun 24, 2023 at 01:10:59PM +0100, Mans Rullgard wrote:
+> From: Jeroen Hofstee <jhofstee@victronenergy.com>
 > 
-> I'm travelling at the moment and can't easily check it, but I would
-> expect that my patch has no effect on the generated object code [...]
+> Commit b6745f6e4e63 ("drivers: net: cpsw: davinci_emac: move reading mac
+> id to common file") did not only move the code for an am3517, it also
+> added the slave parameter, resulting in an invalid (all zero) mac address
+> being returned for an am3517, since it only has a single emac
 
-Michael, Arnd, thx for the replies. To you and everyone else that looked
-into this: sorry for the trouble this caused.
+Hi Mans
 
-The reporter's guess was wrong, as the reporter meanwhile confirmed in
-the bugzilla ticket that the problem started to happen earlier.
+If there is only a single emac, why is the function being called with
+slave=1? Given the description, it seems like you are fixing the wrong
+problem.
 
-Bagas, please be a bit more careful and don't blame a specific commit
-unless it's was found by bisection, a revert through a lucky guess, a
-statement from a developer, or something like that. In cases like this
-it would have been better to sent the developers of said commit a quick
-mail along the lines of "could you imagine that this change could lead
-to the problem the reporter described". But even that might be too much
-in a case like this, as too many of such false alarms and inquiries will
-make developers start hating or ignoring regression tracking in general
-or mails from you or me – and that is something that must be avoided, as
-without help from developers regression tracking becomes a lot harder or
-impossible.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
-
-P.S.: Updating regzbot status, while at it:
-
-#regzbot introduced: v6.1..v6.2
-
-
-
-
-
+	Andrew
 
