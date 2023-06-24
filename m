@@ -1,51 +1,43 @@
-Return-Path: <netdev+bounces-13750-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88BBE73CD39
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:11:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B68FC73CD3B
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:19:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D9C31C208D9
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:11:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1AAF1C20934
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:19:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B5FDEAF1;
-	Sat, 24 Jun 2023 22:10:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 928ECEAF2;
+	Sat, 24 Jun 2023 22:19:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6795711184
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:10:39 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 42D18C433C8;
-	Sat, 24 Jun 2023 22:10:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45EF8DDDD
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:19:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 868DCC433C0;
+	Sat, 24 Jun 2023 22:19:12 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687644639;
-	bh=HWt8oRnYu87Ln4J37mjVUiNFUEhjYUmsz1tsbbm/9FQ=;
+	s=k20201202; t=1687645152;
+	bh=idJ66CRxT3yfJvKA9u94RA70y7BMoYCiaLo9F/vPj1w=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=AP5cpRleJJxVIBPpCJ76uLDgVgCP/AGaJnlKcIitMzQ/jqV7ODH2Xa3+rHcTjgiWw
-	 i7kR+s9dHvWl5t9FnQlg8YoOlYgalhCQaufFlEi/dVFFBhGV7rtw/VXQ3LXMU+LE9m
-	 X/eDmmmiMVQUYrqA52A7wo8hn3Me8u8m356GcndmGixUbgCf+QpEO2DArhhJrFt6cB
-	 WtvWXmc01AUUSEkpIz5g8t68XhbFA4gSu04WfCAx/1JsvR60WS6aTb+oBHamvj7gBN
-	 TfNJN+Y4WDxyPp95aHQfb0TAAYlbhIzIzwKZ4hc1ZUlNIZTgsC9vCj7OMaimFZzaxi
-	 e36XYhHUKSl6w==
-Date: Sat, 24 Jun 2023 15:10:37 -0700
+	b=NQoU9/Cvaljws7IscaBPy5n1X320AYW1Bv27puvgqSJkdj2QRxaXsatElti+TtcDg
+	 npesna2s1JSPGMDbAx3efWbO6G2H3iOuUcdoWZxCybiIYegR/IV6PIjkZo4ggNz8ya
+	 ddZrS6cy1uKSqWy7scWIxp7cAL2GT30isP8g+QnSzahHvytMmNal8m45JGvrNoj8Gl
+	 6Ma+iqQSuifHljv/MNCgKdrg2R9cVltuBN0hl1P+eOqGcrx1U0sjyyK7SgeqsNqbXa
+	 a/OXhUWJwFLnvhyEmyLTQNnQziwkdOeKQjqhpkqHBAtP13e4VyftTZnWyc1fLNsS/1
+	 TuplP+/J19Ohg==
+Date: Sat, 24 Jun 2023 15:19:11 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: longli@linuxonhyperv.com
-Cc: Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Ajay
- Sharma <sharmaajay@microsoft.com>, Dexuan Cui <decui@microsoft.com>, "K. Y.
- Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
- Wei Liu <wei.liu@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
- linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Long Li
- <longli@microsoft.com>, stable@vger.kernel.org
-Subject: Re: [PATCH v2] net: mana: Batch ringing RX queue doorbell on
- receiving packets
-Message-ID: <20230624151037.699c50c6@kernel.org>
-In-Reply-To: <1687450956-6407-1-git-send-email-longli@linuxonhyperv.com>
-References: <1687450956-6407-1-git-send-email-longli@linuxonhyperv.com>
+To: Nick Child <nnac123@linux.ibm.com>
+Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com
+Subject: Re: [PATCH net] ibmvnic: Do not reset dql stats on NON_FATAL err
+Message-ID: <20230624151911.7442620c@kernel.org>
+In-Reply-To: <20230622190332.29223-1-nnac123@linux.ibm.com>
+References: <20230622190332.29223-1-nnac123@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -55,43 +47,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Thu, 22 Jun 2023 09:22:36 -0700 longli@linuxonhyperv.com wrote:
-> It's inefficient to ring the doorbell page every time a WQE is posted to
-> the received queue.
-> 
-> Move the code for ringing doorbell page to where after we have posted all
-> WQEs to the receive queue during a callback from napi_poll().
-> 
-> Tests showed no regression in network latency benchmarks.
-> 
-> Cc: stable@vger.kernel.org
-> Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+On Thu, 22 Jun 2023 14:03:32 -0500 Nick Child wrote:
+> +		if (adapter->reset_reason == VNIC_RESET_NON_FATAL)
+> +			clear_bit(__QUEUE_STATE_STACK_XOFF,
+> +				  &netdev_get_tx_queue(netdev, i)->state);
 
-If this is supposed to be a fix, you need to clearly explain what the
-performance loss was, so that backporters can make an informed decision.
+Why are you trying to clear this bit?
 
->  drivers/net/ethernet/microsoft/mana/gdma_main.c |  5 ++++-
->  drivers/net/ethernet/microsoft/mana/mana_en.c   | 10 ++++++++--
->  2 files changed, 12 insertions(+), 3 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> index 8f3f78b68592..ef11d09a3655 100644
-> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-> @@ -300,8 +300,11 @@ static void mana_gd_ring_doorbell(struct gdma_context *gc, u32 db_index,
->  
->  void mana_gd_wq_ring_doorbell(struct gdma_context *gc, struct gdma_queue *queue)
->  {
-> +	/* BNIC Spec specifies that client should set 0 for rq.wqe_cnt
-> +	 * This value is not used in sq
-> +	 */
->  	mana_gd_ring_doorbell(gc, queue->gdma_dev->doorbell, queue->type,
-> -			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 1);
-> +			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 0);
->  }
+If the completions will still come the bit will be cleared (or not)
+during completion handling (netdev_tx_completed_queue() et al.)
 
-This change needs to be explained in the commit message, or should be 
-a separate patch.
+Drivers shouldn't be poking into queue state bits directly.
 -- 
 pw-bot: cr
 
