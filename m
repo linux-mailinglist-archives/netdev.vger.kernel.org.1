@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-13747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6F5873CD30
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:10:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6A7873CD31
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:10:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 25615281111
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:10:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D91372810F7
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:10:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4BC87DDDD;
-	Sat, 24 Jun 2023 22:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7ACA6DDDD;
+	Sat, 24 Jun 2023 22:10:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B62B4A953
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:10:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 086C5C433C8;
-	Sat, 24 Jun 2023 22:10:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECC0FEAFA
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:10:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BFA51C433C8;
+	Sat, 24 Jun 2023 22:10:26 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687644620;
-	bh=65d6ADRFQflcOt+dEtKU45F1wQAOLj4hjVBFonSVyOs=;
+	s=k20201202; t=1687644626;
+	bh=Af1wluoPesxzfC6tKSmwNEv1detWSwXXYbav1TrsDwA=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=G9Qu/udbCRyoAzhfwtCOCc0zRnQaAAObPoDGorArqFzj3PhuG+4/7dSO5JbyAW+bd
-	 MpJXvKX88eehnGyRbDi8WHdoxmBvYGPT1ZXpbZkY1iaNPeUNBHvNH8BSBLJXPeEjkh
-	 SqFvYAEwvBNCh4AyXnlbJ9ssmM/3HOD4M97o6c6mvEv77lFKlLQcsVUbywj81Ht/jy
-	 ELiXbyND/OVKvgdU9r8jpwkemBBkFSW6aZDMp4MeV203pqigDJiX3uHkQR7nI/BOH3
-	 2XzyVl1KJDwC1F9M0JchWqCDTHE6qqOAXiD+ndhZI37omSBGB31bRmDdNCLSTWIbGI
-	 rp8IRddmOnw2A==
+	b=mh/fzCZcwqpyIeqjker9f2jPAVerk0DNhYcqeTejx//Fd3adpYJZPYA3REXj4jw2Z
+	 e8Chl6qu+5m9z9wym14l6m3te9WoAQkPi/8qAl8jpKO3QpBfnu229OV9rrVxxCq1TG
+	 2Ns2hK/IGLSIGRigP95uS9CtJXERnm+xRIgDOMb30Alot5Xc1hYzmjdl1FFD6Kon1N
+	 bflR1fXCpkHCgsGzyc/C1KHHF5mt2Q2uJHHdjoT130t2fk+zj0TZ+5t+7YWUT5hrND
+	 dl8i1AAmylMO/ud2zhYABP0TKTEjU5lui0WrV/pAYHQRyrRLOFVaKYj+XQyphZXQMN
+	 UIt4OA4yBg3fA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id D2EBFC395F1;
-	Sat, 24 Jun 2023 22:10:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A4544C395F1;
+	Sat, 24 Jun 2023 22:10:26 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,42 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2 0/4][pull request] igc: TX timestamping fixes
+Subject: Re: [PATCH net-next v2] net: phy: broadcom: drop brcm_phy_setbits() and
+ use phy_set_bits() instead
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168764461985.18414.6171868913658722136.git-patchwork-notify@kernel.org>
-Date: Sat, 24 Jun 2023 22:10:19 +0000
-References: <20230622165244.2202786-1-anthony.l.nguyen@intel.com>
-In-Reply-To: <20230622165244.2202786-1-anthony.l.nguyen@intel.com>
-To: Tony Nguyen <anthony.l.nguyen@intel.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, netdev@vger.kernel.org, vinicius.gomes@intel.com,
- sasha.neftin@intel.com, richardcochran@gmail.com
+ <168764462666.18414.17822935967545944021.git-patchwork-notify@kernel.org>
+Date: Sat, 24 Jun 2023 22:10:26 +0000
+References: <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
+In-Reply-To: <20230622184721.24368-1-giulio.benetti@benettiengineering.com>
+To: Giulio Benetti <giulio.benetti@benettiengineering.com>
+Cc: f.fainelli@gmail.com, bcm-kernel-feedback-list@broadcom.com,
+ andrew@lunn.ch, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ simon.horman@corigine.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
-by Tony Nguyen <anthony.l.nguyen@intel.com>:
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Thu, 22 Jun 2023 09:52:40 -0700 you wrote:
-> This is the fixes part of the series intended to add support for using
-> the 4 timestamp registers present in i225/i226.
+On Thu, 22 Jun 2023 20:47:21 +0200 you wrote:
+> Linux provides phy_set_bits() helper so let's drop brcm_phy_setbits() and
+> use phy_set_bits() in its place.
 > 
-> Moving the timestamp handling to be inline with the interrupt handling
-> has the advantage of improving the TX timestamping retrieval latency,
-> here are some numbers using ntpperf:
+> Signed-off-by: Giulio Benetti <giulio.benetti@benettiengineering.com>
+> ---
+> V1->V2:
+> * fix code style and add branch net-next to subject as suggested by Simon
+>   Horman
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,v2,1/4] igc: Fix race condition in PTP tx code
-    https://git.kernel.org/netdev/net/c/9c50e2b150c8
-  - [net,v2,2/4] igc: Check if hardware TX timestamping is enabled earlier
-    https://git.kernel.org/netdev/net/c/ce58c7cc8b99
-  - [net,v2,3/4] igc: Retrieve TX timestamp during interrupt handling
-    https://git.kernel.org/netdev/net/c/afa141583d82
-  - [net,v2,4/4] igc: Work around HW bug causing missing timestamps
-    https://git.kernel.org/netdev/net/c/c789ad7cbebc
+  - [net-next,v2] net: phy: broadcom: drop brcm_phy_setbits() and use phy_set_bits() instead
+    https://git.kernel.org/netdev/net-next/c/28e219aea0b9
 
 You are awesome, thank you!
 -- 
