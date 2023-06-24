@@ -1,99 +1,58 @@
-Return-Path: <netdev+bounces-13756-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13757-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 411E373CD44
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:21:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4666673CD45
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:23:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29F241C20965
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:21:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C3D1280EFE
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:23:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78A2F11CAB;
-	Sat, 24 Jun 2023 22:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD959EAF7;
+	Sat, 24 Jun 2023 22:23:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 62E43F9E0
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id EE685C433CD;
-	Sat, 24 Jun 2023 22:20:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B072EAF3
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:23:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A3DD3C433C0;
+	Sat, 24 Jun 2023 22:23:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687645221;
-	bh=AjbhNxblEDmcYrvQoOY4V25zBqB9CQbFi35ZnsUhK8g=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=ja80yzVHpRyIlh8NqN9wvyzGPM68soNfpYdRu/VI5IZ7eKAoa0OwTTM9I93VJsheE
-	 +G7uu2WlJ66cL+aPmrBBrzNXRNvQda7JOt5Qbfij+CRHGBprPQp/Iyg5WoVPbhCC4D
-	 8QleB8E2EV+VlStUg6oX6dFxliB00k+LlIUAQtfHM8zz9AIcedRBlnTOSwzNLzS5tr
-	 0h6fGDC+lRO3rTQ+W0MzEGncSw5zSoyuQm7Mn9IP61yTVG2yBVzPlJHtpbCSN7hMhg
-	 e0XMVGSwgec/bjvsLUzmHoe63tYMAuE7g2kZMKFTm9oNlCYthrDvh4tBlVm31nYdym
-	 pNltXuDXiU34g==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CFED7C395C7;
-	Sat, 24 Jun 2023 22:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1687645424;
+	bh=gUDhl6OZLxYp39Jf11vLoHAb7USqrQ5fveZFU0IXFQ4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=OiY/d87uh/GjrvEy7X3s06YAuSKIaguyQF/EhabTjNy3nwZOFcc7mJKZH57M4tx1r
+	 DWYm2iy1brXW4aYkd839mUbM/qp8nHF0BDIDlPTpqBALUK7xtNcTw1DJNVrVPdPZjW
+	 CAGtlmwvxWmg+6KDvr2inrPX9g+2tiqZCEMyvuoU8EgsBsgVOYDe4noe1WDHYWM7Yl
+	 YAytVuw9KkcEGGN6nMdpfi3zfjn0S6xJofYmxC/+BPwQ/65m3Efc9mQiu9xhrGT32X
+	 dFpR/Qtu0eD1zX9NrwxXadc/T32o6hGQXkm7iq/zL5k80ZXsisWET45snEbstMVXn4
+	 OIpM9Dc2+j9KA==
+Date: Sat, 24 Jun 2023 15:23:42 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Lin Ma <linma@zju.edu.cn>
+Cc: krzysztof.kozlowski@linaro.org, avem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org
+Subject: Re: [PATCH v3] net: nfc: Fix use-after-free caused by
+ nfc_llcp_find_local
+Message-ID: <20230624152342.72ae073c@kernel.org>
+In-Reply-To: <20230623012030.1532546-1-linma@zju.edu.cn>
+References: <20230623012030.1532546-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH] revert "s390/net: lcs: use IS_ENABLED() for kconfig
- detection"
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168764522084.22804.1672183152551891631.git-patchwork-notify@kernel.org>
-Date: Sat, 24 Jun 2023 22:20:20 +0000
-References: <20230622155409.27311-1-rdunlap@infradead.org>
-In-Reply-To: <20230622155409.27311-1-rdunlap@infradead.org>
-To: Randy Dunlap <rdunlap@infradead.org>
-Cc: linux-kernel@vger.kernel.org, lkp@intel.com, wintera@linux.ibm.com,
- wenjia@linux.ibm.com, linux-s390@vger.kernel.org, netdev@vger.kernel.org,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
+On Fri, 23 Jun 2023 09:20:30 +0800 Lin Ma wrote:
+> +struct nfc_llcp_local *nfc_llcp_remove_local(struct nfc_dev *dev)
 
-This patch was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Thu, 22 Jun 2023 08:54:09 -0700 you wrote:
-> The referenced patch is causing build errors when ETHERNET=y and
-> FDDI=m. While we work out the preferred patch(es), revert this patch
-> to make the pain go away.
-> 
-> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-> Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
-> Reported-by: kernel test robot <lkp@intel.com>
-> Link: lore.kernel.org/r/202306202129.pl0AqK8G-lkp@intel.com
-> Cc: Alexandra Winter <wintera@linux.ibm.com>
-> Cc: Wenjia Zhang <wenjia@linux.ibm.com>
-> Cc: linux-s390@vger.kernel.org
-> Cc: netdev@vger.kernel.org
-> Cc: Heiko Carstens <hca@linux.ibm.com>
-> Cc: Vasily Gorbik <gor@linux.ibm.com>
-> Cc: Alexander Gordeev <agordeev@linux.ibm.com>
-> Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
-> Cc: Sven Schnelle <svens@linux.ibm.com>
-> Cc: David S. Miller <davem@davemloft.net>
-> Cc: Eric Dumazet <edumazet@google.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: Paolo Abeni <pabeni@redhat.com>
-> 
-> [...]
-
-Here is the summary with links:
-  - revert "s390/net: lcs: use IS_ENABLED() for kconfig detection"
-    https://git.kernel.org/netdev/net-next/c/6a11af7c21da
-
-You are awesome, thank you!
+This function needs to be static
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+pw-bot: cr
 
