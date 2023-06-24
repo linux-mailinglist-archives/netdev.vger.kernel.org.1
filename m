@@ -1,38 +1,38 @@
-Return-Path: <netdev+bounces-13752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13755-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AF33A73CD3E
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:20:24 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C3DA73CD43
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 00:21:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3EA4D28110C
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:20:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 652B528112D
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 22:21:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8167EEAF2;
-	Sat, 24 Jun 2023 22:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED43111B9;
+	Sat, 24 Jun 2023 22:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CB51F50D
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:20:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id B6658C433CA;
-	Sat, 24 Jun 2023 22:20:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 612FFF9DA
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 22:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id DF8B2C433C8;
+	Sat, 24 Jun 2023 22:20:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687645219;
-	bh=K57FsvDdDsQvc6eBxw1iMwtDiWoqnphia826r61uT3o=;
+	s=k20201202; t=1687645220;
+	bh=fUeIKoGWA1WFc8cmbNYmndj88NKP1V6FAhxZpP0ubhs=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LWwO3NiN57OSRe0PXPNoDLEGDLODcTDgVclO3tqyFra50+dzMYefFaWh3Rbud03c/
-	 gOpfDQeJP12RdvWeDdirshZPJsjdytVxvYExw5459Y3P1WQYru2QYjt/ujKxzWrOIM
-	 o+lA6MlPNO9qdb7wvNkfqNc4isEoWCP4XkN99bzO7kBqkAEIkYE4JjPHOBJJyDOJGG
-	 yjG7igaqr/UXYWmtLlPDED+F+GxffcI/ox4Rpj3MLmR1EbNbadqg5tEDhCgnHreSnB
-	 2R8BPvr0kR6ysI+B8eOE0HVdZftW6wHRO6UMSw5KYH7UbkxSPLnjFDOVBlu9bxc5+k
-	 Ujs5R4IygvAXA==
+	b=rmE00fpzeRkeHswcCShkOQD4rG+6jWrvLig6JJbwRoTacZpFsM+fsAMLJGdVPHUnh
+	 n5UumTctjgWw6XpVzSEENy2jdy3Ri+2eUtWjdYRTq/nB2uLlqkp3S6+C4/GQ0QoMab
+	 2FDWfUB3Mbu9Y/mhpaacCU689H+8WNhqss1n9tC7BxdXYI1CcOTRE783HjdGbNl7os
+	 f6aNV7GWWJxfALADGeBzKDMtdt8LEi1l2PIIBKtYDLBcDrIInH0v2j4DCDsMfONPQY
+	 Kehx+7OT2cdjj07RcyZy1ULDvejlHtKfYtSDOPROl+7GeAQh+asTwV4/wDfvWAdKbB
+	 rrkcobR+QgoKg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 88599C43157;
-	Sat, 24 Jun 2023 22:20:19 +0000 (UTC)
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C6730E26D3E;
+	Sat, 24 Jun 2023 22:20:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -41,36 +41,44 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] selftests: rtnetlink: remove netdevsim device after ipsec
- offload test
+Subject: Re: [PATCH net-next 0/3][pull request] Intel Wired LAN Driver Updates
+ 2023-06-22 (iavf)
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168764521955.22804.7450435784531069720.git-patchwork-notify@kernel.org>
-Date: Sat, 24 Jun 2023 22:20:19 +0000
-References: <e1cb94f4f82f4eca4a444feec4488a1323396357.1687466906.git.sd@queasysnail.net>
-In-Reply-To: <e1cb94f4f82f4eca4a444feec4488a1323396357.1687466906.git.sd@queasysnail.net>
-To: Sabrina Dubroca <sd@queasysnail.net>
-Cc: netdev@vger.kernel.org, jiri@resnulli.us, shuah@kernel.org,
- linux-kselftest@vger.kernel.org
+ <168764522080.22804.2741090372378824006.git-patchwork-notify@kernel.org>
+Date: Sat, 24 Jun 2023 22:20:20 +0000
+References: <20230622165914.2203081-1-anthony.l.nguyen@intel.com>
+In-Reply-To: <20230622165914.2203081-1-anthony.l.nguyen@intel.com>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, netdev@vger.kernel.org
 
 Hello:
 
-This patch was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+This series was applied to netdev/net-next.git (main)
+by Tony Nguyen <anthony.l.nguyen@intel.com>:
 
-On Thu, 22 Jun 2023 23:03:34 +0200 you wrote:
-> On systems where netdevsim is built-in or loaded before the test
-> starts, kci_test_ipsec_offload doesn't remove the netdevsim device it
-> created during the test.
+On Thu, 22 Jun 2023 09:59:11 -0700 you wrote:
+> This series contains updates to iavf driver only.
 > 
-> Fixes: e05b2d141fef ("netdevsim: move netdev creation/destruction to dev probe")
-> Signed-off-by: Sabrina Dubroca <sd@queasysnail.net>
+> Przemek defers removing, previous, primary MAC address until after
+> getting result of adding its replacement. He also does some cleanup by
+> removing unused functions and making applicable functions static.
+> 
+> The following are changes since commit 98e95872f2b818c74872d073eaa4c937579d41fc:
+>   Merge branch 'mptcp-expose-more-info-and-small-improvements'
+> and are available in the git repository at:
+>   git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/next-queue 40GbE
 > 
 > [...]
 
 Here is the summary with links:
-  - [net] selftests: rtnetlink: remove netdevsim device after ipsec offload test
-    https://git.kernel.org/netdev/net/c/5f789f103671
+  - [net-next,1/3] iavf: fix err handling for MAC replace
+    https://git.kernel.org/netdev/net-next/c/61f723e6f3d2
+  - [net-next,2/3] iavf: remove some unused functions and pointless wrappers
+    https://git.kernel.org/netdev/net-next/c/b855bcdeb897
+  - [net-next,3/3] iavf: make functions static where possible
+    https://git.kernel.org/netdev/net-next/c/a4aadf0f5905
 
 You are awesome, thank you!
 -- 
