@@ -1,144 +1,101 @@
-Return-Path: <netdev+bounces-13698-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13705-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AA0B973C98A
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 10:28:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CF9973CA54
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 11:55:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63637282058
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 08:28:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4D7CA1C20AC1
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 09:55:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A83C211A;
-	Sat, 24 Jun 2023 08:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DF77441E;
+	Sat, 24 Jun 2023 09:55:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 896814409
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 08:28:55 +0000 (UTC)
-Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1BF104C12
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:28:22 -0700 (PDT)
-Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-51d804c7d14so279366a12.3
-        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:28:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687595293; x=1690187293;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=/GIkG+tRxlPhRtm7YOpXeJRcJeLkXqLt09OeZ1Nh1Q4=;
-        b=DkiglpMjfjZCyxhWBqFcrR4RkmF6xYeIJhZq2bOE8/tpFTboyhHRBzqMweLVJwZdse
-         Po5v9VUAlVpzETIWlBeTSQ/MOOvNBADP10/6rUf8cTK/xsSxgq1hO5ZM9vc4292Kwd83
-         VTdWBdvUwwEOS+VqFVyBMZUM6hlNddUzTKFQc1w5NukZTFWumAXPj6zYaXxUMWoU/DSy
-         XQel7bucUiZ+Ngsaptd6xqTY94Y066kVJS9WhWDC0jZ5rzUsfBkGryZ36kc7qmVLWyeh
-         wthERO5PoF7uGlAF2OMarb6r+LyNXoKbb+5cj2mZ36KhHU2OJG0uneADkVzgtHgvzaZM
-         aiVA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687595293; x=1690187293;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/GIkG+tRxlPhRtm7YOpXeJRcJeLkXqLt09OeZ1Nh1Q4=;
-        b=AR8/E1rTHYKEPoXN3Hupr79MP8bCPXHoR+d2dfNbBDxQjgUr/bzavdWz3OZJ+CFL3k
-         N5Sul3JB8n1ZfVmMSETG8IhsxXp+kzii9wReodClo0hd2uOWBSHlffEwwf9HbtScO30E
-         2ubhPUSBlZajAT/rQIVWjbliR1KukC5Zt+KynN/Yduoytcj4NwuVo2XyMcDxrx/n9Q6M
-         1qQzBqAJhQLbw9UJFH3RzfJI8h26DE+PgO8fplMlA+TzRONH/SR+Mbi9VgiykBc+HE9v
-         O+vc2hOZCwFvj1DOhoA4FQLMW/ytYC6hgpf4fNZ3cb5GvyK2tWS5plpG8aa1+GJQo8yw
-         Lhnw==
-X-Gm-Message-State: AC+VfDw0vY9kaJkBNjI3GW/NPPmiRsB1F5LS9y/44DGejqQdFz6RYiuv
-	RsIANtXJTPJ8scYbnq23SaGJbQ==
-X-Google-Smtp-Source: ACHHUZ4ujAlY65iLeyuRh50Ps6Pp7ng1jowk6gt0zzaeZKnGL1gJBg6GDgqsvIKWUupAOCVYBEqBCQ==
-X-Received: by 2002:a17:907:3e8e:b0:987:88eb:2416 with SMTP id hs14-20020a1709073e8e00b0098788eb2416mr19943130ejc.61.1687595293178;
-        Sat, 24 Jun 2023 01:28:13 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id kq2-20020a170906abc200b009887bb956e0sm620186ejb.103.2023.06.24.01.28.07
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 01:28:12 -0700 (PDT)
-Message-ID: <36a6ba38-d01e-96ad-c89f-7e2c860e0a88@linaro.org>
-Date: Sat, 24 Jun 2023 10:28:06 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51C6B211A
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 09:55:31 +0000 (UTC)
+X-Greylist: delayed 1799 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 24 Jun 2023 02:55:27 PDT
+Received: from bues.ch (bues.ch [IPv6:2a01:138:9005::1:4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DAD7B2697;
+	Sat, 24 Jun 2023 02:55:27 -0700 (PDT)
+Received: by bues.ch with esmtpsa (Exim 4.94.2)
+	(envelope-from <m@bues.ch>)
+	id 1qCyyj-000E9e-Oc; Sat, 24 Jun 2023 10:50:44 +0200
+Date: Sat, 24 Jun 2023 10:50:23 +0200
+From: Michael =?UTF-8?B?QsO8c2No?= <m@bues.ch>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux
+ Regressions <regressions@lists.linux.dev>, Linux Wireless
+ <linux-wireless@vger.kernel.org>, Linux Networking
+ <netdev@vger.kernel.org>, Arnd Bergmann <arnd@arndb.de>, kernel test robot
+ <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>, Larry Finger
+ <Larry.Finger@lwfinger.net>, Kalle Valo <kvalo@kernel.org>,
+ sardonimous@hotmail.com
+Subject: Re: After kernel 6.3.7 or 6.3.8 b43 driver fails
+Message-ID: <20230624105023.146d99e0@barney>
+In-Reply-To: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
+References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
+X-Mailer: Claws Mail 4.1.1 (GTK 3.24.37; x86_64-pc-linux-gnu)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 00/45] Add support for sam9x7 SoC family
-Content-Language: en-US
-To: Varshini Rajendran <varshini.rajendran@microchip.com>,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- nicolas.ferre@microchip.com, alexandre.belloni@bootlin.com,
- claudiu.beznea@microchip.com, mturquette@baylibre.com, sboyd@kernel.org,
- herbert@gondor.apana.org.au, davem@davemloft.net, vkoul@kernel.org,
- tglx@linutronix.de, maz@kernel.org, lee@kernel.org, ulf.hansson@linaro.org,
- tudor.ambarus@linaro.org, miquel.raynal@bootlin.com, richard@nod.at,
- vigneshr@ti.com, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- linus.walleij@linaro.org, p.zabel@pengutronix.de, olivia@selenic.com,
- a.zummo@towertech.it, radu_nicolae.pirea@upb.ro, richard.genoud@gmail.com,
- gregkh@linuxfoundation.org, lgirdwood@gmail.com, broonie@kernel.org,
- wim@linux-watchdog.org, linux@roeck-us.net, arnd@arndb.de, olof@lixom.net,
- soc@kernel.org, linux@armlinux.org.uk, sre@kernel.org,
- jerry.ray@microchip.com, horatiu.vultur@microchip.com,
- durai.manickamkr@microchip.com, andrew@lunn.ch, alain.volmat@foss.st.com,
- neil.armstrong@linaro.org, mihai.sain@microchip.com,
- eugen.hristev@collabora.com, devicetree@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-clk@vger.kernel.org, linux-crypto@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-mmc@vger.kernel.org, linux-mtd@lists.infradead.org,
- netdev@vger.kernel.org, linux-gpio@vger.kernel.org,
- linux-rtc@vger.kernel.org, linux-spi@vger.kernel.org,
- linux-serial@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-usb@vger.kernel.org, linux-watchdog@vger.kernel.org,
- linux-pm@vger.kernel.org
-Cc: Hari.PrasathGE@microchip.com, cristian.birsan@microchip.com,
- balamanikandan.gunasundar@microchip.com, manikandan.m@microchip.com,
- dharma.b@microchip.com, nayabbasha.sayed@microchip.com,
- balakrishnan.s@microchip.com
-References: <20230623203056.689705-1-varshini.rajendran@microchip.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230623203056.689705-1-varshini.rajendran@microchip.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/Z8OpuQ9cy1/jd8BhC4DCwVQ";
+ protocol="application/pgp-signature"; micalg=pgp-sha512
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 23/06/2023 22:30, Varshini Rajendran wrote:
-> This patch series adds support for the new SoC family - sam9x7.
->  - The device tree, configs and drivers are added
->  - Clock driver for sam9x7 is added
->  - Support for basic peripherals is added
->  - Target board SAM9X75 Curiosity is added
-> 
->  Changes in v2:
->  --------------
-> 
->  - Added sam9x7 specific compatibles in DT with fallbacks
->  - Documented all the newly added DT compatible strings
->  - Added device tree for the target board sam9x75 curiosity and
->    documented the same in the DT bindings documentation
->  - Removed the dt nodes that are not supported at the moment
->  - Removed the configs added by previous version that are not supported
->    at the moment
->  - Fixed all the corrections in the commit message
->  - Changed all the instances of copyright year to 2023
->  - Added sam9x7 flag in PIT64B configuration
->  - Moved macro definitions to header file
->  - Added another divider in mck characteristics in the pmc driver
->  - Fixed the memory leak in the pmc driver
->  - Dropped patches that are no longer needed
->  - Picked up Acked-by and Reviewed-by tags
+--Sig_/Z8OpuQ9cy1/jd8BhC4DCwVQ
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
 
-Where did you pick them up? Can you point me to the patches?
+On Sat, 24 Jun 2023 08:44:15 +0700
+Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+> > I suspect change introduced when addressing a compiler warning
+> > cased the error.
+> >=20
+> > https://patchwork.kernel.org/project/linux-wireless/patch/2023051618344=
+2.536589-1-arnd%40kernel.org/
 
-Best regards,
-Krzysztof
 
+I doubt it.
+This patch affects the device initialization code. But the crash is in
+the transmit path.
+Can you please double check by manually reverting the patch?
+
+--=20
+Michael B=C3=BCsch
+https://bues.ch/
+
+--Sig_/Z8OpuQ9cy1/jd8BhC4DCwVQ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQIzBAEBCgAdFiEEihRzkKVZOnT2ipsS9TK+HZCNiw4FAmSWrk8ACgkQ9TK+HZCN
+iw7o+g/+L1zZKck52gaqBWL0RCy/d0c3DsVDsSvj4Cx4Ueu03xpyJAPUhGrzZ5ul
+ZGNXu1p1GpfG81lMm/ONuUQgUo8WwXKvVQs8MJkmNAHX+cwzCZ3McyB1JQWrRhV6
+zJVcIXl+RmwRr+EtzH5UWuha0VnXj2ygYWmafGQg7BSK7NvzDOWwzqYj3iZdTHlT
+GbnFeM+lurbH9rbgSZsC9bXMvTxwABZREuzxzfakF3wATGUFuYoQyoq62/wey7gV
+jNkX9PiD/sciVWsLvEri7B+wPfXDQRbj5Og2D07peJ+wZmC1AaR+To5zbAaAEcVh
+jcM05dtnHIbFnoLq4CIrmJljNQHRzxsJjdhPflTcWkm+1fVJ2zucZQyWHs6rZ5ru
+FjcOjfeK6v9gs0vLF+zGjpuPhIHSJqeRjgPWsRRil4ZbYRbG5WThLvs5AOMwDBRV
+6+98COLGkrLqLrkc9iZCbONCW6RnDTdBuVNjaAOi+RVlwTCUM4CdO7APgAjdEd2S
+wbfNQ9j2M8ox+pt5byr8c3/xFQOmOG4XoDRYgPai+k7apnAYX1KN09lWo45dxMQp
+Zj9HKebrBj+C+v4AYrhDYp6v/wlNi/AZ7GDfI3cXxIvgWWNt3D7tQ21zT6jl9B1S
+OOKtUdc55au+byw60JSnN+qFm6za7beCoxuDuQRHLSbgMHQjeok=
+=LxCG
+-----END PGP SIGNATURE-----
+
+--Sig_/Z8OpuQ9cy1/jd8BhC4DCwVQ--
 
