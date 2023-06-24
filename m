@@ -1,335 +1,126 @@
-Return-Path: <netdev+bounces-13661-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93FB173C6AD
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 06:02:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C70E73C72A
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 08:49:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D497281F21
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 04:02:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BF7E0281F50
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 06:49:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1276C638;
-	Sat, 24 Jun 2023 04:02:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA9157FD;
+	Sat, 24 Jun 2023 06:49:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 061FF7F
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 04:02:41 +0000 (UTC)
-Received: from mail-vs1-xe34.google.com (mail-vs1-xe34.google.com [IPv6:2607:f8b0:4864:20::e34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA591E5D;
-	Fri, 23 Jun 2023 21:02:39 -0700 (PDT)
-Received: by mail-vs1-xe34.google.com with SMTP id ada2fe7eead31-440b66adc81so497594137.1;
-        Fri, 23 Jun 2023 21:02:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687579359; x=1690171359;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PCuh9aSXjoK8r6/sTg/D9QolCTlKGcoEEAFlcSDn2ec=;
-        b=oor0mh/5vd4dlbNE/ceGHvKqW1/K/usscKJafysxBp0tZfDdnty1iJFYvDJTKDewzA
-         KM5/9GpiMpdSpk0cTzc7FSkAhVt52BkL4JiSZgtgwqBNuhjrQnyM1G+52btiFT+GtXJC
-         FJCW1EVLeFFw4zyEH9QUExqsiTSvSrTP93IyfwVrGTKVgsXfwKl3HzFatm6OL36kQYZd
-         OEWZlQMsnvkLNzawFOFaDMgkeEeDJZWvbpCeUstUde5trH59QT42ueb3tbwQpQntAnn0
-         XQ9JKwCDpgTdlgbRfHYYcQWOzdx9Lo1o13gByosoLZyTN1S6N9NRTkWVa3IQmUd5L3X8
-         SYnQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687579359; x=1690171359;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PCuh9aSXjoK8r6/sTg/D9QolCTlKGcoEEAFlcSDn2ec=;
-        b=hb4Rhtjt8oF1CQXdshpr6+hoeMjFk+axC8O+14isH1oGa2kXdFYEGytDdNOd4JxzE2
-         qu/6/Nt0L62kDmNkgKkxcIzZSWdzvQy+fcmKn/7LBGajbEY8XcyaLcIKhkrkTKlOjmEH
-         Oe+DR7XBwFNuytY8sro71/fBHN1sI7JllhV4D7Jn5Gf15ZaBY3eHO4DYTVCv7IPwMYJl
-         WKlmlS9HiErNNwqdz6H8nu9V78+4B/hoQrHnGCQvJdSxPvRzZlO1XcUcc7zuX+Qz6U4w
-         tadr+L9WJKMXc7eYrzguuVvMnq1cLTdgtNrlarG4PdKNqpN+8TUWQTWnNI+xuRqkr77Y
-         DkPw==
-X-Gm-Message-State: AC+VfDxchKWCFqr+lBNIXzYbCmYjwq+h2hZhzcF6WgVZGdMyzsB1GrzM
-	uWLIqyQkLIbBmhRTmQL/A6GWToJHWEM6cGavOlg=
-X-Google-Smtp-Source: ACHHUZ59y85cCOIjhzUCmisxmaFufaM/RI+H21zBNu45OBi6SS6CoT7usIN8Ff+AcfBVhQUd1LaT9J4+a0Qd6jor2LU=
-X-Received: by 2002:a67:de81:0:b0:43f:4714:a03b with SMTP id
- r1-20020a67de81000000b0043f4714a03bmr12195580vsk.17.1687579358722; Fri, 23
- Jun 2023 21:02:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93F95360;
+	Sat, 24 Jun 2023 06:49:14 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 479462710;
+	Fri, 23 Jun 2023 23:49:12 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qp4TH5bdMz4f3l83;
+	Sat, 24 Jun 2023 14:49:07 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP2 (Coremail) with SMTP id Syh0CgDHp9XhkZZkMLdXMQ--.9045S2;
+	Sat, 24 Jun 2023 14:49:08 +0800 (CST)
+Subject: Re: [PATCH v2 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
+ similar to kfree_rcu().
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, daniel@iogearbox.net,
+ andrii@kernel.org, void@manifault.com, paulmck@kernel.org
+Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+ bpf@vger.kernel.org, kernel-team@fb.com
+References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
+ <20230624031333.96597-13-alexei.starovoitov@gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <8f2d98bb-51b8-b61f-1f6d-59410befc55e@huaweicloud.com>
+Date: Sat, 24 Jun 2023 14:49:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230621191302.1405623-1-paweldembicki@gmail.com> <ZJQ2yBX16gAg+n0L@shell.armlinux.org.uk>
-In-Reply-To: <ZJQ2yBX16gAg+n0L@shell.armlinux.org.uk>
-From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
-Date: Sat, 24 Jun 2023 06:02:27 +0200
-Message-ID: <CAJN1KkzOZ-aZ8JGL5fyQUnOuFkBDfONVLKP3Xe20HYtp7Not0g@mail.gmail.com>
-Subject: Re: [PATCH net-next 1/6] net: dsa: vsc73xx: convert to PHYLINK
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: netdev@vger.kernel.org, linus.walleij@linaro.org, 
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>, 
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230624031333.96597-13-alexei.starovoitov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:Syh0CgDHp9XhkZZkMLdXMQ--.9045S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7WFWUGF1rZF1UAr1fuF4kWFg_yoW8WF43pF
+	4xGryUGry8AF4Iyr1UtF15ArZ7Zw45X347Gay8JF9xtr15Zrn0qF4Uuryjgr93Jw4kC3y7
+	Jr1qgr1xur40vrDanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
+	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
+	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
+	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
+	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
+	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
+	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
+	CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rW3Jr0E3s1lIxAIcVC2z280aVAF
+	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
+	7IU1zuWJUUUUU==
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-czw., 22 cze 2023 o 13:55 Russell King (Oracle)
-<linux@armlinux.org.uk> napisa=C5=82(a):
->
-> On Wed, Jun 21, 2023 at 09:12:56PM +0200, Pawel Dembicki wrote:
-> > +     /* This driver does not make use of the speed, duplex, pause or t=
-he
-> > +      * advertisement in its mac_config, so it is safe to mark this dr=
-iver
-> > +      * as non-legacy.
-> > +      */
-> > +     config->legacy_pre_march2020 =3D false;
->
-> Great stuff, thanks!
->
-> > +static void vsc73xx_phylink_mac_config(struct dsa_switch *ds, int port=
-,
-> > +                                    unsigned int mode,
-> > +                                    const struct phylink_link_state *s=
-tate)
-> > +{
-> > +     struct vsc73xx *vsc =3D ds->priv;
->
-> Nit: normally have a blank line between function variable declarations
-> and the rest of the function body.
->
-> >       /* Special handling of the CPU-facing port */
-> >       if (port =3D=3D CPU_PORT) {
-> >               /* Other ports are already initialized but not this one *=
-/
-> > @@ -775,104 +803,92 @@ static void vsc73xx_adjust_link(struct dsa_switc=
-h *ds, int port,
-> >                             VSC73XX_ADVPORTM_ENA_GTX |
-> >                             VSC73XX_ADVPORTM_DDR_MODE);
-> >       }
-> > +}
-> >
-> > -     /* This is the MAC confiuration that always need to happen
-> > -      * after a PHY or the CPU port comes up or down.
-> > -      */
-> > -     if (!phydev->link) {
-> > -             int maxloop =3D 10;
-> > +static void vsc73xx_phylink_mac_link_down(struct dsa_switch *ds, int p=
-ort,
-> > +                                       unsigned int mode,
-> > +                                       phy_interface_t interface)
-> > +{
-> > +     struct vsc73xx *vsc =3D ds->priv;
-> > +     u32 val;
-> >
-> > -             dev_dbg(vsc->dev, "port %d: went down\n",
-> > -                     port);
-> > +     int maxloop =3D VSC73XX_TABLE_ATTEMPTS;
->
-> Reverse christmas-tree for variable declarations, and there shouldn't
-> be a blank line between them. In any case, I don't think you need
-> "maxloop" if you adopt my suggestion below.
->
-> >
-> > -             /* Disable RX on this port */
-> > -             vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> > -                                 VSC73XX_MAC_CFG,
-> > -                                 VSC73XX_MAC_CFG_RX_EN, 0);
-> > +     dev_dbg(vsc->dev, "port %d: went down\n",
-> > +             port);
-> >
-> > -             /* Discard packets */
-> > -             vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> > -                                 VSC73XX_ARBDISC, BIT(port), BIT(port)=
-);
-> > +     /* Disable RX on this port */
-> > +     vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
-> > +                         VSC73XX_MAC_CFG,
-> > +                         VSC73XX_MAC_CFG_RX_EN, 0);
-> > +
-> > +     /* Discard packets */
-> > +     vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> > +                         VSC73XX_ARBDISC, BIT(port), BIT(port));
-> >
-> > -             /* Wait until queue is empty */
-> > +     /* Wait until queue is empty */
-> > +     vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> > +                  VSC73XX_ARBEMPTY, &val);
-> > +     while (!(val & BIT(port))) {
-> > +             msleep(1);
-> >               vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> >                            VSC73XX_ARBEMPTY, &val);
-> > -             while (!(val & BIT(port))) {
-> > -                     msleep(1);
-> > -                     vsc73xx_read(vsc, VSC73XX_BLOCK_ARBITER, 0,
-> > -                                  VSC73XX_ARBEMPTY, &val);
-> > -                     if (--maxloop =3D=3D 0) {
-> > -                             dev_err(vsc->dev,
-> > -                                     "timeout waiting for block arbite=
-r\n");
-> > -                             /* Continue anyway */
-> > -                             break;
-> > -                     }
-> > +             if (--maxloop =3D=3D 0) {
-> > +                     dev_err(vsc->dev,
-> > +                             "timeout waiting for block arbiter\n");
-> > +                     /* Continue anyway */
-> > +                     break;
-> >               }
-> > +     }
->
-> I know you're only moving this code, but I think it would be good to
-> _first_ have a patch that fixes this polling function:
->
->         int ret, err;
-> ...
->                 ret =3D read_poll_timeout(vsc73xx_read, err,
->                                         err < 0 || (val & BIT(port)),
->                                         1000, 10000, false,
->                                         vsc, VSC73XX_BLOCK_ARBITER, 0,
->                                         VSC73XX_ARBEMPTY, &val);
->                 if (ret !=3D 0)
->                         dev_err(vsc->dev,
->                                 "timeout waiting for block arbiter\n");
->                 else if (err < 0)
->                         dev_err(vsc->dev,
->                                 "error reading arbiter\n");
->
-> This avoids the issue that on the last iteration, the code reads the
-> register, test it, find the condition that's being waiting for is
-> false, _then_ waits and end up printing the error message - that last
-> wait is rather useless, and as the arbiter state isn't checked after
-> waiting, it could be that we had success during the last wait.
->
+Hi,
 
-Thank you for the tips. I will prepare additional commit in v2 series.
+On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
+> From: Alexei Starovoitov <ast@kernel.org>
+>
+SNIP
+>  
+> +static void __free_by_rcu(struct rcu_head *head)
+> +{
+> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
+> +	struct bpf_mem_cache *tgt = c->tgt;
+> +	struct llist_node *llnode;
+> +
+> +	if (unlikely(READ_ONCE(c->draining)))
+> +		goto out;
+> +
+> +	llnode = llist_del_all(&c->waiting_for_gp);
+> +	if (!llnode)
+> +		goto out;
+> +
+> +	if (llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace))
+> +		tgt->free_by_rcu_ttrace_tail = c->waiting_for_gp_tail;
+Got a null-ptr dereference oops when running multiple test_maps and
+htab-mem benchmark after hacking htab to use bpf_mem_cache_free_rcu().
+And I think it happened as follow:
 
-> > +static void vsc73xx_phylink_mac_link_up(struct dsa_switch *ds, int por=
-t,
-> > +                                     unsigned int mode,
-> > +                                     phy_interface_t interface,
-> > +                                     struct phy_device *phydev,
-> > +                                     int speed, int duplex,
-> > +                                     bool tx_pause, bool rx_pause)
-> > +{
-> > +     struct vsc73xx *vsc =3D ds->priv;
-> > +     u32 val;
-> >
-> > +     switch (speed) {
-> > +     case SPEED_1000:
-> >               /* Set up default for internal port or external RGMII */
-> > -             if (phydev->interface =3D=3D PHY_INTERFACE_MODE_RGMII)
-> > +             if (interface =3D=3D PHY_INTERFACE_MODE_RGMII)
-> >                       val =3D VSC73XX_MAC_CFG_1000M_F_RGMII;
-> >               else
-> >                       val =3D VSC73XX_MAC_CFG_1000M_F_PHY;
-> > -             vsc73xx_adjust_enable_port(vsc, port, phydev, val);
-> > -     } else if (phydev->speed =3D=3D SPEED_100) {
-> > -             if (phydev->duplex =3D=3D DUPLEX_FULL) {
-> > -                     val =3D VSC73XX_MAC_CFG_100_10M_F_PHY;
-> > -                     dev_dbg(vsc->dev,
-> > -                             "port %d: 100 Mbit full duplex mode\n",
-> > -                             port);
-> > -             } else {
-> > -                     val =3D VSC73XX_MAC_CFG_100_10M_H_PHY;
-> > -                     dev_dbg(vsc->dev,
-> > -                             "port %d: 100 Mbit half duplex mode\n",
-> > -                             port);
-> > -             }
-> > -             vsc73xx_adjust_enable_port(vsc, port, phydev, val);
-> > -     } else if (phydev->speed =3D=3D SPEED_10) {
-> > -             if (phydev->duplex =3D=3D DUPLEX_FULL) {
-> > +             break;
-> > +     case SPEED_100:
-> > +     case SPEED_10:
-> > +             if (duplex =3D=3D DUPLEX_FULL)
-> >                       val =3D VSC73XX_MAC_CFG_100_10M_F_PHY;
-> > -                     dev_dbg(vsc->dev,
-> > -                             "port %d: 10 Mbit full duplex mode\n",
-> > -                             port);
-> > -             } else {
-> > +             else
-> >                       val =3D VSC73XX_MAC_CFG_100_10M_H_PHY;
-> > -                     dev_dbg(vsc->dev,
-> > -                             "port %d: 10 Mbit half duplex mode\n",
-> > -                             port);
-> > -             }
-> > -             vsc73xx_adjust_enable_port(vsc, port, phydev, val);
-> > -     } else {
-> > -             dev_err(vsc->dev,
-> > -                     "could not adjust link: unknown speed\n");
-> > +             break;
-> >       }
->
-> Do the dev_dbg() add anything useful over what phylink prints when the
-> link comes up?
->
-> I don't think moving to a switch() statement for this is a good idea.
-> Given that "val" may be uninitialised, I suspect the following may be
-> a better solution:
->
->         if (speed =3D=3D SPEED_1000 || speed =3D=3D SPEED_100 || speed =
-=3D=3D SPEED_10) {
->                 if (speed =3D=3D SPEED_1000) {
->                         ...
->                 } else {
->                         ...
->                 }
->
->                 ... set VSC73XX_BLOCK_ANALYZER and call
->                 vsc73xx_adjust_enable_port ...
->         }
->
-> However, looking at the definitions of the various macros, it seems we
-> can do a little better by not using the VSC73XX_MAC_CFG_*M_[FH]_*
-> definitions:
->
->                 if (speed =3D=3D SPEED_1000) {
->                         val =3D VSC73XX_MAC_CFG_GIGA_MODE |
->                               VSC73XX_MAC_CFG_TX_IPG_1000M;
->
->                         if (interface =3D=3D PHY_INTERFACE_MODE_RGMII)
->                                 val |=3D VSC73XX_MAC_CFG_CLK_SEL_1000M;
->                         else
->                                 val |=3D VSC73XX_MAC_CFG_CLK_SEL_EXT;
->                 } else {
->                         val =3D VSC73XX_MAC_CFG_TX_IPG_100_10M |
->                               VSC73XX_MAC_CFG_CLK_SEL_EXT;
->                 }
->
->                 if (duplex =3D=3D DUPLEX_FULL)
->                         val |=3D VSC73XX_MAC_CFG_FDX;
->
-> Now, this reveals a question: when operating in RGMII mode, why do we
-> need VSC73XX_MAC_CFG_CLK_SEL_1000M for 1G, and
-> VSC73XX_MAC_CFG_CLK_SEL_EXT for 10M and 100M, whereas "PHY" mode always
-> uses CLK_SEL_EXT ?
->
+// c->tgt
+P1: __free_by_rcu()
+        // c->tgt is the same as P1
+        P2: __free_by_rcu()
 
-VSC73XX_MAC_CFG_CLK_SEL_EXT should be used always when phy is used, no
-matter what speed is. VSC73XX_MAC_CFG_CLK_SEL_1000M in RGMII mode. It
-can be even more simplified:
+// return true
+P1: llist_add_batch(&tgt->free_by_rcu_ttrace)
+        // return false
+        P2: llist_add_batch(&tgt->free_by_rcu_ttrace)
+        P2: do_call_rcu_ttrace
+        // return false
+        P2: xchg(tgt->call_rcu_ttrace_in_progress, 1)
+        // llnode is not NULL
+        P2: llnode = llist_del_all(&c->free_by_rcu_ttrace)
+        // BAD: c->free_by_rcu_ttrace_tail is NULL, so oops
+        P2: __llist_add_batch(llnode, c->free_by_rcu_ttrace_tail)
 
-if (speed =3D=3D SPEED_1000)
-val =3D VSC73XX_MAC_CFG_GIGA_MODE | VSC73XX_MAC_CFG_TX_IPG_1000M;
-else
-val =3D VSC73XX_MAC_CFG_TX_IPG_100_10M;
+P1: tgt->free_by_rcu_ttrace_tail = X   
 
-if (interface =3D=3D PHY_INTERFACE_MODE_RGMII)
-val |=3D VSC73XX_MAC_CFG_CLK_SEL_1000M;
-else
-val |=3D VSC73XX_MAC_CFG_CLK_SEL_EXT;
+I don't have a good fix for the problem except adding a spin-lock for
+free_by_rcu_ttrace and free_by_rcu_ttrace_tail.
 
-if (duplex =3D=3D DUPLEX_FULL)
-val |=3D VSC73XX_MAC_CFG_FDX;
-
---
-Pawel Dembicki
 
