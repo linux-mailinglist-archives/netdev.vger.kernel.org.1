@@ -1,98 +1,171 @@
-Return-Path: <netdev+bounces-13718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13719-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF0B973CB82
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 17:02:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4CB073CB9A
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 17:39:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D29528121F
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 15:02:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 029301C2094C
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 15:39:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BD89B5672;
-	Sat, 24 Jun 2023 15:02:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A46C55695;
+	Sat, 24 Jun 2023 15:39:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF0295668
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 15:02:09 +0000 (UTC)
-Received: from unicorn.mansr.com (unicorn.mansr.com [IPv6:2001:8b0:ca0d:1::2])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FF7E10DB;
-	Sat, 24 Jun 2023 08:02:08 -0700 (PDT)
-Received: from raven.mansr.com (raven.mansr.com [IPv6:2001:8b0:ca0d:1::3])
-	by unicorn.mansr.com (Postfix) with ESMTPS id 1FD1D15360;
-	Sat, 24 Jun 2023 16:02:07 +0100 (BST)
-Received: by raven.mansr.com (Postfix, from userid 51770)
-	id 1230F219FD1; Sat, 24 Jun 2023 16:02:07 +0100 (BST)
-From: =?iso-8859-1?Q?M=E5ns_Rullg=E5rd?= <mans@mansr.com>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jeroen Hofstee
- <jhofstee@victronenergy.com>, Tony Lindgren <tony@atomide.com>,
- netdev@vger.kernel.org, Mugunthan V N <mugunthanvnm@ti.com>, Grygorii
- Strashko <grygorii.strashko@ti.com>, "open list:TI ETHERNET SWITCH DRIVER
- (CPSW)" <linux-omap@vger.kernel.org>, open list
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH v2] net: cpsw: fix obtaining mac address for am3517
-References: <1477668756-2651-1-git-send-email-jhofstee@victronenergy.com>
-	<20161028155213.2t3nwwe3lqaynaer@atomide.com>
-	<d8ad5cab-5183-cddf-fa9a-4e7b9b8c9377@victronenergy.com>
-	<20161028181914.mskebckucukzhxhz@atomide.com>
-	<yw1x7cru445g.fsf@mansr.com> <ZJX9FBBvOTv10IO4@corigine.com>
-	<de546232-0638-318a-535f-169184933a20@victronenergy.com>
-	<675a346b-faed-4e86-87e7-b332da540055@lunn.ch>
-	<ZJcD4sqqzZCq7Fww@corigine.com>
-Date: Sat, 24 Jun 2023 16:02:07 +0100
-In-Reply-To: <ZJcD4sqqzZCq7Fww@corigine.com> (Simon Horman's message of "Sat,
-	24 Jun 2023 16:55:30 +0200")
-Message-ID: <yw1xttuw3nv4.fsf@mansr.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 943E120F0
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 15:39:34 +0000 (UTC)
+Received: from mail-pf1-x444.google.com (mail-pf1-x444.google.com [IPv6:2607:f8b0:4864:20::444])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1D2519B7;
+	Sat, 24 Jun 2023 08:39:32 -0700 (PDT)
+Received: by mail-pf1-x444.google.com with SMTP id d2e1a72fcca58-666683eb028so873147b3a.0;
+        Sat, 24 Jun 2023 08:39:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687621172; x=1690213172;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=39nLos2HufPt/yA8HQP7UUWFhI65/4Bzdg4rwaLh9Pg=;
+        b=Q2lGrrIytdpH2NHoE1Bwc6jdQxbZwWL7bdZ8bloOzcvTnO+v22u+2KlXbGl1mQmRhH
+         4RVUnieRRr3rsR86Lbs5JyEMQddDC4A7QspbjNZ/Px94a6MznIrIyb/kKHIJfchnEpWM
+         VEyFVmZmER0ddrrZMbojXFBM8W1rcHNKJzdugXtlWnWDbEd1JJtSBtrP7MmBzXZFoGMy
+         Kshn86UZT0NSG8RPDyRh8MHQynYK+D0FzcD+pu2KB3L6AUMBHESiJmQe/NiAQV9viwDi
+         Uha4EfioTDXi19CrTh1UsBVIHUHVmIH+pfQ0EBszLN8T6j/R4B4dvbp7rseki/++wms9
+         8xjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687621172; x=1690213172;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=39nLos2HufPt/yA8HQP7UUWFhI65/4Bzdg4rwaLh9Pg=;
+        b=NWLduBfVvgYuP/aWT7Kv+DCuLPCrbyRswFhp95XbnvFJd5/lmb/QQlIqmug55IVTok
+         96+yWCfdpOvMCECa9RE42CDywSjpkvg0crD6s49qXq0zKTCxCCEj6ffIPsVJYd85DJsC
+         V9kVt2IwU5H7RA7Gez1HXQetmmLve8BhA52/pCL3McW5Xw4p7jgcKAUSjixJECuxqF8g
+         4/O5N2QnXibH6gVxLLYDs/eWwDzt+nYBs6FzPkej4AQ0Vv4qrr/DJVApwGglBc41qecC
+         vNGSifb3X1CyGSkUIpKCISvo61bde1YxE3TjMlXZ3Ud79Q9OPIE1R9slvQyPCYpvpYeU
+         OPDw==
+X-Gm-Message-State: AC+VfDxOFeXNpTaHopXNW8ACHCjB+W7+HsuSl7rwqM4hkyhjsgUNq0Yq
+	+cN3TmWNp5qGNP+xzz2ZwCGNzQO1vM+mtLYOr2g=
+X-Google-Smtp-Source: ACHHUZ6psDyjg0EJOh7l4OR61JbzeBkd0/PovR4tE9lXw67cSCNwY6T1gRcZym2ybzl5pNFkKjLrcQ==
+X-Received: by 2002:a05:6a21:32a7:b0:121:62fd:61ea with SMTP id yt39-20020a056a2132a700b0012162fd61eamr15659575pzb.24.1687621172372;
+        Sat, 24 Jun 2023 08:39:32 -0700 (PDT)
+Received: from ?IPv6:2409:8a55:301b:e120:5d8f:b0cc:e645:f4d? ([2409:8a55:301b:e120:5d8f:b0cc:e645:f4d])
+        by smtp.gmail.com with ESMTPSA id jm24-20020a17090304d800b001aaecc15d66sm1352712plb.289.2023.06.24.08.39.28
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Jun 2023 08:39:31 -0700 (PDT)
+Subject: Re: [PATCH net-next v3 3/4] page_pool: introduce page_pool_alloc()
+ API
+To: Alexander Duyck <alexander.duyck@gmail.com>
+Cc: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>
+References: <20230609131740.7496-1-linyunsheng@huawei.com>
+ <20230609131740.7496-4-linyunsheng@huawei.com>
+ <CAKgT0UfVwQ=ri7ZDNnsATH2RQpEz+zDBBb6YprvniMEWGdw+dQ@mail.gmail.com>
+ <36366741-8df2-1137-0dd9-d498d0f770e4@huawei.com>
+ <CAKgT0UdXTSv1fDHBX4UC6Ok9NXKMJ_9F88CEv5TK+mpzy0N21g@mail.gmail.com>
+ <c06f6f59-6c35-4944-8f7a-7f6f0e076649@huawei.com>
+ <CAKgT0UccmDe+CE6=zDYQHi1=3vXf5MptzDo+BsPrKdmP5j9kgQ@mail.gmail.com>
+ <0345b6c4-18da-66d8-71a0-02620f9abe9e@huawei.com>
+ <CAKgT0Udmxc6EbUoZ_4P3jfWck3mvUtTY8mqUjT91bDwjZj-uMg@mail.gmail.com>
+ <741d1dab-e8d7-2420-e652-d4a671dac7b1@gmail.com>
+ <CAKgT0UeeWhD0_YWHoQe4=vEvKPXdVcFzp5qca2kM3uG7j+U2dg@mail.gmail.com>
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+Message-ID: <7e7ee6bf-13b6-3194-10df-d8a310778620@gmail.com>
+Date: Sat, 24 Jun 2023 23:39:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+In-Reply-To: <CAKgT0UeeWhD0_YWHoQe4=vEvKPXdVcFzp5qca2kM3uG7j+U2dg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Simon Horman <simon.horman@corigine.com> writes:
+On 2023/6/20 23:39, Alexander Duyck wrote:
+...
 
-> On Fri, Jun 23, 2023 at 11:41:10PM +0200, Andrew Lunn wrote:
->> > > I feel like I am missing something here.
->> >=20
->> > That is a weird response, you feel like something is missing
->>=20
->> There is. The patch.
->>=20
->> Maintainers have a slightly better memory than a goldfish, but given
->> the high volume of patches, we don't remember threads from 2016. Also,
->> all our infrastructure has limited memory, this patch is not in lore,
->> and it is not in patchworks. So in terms of getting merged, it does
->> not exist.
->>=20
->> We do however recommend that if a patch has not been merged within 2
->> weeks, it is rebased, any Acked-by: etc tags are added and the patch
->> reposted.
->
-> Thanks Andrew, that is also my position.
->
-> A ping for a multi-year old patch is unusual (for me).
-> I was wondering if there was a back story. I guess not.
+> 
+>> If I understand it correctly, most hw have a per-queue fixed buffer
+>> size, even the mlx5 one with per-desc buffer size support through
+>> mlx5_wqe_data_seg, the driver seems to use the 'per-queue fixed
+>> buffer size' model, I assume that using per-desc buffer size is just
+>> not worth the effort?
+> 
+> The problem is the device really has two buffer sizes it is dealing
+> with. The wqe size, and the cqe size. What goes in as a 4K page can
+> come up as multiple frames depending on the packet sizes being
+> received.
 
-The only story here is that I was reviewing the set of patches we apply
-to our kernels, and I noticed that this one, judging by the discussion,
-should have been applied to some tree or other ages ago.
+Yes, I understand that the buffer associated with wqe must be large
+enough to hold the biggest packet, and sometimes hw may report that
+only a small portion of that buffer is used as indicated in cqe when
+a small packet is received. The problem is: how much buffer is
+associated with a wqe to allow subdividing within wqe? With biggest
+packet being 2K size, we need a buffer with 4K size to be associated
+with a wqe, right? Isn't it wasteful to do that? Not to mention true
+size exacerbating problem for small packet.
 
-Now if it takes 6 years to get a one-line patch (a fix for a regression,
-no less) accepted, I have better things to spend my time on.
+And it seems mlx5 is not using the page_pool_fragment_page() API as
+you expected.
+As my understanding, for a mpwqe, it have multi strides, a packet
+seems to be able to fit in a stride or multi strides within a mpwqe,
+and a stride seems to be corresponding to a frag, and there seems to
+be no subdividing within a stride, see mlx5e_handle_rx_cqe_mpwrq().
 
---=20
-M=E5ns Rullg=E5rd
+https://elixir.bootlin.com/linux/v6.4-rc6/source/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c#L2366
+
+...
+
+> 
+>>>
+>>> What I was thinking of was the frag count. That is something the
+>>> driver should have the ability to manipulate, be it adding or removing
+>>> frags as it takes the section of memory it was given and it decides to
+>>> break it up further before handing it out in skb frames.
+>>
+>> As my understanding, there is no essential difference between frag
+>> count and frag offet if we want to do 'subdividing', just like we
+>> have frag_count for page pool and _refcount for page allocator, we
+>> may need a third one for this 'subdividing'.
+> 
+> There is a huge difference, and may be part of the reason why you and
+> I have such a different understanding of this.
+> 
+> The offset is just local to your fragmentation, whereas the count is
+> the global value for the page at which it can finally be freed back to
+> the pool. You could have multiple threads all working with different
+> offsets as long as they are all bounded within separate regions of the
+> page, however they must all agree on the frag count they are working
+> with since that is a property specific to the page. This is why
+> frag_count must be atomic whereas we keep frag_offset as a local
+> variable.
+> 
+> No additional counts needed. We never added another _refcount when we
+> were doing splitting in the drivers, and we wouldn't need to in order
+> to do splitting with page_pool pages. We would just have to start with
+> a frag count of 1.
+
+In that case, we can not do something like below as _refcount if we have
+the same frag count for page pool and driver, right?
+
+https://elixir.bootlin.com/linux/v6.4-rc6/source/drivers/net/ethernet/intel/iavf/iavf_txrx.c#L1220
+
 
