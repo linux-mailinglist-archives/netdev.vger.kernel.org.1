@@ -1,203 +1,148 @@
-Return-Path: <netdev+bounces-13632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13634-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6FC0E73C522
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 02:25:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2384373C5BF
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 03:13:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 993141C2141A
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 00:25:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 98C9C281EB1
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:13:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F967364;
-	Sat, 24 Jun 2023 00:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C435A385;
+	Sat, 24 Jun 2023 01:13:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15505360;
-	Sat, 24 Jun 2023 00:25:16 +0000 (UTC)
-Received: from mail-pl1-x631.google.com (mail-pl1-x631.google.com [IPv6:2607:f8b0:4864:20::631])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9829D2727;
-	Fri, 23 Jun 2023 17:25:15 -0700 (PDT)
-Received: by mail-pl1-x631.google.com with SMTP id d9443c01a7336-1b7db2e162cso1271755ad.1;
-        Fri, 23 Jun 2023 17:25:15 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B53C6384
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:13:49 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2592126BD;
+	Fri, 23 Jun 2023 18:13:48 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666fb8b1bc8so1066188b3a.1;
+        Fri, 23 Jun 2023 18:13:48 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687566315; x=1690158315;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nQXba6EmHlynNnz81zH/1sTIxaYKdX0Ois7d/fwOXMI=;
-        b=eIbS0JCuNu/8Ovpf/c2OlH+8jANrdgUnFMfbDnMBGkVbzA48ccqQy5wIrhsPNfr6Wk
-         vi4Lk94wu6uzt/gvypJW9pKK6zZXSJG8rz5x6P+E8CP6GdcaPlM/pvQtL0KIUTa8mZqk
-         M6lhzo7ZNstRIRRX07Y+UCKYXRH2ssLY6mw52EoiTJVN0IvUrZ8P83ulz4YNhzqSXSeg
-         8XMyYF9cstwdUXgkBbJIp68z20E/xtcxrHddht4Q2pvNEbzPUlPgYmpJyMZWOaFfO8kl
-         4Lh0VO7tKxxGkcpnhLm7htNIawq3Ek3RLnf9XDsuloG5ridyLf+J0D5ubFSAPQkvzLn5
-         0ErQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687566315; x=1690158315;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+        d=gmail.com; s=20221208; t=1687569227; x=1690161227;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=nQXba6EmHlynNnz81zH/1sTIxaYKdX0Ois7d/fwOXMI=;
-        b=Ql94TYfczEz5NQE7mIPd98WQEC2OGDnp94wB9uyNTCAxLWXSb45eD1XoeerYvuAFq7
-         oviUe1DjVR1mXmYHhzRIM8yizznB1vp/rnkDwIGZ1RHcsOOr+zGxBhEMxgDZXz+O2NDI
-         LtVHYr+XxGm6h9Mf4zx4VYrRk6RVGWOM7X2VdQhxPOsxEA60QXcIaX9H9d91EIyNpauE
-         001mc6Kt5wdLwSv4dMhwMzNhNdxTVxdQ05knLFY7gI9jcWYCTvnQYw10bEkDaNR+m/Iu
-         yC6VKM+4vp1x8FIYPeUyPnGQv4fEpxQiOawsJCWPIVLIhHCVO2pkjGkdJ2Xtc3GvbT2p
-         U94A==
-X-Gm-Message-State: AC+VfDzyMIICDTLwZlTow6Qg0D/gtbXKvQcGLbi9N4YDlLqQ2K24TCjY
-	rgwG/lhjUxefZYBL+24OIIA=
-X-Google-Smtp-Source: ACHHUZ4XzDWhPIyzekv0j5WRHtFAPr+h4KZbrDQTS1zXL/Bp5iN/F+SCxJxbCEDTTg7FhW+IuJLctw==
-X-Received: by 2002:a17:902:d2c4:b0:1b3:e802:5de6 with SMTP id n4-20020a170902d2c400b001b3e8025de6mr629971plc.29.1687566314909;
-        Fri, 23 Jun 2023 17:25:14 -0700 (PDT)
-Received: from localhost ([98.97.117.85])
-        by smtp.gmail.com with ESMTPSA id jk24-20020a170903331800b001a5fccab02dsm124709plb.177.2023.06.23.17.25.13
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 23 Jun 2023 17:25:14 -0700 (PDT)
-Date: Fri, 23 Jun 2023 17:25:13 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Donald Hunter <donald.hunter@gmail.com>, 
- Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Stanislav Fomichev <sdf@google.com>, 
- bpf <bpf@vger.kernel.org>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- Song Liu <song@kernel.org>, 
- Yonghong Song <yhs@fb.com>, 
- John Fastabend <john.fastabend@gmail.com>, 
- KP Singh <kpsingh@kernel.org>, 
- Hao Luo <haoluo@google.com>, 
- Jiri Olsa <jolsa@kernel.org>, 
- Network Development <netdev@vger.kernel.org>
-Message-ID: <649637e91a709_7bea820894@john.notmuch>
-In-Reply-To: <m2bkh69fcp.fsf@gmail.com>
-References: <20230621170244.1283336-1-sdf@google.com>
- <20230621170244.1283336-12-sdf@google.com>
- <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
- <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
- <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
- <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
- <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
- <m2bkh69fcp.fsf@gmail.com>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+        bh=XPifuwGr7qotS1J4egDcigsPGqIRoWlg/6w0xflvqXc=;
+        b=os0PUm6FrKL+A1DoENP/u20TiGluWujR7+ihWm5WpvDPntOiaFqI+zagF77EPxUeFd
+         gr58N43P9mAq2znfThw1PfGQKEPSYSXsYzcEoKK9A5Du4HKGvzQScblJDy/iGqZAKuWT
+         a4wWxbqnCDJ7t06JAr5Z8X0hOH//fnXZWeq9NqYVRLpKrC6kx5piOAgW//ZY9LTxMEnL
+         jqOhCNst0AIt7XcCt8LzYtm++QMHG2HaCRrv86PEx6ef3m7DMWmPFU5054WCk+Mv5os1
+         kXSEIEH24AbdO3seGYjPXpcaT5TcOUwYnekVdahikCV0h8quKcRXl8JnajWrTwBJOX4a
+         9cMw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687569227; x=1690161227;
+        h=content-transfer-encoding:in-reply-to:content-language:references
+         :cc:to:from:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XPifuwGr7qotS1J4egDcigsPGqIRoWlg/6w0xflvqXc=;
+        b=PBV1HigZeZkxB88zXxbYyiW2UCu4s/R/TLBwUif7/sSDF1hLnIYNOkhioT3Eu1eq9O
+         WJVEMkmUyaCqJNkZS5KmECIuzjhtxMA786mgfdvujZk4OG7zJZr5edOH3IJiYzvKYLxF
+         vPPqf/nbV+bLyJ4pR0ubvpBu52LNsp2/7xtYa/CDbw6u6Yq8GTPboC7BjjER1+g93XXF
+         efFwJCQaEAMigK/uhC89Bsj3/JVIIgTA74Pr9aimJb6Dm/ujDs1xjUV18EhwKJn+IllP
+         tdAKeHqo7CAvYWtpLnPN3FNgmaKxXiXtgSq2EonHNLs4SrHLoqr+Z2jtJvN8xaDfeXiO
+         8Vdw==
+X-Gm-Message-State: AC+VfDw5OYWez6HoUN96BV26uAoJwCbcsKXidG8DKEAMU8ksBgQKCWun
+	vZSQ/jjR/j4J+io0hjPXPb8=
+X-Google-Smtp-Source: ACHHUZ606czjila05woldXKyuDA7Rq8dbV1i+0k6tpmn1h59UzY57EaMRyDQG9n05OaV37lSyFMttw==
+X-Received: by 2002:a05:6a20:12d1:b0:121:b440:2820 with SMTP id v17-20020a056a2012d100b00121b4402820mr19195240pzg.19.1687569227466;
+        Fri, 23 Jun 2023 18:13:47 -0700 (PDT)
+Received: from [192.168.0.103] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id j6-20020a655586000000b0054fe7736ac1sm195469pgs.76.2023.06.23.18.13.41
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 23 Jun 2023 18:13:47 -0700 (PDT)
+Message-ID: <0e85ca99-d1d6-097b-2e04-4cd6492098a1@gmail.com>
+Date: Sat, 24 Jun 2023 08:13:26 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: Fwd: Dell XPS 13 ath10k_pci firmware crashed!
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Kalle Valo <kvalo@kernel.org>, Thorsten Leemhuis <linux@leemhuis.info>,
+ Garry Williams <gtwilliams@gmail.com>
+Cc: Linux Atheros 10K <ath10k@lists.infradead.org>,
+ Linux Wireless <linux-wireless@vger.kernel.org>,
+ Linux Kernel Network Developers <netdev@vger.kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>
+References: <2db51694-aa57-cbfd-096e-4925b76232b0@gmail.com>
+Content-Language: en-US
+In-Reply-To: <2db51694-aa57-cbfd-096e-4925b76232b0@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Donald Hunter wrote:
-> Alexei Starovoitov <alexei.starovoitov@gmail.com> writes:
-> =
+On 6/14/23 08:15, Bagas Sanjaya wrote:
+> Hi,
+> 
+> I notice a regression report on Bugzilla [1]. Quoting from it:
+> 
+>> Beginning with kernel 6.2.15-300.fc38.x86_64 and continuing through 6.3.7-200.fc38.x86_64, the wifi connection fails periodically with these log messages:
+>>
+>> ath10k_pci 0000:02:00.0: firmware crashed! (guid 6c545da0-593c-4a0e-b5ad-3ef2b91cdebf)
+>> ath10k_pci 0000:02:00.0: qca6174 hw3.2 target 0x05030000 chip_id 0x00340aff sub 1a56:143a
+>> ath10k_pci 0000:02:00.0: kconfig debug 0 debugfs 1 tracing 0 dfs 0 testmode 0
+>> ath10k_pci 0000:02:00.0: firmware ver WLAN.RM.4.4.1-00288- api 6 features wowlan,ignore-otp,mfp crc32 bf907c7c
+>> ath10k_pci 0000:02:00.0: board_file api 2 bmi_id N/A crc32 d2863f91
+>> ath10k_pci 0000:02:00.0: htt-ver 3.87 wmi-op 4 htt-op 3 cal otp max-sta 32 raw 0 hwcrypto 1
+>> ath10k_pci 0000:02:00.0: failed to get memcpy hi address for firmware address 4: -16
+>> ath10k_pci 0000:02:00.0: failed to read firmware dump area: -16
+>> ath10k_pci 0000:02:00.0: Copy Engine register dump:
+>> ath10k_pci 0000:02:00.0: [00]: 0x00034400  12  12   3   3
+>> ath10k_pci 0000:02:00.0: [01]: 0x00034800  14  14 347 348
+>> ath10k_pci 0000:02:00.0: [02]: 0x00034c00   8   2   0   1
+>> ath10k_pci 0000:02:00.0: [03]: 0x00035000  16  15  16  14
+>> ath10k_pci 0000:02:00.0: [04]: 0x00035400 2995 2987  22 214
+>> ath10k_pci 0000:02:00.0: [05]: 0x00035800   0   0  64   0
+>> ath10k_pci 0000:02:00.0: [06]: 0x00035c00   0   0  18  18
+>> ath10k_pci 0000:02:00.0: [07]: 0x00036000   1   1   1   0
+>> ath10k_pci 0000:02:00.0: could not request stats (-108)
+>> ath10k_pci 0000:02:00.0: could not request peer stats info: -108
+>> ath10k_pci 0000:02:00.0: failed to read hi_board_data address: -28
+>> ieee80211 phy0: Hardware restart was requested
+>> ath10k_pci 0000:02:00.0: could not request stats (-108)
+>> ath10k_pci 0000:02:00.0: device successfully recovered
+>>
+>>
+>> If I disconnect and reconnect using network manager, the connection is restored.  But this same failure recurs over and over after some few minutes to a few hours.
+>>
+>> This is a regression.  The error was not reported with any previous kernel since 6.2.14-300.fc38.x86_64
+> 
+> See Bugzilla for the full thread.
+> 
+> Unfortunately, the reporter can't bisect this regression (he only tries
+> distribution kernels instead).
+> 
+> Anyway, I'm adding it to regzbot (as mainline regression because v6.2.x
+> has already EOL):
+> 
+> #regzbot introduced: v6.2..v6.3 https://bugzilla.kernel.org/show_bug.cgi?id=217549
+> #regzbot title: ath10k_pci firmware crashed on Dell XPS 13
+> 
 
-> > On Thu, Jun 22, 2023 at 3:13=E2=80=AFPM Stanislav Fomichev <sdf@googl=
-e.com> wrote:
-> >>
-> >> We want to provide common sane interfaces/abstractions via kfuncs.
-> >> That will make most BPF programs portable from mlx to brcm (for
-> >> example) without doing a rewrite.
-> >> We're also exposing raw (readonly) descriptors (via that get_ctx
-> >> helper) to the users who know what to do with them.
-> >> Most users don't know what to do with raw descriptors;
-> >
-> > Why do you think so?
-> > Who are those users?
-> > I see your proposal and thumbs up from onlookers.
-> > afaict there are zero users for rx side hw hints too.
-> =
+It comes out that the regression is due to Fedora patches (see Bugzilla thread),
+thus:
 
-> We have customers in various sectors that want to use rx hw timestamps.=
+#regzbot invalid: regression caused by downstream patch
 
-> =
+Thanks.
 
-> There are several use cases especially in Telco where they use DPDK
-> today and want to move to AF_XDP but they need to be able to benefit
-> from the hw capabilities of the NICs they purchase. Not having access t=
-o
-> hw offloads on rx and tx is a barrier to AF_XDP adoption.
-> =
-
-> The most notable gaps in AF_XDP are checksum offloads and multi buffer
-> support.
-> =
-
-> >> the specs are
-> >> not public; things can change depending on fw version/etc/etc.
-> >> So the progs that touch raw descriptors are not the primary use-case=
-.
-> >> (that was the tl;dr for rx part, seems like it applies here?)
-> >>
-> >> Let's maybe discuss that mlx5 example? Are you proposing to do
-> >> something along these lines?
-> >>
-> >> void mlx5e_devtx_submit(struct mlx5e_tx_wqe *wqe);
-> >> void mlx5e_devtx_complete(struct mlx5_cqe64 *cqe);
-> >>
-> >> If yes, I'm missing how we define the common kfuncs in this case. Th=
-e
-> >> kfuncs need to have some common context. We're defining them with:
-> >> bpf_devtx_<kfunc>(const struct devtx_frame *ctx);
-> >
-> > I'm looking at xdp_metadata and wondering who's using it.
-> > I haven't seen a single bug report.
-> > No bugs means no one is using it. There is zero chance that we manage=
-d
-> > to implement it bug-free on the first try.
-> =
-
-> Nobody is using xdp_metadata today, not because they don't want to, but=
-
-> because there was no consensus for how to use it. We have internal POCs=
-
-> that use xdp_metadata and are still trying to build the foundations
-> needed to support it consistently across different hardware. Jesper
-> Brouer proposed a way to describe xdp_metadata with BTF and it was
-> rejected. The current plan to use kfuncs for xdp hints is the most
-> recent attempt to find a solution.
-
-The hold up on my side is getting it in a LST kernel so we can get it
-deployed in real environments. Although my plan is to just cast the
-ctx to a kernel ctx and read the data out we need.
-
-> =
-
-> > So new tx side things look like a feature creep to me.
-> > rx side is far from proven to be useful for anything.
-> > Yet you want to add new things.
-
-From my side if we just had a hook there and could cast the ctx to
-something BTF type safe so we can simply read through the descriptor
-I think that would sufficient for many use cases. To write into the
-descriptor that might take more thought a writeable BTF flag?
-
-> =
-
-> We have telcos and large enterprises that either use DPDK or use
-> proprietary solutions for getting traffic to user space. They want to
-> move to AF_XDP but without at least RX and TX checksum offloads they ar=
-e
-> paying a CPU tax for using AF_XDP. One customer is also waiting for
-> multi-buffer support to land before they can adopt AF_XDP.
-> =
-
-> So, no it's not feature creep, it's a set of required features to reach=
-
-> minimum viable product to be able to move out of a lab and replace
-> legacy in production.
-
+-- 
+An old man doll... just what I always wanted! - Clara
 
 
