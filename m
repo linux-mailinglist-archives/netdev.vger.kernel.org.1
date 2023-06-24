@@ -1,59 +1,64 @@
-Return-Path: <netdev+bounces-13744-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13745-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6C37173CCCB
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 23:38:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C73B473CCCD
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 23:43:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 262A72810C2
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 21:38:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A932F1C20902
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 21:43:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CA52C2FF;
-	Sat, 24 Jun 2023 21:38:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 825EDD521;
+	Sat, 24 Jun 2023 21:43:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D88D0A953;
-	Sat, 24 Jun 2023 21:38:36 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 6DAA3C433C8;
-	Sat, 24 Jun 2023 21:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53BDBA953
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 21:43:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1E909C433C0;
+	Sat, 24 Jun 2023 21:43:10 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687642716;
-	bh=kZAZb8VwwdIozLgwV01VFij8RmxnZ2PC2T5Y1l9pcz0=;
+	s=k20201202; t=1687642992;
+	bh=lmOEecdkRp4pBOR9oOVxNztmp5HIMJkVrx6xS1MQx8k=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=nM19jKx9x9KMKtEpyDc7sr8mSvWThZPm1yBUzajTeSMnkI666n1hlA4rRFPad4UYf
-	 IosXa/RuVJMwLjxO7oh86IfPsZAu3vZrcbhUGi4hnazgL2uZ2eibtNkqFaSbWCmj0O
-	 4q1AgqVfDlKyAcWncbNYfpqV0udWaQ2xwVvtvshQqOTQTSd7Qx+dopA1lhWhquMxTJ
-	 yTHK+PY5i8P+go6Oi/K8qFvdSkjwX0NYRM8Kn298gu85yue+buUXD9Ua2ZV/cCKkDW
-	 XAEXZMMHE0LHX85A7rpz2kQj3HYbRYYLSxA8VuyhqcT7lGUTs4HrKKscx7j612wYrO
-	 YnKzIpw3EJz9Q==
-Date: Sat, 24 Jun 2023 14:38:34 -0700
+	b=AILdp2c5CxOsj6tC0tqBVwvgFwGEWi/HNCqgnUP9ie2N/3J8Q6hT7ivMLWul3XZHr
+	 K0F527m3/A5wfokBRBq2EoCdMo9FsgZZ4xXrI34JiaXoTZs6r2Tqo0mWGyNuvkT5Hx
+	 rqBkXq7TJf9KNU0u4uFislfstbrlfbHFz3kgruQ6jVE3iG5BADxR8sM3S+eQaaELaB
+	 U9QP8K7Retu4ZVuHIWC+4aWzH36dvMxjUeAGjhNXxvzpZGdUy6XFg4nqRO05CBGEs7
+	 ChgFMA7WUcZdECRkGHISdSMolv/X7dTDd+Jy57O7j1GzG0otI8Oj52RnmkIxn5x8Ut
+	 UPn4FnOQlZyHg==
+Date: Sat, 24 Jun 2023 14:43:09 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, Donald Hunter
- <donald.hunter@gmail.com>, Stanislav Fomichev <sdf@google.com>, bpf
- <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
- <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, Martin KaFai
- Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, Yonghong Song
- <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>,
- Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp
- metadata
-Message-ID: <20230624143834.26c5b5e8@kernel.org>
-In-Reply-To: <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
-References: <20230621170244.1283336-1-sdf@google.com>
-	<20230621170244.1283336-12-sdf@google.com>
-	<20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
-	<CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
-	<CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
-	<CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
-	<CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
-	<m2bkh69fcp.fsf@gmail.com>
-	<649637e91a709_7bea820894@john.notmuch>
-	<CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, vadfed@meta.com,
+ jonathan.lemon@gmail.com, pabeni@redhat.com, corbet@lwn.net,
+ davem@davemloft.net, edumazet@google.com, vadfed@fb.com,
+ jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com, saeedm@nvidia.com,
+ leon@kernel.org, richardcochran@gmail.com, sj@kernel.org,
+ javierm@redhat.com, ricardo.canuelo@collabora.com, mst@redhat.com,
+ tzimmermann@suse.de, michal.michalik@intel.com, gregkh@linuxfoundation.org,
+ jacek.lawrynowicz@linux.intel.com, airlied@redhat.com, ogabbay@kernel.org,
+ arnd@arndb.de, nipun.gupta@amd.com, axboe@kernel.dk, linux@zary.sk,
+ masahiroy@kernel.org, benjamin.tissoires@redhat.com,
+ geert+renesas@glider.be, milena.olech@intel.com, kuniyu@amazon.com,
+ liuhangbin@gmail.com, hkallweit1@gmail.com, andy.ren@getcruise.com,
+ razor@blackwall.org, idosch@nvidia.com, lucien.xin@gmail.com,
+ nicolas.dichtel@6wind.com, phil@nwl.cc, claudiajkang@gmail.com,
+ linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+ netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
+ linux-rdma@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+ poros@redhat.com, mschmidt@redhat.com, linux-clk@vger.kernel.org,
+ vadim.fedorenko@linux.dev
+Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
+Message-ID: <20230624144309.71aa507d@kernel.org>
+In-Reply-To: <ZJa2GEr6frhHQrS0@nanopsycho>
+References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
+	<ZJW37ynDxJCwHscN@nanopsycho>
+	<20230623085336.1a486ca3@kernel.org>
+	<ZJa2GEr6frhHQrS0@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,40 +68,16 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 23 Jun 2023 19:52:03 -0700 Alexei Starovoitov wrote:
-> That's pretty much what I'm suggesting.
-> Add two driver specific __weak nop hook points where necessary
-> with few driver specific kfuncs.
-> Don't build generic infra when it's too early to generalize.
+On Sat, 24 Jun 2023 11:23:36 +0200 Jiri Pirko wrote:
+> Well I would like to conclude discussion in one thread before sending
+> the next one. What should I do? Should I start the same discussion
+> pointing out the same issues in this thread again? This can't work.
 > 
-> It would mean that bpf progs will be driver specific,
-> but when something novel like this is being proposed it's better
-> to start with minimal code change to core kernel (ideally none)
-> and when common things are found then generalize.
+> Even concluded items are ignored, like 3)
 > 
-> Sounds like Stanislav use case is timestamps in TX
-> while Donald's are checksums on RX, TX. These use cases are too different.
-> To make HW TX checksum compute checksum driven by AF_XDP
-> a lot more needs to be done than what Stan is proposing for timestamps.
+> IDK, this is very frustrating for me. I have to double check everything
+> just in case it was not ignored. I don't understand this, there is no
+> justification.
 
-I'd think HW TX csum is actually simpler than dealing with time,
-will you change your mind if Stan posts Tx csum within a few days? :)
-
-The set of offloads is barely changing, the lack of clarity 
-on what is needed seems overstated. IMHO AF_XDP is getting no use
-today, because everything remotely complex was stripped out of 
-the implementation to get it merged. Aren't we hand waving the
-complexity away simply because we don't want to deal with it?
-
-These are the features today's devices support (rx/tx is a mirror):
- - L4 csum
- - segmentation
- - time reporting
-
-Some may also support:
- - forwarding md tagging
- - Tx launch time
- - no fcs
-Legacy / irrelevant:
- - VLAN insertion
+Yes, the open items need to be clearly stated on a new posting.
 
