@@ -1,131 +1,129 @@
-Return-Path: <netdev+bounces-13702-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13703-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 27B9573CA0B
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 11:23:48 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C5C173CA28
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 11:30:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47D7A281FBA
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 09:23:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD3CB281FE1
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 09:30:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60CE73D9F;
-	Sat, 24 Jun 2023 09:23:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC1524409;
+	Sat, 24 Jun 2023 09:30:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 52D08211A
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 09:23:44 +0000 (UTC)
-Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 750D41BF2
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 02:23:40 -0700 (PDT)
-Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-98d8c38549dso197739366b.1
-        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 02:23:40 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687598619; x=1690190619;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=EuyyoXYkLcFUjNW6aU0LWhkMHFG4qPaiZWIPRvxeeTA=;
-        b=g66y85pUmxbEk8gM1Z1/c1SSekEW4T1k4oAFY2odQs17Fe0i5NQtNAg8YfQ0y5PXDO
-         JQ0h5TKyFH8kEJexF4E5uUAYUUTvoLrtDbttalI/TpRRut0MeLBi39qT+qPR9h2crIJ4
-         twd4vI/Sgf2PrnmqyK4K7Wfk3B5izATUbxSr/5XJzNoy2H7OMyCEm4o7a+q8aRj8ALE4
-         dqMLqsB7Vh2D8EfuzTaNFD6MfGlIax3uCuCFL0a+TPqcfaqOdGNmhNNnmzTkV7GZQG27
-         WzW2S7rjCG8vBIjq8J0kwEv7E4teVB6wT4a9BZsQ0gYmst95bLhaIEBSGkJK5s+jxcOj
-         U1Zw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687598619; x=1690190619;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=EuyyoXYkLcFUjNW6aU0LWhkMHFG4qPaiZWIPRvxeeTA=;
-        b=HDENnOkUi3uNti6kua88DgGTb8lMr7fVfT3H1nwSwDMpYnA/CgvZDzGWPHGD6JXV5K
-         Redd1gQQTjhjigQSljrIsmrLMs0whajKcbc5wQk//2qMWqZM4+Kc3eDqgu8rYldZTw8i
-         Qkuvh/3pBX3ku5qqSs0bgTodxAhUJ3o8VkL3QX/oDRHntbPDMZ9V7TqlMvolqb9e8asw
-         VwT160OeD2UP4yaiM6/+ApZ/1DVbXISVrQh1Gxg2Fsv1gaWFuwnKVrQV9/D3wpgyADvC
-         qbkVLRloC+izcPpgPCxiRQP2xvG8lIZoju8un33LJNjX3RETNXQ7rz+tDAxcmDCOMC/e
-         uYLA==
-X-Gm-Message-State: AC+VfDx5eRktENVvlH1IiElxH9Sr+iSJXnryHa07DkvyNxEZewTC7AHg
-	LKbpBTbqTF8IpCRmxq21Vg/wIA==
-X-Google-Smtp-Source: ACHHUZ7Hm22TLuZ2uNMqorvhvVqmtSRdvFVMVJyZ7P02nHMQr1v41Obhbu8aAZ5ky21fmiU2Y7E37A==
-X-Received: by 2002:a17:907:2bc8:b0:98d:758:75ed with SMTP id gv8-20020a1709072bc800b0098d075875edmr6033410ejc.75.1687598618680;
-        Sat, 24 Jun 2023 02:23:38 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id q22-20020a17090622d600b009895af2580asm671367eja.36.2023.06.24.02.23.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 24 Jun 2023 02:23:37 -0700 (PDT)
-Date: Sat, 24 Jun 2023 11:23:36 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>, vadfed@meta.com,
-	jonathan.lemon@gmail.com, pabeni@redhat.com, corbet@lwn.net,
-	davem@davemloft.net, edumazet@google.com, vadfed@fb.com,
-	jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-	saeedm@nvidia.com, leon@kernel.org, richardcochran@gmail.com,
-	sj@kernel.org, javierm@redhat.com, ricardo.canuelo@collabora.com,
-	mst@redhat.com, tzimmermann@suse.de, michal.michalik@intel.com,
-	gregkh@linuxfoundation.org, jacek.lawrynowicz@linux.intel.com,
-	airlied@redhat.com, ogabbay@kernel.org, arnd@arndb.de,
-	nipun.gupta@amd.com, axboe@kernel.dk, linux@zary.sk,
-	masahiroy@kernel.org, benjamin.tissoires@redhat.com,
-	geert+renesas@glider.be, milena.olech@intel.com, kuniyu@amazon.com,
-	liuhangbin@gmail.com, hkallweit1@gmail.com, andy.ren@getcruise.com,
-	razor@blackwall.org, idosch@nvidia.com, lucien.xin@gmail.com,
-	nicolas.dichtel@6wind.com, phil@nwl.cc, claudiajkang@gmail.com,
-	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-	linux-rdma@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	poros@redhat.com, mschmidt@redhat.com, linux-clk@vger.kernel.org,
-	vadim.fedorenko@linux.dev
-Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
-Message-ID: <ZJa2GEr6frhHQrS0@nanopsycho>
-References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
- <ZJW37ynDxJCwHscN@nanopsycho>
- <20230623085336.1a486ca3@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE52333DA
+	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 09:30:29 +0000 (UTC)
+Received: from out2-smtp.messagingengine.com (out2-smtp.messagingengine.com [66.111.4.26])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4149D1728;
+	Sat, 24 Jun 2023 02:30:28 -0700 (PDT)
+Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
+	by mailout.nyi.internal (Postfix) with ESMTP id 6EDAB5C015B;
+	Sat, 24 Jun 2023 05:30:27 -0400 (EDT)
+Received: from imap51 ([10.202.2.101])
+  by compute6.internal (MEProxy); Sat, 24 Jun 2023 05:30:27 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm1; t=
+	1687599027; x=1687685427; bh=pWdS1Pf7rNxsgUXrSdamMs345ibx9lD496N
+	qTwZSDZc=; b=MpXRcqq4KJujRKw3mCRuXO4tOJ5ZqbBOObe1kpJQsENnYYXADDt
+	mrL0N2liwMCXMxEBN0FFhbgx1O2g7Xeee/t/tbuoYB3+VI/+N7g/YW+qou3jSkEH
+	mqLBAzqo6IDgus6bQzi4UnPO24HJ9hdu3DfR6wcMomApVB4bm91TEaBT98F43Ap9
+	1/CCpUg4+n93lGiKuzCSTwYk82NCdwE1zfEjeZAoxVjCty0cAqxMQ4769Ajo/eTV
+	p8nGbcDcmro0181hFsFZQFm4DupHrpNqKo/nppcnmiTQ11McsceTmqGEgSoC6ENo
+	Vcho+9EsiR/jFktMR7nZmfTjshcMuCmDtwA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1687599027; x=1687685427; bh=pWdS1Pf7rNxsgUXrSdamMs345ibx9lD496N
+	qTwZSDZc=; b=YkotbRV3NuFAshgjmbvW3ybbrfoEi9qDKokD8wpFHGFnla4XQue
+	6J3kyELWBqs1FWXmzJA9brtXHvEfxNX8paXpCeXzdMp7SErMwNe2IsWx+/KrhDQm
+	65oE5kz/NBl4p93rZcLLKXCoBh6HBbheQicCKnOIZr81qUnZLruv+LKAsq5STmPW
+	FA+K/wMs9cAQEvJmvpSSL3cvrbBqr3RuMJs1b7ZgEA41+xQ8Yzsr4oEquWWO5leH
+	BK5Vo6Mt8XNkMjf+Fh26oQYLBNXe7oQydiSQijc30ba5YmpJnNK8OZU+8XPkRbTz
+	sBpE7dyCvL7MivHWgJ3UK1OQrymzybwvfyQ==
+X-ME-Sender: <xms:sreWZO3A6jHpW6QGgLD-IZmLdEnqEqe5Am-xSXgDMONxW8osZ0NhRw>
+    <xme:sreWZBEvu9JYkOZi9tFFtPh7hOJ0JL9fdbKwwvFmMT8dJ2UNzS95RpyrwtCax2hVt
+    uTXZlcKPmNj0tO76mc>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeegjedgudeiucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
+    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
+    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrg
+    htthgvrhhnpedufffhudefteevfffgudetleejtefhgfegveehgfeigfeiteffieevffeh
+    geegudenucffohhmrghinhepkhgvrhhnvghlrdhorhhgpdhgohgusgholhhtrdhorhhgne
+    cuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilhhfrhhomheprghrnhgu
+    segrrhhnuggsrdguvg
+X-ME-Proxy: <xmx:sreWZG6oCP-KUAzyy55M0QblHXwBN9iBXqJpXDEVRfjAJYM7kFziGQ>
+    <xmx:sreWZP32TUz1rqGbvtgolDn8oZLxi-EnOo_ibSkBkM-qgXDtMf8iZg>
+    <xmx:sreWZBE8mdy75O2ZJzduOztUBLyUS9izymEGwflqmEz0iPpNv5w8Uw>
+    <xmx:s7eWZHaICpyn8ZbTiPMnr_auqPoVSv7AHeF5UrZ4VEshbeNBJg2DVw>
+Feedback-ID: i56a14606:Fastmail
+Received: by mailuser.nyi.internal (Postfix, from userid 501)
+	id BEDCBB60086; Sat, 24 Jun 2023 05:30:26 -0400 (EDT)
+X-Mailer: MessagingEngine.com Webmail Interface
+User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230623085336.1a486ca3@kernel.org>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+Mime-Version: 1.0
+Message-Id: <d33a248c-c7ac-43d3-b602-3c801d697922@app.fastmail.com>
+In-Reply-To: <20230624105023.146d99e0@barney>
+References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
+ <20230624105023.146d99e0@barney>
+Date: Sat, 24 Jun 2023 11:29:56 +0200
+From: "Arnd Bergmann" <arnd@arndb.de>
+To: =?UTF-8?Q?Michael_B=C3=BCsch?= <m@bues.ch>,
+ "Bagas Sanjaya" <bagasdotme@gmail.com>
+Cc: "Linux Kernel Mailing List" <linux-kernel@vger.kernel.org>,
+ "Linux Regressions" <regressions@lists.linux.dev>,
+ "Linux Wireless" <linux-wireless@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>, "kernel test robot" <lkp@intel.com>,
+ "Simon Horman" <simon.horman@corigine.com>,
+ "Larry Finger" <Larry.Finger@lwfinger.net>, "Kalle Valo" <kvalo@kernel.org>,
+ sardonimous@hotmail.com
+Subject: Re: After kernel 6.3.7 or 6.3.8 b43 driver fails
+Content-Type: text/plain;charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Jun 23, 2023 at 05:53:36PM CEST, kuba@kernel.org wrote:
->On Fri, 23 Jun 2023 17:19:11 +0200 Jiri Pirko wrote:
->> I don't understand. The discussion in the RFCv8 thread is still going
->> on. The things I mentioned there are ignored. Like for example:
->> 1) mode_set op removal
->> 2) odd ice dpll locking scheme (either fix or describe why it is ok -
->> 				that's the unfinished discussion)
->> 3) header file bits squash I suggested. Vadim wrote that it sounds
->>    reasonable, yet nothing changed
->> 
->> I thought we are past this. Why I have to point the same issues over and
->> over?
+On Sat, Jun 24, 2023, at 10:50, Michael B=C3=BCsch wrote:
+> On Sat, 24 Jun 2023 08:44:15 +0700
+> Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>> > I suspect change introduced when addressing a compiler warning
+>> > cased the error.
+>> >=20
+>> > https://patchwork.kernel.org/project/linux-wireless/patch/202305161=
+83442.536589-1-arnd%40kernel.org/
 >
->FWIW I'm lost in the previous thread, so for me there's value in
->refreshing the series.
 >
->But you're right, at the very least there should be a summary of
->outstanding issues / open items / ongoing discussions in the cover
->letter.
+> I doubt it.
+> This patch affects the device initialization code. But the crash is in
+> the transmit path.
+> Can you please double check by manually reverting the patch?
 
-Well I would like to conclude discussion in one thread before sending
-the next one. What should I do? Should I start the same discussion
-pointing out the same issues in this thread again? This can't work.
+I'm travelling at the moment and can't easily check it, but I would
+expect that my patch has no effect on the generated object code at
+all. If the compiler output is different with and without my patch,
+it's probably wrong. I double-checked the structure layout in
+https://godbolt.org, this did not produce any changes, as size,
+alignement and offsets of the members are all the same.
 
-Even concluded items are ignored, like 3)
-
-IDK, this is very frustrating for me. I have to double check everything
-just in case it was not ignored. I don't understand this, there is no
-justification.
+     Arnd
 
