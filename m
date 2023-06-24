@@ -1,85 +1,91 @@
-Return-Path: <netdev+bounces-13635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 90FE073C5F5
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 03:44:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AEC673C600
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 03:46:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 81778281EA0
-	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:44:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E4CA1C21413
+	for <lists+netdev@lfdr.de>; Sat, 24 Jun 2023 01:46:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A81A3388;
-	Sat, 24 Jun 2023 01:44:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ED06A388;
+	Sat, 24 Jun 2023 01:46:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 968D3387
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 01:44:35 +0000 (UTC)
-Received: from mail-oi1-x229.google.com (mail-oi1-x229.google.com [IPv6:2607:f8b0:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B5E32738;
-	Fri, 23 Jun 2023 18:44:34 -0700 (PDT)
-Received: by mail-oi1-x229.google.com with SMTP id 5614622812f47-39ee19cfb77so1060304b6e.0;
-        Fri, 23 Jun 2023 18:44:33 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D5DF3378;
+	Sat, 24 Jun 2023 01:46:08 +0000 (UTC)
+Received: from mail-yw1-x1135.google.com (mail-yw1-x1135.google.com [IPv6:2607:f8b0:4864:20::1135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4BBFE26B0;
+	Fri, 23 Jun 2023 18:46:07 -0700 (PDT)
+Received: by mail-yw1-x1135.google.com with SMTP id 00721157ae682-57045429f76so11170887b3.0;
+        Fri, 23 Jun 2023 18:46:07 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687571073; x=1690163073;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fnVE3e7VprhRGPi15l7LQGONQqGj0Q6nNTdPJOtqQbo=;
-        b=kvzkcyhJbM0nREMhPOJRvwctQ6qdgX1pOw2/sxokIetkKFtZy2ZAszQvyaOUh4jY6e
-         0//L7Ycwar7QkIPWhGJzoWZmyoyJx+GCjc8FFLytjLBAwLKexAIBGe8s4krFs9kcgo4r
-         5eyPaAfi2hr318gydUSGc7vTlhiutWi66QjtMcdkLmG54oZajRNGl6A58jOkdksiizfI
-         gtIEc5OQA0/HLocl5PTK5uK9byccmoRQzJr0elUvnmEN/vfvcYiI8Zwa2le0wmbj+Qbw
-         rXCC+YFsTRLYRUZVINnrm9mkBalM+7LO3jidF7VXI6X59rdsg7JjYxpq00wE9pOBSQ7C
-         28ZQ==
+        d=gmail.com; s=20221208; t=1687571166; x=1690163166;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=6ohlWj59dfEBl6C9lQbUMUfwQD797JYV3vAdsQL++H0=;
+        b=MeCFnRmIknlhdVic+wRlWdemV0cpT0JGgYzXmrNZFr7yyl9rZlYiOxgTckrsQLaZci
+         wfwneuY1oYpHU3jdMhxFIBHLu1VHrte1J/AvRS84UdG2JbGvSKDa5SDcItt1Dvds4hln
+         v4Fz1lqgHJi9Q572c/ayqDaK22FB+4usIN0qwcjsKO1NQJ5pr88XSjZbK0WlbfURosIV
+         WkKYzkfpgG4WzpyMR1Xf7X6EmBu0R7TmMZg4jyJJnZ+n6QZKCTPOqt3seTAIWeqUIXgk
+         EYSmKBVB3/xC95DqhZfTGHalpAT+Uk9xNA6bsDM+mEewuUDg1LkmI+l7BnEBnHaB++S7
+         baKg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687571073; x=1690163073;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=fnVE3e7VprhRGPi15l7LQGONQqGj0Q6nNTdPJOtqQbo=;
-        b=engUgDIeSftvD6NJ5vCg4lkIR3+LVMZIDYyVg+Iq20gGzwOkyD0uVFX0lgKlEtOotX
-         SM5MTTT/VVQrGojOhJTsyEZvsamqTQyb7BG/K7LDxf27YgVtFPcZlv9KAub2cJEZitQA
-         neTUb+umzfbokP9mBtoscHWy2VspXDWWR/sPcmDx/3T151GMMtrWiK8L26FZro4k2cds
-         ggnM4YARV2u3y14rqpDo/yJevjDPEn9z89fB66HVTgkz+SVMH5mW1kSkSd/Nqk8K85i4
-         +vPkspXxLODniEWIQSqLU5UgcylLBQSZgm+m+GQBvTs5juR9gA1wkE4gmRqSKeEURmsv
-         eKJg==
-X-Gm-Message-State: AC+VfDwUZjAdFhsI84YpovlzWcaCGGvH4JogRMPLqUedyN2r/zy69EEI
-	EkcQPCww3Rrepjvby5cRwjaPs3RwFVNhsA==
-X-Google-Smtp-Source: ACHHUZ4pFCWhhOk7YUC51N0jfTbZ5Z66AN3uM1u47fjDBvIBVBp0WPXlFzFVVKVccAykpJVeNa1BNg==
-X-Received: by 2002:a05:6808:1827:b0:3a0:5993:be86 with SMTP id bh39-20020a056808182700b003a05993be86mr10093464oib.3.1687571073050;
-        Fri, 23 Jun 2023 18:44:33 -0700 (PDT)
-Received: from [192.168.0.103] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id t12-20020a170902b20c00b001a95f632340sm184560plr.46.2023.06.23.18.44.28
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 23 Jun 2023 18:44:32 -0700 (PDT)
-Message-ID: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
-Date: Sat, 24 Jun 2023 08:44:15 +0700
+        d=1e100.net; s=20221208; t=1687571166; x=1690163166;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=6ohlWj59dfEBl6C9lQbUMUfwQD797JYV3vAdsQL++H0=;
+        b=KrhG0r7sY99yT3T5bvHm48qrdB91fYIXm5Laj/3Zohxjg7uKKAeeZvCfYhm1vFYFxE
+         lWyDqcGF93YCdt3OOZd0ffb2052QDxBB13IuG7lg9fX5yvEuMO+J+q68bqaPSD9fZ6EL
+         BYsyysZBS+cBwC6GBftC01U9loPr4J9/qaoE8tlMrHjwfyhpVytL7vPIznG0C9Yx7YaW
+         Bv4wK7vzLS7vMrHSWSUD5JwhXlhNtVdLN8GmmU9XUOTVBIWIWIlZ/fJc45zTen1XCu0B
+         gVnBraNU6jJLpEe7kt5QwhVWrzReXRO3yfvNeIyKlRsm8IjSIreU3TDZUZ2kbPmPmm69
+         FaGA==
+X-Gm-Message-State: AC+VfDxs1bq/vyxve1UZfxqcEqcC++rCEbmSDOapn+u/ilkKqOz9JQjV
+	cwI0wgJoliCVCbX8k7N1d4zhK2CPotI=
+X-Google-Smtp-Source: ACHHUZ4oJqe52Nfo2u8yQrMY4vv9jVoTt/W2ISth1Cw2R8m1F2BHzq6LMln+BuMiDmbITKS4YHyKbQ==
+X-Received: by 2002:a0d:cb89:0:b0:56d:a55:4b25 with SMTP id n131-20020a0dcb89000000b0056d0a554b25mr22051794ywd.40.1687571166054;
+        Fri, 23 Jun 2023 18:46:06 -0700 (PDT)
+Received: from kickker.attlocal.net ([2600:1700:6cf8:1240:d5fe:ab6b:8508:3503])
+        by smtp.gmail.com with ESMTPSA id b126-20020a816784000000b005731f3c8989sm107916ywc.62.2023.06.23.18.46.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 23 Jun 2023 18:46:05 -0700 (PDT)
+From: Kui-Feng Lee <thinker.li@gmail.com>
+X-Google-Original-From: Kui-Feng Lee <kuifeng@meta.com>
+To: bpf@vger.kernel.org,
+	ast@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	kernel-team@meta.com,
+	andrii@kernel.org,
+	daniel@iogearbox.net,
+	yhs@fb.com,
+	kpsingh@kernel.org,
+	shuah@kernel.org,
+	john.fastabend@gmail.com,
+	sdf@google.com,
+	mykolal@fb.com,
+	linux-kselftest@vger.kernel.org,
+	jolsa@kernel.org,
+	haoluo@google.com,
+	netdev@vger.kernel.org
+Cc: Kui-Feng Lee <kuifeng@meta.com>
+Subject: [PATCH bpf-next v4 0/2] Fix missing synack in BPF cgroup_skb filters
+Date: Fri, 23 Jun 2023 18:45:58 -0700
+Message-Id: <20230624014600.576756-1-kuifeng@meta.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US
-To: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>
-Cc: Arnd Bergmann <arnd@arndb.de>, =?UTF-8?Q?Michael_B=c3=bcsch?=
- <m@bues.ch>, kernel test robot <lkp@intel.com>,
- Simon Horman <simon.horman@corigine.com>,
- Larry Finger <Larry.Finger@lwfinger.net>, Kalle Valo <kvalo@kernel.org>,
- sardonimous@hotmail.com
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -87,67 +93,92 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+TCP SYN/ACK packets of connections from processes/sockets outside a
+cgroup on the same host are not received by the cgroup's installed
+cgroup_skb filters.
 
-I notice a regression report on Bugzilla [1]. Quoting from it:
+There were two BPF cgroup_skb programs attached to a cgroup named
+"my_cgroup".
 
-> After upgrading to linux 6.3.8-arch1-1 from 6.3.6-arch1-1, b43 broadcom wireless driver fails.  downgrading back to 6.3.6-arch1-1 resolves.
-> 
-> Jun 16 20:56:37 askasleikir kernel: Hardware name: Apple Inc. MacBookPro7,1/Mac-F222BEC8, BIOS MBP71.88Z.0039.B15.1702241313 02/24/17
-> Jun 16 20:56:37 askasleikir kernel: Workqueue: phy0 b43_tx_work [b43]
-> Jun 16 20:56:37 askasleikir kernel: RIP: 0010:__ieee80211_stop_queue+0xcc/0xe0 [mac80211]
-> Jun 16 20:56:37 askasleikir kernel: Code: 74 11 48 8b 78 08 0f b7 d6 89 e9 4c 89 e6 e8 5b eb 00 00 65 ff 0d 0c dd b5 3e 0f 85 55 ff ff ff e8 b9 f4 12 de e9 4b ff>
-> Jun 16 20:56:37 askasleikir kernel: RSP: 0000:ffffc36b0013bdb8 EFLAGS: 00010097
-> Jun 16 20:56:37 askasleikir kernel: RAX: 0000000000000001 RBX: 0000000000000002 RCX: 0000000000000000
-> Jun 16 20:56:37 askasleikir kernel: RDX: 0000000000000000 RSI: 0000000000000002 RDI: ffff9f85d1c108e0
-> Jun 16 20:56:37 askasleikir kernel: RBP: 0000000000000000 R08: 0000000000000000 R09: ffff9f85c0819674
-> Jun 16 20:56:37 askasleikir kernel: R10: 0000000000000005 R11: 0000000000000181 R12: ffff9f85d1c108e0
-> Jun 16 20:56:37 askasleikir kernel: R13: 0000000000000000 R14: ffff9f85d1c12238 R15: ffff9f85d1c12090
-> Jun 16 20:56:37 askasleikir kernel: FS: 0000000000000000(0000) GS:ffff9f85fbe00000(0000) knlGS:0000000000000000
-> Jun 16 20:56:37 askasleikir kernel: CS: 0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> Jun 16 20:56:37 askasleikir kernel: CR2: 000055b33bbd5d70 CR3: 0000000022620000 CR4: 00000000000406f0
-> Jun 16 20:56:37 askasleikir kernel: Call Trace:
-> Jun 16 20:56:37 askasleikir kernel: <TASK>
-> Jun 16 20:56:37 askasleikir kernel: ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 136d1d948548ad6cca697df0da0a13c0a2333310]
-> Jun 16 20:56:37 askasleikir kernel: ? __warn+0x81/0x130
-> Jun 16 20:56:37 askasleikir kernel: ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 136d1d948548ad6cca697df0da0a13c0a2333310]
-> Jun 16 20:56:37 askasleikir kernel: ? report_bug+0x171/0x1a0
-> Jun 16 20:56:37 askasleikir kernel: ? handle_bug+0x3c/0x80
-> Jun 16 20:56:37 askasleikir kernel: ? exc_invalid_op+0x17/0x70
-> Jun 16 20:56:37 askasleikir kernel: ? asm_exc_invalid_op+0x1a/0x20
-> Jun 16 20:56:37 askasleikir kernel: ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 136d1d948548ad6cca697df0da0a13c0a2333310]
-> Jun 16 20:56:37 askasleikir kernel: ieee80211_stop_queue+0x36/0x50 [mac80211 136d1d948548ad6cca697df0da0a13c0a2333310]
-> Jun 16 20:56:37 askasleikir kernel: b43_pio_tx+0x373/0x390 [b43 0f6039cbd530df6f28ebbb52898f2f67b84598dd]
-> Jun 16 20:56:37 askasleikir kernel: ? __schedule+0x44b/0x1400
-> Jun 16 20:56:37 askasleikir kernel: b43_tx_work+0x57/0x130 [b43 0f6039cbd530df6f28ebbb52898f2f67b84598dd]
-> Jun 16 20:56:37 askasleikir kernel: process_one_work+0x1c7/0x3d0
-> Jun 16 20:56:37 askasleikir kernel: worker_thread+0x51/0x390
-> Jun 16 20:56:37 askasleikir kernel: ? __pfx_worker_thread+0x10/0x10
-> Jun 16 20:56:37 askasleikir kernel: kthread+0xde/0x110
-> Jun 16 20:56:37 askasleikir kernel: ? __pfx_kthread+0x10/0x10
-> Jun 16 20:56:37 askasleikir kernel: ret_from_fork+0x2c/0x50
-> Jun 16 20:56:37 askasleikir kernel: </TASK>
-> Jun 16 20:56:37 askasleikir kernel: ---[ end trace 0000000000000000 ]---
-> 
-> I suspect change introduced when addressing a compiler warning cased the error.
-> 
-> https://patchwork.kernel.org/project/linux-wireless/patch/20230516183442.536589-1-arnd%40kernel.org/
-> 
-> The is arch linux and they referred me here.
+    SEC("cgroup_skb/ingress")
+    int ingress(struct __sk_buff *skb)
+    {
+        /* .... process skb ... */
+        return 1;
+    }
 
-See Bugzilla for the full thread.
+    SEC("cgroup_skb/egress")
+    int egress(struct __sk_buff *skb)
+    {
+        /* .... process skb ... */
+        return 1;
+    
+    }
 
-Unfortunately, the reporter can't perform bisection to confirm that
-backport of 212457ccbd60db triggers this regression.
+We discovered that when running the command "nc -6 -l 8000" in
+"my_group" and connecting to it from outside of "my_cgroup" with the
+command "nc -6 localhost 8000", the egress filter did not detect the
+SYN/ACK packet. However, we did observe the SYN/ACK packet at the
+ingress when connecting from a socket in "my_cgroup" to a socket
+outside of it.
 
-Anyway, I'm adding it to regzbot to be sure that it doesn't fall
-through cracks unnoticed:
+We came across BPF_CGROUP_RUN_PROG_INET_EGRESS(). This macro is
+responsible for calling BPF programs that are attached to the egress
+hook of a cgroup and it skips programs if the sending socket is not the
+owner of the skb. Specifically, in our situation, the SYN/ACK
+skb is owned by a struct request_sock instance, but the sending
+socket is the listener socket we use to receive incoming
+connections. The request_sock is created to manage an incoming
+connection.
 
-#regzbot introduced: 212457ccbd60db https://bugzilla.kernel.org/show_bug.cgi?id=217582
-#regzbot title: fixing incorrect __packed annotation for Clang causes b43 driver fail to start
+It has been determined that checking the owner of a skb against
+the sending socket is not required. Removing this check will allow the
+filters to receive SYN/ACK packets.
 
-Thanks.
+To ensure that cgroup_skb filters can receive all signaling packets,
+including SYN, SYN/ACK, ACK, FIN, and FIN/ACK. A new self-test has
+been added as well.
+
+Changes from v3:
+
+ - Check SKB ownership against full socket instead of just remove the
+   check.
+
+ - Address the issue raised by Yonghong.
+
+ - Put more details down in the commit message.
+
+Changes from v2:
+
+ - Remove redundant blank lines.
+
+Changes from v1:
+
+ - Check the number of observed packets instead of just sleeping.
+
+ - Use ASSERT_XXX() instead of CHECK()/
+
+[v1] https://lore.kernel.org/all/20230612191641.441774-1-kuifeng@meta.com/
+[v2] https://lore.kernel.org/all/20230617052756.640916-2-kuifeng@meta.com/
+[v3] https://lore.kernel.org/all/20230620171409.166001-1-kuifeng@meta.com/
+
+Kui-Feng Lee (2):
+  net: bpf: Check SKB ownership against full socket.
+  selftests/bpf: Verify that the cgroup_skb filters receive expected
+    packets.
+
+ include/linux/bpf-cgroup.h                    |   4 +-
+ tools/testing/selftests/bpf/cgroup_helpers.c  |  12 +
+ tools/testing/selftests/bpf/cgroup_helpers.h  |   1 +
+ tools/testing/selftests/bpf/cgroup_tcp_skb.h  |  35 ++
+ .../selftests/bpf/prog_tests/cgroup_tcp_skb.c | 402 ++++++++++++++++++
+ .../selftests/bpf/progs/cgroup_tcp_skb.c      | 382 +++++++++++++++++
+ 6 files changed, 834 insertions(+), 2 deletions(-)
+ create mode 100644 tools/testing/selftests/bpf/cgroup_tcp_skb.h
+ create mode 100644 tools/testing/selftests/bpf/prog_tests/cgroup_tcp_skb.c
+ create mode 100644 tools/testing/selftests/bpf/progs/cgroup_tcp_skb.c
 
 -- 
-An old man doll... just what I always wanted! - Clara
+2.34.1
+
 
