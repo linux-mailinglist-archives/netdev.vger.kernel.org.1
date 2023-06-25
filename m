@@ -1,84 +1,75 @@
-Return-Path: <netdev+bounces-13806-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13807-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CB0473D0BA
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:58:14 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A493E73D0BD
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:00:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7849280AA5
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:58:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 822601C208FE
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:00:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5173D64;
-	Sun, 25 Jun 2023 11:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D7493FEC;
+	Sun, 25 Jun 2023 11:59:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF60A1103
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:58:10 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F2ADA;
-	Sun, 25 Jun 2023 04:58:08 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so2813820e87.3;
-        Sun, 25 Jun 2023 04:58:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909512109
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:59:58 +0000 (UTC)
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 71EAFDD
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:59:57 -0700 (PDT)
+Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-4718bc88afdso1817188e0c.0
+        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:59:57 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687694287; x=1690286287;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=sIwGonOq36GaVS+H1DUiLEFsm2Rip2kBsbIno4UEQXA=;
-        b=qeyPUwCScU+C3CsEAsAfmRs95c9zpnUpXMby3j+wUTgekw+h2Z9see16Vq10XC99in
-         o/GaKLGjqCejqVqbRFlJot53VK+qGAmMmRuqwD3sdKFmWId6xmLgWXBM52PDLFmBeUIJ
-         IicnIzL5xZsM/FLH/zIzT4UYUhKWuDVBiHB1ux+kn+pQ0SEAB82L5co700dnoSScbYQp
-         BONIReDtuzsoaAGeIMx7XLXuYRSn/k2diNAQVI0mHFnrAqVH7SHecru+l9BZuyH+DhJH
-         tdkU7XRXOtVYktrVxNTonKLJVX3RYe6lqyi5dQK/Is0qgzYHTpcFRXf/FE3WHwtohfBy
-         /Wrw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687694287; x=1690286287;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1687694396; x=1690286396;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=sIwGonOq36GaVS+H1DUiLEFsm2Rip2kBsbIno4UEQXA=;
-        b=IgTSnsdN0MBFAIeb+aPx17pY/lzH/IGeptDxfYB672hKVGQf76RdLhzxj8Rhafmoaj
-         fpAirRRdG9CO5AWyKZHsXJPMdx0C4uHzr5tverDHI/qJJatgjYuyr7MxWX5TMosIzBzj
-         DnsZqy+Na+noETcN3MvpdfxHAKTvXLBkExpwvG8XcHLPOePf7QhCGNAirj7OVuGSgvyS
-         q0F/1OwYuyeNI2lwGVuhQQ1YZhun7vmHjLPi3SPtCCK7r/5xMxDhxSHDa72FawaLQHqV
-         EQRhfKdlyltMngG+BokhEwmzWiTMHd9HdAS0A4jG8Enxg26z+pnoeVPcxtBeX8rhgasq
-         t7ag==
-X-Gm-Message-State: AC+VfDwbPA02BZ2tCjB25u6O2mqyVDC/Ge0ApM3avfPXGccHmXXLJm1+
-	ovbGzbCp780Ki1Q7dGFUovM=
-X-Google-Smtp-Source: ACHHUZ7I12kd5+S0HDR2KdCOSiFVeYje3PXTekKdb7Ytwzr2/WtxZygEwkefHTiLx/sxkfSD1gVdIQ==
-X-Received: by 2002:a05:6512:10c5:b0:4f9:5c89:5b08 with SMTP id k5-20020a05651210c500b004f95c895b08mr9991360lfg.21.1687694286412;
-        Sun, 25 Jun 2023 04:58:06 -0700 (PDT)
-Received: from skbuf ([188.25.159.134])
-        by smtp.gmail.com with ESMTPSA id u22-20020aa7d996000000b0051a26ce312dsm1680104eds.71.2023.06.25.04.58.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jun 2023 04:58:05 -0700 (PDT)
-Date: Sun, 25 Jun 2023 14:58:03 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Christian Marangi <ansuelsmth@gmail.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: Re: [net-next PATCH RFC] net: dsa: qca8k: make learning configurable
- and keep off if standalone
-Message-ID: <20230625115803.6xykp4wiqqdwwzv4@skbuf>
-References: <20230623114005.9680-1-ansuelsmth@gmail.com>
- <20230623114005.9680-1-ansuelsmth@gmail.com>
+        bh=yqK8AlIXPu2XJBYa0seEiu0k2STeyrU+nnU7R790jtc=;
+        b=JCfFsPVKB2dru+BO+ne35Cgh7f7dmWZ8I9lPttynsHQrPE2KXUYTZbM0Jqso/MPc5m
+         nX3kyuGlaoViQkt8V0rNgkDE/01AaCKFhX/k14yfkarPtGVJSe9h82Ze6E9oZiIjDGCG
+         irVlA539knPnmhX/hgAD0InOk7wgy2KBmFPTjscm1sDiOW9mrfjIUA8Z8uBN147sF1wc
+         qbwIEgO4gr4y5xHvhoGoth/87UlWnn/2nfLcTyOn4y38vzMVgZCQuJvV4dC1yCzaxlvS
+         COSNwOI56jPDtO9mK3QYCf3X2yZ0DQPq1gDDn5pVufzuFLJa5Mo9ZNl9uYcCq9g/8EXO
+         i2Ig==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687694396; x=1690286396;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=yqK8AlIXPu2XJBYa0seEiu0k2STeyrU+nnU7R790jtc=;
+        b=ZFRVw4byL7IIrNXCmWci9NM8REGuvwxcR6gXBzht7Pi7LZSk6P3KZSycbOiXt/mbjv
+         AF9hOsbYxAfkQwLmpFR5A1eaM04ztZ0bD1ZJx4QjodMetzzxtF1UYSTTLkGXc5Bp9/Bm
+         zriWUXKbjF66JMPpQ28q/iapjpCLzvjKcFxj57F2NlVoHtaYC2xwY1paJj2VMkRdChXN
+         13DdMMQRCA4chjmpWVvdFGwW/SGfgVSrQDGTDb1Cn+0Swq55Zy/aYyacnooFTZ6HtczY
+         M/8s0x4bWrL1vEbg/kKUfNBQsr+oNe8Yg9c0A4AOAWwrjKNQD65yd2ezSwKx4joFYWZg
+         Rjhw==
+X-Gm-Message-State: AC+VfDzrMddBIbchOwv2gODvi8/6Jxn41j9z4N5QL1e73eEbThe2GDeC
+	JVD0rlHXsPF6cjr1M8D38bB8qd6YpjZtBOsL5htwxaVjcwDzVg==
+X-Google-Smtp-Source: ACHHUZ5zFuLpOqElZq163rkzTbszHl8yY6oULKmpi1OEJWqOQK029r5x7LI+wHA7uNpBTBYR9r+Nw2V8tFQ9ZFRtNaA=
+X-Received: by 2002:a05:6122:10dc:b0:47c:e74d:876b with SMTP id
+ l28-20020a05612210dc00b0047ce74d876bmr23118vko.5.1687694396337; Sun, 25 Jun
+ 2023 04:59:56 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230623114005.9680-1-ansuelsmth@gmail.com>
- <20230623114005.9680-1-ansuelsmth@gmail.com>
+References: <20230621191302.1405623-1-paweldembicki@gmail.com> <20230621191302.1405623-7-paweldembicki@gmail.com>
+In-Reply-To: <20230621191302.1405623-7-paweldembicki@gmail.com>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Sun, 25 Jun 2023 13:59:45 +0200
+Message-ID: <CAJN1Kkx74f=61fi-QOVs+jT3fLQVUUU=sJaTm5e0BBn--QnPig@mail.gmail.com>
+Subject: Re: [PATCH net-next 0/6] net: dsa: vsc73xx: Make vsc73xx usable
+To: netdev@vger.kernel.org
+Cc: linus.walleij@linaro.org, Russell King <linux@armlinux.org.uk>, 
+	Jakub Kicinski <kuba@kernel.org>, Simon Horman <simon.horman@corigine.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -86,276 +77,48 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 01:40:05PM +0200, Christian Marangi wrote:
-> Address learning should initially be turned off by the driver for port
-> operation in standalone mode, then the DSA core handles changes to it
-> via ds->ops->port_bridge_flags().
-> 
-> Currently this is not the case for qca8k where learning is enabled
-> unconditionally in qca8k_setup for every user port.
-> 
-> Handle ports configured in standalone mode by making the learning
-> configurable and not enabling it by default.
-> 
-> Implement .port_pre_bridge_flags and .port_bridge_flags dsa ops to
-> enable learning for bridge that request it and tweak
-> .port_stp_state_set to correctly disable learning when port is
-> configured in standalone mode.
-> 
-> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
-> ---
-> 
-> Posting as RFC as I would love some comments from Vladimir for correct
-> implementation of this. This was suggested to be on par with offload
-> bridge API and I used as example [1] (commit that does the same thing
-> with a microchip switch)
-> 
-> I didn't want to bloat the priv struct with additional info with the
-> port state and from what I can see it seems using dp->learning is enough
-> to understand if learning is currently enabled for the port or not but I
-> would love to have some confirmation about this. (from what I notice
-> when port is set in standalone mode, flags are cleared so it should be
-> correct)
+=C5=9Br., 21 cze 2023 o 21:14 Pawel Dembicki <paweldembicki@gmail.com> napi=
+sa=C5=82(a):
+>
+> This patch series is focused on getting vsc73xx usable.
+>
+> First patch is simple convert to phylink, because adjust_link won't work
+> anymore.
+>
+> Patches 2-5 are basic implementation of tag8021q funcionality with QinQ
+> support without vlan filtering in bridge and simple vlan aware in vlan
+> filtering mode.
+>
+> STP frames isn't forwarded at this moment. BPDU frames are forwarded
+> only from to PI/SI interface. For more info see chapter
+> 2.7.1 (CPU Forwarding) in datasheet.
+>
+> Last patch fix wrong MTU configuration.
+>
+> Pawel Dembicki (6):
+>   net: dsa: vsc73xx: convert to PHYLINK
+>   net: dsa: vsc73xx: add port_stp_state_set function
+>   net: dsa: vsc73xx: Add dsa tagging based on 8021q
+>   net: dsa: vsc73xx: Add bridge support
+>   net: dsa: vsc73xx: Add vlan filtering
+>   net: dsa: vsc73xx: fix MTU configuration
+>
+>  drivers/net/dsa/Kconfig                |   2 +-
+>  drivers/net/dsa/vitesse-vsc73xx-core.c | 928 ++++++++++++++++++++-----
+>  drivers/net/dsa/vitesse-vsc73xx.h      |   1 +
+>  include/net/dsa.h                      |   2 +
+>  net/dsa/Kconfig                        |   6 +
+>  net/dsa/Makefile                       |   1 +
+>  net/dsa/tag_vsc73xx_8021q.c            |  87 +++
+>  7 files changed, 857 insertions(+), 170 deletions(-)
+>  create mode 100644 net/dsa/tag_vsc73xx_8021q.c
+>
+> --
+> 2.34.1
+>
 
-In principle you can use dp->learning, but in this case you are using it
-incorrectly (more below).
+I pushed v2. Thank Russell, Jakub, Simon and other people for helping me.
 
-> 
-> I also verified this working by dumping the fdb in a bridge
-> configuration and in a standalone configuration. Traffic works in both
-> configuration.
-> 
-> Dump WITH BRIDGE CONFIGURATION:
-> 01:00:5e:00:00:01 dev eth0 self permanent
-> 33:33:00:00:00:02 dev eth0 self permanent
-> 33:33:00:00:00:01 dev eth0 self permanent
-> 33:33:ff:f2:5d:50 dev eth0 self permanent
-> 33:33:ff:00:00:00 dev eth0 self permanent
-> dc:ef:09:f2:5d:4f dev eth1 self permanent
-> 33:33:00:00:00:01 dev eth1 self permanent
-> 33:33:00:00:00:02 dev eth1 self permanent
-> 01:00:5e:00:00:01 dev eth1 self permanent
-> 33:33:ff:f2:5d:4f dev eth1 self permanent
-> 33:33:ff:00:00:00 dev eth1 self permanent
-> c0:3e:ba:c1:d7:47 dev lan1 master br-lan
-> dc:ef:09:f2:5d:4f dev lan1 vlan 1 master br-lan permanent
-> dc:ef:09:f2:5d:4f dev lan1 master br-lan permanent
-> c0:3e:ba:c1:d7:47 dev lan1 vlan 1 self
-> 33:33:00:00:00:01 dev wlan0 self permanent
-> 33:33:00:00:00:02 dev wlan0 self permanent
-> 33:33:00:00:00:01 dev wlan1 self permanent
-> 33:33:00:00:00:02 dev wlan1 self permanent
-> 33:33:00:00:00:01 dev br-lan self permanent
-> 33:33:00:00:00:02 dev br-lan self permanent
-> 01:00:5e:00:00:01 dev br-lan self permanent
-> 33:33:ff:00:00:01 dev br-lan self permanent
-> 33:33:ff:f2:5d:4f dev br-lan self permanent
-> 33:33:00:01:00:02 dev br-lan self permanent
-> 33:33:00:01:00:03 dev br-lan self permanent
-> 33:33:ff:00:00:00 dev br-lan self permanent
-> 
-> Dump WITH STANDALONE CONFIGURATION:
-> 01:00:5e:00:00:01 dev eth0 self permanent
-> 33:33:00:00:00:02 dev eth0 self permanent
-> 33:33:00:00:00:01 dev eth0 self permanent
-> 33:33:ff:f2:5d:50 dev eth0 self permanent
-> 33:33:ff:00:00:00 dev eth0 self permanent
-> 33:33:00:00:00:01 dev eth1 self permanent
-> 33:33:00:00:00:02 dev eth1 self permanent
-> 01:00:5e:00:00:01 dev eth1 self permanent
-> 33:33:ff:f2:5d:4f dev eth1 self permanent
-> 33:33:ff:00:00:01 dev eth1 self permanent
-> 33:33:ff:00:00:00 dev eth1 self permanent
-> 33:33:00:01:00:02 dev eth1 self permanent
-> 33:33:00:01:00:03 dev eth1 self permanent
-> 33:33:00:00:00:01 dev wlan0 self permanent
-> 33:33:00:00:00:02 dev wlan0 self permanent
-> 33:33:00:00:00:01 dev wlan1 self permanent
-> 33:33:00:00:00:02 dev wlan1 self permanent
-
-The information from these dumps is pretty much irrelevant.
-
-> From what I can see there isn't any self entry with the MAC address of
-> the connected device and this should confirm that learning is actually
-> disabled.
-> 
-> Hope this is enough to test this feature and I would ask what would be
-> the next step to reach a point where port_change_master can be
-> implemented.
-
-The way to test this patch would be to connect in loopback 2 standalone
-qca8k ports having the same MAC address, and ping from one to the other.
-
-ip netns add ns0
-ip link set lan1 netns ns0 && ip -n ns0 link set lan1 up
-ip -n ns0 addr add 192.168.100.1/24 dev lan1
-ip link set lan2 up && ip addr add 192.168.100.2/24 dev lan2
-ping 192.168.100.1
-
-Before, it shouldn't have worked, now it should.
-
-Once that basic precondition passes, you should be able to start looking
-at tools/testing/selftests/drivers/net/dsa/ and run those one by one.
-An interesting one would be local_termination.sh, which monitors the way
-in which frames reach the CPU. Though be aware that some sub-tests from
-that suite will fail on misconfigurations that are non-fatal (and don't
-impact functionality), just sub-optimal (affecting performance). Like
-sending unknown packets to the CPU when the port is non-promiscuous and
-software would drop those packets anyway.
-
-> (would also love to see what are the criteria to enable offload_fwd_mask
-> on the targget for rcv and eventually for xmit)
-
-For RX, skb->offload_fwd_mark = true (mark not mask) means that the software
-bridge shouldn't flood packets received on lanX towards other lanY ports that
-are part of the same hwdom, because the hardware already took care of
-that.
-
-[ the hardware domain is determined by dev_get_port_parent_id() ->
-  devlink_compat_switch_id_get() and populated by dsa_port_devlink_setup() ]
-
-Obviously, the requirement is for the hardware to indeed take care of that :)
-Currently it doesn't flood to the other user ports that are part of the
-same bridge and have egress flooding enabled for that traffic type. It
-just floods to the CPU and software decides where to flood. It's a
-matter of implementing other brport flags, like BR_FLOOD and friends.
-
-For TX, skb->offload_fwd_mark means that the driver should be able to
-send a skb potentially towards multiple TX ports at the same time, as a
-result of an FDB lookup. This makes the bridge avoid cloning that skb
-and calling dev_queue_xmit() towards every individual port that it must
-reach. I would concentrate on RX and leave TX for later.
-
-> Thanks for any response and sorry for the long comments.
-> 
-> 
-> [1] https://github.com/torvalds/linux/commit/15f7cfae912e
-> 
->  drivers/net/dsa/qca/qca8k-8xxx.c   |  8 ++----
->  drivers/net/dsa/qca/qca8k-common.c | 40 ++++++++++++++++++++++++++++++
->  drivers/net/dsa/qca/qca8k.h        |  6 +++++
->  3 files changed, 48 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
-> index f08086ac2261..a9af270a03ce 100644
-> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
-> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
-> @@ -1963,12 +1963,6 @@ qca8k_setup(struct dsa_switch *ds)
->  			if (ret)
->  				return ret;
->  
-> -			/* Enable ARP Auto-learning by default */
-> -			ret = regmap_set_bits(priv->regmap, QCA8K_PORT_LOOKUP_CTRL(i),
-> -					      QCA8K_PORT_LOOKUP_LEARN);
-> -			if (ret)
-> -				return ret;
-> -
->  			/* For port based vlans to work we need to set the
->  			 * default egress vid
->  			 */
-> @@ -2071,6 +2065,8 @@ static const struct dsa_switch_ops qca8k_switch_ops = {
->  	.port_change_mtu	= qca8k_port_change_mtu,
->  	.port_max_mtu		= qca8k_port_max_mtu,
->  	.port_stp_state_set	= qca8k_port_stp_state_set,
-> +	.port_pre_bridge_flags	= qca8k_port_pre_bridge_flags,
-> +	.port_bridge_flags	= qca8k_port_bridge_flags,
->  	.port_bridge_join	= qca8k_port_bridge_join,
->  	.port_bridge_leave	= qca8k_port_bridge_leave,
->  	.port_fast_age		= qca8k_port_fast_age,
-> diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
-> index 8c2dc0e48ff4..f93defbd8b66 100644
-> --- a/drivers/net/dsa/qca/qca8k-common.c
-> +++ b/drivers/net/dsa/qca/qca8k-common.c
-> @@ -559,8 +559,24 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port,
->  	return 0;
->  }
->  
-> +static int qca8k_port_configure_learning(struct dsa_switch *ds, int port,
-> +					 bool learning)
-> +{
-> +	struct qca8k_priv *priv = ds->priv;
-> +
-> +	if (learning)
-> +		return regmap_set_bits(priv->regmap,
-> +				       QCA8K_PORT_LOOKUP_CTRL(port),
-> +				       QCA8K_PORT_LOOKUP_LEARN);
-> +	else
-> +		return regmap_clear_bits(priv->regmap,
-> +					 QCA8K_PORT_LOOKUP_CTRL(port),
-> +					 QCA8K_PORT_LOOKUP_LEARN);
-> +}
-> +
->  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
->  {
-> +	struct dsa_port *dp = dsa_to_port(ds, port);
->  	struct qca8k_priv *priv = ds->priv;
->  	u32 stp_state;
->  
-> @@ -585,6 +601,30 @@ void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
->  
->  	qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
->  		  QCA8K_PORT_LOOKUP_STATE_MASK, stp_state);
-> +
-> +	qca8k_port_configure_learning(ds, port, dp->learning);
-
-Learning should be enabled only if we're in an STP state compatible with
-learning: BR_STATE_LEARNING, BR_STATE_FORWARDING. The dp->learning flag
-does not follow the STP state, it is just an override for that.
-
-So, the condition should be:
-"(state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING) && dp->learning"
-
-> +}
-> +
-> +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-> +				struct switchdev_brport_flags flags,
-> +				struct netlink_ext_ack *extack)
-> +{
-> +	if (flags.mask & ~BR_LEARNING)
-> +		return -EINVAL;
-> +
-> +	return 0;
-> +}
-> +
-> +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
-> +			    struct switchdev_brport_flags flags,
-> +			    struct netlink_ext_ack *extack)
-> +{
-> +	int ret;
-> +
-> +	ret = qca8k_port_configure_learning(ds, port,
-> +					    flags.mask & ~BR_LEARNING);
-
-flags.mask contains the bits that have changed.
-flags.val contains the current value of all bits.
-
-Passing flags.mask & ~BR_LEARNING (the mask of changed flags except for
-BR_LEARNING) to qca8k_port_configure_learning() makes absolutely no sense.
-
-> +
-> +	return ret;
->  }
->  
->  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
-> diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
-> index c5cc8a172d65..8f88b7db384d 100644
-> --- a/drivers/net/dsa/qca/qca8k.h
-> +++ b/drivers/net/dsa/qca/qca8k.h
-> @@ -522,6 +522,12 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
->  
->  /* Common bridge function */
->  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state);
-> +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
-> +				struct switchdev_brport_flags flags,
-> +				struct netlink_ext_ack *extack);
-> +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
-> +			    struct switchdev_brport_flags flags,
-> +			    struct netlink_ext_ack *extack);
->  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
->  			   struct dsa_bridge bridge,
->  			   bool *tx_fwd_offload,
-> -- 
-> 2.40.1
-> 
-
+--
+Pawel Dembicki
 
