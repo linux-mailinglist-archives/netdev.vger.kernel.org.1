@@ -1,224 +1,228 @@
-Return-Path: <netdev+bounces-13828-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13829-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E4A573D204
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:15:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A810373D295
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:58:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E1671C20944
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 16:15:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA2221C2042C
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 16:58:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B7AF76FAA;
-	Sun, 25 Jun 2023 16:15:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 459526FAA;
+	Sun, 25 Jun 2023 16:58:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E5D516FA8;
-	Sun, 25 Jun 2023 16:15:14 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E463C433C8;
-	Sun, 25 Jun 2023 16:15:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687709714;
-	bh=4/ubcrsJvqhBH/vtuVerDOnT8cLh0Z8x9NdrY0vOnlQ=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=WstfenfqrQraRy6ufCoglL05809oMSEcRfUfndB4rQcusE2zI6TcMHkeBnayI84XA
-	 LeozoS1GxcgX6ngSkoBmbS3qtRRxpB4XJfcJ0UBAlF7QFxeCg91BLDI10maMfpngYE
-	 GUM0fRwCgV10clhNpI2PaQ4gob7CHex19G8gRldqPBuUpM78fGkBpM0UXT8ixelGSU
-	 z1J5NhvB3QyMnCUu0HFkwD1i+NEXK0yL9AmrFlsQbZjM/QMXh/KkJhf0b8d0tCsjR9
-	 O2Kt+FWy9X6r90AuucdbQ5DKiCYwwvRks6UN7t6Eai/BXzXsbKQsTn9de+dLQqBnA/
-	 HFT91PEpPBRoA==
-Date: Sun, 25 Jun 2023 19:14:17 +0300
-From: Mike Rapoport <rppt@kernel.org>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Song Liu <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev, netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: [PATCH v2 02/12] mm: introduce execmem_text_alloc() and
- jit_text_alloc()
-Message-ID: <20230625161417.GK52412@kernel.org>
-References: <20230616085038.4121892-1-rppt@kernel.org>
- <20230616085038.4121892-3-rppt@kernel.org>
- <f9a7eebe-d36e-4587-b99d-35d4edefdd14@app.fastmail.com>
- <20230618080027.GA52412@kernel.org>
- <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30D8F63C2
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 16:58:18 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10olkn2022.outbound.protection.outlook.com [40.92.40.22])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C368B1;
+	Sun, 25 Jun 2023 09:58:16 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=g2D+KLYTKTDOQ9aryNLVfmFCr6FHiAS1KTH+shbPgIKo2AtLTNCYEqPS9Gr6aSoh97rR6sqsX1iXrVLYS8Dz+Zpw8A4CJ7Yq4+ugfuCvb8u9YdzZHMINbR6WnnOpBQCY1hLmkFhpVVcuWJ/Ib2uQfPW34BJWy4xNWvPGqcsMmimBfzNz+1tgEBoIu5wsN2TfMU78/RUTijhOniPqXVzo3PO843VNeg8hSoHei4daDFjoQ6UAmRYcTRPQ75LeV/LW8Kfa6AjoqEMVqUcMRGGMFImBzv7XhpKUf3kqO4OhyPSUgSwp5GHBEscE+KR0uDMxCfyqWIb5jhfKggP4vSnvqQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=0nwDQPRC+2nngHIh2pS/zTx59mCETITE4CXQdR2wofg=;
+ b=kNmZRat4JIrh6aF76Fw1ASpNybWMYOCcnHF8ML/fGD9hGOD1giOoMSJGPjHWUku/PR2myRqWlFcZcKUp06xUOv8aaBYJw10hjUd0htcAZVP4ks/q6bxWb1K/shKdOhwIzNnDSwvS7skHWZqwGsd2t7fIukvVANpj0+PzT0hOop+jTr0qdJosoa96VPXZPTqKdc/cn9easnM1pouzkV1XKlifyFOvaYauaYlV7fED7XbRBE12dXukuNQrupwL//tHfuxUNAYuxDTC2m87DCgLE4OeFMn+a6Nicp2OTFcIkjVIRWUve6mywGTPWY2a4p2XrMmvEV7weEAAK1tAV/lSDg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
+ dkim=none; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
+ s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=0nwDQPRC+2nngHIh2pS/zTx59mCETITE4CXQdR2wofg=;
+ b=e6ylI3aZzaBV5DoSiShnAXVXBG4Vn3GLp0umpMCgM5iXXB5z6z+mdtDPApF3LdCt8Za+5wbfmvzVmuQS6+rBo7Ks+virvpNDk4cxUdf/HYCumYz09koFqEPapYqrJYbrdyMjy7pQPmKmMJioQ4Oqa1cPH1V25g70Kd0dqRpi38CBkokq+Ar6gozPvhGem0sCja2vp2pq6/X48CPUodtEDwAsAEVDlfr3Dp80HdWhznDjGtXz9jE2sAa508eQhW1v896Zgvdpi/p6AQcOeVklfWFK6PSItMeMYoc0D9dfeFMwhwwHiVWZKA7mG015adHIClQLRDC/hX/v/OBAUMH48w==
+Received: from RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM (2603:10d6:10:c9::8) by
+ SCZP215MB1933.LAMP215.PROD.OUTLOOK.COM (2603:10d6:300:f::8) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6521.26; Sun, 25 Jun 2023 16:58:12 +0000
+Received: from RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
+ ([fe80::6c3:80e7:184a:98bc]) by RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
+ ([fe80::6c3:80e7:184a:98bc%4]) with mapi id 15.20.6521.024; Sun, 25 Jun 2023
+ 16:58:12 +0000
+Message-ID:
+ <RO2P215MB193879B2D99DD0BAF59EFA92A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+Date: Sun, 25 Jun 2023 11:58:00 -0500
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
+To: Larry Finger <Larry.Finger@lwfinger.net>,
+ Bagas Sanjaya <bagasdotme@gmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Wireless <linux-wireless@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>
+Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
+ kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
+ Kalle Valo <kvalo@kernel.org>
+References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
+ <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
+ <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+ <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
+ <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
+Content-Language: en-US
+From: Sardonimous <sardonimous@hotmail.com>
+In-Reply-To: <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-TMN:
+ [NJTORj29h07yBKb8RnkgmWSUAY1HfTb758cSw1jEW4jhDaeV+atnRb71+0bXqNtfIDDOuYaRlY4=]
+X-ClientProxiedBy: CH2PR07CA0013.namprd07.prod.outlook.com
+ (2603:10b6:610:20::26) To RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
+ (2603:10d6:10:c9::8)
+X-Microsoft-Original-Message-ID:
+ <8ed569e8-a51f-1b8b-83ff-f241f6fa0263@hotmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com>
+X-MS-Exchange-MessageSentRepresentingType: 1
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: RO2P215MB1938:EE_|SCZP215MB1933:EE_
+X-MS-Office365-Filtering-Correlation-Id: 111b26b9-c819-4048-0ee0-08db759d5bdb
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	siapfy8BqKSgnuhBtcKyXGJVgjO550bw9OWD3N0SIfXMESXz/IStl7sb4h2lj4uJt91V7U7oJJ+9aTbNlLGBLhNwflrafql/6YvUnpGE0ZomfgojLgNom3+UqzARz2lfRIgw2O7WAFgvFa8o7MGnHUojfNvRlorK4WeGt9LBCp0WNIhGZhbUJ8skSdnCoxNev9U8j0NIkJrcGBzQeZ0DOgd/cvINrsyOWvrwwBbzbfiOtD4VtS8hnxCbdFLTse4UboOy3ybEzNapMSqO0eV5aymLhIrbN/xC0PUTZmzScxRX+XTU2EX//ggIGxayFL5v1RrYKTSrroiEXj0LiwZdXMam4difHGIwO5j955YyLTbwtjkX7MyeIq7v4AoOsev63W7l2chiqot0Ow0AtRpdTdc8rYQ/ELVuT/C7ggIaPVQEuEKeOnfri3EKv01n0IayoULk0ZFgskwcnBSgN31xLGgV3pHt/K1QQSKxW9s3ctnco4oOppBTAGR978jUCdi9/OaEfiwp/p46b0Z3ZLjfSKSxMFC1eZyB6mrrwgEWO6PQse/KprcsX6vNhQ80XajT
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?utf-8?B?ZXZreUpLSHVVVVdVcUpjZjludzJGMk1UR0VXZkN0dDlhWFp5cUhuRElTY3Va?=
+ =?utf-8?B?bGZkSXFuMEVsWS80TUNxUlA5OEVNcnYvUWJmd0wxTEhqMXJJMnRGRURnNUtW?=
+ =?utf-8?B?MmV0akxwaGt1VlRjMlVWaWVKeUx4b1lweUdUMEhyVUZvZ2hWY2VCV0NLRU1O?=
+ =?utf-8?B?WUhOUy9RMEp5ajZKY2pSc3JaWGV2ZGpSM2tCMVY1cHVNdDJVaWVmMjBuN3lD?=
+ =?utf-8?B?UjFWUlAzeDNHaVlmSDhNL2x0Tkc5MFdHRit1YjVvOTE1amVsK0hONFVYWEtp?=
+ =?utf-8?B?YmJJOExtWXo4T1hwdUxCdjI4NGJqc1lQK0JCRTJWcnRpM3JXbFRJUGtEQ2V2?=
+ =?utf-8?B?TzdrcWZDTHgrM1ovQm9KT0hRbS9vbTRjMTF4V3RmblZVbkhEbnF2ZktjMDJl?=
+ =?utf-8?B?MGRRaVF5clBSM1p2b1Qvcm5pSWJaeWNnak12Y1VMMHMzWGJoRFNwaERMdzhr?=
+ =?utf-8?B?aDZxWk50azJicGllRVAwMkRuOUV6T2ZONnR6NzJMYS9PR0RkU1BTTFNRZlhD?=
+ =?utf-8?B?SDhIQUV1WTdBRzdLUXlhSWpyZlZjS25tVkNBdThnWVQ0V0xwRzBodmtUN2hU?=
+ =?utf-8?B?MVNPRlJCUWlQNlNYV2JUYXdaUkZENVBWT3JnVldkNVprc3Y2MkM5V04vTUxt?=
+ =?utf-8?B?NTBTMW5DNzZRN0pSN0tjMWtSYWRIYldTU2ZwTjZyZ1hYd3crVE9RVzRJaXhP?=
+ =?utf-8?B?R3FubCtBNklpQlZNSzJ1YllaUGViZVJuMzA0am40bzE2cnFtYzAwcTRxV1ZV?=
+ =?utf-8?B?cVJFclY4UjY0U0M5RTlHVlBZN1N0UzdQcnZwYTlNL0JVOUtoY3pra1dvMitz?=
+ =?utf-8?B?N2ZUWE5JYVVvNU50YXlaYVlXVVVOTUQrcytDODVuaXB2L0Z1UkZHTXhJa0xI?=
+ =?utf-8?B?RGswM2FGeVJ2bFd0bWk4SkhJeU1QT2g3UE9CT2ZQQW1rdnFsUkxnNDhKdDdC?=
+ =?utf-8?B?V3Y3Ui8rU0dQTFREbEQ0eWxFczU1ZllNS3FmMStjdVY4dWt4RmNEb0VXbTVC?=
+ =?utf-8?B?MmRIakdvaDRwSW1NUkhQeGUyZ0JBdCswQ3QzMlZURUFvSjBlcjQzVmM2V0ZL?=
+ =?utf-8?B?L1J4Ti8wWXJPZnRSbERSZklHbWNwRG9NdXEwN1NOVnJ2bjYwTDlTUzJ6a3pS?=
+ =?utf-8?B?eEE5VTRWUVlEZHIxdG1zUk9jR3QrS1RoVGE1NHhzU1IySVdtUkwvNkFETVpU?=
+ =?utf-8?B?NUZGZGdkMldEaDdReHNwc2drTWtEMGRkdzFncEdwWFFSUWZqTVltRHZlZGNO?=
+ =?utf-8?B?djJtbTk4enQ2ZEFWSlNzVU5qMWtmQnY0eU5KVFBYRXdOL0cySjlaZGQ4Zko2?=
+ =?utf-8?B?WjNtVTVxcUh5eDFraG45ZWFhNUhLKzFNY2JUS1p3Y1dzbG5UWDE1MVBZTkRm?=
+ =?utf-8?B?N3FkMzh5WTV2YUowcUdDU0hxY1dibUFidXNZODU0SVNzMlVnSEVpUThOblhy?=
+ =?utf-8?B?Z2VqVkQ3OWh6d1kySHZDRzVKN1lyZWgwaitTUkdoeXhKQTNWSVNFTE1zTnRw?=
+ =?utf-8?B?T3J6aUFZck92M0R0OCtPdHRKRTRNdDB1RjVOc2YzWE5rMmJZRXljeWg1OURl?=
+ =?utf-8?B?WGhVNGRLT2FtZzlVdE5SRnF0cEczYUNXOTFUekNFWVRiNDh5TjZINUJ4WHU0?=
+ =?utf-8?B?MmlnZjJOQ2Y0eTUvY0d6L0ZIUnZ2VnVzSTdxLzJvTTVpQ0FoSWNLN3N6Q2pM?=
+ =?utf-8?B?QWxhaGp0WW82cm9JZUdXNlhRN1BZMGl1OXN3Mm1mOEdOR2s3VFhJU2tQSkg2?=
+ =?utf-8?Q?f2LtxgVHff6i8gkUqU=3D?=
+X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-7d2c5.templateTenant
+X-MS-Exchange-CrossTenant-Network-Message-Id: 111b26b9-c819-4048-0ee0-08db759d5bdb
+X-MS-Exchange-CrossTenant-AuthSource: RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 16:58:11.9739
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
+X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
+	00000000-0000-0000-0000-000000000000
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SCZP215MB1933
+X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, Jun 19, 2023 at 10:09:02AM -0700, Andy Lutomirski wrote:
-> 
-> On Sun, Jun 18, 2023, at 1:00 AM, Mike Rapoport wrote:
-> > On Sat, Jun 17, 2023 at 01:38:29PM -0700, Andy Lutomirski wrote:
-> >> On Fri, Jun 16, 2023, at 1:50 AM, Mike Rapoport wrote:
-> >> > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
-> >> >
-> >> > module_alloc() is used everywhere as a mean to allocate memory for code.
-> >> >
-> >> > Beside being semantically wrong, this unnecessarily ties all subsystems
-> >> > that need to allocate code, such as ftrace, kprobes and BPF to modules
-> >> > and puts the burden of code allocation to the modules code.
-> >> >
-> >> > Several architectures override module_alloc() because of various
-> >> > constraints where the executable memory can be located and this causes
-> >> > additional obstacles for improvements of code allocation.
-> >> >
-> >> > Start splitting code allocation from modules by introducing
-> >> > execmem_text_alloc(), execmem_free(), jit_text_alloc(), jit_free() APIs.
-> >> >
-> >> > Initially, execmem_text_alloc() and jit_text_alloc() are wrappers for
-> >> > module_alloc() and execmem_free() and jit_free() are replacements of
-> >> > module_memfree() to allow updating all call sites to use the new APIs.
-> >> >
-> >> > The intention semantics for new allocation APIs:
-> >> >
-> >> > * execmem_text_alloc() should be used to allocate memory that must reside
-> >> >   close to the kernel image, like loadable kernel modules and generated
-> >> >   code that is restricted by relative addressing.
-> >> >
-> >> > * jit_text_alloc() should be used to allocate memory for generated code
-> >> >   when there are no restrictions for the code placement. For
-> >> >   architectures that require that any code is within certain distance
-> >> >   from the kernel image, jit_text_alloc() will be essentially aliased to
-> >> >   execmem_text_alloc().
-> >> >
-> >> 
-> >> Is there anything in this series to help users do the appropriate
-> >> synchronization when the actually populate the allocated memory with
-> >> code?  See here, for example:
-> >
-> > This series only factors out the executable allocations from modules and
-> > puts them in a central place.
-> > Anything else would go on top after this lands.
-> 
-> Hmm.
-> 
-> On the one hand, there's nothing wrong with factoring out common code. On
-> the other hand, this is probably the right time to at least start
-> thinking about synchronization, at least to the extent that it might make
-> us want to change this API.  (I'm not at all saying that this series
-> should require changes -- I'm just saying that this is a good time to
-> think about how this should work.)
-> 
-> The current APIs, *and* the proposed jit_text_alloc() API, don't actually
-> look like the one think in the Linux ecosystem that actually
-> intelligently and efficiently maps new text into an address space:
-> mmap().
-> 
-> On x86, you can mmap() an existing file full of executable code PROT_EXEC
-> and jump to it with minimal synchronization (just the standard implicit
-> ordering in the kernel that populates the pages before setting up the
-> PTEs and whatever user synchronization is needed to avoid jumping into
-> the mapping before mmap() finishes).  It works across CPUs, and the only
-> possible way userspace can screw it up (for a read-only mapping of
-> read-only text, anyway) is to jump to the mapping too early, in which
-> case userspace gets a page fault.  Incoherence is impossible, and no one
-> needs to "serialize" (in the SDM sense).
-> 
-> I think the same sequence (from userspace's perspective) works on other
-> architectures, too, although I think more cache management is needed on
-> the kernel's end.  As far as I know, no Linux SMP architecture needs an
-> IPI to map executable text into usermode, but I could easily be wrong.
-> (IIRC RISC-V has very developer-unfriendly icache management, but I don't
-> remember the details.)
-> 
-> Of course, using ptrace or any other FOLL_FORCE to modify text on x86 is
-> rather fraught, and I bet many things do it wrong when userspace is
-> multithreaded.  But not in production because it's mostly not used in
-> production.)
-> 
-> But jit_text_alloc() can't do this, because the order of operations
-> doesn't match.  With jit_text_alloc(), the executable mapping shows up
-> before the text is populated, so there is no atomic change from not-there
-> to populated-and-executable.  Which means that there is an opportunity
-> for CPUs, speculatively or otherwise, to start filling various caches
-> with intermediate states of the text, which means that various
-> architectures (even x86!) may need serialization.
-> 
-> For eBPF- and module- like use cases, where JITting/code gen is quite
-> coarse-grained, perhaps something vaguely like:
-> 
-> jit_text_alloc() -> returns a handle and an executable virtual address,
-> but does *not* map it there
-> jit_text_write() -> write to that handle
-> jit_text_map() -> map it and synchronize if needed (no sync needed on
-> x86, I think)
-> 
-> could be more efficient and/or safer.
-> 
-> (Modules could use this too.  Getting alternatives right might take some
-> fiddling, because off the top of my head, this doesn't match how it works
-> now.)
-> 
-> To make alternatives easier, this could work, maybe (haven't fully
-> thought it through):
-> 
-> jit_text_alloc()
-> jit_text_map_rw_inplace() -> map at the target address, but RW, !X
-> 
-> write the text and apply alternatives
-> 
-> jit_text_finalize() -> change from RW to RX *and synchronize*
-> 
-> jit_text_finalize() would either need to wait for RCU (possibly extra
-> heavy weight RCU to get "serialization") or send an IPI.
+Hello Larry,
 
-This essentially how modules work now. The memory is allocated RW, written
-and updated with alternatives and then made ROX in the end with set_memory
-APIs.
+On 6/24/23 23:41, Larry Finger wrote:
+>
+> Sardonimous,
+>
+> The critical line is:
+>> Jun 20 18:20:11 askasleikir kernel: b43_pio_tx+0x373/0x390
+>
+> I certainly have not used PIO for a long time. I expect that your 
+> MacBook Pro should do DMA on the b43. Apple makes wierd hardware, but 
+> not likely that wierd.
 
-The issue with not having the memory mapped X when it's written is that we
-cannot use large pages to map it. One of the goals is to have executable
-memory mapped with large pages and make code allocator able to divide that
-page among several callers.
+I have been unable to get DMA to work in the past.  So I have been 
+configuring it with PIO=1 (/etc/modprobe,d/b43.conf):
 
-So the idea was that jit_text_alloc() will have a cache of large pages
-mapped ROX, will allocate memory from those caches and there will be
-jit_update() that uses text poking for writing to that memory.
+     options b43 pio=1 qos=0
 
-Upon allocation of a large page to increase the cache, that large page will
-be "invalidated" by filling it with breakpoint instructions (e.g int3 on
-x86)
+>
+> Does dmesg offer any clues as to what is happening?
+>
+If I try with, say:
 
-To improve the performance of this process, we can write to !X copy and
-then text_poke it to the actual address in one go. This will require some
-changes to get the alternatives right.
+     options b43 pio=0 qos=0 verbose=3
 
--- 
-Sincerely yours,
-Mike.
+Then
+
+     rmmod b43
+     rmmod ssb
+     modprobe b43
+
+I see the following:
+
+     insmod /lib/modules/6.1.12-arch1-1/kernel/drivers/ssb/ssb.ko.zst
+     insmod 
+/lib/modules/6.1.12-arch1-1/kernel/drivers/net/wireless/broadcom/b43/b43.ko.zst 
+pio=0 qos=0 verbose=3
+
+...
+
+[Jun25 11:51] ssb: Found chip with id 0x4322, rev 0x01 and package 0x0A
+[  +0.096950] b43-pci-bridge 0000:02:00.0: Sonics Silicon Backplane 
+found on PCI device 0000:02:00.0
+[  +0.411653] b43-phy1: Broadcom 4322 WLAN found (core revision 16)
+[  +0.038206] b43-phy1: Found PHY: Analog 8, Type 4 (N), Revision 4
+[  +0.000032] b43-phy1: Found Radio: Manuf 0x17F, ID 0x2056, Revision 3, 
+Version 0
+[  +0.015660] Broadcom 43xx driver loaded [ Features: PNLS ]
+[  +0.520933] ieee80211 phy1: Selected rate control algorithm 'minstrel_ht'
+[  +0.726559] b43-phy1: Loading firmware version 784.2 (2012-08-15 21:35:19)
+[  +0.276596] b43-phy1 debug: Chip initialized
+[  +0.000562] b43-phy1 debug: 64-bit DMA initialized
+[  +0.000013] b43-phy1 debug: QoS disabled
+[  +0.023145] b43-phy1 debug: Wireless interface started
+[  +0.056159] b43-phy1 debug: Adding Interface type 2
+[  +0.086691] b43-phy1 debug: Removing Interface type 2
+[  +0.000105] b43-phy1 debug: Wireless interface stopped
+[  +0.099849] b43-phy1 ERROR: DMA RX reset timed out
+[  +0.065067] b43 ssb0:0: Timeout waiting for bitmask 01800000 on 
+register 0F90 to clear
+[  +0.204905] b43-phy1: Loading firmware version 784.2 (2012-08-15 21:35:19)
+[  +0.296681] b43-phy1 debug: Chip initialized
+[  +0.000555] b43-phy1 debug: 64-bit DMA initialized
+[  +0.000010] b43-phy1 debug: QoS disabled
+[  +0.027099] b43-phy1 debug: Wireless interface started
+[  +0.062503] b43-phy1 debug: Adding Interface type 2
+
+The wlan0 device never seems to work, no IP address is obtained, etc.
+
+> If there is nothing shown in the log, you definitely need to do a 
+> proper bisection from the mainline git tree to isolate the change that 
+> led to this failure.
+
+Still working on initial kernel build.
+
+> ADDED WITH EDIT: I looked at the code and b43 will not be built for 
+> any hardware without DMA, thus it appears that adding "b43.pio=1" is 
+> the only way to get PIO mode. Please check the output of dmesg for PIO 
+> messages.
+>
+> Larry
+
+Thanks & regards,
+
+Sardonimous
+
 
