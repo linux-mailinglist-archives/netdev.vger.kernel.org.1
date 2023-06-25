@@ -1,682 +1,379 @@
-Return-Path: <netdev+bounces-13778-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13779-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF02373CE3F
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 05:18:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68D7F73CE63
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 06:20:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DC9E280FBC
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 03:18:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DCB4A280FA2
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 04:20:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AAEE63D;
-	Sun, 25 Jun 2023 03:18:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE6A4653;
+	Sun, 25 Jun 2023 04:20:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7763B62A
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 03:18:40 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C408910E7
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 20:18:13 -0700 (PDT)
-Received: from canpemm500010.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QpblB4lpvzqV24;
-	Sun, 25 Jun 2023 11:17:58 +0800 (CST)
-Received: from [10.174.179.191] (10.174.179.191) by
- canpemm500010.china.huawei.com (7.192.105.118) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 25 Jun 2023 11:18:10 +0800
-Message-ID: <bc78d89c-97e9-4b08-f178-067f5aeec5c6@huawei.com>
-Date: Sun, 25 Jun 2023 11:18:10 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AE31E62A
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:20:00 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6BC5CE8;
+	Sat, 24 Jun 2023 21:19:58 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35P3u2YK013639;
+	Sat, 24 Jun 2023 21:19:28 -0700
+Received: from nam10-bn7-obe.outbound.protection.outlook.com (mail-bn7nam10lp2109.outbound.protection.outlook.com [104.47.70.109])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rdwunht0k-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 24 Jun 2023 21:19:28 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=beppcj24oXFpQn1PjOgfoR/8YCkVE856MyJtZ6XA6scRuR0XiYhtwVIN15kfPPi5P0+MO26XxTcO8IPEW31vXJRrhmWw1EuAIg7XjbC2zmRFqvxiN0lx1ujeIJPQugb/gWfO00z1jinA0o+2Yw1mJ2NEcGGIwNP5SQQE5MipzkDLWqjNuG1lP2hagyXCKSWk2Wjk21/ZJDSdv99aFa55OsNSKqScfnwX6SVZ2FdIEifPfNnEUsy0hiYidlgQknCblz357bRuSHolw2EPcWAvpHUA6O035MtU5z7yIgxVp/2IoAGxOicb8lyexP0r2gc5vNEEj4JZ5bqh4I+wsQptGg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ofTdozQgE+i/y+8JNTJhyB7qeYgQZBvbuDfYRFp8bE4=;
+ b=ecmpWo82GcB6lmoUcrezx4Wpf1Egn7Muisr49uz3Vj9Wilcr4l++p2e9HMQqBXwloJOOVwXftvkhu+TYLO5QKA4+tYV2EiQu1fPoR+s58qpgA+rkyRG2h0dbfaDBF5p8JjznSEqH5fKmQPWGw4HUSF3ESLZxAWpImHXnWWMPgv1cDdiL1aVVdvpsxamDVk5M92gqXo2RrAGBS8h/F744usnx/lvG4hTmbJpW+fHMphAU2NT4sW8Ep1ty717S0dtkRSl5GjUMHqpyZgWjC5ethV+RH/1v998CV8Oslnj1Qa3nozjcme+ZLBS6+mb2oORpRlSSfPVqNKa1tf/udkRhyQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=marvell.com; dmarc=pass action=none header.from=marvell.com;
+ dkim=pass header.d=marvell.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=marvell.onmicrosoft.com; s=selector1-marvell-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=ofTdozQgE+i/y+8JNTJhyB7qeYgQZBvbuDfYRFp8bE4=;
+ b=l/h/l3HozcGCJ4aK3g7gI+ZRQ3c6YLvlfIP9ajyAeKFSPiEWiev1HWMX/ExI3TT/h2H+H3h2SE1KlBWNm0eOfzQgO61o0e+l7XgfOj7Bmg+/lNaG3axmI5sB3CJ7Ew32y/0gDSSJvxDCZ+tDksbVeTDOGbY1t3s8y5AHiZ58SrE=
+Received: from PH0PR18MB4474.namprd18.prod.outlook.com (2603:10b6:510:ea::22)
+ by DS0PR18MB5479.namprd18.prod.outlook.com (2603:10b6:8:164::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Sun, 25 Jun
+ 2023 04:19:25 +0000
+Received: from PH0PR18MB4474.namprd18.prod.outlook.com
+ ([fe80::1032:7a09:9287:7c91]) by PH0PR18MB4474.namprd18.prod.outlook.com
+ ([fe80::1032:7a09:9287:7c91%7]) with mapi id 15.20.6521.024; Sun, 25 Jun 2023
+ 04:19:25 +0000
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: Paolo Abeni <pabeni@redhat.com>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>
+CC: "kuba@kernel.org" <kuba@kernel.org>,
+        "davem@davemloft.net"
+	<davem@davemloft.net>,
+        "willemdebruijn.kernel@gmail.com"
+	<willemdebruijn.kernel@gmail.com>,
+        "andrew@lunn.ch" <andrew@lunn.ch>,
+        Sunil
+ Kovvuri Goutham <sgoutham@marvell.com>,
+        Linu Cherian <lcherian@marvell.com>,
+        Geethasowjanya Akula <gakula@marvell.com>,
+        Jerin Jacob Kollanukkaran
+	<jerinj@marvell.com>,
+        Subbaraya Sundeep Bhatta <sbhatta@marvell.com>,
+        Naveen
+ Mamindlapalli <naveenm@marvell.com>,
+        "edumazet@google.com"
+	<edumazet@google.com>,
+        "jhs@mojatatu.com" <jhs@mojatatu.com>,
+        "xiyou.wangcong@gmail.com" <xiyou.wangcong@gmail.com>,
+        "jiri@resnulli.us"
+	<jiri@resnulli.us>,
+        "maxtram95@gmail.com" <maxtram95@gmail.com>,
+        "corbet@lwn.net" <corbet@lwn.net>,
+        "linux-doc@vger.kernel.org"
+	<linux-doc@vger.kernel.org>
+Subject: Re: [net-next Patch 1/3] octeontx2-pf: implement transmit schedular
+ allocation algorithm
+Thread-Topic: [net-next Patch 1/3] octeontx2-pf: implement transmit schedular
+ allocation algorithm
+Thread-Index: AQHZpxw5WyXjiy/jMUO+6MDq5LWrHw==
+Date: Sun, 25 Jun 2023 04:19:24 +0000
+Message-ID: 
+ <PH0PR18MB447437B8E24747DECA9B2949DE21A@PH0PR18MB4474.namprd18.prod.outlook.com>
+References: <20230622085638.3509-1-hkelam@marvell.com>
+	 <20230622085638.3509-2-hkelam@marvell.com>
+ <71f51047892001e6cdac1de4a6f7c2b9f97c7c8b.camel@redhat.com>
+In-Reply-To: <71f51047892001e6cdac1de4a6f7c2b9f97c7c8b.camel@redhat.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-dg-rorf: true
+x-dg-ref: 
+ =?utf-8?B?UEcxbGRHRStQR0YwSUc1dFBTSmliMlI1TG5SNGRDSWdjRDBpWXpwY2RYTmxj?=
+ =?utf-8?B?bk5jYUd0bGJHRnRYR0Z3Y0dSaGRHRmNjbTloYldsdVoxd3dPV1E0TkRsaU5p?=
+ =?utf-8?B?MHpNbVF6TFRSaE5EQXRPRFZsWlMwMllqZzBZbUV5T1dVek5XSmNiWE5uYzF4?=
+ =?utf-8?B?dGMyY3ROelF4T1dKaU5EWXRNVE13WmkweE1XVmxMV0kyWldNdFpUZzJZVFkw?=
+ =?utf-8?B?WWpWa05XUXlYR0Z0WlMxMFpYTjBYRGMwTVRsaVlqUTRMVEV6TUdZdE1URmxa?=
+ =?utf-8?B?UzFpTm1WakxXVTRObUUyTkdJMVpEVmtNbUp2WkhrdWRIaDBJaUJ6ZWowaU1U?=
+ =?utf-8?B?RTJOU0lnZEQwaU1UTXpNekl4TkRBek5UazROelUyTURZMklpQm9QU0o1ZEc1?=
+ =?utf-8?B?SlltVndiMVJZZWpCQ1NYQjBNRWx5WjFwRlZEZEJMMjg5SWlCcFpEMGlJaUJp?=
+ =?utf-8?B?YkQwaU1DSWdZbTg5SWpFaUlHTnBQU0pqUVVGQlFVVlNTRlV4VWxOU1ZVWk9R?=
+ =?utf-8?B?MmRWUVVGT05GQkJRVVJwTWtoVk1raExabHBCVTBzM2VWQldhV1pZV2tKSmNu?=
+ =?utf-8?B?WkpPVmRLT1dSclJWcEJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlNFRkJRVUZDZFVSM1FVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UlVGQlVVVkNRVUZCUVVrM2NWUndRVU5CUVZGQlFVRkJRVUZCUVVGQlFVbzBR?=
+ =?utf-8?B?VUZCUW1oQlIxRkJXa0ZDZVVGSFZVRmpkMEo2UVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZGUVVGQlFVRkJRVUZCUVdk?=
+ =?utf-8?B?QlFVRkJRVUZ1WjBGQlFVZE5RV1JSUW5wQlNGRkJZbmRDZEVGR09FRmpRVUpz?=
+ =?utf-8?B?UVVoSlFXTjNRblpCUnpSQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlVVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVTkJRVUZCUVVGRFpVRkJRVUZaZDBJeFFVaE5RV1JCUW5aQlJ6?=
+ =?utf-8?B?QkJXSGRDZDBGSFowRmlkMEoxUVVkVlFXSm5RakZCUnpCQldXZENiRUZJU1VG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRa0ZCUVVGQlFVRkJRVUZKUVVGQlFVRkJTalJCUVVGQ2FrRklWVUZq?=
+ =?utf-8?B?ZDBJd1FVYzRRV0pSUW1aQlNFMUJZM2RDZFVGR09FRmFRVUpvUVVoTlFXRkJR?=
+ =?utf-8?B?bVpCU0ZsQlRVRkJlVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-refone: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVWQlFVRkJRVUZCUVVGQlowRkJRVUZCUVc1blFVRkJSMDFC?=
+ =?utf-8?B?WkZGQ2VrRklVVUZpZDBKMFFVWTRRV04zUW5wQlJ6UkJXSGRDY2tGSFZVRmxV?=
+ =?utf-8?B?VUl6UVVjNFFXTm5RbXRCU0UxQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRlJRVUZCUVVGQlFVRkJRMEZCUVVGQlFV?=
+ =?utf-8?B?TmxRVUZCUVZsM1FqRkJTRTFCWkVGQ2RrRkhNRUZZZDBKNlFVaE5RV0puUW1a?=
+ =?utf-8?B?QlJ6UkJZbmRDYTBGSFZVRmlRVUp3UVVjd1FXRlJRakJCUjFWQlkyZENaa0ZJ?=
+ =?utf-8?B?V1VGTlFVRjVRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZDUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVsQlFVRkJRVUZLTkVGQlFVSnFRVWhWUVdOM1FqQkJSemhCWWxGQ1prRklU?=
+ =?utf-8?B?VUZqZDBKMVFVWTRRV04zUW5kQlIwVkJXWGRDYkVGR09FRmtaMEYzUVVSSlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlJV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRm5RVUZCUVVGQmJtZEJRVUZIVVVGaVFVSjNRVVk0UVdO?=
+ =?utf-8?B?M1FuSkJTR3RCWTBGQ2JFRkdPRUZaZDBKdlFVZEZRV1JCUW1aQlJ6QkJXbEZD?=
+ =?utf-8?B?ZWtGSVRVRlpVVUp1UVVkVlFWaDNRakpCUkVGQlRXZEJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVkZCUVVGQlFVRkJRVUZEUVVGQlFVRkJRMlZCUVVGQldrRkNj?=
+ =?utf-8?B?MEZJUVVGWWQwSjZRVWQzUVZsUlFtcEJSM05CV0hkQ2FrRkhaMEZaVVVJd1FV?=
+ =?utf-8?B?WTRRV0pSUW14QlNFMUJZM2RDYUVGSFkwRmFVVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-reftwo: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVKQlFVRkJRVUZCUVVGQlNVRkJRVUZCUVVvMFFVRkJR?=
+ =?utf-8?B?bXRCUjNkQlkwRkNaa0ZJVVVGYVVVSm9RVWN3UVdOM1FtWkJSemhCWW1kQ2JF?=
+ =?utf-8?B?RkhVVUZqWjBKd1FVaFpRVnBSUW1aQlIxbEJZVkZDYzBGSFZVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkZRVUZCUVVGQlFVRkJRV2RCUVVG?=
+ =?utf-8?B?QlFVRnVaMEZCUVVkVlFXSlJRbWhCUjJ0QllrRkNaa0ZIUlVGYVFVSnJRVWhK?=
+ =?utf-8?B?UVZwUlFucEJTRTFCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCVVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVOQlFVRkJRVUZEWlVGQlFVRmlVVUpvUVVoSlFXUm5RbXhCUjNkQldI?=
+ =?utf-8?B?ZENkMEZJU1VGaWQwSnhRVWRWUVZsM1FqQkJSamhCWW1kQ2FFRkhNRUZhVVVK?=
+ =?utf-8?B?NlFVWTRRVmwzUW5aQlJ6UkJXbWRDY0VGSFVVRmFVVUoxUVVoUlFXRlJRbWhC?=
+ =?utf-8?B?UjNkQldIZENhRUZIZDBGaWQwSjFRVWRWUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFrRkJRVUZCUVVGQlFVRkpRVUZCUVVGQlNqUkJRVUZDZEVGSFJVRmpaMEl5?=
+ =?utf-8?B?UVVkVlFXSkJRbVpCU0VGQlkyZENka0ZIYjBGYVVVSnFRVWhSUVZoM1FuVkJS?=
+ =?utf-8?B?MFZCWWxGQ2JFRklUVUZZZDBKNVFVZFZRV04zUWpCQlNFbEJZVkZDYWtGSVVV?=
+ =?utf-8?B?RmFVVUpyUVVZNFFWbFJRbk5CUnpoQlltZENiRUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVVZCUVVGQlFVRkJRVUZCWjBGQlFVRkJRVzVuUVVGQlJ6?=
+ =?utf-8?B?QkJXVkZDZVVGSVdVRmFVVUp6UVVZNFFXTkJRbmxCUnpoQllXZENiRUZIVFVG?=
+ =?utf-8?B?a1FVSm1RVWMwUVZsUlFuUkJSMVZCWTNkQ1prRklTVUZhVVVKNlFVaFJRV05u?=
+ =?utf-8?B?UW5CQlIwMUJaRUZDYkVGSFVVRllkMEp2UVVkVlFXVkJRbXBCUnpoQldrRkNi?=
+ =?utf-8?B?RUZJVFVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGUlFVRkJRVUZCUVVGQlEwRkJRVUZC?=
+ =?utf-8?B?UVVObFFVRkJRV0pSUW1oQlNFbEJaR2RDYkVGSGQwRmlRVUptUVVkRlFXTm5R?=
+ =?utf-8?B?blJCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-refthree: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkNRVUZCUVVGQlFVRkJRVWxC?=
+ =?utf-8?B?UVVGQlFVRktORUZCUVVKMFFVZEZRV05uUWpKQlIxVkJZa0ZDYzBGR09FRmFk?=
+ =?utf-8?B?MEoyUVVjNFFWcDNRbk5CUjFWQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUlVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGblFVRkJRVUZCYm1kQlFVRkhNRUZaVVVKNVFVaFpRVnBSUW5O?=
+ =?utf-8?B?QlIzZEJXSGRDZDBGSVNVRmlkMEp4UVVkVlFWbDNRakJCUmpoQldYZENka0ZI?=
+ =?utf-8?B?VVVGYVVVSjZRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFWRkJRVUZCUVVGQlFVRkRRVUZCUVVGQlEyVkJRVUZCWWxGQ2FFRklT?=
+ =?utf-8?B?VUZrWjBKc1FVZDNRV0pCUW1aQlNFRkJZMmRDZGtGSGIwRmFVVUpxUVVoUlFW?=
+ =?utf-8?B?aDNRbXBCUnpoQldrRkNiRUZJVFVGWWQwSnJRVWRyUVZsM1FqQkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUpCUVVGQlFVRkJRVUZCU1VGQlFVRkJRVW8wUVVG?=
+ =?utf-8?B?QlFuUkJSMFZCWTJkQ01rRkhWVUZpUVVKelFVWTRRV05CUW5sQlJ6aEJZV2RD?=
+ =?utf-8?B?YkVGSFRVRmtRVUptUVVjMFFWbFJRblJCUjFWQlkzZENaa0ZIVFVGaWQwSjFR?=
+ =?utf-8?B?VWRaUVdGUlFtdEJSMVZCWW1kQ01FRkhhMEZaVVVKelFVWTRRV0pSUW1oQlNF?=
+ =?utf-8?B?bEJaR2RDYkVGSGQwRmlRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGRlFVRkJRVUZCUVVGQlFXZEJR?=
+ =?utf-8?B?VUZCUVVGdVowRkJRVWN3UVZsUlFubEJTRmxCV2xGQ2MwRkhkMEZZZDBKM1FV?=
+ =?utf-8?B?aEpRV0ozUW5GQlIxVkJXWGRDTUVGR09FRmlaMEpvUVVjd1FWcFJRbnBCUmpo?=
+ =?utf-8?B?QldYZENka0ZITkVGYVowSndRVWRSUVZwUlFuVkJTRkZCWVZGQ2FFRkhkMEZZ?=
+ =?utf-8?B?ZDBKMFFVZEZRV05uUWpKQlIxVkJZa0ZDYzBGR09FRmlkMEo1UVVZNFFWbFJR?=
+ =?utf-8?B?bmxCUnpCQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?Q?FBQUFB?=
+x-dg-reffour: 
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJVVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VU5CUVVGQlFVRkRaVUZCUVVGaVVVSm9RVWhKUVdSblFteEJSM2RCWWtGQ1pr?=
+ =?utf-8?B?RklRVUZqWjBKMlFVZHZRVnBSUW1wQlNGRkJXSGRDZFVGSFJVRmlVVUpzUVVo?=
+ =?utf-8?B?TlFWaDNRbXBCUnpoQlltZENiVUZIYTBGYVFVSnNRVWMwUVdSQlFuQkJSMFZC?=
+ =?utf-8?B?WWtGQ1prRkhNRUZaVVVKNVFVaFpRVnBSUW5OQlIzZEJXSGRDZGtGSVNVRllk?=
+ =?utf-8?B?MEp1UVVjNFFXSjNRbTVCUjNkQldsRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUWtG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGSlFVRkJRVUZCU2pSQlFVRkNkRUZIUlVGalowSXlRVWRW?=
+ =?utf-8?B?UVdKQlFuTkJSamhCWTBGQ2VVRkhPRUZoWjBKc1FVZE5RV1JCUW1aQlJ6UkJX?=
+ =?utf-8?B?VkZDZEVGSFZVRmpkMEptUVVoSlFWcFJRbnBCU0ZGQlkyZENjRUZIVFVGa1FV?=
+ =?utf-8?B?SnNRVWRSUVZoM1FuUkJSMFZCWTJkQ01rRkhWVUZpUVVKelFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVVkJRVUZCUVVGQlFVRkJaMEZCUVVGQlFXNW5RVUZCUnpCQldW?=
+ =?utf-8?B?RkNlVUZJV1VGYVVVSnpRVWQzUVZoM1FuZEJTRWxCWW5kQ2NVRkhWVUZaZDBJ?=
+ =?utf-8?B?d1FVWTRRV0puUW1oQlJ6QkJXbEZDZWtGR09FRmpaMEpzUVVoTlFXUkJRbmxC?=
+ =?utf-8?B?UjJ0QldYZENNRUZIVlVGYVFVSm1RVWN3UVZsUlFubEJTRmxCV2xGQ2MwRkhk?=
+ =?utf-8?B?MEZZZDBKMlFVaEpRVmgzUW1oQlNFbEJZbEZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZSUVVGQlFVRkJRVUZCUTBGQlFVRkJRVU5s?=
+ =?utf-8?B?UVVGQlFXSlJRbWhCU0VsQlpHZENiRUZIZDBGaVFVSm1RVWhSUVZwUlFubEJS?=
+ =?utf-8?B?ekJCWVZGQ2RVRklWVUZqZDBGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQ1FVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?bEJRVUZCUVVGS05FRkJRVUowUVVkRlFXTm5RakpCUjFWQllrRkNjMEZHT0VG?=
+ =?utf-8?B?a2QwSjJRVWhKUVZwQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJR?=
+ =?utf-8?B?VUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFV?=
+ =?utf-8?B?RkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVGQlFVRkJRVUZCUVVG?=
+ =?utf-8?B?QlFVRkJRVUZCUVVGQlFVRkJRVUZSUVVGQlFVRkJRVUZCUVVGQlFVRkJSVUZC?=
+ =?utf-8?B?UVVGQlFVRkJRVUZuUVVGQlFVRkJJaTgrUEM5dFpYUmhQZz09?=
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR18MB4474:EE_|DS0PR18MB5479:EE_
+x-ms-office365-filtering-correlation-id: ae0bcdea-d681-474d-76b0-08db75335bf5
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ XsVf255EQK+x+xrsbI0KV4NI/bHiyPo1vvPrVX6iumJbINMyKn/lIRQxyefHoTsDpSX1gchbhMbLxqTyqwK+6M1iVAIfiqqHvgUCj/HWAh5Sdrkv4ORW8LVhiwe8innrwCTFupP6kIiH7KZMzU11eUHYJ2Mq1KrJRu7O9W69tR4RBck4pO7EfTzrxFkUk39vbPreiuUwDpqmWd0uX/jqC00hB07576eEd50PBzo5+eVjXAfaOnui6PKjcjl/Mwf+NwRrFIF7qvD54NK+aSD5ItznVHNkF4uc77ZkbRbrrBja2JF/RriDzISm5LMQEKTEep0wEA8bDKUUbYXc/dqnCRs2CLFDEHLeU4s4M139NJefKEg9fQVEWcB7YUs0nFW3IqK+xmD0RsyGDceJIG9LrFG//xnfoJ9jeMkJEC53BELvOSiPTVAwA+HF978vMbNh8JymjZL9OgPBTt/OVl+HGSJ2Lw9pdwuJSb9HbNATy/m842PHY690GOvQ25gMUJlTYM7dWMq25esWFLF+QmTty9ctiSz9E5erUbhuluMMwE9UK5j4F77nd2mPo3RmlqDGIzDkVLfw/wnbdOU5a5FafC8GFmQAlDDt1ljiq9vt348Fjo+8UYo4gOkuZonxDFPS
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR18MB4474.namprd18.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(346002)(396003)(136003)(39850400004)(451199021)(2906002)(4744005)(7696005)(71200400001)(38100700002)(122000001)(6506007)(186003)(9686003)(55016003)(41300700001)(110136005)(54906003)(86362001)(38070700005)(478600001)(316002)(76116006)(4326008)(66946007)(66556008)(66476007)(66446008)(33656002)(64756008)(7416002)(5660300002)(52536014)(8676002)(8936002);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?utf-8?B?Z1cwZjJnWjF0enUzMWswR2R1TmdvdElHWXVwak05bkg2NjZ3M2tPaVBCT3Nk?=
+ =?utf-8?B?R2dXOTJHaHZSYTY0WlRIWDRiVFVOWFhCak9YeHRHMW85eC83eFFqOWczSmNR?=
+ =?utf-8?B?Z3NmOHpxNlQzVjh1bG1FZ09YaU9CK2ZxTko2MDdub3JxTGVPZ2NLQlBrZHJD?=
+ =?utf-8?B?WjhvV0tuU0dEcTZkRXg5c1VTOHMzOUFlRW5kaGlwbkVML2tyUlJZM2Y5V1lX?=
+ =?utf-8?B?ckJuRG9jS2NORk9kcExrQStyYnZUNFNHVzU1MDFXbFNrNEkxOC8yQnJJczc3?=
+ =?utf-8?B?eTR0K01oT3A3NitvdUd6ejZsWVVpcjhhNy9LT0Y4MG5iZkt3dlVqbGVRMUdN?=
+ =?utf-8?B?QmIxdzZXdUhUNktWT1ZDU3BiOEo3VHRsYVV4SDRnUFdxZndSaDA5Vmx1T241?=
+ =?utf-8?B?eEtXOHRmUGVHVGcwZnVkTTQxbC9VL2lDUis2bm02WnR0OUt3ZFd4MTBLMHJl?=
+ =?utf-8?B?WXdSNStyd0hUWG9vZmtmR1JOdVVxR2k4MVZpMzA3eWRSQ2JFKy9GWDM4akhx?=
+ =?utf-8?B?Sit2QWlUb25aOFFHR3AzUUZLdXRrMW1xbEY2T1NZNlhReXhCb1ZRbVdpWWF4?=
+ =?utf-8?B?NGdYYUZ3bUdpcjJDaHZBNHloMjh2ZG9xM3FocUxVelVXbFl4NUx6R3NkNDdt?=
+ =?utf-8?B?bnJFNllYNjB4bGlCZUxabkdoUTNwTFBxbE1YWEdSM0RzTlhiUndpMnZjL2Fr?=
+ =?utf-8?B?OHA5bzV0Q0MxbkpQcGd3NFBPWDFyLzdIQUxmUWo1UDFyWUdUMWpIck0rRXov?=
+ =?utf-8?B?c01oUWJBN1dwY3ZiWFg3UG9Na1l1bWlWODF0VlR6U0MveTliOTZ6OUhJYnVY?=
+ =?utf-8?B?TVY3bkRnNXdKblpOM2FZUi9yamRiczU0UlBxODZjbUlyK2pYVVF2b3QwOEsx?=
+ =?utf-8?B?US9qSVdvMWpKcTZ0YnJ4ZjQ2cWNnYnVodjI5NjVYWjNjektoQ0hlY2R2N1Ux?=
+ =?utf-8?B?OHd2MGZqSkVkSWpodjh0Y05YdDk3eFlISkN0UGluNVdNM1BpVFJTMUo2d2Vr?=
+ =?utf-8?B?NFVVb2RZMnZyMmgrazNQNWdxcHBhL2V0c0RPU1VEU3ZqMUNUOHNzcm0xRU8v?=
+ =?utf-8?B?bXN5cmdpNmhuU0RjY1ZWQjVRZVJkLzNHSHNXTTVKcmxnTWhjTUNwdVE5b2h5?=
+ =?utf-8?B?RlFCaXJhYnZTQ0laN3VvTG5ac21BZnM0WCtCZHR2UjUrdjBlaFNJd1JtQzlk?=
+ =?utf-8?B?ZXYrOXVQckRoN3VnazFWVkc3aVFGazMxMi84ajlHODNaVWNVNE1RSlYvUTNV?=
+ =?utf-8?B?Nm90SlIwZjZTcER5ekxCNllBMzR6U3M1RS9USlVyaW5PRXh4MkdER0VTZ2d4?=
+ =?utf-8?B?YTQ0Y1Yzb1RDOVhkUkpSZnJNdkxtaEt6SUVMSW84WFZoRG5aM3UyL1BSYkp5?=
+ =?utf-8?B?cWFpT25ybFF4YzhSWitFM0NHWXl6S3hQbXlQaVpjTnFnbVpKWFI2YUFCelRr?=
+ =?utf-8?B?RkYwRVFReVVCZ3dkUXBVVU1uTWVZUVh4WDFBQjdDYUFGUTl5bXpEaGwvUHgw?=
+ =?utf-8?B?QlhYTTQ5bit0WU5EeXY4YWNxc04vRUdiUS9KaEdGeXNCdmh3d2FpUUJaME5J?=
+ =?utf-8?B?UnFVbXh3TFIxSGlseGdIdEdPN1I5M05kcGhRODM4TTRZQ29CUjYyNmZVWms5?=
+ =?utf-8?B?Z21CMVo3RWl4SkNtQ2dPV0kva1lsTGwxUEJ6VVdvajJtdmI2bzRDaGlpQjM1?=
+ =?utf-8?B?eTFUcXlTS094S1pwdnNOdFVJWUljL293WTd2NEJMblR0a2dQdE5JVW9LN2dy?=
+ =?utf-8?B?YzRKVFNUM0lhZm4yMGxrcnB5WkJLUFVaNzJlb2dPN2w3aDdtTVBReXdWcUpj?=
+ =?utf-8?B?MmJHWFdvNm1odFFybkhaTThMNzM3cGxnc0EvdHltM0ppRTdnMnFMSFdKdlFW?=
+ =?utf-8?B?VTloZktXcmNzMkRaZVJLODdXZTZSU3pvcGJNdU5sQ3E5eVJjU0lCNmFrRDVt?=
+ =?utf-8?B?S0VIdFBWeUQvbGNKOExvVnNpVCsvbUt5ZDN0WnIzajVyTU82S2JEUEhlYzJE?=
+ =?utf-8?B?N3BQMEU3dW5ZWUtzckhSSGVEcWp3Qm80aU9FOUY3enRuOGVBZDNzOGFPUFEz?=
+ =?utf-8?B?REk4MnVNb3ZtbVczQ2Yyait4elRKT0JtajUvdW5lWnZ2T2tWMjJDMEpqRk8r?=
+ =?utf-8?B?VnV4UHhIVFBGeXdzMXU5b2QrcWRVRW00Y045bWhwN2JpSVUxWlQvYmo1ZUpS?=
+ =?utf-8?Q?r4nfyagZ25jUN1Ug238vS/A=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.2.0
-Subject: Re: [PATCH v2 net] ipv6: rpl: Fix Route of Death.
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-CC: <alex.aring@gmail.com>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <kuba@kernel.org>, <kuni1840@gmail.com>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>
-References: <20230623005223.61341-1-kuniyu@amazon.com>
- <20230623192047.85787-1-kuniyu@amazon.com>
-From: wangyufen <wangyufen@huawei.com>
-In-Reply-To: <20230623192047.85787-1-kuniyu@amazon.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.191]
-X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
- canpemm500010.china.huawei.com (7.192.105.118)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: marvell.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR18MB4474.namprd18.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae0bcdea-d681-474d-76b0-08db75335bf5
+X-MS-Exchange-CrossTenant-originalarrivaltime: 25 Jun 2023 04:19:24.9536
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 70e1fb47-1155-421d-87fc-2e58f638b6e0
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: iIYTNN6eOUECv4XUP96rbMn2M6c3QP/LRAsMkL9PiHliOMgK/F+c0GHp5gETCbqSr5XSFIC7456wgdznYGw2tQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR18MB5479
+X-Proofpoint-GUID: 661RFOdUD6oV5f7LZFJHUz6hGT_rcuF-
+X-Proofpoint-ORIG-GUID: 661RFOdUD6oV5f7LZFJHUz6hGT_rcuF-
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-25_02,2023-06-22_02,2023-05-22_02
+X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-在 2023/6/24 3:20, Kuniyuki Iwashima 写道:
-> From: Kuniyuki Iwashima <kuniyu@amazon.com>
-> Date: Thu, 22 Jun 2023 17:52:23 -0700
->> From: Kuniyuki Iwashima <kuniyu@amazon.com>
->> Date: Tue, 20 Jun 2023 21:25:13 -0700
->>> From: wangyufen <wangyufen@huawei.com>
->>> Date: Wed, 21 Jun 2023 09:55:13 +0800
->>>> 在 2023/6/20 17:10, Kuniyuki Iwashima 写道:
->>>>> From: wangyufen <wangyufen@huawei.com>
->>>>> Date: Tue, 20 Jun 2023 16:12:26 +0800
->>>>>> 在 2023/6/6 2:06, Kuniyuki Iwashima 写道:
->>>>>>> A remote DoS vulnerability of RPL Source Routing is assigned CVE-2023-2156.
->>>>>>>
->>>>>>> The Source Routing Header (SRH) has the following format:
->>>>>>>
->>>>>>>      0                   1                   2                   3
->>>>>>>      0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1 2 3 4 5 6 7 8 9 0 1
->>>>>>>      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>>>>>>      |  Next Header  |  Hdr Ext Len  | Routing Type  | Segments Left |
->>>>>>>      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>>>>>>      | CmprI | CmprE |  Pad  |               Reserved                |
->>>>>>>      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>>>>>>      |                                                               |
->>>>>>>      .                                                               .
->>>>>>>      .                        Addresses[1..n]                        .
->>>>>>>      .                                                               .
->>>>>>>      |                                                               |
->>>>>>>      +-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+-+
->>>>>>>
->>>>>>> The originator of an SRH places the first hop's IPv6 address in the IPv6
->>>>>>> header's IPv6 Destination Address and the second hop's IPv6 address as
->>>>>>> the first address in Addresses[1..n].
->>>>>>>
->>>>>>> The CmprI and CmprE fields indicate the number of prefix octets that are
->>>>>>> shared with the IPv6 Destination Address.  When CmprI or CmprE is not 0,
->>>>>>> Addresses[1..n] are compressed as follows:
->>>>>>>
->>>>>>>      1..n-1 : (16 - CmprI) bytes
->>>>>>>           n : (16 - CmprE) bytes
->>>>>>>
->>>>>>> Segments Left indicates the number of route segments remaining.  When the
->>>>>>> value is not zero, the SRH is forwarded to the next hop.  Its address
->>>>>>> is extracted from Addresses[n - Segment Left + 1] and swapped with IPv6
->>>>>>> Destination Address.
->>>>>>>
->>>>>>> When Segment Left is greater than or equal to 2, the size of SRH is not
->>>>>>> changed because Addresses[1..n-1] are decompressed and recompressed with
->>>>>>> CmprI.
->>>>>>>
->>>>>>> OTOH, when Segment Left changes from 1 to 0, the new SRH could have a
->>>>>>> different size because Addresses[1..n-1] are decompressed with CmprI and
->>>>>>> recompressed with CmprE.
->>>>>>>
->>>>>>> Let's say CmprI is 15 and CmprE is 0.  When we receive SRH with Segment
->>>>>>> Left >= 2, Addresses[1..n-1] have 1 byte for each, and Addresses[n] has
->>>>>>> 16 bytes.  When Segment Left is 1, Addresses[1..n-1] is decompressed to
->>>>>>> 16 bytes and not recompressed.  Finally, the new SRH will need more room
->>>>>>> in the header, and the size is (16 - 1) * (n - 1) bytes.
->>>>>>>
->>>>>>> Here the max value of n is 255 as Segment Left is u8, so in the worst case,
->>>>>>> we have to allocate 3825 bytes in the skb headroom.  However, now we only
->>>>>>> allocate a small fixed buffer that is IPV6_RPL_SRH_WORST_SWAP_SIZE (16 + 7
->>>>>>> bytes).  If the decompressed size overflows the room, skb_push() hits BUG()
->>>>>>> below [0].
->>>>>>>
->>>>>>> Instead of allocating the fixed buffer for every packet, let's allocate
->>>>>>> enough headroom only when we receive SRH with Segment Left 1.
->>>>>>>
->>>>>>> [0]:
->>>>>>>
->>>>>>> Fixes: 8610c7c6e3bd ("net: ipv6: add support for rpl sr exthdr")
->>>>>>> Reported-by: Max VA
->>>>>>> Closes: https://www.interruptlabs.co.uk/articles/linux-ipv6-route-of-death
->>>>>>> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
->>>>>>> ---
->>>>>>> To maintainers:
->>>>>>> Please complement the Reported-by address from the security@ mailing list
->>>>>>> if possible, which checkpatch will complain about.
->>>>>>>
->>>>>>> v2:
->>>>>>>      * Reload oldhdr@ after pskb_expand_head() (Eric Dumazet)
->>>>>>>
->>>>>>> v1: https://lore.kernel.org/netdev/20230605144040.39871-1-kuniyu@amazon.com/
->>>>>>> ---
->>>>>>
->>>>>> When I tested the linux-ipv6-route-of-death issue on Linux 6.4-rc7, I
->>>>>> got the following panic:
->>>>>>
->>>>>> [ 2046.147186] BUG: kernel NULL pointer dereference, address:
->>>>>> 0000000000000000
->>>>>> [ 2046.147978] #PF: supervisor read access in kernel mode
->>>>>> [ 2046.148522] #PF: error_code(0x0000) - not-present page
->>>>>> [ 2046.149082] PGD 8000000187886067 P4D 8000000187886067 PUD 187887067
->>>>>> PMD 0
->>>>>> [ 2046.149788] Oops: 0000 [#1] PREEMPT SMP PTI
->>>>>> [ 2046.150233] CPU: 4 PID: 2093 Comm: python3 Not tainted 6.4.0-rc7 #15
->>>>>> [ 2046.150964] Hardware name: Red Hat KVM, BIOS 0.5.1 01/01/2011
->>>>>> [ 2046.151566] RIP: 0010:icmp6_send+0x691/0x910
->>>>>> [ 2046.152029] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
->>>>>> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
->>>>>> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
->>>>>> [ 2046.153892] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
->>>>>> [ 2046.154432] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
->>>>>> 0000000000000000
->>>>>> [ 2046.155160] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
->>>>>> 0000000000000001
->>>>>> [ 2046.155881] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
->>>>>> 0000000000000040
->>>>>> [ 2046.156611] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
->>>>>> ffff907d21a28888
->>>>>> [ 2046.157340] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
->>>>>> ffffffff97b03d00
->>>>>> [ 2046.158064] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
->>>>>> knlGS:0000000000000000
->>>>>> [ 2046.158895] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>>> [ 2046.159483] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
->>>>>> 00000000000006e0
->>>>>> [ 2046.160205] Call Trace:
->>>>>> [ 2046.160467]  <IRQ>
->>>>>> [ 2046.160693]  ? __die_body+0x1b/0x60
->>>>>> [ 2046.161059]  ? page_fault_oops+0x15b/0x470
->>>>>> [ 2046.161488]  ? fixup_exception+0x22/0x330
->>>>>> [ 2046.161901]  ? exc_page_fault+0x65/0x150
->>>>>> [ 2046.162318]  ? asm_exc_page_fault+0x22/0x30
->>>>>> [ 2046.162750]  ? icmp6_send+0x691/0x910
->>>>>> [ 2046.163137]  ? ip6_route_input+0x187/0x210
->>>>>> [ 2046.163560]  ? __pfx_free_object_rcu+0x10/0x10
->>>>>> [ 2046.164019]  ? __call_rcu_common.constprop.0+0x10a/0x5a0
->>>>>> [ 2046.164568]  ? _raw_spin_lock_irqsave+0x19/0x50
->>>>>> [ 2046.165034]  ? __pfx_free_object_rcu+0x10/0x10
->>>>>> [ 2046.165499]  ? ip6_pkt_drop+0xf2/0x1c0
->>>>>> [ 2046.165890]  ip6_pkt_drop+0xf2/0x1c0
->>>>>> [ 2046.166269]  ipv6_rthdr_rcv+0x122d/0x1310
->>>>>> [ 2046.166684]  ip6_protocol_deliver_rcu+0x4bc/0x630
->>>>>> [ 2046.167173]  ip6_input_finish+0x40/0x60
->>>>>> [ 2046.167568]  ip6_input+0x3b/0xd0
->>>>>> [ 2046.167905]  ? ip6_rcv_core.isra.0+0x2cb/0x5e0
->>>>>> [ 2046.168368]  ipv6_rcv+0x53/0x100
->>>>>> [ 2046.168706]  __netif_receive_skb_one_core+0x63/0xa0
->>>>>> [ 2046.169231]  process_backlog+0xa8/0x150
->>>>>> [ 2046.169626]  __napi_poll+0x2c/0x1b0
->>>>>> [ 2046.169991]  net_rx_action+0x260/0x330
->>>>>> [ 2046.170385]  ? kvm_sched_clock_read+0x5/0x20
->>>>>> [ 2046.170824]  ? kvm_clock_read+0x14/0x30
->>>>>> [ 2046.171226]  __do_softirq+0xe6/0x2d1
->>>>>> [ 2046.171596]  do_softirq+0x80/0xa0
->>>>>> [ 2046.171944]  </IRQ>
->>>>>> [ 2046.172178]  <TASK>
->>>>>> [ 2046.172406]  __local_bh_enable_ip+0x73/0x80
->>>>>> [ 2046.172829]  __dev_queue_xmit+0x331/0xd40
->>>>>> [ 2046.173246]  ? __local_bh_enable_ip+0x37/0x80
->>>>>> [ 2046.173692]  ? ___neigh_create+0x60b/0x8d0
->>>>>> [ 2046.174114]  ? eth_header+0x26/0xc0
->>>>>> [ 2046.174489]  ip6_finish_output2+0x1e7/0x680
->>>>>> [ 2046.174916]  ? asm_sysvec_apic_timer_interrupt+0x16/0x20
->>>>>> [ 2046.175462]  ip6_finish_output+0x1df/0x350
->>>>>> [ 2046.175881]  ? nf_hook_slow+0x40/0xc0
->>>>>> [ 2046.176274]  ip6_output+0x6e/0x140
->>>>>> [ 2046.176627]  ? __pfx_ip6_finish_output+0x10/0x10
->>>>>> [ 2046.177096]  rawv6_sendmsg+0x6f9/0x1210
->>>>>> [ 2046.177497]  ? dl_cpu_busy+0x2f3/0x300
->>>>>> [ 2046.177886]  ? __pfx_dst_output+0x10/0x10
->>>>>> [ 2046.178305]  ? _raw_spin_unlock_irqrestore+0x1e/0x40
->>>>>> [ 2046.178825]  ? __wake_up_common_lock+0x91/0xd0
->>>>>> [ 2046.179339]  ? sock_sendmsg+0x8b/0xa0
->>>>>> [ 2046.179791]  ? __pfx_rawv6_sendmsg+0x10/0x10
->>>>>> [ 2046.180246]  sock_sendmsg+0x8b/0xa0
->>>>>> [ 2046.180610]  __sys_sendto+0xfa/0x170
->>>>>> [ 2046.180983]  ? __bitmap_weight+0x4b/0x60
->>>>>> [ 2046.181399]  ? task_mm_cid_work+0x183/0x200
->>>>>> [ 2046.181827]  __x64_sys_sendto+0x25/0x30
->>>>>> [ 2046.182228]  do_syscall_64+0x3b/0x90
->>>>>> [ 2046.182599]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
->>>>>> [ 2046.183109] RIP: 0033:0x7ff3344a668a
->>>>>> [ 2046.183493] Code: 48 c7 c0 ff ff ff ff eb bc 0f 1f 80 00 00 00 00 f3
->>>>>> 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f
->>>>>> 05 <48> 3d 00 f0 ff ff 77 76 c3 0f 1f 44 00 00 55 48 83 ec 30 44 89 4c
->>>>>> [ 2046.185326] RSP: 002b:00007ffc82a34658 EFLAGS: 00000246 ORIG_RAX:
->>>>>> 000000000000002c
->>>>>> [ 2046.186083] RAX: ffffffffffffffda RBX: 00007ffc82a346f0 RCX:
->>>>>> 00007ff3344a668a
->>>>>> [ 2046.186799] RDX: 0000000000000060 RSI: 00007ff33112db00 RDI:
->>>>>> 0000000000000003
->>>>>> [ 2046.187515] RBP: 000000000159cd90 R08: 00007ffc82a34770 R09:
->>>>>> 000000000000001c
->>>>>> [ 2046.188230] R10: 0000000000000000 R11: 0000000000000246 R12:
->>>>>> 0000000000000000
->>>>>> [ 2046.188958] R13: 0000000000000000 R14: 00007ffc82a346f0 R15:
->>>>>> 0000000000451072
->>>>>> [ 2046.189675]  </TASK>
->>>>>> [ 2046.189909] Modules linked in: fuse rfkill binfmt_misc cirrus
->>>>>> drm_shmem_helper joydev drm_kms_helper sg syscopyarea sysfillrect
->>>>>> sysimgblt virtio_balloon serio_raw squashfs parport_pc ppdev lp parport
->>>>>> ramoops reed_solomon drm ip_tables x_tables xfs sd_mod t10_pi
->>>>>> crc64_rocksoft crc64 ata_generic ata_piix virtio_net net_failover
->>>>>> failover libata e1000 i2c_piix4
->>>>>> [ 2046.193039] CR2: 0000000000000000
->>>>>> [ 2046.193400] ---[ end trace 0000000000000000 ]---
->>>>>> [ 2046.193870] RIP: 0010:icmp6_send+0x691/0x910
->>>>>> [ 2046.194315] Code: 78 0f 13 95 48 c7 c7 d0 a0 d4 95 e8 39 e4 ab ff e9
->>>>>> 81 fe ff ff 48 8b 43 58 48 83 e0 fe 0f 84 bf fa ff ff 48 8b 80 d0 00 00
->>>>>> 00 <48> 8b 00 8b 80 e0 00 00 00 89 85 f0 fe ff ff e9 a4 fa ff ff 0f b7
->>>>>> [ 2046.196146] RSP: 0018:ffffb463c01b0b90 EFLAGS: 00010286
->>>>>> [ 2046.196672] RAX: 0000000000000000 RBX: ffff907d03099700 RCX:
->>>>>> 0000000000000000
->>>>>> [ 2046.197388] RDX: 0000000000000021 RSI: 0000000000000000 RDI:
->>>>>> 0000000000000001
->>>>>> [ 2046.198096] RBP: ffffb463c01b0cb0 R08: 0000000000020021 R09:
->>>>>> 0000000000000040
->>>>>> [ 2046.198825] R10: ffffb463c01b0cd0 R11: 000000000000a600 R12:
->>>>>> ffff907d21a28888
->>>>>> [ 2046.199537] R13: ffff907d21a28870 R14: ffff907d21a28878 R15:
->>>>>> ffffffff97b03d00
->>>>>> [ 2046.200253] FS:  00007ff3341ba740(0000) GS:ffff908018300000(0000)
->>>>>> knlGS:0000000000000000
->>>>>> [ 2046.201044] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
->>>>>> [ 2046.201624] CR2: 0000000000000000 CR3: 0000000109a5a000 CR4:
->>>>>> 00000000000006e0
->>>>>> [ 2046.202340] Kernel panic - not syncing: Fatal exception in interrupt
->>>>>> [ 2046.203655] Kernel Offset: 0x12e00000 from 0xffffffff81000000
->>>>>> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
->>>>>> [ 2046.204731] ---[ end Kernel panic - not syncing: Fatal exception in
->>>>>> interrupt ]---
->>>>>
->>>>> Please decode the stack trace.
->>>>>
->>>>> $ cat <<EOF | ./scripts/decode_stacktrace.sh vmlinux
->>>>> PASTE YOUR TRACE HERE
->>>>> EOF
->>>>>
->>>>>
->>>>>>
->>>>>>
->>>>>> The test procedure is as follows:
->>>>>> # sysctl -a | grep -i rpl_seg_enabled
->>>>>> net.ipv6.conf.all.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.default.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.dummy0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.ens3.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.ens4.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.erspan0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.gre0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.gretap0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.ip6_vti0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.ip6gre0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.ip6tnl0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.ip_vti0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.lo.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.sit0.rpl_seg_enabled = 1
->>>>>> net.ipv6.conf.tunl0.rpl_seg_enabled = 1
->>>>>>
->>>>>> # python3
->>>>>> Python 3.8.10 (default, Nov 14 2022, 12:59:47)
->>>>>> [GCC 9.4.0] on linux
->>>>>> Type "help", "copyright", "credits" or "license" for more information.
->>>>>>    >>> from scapy.all import *
->>>>>>    >>> import socket
->>>>>>    >>> DST_ADDR = "fe80::266:88ff:fe99:7419"
->>>>>>    >>> SRC_ADDR = DST_ADDR
->>>>>>    >>> sockfd = socket.socket(socket.AF_INET6, socket.SOCK_RAW,
->>>>>> socket.IPPROTO_RAW)
->>>>>>    >>> p = IPv6(src=SRC_ADDR, dst=DST_ADDR) /
->>>>>> IPv6ExtHdrSegmentRouting(type=3, addresses=["a8::", "a7::", "a6::"],
->>>>>> segleft=1, lastentry=0xf0)
->>>>>>    >>> sockfd.sendto(bytes(p), (DST_ADDR, 0))
->>>>>>
->>>>>> Is this a new issue?
->>>>>
->>>>> Can you test this ?  I couldn't reproduce the issue on my setup...
->>>>>
->>>>> ---8<---
->>>>> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
->>>>> index 202fc3aaa83c..f2890c391e3b 100644
->>>>> --- a/net/ipv6/exthdrs.c
->>>>> +++ b/net/ipv6/exthdrs.c
->>>>> @@ -587,7 +587,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->>>>>    	skb_pull(skb, ((hdr->hdrlen + 1) << 3));
->>>>>    	skb_postpull_rcsum(skb, oldhdr,
->>>>>    			   sizeof(struct ipv6hdr) + ((hdr->hdrlen + 1) << 3));
->>>>> -	if (unlikely(!hdr->segments_left)) {
->>>>> +	if (unlikely(!hdr->segments_left) || skb_cloned(skb)) {
->>>>>    		if (pskb_expand_head(skb, sizeof(struct ipv6hdr) + ((chdr->hdrlen + 1) << 3), 0,
->>>>>    				     GFP_ATOMIC)) {
->>>>>    			__IP6_INC_STATS(net, ip6_dst_idev(skb_dst(skb)), IPSTATS_MIB_OUTDISCARDS);
->>>>> ---8<---
->>>>
->>>> I tested it and the problem persisted, and attached the config I used.
->>>>
->>>> Also,the DST_ADDR = "fe80::266:88ff:fe99:7419" I used the  the
->>>> link-local address of the local NIC ens4.
->>>>
->>>> # ip addr show dev ens4
->>>> 12: ens4: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel
->>>> state UP group default qlen 1000
->>>>       link/ether 00:66:88:99:74:19 brd ff:ff:ff:ff:ff:ff
->>>>       altname enp0s4
->>>>       inet 169.254.6.143/16 brd 169.254.255.255 scope link ens4:avahi
->>>>          valid_lft forever preferred_lft forever
->>>>       inet6 fe80::266:88ff:fe99:7419/64 scope link
->>>>          valid_lft forever preferred_lft forever
->>>>
->>>> The test machine is an Ubuntu 20.04.4 LTS VM.
->>>
->>> Could you provide your decoded stack trace ?
->>>
->>> It seems the packet is dropped.  I'd like to know where it happens.
->>
->> Ok, I think I reproduced your issue by forcibly calling
->> ip6_pkt_discard_out() for the skb.
-> 
-> I just forgot to "return -1" after this, that leads to null-ptr-deref
-> in ipv6_rthdr_rcv(), not icmp6_send().
-> 
-> So, I didn't reproduce the issue.
-> 
-> Also, I should have used ip6_pkt_discard().  Neither didn't reproduce
-> it with return -1 though.
-> 
-> Could you provide these info ?
-> 
-> * the log of skb_dump() with the diff below
-> * decoded stack trace
-> * the output of
->    * ip -d rule
-# ip -d rule
-0:	from all lookup local proto kernel
-220:	from all lookup 220 proto unspec
-32766:	from all lookup main proto kernel
-32767:	from all lookup default proto kernel
-
->    * ip -d route (for all tables)
-# ip -d route
-unicast default dev ens4 proto boot scope link metric 1012
-unicast default via 192.168.123.1 dev ens3 proto dhcp scope global 
-metric 20100
-unicast 169.254.0.0/16 dev ens4 proto kernel scope link src 169.254.6.143
-unicast 169.254.0.0/16 dev ens3 proto boot scope link metric 1000
-unicast 192.168.123.0/24 dev ens3 proto kernel scope link src 
-192.168.123.110 metric 100
-
->    * ip -d neigh
-# ip -d neigh
-185.125.188.55 dev ens4 FAILED
-185.125.190.58 dev ens4 INCOMPLETE
-91.189.91.157 dev ens4 FAILED
-185.125.188.54 dev ens4 FAILED
-185.125.190.57 dev ens4 FAILED
-192.168.123.1 dev ens3 lladdr 52:54:00:b9:d7:30 REACHABLE
-185.125.188.59 dev ens4 FAILED
-185.125.190.56 dev ens4 FAILED
-185.125.188.58 dev ens4 FAILED
-> 
-> ---8<---
-> diff --git a/net/ipv6/exthdrs.c b/net/ipv6/exthdrs.c
-> index 5fa0e37305d9..41e9256cb81e 100644
-> --- a/net/ipv6/exthdrs.c
-> +++ b/net/ipv6/exthdrs.c
-> @@ -642,6 +642,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->   	ip6_route_input(skb);
->   
->   	if (skb_dst(skb)->error) {
-> +		skb_dump(KERN_ERR, skb, true);
-skb_dump info as follows:
-[  529.457596] skb len=576 headroom=112 headlen=576 tailroom=1040
-[  529.457596] mac=(98,14) net=(112,40) trans=152
-[  529.457596] shinfo(txflags=0 nr_frags=0 gso(size=0 type=0 segs=0))
-[  529.457596] csum(0x0 ip_summed=0 complete_sw=0 valid=0 level=0)
-[  529.457596] hash(0x0 sw=0 l4=0) proto=0x86dd pkttype=0 iif=1
-[  529.460505] dev name=lo feat=0x00000516401d7c69
-[  529.461039] skb headroom: 00000000: 6c 69 62 6e 73 73 5f 66 69 6c 65 
-73 2d 32 2e 33
-[  529.461842] skb headroom: 00000010: 31 2e 73 6f 00 00 6c 64 2d 32 2e 
-33 31 2e 73 6f
-[  529.462673] skb headroom: 00000020: 00 00 a1 c5 3b 8c ff ff 20 d8 a1 
-c5 3b 8c ff ff
-[  529.463503] skb headroom: 00000030: 30 d8 a1 c5 3b 8c ff ff 30 d8 a1 
-c5 3b 8c ff ff
-[  529.464348] skb headroom: 00000040: 40 d8 a1 c5 3b 8c ff ff 40 d8 a1 
-c5 3b 8c ff ff
-[  529.465190] skb headroom: 00000050: 50 d8 a1 c5 3b 8c ff ff 50 d8 a1 
-c5 3b 8c ff ff
-[  529.466040] skb headroom: 00000060: 60 d8 00 00 00 00 00 00 00 00 00 
-00 00 00 86 dd
-[  529.466835] skb linear:   00000000: 60 00 00 00 02 18 2b 40 fe 80 00 
-00 00 00 00 00
-[  529.467656] skb linear:   00000010: 02 66 88 ff fe 99 74 19 00 a6 00 
-00 00 00 00 00
-[  529.468484] skb linear:   00000020: 00 00 00 00 00 00 00 00 3b 42 03 
-00 00 00 00 00
-[  529.469312] skb linear:   00000030: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.470140] skb linear:   00000040: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 a8
-[  529.470946] skb linear:   00000050: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.471755] skb linear:   00000060: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.472583] skb linear:   00000070: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.473410] skb linear:   00000080: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.474245] skb linear:   00000090: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.475073] skb linear:   000000a0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.475885] skb linear:   000000b0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.476700] skb linear:   000000c0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.477521] skb linear:   000000d0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.478341] skb linear:   000000e0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.479164] skb linear:   000000f0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.479964] skb linear:   00000100: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.480769] skb linear:   00000110: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.481588] skb linear:   00000120: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.482407] skb linear:   00000130: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.483228] skb linear:   00000140: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 a7
-[  529.484051] skb linear:   00000150: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.484842] skb linear:   00000160: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.485673] skb linear:   00000170: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.486492] skb linear:   00000180: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.487310] skb linear:   00000190: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.488126] skb linear:   000001a0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.488940] skb linear:   000001b0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.489743] skb linear:   000001c0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.490560] skb linear:   000001d0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.491377] skb linear:   000001e0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.492195] skb linear:   000001f0: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.493014] skb linear:   00000200: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.493803] skb linear:   00000210: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.494615] skb linear:   00000220: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 00
-[  529.495451] skb linear:   00000230: fe 80 00 00 00 00 00 00 02 66 88 
-ff fe 99 74 19
-[  529.496265] skb tailroom: 00000000: b0 da a1 c5 3b 8c ff ff b0 da a1 
-c5 3b 8c ff ff
-[  529.497082] skb tailroom: 00000010: c0 da a1 c5 3b 8c ff ff c0 da a1 
-c5 3b 8c ff ff
-[  529.497867] skb tailroom: 00000020: d0 da a1 c5 3b 8c ff ff d0 da a1 
-c5 3b 8c ff ff
-[  529.498679] skb tailroom: 00000030: e0 da a1 c5 3b 8c ff ff e0 da a1 
-c5 3b 8c ff ff
-[  529.499492] skb tailroom: 00000040: f0 da a1 c5 3b 8c ff ff f0 da a1 
-c5 3b 8c ff ff
-[  529.500306] skb tailroom: 00000050: 00 db a1 c5 3b 8c ff ff 00 db a1 
-c5 3b 8c ff ff
-[  529.501122] skb tailroom: 00000060: 10 db a1 c5 3b 8c ff ff 10 db a1 
-c5 3b 8c ff ff
-[  529.501912] skb tailroom: 00000070: 20 db a1 c5 3b 8c ff ff 20 db a1 
-c5 3b 8c ff ff
-[  529.502718] skb tailroom: 00000080: 30 db a1 c5 3b 8c ff ff 30 db a1 
-c5 3b 8c ff ff
-[  529.503531] skb tailroom: 00000090: 40 db a1 c5 3b 8c ff ff 40 db a1 
-c5 3b 8c ff ff
-[  529.504344] skb tailroom: 000000a0: 50 db a1 c5 3b 8c ff ff 50 db a1 
-c5 3b 8c ff ff
-[  529.505163] skb tailroom: 000000b0: 60 db a1 c5 3b 8c ff ff 60 db a1 
-c5 3b 8c ff ff
-[  529.505996] skb tailroom: 000000c0: 70 db a1 c5 3b 8c ff ff 70 db a1 
-c5 3b 8c ff ff
-[  529.506778] skb tailroom: 000000d0: 80 db a1 c5 3b 8c ff ff 80 db a1 
-c5 3b 8c ff ff
-[  529.507586] skb tailroom: 000000e0: 90 db a1 c5 3b 8c ff ff 90 db a1 
-c5 3b 8c ff ff
-[  529.508396] skb tailroom: 000000f0: a0 db a1 c5 3b 8c ff ff a0 db a1 
-c5 3b 8c ff ff
-[  529.509208] skb tailroom: 00000100: b0 db a1 c5 3b 8c ff ff b0 db a1 
-c5 3b 8c ff ff
-[  529.510022] skb tailroom: 00000110: c0 db a1 c5 3b 8c ff ff c0 db a1 
-c5 3b 8c ff ff
-[  529.510805] skb tailroom: 00000120: d0 db a1 c5 3b 8c ff ff d0 db a1 
-c5 3b 8c ff ff
-[  529.511614] skb tailroom: 00000130: e0 db a1 c5 3b 8c ff ff e0 db a1 
-c5 3b 8c ff ff
-[  529.512424] skb tailroom: 00000140: f0 db a1 c5 3b 8c ff ff f0 db a1 
-c5 3b 8c ff ff
-[  529.513239] skb tailroom: 00000150: 00 b0 a1 c5 3b 8c ff ff 00 dc a1 
-c5 3b 8c ff ff
-[  529.514051] skb tailroom: 00000160: 10 dc a1 c5 3b 8c ff ff 10 dc a1 
-c5 3b 8c ff ff
-[  529.514834] skb tailroom: 00000170: 20 dc a1 c5 3b 8c ff ff 20 dc a1 
-c5 3b 8c ff ff
-[  529.515663] skb tailroom: 00000180: 30 dc a1 c5 3b 8c ff ff 30 dc a1 
-c5 3b 8c ff ff
-[  529.516472] skb tailroom: 00000190: 40 dc a1 c5 3b 8c ff ff 40 dc a1 
-c5 3b 8c ff ff
-[  529.517280] skb tailroom: 000001a0: 50 dc a1 c5 3b 8c ff ff 50 dc a1 
-c5 3b 8c ff ff
-[  529.518090] skb tailroom: 000001b0: 60 dc a1 c5 3b 8c ff ff 60 dc a1 
-c5 3b 8c ff ff
-[  529.518872] skb tailroom: 000001c0: 70 dc a1 c5 3b 8c ff ff 70 dc a1 
-c5 3b 8c ff ff
-[  529.519677] skb tailroom: 000001d0: 80 dc a1 c5 3b 8c ff ff 80 dc a1 
-c5 3b 8c ff ff
-[  529.520488] skb tailroom: 000001e0: 90 dc a1 c5 3b 8c ff ff 90 dc a1 
-c5 3b 8c ff ff
-[  529.521297] skb tailroom: 000001f0: a0 dc a1 c5 3b 8c ff ff a0 dc a1 
-c5 3b 8c ff ff
-[  529.522109] skb tailroom: 00000200: b0 dc a1 c5 3b 8c ff ff b0 dc a1 
-c5 3b 8c ff ff
-[  529.522892] skb tailroom: 00000210: c0 dc a1 c5 3b 8c ff ff c0 dc a1 
-c5 3b 8c ff ff
-[  529.523697] skb tailroom: 00000220: d0 dc a1 c5 3b 8c ff ff d0 dc a1 
-c5 3b 8c ff ff
-[  529.524505] skb tailroom: 00000230: e0 dc a1 c5 3b 8c ff ff e0 dc a1 
-c5 3b 8c ff ff
-[  529.525335] skb tailroom: 00000240: f0 dc a1 c5 3b 8c ff ff f0 dc a1 
-c5 3b 8c ff ff
-[  529.526147] skb tailroom: 00000250: 00 dd a1 c5 3b 8c ff ff 00 dd a1 
-c5 3b 8c ff ff
-[  529.526941] skb tailroom: 00000260: 10 dd a1 c5 3b 8c ff ff 10 dd a1 
-c5 3b 8c ff ff
-[  529.527737] skb tailroom: 00000270: 20 dd a1 c5 3b 8c ff ff 20 dd a1 
-c5 3b 8c ff ff
-[  529.528542] skb tailroom: 00000280: 30 dd a1 c5 3b 8c ff ff 30 dd a1 
-c5 3b 8c ff ff
-[  529.529348] skb tailroom: 00000290: 40 dd a1 c5 3b 8c ff ff 40 dd a1 
-c5 3b 8c ff ff
-[  529.530154] skb tailroom: 000002a0: 50 dd a1 c5 3b 8c ff ff 50 dd a1 
-c5 3b 8c ff ff
-[  529.530941] skb tailroom: 000002b0: 60 dd a1 c5 3b 8c ff ff 60 dd a1 
-c5 3b 8c ff ff
-[  529.531734] skb tailroom: 000002c0: 70 dd a1 c5 3b 8c ff ff 70 dd a1 
-c5 3b 8c ff ff
-[  529.532540] skb tailroom: 000002d0: 80 dd a1 c5 3b 8c ff ff 80 dd a1 
-c5 3b 8c ff ff
-[  529.533348] skb tailroom: 000002e0: 90 dd a1 c5 3b 8c ff ff 90 dd a1 
-c5 3b 8c ff ff
-[  529.534155] skb tailroom: 000002f0: a0 dd a1 c5 3b 8c ff ff a0 dd a1 
-c5 3b 8c ff ff
-[  529.534943] skb tailroom: 00000300: b0 dd a1 c5 3b 8c ff ff b0 dd a1 
-c5 3b 8c ff ff
-[  529.535753] skb tailroom: 00000310: c0 dd a1 c5 3b 8c ff ff c0 dd a1 
-c5 3b 8c ff ff
-[  529.536560] skb tailroom: 00000320: d0 dd a1 c5 3b 8c ff ff d0 dd a1 
-c5 3b 8c ff ff
-[  529.537369] skb tailroom: 00000330: e0 dd a1 c5 3b 8c ff ff e0 dd a1 
-c5 3b 8c ff ff
-[  529.538174] skb tailroom: 00000340: f0 dd a1 c5 3b 8c ff ff f0 dd a1 
-c5 3b 8c ff ff
-[  529.538962] skb tailroom: 00000350: 00 de a1 c5 3b 8c ff ff 00 de a1 
-c5 3b 8c ff ff
-[  529.539755] skb tailroom: 00000360: 10 de a1 c5 3b 8c ff ff 10 de a1 
-c5 3b 8c ff ff
-[  529.540559] skb tailroom: 00000370: 20 de a1 c5 3b 8c ff ff 20 de a1 
-c5 3b 8c ff ff
-[  529.541366] skb tailroom: 00000380: 30 de a1 c5 3b 8c ff ff 30 de a1 
-c5 3b 8c ff ff
-[  529.542173] skb tailroom: 00000390: 40 de a1 c5 3b 8c ff ff 40 de a1 
-c5 3b 8c ff ff
-[  529.542959] skb tailroom: 000003a0: 00 00 00 00 00 00 00 00 63 00 00 
-00 63 00 00 00
-[  529.543752] skb tailroom: 000003b0: 00 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-[  529.544555] skb tailroom: 000003c0: 70 de a1 c5 3b 8c ff ff 70 de a1 
-c5 3b 8c ff ff
-[  529.545376] skb tailroom: 000003d0: 00 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-[  529.546179] skb tailroom: 000003e0: 00 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-[  529.546965] skb tailroom: 000003f0: 40 12 3b d8 3e 8c ff ff 80 e6 34 
-d3 3b 8c ff ff
-[  529.547754] skb tailroom: 00000400: 00 00 00 00 00 00 00 00 00 00 00 
-00 00 00 00 00
-
-The position of the null pointer is as follows:
-
-ipv6_rpl_srh_rcv()
-   ...
-   if (skb_dst(skb)->error) {
-     dst_input(skb);
-       ... ip6_pkt_discard()
-         ip6_pkt_drop()
-           icmpv6_send()
-             icmp6_send()
-               if (__ipv6_addr_needs_scope_id(addr_type)) {
-                 iif = icmp6_iif(skb)；
-                   icmp6_dev()
-                     if (unlikely(dev->ifindex == LOOPBACK_IFINDEX || 
-netif_is_l3_master(skb->dev))) {
-                       const struct rt6_info *rt6 = skb_rt6_info(skb);
-                       if (rt6)
-                         dev = rt6->rt6i_idev->dev;
-			  <==== rt6->rt6i_idev is NULL
-
->   		dst_input(skb);
->   		return -1;
->   	}
-> @@ -660,6 +661,7 @@ static int ipv6_rpl_srh_rcv(struct sk_buff *skb)
->   		goto looped_back;
->   	}
->   
-> +	skb_dump(KERN_ERR, skb, true);
->   	dst_input(skb);
->   
->   	return -1;
-> ---8<---
+DQoNCj4gT24gVGh1LCAyMDIzLTA2LTIyIGF0IDE0OjI2ICswNTMwLCBIYXJpcHJhc2FkIEtlbGFt
+IHdyb3RlOg0KPiA+IGRpZmYgLS1naXQgYS9kcml2ZXJzL25ldC9ldGhlcm5ldC9tYXJ2ZWxsL29j
+dGVvbnR4Mi9uaWMvcW9zLmgNCj4gPiBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0
+ZW9udHgyL25pYy9xb3MuaA0KPiA+IGluZGV4IDE5NzczMjg0YmUyNy4uMGM1ZDJmNzlkYzE1IDEw
+MDY0NA0KPiA+IC0tLSBhL2RyaXZlcnMvbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9udHgyL25p
+Yy9xb3MuaA0KPiA+ICsrKyBiL2RyaXZlcnMvbmV0L2V0aGVybmV0L21hcnZlbGwvb2N0ZW9udHgy
+L25pYy9xb3MuaA0KPiA+IEBAIC0zNSw2ICszNSw3IEBAIHN0cnVjdCBvdHgyX3Fvc19jZmcgew0K
+PiA+ICAJaW50IGR3cnJfbm9kZV9wb3NbTklYX1RYU0NIX0xWTF9DTlRdOw0KPiA+ICAJdTE2DQo+
+IHNjaHFfY29udGlnX2xpc3RbTklYX1RYU0NIX0xWTF9DTlRdW01BWF9UWFNDSFFfUEVSX0ZVTkNd
+Ow0KPiA+ICAJdTE2IHNjaHFfbGlzdFtOSVhfVFhTQ0hfTFZMX0NOVF1bTUFYX1RYU0NIUV9QRVJf
+RlVOQ107DQo+ID4gKwl1MTYNCj4gc2NocV91c2VkX2luZGV4W05JWF9UWFNDSF9MVkxfQ05UXVtN
+QVhfVFhTQ0hRX1BFUl9GVU5DXTsNCj4gDQo+IFRoaXMgc3RydWN0IGlzIGFscmVhZHkgcXVpdGUg
+YmlnLCBhbmQgeW91IHVzZSBzY2hxX3VzZWRfaW5kZXhbeF1beV0gYXMgYSBib29sLg0KPiBJIHRo
+aW5rIHlvdSB3aWxsIGJlIGJldHRlciBvZmYgY2hhbmdpbmcgdGhlIHVzZWQgdHlwZSBhY2NvcmRp
+bmdseS4NCj4gDQo+IFNpZGUgbm90ZSAnc2NocV9pbmRleF91c2VkJyBzb3VuZHMgYSBsaXR0bGUg
+bW9yZSBjbGVhciB0byBtZSwgYnV0IGNvdWxkIGJlDQo+IHNpbXBseSBFTk9OQVRJVkVMQU5HIGhl
+cmUgOykNCg0KVGhhbmtzIGZvciB0aGUgcmVwbHksICB3aWxsIGFkZHJlc3MgdGhlIGNoYW5nZXMg
+aW4gdGhlIG5leHQgdmVyc2lvbi4NCg0KVGhhbmtzLA0KSGFyaXByYXNhZCBrDQo+IA0KPiBDaGVl
+cnMsDQo+IA0KPiBQYW9sbw0KDQo=
 
