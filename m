@@ -1,188 +1,361 @@
-Return-Path: <netdev+bounces-13805-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13806-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 65A9F73D0B9
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:57:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8CB0473D0BA
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:58:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22897280CA2
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:57:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E7849280AA5
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:58:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66932112;
-	Sun, 25 Jun 2023 11:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0D5173D64;
+	Sun, 25 Jun 2023 11:58:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AA81103
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:57:13 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C95DDD
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:56:45 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=gFlP9NSduD2MVoZhVxKQbSAwWT/hh8XDqvvOBbEwYm9dzV/VfjyKKKysKR7Rygg2r3zt08Q8tTI4E+klbYbrKoXzukmSd9JK7kW4rXorR+vVczejFOKbU30S2CPoyfoqKYYztX//QHiub67Tj+R+huU9o0Qm5UITi7i8LFQNaZn3V8drlcfsRtwF8ronxKkDFz94eqnwAkVIOIoZJraBAjAFiyG/bZPFXprVfoLMPsWQpStWZZyVxaFlP+tjb8XntRPFwa4OtRB3uUSIvYh02Atqx8fzlyXOU/Lj438YwRJTBRzN7G9kJ1va6n+k7e6j+h8ne7EZx4cR359mxCuFMg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zg+YzOifBTY/KU2PJ9uTW6GhJyDCmtmp4xQlsa6SKJc=;
- b=n6AnHIt9Ly30INtHYNVw6z1ogzt9/soq918+xkhMqueJQ3h67/9/FIzBEKWBgZOVj/JA2tUc9E/6/m99KylLIXaM6agYguXCuIbdgm2j0IUz2sljA01ZlYMP54b9Wwh9TznkILfnuqGde75enXOd8kh3AVVQabg4tlPiuZEvXDhNB2NmLTlNaIQ3mfmNokH3ecVEVCuETaCV082h4WzLJbRD9bsB2b3yWsghnNiIz8TUPJzjsXwBFpT465hRdAAaIFijSqUDkphqBW4g521sptXEiAypBEalRt+0U0aFQjUeXCNAX3qSRlvCdma0ybcJNpJh+iaKRFFrMen2T4YthA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zg+YzOifBTY/KU2PJ9uTW6GhJyDCmtmp4xQlsa6SKJc=;
- b=aGvbrCpxixSX50wNaaAKYeq4GDOTzO5uq86x0BCVnEgjoMxXpE1ApZmsLtadxkFP7MmPGEWRTpDc2iXnoUp2B52eRoLvBgYt2aZxxgRpk+GHKCTtazSvGTB52HIPdLQGNm6UHbLk3r4Iuzo7VLfnSJHsDWGULO12BxSqz1JaUwj3VPQu4V+IRaRjlJyM/jlHmeKPNwMMLQu5Ym/VQFp0J5S4mJ5yxwULS7rC19CgFfUR6v4blJ87p8hkf5TqIIw04DSIDA1sSmU1lFmY5YCTRCDjoUcBNC3KDqFXF7jKN2pdKmv7Rhdn3bG7zmzHvNo/lze4u75oK58mFaXzUSU3Bw==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by SJ2PR12MB9006.namprd12.prod.outlook.com (2603:10b6:a03:540::17) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Sun, 25 Jun
- 2023 11:55:42 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::66d8:40d2:14ed:7697]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::66d8:40d2:14ed:7697%5]) with mapi id 15.20.6500.036; Sun, 25 Jun 2023
- 11:55:42 +0000
-Date: Sun, 25 Jun 2023 14:55:36 +0300
-From: Ido Schimmel <idosch@nvidia.com>
-To: Jiri Pirko <jiri@resnulli.us>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
-	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com
-Subject: Re: [RFC PATCH net-next 1/2] devlink: Hold a reference on parent
- device
-Message-ID: <ZJgrOAmhIycWSKtU@shredder>
-References: <20230619125015.1541143-1-idosch@nvidia.com>
- <20230619125015.1541143-2-idosch@nvidia.com>
- <ZJLjlGo+jww6QIAg@nanopsycho>
- <ZJMYsyw06+jWVR5i@shredder>
- <ZJPqS0Di6Cg9JT3D@nanopsycho>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJPqS0Di6Cg9JT3D@nanopsycho>
-X-ClientProxiedBy: LO4P265CA0052.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ac::15) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF60A1103
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:58:10 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7F2ADA;
+	Sun, 25 Jun 2023 04:58:08 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4f004cc54f4so2813820e87.3;
+        Sun, 25 Jun 2023 04:58:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687694287; x=1690286287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=sIwGonOq36GaVS+H1DUiLEFsm2Rip2kBsbIno4UEQXA=;
+        b=qeyPUwCScU+C3CsEAsAfmRs95c9zpnUpXMby3j+wUTgekw+h2Z9see16Vq10XC99in
+         o/GaKLGjqCejqVqbRFlJot53VK+qGAmMmRuqwD3sdKFmWId6xmLgWXBM52PDLFmBeUIJ
+         IicnIzL5xZsM/FLH/zIzT4UYUhKWuDVBiHB1ux+kn+pQ0SEAB82L5co700dnoSScbYQp
+         BONIReDtuzsoaAGeIMx7XLXuYRSn/k2diNAQVI0mHFnrAqVH7SHecru+l9BZuyH+DhJH
+         tdkU7XRXOtVYktrVxNTonKLJVX3RYe6lqyi5dQK/Is0qgzYHTpcFRXf/FE3WHwtohfBy
+         /Wrw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687694287; x=1690286287;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=sIwGonOq36GaVS+H1DUiLEFsm2Rip2kBsbIno4UEQXA=;
+        b=IgTSnsdN0MBFAIeb+aPx17pY/lzH/IGeptDxfYB672hKVGQf76RdLhzxj8Rhafmoaj
+         fpAirRRdG9CO5AWyKZHsXJPMdx0C4uHzr5tverDHI/qJJatgjYuyr7MxWX5TMosIzBzj
+         DnsZqy+Na+noETcN3MvpdfxHAKTvXLBkExpwvG8XcHLPOePf7QhCGNAirj7OVuGSgvyS
+         q0F/1OwYuyeNI2lwGVuhQQ1YZhun7vmHjLPi3SPtCCK7r/5xMxDhxSHDa72FawaLQHqV
+         EQRhfKdlyltMngG+BokhEwmzWiTMHd9HdAS0A4jG8Enxg26z+pnoeVPcxtBeX8rhgasq
+         t7ag==
+X-Gm-Message-State: AC+VfDwbPA02BZ2tCjB25u6O2mqyVDC/Ge0ApM3avfPXGccHmXXLJm1+
+	ovbGzbCp780Ki1Q7dGFUovM=
+X-Google-Smtp-Source: ACHHUZ7I12kd5+S0HDR2KdCOSiFVeYje3PXTekKdb7Ytwzr2/WtxZygEwkefHTiLx/sxkfSD1gVdIQ==
+X-Received: by 2002:a05:6512:10c5:b0:4f9:5c89:5b08 with SMTP id k5-20020a05651210c500b004f95c895b08mr9991360lfg.21.1687694286412;
+        Sun, 25 Jun 2023 04:58:06 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id u22-20020aa7d996000000b0051a26ce312dsm1680104eds.71.2023.06.25.04.58.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 04:58:05 -0700 (PDT)
+Date: Sun, 25 Jun 2023 14:58:03 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Christian Marangi <ansuelsmth@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH RFC] net: dsa: qca8k: make learning configurable
+ and keep off if standalone
+Message-ID: <20230625115803.6xykp4wiqqdwwzv4@skbuf>
+References: <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230623114005.9680-1-ansuelsmth@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|SJ2PR12MB9006:EE_
-X-MS-Office365-Filtering-Correlation-Id: 2708f65a-a548-4f6d-2406-08db75731a3a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	8H4umkVPymWYtw7Al0bGGJivahPKZS/SGlc3Fyuv5asYmEfiDv7CHe51PWZJk0GDoEDiYSxAmFy59iVw/f/KhNixB9oeVhI+LKgmQDwInC87iWn0nUgfahmoTSuyBAs6LIpEgIKy05yy+rdE+ND2AArMzDnFtiPTyBYHrUzBfcFVNMiRJxPgxxz6oJuztpjtdLBjm+XIJCltaYXQdrT0GTPSerk3CD8ENw/B6D7lkrJghTDzkJ0rLfPTNkGk/hh1p8KYbaV+xMnrZzHrW0iuZ2Ud9yPTZUaKSbYy7BWJ99zohkLKlczhD8Wg8Y+qKRzUFeN5WAOUD6NnWI2u1qu7Q9XMwARUStPpzXVZ6lpUGaQPO2ZqyE3P35C31QOrjnaTQk/av3KGLAGFjP3aj9Eb0+JrO+icchqEjgZEtNqI4yPch+yZlgmoWsCd61V6CRkHoiVdy9va4cnpC56i7JzOoiIoIxu5qXw1uJbVTcZVUVAbEmk2GgPNAR1z7sXtxavvS7IBcbg5+3IRgXzIUh63vaGtHIT547I1IWd6NaB2H7h7NKQigTAO7sfT9R7UHb//
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(396003)(346002)(376002)(366004)(136003)(39860400002)(451199021)(38100700002)(83380400001)(86362001)(478600001)(6486002)(33716001)(6666004)(41300700001)(66946007)(66556008)(66476007)(316002)(8676002)(8936002)(26005)(6916009)(4326008)(6506007)(6512007)(107886003)(186003)(9686003)(2906002)(5660300002);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?oYn0YN3eQ8SVSXNJA6XMfQ0t2x0gL7WYX/v7pveAsj3hWJopIkYKjS1D23B0?=
- =?us-ascii?Q?Nh6qwdWj78852i/yUQEgmA2a5SFQ3ptalAc1Iu9k3EXkyKceNmiVqcb3mUTt?=
- =?us-ascii?Q?rOCd5zoBwOUd8J07NDn07cA4y6Soq4+SXMbBvF4jr6S6CwEA5KUBnsRzJXE2?=
- =?us-ascii?Q?JZ9Q2AXyPcUEU/nbBhc68kbue3LXJuaapSQsxO3Y3ypxvhqGBNn8yO2pmY1v?=
- =?us-ascii?Q?Vb7TIcjdw2Uf03UaY+DjO0q7GvmbvriL3fouI1Bjv8Tw/IX8DOC2WYFcxWwh?=
- =?us-ascii?Q?gNGko6GupcALK/uzyrPDVsYbm690+l4S6aOnYbT5ZfCp6M7OsIZ5bpgf4aBK?=
- =?us-ascii?Q?Oht9T2HvVHYSPv+k5Ysb5A2Psk9sBENpvvAyWP1nnPmB3+EVBbuGF2fKDh/9?=
- =?us-ascii?Q?cBXeqqjqUfK3WTJ1qj4+6jmexRuRyZOXX8Qx8sV8l+dRcZrr7HSLd95+NExH?=
- =?us-ascii?Q?soyPwSX9Zt94mX9yKywlGpiTUyoRg/3CzvegCFfKPat3AXkPdIXRg0AQNJRX?=
- =?us-ascii?Q?7aBVfLcff//oC+KgLoXWi25R36qJKjytreKk5b8AB8c6mhkjOssvy7Q7FJcm?=
- =?us-ascii?Q?/QOt8KuaVlohDPNLwIdqWS/DB6HJztP7Wv8X7q1aMRv3h84cIkzGlgbVxroA?=
- =?us-ascii?Q?/LVBuFYvZPuZLNT8vFYVdSe3ndK8/UqEyX5QAiP2frFvV3UzL7vaENSTpTxV?=
- =?us-ascii?Q?bN5OOFEn7dPScvy5soF4owA08g+3yoBkDaNhAHj8i/y3UL6BKK7m2D2NC0D5?=
- =?us-ascii?Q?zdvkib/C/JcTvL1rKQcquxWC4sVaho1qsr/RZIiFQEdTymL96XCNXipMbMPR?=
- =?us-ascii?Q?ZTez67cUFxIkesAF8WLl91/Xo8MR3TzfVaSSCfEyYFHWwiNg/XBaahgeEyN4?=
- =?us-ascii?Q?gR5HBzfbrzqbSl0O6/sYhJ70/8a135yYAz2cjo9yhK0rHF16D51S+6glzNmA?=
- =?us-ascii?Q?5ISqk2pBgUMeL0G1oa9Igb/V32W10zMltKkwHckzEJbAtE7bXbGOhjU3E9ve?=
- =?us-ascii?Q?wLf2sLT1zWOrOWd4KW8pcKpWiBMdjyEBIiVuqd31VPCwwr9P7Vk/hPXwmboG?=
- =?us-ascii?Q?K50KBnUnEVriajNp5TA8u+iVUTII5v51nmaKE6xEDlTDFO9dQK9S3o1c63qm?=
- =?us-ascii?Q?f6k16bMhsgYIui+CNfchs5YHouL1g4PKqXNPo/J0N5779oDCZPpEjaeBb+9z?=
- =?us-ascii?Q?ZxuUh0JyqvqOz2qayBdZc3AsXNAeWBfjXvGo+YFehRu4Ez9rsJ6lADtrCGn/?=
- =?us-ascii?Q?KE6yGzR3nbUvebWnioVmnlilr3lLjFexu0WKxL6SJ2lnUScBRrAh431OSM/0?=
- =?us-ascii?Q?S/SCljwe7udbhiY4YgAI1rBk9gxBDu80GD0qUKdhhyB75RJ6mRPQ7qnFaqEG?=
- =?us-ascii?Q?ZIdfJOLnfpMNuV4gATH0L0ZS3P6c6Th4YNnhBqjpLeqULqHspWqnVevrgfvs?=
- =?us-ascii?Q?fvni5rocnQY5v9gMYYdKLJ9vzH6zbjjeImI5SHsM4fe0i92zUoY4Gu3Yvlfy?=
- =?us-ascii?Q?d+xh6peRxOu68orNVicN16VijOJN29RN8FhQCELHkpXCmLT0i6qAyf72epG/?=
- =?us-ascii?Q?bsj1d6cxwAIlNTGPRIrS8sp0atjDFWIGU7Yw8ujT?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 2708f65a-a548-4f6d-2406-08db75731a3a
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 11:55:42.6261
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d0tczQm6aDhKCGfSUgwPC/60osRgR2ksxRKbm7XumGfyHX2IMbu1XcmheJ5MvnYmCUcRZIiHB7ihSjUiVC6G8g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9006
-X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230623114005.9680-1-ansuelsmth@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 22, 2023 at 08:29:31AM +0200, Jiri Pirko wrote:
-> Wed, Jun 21, 2023 at 05:35:15PM CEST, idosch@nvidia.com wrote:
-> >On Wed, Jun 21, 2023 at 01:48:36PM +0200, Jiri Pirko wrote:
-> >> Mon, Jun 19, 2023 at 02:50:14PM CEST, idosch@nvidia.com wrote:
-> >> >@@ -91,6 +92,7 @@ static void devlink_release(struct work_struct *work)
-> >> > 
-> >> > 	mutex_destroy(&devlink->lock);
-> >> > 	lockdep_unregister_key(&devlink->lock_key);
-> >> >+	put_device(devlink->dev);
-> >> 
-> >> In this case I think you have to make sure this is called before
-> >> devlink_free() ends. After the caller of devlink_free() returns (most
-> >> probably .remove callback), nothing stops module from being removed.
-> >> 
-> >> I don't see other way. Utilize complete() here and wait_for_completion()
-> >> at the end of devlink_free().
-> >
-> >I might be missing something, but how can I do something like
-> >wait_for_completion(&devlink->comp) at the end of devlink_free()? After
-> >I call devlink_put() the devlink instance can be freed and the
-> >wait_for_completion() call will result in a UAF.
+On Fri, Jun 23, 2023 at 01:40:05PM +0200, Christian Marangi wrote:
+> Address learning should initially be turned off by the driver for port
+> operation in standalone mode, then the DSA core handles changes to it
+> via ds->ops->port_bridge_flags().
 > 
-> You have to move the free() to devlink_free()
-> Basically, all the things done in devlink_put that are symmetrical to
-> the initialization done in devlink_alloc() should be moved there.
+> Currently this is not the case for qca8k where learning is enabled
+> unconditionally in qca8k_setup for every user port.
+> 
+> Handle ports configured in standalone mode by making the learning
+> configurable and not enabling it by default.
+> 
+> Implement .port_pre_bridge_flags and .port_bridge_flags dsa ops to
+> enable learning for bridge that request it and tweak
+> .port_stp_state_set to correctly disable learning when port is
+> configured in standalone mode.
+> 
+> Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> ---
+> 
+> Posting as RFC as I would love some comments from Vladimir for correct
+> implementation of this. This was suggested to be on par with offload
+> bridge API and I used as example [1] (commit that does the same thing
+> with a microchip switch)
+> 
+> I didn't want to bloat the priv struct with additional info with the
+> port state and from what I can see it seems using dp->learning is enough
+> to understand if learning is currently enabled for the port or not but I
+> would love to have some confirmation about this. (from what I notice
+> when port is set in standalone mode, flags are cleared so it should be
+> correct)
 
-But it's a bit weird to dereference 'devlink' (to wait for the
-completion) after calling 'devlink_put(devlink)'. Given that this
-problem seems to be specific to netdevsim, don't you think it's better
-to fix it in netdevsim rather than working around it in devlink?
+In principle you can use dp->learning, but in this case you are using it
+incorrectly (more below).
 
 > 
+> I also verified this working by dumping the fdb in a bridge
+> configuration and in a standalone configuration. Traffic works in both
+> configuration.
 > 
-> >
-> >> 
-> >> If the completion in devlink_put() area rings a bell for you, let me save
-> >> you the trouble looking it up:
-> >> 9053637e0da7 ("devlink: remove the registration guarantee of references")
-> >> This commit removed that. But it is a different usage.
-> >> 
-> >> 
-> >> 
-> >> > 	kfree(devlink);
-> >> > }
-> >> > 
-> >> >@@ -204,6 +206,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
-> >> > 	if (ret < 0)
-> >> > 		goto err_xa_alloc;
-> >> > 
-> >> >+	get_device(dev);
-> >> > 	devlink->dev = dev;
-> >> > 	devlink->ops = ops;
-> >> > 	xa_init_flags(&devlink->ports, XA_FLAGS_ALLOC);
-> >> >-- 
-> >> >2.40.1
-> >> >
+> Dump WITH BRIDGE CONFIGURATION:
+> 01:00:5e:00:00:01 dev eth0 self permanent
+> 33:33:00:00:00:02 dev eth0 self permanent
+> 33:33:00:00:00:01 dev eth0 self permanent
+> 33:33:ff:f2:5d:50 dev eth0 self permanent
+> 33:33:ff:00:00:00 dev eth0 self permanent
+> dc:ef:09:f2:5d:4f dev eth1 self permanent
+> 33:33:00:00:00:01 dev eth1 self permanent
+> 33:33:00:00:00:02 dev eth1 self permanent
+> 01:00:5e:00:00:01 dev eth1 self permanent
+> 33:33:ff:f2:5d:4f dev eth1 self permanent
+> 33:33:ff:00:00:00 dev eth1 self permanent
+> c0:3e:ba:c1:d7:47 dev lan1 master br-lan
+> dc:ef:09:f2:5d:4f dev lan1 vlan 1 master br-lan permanent
+> dc:ef:09:f2:5d:4f dev lan1 master br-lan permanent
+> c0:3e:ba:c1:d7:47 dev lan1 vlan 1 self
+> 33:33:00:00:00:01 dev wlan0 self permanent
+> 33:33:00:00:00:02 dev wlan0 self permanent
+> 33:33:00:00:00:01 dev wlan1 self permanent
+> 33:33:00:00:00:02 dev wlan1 self permanent
+> 33:33:00:00:00:01 dev br-lan self permanent
+> 33:33:00:00:00:02 dev br-lan self permanent
+> 01:00:5e:00:00:01 dev br-lan self permanent
+> 33:33:ff:00:00:01 dev br-lan self permanent
+> 33:33:ff:f2:5d:4f dev br-lan self permanent
+> 33:33:00:01:00:02 dev br-lan self permanent
+> 33:33:00:01:00:03 dev br-lan self permanent
+> 33:33:ff:00:00:00 dev br-lan self permanent
+> 
+> Dump WITH STANDALONE CONFIGURATION:
+> 01:00:5e:00:00:01 dev eth0 self permanent
+> 33:33:00:00:00:02 dev eth0 self permanent
+> 33:33:00:00:00:01 dev eth0 self permanent
+> 33:33:ff:f2:5d:50 dev eth0 self permanent
+> 33:33:ff:00:00:00 dev eth0 self permanent
+> 33:33:00:00:00:01 dev eth1 self permanent
+> 33:33:00:00:00:02 dev eth1 self permanent
+> 01:00:5e:00:00:01 dev eth1 self permanent
+> 33:33:ff:f2:5d:4f dev eth1 self permanent
+> 33:33:ff:00:00:01 dev eth1 self permanent
+> 33:33:ff:00:00:00 dev eth1 self permanent
+> 33:33:00:01:00:02 dev eth1 self permanent
+> 33:33:00:01:00:03 dev eth1 self permanent
+> 33:33:00:00:00:01 dev wlan0 self permanent
+> 33:33:00:00:00:02 dev wlan0 self permanent
+> 33:33:00:00:00:01 dev wlan1 self permanent
+> 33:33:00:00:00:02 dev wlan1 self permanent
+
+The information from these dumps is pretty much irrelevant.
+
+> From what I can see there isn't any self entry with the MAC address of
+> the connected device and this should confirm that learning is actually
+> disabled.
+> 
+> Hope this is enough to test this feature and I would ask what would be
+> the next step to reach a point where port_change_master can be
+> implemented.
+
+The way to test this patch would be to connect in loopback 2 standalone
+qca8k ports having the same MAC address, and ping from one to the other.
+
+ip netns add ns0
+ip link set lan1 netns ns0 && ip -n ns0 link set lan1 up
+ip -n ns0 addr add 192.168.100.1/24 dev lan1
+ip link set lan2 up && ip addr add 192.168.100.2/24 dev lan2
+ping 192.168.100.1
+
+Before, it shouldn't have worked, now it should.
+
+Once that basic precondition passes, you should be able to start looking
+at tools/testing/selftests/drivers/net/dsa/ and run those one by one.
+An interesting one would be local_termination.sh, which monitors the way
+in which frames reach the CPU. Though be aware that some sub-tests from
+that suite will fail on misconfigurations that are non-fatal (and don't
+impact functionality), just sub-optimal (affecting performance). Like
+sending unknown packets to the CPU when the port is non-promiscuous and
+software would drop those packets anyway.
+
+> (would also love to see what are the criteria to enable offload_fwd_mask
+> on the targget for rcv and eventually for xmit)
+
+For RX, skb->offload_fwd_mark = true (mark not mask) means that the software
+bridge shouldn't flood packets received on lanX towards other lanY ports that
+are part of the same hwdom, because the hardware already took care of
+that.
+
+[ the hardware domain is determined by dev_get_port_parent_id() ->
+  devlink_compat_switch_id_get() and populated by dsa_port_devlink_setup() ]
+
+Obviously, the requirement is for the hardware to indeed take care of that :)
+Currently it doesn't flood to the other user ports that are part of the
+same bridge and have egress flooding enabled for that traffic type. It
+just floods to the CPU and software decides where to flood. It's a
+matter of implementing other brport flags, like BR_FLOOD and friends.
+
+For TX, skb->offload_fwd_mark means that the driver should be able to
+send a skb potentially towards multiple TX ports at the same time, as a
+result of an FDB lookup. This makes the bridge avoid cloning that skb
+and calling dev_queue_xmit() towards every individual port that it must
+reach. I would concentrate on RX and leave TX for later.
+
+> Thanks for any response and sorry for the long comments.
+> 
+> 
+> [1] https://github.com/torvalds/linux/commit/15f7cfae912e
+> 
+>  drivers/net/dsa/qca/qca8k-8xxx.c   |  8 ++----
+>  drivers/net/dsa/qca/qca8k-common.c | 40 ++++++++++++++++++++++++++++++
+>  drivers/net/dsa/qca/qca8k.h        |  6 +++++
+>  3 files changed, 48 insertions(+), 6 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> index f08086ac2261..a9af270a03ce 100644
+> --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> @@ -1963,12 +1963,6 @@ qca8k_setup(struct dsa_switch *ds)
+>  			if (ret)
+>  				return ret;
+>  
+> -			/* Enable ARP Auto-learning by default */
+> -			ret = regmap_set_bits(priv->regmap, QCA8K_PORT_LOOKUP_CTRL(i),
+> -					      QCA8K_PORT_LOOKUP_LEARN);
+> -			if (ret)
+> -				return ret;
+> -
+>  			/* For port based vlans to work we need to set the
+>  			 * default egress vid
+>  			 */
+> @@ -2071,6 +2065,8 @@ static const struct dsa_switch_ops qca8k_switch_ops = {
+>  	.port_change_mtu	= qca8k_port_change_mtu,
+>  	.port_max_mtu		= qca8k_port_max_mtu,
+>  	.port_stp_state_set	= qca8k_port_stp_state_set,
+> +	.port_pre_bridge_flags	= qca8k_port_pre_bridge_flags,
+> +	.port_bridge_flags	= qca8k_port_bridge_flags,
+>  	.port_bridge_join	= qca8k_port_bridge_join,
+>  	.port_bridge_leave	= qca8k_port_bridge_leave,
+>  	.port_fast_age		= qca8k_port_fast_age,
+> diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
+> index 8c2dc0e48ff4..f93defbd8b66 100644
+> --- a/drivers/net/dsa/qca/qca8k-common.c
+> +++ b/drivers/net/dsa/qca/qca8k-common.c
+> @@ -559,8 +559,24 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port,
+>  	return 0;
+>  }
+>  
+> +static int qca8k_port_configure_learning(struct dsa_switch *ds, int port,
+> +					 bool learning)
+> +{
+> +	struct qca8k_priv *priv = ds->priv;
+> +
+> +	if (learning)
+> +		return regmap_set_bits(priv->regmap,
+> +				       QCA8K_PORT_LOOKUP_CTRL(port),
+> +				       QCA8K_PORT_LOOKUP_LEARN);
+> +	else
+> +		return regmap_clear_bits(priv->regmap,
+> +					 QCA8K_PORT_LOOKUP_CTRL(port),
+> +					 QCA8K_PORT_LOOKUP_LEARN);
+> +}
+> +
+>  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+>  {
+> +	struct dsa_port *dp = dsa_to_port(ds, port);
+>  	struct qca8k_priv *priv = ds->priv;
+>  	u32 stp_state;
+>  
+> @@ -585,6 +601,30 @@ void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+>  
+>  	qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
+>  		  QCA8K_PORT_LOOKUP_STATE_MASK, stp_state);
+> +
+> +	qca8k_port_configure_learning(ds, port, dp->learning);
+
+Learning should be enabled only if we're in an STP state compatible with
+learning: BR_STATE_LEARNING, BR_STATE_FORWARDING. The dp->learning flag
+does not follow the STP state, it is just an override for that.
+
+So, the condition should be:
+"(state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING) && dp->learning"
+
+> +}
+> +
+> +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> +				struct switchdev_brport_flags flags,
+> +				struct netlink_ext_ack *extack)
+> +{
+> +	if (flags.mask & ~BR_LEARNING)
+> +		return -EINVAL;
+> +
+> +	return 0;
+> +}
+> +
+> +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
+> +			    struct switchdev_brport_flags flags,
+> +			    struct netlink_ext_ack *extack)
+> +{
+> +	int ret;
+> +
+> +	ret = qca8k_port_configure_learning(ds, port,
+> +					    flags.mask & ~BR_LEARNING);
+
+flags.mask contains the bits that have changed.
+flags.val contains the current value of all bits.
+
+Passing flags.mask & ~BR_LEARNING (the mask of changed flags except for
+BR_LEARNING) to qca8k_port_configure_learning() makes absolutely no sense.
+
+> +
+> +	return ret;
+>  }
+>  
+>  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
+> diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
+> index c5cc8a172d65..8f88b7db384d 100644
+> --- a/drivers/net/dsa/qca/qca8k.h
+> +++ b/drivers/net/dsa/qca/qca8k.h
+> @@ -522,6 +522,12 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
+>  
+>  /* Common bridge function */
+>  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state);
+> +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> +				struct switchdev_brport_flags flags,
+> +				struct netlink_ext_ack *extack);
+> +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
+> +			    struct switchdev_brport_flags flags,
+> +			    struct netlink_ext_ack *extack);
+>  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
+>  			   struct dsa_bridge bridge,
+>  			   bool *tx_fwd_offload,
+> -- 
+> 2.40.1
+> 
+
 
