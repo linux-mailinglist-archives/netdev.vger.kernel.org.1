@@ -1,68 +1,67 @@
-Return-Path: <netdev+bounces-13809-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13810-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B0FE73D0C5
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:10:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5897B73D0CC
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:17:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E475B280F6C
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:10:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7026B1C208E9
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:17:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230BA469D;
-	Sun, 25 Jun 2023 12:10:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2479F46B0;
+	Sun, 25 Jun 2023 12:16:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0EE272109
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:10:21 +0000 (UTC)
-Received: from NAM02-BN1-obe.outbound.protection.outlook.com (mail-bn1nam02on2091.outbound.protection.outlook.com [40.107.212.91])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C768211A
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 05:10:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BA00442C
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:16:57 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2091.outbound.protection.outlook.com [40.107.220.91])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE79DE44;
+	Sun, 25 Jun 2023 05:16:55 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lQciHCm1SMjrTeW3istWYDtWjPpzuj4P600wKc1iE/IR1cUbWGRneVDQxgeQpG4LjUNkRb5nGIyJBB4n4MOZcYmc/EADEW86H6Fxy0YcuCPvfDDlUZLdzleG/DByypgBdHW27N2ZIF65ERioWXuVobfZfdcMNzd83xPEKVhYk0WBd5vN0AD6UXcyASgpr+M9joxMtenh4IYtDaIWoH8wtzeQrL6IIPK6kUOCsSrIwrgG9bSKX2m50shDnXSMpK7SaMTvDQ/bN+3fcQ3Cjj5MHu8+p4nGQa3hyJa2VsmcGj3JY8hAivKadV6Ogsy/EhEQ94WIHqLv7QCXl9sJxkr5bA==
+ b=iePCooK0PMPAs7wrWDLjTPDe8f7UhHN8zj78No6SeylhAk+kMuNmtQT31Eh8zhNVGUSh0lBByCePB8TKCBPMzg/Cf72jfXKCQU2XltuhUQ/I4tDPxtBrV4alKRrOno30kxOuDl32jBlKC5dw+ZNoT4b0lNyupTqO7tcROLKvPBhwFI6Cd/lJLSjDFKVrvFD/MdrjNzowBgEeyD0+SC/u5XYBuIKqoc2a7OvpvLvwhzwp6/UhKfV53gaiB1BFVnvxVDEyNsgB6kPKxs+uaoa90SHtILQN8cZt69IS21anMVxJ5QFd1kZbYd1zKTDpgm7yMheeAzzCHQim316nwJ/wFA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=jBbvFBUFNUTsJBEv8XoMpFZhAyaR096CMB/1NdDFuqo=;
- b=cXXLKvJVXkf29pU8MH/aqxcBRcDPInLMS6zAOH2lS897jTedD791jLo8ghhC+IppIiGwHzw/qgRSo8T1TLDyuQ2h9Tnc14PLYsNHjcWV06XjZZqhRivms9isx9C0W3Smb+w+jAaDPYL4dp03kLRmBoDCUiJjpywcUNH50OUQhzID0UH3n0KJuw98h9SYk3z3h4tQnXAew7N29uKNEcZm1uLmA3DglNvw4ThUihfl9zIffN4tVTN+5z4qdowCQsC6l2N6a3ZvLLXfV0rKtBcfFdlDkUIjHqIGQNnf7o48Cy+L6FUOvdE3mG9K/9j7n0ffp/pcOpdrj9V3SiL1o8eW4g==
+ bh=YQ6elrSezdGzMx453eRdXfeELlw61QliXWjqgWeXZJA=;
+ b=Ck7JNuqOxPNSN3SQ3Vx2Q8eyYSymnKDdN11Ko9IfZv1BHq8UEibsUR7b/yVasrwT12SXVMuHdI/uWA45jAHtbjfM3dMkiyzYMXaxIlmJ21+hHN1bUHGOaLm+ceKQwcAxjuB2oVmltKigq0AQ6N+76Z2i2rtv1Ooy2+ugtfkpAwWokm8aapzalVy2gA47lev6/kJAa55oqrL2aWGQZpit9hvsqXvkmCodG6iXNpB4g3oIh7iWyDiPZWWmXGE+i0h3RRHie2lHXCRonOaVMVRY1so49pZzy6DyGP3GOEcq+6lXVT78R/fwOejoMT1n5a42Q8l6eevnyl626F/0oTF5nA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=jBbvFBUFNUTsJBEv8XoMpFZhAyaR096CMB/1NdDFuqo=;
- b=Atn8dNlYe3qvQ8vmY5AfxH4YlCD7uHu69OrYOBBo/JtKJk0qNynzh886scL4F3TO2TA4H4LxPo+3MaBJuVw7etJGI/8HObMU1PaViMDPonxaPxXBqqgHbqvv8dYQz76enFiFSnQicaxJ7ftxnB7lbEXzHQhDcmQg17ipUWLs60k=
+ bh=YQ6elrSezdGzMx453eRdXfeELlw61QliXWjqgWeXZJA=;
+ b=N1pem204BZQHVXQYa+RGlz87+N7iYx5IQDOU7if0yHDZDQYnEd6HgMRj2Zf+MLfphDRmkfuK+T2Sm9VplDBGkilO9rrh7x3Fh2PrMdQ//wCmD/rpXlOrPcb9hRUjDagJ8TENTaIMh8oxQh2vfAmZiSdA/MdhsZRCGe/SnfHQvq4=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MN2PR13MB3789.namprd13.prod.outlook.com (2603:10b6:208:1e4::24) with
+ by MN2PR13MB3725.namprd13.prod.outlook.com (2603:10b6:208:1e2::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Sun, 25 Jun
- 2023 12:10:14 +0000
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Sun, 25 Jun
+ 2023 12:16:51 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Sun, 25 Jun 2023
- 12:10:14 +0000
-Date: Sun, 25 Jun 2023 14:10:04 +0200
+ 12:16:51 +0000
+Date: Sun, 25 Jun 2023 14:16:44 +0200
 From: Simon Horman <simon.horman@corigine.com>
 To: Lin Ma <linma@zju.edu.cn>
-Cc: krzysztof.kozlowski@linaro.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, sameo@linux.intel.com,
-	thierry.escande@linux.intel.com
-Subject: Re: [PATCH v5] net: nfc: Fix use-after-free caused by
- nfc_llcp_find_local
-Message-ID: <ZJgunIR1d/T7uuu0@corigine.com>
-References: <20230625091007.199624-1-linma@zju.edu.cn>
+Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v1] net: xfrm: Fix xfrm_address_filter OOB read
+Message-ID: <ZJgwLPjJ4m9U04zg@corigine.com>
+References: <20230625092855.207918-1-linma@zju.edu.cn>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230625091007.199624-1-linma@zju.edu.cn>
-X-ClientProxiedBy: AM0PR04CA0095.eurprd04.prod.outlook.com
- (2603:10a6:208:be::36) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230625092855.207918-1-linma@zju.edu.cn>
+X-ClientProxiedBy: AM0PR03CA0097.eurprd03.prod.outlook.com
+ (2603:10a6:208:69::38) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -71,622 +70,252 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3789:EE_
-X-MS-Office365-Filtering-Correlation-Id: b2bee6be-1b75-4b2e-ba26-08db757521a7
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3725:EE_
+X-MS-Office365-Filtering-Correlation-Id: 8425d025-113b-40c8-c262-08db75760e8a
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	YmgVSd09CJk7k0HikQXdfE/2opCt081JHtD45JCvOXYAhGgXwQeuGtL8IZdIDt7az/9HuDZnLtvBS463XSk9/8exHw4SLictq+LzUhomMH1Nq7Gv6HV982byCAgKaoz6jLIl1R9Y0yrxV2sbC5KWemSOpw97NkitcFHg3GOfFgJgIDhCoBAuyb7CSHQEB/iy7OG/OYlQNPhotRnAD2Tntps7f/7tG283/HXHd41EBp8BeyMrmHhci9GCmlEr2kILdyuVjGBZTmzHt/zokjxTDsCfyE7gE/eobo+FcyaN73gY8bohpLpKCrquqCAynhPES6LhL/swXkSwT01BVUg7rvrarR06OpZ6Vpn+khki0l15XvG+CesvqUMI0JlRWCPBs7L5NMcSLCL8tniPCFm93AUtr1goS139lmalpHK2+PueYqtL7V5TEn6xem0TbRwYL5bCPoDVPOpUoEEnXl52isvA70K1WFXhEPp3THfLN5WJqkM6IN5mJPCNSEZv6/JX3VuKJtI3TVOzuQxgKMAI3mWDqxH3UMuLXl7aorwlMqB3x2VuG2CUFhjxVYkMxIS/EkhM4Iw8vFKVKcaqwtcqiSCLkJFsQS33FQ32CBEeUWE=
+	2FzciN8c6Bxr1yClBvEsAChdIGO9wbI4ZQX5NtTnqwCaCntAGLoKK+4thfeT+43tXLmCKPA+jSm7TUnfcDFeknQ8qAshpdzG/kyM6yQ8egegok0d0cMIbmnr+r5vhvSlHizbjIEnUFlFmCm0dyqsQB7Wt6ZHFRAnruSpLHw3GGpRheVeD9D8zMwmWgkI5U6XDvgXHVtqKf88ZJLt2AWcmoNTkM02miBdkmEPsCdHGMQuRdmuVEVja2LwedBAsumJDRp33JJcEfsToicfq4nPdFkH96euXPD1wyBocyqxFFVLBNi2pYp8wsMydb3sXJA8H7apcBZK41KP9tcvsT/iMNSs9Hg87Y98ccLmFuw7a1bzaPgq5FlvBA4Yg/Fms51V7Fi3NmrnP9rJvNFAASdwqf1mfgDKzoJvKMP8UXPZKOl2/HyT451yLi2uFs2kdz3TdaBrcVsNx6izcXPjSi2kRSrmOE/SqXgZzu5T3DJoFcHhAnz0QO6koXG1OtQgG8uUYZXldGRGGChCjE2jrY3xIr19u4kwFHaQSS644m7AyPqmHjgYv2VLcItscw36UXJvf8Xy1grL4I5HX2ZNTaf01qb3c8aVhYn0MhIpfpG1kr8=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(346002)(396003)(136003)(376002)(366004)(451199021)(36756003)(30864003)(5660300002)(44832011)(41300700001)(316002)(86362001)(66476007)(6916009)(8936002)(8676002)(66556008)(4326008)(38100700002)(66946007)(6486002)(26005)(6512007)(6506007)(2906002)(186003)(478600001)(6666004)(83380400001)(2616005);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(396003)(39840400004)(376002)(346002)(451199021)(84970400001)(36756003)(5660300002)(44832011)(6916009)(8936002)(8676002)(41300700001)(86362001)(66556008)(66476007)(4326008)(38100700002)(316002)(66946007)(6506007)(26005)(6512007)(2906002)(186003)(2616005)(478600001)(6666004)(83380400001)(6486002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?bZ36cimNzCUdOnFgMD7lD3fIsm7dS/xXEGfahz9uLe1bJVSO65wfns45IF0U?=
- =?us-ascii?Q?HmBxw6l2Ot6OhnmIydVuIZUw+6gCJlwHyzCFOOewAu1WpFczkaoRvKAI48tw?=
- =?us-ascii?Q?ojZEZXR1n07mjVSfZ9G8SDRhYc/l433VOwGGb1YSMC5FGEqxHBsER6kn82d/?=
- =?us-ascii?Q?rErtaA3MyLEfFksjy+yZnSs2lUTpaCcW3ZmjM9AoMXNYECwrKvEzaYkYATz9?=
- =?us-ascii?Q?ExZlah9hmQpmJA0YMo/QK96yWjST1VF0HS17aG9WSB2AP3b8xNtn4iZR7elM?=
- =?us-ascii?Q?k8b9C1MwN95K9eTrX4+JjWQ4tmXfBh6uSPVcVflPuMdCPhi84gSj66ZYb2Qo?=
- =?us-ascii?Q?pk3Cv6uD0fngb+1ujYaljefv85LLwdHBEL4Ae1bmrF0dUSUD+rsssWCgmftg?=
- =?us-ascii?Q?i/C+Lw02WAAgGwCG0CpsDq/DRQOJHKx7oeX/zMHOm42VdKfrkAUb0NLvVCBB?=
- =?us-ascii?Q?io8NyxkLvx53xW+Ww4bl+64yhZSUTcfJ+KdRfRnngAXlhf7JbGdsaHjkWQIH?=
- =?us-ascii?Q?K2ZppDLIH94Fjc8LwMmQzh/dvdw+T54kRK516xllySpco0+1+R7vt0jDebFB?=
- =?us-ascii?Q?qSjhn0bENV+LVt3wVudouDyBwnJcJoFOqTgHOk1kZ82czsjP0iN/z2QfePRp?=
- =?us-ascii?Q?DRb6UtNAPkLoO4KrpnJljP3JQrmQZ9BRO2F8XbP8Py5WmA9p30yqcJ5++Izq?=
- =?us-ascii?Q?+6NZBo7VsqjSVZPeyJ8tWsT5d8P6epvyCjJkQURVyxz0cmzvEkmLsl/SEo8F?=
- =?us-ascii?Q?Q10BW33gA5BU9i7dLqa1MU0eM8TfgTcqKiRIVXrunL0RHlBOKkBOCXzoFlkB?=
- =?us-ascii?Q?Q3N78lG/E5n/87I8uh/OLdtRWcR5GsbMk5PgS8oCtcxB4AL9BzHFof07eEKU?=
- =?us-ascii?Q?v/V0ZY5gOmyMqMhotRGswmAgZOALpy2T96LcKqpYtHnJzyyBdLEqHGLPK5oz?=
- =?us-ascii?Q?c4FGISCpqmeL54TraxTDfhkZY+4p1SxoYb/55T/9EIi3O7KdgKPa7x/3s57j?=
- =?us-ascii?Q?F4SJHODEwN6t1aZYvzwPgvpDr49vswSxbZSr5e1duATAKp7Vr2iyz7cQKMbJ?=
- =?us-ascii?Q?XJat5412ZhDwAlpI2dJnW9pUgTPU6koDs4xMlh/CQfB2QE5nLd+sAprtSEAW?=
- =?us-ascii?Q?uBiGru4ycopPqZAgz4j4tL0vmjQ9NEl930kLvAzUiV1KnspeToMuD+5HQ6mK?=
- =?us-ascii?Q?db4TrZfUMKpMxYyZAm3glQu6GMwk1RXwtW7hmlq/HqbhJ8LLASGzEW/Ts6kN?=
- =?us-ascii?Q?TRv10DgjTie1HTz6XqXOToHH5mNcYsRJqpNZQ6DRSzAnjc0javOY73LI/dAD?=
- =?us-ascii?Q?r3WU16WJwBN+6T4BkERohHmpkNXpUSBhC7a1STa+59c+DEbHD7POJP7DtCqd?=
- =?us-ascii?Q?IUPgHyj00Fspem4FqTsW3+UxQW1X1cl1a1o6iLb/0wNW/DzOA1OHp52A0lDd?=
- =?us-ascii?Q?PnFEx6raPjk+hcjraj8ltJSTJwQJ+CBy12W95T1nA8UV0lcgxzyuPKAQHDhq?=
- =?us-ascii?Q?Q8zSDPX9AE18vu/faOHOhqsurWdPsce6t9GtlAjAwwmUyNzk+YpF//c6k4zj?=
- =?us-ascii?Q?CkNKMj2R7VXuoSiHDdFvie+XBxQN6ujpw21MF+4hO6tGY5nHzq1Eul90LHtr?=
- =?us-ascii?Q?7g=3D=3D?=
+	=?us-ascii?Q?Lbv5x+7LgkIsfwVkdQ3My6cVrYFgqMsyzckrtw9q50+nfcW+IcegGq0rTI4T?=
+ =?us-ascii?Q?OFhUBMWQN/jqSZy5YnoufvYkdcPbcP5LYBwNbASP00J2WjaHoIjKoSdXCX8u?=
+ =?us-ascii?Q?TdqKk8M4q9P0jWFFkaAei8TSWbAhOV2bv6t/s0msO01vLYDCplhZLPAdfedH?=
+ =?us-ascii?Q?iPTS0DEagBmdLDpUMqXHTBJ9HpaqyF1WDwvnS/vhKRasNBuI5txAdIHbgelW?=
+ =?us-ascii?Q?CN13CR73dg0yXXfZjPqCkzvZoLf1Ga/N76KHx69eVVbo5Ih52HpB2uDcx05f?=
+ =?us-ascii?Q?5W+RDXqHrOXbk3JXytyFfbnihW0T1FnvhiuMXCI+TH+6JFXbAs2aCK7/cKhp?=
+ =?us-ascii?Q?5PXUzI/38wPPRwizqV7kL/66ZocOvEkY9hG6dyi7hBBP8Wf0efIJzpxBpXL0?=
+ =?us-ascii?Q?DXeG802WQOLZ5K1NH8eSqIhm4024/frSPbn619B0/J4HKf9ni63UuojZoNj2?=
+ =?us-ascii?Q?fWwhG95MMSGKbkYEwpxzZxobG6ilx/1yQ5hfEQY6BCYAVUGb0T3FzyvMOmbF?=
+ =?us-ascii?Q?E8P8GFrBghmtQ6h/WnCYdO87LE0ihszxQahC0rEhYPBFAnsMpmSAuYhUiKwH?=
+ =?us-ascii?Q?NTGjh9v1ND7uF9RIA0HF+2oJQisJTrPfjujhqMoVwMJicKKYi091Wt89470L?=
+ =?us-ascii?Q?VZYYJcZf4gM7yVWp5Kvsx99gtj2b5jpHYenv8GRvx0bzB8gRSHrvH7JrETGh?=
+ =?us-ascii?Q?sCkRVPkYzy0zBv/0XQejWzeK8QWhVxFWw5SJQpG27hYINSDAy+kJyHnUC53g?=
+ =?us-ascii?Q?e0E0tuNKWOQvqdLZAV+Kc4ZYk/H3UGqHAXhMl1Gqw+uXJzs0lKDYsCCqsqNX?=
+ =?us-ascii?Q?CwNq007+uvVrmoL5+/jpcYkIQj5dS3vA4mZqoZCufJ5U0pq5tkGWVb/C8YIm?=
+ =?us-ascii?Q?6mI//Pm2G9pd4fJ0q2Ngy3XK+G0Za8g38foYfXhJdFnIHCS2gk9RwbP68R6y?=
+ =?us-ascii?Q?zF8F9BksONNYZm+PMQ8TwAw8Sr7Z8d9IqU225vd7TnYcliad6i17X2/pXvd2?=
+ =?us-ascii?Q?6TzKdr0ao84tjRlOuRoJYYZv37dqZvzNImhS5XUCCkuLmvrunFxUcI//xcZm?=
+ =?us-ascii?Q?RPfvkBNBAMIo3pORSM/IyYrgXMevd62PiQsD1mQMcnUCcuZQY4GyOp16iYdr?=
+ =?us-ascii?Q?wPnHJMqcmIp8p91zGocsQsxWlpUZ0hmDlF+IF+h40c1sFlfkgRDUCcDIXmhv?=
+ =?us-ascii?Q?GSyJ3FE/RZ+K1JbnSxmqnTxkcHdDTrpilmprIHTSOBEKBumxDkdI2zKcIlb5?=
+ =?us-ascii?Q?PFI9vL3e/uyYjwUM3TgRNVICnsCG4iZbHK1FKlP3wN/DvNg8Smc1UhjCX0Hn?=
+ =?us-ascii?Q?cs34xEzpSnTneQL0FIbNbKAj5ymyFW12Dmc8TySaCU9zxFeMvb2Pn6enFoTP?=
+ =?us-ascii?Q?eBoXZuHFzrUtcXRCjpSZFgQnOonoTgmsDRW5gojwTAbRoVa92YNoSafxDmfL?=
+ =?us-ascii?Q?MdchovMn3E3BHzMm+vg2HBBFelv2lkqhUuGbhHiARZxkfT9b7/vSpRcyA3Rb?=
+ =?us-ascii?Q?mzB+m+3+/KqNqm+FTyBs8Pug+0pKpzm3PgEd3IDXe0BY1EJhhMz65gVaj3nZ?=
+ =?us-ascii?Q?8zVWF+k5lCAsTWqBmQDKrV12Pexqx5eUOuVVvrFmf3gEmZS4p90s1VUaXBhI?=
+ =?us-ascii?Q?Og=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b2bee6be-1b75-4b2e-ba26-08db757521a7
+X-MS-Exchange-CrossTenant-Network-Message-Id: 8425d025-113b-40c8-c262-08db75760e8a
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 12:10:14.2364
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 12:16:51.7478
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wiuWufMz++GdDr+OaHY4Pi59KAyrdwnHRMziY2ijaszphmzO0ETTEyeuYqMilgShHPLc21rmxq2//gNNhbvK46Fb7YAVcSoEcKE6B3IkhmQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3789
+X-MS-Exchange-CrossTenant-UserPrincipalName: QhCHkXtHwipXUsY0rQCEmGVQXQZq9eyfDNv2BMuacNboarKzHbM9ZiED4t+gri68gOnfi8hTF/dWz0IbM/swJIaWMyO6oWXLmb6f3aghrqQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3725
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-+ maintainers; corrected Davem's email address
-
-On Sun, Jun 25, 2023 at 05:10:07PM +0800, Lin Ma wrote:
-> This commit fixes several use-after-free that caused by function
-> nfc_llcp_find_local(). For example, one UAF can happen when below buggy
-> time window occurs.
+On Sun, Jun 25, 2023 at 05:28:55PM +0800, Lin Ma wrote:
+> We found below OOB crash:
 > 
-> // nfc_genl_llc_get_params   | // nfc_unregister_device
->                              |
-> dev = nfc_get_device(idx);   | device_lock(...)
-> if (!dev)                    | dev->shutting_down = true;
->     return -ENODEV;          | device_unlock(...);
->                              |
-> device_lock(...);            |   // nfc_llcp_unregister_device
->                              |   nfc_llcp_find_local()
-> nfc_llcp_find_local(...);    |
->                              |   local_cleanup()
-> if (!local) {                |
->     rc = -ENODEV;            |     // nfc_llcp_local_put
->     goto exit;               |     kref_put(.., local_release)
-> }                            |
->                              |       // local_release
->                              |       list_del(&local->list)
->   // nfc_genl_send_params    |       kfree()
->   local->dev->idx !!!UAF!!!  |
->                              |
+> [   44.211730] ==================================================================
+> [   44.212045] BUG: KASAN: slab-out-of-bounds in memcmp+0x8b/0xb0
+> [   44.212045] Read of size 8 at addr ffff88800870f320 by task poc.xfrm/97
+> [   44.212045]
+> [   44.212045] CPU: 0 PID: 97 Comm: poc.xfrm Not tainted 6.4.0-rc7-00072-gdad9774deaf1-dirty #4
+> [   44.212045] Call Trace:
+> [   44.212045]  <TASK>
+> [   44.212045]  dump_stack_lvl+0x37/0x50
+> [   44.212045]  print_report+0xcc/0x620
+> [   44.212045]  ? __virt_addr_valid+0xf3/0x170
+> [   44.212045]  ? memcmp+0x8b/0xb0
+> [   44.212045]  kasan_report+0xb2/0xe0
+> [   44.212045]  ? memcmp+0x8b/0xb0
+> [   44.212045]  kasan_check_range+0x39/0x1c0
+> [   44.212045]  memcmp+0x8b/0xb0
+> [   44.212045]  xfrm_state_walk+0x21c/0x420
+> [   44.212045]  ? __pfx_dump_one_state+0x10/0x10
+> [   44.212045]  xfrm_dump_sa+0x1e2/0x290
+> [   44.212045]  ? __pfx_xfrm_dump_sa+0x10/0x10
+> [   44.212045]  ? __kernel_text_address+0xd/0x40
+> [   44.212045]  ? kasan_unpoison+0x27/0x60
+> [   44.212045]  ? mutex_lock+0x60/0xe0
+> [   44.212045]  ? __pfx_mutex_lock+0x10/0x10
+> [   44.212045]  ? kasan_save_stack+0x22/0x50
+> [   44.212045]  netlink_dump+0x322/0x6c0
+> [   44.212045]  ? __pfx_netlink_dump+0x10/0x10
+> [   44.212045]  ? mutex_unlock+0x7f/0xd0
+> [   44.212045]  ? __pfx_mutex_unlock+0x10/0x10
+> [   44.212045]  __netlink_dump_start+0x353/0x430
+> [   44.212045]  xfrm_user_rcv_msg+0x3a4/0x410
+> [   44.212045]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+> [   44.212045]  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+> [   44.212045]  ? __pfx_xfrm_dump_sa+0x10/0x10
+> [   44.212045]  ? __pfx_xfrm_dump_sa_done+0x10/0x10
+> [   44.212045]  ? __stack_depot_save+0x382/0x4e0
+> [   44.212045]  ? filter_irq_stacks+0x1c/0x70
+> [   44.212045]  ? kasan_save_stack+0x32/0x50
+> [   44.212045]  ? kasan_save_stack+0x22/0x50
+> [   44.212045]  ? kasan_set_track+0x25/0x30
+> [   44.212045]  ? __kasan_slab_alloc+0x59/0x70
+> [   44.212045]  ? kmem_cache_alloc_node+0xf7/0x260
+> [   44.212045]  ? kmalloc_reserve+0xab/0x120
+> [   44.212045]  ? __alloc_skb+0xcf/0x210
+> [   44.212045]  ? netlink_sendmsg+0x509/0x700
+> [   44.212045]  ? sock_sendmsg+0xde/0xe0
+> [   44.212045]  ? __sys_sendto+0x18d/0x230
+> [   44.212045]  ? __x64_sys_sendto+0x71/0x90
+> [   44.212045]  ? do_syscall_64+0x3f/0x90
+> [   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [   44.212045]  ? netlink_sendmsg+0x509/0x700
+> [   44.212045]  ? sock_sendmsg+0xde/0xe0
+> [   44.212045]  ? __sys_sendto+0x18d/0x230
+> [   44.212045]  ? __x64_sys_sendto+0x71/0x90
+> [   44.212045]  ? do_syscall_64+0x3f/0x90
+> [   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [   44.212045]  ? kasan_save_stack+0x22/0x50
+> [   44.212045]  ? kasan_set_track+0x25/0x30
+> [   44.212045]  ? kasan_save_free_info+0x2e/0x50
+> [   44.212045]  ? __kasan_slab_free+0x10a/0x190
+> [   44.212045]  ? kmem_cache_free+0x9c/0x340
+> [   44.212045]  ? netlink_recvmsg+0x23c/0x660
+> [   44.212045]  ? sock_recvmsg+0xeb/0xf0
+> [   44.212045]  ? __sys_recvfrom+0x13c/0x1f0
+> [   44.212045]  ? __x64_sys_recvfrom+0x71/0x90
+> [   44.212045]  ? do_syscall_64+0x3f/0x90
+> [   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [   44.212045]  ? copyout+0x3e/0x50
+> [   44.212045]  netlink_rcv_skb+0xd6/0x210
+> [   44.212045]  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+> [   44.212045]  ? __pfx_netlink_rcv_skb+0x10/0x10
+> [   44.212045]  ? __pfx_sock_has_perm+0x10/0x10
+> [   44.212045]  ? mutex_lock+0x8d/0xe0
+> [   44.212045]  ? __pfx_mutex_lock+0x10/0x10
+> [   44.212045]  xfrm_netlink_rcv+0x44/0x50
+> [   44.212045]  netlink_unicast+0x36f/0x4c0
+> [   44.212045]  ? __pfx_netlink_unicast+0x10/0x10
+> [   44.212045]  ? netlink_recvmsg+0x500/0x660
+> [   44.212045]  netlink_sendmsg+0x3b7/0x700
+> [   44.212045]  ? __pfx_netlink_sendmsg+0x10/0x10
+> [   44.212045]  ? __pfx_netlink_sendmsg+0x10/0x10
+> [   44.212045]  sock_sendmsg+0xde/0xe0
+> [   44.212045]  __sys_sendto+0x18d/0x230
+> [   44.212045]  ? __pfx___sys_sendto+0x10/0x10
+> [   44.212045]  ? rcu_core+0x44a/0xe10
+> [   44.212045]  ? __rseq_handle_notify_resume+0x45b/0x740
+> [   44.212045]  ? _raw_spin_lock_irq+0x81/0xe0
+> [   44.212045]  ? __pfx___rseq_handle_notify_resume+0x10/0x10
+> [   44.212045]  ? __pfx_restore_fpregs_from_fpstate+0x10/0x10
+> [   44.212045]  ? __pfx_blkcg_maybe_throttle_current+0x10/0x10
+> [   44.212045]  ? __pfx_task_work_run+0x10/0x10
+> [   44.212045]  __x64_sys_sendto+0x71/0x90
+> [   44.212045]  do_syscall_64+0x3f/0x90
+> [   44.212045]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [   44.212045] RIP: 0033:0x44b7da
+> [   44.212045] RSP: 002b:00007ffdc8838548 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+> [   44.212045] RAX: ffffffffffffffda RBX: 00007ffdc8839978 RCX: 000000000044b7da
+> [   44.212045] RDX: 0000000000000038 RSI: 00007ffdc8838770 RDI: 0000000000000003
+> [   44.212045] RBP: 00007ffdc88385b0 R08: 00007ffdc883858c R09: 000000000000000c
+> [   44.212045] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+> [   44.212045] R13: 00007ffdc8839968 R14: 00000000004c37d0 R15: 0000000000000001
+> [   44.212045]  </TASK>
+> [   44.212045]
+> [   44.212045] Allocated by task 97:
+> [   44.212045]  kasan_save_stack+0x22/0x50
+> [   44.212045]  kasan_set_track+0x25/0x30
+> [   44.212045]  __kasan_kmalloc+0x7f/0x90
+> [   44.212045]  __kmalloc_node_track_caller+0x5b/0x140
+> [   44.212045]  kmemdup+0x21/0x50
+> [   44.212045]  xfrm_dump_sa+0x17d/0x290
+> [   44.212045]  netlink_dump+0x322/0x6c0
+> [   44.212045]  __netlink_dump_start+0x353/0x430
+> [   44.212045]  xfrm_user_rcv_msg+0x3a4/0x410
+> [   44.212045]  netlink_rcv_skb+0xd6/0x210
+> [   44.212045]  xfrm_netlink_rcv+0x44/0x50
+> [   44.212045]  netlink_unicast+0x36f/0x4c0
+> [   44.212045]  netlink_sendmsg+0x3b7/0x700
+> [   44.212045]  sock_sendmsg+0xde/0xe0
+> [   44.212045]  __sys_sendto+0x18d/0x230
+> [   44.212045]  __x64_sys_sendto+0x71/0x90
+> [   44.212045]  do_syscall_64+0x3f/0x90
+> [   44.212045]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+> [   44.212045]
+> [   44.212045] The buggy address belongs to the object at ffff88800870f300
+> [   44.212045]  which belongs to the cache kmalloc-64 of size 64
+> [   44.212045] The buggy address is located 32 bytes inside of
+> [   44.212045]  allocated 36-byte region [ffff88800870f300, ffff88800870f324)
+> [   44.212045]
+> [   44.212045] The buggy address belongs to the physical page:
+> [   44.212045] page:00000000e4de16ee refcount:1 mapcount:0 mapping:000000000 ...
+> [   44.212045] flags: 0x100000000000200(slab|node=0|zone=1)
+> [   44.212045] page_type: 0xffffffff()
+> [   44.212045] raw: 0100000000000200 ffff888004c41640 dead000000000122 0000000000000000
+> [   44.212045] raw: 0000000000000000 0000000080200020 00000001ffffffff 0000000000000000
+> [   44.212045] page dumped because: kasan: bad access detected
+> [   44.212045]
+> [   44.212045] Memory state around the buggy address:
+> [   44.212045]  ffff88800870f200: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+> [   44.212045]  ffff88800870f280: 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc
+> [   44.212045] >ffff88800870f300: 00 00 00 00 04 fc fc fc fc fc fc fc fc fc fc fc
+> [   44.212045]                                ^
+> [   44.212045]  ffff88800870f380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   44.212045]  ffff88800870f400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+> [   44.212045] ==================================================================
 > 
-> and the crash trace for the one of the discussed UAF like:
+> By investigating the code, we find the root cause of this OOB is the lack
+> of checks in xfrm_dump_sa(). The buggy code allows a malicious user to pass
+> arbitrary value of filter->splen/dplen. Hence, with crafted xfrm states,
+> the attacker can achieve 8 bytes heap OOB read, which causes info leak.
 > 
-> BUG: KASAN: slab-use-after-free in nfc_genl_llc_get_params+0x72f/0x780  net/nfc/netlink.c:1045
-> Read of size 8 at addr ffff888105b0e410 by task 20114
+>   if (attrs[XFRMA_ADDRESS_FILTER]) {
+>     filter = kmemdup(nla_data(attrs[XFRMA_ADDRESS_FILTER]),
+>         sizeof(*filter), GFP_KERNEL);
+>     if (filter == NULL)
+>       return -ENOMEM;
+>     // NO MORE CHECKS HERE !!!
+>   }
 > 
-> Call Trace:
->  <TASK>
->  __dump_stack  lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0x72/0xa0  lib/dump_stack.c:106
->  print_address_description  mm/kasan/report.c:319 [inline]
->  print_report+0xcc/0x620  mm/kasan/report.c:430
->  kasan_report+0xb2/0xe0  mm/kasan/report.c:536
->  nfc_genl_send_params  net/nfc/netlink.c:999 [inline]
->  nfc_genl_llc_get_params+0x72f/0x780  net/nfc/netlink.c:1045
->  genl_family_rcv_msg_doit.isra.0+0x1ee/0x2e0  net/netlink/genetlink.c:968
->  genl_family_rcv_msg  net/netlink/genetlink.c:1048 [inline]
->  genl_rcv_msg+0x503/0x7d0  net/netlink/genetlink.c:1065
->  netlink_rcv_skb+0x161/0x430  net/netlink/af_netlink.c:2548
->  genl_rcv+0x28/0x40  net/netlink/genetlink.c:1076
->  netlink_unicast_kernel  net/netlink/af_netlink.c:1339 [inline]
->  netlink_unicast+0x644/0x900  net/netlink/af_netlink.c:1365
->  netlink_sendmsg+0x934/0xe70  net/netlink/af_netlink.c:1913
->  sock_sendmsg_nosec  net/socket.c:724 [inline]
->  sock_sendmsg+0x1b6/0x200  net/socket.c:747
->  ____sys_sendmsg+0x6e9/0x890  net/socket.c:2501
->  ___sys_sendmsg+0x110/0x1b0  net/socket.c:2555
->  __sys_sendmsg+0xf7/0x1d0  net/socket.c:2584
->  do_syscall_x64  arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x3f/0x90  arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> RIP: 0033:0x7f34640a2389
-> RSP: 002b:00007f3463415168 EFLAGS: 00000246 ORIG_RAX: 000000000000002e
-> RAX: ffffffffffffffda RBX: 00007f34641c1f80 RCX: 00007f34640a2389
-> RDX: 0000000000000000 RSI: 0000000020000240 RDI: 0000000000000006
-> RBP: 00007f34640ed493 R08: 0000000000000000 R09: 0000000000000000
-> R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-> R13: 00007ffe38449ecf R14: 00007f3463415300 R15: 0000000000022000
->  </TASK>
+> This patch fixes the OOB by adding necessary boundary checks, just like
+> the code in pfkey_dump() function.
 > 
-> Allocated by task 20116:
->  kasan_save_stack+0x22/0x50  mm/kasan/common.c:45
->  kasan_set_track+0x25/0x30  mm/kasan/common.c:52
->  ____kasan_kmalloc  mm/kasan/common.c:374 [inline]
->  __kasan_kmalloc+0x7f/0x90  mm/kasan/common.c:383
->  kmalloc  include/linux/slab.h:580 [inline]
->  kzalloc  include/linux/slab.h:720 [inline]
->  nfc_llcp_register_device+0x49/0xa40  net/nfc/llcp_core.c:1567
->  nfc_register_device+0x61/0x260  net/nfc/core.c:1124
->  nci_register_device+0x776/0xb20  net/nfc/nci/core.c:1257
->  virtual_ncidev_open+0x147/0x230  drivers/nfc/virtual_ncidev.c:148
->  misc_open+0x379/0x4a0  drivers/char/misc.c:165
->  chrdev_open+0x26c/0x780  fs/char_dev.c:414
->  do_dentry_open+0x6c4/0x12a0  fs/open.c:920
->  do_open  fs/namei.c:3560 [inline]
->  path_openat+0x24fe/0x37e0  fs/namei.c:3715
->  do_filp_open+0x1ba/0x410  fs/namei.c:3742
->  do_sys_openat2+0x171/0x4c0  fs/open.c:1356
->  do_sys_open  fs/open.c:1372 [inline]
->  __do_sys_openat  fs/open.c:1388 [inline]
->  __se_sys_openat  fs/open.c:1383 [inline]
->  __x64_sys_openat+0x143/0x200  fs/open.c:1383
->  do_syscall_x64  arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x3f/0x90  arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> 
-> Freed by task 20115:
->  kasan_save_stack+0x22/0x50  mm/kasan/common.c:45
->  kasan_set_track+0x25/0x30  mm/kasan/common.c:52
->  kasan_save_free_info+0x2e/0x50  mm/kasan/generic.c:521
->  ____kasan_slab_free  mm/kasan/common.c:236 [inline]
->  ____kasan_slab_free  mm/kasan/common.c:200 [inline]
->  __kasan_slab_free+0x10a/0x190  mm/kasan/common.c:244
->  kasan_slab_free  include/linux/kasan.h:162 [inline]
->  slab_free_hook  mm/slub.c:1781 [inline]
->  slab_free_freelist_hook  mm/slub.c:1807 [inline]
->  slab_free  mm/slub.c:3787 [inline]
->  __kmem_cache_free+0x7a/0x190  mm/slub.c:3800
->  local_release  net/nfc/llcp_core.c:174 [inline]
->  kref_put  include/linux/kref.h:65 [inline]
->  nfc_llcp_local_put  net/nfc/llcp_core.c:182 [inline]
->  nfc_llcp_local_put  net/nfc/llcp_core.c:177 [inline]
->  nfc_llcp_unregister_device+0x206/0x290  net/nfc/llcp_core.c:1620
->  nfc_unregister_device+0x160/0x1d0  net/nfc/core.c:1179
->  virtual_ncidev_close+0x52/0xa0  drivers/nfc/virtual_ncidev.c:163
->  __fput+0x252/0xa20  fs/file_table.c:321
->  task_work_run+0x174/0x270  kernel/task_work.c:179
->  resume_user_mode_work  include/linux/resume_user_mode.h:49 [inline]
->  exit_to_user_mode_loop  kernel/entry/common.c:171 [inline]
->  exit_to_user_mode_prepare+0x108/0x110  kernel/entry/common.c:204
->  __syscall_exit_to_user_mode_work  kernel/entry/common.c:286 [inline]
->  syscall_exit_to_user_mode+0x21/0x50  kernel/entry/common.c:297
->  do_syscall_64+0x4c/0x90  arch/x86/entry/common.c:86
->  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> 
-> Last potentially related work creation:
->  kasan_save_stack+0x22/0x50  mm/kasan/common.c:45
->  __kasan_record_aux_stack+0x95/0xb0  mm/kasan/generic.c:491
->  kvfree_call_rcu+0x29/0xa80  kernel/rcu/tree.c:3328
->  drop_sysctl_table+0x3be/0x4e0  fs/proc/proc_sysctl.c:1735
->  unregister_sysctl_table.part.0+0x9c/0x190  fs/proc/proc_sysctl.c:1773
->  unregister_sysctl_table+0x24/0x30  fs/proc/proc_sysctl.c:1753
->  neigh_sysctl_unregister+0x5f/0x80  net/core/neighbour.c:3895
->  addrconf_notify+0x140/0x17b0  net/ipv6/addrconf.c:3684
->  notifier_call_chain+0xbe/0x210  kernel/notifier.c:87
->  call_netdevice_notifiers_info+0xb5/0x150  net/core/dev.c:1937
->  call_netdevice_notifiers_extack  net/core/dev.c:1975 [inline]
->  call_netdevice_notifiers  net/core/dev.c:1989 [inline]
->  dev_change_name+0x3c3/0x870  net/core/dev.c:1211
->  dev_ifsioc+0x800/0xf70  net/core/dev_ioctl.c:376
->  dev_ioctl+0x3d9/0xf80  net/core/dev_ioctl.c:542
->  sock_do_ioctl+0x160/0x260  net/socket.c:1213
->  sock_ioctl+0x3f9/0x670  net/socket.c:1316
->  vfs_ioctl  fs/ioctl.c:51 [inline]
->  __do_sys_ioctl  fs/ioctl.c:870 [inline]
->  __se_sys_ioctl  fs/ioctl.c:856 [inline]
->  __x64_sys_ioctl+0x19e/0x210  fs/ioctl.c:856
->  do_syscall_x64  arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x3f/0x90  arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> 
-> The buggy address belongs to the object at ffff888105b0e400
->  which belongs to the cache kmalloc-1k of size 1024
-> The buggy address is located 16 bytes inside of
->  freed 1024-byte region [ffff888105b0e400, ffff888105b0e800)
-> 
-> The buggy address belongs to the physical page:
-> head:ffffea000416c200 order:3 entire_mapcount:0 nr_pages_mapped:0 pincount:0
-> flags: 0x200000000010200(slab|head|node=0|zone=2)
-> raw: 0200000000010200 ffff8881000430c0 ffffea00044c7010 ffffea0004510e10
-> raw: 0000000000000000 00000000000a000a 00000001ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> 
-> Memory state around the buggy address:
->  ffff888105b0e300: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
->  ffff888105b0e380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
-> >ffff888105b0e400: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                          ^
->  ffff888105b0e480: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->  ffff888105b0e500: fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> 
-> In summary, this patch solves those use-after-free by
-> 
-> 1. Re-implement the nfc_llcp_find_local(). The current version does not
-> grab the reference when getting the local from the linked list.  For
-> example, the llcp_sock_bind() gets the reference like below:
-> 
-> // llcp_sock_bind()
-> 
->     local = nfc_llcp_find_local(dev); // A
->     ..... \
->            | raceable
->     ..... /
->     llcp_sock->local = nfc_llcp_local_get(local); // B
-> 
-> There is an apparent race window that one can  drop the reference
-> and free the local object fetched in (A) before (B) gets the reference.
-> 
-> 2. Some callers of the nfc_llcp_find_local() do not grab the reference
-> at all. For example, the nfc_genl_llc_{{get/set}_params/sdreq} functions.
-> We add the nfc_llcp_local_put() for them. Moreover, we add the necessary
-> error handling function to put the reference.
-> 
-> 3. Add the nfc_llcp_remove_local() helper. The local object is removed
-> from the linked list in local_release() when all reference is gone. This
-> patch removes it when nfc_llcp_unregister_device() is called.
-> 
-> Therefore, every caller of nfc_llcp_find_local() will get a reference
-> even when the nfc_llcp_unregister_device() is called. This promises no
-> use-after-free for the local object is ever possible.
-> 
-> Fixes: 52feb444a903 ("NFC: Extend netlink interface for LTO, RW, and MIUX parameters support")
-> Fixes: c7aa12252f51 ("NFC: Take a reference on the LLCP local pointer when creating a socket")
+> Fixes: d3623099d350 ("ipsec: add support of limited SA dump")
 > Signed-off-by: Lin Ma <linma@zju.edu.cn>
 > ---
-> V1 -> V2: not just fix nfc_genl_llc_{{get/set}_params/sdreq}
->           but concern on all callers of nfc_llcp_find_local()
-> V2 -> V3: make nfc_llcp_local_get() static to ease the prototype
->           warning, and make the commit message more clear
-> V3 -> V4: make nfc_llcp_remove_local() also static
-> V4 -> V5: fix the buggy error handling in llcp_sock_connect(), make
->           sure llcp_sock->local/dev reset to NULL
-
-Thanks. My only issue with v4 has been resolved by v5.
-
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-
-[ full patch left in place below for the benefit of newly CCed people ]
-
->  net/nfc/llcp.h          |  1 -
->  net/nfc/llcp_commands.c | 12 +++++++---
->  net/nfc/llcp_core.c     | 49 +++++++++++++++++++++++++++++++++++------
->  net/nfc/llcp_sock.c     | 18 ++++++++-------
->  net/nfc/netlink.c       | 20 ++++++++++++-----
->  net/nfc/nfc.h           |  1 +
->  6 files changed, 77 insertions(+), 24 deletions(-)
+>  net/xfrm/xfrm_user.c | 4 ++++
+>  1 file changed, 4 insertions(+)
 > 
-> diff --git a/net/nfc/llcp.h b/net/nfc/llcp.h
-> index c1d9be636933..d8345ed57c95 100644
-> --- a/net/nfc/llcp.h
-> +++ b/net/nfc/llcp.h
-> @@ -201,7 +201,6 @@ void nfc_llcp_sock_link(struct llcp_sock_list *l, struct sock *s);
->  void nfc_llcp_sock_unlink(struct llcp_sock_list *l, struct sock *s);
->  void nfc_llcp_socket_remote_param_init(struct nfc_llcp_sock *sock);
->  struct nfc_llcp_local *nfc_llcp_find_local(struct nfc_dev *dev);
-> -struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local);
->  int nfc_llcp_local_put(struct nfc_llcp_local *local);
->  u8 nfc_llcp_get_sdp_ssap(struct nfc_llcp_local *local,
->  			 struct nfc_llcp_sock *sock);
-> diff --git a/net/nfc/llcp_commands.c b/net/nfc/llcp_commands.c
-> index 41e3a20c8935..5d2d4bc26ef9 100644
-> --- a/net/nfc/llcp_commands.c
-> +++ b/net/nfc/llcp_commands.c
-> @@ -359,6 +359,7 @@ int nfc_llcp_send_symm(struct nfc_dev *dev)
->  	struct sk_buff *skb;
->  	struct nfc_llcp_local *local;
->  	u16 size = 0;
-> +	int err;
->  
->  	local = nfc_llcp_find_local(dev);
->  	if (local == NULL)
-> @@ -368,8 +369,10 @@ int nfc_llcp_send_symm(struct nfc_dev *dev)
->  	size += dev->tx_headroom + dev->tx_tailroom + NFC_HEADER_SIZE;
->  
->  	skb = alloc_skb(size, GFP_KERNEL);
-> -	if (skb == NULL)
-> -		return -ENOMEM;
-> +	if (skb == NULL) {
-> +		err = -ENOMEM;
-> +		goto out;
-> +	}
->  
->  	skb_reserve(skb, dev->tx_headroom + NFC_HEADER_SIZE);
->  
-> @@ -379,8 +382,11 @@ int nfc_llcp_send_symm(struct nfc_dev *dev)
->  
->  	nfc_llcp_send_to_raw_sock(local, skb, NFC_DIRECTION_TX);
->  
-> -	return nfc_data_exchange(dev, local->target_idx, skb,
-> +	err = nfc_data_exchange(dev, local->target_idx, skb,
->  				 nfc_llcp_recv, local);
-> +out:
-> +	nfc_llcp_local_put(local);
-> +	return err;
->  }
->  
->  int nfc_llcp_send_connect(struct nfc_llcp_sock *sock)
-> diff --git a/net/nfc/llcp_core.c b/net/nfc/llcp_core.c
-> index a27e1842b2a0..f60e424e0607 100644
-> --- a/net/nfc/llcp_core.c
-> +++ b/net/nfc/llcp_core.c
-> @@ -17,6 +17,8 @@
->  static u8 llcp_magic[3] = {0x46, 0x66, 0x6d};
->  
->  static LIST_HEAD(llcp_devices);
-> +/* Protects llcp_devices list */
-> +static DEFINE_SPINLOCK(llcp_devices_lock);
->  
->  static void nfc_llcp_rx_skb(struct nfc_llcp_local *local, struct sk_buff *skb);
->  
-> @@ -141,7 +143,7 @@ static void nfc_llcp_socket_release(struct nfc_llcp_local *local, bool device,
->  	write_unlock(&local->raw_sockets.lock);
->  }
->  
-> -struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
-> +static struct nfc_llcp_local *nfc_llcp_local_get(struct nfc_llcp_local *local)
->  {
->  	kref_get(&local->ref);
->  
-> @@ -169,7 +171,6 @@ static void local_release(struct kref *ref)
->  
->  	local = container_of(ref, struct nfc_llcp_local, ref);
->  
-> -	list_del(&local->list);
->  	local_cleanup(local);
->  	kfree(local);
->  }
-> @@ -282,12 +283,33 @@ static void nfc_llcp_sdreq_timer(struct timer_list *t)
->  struct nfc_llcp_local *nfc_llcp_find_local(struct nfc_dev *dev)
->  {
->  	struct nfc_llcp_local *local;
-> +	struct nfc_llcp_local *res = NULL;
->  
-> +	spin_lock(&llcp_devices_lock);
->  	list_for_each_entry(local, &llcp_devices, list)
-> -		if (local->dev == dev)
-> +		if (local->dev == dev) {
-> +			res = nfc_llcp_local_get(local);
-> +			break;
-> +		}
-> +	spin_unlock(&llcp_devices_lock);
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index c34a2a06ca94..a73ae4ad8096 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -1267,6 +1267,10 @@ static int xfrm_dump_sa(struct sk_buff *skb, struct netlink_callback *cb)
+>  					 sizeof(*filter), GFP_KERNEL);
+>  			if (filter == NULL)
+>  				return -ENOMEM;
 > +
-> +	return res;
-> +}
-> +
-> +static struct nfc_llcp_local *nfc_llcp_remove_local(struct nfc_dev *dev)
-> +{
-> +	struct nfc_llcp_local *local, *tmp;
-> +
-> +	spin_lock(&llcp_devices_lock);
-> +	list_for_each_entry_safe(local, tmp, &llcp_devices, list)
-> +		if (local->dev == dev) {
-> +			list_del(&local->list);
-> +			spin_unlock(&llcp_devices_lock);
->  			return local;
-> +		}
-> +	spin_unlock(&llcp_devices_lock);
->  
-> -	pr_debug("No device found\n");
-> +	pr_warn("Shutting down device not found\n");
->  
->  	return NULL;
->  }
-> @@ -608,12 +630,15 @@ u8 *nfc_llcp_general_bytes(struct nfc_dev *dev, size_t *general_bytes_len)
->  
->  	*general_bytes_len = local->gb_len;
->  
-> +	nfc_llcp_local_put(local);
-> +
->  	return local->gb;
->  }
->  
->  int nfc_llcp_set_remote_gb(struct nfc_dev *dev, const u8 *gb, u8 gb_len)
->  {
->  	struct nfc_llcp_local *local;
-> +	int err;
->  
->  	if (gb_len < 3 || gb_len > NFC_MAX_GT_LEN)
->  		return -EINVAL;
-> @@ -630,12 +655,16 @@ int nfc_llcp_set_remote_gb(struct nfc_dev *dev, const u8 *gb, u8 gb_len)
->  
->  	if (memcmp(local->remote_gb, llcp_magic, 3)) {
->  		pr_err("MAC does not support LLCP\n");
-> -		return -EINVAL;
-> +		err = -EINVAL;
-> +		goto out;
->  	}
->  
-> -	return nfc_llcp_parse_gb_tlv(local,
-> +	err = nfc_llcp_parse_gb_tlv(local,
->  				     &local->remote_gb[3],
->  				     local->remote_gb_len - 3);
-> +out:
-> +	nfc_llcp_local_put(local);
-> +	return err;
->  }
->  
->  static u8 nfc_llcp_dsap(const struct sk_buff *pdu)
-> @@ -1517,6 +1546,8 @@ int nfc_llcp_data_received(struct nfc_dev *dev, struct sk_buff *skb)
->  
->  	__nfc_llcp_recv(local, skb);
->  
-> +	nfc_llcp_local_put(local);
-> +
->  	return 0;
->  }
->  
-> @@ -1533,6 +1564,8 @@ void nfc_llcp_mac_is_down(struct nfc_dev *dev)
->  
->  	/* Close and purge all existing sockets */
->  	nfc_llcp_socket_release(local, true, 0);
-> +
-> +	nfc_llcp_local_put(local);
->  }
->  
->  void nfc_llcp_mac_is_up(struct nfc_dev *dev, u32 target_idx,
-> @@ -1558,6 +1591,8 @@ void nfc_llcp_mac_is_up(struct nfc_dev *dev, u32 target_idx,
->  		mod_timer(&local->link_timer,
->  			  jiffies + msecs_to_jiffies(local->remote_lto));
->  	}
-> +
-> +	nfc_llcp_local_put(local);
->  }
->  
->  int nfc_llcp_register_device(struct nfc_dev *ndev)
-> @@ -1608,7 +1643,7 @@ int nfc_llcp_register_device(struct nfc_dev *ndev)
->  
->  void nfc_llcp_unregister_device(struct nfc_dev *dev)
->  {
-> -	struct nfc_llcp_local *local = nfc_llcp_find_local(dev);
-> +	struct nfc_llcp_local *local = nfc_llcp_remove_local(dev);
->  
->  	if (local == NULL) {
->  		pr_debug("No such device\n");
-> diff --git a/net/nfc/llcp_sock.c b/net/nfc/llcp_sock.c
-> index 77642d18a3b4..645677f84dba 100644
-> --- a/net/nfc/llcp_sock.c
-> +++ b/net/nfc/llcp_sock.c
-> @@ -99,7 +99,7 @@ static int llcp_sock_bind(struct socket *sock, struct sockaddr *addr, int alen)
->  	}
->  
->  	llcp_sock->dev = dev;
-> -	llcp_sock->local = nfc_llcp_local_get(local);
-> +	llcp_sock->local = local;
->  	llcp_sock->nfc_protocol = llcp_addr.nfc_protocol;
->  	llcp_sock->service_name_len = min_t(unsigned int,
->  					    llcp_addr.service_name_len,
-> @@ -186,7 +186,7 @@ static int llcp_raw_sock_bind(struct socket *sock, struct sockaddr *addr,
->  	}
->  
->  	llcp_sock->dev = dev;
-> -	llcp_sock->local = nfc_llcp_local_get(local);
-> +	llcp_sock->local = local;
->  	llcp_sock->nfc_protocol = llcp_addr.nfc_protocol;
->  
->  	nfc_llcp_sock_link(&local->raw_sockets, sk);
-> @@ -696,22 +696,22 @@ static int llcp_sock_connect(struct socket *sock, struct sockaddr *_addr,
->  	if (dev->dep_link_up == false) {
->  		ret = -ENOLINK;
->  		device_unlock(&dev->dev);
-> -		goto put_dev;
-> +		goto sock_llcp_put_local;
->  	}
->  	device_unlock(&dev->dev);
->  
->  	if (local->rf_mode == NFC_RF_INITIATOR &&
->  	    addr->target_idx != local->target_idx) {
->  		ret = -ENOLINK;
-> -		goto put_dev;
-> +		goto sock_llcp_put_local;
->  	}
->  
->  	llcp_sock->dev = dev;
-> -	llcp_sock->local = nfc_llcp_local_get(local);
-> +	llcp_sock->local = local;
->  	llcp_sock->ssap = nfc_llcp_get_local_ssap(local);
->  	if (llcp_sock->ssap == LLCP_SAP_MAX) {
->  		ret = -ENOMEM;
-> -		goto sock_llcp_put_local;
-> +		goto sock_llcp_nullify;
->  	}
->  
->  	llcp_sock->reserved_ssap = llcp_sock->ssap;
-> @@ -757,11 +757,13 @@ static int llcp_sock_connect(struct socket *sock, struct sockaddr *_addr,
->  sock_llcp_release:
->  	nfc_llcp_put_ssap(local, llcp_sock->ssap);
->  
-> -sock_llcp_put_local:
-> -	nfc_llcp_local_put(llcp_sock->local);
-> +sock_llcp_nullify:
->  	llcp_sock->local = NULL;
->  	llcp_sock->dev = NULL;
->  
-> +sock_llcp_put_local:
-> +	nfc_llcp_local_put(local);
-> +
->  put_dev:
->  	nfc_put_device(dev);
->  
-> diff --git a/net/nfc/netlink.c b/net/nfc/netlink.c
-> index b9264e730fd9..e9ac6a6f934e 100644
-> --- a/net/nfc/netlink.c
-> +++ b/net/nfc/netlink.c
-> @@ -1039,11 +1039,14 @@ static int nfc_genl_llc_get_params(struct sk_buff *skb, struct genl_info *info)
->  	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
->  	if (!msg) {
->  		rc = -ENOMEM;
-> -		goto exit;
-> +		goto put_local;
->  	}
->  
->  	rc = nfc_genl_send_params(msg, local, info->snd_portid, info->snd_seq);
->  
-> +put_local:
-> +	nfc_llcp_local_put(local);
-> +
->  exit:
->  	device_unlock(&dev->dev);
->  
-> @@ -1105,7 +1108,7 @@ static int nfc_genl_llc_set_params(struct sk_buff *skb, struct genl_info *info)
->  	if (info->attrs[NFC_ATTR_LLC_PARAM_LTO]) {
->  		if (dev->dep_link_up) {
->  			rc = -EINPROGRESS;
-> -			goto exit;
-> +			goto put_local;
+> +			if (filter->splen >= (sizeof(xfrm_address_t) << 3) ||
+> +			    filter->dplen >= (sizeof(xfrm_address_t) << 3))
+> +				return -EINVAL;
+
+Hi Lin Ma,
+
+It appears that the memory allocation for filter is leaked if the
+new condition above is met.
+
 >  		}
 >  
->  		local->lto = nla_get_u8(info->attrs[NFC_ATTR_LLC_PARAM_LTO]);
-> @@ -1117,6 +1120,9 @@ static int nfc_genl_llc_set_params(struct sk_buff *skb, struct genl_info *info)
->  	if (info->attrs[NFC_ATTR_LLC_PARAM_MIUX])
->  		local->miux = cpu_to_be16(miux);
->  
-> +put_local:
-> +	nfc_llcp_local_put(local);
-> +
->  exit:
->  	device_unlock(&dev->dev);
->  
-> @@ -1172,7 +1178,7 @@ static int nfc_genl_llc_sdreq(struct sk_buff *skb, struct genl_info *info)
->  
->  		if (rc != 0) {
->  			rc = -EINVAL;
-> -			goto exit;
-> +			goto put_local;
->  		}
->  
->  		if (!sdp_attrs[NFC_SDP_ATTR_URI])
-> @@ -1191,7 +1197,7 @@ static int nfc_genl_llc_sdreq(struct sk_buff *skb, struct genl_info *info)
->  		sdreq = nfc_llcp_build_sdreq_tlv(tid, uri, uri_len);
->  		if (sdreq == NULL) {
->  			rc = -ENOMEM;
-> -			goto exit;
-> +			goto put_local;
->  		}
->  
->  		tlvs_len += sdreq->tlv_len;
-> @@ -1201,10 +1207,14 @@ static int nfc_genl_llc_sdreq(struct sk_buff *skb, struct genl_info *info)
->  
->  	if (hlist_empty(&sdreq_list)) {
->  		rc = -EINVAL;
-> -		goto exit;
-> +		goto put_local;
->  	}
->  
->  	rc = nfc_llcp_send_snl_sdreq(local, &sdreq_list, tlvs_len);
-> +
-> +put_local:
-> +	nfc_llcp_local_put(local);
-> +
->  exit:
->  	device_unlock(&dev->dev);
->  
-> diff --git a/net/nfc/nfc.h b/net/nfc/nfc.h
-> index de2ec66d7e83..0b1e6466f4fb 100644
-> --- a/net/nfc/nfc.h
-> +++ b/net/nfc/nfc.h
-> @@ -52,6 +52,7 @@ int nfc_llcp_set_remote_gb(struct nfc_dev *dev, const u8 *gb, u8 gb_len);
->  u8 *nfc_llcp_general_bytes(struct nfc_dev *dev, size_t *general_bytes_len);
->  int nfc_llcp_data_received(struct nfc_dev *dev, struct sk_buff *skb);
->  struct nfc_llcp_local *nfc_llcp_find_local(struct nfc_dev *dev);
-> +int nfc_llcp_local_put(struct nfc_llcp_local *local);
->  int __init nfc_llcp_init(void);
->  void nfc_llcp_exit(void);
->  void nfc_llcp_free_sdp_tlv(struct nfc_llcp_sdp_tlv *sdp);
+>  		if (attrs[XFRMA_PROTO])
 > -- 
 > 2.17.1
 > 
