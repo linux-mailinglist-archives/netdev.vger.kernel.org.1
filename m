@@ -1,136 +1,127 @@
-Return-Path: <netdev+bounces-13794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 21EA673D05D
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:20:35 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 299F073D05F
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:21:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5210F1C2084D
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:20:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65F57280F51
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:21:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 230571103;
-	Sun, 25 Jun 2023 11:20:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B9C5E1103;
+	Sun, 25 Jun 2023 11:21:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 031E0ECE;
-	Sun, 25 Jun 2023 11:20:29 +0000 (UTC)
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 01F7CE70;
-	Sun, 25 Jun 2023 04:20:27 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QppRp5CTsz4f3tCq;
-	Sun, 25 Jun 2023 19:20:22 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP2 (Coremail) with SMTP id Syh0CgAnEN72Iphk_OyyMQ--.28212S2;
-	Sun, 25 Jun 2023 19:20:24 +0800 (CST)
-Subject: Re: [PATCH v2 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
- similar to kfree_rcu().
-From: Hou Tao <houtao@huaweicloud.com>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>, daniel@iogearbox.net,
- andrii@kernel.org, void@manifault.com, paulmck@kernel.org
-Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
- bpf@vger.kernel.org, kernel-team@fb.com
-References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
- <20230624031333.96597-13-alexei.starovoitov@gmail.com>
- <8f2d98bb-51b8-b61f-1f6d-59410befc55e@huaweicloud.com>
-Message-ID: <e449a1ad-0efb-d65c-5dae-c146a5a5511a@huaweicloud.com>
-Date: Sun, 25 Jun 2023 19:20:22 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD9BBECE
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:21:33 +0000 (UTC)
+Received: from mail-ej1-x62f.google.com (mail-ej1-x62f.google.com [IPv6:2a00:1450:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5725A18E;
+	Sun, 25 Jun 2023 04:21:32 -0700 (PDT)
+Received: by mail-ej1-x62f.google.com with SMTP id a640c23a62f3a-986d8332f50so277160566b.0;
+        Sun, 25 Jun 2023 04:21:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687692091; x=1690284091;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=RShrmp5d5YjbnMCRTIoskOVV/4dcQN9QlhOXYh59kII=;
+        b=jOypruXWz0mk/akL08lCy4oC5TYSV9uVNfx0p557JHXdD/qM0HTf8tbDH5D/yyoSA6
+         tu6vi5kFIVHP58H1xaZZLIwveCGm3wwRlTOumSGObwtCXZzc+3ub55YGn/EhzavS+8A8
+         RrJjLAa8m4ut0m6ftR5YqFUh9QEhZEALtozurgVP/5SI78futbLJcqSMzXrLaccjtaas
+         9L+EXSEcGiYrg14wrHPLQHF/seAVd3TvbpTmzgEmZGmj4rfYFPKezRJk4Po6JFfPERom
+         OvL2bZ8tRqXSZtxoRH4adxfITRxsq48dgebi9ZHTbBd8PLrFPZmzgLY4dvlRFjb83yhp
+         IJIw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687692091; x=1690284091;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=RShrmp5d5YjbnMCRTIoskOVV/4dcQN9QlhOXYh59kII=;
+        b=gmKi0nyvjtcmSNBIwKLYno4LSYhaWuYaLTSxLMHk3Gv4VQcfST6qdaKEmXSCNc+aNC
+         t3APh+nZHyW+/5f4xMmJzoDX8cwinVZaA83oI4QNAAvnMhxSFgHc3u87oI/8tZd4WycK
+         LSNkdKfkSvZ36pRJ+7T+QQyt0W/XRy8tYiqZO+lhKP1EBqmYuXhEznjakD4hbELAumDn
+         mjcsWza0kvhIBZiW2XozmVAIIKbzH0pELPTOEZVz2ctJcLguvZ+uDRAX937zcvK8+O61
+         zz5ZtdMJRamPtV3j54l2sSu9I3snLgDNrOPhP7OFccrFyKsgisb47xi3koKPJ+0w8pkn
+         uEeA==
+X-Gm-Message-State: AC+VfDznN5QxStoGYlVPpt3aLXEVMtnaEZ7uALxJv4hR1AfjNqf4dbF+
+	jKvBilWX+XT/WJW4YIqHfPu7XwQLjnQ=
+X-Google-Smtp-Source: ACHHUZ7/so+IU0ZbTtSAVgalKgZjhXZp4K2pZ7pCF8kqFz3aUn59spSUfFgjIsTyajE6S7Nqee6+fA==
+X-Received: by 2002:a17:906:8a56:b0:98e:4b2:2e83 with SMTP id gx22-20020a1709068a5600b0098e04b22e83mr2176154ejc.50.1687692090488;
+        Sun, 25 Jun 2023 04:21:30 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id lc6-20020a170906f90600b0096fbc516a93sm1950857ejb.211.2023.06.25.04.21.29
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 04:21:30 -0700 (PDT)
+Date: Sun, 25 Jun 2023 14:21:28 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Linus Walleij <linus.walleij@linaro.org>,
+	Pawel Dembicki <paweldembicki@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next 2/6] net: dsa: vsc73xx: add port_stp_state_set
+ function
+Message-ID: <20230625112128.3vyvcuvypbkxuz3q@skbuf>
+References: <20230621191302.1405623-1-paweldembicki@gmail.com>
+ <20230621191302.1405623-2-paweldembicki@gmail.com>
+ <27e0f7c9-71a8-4882-ab65-6c42d969ea4f@lunn.ch>
+ <CACRpkdZ514z3Y0LP0iqN0zyc5Tgo7n8O3XHTNVWC0BrnPPjM2w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <8f2d98bb-51b8-b61f-1f6d-59410befc55e@huaweicloud.com>
 Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:Syh0CgAnEN72Iphk_OyyMQ--.28212S2
-X-Coremail-Antispam: 1UD129KBjvJXoW7uw4xtw1rXrWxZr17Zr15twb_yoW8Zr43pF
-	Z3KFyUGrykAF4Iyr1jqr15ArZ7Xr1Yqa47Gay8JF9xtrn8Zwn0qFWUuryj9rn3Aw48C3y7
-	Ar1DKr1xur4UZrJanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUv2b4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUGVWUXwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVW3JVWrJr1lIxAIcVC2z280aVAF
-	wI0_Jr0_Gr1lIxAIcVC2z280aVCY1x0267AKxVW8JVW8JrUvcSsGvfC2KfnxnUUI43ZEXa
-	7IUbPEf5UUUUU==
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
-	MAY_BE_FORGED,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+In-Reply-To: <CACRpkdZ514z3Y0LP0iqN0zyc5Tgo7n8O3XHTNVWC0BrnPPjM2w@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Wed, Jun 21, 2023 at 11:27:14PM +0200, Linus Walleij wrote:
+> On Wed, Jun 21, 2023 at 9:33 PM Andrew Lunn <andrew@lunn.ch> wrote:
+> 
+> > > +     struct vsc73xx *vsc = ds->priv;
+> > > +     /* FIXME: STP frames isn't forwarded at this moment. BPDU frames are
+> > > +      * forwarded only from to PI/SI interface. For more info see chapter
+> > > +      * 2.7.1 (CPU Forwarding) in datasheet.
+> >
+> > Do you mean the CPU never gets to see the BPDU frames?
+> >
+> > Does the hardware have any sort of packet matching to trap frames to
+> > the CPU? Can you match on the destination MAC address
+> > 01:80:C2:00:00:00 ?
+> 
+> The hardware contains an embedded Intel 8054 CPU that can
+> execute programs to do pretty much anything.
+> 
+> The bad news: it requires a custom SDK thingy that we do not
+> have access to.
+> 
+> So far we used the chips in a bit of vanilla mode, which is all I
+> have ever seen in the systems we have and it can't do much,
+> not even add a helpful frame tag, but as can be seen from the
+> patches it can do VLAN...
+> 
+> Yours,
+> Linus Walleij
 
-On 6/24/2023 2:49 PM, Hou Tao wrote:
-> Hi,
->
-> On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
->> From: Alexei Starovoitov <ast@kernel.org>
->>
-> SNIP
->>  
->> +static void __free_by_rcu(struct rcu_head *head)
->> +{
->> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
->> +	struct bpf_mem_cache *tgt = c->tgt;
->> +	struct llist_node *llnode;
->> +
->> +	if (unlikely(READ_ONCE(c->draining)))
->> +		goto out;
->> +
->> +	llnode = llist_del_all(&c->waiting_for_gp);
->> +	if (!llnode)
->> +		goto out;
->> +
->> +	if (llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace))
->> +		tgt->free_by_rcu_ttrace_tail = c->waiting_for_gp_tail;
-> Got a null-ptr dereference oops when running multiple test_maps and
-> htab-mem benchmark after hacking htab to use bpf_mem_cache_free_rcu().
-> And I think it happened as follow:
-The same null-ptr dereference happened even before switching htab to use
-bpf_mem_cache_free_rcu(). So it seems after introducing c->tgt, there
-could be two concurrent free_bulk() but with the same c->tgt.
->
-> // c->tgt
-> P1: __free_by_rcu()
->         // c->tgt is the same as P1
->         P2: __free_by_rcu()
->
-> // return true
-> P1: llist_add_batch(&tgt->free_by_rcu_ttrace)
->         // return false
->         P2: llist_add_batch(&tgt->free_by_rcu_ttrace)
->         P2: do_call_rcu_ttrace
->         // return false
->         P2: xchg(tgt->call_rcu_ttrace_in_progress, 1)
->         // llnode is not NULL
->         P2: llnode = llist_del_all(&c->free_by_rcu_ttrace)
->         // BAD: c->free_by_rcu_ttrace_tail is NULL, so oops
->         P2: __llist_add_batch(llnode, c->free_by_rcu_ttrace_tail)
->
-> P1: tgt->free_by_rcu_ttrace_tail = X   
->
-> I don't have a good fix for the problem except adding a spin-lock for
-> free_by_rcu_ttrace and free_by_rcu_ttrace_tail.
->
->
-> .
+But even without involving the iCPU, it should be possible to inject/extract
+control packets over the SI interface, using the CPU_CAPT and CPUTXDAT block
+registers, correct?
 
+IIUC, ocelot with tag_8021q does just that for STP and PTP, see
+ocelot_port_inject_frame() and ocelot_xtr_poll_frame().
 
