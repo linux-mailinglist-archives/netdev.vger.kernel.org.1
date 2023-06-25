@@ -1,129 +1,418 @@
-Return-Path: <netdev+bounces-13775-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13777-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6ECDC73CE02
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 04:19:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B322473CE1D
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 04:48:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 624431C2088E
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 02:19:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D212F1C208DF
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 02:48:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 67E41632;
-	Sun, 25 Jun 2023 02:19:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 62A9963A;
+	Sun, 25 Jun 2023 02:48:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CDD27F
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 02:19:51 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E64E5DA
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 19:19:49 -0700 (PDT)
-Received: from kwepemi500015.china.huawei.com (unknown [172.30.72.57])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QpZNy0wg3ztQrt;
-	Sun, 25 Jun 2023 10:17:06 +0800 (CST)
-Received: from [10.174.178.171] (10.174.178.171) by
- kwepemi500015.china.huawei.com (7.221.188.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 25 Jun 2023 10:19:46 +0800
-Subject: Re: [Question] integer overflow in function
- __qdisc_calculate_pkt_len()
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Networking <netdev@vger.kernel.org>
-References: <7723cc01-57bf-2b64-7f78-98a0e6508a2e@huawei.com>
- <20230605161922.5e417434@kernel.org>
- <c6ab254d-76c3-7507-3935-e9bad4da0bab@huawei.com>
- <20230606084919.5549dd58@kernel.org>
-From: "luwei (O)" <luwei32@huawei.com>
-Message-ID: <374426a9-2739-9aab-4ee4-ef31dab402a2@huawei.com>
-Date: Sun, 25 Jun 2023 10:19:45 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DEC962A;
+	Sun, 25 Jun 2023 02:48:13 +0000 (UTC)
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A099E48;
+	Sat, 24 Jun 2023 19:48:11 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045168;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=12;SR=0;TI=SMTPD_---0Vlqny7v_1687661286;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vlqny7v_1687661286)
+          by smtp.aliyun-inc.com;
+          Sun, 25 Jun 2023 10:48:07 +0800
+Message-ID: <1687660989.9620886-3-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v10 10/10] virtio_net: support dma premapped
+Date: Sun, 25 Jun 2023 10:43:09 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Jesper Dangaard Brouer <hawk@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ netdev@vger.kernel.org,
+ John Fastabend <john.fastabend@gmail.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ virtualization@lists.linux-foundation.org,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ bpf@vger.kernel.org,
+ Paolo Abeni <pabeni@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>
+References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
+ <20230602092206.50108-11-xuanzhuo@linux.alibaba.com>
+ <20230622081142-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230622081142-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-In-Reply-To: <20230606084919.5549dd58@kernel.org>
-Content-Type: text/plain; charset="utf-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.178.171]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- kwepemi500015.china.huawei.com (7.221.188.92)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+
+On Thu, 22 Jun 2023 08:15:03 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Fri, Jun 02, 2023 at 05:22:06PM +0800, Xuan Zhuo wrote:
+> > Introduce the module param "experiment_premapped" to enable the function
+> > that the virtio-net do dma mapping.
+> >
+> > If that is true, the vq of virtio-net is under the premapped mode.
+> > It just handle the sg with dma_address. And the driver must get the dma
+> > address of the buffer to unmap after get the buffer from virtio core.
+> >
+> > That will be useful when AF_XDP is enable, AF_XDP tx and the kernel packet
+> > xmit will share the tx queue, so the skb xmit must support the premapped
+> > mode.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>
+>
+> I put this in next but I don't think this is going upstream
+> in its current form,
+
+I agree.
+
+> certainly not with the experiment_premapped mod config
+> that no one will know how to enable. If you want to experiment,
+> keep it in your private tree, experimenting on humans requires
+> an ethics board approval and consent forms :)
+
+^_^
+
+Maybe, this patchset should not include this patch,
+this patch should work with the patch that uses the premapped.
+
+>
+> Spreading the "premapped" boolean all of the place is also
+> far from pretty, I wonder why we can't only specify it when adding.
+
+I guess you mean that we just use the "premapped" for the virtio api.
+
+I will try.
+
+Thanks.
 
 
-在 2023/6/6 11:49 PM, Jakub Kicinski 写道:
-> On Tue, 6 Jun 2023 20:54:47 +0800 luwei (O) wrote:
->>> on a quick look limiting the cell_align to S16_MIN at the netlink level
->>> (NLA_POLICY_MIN()) seems reasonable, feel free to send a patch.
->>> .
->> Thanks for your reply, but do your mean cell_align or overhead? It seems
->> limit cell_align to
->>
->> S16_MIN(-32768) can still cause the overflow:
->>
->>       66 + (-2147483559) + (-32767) = 2147451036
->>
->>     skb->len = 66
->>     stab->szopts.overhead = -2147483559
->>     stab->szopts.cell_align = -32767
-> Could you explain what the problem caused by the overflow will be?
-
-yes, it affects the final result of pkt_len in 
-__qdisc_calculate_pkt_len().  In the previous example, the final pkt_len 
-will be 2147451040
-
-which is very different from the origin skb->len 66 and it will reduce 
-traffic control accuracy heavily.
-
-it is calculated as follows:
-
-void __qdisc_calculate_pkt_len(struct sk_buff *skb,
-                                const struct qdisc_size_table *stab)
-{
-         int pkt_len, slot;
-
-         pkt_len = skb->len + stab->szopts.overhead;     // pkt_len = 66 
-+ (-2147483559) = -2147483493
-         if (unlikely(!stab->szopts.tsize))
-                 goto out;
-
-         slot = pkt_len + stab->szopts.cell_align;            // slot  = 
--2147483493 + (-32767) = 2147451036
-         if (unlikely(slot < 0))
-                 slot = 0;
-
-         slot >>= stab->szopts.cell_log;          slot  =  2147451036 
- >>  2 =  536862759
-         if (likely(slot < stab->szopts.tsize))
-                 pkt_len = stab->data[slot];
-         else
-                 pkt_len = stab->data[stab->szopts.tsize - 1] *
-                                 (slot / stab->szopts.tsize) +
-                                 stab->data[slot % 
-stab->szopts.tsize];    // pkt_len  = 2048 * (536862759 / 512) + 160 = 
-2147451040
-
-         pkt_len <<= stab->szopts.size_log;
-out:
-         if (unlikely(pkt_len < 1))
-                 pkt_len = 1;
-         qdisc_skb_cb(skb)->pkt_len = pkt_len;
-}
-EXPORT_SYMBOL(__qdisc_calculate_pkt_len);
-> .
-
--- 
-Best Regards,
-Lu Wei
-
+>
+> > ---
+> >  drivers/net/virtio_net.c | 163 +++++++++++++++++++++++++++++++++------
+> >  1 file changed, 141 insertions(+), 22 deletions(-)
+> >
+> > diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> > index 2396c28c0122..5898212fcb3c 100644
+> > --- a/drivers/net/virtio_net.c
+> > +++ b/drivers/net/virtio_net.c
+> > @@ -26,10 +26,11 @@
+> >  static int napi_weight = NAPI_POLL_WEIGHT;
+> >  module_param(napi_weight, int, 0444);
+> >
+> > -static bool csum = true, gso = true, napi_tx = true;
+> > +static bool csum = true, gso = true, napi_tx = true, experiment_premapped;
+> >  module_param(csum, bool, 0444);
+> >  module_param(gso, bool, 0444);
+> >  module_param(napi_tx, bool, 0644);
+> > +module_param(experiment_premapped, bool, 0644);
+> >
+> >  /* FIXME: MTU in config. */
+> >  #define GOOD_PACKET_LEN (ETH_HLEN + VLAN_HLEN + ETH_DATA_LEN)
+> > @@ -142,6 +143,9 @@ struct send_queue {
+> >
+> >  	/* Record whether sq is in reset state. */
+> >  	bool reset;
+> > +
+> > +	/* The vq is premapped mode. */
+> > +	bool premapped;
+> >  };
+> >
+> >  /* Internal representation of a receive virtqueue */
+> > @@ -174,6 +178,9 @@ struct receive_queue {
+> >  	char name[16];
+> >
+> >  	struct xdp_rxq_info xdp_rxq;
+> > +
+> > +	/* The vq is premapped mode. */
+> > +	bool premapped;
+> >  };
+> >
+> >  /* This structure can contain rss message with maximum settings for indirection table and keysize
+> > @@ -546,6 +553,105 @@ static struct sk_buff *page_to_skb(struct virtnet_info *vi,
+> >  	return skb;
+> >  }
+> >
+> > +static int virtnet_generic_unmap(struct virtqueue *vq, struct virtqueue_detach_cursor *cursor)
+> > +{
+> > +	enum dma_data_direction dir;
+> > +	dma_addr_t addr;
+> > +	u32 len;
+> > +	int err;
+> > +
+> > +	do {
+> > +		err = virtqueue_detach(vq, cursor, &addr, &len, &dir);
+> > +		if (!err || err == -EAGAIN)
+> > +			dma_unmap_page_attrs(virtqueue_dma_dev(vq), addr, len, dir, 0);
+> > +
+> > +	} while (err == -EAGAIN);
+> > +
+> > +	return err;
+> > +}
+> > +
+> > +static void *virtnet_detach_unused_buf(struct virtqueue *vq, bool premapped)
+> > +{
+> > +	struct virtqueue_detach_cursor cursor;
+> > +	void *buf;
+> > +
+> > +	if (!premapped)
+> > +		return virtqueue_detach_unused_buf(vq);
+> > +
+> > +	buf = virtqueue_detach_unused_buf_premapped(vq, &cursor);
+> > +	if (buf)
+> > +		virtnet_generic_unmap(vq, &cursor);
+> > +
+> > +	return buf;
+> > +}
+> > +
+> > +static void *virtnet_get_buf_ctx(struct virtqueue *vq, bool premapped, u32 *len, void **ctx)
+> > +{
+> > +	struct virtqueue_detach_cursor cursor;
+> > +	void *buf;
+> > +
+> > +	if (!premapped)
+> > +		return virtqueue_get_buf_ctx(vq, len, ctx);
+> > +
+> > +	buf = virtqueue_get_buf_premapped(vq, len, ctx, &cursor);
+> > +	if (buf)
+> > +		virtnet_generic_unmap(vq, &cursor);
+> > +
+> > +	return buf;
+> > +}
+> > +
+> > +#define virtnet_rq_get_buf(rq, plen, pctx) \
+> > +({ \
+> > +	typeof(rq) _rq = (rq); \
+> > +	virtnet_get_buf_ctx(_rq->vq, _rq->premapped, plen, pctx); \
+> > +})
+> > +
+> > +#define virtnet_sq_get_buf(sq, plen, pctx) \
+> > +({ \
+> > +	typeof(sq) _sq = (sq); \
+> > +	virtnet_get_buf_ctx(_sq->vq, _sq->premapped, plen, pctx); \
+> > +})
+> > +
+> > +static int virtnet_add_sg(struct virtqueue *vq, bool premapped,
+> > +			  struct scatterlist *sg, unsigned int num, bool out,
+> > +			  void *data, void *ctx, gfp_t gfp)
+> > +{
+> > +	enum dma_data_direction dir;
+> > +	struct device *dev;
+> > +	int err, ret;
+> > +
+> > +	if (!premapped)
+> > +		return virtqueue_add_sg(vq, sg, num, out, data, ctx, gfp);
+> > +
+> > +	dir = out ? DMA_TO_DEVICE : DMA_FROM_DEVICE;
+> > +	dev = virtqueue_dma_dev(vq);
+> > +
+> > +	ret = dma_map_sg_attrs(dev, sg, num, dir, 0);
+> > +	if (ret != num)
+> > +		goto err;
+> > +
+> > +	err = virtqueue_add_sg(vq, sg, num, out, data, ctx, gfp);
+> > +	if (err < 0)
+> > +		goto err;
+> > +
+> > +	return 0;
+> > +
+> > +err:
+> > +	dma_unmap_sg_attrs(dev, sg, num, dir, 0);
+> > +	return -ENOMEM;
+> > +}
+> > +
+> > +static int virtnet_add_outbuf(struct send_queue *sq, unsigned int num, void *data)
+> > +{
+> > +	return virtnet_add_sg(sq->vq, sq->premapped, sq->sg, num, true, data, NULL, GFP_ATOMIC);
+> > +}
+> > +
+> > +static int virtnet_add_inbuf(struct receive_queue *rq, unsigned int num, void *data,
+> > +			     void *ctx, gfp_t gfp)
+> > +{
+> > +	return virtnet_add_sg(rq->vq, rq->premapped, rq->sg, num, false, data, ctx, gfp);
+> > +}
+> > +
+> >  static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
+> >  {
+> >  	unsigned int len;
+> > @@ -553,7 +659,7 @@ static void free_old_xmit_skbs(struct send_queue *sq, bool in_napi)
+> >  	unsigned int bytes = 0;
+> >  	void *ptr;
+> >
+> > -	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+> > +	while ((ptr = virtnet_sq_get_buf(sq, &len, NULL)) != NULL) {
+> >  		if (likely(!is_xdp_frame(ptr))) {
+> >  			struct sk_buff *skb = ptr;
+> >
+> > @@ -667,8 +773,7 @@ static int __virtnet_xdp_xmit_one(struct virtnet_info *vi,
+> >  			    skb_frag_size(frag), skb_frag_off(frag));
+> >  	}
+> >
+> > -	err = virtqueue_add_outbuf(sq->vq, sq->sg, nr_frags + 1,
+> > -				   xdp_to_ptr(xdpf), GFP_ATOMIC);
+> > +	err = virtnet_add_outbuf(sq, nr_frags + 1, xdp_to_ptr(xdpf));
+> >  	if (unlikely(err))
+> >  		return -ENOSPC; /* Caller handle free/refcnt */
+> >
+> > @@ -744,7 +849,7 @@ static int virtnet_xdp_xmit(struct net_device *dev,
+> >  	}
+> >
+> >  	/* Free up any pending old buffers before queueing new ones. */
+> > -	while ((ptr = virtqueue_get_buf(sq->vq, &len)) != NULL) {
+> > +	while ((ptr = virtnet_sq_get_buf(sq, &len, NULL)) != NULL) {
+> >  		if (likely(is_xdp_frame(ptr))) {
+> >  			struct xdp_frame *frame = ptr_to_xdp(ptr);
+> >
+> > @@ -828,7 +933,7 @@ static struct page *xdp_linearize_page(struct receive_queue *rq,
+> >  		void *buf;
+> >  		int off;
+> >
+> > -		buf = virtqueue_get_buf(rq->vq, &buflen);
+> > +		buf = virtnet_rq_get_buf(rq, &buflen, NULL);
+> >  		if (unlikely(!buf))
+> >  			goto err_buf;
+> >
+> > @@ -1119,7 +1224,7 @@ static int virtnet_build_xdp_buff_mrg(struct net_device *dev,
+> >  		return -EINVAL;
+> >
+> >  	while (--*num_buf > 0) {
+> > -		buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx);
+> > +		buf = virtnet_rq_get_buf(rq, &len, &ctx);
+> >  		if (unlikely(!buf)) {
+> >  			pr_debug("%s: rx error: %d buffers out of %d missing\n",
+> >  				 dev->name, *num_buf,
+> > @@ -1344,7 +1449,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+> >  	while (--num_buf) {
+> >  		int num_skb_frags;
+> >
+> > -		buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx);
+> > +		buf = virtnet_rq_get_buf(rq, &len, &ctx);
+> >  		if (unlikely(!buf)) {
+> >  			pr_debug("%s: rx error: %d buffers out of %d missing\n",
+> >  				 dev->name, num_buf,
+> > @@ -1407,7 +1512,7 @@ static struct sk_buff *receive_mergeable(struct net_device *dev,
+> >  err_skb:
+> >  	put_page(page);
+> >  	while (num_buf-- > 1) {
+> > -		buf = virtqueue_get_buf(rq->vq, &len);
+> > +		buf = virtnet_rq_get_buf(rq, &len, NULL);
+> >  		if (unlikely(!buf)) {
+> >  			pr_debug("%s: rx error: %d buffers missing\n",
+> >  				 dev->name, num_buf);
+> > @@ -1534,7 +1639,7 @@ static int add_recvbuf_small(struct virtnet_info *vi, struct receive_queue *rq,
+> >  	alloc_frag->offset += len;
+> >  	sg_init_one(rq->sg, buf + VIRTNET_RX_PAD + xdp_headroom,
+> >  		    vi->hdr_len + GOOD_PACKET_LEN);
+> > -	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
+> > +	err = virtnet_add_inbuf(rq, 1, buf, ctx, gfp);
+> >  	if (err < 0)
+> >  		put_page(virt_to_head_page(buf));
+> >  	return err;
+> > @@ -1581,8 +1686,8 @@ static int add_recvbuf_big(struct virtnet_info *vi, struct receive_queue *rq,
+> >
+> >  	/* chain first in list head */
+> >  	first->private = (unsigned long)list;
+> > -	err = virtqueue_add_inbuf(rq->vq, rq->sg, vi->big_packets_num_skbfrags + 2,
+> > -				  first, gfp);
+> > +	err = virtnet_add_inbuf(rq, vi->big_packets_num_skbfrags + 2,
+> > +				first, NULL, gfp);
+> >  	if (err < 0)
+> >  		give_pages(rq, first);
+> >
+> > @@ -1645,7 +1750,7 @@ static int add_recvbuf_mergeable(struct virtnet_info *vi,
+> >
+> >  	sg_init_one(rq->sg, buf, len);
+> >  	ctx = mergeable_len_to_ctx(len + room, headroom);
+> > -	err = virtqueue_add_inbuf_ctx(rq->vq, rq->sg, 1, buf, ctx, gfp);
+> > +	err = virtnet_add_inbuf(rq, 1, buf, ctx, gfp);
+> >  	if (err < 0)
+> >  		put_page(virt_to_head_page(buf));
+> >
+> > @@ -1768,13 +1873,13 @@ static int virtnet_receive(struct receive_queue *rq, int budget,
+> >  		void *ctx;
+> >
+> >  		while (stats.packets < budget &&
+> > -		       (buf = virtqueue_get_buf_ctx(rq->vq, &len, &ctx))) {
+> > +		       (buf = virtnet_rq_get_buf(rq, &len, &ctx))) {
+> >  			receive_buf(vi, rq, buf, len, ctx, xdp_xmit, &stats);
+> >  			stats.packets++;
+> >  		}
+> >  	} else {
+> >  		while (stats.packets < budget &&
+> > -		       (buf = virtqueue_get_buf(rq->vq, &len)) != NULL) {
+> > +		       (buf = virtnet_rq_get_buf(rq, &len, NULL)) != NULL) {
+> >  			receive_buf(vi, rq, buf, len, NULL, xdp_xmit, &stats);
+> >  			stats.packets++;
+> >  		}
+> > @@ -1984,7 +2089,7 @@ static int xmit_skb(struct send_queue *sq, struct sk_buff *skb)
+> >  			return num_sg;
+> >  		num_sg++;
+> >  	}
+> > -	return virtqueue_add_outbuf(sq->vq, sq->sg, num_sg, skb, GFP_ATOMIC);
+> > +	return virtnet_add_outbuf(sq, num_sg, skb);
+> >  }
+> >
+> >  static netdev_tx_t start_xmit(struct sk_buff *skb, struct net_device *dev)
+> > @@ -3552,15 +3657,17 @@ static void free_unused_bufs(struct virtnet_info *vi)
+> >  	int i;
+> >
+> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
+> > -		struct virtqueue *vq = vi->sq[i].vq;
+> > -		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
+> > -			virtnet_sq_free_unused_buf(vq, buf);
+> > +		struct send_queue *sq = &vi->sq[i];
+> > +
+> > +		while ((buf = virtnet_detach_unused_buf(sq->vq, sq->premapped)) != NULL)
+> > +			virtnet_sq_free_unused_buf(sq->vq, buf);
+> >  	}
+> >
+> >  	for (i = 0; i < vi->max_queue_pairs; i++) {
+> > -		struct virtqueue *vq = vi->rq[i].vq;
+> > -		while ((buf = virtqueue_detach_unused_buf(vq)) != NULL)
+> > -			virtnet_rq_free_unused_buf(vq, buf);
+> > +		struct receive_queue *rq = &vi->rq[i];
+> > +
+> > +		while ((buf = virtnet_detach_unused_buf(rq->vq, rq->premapped)) != NULL)
+> > +			virtnet_rq_free_unused_buf(rq->vq, buf);
+> >  	}
+> >  }
+> >
+> > @@ -3658,6 +3765,18 @@ static int virtnet_find_vqs(struct virtnet_info *vi)
+> >  		vi->rq[i].vq = vqs[rxq2vq(i)];
+> >  		vi->rq[i].min_buf_len = mergeable_min_buf_len(vi, vi->rq[i].vq);
+> >  		vi->sq[i].vq = vqs[txq2vq(i)];
+> > +
+> > +		if (experiment_premapped) {
+> > +			if (!virtqueue_set_premapped(vi->rq[i].vq))
+> > +				vi->rq[i].premapped = true;
+> > +			else
+> > +				netdev_warn(vi->dev, "RXQ (%d) enable premapped failure.\n", i);
+> > +
+> > +			if (!virtqueue_set_premapped(vi->sq[i].vq))
+> > +				vi->sq[i].premapped = true;
+> > +			else
+> > +				netdev_warn(vi->dev, "TXQ (%d) enable premapped failure.\n", i);
+> > +		}
+> >  	}
+> >
+> >  	/* run here: ret == 0. */
+> > --
+> > 2.32.0.3.g01195cf9f
+>
+> _______________________________________________
+> Virtualization mailing list
+> Virtualization@lists.linux-foundation.org
+> https://lists.linuxfoundation.org/mailman/listinfo/virtualization
 
