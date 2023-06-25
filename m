@@ -1,121 +1,188 @@
-Return-Path: <netdev+bounces-13804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3882973D0B8
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:56:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 65A9F73D0B9
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:57:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 692241C208BC
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:56:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22897280CA2
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 11:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FF3E6AA4;
-	Sun, 25 Jun 2023 11:55:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D66932112;
+	Sun, 25 Jun 2023 11:57:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D22F63C5
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:54:59 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A246E6B
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:54:58 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b477e9d396so32640871fa.3
-        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:54:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687694096; x=1690286096;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=PhxQZdVN9319Yfa6KgJPNli0v3mL7q28J47ozJNt/vc=;
-        b=JfGu2MpzseImt04dPOPSIqQFQhA6hDsCQkUa3U2iVtnGebvh9RxBo49WEMqX7CwrRQ
-         hkcItaixndpfWhGxmaKWZoTiXY8TE0BiBiNKyHY0rRn1MARox8gyGQ/ejhoFLcqHXP3w
-         mYP5EfDbFYFBHibeQVFecz9qsJTCU50JMQRewHbx2WEdSrIzfW4z7Kni8rxAK5yri4Og
-         IbmQKMk48Dft7PL4s5QfXD5dSdEQcblbxJgkalHG0RPzn/cGUPH9MvIZJQGCxz2HHVsA
-         yuS2t+9jynw/82R0KXhHNaio/pRSYc67nsFv2LLwPpCD2wAHHTuls0Myo9QCrkfMxBpj
-         429w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687694096; x=1690286096;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=PhxQZdVN9319Yfa6KgJPNli0v3mL7q28J47ozJNt/vc=;
-        b=A8DRivQe46ii1GN+sDdlyeqjm+zcHR9dZXMgYRVvmgZ9JWTZQPkfnQ/6XlieNG6IFq
-         w3uVFHGqzFzbi16MtfVYi7QCQpu/k5u7YShlERmQGE/02IHRETVcCSr3N4H+c8xlvQEh
-         2ifdvX8R5ofgVjDL6/7PT2x9e5+VBuJ83IO27nPC1mbDWq9H6qo1t0J+Mt0pXxYTecx/
-         960h3K44pSSVuzbS9+x9y8W4wGDv+GCpDManQC2L0i0yqatmmFyuxLdYDmjDivXv06/b
-         O5wvD1fllxbV6XSJvViQf4xYHTSkkO21/ZGncktHLWqTaCrvCWmwsyfAFmgdGzgPwVSs
-         b5cA==
-X-Gm-Message-State: AC+VfDxb3uK8Qt8LXfS9SHuXjR0h4gEuGINPECuDAKuH/i3AT1M7x6gW
-	u7vurvuhXd4VRHtwhQc52eeNbd5Qlxxk8g==
-X-Google-Smtp-Source: ACHHUZ67LmG6WrJ2uOcSjryY3iMqJ0A7voQX51CB0C8JxVVI/WBo9zbztAm6gX3ckmKXsuc+/HuMog==
-X-Received: by 2002:a2e:3e08:0:b0:2b6:9ed0:46f4 with SMTP id l8-20020a2e3e08000000b002b69ed046f4mr495373lja.23.1687694096004;
-        Sun, 25 Jun 2023 04:54:56 -0700 (PDT)
-Received: from WBEC325.dom.local ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id w21-20020a2e9595000000b002b6993b9665sm416043ljh.65.2023.06.25.04.54.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jun 2023 04:54:55 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>
-Subject: [PATCH net-next v2 0/7] net: dsa: vsc73xx: Make vsc73xx usable
-Date: Sun, 25 Jun 2023 13:53:43 +0200
-Message-Id: <20230625115343.1603330-8-paweldembicki@gmail.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230625115343.1603330-1-paweldembicki@gmail.com>
-References: <20230625115343.1603330-1-paweldembicki@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4AA81103
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:57:13 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2064.outbound.protection.outlook.com [40.107.237.64])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C95DDD
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 04:56:45 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gFlP9NSduD2MVoZhVxKQbSAwWT/hh8XDqvvOBbEwYm9dzV/VfjyKKKysKR7Rygg2r3zt08Q8tTI4E+klbYbrKoXzukmSd9JK7kW4rXorR+vVczejFOKbU30S2CPoyfoqKYYztX//QHiub67Tj+R+huU9o0Qm5UITi7i8LFQNaZn3V8drlcfsRtwF8ronxKkDFz94eqnwAkVIOIoZJraBAjAFiyG/bZPFXprVfoLMPsWQpStWZZyVxaFlP+tjb8XntRPFwa4OtRB3uUSIvYh02Atqx8fzlyXOU/Lj438YwRJTBRzN7G9kJ1va6n+k7e6j+h8ne7EZx4cR359mxCuFMg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zg+YzOifBTY/KU2PJ9uTW6GhJyDCmtmp4xQlsa6SKJc=;
+ b=n6AnHIt9Ly30INtHYNVw6z1ogzt9/soq918+xkhMqueJQ3h67/9/FIzBEKWBgZOVj/JA2tUc9E/6/m99KylLIXaM6agYguXCuIbdgm2j0IUz2sljA01ZlYMP54b9Wwh9TznkILfnuqGde75enXOd8kh3AVVQabg4tlPiuZEvXDhNB2NmLTlNaIQ3mfmNokH3ecVEVCuETaCV082h4WzLJbRD9bsB2b3yWsghnNiIz8TUPJzjsXwBFpT465hRdAAaIFijSqUDkphqBW4g521sptXEiAypBEalRt+0U0aFQjUeXCNAX3qSRlvCdma0ybcJNpJh+iaKRFFrMen2T4YthA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zg+YzOifBTY/KU2PJ9uTW6GhJyDCmtmp4xQlsa6SKJc=;
+ b=aGvbrCpxixSX50wNaaAKYeq4GDOTzO5uq86x0BCVnEgjoMxXpE1ApZmsLtadxkFP7MmPGEWRTpDc2iXnoUp2B52eRoLvBgYt2aZxxgRpk+GHKCTtazSvGTB52HIPdLQGNm6UHbLk3r4Iuzo7VLfnSJHsDWGULO12BxSqz1JaUwj3VPQu4V+IRaRjlJyM/jlHmeKPNwMMLQu5Ym/VQFp0J5S4mJ5yxwULS7rC19CgFfUR6v4blJ87p8hkf5TqIIw04DSIDA1sSmU1lFmY5YCTRCDjoUcBNC3KDqFXF7jKN2pdKmv7Rhdn3bG7zmzHvNo/lze4u75oK58mFaXzUSU3Bw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
+ by SJ2PR12MB9006.namprd12.prod.outlook.com (2603:10b6:a03:540::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Sun, 25 Jun
+ 2023 11:55:42 +0000
+Received: from CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::66d8:40d2:14ed:7697]) by CY5PR12MB6179.namprd12.prod.outlook.com
+ ([fe80::66d8:40d2:14ed:7697%5]) with mapi id 15.20.6500.036; Sun, 25 Jun 2023
+ 11:55:42 +0000
+Date: Sun, 25 Jun 2023 14:55:36 +0300
+From: Ido Schimmel <idosch@nvidia.com>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, kuba@kernel.org,
+	pabeni@redhat.com, edumazet@google.com, petrm@nvidia.com
+Subject: Re: [RFC PATCH net-next 1/2] devlink: Hold a reference on parent
+ device
+Message-ID: <ZJgrOAmhIycWSKtU@shredder>
+References: <20230619125015.1541143-1-idosch@nvidia.com>
+ <20230619125015.1541143-2-idosch@nvidia.com>
+ <ZJLjlGo+jww6QIAg@nanopsycho>
+ <ZJMYsyw06+jWVR5i@shredder>
+ <ZJPqS0Di6Cg9JT3D@nanopsycho>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJPqS0Di6Cg9JT3D@nanopsycho>
+X-ClientProxiedBy: LO4P265CA0052.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:2ac::15) To CY5PR12MB6179.namprd12.prod.outlook.com
+ (2603:10b6:930:24::22)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|SJ2PR12MB9006:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2708f65a-a548-4f6d-2406-08db75731a3a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	8H4umkVPymWYtw7Al0bGGJivahPKZS/SGlc3Fyuv5asYmEfiDv7CHe51PWZJk0GDoEDiYSxAmFy59iVw/f/KhNixB9oeVhI+LKgmQDwInC87iWn0nUgfahmoTSuyBAs6LIpEgIKy05yy+rdE+ND2AArMzDnFtiPTyBYHrUzBfcFVNMiRJxPgxxz6oJuztpjtdLBjm+XIJCltaYXQdrT0GTPSerk3CD8ENw/B6D7lkrJghTDzkJ0rLfPTNkGk/hh1p8KYbaV+xMnrZzHrW0iuZ2Ud9yPTZUaKSbYy7BWJ99zohkLKlczhD8Wg8Y+qKRzUFeN5WAOUD6NnWI2u1qu7Q9XMwARUStPpzXVZ6lpUGaQPO2ZqyE3P35C31QOrjnaTQk/av3KGLAGFjP3aj9Eb0+JrO+icchqEjgZEtNqI4yPch+yZlgmoWsCd61V6CRkHoiVdy9va4cnpC56i7JzOoiIoIxu5qXw1uJbVTcZVUVAbEmk2GgPNAR1z7sXtxavvS7IBcbg5+3IRgXzIUh63vaGtHIT547I1IWd6NaB2H7h7NKQigTAO7sfT9R7UHb//
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(396003)(346002)(376002)(366004)(136003)(39860400002)(451199021)(38100700002)(83380400001)(86362001)(478600001)(6486002)(33716001)(6666004)(41300700001)(66946007)(66556008)(66476007)(316002)(8676002)(8936002)(26005)(6916009)(4326008)(6506007)(6512007)(107886003)(186003)(9686003)(2906002)(5660300002);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?oYn0YN3eQ8SVSXNJA6XMfQ0t2x0gL7WYX/v7pveAsj3hWJopIkYKjS1D23B0?=
+ =?us-ascii?Q?Nh6qwdWj78852i/yUQEgmA2a5SFQ3ptalAc1Iu9k3EXkyKceNmiVqcb3mUTt?=
+ =?us-ascii?Q?rOCd5zoBwOUd8J07NDn07cA4y6Soq4+SXMbBvF4jr6S6CwEA5KUBnsRzJXE2?=
+ =?us-ascii?Q?JZ9Q2AXyPcUEU/nbBhc68kbue3LXJuaapSQsxO3Y3ypxvhqGBNn8yO2pmY1v?=
+ =?us-ascii?Q?Vb7TIcjdw2Uf03UaY+DjO0q7GvmbvriL3fouI1Bjv8Tw/IX8DOC2WYFcxWwh?=
+ =?us-ascii?Q?gNGko6GupcALK/uzyrPDVsYbm690+l4S6aOnYbT5ZfCp6M7OsIZ5bpgf4aBK?=
+ =?us-ascii?Q?Oht9T2HvVHYSPv+k5Ysb5A2Psk9sBENpvvAyWP1nnPmB3+EVBbuGF2fKDh/9?=
+ =?us-ascii?Q?cBXeqqjqUfK3WTJ1qj4+6jmexRuRyZOXX8Qx8sV8l+dRcZrr7HSLd95+NExH?=
+ =?us-ascii?Q?soyPwSX9Zt94mX9yKywlGpiTUyoRg/3CzvegCFfKPat3AXkPdIXRg0AQNJRX?=
+ =?us-ascii?Q?7aBVfLcff//oC+KgLoXWi25R36qJKjytreKk5b8AB8c6mhkjOssvy7Q7FJcm?=
+ =?us-ascii?Q?/QOt8KuaVlohDPNLwIdqWS/DB6HJztP7Wv8X7q1aMRv3h84cIkzGlgbVxroA?=
+ =?us-ascii?Q?/LVBuFYvZPuZLNT8vFYVdSe3ndK8/UqEyX5QAiP2frFvV3UzL7vaENSTpTxV?=
+ =?us-ascii?Q?bN5OOFEn7dPScvy5soF4owA08g+3yoBkDaNhAHj8i/y3UL6BKK7m2D2NC0D5?=
+ =?us-ascii?Q?zdvkib/C/JcTvL1rKQcquxWC4sVaho1qsr/RZIiFQEdTymL96XCNXipMbMPR?=
+ =?us-ascii?Q?ZTez67cUFxIkesAF8WLl91/Xo8MR3TzfVaSSCfEyYFHWwiNg/XBaahgeEyN4?=
+ =?us-ascii?Q?gR5HBzfbrzqbSl0O6/sYhJ70/8a135yYAz2cjo9yhK0rHF16D51S+6glzNmA?=
+ =?us-ascii?Q?5ISqk2pBgUMeL0G1oa9Igb/V32W10zMltKkwHckzEJbAtE7bXbGOhjU3E9ve?=
+ =?us-ascii?Q?wLf2sLT1zWOrOWd4KW8pcKpWiBMdjyEBIiVuqd31VPCwwr9P7Vk/hPXwmboG?=
+ =?us-ascii?Q?K50KBnUnEVriajNp5TA8u+iVUTII5v51nmaKE6xEDlTDFO9dQK9S3o1c63qm?=
+ =?us-ascii?Q?f6k16bMhsgYIui+CNfchs5YHouL1g4PKqXNPo/J0N5779oDCZPpEjaeBb+9z?=
+ =?us-ascii?Q?ZxuUh0JyqvqOz2qayBdZc3AsXNAeWBfjXvGo+YFehRu4Ez9rsJ6lADtrCGn/?=
+ =?us-ascii?Q?KE6yGzR3nbUvebWnioVmnlilr3lLjFexu0WKxL6SJ2lnUScBRrAh431OSM/0?=
+ =?us-ascii?Q?S/SCljwe7udbhiY4YgAI1rBk9gxBDu80GD0qUKdhhyB75RJ6mRPQ7qnFaqEG?=
+ =?us-ascii?Q?ZIdfJOLnfpMNuV4gATH0L0ZS3P6c6Th4YNnhBqjpLeqULqHspWqnVevrgfvs?=
+ =?us-ascii?Q?fvni5rocnQY5v9gMYYdKLJ9vzH6zbjjeImI5SHsM4fe0i92zUoY4Gu3Yvlfy?=
+ =?us-ascii?Q?d+xh6peRxOu68orNVicN16VijOJN29RN8FhQCELHkpXCmLT0i6qAyf72epG/?=
+ =?us-ascii?Q?bsj1d6cxwAIlNTGPRIrS8sp0atjDFWIGU7Yw8ujT?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2708f65a-a548-4f6d-2406-08db75731a3a
+X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 11:55:42.6261
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: d0tczQm6aDhKCGfSUgwPC/60osRgR2ksxRKbm7XumGfyHX2IMbu1XcmheJ5MvnYmCUcRZIiHB7ihSjUiVC6G8g==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR12MB9006
+X-Spam-Status: No, score=-0.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch series is focused on getting vsc73xx usable.
+On Thu, Jun 22, 2023 at 08:29:31AM +0200, Jiri Pirko wrote:
+> Wed, Jun 21, 2023 at 05:35:15PM CEST, idosch@nvidia.com wrote:
+> >On Wed, Jun 21, 2023 at 01:48:36PM +0200, Jiri Pirko wrote:
+> >> Mon, Jun 19, 2023 at 02:50:14PM CEST, idosch@nvidia.com wrote:
+> >> >@@ -91,6 +92,7 @@ static void devlink_release(struct work_struct *work)
+> >> > 
+> >> > 	mutex_destroy(&devlink->lock);
+> >> > 	lockdep_unregister_key(&devlink->lock_key);
+> >> >+	put_device(devlink->dev);
+> >> 
+> >> In this case I think you have to make sure this is called before
+> >> devlink_free() ends. After the caller of devlink_free() returns (most
+> >> probably .remove callback), nothing stops module from being removed.
+> >> 
+> >> I don't see other way. Utilize complete() here and wait_for_completion()
+> >> at the end of devlink_free().
+> >
+> >I might be missing something, but how can I do something like
+> >wait_for_completion(&devlink->comp) at the end of devlink_free()? After
+> >I call devlink_put() the devlink instance can be freed and the
+> >wait_for_completion() call will result in a UAF.
+> 
+> You have to move the free() to devlink_free()
+> Basically, all the things done in devlink_put that are symmetrical to
+> the initialization done in devlink_alloc() should be moved there.
 
-First patch was added in v2, it's switch from poll loop to
-read_poll_timeout.
+But it's a bit weird to dereference 'devlink' (to wait for the
+completion) after calling 'devlink_put(devlink)'. Given that this
+problem seems to be specific to netdevsim, don't you think it's better
+to fix it in netdevsim rather than working around it in devlink?
 
-Second patch is simple convert to phylink, because adjust_link won't work
-anymore.
-
-Patches 3-6 are basic implementation of tag8021q funcionality with QinQ
-support without vlan filtering in bridge and simple vlan aware in vlan
-filtering mode.
-
-STP frames isn't forwarded at this moment. BPDU frames are forwarded 
-only from to PI/SI interface. For more info see chapter 
-2.7.1 (CPU Forwarding) in datasheet.
-
-Last patch fix wrong MTU configuration.
-Pawel Dembicki (7):
-  net: dsa: vsc73xx: use read_poll_timeout instead delay loop
-  net: dsa: vsc73xx: convert to PHYLINK
-  net: dsa: vsc73xx: add port_stp_state_set function
-  net: dsa: vsc73xx: Add dsa tagging based on 8021q
-  net: dsa: vsc73xx: Add bridge support
-  net: dsa: vsc73xx: Add vlan filtering
-  net: dsa: vsc73xx: fix MTU configuration
-
- drivers/net/dsa/Kconfig                |   2 +-
- drivers/net/dsa/vitesse-vsc73xx-core.c | 937 ++++++++++++++++++++-----
- drivers/net/dsa/vitesse-vsc73xx.h      |   2 +
- include/net/dsa.h                      |   2 +
- net/dsa/Kconfig                        |   6 +
- net/dsa/Makefile                       |   1 +
- net/dsa/tag_vsc73xx_8021q.c            |  87 +++
- 7 files changed, 856 insertions(+), 181 deletions(-)
- create mode 100644 net/dsa/tag_vsc73xx_8021q.c
-
--- 
-2.34.1
-
+> 
+> 
+> >
+> >> 
+> >> If the completion in devlink_put() area rings a bell for you, let me save
+> >> you the trouble looking it up:
+> >> 9053637e0da7 ("devlink: remove the registration guarantee of references")
+> >> This commit removed that. But it is a different usage.
+> >> 
+> >> 
+> >> 
+> >> > 	kfree(devlink);
+> >> > }
+> >> > 
+> >> >@@ -204,6 +206,7 @@ struct devlink *devlink_alloc_ns(const struct devlink_ops *ops,
+> >> > 	if (ret < 0)
+> >> > 		goto err_xa_alloc;
+> >> > 
+> >> >+	get_device(dev);
+> >> > 	devlink->dev = dev;
+> >> > 	devlink->ops = ops;
+> >> > 	xa_init_flags(&devlink->ports, XA_FLAGS_ALLOC);
+> >> >-- 
+> >> >2.40.1
+> >> >
 
