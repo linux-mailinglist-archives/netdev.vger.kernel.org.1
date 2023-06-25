@@ -1,71 +1,71 @@
-Return-Path: <netdev+bounces-13838-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13839-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8BCB73D316
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 20:54:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 22B9173D31C
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 21:03:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7057C1C208F7
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:54:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 55184280EEC
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 19:03:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3124C79C5;
-	Sun, 25 Jun 2023 18:54:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 75B4C79DD;
+	Sun, 25 Jun 2023 19:03:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2570B2569
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 18:54:55 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F791B3
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:54:54 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6686a05bc66so1349684b3a.1
-        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:54:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68D847464
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 19:03:45 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156931B3
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:03:44 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b7e1875cc1so2656855ad.1
+        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:03:44 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687719294; x=1690311294;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687719823; x=1690311823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=9RSQhU4HacqAbmsPOCSLV3XsK49Ukze+VlYhgr1qiPM=;
-        b=r4pE3yczVDFsatIyt8hAKnaYfBxsM7TQpHt7ztgsDSugIp17c2tqnr6S/YS7fmrfvi
-         K+Zj2Jly8MQ7+oEKQCEmsllxywTN0ZJX7VUeM2L/tf56iOnYonP/M/a3UTPYtQq2dK/K
-         eGdMe12Wu1Qqs8yaiWBZrS55zdUiGxaFDYlvS515HHo0tW60CaEOEEA4XVwEXVRsffaK
-         r3fN9600KzhUWT8gteZ3G087mqBebAjF82z1fZf5TWaGyzT37FuawkBe6DlR3LxJZeST
-         M89OkzL42Vo0QWc4O0RoRIOw5rLkJuGq+vNHg7I1LaopVAGPI8SV8SnFP+EcMqnF3BOz
-         mV2g==
+        bh=Nrm+sL/vmovf1S8qK7FEwepjJ6TXVSWNhnCVMcCBtB8=;
+        b=KY72FEf317jM3ub38/uJkb5dqvEr/njRlqs1SDfY5wBfN9IVbiE00sGCGZROhmfnPD
+         ow+CTwBPo8hY5K22+HBN4HVR6H8i8qygld5reWytxoJoZ6uRWQV+344DnorPVHwHHDOJ
+         qD2zfPVjZ0KkNO8/2NPlWAPbgBiqzgCGpZzTEtypwFtHSw2yk18t0S5/F+HXjrjoQ3FX
+         ckJXL0s3sawiAIOf5f9cXKjj/jEHw2Nzl3Px0gSga4FOWH9PPn57tRKq3Vr442wwUh7B
+         NOGujVVIxg4zDCSBCgoIdrHqqrJdE47voIblJW508hurVmvK7TDvLK1pPAPJzVcZXXL+
+         NMGQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687719294; x=1690311294;
+        d=1e100.net; s=20221208; t=1687719823; x=1690311823;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=9RSQhU4HacqAbmsPOCSLV3XsK49Ukze+VlYhgr1qiPM=;
-        b=g1sLFrsapa5HbZvv2QoUXf5uWS2ja/X0/dNVvHVip6KKlDIPikM3zlKMHu55ZwPp3z
-         hG9MtIFGLC73TRZS8qRZgxC5kIVzLybur8DIDIJ4+kFFKRBphyrQfmpgnbkF4Fyf4Qk7
-         kmjw4aUFhM+bh+yDA81q4O3M9G62D4Qa07VT1XCzts8GiNELAS1E/mdyW8rExxkOWuVh
-         YtoVNO0hpdkTOAiCMx3onRlYG6x7sxEzWJ8GibwtRiJWUMJS1An/Fz+0YRl631mGJSLd
-         Cll3TSJOgrQO2INo1mirOTl2YyPgFgorJR77yhE1/BiyC/rUEe3GpwLknCe4vx3/AdvB
-         FAMg==
-X-Gm-Message-State: AC+VfDz18l0l3WaPrzBEPtaLSaXVrBhxwaetwu4whkELi3kspqB5CECX
-	zJec9913fuZ4h06uUxppuUc5FJLAiXPjQ82KXPKFyw==
-X-Google-Smtp-Source: ACHHUZ7zOyrPvq1w7g5T0t7ag4Wxn/wso4TPHa6OnqSqxNjN0w2dmamUZh/KmAdogk59eZgJMEQ8Jw==
-X-Received: by 2002:a17:903:32c9:b0:1b3:f91d:15b3 with SMTP id i9-20020a17090332c900b001b3f91d15b3mr3927622plr.22.1687719293999;
-        Sun, 25 Jun 2023 11:54:53 -0700 (PDT)
+        bh=Nrm+sL/vmovf1S8qK7FEwepjJ6TXVSWNhnCVMcCBtB8=;
+        b=D5Bga8NZZach2LQtcZXs8Q5l7ZaBBaWCZ8ld+7O2KVolxacWwnmQCNxXutGEfRGg8z
+         tbb/e4ut/qsnrNuYzZm2qm8PZ4pAHzuHNPcBtiOVfW/3vaq3E2MkbTnIamG//xQt692g
+         yZpZke5L3dMh9qoDJe8YaDvV5RzXlemxfMXSJTH60JAX50unNLkE+/Ba9AttwMCgKRWW
+         MAeDNicAbD3SgsHIDSOiikLSSpM8KwgxIM3a+kYPBBRmcBS9+3wlybfMXRBZFRelSTDg
+         gruT+sK0ee9MxOI1zYqmX/SY+njXFACPsNsekuJeBBIgN3rglIQT5LNpGIR91VCWu3kI
+         fGNw==
+X-Gm-Message-State: AC+VfDzgfXYmkecVQUK8+DKthS4LBZI9kz6dQ9gNcDTRAWk5iAHCudF3
+	l/cCNha6zAdfrBzlh6YuiHAFbA==
+X-Google-Smtp-Source: ACHHUZ7iqKG9j1UtgQKRLrkCJTl/uB0y3kH084FHO85jOBPjWcAVfXqPBoZ5Xp3qiIzRI5SmoSaN9Q==
+X-Received: by 2002:a17:902:ef8f:b0:1b7:db37:fada with SMTP id iz15-20020a170902ef8f00b001b7db37fadamr1944061plb.58.1687719823492;
+        Sun, 25 Jun 2023 12:03:43 -0700 (PDT)
 Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
-        by smtp.gmail.com with ESMTPSA id jg3-20020a17090326c300b001a2104d706fsm1865800plb.225.2023.06.25.11.54.53
+        by smtp.gmail.com with ESMTPSA id d21-20020a170902aa9500b001a4fe00a8d4sm2742149plr.90.2023.06.25.12.03.42
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 25 Jun 2023 11:54:53 -0700 (PDT)
-Date: Sun, 25 Jun 2023 11:54:51 -0700
+        Sun, 25 Jun 2023 12:03:43 -0700 (PDT)
+Date: Sun, 25 Jun 2023 12:03:41 -0700
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: Zahari Doychev <zahari.doychev@linux.com>
 Cc: netdev@vger.kernel.org, dsahern@gmail.com, hmehrtens@maxlinear.com,
  aleksander.lobakin@intel.com, simon.horman@corigine.com, idosch@idosch.org,
  Zahari Doychev <zdoychev@maxlinear.com>
-Subject: Re: [PATCH iproute2-next] f_flower: add cfm support
-Message-ID: <20230625115451.2d044f35@hermes.local>
-In-Reply-To: <20230619213523.520800-1-zahari.doychev@linux.com>
-References: <20230619213523.520800-1-zahari.doychev@linux.com>
+Subject: Re: [PATCH iproute2-next v2] f_flower: add cfm support
+Message-ID: <20230625120341.5e738745@hermes.local>
+In-Reply-To: <20230620201036.539994-1-zahari.doychev@linux.com>
+References: <20230620201036.539994-1-zahari.doychev@linux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -80,13 +80,35 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 19 Jun 2023 23:35:23 +0200
+On Tue, 20 Jun 2023 22:10:36 +0200
 Zahari Doychev <zahari.doychev@linux.com> wrote:
 
-> +		if (matches(*argv, "mdl") == 0) {
-> +			__u8 val;
+> +	print_nl();
+> +	print_string(PRINT_FP, NULL, "  cfm", NULL);
+> +	open_json_object("cfm");
 > +
+> +	v = tb[TCA_FLOWER_KEY_CFM_MD_LEVEL];
+> +	if (v) {
+> +		sz += sprintf(out, " mdl %u", rta_getattr_u8(v));
+> +		print_hhu(PRINT_JSON, "mdl", NULL, rta_getattr_u8(v));
+> +
+> +	}
+> +
+> +	v = tb[TCA_FLOWER_KEY_CFM_OPCODE];
+> +	if (v) {
+> +		sprintf(out + sz, " op %u", rta_getattr_u8(v));
+> +		print_hhu(PRINT_JSON, "op", NULL, rta_getattr_u8(v));
+> +
+> +	}
+> +
+> +	close_json_object();
+> +	print_string(PRINT_FP, "cfm", "%s", out);
 
-No new uses of matches() in iproute2.
-It creates lots of long term debt an confusion.
+Don't think you need to format the temporary string if you do this the easy way.
+Just use print_uint?
+	if (tb[TCA_FLOWER_KEY_CFM_MD_LEVEL])
+		print_uint(PRINT_ANY, "mdl", " mdl %u",
+			rta_getattr_u8(tb[TCA_FLOWER_KEY_CFM_MD_LEVEL]);
+
+Since argument to print_uint is unsigned, the u8 will naturally get expanded.
 
