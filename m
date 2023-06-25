@@ -1,47 +1,77 @@
-Return-Path: <netdev+bounces-13831-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13832-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB02573D2A6
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 19:07:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B4A573D2C2
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 19:44:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A41A81C2091E
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 17:07:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 034A11C20938
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 17:44:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60EB06FC6;
-	Sun, 25 Jun 2023 17:07:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8935E7480;
+	Sun, 25 Jun 2023 17:44:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50BEF6FAB
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 17:07:16 +0000 (UTC)
-Received: from mail-0301.mail-europe.com (mail-0301.mail-europe.com [188.165.51.139])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1AD04100
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 10:07:11 -0700 (PDT)
-Date: Sun, 25 Jun 2023 17:06:59 +0000
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=proton.me;
-	s=protonmail; t=1687712827; x=1687972027;
-	bh=QExAZN0viDBP6uZhV+EBlZi29OCdmxjxCPTr3yF6zNY=;
-	h=Date:To:From:Cc:Subject:Message-ID:In-Reply-To:References:
-	 Feedback-ID:From:To:Cc:Date:Subject:Reply-To:Feedback-ID:
-	 Message-ID:BIMI-Selector;
-	b=dp/renVTAb5fLw0sRwnrbDWzoNPhOBIBNC00aJtvLkUt25C3YSOg2RHh4VjK5hV/O
-	 em0IVoalOH7hUYSuzvGHbV8D0OuZYbOjey78cebH+JQfg+2hNNXZNqVxe5F8E3SFGf
-	 fGCyLefQmxOcqWbjM1bgjN5x1DsFzvbjL8PTVNag0bIL2eUKD3k7DX1kNR0grqlPKi
-	 aA7nYDH8VZEADG712yCkdPW1Vhn9FP+XbdZ3uzpwmoEgXcunnG0+QoUYPHakuz4JTK
-	 kyaZHjPSV0CH4XzenanXnmmlOUTCtYhmWC4bhSDW+4yc0/N5hvZ5xr/zwM5A/WptfZ
-	 BtKBl9uSeBICA==
-To: FUJITA Tomonori <fujita.tomonori@gmail.com>
-From: Benno Lossin <benno.lossin@proton.me>
-Cc: netdev@vger.kernel.org, rust-for-linux@vger.kernel.org, aliceryhl@google.com, andrew@lunn.ch, miguel.ojeda.sandonis@gmail.com
-Subject: Re: [PATCH 1/5] rust: core abstractions for network device drivers
-Message-ID: <69144cf1-6c07-868c-9577-e41db4c0cc75@proton.me>
-In-Reply-To: <20230625.232736.235121744769257487.ubuntu@gmail.com>
-References: <_kID50ojyLurmrpIpn_kNxCRqo5MAaqm9pE47mhFcLops8yDhSqmbkhJiUuHlAFSdgqX1dHdZGxUa95ZSHAPHesIKLci1J21cu6nmdQ3ZGg=@proton.me> <20230621.221349.1237576739913195911.ubuntu@gmail.com> <3ff6edec-c083-9294-d2df-01be983cd293@proton.me> <20230625.232736.235121744769257487.ubuntu@gmail.com>
-Feedback-ID: 71780778:user:proton
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E48EA4;
+	Sun, 25 Jun 2023 17:44:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8AC02C433C8;
+	Sun, 25 Jun 2023 17:44:12 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687715063;
+	bh=WoUrmf0JEvFfQkljC61rPZoFHAXMId+ovOZ+fz1xXRM=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=YP5riMELjwGif5MetoqunCE/NEQNM05SODCHCM3NP274NT5kLDkCw+lYlFK9UhEOT
+	 qDLdn9rWmrAiPScC30o8bBxNq06ndu4LyRdafclIFEHnyh1dl1m6lm8HKVRj0PW8Gd
+	 bS1NGRYWfoyju/EEsTN0Hfg++5BGw6JBu3tNKZMoh+4lxQ/InBdA1cnWhewfz/DpH3
+	 NQvBcro2ROnD4F+sChNda583y6v06vsiiNksZdiHaJOziCCpsjvIYI5dguVCw3W8jl
+	 /7gz0Aq4l2D8Ub/ROd+l5Cg2ih7cqqiikyhGIYUqney6omj2WYc5s+RTv4euyPzP/E
+	 NLShZkWcrywjw==
+Date: Sun, 25 Jun 2023 20:42:57 +0300
+From: Mike Rapoport <rppt@kernel.org>
+To: Andy Lutomirski <luto@kernel.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Andrew Morton <akpm@linux-foundation.org>,
+	Catalin Marinas <catalin.marinas@arm.com>,
+	Christophe Leroy <christophe.leroy@csgroup.eu>,
+	"David S. Miller" <davem@davemloft.net>,
+	Dinh Nguyen <dinguyen@kernel.org>,
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
+	Huacai Chen <chenhuacai@kernel.org>,
+	Kent Overstreet <kent.overstreet@linux.dev>,
+	Luis Chamberlain <mcgrof@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Nadav Amit <nadav.amit@gmail.com>,
+	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
+	Palmer Dabbelt <palmer@dabbelt.com>,
+	Puranjay Mohan <puranjay12@gmail.com>,
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
+	"Russell King (Oracle)" <linux@armlinux.org.uk>,
+	Song Liu <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
+	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
+	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
+	linux-mips@vger.kernel.org, linux-mm@kvack.org,
+	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
+	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
+	loongarch@lists.linux.dev, netdev@vger.kernel.org,
+	sparclinux@vger.kernel.org,
+	the arch/x86 maintainers <x86@kernel.org>
+Subject: Re: [PATCH v2 02/12] mm: introduce execmem_text_alloc() and
+ jit_text_alloc()
+Message-ID: <20230625174257.GL52412@kernel.org>
+References: <20230616085038.4121892-1-rppt@kernel.org>
+ <20230616085038.4121892-3-rppt@kernel.org>
+ <f9a7eebe-d36e-4587-b99d-35d4edefdd14@app.fastmail.com>
+ <20230618080027.GA52412@kernel.org>
+ <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com>
+ <20230625161417.GK52412@kernel.org>
+ <90161ac9-3ca0-4c72-b1c4-ab1293e55445@app.fastmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,177 +79,162 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,DKIM_INVALID,
-	DKIM_SIGNED,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <90161ac9-3ca0-4c72-b1c4-ab1293e55445@app.fastmail.com>
 
-On 25.06.23 16:27, FUJITA Tomonori wrote:
-> Hi,
->
-> On Sun, 25 Jun 2023 09:52:53 +0000
-> Benno Lossin <benno.lossin@proton.me> wrote:
->
->>>>> +/// Trait for device driver specific information.
->>>>> +///
->>>>> +/// This data structure is passed to a driver with the operations fo=
-r `struct net_device`
->>>>> +/// like `struct net_device_ops`, `struct ethtool_ops`, `struct rtnl=
-_link_ops`, etc.
->>>>> +pub trait DriverData {
->>>>> +    /// The object are stored in C object, `struct net_device`.
->>>>> +    type Data: ForeignOwnable + Send + Sync;
->>>>
->>>> Why is this an associated type? Could you not use
->>>> `D: ForeignOwnable + Send + Sync` everywhere instead?
->>>> I think this should be possible, since `DriverData` does not define
->>>> anything else.
->>>
->>> With that approach, is it possible to allow a device driver to define
->>> own data structure and functions taking the structure as aurgument
->>> (like DevOps structutre in the 5th patch)
->>>
->>
->> In the example both structs are empty so I am not really sure why it has
->> to be two types. Can't we do this:
->> ```
->> pub struct MyDriver {
->>       // Just some random fields...
->>       pub access_count: Cell<usize>,
->> }
->>
->>
->> impl DriverData for Box<MyDriver> {}
->>
->> // And then we could make `DeviceOperations: DriverData`.
->> // Users would then do this:
->>
->> #[vtable]
->> impl DeviceOperations for Box<MyDriver> {
->>       fn init(_dev: Device, data: &MyDriver) -> Result {
->>           data.access_count.set(0);
->>           Ok(())
->>       }
->>
->>       fn open(_dev: Device, data: &MyDriver) -> Result {
->>           data.access_count.set(data.access_count.get() + 1);
->>           Ok(())
->>       }
->> }
->> ```
->>
->> I think this would simplify things, because you do not have to carry the
->> extra associated type around (and have to spell out
->> `<D::Data as ForeignOwnable>` everywhere).
->
-> I'm still not sure if I correctly understand what you try to do.
->
-> If I define DeviceOperations in dev.rs like the following:
->
-> #[vtable]
-> pub trait DeviceOperations<D: ForeignOwnable + Send + Sync> {
->      /// Corresponds to `ndo_init` in `struct net_device_ops`.
->          fn init(_dev: &mut Device, _data: D::Borrowed<'_>) -> Result {
-> =09        Ok(())
->          }
-> }
->
-> And the driver implmeents DeviceOperations like the folloing:
->
-> #[vtable]
-> impl<D: ForeignOwnable + Send + Sync> DeviceOperations<D> for Box<DriverD=
-ata> {
->      fn init(_dev: &mut Device, _data: &DriverData) -> Result {
->              Ok(())
->      }
-> }
->
-> I got the following error:
->
-> error[E0053]: method `init` has an incompatible type for trait
->    --> samples/rust/rust_net_dummy.rs:24:39
->     |
-> 24 |     fn init(_dev: &mut Device, _data: &DriverData) -> Result {
->     |                                       ^^^^^^^^^^^
->     |                                       |
->     |                                       expected associated type, fou=
-nd `&DriverData`
->     |                                       help: change the parameter ty=
-pe to match the trait: `<D as ForeignOwnable>::Borrowed<'_>`
->     |
->     =3D note: expected signature `fn(&mut Device, <D as ForeignOwnable>::=
-Borrowed<'_>) -> core::result::Result<_, _>`
->                found signature `fn(&mut Device, &DriverData) -> core::res=
-ult::Result<_, _>`
->
+On Sun, Jun 25, 2023 at 09:59:34AM -0700, Andy Lutomirski wrote:
+> 
+> 
+> On Sun, Jun 25, 2023, at 9:14 AM, Mike Rapoport wrote:
+> > On Mon, Jun 19, 2023 at 10:09:02AM -0700, Andy Lutomirski wrote:
+> >> 
+> >> On Sun, Jun 18, 2023, at 1:00 AM, Mike Rapoport wrote:
+> >> > On Sat, Jun 17, 2023 at 01:38:29PM -0700, Andy Lutomirski wrote:
+> >> >> On Fri, Jun 16, 2023, at 1:50 AM, Mike Rapoport wrote:
+> >> >> > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> >> >> >
+> >> >> > module_alloc() is used everywhere as a mean to allocate memory for code.
+> >> >> >
+> >> >> > Beside being semantically wrong, this unnecessarily ties all subsystems
+> >> >> > that need to allocate code, such as ftrace, kprobes and BPF to modules
+> >> >> > and puts the burden of code allocation to the modules code.
+> >> >> >
+> >> >> > Several architectures override module_alloc() because of various
+> >> >> > constraints where the executable memory can be located and this causes
+> >> >> > additional obstacles for improvements of code allocation.
+> >> >> >
+> >> >> > Start splitting code allocation from modules by introducing
+> >> >> > execmem_text_alloc(), execmem_free(), jit_text_alloc(), jit_free() APIs.
+> >> >> >
+> >> >> > Initially, execmem_text_alloc() and jit_text_alloc() are wrappers for
+> >> >> > module_alloc() and execmem_free() and jit_free() are replacements of
+> >> >> > module_memfree() to allow updating all call sites to use the new APIs.
+> >> >> >
+> >> >> > The intention semantics for new allocation APIs:
+> >> >> >
+> >> >> > * execmem_text_alloc() should be used to allocate memory that must reside
+> >> >> >   close to the kernel image, like loadable kernel modules and generated
+> >> >> >   code that is restricted by relative addressing.
+> >> >> >
+> >> >> > * jit_text_alloc() should be used to allocate memory for generated code
+> >> >> >   when there are no restrictions for the code placement. For
+> >> >> >   architectures that require that any code is within certain distance
+> >> >> >   from the kernel image, jit_text_alloc() will be essentially aliased to
+> >> >> >   execmem_text_alloc().
+> >> >> >
+> >> >> 
+> >> >> Is there anything in this series to help users do the appropriate
+> >> >> synchronization when the actually populate the allocated memory with
+> >> >> code?  See here, for example:
+> >> >
+> >> > This series only factors out the executable allocations from modules and
+> >> > puts them in a central place.
+> >> > Anything else would go on top after this lands.
+> >> 
+> >> Hmm.
+> >> 
+> >> On the one hand, there's nothing wrong with factoring out common code. On
+> >> the other hand, this is probably the right time to at least start
+> >> thinking about synchronization, at least to the extent that it might make
+> >> us want to change this API.  (I'm not at all saying that this series
+> >> should require changes -- I'm just saying that this is a good time to
+> >> think about how this should work.)
+> >> 
+> >> The current APIs, *and* the proposed jit_text_alloc() API, don't actually
+> >> look like the one think in the Linux ecosystem that actually
+> >> intelligently and efficiently maps new text into an address space:
+> >> mmap().
+> >> 
+> >> On x86, you can mmap() an existing file full of executable code PROT_EXEC
+> >> and jump to it with minimal synchronization (just the standard implicit
+> >> ordering in the kernel that populates the pages before setting up the
+> >> PTEs and whatever user synchronization is needed to avoid jumping into
+> >> the mapping before mmap() finishes).  It works across CPUs, and the only
+> >> possible way userspace can screw it up (for a read-only mapping of
+> >> read-only text, anyway) is to jump to the mapping too early, in which
+> >> case userspace gets a page fault.  Incoherence is impossible, and no one
+> >> needs to "serialize" (in the SDM sense).
+> >> 
+> >> I think the same sequence (from userspace's perspective) works on other
+> >> architectures, too, although I think more cache management is needed on
+> >> the kernel's end.  As far as I know, no Linux SMP architecture needs an
+> >> IPI to map executable text into usermode, but I could easily be wrong.
+> >> (IIRC RISC-V has very developer-unfriendly icache management, but I don't
+> >> remember the details.)
+> >> 
+> >> Of course, using ptrace or any other FOLL_FORCE to modify text on x86 is
+> >> rather fraught, and I bet many things do it wrong when userspace is
+> >> multithreaded.  But not in production because it's mostly not used in
+> >> production.)
+> >> 
+> >> But jit_text_alloc() can't do this, because the order of operations
+> >> doesn't match.  With jit_text_alloc(), the executable mapping shows up
+> >> before the text is populated, so there is no atomic change from not-there
+> >> to populated-and-executable.  Which means that there is an opportunity
+> >> for CPUs, speculatively or otherwise, to start filling various caches
+> >> with intermediate states of the text, which means that various
+> >> architectures (even x86!) may need serialization.
+> >> 
+> >> For eBPF- and module- like use cases, where JITting/code gen is quite
+> >> coarse-grained, perhaps something vaguely like:
+> >> 
+> >> jit_text_alloc() -> returns a handle and an executable virtual address,
+> >> but does *not* map it there
+> >> jit_text_write() -> write to that handle
+> >> jit_text_map() -> map it and synchronize if needed (no sync needed on
+> >> x86, I think)
+> >> 
+> >> could be more efficient and/or safer.
+> >> 
+> >> (Modules could use this too.  Getting alternatives right might take some
+> >> fiddling, because off the top of my head, this doesn't match how it works
+> >> now.)
+> >> 
+> >> To make alternatives easier, this could work, maybe (haven't fully
+> >> thought it through):
+> >> 
+> >> jit_text_alloc()
+> >> jit_text_map_rw_inplace() -> map at the target address, but RW, !X
+> >> 
+> >> write the text and apply alternatives
+> >> 
+> >> jit_text_finalize() -> change from RW to RX *and synchronize*
+> >> 
+> >> jit_text_finalize() would either need to wait for RCU (possibly extra
+> >> heavy weight RCU to get "serialization") or send an IPI.
+> >
+> > This essentially how modules work now. The memory is allocated RW, written
+> > and updated with alternatives and then made ROX in the end with set_memory
+> > APIs.
+> >
+> > The issue with not having the memory mapped X when it's written is that we
+> > cannot use large pages to map it. One of the goals is to have executable
+> > memory mapped with large pages and make code allocator able to divide that
+> > page among several callers.
+> >
+> > So the idea was that jit_text_alloc() will have a cache of large pages
+> > mapped ROX, will allocate memory from those caches and there will be
+> > jit_update() that uses text poking for writing to that memory.
+> >
+> > Upon allocation of a large page to increase the cache, that large page will
+> > be "invalidated" by filling it with breakpoint instructions (e.g int3 on
+> > x86)
+> 
+> Is this actually valid?  In between int3 and real code, there’s a
+> potential torn read of real code mixed up with 0xcc.
+ 
+You mean while doing text poking?
 
-I thought you could do this:
-```
-#[vtable]
-pub trait DeviceOperations: ForeignOwnable + Send + Sync {
-     /// Corresponds to `ndo_init` in `struct net_device_ops`.
-     fn init(_dev: &mut Device, _data: Self::Borrowed<'_>) -> Result {
-         Ok(())
-     }
-}
+> > To improve the performance of this process, we can write to !X copy and
+> > then text_poke it to the actual address in one go. This will require some
+> > changes to get the alternatives right.
+> >
+> > -- 
+> > Sincerely yours,
+> > Mike.
 
-#[vtable]
-impl DeviceOperations<D> for Box<DriverData> {
-     fn init(_dev: &mut Device, _data: &DriverData) -> Result {
-         Ok(())
-     }
-}
-```
-
->>>>> +    const fn build_device_ops() -> &'static bindings::net_device_ops=
- {
->>>>> +        &Self::DEVICE_OPS
->>>>> +    }
->>>>
->>>> Why does this function exist?
->>>
->>> To get const struct net_device_ops *netdev_ops.
->>
->> Can't you just use `&Self::DEVICE_OPS`?
->
-> I think that it didn't work in the past but seems that it works
-> now. I'll fix.
->
->
->>>>> +/// Corresponds to the kernel's `struct net_device_ops`.
->>>>> +///
->>>>> +/// A device driver must implement this. Only very basic operations =
-are supported for now.
->>>>> +#[vtable]
->>>>> +pub trait DeviceOperations<D: DriverData> {
->>>>
->>>> Why is this trait generic over `D`? Why is this not `Self` or an assoc=
-iated
->>>> type?
->>>
->>> DriverData also used in EtherOperationsAdapter (the second patch) and
->>> there are other operations that uses DriverData (not in this patchset).
->>
->> Could you point me to those other things that use `DriverData`?
->
-> net_device struct has some like tlsdev_ops, rtnl_link_ops.. A device
-> driver might need to access to the private data via net_device in
-> these operations.
-
-In my mental model you can just implement the `TLSOperations` trait
-alongside the `DeviceOperations` trait. But I would have to see the
-API that will be used for that to be sure. I do not think that you need
-to have different private data for each of those operations traits.
-
---
-Cheers,
-Benno
-
->
->
-> thanks,
-
-
+-- 
+Sincerely yours,
+Mike.
 
