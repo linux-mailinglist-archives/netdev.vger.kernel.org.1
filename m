@@ -1,262 +1,205 @@
-Return-Path: <netdev+bounces-13812-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13813-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7086D73D0F1
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:35:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E32B473D10E
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:42:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A26EE1C208F0
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:35:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27F801C20911
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7006620F6;
-	Sun, 25 Jun 2023 12:35:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA430443F;
+	Sun, 25 Jun 2023 12:42:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 620AD1104
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:35:02 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 52D31E7;
-	Sun, 25 Jun 2023 05:35:00 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-98e39784a85so87724966b.1;
-        Sun, 25 Jun 2023 05:35:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C499220F6
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:42:41 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070d.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::70d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512FAE51;
+	Sun, 25 Jun 2023 05:42:38 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ZZf9TAT/miRRfetcjxAn0JGAbYTARHpKM+PsiFl+Hk64+rGxzJRsnY5DnWAjhJZ2wCJ4v3WLjJ6O6w11AR+uAcB5TfhHAZeEfbNE+cRlBU9kEJPPjCVgGxKfQVqU1LGtlgrGivFG4bCGJVkNH3TcWpxNPmCZaIFZ9ttgxaQnqPL5XDx6VvQO5uvJKQl3C70nURQpMaOLAM8b3pWBqDwPsrdGhETjvJHF2DhjD2w8U+TGuA1lJJJWBukdg4be/IUfXafw6532RcWJT0013/o/2jcEg/A9LV8YgwwqCuTGFpzXkKnOOFoOcD3AC34QXWCly8MogZLjnpfzk2O/z32Zfg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=YgbweR0YYAHqwHlD11oHU17KIiR4xgQq+oZfg93vC5Q=;
+ b=egFpm9bXmfMhRxw+6SuwqkqYLnfrysVF1YF8Tet9ow+4ubGUwFitv1eXi3ikofJI+TR/WEZg8EkaEX+O7TsmgIaEl0QeQFPcMXjxDcleeeD5Vmp1WUlhBOuR7zufFOWaiPYuSY9TJ7FgNPDroe1pqlhynFPmhwzLeNhLnp97ETpw/S25Xl86QKCfj2MVI42iYN5L75801jNTS7LJ4/zXJDa8yCHIA7n7yHf7KwxWoDdfJqRdCqLAzaoZwyM7duaONPCJwHAbcP5SZTg9Few/qx7C2UBdtOQthHtPHwtI7g86btMxEl2P7NC0l3/JumpNADT8v/mS2gL5IY7My7DyNA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687696499; x=1690288499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=mnTM6AH2QXF2gOF8mDFwaIyALk1zi2atW6weIU7EpDk=;
-        b=qFIX6t2djOPZ3NFLEEsWh6kVaD6cm1PqqOZB43uvYQtB5FCIFt1MLynosh38SZn6a+
-         nhuZmKYbdzDSJk4+eyBR5rHzn6xJFUofmi9IVSoYk/vGPIi3N0OpCm39foIfQaadO1CP
-         z6ypR6oH5OE7LXfQHJTlnyQSiR1DU4LSWA3qobpWXR0NmKzvFBrQiWwLgwRAP9lrxDg7
-         b9gVil1hvTLGYONUJovI7F+s+FIRB6bh/Ba78lhpdd5/sAuly6PbxuKn4gWAH+BBT1uG
-         J93qqgCZ9J9x5tZmdcPi2cmRE6/WlD11lJgi5ei9dYsk9ZG3WHqurlZ31eEwc2WX8PTW
-         V9FA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687696499; x=1690288499;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mnTM6AH2QXF2gOF8mDFwaIyALk1zi2atW6weIU7EpDk=;
-        b=ArZOLco//BjVUZdlIlLcWW3SQ0MZCDcxirVfSa6pwGugpqPL+ImDmyswWeLpTxb2ux
-         7kQqnC9YkAVo2SjdvSzakg6vtD+RpKfBmxWcRtXhHlzQyqoTznvM/MwOt+/6xFVxZPTM
-         8DiLJ2n126+CUVGT2FmGII4NJqK4PU8+FphR5qOo6K67heh00Xqy6xYZbN8wqW64ByDA
-         FCVaiu22YyPNEyKVNjq69lGMLUNL8GnRqtlSvlCNdQm+DcHJc39CIOOjuifblwU0HALC
-         98AyD9PtQxIxeFoFqHymbR/qbi6s8v3N5/y7VdifHDVgmzNi7GhPa+uimybOhdxQWbtv
-         NWvg==
-X-Gm-Message-State: AC+VfDzOgSJJiLrflHzd+JnnlrU1hDgdHtt53RK7syNSAmDKzm+ZvMm/
-	ArHvkHmZnREidatK8dBzCUaJAy/3VEl6SRzHzBk=
-X-Google-Smtp-Source: ACHHUZ4Nd6vLIj3xJTixgektcZuykdsnE4als2ZZkaqjSlSc82/AQVEifoR+5LZ+d971Eya9AkiGpbVc22+tDb1da6M=
-X-Received: by 2002:a17:907:1ca8:b0:973:84b0:b077 with SMTP id
- nb40-20020a1709071ca800b0097384b0b077mr25773762ejc.33.1687696498611; Sun, 25
- Jun 2023 05:34:58 -0700 (PDT)
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=YgbweR0YYAHqwHlD11oHU17KIiR4xgQq+oZfg93vC5Q=;
+ b=nzsekuU/X+ZQ+OC2hRDTJkEJ8hF380fwwC0mOANQbJ4e4VONuMu0UNJ2oRDKM+11mg/vTXq4mDDn2lTWMLaReCgGKSB6zic319lEgEZw/BpLC5NKMjgBV/4zyL0wnrshrpnn+1kl4Ta7SvxuPCtQvyRqXwVH0XUPo3vK2AHxAWM=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BN0PR13MB5200.namprd13.prod.outlook.com (2603:10b6:408:157::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Sun, 25 Jun
+ 2023 12:42:34 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Sun, 25 Jun 2023
+ 12:42:34 +0000
+Date: Sun, 25 Jun 2023 14:42:27 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org,
+	Dan Carpenter <dan.carpenter@linaro.org>
+Subject: Re: [PATCH net-next v2 4/7] net: dsa: vsc73xx: Add dsa tagging based
+ on 8021q
+Message-ID: <ZJg2M+Qvg3Fv73CH@corigine.com>
+References: <20230625115343.1603330-1-paweldembicki@gmail.com>
+ <20230625115343.1603330-4-paweldembicki@gmail.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230625115343.1603330-4-paweldembicki@gmail.com>
+X-ClientProxiedBy: AM0PR03CA0064.eurprd03.prod.outlook.com (2603:10a6:208::41)
+ To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230623225513.2732256-1-dhowells@redhat.com> <20230623225513.2732256-5-dhowells@redhat.com>
-In-Reply-To: <20230623225513.2732256-5-dhowells@redhat.com>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Sun, 25 Jun 2023 14:34:46 +0200
-Message-ID: <CAOi1vP_Bn918j24S94MuGyn+Gxk212btw7yWeDrRcW1U8pc_BA@mail.gmail.com>
-Subject: Re: [PATCH net-next v5 04/16] ceph: Use sendmsg(MSG_SPLICE_PAGES)
- rather than sendpage()
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexander.duyck@gmail.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
-	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org, 
-	linux-kernel@vger.kernel.org, Xiubo Li <xiubli@redhat.com>, 
-	Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BN0PR13MB5200:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4d29f0b8-428e-401b-f9c5-08db7579a5f6
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	cuT0SkceznXPTOoo1nRKRWVwZJspVAv0bYGJY8bwYeZh1f1xKDvjXlU0wZdnpRQU3nwXipobBma6rxe8W3xTCZ0bd0vmrS+DsToZLjRyn+9e8ugLw/D77iwU/FYUA1Qd/wt32FyyHW0fSNyRdg4bCDB4A04tkaSOm3SmKjPtvGmFmz/uf3IessnuP4BoYVmuNg97JcRjUhgzcGFbD5g5UkgzlqwxajpeUWFY+oeZFNHU6WLicHB1ZVUjm0hE+6BER6PzXbDXLK1yl+tz4KVfGobA65htHNMYo44+K9v+pxKfSqHJpoc0OrcvG3QtlF2RCh4RkfgC0AtQ5ocTM+U934FS7OrQJC/usayyDwUUjj0h+Rte5ZMwtFmS/a7yncAmsXLFNP7vOeM6LsXdVrgEvV9rFcsXNCTo0BsNEJYfLq1I3ogugWGXTrSgt5yDx7NC6bnLOF3X5GeSFcO0rAmOTPyFDVqoxErCnzOikUkWhnOfzUywKyI9VXoZi7uWq2Stl+xvezQ2IPc3/o5F9ntfHzANYtK33znCHiEkDUEjgX9vf6XehXr35gsn5SiqqpsyIT916eDBFZGDEaLV4ug1p8Bbds9oGjl7aHwsZU5bmQpa1gB6s7qkZfi7IimTh+pd9gHd9bAoUaB02H4ppIw2rw==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39840400004)(136003)(376002)(366004)(451199021)(186003)(2906002)(6666004)(7416002)(8676002)(36756003)(6916009)(316002)(54906003)(478600001)(6486002)(86362001)(4326008)(2616005)(38100700002)(41300700001)(44832011)(5660300002)(8936002)(66556008)(66946007)(66476007)(6512007)(6506007)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?U+jAQ5J318OpA2PfFJzxRvftnuFzz6Xu4GOw4Acw5bmuvnA+qAtyIimmXhqP?=
+ =?us-ascii?Q?iF1/vBm02O/sGCmaSuZPbDWqS1I8j+JOYVv/dBxpMkfgBDFBetmrSRgajazG?=
+ =?us-ascii?Q?2i6klgVshtugXpDT0cNQxB4drtZ55MlnYn4bgK8kNuxraOrO41X/563mKb2m?=
+ =?us-ascii?Q?iSq96fy14r7z7PUmyO/G0whdA8LJCZb9yTOpoEULfjKNaW8WGe6GalilRKem?=
+ =?us-ascii?Q?Yuwi1777q0Ew5YRHL+dbw9jDloYqC50/kXu64IQWnFbgJ4vsDNhSyW9PINeS?=
+ =?us-ascii?Q?5rpVOVB99+hX5QxX/56Ii6mV3jB9wazjSaTXKYkqgc07FkO70uzdi6Cpd6Nt?=
+ =?us-ascii?Q?HovnDLehQ1WJRnpbQNuNmmOK5XCc/4vtr5eooxOn7wrivZ/Fl6HrxvdlJ0jj?=
+ =?us-ascii?Q?IOl1De5actxNGuWDVcbHhwaoVNNs+lQcaQqOPIOGuXZmaMiNDkZs2yvPnATT?=
+ =?us-ascii?Q?AxL0M3QOhTNF/WgMt3T/HDJUhWK5UfSd4tlMrurt7OCz88V17Bn7Hu3TWhAS?=
+ =?us-ascii?Q?CqQPUwMR/Yt/SylYgMt2LQdyuZfIf5iPxeQb1wHapZdErYJ2uW9kvBeh64cS?=
+ =?us-ascii?Q?x3XDjjnJh5ADeSR+y2rpINirXD7N0ArEBMoXjhBNXaTVCDyX69b0KbfPOlGe?=
+ =?us-ascii?Q?dddX2QooQDk87stcsRWLUQfZ01W+COOJRHon8CgK4ma0F7UUkrvFVNJXDR8c?=
+ =?us-ascii?Q?29FR9q/5L4bneqdUhpwLDx/znC2lioZ8wjQTuELAOVLyiMycGcKm1U7VnG0O?=
+ =?us-ascii?Q?ttK410rNkKpRvqfdfJD6U8qB8ggve+gNoK1tqaqPNCjDadbr2R28GwB69wCx?=
+ =?us-ascii?Q?8sZXXzfs54XKfjfy5Ugh6uGGU/eCNdg7HW+iBOqDxF2n0KTcT61JALpXo6Az?=
+ =?us-ascii?Q?8PgzQmsCQHTI/YqAnTNTRsAoKoThEswn+JzLSiQJpGo5Lu5WoCeheTJ3zLU9?=
+ =?us-ascii?Q?LhxcrZlUkQ7E25nNdsEpdLIy8IXActnOlzpC8TVH2FqMHpx7SXPABkaKXCuI?=
+ =?us-ascii?Q?fLiNHDy5Vgtkgki52rgbqNOcjXDhcqTylLLJ16q/5RLkyGgoZVqiZjwxhog+?=
+ =?us-ascii?Q?i3i+sBHOQHUVR+J1UPhRRmkzzUZf4EGGncRb+h9vqXXnFwbfS0ttiK9Iysko?=
+ =?us-ascii?Q?1NmV9Rk91vMpnt1haSF2TcKTf/1zmP3QQfaIzKkNIevBcIjKzDAx75zIP4uQ?=
+ =?us-ascii?Q?NQbiEOBN84cI+m7B7cO4zq0MEXtV3fGqNlw3lxyd6vh96AMhwBwXEN4vr6Rk?=
+ =?us-ascii?Q?vBAFgupbCbU2qVUDHJR+Ct7HPVzDZukFtnh/daO73kSGdkXjnc/XcesAIBhb?=
+ =?us-ascii?Q?hnIA+sHaWpy3o1wdIch3TqgYb8MTSm8Or7Us6NJ2H2bEnvb7Y50gwnFrtrRd?=
+ =?us-ascii?Q?33eZP4d+msYYYylEGmjNjhey8mv9IriNQQj6G3aTpWZft2nIPv48p8gZbijN?=
+ =?us-ascii?Q?mE6jzeN1tyxPTrRdoV2kntbNi5Dp+x+XcjMbUZHSuemAbDe74uIHZjNRVET9?=
+ =?us-ascii?Q?dyDdsZmG3EYSm+DW0OR2XKuHyaxpO9SxBMm5131J2vjNCU4eSKFNY7TwS8ce?=
+ =?us-ascii?Q?yZGXVlqdZqpxKhdq3/oRL6nahuXc7MJiPm/kun+FwC5jIO8K8I4N3ntAiZXt?=
+ =?us-ascii?Q?VO6ItWBrm6OCRJOTOgJiB+Qxjn32M4nCPERGRVPpfUG1GWgk7blzxuvXHiYX?=
+ =?us-ascii?Q?a6K3GA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4d29f0b8-428e-401b-f9c5-08db7579a5f6
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 12:42:34.0703
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: H4MLqiqPAUUWd5ZQ/nNm3VW4CsiKZlQ0e9YcciqfMhKWFMtyujyYIothzfIGhPJ2zmDWWLCF5HbEoKYEKKIz5YM8Td72ShlLeXUR8QsOJNs=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB5200
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jun 24, 2023 at 12:55=E2=80=AFAM David Howells <dhowells@redhat.com=
-> wrote:
->
-> Use sendmsg() and MSG_SPLICE_PAGES rather than sendpage in ceph when
-> transmitting data.  For the moment, this can only transmit one page at a
-> time because of the architecture of net/ceph/, but if
-> write_partial_message_data() can be given a bvec[] at a time by the
++ Dan Carpenter
 
-Hi David,
+On Sun, Jun 25, 2023 at 01:53:39PM +0200, Pawel Dembicki wrote:
+> This patch is simple implementation of 8021q tagging in vsc73xx driver.
+> At this moment devices with DSA_TAG_PROTO_NONE are useless. VSC73XX
+> family doesn't provide any tag support for external ethernet ports.
+> 
+> The only way is vlan-based tagging. It require constant hardware vlan
+> filtering. VSC73XX family support provider bridging but QinQ only without
+> fully implemented 802.1AD. It allow only doubled 0x8100 TPID.
+> 
+> In simple port mode QinQ is enabled to preserve forwarding vlan tagged
+> frames.
+> 
+> Tag driver introduce most simple funcionality required for proper taging
+> support.
+> 
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
 
-write_partial_message_data() is net/ceph/messenger_v1.c specific, so it
-doesn't apply here.  I would suggest squashing the two net/ceph patches
-into one since even the titles are the same.
+...
 
-Also, we tend to use "libceph: " prefix for net/ceph changes.
-
-> iteration code, this would allow pages to be sent in a batch.
->
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> cc: Ilya Dryomov <idryomov@gmail.com>
-> cc: Xiubo Li <xiubli@redhat.com>
-> cc: Jeff Layton <jlayton@kernel.org>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: ceph-devel@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> ---
->  net/ceph/messenger_v2.c | 91 +++++++++--------------------------------
->  1 file changed, 19 insertions(+), 72 deletions(-)
->
-> diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
-> index 301a991dc6a6..87ac97073e75 100644
-> --- a/net/ceph/messenger_v2.c
-> +++ b/net/ceph/messenger_v2.c
-> @@ -117,91 +117,38 @@ static int ceph_tcp_recv(struct ceph_connection *co=
-n)
->         return ret;
->  }
->
-> -static int do_sendmsg(struct socket *sock, struct iov_iter *it)
-> -{
-> -       struct msghdr msg =3D { .msg_flags =3D CEPH_MSG_FLAGS };
-> -       int ret;
-> -
-> -       msg.msg_iter =3D *it;
-> -       while (iov_iter_count(it)) {
-> -               ret =3D sock_sendmsg(sock, &msg);
-> -               if (ret <=3D 0) {
-> -                       if (ret =3D=3D -EAGAIN)
-> -                               ret =3D 0;
-> -                       return ret;
-> -               }
-> -
-> -               iov_iter_advance(it, ret);
-> -       }
-> -
-> -       WARN_ON(msg_data_left(&msg));
-> -       return 1;
-> -}
-> -
-> -static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
-> -{
-> -       struct msghdr msg =3D { .msg_flags =3D CEPH_MSG_FLAGS };
-> -       struct bio_vec bv;
-> -       int ret;
-> -
-> -       if (WARN_ON(!iov_iter_is_bvec(it)))
-> -               return -EINVAL;
-> -
-> -       while (iov_iter_count(it)) {
-> -               /* iov_iter_iovec() for ITER_BVEC */
-> -               bvec_set_page(&bv, it->bvec->bv_page,
-> -                             min(iov_iter_count(it),
-> -                                 it->bvec->bv_len - it->iov_offset),
-> -                             it->bvec->bv_offset + it->iov_offset);
-> -
-> -               /*
-> -                * sendpage cannot properly handle pages with
-> -                * page_count =3D=3D 0, we need to fall back to sendmsg i=
-f
-> -                * that's the case.
-> -                *
-> -                * Same goes for slab pages: skb_can_coalesce() allows
-> -                * coalescing neighboring slab objects into a single frag
-> -                * which triggers one of hardened usercopy checks.
-> -                */
-> -               if (sendpage_ok(bv.bv_page)) {
-> -                       ret =3D sock->ops->sendpage(sock, bv.bv_page,
-> -                                                 bv.bv_offset, bv.bv_len=
-,
-> -                                                 CEPH_MSG_FLAGS);
-> -               } else {
-> -                       iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bv, 1,=
- bv.bv_len);
-> -                       ret =3D sock_sendmsg(sock, &msg);
-> -               }
-> -               if (ret <=3D 0) {
-> -                       if (ret =3D=3D -EAGAIN)
-> -                               ret =3D 0;
-> -                       return ret;
-> -               }
-> -
-> -               iov_iter_advance(it, ret);
-> -       }
-> -
-> -       return 1;
-> -}
-> -
->  /*
->   * Write as much as possible.  The socket is expected to be corked,
-> - * so we don't bother with MSG_MORE/MSG_SENDPAGE_NOTLAST here.
-> + * so we don't bother with MSG_MORE here.
->   *
->   * Return:
-> - *   1 - done, nothing (else) to write
-> + *  >0 - done, nothing (else) to write
-
-It would be nice to avoid making tweaks like this to the outer
-interface as part of switching to a new internal API.
-
->   *   0 - socket is full, need to wait
->   *  <0 - error
->   */
->  static int ceph_tcp_send(struct ceph_connection *con)
->  {
-> +       struct msghdr msg =3D {
-> +               .msg_iter       =3D con->v2.out_iter,
-> +               .msg_flags      =3D CEPH_MSG_FLAGS,
-> +       };
->         int ret;
->
-> +       if (WARN_ON(!iov_iter_is_bvec(&con->v2.out_iter)))
-> +               return -EINVAL;
-
-Previously, this WARN_ON + error applied only to the "try sendpage"
-path.  There is a ton of kvec usage in net/ceph/messenger_v2.c, so I'm
-pretty sure that placing it here breaks everything.
-
+> +static void vsc73xx_vlan_rcv(struct sk_buff *skb, int *source_port,
+> +			     int *switch_id, int *vbid, u16 *vid)
+> +{
+> +	if (vid_is_dsa_8021q(skb_vlan_tag_get(skb) & VLAN_VID_MASK))
+> +		return dsa_8021q_rcv(skb, source_port, switch_id, vbid);
 > +
-> +       if (con->v2.out_iter_sendpage)
-> +               msg.msg_flags |=3D MSG_SPLICE_PAGES;
+> +	/* Try our best with imprecise RX */
+> +	*vid = skb_vlan_tag_get(skb) & VLAN_VID_MASK;
+> +}
 > +
->         dout("%s con %p have %zu try_sendpage %d\n", __func__, con,
->              iov_iter_count(&con->v2.out_iter), con->v2.out_iter_sendpage=
-);
-> -       if (con->v2.out_iter_sendpage)
-> -               ret =3D do_try_sendpage(con->sock, &con->v2.out_iter);
-> -       else
-> -               ret =3D do_sendmsg(con->sock, &con->v2.out_iter);
+> +static struct sk_buff *vsc73xx_rcv(struct sk_buff *skb,
+> +				   struct net_device *netdev)
+> +{
+> +	int src_port = -1, switch_id = -1, vbid = -1;
+> +	u16 vid;
 > +
-> +       ret =3D sock_sendmsg(con->sock, &msg);
-> +       if (ret > 0)
-> +               iov_iter_advance(&con->v2.out_iter, ret);
-> +       else if (ret =3D=3D -EAGAIN)
-> +               ret =3D 0;
+> +	if (skb_vlan_tag_present(skb))
+> +		/* Normal traffic path. */
+> +		vsc73xx_vlan_rcv(skb, &src_port, &switch_id, &vbid, &vid);
+> +
+> +	if (vbid >= 1)
+> +		skb->dev = dsa_tag_8021q_find_port_by_vbid(netdev, vbid);
+> +	else if (src_port == -1 || switch_id == -1)
+> +		skb->dev = dsa_find_designated_bridge_port_by_vid(netdev, vid);
 
-Hrm, is sock_sendmsg() now guaranteed to exhaust the iterator (i.e.
-a "short write" is no longer possible)?  Unless that is the case, this
-is not an equivalent transformation.
+Hi Pawel,
 
-This is actually the reason for
+Smatch warns that vid may be used uninitialised here.
+And it's not clear to me why that cannot be the case.
 
->   * Return:
->   *   1 - done, nothing (else) to write
+> +	else
+> +		skb->dev = dsa_master_find_slave(netdev, switch_id, src_port);
+> +	if (!skb->dev) {
+> +		netdev_warn(netdev, "Couldn't decode source port\n");
+> +		return NULL;
+> +	}
+> +
+> +	dsa_default_offload_fwd_mark(skb);
+> +
+> +	if (dsa_port_is_vlan_filtering(dsa_slave_to_port(skb->dev)) &&
+> +	    eth_hdr(skb)->h_proto == htons(ETH_P_8021Q))
+> +		__vlan_hwaccel_clear_tag(skb);
+> +
+> +	return skb;
+> +}
 
-specification which you also tweaked.  It doesn't make sense for
-ceph_tcp_send() to return the number of bytes sent because the caller
-expects everything to be sent when a positive number is returned.
-
-Thanks,
-
-                Ilya
+...
 
