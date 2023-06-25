@@ -1,144 +1,185 @@
-Return-Path: <netdev+bounces-13772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C62673CDA4
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 03:13:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 88A0773CDF0
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 04:09:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74738280F6C
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 01:13:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F568280FAF
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 02:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4061624;
-	Sun, 25 Jun 2023 01:12:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E3E632;
+	Sun, 25 Jun 2023 02:09:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A28B87F
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 01:12:58 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A0C4DD
-	for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 18:12:57 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-bb0d11a56abso1877766276.2
-        for <netdev@vger.kernel.org>; Sat, 24 Jun 2023 18:12:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C907F
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 02:09:37 +0000 (UTC)
+Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFEF10A;
+	Sat, 24 Jun 2023 19:09:35 -0700 (PDT)
+Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-1b0138963ffso911207fac.0;
+        Sat, 24 Jun 2023 19:09:35 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687655576; x=1690247576;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=8nvfL3Uv42kRId4d+CDNHw2D49cuMseCbdy4kyI3cdw=;
-        b=Of3/7KIlfarGLy9KNUC9N0zhluxvptIe51iHYBRgJi2o3lT/JFDu02umwLOuhLGoUZ
-         jP9FFFh63PKcaT11X4WmDVw1FFQkzbPEW/pohtbuW0wpTRQmXDfrjNdkhc6ClH5k7+18
-         SRQm51yYve1HkDuTfEZ/XaUliBJJUp0es43RUMBSbfZNR6X1ghqKeGzIlRTNJp7sou2b
-         CHsdBDe8o77rxblcKs93itt9L0vnq5JYkRZElSAbrpvu++SXBHnhzaVNqBpe6JL1699z
-         XGrQkbg8dKDPBxwCONu/raWs3/wjbczvC5k6x+rWGSDqYOB+YT0H+I8n1XEKxoQggXr+
-         iodQ==
+        d=gmail.com; s=20221208; t=1687658974; x=1690250974;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=Lh5vypz3YW53PE432QKm5pLDH+RzD6gJnuf3ycT8kBM=;
+        b=OFoGU0c7ug6GC3e3f97q8TNEXtZEU2tV0ovmaqfB1UVr5cadds7wn/sEj38xRQ9ZZt
+         uXfuK9BEJgASt7hE9y5pMnkaSJ5zEhlsmi1qU+sLV81VYq7TmDvR82vuWwQZKQSLi7u+
+         IQYfe/lmeVTKC0ocFMXORVgg98+mpvYaJ2mIPxsmTSBOM3YUhTvayJgRn/bOvV/c+W4c
+         6OLXAsojqH3WbcnEPXUEV9AE+6udDzDPuFE/AD0sCVg00Z//V1vGCFDpwbjiy2Q5NYNt
+         h/aNoRpbQTPgP0Bc5F4UJvtnIodDX517NDdfD9U7SssgUtWcMeMP0uY07pM8MrNAdp3u
+         B2kQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687655576; x=1690247576;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=8nvfL3Uv42kRId4d+CDNHw2D49cuMseCbdy4kyI3cdw=;
-        b=An53tllwrs8JWH7fImCSPzDipN7gxWL2VNDUpvmnkCIFF6s8zMO1NGFIXV6Pd2qjVe
-         GD3XOvHguyFuCE8CC0XWH5WIvwyFs/7R3OfkX/GHvCjaQaQdTQD/aWzuwBbUnCoABJrm
-         MpGBnUAA8Bc8KedXqR9MqM89Q2Qy0jVOXe3ZpcGt/GjLMqRny8f4mPyuTFJllNgBd0dp
-         rataNOe7pIxiTGxFORvlVH4thv7R4Sxjr9vLS3yBZts+Frh16kaxSak7xTjp2yd1LW9+
-         hNkUO+642n0omh+LHD2hti5OJ5owBBkXJSTMV1R12l1WwD2hizcR0mIJXGxstbPMB4NB
-         XEXA==
-X-Gm-Message-State: AC+VfDx4I6XDg4YM9qQB1/e/SBO2AXfpxRQ8G54HOuNENs/gXPcpHOjM
-	uAk+Ub2yIRrkVemAZolcLbn8hos=
-X-Google-Smtp-Source: ACHHUZ5gIcGFoew+OhdZbjpwQtc7tNXBaMKMF9VVxR7DxTOZttfHVHK/ZNoYwoIFtYLcJZw7Y1+fJWg=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:dbc3:0:b0:c17:f547:620d with SMTP id
- g186-20020a25dbc3000000b00c17f547620dmr196289ybf.7.1687655576342; Sat, 24 Jun
- 2023 18:12:56 -0700 (PDT)
-Date: Sat, 24 Jun 2023 18:12:54 -0700
-In-Reply-To: <20230624143834.26c5b5e8@kernel.org>
+        d=1e100.net; s=20221208; t=1687658974; x=1690250974;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Lh5vypz3YW53PE432QKm5pLDH+RzD6gJnuf3ycT8kBM=;
+        b=RHxBbadrDXapT0a4OXwB6KpkD4gDciLPbo8wfUf5DxphEP4IMKMw55o3TSn8koI1CA
+         k7/RvHlgnJiapRSeg3ls6BFSxl5T4fiLgVnH/0oND4wOP4OWFeTFgnLYsbrWf2i5RXtk
+         LGJxqY6JJAqNn/yOyLFJoNd/9enJl4Srj6uVvAvLXg59QmxwH+k3sgn6cKSnRWmkLu9K
+         xVcQdz24VZBoNBhzBk8ZVh5p27AwedAq40eNkhcTBynkfHLUZf9XyejLZVan5kjwls5K
+         DrGgcCS2/nMFvJ91itY0QjAFUSPHv0pz7NyJ1JGKoZNV4WAcIEb6HkWGJARbGZ/M/0JU
+         SUBg==
+X-Gm-Message-State: AC+VfDzuin1hbdSa370+wmz8Uc701GJu8S3uWHQKLLbdgjMZ3jUpMCyF
+	qgHNFcUqsEPikrkXVOEonMM=
+X-Google-Smtp-Source: ACHHUZ5cpncIv1MmRiaENYIsyx8Vg6TUbbCUoEFjdZHKq0Nba1YPmYrzkdKycLAKDiT+oMqM9j455Q==
+X-Received: by 2002:a05:6870:a54b:b0:19f:9495:95ff with SMTP id p11-20020a056870a54b00b0019f949595ffmr29262867oal.27.1687658973515;
+        Sat, 24 Jun 2023 19:09:33 -0700 (PDT)
+Received: from [192.168.1.128] ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id u3-20020a056830118300b006b71d22be29sm1277248otq.18.2023.06.24.19.09.32
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 24 Jun 2023 19:09:33 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <7cd80eeb-baa9-37b7-fd8c-778f015177d4@lwfinger.net>
+Date: Sat, 24 Jun 2023 21:09:31 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230621170244.1283336-12-sdf@google.com> <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
- <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
- <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
- <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
- <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
- <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
- <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com> <20230624143834.26c5b5e8@kernel.org>
-Message-ID: <ZJeUlv/omsyXdO/R@google.com>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-From: Stanislav Fomichev <sdf@google.com>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ "Sardonimous ." <sardonimous@hotmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Wireless <linux-wireless@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>
+Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
+ kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
+ Kalle Valo <kvalo@kernel.org>
+References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
+ <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
+ <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+ <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
+Content-Language: en-US
+From: Larry Finger <Larry.Finger@lwfinger.net>
+In-Reply-To: <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 06/24, Jakub Kicinski wrote:
-> On Fri, 23 Jun 2023 19:52:03 -0700 Alexei Starovoitov wrote:
-> > That's pretty much what I'm suggesting.
-> > Add two driver specific __weak nop hook points where necessary
-> > with few driver specific kfuncs.
-> > Don't build generic infra when it's too early to generalize.
-> > 
-> > It would mean that bpf progs will be driver specific,
-> > but when something novel like this is being proposed it's better
-> > to start with minimal code change to core kernel (ideally none)
-> > and when common things are found then generalize.
-> > 
-> > Sounds like Stanislav use case is timestamps in TX
-> > while Donald's are checksums on RX, TX. These use cases are too different.
-> > To make HW TX checksum compute checksum driven by AF_XDP
-> > a lot more needs to be done than what Stan is proposing for timestamps.
+On 6/24/23 19:50, Bagas Sanjaya wrote:
+> On 6/25/23 04:47, Sardonimous . wrote:
+>> A newer report with the missing top lines:
+>>
 > 
-> I'd think HW TX csum is actually simpler than dealing with time,
-> will you change your mind if Stan posts Tx csum within a few days? :)
+> tl;dr:
 > 
-> The set of offloads is barely changing, the lack of clarity 
-> on what is needed seems overstated. IMHO AF_XDP is getting no use
-> today, because everything remotely complex was stripped out of 
-> the implementation to get it merged. Aren't we hand waving the
-> complexity away simply because we don't want to deal with it?
+>> A: http://en.wikipedia.org/wiki/Top_post
+>> Q: Were do I find info about this thing called top-posting?
+>> A: Because it messes up the order in which people normally read text.
+>> Q: Why is top-posting such a bad thing?
+>> A: Top-posting.
+>> Q: What is the most annoying thing in e-mail?
+>>
+>> A: No.
+>> Q: Should I include quotations after my reply?
+>>
+>> http://daringfireball.net/2007/07/on_top
 > 
-> These are the features today's devices support (rx/tx is a mirror):
->  - L4 csum
->  - segmentation
->  - time reporting
+> Also, please send plain-text email: I don't see your dmesg on
+> lore.kernel.org archive because you send HTML email instead.
 > 
-> Some may also support:
->  - forwarding md tagging
->  - Tx launch time
->  - no fcs
-> Legacy / irrelevant:
->  - VLAN insertion
+> But anyway, I'm pasting yours from Bugzilla thread instead
+> (as Arnd requested):
+> 
+> ```
+> Jun 20 18:20:11 askasleikir kernel: ------------[ cut here ]------------
+> Jun 20 18:20:11 askasleikir kernel: WARNING: CPU: 1 PID: 33 at net/mac80211/util.c:514 __ieee80211_stop_queue+0xcc/0xe0 [mac80211]
+> Jun 20 18:20:11 askasleikir kernel: Modules linked in: ccm tun qrtr rpcrdma rdma_cm iw_cm ib_cm ib_core nls_utf8 cifs cifs_arc4 cifs_md4 dns_resolver fscache net>
+> Jun 20 18:20:11 askasleikir kernel:  lockd grace crypto_user sunrpc fuse dm_mod loop bpf_preload ip_tables x_tables ext4 crc32c_generic crc16 mbcache jbd2 sr_mod>
+> Jun 20 18:20:11 askasleikir kernel: CPU: 1 PID: 33 Comm: kworker/u4:2 Tainted: G        W          6.3.6-arch1-1 #1 a07497485287c74e7a472f42ded4b2ddcf7a6fd7
+> Jun 20 18:20:11 askasleikir kernel: Hardware name: Apple Inc. MacBookPro7,1/Mac-F222BEC8, BIOS    MBP71.88Z.0039.B15.1702241313 02/24/17
+> Jun 20 18:20:11 askasleikir kernel: Workqueue: phy0 b43_tx_work [b43]
+> Jun 20 18:20:11 askasleikir kernel: RIP: 0010:__ieee80211_stop_queue+0xcc/0xe0 [mac80211]
+> Jun 20 18:20:11 askasleikir kernel: Code: 74 11 48 8b 78 08 0f b7 d6 89 e9 4c 89 e6 e8 fb ea 00 00 65 ff 0d 2c 2d ac 3e 0f 85 55 ff ff ff e8 d9 44 69 c3 e9 4b ff>
+> Jun 20 18:20:11 askasleikir kernel: RSP: 0018:ffffb3538013bdb8 EFLAGS: 00010097
+> Jun 20 18:20:11 askasleikir kernel: RAX: 0000000000000001 RBX: 0000000000000002 RCX: 0000000000000000
+> Jun 20 18:20:11 askasleikir kernel: RDX: 0000000000000000 RSI: 0000000000000002 RDI: ffff9e55cfa248e0
+> Jun 20 18:20:11 askasleikir kernel: RBP: 0000000000000000 R08: 0000000000000000 R09: 000000008010000f
+> Jun 20 18:20:11 askasleikir kernel: R10: 0000000000000005 R11: 0000000000000181 R12: ffff9e55cfa248e0
+> Jun 20 18:20:11 askasleikir kernel: R13: 0000000000000000 R14: ffff9e55cfa26238 R15: ffff9e55cfa26090
+> Jun 20 18:20:11 askasleikir kernel: FS:  0000000000000000(0000) GS:ffff9e55fbf00000(0000) knlGS:0000000000000000
+> Jun 20 18:20:11 askasleikir kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> Jun 20 18:20:11 askasleikir kernel: CR2: 00007f37cce5d180 CR3: 0000000057620000 CR4: 00000000000406e0
+> Jun 20 18:20:11 askasleikir kernel: Call Trace:
+> Jun 20 18:20:11 askasleikir kernel:  <TASK>
+> Jun 20 18:20:11 askasleikir kernel:  ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
+> Jun 20 18:20:11 askasleikir kernel:  ? __warn+0x81/0x130
+> Jun 20 18:20:11 askasleikir kernel:  ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
+> Jun 20 18:20:11 askasleikir kernel:  ? report_bug+0x171/0x1a0
+> Jun 20 18:20:11 askasleikir kernel:  ? handle_bug+0x3c/0x80
+> Jun 20 18:20:11 askasleikir kernel:  ? exc_invalid_op+0x17/0x70
+> Jun 20 18:20:11 askasleikir kernel:  ? asm_exc_invalid_op+0x1a/0x20
+> Jun 20 18:20:11 askasleikir kernel:  ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
+> Jun 20 18:20:11 askasleikir kernel:  ? __slab_free+0xe0/0x310
+> Jun 20 18:20:11 askasleikir kernel:  ieee80211_stop_queue+0x36/0x50 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
+> Jun 20 18:20:11 askasleikir kernel:  b43_pio_tx+0x373/0x390 [b43 3dc9b3f0fd98e2a659c64e057bd3b22d977e5228]
+> Jun 20 18:20:11 askasleikir kernel:  b43_tx_work+0x57/0x130 [b43 3dc9b3f0fd98e2a659c64e057bd3b22d977e5228]
+> Jun 20 18:20:11 askasleikir kernel:  process_one_work+0x1c7/0x3d0
+> Jun 20 18:20:11 askasleikir kernel:  worker_thread+0x51/0x390
+> Jun 20 18:20:11 askasleikir kernel:  ? __pfx_worker_thread+0x10/0x10
+> Jun 20 18:20:11 askasleikir kernel:  kthread+0xde/0x110
+> Jun 20 18:20:11 askasleikir kernel:  ? __pfx_kthread+0x10/0x10
+> Jun 20 18:20:11 askasleikir kernel:  ret_from_fork+0x2c/0x50
+> Jun 20 18:20:11 askasleikir kernel:  </TASK>
+> Jun 20 18:20:11 askasleikir kernel: ---[ end trace 0000000000000000 ]---
+> Jun 20 18:20:11 askasleikir kernel: ------------[ cut here ]------------
 
-Right, the goal of the series is to lay out the foundation to support
-AF_XDP offloads. I'm starting with tx timestamp because that's more
-pressing. But, as I mentioned in another thread, we do have other
-users that want to adopt AF_XDP, but due to missing tx offloads, they
-aren't able to.
+Sardonimous,
 
-IMHO, with pre-tx/post-tx hooks, it's pretty easy to go from TX
-timestamp to TX checksum offload, we don't need a lot:
-- define another generic kfunc bpf_request_tx_csum(from, to)
-- drivers implement it
-- af_xdp users call this kfunc from devtx hook
+The critical line is:
+ > Jun 20 18:20:11 askasleikir kernel:  b43_pio_tx+0x373/0x390
 
-We seem to be arguing over start-with-my-specific-narrow-use-case vs
-start-with-generic implementation, so maybe time for the office hours?
-I can try to present some cohesive plan of how we start with the framework
-plus tx-timestamp and expand with tx-checksum/etc. There is a lot of
-commonality in these offloads, so I'm probably not communicating it
-properly..
+I certainly have not used PIO for a long time. I expect that your MacBook Pro 
+should do DMA on the b43. Apple makes wierd hardware, but not likely that wierd.
+
+Does dmesg offer any clues as to what is happening?
+
+If there is nothing shown in the log, you definitely need to do a proper 
+bisection from the mainline git tree to isolate the change that led to this failure.
+
+Larry
+
+
+Larry
+
+
 
