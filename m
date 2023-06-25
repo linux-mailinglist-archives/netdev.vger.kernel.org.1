@@ -1,78 +1,92 @@
-Return-Path: <netdev+bounces-13837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2130173D310
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 20:50:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8BCB73D316
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 20:54:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3D35F1C2040C
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:50:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7057C1C208F7
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:54:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 395D16AD7;
-	Sun, 25 Jun 2023 18:50:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3124C79C5;
+	Sun, 25 Jun 2023 18:54:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C26E42569
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 18:50:19 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5AC0CC433C9;
-	Sun, 25 Jun 2023 18:50:19 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687719019;
-	bh=tKafGQGyvxiWupzMJVZrhKrT0glm8/qi1LiqnW1C0fQ=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CbXcUN4i8wRlzWjGgp9tAqaWB1hqXYDnDZbS/jDoSsFr8Nle5zcJFSALmdeM73134
-	 04FoRP7n7o9EH6mMlI1u8JPLEYYEeL5YOFqlsgC1FwExHYZjOPdia7r60HgIMDUICV
-	 DsvSJvD01toASPHKkuqV58CP21kxgT5NHM1zBona4rLNO28ukTG3ZjKyquD9BtM3wm
-	 uc/FSdMckLkIQwaCxBHr1rkWaH6SrezpGyrNQcPdhErm0gvY/CcpXCnfQbsRgqvPKb
-	 LXI0TtNnYc0n2rUod1iNOobknCDtPLUc75aydSr45M01288Y1fpx1Ovb8d4FZBiioB
-	 nPOWxFDnhTHJg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 41DF7E21ECD;
-	Sun, 25 Jun 2023 18:50:19 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2570B2569
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 18:54:55 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87F791B3
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:54:54 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-6686a05bc66so1349684b3a.1
+        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:54:54 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687719294; x=1690311294;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=9RSQhU4HacqAbmsPOCSLV3XsK49Ukze+VlYhgr1qiPM=;
+        b=r4pE3yczVDFsatIyt8hAKnaYfBxsM7TQpHt7ztgsDSugIp17c2tqnr6S/YS7fmrfvi
+         K+Zj2Jly8MQ7+oEKQCEmsllxywTN0ZJX7VUeM2L/tf56iOnYonP/M/a3UTPYtQq2dK/K
+         eGdMe12Wu1Qqs8yaiWBZrS55zdUiGxaFDYlvS515HHo0tW60CaEOEEA4XVwEXVRsffaK
+         r3fN9600KzhUWT8gteZ3G087mqBebAjF82z1fZf5TWaGyzT37FuawkBe6DlR3LxJZeST
+         M89OkzL42Vo0QWc4O0RoRIOw5rLkJuGq+vNHg7I1LaopVAGPI8SV8SnFP+EcMqnF3BOz
+         mV2g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687719294; x=1690311294;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9RSQhU4HacqAbmsPOCSLV3XsK49Ukze+VlYhgr1qiPM=;
+        b=g1sLFrsapa5HbZvv2QoUXf5uWS2ja/X0/dNVvHVip6KKlDIPikM3zlKMHu55ZwPp3z
+         hG9MtIFGLC73TRZS8qRZgxC5kIVzLybur8DIDIJ4+kFFKRBphyrQfmpgnbkF4Fyf4Qk7
+         kmjw4aUFhM+bh+yDA81q4O3M9G62D4Qa07VT1XCzts8GiNELAS1E/mdyW8rExxkOWuVh
+         YtoVNO0hpdkTOAiCMx3onRlYG6x7sxEzWJ8GibwtRiJWUMJS1An/Fz+0YRl631mGJSLd
+         Cll3TSJOgrQO2INo1mirOTl2YyPgFgorJR77yhE1/BiyC/rUEe3GpwLknCe4vx3/AdvB
+         FAMg==
+X-Gm-Message-State: AC+VfDz18l0l3WaPrzBEPtaLSaXVrBhxwaetwu4whkELi3kspqB5CECX
+	zJec9913fuZ4h06uUxppuUc5FJLAiXPjQ82KXPKFyw==
+X-Google-Smtp-Source: ACHHUZ7zOyrPvq1w7g5T0t7ag4Wxn/wso4TPHa6OnqSqxNjN0w2dmamUZh/KmAdogk59eZgJMEQ8Jw==
+X-Received: by 2002:a17:903:32c9:b0:1b3:f91d:15b3 with SMTP id i9-20020a17090332c900b001b3f91d15b3mr3927622plr.22.1687719293999;
+        Sun, 25 Jun 2023 11:54:53 -0700 (PDT)
+Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
+        by smtp.gmail.com with ESMTPSA id jg3-20020a17090326c300b001a2104d706fsm1865800plb.225.2023.06.25.11.54.53
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 11:54:53 -0700 (PDT)
+Date: Sun, 25 Jun 2023 11:54:51 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Zahari Doychev <zahari.doychev@linux.com>
+Cc: netdev@vger.kernel.org, dsahern@gmail.com, hmehrtens@maxlinear.com,
+ aleksander.lobakin@intel.com, simon.horman@corigine.com, idosch@idosch.org,
+ Zahari Doychev <zdoychev@maxlinear.com>
+Subject: Re: [PATCH iproute2-next] f_flower: add cfm support
+Message-ID: <20230625115451.2d044f35@hermes.local>
+In-Reply-To: <20230619213523.520800-1-zahari.doychev@linux.com>
+References: <20230619213523.520800-1-zahari.doychev@linux.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] man: fix typos found by Lintian
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168771901926.25635.2716847822449149455.git-patchwork-notify@kernel.org>
-Date: Sun, 25 Jun 2023 18:50:19 +0000
-References: <20230615010659.1435955-1-luca.boccassi@gmail.com>
-In-Reply-To: <20230615010659.1435955-1-luca.boccassi@gmail.com>
-To: Luca Boccassi <luca.boccassi@gmail.com>
-Cc: netdev@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Mon, 19 Jun 2023 23:35:23 +0200
+Zahari Doychev <zahari.doychev@linux.com> wrote:
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+> +		if (matches(*argv, "mdl") == 0) {
+> +			__u8 val;
+> +
 
-On Thu, 15 Jun 2023 02:06:59 +0100 you wrote:
-> From: Luca Boccassi <bluca@debian.org>
-> 
-> Signed-off-by: Luca Boccassi <bluca@debian.org>
-> ---
->  man/man8/dcb-apptrust.8 | 2 +-
->  man/man8/tc-netem.8     | 2 +-
->  2 files changed, 2 insertions(+), 2 deletions(-)
-
-Here is the summary with links:
-  - [iproute2] man: fix typos found by Lintian
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=c441f68ba9bc
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+No new uses of matches() in iproute2.
+It creates lots of long term debt an confusion.
 
