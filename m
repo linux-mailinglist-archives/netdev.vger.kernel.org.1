@@ -1,120 +1,148 @@
-Return-Path: <netdev+bounces-13835-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13836-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFD6973D2EA
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 20:17:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1F0A573D2F4
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 20:23:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11F0B280F16
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:17:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 498581C20918
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 18:23:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5EAA79D1;
-	Sun, 25 Jun 2023 18:17:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 436E579D3;
+	Sun, 25 Jun 2023 18:23:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C527579C5
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 18:17:27 +0000 (UTC)
-Received: from mail-oi1-x233.google.com (mail-oi1-x233.google.com [IPv6:2607:f8b0:4864:20::233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F0C6FF;
-	Sun, 25 Jun 2023 11:17:26 -0700 (PDT)
-Received: by mail-oi1-x233.google.com with SMTP id 5614622812f47-39ecf031271so2250024b6e.1;
-        Sun, 25 Jun 2023 11:17:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36F1EEA4
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 18:23:30 +0000 (UTC)
+Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B80B0137
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:23:29 -0700 (PDT)
+Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-5704995f964so34403787b3.2
+        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 11:23:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687717045; x=1690309045;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZAA+VrbO9krgfzrzDGzCg+M3T3IjPa2ks+yrz5EWc4o=;
-        b=jDPKWbld2lNsNaTcg4vgnyBxkoEwQs8+Osrvz7LiEQsvL2fEjMXk7L0nL9S3AWZRzm
-         iq07s4nJv+KzxSeuGy9Csco1w8GqHv02h9VIC5zikekCrnI7K8dx6gmLthIYk8fNF666
-         MkkzYsbedQzt2u6y84BAdETMidChRNtxpXImfXO1UsunzeGM752eB3BV5FUGO5YSSexZ
-         bCkAf3n03b6yj7TNesbLhAx5iq1FvoQHujaBdW61Sv0rApLHtia9JDRMvS7ZLLTn8Brx
-         4BODOfI6WlV9AdUguunYz55357/+0tBWrM4a35mrOZVGq9dlL99PXlsp9K5CuXqUwPT5
-         Zthg==
+        d=google.com; s=20221208; t=1687717409; x=1690309409;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=nStssVR9ZPW4NaCc49D+wnFGC4O65SkKwiCmf2V2d0Y=;
+        b=msXNNXJxzAyQGjjB0NoqLtN+QrxX5gUMXibVtxbYU4OFi2MaeNYA8Z0RxZomf9AvqT
+         45QQi5o1fd3X3xW05GRj7pOGYbxiS+VnYVxP5Uwz7Jfy3hf4kqWymowFyUt7fOZHMYfg
+         OYK5YGQFVXjCzmyXCoYwmNCk+XZJcndt/tIMpTkJftF4/h1YK5PNukTFrndt7p9zMk5U
+         w7P3+OwUQV8iHptnP76wsiypbn9KOncOHMBLX264SqzoCh1RcXHz2jwFvzYvULLnaqE8
+         4+gshS6uN4MYXzH32kVH0NshI/xjnQnvSnogBOTSGJto2W9LUlK0YhNuzYfKmFtWaF6O
+         LrKA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687717045; x=1690309045;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ZAA+VrbO9krgfzrzDGzCg+M3T3IjPa2ks+yrz5EWc4o=;
-        b=K3ezvjtHD+AJKcUCGsMtrgQTJUDv/lxF8zie2ItOLrMLY37q72nrw+DKT4w38usn1W
-         piRWE4obPTxz7SZ6i5qXyq14E79a0k9oKq/nNrE19s+XdzjcaZ4Xs4lDYzX3t+MKGwyl
-         5kQx13bcbHlX24dbROuVNugPCzc0JJ2iy2Yi0qFVp7op46wDBLje3/vhjtBUZeS179IU
-         uoFcutnj2qXOzWrrL2awTsMf2cO+7BCiPODDauX8niEsckDN1SoNf9fpRe2C2e8LcnI+
-         B0l+wA4+lyIzRB8DR5g7cquoyGBcT1/KlZg0Z9zAqvwBh7pWZakYzck6zAVwTuqJn4Ex
-         20Iw==
-X-Gm-Message-State: AC+VfDyQcuLB2qgc93aAbgShAjPI0RSwW8ct10gGU6yisO2B6Xrpu0hY
-	+pA4NXF79S606bvRNhSqXPk=
-X-Google-Smtp-Source: ACHHUZ5H32ckcsK1zBfyNZceMELsMtOPJ905PuQ8Afi9/aItnS8mT3KegO0GWvzYKc6z2xmQQkC4EQ==
-X-Received: by 2002:a05:6808:2810:b0:398:4761:20d with SMTP id et16-20020a056808281000b003984761020dmr27571840oib.19.1687717045532;
-        Sun, 25 Jun 2023 11:17:25 -0700 (PDT)
-Received: from [192.168.1.119] ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id u3-20020a056808000300b0039cc917d0b9sm1697342oic.16.2023.06.25.11.17.24
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 25 Jun 2023 11:17:25 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <da80b806-de3f-c7ea-0352-cd23e0f6dd65@lwfinger.net>
-Date: Sun, 25 Jun 2023 13:17:23 -0500
+        d=1e100.net; s=20221208; t=1687717409; x=1690309409;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nStssVR9ZPW4NaCc49D+wnFGC4O65SkKwiCmf2V2d0Y=;
+        b=SXggotXxRLAAZFqfsuG+P/uQQWvQLOKPnP4wYQP76VaFOF6l5jzaROMxk2PJXWCJyi
+         ze7MXzZQ5cM0NAohJVb1LYMwm09d8kKwNXxOEHXfZD8rDY37OSU8UCY6FOSq/9RTM35i
+         oqnEUBEmPhjkown/8YQhFd2/vmXCvAsgY/QlirrvFNg8UA4Wv3Xze0NhlisLuUJdEqsx
+         eZYHPX19QYkDi86fbiKHgU/0on1lmYR6Mz7iuXUSBE1TjhFotI4xr3o1vpoB7HDjNzec
+         3+p4yLBzIUSxCufltaF7I9ON4GJlyAMJnZTDToY+PVnGsTniQS9NxrfdQ/BoObYZPRQ3
+         y9iQ==
+X-Gm-Message-State: AC+VfDxpChONFptc3TtQG54N8bk3o4kq/RFP1j8kt13EuPp5H3CmcoyH
+	tz/xLcv9M2HdQGfWTGX4PZyJKq1/3dU/PZM5VsNqW9y0kxOMckZb/wQ5+8BAT+rROITXAuh3k5T
+	E8fwJ4KSVxOyTK5Ld4QY3xR4TOyyGvR8I3Udj/oeov4eSDqrNR6fvBWHJRLb22kHN
+X-Google-Smtp-Source: ACHHUZ5pLQBE9Bj0k4hxQUKMJX9VqCllGLV7fdkhVoYhQ/SyjUzIfPuFw6u6b8pvXi3nVVXfdnlZ5cnMmaYL
+X-Received: from morats.c.googlers.com ([fda3:e722:ac3:cc00:14:4d90:c0a8:d9e])
+ (user=moritzf job=sendgmr) by 2002:a25:fc06:0:b0:bad:23f:87bd with SMTP id
+ v6-20020a25fc06000000b00bad023f87bdmr5166246ybd.9.1687717408883; Sun, 25 Jun
+ 2023 11:23:28 -0700 (PDT)
+Date: Sun, 25 Jun 2023 18:23:27 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
-To: Arnd Bergmann <arnd@arndb.de>, "Sardonimous ." <sardonimous@hotmail.com>,
- Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>
-Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
- kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
- Kalle Valo <kvalo@kernel.org>
-References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
- <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
- <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
- <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
- <RO2P215MB193879B2D99DD0BAF59EFA92A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <e0a08449-554a-4a28-ac50-7051866eb95e@app.fastmail.com>
-Content-Language: en-US
-From: Larry Finger <Larry.Finger@lwfinger.net>
-In-Reply-To: <e0a08449-554a-4a28-ac50-7051866eb95e@app.fastmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.178.g377b9f9a00-goog
+Message-ID: <20230625182327.984115-1-moritzf@google.com>
+Subject: [PATCH net-next v2] net: lan743x: Don't sleep in atomic context
+From: Moritz Fischer <moritzf@google.com>
+To: netdev@vger.kernel.org
+Cc: pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, 
+	davem@davemloft.net, bryan.whitehead@microchip.com, 
+	UNGLinuxDriver@microchip.com, mdf@kernel.org, 
+	Moritz Fischer <moritzf@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/25/23 13:12, Arnd Bergmann wrote:
-> On Sun, Jun 25, 2023, at 18:58, Sardonimous wrote:
->> I have been unable to get DMA to work in the past.  So I have been
->> configuring it with PIO=1 (/etc/modprobe,d/b43.conf):
->>
->>       options b43 pio=1 qos=0
->>
-> 
-> I think the qos=0 parameter is what causes the WARN_ON(), as that
-> causes the use of only one queue, while the warning happens when
-> tx function iterates over all the queues and warns that they don't
-> exist.
+dev_set_rx_mode() grabs a spin_lock, and the lan743x implementation
+proceeds subsequently to go to sleep using readx_poll_timeout().
 
-I agree and suggest running with no options. If we need debug, we can turn it on 
-later.
+Introduce a helper wrapping the readx_poll_timeout_atomic() function
+and use it to replace the calls to readx_polL_timeout().
 
-Larry
+Signed-off-by: Moritz Fischer <moritzf@google.com>
+---
 
+Changes from v1:
+- Added line-breaks
+- Changed subject to target net-next
+- Removed Tested-by: tag
+
+---
+ drivers/net/ethernet/microchip/lan743x_main.c | 22 +++++++++++++++----
+ 1 file changed, 18 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
+index f1bded993edc..4f277ffff1dc 100644
+--- a/drivers/net/ethernet/microchip/lan743x_main.c
++++ b/drivers/net/ethernet/microchip/lan743x_main.c
+@@ -144,6 +144,19 @@ static int lan743x_csr_light_reset(struct lan743x_adapter *adapter)
+ 				  !(data & HW_CFG_LRST_), 100000, 10000000);
+ }
+ 
++static int lan743x_csr_wait_for_bit_atomic(struct lan743x_adapter *adapter,
++					   int offset, u32 bit_mask,
++					   int target_value, int udelay_min,
++					   int udelay_max, int count)
++{
++	u32 data;
++
++	return readx_poll_timeout_atomic(LAN743X_CSR_READ_OP, offset, data,
++					 target_value == ((data & bit_mask) ?
++					 1 : 0), udelay_max,
++					 udelay_min * count);
++}
++
+ static int lan743x_csr_wait_for_bit(struct lan743x_adapter *adapter,
+ 				    int offset, u32 bit_mask,
+ 				    int target_value, int usleep_min,
+@@ -736,8 +749,8 @@ static int lan743x_dp_write(struct lan743x_adapter *adapter,
+ 	u32 dp_sel;
+ 	int i;
+ 
+-	if (lan743x_csr_wait_for_bit(adapter, DP_SEL, DP_SEL_DPRDY_,
+-				     1, 40, 100, 100))
++	if (lan743x_csr_wait_for_bit_atomic(adapter, DP_SEL, DP_SEL_DPRDY_,
++					    1, 40, 100, 100))
+ 		return -EIO;
+ 	dp_sel = lan743x_csr_read(adapter, DP_SEL);
+ 	dp_sel &= ~DP_SEL_MASK_;
+@@ -748,8 +761,9 @@ static int lan743x_dp_write(struct lan743x_adapter *adapter,
+ 		lan743x_csr_write(adapter, DP_ADDR, addr + i);
+ 		lan743x_csr_write(adapter, DP_DATA_0, buf[i]);
+ 		lan743x_csr_write(adapter, DP_CMD, DP_CMD_WRITE_);
+-		if (lan743x_csr_wait_for_bit(adapter, DP_SEL, DP_SEL_DPRDY_,
+-					     1, 40, 100, 100))
++		if (lan743x_csr_wait_for_bit_atomic(adapter, DP_SEL,
++						    DP_SEL_DPRDY_,
++						    1, 40, 100, 100))
+ 			return -EIO;
+ 	}
+ 
+-- 
+2.41.0.178.g377b9f9a00-goog
 
 
