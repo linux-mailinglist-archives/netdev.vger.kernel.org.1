@@ -1,204 +1,136 @@
-Return-Path: <netdev+bounces-13844-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3254F73D455
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 23:11:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 64EA773D4B1
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 23:54:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D7416280EB5
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 21:11:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3EB511C208E4
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 21:54:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0B6E8F63;
-	Sun, 25 Jun 2023 21:11:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6CF944F;
+	Sun, 25 Jun 2023 21:54:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F1268F5C
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 21:11:37 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12olkn2055.outbound.protection.outlook.com [40.92.23.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9C06210A;
-	Sun, 25 Jun 2023 14:11:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=mXlWXlUQ8/vJxpEQvy0l4qUNPagJaUy9cf6QckgAjueoJL5x7EKntIlTdNKpIWAyo5gRPaoZU2rej/24HpyxLjObH7eYexqXeZnRo+SkbtF+Kan9ha+EN5m4iKIRbqcX0ol1t2j78xw3oXG+lOP9JtgVjDQilvopb9HCvmXs0bEpbjdEsgEduNYSBDf7/KR4kDwVjhpKSVqrVuG/Fm/pjZjZHLXET25b1MNIsuQXnEFrRHWt+kODK18f3BQIRvi7saGBx8qzWe1gYhD4iPpuazwGO+UCJWckCfQwRbapX7HitdPcs78pbMYnTnk4h9zLe39FaQrcRh2ZdiHifcPZrA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1cLQft2EB4qcUIhz+q97RHD5nIDZ2KgZoY8bBrFqggI=;
- b=NFrecjicx4mjg2OLEJjQX1MFcDScEaH5IXwD58xb0b2ETqS/rolvQ/3FkJ2PzD7zjUaCDtRGj02Q93D/8Ijfrn8L4ErUr6Zrh6RtOgYXYBo5Ng/28WXrrx+AGkObufwOdmuTDquFPIPXw3sBHTHhGXS2hTw6lxzBxbCkzA3ONLjxaceU9aNgzQXSD2yGep2mStKUU1z2DHBWPFdbJsIHsi2iK8iWxpmg6A8yLHhoMybiYjQUMWlDMs5ZA1jaao/l1fGRipBQ83qCHZvMRAsvzXDtEZeBF8wNfy9pD7V3iLo4f3RzL0pGRkWC7UCpI+vg3CEhZ1dzwTicTnkcpj9Eeg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=none; dmarc=none;
- dkim=none; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hotmail.com;
- s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1cLQft2EB4qcUIhz+q97RHD5nIDZ2KgZoY8bBrFqggI=;
- b=qKwpIHuk2HSZ95Whmh8Va8ekltS+6PAgKQz83zjPO7LdCytDa9iqggUy3GW+e4Ke0VwP2gnjiGV2F5Yj3ZchxSW0Ato3MDnWNz3A8zFXeTHD/yYhcrEY28oa549XVahLLHpVX+orEcRghHStBVij0xgYkrDEVxW1hrQZVGScmlUKfoHc2jb/UryzuOoaJ+50t0mobHhiX1eOMrzkhGG1iWZ6cOR6C2jA2LaagOL7xNBhmNXsbyiTWB+0dZUYcCglbfjfjbO9iptr2ZHJv4G2qBXV01Fe/qNWKBMAYwhcwN4olEriYlrHSvMAqQu70PR+fn7F7TF3mMuZE/Kk82ptrA==
-Received: from RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM (2603:10d6:10:c9::8) by
- CPWP215MB1892.LAMP215.PROD.OUTLOOK.COM (2603:10d6:103:13f::9) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6521.24; Sun, 25 Jun 2023 21:11:30 +0000
-Received: from RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
- ([fe80::6c3:80e7:184a:98bc]) by RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
- ([fe80::6c3:80e7:184a:98bc%4]) with mapi id 15.20.6521.024; Sun, 25 Jun 2023
- 21:11:30 +0000
-Message-ID:
- <RO2P215MB1938BD13105900F3525E0FE7A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
-Date: Sun, 25 Jun 2023 16:11:20 -0500
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
-To: Larry Finger <Larry.Finger@lwfinger.net>, Arnd Bergmann <arnd@arndb.de>,
- Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>
-Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
- kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
- Kalle Valo <kvalo@kernel.org>
-References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
- <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
- <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
- <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
- <RO2P215MB193879B2D99DD0BAF59EFA92A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <e0a08449-554a-4a28-ac50-7051866eb95e@app.fastmail.com>
- <da80b806-de3f-c7ea-0352-cd23e0f6dd65@lwfinger.net>
-Content-Language: en-US
-From: Sardonimous <sardonimous@hotmail.com>
-In-Reply-To: <da80b806-de3f-c7ea-0352-cd23e0f6dd65@lwfinger.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-TMN:
- [m+smDcuc7tdhoxGog3mSnSm79psqA6/wEhdvaob3RxTWS2fYxjyuBlklTPXKjqRTVEBS7x7QD+w=]
-X-ClientProxiedBy: CH0P221CA0006.NAMP221.PROD.OUTLOOK.COM
- (2603:10b6:610:11c::29) To RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
- (2603:10d6:10:c9::8)
-X-Microsoft-Original-Message-ID:
- <9b0ca9a2-126b-fffb-3b19-27eb0749619a@hotmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE08AEA4
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 21:54:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96D6B1A5
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 14:54:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687730042;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7K4oZGxfnRQ5Kbcr/TMT6ATY4u3TAiqKM1oEjq6Wqbs=;
+	b=YK/GmRcNnU86Hdy8OylwE/sqfz4N+edChR+xYQqxQD/6RPWxO1s7EzdYoGrY0QE6wqfZ9m
+	atv3cKxkM2cP7MEdf2esMTTxVp92ewLl2v5lnRkx9f+eIwvYPk4vW4oM4AtTZzJzRDEH/D
+	ZkgMqYCSgya6J6cuSe9mMNT0G7/wEeo=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-133-2_qsWSgfOR--Zn4zb_lV2Q-1; Sun, 25 Jun 2023 17:54:00 -0400
+X-MC-Unique: 2_qsWSgfOR--Zn4zb_lV2Q-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fa7a851dadso15306145e9.0
+        for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 14:54:00 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687730039; x=1690322039;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7K4oZGxfnRQ5Kbcr/TMT6ATY4u3TAiqKM1oEjq6Wqbs=;
+        b=drmK0Vq2AU9wH68nW1z5mO1ZHoAumcK57sF5BAtkHTCuzMR/Y9XE4ZeGAip6lSu2fc
+         uwSQuRjw36MYdflLW439wH0WTedIYgo1LcU/E8sJWzwMeE/uljwbE1eCoosqNsMPQeCe
+         LmjGVwINmIj18nsf+oNuAOyO5Qe5iYhm32thok76ee/2hInjXhw9EYY0ZOJtKjaOeTJb
+         dU3N+7DsmOH+o2iGLV1LrEgb1m0ZIALGXeHp6wnJiZZPQ341oV23otY//1oH1oW84dgz
+         ZXvNKzrELu6ExNd5BdznIYCJ82mJVALxTqDXBcj+HXaRe56GtrxTqHHjRRuIiEeK5QAS
+         FKXQ==
+X-Gm-Message-State: AC+VfDywAgG00cWq/CraKdun8uI0v3Ib3Pc7XPfGu3b4rncm6IYTKxMg
+	G5BhYbACKCQ2VwQTKAruFjDDUDbVNcSKrsMl8xn+OsKvME0jk9bMcOzsUTxFELQyhnBlwjQb2oH
+	eofzjYPyTYhAi7zlP
+X-Received: by 2002:a05:600c:2c2:b0:3f7:3699:c294 with SMTP id 2-20020a05600c02c200b003f73699c294mr20914685wmn.29.1687730039041;
+        Sun, 25 Jun 2023 14:53:59 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6YLKbrTNd4D5rPv7fDnrpFIdLUBGklnn9qU6r26Dqf36h1LAW2Xr+PDjXdq8RrNEdgpi4PmA==
+X-Received: by 2002:a05:600c:2c2:b0:3f7:3699:c294 with SMTP id 2-20020a05600c02c200b003f73699c294mr20914680wmn.29.1687730038775;
+        Sun, 25 Jun 2023 14:53:58 -0700 (PDT)
+Received: from redhat.com ([2.52.156.102])
+        by smtp.gmail.com with ESMTPSA id s11-20020a5d69cb000000b00313f07ccca4sm1341205wrw.117.2023.06.25.14.53.56
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 14:53:57 -0700 (PDT)
+Date: Sun, 25 Jun 2023 17:53:54 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Heng Qi <hengqi@linux.alibaba.com>
+Cc: Simon Horman <simon.horman@corigine.com>, netdev@vger.kernel.org,
+	bpf@vger.kernel.org, Jason Wang <jasowang@redhat.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>
+Subject: Re: [PATCH net-next v2 1/3] virtio-net: reprobe csum related fields
+ for skb passed by XDP
+Message-ID: <20230625175337-mutt-send-email-mst@kernel.org>
+References: <20230624122604.110958-1-hengqi@linux.alibaba.com>
+ <20230624122604.110958-2-hengqi@linux.alibaba.com>
+ <ZJdCW4pxTioTPKJn@corigine.com>
+ <45bda8e7-8d4a-c7c9-1fe2-af6926329ef7@linux.alibaba.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-Exchange-MessageSentRepresentingType: 1
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: RO2P215MB1938:EE_|CPWP215MB1892:EE_
-X-MS-Office365-Filtering-Correlation-Id: 00a74570-1f30-45d0-2dc9-08db75c0bf14
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	COJ4dpsqK1pe9pC+GjSn+cAAJW7D4ZSvWT1dZJQYQl7bC4b+/izoC2xoYWXDBFejkAJjuhZg7w09EthBpkahUM4rswAA+QPw7lPLKaYsW2iMiwT4WvPSVWievTINsqRApXLJag2tsjSV77Kgq0qEpH1nwHEiIi2jhhyB+WWXT4TjNG8IzWanzUSBCnTy2RSqIy7qhuRLddMCk3vhoCewoITrEtLDCsNZ039CO+Sn4Fk5FNo/XDfqwDX+12FzpSfIPApQYPt/2HTayZ1cPAGV9EgLf+s8xPYqKlrJa7u97x7tG/g+p9I+NPKSi0FE2RaAZEFZe4vuAj4ZCp/4kEmiZpRSUF+NWOs7bnRadf4XiXhc9iAajttLuYHSWX0bRBreMdd9RxR0QMXOUHKy68cSbwklBA6tz3hcxS549B6JzC2Y9ui6uYUKHqQpMttqUQqwoqss8zGH9OAXI7MSnPTkUFL03zWkmZUeKRotJTtnXHFpogK+oOPWAsTfWF0QLhxhxBml/WomryiNwzLh62I9Hxj0YVCFbAtqE00UCo/4oB51xekf8aGM1Pys4dJVZDle
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?OWxLbjBobVlwMG5USUtVWHhkTGRpQnkyOGs1UkRjV2VrVFNYK0c5M1NTS2xt?=
- =?utf-8?B?c3VTMm1WNVFtc2FjWENFWG1rYWpKZGhwVlNzdTA2ejlocHo1ZlMxUEpuU3A5?=
- =?utf-8?B?eVQ1YXVDSFlGRWFVWUhBMDJ4N0VySGVnVlVDYlUyc3dFQkJQcnZHbHcxaXVJ?=
- =?utf-8?B?K2VCTVNaNklqYVQ1QnprdG5MQ3pNOE1IQzBvYlRkR1V5cUxkNmJMeWEvSkpm?=
- =?utf-8?B?b3lDWm9CNjlCYzlac215N3FTRTVQK2N3dzYzQ2tUM2pBZkF0RW5qd3VyYmdy?=
- =?utf-8?B?U1haWWNkSzJEVWFQY3g5c0ZLZGR3RXQvaUF3cGw1cVJ1c0pNT2VvOFpsOVhX?=
- =?utf-8?B?SGhxK3BhNjg4VVhqdXlXS2VsTVQ4UUR3ZmQ0Z2p1OGFpUE5uUk1xSDMxY0R6?=
- =?utf-8?B?MmJpeExCTTlZY1p3R0ljNU92TTk4Njd3Q1AyNzVyZW10R2lWd1BkajhnSFJS?=
- =?utf-8?B?Lzdzd0ZIWTdsc05Sc250bmhQNmhQTDQ4MUpYeGczWW94YWVqWkZ2V2ExOHRo?=
- =?utf-8?B?RVNrNXg1ZjJXNUF4VDhTRlcwemhycy9la1VSMll5dGd2WnA3eWNwa2JqZEpS?=
- =?utf-8?B?eVkvbjZNa1RwZFpGZXEzS1h1NVIwbHFiVTcvdTJSbWF0WDBRQmpkcDBmQ21Q?=
- =?utf-8?B?eWxvLzlTVTJqYlpKWGk4NVlXTHZjZFlXSTE2eUFmb3d5YXdLTXhFZUljNkVC?=
- =?utf-8?B?RDVSMTlZRGIyYUhyanp1dllsK0ptYzJ2VkNGREsrZ0VBYm9wdW5ocUdxRTJB?=
- =?utf-8?B?aXBaZTNLUStxQUhNck5nZENiak5mZjh5bk1walJhWTVNbzBuOEtEUFF4enhQ?=
- =?utf-8?B?ZXE4ZHRrMTVHdlhFRE4xYWdFa1Y3aGx5dEp4ZUcrVUd0dDJjSm04ZVZXbENo?=
- =?utf-8?B?NSsvOHI2a2s0VW15STBkMGNnUkhlY2tuc0lvK1hNcWhRdVY5Rmp0SUgwUG5C?=
- =?utf-8?B?UlI5NE8yR05Yc1dKV0cyeGRWaytoMzJES3c5c0RpckJWZWFHK1BrSG0zMU5U?=
- =?utf-8?B?MkxORFcvZUNGeUFwbVprMkk2YUYrQnNEUzdkMUIwZlNhRTF5cEwxbkVvUFZ0?=
- =?utf-8?B?YWtwZE5FbDAreldqZHA1eDZsODJRc2RVTko0dnR4UDBhdVVGWTVOWmIzRkl3?=
- =?utf-8?B?VVlJVlNQVDdrbFdLNExsTnFEZElTSXRBOVVkNURPMnVnVWwrbmNicjFPWTNx?=
- =?utf-8?B?K29mQlM3amlBcW1TbHlYa1B3TkhaTHJMZUQ3T0Y0ZSs4czFNVXc3SG43RWkw?=
- =?utf-8?B?dmIxdlh1QlAxV2xjTE82cnR5ZFdqZ0ErTzBucVUrUHlLZk5CMUNMcU4xQW1Z?=
- =?utf-8?B?eHdGOGxacHNPTkJMMFhLd2ZmZU5lTzJHTmtiNzRvUzhxdWpaZkU4cmZyZk0z?=
- =?utf-8?B?ZmZLT1NLUm5DNVdhSW1zZ05wT1BxUVVTTERoaHc1d24ybnVYZmRWOXJuRWNK?=
- =?utf-8?B?VlJNMWJmZEtWQW5GRmlyOWZtRW1oRFZQVXBoVkhBUHh6V2YreXZKQXJQWnlH?=
- =?utf-8?B?RVUwREdDSksyYnVRbEdFRUpuZU1xVnhPbU4rQldpbSs2dnlvTkVCamdlaGt6?=
- =?utf-8?B?WnVpd2NZVzBDWHZSc3VQTGc2d2UrdW9ISEtzeHRkdkU2M1E1RTQvQ1hGY1dX?=
- =?utf-8?B?NnZqVDNXVUJGK3lETnlGNWlrcXdQSUJhUkV0S1RwcFA2UzdHUGpiVFZwaWlz?=
- =?utf-8?B?dDVxZkpEaytjQ0xHMms4YTFIeVR1ZE5BMUZkL1VPc0p5THFCVnA2YjA0TW9X?=
- =?utf-8?Q?OttcZQ38NrGAYyAMrM=3D?=
-X-OriginatorOrg: sct-15-20-4755-11-msonline-outlook-7d2c5.templateTenant
-X-MS-Exchange-CrossTenant-Network-Message-Id: 00a74570-1f30-45d0-2dc9-08db75c0bf14
-X-MS-Exchange-CrossTenant-AuthSource: RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 21:11:30.7954
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 84df9e7f-e9f6-40af-b435-aaaaaaaaaaaa
-X-MS-Exchange-CrossTenant-RMS-PersistedConsumerOrg:
-	00000000-0000-0000-0000-000000000000
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CPWP215MB1892
-X-Spam-Status: No, score=0.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_MUA_MOZILLA,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <45bda8e7-8d4a-c7c9-1fe2-af6926329ef7@linux.alibaba.com>
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/25/23 13:17, Larry Finger wrote:
+On Sun, Jun 25, 2023 at 10:17:15AM +0800, Heng Qi wrote:
+> 
+> 
+> 在 2023/6/25 上午3:28, Simon Horman 写道:
+> > On Sat, Jun 24, 2023 at 08:26:02PM +0800, Heng Qi wrote:
+> > 
+> > ...
+> > 
+> > > +static int virtnet_set_csum_after_xdp(struct virtnet_info *vi,
+> > > +				      struct sk_buff *skb,
+> > > +				      __u8 flags)
+> > Hi Heng Qi,
+> > 
+> > Unfortunately this appears to break an x86_64 allmodconfig build
+> > with GCC 12.3.0:
+> > 
+> > drivers/net/virtio_net.c:1671:12: error: 'virtnet_set_csum_after_xdp' defined but not used [-Werror=unused-function]
+> 
+> I admit that this is a patch set, you can cherry-pick patches [1/3] and
+> [2/3] together
+> to make it compile without 'defined but not used' warning. If people don't
+> want to
+> separate [1/3] and [2/3], I can squash them into one. :)
+> 
+> Thanks.
 
-> On 6/25/23 13:12, Arnd Bergmann wrote:
->> On Sun, Jun 25, 2023, at 18:58, Sardonimous wrote:
->>> I have been unable to get DMA to work in the past.  So I have been
->>> configuring it with PIO=1 (/etc/modprobe,d/b43.conf):
->>>
->>>       options b43 pio=1 qos=0
->>>
->>
->> I think the qos=0 parameter is what causes the WARN_ON(), as that
->> causes the use of only one queue, while the warning happens when
->> tx function iterates over all the queues and warns that they don't
->> exist.
->
-> I agree and suggest running with no options. If we need debug, we can 
-> turn it on later.
->
-> Larry
+the answer is yes, do not break the build.
 
-Sure. Of course, this is what I started out with years ago (2017?) when 
-I was trying to get this to work.
-
-Now:
-Linux version 6.3.9-arch1-1 (linux@archlinux) (gcc (GCC) 13.1.1 
-20230429, GNU ld (GNU Binutils) 2.40.0) #1 SMP PREEMPT_DYNAMIC Wed, 21 
-Jun 2023 20:46:20 +0000
-
-This is the sort of loop I get (dmesg | grep b43):
-
-[   31.979539] b43-pci-bridge 0000:02:00.0: Sonics Silicon Backplane 
-found on PCI device 0000:02:00.0
-[   35.239389] b43-phy0: Broadcom 4322 WLAN found (core revision 16)
-[   35.275018] b43-phy0: Found PHY: Analog 8, Type 4 (N), Revision 4
-[   35.275046] b43-phy0: Found Radio: Manuf 0x17F, ID 0x2056, Revision 
-3, Version 0
-[   66.890631] b43-phy0: Loading firmware version 784.2 (2012-08-15 
-21:35:19)
-[   67.437162] b43-phy0 ERROR: DMA RX reset timed out
-[   67.498976] b43 ssb0:0: Timeout waiting for bitmask 01800000 on 
-register 0F90 to clear
-[   67.707177] b43-phy0: Loading firmware version 784.2 (2012-08-15 
-21:35:19)
-[  391.127300] b43-phy0 ERROR: DMA RX reset timed out
-[  391.360514] b43-phy0 ERROR: DMA TX reset timed out
-[  391.382127] b43 ssb0:0: Timeout waiting for bitmask 01800000 on 
-register 0F90 to clear
-[  391.590659] b43-phy0: Loading firmware version 784.2 (2012-08-15 
-21:35:19)
-[  709.123840] b43-phy0 ERROR: DMA RX reset timed out
-[  709.357235] b43-phy0 ERROR: DMA TX reset timed out
-[  709.378623] b43 ssb0:0: Timeout waiting for bitmask 01800000 on 
-register 0F90 to clear
-[  709.573851] b43-phy0: Loading firmware version 784.2 (2012-08-15 
-21:35:19)
-
-
-
+> >   1671 | static int virtnet_set_csum_after_xdp(struct virtnet_info *vi,
+> >        |            ^~~~~~~~~~~~~~~~~~~~~~~~~~
+> > 
+> > --
+> > pw-bot: changes-requested
 
 
