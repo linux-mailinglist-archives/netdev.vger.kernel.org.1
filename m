@@ -1,185 +1,332 @@
-Return-Path: <netdev+bounces-13773-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13776-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 88A0773CDF0
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 04:09:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90FF673CE03
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 04:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3F568280FAF
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 02:09:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E94D1C2085B
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 02:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1E3E632;
-	Sun, 25 Jun 2023 02:09:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E1CCD632;
+	Sun, 25 Jun 2023 02:20:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C907F
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 02:09:37 +0000 (UTC)
-Received: from mail-oa1-x36.google.com (mail-oa1-x36.google.com [IPv6:2001:4860:4864:20::36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BBFEF10A;
-	Sat, 24 Jun 2023 19:09:35 -0700 (PDT)
-Received: by mail-oa1-x36.google.com with SMTP id 586e51a60fabf-1b0138963ffso911207fac.0;
-        Sat, 24 Jun 2023 19:09:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687658974; x=1690250974;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=Lh5vypz3YW53PE432QKm5pLDH+RzD6gJnuf3ycT8kBM=;
-        b=OFoGU0c7ug6GC3e3f97q8TNEXtZEU2tV0ovmaqfB1UVr5cadds7wn/sEj38xRQ9ZZt
-         uXfuK9BEJgASt7hE9y5pMnkaSJ5zEhlsmi1qU+sLV81VYq7TmDvR82vuWwQZKQSLi7u+
-         IQYfe/lmeVTKC0ocFMXORVgg98+mpvYaJ2mIPxsmTSBOM3YUhTvayJgRn/bOvV/c+W4c
-         6OLXAsojqH3WbcnEPXUEV9AE+6udDzDPuFE/AD0sCVg00Z//V1vGCFDpwbjiy2Q5NYNt
-         h/aNoRpbQTPgP0Bc5F4UJvtnIodDX517NDdfD9U7SssgUtWcMeMP0uY07pM8MrNAdp3u
-         B2kQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687658974; x=1690250974;
-        h=content-transfer-encoding:in-reply-to:from:content-language
-         :references:cc:to:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Lh5vypz3YW53PE432QKm5pLDH+RzD6gJnuf3ycT8kBM=;
-        b=RHxBbadrDXapT0a4OXwB6KpkD4gDciLPbo8wfUf5DxphEP4IMKMw55o3TSn8koI1CA
-         k7/RvHlgnJiapRSeg3ls6BFSxl5T4fiLgVnH/0oND4wOP4OWFeTFgnLYsbrWf2i5RXtk
-         LGJxqY6JJAqNn/yOyLFJoNd/9enJl4Srj6uVvAvLXg59QmxwH+k3sgn6cKSnRWmkLu9K
-         xVcQdz24VZBoNBhzBk8ZVh5p27AwedAq40eNkhcTBynkfHLUZf9XyejLZVan5kjwls5K
-         DrGgcCS2/nMFvJ91itY0QjAFUSPHv0pz7NyJ1JGKoZNV4WAcIEb6HkWGJARbGZ/M/0JU
-         SUBg==
-X-Gm-Message-State: AC+VfDzuin1hbdSa370+wmz8Uc701GJu8S3uWHQKLLbdgjMZ3jUpMCyF
-	qgHNFcUqsEPikrkXVOEonMM=
-X-Google-Smtp-Source: ACHHUZ5cpncIv1MmRiaENYIsyx8Vg6TUbbCUoEFjdZHKq0Nba1YPmYrzkdKycLAKDiT+oMqM9j455Q==
-X-Received: by 2002:a05:6870:a54b:b0:19f:9495:95ff with SMTP id p11-20020a056870a54b00b0019f949595ffmr29262867oal.27.1687658973515;
-        Sat, 24 Jun 2023 19:09:33 -0700 (PDT)
-Received: from [192.168.1.128] ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id u3-20020a056830118300b006b71d22be29sm1277248otq.18.2023.06.24.19.09.32
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 24 Jun 2023 19:09:33 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <7cd80eeb-baa9-37b7-fd8c-778f015177d4@lwfinger.net>
-Date: Sat, 24 Jun 2023 21:09:31 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D13707F;
+	Sun, 25 Jun 2023 02:20:41 +0000 (UTC)
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87FF4194;
+	Sat, 24 Jun 2023 19:20:37 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R511e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VlqVEkf_1687659632;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0VlqVEkf_1687659632)
+          by smtp.aliyun-inc.com;
+          Sun, 25 Jun 2023 10:20:33 +0800
+Message-ID: <1687659046.7482243-2-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v10 05/10] virtio_ring: split-detach: support return dma info to driver
+Date: Sun, 25 Jun 2023 10:10:46 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: virtualization@lists.linux-foundation.org,
+ Jason Wang <jasowang@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
+ <20230602092206.50108-6-xuanzhuo@linux.alibaba.com>
+ <20230622153111-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230622153111-mutt-send-email-mst@kernel.org>
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
-To: Bagas Sanjaya <bagasdotme@gmail.com>,
- "Sardonimous ." <sardonimous@hotmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>
-Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
- kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
- Kalle Valo <kvalo@kernel.org>
-References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
- <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
- <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
-Content-Language: en-US
-From: Larry Finger <Larry.Finger@lwfinger.net>
-In-Reply-To: <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 6/24/23 19:50, Bagas Sanjaya wrote:
-> On 6/25/23 04:47, Sardonimous . wrote:
->> A newer report with the missing top lines:
->>
-> 
-> tl;dr:
-> 
->> A: http://en.wikipedia.org/wiki/Top_post
->> Q: Were do I find info about this thing called top-posting?
->> A: Because it messes up the order in which people normally read text.
->> Q: Why is top-posting such a bad thing?
->> A: Top-posting.
->> Q: What is the most annoying thing in e-mail?
->>
->> A: No.
->> Q: Should I include quotations after my reply?
->>
->> http://daringfireball.net/2007/07/on_top
-> 
-> Also, please send plain-text email: I don't see your dmesg on
-> lore.kernel.org archive because you send HTML email instead.
-> 
-> But anyway, I'm pasting yours from Bugzilla thread instead
-> (as Arnd requested):
-> 
-> ```
-> Jun 20 18:20:11 askasleikir kernel: ------------[ cut here ]------------
-> Jun 20 18:20:11 askasleikir kernel: WARNING: CPU: 1 PID: 33 at net/mac80211/util.c:514 __ieee80211_stop_queue+0xcc/0xe0 [mac80211]
-> Jun 20 18:20:11 askasleikir kernel: Modules linked in: ccm tun qrtr rpcrdma rdma_cm iw_cm ib_cm ib_core nls_utf8 cifs cifs_arc4 cifs_md4 dns_resolver fscache net>
-> Jun 20 18:20:11 askasleikir kernel:  lockd grace crypto_user sunrpc fuse dm_mod loop bpf_preload ip_tables x_tables ext4 crc32c_generic crc16 mbcache jbd2 sr_mod>
-> Jun 20 18:20:11 askasleikir kernel: CPU: 1 PID: 33 Comm: kworker/u4:2 Tainted: G        W          6.3.6-arch1-1 #1 a07497485287c74e7a472f42ded4b2ddcf7a6fd7
-> Jun 20 18:20:11 askasleikir kernel: Hardware name: Apple Inc. MacBookPro7,1/Mac-F222BEC8, BIOS    MBP71.88Z.0039.B15.1702241313 02/24/17
-> Jun 20 18:20:11 askasleikir kernel: Workqueue: phy0 b43_tx_work [b43]
-> Jun 20 18:20:11 askasleikir kernel: RIP: 0010:__ieee80211_stop_queue+0xcc/0xe0 [mac80211]
-> Jun 20 18:20:11 askasleikir kernel: Code: 74 11 48 8b 78 08 0f b7 d6 89 e9 4c 89 e6 e8 fb ea 00 00 65 ff 0d 2c 2d ac 3e 0f 85 55 ff ff ff e8 d9 44 69 c3 e9 4b ff>
-> Jun 20 18:20:11 askasleikir kernel: RSP: 0018:ffffb3538013bdb8 EFLAGS: 00010097
-> Jun 20 18:20:11 askasleikir kernel: RAX: 0000000000000001 RBX: 0000000000000002 RCX: 0000000000000000
-> Jun 20 18:20:11 askasleikir kernel: RDX: 0000000000000000 RSI: 0000000000000002 RDI: ffff9e55cfa248e0
-> Jun 20 18:20:11 askasleikir kernel: RBP: 0000000000000000 R08: 0000000000000000 R09: 000000008010000f
-> Jun 20 18:20:11 askasleikir kernel: R10: 0000000000000005 R11: 0000000000000181 R12: ffff9e55cfa248e0
-> Jun 20 18:20:11 askasleikir kernel: R13: 0000000000000000 R14: ffff9e55cfa26238 R15: ffff9e55cfa26090
-> Jun 20 18:20:11 askasleikir kernel: FS:  0000000000000000(0000) GS:ffff9e55fbf00000(0000) knlGS:0000000000000000
-> Jun 20 18:20:11 askasleikir kernel: CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> Jun 20 18:20:11 askasleikir kernel: CR2: 00007f37cce5d180 CR3: 0000000057620000 CR4: 00000000000406e0
-> Jun 20 18:20:11 askasleikir kernel: Call Trace:
-> Jun 20 18:20:11 askasleikir kernel:  <TASK>
-> Jun 20 18:20:11 askasleikir kernel:  ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
-> Jun 20 18:20:11 askasleikir kernel:  ? __warn+0x81/0x130
-> Jun 20 18:20:11 askasleikir kernel:  ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
-> Jun 20 18:20:11 askasleikir kernel:  ? report_bug+0x171/0x1a0
-> Jun 20 18:20:11 askasleikir kernel:  ? handle_bug+0x3c/0x80
-> Jun 20 18:20:11 askasleikir kernel:  ? exc_invalid_op+0x17/0x70
-> Jun 20 18:20:11 askasleikir kernel:  ? asm_exc_invalid_op+0x1a/0x20
-> Jun 20 18:20:11 askasleikir kernel:  ? __ieee80211_stop_queue+0xcc/0xe0 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
-> Jun 20 18:20:11 askasleikir kernel:  ? __slab_free+0xe0/0x310
-> Jun 20 18:20:11 askasleikir kernel:  ieee80211_stop_queue+0x36/0x50 [mac80211 01be121fb223b347160617528f5dda900e828bc2]
-> Jun 20 18:20:11 askasleikir kernel:  b43_pio_tx+0x373/0x390 [b43 3dc9b3f0fd98e2a659c64e057bd3b22d977e5228]
-> Jun 20 18:20:11 askasleikir kernel:  b43_tx_work+0x57/0x130 [b43 3dc9b3f0fd98e2a659c64e057bd3b22d977e5228]
-> Jun 20 18:20:11 askasleikir kernel:  process_one_work+0x1c7/0x3d0
-> Jun 20 18:20:11 askasleikir kernel:  worker_thread+0x51/0x390
-> Jun 20 18:20:11 askasleikir kernel:  ? __pfx_worker_thread+0x10/0x10
-> Jun 20 18:20:11 askasleikir kernel:  kthread+0xde/0x110
-> Jun 20 18:20:11 askasleikir kernel:  ? __pfx_kthread+0x10/0x10
-> Jun 20 18:20:11 askasleikir kernel:  ret_from_fork+0x2c/0x50
-> Jun 20 18:20:11 askasleikir kernel:  </TASK>
-> Jun 20 18:20:11 askasleikir kernel: ---[ end trace 0000000000000000 ]---
-> Jun 20 18:20:11 askasleikir kernel: ------------[ cut here ]------------
+On Thu, 22 Jun 2023 15:36:41 -0400, "Michael S. Tsirkin" <mst@redhat.com> wrote:
+> On Fri, Jun 02, 2023 at 05:22:01PM +0800, Xuan Zhuo wrote:
+> > Under the premapped mode, the driver needs to unmap the DMA address
+> > after receiving the buffer. The virtio core records the DMA address,
+> > so the driver needs a way to get the dma info from the virtio core.
+> >
+> > A straightforward approach is to pass an array to the virtio core when
+> > calling virtqueue_get_buf(). However, it is not feasible when there are
+> > multiple DMA addresses in the descriptor chain, and the array size is
+> > unknown.
+> >
+> > To solve this problem, a helper be introduced. After calling
+> > virtqueue_get_buf(), the driver can call the helper to
+> > retrieve a dma info. If the helper function returns -EAGAIN, it means
+> > that there are more DMA addresses to be processed, and the driver should
+> > call the helper function again. To keep track of the current position in
+> > the chain, a cursor must be passed to the helper function, which is
+> > initialized by virtqueue_get_buf().
+> >
+> > Some processes are done inside this helper, so this helper MUST be
+> > called under the premapped mode.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 118 ++++++++++++++++++++++++++++++++---
+> >  include/linux/virtio.h       |  11 ++++
+> >  2 files changed, 119 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index dc109fbc05a5..cdc4349f6066 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -754,8 +754,95 @@ static bool virtqueue_kick_prepare_split(struct virtqueue *_vq)
+> >  	return needs_kick;
+> >  }
+> >
+> > -static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
+> > -			     void **ctx)
+> > +static void detach_cursor_init_split(struct vring_virtqueue *vq,
+> > +				     struct virtqueue_detach_cursor *cursor, u16 head)
+> > +{
+> > +	struct vring_desc_extra *extra;
+> > +
+> > +	extra = &vq->split.desc_extra[head];
+> > +
+> > +	/* Clear data ptr. */
+> > +	vq->split.desc_state[head].data = NULL;
+> > +
+> > +	cursor->head = head;
+> > +	cursor->done = 0;
+> > +
+> > +	if (extra->flags & VRING_DESC_F_INDIRECT) {
+> > +		cursor->num = extra->len / sizeof(struct vring_desc);
+> > +		cursor->indirect = true;
+> > +		cursor->pos = 0;
+> > +
+> > +		vring_unmap_one_split(vq, head);
+> > +
+> > +		extra->next = vq->free_head;
+> > +
+> > +		vq->free_head = head;
+> > +
+> > +		/* Plus final descriptor */
+> > +		vq->vq.num_free++;
+> > +
+> > +	} else {
+> > +		cursor->indirect = false;
+> > +		cursor->pos = head;
+> > +	}
+> > +}
+> > +
+> > +static int virtqueue_detach_split(struct virtqueue *_vq, struct virtqueue_detach_cursor *cursor,
+> > +				  dma_addr_t *addr, u32 *len, enum dma_data_direction *dir)
+> > +{
+>
+> I don't get it. This is generic split vq code?
 
-Sardonimous,
+NO. This is the api for split vq when the address is mapped by the driver.
 
-The critical line is:
- > Jun 20 18:20:11 askasleikir kernel:  b43_pio_tx+0x373/0x390
+> Why is it unconditionally
+> wasting time with cursors etc? Poking at split.desc_extra when not
+> necessary is also not really nice, will cause lots of cache misses.
 
-I certainly have not used PIO for a long time. I expect that your MacBook Pro 
-should do DMA on the b43. Apple makes wierd hardware, but not likely that wierd.
+virtqueue_get_buf_ctx_split() is the generic code.
 
-Does dmesg offer any clues as to what is happening?
+I just add the checking of vq->premapped.
 
-If there is nothing shown in the log, you definitely need to do a proper 
-bisection from the mainline git tree to isolate the change that led to this failure.
+>
+> And it looks like we duplicated a bunch of logic?
 
-Larry
+Yes.
+
+The detach_buf_split() is the origin logic.
+But now, the driver needs to get the dma info of every desc, so
+I break the loop of the detach_buf_split().
+But, the logic is simple, so I think it is ok.
+
+virtqueue_detach_split() return the dma info of every desc.
+detach_cursor_init_split() init the cursor inside virtqueue_get_buf_ctx_split().
+
+>
+>
+> > +	struct vring_virtqueue *vq = to_vvq(_vq);
+> > +	__virtio16 nextflag = cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F_NEXT);
+> > +	int rc = -EAGAIN;
+> > +
+> > +	if (unlikely(cursor->done))
+> > +		return -EINVAL;
+> > +
+> > +	if (!cursor->indirect) {
+> > +		struct vring_desc_extra *extra;
+> > +		unsigned int i;
+> > +
+> > +		i = cursor->pos;
+> > +
+> > +		extra = &vq->split.desc_extra[i];
+> > +
+> > +		if (vq->split.vring.desc[i].flags & nextflag) {
+> > +			cursor->pos = extra->next;
+> > +		} else {
+> > +			extra->next = vq->free_head;
+> > +			vq->free_head = cursor->head;
+> > +			cursor->done = true;
+> > +			rc = 0;
+> > +		}
+> > +
+> > +		*addr = extra->addr;
+> > +		*len = extra->len;
+> > +		*dir = (extra->flags & VRING_DESC_F_WRITE) ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+> > +
+> > +		vq->vq.num_free++;
+> > +
+> > +	} else {
+> > +		struct vring_desc *indir_desc, *desc;
+> > +		u16 flags;
+> > +
+> > +		indir_desc = vq->split.desc_state[cursor->head].indir_desc;
+> > +		desc = &indir_desc[cursor->pos];
+> > +
+> > +		flags = virtio16_to_cpu(vq->vq.vdev, desc->flags);
+> > +		*addr = virtio64_to_cpu(vq->vq.vdev, desc->addr);
+> > +		*len = virtio32_to_cpu(vq->vq.vdev, desc->len);
+> > +		*dir = (flags & VRING_DESC_F_WRITE) ? DMA_FROM_DEVICE : DMA_TO_DEVICE;
+> > +
+> > +		if (++cursor->pos == cursor->num) {
+> > +			kfree(indir_desc);
+> > +			cursor->done = true;
+> > +			return 0;
+> > +		}
+> > +	}
+> > +
+> > +	return rc;
+> > +}
+> > +
+> > +static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head)
+> >  {
+> >  	unsigned int i, j;
+> >  	__virtio16 nextflag = cpu_to_virtio16(vq->vq.vdev, VRING_DESC_F_NEXT);
+> > @@ -799,8 +886,6 @@ static void detach_buf_split(struct vring_virtqueue *vq, unsigned int head,
+> >
+> >  		kfree(indir_desc);
+> >  		vq->split.desc_state[head].indir_desc = NULL;
+> > -	} else if (ctx) {
+> > -		*ctx = vq->split.desc_state[head].indir_desc;
+> >  	}
+> >  }
+> >
+> > @@ -812,7 +897,8 @@ static bool more_used_split(const struct vring_virtqueue *vq)
+> >
+> >  static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+> >  					 unsigned int *len,
+> > -					 void **ctx)
+> > +					 void **ctx,
+> > +					 struct virtqueue_detach_cursor *cursor)
+> >  {
+> >  	struct vring_virtqueue *vq = to_vvq(_vq);
+> >  	void *ret;
+> > @@ -852,7 +938,15 @@ static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+> >
+> >  	/* detach_buf_split clears data, so grab it now. */
+> >  	ret = vq->split.desc_state[i].data;
+> > -	detach_buf_split(vq, i, ctx);
+> > +
+> > +	if (!vq->indirect && ctx)
+> > +		*ctx = vq->split.desc_state[i].indir_desc;
+> > +
+> > +	if (vq->premapped)
+> > +		detach_cursor_init_split(vq, cursor, i);
+> > +	else
+> > +		detach_buf_split(vq, i);
+> > +
+> >  	vq->last_used_idx++;
+> >  	/* If we expect an interrupt for the next entry, tell host
+> >  	 * by writing event index and flush out the write before
+> > @@ -961,7 +1055,8 @@ static bool virtqueue_enable_cb_delayed_split(struct virtqueue *_vq)
+> >  	return true;
+> >  }
+> >
+> > -static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
+> > +static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq,
+> > +					       struct virtqueue_detach_cursor *cursor)
+> >  {
+> >  	struct vring_virtqueue *vq = to_vvq(_vq);
+> >  	unsigned int i;
+> > @@ -974,7 +1069,10 @@ static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
+> >  			continue;
+> >  		/* detach_buf_split clears data, so grab it now. */
+> >  		buf = vq->split.desc_state[i].data;
+> > -		detach_buf_split(vq, i, NULL);
+> > +		if (vq->premapped)
+> > +			detach_cursor_init_split(vq, cursor, i);
+> > +		else
+> > +			detach_buf_split(vq, i);
+> >  		vq->split.avail_idx_shadow--;
+> >  		vq->split.vring.avail->idx = cpu_to_virtio16(_vq->vdev,
+> >  				vq->split.avail_idx_shadow);
+> > @@ -2361,7 +2459,7 @@ void *virtqueue_get_buf_ctx(struct virtqueue *_vq, unsigned int *len,
+> >  	struct vring_virtqueue *vq = to_vvq(_vq);
+> >
+> >  	return vq->packed_ring ? virtqueue_get_buf_ctx_packed(_vq, len, ctx) :
+> > -				 virtqueue_get_buf_ctx_split(_vq, len, ctx);
+> > +				 virtqueue_get_buf_ctx_split(_vq, len, ctx, NULL);
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtqueue_get_buf_ctx);
+> >
+> > @@ -2493,7 +2591,7 @@ void *virtqueue_detach_unused_buf(struct virtqueue *_vq)
+> >  	struct vring_virtqueue *vq = to_vvq(_vq);
+> >
+> >  	return vq->packed_ring ? virtqueue_detach_unused_buf_packed(_vq) :
+> > -				 virtqueue_detach_unused_buf_split(_vq);
+> > +				 virtqueue_detach_unused_buf_split(_vq, NULL);
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtqueue_detach_unused_buf);
+> >
+> > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> > index 1fc0e1023bd4..eb4a4e4329aa 100644
+> > --- a/include/linux/virtio.h
+> > +++ b/include/linux/virtio.h
+> > @@ -38,6 +38,17 @@ struct virtqueue {
+> >  	void *priv;
+> >  };
+> >
+> > +struct virtqueue_detach_cursor {
+> > +	unsigned indirect:1;
+> > +	unsigned done:1;
+> > +	unsigned hole:14;
+> > +
+> > +	/* for split head */
+> > +	unsigned head:16;
+> > +	unsigned num:16;
+> > +	unsigned pos:16;
+> > +};
+> > +
+>
+> is cursor ever stored somewhere? If not don't use bitfields,
+> they cause many gcc versions to generate atrocious code.
+
+OK.
 
 
-Larry
+Thanks.
 
 
+>
+>
+> >  int virtqueue_add_outbuf(struct virtqueue *vq,
+> >  			 struct scatterlist sg[], unsigned int num,
+> >  			 void *data,
+> > --
+> > 2.32.0.3.g01195cf9f
+>
 
