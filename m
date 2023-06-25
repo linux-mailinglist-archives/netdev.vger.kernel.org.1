@@ -1,206 +1,261 @@
-Return-Path: <netdev+bounces-13815-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13816-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A26C873D11B
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 15:07:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7363C73D130
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 15:49:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 70F081C208FB
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:07:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82E5B280F7A
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 13:49:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBA3568D;
-	Sun, 25 Jun 2023 13:07:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9865D6117;
+	Sun, 25 Jun 2023 13:49:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4738C1103
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 13:07:30 +0000 (UTC)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC4171B3;
-	Sun, 25 Jun 2023 06:07:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687698448; x=1719234448;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=wCL/X7uPam0LxXngpKubW9ZKYgJCTvCbGquUJLzm6Es=;
-  b=K8CV+zcPjctYax3jZBm/NGxQuSbOJKL29nEdQEi5F/KQTiYMBaV12c85
-   ZKRwwLMJMAa3rkgIJgmurPsLe3GhEpthTvCOiYOB1Oy1sCPo1MpXKNwCT
-   YvPXCgnthrTaJ1RGACieANypXZ+ffNMs4OP3ksqnxavMh6j2tHWZkc/Lz
-   TWBihThqQRzTmb6M67hCM4MCp/VQGYEYUrJW/IP/uORt/u8BAXNECJ/c/
-   P7I4IMHhlhr4VB5SdNohqrk31uDY59p4BzCpK6bno2uhBN2lUoM2Xr817
-   6d+LoT/SjPEIhhhAGljejIx5csvCsxzmrTPrSYFPnAOR994nqed11r6TJ
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10751"; a="427054018"
-X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
-   d="scan'208";a="427054018"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 25 Jun 2023 06:07:28 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10751"; a="745499932"
-X-IronPort-AV: E=Sophos;i="6.01,157,1684825200"; 
-   d="scan'208";a="745499932"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga008.jf.intel.com with ESMTP; 25 Jun 2023 06:07:27 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23; Sun, 25 Jun 2023 06:07:27 -0700
-Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sun, 25 Jun 2023 06:07:27 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.23 via Frontend Transport; Sun, 25 Jun 2023 06:07:27 -0700
-Received: from NAM02-SN1-obe.outbound.protection.outlook.com (104.47.57.46) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.23; Sun, 25 Jun 2023 06:07:26 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=diFz2aH7NlbPB5KZ4n7U4XlNgYTOlVQn7XnB1gkeB+XO9zTtbEWsZEBV+4TRjgJivI3oT7uUCngRbwRHH4GEBk9I3zO8eEp5jiILSHwDB6EHfiqOcyQkNjSlToIQ8zZjX+f8X9pMdO/g0MhD4RyceeGYRms3QyTNuCYMdxmxDJnkf8Bn4SRn4ZC4JOAAsOqntIzzU4zed7XuRVWOoyx9PAidwysLGOA5r9E4vXQL9/szvKztUT1wbP0Fb1R+qehE6J+yf1KE22HoEk+FTtIQGdi/6OOPKRnxL4tmyqfuj+LmP4jalvvLfNhQwhp39D+ytuueidBoB85JM3CIf3+LAw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KaR0gkG2lZw+tm3PIkCd/tNrLbslv9pJKsSa9rzvdgg=;
- b=Q9ZQcRqDiN3lBaOS18yGck6zfjpXiXhC9eBkCrj76WXpT4lDJwh0+WwhuxchaO16rs939e4fIWeylq5EihGanSqiLfSHUMOo6d8IgQDlby72/6JPubiS0pnISq7vVv9q2lG0vP9KYUDoTd7DX/KMuoozesMJQDWD+ng/1U5mktFjEryNrYEcVzDjR54Jp2wXotfvxR3LJ+fgcDA4mxqypCyUn7MhiBfKr9ex82VFaitosaiGul+xfhazr2gXtN9Nav2kjQy+sYLFLmUPDhTcaFRzlBfGkl4c9evUz6P0G+zmBX7990mrZkMCbxr6dMPDeGgv6C8+OrmlpkL+Ky0S0w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from MW4PR11MB6738.namprd11.prod.outlook.com (2603:10b6:303:20c::13)
- by DS0PR11MB7287.namprd11.prod.outlook.com (2603:10b6:8:13f::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Sun, 25 Jun
- 2023 13:07:19 +0000
-Received: from MW4PR11MB6738.namprd11.prod.outlook.com
- ([fe80::df65:1e83:71ec:e026]) by MW4PR11MB6738.namprd11.prod.outlook.com
- ([fe80::df65:1e83:71ec:e026%5]) with mapi id 15.20.6521.024; Sun, 25 Jun 2023
- 13:07:19 +0000
-Message-ID: <543723b9-6087-75ed-187c-729e987090c8@intel.com>
-Date: Sun, 25 Jun 2023 16:07:11 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Firefox/102.0 Thunderbird/102.12.0
-Subject: Re: [Intel-wired-lan] [PATCH] e1000e: Use PME poll to circumvent
- unreliable ACPI wake
-Content-Language: en-US
-To: naamax.meir <naamax.meir@linux.intel.com>, Kai-Heng Feng
-	<kai.heng.feng@canonical.com>, <jesse.brandeburg@intel.com>,
-	<anthony.l.nguyen@intel.com>
-CC: <linux-pm@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Eric Dumazet <edumazet@google.com>,
-	<intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, "David S. Miller" <davem@davemloft.net>, "Neftin,
- Sasha" <sasha.neftin@intel.com>
-References: <20230601162537.1163270-1-kai.heng.feng@canonical.com>
- <546387b5-9e18-a0df-2aa9-159b19435a51@linux.intel.com>
-From: "Neftin, Sasha" <sasha.neftin@intel.com>
-In-Reply-To: <546387b5-9e18-a0df-2aa9-159b19435a51@linux.intel.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-ClientProxiedBy: LO2P265CA0475.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:a2::31) To MW4PR11MB6738.namprd11.prod.outlook.com
- (2603:10b6:303:20c::13)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 87D9D1103
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 13:49:33 +0000 (UTC)
+Received: from zg8tmtu5ljg5lje1ms4xmtka.icoremail.net (zg8tmtu5ljg5lje1ms4xmtka.icoremail.net [159.89.151.119])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id EDBD91B1
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 06:49:28 -0700 (PDT)
+Received: from localhost.localdomain (unknown [36.24.97.154])
+	by mail-app3 (Coremail) with SMTP id cC_KCgCX0gHJRZhkAkS4CA--.49287S4;
+	Sun, 25 Jun 2023 21:48:58 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	simon.horman@corigine.com
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH v2] net: xfrm: Fix xfrm_address_filter OOB read
+Date: Sun, 25 Jun 2023 21:48:54 +0800
+Message-Id: <20230625134854.308508-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgCX0gHJRZhkAkS4CA--.49287S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3GrWUtw1Dur1UCrW3Kr1rZwb_yoWfGF4DpF
+	s5KFyIkr4xJ3s8Xr4jyr1Iq3WrGFZrZF1DJrZ7Gr1UAFW7Gr17JrWDAFWDGwsrCrW8AFy7
+	GFnrJF4jgr18J3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvj14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26r4U
+	JVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4x0Y4vEx4A2jsIEc7CjxVAFwI0_Gc
+	CE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG64xvF2IEw4CE5I8CrVC2j2WlYx0E
+	2Ix0cI8IcVAFwI0_Jr0_Jr4lYx0Ex4A2jsIE14v26r1j6r4UMcvjeVCFs4IE7xkEbVWUJV
+	W8JwACjcxG0xvY0x0EwIxGrwACjI8F5VA0II8E6IAqYI8I648v4I1lFIxGxcIEc7CjxVA2
+	Y2ka0xkIwI1l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxVAqx4
+	xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q6r43
+	MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6xkF7I
+	0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY6I8E87Iv67AKxVWU
+	JVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyTuYvjfUoO
+	J5UUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: MW4PR11MB6738:EE_|DS0PR11MB7287:EE_
-X-MS-Office365-Filtering-Correlation-Id: 081f7d39-ce4d-4a7a-d7ef-08db757d1b5a
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: MTVhXIWYndlL9trvNQbjNK4Qf89ZZKVI5Jm00z8YdStElgJZ+yVtGhLEtuGhPD7H7J8yg/JrHwaaK6GIOBv53K4oAub9uqQ5ggIzFzKd+10vdxYJnPV/78rCFZUbWC5iXXL0pFXmqYpLhCeg3wiD8jSKmluAKBJKvr3gUhmj8Tuta9GJ6d9ypcvVk/K6uTxDjeWPCpES3eG5n4wP7B5lC+dJkuTobvUmIkQI26wDPut6Syj1qWDxUNr4Nh6MVAbslUkDssDFoFT4EAA4lT5sbt1o6EtZrXH0jOFD1ua6CrBL848BmBCdq50NGtE/XYVysABCKdrgC7BrI57dglf2PCKqMaoGYiRf9r5vAVUXrd/FWg9eTrPOOhL3flv9uFQWm/8t1pZtCB/L9QHlOCG9T+hYAxzvc3v5j5QiTM7uH13lUiW6xq81eN9z4HBKq3aImH2CPMVpmtTT/MX/WViLnHFDf1zclnQPRscR88wCaBH2f9z2bpFSnsSP6ZXqdTYwKoJIJeyoKYpA4iEWRUKzrIbg1+GMJqcJfUzDrfQesQk43dvckfFC5eS5rRrhNBrOfgEWbCLAijHkgaTN9E1fH6K+OFQ3XMTeuJ+17to26FKQTQINO/lz0IePwY6HEGTr
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW4PR11MB6738.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(366004)(136003)(376002)(346002)(396003)(39860400002)(451199021)(31686004)(6666004)(6486002)(966005)(110136005)(54906003)(478600001)(83380400001)(2616005)(82960400001)(86362001)(31696002)(66476007)(2906002)(53546011)(186003)(26005)(6506007)(6512007)(36756003)(6636002)(4326008)(316002)(66556008)(66946007)(5660300002)(38100700002)(8936002)(8676002)(7416002)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?bFRsQW5aYVFzYzY3bUtacDAvQ0ZJV240ZVRpNGJJTjZGQ2YxTEdZbUF0SS9W?=
- =?utf-8?B?ZWlweTJOVmN3bThHM01obUlkYzJZWm5odkxuWnZHM3B2YmZDNExlTEFyeUZz?=
- =?utf-8?B?dlR1aFk4RURGd004bHRVK2R5eU03bDN4N1BJdTd3MFU0dUZjQTRVZGZOd01q?=
- =?utf-8?B?SmNiS1RPWDFhQnFWbVR6c2d4MVVZRS9IS1AyR25RSnFIakYxT2VRdTF6NzFk?=
- =?utf-8?B?bW5OWFNEQnNhYm0xUFMrUGZVWGJZVGlRSTFmU3Z1am9hbDBTSlFOeGc0anha?=
- =?utf-8?B?bE1xMklFcW5kdzQvWTVCRUhtT0w2WDVyeThBYlJodjVuam5qN093TTZLZXRL?=
- =?utf-8?B?Qm9EQVlXZStsem1PaGtscWxuV2o3a0lDb3VPT3U3SlNBMjVZY2RUYmlUbTZF?=
- =?utf-8?B?amQ1OVhLQ0Z1QzJrVVJwV2pNWFZ5NHdFZWhiZUV2b244ZmFOallyN2xENGRh?=
- =?utf-8?B?Y0NPQWhCMW1TSzhGUHBjYnF2NWdtVWhzYUg1UFpkWlNEZ0hSQU1iM0RnYlZ4?=
- =?utf-8?B?VUdjZjZpVktyL2JDUWhmZC9nTXdoM2V0ajAzVTdPeHhvUjJJT3QwdjNDeVNv?=
- =?utf-8?B?ZXc3WCtxNHllZU01R3NIQ1N6cU5DZFhBN243U3RYTHE5VnF5UytqSlBrRkd0?=
- =?utf-8?B?ZUptb1BPbjhqT2FveVYrL2hoa3czclRkRzIzR21aZ0d5eG1EQWVtZXo2bTZX?=
- =?utf-8?B?MFVDdGpVZ2RrbXUralhRV0p2cGlYK0w4UlE1Q0NmcDdlSUxrUFpyWVNSQktq?=
- =?utf-8?B?a21UdEVMOEEzWHB5NkRtVEJwSlRTcEM3aWNKYUZDRS95RSs3VzhoQnNhOW5z?=
- =?utf-8?B?c3dYRDRPTUxkQ2t1dVVqYXRURUl6WXVFU2k2ZHNRaDJtR1ZYOFJMblQ4SkRR?=
- =?utf-8?B?Ry94L0dJZHBmSUhqQUhFTUVuOTFvSXpQNFgySHl0UDBlS1dGa2hCZ01XVlEy?=
- =?utf-8?B?b3diRURzckZxT3dhaUNWeEN4UDZVM2RsUEY3Qk5JZXc2a0RJUXEzQjRFOURU?=
- =?utf-8?B?K2FsRWJUYm15QjNjZEErbFdKbEpxTVcxZ1pCN2RYZFhpNnNhOVlnTGc2Z3N4?=
- =?utf-8?B?cmhRZHY2a2NiQTY3aDI2YTlUdzF3cG9QaSs3ZUZobEFHZGxyUi9iclRJY2tW?=
- =?utf-8?B?RmJ4aFhvZ3dDdzlmRWd4SFUzMTAybWdmbUVKamZpTHdrM20zcmNGVTlDS1dT?=
- =?utf-8?B?cmRET2Z3UGwyT0lqRVNJcnc1OC9UOTg1WmRPcEluQmJreFplZ2hFaDFJRnVN?=
- =?utf-8?B?ZjUzczhwYkJVa05FMjBaaUNYY1dlN2lZbkF6VVptWnlDQ1M2MzZvaHFwajcv?=
- =?utf-8?B?WVlIdm52UlJwM3VOUGlFMk1nNlFncVhuN2VUVXhPamJUTzg4azNHN1RkVENp?=
- =?utf-8?B?aGxsUE5WOE0xd1VoelkrMDZqZ0ZvRFNkQkc1WDJ5TEFnRmsxUlJNZ3UyYXlr?=
- =?utf-8?B?bmF2ZEphOXNpOTkyOHF6TXJVNnZZMGxGUTREcmhiSzRVQVhGVjZDZFZkcE5s?=
- =?utf-8?B?T3hMc1JrZTJKUS9zZVkzYjBHb1ZjT3NSN0k5bVNjVlJlYnFwazlUY1NsaDAx?=
- =?utf-8?B?RFJJTWk4VTdmVDBxZnRwZkdMeGcyYU9kNk5EZFVxbnZUZHM5b3AxSlE5Q2M0?=
- =?utf-8?B?d3cxZ2k3V1NmVVAyTmhWTlBsWTdkemZrbFRWSmxJWWJ5cDE4QklhaGl5VU9W?=
- =?utf-8?B?WW1SK3kxd3pYdTJ3NHIyQkF5OWd4Sm9NWXBCZXFNem1MOUxEYTdncTBWQXpl?=
- =?utf-8?B?ODVQbHg4cWo0czMwU3ZUcDByU3V3emxtdEU5REVIZFcvRFNjbXFPQk1NSW9T?=
- =?utf-8?B?TkpsYnYrQVUycGlHbHhuY3hxRFNyZWUyK2plc2JpUEJUbjEveGJmU1ZyczBD?=
- =?utf-8?B?YmE1NjIxZFd3aHR5THpTbUMydTU2Y3JwcitZRjdiTEJsRGFZeVBmQ05URHUy?=
- =?utf-8?B?eFdBbEwxdGIzRGw0K3liM3dZSVMyMnhDRmxidS9EU0FuendLMjkzNWR3ajBF?=
- =?utf-8?B?RGs4dG5TcWU5Wjl4cWM5ZGVtVUF4aTNuMWU4TjBJOHQzYk9rTVNmcjd1OWI1?=
- =?utf-8?B?bVUvNVR5NWg5M1hsQkt3Y09HVloxcU1QNlhuTWJLVXJaK2R4aTloMVRGbFVu?=
- =?utf-8?Q?INrYzlKN3/vui2Xd2sYxBbm2c?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 081f7d39-ce4d-4a7a-d7ef-08db757d1b5a
-X-MS-Exchange-CrossTenant-AuthSource: MW4PR11MB6738.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 13:07:19.6157
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: QW6UrxLaVLYOTnZOwj0ELIFnT0tpKGZh/Sd/Oq58MfwGjZ5js12pSImatPgVyJtMRWacfIRR+H2/I0XLFwx8pg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB7287
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 6/25/2023 09:28, naamax.meir wrote:
-> On 6/1/2023 19:25, Kai-Heng Feng wrote:
->> On some I219 devices, ethernet cable plugging detection only works once
->> from PCI D3 state. Subsequent cable plugging does set PME bit correctly,
->> but device still doesn't get woken up.
->>
->> Since I219 connects to the root complex directly, it relies on platform
->> firmware (ACPI) to wake it up. In this case, the GPE from _PRW only
->> works for first cable plugging but fails to notify the driver for
->> subsequent plugging events.
->>
->> The issue was originally found on CNP, but the same issue can be found
->> on ADL too. So workaround the issue by continuing use PME poll after
->> first ACPI wake. As PME poll is always used, the runtime suspend
->> restriction for CNP can also be removed.
->>
->> Signed-off-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
->> ---
->>   drivers/net/ethernet/intel/e1000e/netdev.c | 4 +++-
->>   1 file changed, 3 insertions(+), 1 deletion(-)
-> 
-> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
-Acked-by: Sasha Neftin <sasha.neftin@intel.com>
-> _______________________________________________
-> Intel-wired-lan mailing list
-> Intel-wired-lan@osuosl.org
-> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
+We found below OOB crash:
+
+[   44.211730] ==================================================================
+[   44.212045] BUG: KASAN: slab-out-of-bounds in memcmp+0x8b/0xb0
+[   44.212045] Read of size 8 at addr ffff88800870f320 by task poc.xfrm/97
+[   44.212045]
+[   44.212045] CPU: 0 PID: 97 Comm: poc.xfrm Not tainted 6.4.0-rc7-00072-gdad9774deaf1-dirty #4
+[   44.212045] Call Trace:
+[   44.212045]  <TASK>
+[   44.212045]  dump_stack_lvl+0x37/0x50
+[   44.212045]  print_report+0xcc/0x620
+[   44.212045]  ? __virt_addr_valid+0xf3/0x170
+[   44.212045]  ? memcmp+0x8b/0xb0
+[   44.212045]  kasan_report+0xb2/0xe0
+[   44.212045]  ? memcmp+0x8b/0xb0
+[   44.212045]  kasan_check_range+0x39/0x1c0
+[   44.212045]  memcmp+0x8b/0xb0
+[   44.212045]  xfrm_state_walk+0x21c/0x420
+[   44.212045]  ? __pfx_dump_one_state+0x10/0x10
+[   44.212045]  xfrm_dump_sa+0x1e2/0x290
+[   44.212045]  ? __pfx_xfrm_dump_sa+0x10/0x10
+[   44.212045]  ? __kernel_text_address+0xd/0x40
+[   44.212045]  ? kasan_unpoison+0x27/0x60
+[   44.212045]  ? mutex_lock+0x60/0xe0
+[   44.212045]  ? __pfx_mutex_lock+0x10/0x10
+[   44.212045]  ? kasan_save_stack+0x22/0x50
+[   44.212045]  netlink_dump+0x322/0x6c0
+[   44.212045]  ? __pfx_netlink_dump+0x10/0x10
+[   44.212045]  ? mutex_unlock+0x7f/0xd0
+[   44.212045]  ? __pfx_mutex_unlock+0x10/0x10
+[   44.212045]  __netlink_dump_start+0x353/0x430
+[   44.212045]  xfrm_user_rcv_msg+0x3a4/0x410
+[   44.212045]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[   44.212045]  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+[   44.212045]  ? __pfx_xfrm_dump_sa+0x10/0x10
+[   44.212045]  ? __pfx_xfrm_dump_sa_done+0x10/0x10
+[   44.212045]  ? __stack_depot_save+0x382/0x4e0
+[   44.212045]  ? filter_irq_stacks+0x1c/0x70
+[   44.212045]  ? kasan_save_stack+0x32/0x50
+[   44.212045]  ? kasan_save_stack+0x22/0x50
+[   44.212045]  ? kasan_set_track+0x25/0x30
+[   44.212045]  ? __kasan_slab_alloc+0x59/0x70
+[   44.212045]  ? kmem_cache_alloc_node+0xf7/0x260
+[   44.212045]  ? kmalloc_reserve+0xab/0x120
+[   44.212045]  ? __alloc_skb+0xcf/0x210
+[   44.212045]  ? netlink_sendmsg+0x509/0x700
+[   44.212045]  ? sock_sendmsg+0xde/0xe0
+[   44.212045]  ? __sys_sendto+0x18d/0x230
+[   44.212045]  ? __x64_sys_sendto+0x71/0x90
+[   44.212045]  ? do_syscall_64+0x3f/0x90
+[   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]  ? netlink_sendmsg+0x509/0x700
+[   44.212045]  ? sock_sendmsg+0xde/0xe0
+[   44.212045]  ? __sys_sendto+0x18d/0x230
+[   44.212045]  ? __x64_sys_sendto+0x71/0x90
+[   44.212045]  ? do_syscall_64+0x3f/0x90
+[   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]  ? kasan_save_stack+0x22/0x50
+[   44.212045]  ? kasan_set_track+0x25/0x30
+[   44.212045]  ? kasan_save_free_info+0x2e/0x50
+[   44.212045]  ? __kasan_slab_free+0x10a/0x190
+[   44.212045]  ? kmem_cache_free+0x9c/0x340
+[   44.212045]  ? netlink_recvmsg+0x23c/0x660
+[   44.212045]  ? sock_recvmsg+0xeb/0xf0
+[   44.212045]  ? __sys_recvfrom+0x13c/0x1f0
+[   44.212045]  ? __x64_sys_recvfrom+0x71/0x90
+[   44.212045]  ? do_syscall_64+0x3f/0x90
+[   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]  ? copyout+0x3e/0x50
+[   44.212045]  netlink_rcv_skb+0xd6/0x210
+[   44.212045]  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+[   44.212045]  ? __pfx_netlink_rcv_skb+0x10/0x10
+[   44.212045]  ? __pfx_sock_has_perm+0x10/0x10
+[   44.212045]  ? mutex_lock+0x8d/0xe0
+[   44.212045]  ? __pfx_mutex_lock+0x10/0x10
+[   44.212045]  xfrm_netlink_rcv+0x44/0x50
+[   44.212045]  netlink_unicast+0x36f/0x4c0
+[   44.212045]  ? __pfx_netlink_unicast+0x10/0x10
+[   44.212045]  ? netlink_recvmsg+0x500/0x660
+[   44.212045]  netlink_sendmsg+0x3b7/0x700
+[   44.212045]  ? __pfx_netlink_sendmsg+0x10/0x10
+[   44.212045]  ? __pfx_netlink_sendmsg+0x10/0x10
+[   44.212045]  sock_sendmsg+0xde/0xe0
+[   44.212045]  __sys_sendto+0x18d/0x230
+[   44.212045]  ? __pfx___sys_sendto+0x10/0x10
+[   44.212045]  ? rcu_core+0x44a/0xe10
+[   44.212045]  ? __rseq_handle_notify_resume+0x45b/0x740
+[   44.212045]  ? _raw_spin_lock_irq+0x81/0xe0
+[   44.212045]  ? __pfx___rseq_handle_notify_resume+0x10/0x10
+[   44.212045]  ? __pfx_restore_fpregs_from_fpstate+0x10/0x10
+[   44.212045]  ? __pfx_blkcg_maybe_throttle_current+0x10/0x10
+[   44.212045]  ? __pfx_task_work_run+0x10/0x10
+[   44.212045]  __x64_sys_sendto+0x71/0x90
+[   44.212045]  do_syscall_64+0x3f/0x90
+[   44.212045]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045] RIP: 0033:0x44b7da
+[   44.212045] RSP: 002b:00007ffdc8838548 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+[   44.212045] RAX: ffffffffffffffda RBX: 00007ffdc8839978 RCX: 000000000044b7da
+[   44.212045] RDX: 0000000000000038 RSI: 00007ffdc8838770 RDI: 0000000000000003
+[   44.212045] RBP: 00007ffdc88385b0 R08: 00007ffdc883858c R09: 000000000000000c
+[   44.212045] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+[   44.212045] R13: 00007ffdc8839968 R14: 00000000004c37d0 R15: 0000000000000001
+[   44.212045]  </TASK>
+[   44.212045]
+[   44.212045] Allocated by task 97:
+[   44.212045]  kasan_save_stack+0x22/0x50
+[   44.212045]  kasan_set_track+0x25/0x30
+[   44.212045]  __kasan_kmalloc+0x7f/0x90
+[   44.212045]  __kmalloc_node_track_caller+0x5b/0x140
+[   44.212045]  kmemdup+0x21/0x50
+[   44.212045]  xfrm_dump_sa+0x17d/0x290
+[   44.212045]  netlink_dump+0x322/0x6c0
+[   44.212045]  __netlink_dump_start+0x353/0x430
+[   44.212045]  xfrm_user_rcv_msg+0x3a4/0x410
+[   44.212045]  netlink_rcv_skb+0xd6/0x210
+[   44.212045]  xfrm_netlink_rcv+0x44/0x50
+[   44.212045]  netlink_unicast+0x36f/0x4c0
+[   44.212045]  netlink_sendmsg+0x3b7/0x700
+[   44.212045]  sock_sendmsg+0xde/0xe0
+[   44.212045]  __sys_sendto+0x18d/0x230
+[   44.212045]  __x64_sys_sendto+0x71/0x90
+[   44.212045]  do_syscall_64+0x3f/0x90
+[   44.212045]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]
+[   44.212045] The buggy address belongs to the object at ffff88800870f300
+[   44.212045]  which belongs to the cache kmalloc-64 of size 64
+[   44.212045] The buggy address is located 32 bytes inside of
+[   44.212045]  allocated 36-byte region [ffff88800870f300, ffff88800870f324)
+[   44.212045]
+[   44.212045] The buggy address belongs to the physical page:
+[   44.212045] page:00000000e4de16ee refcount:1 mapcount:0 mapping:000000000 ...
+[   44.212045] flags: 0x100000000000200(slab|node=0|zone=1)
+[   44.212045] page_type: 0xffffffff()
+[   44.212045] raw: 0100000000000200 ffff888004c41640 dead000000000122 0000000000000000
+[   44.212045] raw: 0000000000000000 0000000080200020 00000001ffffffff 0000000000000000
+[   44.212045] page dumped because: kasan: bad access detected
+[   44.212045]
+[   44.212045] Memory state around the buggy address:
+[   44.212045]  ffff88800870f200: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+[   44.212045]  ffff88800870f280: 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045] >ffff88800870f300: 00 00 00 00 04 fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045]                                ^
+[   44.212045]  ffff88800870f380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045]  ffff88800870f400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045] ==================================================================
+
+By investigating the code, we find the root cause of this OOB is the lack
+of checks in xfrm_dump_sa(). The buggy code allows a malicious user to pass
+arbitrary value of filter->splen/dplen. Hence, with crafted xfrm states,
+the attacker can achieve 8 bytes heap OOB read, which causes info leak.
+
+  if (attrs[XFRMA_ADDRESS_FILTER]) {
+    filter = kmemdup(nla_data(attrs[XFRMA_ADDRESS_FILTER]),
+        sizeof(*filter), GFP_KERNEL);
+    if (filter == NULL)
+      return -ENOMEM;
+    // NO MORE CHECKS HERE !!!
+  }
+
+This patch fixes the OOB by adding necessary boundary checks, just like
+the code in pfkey_dump() function.
+
+Fixes: d3623099d350 ("ipsec: add support of limited SA dump")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+V1 -> V2: add kfree() hence no memory leak
+
+ net/xfrm/xfrm_user.c | 6 ++++++
+ 1 file changed, 6 insertions(+)
+
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index c34a2a06ca94..88301c3295bd 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -1267,6 +1267,12 @@ static int xfrm_dump_sa(struct sk_buff *skb, struct netlink_callback *cb)
+ 					 sizeof(*filter), GFP_KERNEL);
+ 			if (filter == NULL)
+ 				return -ENOMEM;
++
++			if (filter->splen >= (sizeof(xfrm_address_t) << 3) ||
++			    filter->dplen >= (sizeof(xfrm_address_t) << 3)) {
++				kfree(filter);
++				return -EINVAL;
++			}
+ 		}
+ 
+ 		if (attrs[XFRMA_PROTO])
+-- 
+2.17.1
 
 
