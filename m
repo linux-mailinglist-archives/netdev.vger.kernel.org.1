@@ -1,139 +1,90 @@
-Return-Path: <netdev+bounces-13813-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13814-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E32B473D10E
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:42:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3563273D113
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 14:47:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27F801C20911
-	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:42:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 22C7A1C208FC
+	for <lists+netdev@lfdr.de>; Sun, 25 Jun 2023 12:47:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA430443F;
-	Sun, 25 Jun 2023 12:42:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93DEA5661;
+	Sun, 25 Jun 2023 12:47:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C499220F6
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:42:41 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2070d.outbound.protection.outlook.com [IPv6:2a01:111:f400:7e89::70d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 512FAE51;
-	Sun, 25 Jun 2023 05:42:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=ZZf9TAT/miRRfetcjxAn0JGAbYTARHpKM+PsiFl+Hk64+rGxzJRsnY5DnWAjhJZ2wCJ4v3WLjJ6O6w11AR+uAcB5TfhHAZeEfbNE+cRlBU9kEJPPjCVgGxKfQVqU1LGtlgrGivFG4bCGJVkNH3TcWpxNPmCZaIFZ9ttgxaQnqPL5XDx6VvQO5uvJKQl3C70nURQpMaOLAM8b3pWBqDwPsrdGhETjvJHF2DhjD2w8U+TGuA1lJJJWBukdg4be/IUfXafw6532RcWJT0013/o/2jcEg/A9LV8YgwwqCuTGFpzXkKnOOFoOcD3AC34QXWCly8MogZLjnpfzk2O/z32Zfg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=YgbweR0YYAHqwHlD11oHU17KIiR4xgQq+oZfg93vC5Q=;
- b=egFpm9bXmfMhRxw+6SuwqkqYLnfrysVF1YF8Tet9ow+4ubGUwFitv1eXi3ikofJI+TR/WEZg8EkaEX+O7TsmgIaEl0QeQFPcMXjxDcleeeD5Vmp1WUlhBOuR7zufFOWaiPYuSY9TJ7FgNPDroe1pqlhynFPmhwzLeNhLnp97ETpw/S25Xl86QKCfj2MVI42iYN5L75801jNTS7LJ4/zXJDa8yCHIA7n7yHf7KwxWoDdfJqRdCqLAzaoZwyM7duaONPCJwHAbcP5SZTg9Few/qx7C2UBdtOQthHtPHwtI7g86btMxEl2P7NC0l3/JumpNADT8v/mS2gL5IY7My7DyNA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8156F46A3
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 12:47:27 +0000 (UTC)
+Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 305DF90;
+	Sun, 25 Jun 2023 05:47:24 -0700 (PDT)
+Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-98802908fedso281928566b.1;
+        Sun, 25 Jun 2023 05:47:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=YgbweR0YYAHqwHlD11oHU17KIiR4xgQq+oZfg93vC5Q=;
- b=nzsekuU/X+ZQ+OC2hRDTJkEJ8hF380fwwC0mOANQbJ4e4VONuMu0UNJ2oRDKM+11mg/vTXq4mDDn2lTWMLaReCgGKSB6zic319lEgEZw/BpLC5NKMjgBV/4zyL0wnrshrpnn+1kl4Ta7SvxuPCtQvyRqXwVH0XUPo3vK2AHxAWM=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BN0PR13MB5200.namprd13.prod.outlook.com (2603:10b6:408:157::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Sun, 25 Jun
- 2023 12:42:34 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Sun, 25 Jun 2023
- 12:42:34 +0000
-Date: Sun, 25 Jun 2023 14:42:27 +0200
-From: Simon Horman <simon.horman@corigine.com>
+        d=gmail.com; s=20221208; t=1687697242; x=1690289242;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=NImB+nDREXRyoYcTfbpF7jHbPB+3nuf+py0mnCeHIEs=;
+        b=UY6zAcH3hU8b2uXnoS09tJ/vPua/WWSUg6CossrGHKI25rKJgjhLaRhOEPodXKJVfk
+         kdt4TS92nHx1ePgkoBcg2D9iUwqAf5ccZi54tFJIFuWs0OgdZbs/PLbC4gnEe0MMcqQU
+         9kXVZS46kgajwHZWM7uIaikchMLnHbTa8/sv3vyLy+s2HlE4wu87PmlhpssEKO4bZy6s
+         iOYzst+9RhYQcwUfXkxzK+oduDaCj2UGU1EQZ+4X7h8m7MLXPOVJYhUDwaC4BOWM5ME4
+         RHq2aY+sEOJegK62AY3TpFkwRww2wdJgO3IQ/wCHGz+oyzYDk9TdrXNIOQdTt8Dlxboo
+         SzFg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687697242; x=1690289242;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=NImB+nDREXRyoYcTfbpF7jHbPB+3nuf+py0mnCeHIEs=;
+        b=P6JlIoKivpiqggt2BWhdN3e5bXS+vt85uj43dHTk26dF/uNsljazMJX3NCzzjCpZHi
+         a3CZToxApL+v/N9lZRUsddUn96yY8UWbQPtnoSgmrebV1YaMIkNEM0T0zfnKGiI3tnTm
+         2a9gu4VkVFhG2flHOu20WigXA2Wf21Mz/May2zEm6p3XoAxxjag/KPFes9tM7LoRtSuI
+         opKBw90RAFCBOcc3yNcuc70TtIm15aNGAQlTGUHpGlqZebKsepfkJXwbFaSEy8HxQXPl
+         kZ9DMKawfGPcqiM5Eay7HLGEEJhKM7vZ61ueyKRWlM+eLvb4i+tTojFJaymqLX4FBWtn
+         q7Ag==
+X-Gm-Message-State: AC+VfDy/iVrhlLHi3aCSyv0EaA/bIVygxg/HeaqF0uy16Ybarm1seFa7
+	1w6VhPOISXn6iAIqei7FoLo=
+X-Google-Smtp-Source: ACHHUZ7JsHvoPArn4vlAmMwfvl1b3V+R88PyOhmPaQtH4KPsWyvDH2/KaSAiVc4U/n8SLUkbbtn4Ow==
+X-Received: by 2002:a17:906:db0b:b0:982:6bba:79c9 with SMTP id xj11-20020a170906db0b00b009826bba79c9mr21269191ejb.20.1687697242219;
+        Sun, 25 Jun 2023 05:47:22 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id h6-20020a170906398600b009829f31dd08sm2051204eje.50.2023.06.25.05.47.21
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 05:47:21 -0700 (PDT)
+Date: Sun, 25 Jun 2023 15:47:19 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
 To: Pawel Dembicki <paweldembicki@gmail.com>
 Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
 	Andrew Lunn <andrew@lunn.ch>,
 	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Dan Carpenter <dan.carpenter@linaro.org>
+	linux-kernel@vger.kernel.org
 Subject: Re: [PATCH net-next v2 4/7] net: dsa: vsc73xx: Add dsa tagging based
  on 8021q
-Message-ID: <ZJg2M+Qvg3Fv73CH@corigine.com>
+Message-ID: <20230625124719.6yn7z2r2kfds5kbv@skbuf>
 References: <20230625115343.1603330-1-paweldembicki@gmail.com>
  <20230625115343.1603330-4-paweldembicki@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230625115343.1603330-4-paweldembicki@gmail.com>
-X-ClientProxiedBy: AM0PR03CA0064.eurprd03.prod.outlook.com (2603:10a6:208::41)
- To PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BN0PR13MB5200:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4d29f0b8-428e-401b-f9c5-08db7579a5f6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	cuT0SkceznXPTOoo1nRKRWVwZJspVAv0bYGJY8bwYeZh1f1xKDvjXlU0wZdnpRQU3nwXipobBma6rxe8W3xTCZ0bd0vmrS+DsToZLjRyn+9e8ugLw/D77iwU/FYUA1Qd/wt32FyyHW0fSNyRdg4bCDB4A04tkaSOm3SmKjPtvGmFmz/uf3IessnuP4BoYVmuNg97JcRjUhgzcGFbD5g5UkgzlqwxajpeUWFY+oeZFNHU6WLicHB1ZVUjm0hE+6BER6PzXbDXLK1yl+tz4KVfGobA65htHNMYo44+K9v+pxKfSqHJpoc0OrcvG3QtlF2RCh4RkfgC0AtQ5ocTM+U934FS7OrQJC/usayyDwUUjj0h+Rte5ZMwtFmS/a7yncAmsXLFNP7vOeM6LsXdVrgEvV9rFcsXNCTo0BsNEJYfLq1I3ogugWGXTrSgt5yDx7NC6bnLOF3X5GeSFcO0rAmOTPyFDVqoxErCnzOikUkWhnOfzUywKyI9VXoZi7uWq2Stl+xvezQ2IPc3/o5F9ntfHzANYtK33znCHiEkDUEjgX9vf6XehXr35gsn5SiqqpsyIT916eDBFZGDEaLV4ug1p8Bbds9oGjl7aHwsZU5bmQpa1gB6s7qkZfi7IimTh+pd9gHd9bAoUaB02H4ppIw2rw==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(39840400004)(136003)(376002)(366004)(451199021)(186003)(2906002)(6666004)(7416002)(8676002)(36756003)(6916009)(316002)(54906003)(478600001)(6486002)(86362001)(4326008)(2616005)(38100700002)(41300700001)(44832011)(5660300002)(8936002)(66556008)(66946007)(66476007)(6512007)(6506007)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?U+jAQ5J318OpA2PfFJzxRvftnuFzz6Xu4GOw4Acw5bmuvnA+qAtyIimmXhqP?=
- =?us-ascii?Q?iF1/vBm02O/sGCmaSuZPbDWqS1I8j+JOYVv/dBxpMkfgBDFBetmrSRgajazG?=
- =?us-ascii?Q?2i6klgVshtugXpDT0cNQxB4drtZ55MlnYn4bgK8kNuxraOrO41X/563mKb2m?=
- =?us-ascii?Q?iSq96fy14r7z7PUmyO/G0whdA8LJCZb9yTOpoEULfjKNaW8WGe6GalilRKem?=
- =?us-ascii?Q?Yuwi1777q0Ew5YRHL+dbw9jDloYqC50/kXu64IQWnFbgJ4vsDNhSyW9PINeS?=
- =?us-ascii?Q?5rpVOVB99+hX5QxX/56Ii6mV3jB9wazjSaTXKYkqgc07FkO70uzdi6Cpd6Nt?=
- =?us-ascii?Q?HovnDLehQ1WJRnpbQNuNmmOK5XCc/4vtr5eooxOn7wrivZ/Fl6HrxvdlJ0jj?=
- =?us-ascii?Q?IOl1De5actxNGuWDVcbHhwaoVNNs+lQcaQqOPIOGuXZmaMiNDkZs2yvPnATT?=
- =?us-ascii?Q?AxL0M3QOhTNF/WgMt3T/HDJUhWK5UfSd4tlMrurt7OCz88V17Bn7Hu3TWhAS?=
- =?us-ascii?Q?CqQPUwMR/Yt/SylYgMt2LQdyuZfIf5iPxeQb1wHapZdErYJ2uW9kvBeh64cS?=
- =?us-ascii?Q?x3XDjjnJh5ADeSR+y2rpINirXD7N0ArEBMoXjhBNXaTVCDyX69b0KbfPOlGe?=
- =?us-ascii?Q?dddX2QooQDk87stcsRWLUQfZ01W+COOJRHon8CgK4ma0F7UUkrvFVNJXDR8c?=
- =?us-ascii?Q?29FR9q/5L4bneqdUhpwLDx/znC2lioZ8wjQTuELAOVLyiMycGcKm1U7VnG0O?=
- =?us-ascii?Q?ttK410rNkKpRvqfdfJD6U8qB8ggve+gNoK1tqaqPNCjDadbr2R28GwB69wCx?=
- =?us-ascii?Q?8sZXXzfs54XKfjfy5Ugh6uGGU/eCNdg7HW+iBOqDxF2n0KTcT61JALpXo6Az?=
- =?us-ascii?Q?8PgzQmsCQHTI/YqAnTNTRsAoKoThEswn+JzLSiQJpGo5Lu5WoCeheTJ3zLU9?=
- =?us-ascii?Q?LhxcrZlUkQ7E25nNdsEpdLIy8IXActnOlzpC8TVH2FqMHpx7SXPABkaKXCuI?=
- =?us-ascii?Q?fLiNHDy5Vgtkgki52rgbqNOcjXDhcqTylLLJ16q/5RLkyGgoZVqiZjwxhog+?=
- =?us-ascii?Q?i3i+sBHOQHUVR+J1UPhRRmkzzUZf4EGGncRb+h9vqXXnFwbfS0ttiK9Iysko?=
- =?us-ascii?Q?1NmV9Rk91vMpnt1haSF2TcKTf/1zmP3QQfaIzKkNIevBcIjKzDAx75zIP4uQ?=
- =?us-ascii?Q?NQbiEOBN84cI+m7B7cO4zq0MEXtV3fGqNlw3lxyd6vh96AMhwBwXEN4vr6Rk?=
- =?us-ascii?Q?vBAFgupbCbU2qVUDHJR+Ct7HPVzDZukFtnh/daO73kSGdkXjnc/XcesAIBhb?=
- =?us-ascii?Q?hnIA+sHaWpy3o1wdIch3TqgYb8MTSm8Or7Us6NJ2H2bEnvb7Y50gwnFrtrRd?=
- =?us-ascii?Q?33eZP4d+msYYYylEGmjNjhey8mv9IriNQQj6G3aTpWZft2nIPv48p8gZbijN?=
- =?us-ascii?Q?mE6jzeN1tyxPTrRdoV2kntbNi5Dp+x+XcjMbUZHSuemAbDe74uIHZjNRVET9?=
- =?us-ascii?Q?dyDdsZmG3EYSm+DW0OR2XKuHyaxpO9SxBMm5131J2vjNCU4eSKFNY7TwS8ce?=
- =?us-ascii?Q?yZGXVlqdZqpxKhdq3/oRL6nahuXc7MJiPm/kun+FwC5jIO8K8I4N3ntAiZXt?=
- =?us-ascii?Q?VO6ItWBrm6OCRJOTOgJiB+Qxjn32M4nCPERGRVPpfUG1GWgk7blzxuvXHiYX?=
- =?us-ascii?Q?a6K3GA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4d29f0b8-428e-401b-f9c5-08db7579a5f6
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 25 Jun 2023 12:42:34.0703
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: H4MLqiqPAUUWd5ZQ/nNm3VW4CsiKZlQ0e9YcciqfMhKWFMtyujyYIothzfIGhPJ2zmDWWLCF5HbEoKYEKKIz5YM8Td72ShlLeXUR8QsOJNs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB5200
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230625115343.1603330-4-paweldembicki@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
-
-+ Dan Carpenter
 
 On Sun, Jun 25, 2023 at 01:53:39PM +0200, Pawel Dembicki wrote:
 > This patch is simple implementation of 8021q tagging in vsc73xx driver.
@@ -152,54 +103,759 @@ On Sun, Jun 25, 2023 at 01:53:39PM +0200, Pawel Dembicki wrote:
 > 
 > Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
 > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
-
-...
-
-> +static void vsc73xx_vlan_rcv(struct sk_buff *skb, int *source_port,
-> +			     int *switch_id, int *vbid, u16 *vid)
-> +{
-> +	if (vid_is_dsa_8021q(skb_vlan_tag_get(skb) & VLAN_VID_MASK))
-> +		return dsa_8021q_rcv(skb, source_port, switch_id, vbid);
+> ---
+> v2:
+>   - change poll loop into dedicated macro
+>   - fix style issues
+> 
+>  drivers/net/dsa/Kconfig                |   2 +-
+>  drivers/net/dsa/vitesse-vsc73xx-core.c | 532 +++++++++++++++++++++----
+>  include/net/dsa.h                      |   2 +
+>  net/dsa/Kconfig                        |   6 +
+>  net/dsa/Makefile                       |   1 +
+>  net/dsa/tag_vsc73xx_8021q.c            |  87 ++++
+>  6 files changed, 544 insertions(+), 86 deletions(-)
+>  create mode 100644 net/dsa/tag_vsc73xx_8021q.c
+> 
+> diff --git a/drivers/net/dsa/Kconfig b/drivers/net/dsa/Kconfig
+> index 3ed5391bb18d..4cf0166fef7b 100644
+> --- a/drivers/net/dsa/Kconfig
+> +++ b/drivers/net/dsa/Kconfig
+> @@ -125,7 +125,7 @@ config NET_DSA_SMSC_LAN9303_MDIO
+>  
+>  config NET_DSA_VITESSE_VSC73XX
+>  	tristate
+> -	select NET_DSA_TAG_NONE
+> +	select NET_DSA_TAG_VSC73XX
+>  	select FIXED_PHY
+>  	select VITESSE_PHY
+>  	select GPIOLIB
+> diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> index f123ce2ed244..f7c38f9a81a8 100644
+> --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> @@ -17,6 +17,7 @@
+>  #include <linux/kernel.h>
+>  #include <linux/module.h>
+>  #include <linux/device.h>
+> +#include <linux/iopoll.h>
+>  #include <linux/of.h>
+>  #include <linux/of_device.h>
+>  #include <linux/of_mdio.h>
+> @@ -25,6 +26,7 @@
+>  #include <linux/etherdevice.h>
+>  #include <linux/gpio/consumer.h>
+>  #include <linux/gpio/driver.h>
+> +#include <linux/dsa/8021q.h>
+>  #include <linux/random.h>
+>  #include <net/dsa.h>
+>  
+> @@ -62,6 +64,8 @@
+>  #define VSC73XX_CAT_DROP	0x6e
+>  #define VSC73XX_CAT_PR_MISC_L2	0x6f
+>  #define VSC73XX_CAT_PR_USR_PRIO	0x75
+> +#define VSC73XX_CAT_VLAN_MISC	0x79
+> +#define VSC73XX_CAT_PORT_VLAN	0x7a
+>  #define VSC73XX_Q_MISC_CONF	0xdf
+>  
+>  /* MAC_CFG register bits */
+> @@ -122,6 +126,17 @@
+>  #define VSC73XX_ADVPORTM_IO_LOOPBACK	BIT(1)
+>  #define VSC73XX_ADVPORTM_HOST_LOOPBACK	BIT(0)
+>  
+> +/*  TXUPDCFG transmit modify setup bits */
+> +#define VSC73XX_TXUPDCFG_DSCP_REWR_MODE	GENMASK(20, 19)
+> +#define VSC73XX_TXUPDCFG_DSCP_REWR_ENA	BIT(18)
+> +#define VSC73XX_TXUPDCFG_TX_INT_TO_USRPRIO_ENA	BIT(17)
+> +#define VSC73XX_TXUPDCFG_TX_UNTAGGED_VID	GENMASK(15, 4)
+> +#define VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA	BIT(3)
+> +#define VSC73XX_TXUPDCFG_TX_UPDATE_CRC_CPU_ENA	BIT(1)
+> +#define VSC73XX_TXUPDCFG_TX_INSERT_TAG	BIT(0)
 > +
-> +	/* Try our best with imprecise RX */
-> +	*vid = skb_vlan_tag_get(skb) & VLAN_VID_MASK;
+> +#define VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT 4
+> +
+>  /* CAT_DROP categorizer frame dropping register bits */
+>  #define VSC73XX_CAT_DROP_DROP_MC_SMAC_ENA	BIT(6)
+>  #define VSC73XX_CAT_DROP_FWD_CTRL_ENA		BIT(4)
+> @@ -135,6 +150,15 @@
+>  #define VSC73XX_Q_MISC_CONF_EARLY_TX_512	(1 << 1)
+>  #define VSC73XX_Q_MISC_CONF_MAC_PAUSE_MODE	BIT(0)
+>  
+> +/* CAT_VLAN_MISC categorizer VLAN miscellaneous bits*/
+> +#define VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA BIT(8)
+> +#define VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA BIT(7)
+> +
+> +/* CAT_PORT_VLAN categorizer port VLAN*/
+> +#define VSC73XX_CAT_PORT_VLAN_VLAN_CFI BIT(15)
+> +#define VSC73XX_CAT_PORT_VLAN_VLAN_USR_PRIO GENMASK(14, 12)
+> +#define VSC73XX_CAT_PORT_VLAN_VLAN_VID GENMASK(11, 0)
+> +
+>  /* Frame analyzer block 2 registers */
+>  #define VSC73XX_STORMLIMIT	0x02
+>  #define VSC73XX_ADVLEARN	0x03
+> @@ -189,7 +213,8 @@
+>  #define VSC73XX_VLANACCESS_VLAN_MIRROR		BIT(29)
+>  #define VSC73XX_VLANACCESS_VLAN_SRC_CHECK	BIT(28)
+>  #define VSC73XX_VLANACCESS_VLAN_PORT_MASK	GENMASK(9, 2)
+> -#define VSC73XX_VLANACCESS_VLAN_TBL_CMD_MASK	GENMASK(2, 0)
+> +#define VSC73XX_VLANACCESS_VLAN_PORT_MASK_SHIFT	2
+> +#define VSC73XX_VLANACCESS_VLAN_TBL_CMD_MASK	GENMASK(1, 0)
+>  #define VSC73XX_VLANACCESS_VLAN_TBL_CMD_IDLE	0
+>  #define VSC73XX_VLANACCESS_VLAN_TBL_CMD_READ_ENTRY	1
+>  #define VSC73XX_VLANACCESS_VLAN_TBL_CMD_WRITE_ENTRY	2
+> @@ -344,6 +369,13 @@ static const struct vsc73xx_counter vsc73xx_tx_counters[] = {
+>  	{ 29, "TxQoSClass3" }, /* non-standard counter */
+>  };
+>  
+> +enum vsc73xx_port_vlan_conf {
+> +	VSC73XX_VLAN_UNAWARE,
+> +	VSC73XX_VLAN_AWARE,
+> +	VSC73XX_DOUBLE_VLAN_AWARE,
+> +	VSC73XX_DOUBLE_VLAN_CPU_AWARE,
+> +};
+> +
+>  int vsc73xx_is_addr_valid(u8 block, u8 subblock)
+>  {
+>  	switch (block) {
+> @@ -558,90 +590,7 @@ static enum dsa_tag_protocol vsc73xx_get_tag_protocol(struct dsa_switch *ds,
+>  	 * cannot access the tag. (See "Internal frame header" section
+>  	 * 3.9.1 in the manual.)
+>  	 */
+> -	return DSA_TAG_PROTO_NONE;
+> -}
+> -
+> -static int vsc73xx_setup(struct dsa_switch *ds)
+> -{
+> -	struct vsc73xx *vsc = ds->priv;
+> -	int i;
+> -
+> -	dev_info(vsc->dev, "set up the switch\n");
+> -
+> -	/* Issue RESET */
+> -	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
+> -		      VSC73XX_GLORESET_MASTER_RESET);
+> -	usleep_range(125, 200);
+> -
+> -	/* Initialize memory, initialize RAM bank 0..15 except 6 and 7
+> -	 * This sequence appears in the
+> -	 * VSC7385 SparX-G5 datasheet section 6.6.1
+> -	 * VSC7395 SparX-G5e datasheet section 6.6.1
+> -	 * "initialization sequence".
+> -	 * No explanation is given to the 0x1010400 magic number.
+> -	 */
+> -	for (i = 0; i <= 15; i++) {
+> -		if (i != 6 && i != 7) {
+> -			vsc73xx_write(vsc, VSC73XX_BLOCK_MEMINIT,
+> -				      2,
+> -				      0, 0x1010400 + i);
+> -			mdelay(1);
+> -		}
+> -	}
+> -	mdelay(30);
+> -
+> -	/* Clear MAC table */
+> -	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> -		      VSC73XX_MACACCESS,
+> -		      VSC73XX_MACACCESS_CMD_CLEAR_TABLE);
+> -
+> -	/* Clear VLAN table */
+> -	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> -		      VSC73XX_VLANACCESS,
+> -		      VSC73XX_VLANACCESS_VLAN_TBL_CMD_CLEAR_TABLE);
+> -
+> -	msleep(40);
+> -
+> -	/* Use 20KiB buffers on all ports on VSC7395
+> -	 * The VSC7385 has 16KiB buffers and that is the
+> -	 * default if we don't set this up explicitly.
+> -	 * Port "31" is "all ports".
+> -	 */
+> -	if (IS_739X(vsc))
+> -		vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, 0x1f,
+> -			      VSC73XX_Q_MISC_CONF,
+> -			      VSC73XX_Q_MISC_CONF_EXTENT_MEM);
+> -
+> -	/* Put all ports into reset until enabled */
+> -	for (i = 0; i < 7; i++) {
+> -		if (i == 5)
+> -			continue;
+> -		vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, 4,
+> -			      VSC73XX_MAC_CFG, VSC73XX_MAC_CFG_RESET);
+> -	}
+> -
+> -	/* MII delay, set both GTX and RX delay to 2 ns */
+> -	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
+> -		      VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS |
+> -		      VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS);
+> -	/* IP multicast flood mask (table 144) */
+> -	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_IFLODMSK,
+> -		      0xff);
+> -
+> -	mdelay(50);
+> -
+> -	/*configure forward map to CPU <-> port only*/
+> -	for (i = 0; i < vsc->ds->num_ports; i++)
+> -		vsc->forward_map[i] = VSC73XX_SRCMASKS_PORTS_MASK & BIT(CPU_PORT);
+> -	vsc->forward_map[CPU_PORT] = VSC73XX_SRCMASKS_PORTS_MASK & ~BIT(CPU_PORT);
+> -
+> -	/* Release reset from the internal PHYs */
+> -	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
+> -		      VSC73XX_GLORESET_PHY_RESET);
+> -
+> -	udelay(4);
+> -
+> -	return 0;
+
+Try to make this code movement part of a separate patch. It's
+distracting and makes it hard to see what really changed.
+
+> +	return DSA_TAG_PROTO_VSC73XX_8021Q;
+>  }
+>  
+>  static void vsc73xx_init_port(struct vsc73xx *vsc, int port)
+> @@ -1078,6 +1027,417 @@ static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port,
+>  				    VSC73XX_SRCMASKS_PORTS_MASK, 0);
+>  }
+>  
+> +static int
+> +vsc73xx_port_wait_for_vlan_table_cmd(struct vsc73xx *vsc)
+> +{
+> +	u32 val;
+> +	int ret, err;
+> +
+> +	ret = read_poll_timeout(vsc73xx_read, err,
+> +				err < 0 || ((val & VSC73XX_VLANACCESS_VLAN_TBL_CMD_MASK) ==
+> +					    VSC73XX_VLANACCESS_VLAN_TBL_CMD_IDLE),
+> +				1000, 10000, false, vsc, VSC73XX_BLOCK_ANALYZER,
+> +				0, VSC73XX_VLANACCESS, &val);
+> +	if (ret)
+> +		return ret;
+> +	return err;
 > +}
 > +
-> +static struct sk_buff *vsc73xx_rcv(struct sk_buff *skb,
-> +				   struct net_device *netdev)
+> +static int
+> +vsc73xx_port_read_vlan_table_entry(struct dsa_switch *ds, u16 vid, u8 *portmap)
 > +{
-> +	int src_port = -1, switch_id = -1, vbid = -1;
-> +	u16 vid;
+> +	struct vsc73xx *vsc = ds->priv;
+> +	u32 val;
+> +	int ret;
 > +
-> +	if (skb_vlan_tag_present(skb))
-> +		/* Normal traffic path. */
-> +		vsc73xx_vlan_rcv(skb, &src_port, &switch_id, &vbid, &vid);
+> +	if (vid > 4095)
+> +		return -EPERM;
+
+Unnecessary defensive programming.
+
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANTIDX, vid);
+> +	ret = vsc73xx_port_wait_for_vlan_table_cmd(vsc);
+> +	if (ret)
+> +		return ret;
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANACCESS,
+> +			    VSC73XX_VLANACCESS_VLAN_TBL_CMD_MASK,
+> +			    VSC73XX_VLANACCESS_VLAN_TBL_CMD_READ_ENTRY);
+> +	ret = vsc73xx_port_wait_for_vlan_table_cmd(vsc);
+> +	if (ret)
+> +		return ret;
+> +	vsc73xx_read(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANACCESS, &val);
+> +	*portmap = (val & VSC73XX_VLANACCESS_VLAN_PORT_MASK) >>
+> +		   VSC73XX_VLANACCESS_VLAN_PORT_MASK_SHIFT;
+> +	return 0;
+> +}
 > +
-> +	if (vbid >= 1)
-> +		skb->dev = dsa_tag_8021q_find_port_by_vbid(netdev, vbid);
-> +	else if (src_port == -1 || switch_id == -1)
-> +		skb->dev = dsa_find_designated_bridge_port_by_vid(netdev, vid);
+> +static int
+> +vsc73xx_port_write_vlan_table_entry(struct dsa_switch *ds, u16 vid, u8 portmap)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +	int ret;
+> +
+> +	if (vid > 4095)
+> +		return -EPERM;
 
-Hi Pawel,
+Unnecessary defensive programming.
 
-Smatch warns that vid may be used uninitialised here.
-And it's not clear to me why that cannot be the case.
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANTIDX, vid);
+> +	ret = vsc73xx_port_wait_for_vlan_table_cmd(vsc);
+> +	if (ret)
+> +		return ret;
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANACCESS,
+> +			    VSC73XX_VLANACCESS_VLAN_TBL_CMD_MASK |
+> +			    VSC73XX_VLANACCESS_VLAN_SRC_CHECK |
+> +			    VSC73XX_VLANACCESS_VLAN_PORT_MASK,
+> +			    VSC73XX_VLANACCESS_VLAN_TBL_CMD_WRITE_ENTRY |
+> +			    VSC73XX_VLANACCESS_VLAN_SRC_CHECK |
+> +			    (portmap <<
+> +			     VSC73XX_VLANACCESS_VLAN_PORT_MASK_SHIFT));
+> +	ret = vsc73xx_port_wait_for_vlan_table_cmd(vsc);
+> +	if (ret)
+> +		return ret;
+> +	return 0;
+> +}
+> +
+> +static int
+> +vsc73xx_port_update_vlan_table(struct dsa_switch *ds, int port, u16 vid,
+> +			       bool set)
+> +{
+> +	u8 portmap;
+> +	int ret;
+> +
+> +	if (vid > 4095)
+> +		return -EPERM;
 
+Unnecessary defensive programming.
+
+> +
+> +	ret = vsc73xx_port_read_vlan_table_entry(ds, vid, &portmap);
+> +	if (ret)
+> +		return ret;
+> +
+> +	if (set)
+> +		portmap |= BIT(port) | BIT(CPU_PORT);
 > +	else
-> +		skb->dev = dsa_master_find_slave(netdev, switch_id, src_port);
-> +	if (!skb->dev) {
-> +		netdev_warn(netdev, "Couldn't decode source port\n");
-> +		return NULL;
+> +		portmap &= ~BIT(port);
+> +
+> +	if (portmap == BIT(CPU_PORT))
+> +		portmap = 0;
+> +
+> +	ret = vsc73xx_port_write_vlan_table_entry(ds, vid, portmap);
+> +
+> +	return ret;
+
+return vsc73xx_port_write_vlan_table_entry(...)
+
+> +}
+> +
+> +static void
+> +vsc73xx_port_set_vlan_conf(struct dsa_switch *ds, int port,
+> +			   enum vsc73xx_port_vlan_conf port_vlan_conf)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +
+> +	if (port_vlan_conf == VSC73XX_VLAN_UNAWARE) {
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_MAC_CFG,
+> +				    VSC73XX_MAC_CFG_VLAN_AWR, 0);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_MAC_CFG,
+> +				    VSC73XX_MAC_CFG_VLAN_DBLAWR, 0);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_VLAN_MISC,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_VLAN_MISC,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_DROP,
+> +				    VSC73XX_CAT_DROP_TAGGED_ENA, 0);
+> +	} else {
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_MAC_CFG,
+> +				    VSC73XX_MAC_CFG_VLAN_AWR,
+> +				    VSC73XX_MAC_CFG_VLAN_AWR);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_DROP,
+> +				    VSC73XX_CAT_DROP_TAGGED_ENA, 0);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_DROP,
+> +				    VSC73XX_CAT_DROP_UNTAGGED_ENA,
+> +				    VSC73XX_CAT_DROP_UNTAGGED_ENA);
+> +
+> +		if (port_vlan_conf == VSC73XX_DOUBLE_VLAN_CPU_AWARE)
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_MAC_CFG,
+> +					    VSC73XX_MAC_CFG_VLAN_DBLAWR,
+> +					    VSC73XX_MAC_CFG_VLAN_DBLAWR);
+> +		else
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_MAC_CFG,
+> +					    VSC73XX_MAC_CFG_VLAN_DBLAWR, 0);
+> +
+> +		if (port_vlan_conf == VSC73XX_DOUBLE_VLAN_AWARE) {
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_CAT_VLAN_MISC,
+> +					    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA,
+> +					    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA);
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_CAT_VLAN_MISC,
+> +					    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA,
+> +					    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA);
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_TXUPDCFG,
+> +					    VSC73XX_TXUPDCFG_TX_INSERT_TAG, 0);
+> +		} else {
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_CAT_VLAN_MISC,
+> +					    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA,
+> +					    0);
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_CAT_VLAN_MISC,
+> +					    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA,
+> +					    0);
+> +			vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +					    VSC73XX_TXUPDCFG,
+> +					    VSC73XX_TXUPDCFG_TX_INSERT_TAG,
+> +					    VSC73XX_TXUPDCFG_TX_INSERT_TAG);
+> +		}
+> +
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_TXUPDCFG,
+> +				    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA, 0);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_TXUPDCFG,
+> +				    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID, 0);
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_PORT_VLAN,
+> +				    VSC73XX_CAT_PORT_VLAN_VLAN_VID, 0);
+> +	}
+> +}
+> +
+
+I need some time to understand what is being done here.
+
+> +static int vsc73xx_port_set_double_vlan_aware(struct dsa_switch *ds, int port)
+> +{
+> +	int i, ret;
+> +
+> +	if (port == CPU_PORT)
+> +		vsc73xx_port_set_vlan_conf(ds, port,
+> +					   VSC73XX_DOUBLE_VLAN_CPU_AWARE);
+> +	else
+> +		vsc73xx_port_set_vlan_conf(ds, port,
+> +					   VSC73XX_DOUBLE_VLAN_AWARE);
+> +
+> +	for (i = 0; i <= 4095; i++) {
+
+i < VLAN_N_VID
+
+> +		ret = vsc73xx_port_update_vlan_table(ds, port, i, 0);
+> +		if (ret)
+> +			return ret;
+
+Clearing the VLAN table absolutely does not belong in a function that
+makes a port aware of double VLANs. And neither does it belong in a
+function that changes VLAN awareness, but that's not part of this patch,
+but 6/7. The bridge expects the VLAN table to be able to be populated
+asynchronously relative to enabling/disabling it. The same for the
+VLAN-aware FDB and MDB entries.
+
+> +	}
+> +	return ret;
+> +}
+> +
+> +static int vsc73xx_vlan_set_untagged(struct dsa_switch *ds, int port, u16 vid,
+> +				     bool port_vlan)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +	u16 vlan_no;
+> +	u32 val;
+> +
+> +	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG, &val);
+> +
+> +	if (port_vlan && (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA)) {
+> +		vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG,
+> +			     &val);
+> +		vlan_no = (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID) >>
+> +				VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT;
+> +		if (!vid_is_dsa_8021q(vlan_no) && !vid_is_dsa_8021q(vid) &&
+> +		    vlan_no != vid) {
+> +			dev_warn(vsc->dev,
+> +				 "Port %d can have only one untagged vid! Now is: %d.\n",
+> +				 port, vlan_no);
+> +				return -EPERM;
+
+drop indentation by 1 level
+
+don't return -EPERM, as that indicates a permissions-related issue to
+the user process. Perhaps -EOPNOTSUPP.
+
+use the extack for the message.. we now also have NL_SET_ERR_MSG_FMT()
+
+> +		}
 > +	}
 > +
-> +	dsa_default_offload_fwd_mark(skb);
-> +
-> +	if (dsa_port_is_vlan_filtering(dsa_slave_to_port(skb->dev)) &&
-> +	    eth_hdr(skb)->h_proto == htons(ETH_P_8021Q))
-> +		__vlan_hwaccel_clear_tag(skb);
-> +
-> +	return skb;
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_DROP,
+> +			    VSC73XX_CAT_DROP_UNTAGGED_ENA, 0);
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG,
+> +			    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA,
+> +			    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA);
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG,
+> +			    VSC73XX_TXUPDCFG_TX_UNTAGGED_VID,
+> +			    (vid << VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT) &
+> +			     VSC73XX_TXUPDCFG_TX_UNTAGGED_VID);
+> +	return 0;
 > +}
+> +
+> +static int vsc73xx_vlan_set_pvid(struct dsa_switch *ds, int port, u16 vid,
+> +				 bool port_vlan)
+> +{
+> +	struct dsa_port *dsa_port = dsa_to_port(ds, port);
+> +	struct vsc73xx *vsc = ds->priv;
+> +	u16 vlan_no;
+> +	u32 val;
+> +
+> +	if (!dsa_port)
+> +		return -EINVAL;
+> +
+> +	vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_PORT_VLAN, &val);
+> +	vlan_no = val & VSC73XX_CAT_PORT_VLAN_VLAN_VID;
+> +
+> +	if (port_vlan && vlan_no && !vid_is_dsa_8021q(vlan_no) &&
+> +	    !vid_is_dsa_8021q(vid) && vlan_no != vid) {
+> +		dev_warn(vsc->dev,
+> +			 "Port %d can have only one pvid! Now is: %d.\n",
+> +			 port, vlan_no);
+> +		return -EPERM;
+> +	}
+> +
+> +	if (dsa_port_is_vlan_filtering(dsa_port))
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_VLAN_MISC,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA,
+> +				    0);
+> +	else
+> +		vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> +				    VSC73XX_CAT_VLAN_MISC,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA,
+> +				    VSC73XX_CAT_VLAN_MISC_VLAN_TCI_IGNORE_ENA);
+> +
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_VLAN_MISC,
+> +			    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA,
+> +			    VSC73XX_CAT_VLAN_MISC_VLAN_KEEP_TAG_ENA);
+> +
+> +	vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_PORT_VLAN,
+> +			    VSC73XX_CAT_PORT_VLAN_VLAN_VID,
+> +			    vid & VSC73XX_CAT_PORT_VLAN_VLAN_VID);
 
-...
+Why would changing the PVID (what this function does) alter VLAN_TCI_IGNORE_ENA
+and VLAN_KEEP_TAG_ENA?
+
+> +	return 0;
+> +}
+> +
+> +static int vsc73xx_tag_8021q_vlan_add(struct dsa_switch *ds, int port, u16 vid,
+> +				      u16 flags)
+> +{
+> +	bool untagged = flags & BRIDGE_VLAN_INFO_UNTAGGED;
+> +	bool pvid = flags & BRIDGE_VLAN_INFO_PVID;
+> +	int ret;
+> +
+> +	if (untagged) {
+> +		ret = vsc73xx_vlan_set_untagged(ds, port, vid, false);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	if (pvid) {
+> +		ret = vsc73xx_vlan_set_pvid(ds, port, vid, false);
+> +		if (ret)
+> +			return ret;
+> +	}
+> +	ret = vsc73xx_port_update_vlan_table(ds, port, vid, 1);
+
+return vsc73xx_port_update_vlan_table(...)
+
+> +	if (ret)
+> +		return ret;
+> +
+> +	return 0;
+> +}
+> +
+> +static int vsc73xx_tag_8021q_vlan_del(struct dsa_switch *ds, int port, u16 vid)
+> +{
+> +	return vsc73xx_port_update_vlan_table(ds, port, vid, 0);
+> +}
+> +
+> +static int vsc73xx_setup(struct dsa_switch *ds)
+> +{
+> +	struct vsc73xx *vsc = ds->priv;
+> +	int i, ret;
+> +
+> +	dev_info(vsc->dev, "set up the switch\n");
+> +
+> +	ds->vlan_filtering_is_global = false;
+
+No reason to set this, it's false by default.
+
+> +	ds->configure_vlan_while_not_filtering = false;
+
+This is a legacy flag that should be set to true (default value) for all
+drivers and then eliminated.
+
+To check whether your implementation is doing the right thing, you must
+remove this line, and make sure that after this configuration:
+
+ip link add br0 type bridge vlan_filtering 0
+ip link set swp0 master br0
+bridge vlan add dev swp0 vid 100 pvid untagged
+
+the VLAN-unaware forwarding of the switch is not affected. This means
+that the PVID of the port that is committed to hardware (and thus, the
+allowed destination port mask) must remain what the driver set it to,
+while the bridge vlan_filtering option is not enabled. The hardware PVID
+must only follow the bridge port PVID while in vlan_filtering=true mode.
+
+> +
+> +	/* Issue RESET */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
+> +		      VSC73XX_GLORESET_MASTER_RESET);
+> +	usleep_range(125, 200);
+> +
+> +	/* Initialize memory, initialize RAM bank 0..15 except 6 and 7
+> +	 * This sequence appears in the
+> +	 * VSC7385 SparX-G5 datasheet section 6.6.1
+> +	 * VSC7395 SparX-G5e datasheet section 6.6.1
+> +	 * "initialization sequence".
+> +	 * No explanation is given to the 0x1010400 magic number.
+> +	 */
+> +	for (i = 0; i <= 15; i++) {
+> +		if (i != 6 && i != 7) {
+> +			vsc73xx_write(vsc, VSC73XX_BLOCK_MEMINIT,
+> +				      2,
+> +				      0, 0x1010400 + i);
+> +			mdelay(1);
+> +		}
+> +	}
+> +	mdelay(30);
+> +
+> +	/* Clear MAC table */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +		      VSC73XX_MACACCESS,
+> +		      VSC73XX_MACACCESS_CMD_CLEAR_TABLE);
+> +
+> +	/* Clear VLAN table */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0,
+> +		      VSC73XX_VLANACCESS,
+> +		      VSC73XX_VLANACCESS_VLAN_TBL_CMD_CLEAR_TABLE);
+> +
+> +	msleep(40);
+> +
+> +	/* Use 20KiB buffers on all ports on VSC7395
+> +	 * The VSC7385 has 16KiB buffers and that is the
+> +	 * default if we don't set this up explicitly.
+> +	 * Port "31" is "all ports".
+> +	 */
+> +	if (IS_739X(vsc))
+> +		vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, 0x1f,
+> +			      VSC73XX_Q_MISC_CONF,
+> +			      VSC73XX_Q_MISC_CONF_EXTENT_MEM);
+> +
+> +	/* Put all ports into reset until enabled */
+> +	for (i = 0; i < 7; i++) {
+> +		if (i == 5)
+> +			continue;
+> +		vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, 4,
+> +			      VSC73XX_MAC_CFG, VSC73XX_MAC_CFG_RESET);
+> +	}
+> +
+> +	/* MII delay, set both GTX and RX delay to 2 ns */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GMIIDELAY,
+> +		      VSC73XX_GMIIDELAY_GMII0_GTXDELAY_2_0_NS |
+> +		      VSC73XX_GMIIDELAY_GMII0_RXDELAY_2_0_NS);
+> +	/* Ingess VLAN reception mask (table 145) */
+
+s/ingess/ingress/
+
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_VLANMASK,
+> +		      0x5f);
+> +	/* IP multicast flood mask (table 144) */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_ANALYZER, 0, VSC73XX_IFLODMSK,
+> +		      0xff);
+> +
+> +	mdelay(50);
+> +
+> +	for (i = 0; i < vsc->ds->num_ports; i++) {
+> +		if (i == 5)
+> +			continue;
+
+dsa_switch_for_each_available_port()
+
+> +		ret = vsc73xx_port_set_double_vlan_aware(ds, i);
+> +		if (ret)
+> +			return ret;
+
+If ports are made VLAN-aware by default (including in standalone mode),
+shouldn't this be reflected in ds->needs_standalone_vlan_filtering?
+
+> +	}
+> +
+> +	rtnl_lock();
+> +	ret = dsa_tag_8021q_register(ds, htons(ETH_P_8021Q));
+> +	rtnl_unlock();
+> +	if (ret)
+> +		return ret;
+> +
+> +	/*configure forward map to CPU <-> port only*/
+
+style: space after /* and before */ (also present in a few other places)
+
+> +	for (i = 0; i < vsc->ds->num_ports; i++)
+> +		vsc->forward_map[i] = VSC73XX_SRCMASKS_PORTS_MASK &
+> +				      BIT(CPU_PORT);
+> +	vsc->forward_map[CPU_PORT] = VSC73XX_SRCMASKS_PORTS_MASK &
+> +				     ~BIT(CPU_PORT);
+> +
+> +	/* Release reset from the internal PHYs */
+> +	vsc73xx_write(vsc, VSC73XX_BLOCK_SYSTEM, 0, VSC73XX_GLORESET,
+> +		      VSC73XX_GLORESET_PHY_RESET);
+> +
+> +	udelay(4);
+> +
+> +	return 0;
+> +}
+> +
+>  static const struct dsa_switch_ops vsc73xx_ds_ops = {
+>  	.get_tag_protocol = vsc73xx_get_tag_protocol,
+>  	.setup = vsc73xx_setup,
+> @@ -1095,6 +1455,8 @@ static const struct dsa_switch_ops vsc73xx_ds_ops = {
+>  	.port_change_mtu = vsc73xx_change_mtu,
+>  	.port_max_mtu = vsc73xx_get_max_mtu,
+>  	.port_stp_state_set = vsc73xx_port_stp_state_set,
+> +	.tag_8021q_vlan_add = vsc73xx_tag_8021q_vlan_add,
+> +	.tag_8021q_vlan_del = vsc73xx_tag_8021q_vlan_del,
+>  };
+>  
+>  static int vsc73xx_gpio_get(struct gpio_chip *chip, unsigned int offset)
+> diff --git a/include/net/dsa.h b/include/net/dsa.h
+> index 75022cf771cf..2440df7ea6c9 100644
+> --- a/include/net/dsa.h
+> +++ b/include/net/dsa.h
+> @@ -56,6 +56,7 @@ struct phylink_link_state;
+>  #define DSA_TAG_PROTO_RTL8_4T_VALUE		25
+>  #define DSA_TAG_PROTO_RZN1_A5PSW_VALUE		26
+>  #define DSA_TAG_PROTO_LAN937X_VALUE		27
+> +#define DSA_TAG_PROTO_VSC73XX_8021Q_VALUE	28
+>  
+>  enum dsa_tag_protocol {
+>  	DSA_TAG_PROTO_NONE		= DSA_TAG_PROTO_NONE_VALUE,
+> @@ -86,6 +87,7 @@ enum dsa_tag_protocol {
+>  	DSA_TAG_PROTO_RTL8_4T		= DSA_TAG_PROTO_RTL8_4T_VALUE,
+>  	DSA_TAG_PROTO_RZN1_A5PSW	= DSA_TAG_PROTO_RZN1_A5PSW_VALUE,
+>  	DSA_TAG_PROTO_LAN937X		= DSA_TAG_PROTO_LAN937X_VALUE,
+> +	DSA_TAG_PROTO_VSC73XX_8021Q	= DSA_TAG_PROTO_VSC73XX_8021Q_VALUE,
+>  };
+>  
+>  struct dsa_switch;
+> diff --git a/net/dsa/Kconfig b/net/dsa/Kconfig
+> index 8e698bea99a3..e59360071c67 100644
+> --- a/net/dsa/Kconfig
+> +++ b/net/dsa/Kconfig
+> @@ -166,6 +166,12 @@ config NET_DSA_TAG_TRAILER
+>  	  Say Y or M if you want to enable support for tagging frames at
+>  	  with a trailed. e.g. Marvell 88E6060.
+>  
+> +config NET_DSA_TAG_VSC73XX_8021Q
+> +	tristate "Tag driver for Microchip/Vitesse VSC73xx family of switches, using VLAN"
+> +	help
+> +	  Say Y or M if you want to enable support for tagging frames with a
+> +	  custom VLAN-based header.
+> +
+
+Separate patches for the tagger and for the driver infrastructure please.
+It's hard to review.
+
+Also, there's some very strange splitting between this patch and 6/7
+("net: dsa: vsc73xx: Add vlan filtering"). I would have expected that to
+contain the basic infrastructure (thus appearing first), then the
+driver-side tag_8021q infra, then the tagger. It's impossible for me to
+comment on things that have to do with VLAN infrastructure when it's
+split between 2 patches.
 
