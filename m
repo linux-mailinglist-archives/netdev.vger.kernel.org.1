@@ -1,164 +1,122 @@
-Return-Path: <netdev+bounces-13963-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13964-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6241873E34F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:29:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A7FC073E358
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:31:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C867280DD3
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:29:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 612AD280D4E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:31:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 712C4BE58;
-	Mon, 26 Jun 2023 15:29:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 99053BE64;
+	Mon, 26 Jun 2023 15:31:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DC28C120
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:29:40 +0000 (UTC)
-Received: from smtp-8fa9.mail.infomaniak.ch (smtp-8fa9.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fa9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78E7A11D
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:29:38 -0700 (PDT)
-Received: from smtp-2-0001.mail.infomaniak.ch (unknown [10.5.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QqWww4gzDzMqFyC;
-	Mon, 26 Jun 2023 15:29:36 +0000 (UTC)
-Received: from unknown by smtp-2-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QqWwv3tWXzMpsR5;
-	Mon, 26 Jun 2023 17:29:35 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1687793376;
-	bh=amhXeU0fX/W7kl1vw8y/Smi4UUNsqGIONRjqSmgYgg4=;
-	h=Date:Subject:From:To:Cc:References:In-Reply-To:From;
-	b=jJvdHS1i54evqQhpUdSmwf/YptBkmPoEx7wBE1YU69EpfmuiYSdKJtoXuerUMffYJ
-	 s8wAoyLmi4nOtpjWyL29fVzYhzhRyGNgN4pVK3OPvvdI01CNWAdLphu5pij34WZitb
-	 LMTxnlSJZamC90Ca1CRKaqyaO+q9e7MCtTFXsIOE=
-Message-ID: <b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net>
-Date: Mon, 26 Jun 2023 17:29:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB6CBA49
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:31:04 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6881722
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:30:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687793444;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=7uLYHxA1BeyjC2zeH9Gn+m3MAcFP9PjLf/sWdMqlqe8=;
+	b=Op+dfTjwM+QCIyVLdEGzmP8oLq7IElZYOZ2wBbsVA7urdao1XCXjcp1VVL8BkGfDtqkYrx
+	qF8J2f12qQPWjmOS05EzeKxZbtKYRPnBxTGtiSqOIi+ZzD101W7s4n9IszYNkIvbKnuM+M
+	AwImM6LtUBvP6gkA9hsJ1EIW+CMZWE8=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-250-PqDpqqq7PE2LP5FGnG2VSA-1; Mon, 26 Jun 2023 11:30:42 -0400
+X-MC-Unique: PqDpqqq7PE2LP5FGnG2VSA-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 228B51044597;
+	Mon, 26 Jun 2023 15:30:25 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 222FE492B01;
+	Mon, 26 Jun 2023 15:30:23 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAOi1vP_Bn918j24S94MuGyn+Gxk212btw7yWeDrRcW1U8pc_BA@mail.gmail.com>
+References: <CAOi1vP_Bn918j24S94MuGyn+Gxk212btw7yWeDrRcW1U8pc_BA@mail.gmail.com> <20230623225513.2732256-1-dhowells@redhat.com> <20230623225513.2732256-5-dhowells@redhat.com>
+To: Ilya Dryomov <idryomov@gmail.com>
+Cc: dhowells@redhat.com, netdev@vger.kernel.org,
+    Alexander Duyck <alexander.duyck@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    David Ahern <dsahern@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+    Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
+    ceph-devel@vger.kernel.org
+Subject: Re: [PATCH net-next v5 04/16] ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than sendpage()
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v9 00/12] Network support for Landlock - allowed list of
- protocols
-Content-Language: en-US
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>,
- =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack3000@gmail.com>
-Cc: willemdebruijn.kernel@gmail.com, linux-security-module@vger.kernel.org,
- netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
- yusongping@huawei.com, artem.kuzin@huawei.com, Jeff Xu <jeffxu@google.com>,
- Jorge Lucangeli Obes <jorgelo@chromium.org>,
- Allen Webb <allenwebb@google.com>, Dmitry Torokhov <dtor@google.com>
-References: <20230116085818.165539-1-konstantin.meskhidze@huawei.com>
- <Y/fl5iEbkL5Pj5cJ@galopp> <c20fc9eb-518e-84b4-0dd5-7b97c0825259@huawei.com>
- <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net>
-In-Reply-To: <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3070988.1687793422.1@warthog.procyon.org.uk>
+Date: Mon, 26 Jun 2023 16:30:22 +0100
+Message-ID: <3070989.1687793422@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Reviving Günther's suggestion to deny a set of network protocols:
+Ilya Dryomov <idryomov@gmail.com> wrote:
 
-On 14/03/2023 14:28, Mickaël Salaün wrote:
+> write_partial_message_data() is net/ceph/messenger_v1.c specific, so it
+> doesn't apply here.  I would suggest squashing the two net/ceph patches
+> into one since even the titles are the same.
+
+I would, but they're now applied to net-next, so we need to patch that.
+
+> >   * Write as much as possible.  The socket is expected to be corked,
+> > - * so we don't bother with MSG_MORE/MSG_SENDPAGE_NOTLAST here.
+> > + * so we don't bother with MSG_MORE here.
+> >   *
+> >   * Return:
+> > - *   1 - done, nothing (else) to write
+> > + *  >0 - done, nothing (else) to write
 > 
-> On 13/03/2023 18:16, Konstantin Meskhidze (A) wrote:
->>
->>
->> 2/24/2023 1:17 AM, Günther Noack пишет:
+> It would be nice to avoid making tweaks like this to the outer
+> interface as part of switching to a new internal API.
 
-[...]
+Ok.  I'll change that and wrap the sendmsg in a loop.  Though, as I asked in
+an earlier reply, why is MSG_DONTWAIT used here?
 
->>>
->>> * Given the list of obscure network protocols listed in the socket(2)
->>>      man page, I find it slightly weird to have rules for the use of TCP,
->>>      but to leave less prominent protocols unrestricted.
->>>
->>>      For example, a process with an enabled Landlock network ruleset may
->>>      connect only to certain TCP ports, but at the same time it can
->>>      happily use Bluetooth/CAN bus/DECnet/IPX or other protocols?
->>
->>         We also have started a discussion about UDP protocol, but it's
->> more complicated since UDP sockets does not establish connections
->> between each other. There is a performance problem on the first place here.
->>
->> I'm not familiar with Bluetooth/CAN bus/DECnet/IPX but let's discuss it.
->> Any ideas here?
+> > +       if (WARN_ON(!iov_iter_is_bvec(&con->v2.out_iter)))
+> > +               return -EINVAL;
 > 
-> All these protocols should be handled one way or another someday. ;)
-> 
-> 
->>
->>>
->>>      I'm mentioning these more obscure protocols, because I doubt that
->>>      Landlock will grow more sophisticated support for them anytime soon,
->>>      so maybe the best option would be to just make it possible to
->>>      disable these?  Is that also part of the plan?
->>>
->>>      (I think there would be a lot of value in restricting network
->>>      access, even when it's done very broadly.  There are many programs
->>>      that don't need network at all, and among those that do need
->>>      network, most only require IP networking.
-> 
-> Indeed, protocols that nobody care to make Landlock supports them will
-> probably not have fine-grained control. We could extend the ruleset
-> attributes to disable the use (i.e. not only the creation of new related
-> sockets/resources) of network protocol families, in a way that would
-> make sandboxes simulate a kernel without such protocol support. In this
-> case, this should be an allowed list of protocols, and everything not in
-> that list should be denied. This approach could be used for other kernel
-> features (unrelated to network).
-> 
-> 
->>>
->>>      Btw, the argument for more broad disabling of network access was
->>>      already made at https://cr.yp.to/unix/disablenetwork.html in the
->>>      past.)
-> 
-> This is interesting but scoped to a single use case. As specified at the
-> beginning of this linked page, there must be exceptions, not only with
-> AF_UNIX but also for (the newer) AF_VSOCK, and probably future ones.
-> This is why I don't think a binary approach is a good one for Linux.
-> Users should be able to specify what they need, and block the rest.
+> Previously, this WARN_ON + error applied only to the "try sendpage"
+> path.  There is a ton of kvec usage in net/ceph/messenger_v2.c, so I'm
+> pretty sure that placing it here breaks everything.
 
-Here is a design to be able to only allow a set of network protocols and 
-deny everything else. This would be complementary to Konstantin's patch 
-series which addresses fine-grained access control.
+This should have been removed as MSG_SPLICE_PAGES now accepts KVEC and XARRAY
+iterators also.
 
-First, I want to remind that Landlock follows an allowed list approach 
-with a set of (growing) supported actions (for compatibility reasons), 
-which is kind of an allow-list-on-a-deny-list. But with this proposal, 
-we want to be able to deny everything, which means: supported, not 
-supported, known and unknown protocols.
+Btw, is it feasible to use con->v2.out_iter_sendpage to apply MSG_SPLICE_PAGES
+to the iterator to be transmitted as a whole?  It seems to be set depending on
+iterator type.
 
-We could add a new "handled_access_socket" field to the landlock_ruleset 
-struct, which could contain a LANDLOCK_ACCESS_SOCKET_CREATE flag.
+David
 
-If this field is set, users could add a new type of rules:
-struct landlock_socket_attr {
-     __u64 allowed_access;
-     int domain; // see socket(2)
-     int type; // see socket(2)
-}
-
-The allowed_access field would only contain 
-LANDLOCK_ACCESS_SOCKET_CREATE at first, but it could grow with other 
-actions (which cannot be handled with seccomp):
-- use: walk through all opened FDs and mark them as allowed or denied
-- receive: hook on received FDs
-- send: hook on sent FDs
-
-We might also use the same approach for non-socket objects that can be 
-identified with some meaningful properties.
-
-What do you think?
 
