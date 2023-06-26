@@ -1,150 +1,164 @@
-Return-Path: <netdev+bounces-13991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00DE573E43A
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:09:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F1F2B73E43D
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:09:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 385B5280DE7
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:09:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1B251C2093E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:09:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8540ED51B;
-	Mon, 26 Jun 2023 16:09:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCC5CD520;
+	Mon, 26 Jun 2023 16:09:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76D7FC2FC
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:09:06 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3F09E72
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:09:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687795743;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=wVw/Wv9H1+jgHlFyXB8K46FNsZdoHq7Qo4C7jHkkuH8=;
-	b=TMH+rpfn9ii3H81oh2K+pvHM+pYMLnazLjqLI+6Myti3tf5rW75IHDb27J15Hakx7qoBvc
-	rKz6tl/8UatpjSUzFUEomvW1C8HLtQPwfFmhxLWsJL1cTI5G5/IyFYbwUVdb0LmtJq/r0K
-	e0lljxxCliF7qf+zZBhZ6HvcsgVObpQ=
-Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
- [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-654-tngORGxpOH613wwsZsiyLg-1; Mon, 26 Jun 2023 12:08:53 -0400
-X-MC-Unique: tngORGxpOH613wwsZsiyLg-1
-Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-635d9e482f1so18567746d6.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:08:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687795722; x=1690387722;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BE400101D6;
+	Mon, 26 Jun 2023 16:09:35 +0000 (UTC)
+Received: from mail-lj1-x232.google.com (mail-lj1-x232.google.com [IPv6:2a00:1450:4864:20::232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 26D6DC6;
+	Mon, 26 Jun 2023 09:09:34 -0700 (PDT)
+Received: by mail-lj1-x232.google.com with SMTP id 38308e7fff4ca-2b69a48368fso26299171fa.0;
+        Mon, 26 Jun 2023 09:09:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687795772; x=1690387772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=wVw/Wv9H1+jgHlFyXB8K46FNsZdoHq7Qo4C7jHkkuH8=;
-        b=DLZ33sezGJwreMqYpjRH3ZUt9P0pYaSe4MGXgTNl9wmezOk6Hu0WdhjMnMHvAhU5j4
-         0T3OWYhe5vCM9FjEZMoZoK0R6qaw64GQGBuQ9vTaIJw4rOUNO4V0WPh+z0N0El1eDe/y
-         2/9qNmgDClGNVMCPm63W7KQ03CA+lLa+oOBSN3JuYbMVQA4NGQgDwgp9QO+0UrxQe7Fa
-         Ft5H2fMnOoj9qrUJI0C41SzJMM/LPwF/lfSdgkg+xxtNEUk8AnT14AYpiWUGTT9AOkpt
-         N5SkJlak8pseD0rxVPfN/BvQ3MMF6Kjx+YQ4x4BaBGlz4eXMyxxjzWDv00F2S2PdYn1f
-         xsWg==
-X-Gm-Message-State: AC+VfDwIBu+eFs5wlxRa8wRMUX4TaMD3RPmftVAkaIuPt9DjKFfW3SN5
-	yqrqO59khqFUnLQRzoe+16iibLopGiBBFL50crNClaYZSJ2ZltoaqNom3ghy6nfdVzpu2UoeZHJ
-	9sZACmsEsxVQSHEOB
-X-Received: by 2002:a05:6214:27c9:b0:62d:f515:9320 with SMTP id ge9-20020a05621427c900b0062df5159320mr36074267qvb.28.1687795722198;
-        Mon, 26 Jun 2023 09:08:42 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5raYOLH44gjALQWDUf6IbJggeYwYWXvVHtOWcRvbl3wuo2Ee6zIMMrWONEOeu5ohWrGHlbZg==
-X-Received: by 2002:a05:6214:27c9:b0:62d:f515:9320 with SMTP id ge9-20020a05621427c900b0062df5159320mr36074244qvb.28.1687795721957;
-        Mon, 26 Jun 2023 09:08:41 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id l13-20020ad44d0d000000b0063227969cf7sm3308298qvl.96.2023.06.26.09.08.39
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:08:41 -0700 (PDT)
-Date: Mon, 26 Jun 2023 18:08:36 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 07/17] vsock: read from socket's error queue
-Message-ID: <sq5jlfhhlj347uapazqnotc5rakzdvj33ruzqwxdjsfx275m5r@dxujwphcffkl>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <20230603204939.1598818-8-AVKrasnov@sberdevices.ru>
+        bh=W/NDHED1ujs/UngC21AHkpHgu///ga1PH3JBVVsZqBI=;
+        b=ULHpwXalkFaN6co9yTin1SgSWeK9zwgxJ5P0xLvcLzqfjuGvLXsLoTHPQdWexGAem3
+         9rTUlca6k+rXRU+XIYh5wrFcwX6ApCKP6U4+eFx/tLJOCzdsmObx9/DqItY0r0G0uU/B
+         wjpEr7Obib/slLrfdLxX30UiFoNqreS3qFOX4JCECNXK2a42bQXzWq/x4POzJkw0bmu6
+         /wESuB+Cy8rbx/7kQjFVzwuaiB+In4qU3SYAocy4QYthwZtRPZvq9Nf9fYQOR8UPZSmK
+         VIjJIai/8ujWprhd9ckTd2nTZw+55BOo2std2IgQ3NgzhCcctyiLjCB8nfubp/YrJZOC
+         CAuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687795772; x=1690387772;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=W/NDHED1ujs/UngC21AHkpHgu///ga1PH3JBVVsZqBI=;
+        b=UHM5WDxR67gqputDAs7BcRSSIsuHSMIpNalzFP8dJ1LIz/Jr1ld4RkzWfVFhOEyEaT
+         9An1VnbHu2GGqrGqvezIAOz2hRwjoFUhK8nLLKJfAz0P1pZ0zy46RtaY1o7f0tOIfqeK
+         VFoJleTe2v1jhUM5dj9fYFaXUGADTcCb96vcxtPdDXKxpiAnEsF1YI75FOvU3tGnUagA
+         VwtOx30TACPgIazuwwWrm3QwakrMNrmce/pzjZXBE0eO5lnd2JQgSFfIbiDkboz5Pw2L
+         18cgxE2uH8khcwUs5bKFYeVfCDOsJ3VNvCpeEBLE+6SY3+VRlyqyE2OI1itxdxvxQ+uD
+         vttg==
+X-Gm-Message-State: AC+VfDwWY9kqu7QQIvCTvSaZQpjrJ7Uh6Of+SFSHGrmWnZfC8A9RXJzH
+	6aJ9gol/O34wi0JXoiJtIQfnhjoEVba4ej/JTjk=
+X-Google-Smtp-Source: ACHHUZ70+cJtyMN34gDSOW/vgF01LinpLLaWrJ2nrQmr/F0NOwUD1zLw62Oxofz49FVdGFTrETheAKcLJuqH8L8RISw=
+X-Received: by 2002:a2e:b049:0:b0:2b6:a2dc:7681 with SMTP id
+ d9-20020a2eb049000000b002b6a2dc7681mr1894285ljl.6.1687795772144; Mon, 26 Jun
+ 2023 09:09:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230603204939.1598818-8-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
+ <20230624031333.96597-14-alexei.starovoitov@gmail.com> <20230626154228.GA6798@maniforge>
+In-Reply-To: <20230626154228.GA6798@maniforge>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 26 Jun 2023 09:09:20 -0700
+Message-ID: <CAADnVQK7rgcSevdyrG8t-rPqg-n8=Eic8K63q-q3SPtOR0VP2Q@mail.gmail.com>
+Subject: Re: [PATCH v2 bpf-next 13/13] bpf: Convert bpf_cpumask to bpf_mem_cache_free_rcu.
+To: David Vernet <void@manifault.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	Hou Tao <houtao@huaweicloud.com>, "Paul E. McKenney" <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>, 
+	rcu@vger.kernel.org, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Kernel Team <kernel-team@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jun 03, 2023 at 11:49:29PM +0300, Arseniy Krasnov wrote:
->This adds handling of MSG_ERRQUEUE input flag in receive call. This flag
->is used to read socket's error queue instead of data queue. Possible
->scenario of error queue usage is receiving completions for transmission
->with MSG_ZEROCOPY flag.
+On Mon, Jun 26, 2023 at 8:42=E2=80=AFAM David Vernet <void@manifault.com> w=
+rote:
 >
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> include/linux/socket.h   | 1 +
-> net/vmw_vsock/af_vsock.c | 5 +++++
-> 2 files changed, 6 insertions(+)
+> On Fri, Jun 23, 2023 at 08:13:33PM -0700, Alexei Starovoitov wrote:
+> > From: Alexei Starovoitov <ast@kernel.org>
+> >
+> > Convert bpf_cpumask to bpf_mem_cache_free_rcu.
+> >
+> > Signed-off-by: Alexei Starovoitov <ast@kernel.org>
 >
->diff --git a/include/linux/socket.h b/include/linux/socket.h
->index bd1cc3238851..d79efd026880 100644
->--- a/include/linux/socket.h
->+++ b/include/linux/socket.h
->@@ -382,6 +382,7 @@ struct ucred {
-> #define SOL_MPTCP	284
-> #define SOL_MCTP	285
-> #define SOL_SMC		286
->+#define SOL_VSOCK	287
+> Acked-by: David Vernet <void@manifault.com>
+>
+> LGTM, thanks for cleaning this up. I left one drive-by comment /
+> observation below, but it's not a blocker for this patch / series.
+>
+> > ---
+> >  kernel/bpf/cpumask.c | 20 ++++++--------------
+> >  1 file changed, 6 insertions(+), 14 deletions(-)
+> >
+> > diff --git a/kernel/bpf/cpumask.c b/kernel/bpf/cpumask.c
+> > index 938a60ff4295..6983af8e093c 100644
+> > --- a/kernel/bpf/cpumask.c
+> > +++ b/kernel/bpf/cpumask.c
+> > @@ -9,7 +9,6 @@
+> >  /**
+> >   * struct bpf_cpumask - refcounted BPF cpumask wrapper structure
+> >   * @cpumask: The actual cpumask embedded in the struct.
+> > - * @rcu:     The RCU head used to free the cpumask with RCU safety.
+> >   * @usage:   Object reference counter. When the refcount goes to 0, th=
+e
+> >   *           memory is released back to the BPF allocator, which provi=
+des
+> >   *           RCU safety.
+> > @@ -25,7 +24,6 @@
+> >   */
+> >  struct bpf_cpumask {
+> >       cpumask_t cpumask;
+> > -     struct rcu_head rcu;
+> >       refcount_t usage;
+> >  };
+> >
+> > @@ -82,16 +80,6 @@ __bpf_kfunc struct bpf_cpumask *bpf_cpumask_acquire(=
+struct bpf_cpumask *cpumask)
+> >       return cpumask;
+> >  }
+> >
+> > -static void cpumask_free_cb(struct rcu_head *head)
+> > -{
+> > -     struct bpf_cpumask *cpumask;
+> > -
+> > -     cpumask =3D container_of(head, struct bpf_cpumask, rcu);
+> > -     migrate_disable();
+> > -     bpf_mem_cache_free(&bpf_cpumask_ma, cpumask);
+> > -     migrate_enable();
+> > -}
+> > -
+> >  /**
+> >   * bpf_cpumask_release() - Release a previously acquired BPF cpumask.
+> >   * @cpumask: The cpumask being released.
+> > @@ -102,8 +90,12 @@ static void cpumask_free_cb(struct rcu_head *head)
+> >   */
+> >  __bpf_kfunc void bpf_cpumask_release(struct bpf_cpumask *cpumask)
+> >  {
+> > -     if (refcount_dec_and_test(&cpumask->usage))
+> > -             call_rcu(&cpumask->rcu, cpumask_free_cb);
+> > +     if (!refcount_dec_and_test(&cpumask->usage))
+> > +             return;
+> > +
+> > +     migrate_disable();
+> > +     bpf_mem_cache_free_rcu(&bpf_cpumask_ma, cpumask);
+> > +     migrate_enable();
+>
+> The fact that callers have to disable migration like this in order to
+> safely free the memory feels a bit leaky. Is there any reason we can't
+> move this into bpf_mem_{cache_}free_rcu()?
 
-Maybe this change should go in another patch where we describe that
-we need to support setsockopt()
-
->
-> /* IPX options */
-> #define IPX_TYPE	1
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 45fd20c4ed50..07803d9fbf6d 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -110,6 +110,7 @@
-> #include <linux/workqueue.h>
-> #include <net/sock.h>
-> #include <net/af_vsock.h>
->+#include <linux/errqueue.h>
->
-> static int __vsock_bind(struct sock *sk, struct sockaddr_vm *addr);
-> static void vsock_sk_destruct(struct sock *sk);
->@@ -2135,6 +2136,10 @@ vsock_connectible_recvmsg(struct socket *sock, struct msghdr *msg, size_t len,
-> 	int err;
->
-> 	sk = sock->sk;
->+
->+	if (unlikely(flags & MSG_ERRQUEUE))
->+		return sock_recv_errqueue(sk, msg, len, SOL_VSOCK, 0);
->+
-> 	vsk = vsock_sk(sk);
-> 	err = 0;
->
->-- 
->2.25.1
->
-
+migrate_disable/enable() are actually not necessary here.
+We can call bpf_mem_cache_free_rcu() directly from any kfunc.
+Explicit migrate_disable() is only necessary from syscall.
+I believe rcu callbacks also cannot migrate, so the existing
+code probably doesn't need them either.
 
