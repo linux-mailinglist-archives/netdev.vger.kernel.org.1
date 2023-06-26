@@ -1,111 +1,190 @@
-Return-Path: <netdev+bounces-13884-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13885-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E033073D8A7
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:37:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5BE8C73D8C6
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:48:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 857D71C204E8
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:37:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CFC4280D65
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:48:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AF21440C;
-	Mon, 26 Jun 2023 07:37:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4860B46A0;
+	Mon, 26 Jun 2023 07:48:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B13EA20F6
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:37:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F19DEC433C8;
-	Mon, 26 Jun 2023 07:37:49 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687765073;
-	bh=RKPoNxTE7vcvysXf4LPjc4udS84UlrS8TNGtbR/i1LM=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=JvD6qUdQCSq/1egAvme7X/GHETIBaQmDFD6mhyJxV5fUXJ5A08wSqYgbiu7RCfnwv
-	 yRWZh4DmDvj+LV2IRW6uYa92Y3GNwMdSXUMM5ftsL6EZdH5dJRviIhrhEvbG16FPV9
-	 d8W5QLqYkLMXvl8B51Geber6X9Ci2r4JqHOH9DPizVroZbL07wJUFSidD7bfYdOpqx
-	 Q5p7ilCG1ee4EDZLdFW2eST+55JwOKLV4pp0fsl/5ZQgU0R1dyN1q9jB2JGcRWLwxQ
-	 oE4xcdjp0K1R19HjP6FsqpZoyno/bXy/d8x732wGEV7/X777cOqVfWl4DHRHVjyjIW
-	 0sn3hT1qVWPsQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 34DC2440C
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:48:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F7371B0
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:48:32 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687765711;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=ocXyG+slkr0gL4aywexn0lNOfJV4nZ/IWmE7AdPVwQ0=;
+	b=MT9ocXqZuGm1jcYNNVQu5c9dAyoMAhW4XZG5ZFyuzkinebKQ0NOJam/Ik6eqJEuMlO1TDI
+	ksT+2SZt1/vAfs1tHqCe4CUO1O1ACLPGNPBtdynVN2NslLrcfPh6ElWmCfYZqVe6TvSQnE
+	gp/vRDwTQ7l/gDdXaK+kEMqDGAAT3Bk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-518-LZEMRXVMNku8ZOzuiFUVAA-1; Mon, 26 Jun 2023 03:48:30 -0400
+X-MC-Unique: LZEMRXVMNku8ZOzuiFUVAA-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 3FBDE29A9D2A;
+	Mon, 26 Jun 2023 07:48:29 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 173F640C6CD1;
+	Mon, 26 Jun 2023 07:48:27 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <20230626112847.2ef3d422@canb.auug.org.au>
+References: <20230626112847.2ef3d422@canb.auug.org.au>
+To: Stephen Rothwell <sfr@canb.auug.org.au>
+Cc: dhowells@redhat.com, Peter Zijlstra <peterz@infradead.org>,
+    Ingo Molnar <mingo@redhat.com>,
+    Arnaldo Carvalho de Melo <acme@kernel.org>,
+    Mark Rutland <mark.rutland@arm.com>,
+    Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+    Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+    Ian Rogers <irogers@google.com>,
+    Adrian Hunter <adrian.hunter@intel.com>,
+    David Miller <davem@davemloft.net>,
+    Networking <netdev@vger.kernel.org>,
+    Jakub Kicinski <kuba@kernel.org>, linux-perf-users@vger.kernel.org,
+    bpf@vger.kernel.org, linux-next@vger.kernel.org,
+    linux-kernel@vger.kernel.org
+Subject: Re: linux-next: build failure after merge of the net-next tree
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 26 Jun 2023 09:37:47 +0200
-From: Michael Walle <mwalle@kernel.org>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yisen Zhuang
- <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_Beh?=
- =?UTF-8?Q?=C3=BAn?= <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 10/10] net: mdio: support C45-over-C22 when
- probed via OF
-In-Reply-To: <ZJYFDcbZqI+EC3OX@corigine.com>
-References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
- <20230620-feature-c45-over-c22-v2-10-def0ab9ccee2@kernel.org>
- <ZJYFDcbZqI+EC3OX@corigine.com>
-Message-ID: <e5e1af31a4e609c94ac306f4f5140193@kernel.org>
-X-Sender: mwalle@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2947428.1687765706.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Mon, 26 Jun 2023 08:48:26 +0100
+Message-ID: <2947430.1687765706@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi Simon,
+Stephen Rothwell <sfr@canb.auug.org.au> wrote:
 
-Am 2023-06-23 22:48, schrieb Simon Horman:
-> On Fri, Jun 23, 2023 at 12:29:19PM +0200, Michael Walle wrote:
-> 
-> ...
-> 
->> @@ -178,24 +209,26 @@ int __of_mdiobus_register(struct mii_bus *mdio, 
->> struct device_node *np,
->>  	if (rc)
->>  		return rc;
->> 
->> -	/* Loop over the child nodes and register a phy_device for each phy 
->> */
->> +	/* Loop over the child nodes, skipping C45 PHYs so we can scan for
->> +	 * broken C22 PHYs. The C45 PHYs will be registered afterwards.
->> +	 */
->>  	for_each_available_child_of_node(np, child) {
->> -		addr = of_mdio_parse_addr(&mdio->dev, child);
->> -		if (addr < 0) {
->> -			scanphys = true;
->> +		if (of_mdiobus_child_is_c45_phy(child))
->>  			continue;
->> -		}
->> +		rc = of_mdiobus_register_child(mdio, child, &scanphys);
->> +		if (rc)
->> +			goto unregister;
->> +	}
->> 
->> -		if (of_mdiobus_child_is_phy(child))
->> -			rc = of_mdiobus_register_phy(mdio, child, addr);
->> -		else
->> -			rc = of_mdiobus_register_device(mdio, child, addr);
->> +	/* Some C22 PHYs are broken with C45 transactions. */
->> +	mdiobus_scan_for_broken_c45_access(mdio);
-> 
-> Hi Michael,
-> 
-> Unfortunately this seems to cause a build fauilure
-> for x86_64 allmodconfig.
-> 
-> ERROR: modpost: "mdiobus_scan_for_broken_c45_access" 
-> [drivers/net/mdio/of_mdio.ko] undefined!
+> After merging the net-next tree, today's linux-next build (native perf)
+> failed like this:
+> =
 
-Oops, sorry. Seems I've forgot to export it. I guess it should
-be EXPORT_SYMBOL_GPL().
+> In file included from builtin-trace.c:907:
+> trace/beauty/msg_flags.c: In function 'syscall_arg__scnprintf_msg_flags'=
+:
+> trace/beauty/msg_flags.c:28:21: error: 'MSG_SPLICE_PAGES' undeclared (fi=
+rst use in this function)
 
--michael
+I tried applying the attached patch, but it doesn't make any difference.
+
+Any idea what I've missed?  Also, why do we have duplicates of all the ker=
+nel
+headers in the tools/ directory?
+
+David
+---
+
+commit 878ff45f5f746f6773224ff952c490b5812462f2
+Author: David Howells <dhowells@redhat.com>
+Date:   Mon Jun 26 08:08:12 2023 +0100
+
+    tools: Fix MSG_SPLICE_PAGES build error in trace tools
+    =
+
+    Fix the following error:
+    =
+
+    In file included from builtin-trace.c:907:
+    trace/beauty/msg_flags.c: In function 'syscall_arg__scnprintf_msg_flag=
+s':
+    trace/beauty/msg_flags.c:28:21: error: 'MSG_SPLICE_PAGES' undeclared (=
+first use in this function)
+       28 |         if (flags & MSG_##n) { \
+          |                     ^~~~
+    trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG=
+'
+       50 |         P_MSG_FLAG(SPLICE_PAGES);
+          |         ^~~~~~~~~~
+    trace/beauty/msg_flags.c:28:21: note: each undeclared identifier is re=
+ported only once for each function it appears in
+       28 |         if (flags & MSG_##n) { \
+          |                     ^~~~
+    trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG=
+'
+       50 |         P_MSG_FLAG(SPLICE_PAGES);
+          |         ^~~~~~~~~~
+    =
+
+    There is no MSG_SPLICE_PAGES in tools/perf/trace/beauty/include/linux/=
+socket.h
+    =
+
+    Fixes: b848b26c6672 ("net: Kill MSG_SENDPAGE_NOTLAST")
+    Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+    Link: https://lore.kernel.org/r/20230626112847.2ef3d422@canb.auug.org.=
+au/
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    cc: "David S. Miller" <davem@davemloft.net>
+    cc: Eric Dumazet <edumazet@google.com>
+    cc: Jakub Kicinski <kuba@kernel.org>
+    cc: Paolo Abeni <pabeni@redhat.com>
+    cc: Jens Axboe <axboe@kernel.dk>
+    cc: Matthew Wilcox <willy@infradead.org>
+    cc: bpf@vger.kernel.org
+    cc: dccp@vger.kernel.org
+    cc: linux-afs@lists.infradead.org
+    cc: linux-arm-msm@vger.kernel.org
+    cc: linux-can@vger.kernel.org
+    cc: linux-crypto@vger.kernel.org
+    cc: linux-doc@vger.kernel.org
+    cc: linux-hams@vger.kernel.org
+    cc: linux-perf-users@vger.kernel.org
+    cc: linux-rdma@vger.kernel.org
+    cc: linux-sctp@vger.kernel.org
+    cc: linux-wpan@vger.kernel.org
+    cc: linux-x25@vger.kernel.org
+    cc: mptcp@lists.linux.dev
+    cc: netdev@vger.kernel.org
+    cc: rds-devel@oss.oracle.com
+    cc: tipc-discussion@lists.sourceforge.net
+    cc: virtualization@lists.linux-foundation.org
+
+diff --git a/tools/perf/trace/beauty/include/linux/socket.h b/tools/perf/t=
+race/beauty/include/linux/socket.h
+index 3bef212a24d7..77cb707a566a 100644
+--- a/tools/perf/trace/beauty/include/linux/socket.h
++++ b/tools/perf/trace/beauty/include/linux/socket.h
+@@ -326,6 +326,7 @@ struct ucred {
+ 					  */
+ =
+
+ #define MSG_ZEROCOPY	0x4000000	/* Use user data in kernel path */
++#define MSG_SPLICE_PAGES 0x8000000	/* Splice the pages from the iterator =
+in sendmsg() */
+ #define MSG_FASTOPEN	0x20000000	/* Send data in TCP SYN */
+ #define MSG_CMSG_CLOEXEC 0x40000000	/* Set close_on_exec for file
+ 					   descriptor received through
+
 
