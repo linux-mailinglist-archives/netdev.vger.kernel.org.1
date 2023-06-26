@@ -1,197 +1,387 @@
-Return-Path: <netdev+bounces-14034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D80B73E74D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:14:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5239C73E7E8
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:20:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E1851C20973
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:14:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0942280E50
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDFA134C0;
-	Mon, 26 Jun 2023 18:13:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B71D134D9;
+	Mon, 26 Jun 2023 18:20:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497B5134C7
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:13:58 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070.outbound.protection.outlook.com [40.107.243.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0608D10D5;
-	Mon, 26 Jun 2023 11:13:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=YP/OoKpc7Foo2N7IkRxmj12h+Jj2SdW0kGXtETtYvU1KqB1pNUheAXyS4LVdsk9fB/OfcsvD1vRYpxHy4HClNLEwlQYBep9aBncaJbDykZvXocF4bHpFrMPqR7KcSvcRQdD9AGRHdGRpU0wCEdrFWHJBqvFAwH6xO333HN0MXUG/qwhE47uMh/JtR8n4iRgL8pecNDoUFNKGK4j3jONcChWFXqnq3iQ0cs24L2b5MuvDl6ZwNiMdHjpssDDSNaZlsdJ43AurNC0btVVXz05tq5OwVMCkd8acMPJ+AwK2vEdbq9paSC+NNSCRfAfJSF+TIQJcF4n4/O5gK38f+SmHHg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=v1YF1Y3EaC/qkf53jDmmjppTEtv5IAXnoNvwHj0TZIQ=;
- b=aUW5G+C6lik1y5xv1vHp8y5ekXoHTRPWs0NaJ13Tr28pEZFWZNdw3A/oMpK6QZO6uTpMoYQj4xTb4El8pG+RMLw2hRyPmG/MWbno3TLEEYNKgx0ezs77CVWOUFEQ7cfivQnmnKk6asxqMuYNxWYXAkUjgr7Am2qpkKkNjZbYr27bfANmEgD32H2wrY/TM4XazdmrmgMgOtr//zaj8EyB+/6qBHmc4IkOJoL35g9LWreIaJ9GzKViKgNUtzjctrcaJ2QTL6QmSnoqA7dECuzKRIFnQDvaDw1gx1Z6k0q7z1nuhM4FejDMedSqm2RK1lK7XuCqbQaA8up1eXrJy3evEw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=v1YF1Y3EaC/qkf53jDmmjppTEtv5IAXnoNvwHj0TZIQ=;
- b=ER5gHLDf+qPbWqWl/mJiI2IXH5Me0h5zRKOvRsYJyol0ngVzLa+4tJVnrrSOmn2XgKSY8RvsMVu9zQRjNFfNvImCgy531tlnjaEByEGgHtmnCvC3qOhrdVCpALnv9wv7phwZbJg2EayCxBKgcUivhoeVkz3SNzdb2lv5HvQdMWo/MJAnL+MAuUrGuXPb5HhwyBDlK9AI/X6eMW1Co8CyBN/hhRYf+4q6BDCx/cOt0mAFqhMCu7+vx30puSInqSsJ1+oLI802uWhDmRSMtikaLcpEmaTRUzkunJf+Solm/q821gac5/77uwVp+ufm5XMTqSaaJIjYA4HHyd6Y7YuMAg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
- by SA1PR12MB7247.namprd12.prod.outlook.com (2603:10b6:806:2bb::6) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Mon, 26 Jun
- 2023 18:13:55 +0000
-Received: from LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
- ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6521.024; Mon, 26 Jun 2023
- 18:13:54 +0000
-Date: Mon, 26 Jun 2023 15:13:53 -0300
-From: Jason Gunthorpe <jgg@nvidia.com>
-To: "Tian, Kevin" <kevin.tian@intel.com>
-Cc: Brett Creeley <brett.creeley@amd.com>,
-	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
-	"yishaih@nvidia.com" <yishaih@nvidia.com>,
-	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
-	"shannon.nelson@amd.com" <shannon.nelson@amd.com>
-Subject: Re: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
-Message-ID: <ZJnVYczb9M/wugO8@nvidia.com>
-References: <20230602220318.15323-1-brett.creeley@amd.com>
- <20230602220318.15323-5-brett.creeley@amd.com>
- <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJBONrx5LOgpTr1U@nvidia.com>
- <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJGcCF2hBGERGUBZ@nvidia.com>
- <BN9PR11MB52763F3D4F18DAB867D146458C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
- <ZJL6wHiXHc1eBj/R@nvidia.com>
- <BN9PR11MB52762ECFCA869B97BDD2AA9D8C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <BN9PR11MB52762ECFCA869B97BDD2AA9D8C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
-X-ClientProxiedBy: BL6PEPF00016410.NAMP222.PROD.OUTLOOK.COM
- (2603:10b6:22e:400:0:1004:0:17) To LV2PR12MB5869.namprd12.prod.outlook.com
- (2603:10b6:408:176::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FA3134CE
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:20:20 +0000 (UTC)
+Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C0FDE75;
+	Mon, 26 Jun 2023 11:20:18 -0700 (PDT)
+Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-471658cc106so1444163e0c.0;
+        Mon, 26 Jun 2023 11:20:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687803617; x=1690395617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=VJMJu0RIu0Yr3c1tM1bkZs7eH/52zFhiEMrJQGgiSpE=;
+        b=jyfJZBhHadw2aNYkjNGGvZc8zzRvW1kt9oeOx4OpGxN7thwCJELI6qCXYQXqvtfP/z
+         eTL3A/eo0HBJup7rTdbsq1wv5CkXX4JAfdnSLwK9o7JS76v1Sw3Oq/M4RBtFC+CmjqZV
+         tg1l8Dh7tOHe2rI9dBfeZ1igC3gmxsfUCjQZ7jPw1ZAv+prFmPp0kgn5qh6uQ2OXrxTN
+         A58SydVDjrNEZwn1tlx8MUQ6xexckDL3uaFO0w0w8Zyk1jN8NyurAj472EikWCPO8BR/
+         0vKSfnrpjzX2U7avoKJ5huCwTVvJ9BpmFEAUREuBaCYrLykZAbfhAJOzxI0nldeeoS1X
+         a4EQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687803617; x=1690395617;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=VJMJu0RIu0Yr3c1tM1bkZs7eH/52zFhiEMrJQGgiSpE=;
+        b=cJQexnGoXSSzAYJ1P3v3KvOcq+MbDKmrCxzUeHP/QHjf9cbagq/+h9FPxNgoGGn3SD
+         gT+Uo37Vaj01brMiXsLY3jttm7mmNK42TnF5qIOt448VQvom7RBtKebXUvDiwTGnE6QD
+         a6X2IZUjNWoSFqeGmoilzDiVTjsyN1L9O3qVAZG9laFGPbz8FPJhpp+ZyncF+XesCiga
+         GKVMiutdLdZhlRldxOLx7ugRTHBJn/Lz4P2/a776lamAjzxQGyp/jmFfex0a9gg8lsqW
+         PbxvWYusMUXFhuipcZU8z6WX8QQpI8sR1Ckg3zLV1ewpQatn1jQFqGZpfFTHs+N+aKWQ
+         gebw==
+X-Gm-Message-State: AC+VfDxR5DpqMV3id4Hgl6+yjD/1a7hp8OxaxthyNHIATT7ApUbVmJHu
+	oWby8agoFooOHH8iLeVd9FMLy6qaM9L/SFFpMVw=
+X-Google-Smtp-Source: ACHHUZ5MC/bSeanmNy7FRRrmrPNTIL+4GtnO9yspk4+jJY/Omvra0wdQ1+cDXoqSNXQzCdXwl/xnq0AFHSw5kabyPLw=
+X-Received: by 2002:a1f:43d0:0:b0:44f:e6ff:f30e with SMTP id
+ q199-20020a1f43d0000000b0044fe6fff30emr14735009vka.10.1687803617275; Mon, 26
+ Jun 2023 11:20:17 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB7247:EE_
-X-MS-Office365-Filtering-Correlation-Id: 99e7cf20-0b2b-4087-d10c-08db76711a37
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	i847hOns2AeZ2O9p1LUV+mkyYidZUPtuTne15P3kpLbGbEvXaupXbhYQhD3aKSwidH0e9MJ/XKg5fVv0HfrNAwfhbzskfL03rIqY601RYZ2OQQBDUQ3XI67McQq5mSwmluFc8e6MAbJTa4gHqx4W5Fjse0TXTmOJSvancOt2KNeZIfnXWjuLLlB3AOGtbTnBVRZ/yq+UAFaLOqHxFAfGdr5Xo8i6MIeNXhEw0Aa6pS0sOhbFigGA24SzBwT3NygLTeBmt2aa1Ie4kevaPOe5+4SaMuadYHqwyV5CqOk4rpLrbgBGNNcOdj2Ip923TyueeGSHssbRn6XhP/n2RAuqFHLK+k0WK8fbnGk0TJOlFA0xMLW0N0hRm3J9vlArvp5yorAD0bhQUIKgcHkj+LErvc2Lq/o+qVfW/q5caumT8ihvzedaSpu42+YbGcY2vdaf8MwTSYcrIzBVq/m+clSK13Cz/527moRjQAr2oDP+vIWXFxDWoY2WCWE4EsNcKDWjy7q7GTYSWBsNLzV/gIvCi//vNEc2R71cODLxgcFWawW08fStomMs4fHfCa6nD11F
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(376002)(136003)(366004)(39860400002)(451199021)(26005)(36756003)(66946007)(6486002)(478600001)(54906003)(2616005)(83380400001)(6512007)(2906002)(6506007)(186003)(5660300002)(316002)(38100700002)(8936002)(66556008)(8676002)(6916009)(4326008)(41300700001)(66476007)(86362001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?kPM6rzV7VC+qgkMZ1xtZTkcvhUwnfjuxlpSHROgljjmQH8qUdGo1CzEU0kKX?=
- =?us-ascii?Q?DFHWTBA3gOElMg7CLqbtlYR7FyqOn8x8BaorszNoGK/pVnO8Aiy58o+UW1wU?=
- =?us-ascii?Q?UoQ7aXXhqviCFd6uBVxOXqRt3LJ9t1fuTuTttgEo220WLmnTymeJ40QbjCby?=
- =?us-ascii?Q?SRaDT6U7Dp+pqULWNZfeLCQjfraXW+OCx24TXk/ue6PYR82I839Oz98sVMv8?=
- =?us-ascii?Q?pH0W16LmnDAQuUpASaTxjA4QvA7/ffrvN3GAcrsJ9AYoAZbRTMxr3mqSbeOm?=
- =?us-ascii?Q?+4z0mMAuMYMiTvk6Iw9fSyTqSGJtKdwikh7C5MV/2SBmjhBrEcOPCdGvq6UE?=
- =?us-ascii?Q?Irr7vwcSgHZETtDLdQPkkAbM1fZGfFf/EZfCu0K4A+x++wnRVJsU2SYpPQkq?=
- =?us-ascii?Q?j1oneynoT+4WSyCzgUTdxx0kTc79YqrjkdzHa16QsHDt46TdEuc1qRSEDbp0?=
- =?us-ascii?Q?wxw3a+C07TdFrPptnTdqvq8PTCl/aLDak12DiqCMWSTj9HAJdkitZ99udZeB?=
- =?us-ascii?Q?gnxry2LRs5r8mS4baVgKSKKOR0t9OXFW7fJ3L/MWxb1Cw7Yo+mL24a1wLq3a?=
- =?us-ascii?Q?S5M4N36VYRn9aDMhjNHNhNAVxB0Rts2qft+rKBOQpiVjLnRi1GTh5bSBQXy5?=
- =?us-ascii?Q?ugoGNbLaVL+8ycgqxRCR4n9IFoagzMr0BXqpsNHbbdQcSYmeiZkAlMFKMFRI?=
- =?us-ascii?Q?+QhmL3SDYxkLf067PlY1irn9uXsPo9qra3JDNf6ZL5GL5LBkgiTdY1QQJxmq?=
- =?us-ascii?Q?UQt0z8DD3U4sIECK1xJAi1FhYpJeIyBfpG/gov/BMq2oUtA+vJCcqIrus5qY?=
- =?us-ascii?Q?t61Lqkh5tMVyJuZEL/xshaNw4incpHcT7SckbIVBW5F4QXzSWFMFFpV1n0xb?=
- =?us-ascii?Q?OpjQdv535d0gVakG5t9gFqjfQZwGnQL/mfORQJNkEVKO8qfV4TsCcbiUa4EI?=
- =?us-ascii?Q?dgNjZoHYfYRZRbxWtWZG6TysRx3A1BL6rF9Jc+z+lwKc49cgggjGXqZa/OKt?=
- =?us-ascii?Q?5/BGXgtg72309WUDcYI2U2dCxEQ93xpPOCLGFJ8UCDs1GJoV9+VwV0NPlFJC?=
- =?us-ascii?Q?urmurcsBUBzDvQtAYRSR9D1bOY2yEYJKc3j9UhtDnoGpXZgx/yulIg0NHr7b?=
- =?us-ascii?Q?nDG9wjNpGkeLmUQXyfyDUPxI5qdPJPAlDNW5jM55PE98lEmN6JAYbAdkvSsu?=
- =?us-ascii?Q?K95EpfbdE8z0I9mLlOU0Q2OrflyfCkC1UUvhdjrVzUq19gUzCTqZg5byY2QL?=
- =?us-ascii?Q?GLE95wJpDJyp7J4UzGwy800dTC9IgHRkY1Z90mQ2Oy9xd1G4l6n1AERcYnGo?=
- =?us-ascii?Q?BIRHmYyaIxHX589acdazbAa9NlVDVkWXJMsAWMddZy0vR2QcPCBRlGdsrFjC?=
- =?us-ascii?Q?8BuB44njWNXIvjLQGBXcO9YzCw1s4vuM7L6lFnUkD7VFMKRn2ymlZEzymvih?=
- =?us-ascii?Q?KzoB1piDfpgz7+QlFzE9cEDAHvwu6cRdW170vFLArURIICSIN0x0DTG7TWmX?=
- =?us-ascii?Q?vFkPiGnCrhds0WoBjAPQcKoi8EXGNvvEQUmEq2Dj+wVkxILnb+PaKXIHRONw?=
- =?us-ascii?Q?SeNOybI/taWm1Hp4uLaDkN4zYDpGO7rlBB8sRZ3d?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 99e7cf20-0b2b-4087-d10c-08db76711a37
-X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 18:13:54.8056
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: n68FfvaySkBYrB8S+ni3PC5RHPtpy1+vuD5MM1wPSfG4K6JEEyswyM1wiCjj40t6
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7247
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+ <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+ <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+ <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+ <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+ <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com> <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+In-Reply-To: <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Mon, 26 Jun 2023 20:20:05 +0200
+Message-ID: <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jun 26, 2023 at 07:31:31AM +0000, Tian, Kevin wrote:
-> > From: Jason Gunthorpe <jgg@nvidia.com>
-> > Sent: Wednesday, June 21, 2023 9:27 PM
-> > 
-> > On Wed, Jun 21, 2023 at 06:49:12AM +0000, Tian, Kevin wrote:
-> > 
-> > > What is the criteria for 'reasonable'? How does CSPs judge that such
-> > > device can guarantee a *reliable* reasonable window so live migration
-> > > can be enabled in the production environment?
-> > 
-> > The CSP needs to work with the device vendor to understand how it fits
-> > into their system, I don't see how we can externalize this kind of
-> > detail in a general way.
-> > 
-> > > I'm afraid that we are hiding a non-deterministic factor in current protocol.
-> > 
-> > Yes
-> > 
-> > > But still I don't think it's a good situation where the user has ZERO
-> > > knowledge about the non-negligible time in the stopping path...
-> > 
-> > In any sane device design this will be a small period of time. These
-> > timeouts should be to protect against a device that has gone wild.
-> > 
-> 
-> Any example how 'small' it will be (e.g. <1ms)?
+Nevermind, I think I found it, I will loop this thing until I have a
+proper trace....
 
-Not personally..
-
-> Should we define a *reasonable* threshold in VFIO community which
-> any new variant driver should provide information to judge against?
-
-Ah, I think we are just too new to get into such details. I think we
-need some real world experience to see if this is really an issue.
-
-> The reason why I keep discussing it is that IMHO achieving negligible
-> stop time is a very challenging task for many accelerators. e.g. IDXD
-> can be stopped only after completing all the pending requests. While
-> it allows software to configure the max pending work size (and a
-> reasonable setting could meet both migration SLA and performance
-> SLA) the worst-case draining latency could be in 10's milliseconds which
-> cannot be ignored by the VMM.
-
-Well, what would you report here if you had the opportunity to report
-something? Some big number? Then what?
-
-> Or do you think it's still better left to CSP working with the device vendor
-> even in this case, given the worst-case latency could be affected by
-> many factors hence not something which a kernel driver can accurately
-> estimate?
-
-This is my fear, that it is so complicated that reducing it to any
-sort of cross-vendor data is not feasible. At least I'd like to see
-someone experiment with what information would be useful to qemu
-before we add kernel ABI..
-
-Jason
+On Mon, Jun 26, 2023 at 8:01=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com>=
+ wrote:
+>
+> On Mon, Jun 26, 2023 at 7:56=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > On Mon, 2023-06-26 at 19:30 +0200, Ian Kumlien wrote:
+> > > There, that didn't take long, even with wireguard disabled
+> > >
+> > > [14079.678380] BUG: kernel NULL pointer dereference, address: 0000000=
+0000000c0
+> > > [14079.685456] #PF: supervisor read access in kernel mode
+> > > [14079.690686] #PF: error_code(0x0000) - not-present page
+> > > [14079.695915] PGD 0 P4D 0
+> > > [14079.698540] Oops: 0000 [#1] PREEMPT SMP NOPTI
+> > > [14079.702996] CPU: 11 PID: 891 Comm: napi/eno2-80 Not tainted 6.4.0 =
+#360
+> > > [14079.709614] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F=
+,
+> > > BIOS 1.7a 10/13/2022
+> > > [14079.717796] RIP: 0010:__udp_gso_segment+0x346/0x4f0
+> > > [14079.722778] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
+> > > 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
+> > > 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c=
+5
+> > > 48 8d
+> > > [14079.741645] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
+> > > [14079.746966] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 00000=
+00000000000
+> > > [14079.754195] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa=
+2afc9d302d4
+> > > [14079.761422] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 00002=
+000001558c9
+> > > [14079.768650] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 00000=
+000000000e2
+> > > [14079.775879] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 00002=
+000001558c9
+> > > [14079.783106] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
+> > > knlGS:0000000000000000
+> > > [14079.791305] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [14079.797162] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 00000=
+000003526e0
+> > > [14079.804408] Call Trace:
+> > > [14079.806961]  <TASK>
+> > > [14079.809170]  ? __die+0x1a/0x60
+> > > [14079.812340]  ? page_fault_oops+0x158/0x440
+> > > [14079.816551]  ? ip6_route_output_flags+0xe3/0x160
+> > > [14079.821284]  ? exc_page_fault+0x3f4/0x820
+> > > [14079.825408]  ? update_load_avg+0x77/0x710
+> > > [14079.829534]  ? asm_exc_page_fault+0x22/0x30
+> > > [14079.833836]  ? __udp_gso_segment+0x346/0x4f0
+> > > [14079.838218]  ? __udp_gso_segment+0x2fa/0x4f0
+> > > [14079.842600]  ? _raw_spin_unlock_irqrestore+0x16/0x30
+> > > [14079.847679]  ? try_to_wake_up+0x8e/0x5a0
+> > > [14079.851713]  inet_gso_segment+0x150/0x3c0
+> > > [14079.855827]  ? vhost_poll_wakeup+0x31/0x40
+> > > [14079.860032]  skb_mac_gso_segment+0x9b/0x110
+> > > [14079.864331]  __skb_gso_segment+0xae/0x160
+> > > [14079.868455]  ? netif_skb_features+0x144/0x290
+> > > [14079.872928]  validate_xmit_skb+0x167/0x370
+> > > [14079.877139]  validate_xmit_skb_list+0x43/0x70
+> > > [14079.881612]  sch_direct_xmit+0x267/0x380
+> > > [14079.885641]  __qdisc_run+0x140/0x590
+> > > [14079.889324]  __dev_queue_xmit+0x44d/0xba0
+> > > [14079.893450]  ? nf_hook_slow+0x3c/0xb0
+> > > [14079.897229]  br_dev_queue_push_xmit+0xb2/0x1c0
+> > > [14079.901788]  maybe_deliver+0xa9/0x100
+> > > [14079.905564]  br_flood+0x8a/0x180
+> > > [14079.908903]  br_handle_frame_finish+0x31f/0x5b0
+> > > [14079.913547]  br_handle_frame+0x28f/0x3a0
+> > > [14079.917585]  ? ipv6_find_hdr+0x1f0/0x3e0
+> > > [14079.921622]  ? br_handle_local_finish+0x20/0x20
+> > > [14079.926267]  __netif_receive_skb_core.constprop.0+0x4c5/0xc90
+> > > [14079.932125]  ? br_handle_frame_finish+0x5b0/0x5b0
+> > > [14079.936946]  ? ___slab_alloc+0x4bf/0xaf0
+> > > [14079.940986]  __netif_receive_skb_list_core+0x107/0x250
+> > > [14079.946240]  netif_receive_skb_list_internal+0x194/0x2b0
+> > > [14079.951660]  ? napi_gro_flush+0x97/0xf0
+> > > [14079.955604]  napi_complete_done+0x69/0x180
+> > > [14079.959808]  ixgbe_poll+0xe10/0x12e0
+> > > [14079.963506]  __napi_poll+0x26/0x1b0
+> > > [14079.967106]  napi_threaded_poll+0x232/0x250
+> > > [14079.971405]  ? __napi_poll+0x1b0/0x1b0
+> > > [14079.975260]  kthread+0xee/0x120
+> > > [14079.978510]  ? kthread_complete_and_exit+0x20/0x20
+> > > [14079.983415]  ret_from_fork+0x22/0x30
+> > > [14079.987102]  </TASK>
+> > > [14079.989395] Modules linked in: chaoskey
+> > > [14079.993347] CR2: 00000000000000c0
+> > > [14079.996773] ---[ end trace 0000000000000000 ]---
+> > > [14080.018013] pstore: backend (erst) writing error (-28)
+> > > [14080.023274] RIP: 0010:__udp_gso_segment+0x346/0x4f0
+> > > [14080.028264] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
+> > > 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
+> > > 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c=
+5
+> > > 48 8d
+> > > [14080.047181] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
+> > > [14080.052522] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 00000=
+00000000000
+> > > [14080.059765] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa=
+2afc9d302d4
+> > > [14080.067012] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 00002=
+000001558c9
+> > > [14080.074257] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 00000=
+000000000e2
+> > > [14080.081502] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 00002=
+000001558c9
+> > > [14080.088746] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
+> > > knlGS:0000000000000000
+> > > [14080.096964] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> > > [14080.102823] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 00000=
+000003526e0
+> > > [14080.110067] Kernel panic - not syncing: Fatal exception in interru=
+pt
+> > > [14080.325501] Kernel Offset: 0x12600000 from 0xffffffff81000000
+> > > (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> > > [14080.353129] ---[ end Kernel panic - not syncing: Fatal exception i=
+n
+> > > interrupt ]---
+> >
+> > Could you please provide a decoded stack trace?
+> >
+> > # in your git tree:
+> > cat <stacktrace file > | ./scripts/decode_stacktrace.sh vmlinux
+>
+> I'm afraid it doesn't yield more information, really... I can't say why
+>
+>  cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
+> [14079.678380] BUG: kernel NULL pointer dereference, address: 00000000000=
+000c0
+> [14079.685456] #PF: supervisor read access in kernel mode
+> [14079.690686] #PF: error_code(0x0000) - not-present page
+> [14079.695915] PGD 0 P4D 0
+> [14079.698540] Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [14079.702996] CPU: 11 PID: 891 Comm: napi/eno2-80 Not tainted 6.4.0 #360
+> [14079.709614] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
+> BIOS 1.7a 10/13/2022
+> [14079.717796] RIP: 0010:__udp_gso_segment (??:?)
+> [14079.722778] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
+>
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>    0: c3                    ret
+>    1: 08 66 89              or     %ah,-0x77(%rsi)
+>    4: 5c                    pop    %rsp
+>    5: 02 04 45 84 e4 0f 85 add    -0x7af01b7c(,%rax,2),%al
+>    c: 27                    (bad)
+>    d: fd                    std
+>    e: ff                    (bad)
+>    f: ff                    .byte 0xff
+> 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
+> 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
+> 48 8d
+> [14079.741645] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
+> [14079.746966] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 000000000=
+0000000
+> [14079.754195] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2afc=
+9d302d4
+> [14079.761422] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 000020000=
+01558c9
+> [14079.768650] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 000000000=
+00000e2
+> [14079.775879] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 000020000=
+01558c9
+> [14079.783106] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
+> knlGS:0000000000000000
+> [14079.791305] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [14079.797162] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 000000000=
+03526e0
+> [14079.804408] Call Trace:
+> [14079.806961]  <TASK>
+> [14079.809170] ? __die (??:?)
+> [14079.812340] ? page_fault_oops (fault.c:?)
+> [14079.816551] ? ip6_route_output_flags (??:?)
+> [14079.821284] ? exc_page_fault (??:?)
+> [14079.825408] ? update_load_avg (fair.c:?)
+> [14079.829534] ? asm_exc_page_fault (??:?)
+> [14079.833836] ? __udp_gso_segment (??:?)
+> [14079.838218] ? __udp_gso_segment (??:?)
+> [14079.842600] ? _raw_spin_unlock_irqrestore (??:?)
+> [14079.847679] ? try_to_wake_up (core.c:?)
+> [14079.851713] inet_gso_segment (??:?)
+> [14079.855827] ? vhost_poll_wakeup (vhost.c:?)
+> [14079.860032] skb_mac_gso_segment (??:?)
+> [14079.864331] __skb_gso_segment (??:?)
+> [14079.868455] ? netif_skb_features (??:?)
+> [14079.872928] validate_xmit_skb (dev.c:?)
+> [14079.877139] validate_xmit_skb_list (??:?)
+> [14079.881612] sch_direct_xmit (??:?)
+> [14079.885641] __qdisc_run (??:?)
+> [14079.889324] __dev_queue_xmit (??:?)
+> [14079.893450] ? nf_hook_slow (??:?)
+> [14079.897229] br_dev_queue_push_xmit (??:?)
+> [14079.901788] maybe_deliver (br_forward.c:?)
+> [14079.905564] br_flood (??:?)
+> [14079.908903] br_handle_frame_finish (??:?)
+> [14079.913547] br_handle_frame (br_input.c:?)
+> [14079.917585] ? ipv6_find_hdr (??:?)
+> [14079.921622] ? br_handle_local_finish (??:?)
+> [14079.926267] __netif_receive_skb_core.constprop.0 (dev.c:?)
+> [14079.932125] ? br_handle_frame_finish (br_input.c:?)
+> [14079.936946] ? ___slab_alloc (slub.c:?)
+> [14079.940986] __netif_receive_skb_list_core (dev.c:?)
+> [14079.946240] netif_receive_skb_list_internal (??:?)
+> [14079.951660] ? napi_gro_flush (??:?)
+> [14079.955604] napi_complete_done (??:?)
+> [14079.959808] ixgbe_poll (??:?)
+> [14079.963506] __napi_poll (dev.c:?)
+> [14079.967106] napi_threaded_poll (dev.c:?)
+> [14079.971405] ? __napi_poll (dev.c:?)
+> [14079.975260] kthread (kthread.c:?)
+> [14079.978510] ? kthread_complete_and_exit (kthread.c:?)
+> [14079.983415] ret_from_fork (??:?)
+> [14079.987102]  </TASK>
+> [14079.989395] Modules linked in: chaoskey
+> [14079.993347] CR2: 00000000000000c0
+> [14079.996773] ---[ end trace 0000000000000000 ]---
+> [14080.018013] pstore: backend (erst) writing error (-28)
+> [14080.023274] RIP: 0010:__udp_gso_segment (??:?)
+> [14080.028264] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
+>
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>    0: c3                    ret
+>    1: 08 66 89              or     %ah,-0x77(%rsi)
+>    4: 5c                    pop    %rsp
+>    5: 02 04 45 84 e4 0f 85 add    -0x7af01b7c(,%rax,2),%al
+>    c: 27                    (bad)
+>    d: fd                    std
+>    e: ff                    (bad)
+>    f: ff                    .byte 0xff
+> 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
+> 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
+> 48 8d
+> [14080.047181] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
+> [14080.052522] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 000000000=
+0000000
+> [14080.059765] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2afc=
+9d302d4
+> [14080.067012] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 000020000=
+01558c9
+> [14080.074257] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 000000000=
+00000e2
+> [14080.081502] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 000020000=
+01558c9
+> [14080.088746] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
+> knlGS:0000000000000000
+> [14080.096964] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [14080.102823] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 000000000=
+03526e0
+> [14080.110067] Kernel panic - not syncing: Fatal exception in interrupt
+> [14080.325501] Kernel Offset: 0x12600000 from 0xffffffff81000000
+> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> [14080.353129] ---[ end Kernel panic - not syncing: Fatal exception in
+> interrupt ]---
+>
+> The binaries aren't stripped so i don't, currently, know why it's like th=
+is...
+>
+> but i also get:
+> gdb vmlinux
+> GNU gdb (Gentoo 13.2 vanilla) 13.2
+> Copyright (C) 2023 Free Software Foundation, Inc.
+> License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
+tml>
+> This is free software: you are free to change and redistribute it.
+> There is NO WARRANTY, to the extent permitted by law.
+> Type "show copying" and "show warranty" for details.
+> This GDB was configured as "x86_64-pc-linux-gnu".
+> Type "show configuration" for configuration details.
+> For bug reporting instructions, please see:
+> <https://bugs.gentoo.org/>.
+> Find the GDB manual and other documentation resources online at:
+>     <http://www.gnu.org/software/gdb/documentation/>.
+>
+> For help, type "help".
+> Type "apropos word" to search for commands related to "word"...
+> Reading symbols from vmlinux...
+> (No debugging symbols found in vmlinux)
+> Traceback (most recent call last):
+>   File "/usr/src/linux/vmlinux-gdb.py", line 25, in <module>
+>     import linux.constants
+>   File "/usr/src/linux/scripts/gdb/linux/constants.py", line 10, in <modu=
+le>
+>     LX_hrtimer_resolution =3D gdb.parse_and_eval("hrtimer_resolution")
+>                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+> gdb.error: 'hrtimer_resolution' has unknown type; cast it to its declared=
+ type
+> ---
+>
+> > Thanks!
+> >
+> > Paolo
+> >
 
