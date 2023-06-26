@@ -1,69 +1,52 @@
-Return-Path: <netdev+bounces-13898-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3C2B373DB29
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 11:20:43 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB7ED73DB74
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 11:34:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D0371C203DA
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:20:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E67FE280DB5
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:34:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651046FB3;
-	Mon, 26 Jun 2023 09:20:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B773D6FD8;
+	Mon, 26 Jun 2023 09:34:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5766746BD
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:20:40 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B868A30ED;
-	Mon, 26 Jun 2023 02:20:26 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 0B90D21C3F28; Mon, 26 Jun 2023 02:20:26 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 0B90D21C3F28
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1687771226;
-	bh=VB4MexHF8wUx/3UJxoMDpyL6ZRDMzCiGHwtXMUapkGk=;
-	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=aGUviutx7TQIUQCUbspcEJ5RfWrsdiEnMmLa1VIOTU4KcMiVu/eSDvRmLIB9Vj/1G
-	 G/otWpA7LWm+Md5BEoCdwirBQt3hTRoNAk1fVkN1Rg2IRz/+rDW8c/Z+aI/IcAREk9
-	 97u7ti3KNh+swoUgKVfWtKHnmTNT/RCY/rt3gCQY=
-From: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
-To: kys@microsoft.com,
-	haiyangz@microsoft.com,
-	wei.liu@kernel.org,
-	decui@microsoft.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	longli@microsoft.com,
-	sharmaajay@microsoft.com,
-	leon@kernel.org,
-	cai.huoqing@linux.dev,
-	ssengar@linux.microsoft.com,
-	vkuznets@redhat.com,
-	tglx@linutronix.de,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	linux-rdma@vger.kernel.org
-Cc: stable@vger.kernel.org,
-	schakrabarti@microsoft.com,
-	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-Subject: [PATCH 2/2 V3 net] net: mana: Fix MANA VF unload when host is unresponsive
-Date: Mon, 26 Jun 2023 02:20:24 -0700
-Message-Id: <1687771224-27162-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
-References: <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
-X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A72F86FB2
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:34:07 +0000 (UTC)
+Received: from out30-112.freemail.mail.aliyun.com (out30-112.freemail.mail.aliyun.com [115.124.30.112])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BB183
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 02:34:05 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R211e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=cambda@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vm-LrFV_1687772041;
+Received: from localhost(mailfrom:cambda@linux.alibaba.com fp:SMTPD_---0Vm-LrFV_1687772041)
+          by smtp.aliyun-inc.com;
+          Mon, 26 Jun 2023 17:34:02 +0800
+From: Cambda Zhu <cambda@linux.alibaba.com>
+To: netdev@vger.kernel.org
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"t.feng" <fengtao40@huawei.com>,
+	Xin Long <lucien.xin@gmail.com>,
+	Lu Wei <luwei32@huawei.com>,
+	Mahesh Bandewar <maheshb@google.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
+	Dust Li <dust.li@linux.alibaba.com>,
+	Tony Lu <tonylu@linux.alibaba.com>,
+	Cambda Zhu <cambda@linux.alibaba.com>
+Subject: [PATCH net v2] ipvlan: Fix return value of ipvlan_queue_xmit()
+Date: Mon, 26 Jun 2023 17:33:47 +0800
+Message-Id: <20230626093347.7492-1-cambda@linux.alibaba.com>
+X-Mailer: git-send-email 2.16.6
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 Precedence: bulk
@@ -72,115 +55,65 @@ List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 
-From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+ipvlan_queue_xmit() should return NET_XMIT_XXX, but
+ipvlan_xmit_mode_l2/l3() returns rx_handler_result_t or NET_RX_XXX
+in some cases. ipvlan_rcv_frame() will only return RX_HANDLER_CONSUMED
+in ipvlan_xmit_mode_l2/l3() because 'local' is true. It's equal to
+NET_XMIT_SUCCESS. But dev_forward_skb() can return NET_RX_SUCCESS or
+NET_RX_DROP, and returning NET_RX_DROP(NET_XMIT_DROP) will increase
+both ipvlan and ipvlan->phy_dev drops counter.
 
-This is the second part of the fix.
+The skb to forward can be treated as xmitted successfully. This patch
+makes ipvlan_queue_xmit() return NET_XMIT_SUCCESS for forward skb.
 
-Also this patch adds a new attribute in mana_context, which gets set when
-mana_hwc_send_request() hits a timeout because of host unresponsiveness.
-This flag then helps to avoid the timeouts in successive calls.
-
-Fixes: ca9c54d2d6a5ab2430c4eda364c77125d62e5e0f (net: mana: Add a driver for
-Microsoft Azure Network Adapter)
-Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Fixes: 2ad7bf363841 ("ipvlan: Initial check-in of the IPVLAN driver.")
+Signed-off-by: Cambda Zhu <cambda@linux.alibaba.com>
 ---
-V2 -> V3:
-* Removed the initialization of vf_unload_timeout
-* Splitted the patch in two.
-* Fixed extra space from the commit message.
----
- drivers/net/ethernet/microsoft/mana/gdma_main.c  |  4 +++-
- drivers/net/ethernet/microsoft/mana/hw_channel.c | 12 +++++++++++-
- include/net/mana/mana.h                          |  2 ++
- 3 files changed, 16 insertions(+), 2 deletions(-)
+v2:
+- Add explanation to commit message.
+- Add CC Mahesh.
 
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 8f3f78b68592..6411f01be0d9 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -946,10 +946,12 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
- 	struct gdma_context *gc = gd->gdma_context;
- 	struct gdma_general_resp resp = {};
- 	struct gdma_general_req req = {};
-+	struct mana_context *ac;
- 	int err;
- 
- 	if (gd->pdid == INVALID_PDID)
- 		return -EINVAL;
-+	ac = gd->driver_data;
- 
- 	mana_gd_init_req_hdr(&req.hdr, GDMA_DEREGISTER_DEVICE, sizeof(req),
- 			     sizeof(resp));
-@@ -957,7 +959,7 @@ int mana_gd_deregister_device(struct gdma_dev *gd)
- 	req.hdr.dev_id = gd->dev_id;
- 
- 	err = mana_gd_send_request(gc, sizeof(req), &req, sizeof(resp), &resp);
--	if (err || resp.hdr.status) {
-+	if ((err || resp.hdr.status) && !ac->vf_unload_timeout) {
- 		dev_err(gc->dev, "Failed to deregister device: %d, 0x%x\n",
- 			err, resp.hdr.status);
- 		if (!err)
-diff --git a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-index 9d1507eba5b9..492cb2c6e2cb 100644
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -1,8 +1,10 @@
- // SPDX-License-Identifier: GPL-2.0 OR BSD-3-Clause
- /* Copyright (c) 2021, Microsoft Corporation. */
- 
-+#include "asm-generic/errno.h"
- #include <net/mana/gdma.h>
- #include <net/mana/hw_channel.h>
-+#include <net/mana/mana.h>
- 
- static int mana_hwc_get_msg_index(struct hw_channel_context *hwc, u16 *msg_id)
- {
-@@ -786,12 +788,19 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 	struct hwc_wq *txq = hwc->txq;
- 	struct gdma_req_hdr *req_msg;
- 	struct hwc_caller_ctx *ctx;
-+	struct mana_context *ac;
- 	u32 dest_vrcq = 0;
- 	u32 dest_vrq = 0;
- 	u16 msg_id;
- 	int err;
- 
- 	mana_hwc_get_msg_index(hwc, &msg_id);
-+	ac = hwc->gdma_dev->driver_data;
-+	if (ac->vf_unload_timeout) {
-+		dev_err(hwc->dev, "HWC: vport is already unloaded.\n");
-+		err = -ETIMEDOUT;
-+		goto out;
-+	}
- 
- 	tx_wr = &txq->msg_buf->reqs[msg_id];
- 
-@@ -825,9 +834,10 @@ int mana_hwc_send_request(struct hw_channel_context *hwc, u32 req_len,
- 		goto out;
+v1:
+- Add Fixes tag.
+---
+ drivers/net/ipvlan/ipvlan_core.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ipvlan/ipvlan_core.c b/drivers/net/ipvlan/ipvlan_core.c
+index ab5133eb1d51..e45817caaee8 100644
+--- a/drivers/net/ipvlan/ipvlan_core.c
++++ b/drivers/net/ipvlan/ipvlan_core.c
+@@ -585,7 +585,8 @@ static int ipvlan_xmit_mode_l3(struct sk_buff *skb, struct net_device *dev)
+ 				consume_skb(skb);
+ 				return NET_XMIT_DROP;
+ 			}
+-			return ipvlan_rcv_frame(addr, &skb, true);
++			ipvlan_rcv_frame(addr, &skb, true);
++			return NET_XMIT_SUCCESS;
+ 		}
  	}
+ out:
+@@ -611,7 +612,8 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
+ 					consume_skb(skb);
+ 					return NET_XMIT_DROP;
+ 				}
+-				return ipvlan_rcv_frame(addr, &skb, true);
++				ipvlan_rcv_frame(addr, &skb, true);
++				return NET_XMIT_SUCCESS;
+ 			}
+ 		}
+ 		skb = skb_share_check(skb, GFP_ATOMIC);
+@@ -623,7 +625,8 @@ static int ipvlan_xmit_mode_l2(struct sk_buff *skb, struct net_device *dev)
+ 		 * the skb for the main-dev. At the RX side we just return
+ 		 * RX_PASS for it to be processed further on the stack.
+ 		 */
+-		return dev_forward_skb(ipvlan->phy_dev, skb);
++		dev_forward_skb(ipvlan->phy_dev, skb);
++		return NET_XMIT_SUCCESS;
  
--	if (!wait_for_completion_timeout(&ctx->comp_event, 30 * HZ)) {
-+	if (!wait_for_completion_timeout(&ctx->comp_event, 5 * HZ)) {
- 		dev_err(hwc->dev, "HWC: Request timed out!\n");
- 		err = -ETIMEDOUT;
-+		ac->vf_unload_timeout = true;
- 		goto out;
- 	}
- 
-diff --git a/include/net/mana/mana.h b/include/net/mana/mana.h
-index 9eef19972845..5f5affdca1eb 100644
---- a/include/net/mana/mana.h
-+++ b/include/net/mana/mana.h
-@@ -358,6 +358,8 @@ struct mana_context {
- 
- 	u16 num_ports;
- 
-+	bool vf_unload_timeout;
-+
- 	struct mana_eq *eqs;
- 
- 	struct net_device *ports[MAX_PORTS_IN_MANA_DEV];
+ 	} else if (is_multicast_ether_addr(eth->h_dest)) {
+ 		skb_reset_mac_header(skb);
 -- 
-2.34.1
+2.16.6
 
 
