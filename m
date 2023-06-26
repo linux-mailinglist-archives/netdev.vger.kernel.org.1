@@ -1,324 +1,171 @@
-Return-Path: <netdev+bounces-13876-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13877-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E00E273D84C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:15:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C08DB73D854
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:17:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB62D1C20627
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:15:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0535B1C203BF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:17:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1473187A;
-	Mon, 26 Jun 2023 07:15:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFB71C28;
+	Mon, 26 Jun 2023 07:17:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E2371FA3
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:15:34 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 908B41AD
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:15:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687763731;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=oRpAZ7Nti36ln6bLh1OetP04CWB4zN6419jS3K9TtVg=;
-	b=SEiaiwbXcqzxKESklgixXddaIcFPV6mjD4H73Oj1c1tyupKnudITJjc4g8OYma8XpRUhY7
-	cvIlcEHHV7zLR411Js/asAF7bB93V8bYQbHrZ9LJPaQxwFIegw7Odb0HKBjKbCC4jlLwbs
-	Tx1DRBXQzmg3/n0DGFV0IDIacguKKf4=
-Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
- [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-389-4KVy7UCEOfivOgMo58kytA-1; Mon, 26 Jun 2023 03:15:27 -0400
-X-MC-Unique: 4KVy7UCEOfivOgMo58kytA-1
-Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-313ded95aeaso2339334f8f.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:15:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687763726; x=1690355726;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=oRpAZ7Nti36ln6bLh1OetP04CWB4zN6419jS3K9TtVg=;
-        b=A1iTfKHh2eKyT45rFINfx+TXNBtNF8Tlt/zvKupwfk3sl+AvaUKjRyTYCWvKF60zFj
-         BRGPmmbwY2JI4uFD8pDdhxsGQatkjQnGJm0aE3vJ319uLgI8/TEumjk58eX1LEuqloWG
-         e25dbuTG0j2cXb6CqWAUE7ZUzgo8D2e+Z5BoLdWs2fQGz/UGxV1JoXocx2K+DY6m3UI/
-         NtaPMaMEJYcJa7a6AyYGuJewR8Z/K8hjDPSp0CrZtstPAfemixGVAsswfjGT5u8opl2r
-         MriSmogg4NgYyeDdZww3u1s63Mj19LbzEUsu7GVlSznCWTyetN336rRYtoe9tqX1y3qH
-         oIaA==
-X-Gm-Message-State: AC+VfDwx/2vs6CXG7ZIWIxQOEfvNFgustMoPsyMVcsSRSCSut0dRC0Qx
-	wa58VngEl0YW8jh8seK2TCZKyy0A2Sc8nH+UudMxswLO5UX81yBrVlwfH2k6EHKXahPQ6WN6Ook
-	Sn7qV3zEmOFfhltbR
-X-Received: by 2002:a5d:63c5:0:b0:30d:673e:1547 with SMTP id c5-20020a5d63c5000000b0030d673e1547mr31614814wrw.41.1687763726394;
-        Mon, 26 Jun 2023 00:15:26 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4IfQOVFgnyM9im+2Beb7wrvIRhCpIKB6kM8gY1Yc9KBzl/+EAkyeCECJFGYDJJTl85veKcRQ==
-X-Received: by 2002:a5d:63c5:0:b0:30d:673e:1547 with SMTP id c5-20020a5d63c5000000b0030d673e1547mr31614793wrw.41.1687763726045;
-        Mon, 26 Jun 2023 00:15:26 -0700 (PDT)
-Received: from redhat.com ([2.52.156.102])
-        by smtp.gmail.com with ESMTPSA id m8-20020adffe48000000b002c71b4d476asm6416594wrs.106.2023.06.26.00.15.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 00:15:25 -0700 (PDT)
-Date: Mon, 26 Jun 2023 03:15:22 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: syzbot <syzbot+8540db210d403f1aa214@syzkaller.appspotmail.com>
-Cc: jasowang@redhat.com, kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-	michael.christie@oracle.com, netdev@vger.kernel.org,
-	syzkaller-bugs@googlegroups.com,
-	virtualization@lists.linux-foundation.org
-Subject: Re: [syzbot] [net?] [virt?] [kvm?] KASAN: slab-use-after-free Read
- in __vhost_vq_attach_worker
-Message-ID: <20230626031411-mutt-send-email-mst@kernel.org>
-References: <000000000000df3e3b05ff02fe20@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F5A20E1;
+	Mon, 26 Jun 2023 07:17:06 +0000 (UTC)
+Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23CCAE7D;
+	Mon, 26 Jun 2023 00:16:41 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QqK014gD0z4f3nyQ;
+	Mon, 26 Jun 2023 15:16:33 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP1 (Coremail) with SMTP id cCh0CgDXPypQO5lk8PWFLw--.36685S2;
+	Mon, 26 Jun 2023 15:16:35 +0800 (CST)
+Subject: Re: [PATCH v2 bpf-next 09/13] bpf: Allow reuse from
+ waiting_for_gp_ttrace list.
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>,
+ rcu@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
+ bpf <bpf@vger.kernel.org>, Kernel Team <kernel-team@fb.com>
+References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
+ <20230624031333.96597-10-alexei.starovoitov@gmail.com>
+ <9cc35513-5522-9229-469b-7d691c9790e1@huaweicloud.com>
+ <CAADnVQJViJh47Cze186XCS0_jeQMb1wu6BfVZiQL6982a_hhfg@mail.gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <417e4d9c-7b69-0b9a-07e3-9af4b3b3299f@huaweicloud.com>
+Date: Mon, 26 Jun 2023 15:16:32 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <000000000000df3e3b05ff02fe20@google.com>
-X-Spam-Status: No, score=-0.6 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+In-Reply-To: <CAADnVQJViJh47Cze186XCS0_jeQMb1wu6BfVZiQL6982a_hhfg@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID:cCh0CgDXPypQO5lk8PWFLw--.36685S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxCFyfZFW8XF15tw1DGFW7Jwb_yoW5uw1rpr
+	W8JFy5GFy8JrWIy3Wqqr48GFyqqr48JasrJayUXa4fKr15Xrn0qryfWry2grnxA3y8Cry7
+	tw4kWr1Ivr45C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
+	MAY_BE_FORGED,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jun 26, 2023 at 12:06:54AM -0700, syzbot wrote:
-> Hello,
-> 
-> syzbot found the following issue on:
-> 
-> HEAD commit:    8d2be868b42c Add linux-next specific files for 20230623
-> git tree:       linux-next
-> console+strace: https://syzkaller.appspot.com/x/log.txt?x=12872950a80000
-> kernel config:  https://syzkaller.appspot.com/x/.config?x=d8ac8dd33677e8e0
-> dashboard link: https://syzkaller.appspot.com/bug?extid=8540db210d403f1aa214
-> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-> syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15c1b70f280000
-> C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=122ee4cb280000
-> 
-> Downloadable assets:
-> disk image: https://storage.googleapis.com/syzbot-assets/2a004483aca3/disk-8d2be868.raw.xz
-> vmlinux: https://storage.googleapis.com/syzbot-assets/5688cb13b277/vmlinux-8d2be868.xz
-> kernel image: https://storage.googleapis.com/syzbot-assets/76de0b63bc53/bzImage-8d2be868.xz
-> 
-> The issue was bisected to:
-> 
-> commit 21a18f4a51896fde11002165f0e7340f4131d6a0
-> Author: Mike Christie <michael.christie@oracle.com>
-> Date:   Tue Jun 13 01:32:46 2023 +0000
-> 
->     vhost: allow userspace to create workers
-> 
-> bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=130850bf280000
-> final oops:     https://syzkaller.appspot.com/x/report.txt?x=108850bf280000
-> console output: https://syzkaller.appspot.com/x/log.txt?x=170850bf280000
-> 
-> IMPORTANT: if you fix the issue, please add the following tag to the commit:
-> Reported-by: syzbot+8540db210d403f1aa214@syzkaller.appspotmail.com
-> Fixes: 21a18f4a5189 ("vhost: allow userspace to create workers")
+Hi,
 
-Mike, would appreciate prompt attention to this as I am preparing
-a pull request for the merge window and need to make a
-decision on whether to include your userspace-controlled
-threading patchset.
+On 6/26/2023 12:42 PM, Alexei Starovoitov wrote:
+> On Sun, Jun 25, 2023 at 8:30 PM Hou Tao <houtao@huaweicloud.com> wrote:
+>> Hi,
+>>
+>> On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
+>>> From: Alexei Starovoitov <ast@kernel.org>
+>>>
+>>> alloc_bulk() can reuse elements from free_by_rcu_ttrace.
+>>> Let it reuse from waiting_for_gp_ttrace as well to avoid unnecessary kmalloc().
+>>>
+>>> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+>>> ---
+>>>  kernel/bpf/memalloc.c | 9 +++++++++
+>>>  1 file changed, 9 insertions(+)
+>>>
+>>> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
+>>> index 692a9a30c1dc..666917c16e87 100644
+>>> --- a/kernel/bpf/memalloc.c
+>>> +++ b/kernel/bpf/memalloc.c
+>>> @@ -203,6 +203,15 @@ static void alloc_bulk(struct bpf_mem_cache *c, int cnt, int node)
+>>>       if (i >= cnt)
+>>>               return;
+>>>
+>>> +     for (; i < cnt; i++) {
+>>> +             obj = llist_del_first(&c->waiting_for_gp_ttrace);
+>> After allowing to reuse elements from waiting_for_gp_ttrace, there may
+>> be concurrent llist_del_first() and llist_del_all() as shown below and
+>> llist_del_first() is not safe because the elements freed from free_rcu()
+>> could be reused immediately and head->first may be added back to
+>> c0->waiting_for_gp_ttrace by other process.
+>>
+>> // c0
+>> alloc_bulk()
+>>     llist_del_first(&c->waiting_for_gp_ttrace)
+>>
+>> // c1->tgt = c0
+>> free_rcu()
+>>     llist_del_all(&c->waiting_for_gp_ttrace)
+> I'm still thinking about how to fix the other issues you've reported,
+> but this one, I believe, is fine.
+> Are you basing 'not safe' on a comment?
+> Why xchg(&head->first, NULL); on one cpu and
+> try_cmpxchg(&head->first, &entry, next);
+> is unsafe?
+No, I didn't reason it only based on the comment in llist.h. The reason
+I though it was not safe because llist_del_first() may have ABA problem
+as pointed by you early, because after __free_rcu(), the elements on
+waiting_for_gp_ttrace would be available immediately and
+waiting_for_gp_ttrace->first may be reused and then added back to
+waiting_for_gp_ttrace->first again as shown below.
 
-Thanks!
+// c0->waiting_for_gp_ttrace 
+A -> B -> C -> nil 
+ 
+P1: 
+alloc_bulk(c0) 
+    llist_del_first(&c0->waiting_for_gp_ttrace) 
+        entry = A 
+        next = B 
+ 
+    P2: __free_rcu 
+        // A/B/C is freed back to slab 
+        // c0->waiting_for_gp_ttrace->first = NULL 
+        free_all(llist_del_all(c0)) 
+ 
+    P3: alloc_bulk(c1) 
+        // got A 
+        __kmalloc() 
+ 
+    // free A (from c1), ..., last free X (allocated from c0) 
+    P3: unit_free(c1)
+        // the last freed element X is from c0
+        c1->tgt = c0 
+        c1->free_llist->first -> X -> Y -> ... -> A 
+    P3: free_bulk(c1) 
+        enque_to_free(c0) 
+            c0->free_by_rcu_ttrace->first -> A -> ... -> Y -> X 
+        __llist_add_batch(c0->waiting_for_gp_ttrace) 
+            c0->waiting_for_gp_ttrace = A -> ... -> Y -> X 
 
-
-> ==================================================================
-> BUG: KASAN: slab-use-after-free in __mutex_lock_common kernel/locking/mutex.c:582 [inline]
-> BUG: KASAN: slab-use-after-free in __mutex_lock+0x1029/0x1350 kernel/locking/mutex.c:747
-> Read of size 8 at addr ffff8880703fff68 by task syz-executor204/5105
-> 
-> CPU: 0 PID: 5105 Comm: syz-executor204 Not tainted 6.4.0-rc7-next-20230623-syzkaller #0
-> Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-> Call Trace:
->  <TASK>
->  __dump_stack lib/dump_stack.c:88 [inline]
->  dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
->  print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:364
->  print_report mm/kasan/report.c:475 [inline]
->  kasan_report+0x11d/0x130 mm/kasan/report.c:588
->  __mutex_lock_common kernel/locking/mutex.c:582 [inline]
->  __mutex_lock+0x1029/0x1350 kernel/locking/mutex.c:747
->  __vhost_vq_attach_worker+0xe7/0x390 drivers/vhost/vhost.c:678
->  vhost_dev_set_owner+0x670/0xa60 drivers/vhost/vhost.c:892
->  vhost_net_set_owner drivers/vhost/net.c:1687 [inline]
->  vhost_net_ioctl+0x668/0x16a0 drivers/vhost/net.c:1737
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:870 [inline]
->  __se_sys_ioctl fs/ioctl.c:856 [inline]
->  __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> RIP: 0033:0x7fe7a9715629
-> Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 21 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-> RSP: 002b:00007fe7a96ba208 EFLAGS: 00000246 ORIG_RAX: 0000000000000010
-> RAX: ffffffffffffffda RBX: 000000000000000b RCX: 00007fe7a9715629
-> RDX: 0000000000000000 RSI: 000000000000af01 RDI: 0000000000000003
-> RBP: 00007fe7a979e240 R08: 00007fe7a979e248 R09: 00007fe7a979e248
-> R10: 00007fe7a979e248 R11: 0000000000000246 R12: 00007fe7a979e24c
-> R13: 00007ffcfa04d48f R14: 00007fe7a96ba300 R15: 0000000000022000
->  </TASK>
-> 
-> Allocated by task 5105:
->  kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
->  kasan_set_track+0x25/0x30 mm/kasan/common.c:52
->  ____kasan_kmalloc mm/kasan/common.c:374 [inline]
->  ____kasan_kmalloc mm/kasan/common.c:333 [inline]
->  __kasan_kmalloc+0xa2/0xb0 mm/kasan/common.c:383
->  kmalloc include/linux/slab.h:579 [inline]
->  kzalloc include/linux/slab.h:700 [inline]
->  vhost_worker_create+0x9c/0x320 drivers/vhost/vhost.c:627
->  vhost_dev_set_owner+0x5b9/0xa60 drivers/vhost/vhost.c:885
->  vhost_net_set_owner drivers/vhost/net.c:1687 [inline]
->  vhost_net_ioctl+0x668/0x16a0 drivers/vhost/net.c:1737
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:870 [inline]
->  __se_sys_ioctl fs/ioctl.c:856 [inline]
->  __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> Freed by task 5108:
->  kasan_save_stack+0x22/0x40 mm/kasan/common.c:45
->  kasan_set_track+0x25/0x30 mm/kasan/common.c:52
->  kasan_save_free_info+0x2b/0x40 mm/kasan/generic.c:521
->  ____kasan_slab_free mm/kasan/common.c:236 [inline]
->  ____kasan_slab_free+0x160/0x1c0 mm/kasan/common.c:200
->  kasan_slab_free include/linux/kasan.h:164 [inline]
->  slab_free_hook mm/slub.c:1792 [inline]
->  slab_free_freelist_hook+0x8b/0x1c0 mm/slub.c:1818
->  slab_free mm/slub.c:3801 [inline]
->  __kmem_cache_free+0xb8/0x2d0 mm/slub.c:3814
->  vhost_worker_destroy drivers/vhost/vhost.c:600 [inline]
->  vhost_workers_free drivers/vhost/vhost.c:615 [inline]
->  vhost_dev_cleanup+0x66b/0x850 drivers/vhost/vhost.c:991
->  vhost_dev_reset_owner+0x25/0x160 drivers/vhost/vhost.c:923
->  vhost_net_reset_owner drivers/vhost/net.c:1621 [inline]
->  vhost_net_ioctl+0x807/0x16a0 drivers/vhost/net.c:1735
->  vfs_ioctl fs/ioctl.c:51 [inline]
->  __do_sys_ioctl fs/ioctl.c:870 [inline]
->  __se_sys_ioctl fs/ioctl.c:856 [inline]
->  __x64_sys_ioctl+0x19d/0x210 fs/ioctl.c:856
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> The buggy address belongs to the object at ffff8880703fff00
->  which belongs to the cache kmalloc-cg-192 of size 192
-> The buggy address is located 104 bytes inside of
->  freed 192-byte region [ffff8880703fff00, ffff8880703fffc0)
-> 
-> The buggy address belongs to the physical page:
-> page:ffffea0001c0ffc0 refcount:1 mapcount:0 mapping:0000000000000000 index:0x0 pfn:0x703ff
-> flags: 0xfff00000000200(slab|node=0|zone=1|lastcpupid=0x7ff)
-> page_type: 0xffffffff()
-> raw: 00fff00000000200 ffff88801284ddc0 dead000000000122 0000000000000000
-> raw: 0000000000000000 0000000000100010 00000001ffffffff 0000000000000000
-> page dumped because: kasan: bad access detected
-> page_owner tracks the page as allocated
-> page last allocated via order 0, migratetype Unmovable, gfp_mask 0x16cc0(GFP_KERNEL|__GFP_NOWARN|__GFP_RETRY_MAYFAIL|__GFP_NORETRY), pid 5034, tgid 5034 (syz-executor204), ts 72916757418, free_ts 72797036103
->  set_page_owner include/linux/page_owner.h:31 [inline]
->  post_alloc_hook+0x2db/0x350 mm/page_alloc.c:1570
->  prep_new_page mm/page_alloc.c:1577 [inline]
->  get_page_from_freelist+0xfd9/0x2c40 mm/page_alloc.c:3257
->  __alloc_pages+0x1cb/0x4a0 mm/page_alloc.c:4513
->  alloc_pages+0x1aa/0x270 mm/mempolicy.c:2279
->  alloc_slab_page mm/slub.c:1862 [inline]
->  allocate_slab+0x25f/0x390 mm/slub.c:2009
->  new_slab mm/slub.c:2062 [inline]
->  ___slab_alloc+0xbc3/0x15d0 mm/slub.c:3215
->  __slab_alloc.constprop.0+0x56/0xa0 mm/slub.c:3314
->  __slab_alloc_node mm/slub.c:3367 [inline]
->  slab_alloc_node mm/slub.c:3460 [inline]
->  __kmem_cache_alloc_node+0x143/0x350 mm/slub.c:3509
->  __do_kmalloc_node mm/slab_common.c:984 [inline]
->  __kmalloc_node+0x51/0x1a0 mm/slab_common.c:992
->  kmalloc_node include/linux/slab.h:599 [inline]
->  kvmalloc_node+0xa2/0x1a0 mm/util.c:604
->  kvmalloc include/linux/slab.h:717 [inline]
->  kvzalloc include/linux/slab.h:725 [inline]
->  netif_alloc_rx_queues net/core/dev.c:9847 [inline]
->  alloc_netdev_mqs+0xbde/0x1270 net/core/dev.c:10660
->  ieee80211_if_add+0x1b7/0x19d0 net/mac80211/iface.c:2099
->  ieee80211_register_hw+0x37e5/0x40e0 net/mac80211/main.c:1407
->  mac80211_hwsim_new_radio+0x26e6/0x4c70 drivers/net/wireless/virtual/mac80211_hwsim.c:5303
->  hwsim_new_radio_nl+0xacf/0x1210 drivers/net/wireless/virtual/mac80211_hwsim.c:5983
->  genl_family_rcv_msg_doit.isra.0+0x1e6/0x2d0 net/netlink/genetlink.c:970
-> page last free stack trace:
->  reset_page_owner include/linux/page_owner.h:24 [inline]
->  free_pages_prepare mm/page_alloc.c:1161 [inline]
->  free_unref_page_prepare+0x62e/0xcb0 mm/page_alloc.c:2384
->  free_unref_page+0x33/0x370 mm/page_alloc.c:2479
->  __unfreeze_partials+0x1fe/0x220 mm/slub.c:2647
->  qlink_free mm/kasan/quarantine.c:166 [inline]
->  qlist_free_all+0x6a/0x170 mm/kasan/quarantine.c:185
->  kasan_quarantine_reduce+0x195/0x220 mm/kasan/quarantine.c:292
->  __kasan_slab_alloc+0x63/0x90 mm/kasan/common.c:305
->  kasan_slab_alloc include/linux/kasan.h:188 [inline]
->  slab_post_alloc_hook mm/slab.h:750 [inline]
->  slab_alloc_node mm/slub.c:3470 [inline]
->  __kmem_cache_alloc_node+0x1ce/0x350 mm/slub.c:3509
->  __do_kmalloc_node mm/slab_common.c:984 [inline]
->  __kmalloc_node+0x51/0x1a0 mm/slab_common.c:992
->  kmalloc_node include/linux/slab.h:599 [inline]
->  kvmalloc_node+0xa2/0x1a0 mm/util.c:604
->  kvmalloc include/linux/slab.h:717 [inline]
->  seq_buf_alloc fs/seq_file.c:38 [inline]
->  seq_read_iter+0x7fb/0x12d0 fs/seq_file.c:210
->  kernfs_fop_read_iter+0x4ce/0x690 fs/kernfs/file.c:279
->  call_read_iter include/linux/fs.h:1865 [inline]
->  new_sync_read fs/read_write.c:389 [inline]
->  vfs_read+0x4a8/0x8d0 fs/read_write.c:470
->  ksys_read+0x122/0x250 fs/read_write.c:613
->  do_syscall_x64 arch/x86/entry/common.c:50 [inline]
->  do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
->  entry_SYSCALL_64_after_hwframe+0x63/0xcd
-> 
-> Memory state around the buggy address:
->  ffff8880703ffe00: 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00 00
->  ffff8880703ffe80: 00 00 00 00 00 00 00 00 fc fc fc fc fc fc fc fc
-> >ffff8880703fff00: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
->                                                           ^
->  ffff8880703fff80: fb fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
->  ffff888070400000: fa fb fb fb fb fb fb fb fb fb fb fb fb fb fb fb
-> ==================================================================
-> 
-> 
-> ---
-> This report is generated by a bot. It may contain errors.
-> See https://goo.gl/tpsmEJ for more information about syzbot.
-> syzbot engineers can be reached at syzkaller@googlegroups.com.
-> 
-> syzbot will keep track of this issue. See:
-> https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-> For information about bisection process see: https://goo.gl/tpsmEJ#bisection
-> 
-> If the bug is already fixed, let syzbot know by replying with:
-> #syz fix: exact-commit-title
-> 
-> If you want syzbot to run the reproducer, reply with:
-> #syz test: git://repo/address.git branch-or-commit-hash
-> If you attach or paste a git patch, syzbot will apply it before testing.
-> 
-> If you want to change bug's subsystems, reply with:
-> #syz set subsystems: new-subsystem
-> (See the list of subsystem names on the web dashboard)
-> 
-> If the bug is a duplicate of another bug, reply with:
-> #syz dup: exact-subject-of-another-report
-> 
-> If you want to undo deduplication, reply with:
-> #syz undup
+P1: 
+    // A is added back as first again
+    // but llist_del_first() didn't know
+    try_cmpxhg(&c0->waiting_for_gp_ttrace->first, A, B) 
+    // c0->waiting_for_gp_trrace is corrupted 
+    c0->waiting_for_gp_ttrace->first = B
 
 
