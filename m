@@ -1,253 +1,315 @@
-Return-Path: <netdev+bounces-13857-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13858-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E283C73D74E
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:50:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4993173D7A3
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:13:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56A9D280D7C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 05:50:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D12CF280D7A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:13:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68FB1ECF;
-	Mon, 26 Jun 2023 05:50:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AC51310FE;
+	Mon, 26 Jun 2023 06:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59B02EC5
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 05:50:27 +0000 (UTC)
-Received: from sonic306-19.consmr.mail.gq1.yahoo.com (sonic306-19.consmr.mail.gq1.yahoo.com [98.137.68.82])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72B4B1A1
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 22:50:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1687758624; bh=YSPfpiwOkBQ46XmUoyeSet/T0M+S11yQNJsZwzaMjfg=; h=From:To:Cc:Subject:Date:In-Reply-To:References:From:Subject:Reply-To; b=iSwh70zPOJBOQnKaziyB5LolyzqpikN5M1m9tMyTLVltyv3Cxt+lo3W2+wWpqzbj2bamHgx9gIjE1TLjQSeZpvPy9hbRVofxO0DRBTABPMfcCrwYHBz8QxvmHRPf49VRSAlm3ilnd/ESSvBg7Bsyj8ESKhpgk7nwvTG/12S0g2f7+lOy7+L8mip/vpi7myVihS/Wjp155/ClXDePzmLv+m80J/ikiOWI0RyGODnWx656kC6cbhp49js3Y/Ye4FV/7/TgcellX++wQlbeukXzAOjlhOancO5U2BM1ueOT6P1ZPybm2lNpXGFrx18vsL2pUPnzIZRtd9Y4dYabwoTAGg==
-X-SONIC-DKIM-SIGN: v=1; a=rsa-sha256; c=relaxed/relaxed; d=yahoo.com; s=s2048; t=1687758624; bh=m3FvznhgHOpvj8k7IEuJ5leuJe78mMgrUbbJzz/+kGp=; h=X-Sonic-MF:From:To:Subject:Date:From:Subject; b=dWCwyxwVIr0R014B2UkCfse9rORV9nWMbF/438S3UMyDiEgsAvbcYL3+O9A9e6sPBCqnd1C0CAfMFDWOi/aAlQS6J6gJwSUTUE2+/AScdj+xZDTShFbqnM98IW0sNNDn47fG0ZFV5MGKIeGgQdj4MWhv+ZqZQj9udgG6COlx4lSY642OFT6hqzFHaNEtAQfJ7SD7HwmVivI4laVGV192U018tgb5ZnIHnjFrkTWJe9cTpmY4+QDcyeNreJ0n4hHYSnDvtH/i2qDmw+vq64vzDrvqHXzSolPG/86VXoj82vr0fWwBn5d/ILn1i/PEdZq/xNbbaeVXuoE9tfCzAA3JIQ==
-X-YMail-OSG: r0usPE8VM1nYaCvVbAWqc7TrSh2GRlB1hPF3gBnuic.eHpFVJTpv_G8iz__PWfR
- XHjysvHD4Zg7W6x9j9Ojwi.KF9dqXgc27O_5_3O51TaK9IWTooYRFUX7kroq2Cm8Mz3sitxl2LX8
- DWqO39fktnUnwT8kWHenJ.qvBRY8MqHxlF_HEzhaW6cSzveRqAM3tOSFtqewspAinFNkjnGJbkdH
- 49Ei9dct6usZs3ISARXNl9zCR4lZNFwEF_qU4NyhQ0l7BYZ508f2yGHVu.RVlW6e07atJL3T5H8a
- D4HD0QEXnbvojZlJzItO_Q.krX.VcNeD.Hs9YquLv5YNt0e.wX_jaQOiJwvptN42NKYSATQX.GhD
- TpBVE3gwYZvtEIZTe0frhw9Q3DhTQVM.qAd..GGW8hon0WDVGDruj8xn2abhv4vjFnmv3kjPrIAs
- aFi52gEHoXytALWbLtB6tPcckOQhrsfaHrj7jbSffpMItJCv1KJQLPTaryp87O_X4E0MYfGt2jPo
- bypJ2exnmENL2KAAaXAhdAQbwuID55BldC3f0oq.UbMDh9llBL9c0TGz_lznUsr80hWHF94InJ80
- bTKnM49PTOB5eNTA5PpqKmy8sW6uLxbU1.3jYzMT485ZK8x5MBxLxtxpbUrUc2aL.ss65GyT44D4
- jRBxcRuThGFLwRMfyBROEwBpHRvkCY01dTbVO5ihUA9C_omNHaE.fWVT_OghtoQgc1DlM_OrQNCI
- J42kxqd3ad28tIDaCR92i6AWb54Fcn9UrUtQpA1ZnPM0.FF1BT.DiKyBBiJyFYQx3M7Y5TJys5Fy
- DdKDnqUbYwhi1fWUh_z37vS39_bxyinCP05Yc9Q6unfyk5Rrozy2exIPxNpgjuW8RPgyYCwT.pRa
- bNb17uO7d8IhR2OJb.xdaIK33n7SdYi5mn8LaueUFEuFzpJVSCMM9TfDbvggQOTQhXuHuScFaQma
- 7Bq3a8ZxcN3qVBrMsr1MLPFfXfMYjji_t_NgtY7aSPzlNLXoat_fPgr_9zcjcvGsStSIwR1sPqb_
- y64V0D_Xz7VD97fBDUKphVQBXs01wM1d6R6XGHPBx4z3sW6zfEyQXtyRnDgq_.HrRV9rAtdiU1kw
- hQe3ItEkJASUcEYtMxfwhWBXiNhh45We6sr1mPvj709Db80nu.L3CyATk_htgbNEKASvoI5Y5NsP
- SG4zP3.ikJVAdP_fgUdgCjiJhbO0gkjy.XTlAIuzZ5p7HCz0uyIgd.sKNXG9.FZ5teCL5nKc_0SA
- XbJeru5IfeRNLL4AZwvHH9qC_i16CREi3HYr.cvZYQ2v3ZObV5oGcIOPSavzFtiYGnb2UapPgq61
- wVjjQh3fr0yvogIIl5uTG5Xab4OrgX88SOsOq9nj8A6S_Wyd_hyfS4encthpEBy0x9BkMqYUo60n
- mFsqI3oqmC8gOP0qXqj7CQ9FSkSzsuCh1YYIy4PHi9q4ers2JnojuT0Mm0VE3wh75aolS9ZjK_xL
- F8ScYq4EshFw9Umxk.vnLk62GjmrxPk3z0r7zhybKUJbHpWf64bZWVZgA7zACu8bRMo.VL9EdfVH
- 5KvMj_.uxAs37w2xRLSQJxxqoESH2Fsd3dkTKqubVgL2pZYwbOuB5r93etLNyoVzwU6XkPf1f3zS
- 8l_daXL.DCOAB9JS4WpNJHk.JEh4pnUoVPpQA1j3aAtN94qm8rrbjkh0ctM_oJrdo4tFVNFD6.Nr
- 2ueFP9T78wD4XQSoqsXQXKf6vc8zSRphcOM6yt5raAU43XoR4K6pgBN7P5fx.K_mlSJddoWnrp2m
- bkqh95LP1UZvS_kQZZ3VqfCOBIvY0evdqMBYsualgppzRJ0g638P24bPpADx5AtASg_Lc8LY8nJ2
- .PauUxsGMlRNg8W8JbZm4aXqKcj8Q_t0PSOpROvbS4X4DIjcbBzew21SRDLdF7hW2UePtLeAHKXl
- UwhqUopwyCQ6rW6XSESFl0LJUrmjB6z2hsI2L8.rlrEY2XnW_V90oc1_PT5HP4KctfqxK2bmPVOU
- XErcHJxV55RGx2hA_hyi9.52huQIAqyf_KZyN2UenSInA0n6I17h_UgAo.hRKISaJAdU_DsMSASI
- U7WY5FWp6bUrMSOg8jFxE_6zmOnguCgB7Sg1PG98Nqs.6Qq.s8S7DXWGcJwr2zRkpVwqID_z7Jx.
- DNqGcFG0Gj7iHyTMHwqjj6CGfFWDUBznpRhJgqFdRCsDVoqFc5Qi3hwWJqv7R0f5nfA8f0Sk1QDn
- 0xSlMgc42H3GBEl1ziRaZ94U.qZfB1LYWun48wmNchEzia2xBTQU1UMyk.g--
-X-Sonic-MF: <astrajoan@yahoo.com>
-X-Sonic-ID: cf970580-2d62-457c-b04b-30abe5780566
-Received: from sonic.gate.mail.ne1.yahoo.com by sonic306.consmr.mail.gq1.yahoo.com with HTTP; Mon, 26 Jun 2023 05:50:24 +0000
-Received: by hermes--production-ne1-574d4b7954-scd6l (Yahoo Inc. Hermes SMTP Server) with ESMTPA ID c49500d6fa260bb4bc461a6730467256;
-          Mon, 26 Jun 2023 05:50:20 +0000 (UTC)
-From: Ziqi Zhao <astrajoan@yahoo.com>
-To: mudongliangabcd@gmail.com
-Cc: arnd@arndb.de,
-	astrajoan@yahoo.com,
-	bridge@lists.linux-foundation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	ivan.orlov0322@gmail.com,
-	kuba@kernel.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	nikolay@nvidia.com,
-	pabeni@redhat.com,
-	roopa@nvidia.com,
-	skhan@linuxfoundation.org,
-	syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com,
-	syzkaller-bugs@googlegroups.com
-Subject: [PATCH] can: j1939: prevent deadlock by changing j1939_socks_lock to rwlock
-Date: Sun, 25 Jun 2023 22:50:04 -0700
-Message-Id: <20230626055004.29303-1-astrajoan@yahoo.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <CAD-N9QXZFMFGp3Vw4449Bx1-ttDVSF3hiwSw=e6+D096UDNfvw@mail.gmail.com>
-References: <CAD-N9QXZFMFGp3Vw4449Bx1-ttDVSF3hiwSw=e6+D096UDNfvw@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BBBDED3;
+	Mon, 26 Jun 2023 06:13:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A64A6C433D9;
+	Mon, 26 Jun 2023 06:13:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687760010;
+	bh=tIDPiX4oZCQnSjoJrRmXYm4/HW+kneyQ9COWSK2/0ZY=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=Kqp3cvsRJ3zrwxvYCz0cNhvxJ+ddOQlZbdAd6MYB7hpQfGaPjaEWx4XRgumHA3asl
+	 2pfxaCvJsapTma27TczMyDfkLmZLMX4LxIpbXhwpJJZRXNZyd0yCBPciRDI7IG26pW
+	 ZofYK78Vy6+X23yGoPjG4iHaIJX3xZk1Cf5VyXONw4g0+lhwJyZb3QOZc9UC1abgeN
+	 JpHRigJrpulMhEXYrJrzp6iqFIELQ33QjiEoR3RKROk8Rgf0ZADCCTCGDDgSsfyqIA
+	 PxNsesDEzXoQ4yNdH5/98H+JDv2HJQTHEWa2ob8wVV0DOdBO7Eu/aKKZ0U8efnWun+
+	 0ZC+zZqTlmuaA==
+Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4f4b2bc1565so3627446e87.2;
+        Sun, 25 Jun 2023 23:13:30 -0700 (PDT)
+X-Gm-Message-State: AC+VfDx3RS1tSDV4GnIXUXfaas/h7pEg6GTeJf56cXwb5ntnihtFlMH2
+	4eNkqPkScdfHuPfCm6ZyZQyYLXmlruTm9AAJST8=
+X-Google-Smtp-Source: ACHHUZ7Z1BsryLRBJgwSdFpXVYEgN5RfTaOqmCtmT2+wVlbf2QTe+Yf05nZb1BtwYAaKvRHJWuEELQy+6WhHrJTYCe0=
+X-Received: by 2002:a05:6512:705:b0:4f9:ec5e:d624 with SMTP id
+ b5-20020a056512070500b004f9ec5ed624mr1614382lfs.38.1687760008514; Sun, 25 Jun
+ 2023 23:13:28 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Reported-by: syzbot+881d65229ca4f9ae8c84@syzkaller.appspotmail.com
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+References: <20230616085038.4121892-1-rppt@kernel.org> <20230616085038.4121892-3-rppt@kernel.org>
+ <f9a7eebe-d36e-4587-b99d-35d4edefdd14@app.fastmail.com> <20230618080027.GA52412@kernel.org>
+ <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com> <20230625161417.GK52412@kernel.org>
+ <90161ac9-3ca0-4c72-b1c4-ab1293e55445@app.fastmail.com> <20230625174257.GL52412@kernel.org>
+ <20230625180741.jrrtkq55c4jrqh3t@moria.home.lan>
+In-Reply-To: <20230625180741.jrrtkq55c4jrqh3t@moria.home.lan>
+From: Song Liu <song@kernel.org>
+Date: Sun, 25 Jun 2023 23:13:15 -0700
+X-Gmail-Original-Message-ID: <CAPhsuW45gmtCVgA0mg6X87x5EOzSmVqq3SCMSR6agyiukiJvEQ@mail.gmail.com>
+Message-ID: <CAPhsuW45gmtCVgA0mg6X87x5EOzSmVqq3SCMSR6agyiukiJvEQ@mail.gmail.com>
+Subject: Re: [PATCH v2 02/12] mm: introduce execmem_text_alloc() and jit_text_alloc()
+To: Kent Overstreet <kent.overstreet@linux.dev>
+Cc: Mike Rapoport <rppt@kernel.org>, Andy Lutomirski <luto@kernel.org>, 
+	Mark Rutland <mark.rutland@arm.com>, Kees Cook <keescook@chromium.org>, 
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Andrew Morton <akpm@linux-foundation.org>, 
+	Catalin Marinas <catalin.marinas@arm.com>, Christophe Leroy <christophe.leroy@csgroup.eu>, 
+	"David S. Miller" <davem@davemloft.net>, Dinh Nguyen <dinguyen@kernel.org>, 
+	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>, Huacai Chen <chenhuacai@kernel.org>, 
+	Luis Chamberlain <mcgrof@kernel.org>, Michael Ellerman <mpe@ellerman.id.au>, 
+	Nadav Amit <nadav.amit@gmail.com>, "Naveen N. Rao" <naveen.n.rao@linux.ibm.com>, 
+	Palmer Dabbelt <palmer@dabbelt.com>, Puranjay Mohan <puranjay12@gmail.com>, 
+	Rick P Edgecombe <rick.p.edgecombe@intel.com>, 
+	"Russell King (Oracle)" <linux@armlinux.org.uk>, Steven Rostedt <rostedt@goodmis.org>, 
+	Thomas Bogendoerfer <tsbogend@alpha.franken.de>, Thomas Gleixner <tglx@linutronix.de>, 
+	Will Deacon <will@kernel.org>, bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org, 
+	linux-mips@vger.kernel.org, linux-mm@kvack.org, linux-modules@vger.kernel.org, 
+	linux-parisc@vger.kernel.org, linux-riscv@lists.infradead.org, 
+	linux-s390@vger.kernel.org, linux-trace-kernel@vger.kernel.org, 
+	linuxppc-dev@lists.ozlabs.org, loongarch@lists.linux.dev, 
+	netdev@vger.kernel.org, sparclinux@vger.kernel.org, 
+	"the arch/x86 maintainers" <x86@kernel.org>, pjt@google.com, torvalds@linux-foundation.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 
-The following 3 locks would race against each other, causing the
-deadlock situation in the Syzbot bug report:
+On Sun, Jun 25, 2023 at 11:07=E2=80=AFAM Kent Overstreet
+<kent.overstreet@linux.dev> wrote:
+>
+> On Sun, Jun 25, 2023 at 08:42:57PM +0300, Mike Rapoport wrote:
+> > On Sun, Jun 25, 2023 at 09:59:34AM -0700, Andy Lutomirski wrote:
+> > >
+> > >
+> > > On Sun, Jun 25, 2023, at 9:14 AM, Mike Rapoport wrote:
+> > > > On Mon, Jun 19, 2023 at 10:09:02AM -0700, Andy Lutomirski wrote:
+> > > >>
+> > > >> On Sun, Jun 18, 2023, at 1:00 AM, Mike Rapoport wrote:
+> > > >> > On Sat, Jun 17, 2023 at 01:38:29PM -0700, Andy Lutomirski wrote:
+> > > >> >> On Fri, Jun 16, 2023, at 1:50 AM, Mike Rapoport wrote:
+> > > >> >> > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
+> > > >> >> >
+> > > >> >> > module_alloc() is used everywhere as a mean to allocate memor=
+y for code.
+> > > >> >> >
+> > > >> >> > Beside being semantically wrong, this unnecessarily ties all =
+subsystems
+> > > >> >> > that need to allocate code, such as ftrace, kprobes and BPF t=
+o modules
+> > > >> >> > and puts the burden of code allocation to the modules code.
+> > > >> >> >
+> > > >> >> > Several architectures override module_alloc() because of vari=
+ous
+> > > >> >> > constraints where the executable memory can be located and th=
+is causes
+> > > >> >> > additional obstacles for improvements of code allocation.
+> > > >> >> >
+> > > >> >> > Start splitting code allocation from modules by introducing
+> > > >> >> > execmem_text_alloc(), execmem_free(), jit_text_alloc(), jit_f=
+ree() APIs.
+> > > >> >> >
+> > > >> >> > Initially, execmem_text_alloc() and jit_text_alloc() are wrap=
+pers for
+> > > >> >> > module_alloc() and execmem_free() and jit_free() are replacem=
+ents of
+> > > >> >> > module_memfree() to allow updating all call sites to use the =
+new APIs.
+> > > >> >> >
+> > > >> >> > The intention semantics for new allocation APIs:
+> > > >> >> >
+> > > >> >> > * execmem_text_alloc() should be used to allocate memory that=
+ must reside
+> > > >> >> >   close to the kernel image, like loadable kernel modules and=
+ generated
+> > > >> >> >   code that is restricted by relative addressing.
+> > > >> >> >
+> > > >> >> > * jit_text_alloc() should be used to allocate memory for gene=
+rated code
+> > > >> >> >   when there are no restrictions for the code placement. For
+> > > >> >> >   architectures that require that any code is within certain =
+distance
+> > > >> >> >   from the kernel image, jit_text_alloc() will be essentially=
+ aliased to
+> > > >> >> >   execmem_text_alloc().
+> > > >> >> >
+> > > >> >>
+> > > >> >> Is there anything in this series to help users do the appropria=
+te
+> > > >> >> synchronization when the actually populate the allocated memory=
+ with
+> > > >> >> code?  See here, for example:
+> > > >> >
+> > > >> > This series only factors out the executable allocations from mod=
+ules and
+> > > >> > puts them in a central place.
+> > > >> > Anything else would go on top after this lands.
+> > > >>
+> > > >> Hmm.
+> > > >>
+> > > >> On the one hand, there's nothing wrong with factoring out common c=
+ode. On
+> > > >> the other hand, this is probably the right time to at least start
+> > > >> thinking about synchronization, at least to the extent that it mig=
+ht make
+> > > >> us want to change this API.  (I'm not at all saying that this seri=
+es
+> > > >> should require changes -- I'm just saying that this is a good time=
+ to
+> > > >> think about how this should work.)
+> > > >>
+> > > >> The current APIs, *and* the proposed jit_text_alloc() API, don't a=
+ctually
+> > > >> look like the one think in the Linux ecosystem that actually
+> > > >> intelligently and efficiently maps new text into an address space:
+> > > >> mmap().
+> > > >>
+> > > >> On x86, you can mmap() an existing file full of executable code PR=
+OT_EXEC
+> > > >> and jump to it with minimal synchronization (just the standard imp=
+licit
+> > > >> ordering in the kernel that populates the pages before setting up =
+the
+> > > >> PTEs and whatever user synchronization is needed to avoid jumping =
+into
+> > > >> the mapping before mmap() finishes).  It works across CPUs, and th=
+e only
+> > > >> possible way userspace can screw it up (for a read-only mapping of
+> > > >> read-only text, anyway) is to jump to the mapping too early, in wh=
+ich
+> > > >> case userspace gets a page fault.  Incoherence is impossible, and =
+no one
+> > > >> needs to "serialize" (in the SDM sense).
+> > > >>
+> > > >> I think the same sequence (from userspace's perspective) works on =
+other
+> > > >> architectures, too, although I think more cache management is need=
+ed on
+> > > >> the kernel's end.  As far as I know, no Linux SMP architecture nee=
+ds an
+> > > >> IPI to map executable text into usermode, but I could easily be wr=
+ong.
+> > > >> (IIRC RISC-V has very developer-unfriendly icache management, but =
+I don't
+> > > >> remember the details.)
+> > > >>
+> > > >> Of course, using ptrace or any other FOLL_FORCE to modify text on =
+x86 is
+> > > >> rather fraught, and I bet many things do it wrong when userspace i=
+s
+> > > >> multithreaded.  But not in production because it's mostly not used=
+ in
+> > > >> production.)
+> > > >>
+> > > >> But jit_text_alloc() can't do this, because the order of operation=
+s
+> > > >> doesn't match.  With jit_text_alloc(), the executable mapping show=
+s up
+> > > >> before the text is populated, so there is no atomic change from no=
+t-there
+> > > >> to populated-and-executable.  Which means that there is an opportu=
+nity
+> > > >> for CPUs, speculatively or otherwise, to start filling various cac=
+hes
+> > > >> with intermediate states of the text, which means that various
+> > > >> architectures (even x86!) may need serialization.
+> > > >>
+> > > >> For eBPF- and module- like use cases, where JITting/code gen is qu=
+ite
+> > > >> coarse-grained, perhaps something vaguely like:
+> > > >>
+> > > >> jit_text_alloc() -> returns a handle and an executable virtual add=
+ress,
+> > > >> but does *not* map it there
+> > > >> jit_text_write() -> write to that handle
+> > > >> jit_text_map() -> map it and synchronize if needed (no sync needed=
+ on
+> > > >> x86, I think)
+> > > >>
+> > > >> could be more efficient and/or safer.
+> > > >>
+> > > >> (Modules could use this too.  Getting alternatives right might tak=
+e some
+> > > >> fiddling, because off the top of my head, this doesn't match how i=
+t works
+> > > >> now.)
+> > > >>
+> > > >> To make alternatives easier, this could work, maybe (haven't fully
+> > > >> thought it through):
+> > > >>
+> > > >> jit_text_alloc()
+> > > >> jit_text_map_rw_inplace() -> map at the target address, but RW, !X
+> > > >>
+> > > >> write the text and apply alternatives
+> > > >>
+> > > >> jit_text_finalize() -> change from RW to RX *and synchronize*
+> > > >>
+> > > >> jit_text_finalize() would either need to wait for RCU (possibly ex=
+tra
+> > > >> heavy weight RCU to get "serialization") or send an IPI.
+> > > >
+> > > > This essentially how modules work now. The memory is allocated RW, =
+written
+> > > > and updated with alternatives and then made ROX in the end with set=
+_memory
+> > > > APIs.
+> > > >
+> > > > The issue with not having the memory mapped X when it's written is =
+that we
+> > > > cannot use large pages to map it. One of the goals is to have execu=
+table
+> > > > memory mapped with large pages and make code allocator able to divi=
+de that
+> > > > page among several callers.
+> > > >
+> > > > So the idea was that jit_text_alloc() will have a cache of large pa=
+ges
+> > > > mapped ROX, will allocate memory from those caches and there will b=
+e
+> > > > jit_update() that uses text poking for writing to that memory.
+> > > >
+> > > > Upon allocation of a large page to increase the cache, that large p=
+age will
+> > > > be "invalidated" by filling it with breakpoint instructions (e.g in=
+t3 on
+> > > > x86)
+> > >
+> > > Is this actually valid?  In between int3 and real code, there=E2=80=
+=99s a
+> > > potential torn read of real code mixed up with 0xcc.
+> >
+> > You mean while doing text poking?
+>
+> I think we've been getting distracted by text_poke(). text_poke() does
+> updates via a different virtual address which introduce new
+> synchroniation wrinkles, but it's not the main issue.
+>
+> As _think_ I understand it, the root of the issue is that speculative
+> execution - and that per Andy, speculative execution doesn't obey memory
+> barriers.
+>
+> I have _not_ dug into the details of how retpolines work and all the
+> spectre stuff that was going on, but - retpoline uses lfence, doesn't
+> it? And if speculative execution is the issue here, isn't retpoline what
+> we need?
+>
+> For this particular issue, I'm not sure "invalidate by filling with
+> illegal instructions" makes sense. For that to work, would the processor
+> have to execute a serialize operation and a retry on hitting an illegal
+> instruction - or perhaps we do in the interrupt handler?
+>
+> But if filling with illegal instructions does act as a speculation
+> barrier, then the issue is that a torn read could generate a legal but
+> incorrect instruction.
 
-- j1939_socks_lock
-- active_session_list_lock
-- sk_session_queue_lock
+What is a "torn read" here? I assume it is an instruction read that
+goes at the wrong instruction boundary (CISC). If this is correct, do
+we need to handle torn read caused by software bug, or hardware
+bit flip, or both?
 
-A reasonable fix is to change j1939_socks_lock to an rwlock, since in
-the rare situations where a write lock is required for the linked list
-that j1939_socks_lock is protecting, the code does not attempt to
-acquire any more locks. This would break the circular lock dependency,
-where, for example, the current thread already locks j1939_socks_lock
-and attempts to acquire sk_session_queue_lock, and at the same time,
-another thread attempts to acquire j1939_socks_lock while holding
-sk_session_queue_lock.
-
-NOTE: This patch along does not fix the unregister_netdevice bug
-reported by Syzbot; instead, it solves a deadlock situation to prepare
-for one or more further patches to actually fix the Syzbot bug, which
-appears to be a reference counting problem within the j1939 codebase.
-
-Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
----
- net/can/j1939/j1939-priv.h |  2 +-
- net/can/j1939/main.c       |  2 +-
- net/can/j1939/socket.c     | 25 +++++++++++++------------
- 3 files changed, 15 insertions(+), 14 deletions(-)
-
-diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
-index 16af1a7f80f6..74f15592d170 100644
---- a/net/can/j1939/j1939-priv.h
-+++ b/net/can/j1939/j1939-priv.h
-@@ -86,7 +86,7 @@ struct j1939_priv {
- 	unsigned int tp_max_packet_size;
- 
- 	/* lock for j1939_socks list */
--	spinlock_t j1939_socks_lock;
-+	rwlock_t j1939_socks_lock;
- 	struct list_head j1939_socks;
- 
- 	struct kref rx_kref;
-diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
-index ecff1c947d68..a6fb89fa6278 100644
---- a/net/can/j1939/main.c
-+++ b/net/can/j1939/main.c
-@@ -274,7 +274,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
- 		return ERR_PTR(-ENOMEM);
- 
- 	j1939_tp_init(priv);
--	spin_lock_init(&priv->j1939_socks_lock);
-+	rwlock_init(&priv->j1939_socks_lock);
- 	INIT_LIST_HEAD(&priv->j1939_socks);
- 
- 	mutex_lock(&j1939_netdev_lock);
-diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
-index 35970c25496a..6dce9d645116 100644
---- a/net/can/j1939/socket.c
-+++ b/net/can/j1939/socket.c
-@@ -80,16 +80,16 @@ static void j1939_jsk_add(struct j1939_priv *priv, struct j1939_sock *jsk)
- 	jsk->state |= J1939_SOCK_BOUND;
- 	j1939_priv_get(priv);
- 
--	spin_lock_bh(&priv->j1939_socks_lock);
-+	write_lock_bh(&priv->j1939_socks_lock);
- 	list_add_tail(&jsk->list, &priv->j1939_socks);
--	spin_unlock_bh(&priv->j1939_socks_lock);
-+	write_unlock_bh(&priv->j1939_socks_lock);
- }
- 
- static void j1939_jsk_del(struct j1939_priv *priv, struct j1939_sock *jsk)
- {
--	spin_lock_bh(&priv->j1939_socks_lock);
-+	write_lock_bh(&priv->j1939_socks_lock);
- 	list_del_init(&jsk->list);
--	spin_unlock_bh(&priv->j1939_socks_lock);
-+	write_unlock_bh(&priv->j1939_socks_lock);
- 
- 	j1939_priv_put(priv);
- 	jsk->state &= ~J1939_SOCK_BOUND;
-@@ -329,13 +329,13 @@ bool j1939_sk_recv_match(struct j1939_priv *priv, struct j1939_sk_buff_cb *skcb)
- 	struct j1939_sock *jsk;
- 	bool match = false;
- 
--	spin_lock_bh(&priv->j1939_socks_lock);
-+	read_lock_bh(&priv->j1939_socks_lock);
- 	list_for_each_entry(jsk, &priv->j1939_socks, list) {
- 		match = j1939_sk_recv_match_one(jsk, skcb);
- 		if (match)
- 			break;
- 	}
--	spin_unlock_bh(&priv->j1939_socks_lock);
-+	read_unlock_bh(&priv->j1939_socks_lock);
- 
- 	return match;
- }
-@@ -344,11 +344,11 @@ void j1939_sk_recv(struct j1939_priv *priv, struct sk_buff *skb)
- {
- 	struct j1939_sock *jsk;
- 
--	spin_lock_bh(&priv->j1939_socks_lock);
-+	read_lock_bh(&priv->j1939_socks_lock);
- 	list_for_each_entry(jsk, &priv->j1939_socks, list) {
- 		j1939_sk_recv_one(jsk, skb);
- 	}
--	spin_unlock_bh(&priv->j1939_socks_lock);
-+	read_unlock_bh(&priv->j1939_socks_lock);
- }
- 
- static void j1939_sk_sock_destruct(struct sock *sk)
-@@ -484,6 +484,7 @@ static int j1939_sk_bind(struct socket *sock, struct sockaddr *uaddr, int len)
- 
- 		priv = j1939_netdev_start(ndev);
- 		dev_put(ndev);
-+
- 		if (IS_ERR(priv)) {
- 			ret = PTR_ERR(priv);
- 			goto out_release_sock;
-@@ -1078,12 +1079,12 @@ void j1939_sk_errqueue(struct j1939_session *session,
- 	}
- 
- 	/* spread RX notifications to all sockets subscribed to this session */
--	spin_lock_bh(&priv->j1939_socks_lock);
-+	read_lock_bh(&priv->j1939_socks_lock);
- 	list_for_each_entry(jsk, &priv->j1939_socks, list) {
- 		if (j1939_sk_recv_match_one(jsk, &session->skcb))
- 			__j1939_sk_errqueue(session, &jsk->sk, type);
- 	}
--	spin_unlock_bh(&priv->j1939_socks_lock);
-+	read_unlock_bh(&priv->j1939_socks_lock);
- };
- 
- void j1939_sk_send_loop_abort(struct sock *sk, int err)
-@@ -1271,7 +1272,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
- 	struct j1939_sock *jsk;
- 	int error_code = ENETDOWN;
- 
--	spin_lock_bh(&priv->j1939_socks_lock);
-+	read_lock_bh(&priv->j1939_socks_lock);
- 	list_for_each_entry(jsk, &priv->j1939_socks, list) {
- 		jsk->sk.sk_err = error_code;
- 		if (!sock_flag(&jsk->sk, SOCK_DEAD))
-@@ -1279,7 +1280,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
- 
- 		j1939_sk_queue_drop_all(priv, jsk, error_code);
- 	}
--	spin_unlock_bh(&priv->j1939_socks_lock);
-+	read_unlock_bh(&priv->j1939_socks_lock);
- }
- 
- static int j1939_sk_no_ioctlcmd(struct socket *sock, unsigned int cmd,
--- 
-2.34.1
-
+Thanks,
+Song
 
