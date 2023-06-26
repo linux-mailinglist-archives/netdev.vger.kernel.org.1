@@ -1,163 +1,117 @@
-Return-Path: <netdev+bounces-13962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13968-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A233C73E334
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:24:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B0EA473E393
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:40:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C688280D9D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:24:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB1E41C20972
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:40:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C40BE58;
-	Mon, 26 Jun 2023 15:24:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66861C2C1;
+	Mon, 26 Jun 2023 15:40:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A430EBA4A
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:24:22 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8585011D
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:24:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687793060;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=pNcIf8DGlU4ngflbaStrLY/OgH3ZgZfAt2j/tScjlPs=;
-	b=Dl6pKlNRhDXxOvVjstL54kQe5jsPuQwLfGaC2Hr/9G1QQzbFZlonJYVd7hAu3WVc3INDjr
-	gDn+RY12p7OyR+XHfJf6Q7m66ZVjKTOySmWctLSUFEIGm9vJX6mJG5mTQV82DrF1aWkeuT
-	LXQyg7bNDuRxNhzH+KBnK3RSw4MvlFQ=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-483-CXoiVzLQP8mwx3S4jva-ug-1; Mon, 26 Jun 2023 11:24:13 -0400
-X-MC-Unique: CXoiVzLQP8mwx3S4jva-ug-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7624ca834b5so482862685a.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687793052; x=1690385052;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=pNcIf8DGlU4ngflbaStrLY/OgH3ZgZfAt2j/tScjlPs=;
-        b=js6ERpd8rzwNR+KkamfBsfvAhBlcRGZlXjvD6Dg8lW/XOw/Ws4iInL5Y8ugvLaCfFr
-         sdrsUkEDeXc1xh4eIqJ99p21aSjjQpDN7BIOR482uOtHPCtLb8C71tnYENiYC6CUoEU/
-         mFiH+e+WB7e9f7SFbLyQyU62CbEG/ioALZN85VBhrI3/PDotQOs4GaCE94DHEvcLJ/N9
-         Zk0+jZVEX+uZxqzNrVsC3zJ5nhBltgUB4gagf144RZPKZkTxu4XKRwoKXPUdhMe5ypSi
-         AAjJ5XVznB6QahKoTqjtw/ZcdHxvDkyTaU6OmxJd416aIh8JsLTK00oToX7XK9NE6tPH
-         8KNQ==
-X-Gm-Message-State: AC+VfDydCIwkpcIk3QFrFEVrpepJgAYQZ3b8gzKyaoIgXpDwnwo+NUIe
-	vt5QK4Xw+XlT4pqbZ+Mf103CeZirYzFLw99lcpKiIg7RunOYa/z3SFr7tYaNXU6uq4gxiiw+n9Y
-	s4vYIbiv2LB+ghYL8
-X-Received: by 2002:a05:620a:880f:b0:75b:23a1:363d with SMTP id qj15-20020a05620a880f00b0075b23a1363dmr20468176qkn.78.1687793052464;
-        Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ67krRALDwbYzxNGPfYizrvdl7LS+HU+avZAWHRkye9gBvomn4n/ypyeI8Y0aTbS2T5cmmDUw==
-X-Received: by 2002:a05:620a:880f:b0:75b:23a1:363d with SMTP id qj15-20020a05620a880f00b0075b23a1363dmr20468165qkn.78.1687793052227;
-        Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id y24-20020a37e318000000b007579ea33cdesm2785460qki.62.2023.06.26.08.24.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 08:24:11 -0700 (PDT)
-Date: Mon, 26 Jun 2023 17:24:07 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 02/17] vhost/vsock: read data from non-linear skb
-Message-ID: <vpcrdclcic7oiuat4oapnkj54dolld6hh2wixe3fozlthyt2ni@omyjyem3uj3t>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <20230603204939.1598818-3-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B329BC12D;
+	Mon, 26 Jun 2023 15:40:12 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88117C433C8;
+	Mon, 26 Jun 2023 15:40:08 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687794012;
+	bh=dwXCF9f2fQo97nSVcp6MB0XwLHJLjovoiu215aV3VIM=;
+	h=From:To:Cc:Subject:Date:From;
+	b=W6J0PeX7nYnoL6w01+rkgKirTv4OLMBI/68lgNEjJ6QrTT0+U5tJy43V9tdw/p/FZ
+	 U2Z4ez+Tej6OdPwLCrOOl9FQ1K5JE0Ccdy0fuIysYDlXH/mZMxJ5jFoWmr644S/Gio
+	 UgHgnyTrtpDXoh+g8dOS3EHJY4MXMPaVoF+H0FfZARHiKKZwVQD8QNdO97ieAMcsTT
+	 UbpzN2fWkB+xjxgFhRaxcAJ/XpEDcZcc1+0bgc0P85runCJPxLuWnkmi5LHgl4Sw9O
+	 +r/8+L+FQU0eI8iTkh7peEb5CZohWf6/NNMPyDEIYjWZSjTP9yp3GTvlUUYRXwfnDq
+	 EM5evYV8nKdyg==
+From: Jisheng Zhang <jszhang@kernel.org>
+To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
+	Alexandre Torgue <alexandre.torgue@foss.st.com>,
+	Jose Abreu <joabreu@synopsys.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
+	Chen-Yu Tsai <wens@csie.org>,
+	Jernej Skrabec <jernej.skrabec@gmail.com>,
+	Samuel Holland <samuel@sholland.org>
+Cc: netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org,
+	linux-sunxi@lists.linux.dev,
+	Simon Horman <simon.horman@corigine.com>
+Subject: [PATCH net-next v4 0/2] net: stmmac: improve driver statistics
+Date: Mon, 26 Jun 2023 23:28:42 +0800
+Message-Id: <20230626152844.484-1-jszhang@kernel.org>
+X-Mailer: git-send-email 2.40.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230603204939.1598818-3-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-On Sat, Jun 03, 2023 at 11:49:24PM +0300, Arseniy Krasnov wrote:
->This adds copying to guest's virtio buffers from non-linear skbs. Such
->skbs are created by protocol layer when MSG_ZEROCOPY flags is used. It
->changes call of 'copy_to_iter()' to 'skb_copy_datagram_iter()'. Second
->function can read data from non-linear skb.
->
->See commit to 'net/vmw_vsock/virtio_transport_common.c' with the same
->name for more details.
+improve the stmmac driver statistics:
 
-I think it's okay if we report the same details here.
+1. don't clear network driver statistics in .ndo_close() and
+.ndo_open() cycle
+2. avoid some network driver statistics overflow on 32 bit platforms
+3. use per-queue statistics where necessary to remove frequent
+cacheline ping pongs.
 
->
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> drivers/vhost/vsock.c | 12 +++++++-----
-> 1 file changed, 7 insertions(+), 5 deletions(-)
->
->diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
->index 6578db78f0ae..b254aa4b756a 100644
->--- a/drivers/vhost/vsock.c
->+++ b/drivers/vhost/vsock.c
->@@ -156,7 +156,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		}
->
-> 		iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[out], in, iov_len);
->-		payload_len = skb->len;
->+		payload_len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
+NOTE: v1 and v2 are back ported from an internal LTS tree, I made
+some mistakes when backporting and squashing. Now, net-next + v3
+has been well tested with 'ethtool -s' and 'ip -s link show'.
 
-Also here a variable should make the code more readable.
+Since v3:
+  - coding style pointed out by Simon, I.E reverse xmas tree for local
+    variable declarations and so on.
+  - put the counters in queue structs, I.E per-queue rather than per-cpu
+  - use _irqsave() variant where necessary.
 
-Stefano
+Since v2:
+  - fix ethtool .get_sset_count, .get_strings and per queue stats
+    couting.
+  - fix .ndo_get_stats64 only counts the last cpu's pcpu stats.
+  - fix typo: s/iff/if in commit msg.
+  - remove unnecessary if statement brackets since we have removed
+    one LoC.
 
-> 		hdr = virtio_vsock_hdr(skb);
->
-> 		/* If the packet is greater than the space available in the
->@@ -197,8 +197,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 			break;
-> 		}
->
->-		nbytes = copy_to_iter(skb->data, payload_len, &iov_iter);
->-		if (nbytes != payload_len) {
->+		if (skb_copy_datagram_iter(skb,
->+					   VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
->+					   &iov_iter,
->+					   payload_len)) {
-> 			kfree_skb(skb);
-> 			vq_err(vq, "Faulted on copying pkt buf\n");
-> 			break;
->@@ -212,13 +214,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
-> 		vhost_add_used(vq, head, sizeof(*hdr) + payload_len);
-> 		added = true;
->
->-		skb_pull(skb, payload_len);
->+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += payload_len;
-> 		total_len += payload_len;
->
-> 		/* If we didn't send all the payload we can requeue the packet
-> 		 * to send it with the next available buffer.
-> 		 */
->-		if (skb->len > 0) {
->+		if (VIRTIO_VSOCK_SKB_CB(skb)->frag_off < skb->len) {
-> 			hdr->flags |= cpu_to_le32(flags_to_restore);
->
-> 			/* We are queueing the same skb to handle
->-- 
->2.25.1
->
+Since v1:
+  - rebase on net-next
+  - fold two original patches into one patch
+  - fix issues found by lkp
+  - update commit msg
+
+Jisheng Zhang (2):
+  net: stmmac: don't clear network statistics in .ndo_open()
+  net: stmmac: use per-queue 64 bit statistics where necessary
+
+ drivers/net/ethernet/stmicro/stmmac/common.h  |  39 ++--
+ .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  12 +-
+ .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   7 +-
+ .../ethernet/stmicro/stmmac/dwmac4_descs.c    |  16 +-
+ .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |  15 +-
+ .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  12 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  |   6 +-
+ .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  14 +-
+ .../net/ethernet/stmicro/stmmac/enh_desc.c    |  20 +-
+ drivers/net/ethernet/stmicro/stmmac/hwif.h    |  12 +-
+ .../net/ethernet/stmicro/stmmac/norm_desc.c   |  15 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +
+ .../ethernet/stmicro/stmmac/stmmac_ethtool.c  | 123 ++++++++---
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c | 206 ++++++++++++++----
+ 14 files changed, 337 insertions(+), 162 deletions(-)
+
+-- 
+2.40.1
 
 
