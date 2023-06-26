@@ -1,145 +1,159 @@
-Return-Path: <netdev+bounces-14123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1786473EF50
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:30:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E371773EF81
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:57:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 47E4C1C20A35
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 23:30:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A12A2280F4E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 23:57:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA6E15AE7;
-	Mon, 26 Jun 2023 23:30:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D473215AF0;
+	Mon, 26 Jun 2023 23:57:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2E6D16402
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 23:30:02 +0000 (UTC)
-Received: from mail-pl1-x635.google.com (mail-pl1-x635.google.com [IPv6:2607:f8b0:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D87A198C
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:30:01 -0700 (PDT)
-Received: by mail-pl1-x635.google.com with SMTP id d9443c01a7336-1b539d2f969so25940325ad.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:30:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687822201; x=1690414201;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=yBfFQZUX3TFp/GqwGJFfJB4DrjscjdNgSaY0xn6MjAM=;
-        b=6B+xzRZ4Vr6/d44ciru9AZg0TUC+dDojZ+J4hgY6gSezr7tUqy4vxRZfwHG7x+xUFq
-         Ds3JKiZuneil7R5laOCCwtgqLitSPFKlw895SklwI1CnY4xlSPNINmzcruyy6MBYJNZR
-         otj55X4qsL6vk5KAYqCZRgF4ugyb9K3WX512bE4Q+EGl1RXBjRARf4HtIKTv4OzmZOji
-         dvjR1J96ASORVMMFFxTCJL+6ddzCL5opClDZ8MBdqHxsc21CD/YmrXILivuhBxSTEriD
-         eLrumf4R02/zNnwgPk97gm4ngdqxbXYnML3GtUOLuW15rpNzdeUp4bn1K7mo1JvL82oT
-         U//A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687822201; x=1690414201;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yBfFQZUX3TFp/GqwGJFfJB4DrjscjdNgSaY0xn6MjAM=;
-        b=NLr+JoumYBfpG6XWEXbxrXaVsGTFoHvFYxQuSCzhS7z5oo+7/V3/Bk2aBKe0Qmf6ne
-         s5s9pX3M6nl4tH3rr9tcHfbRVqsQs+SyaTzZPGcMv98lvqu/CoMI4Eq0JWEh7FpCmxPK
-         nT8fj9fN+RlcpFopemKH6Var9FWYp01uRG1u/LVA1bPqnlZb0Uthw95Lfp/nx3FxhCYU
-         pb0GxY9qyKF7chkwuQPHTI5+XpsHj65z11TcJYboFGDogxxViznucZYhaI5YXgArWYDN
-         tnz10kGtWyYEV++W7FHXKU8mZfncHNFkU9Z6ioCi8lMFz7cT936eMxYOKMF8SLeLs/gI
-         Jcnw==
-X-Gm-Message-State: AC+VfDw7BTUpfka3hjMs+CTauV+GCVDwyf9jWzcI/gaUX4Lkn/UrxSp3
-	zr+qcunj5xvow8IG+GMneKNbCYD0pWxfrc4fa32WNw==
-X-Google-Smtp-Source: ACHHUZ7kmR/5IyInq4cGj0nTDpcqrTcSrOkofcHLV+HyI1PKaxQ289bhH25bXNqhGOWXDADOI4KFESBvCraLaHPdPAw=
-X-Received: by 2002:a17:902:ecca:b0:1b3:c62d:71b7 with SMTP id
- a10-20020a170902ecca00b001b3c62d71b7mr9340964plh.18.1687822200626; Mon, 26
- Jun 2023 16:30:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C680D12B66
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 23:57:13 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2FB90E5A;
+	Mon, 26 Jun 2023 16:57:12 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1004)
+	id 5992020553EC; Mon, 26 Jun 2023 16:57:11 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5992020553EC
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
+	s=default; t=1687823831;
+	bh=fiPgyc8J5BXMwqhx//yUhPKJcnCZ0LyA5rM0uvnK2RY=;
+	h=From:To:Cc:Subject:Date:From;
+	b=hwuzGsd2Oc4je6vn0zd2blhZI89dhXLSyTpRe5TdImHU+QimtplZLUomb62Ga1ozO
+	 yyl/HRhtzwXuY0YUNAsVfgWjMCkuZYyzlxUFAzpWOVq7fD/gHqDcDxjP99XqwqP4eV
+	 3G7iIQ3K0o0LhNNMULVp2YA0FtGWVRutI8KDUZCY=
+From: longli@linuxonhyperv.com
+To: Jason Gunthorpe <jgg@ziepe.ca>,
+	Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>,
+	"K. Y. Srinivasan" <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: linux-rdma@vger.kernel.org,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Long Li <longli@microsoft.com>,
+	stable@vger.kernel.org
+Subject: [Patch v3] net: mana: Batch ringing RX queue doorbell on receiving packets
+Date: Mon, 26 Jun 2023 16:57:07 -0700
+Message-Id: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-11.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <20230621170244.1283336-1-sdf@google.com> <20230621170244.1283336-7-sdf@google.com>
- <87edm1rc4m.fsf@intel.com> <CAKH8qBt1GHnY2jVac--xymN-ch8iCDftiBckzp9wvTJ7k-3zAg@mail.gmail.com>
- <874jmtrij4.fsf@intel.com>
-In-Reply-To: <874jmtrij4.fsf@intel.com>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Mon, 26 Jun 2023 16:29:49 -0700
-Message-ID: <CAKH8qBvnqOvCnp2C=hmPGwCcEz4UkuE9nod2N9sNmpPve9n_CQ@mail.gmail.com>
-Subject: Re: [RFC bpf-next v2 06/11] net: veth: Implement devtx timestamp kfuncs
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On Mon, Jun 26, 2023 at 3:00=E2=80=AFPM Vinicius Costa Gomes
-<vinicius.gomes@intel.com> wrote:
->
-> Stanislav Fomichev <sdf@google.com> writes:
->
-> > On Fri, Jun 23, 2023 at 4:29=E2=80=AFPM Vinicius Costa Gomes
-> > <vinicius.gomes@intel.com> wrote:
-> >>
-> >> Stanislav Fomichev <sdf@google.com> writes:
-> >>
-> >> > Have a software-based example for kfuncs to showcase how it
-> >> > can be used in the real devices and to have something to
-> >> > test against in the selftests.
-> >> >
-> >> > Both path (skb & xdp) are covered. Only the skb path is really
-> >> > tested though.
-> >> >
-> >> > Cc: netdev@vger.kernel.org
-> >> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
-> >>
-> >> Not really related to this patch, but to how it would work with
-> >> different drivers/hardware.
-> >>
-> >> In some of our hardware (the ones handled by igc/igb, for example), th=
-e
-> >> timestamp notification comes some time after the transmit completion
-> >> event.
-> >>
-> >> From what I could gather, the idea would be for the driver to "hold" t=
-he
-> >> completion until the timestamp is ready and then signal the completion
-> >> of the frame. Is that right?
-> >
-> > Yeah, that might be the option. Do you think it could work?
-> >
->
-> For the skb and XDP cases, yeah, just holding the completion for a while
-> seems like it's going to work.
->
-> XDP ZC looks more complicated to me, not sure if it's only a matter of
-> adding something like:
+From: Long Li <longli@microsoft.com>
 
-[..]
+It's inefficient to ring the doorbell page every time a WQE is posted to
+the received queue. Excessive MMIO writes result in CPU spending more
+time waiting on LOCK instructions (atomic operations), resulting in
+poor scaling performance.
 
-> void xsk_tx_completed_one(struct xsk_buff_pool *pool, struct xdp_buff *xd=
-p);
->
-> Or if more changes would be needed. I am trying to think about the case
-> that the user sent a single "timestamp" packet among a bunch of
-> "non-timestamp" packets.
+Move the code for ringing doorbell page to where after we have posted all
+WQEs to the receive queue during a callback from napi_poll().
 
-Since you're passing xdp_buff as an argument I'm assuming that is
-suggesting out-of-order completions?
-The completion queue is a single index, we can't do ooo stuff.
-So you'd have to hold a bunch of packets until you receive the
-timestamp completion; after this event, you can complete the whole
-batch (1 packet waiting for the timestamp + a bunch that have been
-transmitted afterwards but were still unacknowleged in the queue).
+With this change, tests showed an improvement from 120G/s to 160G/s on a
+200G physical link, with 16 or 32 hardware queues.
 
-(lmk if I've misinterpreted)
+Tests showed no regression in network latency benchmarks on single
+connection.
+
+While we are making changes in this code path, change the code for
+ringing doorbell to set the WQE_COUNT to 0 for Receive Queue. The
+hardware specification specifies that it should set to 0. Although
+currently the hardware doesn't enforce the check, in the future releases
+it may do.
+
+Cc: stable@vger.kernel.org
+Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
+
+Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
+Reviewed-by: Dexuan Cui <decui@microsoft.com>
+Signed-off-by: Long Li <longli@microsoft.com>
+---
+Change log:
+v2:
+Check for comp_read > 0 as it might be negative on completion error.
+Set rq.wqe_cnt to 0 according to BNIC spec.
+
+v3:
+Add details in the commit on the reason of performance increase and test numbers.
+Add details in the commit on why rq.wqe_cnt should be set to 0 according to hardware spec.
+Add "Reviewed-by" from Haiyang and Dexuan.
+
+ drivers/net/ethernet/microsoft/mana/gdma_main.c |  5 ++++-
+ drivers/net/ethernet/microsoft/mana/mana_en.c   | 10 ++++++++--
+ 2 files changed, 12 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+index 8f3f78b68592..3765d3389a9a 100644
+--- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
++++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+@@ -300,8 +300,11 @@ static void mana_gd_ring_doorbell(struct gdma_context *gc, u32 db_index,
+ 
+ void mana_gd_wq_ring_doorbell(struct gdma_context *gc, struct gdma_queue *queue)
+ {
++	/* Hardware Spec specifies that software client should set 0 for
++	 * wqe_cnt for Receive Queues. This value is not used in Send Queues.
++	 */
+ 	mana_gd_ring_doorbell(gc, queue->gdma_dev->doorbell, queue->type,
+-			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 1);
++			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 0);
+ }
+ 
+ void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index cd4d5ceb9f2d..1d8abe63fcb8 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -1383,8 +1383,8 @@ static void mana_post_pkt_rxq(struct mana_rxq *rxq)
+ 
+ 	recv_buf_oob = &rxq->rx_oobs[curr_index];
+ 
+-	err = mana_gd_post_and_ring(rxq->gdma_rq, &recv_buf_oob->wqe_req,
+-				    &recv_buf_oob->wqe_inf);
++	err = mana_gd_post_work_request(rxq->gdma_rq, &recv_buf_oob->wqe_req,
++					&recv_buf_oob->wqe_inf);
+ 	if (WARN_ON_ONCE(err))
+ 		return;
+ 
+@@ -1654,6 +1654,12 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
+ 		mana_process_rx_cqe(rxq, cq, &comp[i]);
+ 	}
+ 
++	if (comp_read > 0) {
++		struct gdma_context *gc = rxq->gdma_rq->gdma_dev->gdma_context;
++
++		mana_gd_wq_ring_doorbell(gc, rxq->gdma_rq);
++	}
++
+ 	if (rxq->xdp_flush)
+ 		xdp_do_flush();
+ }
+-- 
+2.34.1
+
 
