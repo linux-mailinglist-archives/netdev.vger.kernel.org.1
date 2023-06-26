@@ -1,245 +1,160 @@
-Return-Path: <netdev+bounces-13923-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13924-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2CCD573DFFF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:02:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C85CE73E01A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:05:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0E09280D4F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 13:02:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89F9A280C82
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 13:05:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B08E8F51;
-	Mon, 26 Jun 2023 13:02:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F06698F60;
+	Mon, 26 Jun 2023 13:05:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24A6A7F;
-	Mon, 26 Jun 2023 13:02:09 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 482ECD2;
-	Mon, 26 Jun 2023 06:02:04 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id CF2D62F4;
-	Mon, 26 Jun 2023 06:02:47 -0700 (PDT)
-Received: from FVFF77S0Q05N (unknown [10.57.23.38])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id 14E543F64C;
-	Mon, 26 Jun 2023 06:01:57 -0700 (PDT)
-Date: Mon, 26 Jun 2023 14:01:55 +0100
-From: Mark Rutland <mark.rutland@arm.com>
-To: Andy Lutomirski <luto@kernel.org>
-Cc: Mike Rapoport <rppt@kernel.org>, Kees Cook <keescook@chromium.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Andrew Morton <akpm@linux-foundation.org>,
-	Catalin Marinas <catalin.marinas@arm.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	"David S. Miller" <davem@davemloft.net>,
-	Dinh Nguyen <dinguyen@kernel.org>,
-	Heiko Carstens <hca@linux.ibm.com>, Helge Deller <deller@gmx.de>,
-	Huacai Chen <chenhuacai@kernel.org>,
-	Kent Overstreet <kent.overstreet@linux.dev>,
-	Luis Chamberlain <mcgrof@kernel.org>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nadav Amit <nadav.amit@gmail.com>,
-	"Naveen N. Rao" <naveen.n.rao@linux.ibm.com>,
-	Palmer Dabbelt <palmer@dabbelt.com>,
-	Puranjay Mohan <puranjay12@gmail.com>,
-	Rick P Edgecombe <rick.p.edgecombe@intel.com>,
-	"Russell King (Oracle)" <linux@armlinux.org.uk>,
-	Song Liu <song@kernel.org>, Steven Rostedt <rostedt@goodmis.org>,
-	Thomas Bogendoerfer <tsbogend@alpha.franken.de>,
-	Thomas Gleixner <tglx@linutronix.de>, Will Deacon <will@kernel.org>,
-	bpf@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-mips@vger.kernel.org, linux-mm@kvack.org,
-	linux-modules@vger.kernel.org, linux-parisc@vger.kernel.org,
-	linux-riscv@lists.infradead.org, linux-s390@vger.kernel.org,
-	linux-trace-kernel@vger.kernel.org, linuxppc-dev@lists.ozlabs.org,
-	loongarch@lists.linux.dev, netdev@vger.kernel.org,
-	sparclinux@vger.kernel.org,
-	the arch/x86 maintainers <x86@kernel.org>
-Subject: Re: [PATCH v2 02/12] mm: introduce execmem_text_alloc() and
- jit_text_alloc()
-Message-ID: <ZJmMQ62fW7RO5W2O@FVFF77S0Q05N>
-References: <20230616085038.4121892-1-rppt@kernel.org>
- <20230616085038.4121892-3-rppt@kernel.org>
- <f9a7eebe-d36e-4587-b99d-35d4edefdd14@app.fastmail.com>
- <20230618080027.GA52412@kernel.org>
- <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFE6D7F
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 13:05:22 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3A89B9;
+	Mon, 26 Jun 2023 06:05:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=KKuy+mu5Ioi/NzkAWP45MnAI0wPcMamqRsqaQuMbitF5phylfWZAFM15/2U4tKgHz6wadkwD2fv0BmtItjIuGz7TStqJ8W6y1RV/4zE3R8fSRUlkingxRcUhZs4WEV9DI3gU5M1a76wC76pnTvLYzaWJTuQHeKVzV26l1iEyVbyd0eTW8XKikZpdu+0q0a/Ir3TBu5C47CxuWTX2V2OsEbaRjlxUysEjY0Sf2Gbfb+Gx7WufD4f+DJGbj97a2Jv9EUzE35nJzYKJiyhT2UYbD7omTboVUB5YXAb4HJg6vbOmM7QFDz0NhYUbcB7r77UWXWf/KXv/VoaIEgiprGu6fw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=2SSKU10nPSOLIg93ULzjWNsd9QrTDtZZ3qXAabIBeMQ=;
+ b=fW7MRaBp7jrCA1pWAgnkfvQfN69QPG0dgayOWdo77Z9icW4NoNuIuaJ+3UQozwIoBWfcGr64QFfIg1t4UYejMoxDnpU6JO/Kjk6R97RIjVfmpzwz8Fk6RlWZO+w5qJ2PgRoB2T6LOJsIQ9SLAKc6bSzY6rKxu+/KVNBKAUM3tOgQykUAGGv/31V6ciZxhB7V3GPMXCbTYib3P9hiTEedTGrBBPAKOirBJep5DtnlBEXx55NLZDe/mJTbRFLMyydb64yoAmSd//qPMZMebvmFKV7ppNArKp/SVa/01paakOie/jWtuc6FYmsPOQOGoD8jl2q8RHsrdT76s/dcb1s9FQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=2SSKU10nPSOLIg93ULzjWNsd9QrTDtZZ3qXAabIBeMQ=;
+ b=DkT36rDVgaUXBN/Ks7yC5jO2NN5w/X4kO/gfx3j5Hjf6IjtHM5xZlaK0utFTqdoCU5wPlfpxcN9KbVMBxfwuORNemnvJSZPIZGL9PmJ9Xa5pzc71voUDLmIXEJVeA9C7cXyBazpRWbSpW7TPoDd0u92LUfZZl5kLeVW1uTelT6A=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH3PR13MB6337.namprd13.prod.outlook.com (2603:10b6:610:196::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Mon, 26 Jun
+ 2023 13:05:17 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Mon, 26 Jun 2023
+ 13:05:16 +0000
+Date: Mon, 26 Jun 2023 15:05:08 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com, vkuznets@redhat.com,
+	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, stable@vger.kernel.org,
+	schakrabarti@microsoft.com
+Subject: Re: [PATCH 1/2 V3 net] net: mana: Fix MANA VF unload when host is
+ unresponsive
+Message-ID: <ZJmNBKA3ygDryP7i@corigine.com>
+References: <1687771058-26634-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-ClientProxiedBy: AM0PR03CA0027.eurprd03.prod.outlook.com
+ (2603:10a6:208:14::40) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <a17c65c6-863f-4026-9c6f-a04b659e9ab4@app.fastmail.com>
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,DIET_1,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH3PR13MB6337:EE_
+X-MS-Office365-Filtering-Correlation-Id: 707cde5a-43e8-43a2-9ccc-08db7645fc83
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	wi2LZUn+oxXQU5PdNE6RLgAZQaL9FmfK0PR7l6NqBFygXbZAj9bXWvJKjslxO9ydi49VotX2oo8e5KuODhLSLCQdx9atCZhhn5zemN7EBPvn67zwCe+2SOAMWrP3oYHJVaahS7E+JxOYWVOdriX+xZFfJAu4PudkW9Mh9jJkywjvo8kganSDcxzGiC5WvjQlR5UAg/o0hGX75S3feXWkkkcWxlHDH2n4owfZog7L8FkOV9BwOFtd+ys/qB82MfO6RBj1Ccw+EzdG46jE4Ynggf/sNaBRXL5xG/xgrLbyPbilsxvOc4rLPUA5qXuZyZt7UD72JA6fsUwvkaBUGwlu91cEPGsU+FZkJYreFd7Puk7Vr7VcHQu5xL/JJRG5B9wYkwv4Df9WuEmkCmPOlCS3ON5G+iLlQ7mpR0Gy1Gg+C2q2HoNWbZ2BHXcYmjCYcJ1jIE+NiDUbs2waYpgIsfevybmpBeG5T0356z/bSoecuPF/yc5u9punA2PFJpqdOsGGErdDvxc8PjscxOPtgexcG27eXTxOv7T/4HtAvfkJfYGHYf6TRJUbyaRgRLdwSGgF0JY4R8l6OtjL2TMjZHd4tDrBNdwIecXfSkClxy/cqY0=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(346002)(396003)(39840400004)(376002)(451199021)(2906002)(4744005)(6486002)(45080400002)(6666004)(38100700002)(2616005)(6512007)(186003)(41300700001)(86362001)(478600001)(36756003)(66476007)(66556008)(4326008)(66946007)(6916009)(316002)(6506007)(44832011)(7416002)(5660300002)(8676002)(8936002)(66899021);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?//euGGiqDg7DorI1tgRW/NliooXaP67E7gEImr5ttMKRRgAb8kMcEHTt+Vv+?=
+ =?us-ascii?Q?pL2PFebqbKd0YZCN93QWOjQQV2+iLhLth3rfzjp5Q/FK8xT2llxHeVUEK3Bn?=
+ =?us-ascii?Q?N06ueOJ67ajOBp1cjMj4RK8EqpsauJs3EWb97I7RSNWYtVo8X73hzpgH1Nzb?=
+ =?us-ascii?Q?7FflI+uAgtPQVNl88fLroR9qg1XMOJ+wkwZ/RxVKcMj+kDu1MdkFX8mnQeMf?=
+ =?us-ascii?Q?xYkljKauHZFEIsaWz+jzelYKJpeXXq+A7/YS1FBQBbvxpiDsopB9u6igTApi?=
+ =?us-ascii?Q?dWdZayVh5PPbnEo0E3uIW/HrfFTgQJBYCckUzU+U+e3qWnMXQzXH94s9L+p6?=
+ =?us-ascii?Q?GPmPT686kpOYyEEaF8FMBrby+S99FqaNmHs6jGNMwV2hF9rXXBnf1H7L8Fq+?=
+ =?us-ascii?Q?UoT6WvoM8In7uWnlmjut5vxopBuiUGyDhAdahO4/sx+VunUq9VC54BrTA08u?=
+ =?us-ascii?Q?Wt11KaBMERI738XhgxpOA8hhS3dwNdrWL1UBtNor/E7wikFe24OKgxno0qr1?=
+ =?us-ascii?Q?zrvJp3YrTgsFx3JZo0xilEtGzUNPoiWZeAOhx/ia1pAY60POIqBJLMiq7Xfu?=
+ =?us-ascii?Q?siQrq35oQg5ekW5vJ0BPgclpmjV74BEIARvnrGEsO6zIxksV9yykkDf/6P7G?=
+ =?us-ascii?Q?Q5ni4+oxIGNEIQCkST2MoRMjzR55H6CKRoikApCU+Ou5EICIIVys2iBi0RHq?=
+ =?us-ascii?Q?/fMS3L2nZoKwpuC63iynts/XEK1A54GWMJEi0nNQfCttImDP5Vi2ecGI9ioR?=
+ =?us-ascii?Q?mXheJbKqoXSrAVZTEIDc0+5ZtpanLxmNbMNw4ZUhbnz8dcG/y9iz1jteOdRa?=
+ =?us-ascii?Q?QTJ5s09yZqKxahK5i1WXawZhVtkDbamzZAYORQfL4SxUq6gJTZFOAyytqGd1?=
+ =?us-ascii?Q?XX9gWEe1bxGWc8jlKA64kMuUquYxjuxoZaL3InZ2QGEgMnaPKFyk0NTFbB9M?=
+ =?us-ascii?Q?lE3y8ahcHOF1A5gY1bbFo+v4D8R2lGdB2ZlF2eWJaJgkg8SuhLO/x3HzJ4Q7?=
+ =?us-ascii?Q?rPwPJgVolv4tsk81fVp6mYtN7Sm1QbdCFkdXq1EQA5P5NIPOj1Wp9pmWp8my?=
+ =?us-ascii?Q?oU0OWNtfEnSgjGT0nNJiNNZHqKoc+MFxXYA22uD8PKVji8dOMO/jqvukgM7A?=
+ =?us-ascii?Q?3W8O13wr8xAe0yA8NuYSgyPen4p4B3CkQhd5VN4QkakY0YPdhcZ8xki5W35h?=
+ =?us-ascii?Q?tIso7tmYPvhDY3GdQ28c6QYnrx61U1syRunsFTRMu7QJPhr9M/Xr9lsqaeIW?=
+ =?us-ascii?Q?P6ANdcEbKZnqkaCPtZ6ukSIaArzk27nkOQqUx6e/L0kJzfroa3wI0VCt+dB3?=
+ =?us-ascii?Q?mL9eAjF+NnlpdZeL9M51MPsw+kZu0oczC+YTW73f+s5FLvtNmlXFjQCk7erJ?=
+ =?us-ascii?Q?AhNoFWXLy9PSA7oA/GEsOUARA2u5EzfIBXRR5NUqYBNf8dLeTDUkNXl5nE81?=
+ =?us-ascii?Q?Pq8qvkcv6YMlkDdtk6CDSffOpivWhEl3/081JO11ujL04mZF1kV5fMl+8weN?=
+ =?us-ascii?Q?fiaYgSwaTndz9jR8xeQp0HwS+Zo3HUJjAIhACnOsAISA44wm/B9K+GQiKRla?=
+ =?us-ascii?Q?u4fU/WJY1bXrTmzxWSt2Uvhrrimot+oCiMu6lfN3GXWqewiOoPNyfCZBWK/P?=
+ =?us-ascii?Q?U4CSvPK6lFBg9KmAetDUVnbIqHumMFWP2DugIC2PFfuwBjHTzvLOdJimlqIF?=
+ =?us-ascii?Q?bofYDw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 707cde5a-43e8-43a2-9ccc-08db7645fc83
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 13:05:16.6830
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mXiDuXvTDzMW4Fuyx0cgUpmq9Is78jHTN1tSMAPdopNmXKAefDyBdyT+G+fa/xDtqT74VO1AXHFebvqUjicRfGqh8ICKaXTaYQMpIORf6Bo=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6337
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jun 19, 2023 at 10:09:02AM -0700, Andy Lutomirski wrote:
-> On Sun, Jun 18, 2023, at 1:00 AM, Mike Rapoport wrote:
-> > On Sat, Jun 17, 2023 at 01:38:29PM -0700, Andy Lutomirski wrote:
-> >> On Fri, Jun 16, 2023, at 1:50 AM, Mike Rapoport wrote:
-> >> > From: "Mike Rapoport (IBM)" <rppt@kernel.org>
-> >> >
-> >> > module_alloc() is used everywhere as a mean to allocate memory for code.
-> >> >
-> >> > Beside being semantically wrong, this unnecessarily ties all subsystems
-> >> > that need to allocate code, such as ftrace, kprobes and BPF to modules
-> >> > and puts the burden of code allocation to the modules code.
-> >> >
-> >> > Several architectures override module_alloc() because of various
-> >> > constraints where the executable memory can be located and this causes
-> >> > additional obstacles for improvements of code allocation.
-> >> >
-> >> > Start splitting code allocation from modules by introducing
-> >> > execmem_text_alloc(), execmem_free(), jit_text_alloc(), jit_free() APIs.
-> >> >
-> >> > Initially, execmem_text_alloc() and jit_text_alloc() are wrappers for
-> >> > module_alloc() and execmem_free() and jit_free() are replacements of
-> >> > module_memfree() to allow updating all call sites to use the new APIs.
-> >> >
-> >> > The intention semantics for new allocation APIs:
-> >> >
-> >> > * execmem_text_alloc() should be used to allocate memory that must reside
-> >> >   close to the kernel image, like loadable kernel modules and generated
-> >> >   code that is restricted by relative addressing.
-> >> >
-> >> > * jit_text_alloc() should be used to allocate memory for generated code
-> >> >   when there are no restrictions for the code placement. For
-> >> >   architectures that require that any code is within certain distance
-> >> >   from the kernel image, jit_text_alloc() will be essentially aliased to
-> >> >   execmem_text_alloc().
-> >> >
-> >> 
-> >> Is there anything in this series to help users do the appropriate
-> >> synchronization when the actually populate the allocated memory with
-> >> code?  See here, for example:
-> >
-> > This series only factors out the executable allocations from modules and
-> > puts them in a central place.
-> > Anything else would go on top after this lands.
+On Mon, Jun 26, 2023 at 02:18:18AM -0700, souradeep chakrabarti wrote:
+> From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 > 
-> Hmm.
+> This patch addresses the VF unload issue, where mana_dealloc_queues()
+> gets stuck in infinite while loop, because of host unresponsiveness.
+> It adds a timeout in the while loop, to fix it.
 > 
-> On the one hand, there's nothing wrong with factoring out common code. On the
-> other hand, this is probably the right time to at least start thinking about
-> synchronization, at least to the extent that it might make us want to change
-> this API.  (I'm not at all saying that this series should require changes --
-> I'm just saying that this is a good time to think about how this should
-> work.)
-> 
-> The current APIs, *and* the proposed jit_text_alloc() API, don't actually
-> look like the one think in the Linux ecosystem that actually intelligently
-> and efficiently maps new text into an address space: mmap().
-> 
-> On x86, you can mmap() an existing file full of executable code PROT_EXEC and
-> jump to it with minimal synchronization (just the standard implicit ordering
-> in the kernel that populates the pages before setting up the PTEs and
-> whatever user synchronization is needed to avoid jumping into the mapping
-> before mmap() finishes).  It works across CPUs, and the only possible way
-> userspace can screw it up (for a read-only mapping of read-only text, anyway)
-> is to jump to the mapping too early, in which case userspace gets a page
-> fault.  Incoherence is impossible, and no one needs to "serialize" (in the
-> SDM sense).
-> 
-> I think the same sequence (from userspace's perspective) works on other
-> architectures, too, although I think more cache management is needed on the
-> kernel's end.  As far as I know, no Linux SMP architecture needs an IPI to
-> map executable text into usermode, but I could easily be wrong.  (IIRC RISC-V
-> has very developer-unfriendly icache management, but I don't remember the
-> details.)
+> Fixes: ca9c54d2d6a5ab2430c4eda364c77125d62e5e0f (net: mana: Add a driver for
+> Microsoft Azure Network Adapter)
 
-That's my understanding too, with a couple of details:
+nit: A correct format of this fixes tag is:
 
-1) After the copy we perform and complete all the data + instruction cache
-   maintenance *before* marking the mapping as executable.
+In particular:
+* All on lone line
+* Description in double quotes.
 
-2) Even *after* the mapping is marked executable, a thread could take a
-   spurious fault on an instruction fetch for the new instructions. One way to
-   think about this is that the CPU attempted to speculate the instructions
-   earlier, saw that the mapping was faulting, and placed a "generate a fault
-   here" operation into its pipeline to generate that later.
+Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
 
-   The CPU pipeline/OoO-engine/whatever is effectively a transient cache for
-   operations in-flight which is only ever "invalidated" by a
-   context-synchronization-event (akin to an x86 serializing effect).
-
-   We're only guarnateed to have a new instruction fetch (from the I-cache into
-   the CPU pipeline) after the next context synchronization event (akin to an x86
-   serializing effect), and luckily out exception entry/exit is architecturally
-   guarnateed to provide that (unless we explicitly opt out via a control bit).
-
-I know we're a bit lax with that today: I think we omit the
-context-synchronization-event when enabling ftrace callsites, and worse, for
-static keys. Those are both on my TODO list of nasty problems that require
-careful auditing...
-
-> Of course, using ptrace or any other FOLL_FORCE to modify text on x86 is
-> rather fraught, and I bet many things do it wrong when userspace is
-> multithreaded.  But not in production because it's mostly not used in
-> production.)
-
-I suspect uprobes needs a look too...
-
-I'll need to go dig into all that a bit before I have more of an opinion on the
-shape of the API.
-
-Thanks,
-Mark.
-
-> But jit_text_alloc() can't do this, because the order of operations doesn't
-> match.  With jit_text_alloc(), the executable mapping shows up before the
-> text is populated, so there is no atomic change from not-there to
-> populated-and-executable.  Which means that there is an opportunity for CPUs,
-> speculatively or otherwise, to start filling various caches with intermediate
-> states of the text, which means that various architectures (even x86!) may
-> need serialization.
-> 
-> For eBPF- and module- like use cases, where JITting/code gen is quite
-> coarse-grained, perhaps something vaguely like:
-> 
-> jit_text_alloc() -> returns a handle and an executable virtual address, but does *not* map it there
-> jit_text_write() -> write to that handle
-> jit_text_map() -> map it and synchronize if needed (no sync needed on x86, I think)
-> 
-> could be more efficient and/or safer.
-> 
-> (Modules could use this too.  Getting alternatives right might take some
-> fiddling, because off the top of my head, this doesn't match how it works
-> now.)
-> 
-> To make alternatives easier, this could work, maybe (haven't fully thought it through):
-> 
-> jit_text_alloc()
-> jit_text_map_rw_inplace() -> map at the target address, but RW, !X
-> 
-> write the text and apply alternatives
-> 
-> jit_text_finalize() -> change from RW to RX *and synchronize*
-> 
-> jit_text_finalize() would either need to wait for RCU (possibly extra heavy
-> weight RCU to get "serialization") or send an IPI.
-> 
-> This is slower than the alloc, write, map solution, but allows alternatives
-> to be applied at the final address.
-> 
-> 
-> Even fancier variants where the writing is some using something like
-> use_temporary_mm() might even make sense.
-> 
-> 
-> To what extent does performance matter for the various users?  module loading
-> is slow, and I don't think we care that much.  eBPF loaded is not super fast,
-> and we care to a limited extent.  I *think* the bcachefs use case needs to be
-> very fast, but I'm not sure it can be fast and supportable.
-> 
-> Anyway, food for thought.
-> 
+> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> ---
+> V2 -> V3:
+> * Splitted the patch in two parts.
+> * Removed the unnecessary braces from mana_dealloc_queues().
 
