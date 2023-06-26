@@ -1,375 +1,210 @@
-Return-Path: <netdev+bounces-14030-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14031-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 629D473E725
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:02:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95C8D73E72E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:08:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3C4CA1C20990
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:02:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 92956280E33
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:07:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 807F2134AD;
-	Mon, 26 Jun 2023 18:02:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AEB09134B9;
+	Mon, 26 Jun 2023 18:07:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DB16134AB
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:02:07 +0000 (UTC)
-Received: from mail-wm1-x32d.google.com (mail-wm1-x32d.google.com [IPv6:2a00:1450:4864:20::32d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 222BC130;
-	Mon, 26 Jun 2023 11:02:05 -0700 (PDT)
-Received: by mail-wm1-x32d.google.com with SMTP id 5b1f17b1804b1-3f9c2913133so46663975e9.1;
-        Mon, 26 Jun 2023 11:02:05 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99F5FD520
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:07:54 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F13E106;
+	Mon, 26 Jun 2023 11:07:51 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-313f2a24cb6so1338681f8f.0;
+        Mon, 26 Jun 2023 11:07:51 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687802523; x=1690394523;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MXhWOFbm8tgjo2DxnrLL5naEj512mKWq/1/8bCq2NmU=;
-        b=RyOHdAwwyfzFNJNd3WVUucshF5vLISZ3efkyLekMnQkSSqFaJE96PvlXTowK0XvCLu
-         ARLbKS3AgvLQf0UWar+gkT2iDiQqmivtFCExhqPL2zLNvwRw0z6qgKSbrmKOWmrKM9vC
-         JmSpDlwBC9PA5yqGI4yzdmZkjwIuQV2jMv1RJ1efo075mWXjYJcL9OYfzVZHm/N2UL3u
-         Bn//8NgVuoj64TYbH2BOi3gBhmttfzpeKtcFQvgO6d0N3Jm2Jr5NeAW1MxqlMv2bIEQy
-         W2FLHYDA+zsckGiNoNDKwrOFQQTWyAmlhmiV9ZzsMDkZNpKCZis4Z86WKvVgPcQhulaP
-         k2WA==
+        d=gmail.com; s=20221208; t=1687802870; x=1690394870;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=YHaGiadj1/XOqlPkGLzbFu74E9MIGjrASNEgHQUgemo=;
+        b=Uyl45V6m6U9YHt9wlOOlncRXWyaK4xPJJJfj7xGUG4TiROxIbdxbXkp5iggUC/+Cbc
+         gLbPKV7Xf46HUBS2ythvz71UFSfNQQb3VA11KprCCUpVUQBkHhiOKC/xyrw3gDgF1Q2T
+         pn1V7qpp6oQSO0ROYW4qRAyfGI0Wffd7e4fQq9j2vH0Wi4iAlDC3H+Lwl94ubElInhjb
+         /Xh2AZb1i1kiFRkI1yZo2zwQQb751PJbtZg7pmP6F7BOMMajTs4JEgry7CR4EgjN/nki
+         8UBBLGP1qfbKSeSqqAj1g6NqDR90hwmmXjxG0cNFjYijwqQq8em5OdxtFY9AmICjWCs5
+         KMXQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687802523; x=1690394523;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=MXhWOFbm8tgjo2DxnrLL5naEj512mKWq/1/8bCq2NmU=;
-        b=AKy0Vuk4c8rFUA6LLSTZmzvuZcbuuzzJf3i+wrU+bGHOwAI+BBU5APScJaeeLXG/0+
-         c6F1o4RIZNafeBQ+HXR1DIYR3T6vRVGXGi0zyx12vJvmi6mCrfKOJx/FqTTTYSXiECtJ
-         PLgMJFr5oR/Gfxc0HzhwyjCOfeEtr64ztcrDXCBTOcHB5P/rBSwdloX1eqRVkKDjwbkF
-         gxVNRNDqHgwISmJNzVWYUk7pmEizwM+IFx/SgkTquIE0GOKnVv48DodfPXyW2CyQGnf5
-         O9HQNdppTCxVt2XzTNy291h6Vt7AX+M8PHXEOGeVTv8OKAHt1NxpiqbHfmAtIm8/3zTU
-         RoYA==
-X-Gm-Message-State: AC+VfDxkQJgSYys52UC17D2X6DW5TiNlAbVOs5yojN0548UP2Y2hoLSX
-	jlqgpTo2wNq8rUmfmuI0vwr6qYiFMNmU1wgeMnM=
-X-Google-Smtp-Source: ACHHUZ4WIJtgoSDsEKSe2nWtIAUNJC+65ayU/wYdrSclk4eFEMcNSzS8O2LtHwRAbgmBsN13h4xvAUXeo1C4ZRL4yuc=
-X-Received: by 2002:a05:600c:3790:b0:3fb:5dad:1392 with SMTP id
- o16-20020a05600c379000b003fb5dad1392mr400263wmr.17.1687802523121; Mon, 26 Jun
- 2023 11:02:03 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687802870; x=1690394870;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=YHaGiadj1/XOqlPkGLzbFu74E9MIGjrASNEgHQUgemo=;
+        b=lU5K18T5AB+vefoyhCz96f8ygzME1QWCccfbzXU6Z5uwm7uzY5RhDIRq43wysUyW30
+         8hjkEsgnierl05Gxs5ePH3JqnCo3BnIzYViVmhYf21OchMlS2MrfmJufmBQn+IrFwTJP
+         Eb0I3VQLdh5dEh/CBne0R2za1SdMOsW4eKYFSgaEFGkDp1ksKmVvJAdGN1p3TTnMrv53
+         IBOu1IHM/vxMb3bAdVSAvRiLNTG+peD9smcUvJD6/ZGohIcJvbWfen+sn4Uq8gecoL59
+         KzJLofvRkGcjWRrGBEabXLpakYRA/o5LlzrOMprVC3mYYxyHb06V//1lVqowC9+mi2hs
+         PJNg==
+X-Gm-Message-State: AC+VfDyOg7feEm4LF8sjWwtDwIT1iRaBs+hpqbT5D8PhJ6ytCdZBcxmi
+	Hq+JENCMEVUKRRyWnvUQ5FQtrey7rWY=
+X-Google-Smtp-Source: ACHHUZ4TcWrJ12AxgWebGI+qv9AS5Tpez5g8q3BKsXS9AGYRIvyNMU7eFTXDPc3jP1wfT0/T2rQ6zw==
+X-Received: by 2002:a5d:424d:0:b0:313:f2c6:a4f1 with SMTP id s13-20020a5d424d000000b00313f2c6a4f1mr2521853wrr.36.1687802869493;
+        Mon, 26 Jun 2023 11:07:49 -0700 (PDT)
+Received: from Ansuel-xps. (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
+        by smtp.gmail.com with ESMTPSA id cx16-20020a056000093000b00301a351a8d6sm8109818wrb.84.2023.06.26.11.07.48
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 11:07:49 -0700 (PDT)
+Message-ID: <6499d3f5.050a0220.3becf.7296@mx.google.com>
+X-Google-Original-Message-ID: <ZJnSDVCZO/xhySCe@Ansuel-xps.>
+Date: Mon, 26 Jun 2023 19:59:41 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH RFC] net: dsa: qca8k: make learning configurable
+ and keep off if standalone
+References: <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230625115803.6xykp4wiqqdwwzv4@skbuf>
+ <6499c31c.df0a0220.e2acb.5549@mx.google.com>
+ <20230626173056.zq77nilzrr5djns5@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
- <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
- <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
- <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
- <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com> <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
-In-Reply-To: <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Mon, 26 Jun 2023 20:01:50 +0200
-Message-ID: <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230626173056.zq77nilzrr5djns5@skbuf>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	WEIRD_QUOTING autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jun 26, 2023 at 7:56=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wro=
-te:
+On Mon, Jun 26, 2023 at 08:30:56PM +0300, Vladimir Oltean wrote:
+> On Mon, Jun 26, 2023 at 06:41:50PM +0200, Christian Marangi wrote:
+> > > Once that basic precondition passes, you should be able to start looking
+> > > at tools/testing/selftests/drivers/net/dsa/ and run those one by one.
+> > > An interesting one would be local_termination.sh, which monitors the way
+> > > in which frames reach the CPU. Though be aware that some sub-tests from
+> > > that suite will fail on misconfigurations that are non-fatal (and don't
+> > > impact functionality), just sub-optimal (affecting performance). Like
+> > > sending unknown packets to the CPU when the port is non-promiscuous and
+> > > software would drop those packets anyway.
+> > > 
+> > 
+> > Lots of difficult to run the selftests on a light fw but step at times
+> > I'm managing to make use of them (could be helpfull to add some comments
+> > in the .config saying that the testing port needs to be declared in the
+> > struct) (and maybe some additional checks on the kind of device type are
+> > required for the test to actually work (vrf, dummy, macvlan...)
+> 
+> Yeah, that doesn't sound like a bad idea at all. AFAIK,
+> tools/testing/selftests/net/forwarding/lib.sh doesn't check
+> "zcat /proc/config.gz" at all. Maybe it would be nice if it did, and to
+> guard that behavior based on some REQUIRE_* variables that are true by
+> default (but can be set to false by scripts).
 >
-> On Mon, 2023-06-26 at 19:30 +0200, Ian Kumlien wrote:
-> > There, that didn't take long, even with wireguard disabled
-> >
-> > [14079.678380] BUG: kernel NULL pointer dereference, address: 000000000=
-00000c0
-> > [14079.685456] #PF: supervisor read access in kernel mode
-> > [14079.690686] #PF: error_code(0x0000) - not-present page
-> > [14079.695915] PGD 0 P4D 0
-> > [14079.698540] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> > [14079.702996] CPU: 11 PID: 891 Comm: napi/eno2-80 Not tainted 6.4.0 #3=
-60
-> > [14079.709614] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-> > BIOS 1.7a 10/13/2022
-> > [14079.717796] RIP: 0010:__udp_gso_segment+0x346/0x4f0
-> > [14079.722778] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
-> > 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-> > 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
-> > 48 8d
-> > [14079.741645] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-> > [14079.746966] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 0000000=
-000000000
-> > [14079.754195] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2a=
-fc9d302d4
-> > [14079.761422] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 0000200=
-0001558c9
-> > [14079.768650] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 0000000=
-0000000e2
-> > [14079.775879] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 0000200=
-0001558c9
-> > [14079.783106] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-> > knlGS:0000000000000000
-> > [14079.791305] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [14079.797162] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 0000000=
-0003526e0
-> > [14079.804408] Call Trace:
-> > [14079.806961]  <TASK>
-> > [14079.809170]  ? __die+0x1a/0x60
-> > [14079.812340]  ? page_fault_oops+0x158/0x440
-> > [14079.816551]  ? ip6_route_output_flags+0xe3/0x160
-> > [14079.821284]  ? exc_page_fault+0x3f4/0x820
-> > [14079.825408]  ? update_load_avg+0x77/0x710
-> > [14079.829534]  ? asm_exc_page_fault+0x22/0x30
-> > [14079.833836]  ? __udp_gso_segment+0x346/0x4f0
-> > [14079.838218]  ? __udp_gso_segment+0x2fa/0x4f0
-> > [14079.842600]  ? _raw_spin_unlock_irqrestore+0x16/0x30
-> > [14079.847679]  ? try_to_wake_up+0x8e/0x5a0
-> > [14079.851713]  inet_gso_segment+0x150/0x3c0
-> > [14079.855827]  ? vhost_poll_wakeup+0x31/0x40
-> > [14079.860032]  skb_mac_gso_segment+0x9b/0x110
-> > [14079.864331]  __skb_gso_segment+0xae/0x160
-> > [14079.868455]  ? netif_skb_features+0x144/0x290
-> > [14079.872928]  validate_xmit_skb+0x167/0x370
-> > [14079.877139]  validate_xmit_skb_list+0x43/0x70
-> > [14079.881612]  sch_direct_xmit+0x267/0x380
-> > [14079.885641]  __qdisc_run+0x140/0x590
-> > [14079.889324]  __dev_queue_xmit+0x44d/0xba0
-> > [14079.893450]  ? nf_hook_slow+0x3c/0xb0
-> > [14079.897229]  br_dev_queue_push_xmit+0xb2/0x1c0
-> > [14079.901788]  maybe_deliver+0xa9/0x100
-> > [14079.905564]  br_flood+0x8a/0x180
-> > [14079.908903]  br_handle_frame_finish+0x31f/0x5b0
-> > [14079.913547]  br_handle_frame+0x28f/0x3a0
-> > [14079.917585]  ? ipv6_find_hdr+0x1f0/0x3e0
-> > [14079.921622]  ? br_handle_local_finish+0x20/0x20
-> > [14079.926267]  __netif_receive_skb_core.constprop.0+0x4c5/0xc90
-> > [14079.932125]  ? br_handle_frame_finish+0x5b0/0x5b0
-> > [14079.936946]  ? ___slab_alloc+0x4bf/0xaf0
-> > [14079.940986]  __netif_receive_skb_list_core+0x107/0x250
-> > [14079.946240]  netif_receive_skb_list_internal+0x194/0x2b0
-> > [14079.951660]  ? napi_gro_flush+0x97/0xf0
-> > [14079.955604]  napi_complete_done+0x69/0x180
-> > [14079.959808]  ixgbe_poll+0xe10/0x12e0
-> > [14079.963506]  __napi_poll+0x26/0x1b0
-> > [14079.967106]  napi_threaded_poll+0x232/0x250
-> > [14079.971405]  ? __napi_poll+0x1b0/0x1b0
-> > [14079.975260]  kthread+0xee/0x120
-> > [14079.978510]  ? kthread_complete_and_exit+0x20/0x20
-> > [14079.983415]  ret_from_fork+0x22/0x30
-> > [14079.987102]  </TASK>
-> > [14079.989395] Modules linked in: chaoskey
-> > [14079.993347] CR2: 00000000000000c0
-> > [14079.996773] ---[ end trace 0000000000000000 ]---
-> > [14080.018013] pstore: backend (erst) writing error (-28)
-> > [14080.023274] RIP: 0010:__udp_gso_segment+0x346/0x4f0
-> > [14080.028264] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
-> > 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-> > 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
-> > 48 8d
-> > [14080.047181] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-> > [14080.052522] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 0000000=
-000000000
-> > [14080.059765] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2a=
-fc9d302d4
-> > [14080.067012] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 0000200=
-0001558c9
-> > [14080.074257] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 0000000=
-0000000e2
-> > [14080.081502] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 0000200=
-0001558c9
-> > [14080.088746] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-> > knlGS:0000000000000000
-> > [14080.096964] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [14080.102823] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 0000000=
-0003526e0
-> > [14080.110067] Kernel panic - not syncing: Fatal exception in interrupt
-> > [14080.325501] Kernel Offset: 0x12600000 from 0xffffffff81000000
-> > (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> > [14080.353129] ---[ end Kernel panic - not syncing: Fatal exception in
-> > interrupt ]---
->
-> Could you please provide a decoded stack trace?
->
-> # in your git tree:
-> cat <stacktrace file > | ./scripts/decode_stacktrace.sh vmlinux
 
-I'm afraid it doesn't yield more information, really... I can't say why
+Some thing can even be checked by simply creating an interface and see
+if the thing gives error. I feel this is a better approach than checking
+config and kflags since from what I can see the idea of these scripts is
+to be system agnostic and sometimes it's handy to ""compile"" or package
+these scripts on a different system than the target one (this is true
+for every shell script and target specific stuff that needs to be
+compiled is not the case)
 
- cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
-[14079.678380] BUG: kernel NULL pointer dereference, address: 0000000000000=
-0c0
-[14079.685456] #PF: supervisor read access in kernel mode
-[14079.690686] #PF: error_code(0x0000) - not-present page
-[14079.695915] PGD 0 P4D 0
-[14079.698540] Oops: 0000 [#1] PREEMPT SMP NOPTI
-[14079.702996] CPU: 11 PID: 891 Comm: napi/eno2-80 Not tainted 6.4.0 #360
-[14079.709614] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-BIOS 1.7a 10/13/2022
-[14079.717796] RIP: 0010:__udp_gso_segment (??:?)
-[14079.722778] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
+> > Anyway a run of local_termination.sh produce the following output.
+> > # selftests: drivers/net/dsa: local_termination.sh
+> > # TEST: lan1: Unicast IPv4 to primary MAC address                     [FAIL]
+> > #       reception failed
+> 
+> Hmm, so ping works but this doesn't? That's strange, because send_uc_ipv4()
+> also pings. Have you run with bash -x to see why it fails?
+> 
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0: c3                    ret
-   1: 08 66 89              or     %ah,-0x77(%rsi)
-   4: 5c                    pop    %rsp
-   5: 02 04 45 84 e4 0f 85 add    -0x7af01b7c(,%rax,2),%al
-   c: 27                    (bad)
-   d: fd                    std
-   e: ff                    (bad)
-   f: ff                    .byte 0xff
-49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
-48 8d
-[14079.741645] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-[14079.746966] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 00000000000=
-00000
-[14079.754195] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2afc9d=
-302d4
-[14079.761422] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 00002000001=
-558c9
-[14079.768650] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 00000000000=
-000e2
-[14079.775879] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 00002000001=
-558c9
-[14079.783106] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-knlGS:0000000000000000
-[14079.791305] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[14079.797162] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 00000000003=
-526e0
-[14079.804408] Call Trace:
-[14079.806961]  <TASK>
-[14079.809170] ? __die (??:?)
-[14079.812340] ? page_fault_oops (fault.c:?)
-[14079.816551] ? ip6_route_output_flags (??:?)
-[14079.821284] ? exc_page_fault (??:?)
-[14079.825408] ? update_load_avg (fair.c:?)
-[14079.829534] ? asm_exc_page_fault (??:?)
-[14079.833836] ? __udp_gso_segment (??:?)
-[14079.838218] ? __udp_gso_segment (??:?)
-[14079.842600] ? _raw_spin_unlock_irqrestore (??:?)
-[14079.847679] ? try_to_wake_up (core.c:?)
-[14079.851713] inet_gso_segment (??:?)
-[14079.855827] ? vhost_poll_wakeup (vhost.c:?)
-[14079.860032] skb_mac_gso_segment (??:?)
-[14079.864331] __skb_gso_segment (??:?)
-[14079.868455] ? netif_skb_features (??:?)
-[14079.872928] validate_xmit_skb (dev.c:?)
-[14079.877139] validate_xmit_skb_list (??:?)
-[14079.881612] sch_direct_xmit (??:?)
-[14079.885641] __qdisc_run (??:?)
-[14079.889324] __dev_queue_xmit (??:?)
-[14079.893450] ? nf_hook_slow (??:?)
-[14079.897229] br_dev_queue_push_xmit (??:?)
-[14079.901788] maybe_deliver (br_forward.c:?)
-[14079.905564] br_flood (??:?)
-[14079.908903] br_handle_frame_finish (??:?)
-[14079.913547] br_handle_frame (br_input.c:?)
-[14079.917585] ? ipv6_find_hdr (??:?)
-[14079.921622] ? br_handle_local_finish (??:?)
-[14079.926267] __netif_receive_skb_core.constprop.0 (dev.c:?)
-[14079.932125] ? br_handle_frame_finish (br_input.c:?)
-[14079.936946] ? ___slab_alloc (slub.c:?)
-[14079.940986] __netif_receive_skb_list_core (dev.c:?)
-[14079.946240] netif_receive_skb_list_internal (??:?)
-[14079.951660] ? napi_gro_flush (??:?)
-[14079.955604] napi_complete_done (??:?)
-[14079.959808] ixgbe_poll (??:?)
-[14079.963506] __napi_poll (dev.c:?)
-[14079.967106] napi_threaded_poll (dev.c:?)
-[14079.971405] ? __napi_poll (dev.c:?)
-[14079.975260] kthread (kthread.c:?)
-[14079.978510] ? kthread_complete_and_exit (kthread.c:?)
-[14079.983415] ret_from_fork (??:?)
-[14079.987102]  </TASK>
-[14079.989395] Modules linked in: chaoskey
-[14079.993347] CR2: 00000000000000c0
-[14079.996773] ---[ end trace 0000000000000000 ]---
-[14080.018013] pstore: backend (erst) writing error (-28)
-[14080.023274] RIP: 0010:__udp_gso_segment (??:?)
-[14080.028264] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
+I just run with bash -x and I also mod the script to not delete the
+tcpdump. Limiting the script to only this test the dump is just 2 ICMPv6
+packet and no output from tcpdump aside from
 
-Code starting with the faulting instruction
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-   0: c3                    ret
-   1: 08 66 89              or     %ah,-0x77(%rsi)
-   4: 5c                    pop    %rsp
-   5: 02 04 45 84 e4 0f 85 add    -0x7af01b7c(,%rax,2),%al
-   c: 27                    (bad)
-   d: fd                    std
-   e: ff                    (bad)
-   f: ff                    .byte 0xff
-49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
-48 8d
-[14080.047181] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-[14080.052522] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 00000000000=
-00000
-[14080.059765] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2afc9d=
-302d4
-[14080.067012] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 00002000001=
-558c9
-[14080.074257] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 00000000000=
-000e2
-[14080.081502] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 00002000001=
-558c9
-[14080.088746] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-knlGS:0000000000000000
-[14080.096964] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[14080.102823] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 00000000003=
-526e0
-[14080.110067] Kernel panic - not syncing: Fatal exception in interrupt
-[14080.325501] Kernel Offset: 0x12600000 from 0xffffffff81000000
-(relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-[14080.353129] ---[ end Kernel panic - not syncing: Fatal exception in
-interrupt ]---
+tcpdump: listening on lan1, link-type EN10MB (Ethernet), snapshot length 65535 bytes
+3 packets captured
+5 packets received by filter
+0 packets dropped by kernel
 
-The binaries aren't stripped so i don't, currently, know why it's like this=
-...
+I feel like this is important so I think I should focus on understanding
+why this doesn't work? Any clue?
 
-but i also get:
-gdb vmlinux
-GNU gdb (Gentoo 13.2 vanilla) 13.2
-Copyright (C) 2023 Free Software Foundation, Inc.
-License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.htm=
-l>
-This is free software: you are free to change and redistribute it.
-There is NO WARRANTY, to the extent permitted by law.
-Type "show copying" and "show warranty" for details.
-This GDB was configured as "x86_64-pc-linux-gnu".
-Type "show configuration" for configuration details.
-For bug reporting instructions, please see:
-<https://bugs.gentoo.org/>.
-Find the GDB manual and other documentation resources online at:
-    <http://www.gnu.org/software/gdb/documentation/>.
+> > # TEST: lan1: Unicast IPv4 to macvlan MAC address                     [FAIL]
+> > #       reception failed
+> > # TEST: lan1: Unicast IPv4 to unknown MAC address                     [ OK ]
+> 
+> So the only reason why this test passes is because in this case, the
+> unicast drops are okay?
+> 
+> > # TEST: lan1: Unicast IPv4 to unknown MAC address, promisc            [FAIL]
+> > #       reception failed
+> > # TEST: lan1: Unicast IPv4 to unknown MAC address, allmulti           [ OK ]
+> 
+> Similar here. Packet should have been dropped; the test detects a drop => okay.
+> Passes for the wrong reason, most likely, because this driver doesn't react
+> on IFF_PROMISC or IFF_ALLMULTI.
+> 
+> > # TEST: lan1: Multicast IPv4 to joined group                          [ OK ]
+> > # TEST: lan1: Multicast IPv4 to unknown group                         [FAIL]
+> > #       reception succeeded, but should have failed
+> 
+> "reception succeeded, but should have failed" is the okay kind of failure.
+> "reception failed" is what's bothering.
+> 
+> > # TEST: lan1: Multicast IPv4 to unknown group, promisc                [FAIL]
+> > #       reception failed
+> > # TEST: lan1: Multicast IPv4 to unknown group, allmulti               [ OK ]
+> > # TEST: lan1: Multicast IPv6 to joined group                          [ OK ]
+> > # TEST: lan1: Multicast IPv6 to unknown group                         [FAIL]
+> > #       reception succeeded, but should have failed
+> > # TEST: lan1: Multicast IPv6 to unknown group, promisc                [FAIL]
+> > #       reception failed
+> 
+> This I cannot explain. For the test right above, "Multicast IPv6 to unknown group",
+> it said that reception succeeded. This is sending the same packet, only
+> the IFF_PROMISC flag of the device changes (this is also propagated to
+> the DSA master). I've no idea why it fails. Again, bash -x will say more.
+> 
+> > # TEST: lan1: Multicast IPv6 to unknown group, allmulti               [ OK ]
+> > # TEST: br0: Unicast IPv4 to primary MAC address                      [FAIL]
+> > #       reception failed
+> > # TEST: br0: Unicast IPv4 to macvlan MAC address                      [FAIL]
+> > #       reception failed
+> > # TEST: br0: Unicast IPv4 to unknown MAC address                      [ OK ]
+> > # TEST: br0: Unicast IPv4 to unknown MAC address, promisc             [FAIL]
+> > #       reception failed
+> > # TEST: br0: Unicast IPv4 to unknown MAC address, allmulti            [ OK ]
+> > # TEST: br0: Multicast IPv4 to joined group                           [ OK ]
+> > # TEST: br0: Multicast IPv4 to unknown group                          [FAIL]
+> > #       reception succeeded, but should have failed
+> > # TEST: br0: Multicast IPv4 to unknown group, promisc                 [FAIL]
+> > #       reception failed
+> > # TEST: br0: Multicast IPv4 to unknown group, allmulti                [ OK ]
+> > # TEST: br0: Multicast IPv6 to joined group                           [ OK ]
+> > # TEST: br0: Multicast IPv6 to unknown group                          [FAIL]
+> > #       reception succeeded, but should have failed
+> > # TEST: br0: Multicast IPv6 to unknown group, promisc                 [FAIL]
+> > #       reception failed
+> > # TEST: br0: Multicast IPv6 to unknown group, allmulti                [ OK ]
+> > 
+> > Things doesn't look good to me or I am wrong?
+> 
+> Nope, doesn't look good at all. Looks like an incomplete setup.
 
-For help, type "help".
-Type "apropos word" to search for commands related to "word"...
-Reading symbols from vmlinux...
-(No debugging symbols found in vmlinux)
-Traceback (most recent call last):
-  File "/usr/src/linux/vmlinux-gdb.py", line 25, in <module>
-    import linux.constants
-  File "/usr/src/linux/scripts/gdb/linux/constants.py", line 10, in <module=
->
-    LX_hrtimer_resolution =3D gdb.parse_and_eval("hrtimer_resolution")
-                            ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-gdb.error: 'hrtimer_resolution' has unknown type; cast it to its declared t=
-ype
----
-
-> Thanks!
->
-> Paolo
->
+-- 
+	Ansuel
 
