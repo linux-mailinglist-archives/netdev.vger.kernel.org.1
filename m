@@ -1,180 +1,433 @@
-Return-Path: <netdev+bounces-14002-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C568B73E51D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:31:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 49E3673E5DE
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:56:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 015C31C20A3C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:31:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 533D6280B91
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:56:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A78D506;
-	Mon, 26 Jun 2023 16:31:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4ED26C8FD;
+	Mon, 26 Jun 2023 16:56:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1D823C7D
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:31:42 +0000 (UTC)
-Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EB1C6
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:31:40 -0700 (PDT)
-Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso1618566b3a.2
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:31:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 358C363C0
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:56:02 +0000 (UTC)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96908106;
+	Mon, 26 Jun 2023 09:55:59 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-313e68e99c7so3126113f8f.1;
+        Mon, 26 Jun 2023 09:55:59 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687797099; x=1690389099;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ElVQSNFQeBSJ8cUDkz1CqixeRQkBNwJHNP3Ld++dWRY=;
-        b=L07WBZsg3ebScE1i/zNFEVtycZ/Cvvp66e8wB7z4hPfIUswMI/WdEw5z/WdgU5mkZn
-         d0OvXti2Xmjbvv9fedQ+t412YJdQ6aK4FAQoccn+wGuGGncH1IC0nurX7H2qH9iW5nLn
-         AdonOzNMCcu63+dP2PgaSBqzWmWURx0ec/izohi6XZMIOgaN840Ng7KOoYrk1f8nremA
-         cv2nlmyyKBCpuPIny6vqt2PPmtAgK+f9enyEpdwXazEGe3zQam9NlLz58VwF49jIB96Q
-         4azUQ0QGRTQGYRXTVyNtAhjGyr5bBqoWmXDgy2cQe6ARXVslXFNcduTu7wZB7a32AkMM
-         3cRA==
+        d=gmail.com; s=20221208; t=1687798558; x=1690390558;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=0CtVdh2bwPFXtiAqHseNgU5XOV2yXb7WFSKHepKg2d4=;
+        b=pEJDYN8s1S8dExgQ7NWUS9zN8Pbf6tPi+3W1BAwGWRGU3oTJYz9wLSTTyJjrlcXdoX
+         JV7zKuK76UpropGMCOh2LPt67oEGsPUzK6YSIlVNzrWq+a2vn5fm5vmvF2wPUtOuDTBw
+         yRh04sqLx5R/DFSUPDSROvwdJgAmor/iThGguJiJi3DtWYVoTf21/VjAe3JnDcN9AhKr
+         FhZ2y6cAZj7A/QjInmYOgvhnrTE7R9CfKGEKqC4Uss1EQhh447Vld3d6+goS4A3cTGqb
+         ZI8mKM6D+V6W2Idv3TcLnSSxzhBtngNvFVl7sjQpSkeoRtIkkluXYYR4/5iWTAqNHC/e
+         9XeA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687797099; x=1690389099;
-        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
-         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=ElVQSNFQeBSJ8cUDkz1CqixeRQkBNwJHNP3Ld++dWRY=;
-        b=H2SFb+F4Jm3umZpzDpPViZwcn5EaFRb3mt0GFuk/3/cti79O8wO8lz3EYc3tUpEEmV
-         B5UY4Vv4e/GOuR6gLvXvgToe84Vub/0DgLQ5+a4pXx0qZOnvFt3/1nk+UwJ00pjpoNhm
-         ismhD7UowPGw5rnKE8o81G1oC3eq6chhuemrB/lwtjVJHeCc86S56I58QM4A05qCAC5q
-         oqwns65mTNUFYcke0MqQoZo8LCgUaQwoUIMgCq+kLXTxNwW+CWcfpFJh++ezeZLCN8cP
-         /NueWIeQuYb2vB4M/rl/Jf/fZtzcpwEug5V7+cZlt1EZNvo+PrYCiaeX7OdfHWHblKrS
-         N4ng==
-X-Gm-Message-State: AC+VfDwXZGS0BV4xTD7YsIwxLgdGpjJS3JYOpGuwkvDuDYunu/4FvX48
-	pv642OYpfnTdb+/DIYhCOB++b8siXvrYtoIyQgULxg==
-X-Google-Smtp-Source: ACHHUZ4e++rRgYbN2T01eKdUgjlpuJ0Wh4RimtVZlL+eqy3ga2KMAgCgwCHcoJVBLF/QsxP4ezyl3w==
-X-Received: by 2002:a05:6a20:1054:b0:128:fce6:dd8b with SMTP id gt20-20020a056a20105400b00128fce6dd8bmr1104801pzc.39.1687797099496;
-        Mon, 26 Jun 2023 09:31:39 -0700 (PDT)
-Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
-        by smtp.gmail.com with ESMTPSA id a21-20020a63e855000000b0053ba104c113sm4398581pgk.72.2023.06.26.09.31.39
+        d=1e100.net; s=20221208; t=1687798558; x=1690390558;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0CtVdh2bwPFXtiAqHseNgU5XOV2yXb7WFSKHepKg2d4=;
+        b=Gh5SPRyVHkjsZX6OOcCvqg7kFWohEYi4YloSIPRlleRlrW8doBWk6z02Zub3BLkLW9
+         /H4TaT/hyglyLCPgYC2r7bxW680rztdoDZLAXelJt+dxVZjbNaW5PDYeRTH0crA1awo1
+         6gU1pmCIdUy2mp33yIALferSsFBrc+f1JJf5YAAtOSxENnW1so9gaV45DeSMAQeG8WBk
+         oU8cpBPiJKlr/mnTXhL6BCGtLf7E3/K1MVAYWA8Acu8SCgWwSVlVpKtJ7WVGOvT18XDg
+         0yZahEtw1NFsKpGLjKw4yFi4yUyf75vlx0BEtaJv8QzcnnFXRh53gVONMJamB+wUZhJx
+         C03g==
+X-Gm-Message-State: AC+VfDwGSjiCsTxw9w54VmCbnI5FxOfCe5FtyWbRHseEnLUsMTqUUTG+
+	DSQZByf2nK/ahXcuAOT7y6c=
+X-Google-Smtp-Source: ACHHUZ43DPrPTsrlrF8irzur6WjGZ1XZG78XmUz8rfvgGUE1gkIAEVOZLOuKtOXIHB4XjyJqDW28ow==
+X-Received: by 2002:a5d:4c49:0:b0:307:9702:dfc8 with SMTP id n9-20020a5d4c49000000b003079702dfc8mr26178001wrt.48.1687798557521;
+        Mon, 26 Jun 2023 09:55:57 -0700 (PDT)
+Received: from Ansuel-xps. (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
+        by smtp.gmail.com with ESMTPSA id i6-20020adff306000000b00311339f5b06sm7846269wro.57.2023.06.26.09.55.56
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:31:39 -0700 (PDT)
-Date: Mon, 26 Jun 2023 09:31:37 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: netdev@vger.kernel.org
-Cc: linux-kernel@vger.kernel.org
-Subject: [ANNOUNCE] iproute2 6.4.0 release
-Message-ID: <20230626093137.2f302acc@hermes.local>
+        Mon, 26 Jun 2023 09:55:56 -0700 (PDT)
+Message-ID: <6499c31c.df0a0220.e2acb.5549@mx.google.com>
+X-Google-Original-Message-ID: <ZJm/zq4Lw9PmN2Lo@Ansuel-xps.>
+Date: Mon, 26 Jun 2023 18:41:50 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH RFC] net: dsa: qca8k: make learning configurable
+ and keep off if standalone
+References: <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230625115803.6xykp4wiqqdwwzv4@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230625115803.6xykp4wiqqdwwzv4@skbuf>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Just released iproute2 corresponding to the 6.4 kernel.
-Not much is new in this release heading into summer holidays.
-The bridge utility added some new capabilities around multicast
-forwarding database. Lots of cleanups and similar fixes. 
+On Sun, Jun 25, 2023 at 02:58:03PM +0300, Vladimir Oltean wrote:
+> On Fri, Jun 23, 2023 at 01:40:05PM +0200, Christian Marangi wrote:
+> > Address learning should initially be turned off by the driver for port
+> > operation in standalone mode, then the DSA core handles changes to it
+> > via ds->ops->port_bridge_flags().
+> > 
+> > Currently this is not the case for qca8k where learning is enabled
+> > unconditionally in qca8k_setup for every user port.
+> > 
+> > Handle ports configured in standalone mode by making the learning
+> > configurable and not enabling it by default.
+> > 
+> > Implement .port_pre_bridge_flags and .port_bridge_flags dsa ops to
+> > enable learning for bridge that request it and tweak
+> > .port_stp_state_set to correctly disable learning when port is
+> > configured in standalone mode.
+> > 
+> > Signed-off-by: Christian Marangi <ansuelsmth@gmail.com>
+> > ---
+> > 
+> > Posting as RFC as I would love some comments from Vladimir for correct
+> > implementation of this. This was suggested to be on par with offload
+> > bridge API and I used as example [1] (commit that does the same thing
+> > with a microchip switch)
+> > 
+> > I didn't want to bloat the priv struct with additional info with the
+> > port state and from what I can see it seems using dp->learning is enough
+> > to understand if learning is currently enabled for the port or not but I
+> > would love to have some confirmation about this. (from what I notice
+> > when port is set in standalone mode, flags are cleared so it should be
+> > correct)
+> 
+> In principle you can use dp->learning, but in this case you are using it
+> incorrectly (more below).
+>
 
-Download:
-    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.4.0.tar.gz
+Hi, thanks a lot for the response and for catching the stupid mistake.
 
-Repository for current release
-    https://github.com/shemminger/iproute2.git
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+> > 
+> > I also verified this working by dumping the fdb in a bridge
+> > configuration and in a standalone configuration. Traffic works in both
+> > configuration.
+> > 
+> > Dump WITH BRIDGE CONFIGURATION:
+> > 01:00:5e:00:00:01 dev eth0 self permanent
+> > 33:33:00:00:00:02 dev eth0 self permanent
+> > 33:33:00:00:00:01 dev eth0 self permanent
+> > 33:33:ff:f2:5d:50 dev eth0 self permanent
+> > 33:33:ff:00:00:00 dev eth0 self permanent
+> > dc:ef:09:f2:5d:4f dev eth1 self permanent
+> > 33:33:00:00:00:01 dev eth1 self permanent
+> > 33:33:00:00:00:02 dev eth1 self permanent
+> > 01:00:5e:00:00:01 dev eth1 self permanent
+> > 33:33:ff:f2:5d:4f dev eth1 self permanent
+> > 33:33:ff:00:00:00 dev eth1 self permanent
+> > c0:3e:ba:c1:d7:47 dev lan1 master br-lan
+> > dc:ef:09:f2:5d:4f dev lan1 vlan 1 master br-lan permanent
+> > dc:ef:09:f2:5d:4f dev lan1 master br-lan permanent
+> > c0:3e:ba:c1:d7:47 dev lan1 vlan 1 self
+> > 33:33:00:00:00:01 dev wlan0 self permanent
+> > 33:33:00:00:00:02 dev wlan0 self permanent
+> > 33:33:00:00:00:01 dev wlan1 self permanent
+> > 33:33:00:00:00:02 dev wlan1 self permanent
+> > 33:33:00:00:00:01 dev br-lan self permanent
+> > 33:33:00:00:00:02 dev br-lan self permanent
+> > 01:00:5e:00:00:01 dev br-lan self permanent
+> > 33:33:ff:00:00:01 dev br-lan self permanent
+> > 33:33:ff:f2:5d:4f dev br-lan self permanent
+> > 33:33:00:01:00:02 dev br-lan self permanent
+> > 33:33:00:01:00:03 dev br-lan self permanent
+> > 33:33:ff:00:00:00 dev br-lan self permanent
+> > 
+> > Dump WITH STANDALONE CONFIGURATION:
+> > 01:00:5e:00:00:01 dev eth0 self permanent
+> > 33:33:00:00:00:02 dev eth0 self permanent
+> > 33:33:00:00:00:01 dev eth0 self permanent
+> > 33:33:ff:f2:5d:50 dev eth0 self permanent
+> > 33:33:ff:00:00:00 dev eth0 self permanent
+> > 33:33:00:00:00:01 dev eth1 self permanent
+> > 33:33:00:00:00:02 dev eth1 self permanent
+> > 01:00:5e:00:00:01 dev eth1 self permanent
+> > 33:33:ff:f2:5d:4f dev eth1 self permanent
+> > 33:33:ff:00:00:01 dev eth1 self permanent
+> > 33:33:ff:00:00:00 dev eth1 self permanent
+> > 33:33:00:01:00:02 dev eth1 self permanent
+> > 33:33:00:01:00:03 dev eth1 self permanent
+> > 33:33:00:00:00:01 dev wlan0 self permanent
+> > 33:33:00:00:00:02 dev wlan0 self permanent
+> > 33:33:00:00:00:01 dev wlan1 self permanent
+> > 33:33:00:00:00:02 dev wlan1 self permanent
+> 
+> The information from these dumps is pretty much irrelevant.
+> 
+> > From what I can see there isn't any self entry with the MAC address of
+> > the connected device and this should confirm that learning is actually
+> > disabled.
+> > 
+> > Hope this is enough to test this feature and I would ask what would be
+> > the next step to reach a point where port_change_master can be
+> > implemented.
+> 
+> The way to test this patch would be to connect in loopback 2 standalone
+> qca8k ports having the same MAC address, and ping from one to the other.
+> 
+> ip netns add ns0
+> ip link set lan1 netns ns0 && ip -n ns0 link set lan1 up
+> ip -n ns0 addr add 192.168.100.1/24 dev lan1
+> ip link set lan2 up && ip addr add 192.168.100.2/24 dev lan2
+> ping 192.168.100.1
+> 
+> Before, it shouldn't have worked, now it should.
 
-And future release (net-next):
-    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+I can confirm this works.
 
-Contributions:
+> 
+> Once that basic precondition passes, you should be able to start looking
+> at tools/testing/selftests/drivers/net/dsa/ and run those one by one.
+> An interesting one would be local_termination.sh, which monitors the way
+> in which frames reach the CPU. Though be aware that some sub-tests from
+> that suite will fail on misconfigurations that are non-fatal (and don't
+> impact functionality), just sub-optimal (affecting performance). Like
+> sending unknown packets to the CPU when the port is non-promiscuous and
+> software would drop those packets anyway.
+> 
 
-Andrea Claudi (5):
-      ip: remove double space before 'allmulti' flag
-      bridge: vni: remove useless checks on vni
-      ipstats: fix message reporting error
-      vdpa: propagate error from cmd_dev_vstats_show()
-      iproute_lwtunnel: fix array boundary check
+Lots of difficult to run the selftests on a light fw but step at times
+I'm managing to make use of them (could be helpfull to add some comments
+in the .config saying that the testing port needs to be declared in the
+struct) (and maybe some additional checks on the kind of device type are
+required for the test to actually work (vrf, dummy, macvlan...)
 
-Bilal Khan (1):
-      fixed the grammar in ip-rule(8) man page
+Anyway a run of local_termination.sh produce the following output.
+# selftests: drivers/net/dsa: local_termination.sh
+# TEST: lan1: Unicast IPv4 to primary MAC address                     [FAIL]
+#       reception failed
+# TEST: lan1: Unicast IPv4 to macvlan MAC address                     [FAIL]
+#       reception failed
+# TEST: lan1: Unicast IPv4 to unknown MAC address                     [ OK ]
+# TEST: lan1: Unicast IPv4 to unknown MAC address, promisc            [FAIL]
+#       reception failed
+# TEST: lan1: Unicast IPv4 to unknown MAC address, allmulti           [ OK ]
+# TEST: lan1: Multicast IPv4 to joined group                          [ OK ]
+# TEST: lan1: Multicast IPv4 to unknown group                         [FAIL]
+#       reception succeeded, but should have failed
+# TEST: lan1: Multicast IPv4 to unknown group, promisc                [FAIL]
+#       reception failed
+# TEST: lan1: Multicast IPv4 to unknown group, allmulti               [ OK ]
+# TEST: lan1: Multicast IPv6 to joined group                          [ OK ]
+# TEST: lan1: Multicast IPv6 to unknown group                         [FAIL]
+#       reception succeeded, but should have failed
+# TEST: lan1: Multicast IPv6 to unknown group, promisc                [FAIL]
+#       reception failed
+# TEST: lan1: Multicast IPv6 to unknown group, allmulti               [ OK ]
+# TEST: br0: Unicast IPv4 to primary MAC address                      [FAIL]
+#       reception failed
+# TEST: br0: Unicast IPv4 to macvlan MAC address                      [FAIL]
+#       reception failed
+# TEST: br0: Unicast IPv4 to unknown MAC address                      [ OK ]
+# TEST: br0: Unicast IPv4 to unknown MAC address, promisc             [FAIL]
+#       reception failed
+# TEST: br0: Unicast IPv4 to unknown MAC address, allmulti            [ OK ]
+# TEST: br0: Multicast IPv4 to joined group                           [ OK ]
+# TEST: br0: Multicast IPv4 to unknown group                          [FAIL]
+#       reception succeeded, but should have failed
+# TEST: br0: Multicast IPv4 to unknown group, promisc                 [FAIL]
+#       reception failed
+# TEST: br0: Multicast IPv4 to unknown group, allmulti                [ OK ]
+# TEST: br0: Multicast IPv6 to joined group                           [ OK ]
+# TEST: br0: Multicast IPv6 to unknown group                          [FAIL]
+#       reception succeeded, but should have failed
+# TEST: br0: Multicast IPv6 to unknown group, promisc                 [FAIL]
+#       reception failed
+# TEST: br0: Multicast IPv6 to unknown group, allmulti                [ OK ]
 
-David Ahern (4):
-      Update kernel headers
-      Update kernel headers
-      Update kernel headers
-      Update kernel headers
+Things doesn't look good to me or I am wrong?
 
-Davide Caratti (1):
-      tc: m_tunnel_key: support code for "nofrag" tunnels
+> > (would also love to see what are the criteria to enable offload_fwd_mask
+> > on the targget for rcv and eventually for xmit)
+> 
+> For RX, skb->offload_fwd_mark = true (mark not mask) means that the software
+> bridge shouldn't flood packets received on lanX towards other lanY ports that
+> are part of the same hwdom, because the hardware already took care of
+> that.
+> 
+> [ the hardware domain is determined by dev_get_port_parent_id() ->
+>   devlink_compat_switch_id_get() and populated by dsa_port_devlink_setup() ]
+> 
+> Obviously, the requirement is for the hardware to indeed take care of that :)
+> Currently it doesn't flood to the other user ports that are part of the
+> same bridge and have egress flooding enabled for that traffic type. It
+> just floods to the CPU and software decides where to flood. It's a
+> matter of implementing other brport flags, like BR_FLOOD and friends.
+> 
+> For TX, skb->offload_fwd_mark means that the driver should be able to
+> send a skb potentially towards multiple TX ports at the same time, as a
+> result of an FDB lookup. This makes the bridge avoid cloning that skb
+> and calling dev_queue_xmit() towards every individual port that it must
+> reach. I would concentrate on RX and leave TX for later.
+> 
 
-Herbert Xu (1):
-      macvlan: Add bclim parameter
+Sure.
 
-Ido Schimmel (8):
-      bridge: mdb: Add underlay destination IP support
-      bridge: mdb: Add UDP destination port support
-      bridge: mdb: Add destination VNI support
-      bridge: mdb: Add source VNI support
-      bridge: mdb: Add outgoing interface support
-      bridge: mdb: Document the catchall MDB entries
-      bridge: vlan: Add support for neigh_suppress option
-      bridge: link: Add support for neigh_vlan_suppress option
+> > Thanks for any response and sorry for the long comments.
+> > 
+> > 
+> > [1] https://github.com/torvalds/linux/commit/15f7cfae912e
+> > 
+> >  drivers/net/dsa/qca/qca8k-8xxx.c   |  8 ++----
+> >  drivers/net/dsa/qca/qca8k-common.c | 40 ++++++++++++++++++++++++++++++
+> >  drivers/net/dsa/qca/qca8k.h        |  6 +++++
+> >  3 files changed, 48 insertions(+), 6 deletions(-)
+> > 
+> > diff --git a/drivers/net/dsa/qca/qca8k-8xxx.c b/drivers/net/dsa/qca/qca8k-8xxx.c
+> > index f08086ac2261..a9af270a03ce 100644
+> > --- a/drivers/net/dsa/qca/qca8k-8xxx.c
+> > +++ b/drivers/net/dsa/qca/qca8k-8xxx.c
+> > @@ -1963,12 +1963,6 @@ qca8k_setup(struct dsa_switch *ds)
+> >  			if (ret)
+> >  				return ret;
+> >  
+> > -			/* Enable ARP Auto-learning by default */
+> > -			ret = regmap_set_bits(priv->regmap, QCA8K_PORT_LOOKUP_CTRL(i),
+> > -					      QCA8K_PORT_LOOKUP_LEARN);
+> > -			if (ret)
+> > -				return ret;
+> > -
+> >  			/* For port based vlans to work we need to set the
+> >  			 * default egress vid
+> >  			 */
+> > @@ -2071,6 +2065,8 @@ static const struct dsa_switch_ops qca8k_switch_ops = {
+> >  	.port_change_mtu	= qca8k_port_change_mtu,
+> >  	.port_max_mtu		= qca8k_port_max_mtu,
+> >  	.port_stp_state_set	= qca8k_port_stp_state_set,
+> > +	.port_pre_bridge_flags	= qca8k_port_pre_bridge_flags,
+> > +	.port_bridge_flags	= qca8k_port_bridge_flags,
+> >  	.port_bridge_join	= qca8k_port_bridge_join,
+> >  	.port_bridge_leave	= qca8k_port_bridge_leave,
+> >  	.port_fast_age		= qca8k_port_fast_age,
+> > diff --git a/drivers/net/dsa/qca/qca8k-common.c b/drivers/net/dsa/qca/qca8k-common.c
+> > index 8c2dc0e48ff4..f93defbd8b66 100644
+> > --- a/drivers/net/dsa/qca/qca8k-common.c
+> > +++ b/drivers/net/dsa/qca/qca8k-common.c
+> > @@ -559,8 +559,24 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port,
+> >  	return 0;
+> >  }
+> >  
+> > +static int qca8k_port_configure_learning(struct dsa_switch *ds, int port,
+> > +					 bool learning)
+> > +{
+> > +	struct qca8k_priv *priv = ds->priv;
+> > +
+> > +	if (learning)
+> > +		return regmap_set_bits(priv->regmap,
+> > +				       QCA8K_PORT_LOOKUP_CTRL(port),
+> > +				       QCA8K_PORT_LOOKUP_LEARN);
+> > +	else
+> > +		return regmap_clear_bits(priv->regmap,
+> > +					 QCA8K_PORT_LOOKUP_CTRL(port),
+> > +					 QCA8K_PORT_LOOKUP_LEARN);
+> > +}
+> > +
+> >  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+> >  {
+> > +	struct dsa_port *dp = dsa_to_port(ds, port);
+> >  	struct qca8k_priv *priv = ds->priv;
+> >  	u32 stp_state;
+> >  
+> > @@ -585,6 +601,30 @@ void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state)
+> >  
+> >  	qca8k_rmw(priv, QCA8K_PORT_LOOKUP_CTRL(port),
+> >  		  QCA8K_PORT_LOOKUP_STATE_MASK, stp_state);
+> > +
+> > +	qca8k_port_configure_learning(ds, port, dp->learning);
+> 
+> Learning should be enabled only if we're in an STP state compatible with
+> learning: BR_STATE_LEARNING, BR_STATE_FORWARDING. The dp->learning flag
+> does not follow the STP state, it is just an override for that.
+> 
+> So, the condition should be:
+> "(state == BR_STATE_LEARNING || state == BR_STATE_FORWARDING) && dp->learning"
+>
 
-Luca Boccassi (1):
-      man: fix typos found by Lintian
+Fixed.
 
-Nicolas Dichtel (1):
-      ipnetns: fix fd leak with 'ip netns set'
+> > +}
+> > +
+> > +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> > +				struct switchdev_brport_flags flags,
+> > +				struct netlink_ext_ack *extack)
+> > +{
+> > +	if (flags.mask & ~BR_LEARNING)
+> > +		return -EINVAL;
+> > +
+> > +	return 0;
+> > +}
+> > +
+> > +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
+> > +			    struct switchdev_brport_flags flags,
+> > +			    struct netlink_ext_ack *extack)
+> > +{
+> > +	int ret;
+> > +
+> > +	ret = qca8k_port_configure_learning(ds, port,
+> > +					    flags.mask & ~BR_LEARNING);
+> 
+> flags.mask contains the bits that have changed.
+> flags.val contains the current value of all bits.
+> 
+> Passing flags.mask & ~BR_LEARNING (the mask of changed flags except for
+> BR_LEARNING) to qca8k_port_configure_learning() makes absolutely no sense.
+> 
 
-Petr Machata (2):
-      ip: Support IP address protocol
-      man: man8: Add man page coverage for "ip address add ... proto"
+Very stupid of me.
 
-Stephen Hemminger (32):
-      uapi: update kernel headers 6.4-rc1
-      uapi: add capability.h
-      remove unnecessary checks for NULL before calling free()
-      ip-rule: more manual page grammer fixes
-      Add MAINTAINERS file
-      lib/fs: fix file leak in task_get_name
-      ipmaddr: fix dereference of NULL on malloc() failure
-      iproute_lwtunnel: fix possible use of NULL when malloc() fails
-      tc_filter: fix unitialized warning
-      tc_util fix unitialized warning
-      tc_exec: don't dereference NULL on calloc failure
-      m_action: fix warning of overwrite of const string
-      netem: fix NULL deref on allocation failure
-      nstat: fix potential NULL deref
-      rdma/utils: fix some analyzer warnings
-      tc/prio: handle possible truncated kernel response
-      CREDITS: add file
-      ll_type_n2a: use ARRAY_SIZE
-      vxlan: use print_nll for gbp and gpe
-      vxlan: make option printing more consistent
-      uapi: update headers to 6.4-rc4
-      ipaddress: accept symbolic names
-      utils: make local cmdline functions static
-      libnetlink: drop unused rtnl_talk_iov
-      bridge: make print_vlan_info static
-      ip: make print_rta_gateway static
-      xfrm: make xfrm_stat_print_nokeys static
-      rdma: make rd_attr_check static
-      whitespace cleanups
-      rt_names: check for malloc() failure
-      uapi: update to bpf.h
-      v6.4.0
+> > +
+> > +	return ret;
+> >  }
+> >  
+> >  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
+> > diff --git a/drivers/net/dsa/qca/qca8k.h b/drivers/net/dsa/qca/qca8k.h
+> > index c5cc8a172d65..8f88b7db384d 100644
+> > --- a/drivers/net/dsa/qca/qca8k.h
+> > +++ b/drivers/net/dsa/qca/qca8k.h
+> > @@ -522,6 +522,12 @@ int qca8k_get_mac_eee(struct dsa_switch *ds, int port, struct ethtool_eee *e);
+> >  
+> >  /* Common bridge function */
+> >  void qca8k_port_stp_state_set(struct dsa_switch *ds, int port, u8 state);
+> > +int qca8k_port_pre_bridge_flags(struct dsa_switch *ds, int port,
+> > +				struct switchdev_brport_flags flags,
+> > +				struct netlink_ext_ack *extack);
+> > +int qca8k_port_bridge_flags(struct dsa_switch *ds, int port,
+> > +			    struct switchdev_brport_flags flags,
+> > +			    struct netlink_ext_ack *extack);
+> >  int qca8k_port_bridge_join(struct dsa_switch *ds, int port,
+> >  			   struct dsa_bridge bridge,
+> >  			   bool *tx_fwd_offload,
+> > -- 
+> > 2.40.1
+> > 
+> 
 
-Vladimir Oltean (3):
-      utils: add max() definition
-      tc/mqprio: add support for preemptible traffic classes
-      tc/taprio: add support for preemptible traffic classes
-
-zhaoshuang (1):
-      iproute2: optimize code and fix some mem-leak risk
-
+-- 
+	Ansuel
 
