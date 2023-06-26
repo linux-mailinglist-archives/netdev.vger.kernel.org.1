@@ -1,46 +1,43 @@
-Return-Path: <netdev+bounces-14059-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14060-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 38AF173EB99
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:13:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 25B1A73EBA3
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:18:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CD5A1C209B9
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:13:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D5651C20988
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:18:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA3914270;
-	Mon, 26 Jun 2023 20:13:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD22014270;
+	Mon, 26 Jun 2023 20:18:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2541426C
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:13:45 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ED2AC433C8;
-	Mon, 26 Jun 2023 20:13:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8BAD414A80
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:17:59 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C8163C433C8;
+	Mon, 26 Jun 2023 20:17:58 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687810425;
-	bh=UbRl1KTErIhEYg+YOa7ZBftAN9h4c9fJjPE40+2/qb4=;
+	s=k20201202; t=1687810678;
+	bh=9T+7daHgx1xtss02IAOpdNskFIch4WssAJyVD94wQPk=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YkULExNGJwymo7jQ0cbBjIMOGbzql1Kp2sETo0R9TYugc9g6RHD7qkKj8uBYkCOYM
-	 dG91J3h8bJ5/HkPZpRJWub9hFjTYiLAWGdvuHcuKfTx3n9KJpl+AnoEbbHo58l6y0j
-	 TK2BiakYDnEuo0PlxPSepaV0R3Kb00LZGuE22+tWb9/jvNZNo+bfuB+neicpgUrxQk
-	 hmyMaUIjPk7MTXrNt5MESHPFSWkxm4Q4hKN2wlHCq1H5/bM8GyBlInc2F7E42Iimd1
-	 FWuNnN38cbkz+YDc8NaULjIKN9m6zsVRWixJTmVrJmAV1qb1i/+q1k7tAXe/f7m1ib
-	 /3CH7U9XM8lOA==
-Date: Mon, 26 Jun 2023 13:13:44 -0700
+	b=fNjo0SOxC5EgergGPGlU5IVCl6HU50kzS0hd85d7QosQmNfvCgkojzodGslc/N6tH
+	 5TLMEr3y8aK3fB/4y99aGdDFUR7PNBplWlubSl8zQZ07D4NtwzQ2+1Dyw10pzKDqrl
+	 K1/N/lITfLOX5IUVWcCERHlralJ5M3SXmjeu7U55OQpPfh/3VxciBnJRiuGTgYfZpT
+	 KL9W5I+PYn1fFI5zpZMKT5Mbs/0nNdVoGuU3GLK+YzXzy3SECy6eTGRWxMGWAkwN6S
+	 5IKws6V5seP1aylnJZV27J20YxjMZCr1f+XYUabwFvSMSFYPzPAOf99djTupqKqBpW
+	 KtlewcdP4hCaA==
+Date: Mon, 26 Jun 2023 13:17:57 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
-Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
- johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- jinjian.song@fibocom.com
-Subject: Re: [PATCH] net: wwan: t7xx: Add AP CLDMA
-Message-ID: <20230626131344.2364f834@kernel.org>
-In-Reply-To: <20230626082040.15671-1-jtornosm@redhat.com>
-References: <20230626082040.15671-1-jtornosm@redhat.com>
+To: Mengyuan Lou <mengyuanlou@net-swift.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: [PATCH net-next v3] net: ngbe: add Wake on Lan support
+Message-ID: <20230626131757.3a7b04c0@kernel.org>
+In-Reply-To: <934157CCB15D2775+20230626083708.47930-1-mengyuanlou@net-swift.com>
+References: <934157CCB15D2775+20230626083708.47930-1-mengyuanlou@net-swift.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -50,56 +47,17 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Mon, 26 Jun 2023 10:20:37 +0200 Jose Ignacio Tornos Martinez wrote:
-> At this moment with the current status, t7xx is not functional due to
-> problems like this after connection, if there is no activity:
-> [   57.370534] mtk_t7xx 0000:72:00.0: [PM] SAP suspend error: -110
-> [   57.370581] mtk_t7xx 0000:72:00.0: can't suspend
->     (t7xx_pci_pm_runtime_suspend [mtk_t7xx] returned -110)
-> because after this, the traffic no longer works.
-> 
-> The complete series 'net: wwan: t7xx: fw flashing & coredump support'
-> was reverted because of issues with the pci implementation.
-> In order to have at least the modem working, it would be enough if just
-> the first commit of the series is re-applied:
-> d20ef656f994 net: wwan: t7xx: Add AP CLDMA).
-> With that, the Application Processor would be controlled, correctly
-> suspended and the commented problems would be fixed (I am testing here
-> like this with no related issue).
-> 
-> This commit is independent of the others in the series and not related to 
-> the commented pci implementation for the new features: fw flashing and
-> coredump collection.
-> 
-> Original text from the commit that would be re-applied:
-> 
->     d20ef656f994 net: wwan: t7xx: Add AP CLDMA
->     Author: Haijun Liu <haijun.liu@mediatek.com>
->     Date:   Tue Aug 16 09:53:28 2022 +0530
-> 
->     The t7xx device contains two Cross Layer DMA (CLDMA) interfaces to
->     communicate with AP and Modem processors respectively. So far only
->     MD-CLDMA was being used, this patch enables AP-CLDMA.
-> 
->     Rename small Application Processor (sAP) to AP.
+On Mon, 26 Jun 2023 16:37:08 +0800 Mengyuan Lou wrote:
+> +	if (!wx->wol_hw_supported)
+> +		return -EOPNOTSUPP;
+> +	if (!(wol->wolopts & WAKE_MAGIC) &&
+> +	    wol->wolopts != 0)
+> +		return -EOPNOTSUPP;
 
-A bit of a bad timing, the merge window for 6.5 has just opened 
-and we're busy settling the bugs in linux-next right now. So you
-will need to repost this change in 2 weeks...
+AFAIK core (by which I mean net/ethtool/* code) already checks that
+bits outside of ->supported are not set in wolopts.
 
-
-## Form letter - net-next-closed
-
-The merge window for v6.5 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
-We are currently accepting bug fixes only.
-
-Please repost when net-next reopens after July 10th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+Please post v4 after the merge window (in 2 weeks)
 -- 
-pw-bot: defer
-
+pw-bot: cr
 
