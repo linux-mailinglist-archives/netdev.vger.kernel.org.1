@@ -1,31 +1,63 @@
-Return-Path: <netdev+bounces-13930-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13931-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BFE2373E0AC
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:32:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EDBC373E0F7
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:47:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AC7FF1C208DA
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 13:32:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BF5D01C20944
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 13:47:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D5E1947E;
-	Mon, 26 Jun 2023 13:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 707D7A92C;
+	Mon, 26 Jun 2023 13:47:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31B56947A
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 13:32:04 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 852891A2;
-	Mon, 26 Jun 2023 06:32:03 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qDmJy-0003d0-5j; Mon, 26 Jun 2023 15:31:58 +0200
-Message-ID: <216ebf53-f56b-0723-7112-5604acac8d4c@leemhuis.info>
-Date: Mon, 26 Jun 2023 15:31:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 60A9AA920
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 13:47:10 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F19D2E7B
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:47:07 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b6a5fd1f46so8972701fa.1
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:47:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares.net; s=google; t=1687787226; x=1690379226;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=3ajgNyIwWVcjYzMwm3DqnghOvwsLRw6qD3CZhsNi77c=;
+        b=V8u9lIovuozTtLYUjXpTS7ULYjyFXNNH91wqTcdZLzgyKyyep5wVeXZCMcMy8wX9jF
+         bFZ7vDrmDSceVrr7oDg+wbgk4TKsV7sq+NHSWOwEYO8XTENMv4rFSFUjeszEYgm/3anL
+         ZSY8rR3ZF6c6OtMdC6Y76w4uVX0QNMrVRBh6a+fCocx77Hp3Q8HyakiAKh5RM3dS9OUk
+         rLbcsr43EA/DQGnVN8a7Zt7OWr5FFJAN/Eh3spRhI6dHfxdvS75vlizeP2assm03fNwm
+         NjPnafyE7zUejngXe65jjCyijnu/+OiRggEdOwFtGL3Rlg8OPVf3m/wCIg0Ily+fDnBY
+         ccuQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687787226; x=1690379226;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=3ajgNyIwWVcjYzMwm3DqnghOvwsLRw6qD3CZhsNi77c=;
+        b=AOqkl5NDTe0mu/UbLr0IEK4/SJrh9VSB10DQqD1/CxpbJQ3aDgs1OUEC+R3ujXSJyC
+         NAcHulfd+ksh/NX0heMdSb5O7DPhgdU52tnNrXsexkk5ZDIvhWoAycLb/9Y7HtzTWS2v
+         HhiSlnCyEFq0nBxbxz051O1R7grUTZvZ7Em0sa0AVNd8go2h8SD19Jln1Wb87VTx6j5o
+         9ouItr0XNaiLVhZuS1bm87/UArCGd1Zx6cczEFcnaertiyd/7GcnojrX8jmHC/Ygd6tt
+         Y8IOXyrYrrvPKMey85URq8sT2ACPhSIeJV9EggqPMoMKzo9znYv6FrNfryA+juFI0a0W
+         JlFw==
+X-Gm-Message-State: AC+VfDzZ7tEwx2OlwbIxK363wIFKnS3/9C6QsH+VAFlCavGj8t5rxYDH
+	As5x4B8AJndHDdeColz9WxF3xQ==
+X-Google-Smtp-Source: ACHHUZ49MM6SoxHOQwXx4/5NyeGysVk3STjfIfrbc8JWShz/Wbl953NReXc8cQftzBAW+LXumnPAvw==
+X-Received: by 2002:a05:6512:31c8:b0:4f9:5d34:44b1 with SMTP id j8-20020a05651231c800b004f95d3444b1mr10794636lfe.2.1687787226112;
+        Mon, 26 Jun 2023 06:47:06 -0700 (PDT)
+Received: from [10.44.2.5] ([81.246.10.41])
+        by smtp.gmail.com with ESMTPSA id o16-20020a1c7510000000b003f9b155b148sm10720189wmc.34.2023.06.26.06.47.00
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jun 2023 06:47:05 -0700 (PDT)
+Message-ID: <5791ec06-7174-9ae5-4fe4-6969ed110165@tessares.net>
+Date: Mon, 26 Jun 2023 15:47:00 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -34,106 +66,88 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: MT7922 problem with "fix rx filter incorrect by drv/fw
- inconsistent"
-Content-Language: en-US, de-DE
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-To: Kalle Valo <kvalo@kernel.org>
-Cc: Andrey Rakhmatullin <wrar@wrar.name>,
- Linux regressions mailing list <regressions@lists.linux.dev>,
- linux-wireless@vger.kernel.org, Neil Chen <yn.chen@mediatek.com>,
- Deren Wu <deren.wu@mediatek.com>, Lorenzo Bianconi <lorenzo@kernel.org>,
- Felix Fietkau <nbd@nbd.name>,
- AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+Subject: Re: [PATCH net-next] tools: Fix MSG_SPLICE_PAGES build error in trace
+ tools
+Content-Language: en-GB
+To: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>,
+ David Miller <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
  Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- netdev <netdev@vger.kernel.org>
-References: <ZGY4peApQnPAmDkY@durkon.wrar.name>
- <ad948b42-74d3-b4f1-bbd6-449f71703083@leemhuis.info>
- <ZGtsNO0VZQDWJG+A@durkon.wrar.name>
- <cd7d298b-2b46-770e-ed54-7ae3f33b97ee@leemhuis.info>
- <c647de2d-fbb5-4793-99b3-b800c95c04c2@leemhuis.info>
- <87jzw8g8hk.fsf@kernel.org>
- <e3af69f2-d3e5-8039-c6e5-5b00fe066cc0@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <e3af69f2-d3e5-8039-c6e5-5b00fe066cc0@leemhuis.info>
+ Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>,
+ Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
+ Arnaldo Carvalho de Melo <acme@kernel.org>,
+ Mark Rutland <mark.rutland@arm.com>,
+ Alexander Shishkin <alexander.shishkin@linux.intel.com>,
+ Jiri Olsa <jolsa@kernel.org>, Namhyung Kim <namhyung@kernel.org>,
+ Ian Rogers <irogers@google.com>, Adrian Hunter <adrian.hunter@intel.com>,
+ linux-perf-users@vger.kernel.org, bpf@vger.kernel.org,
+ linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <3065880.1687785614@warthog.procyon.org.uk>
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+In-Reply-To: <3065880.1687785614@warthog.procyon.org.uk>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1687786323;4d4421b7;
-X-HE-SMSGID: 1qDmJy-0003d0-5j
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-for once, to make this easily accessible to everyone.
+Hi David,
 
-FWIW, I'm dropping this from the list of tracked regressions now. This
-wasn't handled as it IMHO should be, but whatever, at this point it
-afaics is best to leave things as they are, unless more reports of this
-kind show up.
+Thank you for the patch!
 
-Thx everyone.
+On 26/06/2023 15:20, David Howells wrote:
+> The following error is being seen the perf tools because they have their
+> own copies of a lot of kernel headers:
+> 
+> In file included from builtin-trace.c:907:
+> trace/beauty/msg_flags.c: In function 'syscall_arg__scnprintf_msg_flags':
+> trace/beauty/msg_flags.c:28:21: error: 'MSG_SPLICE_PAGES' undeclared (first use in this function)
+>    28 |         if (flags & MSG_##n) { \
+>       |                     ^~~~
+> trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG'
+>    50 |         P_MSG_FLAG(SPLICE_PAGES);
+>       |         ^~~~~~~~~~
+> trace/beauty/msg_flags.c:28:21: note: each undeclared identifier is reported only once for each function it appears in
+>    28 |         if (flags & MSG_##n) { \
+>       |                     ^~~~
+> trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG'
+>    50 |         P_MSG_FLAG(SPLICE_PAGES);
+>       |         ^~~~~~~~~~
+> 
+> Fix this by (1) adding MSG_SPLICE_PAGES to
+> tools/perf/trace/beauty/include/linux/socket.h - which looks like it ought
+> to work, but doesn't
 
-#regzbot inconclusive: not fixed, but fixing likely would cause more
-trouble than it's worth, unless more people complain
+Commit 58277f502f42 ("perf trace beauty: Add script to autogenerate
+socket families table") seems to suggest this file is only used by
+tools/perf/trace/beauty/socket.sh script (and later by sockaddr.sh) but
+not by msg_flags.c.
 
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-If I did something stupid, please tell me, as explained on that page.
+If I'm not mistaken, it is then not required to modify this file to fix
+the issue you mention.
 
-On 19.06.23 14:48, Thorsten Leemhuis wrote:
-> On 12.06.23 14:39, Kalle Valo wrote:
->> Thorsten Leemhuis <regressions@leemhuis.info> writes:
->>> On 22.05.23 16:12, Thorsten Leemhuis wrote:
->>>> On 22.05.23 15:20, Andrey Rakhmatullin wrote:
->>>>> On Mon, May 22, 2023 at 03:00:30PM +0200, Linux regression tracking
->>>>> #adding (Thorsten Leemhuis) wrote:
->>>>>> On 18.05.23 16:39, Andrey Rakhmatullin wrote:
->>>>> I updated the firmware and now the problem doesn't happen.
->>>>> The firmware where the problem happens is
->>>>> mediatek/WIFI_RAM_CODE_MT7922_1.bin from the linux-firmware commit
->>>>> e2d11744ef (file size 826740, md5sum 8ff1bdc0f54f255bb2a1d6825781506b),
->>>>> the one where the problem doesn't happen is from the commit 6569484e6b
->>>>> (file size 827124, md5sum 14c08c8298b639ee52409b5e9711a083).
->>>> FWIW, just checked: that commit is from 2023-05-15, so quite recent.
->>>>
->>>>> I haven't
->>>>> tried the version committed between these ones.
->>>>> Not sure if this should be reported to regzbot and if there are any
->>>>> further actions needed by the kernel maintainers.
->>>>
->>>> Well, to quote the first sentence from
->>>> Documentation/driver-api/firmware/firmware-usage-guidelines.rst
->>>>
->>>> ```Users switching to a newer kernel should *not* have to install newer
->>>> firmware files to keep their hardware working.```
->>>>
->>>> IOW: the problem you ran into should not happen. This afaics makes it a
->>>> regression that needs to be addressed -- at least if it's something that
->>>> is likely to hit others users as well. But I'd guess that's the case.
->>>
->>> Well, until now I didn't see any other report about a problem like this.
->>> Maybe things work better for others with that hardware – in that case it
->>> might be something not worth making a fuzz about. But I'll wait another
->>> week or two before I remove this from the tracking.
->>
->> Yeah, this is bad. mt76 (or any other wireless driver) must not require
->> a new firmware whenever upgrading the kernel. Instead the old and new
->> firmware should coexist (for example have firmware-2.bin for the new
->> version and firmware.bin for the old version). Then mt76 should first
->> try loading the new firmware (eg. firmware-2.bin) and then try the old
->> one (eg. firmware.bin).
->>
->> Should we revert commit c222f77fd4 or how to solve this?
+But it is still needed to modify it to avoid another warning:
 
-> Hmmm. Tricky. This was the only such report I noticed. Giving that and
-> the risk that a revert might cause regressions on its own, I guess it
-> might be better to leave everything as it is for now - and re-evaluate
-> the situation in case more problems show up.
+  Warning: Kernel ABI header at
+'tools/perf/trace/beauty/include/linux/socket.h' differs from latest
+version at 'include/linux/socket.h'
+  diff -u tools/perf/trace/beauty/include/linux/socket.h
+include/linux/socket.h
+So another issue. When checking the differences between the two files, I
+see there are still also other modifications to import, e.g. it looks
+like you also added MSG_INTERNAL_SENDMSG_FLAGS macro in socket.h. Do you
+plan to fix that too?
+It might be clearer to have all these modifications of
+tools/perf/trace/beauty/include/linux/socket.h in a separated commit as
+it is fixing a different issue but that's a detail. As long as we can
+have perf compiling without issues when using the net-next tree :)
+
+Cheers,
+Matt
+-- 
+Tessares | Belgium | Hybrid Access Solutions
+www.tessares.net
 
