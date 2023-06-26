@@ -1,381 +1,156 @@
-Return-Path: <netdev+bounces-13997-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13998-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8911E73E4C4
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:17:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0BED73E4C5
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:18:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B51FC1C2074B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:17:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 47BA5280DE7
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:18:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59990111B0;
-	Mon, 26 Jun 2023 16:17:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1B6D111B9;
+	Mon, 26 Jun 2023 16:18:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 41EDE100CA
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:17:35 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2CE853C1E
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:16:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687796166;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dQhNAf+TExCr+4Xu9asT4xEXXoB7XFc9GbCRqzaucKw=;
-	b=jIVuWzwYLwRd6rC03Nh29n/8/KlVmWsKIiqyStUGSHPOZRxoWJbMNQ8BXE3E5J8tXCOpXW
-	SKfQVH57PrFDadbKwdbdFQMG17OynyqxbuP4iLKQ7B6IvlIlna0S5B0dAy0msDzB43gya/
-	WieTltrrgXISXlRcPp1hd2H/5O01MIw=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-632-63-CXdQcOU2p6CVMrAQPoA-1; Mon, 26 Jun 2023 12:16:01 -0400
-X-MC-Unique: 63-CXdQcOU2p6CVMrAQPoA-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-635ddb30491so20540176d6.1
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:15:59 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687796159; x=1690388159;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=dQhNAf+TExCr+4Xu9asT4xEXXoB7XFc9GbCRqzaucKw=;
-        b=RzObDmvphd4AfMWD/NXyoKUGWl0ZdTmYL3z/JK2Yt/a6pev1cRqf8Jt/4gfm3yfE1b
-         gggC+TfC8Re/PyFICP/0erVc7rxWQ+QLjU07TTycjqaBhAvtHe8yv6WgKKMjLs8BaLVy
-         eQa/2/w//sg/ioj/24K1Wl5dCX/p4STw5ThF9Gu3faqrq+gm74D0Iw0oPH/GOgv8FGWF
-         7pew9TxFjh/S5bibekBggfM8yEQ61/zccN/69S9/InK9FmpIpniPlTN9uqO2eXlwjUym
-         JXWeE5yMGrFNUI+CVz3fJCZcezVHBUEd/Erqsw8MgX5QFmJJd3fihjIM4oRkOnxx/hcT
-         4r2Q==
-X-Gm-Message-State: AC+VfDza+7fOvP+hUP/rYDMPpQluuGp8Z+ZDiAODl2/c7l/Gi9lTMK6s
-	5tpK+C9Ub8WGSPjfOhwyxee/VfsIn602IZIGN4a5svnhNlxakcaz9BbstgHUigtGHqq8lB8KJgY
-	4fgv01B4inVUhcaH3
-X-Received: by 2002:a05:6214:20e4:b0:62f:ebc4:89bc with SMTP id 4-20020a05621420e400b0062febc489bcmr26215319qvk.20.1687796158843;
-        Mon, 26 Jun 2023 09:15:58 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5z2/dWruxVtHYjnw3hfwHKiIUlRXEc7Ielx2zyIyhUlvUiU74HlQWqlpxElW40sJRPTZsnWw==
-X-Received: by 2002:a05:6214:20e4:b0:62f:ebc4:89bc with SMTP id 4-20020a05621420e400b0062febc489bcmr26215300qvk.20.1687796158535;
-        Mon, 26 Jun 2023 09:15:58 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id ml9-20020a056214584900b0062def68f75csm3297222qvb.124.2023.06.26.09.15.55
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:15:58 -0700 (PDT)
-Date: Mon, 26 Jun 2023 18:15:53 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 00/17] vsock: MSG_ZEROCOPY flag support
-Message-ID: <kilgxopbdguge4bd6pfdjb3oqzemttwzf4na54xurwl62hi7uc@2njjwuhox3al>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A6C10DDD6
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:18:09 +0000 (UTC)
+Received: from smtp-fw-6002.amazon.com (smtp-fw-6002.amazon.com [52.95.49.90])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E8C92421A
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:17:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1687796262; x=1719332262;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=NcKGNZEeegx/XWD4EmSNQ84ptypc4fdf+HNCUJPYbWg=;
+  b=uXj45IDAe9Cigjxsa0R9C7oH22mMbW3gON0Jlm061/rwwJw9LxKMlV/X
+   IK8DJ1sKOq2IOCOBNp/q0ccYcsEOMumSY4o4oJFqdOLzJz1G1MNkHzOW5
+   N4c+FCPgVjE8MNsB2is5A/NTQOTfPNYt3lfcne48aFfVKeUueWEniqVAM
+   g=;
+X-IronPort-AV: E=Sophos;i="6.01,159,1684800000"; 
+   d="scan'208";a="341052479"
+Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com) ([10.43.8.6])
+  by smtp-border-fw-6002.iad6.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 16:17:03 +0000
+Received: from EX19MTAUWB001.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan3.iad.amazon.com [10.40.163.38])
+	by email-inbound-relay-iad-1a-m6i4x-b5bd57cf.us-east-1.amazon.com (Postfix) with ESMTPS id A899846AC2;
+	Mon, 26 Jun 2023 16:17:01 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Mon, 26 Jun 2023 16:16:52 +0000
+Received: from 88665a182662.ant.amazon.com (10.187.170.15) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Mon, 26 Jun 2023 16:16:50 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <edumazet@google.com>
+CC: <davem@davemloft.net>, <kuba@kernel.org>, <kuni1840@gmail.com>,
+	<kuniyu@amazon.com>, <netdev@vger.kernel.org>, <pabeni@redhat.com>,
+	<syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com>
+Subject: Re: [PATCH v1 net] netlink: Add sock_i_ino_irqsaved() for __netlink_diag_dump().
+Date: Mon, 26 Jun 2023 09:16:42 -0700
+Message-ID: <20230626161642.48464-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <CANn89iL0n5Prem6Cjc6jkdAq6jm5AOYXWgn=i80UPsnNZE6WQw@mail.gmail.com>
+References: <CANn89iL0n5Prem6Cjc6jkdAq6jm5AOYXWgn=i80UPsnNZE6WQw@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.187.170.15]
+X-ClientProxiedBy: EX19D039UWB004.ant.amazon.com (10.13.138.57) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jun 03, 2023 at 11:49:22PM +0300, Arseniy Krasnov wrote:
->Hello,
->
->                           DESCRIPTION
->
->this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
->current implementation for TCP as much as possible:
->
->1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
->   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
->   flag will be ignored (e.g. without completion).
->
->2) Kernel uses completions from socket's error queue. Single completion
->   for single tx syscall (or it can merge several completions to single
->   one). I used already implemented logic for MSG_ZEROCOPY support:
->   'msg_zerocopy_realloc()' etc.
->
->Difference with copy way is not significant. During packet allocation,
->non-linear skb is created and filled with pinned user pages.
->There are also some updates for vhost and guest parts of transport - in
->both cases i've added handling of non-linear skb for virtio part. vhost
->copies data from such skb to the guest's rx virtio buffers. In the guest,
->virtio transport fills tx virtio queue with pages from skb.
->
->Head of this patchset is:
->https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
->
->
->This version has several limits/problems:
->
->1) As this feature totally depends on transport, there is no way (or it
->   is difficult) to check whether transport is able to handle it or not
->   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
->   setsockopt callback from setsockopt callback for SOL_SOCKET, but this
->   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
->   are not considered to be called from each other. So in current version
->   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
->   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
->   tx routine will fail with EOPNOTSUPP.
->
->   ^^^
->   This is still no resolved :(
->
->2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
->   one completion. In each completion there is flag which shows how tx
->   was performed: zerocopy or copy. This leads that whole message must
->   be send in zerocopy or copy way - we can't send part of message with
->   copying and rest of message with zerocopy mode (or vice versa). Now,
->   we need to account vsock credit logic, e.g. we can't send whole data
->   once - only allowed number of bytes could sent at any moment. In case
->   of copying way there is no problem as in worst case we can send single
->   bytes, but zerocopy is more complex because smallest transmission
->   unit is single page. So if there is not enough space at peer's side
->   to send integer number of pages (at least one) - we will wait, thus
->   stalling tx side. To overcome this problem i've added simple rule -
->   zerocopy is possible only when there is enough space at another side
->   for whole message (to check, that current 'msghdr' was already used
->   in previous tx iterations i use 'iov_offset' field of it's iov iter).
->
->   ^^^
->   Discussed as ok during v2. Link:
->   https://lore.kernel.org/netdev/23guh3txkghxpgcrcjx7h62qsoj3xgjhfzgtbmqp2slrz3rxr4@zya2z7kwt75l/
->
->3) loopback transport is not supported, because it requires to implement
->   non-linear skb handling in dequeue logic (as we "send" fragged skb
->   and "receive" it from the same queue). I'm going to implement it in
->   next versions.
->
->   ^^^ fixed in v2
->
->4) Current implementation sets max length of packet to 64KB. IIUC this
->   is due to 'kmalloc()' allocated data buffers. I think, in case of
->   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
->   not touched for data - user space pages are used as buffers. Also
->   this limit trims every message which is > 64KB, thus such messages
->   will be send in copy mode due to 'iov_offset' check in 2).
->
->   ^^^ fixed in v2
->
->                         PATCHSET STRUCTURE
->
->Patchset has the following structure:
->1) Handle non-linear skbuff on receive in virtio/vhost.
->2) Handle non-linear skbuff on send in virtio/vhost.
->3) Updates for AF_VSOCK.
->4) Enable MSG_ZEROCOPY support on transports.
->5) Tests/tools/docs updates.
->
->                            PERFORMANCE
->
->Performance: it is a little bit tricky to compare performance between
->copy and zerocopy transmissions. In zerocopy way we need to wait when
->user buffers will be released by kernel, so it is like synchronous
->path (wait until device driver will process it), while in copy way we
->can feed data to kernel as many as we want, don't care about device
->driver. So I compared only time which we spend in the 'send()' syscall.
->Then if this value will be combined with total number of transmitted
->bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
->enough credit, receiver allocates same amount of space as sender needs.
->
->Sender:
->./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
->
->Receiver:
->./vsock_perf --vsk-size 256M
->
->I run tests on two setups: desktop with Core i7 - I use this PC for
->development and in this case guest is nested guest, and host is normal
->guest. Another hardware is some embedded board with Atom - here I don't
->have nested virtualization - host runs on hw, and guest is normal guest.
->
->G2H transmission (values are Gbit/s):
->
->   Core i7 with nested guest.            Atom with normal guest.
->
->*-------------------------------*   *-------------------------------*
->|          |         |          |   |          |         |          |
->| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
->|          |         |          |   |          |         |          |
->*-------------------------------*   *-------------------------------*
->|   4KB    |    3    |    10    |   |   4KB    |   0.8   |   1.9    |
->*-------------------------------*   *-------------------------------*
->|   32KB   |   20    |    61    |   |   32KB   |   6.8   |   20.2   |
->*-------------------------------*   *-------------------------------*
->|   256KB  |   33    |   244    |   |   256KB  |   7.8   |   55     |
->*-------------------------------*   *-------------------------------*
->|    1M    |   30    |   373    |   |    1M    |   7     |   95     |
->*-------------------------------*   *-------------------------------*
->|    8M    |   22    |   475    |   |    8M    |   7     |   114    |
->*-------------------------------*   *-------------------------------*
->
->H2G:
->
->   Core i7 with nested guest.            Atom with normal guest.
->
->*-------------------------------*   *-------------------------------*
->|          |         |          |   |          |         |          |
->| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
->|          |         |          |   |          |         |          |
->*-------------------------------*   *-------------------------------*
->|   4KB    |   20    |    10    |   |   4KB    |   4.37  |    3     |
->*-------------------------------*   *-------------------------------*
->|   32KB   |   37    |    75    |   |   32KB   |   11    |   18     |
->*-------------------------------*   *-------------------------------*
->|   256KB  |   44    |   299    |   |   256KB  |   11    |   62     |
->*-------------------------------*   *-------------------------------*
->|    1M    |   28    |   335    |   |    1M    |   9     |   77     |
->*-------------------------------*   *-------------------------------*
->|    8M    |   27    |   417    |   |    8M    |  9.35   |  115     |
->*-------------------------------*   *-------------------------------*
->
-> * Let's look to the first line of both tables - where copy is better
->   than zerocopy. I analyzed this case more deeply and found that
->   bottleneck is function 'vhost_work_queue()'. With 4K buffer size,
->   caller spends too much time in it with zerocopy mode (comparing to
->   copy mode). This happens only with 4K buffer size. This function just
->   calls 'wake_up_process()' and its internal logic does not depends on
->   skb, so i think potential reason (may be) is interval between two
->   calls of this function (e.g. how often it is called). Note, that
->   'vhost_work_queue()' differs from the same function at guest's side of
->   transport: 'virtio_transport_send_pkt()' uses 'queue_work()' which
->   i think is more optimized for worker purposes, than direct call to
->   'wake_up_process()'. But again - this is just my assumption.
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Jun 2023 09:21:30 +0200
+> On Sun, Jun 25, 2023 at 6:14 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
+> >
+> > syzbot reported a warning in __local_bh_enable_ip(). [0]
+> >
+> > Commit 8d61f926d420 ("netlink: fix potential deadlock in
+> > netlink_set_err()") converted read_lock(&nl_table_lock) to
+> > read_lock_irqsave() in __netlink_diag_dump() to prevent a deadlock.
+> >
+> > However, __netlink_diag_dump() calls sock_i_ino() that uses
+> > read_lock_bh() and read_unlock_bh().  read_unlock_bh() finally
+> > enables BH even though it should stay disabled until the following
+> > read_unlock_irqrestore().
+> >
+> > Using read_lock() in sock_i_ino() would trigger a lockdep splat
+> > in another place that was fixed in commit f064af1e500a ("net: fix
+> > a lockdep splat"), so let's add another function that would be safe
+> > to use under BH disabled.
+> >
+> > [0]:
+> >
+> > Fixes: 8d61f926d420 ("netlink: fix potential deadlock in netlink_set_err()")
+> > Reported-by: syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
+> > Closes: https://syzkaller.appspot.com/bug?extid=5da61cf6a9bc1902d422
+> > Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> > ---
+> >
+> 
+> Hi Kuniyuki, thanks for the fix, I mistakenly released this syzbot
+> bug/report the other day ;)
+> 
+> I wonder if we could use __sock_i_ino() instead of sock_i_ino_bh_disabled(),
+> and perhaps something like the following to have less copy/pasted code ?
 
-Thanks for the analysis, however for small payloads it makes sense that
-the cost might be too high that optimization does not bring benefits.
+Ah, that's much cleaner and nice name :)
+Will post v2 with the diff.
 
->
->Loopback:
->
->   Core i7 with nested guest.            Atom with normal guest.
->
->*-------------------------------*   *-------------------------------*
->|          |         |          |   |          |         |          |
->| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
->|          |         |          |   |          |         |          |
->*-------------------------------*   *-------------------------------*
->|   4KB    |    8    |     7    |   |   4KB    |   1.8   |   1.3    |
->*-------------------------------*   *-------------------------------*
->|   32KB   |   38    |    44    |   |   32KB   |   10    |   10     |
->*-------------------------------*   *-------------------------------*
->|   256KB  |   55    |   168    |   |   256KB  |   15    |   36     |
->*-------------------------------*   *-------------------------------*
->|    1M    |   53    |   250    |   |    1M    |   12    |   45     |
->*-------------------------------*   *-------------------------------*
->|    8M    |   40    |   344    |   |    8M    |   11    |   74     |
->*-------------------------------*   *-------------------------------*
->
->I analyzed performace difference more deeply for the following setup:
->server: ./vsock_perf --vsk-size 16M
->client: ./vsock_perf --sender 2 --bytes 16M --buf-size 16K/4K [--zc]
->
->In other words I send 16M of data from guest to host in copy/zerocopy
->modes and with two different sizes of buffer - 4K and 64K. Let's see
->to tx path for both modes - it consists of two steps:
->
->copy:
->1) Allocate skb of buffer's length.
->2) Copy data to skb from buffer.
->
->zerocopy:
->1) Allocate skb with header space only.
->2) Pin pages of the buffer and insert them to skb.
->
->I measured average number of ns (returned by 'ktime_get()') for each
->step above:
->1) Skb allocation (for both copy and zerocopy modes).
->2) For copy mode in 'memcpy_to_msg()' - copying.
->3) For zerocopy mode in '__zerocopy_sg_from_iter()' - pinning.
->
->Here are results for copy mode:
->*-------------------------------------*
->| buf | skb alloc | 'memcpy_to_msg()' |
->*-------------------------------------*
->|     |           |                   |
->| 64K |  5000ns   |      25000ns      |
->|     |           |                   |
->*-------------------------------------*
->|     |           |                   |
->| 4K  |  800ns    |      2200ns       |
->|     |           |                   |
->*-------------------------------------*
->
->Here are results for zerocopy mode:
->*-----------------------------------------------*
->| buf | skb alloc | '__zerocopy_sg_from_iter()' |
->*-----------------------------------------------*
->|     |           |                             |
->| 64K |  250ns    |          3500ns             |
->|     |           |                             |
->*-----------------------------------------------*
->|     |           |                             |
->| 4K  |  250ns    |          3000ns             |
->|     |           |                             |
->*-----------------------------------------------*
->
->I guess that reason of zerocopy performance is low overhead for page
->pinning: there is big difference between 4K and 64K in case of copying
->(25000 vs 2200), but in pinning case - just 3000 vs 3500.
->
->So, zerocopy is faster than classic copy mode, but of course it requires
->specific architecture of application due to user pages pinning, buffer
->size and alignment.
+Thanks, Eric!
 
-Makes sense!
 
->
->                             NOTES
->
->If host fails to send data with "Cannot allocate memory", check value
->/proc/sys/net/core/optmem_max - it is accounted during completion skb
->allocation. Try to update it to for example 1M and try send again:
->"echo 1048576 > /proc/sys/net/core/optmem_max" (as root).
->
->                            TESTING
->
->This patchset includes set of tests for MSG_ZEROCOPY feature. I tried to
->cover new code as much as possible so there are different cases for
->MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
->vector types (different sizes, alignments, with unmapped pages). I also
->run tests with loopback transport and run vsockmon. In v3 i've added
->io_uring test as separated application.
->
->           LET'S SPLIT PATCHSET TO MAKE REVIEW EASIER
->
->In v3 Stefano Garzarella <sgarzare@redhat.com> asked to split this patchset
->for several parts, because it looks too big for review. I think in this
->version (v4) we can do it in the following way:
->
->[0001 - 0005] - this is preparation for virtio/vhost part.
->[0006 - 0009] - this is preparation for AF_VSOCK part.
->[0010 - 0013] - these patches allows to trigger logic from the previous
->                two parts.
->[0014 - rest] - updates for doc, tests, utils. This part doesn't touch
->                kernel code and looks not critical.
-
-Yeah, I like this split, but I'd include 14 in the (10, 13) group.
-
-I have reviewed most of them and I think we are well on our way :-)
-I've already seen that Bobby suggested changes for v5, so I'll review
-that version better.
-
-Great work so far!
-
-Thanks,
-Stefano
-
+> 
+> diff --git a/net/core/sock.c b/net/core/sock.c
+> index 6e5662ca00fe5638881db11c71c46169d59a2746..146a83c50c5d329fee2e833c4f2ba29e896d7766
+> 100644
+> --- a/net/core/sock.c
+> +++ b/net/core/sock.c
+> @@ -2550,13 +2550,25 @@ kuid_t sock_i_uid(struct sock *sk)
+>  }
+>  EXPORT_SYMBOL(sock_i_uid);
+> 
+> -unsigned long sock_i_ino(struct sock *sk)
+> +/* Must be called while interrupts are disabled. */
+> +unsigned long __sock_i_ino(struct sock *sk)
+>  {
+>         unsigned long ino;
+> 
+> -       read_lock_bh(&sk->sk_callback_lock);
+> +       read_lock(&sk->sk_callback_lock);
+>         ino = sk->sk_socket ? SOCK_INODE(sk->sk_socket)->i_ino : 0;
+> -       read_unlock_bh(&sk->sk_callback_lock);
+> +       read_unlock(&sk->sk_callback_lock);
+> +       return ino;
+> +}
+> +EXPORT_SYMBOL(__sock_i_ino);
+> +
+> +unsigned long sock_i_ino(struct sock *sk)
+> +{
+> +       unsigned long ino;
+> +
+> +       local_bh_disable();
+> +       ino = __sock_i_ino(sk);
+> +       local_bh_enable();
+>         return ino;
+>  }
+>  EXPORT_SYMBOL(sock_i_ino);
 
