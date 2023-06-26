@@ -1,289 +1,125 @@
-Return-Path: <netdev+bounces-13871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9338573D7FC
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:50:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 258DB73D800
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:51:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C43D71C20754
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:50:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B0E280DAD
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:51:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0ED386130;
-	Mon, 26 Jun 2023 06:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CC91109;
+	Mon, 26 Jun 2023 06:50:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04D616122
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:48:02 +0000 (UTC)
-Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id EE495E53;
-	Sun, 25 Jun 2023 23:47:59 -0700 (PDT)
-From: Pablo Neira Ayuso <pablo@netfilter.org>
-To: netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net,
-	netdev@vger.kernel.org,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	edumazet@google.com
-Subject: [PATCH net-next 8/8] netfilter: nf_tables: limit allowed range via nla_policy
-Date: Mon, 26 Jun 2023 08:47:49 +0200
-Message-Id: <20230626064749.75525-9-pablo@netfilter.org>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230626064749.75525-1-pablo@netfilter.org>
-References: <20230626064749.75525-1-pablo@netfilter.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24452A59
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:50:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5375C433C0;
+	Mon, 26 Jun 2023 06:50:53 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687762256;
+	bh=NK1Y2wM/ZOdh+mw3/gFJTpCbuhSPj2RAqLErmTyzoyQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ufnWcxk76jWKQLFOaqzje+TnwPLMLen61PyUWDLytnf2lE3jx+oJVgE+/3gcAClXQ
+	 KemKhn/4cZtBNK0H2dxij0oWQYhtxNiNWjigmZeXMGS8lzASMVO3W5OrkZ5MmK1Wqt
+	 L3jPVA4dwEy2xqyrmSy5gjEd3r9/3ueZKG7DjeKpfiLChThRc8O5zMiFHc4X5JKUvP
+	 GNJ/I1XJ7U8tJzxzp9sMo+BNKSbKhAteU6GaSlNc9UySZCOPFa9WAjlb0fhMRCFKI+
+	 57+jO21YV1fw2M9wC0aQ5us+FthYPGrmZ09weJYvQ+Uuqg9YCkfy//hOZAoNNWdDz/
+	 NCiab0BFwuA+g==
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Date: Mon, 26 Jun 2023 08:50:51 +0200
+From: Michael Walle <mwalle@kernel.org>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
+ Russell King <linux@armlinux.org.uk>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yisen Zhuang
+ <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Florian
+ Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
+ list <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_Beh?=
+ =?UTF-8?Q?=C3=BAn?= <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net-next v2 06/10] net: phy: print an info if a broken C45
+ bus is found
+In-Reply-To: <ZJYCBeKdXBot/9Xd@corigine.com>
+References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
+ <20230620-feature-c45-over-c22-v2-6-def0ab9ccee2@kernel.org>
+ <af166ce6-b9b2-44e0-9f45-2b2aa001fd6b@lunn.ch>
+ <ZJYCBeKdXBot/9Xd@corigine.com>
+Message-ID: <eb8390d30907893c4327ffe076c04c82@kernel.org>
+X-Sender: mwalle@kernel.org
+Content-Type: text/plain; charset=US-ASCII;
+ format=flowed
+Content-Transfer-Encoding: 7bit
 
-From: Florian Westphal <fw@strlen.de>
+Am 2023-06-23 22:35, schrieb Simon Horman:
+> On Fri, Jun 23, 2023 at 07:42:08PM +0200, Andrew Lunn wrote:
+>> On Fri, Jun 23, 2023 at 12:29:15PM +0200, Michael Walle wrote:
+>> > If there is an PHY which gets confused by C45 transactions on the MDIO
+>> > bus, print an info together with the PHY identifier of the offending
+>> > one.
+>> >
+>> > Signed-off-by: Michael Walle <mwalle@kernel.org>
+>> >
+>> > ---
+>> > I wasn't sure if this should be phydev_dbg() or phydev_info(). I mainly
+>> > see this as an info to a user why some PHYs might not be probed (or
+>> > c45-over-c22 is used later).
+>> 
+>> The information is useful to the DT writer, not the 'user'. I would
+>> assume the DT writer has a bit more kernel knowledge and can debug
+>> prints on. So i would suggest phydev_dbg().
 
-These NLA_U32 types get stored in u8 fields, reject invalid values
-instead of silently casting to u8.
+Why the DT writer? There could be no DT at all, right? But yeah, fair
+enough, I thought of our hardware engineers as a user, which might be
+surprised to find no C45 transactions at all for a C45 PHY.
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
-Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
----
- net/netfilter/nft_bitwise.c    | 2 +-
- net/netfilter/nft_byteorder.c  | 6 +++---
- net/netfilter/nft_ct.c         | 2 +-
- net/netfilter/nft_dynset.c     | 2 +-
- net/netfilter/nft_exthdr.c     | 4 ++--
- net/netfilter/nft_fwd_netdev.c | 2 +-
- net/netfilter/nft_hash.c       | 2 +-
- net/netfilter/nft_meta.c       | 2 +-
- net/netfilter/nft_range.c      | 2 +-
- net/netfilter/nft_reject.c     | 2 +-
- net/netfilter/nft_rt.c         | 2 +-
- net/netfilter/nft_socket.c     | 4 ++--
- net/netfilter/nft_tproxy.c     | 2 +-
- net/netfilter/nft_tunnel.c     | 4 ++--
- net/netfilter/nft_xfrm.c       | 4 ++--
- 15 files changed, 21 insertions(+), 21 deletions(-)
+That said, I don't have a strong opinion. I'm fine to switch that to
+dev_dbg() to make the kernel output less noisy.
 
-diff --git a/net/netfilter/nft_bitwise.c b/net/netfilter/nft_bitwise.c
-index 84eae7cabc67..14e3c44ef959 100644
---- a/net/netfilter/nft_bitwise.c
-+++ b/net/netfilter/nft_bitwise.c
-@@ -86,7 +86,7 @@ static const struct nla_policy nft_bitwise_policy[NFTA_BITWISE_MAX + 1] = {
- 	[NFTA_BITWISE_LEN]	= { .type = NLA_U32 },
- 	[NFTA_BITWISE_MASK]	= { .type = NLA_NESTED },
- 	[NFTA_BITWISE_XOR]	= { .type = NLA_NESTED },
--	[NFTA_BITWISE_OP]	= { .type = NLA_U32 },
-+	[NFTA_BITWISE_OP]	= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_BITWISE_DATA]	= { .type = NLA_NESTED },
- };
- 
-diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-index b66647a5a171..9a85e797ed58 100644
---- a/net/netfilter/nft_byteorder.c
-+++ b/net/netfilter/nft_byteorder.c
-@@ -88,9 +88,9 @@ void nft_byteorder_eval(const struct nft_expr *expr,
- static const struct nla_policy nft_byteorder_policy[NFTA_BYTEORDER_MAX + 1] = {
- 	[NFTA_BYTEORDER_SREG]	= { .type = NLA_U32 },
- 	[NFTA_BYTEORDER_DREG]	= { .type = NLA_U32 },
--	[NFTA_BYTEORDER_OP]	= { .type = NLA_U32 },
--	[NFTA_BYTEORDER_LEN]	= { .type = NLA_U32 },
--	[NFTA_BYTEORDER_SIZE]	= { .type = NLA_U32 },
-+	[NFTA_BYTEORDER_OP]	= NLA_POLICY_MAX(NLA_BE32, 255),
-+	[NFTA_BYTEORDER_LEN]	= NLA_POLICY_MAX(NLA_BE32, 255),
-+	[NFTA_BYTEORDER_SIZE]	= NLA_POLICY_MAX(NLA_BE32, 255),
- };
- 
- static int nft_byteorder_init(const struct nft_ctx *ctx,
-diff --git a/net/netfilter/nft_ct.c b/net/netfilter/nft_ct.c
-index b9c84499438b..38958e067aa8 100644
---- a/net/netfilter/nft_ct.c
-+++ b/net/netfilter/nft_ct.c
-@@ -332,7 +332,7 @@ static void nft_ct_set_eval(const struct nft_expr *expr,
- 
- static const struct nla_policy nft_ct_policy[NFTA_CT_MAX + 1] = {
- 	[NFTA_CT_DREG]		= { .type = NLA_U32 },
--	[NFTA_CT_KEY]		= { .type = NLA_U32 },
-+	[NFTA_CT_KEY]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_CT_DIRECTION]	= { .type = NLA_U8 },
- 	[NFTA_CT_SREG]		= { .type = NLA_U32 },
- };
-diff --git a/net/netfilter/nft_dynset.c b/net/netfilter/nft_dynset.c
-index bd19c7aec92e..4fb34d76dbea 100644
---- a/net/netfilter/nft_dynset.c
-+++ b/net/netfilter/nft_dynset.c
-@@ -148,7 +148,7 @@ static const struct nla_policy nft_dynset_policy[NFTA_DYNSET_MAX + 1] = {
- 	[NFTA_DYNSET_SET_NAME]	= { .type = NLA_STRING,
- 				    .len = NFT_SET_MAXNAMELEN - 1 },
- 	[NFTA_DYNSET_SET_ID]	= { .type = NLA_U32 },
--	[NFTA_DYNSET_OP]	= { .type = NLA_U32 },
-+	[NFTA_DYNSET_OP]	= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_DYNSET_SREG_KEY]	= { .type = NLA_U32 },
- 	[NFTA_DYNSET_SREG_DATA]	= { .type = NLA_U32 },
- 	[NFTA_DYNSET_TIMEOUT]	= { .type = NLA_U64 },
-diff --git a/net/netfilter/nft_exthdr.c b/net/netfilter/nft_exthdr.c
-index 671474e59817..7f856ceb3a66 100644
---- a/net/netfilter/nft_exthdr.c
-+++ b/net/netfilter/nft_exthdr.c
-@@ -487,9 +487,9 @@ static const struct nla_policy nft_exthdr_policy[NFTA_EXTHDR_MAX + 1] = {
- 	[NFTA_EXTHDR_DREG]		= { .type = NLA_U32 },
- 	[NFTA_EXTHDR_TYPE]		= { .type = NLA_U8 },
- 	[NFTA_EXTHDR_OFFSET]		= { .type = NLA_U32 },
--	[NFTA_EXTHDR_LEN]		= { .type = NLA_U32 },
-+	[NFTA_EXTHDR_LEN]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_EXTHDR_FLAGS]		= { .type = NLA_U32 },
--	[NFTA_EXTHDR_OP]		= { .type = NLA_U32 },
-+	[NFTA_EXTHDR_OP]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_EXTHDR_SREG]		= { .type = NLA_U32 },
- };
- 
-diff --git a/net/netfilter/nft_fwd_netdev.c b/net/netfilter/nft_fwd_netdev.c
-index 7b9d4d1bd17c..a5268e6dd32f 100644
---- a/net/netfilter/nft_fwd_netdev.c
-+++ b/net/netfilter/nft_fwd_netdev.c
-@@ -40,7 +40,7 @@ static void nft_fwd_netdev_eval(const struct nft_expr *expr,
- static const struct nla_policy nft_fwd_netdev_policy[NFTA_FWD_MAX + 1] = {
- 	[NFTA_FWD_SREG_DEV]	= { .type = NLA_U32 },
- 	[NFTA_FWD_SREG_ADDR]	= { .type = NLA_U32 },
--	[NFTA_FWD_NFPROTO]	= { .type = NLA_U32 },
-+	[NFTA_FWD_NFPROTO]	= NLA_POLICY_MAX(NLA_BE32, 255),
- };
- 
- static int nft_fwd_netdev_init(const struct nft_ctx *ctx,
-diff --git a/net/netfilter/nft_hash.c b/net/netfilter/nft_hash.c
-index ee8d487b69c0..92d47e469204 100644
---- a/net/netfilter/nft_hash.c
-+++ b/net/netfilter/nft_hash.c
-@@ -59,7 +59,7 @@ static void nft_symhash_eval(const struct nft_expr *expr,
- static const struct nla_policy nft_hash_policy[NFTA_HASH_MAX + 1] = {
- 	[NFTA_HASH_SREG]	= { .type = NLA_U32 },
- 	[NFTA_HASH_DREG]	= { .type = NLA_U32 },
--	[NFTA_HASH_LEN]		= { .type = NLA_U32 },
-+	[NFTA_HASH_LEN]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_HASH_MODULUS]	= { .type = NLA_U32 },
- 	[NFTA_HASH_SEED]	= { .type = NLA_U32 },
- 	[NFTA_HASH_OFFSET]	= { .type = NLA_U32 },
-diff --git a/net/netfilter/nft_meta.c b/net/netfilter/nft_meta.c
-index e384e0de7a54..8fdc7318c03c 100644
---- a/net/netfilter/nft_meta.c
-+++ b/net/netfilter/nft_meta.c
-@@ -458,7 +458,7 @@ EXPORT_SYMBOL_GPL(nft_meta_set_eval);
- 
- const struct nla_policy nft_meta_policy[NFTA_META_MAX + 1] = {
- 	[NFTA_META_DREG]	= { .type = NLA_U32 },
--	[NFTA_META_KEY]		= { .type = NLA_U32 },
-+	[NFTA_META_KEY]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_META_SREG]	= { .type = NLA_U32 },
- };
- EXPORT_SYMBOL_GPL(nft_meta_policy);
-diff --git a/net/netfilter/nft_range.c b/net/netfilter/nft_range.c
-index 0566d6aaf1e5..51ae64cd268f 100644
---- a/net/netfilter/nft_range.c
-+++ b/net/netfilter/nft_range.c
-@@ -42,7 +42,7 @@ void nft_range_eval(const struct nft_expr *expr,
- 
- static const struct nla_policy nft_range_policy[NFTA_RANGE_MAX + 1] = {
- 	[NFTA_RANGE_SREG]		= { .type = NLA_U32 },
--	[NFTA_RANGE_OP]			= { .type = NLA_U32 },
-+	[NFTA_RANGE_OP]			= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_RANGE_FROM_DATA]		= { .type = NLA_NESTED },
- 	[NFTA_RANGE_TO_DATA]		= { .type = NLA_NESTED },
- };
-diff --git a/net/netfilter/nft_reject.c b/net/netfilter/nft_reject.c
-index f2addc844dd2..ed2e668474d6 100644
---- a/net/netfilter/nft_reject.c
-+++ b/net/netfilter/nft_reject.c
-@@ -18,7 +18,7 @@
- #include <linux/icmpv6.h>
- 
- const struct nla_policy nft_reject_policy[NFTA_REJECT_MAX + 1] = {
--	[NFTA_REJECT_TYPE]		= { .type = NLA_U32 },
-+	[NFTA_REJECT_TYPE]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_REJECT_ICMP_CODE]		= { .type = NLA_U8 },
- };
- EXPORT_SYMBOL_GPL(nft_reject_policy);
-diff --git a/net/netfilter/nft_rt.c b/net/netfilter/nft_rt.c
-index 5990fdd7b3cc..35a2c28caa60 100644
---- a/net/netfilter/nft_rt.c
-+++ b/net/netfilter/nft_rt.c
-@@ -104,7 +104,7 @@ void nft_rt_get_eval(const struct nft_expr *expr,
- 
- static const struct nla_policy nft_rt_policy[NFTA_RT_MAX + 1] = {
- 	[NFTA_RT_DREG]		= { .type = NLA_U32 },
--	[NFTA_RT_KEY]		= { .type = NLA_U32 },
-+	[NFTA_RT_KEY]		= NLA_POLICY_MAX(NLA_BE32, 255),
- };
- 
- static int nft_rt_get_init(const struct nft_ctx *ctx,
-diff --git a/net/netfilter/nft_socket.c b/net/netfilter/nft_socket.c
-index 85f8df87efda..84def74698b7 100644
---- a/net/netfilter/nft_socket.c
-+++ b/net/netfilter/nft_socket.c
-@@ -138,9 +138,9 @@ static void nft_socket_eval(const struct nft_expr *expr,
- }
- 
- static const struct nla_policy nft_socket_policy[NFTA_SOCKET_MAX + 1] = {
--	[NFTA_SOCKET_KEY]		= { .type = NLA_U32 },
-+	[NFTA_SOCKET_KEY]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_SOCKET_DREG]		= { .type = NLA_U32 },
--	[NFTA_SOCKET_LEVEL]		= { .type = NLA_U32 },
-+	[NFTA_SOCKET_LEVEL]		= NLA_POLICY_MAX(NLA_BE32, 255),
- };
- 
- static int nft_socket_init(const struct nft_ctx *ctx,
-diff --git a/net/netfilter/nft_tproxy.c b/net/netfilter/nft_tproxy.c
-index ea83f661417e..ae15cd693f0e 100644
---- a/net/netfilter/nft_tproxy.c
-+++ b/net/netfilter/nft_tproxy.c
-@@ -183,7 +183,7 @@ static void nft_tproxy_eval(const struct nft_expr *expr,
- }
- 
- static const struct nla_policy nft_tproxy_policy[NFTA_TPROXY_MAX + 1] = {
--	[NFTA_TPROXY_FAMILY]   = { .type = NLA_U32 },
-+	[NFTA_TPROXY_FAMILY]   = NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_TPROXY_REG_ADDR] = { .type = NLA_U32 },
- 	[NFTA_TPROXY_REG_PORT] = { .type = NLA_U32 },
- };
-diff --git a/net/netfilter/nft_tunnel.c b/net/netfilter/nft_tunnel.c
-index b059aa541798..9f21953c7433 100644
---- a/net/netfilter/nft_tunnel.c
-+++ b/net/netfilter/nft_tunnel.c
-@@ -66,9 +66,9 @@ static void nft_tunnel_get_eval(const struct nft_expr *expr,
- }
- 
- static const struct nla_policy nft_tunnel_policy[NFTA_TUNNEL_MAX + 1] = {
--	[NFTA_TUNNEL_KEY]	= { .type = NLA_U32 },
-+	[NFTA_TUNNEL_KEY]	= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_TUNNEL_DREG]	= { .type = NLA_U32 },
--	[NFTA_TUNNEL_MODE]	= { .type = NLA_U32 },
-+	[NFTA_TUNNEL_MODE]	= NLA_POLICY_MAX(NLA_BE32, 255),
- };
- 
- static int nft_tunnel_get_init(const struct nft_ctx *ctx,
-diff --git a/net/netfilter/nft_xfrm.c b/net/netfilter/nft_xfrm.c
-index c88fd078a9ae..452f8587adda 100644
---- a/net/netfilter/nft_xfrm.c
-+++ b/net/netfilter/nft_xfrm.c
-@@ -16,9 +16,9 @@
- #include <net/xfrm.h>
- 
- static const struct nla_policy nft_xfrm_policy[NFTA_XFRM_MAX + 1] = {
--	[NFTA_XFRM_KEY]		= { .type = NLA_U32 },
-+	[NFTA_XFRM_KEY]		= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_XFRM_DIR]		= { .type = NLA_U8 },
--	[NFTA_XFRM_SPNUM]	= { .type = NLA_U32 },
-+	[NFTA_XFRM_SPNUM]	= NLA_POLICY_MAX(NLA_BE32, 255),
- 	[NFTA_XFRM_DREG]	= { .type = NLA_U32 },
- };
- 
--- 
-2.30.2
+>> > @@ -617,10 +617,10 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
+>> >   */
+>> >  void mdiobus_scan_for_broken_c45_access(struct mii_bus *bus)
+>> >  {
+>> > +	struct phy_device *phydev;
+>> >  	int i;
+>> >
+>> >  	for (i = 0; i < PHY_MAX_ADDR; i++) {
+>> > -		struct phy_device *phydev;
+>> >  		u32 oui;
+>> 
+>> It is not clear why you changed the scope of phydev. I guess another
+>> version used phydev_info(), where as now you have dev_info()?
+> 
+> I think it is so it can be used in the dev_info() call below.
 
+Yes, to print the PHY ID of the offending one.
+
+> However Smatch has it's doubts that it is always initialised there.
+> 
+>   .../mdio_bus.c:638 mdiobus_scan_for_broken_c45_access() error: we 
+> previously assumed 'phydev' could be null (see line 627)
+> 
+>> >  		phydev = mdiobus_get_phy(bus, i);
+> 
+> Line 627 immediately follows the line above, like this:
+> 
+> 		if (!phydev)
+> 			continue;
+
+Mhh, I see. bus->prevent_c45_access could (theoretically) set before
+calling this function. I could set it to false at the beginning of
+this function or I could use a new flag to indicate when to print the
+warning. Any suggestions?
+
+-michael
 
