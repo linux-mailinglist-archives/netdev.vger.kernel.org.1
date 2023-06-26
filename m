@@ -1,387 +1,253 @@
-Return-Path: <netdev+bounces-14035-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14036-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5239C73E7E8
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:20:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 61F7B73E7F4
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:20:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F0942280E50
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:20:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FC6E1C2093F
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:20:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1B71D134D9;
-	Mon, 26 Jun 2023 18:20:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2763A134CE;
+	Mon, 26 Jun 2023 18:20:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06FA3134CE
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:20:20 +0000 (UTC)
-Received: from mail-vk1-xa2d.google.com (mail-vk1-xa2d.google.com [IPv6:2607:f8b0:4864:20::a2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C0FDE75;
-	Mon, 26 Jun 2023 11:20:18 -0700 (PDT)
-Received: by mail-vk1-xa2d.google.com with SMTP id 71dfb90a1353d-471658cc106so1444163e0c.0;
-        Mon, 26 Jun 2023 11:20:18 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687803617; x=1690395617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=VJMJu0RIu0Yr3c1tM1bkZs7eH/52zFhiEMrJQGgiSpE=;
-        b=jyfJZBhHadw2aNYkjNGGvZc8zzRvW1kt9oeOx4OpGxN7thwCJELI6qCXYQXqvtfP/z
-         eTL3A/eo0HBJup7rTdbsq1wv5CkXX4JAfdnSLwK9o7JS76v1Sw3Oq/M4RBtFC+CmjqZV
-         tg1l8Dh7tOHe2rI9dBfeZ1igC3gmxsfUCjQZ7jPw1ZAv+prFmPp0kgn5qh6uQ2OXrxTN
-         A58SydVDjrNEZwn1tlx8MUQ6xexckDL3uaFO0w0w8Zyk1jN8NyurAj472EikWCPO8BR/
-         0vKSfnrpjzX2U7avoKJ5huCwTVvJ9BpmFEAUREuBaCYrLykZAbfhAJOzxI0nldeeoS1X
-         a4EQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687803617; x=1690395617;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=VJMJu0RIu0Yr3c1tM1bkZs7eH/52zFhiEMrJQGgiSpE=;
-        b=cJQexnGoXSSzAYJ1P3v3KvOcq+MbDKmrCxzUeHP/QHjf9cbagq/+h9FPxNgoGGn3SD
-         gT+Uo37Vaj01brMiXsLY3jttm7mmNK42TnF5qIOt448VQvom7RBtKebXUvDiwTGnE6QD
-         a6X2IZUjNWoSFqeGmoilzDiVTjsyN1L9O3qVAZG9laFGPbz8FPJhpp+ZyncF+XesCiga
-         GKVMiutdLdZhlRldxOLx7ugRTHBJn/Lz4P2/a776lamAjzxQGyp/jmFfex0a9gg8lsqW
-         PbxvWYusMUXFhuipcZU8z6WX8QQpI8sR1Ckg3zLV1ewpQatn1jQFqGZpfFTHs+N+aKWQ
-         gebw==
-X-Gm-Message-State: AC+VfDxR5DpqMV3id4Hgl6+yjD/1a7hp8OxaxthyNHIATT7ApUbVmJHu
-	oWby8agoFooOHH8iLeVd9FMLy6qaM9L/SFFpMVw=
-X-Google-Smtp-Source: ACHHUZ5MC/bSeanmNy7FRRrmrPNTIL+4GtnO9yspk4+jJY/Omvra0wdQ1+cDXoqSNXQzCdXwl/xnq0AFHSw5kabyPLw=
-X-Received: by 2002:a1f:43d0:0:b0:44f:e6ff:f30e with SMTP id
- q199-20020a1f43d0000000b0044fe6fff30emr14735009vka.10.1687803617275; Mon, 26
- Jun 2023 11:20:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E9F13AC5
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:20:37 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8C8E7F;
+	Mon, 26 Jun 2023 11:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1687803635; x=1719339635;
+  h=from:to:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=ocIkXRYDE2Ci9W3TOmiMIPb9bxSCddVwIw/OcWkYvkM=;
+  b=gQdWyrYfTJgd0MMbTwNQMnkeX3Vw0n95VtoeBFh34CAcy6A49mwfvO68
+   RmZQml+RdDN635ajTfvKtzIBy68txAbRVzq3GAc8NeNy0S7C0B3q5/ezd
+   3D+E6xFBc6rwv7A+CLig+X/oKzN3+roGfHFxYpn7q4C3YpnAdsua7LZ+U
+   X2s8z/VEu0TH2iVVc8/p+3luW7sgtQLPFMyaWOvm2owuGzb9SBMANByYX
+   Zmw+ryi/Ezqgj/EOOByv+vj5OwaqC9ozyCVOTt6yD9rJKPTwSBkjtkpbg
+   7fedAtyhxmZOZ+nI6f4hS73UF2PON7K6rt22FGMN+scJaoH2f2XId0GJX
+   A==;
+X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
+   d="scan'208";a="220598045"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 26 Jun 2023 11:20:34 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 26 Jun 2023 11:20:32 -0700
+Received: from chn-vm-ungsw-01.microchip.com (10.10.115.15) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Mon, 26 Jun 2023 11:20:32 -0700
+From: Jerry Ray <jerry.ray@microchip.com>
+To: Woojung Huh <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: [PATCH] net: dsa: microchip: phy reg access 0x10-0x1f
+Date: Mon, 26 Jun 2023 11:20:32 -0700
+Message-ID: <20230626182032.2079497-1-jerry.ray@microchip.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
- <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
- <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
- <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
- <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
- <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com> <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
-In-Reply-To: <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Mon, 26 Jun 2023 20:20:05 +0200
-Message-ID: <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Nevermind, I think I found it, I will loop this thing until I have a
-proper trace....
+With the recent patch to promote phy register accesses to 32-bits for the
+range >=0x10, it is also necessary to expand the allowed register address
+table for the affected devices.  These three register sets use
+ksz9477_dev_ops and are therefore affected by the change. The address
+ranges 0xN120-0xN13f map to the phy register address 0x10-0x1f. There is
+no reason to exclude any register accesses within this space.
 
-On Mon, Jun 26, 2023 at 8:01=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com>=
- wrote:
->
-> On Mon, Jun 26, 2023 at 7:56=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On Mon, 2023-06-26 at 19:30 +0200, Ian Kumlien wrote:
-> > > There, that didn't take long, even with wireguard disabled
-> > >
-> > > [14079.678380] BUG: kernel NULL pointer dereference, address: 0000000=
-0000000c0
-> > > [14079.685456] #PF: supervisor read access in kernel mode
-> > > [14079.690686] #PF: error_code(0x0000) - not-present page
-> > > [14079.695915] PGD 0 P4D 0
-> > > [14079.698540] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> > > [14079.702996] CPU: 11 PID: 891 Comm: napi/eno2-80 Not tainted 6.4.0 =
-#360
-> > > [14079.709614] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F=
-,
-> > > BIOS 1.7a 10/13/2022
-> > > [14079.717796] RIP: 0010:__udp_gso_segment+0x346/0x4f0
-> > > [14079.722778] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
-> > > 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-> > > 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c=
-5
-> > > 48 8d
-> > > [14079.741645] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-> > > [14079.746966] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 00000=
-00000000000
-> > > [14079.754195] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa=
-2afc9d302d4
-> > > [14079.761422] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 00002=
-000001558c9
-> > > [14079.768650] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 00000=
-000000000e2
-> > > [14079.775879] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 00002=
-000001558c9
-> > > [14079.783106] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-> > > knlGS:0000000000000000
-> > > [14079.791305] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [14079.797162] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 00000=
-000003526e0
-> > > [14079.804408] Call Trace:
-> > > [14079.806961]  <TASK>
-> > > [14079.809170]  ? __die+0x1a/0x60
-> > > [14079.812340]  ? page_fault_oops+0x158/0x440
-> > > [14079.816551]  ? ip6_route_output_flags+0xe3/0x160
-> > > [14079.821284]  ? exc_page_fault+0x3f4/0x820
-> > > [14079.825408]  ? update_load_avg+0x77/0x710
-> > > [14079.829534]  ? asm_exc_page_fault+0x22/0x30
-> > > [14079.833836]  ? __udp_gso_segment+0x346/0x4f0
-> > > [14079.838218]  ? __udp_gso_segment+0x2fa/0x4f0
-> > > [14079.842600]  ? _raw_spin_unlock_irqrestore+0x16/0x30
-> > > [14079.847679]  ? try_to_wake_up+0x8e/0x5a0
-> > > [14079.851713]  inet_gso_segment+0x150/0x3c0
-> > > [14079.855827]  ? vhost_poll_wakeup+0x31/0x40
-> > > [14079.860032]  skb_mac_gso_segment+0x9b/0x110
-> > > [14079.864331]  __skb_gso_segment+0xae/0x160
-> > > [14079.868455]  ? netif_skb_features+0x144/0x290
-> > > [14079.872928]  validate_xmit_skb+0x167/0x370
-> > > [14079.877139]  validate_xmit_skb_list+0x43/0x70
-> > > [14079.881612]  sch_direct_xmit+0x267/0x380
-> > > [14079.885641]  __qdisc_run+0x140/0x590
-> > > [14079.889324]  __dev_queue_xmit+0x44d/0xba0
-> > > [14079.893450]  ? nf_hook_slow+0x3c/0xb0
-> > > [14079.897229]  br_dev_queue_push_xmit+0xb2/0x1c0
-> > > [14079.901788]  maybe_deliver+0xa9/0x100
-> > > [14079.905564]  br_flood+0x8a/0x180
-> > > [14079.908903]  br_handle_frame_finish+0x31f/0x5b0
-> > > [14079.913547]  br_handle_frame+0x28f/0x3a0
-> > > [14079.917585]  ? ipv6_find_hdr+0x1f0/0x3e0
-> > > [14079.921622]  ? br_handle_local_finish+0x20/0x20
-> > > [14079.926267]  __netif_receive_skb_core.constprop.0+0x4c5/0xc90
-> > > [14079.932125]  ? br_handle_frame_finish+0x5b0/0x5b0
-> > > [14079.936946]  ? ___slab_alloc+0x4bf/0xaf0
-> > > [14079.940986]  __netif_receive_skb_list_core+0x107/0x250
-> > > [14079.946240]  netif_receive_skb_list_internal+0x194/0x2b0
-> > > [14079.951660]  ? napi_gro_flush+0x97/0xf0
-> > > [14079.955604]  napi_complete_done+0x69/0x180
-> > > [14079.959808]  ixgbe_poll+0xe10/0x12e0
-> > > [14079.963506]  __napi_poll+0x26/0x1b0
-> > > [14079.967106]  napi_threaded_poll+0x232/0x250
-> > > [14079.971405]  ? __napi_poll+0x1b0/0x1b0
-> > > [14079.975260]  kthread+0xee/0x120
-> > > [14079.978510]  ? kthread_complete_and_exit+0x20/0x20
-> > > [14079.983415]  ret_from_fork+0x22/0x30
-> > > [14079.987102]  </TASK>
-> > > [14079.989395] Modules linked in: chaoskey
-> > > [14079.993347] CR2: 00000000000000c0
-> > > [14079.996773] ---[ end trace 0000000000000000 ]---
-> > > [14080.018013] pstore: backend (erst) writing error (-28)
-> > > [14080.023274] RIP: 0010:__udp_gso_segment+0x346/0x4f0
-> > > [14080.028264] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
-> > > 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-> > > 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c=
-5
-> > > 48 8d
-> > > [14080.047181] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-> > > [14080.052522] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 00000=
-00000000000
-> > > [14080.059765] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa=
-2afc9d302d4
-> > > [14080.067012] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 00002=
-000001558c9
-> > > [14080.074257] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 00000=
-000000000e2
-> > > [14080.081502] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 00002=
-000001558c9
-> > > [14080.088746] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-> > > knlGS:0000000000000000
-> > > [14080.096964] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [14080.102823] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 00000=
-000003526e0
-> > > [14080.110067] Kernel panic - not syncing: Fatal exception in interru=
-pt
-> > > [14080.325501] Kernel Offset: 0x12600000 from 0xffffffff81000000
-> > > (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> > > [14080.353129] ---[ end Kernel panic - not syncing: Fatal exception i=
-n
-> > > interrupt ]---
-> >
-> > Could you please provide a decoded stack trace?
-> >
-> > # in your git tree:
-> > cat <stacktrace file > | ./scripts/decode_stacktrace.sh vmlinux
->
-> I'm afraid it doesn't yield more information, really... I can't say why
->
->  cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
-> [14079.678380] BUG: kernel NULL pointer dereference, address: 00000000000=
-000c0
-> [14079.685456] #PF: supervisor read access in kernel mode
-> [14079.690686] #PF: error_code(0x0000) - not-present page
-> [14079.695915] PGD 0 P4D 0
-> [14079.698540] Oops: 0000 [#1] PREEMPT SMP NOPTI
-> [14079.702996] CPU: 11 PID: 891 Comm: napi/eno2-80 Not tainted 6.4.0 #360
-> [14079.709614] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-> BIOS 1.7a 10/13/2022
-> [14079.717796] RIP: 0010:__udp_gso_segment (??:?)
-> [14079.722778] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    0: c3                    ret
->    1: 08 66 89              or     %ah,-0x77(%rsi)
->    4: 5c                    pop    %rsp
->    5: 02 04 45 84 e4 0f 85 add    -0x7af01b7c(,%rax,2),%al
->    c: 27                    (bad)
->    d: fd                    std
->    e: ff                    (bad)
->    f: ff                    .byte 0xff
-> 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-> 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
-> 48 8d
-> [14079.741645] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-> [14079.746966] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 000000000=
-0000000
-> [14079.754195] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2afc=
-9d302d4
-> [14079.761422] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 000020000=
-01558c9
-> [14079.768650] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 000000000=
-00000e2
-> [14079.775879] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 000020000=
-01558c9
-> [14079.783106] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-> knlGS:0000000000000000
-> [14079.791305] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [14079.797162] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 000000000=
-03526e0
-> [14079.804408] Call Trace:
-> [14079.806961]  <TASK>
-> [14079.809170] ? __die (??:?)
-> [14079.812340] ? page_fault_oops (fault.c:?)
-> [14079.816551] ? ip6_route_output_flags (??:?)
-> [14079.821284] ? exc_page_fault (??:?)
-> [14079.825408] ? update_load_avg (fair.c:?)
-> [14079.829534] ? asm_exc_page_fault (??:?)
-> [14079.833836] ? __udp_gso_segment (??:?)
-> [14079.838218] ? __udp_gso_segment (??:?)
-> [14079.842600] ? _raw_spin_unlock_irqrestore (??:?)
-> [14079.847679] ? try_to_wake_up (core.c:?)
-> [14079.851713] inet_gso_segment (??:?)
-> [14079.855827] ? vhost_poll_wakeup (vhost.c:?)
-> [14079.860032] skb_mac_gso_segment (??:?)
-> [14079.864331] __skb_gso_segment (??:?)
-> [14079.868455] ? netif_skb_features (??:?)
-> [14079.872928] validate_xmit_skb (dev.c:?)
-> [14079.877139] validate_xmit_skb_list (??:?)
-> [14079.881612] sch_direct_xmit (??:?)
-> [14079.885641] __qdisc_run (??:?)
-> [14079.889324] __dev_queue_xmit (??:?)
-> [14079.893450] ? nf_hook_slow (??:?)
-> [14079.897229] br_dev_queue_push_xmit (??:?)
-> [14079.901788] maybe_deliver (br_forward.c:?)
-> [14079.905564] br_flood (??:?)
-> [14079.908903] br_handle_frame_finish (??:?)
-> [14079.913547] br_handle_frame (br_input.c:?)
-> [14079.917585] ? ipv6_find_hdr (??:?)
-> [14079.921622] ? br_handle_local_finish (??:?)
-> [14079.926267] __netif_receive_skb_core.constprop.0 (dev.c:?)
-> [14079.932125] ? br_handle_frame_finish (br_input.c:?)
-> [14079.936946] ? ___slab_alloc (slub.c:?)
-> [14079.940986] __netif_receive_skb_list_core (dev.c:?)
-> [14079.946240] netif_receive_skb_list_internal (??:?)
-> [14079.951660] ? napi_gro_flush (??:?)
-> [14079.955604] napi_complete_done (??:?)
-> [14079.959808] ixgbe_poll (??:?)
-> [14079.963506] __napi_poll (dev.c:?)
-> [14079.967106] napi_threaded_poll (dev.c:?)
-> [14079.971405] ? __napi_poll (dev.c:?)
-> [14079.975260] kthread (kthread.c:?)
-> [14079.978510] ? kthread_complete_and_exit (kthread.c:?)
-> [14079.983415] ret_from_fork (??:?)
-> [14079.987102]  </TASK>
-> [14079.989395] Modules linked in: chaoskey
-> [14079.993347] CR2: 00000000000000c0
-> [14079.996773] ---[ end trace 0000000000000000 ]---
-> [14080.018013] pstore: backend (erst) writing error (-28)
-> [14080.023274] RIP: 0010:__udp_gso_segment (??:?)
-> [14080.028264] Code: c3 08 66 89 5c 02 04 45 84 e4 0f 85 27 fd ff ff
->
-> Code starting with the faulting instruction
-> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
->    0: c3                    ret
->    1: 08 66 89              or     %ah,-0x77(%rsi)
->    4: 5c                    pop    %rsp
->    5: 02 04 45 84 e4 0f 85 add    -0x7af01b7c(,%rax,2),%al
->    c: 27                    (bad)
->    d: fd                    std
->    e: ff                    (bad)
->    f: ff                    .byte 0xff
-> 49 8b 1e 49 8b ae c0 00 00 00 41 0f b7 86 b4 00 00 00 45 0f b7 a6 b2
-> 00 00 00 <48> 8b b3 c0 00 00 00 0f b7 8b b2 00 00 00 49 01 ec 48 01 c5
-> 48 8d
-> [14080.047181] RSP: 0018:ffffa83643a4f818 EFLAGS: 00010246
-> [14080.052522] RAX: 00000000000000ce RBX: 0000000000000000 RCX: 000000000=
-0000000
-> [14080.059765] RDX: ffffa2ad1403b000 RSI: 0000000000000028 RDI: ffffa2afc=
-9d302d4
-> [14080.067012] RBP: ffffa2ad1403b000 R08: 0000000000000022 R09: 000020000=
-01558c9
-> [14080.074257] R10: 0000000000000000 R11: ffffa2b02fcea888 R12: 000000000=
-00000e2
-> [14080.081502] R13: ffffa2afc9d30200 R14: ffffa2afc9d30200 R15: 000020000=
-01558c9
-> [14080.088746] FS:  0000000000000000(0000) GS:ffffa2b02fcc0000(0000)
-> knlGS:0000000000000000
-> [14080.096964] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> [14080.102823] CR2: 00000000000000c0 CR3: 0000000151ff4000 CR4: 000000000=
-03526e0
-> [14080.110067] Kernel panic - not syncing: Fatal exception in interrupt
-> [14080.325501] Kernel Offset: 0x12600000 from 0xffffffff81000000
-> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> [14080.353129] ---[ end Kernel panic - not syncing: Fatal exception in
-> interrupt ]---
->
-> The binaries aren't stripped so i don't, currently, know why it's like th=
-is...
->
-> but i also get:
-> gdb vmlinux
-> GNU gdb (Gentoo 13.2 vanilla) 13.2
-> Copyright (C) 2023 Free Software Foundation, Inc.
-> License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.h=
-tml>
-> This is free software: you are free to change and redistribute it.
-> There is NO WARRANTY, to the extent permitted by law.
-> Type "show copying" and "show warranty" for details.
-> This GDB was configured as "x86_64-pc-linux-gnu".
-> Type "show configuration" for configuration details.
-> For bug reporting instructions, please see:
-> <https://bugs.gentoo.org/>.
-> Find the GDB manual and other documentation resources online at:
->     <http://www.gnu.org/software/gdb/documentation/>.
->
-> For help, type "help".
-> Type "apropos word" to search for commands related to "word"...
-> Reading symbols from vmlinux...
-> (No debugging symbols found in vmlinux)
-> Traceback (most recent call last):
->   File "/usr/src/linux/vmlinux-gdb.py", line 25, in <module>
->     import linux.constants
->   File "/usr/src/linux/scripts/gdb/linux/constants.py", line 10, in <modu=
-le>
->     LX_hrtimer_resolution =3D gdb.parse_and_eval("hrtimer_resolution")
->                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-> gdb.error: 'hrtimer_resolution' has unknown type; cast it to its declared=
- type
-> ---
->
-> > Thanks!
-> >
-> > Paolo
-> >
+on June 20, 2023
+commit 5c844d57aa78    ("net: dsa: microchip: fix writes to phy registers >= 0x10")
+
+Signed-off-by: Jerry Ray <jerry.ray@microchip.com>
+---
+ drivers/net/dsa/microchip/ksz_common.c | 65 ++++++--------------------
+ 1 file changed, 13 insertions(+), 52 deletions(-)
+
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index 813b91a816bb..b7ce48147a38 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -509,10 +509,7 @@ static const struct regmap_range ksz8563_valid_regs[] = {
+ 	regmap_reg_range(0x1030, 0x1030),
+ 	regmap_reg_range(0x1100, 0x1111),
+ 	regmap_reg_range(0x111a, 0x111d),
+-	regmap_reg_range(0x1122, 0x1127),
+-	regmap_reg_range(0x112a, 0x112b),
+-	regmap_reg_range(0x1136, 0x1139),
+-	regmap_reg_range(0x113e, 0x113f),
++	regmap_reg_range(0x1120, 0x113f),
+ 	regmap_reg_range(0x1400, 0x1401),
+ 	regmap_reg_range(0x1403, 0x1403),
+ 	regmap_reg_range(0x1410, 0x1417),
+@@ -539,10 +536,7 @@ static const struct regmap_range ksz8563_valid_regs[] = {
+ 	regmap_reg_range(0x2030, 0x2030),
+ 	regmap_reg_range(0x2100, 0x2111),
+ 	regmap_reg_range(0x211a, 0x211d),
+-	regmap_reg_range(0x2122, 0x2127),
+-	regmap_reg_range(0x212a, 0x212b),
+-	regmap_reg_range(0x2136, 0x2139),
+-	regmap_reg_range(0x213e, 0x213f),
++	regmap_reg_range(0x2120, 0x213f),
+ 	regmap_reg_range(0x2400, 0x2401),
+ 	regmap_reg_range(0x2403, 0x2403),
+ 	regmap_reg_range(0x2410, 0x2417),
+@@ -635,10 +629,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x1030, 0x1030),
+ 	regmap_reg_range(0x1100, 0x1115),
+ 	regmap_reg_range(0x111a, 0x111f),
+-	regmap_reg_range(0x1122, 0x1127),
+-	regmap_reg_range(0x112a, 0x112b),
+-	regmap_reg_range(0x1136, 0x1139),
+-	regmap_reg_range(0x113e, 0x113f),
++	regmap_reg_range(0x1120, 0x113f),
+ 	regmap_reg_range(0x1400, 0x1401),
+ 	regmap_reg_range(0x1403, 0x1403),
+ 	regmap_reg_range(0x1410, 0x1417),
+@@ -669,10 +660,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x2030, 0x2030),
+ 	regmap_reg_range(0x2100, 0x2115),
+ 	regmap_reg_range(0x211a, 0x211f),
+-	regmap_reg_range(0x2122, 0x2127),
+-	regmap_reg_range(0x212a, 0x212b),
+-	regmap_reg_range(0x2136, 0x2139),
+-	regmap_reg_range(0x213e, 0x213f),
++	regmap_reg_range(0x2120, 0x213f),
+ 	regmap_reg_range(0x2400, 0x2401),
+ 	regmap_reg_range(0x2403, 0x2403),
+ 	regmap_reg_range(0x2410, 0x2417),
+@@ -703,10 +691,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x3030, 0x3030),
+ 	regmap_reg_range(0x3100, 0x3115),
+ 	regmap_reg_range(0x311a, 0x311f),
+-	regmap_reg_range(0x3122, 0x3127),
+-	regmap_reg_range(0x312a, 0x312b),
+-	regmap_reg_range(0x3136, 0x3139),
+-	regmap_reg_range(0x313e, 0x313f),
++	regmap_reg_range(0x3120, 0x313f),
+ 	regmap_reg_range(0x3400, 0x3401),
+ 	regmap_reg_range(0x3403, 0x3403),
+ 	regmap_reg_range(0x3410, 0x3417),
+@@ -737,10 +722,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x4030, 0x4030),
+ 	regmap_reg_range(0x4100, 0x4115),
+ 	regmap_reg_range(0x411a, 0x411f),
+-	regmap_reg_range(0x4122, 0x4127),
+-	regmap_reg_range(0x412a, 0x412b),
+-	regmap_reg_range(0x4136, 0x4139),
+-	regmap_reg_range(0x413e, 0x413f),
++	regmap_reg_range(0x4120, 0x413f),
+ 	regmap_reg_range(0x4400, 0x4401),
+ 	regmap_reg_range(0x4403, 0x4403),
+ 	regmap_reg_range(0x4410, 0x4417),
+@@ -771,10 +753,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+ 	regmap_reg_range(0x5030, 0x5030),
+ 	regmap_reg_range(0x5100, 0x5115),
+ 	regmap_reg_range(0x511a, 0x511f),
+-	regmap_reg_range(0x5122, 0x5127),
+-	regmap_reg_range(0x512a, 0x512b),
+-	regmap_reg_range(0x5136, 0x5139),
+-	regmap_reg_range(0x513e, 0x513f),
++	regmap_reg_range(0x5120, 0x513f),
+ 	regmap_reg_range(0x5400, 0x5401),
+ 	regmap_reg_range(0x5403, 0x5403),
+ 	regmap_reg_range(0x5410, 0x5417),
+@@ -897,10 +876,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x1030, 0x1030),
+ 	regmap_reg_range(0x1100, 0x1115),
+ 	regmap_reg_range(0x111a, 0x111f),
+-	regmap_reg_range(0x1122, 0x1127),
+-	regmap_reg_range(0x112a, 0x112b),
+-	regmap_reg_range(0x1136, 0x1139),
+-	regmap_reg_range(0x113e, 0x113f),
++	regmap_reg_range(0x1120, 0x113f),
+ 	regmap_reg_range(0x1400, 0x1401),
+ 	regmap_reg_range(0x1403, 0x1403),
+ 	regmap_reg_range(0x1410, 0x1417),
+@@ -927,10 +903,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x2030, 0x2030),
+ 	regmap_reg_range(0x2100, 0x2115),
+ 	regmap_reg_range(0x211a, 0x211f),
+-	regmap_reg_range(0x2122, 0x2127),
+-	regmap_reg_range(0x212a, 0x212b),
+-	regmap_reg_range(0x2136, 0x2139),
+-	regmap_reg_range(0x213e, 0x213f),
++	regmap_reg_range(0x2120, 0x213f),
+ 	regmap_reg_range(0x2400, 0x2401),
+ 	regmap_reg_range(0x2403, 0x2403),
+ 	regmap_reg_range(0x2410, 0x2417),
+@@ -957,10 +930,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x3030, 0x3030),
+ 	regmap_reg_range(0x3100, 0x3115),
+ 	regmap_reg_range(0x311a, 0x311f),
+-	regmap_reg_range(0x3122, 0x3127),
+-	regmap_reg_range(0x312a, 0x312b),
+-	regmap_reg_range(0x3136, 0x3139),
+-	regmap_reg_range(0x313e, 0x313f),
++	regmap_reg_range(0x3120, 0x313f),
+ 	regmap_reg_range(0x3400, 0x3401),
+ 	regmap_reg_range(0x3403, 0x3403),
+ 	regmap_reg_range(0x3410, 0x3417),
+@@ -987,10 +957,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x4030, 0x4030),
+ 	regmap_reg_range(0x4100, 0x4115),
+ 	regmap_reg_range(0x411a, 0x411f),
+-	regmap_reg_range(0x4122, 0x4127),
+-	regmap_reg_range(0x412a, 0x412b),
+-	regmap_reg_range(0x4136, 0x4139),
+-	regmap_reg_range(0x413e, 0x413f),
++	regmap_reg_range(0x4120, 0x413f),
+ 	regmap_reg_range(0x4400, 0x4401),
+ 	regmap_reg_range(0x4403, 0x4403),
+ 	regmap_reg_range(0x4410, 0x4417),
+@@ -1017,10 +984,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x5030, 0x5030),
+ 	regmap_reg_range(0x5100, 0x5115),
+ 	regmap_reg_range(0x511a, 0x511f),
+-	regmap_reg_range(0x5122, 0x5127),
+-	regmap_reg_range(0x512a, 0x512b),
+-	regmap_reg_range(0x5136, 0x5139),
+-	regmap_reg_range(0x513e, 0x513f),
++	regmap_reg_range(0x5120, 0x513f),
+ 	regmap_reg_range(0x5400, 0x5401),
+ 	regmap_reg_range(0x5403, 0x5403),
+ 	regmap_reg_range(0x5410, 0x5417),
+@@ -1047,10 +1011,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+ 	regmap_reg_range(0x6030, 0x6030),
+ 	regmap_reg_range(0x6100, 0x6115),
+ 	regmap_reg_range(0x611a, 0x611f),
+-	regmap_reg_range(0x6122, 0x6127),
+-	regmap_reg_range(0x612a, 0x612b),
+-	regmap_reg_range(0x6136, 0x6139),
+-	regmap_reg_range(0x613e, 0x613f),
++	regmap_reg_range(0x6120, 0x613f),
+ 	regmap_reg_range(0x6300, 0x6301),
+ 	regmap_reg_range(0x6400, 0x6401),
+ 	regmap_reg_range(0x6403, 0x6403),
+-- 
+2.25.1
+
 
