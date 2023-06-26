@@ -1,153 +1,116 @@
-Return-Path: <netdev+bounces-13878-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13879-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FC2173D860
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:21:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 169C073D868
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:24:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9454D280D5B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:21:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C0D5C280C45
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:24:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DE41C2E;
-	Mon, 26 Jun 2023 07:21:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0D4B1C31;
+	Mon, 26 Jun 2023 07:24:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B736A1C15
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:21:43 +0000 (UTC)
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF57E0
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:21:42 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-40079620a83so372191cf.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:21:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687764101; x=1690356101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=uj+GYS1A1tGQ+FJ/n5yk4Al/k8DmZXMPigKhaI306Q0=;
-        b=3a5trGOb50p1P9+5CS5wMofgSHLQ8AGT8jYDtRkfWLhdPaQhoXPNskjVu2j8tTg7JP
-         xRmwsKweyzrp2ydJt0z0cQHJ/21mSMdcAVeuAvjqJ/U5Ex0UINuJlJGFSM2tjM4V/ksp
-         cTlb0Mf7IapJOgl4DNARuYoPv+YOLpTU/J3v2acaxJyFepYRUPrLjiXA/1a9jiX5qAbA
-         WqX/14yDtW9kjCzn6umaRdPoc6R8Zq7vN0GkSKIJKCUxxItPgZSGot0LxBMq1DCw/JVv
-         +RJjSWDztNvuxC00M6xEeT/o0PPMkwXqG9m86XvfpwDG/1rKhXcm7Bz/cKi4EktEUKIv
-         ayCw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687764101; x=1690356101;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=uj+GYS1A1tGQ+FJ/n5yk4Al/k8DmZXMPigKhaI306Q0=;
-        b=MKE0OYFxZv/G/fnnDJBB5LdSyQgM2mVEwXLeng/D9K+u/NvggwOR4jlaRtEuDoywWb
-         XR464NxmVpETtlwFkJtOMOJWF55YORosS9i03dqio0pdY36V99NycgG8aZT97+yiQzPP
-         f4BgLQTs1+8OqpYJuGfcaDttD6sOWxbPCXk2dy05k+NEt0ZrKGgkgmncT3pLjqaL89Qe
-         Rf/7Ax3vpR4hqmVIZ2vWSWSYSmvgaX/EPrhxvfhq/Z1MDPYZs8Usc12yE/rptbfYBqQb
-         9x3YXA44iuGi0w2oW7IPCI1U/akHj5v/Gb26wBlPo8jZYh3a/2XS7qmVhUO2CFdCR8Rc
-         Wrrw==
-X-Gm-Message-State: AC+VfDwN/ZNxOk9nMqVPLClUP80BLu3Irsa9xlkjVrIAWIjGynpGl2cp
-	BL+3ia42WzTSw9ET84bxrEbORESArkV77Aosj5sTBnrdO/LFp4BKu8xNpg==
-X-Google-Smtp-Source: ACHHUZ5qxL4bLh1NhEQSv8y/url9PeeYWRy+hcmaRJiXdcc+7aAQnK/3ppFEAJ8I3PCX6FkEPall1PlgdKsTvSxXPHo=
-X-Received: by 2002:ac8:5b45:0:b0:3f8:175a:4970 with SMTP id
- n5-20020ac85b45000000b003f8175a4970mr343069qtw.18.1687764101132; Mon, 26 Jun
- 2023 00:21:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B423D1C2E
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:24:35 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DF661AC;
+	Mon, 26 Jun 2023 00:24:34 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35Q4cFVa013318;
+	Mon, 26 Jun 2023 00:24:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=fqHrSBL3hoY+JjPtKwIfd8KWeoYZRh46fiQOckzwMdQ=;
+ b=XGxYJz1AFJt4HQZiGZ1PFAWXQePEYmRTYH1KXucCFPzM33drrEjWavsQVnMk1rzUfHQ5
+ QnUcm991Hz8v6pLIZDIZqlsRAui7mPcw+j2wQc7N0NXa+QDN0IyPMMXt7RCbiqrWWEsG
+ jv/je2u/g/4iJwqyLLeAD/+NcHeE9rwEHxjej9glfODinXDk2cLH/BSxr8Xf9TM9ne7j
+ lodr9nCq/6X73rtHgCz+t7K1RR917rfNxvKgPBSzPbMC62au+kK+V0UgLIm6aS02edkE
+ u20iF7jJ2mnPlayCMkm2/O0PvphFiItjnPQEdCE+PPO7T+JwMdbccipHK3RYgu9Hm4o5 UA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3re00juuf2-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 26 Jun 2023 00:24:16 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 26 Jun
+ 2023 00:24:14 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 26 Jun 2023 00:24:14 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id A2F693F7063;
+	Mon, 26 Jun 2023 00:24:08 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <kuba@kernel.org>, <davem@davemloft.net>,
+        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
+        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
+        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
+        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
+        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
+        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
+Subject: [net-next Patchv2 0/3] support Round Robin scheduling
+Date: Mon, 26 Jun 2023 12:54:04 +0530
+Message-ID: <20230626072407.32158-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230625161334.51672-1-kuniyu@amazon.com>
-In-Reply-To: <20230625161334.51672-1-kuniyu@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Mon, 26 Jun 2023 09:21:30 +0200
-Message-ID: <CANn89iL0n5Prem6Cjc6jkdAq6jm5AOYXWgn=i80UPsnNZE6WQw@mail.gmail.com>
-Subject: Re: [PATCH v1 net] netlink: Add sock_i_ino_irqsaved() for __netlink_diag_dump().
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
-	syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Proofpoint-GUID: vNeRXWrTxbJqQtv2s7bxOfdxXm9gdQPh
+X-Proofpoint-ORIG-GUID: vNeRXWrTxbJqQtv2s7bxOfdxXm9gdQPh
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-26_04,2023-06-22_02,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jun 25, 2023 at 6:14=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
-m> wrote:
->
-> syzbot reported a warning in __local_bh_enable_ip(). [0]
->
-> Commit 8d61f926d420 ("netlink: fix potential deadlock in
-> netlink_set_err()") converted read_lock(&nl_table_lock) to
-> read_lock_irqsave() in __netlink_diag_dump() to prevent a deadlock.
->
-> However, __netlink_diag_dump() calls sock_i_ino() that uses
-> read_lock_bh() and read_unlock_bh().  read_unlock_bh() finally
-> enables BH even though it should stay disabled until the following
-> read_unlock_irqrestore().
->
-> Using read_lock() in sock_i_ino() would trigger a lockdep splat
-> in another place that was fixed in commit f064af1e500a ("net: fix
-> a lockdep splat"), so let's add another function that would be safe
-> to use under BH disabled.
->
-> [0]:
->
-> Fixes: 8d61f926d420 ("netlink: fix potential deadlock in netlink_set_err(=
-)")
-> Reported-by: syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
-> Closes: https://syzkaller.appspot.com/bug?extid=3D5da61cf6a9bc1902d422
-> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-> ---
->
+octeontx2 and CN10K silicons support Round Robin scheduling. When multiple
+traffic flows reach transmit level with the same priority, with Round Robin
+scheduling traffic flow with the highest quantum value is picked. With this
+support, the user can add multiple classes with the same priority and
+different quantum in htb offload.
 
-Hi Kuniyuki, thanks for the fix, I mistakenly released this syzbot
-bug/report the other day ;)
+This series of patches adds support for the same.
 
-I wonder if we could use __sock_i_ino() instead of sock_i_ino_bh_disabled()=
-,
-and perhaps something like the following to have less copy/pasted code ?
+Patch1: implement transmit schedular allocation algorithm as preparation
+        for support round robin scheduling.
 
-diff --git a/net/core/sock.c b/net/core/sock.c
-index 6e5662ca00fe5638881db11c71c46169d59a2746..146a83c50c5d329fee2e833c4f2=
-ba29e896d7766
-100644
---- a/net/core/sock.c
-+++ b/net/core/sock.c
-@@ -2550,13 +2550,25 @@ kuid_t sock_i_uid(struct sock *sk)
- }
- EXPORT_SYMBOL(sock_i_uid);
+Patch2: Allow quantum parameter in HTB offload mode.
 
--unsigned long sock_i_ino(struct sock *sk)
-+/* Must be called while interrupts are disabled. */
-+unsigned long __sock_i_ino(struct sock *sk)
- {
-        unsigned long ino;
+Patch3: extends octeontx2 htb offload support for  Round Robin scheduling
 
--       read_lock_bh(&sk->sk_callback_lock);
-+       read_lock(&sk->sk_callback_lock);
-        ino =3D sk->sk_socket ? SOCK_INODE(sk->sk_socket)->i_ino : 0;
--       read_unlock_bh(&sk->sk_callback_lock);
-+       read_unlock(&sk->sk_callback_lock);
-+       return ino;
-+}
-+EXPORT_SYMBOL(__sock_i_ino);
-+
-+unsigned long sock_i_ino(struct sock *sk)
-+{
-+       unsigned long ino;
-+
-+       local_bh_disable();
-+       ino =3D __sock_i_ino(sk);
-+       local_bh_enable();
-        return ino;
- }
- EXPORT_SYMBOL(sock_i_ino);
+
+Naveen Mamindlapalli (3):
+  octeontx2-pf: implement transmit schedular allocation algorithm
+  sch_htb: Allow HTB quantum parameter in offload mode
+  octeontx2-pf: htb offload support for Round Robin scheduling
+--
+v2 * change data type of otx2_index_used to reduce size of structure
+     otx2_qos_cfg
+
+
+ .../marvell/octeontx2/nic/otx2_common.c       |   1 +
+ .../marvell/octeontx2/nic/otx2_common.h       |   1 +
+ .../net/ethernet/marvell/octeontx2/nic/qos.c  | 347 ++++++++++++++++--
+ .../net/ethernet/marvell/octeontx2/nic/qos.h  |  11 +-
+ .../net/ethernet/mellanox/mlx5/core/en/qos.c  |   4 +-
+ include/net/pkt_cls.h                         |   1 +
+ net/sched/sch_htb.c                           |   7 +-
+ 7 files changed, 329 insertions(+), 43 deletions(-)
+
+--
+2.17.1
 
