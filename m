@@ -1,64 +1,165 @@
-Return-Path: <netdev+bounces-14011-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14012-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AC7A373E65D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 19:24:18 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EFD1873E65E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 19:24:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 89E7C280E11
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:24:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B6228280E1C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:24:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92EFE125A5;
-	Mon, 26 Jun 2023 17:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EDD96125A7;
+	Mon, 26 Jun 2023 17:24:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ED68E11CB7
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 17:24:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4F402C433C0;
-	Mon, 26 Jun 2023 17:24:12 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687800252;
-	bh=xNQCG2LqF/V/0wlxLGcR8H9p+ZOQ2yyGq0+QJyOPzQg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=BNH+kNKi8O8l3GVSyYaSo3MB8bWZ5fO+4SxhNTQ7uc7t7mAf/UBKThwSdREH4IhrQ
-	 H2u7rDoz6Socw4ZITfyAm+ZEz48il6XwAObaTNlP+Pi140PNK0kUfjaIh4YPfvUnyn
-	 Qp8QDAJw1/A++MIZddAPw45XnUzatsu87wApbZjPajTw1jKsT2FEcQ7+6P9W1bZmgm
-	 26hXP0J4mzhj0AGv3SGwwLKQKncq4RSaUMZD4Ih1CwspXAFkvuAj7dZpq/cLOcHfeO
-	 35yONOdO1Kvk6dhNxnCPp5FZQeE00XzHcup7e36jMNbuK5bi+a31ggGTd/NtrTphVD
-	 FKJUf3ZfcF6mg==
-Date: Mon, 26 Jun 2023 10:24:11 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Jiawen Wu <jiawenwu@trustnetic.com>,
- netdev@vger.kernel.org
-Subject: Re: [PATCH net] net: txgbe: change hw reset mode
-Message-ID: <20230626102411.2b067fa8@kernel.org>
-In-Reply-To: <6964AD00-15BF-4F2D-9473-A84E07025BE8@net-swift.com>
-References: <20230621090645.125466-1-jiawenwu@trustnetic.com>
-	<20230622192158.50da604e@kernel.org>
-	<D61A4E6D-8049-4454-9870-E62C2A980D0C@net-swift.com>
-	<362f04fc-dafb-4091-a0cc-b94931083278@lunn.ch>
-	<6964AD00-15BF-4F2D-9473-A84E07025BE8@net-swift.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBB0B125A5
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 17:24:46 +0000 (UTC)
+Received: from mail-ua1-x92d.google.com (mail-ua1-x92d.google.com [IPv6:2607:f8b0:4864:20::92d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 21789B5;
+	Mon, 26 Jun 2023 10:24:45 -0700 (PDT)
+Received: by mail-ua1-x92d.google.com with SMTP id a1e0cc1a2514c-7943105effbso605494241.1;
+        Mon, 26 Jun 2023 10:24:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687800284; x=1690392284;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=dujPk+6duNP2d1uQS/BC+afoRfdG4+lHXiKhSULvjm4=;
+        b=qULknWVGqlfHHFE6RKEofS3iqzTgUK1xS362rivCouyzRDp0EpzPCCTp5qra30NsHh
+         R2DfV0fErw+8uM8c0M4MvgGCHTcj4UP4gm5WgJPJSio442Gui8KSfpSwydB7oRK1Bvzo
+         ybH1gQjnamNO3685GnrDaDfds3R50w6y7sCAzj/+q/+yt5KyHhCW2If9hc91DKd4mfl/
+         TezrTiSKAJVGN+Th9660Qlin5VaYyNvOVyDxlakamCPiSealD0oSxgBkWJg2JltyzcvO
+         Ga0V4gAFh0MJuNahgW8IqmB+XuGvkqLEjtiMQOY1Wee1S314kWPFOaRFdlVRXrQGXbDp
+         I74g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687800284; x=1690392284;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=dujPk+6duNP2d1uQS/BC+afoRfdG4+lHXiKhSULvjm4=;
+        b=jnkdTuGy83O1fSAU1G+YEx8LqYe9G687XMYGdaiqAC7PQSOkLb9QZU3jtcyaIp/XG/
+         nUfB8Q/2PV8z0KGX4sqkeU6UBlDhMqAQTBdJkDW853TlL2Qe2qMFJ7y6FpM9hhLJk6f+
+         +izclWNDsAcalf7lQ1tAFy12GdoZ5RexW5p+hoNwyMbHBEYghSs4LVyvG5ZDEZn4SNDZ
+         w1aOOMcm0BeKAQJ9Uv75JjIjQZcn0UxeZkHm/mnY4/kwszXKhFubqGg8g5hi/LP7xlxZ
+         bAC9poNWFbuUoFUyjaH+tBb6nrP5AHr5LdO0v2ewz5NM3pYa7/+lG1lwipWDYQkQln95
+         4BCA==
+X-Gm-Message-State: AC+VfDwrg/c+NXXCzuy5kkRwy7+/Zzs/2AlVxqLPRhwxHM5Poe3cdlNa
+	FEB2+OiYVYmSRn4/YgrlZkjJoCmlM2b+HOoBgOU=
+X-Google-Smtp-Source: ACHHUZ4CguV7XgsKSOUJIQqgdZwYCRCvfxWYx7/7i2VzgRfv4+5VoGDlRRxb8amVE4sJFFWZFXdjJHQGzOm9h5BErfY=
+X-Received: by 2002:a05:6102:458f:b0:440:a8a6:333e with SMTP id
+ dx15-20020a056102458f00b00440a8a6333emr7201338vsb.9.1687800284081; Mon, 26
+ Jun 2023 10:24:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+ <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+ <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+ <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
+In-Reply-To: <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Mon, 26 Jun 2023 19:24:32 +0200
+Message-ID: <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 26 Jun 2023 09:56:32 +0800 mengyuanlou@net-swift.com wrote:
-> > That does not answer the question. Is this backwards compatible with
-> > old firmware? =20
->=20
-> Yeah=EF=BC=8Cthe veto bit is not set in old firmware, so they have the sa=
-me effect.
+On Mon, Jun 26, 2023 at 7:15=E2=80=AFPM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Ian Kumlien <ian.kumlien@gmail.com>
+> Date: Mon, 26 Jun 2023 16:25:24 +0200
+>
+> > On Mon, Jun 26, 2023 at 4:18=E2=80=AFPM Alexander Lobakin
+> > <aleksander.lobakin@intel.com> wrote:
+> >>
+> >> From: Ian Kumlien <ian.kumlien@gmail.com>
+> >> Date: Sun, 25 Jun 2023 12:59:54 +0200
+> >>
+> >>> It could actually be that it's related to: rx-gro-list but
+> >>> rx-udp-gro-forwarding makes it trigger quicker...  I have yet to
+> >>> trigger it on igb
+> >>
+> >> Hi, the rx-udp-gro-forwarding author here.
+> >>
+> >> (good thing this appeared on IWL, which I read time to time, but pleas=
+e
+> >>  Cc netdev next time)
+> >> (thus +Cc Jakub, Eric, and netdev)
+> >
+> > Well, two things, it seems like rx-udp-gro-forwarding accelerates it
+> > but the issue is actually in: rx-gro-list
+>
+> Do you enable them simultaneously? I remember, when I was adding
+> gro-fwd, it was working (and working good) as follows:
+>
+> 1. gro-fwd on, gro-list off: gro-fwd
+> 2. gro-fwd off, gro-list on: gro-list
+> 3. gro-fwd on, gro-list on: gro-list
+>
+> Note that their receive paths are independent[0]: skb_gro_receive_list()
+> vs skb_gro_receive(), thus I'm still not really sure how gro-fwd can
+> trigger gro-list's bug.
 
-Why were you using the more complex FW command then rather than just=20
-the register write, previously then?
+Neither am I... I have enabled sol via ipmitool now, will try to get a
+better capture
+
+> > And since i've only been able to trigger it in ixgbe i thought it
+> > might be a driver issue =3D)
+>
+> Your screenshot says "__udp_gso_segment", which means that the
+> problematic UDP GRO packet hits the Tx path. Rx is in general
+> driver-independent. Tx has separate netdev feature ("tx-gso-list"), but
+> it's not supported by any driver, just software stack. It might be that
+> your traffic goes through a bridge or tunnel or anything else that
+> triggers GSO and software segmentation then booms for some reason.
+> BTW, __udp_gso_segment() is one-liner when the passed skb was
+> gro-listed[1], so having it in the bug splat could mean the skb didn't
+> take that route. But hard to say with no full stacktrace.
+
+I do have a UDP tunnel, in wireguard, will disable it.
+
+Beyond that some bridges and veth interfaces, but lets wait for a full trac=
+e
+
+> [...]
+>
+> >>>> But correlating that with the source is beyond me, it could be gener=
+ic
+> >>>> but i thought i'd send it you first since it's part of the redhat
+> >>>> guide to speeding up udp traffic
+> >> [0]
+> >> https://lore.kernel.org/netdev/f83d79d6-f8d7-a229-941a-7d7427975160@nv=
+idia.com
+> >>
+> >> Thanks,
+> >> Olek
+>
+> [0]
+> https://elixir.bootlin.com/linux/latest/source/net/ipv4/udp_offload.c#L51=
+8
+> [1]
+> https://elixir.bootlin.com/linux/latest/source/net/ipv4/udp_offload.c#L27=
+7
+>
+> Thanks,
+> Olek
 
