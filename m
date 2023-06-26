@@ -1,124 +1,220 @@
-Return-Path: <netdev+bounces-14113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4645D73EE35
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:02:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 91E0573EE4F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E28D1C209B0
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:02:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42A53280EDF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E60415AC1;
-	Mon, 26 Jun 2023 22:02:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6880A15AC5;
+	Mon, 26 Jun 2023 22:06:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D3E2154AB;
-	Mon, 26 Jun 2023 22:02:54 +0000 (UTC)
-Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390A73595;
-	Mon, 26 Jun 2023 15:02:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687816946; x=1719352946;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=QK3fdaxZuor5qa3Z/btpNB2OXP4VL4lcuTWSbkk2O98=;
-  b=Vo7+flBjeR53wETWhYnz3XTthbpwXDdnqmSKb16d1nqxjUfkN5Z+oHco
-   xUby4BUXtFkaE7o2j97gn8Y146e9QaXba31p98hMQTChIdYN5Mux30+5K
-   wpZ5TDfqOJp/QS9M6I5qVwmv+t17YhP/leXIBd96C9WS4TOt1r9oz/Kod
-   0fleN37eZseHWcP8YthO0LpkXKZJch79qeTTF6A/eH4X3FDiPK/QkEK6l
-   q5hDhzWaIEDEmEKMyYK1w1akm5mM1jMRbxF37j1hdOAPRrLi94BWvQweF
-   oVUF11enMEKvsIn7WH9KpjsErJgvcI8YxLy7WnmuUC53CO4Z/ClyX+V49
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="341740629"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="341740629"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 15:00:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="710376128"
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="710376128"
-Received: from timot11x-mobl3.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.78.36])
-  by orsmga007-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 15:00:16 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC bpf-next v2 06/11] net: veth: Implement devtx timestamp
- kfuncs
-In-Reply-To: <CAKH8qBt1GHnY2jVac--xymN-ch8iCDftiBckzp9wvTJ7k-3zAg@mail.gmail.com>
-References: <20230621170244.1283336-1-sdf@google.com>
- <20230621170244.1283336-7-sdf@google.com> <87edm1rc4m.fsf@intel.com>
- <CAKH8qBt1GHnY2jVac--xymN-ch8iCDftiBckzp9wvTJ7k-3zAg@mail.gmail.com>
-Date: Mon, 26 Jun 2023 15:00:15 -0700
-Message-ID: <874jmtrij4.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5984214282
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:06:02 +0000 (UTC)
+Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D6CE59CF
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:05:41 -0700 (PDT)
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 79127413A5
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:00:01 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1687816801;
+	bh=WrPgRiS83Y2mIcWHryPXtoWboK6sANlwF7CN0nqeeXc=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=qQM9tTvvQdz58zqZnYVXLY6GLI53DKyGpp1cmabVV0YHUgPFsSGgWn8ds4RphxJfv
+	 bH1U9tqEWSzwYgpf3aE2X/Wm8U9uEG7PNjQ/5wS4X6XOLDwy9QVtPZB7ULdwXAbxOt
+	 I8HrZ8Bb45gBYSyrfX2xnvKhIc/IPglLNJojJaZ7EbRdESmZp3wa7GdUbN+xaoyAlO
+	 ZCzmYwN1N2HYuOtu0vZR7IxNFULCHEMAyP4UYvd/9tqgI7abTqzsxMrUxlDmYWM3CG
+	 xdoM1jEtPXUrxcr64bzKv8lwssKJfsP54g8IAYezRVCB7anJKzXtRrzXQcj8kQoP4S
+	 q6bh4J1FtK1pA==
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b69dcf0d73so17330121fa.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:00:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687816801; x=1690408801;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=WrPgRiS83Y2mIcWHryPXtoWboK6sANlwF7CN0nqeeXc=;
+        b=hMPyIh1aj0DwNoSu35ZyBgCJ5r80MVbsOwCFubjroUn1pp+w3mqYGJsu+tHrgkQJjL
+         EIbJ3T2TFDnVoDyjwqy81P60rR2k8npubK58QKHjgbNmpFn5TRVtumHS7+NR9AnLOUuK
+         jmASUY413aIJfiR/E6AyWfVyqg+461S4SHpnu8yI9ainsrjExKy3z+f0wAYpRe4xMFC+
+         SFTrEKllqvgI2HrpZEoT9wfE/Q7hjtzjZXOsIR9zax5PfFskITOHMx/EDNV0cE+XpH0E
+         DHxmG60X/CgPrIBAwG/hCVvQs3kiKVjbx5KOk67TxTEyfh6ReviTW+dxP7XKBWu7PImw
+         oD6w==
+X-Gm-Message-State: AC+VfDx9KJNTlpZEOiKv9SN7VX36o0aIgm89dXUSRx8Lucf6RSTeXXBc
+	pegsIzP7GSUOLCDrPk//2il5MM70HvRCJVVtWAoqJTHBP4ERf2sWAF/PG+T2GIZaO+Ea/k5kgul
+	H1Bz4JX32lLxfBK9KFPfTGq6bhsRxi53fgA==
+X-Received: by 2002:a2e:8689:0:b0:2b4:6195:bb2f with SMTP id l9-20020a2e8689000000b002b46195bb2fmr17494472lji.25.1687816800744;
+        Mon, 26 Jun 2023 15:00:00 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5kEAG7BKp281vQ4Tc4uIIwnYqIhjtiqYLG/VOPCVutTsyYJTaNlnV0Ghbwg0sP5GAXOWPw1Q==
+X-Received: by 2002:a2e:8689:0:b0:2b4:6195:bb2f with SMTP id l9-20020a2e8689000000b002b46195bb2fmr17494457lji.25.1687816800440;
+        Mon, 26 Jun 2023 15:00:00 -0700 (PDT)
+Received: from amikhalitsyn.local (dslb-002-205-064-187.002.205.pools.vodafone-ip.de. [2.205.64.187])
+        by smtp.gmail.com with ESMTPSA id y7-20020a1709060a8700b0098f99048053sm2097490ejf.148.2023.06.26.14.59.59
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 14:59:59 -0700 (PDT)
+From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+To: davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
+	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Christian Brauner <brauner@kernel.org>,
+	Kuniyuki Iwashima <kuniyu@amazon.com>,
+	linux-bluetooth@vger.kernel.org
+Subject: [PATCH net-next] net: scm: introduce and use scm_recv_unix helper
+Date: Mon, 26 Jun 2023 23:59:51 +0200
+Message-Id: <20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Stanislav Fomichev <sdf@google.com> writes:
+Recently, our friends from bluetooth subsystem reported
+[1] that after ("scm: add SO_PASSPIDFD and SCM_PIDFD")
+scm_recv helper become unusable in kernel modules (because it
+uses unexported pidfd_prepare() API).
 
-> On Fri, Jun 23, 2023 at 4:29=E2=80=AFPM Vinicius Costa Gomes
-> <vinicius.gomes@intel.com> wrote:
->>
->> Stanislav Fomichev <sdf@google.com> writes:
->>
->> > Have a software-based example for kfuncs to showcase how it
->> > can be used in the real devices and to have something to
->> > test against in the selftests.
->> >
->> > Both path (skb & xdp) are covered. Only the skb path is really
->> > tested though.
->> >
->> > Cc: netdev@vger.kernel.org
->> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
->>
->> Not really related to this patch, but to how it would work with
->> different drivers/hardware.
->>
->> In some of our hardware (the ones handled by igc/igb, for example), the
->> timestamp notification comes some time after the transmit completion
->> event.
->>
->> From what I could gather, the idea would be for the driver to "hold" the
->> completion until the timestamp is ready and then signal the completion
->> of the frame. Is that right?
->
-> Yeah, that might be the option. Do you think it could work?
->
+We were aware of this issue and workarounded it in a hard way
+by ("af_unix: Kconfig: make CONFIG_UNIX bool").
 
-For the skb and XDP cases, yeah, just holding the completion for a while
-seems like it's going to work.
+But recently a new functionality was added in the scope of
+817efd3cad74 ("Bluetooth: hci_sock: Forward credentials to monitor")
+and after that bluetooth can't be compiled as a kernel module.
 
-XDP ZC looks more complicated to me, not sure if it's only a matter of
-adding something like:
+After some discussion in [1] we decided to split scm_recv into
+two helpers, one won't support SCM_PIDFD (used for unix sockets),
+and another one will be completely the same as it was before
+("scm: add SO_PASSPIDFD and SCM_PIDFD").
 
-void xsk_tx_completed_one(struct xsk_buff_pool *pool, struct xdp_buff *xdp);
+[1] https://lore.kernel.org/lkml/CAJqdLrpFcga4n7wxBhsFqPQiN8PKFVr6U10fKcJ9W7AcZn+o6Q@mail.gmail.com/
 
-Or if more changes would be needed. I am trying to think about the case
-that the user sent a single "timestamp" packet among a bunch of
-"non-timestamp" packets.
+Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Christian Brauner <brauner@kernel.org>
+Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: linux-kernel@vger.kernel.org
+Cc: linux-bluetooth@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
+---
+ include/net/scm.h  | 35 +++++++++++++++++++++++++----------
+ net/unix/af_unix.c |  4 ++--
+ 2 files changed, 27 insertions(+), 12 deletions(-)
 
+diff --git a/include/net/scm.h b/include/net/scm.h
+index c67f765a165b..409b8efda2c9 100644
+--- a/include/net/scm.h
++++ b/include/net/scm.h
+@@ -151,8 +151,8 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
+ 		fd_install(pidfd, pidfd_file);
+ }
+ 
+-static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
+-				struct scm_cookie *scm, int flags)
++static inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
++					 struct scm_cookie *scm, int flags)
+ {
+ 	if (!msg->msg_control) {
+ 		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
+@@ -160,7 +160,7 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
+ 		    scm->fp || scm_has_secdata(sock))
+ 			msg->msg_flags |= MSG_CTRUNC;
+ 		scm_destroy(scm);
+-		return;
++		return false;
+ 	}
+ 
+ 	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
+@@ -173,19 +173,34 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
+ 		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
+ 	}
+ 
+-	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
+-		scm_pidfd_recv(msg, scm);
++	scm_passec(sock, msg, scm);
+ 
+-	scm_destroy_cred(scm);
++	if (scm->fp)
++		scm_detach_fds(msg, scm);
+ 
+-	scm_passec(sock, msg, scm);
++	return true;
++}
+ 
+-	if (!scm->fp)
++static inline void scm_recv(struct socket *sock, struct msghdr *msg,
++				struct scm_cookie *scm, int flags)
++{
++	if (!__scm_recv_common(sock, msg, scm, flags))
+ 		return;
+-	
+-	scm_detach_fds(msg, scm);
++
++	scm_destroy_cred(scm);
+ }
+ 
++static inline void scm_recv_unix(struct socket *sock, struct msghdr *msg,
++				     struct scm_cookie *scm, int flags)
++{
++	if (!__scm_recv_common(sock, msg, scm, flags))
++		return;
++
++	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
++		scm_pidfd_recv(msg, scm);
++
++	scm_destroy_cred(scm);
++}
+ 
+ #endif /* __LINUX_NET_SCM_H */
+ 
+diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
+index f2f234f0b92c..20ac83e012e4 100644
+--- a/net/unix/af_unix.c
++++ b/net/unix/af_unix.c
+@@ -2427,7 +2427,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
+ 	}
+ 	err = (flags & MSG_TRUNC) ? skb->len - skip : size;
+ 
+-	scm_recv(sock, msg, &scm, flags);
++	scm_recv_unix(sock, msg, &scm, flags);
+ 
+ out_free:
+ 	skb_free_datagram(sk, skb);
+@@ -2808,7 +2808,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
+ 
+ 	mutex_unlock(&u->iolock);
+ 	if (state->msg && check_creds)
+-		scm_recv(sock, state->msg, &scm, flags);
++		scm_recv_unix(sock, state->msg, &scm, flags);
+ 	else
+ 		scm_destroy(&scm);
+ out:
+-- 
+2.34.1
 
-Cheers,
---=20
-Vinicius
 
