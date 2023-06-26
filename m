@@ -1,127 +1,163 @@
-Return-Path: <netdev+bounces-13961-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13962-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D6DA273E317
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:21:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A233C73E334
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:24:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CF13280DC1
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:21:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C688280D9D
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:24:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A214DBA49;
-	Mon, 26 Jun 2023 15:21:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2C40BE58;
+	Mon, 26 Jun 2023 15:24:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92E08BE5B
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:21:30 +0000 (UTC)
-Received: from mail-ot1-x32c.google.com (mail-ot1-x32c.google.com [IPv6:2607:f8b0:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0B44218E;
-	Mon, 26 Jun 2023 08:21:29 -0700 (PDT)
-Received: by mail-ot1-x32c.google.com with SMTP id 46e09a7af769-6b73741a632so1531177a34.3;
-        Mon, 26 Jun 2023 08:21:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687792888; x=1690384888;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=U7yKgaTyZsXh/LVlqDwX9ljmxURKTiccXbAlSGToiHo=;
-        b=Tjt5O7M7jioM8v1Toy2pI9OfzlJeKKDu+DWcLnjVGtnbDktNv+pDXB85tYgfkIi8Yf
-         clTgzs36PawH2B5mrkGWKfKzYPVKg1UAM3XCVpPHAgr4SFfsqRNQ2zbM7MDY98su4M3f
-         sQxMD43E7nFYe72FJpLoGHrymFRxI5Sv/oUcDgMsso8CK54UI+iFTX6lfwfQrLCeOAIe
-         +lYsMWsaHbWPSmZoVOT/+X3D96MNULl2sW8iOpFfLD/xZdLa3rICUtO+Ssbu+MLZJOce
-         BhlWpuyGIoLwPFbe/0wJ533GCiBsSvx6058d82i8TLEOQOGxfE5Yw2JMMOC3Zf/81Mcj
-         8Ccg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A430EBA4A
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:24:22 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8585011D
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:24:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687793060;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=pNcIf8DGlU4ngflbaStrLY/OgH3ZgZfAt2j/tScjlPs=;
+	b=Dl6pKlNRhDXxOvVjstL54kQe5jsPuQwLfGaC2Hr/9G1QQzbFZlonJYVd7hAu3WVc3INDjr
+	gDn+RY12p7OyR+XHfJf6Q7m66ZVjKTOySmWctLSUFEIGm9vJX6mJG5mTQV82DrF1aWkeuT
+	LXQyg7bNDuRxNhzH+KBnK3RSw4MvlFQ=
+Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
+ [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-483-CXoiVzLQP8mwx3S4jva-ug-1; Mon, 26 Jun 2023 11:24:13 -0400
+X-MC-Unique: CXoiVzLQP8mwx3S4jva-ug-1
+Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7624ca834b5so482862685a.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687792888; x=1690384888;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=U7yKgaTyZsXh/LVlqDwX9ljmxURKTiccXbAlSGToiHo=;
-        b=I+8KGYeSL5++m9iPn1xU4BpPzYvVWl56/st32UuDtGA6ivl6aNHdF7DOFgQpPxzfVn
-         a8LDh2QfJiG43AhDp1ELLC7hFIzGjmo3UfM6FyhPIMDYUuUcYOIRZ7etzrrQRnLff663
-         6YGGE+0Bdeylpd3xcnwkJ1I03G5B4Q15GqeA22Te+IONovBuaRaD1LscXI+e5t+QoUTm
-         oejkQadllvU8ALAxOpoLRfJtKk6/5Evc6dWacQ7MtPJLFplH5W1fw+oEDMgO4AN9tEfU
-         DrwmLLiHlWyR99z9opg840KhAbe3hVUav7r6DJipgmwfVohnIbRFxwFlp71PBGWEtk5v
-         3Oww==
-X-Gm-Message-State: AC+VfDysTYHFLy5fJAX2gJkf3XRfpH/0PQUDT6wFHR8TDMNArl4hZZas
-	ECRQsxEyzWG5cFnsKngoATc=
-X-Google-Smtp-Source: ACHHUZ5wqv+0eYYAwSPD6a/T5HCMJ1GPot627Zd3ObnUIycb4X9Nq4NcidPVG6HtiBEAV0Du0HSGCA==
-X-Received: by 2002:a05:6830:1041:b0:6b7:1d92:3796 with SMTP id b1-20020a056830104100b006b71d923796mr9333165otp.22.1687792888297;
-        Mon, 26 Jun 2023 08:21:28 -0700 (PDT)
-Received: from [192.168.1.119] ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id l15-20020a9d6a8f000000b006b58e0ef27esm407894otq.39.2023.06.26.08.21.27
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jun 2023 08:21:27 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <6afa0ebc-1d3f-8cba-79dc-8ddfe13c296a@lwfinger.net>
-Date: Mon, 26 Jun 2023 10:21:26 -0500
+        d=1e100.net; s=20221208; t=1687793052; x=1690385052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pNcIf8DGlU4ngflbaStrLY/OgH3ZgZfAt2j/tScjlPs=;
+        b=js6ERpd8rzwNR+KkamfBsfvAhBlcRGZlXjvD6Dg8lW/XOw/Ws4iInL5Y8ugvLaCfFr
+         sdrsUkEDeXc1xh4eIqJ99p21aSjjQpDN7BIOR482uOtHPCtLb8C71tnYENiYC6CUoEU/
+         mFiH+e+WB7e9f7SFbLyQyU62CbEG/ioALZN85VBhrI3/PDotQOs4GaCE94DHEvcLJ/N9
+         Zk0+jZVEX+uZxqzNrVsC3zJ5nhBltgUB4gagf144RZPKZkTxu4XKRwoKXPUdhMe5ypSi
+         AAjJ5XVznB6QahKoTqjtw/ZcdHxvDkyTaU6OmxJd416aIh8JsLTK00oToX7XK9NE6tPH
+         8KNQ==
+X-Gm-Message-State: AC+VfDydCIwkpcIk3QFrFEVrpepJgAYQZ3b8gzKyaoIgXpDwnwo+NUIe
+	vt5QK4Xw+XlT4pqbZ+Mf103CeZirYzFLw99lcpKiIg7RunOYa/z3SFr7tYaNXU6uq4gxiiw+n9Y
+	s4vYIbiv2LB+ghYL8
+X-Received: by 2002:a05:620a:880f:b0:75b:23a1:363d with SMTP id qj15-20020a05620a880f00b0075b23a1363dmr20468176qkn.78.1687793052464;
+        Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ67krRALDwbYzxNGPfYizrvdl7LS+HU+avZAWHRkye9gBvomn4n/ypyeI8Y0aTbS2T5cmmDUw==
+X-Received: by 2002:a05:620a:880f:b0:75b:23a1:363d with SMTP id qj15-20020a05620a880f00b0075b23a1363dmr20468165qkn.78.1687793052227;
+        Mon, 26 Jun 2023 08:24:12 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
+        by smtp.gmail.com with ESMTPSA id y24-20020a37e318000000b007579ea33cdesm2785460qki.62.2023.06.26.08.24.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 08:24:11 -0700 (PDT)
+Date: Mon, 26 Jun 2023 17:24:07 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v4 02/17] vhost/vsock: read data from non-linear skb
+Message-ID: <vpcrdclcic7oiuat4oapnkj54dolld6hh2wixe3fozlthyt2ni@omyjyem3uj3t>
+References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
+ <20230603204939.1598818-3-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
-Content-Language: en-US
-To: Sardonimous <sardonimous@hotmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>
-Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
- kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
- Kalle Valo <kvalo@kernel.org>
-References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
- <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
- <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
- <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
- <RO2P215MB193879B2D99DD0BAF59EFA92A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <e0a08449-554a-4a28-ac50-7051866eb95e@app.fastmail.com>
- <da80b806-de3f-c7ea-0352-cd23e0f6dd65@lwfinger.net>
- <RO2P215MB1938BD13105900F3525E0FE7A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <67faf4f4-f36c-3ff7-03b8-cd259e4a5548@lwfinger.net>
- <RO2P215MB1938BA68BBB683EC696F4BFAA726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-In-Reply-To: <RO2P215MB1938BA68BBB683EC696F4BFAA726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii; format=flowed
+Content-Disposition: inline
+In-Reply-To: <20230603204939.1598818-3-AVKrasnov@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/26/23 07:44, Sardonimous wrote:
-> If I were to send you some test patches, could you create a kernel with them 
-> applied?
-> 
-> Doubtful.
+On Sat, Jun 03, 2023 at 11:49:24PM +0300, Arseniy Krasnov wrote:
+>This adds copying to guest's virtio buffers from non-linear skbs. Such
+>skbs are created by protocol layer when MSG_ZEROCOPY flags is used. It
+>changes call of 'copy_to_iter()' to 'skb_copy_datagram_iter()'. Second
+>function can read data from non-linear skb.
+>
+>See commit to 'net/vmw_vsock/virtio_transport_common.c' with the same
+>name for more details.
 
-Sardonimous,
+I think it's okay if we report the same details here.
 
-OK, that essentially eliminates  getting DMA to work. The cost of a MacBookPro7 
-is too much for me to acquire one to debug that issue.
+>
+>Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>---
+> drivers/vhost/vsock.c | 12 +++++++-----
+> 1 file changed, 7 insertions(+), 5 deletions(-)
+>
+>diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+>index 6578db78f0ae..b254aa4b756a 100644
+>--- a/drivers/vhost/vsock.c
+>+++ b/drivers/vhost/vsock.c
+>@@ -156,7 +156,7 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		}
+>
+> 		iov_iter_init(&iov_iter, ITER_DEST, &vq->iov[out], in, iov_len);
+>-		payload_len = skb->len;
+>+		payload_len = skb->len - VIRTIO_VSOCK_SKB_CB(skb)->frag_off;
 
-On my PowerBook G4, I also got the failure to connect, thus I should be able to 
-fix that problem, but getting a new kernel with the fix onto your machine will 
-not be easy.
+Also here a variable should make the code more readable.
 
-Is it possible to ssh into your machine, or to use TeamViewer? Those questions 
-do not need an answer now, but think about them.
+Stefano
 
-Larry
-
-
+> 		hdr = virtio_vsock_hdr(skb);
+>
+> 		/* If the packet is greater than the space available in the
+>@@ -197,8 +197,10 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 			break;
+> 		}
+>
+>-		nbytes = copy_to_iter(skb->data, payload_len, &iov_iter);
+>-		if (nbytes != payload_len) {
+>+		if (skb_copy_datagram_iter(skb,
+>+					   VIRTIO_VSOCK_SKB_CB(skb)->frag_off,
+>+					   &iov_iter,
+>+					   payload_len)) {
+> 			kfree_skb(skb);
+> 			vq_err(vq, "Faulted on copying pkt buf\n");
+> 			break;
+>@@ -212,13 +214,13 @@ vhost_transport_do_send_pkt(struct vhost_vsock *vsock,
+> 		vhost_add_used(vq, head, sizeof(*hdr) + payload_len);
+> 		added = true;
+>
+>-		skb_pull(skb, payload_len);
+>+		VIRTIO_VSOCK_SKB_CB(skb)->frag_off += payload_len;
+> 		total_len += payload_len;
+>
+> 		/* If we didn't send all the payload we can requeue the packet
+> 		 * to send it with the next available buffer.
+> 		 */
+>-		if (skb->len > 0) {
+>+		if (VIRTIO_VSOCK_SKB_CB(skb)->frag_off < skb->len) {
+> 			hdr->flags |= cpu_to_le32(flags_to_restore);
+>
+> 			/* We are queueing the same skb to handle
+>-- 
+>2.25.1
+>
 
 
