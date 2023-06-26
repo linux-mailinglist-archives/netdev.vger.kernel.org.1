@@ -1,220 +1,173 @@
-Return-Path: <netdev+bounces-14114-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14115-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 91E0573EE4F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:06:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 276F073EE92
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:18:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42A53280EDF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:06:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C758E280C29
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6880A15AC5;
-	Mon, 26 Jun 2023 22:06:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C280E15AE3;
+	Mon, 26 Jun 2023 22:18:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5984214282
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:06:02 +0000 (UTC)
-Received: from smtp-relay-internal-1.canonical.com (smtp-relay-internal-1.canonical.com [185.125.188.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0D6CE59CF
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:05:41 -0700 (PDT)
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com [209.85.208.197])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-internal-1.canonical.com (Postfix) with ESMTPS id 79127413A5
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:00:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1687816801;
-	bh=WrPgRiS83Y2mIcWHryPXtoWboK6sANlwF7CN0nqeeXc=;
-	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
-	b=qQM9tTvvQdz58zqZnYVXLY6GLI53DKyGpp1cmabVV0YHUgPFsSGgWn8ds4RphxJfv
-	 bH1U9tqEWSzwYgpf3aE2X/Wm8U9uEG7PNjQ/5wS4X6XOLDwy9QVtPZB7ULdwXAbxOt
-	 I8HrZ8Bb45gBYSyrfX2xnvKhIc/IPglLNJojJaZ7EbRdESmZp3wa7GdUbN+xaoyAlO
-	 ZCzmYwN1N2HYuOtu0vZR7IxNFULCHEMAyP4UYvd/9tqgI7abTqzsxMrUxlDmYWM3CG
-	 xdoM1jEtPXUrxcr64bzKv8lwssKJfsP54g8IAYezRVCB7anJKzXtRrzXQcj8kQoP4S
-	 q6bh4J1FtK1pA==
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b69dcf0d73so17330121fa.2
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:00:01 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687816801; x=1690408801;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=WrPgRiS83Y2mIcWHryPXtoWboK6sANlwF7CN0nqeeXc=;
-        b=hMPyIh1aj0DwNoSu35ZyBgCJ5r80MVbsOwCFubjroUn1pp+w3mqYGJsu+tHrgkQJjL
-         EIbJ3T2TFDnVoDyjwqy81P60rR2k8npubK58QKHjgbNmpFn5TRVtumHS7+NR9AnLOUuK
-         jmASUY413aIJfiR/E6AyWfVyqg+461S4SHpnu8yI9ainsrjExKy3z+f0wAYpRe4xMFC+
-         SFTrEKllqvgI2HrpZEoT9wfE/Q7hjtzjZXOsIR9zax5PfFskITOHMx/EDNV0cE+XpH0E
-         DHxmG60X/CgPrIBAwG/hCVvQs3kiKVjbx5KOk67TxTEyfh6ReviTW+dxP7XKBWu7PImw
-         oD6w==
-X-Gm-Message-State: AC+VfDx9KJNTlpZEOiKv9SN7VX36o0aIgm89dXUSRx8Lucf6RSTeXXBc
-	pegsIzP7GSUOLCDrPk//2il5MM70HvRCJVVtWAoqJTHBP4ERf2sWAF/PG+T2GIZaO+Ea/k5kgul
-	H1Bz4JX32lLxfBK9KFPfTGq6bhsRxi53fgA==
-X-Received: by 2002:a2e:8689:0:b0:2b4:6195:bb2f with SMTP id l9-20020a2e8689000000b002b46195bb2fmr17494472lji.25.1687816800744;
-        Mon, 26 Jun 2023 15:00:00 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5kEAG7BKp281vQ4Tc4uIIwnYqIhjtiqYLG/VOPCVutTsyYJTaNlnV0Ghbwg0sP5GAXOWPw1Q==
-X-Received: by 2002:a2e:8689:0:b0:2b4:6195:bb2f with SMTP id l9-20020a2e8689000000b002b46195bb2fmr17494457lji.25.1687816800440;
-        Mon, 26 Jun 2023 15:00:00 -0700 (PDT)
-Received: from amikhalitsyn.local (dslb-002-205-064-187.002.205.pools.vodafone-ip.de. [2.205.64.187])
-        by smtp.gmail.com with ESMTPSA id y7-20020a1709060a8700b0098f99048053sm2097490ejf.148.2023.06.26.14.59.59
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 14:59:59 -0700 (PDT)
-From: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
-To: davem@davemloft.net
-Cc: linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>,
-	Luiz Augusto von Dentz <luiz.von.dentz@intel.com>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B129E13AD1
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:18:36 +0000 (UTC)
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2086.outbound.protection.outlook.com [40.107.105.86])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1492093;
+	Mon, 26 Jun 2023 15:18:35 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=l4K66eRMgiGjcZ9kFrm/Qhd89fCsCCddBetkLxfyrIahJHVfkDB911lEzXOfm7zyKdHY9rJF54s6mLepS0Sl7gfSrRL7yAuMRwiRmi5zRCcuJaIgBPVtGRqLq30Tx1O/WmIYGwIjw1NjVIMz6+o18nBP4LB4PlLTSJXHXS4WeuqRF5amPrhWKI/duSefj1NO4cI9og5BEOO48UQV6bp7tdKFgaYfI5k9zw3s/GQSWInoZglefMKqJDECay+4E37Cn9/heHWQXf3PEsj1s71EIo6xDpJvruDS3KMxzPvy4RNLmwiJdMC7702qUC6fu+NfXk2ZpXqBdoDk99x5V2Wlsw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9kI/gw8SKfiSKqDR8uaPmeAjHZ7Lubzqvx3MLZko33A=;
+ b=hLxdAbgQ73TKCd/oQUe23e3UCZKoScOX3loT23nVq3zeXZo90MQecpjG11uAvlbMh20XIcg+Km10RI48nGA7g26RlMX2J+DAhyEAh9grcl7mXcDy4QVwUJTG8Y4B2Kky/ClQ6KOTglZaH8bFGwPVoOrj2F5cEcOugt/1YHqsWaxF6NBDclBgnxGSD69qCdz1celBsFYKjQP3NaehkXUs52BrXkU73+7bynxON+nI4zAEIs3m6efZjpvW1r96/mCIVDo0CI4iWDTUsFWw/NOffLmHMDyPZO9hCZGO8hGZ1xTuKLlqDfvyHn8xKZbccMJ8b5hVzOXF2oqHXzEhUGZy4w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=9kI/gw8SKfiSKqDR8uaPmeAjHZ7Lubzqvx3MLZko33A=;
+ b=cPlwX+aQJ+YA7PVB3lNUtU3ggIaGdYDb4Hg82FLVjzVeIJ7mlaceT+Xf7CCogll0V/v0qyoVFgq0bI2vR0xEyF4TivKY7xqB8onNaxvd7vzUTU7SOIsulP1fsYKQjaw/EH0DKWCQG0bbYV32jlFvavacqADy0jQsTN5f/nLVT7Y=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM9PR04MB8306.eurprd04.prod.outlook.com (2603:10a6:20b:3e4::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Mon, 26 Jun
+ 2023 22:18:32 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6521.026; Mon, 26 Jun 2023
+ 22:18:32 +0000
+Date: Tue, 27 Jun 2023 01:18:28 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Kuniyuki Iwashima <kuniyu@amazon.com>,
-	linux-bluetooth@vger.kernel.org
-Subject: [PATCH net-next] net: scm: introduce and use scm_recv_unix helper
-Date: Mon, 26 Jun 2023 23:59:51 +0200
-Message-Id: <20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com>
-X-Mailer: git-send-email 2.34.1
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: dsa: tag_sja1105: always prefer source port
+ information from INCL_SRCPT
+Message-ID: <20230626221828.qzjeo6dedjnyme6k@skbuf>
+References: <20230626155112.3155993-1-vladimir.oltean@nxp.com>
+ <20230626155112.3155993-3-vladimir.oltean@nxp.com>
+ <ZJnU6WntVQW2AgvZ@corigine.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJnU6WntVQW2AgvZ@corigine.com>
+X-ClientProxiedBy: FR2P281CA0100.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9c::14) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB8306:EE_
+X-MS-Office365-Filtering-Correlation-Id: 43c6c987-da5a-48d4-b80d-08db769346d0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	9cCsSUwNI38JfP77L8NCtt8AWi2GNrTSKSKW8IxE1o4vRt91+vqshKxpr06vTBeLiZWhPx53QYzuV8hmwrXDTlbXZ0VS/o4rjpnX+qmO0KlcKaDXu4CTk0tNhQt7d6ksvCYFhOAHnhWN6rn/DN6/56PyjcUqpc4zOUuzxwITGK3OyUmaM/4NiiqgkzwXD8o9yiE8nZLwTVja7Y1iAbURAoAzIbLX81cD6j3TRwbc4ASrtk8Wmnm3ZCjNfhOtmHbKXh3kxeJVOP+QApn1xTEKdGkLqJhrkksrtUu6IprQyvurcjuzae8Dcy5l0E5Bk77lHFd1bdCSKWFmyoBKxJXTABMXDdvSIbk+rUupJMBIHEMDJNuL9pQdcZWgVRnK3Lf02AGj+ij6lPVklEjLpv5AgVLM4sn2RhWN/EDQCl9+7lsomvkMa+UsWBAcjq0oG4tiVP9MOe1IKvR2XBUSJJwqftxo4vmIlEFwzs1N1qFMdKHCOmIdoh243vB2BegL+aasGneQqSDgi0LxM9KWR2LOR6c7kKX0pHYMv8Q3e4rhKZ8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(136003)(346002)(376002)(396003)(39860400002)(366004)(451199021)(26005)(2906002)(44832011)(186003)(33716001)(8676002)(6666004)(6916009)(478600001)(54906003)(316002)(966005)(6486002)(4326008)(86362001)(38100700002)(1076003)(41300700001)(5660300002)(83380400001)(8936002)(66476007)(66556008)(66946007)(9686003)(6512007)(6506007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?L6/wY2FbVXYPMQgCHGLQUJ/tKNr3ujAGw6vR9i824SzgG1dQ0sqrcb7TARFk?=
+ =?us-ascii?Q?cDWZ8LspCiFXWuppJucv4Oq8DRT/XuvfmhAU5xrbNeWNcugAugCusLPINE/Q?=
+ =?us-ascii?Q?VfHito+tDxpajsPC/j3/U3LOWOOen220QBVWROB27iI7o986hDQpppECU+Xf?=
+ =?us-ascii?Q?C4ZHq+w7ZVhqWkf21YrHqb2vaoIMcY5w+PjiQhNnZlePd6g7zo5IisvxQlfF?=
+ =?us-ascii?Q?1ox1lGBeOjtzCFnYGrVhcQqy5JSf88NdmaXIByZ8i6uyW2ixEczrfrSu0bbM?=
+ =?us-ascii?Q?Y43mr2Ccf7KEmgoiFrqmL0E1rh1uSvVeoMsffPzjcFrUIzpRr5bUmdlVUZ7F?=
+ =?us-ascii?Q?e3zMhHjNRpDDmbVDWZwHum7I842h6XA7GlbJeAMI04+4XTqtHPIgcw41wau5?=
+ =?us-ascii?Q?oHfh7naH2KM7z3dvEjPoxC/RGHqDj62bpQr/3waYX71QGrWflXccsiV0HqA1?=
+ =?us-ascii?Q?3WcE2AT1CEYXQJqiE3srpXA4VcdnxOzodaZ3F33HRVXSmnvi+ypOx2h1PoFv?=
+ =?us-ascii?Q?NgkJpMHknL9KBS01olOjg3re7/JQTDktIrVOcjaFlTJivEYWU+KLLKFVZBlB?=
+ =?us-ascii?Q?W7h5I5CD5VbJtq1AQsENYl/yf+GLe5QhuCLHE2CSPBIcES1t1v1ZjXD3U9i3?=
+ =?us-ascii?Q?LbqboW+sJtH8y1UP75/MtCqRjg45Z+vzWbekVYfM0t/ZLvPsz9lNhDHGftCF?=
+ =?us-ascii?Q?fF6NzNakoQjMzENsdvrphm7UoEH9YgIlHwwh3LqbL7jvRY3muPQMgxPq4XyP?=
+ =?us-ascii?Q?OKGJlp+Y2NlE1ptfc/Wd/5ztcgZ5Ao0sy0pwzoTwTD8/whgwkM55M1Fp6ZvT?=
+ =?us-ascii?Q?Ht6A/E19eEDaWefMZws3mqnoGKR343bb6iamVOhXV9uCsQVrnSJHXDvCJ2w+?=
+ =?us-ascii?Q?is+i+jc0yrxbaJBUjNIhzaggjWzYtKFi3YwoOcnHC0cRi+yPgV8iZruSYptY?=
+ =?us-ascii?Q?oexEBcXhoc8LW+MI86Wnx4JG1ZAgPblo9LHKecfYiMtDx+M/HK1/F+e5m/ku?=
+ =?us-ascii?Q?L5lbbbD7ZZYvKoG3s8DrEDonMQx55qJfjIKUdXnaMZajlqv/kIMwsiuJjHe4?=
+ =?us-ascii?Q?vf+h1p09sIHm9YmD6Z70vS8nmJrzAQ36myiaepO/yqs/iw8ApwuFSKoVKeZY?=
+ =?us-ascii?Q?ZrEguDTU/gniT1KL+TX8Bn4Z+MwcrogyKMXICCyixzzFM/istLIr743W7pko?=
+ =?us-ascii?Q?SmoVhx506P28PaKkfjI65gr0EOK+QtF9x1h3s1Fyccofcc2H6YmAmbSf6QCH?=
+ =?us-ascii?Q?XLHwwOOxVf763Z8720Ydzls/srCNYhfa1dfgN9DNqoyqdwbqmCEl51dy2mRV?=
+ =?us-ascii?Q?lSVsiXYc5iQNU01NKC3Md8+b4wKsa+q/Wzm5OiPQrUvQwf5+UzbVxok/xdpp?=
+ =?us-ascii?Q?PDbmGhLuA6ikX0enheTnVaYF+14B8Zb1Crfv6K1CuLhVOKuLFDJqlTqYoIgu?=
+ =?us-ascii?Q?2Up3mCpONKHt55CmGWh761vw7JTx0eG6McT+8lo6vNKka6wR4t1v3oHWSlki?=
+ =?us-ascii?Q?tEGT7FKF5GhHEh2wcTDzUkdel1BX1hbQthp/23y4BDs70hgdSpT15hDzU5yS?=
+ =?us-ascii?Q?olNEHRh/7k6bTN/qdP0VreaCvz9JpcC2xkHALZUkFBwpojcyrvLOGHESsMid?=
+ =?us-ascii?Q?xg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 43c6c987-da5a-48d4-b80d-08db769346d0
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 22:18:32.4769
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IQuZDxkxmNHXffmciEGqPabriC5wdSJcndITsN1NNXnVkqashsuqf3PvM+pyy8EIBfPTcUAFAoaFUcGkSRJIbw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8306
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Recently, our friends from bluetooth subsystem reported
-[1] that after ("scm: add SO_PASSPIDFD and SCM_PIDFD")
-scm_recv helper become unusable in kernel modules (because it
-uses unexported pidfd_prepare() API).
+Hi Simon,
 
-We were aware of this issue and workarounded it in a hard way
-by ("af_unix: Kconfig: make CONFIG_UNIX bool").
+On Mon, Jun 26, 2023 at 08:11:53PM +0200, Simon Horman wrote:
+> Hi Vladimir,
+> 
+> A similar comment to that made for [1], though the code is somewhat
+> different to that case: are you sure vid is initialised here?
+> GCC 12 and Smatch seem unsure about it.
+> 
+> [1] Re: [PATCH net-next v2 4/7] net: dsa: vsc73xx: Add dsa tagging based on 8021q
+>     https://lore.kernel.org/all/ZJg2M+Qvg3Fv73CH@corigine.com/
 
-But recently a new functionality was added in the scope of
-817efd3cad74 ("Bluetooth: hci_sock: Forward credentials to monitor")
-and after that bluetooth can't be compiled as a kernel module.
+"vid" can be uninitialized if the tagger is fed a junk packet (a
+non-link-local, non-meta packet that also has no tag_8021q header).
 
-After some discussion in [1] we decided to split scm_recv into
-two helpers, one won't support SCM_PIDFD (used for unix sockets),
-and another one will be completely the same as it was before
-("scm: add SO_PASSPIDFD and SCM_PIDFD").
+The immediate answer that comes to mind is: it depends on how the driver
+configures the hardware to send packets to the CPU (and it will never
+configure the switch in that way).
 
-[1] https://lore.kernel.org/lkml/CAJqdLrpFcga4n7wxBhsFqPQiN8PKFVr6U10fKcJ9W7AcZn+o6Q@mail.gmail.com/
+But, between the sja1105 driver configuring the switch in a certain way
+and the tag_sja1105 driver seeing the results of that, there's also the
+DSA master driver (can be any net_device) which can alter the packet in
+a nonsensical way, like remove the VLAN header for some reason.
 
-Cc: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>
-Cc: Eric Dumazet <edumazet@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>
-Cc: Christian Brauner <brauner@kernel.org>
-Cc: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: linux-kernel@vger.kernel.org
-Cc: linux-bluetooth@vger.kernel.org
-Cc: netdev@vger.kernel.org
-Signed-off-by: Alexander Mikhalitsyn <aleksandr.mikhalitsyn@canonical.com>
----
- include/net/scm.h  | 35 +++++++++++++++++++++++++----------
- net/unix/af_unix.c |  4 ++--
- 2 files changed, 27 insertions(+), 12 deletions(-)
+Considering the fact that the DSA master can have tc rules on its
+ingress path which do just that, it would probably be wise to be
+defensive about this. So I can probably add:
 
-diff --git a/include/net/scm.h b/include/net/scm.h
-index c67f765a165b..409b8efda2c9 100644
---- a/include/net/scm.h
-+++ b/include/net/scm.h
-@@ -151,8 +151,8 @@ static __inline__ void scm_pidfd_recv(struct msghdr *msg, struct scm_cookie *scm
- 		fd_install(pidfd, pidfd_file);
- }
- 
--static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
--				struct scm_cookie *scm, int flags)
-+static inline bool __scm_recv_common(struct socket *sock, struct msghdr *msg,
-+					 struct scm_cookie *scm, int flags)
- {
- 	if (!msg->msg_control) {
- 		if (test_bit(SOCK_PASSCRED, &sock->flags) ||
-@@ -160,7 +160,7 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
- 		    scm->fp || scm_has_secdata(sock))
- 			msg->msg_flags |= MSG_CTRUNC;
- 		scm_destroy(scm);
--		return;
-+		return false;
- 	}
- 
- 	if (test_bit(SOCK_PASSCRED, &sock->flags)) {
-@@ -173,19 +173,34 @@ static __inline__ void scm_recv(struct socket *sock, struct msghdr *msg,
- 		put_cmsg(msg, SOL_SOCKET, SCM_CREDENTIALS, sizeof(ucreds), &ucreds);
- 	}
- 
--	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
--		scm_pidfd_recv(msg, scm);
-+	scm_passec(sock, msg, scm);
- 
--	scm_destroy_cred(scm);
-+	if (scm->fp)
-+		scm_detach_fds(msg, scm);
- 
--	scm_passec(sock, msg, scm);
-+	return true;
-+}
- 
--	if (!scm->fp)
-+static inline void scm_recv(struct socket *sock, struct msghdr *msg,
-+				struct scm_cookie *scm, int flags)
-+{
-+	if (!__scm_recv_common(sock, msg, scm, flags))
- 		return;
--	
--	scm_detach_fds(msg, scm);
-+
-+	scm_destroy_cred(scm);
- }
- 
-+static inline void scm_recv_unix(struct socket *sock, struct msghdr *msg,
-+				     struct scm_cookie *scm, int flags)
-+{
-+	if (!__scm_recv_common(sock, msg, scm, flags))
-+		return;
-+
-+	if (test_bit(SOCK_PASSPIDFD, &sock->flags))
-+		scm_pidfd_recv(msg, scm);
-+
-+	scm_destroy_cred(scm);
-+}
- 
- #endif /* __LINUX_NET_SCM_H */
- 
-diff --git a/net/unix/af_unix.c b/net/unix/af_unix.c
-index f2f234f0b92c..20ac83e012e4 100644
---- a/net/unix/af_unix.c
-+++ b/net/unix/af_unix.c
-@@ -2427,7 +2427,7 @@ int __unix_dgram_recvmsg(struct sock *sk, struct msghdr *msg, size_t size,
- 	}
- 	err = (flags & MSG_TRUNC) ? skb->len - skip : size;
- 
--	scm_recv(sock, msg, &scm, flags);
-+	scm_recv_unix(sock, msg, &scm, flags);
- 
- out_free:
- 	skb_free_datagram(sk, skb);
-@@ -2808,7 +2808,7 @@ static int unix_stream_read_generic(struct unix_stream_read_state *state,
- 
- 	mutex_unlock(&u->iolock);
- 	if (state->msg && check_creds)
--		scm_recv(sock, state->msg, &scm, flags);
-+		scm_recv_unix(sock, state->msg, &scm, flags);
- 	else
- 		scm_destroy(&scm);
- out:
--- 
-2.34.1
+	if (sja1105_skb_has_tag_8021q(skb)) {
+		... // existing call to sja1105_vlan_rcv() here
+	} else if (source_port == -1 && switch_id == -1) {
+		/* Packets with no source information have no chance of
+		 * getting accepted, drop them straight away.
+		 */
+		return NULL;
+	}
 
+This "else if" block should ensure that when "vid" is uninitialized,
+either "source_port" and "switch_id", or "vbid", always have valid values.
 
