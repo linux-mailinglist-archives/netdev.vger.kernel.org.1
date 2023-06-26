@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-14000-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14001-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F2D6073E4FF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:28:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AB23873E51B
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:30:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1F56280E2F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:28:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5205C280E2F
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:30:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B83A11CAE;
-	Mon, 26 Jun 2023 16:28:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF692C156;
+	Mon, 26 Jun 2023 16:30:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F336F101D6
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:28:54 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A75171D
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:28:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F33A125AA
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:30:55 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9174FD3
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:30:30 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687796932;
+	s=mimecast20190719; t=1687797029;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4O/2NH0yzSJoeQQqIwYX3nixVBwHLA7LkW0cO2CrI0s=;
-	b=YK1SCIj9a5n3izhSThO4IbGQEGlhHC6kjOLYdM/JC8ZFdygcgrKhST72LnnveszPJunvf9
-	/tQGkkG+fq298f/YpbIRantyqN8dc+wsKjp71AE+jHL0EvT6hiqQthls8QRSN5cqohXaxJ
-	hm4Qgmt7iWu+i14qgpvcbLxhImL8BFw=
-Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
- [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=17WXujS/YadeWAnXnT2WRgIIGXFkn1Rmc4cmEtM2dPk=;
+	b=X9oAWOZCz8os93rlgMj6aA7gdoQ4mc1dxhx9Nq/J0Qum04slbtjXL1KLxDYxnIyp21h9IO
+	MjA4nyn87Hk2CKS4DdjPc+w9wpKK4AuqHOXwI+Cc4/Qx//2yapVnlFwdEz6wAA84J1j/Fw
+	HvLadTQ8EEyQQeAcyomxH8mkmwfIw/I=
+Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
+ [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-97-sYbBhgV5NyyfozrvIabAMQ-1; Mon, 26 Jun 2023 12:28:41 -0400
-X-MC-Unique: sYbBhgV5NyyfozrvIabAMQ-1
-Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-765a6bbdd17so144258485a.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:28:36 -0700 (PDT)
+ us-mta-634-g6owQAvVPNSjjp7zx8YN4A-1; Mon, 26 Jun 2023 12:30:28 -0400
+X-MC-Unique: g6owQAvVPNSjjp7zx8YN4A-1
+Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6355b301c9dso19977976d6.3
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:30:28 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687796916; x=1690388916;
+        d=1e100.net; s=20221208; t=1687797028; x=1690389028;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=4O/2NH0yzSJoeQQqIwYX3nixVBwHLA7LkW0cO2CrI0s=;
-        b=W1r17RVt9yiDTGDoR4rjgVTB2h6EmEdE3lGi6kprEoDIKH4iENkItp9VjqrdDW2kde
-         EbJL3kEQZDe6gLg1S57Zda8T2BEEqo6xkenRgkFmBWP3rxoJDEexpZ+F1QdvS1ogfb/N
-         ZBN4RjnLbpdXjbsJyQisUYR/IYVkrbxbXoXBEXjjVBhNJ1NkgmGsLcz+fot6ZckPklXC
-         p4KMeuHRZhIUIdNgEHGhxWw+sitI6oJsDnbbtJJopYCDw2KROtXUk0H9SWIJpU9AvTlK
-         pB4tRTylivhpgp7XryGsBZQvzdZIF4TqczPDQRnYYGINQFd+OxWER1Ecd+eaNxo9mnfB
-         KYUg==
-X-Gm-Message-State: AC+VfDx14rUELKb4DQO4jWXy7iw0AOj/4A7P//8+zfOP3whp/G8MToHo
-	0FUY712N92qnB3QtK9dgSMv9DD6CuBeuYqobEj5u2CqjNIRtPNs2LgWXXmltvxCEtu9Y2vIe4/7
-	+OuTv/z5KLTYvECmN
-X-Received: by 2002:a05:620a:1a93:b0:763:9e59:5f72 with SMTP id bl19-20020a05620a1a9300b007639e595f72mr25681285qkb.41.1687796916285;
-        Mon, 26 Jun 2023 09:28:36 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5x5ugD0TqhCXgVw9va06ED6hrsB+ZQed5/Tu0Pg5AhOHB/hmdqOV0biY+XBPnHF/pES4ZZUQ==
-X-Received: by 2002:a05:620a:1a93:b0:763:9e59:5f72 with SMTP id bl19-20020a05620a1a9300b007639e595f72mr25681263qkb.41.1687796916050;
-        Mon, 26 Jun 2023 09:28:36 -0700 (PDT)
+        bh=17WXujS/YadeWAnXnT2WRgIIGXFkn1Rmc4cmEtM2dPk=;
+        b=Muti1vClw6ymmDzjlMAGhve7axKNekAAEii+x8vqBIiMxwhf9XF9yY376UjbIM/0uZ
+         dk+Kt/yeq+r3uFoKNgALMB7bTxsXJgt/WTsWgWlB2MbM8zdTNyW7s+Mc5PmWPcTg3ScP
+         YGu2zXuJGL1EfJRCVi5F4q1P/eM+eLONyCfoSdzGjPOxxV5E6LosJIaiwsps/5gV4EsN
+         9kKJOqUucfTG20K3WpU1Vhtr1mP/PNHMRPPOWmXPA2IsAmxJdUf8x02G/m2/zcZFAhIr
+         r2p5Bm9HBC12mqJ+CFHavAkMslE0pL1WFQI8R33qhi72SAUi35zQcJZRVudiKJXRrOJK
+         MUnA==
+X-Gm-Message-State: AC+VfDxaW481Z6IfchAOkw+zGflrvvbctWEBPgRwBtL6PrEu2FrqadK7
+	x1iXdS3+E4U8Ns8rX89YFdN7re3S8KYqAqCa/4abp+grEQusueOKNRHTFjU7WMfMkRjWntNMCZv
+	2WFwAIIBIAU85IX+u
+X-Received: by 2002:a05:6214:1cc5:b0:62d:e8a2:4d36 with SMTP id g5-20020a0562141cc500b0062de8a24d36mr34309504qvd.61.1687797028065;
+        Mon, 26 Jun 2023 09:30:28 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7uBH00Gk/fKeQLrvD/GY47XvG7v3BCuca4UyzNoimZCXIfrb0LXztvOgJ/KifRuXdADW4Jbg==
+X-Received: by 2002:a05:6214:1cc5:b0:62d:e8a2:4d36 with SMTP id g5-20020a0562141cc500b0062de8a24d36mr34309488qvd.61.1687797027844;
+        Mon, 26 Jun 2023 09:30:27 -0700 (PDT)
 Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id oo25-20020a05620a531900b0075c9abecdf8sm2877975qkn.1.2023.06.26.09.28.33
+        by smtp.gmail.com with ESMTPSA id nd14-20020a056214420e00b006215d0bdf37sm3351810qvb.16.2023.06.26.09.30.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:28:35 -0700 (PDT)
-Date: Mon, 26 Jun 2023 18:28:31 +0200
+        Mon, 26 Jun 2023 09:30:27 -0700 (PDT)
+Date: Mon, 26 Jun 2023 18:30:23 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
@@ -71,11 +71,9 @@ Cc: Stefan Hajnoczi <stefanha@redhat.com>,
 	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
 	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v1 2/4] virtio/vsock: support MSG_PEEK for
- SOCK_SEQPACKET
-Message-ID: <yiy3kssoiyzs6ehnlo7g2xsb26zee5vih3jpgyc7i3dvfcyfpv@xvokxez3lzpo>
+Subject: Re: [RFC PATCH v1 0/4] virtio/vsock: some updates for MSG_PEEK flag
+Message-ID: <tmcj34lrgk7rxlnp4qvkpljwovowlz3wnosqboxssv6f6enr6u@qnf422n6lu6j>
 References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
- <20230618062451.79980-3-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,114 +82,58 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230618062451.79980-3-AVKrasnov@sberdevices.ru>
+In-Reply-To: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jun 18, 2023 at 09:24:49AM +0300, Arseniy Krasnov wrote:
->This adds support of MSG_PEEK flag for SOCK_SEQPACKET type of socket.
->Difference with SOCK_STREAM is that this callback returns either length
->of the message or error.
+On Sun, Jun 18, 2023 at 09:24:47AM +0300, Arseniy Krasnov wrote:
+>Hello,
 >
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/virtio_transport_common.c | 63 +++++++++++++++++++++++--
-> 1 file changed, 60 insertions(+), 3 deletions(-)
+>This patchset does several things around MSG_PEEK flag support. In
+>general words it reworks MSG_PEEK test and adds support for this flag
+>in SOCK_SEQPACKET logic. Here is per-patch description:
 >
->diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
->index 2ee40574c339..352d042b130b 100644
->--- a/net/vmw_vsock/virtio_transport_common.c
->+++ b/net/vmw_vsock/virtio_transport_common.c
->@@ -460,6 +460,63 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
-> 	return err;
-> }
+>1) This is cosmetic change for SOCK_STREAM implementation of MSG_PEEK:
+>   1) I think there is no need of "safe" mode walk here as there is no
+>      "unlink" of skbs inside loop (it is MSG_PEEK mode - we don't change
+>      queue).
+>   2) Nested while loop is removed: in case of MSG_PEEK we just walk
+>      over skbs and copy data from each one. I guess this nested loop
+>      even didn't behave as loop - it always executed just for single
+>      iteration.
 >
->+static ssize_t
->+virtio_transport_seqpacket_do_peek(struct vsock_sock *vsk,
->+				   struct msghdr *msg)
->+{
->+	struct virtio_vsock_sock *vvs = vsk->trans;
->+	struct sk_buff *skb;
->+	size_t total, len;
->+
->+	spin_lock_bh(&vvs->rx_lock);
->+
->+	if (!vvs->msg_count) {
->+		spin_unlock_bh(&vvs->rx_lock);
->+		return 0;
->+	}
->+
->+	total = 0;
->+	len = msg_data_left(msg);
->+
->+	skb_queue_walk(&vvs->rx_queue, skb) {
->+		struct virtio_vsock_hdr *hdr;
->+
->+		if (total < len) {
->+			size_t bytes;
->+			int err;
->+
->+			bytes = len - total;
->+			if (bytes > skb->len)
->+				bytes = skb->len;
->+
->+			spin_unlock_bh(&vvs->rx_lock);
->+
->+			/* sk_lock is held by caller so no one else can dequeue.
->+			 * Unlock rx_lock since memcpy_to_msg() may sleep.
->+			 */
->+			err = memcpy_to_msg(msg, skb->data, bytes);
->+			if (err)
->+				return err;
->+
->+			spin_lock_bh(&vvs->rx_lock);
->+		}
->+
->+		total += skb->len;
->+		hdr = virtio_vsock_hdr(skb);
->+
->+		if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) {
->+			if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOR)
->+				msg->msg_flags |= MSG_EOR;
->+
->+			break;
->+		}
->+	}
->+
->+	spin_unlock_bh(&vvs->rx_lock);
->+
->+	return total;
+>2) This adds MSG_PEEK support for SOCK_SEQPACKET. It could be implemented
+>   be reworking MSG_PEEK callback for SOCK_STREAM to support SOCK_SEQPACKET
+>   also, but I think it will be more simple and clear from potential
+>   bugs to implemented it as separate function thus not mixing logics
+>   for both types of socket. So I've added it as dedicated function.
+>
+>3) This is reworked MSG_PEEK test for SOCK_STREAM. Previous version just
+>   sent single byte, then tried to read it with MSG_PEEK flag, then read
+>   it in normal way. New version is more complex: now sender uses buffer
+>   instead of single byte and this buffer is initialized with random
+>   values. Receiver tests several things:
+>   1) Read empty socket with MSG_PEEK flag.
+>   2) Read part of buffer with MSG_PEEK flag.
+>   3) Read whole buffer with MSG_PEEK flag, then checks that it is same
+>      as buffer from 2) (limited by size of buffer from 2) of course).
+>   4) Read whole buffer without any flags, then checks that is is same
+>      as buffer from 3).
+>
+>4) This is MSG_PEEK test for SOCK_SEQPACKET. It works in the same way
+>   as for SOCK_STREAM, except it also checks combination of MSG_TRUNC
+>   and MSG_PEEK.
+>
+>Head is:
+>https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
 
-Should we return the minimum between total and len?
+Nice cleanup, LGTM, but I'd like a comment from Bobby.
 
 Thanks,
 Stefano
-
->+}
->+
-> static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
-> 						 struct msghdr *msg,
-> 						 int flags)
->@@ -554,9 +611,9 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
-> 				   int flags)
-> {
-> 	if (flags & MSG_PEEK)
->-		return -EOPNOTSUPP;
->-
->-	return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
->+		return virtio_transport_seqpacket_do_peek(vsk, msg);
->+	else
->+		return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
-> }
-> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
->
->-- 
->2.25.1
->
 
 
