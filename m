@@ -1,167 +1,171 @@
-Return-Path: <netdev+bounces-13892-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13893-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 194A373DA99
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 10:56:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A7EAF73DABF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 11:04:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B2FA280D82
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:56:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C9E081C208CD
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:04:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8B0E163B8;
-	Mon, 26 Jun 2023 08:56:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D5C6AB7;
+	Mon, 26 Jun 2023 09:03:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 759B846BD
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:56:27 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2083.outbound.protection.outlook.com [40.107.243.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29C264693;
-	Mon, 26 Jun 2023 01:56:04 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=lsEO4e8q0gibuBoYfGfCANjWUR0vznH/N8tcvzUFr0X7feR+jOvi5DLzj4tb9RfHRc6T6Cr92hqoD51mnVrDwUwJ0YA+Ax287FxxFYUqnNLd1Gin76vXGYEOIKoteng65r1tB4nxKPtswbmh86mpFZKlDTzpOya5Uzu1OYWx3HWQLj3VdcLKNGIufXQOQFNqu+6EgE04JJ8NKj8sbD9XA/cXEUlmgcAnCgy8ZFpp1wuhKWR4sHNMSPSGLFO2qTXUtbRac165aSWbMKx0po4EB6n+VTysVPliXi0aq9JIDe56zZLJjhUQ/ePq2lZGhyOym6cCbseCDkgIPJU6jH1xKA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=2L+zq38fp2M8Ugtr8/O2zCVrhdi2MBKVcQ8txfInd30=;
- b=Nh1ihuccD2aemieD8H8jXxakYUo1psJ0Vv3iUNQKMXuC/brP05+8DNpK0lfAhcIpqtiOYQZZoA64jgPEBuhD5/Vv8rms66iKYhhho3Hg987plmHy9EhhXxRX/VxPvYIJ9Ecwzw7ssB37QApEy4Egp538bTD+fpjl+DEKmMlvIj5BEwBr3y860ZQ/0S8cIbz/LrWJj/BVhHZdGzgZBAADm7vGttgsAHXHCmpZdzI5UQFqFkMcUBm2HQg37zHhh7i2WggbMoPLWk9DP+LG9exaBOz135KIcycn8J5R2FreJcbLTr32lPke+X1d//EnkSp2w5SrYq17K74VdVKLjKIpjQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=2L+zq38fp2M8Ugtr8/O2zCVrhdi2MBKVcQ8txfInd30=;
- b=JtORPzNZgL9YS4U1R3ig8bDk+LhypRzRSW2I1skrjSDzZEH1HGiEgeBCKvOjLrubVkpPqkno1MvAjluez3+eXiMncXrRdYUiIXXsycq0D5DPi841ZHELcGI00F/DDna8gPmN3vHvTmC4egYdcieFAFAe/CGtXxizItJOKkBoY5OfsePSY8D1o6nsxX50mYqKw7wYZQlHEQT0su7zSxsE5T8uNcYZcJX+zb5KqZBCbKX7a5We/XxWnxkRvGi8HSFDZCtx/JrZcJzC75cI6elUGYcTgJE34NNK3u/gB5LfJxG3Ue1ZlZCl3xoeJWalejSAUzG8UB5XkARmjsGgj/ve3Q==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
- IA0PR12MB8862.namprd12.prod.outlook.com (2603:10b6:208:48e::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Mon, 26 Jun
- 2023 08:55:57 +0000
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::12e5:730c:ea20:b402]) by DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::12e5:730c:ea20:b402%4]) with mapi id 15.20.6521.026; Mon, 26 Jun 2023
- 08:55:56 +0000
-Message-ID: <f83d79d6-f8d7-a229-941a-7d7427975160@nvidia.com>
-Date: Mon, 26 Jun 2023 11:55:47 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v3 1/1] gro: decrease size of CB
-To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- aleksander.lobakin@intel.com, lixiaoyan@google.com, lucien.xin@gmail.com,
- alexanderduyck@fb.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-References: <20230601160924.GA9194@debian> <20230601161407.GA9253@debian>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20230601161407.GA9253@debian>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0150.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:98::11) To DS7PR12MB6288.namprd12.prod.outlook.com
- (2603:10b6:8:93::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49D8A6AB6
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:03:50 +0000 (UTC)
+Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3FB64420F
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 02:03:42 -0700 (PDT)
+Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4faaaa476a9so1669449e87.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 02:03:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=tessares.net; s=google; t=1687770220; x=1690362220;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iBtvdyg3zPGmDTEDFgfwW8EkoCJT54ipAPsex1tB6pY=;
+        b=Ch01q1nycQLv4qbgUZej9DL+CNVp2IBIcH15X/TZFlb7e+L8+LJxswcHRRqU3wiHZC
+         auVFwf4j0Us7fJA7XVFSC3sOEdbJWObR7/mF63Qcn4xWnMfzZJK9gtkGvPWvDz6yogGL
+         u/vd87asULKVevsgUzq0tPHtOkIlOX5Fjy2kIDZaWDOs0m7OVioRGMTacF0g/sGjs/L2
+         XgM13Iakqa0Hcnh/IVjWsOy1dCJCBPs6K4IFjP6catJ9m5BCVI0kax5CVcAvLcJumHPY
+         9GWlBXIWFpVtdJWE16W5TzfpJFEQKSSLZszykHNtrY62kcYtoX+JMzjNYVRX8a+Ew6Zk
+         k1vg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687770220; x=1690362220;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iBtvdyg3zPGmDTEDFgfwW8EkoCJT54ipAPsex1tB6pY=;
+        b=kagkgmXDdjkacm2+VyvvjD/55GAIbSd0EGnBkTMzuW6Yr3EREjcUQfgbZ2oXbi1fqa
+         ejBWojlsipsejNRtNWQA4GGwSANWSOiNrB8Ls9R+D+5d5lzx23kg/lWUPtuUf4ugh6hZ
+         0o2OOOtmk4rciLOcj12/18Fw8qX4bQjtm3WeSw/ZcbYN/iWCdhTJgKf7iFX2nFX6EuaS
+         falGXnyPS9xjJ11IcRVZWq3tOestvyA2ayiy0NdSgHRJXpMVV6XhkHUPblw+WjAprK09
+         wa0NrOHINAPYTYeqKnjZTISINQfrs42aUv3eR3cD0RmQ9VVL/C2SPaR8nqiNqh29QT7L
+         8g5w==
+X-Gm-Message-State: AC+VfDxGGnFHUGhPSQZWPMu/GONrZBm1xs4bf2iFTWJCPN/knMgPMQ3f
+	F2u9fTViCBEdReSsJJ1WYoPq9w==
+X-Google-Smtp-Source: ACHHUZ5w0hp4mnWZXJ8kfFD2rbwHISXlWAk8s9fce2zv3Gv/aCxy6IeBh13DWs26De5D+rjokJ2msg==
+X-Received: by 2002:a19:4353:0:b0:4f9:586b:dba6 with SMTP id m19-20020a194353000000b004f9586bdba6mr8099792lfj.10.1687770220302;
+        Mon, 26 Jun 2023 02:03:40 -0700 (PDT)
+Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
+        by smtp.gmail.com with ESMTPSA id u19-20020a4ad0d3000000b0054fe8b73314sm631887oor.22.2023.06.26.02.03.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 02:03:39 -0700 (PDT)
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+To: dhowells@redhat.com
+Cc: acme@kernel.org,
+	adrian.hunter@intel.com,
+	alexander.shishkin@linux.intel.com,
+	bpf@vger.kernel.org,
+	davem@davemloft.net,
+	irogers@google.com,
+	jolsa@kernel.org,
+	kuba@kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-next@vger.kernel.org,
+	linux-perf-users@vger.kernel.org,
+	mark.rutland@arm.com,
+	mingo@redhat.com,
+	namhyung@kernel.org,
+	netdev@vger.kernel.org,
+	peterz@infradead.org,
+	sfr@canb.auug.org.au,
+	Matthieu Baerts <matthieu.baerts@tessares.net>,
+	Arnaldo Carvalho de Melo <acme@redhat.com>
+Subject: [PATCH net-next] perf trace: fix MSG_SPLICE_PAGES build error
+Date: Mon, 26 Jun 2023 11:02:39 +0200
+Message-Id: <20230626090239.899672-1-matthieu.baerts@tessares.net>
+X-Mailer: git-send-email 2.40.1
+In-Reply-To: <2947430.1687765706@warthog.procyon.org.uk>
+References: <2947430.1687765706@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|IA0PR12MB8862:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0c94c461-58dc-4cdc-63f4-08db762327b3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	grDNIRtwT5gJH0gKhQXWnXYcZA+x0Ign48Rp2GxY9TInsKlME37NKiK6fR3WFkxHDvtGFFG0ME4DO61lnb4vsp2ndvBVcXQ6lYNuZLJGtDHTps52ZWmbkiR+plQxfk+xNG2nxcM8w9ZkAJT2dAncy02wKehqC7oNg+nQEKualRFDj8H5JUyIoSR5bw3eSGpvYBdDle4kTnGvfCfvN42krtJaqUjZwBk/E/WzFutArNRy8gCzrYquQceSjSCZb8la1vy5bBvvbNHdFALTk/45CWgpYaCGUIBCtBMuvSJFPlkVkez18QmCHhNY26bE+it0x/R7yuzfIg9TkILwdIyj2uGAq2qtC6n8r7sv9tFPYa3WvgsxGifqdjABQ1ExadUmq+OkLfc8tI1g/I5O5h65gNl5sTMxfd+wiCH+lN+09dxtYF5ZrGIzTM74LeAscjQQbPXhSSTr17y3y0e3A4WDejrSkuOlFopBqyoOnj4COjVagVruroPz3brPP4U16+cx9wFqVioZtiNOEvIAj0XlG5vsCGNzIS49fEqDKWUq1b37fgonRr0mYgCH+vWjaUmQwmRt58VyNtuCInXXFFv+MLJ8Krmz5lIErHtly/LXaS8t+uVZns+zIypHyVG9Y4Gh7TsU1JE0PRYnKW8xdA+ja7d+28FrpyuVaf+gcLsKRPI=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39850400004)(376002)(346002)(136003)(396003)(451199021)(2906002)(6486002)(6666004)(921005)(38100700002)(2616005)(83380400001)(6512007)(6506007)(26005)(53546011)(186003)(41300700001)(31696002)(86362001)(478600001)(316002)(36756003)(66556008)(66946007)(66476007)(31686004)(7416002)(5660300002)(8676002)(8936002)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?b2ZKNm5scHd6MndRMmdPSk4xdDBzWktvLzQ0S291b292ZVJ0aCtOOEZYMkxH?=
- =?utf-8?B?OC9TazI0a2xYNCsvWFRkbnRCUDBHZ3UzSmlzRjMxZndkakdTRHFKR2dBb1Rh?=
- =?utf-8?B?SmwzTHJ6T1NrQVNmWEhnMFRyZ3EvdXZLZ29nYWx4SVFLeXlUU2lXbmQ2Wmtz?=
- =?utf-8?B?OG9VeVJIYmVYdVZjY2dwUWdaZlBEUkkzK2hhTG5HSjJSS1cyQVVmM0p5Ukt5?=
- =?utf-8?B?Snhwbko3N1FHVU5CY3piZWluZHVXSi9tcW1MZXVUYlM3Ny9nS3FkbkRQeHpv?=
- =?utf-8?B?Qm9UWWJtb2R4dndrQ0VqQkRNL1pwOEJhQnRSb0IvR3l3VkJWbUpGSlZRcUd2?=
- =?utf-8?B?aUNTOGlXQUpjUDZHRHpGeTRQak4wck5sN00raEVJWGJ1WmFrWUR5bDhSYkhR?=
- =?utf-8?B?SU9Ea0J4WnJOdmVJRXI3V1FtNnNCdDZCZXc2bkYzcHc2dGtRTFNWZDUxUGNP?=
- =?utf-8?B?MEpkNEhqQ0pCZ0lmbHhrRi9pU2F3dlpBS1hHdVhMeXN3L283c2MzaTMrSFdi?=
- =?utf-8?B?dDJDSS9zWmY0TUJSQm9MY1ZVSVlZT3NwWmp3QVlGVmNNWlhYWSttVzM5bEFQ?=
- =?utf-8?B?TCtsRWNzbEFjTVByTjNsOU9MQlV5MTQwMFBxdTFkR1ZtSFlsa2krUkYrZ2Rk?=
- =?utf-8?B?UnpBVHJQNXEyNHJ5Umh0U1dOR1JPaU9KSDE4SkgwbmFSbG9QK3FjUUF4QWZz?=
- =?utf-8?B?VTBhN0VqZHAvYVhpQnk3UkgwcTdDZ0lTWHgwTUU5RjVaMmhqdFNieG1oanc3?=
- =?utf-8?B?NXVTaEZ4L3p2Yzkybkx4YUVlQnZBN1paUjhpV0lvc0lzTlJyWGxRR1k5NzVj?=
- =?utf-8?B?TzZMMlRZcTFGRUJBcGp4Z1NZZmp4WE5FdGZZNUdUaGJxOFU5TlpOaEFhcEJ4?=
- =?utf-8?B?K1NxMmZORDQ3MzRNa2hGUEkzS1YwMCtJaGVPb0lIMkgxTUNwYWNWWW5ha1NL?=
- =?utf-8?B?cUxHcEJwVWVVaVNQdWF1YW9PajFZdXhmN3RtVVZPaHdwZi9vZzNpSENYSUxp?=
- =?utf-8?B?RW4rWjNxZFV1ZU9qeno2aUFQMlhnZm9rbmtveWlZTGJTU2VyejdqcU1qOTNl?=
- =?utf-8?B?WnZESEgzM0lsL0c2M25XVkJiQzFQTVd4TlM3VEFWRWNVTzR5M0dXNjc4SmZl?=
- =?utf-8?B?a1kySG1QdFh1WnFuUzAza0JocjFTbWhlNXpZOE4zalVZUTFya3dXY1VvZEw3?=
- =?utf-8?B?cXJwM0xKK0FzUHI3ZG80UUttMEk5MytYcU8vZHZjUUlwV29YUkxPZFRtQ0NW?=
- =?utf-8?B?Y01qUm5YN0o0WjZXdmhmdDZUU1NaOVJGOGE5S0pYeUc3Q2JDc1JpbXBld0FE?=
- =?utf-8?B?V0gwSjRoeElmVFJ3b2pFZ0JJaTMxVEpRUXRSM2N5MXNPTjdlWGdHVFR5OEh4?=
- =?utf-8?B?UitMMTl2MGJJT0todkM3QnVCQ2thUFJ5Tlc5blAveS9QZW96ekZYaXZXNmlS?=
- =?utf-8?B?eTJwbUdDemMxdExWOXk2cERWdFZMWWFJL3R1RWhBQnZIY0VGSndkdHRXRE9p?=
- =?utf-8?B?QVZGcmpaSjJJVDhRVzJXbVZFbDRKSGR5TXBTL016Q3BxMXRKSXBNUkpOT1hO?=
- =?utf-8?B?R216dkpaQXlUR3Z2WVM3b0FtcjM0UG5lMzMweUl3cVpUdTJIS1ZWbmxJbEIy?=
- =?utf-8?B?L25kT1VlZ1JIMjFwT0E4aVlqWHgrbFYwVlpvckdXTnRaTXdPVklJUjBQM1ZI?=
- =?utf-8?B?WXFOU04zVzdCb09hWSt3OUxDY3NobEhaQVhaSGRtMlQ2S3huZzVjSzNTSWVX?=
- =?utf-8?B?NDAwbDB5cFBYYndwYnlJZ2FvY2s1eXhGOFBNYzJUZlRWemJzQisyUmxOV1M0?=
- =?utf-8?B?QnEwempEOHQ4R2hBU0xjU3pCc0VXY1RReW5BcWpLTGFQSHFrc25wZTIrcnZp?=
- =?utf-8?B?R29xWjZtRWFzMVRxL0xyTlg1M0IxWlpqUzNSNlNuVlB3cGZVek9sY005aUlG?=
- =?utf-8?B?OHRZK1ZNWTh2M3VuL2FLcFNkVzRqc09NODVrWnhIZTB6QUVzKzRpNW5WMFcw?=
- =?utf-8?B?RGZhdGVBNVNnVzdHcDA4RHlpdVV5T1ZERGNHOWgxelhBUGFpWHFwR1l4eXlu?=
- =?utf-8?B?a2RvN3RsWldFRGw2cWhzME9KS2FIUERZZEdaWi9aL0pBYzNlK1ZaSzhDK3BU?=
- =?utf-8?Q?qUWH/lzlQ6gQK6n+/Er0rU/8V?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0c94c461-58dc-4cdc-63f4-08db762327b3
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 08:55:56.7503
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: Ml2aFi9nI4ox91LJ+VdgEnGJd19XMGRxnNENfsBpBj0az8rwv5Fs3kZ2zcDQxsI+
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA0PR12MB8862
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2321; i=matthieu.baerts@tessares.net;
+ h=from:subject; bh=sxG8xrhdK31/co0Ub/5kGgaE5z4tmRlqcKfVFKr3vdg=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkmVQvPws0wIwv8RrKWRoYg8xng7wy3W2AYbR3U
+ Dg5nRJiEmSJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZJlULwAKCRD2t4JPQmmg
+ c4Y3D/4pt5+NOQTMEBuLpy0Qs1pmmByxefhcjQqCzSLmUzbXXs1eoijTEp9MEOcp0G4dkiktEmn
+ xwITEZDORpziIlAktNX3B/f30qVyONF06Y7+pfGoYbReuL5heqzqWeI0Zv/oOtpP0cgI5dTQiUM
+ yKzQ41AIFbNK51cQFwxJuEDwlwblDEmGAR2985PtwOsiJ5PKQT4ESCxEz6EpKU12wL0eSlJBSZj
+ 2rrb/+yGn5BOAEREd3Gnp8418+f+TTR/HMcpUEUsEb/+pfnKRI5FO1rRAuSoWK8calMXHHE5Ji2
+ HhTUQsDdUqzZOGFvbm+JroUh0vihUnZNKm56RlZcieBm8xXJqs31kngBGzt/yqzau4p0Z6xZy3b
+ 0DWPt/1l5JTKMIHymZBiSy5/GLhSk4AB2Y4n+skUSi7rJOda1g3QzkuAti+0E2Bi+9K7AkCiY2A
+ icsVVgH8u9e9bv2SQDfmIli2HaM6bVp0J2FNAeREQP/zuy/OWDl9ezgQJDxHFC/5eGOXcovFVJL
+ SbGDNlbDqYYZarMGWLi7Gjh18W8fS3WKmdGIBfB1skxrwm1orlpx9adAdLcFr6TQVqsl71xeab2
+ u2KH28JxLSkPD7Zy9SNVKyJG9AQpPcICghi5tbOaWYpViXcDT+90hy+2EYei9NRXt2j28YUOus8 BzeysYSKbjZCKIg==
+X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp; fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 01/06/2023 19:14, Richard Gobert wrote:
-> The GRO control block (NAPI_GRO_CB) is currently at its maximum size.
-> This commit reduces its size by putting two groups of fields that are
-> used only at different times into a union.
-> 
-> Specifically, the fields frag0 and frag0_len are the fields that make up
-> the frag0 optimisation mechanism, which is used during the initial
-> parsing of the SKB.
-> 
-> The fields last and age are used after the initial parsing, while the
-> SKB is stored in the GRO list, waiting for other packets to arrive.
-> 
-> There was one location in dev_gro_receive that modified the frag0 fields
-> after setting last and age. I changed this accordingly without altering
-> the code behaviour.
-> 
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+Our MPTCP CI and Stephen got this error:
 
-Hello Richard,
+    In file included from builtin-trace.c:907:
+    trace/beauty/msg_flags.c: In function 'syscall_arg__scnprintf_msg_flags':
+    trace/beauty/msg_flags.c:28:21: error: 'MSG_SPLICE_PAGES' undeclared (first use in this function)
+       28 |         if (flags & MSG_##n) {           |                     ^~~~
+    trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG'
+       50 |         P_MSG_FLAG(SPLICE_PAGES);
+          |         ^~~~~~~~~~
+    trace/beauty/msg_flags.c:28:21: note: each undeclared identifier is reported only once for each function it appears in
+       28 |         if (flags & MSG_##n) {           |                     ^~~~
+    trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG'
+       50 |         P_MSG_FLAG(SPLICE_PAGES);
+          |         ^~~~~~~~~~
 
-I believe this commit broke gro over udp tunnels.
-I'm running iperf tcp traffic over geneve interfaces and the bandwidth
-is pretty much zero.
+The fix is similar to what was done with MSG_FASTOPEN: the new macro is
+defined if it is not defined in the system headers.
 
-Turning off gro on the receiving side (or reverting this commit)
-resolves the issue.
+Fixes: b848b26c6672 ("net: Kill MSG_SENDPAGE_NOTLAST")
+Reported-by: Stephen Rothwell <sfr@canb.auug.org.au>
+Closes: https://lore.kernel.org/r/20230626112847.2ef3d422@canb.auug.org.au/
+Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+---
+
+Notes:
+    @David: I solved it like that in MPTCP tree. Does it work for you too?
+
+    I guess tools/perf/trace/beauty/include/linux/socket.h file still needs
+    to be updated, not just to add MSG_SPLICE_PAGES but also other
+    modifications done in this file. Maybe best to sync with Arnaldo because
+    he might do it soon during the coming merge window I guess.
+
+Cc: David Howells <dhowells@redhat.com>
+Cc: Arnaldo Carvalho de Melo <acme@redhat.com>
+
+ tools/perf/trace/beauty/msg_flags.c | 3 +++
+ 1 file changed, 3 insertions(+)
+
+diff --git a/tools/perf/trace/beauty/msg_flags.c b/tools/perf/trace/beauty/msg_flags.c
+index 5cdebd7ece7e..aa9934020232 100644
+--- a/tools/perf/trace/beauty/msg_flags.c
++++ b/tools/perf/trace/beauty/msg_flags.c
+@@ -8,6 +8,9 @@
+ #ifndef MSG_WAITFORONE
+ #define MSG_WAITFORONE		   0x10000
+ #endif
++#ifndef MSG_SPLICE_PAGES
++#define MSG_SPLICE_PAGES	0x8000000
++#endif
+ #ifndef MSG_FASTOPEN
+ #define MSG_FASTOPEN		0x20000000
+ #endif
+
+base-commit: 9ae440b8fdd6772b6c007fa3d3766530a09c9045
+-- 
+2.40.1
+
 
