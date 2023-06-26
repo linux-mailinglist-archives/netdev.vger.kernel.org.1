@@ -1,171 +1,153 @@
-Return-Path: <netdev+bounces-13877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C08DB73D854
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:17:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1FC2173D860
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:21:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0535B1C203BF
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:17:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9454D280D5B
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:21:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEFB71C28;
-	Mon, 26 Jun 2023 07:17:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4DE41C2E;
+	Mon, 26 Jun 2023 07:21:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7F5A20E1;
-	Mon, 26 Jun 2023 07:17:06 +0000 (UTC)
-Received: from dggsgout12.his.huawei.com (unknown [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 23CCAE7D;
-	Mon, 26 Jun 2023 00:16:41 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4QqK014gD0z4f3nyQ;
-	Mon, 26 Jun 2023 15:16:33 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP1 (Coremail) with SMTP id cCh0CgDXPypQO5lk8PWFLw--.36685S2;
-	Mon, 26 Jun 2023 15:16:35 +0800 (CST)
-Subject: Re: [PATCH v2 bpf-next 09/13] bpf: Allow reuse from
- waiting_for_gp_ttrace list.
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>,
- "Paul E. McKenney" <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>,
- rcu@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
- bpf <bpf@vger.kernel.org>, Kernel Team <kernel-team@fb.com>
-References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
- <20230624031333.96597-10-alexei.starovoitov@gmail.com>
- <9cc35513-5522-9229-469b-7d691c9790e1@huaweicloud.com>
- <CAADnVQJViJh47Cze186XCS0_jeQMb1wu6BfVZiQL6982a_hhfg@mail.gmail.com>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <417e4d9c-7b69-0b9a-07e3-9af4b3b3299f@huaweicloud.com>
-Date: Mon, 26 Jun 2023 15:16:32 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B736A1C15
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:21:43 +0000 (UTC)
+Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF57E0
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:21:42 -0700 (PDT)
+Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-40079620a83so372191cf.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 00:21:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687764101; x=1690356101;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=uj+GYS1A1tGQ+FJ/n5yk4Al/k8DmZXMPigKhaI306Q0=;
+        b=3a5trGOb50p1P9+5CS5wMofgSHLQ8AGT8jYDtRkfWLhdPaQhoXPNskjVu2j8tTg7JP
+         xRmwsKweyzrp2ydJt0z0cQHJ/21mSMdcAVeuAvjqJ/U5Ex0UINuJlJGFSM2tjM4V/ksp
+         cTlb0Mf7IapJOgl4DNARuYoPv+YOLpTU/J3v2acaxJyFepYRUPrLjiXA/1a9jiX5qAbA
+         WqX/14yDtW9kjCzn6umaRdPoc6R8Zq7vN0GkSKIJKCUxxItPgZSGot0LxBMq1DCw/JVv
+         +RJjSWDztNvuxC00M6xEeT/o0PPMkwXqG9m86XvfpwDG/1rKhXcm7Bz/cKi4EktEUKIv
+         ayCw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687764101; x=1690356101;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=uj+GYS1A1tGQ+FJ/n5yk4Al/k8DmZXMPigKhaI306Q0=;
+        b=MKE0OYFxZv/G/fnnDJBB5LdSyQgM2mVEwXLeng/D9K+u/NvggwOR4jlaRtEuDoywWb
+         XR464NxmVpETtlwFkJtOMOJWF55YORosS9i03dqio0pdY36V99NycgG8aZT97+yiQzPP
+         f4BgLQTs1+8OqpYJuGfcaDttD6sOWxbPCXk2dy05k+NEt0ZrKGgkgmncT3pLjqaL89Qe
+         Rf/7Ax3vpR4hqmVIZ2vWSWSYSmvgaX/EPrhxvfhq/Z1MDPYZs8Usc12yE/rptbfYBqQb
+         9x3YXA44iuGi0w2oW7IPCI1U/akHj5v/Gb26wBlPo8jZYh3a/2XS7qmVhUO2CFdCR8Rc
+         Wrrw==
+X-Gm-Message-State: AC+VfDwN/ZNxOk9nMqVPLClUP80BLu3Irsa9xlkjVrIAWIjGynpGl2cp
+	BL+3ia42WzTSw9ET84bxrEbORESArkV77Aosj5sTBnrdO/LFp4BKu8xNpg==
+X-Google-Smtp-Source: ACHHUZ5qxL4bLh1NhEQSv8y/url9PeeYWRy+hcmaRJiXdcc+7aAQnK/3ppFEAJ8I3PCX6FkEPall1PlgdKsTvSxXPHo=
+X-Received: by 2002:ac8:5b45:0:b0:3f8:175a:4970 with SMTP id
+ n5-20020ac85b45000000b003f8175a4970mr343069qtw.18.1687764101132; Mon, 26 Jun
+ 2023 00:21:41 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAADnVQJViJh47Cze186XCS0_jeQMb1wu6BfVZiQL6982a_hhfg@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:cCh0CgDXPypQO5lk8PWFLw--.36685S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxCFyfZFW8XF15tw1DGFW7Jwb_yoW5uw1rpr
-	W8JFy5GFy8JrWIy3Wqqr48GFyqqr48JasrJayUXa4fKr15Xrn0qryfWry2grnxA3y8Cry7
-	tw4kWr1Ivr45C3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
-	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
-	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
-	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
-	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
-	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
-	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
-	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
-	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-	9x07UWE__UUUUU=
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-1.0 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
-	MAY_BE_FORGED,NICE_REPLY_A,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20230625161334.51672-1-kuniyu@amazon.com>
+In-Reply-To: <20230625161334.51672-1-kuniyu@amazon.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 26 Jun 2023 09:21:30 +0200
+Message-ID: <CANn89iL0n5Prem6Cjc6jkdAq6jm5AOYXWgn=i80UPsnNZE6WQw@mail.gmail.com>
+Subject: Re: [PATCH v1 net] netlink: Add sock_i_ino_irqsaved() for __netlink_diag_dump().
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>, Kuniyuki Iwashima <kuni1840@gmail.com>, netdev@vger.kernel.org, 
+	syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Sun, Jun 25, 2023 at 6:14=E2=80=AFPM Kuniyuki Iwashima <kuniyu@amazon.co=
+m> wrote:
+>
+> syzbot reported a warning in __local_bh_enable_ip(). [0]
+>
+> Commit 8d61f926d420 ("netlink: fix potential deadlock in
+> netlink_set_err()") converted read_lock(&nl_table_lock) to
+> read_lock_irqsave() in __netlink_diag_dump() to prevent a deadlock.
+>
+> However, __netlink_diag_dump() calls sock_i_ino() that uses
+> read_lock_bh() and read_unlock_bh().  read_unlock_bh() finally
+> enables BH even though it should stay disabled until the following
+> read_unlock_irqrestore().
+>
+> Using read_lock() in sock_i_ino() would trigger a lockdep splat
+> in another place that was fixed in commit f064af1e500a ("net: fix
+> a lockdep splat"), so let's add another function that would be safe
+> to use under BH disabled.
+>
+> [0]:
+>
+> Fixes: 8d61f926d420 ("netlink: fix potential deadlock in netlink_set_err(=
+)")
+> Reported-by: syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
+> Closes: https://syzkaller.appspot.com/bug?extid=3D5da61cf6a9bc1902d422
+> Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
+> ---
+>
 
-On 6/26/2023 12:42 PM, Alexei Starovoitov wrote:
-> On Sun, Jun 25, 2023 at 8:30 PM Hou Tao <houtao@huaweicloud.com> wrote:
->> Hi,
->>
->> On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
->>> From: Alexei Starovoitov <ast@kernel.org>
->>>
->>> alloc_bulk() can reuse elements from free_by_rcu_ttrace.
->>> Let it reuse from waiting_for_gp_ttrace as well to avoid unnecessary kmalloc().
->>>
->>> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
->>> ---
->>>  kernel/bpf/memalloc.c | 9 +++++++++
->>>  1 file changed, 9 insertions(+)
->>>
->>> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
->>> index 692a9a30c1dc..666917c16e87 100644
->>> --- a/kernel/bpf/memalloc.c
->>> +++ b/kernel/bpf/memalloc.c
->>> @@ -203,6 +203,15 @@ static void alloc_bulk(struct bpf_mem_cache *c, int cnt, int node)
->>>       if (i >= cnt)
->>>               return;
->>>
->>> +     for (; i < cnt; i++) {
->>> +             obj = llist_del_first(&c->waiting_for_gp_ttrace);
->> After allowing to reuse elements from waiting_for_gp_ttrace, there may
->> be concurrent llist_del_first() and llist_del_all() as shown below and
->> llist_del_first() is not safe because the elements freed from free_rcu()
->> could be reused immediately and head->first may be added back to
->> c0->waiting_for_gp_ttrace by other process.
->>
->> // c0
->> alloc_bulk()
->>     llist_del_first(&c->waiting_for_gp_ttrace)
->>
->> // c1->tgt = c0
->> free_rcu()
->>     llist_del_all(&c->waiting_for_gp_ttrace)
-> I'm still thinking about how to fix the other issues you've reported,
-> but this one, I believe, is fine.
-> Are you basing 'not safe' on a comment?
-> Why xchg(&head->first, NULL); on one cpu and
-> try_cmpxchg(&head->first, &entry, next);
-> is unsafe?
-No, I didn't reason it only based on the comment in llist.h. The reason
-I though it was not safe because llist_del_first() may have ABA problem
-as pointed by you early, because after __free_rcu(), the elements on
-waiting_for_gp_ttrace would be available immediately and
-waiting_for_gp_ttrace->first may be reused and then added back to
-waiting_for_gp_ttrace->first again as shown below.
+Hi Kuniyuki, thanks for the fix, I mistakenly released this syzbot
+bug/report the other day ;)
 
-// c0->waiting_for_gp_ttrace 
-A -> B -> C -> nil 
- 
-P1: 
-alloc_bulk(c0) 
-    llist_del_first(&c0->waiting_for_gp_ttrace) 
-        entry = A 
-        next = B 
- 
-    P2: __free_rcu 
-        // A/B/C is freed back to slab 
-        // c0->waiting_for_gp_ttrace->first = NULL 
-        free_all(llist_del_all(c0)) 
- 
-    P3: alloc_bulk(c1) 
-        // got A 
-        __kmalloc() 
- 
-    // free A (from c1), ..., last free X (allocated from c0) 
-    P3: unit_free(c1)
-        // the last freed element X is from c0
-        c1->tgt = c0 
-        c1->free_llist->first -> X -> Y -> ... -> A 
-    P3: free_bulk(c1) 
-        enque_to_free(c0) 
-            c0->free_by_rcu_ttrace->first -> A -> ... -> Y -> X 
-        __llist_add_batch(c0->waiting_for_gp_ttrace) 
-            c0->waiting_for_gp_ttrace = A -> ... -> Y -> X 
+I wonder if we could use __sock_i_ino() instead of sock_i_ino_bh_disabled()=
+,
+and perhaps something like the following to have less copy/pasted code ?
 
-P1: 
-    // A is added back as first again
-    // but llist_del_first() didn't know
-    try_cmpxhg(&c0->waiting_for_gp_ttrace->first, A, B) 
-    // c0->waiting_for_gp_trrace is corrupted 
-    c0->waiting_for_gp_ttrace->first = B
+diff --git a/net/core/sock.c b/net/core/sock.c
+index 6e5662ca00fe5638881db11c71c46169d59a2746..146a83c50c5d329fee2e833c4f2=
+ba29e896d7766
+100644
+--- a/net/core/sock.c
++++ b/net/core/sock.c
+@@ -2550,13 +2550,25 @@ kuid_t sock_i_uid(struct sock *sk)
+ }
+ EXPORT_SYMBOL(sock_i_uid);
 
+-unsigned long sock_i_ino(struct sock *sk)
++/* Must be called while interrupts are disabled. */
++unsigned long __sock_i_ino(struct sock *sk)
+ {
+        unsigned long ino;
+
+-       read_lock_bh(&sk->sk_callback_lock);
++       read_lock(&sk->sk_callback_lock);
+        ino =3D sk->sk_socket ? SOCK_INODE(sk->sk_socket)->i_ino : 0;
+-       read_unlock_bh(&sk->sk_callback_lock);
++       read_unlock(&sk->sk_callback_lock);
++       return ino;
++}
++EXPORT_SYMBOL(__sock_i_ino);
++
++unsigned long sock_i_ino(struct sock *sk)
++{
++       unsigned long ino;
++
++       local_bh_disable();
++       ino =3D __sock_i_ino(sk);
++       local_bh_enable();
+        return ino;
+ }
+ EXPORT_SYMBOL(sock_i_ino);
 
