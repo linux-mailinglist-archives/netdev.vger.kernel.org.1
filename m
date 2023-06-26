@@ -1,491 +1,197 @@
-Return-Path: <netdev+bounces-14033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D78E473E73D
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:12:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D80B73E74D
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:14:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C32A280E5A
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:12:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E1851C20973
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:14:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7F9134C7;
-	Mon, 26 Jun 2023 18:12:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CDFA134C0;
+	Mon, 26 Jun 2023 18:13:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 808B6134B3;
-	Mon, 26 Jun 2023 18:12:33 +0000 (UTC)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 156392942;
-	Mon, 26 Jun 2023 11:12:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687803136; x=1719339136;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=eSK17/Nu3oaFQ2VpG4P41G6xg6u1+jOi/ite1ltKpmI=;
-  b=oxZgnOUmBSzcsiRRfrledeQclCoQnt2h0f5sycQikg3q334OjFbrI7wa
-   KJ/me9HrJYSFsI+Axa3RIAhnXEBdjzclc1U3k5xdemj3xMyJ90WH0dI+j
-   LYQpvVtCkGMJL/VcViY+4wl/4O0oy2QCCFzRrRUVqaQ5puq1uzHWz461v
-   U=;
-X-IronPort-AV: E=Sophos;i="6.01,160,1684800000"; 
-   d="scan'208";a="347902966"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 18:12:10 +0000
-Received: from EX19MTAUWB001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-8a14c045.us-west-2.amazon.com (Postfix) with ESMTPS id 3F03D805EB;
-	Mon, 26 Jun 2023 18:12:09 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB001.ant.amazon.com (10.250.64.248) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Mon, 26 Jun 2023 18:12:08 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.15) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
- Mon, 26 Jun 2023 18:12:04 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <lmb@isovalent.com>
-CC: <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-	<daniel@iogearbox.net>, <davem@davemloft.net>, <dsahern@kernel.org>,
-	<edumazet@google.com>, <haoluo@google.com>, <hemanthmalla@gmail.com>,
-	<joe@wand.net.nz>, <john.fastabend@gmail.com>, <jolsa@kernel.org>,
-	<kpsingh@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-	<linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-	<martin.lau@linux.dev>, <mykolal@fb.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>, <sdf@google.com>, <shuah@kernel.org>, <song@kernel.org>,
-	<willemdebruijn.kernel@gmail.com>, <yhs@fb.com>
-Subject: Re: [PATCH bpf-next v3 4/7] net: remove duplicate reuseport_lookup functions
-Date: Mon, 26 Jun 2023 11:11:56 -0700
-Message-ID: <20230626181156.62006-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230613-so-reuseport-v3-4-907b4cbb7b99@isovalent.com>
-References: <20230613-so-reuseport-v3-4-907b4cbb7b99@isovalent.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 497B5134C7
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:13:58 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2070.outbound.protection.outlook.com [40.107.243.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0608D10D5;
+	Mon, 26 Jun 2023 11:13:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=YP/OoKpc7Foo2N7IkRxmj12h+Jj2SdW0kGXtETtYvU1KqB1pNUheAXyS4LVdsk9fB/OfcsvD1vRYpxHy4HClNLEwlQYBep9aBncaJbDykZvXocF4bHpFrMPqR7KcSvcRQdD9AGRHdGRpU0wCEdrFWHJBqvFAwH6xO333HN0MXUG/qwhE47uMh/JtR8n4iRgL8pecNDoUFNKGK4j3jONcChWFXqnq3iQ0cs24L2b5MuvDl6ZwNiMdHjpssDDSNaZlsdJ43AurNC0btVVXz05tq5OwVMCkd8acMPJ+AwK2vEdbq9paSC+NNSCRfAfJSF+TIQJcF4n4/O5gK38f+SmHHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=v1YF1Y3EaC/qkf53jDmmjppTEtv5IAXnoNvwHj0TZIQ=;
+ b=aUW5G+C6lik1y5xv1vHp8y5ekXoHTRPWs0NaJ13Tr28pEZFWZNdw3A/oMpK6QZO6uTpMoYQj4xTb4El8pG+RMLw2hRyPmG/MWbno3TLEEYNKgx0ezs77CVWOUFEQ7cfivQnmnKk6asxqMuYNxWYXAkUjgr7Am2qpkKkNjZbYr27bfANmEgD32H2wrY/TM4XazdmrmgMgOtr//zaj8EyB+/6qBHmc4IkOJoL35g9LWreIaJ9GzKViKgNUtzjctrcaJ2QTL6QmSnoqA7dECuzKRIFnQDvaDw1gx1Z6k0q7z1nuhM4FejDMedSqm2RK1lK7XuCqbQaA8up1eXrJy3evEw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=v1YF1Y3EaC/qkf53jDmmjppTEtv5IAXnoNvwHj0TZIQ=;
+ b=ER5gHLDf+qPbWqWl/mJiI2IXH5Me0h5zRKOvRsYJyol0ngVzLa+4tJVnrrSOmn2XgKSY8RvsMVu9zQRjNFfNvImCgy531tlnjaEByEGgHtmnCvC3qOhrdVCpALnv9wv7phwZbJg2EayCxBKgcUivhoeVkz3SNzdb2lv5HvQdMWo/MJAnL+MAuUrGuXPb5HhwyBDlK9AI/X6eMW1Co8CyBN/hhRYf+4q6BDCx/cOt0mAFqhMCu7+vx30puSInqSsJ1+oLI802uWhDmRSMtikaLcpEmaTRUzkunJf+Solm/q821gac5/77uwVp+ufm5XMTqSaaJIjYA4HHyd6Y7YuMAg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com (2603:10b6:408:176::16)
+ by SA1PR12MB7247.namprd12.prod.outlook.com (2603:10b6:806:2bb::6) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Mon, 26 Jun
+ 2023 18:13:55 +0000
+Received: from LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab]) by LV2PR12MB5869.namprd12.prod.outlook.com
+ ([fe80::f7a7:a561:87e9:5fab%7]) with mapi id 15.20.6521.024; Mon, 26 Jun 2023
+ 18:13:54 +0000
+Date: Mon, 26 Jun 2023 15:13:53 -0300
+From: Jason Gunthorpe <jgg@nvidia.com>
+To: "Tian, Kevin" <kevin.tian@intel.com>
+Cc: Brett Creeley <brett.creeley@amd.com>,
+	"kvm@vger.kernel.org" <kvm@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com" <shameerali.kolothum.thodi@huawei.com>,
+	"shannon.nelson@amd.com" <shannon.nelson@amd.com>
+Subject: Re: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
+Message-ID: <ZJnVYczb9M/wugO8@nvidia.com>
+References: <20230602220318.15323-1-brett.creeley@amd.com>
+ <20230602220318.15323-5-brett.creeley@amd.com>
+ <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBONrx5LOgpTr1U@nvidia.com>
+ <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJGcCF2hBGERGUBZ@nvidia.com>
+ <BN9PR11MB52763F3D4F18DAB867D146458C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJL6wHiXHc1eBj/R@nvidia.com>
+ <BN9PR11MB52762ECFCA869B97BDD2AA9D8C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <BN9PR11MB52762ECFCA869B97BDD2AA9D8C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
+X-ClientProxiedBy: BL6PEPF00016410.NAMP222.PROD.OUTLOOK.COM
+ (2603:10b6:22e:400:0:1004:0:17) To LV2PR12MB5869.namprd12.prod.outlook.com
+ (2603:10b6:408:176::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.15]
-X-ClientProxiedBy: EX19D045UWA001.ant.amazon.com (10.13.139.83) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: LV2PR12MB5869:EE_|SA1PR12MB7247:EE_
+X-MS-Office365-Filtering-Correlation-Id: 99e7cf20-0b2b-4087-d10c-08db76711a37
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	i847hOns2AeZ2O9p1LUV+mkyYidZUPtuTne15P3kpLbGbEvXaupXbhYQhD3aKSwidH0e9MJ/XKg5fVv0HfrNAwfhbzskfL03rIqY601RYZ2OQQBDUQ3XI67McQq5mSwmluFc8e6MAbJTa4gHqx4W5Fjse0TXTmOJSvancOt2KNeZIfnXWjuLLlB3AOGtbTnBVRZ/yq+UAFaLOqHxFAfGdr5Xo8i6MIeNXhEw0Aa6pS0sOhbFigGA24SzBwT3NygLTeBmt2aa1Ie4kevaPOe5+4SaMuadYHqwyV5CqOk4rpLrbgBGNNcOdj2Ip923TyueeGSHssbRn6XhP/n2RAuqFHLK+k0WK8fbnGk0TJOlFA0xMLW0N0hRm3J9vlArvp5yorAD0bhQUIKgcHkj+LErvc2Lq/o+qVfW/q5caumT8ihvzedaSpu42+YbGcY2vdaf8MwTSYcrIzBVq/m+clSK13Cz/527moRjQAr2oDP+vIWXFxDWoY2WCWE4EsNcKDWjy7q7GTYSWBsNLzV/gIvCi//vNEc2R71cODLxgcFWawW08fStomMs4fHfCa6nD11F
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:LV2PR12MB5869.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(396003)(376002)(136003)(366004)(39860400002)(451199021)(26005)(36756003)(66946007)(6486002)(478600001)(54906003)(2616005)(83380400001)(6512007)(2906002)(6506007)(186003)(5660300002)(316002)(38100700002)(8936002)(66556008)(8676002)(6916009)(4326008)(41300700001)(66476007)(86362001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?kPM6rzV7VC+qgkMZ1xtZTkcvhUwnfjuxlpSHROgljjmQH8qUdGo1CzEU0kKX?=
+ =?us-ascii?Q?DFHWTBA3gOElMg7CLqbtlYR7FyqOn8x8BaorszNoGK/pVnO8Aiy58o+UW1wU?=
+ =?us-ascii?Q?UoQ7aXXhqviCFd6uBVxOXqRt3LJ9t1fuTuTttgEo220WLmnTymeJ40QbjCby?=
+ =?us-ascii?Q?SRaDT6U7Dp+pqULWNZfeLCQjfraXW+OCx24TXk/ue6PYR82I839Oz98sVMv8?=
+ =?us-ascii?Q?pH0W16LmnDAQuUpASaTxjA4QvA7/ffrvN3GAcrsJ9AYoAZbRTMxr3mqSbeOm?=
+ =?us-ascii?Q?+4z0mMAuMYMiTvk6Iw9fSyTqSGJtKdwikh7C5MV/2SBmjhBrEcOPCdGvq6UE?=
+ =?us-ascii?Q?Irr7vwcSgHZETtDLdQPkkAbM1fZGfFf/EZfCu0K4A+x++wnRVJsU2SYpPQkq?=
+ =?us-ascii?Q?j1oneynoT+4WSyCzgUTdxx0kTc79YqrjkdzHa16QsHDt46TdEuc1qRSEDbp0?=
+ =?us-ascii?Q?wxw3a+C07TdFrPptnTdqvq8PTCl/aLDak12DiqCMWSTj9HAJdkitZ99udZeB?=
+ =?us-ascii?Q?gnxry2LRs5r8mS4baVgKSKKOR0t9OXFW7fJ3L/MWxb1Cw7Yo+mL24a1wLq3a?=
+ =?us-ascii?Q?S5M4N36VYRn9aDMhjNHNhNAVxB0Rts2qft+rKBOQpiVjLnRi1GTh5bSBQXy5?=
+ =?us-ascii?Q?ugoGNbLaVL+8ycgqxRCR4n9IFoagzMr0BXqpsNHbbdQcSYmeiZkAlMFKMFRI?=
+ =?us-ascii?Q?+QhmL3SDYxkLf067PlY1irn9uXsPo9qra3JDNf6ZL5GL5LBkgiTdY1QQJxmq?=
+ =?us-ascii?Q?UQt0z8DD3U4sIECK1xJAi1FhYpJeIyBfpG/gov/BMq2oUtA+vJCcqIrus5qY?=
+ =?us-ascii?Q?t61Lqkh5tMVyJuZEL/xshaNw4incpHcT7SckbIVBW5F4QXzSWFMFFpV1n0xb?=
+ =?us-ascii?Q?OpjQdv535d0gVakG5t9gFqjfQZwGnQL/mfORQJNkEVKO8qfV4TsCcbiUa4EI?=
+ =?us-ascii?Q?dgNjZoHYfYRZRbxWtWZG6TysRx3A1BL6rF9Jc+z+lwKc49cgggjGXqZa/OKt?=
+ =?us-ascii?Q?5/BGXgtg72309WUDcYI2U2dCxEQ93xpPOCLGFJ8UCDs1GJoV9+VwV0NPlFJC?=
+ =?us-ascii?Q?urmurcsBUBzDvQtAYRSR9D1bOY2yEYJKc3j9UhtDnoGpXZgx/yulIg0NHr7b?=
+ =?us-ascii?Q?nDG9wjNpGkeLmUQXyfyDUPxI5qdPJPAlDNW5jM55PE98lEmN6JAYbAdkvSsu?=
+ =?us-ascii?Q?K95EpfbdE8z0I9mLlOU0Q2OrflyfCkC1UUvhdjrVzUq19gUzCTqZg5byY2QL?=
+ =?us-ascii?Q?GLE95wJpDJyp7J4UzGwy800dTC9IgHRkY1Z90mQ2Oy9xd1G4l6n1AERcYnGo?=
+ =?us-ascii?Q?BIRHmYyaIxHX589acdazbAa9NlVDVkWXJMsAWMddZy0vR2QcPCBRlGdsrFjC?=
+ =?us-ascii?Q?8BuB44njWNXIvjLQGBXcO9YzCw1s4vuM7L6lFnUkD7VFMKRn2ymlZEzymvih?=
+ =?us-ascii?Q?KzoB1piDfpgz7+QlFzE9cEDAHvwu6cRdW170vFLArURIICSIN0x0DTG7TWmX?=
+ =?us-ascii?Q?vFkPiGnCrhds0WoBjAPQcKoi8EXGNvvEQUmEq2Dj+wVkxILnb+PaKXIHRONw?=
+ =?us-ascii?Q?SeNOybI/taWm1Hp4uLaDkN4zYDpGO7rlBB8sRZ3d?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 99e7cf20-0b2b-4087-d10c-08db76711a37
+X-MS-Exchange-CrossTenant-AuthSource: LV2PR12MB5869.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 18:13:54.8056
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: n68FfvaySkBYrB8S+ni3PC5RHPtpy1+vuD5MM1wPSfG4K6JEEyswyM1wiCjj40t6
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7247
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Lorenz Bauer <lmb@isovalent.com>
-Date: Mon, 26 Jun 2023 16:09:01 +0100
-> There are currently four copies of reuseport_lookup: one each for
-> (TCP, UDP)x(IPv4, IPv6). This forces us to duplicate all callers of
-> those functions as well. This is already the case for sk_lookup
-> helpers (inet,inet6,udp4,udp6)_lookup_run_bpf.
+On Mon, Jun 26, 2023 at 07:31:31AM +0000, Tian, Kevin wrote:
+> > From: Jason Gunthorpe <jgg@nvidia.com>
+> > Sent: Wednesday, June 21, 2023 9:27 PM
+> > 
+> > On Wed, Jun 21, 2023 at 06:49:12AM +0000, Tian, Kevin wrote:
+> > 
+> > > What is the criteria for 'reasonable'? How does CSPs judge that such
+> > > device can guarantee a *reliable* reasonable window so live migration
+> > > can be enabled in the production environment?
+> > 
+> > The CSP needs to work with the device vendor to understand how it fits
+> > into their system, I don't see how we can externalize this kind of
+> > detail in a general way.
+> > 
+> > > I'm afraid that we are hiding a non-deterministic factor in current protocol.
+> > 
+> > Yes
+> > 
+> > > But still I don't think it's a good situation where the user has ZERO
+> > > knowledge about the non-negligible time in the stopping path...
+> > 
+> > In any sane device design this will be a small period of time. These
+> > timeouts should be to protect against a device that has gone wild.
+> > 
 > 
-> There are two differences between the reuseport_lookup helpers:
-> 
-> 1. They call different hash functions depending on protocol
-> 2. UDP reuseport_lookup checks that sk_state != TCP_ESTABLISHED
-> 
-> Move the check for sk_state into the caller and use the INDIRECT_CALL
-> infrastructure to cut down the helpers to one per IP version.
-> 
-> Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
-> ---
->  include/net/inet6_hashtables.h | 11 ++++++++++-
->  include/net/inet_hashtables.h  | 15 ++++++++++-----
->  include/net/udp.h              |  8 ++++++++
->  net/ipv4/inet_hashtables.c     | 23 ++++++++++++++++-------
->  net/ipv4/udp.c                 | 34 +++++++++++++---------------------
->  net/ipv6/inet6_hashtables.c    | 17 +++++++++++++----
->  net/ipv6/udp.c                 | 41 ++++++++++++++++-------------------------
->  7 files changed, 86 insertions(+), 63 deletions(-)
-> 
-> diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
-> index 032ddab48f8f..49d586454287 100644
-> --- a/include/net/inet6_hashtables.h
-> +++ b/include/net/inet6_hashtables.h
-> @@ -48,12 +48,21 @@ struct sock *__inet6_lookup_established(struct net *net,
->  					const u16 hnum, const int dif,
->  					const int sdif);
->  
-> +typedef u32 (*inet6_ehashfn_t)(const struct net *net,
-> +			       const struct in6_addr *laddr, const u16 lport,
-> +			       const struct in6_addr *faddr, const __be16 fport);
-> +
-> +u32 inet6_ehashfn(const struct net *net,
-> +		  const struct in6_addr *laddr, const u16 lport,
-> +		  const struct in6_addr *faddr, const __be16 fport);
+> Any example how 'small' it will be (e.g. <1ms)?
 
-Can we use inet6_ehashfn_t here ?
+Not personally..
 
-Same for .c file, IPv4, and UDP.
+> Should we define a *reasonable* threshold in VFIO community which
+> any new variant driver should provide information to judge against?
 
+Ah, I think we are just too new to get into such details. I think we
+need some real world experience to see if this is really an issue.
 
-> +
->  struct sock *inet6_lookup_reuseport(struct net *net, struct sock *sk,
->  				    struct sk_buff *skb, int doff,
->  				    const struct in6_addr *saddr,
->  				    __be16 sport,
->  				    const struct in6_addr *daddr,
-> -				    unsigned short hnum);
-> +				    unsigned short hnum,
-> +				    inet6_ehashfn_t ehashfn);
->  
->  struct sock *inet6_lookup_listener(struct net *net,
->  				   struct inet_hashinfo *hashinfo,
-> diff --git a/include/net/inet_hashtables.h b/include/net/inet_hashtables.h
-> index 8734f3488f5d..51ab6a1a3601 100644
-> --- a/include/net/inet_hashtables.h
-> +++ b/include/net/inet_hashtables.h
-> @@ -379,10 +379,19 @@ struct sock *__inet_lookup_established(struct net *net,
->  				       const __be32 daddr, const u16 hnum,
->  				       const int dif, const int sdif);
->  
-> +typedef u32 (*inet_ehashfn_t)(const struct net *net,
-> +			      const __be32 laddr, const __u16 lport,
-> +			      const __be32 faddr, const __be16 fport);
-> +
-> +u32 inet_ehashfn(const struct net *net,
-> +		 const __be32 laddr, const __u16 lport,
-> +		 const __be32 faddr, const __be16 fport);
-> +
->  struct sock *inet_lookup_reuseport(struct net *net, struct sock *sk,
->  				   struct sk_buff *skb, int doff,
->  				   __be32 saddr, __be16 sport,
-> -				   __be32 daddr, unsigned short hnum);
-> +				   __be32 daddr, unsigned short hnum,
-> +				   inet_ehashfn_t ehashfn);
->  
->  static inline struct sock *
->  	inet_lookup_established(struct net *net, struct inet_hashinfo *hashinfo,
-> @@ -453,10 +462,6 @@ static inline struct sock *__inet_lookup_skb(struct inet_hashinfo *hashinfo,
->  			     refcounted);
->  }
->  
-> -u32 inet6_ehashfn(const struct net *net,
-> -		  const struct in6_addr *laddr, const u16 lport,
-> -		  const struct in6_addr *faddr, const __be16 fport);
-> -
->  static inline void sk_daddr_set(struct sock *sk, __be32 addr)
->  {
->  	sk->sk_daddr = addr; /* alias of inet_daddr */
-> diff --git a/include/net/udp.h b/include/net/udp.h
-> index 5cad44318d71..3b404b429f88 100644
-> --- a/include/net/udp.h
-> +++ b/include/net/udp.h
-> @@ -317,6 +317,14 @@ struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
->  				 __be16 sport, __be16 dport);
->  int udp_read_skb(struct sock *sk, skb_read_actor_t recv_actor);
->  
-> +INDIRECT_CALLABLE_DECLARE(u32 udp_ehashfn(const struct net *,
-> +					  const __be32, const __u16,
-> +					  const __be32, const __be16));
-> +
-> +INDIRECT_CALLABLE_DECLARE(u32 udp6_ehashfn(const struct net *,
-> +					   const struct in6_addr *, const u16,
-> +					   const struct in6_addr *, const __be16));
-> +
->  /* UDP uses skb->dev_scratch to cache as much information as possible and avoid
->   * possibly multiple cache miss on dequeue()
->   */
-> diff --git a/net/ipv4/inet_hashtables.c b/net/ipv4/inet_hashtables.c
-> index 91f9210d4e83..0dd768ab22d9 100644
-> --- a/net/ipv4/inet_hashtables.c
-> +++ b/net/ipv4/inet_hashtables.c
-> @@ -28,9 +28,9 @@
->  #include <net/tcp.h>
->  #include <net/sock_reuseport.h>
->  
-> -static u32 inet_ehashfn(const struct net *net, const __be32 laddr,
-> -			const __u16 lport, const __be32 faddr,
-> -			const __be16 fport)
-> +u32 inet_ehashfn(const struct net *net, const __be32 laddr,
-> +		 const __u16 lport, const __be32 faddr,
-> +		 const __be16 fport)
->  {
->  	static u32 inet_ehash_secret __read_mostly;
->  
-> @@ -39,6 +39,7 @@ static u32 inet_ehashfn(const struct net *net, const __be32 laddr,
->  	return __inet_ehashfn(laddr, lport, faddr, fport,
->  			      inet_ehash_secret + net_hash_mix(net));
->  }
-> +EXPORT_SYMBOL_GPL(inet_ehashfn);
->  
->  /* This function handles inet_sock, but also timewait and request sockets
->   * for IPv4/IPv6.
-> @@ -332,6 +333,10 @@ static inline int compute_score(struct sock *sk, struct net *net,
->  	return score;
->  }
->  
-> +INDIRECT_CALLABLE_DECLARE(u32 udp_ehashfn(const struct net *,
-> +					  const __be32, const __u16,
-> +					  const __be32, const __be16));
-> +
->  /**
->   * inet_lookup_reuseport() - execute reuseport logic on AF_INET socket if necessary.
->   * @net: network namespace.
-> @@ -342,6 +347,7 @@ static inline int compute_score(struct sock *sk, struct net *net,
->   * @sport: source port.
->   * @daddr: destination address.
->   * @hnum: destination port in host byte order.
-> + * @ehashfn: hash function used to generate the fallback hash.
->   *
->   * Return: NULL if sk doesn't have SO_REUSEPORT set, otherwise a pointer to
->   *         the selected sock or an error.
-> @@ -349,13 +355,15 @@ static inline int compute_score(struct sock *sk, struct net *net,
->  struct sock *inet_lookup_reuseport(struct net *net, struct sock *sk,
->  				   struct sk_buff *skb, int doff,
->  				   __be32 saddr, __be16 sport,
-> -				   __be32 daddr, unsigned short hnum)
-> +				   __be32 daddr, unsigned short hnum,
-> +				   inet_ehashfn_t ehashfn)
->  {
->  	struct sock *reuse_sk = NULL;
->  	u32 phash;
->  
->  	if (sk->sk_reuseport) {
-> -		phash = inet_ehashfn(net, daddr, hnum, saddr, sport);
-> +		phash = INDIRECT_CALL_2(ehashfn, udp_ehashfn, inet_ehashfn,
-> +					net, daddr, hnum, saddr, sport);
->  		reuse_sk = reuseport_select_sock(sk, phash, skb, doff);
->  	}
->  	return reuse_sk;
-> @@ -385,7 +393,7 @@ static struct sock *inet_lhash2_lookup(struct net *net,
->  		score = compute_score(sk, net, hnum, daddr, dif, sdif);
->  		if (score > hiscore) {
->  			result = inet_lookup_reuseport(net, sk, skb, doff,
-> -						       saddr, sport, daddr, hnum);
-> +						       saddr, sport, daddr, hnum, inet_ehashfn);
->  			if (result)
->  				return result;
->  
-> @@ -414,7 +422,8 @@ static inline struct sock *inet_lookup_run_bpf(struct net *net,
->  	if (no_reuseport || IS_ERR_OR_NULL(sk))
->  		return sk;
->  
-> -	reuse_sk = inet_lookup_reuseport(net, sk, skb, doff, saddr, sport, daddr, hnum);
-> +	reuse_sk = inet_lookup_reuseport(net, sk, skb, doff, saddr, sport, daddr, hnum,
-> +					 inet_ehashfn);
->  	if (reuse_sk)
->  		sk = reuse_sk;
->  	return sk;
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 5ef478d2c408..7258edece691 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -405,9 +405,9 @@ static int compute_score(struct sock *sk, struct net *net,
->  	return score;
->  }
->  
-> -static u32 udp_ehashfn(const struct net *net, const __be32 laddr,
-> -		       const __u16 lport, const __be32 faddr,
-> -		       const __be16 fport)
-> +INDIRECT_CALLABLE_SCOPE
-> +u32 udp_ehashfn(const struct net *net, const __be32 laddr, const __u16 lport,
-> +		const __be32 faddr, const __be16 fport)
->  {
->  	static u32 udp_ehash_secret __read_mostly;
->  
-> @@ -417,22 +417,6 @@ static u32 udp_ehashfn(const struct net *net, const __be32 laddr,
->  			      udp_ehash_secret + net_hash_mix(net));
->  }
->  
-> -static struct sock *lookup_reuseport(struct net *net, struct sock *sk,
-> -				     struct sk_buff *skb,
-> -				     __be32 saddr, __be16 sport,
-> -				     __be32 daddr, unsigned short hnum)
-> -{
-> -	struct sock *reuse_sk = NULL;
-> -	u32 hash;
-> -
-> -	if (sk->sk_reuseport && sk->sk_state != TCP_ESTABLISHED) {
-> -		hash = udp_ehashfn(net, daddr, hnum, saddr, sport);
-> -		reuse_sk = reuseport_select_sock(sk, hash, skb,
-> -						 sizeof(struct udphdr));
-> -	}
-> -	return reuse_sk;
-> -}
-> -
->  /* called with rcu_read_lock() */
->  static struct sock *udp4_lib_lookup2(struct net *net,
->  				     __be32 saddr, __be16 sport,
-> @@ -451,7 +435,14 @@ static struct sock *udp4_lib_lookup2(struct net *net,
->  				      daddr, hnum, dif, sdif);
->  		if (score > badness) {
->  			badness = score;
-> -			result = lookup_reuseport(net, sk, skb, saddr, sport, daddr, hnum);
-> +
-> +			if (sk->sk_state == TCP_ESTABLISHED) {
-> +				result = sk;
-> +				continue;
-> +			}
-> +
-> +			result = inet_lookup_reuseport(net, sk, skb, sizeof(struct udphdr),
-> +						       saddr, sport, daddr, hnum, udp_ehashfn);
->  			if (!result) {
->  				result = sk;
->  				continue;
-> @@ -490,7 +481,8 @@ static struct sock *udp4_lookup_run_bpf(struct net *net,
->  	if (no_reuseport || IS_ERR_OR_NULL(sk))
->  		return sk;
->  
-> -	reuse_sk = lookup_reuseport(net, sk, skb, saddr, sport, daddr, hnum);
-> +	reuse_sk = inet_lookup_reuseport(net, sk, skb, sizeof(struct udphdr),
-> +					 saddr, sport, daddr, hnum, udp_ehashfn);
->  	if (reuse_sk)
->  		sk = reuse_sk;
->  	return sk;
-> diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-> index 208998694ae3..b5de1642bc51 100644
-> --- a/net/ipv6/inet6_hashtables.c
-> +++ b/net/ipv6/inet6_hashtables.c
-> @@ -39,6 +39,7 @@ u32 inet6_ehashfn(const struct net *net,
->  	return __inet6_ehashfn(lhash, lport, fhash, fport,
->  			       inet6_ehash_secret + net_hash_mix(net));
->  }
-> +EXPORT_SYMBOL_GPL(inet6_ehashfn);
->  
->  /*
->   * Sockets in TCP_CLOSE state are _always_ taken out of the hash, so
-> @@ -111,6 +112,10 @@ static inline int compute_score(struct sock *sk, struct net *net,
->  	return score;
->  }
->  
-> +INDIRECT_CALLABLE_DECLARE(u32 udp6_ehashfn(const struct net *,
-> +					   const struct in6_addr *, const u16,
-> +					   const struct in6_addr *, const __be16));
-> +
->  /**
->   * inet6_lookup_reuseport() - execute reuseport logic on AF_INET6 socket if necessary.
->   * @net: network namespace.
-> @@ -121,6 +126,7 @@ static inline int compute_score(struct sock *sk, struct net *net,
->   * @sport: source port.
->   * @daddr: destination address.
->   * @hnum: destination port in host byte order.
-> + * @ehashfn: hash function used to generate the fallback hash.
->   *
->   * Return: NULL if sk doesn't have SO_REUSEPORT set, otherwise a pointer to
->   *         the selected sock or an error.
-> @@ -130,13 +136,15 @@ struct sock *inet6_lookup_reuseport(struct net *net, struct sock *sk,
->  				    const struct in6_addr *saddr,
->  				    __be16 sport,
->  				    const struct in6_addr *daddr,
-> -				    unsigned short hnum)
-> +				    unsigned short hnum,
-> +				    inet6_ehashfn_t ehashfn)
->  {
->  	struct sock *reuse_sk = NULL;
->  	u32 phash;
->  
->  	if (sk->sk_reuseport) {
-> -		phash = inet6_ehashfn(net, daddr, hnum, saddr, sport);
-> +		phash = INDIRECT_CALL_INET(ehashfn, udp6_ehashfn, inet6_ehashfn,
-> +					   net, daddr, hnum, saddr, sport);
->  		reuse_sk = reuseport_select_sock(sk, phash, skb, doff);
->  	}
->  	return reuse_sk;
-> @@ -159,7 +167,7 @@ static struct sock *inet6_lhash2_lookup(struct net *net,
->  		score = compute_score(sk, net, hnum, daddr, dif, sdif);
->  		if (score > hiscore) {
->  			result = inet6_lookup_reuseport(net, sk, skb, doff,
-> -							saddr, sport, daddr, hnum);
-> +							saddr, sport, daddr, hnum, inet6_ehashfn);
->  			if (result)
->  				return result;
->  
-> @@ -190,7 +198,8 @@ static inline struct sock *inet6_lookup_run_bpf(struct net *net,
->  	if (no_reuseport || IS_ERR_OR_NULL(sk))
->  		return sk;
->  
-> -	reuse_sk = inet6_lookup_reuseport(net, sk, skb, doff, saddr, sport, daddr, hnum);
-> +	reuse_sk = inet6_lookup_reuseport(net, sk, skb, doff,
-> +					  saddr, sport, daddr, hnum, inet6_ehashfn);
->  	if (reuse_sk)
->  		sk = reuse_sk;
->  	return sk;
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 8b3cb1d7da7c..ebac9200b15c 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -70,11 +70,12 @@ int udpv6_init_sock(struct sock *sk)
->  	return 0;
->  }
->  
-> -static u32 udp6_ehashfn(const struct net *net,
-> -			const struct in6_addr *laddr,
-> -			const u16 lport,
-> -			const struct in6_addr *faddr,
-> -			const __be16 fport)
-> +INDIRECT_CALLABLE_SCOPE
-> +u32 udp6_ehashfn(const struct net *net,
-> +		 const struct in6_addr *laddr,
-> +		 const u16 lport,
-> +		 const struct in6_addr *faddr,
-> +		 const __be16 fport)
->  {
->  	static u32 udp6_ehash_secret __read_mostly;
->  	static u32 udp_ipv6_hash_secret __read_mostly;
-> @@ -159,24 +160,6 @@ static int compute_score(struct sock *sk, struct net *net,
->  	return score;
->  }
->  
-> -static struct sock *lookup_reuseport(struct net *net, struct sock *sk,
-> -				     struct sk_buff *skb,
-> -				     const struct in6_addr *saddr,
-> -				     __be16 sport,
-> -				     const struct in6_addr *daddr,
-> -				     unsigned int hnum)
-> -{
-> -	struct sock *reuse_sk = NULL;
-> -	u32 hash;
-> -
-> -	if (sk->sk_reuseport && sk->sk_state != TCP_ESTABLISHED) {
-> -		hash = udp6_ehashfn(net, daddr, hnum, saddr, sport);
-> -		reuse_sk = reuseport_select_sock(sk, hash, skb,
-> -						 sizeof(struct udphdr));
-> -	}
-> -	return reuse_sk;
-> -}
-> -
->  /* called with rcu_read_lock() */
->  static struct sock *udp6_lib_lookup2(struct net *net,
->  		const struct in6_addr *saddr, __be16 sport,
-> @@ -194,7 +177,14 @@ static struct sock *udp6_lib_lookup2(struct net *net,
->  				      daddr, hnum, dif, sdif);
->  		if (score > badness) {
->  			badness = score;
-> -			result = lookup_reuseport(net, sk, skb, saddr, sport, daddr, hnum);
-> +
-> +			if (sk->sk_state == TCP_ESTABLISHED) {
-> +				result = sk;
-> +				continue;
-> +			}
-> +
-> +			result = inet6_lookup_reuseport(net, sk, skb, sizeof(struct udphdr),
-> +							saddr, sport, daddr, hnum, udp6_ehashfn);
->  			if (!result) {
->  				result = sk;
->  				continue;
-> @@ -234,7 +224,8 @@ static inline struct sock *udp6_lookup_run_bpf(struct net *net,
->  	if (no_reuseport || IS_ERR_OR_NULL(sk))
->  		return sk;
->  
-> -	reuse_sk = lookup_reuseport(net, sk, skb, saddr, sport, daddr, hnum);
-> +	reuse_sk = inet6_lookup_reuseport(net, sk, skb, sizeof(struct udphdr),
-> +					  saddr, sport, daddr, hnum, udp6_ehashfn);
->  	if (reuse_sk)
->  		sk = reuse_sk;
->  	return sk;
-> 
-> -- 
-> 2.40.1
+> The reason why I keep discussing it is that IMHO achieving negligible
+> stop time is a very challenging task for many accelerators. e.g. IDXD
+> can be stopped only after completing all the pending requests. While
+> it allows software to configure the max pending work size (and a
+> reasonable setting could meet both migration SLA and performance
+> SLA) the worst-case draining latency could be in 10's milliseconds which
+> cannot be ignored by the VMM.
+
+Well, what would you report here if you had the opportunity to report
+something? Some big number? Then what?
+
+> Or do you think it's still better left to CSP working with the device vendor
+> even in this case, given the worst-case latency could be affected by
+> many factors hence not something which a kernel driver can accurately
+> estimate?
+
+This is my fear, that it is so complicated that reducing it to any
+sort of cross-vendor data is not feasible. At least I'd like to see
+someone experiment with what information would be useful to qemu
+before we add kernel ABI..
+
+Jason
 
