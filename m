@@ -1,131 +1,289 @@
-Return-Path: <netdev+bounces-14050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DAAC73EB2F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 21:25:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC92173EB32
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 21:26:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 380CD1C209C5
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 19:25:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF3641C209A8
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 19:26:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6061F13AD5;
-	Mon, 26 Jun 2023 19:25:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE3E913AD6;
+	Mon, 26 Jun 2023 19:26:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5338D13AC5
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:25:29 +0000 (UTC)
-Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4177A1700;
-	Mon, 26 Jun 2023 12:25:26 -0700 (PDT)
-Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b5c2433134so30032651fa.0;
-        Mon, 26 Jun 2023 12:25:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687807524; x=1690399524;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=9NFypNUympay54cWESrUztMRbmrTa5aoLaDv8wRaHyk=;
-        b=LnHIUwEIcP2pbXYaPoaAF/4xSheQVBu061Iu2+/UOzv5F5HeQk9tVn3M+KeSXKcgn5
-         bH/gjVAeB+ISb5Dt9HYF773Wv3RyiXBXEBjjkF1NKcUtjA0Z9QQ/j+gDOWBAFH3r3ute
-         wNyyiLmezGAH2Q/bfZJ8rkWwBAySe8cNp4MB7J9fqJtmoqLbXIljLZNVkj0hLV9TeJhZ
-         My50++zYAkbgOEEZ9OEZgjdVFaCFPhzmL0KiXcAYe4/F4ythLq8wWNqJgxb0dbZHKVzU
-         0u0uibLstNJ1ggzsHso8yXTR3nPdHQVK/aPeSDHY5WGYvUIqDRA/N3o6MM70q0et/T6h
-         4bvg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687807524; x=1690399524;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=9NFypNUympay54cWESrUztMRbmrTa5aoLaDv8wRaHyk=;
-        b=d74MmAwB+fFC8uKLLyjOwTF0t5C+5vwo8Z/IboTRF8QQYfRI+VgKR/rZYXxDLiwysS
-         3yvF6sBH/ozi2TGdaA5gXm2mvomQz5j8m13y6VjnJKg/CZMmAUaBLwtlbFUzyjU0/SEY
-         McSQImaZwQR6YtITZc91sfq75e4UViISe9JSknL3lyXpGOjsQas4R8RZU73OVRaj6hG2
-         GwKaYuh9sohn/6fql74mmqL6rBi+uh048Ns84JSy7rlTYOtsF1T4rob+QCLBj1cVg7Ya
-         eIhtfZDDvTr+qLw6eky0s0ayuTzzypbh4zYjigKZE1DerYbS5saPc2yyoKeG2bzQU1qx
-         XpqA==
-X-Gm-Message-State: AC+VfDx2HcO+tcyG1vbI5HyszLijL05dEDF8HftTdRUwmtE3ZSLYmzFb
-	cJt2OAgxvDjbiW1KvdO15P7wywyynquFhXhgHwY=
-X-Google-Smtp-Source: ACHHUZ52YLNCzMs7G5WhmajLVFQEbSpIPEzBT2uH/WajntZtI7mXMfpPIwlie0L7t6pFa9D+R6aydxShD/0DtMiCZk0=
-X-Received: by 2002:a2e:a268:0:b0:2b4:7763:c1fb with SMTP id
- k8-20020a2ea268000000b002b47763c1fbmr9829487ljm.13.1687807524076; Mon, 26 Jun
- 2023 12:25:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05C9FC0F
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:26:54 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.154.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D3BAE70;
+	Mon, 26 Jun 2023 12:26:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1687807611; x=1719343611;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=BX6NZi0IETC1cnCQXHVeeJ9qLyVZHkSXhm2gMXf0+M4=;
+  b=ZB6bsst/PVdyJlz3XxopgQRea+geEJ4sBAHIAzAs8vyn6wJjv0zkz/6O
+   dHJWs8OJlIqa4rTxZ3MAqkAJu0Q8RXui0YM46cr3G32XLh17K7CWYS11T
+   gGlUCdEn6TOZmBG/CF478DmIr8uOtNMIgKQWlQD6npCI/FTwfrfasvXqs
+   u7T2UvYSypPeHdwFX2781i0Qb2Rdk+MiX50ipC8BJJK5f/VTgmjpHyV//
+   wMjNL1sF48Y3Kwg/iOhLzANYahOga8aKBdC2GSK3Q9LAyQZhYvM1EtOMD
+   IKP/TliAmnFqyKXFJ8XvTBgsT4FvTnYrrR1VZj/hDvcuToNjGsde90410
+   g==;
+X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
+   d="scan'208";a="222011712"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa2.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 26 Jun 2023 12:26:51 -0700
+Received: from chn-vm-ex01.mchp-main.com (10.10.85.143) by
+ chn-vm-ex01.mchp-main.com (10.10.85.143) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 26 Jun 2023 12:26:45 -0700
+Received: from localhost (10.10.115.15) by chn-vm-ex01.mchp-main.com
+ (10.10.85.143) with Microsoft SMTP Server id 15.1.2507.21 via Frontend
+ Transport; Mon, 26 Jun 2023 12:26:45 -0700
+Date: Mon, 26 Jun 2023 21:26:43 +0200
+From: Horatiu Vultur <horatiu.vultur@microchip.com>
+To: Jerry Ray <jerry.ray@microchip.com>
+CC: Woojung Huh <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [PATCH] net: dsa: microchip: phy reg access 0x10-0x1f
+Message-ID: <20230626192643.4zi2qyrjfllkxlmw@soft-dev3-1>
+References: <20230626182032.2079497-1-jerry.ray@microchip.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <259e755c.4eaad.188f817a0f3.Coremail.lxybhu@buaa.edu.cn>
-In-Reply-To: <259e755c.4eaad.188f817a0f3.Coremail.lxybhu@buaa.edu.cn>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Mon, 26 Jun 2023 12:25:12 -0700
-Message-ID: <CABBYNZJtGo2SSRREH9jpAKM8UoEUNgK9uzyPuzqDdks_KBoDdw@mail.gmail.com>
-Subject: Re: [BUG]Bluetooth: HCI_Command_Status: possible semantic bug when
- Num_HCI_Command_Packets set to zero
-To: =?UTF-8?B?5YiY5paw5a6H?= <lxybhu@buaa.edu.cn>
-Cc: marcel@holtmann.org, johan.hedberg@gmail.com, davem@davemloft.net, 
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
-	baijiaju1990@gmail.com, sy2239101@buaa.edu.cn, 
-	linux-bluetooth@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Disposition: inline
+In-Reply-To: <20230626182032.2079497-1-jerry.ray@microchip.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+The 06/26/2023 11:20, Jerry Ray wrote:
 
-On Mon, Jun 26, 2023 at 7:25=E2=80=AFAM =E5=88=98=E6=96=B0=E5=AE=87 <lxybhu=
-@buaa.edu.cn> wrote:
->
-> Hello,
->
-> Our fuzzing tool finds a possible semantic bug in the Bluetooth system in=
- Linux 5.18:
->
-> During the connection process, the host server needs to receive the HCI_C=
-ommand_Status packet from the hardware controller. In normal cases, the Num=
-_HCI_Command_Packets field of this packet is not zero, and the host server =
-can normally handle this packet. However, in our testing, when the Num_HCI_=
-Command_Packets field is set to zero, the Bluetooth functionality is totall=
-y stopped until it is manually reopened.
->
-> In the Bluetooth Core Specification 5.4, the section 7.7.15 "Command Stat=
-us event" says that:
->
-> "The Num_HCI_Command_Packets event parameter allows the Controller to ind=
-icate the number of HCI command packets the Host can send to the Controller=
-. If the Controller requires the Host to stop sending commands, the Num_HCI=
-_Command_Packets event parameter will be set to zero."
->
-> This section does not mean that the Bluetooth functionality needs to be t=
-otally stopped when Num_HCI_Command_Packets is zero. Maybe in this case, th=
-e Bluetooth functionality could be still available, but the host server cou=
-ld reject any packet until Num_HCI_Command_Packets is not zero.
+Hi Jerry,
 
-Well it says, If the Controller requires the Host to stop sending
-commands, so if your tool is sending 0 then it is requesting he host
-to stop sending more commands, if you want it to continue just send
-another Num_HCI_Command_Packets, or are you saying some other
-functionality that doesn't require sending commands shall still work?
+This seems like a patch for net-next which seems to be closed now.
+Please hold back this patch until the window opens again in like 2 weeks.
 
-> We are not sure whether this is a semantic bug or implementation feature =
-in the Linux kernel. Any feedback would be appreciated, thanks!
->
->
-> Best wishes,
-> Xin-Yu Liu
+Also you need to add in the subject which tree are you targeting.
+In your case is net-next then it should be something like:
+[PATCH net-next] net: dsa: microchip: phy reg access 0x10-0x1f
 
+> With the recent patch to promote phy register accesses to 32-bits for the
+> range >=0x10, it is also necessary to expand the allowed register address
+> table for the affected devices.  These three register sets use
+> ksz9477_dev_ops and are therefore affected by the change. The address
+> ranges 0xN120-0xN13f map to the phy register address 0x10-0x1f. There is
+> no reason to exclude any register accesses within this space.
+> 
+> on June 20, 2023
+> commit 5c844d57aa78    ("net: dsa: microchip: fix writes to phy registers >= 0x10")
 
+This is just a small thing but as you need to send a new version, you can
+write something like this:
+---
+With the recent patch [0] to promote ...
 
---=20
-Luiz Augusto von Dentz
+[0] 5c844d57aa78 ("net: dsa: microchip: fix writes to phy registers >= 0x10")
+---
+
+Or:
+
+---
+With the commit 5c844d57aa78 ("net: dsa: microchip: fix writes to phy
+registers >= 0x10") which promotes phy ...
+---
+
+Just to make it a little bit more clear that the commit that you posted
+at the end refers to the patch that you mention to at the beginning of
+the commit message.
+
+> 
+> Signed-off-by: Jerry Ray <jerry.ray@microchip.com>
+> ---
+>  drivers/net/dsa/microchip/ksz_common.c | 65 ++++++--------------------
+>  1 file changed, 13 insertions(+), 52 deletions(-)
+> 
+> diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+> index 813b91a816bb..b7ce48147a38 100644
+> --- a/drivers/net/dsa/microchip/ksz_common.c
+> +++ b/drivers/net/dsa/microchip/ksz_common.c
+> @@ -509,10 +509,7 @@ static const struct regmap_range ksz8563_valid_regs[] = {
+>  	regmap_reg_range(0x1030, 0x1030),
+>  	regmap_reg_range(0x1100, 0x1111),
+>  	regmap_reg_range(0x111a, 0x111d),
+> -	regmap_reg_range(0x1122, 0x1127),
+> -	regmap_reg_range(0x112a, 0x112b),
+> -	regmap_reg_range(0x1136, 0x1139),
+> -	regmap_reg_range(0x113e, 0x113f),
+> +	regmap_reg_range(0x1120, 0x113f),
+>  	regmap_reg_range(0x1400, 0x1401),
+>  	regmap_reg_range(0x1403, 0x1403),
+>  	regmap_reg_range(0x1410, 0x1417),
+> @@ -539,10 +536,7 @@ static const struct regmap_range ksz8563_valid_regs[] = {
+>  	regmap_reg_range(0x2030, 0x2030),
+>  	regmap_reg_range(0x2100, 0x2111),
+>  	regmap_reg_range(0x211a, 0x211d),
+> -	regmap_reg_range(0x2122, 0x2127),
+> -	regmap_reg_range(0x212a, 0x212b),
+> -	regmap_reg_range(0x2136, 0x2139),
+> -	regmap_reg_range(0x213e, 0x213f),
+> +	regmap_reg_range(0x2120, 0x213f),
+>  	regmap_reg_range(0x2400, 0x2401),
+>  	regmap_reg_range(0x2403, 0x2403),
+>  	regmap_reg_range(0x2410, 0x2417),
+> @@ -635,10 +629,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x1030, 0x1030),
+>  	regmap_reg_range(0x1100, 0x1115),
+>  	regmap_reg_range(0x111a, 0x111f),
+> -	regmap_reg_range(0x1122, 0x1127),
+> -	regmap_reg_range(0x112a, 0x112b),
+> -	regmap_reg_range(0x1136, 0x1139),
+> -	regmap_reg_range(0x113e, 0x113f),
+> +	regmap_reg_range(0x1120, 0x113f),
+>  	regmap_reg_range(0x1400, 0x1401),
+>  	regmap_reg_range(0x1403, 0x1403),
+>  	regmap_reg_range(0x1410, 0x1417),
+> @@ -669,10 +660,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x2030, 0x2030),
+>  	regmap_reg_range(0x2100, 0x2115),
+>  	regmap_reg_range(0x211a, 0x211f),
+> -	regmap_reg_range(0x2122, 0x2127),
+> -	regmap_reg_range(0x212a, 0x212b),
+> -	regmap_reg_range(0x2136, 0x2139),
+> -	regmap_reg_range(0x213e, 0x213f),
+> +	regmap_reg_range(0x2120, 0x213f),
+>  	regmap_reg_range(0x2400, 0x2401),
+>  	regmap_reg_range(0x2403, 0x2403),
+>  	regmap_reg_range(0x2410, 0x2417),
+> @@ -703,10 +691,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x3030, 0x3030),
+>  	regmap_reg_range(0x3100, 0x3115),
+>  	regmap_reg_range(0x311a, 0x311f),
+> -	regmap_reg_range(0x3122, 0x3127),
+> -	regmap_reg_range(0x312a, 0x312b),
+> -	regmap_reg_range(0x3136, 0x3139),
+> -	regmap_reg_range(0x313e, 0x313f),
+> +	regmap_reg_range(0x3120, 0x313f),
+>  	regmap_reg_range(0x3400, 0x3401),
+>  	regmap_reg_range(0x3403, 0x3403),
+>  	regmap_reg_range(0x3410, 0x3417),
+> @@ -737,10 +722,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x4030, 0x4030),
+>  	regmap_reg_range(0x4100, 0x4115),
+>  	regmap_reg_range(0x411a, 0x411f),
+> -	regmap_reg_range(0x4122, 0x4127),
+> -	regmap_reg_range(0x412a, 0x412b),
+> -	regmap_reg_range(0x4136, 0x4139),
+> -	regmap_reg_range(0x413e, 0x413f),
+> +	regmap_reg_range(0x4120, 0x413f),
+>  	regmap_reg_range(0x4400, 0x4401),
+>  	regmap_reg_range(0x4403, 0x4403),
+>  	regmap_reg_range(0x4410, 0x4417),
+> @@ -771,10 +753,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
+>  	regmap_reg_range(0x5030, 0x5030),
+>  	regmap_reg_range(0x5100, 0x5115),
+>  	regmap_reg_range(0x511a, 0x511f),
+> -	regmap_reg_range(0x5122, 0x5127),
+> -	regmap_reg_range(0x512a, 0x512b),
+> -	regmap_reg_range(0x5136, 0x5139),
+> -	regmap_reg_range(0x513e, 0x513f),
+> +	regmap_reg_range(0x5120, 0x513f),
+>  	regmap_reg_range(0x5400, 0x5401),
+>  	regmap_reg_range(0x5403, 0x5403),
+>  	regmap_reg_range(0x5410, 0x5417),
+> @@ -897,10 +876,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+>  	regmap_reg_range(0x1030, 0x1030),
+>  	regmap_reg_range(0x1100, 0x1115),
+>  	regmap_reg_range(0x111a, 0x111f),
+> -	regmap_reg_range(0x1122, 0x1127),
+> -	regmap_reg_range(0x112a, 0x112b),
+> -	regmap_reg_range(0x1136, 0x1139),
+> -	regmap_reg_range(0x113e, 0x113f),
+> +	regmap_reg_range(0x1120, 0x113f),
+>  	regmap_reg_range(0x1400, 0x1401),
+>  	regmap_reg_range(0x1403, 0x1403),
+>  	regmap_reg_range(0x1410, 0x1417),
+> @@ -927,10 +903,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+>  	regmap_reg_range(0x2030, 0x2030),
+>  	regmap_reg_range(0x2100, 0x2115),
+>  	regmap_reg_range(0x211a, 0x211f),
+> -	regmap_reg_range(0x2122, 0x2127),
+> -	regmap_reg_range(0x212a, 0x212b),
+> -	regmap_reg_range(0x2136, 0x2139),
+> -	regmap_reg_range(0x213e, 0x213f),
+> +	regmap_reg_range(0x2120, 0x213f),
+>  	regmap_reg_range(0x2400, 0x2401),
+>  	regmap_reg_range(0x2403, 0x2403),
+>  	regmap_reg_range(0x2410, 0x2417),
+> @@ -957,10 +930,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+>  	regmap_reg_range(0x3030, 0x3030),
+>  	regmap_reg_range(0x3100, 0x3115),
+>  	regmap_reg_range(0x311a, 0x311f),
+> -	regmap_reg_range(0x3122, 0x3127),
+> -	regmap_reg_range(0x312a, 0x312b),
+> -	regmap_reg_range(0x3136, 0x3139),
+> -	regmap_reg_range(0x313e, 0x313f),
+> +	regmap_reg_range(0x3120, 0x313f),
+>  	regmap_reg_range(0x3400, 0x3401),
+>  	regmap_reg_range(0x3403, 0x3403),
+>  	regmap_reg_range(0x3410, 0x3417),
+> @@ -987,10 +957,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+>  	regmap_reg_range(0x4030, 0x4030),
+>  	regmap_reg_range(0x4100, 0x4115),
+>  	regmap_reg_range(0x411a, 0x411f),
+> -	regmap_reg_range(0x4122, 0x4127),
+> -	regmap_reg_range(0x412a, 0x412b),
+> -	regmap_reg_range(0x4136, 0x4139),
+> -	regmap_reg_range(0x413e, 0x413f),
+> +	regmap_reg_range(0x4120, 0x413f),
+>  	regmap_reg_range(0x4400, 0x4401),
+>  	regmap_reg_range(0x4403, 0x4403),
+>  	regmap_reg_range(0x4410, 0x4417),
+> @@ -1017,10 +984,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+>  	regmap_reg_range(0x5030, 0x5030),
+>  	regmap_reg_range(0x5100, 0x5115),
+>  	regmap_reg_range(0x511a, 0x511f),
+> -	regmap_reg_range(0x5122, 0x5127),
+> -	regmap_reg_range(0x512a, 0x512b),
+> -	regmap_reg_range(0x5136, 0x5139),
+> -	regmap_reg_range(0x513e, 0x513f),
+> +	regmap_reg_range(0x5120, 0x513f),
+>  	regmap_reg_range(0x5400, 0x5401),
+>  	regmap_reg_range(0x5403, 0x5403),
+>  	regmap_reg_range(0x5410, 0x5417),
+> @@ -1047,10 +1011,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
+>  	regmap_reg_range(0x6030, 0x6030),
+>  	regmap_reg_range(0x6100, 0x6115),
+>  	regmap_reg_range(0x611a, 0x611f),
+> -	regmap_reg_range(0x6122, 0x6127),
+> -	regmap_reg_range(0x612a, 0x612b),
+> -	regmap_reg_range(0x6136, 0x6139),
+> -	regmap_reg_range(0x613e, 0x613f),
+> +	regmap_reg_range(0x6120, 0x613f),
+>  	regmap_reg_range(0x6300, 0x6301),
+>  	regmap_reg_range(0x6400, 0x6401),
+>  	regmap_reg_range(0x6403, 0x6403),
+> -- 
+> 2.25.1
+> 
+
+-- 
+/Horatiu
 
