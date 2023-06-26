@@ -1,45 +1,46 @@
-Return-Path: <netdev+bounces-14058-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14059-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C076173EB81
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:10:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 38AF173EB99
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:13:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 01910280D90
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:10:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1CD5A1C209B9
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:13:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B96F1426C;
-	Mon, 26 Jun 2023 20:10:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DAA3914270;
+	Mon, 26 Jun 2023 20:13:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4761814263
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:10:35 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 851EBC433C8;
-	Mon, 26 Jun 2023 20:10:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2541426C
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:13:45 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5ED2AC433C8;
+	Mon, 26 Jun 2023 20:13:45 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687810235;
-	bh=yuBK0Q1abdvZ/58g4fK2gtVQqivGoLYyU4dEpgWA//M=;
+	s=k20201202; t=1687810425;
+	bh=UbRl1KTErIhEYg+YOa7ZBftAN9h4c9fJjPE40+2/qb4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ZQPpfN14Ey9K9lAlUCyKWYkuy+qQDrw7qQtefBRs+qMrmY8+b4xBKyzPUzJjjukjQ
-	 7oXsxWowQYk2Nse4kGxFrWbLPGUWQamYFCTk9nWHPCDUEu8VGJRYMK8bka2t1oMZ24
-	 MqHbNrWtDrN0TzQg48JkS8YsWGl3sA9CrmQH9k5/+FpkP3rJjolaqjv7CgXH3mg5m/
-	 uuJwTZyXKw6CRkbyvHOHPIBum8q2Dy5PA11tUnnL4nYrvvDlY3Zu+Mf8+XeN9TA4VL
-	 KWdUCOelpq/6jVe8Dwa17cZHDXTLd6f0+vpQU+WTXHIPMPXUp3I3O7GoI1QIN/68xm
-	 Jdqd6NWKJZRqA==
-Date: Mon, 26 Jun 2023 13:10:34 -0700
+	b=YkULExNGJwymo7jQ0cbBjIMOGbzql1Kp2sETo0R9TYugc9g6RHD7qkKj8uBYkCOYM
+	 dG91J3h8bJ5/HkPZpRJWub9hFjTYiLAWGdvuHcuKfTx3n9KJpl+AnoEbbHo58l6y0j
+	 TK2BiakYDnEuo0PlxPSepaV0R3Kb00LZGuE22+tWb9/jvNZNo+bfuB+neicpgUrxQk
+	 hmyMaUIjPk7MTXrNt5MESHPFSWkxm4Q4hKN2wlHCq1H5/bM8GyBlInc2F7E42Iimd1
+	 FWuNnN38cbkz+YDc8NaULjIKN9m6zsVRWixJTmVrJmAV1qb1i/+q1k7tAXe/f7m1ib
+	 /3CH7U9XM8lOA==
+Date: Mon, 26 Jun 2023 13:13:44 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Moritz Fischer <moritzf@google.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, edumazet@google.com,
- davem@davemloft.net, bryan.whitehead@microchip.com,
- UNGLinuxDriver@microchip.com, mdf@kernel.org
-Subject: Re: [PATCH net-next v2] net: lan743x: Don't sleep in atomic context
-Message-ID: <20230626131034.1766bdbf@kernel.org>
-In-Reply-To: <20230625182327.984115-1-moritzf@google.com>
-References: <20230625182327.984115-1-moritzf@google.com>
+To: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+Cc: loic.poulain@linaro.org, ryazanov.s.a@gmail.com,
+ johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ jinjian.song@fibocom.com
+Subject: Re: [PATCH] net: wwan: t7xx: Add AP CLDMA
+Message-ID: <20230626131344.2364f834@kernel.org>
+In-Reply-To: <20230626082040.15671-1-jtornosm@redhat.com>
+References: <20230626082040.15671-1-jtornosm@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,55 +50,56 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Sun, 25 Jun 2023 18:23:27 +0000 Moritz Fischer wrote:
-> dev_set_rx_mode() grabs a spin_lock, and the lan743x implementation
-> proceeds subsequently to go to sleep using readx_poll_timeout().
+On Mon, 26 Jun 2023 10:20:37 +0200 Jose Ignacio Tornos Martinez wrote:
+> At this moment with the current status, t7xx is not functional due to
+> problems like this after connection, if there is no activity:
+> [   57.370534] mtk_t7xx 0000:72:00.0: [PM] SAP suspend error: -110
+> [   57.370581] mtk_t7xx 0000:72:00.0: can't suspend
+>     (t7xx_pci_pm_runtime_suspend [mtk_t7xx] returned -110)
+> because after this, the traffic no longer works.
 > 
-> Introduce a helper wrapping the readx_poll_timeout_atomic() function
-> and use it to replace the calls to readx_polL_timeout().
+> The complete series 'net: wwan: t7xx: fw flashing & coredump support'
+> was reverted because of issues with the pci implementation.
+> In order to have at least the modem working, it would be enough if just
+> the first commit of the series is re-applied:
+> d20ef656f994 net: wwan: t7xx: Add AP CLDMA).
+> With that, the Application Processor would be controlled, correctly
+> suspended and the commented problems would be fixed (I am testing here
+> like this with no related issue).
 > 
-> Signed-off-by: Moritz Fischer <moritzf@google.com>
-> ---
+> This commit is independent of the others in the series and not related to 
+> the commented pci implementation for the new features: fw flashing and
+> coredump collection.
 > 
-> Changes from v1:
-> - Added line-breaks
-> - Changed subject to target net-next
-> - Removed Tested-by: tag
-
-Sleeping in atomic context is a bug, this is a bug fix.
-You should add a Fixes tag (probably 23f0703c125be AFAICT)
-and target the patch at net rather than net-next.
-Make sure you CC the authors of the patch under fixes (get_maintainer
-will point them out if run on a patch file with a Fixes tag)
-One more nit below...
-
->  drivers/net/ethernet/microchip/lan743x_main.c | 22 +++++++++++++++----
->  1 file changed, 18 insertions(+), 4 deletions(-)
+> Original text from the commit that would be re-applied:
 > 
-> diff --git a/drivers/net/ethernet/microchip/lan743x_main.c b/drivers/net/ethernet/microchip/lan743x_main.c
-> index f1bded993edc..4f277ffff1dc 100644
-> --- a/drivers/net/ethernet/microchip/lan743x_main.c
-> +++ b/drivers/net/ethernet/microchip/lan743x_main.c
-> @@ -144,6 +144,19 @@ static int lan743x_csr_light_reset(struct lan743x_adapter *adapter)
->  				  !(data & HW_CFG_LRST_), 100000, 10000000);
->  }
->  
-> +static int lan743x_csr_wait_for_bit_atomic(struct lan743x_adapter *adapter,
-> +					   int offset, u32 bit_mask,
-> +					   int target_value, int udelay_min,
-> +					   int udelay_max, int count)
-> +{
-> +	u32 data;
-> +
-> +	return readx_poll_timeout_atomic(LAN743X_CSR_READ_OP, offset, data,
-> +					 target_value == ((data & bit_mask) ?
-> +					 1 : 0), udelay_max,
+>     d20ef656f994 net: wwan: t7xx: Add AP CLDMA
+>     Author: Haijun Liu <haijun.liu@mediatek.com>
+>     Date:   Tue Aug 16 09:53:28 2022 +0530
+> 
+>     The t7xx device contains two Cross Layer DMA (CLDMA) interfaces to
+>     communicate with AP and Modem processors respectively. So far only
+>     MD-CLDMA was being used, this patch enables AP-CLDMA.
+> 
+>     Rename small Application Processor (sAP) to AP.
 
-You can save the awkward wrapping by using a double negation:
+A bit of a bad timing, the merge window for 6.5 has just opened 
+and we're busy settling the bugs in linux-next right now. So you
+will need to repost this change in 2 weeks...
 
-					target_value == !!(data & bit_mask)
 
-this is a fairly common form in the kernel.
+## Form letter - net-next-closed
+
+The merge window for v6.5 has begun and therefore net-next is closed
+for new drivers, features, code refactoring and optimizations.
+We are currently accepting bug fixes only.
+
+Please repost when net-next reopens after July 10th.
+
+RFC patches sent for review only are obviously welcome at any time.
+
+See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
 -- 
-pw-bot: cr
+pw-bot: defer
+
 
