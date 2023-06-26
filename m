@@ -1,618 +1,215 @@
-Return-Path: <netdev+bounces-13881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A648373D86F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:25:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9C21C73D88B
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:31:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5B228280CF2
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:25:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3BEA4280D82
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 07:31:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7D1581C33;
-	Mon, 26 Jun 2023 07:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 697D320E1;
+	Mon, 26 Jun 2023 07:31:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 68E6746BD
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:24:50 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4A704E79;
-	Mon, 26 Jun 2023 00:24:46 -0700 (PDT)
-Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
-	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35Q0sDBQ021015;
-	Mon, 26 Jun 2023 00:24:35 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=pfpt0220; bh=rFCpgYtF+w2uB45Jtz63kzRtZtMJNfTijhPQJd36UhQ=;
- b=PNaJg/c49ZcjsoB5+bINhXjdTD/jnmTmq0S2kZLvZcCIKfimFAJ3oMA06SkVhmFblsij
- tP7iabOxQE+IIsDHmWk3e4fG2u0LZ4xrMisD0+vjVCUTGXd8xM/znvmaXM4OGliO3vdg
- zpa34+iEJsa+Tz4g8DZgL2Udceik7kBpx/AxLPLhjUgkG/wD4A8FCItTgrtswx+3wI+6
- 2nxPGLcQyxUtusn0QuKHgbklKFve0PE/V1a0kClpw5n31TRte4ZqDV8iwE0Ma4LpI7qA
- um7kDlR/xYos5uqgtXh/95K2Q1JGAIQuNRVVpSALGd5o/13orPNJvIzV/24mRuLWqRH6 CQ== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3re00juufy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Mon, 26 Jun 2023 00:24:35 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 26 Jun
- 2023 00:24:32 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Mon, 26 Jun 2023 00:24:32 -0700
-Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
-	by maili.marvell.com (Postfix) with ESMTP id 41E503F7063;
-	Mon, 26 Jun 2023 00:24:27 -0700 (PDT)
-From: Hariprasad Kelam <hkelam@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <kuba@kernel.org>, <davem@davemloft.net>,
-        <willemdebruijn.kernel@gmail.com>, <andrew@lunn.ch>,
-        <sgoutham@marvell.com>, <lcherian@marvell.com>, <gakula@marvell.com>,
-        <jerinj@marvell.com>, <sbhatta@marvell.com>, <hkelam@marvell.com>,
-        <naveenm@marvell.com>, <edumazet@google.com>, <pabeni@redhat.com>,
-        <jhs@mojatatu.com>, <xiyou.wangcong@gmail.com>, <jiri@resnulli.us>,
-        <maxtram95@gmail.com>, <corbet@lwn.net>, <linux-doc@vger.kernel.org>
-Subject: [net-next Patchv2 3/3] octeontx2-pf: htb offload support for Round Robin scheduling
-Date: Mon, 26 Jun 2023 12:54:07 +0530
-Message-ID: <20230626072407.32158-4-hkelam@marvell.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230626072407.32158-1-hkelam@marvell.com>
-References: <20230626072407.32158-1-hkelam@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 580DC4C75
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 07:31:36 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05CF5E0;
+	Mon, 26 Jun 2023 00:31:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687764695; x=1719300695;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ruY20NAQ08oiR1PebyTz+Ma7La4SJPgiZxvT2aHjzFQ=;
+  b=LeHws0mZ5/4f4YI9TOoK4nwsPqA3ULspIOvyC4e0IMKPp2d5nr5Ah6Kz
+   iIvFVGaKbztZiGsdVfL7db0cweudDlGUsK8r+GYEdY6p4q8kxO/Pa3asm
+   z6OdYuOMhBdp/oXosoPyDZJbGLA9t9yeGNaVa4LQfNDkR5OyoCR4B5vGx
+   P293WN3cdCDMqQbWwo4plUWdVfpshbITop04fyduIyRJ1dUMhqcEvobsf
+   M1Atrq5iWt9I80VG9Bk8rxdfstIMaAFQ866m1DZEj8PDG+Wr3roFI9B4P
+   w989zVTLY5IakdtXk4bfD822o03Io1yVlmhzeIWXhaCt7K7XxYaBQgNiH
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10752"; a="427193406"
+X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
+   d="scan'208";a="427193406"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 00:31:34 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10752"; a="745694975"
+X-IronPort-AV: E=Sophos;i="6.01,158,1684825200"; 
+   d="scan'208";a="745694975"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga008.jf.intel.com with ESMTP; 26 Jun 2023 00:31:34 -0700
+Received: from orsmsx602.amr.corp.intel.com (10.22.229.15) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 26 Jun 2023 00:31:34 -0700
+Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
+ orsmsx602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 26 Jun 2023 00:31:34 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.23; Mon, 26 Jun 2023 00:31:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=ToqC73nc3jPweECAtoDoZqGiFCR0NGRQk4DwPT/vQLxUMxHGU4Xk3H9cqSmsy/qbSUhMHJWtQ/vl4XxFiPOG03J1y08NQ/UHNwkmpPqUnJrnJ3HSPmQdNHuTHdKfON4k4euaPaLTGCgv66QKdGdVRfVuvAGW+/Lkrdja5Wrh7i5PCak+8sd+j9lJc6oC1GOwQziDjEwoZxj5K+pZHF04MGKo0SO4pGTteYIaVk1SKLXBPvz3PDBgw4lGRTqqiD8qXrsOBu1nS0OdlJs7aP9Aga2IIlp3VvsnbV+HC5E/r4+Lo8Fp9eHCnVNi8kSH40PI8GtroQn+0BSfYBak++W2vA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=ruY20NAQ08oiR1PebyTz+Ma7La4SJPgiZxvT2aHjzFQ=;
+ b=j5dcT2/HUAlwEuMDRMbCCTJdO+XVmKthHxTvWc4+aCdfzlKOwX7uFfI3HjYH5yu0I03EMmXABL3X6tdUdi6uALCAzNBGyRDTv1U06WTYhoCerUMOqthHGK8FKj2fYQtRR3FRDp9f/IJNNdZrbV0O1t063dHx8wNTRi0jg0KrclV4x6jtecGFxc1WnWrx7etOR7STbMe+QOtNn0wydOq5NZedc7NmwzjFa6y1iB34wyPAKM2PEgDOYXtUPI5a3gdjznyY3f0avR6IXMwTWtdi+UV5ezr8MWjVlp7RX6n48Z/R5aDw660TbHgPa/RBuAXSbFPlrxIFlS2bUm+107EzpQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com (2603:10b6:408:135::18)
+ by PH0PR11MB7563.namprd11.prod.outlook.com (2603:10b6:510:286::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Mon, 26 Jun
+ 2023 07:31:32 +0000
+Received: from BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb]) by BN9PR11MB5276.namprd11.prod.outlook.com
+ ([fe80::4f05:6b0b:dbc8:abbb%7]) with mapi id 15.20.6521.026; Mon, 26 Jun 2023
+ 07:31:31 +0000
+From: "Tian, Kevin" <kevin.tian@intel.com>
+To: Jason Gunthorpe <jgg@nvidia.com>
+CC: Brett Creeley <brett.creeley@amd.com>, "kvm@vger.kernel.org"
+	<kvm@vger.kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"alex.williamson@redhat.com" <alex.williamson@redhat.com>,
+	"yishaih@nvidia.com" <yishaih@nvidia.com>,
+	"shameerali.kolothum.thodi@huawei.com"
+	<shameerali.kolothum.thodi@huawei.com>, "shannon.nelson@amd.com"
+	<shannon.nelson@amd.com>
+Subject: RE: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
+Thread-Topic: [PATCH v10 vfio 4/7] vfio/pds: Add VFIO live migration support
+Thread-Index: AQHZlZ4kU3Fwl99xbECsoSBHo1JwW6+NFosQgAUWbwCAANnr4IAAtAcAgAEnoKCAAHp3AIAHb+Ew
+Date: Mon, 26 Jun 2023 07:31:31 +0000
+Message-ID: <BN9PR11MB52762ECFCA869B97BDD2AA9D8C26A@BN9PR11MB5276.namprd11.prod.outlook.com>
+References: <20230602220318.15323-1-brett.creeley@amd.com>
+ <20230602220318.15323-5-brett.creeley@amd.com>
+ <BN9PR11MB5276511543775B852AD1C5A88C58A@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJBONrx5LOgpTr1U@nvidia.com>
+ <BN9PR11MB5276DD9E2B791EE2C06046348C5CA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJGcCF2hBGERGUBZ@nvidia.com>
+ <BN9PR11MB52763F3D4F18DAB867D146458C5DA@BN9PR11MB5276.namprd11.prod.outlook.com>
+ <ZJL6wHiXHc1eBj/R@nvidia.com>
+In-Reply-To: <ZJL6wHiXHc1eBj/R@nvidia.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BN9PR11MB5276:EE_|PH0PR11MB7563:EE_
+x-ms-office365-filtering-correlation-id: 77554316-389f-4452-320d-08db76175cca
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 2pDrDCh5P+2cX1+td7Nbqfnq1sdMX3caxhCHKPp8pIOgx0X84dLaUIz8gNzxCVL3jyfKYWR8vO2IsJXOeKVYxpS8mnUtJNizY8oW37acjWY7cfXCfludi5ZjFseMk5F3wZ3N0t2QuZgI2nUjLFCS4dEHpvM7oVjR+W5RkVhdl9vKTfWTUPALLss2/0fIODaextE5oRopnPdgDm6cOtWCmEFjt4yZYE1ZJYhO1Hl9kCD12Du4vU+LV+zmHTg0E6xu3ClSrSoBShiGIba8lffKcB+AvQPEWDHMF/JPgDzWoYQurBvOPy8835bhg8QfEl27SylvNAevmOAceNsaVLk9fyHxKgYAlb5Su1ajGARi8q3xfx9v8c1UBrpuUH1bh3Nh7brg26fGYS6YJPchmdMYPRqLeOtpLcZ4vqXq3995bbYxGde9gDM6JBr9uzyAQVYEd47rvGEJLlSSYEjB0o4kj5UYt/jiUYF3BU9RJpv/kfQk9ZMD+AJrNNB6nzKEohY86NXmYxyQUUfpdsn1/P/O7a7DwOFbZTG27wKFKRuB786K6oh9VOZEDlo49h7+2eN18bokqpIpklmYeZZhi5u9c63C3hegWPRBCVnnfOPq1i23DFJ0BTeu9o/x17cHGTGh
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BN9PR11MB5276.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(346002)(39860400002)(396003)(366004)(451199021)(33656002)(52536014)(38100700002)(122000001)(55016003)(26005)(6506007)(83380400001)(9686003)(82960400001)(186003)(8936002)(2906002)(8676002)(5660300002)(41300700001)(71200400001)(478600001)(66476007)(38070700005)(6916009)(66446008)(76116006)(66556008)(4326008)(7696005)(64756008)(66946007)(86362001)(316002)(54906003);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?MElkaUFlZndoUTErZ1dmTng3T0hSMTRUbWt1RCtlaU4weHZFaDd2ZG12RjBq?=
+ =?utf-8?B?VkM4ZmxpaERUVFByalZxcEdaYVpleE9XOXhEUDdNWmkxNEhtNVF1amt3SDJ5?=
+ =?utf-8?B?K21CMzUvZVUrSmpuTEZiUHdXaHRKdnFPYStQZXl5eWh2ZFN2WlczdThEaWxm?=
+ =?utf-8?B?YzJvaDJxUU1wVlF5alk2emVtZmxoQW53Q2JpT0E3bXhXRDJkTnByZk12ZjV6?=
+ =?utf-8?B?aU54ZDlHM1hCN3AzUWNRMjhISjUyS1VLaUF4cTFvellDYkdveUQyejUyYUJR?=
+ =?utf-8?B?dWhGZlVUSVY2ak43MlU3L1pkWVhwQ3M2ZW1ScktIUDUvYVVqckJqNklHRTJu?=
+ =?utf-8?B?WEhqTUtiN2hQMXhIcTQzVS81WVZBdEhYOUw0VmUvQlZTMHcwMGl3OVNOUkxD?=
+ =?utf-8?B?d0FLR2dvdnFVTFh4NFdibXZhaUo2MGtjSE9GVDZZQUxNcW1Bc0dieUM0a2J3?=
+ =?utf-8?B?ZGsrQmtDd21tTHVJY0s4VlBFWDJwSER0eHMrd3oycnR1RUlZUGVZMVdLbCtV?=
+ =?utf-8?B?RzdFOFFBeVAzdmdNYmhLamdlbTV2YVJ1ZjY1QWhVZUQrZ1N1aXRTSVFCNUx1?=
+ =?utf-8?B?NnptbS9rM1dma1FlQ0d2V2RJR21RN2J4em9XOUFneXdXTk03U1MxRndBZ2dK?=
+ =?utf-8?B?WkFUVFdoUDF4TTA1OVdILy9Sak5lL0w2OXI4TVh6QW1yY0M0Q1RFNVlpQS9N?=
+ =?utf-8?B?MEVnKzFtTWt5cHZQVzc1RGdWSEIrMURqY1k3eDFQcVFZNm1xVTNJMkZGOW9Z?=
+ =?utf-8?B?aUJkVnlmOXgrekNQU0VBSDZUSlNJeWpvYVdPZDd3cE1YQTh5OE1UbDFSQjlS?=
+ =?utf-8?B?Q1pCRUMvSlRadkRncy9MbXdUVDBsZERiYTdpN2MwZEFIM1FrdGNnMXJEVUN6?=
+ =?utf-8?B?N0V4aTJmNmVlbmhPb2luOFdkdXhYN1BGOENDbi9QclIxQVE2MzUvVTB1ODNx?=
+ =?utf-8?B?dEJPT1dPWnRJb21MUDN2MnA5OVhsbE5wWCs1cW41bm11dHdFQVVmWUFGV0JN?=
+ =?utf-8?B?dWtvSG5SdjcvczAzTnZCeWxUSVhaMlh6R0JPRWg4YmVzTVlmR0ZyUm5wQ1Za?=
+ =?utf-8?B?MjFpRXM3NGhBNXB6TDVKYmtUaXZrQ1l2ekE4eTJWaHpQOUFQc1AzZXpyYTJZ?=
+ =?utf-8?B?WUVBKzQyOGlRM3U3K0FVZHVQMzhYMXo1UWdxRTFpRVlnM3c5Mm5maFZtb0pp?=
+ =?utf-8?B?cmo5WEZvTjEwTldQLzBQRXFnbGEwam5uNmVQRUgrUFRpWC9sTW1vV2xSRzB2?=
+ =?utf-8?B?U0RqSWRlSDJNbUlicldrYWhFeFlIUy9VQkIvdmgrZ2UzRU1KQmxMREV5ekJV?=
+ =?utf-8?B?SnRvajlYWmhOUVBwUFJNbG5YWFo3SzY4cDlKaGxpWDI1Z0lOSG5JcE5oU0Qx?=
+ =?utf-8?B?bXpEUXFmdnU3YjhsbXVRR2Q5MmZ1VXFiRDlXQUVhWkJDUndEWHdGdVB3eHFN?=
+ =?utf-8?B?ZWxUNHBtN2JkNnNTWEpQWmNqWFNhdExGcmFucm9wSSs1Q0phU0FkUG9IT0Ra?=
+ =?utf-8?B?SzVSY0FhNXRnOG8rKzBoc3hNeGxNM3BlWGFCVkJIOEZ5cWF5SHprNEF0TkYy?=
+ =?utf-8?B?UEk0TTgwWFlMclQzVmdQeExFL0dPNDJMeTQ1ck9zTEFzOGNUazN1NXFTQkZH?=
+ =?utf-8?B?NTB0QVljMHNTME5ZNlpLSzdxSzdJZHlUcHZIeUI0TmU0aWFSWnZkWEczWlR0?=
+ =?utf-8?B?MjRiWFZ0TExUS2N3YnNZazY5SU9jeWJyU1pTSEZ4SGZSZnlYY2ZVblU3aVY5?=
+ =?utf-8?B?ZGFnc213QjNXSWtHU2cxMVF6YWpXOWFvRC9ielRCRm5QRCtVclRwUWgwUUVl?=
+ =?utf-8?B?TEpzV0g5eTBydjhVazdkdHpOUk5JOWI3SVczeVZBeStYL0N4cTh5NUYzRDdS?=
+ =?utf-8?B?d0YvZ2M0MFR3VlNiUlJySTB5TzdDUGdzelpvOERqeGxRTVJQWDdsT3UxQUpV?=
+ =?utf-8?B?VzVtRDZsOUNXa2lTVDBEMEg0MHgwUXpaU1ZFcXdudHdRbVl2SlZjdmFsKzVK?=
+ =?utf-8?B?S2twMzU5UUludCtCOUN1RTM0M2djazI4Q0prVUZoKy82c2pMVy9BdzBleHpD?=
+ =?utf-8?B?bkRLUXI2UUowVjRQaDVkS2poZ0lyMHZZMThQdnhweC9YeHRPY1VyRjJKZFUr?=
+ =?utf-8?Q?52gBmFumzSStgHD9mpvOU02D/?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Proofpoint-GUID: difAx8mj14DL6uJrDimrsQRLdiViJcQh
-X-Proofpoint-ORIG-GUID: difAx8mj14DL6uJrDimrsQRLdiViJcQh
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-26_04,2023-06-22_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: BN9PR11MB5276.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 77554316-389f-4452-320d-08db76175cca
+X-MS-Exchange-CrossTenant-originalarrivaltime: 26 Jun 2023 07:31:31.6043
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: ORvmD1s5AjSZfPXEipa9/laVXZgtaLp78AgNYs8YY+ilSdzeAQUQhpek37VGRjz3qVbCX6Gu9xNFDywG4kppEQ==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR11MB7563
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Naveen Mamindlapalli <naveenm@marvell.com>
-
-When multiple traffic flows reach Transmit level with the same
-priority, with Round robin scheduling traffic flow with the highest
-quantum value is picked. With this support, the user can add multiple
-classes with the same priority and different quantum. This patch
-does necessary changes to support the same.
-
-Signed-off-by: Naveen Mamindlapalli <naveenm@marvell.com>
-Signed-off-by: Hariprasad Kelam <hkelam@marvell.com>
----
- .../marvell/octeontx2/nic/otx2_common.c       |   1 +
- .../marvell/octeontx2/nic/otx2_common.h       |   1 +
- .../net/ethernet/marvell/octeontx2/nic/qos.c  | 236 +++++++++++++++---
- .../net/ethernet/marvell/octeontx2/nic/qos.h  |   5 +-
- 4 files changed, 203 insertions(+), 40 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-index 77c8f650f7ac..8cdd92dd9762 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.c
-@@ -774,6 +774,7 @@ int otx2_txsch_alloc(struct otx2_nic *pfvf)
- 				rsp->schq_list[lvl][schq];
- 
- 	pfvf->hw.txschq_link_cfg_lvl = rsp->link_cfg_lvl;
-+	pfvf->hw.txschq_aggr_lvl_rr_prio = rsp->aggr_lvl_rr_prio;
- 
- 	return 0;
- }
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-index ba8091131ec0..37d792f18809 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_common.h
-@@ -224,6 +224,7 @@ struct otx2_hw {
- 
- 	/* NIX */
- 	u8			txschq_link_cfg_lvl;
-+	u8			txschq_aggr_lvl_rr_prio;
- 	u16			txschq_list[NIX_TXSCH_LVL_CNT][MAX_TXSCHQ_PER_FUNC];
- 	u16			matchall_ipolicer;
- 	u32			dwrr_mtu;
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-index 51e9be55d5f5..7912824322d5 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.c
-@@ -66,11 +66,24 @@ static void otx2_qos_get_regaddr(struct otx2_qos_node *node,
- 	}
- }
- 
-+static int otx2_qos_quantum_to_dwrr_weight(struct otx2_nic *pfvf, u32 quantum)
-+{
-+	u32 weight;
-+
-+	weight = quantum / pfvf->hw.dwrr_mtu;
-+	if (quantum % pfvf->hw.dwrr_mtu)
-+		weight += 1;
-+
-+	return weight;
-+}
-+
- static void otx2_config_sched_shaping(struct otx2_nic *pfvf,
- 				      struct otx2_qos_node *node,
- 				      struct nix_txschq_config *cfg,
- 				      int *num_regs)
- {
-+	u32 rr_weight;
-+	u32 quantum;
- 	u64 maxrate;
- 
- 	otx2_qos_get_regaddr(node, cfg, *num_regs);
-@@ -87,8 +100,16 @@ static void otx2_config_sched_shaping(struct otx2_nic *pfvf,
- 		return;
- 	}
- 
--	/* configure priority  */
--	cfg->regval[*num_regs] = (node->schq - node->parent->prio_anchor) << 24;
-+	/* configure priority/quantum  */
-+	if (node->is_static) {
-+		cfg->regval[*num_regs] = (node->schq - node->parent->prio_anchor) << 24;
-+	} else {
-+		quantum = node->quantum ?
-+			  node->quantum : pfvf->tx_max_pktlen;
-+		rr_weight = otx2_qos_quantum_to_dwrr_weight(pfvf, quantum);
-+		cfg->regval[*num_regs] = node->parent->child_dwrr_prio << 24 |
-+					 rr_weight;
-+	}
- 	(*num_regs)++;
- 
- 	/* configure PIR */
-@@ -196,9 +217,8 @@ static int otx2_qos_txschq_set_parent_topology(struct otx2_nic *pfvf,
- 		cfg->reg[0] = NIX_AF_TL1X_TOPOLOGY(parent->schq);
- 
- 	cfg->regval[0] = (u64)parent->prio_anchor << 32;
--	if (parent->level == NIX_TXSCH_LVL_TL1)
--		cfg->regval[0] |= (u64)TXSCH_TL1_DFLT_RR_PRIO << 1;
--
-+	cfg->regval[0] |= ((parent->child_dwrr_prio != OTX2_QOS_DEFAULT_PRIO) ?
-+			    parent->child_dwrr_prio : 0)  << 1;
- 	cfg->num_regs++;
- 
- 	rc = otx2_sync_mbox_msg(&pfvf->mbox);
-@@ -382,10 +402,12 @@ otx2_qos_alloc_root(struct otx2_nic *pfvf)
- 		return ERR_PTR(-ENOMEM);
- 
- 	node->parent = NULL;
--	if (!is_otx2_vf(pfvf->pcifunc))
-+	if (!is_otx2_vf(pfvf->pcifunc)) {
- 		node->level = NIX_TXSCH_LVL_TL1;
--	else
-+	} else {
- 		node->level = NIX_TXSCH_LVL_TL2;
-+		node->child_dwrr_prio = OTX2_QOS_DEFAULT_PRIO;
-+	}
- 
- 	WRITE_ONCE(node->qid, OTX2_QOS_QID_INNER);
- 	node->classid = OTX2_QOS_ROOT_CLASSID;
-@@ -442,6 +464,10 @@ static int otx2_qos_alloc_txschq_node(struct otx2_nic *pfvf,
- 		txschq_node->rate = 0;
- 		txschq_node->ceil = 0;
- 		txschq_node->prio = 0;
-+		txschq_node->quantum = 0;
-+		txschq_node->is_static = true;
-+		txschq_node->child_dwrr_prio = OTX2_QOS_DEFAULT_PRIO;
-+		txschq_node->txschq_idx = OTX2_QOS_INVALID_TXSCHQ_IDX;
- 
- 		mutex_lock(&pfvf->qos.qos_lock);
- 		list_add_tail(&txschq_node->list, &node->child_schq_list);
-@@ -467,7 +493,7 @@ static struct otx2_qos_node *
- otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
- 			     struct otx2_qos_node *parent,
- 			     u16 classid, u32 prio, u64 rate, u64 ceil,
--			     u16 qid)
-+			     u32 quantum, u16 qid, bool static_cfg)
- {
- 	struct otx2_qos_node *node;
- 	int err;
-@@ -484,7 +510,10 @@ otx2_qos_sw_create_leaf_node(struct otx2_nic *pfvf,
- 	node->rate = otx2_convert_rate(rate);
- 	node->ceil = otx2_convert_rate(ceil);
- 	node->prio = prio;
--	node->is_static = true;
-+	node->quantum = quantum;
-+	node->is_static = static_cfg;
-+	node->child_dwrr_prio = OTX2_QOS_DEFAULT_PRIO;
-+	node->txschq_idx = OTX2_QOS_INVALID_TXSCHQ_IDX;
- 
- 	__set_bit(qid, pfvf->qos.qos_sq_bmap);
- 
-@@ -631,6 +660,7 @@ static int otx2_qos_txschq_alloc(struct otx2_nic *pfvf,
- 	}
- 
- 	pfvf->qos.link_cfg_lvl = rsp->link_cfg_lvl;
-+	pfvf->hw.txschq_aggr_lvl_rr_prio = rsp->aggr_lvl_rr_prio;
- 
- out:
- 	mutex_unlock(&mbox->lock);
-@@ -999,6 +1029,13 @@ static int otx2_qos_root_add(struct otx2_nic *pfvf, u16 htb_maj_id, u16 htb_defc
- 		goto free_root_node;
- 	}
- 
-+	/* Update TL1 RR PRIO */
-+	if (root->level == NIX_TXSCH_LVL_TL1) {
-+		root->child_dwrr_prio = pfvf->hw.txschq_aggr_lvl_rr_prio;
-+		netdev_dbg(pfvf->netdev,
-+			   "TL1 DWRR Priority %d\n", root->child_dwrr_prio);
-+	}
-+
- 	if (!(pfvf->netdev->flags & IFF_UP) ||
- 	    root->level == NIX_TXSCH_LVL_TL1) {
- 		root->schq = new_cfg->schq_list[root->level][0];
-@@ -1045,37 +1082,81 @@ static int otx2_qos_root_destroy(struct otx2_nic *pfvf)
- 	return 0;
- }
- 
-+static int otx2_qos_validate_dwrr_cfg(struct otx2_qos_node *parent,
-+				      struct netlink_ext_ack *extack,
-+				      u64 prio)
-+{
-+	if (parent->child_dwrr_prio == OTX2_QOS_DEFAULT_PRIO) {
-+		parent->child_dwrr_prio = prio;
-+	} else if (prio != parent->child_dwrr_prio) {
-+		NL_SET_ERR_MSG_MOD(extack, "Only one DWRR group is allowed");
-+		return -EOPNOTSUPP;
-+	}
-+
-+	return 0;
-+}
-+
- static int otx2_qos_validate_configuration(struct otx2_qos_node *parent,
- 					   struct netlink_ext_ack *extack,
- 					   struct otx2_nic *pfvf,
--					   u64 prio)
-+					   u64 prio, bool static_cfg)
- {
--	if (test_bit(prio, parent->prio_bmap)) {
--		NL_SET_ERR_MSG_MOD(extack,
--				   "Static priority child with same priority exists");
-+	if (prio == parent->child_dwrr_prio && static_cfg) {
-+		NL_SET_ERR_MSG_MOD(extack, "DWRR child group with same priority exists");
- 		return -EEXIST;
- 	}
- 
--	if (prio == TXSCH_TL1_DFLT_RR_PRIO) {
-+	if (static_cfg && test_bit(prio, parent->prio_bmap)) {
- 		NL_SET_ERR_MSG_MOD(extack,
--				   "Priority is reserved for Round Robin");
--		return -EINVAL;
-+				   "Static priority child with same priority exists");
-+		return -EEXIST;
- 	}
- 
- 	return 0;
- }
- 
-+static bool is_qos_node_dwrr(struct otx2_qos_node *parent,
-+			     struct otx2_nic *pfvf,
-+			     u64 prio)
-+{
-+	struct otx2_qos_node *node;
-+	bool ret = false;
-+
-+	if (parent->child_dwrr_prio == prio)
-+		return true;
-+
-+	mutex_lock(&pfvf->qos.qos_lock);
-+	list_for_each_entry(node, &parent->child_list, list) {
-+		if (prio == node->prio) {
-+			if (parent->child_dwrr_prio != OTX2_QOS_DEFAULT_PRIO &&
-+			    parent->child_dwrr_prio != prio)
-+				continue;
-+			/* mark old node as dwrr */
-+			node->is_static = false;
-+			parent->child_dwrr_cnt++;
-+			parent->child_static_cnt--;
-+			ret = true;
-+			break;
-+		}
-+	}
-+	mutex_unlock(&pfvf->qos.qos_lock);
-+
-+	return ret;
-+}
-+
- static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
- 				     u32 parent_classid, u64 rate, u64 ceil,
--				     u64 prio, struct netlink_ext_ack *extack)
-+				     u64 prio, u32 quantum,
-+				     struct netlink_ext_ack *extack)
- {
- 	struct otx2_qos_cfg *old_cfg, *new_cfg;
- 	struct otx2_qos_node *node, *parent;
- 	int qid, ret, err;
-+	bool static_cfg;
- 
- 	netdev_dbg(pfvf->netdev,
--		   "TC_HTB_LEAF_ALLOC_QUEUE: classid=0x%x parent_classid=0x%x rate=%lld ceil=%lld prio=%lld\n",
--		   classid, parent_classid, rate, ceil, prio);
-+		   "TC_HTB_LEAF_ALLOC_QUEUE: classid=0x%x parent_classid=0x%x rate=%lld ceil=%lld prio=%lld quantum=%d\n",
-+		   classid, parent_classid, rate, ceil, prio, quantum);
- 
- 	if (prio > OTX2_QOS_MAX_PRIO) {
- 		NL_SET_ERR_MSG_MOD(extack, "Valid priority range 0 to 7");
-@@ -1083,6 +1164,12 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
- 		goto out;
- 	}
- 
-+	if (!quantum || quantum > INT_MAX) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid quantum, range 1 - 2147483647 bytes");
-+		ret = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
- 	/* get parent node */
- 	parent = otx2_sw_node_find(pfvf, parent_classid);
- 	if (!parent) {
-@@ -1096,11 +1183,23 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
- 		goto out;
- 	}
- 
--	ret = otx2_qos_validate_configuration(parent, extack, pfvf, prio);
-+	static_cfg = !is_qos_node_dwrr(parent, pfvf, prio);
-+	ret = otx2_qos_validate_configuration(parent, extack, pfvf, prio,
-+					      static_cfg);
- 	if (ret)
- 		goto out;
- 
--	parent->child_static_cnt++;
-+	if (!static_cfg) {
-+		ret = otx2_qos_validate_dwrr_cfg(parent, extack, prio);
-+		if (ret)
-+			goto out;
-+	}
-+
-+	if (static_cfg)
-+		parent->child_static_cnt++;
-+	else
-+		parent->child_dwrr_cnt++;
-+
- 	set_bit(prio, parent->prio_bmap);
- 
- 	/* read current txschq configuration */
-@@ -1125,7 +1224,7 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
- 
- 	/* allocate and initialize a new child node */
- 	node = otx2_qos_sw_create_leaf_node(pfvf, parent, classid, prio, rate,
--					    ceil, qid);
-+					    ceil, quantum, qid, static_cfg);
- 	if (IS_ERR(node)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Unable to allocate leaf node");
- 		ret = PTR_ERR(node);
-@@ -1173,7 +1272,11 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
- free_old_cfg:
- 	kfree(old_cfg);
- reset_prio:
--	parent->child_static_cnt--;
-+	if (static_cfg)
-+		parent->child_static_cnt--;
-+	else
-+		parent->child_dwrr_cnt--;
-+
- 	clear_bit(prio, parent->prio_bmap);
- out:
- 	return ret;
-@@ -1181,10 +1284,11 @@ static int otx2_qos_leaf_alloc_queue(struct otx2_nic *pfvf, u16 classid,
- 
- static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- 				  u16 child_classid, u64 rate, u64 ceil, u64 prio,
--				  struct netlink_ext_ack *extack)
-+				  u32 quantum, struct netlink_ext_ack *extack)
- {
- 	struct otx2_qos_cfg *old_cfg, *new_cfg;
- 	struct otx2_qos_node *node, *child;
-+	bool static_cfg;
- 	int ret, err;
- 	u16 qid;
- 
-@@ -1198,6 +1302,12 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- 		goto out;
- 	}
- 
-+	if (!quantum || quantum > INT_MAX) {
-+		NL_SET_ERR_MSG_MOD(extack, "Invalid quantum, range 1 - 2147483647 bytes");
-+		ret = -EOPNOTSUPP;
-+		goto out;
-+	}
-+
- 	/* find node related to classid */
- 	node = otx2_sw_node_find(pfvf, classid);
- 	if (!node) {
-@@ -1212,7 +1322,18 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- 		goto out;
- 	}
- 
--	node->child_static_cnt++;
-+	static_cfg = !is_qos_node_dwrr(node, pfvf, prio);
-+	if (!static_cfg) {
-+		ret = otx2_qos_validate_dwrr_cfg(node, extack, prio);
-+		if (ret)
-+			goto out;
-+	}
-+
-+	if (static_cfg)
-+		node->child_static_cnt++;
-+	else
-+		node->child_dwrr_cnt++;
-+
- 	set_bit(prio, node->prio_bmap);
- 
- 	/* store the qid to assign to leaf node */
-@@ -1235,7 +1356,8 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- 
- 	/* allocate and initialize a new child node */
- 	child = otx2_qos_sw_create_leaf_node(pfvf, node, child_classid,
--					     prio, rate, ceil, qid);
-+					     prio, rate, ceil, quantum,
-+					     qid, static_cfg);
- 	if (IS_ERR(child)) {
- 		NL_SET_ERR_MSG_MOD(extack, "Unable to allocate leaf node");
- 		ret = PTR_ERR(child);
-@@ -1286,7 +1408,10 @@ static int otx2_qos_leaf_to_inner(struct otx2_nic *pfvf, u16 classid,
- free_old_cfg:
- 	kfree(old_cfg);
- reset_prio:
--	node->child_static_cnt--;
-+	if (static_cfg)
-+		node->child_static_cnt--;
-+	else
-+		node->child_dwrr_cnt--;
- 	clear_bit(prio, node->prio_bmap);
- out:
- 	return ret;
-@@ -1296,6 +1421,7 @@ static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
- 			     struct netlink_ext_ack *extack)
- {
- 	struct otx2_qos_node *node, *parent;
-+	int dwrr_del_node = false;
- 	u64 prio;
- 	u16 qid;
- 
-@@ -1311,17 +1437,31 @@ static int otx2_qos_leaf_del(struct otx2_nic *pfvf, u16 *classid,
- 	prio   = node->prio;
- 	qid    = node->qid;
- 
-+	if (!node->is_static)
-+		dwrr_del_node = true;
-+
- 	otx2_qos_disable_sq(pfvf, node->qid);
- 
- 	otx2_qos_destroy_node(pfvf, node);
- 	pfvf->qos.qid_to_sqmap[qid] = OTX2_QOS_INVALID_SQ;
- 
--	parent->child_static_cnt--;
-+	if (dwrr_del_node) {
-+		parent->child_dwrr_cnt--;
-+	} else {
-+		parent->child_static_cnt--;
-+		clear_bit(prio, parent->prio_bmap);
-+	}
-+
-+	/* Reset DWRR priority if all dwrr nodes are deleted */
-+	if (!parent->child_dwrr_cnt &&
-+	    parent->child_dwrr_prio != OTX2_QOS_DEFAULT_PRIO) {
-+		parent->child_dwrr_prio = OTX2_QOS_DEFAULT_PRIO;
-+		clear_bit(prio, parent->prio_bmap);
-+	}
-+
- 	if (!parent->child_static_cnt)
- 		parent->max_static_prio = 0;
- 
--	clear_bit(prio, parent->prio_bmap);
--
- 	return 0;
- }
- 
-@@ -1330,6 +1470,7 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
- {
- 	struct otx2_qos_node *node, *parent;
- 	struct otx2_qos_cfg *new_cfg;
-+	int dwrr_del_node = false;
- 	u64 prio;
- 	int err;
- 	u16 qid;
-@@ -1354,16 +1495,30 @@ static int otx2_qos_leaf_del_last(struct otx2_nic *pfvf, u16 classid, bool force
- 		return -ENOENT;
- 	}
- 
-+	if (!node->is_static)
-+		dwrr_del_node = true;
-+
- 	/* destroy the leaf node */
- 	otx2_qos_destroy_node(pfvf, node);
- 	pfvf->qos.qid_to_sqmap[qid] = OTX2_QOS_INVALID_SQ;
- 
--	parent->child_static_cnt--;
-+	if (dwrr_del_node) {
-+		parent->child_dwrr_cnt--;
-+	} else {
-+		parent->child_static_cnt--;
-+		clear_bit(prio, parent->prio_bmap);
-+	}
-+
-+	/* Reset DWRR priority if all dwrr nodes are deleted */
-+	if (!parent->child_dwrr_cnt &&
-+	    parent->child_dwrr_prio != OTX2_QOS_DEFAULT_PRIO) {
-+		parent->child_dwrr_prio = OTX2_QOS_DEFAULT_PRIO;
-+		clear_bit(prio, parent->prio_bmap);
-+	}
-+
- 	if (!parent->child_static_cnt)
- 		parent->max_static_prio = 0;
- 
--	clear_bit(prio, parent->prio_bmap);
--
- 	/* create downstream txschq entries to parent */
- 	err = otx2_qos_alloc_txschq_node(pfvf, parent);
- 	if (err) {
-@@ -1415,10 +1570,12 @@ void otx2_qos_config_txschq(struct otx2_nic *pfvf)
- 	if (!root)
- 		return;
- 
--	err = otx2_qos_txschq_config(pfvf, root);
--	if (err) {
--		netdev_err(pfvf->netdev, "Error update txschq configuration\n");
--		goto root_destroy;
-+	if (root->level != NIX_TXSCH_LVL_TL1) {
-+		err = otx2_qos_txschq_config(pfvf, root);
-+		if (err) {
-+			netdev_err(pfvf->netdev, "Error update txschq configuration\n");
-+			goto root_destroy;
-+		}
- 	}
- 
- 	err = otx2_qos_txschq_push_cfg_tl(pfvf, root, NULL);
-@@ -1451,7 +1608,8 @@ int otx2_setup_tc_htb(struct net_device *ndev, struct tc_htb_qopt_offload *htb)
- 		res = otx2_qos_leaf_alloc_queue(pfvf, htb->classid,
- 						htb->parent_classid,
- 						htb->rate, htb->ceil,
--						htb->prio, htb->extack);
-+						htb->prio, htb->quantum,
-+						htb->extack);
- 		if (res < 0)
- 			return res;
- 		htb->qid = res;
-@@ -1460,7 +1618,7 @@ int otx2_setup_tc_htb(struct net_device *ndev, struct tc_htb_qopt_offload *htb)
- 		return otx2_qos_leaf_to_inner(pfvf, htb->parent_classid,
- 					      htb->classid, htb->rate,
- 					      htb->ceil, htb->prio,
--					      htb->extack);
-+					      htb->quantum, htb->extack);
- 	case TC_HTB_LEAF_DEL:
- 		return otx2_qos_leaf_del(pfvf, &htb->classid, htb->extack);
- 	case TC_HTB_LEAF_DEL_LAST:
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/qos.h b/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
-index faa7c24675d1..221bd0438f60 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/qos.h
-@@ -60,12 +60,15 @@ struct otx2_qos_node {
- 	u64 ceil;
- 	u32 classid;
- 	u32 prio;
--	u16 schq; /* hw txschq */
-+	u32 quantum;
-+	/* hw txschq */
-+	u16 schq;
- 	u16 qid;
- 	u16 prio_anchor;
- 	u16 max_static_prio;
- 	u16 child_dwrr_cnt;
- 	u16 child_static_cnt;
-+	u16 child_dwrr_prio;
- 	u16 txschq_idx;			/* txschq allocation index */
- 	u8 level;
- 	bool is_static;
--- 
-2.17.1
-
+PiBGcm9tOiBKYXNvbiBHdW50aG9ycGUgPGpnZ0BudmlkaWEuY29tPg0KPiBTZW50OiBXZWRuZXNk
+YXksIEp1bmUgMjEsIDIwMjMgOToyNyBQTQ0KPiANCj4gT24gV2VkLCBKdW4gMjEsIDIwMjMgYXQg
+MDY6NDk6MTJBTSArMDAwMCwgVGlhbiwgS2V2aW4gd3JvdGU6DQo+IA0KPiA+IFdoYXQgaXMgdGhl
+IGNyaXRlcmlhIGZvciAncmVhc29uYWJsZSc/IEhvdyBkb2VzIENTUHMganVkZ2UgdGhhdCBzdWNo
+DQo+ID4gZGV2aWNlIGNhbiBndWFyYW50ZWUgYSAqcmVsaWFibGUqIHJlYXNvbmFibGUgd2luZG93
+IHNvIGxpdmUgbWlncmF0aW9uDQo+ID4gY2FuIGJlIGVuYWJsZWQgaW4gdGhlIHByb2R1Y3Rpb24g
+ZW52aXJvbm1lbnQ/DQo+IA0KPiBUaGUgQ1NQIG5lZWRzIHRvIHdvcmsgd2l0aCB0aGUgZGV2aWNl
+IHZlbmRvciB0byB1bmRlcnN0YW5kIGhvdyBpdCBmaXRzDQo+IGludG8gdGhlaXIgc3lzdGVtLCBJ
+IGRvbid0IHNlZSBob3cgd2UgY2FuIGV4dGVybmFsaXplIHRoaXMga2luZCBvZg0KPiBkZXRhaWwg
+aW4gYSBnZW5lcmFsIHdheS4NCj4gDQo+ID4gSSdtIGFmcmFpZCB0aGF0IHdlIGFyZSBoaWRpbmcg
+YSBub24tZGV0ZXJtaW5pc3RpYyBmYWN0b3IgaW4gY3VycmVudCBwcm90b2NvbC4NCj4gDQo+IFll
+cw0KPiANCj4gPiBCdXQgc3RpbGwgSSBkb24ndCB0aGluayBpdCdzIGEgZ29vZCBzaXR1YXRpb24g
+d2hlcmUgdGhlIHVzZXIgaGFzIFpFUk8NCj4gPiBrbm93bGVkZ2UgYWJvdXQgdGhlIG5vbi1uZWds
+aWdpYmxlIHRpbWUgaW4gdGhlIHN0b3BwaW5nIHBhdGguLi4NCj4gDQo+IEluIGFueSBzYW5lIGRl
+dmljZSBkZXNpZ24gdGhpcyB3aWxsIGJlIGEgc21hbGwgcGVyaW9kIG9mIHRpbWUuIFRoZXNlDQo+
+IHRpbWVvdXRzIHNob3VsZCBiZSB0byBwcm90ZWN0IGFnYWluc3QgYSBkZXZpY2UgdGhhdCBoYXMg
+Z29uZSB3aWxkLg0KPiANCg0KQW55IGV4YW1wbGUgaG93ICdzbWFsbCcgaXQgd2lsbCBiZSAoZS5n
+LiA8MW1zKT8NCg0KU2hvdWxkIHdlIGRlZmluZSBhICpyZWFzb25hYmxlKiB0aHJlc2hvbGQgaW4g
+VkZJTyBjb21tdW5pdHkgd2hpY2gNCmFueSBuZXcgdmFyaWFudCBkcml2ZXIgc2hvdWxkIHByb3Zp
+ZGUgaW5mb3JtYXRpb24gdG8ganVkZ2UgYWdhaW5zdD8NCg0KSWYgdGhlIHdvcnN0LWNhc2Ugc3Rv
+cCB0aW1lIChhc3N1bWluZyB0aGUgZGV2aWNlIGRvZXNuJ3QgZ28gd2lsZCkgbWF5DQpleGNlZWQg
+dGhlIHRocmVzaG9sZCB0aGVuIGl0J3MgdGltZSB0byBjb25zaWRlciB3aGV0aGVyIGEgbmV3IGlu
+dGVyZmFjZQ0KaXMgcmVxdWlyZWQgdG8gY29tbXVuaWNhdGUgc3VjaCBjb25zdHJhaW50IHRvIHVz
+ZXJzcGFjZS4NCg0KVGhlIHJlYXNvbiB3aHkgSSBrZWVwIGRpc2N1c3NpbmcgaXQgaXMgdGhhdCBJ
+TUhPIGFjaGlldmluZyBuZWdsaWdpYmxlDQpzdG9wIHRpbWUgaXMgYSB2ZXJ5IGNoYWxsZW5naW5n
+IHRhc2sgZm9yIG1hbnkgYWNjZWxlcmF0b3JzLiBlLmcuIElEWEQNCmNhbiBiZSBzdG9wcGVkIG9u
+bHkgYWZ0ZXIgY29tcGxldGluZyBhbGwgdGhlIHBlbmRpbmcgcmVxdWVzdHMuIFdoaWxlDQppdCBh
+bGxvd3Mgc29mdHdhcmUgdG8gY29uZmlndXJlIHRoZSBtYXggcGVuZGluZyB3b3JrIHNpemUgKGFu
+ZCBhDQpyZWFzb25hYmxlIHNldHRpbmcgY291bGQgbWVldCBib3RoIG1pZ3JhdGlvbiBTTEEgYW5k
+IHBlcmZvcm1hbmNlDQpTTEEpIHRoZSB3b3JzdC1jYXNlIGRyYWluaW5nIGxhdGVuY3kgY291bGQg
+YmUgaW4gMTAncyBtaWxsaXNlY29uZHMgd2hpY2gNCmNhbm5vdCBiZSBpZ25vcmVkIGJ5IHRoZSBW
+TU0uDQoNCk9yIGRvIHlvdSB0aGluayBpdCdzIHN0aWxsIGJldHRlciBsZWZ0IHRvIENTUCB3b3Jr
+aW5nIHdpdGggdGhlIGRldmljZSB2ZW5kb3INCmV2ZW4gaW4gdGhpcyBjYXNlLCBnaXZlbiB0aGUg
+d29yc3QtY2FzZSBsYXRlbmN5IGNvdWxkIGJlIGFmZmVjdGVkIGJ5DQptYW55IGZhY3RvcnMgaGVu
+Y2Ugbm90IHNvbWV0aGluZyB3aGljaCBhIGtlcm5lbCBkcml2ZXIgY2FuIGFjY3VyYXRlbHkNCmVz
+dGltYXRlPw0KDQpUaGFua3MNCktldmluDQoNCg==
 
