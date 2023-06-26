@@ -1,86 +1,87 @@
-Return-Path: <netdev+bounces-14116-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14117-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3B3AF73EEB3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:38:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF1EA73EEBC
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:42:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11A8C1C20A37
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:38:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EF8DD1C2084E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:42:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DA7111E;
-	Mon, 26 Jun 2023 22:37:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC6C71870;
+	Mon, 26 Jun 2023 22:42:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDE315AC4;
-	Mon, 26 Jun 2023 22:37:59 +0000 (UTC)
-Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7753E71;
-	Mon, 26 Jun 2023 15:37:57 -0700 (PDT)
-Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b6a675743dso16661111fa.2;
-        Mon, 26 Jun 2023 15:37:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E0006111E
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:42:50 +0000 (UTC)
+Received: from mail-ej1-x62c.google.com (mail-ej1-x62c.google.com [IPv6:2a00:1450:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6FEB9BD;
+	Mon, 26 Jun 2023 15:42:47 -0700 (PDT)
+Received: by mail-ej1-x62c.google.com with SMTP id a640c23a62f3a-98e25fa6f5bso359022666b.3;
+        Mon, 26 Jun 2023 15:42:47 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687819076; x=1690411076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=fGKAFHbZC4cH7Ih+qJbRUkOpVmcOgEOXjYwSvJ4Lvgg=;
-        b=RIHDV327WnntGMoaDhWBjriya4erCYEhKRMDZ3sfrt3BHDrbRQ3BffTu4o9n0T6GPn
-         pOCD5xfUyCNqY6kQ4Vu+RS5cWBoWwOoqVDCGlzyLhJ681wmaLwC33uLl1HRQLfHiEEML
-         huXx1LWRIC9Q8UmilKW0VXPASR0cq1xirBubEC7Ev4wWtafdKK3NxRfg9rugsi1GX/hF
-         SH8bhjQKUgGL2Do8N73Gxes7cH2rVTNpG6r/IEbYuwlURk8iBe8/xD4JCqAMvoO8MU9f
-         VaOZtzXOmLpnE1ija/PUj1BD+3VBEGfqf+/fODv5/jfABkBNd/43XLLB04IFBlqMvsqx
-         q48g==
+        d=gmail.com; s=20221208; t=1687819366; x=1690411366;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=XEFAA2gDkBPNK5+f6P7/QUuUIhTBpSxnJII7HREQcf4=;
+        b=YLrQte4c8sCVsgfT+rkj3HZoftvrYZKLN/SZ6yN9wgOuBxe+zMEt4WwOwbqmAjztzL
+         HBFOCy1Pkg/8XEcPMbRnQPZ2NF3GerJ3CNYuJACzUxFjHAhSB7gqmkHoQ3/0+tqfnXG/
+         P0vWBJ/86T6KXAa6vO2pMGmjjpssAiY8h5xD4wCz3tOhfCu/4kCi/W/h7LmyNSP30xLF
+         GJrz/W6jX/mzMAIjrECcLKoKwTVZSJtcxiQaCMzWNFAhCxJcv+3nV+dzCVuBpLtsnJhE
+         0kxlly/Ni182qSGQZ6RbR2navv0B4bUZtPzBI9tp2xUO0NP1ldUc4QO+EAFO3Hc39Knj
+         KVww==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687819076; x=1690411076;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=fGKAFHbZC4cH7Ih+qJbRUkOpVmcOgEOXjYwSvJ4Lvgg=;
-        b=BMvFE8ltqjHUZb3eEF+Bbjqjg8BTmHOgdYVNQpwiOSYe29DHn25fvYkY55U6DyHLlI
-         N40o3lGaMHnnt+HJt03jKNegIWlCP85vyoOy2x6yOreiQPRi+GyzSJB/RM2tezauXDEm
-         0gTbzQIIvTJJzNSMNedBef73JlqGxRTNafEYikqQV+h01mIp604h06s4D9ljydF5nsgs
-         hTGwv4V/3tblPoaCGTDF0ewkZp9umCXJKtxjMo13O59heWU6zQuNTopnXxERTP2Glnj/
-         X/WVhLBtIR0VqsPWICaBGSJH3PGutY/V69/isS2ZSIAXM5X4U2br2wn+7t7CoMLkH8Ng
-         t9Tg==
-X-Gm-Message-State: AC+VfDz0v/FDPnfBgENTbkqrNS1R+YzfTpVPysBCrml8JJJswrd1iSe1
-	7YzCNAFozB8rgf+WTBwF4VQoqnkSIYpA7brQiUg=
-X-Google-Smtp-Source: ACHHUZ7ock+asetNFMgH9r8OM4sh2UOfPQXFq8CTlan1/hLD/+e4P19VDE1hXlakS5yYw6WVOJvaZ2hKGTum/mMY8K0=
-X-Received: by 2002:a2e:9a8e:0:b0:2b6:a52b:24ac with SMTP id
- p14-20020a2e9a8e000000b002b6a52b24acmr2383951lji.22.1687819075481; Mon, 26
- Jun 2023 15:37:55 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687819366; x=1690411366;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=XEFAA2gDkBPNK5+f6P7/QUuUIhTBpSxnJII7HREQcf4=;
+        b=ExWIix47ESYnUleyfvr14+lD4ReWnGw/8jjot0oiFj7AeDU09xNKErqNCj3cft32fQ
+         OOfxQITiIiqVU1LGTbhN3U/KeLVWF1ECYKSKlewOWxd4Ng/YnBdXu4JAQKLYHdrL1w/V
+         FEZcZYczNGio8EALfdulFHzhvo7SEA+A75A0RPIZcfvQars3uNR+WOjSKI3c0+hTBJWv
+         Z4yMNRQONv/J+bq0SGag1/7ug2mNvKGgD4Nly84/MbR7ToqW8m3yw0BMPMgj4285uzz7
+         33kisriXjaW5Hwg5h0qbhgpJSqguBEScP7p8TZ1h+AKzUmTsp7mfJf3y439w5LA1peOw
+         LJOA==
+X-Gm-Message-State: AC+VfDwbhMk4RlYjVCpXhEghsBoW4cx7yT4a49niuq5RgwYi4/BrWcTI
+	W9/hgq4qj02nHVdnEY+0mn4=
+X-Google-Smtp-Source: ACHHUZ4NF6wL71lj6OSAtImbZz2ZXBouok992OJFHQNzEIdK8d/p0s+eFBurHUtzVKqyYcBku5XBYw==
+X-Received: by 2002:a17:907:806:b0:974:5e14:29c0 with SMTP id wv6-20020a170907080600b009745e1429c0mr28660350ejb.21.1687819365605;
+        Mon, 26 Jun 2023 15:42:45 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id pv18-20020a170907209200b00987cd2db33fsm3737147ejb.131.2023.06.26.15.42.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 15:42:45 -0700 (PDT)
+Date: Tue, 27 Jun 2023 01:42:42 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Horatiu Vultur <horatiu.vultur@microchip.com>
+Cc: Jerry Ray <jerry.ray@microchip.com>,
+	Woojung Huh <woojung.huh@microchip.com>,
+	UNGLinuxDriver@microchip.com, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Subject: Re: [PATCH] net: dsa: microchip: phy reg access 0x10-0x1f
+Message-ID: <20230626224242.bqzqyfep5hvdkboh@skbuf>
+References: <20230626182032.2079497-1-jerry.ray@microchip.com>
+ <20230626192643.4zi2qyrjfllkxlmw@soft-dev3-1>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
- <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
- <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
- <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
- <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
- <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
- <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
- <20230624143834.26c5b5e8@kernel.org> <ZJeUlv/omsyXdO/R@google.com> <ZJoExxIaa97JGPqM@google.com>
-In-Reply-To: <ZJoExxIaa97JGPqM@google.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Mon, 26 Jun 2023 15:37:44 -0700
-Message-ID: <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-To: Stanislav Fomichev <sdf@google.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
-	Donald Hunter <donald.hunter@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230626192643.4zi2qyrjfllkxlmw@soft-dev3-1>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -88,78 +89,73 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jun 26, 2023 at 2:36=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
- wrote:
->
-> > >
-> > > I'd think HW TX csum is actually simpler than dealing with time,
-> > > will you change your mind if Stan posts Tx csum within a few days? :)
+Hi Horațiu,
 
-Absolutely :) Happy to change my mind.
+On Mon, Jun 26, 2023 at 09:26:43PM +0200, Horatiu Vultur wrote:
+> The 06/26/2023 11:20, Jerry Ray wrote:
+> 
+> Hi Jerry,
+> 
+> This seems like a patch for net-next which seems to be closed now.
+> Please hold back this patch until the window opens again in like 2 weeks.
+> 
+> Also you need to add in the subject which tree are you targeting.
+> In your case is net-next then it should be something like:
+> [PATCH net-next] net: dsa: microchip: phy reg access 0x10-0x1f
+> 
+> > With the recent patch to promote phy register accesses to 32-bits for the
+> > range >=0x10, it is also necessary to expand the allowed register address
+> > table for the affected devices.  These three register sets use
+> > ksz9477_dev_ops and are therefore affected by the change. The address
+> > ranges 0xN120-0xN13f map to the phy register address 0x10-0x1f. There is
+> > no reason to exclude any register accesses within this space.
+> > 
+> > on June 20, 2023
+> > commit 5c844d57aa78    ("net: dsa: microchip: fix writes to phy registers >= 0x10")
+> 
+> This is just a small thing but as you need to send a new version, you can
+> write something like this:
+> ---
+> With the recent patch [0] to promote ...
+> 
+> [0] 5c844d57aa78 ("net: dsa: microchip: fix writes to phy registers >= 0x10")
+> ---
+> 
+> Or:
+> 
+> ---
+> With the commit 5c844d57aa78 ("net: dsa: microchip: fix writes to phy
+> registers >= 0x10") which promotes phy ...
+> ---
+> 
+> Just to make it a little bit more clear that the commit that you posted
+> at the end refers to the patch that you mention to at the beginning of
+> the commit message.
 
-> > > The set of offloads is barely changing, the lack of clarity
-> > > on what is needed seems overstated. IMHO AF_XDP is getting no use
-> > > today, because everything remotely complex was stripped out of
-> > > the implementation to get it merged. Aren't we hand waving the
-> > > complexity away simply because we don't want to deal with it?
-> > >
-> > > These are the features today's devices support (rx/tx is a mirror):
-> > >  - L4 csum
-> > >  - segmentation
-> > >  - time reporting
-> > >
-> > > Some may also support:
-> > >  - forwarding md tagging
-> > >  - Tx launch time
-> > >  - no fcs
-> > > Legacy / irrelevant:
-> > >  - VLAN insertion
-> >
-> > Right, the goal of the series is to lay out the foundation to support
-> > AF_XDP offloads. I'm starting with tx timestamp because that's more
-> > pressing. But, as I mentioned in another thread, we do have other
-> > users that want to adopt AF_XDP, but due to missing tx offloads, they
-> > aren't able to.
-> >
-> > IMHO, with pre-tx/post-tx hooks, it's pretty easy to go from TX
-> > timestamp to TX checksum offload, we don't need a lot:
-> > - define another generic kfunc bpf_request_tx_csum(from, to)
-> > - drivers implement it
-> > - af_xdp users call this kfunc from devtx hook
-> >
-> > We seem to be arguing over start-with-my-specific-narrow-use-case vs
-> > start-with-generic implementation, so maybe time for the office hours?
-> > I can try to present some cohesive plan of how we start with the framew=
-ork
-> > plus tx-timestamp and expand with tx-checksum/etc. There is a lot of
-> > commonality in these offloads, so I'm probably not communicating it
-> > properly..
->
-> Or, maybe a better suggestion: let me try to implement TX checksum
-> kfunc in the v3 (to show how to build on top this series).
-> Having code is better than doing slides :-D
+I think these signs intend to denote a Fixes: tag. For that, we have a
+fairly standard way of generating them:
 
-That would certainly help :)
-What I got out of your lsfmmbpf talk is that timestamp is your
-main and only use case. tx checksum for af_xdp is the other use case,
-but it's not yours, so you sort-of use it as an extra justification
-for timestamp. Hence my negative reaction to 'generality'.
-I think we'll have better results in designing an api
-when we look at these two use cases independently.
-And implement them in patches solving specifically timestamp
-with normal skb traffic and tx checksum for af_xdp as two independent apis.
-If it looks like we can extract a common framework out of them. Great.
-But trying to generalize before truly addressing both cases
-is likely to cripple both apis.
+$ cat ~/.gitconfig
+...
+[core]
+        abbrev = 12
+[pretty]
+        fixes = Fixes: %h (\"%s\")
 
-It doesn't have to be only two use cases.
-I completely agree with Kuba that:
- - L4 csum
- - segmentation
- - time reporting
-are universal HW NIC features and we need to have an api
-that exposes these features in programmable way to bpf progs in the kernel
-and through af_xdp to user space.
-I mainly suggest addressing them one by one and look
-for common code bits and api similarities later.
+$ git show 5c844d57aa78 --pretty=fixes
+Fixes: 5c844d57aa78 ("net: dsa: microchip: fix writes to phy registers >= 0x10")
+
+That line should be pasted in the commit message next to (no empty lines
+in between) the other tags like reviews and sign offs.
+
+If Jerry can prove a problem with the existing code structure from
+net-next (any PHY writes to registers >= 0x10), then the patch does not
+need to wait until net-next reopens. It needs to wait until the net-next
+pull request is sent to Linus, then this can be resent towards 'net.git'.
+That problem needs to be described in the commit message.
+
+If there's no problem that could potentially have a user-visible impact
+in the existing code and PHY driver (those PHY writes are unreachable),
+then I agree with you, the change can wait and should be resent when
+net-next reopens.
 
