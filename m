@@ -1,140 +1,158 @@
-Return-Path: <netdev+bounces-13979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8FA7873E3D0
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:46:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EE21873E3F1
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:52:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 58C13280E23
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:46:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8C89280D63
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:52:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0208C2F6;
-	Mon, 26 Jun 2023 15:46:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D63DAC2F9;
+	Mon, 26 Jun 2023 15:52:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EFE8D2E7
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:46:01 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D7A51700
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:45:51 -0700 (PDT)
-Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35QFeWVq026955;
-	Mon, 26 Jun 2023 15:45:41 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=PXd0zt9v4DLe8BgTWclPxjt5aWCb511wnx6MfMkAnGM=;
- b=jG/9AKWXTnMTLfxZaXvw/hCXvzfwaVGsqZIPYEiK7ohsn9dRDfqefq9+TUMPJcUsVc+H
- +OVSlFUp/kabQOvJRU/haYaG4zJcKoB9ZVO5k+jWpgBQsmFoev0NENx8bD2kduPmBgcB
- BjCBbRYoYzSnjoEusA1mbmXH6g7OA8pyJTXZ3ayQH/iB0iDjvojP2BO9DEtAJY4ImZ/h
- RlP/DfYO4p6+0gir44gnGskQ6j6vPaSfwozNmyygvOuCTBkMYTY6+ogmeRco+lZDPdYC
- h+wuspU/T3T8KJXvA6DGDazzFVcaX1El5ZmkBkwQFdLA51oTMdr8gVjzrvu6P2qpmWpk lQ== 
-Received: from ppma01dal.us.ibm.com (83.d6.3fa9.ip4.static.sl-reverse.com [169.63.214.131])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfd618k06-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Jun 2023 15:45:41 +0000
-Received: from pps.filterd (ppma01dal.us.ibm.com [127.0.0.1])
-	by ppma01dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35QF7UGk011033;
-	Mon, 26 Jun 2023 15:45:40 GMT
-Received: from smtprelay02.dal12v.mail.ibm.com ([9.208.130.97])
-	by ppma01dal.us.ibm.com (PPS) with ESMTPS id 3rdr46j9h4-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Mon, 26 Jun 2023 15:45:40 +0000
-Received: from smtpav03.dal12v.mail.ibm.com (smtpav03.dal12v.mail.ibm.com [10.241.53.102])
-	by smtprelay02.dal12v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35QFjcox27001348
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Mon, 26 Jun 2023 15:45:38 GMT
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 8EAD758056;
-	Mon, 26 Jun 2023 15:45:38 +0000 (GMT)
-Received: from smtpav03.dal12v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 6DE0C5803F;
-	Mon, 26 Jun 2023 15:45:38 +0000 (GMT)
-Received: from [9.24.4.46] (unknown [9.24.4.46])
-	by smtpav03.dal12v.mail.ibm.com (Postfix) with ESMTP;
-	Mon, 26 Jun 2023 15:45:38 +0000 (GMT)
-Message-ID: <25e42e2a-4662-e00a-e274-a6887aaae9d6@linux.ibm.com>
-Date: Mon, 26 Jun 2023 10:45:38 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C85D5D2E7
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 15:52:21 +0000 (UTC)
+Received: from EUR05-VI1-obe.outbound.protection.outlook.com (mail-vi1eur05on2068.outbound.protection.outlook.com [40.107.21.68])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 385A1F3;
+	Mon, 26 Jun 2023 08:52:20 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=SgQ/M6fP6wgdux2HgyAIwOwizRPJwncEFMNw/Fn7EYdLFkqa6L/huuG1XIX107oNh+P4tTaUMkLV/NTRBmQ+oaQLopq1a5td1yBRX2NQKdQehpUyBm4maEW+rN35bV6Vt/4iYPq2yQBYUt7zpxMBG19Q1jI1e3uBlcQqBPO3AHqU8KHOTiwNwwMwTcgLzdoYbrLCBGZy3utV0065a23pNzBSakIT/NP6NC/GpfCEyBhoo3Ghxu9pOChTeH+WAE9dgzs8EBAl34BS+OgFroeieLi36WPDF2+0eC0fVHZJ3kK4I0GhNGTUMN/tBdik3GKtLqYisCShGZkJOfSDELd75A==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=6isCo4W/qt2+deuKSmeCVxUyhhJQjnFMocv3q1kkiPM=;
+ b=i+2h03x4novlmpjriuCtFeRmnyJUbe7F8rOi7GOU9JxpXJ3kO6Nt797LWou8xjt4kbOrM/mj5xBOlqNE7ZrS33O1WT4tTTMcfRqp3N71MXU04CCzoFoxWsK+jp/odFHaNkjhvjMEkq/konjm5eRjMHvjsnhrKVM3NRECgxOnNxhASwr0cQOgo5Enbp/Y9MyosSEAD+eafjN6vZPETMWozrqizFUMgQjXOC85nnRfnHzm+p+g/QdC4telp97bF1IeMQfFV4Ow+MXGjmkTY+ehVqV7vbf5dtAl11Chj4x3wrCVdwLCh9nDPsnsGjRme49mnlfpH7h9FT7iGKc0GTtdcQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=6isCo4W/qt2+deuKSmeCVxUyhhJQjnFMocv3q1kkiPM=;
+ b=BuP7KkP2s1t+YmjBUdNnmN3hR7evJjntjFBIrjxYetzo3vHBEVdoN7TvzpxRbBSGjvDo6pHqClar3tPTKZYBYHjbv3mOGOqggFHsNnP/kLrR07bZNrWLaK07qR/qyax+qhQ4EeARTlStbMn87GW8QsHq08V31tMUNCJ0oz/oICQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DU2PR04MB9522.eurprd04.prod.outlook.com (2603:10a6:10:2f5::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Mon, 26 Jun
+ 2023 15:52:17 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6521.026; Mon, 26 Jun 2023
+ 15:52:17 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net 0/2] Fix PTP received on wrong port with bridged SJA1105 DSA
+Date: Mon, 26 Jun 2023 18:51:10 +0300
+Message-Id: <20230626155112.3155993-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: AM4PR0302CA0003.eurprd03.prod.outlook.com
+ (2603:10a6:205:2::16) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net] ibmvnic: Do not reset dql stats on NON_FATAL err
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com
-References: <20230622190332.29223-1-nnac123@linux.ibm.com>
- <20230624151911.7442620c@kernel.org>
-From: Nick Child <nnac123@linux.ibm.com>
-In-Reply-To: <20230624151911.7442620c@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: hlAS6s3Cw6IWlhpzYRGX2fgGyuQQEL2I
-X-Proofpoint-ORIG-GUID: hlAS6s3Cw6IWlhpzYRGX2fgGyuQQEL2I
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-26_13,2023-06-26_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=999
- priorityscore=1501 adultscore=0 suspectscore=0 clxscore=1011 phishscore=0
- impostorscore=0 lowpriorityscore=0 mlxscore=0 spamscore=0 bulkscore=0
- malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306260141
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DU2PR04MB9522:EE_
+X-MS-Office365-Filtering-Correlation-Id: c5629bdf-cefd-4d94-49c3-08db765d515a
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	NuIdrbTHhsP53RHDnZomJt5IMqXbkTLw48LOmyntyQetDRm+sYGd23Fidz63BFz43XndgZjJbjtuc8w8tJZO52rKZixAYntdRwq1rGVbs+ejAzziGIvOddTJlX7D7gh1VaoCB9ljcpJZpPRiT7gG8iFExfyXihXRz+npgJrQGHVcDmVy2eh2/9RUo8OiDXWHPuHGbdzwxkY8PP7tOV4NfNf7RLEX5eRVj4EWuBm4QDgGrZhaGFg3W+CaDYm+LQvjHlM2YgANqhw6neNJxwXnqMdDiAQ31iV5h3bihRiAjuJm//6omynJ0mqKyGFKCGK/UCI+8BQNYEd68N56IwNoKRqPvWR749eHQjXVp82oyJRsU+i0ny55Yl3A0E2ah/xPZ6io+74ARP6rkDT4jouQrrW1CfbTvo8ppSsT8ZK+LubVvoDzmxxH3m0xMa3vDfatiCDWq2ob0Y9IY1qvoO1uLQdR9HVpLcSLBcUXX2AARj/EsTviFShnvDFFdAfmrF0ESgLcvMpdE7GBs4zbqSZ9BGKmmo+wAKHkAL0IAJ2KgKvxdURsTWdPAHekWpd9DC1z0Q40vaG5VdhylE5gO+LH5HMQkQIvaQrgbyoitl8Vs61tmdMJZqVWl+37XB8fY7Cu
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(376002)(346002)(396003)(366004)(451199021)(6512007)(1076003)(44832011)(66556008)(6916009)(66946007)(66476007)(4326008)(316002)(478600001)(8936002)(36756003)(8676002)(5660300002)(2906002)(86362001)(54906003)(41300700001)(6486002)(52116002)(6666004)(186003)(6506007)(26005)(38350700002)(38100700002)(83380400001)(2616005);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?H6hSEWRVMdtYdhNR+hr+qTQk6wm7ZDpQF2gEr90l39O+Pzrehclyw9/2kri8?=
+ =?us-ascii?Q?yenWmIVJXoFmQ2klxxg4UwG34f/TefX9QE6jEkvHVxgU+U2pWoVqcY3PlUFm?=
+ =?us-ascii?Q?xy2K+0YxLrL550I2hXV/6O1Mc4QiZqmhKF8lzlQuv1JWIz+pcnBwK+wOJcsd?=
+ =?us-ascii?Q?to23yGGKGpVSCOEkvbaAOGgJs+ANWUkEg1MmAWWhCUP/hm/biVIWLmPa20ZR?=
+ =?us-ascii?Q?BkX6boONxC+hlL+g0FcUDHWGw0jKCjq2uklHR6Z3oS9EvxuAV/FzaIGUKCcq?=
+ =?us-ascii?Q?cBUK6b4tiZ1/AuEZ6K4rfjC4oeuG7jnTb6tYmxnOpPRI5d6tZxQBsIMmtLsU?=
+ =?us-ascii?Q?EUtyn97rEGpD6G5aS2bSceTx8QHUGVOP//IAyTomPscKyIOW+Gvkn+TnxeyQ?=
+ =?us-ascii?Q?9xn8yE4F7f+agFzc+YcH2msQf6S+uIuYYOJBwyYBFyW30dfTRx94BhWyhHyp?=
+ =?us-ascii?Q?7jlPMGozdWJZCzyBRmQBU0OAK3TfTJHkn6/L3WY8tNrdiuSToxLgipMivrZ2?=
+ =?us-ascii?Q?T1zqRjbUlgjgYjqIysRn49wqXaHU4kfO4Yn6ao0O9lhgFh7c9+GMR72Lwi0y?=
+ =?us-ascii?Q?vQTrjADSiyeWzJJfxhBF/SXOvmHsBbUIt2whJ3LNdMTyKDUyABKG0gLG8bTw?=
+ =?us-ascii?Q?W3Cf1QXrgxKgrh/8BXuddtFP48B+cXPfia9TshVJ1nLiu9QddYcBY2FxQNAR?=
+ =?us-ascii?Q?7c4JvHPIpQjUWEn0DzEWQWc38+C5md999Kdttl+yaBVUxWa7W+FNgTf9MgbI?=
+ =?us-ascii?Q?btkkxLI0G2PSIncQqtkHB1/A/pbMl63uUB8zs7snl2E84Glki/ssXLDCjy1V?=
+ =?us-ascii?Q?I6PQfsVJ/x4I9c9QIQNKLJrvzg9EW6XbConRYjJR2MhZkE5/0rQ1Sh3ov6l4?=
+ =?us-ascii?Q?LdB1PqgI9ER0EEJTm6mfgad5nGRk/7f7KVLRhZbpsRUgmEPM3awJgZpfsGlr?=
+ =?us-ascii?Q?xWWJkoWxeBFinN0x3au9e0KSRQGciqOKMt6QpvXf+PQ27AAzY7h/yTMUuvwe?=
+ =?us-ascii?Q?T8iOi8W5LM/GtjCjdrWxmzhUN33Ux2tkGsTXMhdIytwCLUe9UGtq1HmZfTTv?=
+ =?us-ascii?Q?2e42+HsquSkVl62WXvpqlTzFKO+aNQmkgUU5XzqfByK5A2/7GdpIicUqWSYc?=
+ =?us-ascii?Q?TITIyFxktM6BgRtkiKTAG5oLqU8kvPsoeCO9z9ZIMrGH/fOZpzxZT8sOocTU?=
+ =?us-ascii?Q?p+h3tiSmERAUxBIY8e83hiMIKIzoxFnV6Kgi+nZuuiDmHQzZ5A7xihtOBEty?=
+ =?us-ascii?Q?fVR7aWdCiTTYUXBNnb7KwDr6Z/Ns0tjk5SZiTTbiD4JHZqXP7jYOadCItdKS?=
+ =?us-ascii?Q?l6i+Llh6r/wcgMG999TeB8xWKAxuE2AJUjRRnXOFerOkhs50GxSi8KiUg5Jy?=
+ =?us-ascii?Q?nyhbBdkbnfzo7qKxykSBjK4nn06UMQOxZG3ufd2AlplbcfzU54GDl3fjTxNd?=
+ =?us-ascii?Q?dKfPPP+daDWDBg9rcrhyd2/5K2ryfhd9ljDGBj8DQlX6GREdYanAYoaHr8cE?=
+ =?us-ascii?Q?UVxFFMybHyOLPWMVWLR1ZmON0idSFajlLnrXG0KcJnPZE6xETwnVI+EKIB12?=
+ =?us-ascii?Q?a8fuYm/p7GfDzK2N6ntU8MgelSiF3unD5U+eMsHvN9RTEcr94bdI8Zkm7BTK?=
+ =?us-ascii?Q?ug=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c5629bdf-cefd-4d94-49c3-08db765d515a
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 15:52:17.3962
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: mfxXKdFge37Vr3hHBOryNsFr8iRXZgu+MekrYlDboxGhJuf1jDt+jhXGo8i7R79r2jK3osC6nhiSJNaNQNTNSg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB9522
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Since the changes were made to tag_8021q to support imprecise RX for
+bridged ports, the tag_sja1105 driver still prefers the source port
+information deduced from the VLAN headers for link-local traffic, even
+though the switch can theoretically do better and report the precise
+source port.
 
+The problem is that the tagger doesn't know when to trust one source of
+information over another, because the INCL_SRCPT option (to "tag" link
+local frames) is sometimes enabled and sometimes it isn't.
 
-On 6/24/23 17:19, Jakub Kicinski wrote:
-> On Thu, 22 Jun 2023 14:03:32 -0500 Nick Child wrote:
->> +		if (adapter->reset_reason == VNIC_RESET_NON_FATAL)
->> +			clear_bit(__QUEUE_STATE_STACK_XOFF,
->> +				  &netdev_get_tx_queue(netdev, i)->state);
-> 
-> Why are you trying to clear this bit?
-> 
-> If the completions will still come the bit will be cleared (or not)
-> during completion handling (netdev_tx_completed_queue() et al.)
-> 
-> Drivers shouldn't be poking into queue state bits directly.
+The first patch makes the switch provide the hardware tag for link local
+traffic under all circumstances, and the second patch makes the tagger
+always use that hardware tag as primary source of information for link
+local packets.
 
-Most likely, yes there could be some bytes that will get a completion 
-which would clear this bit.
+Vladimir Oltean (2):
+  net: dsa: sja1105: always enable the INCL_SRCPT option
+  net: dsa: tag_sja1105: always prefer source port information from
+    INCL_SRCPT
 
-That being said, it is also possible that all bytes sent to the NIC are 
-already completed. In which case we would not get a completion. The 
-ibmvnic driver sends its skb's to the NIC in batches, it makes a call to 
-netdev_tx_sent_queue on every time an skb is added to the batch. This is 
-not necessarily every-time that the batch is sent to the NIC.
+ drivers/net/dsa/sja1105/sja1105_main.c |  9 ++-----
+ net/dsa/tag_sja1105.c                  | 35 ++++++++++++++++++--------
+ 2 files changed, 27 insertions(+), 17 deletions(-)
 
-I am not sure what number of bytes causes dql to set 
-__QUEUE_STATE_STACK_XOFF but I do know that it is possible for up to 15 
-skb's to be sitting in the queues batch. If there are no outstanding 
-bytes on the NIC (ie not expecting a tx completion) and the internal 
-batch has 15 references per queue, is this enough to enforce dql and set 
-__QUEUE_STATE_STACK_XOFF? If so, then we must clear 
-__QUEUE_STATE_STACK_XOFF when resetting.
+-- 
+2.34.1
 
-I had a feeling this would raise some eyebrows. The main intent is to do 
-everything that netdev_tx_reset_queue() does besides resetting 
-statistics. Setting a "*STACK*" flag in driver code feels wrong 
-(especially since a *DRV* flag exists) but I could not find an 
-appropriate upper-level function. I suppose an alternative is to read 
-this flag after the device finishes the reset and sending the batch if 
-it is set. Is this any better?
-
-As always, thanks for the review.
-Nick
 
