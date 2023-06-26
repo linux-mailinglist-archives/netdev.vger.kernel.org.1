@@ -1,322 +1,189 @@
-Return-Path: <netdev+bounces-14121-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14122-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43DED73EF03
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:03:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B20D373EF49
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:29:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 02F7C280ED7
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 23:03:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D60691C209E9
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 23:29:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 00E5E1641E;
-	Mon, 26 Jun 2023 23:02:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 80A6D15AE9;
+	Mon, 26 Jun 2023 23:29:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E05CC1641A;
-	Mon, 26 Jun 2023 23:02:30 +0000 (UTC)
-Received: from new3-smtp.messagingengine.com (new3-smtp.messagingengine.com [66.111.4.229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D8C110DB;
-	Mon, 26 Jun 2023 16:02:29 -0700 (PDT)
-Received: from compute3.internal (compute3.nyi.internal [10.202.2.43])
-	by mailnew.nyi.internal (Postfix) with ESMTP id 63445582914;
-	Mon, 26 Jun 2023 19:02:28 -0400 (EDT)
-Received: from mailfrontend2 ([10.202.2.163])
-  by compute3.internal (MEProxy); Mon, 26 Jun 2023 19:02:28 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm1; t=1687820548; x=
-	1687827748; bh=6b8JNzZ9nHf7gmJe2DR3IE4e9XIkJuXbimCGs/vSd/M=; b=h
-	UlRbSOvbGdVTP9mq/hwOXnTs4E0qglcpDth6gzoSTd+vcXWRZxKrvVPjAIBuhIQ7
-	HqfmDdZTNy3VHPVcJJN/3cNp/cjy1aoBCRIz8emdGW2WNnPPe58ehW3l9B1sWink
-	44TuFHn6YAgM7gHCRYa8nUzBT6x0oCXnI9M9p7sqoOCRcUqnRWQqKMmjGUPIduXs
-	NSAaWmVdhsZjsldHm8a1JhUXIUBwH3SDdIQ8ONFyULEasv1ii0+5lQFLnWwPyUMY
-	fbOsqy/qYyIaW9V0696iTndrHYvVpfNAniQcjKLbUtCyISZ3cLNni0PBL1wa1gyE
-	eCywaJhT6CHvic7M3x8Ew==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1687820548; x=
-	1687827748; bh=6b8JNzZ9nHf7gmJe2DR3IE4e9XIkJuXbimCGs/vSd/M=; b=G
-	Wge2ZbpLNg+JUeRkVe2Cp14zoqrHUQ0lGt+tgbhb0ul+PjPEc4ih6F01Vi0DnKM2
-	e0Q6ghnJCBl3upU1OHC6XVu0EpxJDG5aHSAP9snAALj0vxjmxRgaip+rtzp62aZq
-	5plzTsTiBnMUzsIFakmFB/iNmMSARpMRnds/UV+JyPPvx8ysSXp3/OuQrcbMIWIl
-	kf3gqaQnM9tKlFAyzvGf0uixTg17KzkqW23NTcJj64guV7E1gorVJ0T+5umye7Vl
-	BXp0RAne132qqvLgBSIw6cY8gYHq39h+KDd+43/jLTQRuKZRjy5uLPZ3wiI6q7UQ
-	ioLtS32RyLb1/tGicxgDQ==
-X-ME-Sender: <xms:BBmaZFK0O5mEl4Ht6kCHqmL0WAUN0QOot3Fokgp7PATry8hjxccYGQ>
-    <xme:BBmaZBKP-4HSB3jVGFP26C928YVGuOXB60vEBMRYpLqbAkhPrlniaJTDxAMqC0hh9
-    PE8t-yo8H9fhislEA>
-X-ME-Received: <xmr:BBmaZNtuntJs_MbSzf7iMvYsUYGojcoIS4exqNqVMqWtFUkckpDjOuc74s-t4QHQVYNWGa6nyf1O9KukGJTPw8IRJ9g-8VcR2eCcMDXtJHM>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedvhedrgeehgedgudejucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdljedtmdenucfjughrpefhvf
-    evufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceo
-    ugiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepjeegveeljeehvdevud
-    duffffleelveejueegjedvhedvhedvheethfejgedtieeinecuffhomhgrihhnpehnvght
-    fhhilhhtvghrrdhpfhenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:BBmaZGZh1WV13W_ABIo76a7XYSR0KfVxXzJFev72NtRQ38wZL4uYsg>
-    <xmx:BBmaZMbgp4scvuhrwNtVOBN6qfLdYblF7kT1AeDEtU-ljt6Gt1oylg>
-    <xmx:BBmaZKA027UvcdHag-yM9vFZd_KJZLwNCcousDkSKH-_RLjn-oQ3EA>
-    <xmx:BBmaZJJfCxHaq5U8VaK5wHde4FXM0tgLPeoFIl23PNTvm5o4RxoIjA>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Mon,
- 26 Jun 2023 19:02:25 -0400 (EDT)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: daniel@iogearbox.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	fw@strlen.de,
-	pabeni@redhat.com,
-	pablo@netfilter.org,
-	andrii@kernel.org,
-	davem@davemloft.net,
-	ast@kernel.org,
-	kadlec@netfilter.org
-Cc: martin.lau@linux.dev,
-	song@kernel.org,
-	yhs@fb.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	bpf@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	netdev@vger.kernel.org,
-	dsahern@kernel.org
-Subject: [PATCH bpf-next 4/7] netfilter: bpf: Support BPF_F_NETFILTER_IP_DEFRAG in netfilter link
-Date: Mon, 26 Jun 2023 17:02:11 -0600
-Message-Id: <242c66138bf4ec8aa26b29d736fb48242b4164ce.1687819413.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <cover.1687819413.git.dxu@dxuuu.xyz>
-References: <cover.1687819413.git.dxu@dxuuu.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6CF9C111A
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 23:29:49 +0000 (UTC)
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0F17D198C
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:29:45 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-3a1d9b64837so1592619b6e.0
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:29:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1687822184; x=1690414184;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=eB+hLzf5vN2BpJgn/pfhzOLf4wUhdIzhLLOZSbRwpgM=;
+        b=PGSK9sycO/nfwep3uZiYAxPhuzUZoaLAFQgIaZ3vyuBHTMbWwG41g4MMUrGP3RysCX
+         NZFzlGs63NIhzCrDVWbcPXj6Ym9wEvWf5LmdTJWSlXdjkEdzHGRMsyr8y1yOWvb2zQHG
+         RqZlzhstAbHnyXhejxmucJq9C4GkfpqzPJbSDRV+Kz6GUjqSC52Xe4kM4mZe5+SvG76N
+         a+gCf4NcQEUr2FzDgXY9R4I36SODa7jtv070GTAbJvOzzmTJg2t0a12/6WbNTf8zRUG1
+         aKwlYaUnjUidXu3BkcOc8ZEo2rVcQ95HLJBfest90TJSUAO8EISnH/dWcHZcVkTzZ4Za
+         CcSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687822184; x=1690414184;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=eB+hLzf5vN2BpJgn/pfhzOLf4wUhdIzhLLOZSbRwpgM=;
+        b=gfabT3rRTq6jgeusoSqTpIiNgwQhJBzqJzqwU2bvwQiEZf4l+Aq/bFp5vxwdPupZkp
+         eXU5BFfGSB0QjxMdVc2EUTlEjwp9PUSGjkxukeEr8TPEzqh7endJq3QrZUI1l51pBHVX
+         j2f+y4ucdU6d4R+8FO/9ykR3dqB0P+P0gkzN+GXEPDaSgXqC8c4ZRztGvo2vS/b+ZpTa
+         znQX09XaSBmZZ1NKPU1a4pmw7Gu+IHC5ysK3o7NBQzHKp4s5mTcXoQP8jzsuue8yW/fJ
+         QP/PCHj+N5WkkFZWvhPuSeEW9rJKNaoci8z813cBnYUmsIaSD9owCvtsOAr1L/C4nxWB
+         QwNA==
+X-Gm-Message-State: AC+VfDz3mnyDaamRZKBfdwdpYNfwG18fReOy6V0FhiRaXasZnq9s8ZZz
+	H8vlv8zxGTH9QtZfJFeh/7NSh54tUZnjr7jog6SNMQ==
+X-Google-Smtp-Source: ACHHUZ5x7Ete2qu0HOyY704vpmm5QNQQ/uoPQKHE11ZOwqsylvlZDZQ92OBa9pnA5GLEzpNW55kAnBcaV+KuulUKtEA=
+X-Received: by 2002:a05:6808:148f:b0:39e:7af4:7eea with SMTP id
+ e15-20020a056808148f00b0039e7af47eeamr42784391oiw.55.1687822184187; Mon, 26
+ Jun 2023 16:29:44 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+ <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
+ <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
+ <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
+ <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
+ <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
+ <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
+ <20230624143834.26c5b5e8@kernel.org> <ZJeUlv/omsyXdO/R@google.com>
+ <ZJoExxIaa97JGPqM@google.com> <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
+In-Reply-To: <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
+From: Stanislav Fomichev <sdf@google.com>
+Date: Mon, 26 Jun 2023 16:29:32 -0700
+Message-ID: <CAKH8qBv-jU6TUcWrze5VeiVhiJ-HUcpHX7rMJzN5o2tXFkS8kA@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This commit adds support for enabling IP defrag using pre-existing
-netfilter defrag support. Basically all the flag does is bump a refcnt
-while the link the active. Checks are also added to ensure the prog
-requesting defrag support is run _after_ netfilter defrag hooks.
+On Mon, Jun 26, 2023 at 3:37=E2=80=AFPM Alexei Starovoitov
+<alexei.starovoitov@gmail.com> wrote:
+>
+> On Mon, Jun 26, 2023 at 2:36=E2=80=AFPM Stanislav Fomichev <sdf@google.co=
+m> wrote:
+> >
+> > > >
+> > > > I'd think HW TX csum is actually simpler than dealing with time,
+> > > > will you change your mind if Stan posts Tx csum within a few days? =
+:)
+>
+> Absolutely :) Happy to change my mind.
+>
+> > > > The set of offloads is barely changing, the lack of clarity
+> > > > on what is needed seems overstated. IMHO AF_XDP is getting no use
+> > > > today, because everything remotely complex was stripped out of
+> > > > the implementation to get it merged. Aren't we hand waving the
+> > > > complexity away simply because we don't want to deal with it?
+> > > >
+> > > > These are the features today's devices support (rx/tx is a mirror):
+> > > >  - L4 csum
+> > > >  - segmentation
+> > > >  - time reporting
+> > > >
+> > > > Some may also support:
+> > > >  - forwarding md tagging
+> > > >  - Tx launch time
+> > > >  - no fcs
+> > > > Legacy / irrelevant:
+> > > >  - VLAN insertion
+> > >
+> > > Right, the goal of the series is to lay out the foundation to support
+> > > AF_XDP offloads. I'm starting with tx timestamp because that's more
+> > > pressing. But, as I mentioned in another thread, we do have other
+> > > users that want to adopt AF_XDP, but due to missing tx offloads, they
+> > > aren't able to.
+> > >
+> > > IMHO, with pre-tx/post-tx hooks, it's pretty easy to go from TX
+> > > timestamp to TX checksum offload, we don't need a lot:
+> > > - define another generic kfunc bpf_request_tx_csum(from, to)
+> > > - drivers implement it
+> > > - af_xdp users call this kfunc from devtx hook
+> > >
+> > > We seem to be arguing over start-with-my-specific-narrow-use-case vs
+> > > start-with-generic implementation, so maybe time for the office hours=
+?
+> > > I can try to present some cohesive plan of how we start with the fram=
+ework
+> > > plus tx-timestamp and expand with tx-checksum/etc. There is a lot of
+> > > commonality in these offloads, so I'm probably not communicating it
+> > > properly..
+> >
+> > Or, maybe a better suggestion: let me try to implement TX checksum
+> > kfunc in the v3 (to show how to build on top this series).
+> > Having code is better than doing slides :-D
+>
+> That would certainly help :)
+> What I got out of your lsfmmbpf talk is that timestamp is your
+> main and only use case. tx checksum for af_xdp is the other use case,
+> but it's not yours, so you sort-of use it as an extra justification
+> for timestamp. Hence my negative reaction to 'generality'.
+> I think we'll have better results in designing an api
+> when we look at these two use cases independently.
+> And implement them in patches solving specifically timestamp
+> with normal skb traffic and tx checksum for af_xdp as two independent api=
+s.
+> If it looks like we can extract a common framework out of them. Great.
+> But trying to generalize before truly addressing both cases
+> is likely to cripple both apis.
 
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- include/uapi/linux/bpf.h       |   5 ++
- net/netfilter/nf_bpf_link.c    | 108 +++++++++++++++++++++++++++++----
- tools/include/uapi/linux/bpf.h |   5 ++
- 3 files changed, 107 insertions(+), 11 deletions(-)
+I need timestamps for the af_xdp case and I don't really care about skb :-(
+I brought skb into the picture mostly to cover John's cases.
+So maybe let's drop the skb case for now and focus on af_xdp?
+skb is convenient testing-wise though (with veth), but maybe I can
+somehow carve-out af_xdp skbs only out of it..
 
-diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-index 60a9d59beeab..04ac77481583 100644
---- a/include/uapi/linux/bpf.h
-+++ b/include/uapi/linux/bpf.h
-@@ -1170,6 +1170,11 @@ enum bpf_link_type {
-  */
- #define BPF_F_KPROBE_MULTI_RETURN	(1U << 0)
- 
-+/* link_create.netfilter.flags used in LINK_CREATE command for
-+ * BPF_PROG_TYPE_NETFILTER to enable IP packet defragmentation.
-+ */
-+#define BPF_F_NETFILTER_IP_DEFRAG (1U << 0)
-+
- /* When BPF ldimm64's insn[0].src_reg != 0 then this can have
-  * the following extensions:
-  *
-diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-index c36da56d756f..a8015dbce12a 100644
---- a/net/netfilter/nf_bpf_link.c
-+++ b/net/netfilter/nf_bpf_link.c
-@@ -1,6 +1,7 @@
- // SPDX-License-Identifier: GPL-2.0
- #include <linux/bpf.h>
- #include <linux/filter.h>
-+#include <linux/kmod.h>
- #include <linux/netfilter.h>
- 
- #include <net/netfilter/nf_bpf_link.h>
-@@ -23,8 +24,77 @@ struct bpf_nf_link {
- 	struct nf_hook_ops hook_ops;
- 	struct net *net;
- 	u32 dead;
-+	bool defrag;
- };
- 
-+static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
-+{
-+	int err;
-+
-+	switch (link->hook_ops.pf) {
-+#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4)
-+	case NFPROTO_IPV4:
-+		const struct nf_defrag_v4_hook *v4_hook;
-+
-+		err = request_module("nf_defrag_ipv4");
-+		if (err)
-+			return err;
-+
-+		rcu_read_lock();
-+		v4_hook = rcu_dereference(nf_defrag_v4_hook);
-+		err = v4_hook->enable(link->net);
-+		rcu_read_unlock();
-+
-+		return err;
-+#endif
-+#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
-+	case NFPROTO_IPV6:
-+		const struct nf_defrag_v6_hook *v6_hook;
-+
-+		err = request_module("nf_defrag_ipv6_hooks");
-+		if (err)
-+			return err;
-+
-+		rcu_read_lock();
-+		v6_hook = rcu_dereference(nf_defrag_v6_hook);
-+		err = v6_hook->enable(link->net);
-+		rcu_read_unlock();
-+
-+		return err;
-+#endif
-+	default:
-+		return -EAFNOSUPPORT;
-+	}
-+}
-+
-+static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
-+{
-+	switch (link->hook_ops.pf) {
-+#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4)
-+	case NFPROTO_IPV4:
-+		const struct nf_defrag_v4_hook *v4_hook;
-+
-+		rcu_read_lock();
-+		v4_hook = rcu_dereference(nf_defrag_v4_hook);
-+		v4_hook->disable(link->net);
-+		rcu_read_unlock();
-+
-+		break;
-+#endif
-+#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV6)
-+	case NFPROTO_IPV6:
-+		const struct nf_defrag_v6_hook *v6_hook;
-+
-+		rcu_read_lock();
-+		v6_hook = rcu_dereference(nf_defrag_v6_hook);
-+		v6_hook->disable(link->net);
-+		rcu_read_unlock();
-+
-+		break;
-+	}
-+#endif
-+}
-+
- static void bpf_nf_link_release(struct bpf_link *link)
- {
- 	struct bpf_nf_link *nf_link = container_of(link, struct bpf_nf_link, link);
-@@ -37,6 +107,9 @@ static void bpf_nf_link_release(struct bpf_link *link)
- 	 */
- 	if (!cmpxchg(&nf_link->dead, 0, 1))
- 		nf_unregister_net_hook(nf_link->net, &nf_link->hook_ops);
-+
-+	if (nf_link->defrag)
-+		bpf_nf_disable_defrag(nf_link);
- }
- 
- static void bpf_nf_link_dealloc(struct bpf_link *link)
-@@ -92,6 +165,8 @@ static const struct bpf_link_ops bpf_nf_link_lops = {
- 
- static int bpf_nf_check_pf_and_hooks(const union bpf_attr *attr)
- {
-+	int prio;
-+
- 	switch (attr->link_create.netfilter.pf) {
- 	case NFPROTO_IPV4:
- 	case NFPROTO_IPV6:
-@@ -102,19 +177,18 @@ static int bpf_nf_check_pf_and_hooks(const union bpf_attr *attr)
- 		return -EAFNOSUPPORT;
- 	}
- 
--	if (attr->link_create.netfilter.flags)
-+	if (attr->link_create.netfilter.flags & ~BPF_F_NETFILTER_IP_DEFRAG)
- 		return -EOPNOTSUPP;
- 
--	/* make sure conntrack confirm is always last.
--	 *
--	 * In the future, if userspace can e.g. request defrag, then
--	 * "defrag_requested && prio before NF_IP_PRI_CONNTRACK_DEFRAG"
--	 * should fail.
--	 */
--	switch (attr->link_create.netfilter.priority) {
--	case NF_IP_PRI_FIRST: return -ERANGE; /* sabotage_in and other warts */
--	case NF_IP_PRI_LAST: return -ERANGE; /* e.g. conntrack confirm */
--	}
-+	/* make sure conntrack confirm is always last */
-+	prio = attr->link_create.netfilter.priority;
-+	if (prio == NF_IP_PRI_FIRST)
-+		return -ERANGE;  /* sabotage_in and other warts */
-+	else if (prio == NF_IP_PRI_LAST)
-+		return -ERANGE;  /* e.g. conntrack confirm */
-+	else if ((attr->link_create.netfilter.flags & BPF_F_NETFILTER_IP_DEFRAG) &&
-+		 (prio > NF_IP_PRI_FIRST && prio <= NF_IP_PRI_CONNTRACK_DEFRAG))
-+		return -ERANGE;  /* cannot use defrag if prog runs before nf_defrag */
- 
- 	return 0;
- }
-@@ -156,6 +230,18 @@ int bpf_nf_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
- 		return err;
- 	}
- 
-+	if (attr->link_create.netfilter.flags & BPF_F_NETFILTER_IP_DEFRAG) {
-+		err = bpf_nf_enable_defrag(link);
-+		if (err) {
-+			bpf_link_cleanup(&link_primer);
-+			return err;
-+		}
-+		/* only mark defrag enabled if enabling succeeds so cleanup path
-+		 * doesn't disable without a corresponding enable
-+		 */
-+		link->defrag = true;
-+	}
-+
- 	err = nf_register_net_hook(net, &link->hook_ops);
- 	if (err) {
- 		bpf_link_cleanup(&link_primer);
-diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-index 60a9d59beeab..04ac77481583 100644
---- a/tools/include/uapi/linux/bpf.h
-+++ b/tools/include/uapi/linux/bpf.h
-@@ -1170,6 +1170,11 @@ enum bpf_link_type {
-  */
- #define BPF_F_KPROBE_MULTI_RETURN	(1U << 0)
- 
-+/* link_create.netfilter.flags used in LINK_CREATE command for
-+ * BPF_PROG_TYPE_NETFILTER to enable IP packet defragmentation.
-+ */
-+#define BPF_F_NETFILTER_IP_DEFRAG (1U << 0)
-+
- /* When BPF ldimm64's insn[0].src_reg != 0 then this can have
-  * the following extensions:
-  *
--- 
-2.40.1
+Regarding timestamp vs checksum: timestamp is more pressing, but I do
+have people around that want to use af_xdp but need multibuf + tx
+offloads, so I was hoping to at least have a path for more tx offloads
+after we're done with tx timestamp "offload"..
 
+> It doesn't have to be only two use cases.
+> I completely agree with Kuba that:
+>  - L4 csum
+>  - segmentation
+>  - time reporting
+> are universal HW NIC features and we need to have an api
+> that exposes these features in programmable way to bpf progs in the kerne=
+l
+> and through af_xdp to user space.
+> I mainly suggest addressing them one by one and look
+> for common code bits and api similarities later.
+
+Ack, let me see if I can fit tx csum into the picture. I still feel
+like we need these dev-bound tracing programs if we want to trigger
+kfuncs safely, but maybe we can simplify further..
 
