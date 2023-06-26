@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-13968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0EA473E393
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:40:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E49F73E397
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 17:40:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CB1E41C20972
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:40:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F2CB1C208BC
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 15:40:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66861C2C1;
-	Mon, 26 Jun 2023 15:40:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86D6AC2F6;
+	Mon, 26 Jun 2023 15:40:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B329BC12D;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F40C2C1;
+	Mon, 26 Jun 2023 15:40:17 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9542DC433C0;
 	Mon, 26 Jun 2023 15:40:12 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 88117C433C8;
-	Mon, 26 Jun 2023 15:40:08 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687794012;
-	bh=dwXCF9f2fQo97nSVcp6MB0XwLHJLjovoiu215aV3VIM=;
-	h=From:To:Cc:Subject:Date:From;
-	b=W6J0PeX7nYnoL6w01+rkgKirTv4OLMBI/68lgNEjJ6QrTT0+U5tJy43V9tdw/p/FZ
-	 U2Z4ez+Tej6OdPwLCrOOl9FQ1K5JE0Ccdy0fuIysYDlXH/mZMxJ5jFoWmr644S/Gio
-	 UgHgnyTrtpDXoh+g8dOS3EHJY4MXMPaVoF+H0FfZARHiKKZwVQD8QNdO97ieAMcsTT
-	 UbpzN2fWkB+xjxgFhRaxcAJ/XpEDcZcc1+0bgc0P85runCJPxLuWnkmi5LHgl4Sw9O
-	 +r/8+L+FQU0eI8iTkh7peEb5CZohWf6/NNMPyDEIYjWZSjTP9yp3GTvlUUYRXwfnDq
-	 EM5evYV8nKdyg==
+	s=k20201202; t=1687794017;
+	bh=kJMjOEWBubOW9yDcj4y+c7DM6eBhC1GM5K1t94VIlM0=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=pjC538ejKJF2eQqF6iIIHTI84+Kq2vWLZ8C7dPnMmb+7tEFsLzTxeqoUeitjGPmkK
+	 SOkOgn7zgCYtd7IMLE0KTMOFNV3ANmp5+cv7yII3sHOUB//cfeQYUuz4Ef5xgHTADn
+	 gZkDPX/TRggSuuQzismphdz21txnNQREx0Uiioc2TPdb+BfMTC6RzYb5Guj+zvp22e
+	 cbcXvsTwmBt4lJ5Ad2499U0oJ8pDDjoODjTclOyVnF9VdDCEeANEsZEs5Euis/nPWu
+	 TSNoQda7X4NBKGDt29xkfCsbv6xVh4UY29PRo3H3/IVnsH7TKJi9VvXKLADrWfKHqT
+	 lR68uoczfFCSg==
 From: Jisheng Zhang <jszhang@kernel.org>
 To: Giuseppe Cavallaro <peppe.cavallaro@st.com>,
 	Alexandre Torgue <alexandre.torgue@foss.st.com>,
@@ -47,10 +47,12 @@ Cc: netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
 	linux-sunxi@lists.linux.dev,
 	Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH net-next v4 0/2] net: stmmac: improve driver statistics
-Date: Mon, 26 Jun 2023 23:28:42 +0800
-Message-Id: <20230626152844.484-1-jszhang@kernel.org>
+Subject: [PATCH net-next v4 1/2] net: stmmac: don't clear network statistics in .ndo_open()
+Date: Mon, 26 Jun 2023 23:28:43 +0800
+Message-Id: <20230626152844.484-2-jszhang@kernel.org>
 X-Mailer: git-send-email 2.40.0
+In-Reply-To: <20230626152844.484-1-jszhang@kernel.org>
+References: <20230626152844.484-1-jszhang@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -59,58 +61,39 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-improve the stmmac driver statistics:
+FWICT, the common style in other network drivers: the network
+statistics are not cleared since initialization, follow the common
+style for stmmac.
 
-1. don't clear network driver statistics in .ndo_close() and
-.ndo_open() cycle
-2. avoid some network driver statistics overflow on 32 bit platforms
-3. use per-queue statistics where necessary to remove frequent
-cacheline ping pongs.
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+---
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c | 6 ++----
+ 1 file changed, 2 insertions(+), 4 deletions(-)
 
-NOTE: v1 and v2 are back ported from an internal LTS tree, I made
-some mistakes when backporting and squashing. Now, net-next + v3
-has been well tested with 'ethtool -s' and 'ip -s link show'.
-
-Since v3:
-  - coding style pointed out by Simon, I.E reverse xmas tree for local
-    variable declarations and so on.
-  - put the counters in queue structs, I.E per-queue rather than per-cpu
-  - use _irqsave() variant where necessary.
-
-Since v2:
-  - fix ethtool .get_sset_count, .get_strings and per queue stats
-    couting.
-  - fix .ndo_get_stats64 only counts the last cpu's pcpu stats.
-  - fix typo: s/iff/if in commit msg.
-  - remove unnecessary if statement brackets since we have removed
-    one LoC.
-
-Since v1:
-  - rebase on net-next
-  - fold two original patches into one patch
-  - fix issues found by lkp
-  - update commit msg
-
-Jisheng Zhang (2):
-  net: stmmac: don't clear network statistics in .ndo_open()
-  net: stmmac: use per-queue 64 bit statistics where necessary
-
- drivers/net/ethernet/stmicro/stmmac/common.h  |  39 ++--
- .../net/ethernet/stmicro/stmmac/dwmac-sun8i.c |  12 +-
- .../ethernet/stmicro/stmmac/dwmac100_dma.c    |   7 +-
- .../ethernet/stmicro/stmmac/dwmac4_descs.c    |  16 +-
- .../net/ethernet/stmicro/stmmac/dwmac4_lib.c  |  15 +-
- .../net/ethernet/stmicro/stmmac/dwmac_lib.c   |  12 +-
- .../ethernet/stmicro/stmmac/dwxgmac2_descs.c  |   6 +-
- .../ethernet/stmicro/stmmac/dwxgmac2_dma.c    |  14 +-
- .../net/ethernet/stmicro/stmmac/enh_desc.c    |  20 +-
- drivers/net/ethernet/stmicro/stmmac/hwif.h    |  12 +-
- .../net/ethernet/stmicro/stmmac/norm_desc.c   |  15 +-
- drivers/net/ethernet/stmicro/stmmac/stmmac.h  |   2 +
- .../ethernet/stmicro/stmmac/stmmac_ethtool.c  | 123 ++++++++---
- .../net/ethernet/stmicro/stmmac/stmmac_main.c | 206 ++++++++++++++----
- 14 files changed, 337 insertions(+), 162 deletions(-)
-
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 5c645b6d5660..eb83396d6971 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -3827,10 +3827,6 @@ static int __stmmac_open(struct net_device *dev,
+ 		}
+ 	}
+ 
+-	/* Extra statistics */
+-	memset(&priv->xstats, 0, sizeof(struct stmmac_extra_stats));
+-	priv->xstats.threshold = tc;
+-
+ 	priv->rx_copybreak = STMMAC_RX_COPYBREAK;
+ 
+ 	buf_sz = dma_conf->dma_buf_sz;
+@@ -7315,6 +7311,8 @@ int stmmac_dvr_probe(struct device *device,
+ #endif
+ 	priv->msg_enable = netif_msg_init(debug, default_msg_level);
+ 
++	priv->xstats.threshold = tc;
++
+ 	/* Initialize RSS */
+ 	rxq = priv->plat->rx_queues_to_use;
+ 	netdev_rss_key_fill(priv->rss.key, sizeof(priv->rss.key));
 -- 
 2.40.1
 
