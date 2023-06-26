@@ -1,129 +1,145 @@
-Return-Path: <netdev+bounces-13989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A408F73E427
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:05:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C98773E430
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:07:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5ACA0280D4C
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:05:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 32E201C2032A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:07:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D71ED511;
-	Mon, 26 Jun 2023 16:05:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1EAF9D519;
+	Mon, 26 Jun 2023 16:07:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F4BCD505
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:05:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D5C4910FD
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:05:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687795513;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=b0yQZBdpdUXl4YMdFLcFlkwsrjZb29VthZRnokOZ88k=;
-	b=W1K6o3st3YkxrAp94QsGHdnY4/VhM9G8rsnc5+MiP7Rq6yE+lh7CIKc3QiEsXaedhpZhOO
-	EkArxTjEj//NnPgVFP3axBd0Js2fTYGnYrhJbntqE5h4Fcp7MGXV1y/q1JqlWWzsdWQdyC
-	sjAGiRyi5GaxnY+mHq+qsGJXJ1/hWwY=
-Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
- [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-596-lMWIK_PjPTizZoht8j-J1w-1; Mon, 26 Jun 2023 12:05:08 -0400
-X-MC-Unique: lMWIK_PjPTizZoht8j-J1w-1
-Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4008e5f1dfbso25591591cf.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:04:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687795490; x=1690387490;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10DA0D505
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:07:33 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F1DD4FA;
+	Mon, 26 Jun 2023 09:07:31 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b69e6d324aso21827371fa.0;
+        Mon, 26 Jun 2023 09:07:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687795650; x=1690387650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=b0yQZBdpdUXl4YMdFLcFlkwsrjZb29VthZRnokOZ88k=;
-        b=fdPFIoHuLWtaKa49q6TK3azcFdH43SC2xQvNVfhGRZCqC4rMvoTwjSvmS4iFnORxIr
-         zWTGh2Dilcmg7h2FM7LNepLbB+exnVucUjBf2wjEqnCk/7Hy0qxv2eN7GULdvPow6/ga
-         N860qLBvGPEkcpytvAd2ZGrmSavNGiaivSPKjwps8MrOPYzkAg5yuw2ia0hIHjtF7C5s
-         cDSpVBYT+vj5VyITN8gtczlXIimYfzwzELVOUQGE4M0PuUzHa90XhCKpGC/FgzEpWWS4
-         vZe3MJ3JXOfF8qXknebeIJHbPVVcJFFuoipeGZ/dZh82EOoRHb9QCjWXq7fDCnKxZqTc
-         ZUrA==
-X-Gm-Message-State: AC+VfDz5WKgHPqAF/D+h5IK24HiAlt1P+O1tZXmPkb1L4nEX8zACdBxv
-	k3c5ZKBxsJ5awg7zopFnFHDt/fMUejUjZMUjCZIV95k5Td8Db7cP46JOCjlWEfHh0LTXeQWC8su
-	R6SVjGP/h2UENiKkb
-X-Received: by 2002:ac8:5dcc:0:b0:3ff:2fae:b4bb with SMTP id e12-20020ac85dcc000000b003ff2faeb4bbmr22270348qtx.37.1687795489890;
-        Mon, 26 Jun 2023 09:04:49 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6scFxlQwYFHNY1LJg+2KYwo5IzNCiATxO/eK3932x063Eqk2Ca+8K2qyxj23DPRz3vgCwgrw==
-X-Received: by 2002:ac8:5dcc:0:b0:3ff:2fae:b4bb with SMTP id e12-20020ac85dcc000000b003ff2faeb4bbmr22270315qtx.37.1687795489480;
-        Mon, 26 Jun 2023 09:04:49 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id z6-20020a05622a124600b00400ab543858sm900265qtx.67.2023.06.26.09.04.46
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:04:48 -0700 (PDT)
-Date: Mon, 26 Jun 2023 18:04:44 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v4 06/17] vsock: check error queue to set EPOLLERR
-Message-ID: <rg3qxgiqqi5ltt4jcf3k5tcnynh2so5ascvrte4gywcfffusv4@qjz3tkumeq7g>
-References: <20230603204939.1598818-1-AVKrasnov@sberdevices.ru>
- <20230603204939.1598818-7-AVKrasnov@sberdevices.ru>
+        bh=+4iSzTg8EChOOzM4BxDcM+RvFk02kmVmbliMB8mfUCk=;
+        b=RlnK3OZoaEKxJnom2X8CXl92pbWx7OOPW4z0jpKaCHbGXroW0iQAsSISlIaV4C8G8x
+         gK1MOooiRRWfenFnvdfXiSVEVcMWb8LVrk+kNPSJIiB4OthW+XopAMs0ohxXFBO6MZzx
+         xSS+fZp9IO2IqrTy2iaKTdrItk2cvv2xVSz2QF7kcl2N3PQsgFWom2cZkSD7OlepUhRh
+         QeyFDcM0MFp5+izZO5CpgbepvcNdsGpIMb9zj2O9x3o9Wz383Fh4CGG6pOxAOoVXe+26
+         Ud/6Sl6lcVCtQjx7rER0jxpx+HyFIEctGfvtCyVSt1QRfo4NaN7sZ6JzkmyeXZNdV+mw
+         6o5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687795650; x=1690387650;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=+4iSzTg8EChOOzM4BxDcM+RvFk02kmVmbliMB8mfUCk=;
+        b=hVK5CsuX4NcJqQAbmE4tmF6kCGlqHVmQ0kNLhh/q0Hzs4sOKfw4oMOLQysFsnuFUKp
+         gtyFTSeIj6N4PRx1unjFeFJq+3jxpaGG80FAMyCRnFpCc2zU3nkKK/ofuRMdFDXekNJr
+         rLY9AGLSWGuQb4Y6Tf52nhGNNE83WnnrsTqDtq4o6SYhza4Iw6cUzbFX5aa28Us7EABC
+         6N7hVLtXcqjAo36bXyLXInC8YENRm70a9dqGVN/JfUqMA/6imh7zVIO4crgj4PVfYlPB
+         ZGdl141KeY5SHB9/aU6EHhSjNSNPlZl/o279NBu+DfvdxGpOm1lf6Kq9eV961a9A0+R+
+         e/Kw==
+X-Gm-Message-State: AC+VfDy9i2E//s7LCpdkIQayJ2h7LrWot5tIK1XzguiI3iufdCxXHAOI
+	alAdhVnnanYHb6x7tzsbCikI2m3cXaF+IH3GJDY=
+X-Google-Smtp-Source: ACHHUZ4lqZ0HZVO22tySvTRMn9GTWb4kquzbA2i7q+jgXEC8Llv50w26JmRWX6NR8AVm/Q3ttM2tntum2WpC3Qy2R/A=
+X-Received: by 2002:a2e:a401:0:b0:2b6:a186:52ac with SMTP id
+ p1-20020a2ea401000000b002b6a18652acmr1820365ljn.47.1687795649926; Mon, 26 Jun
+ 2023 09:07:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230603204939.1598818-7-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <20230623225513.2732256-1-dhowells@redhat.com> <20230623225513.2732256-5-dhowells@redhat.com>
+ <CAOi1vP_Bn918j24S94MuGyn+Gxk212btw7yWeDrRcW1U8pc_BA@mail.gmail.com> <3070989.1687793422@warthog.procyon.org.uk>
+In-Reply-To: <3070989.1687793422@warthog.procyon.org.uk>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Mon, 26 Jun 2023 18:07:18 +0200
+Message-ID: <CAOi1vP9hOhaAWp6ext=6tH7XjKUFAkC0xhkB91QozWr0-fw0NA@mail.gmail.com>
+Subject: Re: [PATCH net-next v5 04/16] ceph: Use sendmsg(MSG_SPLICE_PAGES)
+ rather than sendpage()
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Alexander Duyck <alexander.duyck@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>, David Ahern <dsahern@kernel.org>, 
+	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org, 
+	linux-kernel@vger.kernel.org, Xiubo Li <xiubli@redhat.com>, 
+	Jeff Layton <jlayton@kernel.org>, ceph-devel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jun 03, 2023 at 11:49:28PM +0300, Arseniy Krasnov wrote:
->If socket's error queue is not empty, EPOLLERR must be set. Otherwise,
->reader of error queue won't detect data in it using EPOLLERR bit.
+On Mon, Jun 26, 2023 at 5:30=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
 >
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> net/vmw_vsock/af_vsock.c | 2 +-
-> 1 file changed, 1 insertion(+), 1 deletion(-)
+> Ilya Dryomov <idryomov@gmail.com> wrote:
+>
+> > write_partial_message_data() is net/ceph/messenger_v1.c specific, so it
+> > doesn't apply here.  I would suggest squashing the two net/ceph patches
+> > into one since even the titles are the same.
+>
+> I would, but they're now applied to net-next, so we need to patch that.
 
-This patch looks like it can go even without this series.
+I don't see a problem with that given that the patches themselves have
+major issues (i.e. it's not just a commit message/title nit).
 
-Is it a fix? Should we add a fixes tag?
+>
+> > >   * Write as much as possible.  The socket is expected to be corked,
+> > > - * so we don't bother with MSG_MORE/MSG_SENDPAGE_NOTLAST here.
+> > > + * so we don't bother with MSG_MORE here.
+> > >   *
+> > >   * Return:
+> > > - *   1 - done, nothing (else) to write
+> > > + *  >0 - done, nothing (else) to write
+> >
+> > It would be nice to avoid making tweaks like this to the outer
+> > interface as part of switching to a new internal API.
+>
+> Ok.  I'll change that and wrap the sendmsg in a loop.  Though, as I asked=
+ in
+> an earlier reply, why is MSG_DONTWAIT used here?
+
+See my reply there.
+
+>
+> > > +       if (WARN_ON(!iov_iter_is_bvec(&con->v2.out_iter)))
+> > > +               return -EINVAL;
+> >
+> > Previously, this WARN_ON + error applied only to the "try sendpage"
+> > path.  There is a ton of kvec usage in net/ceph/messenger_v2.c, so I'm
+> > pretty sure that placing it here breaks everything.
+>
+> This should have been removed as MSG_SPLICE_PAGES now accepts KVEC and XA=
+RRAY
+> iterators also.
+>
+> Btw, is it feasible to use con->v2.out_iter_sendpage to apply MSG_SPLICE_=
+PAGES
+> to the iterator to be transmitted as a whole?  It seems to be set dependi=
+ng on
+> iterator type.
+
+I'm not sure I understand what you mean by "transmitted as a whole".
+con->v2.out_iter_sendpage is set only when zerocopy is desired.  If the
+underlying data is not guaranteed to remain stable, zerocopy behavior
+is not safe.
 
 Thanks,
-Stefano
 
->
->diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index efb8a0937a13..45fd20c4ed50 100644
->--- a/net/vmw_vsock/af_vsock.c
->+++ b/net/vmw_vsock/af_vsock.c
->@@ -1030,7 +1030,7 @@ static __poll_t vsock_poll(struct file *file, struct socket *sock,
-> 	poll_wait(file, sk_sleep(sk), wait);
-> 	mask = 0;
->
->-	if (sk->sk_err)
->+	if (sk->sk_err || !skb_queue_empty_lockless(&sk->sk_error_queue))
-> 		/* Signify that there has been an error on this socket. */
-> 		mask |= EPOLLERR;
->
->-- 
->2.25.1
->
-
+                Ilya
 
