@@ -1,36 +1,36 @@
-Return-Path: <netdev+bounces-13896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13897-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D9F6273DB16
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 11:18:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D106573DB17
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 11:19:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 959BC280D7A
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:18:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF6061C20320
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 09:19:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C3BCB6FA1;
-	Mon, 26 Jun 2023 09:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9D26D6FAF;
+	Mon, 26 Jun 2023 09:19:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B777C46BD
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:18:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 909076FA1
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:19:01 +0000 (UTC)
 Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id C06891BE4;
-	Mon, 26 Jun 2023 02:18:20 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 8F58F119;
+	Mon, 26 Jun 2023 02:19:00 -0700 (PDT)
 Received: by linux.microsoft.com (Postfix, from userid 1099)
-	id 559A121C3F2C; Mon, 26 Jun 2023 02:18:20 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 559A121C3F2C
+	id 2481B21C3F2C; Mon, 26 Jun 2023 02:19:00 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 2481B21C3F2C
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-	s=default; t=1687771100;
+	s=default; t=1687771140;
 	bh=w0RTwq6xnEh5PToktxOWxF1t6KZX1z6EpuCc02QAfJw=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=VHls5pA/ruzwRNkIcImhFmzyr8irMnHGZRx2V6Qjgi+qr8THoNSAGAwg0qUH78FLZ
-	 M2PQDhE/cZxJWCL9f7NHyRAHnVNAuU6il0ikj2vt7tX4kK0NtP3N4kGlR0FMKvHUXI
-	 xR4St1XZsUv4BYi+UBJmk6aZpJa4pkL9gKC8ih9I=
+	b=koblSqD/2huTtJrCBeUEQy5eNoqXbPICww1juVE4bM7oCKFN9eFyD7AKtHBAxcYca
+	 /vfnAMLBZaqKImty5tAGrIrQJMKatGmVIj85erlx6WQALHMJOb5i2brI+YsQwYmeQu
+	 IA9wF6IVXuzpu5Bv8ch7eeQvOqO3cEdHXhcZqmsg=
 From: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
 To: kys@microsoft.com,
 	haiyangz@microsoft.com,
@@ -55,11 +55,11 @@ Cc: stable@vger.kernel.org,
 	schakrabarti@microsoft.com,
 	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 Subject: [PATCH 1/2 V3 net] net: mana: Fix MANA VF unload when host is unresponsive
-Date: Mon, 26 Jun 2023 02:18:18 -0700
-Message-Id: <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
+Date: Mon, 26 Jun 2023 02:18:57 -0700
+Message-Id: <1687771137-26911-1-git-send-email-schakrabarti@linux.microsoft.com>
 X-Mailer: git-send-email 1.8.3.1
-In-Reply-To: <1687771058-26634-1-git-send-email-schakrabarti@linux.microsoft.com>
-References: <1687771058-26634-1-git-send-email-schakrabarti@linux.microsoft.com>
+In-Reply-To: <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
+References: <1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
 X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
 	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
