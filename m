@@ -1,117 +1,88 @@
-Return-Path: <netdev+bounces-13886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D7CC73D948
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 10:12:47 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D578973D985
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 10:20:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A1F9E1C20750
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:12:46 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1A618280D75
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:20:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8176F46B2;
-	Mon, 26 Jun 2023 08:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36F0846B4;
+	Mon, 26 Jun 2023 08:20:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6D1ED46A0;
-	Mon, 26 Jun 2023 08:12:42 +0000 (UTC)
-Received: from gandalf.ozlabs.org (gandalf.ozlabs.org [150.107.74.76])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D63E76;
-	Mon, 26 Jun 2023 01:12:35 -0700 (PDT)
-Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25A9646B1
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 08:20:33 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37AFC12A
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 01:20:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687767629;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mRX9nqC6P5D5hiCMFHlNTR/HTH0hcCzrU0RiwOqHWTU=;
+	b=P207MiM1F+SA7bMheCljNmdhoUyLVnAI4hso2JQHnrlRSk7J8TuPYeuP7qlS36+MafcaII
+	EwY0ikbd0Hfo7/ci2tbAaU2nSf0x9IKLLQqh3T0bcnvrPrb96lbLvMpYZdXPgJIPn4v8ko
+	WU7iYusARYP/D+vJheIhLVkYe+sFw6E=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-605-Hot-SNnfMUOBP9aewfvRzw-1; Mon, 26 Jun 2023 04:20:23 -0400
+X-MC-Unique: Hot-SNnfMUOBP9aewfvRzw-1
+Received: from smtp.corp.redhat.com (int-mx07.intmail.prod.int.rdu2.redhat.com [10.11.54.7])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
 	(No client certificate requested)
-	by mail.ozlabs.org (Postfix) with ESMTPSA id 4QqLDc5xCyz4wZr;
-	Mon, 26 Jun 2023 18:12:32 +1000 (AEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
-	s=201702; t=1687767154;
-	bh=YL4WtG8LHm8HUihCvX1m65X1iguc/Lla+C+qJnkgHSU=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=l/0v/jqK+E4RhCKLhMKi2A2cfLf7MEG/IjT47KrFbvNwUcc/ak2DcL4RwaSXDX5HU
-	 32GcpNT4wkfyYrOboPEi/MBWW99W9Hs4wuyupj1wBRh9zSyX1B4QhqA96VXrhyfuG9
-	 wZANibg/LWtdko5+N4iG4gJ8/GrLEK186mgGG4z3akt2rQTtTq5Xw3tUOGoIsuO+Ub
-	 4JIZZmUIHPUjc4KZoHW2y8iin8mA5M4WHvkRIW0+vcWGxPxQOqKrG37PR8lxBH/Mq7
-	 DpOn27+D47aUPU6eNxX6RONJ2cLF8/RpY47ESCplSGpmtbCldGCdPLzG+wWdHUteUZ
-	 tqaKUnDV2rudw==
-Date: Mon, 26 Jun 2023 18:12:31 +1000
-From: Stephen Rothwell <sfr@canb.auug.org.au>
-To: David Howells <dhowells@redhat.com>
-Cc: Peter Zijlstra <peterz@infradead.org>, Ingo Molnar <mingo@redhat.com>,
- Arnaldo Carvalho de Melo <acme@kernel.org>, Mark Rutland
- <mark.rutland@arm.com>, Alexander Shishkin
- <alexander.shishkin@linux.intel.com>, Jiri Olsa <jolsa@kernel.org>,
- Namhyung Kim <namhyung@kernel.org>, Ian Rogers <irogers@google.com>, Adrian
- Hunter <adrian.hunter@intel.com>, David Miller <davem@davemloft.net>,
- Networking <netdev@vger.kernel.org>, Jakub Kicinski <kuba@kernel.org>,
- linux-perf-users@vger.kernel.org, bpf@vger.kernel.org,
- linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: linux-next: build failure after merge of the net-next tree
-Message-ID: <20230626181231.70405c1f@canb.auug.org.au>
-In-Reply-To: <2947430.1687765706@warthog.procyon.org.uk>
-References: <20230626112847.2ef3d422@canb.auug.org.au>
-	<2947430.1687765706@warthog.procyon.org.uk>
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1B5421044592;
+	Mon, 26 Jun 2023 08:20:23 +0000 (UTC)
+Received: from fedora.redhat.com (unknown [10.39.192.192])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6A19315230A0;
+	Mon, 26 Jun 2023 08:20:20 +0000 (UTC)
+From: Jose Ignacio Tornos Martinez <jtornosm@redhat.com>
+To: jinjian.song@fibocom.com
+Cc: Reid.he@fibocom.com,
+	bjorn.helgaas@gmail.com,
+	bjorn@helgaas.com,
+	haijun.liu@mediatek.com,
+	helgaas@kernel.org,
+	jtornosm@redhat.com,
+	kuba@kernel.org,
+	netdev@vger.kernel.org,
+	rafael.wang@fibocom.com,
+	somashekhar.puttagangaiah@intel.com
+Subject: Re: [v5,net-next]net: wwan: t7xx : V5 ptach upstream work
+Date: Mon, 26 Jun 2023 10:20:18 +0200
+Message-ID: <20230626082018.15625-1-jtornosm@redhat.com>
+In-Reply-To: <SG2PR02MB3606473ED18C4A0F105A25B28C26A@SG2PR02MB3606.apcprd02.prod.outlook.com>
+References: <SG2PR02MB3606473ED18C4A0F105A25B28C26A@SG2PR02MB3606.apcprd02.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; boundary="Sig_/1Ge+Wr0ku4FcBxMax3jOKWi";
- protocol="application/pgp-signature"; micalg=pgp-sha256
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.7
+X-Spam-Status: No, score=-3.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
---Sig_/1Ge+Wr0ku4FcBxMax3jOKWi
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: quoted-printable
+Thanks Bjorn, I will do as you comment.
 
-Hi David,
+Jinjian, I had already prepare it, we need to have something working
+and then you can complete what you need for the pending features 
+(fw flashing and coredump collection).
 
-On Mon, 26 Jun 2023 08:48:26 +0100 David Howells <dhowells@redhat.com> wrot=
-e:
->
-> Stephen Rothwell <sfr@canb.auug.org.au> wrote:
->=20
-> > After merging the net-next tree, today's linux-next build (native perf)
-> > failed like this:
-> >=20
-> > In file included from builtin-trace.c:907:
-> > trace/beauty/msg_flags.c: In function 'syscall_arg__scnprintf_msg_flags=
-':
-> > trace/beauty/msg_flags.c:28:21: error: 'MSG_SPLICE_PAGES' undeclared (f=
-irst use in this function) =20
->=20
-> I tried applying the attached patch, but it doesn't make any difference.
+Thanks
+Jose Ignacio
 
-I wonder if it is using the system headers?  Or depends on "make headers-in=
-stall"?
-
---=20
-Cheers,
-Stephen Rothwell
-
---Sig_/1Ge+Wr0ku4FcBxMax3jOKWi
-Content-Type: application/pgp-signature
-Content-Description: OpenPGP digital signature
-
------BEGIN PGP SIGNATURE-----
-
-iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSZSG8ACgkQAVBC80lX
-0Gxg/ggAkTZ+/82QjJe4wJrDgQ+zyJhq4vhN3TFH56b9I64FB9blMUZicISKfQte
-O/y63r6wPVD5Tsjc8v81egJO+i4/jXd/jp4i+ce7xSNDk0uSIjeRoXr8wMD3R793
-Z0925rEhClPbyGwjhNZulvAOEcNZOyN/2A8z+zFSN/3ie6bTNxWNrVXkN1P25RTd
-FAQYiT+YtY5taSmAnmO+O7ckJl69o3K8xUPct4a0oeEWxgNnjrXfKlhAUyFZzLzv
-TjYK7Vk3KfGKJ2rGrLEw2RlgaIMMJ5/3NupwFqbpa6UMHtyMfv+5Z2EzHVs8BqFJ
-G9IHURBU29V9G16Lrjo2uPr0UBOIaw==
-=IP/A
------END PGP SIGNATURE-----
-
---Sig_/1Ge+Wr0ku4FcBxMax3jOKWi--
 
