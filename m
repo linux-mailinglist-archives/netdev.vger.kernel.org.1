@@ -1,123 +1,127 @@
-Return-Path: <netdev+bounces-14044-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14045-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 865C073EAC3
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 21:00:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5A17273EADF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 21:06:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B7B661C209C5
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 19:00:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E3B79280E6E
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 19:06:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C284A125AB;
-	Mon, 26 Jun 2023 19:00:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0858C134D5;
+	Mon, 26 Jun 2023 19:06:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6EB3D505
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:00:05 +0000 (UTC)
-Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [IPv6:2001:1600:3:17::bc0f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8A85710D5
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 11:59:57 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Qqcbb3j51zMqHtw;
-	Mon, 26 Jun 2023 18:59:55 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QqcbZ4T7mzMpvTt;
-	Mon, 26 Jun 2023 20:59:54 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1687805995;
-	bh=Rp8e/1RLaJ/xuqp2uYfEReDbnGzeQ5DGvewG/zWsFBs=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=VPR0HlK1nc9903KzRFaGnqZer/CQ0zCy2kFFF+lh2wpFH2ymZL1IbR9MMIBaolGjz
-	 0WmeQ6p+F8Dl4S+xFBfmVel3m+gq7wXuScNBDRvshV7z1GJ6J7k0euWiWHAtVwZEZ2
-	 qusN8URnhgyroKm+MvsEpsB5Ov5q7EYS/7rGZjd8=
-Message-ID: <524f3c11-f228-1519-451f-c992bff8be79@digikod.net>
-Date: Mon, 26 Jun 2023 20:59:54 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EBA7CC155
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:06:22 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C08397
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 12:06:21 -0700 (PDT)
+Received: from pps.filterd (m0356516.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35QImC2i022881;
+	Mon, 26 Jun 2023 19:06:14 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ mime-version : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : subject; s=pp1;
+ bh=nV3+4uIZ1t0ypUT6dt1g2EdpvmgastWw8MEPoThD0/I=;
+ b=lz+lUbxLymACveCoxsvZcwMYBFBnXABdOwGOHMHEJ94RIMENK7m3iGKHXX69dRnigIwn
+ 3HGZ3WucuILaV3Gxhi8HPBXkyuMkcNdXoF0F6KfOOriySSJB1GqnWeRsmQBt6oChkmcQ
+ mwojW2ywWOFikykvQVcitQwioPg+zMj7C16xngSSv97ENccFfvxkzUL8lTBskIhvz8XN
+ BSBwtotcpnzQT5jjTKBIFq7k++G9HjazlqTOV3E6M+KipW/Oxt2at5W08ybSWmNfDgh4
+ V/0cJGhP+kolV3/fcEsuL8KQjEVchoOpcMPzbxJ1bpxd1ctu980QrB+fwtVuuWxFkOgA Uw== 
+Received: from ppma04dal.us.ibm.com (7a.29.35a9.ip4.static.sl-reverse.com [169.53.41.122])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfg96gf57-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Jun 2023 19:06:14 +0000
+Received: from pps.filterd (ppma04dal.us.ibm.com [127.0.0.1])
+	by ppma04dal.us.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35QHMwW8020457;
+	Mon, 26 Jun 2023 19:06:13 GMT
+Received: from smtprelay06.wdc07v.mail.ibm.com ([9.208.129.118])
+	by ppma04dal.us.ibm.com (PPS) with ESMTPS id 3rdr45ueuc-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Mon, 26 Jun 2023 19:06:13 +0000
+Received: from smtpav05.dal12v.mail.ibm.com (smtpav05.dal12v.mail.ibm.com [10.241.53.104])
+	by smtprelay06.wdc07v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35QJ6BbY63766994
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Mon, 26 Jun 2023 19:06:11 GMT
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EAD6E58052;
+	Mon, 26 Jun 2023 19:06:10 +0000 (GMT)
+Received: from smtpav05.dal12v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 893255805D;
+	Mon, 26 Jun 2023 19:06:10 +0000 (GMT)
+Received: from [9.61.91.250] (unknown [9.61.91.250])
+	by smtpav05.dal12v.mail.ibm.com (Postfix) with ESMTP;
+	Mon, 26 Jun 2023 19:06:10 +0000 (GMT)
+Message-ID: <277ca0b3-32df-532f-e82f-a7d42dce54ab@linux.vnet.ibm.com>
+Date: Mon, 26 Jun 2023 12:06:10 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v11 12/12] landlock: Document Landlock's network support
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
 Content-Language: en-US
-To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, yusongping@huawei.com,
- artem.kuzin@huawei.com
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-13-konstantin.meskhidze@huawei.com>
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <20230515161339.631577-13-konstantin.meskhidze@huawei.com>
+To: Jakub Kicinski <kuba@kernel.org>, Nick Child <nnac123@linux.ibm.com>
+Cc: netdev@vger.kernel.org, haren@linux.ibm.com, ricklind@us.ibm.com
+References: <20230622190332.29223-1-nnac123@linux.ibm.com>
+ <20230624151911.7442620c@kernel.org>
+From: Rick Lindsley <ricklind@linux.vnet.ibm.com>
+In-Reply-To: <20230624151911.7442620c@kernel.org>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
+Content-Transfer-Encoding: 7bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: uFaNfZkHj9GqsZ9CZd7raymC4c2M-1hL
+X-Proofpoint-ORIG-GUID: uFaNfZkHj9GqsZ9CZd7raymC4c2M-1hL
+Subject: RE: [PATCH net] ibmvnic: Do not reset dql stats on NON_FATAL err
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-26_16,2023-06-26_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 phishscore=0
+ malwarescore=0 mlxscore=0 adultscore=0 bulkscore=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 mlxlogscore=999 lowpriorityscore=0
+ spamscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306260175
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On 6/24/23 15:19, Jakub Kicinski wrote:
 
-On 15/05/2023 18:13, Konstantin Meskhidze wrote:
-> Describe network access rules for TCP sockets. Add network access
-> example in the tutorial. Add kernel configuration support for network.
+> Why are you trying to clear this bit?
 > 
-> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> ---
+> If the completions will still come the bit will be cleared (or not)
+> during completion handling (netdev_tx_completed_queue() et al.)
 > 
-> Changes since v10:
-> * Fixes documentaion as Mickaёl suggested:
-> https://lore.kernel.org/linux-security-module/ec23be77-566e-c8fd-179e-f50e025ac2cf@digikod.net/
-> 
-> Changes since v9:
-> * Minor refactoring.
-> 
-> Changes since v8:
-> * Minor refactoring.
-> 
-> Changes since v7:
-> * Fixes documentaion logic errors and typos as Mickaёl suggested:
-> https://lore.kernel.org/netdev/9f354862-2bc3-39ea-92fd-53803d9bbc21@digikod.net/
-> 
-> Changes since v6:
-> * Adds network support documentaion.
-> 
-> ---
->   Documentation/userspace-api/landlock.rst | 83 ++++++++++++++++++------
->   1 file changed, 62 insertions(+), 21 deletions(-)
-> 
-
-[...]
-
-> @@ -143,10 +159,23 @@ for the ruleset creation, by filtering access rights according to the Landlock
->   ABI version.  In this example, this is not required because all of the requested
->   ``allowed_access`` rights are already available in ABI 1.
-> 
-> -We now have a ruleset with one rule allowing read access to ``/usr`` while
-> -denying all other handled accesses for the filesystem.  The next step is to
-> -restrict the current thread from gaining more privileges (e.g. thanks to a SUID
-> -binary).
-> +For network access-control, we can add a set of rules that allow to use a port
-> +number for a specific action: HTTPS connections.
-> +
-> +.. code-block:: c
-> +
-> +    struct landlock_net_service_attr net_service = {
-> +        .allowed_access = NET_CONNECT_TCP,
-
-LANDLOCK_ACCESS_NET_CONNECT_TCP
+> Drivers shouldn't be poking into queue state bits directly.
 
 
-> +        .port = 443,
-> +    };
-> +
-> +    err = landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
-> +                            &net_service, 0);
-> +
++		if (adapter->reset_reason == VNIC_RESET_NON_FATAL)
++			clear_bit(__QUEUE_STATE_STACK_XOFF,
++				  &netdev_get_tx_queue(netdev, i)->state);
++		else
++			netdev_tx_reset_queue(netdev_get_tx_queue(netdev, i));
+
+The problem is the call to dql_reset() in netdev_tx_reset_queue().  If we reset dql stats,   we risk num_completed being greater than num_queued, which will cause a BUG_ON to fire in dql_completed().
+
+     static inline void netdev_tx_reset_queue(struct netdev_queue *q)
+     {
+     #ifdef CONFIG_BQL
+         clear_bit(__QUEUE_STATE_STACK_XOFF, &q->state);
+         dql_reset(&q->dql);
+     #endif
+     }
+
+Existing code calls  netdev_tx_reset_queue() unconditionally.  When the error is non-fatal, though, we were tripping over the BUG_ON on those occasions when a few skbs were already submitted.  The patch here is more about NOT calling dql_reset() than it is about clearing __QUEUE_STATE_STACK_XOFF.  That was only included because it-was-the-other-thing-the-function-did.  So ... maybe we don't care about __QUEUE_STATE_STACK_XOFF?
+
+Nick, do we *need* to have __QUEUE_STATE_STACK_XOFF cleared?  If not, then do we need to call or emulate netdev_tx_reset_queue() at all on a non-fatal error?
 
