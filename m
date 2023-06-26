@@ -1,125 +1,144 @@
-Return-Path: <netdev+bounces-13872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 258DB73D800
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:51:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7986C73D816
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:56:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43B0E280DAD
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:51:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 379AA280D71
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:56:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CC91109;
-	Mon, 26 Jun 2023 06:50:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68D611116;
+	Mon, 26 Jun 2023 06:56:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 24452A59
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:50:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5375C433C0;
-	Mon, 26 Jun 2023 06:50:53 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687762256;
-	bh=NK1Y2wM/ZOdh+mw3/gFJTpCbuhSPj2RAqLErmTyzoyQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=ufnWcxk76jWKQLFOaqzje+TnwPLMLen61PyUWDLytnf2lE3jx+oJVgE+/3gcAClXQ
-	 KemKhn/4cZtBNK0H2dxij0oWQYhtxNiNWjigmZeXMGS8lzASMVO3W5OrkZ5MmK1Wqt
-	 L3jPVA4dwEy2xqyrmSy5gjEd3r9/3ueZKG7DjeKpfiLChThRc8O5zMiFHc4X5JKUvP
-	 GNJ/I1XJ7U8tJzxzp9sMo+BNKSbKhAteU6GaSlNc9UySZCOPFa9WAjlb0fhMRCFKI+
-	 57+jO21YV1fw2M9wC0aQ5us+FthYPGrmZ09weJYvQ+Uuqg9YCkfy//hOZAoNNWdDz/
-	 NCiab0BFwuA+g==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53F641109
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:56:43 +0000 (UTC)
+Received: from mail-pl1-f179.google.com (mail-pl1-f179.google.com [209.85.214.179])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 173B9AC;
+	Sun, 25 Jun 2023 23:56:42 -0700 (PDT)
+Received: by mail-pl1-f179.google.com with SMTP id d9443c01a7336-1b7fb1a82c4so3799195ad.1;
+        Sun, 25 Jun 2023 23:56:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687762601; x=1690354601;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=u58j1CoFhNAAP0kPknc/GhPhE9N5OmJCD1ZWCCtRRgc=;
+        b=WDPKuhXalnGPckp2TpIKynsO8ZnokkfdhiarQXI1U9VrqORX/RqI+YQ6iOzudxuYfh
+         4q6XXJOoyqqR6QwbktPcLn3j/Hia6cNtm2Nrhm3yJiWc7JcKmjD3tVjEuADNSmK2GgDV
+         xk8ovnwV1ONicO1yc5JYu90NJCKD2g0I+aPJlJcB+YR5HHSFgftpBca8XhiVusEZTmu+
+         +qlUGGQiGJiMT1OVUk9z8yv0fpOv85eDrKiCyXaOhKgjcvScYC6P8FrVEMhdjE7n32Sn
+         iHlKwHWwvll89VW7GKPNxJvK15XueSQ8E1WR4TpisHG4FV0/OHjFbqUI8/raDxp23ahg
+         j18A==
+X-Gm-Message-State: AC+VfDzH7/LQdst87G9Hu9Qbm2z58jPxCzQv6It28ppNG805JMr6LwXE
+	0lNQtVHRiUvsINC/V/q86Hk=
+X-Google-Smtp-Source: ACHHUZ6OtbsuuY2aXoeHYGi4XSA3mdaoGOU6p/4pXML9TF8F1ADk58bPj18ptJOfaGu5YjoBFEMRig==
+X-Received: by 2002:a17:903:1250:b0:1b5:3c7f:1b3b with SMTP id u16-20020a170903125000b001b53c7f1b3bmr5150508plh.35.1687762601317;
+        Sun, 25 Jun 2023 23:56:41 -0700 (PDT)
+Received: from localhost (fpd11144dd.ap.nuro.jp. [209.17.68.221])
+        by smtp.gmail.com with ESMTPSA id jg3-20020a17090326c300b001a2104d706fsm2559571plb.225.2023.06.25.23.56.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 25 Jun 2023 23:56:40 -0700 (PDT)
+Date: Mon, 26 Jun 2023 15:56:39 +0900
+From: Krzysztof =?utf-8?Q?Wilczy=C5=84ski?= <kw@linux.com>
+To: Randy Dunlap <rdunlap@infradead.org>
+Cc: linux-kernel@vger.kernel.org, Jonathan Corbet <corbet@lwn.net>,
+	Russell King <linux@armlinux.org.uk>, Jens Axboe <axboe@kernel.dk>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Daniel Jordan <daniel.m.jordan@oracle.com>,
+	Akinobu Mita <akinobu.mita@gmail.com>, Helge Deller <deller@gmx.de>,
+	Dmitry Torokhov <dmitry.torokhov@gmail.com>,
+	Henrik Rydberg <rydberg@bitmath.org>,
+	Karsten Keil <isdn@linux-pingi.de>, Jiri Kosina <jikos@kernel.org>,
+	Miroslav Benes <mbenes@suse.cz>, Petr Mladek <pmladek@suse.com>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Peter Zijlstra <peterz@infradead.org>,
+	Ingo Molnar <mingo@redhat.com>, Will Deacon <will@kernel.org>,
+	=?utf-8?B?SsOpcsO0bWU=?= Glisse <jglisse@redhat.com>,
+	Naoya Horiguchi <naoya.horiguchi@nec.com>,
+	Miaohe Lin <linmiaohe@huawei.com>, Jonas Bonn <jonas@southpole.se>,
+	Stefan Kristiansson <stefan.kristiansson@saunalahti.fi>,
+	Stafford Horne <shorne@gmail.com>,
+	Bjorn Helgaas <bhelgaas@google.com>,
+	Lorenzo Pieralisi <lpieralisi@kernel.org>,
+	Marc Zyngier <maz@kernel.org>,
+	Michael Ellerman <mpe@ellerman.id.au>,
+	Heiko Carstens <hca@linux.ibm.com>,
+	Vasily Gorbik <gor@linux.ibm.com>,
+	Alexander Gordeev <agordeev@linux.ibm.com>,
+	Juri Lelli <juri.lelli@redhat.com>,
+	Vincent Guittot <vincent.guittot@linaro.org>,
+	David Howells <dhowells@redhat.com>,
+	Jarkko Sakkinen <jarkko@kernel.org>,
+	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
+	"Serge E. Hallyn" <serge@hallyn.com>,
+	Daniel Bristot de Oliveira <bristot@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Masami Hiramatsu <mhiramat@kernel.org>,
+	Mathieu Poirier <mathieu.poirier@linaro.org>,
+	Suzuki K Poulose <suzuki.poulose@arm.com>,
+	Evgeniy Polyakov <zbr@ioremap.net>,
+	Fenghua Yu <fenghua.yu@intel.com>,
+	Reinette Chatre <reinette.chatre@intel.com>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Borislav Petkov <bp@alien8.de>, Chris Zankel <chris@zankel.net>,
+	Max Filippov <jcmvbkbc@gmail.com>, coresight@lists.linaro.org,
+	dri-devel@lists.freedesktop.org, keyrings@vger.kernel.org,
+	linux-block@vger.kernel.org, linux-crypto@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-fbdev@vger.kernel.org,
+	linux-input@vger.kernel.org, linux-pci@vger.kernel.org,
+	linux-s390@vger.kernel.org, linux-scsi@vger.kernel.org,
+	linux-sgx@vger.kernel.org, linux-trace-devel@vger.kernel.org,
+	linux-trace-kernel@vger.kernel.org, live-patching@vger.kernel.org,
+	linux-security-module@vger.kernel.org, linux-usb@vger.kernel.org,
+	netdev@vger.kernel.org, linux-mm@kvack.org,
+	openrisc@lists.librecores.org, linux-arm-kernel@lists.infradead.org,
+	linux-xtensa@linux-xtensa.org, linuxppc-dev@lists.ozlabs.org,
+	x86@kernel.org
+Subject: Re: [PATCH 00/24 v2] Documentation: correct lots of spelling errors
+ (series 1)
+Message-ID: <20230626065639.GA3403711@rocinante>
+References: <20230209071400.31476-1-rdunlap@infradead.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 26 Jun 2023 08:50:51 +0200
-From: Michael Walle <mwalle@kernel.org>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Heiner Kallweit <hkallweit1@gmail.com>,
- Russell King <linux@armlinux.org.uk>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
- <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Yisen Zhuang
- <yisen.zhuang@huawei.com>, Salil Mehta <salil.mehta@huawei.com>, Florian
- Fainelli <florian.fainelli@broadcom.com>, Broadcom internal kernel review
- list <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_Beh?=
- =?UTF-8?Q?=C3=BAn?= <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 06/10] net: phy: print an info if a broken C45
- bus is found
-In-Reply-To: <ZJYCBeKdXBot/9Xd@corigine.com>
-References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
- <20230620-feature-c45-over-c22-v2-6-def0ab9ccee2@kernel.org>
- <af166ce6-b9b2-44e0-9f45-2b2aa001fd6b@lunn.ch>
- <ZJYCBeKdXBot/9Xd@corigine.com>
-Message-ID: <eb8390d30907893c4327ffe076c04c82@kernel.org>
-X-Sender: mwalle@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230209071400.31476-1-rdunlap@infradead.org>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Am 2023-06-23 22:35, schrieb Simon Horman:
-> On Fri, Jun 23, 2023 at 07:42:08PM +0200, Andrew Lunn wrote:
->> On Fri, Jun 23, 2023 at 12:29:15PM +0200, Michael Walle wrote:
->> > If there is an PHY which gets confused by C45 transactions on the MDIO
->> > bus, print an info together with the PHY identifier of the offending
->> > one.
->> >
->> > Signed-off-by: Michael Walle <mwalle@kernel.org>
->> >
->> > ---
->> > I wasn't sure if this should be phydev_dbg() or phydev_info(). I mainly
->> > see this as an info to a user why some PHYs might not be probed (or
->> > c45-over-c22 is used later).
->> 
->> The information is useful to the DT writer, not the 'user'. I would
->> assume the DT writer has a bit more kernel knowledge and can debug
->> prints on. So i would suggest phydev_dbg().
+Hello,
 
-Why the DT writer? There could be no DT at all, right? But yeah, fair
-enough, I thought of our hardware engineers as a user, which might be
-surprised to find no C45 transactions at all for a C45 PHY.
-
-That said, I don't have a strong opinion. I'm fine to switch that to
-dev_dbg() to make the kernel output less noisy.
-
->> > @@ -617,10 +617,10 @@ static int mdiobus_scan_bus_c45(struct mii_bus *bus)
->> >   */
->> >  void mdiobus_scan_for_broken_c45_access(struct mii_bus *bus)
->> >  {
->> > +	struct phy_device *phydev;
->> >  	int i;
->> >
->> >  	for (i = 0; i < PHY_MAX_ADDR; i++) {
->> > -		struct phy_device *phydev;
->> >  		u32 oui;
->> 
->> It is not clear why you changed the scope of phydev. I guess another
->> version used phydev_info(), where as now you have dev_info()?
+> Correct many spelling errors in Documentation/ as reported by codespell.
 > 
-> I think it is so it can be used in the dev_info() call below.
-
-Yes, to print the PHY ID of the offending one.
-
-> However Smatch has it's doubts that it is always initialised there.
+> Maintainers of specific kernel subsystems are only Cc-ed on their
+> respective patches, not the entire series.
 > 
->   .../mdio_bus.c:638 mdiobus_scan_for_broken_c45_access() error: we 
-> previously assumed 'phydev' could be null (see line 627)
+> These patches are based on linux-next-20230209.
 > 
->> >  		phydev = mdiobus_get_phy(bus, i);
-> 
-> Line 627 immediately follows the line above, like this:
-> 
-> 		if (!phydev)
-> 			continue;
+[...]
+>  [PATCH 13/24] Documentation: PCI: correct spelling
+[...]
 
-Mhh, I see. bus->prevent_c45_access could (theoretically) set before
-calling this function. I could set it to false at the beginning of
-this function or I could use a new flag to indicate when to print the
-warning. Any suggestions?
+Applied to misc, thank you!
 
--michael
+[1/1] Documentation: PCI: correct spelling
+      https://git.kernel.org/pci/pci/c/b58d6d89ae02
+
+	Krzysztof
 
