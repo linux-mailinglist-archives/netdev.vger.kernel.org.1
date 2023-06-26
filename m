@@ -1,93 +1,144 @@
-Return-Path: <netdev+bounces-14068-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00BCB73EC03
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:45:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 472B573EC09
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 318DC1C20988
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:45:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0600A280D2A
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07E6D134BD;
-	Mon, 26 Jun 2023 20:45:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1096213AC0;
+	Mon, 26 Jun 2023 20:47:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB541125DA
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:45:24 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B4622115
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 13:44:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687812281;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Jg84V4EUJQpXdxqWzxivCvOZP0F5oMgT+7AkEanWAjY=;
-	b=Cpf6OWKtYIIsMAq+YthMzi0KeMDv4G97m9HMMo2zHP0m/LJlwaONp1t7MX9xOKu09pexpW
-	sM5ND6xxWVZS4awpDs2sh1Gpl46c7YwxmKjIPqtQndXKV4wQfJbaj6sVfrG7EbokEpCepX
-	tOg7epQEit63RlP9QdA9eVYwLAJzupw=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-421-7YCo_sUtM-2ljXNnHnLNqA-1; Mon, 26 Jun 2023 16:44:37 -0400
-X-MC-Unique: 7YCo_sUtM-2ljXNnHnLNqA-1
-Received: from smtp.corp.redhat.com (int-mx01.intmail.prod.int.rdu2.redhat.com [10.11.54.1])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D44F6280D5BC;
-	Mon, 26 Jun 2023 20:44:17 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 71C6340C206F;
-	Mon, 26 Jun 2023 20:44:16 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAOi1vP_g70kV_YFjHNoS1hHPpCiMxW1hTfm92Ud35ehYrmv=1Q@mail.gmail.com>
-References: <CAOi1vP_g70kV_YFjHNoS1hHPpCiMxW1hTfm92Ud35ehYrmv=1Q@mail.gmail.com> <3101881.1687801973@warthog.procyon.org.uk>
-To: Ilya Dryomov <idryomov@gmail.com>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>,
-    Matthew Wilcox <willy@infradead.org>, ceph-devel@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next] libceph: Partially revert changes to support MSG_SPLICE_PAGES
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 048B7125AA
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:47:26 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98765E4D
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 13:47:24 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b7db2e162cso12402895ad.1
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 13:47:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687812444; x=1690404444;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Kms0H0qh0BC4E2qqH9Z2kg6XISwIpNu68Rt88k6ZU9Q=;
+        b=b6tD4vEHA9gzY35UuB/3ZPY6VXg3JK4i/zJQpSmzcyjmImYw3S3AZxmuC/LO7qrRHL
+         0OPNSnECNq6rI1m+NTfcw5y4T4yOBrqbj14pLGLE6W/zhm7plrIW8tUujSR4hcynV1oy
+         P27X5sd+Hc+Q25xcY/jY5XFyFA+6UBpUcLgqxaSBEEv4BCXrxzK7Omy2zHpQzEc/DjPR
+         13neo9pSlKT+sV1tPjVkBlICkU85jivaG3EsWDBtcI4FxNBTSYwk2uMDzZdEYlvtSu6a
+         NWv0o8xHVXOk9+J+HhT60qemCSboEreLuD/mxA2KGBfXxNMoI6L4H9hGxULcqImpM8Dy
+         1qcQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687812444; x=1690404444;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Kms0H0qh0BC4E2qqH9Z2kg6XISwIpNu68Rt88k6ZU9Q=;
+        b=PJmeyP7UReuEEpJm6cf0QjPv4Az6IwG4XYyBDu2zxaDih5x1KoBJ+vgIuFXWcWKwwF
+         Uk9OzBGyfTvJzufCfwlFazYcWcmdqw80vamp8nbSum/oTWhjmUgURQ+85UbjetpHqnxb
+         LSupCxrxE0KueyYchPwcotsel3jT/U6u0+mme6mPe6rISFdVEKBKBaAZi9bXM7MY03WM
+         TDLpLzyeCZ445TsfbF4aUYgsMXssX2Mo4yBs43KPLX+rQyY4dodsRTTURkADo4yQzebU
+         61xqae6WWM5yc4AXZUSS7mAogzNtvwW6TBvZ1wKU6Z2Pu+nKYYLs4/9KqtHK8EvUZn/L
+         V25w==
+X-Gm-Message-State: AC+VfDxbEWu8yo1Me87IpSmEDDOhBGdbT0tj9y9zbzqto66iTEWls4xJ
+	CADrsut9OQzmUH9liz2ma+o3Gw==
+X-Google-Smtp-Source: ACHHUZ5fzWr4Vm6bBdKDmKxsox3wJmLPjxaF521aPRnVQeoeej/eMt9HBi1dHHVHz+Pmx4dFCv82Ug==
+X-Received: by 2002:a17:902:c085:b0:1b6:a972:4414 with SMTP id j5-20020a170902c08500b001b6a9724414mr4558982pld.3.1687812444029;
+        Mon, 26 Jun 2023 13:47:24 -0700 (PDT)
+Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
+        by smtp.gmail.com with ESMTPSA id k19-20020a170902ba9300b001ab39cd875csm4594066pls.133.2023.06.26.13.47.23
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 26 Jun 2023 13:47:23 -0700 (PDT)
+Date: Mon, 26 Jun 2023 13:47:21 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Dexuan Cui <decui@microsoft.com>
+Cc: Simon Horman <simon.horman@corigine.com>, souradeep chakrabarti
+ <schakrabarti@linux.microsoft.com>, KY Srinivasan <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, "wei.liu@kernel.org"
+ <wei.liu@kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org"
+ <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>, Long Li
+ <longli@microsoft.com>, Ajay Sharma <sharmaajay@microsoft.com>,
+ "leon@kernel.org" <leon@kernel.org>, "cai.huoqing@linux.dev"
+ <cai.huoqing@linux.dev>, "ssengar@linux.microsoft.com"
+ <ssengar@linux.microsoft.com>, "vkuznets@redhat.com" <vkuznets@redhat.com>,
+ "tglx@linutronix.de" <tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
+ <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+ <linux-rdma@vger.kernel.org>, "stable@vger.kernel.org"
+ <stable@vger.kernel.org>, Souradeep Chakrabarti
+ <schakrabarti@microsoft.com>
+Subject: Re: [PATCH 1/2 V3 net] net: mana: Fix MANA VF unload when host is
+ unresponsive
+Message-ID: <20230626134721.256c6c16@hermes.local>
+In-Reply-To: <SA1PR21MB1335166153541BFDC2B7036BBF26A@SA1PR21MB1335.namprd21.prod.outlook.com>
+References: <1687771058-26634-1-git-send-email-schakrabarti@linux.microsoft.com>
+	<1687771098-26775-1-git-send-email-schakrabarti@linux.microsoft.com>
+	<ZJmNBKA3ygDryP7i@corigine.com>
+	<SA1PR21MB1335166153541BFDC2B7036BBF26A@SA1PR21MB1335.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3109247.1687812255.1@warthog.procyon.org.uk>
-Date: Mon, 26 Jun 2023 21:44:15 +0100
-Message-ID: <3109248.1687812255@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.1
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Ilya Dryomov <idryomov@gmail.com> wrote:
+On Mon, 26 Jun 2023 20:06:48 +0000
+Dexuan Cui <decui@microsoft.com> wrote:
 
->   if (sendpage_ok(bv.bv_page))
->           msg.msg_flags |= MSG_SPLICE_PAGES;
->   else
->           msg.msg_flags &= ~MSG_SPLICE_PAGES;
+> > From: Simon Horman
+> > Sent: Monday, June 26, 2023 6:05 AM  
+> > > ...
+> > > Fixes: ca9c54d2d6a5ab2430c4eda364c77125d62e5e0f (net: mana: Add a
+> > > driver for
+> > > Microsoft Azure Network Adapter)  
+> > 
+> > nit: A correct format of this fixes tag is:
+> > 
+> > In particular:
+> > * All on lone line
+> > * Description in double quotes.
+> > 
+> > Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network
+> > Adapter (MANA)")  
+> 
+> Hi Souradeep, FYI I often refer to:
+> https://marc.info/?l=linux-pci&m=150905742808166&w=2
+> 
+> The link mentions:
+> alias gsr='git --no-pager show -s --abbrev-commit --abbrev=12 --pretty=format:"%h (\"%s\")%n"'
+> 
+> "gsr ca9c54d2d6a5ab2430c4eda364c77125d62e5e0f" produces:
+> ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
 
-Hmmm...  I'm not sure there's any guarantee that msg, including msg_flags,
-won't get altered by ->sendmsg().
+You can do same thing without shell alias by using git-config
 
-David
+[alias]
+	fixes = log -1 --format=fixes
+	gsr = log -1 --format=gsr
+
+[pretty]
+	fixes = Fixes: %h (\"%s\")
+	gsr = %h (\"%s\")
+
+Then:
+$ git gsr 1919b39fc6eabb9a6f9a51706ff6d03865f5df29
+1919b39fc6ea ("net: mana: Fix perf regression: remove rx_cqes, tx_cqes counters")
 
 
