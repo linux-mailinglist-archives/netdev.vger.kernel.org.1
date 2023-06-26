@@ -1,82 +1,344 @@
-Return-Path: <netdev+bounces-14061-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14062-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57C8573EBB2
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:20:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A1BC373EBBE
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:23:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 568EF1C209BB
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:20:07 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C54211C209CD
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:23:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E12EC14270;
-	Mon, 26 Jun 2023 20:20:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AABBE14281;
+	Mon, 26 Jun 2023 20:23:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 850D414A80;
-	Mon, 26 Jun 2023 20:20:03 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7354EC433C0;
-	Mon, 26 Jun 2023 20:20:02 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687810803;
-	bh=Maky/E8y47QdX20qkzXbLBDyC0PqI8ISHALA3ayx/pE=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=Z3x8LFJljPHUMLCFgTv4ip85HVkbz8dW4da5UnZQbLpbXG0rpq+NuPVtunfh7HNhO
-	 ffeMvEtX1ZvkZhKNMHIelkF/nQ+FBlECZJvIjTnzG7N3wIqKwDQNkNRlwQMeDBGcB3
-	 YeWSVCB7ojeNPhK6JY986CD+MT+3BmGS3MSURUM0qK1j2g6eABEkTfxawCFfjvbYYp
-	 l6w8gZAfR5b6z1mSKR4Dv3sxd3eaAfID8POBiJJB525MYbZPJh9WX1ir2CaC6wmK6d
-	 jbgHz/2Un4DJEmh+CHU6DyrZoh/6OETTxPKpL56brXTcF9Xz29nQROIY+AUla1rTWU
-	 38BQCfWMIdRWA==
-Date: Mon, 26 Jun 2023 13:20:01 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Jisheng Zhang <jszhang@kernel.org>
-Cc: Giuseppe Cavallaro <peppe.cavallaro@st.com>, Alexandre Torgue
- <alexandre.torgue@foss.st.com>, Jose Abreu <joabreu@synopsys.com>, "David S
- . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo
- Abeni <pabeni@redhat.com>, Maxime Coquelin <mcoquelin.stm32@gmail.com>,
- Chen-Yu Tsai <wens@csie.org>, Jernej Skrabec <jernej.skrabec@gmail.com>,
- Samuel Holland <samuel@sholland.org>, netdev@vger.kernel.org,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- linux-sunxi@lists.linux.dev, Simon Horman <simon.horman@corigine.com>
-Subject: Re: [PATCH net-next v4 0/2] net: stmmac: improve driver statistics
-Message-ID: <20230626132001.2b0e2ac2@kernel.org>
-In-Reply-To: <20230626152844.484-1-jszhang@kernel.org>
-References: <20230626152844.484-1-jszhang@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9987414276
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:23:08 +0000 (UTC)
+Received: from mail-lj1-x233.google.com (mail-lj1-x233.google.com [IPv6:2a00:1450:4864:20::233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F418510CC;
+	Mon, 26 Jun 2023 13:23:05 -0700 (PDT)
+Received: by mail-lj1-x233.google.com with SMTP id 38308e7fff4ca-2b5c231f842so32003071fa.2;
+        Mon, 26 Jun 2023 13:23:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687810984; x=1690402984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=N+afpUqUgO3CcUicCLnW8oZ9GpmDccQRCfUB8BuBpHM=;
+        b=fRayBtAFFLvM/R80MwuZwHpKxY5vA0bV9vqTBPstxOg2J42R7YtQwQUN+o2bNMxF2y
+         yRvEw+LBnLBrUr/yPHdF7oC+ClQaxpyhZtJg/eLyuXSWvHvxJ5lsQ94SHRFy7Zbt4AFB
+         AH1tuLhExN1znW20ABkCEIru5eihiGFssZzVkC84upAi0RBUV5C0iv/c0ws9oSR6BCqw
+         vsRNiUocx8O3tWuUGbKVGI/tgIcmCADY99ubeP1AKg5uoOqeRO1rXFY4j+RmX229KaRx
+         Yt3RcrxLJuKxXT1Z+N+IhVgiaiB1eXDVNtSQC5J/w8V9aMKGgX5jknWgXZqxx5Tmu92j
+         odyA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687810984; x=1690402984;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=N+afpUqUgO3CcUicCLnW8oZ9GpmDccQRCfUB8BuBpHM=;
+        b=ea0cWFslDGEHKqof4wigvLVgzIz89xTepVLaj9fs/alR7vjjgzNzeF07F+BXmwyjJe
+         gc7iNZus+knhXNQSadh9OTnNVBV9BR1Lab4yF8XLfhC0xxT9PrEU6tTasuyIMWM/qYcH
+         kMf1wf+y4VWYbBmCeqyfNHeM21ztoqHwAVDdPQk9WYg56qL+0Pag9aprKd9/H/9+V543
+         Kigv7FvMQRVQZjKtZBRScp3ZcOPlkBofJCSa97UjpPpD60gJ2ibQoYYDj4TD9kuqWZUd
+         2t65DtkFqCb+zOU1ERdoV+HOzPq3OxDwknWfystFurL4qwbrqtE1MKqMT7P9CBlv/QHb
+         Ukqg==
+X-Gm-Message-State: AC+VfDya8MXRHUkIfvGwtrpaV8gbXVzSqf4h7Xxh69H83OGk29HqrsNO
+	IOPhlrVcnLD9ke/FHH9QtRxAQgUDX7uKFMLCYcw=
+X-Google-Smtp-Source: ACHHUZ5hvqpJrwoenjnisP2tLiZFIA1b1al2OZoYk7zoF2GBn8JP4rgdpeXWgxKVqLFZG0bqK2fGtqZBCQFFwCrpTgo=
+X-Received: by 2002:a2e:9982:0:b0:2b6:a6a6:4a16 with SMTP id
+ w2-20020a2e9982000000b002b6a6a64a16mr1487497lji.3.1687810983897; Mon, 26 Jun
+ 2023 13:23:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <3101881.1687801973@warthog.procyon.org.uk>
+In-Reply-To: <3101881.1687801973@warthog.procyon.org.uk>
+From: Ilya Dryomov <idryomov@gmail.com>
+Date: Mon, 26 Jun 2023 22:22:51 +0200
+Message-ID: <CAOi1vP_g70kV_YFjHNoS1hHPpCiMxW1hTfm92Ud35ehYrmv=1Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] libceph: Partially revert changes to support MSG_SPLICE_PAGES
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org, Xiubo Li <xiubli@redhat.com>, 
+	Jeff Layton <jlayton@kernel.org>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>, ceph-devel@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 26 Jun 2023 23:28:42 +0800 Jisheng Zhang wrote:
-> 1. don't clear network driver statistics in .ndo_close() and
-> .ndo_open() cycle
-> 2. avoid some network driver statistics overflow on 32 bit platforms
-> 3. use per-queue statistics where necessary to remove frequent
-> cacheline ping pongs.
-> 
-> NOTE: v1 and v2 are back ported from an internal LTS tree, I made
-> some mistakes when backporting and squashing. Now, net-next + v3
-> has been well tested with 'ethtool -s' and 'ip -s link show'.
+On Mon, Jun 26, 2023 at 7:53=E2=80=AFPM David Howells <dhowells@redhat.com>=
+ wrote:
+>
+>
+> Fix the mishandling of MSG_DONTWAIT and also reinstates the per-page
+> checking of the source pages (which might have come from a DIO write by
+> userspace) by partially reverting the changes to support MSG_SPLICE_PAGES
+> and doing things a little differently.  In messenger_v1:
+>
+>  (1) The ceph_tcp_sendpage() is resurrected and the callers reverted to u=
+se
+>      that.
+>
+>  (2) The callers now pass MSG_MORE unconditionally.  Previously, they wer=
+e
+>      passing in MSG_MORE|MSG_SENDPAGE_NOTLAST and then degrading that to
+>      just MSG_MORE on the last call to ->sendpage().
+>
+>  (3) Make ceph_tcp_sendpage() a wrapper around sendmsg() rather than
+>      sendpage(), setting MSG_SPLICE_PAGES if sendpage_ok() returns true o=
+n
+>      the page.
+>
+> In messenger_v2:
+>
+>  (4) Bring back do_try_sendpage() and make the callers use that.
+>
+>  (5) Make do_try_sendpage() use sendmsg() for both cases and set
+>      MSG_SPLICE_PAGES if sendpage_ok() is set.
+>
+> Note that libceph is using sendpage_ok() for this, but it should not real=
+ly
+> be considered exhaustive in this regard - this is, however, what libceph =
+is
+> doing upstream.
 
-## Form letter - net-next-closed
+Such use spans far beyond libceph: drbd, iSCSI, NVMe-over-TCP, etc.
+sendpage_ok() the only tool we have got...
 
-The merge window for v6.5 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
-We are currently accepting bug fixes only.
+>
+> Fixes: 40a8c17aa770 ("ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than sen=
+dpage")
+> Fixes: fa094ccae1e7 ("ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than sen=
+dpage()")
+> Reported-by: Ilya Dryomov <idryomov@gmail.com>
+> Link: https://lore.kernel.org/r/CAOi1vP9vjLfk3W+AJFeexC93jqPaPUn2dD_4Nrzx=
+woZTbYfOnw@mail.gmail.com/
+> Link: https://lore.kernel.org/r/CAOi1vP_Bn918j24S94MuGyn+Gxk212btw7yWeDrR=
+cW1U8pc_BA@mail.gmail.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Ilya Dryomov <idryomov@gmail.com>
+> cc: Xiubo Li <xiubli@redhat.com>
+> cc: Jeff Layton <jlayton@kernel.org>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: Jens Axboe <axboe@kernel.dk>
+> cc: Matthew Wilcox <willy@infradead.org>
+> cc: ceph-devel@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  net/ceph/messenger_v1.c |   57 +++++++++++++++++++------------
+>  net/ceph/messenger_v2.c |   87 ++++++++++++++++++++++++++++++++++++++---=
+-------
+>  2 files changed, 105 insertions(+), 39 deletions(-)
+>
+> diff --git a/net/ceph/messenger_v1.c b/net/ceph/messenger_v1.c
+> index 814579f27f04..1ee58cbaf151 100644
+> --- a/net/ceph/messenger_v1.c
+> +++ b/net/ceph/messenger_v1.c
+> @@ -74,6 +74,38 @@ static int ceph_tcp_sendmsg(struct socket *sock, struc=
+t kvec *iov,
+>         return r;
+>  }
+>
+> +/*
+> + * @more: either or both of MSG_MORE and MSG_SENDPAGE_NOTLAST
 
-Please repost when net-next reopens after July 10th.
+MSG_SENDPAGE_NOTLAST flag doesn't exist anymore.
 
-RFC patches sent for review only are obviously welcome at any time.
+> + */
+> +static int ceph_tcp_sendpage(struct socket *sock, struct page *page,
+> +                            int offset, size_t size, int more)
+> +{
+> +       struct msghdr msg =3D {
+> +               .msg_flags =3D MSG_DONTWAIT | MSG_NOSIGNAL | more,
+> +       };
+> +       struct bio_vec bvec;
+> +       int ret;
+> +
+> +       /*
+> +        * sendpage cannot properly handle pages with page_count =3D=3D 0=
+,
 
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
+I would suggest sendpage -> MSG_SPLICE_PAGES here like was done in
+the other file.
 
+> +        * we need to fall back to sendmsg if that's the case.
+> +        *
+> +        * Same goes for slab pages: skb_can_coalesce() allows
+> +        * coalescing neighboring slab objects into a single frag which
+> +        * triggers one of hardened usercopy checks.
+> +        */
+> +       if (sendpage_ok(page))
+> +               msg.msg_flags |=3D MSG_SPLICE_PAGES;
+> +
+> +       bvec_set_page(&bvec, page, size, offset);
+
+The bvec is not added to the message, so I don't think this actually
+sends anything...
+
+> +
+> +       ret =3D sock_sendmsg(sock, &msg);
+> +       if (ret =3D=3D -EAGAIN)
+> +               ret =3D 0;
+> +
+> +       return ret;
+> +}
+> +
+>  static void con_out_kvec_reset(struct ceph_connection *con)
+>  {
+>         BUG_ON(con->v1.out_skip);
+> @@ -450,10 +482,6 @@ static int write_partial_message_data(struct ceph_co=
+nnection *con)
+>          */
+>         crc =3D do_datacrc ? le32_to_cpu(msg->footer.data_crc) : 0;
+>         while (cursor->total_resid) {
+> -               struct bio_vec bvec;
+> -               struct msghdr msghdr =3D {
+> -                       .msg_flags =3D MSG_SPLICE_PAGES,
+> -               };
+>                 struct page *page;
+>                 size_t page_offset;
+>                 size_t length;
+> @@ -465,13 +493,8 @@ static int write_partial_message_data(struct ceph_co=
+nnection *con)
+>                 }
+>
+>                 page =3D ceph_msg_data_next(cursor, &page_offset, &length=
+);
+> -               if (length !=3D cursor->total_resid)
+> -                       msghdr.msg_flags |=3D MSG_MORE;
+> -
+> -               bvec_set_page(&bvec, page, length, page_offset);
+> -               iov_iter_bvec(&msghdr.msg_iter, ITER_SOURCE, &bvec, 1, le=
+ngth);
+> -
+> -               ret =3D sock_sendmsg(con->sock, &msghdr);
+> +               ret =3D ceph_tcp_sendpage(con->sock, page, page_offset, l=
+ength,
+> +                                       MSG_MORE);
+>                 if (ret <=3D 0) {
+>                         if (do_datacrc)
+>                                 msg->footer.data_crc =3D cpu_to_le32(crc)=
+;
+> @@ -501,22 +524,14 @@ static int write_partial_message_data(struct ceph_c=
+onnection *con)
+>   */
+>  static int write_partial_skip(struct ceph_connection *con)
+>  {
+> -       struct bio_vec bvec;
+> -       struct msghdr msghdr =3D {
+> -               .msg_flags =3D MSG_SPLICE_PAGES | MSG_MORE,
+> -       };
+>         int ret;
+>
+>         dout("%s %p %d left\n", __func__, con, con->v1.out_skip);
+>         while (con->v1.out_skip > 0) {
+>                 size_t size =3D min(con->v1.out_skip, (int)PAGE_SIZE);
+>
+> -               if (size =3D=3D con->v1.out_skip)
+> -                       msghdr.msg_flags &=3D ~MSG_MORE;
+> -               bvec_set_page(&bvec, ZERO_PAGE(0), size, 0);
+> -               iov_iter_bvec(&msghdr.msg_iter, ITER_SOURCE, &bvec, 1, si=
+ze);
+> -
+> -               ret =3D sock_sendmsg(con->sock, &msghdr);
+> +               ret =3D ceph_tcp_sendpage(con->sock, ceph_zero_page, 0, s=
+ize,
+> +                                       MSG_MORE);
+>                 if (ret <=3D 0)
+>                         goto out;
+>                 con->v1.out_skip -=3D ret;
+> diff --git a/net/ceph/messenger_v2.c b/net/ceph/messenger_v2.c
+> index 87ac97073e75..139b61598f4f 100644
+> --- a/net/ceph/messenger_v2.c
+> +++ b/net/ceph/messenger_v2.c
+> @@ -117,38 +117,89 @@ static int ceph_tcp_recv(struct ceph_connection *co=
+n)
+>         return ret;
+>  }
+>
+> +static int do_sendmsg(struct socket *sock, struct iov_iter *it)
+> +{
+> +       struct msghdr msg =3D { .msg_flags =3D CEPH_MSG_FLAGS };
+> +       int ret;
+> +
+> +       msg.msg_iter =3D *it;
+> +       while (iov_iter_count(it)) {
+> +               ret =3D sock_sendmsg(sock, &msg);
+> +               if (ret <=3D 0) {
+> +                       if (ret =3D=3D -EAGAIN)
+> +                               ret =3D 0;
+> +                       return ret;
+> +               }
+> +
+> +               iov_iter_advance(it, ret);
+> +       }
+> +
+> +       WARN_ON(msg_data_left(&msg));
+> +       return 1;
+> +}
+> +
+> +static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
+> +{
+> +       struct msghdr msg =3D {};
+> +       struct bio_vec bv;
+> +       int ret;
+> +
+> +       if (WARN_ON(!iov_iter_is_bvec(it)))
+> +               return -EINVAL;
+> +
+> +       while (iov_iter_count(it)) {
+> +               msg.msg_flags =3D CEPH_MSG_FLAGS;
+> +               if (sendpage_ok(bv.bv_page))
+> +                       msg.msg_flags |=3D MSG_SPLICE_PAGES;
+> +
+> +               /* iov_iter_iovec() for ITER_BVEC */
+> +               bvec_set_page(&bv, it->bvec->bv_page,
+> +                             min(iov_iter_count(it),
+> +                                 it->bvec->bv_len - it->iov_offset),
+> +                             it->bvec->bv_offset + it->iov_offset);
+> +
+> +               /*
+> +                * MSG_SPLICE_PAGES cannot properly handle pages with
+> +                * page_count =3D=3D 0, we need to fall back to sendmsg i=
+f
+> +                * that's the case.
+> +                *
+> +                * Same goes for slab pages: skb_can_coalesce() allows
+> +                * coalescing neighboring slab objects into a single frag
+> +                * which triggers one of hardened usercopy checks.
+> +                */
+
+This comment is now misplaced.  I would suggest
+
+  if (sendpage_ok(bv.bv_page))
+          msg.msg_flags |=3D MSG_SPLICE_PAGES;
+  else
+          msg.msg_flags &=3D ~MSG_SPLICE_PAGES;
+
+here and keeping the initialization
+
+  struct msghdr msg =3D { .msg_flags =3D CEPH_MSG_FLAGS };
+
+above thus staying closer to the original.
+
+Thanks,
+
+                Ilya
 
