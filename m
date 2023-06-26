@@ -1,139 +1,180 @@
-Return-Path: <netdev+bounces-14001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB23873E51B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:30:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C568B73E51D
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:31:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5205C280E2F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:30:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 015C31C20A3C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 16:31:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF692C156;
-	Mon, 26 Jun 2023 16:30:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 18A78D506;
+	Mon, 26 Jun 2023 16:31:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F33A125AA
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:30:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9174FD3
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:30:30 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687797029;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=17WXujS/YadeWAnXnT2WRgIIGXFkn1Rmc4cmEtM2dPk=;
-	b=X9oAWOZCz8os93rlgMj6aA7gdoQ4mc1dxhx9Nq/J0Qum04slbtjXL1KLxDYxnIyp21h9IO
-	MjA4nyn87Hk2CKS4DdjPc+w9wpKK4AuqHOXwI+Cc4/Qx//2yapVnlFwdEz6wAA84J1j/Fw
-	HvLadTQ8EEyQQeAcyomxH8mkmwfIw/I=
-Received: from mail-qv1-f69.google.com (mail-qv1-f69.google.com
- [209.85.219.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-634-g6owQAvVPNSjjp7zx8YN4A-1; Mon, 26 Jun 2023 12:30:28 -0400
-X-MC-Unique: g6owQAvVPNSjjp7zx8YN4A-1
-Received: by mail-qv1-f69.google.com with SMTP id 6a1803df08f44-6355b301c9dso19977976d6.3
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:30:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B1D823C7D
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 16:31:42 +0000 (UTC)
+Received: from mail-pf1-x434.google.com (mail-pf1-x434.google.com [IPv6:2607:f8b0:4864:20::434])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 60EB1C6
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:31:40 -0700 (PDT)
+Received: by mail-pf1-x434.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso1618566b3a.2
+        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 09:31:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687797099; x=1690389099;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=ElVQSNFQeBSJ8cUDkz1CqixeRQkBNwJHNP3Ld++dWRY=;
+        b=L07WBZsg3ebScE1i/zNFEVtycZ/Cvvp66e8wB7z4hPfIUswMI/WdEw5z/WdgU5mkZn
+         d0OvXti2Xmjbvv9fedQ+t412YJdQ6aK4FAQoccn+wGuGGncH1IC0nurX7H2qH9iW5nLn
+         AdonOzNMCcu63+dP2PgaSBqzWmWURx0ec/izohi6XZMIOgaN840Ng7KOoYrk1f8nremA
+         cv2nlmyyKBCpuPIny6vqt2PPmtAgK+f9enyEpdwXazEGe3zQam9NlLz58VwF49jIB96Q
+         4azUQ0QGRTQGYRXTVyNtAhjGyr5bBqoWmXDgy2cQe6ARXVslXFNcduTu7wZB7a32AkMM
+         3cRA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687797028; x=1690389028;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=17WXujS/YadeWAnXnT2WRgIIGXFkn1Rmc4cmEtM2dPk=;
-        b=Muti1vClw6ymmDzjlMAGhve7axKNekAAEii+x8vqBIiMxwhf9XF9yY376UjbIM/0uZ
-         dk+Kt/yeq+r3uFoKNgALMB7bTxsXJgt/WTsWgWlB2MbM8zdTNyW7s+Mc5PmWPcTg3ScP
-         YGu2zXuJGL1EfJRCVi5F4q1P/eM+eLONyCfoSdzGjPOxxV5E6LosJIaiwsps/5gV4EsN
-         9kKJOqUucfTG20K3WpU1Vhtr1mP/PNHMRPPOWmXPA2IsAmxJdUf8x02G/m2/zcZFAhIr
-         r2p5Bm9HBC12mqJ+CFHavAkMslE0pL1WFQI8R33qhi72SAUi35zQcJZRVudiKJXRrOJK
-         MUnA==
-X-Gm-Message-State: AC+VfDxaW481Z6IfchAOkw+zGflrvvbctWEBPgRwBtL6PrEu2FrqadK7
-	x1iXdS3+E4U8Ns8rX89YFdN7re3S8KYqAqCa/4abp+grEQusueOKNRHTFjU7WMfMkRjWntNMCZv
-	2WFwAIIBIAU85IX+u
-X-Received: by 2002:a05:6214:1cc5:b0:62d:e8a2:4d36 with SMTP id g5-20020a0562141cc500b0062de8a24d36mr34309504qvd.61.1687797028065;
-        Mon, 26 Jun 2023 09:30:28 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ7uBH00Gk/fKeQLrvD/GY47XvG7v3BCuca4UyzNoimZCXIfrb0LXztvOgJ/KifRuXdADW4Jbg==
-X-Received: by 2002:a05:6214:1cc5:b0:62d:e8a2:4d36 with SMTP id g5-20020a0562141cc500b0062de8a24d36mr34309488qvd.61.1687797027844;
-        Mon, 26 Jun 2023 09:30:27 -0700 (PDT)
-Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
-        by smtp.gmail.com with ESMTPSA id nd14-20020a056214420e00b006215d0bdf37sm3351810qvb.16.2023.06.26.09.30.25
+        d=1e100.net; s=20221208; t=1687797099; x=1690389099;
+        h=content-transfer-encoding:mime-version:message-id:subject:cc:to
+         :from:date:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=ElVQSNFQeBSJ8cUDkz1CqixeRQkBNwJHNP3Ld++dWRY=;
+        b=H2SFb+F4Jm3umZpzDpPViZwcn5EaFRb3mt0GFuk/3/cti79O8wO8lz3EYc3tUpEEmV
+         B5UY4Vv4e/GOuR6gLvXvgToe84Vub/0DgLQ5+a4pXx0qZOnvFt3/1nk+UwJ00pjpoNhm
+         ismhD7UowPGw5rnKE8o81G1oC3eq6chhuemrB/lwtjVJHeCc86S56I58QM4A05qCAC5q
+         oqwns65mTNUFYcke0MqQoZo8LCgUaQwoUIMgCq+kLXTxNwW+CWcfpFJh++ezeZLCN8cP
+         /NueWIeQuYb2vB4M/rl/Jf/fZtzcpwEug5V7+cZlt1EZNvo+PrYCiaeX7OdfHWHblKrS
+         N4ng==
+X-Gm-Message-State: AC+VfDwXZGS0BV4xTD7YsIwxLgdGpjJS3JYOpGuwkvDuDYunu/4FvX48
+	pv642OYpfnTdb+/DIYhCOB++b8siXvrYtoIyQgULxg==
+X-Google-Smtp-Source: ACHHUZ4e++rRgYbN2T01eKdUgjlpuJ0Wh4RimtVZlL+eqy3ga2KMAgCgwCHcoJVBLF/QsxP4ezyl3w==
+X-Received: by 2002:a05:6a20:1054:b0:128:fce6:dd8b with SMTP id gt20-20020a056a20105400b00128fce6dd8bmr1104801pzc.39.1687797099496;
+        Mon, 26 Jun 2023 09:31:39 -0700 (PDT)
+Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
+        by smtp.gmail.com with ESMTPSA id a21-20020a63e855000000b0053ba104c113sm4398581pgk.72.2023.06.26.09.31.39
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 09:30:27 -0700 (PDT)
-Date: Mon, 26 Jun 2023 18:30:23 +0200
-From: Stefano Garzarella <sgarzare@redhat.com>
-To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
-	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
-	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v1 0/4] virtio/vsock: some updates for MSG_PEEK flag
-Message-ID: <tmcj34lrgk7rxlnp4qvkpljwovowlz3wnosqboxssv6f6enr6u@qnf422n6lu6j>
-References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
+        Mon, 26 Jun 2023 09:31:39 -0700 (PDT)
+Date: Mon, 26 Jun 2023 09:31:37 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org
+Subject: [ANNOUNCE] iproute2 6.4.0 release
+Message-ID: <20230626093137.2f302acc@hermes.local>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii; format=flowed
-Content-Disposition: inline
-In-Reply-To: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jun 18, 2023 at 09:24:47AM +0300, Arseniy Krasnov wrote:
->Hello,
->
->This patchset does several things around MSG_PEEK flag support. In
->general words it reworks MSG_PEEK test and adds support for this flag
->in SOCK_SEQPACKET logic. Here is per-patch description:
->
->1) This is cosmetic change for SOCK_STREAM implementation of MSG_PEEK:
->   1) I think there is no need of "safe" mode walk here as there is no
->      "unlink" of skbs inside loop (it is MSG_PEEK mode - we don't change
->      queue).
->   2) Nested while loop is removed: in case of MSG_PEEK we just walk
->      over skbs and copy data from each one. I guess this nested loop
->      even didn't behave as loop - it always executed just for single
->      iteration.
->
->2) This adds MSG_PEEK support for SOCK_SEQPACKET. It could be implemented
->   be reworking MSG_PEEK callback for SOCK_STREAM to support SOCK_SEQPACKET
->   also, but I think it will be more simple and clear from potential
->   bugs to implemented it as separate function thus not mixing logics
->   for both types of socket. So I've added it as dedicated function.
->
->3) This is reworked MSG_PEEK test for SOCK_STREAM. Previous version just
->   sent single byte, then tried to read it with MSG_PEEK flag, then read
->   it in normal way. New version is more complex: now sender uses buffer
->   instead of single byte and this buffer is initialized with random
->   values. Receiver tests several things:
->   1) Read empty socket with MSG_PEEK flag.
->   2) Read part of buffer with MSG_PEEK flag.
->   3) Read whole buffer with MSG_PEEK flag, then checks that it is same
->      as buffer from 2) (limited by size of buffer from 2) of course).
->   4) Read whole buffer without any flags, then checks that is is same
->      as buffer from 3).
->
->4) This is MSG_PEEK test for SOCK_SEQPACKET. It works in the same way
->   as for SOCK_STREAM, except it also checks combination of MSG_TRUNC
->   and MSG_PEEK.
->
->Head is:
->https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
+Just released iproute2 corresponding to the 6.4 kernel.
+Not much is new in this release heading into summer holidays.
+The bridge utility added some new capabilities around multicast
+forwarding database. Lots of cleanups and similar fixes. 
 
-Nice cleanup, LGTM, but I'd like a comment from Bobby.
+Download:
+    https://www.kernel.org/pub/linux/utils/net/iproute2/iproute2-6.4.0.tar.gz
 
-Thanks,
-Stefano
+Repository for current release
+    https://github.com/shemminger/iproute2.git
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2.git
+
+And future release (net-next):
+    git://git.kernel.org/pub/scm/network/iproute2/iproute2-next.git
+
+Contributions:
+
+Andrea Claudi (5):
+      ip: remove double space before 'allmulti' flag
+      bridge: vni: remove useless checks on vni
+      ipstats: fix message reporting error
+      vdpa: propagate error from cmd_dev_vstats_show()
+      iproute_lwtunnel: fix array boundary check
+
+Bilal Khan (1):
+      fixed the grammar in ip-rule(8) man page
+
+David Ahern (4):
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+      Update kernel headers
+
+Davide Caratti (1):
+      tc: m_tunnel_key: support code for "nofrag" tunnels
+
+Herbert Xu (1):
+      macvlan: Add bclim parameter
+
+Ido Schimmel (8):
+      bridge: mdb: Add underlay destination IP support
+      bridge: mdb: Add UDP destination port support
+      bridge: mdb: Add destination VNI support
+      bridge: mdb: Add source VNI support
+      bridge: mdb: Add outgoing interface support
+      bridge: mdb: Document the catchall MDB entries
+      bridge: vlan: Add support for neigh_suppress option
+      bridge: link: Add support for neigh_vlan_suppress option
+
+Luca Boccassi (1):
+      man: fix typos found by Lintian
+
+Nicolas Dichtel (1):
+      ipnetns: fix fd leak with 'ip netns set'
+
+Petr Machata (2):
+      ip: Support IP address protocol
+      man: man8: Add man page coverage for "ip address add ... proto"
+
+Stephen Hemminger (32):
+      uapi: update kernel headers 6.4-rc1
+      uapi: add capability.h
+      remove unnecessary checks for NULL before calling free()
+      ip-rule: more manual page grammer fixes
+      Add MAINTAINERS file
+      lib/fs: fix file leak in task_get_name
+      ipmaddr: fix dereference of NULL on malloc() failure
+      iproute_lwtunnel: fix possible use of NULL when malloc() fails
+      tc_filter: fix unitialized warning
+      tc_util fix unitialized warning
+      tc_exec: don't dereference NULL on calloc failure
+      m_action: fix warning of overwrite of const string
+      netem: fix NULL deref on allocation failure
+      nstat: fix potential NULL deref
+      rdma/utils: fix some analyzer warnings
+      tc/prio: handle possible truncated kernel response
+      CREDITS: add file
+      ll_type_n2a: use ARRAY_SIZE
+      vxlan: use print_nll for gbp and gpe
+      vxlan: make option printing more consistent
+      uapi: update headers to 6.4-rc4
+      ipaddress: accept symbolic names
+      utils: make local cmdline functions static
+      libnetlink: drop unused rtnl_talk_iov
+      bridge: make print_vlan_info static
+      ip: make print_rta_gateway static
+      xfrm: make xfrm_stat_print_nokeys static
+      rdma: make rd_attr_check static
+      whitespace cleanups
+      rt_names: check for malloc() failure
+      uapi: update to bpf.h
+      v6.4.0
+
+Vladimir Oltean (3):
+      utils: add max() definition
+      tc/mqprio: add support for preemptible traffic classes
+      tc/taprio: add support for preemptible traffic classes
+
+zhaoshuang (1):
+      iproute2: optimize code and fix some mem-leak risk
 
 
