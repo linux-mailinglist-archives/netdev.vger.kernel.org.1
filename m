@@ -1,108 +1,100 @@
-Return-Path: <netdev+bounces-13860-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13862-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C345C73D7C5
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:31:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD0873D7DC
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 08:42:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F3A861C2074B
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:31:35 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EAC7C1C2080C
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 06:42:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08BE5637;
-	Mon, 26 Jun 2023 06:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DFDBF1107;
+	Mon, 26 Jun 2023 06:42:04 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9FD0A51
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:31:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 52035C433C0;
-	Mon, 26 Jun 2023 06:31:29 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687761092;
-	bh=yTWynjpAhpo2gu8Y4caUg/BFG5wYbkP2zkvjL/DB+iQ=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LaDimiIMDAPdF/zygITg2soLuLIZLvuykkxrp0pq2SxUk+MIRbHLJo3CZojzxrv6o
-	 qvKl2hXpxJliJcF/VrevKzExYeltWMqPqIscp8kGuI6iG4XkzcQQ2BAAP2+4gI+qki
-	 aB1pplzRZuNsz57kX9mxY3R7ymmmtJ9G+0Q3wR2jrAMqknyEeC81mitslpQuaLkwur
-	 riAKJEejphOvrZuUQ//AQoDxN4tnjfnrG3VkLQbvoYZifm/LC/1os9DGFVrzdmbYaJ
-	 5WI1zjg4v++1OlRkUTc2djVrB1JMbU7t/DBaG3uCZvOx2LHO0EfC90mLA0mZBG0lgo
-	 OY7s9HcP/xnHQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D130DA59
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 06:42:04 +0000 (UTC)
+Received: from mailgw.kylinos.cn (mailgw.kylinos.cn [124.126.103.232])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86CAE180
+	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 23:42:00 -0700 (PDT)
+X-UUID: e80ed0ee7d9045a8854065e27f85d757-20230626
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.25,REQID:c4f5351a-eeec-451f-a070-e2f9380a11ff,IP:15,
+	URL:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,AC
+	TION:release,TS:20
+X-CID-INFO: VERSION:1.1.25,REQID:c4f5351a-eeec-451f-a070-e2f9380a11ff,IP:15,UR
+	L:0,TC:0,Content:-5,EDM:25,RT:0,SF:-15,FILE:0,BULK:0,RULE:Release_Ham,ACTI
+	ON:release,TS:20
+X-CID-META: VersionHash:d5b0ae3,CLOUDID:72cda83f-7aa7-41f3-a6bd-0433bee822f3,B
+	ulkID:230626144153LMJIG539,BulkQuantity:0,Recheck:0,SF:38|24|17|19|44|102,
+	TC:nil,Content:0,EDM:5,IP:-2,URL:0,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,
+	OSI:0,OSA:0,AV:0
+X-CID-BVR: 0,NGT
+X-CID-BAS: 0,NGT,0,_
+X-UUID: e80ed0ee7d9045a8854065e27f85d757-20230626
+X-User: guodongtai@kylinos.cn
+Received: from localhost.localdomain [(39.156.73.12)] by mailgw
+	(envelope-from <guodongtai@kylinos.cn>)
+	(Generic MTA)
+	with ESMTP id 1030505675; Mon, 26 Jun 2023 14:41:52 +0800
+From: George Guo <guodongtai@kylinos.cn>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org
+Subject: [PATCH] e1000e: Remove unnecessary local variable bufsz
+Date: Mon, 26 Jun 2023 14:41:56 +0800
+Message-Id: <20230626064157.973984-1-guodongtai@kylinos.cn>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Mon, 26 Jun 2023 08:31:26 +0200
-From: Michael Walle <mwalle@kernel.org>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: Heiner Kallweit <hkallweit1@gmail.com>, Russell King
- <linux@armlinux.org.uk>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Yisen Zhuang <yisen.zhuang@huawei.com>, Salil Mehta
- <salil.mehta@huawei.com>, Florian Fainelli <florian.fainelli@broadcom.com>,
- Broadcom internal kernel review list
- <bcm-kernel-feedback-list@broadcom.com>, =?UTF-8?Q?Marek_Beh=C3=BAn?=
- <kabel@kernel.org>, Xu Liang <lxu@maxlinear.com>, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net-next v2 04/10] net: phy: replace is_c45 with
- phy_accces_mode
-In-Reply-To: <6fcd887a-c731-4c31-bb43-e8d14071524e@lunn.ch>
-References: <20230620-feature-c45-over-c22-v2-0-def0ab9ccee2@kernel.org>
- <20230620-feature-c45-over-c22-v2-4-def0ab9ccee2@kernel.org>
- <52cdebe9-0f94-430d-93ff-11f26d2e3c5b@lunn.ch>
- <6fcd887a-c731-4c31-bb43-e8d14071524e@lunn.ch>
-Message-ID: <353752b143bca56f79035635808e8e30@kernel.org>
-X-Sender: mwalle@kernel.org
-Content-Type: text/plain; charset=US-ASCII;
- format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Am 2023-06-23 21:54, schrieb Andrew Lunn:
-> On Fri, Jun 23, 2023 at 07:34:22PM +0200, Andrew Lunn wrote:
->> > @@ -131,9 +131,11 @@ int fwnode_mdiobus_register_phy(struct mii_bus *bus,
->> >
->> >  	is_c45 = fwnode_device_is_compatible(child, "ethernet-phy-ieee802.3-c45");
->> >  	if (is_c45 || fwnode_get_phy_id(child, &phy_id))
->> > -		phy = get_phy_device(bus, addr, is_c45);
->> > +		phy = get_phy_device(bus, addr,
->> > +				     is_c45 ? PHY_ACCESS_C45 : PHY_ACCESS_C22);
->> >  	else
->> > -		phy = phy_device_create(bus, addr, phy_id, 0, NULL);
->> > +		phy = phy_device_create(bus, addr, phy_id, PHY_ACCESS_C22,
->> > +					NULL);
->> 
->> Documentation/devicetree/bindings/net/ethernet-phy.yaml says:
->> 
->>   compatible:
->>     oneOf:
->>       - const: ethernet-phy-ieee802.3-c22
->>         description: PHYs that implement IEEE802.3 clause 22
->>       - const: ethernet-phy-ieee802.3-c45
->>         description: PHYs that implement IEEE802.3 clause 45
->> 
->> It would be nice to make this documentation more specific. It now
->> refers to 'bus transaction', so maybe we want to append that to these
->> lines?
-> 
-> Humm, looking at patch 9, maybe i got this wrong. Patch 9 seems to
-> suggest ethernet-phy-ieee802.3-c45 means c45 register space, and it is
-> upto the core to figure out how to access that register space, either
-> using c45 transactions, or C45 over C22.
+here bufsz is not necessary, use adapter->rx_buffer_len is better.
 
-Yes. And I think the core has all information to determine what mode
-should be used. Use C45 transfers first and iff that's not possible
-switch to C45-over-C22. Therefore, there isn't really a choice. It's
-either "it will work" or "it won't work at all".
+Signed-off-by: George Guo <guodongtai@kylinos.cn>
+---
+ drivers/net/ethernet/intel/e1000e/netdev.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-For all supported C45 PHYs right now, the mode should stay with C45
-because, that was the only supported mode. Except, if a C45 PHY was
-probed as a C22 PHY and stayed that way. With this patchset they
-would now be probed a PHY with C45 registers and using C45-over-C22.
-But I'm not sure if that's a thing.
+diff --git a/drivers/net/ethernet/intel/e1000e/netdev.c b/drivers/net/ethernet/intel/e1000e/netdev.c
+index bd7ef59b1f2e..c2b547aed79d 100644
+--- a/drivers/net/ethernet/intel/e1000e/netdev.c
++++ b/drivers/net/ethernet/intel/e1000e/netdev.c
+@@ -653,7 +653,6 @@ static void e1000_alloc_rx_buffers(struct e1000_ring *rx_ring,
+ 	struct e1000_buffer *buffer_info;
+ 	struct sk_buff *skb;
+ 	unsigned int i;
+-	unsigned int bufsz = adapter->rx_buffer_len;
+ 
+ 	i = rx_ring->next_to_use;
+ 	buffer_info = &rx_ring->buffer_info[i];
+@@ -665,7 +664,7 @@ static void e1000_alloc_rx_buffers(struct e1000_ring *rx_ring,
+ 			goto map_skb;
+ 		}
+ 
+-		skb = __netdev_alloc_skb_ip_align(netdev, bufsz, gfp);
++		skb = __netdev_alloc_skb_ip_align(netdev, adapter->rx_buffer_len, gfp);
+ 		if (!skb) {
+ 			/* Better luck next round */
+ 			adapter->alloc_rx_buff_failed++;
+-- 
+2.34.1
 
--michael
 
