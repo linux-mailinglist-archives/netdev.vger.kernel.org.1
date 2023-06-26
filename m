@@ -1,173 +1,165 @@
-Return-Path: <netdev+bounces-14115-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14116-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 276F073EE92
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:18:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3B3AF73EEB3
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:38:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C758E280C29
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:18:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 11A8C1C20A37
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 22:38:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C280E15AE3;
-	Mon, 26 Jun 2023 22:18:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C0DA7111E;
+	Mon, 26 Jun 2023 22:37:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B129E13AD1
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 22:18:36 +0000 (UTC)
-Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2086.outbound.protection.outlook.com [40.107.105.86])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1492093;
-	Mon, 26 Jun 2023 15:18:35 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=l4K66eRMgiGjcZ9kFrm/Qhd89fCsCCddBetkLxfyrIahJHVfkDB911lEzXOfm7zyKdHY9rJF54s6mLepS0Sl7gfSrRL7yAuMRwiRmi5zRCcuJaIgBPVtGRqLq30Tx1O/WmIYGwIjw1NjVIMz6+o18nBP4LB4PlLTSJXHXS4WeuqRF5amPrhWKI/duSefj1NO4cI9og5BEOO48UQV6bp7tdKFgaYfI5k9zw3s/GQSWInoZglefMKqJDECay+4E37Cn9/heHWQXf3PEsj1s71EIo6xDpJvruDS3KMxzPvy4RNLmwiJdMC7702qUC6fu+NfXk2ZpXqBdoDk99x5V2Wlsw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=9kI/gw8SKfiSKqDR8uaPmeAjHZ7Lubzqvx3MLZko33A=;
- b=hLxdAbgQ73TKCd/oQUe23e3UCZKoScOX3loT23nVq3zeXZo90MQecpjG11uAvlbMh20XIcg+Km10RI48nGA7g26RlMX2J+DAhyEAh9grcl7mXcDy4QVwUJTG8Y4B2Kky/ClQ6KOTglZaH8bFGwPVoOrj2F5cEcOugt/1YHqsWaxF6NBDclBgnxGSD69qCdz1celBsFYKjQP3NaehkXUs52BrXkU73+7bynxON+nI4zAEIs3m6efZjpvW1r96/mCIVDo0CI4iWDTUsFWw/NOffLmHMDyPZO9hCZGO8hGZ1xTuKLlqDfvyHn8xKZbccMJ8b5hVzOXF2oqHXzEhUGZy4w==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=9kI/gw8SKfiSKqDR8uaPmeAjHZ7Lubzqvx3MLZko33A=;
- b=cPlwX+aQJ+YA7PVB3lNUtU3ggIaGdYDb4Hg82FLVjzVeIJ7mlaceT+Xf7CCogll0V/v0qyoVFgq0bI2vR0xEyF4TivKY7xqB8onNaxvd7vzUTU7SOIsulP1fsYKQjaw/EH0DKWCQG0bbYV32jlFvavacqADy0jQsTN5f/nLVT7Y=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM9PR04MB8306.eurprd04.prod.outlook.com (2603:10a6:20b:3e4::12) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Mon, 26 Jun
- 2023 22:18:32 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6521.026; Mon, 26 Jun 2023
- 22:18:32 +0000
-Date: Tue, 27 Jun 2023 01:18:28 +0300
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 2/2] net: dsa: tag_sja1105: always prefer source port
- information from INCL_SRCPT
-Message-ID: <20230626221828.qzjeo6dedjnyme6k@skbuf>
-References: <20230626155112.3155993-1-vladimir.oltean@nxp.com>
- <20230626155112.3155993-3-vladimir.oltean@nxp.com>
- <ZJnU6WntVQW2AgvZ@corigine.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJnU6WntVQW2AgvZ@corigine.com>
-X-ClientProxiedBy: FR2P281CA0100.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9c::14) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EDE315AC4;
+	Mon, 26 Jun 2023 22:37:59 +0000 (UTC)
+Received: from mail-lj1-x234.google.com (mail-lj1-x234.google.com [IPv6:2a00:1450:4864:20::234])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7753E71;
+	Mon, 26 Jun 2023 15:37:57 -0700 (PDT)
+Received: by mail-lj1-x234.google.com with SMTP id 38308e7fff4ca-2b6a675743dso16661111fa.2;
+        Mon, 26 Jun 2023 15:37:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687819076; x=1690411076;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fGKAFHbZC4cH7Ih+qJbRUkOpVmcOgEOXjYwSvJ4Lvgg=;
+        b=RIHDV327WnntGMoaDhWBjriya4erCYEhKRMDZ3sfrt3BHDrbRQ3BffTu4o9n0T6GPn
+         pOCD5xfUyCNqY6kQ4Vu+RS5cWBoWwOoqVDCGlzyLhJ681wmaLwC33uLl1HRQLfHiEEML
+         huXx1LWRIC9Q8UmilKW0VXPASR0cq1xirBubEC7Ev4wWtafdKK3NxRfg9rugsi1GX/hF
+         SH8bhjQKUgGL2Do8N73Gxes7cH2rVTNpG6r/IEbYuwlURk8iBe8/xD4JCqAMvoO8MU9f
+         VaOZtzXOmLpnE1ija/PUj1BD+3VBEGfqf+/fODv5/jfABkBNd/43XLLB04IFBlqMvsqx
+         q48g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687819076; x=1690411076;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=fGKAFHbZC4cH7Ih+qJbRUkOpVmcOgEOXjYwSvJ4Lvgg=;
+        b=BMvFE8ltqjHUZb3eEF+Bbjqjg8BTmHOgdYVNQpwiOSYe29DHn25fvYkY55U6DyHLlI
+         N40o3lGaMHnnt+HJt03jKNegIWlCP85vyoOy2x6yOreiQPRi+GyzSJB/RM2tezauXDEm
+         0gTbzQIIvTJJzNSMNedBef73JlqGxRTNafEYikqQV+h01mIp604h06s4D9ljydF5nsgs
+         hTGwv4V/3tblPoaCGTDF0ewkZp9umCXJKtxjMo13O59heWU6zQuNTopnXxERTP2Glnj/
+         X/WVhLBtIR0VqsPWICaBGSJH3PGutY/V69/isS2ZSIAXM5X4U2br2wn+7t7CoMLkH8Ng
+         t9Tg==
+X-Gm-Message-State: AC+VfDz0v/FDPnfBgENTbkqrNS1R+YzfTpVPysBCrml8JJJswrd1iSe1
+	7YzCNAFozB8rgf+WTBwF4VQoqnkSIYpA7brQiUg=
+X-Google-Smtp-Source: ACHHUZ7ock+asetNFMgH9r8OM4sh2UOfPQXFq8CTlan1/hLD/+e4P19VDE1hXlakS5yYw6WVOJvaZ2hKGTum/mMY8K0=
+X-Received: by 2002:a2e:9a8e:0:b0:2b6:a52b:24ac with SMTP id
+ p14-20020a2e9a8e000000b002b6a52b24acmr2383951lji.22.1687819075481; Mon, 26
+ Jun 2023 15:37:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB8306:EE_
-X-MS-Office365-Filtering-Correlation-Id: 43c6c987-da5a-48d4-b80d-08db769346d0
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	9cCsSUwNI38JfP77L8NCtt8AWi2GNrTSKSKW8IxE1o4vRt91+vqshKxpr06vTBeLiZWhPx53QYzuV8hmwrXDTlbXZ0VS/o4rjpnX+qmO0KlcKaDXu4CTk0tNhQt7d6ksvCYFhOAHnhWN6rn/DN6/56PyjcUqpc4zOUuzxwITGK3OyUmaM/4NiiqgkzwXD8o9yiE8nZLwTVja7Y1iAbURAoAzIbLX81cD6j3TRwbc4ASrtk8Wmnm3ZCjNfhOtmHbKXh3kxeJVOP+QApn1xTEKdGkLqJhrkksrtUu6IprQyvurcjuzae8Dcy5l0E5Bk77lHFd1bdCSKWFmyoBKxJXTABMXDdvSIbk+rUupJMBIHEMDJNuL9pQdcZWgVRnK3Lf02AGj+ij6lPVklEjLpv5AgVLM4sn2RhWN/EDQCl9+7lsomvkMa+UsWBAcjq0oG4tiVP9MOe1IKvR2XBUSJJwqftxo4vmIlEFwzs1N1qFMdKHCOmIdoh243vB2BegL+aasGneQqSDgi0LxM9KWR2LOR6c7kKX0pHYMv8Q3e4rhKZ8=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(136003)(346002)(376002)(396003)(39860400002)(366004)(451199021)(26005)(2906002)(44832011)(186003)(33716001)(8676002)(6666004)(6916009)(478600001)(54906003)(316002)(966005)(6486002)(4326008)(86362001)(38100700002)(1076003)(41300700001)(5660300002)(83380400001)(8936002)(66476007)(66556008)(66946007)(9686003)(6512007)(6506007);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?L6/wY2FbVXYPMQgCHGLQUJ/tKNr3ujAGw6vR9i824SzgG1dQ0sqrcb7TARFk?=
- =?us-ascii?Q?cDWZ8LspCiFXWuppJucv4Oq8DRT/XuvfmhAU5xrbNeWNcugAugCusLPINE/Q?=
- =?us-ascii?Q?VfHito+tDxpajsPC/j3/U3LOWOOen220QBVWROB27iI7o986hDQpppECU+Xf?=
- =?us-ascii?Q?C4ZHq+w7ZVhqWkf21YrHqb2vaoIMcY5w+PjiQhNnZlePd6g7zo5IisvxQlfF?=
- =?us-ascii?Q?1ox1lGBeOjtzCFnYGrVhcQqy5JSf88NdmaXIByZ8i6uyW2ixEczrfrSu0bbM?=
- =?us-ascii?Q?Y43mr2Ccf7KEmgoiFrqmL0E1rh1uSvVeoMsffPzjcFrUIzpRr5bUmdlVUZ7F?=
- =?us-ascii?Q?e3zMhHjNRpDDmbVDWZwHum7I842h6XA7GlbJeAMI04+4XTqtHPIgcw41wau5?=
- =?us-ascii?Q?oHfh7naH2KM7z3dvEjPoxC/RGHqDj62bpQr/3waYX71QGrWflXccsiV0HqA1?=
- =?us-ascii?Q?3WcE2AT1CEYXQJqiE3srpXA4VcdnxOzodaZ3F33HRVXSmnvi+ypOx2h1PoFv?=
- =?us-ascii?Q?NgkJpMHknL9KBS01olOjg3re7/JQTDktIrVOcjaFlTJivEYWU+KLLKFVZBlB?=
- =?us-ascii?Q?W7h5I5CD5VbJtq1AQsENYl/yf+GLe5QhuCLHE2CSPBIcES1t1v1ZjXD3U9i3?=
- =?us-ascii?Q?LbqboW+sJtH8y1UP75/MtCqRjg45Z+vzWbekVYfM0t/ZLvPsz9lNhDHGftCF?=
- =?us-ascii?Q?fF6NzNakoQjMzENsdvrphm7UoEH9YgIlHwwh3LqbL7jvRY3muPQMgxPq4XyP?=
- =?us-ascii?Q?OKGJlp+Y2NlE1ptfc/Wd/5ztcgZ5Ao0sy0pwzoTwTD8/whgwkM55M1Fp6ZvT?=
- =?us-ascii?Q?Ht6A/E19eEDaWefMZws3mqnoGKR343bb6iamVOhXV9uCsQVrnSJHXDvCJ2w+?=
- =?us-ascii?Q?is+i+jc0yrxbaJBUjNIhzaggjWzYtKFi3YwoOcnHC0cRi+yPgV8iZruSYptY?=
- =?us-ascii?Q?oexEBcXhoc8LW+MI86Wnx4JG1ZAgPblo9LHKecfYiMtDx+M/HK1/F+e5m/ku?=
- =?us-ascii?Q?L5lbbbD7ZZYvKoG3s8DrEDonMQx55qJfjIKUdXnaMZajlqv/kIMwsiuJjHe4?=
- =?us-ascii?Q?vf+h1p09sIHm9YmD6Z70vS8nmJrzAQ36myiaepO/yqs/iw8ApwuFSKoVKeZY?=
- =?us-ascii?Q?ZrEguDTU/gniT1KL+TX8Bn4Z+MwcrogyKMXICCyixzzFM/istLIr743W7pko?=
- =?us-ascii?Q?SmoVhx506P28PaKkfjI65gr0EOK+QtF9x1h3s1Fyccofcc2H6YmAmbSf6QCH?=
- =?us-ascii?Q?XLHwwOOxVf763Z8720Ydzls/srCNYhfa1dfgN9DNqoyqdwbqmCEl51dy2mRV?=
- =?us-ascii?Q?lSVsiXYc5iQNU01NKC3Md8+b4wKsa+q/Wzm5OiPQrUvQwf5+UzbVxok/xdpp?=
- =?us-ascii?Q?PDbmGhLuA6ikX0enheTnVaYF+14B8Zb1Crfv6K1CuLhVOKuLFDJqlTqYoIgu?=
- =?us-ascii?Q?2Up3mCpONKHt55CmGWh761vw7JTx0eG6McT+8lo6vNKka6wR4t1v3oHWSlki?=
- =?us-ascii?Q?tEGT7FKF5GhHEh2wcTDzUkdel1BX1hbQthp/23y4BDs70hgdSpT15hDzU5yS?=
- =?us-ascii?Q?olNEHRh/7k6bTN/qdP0VreaCvz9JpcC2xkHALZUkFBwpojcyrvLOGHESsMid?=
- =?us-ascii?Q?xg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 43c6c987-da5a-48d4-b80d-08db769346d0
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 26 Jun 2023 22:18:32.4769
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IQuZDxkxmNHXffmciEGqPabriC5wdSJcndITsN1NNXnVkqashsuqf3PvM+pyy8EIBfPTcUAFAoaFUcGkSRJIbw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB8306
+References: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+ <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
+ <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
+ <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
+ <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
+ <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
+ <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
+ <20230624143834.26c5b5e8@kernel.org> <ZJeUlv/omsyXdO/R@google.com> <ZJoExxIaa97JGPqM@google.com>
+In-Reply-To: <ZJoExxIaa97JGPqM@google.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Mon, 26 Jun 2023 15:37:44 -0700
+Message-ID: <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+To: Stanislav Fomichev <sdf@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>, 
+	Donald Hunter <donald.hunter@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Simon,
+On Mon, Jun 26, 2023 at 2:36=E2=80=AFPM Stanislav Fomichev <sdf@google.com>=
+ wrote:
+>
+> > >
+> > > I'd think HW TX csum is actually simpler than dealing with time,
+> > > will you change your mind if Stan posts Tx csum within a few days? :)
 
-On Mon, Jun 26, 2023 at 08:11:53PM +0200, Simon Horman wrote:
-> Hi Vladimir,
-> 
-> A similar comment to that made for [1], though the code is somewhat
-> different to that case: are you sure vid is initialised here?
-> GCC 12 and Smatch seem unsure about it.
-> 
-> [1] Re: [PATCH net-next v2 4/7] net: dsa: vsc73xx: Add dsa tagging based on 8021q
->     https://lore.kernel.org/all/ZJg2M+Qvg3Fv73CH@corigine.com/
+Absolutely :) Happy to change my mind.
 
-"vid" can be uninitialized if the tagger is fed a junk packet (a
-non-link-local, non-meta packet that also has no tag_8021q header).
+> > > The set of offloads is barely changing, the lack of clarity
+> > > on what is needed seems overstated. IMHO AF_XDP is getting no use
+> > > today, because everything remotely complex was stripped out of
+> > > the implementation to get it merged. Aren't we hand waving the
+> > > complexity away simply because we don't want to deal with it?
+> > >
+> > > These are the features today's devices support (rx/tx is a mirror):
+> > >  - L4 csum
+> > >  - segmentation
+> > >  - time reporting
+> > >
+> > > Some may also support:
+> > >  - forwarding md tagging
+> > >  - Tx launch time
+> > >  - no fcs
+> > > Legacy / irrelevant:
+> > >  - VLAN insertion
+> >
+> > Right, the goal of the series is to lay out the foundation to support
+> > AF_XDP offloads. I'm starting with tx timestamp because that's more
+> > pressing. But, as I mentioned in another thread, we do have other
+> > users that want to adopt AF_XDP, but due to missing tx offloads, they
+> > aren't able to.
+> >
+> > IMHO, with pre-tx/post-tx hooks, it's pretty easy to go from TX
+> > timestamp to TX checksum offload, we don't need a lot:
+> > - define another generic kfunc bpf_request_tx_csum(from, to)
+> > - drivers implement it
+> > - af_xdp users call this kfunc from devtx hook
+> >
+> > We seem to be arguing over start-with-my-specific-narrow-use-case vs
+> > start-with-generic implementation, so maybe time for the office hours?
+> > I can try to present some cohesive plan of how we start with the framew=
+ork
+> > plus tx-timestamp and expand with tx-checksum/etc. There is a lot of
+> > commonality in these offloads, so I'm probably not communicating it
+> > properly..
+>
+> Or, maybe a better suggestion: let me try to implement TX checksum
+> kfunc in the v3 (to show how to build on top this series).
+> Having code is better than doing slides :-D
 
-The immediate answer that comes to mind is: it depends on how the driver
-configures the hardware to send packets to the CPU (and it will never
-configure the switch in that way).
+That would certainly help :)
+What I got out of your lsfmmbpf talk is that timestamp is your
+main and only use case. tx checksum for af_xdp is the other use case,
+but it's not yours, so you sort-of use it as an extra justification
+for timestamp. Hence my negative reaction to 'generality'.
+I think we'll have better results in designing an api
+when we look at these two use cases independently.
+And implement them in patches solving specifically timestamp
+with normal skb traffic and tx checksum for af_xdp as two independent apis.
+If it looks like we can extract a common framework out of them. Great.
+But trying to generalize before truly addressing both cases
+is likely to cripple both apis.
 
-But, between the sja1105 driver configuring the switch in a certain way
-and the tag_sja1105 driver seeing the results of that, there's also the
-DSA master driver (can be any net_device) which can alter the packet in
-a nonsensical way, like remove the VLAN header for some reason.
-
-Considering the fact that the DSA master can have tc rules on its
-ingress path which do just that, it would probably be wise to be
-defensive about this. So I can probably add:
-
-	if (sja1105_skb_has_tag_8021q(skb)) {
-		... // existing call to sja1105_vlan_rcv() here
-	} else if (source_port == -1 && switch_id == -1) {
-		/* Packets with no source information have no chance of
-		 * getting accepted, drop them straight away.
-		 */
-		return NULL;
-	}
-
-This "else if" block should ensure that when "vid" is uninitialized,
-either "source_port" and "switch_id", or "vbid", always have valid values.
+It doesn't have to be only two use cases.
+I completely agree with Kuba that:
+ - L4 csum
+ - segmentation
+ - time reporting
+are universal HW NIC features and we need to have an api
+that exposes these features in programmable way to bpf progs in the kernel
+and through af_xdp to user space.
+I mainly suggest addressing them one by one and look
+for common code bits and api similarities later.
 
