@@ -1,253 +1,180 @@
-Return-Path: <netdev+bounces-14036-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14037-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 61F7B73E7F4
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:20:44 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 89AC073E9CF
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 20:40:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FC6E1C2093F
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:20:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 43179280ED5
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 18:40:20 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2763A134CE;
-	Mon, 26 Jun 2023 18:20:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C2BABA4F;
+	Mon, 26 Jun 2023 18:40:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12E9F13AC5
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:20:37 +0000 (UTC)
-Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A8C8E7F;
-	Mon, 26 Jun 2023 11:20:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
-  t=1687803635; x=1719339635;
-  h=from:to:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=ocIkXRYDE2Ci9W3TOmiMIPb9bxSCddVwIw/OcWkYvkM=;
-  b=gQdWyrYfTJgd0MMbTwNQMnkeX3Vw0n95VtoeBFh34CAcy6A49mwfvO68
-   RmZQml+RdDN635ajTfvKtzIBy68txAbRVzq3GAc8NeNy0S7C0B3q5/ezd
-   3D+E6xFBc6rwv7A+CLig+X/oKzN3+roGfHFxYpn7q4C3YpnAdsua7LZ+U
-   X2s8z/VEu0TH2iVVc8/p+3luW7sgtQLPFMyaWOvm2owuGzb9SBMANByYX
-   Zmw+ryi/Ezqgj/EOOByv+vj5OwaqC9ozyCVOTt6yD9rJKPTwSBkjtkpbg
-   7fedAtyhxmZOZ+nI6f4hS73UF2PON7K6rt22FGMN+scJaoH2f2XId0GJX
-   A==;
-X-IronPort-AV: E=Sophos;i="6.01,160,1684825200"; 
-   d="scan'208";a="220598045"
-X-Amp-Result: SKIPPED(no attachment in message)
-Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
-  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 26 Jun 2023 11:20:34 -0700
-Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
- chn-vm-ex02.mchp-main.com (10.10.85.144) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.21; Mon, 26 Jun 2023 11:20:32 -0700
-Received: from chn-vm-ungsw-01.microchip.com (10.10.115.15) by
- chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
- 15.1.2507.21 via Frontend Transport; Mon, 26 Jun 2023 11:20:32 -0700
-From: Jerry Ray <jerry.ray@microchip.com>
-To: Woojung Huh <woojung.huh@microchip.com>, <UNGLinuxDriver@microchip.com>,
-	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>, "David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, Rasmus Villemoes <linux@rasmusvillemoes.dk>
-Subject: [PATCH] net: dsa: microchip: phy reg access 0x10-0x1f
-Date: Mon, 26 Jun 2023 11:20:32 -0700
-Message-ID: <20230626182032.2079497-1-jerry.ray@microchip.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B66511CAE
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 18:40:17 +0000 (UTC)
+Received: from smtp-bc0e.mail.infomaniak.ch (smtp-bc0e.mail.infomaniak.ch [IPv6:2001:1600:4:17::bc0e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3803FA
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 11:40:15 -0700 (PDT)
+Received: from smtp-2-0000.mail.infomaniak.ch (unknown [10.5.36.107])
+	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Qqc8s6HNHzMq6Tp;
+	Mon, 26 Jun 2023 18:40:13 +0000 (UTC)
+Received: from unknown by smtp-2-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Qqc8s0mlGzMpqLq;
+	Mon, 26 Jun 2023 20:40:12 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1687804813;
+	bh=1lsc72iy6ST9mPJPeVB5zyv/6hjrSVWAcBML9Eit0II=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=FUtUSqnlRlIyxj5gsiRsVZGGbuvPVYz5sEh2XUIIzsDeMqGIt0MSNEcz4aL+dNBuY
+	 txxCGyKxbRDKp8NNaaC0IsCVG1RCIXHhNT5Ed5ln8pi/u4ODhBZMaYOaQsNV/VdO1q
+	 LBLy6o0htmp+vEDsbPiv7STwQ+qEaTyF51vLAqLk=
+Message-ID: <7ccd6600-c171-136d-82b5-8555b81ea7ba@digikod.net>
+Date: Mon, 26 Jun 2023 20:40:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent:
+Subject: Re: [PATCH v11 03/12] landlock: Refactor
+ landlock_find_rule/insert_rule
+Content-Language: en-US
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com,
+ linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, yusongping@huawei.com,
+ artem.kuzin@huawei.com
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-4-konstantin.meskhidze@huawei.com>
+From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+In-Reply-To: <20230515161339.631577-4-konstantin.meskhidze@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Infomaniak-Routing: alpha
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-With the recent patch to promote phy register accesses to 32-bits for the
-range >=0x10, it is also necessary to expand the allowed register address
-table for the affected devices.  These three register sets use
-ksz9477_dev_ops and are therefore affected by the change. The address
-ranges 0xN120-0xN13f map to the phy register address 0x10-0x1f. There is
-no reason to exclude any register accesses within this space.
 
-on June 20, 2023
-commit 5c844d57aa78    ("net: dsa: microchip: fix writes to phy registers >= 0x10")
+On 15/05/2023 18:13, Konstantin Meskhidze wrote:
+> Add a new landlock_key union and landlock_id structure to support
+> a socket port rule type. A struct landlock_id identifies a unique entry
+> in a ruleset: either a kernel object (e.g inode) or typed data (e.g TCP
+> port). There is one red-black tree per key type.
+> 
+> This patch also adds is_object_pointer() and get_root() helpers.
+> is_object_pointer() returns true if key type is LANDLOCK_KEY_INODE.
+> get_root() helper returns a red_black tree root pointer according to
+> a key type.
+> 
+> Refactor landlock_insert_rule() and landlock_find_rule() to support coming
+> network modifications. Adding or searching a rule in ruleset can now be
+> done thanks to a Landlock ID argument passed to these helpers.
+> 
+> Co-developed-by: Mickaël Salaün <mic@digikod.net>
+> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> ---
+> 
+> Changes since v10:
+> * None.
+> 
+> Changes since v9:
+> * Splits commit.
+> * Refactors commit message.
+> * Minor fixes.
+> 
+> Changes since v8:
+> * Refactors commit message.
+> * Removes inlining.
+> * Minor fixes.
+> 
+> Changes since v7:
+> * Completes all the new field descriptions landlock_key,
+>    landlock_key_type, landlock_id.
+> * Refactors commit message, adds a co-developer.
+> 
+> Changes since v6:
+> * Adds union landlock_key, enum landlock_key_type, and struct
+>    landlock_id.
+> * Refactors ruleset functions and improves switch/cases: create_rule(),
+>    insert_rule(), get_root(), is_object_pointer(), free_rule(),
+>    landlock_find_rule().
+> * Refactors landlock_append_fs_rule() functions to support new
+>    landlock_id type.
+> 
+> Changes since v5:
+> * Formats code with clang-format-14.
+> 
+> Changes since v4:
+> * Refactors insert_rule() and create_rule() functions by deleting
+> rule_type from their arguments list, it helps to reduce useless code.
+> 
+> Changes since v3:
+> * Splits commit.
+> * Refactors landlock_insert_rule and landlock_find_rule functions.
+> * Rename new_ruleset->root_inode.
+> 
+> ---
+>   security/landlock/fs.c      |  21 +++---
+>   security/landlock/ruleset.c | 134 ++++++++++++++++++++++++++----------
+>   security/landlock/ruleset.h |  65 ++++++++++++++---
+>   3 files changed, 166 insertions(+), 54 deletions(-)
 
-Signed-off-by: Jerry Ray <jerry.ray@microchip.com>
----
- drivers/net/dsa/microchip/ksz_common.c | 65 ++++++--------------------
- 1 file changed, 13 insertions(+), 52 deletions(-)
+[...]
 
-diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
-index 813b91a816bb..b7ce48147a38 100644
---- a/drivers/net/dsa/microchip/ksz_common.c
-+++ b/drivers/net/dsa/microchip/ksz_common.c
-@@ -509,10 +509,7 @@ static const struct regmap_range ksz8563_valid_regs[] = {
- 	regmap_reg_range(0x1030, 0x1030),
- 	regmap_reg_range(0x1100, 0x1111),
- 	regmap_reg_range(0x111a, 0x111d),
--	regmap_reg_range(0x1122, 0x1127),
--	regmap_reg_range(0x112a, 0x112b),
--	regmap_reg_range(0x1136, 0x1139),
--	regmap_reg_range(0x113e, 0x113f),
-+	regmap_reg_range(0x1120, 0x113f),
- 	regmap_reg_range(0x1400, 0x1401),
- 	regmap_reg_range(0x1403, 0x1403),
- 	regmap_reg_range(0x1410, 0x1417),
-@@ -539,10 +536,7 @@ static const struct regmap_range ksz8563_valid_regs[] = {
- 	regmap_reg_range(0x2030, 0x2030),
- 	regmap_reg_range(0x2100, 0x2111),
- 	regmap_reg_range(0x211a, 0x211d),
--	regmap_reg_range(0x2122, 0x2127),
--	regmap_reg_range(0x212a, 0x212b),
--	regmap_reg_range(0x2136, 0x2139),
--	regmap_reg_range(0x213e, 0x213f),
-+	regmap_reg_range(0x2120, 0x213f),
- 	regmap_reg_range(0x2400, 0x2401),
- 	regmap_reg_range(0x2403, 0x2403),
- 	regmap_reg_range(0x2410, 0x2417),
-@@ -635,10 +629,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
- 	regmap_reg_range(0x1030, 0x1030),
- 	regmap_reg_range(0x1100, 0x1115),
- 	regmap_reg_range(0x111a, 0x111f),
--	regmap_reg_range(0x1122, 0x1127),
--	regmap_reg_range(0x112a, 0x112b),
--	regmap_reg_range(0x1136, 0x1139),
--	regmap_reg_range(0x113e, 0x113f),
-+	regmap_reg_range(0x1120, 0x113f),
- 	regmap_reg_range(0x1400, 0x1401),
- 	regmap_reg_range(0x1403, 0x1403),
- 	regmap_reg_range(0x1410, 0x1417),
-@@ -669,10 +660,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
- 	regmap_reg_range(0x2030, 0x2030),
- 	regmap_reg_range(0x2100, 0x2115),
- 	regmap_reg_range(0x211a, 0x211f),
--	regmap_reg_range(0x2122, 0x2127),
--	regmap_reg_range(0x212a, 0x212b),
--	regmap_reg_range(0x2136, 0x2139),
--	regmap_reg_range(0x213e, 0x213f),
-+	regmap_reg_range(0x2120, 0x213f),
- 	regmap_reg_range(0x2400, 0x2401),
- 	regmap_reg_range(0x2403, 0x2403),
- 	regmap_reg_range(0x2410, 0x2417),
-@@ -703,10 +691,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
- 	regmap_reg_range(0x3030, 0x3030),
- 	regmap_reg_range(0x3100, 0x3115),
- 	regmap_reg_range(0x311a, 0x311f),
--	regmap_reg_range(0x3122, 0x3127),
--	regmap_reg_range(0x312a, 0x312b),
--	regmap_reg_range(0x3136, 0x3139),
--	regmap_reg_range(0x313e, 0x313f),
-+	regmap_reg_range(0x3120, 0x313f),
- 	regmap_reg_range(0x3400, 0x3401),
- 	regmap_reg_range(0x3403, 0x3403),
- 	regmap_reg_range(0x3410, 0x3417),
-@@ -737,10 +722,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
- 	regmap_reg_range(0x4030, 0x4030),
- 	regmap_reg_range(0x4100, 0x4115),
- 	regmap_reg_range(0x411a, 0x411f),
--	regmap_reg_range(0x4122, 0x4127),
--	regmap_reg_range(0x412a, 0x412b),
--	regmap_reg_range(0x4136, 0x4139),
--	regmap_reg_range(0x413e, 0x413f),
-+	regmap_reg_range(0x4120, 0x413f),
- 	regmap_reg_range(0x4400, 0x4401),
- 	regmap_reg_range(0x4403, 0x4403),
- 	regmap_reg_range(0x4410, 0x4417),
-@@ -771,10 +753,7 @@ static const struct regmap_range ksz9477_valid_regs[] = {
- 	regmap_reg_range(0x5030, 0x5030),
- 	regmap_reg_range(0x5100, 0x5115),
- 	regmap_reg_range(0x511a, 0x511f),
--	regmap_reg_range(0x5122, 0x5127),
--	regmap_reg_range(0x512a, 0x512b),
--	regmap_reg_range(0x5136, 0x5139),
--	regmap_reg_range(0x513e, 0x513f),
-+	regmap_reg_range(0x5120, 0x513f),
- 	regmap_reg_range(0x5400, 0x5401),
- 	regmap_reg_range(0x5403, 0x5403),
- 	regmap_reg_range(0x5410, 0x5417),
-@@ -897,10 +876,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
- 	regmap_reg_range(0x1030, 0x1030),
- 	regmap_reg_range(0x1100, 0x1115),
- 	regmap_reg_range(0x111a, 0x111f),
--	regmap_reg_range(0x1122, 0x1127),
--	regmap_reg_range(0x112a, 0x112b),
--	regmap_reg_range(0x1136, 0x1139),
--	regmap_reg_range(0x113e, 0x113f),
-+	regmap_reg_range(0x1120, 0x113f),
- 	regmap_reg_range(0x1400, 0x1401),
- 	regmap_reg_range(0x1403, 0x1403),
- 	regmap_reg_range(0x1410, 0x1417),
-@@ -927,10 +903,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
- 	regmap_reg_range(0x2030, 0x2030),
- 	regmap_reg_range(0x2100, 0x2115),
- 	regmap_reg_range(0x211a, 0x211f),
--	regmap_reg_range(0x2122, 0x2127),
--	regmap_reg_range(0x212a, 0x212b),
--	regmap_reg_range(0x2136, 0x2139),
--	regmap_reg_range(0x213e, 0x213f),
-+	regmap_reg_range(0x2120, 0x213f),
- 	regmap_reg_range(0x2400, 0x2401),
- 	regmap_reg_range(0x2403, 0x2403),
- 	regmap_reg_range(0x2410, 0x2417),
-@@ -957,10 +930,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
- 	regmap_reg_range(0x3030, 0x3030),
- 	regmap_reg_range(0x3100, 0x3115),
- 	regmap_reg_range(0x311a, 0x311f),
--	regmap_reg_range(0x3122, 0x3127),
--	regmap_reg_range(0x312a, 0x312b),
--	regmap_reg_range(0x3136, 0x3139),
--	regmap_reg_range(0x313e, 0x313f),
-+	regmap_reg_range(0x3120, 0x313f),
- 	regmap_reg_range(0x3400, 0x3401),
- 	regmap_reg_range(0x3403, 0x3403),
- 	regmap_reg_range(0x3410, 0x3417),
-@@ -987,10 +957,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
- 	regmap_reg_range(0x4030, 0x4030),
- 	regmap_reg_range(0x4100, 0x4115),
- 	regmap_reg_range(0x411a, 0x411f),
--	regmap_reg_range(0x4122, 0x4127),
--	regmap_reg_range(0x412a, 0x412b),
--	regmap_reg_range(0x4136, 0x4139),
--	regmap_reg_range(0x413e, 0x413f),
-+	regmap_reg_range(0x4120, 0x413f),
- 	regmap_reg_range(0x4400, 0x4401),
- 	regmap_reg_range(0x4403, 0x4403),
- 	regmap_reg_range(0x4410, 0x4417),
-@@ -1017,10 +984,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
- 	regmap_reg_range(0x5030, 0x5030),
- 	regmap_reg_range(0x5100, 0x5115),
- 	regmap_reg_range(0x511a, 0x511f),
--	regmap_reg_range(0x5122, 0x5127),
--	regmap_reg_range(0x512a, 0x512b),
--	regmap_reg_range(0x5136, 0x5139),
--	regmap_reg_range(0x513e, 0x513f),
-+	regmap_reg_range(0x5120, 0x513f),
- 	regmap_reg_range(0x5400, 0x5401),
- 	regmap_reg_range(0x5403, 0x5403),
- 	regmap_reg_range(0x5410, 0x5417),
-@@ -1047,10 +1011,7 @@ static const struct regmap_range ksz9896_valid_regs[] = {
- 	regmap_reg_range(0x6030, 0x6030),
- 	regmap_reg_range(0x6100, 0x6115),
- 	regmap_reg_range(0x611a, 0x611f),
--	regmap_reg_range(0x6122, 0x6127),
--	regmap_reg_range(0x612a, 0x612b),
--	regmap_reg_range(0x6136, 0x6139),
--	regmap_reg_range(0x613e, 0x613f),
-+	regmap_reg_range(0x6120, 0x613f),
- 	regmap_reg_range(0x6300, 0x6301),
- 	regmap_reg_range(0x6400, 0x6401),
- 	regmap_reg_range(0x6403, 0x6403),
--- 
-2.25.1
+> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+> index 1f3188b4e313..deab37838f5b 100644
+> --- a/security/landlock/ruleset.c
+> +++ b/security/landlock/ruleset.c
 
+[...]
+
+> @@ -316,21 +368,29 @@ static int inherit_ruleset(struct landlock_ruleset *const parent,
+>   			   struct landlock_ruleset *const child)
+>   {
+>   	struct landlock_rule *walker_rule, *next_rule;
+> +	struct rb_root *parent_root;
+>   	int err = 0;
+> 
+>   	might_sleep();
+>   	if (!parent)
+>   		return 0;
+> 
+> +	parent_root = get_root(parent, LANDLOCK_KEY_INODE);
+> +	if (IS_ERR(parent_root))
+> +		return PTR_ERR(parent_root);
+> +
+>   	/* Locks @child first because we are its only owner. */
+>   	mutex_lock(&child->lock);
+>   	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
+> 
+>   	/* Copies the @parent tree. */
+>   	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule,
+> -					     &parent->root, node) {
+> -		err = insert_rule(child, walker_rule->object,
+> -				  &walker_rule->layers,
+> +					     parent_root, node) {
+> +		const struct landlock_id id = {
+> +			.key = walker_rule->key,
+> +			.type = LANDLOCK_KEY_INODE,
+> +		};
+
+Please add a line break here instead of in a the following refactoring 
+commit.
+
+
+> +		err = insert_rule(child, id, &walker_rule->layers,
+>   				  walker_rule->num_layers);
+>   		if (err)
+>   			goto out_unlock;
 
