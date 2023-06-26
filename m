@@ -1,82 +1,118 @@
-Return-Path: <netdev+bounces-13847-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-13848-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D908773D582
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 03:21:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6B90D73D58B
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 03:29:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B6201C20404
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 01:21:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 563061C208CE
+	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 01:29:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5427D7EB;
-	Mon, 26 Jun 2023 01:21:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B9057EF;
+	Mon, 26 Jun 2023 01:28:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42670628
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 01:21:26 +0000 (UTC)
-Received: from zg8tmtyylji0my4xnjqunzqa.icoremail.net (zg8tmtyylji0my4xnjqunzqa.icoremail.net [162.243.164.74])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id CC270194
-	for <netdev@vger.kernel.org>; Sun, 25 Jun 2023 18:21:23 -0700 (PDT)
-Received: from linma$zju.edu.cn ( [42.120.103.48] ) by
- ajax-webmail-mail-app4 (Coremail) ; Mon, 26 Jun 2023 09:20:57 +0800
- (GMT+08:00)
-X-Originating-IP: [42.120.103.48]
-Date: Mon, 26 Jun 2023 09:20:57 +0800 (GMT+08:00)
-X-CM-HeaderCharset: UTF-8
-From: "Lin Ma" <linma@zju.edu.cn>
-To: "Alexey Dobriyan" <adobriyan@gmail.com>
-Cc: steffen.klassert@secunet.com, herbert@gondor.apana.org.au, 
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, 
-	pabeni@redhat.com, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, simon.horman@corigine.com
-Subject: Re: [PATCH v2] net: xfrm: Fix xfrm_address_filter OOB read
-X-Priority: 3
-X-Mailer: Coremail Webmail Server Version XT5.0.14 build 20220622(41e5976f)
- Copyright (c) 2002-2023 www.mailtech.cn
- mispb-4df6dc2c-e274-4d1c-b502-72c5c3dfa9ce-zj.edu.cn
-In-Reply-To: <8a80ec0b-154a-4e6c-8fb8-916f506cd26d@p183>
-References: <8a80ec0b-154a-4e6c-8fb8-916f506cd26d@p183>
-Content-Transfer-Encoding: base64
-Content-Type: text/plain; charset=UTF-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 208EA628
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 01:28:57 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 91F03C6;
+	Sun, 25 Jun 2023 18:28:55 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Qq9Gp0wbgz4wb1;
+	Mon, 26 Jun 2023 11:28:49 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1687742930;
+	bh=tHVai39HxgjGHNP/zksmmKbc9HmL2vXQATBH3nrtmIk=;
+	h=Date:From:To:Cc:Subject:From;
+	b=qRz3LYRs0stJLsICMI4jvbq0Lx+qk4n4L9VDO3L2lMdcrnyQ4oW4EikpbkZxS65xu
+	 rq+/IqZgIZTEfYOarRrpPsu9X1B8kTiNoeHQ+7vvipXJUACt0JzyCAbArG+x6CZz3h
+	 hfq6SsNXR4Pa8MnvbK5xT47bZ0e/v3OpmT2ltFEv0VFiVADClHsePJZImdCXH25JzN
+	 5YzsB5gPBPiEELo9UQt0JX2PpnG4wSMsqyqMnADd5y6lp6oweFdmeAu6lFS3+V7pTb
+	 eaf4gM+cil75xkojJI5St7jwNCa39iNsUBaVon0oBEf6EMl6GXQhIeLfVpJSHu4DOp
+	 1l6y60kjCu6gQ==
+Date: Mon, 26 Jun 2023 11:28:47 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>, Networking <netdev@vger.kernel.org>
+Cc: David Howells <dhowells@redhat.com>, Jakub Kicinski <kuba@kernel.org>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next
+ Mailing List <linux-next@vger.kernel.org>
+Subject: linux-next: build failure after merge of the net-next tree
+Message-ID: <20230626112847.2ef3d422@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Message-ID: <55aca58a.a2c0e.188f54a2741.Coremail.linma@zju.edu.cn>
-X-Coremail-Locale: zh_CN
-X-CM-TRANSID:cS_KCgBHTQr555hk63x8Bw--.28789W
-X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/1tbiAwISEmSYV+MGPwAAsw
-X-Coremail-Antispam: 1Ur529EdanIXcx71UUUUU7IcSsGvfJ3iIAIbVAYjsxI4VW7Jw
-	CS07vEb4IE77IF4wCS07vE1I0E4x80FVAKz4kxMIAIbVAFxVCaYxvI4VCIwcAKzIAtYxBI
-	daVFxhVjvjDU=
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: multipart/signed; boundary="Sig_/xdtucNmpqhA0UpIbgQavQMZ";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGVsbG8gQWxleGV5LAoKKHNvcnJ5IGxhc3QgbWFpbCBqdXN0IHJlcGx5IHRvIG9uZSAuLikKCj4g
-Cj4gPiArIGlmIChmaWx0ZXItPnNwbGVuID49IChzaXplb2YoeGZybV9hZGRyZXNzX3QpIDw8IDMp
-IHx8Cj4gPiArIAlmaWx0ZXItPmRwbGVuID49IChzaXplb2YoeGZybV9hZGRyZXNzX3QpIDw8IDMp
-KSB7Cj4gCj4gUGxlYXNlIG11bHRpcGx5IGJ5IDggaWYgeW91IHdhbnQgdG8gbXVsdGlwbHkgYnkg
-OC4KPiAKClRoYW5rcyBmb3IgcmVtaW5kaW5nLgoKQXMgSSB0b2xkIGluIHRoZSBjb21taXQgbWVz
-c2FnZSwgdGhpcyBjaGVja2luZyBjb2RlIGlzIGp1c3QgY29weSBmcm9tIHRoZSBmdW5jdGlvbiBw
-ZmtleV9kdW1wIChuZXQva2V5L2FmX2tleS5jKSwgd2hpY2ggbGlrZQoKCWlmICgoeGZpbHRlci0+
-c2FkYl94X2ZpbHRlcl9zcGxlbiA+PQoJCShzaXplb2YoeGZybV9hZGRyZXNzX3QpIDw8IDMpKSB8
-fAoJICAgICh4ZmlsdGVyLT5zYWRiX3hfZmlsdGVyX2RwbGVuID49CgkJKHNpemVvZih4ZnJtX2Fk
-ZHJlc3NfdCkgPDwgMykpKSB7CgkJbXV0ZXhfdW5sb2NrKCZwZmstPmR1bXBfbG9jayk7CgkJcmV0
-dXJuIC1FSU5WQUw7Cgl9CgpJIHRoaW5rIHRoZSBsZWZ0IHNoaWZ0IDMgaXMgb2theSBhcyB0aGUg
-YWN0dWFsIGNhbGN1bGF0aW9uIG9uIHRob3NlIGxlbmd0aHMgaXMgcmlnaHQgc2hpZnQgKyBsZWZ0
-IHNoaWZ0IChzZWUgaW4gYWRkcl9tYXRjaCgpIGZ1bmN0aW9uKS4KCj4gU2hvdWxkIGl0IGJlICJz
-cGxlbiA+IDggKiBzaXplb2YoKSIgPwoKR29vZCBxdWVzdGlvbi4gSXQgc2VlbXMgdGhhdCB0aGUg
-ZmlsdGVyIGxlbmd0aCBpcyBsZWdhbCB0byByZWFjaCB0aGUgbWF4aW11bSBsZW5ndGguIFNvIHNo
-b3VsZCBJIHNlbmQgYW5vdGhlciBwYXRjaCB0aGF0IGFsbG93cyB0aGUgY2hlY2tpbmcgY29kZSBp
-biBwZmtleV9kdW1wIChuZXQva2V5L2FmX2tleS5jKSB0byBjaGFuZ2UgdG8gPiBpbnN0ZWFkIG9m
-ID49ID8KClJlZ2FyZHMKTGlu
+--Sig_/xdtucNmpqhA0UpIbgQavQMZ
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
+
+Hi all,
+
+After merging the net-next tree, today's linux-next build (native perf)
+failed like this:
+
+In file included from builtin-trace.c:907:
+trace/beauty/msg_flags.c: In function 'syscall_arg__scnprintf_msg_flags':
+trace/beauty/msg_flags.c:28:21: error: 'MSG_SPLICE_PAGES' undeclared (first=
+ use in this function)
+   28 |         if (flags & MSG_##n) { \
+      |                     ^~~~
+trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG'
+   50 |         P_MSG_FLAG(SPLICE_PAGES);
+      |         ^~~~~~~~~~
+trace/beauty/msg_flags.c:28:21: note: each undeclared identifier is reporte=
+d only once for each function it appears in
+   28 |         if (flags & MSG_##n) { \
+      |                     ^~~~
+trace/beauty/msg_flags.c:50:9: note: in expansion of macro 'P_MSG_FLAG'
+   50 |         P_MSG_FLAG(SPLICE_PAGES);
+      |         ^~~~~~~~~~
+
+Caused by commit
+
+  b848b26c6672 ("net: Kill MSG_SENDPAGE_NOTLAST")
+
+There is no MSG_SPLICE_PAGES in tools/perf/trace/beauty/include/linux/socke=
+t.h
+
+I have reverted that commit for today.
+
+--=20
+Cheers,
+Stephen Rothwell
+
+--Sig_/xdtucNmpqhA0UpIbgQavQMZ
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSY6c8ACgkQAVBC80lX
+0Gzy9gf7BbnAhJ+PyhJzcE3tD3D2p8tk+Ycg5XNOGQOQNfsOALTWKBnd4mkJaToX
+eAg+moYZMw8mVHA56NuKPSiJT7+X2h3B5LTCt8Gf38nRVczvb57MWZKF4mBg2jZa
+EGwTpazMY1j5H/0uYHkmLenJO1xVRYAkLoYcHgbQcm7fsoQ5L33pC+H0gY9NNHEY
+fsb781ytiSdnS1HlZWc+JK2zO16DFLYtUKHXpW2AyIyzicpxrqHwleEwU/ezOplm
+u8hSBPA6Omsy3qSOpMtiG6Sgr3em1sx1X7thXP/RTqg/fc4k7PsbqgqYwMzvy+Qr
+KQvFsiTTPTyKqsZ7TgOTgQGrEuPMUg==
+=eZf6
+-----END PGP SIGNATURE-----
+
+--Sig_/xdtucNmpqhA0UpIbgQavQMZ--
 
