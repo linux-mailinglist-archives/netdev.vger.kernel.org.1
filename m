@@ -1,97 +1,105 @@
-Return-Path: <netdev+bounces-14130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14133-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B7B4373F0C7
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 04:20:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 293FB73F0DD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 04:34:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E59991C209D9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:20:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 29A6A1C20A44
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:34:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B63F3A44;
-	Tue, 27 Jun 2023 02:20:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E49EA47;
+	Tue, 27 Jun 2023 02:34:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3E92A23
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:20:12 +0000 (UTC)
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C7D981720
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:20:07 -0700 (PDT)
-X-QQ-mid: bizesmtp80t1687832338t5ib88fb
-Received: from smtpclient.apple ( [115.195.149.82])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Tue, 27 Jun 2023 10:18:56 +0800 (CST)
-X-QQ-SSF: 00400000000000N0Z000000A0000000
-X-QQ-FEAT: QdNbrVbAPlu0ZcHzibRS7fc4+yjPO59eV0tsw1ptgkHnwOo6/sfHNeWu3u/5F
-	iER8ig5SQ9rYvhtirPvEmLqKsEaLjUE+K3OJZLTW8bVgUi7Z+MHCy3lDgo+mXynk5+L5C1f
-	1MxRi7b49fsYCrDWruLLam2qCFgfmnGUda3/IsU6tLe84LsO7WaV64FdiGroA9+El363hmv
-	fighDFO0suPbtsB2l/m+q3LYAkYqP4aaJmW8OhBIU84JXTEJ4PQ3WSa2BuAkbEusZOIKi8B
-	annMAlPR/0zPSf46f6s83vG8YHU7pVU9IMgPPDjCad3FbhxWrd/H93Ns0tS+6AqyzLq57pQ
-	Vv7mxSlkLZz/mS9S9wsh09yT+TMVzYa17+AVYOnBXJbcIciFCFHDw+r8iX/oF5Xh1lGo/vd
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 16090861321225047725
-Content-Type: text/plain;
-	charset=utf-8
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F281436B
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:34:51 +0000 (UTC)
+X-Greylist: delayed 453 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 26 Jun 2023 19:34:50 PDT
+Received: from out-8.mta1.migadu.com (out-8.mta1.migadu.com [IPv6:2001:41d0:203:375::8])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3CBD219A2
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:34:50 -0700 (PDT)
+X-Report-Abuse: Please report any abuse attempt to abuse@migadu.com and include these headers.
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.dev; s=key1;
+	t=1687832833;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=NiLCSG+J8TFDNfzSLNUB+HE+7XY7CA+7w0Zb1WNocDM=;
+	b=IhqNKXxGVHAbv02ycD8gt4pXO7ev48kyVUIt/6qCLWeiBDI1Puem2akmTJkVtW85kXxD2v
+	Dz6OdsIobdamjjipKw3k7iAt5SY9kitKkaE3qJdHabDP9eT8QLHB2BoUz6V9Y0QM8kwTDq
+	qXggTMDRHehcW7QeX0CEM/ecZlOf+Kw=
+From: Yajun Deng <yajun.deng@linux.dev>
+To: jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	richardcochran@gmail.com,
+	jacob.e.keller@intel.com
+Cc: intel-wired-lan@lists.osuosl.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Yajun Deng <yajun.deng@linux.dev>,
+	stable@vger.kernel.org
+Subject: [PATCH] i40e: fix the wrong PTP frequency calculation
+Date: Tue, 27 Jun 2023 10:26:58 +0800
+Message-Id: <20230627022658.1876747-1-yajun.deng@linux.dev>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
-Subject: Re: [PATCH net] net: txgbe: change hw reset mode
-From: "mengyuanlou@net-swift.com" <mengyuanlou@net-swift.com>
-In-Reply-To: <20230626102411.2b067fa8@kernel.org>
-Date: Tue, 27 Jun 2023 10:18:46 +0800
-Cc: Andrew Lunn <andrew@lunn.ch>,
- Jiawen Wu <jiawenwu@trustnetic.com>,
- netdev@vger.kernel.org
-Content-Transfer-Encoding: quoted-printable
-Message-Id: <23312110-478A-4AC2-A66D-33C4BD2DBD0E@net-swift.com>
-References: <20230621090645.125466-1-jiawenwu@trustnetic.com>
- <20230622192158.50da604e@kernel.org>
- <D61A4E6D-8049-4454-9870-E62C2A980D0C@net-swift.com>
- <362f04fc-dafb-4091-a0cc-b94931083278@lunn.ch>
- <6964AD00-15BF-4F2D-9473-A84E07025BE8@net-swift.com>
- <20230626102411.2b067fa8@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-X-Mailer: Apple Mail (2.3731.600.7)
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:net-swift.com:qybglogicsvrgz:qybglogicsvrgz5a-3
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Migadu-Flow: FLOW_OUT
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+The new adjustment should be based on the base frequency, not the
+I40E_PTP_40GB_INCVAL in i40e_ptp_adjfine().
 
+This issue was introduced in commit 3626a690b717 ("i40e: use
+mul_u64_u64_div_u64 for PTP frequency calculation"), and was fixed in
+commit 1060707e3809 ("ptp: introduce helpers to adjust by scaled
+parts per million"). However the latter is a new feature and hasn't been
+backported to the stable releases.
 
-> 2023=E5=B9=B46=E6=9C=8827=E6=97=A5 01:24=EF=BC=8CJakub Kicinski =
-<kuba@kernel.org> =E5=86=99=E9=81=93=EF=BC=9A
->=20
-> On Mon, 26 Jun 2023 09:56:32 +0800 mengyuanlou@net-swift.com wrote:
->>> That does not answer the question. Is this backwards compatible with
->>> old firmware? =20
->>=20
->> Yeah=EF=BC=8Cthe veto bit is not set in old firmware, so they have =
-the same effect.
->=20
-> Why were you using the more complex FW command then rather than just=20=
+This issue affects both v6.0 and v6.1 versions, and the v6.1 version is
+an LTS version.
 
-> the register write, previously then?
->=20
+Fixes: 3626a690b717 ("i40e: use mul_u64_u64_div_u64 for PTP frequency calculation")
+Cc: <stable@vger.kernel.org> # 6.1
+Signed-off-by: Yajun Deng <yajun.deng@linux.dev>
+---
+ drivers/net/ethernet/intel/i40e/i40e_ptp.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Using FW command can notify fw that lan reset has happened, then FW
-can configure something which should reconfigure.
-
-Drivers write the register, the FW will not know lan reset has happened.
-
-Later, we found the things which FW need in NCSI/LLDP/WOL... is only the =
-phy.=20
-So just block phy reset, and use simple the register write.
-
+diff --git a/drivers/net/ethernet/intel/i40e/i40e_ptp.c b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+index ffea0c9c82f1..97a9efe7b713 100644
+--- a/drivers/net/ethernet/intel/i40e/i40e_ptp.c
++++ b/drivers/net/ethernet/intel/i40e/i40e_ptp.c
+@@ -361,9 +361,9 @@ static int i40e_ptp_adjfine(struct ptp_clock_info *ptp, long scaled_ppm)
+ 				   1000000ULL << 16);
+ 
+ 	if (neg_adj)
+-		adj = I40E_PTP_40GB_INCVAL - diff;
++		adj = freq - diff;
+ 	else
+-		adj = I40E_PTP_40GB_INCVAL + diff;
++		adj = freq + diff;
+ 
+ 	wr32(hw, I40E_PRTTSYN_INC_L, adj & 0xFFFFFFFF);
+ 	wr32(hw, I40E_PRTTSYN_INC_H, adj >> 32);
+-- 
+2.25.1
 
 
