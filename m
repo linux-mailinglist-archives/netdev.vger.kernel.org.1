@@ -1,333 +1,171 @@
-Return-Path: <netdev+bounces-14345-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14346-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C72DF7406AD
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 00:56:45 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FA1A7406D2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 01:22:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB67D281106
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 22:56:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 82D0528105D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 23:22:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55B341951D;
-	Tue, 27 Jun 2023 22:56:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 884DC19909;
+	Tue, 27 Jun 2023 23:22:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F12F12B66
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 22:56:39 +0000 (UTC)
-Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A703526BC
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:56:36 -0700 (PDT)
-Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-262cf62e9b4so3129845a91.0
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:56:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687906596; x=1690498596;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=BppL4pIMzWeNGHHQE5K6cgnUj/DXAiBmZ2VECcdhSzc=;
-        b=wvMLM9Lo2uxGk2neYzzM2/5ReZ+CDmN+sZOQqqRncTL5Hvh2bH/Mq3N5bg8nElHaUE
-         jkaGPzQdDnMEiyWvnW5xzuLi1Xy2o0jip7uWzdjAUm6S5FF9wa5q5P8PPX87j6W7LLSt
-         6/0+A5hD5t31hXwXePyrVhK5tMa4ZiO2zVKobVyHVn2GnBLk3TWpLUZVF2gzS4tZifR8
-         FFlpJ7Ak31YNgJrvDUtbazfAAs3Y+Y6hggvix3MsFdG5DW6eeC7bakxVBoOiTMTq/YFJ
-         EtXI1nFB4ZLA2ft5o9ApI15jmx4Dpc9Hpeget5PXpqYpE8STIcT5+cAut71Gaf7AoHk0
-         Il4w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687906596; x=1690498596;
-        h=content-transfer-encoding:cc:to:from:subject:message-id:references
-         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=BppL4pIMzWeNGHHQE5K6cgnUj/DXAiBmZ2VECcdhSzc=;
-        b=K+9sWbdOHsccTKnT01UbILBySAwWJIjlJgYPg2V+yio22+/zfzviJlMRqCmuqw7YwO
-         WhF9FoeMgSqW7f9o5ZWE7ALv4uGkFr/Ka3Y48AkcyuQfOHJ9cfPoogHGbdRXBw/VxTgr
-         CP3wsNvzYvMwdzIeDYQOUV48/NtQCSJjfceXoJTUk1y1tqXx7hctJmiU7rAKRWDJ84lx
-         Zh0IhCQxvOFVjtOHbwmLCXD7Zeo3n8k8H8uvG42Pi8EWS/riCJWESB3kk8xGWCIxeOv3
-         GN4pHRKWQL6yWBef2MRHG+lnqPNMTZEItKUYpL/RJV86BGOE1XtwOsA7XDIlNUKUMxT4
-         +dow==
-X-Gm-Message-State: AC+VfDwDBFCUcXEFLlqB24ROBJebGxXTm7WFg0tQV2on81K3f+Qsvbcy
-	TMWdnxKS3xa7zKZ3POLHzA9kiy8=
-X-Google-Smtp-Source: ACHHUZ6KNOaOQbyX4kd6/Ze6mcY8Sd9AHth7n239qiDEqC5j/OQQW9isTVPriZLAse36awNnY+E4Ns0=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:90a:ea92:b0:262:e5cb:6c12 with SMTP id
- h18-20020a17090aea9200b00262e5cb6c12mr1232513pjz.6.1687906596123; Tue, 27 Jun
- 2023 15:56:36 -0700 (PDT)
-Date: Tue, 27 Jun 2023 15:56:34 -0700
-In-Reply-To: <649b581ded8c1_75d8a208c@john.notmuch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77CC84A27
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 23:22:14 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2055.outbound.protection.outlook.com [40.107.94.55])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 20224B3
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:22:13 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GDmcO27T+Zy9KMs00I9ucwgzVeYD6BrJ7QMqCtK5Q/s7DcmUVp3y+qn8FUqkHrkWaLA6JVgleWNtne1bhuYNoZ3ljTW41nBFJoL82Lb3yvlhGd+bBuPwHFhpAT9HcJ643fFTtMVKh0IJWEAuFRdLPCopwtmisv7Il3XsiGDKhrgPz5fFX9jBBsZur5YrtxnFIELy3EtRWtAJgOW5mRNy0tmiGNr1BZxRLfTfJQuHJhKOQFDpwr4sGGufrUYzkjIVMWQ7kek9B8rB13Oeki0d2m/gWJQVegQzvqaoDYK07x7SFr0agHbSBykyTFmqeMD693v7hghC/jek6v5rOokiBg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TGGG3TJAhFeAyuDOKcukmBMnvBQzNRcTr7aaq1gjCn0=;
+ b=bZ5usaY37kdoEFz9fAMtivNgpBoBiG4wG3WxApD5VvGQAXL13dwSHGif3zcqDc7hqs4/FcE/y9UYqRs2jhLlhltEESemN89V5V8mntYkiF477cn6pbyPm1s9LtnbSNOI+1pJ+5sAre8A1rabLCzs+TJn59OTP1HFzD5MeTCr4OT3UKBxgZ7+ZdVVoxuI4GPT/Rn1C7MoW5fSBf4YWHy/5B4RTCIqe1ZnSo+qDkP3IJfZa2ocUbguz3QRgjsbgItpkKdfmk5VskziWrmrVsn6pRzvXzWm+DNqolAhIY1wCsLMX7xtssnfhShhaKdQhnasBDjBTy2G7vq8QUqyd348Gg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TGGG3TJAhFeAyuDOKcukmBMnvBQzNRcTr7aaq1gjCn0=;
+ b=H4BV1vWKFOuFX1BQMHlkVREZG3yPLFS7fCxIei2aqeNEZNANwR61YcnAm10ya0CQOuIe01rVIJadmtHGCJS9OkENK6YfBRuHqsJIxm+r2qOh2WIpbJsX/3CyM//56zITLUHyBNRigys4N6Y6NDp+fGazj+KzoV7mUy5///AE2S/fr2V7p//R5UgmILXgvAKv1uDagzgnC918RGIuxPUOSKbpwHwE82Se0//xPAwujh6gJ0xf0ysgJG3diLqtHGAwqW0HvYfTKPOiWD1P6FL4qkz+jmEFINpCh6VfvPw1g2c2D05uKGKvDOiwyxUakTZ+98um/a2qzNi18z4x3smIhw==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
+ by PH0PR12MB7957.namprd12.prod.outlook.com (2603:10b6:510:281::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Tue, 27 Jun
+ 2023 23:22:09 +0000
+Received: from BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::ecb0:2f8e:c4bf:b471]) by BYAPR12MB2743.namprd12.prod.outlook.com
+ ([fe80::ecb0:2f8e:c4bf:b471%7]) with mapi id 15.20.6521.024; Tue, 27 Jun 2023
+ 23:22:08 +0000
+From: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+To: netdev@vger.kernel.org
+Cc: Richard Cochran <richardcochran@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Saeed Mahameed <saeed@kernel.org>,
+	Gal Pressman <gal@nvidia.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	lkft-triage@lists.linaro.org,
+	"LTP List" <ltp@lists.linux.it>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>,
+	Nathan Chancellor <nathan@kernel.org>,
+	Naresh Kamboju <naresh.kamboju@linaro.org>,
+	Linux Kernel Functional Testing <lkft@linaro.org>
+Subject: [PATCH net v1] ptp: Make max_phase_adjustment sysfs device attribute invisible when not supported
+Date: Tue, 27 Jun 2023 16:21:39 -0700
+Message-Id: <20230627232139.213130-1-rrameshbabu@nvidia.com>
+X-Mailer: git-send-email 2.40.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SJ0PR13CA0217.namprd13.prod.outlook.com
+ (2603:10b6:a03:2c1::12) To BYAPR12MB2743.namprd12.prod.outlook.com
+ (2603:10b6:a03:61::28)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
- <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
- <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
- <20230624143834.26c5b5e8@kernel.org> <ZJeUlv/omsyXdO/R@google.com>
- <ZJoExxIaa97JGPqM@google.com> <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
- <CAKH8qBv-jU6TUcWrze5VeiVhiJ-HUcpHX7rMJzN5o2tXFkS8kA@mail.gmail.com> <649b581ded8c1_75d8a208c@john.notmuch>
-Message-ID: <ZJtpIpwRGhhRFk8P@google.com>
-Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
-From: Stanislav Fomichev <sdf@google.com>
-To: John Fastabend <john.fastabend@gmail.com>
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Donald Hunter <donald.hunter@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
-	Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
-	Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|PH0PR12MB7957:EE_
+X-MS-Office365-Filtering-Correlation-Id: 80be58d5-a1e0-4bac-4334-08db7765538f
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	lg+Ma5qwky8S77OMek+qJ5LVy3WHLAq5rLKvSMAqQDU2lj/tvaKSavPuLdezVrMmiOR2P11ok2SMJETKRvYdfrmv/tORiy5ShpZjsCPArUNLqChSbA1Wj7zm4ePBlXnppSnGrdq2RM/L6okKQA8vZ7jTyYphpv7OJfPLesp3pY81CEADNNc47+K8cLhh7uAimYZO6wfr65V/6sFTr7KFO09hNSIdiMXtFH2OS9HXP6/Kl22pulPuibzTWPKNF8PaUp9S84DfZSPdkyZCW3sHyLjONltFO3nawpNU8/oLUxdXKMVWFBfFZWhuaKQ7TP8WIEPFy2z5ukvKjh6PfoywHfvZVEDYkZU0a0cYtJcSqXlLiDoYr/13Gdnkg0BBhpauYFu/1vaFajWn9+W7DQtJRX3lUs5jTdE3S9J+qwtbKq2vQBtLeWwKECuEVg1V49uQ/mfOdlc8B0BISYJdt7XmCYoO0FO9IPG2+iLcUMUN60GE/ZxPHbiNYxK4Eg2I5QA5ZEdDgqmgnmgeIUnVU5mj9OguCeSxYneQGW75xO9pNIhpn8WLm207WFzpw8UyjaX6Tg6zLDfkJmm2cfjqM5lgosivpAyuii6AE47nNeF0YhO0C5bq6QAhE88Ut20EVf/C
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(346002)(39860400002)(396003)(366004)(376002)(451199021)(66556008)(66476007)(6506007)(36756003)(966005)(6666004)(54906003)(1076003)(478600001)(2616005)(83380400001)(186003)(6486002)(2906002)(5660300002)(7416002)(6916009)(66946007)(38100700002)(8676002)(86362001)(316002)(8936002)(41300700001)(4326008)(26005)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?GayT5f5Wh+WWKnFC0VKF/qb2NaNimENUKzq40Bl9nSboXSD601Z9De5tBLLM?=
+ =?us-ascii?Q?/QF8eVBhZ1hzreGFQJETO9XQIOO0QVCNFgf+udr6h1gHKUemUMClG3ZSjZYr?=
+ =?us-ascii?Q?AWPcoPB9PiSMqVVbDpPYz+Xj8WLTMAYbyidntz/tMI041dbWSukyxUkx6SAS?=
+ =?us-ascii?Q?UwL0Fha8EY7JMqLHTxAYhMavv6/k7CrKlDUJk+CP71iImFqs18WgBa2S/MOi?=
+ =?us-ascii?Q?hU6EVWe4dBOQ3QhQmjlqv5UPmXsqNBiV2opn/rnOYmT8c1MXxSHozM4imoYz?=
+ =?us-ascii?Q?chtUtRuYQa9dxwYqt0/4ko99Bu/tG4AOeUWCtp0Pao/RZsrdEfRzJQnd73rU?=
+ =?us-ascii?Q?M8VgwnRECUcaOrQ9iUmeOM9kWNfb5Tc5qUASAUCajrOF4bjTfdOjC2isnfsV?=
+ =?us-ascii?Q?h9/B7mcDmSRZLoTv2Guvs0yv+cg9+X2ZV4e1TipF1S5EzEc+e8Rlbma+Zxrj?=
+ =?us-ascii?Q?nzKLx+BE+zgo+1yFWAFLyBtckJfs+MaZ+yC2WTtnX8JjImsgr68gjJpwdOjk?=
+ =?us-ascii?Q?S1GK4oa5s7YxZum661AEUr1L4BL39HODMKIQAyMD3IQC3SxQDXfgBFudn9sy?=
+ =?us-ascii?Q?c5tK/SQkASEBG3i5c1ndDPwWhNgsG+rJ6ccdRuiw0B9Dv2N3ElAdgP168QLO?=
+ =?us-ascii?Q?PDwFjglkdqcaq6+LMJiXdbTnYcJorZjjAzN5I9YbCa0+66GAExfAZr/n7S2J?=
+ =?us-ascii?Q?QwpXpMlK6yRmfip1ifv0iIQoH60fhTOnwYdFBqAeKxdTAWQAWIikL+j6PDJp?=
+ =?us-ascii?Q?egsue0AAQC0baVLplpb1GIzJ8Zr4wVT+HeL1kXd2dskZoW62sBTuyAWEyi1T?=
+ =?us-ascii?Q?89L46tBc0+bXm73dK4urBDkTXtGpwKXdSX14Qsqo+iN3ErGGCmt/Qluf12uc?=
+ =?us-ascii?Q?QkBP7polSdF3SaVp2CzqltFdKWj1xy8kfHq1SMmNjTqPvRiHA3eN8DYmibGP?=
+ =?us-ascii?Q?WSx7vOmtUVScreerlI+bnj+Qiaor8EO1VKSznaXmwzjk3gSZJmwIt11YBbK6?=
+ =?us-ascii?Q?nWAzCTqAri/yIuaGKRZUhVdY11+QEXWSZQfXpnMKlEeh6UZ8PZ3JjzEVnMpS?=
+ =?us-ascii?Q?t39wtY9xKkobRo9/rs40lnm+QIcLTQE8HPI1O2pH9B95wqn0f/i7JLEI85yd?=
+ =?us-ascii?Q?RWmA8iXO1oWKrQlmRBsCCG7/Vd1suo0ePXudyrpuzp//wNH5DIBC85r6rkmN?=
+ =?us-ascii?Q?Rbzawtsh3sks4HMbYT/DyO90OhMXZH7ovJfghJhHyaZ8bq8B6b/oJx6XbXbD?=
+ =?us-ascii?Q?RCFRVCxpM6nykp/SvXXFGmessGxi3F3/faAXHGvZflw1V7pS5fMgVGFMm3ID?=
+ =?us-ascii?Q?A93OK9xeP6VrHuKnTOzLzsubiiIZaQLGt9q9GQy/J2QINwhSWdcfSCx6smau?=
+ =?us-ascii?Q?iHbwY5CdUGWwN1uPeJ2vqNVCnxwzp4wAYgTqXmqe1L6cuxYfXfh7tZq/1O+L?=
+ =?us-ascii?Q?gA5xPqSCevEs3uYHhqEEbCZBMRuFh0r74M8d4fvabeN7q5RMF5v7CoE6JZtN?=
+ =?us-ascii?Q?IchOsrw2wYnRzHEOJ0eKsduiFr84RKxKMTfMTkd/1UZ0m/BoHdb+qd9Of7Ql?=
+ =?us-ascii?Q?mcjozH3gE0GUqPqe2PGxgFCzFQ+fLeq8pwbKbhhjPUGByOPCpUweOadouuGg?=
+ =?us-ascii?Q?3A=3D=3D?=
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 80be58d5-a1e0-4bac-4334-08db7765538f
+X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 23:22:08.1794
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: t5huhNro4P9Hl+k0CG4K7tUvNSpf2+b3Lb7DiQlBt+H6lPxeFDbO0TTep+m3shLGpXF5RT+dSKWkYfydl0zpuA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH0PR12MB7957
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 06/27, John Fastabend wrote:
-> Stanislav Fomichev wrote:
-> > On Mon, Jun 26, 2023 at 3:37=E2=80=AFPM Alexei Starovoitov
-> > <alexei.starovoitov@gmail.com> wrote:
-> > >
-> > > On Mon, Jun 26, 2023 at 2:36=E2=80=AFPM Stanislav Fomichev <sdf@googl=
-e.com> wrote:
-> > > >
-> > > > > >
-> > > > > > I'd think HW TX csum is actually simpler than dealing with time=
-,
-> > > > > > will you change your mind if Stan posts Tx csum within a few da=
-ys? :)
-> > >
-> > > Absolutely :) Happy to change my mind.
-> > >
-> > > > > > The set of offloads is barely changing, the lack of clarity
-> > > > > > on what is needed seems overstated. IMHO AF_XDP is getting no u=
-se
-> > > > > > today, because everything remotely complex was stripped out of
-> > > > > > the implementation to get it merged. Aren't we hand waving the
-> > > > > > complexity away simply because we don't want to deal with it?
-> > > > > >
-> > > > > > These are the features today's devices support (rx/tx is a mirr=
-or):
-> > > > > >  - L4 csum
-> > > > > >  - segmentation
-> > > > > >  - time reporting
-> > > > > >
-> > > > > > Some may also support:
-> > > > > >  - forwarding md tagging
-> > > > > >  - Tx launch time
-> > > > > >  - no fcs
-> > > > > > Legacy / irrelevant:
-> > > > > >  - VLAN insertion
-> > > > >
-> > > > > Right, the goal of the series is to lay out the foundation to sup=
-port
-> > > > > AF_XDP offloads. I'm starting with tx timestamp because that's mo=
-re
-> > > > > pressing. But, as I mentioned in another thread, we do have other
-> > > > > users that want to adopt AF_XDP, but due to missing tx offloads, =
-they
-> > > > > aren't able to.
-> > > > >
-> > > > > IMHO, with pre-tx/post-tx hooks, it's pretty easy to go from TX
-> > > > > timestamp to TX checksum offload, we don't need a lot:
-> > > > > - define another generic kfunc bpf_request_tx_csum(from, to)
-> > > > > - drivers implement it
-> > > > > - af_xdp users call this kfunc from devtx hook
-> > > > >
-> > > > > We seem to be arguing over start-with-my-specific-narrow-use-case=
- vs
-> > > > > start-with-generic implementation, so maybe time for the office h=
-ours?
-> > > > > I can try to present some cohesive plan of how we start with the =
-framework
-> > > > > plus tx-timestamp and expand with tx-checksum/etc. There is a lot=
- of
-> > > > > commonality in these offloads, so I'm probably not communicating =
-it
-> > > > > properly..
-> > > >
-> > > > Or, maybe a better suggestion: let me try to implement TX checksum
-> > > > kfunc in the v3 (to show how to build on top this series).
-> > > > Having code is better than doing slides :-D
-> > >
-> > > That would certainly help :)
-> > > What I got out of your lsfmmbpf talk is that timestamp is your
-> > > main and only use case. tx checksum for af_xdp is the other use case,
-> > > but it's not yours, so you sort-of use it as an extra justification
-> > > for timestamp. Hence my negative reaction to 'generality'.
-> > > I think we'll have better results in designing an api
-> > > when we look at these two use cases independently.
-> > > And implement them in patches solving specifically timestamp
-> > > with normal skb traffic and tx checksum for af_xdp as two independent=
- apis.
-> > > If it looks like we can extract a common framework out of them. Great=
-.
-> > > But trying to generalize before truly addressing both cases
-> > > is likely to cripple both apis.
-> >=20
-> > I need timestamps for the af_xdp case and I don't really care about skb=
- :-(
-> > I brought skb into the picture mostly to cover John's cases.
-> > So maybe let's drop the skb case for now and focus on af_xdp?
-> > skb is convenient testing-wise though (with veth), but maybe I can
-> > somehow carve-out af_xdp skbs only out of it..
->=20
-> I'm ok if your drop my use case but I read above and I seem to have a
-> slightly different opinion/approach in mind.
->=20
-> What I think would be the most straight-forward thing and most flexible
-> is to create a <drvname>_devtx_submit_skb(<drivname>descriptor, sk_buff)
-> and <drvname>_devtx_submit_xdp(<drvname>descriptor, xdp_frame) and then
-> corresponding calls for <drvname>_devtx_complete_{skb|xdp}() Then you
-> don't spend any cycles building the metadata thing or have to even
-> worry about read kfuncs. The BPF program has read access to any
-> fields they need. And with the skb, xdp pointer we have the context
-> that created the descriptor and generate meaningful metrics.
->=20
-> I'm clearly sacrificing usability in some sense of a general user that
-> doesn't know about drivers, hardware and so on for performance,
-> flexibility and simplicity of implementation. In general I'm OK with
-> this. I have trouble understanding who the dev is that is coding at
-> this layer, but can't read kernel driver code or at least has a good
-> understanding of the hardware. We are deep in optimization and
-> performance world once we get to putting hooks in the driver we should
-> expect a certain amount of understanding before we let folks just plant
-> hooks here. Its going to be very easy to cause all sort of damage
-> even if we go to the other extreme and make a unified interface and
-> push the complexity onto kernel devs to maintain. I really believe
-> folks writing AF_XDP code (for DPDK or otherwise) have a really good
-> handle on networking, hardware, and drivers. I also expect that
-> AF_XDP users will mostly be abstracted away from AF_XDP internals
-> by DPDK and other libs or applications. My $.02 is these will be
-> primarily middle box type application built for special purpose l2/l3/l4
-> firewalling, DDOS, etc and telco protocols. Rant off.
->=20
-> But I can admit <drvname>_devtx_submit_xdp(<drvname>descriptor, ...)
-> is a bit raw. For one its going to require an object file per
-> driver/hardware and maybe worse multiple objects per driver/hw to
-> deal with hw descriptor changes with features. My $.02 is we could
-> solve this with better attach time linking. Now you have to at
-> compile time know what you are going to attach to and how to parse
-> the descriptor. If we had attach time linking we could dynamically
-> link to the hardware specific code at link time. And then its up
-> to us here or others who really understand the hardware to write
-> a ice_read_ts, mlx_read_tx but that can all just be normal BPF code.
->=20
-> Also I hand waved through a step where at attach time we have
-> some way to say link the thing that is associated with the
-> driver I'm about to attach to. As a first step a loader could
-> do this.
->=20
-> Its maybe more core work and less wrangling drivers then and
-> it means kfuncs become just blocks of BPF that anyone can
-> write. The big win in my mind is I don't need to know now
-> what I want tomorrow because I should have access. Also we push
-> the complexity and maintenance out of driver/kernel and into
-> BPF libs and users. Then we don't have to touch BPF core just
-> to add new things.
->=20
-> Last bit that complicates things is I need a way to also write
-> allowed values into the descriptor. We don't have anything that
-> can do this now. So maybe kfuncs for the write tstamp flags and
-> friends?
+The .adjphase operation is an operation that is implemented only by certain
+PHCs. The sysfs device attribute node for querying the maximum phase
+adjustment supported should not be exposed on devices that do not support
+.adjphase.
 
-And in this case, the kfuncs would be non-generic and look something
-like the following?
+Fixes: c3b60ab7a4df ("ptp: Add .getmaxphase callback to ptp_clock_info")
+Signed-off-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Reported-by: Nathan Chancellor <nathan@kernel.org>
+Reported-by: Naresh Kamboju <naresh.kamboju@linaro.org>
+Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+Link: https://lore.kernel.org/netdev/20230627162146.GA114473@dev-arch.thelio-3990X/
+Link: https://lore.kernel.org/all/CA+G9fYtKCZeAUTtwe69iK8Xcz1mOKQzwcy49wd+imZrfj6ifXA@mail.gmail.com/
+---
+ drivers/ptp/ptp_sysfs.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-  bpf_devtx_<drvname>_request_timestamp(<drivname>descriptor, xdp_frame)
+diff --git a/drivers/ptp/ptp_sysfs.c b/drivers/ptp/ptp_sysfs.c
+index 77219cdcd683..6e4d5456a885 100644
+--- a/drivers/ptp/ptp_sysfs.c
++++ b/drivers/ptp/ptp_sysfs.c
+@@ -358,6 +358,9 @@ static umode_t ptp_is_attribute_visible(struct kobject *kobj,
+ 		   attr == &dev_attr_max_vclocks.attr) {
+ 		if (ptp->is_virtual_clock)
+ 			mode = 0;
++	} else if (attr == &dev_attr_max_phase_adjustment.attr) {
++		if (!info->adjphase || !info->getmaxphase)
++			mode = 0;
+ 	}
+ 
+ 	return mode;
+-- 
+2.40.1
 
-I feel like this can work, yeah. The interface is raw, but maybe
-you are both right in assuming that different nics will
-expose different capabilities and we shouldn't try to pretend
-there is some commonality. I'll try to explore that idea more with
-the tx-csum..
-
-Worst case, userspace can do:
-
-int bpf_devtx_request_timestamp(some-generic-prog-abstraction-to-pass-ctx)
-{
-#ifdef DEVICE_MLX5
-  return mlx5_request_timestamp(...);
-#elif DEVICE_VETH
-  return veth_request-timestamp(...);
-#else
-  ...
-#endif
-}
-
-One thing we should probably spend more time in this case is documenting
-it all. Or maybe having some DEVTX_XXX macros for those kfunc definitions
-and hooks to make them discoverable.
-
-But yeah, I see the appeal. The only ugly part with this all is that
-my xdp_hw_metadata would not be portable at all :-/ But it might be
-a good place/reason to actually figure out how to do it :-)
-
-> Anyways, my $.02.
->=20
->=20
->=20
-> >=20
-> > Regarding timestamp vs checksum: timestamp is more pressing, but I do
->=20
-> One request would be to also include a driver that doesn't have
-> always on timestamps so some writer is needed. CSUM enabling
-> I'm interested to see what the signature looks like? On the
-> skb side we use the skb a fair amount to build the checksum
-> it seems so I guess AF_XDP needs to push down the csum_offset?
-> In the SKB case its less interesting I think becuase the
-> stack is already handling it.
-
-I need access to your lab :-p
-
-Regarding the signature, csum_start + csum_offset maybe? As we have in
-skb?
-
-Although, from a quick grepping, I see some of the drivers have only
-a fixed set of tx checksum configurations they support:
-
-switch (skb->csum_offset) {
-case offsetof(struct tcphdr, check):
-	tx_desc->flags |=3D DO_TCP_IP_TX_CSUM_AT_FIXED_OFFSET;
-	break;
-default:
-	/* sw fallback */
-}
-
-So maybe that's another argument in favor of not doing a generic
-layer and just expose whatever HW has in a non-portable way...
-(otoh, still accepting csum_offset+start + doing that switch inside
-is probably an ok common interface)
-
-> > have people around that want to use af_xdp but need multibuf + tx
-> > offloads, so I was hoping to at least have a path for more tx offloads
-> > after we're done with tx timestamp "offload"..
-> >=20
-> > > It doesn't have to be only two use cases.
-> > > I completely agree with Kuba that:
-> > >  - L4 csum
-> > >  - segmentation
-> > >  - time reporting
-> > > are universal HW NIC features and we need to have an api
-> > > that exposes these features in programmable way to bpf progs in the k=
-ernel
-> > > and through af_xdp to user space.
-> > > I mainly suggest addressing them one by one and look
-> > > for common code bits and api similarities later.
-> >=20
-> > Ack, let me see if I can fit tx csum into the picture. I still feel
-> > like we need these dev-bound tracing programs if we want to trigger
-> > kfuncs safely, but maybe we can simplify further..
->=20
-> Its not clear to me how you get to a dev specific attach here
-> without complicating the hot path more. I think we need to
-> really be careful to not make hotpath more complex. Will
-> follow along for sure to see what gets created.
-
-Agreed. I've yet to test it with some real HW (still in the process of
-trying to get back my lab configuration which was changed recently) :-(
 
