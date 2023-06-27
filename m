@@ -1,64 +1,64 @@
-Return-Path: <netdev+bounces-14194-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14195-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC58173F6C3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:17:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0C69673F6C4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:17:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC4ED1C20A70
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 08:17:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDB5028101A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 08:17:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4D93168C7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE55C168D3;
 	Tue, 27 Jun 2023 08:16:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B60B2168C1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C811D168C8
 	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 08:16:16 +0000 (UTC)
-Received: from mail-wm1-x333.google.com (mail-wm1-x333.google.com [IPv6:2a00:1450:4864:20::333])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A0CC826A6
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:16:10 -0700 (PDT)
-Received: by mail-wm1-x333.google.com with SMTP id 5b1f17b1804b1-3fb4146e8fcso9980655e9.0
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:16:10 -0700 (PDT)
+Received: from mail-lj1-x22c.google.com (mail-lj1-x22c.google.com [IPv6:2a00:1450:4864:20::22c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 015141FCA
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:16:11 -0700 (PDT)
+Received: by mail-lj1-x22c.google.com with SMTP id 38308e7fff4ca-2b5c231c23aso43934751fa.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:16:11 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1687853769; x=1690445769;
+        d=linaro.org; s=google; t=1687853770; x=1690445770;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=xpBVPAKTok015GFuGr3EUx7kWd0lyxxnZqUym4JaeO4=;
-        b=ZQo8rjS3M43oVtjApvtLlboCA+7nsIRrPeGPpDp2QybbPqx2dtnCqtIYjqmERYsoyK
-         e1gd+OAZ6ldoRUOnLdLFu+HzLh3+RM08HQoo3FCceC6CvFV9td45EoX/EKPPJ1DEAO+M
-         wJtas4eOMauFMwdX5iwzp/MNtCroMopvKAPnCDps7a/UDbyCRKgxVELGrWcf9ZWSPqIR
-         C08rQiw2WJ3hRIuH8Q/i9RD3PXcThS+5P0V2nKJw9PMCfM/6JuJruBgdRMh0WMB2hR5Q
-         A2nRsTNNsYrhwrNwnq6a5i2LW9HwwenH4yhAIitoist08xJ3Z2ZM2uHEc29LMHjKiq5x
-         0vJA==
+        bh=NKYCzO30p3CfM15O+HnQkgKCwJC3L8nVgasQMiwytMc=;
+        b=L+Ba8kZzAvoW9rOZRCbcExHEQdRcSD0u9/08ipPkP6Nx4VIpkxfpg07UBFffH3Q94y
+         FYA0K0EMH8Vu0QlUpozyl5S3KszOBSvO8z9WMPElD/h5vp4+iry+nD4Xlh31mEFiQUY7
+         U3yqb2C2PyNd7wc+fD3m9NIQ6XZTGXKF2I/dMGB3848H75F/mrgT8s0u9QqMz+DZX4Hd
+         zYEdFxHJx149CVXRp3fQzxIpxVPxRjtHs1pswiDyVwKSfz0TAIw3dkqViqFp7PpLIia3
+         y5VCQ0IVFTbCM8PmJLTWRLtNFzj9ZQraJDoPzvIOnJX986KYkCP6hcgJC8zU0AB4Wk0+
+         AXJg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687853769; x=1690445769;
+        d=1e100.net; s=20221208; t=1687853770; x=1690445770;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xpBVPAKTok015GFuGr3EUx7kWd0lyxxnZqUym4JaeO4=;
-        b=cCBoWXQGyu53jR/7D7Yt7nxMUr7hX6SQlyOXvW/lnm+Ri9mRM+rcWSjVvclLz1Vtyf
-         IYHLghUnC5jhAMZT+x/X0AFpU4hrZuDDfHmXceC09OcDVUt5PXYeNBYI1WKFfMXZC2Jf
-         6nFVxwwExo5Fi5eXrUfO6JTbaT0IuOqVh+hJL0ZzFfJcw8MueAT5+CuRhRptkOoxCLtU
-         nzJer0BTvsPEkSnrBRwxWj+e98mwClcXvT2yYYUajgcP2ORSoX+imxyGFHm5eAMUAAvW
-         6WUShVPrNqXH1qyF0KE4Z4wWTgMrqJUdDzYILKf9gkYgVEfojMnDZ1dMmrzVnK1w/J+b
-         eX0w==
-X-Gm-Message-State: AC+VfDwaViIG6OUsnpxcsc2UX0wnigl+Odfp/GHeorH9OHA25JyxwdqI
-	LXlNsRjkIp21rCbjAuYDGisFAQ==
-X-Google-Smtp-Source: ACHHUZ4iJV35Qhf/eHohnuHCSGC1/jskmwlcjwe9pybhzXdx2fgXkcopzP+c55nSL5t6EIuFxjsAgg==
-X-Received: by 2002:a1c:4b11:0:b0:3f7:e78e:8a41 with SMTP id y17-20020a1c4b11000000b003f7e78e8a41mr34257351wma.18.1687853768782;
-        Tue, 27 Jun 2023 01:16:08 -0700 (PDT)
+        bh=NKYCzO30p3CfM15O+HnQkgKCwJC3L8nVgasQMiwytMc=;
+        b=Rxsx4Qdc692Wovivj+1qF/nYcEFBk/BySWsYsi3x3Av/KyaeglXJLv6oNHXxHRY3/T
+         rY3DkenrHwyLox/WDvef2svnbG3vq/WiCKiBzEhf62OSWg1FnammFetu1zX483u05k8l
+         gm80pkwOsixeIBsbAbl44+pASAu237S5DLXCWRMaSOZwXw4DtHufEVORGPTsmBGWdxw3
+         VZTNAR2TEmMEaOK9CW2X4wbj5++RiXquU0yifScxB9zzGrW7iDs6hevYndYfbuL/0QFf
+         nJ1WLIzF+ILimPQx8BQKSzlmKPRF4kKsZIR/ru5awgwL2KnuevJ/Qv4yATGRHoRaMNmC
+         li9Q==
+X-Gm-Message-State: AC+VfDwtMGLHQwmuLCUZjUi+XEcYsSSJtxEYi4xQibUYGzgndEon9qUp
+	OYnVlpHciyKqNIDJc/wn5ZaNtA==
+X-Google-Smtp-Source: ACHHUZ5UPAmAdebNT5QrLSKqgB0AygVdakqXqFCOobyHd6YHonqV8YRcXuBXtU1vnT8yWryia1+t9Q==
+X-Received: by 2002:a19:5e47:0:b0:4f3:b708:f554 with SMTP id z7-20020a195e47000000b004f3b708f554mr16973278lfi.47.1687853770077;
+        Tue, 27 Jun 2023 01:16:10 -0700 (PDT)
 Received: from arrakeen.starnux.net ([2a01:e0a:982:cbb0:52eb:f6ff:feb3:451a])
-        by smtp.gmail.com with ESMTPSA id m21-20020a7bcb95000000b003faabd8fcb8sm3922480wmi.46.2023.06.27.01.16.07
+        by smtp.gmail.com with ESMTPSA id m21-20020a7bcb95000000b003faabd8fcb8sm3922480wmi.46.2023.06.27.01.16.08
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 01:16:08 -0700 (PDT)
+        Tue, 27 Jun 2023 01:16:09 -0700 (PDT)
 From: Neil Armstrong <neil.armstrong@linaro.org>
-Date: Tue, 27 Jun 2023 10:15:57 +0200
-Subject: [PATCH v2 4/5] arm64: dts: qcom: sm8550: add UART14 nodes
+Date: Tue, 27 Jun 2023 10:15:58 +0200
+Subject: [PATCH v2 5/5] arm64: dts: qcom: sm8550-qrd: add bluetooth support
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -67,7 +67,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230620-topic-sm8550-upstream-bt-v2-4-98b0043d31a4@linaro.org>
+Message-Id: <20230620-topic-sm8550-upstream-bt-v2-5-98b0043d31a4@linaro.org>
 References: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
 In-Reply-To: <20230620-topic-sm8550-upstream-bt-v2-0-98b0043d31a4@linaro.org>
 To: "David S. Miller" <davem@davemloft.net>, 
@@ -85,20 +85,20 @@ Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
  linux-kernel@vger.kernel.org, linux-bluetooth@vger.kernel.org, 
  linux-arm-msm@vger.kernel.org, Neil Armstrong <neil.armstrong@linaro.org>
 X-Mailer: b4 0.12.2
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1815;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=1926;
  i=neil.armstrong@linaro.org; h=from:subject:message-id;
- bh=jaEK1SW0U7tuAtTapDJNwvxMKnI1nWuMsJihPmoQlrc=;
- b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkmprB7csm8NK59FIRf37oWsYMsFzp8vr3jW15ZUbT
- 5t8cumCJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJqawQAKCRB33NvayMhJ0R/LD/
- wIHevPwfj1Ukpd5iMRwuoLG9MKWLcB6AXx/pQfrRYvossKg41fiiLcDXztNq3ZxiQ3ijdK9VJEkZNb
- 4D49dHXO4gowVFYSGSyKulhhazUrXo58CBS9jqiziNEQ+JhAWWHHJb3t7+OnsBaCgdUrc+XyskIzeF
- 3yeEtn+OOFbEjg9b8svDP1Yjchf1iEbLBCG2T4CFVrlreQUxy0ixocoe2et5yxACvF0MrDaEwbCJOj
- 7L1mQ7G+fcEQdtvoGEAOtmy+Q7b78NFkLm6nENio+QUHyxQ84C1vhG3puMsI8Uoz8Z0J3a1fGje6Eq
- +MiuU46+kUlRGGTsYnZqKJ5hEzzNHeo7liHsfmDrCeuY5WTzkt/7ZHhDRvQ5PddhStTbnl5cIg2l+v
- 1DK5x68AYWpFnK4KVeYxcYY0HBL61K7deBFrkn6nD6CgcCOPOaRoRqr67Klj2YIlaCJkIxkKX1vjXx
- 7oq3GWcLPIHtTPXSKVDJqZNdKBmYZTgUdc6ftR1UgSGgGSi0OTIJmi1Kb97doJG0Wu1S4B9e9jDdx9
- rU4FFpKpGy0BeTlygCjJxHIyuYmHdGswSmW/j0rLAyEFDzwXzd6AIt2E0UwB83tISn/zVfYPXowdx8
- Tth0KwGuEIHB68XYPaDBohR6bD3dcMw29pNhYMOShyH7HdUb0sdSnBLpDaXQ==
+ bh=KySBmP9dGxG5IltGtai2AUWCcupms4WbJYVY2a5iftc=;
+ b=owEBbQKS/ZANAwAKAXfc29rIyEnRAcsmYgBkmprC7LKuKQP5lEnWMlwQNfkscjbmRXDGgpsEkAFO
+ IxxCBGyJAjMEAAEKAB0WIQQ9U8YmyFYF/h30LIt33NvayMhJ0QUCZJqawgAKCRB33NvayMhJ0c0mEA
+ CSX5Cq1063oGxde+A1fOmlMP6bKKBH6leth2l0fopZRTKgSlexd2KsE2Q36Wk4KeBHmcWz1T59DiMY
+ xgYqjUBMaJS4jXiZ+EznmPkvPaHOwdTaG1WDLNkP/PoNn++6rCZ7aazev6k0EcHvQs2OD8EHXSGrQq
+ nBefTd0QNIqDgI3MCsRWQHyHcLDIhlYjALvMbYwuzWRYIU11p6bNImUQy/4qyjYlijLP9KmuFys7XI
+ bB2W6XAB/LJy1TnYOc9NCmwi9z7weOCj6F627uMug1JdX4sgUHMTWQy0U23xSYWr9Sey5NIkRS2FoL
+ wdBlEHtmyrqqvEMbYq3tR2HyqDRPIpE8QVBt3tQeWPxGa4TktcpRM2+unvKCvne0vDm7E5JJZcHZEZ
+ mqiMkcHw1UUHuKLH5w6vfKDT6i4i5PtRlL8tzh8caL/E5h0jdaHT9UFSQm7NnzLA8XmB9/KuuELxIU
+ 5K48w7nZojT+lyMf4o+xGGUsb8sAnpfC19wVqLTpm7pW5qrjRXf0XTJXcv0IYMVTSzzgWXKgPqFis7
+ kga2dx+f65fR2FqrOH5JWWMNfIsNjycTPWVdFMOupkLhuvevsiM360Ew4g6MEmHTsIEZDfoclsxMPE
+ gPVxFIdAFUadqN2vnX4NQaKoZyX9q2IMwAjympQqELx18xZxbmq81qKJBt3Q==
 X-Developer-Key: i=neil.armstrong@linaro.org; a=openpgp;
  fpr=89EC3D058446217450F22848169AB7B1A4CFF8AE
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -108,62 +108,88 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add the Geni High Speed UART QUP instance 2 element 6
-node and associated default pinctrl.
+Enable the WCN7850 bluetooth over the UART14 link.
 
 Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
 ---
- arch/arm64/boot/dts/qcom/sm8550.dtsi | 30 ++++++++++++++++++++++++++++++
- 1 file changed, 30 insertions(+)
+ arch/arm64/boot/dts/qcom/sm8550-qrd.dts | 43 +++++++++++++++++++++++++++++++++
+ 1 file changed, 43 insertions(+)
 
-diff --git a/arch/arm64/boot/dts/qcom/sm8550.dtsi b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-index 75cd374943eb..252e3863322c 100644
---- a/arch/arm64/boot/dts/qcom/sm8550.dtsi
-+++ b/arch/arm64/boot/dts/qcom/sm8550.dtsi
-@@ -1053,6 +1053,20 @@ spi13: spi@894000 {
- 				status = "disabled";
- 			};
+diff --git a/arch/arm64/boot/dts/qcom/sm8550-qrd.dts b/arch/arm64/boot/dts/qcom/sm8550-qrd.dts
+index 8669d29144bb..8f4b07475ca9 100644
+--- a/arch/arm64/boot/dts/qcom/sm8550-qrd.dts
++++ b/arch/arm64/boot/dts/qcom/sm8550-qrd.dts
+@@ -22,6 +22,7 @@ / {
  
-+			uart14: uart@898000 {
-+				compatible = "qcom,geni-uart";
-+				reg = <0 0x898000 0 0x4000>;
-+				clock-names = "se";
-+				clocks = <&gcc GCC_QUPV3_WRAP2_S6_CLK>;
-+				pinctrl-names = "default";
-+				pinctrl-0 = <&qup_uart14_default>, <&qup_uart14_cts_rts>;
-+				interrupts = <GIC_SPI 461 IRQ_TYPE_LEVEL_HIGH>;
-+				interconnects = <&clk_virt MASTER_QUP_CORE_2 0 &clk_virt SLAVE_QUP_CORE_2 0>,
-+						<&gem_noc MASTER_APPSS_PROC 0 &config_noc SLAVE_QUP_2 0>;
-+				interconnect-names = "qup-core", "qup-config";
-+				status = "disabled";
-+			};
-+
- 			i2c15: i2c@89c000 {
- 				compatible = "qcom,geni-i2c";
- 				reg = <0 0x0089c000 0 0x4000>;
-@@ -3382,6 +3396,22 @@ qup_uart7_default: qup-uart7-default-state {
- 				bias-disable;
- 			};
+ 	aliases {
+ 		serial0 = &uart7;
++		serial1 = &uart14;
+ 	};
  
-+			qup_uart14_default: qup-uart14-default-state {
-+				/* TX, RX */
-+				pins = "gpio78", "gpio79";
-+				function = "qup2_se6";
-+				drive-strength = <2>;
-+				bias-pull-up;
-+			};
+ 	wcd938x: audio-codec {
+@@ -529,6 +530,10 @@ &qupv3_id_0 {
+ 	status = "okay";
+ };
+ 
++&qupv3_id_1 {
++	status = "okay";
++};
 +
-+			qup_uart14_cts_rts: qup-uart14-cts-rts-state {
-+				/* CTS, RTS */
-+				pins = "gpio76", "gpio77";
-+				function = "qup2_se6";
-+				drive-strength = <2>;
-+				bias-pull-down;
-+			};
+ &remoteproc_adsp {
+ 	firmware-name = "qcom/sm8550/adsp.mbn",
+ 			"qcom/sm8550/adsp_dtb.mbn";
+@@ -576,6 +581,21 @@ wcd_tx: codec@0,3 {
+ &tlmm {
+ 	gpio-reserved-ranges = <32 8>;
+ 
++	bt_default: bt-default-state {
++		bt-en-pins {
++			pins = "gpio81";
++			function = "gpio";
++			drive-strength = <16>;
++			bias-disable;
++		};
 +
- 			sdc2_sleep: sdc2-sleep-state {
- 				clk-pins {
- 					pins = "sdc2_clk";
++		sw-ctrl-pins {
++			pins = "gpio82";
++			function = "gpio";
++			bias-pull-down;
++		};
++	};
++
+ 	sde_dsi_active: sde-dsi-active-state {
+ 		pins = "gpio133";
+ 		function = "gpio";
+@@ -617,6 +637,29 @@ &uart7 {
+ 	status = "okay";
+ };
+ 
++&uart14 {
++	status = "okay";
++
++	bluetooth {
++		compatible = "qcom,wcn7850-bt";
++
++		vddio-supply = <&vreg_l15b_1p8>;
++		vddaon-supply = <&vreg_s4e_0p95>;
++		vdddig-supply = <&vreg_s4e_0p95>;
++		vddrfa0p8-supply = <&vreg_s4e_0p95>;
++		vddrfa1p2-supply = <&vreg_s4g_1p25>;
++		vddrfa1p9-supply = <&vreg_s6g_1p86>;
++
++		max-speed = <3200000>;
++
++		enable-gpios = <&tlmm 81 GPIO_ACTIVE_HIGH>;
++		swctrl-gpios = <&tlmm 82 GPIO_ACTIVE_HIGH>;
++
++		pinctrl-0 = <&bt_default>;
++		pinctrl-names = "default";
++	};
++};
++
+ &ufs_mem_hc {
+ 	reset-gpios = <&tlmm 210 GPIO_ACTIVE_LOW>;
+ 	vcc-supply = <&vreg_l17b_2p5>;
 
 -- 
 2.34.1
