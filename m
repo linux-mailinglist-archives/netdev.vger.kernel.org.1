@@ -1,165 +1,343 @@
-Return-Path: <netdev+bounces-14210-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14211-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 347F873F892
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:19:59 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BDB5973F89D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:21:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E2B7F281018
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:19:57 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EC1561C20A90
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:21:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 343D1168BE;
-	Tue, 27 Jun 2023 09:19:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0260F168CB;
+	Tue, 27 Jun 2023 09:21:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27688168B1
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:19:55 +0000 (UTC)
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2075.outbound.protection.outlook.com [40.107.237.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27199106;
-	Tue, 27 Jun 2023 02:19:54 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GNiG31g1gxD7rlA6iEtIDONuu6Q0Dayph0wajbwCLbR8ySgwhCxypV0gFcCLjOPzFNyB1dmugHSoF0ayRd/ItCsIKw7cp7X41FkqMAUbcix5qcocv6pD13oqezBtkpN6WV8pVgBi2CNyQb9a+v7VV3QWi5mLs8ja8t3WqxF4ERa80eykkDKvAcLySeqXGiaZwbNau+wsVKFAa/AzxI+LOWPXGjjgNyFHbeMSfaWPrxm4j+UOkn3yYqAd2cqKQ91PD8goorYp25jzEpS4G/oMx06WHiKEu7vltUQu1QM+XPr2/15HIr56bxCdH7VCjCiiRznM1QpAv/0mImzGOgZF0w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=l7heYl/XOUrCV6rppMlz4MHksi6bF0TIBx48rlDObYY=;
- b=Nbsc4WJ1rKYImKzo5XM8UHlwvAS7UNaouIDVCuXFeUPRpZvdKVG9JkPnVZfVPvea8NLW5tCa5hMZeAxaHwFmdSfFlWofHhWxqXFXp8FJxAQZis7K6K1aJRby/cgCMVQW5Ny946bFM4gX/egL99gueaZU3fcKo7xuTqnxAHvnXEYpFDSueIfrYP8LZsGT+saI0I+UNxR4N4mCEdalKJ4mEq8ZvKNVDh1WeDD0rp9HnUQBt+O9PWW+q4SOmPrqjkw8DIN/FOS1VJRlw9YKRFm8MP13X5TgUpNJBw8K0SRF1mL2fqOFeGr82i76x3fJMdXhI/3fvN8cIeNLe2dlo6YGCg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=l7heYl/XOUrCV6rppMlz4MHksi6bF0TIBx48rlDObYY=;
- b=ITPF2qM9A0yMpFJjsz3CV3C7dqf/KzNjw/V6ZE6Qwj7TWc57G4OYl0zX+ybqU5oc+G/PFEUsKj3yekkn0jwLf2gi2RGStLlDl6htzTxqcqmYhCzyZXVvXgHRTVlr2PCCr5sSUhcNqu9IWJ9ghxjsb74uXfdJfDecO6b7hXSrhIg=
-Received: from BYAPR12MB4773.namprd12.prod.outlook.com (2603:10b6:a03:109::17)
- by LV3PR12MB9233.namprd12.prod.outlook.com (2603:10b6:408:194::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Tue, 27 Jun
- 2023 09:19:52 +0000
-Received: from BYAPR12MB4773.namprd12.prod.outlook.com
- ([fe80::dd8c:65dc:5934:7ecc]) by BYAPR12MB4773.namprd12.prod.outlook.com
- ([fe80::dd8c:65dc:5934:7ecc%7]) with mapi id 15.20.6521.024; Tue, 27 Jun 2023
- 09:19:51 +0000
-From: "Katakam, Harini" <harini.katakam@amd.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Jose Abreu <Jose.Abreu@synopsys.com>, Andrew Lunn <andrew@lunn.ch>, Heiner
- Kallweit <hkallweit1@gmail.com>, Russell King <linux@armlinux.org.uk>, "David
- S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub
- Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Subject: RE: [PATCH net] net: phy: mscc: fix packet loss due to RGMII delays
-Thread-Topic: [PATCH net] net: phy: mscc: fix packet loss due to RGMII delays
-Thread-Index: AQHZqNda5+DRbHxbQUikxPH5Tvdjz6+eXxZA
-Date: Tue, 27 Jun 2023 09:19:51 +0000
-Message-ID:
- <BYAPR12MB477315C261B843487E2F21949E27A@BYAPR12MB4773.namprd12.prod.outlook.com>
-References: <20230627091109.3374701-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20230627091109.3374701-1-vladimir.oltean@nxp.com>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: BYAPR12MB4773:EE_|LV3PR12MB9233:EE_
-x-ms-office365-filtering-correlation-id: becf4601-1fb1-4b68-cb12-08db76efa97e
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- bfatvjbjzWYXPEHksmfGhwTDBQhW9MJMpB1YaDx4dmK6M1gWSR9P8jY6Pgj1fCaVV8afzeyOl21tyAkA5n4ZY7Y/YCTACesnAugbdLMJiWcyBLLfe0V65QNfKoG4tbTT/1MZyTlphMkVaQSrWIjLpEwRtnnKSeZiAhqrRkjHZnWtSmWSBjilNWoyosVvb8LO3z6ZsuUp6RDCMYhPFGCo2kPIpV5yiSrsnfH/WCCedRwMCow4lRhaB5eq6Mac1qTVV6swTGkerg6habDnxPNNTQdJFkYhcdWBhRxRa3I/Pvmf0w8xe65eJC5o7Pbnn3KUiMBCoUXW8aRFRU6xPxwxKUQza+aHbeA61seFRw6XGBQaG683I4oVGSjXUjiIfZ7GjxjHAEbwhBHdZuefrQY5n/MEBZd8+kWWBPpsKo/g1l5r+wH26zmooOmXH35dbETIySZ2jjs+tRogPiGRjtPRD070wzEzyjvGQD0vPHDFb7P1C2dYMKU7p+tyYwd4c2wQewqUiUUBTRA07OhqWKbOAxkmSmqr27nzFIiVD8kK6Se6aMjT8f5a9qcxo1PqA0mifvnfbq3HR5sCgIhnFCRavdMJhYscys50XtU07m3qbce/cdHGnRsnfH+KPWGtoaDE
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB4773.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(376002)(39860400002)(396003)(346002)(451199021)(2906002)(38070700005)(186003)(7696005)(71200400001)(122000001)(38100700002)(83380400001)(6506007)(53546011)(9686003)(4744005)(26005)(55016003)(110136005)(41300700001)(54906003)(86362001)(316002)(478600001)(66556008)(66446008)(4326008)(66946007)(66476007)(64756008)(33656002)(76116006)(7416002)(5660300002)(52536014)(8676002)(8936002);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?2F2MjSNiuEE0KvqWTIr3U+MDp2D7m+kA6JaUV7+gufKecxUaWy4vzLpfmJpK?=
- =?us-ascii?Q?S5YEM63M9VdeJbhuRGXN7lNNIaw/nLJ3UktUxinQcoJyG5hISVC9EgnG5c93?=
- =?us-ascii?Q?EZYAefdM0+4aXC0jyPs4Outhf6an/DykoRQ/GflCDYYBI7EvPp2a0wd/K70K?=
- =?us-ascii?Q?3Zi2GEXSPsa0NnpSi8Qg+HRGWwb5qQxweDK5DAidlkjorQkmZyR4etuPvKiU?=
- =?us-ascii?Q?hEowEY9c1DA/QqeGHOUCPxijn17SgHq+8n415w65hpqhfcCM0MezRTG6wCmm?=
- =?us-ascii?Q?OcYBB973FOY2ag5J/XSag2PprKc8L5/N345zk3qhjM1bXfYzGtvc5PLF3iKT?=
- =?us-ascii?Q?hdQaXqxjF4fsTrDYpFeiON2R/Vna7ndlysoHgFK6u+ejn46rooVfFtbhBhqa?=
- =?us-ascii?Q?5jCyDYVMx1YjZ2Hc0P3nPZPGsM4F7Kq3LxWCwlaG4u/YAW7G5Y3xPjXXMfHf?=
- =?us-ascii?Q?+rFk89Rs2Rsh+nwQaQu/NdCkvSdYoe1FfhLcaOz6XEv7A2M6Itr+jAzyCJQQ?=
- =?us-ascii?Q?GdOloJ4QYArpIJOO8rXFKl2YkUOCCZBUrhUIj4JGimVmVP4l+dFeRPUZka7i?=
- =?us-ascii?Q?NsGX9MtdfPhhW8OWAlQ0hcULv3H4DnxKBjR635VM0HAivCUCeA/VyEu6sNon?=
- =?us-ascii?Q?X4S+OQPxHp1JdwbN/Qkj6UPKPfSkATwAdXn9R4/RquWYbCopQQ8weIpA4KMz?=
- =?us-ascii?Q?D1zrLn4nHfD92R7sBDSMRmh64HYfw7+XxVaRdcd1ueW9aS8lj6u2SYpoBDhP?=
- =?us-ascii?Q?M5xYUz/FkfUxdyJ28oJaq3F5T8I6RX3apYWT9hTJ3YIdGUDijyHeN2PsqSZF?=
- =?us-ascii?Q?gP2m4WgrtdgeqxhJQqU0Uq0ZZ6BNWObSUOHuKCDhkw/elBbUyLxMbw4kXqsX?=
- =?us-ascii?Q?g6N8nyeq/Q6eBAQc13TSKuSJeJ9Nx7iuTn/CbO0g/JqBU9JcuZGzX42BDOMN?=
- =?us-ascii?Q?FXnqtqC7wcX7a8ylkBmJrYnTrvFNKBQMszLh3EyNVt7NoDa1/xxxfzcAkcSh?=
- =?us-ascii?Q?L9jhZ6orpuZQUR9Ye/VBeZaqKJaLyttnqJWxOff1DpoFM8mCeX7pntiULXsY?=
- =?us-ascii?Q?9YsrHASPKqKjLbpuaZN02+fYrLTl4TFabVf5qivW8HzssHIMAIf2+xytxprb?=
- =?us-ascii?Q?yzcw87CZ9fj5LU2vHckpYaU17N6TA1sowMk8nkccckvkg7oCXXnBla/Go6Ky?=
- =?us-ascii?Q?wx3kuulkwsBjx0QIdJtr4yiHjOaO5eFTf4qOjKNTVUzUeCR5c7dyCEYjirak?=
- =?us-ascii?Q?F4PhZ9KNspmtn8VkOEa09EnT5Bv7yFfeTObE9s568rHVkfD4wAcnJebIbWba?=
- =?us-ascii?Q?rxB/plCbuWpFcrAyCH1/F7CAOK2t77H2/piNO7wzInNuDykd5FBuAj1+1SNK?=
- =?us-ascii?Q?9uis+q9fTThCTAgQLXHZYAUmI9CVBlxQzKWhwIw0oYIrKMkAkrxGZKLGM2YV?=
- =?us-ascii?Q?XpDWDCvCFVqbc4jNbQg5JjBCuhCaI3Q6AqnuugpWWDMay4nxiS0rsY0isQOr?=
- =?us-ascii?Q?cMmkleg60iLmmp+M3hLxesFLFNczesPRJbDU7pDVI+4vWD+7XnURY+T34J2x?=
- =?us-ascii?Q?GoKl5AIPmWLES6zPRKI=3D?=
-Content-Type: text/plain; charset="us-ascii"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D294C10F9;
+	Tue, 27 Jun 2023 09:21:41 +0000 (UTC)
+Received: from out30-131.freemail.mail.aliyun.com (out30-131.freemail.mail.aliyun.com [115.124.30.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C10110C;
+	Tue, 27 Jun 2023 02:21:38 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R201e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046051;MF=xuanzhuo@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vm5G9bd_1687857694;
+Received: from localhost(mailfrom:xuanzhuo@linux.alibaba.com fp:SMTPD_---0Vm5G9bd_1687857694)
+          by smtp.aliyun-inc.com;
+          Tue, 27 Jun 2023 17:21:35 +0800
+Message-ID: <1687857679.82929-7-xuanzhuo@linux.alibaba.com>
+Subject: Re: [PATCH vhost v10 05/10] virtio_ring: split-detach: support return dma info to driver
+Date: Tue, 27 Jun 2023 17:21:19 +0800
+From: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: virtualization@lists.linux-foundation.org,
+ "Michael S. Tsirkin" <mst@redhat.com>,
+ "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ netdev@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
+ <20230602092206.50108-6-xuanzhuo@linux.alibaba.com>
+ <CACGkMEvynjFgmt5Q9ime1-Zf6P5LXYYXg4e4iVpAEtmSV7d0pQ@mail.gmail.com>
+In-Reply-To: <CACGkMEvynjFgmt5Q9ime1-Zf6P5LXYYXg4e4iVpAEtmSV7d0pQ@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB4773.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: becf4601-1fb1-4b68-cb12-08db76efa97e
-X-MS-Exchange-CrossTenant-originalarrivaltime: 27 Jun 2023 09:19:51.5461
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: HyAB9ggtpW2xon32TsKLQbh6dRzmJ6tlGKE9BsbW3smSBOdhtuZ2gbjC0RRBoQ2R
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR12MB9233
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+
+On Tue, 27 Jun 2023 16:03:31 +0800, Jason Wang <jasowang@redhat.com> wrote:
+> On Fri, Jun 2, 2023 at 5:22=E2=80=AFPM Xuan Zhuo <xuanzhuo@linux.alibaba.=
+com> wrote:
+> >
+> > Under the premapped mode, the driver needs to unmap the DMA address
+> > after receiving the buffer. The virtio core records the DMA address,
+> > so the driver needs a way to get the dma info from the virtio core.
+>
+> A second thought, can we simply offload the tracking to the driver
+> itself? This looks the way many other modern NIC drivers did.
+>
+> In pre mapped mode, the DMA address is in fact told by the driver
+> itself so it should have sufficient knowledge. And in some cases, the
+> driver wants to optimize/merge/delay the unampping so the DMA
+> addresses returned by the virtio core are not even interested in those
+> cases.
+
+Will fix.
+
+Thanks.
 
 
-
-> -----Original Message-----
-> From: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Sent: Tuesday, June 27, 2023 2:41 PM
-> To: netdev@vger.kernel.org
-> Cc: Jose Abreu <Jose.Abreu@synopsys.com>; Andrew Lunn
-> <andrew@lunn.ch>; Heiner Kallweit <hkallweit1@gmail.com>; Russell King
-> <linux@armlinux.org.uk>; David S. Miller <davem@davemloft.net>; Eric
-> Dumazet <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo
-> Abeni <pabeni@redhat.com>; linux-kernel@vger.kernel.org; Katakam, Harini
-> <harini.katakam@amd.com>
-> Subject: [PATCH net] net: phy: mscc: fix packet loss due to RGMII delays
->=20
-> Two deadly typos break RX and TX traffic on the VSC8502 PHY using RGMII
-> if phy-mode =3D "rgmii-id" or "rgmii-txid", and no "tx-internal-delay-ps"
-> override exists. The negative error code from phy_get_internal_delay()
-> does not get overridden with the delay deduced from the phy-mode, and
-> later gets committed to hardware. Also, the rx_delay gets overridden by
-> what should have been the tx_delay.
->=20
-> Fixes: dbb050d2bfc8 ("phy: mscc: Add support for RGMII delay
-> configuration")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-
-Thanks
-Reviewed-by: Harini Katakam <harini.katakam@amd.com>
-
-Regards,
-Harini
+>
+> Thanks
+>
+>
+>
+> >
+> > A straightforward approach is to pass an array to the virtio core when
+> > calling virtqueue_get_buf(). However, it is not feasible when there are
+> > multiple DMA addresses in the descriptor chain, and the array size is
+> > unknown.
+> >
+> > To solve this problem, a helper be introduced. After calling
+> > virtqueue_get_buf(), the driver can call the helper to
+> > retrieve a dma info. If the helper function returns -EAGAIN, it means
+> > that there are more DMA addresses to be processed, and the driver should
+> > call the helper function again. To keep track of the current position in
+> > the chain, a cursor must be passed to the helper function, which is
+> > initialized by virtqueue_get_buf().
+> >
+> > Some processes are done inside this helper, so this helper MUST be
+> > called under the premapped mode.
+> >
+> > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> > ---
+> >  drivers/virtio/virtio_ring.c | 118 ++++++++++++++++++++++++++++++++---
+> >  include/linux/virtio.h       |  11 ++++
+> >  2 files changed, 119 insertions(+), 10 deletions(-)
+> >
+> > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
+> > index dc109fbc05a5..cdc4349f6066 100644
+> > --- a/drivers/virtio/virtio_ring.c
+> > +++ b/drivers/virtio/virtio_ring.c
+> > @@ -754,8 +754,95 @@ static bool virtqueue_kick_prepare_split(struct vi=
+rtqueue *_vq)
+> >         return needs_kick;
+> >  }
+> >
+> > -static void detach_buf_split(struct vring_virtqueue *vq, unsigned int =
+head,
+> > -                            void **ctx)
+> > +static void detach_cursor_init_split(struct vring_virtqueue *vq,
+> > +                                    struct virtqueue_detach_cursor *cu=
+rsor, u16 head)
+> > +{
+> > +       struct vring_desc_extra *extra;
+> > +
+> > +       extra =3D &vq->split.desc_extra[head];
+> > +
+> > +       /* Clear data ptr. */
+> > +       vq->split.desc_state[head].data =3D NULL;
+> > +
+> > +       cursor->head =3D head;
+> > +       cursor->done =3D 0;
+> > +
+> > +       if (extra->flags & VRING_DESC_F_INDIRECT) {
+> > +               cursor->num =3D extra->len / sizeof(struct vring_desc);
+> > +               cursor->indirect =3D true;
+> > +               cursor->pos =3D 0;
+> > +
+> > +               vring_unmap_one_split(vq, head);
+> > +
+> > +               extra->next =3D vq->free_head;
+> > +
+> > +               vq->free_head =3D head;
+> > +
+> > +               /* Plus final descriptor */
+> > +               vq->vq.num_free++;
+> > +
+> > +       } else {
+> > +               cursor->indirect =3D false;
+> > +               cursor->pos =3D head;
+> > +       }
+> > +}
+> > +
+> > +static int virtqueue_detach_split(struct virtqueue *_vq, struct virtqu=
+eue_detach_cursor *cursor,
+> > +                                 dma_addr_t *addr, u32 *len, enum dma_=
+data_direction *dir)
+> > +{
+> > +       struct vring_virtqueue *vq =3D to_vvq(_vq);
+> > +       __virtio16 nextflag =3D cpu_to_virtio16(vq->vq.vdev, VRING_DESC=
+_F_NEXT);
+> > +       int rc =3D -EAGAIN;
+> > +
+> > +       if (unlikely(cursor->done))
+> > +               return -EINVAL;
+> > +
+> > +       if (!cursor->indirect) {
+> > +               struct vring_desc_extra *extra;
+> > +               unsigned int i;
+> > +
+> > +               i =3D cursor->pos;
+> > +
+> > +               extra =3D &vq->split.desc_extra[i];
+> > +
+> > +               if (vq->split.vring.desc[i].flags & nextflag) {
+> > +                       cursor->pos =3D extra->next;
+> > +               } else {
+> > +                       extra->next =3D vq->free_head;
+> > +                       vq->free_head =3D cursor->head;
+> > +                       cursor->done =3D true;
+> > +                       rc =3D 0;
+> > +               }
+> > +
+> > +               *addr =3D extra->addr;
+> > +               *len =3D extra->len;
+> > +               *dir =3D (extra->flags & VRING_DESC_F_WRITE) ? DMA_FROM=
+_DEVICE : DMA_TO_DEVICE;
+> > +
+> > +               vq->vq.num_free++;
+> > +
+> > +       } else {
+> > +               struct vring_desc *indir_desc, *desc;
+> > +               u16 flags;
+> > +
+> > +               indir_desc =3D vq->split.desc_state[cursor->head].indir=
+_desc;
+> > +               desc =3D &indir_desc[cursor->pos];
+> > +
+> > +               flags =3D virtio16_to_cpu(vq->vq.vdev, desc->flags);
+> > +               *addr =3D virtio64_to_cpu(vq->vq.vdev, desc->addr);
+> > +               *len =3D virtio32_to_cpu(vq->vq.vdev, desc->len);
+> > +               *dir =3D (flags & VRING_DESC_F_WRITE) ? DMA_FROM_DEVICE=
+ : DMA_TO_DEVICE;
+> > +
+> > +               if (++cursor->pos =3D=3D cursor->num) {
+> > +                       kfree(indir_desc);
+> > +                       cursor->done =3D true;
+> > +                       return 0;
+> > +               }
+> > +       }
+> > +
+> > +       return rc;
+> > +}
+> > +
+> > +static void detach_buf_split(struct vring_virtqueue *vq, unsigned int =
+head)
+> >  {
+> >         unsigned int i, j;
+> >         __virtio16 nextflag =3D cpu_to_virtio16(vq->vq.vdev, VRING_DESC=
+_F_NEXT);
+> > @@ -799,8 +886,6 @@ static void detach_buf_split(struct vring_virtqueue=
+ *vq, unsigned int head,
+> >
+> >                 kfree(indir_desc);
+> >                 vq->split.desc_state[head].indir_desc =3D NULL;
+> > -       } else if (ctx) {
+> > -               *ctx =3D vq->split.desc_state[head].indir_desc;
+> >         }
+> >  }
+> >
+> > @@ -812,7 +897,8 @@ static bool more_used_split(const struct vring_virt=
+queue *vq)
+> >
+> >  static void *virtqueue_get_buf_ctx_split(struct virtqueue *_vq,
+> >                                          unsigned int *len,
+> > -                                        void **ctx)
+> > +                                        void **ctx,
+> > +                                        struct virtqueue_detach_cursor=
+ *cursor)
+> >  {
+> >         struct vring_virtqueue *vq =3D to_vvq(_vq);
+> >         void *ret;
+> > @@ -852,7 +938,15 @@ static void *virtqueue_get_buf_ctx_split(struct vi=
+rtqueue *_vq,
+> >
+> >         /* detach_buf_split clears data, so grab it now. */
+> >         ret =3D vq->split.desc_state[i].data;
+> > -       detach_buf_split(vq, i, ctx);
+> > +
+> > +       if (!vq->indirect && ctx)
+> > +               *ctx =3D vq->split.desc_state[i].indir_desc;
+> > +
+> > +       if (vq->premapped)
+> > +               detach_cursor_init_split(vq, cursor, i);
+> > +       else
+> > +               detach_buf_split(vq, i);
+> > +
+> >         vq->last_used_idx++;
+> >         /* If we expect an interrupt for the next entry, tell host
+> >          * by writing event index and flush out the write before
+> > @@ -961,7 +1055,8 @@ static bool virtqueue_enable_cb_delayed_split(stru=
+ct virtqueue *_vq)
+> >         return true;
+> >  }
+> >
+> > -static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq)
+> > +static void *virtqueue_detach_unused_buf_split(struct virtqueue *_vq,
+> > +                                              struct virtqueue_detach_=
+cursor *cursor)
+> >  {
+> >         struct vring_virtqueue *vq =3D to_vvq(_vq);
+> >         unsigned int i;
+> > @@ -974,7 +1069,10 @@ static void *virtqueue_detach_unused_buf_split(st=
+ruct virtqueue *_vq)
+> >                         continue;
+> >                 /* detach_buf_split clears data, so grab it now. */
+> >                 buf =3D vq->split.desc_state[i].data;
+> > -               detach_buf_split(vq, i, NULL);
+> > +               if (vq->premapped)
+> > +                       detach_cursor_init_split(vq, cursor, i);
+> > +               else
+> > +                       detach_buf_split(vq, i);
+> >                 vq->split.avail_idx_shadow--;
+> >                 vq->split.vring.avail->idx =3D cpu_to_virtio16(_vq->vde=
+v,
+> >                                 vq->split.avail_idx_shadow);
+> > @@ -2361,7 +2459,7 @@ void *virtqueue_get_buf_ctx(struct virtqueue *_vq=
+, unsigned int *len,
+> >         struct vring_virtqueue *vq =3D to_vvq(_vq);
+> >
+> >         return vq->packed_ring ? virtqueue_get_buf_ctx_packed(_vq, len,=
+ ctx) :
+> > -                                virtqueue_get_buf_ctx_split(_vq, len, =
+ctx);
+> > +                                virtqueue_get_buf_ctx_split(_vq, len, =
+ctx, NULL);
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtqueue_get_buf_ctx);
+> >
+> > @@ -2493,7 +2591,7 @@ void *virtqueue_detach_unused_buf(struct virtqueu=
+e *_vq)
+> >         struct vring_virtqueue *vq =3D to_vvq(_vq);
+> >
+> >         return vq->packed_ring ? virtqueue_detach_unused_buf_packed(_vq=
+) :
+> > -                                virtqueue_detach_unused_buf_split(_vq);
+> > +                                virtqueue_detach_unused_buf_split(_vq,=
+ NULL);
+> >  }
+> >  EXPORT_SYMBOL_GPL(virtqueue_detach_unused_buf);
+> >
+> > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
+> > index 1fc0e1023bd4..eb4a4e4329aa 100644
+> > --- a/include/linux/virtio.h
+> > +++ b/include/linux/virtio.h
+> > @@ -38,6 +38,17 @@ struct virtqueue {
+> >         void *priv;
+> >  };
+> >
+> > +struct virtqueue_detach_cursor {
+> > +       unsigned indirect:1;
+> > +       unsigned done:1;
+> > +       unsigned hole:14;
+> > +
+> > +       /* for split head */
+> > +       unsigned head:16;
+> > +       unsigned num:16;
+> > +       unsigned pos:16;
+> > +};
+> > +
+> >  int virtqueue_add_outbuf(struct virtqueue *vq,
+> >                          struct scatterlist sg[], unsigned int num,
+> >                          void *data,
+> > --
+> > 2.32.0.3.g01195cf9f
+> >
+>
 
