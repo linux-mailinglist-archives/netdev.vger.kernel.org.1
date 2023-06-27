@@ -1,84 +1,64 @@
-Return-Path: <netdev+bounces-14225-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14226-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8AC2973FA3F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:30:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77F3A73FA77
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:48:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44F1628107C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:30:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 59F9A1C20AE8
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:48:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBAF5BA33;
-	Tue, 27 Jun 2023 10:30:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FB0316418;
+	Tue, 27 Jun 2023 10:48:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFCB17AAA
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 10:30:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 34D5FC433C0;
-	Tue, 27 Jun 2023 10:30:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687861820;
-	bh=R38voaZXR74g7j6AGu6e9jUGzSMGKBcf62IbBXvdPZM=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=LzMywWKqASFwoVLn4+bEW1NKWiQTMUosUJvWxZMvHXxEPkzewAPkv0SIK2VMdLp5u
-	 v1pChSNqGxycB1mK1Dhgg42rZmumKr5okb0Bo5ZS7EozHCl+njQVDKkiwgXlz8Vtd7
-	 Eo+fspgOvKa8GYyGsxfE7hWtegcQkLDCJg/3lI1tSQKDbELrIOcwwtq3CTtWVwtz+M
-	 Uvns7WL9XI+0wNDFJIzROXCLxgFthbUKqRFwTz2FW+XNv6OZl2v1U4RFA9FzZGOVtV
-	 OyWNBpwJ0WkfKCtsTrtgSXaVl3pDk5Nny0pWlUdR/SA+ya0ZLFW3Tn59fi+Anqu17h
-	 qj/fnyxNY+4pA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12ECDE537FF;
-	Tue, 27 Jun 2023 10:30:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 40FCB12B9C;
+	Tue, 27 Jun 2023 10:48:26 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E9C1210FF;
+	Tue, 27 Jun 2023 03:48:23 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qE6FA-0003Jr-AG; Tue, 27 Jun 2023 12:48:20 +0200
+Date: Tue, 27 Jun 2023 12:48:20 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
+	fw@strlen.de, daniel@iogearbox.net, dsahern@kernel.org
+Subject: Re: [PATCH bpf-next 0/7] Support defragmenting IPv(4|6) packets in
+ BPF
+Message-ID: <20230627104820.GF3207@breakpoint.cc>
+References: <cover.1687819413.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v2] ipvlan: Fix return value of ipvlan_queue_xmit()
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168786182007.31138.6869118162868476838.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Jun 2023 10:30:20 +0000
-References: <20230626093347.7492-1-cambda@linux.alibaba.com>
-In-Reply-To: <20230626093347.7492-1-cambda@linux.alibaba.com>
-To: Cambda Zhu <cambda@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, fengtao40@huawei.com,
- lucien.xin@gmail.com, luwei32@huawei.com, maheshb@google.com,
- xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
- tonylu@linux.alibaba.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <cover.1687819413.git.dxu@dxuuu.xyz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Daniel Xu <dxu@dxuuu.xyz> wrote:
+> Patches 1 & 2 are stolenfrom Florian. Hopefully he doesn't mind. There
+> were some outstanding comments on the v2 [2] but it doesn't look like a
+> v3 was ever submitted.  I've addressed the comments and put them in this
+> patchset cuz I needed them.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+I did not submit a v3 because i had to wait for the bpf -> bpf-next
+merge to get "bpf: netfilter: Add BPF_NETFILTER bpf_attach_type".
 
-On Mon, 26 Jun 2023 17:33:47 +0800 you wrote:
-> ipvlan_queue_xmit() should return NET_XMIT_XXX, but
-> ipvlan_xmit_mode_l2/l3() returns rx_handler_result_t or NET_RX_XXX
-> in some cases. ipvlan_rcv_frame() will only return RX_HANDLER_CONSUMED
-> in ipvlan_xmit_mode_l2/l3() because 'local' is true. It's equal to
-> NET_XMIT_SUCCESS. But dev_forward_skb() can return NET_RX_SUCCESS or
-> NET_RX_DROP, and returning NET_RX_DROP(NET_XMIT_DROP) will increase
-> both ipvlan and ipvlan->phy_dev drops counter.
-> 
-> [...]
-
-Here is the summary with links:
-  - [net,v2] ipvlan: Fix return value of ipvlan_queue_xmit()
-    https://git.kernel.org/netdev/net/c/8a9922e7be6d
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+Now that has been done so I will do v3 shortly.
 
