@@ -1,72 +1,172 @@
-Return-Path: <netdev+bounces-14256-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14257-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A547B73FC6B
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:08:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 140FC73FC71
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:09:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0B711C20B05
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:08:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 003CF1C20A71
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:09:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C2A2517FFE;
-	Tue, 27 Jun 2023 13:07:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE6D18000;
+	Tue, 27 Jun 2023 13:09:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B4C49171C5
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 13:07:59 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 43DB41715;
-	Tue, 27 Jun 2023 06:07:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=XUis5pG35TsAgUo4YDECHCrWQ4QCida4BlQpVHkG5bA=; b=I3ROVaFWpWwm1rFStU6g8fw0Dr
-	/RrARqjoo6AQ+tACuJcEbLhEDaqsy0Q0biQRlxT78jtC/mc1T+29TmNMLzxzuKOVTc1yQjVv9+bRX
-	RZZFPIR1WFrKxW1//f6tvR4BryWk+pGFeEoE9nocVL2WnHgH5L/Obe3FqU2AapAXHxZA=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qE8Pw-0001oD-IO; Tue, 27 Jun 2023 15:07:36 +0200
-Date: Tue, 27 Jun 2023 15:07:36 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Moritz Fischer <moritzf@google.com>, netdev@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, mdf@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net: lan743x: Don't sleep in atomic context
-Message-ID: <35db66a9-d478-4b15-ad30-bfc4cded0b5c@lunn.ch>
-References: <20230627035000.1295254-1-moritzf@google.com>
- <ZJrc5xjeHp5vYtAO@boxer>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0222111E
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 13:09:28 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4851E2720
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:09:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687871366;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=waR2ddNVaa0bZ59PsKuTu38VAo3ER9tvWWrmghdj6V4=;
+	b=RTT6EMQGoExPQ+bKD1m64SpKmzM9hzVKKZuDyQLr/2a2bX5LIqtDNChzD8NIlHGfMLwtNW
+	V6vjklBmJDDPu+c8GSGRrv35WC/+nYQns69tv2uYVveeY/zVa2/1IF90Q2Ws3IumGvEodZ
+	MBg5EkgtpZig6hf92D/LNwKXbrfrDY8=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-84-QLS9g6EqP-WwxVUbWDdDfQ-1; Tue, 27 Jun 2023 09:09:23 -0400
+X-MC-Unique: QLS9g6EqP-WwxVUbWDdDfQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A4EAC2814245;
+	Tue, 27 Jun 2023 13:09:22 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id A9E6440C6F5A;
+	Tue, 27 Jun 2023 13:09:21 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <b0a0cb0fac4ebdc23f01d183a9de10731dc90093.camel@redhat.com>
+References: <b0a0cb0fac4ebdc23f01d183a9de10731dc90093.camel@redhat.com> <3112097.1687814081@warthog.procyon.org.uk> <20230626142257.6e14a801@kernel.org>
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
+    Ilya Dryomov <idryomov@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, ceph-devel@vger.kernel.org,
+    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: Is ->sendmsg() allowed to change the msghdr struct it is given?
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZJrc5xjeHp5vYtAO@boxer>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <3132609.1687871361.1@warthog.procyon.org.uk>
+Date: Tue, 27 Jun 2023 14:09:21 +0100
+Message-ID: <3132610.1687871361@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> > +static int lan743x_csr_wait_for_bit_atomic(struct lan743x_adapter *adapter,
+Paolo Abeni <pabeni@redhat.com> wrote:
+
+> udp_sendmsg() can set the MSG_TRUNC bit in msg->msg_flags, so I guess
+> that kind of actions are sort of allowed. Still, AFAICS, the kernel
+> based msghdr is not copied back to the user-space, so such change
+> should be almost a no-op in practice.
 > 
-> adapter is not used in readx_poll_timeout_atomic() call, right?
-> can be removed.
+> @David: which would be the end goal for such action?
 
-I thought that when i first looked at an earlier version of this
-patch. But LAN743X_CSR_READ_OP is not what you think :-(
+Various places in the kernel use sock_sendmsg() - and I've added a bunch more
+with the MSG_SPLICE_PAGES patches.  For some of the things I've added, there's
+a loop which used to call ->sendpage() and now calls sock_sendmsg().  In most
+of those places, msghdr will get reset each time round the loop - but not in
+all cases.
 
-       Andrew
+Of particular immediate interest is net/ceph/messenger_v2.c.  If you go to:
+
+	https://lore.kernel.org/r/3111635.1687813501@warthog.procyon.org.uk/
+
+and look at the resultant code:
+
+	static int do_sendmsg(struct socket *sock, struct iov_iter *it)
+	{
+		struct msghdr msg = { .msg_flags = CEPH_MSG_FLAGS };
+		int ret;
+
+		msg.msg_iter = *it;
+		while (iov_iter_count(it)) {
+			ret = sock_sendmsg(sock, &msg);
+			if (ret <= 0) {
+				if (ret == -EAGAIN)
+					ret = 0;
+				return ret;
+			}
+
+			iov_iter_advance(it, ret);
+		}
+
+		WARN_ON(msg_data_left(&msg));
+		return 1;
+	}
+
+for example.  It could/would malfunction if sendmsg() is allowed to modify
+msghdr - or if it doesn't update msg_iter.  Likewise:
+
+	static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
+	{
+		struct msghdr msg = { .msg_flags = CEPH_MSG_FLAGS };
+		struct bio_vec bv;
+		int ret;
+
+		if (WARN_ON(!iov_iter_is_bvec(it)))
+			return -EINVAL;
+
+		while (iov_iter_count(it)) {
+			/* iov_iter_iovec() for ITER_BVEC */
+			bvec_set_page(&bv, it->bvec->bv_page,
+				      min(iov_iter_count(it),
+					  it->bvec->bv_len - it->iov_offset),
+				      it->bvec->bv_offset + it->iov_offset);
+
+			/*
+			 * MSG_SPLICE_PAGES cannot properly handle pages with
+			 * page_count == 0, we need to fall back to sendmsg if
+			 * that's the case.
+			 *
+			 * Same goes for slab pages: skb_can_coalesce() allows
+			 * coalescing neighboring slab objects into a single frag
+			 * which triggers one of hardened usercopy checks.
+			 */
+			if (sendpage_ok(bv.bv_page))
+				msg.msg_flags |= MSG_SPLICE_PAGES;
+			else
+				msg.msg_flags &= ~MSG_SPLICE_PAGES;
+
+			iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bv, 1, bv.bv_len);
+			ret = sock_sendmsg(sock, &msg);
+			if (ret <= 0) {
+				if (ret == -EAGAIN)
+					ret = 0;
+				return ret;
+			}
+
+			iov_iter_advance(it, ret);
+		}
+
+		return 1;
+	}
+
+could be similarly affected if ->sendmsg() mucks about with msg_flags.
+
+David
+
 
