@@ -1,86 +1,79 @@
-Return-Path: <netdev+bounces-14222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14224-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 816EA73FA06
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:18:46 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5486673FA0E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:20:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 13771281044
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:18:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 11438281074
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:20:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09A98174E7;
-	Tue, 27 Jun 2023 10:18:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBC76174D6;
+	Tue, 27 Jun 2023 10:20:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F141C10F9
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 10:18:39 +0000 (UTC)
-Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00FA03C15
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 03:18:22 -0700 (PDT)
-Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-313e34ab99fso3557762f8f.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 03:18:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687861101; x=1690453101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=gT7GboGGDk7AitS54Ow1poGL7UR1gfZLBCd0QKdV4C0=;
-        b=C5OXmNsX0m80OIL6Emr3JWyhtE0S88G7Rwlsr6ZmfJU130SsETmmm6+Ce6D9TL1Gz8
-         nDoBo+bvQGs6hMHJoPMI3jmFchyOb5ggBoDyzMzwB3l/DFkSZVi8LIqb99E7t0K7IiWh
-         6uNrq1/A/CUTpd7fCD/3Kvpfd0Cqs2VWR6zUajX6+4UiDtM84yFga/qi2QD5GNSb6yZI
-         OZEY8BdqDtB3AjzNVqO9QSby+3KFiKFHnFMY7wdtW4B+V54Gbbk1wPnSRIlNU68+niLX
-         rkP/hxL4xyd7j1h27zQw0raPbp3oAHhgriG7W5v5BHo71+8tBHHQ0UEwjElbpVakhs8m
-         XyAw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687861101; x=1690453101;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gT7GboGGDk7AitS54Ow1poGL7UR1gfZLBCd0QKdV4C0=;
-        b=inEMfwHGZ95t+GbqqcjOsyELkTmCsWHJ5ULMg9y0gNIsZI+3sGSN13XwMUyrGf+axS
-         Mje2t0m8zDL97anJzF9aJWkwB26sdKrXRfbsfJq6BNX9J+ic+JehaewxzqcIceD5ibqY
-         6CtNQ9DnSgt4ce/qm1euTu8bhlT1smSqClfp7++TX5wuDyyUiJk4QFbbpuWUaqdeDMfT
-         uoepRTSubfrztN9PNDIUchGc+noVlVhM0/RrABA+rYc2O5GuW6FcTLQfoSmD322WPhD6
-         Rhg6xaliINxC2HNIB6AwM2EwEa7E2ud5lG/LogJHjeqLW241Nrq1886CkviGWEtBw607
-         mdRQ==
-X-Gm-Message-State: AC+VfDzJqNsU1xnxrhfbhnjZS8622K9wLFtD67V553l7S3/F7VtlkxhE
-	SMI7YXWqJ6FxqOnA56Su7RoGbA==
-X-Google-Smtp-Source: ACHHUZ6IABQj80YZlbwlRcPCQeFmBfCPH/Nv02/YbE4SHjy4A9ioFacLP6XEwynurT1i4MOWCkpn+w==
-X-Received: by 2002:a5d:5009:0:b0:313:e146:1816 with SMTP id e9-20020a5d5009000000b00313e1461816mr7669279wrt.24.1687861101257;
-        Tue, 27 Jun 2023 03:18:21 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id cx16-20020a056000093000b00301a351a8d6sm10065190wrb.84.2023.06.27.03.18.20
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 03:18:20 -0700 (PDT)
-Date: Tue, 27 Jun 2023 12:18:19 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: kuba@kernel.org, vadfed@meta.com, jonathan.lemon@gmail.com,
-	pabeni@redhat.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, vadfed@fb.com, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, saeedm@nvidia.com, leon@kernel.org,
-	richardcochran@gmail.com, sj@kernel.org, javierm@redhat.com,
-	ricardo.canuelo@collabora.com, mst@redhat.com, tzimmermann@suse.de,
-	michal.michalik@intel.com, gregkh@linuxfoundation.org,
-	jacek.lawrynowicz@linux.intel.com, airlied@redhat.com,
-	ogabbay@kernel.org, arnd@arndb.de, nipun.gupta@amd.com,
-	axboe@kernel.dk, linux@zary.sk, masahiroy@kernel.org,
-	benjamin.tissoires@redhat.com, geert+renesas@glider.be,
-	milena.olech@intel.com, kuniyu@amazon.com, liuhangbin@gmail.com,
-	hkallweit1@gmail.com, andy.ren@getcruise.com, razor@blackwall.org,
-	idosch@nvidia.com, lucien.xin@gmail.com, nicolas.dichtel@6wind.com,
-	phil@nwl.cc, claudiajkang@gmail.com, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, poros@redhat.com,
-	mschmidt@redhat.com, linux-clk@vger.kernel.org,
-	vadim.fedorenko@linux.dev
-Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
-Message-ID: <ZJq3a6rl6dnPMV17@nanopsycho>
-References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C04F717727
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 10:20:07 +0000 (UTC)
+Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4D572109;
+	Tue, 27 Jun 2023 03:20:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:Sender:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description;
+	bh=QpIG8zIiPiSqoF8aX8idnXur9dqkJW4/QKoTrZH8cD8=; b=AvSWYAQNpQ/maAcKP7sl2uAWaM
+	r8VUkC/gUpf8gqV4fszhxttZkOR2LWKnEc87QNlx02OHUeHuUts/aXwTibIk39V5MnW2AcRRxkFw/
+	A5XYNmTvrwPSkdZqKNBuRoxZrePTBbZaP9Y1fHc3WOYafzBheEm/pdMdp/JftCUyKwlTmQLUhkkgO
+	E5bE9FwoMVtR525XRJIhz1KEncHrv9TwrCTeIrqVtuiHNK4ELXfXcDrCfNZIsKJCz+H+LwZmJiLNU
+	tB3d2WpFl5GpcyT6+4gZxPQsriZBPZcc2owzmgLkK5DEA6frQWGkpyGMtkQCmLDXJy7r6s1NWxF9P
+	e47EPxlA==;
+Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
+	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qE5nR-004e0Y-1h;
+	Tue, 27 Jun 2023 10:19:42 +0000
+Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (4096 bits))
+	(Client did not present a certificate)
+	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 5A8D5300118;
+	Tue, 27 Jun 2023 12:19:39 +0200 (CEST)
+Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
+	id 3790924A40809; Tue, 27 Jun 2023 12:19:39 +0200 (CEST)
+Date: Tue, 27 Jun 2023 12:19:39 +0200
+From: Peter Zijlstra <peterz@infradead.org>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+Cc: "Steven Rostedt (Google)" <rostedt@goodmis.org>,
+	Pablo Neira Ayuso <pablo@netfilter.org>,
+	Jozsef Kadlecsik <kadlec@netfilter.org>,
+	Florian Westphal <fw@strlen.de>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Lingutla Chandrasekhar <clingutla@codeaurora.org>,
+	Frederic Weisbecker <frederic@kernel.org>,
+	"J. Avila" <elavila@google.com>,
+	Vivek Anand <vivekanand754@gmail.com>,
+	"Rafael J. Wysocki" <rafael@kernel.org>,
+	Thomas Renninger <trenn@suse.com>, Shuah Khan <shuah@kernel.org>,
+	Borislav Petkov <bp@alien8.de>,
+	Josh Poimboeuf <jpoimboe@kernel.org>,
+	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+	Linux Regressions <regressions@lists.linux.dev>,
+	Linux Netfilter Development <netfilter-devel@vger.kernel.org>,
+	Netfilter Core Developers <coreteam@netfilter.org>,
+	Linux Networking <netdev@vger.kernel.org>,
+	Linux Power Management <linux-pm@vger.kernel.org>, x86@kernel.org
+Subject: Re: Fwd: High cpu usage caused by kernel process when upgraded to
+ linux 5.19.17 or later
+Message-ID: <20230627101939.GZ4253@hirez.programming.kicks-ass.net>
+References: <01ac399d-f793-49d4-844b-72cd8e0034df@gmail.com>
+ <ZJpJkL3dPXxgw6RK@debian.me>
+ <20230627073035.GV4253@hirez.programming.kicks-ass.net>
+ <99b64dfd-be4a-2248-5c42-8eb9197824e1@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -89,19 +82,19 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <99b64dfd-be4a-2248-5c42-8eb9197824e1@gmail.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Jun 23, 2023 at 02:38:10PM CEST, arkadiusz.kubalewski@intel.com wrote:
+On Tue, Jun 27, 2023 at 05:15:42PM +0700, Bagas Sanjaya wrote:
+> On 6/27/23 14:30, Peter Zijlstra wrote:
+> > I can't tell from this. Also, please don't use bugzilla.
+> 
+> Why not BZ? I'm confused too...
 
->v8 -> v9:
-
-Could you please address all the unresolved issues from v8 and send v10?
-I'm not reviewing this one.
-
-Thanks!
+Because we have email; and why would I want to touch a browser for this?
 
