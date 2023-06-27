@@ -1,172 +1,182 @@
-Return-Path: <netdev+bounces-14257-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14258-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 140FC73FC71
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:09:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3EE773FCD2
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:26:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 003CF1C20A71
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:09:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9877F1C209FD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:26:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBE6D18000;
-	Tue, 27 Jun 2023 13:09:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9541318008;
+	Tue, 27 Jun 2023 13:26:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B0222111E
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 13:09:28 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4851E2720
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:09:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 890AA171C5
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 13:26:07 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CC5EF1737
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:26:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687871366;
+	s=mimecast20190719; t=1687872364;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=waR2ddNVaa0bZ59PsKuTu38VAo3ER9tvWWrmghdj6V4=;
-	b=RTT6EMQGoExPQ+bKD1m64SpKmzM9hzVKKZuDyQLr/2a2bX5LIqtDNChzD8NIlHGfMLwtNW
-	V6vjklBmJDDPu+c8GSGRrv35WC/+nYQns69tv2uYVveeY/zVa2/1IF90Q2Ws3IumGvEodZ
-	MBg5EkgtpZig6hf92D/LNwKXbrfrDY8=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-84-QLS9g6EqP-WwxVUbWDdDfQ-1; Tue, 27 Jun 2023 09:09:23 -0400
-X-MC-Unique: QLS9g6EqP-WwxVUbWDdDfQ-1
-Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id A4EAC2814245;
-	Tue, 27 Jun 2023 13:09:22 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id A9E6440C6F5A;
-	Tue, 27 Jun 2023 13:09:21 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <b0a0cb0fac4ebdc23f01d183a9de10731dc90093.camel@redhat.com>
-References: <b0a0cb0fac4ebdc23f01d183a9de10731dc90093.camel@redhat.com> <3112097.1687814081@warthog.procyon.org.uk> <20230626142257.6e14a801@kernel.org>
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: dhowells@redhat.com, Jakub Kicinski <kuba@kernel.org>,
-    Ilya Dryomov <idryomov@gmail.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, ceph-devel@vger.kernel.org,
-    netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: Is ->sendmsg() allowed to change the msghdr struct it is given?
+	bh=Z1RsGs/Oy7XaTXoMXOFwYlyEKnB3c+tNOHwOA6wYMVE=;
+	b=G0X9nUhttHqfipaw7dW1+AkFCUB1v9PUg+5TBAbMuPMXqEMf4FUp4som/yKTUh+ScTa8nW
+	5RgFJqEIGitpufFeSkUMqQdlhe/dNkQUMbqMhpVEN8EjbhbYRnzEdiCEIPDhOyKh4Vew0Z
+	Ubaw2awcVDj5CLP1kx/Fqw3sB3aqOdY=
+Received: from mail-oi1-f197.google.com (mail-oi1-f197.google.com
+ [209.85.167.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-173-MtUBNtirMtKut58NbAXWQg-1; Tue, 27 Jun 2023 09:26:03 -0400
+X-MC-Unique: MtUBNtirMtKut58NbAXWQg-1
+Received: by mail-oi1-f197.google.com with SMTP id 5614622812f47-39edcb52625so3853427b6e.3
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:26:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687872363; x=1690464363;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z1RsGs/Oy7XaTXoMXOFwYlyEKnB3c+tNOHwOA6wYMVE=;
+        b=J+tAU3z3KvFgIGp3HSZgWZkCyRQ5PBkSBiHvEklF3uAU8YWFJC4kAeA6rWwaHSN9KG
+         mDJHRVr6bYfdjvmCA4Ur2NpqGOZNyI53wb/z7XfEC3NClARTZEZvTLbB855cUW0xvSCJ
+         6xtzMxH8T1qyAXoyszo9JP8iAFpZiVSiFjQI0jQyV0mPN2km8OmnHoDnF6Npp2VLfW2+
+         WSzdDVhSeqdV3fbBfv9yigtHmoiYrnMVjIdR1+sUOmZJQ/qXy2Uwn1Bx7faIF+LvkqEP
+         HDmVU8yb8yFPHi7Y01JZareVUqcVdf8MjgXG3qxgiWlcvn+hx+fqozUEilQgF18F894v
+         w3Gg==
+X-Gm-Message-State: AC+VfDyq+ilqN4jr0BlFIKUCI4wDFeOPWqce2i6Y96bobTq/SWtkRnkA
+	y84Wkfzfga1R9vNT3Cyr6qnhJOstEaUN+vRDX5G0R18ukTZgE9VqHBFZYwIZYVt/cKsNI9N7fzq
+	xmMnRomDG4DPKPV5M
+X-Received: by 2002:a05:6358:ed9:b0:12f:22c1:66aa with SMTP id 25-20020a0563580ed900b0012f22c166aamr22209963rwh.3.1687872362784;
+        Tue, 27 Jun 2023 06:26:02 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4Ct1+vuM40E/glXJ0Z8sHGosVgklX3+elTmV7NxPnN4Rqt8k0kdWNrsXNDAwiy/A0QTuLYPw==
+X-Received: by 2002:a05:6358:ed9:b0:12f:22c1:66aa with SMTP id 25-20020a0563580ed900b0012f22c166aamr22209940rwh.3.1687872362494;
+        Tue, 27 Jun 2023 06:26:02 -0700 (PDT)
+Received: from localhost ([37.163.11.144])
+        by smtp.gmail.com with ESMTPSA id j13-20020a05622a038d00b003ff44c0487asm4533762qtx.43.2023.06.27.06.26.01
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 06:26:02 -0700 (PDT)
+Date: Tue, 27 Jun 2023 15:25:56 +0200
+From: Andrea Claudi <aclaudi@redhat.com>
+To: Matthieu Baerts <matthieu.baerts@tessares.net>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, mptcp@lists.linux.dev,
+	martineau@kernel.org, geliang.tang@suse.com
+Subject: Re: [PATCH net 1/2] selftests: mptcp: join: fix 'delete and re-add'
+ test
+Message-ID: <ZJrjZJ4qc5sMyr75@renaissance-vector>
+References: <cover.1687522138.git.aclaudi@redhat.com>
+ <927493b7ba79d647668e95a34007f48e87c0992a.1687522138.git.aclaudi@redhat.com>
+ <94a77161-2299-e470-c0d5-c14cf828cd92@tessares.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3132609.1687871361.1@warthog.procyon.org.uk>
-Date: Tue, 27 Jun 2023 14:09:21 +0100
-Message-ID: <3132610.1687871361@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <94a77161-2299-e470-c0d5-c14cf828cd92@tessares.net>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Paolo Abeni <pabeni@redhat.com> wrote:
+On Mon, Jun 26, 2023 at 01:31:07PM +0200, Matthieu Baerts wrote:
+> Hi Andrea,
 
-> udp_sendmsg() can set the MSG_TRUNC bit in msg->msg_flags, so I guess
-> that kind of actions are sort of allowed. Still, AFAICS, the kernel
-> based msghdr is not copied back to the user-space, so such change
-> should be almost a no-op in practice.
+Hi Matthieu,
+Thanks for your review.
+
 > 
-> @David: which would be the end goal for such action?
+> On 23/06/2023 14:19, Andrea Claudi wrote:
+> > mptcp_join '002 delete and re-add' test currently fails in the 'after
+> > delete' testcase.
+> 
+> I guess it only fails if you use "-i" option to use "ip mptcp" instead
+> of "pm_nl_ctl", right?
+>
 
-Various places in the kernel use sock_sendmsg() - and I've added a bunch more
-with the MSG_SPLICE_PAGES patches.  For some of the things I've added, there's
-a loop which used to call ->sendpage() and now calls sock_sendmsg().  In most
-of those places, msghdr will get reset each time round the loop - but not in
-all cases.
+Yes, exactly.
 
-Of particular immediate interest is net/ceph/messenger_v2.c.  If you go to:
+> MPTCP CI doesn't launch the tests with the "-i" option.
+> 
+> Can you mention that it fails only when using "ip mptcp" which is not
+> the default mode please? It might be good to include that in the title
+> too not to think the test is broken and the CI didn't complain about that.
+>
 
-	https://lore.kernel.org/r/3111635.1687813501@warthog.procyon.org.uk/
+Sure, will do that.
 
-and look at the resultant code:
+> BTW, how did you launch mptcp_join.sh selftest to have this test
+> launched as second position ("002")? With "-Ii"?
+> 
 
-	static int do_sendmsg(struct socket *sock, struct iov_iter *it)
-	{
-		struct msghdr msg = { .msg_flags = CEPH_MSG_FLAGS };
-		int ret;
+Yes, that's exactly the case, I use "./mptcp_join.sh -I -i"
 
-		msg.msg_iter = *it;
-		while (iov_iter_count(it)) {
-			ret = sock_sendmsg(sock, &msg);
-			if (ret <= 0) {
-				if (ret == -EAGAIN)
-					ret = 0;
-				return ret;
-			}
+> (you can remove this "002": it is specific to the way you launched the
+> test, not using the default mode)
 
-			iov_iter_advance(it, ret);
-		}
+Will do.
 
-		WARN_ON(msg_data_left(&msg));
-		return 1;
-	}
+> 
+> > This happens because endpoint delete includes an ip address while id is
+> > not 0, contrary to what is indicated in the ip mptcp man page:
+> > 
+> > "When used with the delete id operation, an IFADDR is only included when
+> > the ID is 0."
+> > 
+> > This fixes the issue simply not using the $addr variable in
+> > pm_nl_del_endpoint().
+> 
+> If you do that, are you not going to break other tests? e.g.
+> - "remove id 0 subflow"
+> - "remove id 0 address"
+> 
+> (I didn't check all possibilities, maybe not or maybe there are others)
+> 
+> Because if you specify the ID 0, you do need to specify the address, no?
+> 
 
-for example.  It could/would malfunction if sendmsg() is allowed to modify
-msghdr - or if it doesn't update msg_iter.  Likewise:
+That's right, of course. I'll fix that in v2 and make sure no other
+tests are impacted with a "mptcp_join.sh -i" run.
 
-	static int do_try_sendpage(struct socket *sock, struct iov_iter *it)
-	{
-		struct msghdr msg = { .msg_flags = CEPH_MSG_FLAGS };
-		struct bio_vec bv;
-		int ret;
-
-		if (WARN_ON(!iov_iter_is_bvec(it)))
-			return -EINVAL;
-
-		while (iov_iter_count(it)) {
-			/* iov_iter_iovec() for ITER_BVEC */
-			bvec_set_page(&bv, it->bvec->bv_page,
-				      min(iov_iter_count(it),
-					  it->bvec->bv_len - it->iov_offset),
-				      it->bvec->bv_offset + it->iov_offset);
-
-			/*
-			 * MSG_SPLICE_PAGES cannot properly handle pages with
-			 * page_count == 0, we need to fall back to sendmsg if
-			 * that's the case.
-			 *
-			 * Same goes for slab pages: skb_can_coalesce() allows
-			 * coalescing neighboring slab objects into a single frag
-			 * which triggers one of hardened usercopy checks.
-			 */
-			if (sendpage_ok(bv.bv_page))
-				msg.msg_flags |= MSG_SPLICE_PAGES;
-			else
-				msg.msg_flags &= ~MSG_SPLICE_PAGES;
-
-			iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bv, 1, bv.bv_len);
-			ret = sock_sendmsg(sock, &msg);
-			if (ret <= 0) {
-				if (ret == -EAGAIN)
-					ret = 0;
-				return ret;
-			}
-
-			iov_iter_advance(it, ret);
-		}
-
-		return 1;
-	}
-
-could be similarly affected if ->sendmsg() mucks about with msg_flags.
-
-David
+> > Fixes: 34aa6e3bccd8 ("selftests: mptcp: add ip mptcp wrappers")
+> > Signed-off-by: Andrea Claudi <aclaudi@redhat.com>
+> > ---
+> >  tools/testing/selftests/net/mptcp/mptcp_join.sh | 2 +-
+> >  1 file changed, 1 insertion(+), 1 deletion(-)
+> > 
+> > diff --git a/tools/testing/selftests/net/mptcp/mptcp_join.sh b/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> > index 0ae8cafde439..5424dcacfffa 100755
+> > --- a/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> > +++ b/tools/testing/selftests/net/mptcp/mptcp_join.sh
+> > @@ -678,7 +678,7 @@ pm_nl_del_endpoint()
+> >  	local addr=$3
+> >  
+> >  	if [ $ip_mptcp -eq 1 ]; then
+> > -		ip -n $ns mptcp endpoint delete id $id $addr
+> > +		ip -n $ns mptcp endpoint delete id $id
+> 
+> Should you not add "${addr}" only if ${id} == 1?
+> 
+> >  	else
+> >  		ip netns exec $ns ./pm_nl_ctl del $id $addr
+> >  	fi
+> 
+> Cheers,
+> Matt
+> -- 
+> Tessares | Belgium | Hybrid Access Solutions
+> www.tessares.net
+> 
 
 
