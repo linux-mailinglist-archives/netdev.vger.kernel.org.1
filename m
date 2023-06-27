@@ -1,203 +1,205 @@
-Return-Path: <netdev+bounces-14338-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14339-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FE7B7403BA
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 21:03:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60A1B7403CD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 21:10:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BEB5C281162
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:03:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC663281142
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:10:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 195824A24;
-	Tue, 27 Jun 2023 19:03:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA6B74A26;
+	Tue, 27 Jun 2023 19:10:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0E4261306E
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 19:03:10 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7B70E52
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 12:03:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687892588;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=sCI/D1beeMuSDdc7buAbwdUV7v4DV3y3fmbUulZO5CA=;
-	b=EOVFCqczgcvfOw+XXD6OK2feYdm4ZiY9dxO8DrB/K+6MsbTpGvzBhLwRFBfhWjVR/4bj49
-	PVZBpNixd2it/ywAMmv+FXnDqaPz8NC9ShoTfK4xj1r7zWEZhyysVuMUIILOfdMu97UA3t
-	6Cm68/pGFvdWkHm00LzzyAPeU5eQG+0=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-6-ArLMsJJIOvWM1THfmZi-ew-1; Tue, 27 Jun 2023 15:03:04 -0400
-X-MC-Unique: ArLMsJJIOvWM1THfmZi-ew-1
-Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id C760328088B1;
-	Tue, 27 Jun 2023 19:02:44 +0000 (UTC)
-Received: from toolbox (unknown [10.2.17.15])
-	by smtp.corp.redhat.com (Postfix) with ESMTPS id 7AEBC200A3AD;
-	Tue, 27 Jun 2023 19:02:42 +0000 (UTC)
-Date: Tue, 27 Jun 2023 12:02:40 -0700
-From: Chris Leech <cleech@redhat.com>
-To: David Howells <dhowells@redhat.com>
-Cc: netdev@vger.kernel.org, Alexander Duyck <alexander.duyck@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-	David Ahern <dsahern@kernel.org>,
-	Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-	linux-mm@kvack.org, linux-kernel@vger.kernel.org,
-	Mike Christie <michael.christie@oracle.com>,
-	Lee Duncan <lduncan@suse.com>,
-	"James E.J. Bottomley" <jejb@linux.ibm.com>,
-	"Martin K. Petersen" <martin.petersen@oracle.com>,
-	Al Viro <viro@zeniv.linux.org.uk>, open-iscsi@googlegroups.com,
-	linux-scsi@vger.kernel.org, target-devel@vger.kernel.org
-Subject: Re: [PATCH net-next v5 11/16] scsi: iscsi_tcp: Use
- sendmsg(MSG_SPLICE_PAGES) rather than sendpage
-Message-ID: <ZJsyUK8DMN+P0nQo@toolbox>
-References: <20230623225513.2732256-1-dhowells@redhat.com>
- <20230623225513.2732256-12-dhowells@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD5A41FC4
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 19:10:08 +0000 (UTC)
+Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34AE9FD;
+	Tue, 27 Jun 2023 12:10:07 -0700 (PDT)
+Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-666edfc50deso143009b3a.0;
+        Tue, 27 Jun 2023 12:10:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687893006; x=1690485006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=X027yh/r9JwHRCGkoovD51WQvCd3gcUGQ2TPC2PVuLc=;
+        b=ODJco3W6O0fZXPOdmsLJAIVJfTPQr248Ekj/CCcQLJtzzWbJbveYP5OD8V+WSRm9CQ
+         +RJej4uibvc+kpRY05kMsHENyXwaO5u1qds4I2UCfs3leyJgJOYOPfX6F5X0W0TKmRm5
+         enS0m9Vapf9ts4rBDUpdQI60rOKhYhghNda00vpcHL2v/KLK1TxmmJkYBQwphpRSa2Is
+         3aDzpjuJWBf0OgtiNHLtXXIb/1Im35BN66+IL6TM4RueRuiu6L3I+Xj86mdLa5JaTs2w
+         ZsNhe9HUrbyq0BdC1xu2/knBVtGgcI0xhtvQTdm2NpRa6wtCeNr3JIRaEJ5nNUNQoQJi
+         5evw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687893006; x=1690485006;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=X027yh/r9JwHRCGkoovD51WQvCd3gcUGQ2TPC2PVuLc=;
+        b=iyG1kL+JTG41x4kSy7HgyrErFTJrC4Gnjk9UPe9NQ6TUnmdwJqb5FF2+H5mrcZP5hJ
+         6ET17mhps92pP3B3aA32u+UHjEEpL6CuH4/t8pCxkIZaXpeXjmIx0oYkCNt7ieqUUOx1
+         VfaKDVl8KAvV+J8hz5cO3zh7kB3+NER1kg4XejGgiL18jkmxjK53NyCKCmBQN1CFo9YQ
+         UhoY8vxLzKQLX4vUUDEpoTmItY3ZOAqKPNeRS8Fq6Ay2izntuVpnL2hR8vxv6vUXgyBI
+         xj+znewW8WE2mXtBlAtTDhCWByNNcOqb3E/ivI/5kXHbyfmlxrrTO9LGk9BWBQ/aq8VH
+         dpDA==
+X-Gm-Message-State: AC+VfDxM489FnQZRibwt1iwoDs25hmufYqaqUwJB5/KXkK+UXeMQ6sRQ
+	uRkfEotJoVnP0i4zKiNLoXt7aEL0yZgpAi4k
+X-Google-Smtp-Source: ACHHUZ66aZUoM6biv8pXSVCJi7fQDAP6qeJ1wGLKWfT74dVOsuJvM3vd0L05JhfPmJuzm5c/7g0zOw==
+X-Received: by 2002:a05:6a00:a23:b0:656:c971:951 with SMTP id p35-20020a056a000a2300b00656c9710951mr58984372pfh.8.1687893006485;
+        Tue, 27 Jun 2023 12:10:06 -0700 (PDT)
+Received: from lvondent-mobl4.. (c-71-59-129-171.hsd1.or.comcast.net. [71.59.129.171])
+        by smtp.gmail.com with ESMTPSA id z19-20020aa785d3000000b00679efed4108sm3032851pfn.33.2023.06.27.12.10.05
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 12:10:05 -0700 (PDT)
+From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+To: davem@davemloft.net,
+	kuba@kernel.org
+Cc: linux-bluetooth@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: pull request: bluetooth-next 2023-06-27
+Date: Tue, 27 Jun 2023 12:10:04 -0700
+Message-Id: <20230627191004.2586540-1-luiz.dentz@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230623225513.2732256-12-dhowells@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 23, 2023 at 11:55:08PM +0100, David Howells wrote:
-> Use sendmsg() with MSG_SPLICE_PAGES rather than sendpage.  This allows
-> multiple pages and multipage folios to be passed through.
-> 
-> Signed-off-by: David Howells <dhowells@redhat.com>
-> Reviewed-by: Mike Christie <michael.christie@oracle.com>
-> cc: Lee Duncan <lduncan@suse.com>
-> cc: Chris Leech <cleech@redhat.com>
-> cc: "James E.J. Bottomley" <jejb@linux.ibm.com>
-> cc: "Martin K. Petersen" <martin.petersen@oracle.com>
-> cc: "David S. Miller" <davem@davemloft.net>
-> cc: Eric Dumazet <edumazet@google.com>
-> cc: Jakub Kicinski <kuba@kernel.org>
-> cc: Paolo Abeni <pabeni@redhat.com>
-> cc: Jens Axboe <axboe@kernel.dk>
-> cc: Matthew Wilcox <willy@infradead.org>
-> cc: Al Viro <viro@zeniv.linux.org.uk>
-> cc: open-iscsi@googlegroups.com
-> cc: linux-scsi@vger.kernel.org
-> cc: target-devel@vger.kernel.org
-> cc: netdev@vger.kernel.org
-> ---
-> 
-> Notes:
->     ver #5)
->      - Split iscsi changes into client and target patches
-> 
->  drivers/scsi/iscsi_tcp.c | 26 ++++++++++----------------
->  drivers/scsi/iscsi_tcp.h |  2 --
->  2 files changed, 10 insertions(+), 18 deletions(-)
+The following changes since commit ae230642190a51b85656d6da2df744d534d59544:
 
-This seems good to me.
+  Merge branch 'af_unix-followup-fixes-for-so_passpidfd' (2023-06-27 10:50:25 -0700)
 
-Reviewed-by: Chris Leech <cleech@redhat.com>
- 
-> diff --git a/drivers/scsi/iscsi_tcp.c b/drivers/scsi/iscsi_tcp.c
-> index 9637d4bc2bc9..9ab8555180a3 100644
-> --- a/drivers/scsi/iscsi_tcp.c
-> +++ b/drivers/scsi/iscsi_tcp.c
-> @@ -301,35 +301,32 @@ static int iscsi_sw_tcp_xmit_segment(struct iscsi_tcp_conn *tcp_conn,
->  
->  	while (!iscsi_tcp_segment_done(tcp_conn, segment, 0, r)) {
->  		struct scatterlist *sg;
-> +		struct msghdr msg = {};
-> +		struct bio_vec bv;
->  		unsigned int offset, copy;
-> -		int flags = 0;
->  
->  		r = 0;
->  		offset = segment->copied;
->  		copy = segment->size - offset;
->  
->  		if (segment->total_copied + segment->size < segment->total_size)
-> -			flags |= MSG_MORE | MSG_SENDPAGE_NOTLAST;
-> +			msg.msg_flags |= MSG_MORE;
->  
->  		if (tcp_sw_conn->queue_recv)
-> -			flags |= MSG_DONTWAIT;
-> +			msg.msg_flags |= MSG_DONTWAIT;
->  
-> -		/* Use sendpage if we can; else fall back to sendmsg */
->  		if (!segment->data) {
-> +			if (!tcp_conn->iscsi_conn->datadgst_en)
-> +				msg.msg_flags |= MSG_SPLICE_PAGES;
->  			sg = segment->sg;
->  			offset += segment->sg_offset + sg->offset;
-> -			r = tcp_sw_conn->sendpage(sk, sg_page(sg), offset,
-> -						  copy, flags);
-> +			bvec_set_page(&bv, sg_page(sg), copy, offset);
->  		} else {
-> -			struct msghdr msg = { .msg_flags = flags };
-> -			struct kvec iov = {
-> -				.iov_base = segment->data + offset,
-> -				.iov_len = copy
-> -			};
-> -
-> -			r = kernel_sendmsg(sk, &msg, &iov, 1, copy);
-> +			bvec_set_virt(&bv, segment->data + offset, copy);
->  		}
-> +		iov_iter_bvec(&msg.msg_iter, ITER_SOURCE, &bv, 1, copy);
->  
-> +		r = sock_sendmsg(sk, &msg);
->  		if (r < 0) {
->  			iscsi_tcp_segment_unmap(segment);
->  			return r;
-> @@ -746,7 +743,6 @@ iscsi_sw_tcp_conn_bind(struct iscsi_cls_session *cls_session,
->  	sock_no_linger(sk);
->  
->  	iscsi_sw_tcp_conn_set_callbacks(conn);
-> -	tcp_sw_conn->sendpage = tcp_sw_conn->sock->ops->sendpage;
->  	/*
->  	 * set receive state machine into initial state
->  	 */
-> @@ -777,8 +773,6 @@ static int iscsi_sw_tcp_conn_set_param(struct iscsi_cls_conn *cls_conn,
->  			return -ENOTCONN;
->  		}
->  		iscsi_set_param(cls_conn, param, buf, buflen);
-> -		tcp_sw_conn->sendpage = conn->datadgst_en ?
-> -			sock_no_sendpage : tcp_sw_conn->sock->ops->sendpage;
->  		mutex_unlock(&tcp_sw_conn->sock_lock);
->  		break;
->  	case ISCSI_PARAM_MAX_R2T:
-> diff --git a/drivers/scsi/iscsi_tcp.h b/drivers/scsi/iscsi_tcp.h
-> index 68e14a344904..89a6fc552f0b 100644
-> --- a/drivers/scsi/iscsi_tcp.h
-> +++ b/drivers/scsi/iscsi_tcp.h
-> @@ -47,8 +47,6 @@ struct iscsi_sw_tcp_conn {
->  	/* MIB custom statistics */
->  	uint32_t		sendpage_failures_cnt;
->  	uint32_t		discontiguous_hdr_cnt;
-> -
-> -	ssize_t (*sendpage)(struct socket *, struct page *, int, size_t, int);
->  };
->  
->  struct iscsi_sw_tcp_host {
-> 
+are available in the Git repository at:
 
+  git://git.kernel.org/pub/scm/linux/kernel/git/bluetooth/bluetooth-next.git tags/for-net-next-2023-06-27
+
+for you to fetch changes up to e63d8ed98082395ca509163f386f5b04f53872b3:
+
+  Bluetooth: msft: Extended monitor tracking by address filter (2023-06-27 11:52:58 -0700)
+
+----------------------------------------------------------------
+bluetooth-next pull request for net-next:
+
+ - Add Reialtek devcoredump support
+ - Add support for device 6655:8771
+ - Add extended monitor tracking by address filter
+ - Add support for connecting multiple BISes
+ - Add support to reset via ACPI DSM for Intel controllers
+ - Add support for MT7922 used in Asus Ally
+ - Add support Mediatek MT7925
+ - Fixes for use-after-free in L2CAP
+
+----------------------------------------------------------------
+Claudia Draghicescu (1):
+      Bluetooth: Check for ISO support in controller
+
+Dan Gora (2):
+      Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations
+      Bluetooth: btusb: Add device 6655:8771 to device tables
+
+Hilda Wu (2):
+      Bluetooth: btrtl: Add Realtek devcoredump support
+      Bluetooth: msft: Extended monitor tracking by address filter
+
+Iulia Tanasescu (2):
+      Bluetooth: ISO: Add support for connecting multiple BISes
+      Bluetooth: ISO: Support multiple BIGs
+
+Ivan Orlov (1):
+      Bluetooth: hci_sysfs: make bt_class a static const structure
+
+Jiapeng Chong (1):
+      Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + memcpy
+
+Johan Hovold (3):
+      Bluetooth: fix invalid-bdaddr quirk for non-persistent setup
+      Bluetooth: fix use-bdaddr-property quirk
+      Bluetooth: hci_bcm: do not mark valid bd_addr as invalid
+
+Kiran K (1):
+      Bluetooth: btintel: Add support to reset bluetooth via ACPI DSM
+
+Luiz Augusto von Dentz (6):
+      Bluetooth: Consolidate code around sk_alloc into a helper function
+      Bluetooth: Init sk_peer_* on bt_sock_alloc
+      Bluetooth: hci_sock: Forward credentials to monitor
+      Bluetooth: MGMT: Fix marking SCAN_RSP as not connectable
+      Bluetooth: ISO: Rework sync_interval to be sync_factor
+      Bluetooth: hci_event: Fix parsing of CIS Established Event
+
+Matthew Anderson (1):
+      Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally
+
+Max Chou (1):
+      Bluetooth: btrtl: Correct the length of the HCI command for drop fw
+
+Min-Hua Chen (1):
+      Bluetooth: btqca: use le32_to_cpu for ver.soc_id
+
+Pauli Virtanen (6):
+      Bluetooth: ISO: use hci_sync for setting CIG parameters
+      Bluetooth: ISO: do not emit new LE Create CIS if previous is pending
+      Bluetooth: hci_event: fix Set CIG Parameters error status handling
+      Bluetooth: use RCU for hci_conn_params and iterate safely in hci_sync
+      Bluetooth: hci_event: call disconnect callback before deleting conn
+      Bluetooth: ISO: fix iso_conn related locking and validity issues
+
+Peter Tsao (1):
+      Bluetooth: btusb: Add support Mediatek MT7925
+
+Sai Teja Aluvala (2):
+      Bluetooth: hci_qca: Add qcom devcoredump sysfs support
+      Bluetooth: hci_qca: Add qcom devcoredump support
+
+Sungwoo Kim (1):
+      Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb
+
+Zhengping Jiang (1):
+      Bluetooth: L2CAP: Fix use-after-free
+
+ drivers/bluetooth/btintel.c       | 121 +++++++++++
+ drivers/bluetooth/btintel.h       |   2 +
+ drivers/bluetooth/btmtk.c         |   1 +
+ drivers/bluetooth/btmtk.h         |   5 +
+ drivers/bluetooth/btqca.c         |   2 +-
+ drivers/bluetooth/btrtl.c         | 181 +++++++++++++----
+ drivers/bluetooth/btrtl.h         |  13 ++
+ drivers/bluetooth/btusb.c         | 173 ++++++++++++++--
+ drivers/bluetooth/hci_bcm.c       |   3 +-
+ drivers/bluetooth/hci_qca.c       | 150 +++++++++-----
+ include/net/bluetooth/bluetooth.h |   5 +-
+ include/net/bluetooth/hci.h       |  11 +
+ include/net/bluetooth/hci_core.h  |  45 ++++-
+ include/net/bluetooth/hci_sync.h  |   2 +-
+ include/net/bluetooth/mgmt.h      |   3 +
+ net/bluetooth/af_bluetooth.c      |  45 +++++
+ net/bluetooth/bnep/sock.c         |  10 +-
+ net/bluetooth/hci_conn.c          | 315 +++++++++++++++++------------
+ net/bluetooth/hci_core.c          |  38 +++-
+ net/bluetooth/hci_event.c         | 190 ++++++++++++------
+ net/bluetooth/hci_sock.c          |  77 ++++++-
+ net/bluetooth/hci_sync.c          | 265 +++++++++++++++++-------
+ net/bluetooth/hci_sysfs.c         |  14 +-
+ net/bluetooth/hidp/sock.c         |  10 +-
+ net/bluetooth/iso.c               |  97 +++++----
+ net/bluetooth/l2cap_core.c        |   5 +
+ net/bluetooth/l2cap_sock.c        |  31 +--
+ net/bluetooth/mgmt.c              |  32 +--
+ net/bluetooth/msft.c              | 412 ++++++++++++++++++++++++++++++++++++--
+ net/bluetooth/rfcomm/sock.c       |  13 +-
+ net/bluetooth/sco.c               |  10 +-
+ 31 files changed, 1753 insertions(+), 528 deletions(-)
 
