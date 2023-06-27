@@ -1,220 +1,304 @@
-Return-Path: <netdev+bounces-14343-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14344-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D1CCE740520
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 22:46:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8FF3F7405C8
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 23:44:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E920E1C20B56
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 20:46:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 89BA21C20B7B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 21:44:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C811E46A8;
-	Tue, 27 Jun 2023 20:46:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB3C179C2;
+	Tue, 27 Jun 2023 21:44:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B85D37E6
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 20:46:44 +0000 (UTC)
-Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3E91270C;
-	Tue, 27 Jun 2023 13:46:42 -0700 (PDT)
-Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fb8574a3a1so1833822e87.1;
-        Tue, 27 Jun 2023 13:46:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D3C6E4C87;
+	Tue, 27 Jun 2023 21:44:02 +0000 (UTC)
+Received: from mail-pl1-x62f.google.com (mail-pl1-x62f.google.com [IPv6:2607:f8b0:4864:20::62f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CA8932726;
+	Tue, 27 Jun 2023 14:44:00 -0700 (PDT)
+Received: by mail-pl1-x62f.google.com with SMTP id d9443c01a7336-1b80b3431d2so15215615ad.1;
+        Tue, 27 Jun 2023 14:44:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687898801; x=1690490801;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=Xg4AxPhZP87yhv5fBI4Lu3V6Q+5JB9PVkPOY/RBS8xY=;
-        b=TgFikHdUqIJnj50tFvQd/5p7XVGi/8nDLwTb/aK/3zSRDpMPLr93oqo5vayGq0D5fg
-         pCImK4lgNb4XTy/6SiV6xcHFKwp668xFDounZjw9VWISxiTK85z1ZZiujkGolQUJxzuX
-         w2sd8ZRocIizP7neeVZDZ2WHL6uVUCIa+Go2asBW5OnD2qN/Qk6PRGFgrcouUjZKLGEt
-         jDvrPdIUWt6N92FEguGVevDZPcqvJKnO0BbEEmwa5aM3ayGNqYXN40Z1oohU1HZWoZRL
-         pjDnYpXppmyh4ZeYhQAc5I+AY6ykD7fuHVnBPZppUet5eFO6Xf4ebMo2Bx122PQYevOP
-         OZZA==
+        d=gmail.com; s=20221208; t=1687902240; x=1690494240;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rmXIU939ZABZ8OnPK8Iu727nfHwmycZbby4695oj+No=;
+        b=LankF8ims6Fm119xwRxXZsE7Y1sJM+WODqRTAowem9zF6gBFEUQ2+Xz+wVgF3k1Ssa
+         ulxD86Fx6TDwgnmW7YBEz9Vl2quNbEy7RqXEh/4tS+ZJZRCmm22d/63xaGzTEP7HthLO
+         XMlksUdhAoly/9PB/9u2z3uD6QnXB0YkDSUAJbXmetk//VmKwvVoecXEY3Kc1mirihkI
+         IeejotdxpS4TBo7TAAvJxYf/FKKk+FDHZ/ioyzG4xG3VvPW/EHnl9FkPTkyR/PPpTl58
+         fHH6IF3DlHO1tR60yvQw42f8l1Y06qLwMr9sDnCBGGxfZyU9RI4wPLu1X4paWzqRJYOf
+         Qfvg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687898801; x=1690490801;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=Xg4AxPhZP87yhv5fBI4Lu3V6Q+5JB9PVkPOY/RBS8xY=;
-        b=Hamf1oES/ASzLWnJ6M8kps0ddrPPpG/PooYI02pZqOibhavF5M1lLEju27uj7tLLU5
-         ED4iEj0Mjjkey9kCzIkliXf8O490n6IyIfVVxUDz0jUU0+EuU5PvPosIuUIEDNSIXSye
-         j9hVacJR3EzEvynWsuHXqvP9lrXu5zf+xg27E+u9rULd48pwJWL411aJ79EmLDc06Dv5
-         ANfbmR6B9GZKPWzbfbhjooSra/fohwWfQVRhyRWArgfT9CcQqj1lrTlh7BJxe/sAmZW1
-         OfDC8mVDTe5JweAxEx84aovZFrIwfDieYc9dD7dJlBg0k/OixOsmeh5/UWXu7vqyRC8/
-         AC2g==
-X-Gm-Message-State: AC+VfDyOT+gh0eXO9wRk/qTWk26Z0Gp9PxwgKiGhQHn9Qo4IIjm6qZZI
-	Lf4Bp/r6mnjvCWbDokDaI/0=
-X-Google-Smtp-Source: ACHHUZ7Jta8Fiw0a6MNemirv+o2WHCgY+IOaudKsuyPKCc31koNIFA8H/b/wyOTmLo+/Kh0jdxJgzA==
-X-Received: by 2002:a19:da12:0:b0:4f9:5622:4795 with SMTP id r18-20020a19da12000000b004f956224795mr11514929lfg.42.1687898800559;
-        Tue, 27 Jun 2023 13:46:40 -0700 (PDT)
-Received: from localhost.lan (031011218106.poznan.vectranet.pl. [31.11.218.106])
-        by smtp.gmail.com with ESMTPSA id t5-20020ac243a5000000b004eb44c2ab6bsm1654087lfl.294.2023.06.27.13.46.39
+        d=1e100.net; s=20221208; t=1687902240; x=1690494240;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=rmXIU939ZABZ8OnPK8Iu727nfHwmycZbby4695oj+No=;
+        b=i6i+HGr7TNJW+E3D4C89VIt4XOMedxgTFk2bD07ASC1qY262AVzrkTzFZL2V/ib5ok
+         Oc0GnMIiYiq2NELdCkmPf2nl1odGVfILwxqtrSVD1KEZ/I9slG6GUX7JAauo3i4/xteD
+         qfHlD37B7wq8IYlkNJD3vBh/N7Zr5xw0qERH4DSKlroczqvXh0xHxun1i0IuPbz6LVsz
+         KctpfjxfgvG5D9KHcLHTfgbdfKIxg12tLfWEPEXXxWmFQZv1WqtOqsHb0mcSO+uznBSq
+         mGhwWGR1N1aH4zwGQsakc7jRmNFQoaAj9I3k/jynpWamy269soKcRexvAQi9iPCNdBYx
+         VRiA==
+X-Gm-Message-State: AC+VfDxxqYrm0nwlKf3V7Qq5MnmfF4HUx4LUenku90ybmd90ExmTGaB8
+	+TGQ2actX3ZMdeBjG22qzYE=
+X-Google-Smtp-Source: ACHHUZ4RFlJhg25mbl40WW0xwcUyg/AqNtT6IVR+BrUfVEtzDHc5nHrlv1I16C0u1MiW36/AuH8MQQ==
+X-Received: by 2002:a17:903:2307:b0:1b8:1335:b799 with SMTP id d7-20020a170903230700b001b81335b799mr5016618plh.51.1687902239993;
+        Tue, 27 Jun 2023 14:43:59 -0700 (PDT)
+Received: from localhost ([98.97.117.85])
+        by smtp.gmail.com with ESMTPSA id bg6-20020a1709028e8600b001b3d0aff88fsm6387743plb.109.2023.06.27.14.43.58
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 13:46:40 -0700 (PDT)
-From: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>
-To: Srinivas Kandagatla <srinivas.kandagatla@linaro.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>
-Cc: Miquel Raynal <miquel.raynal@bootlin.com>,
-	Christian Marangi <ansuelsmth@gmail.com>,
-	devicetree@vger.kernel.org,
-	linux-mtd@lists.infradead.org,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
-Subject: [PATCH V4] dt-bindings: nvmem: fixed-cell: add compatible for MAC cells
-Date: Tue, 27 Jun 2023 22:46:30 +0200
-Message-Id: <20230627204630.9476-1-zajec5@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        Tue, 27 Jun 2023 14:43:59 -0700 (PDT)
+Date: Tue, 27 Jun 2023 14:43:57 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Stanislav Fomichev <sdf@google.com>, 
+ Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, 
+ John Fastabend <john.fastabend@gmail.com>, 
+ Donald Hunter <donald.hunter@gmail.com>, 
+ bpf <bpf@vger.kernel.org>, 
+ Alexei Starovoitov <ast@kernel.org>, 
+ Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, 
+ Song Liu <song@kernel.org>, 
+ Yonghong Song <yhs@fb.com>, 
+ KP Singh <kpsingh@kernel.org>, 
+ Hao Luo <haoluo@google.com>, 
+ Jiri Olsa <jolsa@kernel.org>, 
+ Network Development <netdev@vger.kernel.org>
+Message-ID: <649b581ded8c1_75d8a208c@john.notmuch>
+In-Reply-To: <CAKH8qBv-jU6TUcWrze5VeiVhiJ-HUcpHX7rMJzN5o2tXFkS8kA@mail.gmail.com>
+References: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+ <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
+ <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
+ <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
+ <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
+ <m2bkh69fcp.fsf@gmail.com>
+ <649637e91a709_7bea820894@john.notmuch>
+ <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
+ <20230624143834.26c5b5e8@kernel.org>
+ <ZJeUlv/omsyXdO/R@google.com>
+ <ZJoExxIaa97JGPqM@google.com>
+ <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
+ <CAKH8qBv-jU6TUcWrze5VeiVhiJ-HUcpHX7rMJzN5o2tXFkS8kA@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Rafał Miłecki <rafal@milecki.pl>
+Stanislav Fomichev wrote:
+> On Mon, Jun 26, 2023 at 3:37=E2=80=AFPM Alexei Starovoitov
+> <alexei.starovoitov@gmail.com> wrote:
+> >
+> > On Mon, Jun 26, 2023 at 2:36=E2=80=AFPM Stanislav Fomichev <sdf@googl=
+e.com> wrote:
+> > >
+> > > > >
+> > > > > I'd think HW TX csum is actually simpler than dealing with time=
+,
+> > > > > will you change your mind if Stan posts Tx csum within a few da=
+ys? :)
+> >
+> > Absolutely :) Happy to change my mind.
+> >
+> > > > > The set of offloads is barely changing, the lack of clarity
+> > > > > on what is needed seems overstated. IMHO AF_XDP is getting no u=
+se
+> > > > > today, because everything remotely complex was stripped out of
+> > > > > the implementation to get it merged. Aren't we hand waving the
+> > > > > complexity away simply because we don't want to deal with it?
+> > > > >
+> > > > > These are the features today's devices support (rx/tx is a mirr=
+or):
+> > > > >  - L4 csum
+> > > > >  - segmentation
+> > > > >  - time reporting
+> > > > >
+> > > > > Some may also support:
+> > > > >  - forwarding md tagging
+> > > > >  - Tx launch time
+> > > > >  - no fcs
+> > > > > Legacy / irrelevant:
+> > > > >  - VLAN insertion
+> > > >
+> > > > Right, the goal of the series is to lay out the foundation to sup=
+port
+> > > > AF_XDP offloads. I'm starting with tx timestamp because that's mo=
+re
+> > > > pressing. But, as I mentioned in another thread, we do have other=
 
-A lot of home routers have NVMEM fixed cells containing MAC address that
-need some further processing. In ~99% cases MAC needs to be:
-1. Optionally parsed from ASCII format
-2. Increased by a vendor-picked value
+> > > > users that want to adopt AF_XDP, but due to missing tx offloads, =
+they
+> > > > aren't able to.
+> > > >
+> > > > IMHO, with pre-tx/post-tx hooks, it's pretty easy to go from TX
+> > > > timestamp to TX checksum offload, we don't need a lot:
+> > > > - define another generic kfunc bpf_request_tx_csum(from, to)
+> > > > - drivers implement it
+> > > > - af_xdp users call this kfunc from devtx hook
+> > > >
+> > > > We seem to be arguing over start-with-my-specific-narrow-use-case=
+ vs
+> > > > start-with-generic implementation, so maybe time for the office h=
+ours?
+> > > > I can try to present some cohesive plan of how we start with the =
+framework
+> > > > plus tx-timestamp and expand with tx-checksum/etc. There is a lot=
+ of
+> > > > commonality in these offloads, so I'm probably not communicating =
+it
+> > > > properly..
+> > >
+> > > Or, maybe a better suggestion: let me try to implement TX checksum
+> > > kfunc in the v3 (to show how to build on top this series).
+> > > Having code is better than doing slides :-D
+> >
+> > That would certainly help :)
+> > What I got out of your lsfmmbpf talk is that timestamp is your
+> > main and only use case. tx checksum for af_xdp is the other use case,=
 
-There was already an attempt to design a binding for that at NVMEM
-device level in the past. It wasn't accepted though as it didn't really
-fit NVMEM device layer.
+> > but it's not yours, so you sort-of use it as an extra justification
+> > for timestamp. Hence my negative reaction to 'generality'.
+> > I think we'll have better results in designing an api
+> > when we look at these two use cases independently.
+> > And implement them in patches solving specifically timestamp
+> > with normal skb traffic and tx checksum for af_xdp as two independent=
+ apis.
+> > If it looks like we can extract a common framework out of them. Great=
+.
+> > But trying to generalize before truly addressing both cases
+> > is likely to cripple both apis.
+> =
 
-The introduction of NVMEM fixed-cells layout seems to be an opportunity
-to provide a relevant binding in a clean way.
+> I need timestamps for the af_xdp case and I don't really care about skb=
+ :-(
+> I brought skb into the picture mostly to cover John's cases.
+> So maybe let's drop the skb case for now and focus on af_xdp?
+> skb is convenient testing-wise though (with veth), but maybe I can
+> somehow carve-out af_xdp skbs only out of it..
 
-This commit adds a *generic* compatible string: "mac-base". As always it
-needs to be carefully reviewed.
+I'm ok if your drop my use case but I read above and I seem to have a
+slightly different opinion/approach in mind.
 
-OpenWrt project currently supports ~300 home routers that have NVMEM
-cell with binary-stored base MAC.T hose devices are manufactured by
-multiple vendors. There are TP-Link devices (76 of them), Netgear (19),
-D-Link (11), OpenMesh (9), EnGenius (8), GL.iNet (8), ZTE (7),
-Xiaomi (5), Ubiquiti (6) and more. Those devices don't share an
-architecture or SoC.
+What I think would be the most straight-forward thing and most flexible
+is to create a <drvname>_devtx_submit_skb(<drivname>descriptor, sk_buff)
+and <drvname>_devtx_submit_xdp(<drvname>descriptor, xdp_frame) and then
+corresponding calls for <drvname>_devtx_complete_{skb|xdp}() Then you
+don't spend any cycles building the metadata thing or have to even
+worry about read kfuncs. The BPF program has read access to any
+fields they need. And with the skb, xdp pointer we have the context
+that created the descriptor and generate meaningful metrics.
 
-Another 200 devices have base MAC stored in an ASCII format (not all
-those devices have been converted to DT though).
+I'm clearly sacrificing usability in some sense of a general user that
+doesn't know about drivers, hardware and so on for performance,
+flexibility and simplicity of implementation. In general I'm OK with
+this. I have trouble understanding who the dev is that is coding at
+this layer, but can't read kernel driver code or at least has a good
+understanding of the hardware. We are deep in optimization and
+performance world once we get to putting hooks in the driver we should
+expect a certain amount of understanding before we let folks just plant
+hooks here. Its going to be very easy to cause all sort of damage
+even if we go to the other extreme and make a unified interface and
+push the complexity onto kernel devs to maintain. I really believe
+folks writing AF_XDP code (for DPDK or otherwise) have a really good
+handle on networking, hardware, and drivers. I also expect that
+AF_XDP users will mostly be abstracted away from AF_XDP internals
+by DPDK and other libs or applications. My $.02 is these will be
+primarily middle box type application built for special purpose l2/l3/l4
+firewalling, DDOS, etc and telco protocols. Rant off.
 
-It would be impractical to provide unique "compatible" strings for NVMEM
-layouts of all those devices. It seems like a valid case for allowing a
-generic binding instead. Even if this binding will not be sufficient for
-some further devices it seems to be useful enough as it is.
+But I can admit <drvname>_devtx_submit_xdp(<drvname>descriptor, ...)
+is a bit raw. For one its going to require an object file per
+driver/hardware and maybe worse multiple objects per driver/hw to
+deal with hw descriptor changes with features. My $.02 is we could
+solve this with better attach time linking. Now you have to at
+compile time know what you are going to attach to and how to parse
+the descriptor. If we had attach time linking we could dynamically
+link to the hardware specific code at link time. And then its up
+to us here or others who really understand the hardware to write
+a ice_read_ts, mlx_read_tx but that can all just be normal BPF code.
 
-Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
----
-V2: Drop "mac-ascii" as length can be checked instead
-    Fix "allOf" by adding required: [ compatible ]
-V3: Fix cell length in "description" (thank you Rob!)
-V4: Fix cell length (12 → 6) in fixed-layout.yaml example as well
----
- .../bindings/nvmem/layouts/fixed-cell.yaml    | 26 +++++++++++++++++++
- .../bindings/nvmem/layouts/fixed-layout.yaml  | 12 +++++++++
- .../devicetree/bindings/nvmem/nvmem.yaml      |  5 +++-
- 3 files changed, 42 insertions(+), 1 deletion(-)
+Also I hand waved through a step where at attach time we have
+some way to say link the thing that is associated with the
+driver I'm about to attach to. As a first step a loader could
+do this.
 
-diff --git a/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml b/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml
-index e698098450e1..ac2381e66027 100644
---- a/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml
-+++ b/Documentation/devicetree/bindings/nvmem/layouts/fixed-cell.yaml
-@@ -11,6 +11,15 @@ maintainers:
-   - Srinivas Kandagatla <srinivas.kandagatla@linaro.org>
- 
- properties:
-+  compatible:
-+    oneOf:
-+      - const: mac-base
-+        description: >
-+          Cell with base MAC address to be used for calculating extra relative
-+          addresses.
-+          It can be stored in a plain binary format (cell length 6) or as an
-+          ASCII text like "00:11:22:33:44:55" (cell length 17).
-+
-   reg:
-     maxItems: 1
- 
-@@ -25,6 +34,23 @@ properties:
-         description:
-           Size in bit within the address range specified by reg.
- 
-+allOf:
-+  - if:
-+      required: [ compatible ]
-+    then:
-+      if:
-+        properties:
-+          compatible:
-+            contains:
-+              const: mac-base
-+      then:
-+        properties:
-+          "#nvmem-cell-cells":
-+            description: The first argument is a MAC address offset.
-+            const: 1
-+        required:
-+          - "#nvmem-cell-cells"
-+
- required:
-   - reg
- 
-diff --git a/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml b/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-index c271537d0714..9bd34bd5af30 100644
---- a/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-+++ b/Documentation/devicetree/bindings/nvmem/layouts/fixed-layout.yaml
-@@ -44,6 +44,18 @@ examples:
-         #address-cells = <1>;
-         #size-cells = <1>;
- 
-+        mac@100 {
-+            compatible = "mac-base";
-+            reg = <0x100 0x6>;
-+            #nvmem-cell-cells = <1>;
-+        };
-+
-+        mac@110 {
-+            compatible = "mac-base";
-+            reg = <0x110 0x11>;
-+            #nvmem-cell-cells = <1>;
-+        };
-+
-         calibration@4000 {
-             reg = <0x4000 0x100>;
-         };
-diff --git a/Documentation/devicetree/bindings/nvmem/nvmem.yaml b/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-index 980244100690..9f921d940142 100644
---- a/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-+++ b/Documentation/devicetree/bindings/nvmem/nvmem.yaml
-@@ -49,7 +49,10 @@ properties:
- patternProperties:
-   "@[0-9a-f]+(,[0-7])?$":
-     type: object
--    $ref: layouts/fixed-cell.yaml
-+    allOf:
-+      - $ref: layouts/fixed-cell.yaml
-+      - properties:
-+          compatible: false
-     deprecated: true
- 
- additionalProperties: true
--- 
-2.35.3
+Its maybe more core work and less wrangling drivers then and
+it means kfuncs become just blocks of BPF that anyone can
+write. The big win in my mind is I don't need to know now
+what I want tomorrow because I should have access. Also we push
+the complexity and maintenance out of driver/kernel and into
+BPF libs and users. Then we don't have to touch BPF core just
+to add new things.
 
+Last bit that complicates things is I need a way to also write
+allowed values into the descriptor. We don't have anything that
+can do this now. So maybe kfuncs for the write tstamp flags and
+friends?
+
+Anyways, my $.02.
+
+
+
+> =
+
+> Regarding timestamp vs checksum: timestamp is more pressing, but I do
+
+One request would be to also include a driver that doesn't have
+always on timestamps so some writer is needed. CSUM enabling
+I'm interested to see what the signature looks like? On the
+skb side we use the skb a fair amount to build the checksum
+it seems so I guess AF_XDP needs to push down the csum_offset?
+In the SKB case its less interesting I think becuase the
+stack is already handling it.
+
+> have people around that want to use af_xdp but need multibuf + tx
+> offloads, so I was hoping to at least have a path for more tx offloads
+> after we're done with tx timestamp "offload"..
+> =
+
+> > It doesn't have to be only two use cases.
+> > I completely agree with Kuba that:
+> >  - L4 csum
+> >  - segmentation
+> >  - time reporting
+> > are universal HW NIC features and we need to have an api
+> > that exposes these features in programmable way to bpf progs in the k=
+ernel
+> > and through af_xdp to user space.
+> > I mainly suggest addressing them one by one and look
+> > for common code bits and api similarities later.
+> =
+
+> Ack, let me see if I can fit tx csum into the picture. I still feel
+> like we need these dev-bound tracing programs if we want to trigger
+> kfuncs safely, but maybe we can simplify further..
+
+Its not clear to me how you get to a dev specific attach here
+without complicating the hot path more. I think we need to
+really be careful to not make hotpath more complex. Will
+follow along for sure to see what gets created.
+
+Thanks,
+John=
 
