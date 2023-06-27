@@ -1,54 +1,46 @@
-Return-Path: <netdev+bounces-14230-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14231-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70BF473FACA
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:10:16 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E6FA073FAD4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:13:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FA881C209BF
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:10:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 789CE281068
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:13:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 285AB174FF;
-	Tue, 27 Jun 2023 11:10:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 92A1917739;
+	Tue, 27 Jun 2023 11:13:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1C72C10F9
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 11:10:12 +0000 (UTC)
-X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 27 Jun 2023 04:10:09 PDT
-Received: from h1.cmg1.smtp.forpsi.com (h1.cmg1.smtp.forpsi.com [81.2.195.162])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 760B71BE8
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 04:10:08 -0700 (PDT)
-Received: from lenoch ([91.218.190.200])
-	by cmgsmtp with ESMTPSA
-	id E6ZDqDEhkPm6CE6ZEqdxdu; Tue, 27 Jun 2023 13:09:04 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=triops.cz; s=f2019;
-	t=1687864144; bh=QJwm9O4eOCKZW+kXrCWmyiHkoLcbfR6b9a4Ww9MQU3s=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	b=vmO4A4CgOQ2M+G8ikEhbJ9wZ6pIQTZ2fBgwohhTkvRYp6BulQP0i/ImBPQs8aUnHI
-	 7xxVAoJjI5aiFdkn/3CzdHCD5L5Ygw7vkUvi+EfytTBnTF/dY4Ejd028UrE5uaO0Az
-	 8zu4zLwBpL5SdLbAxkvdiISOpp2U3ZVSVNG4Uz21eoYL+hNTJnh4CcDQPEXTNMnNSF
-	 AA3p+ejxSY+M3ef3/1tFXN1db+PfcAu2DKYqQZHBUEyd6HnDfQ8REw0SlvXhfGJNBR
-	 ZYGWtcJjKntbAg/SX9ml3SYlGQFELSwye+9ikyRPVaSf3LbwIHs9WGsu42hAj4Gr2A
-	 48+CP3NokvhVQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=triops.cz; s=f2019;
-	t=1687864144; bh=QJwm9O4eOCKZW+kXrCWmyiHkoLcbfR6b9a4Ww9MQU3s=;
-	h=Date:From:To:Subject:Message-ID:MIME-Version:Content-Type;
-	b=vmO4A4CgOQ2M+G8ikEhbJ9wZ6pIQTZ2fBgwohhTkvRYp6BulQP0i/ImBPQs8aUnHI
-	 7xxVAoJjI5aiFdkn/3CzdHCD5L5Ygw7vkUvi+EfytTBnTF/dY4Ejd028UrE5uaO0Az
-	 8zu4zLwBpL5SdLbAxkvdiISOpp2U3ZVSVNG4Uz21eoYL+hNTJnh4CcDQPEXTNMnNSF
-	 AA3p+ejxSY+M3ef3/1tFXN1db+PfcAu2DKYqQZHBUEyd6HnDfQ8REw0SlvXhfGJNBR
-	 ZYGWtcJjKntbAg/SX9ml3SYlGQFELSwye+9ikyRPVaSf3LbwIHs9WGsu42hAj4Gr2A
-	 48+CP3NokvhVQ==
-Date: Tue, 27 Jun 2023 13:09:03 +0200
-From: Ladislav Michl <oss-lists@triops.cz>
-To: Michal Kubecek <mkubecek@suse.cz>
-Cc: netdev@vger.kernel.org
-Subject: [PATCH ethtool] netlink: fix duplex setting
-Message-ID: <ZJrDT9k52oFTf/vs@lenoch>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 77B7416427;
+	Tue, 27 Jun 2023 11:13:00 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E08181FF3;
+	Tue, 27 Jun 2023 04:12:58 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qE6cq-0003Sm-6H; Tue, 27 Jun 2023 13:12:48 +0200
+Date: Tue, 27 Jun 2023 13:12:48 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: daniel@iogearbox.net, edumazet@google.com, kuba@kernel.org,
+	fw@strlen.de, pabeni@redhat.com, pablo@netfilter.org,
+	andrii@kernel.org, davem@davemloft.net, ast@kernel.org,
+	kadlec@netfilter.org, martin.lau@linux.dev, song@kernel.org,
+	yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+	sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+	bpf@vger.kernel.org, linux-kernel@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	netdev@vger.kernel.org, dsahern@kernel.org
+Subject: Re: [PATCH bpf-next 4/7] netfilter: bpf: Support
+ BPF_F_NETFILTER_IP_DEFRAG in netfilter link
+Message-ID: <20230627111248.GH3207@breakpoint.cc>
+References: <cover.1687819413.git.dxu@dxuuu.xyz>
+ <242c66138bf4ec8aa26b29d736fb48242b4164ce.1687819413.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -57,41 +49,63 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-X-CMAE-Envelope: MS4wfGwq9r/oxR1sZIvSsx9PlfDQdULTKJuH1ulGO2Icv0IYvJS2UfUwUWldHbiyY5XcLv/spX7Xm+uKmSlXAe59dQn+8AW7nchqmLm8b49HgQOzAxARDVU+
- dC7HL3QMukVNZECQB2Wred5hFacbHV/RDqn2V7nzsHxDgrSCCeLnbCmGuYwvfShwzlzly+OQ3DLwoA==
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <242c66138bf4ec8aa26b29d736fb48242b4164ce.1687819413.git.dxu@dxuuu.xyz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Ladislav Michl <ladis@linux-mips.org>
+Daniel Xu <dxu@dxuuu.xyz> wrote:
+> +static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
+> +{
+> +	int err;
+> +
+> +	switch (link->hook_ops.pf) {
+> +#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4)
+> +	case NFPROTO_IPV4:
+> +		const struct nf_defrag_v4_hook *v4_hook;
+> +
+> +		err = request_module("nf_defrag_ipv4");
+> +		if (err)
+> +			return err;
+> +
+> +		rcu_read_lock();
+> +		v4_hook = rcu_dereference(nf_defrag_v4_hook);
+> +		err = v4_hook->enable(link->net);
+> +		rcu_read_unlock();
 
-nl_parse_lookup_u8 handler is used with duplex_values defined as
-lookup_entry_u32. While it still works on little endian machines,
-duplex is always 0 (DUPLEX_HALF) on big endian ones...
+I'd reverse this, first try rcu_dereference(), then modprobe
+if thats returned NULL.
 
-Fixes: 392b12e38747 ("netlink: add netlink handler for sset (-s)")
-Signed-off-by: Ladislav Michl <ladis@linux-mips.org>
----
- netlink/settings.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+> +static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
+> +{
+> +	switch (link->hook_ops.pf) {
+> +#if IS_ENABLED(CONFIG_NF_DEFRAG_IPV4)
+> +	case NFPROTO_IPV4:
+> +		const struct nf_defrag_v4_hook *v4_hook;
+> +
+> +		rcu_read_lock();
+> +		v4_hook = rcu_dereference(nf_defrag_v4_hook);
+> +		v4_hook->disable(link->net);
+> +		rcu_read_unlock();
 
-diff --git a/netlink/settings.c b/netlink/settings.c
-index 4fd75d2..9aad8d9 100644
---- a/netlink/settings.c
-+++ b/netlink/settings.c
-@@ -1089,7 +1089,7 @@ static const struct bitset_parser_data advertise_parser_data = {
- 	.force_hex	= true,
- };
- 
--static const struct lookup_entry_u32 duplex_values[] = {
-+static const struct lookup_entry_u8 duplex_values[] = {
- 	{ .arg = "half",	.val = DUPLEX_HALF },
- 	{ .arg = "full",	.val = DUPLEX_FULL },
- 	{}
--- 
-2.39.2
+if (v4_hook)
+	v4_hook->disable()
 
+Else we get trouble on manual 'rmmod'.
+
+> +	/* make sure conntrack confirm is always last */
+> +	prio = attr->link_create.netfilter.priority;
+> +	if (prio == NF_IP_PRI_FIRST)
+> +		return -ERANGE;  /* sabotage_in and other warts */
+> +	else if (prio == NF_IP_PRI_LAST)
+> +		return -ERANGE;  /* e.g. conntrack confirm */
+> +	else if ((attr->link_create.netfilter.flags & BPF_F_NETFILTER_IP_DEFRAG) &&
+> +		 (prio > NF_IP_PRI_FIRST && prio <= NF_IP_PRI_CONNTRACK_DEFRAG))
+> +		return -ERANGE;  /* cannot use defrag if prog runs before nf_defrag */
+
+You could elide the (prio > NF_IP_PRI_FIRST, its already handled by
+first conditional.  Otherwise this looks good to me.
 
