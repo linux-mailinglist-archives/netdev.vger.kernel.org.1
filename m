@@ -1,144 +1,226 @@
-Return-Path: <netdev+bounces-14301-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14302-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 93E22740057
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:08:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8867A740098
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:14:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4E63D1C20B20
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:08:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 041022810FF
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:14:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 02AEB19BCD;
-	Tue, 27 Jun 2023 16:08:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64ACB19BDF;
+	Tue, 27 Jun 2023 16:14:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EE219BBF
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:08:35 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3223930FF;
-	Tue, 27 Jun 2023 09:08:34 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-98df69cacd1so303552666b.1;
-        Tue, 27 Jun 2023 09:08:34 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687882111; x=1690474111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Tpd3lAFkgPOZAmtsEdYx4agOG1zhm3c7wmN24nFCRP8=;
-        b=q06GNPWOebOMOVK5HxSGaEx7LPlAXSxIc/Aq8MQqa1KOppEIqGqtMhwG4NpjZkOm9S
-         AFyR5QRFV5Y4HWjtBCFBNLrJk5S4Lc7K8YZNHrIZdxMmDQA/+lLQ3p8y9UgKzJsIf86A
-         6mgRi6asDKOmW/iWnEEaxh6aCjW2wpoxwylPIFbl3o9t7f68PKixGMqc9eY+4A0mQYyK
-         /NKPB7mafWWAJMN3H/YcHBf8569Pxbdxn2kFSPB9d/Zx+IZTpfRyXx13QuiKS/N9+aK/
-         qXilL+LWm4uaO9ESacaaI9YCZeZXSWrdMC3YtgW+4T2fSzrERUBgn1BaSIhHBSbx3TEd
-         2oEg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687882111; x=1690474111;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=Tpd3lAFkgPOZAmtsEdYx4agOG1zhm3c7wmN24nFCRP8=;
-        b=Tf7oe1AACsmCnbfhu/0NRKfe6T+07LH+TWtI1Hb1ZRkMsgt+MAFDH5ONX6kWM5fY+f
-         QwurXlBnM9tPohvOiiaXrKdvERvCb8vDjE2y2H5sHN/ng2qcAi98AcIOmGMuIxjGxj89
-         iLKZLFVRR0khDgi22tdH/G3E7kv3f9Zp/nSPHRAhaZKXh7lXNqPlT6Si14noQfTyA5NC
-         Kzm1OwE1WUdHSYqjVv9qCiFp92YIMo1zqcf7mVQa6Y49505FDISnBlq7cYVlsNIgHn3A
-         aoet7zhHTYBF+r3W+Zh7Cb9QhI9BNdAcTi5ifaG5a2CqVROkQdMRU3cs7vheCZJ7usEG
-         6hbQ==
-X-Gm-Message-State: AC+VfDxcAb1/TNIsDbRQ6eLPf/7KGaWqQEce6bu+tutM3BcK0zYiqevB
-	tjnYIR/nYocPLLpLTVOkUIi950noMnh5UfQJt1bJ7DX8Zd9ySQ==
-X-Google-Smtp-Source: ACHHUZ5eFupuDSzxk+XYCDYxcusnVKqMDv7K7KW/OxsPLBOsMdd40uQa4uFTdLNO9TafVR9bMvBKw7UkvrKS5CDSshk=
-X-Received: by 2002:a17:907:803:b0:982:cfe2:32fe with SMTP id
- wv3-20020a170907080300b00982cfe232femr28075108ejb.63.1687882111373; Tue, 27
- Jun 2023 09:08:31 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5946A18008
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:14:15 +0000 (UTC)
+Received: from smtp-bc0f.mail.infomaniak.ch (smtp-bc0f.mail.infomaniak.ch [IPv6:2001:1600:3:17::bc0f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2244C2D77
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:14:09 -0700 (PDT)
+Received: from smtp-3-0000.mail.infomaniak.ch (unknown [10.4.36.107])
+	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Qr8sq04jszMqN1J;
+	Tue, 27 Jun 2023 16:14:07 +0000 (UTC)
+Received: from unknown by smtp-3-0000.mail.infomaniak.ch (Postfix) with ESMTPA id 4Qr8sn63VPz3Y;
+	Tue, 27 Jun 2023 18:14:05 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+	s=20191114; t=1687882446;
+	bh=Yg0KfM1iR2/QRwbQzzpHFvLUdwy1soimluoZk9JrzsM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+	b=zyxurIKP4rMveeqXsq1BdFQ5dtryxGpiG79aSrqs9dG2uh8XIP8ebTDnZBF2YnTxP
+	 3G2FsO4V3uInOtvmm8YRp7xIt5TGizCLmxwUuxKDSh/Y2nyKEFXGCdKYdAhW7C7ee1
+	 hIVvu7grhhnHH8QbU2kK8hn58iRyBMmgBbpWaTfc=
+Message-ID: <167413e7-c69a-3030-cd72-4c198158622e@digikod.net>
+Date: Tue, 27 Jun 2023 18:14:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <3199652.1687873788@warthog.procyon.org.uk> <20230627085928.6569353e@kernel.org>
-In-Reply-To: <20230627085928.6569353e@kernel.org>
-From: Ilya Dryomov <idryomov@gmail.com>
-Date: Tue, 27 Jun 2023 18:08:19 +0200
-Message-ID: <CAOi1vP-ogmcKE3brjEsm+zLvcXJa_5tGjv_XMsrnZuZUhXonhQ@mail.gmail.com>
-Subject: Re: [PATCH net-next v3] libceph: Partially revert changes to support MSG_SPLICE_PAGES
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
-	Xiubo Li <xiubli@redhat.com>, Jeff Layton <jlayton@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>, 
-	Matthew Wilcox <willy@infradead.org>, ceph-devel@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+User-Agent:
+Subject: Re: [PATCH v11 08/12] landlock: Add network rules and TCP hooks
+ support
+Content-Language: en-US
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com,
+ linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+ netfilter-devel@vger.kernel.org, yusongping@huawei.com,
+ artem.kuzin@huawei.com
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-9-konstantin.meskhidze@huawei.com>
+From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+In-Reply-To: <20230515161339.631577-9-konstantin.meskhidze@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Infomaniak-Routing: alpha
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 5:59=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 27 Jun 2023 14:49:48 +0100 David Howells wrote:
-> > Fix the mishandling of MSG_DONTWAIT and also reinstates the per-page
-> > checking of the source pages (which might have come from a DIO write by
-> > userspace) by partially reverting the changes to support MSG_SPLICE_PAG=
-ES
-> > and doing things a little differently.  In messenger_v1:
-> >
-> >  (1) The ceph_tcp_sendpage() is resurrected and the callers reverted to=
- use
-> >      that.
-> >
-> >  (2) The callers now pass MSG_MORE unconditionally.  Previously, they w=
-ere
-> >      passing in MSG_MORE|MSG_SENDPAGE_NOTLAST and then degrading that t=
-o
-> >      just MSG_MORE on the last call to ->sendpage().
-> >
-> >  (3) Make ceph_tcp_sendpage() a wrapper around sendmsg() rather than
-> >      sendpage(), setting MSG_SPLICE_PAGES if sendpage_ok() returns true=
- on
-> >      the page.
-> >
-> > In messenger_v2:
-> >
-> >  (4) Bring back do_try_sendpage() and make the callers use that.
-> >
-> >  (5) Make do_try_sendpage() use sendmsg() for both cases and set
-> >      MSG_SPLICE_PAGES if sendpage_ok() is set.
-> >
-> > Fixes: 40a8c17aa770 ("ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than s=
-endpage")
-> > Fixes: fa094ccae1e7 ("ceph: Use sendmsg(MSG_SPLICE_PAGES) rather than s=
-endpage()")
-> > Reported-by: Ilya Dryomov <idryomov@gmail.com>
->
-> Ilya, would you be okay if we sent the 6.5 PR without this and then
-> we can either follow up with a PR in a few days or you can take this
-> via your tree?
->
-> Or you could review it now, that'd also work :)
->
-> In hindsight we should have pushed harder to make the FS changes as
-> small as possible for sendpage removal, so that they can go in via
-> the appropriate tree with an appropriate level of scrutiny for 6.6,
-> lesson learned :(
 
-Hi Jakub,
+On 15/05/2023 18:13, Konstantin Meskhidze wrote:
+> This commit adds network rules support in the ruleset management
+> helpers and the landlock_create_ruleset syscall.
+> Refactor user space API to support network actions. Add new network
+> access flags, network rule and network attributes. Increment Landlock
+> ABI version. Expand access_masks_t to u32 to be sure network access
+> rights can be stored. Implement socket_bind() and socket_connect()
+> LSM hooks, which enables to restrict TCP socket binding and connection
+> to specific ports.
+> 
+> Co-developed-by: Mickaël Salaün <mic@digikod.net>
+> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+> ---
+> 
+> Changes since v10:
+> * Removes "packed" attribute.
+> * Applies Mickaёl's patch with some refactoring.
+> * Deletes get_port() and check_addrlen() helpers.
+> * Refactors check_socket_access() by squashing get_port() and
+> check_addrlen() helpers into it.
+> * Fixes commit message.
+> 
+> Changes since v9:
+> * Changes UAPI port field to __u64.
+> * Moves shared code into check_socket_access().
+> * Adds get_raw_handled_net_accesses() and
+> get_current_net_domain() helpers.
+> * Minor fixes.
+> 
+> Changes since v8:
+> * Squashes commits.
+> * Refactors commit message.
+> * Changes UAPI port field to __be16.
+> * Changes logic of bind/connect hooks with AF_UNSPEC families.
+> * Adds address length checking.
+> * Minor fixes.
+> 
+> Changes since v7:
+> * Squashes commits.
+> * Increments ABI version to 4.
+> * Refactors commit message.
+> * Minor fixes.
+> 
+> Changes since v6:
+> * Renames landlock_set_net_access_mask() to landlock_add_net_access_mask()
+>    because it OR values.
+> * Makes landlock_add_net_access_mask() more resilient incorrect values.
+> * Refactors landlock_get_net_access_mask().
+> * Renames LANDLOCK_MASK_SHIFT_NET to LANDLOCK_SHIFT_ACCESS_NET and use
+>    LANDLOCK_NUM_ACCESS_FS as value.
+> * Updates access_masks_t to u32 to support network access actions.
+> * Refactors landlock internal functions to support network actions with
+>    landlock_key/key_type/id types.
+> 
+> Changes since v5:
+> * Gets rid of partial revert from landlock_add_rule
+> syscall.
+> * Formats code with clang-format-14.
+> 
+> Changes since v4:
+> * Refactors landlock_create_ruleset() - splits ruleset and
+> masks checks.
+> * Refactors landlock_create_ruleset() and landlock mask
+> setters/getters to support two rule types.
+> * Refactors landlock_add_rule syscall add_rule_path_beneath
+> function by factoring out get_ruleset_from_fd() and
+> landlock_put_ruleset().
+> 
+> Changes since v3:
+> * Splits commit.
+> * Adds network rule support for internal landlock functions.
+> * Adds set_mask and get_mask for network.
+> * Adds rb_root root_net_port.
+> 
+> ---
+>   include/uapi/linux/landlock.h                |  48 +++++
+>   security/landlock/Kconfig                    |   1 +
+>   security/landlock/Makefile                   |   2 +
+>   security/landlock/limits.h                   |   6 +-
+>   security/landlock/net.c                      | 174 +++++++++++++++++++
+>   security/landlock/net.h                      |  26 +++
+>   security/landlock/ruleset.c                  |  52 +++++-
+>   security/landlock/ruleset.h                  |  63 +++++--
+>   security/landlock/setup.c                    |   2 +
+>   security/landlock/syscalls.c                 |  72 +++++++-
+>   tools/testing/selftests/landlock/base_test.c |   2 +-
+>   11 files changed, 425 insertions(+), 23 deletions(-)
+>   create mode 100644 security/landlock/net.c
+>   create mode 100644 security/landlock/net.h
+> 
+> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+> index 81d09ef9aa50..93794759dad4 100644
+> --- a/include/uapi/linux/landlock.h
+> +++ b/include/uapi/linux/landlock.h
+> @@ -31,6 +31,13 @@ struct landlock_ruleset_attr {
+>   	 * this access right.
+>   	 */
+>   	__u64 handled_access_fs;
+> +
+> +	/**
+> +	 * @handled_access_net: Bitmask of actions (cf. `Network flags`_)
+> +	 * that is handled by this ruleset and should then be forbidden if no
+> +	 * rule explicitly allow them.
+> +	 */
+> +	__u64 handled_access_net;
+>   };
+> 
+>   /*
+> @@ -54,6 +61,11 @@ enum landlock_rule_type {
+>   	 * landlock_path_beneath_attr .
+>   	 */
+>   	LANDLOCK_RULE_PATH_BENEATH = 1,
+> +	/**
+> +	 * @LANDLOCK_RULE_NET_SERVICE: Type of a &struct
+> +	 * landlock_net_service_attr .
+> +	 */
+> +	LANDLOCK_RULE_NET_SERVICE = 2,
+>   };
+> 
+>   /**
+> @@ -79,6 +91,23 @@ struct landlock_path_beneath_attr {
+>   	 */
+>   } __attribute__((packed));
+> 
+> +/**
+> + * struct landlock_net_service_attr - TCP subnet definition
+> + *
+> + * Argument of sys_landlock_add_rule().
+> + */
+> +struct landlock_net_service_attr {
+> +	/**
+> +	 * @allowed_access: Bitmask of allowed access network for services
+> +	 * (cf. `Network flags`_).
+> +	 */
+> +	__u64 allowed_access;
+> +	/**
+> +	 * @port: Network port.
+> +	 */
+> +	__u64 port;
+> +};
 
-This patch looks good to me.  I have been meaning to actually test
-it, but, if time is of the essence, I'm OK with it being merged via
-the networking tree now.
+The "net service" name reflects the semantic but it doesn't fit well 
+with the data type. It works with TCP, UDP and other protocols such as 
+VSOCK, but not unix sockets. I think it makes more sense to rename 
+LANDLOCK_RULE_NET_SERVICE to LANDLOCK_RULE_NET_PORT and 
+landlock_net_service_attr to landlock_net_port_attr. Please be careful 
+with the documentation, non-kernel code, and comments as well.
 
-Reviewed-by: Ilya Dryomov <idryomov@gmail.com>
+In the future, we could add a landlock_net_path_attr to identify a unix 
+abstract path, which would also be a network service, but it would not 
+accept the TCP access rights.
 
-Thanks,
+The access right names (LANDLOCK_ACCESS_NET_{BIND,CONNECT}_TCP) are 
+still good.
 
-                Ilya
+
+I'm still improving tests, so you might wait a bit before renaming the 
+related files.
 
