@@ -1,169 +1,182 @@
-Return-Path: <netdev+bounces-14208-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14209-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DBB1573F878
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:13:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6071173F88E
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:19:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93D77281021
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:13:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6D3E11C203B4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:19:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4BD168B1;
-	Tue, 27 Jun 2023 09:13:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E688F168BC;
+	Tue, 27 Jun 2023 09:19:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3EE168A2
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:13:24 +0000 (UTC)
-Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D8BFD;
-	Tue, 27 Jun 2023 02:13:23 -0700 (PDT)
-Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35R96B9i008761;
-	Tue, 27 Jun 2023 09:13:04 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=eRYl3tInGhDOkzzXnyLKjP4RygjUjtbP4SrRO0c+vWQ=;
- b=qDMffMBt8L6VJlwG8tURp2ZwilOX9K/rqLsrvTLNcHcNumo5bXR85n2fT0V+E8EjUk5Y
- MlWgFliseuH0ILUWdMKcO74nbfFS/WBE7JHU1CjKECJJGNRi3wHYo6DeppuQ3OdJdQrn
- Vbi1W3l1URgOENUohIs1eHwzBsJ1jkOe8pkB2S/b45Od2XToIs9s3TTdIAJ5lmd7Dpv/
- Kr47XyYy/CdcVx1PLxDAOnJIcagSMolnzSck45iCfK6vIL0+ZJ4rMkjXu9OHE0C6CyVN
- /LX4QweXpJ/o2Jw3gyZosKjZq3kQrz/FcGOCH/SxTFGXM6U/+vnhzy9/MS8svLtRjepB 3Q== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfvq8rabp-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jun 2023 09:13:03 +0000
-Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35R96GKB009302;
-	Tue, 27 Jun 2023 09:13:03 GMT
-Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfvq8raar-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jun 2023 09:13:03 +0000
-Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
-	by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35R3BSQ5025785;
-	Tue, 27 Jun 2023 09:13:00 GMT
-Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
-	by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3rdqre1bqm-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Tue, 27 Jun 2023 09:13:00 +0000
-Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
-	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35R9CwrH65798408
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Tue, 27 Jun 2023 09:12:58 GMT
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 2A85F2004B;
-	Tue, 27 Jun 2023 09:12:58 +0000 (GMT)
-Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id D7F0C20040;
-	Tue, 27 Jun 2023 09:12:57 +0000 (GMT)
-Received: from [9.152.212.248] (unknown [9.152.212.248])
-	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Tue, 27 Jun 2023 09:12:57 +0000 (GMT)
-Message-ID: <43a1f34a6b1c5a14519f3967dff5eb42e82ee88d.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 00/44] treewide: Remove I/O port accessors for
- HAS_IOPORT=n
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Arnd Bergmann <arnd@arndb.de>, Richard Cochran
- <richardcochran@gmail.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas
- <bhelgaas@google.com>,
-        Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
- <u.kleine-koenig@pengutronix.de>,
-        Mauro Carvalho Chehab
- <mchehab@kernel.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Rafael J .
- Wysocki" <rafael@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt
- <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, linux-kernel@vger.kernel.org,
-        Linux-Arch <linux-arch@vger.kernel.org>, linux-pci@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>
-Date: Tue, 27 Jun 2023 11:12:57 +0200
-In-Reply-To: <7b5c40f3-d25b-4082-807d-4d75dc38886d@app.fastmail.com>
-References: <20230522105049.1467313-1-schnelle@linux.ibm.com>
-	 <7b5c40f3-d25b-4082-807d-4d75dc38886d@app.fastmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCCD810F9
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:19:14 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2723DBF
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:19:13 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687857551;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=eBL/ONwUzr+ymBLvWZ1Y11d3T68bnTpzSD3KdNONaLc=;
+	b=YustFy5ZKCuC+rbV1cigkgLqAZ/VDbgZJE+UBrusKU2jv23JUNKKYkI4jlCQ3R6cvCiSgX
+	NfkQc0ix+Wir63OsndNj3dCeAFP6SaTP+M53VkVWE/+zOqeFKdnoE6vyE72m7wzNzdL8w2
+	DQOUjqcS6fl1tAFJy5WAFUBHIsNoCms=
+Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
+ [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-302-YOizNUtmOD6RsX1vk3LgNw-1; Tue, 27 Jun 2023 05:19:09 -0400
+X-MC-Unique: YOizNUtmOD6RsX1vk3LgNw-1
+Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635e2618aaeso3036966d6.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:19:09 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687857549; x=1690449549;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=eBL/ONwUzr+ymBLvWZ1Y11d3T68bnTpzSD3KdNONaLc=;
+        b=M+YMMNfJ/CcmaBaf/URao3Q+6ZHvWmxxSaMv+54CNRMOw3wX+r4F+dauXFsBFYecdi
+         lI9T+xcU2qW8Qu3Pdimgcb2KoDD0bjiSNAeQ6RsGORvIPiDDoLcOL5JRyGXnMJ3Ape+Z
+         JU0hR5cwe7ngPadrVMyJ+CPP50JRUjwA92rKauCVvxp+ea2FBaH5YXZHFoOkXwLUKncW
+         x+T7VqERtTpLznqjmtnG97eiJYHXeMOFGNzaHlZeEsDnwyQY0fLH8/rWYq7VqgJZycjW
+         Hr8pNR7rwRwXgqm1bBR4zy8PxYSR0TRa4gUC243g+u+VcP77SpUb5yyoCoWHCVWF3Vvc
+         pLmw==
+X-Gm-Message-State: AC+VfDycNixKUhSf/XUVU8nCxz0+aekhTwdMHXep4oJLUMkwjIlx1LFx
+	zJx7QI/OCySWOpmBioUtNBMrjJs0+3SHD0fYHzwyzXsAGtUeVweWVh+8SruCC2IgbJCkT5N3dU/
+	QLBy1l/zdx7wSCZkv
+X-Received: by 2002:a05:6214:5298:b0:62f:1283:6185 with SMTP id kj24-20020a056214529800b0062f12836185mr37647407qvb.2.1687857548926;
+        Tue, 27 Jun 2023 02:19:08 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7Mpr5BxSTiv/lGQNPYL079y7c7KMZMILIPd+bPX/Eb9M0+r627zUdyOvLZwRglkf/GIl0WJQ==
+X-Received: by 2002:a05:6214:5298:b0:62f:1283:6185 with SMTP id kj24-20020a056214529800b0062f12836185mr37647399qvb.2.1687857548666;
+        Tue, 27 Jun 2023 02:19:08 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-239-6.dyn.eolo.it. [146.241.239.6])
+        by smtp.gmail.com with ESMTPSA id q15-20020ae9e40f000000b0075ed10554a5sm3758590qkc.11.2023.06.27.02.19.07
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 02:19:08 -0700 (PDT)
+Message-ID: <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+From: Paolo Abeni <pabeni@redhat.com>
+To: Ian Kumlien <ian.kumlien@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, intel-wired-lan
+ <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>,  "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Date: Tue, 27 Jun 2023 11:19:05 +0200
+In-Reply-To: <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
+References: 
+	<CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+	 <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+	 <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com>
+	 <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+	 <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
+	 <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+	 <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+	 <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
+	 <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+	 <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+	 <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
 Content-Type: text/plain; charset="UTF-8"
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: fZujSueKmVHDxjYCpP51RL3hPXVzRXrP
-X-Proofpoint-ORIG-GUID: XqQNy_k3bnezF-iSHCzgIlhzyUZTuwmi
 Content-Transfer-Encoding: quoted-printable
-X-Proofpoint-UnRewURL: 0 URL was un-rewritten
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-27_05,2023-06-26_03,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
- malwarescore=0 impostorscore=0 mlxscore=0 bulkscore=0 adultscore=0
- clxscore=1011 priorityscore=1501 lowpriorityscore=0 suspectscore=0
- mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306270086
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-05-22 at 13:29 +0200, Arnd Bergmann wrote:
-> On Mon, May 22, 2023, at 12:50, Niklas Schnelle wrote:
->=20
-> > A few patches have already been applied but I've kept those which are n=
-ot yet
-> > in v6.4-rc3.
+On Mon, 2023-06-26 at 20:59 +0200, Ian Kumlien wrote:
+> On Mon, Jun 26, 2023 at 8:20=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.co=
+m> wrote:
 > >=20
-> > This version is based on v6.4-rc3 and is also available on my kernel.or=
-g tree
-> > in the has_ioport_v5:
-> >=20
-> > https://git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git
+> > Nevermind, I think I found it, I will loop this thing until I have a
+> > proper trace....
 >=20
-> I think it would be best if as many patches as possible get merged
-> into v6.5 through the individidual subsystems, though I can take
-> whatever is left through the asm-generic tree.
->=20
-> Since the goal is to have maintainers pick up part of this, I would
-> recommend splitting the series per subsystem, having either a
-> separate patch or a small series for each maintainer that should
-> pick them up.
->=20
-> More importantly, I think you should rebase the series against
-> linux-next in order to find and drop the patches that are queued
-> up for 6.5 already. The patches will be applied into branches
-> that are based on 6.4-rc of course, but basing on linux-next
-> is usually the easiest when targeting multiple maintainer
-> trees.
->=20
-> Maybe let's give it another week to have more maintainers pick
-> up stuff from v5, and then send out a v6 as separate submissions.
->=20
->     Arnd
+> Still some question marks, but much better
 
-Hi Arnd and All,
+Thanks!
+>=20
+> cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
+> [   62.624003] BUG: kernel NULL pointer dereference, address: 00000000000=
+000c0
+> [   62.631083] #PF: supervisor read access in kernel mode
+> [   62.636312] #PF: error_code(0x0000) - not-present page
+> [   62.641541] PGD 0 P4D 0
+> [   62.644174] Oops: 0000 [#1] PREEMPT SMP NOPTI
+> [   62.648629] CPU: 1 PID: 913 Comm: napi/eno2-79 Not tainted 6.4.0 #364
+> [   62.655162] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
+> BIOS 1.7a 10/13/2022
+> [   62.663344] RIP: 0010:__udp_gso_segment
+> (./include/linux/skbuff.h:2858 ./include/linux/udp.h:23
+> net/ipv4/udp_offload.c:228 net/ipv4/udp_offload.c:261
+> net/ipv4/udp_offload.c:277)
 
-I'm sorry there hasn't been an updated in a long time and we're missing
-v6.5. I've been quite busy with other work and life. Speaking of, I
-will be mostly out for around a month starting some time mid to end
-July as, if all goes well, I'm expecting to become a dad. That said, I
-haven't forgotten about this and your overall plan of sending per-
-subsystem patches sounds good, just haven't had the time to also
-incorporate the feedback.
+So it's faulting here:
 
-Thanks,
-Niklas
+static struct sk_buff *__udpv4_gso_segment_list_csum(struct sk_buff *segs)
+{
+        struct sk_buff *seg;
+        struct udphdr *uh, *uh2;
+        struct iphdr *iph, *iph2;
+
+        seg =3D segs;
+        uh =3D udp_hdr(seg);
+        iph =3D ip_hdr(seg);
+
+        if ((udp_hdr(seg)->dest =3D=3D udp_hdr(seg->next)->dest) &&
+        // ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+The GSO segment has been assembled by skb_gro_receive_list()
+I guess seg->next is NULL, which is somewhat unexpected as
+napi_gro_complete() clears the gso_size when sending up the stack a
+single frame.
+
+On the flip side, AFAICS, nothing prevents the stack from changing the
+aggregated packet layout (e.g. pulling data and/or linearizing the
+skb).
+
+In any case this looks more related to rx-gro-list then rx-udp-gro-
+forwarding. I understand you have both feature enabled in your env?
+
+Side questions: do you have any non trivial nf/br filter rule?
+
+The following could possibly validate the above and avoid the issue,
+but it's a bit papering over it. Could you please try it in your env?
+
+Thanks!
+
+Paolo
+---
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6c5915efbc17..75531686bfdf 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4319,6 +4319,9 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+=20
+ 	skb->prev =3D tail;
+=20
++	if (WARN_ON_ONCE(!skb->next))
++		goto err_linearize;
++
+ 	if (skb_needs_linearize(skb, features) &&
+ 	    __skb_linearize(skb))
+ 		goto err_linearize;
+
 
