@@ -1,254 +1,166 @@
-Return-Path: <netdev+bounces-14287-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14288-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57CF273FF17
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:57:34 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 911F973FF42
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:06:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8887A1C2040F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:57:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C1FAA1C20A3A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9AF2419515;
-	Tue, 27 Jun 2023 14:57:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A78AE1952D;
+	Tue, 27 Jun 2023 15:06:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F56518000
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:57:24 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BB83AA4
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 07:57:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687877827;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=MjhqKJ6qHLUSB8vtY/otx3G8KHzKt0XENzTe4gO6p4g=;
-	b=FdaQkJaEhfgz/koij3W/KKb3bQPGirP+StutMHTrnHstkhEGcHeKDXdd0LrfJyt+AuSict
-	OiTnIUBMVZoTWVf170iPqfN+DOz0zMSM8GHP836EjtCY2B+Y2DHWDRxcQQ40vOAaDZTBM7
-	tyERC1OsYuONIyVMzNnV1Iu8PyKm1MI=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-318-6PfRRowrPZeV3qT-cxAavA-1; Tue, 27 Jun 2023 10:57:04 -0400
-X-MC-Unique: 6PfRRowrPZeV3qT-cxAavA-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635325b87c9so37635046d6.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 07:57:02 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687877822; x=1690469822;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=MjhqKJ6qHLUSB8vtY/otx3G8KHzKt0XENzTe4gO6p4g=;
-        b=CLnS0OgC1SpzsOTuQInACeiPQWcN2uxKYozKehRFrLcLOAE0wktETK7tpYs306ynd7
-         Q1uMdr9MsNkBH8J3zlr2lpqgsinLOLkkk764suy5/aGD862Pv+aJn9fAO90YP7iZe6/t
-         wOG9RjxzCN6i+HBYxy1x2iokMjJ2c+tLE47KEh662mGgiHRwokp2NuCVFajQpkz8I0av
-         P6HrqcGQ7fuG+L1rrwiqzm/2OU2c52jqfFfS0L8vFlvi9xHYkpppyNWJwynhUrPb/i3/
-         ER0qzOA16uDGK/L2QdfsMJHVbEfqaYMsHcLYLVyZ6IgdfzbNrSXVWr0xz7f2ejj9SSfB
-         JhZQ==
-X-Gm-Message-State: AC+VfDy6y9M9UMV4W4in1KeOmA5bF5QuEIbFMYmBdiIlatI4tTogVBlj
-	Ia6ErXUizsIiHpL8c8qNDj3/B6ABS+KZ5nUEn7LmRgDErVcFvNxXoOQO1gEguIN8BW4Nfon9zzP
-	KPrHHRqJmAMjYTXZ1
-X-Received: by 2002:a05:6214:2aae:b0:632:32ce:7947 with SMTP id js14-20020a0562142aae00b0063232ce7947mr14376524qvb.28.1687877822155;
-        Tue, 27 Jun 2023 07:57:02 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5FD4BbrfWJUBHlxMixbL2nRBP622c0YmQmLo/tSNy5xIH+gMS3yY4rfgKonMVPNm3KAa5EFw==
-X-Received: by 2002:a05:6214:2aae:b0:632:32ce:7947 with SMTP id js14-20020a0562142aae00b0063232ce7947mr14376506qvb.28.1687877821863;
-        Tue, 27 Jun 2023 07:57:01 -0700 (PDT)
-Received: from redhat.com ([45.144.113.5])
-        by smtp.gmail.com with ESMTPSA id fc4-20020ad44f24000000b00635ef0579c2sm1022904qvb.39.2023.06.27.07.56.57
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 07:57:01 -0700 (PDT)
-Date: Tue, 27 Jun 2023 10:56:54 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Cc: Jason Wang <jasowang@redhat.com>,
-	virtualization@lists.linux-foundation.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 97C4C17FE5
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:06:37 +0000 (UTC)
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (mail-bn8nam04on2102.outbound.protection.outlook.com [40.107.100.102])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24D8F12C;
+	Tue, 27 Jun 2023 08:06:36 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=EkW/yhAjsGwWGGJYQrxXpE7IaK++ByLbO5y7cJ/jmtMsnEcTYBb6jNPz7pYidTJccuvtIAzZBr4uomD6qaM57CL1Vp74hlYA2/qgvB6M0uDDwXLp7OLvPt9DZUI7dooIXqGcq6CloCF7EMxs26hozHO4NIG/pDHhQ+g5SSGFKtF+nspfKXimhnQZjvmvCEzSFy+UFYVslrDjpN+1xzAhpfMwRvO7UpLiByRBmKhOKafLpX88SEAfZalyX4BK0AdO1NuK4S92Y82535I8hCtnwakINDuJxAv5VN3ndrGOGuSg5VNRwkIoCeML2jSIVpRRJxkQWXC0LeMvzKSWukCKJQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8hvnWKFaV4WXsDizwxK067McVvJGp6/oX8XgKSlsVhQ=;
+ b=jwB81YfvxTv674xdcjHJvhjSoNvMSHZ9FpPl13iQlvuEj8oKMamnQVfQSqsJgJRsbHdfmAW+eVB0D+RBcSeioqnWjZYeOduniOX6fgWIbuyIkZbwNepFM7BTurLXX1uM7/akLceF6VvcGQevoYlpVGanUiJoVNNyt00OtfbbaokwgM2UdaJWNQaDoyp3ZLiLez6SzZ4s9/WCD1BfDFEsObsFsMi+7Ef0U83pY+8KsNXd9jbnQ2cjIrSbjU4KFe79ibXhMVooCiWk+VWOkCL3AMeIzCieq7pIB4XNCdoaF3A9e6+pPpJVGmHINH93cnhOxgnzNlZri1UtTDiQvBDRxg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8hvnWKFaV4WXsDizwxK067McVvJGp6/oX8XgKSlsVhQ=;
+ b=Pr7yRGs5MkqtsoB6yY8uk/2I2i6nF7MVYYTQiiBwDwdydaXbs/w8fmgn6+SLZjS7xLr+adtSpLENVfTpRUaiT4f72V8uGjtgXaDVBO5Fg1YYQ9Fb98kc7uhBZuvvPJmops9Ltui1W9ehItNWH8SC1gkirSWTFJLmMi9ZX+QjLwE=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by LV3PR13MB6500.namprd13.prod.outlook.com (2603:10b6:408:19a::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Tue, 27 Jun
+ 2023 15:06:31 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Tue, 27 Jun 2023
+ 15:06:31 +0000
+Date: Tue, 27 Jun 2023 17:06:24 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Jesper Dangaard Brouer <hawk@kernel.org>,
-	John Fastabend <john.fastabend@gmail.com>, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH vhost v10 02/10] virtio_ring: introduce
- virtqueue_set_premapped()
-Message-ID: <20230627105503-mutt-send-email-mst@kernel.org>
-References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com>
- <20230602092206.50108-3-xuanzhuo@linux.alibaba.com>
- <CACGkMEt3xRvn5na+f4vHjFQoJJcPTvvE3Yd_bGxrDFo9owkqCA@mail.gmail.com>
- <1687855801.1280077-4-xuanzhuo@linux.alibaba.com>
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 1/2] net: dsa: sja1105: always enable the
+ INCL_SRCPT option
+Message-ID: <ZJr68GHgNhlzbObk@corigine.com>
+References: <20230627094207.3385231-1-vladimir.oltean@nxp.com>
+ <20230627094207.3385231-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230627094207.3385231-2-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: AM0PR01CA0090.eurprd01.prod.exchangelabs.com
+ (2603:10a6:208:10e::31) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <1687855801.1280077-4-xuanzhuo@linux.alibaba.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|LV3PR13MB6500:EE_
+X-MS-Office365-Filtering-Correlation-Id: 6c82b374-8392-4262-3910-08db77201713
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1q/lcXklaegGCI8bP0pH5GA/KM8cJY/OxLijXWcJE9FYsZ6yVbkw+iWeNmGK98Vj8EyDBYo8zgdclIzk8g1vfhdTPCCMwq5HpZ69TnGAhAX9tPC2SJBiQ2mDZS7lG7Ii+yGQqgiJ1uadT3CI02sOLnH0zQ9aRkXTYIHZUIZiCFZq/G3+z7fHDCEkxWjE9uP1iAz3d9HWkOBju1XB3fdQYo/vpUEyge0UsnBz0y+h2O2uopxxm8jOMcGUSu5o5iUC1A2tkMi08+f15TRaHoNWbvELJcheaBhMsSQ/FoSu7juBdLJpQgoFSv827Ge8nGZjkmZlrecPba+uS9Al56QuUsphX0xenUDQ5yoiH8p6GG260k8OHKG7+YDkhKw0SvPBOfaNWrfgVFnKVXGTNXlUiTkk5eBrLhnzp9SXLuB0qovXQeWpygEFSIXcfvqS8/8xbdTxFbhCRgISalPTZoadpygX8Z0/HPh6q4WsFGUX32DCjWQAgioZ87PH6KMNrQCYz8TEgJIN9OLk7ZMEZNR1IXL4Cu9VQbWb+T34nt7a8lM0MV54e0BfhF2PbSs07kPBI+Hi5JhAa5G1PmKgifW0d1a8wlNN+AKDQZe+pV8642A=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(346002)(366004)(136003)(376002)(396003)(451199021)(38100700002)(86362001)(6506007)(5660300002)(6512007)(66476007)(66556008)(66946007)(44832011)(2616005)(186003)(6916009)(478600001)(2906002)(8676002)(54906003)(4326008)(316002)(6666004)(8936002)(6486002)(41300700001)(83380400001)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?Wa9Gz5VpJ8oDc4fk5nWNBiVPNwXCuzB6M6EOCKiP8RcSKVGXJ9UtEg34NUrG?=
+ =?us-ascii?Q?DHob3x1q7qYgs5MfxDZ+TX7dyKvknupfGVBbZshKKRjNpLHInEeEGOwYg1ug?=
+ =?us-ascii?Q?ew9/Zcnt4SXKxD/QQ/lQ+rUNzndLNrRZCJeo1AVJDN5NgU2NRTvDcNW05dcQ?=
+ =?us-ascii?Q?GuJrA6aMWjJNOekUCi8oOkVti/WcftEOTd3PMAjQOGBxAKvVEuCiCt8499lL?=
+ =?us-ascii?Q?cfX1WwQQ6TfpgFUj8gs/zg0Y4iIMQXtkcV8og+S0me49+vza1J+RIXdQha+r?=
+ =?us-ascii?Q?t07ipEyHM8AOIgrfhezamSiDVaBNPI4JZynQCZDFdakDLdR+/TdBBrmxh2Ny?=
+ =?us-ascii?Q?SLZe9c2yuZw5lB/TiHKFqTJQdmcQ+Aom+cLLYpU6VvJSbp6ft+ZkZ1Q1tMSN?=
+ =?us-ascii?Q?eUPARkUaFpKA4AsdJev1b6+Epj7/WfgOsz+QHctim3Ntv4ddkTcUokpKPRa2?=
+ =?us-ascii?Q?9OXYPiuUf84E6AZm59vhr6vznAwRpWaZu3OSdwLAOctS92/OcBc71t7qooRt?=
+ =?us-ascii?Q?LGHa5VVuA+53DybgpVlsia4/h6FfoJDdxYhqSQSsktCWWIR0misf9aYhwkpo?=
+ =?us-ascii?Q?9aj4byBuS0vPPHXMn70mD1jwrV/OI2Tvk8E1uCzzHgzoET6neRmha/2PkN3I?=
+ =?us-ascii?Q?vZUpoIkhO2XClGD6pxKHvatJ5Jn96Tah3n5vytqpngOlNYMHApger+I4oAiQ?=
+ =?us-ascii?Q?eOkyqAJ6KPArFzhvTF9jGWyJnGVu+FX8KHErt4dz61bWoh1ndvtcrGyOcYV5?=
+ =?us-ascii?Q?fp6LMHt0Epjh1igpxO/dl2o5zBI1FnXPEgUvUGZwzmLu0ZErnH78RuvyM9JY?=
+ =?us-ascii?Q?dIwPQMhuf6lo0UBCwpYrYREeQVKoL8Viyi17GNaovWJFamrgXmzVE0D8R/hP?=
+ =?us-ascii?Q?yE0rLRvczZjKFHF/CB6dEFfA7rJtXL4dKbRGC9vKGuN/6ZIwtryTA9CN7Jbv?=
+ =?us-ascii?Q?DBj6pAZd8Un81xfCQ9lGqKxHCc5z/TWSn1TPG8lCBzMZP840YdUb18NEHfD+?=
+ =?us-ascii?Q?iwIZUgEHXFXjg1y1nC2hI6sF7j4ex3o3OybREHhgNw3xQj24fXbZt4xZjqhI?=
+ =?us-ascii?Q?c4hKNA0WaUIe6MjOo27/43XI8BchvY7FNYfykHN7l0p1WGI28UkkyxcoHWYR?=
+ =?us-ascii?Q?63bWJ1TrBRtRx7OkNc1GMvXX9PwF/KQ9a/z2/XxoLpdHXGUgIrXbIJjWoEnS?=
+ =?us-ascii?Q?6u9ctTYCSLbD8rP3Io//x3Etz0O/9vENhZHgTsP86nG+n0wJxJvH0dV9Gz6i?=
+ =?us-ascii?Q?fdZUvxOHO8rBVrK7cKx+U0TtrPBmowTgIZb1HerfWiTROSaiwMypE0yDT7cn?=
+ =?us-ascii?Q?9aDF1S9ucpkh4ZFGNO/RP5RAQI9Fd87bpXmIIJ+TD06rMeKSIpvaNAhdci+h?=
+ =?us-ascii?Q?jprSamad8lbD/zu+fEEdIRSM8qiQcnJo4B9r6e4cATimFOrxhXJs2XwN6IkZ?=
+ =?us-ascii?Q?OpjwR3sVIsTP54ZQD1klnDkJVPq1Lx66pveoVqNoC0a90VkRg6JPN9FKSuKf?=
+ =?us-ascii?Q?0yIgbYvNROEZNnsz8Qd3gz3xdYfMYCVou9bfCYsCse+mQ4DQn3L2L6bJ5DHN?=
+ =?us-ascii?Q?LP0778RRbPeM5apH24REy9znla9R5NzJi9ERqfpE4mIh4l/INFLE3NsZBtpV?=
+ =?us-ascii?Q?q2kncSLsuHtL9Z3gClwoBGmXWzL5TCZAx8QSnMQxR6+6mKwPgTi0kgre2oMP?=
+ =?us-ascii?Q?+uwUYw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 6c82b374-8392-4262-3910-08db77201713
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 15:06:31.5024
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: C05Q3JXOj9QqRB6YEy0/EuJMlW3uAHN2bBstq2n+gn7xizPy9hqwDlxKga/WlFsiiqH0KmGM58X3KuRZ4N6XXUSk9Yww1IzjJWsz4wI1Ncw=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV3PR13MB6500
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 04:50:01PM +0800, Xuan Zhuo wrote:
-> On Tue, 27 Jun 2023 16:03:23 +0800, Jason Wang <jasowang@redhat.com> wrote:
-> > On Fri, Jun 2, 2023 at 5:22 PM Xuan Zhuo <xuanzhuo@linux.alibaba.com> wrote:
-> > >
-> > > This helper allows the driver change the dma mode to premapped mode.
-> > > Under the premapped mode, the virtio core do not do dma mapping
-> > > internally.
-> > >
-> > > This just work when the use_dma_api is true. If the use_dma_api is false,
-> > > the dma options is not through the DMA APIs, that is not the standard
-> > > way of the linux kernel.
-> > >
-> > > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > ---
-> > >  drivers/virtio/virtio_ring.c | 40 ++++++++++++++++++++++++++++++++++++
-> > >  include/linux/virtio.h       |  2 ++
-> > >  2 files changed, 42 insertions(+)
-> > >
-> > > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> > > index 72ed07a604d4..2afdfb9e3e30 100644
-> > > --- a/drivers/virtio/virtio_ring.c
-> > > +++ b/drivers/virtio/virtio_ring.c
-> > > @@ -172,6 +172,9 @@ struct vring_virtqueue {
-> > >         /* Host publishes avail event idx */
-> > >         bool event;
-> > >
-> > > +       /* Do DMA mapping by driver */
-> > > +       bool premapped;
-> > > +
-> > >         /* Head of free buffer list. */
-> > >         unsigned int free_head;
-> > >         /* Number we've added since last sync. */
-> > > @@ -2059,6 +2062,7 @@ static struct virtqueue *vring_create_virtqueue_packed(
-> > >         vq->packed_ring = true;
-> > >         vq->dma_dev = dma_dev;
-> > >         vq->use_dma_api = vring_use_dma_api(vdev);
-> > > +       vq->premapped = false;
-> > >
-> > >         vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
-> > >                 !context;
-> > > @@ -2548,6 +2552,7 @@ static struct virtqueue *__vring_new_virtqueue(unsigned int index,
-> > >  #endif
-> > >         vq->dma_dev = dma_dev;
-> > >         vq->use_dma_api = vring_use_dma_api(vdev);
-> > > +       vq->premapped = false;
-> > >
-> > >         vq->indirect = virtio_has_feature(vdev, VIRTIO_RING_F_INDIRECT_DESC) &&
-> > >                 !context;
-> > > @@ -2691,6 +2696,41 @@ int virtqueue_resize(struct virtqueue *_vq, u32 num,
-> > >  }
-> > >  EXPORT_SYMBOL_GPL(virtqueue_resize);
-> > >
-> > > +/**
-> > > + * virtqueue_set_premapped - set the vring premapped mode
-> > > + * @_vq: the struct virtqueue we're talking about.
-> > > + *
-> > > + * Enable the premapped mode of the vq.
-> > > + *
-> > > + * The vring in premapped mode does not do dma internally, so the driver must
-> > > + * do dma mapping in advance. The driver must pass the dma_address through
-> > > + * dma_address of scatterlist. When the driver got a used buffer from
-> > > + * the vring, it has to unmap the dma address. So the driver must call
-> > > + * virtqueue_get_buf_premapped()/virtqueue_detach_unused_buf_premapped().
-> > > + *
-> > > + * This must be called before adding any buf to vring.
-> >
-> > And any old buffer should be detached?
+On Tue, Jun 27, 2023 at 12:42:06PM +0300, Vladimir Oltean wrote:
+> Link-local traffic on bridged SJA1105 ports is sometimes tagged by the
+> hardware with source port information (when the port is under a VLAN
+> aware bridge).
 > 
-> I mean that before adding any buf, So there are not old buffer.
+> The tag_8021q source port identification has become more loose
+> ("imprecise") and will report a plausible rather than exact bridge port,
+> when under a bridge (be it VLAN-aware or VLAN-unaware). But link-local
+> traffic always needs to know the precise source port.
 > 
+> Modify the driver logic (and therefore: the tagging protocol itself) to
+> always include the source port information with link-local packets,
+> regardless of whether the port is standalone, under a VLAN-aware or
+> VLAN-unaware bridge. This makes it possible for the tagging driver to
+> give priority to that information over the tag_8021q VLAN header.
+> 
+> The big drawback with INCL_SRCPT is that it makes it impossible to
+> distinguish between an original MAC DA of 01:80:C2:XX:YY:ZZ and
+> 01:80:C2:AA:BB:ZZ, because the tagger just patches MAC DA bytes 3 and 4
+> with zeroes. Only if PTP RX timestamping is enabled, the switch will
+> generate a META follow-up frame containing the RX timestamp and the
+> original bytes 3 and 4 of the MAC DA. Those will be used to patch up the
+> original packet. Nonetheless, in the absence of PTP RX timestamping, we
+> have to live with this limitation, since it is more important to have
+> the more precise source port information for link-local traffic.
+> 
+> Fixes: d7f9787a763f ("net: dsa: tag_8021q: add support for imprecise RX based on the VBID")
+> Fixes: 91495f21fcec ("net: dsa: tag_8021q: replace the SVL bridging with VLAN-unaware IVL bridging")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-Oh. So put this in the same sentence:
-
-	This function must be called immediately after creating the vq,
-	or after vq reset, and before adding any buffers to it.
-
-
-> >
-> > > + * So this should be called immediately after init vq or vq reset.
-
-Do you really need to call this again after each reset?
-
-
-> > Any way to detect and warn in this case? (not a must if it's too
-> > expensive to do the check)
-> 
-> 
-> I can try to check whether the qeueu is empty.
-> 
-> 
-> >
-> > > + *
-> > > + * Caller must ensure we don't call this with other virtqueue operations
-> > > + * at the same time (except where noted).
-> > > + *
-> > > + * Returns zero or a negative error.
-> > > + * 0: success.
-> > > + * -EINVAL: vring does not use the dma api, so we can not enable premapped mode.
-> > > + */
-> > > +int virtqueue_set_premapped(struct virtqueue *_vq)
-> > > +{
-> > > +       struct vring_virtqueue *vq = to_vvq(_vq);
-> > > +
-> > > +       if (!vq->use_dma_api)
-> > > +               return -EINVAL;
-> > > +
-> > > +       vq->premapped = true;
-> >
-> > I guess there should be a way to disable it. Would it be useful for
-> > the case when AF_XDP sockets were destroyed?
-> 
-> Yes.
-> 
-> When we reset the queue, the vq->premapped will be set to 0.
-> 
-> The is called after find_vqs or reset vq.
-> 
-> Thanks.
-> 
-> 
-> 
-> >
-> > Thanks
-> >
-> >
-> > > +
-> > > +       return 0;
-> > > +}
-> > > +EXPORT_SYMBOL_GPL(virtqueue_set_premapped);
-> > > +
-> > >  /* Only available for split ring */
-> > >  struct virtqueue *vring_new_virtqueue(unsigned int index,
-> > >                                       unsigned int num,
-> > > diff --git a/include/linux/virtio.h b/include/linux/virtio.h
-> > > index b93238db94e3..1fc0e1023bd4 100644
-> > > --- a/include/linux/virtio.h
-> > > +++ b/include/linux/virtio.h
-> > > @@ -78,6 +78,8 @@ bool virtqueue_enable_cb(struct virtqueue *vq);
-> > >
-> > >  unsigned virtqueue_enable_cb_prepare(struct virtqueue *vq);
-> > >
-> > > +int virtqueue_set_premapped(struct virtqueue *_vq);
-> > > +
-> > >  bool virtqueue_poll(struct virtqueue *vq, unsigned);
-> > >
-> > >  bool virtqueue_enable_cb_delayed(struct virtqueue *vq);
-> > > --
-> > > 2.32.0.3.g01195cf9f
-> > >
-> >
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
 
