@@ -1,154 +1,122 @@
-Return-Path: <netdev+bounces-14290-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14291-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A30C973FF50
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:11:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0754373FF58
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:12:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8B6FF1C20B0E
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFCE5280DA8
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:12:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AB6E1953C;
-	Tue, 27 Jun 2023 15:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B30319902;
+	Tue, 27 Jun 2023 15:12:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 292B51952D
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:11:28 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 444DA1FC3;
-	Tue, 27 Jun 2023 08:11:27 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=O9fuyuQAgY3nYTHc1mvtpEYIvQ8t0mEIU8VITo4I082RVjO7xiPRaeoIdVMgOQlUN0Q6LPqfYvkxk7iBUWy0dZ/MguASjBB6BQTHxC5/bNpMvOPqMYJpYnBUBBFP/mK33sa+ZpnjDsn0cXSRRkVGnBbrQBa3w9GPoxvG9f9iuyzwIh5IgW4GBEw16ZMEyr1fVWujFo3KKHVVy3c8JcKbe3ywdeoxbijeX0xAxXAp3d5pV0SUE2+UVmyTDLzJV/JQlrgJxXpVNOMetNEJTZZNiCD59gaU0x+OAtPBC9dFPCHWMdNvCiMM7ALfxnU3wxsDJezQfoRhKhvs8mMT5/XpWg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=GnXnrUIeLH0HpRNWyaEQr5DD63JOZAUapMSr6Gxt1Ag=;
- b=Nfven1A5MEsAD170wUkEMZ4K8eAjh0gt3sC3/H3g5/BW36hb+Ho+V10r6XrbIbzfzsvnrQfpavSN6oUjGeSjA46RCEhEXPbHohv8NtutgS8R4A1T2B0TJq9EY8CuO+RfEsZAgSg9Wf41ksFvp5lagZvJw7TaX6bNXiGhcEftNRy3sEF/BKfhc/YZhr6Mlt2CpA8zDYoSu/B0+CPEqeoS2lGKyVuvHFumiAiL8DKj4v0o0W1LeSXFB5vaw1VY5x97ALW1sH3Kkud6Y0ujlnlLpOc9bHutENWFmrPFpidC5gTVbCUGW2rgOaQ9uE/DCPf4qz6h01LQYp4nJwMWG5KECg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31CE17FE5
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:12:29 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5703626AE;
+	Tue, 27 Jun 2023 08:12:28 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b69a48368fso44750401fa.0;
+        Tue, 27 Jun 2023 08:12:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=GnXnrUIeLH0HpRNWyaEQr5DD63JOZAUapMSr6Gxt1Ag=;
- b=m6Y6+xOg8WlcWxZ1pOmBfkwscdGHQ+pMgNUGvkplx4xq/JeNKCtjlkYi3+k2NMW/LrGxI5sM3uUJr+2sACvSbaWZmbBiUjFWZhw/jj47iEo+dYLiw7GVJvdjb762yHgwLIolxfxIGIbD8maruXScqekyLU+06IhBBAriEgoukd0=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BY5PR13MB3795.namprd13.prod.outlook.com (2603:10b6:a03:21a::8) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Tue, 27 Jun
- 2023 15:11:23 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Tue, 27 Jun 2023
- 15:11:23 +0000
-Date: Tue, 27 Jun 2023 17:11:15 +0200
-From: Simon Horman <simon.horman@corigine.com>
+        d=gmail.com; s=20221208; t=1687878746; x=1690470746;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=qZIgd4fYB3ByX3RTUvZ0WYtgm0ZduaW6wVx4c6DcS14=;
+        b=VgKsMi5C9k9JCKxrscWXA3mexVMQsNCH+inlV15GbcfLm8bG5s8ml1IMGIOa30cWNP
+         WJBSsoMcCCs7sbN1fD4EMgyUy8XczB3sK2YnqVxp7+CHceFk+YgIWOccO+pHd+wbNtgt
+         IPbJ5W06O4zcRwVxD4l7o7tTZsSWA/5grkMHuxAkW7tTwOd81jjQQWlLt0wjqtLf8CRa
+         8MOnAEWm0bHXH5wD+OmEIzZElNzU/oMcHSRhor3JW5BMDG+b6vy/NmiX8pALqfPO4URU
+         MhdL74MpzUF37HPxKdqsW7yKVEH3WewO5oNTR8QK4GEIi+KSVbg9k6JxoFvud//Wb60j
+         BlUw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687878746; x=1690470746;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=qZIgd4fYB3ByX3RTUvZ0WYtgm0ZduaW6wVx4c6DcS14=;
+        b=Hd1pHLnkNRZH4/W6TUDj08zz1aKyo27OhAWFm4qpAa8x3WM10y1TKimM+Eytvn4lls
+         NNDHL49B4Whv8hdR0cbuzkszfTQrEHQ1HulRPkdW7yYXdrJ9TXoKdbeDpuKUqL0sFhMH
+         uZBOWyw+KWIcIxQleAvqRO3GauNhHAcHNNHKyB2E6dEi949gmLHzD7BX7qCQ/iFwvx+p
+         VYTfUyQ166LCPb7RtubIBlke5dfXh2MGesY8fDn0sj6k7RIKipf7hyh9CQRO7dGG/UCm
+         eIDYiFCnf8PBs+3aEjreSSDoMlDsaweQs/xrTjxTOv5+rQFqN5YlKyHLjeh1+wJXJNrz
+         TxDA==
+X-Gm-Message-State: AC+VfDy8/cIiXJ7DYby4kO0iApdaSSq04tU7dd2TwtjRq0YqEbyCwqm2
+	utkYJFqrqw/JmVthfkUYw5o=
+X-Google-Smtp-Source: ACHHUZ7mRHIZs2QvUdX//EueZe/Ou9/OGafY8K3OZ0KvRoLjTb7jllH2Ph86dszLqocVNl0GaEJ+Ng==
+X-Received: by 2002:a2e:3502:0:b0:2b6:98c3:7a70 with SMTP id z2-20020a2e3502000000b002b698c37a70mr5719398ljz.41.1687878745573;
+        Tue, 27 Jun 2023 08:12:25 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id pg9-20020a170907204900b00977e0bcff1esm4726178ejb.10.2023.06.27.08.12.24
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 08:12:25 -0700 (PDT)
+Date: Tue, 27 Jun 2023 18:12:22 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Harini Katakam <harini.katakam@amd.com>
-Subject: Re: [PATCH v2 net-next] net: phy: mscc: fix packet loss due to RGMII
- delays
-Message-ID: <ZJr8E7iyKnOxlPgG@corigine.com>
-References: <20230627134235.3453358-1-vladimir.oltean@nxp.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230627134235.3453358-1-vladimir.oltean@nxp.com>
-X-ClientProxiedBy: AM0PR01CA0122.eurprd01.prod.exchangelabs.com
- (2603:10a6:208:168::27) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	Claudiu Manoil <claudiu.manoil@nxp.com>,
+	Alexandre Belloni <alexandre.belloni@bootlin.com>,
+	UNGLinuxDriver@microchip.com,
+	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
+	Richard Cochran <richardcochran@gmail.com>,
+	Antoine Tenart <atenart@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 3/3] net: dsa: felix: don't drop PTP frames with
+ tag_8021q when RX timestamping is disabled
+Message-ID: <20230627151222.bn3vboqjutkqzxjs@skbuf>
+References: <20230626154003.3153076-1-vladimir.oltean@nxp.com>
+ <20230626154003.3153076-4-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BY5PR13MB3795:EE_
-X-MS-Office365-Filtering-Correlation-Id: 93a2b2a7-4a65-41ce-6020-08db7720c501
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	SRhJPsHE6rdkBcXfpuk+c5s72+oPT+L3oKFDkc0010RmyxYkKSQiPfB5gu1Aurd6yQ2lgOMdLsF4zh/y/El6ZeNgecVBG8NsbAIGP+sAcvzhWLy4A9ws6AD1/VVTwPhqXYp/P/NLhVvlL/tn1GgyOQOyK1dr24ncyXlaMDxzPrF4GdNGT+omOeWPhE0qGzmSsDoWuLDQaHtaL3xmJoWJ5t14tT9qJmIbufQMGZ13lKjy4/W5+xKS2YLUh6gYDHJoLCm+8+ni13dR1LOHy4p7iBF3ysqAG3ZEnApQEDhHy3589UqUkTKANKeSRndiwyZAF51W6NqgTK0At/GThl2ebU0HpQo77I1yXCdolGUqBiqS6JaC7TGRL86V/R5kTIYP4GnbeAJ0mMnQHYM0D/Uou8/sDYbaYBqQ7ro7knbhkt+K+hfn+heNrC+T/7GHKsX1Yt58dAbvvC2FtJbYWLb+WXszZ4SU5DFHjUbGtcuKUYCiFD93WVFdchLDJFhf+J5oOA8G+tiF89DDqerILLKOR/oAAGsuc0mQkDt+3oP3X5n618nHSte4nx+H6ZYTtQVk1x4V4ICwbhqXVVEm0Nzj1YU8AOBGKYVJz87Bdu+UCCk=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39830400003)(346002)(376002)(396003)(366004)(451199021)(6506007)(36756003)(6486002)(478600001)(2616005)(6666004)(54906003)(2906002)(6512007)(186003)(4744005)(5660300002)(44832011)(86362001)(7416002)(316002)(66476007)(66946007)(41300700001)(8936002)(4326008)(6916009)(66556008)(38100700002)(8676002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RJ8EL4/sPYsZHZwzS5PisdUrydDP5xFJEcrECl71ulLq+HYMkVP7EWoS5W4U?=
- =?us-ascii?Q?sgWxg7C7NzT3wKYM8iJ+VECzi6ONpDqNyJmhg2882OfL1MjZoLS64yCbYI4F?=
- =?us-ascii?Q?zpuYAYdjtefK/u2FZTbHlC+n250dCPdDtKytBjlsA0VZpbgDarj/JcAc5F3F?=
- =?us-ascii?Q?os08n0Kx6YYN8dWfHLTGu1jpohwyY4dfTp5KEf++V4dpiIPtIE6r3kh0z4V1?=
- =?us-ascii?Q?HXCq0J5gsoRz4QxDD3NzkBw01baiQlhXX/EU0nZqJ2HTGFIEQ9rUUcqXG8AJ?=
- =?us-ascii?Q?D0irPSHWWVVSsgp7h/5RnjOt4kPjM5T5IfqTJ/bAnqy/U0FIUQa5cJXjhGRT?=
- =?us-ascii?Q?VqaDwmDvMMQpOAsB3PzGJp4FtxdSZT5pLyOPHH7BjfuoG46ZMJcEcxXQlfCD?=
- =?us-ascii?Q?uW4G3s031l6aaFZmWf8C4BfyALaWGOgahspcXAlfLSLJII0eQNBqVWG1anyw?=
- =?us-ascii?Q?ZBfcjgDnX4sqBoGkt2TpwlO+kKT5Hdys4xcWzxa92uENoQKeyfgFTSb6m1IZ?=
- =?us-ascii?Q?KDB8VNT7qFqug2p6D6dFSxuKbCy9MbGiIoMonjAVZzrCpJq3XDcAsGaLlHa+?=
- =?us-ascii?Q?n40YVyFNDeMrzG4+hhUAsxaWzXzgZiovt62JGDHjy4bQjKXTqAEEuqwPgxaM?=
- =?us-ascii?Q?MvX9lJTnwoDy9SezH89DZxNYPUoWnwhnye+cD75RUb4GCaNX7kMbnuJSuNQo?=
- =?us-ascii?Q?MLmZk4m9JD2XznBurxwGvspibLbAnZXgxH/9MLDK7QBpaQWE2dSPSQP0QN6c?=
- =?us-ascii?Q?VZJ8ndn4pHiGlaiFgPrIokz/srgR+aiR/YHCxt8nCKBa783rEG7Qt3ds9Omq?=
- =?us-ascii?Q?j3e7+DsnVof92Xn2jpRZ2wTWWFkiD4IPUpw44QzSPyz8CbzBytaKCxiOhbyh?=
- =?us-ascii?Q?xtJqGDwifNWKVUdEaVPEMD/jcNEnP2owDmvFRK7h2nSFuWyEoUk6rqeRFKaK?=
- =?us-ascii?Q?E16tXWmMC4PbfNq7fKsjS5+rfHaCTiM4t4/ORJCIGKD9WDvR9irHSa4J1xQz?=
- =?us-ascii?Q?Z3y4Qh4OxWkjtszvMQfigs4QcEVz2bxNqMVbLS5kjYSFn1vwJ22KGh6keGtD?=
- =?us-ascii?Q?pK3jLsKaKznV41bBUEP/IHfxlwyzdK3B65xlCtwBsMdGm9xnRZaDLGqlqFBg?=
- =?us-ascii?Q?BDXKdx5CEkyfiH2r9mBYaqSYC/qUOMQQJw2jNTR9S57I+dz+U5QJ14VTe6f9?=
- =?us-ascii?Q?iI3KnoJn3BGu1D9aejpDjq9otDapO/Fg9sVrJhV4WeB/Tn/rim39b/Uq+2rp?=
- =?us-ascii?Q?snJXGav/Fg+1ugPLCWCD9sMCo5ToR9tlO3voPmE7kC5reqAwxNqhX1FYu8W0?=
- =?us-ascii?Q?i+gQLpZi2SHGAPiECcoClxyhEBH/qTg+s4J1x/msASXo+wHjWMFFIJ2iA1cF?=
- =?us-ascii?Q?Ur41PbhuTaetUhLv8fm0AFiygJw+fHLpHKgia2we9POIU+5c1pMex81sPDPW?=
- =?us-ascii?Q?uYqNUvDBLTj+QrWSSgyiZGRMUA9dl0xm5eQ5Df2ZvjKd5t1lCUk8Ocl+Jckn?=
- =?us-ascii?Q?NZeU9/h4RQ6BQsqFor7DWCGTYkIX0DqNx6HdgECb81EJZ27ft4Y/6fq0PnDs?=
- =?us-ascii?Q?p6j7jVmw4rz9xLOqY48LPE3w7LObQ2jCMkuiB8QzlJcgKG+2Ydn2zet60VTv?=
- =?us-ascii?Q?VyaQiYtGEKP/t/KZvAqyd4074T7WP3As4I+0FfcQgzyEbinYG+4wWiLWbe05?=
- =?us-ascii?Q?GnmdVA=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 93a2b2a7-4a65-41ce-6020-08db7720c501
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 15:11:23.2526
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: d1dEtXEC97a2D/wKsIZa+jES3UU2nJSnA2Yf2YawVBT4/O86h8x78+/JDsY12lnHj+OkCn/0DPBw15YhT3R4nrkV1JJPiC3vTxa5LKHMv8g=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BY5PR13MB3795
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230626154003.3153076-4-vladimir.oltean@nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 04:42:35PM +0300, Vladimir Oltean wrote:
-> Two deadly typos break RX and TX traffic on the VSC8502 PHY using RGMII
-> if phy-mode = "rgmii-id" or "rgmii-txid", and no "tx-internal-delay-ps"
-> override exists. The negative error code from phy_get_internal_delay()
-> does not get overridden with the delay deduced from the phy-mode, and
-> later gets committed to hardware. Also, the rx_delay gets overridden by
-> what should have been the tx_delay.
+On Mon, Jun 26, 2023 at 06:40:03PM +0300, Vladimir Oltean wrote:
+>  drivers/net/dsa/ocelot/felix.c | 3 +++
+>  1 file changed, 3 insertions(+)
 > 
-> Fixes: dbb050d2bfc8 ("phy: mscc: Add support for RGMII delay configuration")
-> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
-> Reviewed-by: Harini Katakam <harini.katakam@amd.com>
-> ---
-> v1->v2: resend to net-next
+> diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
+> index 80861ac090ae..7b494d975073 100644
+> --- a/drivers/net/dsa/ocelot/felix.c
+> +++ b/drivers/net/dsa/ocelot/felix.c
+> @@ -1725,6 +1725,9 @@ static bool felix_rxtstamp(struct dsa_switch *ds, int port,
+>  	u32 tstamp_hi;
+>  	u64 tstamp;
+>  
+> +	if (ocelot->ports[port]->ptp_rx_filter == HWTSTAMP_FILTER_NONE)
+> +		return false;
+> +
+>  	/* If the "no XTR IRQ" workaround is in use, tell DSA to defer this skb
+>  	 * for RX timestamping. Then free it, and poll for its copy through
+>  	 * MMIO in the CPU port module, and inject that into the stack from
+> -- 
+> 2.34.1
+> 
+> 
 
-Patch looks good.
+This is still not as good as I had wanted it, because simply checking
+for HWTSTAMP_FILTER_NONE does not distinguish between L2 and L4
+timestamping filters, and a port configured just with L2 traps will
+still drop L4 PTP packets.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
-
-Though, TBH, I'm unsure what the correct tree is at this point.
+Preparing a v2.
 
