@@ -1,159 +1,184 @@
-Return-Path: <netdev+bounces-14126-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14127-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 256C473F094
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 03:38:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B4EEF73F0B4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 04:01:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB5D4280A54
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:38:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 602B31C20A3A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:01:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288A6A2D;
-	Tue, 27 Jun 2023 01:38:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 34AB9A35;
+	Tue, 27 Jun 2023 02:01:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EB5A23;
-	Tue, 27 Jun 2023 01:38:42 +0000 (UTC)
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 367AE10FF;
-	Mon, 26 Jun 2023 18:38:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687829921; x=1719365921;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version:content-transfer-encoding;
-  bh=lFXEDX8rSLqvIeeUP6Xgm1z7xi2mZaQYDH77RRje1w0=;
-  b=Gwr1WGjKv0Z9GiliH3gTNvbc8b+y9z2AgFLZExK00rU+dzLomo2Q4e8a
-   5Ofk/ct/eQcLhkj8Y9EYWKVOCL6ZYqC5zZniDxU6rtmoKm3Ei+TvmSMyU
-   TF4bMMfA+0ntQvGfh/WoORFGUnjIZwrHIfZ1iJJvAZ9MsebXVcq5SRUMQ
-   DqtX4OuUjqWefO0+8BG6G8RlnxL6q3YFCDdXkSrvaVT9C9oPUiRjd0oaj
-   pR7GBO1YV3gXr270u9zJo9/PtvprbaKjLb4oFH13MImvCv8uJ+rczc2Ex
-   si66TrStONcUe6HOOd3/EtZ7ID2hvldtOhy41GGByGsc22A7SkxtDNz0x
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="391883720"
-X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
-   d="scan'208";a="391883720"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 18:38:40 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="719595265"
-X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
-   d="scan'208";a="719595265"
-Received: from timot11x-mobl3.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.78.36])
-  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 18:38:40 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Stanislav Fomichev <sdf@google.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
- jolsa@kernel.org, netdev@vger.kernel.org
-Subject: Re: [RFC bpf-next v2 06/11] net: veth: Implement devtx timestamp
- kfuncs
-In-Reply-To: <CAKH8qBvnqOvCnp2C=hmPGwCcEz4UkuE9nod2N9sNmpPve9n_CQ@mail.gmail.com>
-References: <20230621170244.1283336-1-sdf@google.com>
- <20230621170244.1283336-7-sdf@google.com> <87edm1rc4m.fsf@intel.com>
- <CAKH8qBt1GHnY2jVac--xymN-ch8iCDftiBckzp9wvTJ7k-3zAg@mail.gmail.com>
- <874jmtrij4.fsf@intel.com>
- <CAKH8qBvnqOvCnp2C=hmPGwCcEz4UkuE9nod2N9sNmpPve9n_CQ@mail.gmail.com>
-Date: Mon, 26 Jun 2023 18:38:39 -0700
-Message-ID: <87y1k5ptuo.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243DEA23
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:01:12 +0000 (UTC)
+Received: from gandalf.ozlabs.org (mail.ozlabs.org [IPv6:2404:9400:2221:ea00::3])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C23AC1715;
+	Mon, 26 Jun 2023 19:00:52 -0700 (PDT)
+Received: from authenticated.ozlabs.org (localhost [127.0.0.1])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (P-256) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(No client certificate requested)
+	by mail.ozlabs.org (Postfix) with ESMTPSA id 4Qqnx84x1Rz4wZr;
+	Tue, 27 Jun 2023 12:00:44 +1000 (AEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canb.auug.org.au;
+	s=201702; t=1687831245;
+	bh=vTe0qIu1u6l3/BzxgdzdRr5qwDbnigi8icXlQUmm+y0=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LkckMgtYuv61gH8Y6NBykmhNZDZ6p84AlXL9OJTvsFC9pp3nFqdOMgV7x2YpP4e6I
+	 Df5oc85PX6C0btvq5CFNPn1Z9k2XIAkM3zWxgLoaGr4KYdaMNSHpCiFOD5sCBdoFEv
+	 s79kKlurogwi/Lsku59zHc5Tw6q/wJnfzmSwgZmpSWfORwI5Vfy0wFIbeNNn9xmwAj
+	 B5p+8V/6Uw6VktZYuzNhhfwGC9M+qYOhF1rXKA6C/5XEmpCUidl4y2QqBjT6AJjhks
+	 tw42+1dKv63vwoRIQCJ9MdwsmFnHWDS9/SO0UU7C468ew29GC+5GaplnmWbKOsAwvX
+	 FL1rGqCBGUA/w==
+Date: Tue, 27 Jun 2023 12:00:43 +1000
+From: Stephen Rothwell <sfr@canb.auug.org.au>
+To: David Miller <davem@davemloft.net>
+Cc: Jens Axboe <axboe@kernel.dk>, David Howells <dhowells@redhat.com>, Jakub
+ Kicinski <kuba@kernel.org>, Networking <netdev@vger.kernel.org>, Linux
+ Kernel Mailing List <linux-kernel@vger.kernel.org>, Linux Next Mailing List
+ <linux-next@vger.kernel.org>
+Subject: Re: linux-next: manual merge of the block tree with the net-next
+ tree
+Message-ID: <20230627120043.152df5dd@canb.auug.org.au>
+In-Reply-To: <20230613125939.595e50b8@canb.auug.org.au>
+References: <20230613125939.595e50b8@canb.auug.org.au>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: multipart/signed; boundary="Sig_/1zMnyQ_fpp7ls0cIvHGjgX+";
+ protocol="application/pgp-signature"; micalg=pgp-sha256
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Stanislav Fomichev <sdf@google.com> writes:
+--Sig_/1zMnyQ_fpp7ls0cIvHGjgX+
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: quoted-printable
 
-> On Mon, Jun 26, 2023 at 3:00=E2=80=AFPM Vinicius Costa Gomes
-> <vinicius.gomes@intel.com> wrote:
->>
->> Stanislav Fomichev <sdf@google.com> writes:
->>
->> > On Fri, Jun 23, 2023 at 4:29=E2=80=AFPM Vinicius Costa Gomes
->> > <vinicius.gomes@intel.com> wrote:
->> >>
->> >> Stanislav Fomichev <sdf@google.com> writes:
->> >>
->> >> > Have a software-based example for kfuncs to showcase how it
->> >> > can be used in the real devices and to have something to
->> >> > test against in the selftests.
->> >> >
->> >> > Both path (skb & xdp) are covered. Only the skb path is really
->> >> > tested though.
->> >> >
->> >> > Cc: netdev@vger.kernel.org
->> >> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
->> >>
->> >> Not really related to this patch, but to how it would work with
->> >> different drivers/hardware.
->> >>
->> >> In some of our hardware (the ones handled by igc/igb, for example), t=
-he
->> >> timestamp notification comes some time after the transmit completion
->> >> event.
->> >>
->> >> From what I could gather, the idea would be for the driver to "hold" =
-the
->> >> completion until the timestamp is ready and then signal the completion
->> >> of the frame. Is that right?
->> >
->> > Yeah, that might be the option. Do you think it could work?
->> >
->>
->> For the skb and XDP cases, yeah, just holding the completion for a while
->> seems like it's going to work.
->>
->> XDP ZC looks more complicated to me, not sure if it's only a matter of
->> adding something like:
+Hi all,
+
+On Tue, 13 Jun 2023 12:59:39 +1000 Stephen Rothwell <sfr@canb.auug.org.au> =
+wrote:
 >
-> [..]
->
->> void xsk_tx_completed_one(struct xsk_buff_pool *pool, struct xdp_buff *x=
-dp);
->>
->> Or if more changes would be needed. I am trying to think about the case
->> that the user sent a single "timestamp" packet among a bunch of
->> "non-timestamp" packets.
->
-> Since you're passing xdp_buff as an argument I'm assuming that is
-> suggesting out-of-order completions?
-> The completion queue is a single index, we can't do ooo stuff.
-> So you'd have to hold a bunch of packets until you receive the
-> timestamp completion; after this event, you can complete the whole
-> batch (1 packet waiting for the timestamp + a bunch that have been
-> transmitted afterwards but were still unacknowleged in the queue).
->
-> (lmk if I've misinterpreted)
+> Today's linux-next merge of the block tree got a conflict in:
+>=20
+>   fs/splice.c
+>=20
+> between commit:
+>=20
+>   2bfc66850952 ("splice, net: Add a splice_eof op to file-ops and socket-=
+ops")
+>=20
+> from the net-next tree and commit:
+>=20
+>   6a3f30b8bdb2 ("splice: Make do_splice_to() generic and export it")
+>=20
+> from the block tree.
+>=20
+> I fixed it up (see below) and can carry the fix as necessary. This
+> is now fixed as far as linux-next is concerned, but any non trivial
+> conflicts should be mentioned to your upstream maintainer when your tree
+> is submitted for merging.  You may also want to consider cooperating
+> with the maintainer of the conflicting tree to minimise any particularly
+> complex conflicts.
+>=20
+> diff --cc fs/splice.c
+> index 67ddaac1f5c5,2420ead610a7..000000000000
+> --- a/fs/splice.c
+> +++ b/fs/splice.c
+> @@@ -969,23 -841,24 +937,35 @@@ static long do_splice_from(struct pipe_
+>   	return out->f_op->splice_write(pipe, out, ppos, len, flags);
+>   }
+>  =20
+>  +/*
+>  + * Indicate to the caller that there was a premature EOF when reading f=
+rom the
+>  + * source and the caller didn't indicate they would be sending more dat=
+a after
+>  + * this.
+>  + */
+>  +static void do_splice_eof(struct splice_desc *sd)
+>  +{
+>  +	if (sd->splice_eof)
+>  +		sd->splice_eof(sd);
+>  +}
+>  +
+> - /*
+> -  * Attempt to initiate a splice from a file to a pipe.
+> + /**
+> +  * vfs_splice_read - Read data from a file and splice it into a pipe
+> +  * @in:		File to splice from
+> +  * @ppos:	Input file offset
+> +  * @pipe:	Pipe to splice to
+> +  * @len:	Number of bytes to splice
+> +  * @flags:	Splice modifier flags (SPLICE_F_*)
+> +  *
+> +  * Splice the requested amount of data from the input file to the pipe.=
+  This
+> +  * is synchronous as the caller must hold the pipe lock across the enti=
+re
+> +  * operation.
+> +  *
+> +  * If successful, it returns the amount of data spliced, 0 if it hit th=
+e EOF or
+> +  * a hole and a negative error code otherwise.
+>    */
+> - static long do_splice_to(struct file *in, loff_t *ppos,
+> - 			 struct pipe_inode_info *pipe, size_t len,
+> - 			 unsigned int flags)
+> + long vfs_splice_read(struct file *in, loff_t *ppos,
+> + 		     struct pipe_inode_info *pipe, size_t len,
+> + 		     unsigned int flags)
+>   {
+>   	unsigned int p_space;
+>   	int ret;
+> @@@ -1081,9 -959,9 +1070,9 @@@ ssize_t splice_direct_to_actor(struct f
+>   		size_t read_len;
+>   		loff_t pos =3D sd->pos, prev_pos =3D pos;
+>  =20
+> - 		ret =3D do_splice_to(in, &pos, pipe, len, flags);
+> + 		ret =3D vfs_splice_read(in, &pos, pipe, len, flags);
+>   		if (unlikely(ret <=3D 0))
+>  -			goto out_release;
+>  +			goto read_failure;
+>  =20
+>   		read_len =3D ret;
+>   		sd->total_len =3D read_len;
 
-Not at all, it was me that wasn't aware that out-of-order completions
-were out of the picture.
+This is now a conflict between the net-next tree and Linus' tree.
 
-So, yeah, what you are proposing, accumulating the pending completions
-while there's a pending timestamp request, seems the only way to go.
-
-The logic seems simple enough, but the fact that the "timestamp ready"
-interrupt is not associated with any queue seems that it will make
-things a bit "interesting" to get it right :-)=20
-
-But I don't have any better suggestions.
-
-
-Thank you,
 --=20
-Vinicius
+Cheers,
+Stephen Rothwell
+
+--Sig_/1zMnyQ_fpp7ls0cIvHGjgX+
+Content-Type: application/pgp-signature
+Content-Description: OpenPGP digital signature
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAEBCAAdFiEENIC96giZ81tWdLgKAVBC80lX0GwFAmSaQssACgkQAVBC80lX
+0Gwkegf+KaweOSCqQ1Sz/QDtj3hFrCYCowyUVZmQO5ocg2ZzR2CdoQEW9/praDOM
+/twS149DftI+10rURHfiM2eFbF/UxkyvT3b0dtL0hHHKU1DRt/vr0+oZbZnxETSX
+6x2d59FCDlLD6NBoje0xxND7W1QdieqCWyIgOII7FMo0RvaxiOPYqJKxHCxSRUTR
+Z2INic/3KCYVN7Y6L7MmXFn08ZqRsSxZ5gKa3/Ie5Z3h2KNehOmvvgYSz/yFpv3o
+0C0vWx/CtnwYYzJX+gmmlIBglYfKZ2jnCrNCPB+mFgRuMe4K9tn8mDp9cslXHSM9
+zX0l8nyJ3MpB9Jy/rv4anPOYvM4RJw==
+=ln5M
+-----END PGP SIGNATURE-----
+
+--Sig_/1zMnyQ_fpp7ls0cIvHGjgX+--
 
