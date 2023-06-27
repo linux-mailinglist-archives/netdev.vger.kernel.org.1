@@ -1,59 +1,84 @@
-Return-Path: <netdev+bounces-14335-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14336-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 616C67403AE
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 20:59:36 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 44FA17403B2
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 21:01:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A14FC28115D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:59:34 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E98222810C7
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:01:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B88541FC4;
-	Tue, 27 Jun 2023 18:59:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335204A23;
+	Tue, 27 Jun 2023 19:01:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 310821FB1;
-	Tue, 27 Jun 2023 18:59:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7C81CC433C8;
-	Tue, 27 Jun 2023 18:59:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FAF1306E
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 834ADC433C8;
+	Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687892366;
-	bh=jrWpCrzpq9YG0+S/IRAGmEuhe4lIZLpzAlVkc1cLz7c=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=WcKXcba4+0jmSpEQOldnayk5/DNFBwkWx+lPEW/Qi41+DufsY7n9ZLEyOlljTskcW
-	 K9kqXwDwJjNZhuM/Km8xXnMjjsP4c78rZi0D5e9W1daLNQnKgfxrEg+Jh5SFZZBl23
-	 iJUNkIrYemmLMVYMI2eH9iPnOxR7AeH5EnjLYBIyffVv3qYugqoL+ev+5g1AGtIfjn
-	 YEQcBk1DEFOeLtF6O1kG3fhW9KK+zqhFIKW9qpQfFpERAoKoEgnOj8A6zbaUX1dQbt
-	 WBzzo8tCWStyCEY34lQ/SGyczqQqfeaeyiXQNghOS3Sbz4UbK/WFWJ+G/ZCXsSfqJo
-	 2nxMyjgCfIJAA==
-Date: Tue, 27 Jun 2023 11:59:25 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: torvalds@linux-foundation.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, pabeni@redhat.com, bpf@vger.kernel.org
-Subject: Re: [GIT PULL] Networking for v6.5
-Message-ID: <20230627115925.4e55f199@kernel.org>
-In-Reply-To: <20230627184830.1205815-1-kuba@kernel.org>
-References: <20230627184830.1205815-1-kuba@kernel.org>
+	s=k20201202; t=1687892513;
+	bh=bGvMc1yTWDTMtingXAKSAxWvQtLuTim0DetY04msz+Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=TW4V6UOvZ5YhON1NiFHfCs3+vixNsfTuZ5V/A17O6UkpjXBHU4RmbmR6FS4Ny4l9F
+	 5fdKbtyHR9krZys/3VtlrBFHgvis5pHDHXwBkLCGnblI8MIEBLlXYz80GrvU2/XyvP
+	 ed+HMQFv2EbxPJ790pCGvak5AXT/vlOr7IJLKiY1P6bltHScUC6sy9xQ026gIKbxN8
+	 WPTQUHtHQqknHL9sNhHHxf4rKoCheNLWT0Qc4jHHH5+dBf8/gTxXm9ZbM60fznlO0L
+	 WYqsg4ZdDpR9IwozaP7KUW4NHmHFzyPnMvnG+kdasT/I9QtDojV6vWIRrYfKXs8NPc
+	 M7QNQpsbyFtiA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65714E5380A;
+	Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v1 net-next 0/2] af_unix: Followup fixes for SO_PASSPIDFD.
+From: patchwork-bot+bluetooth@kernel.org
+Message-Id: 
+ <168789251341.11348.5241440174968893552.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Jun 2023 19:01:53 +0000
+References: <20230627174314.67688-1-kuniyu@amazon.com>
+In-Reply-To: <20230627174314.67688-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, alexander@mihalicyn.com, brauner@kernel.org,
+ luiz.von.dentz@intel.com, kuni1840@gmail.com, netdev@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org
 
-On Tue, 27 Jun 2023 11:48:30 -0700 Jakub Kicinski wrote:
-> WiFi 7 and sendpage changes are the biggest pieces of work for
-> this release. The latter will definitely require fixes but
-> I think that we got it to a reasonable point.
+Hello:
 
-I forgot to mention a conflict, there's a trivial one because of
-adjacent changes in fs/splice.c. Stephen has the resolution:
-https://lore.kernel.org/all/20230613125939.595e50b8@canb.auug.org.au/
+This series was applied to bluetooth/bluetooth-next.git (master)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 27 Jun 2023 10:43:12 -0700 you wrote:
+> This series fixes 2 issues introduced by commit 5e2ff6704a27 ("scm: add
+> SO_PASSPIDFD and SCM_PIDFD").
+> 
+> The 1st patch fixes a warning in scm_pidfd_recv() reported by syzkaller.
+> The 2nd patch fixes a regression that bluetooth can't be built as module.
+> 
+> 
+> [...]
+
+Here is the summary with links:
+  - [v1,net-next,1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL.
+    https://git.kernel.org/bluetooth/bluetooth-next/c/603fc57ab70c
+  - [v1,net-next,2/2] net: scm: introduce and use scm_recv_unix helper
+    https://git.kernel.org/bluetooth/bluetooth-next/c/a9c49cc2f5b5
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
