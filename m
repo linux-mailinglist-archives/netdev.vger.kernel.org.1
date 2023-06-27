@@ -1,62 +1,39 @@
-Return-Path: <netdev+bounces-14319-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14320-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 63C467401DA
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:03:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1B177401DD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:04:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF8F81C20A96
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:03:51 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D59E1C20B44
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:04:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651CF1307C;
-	Tue, 27 Jun 2023 17:03:49 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0ECB1307F;
+	Tue, 27 Jun 2023 17:04:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562D113064
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 17:03:49 +0000 (UTC)
-Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB361715
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 10:03:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687885425; x=1719421425;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=JOGbQAa6vQegG44rS59W/htQM6VMZJ4uwPQo1WT/hkY=;
-  b=sKXFy/8r/waKWMwCLb5zdqzUQiX1kH3BLsN1D5ozMfDY/bnnO+ONXFZW
-   laAL/b8MvosY63xmYVrEHOHU8QCeoI5Qvlh4r/rkdwGI627knxZ46KoAZ
-   /ZxRUShT3J52jgYs5ufqTRQ0bfF1dNhdHMuKw/QEFb1NO/eb32ebC96yr
-   s=;
-X-IronPort-AV: E=Sophos;i="6.01,163,1684800000"; 
-   d="scan'208";a="12802835"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-47cc8a4c.us-east-1.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 17:03:40 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
-	by email-inbound-relay-iad-1a-m6i4x-47cc8a4c.us-east-1.amazon.com (Postfix) with ESMTPS id C3B21160BD1;
-	Tue, 27 Jun 2023 17:03:37 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Tue, 27 Jun 2023 17:03:37 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.106.101.41) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Tue, 27 Jun 2023 17:03:34 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <kuba@kernel.org>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <konradybcio@kernel.org>,
-	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
-	<pabeni@redhat.com>
-Subject: Re: [PATCH v1 net-next] Revert "af_unix: Call scm_recv() only after scm_set_cred()."
-Date: Tue, 27 Jun 2023 10:03:24 -0700
-Message-ID: <20230627170324.63272-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230627094245.01753815@kernel.org>
-References: <20230627094245.01753815@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8B78213064
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 17:04:05 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 58B55C433C0;
+	Tue, 27 Jun 2023 17:04:05 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687885445;
+	bh=WktUtzQgyKhGuN+DwlGY0IILBQcbGYEDvZmLf2FeL9g=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=V/0Fc8SKZKGqRdQ1nq9ozoJFz6O0k4AlNy2/AyIMYbrKmrG/j4k75sCpR1MHxbKsW
+	 tG09PAJxQpjv0nzOZj6A0aI5xUV0MW3oSTdHi+GqNeh6ybkGq6/2QJH2EKfReMo74w
+	 mWHZxYvOmOETr6f6gdYi6PY9/hTgc2SkgKyRLVhYMca0/znyf9VQmmnRDlz2Wt4Dxq
+	 1Ma8C/1gGThGfQidd0KIKqLxAiCcEXnq5DOgJK6ykIbi3AC+NAfE+sLIMOdrHs5Tjo
+	 dP3FZw6u95r4VtUU+vdpE7xylR7C/sO3XbGfGQat7qz4eeb3inrccWY58OOOBGqFDf
+	 3ZBfe/Gtviw/Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 362A1E53807;
+	Tue, 27 Jun 2023 17:04:05 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,35 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.106.101.41]
-X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net-next] net: lan743x: Simplify comparison
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168788544521.32757.7129863928208205686.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Jun 2023 17:04:05 +0000
+References: <20230627035432.1296760-1-moritzf@google.com>
+In-Reply-To: <20230627035432.1296760-1-moritzf@google.com>
+To: Moritz Fischer <moritzf@google.com>
+Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
+ edumazet@google.com, davem@davemloft.net, bryan.whitehead@microchip.com,
+ UNGLinuxDriver@microchip.com, mdf@kernel.org
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Tue, 27 Jun 2023 09:42:45 -0700
-> On Mon, 26 Jun 2023 13:58:37 -0700 Kuniyuki Iwashima wrote:
-> > Regarding to the warning of SO_PASSPIDFD, I'll post another patch to
-> > suppress it by skipping SCM_PIDFD if scm->pid == NULL in scm_pidfd_recv().
+Hello:
+
+This patch was applied to netdev/net-next.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
+
+On Tue, 27 Jun 2023 03:54:32 +0000 you wrote:
+> Simplify comparison, no functional changes.
 > 
-> > Sorry for bothering, but can this make it to the v6.5 train to
-> > avoid regression reports ?
+> Cc: Bryan Whitehead <bryan.whitehead@microchip.com>
+> Cc: UNGLinuxDriver@microchip.com
+> Suggested-by: Jakub Kicinski <kuba@kernel.org>
+> Signed-off-by: Moritz Fischer <moritzf@google.com>
 > 
-> I'm merging the trees now, could you send the follow up soon?
-> Could you respin Alexander's fix for me as well (make it a two patch
-> series?):
-> https://lore.kernel.org/all/20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com/
-> It trivially conflicts after applying this patch.
+> [...]
 
-I see.  I'll post 2 patches soon.
+Here is the summary with links:
+  - [net-next] net: lan743x: Simplify comparison
+    https://git.kernel.org/netdev/net-next/c/30ac666a2fcc
 
-Thank you, Jakub!
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
