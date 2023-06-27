@@ -1,122 +1,75 @@
-Return-Path: <netdev+bounces-14291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0754373FF58
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:12:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6CE073FF96
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:24:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BFCE5280DA8
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:12:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B72AE1C20B05
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:24:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B30319902;
-	Tue, 27 Jun 2023 15:12:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A2EA19922;
+	Tue, 27 Jun 2023 15:24:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F31CE17FE5
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:12:29 +0000 (UTC)
-Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5703626AE;
-	Tue, 27 Jun 2023 08:12:28 -0700 (PDT)
-Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b69a48368fso44750401fa.0;
-        Tue, 27 Jun 2023 08:12:28 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687878746; x=1690470746;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=qZIgd4fYB3ByX3RTUvZ0WYtgm0ZduaW6wVx4c6DcS14=;
-        b=VgKsMi5C9k9JCKxrscWXA3mexVMQsNCH+inlV15GbcfLm8bG5s8ml1IMGIOa30cWNP
-         WJBSsoMcCCs7sbN1fD4EMgyUy8XczB3sK2YnqVxp7+CHceFk+YgIWOccO+pHd+wbNtgt
-         IPbJ5W06O4zcRwVxD4l7o7tTZsSWA/5grkMHuxAkW7tTwOd81jjQQWlLt0wjqtLf8CRa
-         8MOnAEWm0bHXH5wD+OmEIzZElNzU/oMcHSRhor3JW5BMDG+b6vy/NmiX8pALqfPO4URU
-         MhdL74MpzUF37HPxKdqsW7yKVEH3WewO5oNTR8QK4GEIi+KSVbg9k6JxoFvud//Wb60j
-         BlUw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687878746; x=1690470746;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qZIgd4fYB3ByX3RTUvZ0WYtgm0ZduaW6wVx4c6DcS14=;
-        b=Hd1pHLnkNRZH4/W6TUDj08zz1aKyo27OhAWFm4qpAa8x3WM10y1TKimM+Eytvn4lls
-         NNDHL49B4Whv8hdR0cbuzkszfTQrEHQ1HulRPkdW7yYXdrJ9TXoKdbeDpuKUqL0sFhMH
-         uZBOWyw+KWIcIxQleAvqRO3GauNhHAcHNNHKyB2E6dEi949gmLHzD7BX7qCQ/iFwvx+p
-         VYTfUyQ166LCPb7RtubIBlke5dfXh2MGesY8fDn0sj6k7RIKipf7hyh9CQRO7dGG/UCm
-         eIDYiFCnf8PBs+3aEjreSSDoMlDsaweQs/xrTjxTOv5+rQFqN5YlKyHLjeh1+wJXJNrz
-         TxDA==
-X-Gm-Message-State: AC+VfDy8/cIiXJ7DYby4kO0iApdaSSq04tU7dd2TwtjRq0YqEbyCwqm2
-	utkYJFqrqw/JmVthfkUYw5o=
-X-Google-Smtp-Source: ACHHUZ7mRHIZs2QvUdX//EueZe/Ou9/OGafY8K3OZ0KvRoLjTb7jllH2Ph86dszLqocVNl0GaEJ+Ng==
-X-Received: by 2002:a2e:3502:0:b0:2b6:98c3:7a70 with SMTP id z2-20020a2e3502000000b002b698c37a70mr5719398ljz.41.1687878745573;
-        Tue, 27 Jun 2023 08:12:25 -0700 (PDT)
-Received: from skbuf ([188.25.159.134])
-        by smtp.gmail.com with ESMTPSA id pg9-20020a170907204900b00977e0bcff1esm4726178ejb.10.2023.06.27.08.12.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 08:12:25 -0700 (PDT)
-Date: Tue, 27 Jun 2023 18:12:22 +0300
-From: Vladimir Oltean <olteanv@gmail.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Claudiu Manoil <claudiu.manoil@nxp.com>,
-	Alexandre Belloni <alexandre.belloni@bootlin.com>,
-	UNGLinuxDriver@microchip.com,
-	Xiaoliang Yang <xiaoliang.yang_1@nxp.com>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Antoine Tenart <atenart@kernel.org>, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 3/3] net: dsa: felix: don't drop PTP frames with
- tag_8021q when RX timestamping is disabled
-Message-ID: <20230627151222.bn3vboqjutkqzxjs@skbuf>
-References: <20230626154003.3153076-1-vladimir.oltean@nxp.com>
- <20230626154003.3153076-4-vladimir.oltean@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D2A61991B
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 15:24:30 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 379BBC433C8;
+	Tue, 27 Jun 2023 15:24:30 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687879470;
+	bh=WAVMj4k643XkD8zEGHR9X/xsm5cOk5NFtasKqScWN0k=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=mOwv9Z+FqIBr9aDu2uX1W+InNnC2XilmtmuBOUJPST7mjYxMIpqB9ZBEG8Fl5z5vQ
+	 GqL6qO+PNLIcw67OrgfxF1KEF6eU8OhvyvGXXP/+e0qgrug0hzFqKroqzm+vpD+iyZ
+	 ioVlK/fFN46wTdCTnvn+y/AgdqZK4JoF076r2NM7dfrDR0wBUth6TvSBlCjpsnkdpV
+	 0v++0IWLAWETbySsOdqt47/xxlrN9kRkOz0o8OEXugcqOui1PXS9OVVkp+E52c4fvW
+	 s7avGWFV/aNcuUNPw+9Wyz6LETQ4Nbu83cCT4w1G3+DeApeppgVG8rWWXELP9oImvH
+	 79ZvMo67BwyAg==
+Date: Tue, 27 Jun 2023 08:24:29 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Jiri Pirko <jiri@resnulli.us>
+Cc: Saeed Mahameed <saeed@kernel.org>, Saeed Mahameed <saeedm@nvidia.com>,
+ "David S. Miller" <davem@davemloft.net>, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Tariq Toukan
+ <tariqt@nvidia.com>, Shay Drory <shayd@nvidia.com>, Moshe Shemesh
+ <moshe@nvidia.com>
+Subject: Re: [net-next 14/15] net/mlx5: Light probe local SFs
+Message-ID: <20230627082429.36100040@kernel.org>
+In-Reply-To: <ZJq1+ok+WkwePYaq@nanopsycho>
+References: <20230615093701.20d0ad1b@kernel.org>
+	<ZItMUwiRD8mAmEz1@nanopsycho>
+	<20230615123325.421ec9aa@kernel.org>
+	<ZJL3u/6Pg7R2Qy94@nanopsycho>
+	<ZJPsTVKUj/hCUozU@nanopsycho>
+	<20230622093523.18993f44@kernel.org>
+	<ZJVlbmR9bJknznPM@nanopsycho>
+	<20230623082108.7a4973cc@kernel.org>
+	<ZJa4YPtXaLOJigVM@nanopsycho>
+	<20230624134703.10ec915f@kernel.org>
+	<ZJq1+ok+WkwePYaq@nanopsycho>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230626154003.3153076-4-vladimir.oltean@nxp.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Mon, Jun 26, 2023 at 06:40:03PM +0300, Vladimir Oltean wrote:
->  drivers/net/dsa/ocelot/felix.c | 3 +++
->  1 file changed, 3 insertions(+)
+On Tue, 27 Jun 2023 12:12:10 +0200 Jiri Pirko wrote:
+> $ sudo devlink port add pci/0000:08:00.0 flavour pcisf pfnum 0 sfnum 103
+> pci/0000:08:00.0/32770: type eth netdev eth10 flavour pcisf controller 0 pfnum 0 sfnum 103 splittable false
+>   function:
+>     hw_addr 00:00:00:00:00:00 state inactive opstate detached
 > 
-> diff --git a/drivers/net/dsa/ocelot/felix.c b/drivers/net/dsa/ocelot/felix.c
-> index 80861ac090ae..7b494d975073 100644
-> --- a/drivers/net/dsa/ocelot/felix.c
-> +++ b/drivers/net/dsa/ocelot/felix.c
-> @@ -1725,6 +1725,9 @@ static bool felix_rxtstamp(struct dsa_switch *ds, int port,
->  	u32 tstamp_hi;
->  	u64 tstamp;
->  
-> +	if (ocelot->ports[port]->ptp_rx_filter == HWTSTAMP_FILTER_NONE)
-> +		return false;
-> +
->  	/* If the "no XTR IRQ" workaround is in use, tell DSA to defer this skb
->  	 * for RX timestamping. Then free it, and poll for its copy through
->  	 * MMIO in the CPU port module, and inject that into the stack from
-> -- 
-> 2.34.1
-> 
-> 
+> $ sudo devlink port function set pci/0000:08:00.0/32770 hw_addr AA:22:33:44:55:66 uuid SOMETHINGREALLYUNIQUE
 
-This is still not as good as I had wanted it, because simply checking
-for HWTSTAMP_FILTER_NONE does not distinguish between L2 and L4
-timestamping filters, and a port configured just with L2 traps will
-still drop L4 PTP packets.
-
-Preparing a v2.
+Why does the user have to set the uuid? I was expecting it'd pop up 
+on the port automatically, generated by the kernel, as a read-only
+attribute.
 
