@@ -1,141 +1,87 @@
-Return-Path: <netdev+bounces-14284-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14285-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A588373FEB9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:46:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C14E373FEF4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:51:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A08280FE3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:46:40 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899431C2031C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:51:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B1B19934;
-	Tue, 27 Jun 2023 14:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD4518C24;
+	Tue, 27 Jun 2023 14:51:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3E518000
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:45:28 +0000 (UTC)
-Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1548835A6;
-	Tue, 27 Jun 2023 07:45:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=inria.fr; s=dc;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=rUzmkjTakIf1l5Hdr1TLtSGZWZezFJIK9Clkpx3VPN4=;
-  b=YU2muZyAimuOaNCN/40I/rQBJ4UKO7cZzX4Ns4xfMNxcNtf60stG8vLV
-   OUQT7SM9PQDqEiNQb+GJRV7tsNdaMhbSut5FfSyOzxaZDsiUfbnN8/yiX
-   zL2fR+ESjZuSBV6CTlVOC54xtEJBTZW28IAqKnqEDsce1t7x/6m+mZ0e+
-   k=;
-Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
-X-IronPort-AV: E=Sophos;i="6.01,162,1684792800"; 
-   d="scan'208";a="114936345"
-Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 16:43:53 +0200
-From: Julia Lawall <Julia.Lawall@inria.fr>
-To: "K. Y. Srinivasan" <kys@microsoft.com>
-Cc: kernel-janitors@vger.kernel.org,
-	keescook@chromium.org,
-	christophe.jaillet@wanadoo.fr,
-	kuba@kernel.org,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	Dexuan Cui <decui@microsoft.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 22/24] net: mana: use vmalloc_array and vcalloc
-Date: Tue, 27 Jun 2023 16:43:37 +0200
-Message-Id: <20230627144339.144478-23-Julia.Lawall@inria.fr>
-X-Mailer: git-send-email 2.20.1
-In-Reply-To: <20230627144339.144478-1-Julia.Lawall@inria.fr>
-References: <20230627144339.144478-1-Julia.Lawall@inria.fr>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA2218000
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:51:25 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5F430F3;
+	Tue, 27 Jun 2023 07:51:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=grZGX8JELpOIKZjXlliOgEI/DJc38Q546m4p6RZBCpM=; b=R49xoCj2QcPcOYNbLkV444Qwnp
+	vHN3xtMJ/uhKF5VZnJPMpKEWskxF2mBMxp7SqIZpcg5kC+CchRVA9oTBp59RuUjmBIGXKu2gfdSnW
+	8bjqo5/WN4geMWzeKypRE1tP5cl6WwlZop5oL5zclyaEEu4PIrljTLzVQ7oRuTgr+EnU=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qEA1y-0002Rm-HB; Tue, 27 Jun 2023 16:50:58 +0200
+Date: Tue, 27 Jun 2023 16:50:58 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
+Cc: Moritz Fischer <moritzf@google.com>, netdev@vger.kernel.org,
+	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+	davem@davemloft.net, bryan.whitehead@microchip.com,
+	UNGLinuxDriver@microchip.com, mdf@kernel.org,
+	stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net: lan743x: Don't sleep in atomic context
+Message-ID: <9a42d3d3-a142-4e4a-811b-0b3b931e798b@lunn.ch>
+References: <20230627035000.1295254-1-moritzf@google.com>
+ <ZJrc5xjeHp5vYtAO@boxer>
+ <35db66a9-d478-4b15-ad30-bfc4cded0b5c@lunn.ch>
+ <CAFyOScpRDOvVrCsrwdxFstoNf1tOEnGbPSt5XDM1PKhCDyUGaw@mail.gmail.com>
+ <ZJr1Ifp9cOlfcqbE@boxer>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJr1Ifp9cOlfcqbE@boxer>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Use vmalloc_array and vcalloc to protect against
-multiplication overflows.
+> Side note would be that I don't see much value in iopoll.h's macros
+> returning
+> 
+> 	(cond) ? 0 : -ETIMEDOUT; \
+> 
+> this could be just !!cond but given the count of the callsites...probably
+> better to leave it as is.
 
-The changes were done using the following Coccinelle
-semantic patch:
+The general pattern everywhere in linux is:
 
-// <smpl>
-@initialize:ocaml@
-@@
+    err = foo(bar);
+    if (err)
+        return err;
 
-let rename alloc =
-  match alloc with
-    "vmalloc" -> "vmalloc_array"
-  | "vzalloc" -> "vcalloc"
-  | _ -> failwith "unknown"
+We want functions to return meaningful error codes, otherwise the
+caller needs to figure out an error code and return it. Having iopoll
+return an error code means we have consistency. Otherwise i would
+expect some developers to decide on EIO, ETIMEDOUT, EINVAL, maybe
+ENXIO?
 
-@@
-    size_t e1,e2;
-    constant C1, C2;
-    expression E1, E2, COUNT, x1, x2, x3;
-    typedef u8;
-    typedef __u8;
-    type t = {u8,__u8,char,unsigned char};
-    identifier alloc = {vmalloc,vzalloc};
-    fresh identifier realloc = script:ocaml(alloc) { rename alloc };
-@@
-
-(
-      alloc(x1*x2*x3)
-|
-      alloc(C1 * C2)
-|
-      alloc((sizeof(t)) * (COUNT), ...)
-|
--     alloc((e1) * (e2))
-+     realloc(e1, e2)
-|
--     alloc((e1) * (COUNT))
-+     realloc(COUNT, e1)
-|
--     alloc((E1) * (E2))
-+     realloc(E1, E2)
-)
-// </smpl>
-
-Signed-off-by: Julia Lawall <Julia.Lawall@inria.fr>
-
----
-v2: Use vmalloc_array and vcalloc instead of array_size.
-This also leaves a multiplication of a constant by a sizeof
-as is.  Two patches are thus dropped from the series.
-
- drivers/net/ethernet/microsoft/mana/hw_channel.c |    2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
-
-diff -u -p a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
---- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
-+++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
-@@ -627,7 +627,7 @@ static int mana_hwc_establish_channel(st
- 	if (WARN_ON(cq->id >= gc->max_num_cqs))
- 		return -EPROTO;
- 
--	gc->cq_table = vzalloc(gc->max_num_cqs * sizeof(struct gdma_queue *));
-+	gc->cq_table = vcalloc(gc->max_num_cqs, sizeof(struct gdma_queue *));
- 	if (!gc->cq_table)
- 		return -ENOMEM;
- 
-
+	Andrew
 
