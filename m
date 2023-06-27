@@ -1,157 +1,159 @@
-Return-Path: <netdev+bounces-14125-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14126-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2891E73EFB3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:31:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 256C473F094
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 03:38:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A2391C209CB
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:31:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DB5D4280A54
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:38:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE188630;
-	Tue, 27 Jun 2023 00:31:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 288A6A2D;
+	Tue, 27 Jun 2023 01:38:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BF8623
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 00:31:08 +0000 (UTC)
-Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DDEA1702;
-	Mon, 26 Jun 2023 17:31:07 -0700 (PDT)
-Received: by mail-ot1-x332.google.com with SMTP id 46e09a7af769-6b708b97418so3575833a34.3;
-        Mon, 26 Jun 2023 17:31:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687825866; x=1690417866;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:from:to:cc:subject:date:message-id:reply-to;
-        bh=O/2c9YwwQFhf0X0LD7Wd4iGQMCYKRK/hqVyQ7BZ1+ok=;
-        b=q8mhZZdYPrHx1I3QLvplF2h9BxzqYZesS+LMX5o3xCNa2BrRmKGuk0gzEUXntLV366
-         D24KIkzO67C2Wb+RbX7NYZQbzbEjoKTEWGD0nJ+8UFVIjBP7YZgTO6PvjHnd3ejedoHP
-         bKVL3syv5a9hXjbDpCcSnhqBlB44YgNm/+8RO65bAbaYpZpRXe8g9ezxRZqDvkW4I98d
-         FrnuSfeiVGtmb7Tx1o6ACRV73r4qa5h5CMHXkgp5+OIVXQbmsjofJzquTTxHICf6YWFZ
-         eAMboNZNdMx6oVqDMt4Ing9al5z9YVwzMu3iEk8Lu0rLyO1gQ9CiCeiGwwlYge2r/VYd
-         VCCg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687825866; x=1690417866;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=O/2c9YwwQFhf0X0LD7Wd4iGQMCYKRK/hqVyQ7BZ1+ok=;
-        b=CdmiZ1wtTmzoAm036k1/Y7kfRedwg3Mf9T5QQCiaQDJZCiG3Mt5qIaPqpAwv2xsIcx
-         nE9y3DwiXLbzLK9edH2erPNnuTVl/Fk0MaaQbM5Mr2UlDyeoPAFVD1cW2tY6786VIYTY
-         HEFkMQ+vgvv6tT8jFeKOgwJwSmQAxe5e7hrtCBFAplyRg1Y9kNi8QOF2dxfnDQq7Dd1A
-         /mJmnHDJj/vmA1xQrqu/ozvO/EToTBKn/pUqxGGowhbcLzwvwD/9aoGkSA0ul4HDj0jA
-         upsRPoLb1OLWfGpyrbNV2nbeZDW0ZigIw67QqyUiZz9pJ0pdN+wbRkgPU7ZfqtXkkkgY
-         w4WA==
-X-Gm-Message-State: AC+VfDzBEisI71WqyJOFMSomtZmHWc58U2cR0zW824gQZfLabRkJs704
-	jRcLZKAMQ8VpDN6u11vQB5y3PXjmUmE=
-X-Google-Smtp-Source: ACHHUZ55w/s5bZkFY+aekRuMQHhZ6sW4heSKvm03Smaj5yPZV18Y21i2LabwstcZX3q+GaColKLSGw==
-X-Received: by 2002:a9d:4801:0:b0:6b7:38c0:7420 with SMTP id c1-20020a9d4801000000b006b738c07420mr8014064otf.9.1687825866336;
-        Mon, 26 Jun 2023 17:31:06 -0700 (PDT)
-Received: from [192.168.1.128] ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id t6-20020a9d7486000000b006b735499817sm2722862otk.25.2023.06.26.17.31.05
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jun 2023 17:31:05 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-Message-ID: <02659cdf-753b-442d-f110-1f92619d55c7@lwfinger.net>
-Date: Mon, 26 Jun 2023 19:31:04 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 10EB5A23;
+	Tue, 27 Jun 2023 01:38:42 +0000 (UTC)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 367AE10FF;
+	Mon, 26 Jun 2023 18:38:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687829921; x=1719365921;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version:content-transfer-encoding;
+  bh=lFXEDX8rSLqvIeeUP6Xgm1z7xi2mZaQYDH77RRje1w0=;
+  b=Gwr1WGjKv0Z9GiliH3gTNvbc8b+y9z2AgFLZExK00rU+dzLomo2Q4e8a
+   5Ofk/ct/eQcLhkj8Y9EYWKVOCL6ZYqC5zZniDxU6rtmoKm3Ei+TvmSMyU
+   TF4bMMfA+0ntQvGfh/WoORFGUnjIZwrHIfZ1iJJvAZ9MsebXVcq5SRUMQ
+   DqtX4OuUjqWefO0+8BG6G8RlnxL6q3YFCDdXkSrvaVT9C9oPUiRjd0oaj
+   pR7GBO1YV3gXr270u9zJo9/PtvprbaKjLb4oFH13MImvCv8uJ+rczc2Ex
+   si66TrStONcUe6HOOd3/EtZ7ID2hvldtOhy41GGByGsc22A7SkxtDNz0x
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="391883720"
+X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
+   d="scan'208";a="391883720"
+Received: from fmsmga007.fm.intel.com ([10.253.24.52])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 18:38:40 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10753"; a="719595265"
+X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
+   d="scan'208";a="719595265"
+Received: from timot11x-mobl3.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.78.36])
+  by fmsmga007-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 26 Jun 2023 18:38:40 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Stanislav Fomichev <sdf@google.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com,
+ jolsa@kernel.org, netdev@vger.kernel.org
+Subject: Re: [RFC bpf-next v2 06/11] net: veth: Implement devtx timestamp
+ kfuncs
+In-Reply-To: <CAKH8qBvnqOvCnp2C=hmPGwCcEz4UkuE9nod2N9sNmpPve9n_CQ@mail.gmail.com>
+References: <20230621170244.1283336-1-sdf@google.com>
+ <20230621170244.1283336-7-sdf@google.com> <87edm1rc4m.fsf@intel.com>
+ <CAKH8qBt1GHnY2jVac--xymN-ch8iCDftiBckzp9wvTJ7k-3zAg@mail.gmail.com>
+ <874jmtrij4.fsf@intel.com>
+ <CAKH8qBvnqOvCnp2C=hmPGwCcEz4UkuE9nod2N9sNmpPve9n_CQ@mail.gmail.com>
+Date: Mon, 26 Jun 2023 18:38:39 -0700
+Message-ID: <87y1k5ptuo.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
-Content-Language: en-US
-To: Sardonimous <sardonimous@hotmail.com>, Arnd Bergmann <arnd@arndb.de>,
- Bagas Sanjaya <bagasdotme@gmail.com>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Netdev <netdev@vger.kernel.org>
-Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
- kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
- Kalle Valo <kvalo@kernel.org>
-References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
- <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
- <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
- <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
- <RO2P215MB193879B2D99DD0BAF59EFA92A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <e0a08449-554a-4a28-ac50-7051866eb95e@app.fastmail.com>
- <da80b806-de3f-c7ea-0352-cd23e0f6dd65@lwfinger.net>
- <RO2P215MB1938BD13105900F3525E0FE7A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <67faf4f4-f36c-3ff7-03b8-cd259e4a5548@lwfinger.net>
- <RO2P215MB1938BA68BBB683EC696F4BFAA726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
- <6afa0ebc-1d3f-8cba-79dc-8ddfe13c296a@lwfinger.net>
- <RO2P215MB193898F3008E0F390CCEBC87A726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-In-Reply-To: <RO2P215MB193898F3008E0F390CCEBC87A726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/26/23 16:33, Sardonimous wrote:
-> 
-> On 6/26/23 10:21 AM, Larry Finger wrote:
->> On 6/26/23 07:44, Sardonimous wrote:
->>> If I were to send you some test patches, could you create a kernel with them 
->>> applied?
->>>
->>> Doubtful.
+Stanislav Fomichev <sdf@google.com> writes:
+
+> On Mon, Jun 26, 2023 at 3:00=E2=80=AFPM Vinicius Costa Gomes
+> <vinicius.gomes@intel.com> wrote:
 >>
->> Sardonimous,
+>> Stanislav Fomichev <sdf@google.com> writes:
 >>
->> OK, that essentially eliminates  getting DMA to work. The cost of a 
->> MacBookPro7 is too much for me to acquire one to debug that issue.
+>> > On Fri, Jun 23, 2023 at 4:29=E2=80=AFPM Vinicius Costa Gomes
+>> > <vinicius.gomes@intel.com> wrote:
+>> >>
+>> >> Stanislav Fomichev <sdf@google.com> writes:
+>> >>
+>> >> > Have a software-based example for kfuncs to showcase how it
+>> >> > can be used in the real devices and to have something to
+>> >> > test against in the selftests.
+>> >> >
+>> >> > Both path (skb & xdp) are covered. Only the skb path is really
+>> >> > tested though.
+>> >> >
+>> >> > Cc: netdev@vger.kernel.org
+>> >> > Signed-off-by: Stanislav Fomichev <sdf@google.com>
+>> >>
+>> >> Not really related to this patch, but to how it would work with
+>> >> different drivers/hardware.
+>> >>
+>> >> In some of our hardware (the ones handled by igc/igb, for example), t=
+he
+>> >> timestamp notification comes some time after the transmit completion
+>> >> event.
+>> >>
+>> >> From what I could gather, the idea would be for the driver to "hold" =
+the
+>> >> completion until the timestamp is ready and then signal the completion
+>> >> of the frame. Is that right?
+>> >
+>> > Yeah, that might be the option. Do you think it could work?
+>> >
 >>
->> On my PowerBook G4, I also got the failure to connect, thus I should be able 
->> to fix that problem, but getting a new kernel with the fix onto your machine 
->> will not be easy.
-> 
-> It might be possible to follow the arch instructions for patching the kernel
-> 
-> https://wiki.archlinux.org/title/Kernel/Arch_build_system
-> 
-> It takes about a day to rebuild the kernel following this procedure.
-> 
->> Is it possible to ssh into your machine, or to use TeamViewer? Those questions 
->> do not need an answer now, but think about them.
-> 
-> This is complicated by being in a CGNAT environment.  I usually do this via 
-> tailscale.  Will have to think about it.
-> 
->> Larry
-> 
-> Should pio=1 qos=0 cause the problems that it does?  It if is no longer a 
-> supported configuration, perhaps it should fail more gracefully.
+>> For the skb and XDP cases, yeah, just holding the completion for a while
+>> seems like it's going to work.
+>>
+>> XDP ZC looks more complicated to me, not sure if it's only a matter of
+>> adding something like:
+>
+> [..]
+>
+>> void xsk_tx_completed_one(struct xsk_buff_pool *pool, struct xdp_buff *x=
+dp);
+>>
+>> Or if more changes would be needed. I am trying to think about the case
+>> that the user sent a single "timestamp" packet among a bunch of
+>> "non-timestamp" packets.
+>
+> Since you're passing xdp_buff as an argument I'm assuming that is
+> suggesting out-of-order completions?
+> The completion queue is a single index, we can't do ooo stuff.
+> So you'd have to hold a bunch of packets until you receive the
+> timestamp completion; after this event, you can complete the whole
+> batch (1 packet waiting for the timestamp + a bunch that have been
+> transmitted afterwards but were still unacknowleged in the queue).
+>
+> (lmk if I've misinterpreted)
 
-Setting qos=0 will generate a harmless warning, but the network still works. 
-Using pio=1 should still be supported.
+Not at all, it was me that wasn't aware that out-of-order completions
+were out of the picture.
 
-I am bisecting the source. It will take a while as I still have 13 kernels to 
-build and my PowerBook G4 takes about 6 hours per build - it is a lot slower 
-than your computer. At this point, I know that kernel v6.1.0 works, and that 
-v6.2.0-rc4 fails.
+So, yeah, what you are proposing, accumulating the pending completions
+while there's a pending timestamp request, seems the only way to go.
 
-If you can find a 6.1 kernel, it should work for you. Once I know the fix, we 
-can explore having you patch and rebuild your 6.3.X kernel.
+The logic seems simple enough, but the fact that the "timestamp ready"
+interrupt is not associated with any queue seems that it will make
+things a bit "interesting" to get it right :-)=20
 
-Larry
-
+But I don't have any better suggestions.
 
 
+Thank you,
+--=20
+Vinicius
 
