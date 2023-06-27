@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-14317-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14316-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 80AB174019C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:50:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 58A3B74019B
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:50:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B20541C20ACD
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:50:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 892011C209CB
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:50:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A19FA13076;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0B013071;
 	Tue, 27 Jun 2023 16:50:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCBB1373
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:50:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D41BEC433C8;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FCED13069
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:50:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id BE9D4C433C9;
 	Tue, 27 Jun 2023 16:50:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687884620;
-	bh=6TvhQXborCtEFeKBN48VRZ6+Hf6Ywkxx1C1qCnmtMyk=;
+	bh=DcBFHXhRAWFmRLSZK2RajKpsfjr2KTMlxNIK0yzVQZM=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=PDoU8Pk+vZF5nHbbYgCyVdfJj+7bA8SNla+mouM9FuU553sP3haUAEXFU+Fqn/zzh
-	 zVrEZjb36g7jFMiR/WLOUPw0+9dMXqsIQxR7QF1TxYvEeWErpQIsRJZre5duagfMJn
-	 pK6TUdoFpa2N7lNH3bQxTfE42Sg5WzfuL8mzK0A+bmAlTIsKgdJJ0TQleVoWpvrAMG
-	 SxPs5ycgGmRLBmzl8ZwEH1SfYTHdNIbkDs3lN3lLJZKJi/PyLYIKPzyvDbj+gYlzYn
-	 HE1tPxQQqAVkBOX4P4pvxlZ8VUYrg5EHyOB9uH0gcCQCdjJ+jSlenMfuP9om/qwODd
-	 ajvDzA83cyaLA==
+	b=IiZxg11iz2NXInO20/34IniSrFfhWL7Pw2bbjGU6m4lq8d28RXgUICpWOTt+mXruH
+	 TTl3hkS2f9K4aa0ijDhZ7HusVR1xwBW4/Ocwk+BoW+b/QW5XJgod/0AGppGATjTEMK
+	 /YvceUb7XjrojDkfcOFpPCjKeJvXOdd16DXab4+XEWy6dLijHt+qRg2yFZt+tM4w6f
+	 U69nxVoAMvWxaMyaAKjd8TfwQ9WMopdSfXDSsAPsRobr69fJtsmQ51q4KzPxJP0GfP
+	 HOwZIS3ef9+7d+QCqWtxe9zIkrVFDuv9Zj5Kr/AnMgtpm4BhXbgcwlE4949R5rws0M
+	 Cltegzdq2cPPw==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id AC7D7C64457;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id A08EAE53800;
 	Tue, 27 Jun 2023 16:50:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,40 +41,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2 net] netlink: Add __sock_i_ino() for __netlink_diag_dump().
+Subject: Re: [PATCH net] net: dsa: avoid suspicious RCU usage for synced
+ VLAN-aware MAC addresses
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168788462070.27533.16207439638694222251.git-patchwork-notify@kernel.org>
+ <168788462065.27533.11355169093087204068.git-patchwork-notify@kernel.org>
 Date: Tue, 27 Jun 2023 16:50:20 +0000
-References: <20230626164313.52528-1-kuniyu@amazon.com>
-In-Reply-To: <20230626164313.52528-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org,
- syzbot+5da61cf6a9bc1902d422@syzkaller.appspotmail.com
+References: <20230626154402.3154454-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20230626154402.3154454-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ simon.horman@corigine.com, linux-kernel@vger.kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Mon, 26 Jun 2023 09:43:13 -0700 you wrote:
-> syzbot reported a warning in __local_bh_enable_ip(). [0]
+On Mon, 26 Jun 2023 18:44:02 +0300 you wrote:
+> When using the felix driver (the only one which supports UC filtering
+> and MC filtering) as a DSA master for a random other DSA switch, one can
+> see the following stack trace when the downstream switch ports join a
+> VLAN-aware bridge:
 > 
-> Commit 8d61f926d420 ("netlink: fix potential deadlock in
-> netlink_set_err()") converted read_lock(&nl_table_lock) to
-> read_lock_irqsave() in __netlink_diag_dump() to prevent a deadlock.
-> 
-> However, __netlink_diag_dump() calls sock_i_ino() that uses
-> read_lock_bh() and read_unlock_bh().  If CONFIG_TRACE_IRQFLAGS=y,
-> read_unlock_bh() finally enables IRQ even though it should stay
-> disabled until the following read_unlock_irqrestore().
+> =============================
+> WARNING: suspicious RCU usage
 > 
 > [...]
 
 Here is the summary with links:
-  - [v2,net] netlink: Add __sock_i_ino() for __netlink_diag_dump().
-    https://git.kernel.org/netdev/net/c/25a9c8a4431c
+  - [net] net: dsa: avoid suspicious RCU usage for synced VLAN-aware MAC addresses
+    https://git.kernel.org/netdev/net/c/d06f925f1397
 
 You are awesome, thank you!
 -- 
