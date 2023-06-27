@@ -1,201 +1,155 @@
-Return-Path: <netdev+bounces-14131-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14132-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6870B73F0D4
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 04:29:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF03473F0D9
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 04:32:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 82E741C20A18
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:29:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1C40C1C209E6
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9805A47;
-	Tue, 27 Jun 2023 02:29:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CAEF8A21;
+	Tue, 27 Jun 2023 02:32:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C9B8CA46
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:29:45 +0000 (UTC)
-Received: from mail-ot1-x329.google.com (mail-ot1-x329.google.com [IPv6:2607:f8b0:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 030F5199A;
-	Mon, 26 Jun 2023 19:29:44 -0700 (PDT)
-Received: by mail-ot1-x329.google.com with SMTP id 46e09a7af769-6b71cdb47e1so3639658a34.2;
-        Mon, 26 Jun 2023 19:29:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687832983; x=1690424983;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=7s3J7mtj2DOT05cABKB4L4599zUF5rb8Gns79BnadUM=;
-        b=nJqHWenFI/MLjK7BeJH7sTGYYzoSNt10WsYID0G02bMhy1n68WLfT3ZyHqiNFtl9qi
-         GFOr/fTkJg2mcLBQjzczNBZ2i7V1H9NxykzsU8EZqXjlmziF2wGVCBhCyTXiE2vaBaiq
-         sTMNAJXUnmSkGXi110SD1WrOwYYbwX9ns7dLHkJmzCXdir4ExBg3qYcYZZ6otVksIzFz
-         uIPP+lHjhN/sFRS0la+atGEmSABIA+SqMEQ7XN3gFWeGob+nhb2fb2mUCN4LpiOCm6oG
-         1NRlpcEBzEFz3lP5OIAa1VrYuWnt1Nr1vc7cP7Il21y6PIF0LFpooEZ15CI/q1v6ONue
-         4NGw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687832983; x=1690424983;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=7s3J7mtj2DOT05cABKB4L4599zUF5rb8Gns79BnadUM=;
-        b=G+jJ4voOqP1pqXhMurAyMsCxHmoZ65bL7Ni3ggb1bdDfSAV2zvD6ZuDjYJnV+SxuT3
-         dWZo2uRXtfzvLUbP3awEOwHbA4Uh1hmXOUchYBaS2GlHmcuFGAI/FwIfnSy3Z72V/1CH
-         ECJvRkbsHSIgNr+A8NnjCkSvEh2uszGNQCaBBq3OEs6naM/QWNJ0RX3UR6XXiie0ohbZ
-         XLD6SsQPl8VdJscrmbcEAuFrtp1onXJsEh682einS9wJWM5P5Zdmoc2G6zafJqjGYr2c
-         8nBlreEbNC1elVIN1nnqhz4dH/gigOVHov+Y4D7H7VXEU9pebYnQsFdf+TdKE3XIj6pQ
-         EU9Q==
-X-Gm-Message-State: AC+VfDzqEcKbCH1aGYD8keL9yOCnTJdNeIGt7+pLiMv9sosi6H/J58n9
-	eodGcvI6vQgwGxrPNcH504g=
-X-Google-Smtp-Source: ACHHUZ6IwQ9FELesSLU/UHwcmF0hCmBoDWfKnYld0eaSg231u/frP7cFaztMIwvdsHyGV/NyTGXk0w==
-X-Received: by 2002:a05:6359:62f:b0:127:d8c1:b829 with SMTP id eh47-20020a056359062f00b00127d8c1b829mr20826988rwb.27.1687832983046;
-        Mon, 26 Jun 2023 19:29:43 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id q17-20020a62ae11000000b00679dc747738sm1759832pff.10.2023.06.26.19.29.42
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 26 Jun 2023 19:29:42 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 92C3781BD58D; Tue, 27 Jun 2023 09:29:37 +0700 (WIB)
-Date: Tue, 27 Jun 2023 09:29:36 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: "Steven Rostedt (Google)" <rostedt@goodmis.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lingutla Chandrasekhar <clingutla@codeaurora.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"J. Avila" <elavila@google.com>,
-	Vivek Anand <vivekanand754@gmail.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Thomas Renninger <trenn@suse.com>, Shuah Khan <shuah@kernel.org>,
-	Peter Zijlstra <peterz@infradead.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Josh Poimboeuf <jpoimboe@kernel.org>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Linux Netfilter Development <netfilter-devel@vger.kernel.org>,
-	Netfilter Core Developers <coreteam@netfilter.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Power Management <linux-pm@vger.kernel.org>
-Subject: Re: Fwd: High cpu usage caused by kernel process when upgraded to
- linux 5.19.17 or later
-Message-ID: <ZJpJkL3dPXxgw6RK@debian.me>
-References: <01ac399d-f793-49d4-844b-72cd8e0034df@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BBA2C36B
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 02:32:37 +0000 (UTC)
+Received: from esa.microchip.iphmx.com (esa.microchip.iphmx.com [68.232.153.233])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 237F419A1
+	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 19:32:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=microchip.com; i=@microchip.com; q=dns/txt; s=mchp;
+  t=1687833157; x=1719369157;
+  h=from:to:cc:subject:date:message-id:mime-version;
+  bh=OEXo62myx6hQDxFmvymqLEvdScEYILLvYYQ6q+9KruM=;
+  b=lsQ/tv0W12SmLFGKWNRxw7sW3KYuWckyBtIDqd8MHKpGHqcgX9DMW4GE
+   YkHGNKIN6UZ3jW0ut+G2boH92zjZltmuoZQOQWCT1LUQEsHmpOuny7rrf
+   cma5/QcvOxVXK0hy77K5FaSKPbfoo/s7xHdvKmc+N80IPQ5Da31VkTDlV
+   Npvy7t8zsF3p1LvaoUraZJIZ0YjSS1aznKBF8HFnSA9NxfWB/+5vIxIid
+   j45bDiWioWJg/BzdfR1zuXXKXIsYT82e9A1Z1wCSt2nYQ/6pyuYLdz4Ob
+   zvdv8yS1r22A2rH8tedUL9hxsFlSVzrHr1O/53PJxEfXAbkGebpyYvOMd
+   Q==;
+X-IronPort-AV: E=Sophos;i="6.01,161,1684825200"; 
+   d="scan'208";a="220664331"
+X-Amp-Result: SKIPPED(no attachment in message)
+Received: from unknown (HELO email.microchip.com) ([170.129.1.10])
+  by esa5.microchip.iphmx.com with ESMTP/TLS/AES256-SHA256; 26 Jun 2023 19:32:35 -0700
+Received: from chn-vm-ex03.mchp-main.com (10.10.85.151) by
+ chn-vm-ex04.mchp-main.com (10.10.85.152) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.21; Mon, 26 Jun 2023 19:32:34 -0700
+Received: from hat-linux.microchip.com (10.10.115.15) by
+ chn-vm-ex03.mchp-main.com (10.10.85.151) with Microsoft SMTP Server id
+ 15.1.2507.21 via Frontend Transport; Mon, 26 Jun 2023 19:32:34 -0700
+From: <Tristram.Ha@microchip.com>
+To: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>
+CC: <netdev@vger.kernel.org>, <UNGLinuxDriver@microchip.com>, Tristram Ha
+	<Tristram.Ha@microchip.com>
+Subject: [PATCH net] net: dsa: microchip: correct KSZ8795 static MAC table access
+Date: Mon, 26 Jun 2023 19:33:07 -0700
+Message-ID: <1687833188-3184-1-git-send-email-Tristram.Ha@microchip.com>
+X-Mailer: git-send-email 1.9.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="90Q4kbwiz0bo494z"
-Content-Disposition: inline
-In-Reply-To: <01ac399d-f793-49d4-844b-72cd8e0034df@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+From: Tristram Ha <Tristram.Ha@microchip.com>
 
---90Q4kbwiz0bo494z
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+The KSZ8795 driver code was modified to use on KSZ8863/73, which has
+different register definitions.  Some of the new KSZ8795 register
+information are wrong compared with previous code.
 
-On Fri, Jun 23, 2023 at 07:58:51AM +0700, Bagas Sanjaya wrote:
-> Hi,
->=20
-> I notice a regression report on Bugzilla [1]. Quoting from it:
->=20
-> > kernel process "kworker/events_power_efficient" uses a lot of cpu power=
- (100% on ESXI 6.7, ~30% on ESXI 7.0U3 or later) after upgrading from 5.17.=
-3 to 5.19.17 or later.
-> >=20
-> > dmesg log:
-> > [ 2430.973102]  </TASK>
-> > [ 2430.973131] Sending NMI from CPU 1 to CPUs 0:
-> > [ 2430.973241] NMI backtrace for cpu 0
-> > [ 2430.973247] CPU: 0 PID: 22 Comm: kworker/0:1 Not tainted 6.3.3 #1
-> > [ 2430.973254] Hardware name: VMware, Inc. VMware Virtual Platform/440B=
-X Desktop Reference Platform, BIOS 6.00 11/12/2020
-> > [ 2430.973258] Workqueue: events_power_efficient htable_gc [xt_hashlimi=
-t]
-> > [ 2430.973275] RIP: 0010:preempt_count_sub+0x2e/0xa0
-> > [ 2430.973289] Code: 36 01 85 c9 75 1b 65 8b 15 a7 da f8 5e 89 d1 81 e1=
- ff ff ff 7f 39 f9 7c 16 81 ff fe 00 00 00 76 3b f7 df 65 01 3d 8a da f8 5e=
- <c3> cc cc cc cc e8 98 aa 25 00 85 c0 74 f2 8b 15 da 71 ed 00 85 d2
-> > [ 2430.973294] RSP: 0018:ffffb15ec00dbe58 EFLAGS: 00000297
-> > [ 2430.973299] RAX: 0000000000000000 RBX: ffffb15ec12ad000 RCX: 0000000=
-000000001
-> > [ 2430.973302] RDX: 0000000080000001 RSI: ffffffffa1c3313b RDI: 0000000=
-0ffffffff
-> > [ 2430.973306] RBP: dead000000000122 R08: 0000000000000010 R09: 0000746=
-e65696369
-> > [ 2430.973309] R10: 8080808080808080 R11: 0000000000000018 R12: 0000000=
-000000000
-> > [ 2430.973312] R13: 0000000000001e2b R14: ffffb15ec12ad048 R15: ffff91c=
-279c26a05
-> > [ 2430.973316] FS:  0000000000000000(0000) GS:ffff91c279c00000(0000) kn=
-lGS:0000000000000000
-> > [ 2430.973320] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [ 2430.973324] CR2: 000055fc138890e0 CR3: 000000010810e002 CR4: 0000000=
-0001706f0
-> > [ 2430.973374] Call Trace:
-> > [ 2430.973388]  <TASK>
-> > [ 2430.973390]  __local_bh_enable_ip+0x32/0x70
-> > [ 2430.973413]  htable_selective_cleanup+0x95/0xc0 [xt_hashlimit]
-> > [ 2430.973428]  htable_gc+0xf/0x30 [xt_hashlimit]
-> > [ 2430.973440]  process_one_work+0x1d4/0x360
-> > [ 2430.973459]  ? process_one_work+0x360/0x360
-> > [ 2430.973467]  worker_thread+0x25/0x3b0
-> > [ 2430.973476]  ? process_one_work+0x360/0x360
-> > [ 2430.973483]  kthread+0xe1/0x110
-> > [ 2430.973499]  ? kthread_complete_and_exit+0x20/0x20
-> > [ 2430.973507]  ret_from_fork+0x1f/0x30
-> > [ 2430.973526]  </TASK>
->=20
-> See Bugzilla for the full thread and perf output.
->=20
-> Anyway, I'm tracking it in regzbot so that it doesn't fall through
-> cracks unnoticed:
->=20
-> #regzbot introduced: v5.17.3..v5.19.17 https://bugzilla.kernel.org/show_b=
-ug.cgi?id=3D217586
-> #regzbot title: kworker/events_power_efficient utilizes full CPU power af=
-ter kernel upgrade
->=20
+KSZ8795 also behaves differently in that the STATIC_MAC_TABLE_USE_FID
+and STATIC_MAC_TABLE_FID bits are off by 1 when doing MAC table reading
+than writing.  To compensate that a special code was added to shift the
+register value by 1 before applying those bits.  This is wrong when the
+code is running on KSZ8863, so this special is only executed when
+KSZ8795 is detected.
 
-The reporter had found the culprit (see Bugzilla for more information), thus
-telling regzbot:
+Fixes: c8e04374f9e1 ("net: dsa: microchip: Make ksz8_w_sta_mac_table() static")
 
-#regzbot introduced: 6ad0ad2bf8a67e
-#regzbot title: retbleed reporting causes high cpu utilization due to kwork=
-er/events_power_efficient
-#regzbot link: https://lore.kernel.org/all/PH0PR05MB8448A203A909959FAC754B7=
-AAF439@PH0PR05MB8448.namprd05.prod.outlook.com/
-#regzbot link: 6ad0ad2bf8a67e
+Signed-off-by: Tristram Ha <Tristram.Ha@microchip.com>
+---
+ drivers/net/dsa/microchip/ksz8795.c    | 8 +++++++-
+ drivers/net/dsa/microchip/ksz_common.c | 8 ++++----
+ drivers/net/dsa/microchip/ksz_common.h | 7 +++++++
+ 3 files changed, 18 insertions(+), 5 deletions(-)
 
-Thanks.
+diff --git a/drivers/net/dsa/microchip/ksz8795.c b/drivers/net/dsa/microchip/ksz8795.c
+index f56fca1b1a22..cc5b19a3d0df 100644
+--- a/drivers/net/dsa/microchip/ksz8795.c
++++ b/drivers/net/dsa/microchip/ksz8795.c
+@@ -506,7 +506,13 @@ static int ksz8_r_sta_mac_table(struct ksz_device *dev, u16 addr,
+ 		(data_hi & masks[STATIC_MAC_TABLE_FWD_PORTS]) >>
+ 			shifts[STATIC_MAC_FWD_PORTS];
+ 	alu->is_override = (data_hi & masks[STATIC_MAC_TABLE_OVERRIDE]) ? 1 : 0;
+-	data_hi >>= 1;
++
++	/* KSZ8795 family switches have STATIC_MAC_TABLE_USE_FID and
++	 * STATIC_MAC_TABLE_FID definitions off by 1 when doing read on the
++	 * static MAC table compared to doing write.
++	 */
++	if (ksz_is_ksz87xx(dev))
++		data_hi >>= 1;
+ 	alu->is_static = true;
+ 	alu->is_use_fid = (data_hi & masks[STATIC_MAC_TABLE_USE_FID]) ? 1 : 0;
+ 	alu->fid = (data_hi & masks[STATIC_MAC_TABLE_FID]) >>
+diff --git a/drivers/net/dsa/microchip/ksz_common.c b/drivers/net/dsa/microchip/ksz_common.c
+index a4428be5f483..a0ba2605bb62 100644
+--- a/drivers/net/dsa/microchip/ksz_common.c
++++ b/drivers/net/dsa/microchip/ksz_common.c
+@@ -331,13 +331,13 @@ static const u32 ksz8795_masks[] = {
+ 	[STATIC_MAC_TABLE_VALID]	= BIT(21),
+ 	[STATIC_MAC_TABLE_USE_FID]	= BIT(23),
+ 	[STATIC_MAC_TABLE_FID]		= GENMASK(30, 24),
+-	[STATIC_MAC_TABLE_OVERRIDE]	= BIT(26),
+-	[STATIC_MAC_TABLE_FWD_PORTS]	= GENMASK(24, 20),
++	[STATIC_MAC_TABLE_OVERRIDE]	= BIT(22),
++	[STATIC_MAC_TABLE_FWD_PORTS]	= GENMASK(20, 16),
+ 	[DYNAMIC_MAC_TABLE_ENTRIES_H]	= GENMASK(6, 0),
+-	[DYNAMIC_MAC_TABLE_MAC_EMPTY]	= BIT(8),
++	[DYNAMIC_MAC_TABLE_MAC_EMPTY]	= BIT(7),
+ 	[DYNAMIC_MAC_TABLE_NOT_READY]	= BIT(7),
+ 	[DYNAMIC_MAC_TABLE_ENTRIES]	= GENMASK(31, 29),
+-	[DYNAMIC_MAC_TABLE_FID]		= GENMASK(26, 20),
++	[DYNAMIC_MAC_TABLE_FID]		= GENMASK(22, 16),
+ 	[DYNAMIC_MAC_TABLE_SRC_PORT]	= GENMASK(26, 24),
+ 	[DYNAMIC_MAC_TABLE_TIMESTAMP]	= GENMASK(28, 27),
+ 	[P_MII_TX_FLOW_CTRL]		= BIT(5),
+diff --git a/drivers/net/dsa/microchip/ksz_common.h b/drivers/net/dsa/microchip/ksz_common.h
+index 8abecaf6089e..33d9a2f6af27 100644
+--- a/drivers/net/dsa/microchip/ksz_common.h
++++ b/drivers/net/dsa/microchip/ksz_common.h
+@@ -569,6 +569,13 @@ static inline void ksz_regmap_unlock(void *__mtx)
+ 	mutex_unlock(mtx);
+ }
+ 
++static inline bool ksz_is_ksz87xx(struct ksz_device *dev)
++{
++	return dev->chip_id == KSZ8795_CHIP_ID ||
++	       dev->chip_id == KSZ8794_CHIP_ID ||
++	       dev->chip_id == KSZ8765_CHIP_ID;
++}
++
+ static inline bool ksz_is_ksz88x3(struct ksz_device *dev)
+ {
+ 	return dev->chip_id == KSZ8830_CHIP_ID;
+-- 
+2.17.1
 
---=20
-An old man doll... just what I always wanted! - Clara
-
---90Q4kbwiz0bo494z
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZJpJiwAKCRD2uYlJVVFO
-o1jRAP4q8brZctIPnGZqlJZqlJEMRnc4sRukxEX4ieIUH5Xn0QEA1g/dJoM/iQbR
-z2LBNutalMJVqVv8mRZOw176rScpTw0=
-=xdMq
------END PGP SIGNATURE-----
-
---90Q4kbwiz0bo494z--
 
