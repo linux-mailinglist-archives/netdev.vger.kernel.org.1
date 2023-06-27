@@ -1,25 +1,25 @@
-Return-Path: <netdev+bounces-14160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14159-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4060873F4F5
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 08:55:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EB5F073F4F4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 08:55:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C8FAA280DE8
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 06:55:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A1B6A280D5F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 06:55:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7ADC14A85;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C5E979FF;
 	Tue, 27 Jun 2023 06:53:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CD92113AE5
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61ABBBE55
 	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:53:34 +0000 (UTC)
 Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C2681708;
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 6C1261701;
 	Mon, 26 Jun 2023 23:53:28 -0700 (PDT)
 From: Pablo Neira Ayuso <pablo@netfilter.org>
 To: netfilter-devel@vger.kernel.org
@@ -28,9 +28,9 @@ Cc: davem@davemloft.net,
 	kuba@kernel.org,
 	pabeni@redhat.com,
 	edumazet@google.com
-Subject: [PATCH net 5/6] netfilter: nf_tables: unbind non-anonymous set if rule construction fails
-Date: Tue, 27 Jun 2023 08:53:03 +0200
-Message-Id: <20230627065304.66394-6-pablo@netfilter.org>
+Subject: [PATCH net 6/6] netfilter: nf_tables: fix underflow in chain reference counter
+Date: Tue, 27 Jun 2023 08:53:04 +0200
+Message-Id: <20230627065304.66394-7-pablo@netfilter.org>
 X-Mailer: git-send-email 2.30.2
 In-Reply-To: <20230627065304.66394-1-pablo@netfilter.org>
 References: <20230627065304.66394-1-pablo@netfilter.org>
@@ -47,28 +47,40 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Otherwise a dangling reference to a rule object that is gone remains
-in the set binding list.
+Set element addition error path decrements reference counter on chains
+twice: once on element release and again via nft_data_release().
 
-Fixes: 26b5a5712eb8 ("netfilter: nf_tables: add NFT_TRANS_PREPARE_ERROR to deal with bound set/chain")
+Then, d6b478666ffa ("netfilter: nf_tables: fix underflow in object
+reference counter") incorrectly fixed this by removing the stateful
+object reference count decrement.
+
+Restore the stateful object decrement as in b91d90368837 ("netfilter:
+nf_tables: fix leaking object reference count") and let
+nft_data_release() decrement the chain reference counter, so this is
+done only once.
+
+Fixes: d6b478666ffa ("netfilter: nf_tables: fix underflow in object reference counter")
+Fixes: 628bd3e49cba ("netfilter: nf_tables: drop map element references from preparation phase")
 Signed-off-by: Pablo Neira Ayuso <pablo@netfilter.org>
 ---
- net/netfilter/nf_tables_api.c | 2 ++
- 1 file changed, 2 insertions(+)
+ net/netfilter/nf_tables_api.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
 diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
-index 4c7937fd803f..1d64c163076a 100644
+index 1d64c163076a..c742918f22a4 100644
 --- a/net/netfilter/nf_tables_api.c
 +++ b/net/netfilter/nf_tables_api.c
-@@ -5343,6 +5343,8 @@ void nf_tables_deactivate_set(const struct nft_ctx *ctx, struct nft_set *set,
- 		nft_set_trans_unbind(ctx, set);
- 		if (nft_set_is_anonymous(set))
- 			nft_deactivate_next(ctx->net, set);
-+		else
-+			list_del_rcu(&binding->list);
- 
- 		set->use--;
- 		break;
+@@ -6771,7 +6771,9 @@ static int nft_add_set_elem(struct nft_ctx *ctx, struct nft_set *set,
+ err_element_clash:
+ 	kfree(trans);
+ err_elem_free:
+-	nft_set_elem_destroy(set, elem.priv, true);
++	nf_tables_set_elem_destroy(ctx, set, elem.priv);
++	if (obj)
++		obj->use--;
+ err_parse_data:
+ 	if (nla[NFTA_SET_ELEM_DATA] != NULL)
+ 		nft_data_release(&elem.data.val, desc.type);
 -- 
 2.30.2
 
