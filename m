@@ -1,159 +1,157 @@
-Return-Path: <netdev+bounces-14124-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14125-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E371773EF81
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 01:57:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2891E73EFB3
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 02:31:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A12A2280F4E
-	for <lists+netdev@lfdr.de>; Mon, 26 Jun 2023 23:57:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5A2391C209CB
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 00:31:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D473215AF0;
-	Mon, 26 Jun 2023 23:57:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DE188630;
+	Tue, 27 Jun 2023 00:31:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C680D12B66
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 23:57:13 +0000 (UTC)
-Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 2FB90E5A;
-	Mon, 26 Jun 2023 16:57:12 -0700 (PDT)
-Received: by linux.microsoft.com (Postfix, from userid 1004)
-	id 5992020553EC; Mon, 26 Jun 2023 16:57:11 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 5992020553EC
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linuxonhyperv.com;
-	s=default; t=1687823831;
-	bh=fiPgyc8J5BXMwqhx//yUhPKJcnCZ0LyA5rM0uvnK2RY=;
-	h=From:To:Cc:Subject:Date:From;
-	b=hwuzGsd2Oc4je6vn0zd2blhZI89dhXLSyTpRe5TdImHU+QimtplZLUomb62Ga1ozO
-	 yyl/HRhtzwXuY0YUNAsVfgWjMCkuZYyzlxUFAzpWOVq7fD/gHqDcDxjP99XqwqP4eV
-	 3G7iIQ3K0o0LhNNMULVp2YA0FtGWVRutI8KDUZCY=
-From: longli@linuxonhyperv.com
-To: Jason Gunthorpe <jgg@ziepe.ca>,
-	Leon Romanovsky <leon@kernel.org>,
-	Ajay Sharma <sharmaajay@microsoft.com>,
-	Dexuan Cui <decui@microsoft.com>,
-	"K. Y. Srinivasan" <kys@microsoft.com>,
-	Haiyang Zhang <haiyangz@microsoft.com>,
-	Wei Liu <wei.liu@kernel.org>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: linux-rdma@vger.kernel.org,
-	linux-hyperv@vger.kernel.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Long Li <longli@microsoft.com>,
-	stable@vger.kernel.org
-Subject: [Patch v3] net: mana: Batch ringing RX queue doorbell on receiving packets
-Date: Mon, 26 Jun 2023 16:57:07 -0700
-Message-Id: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
-X-Mailer: git-send-email 1.8.3.1
-X-Spam-Status: No, score=-11.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0BF8623
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 00:31:08 +0000 (UTC)
+Received: from mail-ot1-x332.google.com (mail-ot1-x332.google.com [IPv6:2607:f8b0:4864:20::332])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DDEA1702;
+	Mon, 26 Jun 2023 17:31:07 -0700 (PDT)
+Received: by mail-ot1-x332.google.com with SMTP id 46e09a7af769-6b708b97418so3575833a34.3;
+        Mon, 26 Jun 2023 17:31:07 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687825866; x=1690417866;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=O/2c9YwwQFhf0X0LD7Wd4iGQMCYKRK/hqVyQ7BZ1+ok=;
+        b=q8mhZZdYPrHx1I3QLvplF2h9BxzqYZesS+LMX5o3xCNa2BrRmKGuk0gzEUXntLV366
+         D24KIkzO67C2Wb+RbX7NYZQbzbEjoKTEWGD0nJ+8UFVIjBP7YZgTO6PvjHnd3ejedoHP
+         bKVL3syv5a9hXjbDpCcSnhqBlB44YgNm/+8RO65bAbaYpZpRXe8g9ezxRZqDvkW4I98d
+         FrnuSfeiVGtmb7Tx1o6ACRV73r4qa5h5CMHXkgp5+OIVXQbmsjofJzquTTxHICf6YWFZ
+         eAMboNZNdMx6oVqDMt4Ing9al5z9YVwzMu3iEk8Lu0rLyO1gQ9CiCeiGwwlYge2r/VYd
+         VCCg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687825866; x=1690417866;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=O/2c9YwwQFhf0X0LD7Wd4iGQMCYKRK/hqVyQ7BZ1+ok=;
+        b=CdmiZ1wtTmzoAm036k1/Y7kfRedwg3Mf9T5QQCiaQDJZCiG3Mt5qIaPqpAwv2xsIcx
+         nE9y3DwiXLbzLK9edH2erPNnuTVl/Fk0MaaQbM5Mr2UlDyeoPAFVD1cW2tY6786VIYTY
+         HEFkMQ+vgvv6tT8jFeKOgwJwSmQAxe5e7hrtCBFAplyRg1Y9kNi8QOF2dxfnDQq7Dd1A
+         /mJmnHDJj/vmA1xQrqu/ozvO/EToTBKn/pUqxGGowhbcLzwvwD/9aoGkSA0ul4HDj0jA
+         upsRPoLb1OLWfGpyrbNV2nbeZDW0ZigIw67QqyUiZz9pJ0pdN+wbRkgPU7ZfqtXkkkgY
+         w4WA==
+X-Gm-Message-State: AC+VfDzBEisI71WqyJOFMSomtZmHWc58U2cR0zW824gQZfLabRkJs704
+	jRcLZKAMQ8VpDN6u11vQB5y3PXjmUmE=
+X-Google-Smtp-Source: ACHHUZ55w/s5bZkFY+aekRuMQHhZ6sW4heSKvm03Smaj5yPZV18Y21i2LabwstcZX3q+GaColKLSGw==
+X-Received: by 2002:a9d:4801:0:b0:6b7:38c0:7420 with SMTP id c1-20020a9d4801000000b006b738c07420mr8014064otf.9.1687825866336;
+        Mon, 26 Jun 2023 17:31:06 -0700 (PDT)
+Received: from [192.168.1.128] ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id t6-20020a9d7486000000b006b735499817sm2722862otk.25.2023.06.26.17.31.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 26 Jun 2023 17:31:05 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <02659cdf-753b-442d-f110-1f92619d55c7@lwfinger.net>
+Date: Mon, 26 Jun 2023 19:31:04 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: Fwd: After kernel 6.3.7 or 6.3.8 b43 driver fails
+Content-Language: en-US
+To: Sardonimous <sardonimous@hotmail.com>, Arnd Bergmann <arnd@arndb.de>,
+ Bagas Sanjaya <bagasdotme@gmail.com>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Wireless <linux-wireless@vger.kernel.org>,
+ Netdev <netdev@vger.kernel.org>
+Cc: =?UTF-8?Q?Michael_B=c3=bcsch?= <m@bues.ch>,
+ kernel test robot <lkp@intel.com>, Simon Horman <simon.horman@corigine.com>,
+ Kalle Valo <kvalo@kernel.org>
+References: <27829c69-515c-36a6-4beb-3210225f8936@gmail.com>
+ <b9428e48-f0f9-46f6-892c-4c8834c930c4@app.fastmail.com>
+ <RO2P215MB193850DDADD38492BEC8CC2FA720A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+ <a3bc5eb5-9639-8016-36ab-105abc8c0ca3@gmail.com>
+ <69b98eb4-2c4e-fe75-90b4-4b08505a595a@lwfinger.net>
+ <RO2P215MB193879B2D99DD0BAF59EFA92A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+ <e0a08449-554a-4a28-ac50-7051866eb95e@app.fastmail.com>
+ <da80b806-de3f-c7ea-0352-cd23e0f6dd65@lwfinger.net>
+ <RO2P215MB1938BD13105900F3525E0FE7A721A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+ <67faf4f4-f36c-3ff7-03b8-cd259e4a5548@lwfinger.net>
+ <RO2P215MB1938BA68BBB683EC696F4BFAA726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+ <6afa0ebc-1d3f-8cba-79dc-8ddfe13c296a@lwfinger.net>
+ <RO2P215MB193898F3008E0F390CCEBC87A726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+From: Larry Finger <Larry.Finger@lwfinger.net>
+In-Reply-To: <RO2P215MB193898F3008E0F390CCEBC87A726A@RO2P215MB1938.LAMP215.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Long Li <longli@microsoft.com>
+On 6/26/23 16:33, Sardonimous wrote:
+> 
+> On 6/26/23 10:21 AM, Larry Finger wrote:
+>> On 6/26/23 07:44, Sardonimous wrote:
+>>> If I were to send you some test patches, could you create a kernel with them 
+>>> applied?
+>>>
+>>> Doubtful.
+>>
+>> Sardonimous,
+>>
+>> OK, that essentially eliminates  getting DMA to work. The cost of a 
+>> MacBookPro7 is too much for me to acquire one to debug that issue.
+>>
+>> On my PowerBook G4, I also got the failure to connect, thus I should be able 
+>> to fix that problem, but getting a new kernel with the fix onto your machine 
+>> will not be easy.
+> 
+> It might be possible to follow the arch instructions for patching the kernel
+> 
+> https://wiki.archlinux.org/title/Kernel/Arch_build_system
+> 
+> It takes about a day to rebuild the kernel following this procedure.
+> 
+>> Is it possible to ssh into your machine, or to use TeamViewer? Those questions 
+>> do not need an answer now, but think about them.
+> 
+> This is complicated by being in a CGNAT environment.  I usually do this via 
+> tailscale.  Will have to think about it.
+> 
+>> Larry
+> 
+> Should pio=1 qos=0 cause the problems that it does?  It if is no longer a 
+> supported configuration, perhaps it should fail more gracefully.
 
-It's inefficient to ring the doorbell page every time a WQE is posted to
-the received queue. Excessive MMIO writes result in CPU spending more
-time waiting on LOCK instructions (atomic operations), resulting in
-poor scaling performance.
+Setting qos=0 will generate a harmless warning, but the network still works. 
+Using pio=1 should still be supported.
 
-Move the code for ringing doorbell page to where after we have posted all
-WQEs to the receive queue during a callback from napi_poll().
+I am bisecting the source. It will take a while as I still have 13 kernels to 
+build and my PowerBook G4 takes about 6 hours per build - it is a lot slower 
+than your computer. At this point, I know that kernel v6.1.0 works, and that 
+v6.2.0-rc4 fails.
 
-With this change, tests showed an improvement from 120G/s to 160G/s on a
-200G physical link, with 16 or 32 hardware queues.
+If you can find a 6.1 kernel, it should work for you. Once I know the fix, we 
+can explore having you patch and rebuild your 6.3.X kernel.
 
-Tests showed no regression in network latency benchmarks on single
-connection.
+Larry
 
-While we are making changes in this code path, change the code for
-ringing doorbell to set the WQE_COUNT to 0 for Receive Queue. The
-hardware specification specifies that it should set to 0. Although
-currently the hardware doesn't enforce the check, in the future releases
-it may do.
 
-Cc: stable@vger.kernel.org
-Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network Adapter (MANA)")
-
-Reviewed-by: Haiyang Zhang <haiyangz@microsoft.com>
-Reviewed-by: Dexuan Cui <decui@microsoft.com>
-Signed-off-by: Long Li <longli@microsoft.com>
----
-Change log:
-v2:
-Check for comp_read > 0 as it might be negative on completion error.
-Set rq.wqe_cnt to 0 according to BNIC spec.
-
-v3:
-Add details in the commit on the reason of performance increase and test numbers.
-Add details in the commit on why rq.wqe_cnt should be set to 0 according to hardware spec.
-Add "Reviewed-by" from Haiyang and Dexuan.
-
- drivers/net/ethernet/microsoft/mana/gdma_main.c |  5 ++++-
- drivers/net/ethernet/microsoft/mana/mana_en.c   | 10 ++++++++--
- 2 files changed, 12 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-index 8f3f78b68592..3765d3389a9a 100644
---- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
-+++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
-@@ -300,8 +300,11 @@ static void mana_gd_ring_doorbell(struct gdma_context *gc, u32 db_index,
- 
- void mana_gd_wq_ring_doorbell(struct gdma_context *gc, struct gdma_queue *queue)
- {
-+	/* Hardware Spec specifies that software client should set 0 for
-+	 * wqe_cnt for Receive Queues. This value is not used in Send Queues.
-+	 */
- 	mana_gd_ring_doorbell(gc, queue->gdma_dev->doorbell, queue->type,
--			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 1);
-+			      queue->id, queue->head * GDMA_WQE_BU_SIZE, 0);
- }
- 
- void mana_gd_ring_cq(struct gdma_queue *cq, u8 arm_bit)
-diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
-index cd4d5ceb9f2d..1d8abe63fcb8 100644
---- a/drivers/net/ethernet/microsoft/mana/mana_en.c
-+++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
-@@ -1383,8 +1383,8 @@ static void mana_post_pkt_rxq(struct mana_rxq *rxq)
- 
- 	recv_buf_oob = &rxq->rx_oobs[curr_index];
- 
--	err = mana_gd_post_and_ring(rxq->gdma_rq, &recv_buf_oob->wqe_req,
--				    &recv_buf_oob->wqe_inf);
-+	err = mana_gd_post_work_request(rxq->gdma_rq, &recv_buf_oob->wqe_req,
-+					&recv_buf_oob->wqe_inf);
- 	if (WARN_ON_ONCE(err))
- 		return;
- 
-@@ -1654,6 +1654,12 @@ static void mana_poll_rx_cq(struct mana_cq *cq)
- 		mana_process_rx_cqe(rxq, cq, &comp[i]);
- 	}
- 
-+	if (comp_read > 0) {
-+		struct gdma_context *gc = rxq->gdma_rq->gdma_dev->gdma_context;
-+
-+		mana_gd_wq_ring_doorbell(gc, rxq->gdma_rq);
-+	}
-+
- 	if (rxq->xdp_flush)
- 		xdp_do_flush();
- }
--- 
-2.34.1
 
 
