@@ -1,80 +1,196 @@
-Return-Path: <netdev+bounces-14140-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14141-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E7ADF73F30F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 05:57:06 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CA1773F38F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 06:39:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD3AA280F6F
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 03:57:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 34091280CCC
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 04:39:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DDF7BEBF;
-	Tue, 27 Jun 2023 03:57:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C25710EF;
+	Tue, 27 Jun 2023 04:39:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2EB26EA1
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 03:57:01 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 62906C433C8;
-	Tue, 27 Jun 2023 03:57:01 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687838221;
-	bh=lbqCvYJZh8SNnzJHRVkGMjw86NGTJnfT4uBpXp3TsMg=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UJRyf34z65RZchlmGj5kDLX8/xIFZBl4JuqPoaOeWL3HrkrpHeHhzo2SM0uFY8819
-	 GIz1SX8wvhzxCsMcDeVkxIiYg22Ey/z/cMXAaxgdldvW/JyWu64/GS1IYm+v3M1fsn
-	 IQSB9aQjQyHzkCZa80cvDJ99znfCPmYcnrxj+dj/tuQ9ofL4jpaZbcotTfvyRIe9BZ
-	 r2hpe5rpcJeqxDYyd5Wt5dc9OBaSMQYwQLXJljmEfBqY1jXv3ebhPZ/K4XN2t/FXal
-	 WCE9hmCEAPs8OlQXGtXeA9DUE3a/p4mROkRBEehc0CKC+wzL0/ML++5E4Y7Q/Wgpj/
-	 063J82HUmM7hQ==
-Date: Mon, 26 Jun 2023 20:57:00 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: <Tristram.Ha@microchip.com>
-Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, <netdev@vger.kernel.org>,
- <UNGLinuxDriver@microchip.com>
-Subject: Re: [PATCH v4 net-next] net: phy: smsc: add WoL support to
- LAN8740/LAN8742 PHYs
-Message-ID: <20230626205700.2ec4acc0@kernel.org>
-In-Reply-To: <1687832250-2867-1-git-send-email-Tristram.Ha@microchip.com>
-References: <1687832250-2867-1-git-send-email-Tristram.Ha@microchip.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 500F1EDD
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 04:39:41 +0000 (UTC)
+Received: from mx.sberdevices.ru (mx.sberdevices.ru [45.89.227.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 84C0826A8;
+	Mon, 26 Jun 2023 21:39:35 -0700 (PDT)
+Received: from s-lin-edge02.sberdevices.ru (localhost [127.0.0.1])
+	by mx.sberdevices.ru (Postfix) with ESMTP id A5B095FD20;
+	Tue, 27 Jun 2023 07:39:30 +0300 (MSK)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
+	s=mail; t=1687840770;
+	bh=95OGPHRDGayh8A0YYyqNyKQ1yAf3hId+4mS4asKi6iA=;
+	h=Message-ID:Date:MIME-Version:Subject:To:From:Content-Type;
+	b=ghf1LqwVimoV5AgcawNO04eGGiCBCjyEdL8auyfrIPdU5L4J5OmaTHhzqK6bE5+8J
+	 2OyZwfTTaLjv9aumSOdQjIwGYx7fSGnN1LFjwiWPvS1CDmNJT92MDYyYCvKwe9TCLD
+	 viZ3divoTp1VLsHQgqhzPuQtTAEcOmvAKXl3PCEwLpo2gIxP0OHNvY/YCXdxsCE9fn
+	 4nZ4S++FAsSQomKRUmENtb77xbwNyKoNNoP3rXSzidVOPFGrkoJCy/D7R7sHLYFt/M
+	 ZSb+IR+eCAafKKZu8be4GVLybrjHYt/uQegVLyEfQbCGZIyyYSplr9Mwaccz4TZx15
+	 NFf1IVlarzDcg==
+Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
+	by mx.sberdevices.ru (Postfix) with ESMTP;
+	Tue, 27 Jun 2023 07:39:26 +0300 (MSK)
+Message-ID: <9553a82f-ce31-e2e0-ff62-8abd2a6b639b@sberdevices.ru>
+Date: Tue, 27 Jun 2023 07:34:29 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.7.1
+Subject: Re: [RFC PATCH v1 2/4] virtio/vsock: support MSG_PEEK for
+ SOCK_SEQPACKET
+Content-Language: en-US
+To: Stefano Garzarella <sgarzare@redhat.com>
+CC: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "Michael S. Tsirkin"
+	<mst@redhat.com>, Jason Wang <jasowang@redhat.com>, Bobby Eshleman
+	<bobby.eshleman@bytedance.com>, <kvm@vger.kernel.org>,
+	<virtualization@lists.linux-foundation.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <kernel@sberdevices.ru>, <oxffffaa@gmail.com>
+References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
+ <20230618062451.79980-3-AVKrasnov@sberdevices.ru>
+ <yiy3kssoiyzs6ehnlo7g2xsb26zee5vih3jpgyc7i3dvfcyfpv@xvokxez3lzpo>
+From: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+In-Reply-To: <yiy3kssoiyzs6ehnlo7g2xsb26zee5vih3jpgyc7i3dvfcyfpv@xvokxez3lzpo>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [100.64.160.123]
+X-ClientProxiedBy: p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) To
+ p-i-exch-sc-m01.sberdevices.ru (172.16.192.107)
+X-KSMG-Rule-ID: 4
+X-KSMG-Message-Action: clean
+X-KSMG-AntiSpam-Status: not scanned, disabled by settings
+X-KSMG-AntiSpam-Interceptor-Info: not scanned
+X-KSMG-AntiPhishing: not scanned, disabled by settings
+X-KSMG-AntiVirus: Kaspersky Secure Mail Gateway, version 1.1.2.30, bases: 2023/06/27 02:11:00 #21585463
+X-KSMG-AntiVirus-Status: Clean, skipped
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Mon, 26 Jun 2023 19:17:30 -0700 Tristram.Ha@microchip.com wrote:
-> From: Tristram Ha <Tristram.Ha@microchip.com>
+
+
+On 26.06.2023 19:28, Stefano Garzarella wrote:
+> On Sun, Jun 18, 2023 at 09:24:49AM +0300, Arseniy Krasnov wrote:
+>> This adds support of MSG_PEEK flag for SOCK_SEQPACKET type of socket.
+>> Difference with SOCK_STREAM is that this callback returns either length
+>> of the message or error.
+>>
+>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>> ---
+>> net/vmw_vsock/virtio_transport_common.c | 63 +++++++++++++++++++++++--
+>> 1 file changed, 60 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>> index 2ee40574c339..352d042b130b 100644
+>> --- a/net/vmw_vsock/virtio_transport_common.c
+>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>> @@ -460,6 +460,63 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>     return err;
+>> }
+>>
+>> +static ssize_t
+>> +virtio_transport_seqpacket_do_peek(struct vsock_sock *vsk,
+>> +                   struct msghdr *msg)
+>> +{
+>> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>> +    struct sk_buff *skb;
+>> +    size_t total, len;
+>> +
+>> +    spin_lock_bh(&vvs->rx_lock);
+>> +
+>> +    if (!vvs->msg_count) {
+>> +        spin_unlock_bh(&vvs->rx_lock);
+>> +        return 0;
+>> +    }
+>> +
+>> +    total = 0;
+>> +    len = msg_data_left(msg);
+>> +
+>> +    skb_queue_walk(&vvs->rx_queue, skb) {
+>> +        struct virtio_vsock_hdr *hdr;
+>> +
+>> +        if (total < len) {
+>> +            size_t bytes;
+>> +            int err;
+>> +
+>> +            bytes = len - total;
+>> +            if (bytes > skb->len)
+>> +                bytes = skb->len;
+>> +
+>> +            spin_unlock_bh(&vvs->rx_lock);
+>> +
+>> +            /* sk_lock is held by caller so no one else can dequeue.
+>> +             * Unlock rx_lock since memcpy_to_msg() may sleep.
+>> +             */
+>> +            err = memcpy_to_msg(msg, skb->data, bytes);
+>> +            if (err)
+>> +                return err;
+>> +
+>> +            spin_lock_bh(&vvs->rx_lock);
+>> +        }
+>> +
+>> +        total += skb->len;
+>> +        hdr = virtio_vsock_hdr(skb);
+>> +
+>> +        if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) {
+>> +            if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOR)
+>> +                msg->msg_flags |= MSG_EOR;
+>> +
+>> +            break;
+>> +        }
+>> +    }
+>> +
+>> +    spin_unlock_bh(&vvs->rx_lock);
+>> +
+>> +    return total;
 > 
-> Microchip LAN8740/LAN8742 PHYs support basic unicast, broadcast, and
-> Magic Packet WoL.  They have one pattern filter matching up to 128 bytes
-> of frame data, which can be used to implement ARP or multicast WoL.
+> Should we return the minimum between total and len?
+
+I guess no, because seqpacket dequeue callback always returns length of message,
+then, in af_vsock.c we return either number of bytes read or length of message
+depending on MSG_TRUNC flags.
+
+Thanks, Arseniy
+
 > 
-> ARP WoL matches any ARP frame with broadcast address.
+> Thanks,
+> Stefano
 > 
-> Multicast WoL matches any multicast frame.
+>> +}
+>> +
+>> static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>>                          struct msghdr *msg,
+>>                          int flags)
+>> @@ -554,9 +611,9 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>>                    int flags)
+>> {
+>>     if (flags & MSG_PEEK)
+>> -        return -EOPNOTSUPP;
+>> -
+>> -    return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
+>> +        return virtio_transport_seqpacket_do_peek(vsk, msg);
+>> +    else
+>> +        return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
+>> }
+>> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+>>
+>> -- 
+>> 2.25.1
+>>
 > 
-> Signed-off-by: Tristram Ha <Tristram.Ha@microchip.com>
-
-## Form letter - net-next-closed
-
-The merge window for v6.5 has begun and therefore net-next is closed
-for new drivers, features, code refactoring and optimizations.
-We are currently accepting bug fixes only.
-
-Please repost when net-next reopens after July 10th.
-
-RFC patches sent for review only are obviously welcome at any time.
-
-See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
--- 
-pw-bot: defer
-
 
