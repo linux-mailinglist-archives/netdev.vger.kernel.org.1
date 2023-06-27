@@ -1,84 +1,73 @@
-Return-Path: <netdev+bounces-14332-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14333-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 00C2F7402D9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 20:10:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC531740311
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 20:18:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DD5091C20B12
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:10:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 331232815B1
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:18:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F5F1990D;
-	Tue, 27 Jun 2023 18:10:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F6161ACAC;
+	Tue, 27 Jun 2023 18:18:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6E3C61308A
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 18:10:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id E5CB4C433C0;
-	Tue, 27 Jun 2023 18:10:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AACD113062
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 18:18:01 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id DF41AC433C0;
+	Tue, 27 Jun 2023 18:18:00 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687889422;
-	bh=kfiAacQdD7qLCWrdw5MVrFHxdOHYaIiUktgveu5w3Is=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=Qnh3py2faCSBjAQvGp3cnGrNFaMor7DytEuR4gXwTd4XYF/uyAZ1eZKFFgeN/yiZU
-	 VR892rDRWYHHuI8AKGjP7NVNgPKMOwIG4gVNnc7BecxCy3y7Oya/cHLvSjgxRy0HWp
-	 N/hZKdcVFinpgPTrt5iSxkS/QelgbHICkuk4sShYcrG/bVsBUH7i7RF6yz8tGdPFzT
-	 cPYtZVmqHVS/gRh9f0Xhh3r/3fBPrIKiw/K0LGuPNuAmHZDi+Q3MXFKiN1dPUfuDJ/
-	 E/7JfSPQ+ti+NoM4OGTkq0L3yGI4pzJP0yDkghfG20LhSEPTorraQuHj17DEF5B5+F
-	 wsg3mGRGoxFjg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id CA55BE53807;
-	Tue, 27 Jun 2023 18:10:21 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	s=k20201202; t=1687889881;
+	bh=iYtIyO/ySZzF+IOqcCHeQhRSytBBD9onL/5yGdI7F1Q=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=ngOGXNaHdjsvIlZnF6+wsprKCBG6oiYmUo7UWH9qOldOrru82Gsd5DOlMImLDyOl2
+	 Hha2ReO5/ORJUUDk9UD2sT5dJskIzJ6kpPi/GCaHL7z7ZouqkTj5YbeOMZuOR9Hjfi
+	 3a+bQtdw0pjAhC9Xq1xEWY2jclbs0yYJzIPaNGU06hRGbxcBD7wSimGe1/CQohQYkr
+	 193QgmOkDMnG88T68YtlFm0OgD6Nr4FFdorTwDLSwQjOPKNkVUPDLW3fcyjsfopSZ0
+	 LxeY+RgDwODdIQlfD1AnJXwiuNcJHmoVAheTZmykwGuDQ9qbGVYk2DWJ+gLp2yp+0e
+	 BOCzttu8uS/oA==
+Date: Tue, 27 Jun 2023 11:18:00 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ gregkh@linuxfoundation.org, kuniyu@amazon.com, io-uring@vger.kernel.org
+ (open list:IO_URING), linux-kernel@vger.kernel.org (open list),
+ netdev@vger.kernel.org (open list:NETWORKING [GENERAL])
+Subject: Re: [PATCH v4] io_uring: Add io_uring command support for sockets
+Message-ID: <20230627111800.70035051@kernel.org>
+In-Reply-To: <20230627134424.2784797-1-leitao@debian.org>
+References: <20230627134424.2784797-1-leitao@debian.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next 0/2] af_unix: Followup fixes for SO_PASSPIDFD.
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168788942182.15653.17504067646804498753.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Jun 2023 18:10:21 +0000
-References: <20230627174314.67688-1-kuniyu@amazon.com>
-In-Reply-To: <20230627174314.67688-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, alexander@mihalicyn.com, brauner@kernel.org,
- luiz.von.dentz@intel.com, kuni1840@gmail.com, netdev@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Hello:
-
-This series was applied to netdev/net-next.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
-
-On Tue, 27 Jun 2023 10:43:12 -0700 you wrote:
-> This series fixes 2 issues introduced by commit 5e2ff6704a27 ("scm: add
-> SO_PASSPIDFD and SCM_PIDFD").
+On Tue, 27 Jun 2023 06:44:24 -0700 Breno Leitao wrote:
+> Enable io_uring commands on network sockets. Create two new
+> SOCKET_URING_OP commands that will operate on sockets.
 > 
-> The 1st patch fixes a warning in scm_pidfd_recv() reported by syzkaller.
-> The 2nd patch fixes a regression that bluetooth can't be built as module.
+> In order to call ioctl on sockets, use the file_operations->io_uring_cmd
+> callbacks, and map it to a uring socket function, which handles the
+> SOCKET_URING_OP accordingly, and calls socket ioctls.
 > 
-> 
-> [...]
+> This patches was tested by creating a new test case in liburing.
+> Link: https://github.com/leitao/liburing/tree/io_uring_cmd
 
-Here is the summary with links:
-  - [v1,net-next,1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL.
-    https://git.kernel.org/netdev/net-next/c/603fc57ab70c
-  - [v1,net-next,2/2] net: scm: introduce and use scm_recv_unix helper
-    https://git.kernel.org/netdev/net-next/c/a9c49cc2f5b5
+It's a bit late for net-next to take this, I'm about to send our 6.5 PR.
+But in case Jens wants to take it via io_uring for 6.5:
 
-You are awesome, thank you!
+Acked-by: Jakub Kicinski <kuba@kernel.org>
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+For netdev:
+pw-bot: defer
 
