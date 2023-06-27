@@ -1,87 +1,136 @@
-Return-Path: <netdev+bounces-14285-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14286-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C14E373FEF4
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:51:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C6F9473FEF7
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:51:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 899431C2031C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:51:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 032001C20B47
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:51:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BD4518C24;
-	Tue, 27 Jun 2023 14:51:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C41019501;
+	Tue, 27 Jun 2023 14:51:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4FA2218000
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:51:25 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3A5F430F3;
-	Tue, 27 Jun 2023 07:51:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=grZGX8JELpOIKZjXlliOgEI/DJc38Q546m4p6RZBCpM=; b=R49xoCj2QcPcOYNbLkV444Qwnp
-	vHN3xtMJ/uhKF5VZnJPMpKEWskxF2mBMxp7SqIZpcg5kC+CchRVA9oTBp59RuUjmBIGXKu2gfdSnW
-	8bjqo5/WN4geMWzeKypRE1tP5cl6WwlZop5oL5zclyaEEu4PIrljTLzVQ7oRuTgr+EnU=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qEA1y-0002Rm-HB; Tue, 27 Jun 2023 16:50:58 +0200
-Date: Tue, 27 Jun 2023 16:50:58 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Moritz Fischer <moritzf@google.com>, netdev@vger.kernel.org,
-	pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
-	davem@davemloft.net, bryan.whitehead@microchip.com,
-	UNGLinuxDriver@microchip.com, mdf@kernel.org,
-	stable@vger.kernel.org
-Subject: Re: [PATCH net v3] net: lan743x: Don't sleep in atomic context
-Message-ID: <9a42d3d3-a142-4e4a-811b-0b3b931e798b@lunn.ch>
-References: <20230627035000.1295254-1-moritzf@google.com>
- <ZJrc5xjeHp5vYtAO@boxer>
- <35db66a9-d478-4b15-ad30-bfc4cded0b5c@lunn.ch>
- <CAFyOScpRDOvVrCsrwdxFstoNf1tOEnGbPSt5XDM1PKhCDyUGaw@mail.gmail.com>
- <ZJr1Ifp9cOlfcqbE@boxer>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 08F7818000;
+	Tue, 27 Jun 2023 14:51:52 +0000 (UTC)
+Received: from wout1-smtp.messagingengine.com (wout1-smtp.messagingengine.com [64.147.123.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267A4FA;
+	Tue, 27 Jun 2023 07:51:51 -0700 (PDT)
+Received: from compute4.internal (compute4.nyi.internal [10.202.2.44])
+	by mailout.west.internal (Postfix) with ESMTP id 076803200902;
+	Tue, 27 Jun 2023 10:51:49 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute4.internal (MEProxy); Tue, 27 Jun 2023 10:51:50 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:content-type:date
+	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to; s=fm1; t=
+	1687877509; x=1687963909; bh=J3c7xEg1YYI1wbRJy4qEuZ+boAxMySi5/Do
+	IOAO5gmQ=; b=hz+vJUg6/cZg8YDhve5zDRJlNDDz7L3F3NrNUBFBV7BRIVCY/cO
+	yudg+iwgFub4Y2o/zqIA/jswngiWu1DT8Jtxii5L/zV/tI7xKQMHIDfjpziFGnf6
+	GP9WqzvTGneYGh0KxDj5Mgj0oVPZgiEUIhiZ0iwlOXwgt9X1SSdmBUm3rQvNli8Q
+	W8Mgh17/B455eXKqfEsS4kjEw1tVnvqlUnBxElvl6AW61PvnKkA2+28lc0RiJbLo
+	CcFMZ0Ec+tvHXrIrB8Hz7uZ/IVQsDk38cuBOokKNrPWdsbAGQvYpSVk88JcQcoiV
+	jDvm4fvt/sJq9F9J0lvtjbvb2gMlopxHI6Q==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:content-type:date:date:feedback-id:feedback-id
+	:from:from:in-reply-to:in-reply-to:message-id:mime-version
+	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
+	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
+	1687877509; x=1687963909; bh=J3c7xEg1YYI1wbRJy4qEuZ+boAxMySi5/Do
+	IOAO5gmQ=; b=A29GD4T+i5IqDhXAoTc3X1F9q08SZiK4F/dqN2gK6eClwF+xUsc
+	Rb0kKaF8UXdrQWfWsfMX81NxWhJ4C37Yzn0VGKYaUF6ug2i8EYo7Musc3OhnuKSX
+	lsMwf5JynptvrqXgKjpDtbKF0V3Bb3iwxDy+q9Eu+/1nHbsSoEeL5h7SeS/19n3g
+	OHxElU34m3xpbnt5F0o1UE6pUc9uucx3wzW5PgnjUtetc2HZRcmxZLBJFlHFcGMN
+	xrIOcU2UGUdIoRihQVhfe/MwciVfteHECfgqJzrjGzz3qYXsnI9l8dn+yRLLktf7
+	6IMfDTEJRTQam69e+SHFs9Rz2N718k/vZVQ==
+X-ME-Sender: <xms:hfeaZOUsX6-KqQxbmdgBnMZ6wNH0rhCxn1TOVs_SDDeMdBKYWuM00A>
+    <xme:hfeaZKn37W5L4sGVVjJChvYyulvnep473lsDql4-0UvzhhD6PHZhmWb3yXSqIQJlx
+    4ZxETT6TQTyUySDAA>
+X-ME-Received: <xmr:hfeaZCahAN26rfSxkkVFGPyXi3CD6Qb9wQDzyqvVXo7SvVpGNOML-JGHFq0lorqspFmU4Rvw4wQG7TvMV8IH_p-T5G0svIZBpKax>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrtddtgdeflecutefuodetggdotefrodftvf
+    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
+    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenfg
+    hrlhcuvffnffculdejtddmnecujfgurhepfffhvfevuffkfhggtggugfgjsehtkefstddt
+    tddunecuhfhrohhmpeffrghnihgvlhcuighuuceougiguhesugiguhhuuhdrgiihiieqne
+    cuggftrfgrthhtvghrnhepudefiedtieehffeuffelffegheegjeekteekgfdtkeefjeeh
+    ffejtdfgkeeiteelnecuvehluhhsthgvrhfuihiivgeptdenucfrrghrrghmpehmrghilh
+    hfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:hfeaZFUt-HHxVlILylDOTB_guDV_gvTgjgjh468_aQIlDVu3G1dY9g>
+    <xmx:hfeaZIlvBTx6nBB6Nj_IvLEBd3yma-IqEq_zlI5mgoKcGK6pxQm7IQ>
+    <xmx:hfeaZKcvuJFGIxzHbokFp40x4LcuS9dbxC7U8xOHom64hGUfV0fckg>
+    <xmx:hfeaZC4fUpuPIKeRG5l1RH2I8d9cULCwJgiGhNg6D1ehy4U2aU3GkQ>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Tue,
+ 27 Jun 2023 10:51:48 -0400 (EDT)
+Date: Tue, 27 Jun 2023 08:51:47 -0600
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org, coreteam@netfilter.org, 
+	netfilter-devel@vger.kernel.org, fw@strlen.de, daniel@iogearbox.net, dsahern@kernel.org
+Subject: Re: [PATCH bpf-next 0/7] Support defragmenting IPv(4|6) packets in
+ BPF
+Message-ID: <hwsdt5pjygunx7lxrvnwjerugchzpu5mpb442hlwf2h5szqq2h@cuqbteb6bqyh>
+References: <cover.1687819413.git.dxu@dxuuu.xyz>
+ <874jmthtiu.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1
 Content-Disposition: inline
-In-Reply-To: <ZJr1Ifp9cOlfcqbE@boxer>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <874jmthtiu.fsf@toke.dk>
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Side note would be that I don't see much value in iopoll.h's macros
-> returning
+Hi Toke,
+
+Thanks for taking a look at the patchset.
+
+On Tue, Jun 27, 2023 at 04:25:13PM +0200, Toke Høiland-Jørgensen wrote:
+> > The basic idea is we bump a refcnt on the netfilter defrag module and
+> > then run the bpf prog after the defrag module runs. This allows bpf
+> > progs to transparently see full, reassembled packets. The nice thing
+> > about this is that progs don't have to carry around logic to detect
+> > fragments.
 > 
-> 	(cond) ? 0 : -ETIMEDOUT; \
-> 
-> this could be just !!cond but given the count of the callsites...probably
-> better to leave it as is.
+> One high-level comment after glancing through the series: Instead of
+> allocating a flag specifically for the defrag module, why not support
+> loading (and holding) arbitrary netfilter modules in the UAPI? If we
+> need to allocate a new flag every time someone wants to use a netfilter
+> module along with BPF we'll run out of flags pretty quickly :)
 
-The general pattern everywhere in linux is:
+I don't have enough context on netfilter in general to say if it'd be
+generically useful -- perhaps Florian can comment on that.
 
-    err = foo(bar);
-    if (err)
-        return err;
+However, I'm not sure such a mechanism removes the need for a flag. The
+netfilter defrag modules still need to be called into to bump the refcnt.
 
-We want functions to return meaningful error codes, otherwise the
-caller needs to figure out an error code and return it. Having iopoll
-return an error code means we have consistency. Otherwise i would
-expect some developers to decide on EIO, ETIMEDOUT, EINVAL, maybe
-ENXIO?
+The module could export some kfuncs to inc/dec the refcnt, but it'd be
+rather odd for prog code to think about the lifetime of the attachment
+(as inc/dec for _each_ prog execution seems wasteful and slow).  AFAIK
+all the other resource acquire/release APIs are for a single prog
+execution.
 
-	Andrew
+So a flag for link attach feels the most natural to me. We could always
+add a flag2 field or something right?
+
+[...]
+
+Thanks,
+Daniel
 
