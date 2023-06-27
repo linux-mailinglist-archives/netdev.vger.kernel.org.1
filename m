@@ -1,117 +1,86 @@
-Return-Path: <netdev+bounces-14267-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14268-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C817473FD43
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 15:55:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5E25B73FD4D
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:00:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7C36C281065
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:55:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 934831C20A96
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:00:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 823A3182D5;
-	Tue, 27 Jun 2023 13:55:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5E37918AE8;
+	Tue, 27 Jun 2023 14:00:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 734C2182CC
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 13:55:25 +0000 (UTC)
-Received: from mail-qt1-x832.google.com (mail-qt1-x832.google.com [IPv6:2607:f8b0:4864:20::832])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 143341FCD
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:55:24 -0700 (PDT)
-Received: by mail-qt1-x832.google.com with SMTP id d75a77b69052e-4007b5bafceso229261cf.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 06:55:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1687874123; x=1690466123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=QGOH63jgnVEs2f+80uEeHRGpcn2owuUaHFI+XI/Lwro=;
-        b=4jpRsGb+eEeMvdz049rnzuwxgDroNMoFwnA24xUhw8wYNtRIr6lxsWdA/P/rFb0HkR
-         lDMop5UXZhkkHrT2PhbP0SKfe09XFulHDdDX7kkilQf397tCis5Gm4Ywd+bYh4ZmbyFe
-         jrMCqd+JLCEHFz9pIpK7fUCljELdHdGRI74Ie6SO3a44srbGtPWzvAA5qD8MLuuVvuYO
-         4Ak7S0APJbZNLpYXYwifpTCaM6htT0oZSZ1YSeh1TbD0iUMTTAEb+1vvq3HGMEXyOz5r
-         wcFAhd+BLPd3Cvh8SBMl56DYXOoNFsknCSE53CCdmANx6sZcdJkXuUe1gJC3leihqpqG
-         ao6A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687874123; x=1690466123;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=QGOH63jgnVEs2f+80uEeHRGpcn2owuUaHFI+XI/Lwro=;
-        b=Q07aHUKTXCKpApPRLGwDLa3IOjH8fa6BYw8/B56zpUnGMzSw7TYymtTvMcGvgyF5e4
-         vyo7Iul3Z5dfC+7SjlNVArVBDGe3lIs95EiY7Msd16az6sK81NWDcTTq15nhriCKmcyY
-         LW1kqrSFnLb3Az29zbNoK21yh/uA56o3cYeJo75Z1g13ceYtyzFFiTMPpLq/4rYbY+uD
-         7Q+34y8NdyAMMT+rWL7HejU6aWcKMFPGMlqHdMDhWF1gz+orOWa2ZOgwv5giMbuOcpRV
-         6O4JjvaHg9mILuDHIG4joYxUz1QlJFgleWYmS7tmE87s4TcZcCJtgMVcUA/mkh5Wl6BJ
-         Iv1g==
-X-Gm-Message-State: AC+VfDwD1TdI5YyH4djnqvXtflt3be1F9VhD3NvoYDfHOwJmHP/+o8aV
-	vth0E1S6floT1NR6OgaivWUQFKFxFE6fO7CZRWYZCg==
-X-Google-Smtp-Source: ACHHUZ5GPkxVhmJt7C7Zmwoh0e7IvTuPuxE1QBH9E9t9bnIcJaaMSg5SFknMlx4nZK8GGimQ2eJFlpxzPfLF6K79RdI=
-X-Received: by 2002:ac8:5708:0:b0:3f3:75c2:7466 with SMTP id
- 8-20020ac85708000000b003f375c27466mr182910qtw.8.1687874122873; Tue, 27 Jun
- 2023 06:55:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 073EA12B66
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 7075BC433C9;
+	Tue, 27 Jun 2023 14:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687874421;
+	bh=ZEwQrb/fi5vfcUlclM+i6WFurE6qdtrAMyjekMsn2ss=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G1v/qG5rZyuf5SOAJR+J6lY80Y/Eia6qfIYguXUB+KkFX4/BgwumlQypCqBCivDk5
+	 Vf6CGTOoAFWQlQy1t5B7geOL1Z3Lk+JiVlNS33vjJek5r+AEme9QLX7dknkO/DbLWh
+	 vPU6E0gXcSxAsxRb5xMI/63PKjC0rIIkRayIO6HicYi8c+kOi+IC/u3AkMWUGFCPPO
+	 cOdlNelRoORFFQSeemf/ORMBwDIOWtYG9bIYmcaJ3ALaeDqOt77h33ux5QgOgmWTpr
+	 DSzuM1lyaxkEOu1lLGtzMh7+6OvIUV3I0AGBui1U8eWDl3Wzk3htBu8r1tFUlY0+XN
+	 B6iDC/3/zN3Ug==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 51330C0C40E;
+	Tue, 27 Jun 2023 14:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230627105209.15163-1-dg573847474@gmail.com>
-In-Reply-To: <20230627105209.15163-1-dg573847474@gmail.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Tue, 27 Jun 2023 15:55:11 +0200
-Message-ID: <CANn89iJRaT1B=HwWDsEdcAUZzYERzeR8iwGYHZuLcy+G4G39Lw@mail.gmail.com>
-Subject: Re: [PATCH] net/802/garp: fix potential deadlock on &app->lock
-To: Chengfeng Ye <dg573847474@gmail.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] net: usb: qmi_wwan: add u-blox 0x1312 composition
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168787442132.17759.5399865184186405381.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Jun 2023 14:00:21 +0000
+References: <20230626125336.3127-1-davide.tronchin.94@gmail.com>
+In-Reply-To: <20230626125336.3127-1-davide.tronchin.94@gmail.com>
+To: Davide Tronchin <davide.tronchin.94@gmail.com>
+Cc: bjorn@mork.no, netdev@vger.kernel.org, pabeni@redhat.com,
+ marco.demarco@posteo.net
 
-On Tue, Jun 27, 2023 at 12:52=E2=80=AFPM Chengfeng Ye <dg573847474@gmail.co=
-m> wrote:
->
-> As &app->lock is also acquired by the timer garp_join_timer() which
-> which executes under soft-irq context, code executing under process
-> context should disable irq before acquiring the lock, otherwise
-> deadlock could happen if the process context hold the lock then
-> preempt by the interruption.
->
-> garp_pdu_rcv() is one such function that acquires &app->lock, but I
-> am not sure whether it is called with irq disable outside thus the
-> patch could be false.
->
-> Possible deadlock scenario:
-> garp_pdu_rcv()
->     -> spin_lock(&app->lock)
->         <timer interrupt>
+Hello:
 
-This can not happen.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-RX handlers are called from BH context, and rcu_read_lock()
+On Mon, 26 Jun 2023 14:53:36 +0200 you wrote:
+> Add RmNet support for LARA-R6 01B.
+> 
+> The new LARA-R6 product variant identified by the "01B" string can be
+> configured (by AT interface) in three different USB modes:
+> * Default mode (Vendor ID: 0x1546 Product ID: 0x1311) with 4 serial
+> interfaces
+> * RmNet mode (Vendor ID: 0x1546 Product ID: 0x1312) with 4 serial
+> interfaces and 1 RmNet virtual network interface
+> * CDC-ECM mode (Vendor ID: 0x1546 Product ID: 0x1313) with 4 serial
+> interface and 1 CDC-ECM virtual network interface
+> The first 4 interfaces of all the 3 configurations (default, RmNet, ECM)
+> are the same.
+> 
+> [...]
 
-See net/core/dev.c,  deliver_skb() and netif_receive_skb()
+Here is the summary with links:
+  - net: usb: qmi_wwan: add u-blox 0x1312 composition
+    https://git.kernel.org/netdev/net/c/eaaacb085144
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
 
 
->         -> garp_join_timer()
->         -> spin_lock(&app->lock)
->
-> This flaw was found using an experimental static analysis tool we are
-> developing for irq-related deadlock.
->
-> The tentative patch fix the potential deadlock by spin_lock_irqsave(),
-> or it should be fixed with spin_lock_bh() if it is a real bug? I am
-> not very sure.
-
-I guess more work is needed at your side :)
 
