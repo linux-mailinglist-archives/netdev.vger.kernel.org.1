@@ -1,136 +1,123 @@
-Return-Path: <netdev+bounces-14253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5001273FC3A
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:54:52 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2FB9973FC44
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:55:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BA59E281061
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:54:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 25CBD1C209FD
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:55:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5A7A17FE6;
-	Tue, 27 Jun 2023 12:54:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5B8A17FE8;
+	Tue, 27 Jun 2023 12:55:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 98A82111E
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 12:54:48 +0000 (UTC)
-Received: from out4-smtp.messagingengine.com (out4-smtp.messagingengine.com [66.111.4.28])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E5A92944;
-	Tue, 27 Jun 2023 05:54:44 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 431B65C01D0;
-	Tue, 27 Jun 2023 08:54:41 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Tue, 27 Jun 2023 08:54:41 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=arndb.de; h=cc
-	:cc:content-type:content-type:date:date:from:from:in-reply-to
-	:in-reply-to:message-id:mime-version:references:reply-to:sender
-	:subject:subject:to:to; s=fm1; t=1687870481; x=1687956881; bh=Il
-	Bb3apajPhN/l8gLah0GaLHQYTfmUxtdLJ9RjV0BfI=; b=WkeCwVfZDHVMO+MpRb
-	KzlnGYLTGdhc1hJmjiKDRwOnBqY2z57Fr1SxMUgz4dZHSy1xQpRRl6qC2xd/7wFH
-	8tAqeoMAxB4pLt4DXMtRlHf4mhSBuvFc1IMYjq2qxlugPMOcAfrLM/Kfo77GF06n
-	DAfYNxEHCyvF4d6MEyBBzeyTWxr4Koc5ThhTwfuUR+lFPBC8AfIIHqh2XMlk6uid
-	5CgOD2s7t1mrb0n1+GpBKyBSRiTX2TXVTmFSbYbaXPbFmJVEwmrsxsKL+OSW62rj
-	kZ7/e/XUkQ8H76giweWQ5DoaVBoyanNntQj/mTH5WIjFnrKqyZjvHeeARDjeQm5e
-	lsGg==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-type:content-type:date:date
-	:feedback-id:feedback-id:from:from:in-reply-to:in-reply-to
-	:message-id:mime-version:references:reply-to:sender:subject
-	:subject:to:to:x-me-proxy:x-me-proxy:x-me-sender:x-me-sender
-	:x-sasl-enc; s=fm2; t=1687870481; x=1687956881; bh=IlBb3apajPhN/
-	l8gLah0GaLHQYTfmUxtdLJ9RjV0BfI=; b=f7sKexIVSPqInL2fcESgFKBXUNLbZ
-	fbD34+KA5c4+wcPw8jTCxQhd3oOgXYGQM9NbadInyZl4pOYmoIzMDPjbBeszcQPu
-	SxZeU3FhAEzQ/5rrt8YXLxgqFf2ftb6DdXqpNqrQpBUT/+a+s8eJ2gykl+fp2tM/
-	WMIdDriRJHdUe/jw0NqutnuGELpUs86lWRarkWgZQ/FFV2d+X8HOfj0fhSe+Vomr
-	hWsXsrkRF2tGouQpiOG691IgreX8jr6PUjwdd1TNeqO3lO/DwyLrHN5SXxujXJPN
-	2YhcEV0QSzN09zkyvcCC0pvnYxJkRenFSkU1ZtPK01QRJlJBEmmyT7qjA==
-X-ME-Sender: <xms:ENyaZKlStiUDI71v2z9eXPoBbJj_fXA2caEiaeEy4HkhkgGl9ZSLjQ>
-    <xme:ENyaZB0kp-ZdUWg9T17Ui9KVmvNL7hWsmyw-NMJRlePGPvq6Jq3aIVTOBlTolSeGr
-    xF2cBHVNQxkxlfWuS8>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrtddtgdduhecutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecusecvtfgvtghiphhivghnthhsucdlqddutddtmdenuc
-    fjughrpefofgggkfgjfhffhffvvefutgesthdtredtreertdenucfhrhhomhepfdetrhhn
-    ugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugesrghrnhgusgdruggvqeenucggtffrrghtth
-    gvrhhnpeffheeugeetiefhgeethfejgfdtuefggeejleehjeeutefhfeeggefhkedtkeet
-    ffenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhrohhmpegrrh
-    hnugesrghrnhgusgdruggv
-X-ME-Proxy: <xmx:ENyaZIrGuMf4xHJ5grbl2j-xIZbft02DGFwUPv2zKTFPG7PZBEGAVQ>
-    <xmx:ENyaZOnwJwSma7IIF8Tht0fh9-D_9xWKeu3re7VUnCPgi41mKRFyKA>
-    <xmx:ENyaZI2tgggHmEUBUc0-IMGjg9S2uDm79jIRukj0auBxhRjii2n1VQ>
-    <xmx:EdyaZCM3E-tfO0_X23ZOyyNU-xH-9ocLC9K38h6hwDCGHss4_cYZMw>
-Feedback-ID: i56a14606:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 7B94FB60086; Tue, 27 Jun 2023 08:54:40 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-499-gf27bbf33e2-fm-20230619.001-gf27bbf33
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA534171C5
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 12:55:45 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82B9F2D60
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 05:55:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687870525;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=jRl7aKap1SeKgVZS63rqtI75g0CI3hogPpCfcoBBCMs=;
+	b=RpREXICvHLQwsrzFd8s14IssnGMNrOags+Q4gp9fKMKZu55y5MEqB16sZT359KsGHUdNLZ
+	cZgfBaEeNlxJ0nmuKCLJ+NoJPBlyRE1pFgBrRW8x+viWUl+AvfrFjCRu7+FZPc4BXnt0b2
+	1FYRocBk0nS21htfisXnuD7AI+Qp3Q4=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-146-s3SKjBBrN6-NdRELn2juUA-1; Tue, 27 Jun 2023 08:55:24 -0400
+X-MC-Unique: s3SKjBBrN6-NdRELn2juUA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-765ad67e600so35760685a.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 05:55:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687870524; x=1690462524;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=jRl7aKap1SeKgVZS63rqtI75g0CI3hogPpCfcoBBCMs=;
+        b=anBVmsfS4pNXnUYbtT4B+vpBChU8sEqG8+FExqJrzUWL2lPynFVjQtNdUWHF9sMqkJ
+         uLXA90pjZAJoNG27jieFvajQfrIldbcNpgKXRZ1WfR2VrxkN1vSYaN0RPzVzhs9sCJy3
+         sACq/WiWK0m7v1g+Rr96n545TEhmjQaWKSVrxRLCJss01UrG0MNhND8t0b+7pKme+CDz
+         npPxJF6BrvnEe8jQLvq1rSNMN5ip84o4pLdybTlNoC5R7/A3L81EaMltZq8lO26IW1Y+
+         OwHytRHjGUObb7nZwYlrxTnF/uKD5IsMxYKdZ8F0Vwc0j20saY2g7nA4hCAVR7whSB0A
+         wV9Q==
+X-Gm-Message-State: AC+VfDxieDZzTh0qtc9EJej6li4GFTLikneKiGBAYhHUjL7UZrlbYrWq
+	tzyeBWEnN5x5U0knS/qXC0/Z9L3cLNUb45+7gFKUVZcdWD+afPybQezjcRoEVO+lzjpphRpP42L
+	MrtpyZ6o1GYcbTrSU
+X-Received: by 2002:a05:620a:190e:b0:765:3b58:99ab with SMTP id bj14-20020a05620a190e00b007653b5899abmr2670206qkb.4.1687870523898;
+        Tue, 27 Jun 2023 05:55:23 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5MVSVOTOJGm6y6OkidtOFcnyLv70o/VU/KFN2yDxpJyfTZKFyUUry0ejHmhywBuZIZSQ+qRw==
+X-Received: by 2002:a05:620a:190e:b0:765:3b58:99ab with SMTP id bj14-20020a05620a190e00b007653b5899abmr2670184qkb.4.1687870523654;
+        Tue, 27 Jun 2023 05:55:23 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-239-6.dyn.eolo.it. [146.241.239.6])
+        by smtp.gmail.com with ESMTPSA id j7-20020a05620a146700b00765516bd9f2sm3912923qkl.33.2023.06.27.05.54.04
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 05:54:07 -0700 (PDT)
+Message-ID: <1f4271105ac5be66e5130d487464680fc65bacc8.camel@redhat.com>
+Subject: Re: Is ->sendmsg() allowed to change the msghdr struct it is given?
+From: Paolo Abeni <pabeni@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>, David Howells <dhowells@redhat.com>
+Cc: Ilya Dryomov <idryomov@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>,  Eric Dumazet <edumazet@google.com>,
+ ceph-devel@vger.kernel.org, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org
+Date: Tue, 27 Jun 2023 14:54:02 +0200
+In-Reply-To: <b0a0cb0fac4ebdc23f01d183a9de10731dc90093.camel@redhat.com>
+References: <3112097.1687814081@warthog.procyon.org.uk>
+	 <20230626142257.6e14a801@kernel.org>
+	 <b0a0cb0fac4ebdc23f01d183a9de10731dc90093.camel@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-Id: <de4fe7d1-a0ae-40eb-a9d4-434802083e70@app.fastmail.com>
-In-Reply-To: <43a1f34a6b1c5a14519f3967dff5eb42e82ee88d.camel@linux.ibm.com>
-References: <20230522105049.1467313-1-schnelle@linux.ibm.com>
- <7b5c40f3-d25b-4082-807d-4d75dc38886d@app.fastmail.com>
- <43a1f34a6b1c5a14519f3967dff5eb42e82ee88d.camel@linux.ibm.com>
-Date: Tue, 27 Jun 2023 14:53:59 +0200
-From: "Arnd Bergmann" <arnd@arndb.de>
-To: "Niklas Schnelle" <schnelle@linux.ibm.com>,
- "Richard Cochran" <richardcochran@gmail.com>,
- "Heiko Carstens" <hca@linux.ibm.com>
-Cc: "Greg Kroah-Hartman" <gregkh@linuxfoundation.org>,
- "Bjorn Helgaas" <bhelgaas@google.com>,
- =?UTF-8?Q?Uwe_Kleine-K=C3=B6nig?= <u.kleine-koenig@pengutronix.de>,
- "Mauro Carvalho Chehab" <mchehab@kernel.org>,
- "Alan Stern" <stern@rowland.harvard.edu>,
- "Rafael J . Wysocki" <rafael@kernel.org>,
- "Geert Uytterhoeven" <geert@linux-m68k.org>,
- "Paul Walmsley" <paul.walmsley@sifive.com>,
- "Palmer Dabbelt" <palmer@dabbelt.com>, "Albert Ou" <aou@eecs.berkeley.edu>,
- linux-kernel@vger.kernel.org, Linux-Arch <linux-arch@vger.kernel.org>,
- linux-pci@vger.kernel.org, Netdev <netdev@vger.kernel.org>
-Subject: Re: [PATCH v5 00/44] treewide: Remove I/O port accessors for HAS_IOPORT=n
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023, at 11:12, Niklas Schnelle wrote:
-> On Mon, 2023-05-22 at 13:29 +0200, Arnd Bergmann wrote:
->> 
->> Maybe let's give it another week to have more maintainers pick
->> up stuff from v5, and then send out a v6 as separate submissions.
->> 
->>     Arnd
->
-> Hi Arnd and All,
->
-> I'm sorry there hasn't been an updated in a long time and we're missing
-> v6.5. I've been quite busy with other work and life. Speaking of, I
-> will be mostly out for around a month starting some time mid to end
-> July as, if all goes well, I'm expecting to become a dad. That said, I
-> haven't forgotten about this and your overall plan of sending per-
-> subsystem patches sounds good, just haven't had the time to also
-> incorporate the feedback.
+On Tue, 2023-06-27 at 14:51 +0200, Paolo Abeni wrote:
+> On Mon, 2023-06-26 at 14:22 -0700, Jakub Kicinski wrote:
+> > On Mon, 26 Jun 2023 22:14:41 +0100 David Howells wrote:
+> > > Do you know if ->sendmsg() might alter the msghdr struct it is passed=
+ as an
+> > > argument? Certainly it can alter msg_iter, but can it also modify,
+> > > say, msg_flags?
+> >=20
+> > I'm not aware of a precedent either way.
+> > Eric or Paolo would know better than me, tho.
+>=20
+> udp_sendmsg() can set the MSG_TRUNC bit in msg->msg_flags, so I guess
+> that kind of actions are sort of allowed.
 
-Ok, thanks for letting us know. I just checked to see that about half
-of your series has already made it into linux-next and is likely to
-be part of v6.5 or already in v6.4.
+Sorry, ENOCOFFEE here. It's actually udp_recvmsg() updating msg-
+>msg_flags.
 
-Maybe you can start out by taking a pass at just resending the ones
-that don't need any changes and can just get picked up after -rc1,
-and then I'll try to have a look at whatever remains after that.
+>  Still, AFAICS, the kernel
+> based msghdr is not copied back to the user-space, so such change
+> should be almost a no-op in practice.
 
-    Arnd
+This part should be correct.
+
+> @David: which would be the end goal for such action?
+
+Sorry for the noisy reply,
+
+Paolo
+
 
