@@ -1,131 +1,268 @@
-Return-Path: <netdev+bounces-14135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 57E2973F2CA
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 05:32:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4F7E773F2CE
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 05:32:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 86A321C20A5C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 03:32:12 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71BB21C20A5A
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 03:32:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 271B0EA6;
-	Tue, 27 Jun 2023 03:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8AC61EA1;
+	Tue, 27 Jun 2023 03:32:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12442EA1
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 03:32:09 +0000 (UTC)
-Received: from mail-wr1-x429.google.com (mail-wr1-x429.google.com [IPv6:2a00:1450:4864:20::429])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E74C14EDE
-	for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:31:41 -0700 (PDT)
-Received: by mail-wr1-x429.google.com with SMTP id ffacd0b85a97d-313e12db357so4421956f8f.0
-        for <netdev@vger.kernel.org>; Mon, 26 Jun 2023 20:31:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1687836697; x=1690428697;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=5GbO+jlh/+SHI/tcTuT/GmsMZMmHOv628giw+Fale9I=;
-        b=lt548kuA2FVP1IeyUVcVhJeuGW7XELKZtjZgyAjoQyHAfg3ZsJMACuUyP/8R0tOAv2
-         CtFgWlyaIyegpQv0616hNffKXuCk4lNpLmlH7IEbUj1jZx3iy9KlcRSCbc1Zu9jWKdvF
-         ardr3J/KujJJjfK8M3DGp3TpJA2V+JUqHv4iKvscpko98v/tssEwHb2zJ9E3Bvl1+vd2
-         YCBH8uuzkY//2j/zVqqYxyXQ2Vkq3UQxPn8Gtr0K1aw20c1n/TMr6fj9DqkLnGZn1OXA
-         YUwOfPCTWfYiR/ke2rjNq867mcE+m/lnsQHyZBQWG90jmypsh/pFOMcSmzB3f5ZHr+iM
-         aJrg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687836697; x=1690428697;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=5GbO+jlh/+SHI/tcTuT/GmsMZMmHOv628giw+Fale9I=;
-        b=KsNut8Z9lW8SFow3bOvBkgtDMTs6hMgH2AZYNevfmB/1vYhUJEHSTSUT5wnCvTsy+d
-         pM0bje1YJwjXo4HuPeJY1xihMa4/U17AtRCW6S35JkFp9cbua+z/xJYjCkqoPPsdDoBO
-         7ydiRCDjfsND6IUlKaiDw1N+e3WHAEhsVXsgu/1IsSBF0AqD+JaxVAY7KiCFdjyuNmNN
-         1QVkh94poXOYmh/o0GF9Arv6433QQZPN61bXycKQadKeejM5ZvGOQXlwrgKV3F7yMFIy
-         Y9ESjWbJTdJGw72yDOZT8YqsXHhtltL6gk/ig8qw31N4kavVVfBydIp6b0JWFwhfBGkU
-         msEg==
-X-Gm-Message-State: AC+VfDy31DebfOWVBmkoNFl35Y2EFTUzmB0yCugGMQKapy0StAcb5bvO
-	mX5G/yBwhPrzdBfB2GxFMge4nA==
-X-Google-Smtp-Source: ACHHUZ4DG/F1MkxDITFfZ6tV/0y1Ks9e+W7zekR6iDGnLjp/6Kd9oN2II721QlOREWqFQ3r/v/cHxA==
-X-Received: by 2002:a05:6000:545:b0:313:ef93:9257 with SMTP id b5-20020a056000054500b00313ef939257mr6305157wrf.32.1687836697578;
-        Mon, 26 Jun 2023 20:31:37 -0700 (PDT)
-Received: from [127.0.0.1] ([185.232.21.146])
-        by smtp.gmail.com with ESMTPSA id c1-20020a056000104100b003140039f318sm227717wrx.69.2023.06.26.20.31.35
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 26 Jun 2023 20:31:37 -0700 (PDT)
-Date: Tue, 27 Jun 2023 05:31:35 +0200 (GMT+02:00)
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: Namhyung Kim <namhyung@kernel.org>,
-	Arnaldo Carvalho de Melo <acme@redhat.com>, dhowells@redhat.com,
-	acme@kernel.org, adrian.hunter@intel.com,
-	alexander.shishkin@linux.intel.com, bpf@vger.kernel.org,
-	davem@davemloft.net, irogers@google.com, jolsa@kernel.org,
-	linux-kernel@vger.kernel.org, linux-next@vger.kernel.org,
-	linux-perf-users@vger.kernel.org, mark.rutland@arm.com,
-	mingo@redhat.com, netdev@vger.kernel.org, peterz@infradead.org,
-	sfr@canb.auug.org.au
-Message-ID: <f99109bb-34aa-44d7-9a38-a6df0d6b2ff9@tessares.net>
-In-Reply-To: <20230626144934.4904c2ad@kernel.org>
-References: <2947430.1687765706@warthog.procyon.org.uk> <20230626090239.899672-1-matthieu.baerts@tessares.net> <20230626142734.0fa4fa68@kernel.org> <CAM9d7che_3z=NgT9OkrNmAQigY3Bo8nv16TVH6fgx8pn76xUbg@mail.gmail.com> <20230626144934.4904c2ad@kernel.org>
-Subject: Re: [PATCH net-next] perf trace: fix MSG_SPLICE_PAGES build error
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 780311109
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 03:32:23 +0000 (UTC)
+X-Greylist: delayed 135752 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 26 Jun 2023 20:31:56 PDT
+Received: from zg8tmja2lje4os4yms4ymjma.icoremail.net (zg8tmja2lje4os4yms4ymjma.icoremail.net [206.189.21.223])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id B3C442D4C;
+	Mon, 26 Jun 2023 20:31:56 -0700 (PDT)
+Received: from localhost.localdomain (unknown [122.235.246.99])
+	by mail-app3 (Coremail) with SMTP id cC_KCgDnzIkcWJpk26rsCA--.52058S4;
+	Tue, 27 Jun 2023 11:31:41 +0800 (CST)
+From: Lin Ma <linma@zju.edu.cn>
+To: steffen.klassert@secunet.com,
+	herbert@gondor.apana.org.au,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	simon.horman@corigine.com,
+	adobriyan@gmail.com
+Cc: Lin Ma <linma@zju.edu.cn>
+Subject: [PATCH v3] net: xfrm: Fix xfrm_address_filter OOB read
+Date: Tue, 27 Jun 2023 11:31:38 +0800
+Message-Id: <20230627033138.1177437-1-linma@zju.edu.cn>
+X-Mailer: git-send-email 2.17.1
+X-CM-TRANSID:cC_KCgDnzIkcWJpk26rsCA--.52058S4
+X-Coremail-Antispam: 1UD129KBjvJXoW3GrWUtw1Dur1UCrW3Kr1rZwb_yoWfWr4UpF
+	s5KFyIkr4xJ3s8Xr4jyr1Iq3WrGFZrZF1DJrZ7Gr1UAFW7Gr17JrWDAFWDGwsrCrW8AFy7
+	GFnrJF4jgr18J3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvG14x267AKxVW8JVW5JwAFc2x0x2IEx4CE42xK8VAvwI8IcIk0
+	rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII0Yj41l84x0c7CEw4AK67xGY2AK02
+	1l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xvwVC0I7IYx2IY6xkF7I0E14v26F4U
+	JVW0owA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x0267AKxVW0oV
+	Cq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG6I80ewAv7VC0
+	I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFVCjc4AY6r1j6r
+	4UM4x0Y48IcxkI7VAKI48JM4x0x7Aq67IIx4CEVc8vx2IErcIFxwACI402YVCY1x02628v
+	n2kIc2xKxwCY02Avz4vE14v_Gr4l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr
+	0_Gr1lx2IqxVAqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY
+	17CE14v26r1q6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcV
+	C0I7IYx2IY6xkF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWUJVWUCwCI42IY
+	6I8E87Iv67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa
+	73UjIFyTuYvjfUnQ6pDUUUU
+X-CM-SenderInfo: qtrwiiyqvtljo62m3hxhgxhubq/
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Correlation-ID: <f99109bb-34aa-44d7-9a38-a6df0d6b2ff9@tessares.net>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-Hi Jakub, Namhyung,
+We found below OOB crash:
 
-@Namhyung: thank you for the explanations about the header files in the oth=
-er thread!
+[   44.211730] ==================================================================
+[   44.212045] BUG: KASAN: slab-out-of-bounds in memcmp+0x8b/0xb0
+[   44.212045] Read of size 8 at addr ffff88800870f320 by task poc.xfrm/97
+[   44.212045]
+[   44.212045] CPU: 0 PID: 97 Comm: poc.xfrm Not tainted 6.4.0-rc7-00072-gdad9774deaf1-dirty #4
+[   44.212045] Call Trace:
+[   44.212045]  <TASK>
+[   44.212045]  dump_stack_lvl+0x37/0x50
+[   44.212045]  print_report+0xcc/0x620
+[   44.212045]  ? __virt_addr_valid+0xf3/0x170
+[   44.212045]  ? memcmp+0x8b/0xb0
+[   44.212045]  kasan_report+0xb2/0xe0
+[   44.212045]  ? memcmp+0x8b/0xb0
+[   44.212045]  kasan_check_range+0x39/0x1c0
+[   44.212045]  memcmp+0x8b/0xb0
+[   44.212045]  xfrm_state_walk+0x21c/0x420
+[   44.212045]  ? __pfx_dump_one_state+0x10/0x10
+[   44.212045]  xfrm_dump_sa+0x1e2/0x290
+[   44.212045]  ? __pfx_xfrm_dump_sa+0x10/0x10
+[   44.212045]  ? __kernel_text_address+0xd/0x40
+[   44.212045]  ? kasan_unpoison+0x27/0x60
+[   44.212045]  ? mutex_lock+0x60/0xe0
+[   44.212045]  ? __pfx_mutex_lock+0x10/0x10
+[   44.212045]  ? kasan_save_stack+0x22/0x50
+[   44.212045]  netlink_dump+0x322/0x6c0
+[   44.212045]  ? __pfx_netlink_dump+0x10/0x10
+[   44.212045]  ? mutex_unlock+0x7f/0xd0
+[   44.212045]  ? __pfx_mutex_unlock+0x10/0x10
+[   44.212045]  __netlink_dump_start+0x353/0x430
+[   44.212045]  xfrm_user_rcv_msg+0x3a4/0x410
+[   44.212045]  ? __pfx__raw_spin_lock_irqsave+0x10/0x10
+[   44.212045]  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+[   44.212045]  ? __pfx_xfrm_dump_sa+0x10/0x10
+[   44.212045]  ? __pfx_xfrm_dump_sa_done+0x10/0x10
+[   44.212045]  ? __stack_depot_save+0x382/0x4e0
+[   44.212045]  ? filter_irq_stacks+0x1c/0x70
+[   44.212045]  ? kasan_save_stack+0x32/0x50
+[   44.212045]  ? kasan_save_stack+0x22/0x50
+[   44.212045]  ? kasan_set_track+0x25/0x30
+[   44.212045]  ? __kasan_slab_alloc+0x59/0x70
+[   44.212045]  ? kmem_cache_alloc_node+0xf7/0x260
+[   44.212045]  ? kmalloc_reserve+0xab/0x120
+[   44.212045]  ? __alloc_skb+0xcf/0x210
+[   44.212045]  ? netlink_sendmsg+0x509/0x700
+[   44.212045]  ? sock_sendmsg+0xde/0xe0
+[   44.212045]  ? __sys_sendto+0x18d/0x230
+[   44.212045]  ? __x64_sys_sendto+0x71/0x90
+[   44.212045]  ? do_syscall_64+0x3f/0x90
+[   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]  ? netlink_sendmsg+0x509/0x700
+[   44.212045]  ? sock_sendmsg+0xde/0xe0
+[   44.212045]  ? __sys_sendto+0x18d/0x230
+[   44.212045]  ? __x64_sys_sendto+0x71/0x90
+[   44.212045]  ? do_syscall_64+0x3f/0x90
+[   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]  ? kasan_save_stack+0x22/0x50
+[   44.212045]  ? kasan_set_track+0x25/0x30
+[   44.212045]  ? kasan_save_free_info+0x2e/0x50
+[   44.212045]  ? __kasan_slab_free+0x10a/0x190
+[   44.212045]  ? kmem_cache_free+0x9c/0x340
+[   44.212045]  ? netlink_recvmsg+0x23c/0x660
+[   44.212045]  ? sock_recvmsg+0xeb/0xf0
+[   44.212045]  ? __sys_recvfrom+0x13c/0x1f0
+[   44.212045]  ? __x64_sys_recvfrom+0x71/0x90
+[   44.212045]  ? do_syscall_64+0x3f/0x90
+[   44.212045]  ? entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]  ? copyout+0x3e/0x50
+[   44.212045]  netlink_rcv_skb+0xd6/0x210
+[   44.212045]  ? __pfx_xfrm_user_rcv_msg+0x10/0x10
+[   44.212045]  ? __pfx_netlink_rcv_skb+0x10/0x10
+[   44.212045]  ? __pfx_sock_has_perm+0x10/0x10
+[   44.212045]  ? mutex_lock+0x8d/0xe0
+[   44.212045]  ? __pfx_mutex_lock+0x10/0x10
+[   44.212045]  xfrm_netlink_rcv+0x44/0x50
+[   44.212045]  netlink_unicast+0x36f/0x4c0
+[   44.212045]  ? __pfx_netlink_unicast+0x10/0x10
+[   44.212045]  ? netlink_recvmsg+0x500/0x660
+[   44.212045]  netlink_sendmsg+0x3b7/0x700
+[   44.212045]  ? __pfx_netlink_sendmsg+0x10/0x10
+[   44.212045]  ? __pfx_netlink_sendmsg+0x10/0x10
+[   44.212045]  sock_sendmsg+0xde/0xe0
+[   44.212045]  __sys_sendto+0x18d/0x230
+[   44.212045]  ? __pfx___sys_sendto+0x10/0x10
+[   44.212045]  ? rcu_core+0x44a/0xe10
+[   44.212045]  ? __rseq_handle_notify_resume+0x45b/0x740
+[   44.212045]  ? _raw_spin_lock_irq+0x81/0xe0
+[   44.212045]  ? __pfx___rseq_handle_notify_resume+0x10/0x10
+[   44.212045]  ? __pfx_restore_fpregs_from_fpstate+0x10/0x10
+[   44.212045]  ? __pfx_blkcg_maybe_throttle_current+0x10/0x10
+[   44.212045]  ? __pfx_task_work_run+0x10/0x10
+[   44.212045]  __x64_sys_sendto+0x71/0x90
+[   44.212045]  do_syscall_64+0x3f/0x90
+[   44.212045]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045] RIP: 0033:0x44b7da
+[   44.212045] RSP: 002b:00007ffdc8838548 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
+[   44.212045] RAX: ffffffffffffffda RBX: 00007ffdc8839978 RCX: 000000000044b7da
+[   44.212045] RDX: 0000000000000038 RSI: 00007ffdc8838770 RDI: 0000000000000003
+[   44.212045] RBP: 00007ffdc88385b0 R08: 00007ffdc883858c R09: 000000000000000c
+[   44.212045] R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000001
+[   44.212045] R13: 00007ffdc8839968 R14: 00000000004c37d0 R15: 0000000000000001
+[   44.212045]  </TASK>
+[   44.212045]
+[   44.212045] Allocated by task 97:
+[   44.212045]  kasan_save_stack+0x22/0x50
+[   44.212045]  kasan_set_track+0x25/0x30
+[   44.212045]  __kasan_kmalloc+0x7f/0x90
+[   44.212045]  __kmalloc_node_track_caller+0x5b/0x140
+[   44.212045]  kmemdup+0x21/0x50
+[   44.212045]  xfrm_dump_sa+0x17d/0x290
+[   44.212045]  netlink_dump+0x322/0x6c0
+[   44.212045]  __netlink_dump_start+0x353/0x430
+[   44.212045]  xfrm_user_rcv_msg+0x3a4/0x410
+[   44.212045]  netlink_rcv_skb+0xd6/0x210
+[   44.212045]  xfrm_netlink_rcv+0x44/0x50
+[   44.212045]  netlink_unicast+0x36f/0x4c0
+[   44.212045]  netlink_sendmsg+0x3b7/0x700
+[   44.212045]  sock_sendmsg+0xde/0xe0
+[   44.212045]  __sys_sendto+0x18d/0x230
+[   44.212045]  __x64_sys_sendto+0x71/0x90
+[   44.212045]  do_syscall_64+0x3f/0x90
+[   44.212045]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+[   44.212045]
+[   44.212045] The buggy address belongs to the object at ffff88800870f300
+[   44.212045]  which belongs to the cache kmalloc-64 of size 64
+[   44.212045] The buggy address is located 32 bytes inside of
+[   44.212045]  allocated 36-byte region [ffff88800870f300, ffff88800870f324)
+[   44.212045]
+[   44.212045] The buggy address belongs to the physical page:
+[   44.212045] page:00000000e4de16ee refcount:1 mapcount:0 mapping:000000000 ...
+[   44.212045] flags: 0x100000000000200(slab|node=0|zone=1)
+[   44.212045] page_type: 0xffffffff()
+[   44.212045] raw: 0100000000000200 ffff888004c41640 dead000000000122 0000000000000000
+[   44.212045] raw: 0000000000000000 0000000080200020 00000001ffffffff 0000000000000000
+[   44.212045] page dumped because: kasan: bad access detected
+[   44.212045]
+[   44.212045] Memory state around the buggy address:
+[   44.212045]  ffff88800870f200: fa fb fb fb fb fb fb fb fc fc fc fc fc fc fc fc
+[   44.212045]  ffff88800870f280: 00 00 00 00 00 fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045] >ffff88800870f300: 00 00 00 00 04 fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045]                                ^
+[   44.212045]  ffff88800870f380: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045]  ffff88800870f400: fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc fc
+[   44.212045] ==================================================================
 
+By investigating the code, we find the root cause of this OOB is the lack
+of checks in xfrm_dump_sa(). The buggy code allows a malicious user to pass
+arbitrary value of filter->splen/dplen. Hence, with crafted xfrm states,
+the attacker can achieve 8 bytes heap OOB read, which causes info leak.
 
-26 Jun 2023 23:49:36 Jakub Kicinski <kuba@kernel.org>:
-> On Mon, 26 Jun 2023 14:41:56 -0700 Namhyung Kim wrote:
->
->> But in general you don't need to change the copy of the tools
->> headers together.=C2=A0 It also needs to support old & new kernels
->> so different care should be taken.=C2=A0 Please separate tooling
->> changes and let us handle them.
->
-> Ack, I'm not sure what makes this a special case, from Stephen's
-> original report:
->
-> https://lore.kernel.org/all/20230626112847.2ef3d422@canb.auug.org.au/
-> > it sounded like perf won't build without the fix.
+  if (attrs[XFRMA_ADDRESS_FILTER]) {
+    filter = kmemdup(nla_data(attrs[XFRMA_ADDRESS_FILTER]),
+        sizeof(*filter), GFP_KERNEL);
+    if (filter == NULL)
+      return -ENOMEM;
+    // NO MORE CHECKS HERE !!!
+  }
 
-The copy of the header file is confusing :)
+This patch fixes the OOB by adding necessary boundary checks, just like
+the code in pfkey_dump() function.
 
-If I understood properly, here, we need the modification in msg_flags.c fro=
-m Perf code because this file has been recently modified by David's series =
-in net-next to support a new flag (not present in the system header files y=
-et). Without this patch, Perf doesn't build.
+Fixes: d3623099d350 ("ipsec: add support of limited SA dump")
+Signed-off-by: Lin Ma <linma@zju.edu.cn>
+---
+V1 -> V2: add kfree() hence no memory leak
+V2 -> V3: add additional note and use > instead of >= to
+          allow complete filter comparision
 
-Now regarding the "internal" copy of header files: we don't need to modify =
-it because it is just used by Perf maintainers to monitor the modifications=
- in the original file. If I'm not mistaken, it might even be better to reve=
-rt the line that has been removed in David's original series in net-next in=
- this header file. But now that Namhyung is aware of that modification, I g=
-uess the revert is probably not needed. But in short, it is then better not=
- to modify this header file in the networking tree :-)
+ net/xfrm/xfrm_user.c | 9 +++++++++
+ 1 file changed, 9 insertions(+)
 
-Cheers,
-Matt
---
-Tessares | Belgium | Hybrid Access Solutions
-www.tessares.net
+diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+index c34a2a06ca94..7c91deadc36e 100644
+--- a/net/xfrm/xfrm_user.c
++++ b/net/xfrm/xfrm_user.c
+@@ -1267,6 +1267,15 @@ static int xfrm_dump_sa(struct sk_buff *skb, struct netlink_callback *cb)
+ 					 sizeof(*filter), GFP_KERNEL);
+ 			if (filter == NULL)
+ 				return -ENOMEM;
++
++			/* see addr_match(), (prefix length >> 5) << 2
++			 * will be used to compare xfrm_address_t
++			 */
++			if (filter->splen > (sizeof(xfrm_address_t) << 3) ||
++			    filter->dplen > (sizeof(xfrm_address_t) << 3)) {
++				kfree(filter);
++				return -EINVAL;
++			}
+ 		}
+ 
+ 		if (attrs[XFRMA_PROTO])
+-- 
+2.17.1
+
 
