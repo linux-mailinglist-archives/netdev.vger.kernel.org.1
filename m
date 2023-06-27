@@ -1,243 +1,111 @@
-Return-Path: <netdev+bounces-14350-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14351-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24DFC7406E5
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 01:38:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77CBC7406F8
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 01:50:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5651281148
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 23:38:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8F1428111C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 23:50:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52FFC1ACB5;
-	Tue, 27 Jun 2023 23:38:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B32071ACBB;
+	Tue, 27 Jun 2023 23:50:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C481ACB4
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 23:38:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26B1FC433C0;
-	Tue, 27 Jun 2023 23:38:33 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687909113;
-	bh=uVAlmvfwTuYJ3dpsZuULPUGZVsxZWZjSUtB0+2wBi4o=;
-	h=Date:From:To:Cc:Subject:From;
-	b=HAO2hp4fLbDhTniJHnlFJRKh7cBSXEfEDMo1creVW9dA7VKLUpoI1DdpoUR7AFv4G
-	 rw+yXxxmD2kqncu2y/VrGY6XgS6h6i6CYecYRxkTi40c8sx48VsKszXYMo9lgf7na2
-	 2ChatiWUe40lP3Dn9iar6C2JU8hk6Cgtl0AmhWwj0TYJCiy1yW0SVr8/iR4KFFDW98
-	 awnphEu7lR8xFJ4nCD15Mv6MDTIjYYmWYmp2bawnAnU8IMG7ypd2EKyn/2FrYYztTo
-	 Crh+ToeFoIMPM8jDbcv8Qbsv9GXT9heBi8g06+Po2NvN2kUIXeaxOfLXbm9g4JShDI
-	 /RnIY333JAciA==
-Date: Tue, 27 Jun 2023 16:38:32 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: netdev@vger.kernel.org
-Cc: netdev-driver-reviewers@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: [ANN] netdev development stats for 6.5
-Message-ID: <20230627163832.75f3a340@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9582C19BBB;
+	Tue, 27 Jun 2023 23:50:44 +0000 (UTC)
+Received: from mail-lf1-x12e.google.com (mail-lf1-x12e.google.com [IPv6:2a00:1450:4864:20::12e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC3A199E;
+	Tue, 27 Jun 2023 16:50:43 -0700 (PDT)
+Received: by mail-lf1-x12e.google.com with SMTP id 2adb3069b0e04-4fb7769f15aso4065117e87.0;
+        Tue, 27 Jun 2023 16:50:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687909841; x=1690501841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=C+SArcw9eGhrWMtwgw6NvssSbmXz4ONgTReXtsZYLhA=;
+        b=Lpb+KvR+FcFbejqhG+YeOk+cyaytGkC5WDmvfSBx2WpzcXtWnXmGtW31+xof5jkNyQ
+         quvhgTp55OBj4YfpYK6bXUWe4tc6Q1WiZmDnC6cFC7YLk9yOfHCorcYRa+tJicV48dbX
+         0MVaV3orG5l0PGoiUa2NLnwaeGG0uiEf+Jn9kFYwsbj9+4R8fcCtg7cHmmuD85WxoG38
+         FJ9XVWE0xOeGTuBjrFkVBvD+0COFeKK/reLrWCdp4OhmgDGvWy7b5C9bh5lOvATT15/l
+         mp9IgMxEqXVqS8kV6RxefAwK2jqXbvk3xHw3Qbc8bzvhechHlyAq8mv4M6xpphAS6M+x
+         gK+g==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687909841; x=1690501841;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=C+SArcw9eGhrWMtwgw6NvssSbmXz4ONgTReXtsZYLhA=;
+        b=gA0RZh3USQiEGWZbi5lb+xKI85/FvEZ1oirGcMYPmFLbpocNm6BSW9Cf2Zmo8GjsiT
+         OliewxqdjLP6PE+dfVBnesKtAz0kK53TtsfW/hyukbJ1fknFGwaF9gCoFACInBsr1CsU
+         HY1SWsq0593VKSkB+aPY07dlI2/2PrFLXrs0wQ/OkjPlhzqEut8L3V+DA2xS4riPjgSt
+         Eaw3KMfodsHAc8kQExR2kq56Uc6SCSMz8qudert0hQZgkMjiDMsUN7cp40Bv3uqy4/V4
+         owuAygRLWVEp4TFiqvQQq7ohzRICnTlGv4IofefrIMjkoTEx2F4QTG3T9wCQ82sDyvaL
+         PyyA==
+X-Gm-Message-State: AC+VfDz715mKbnjNFD4nEswAdlGOFfj8AfPsq9xs+emK1YhEnMuIy5kc
+	zb3ua8G8t+UViGGl4R1afIwMATJTvwPtGndBKz8=
+X-Google-Smtp-Source: ACHHUZ4vqeR0CJqToVpTfsC/OYLVbdp6V0x5jn/DMiPp82EZ8994VbSVWMmslayUuAEKBMhDpf9PUZDpX8F/mv8XjjU=
+X-Received: by 2002:a2e:a16b:0:b0:2b4:6dbf:e700 with SMTP id
+ u11-20020a2ea16b000000b002b46dbfe700mr20395365ljl.38.1687909840905; Tue, 27
+ Jun 2023 16:50:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
+References: <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
+ <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
+ <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
+ <20230624143834.26c5b5e8@kernel.org> <ZJeUlv/omsyXdO/R@google.com>
+ <ZJoExxIaa97JGPqM@google.com> <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
+ <CAKH8qBv-jU6TUcWrze5VeiVhiJ-HUcpHX7rMJzN5o2tXFkS8kA@mail.gmail.com>
+ <649b581ded8c1_75d8a208c@john.notmuch> <ZJtpIpwRGhhRFk8P@google.com> <649b71daaa4fa_7afc420820@john.notmuch>
+In-Reply-To: <649b71daaa4fa_7afc420820@john.notmuch>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Tue, 27 Jun 2023 16:50:29 -0700
+Message-ID: <CAADnVQKNGMiwmodP=6MVFD8OtbQj+OGUmigVYrGDQQ6gi0VODA@mail.gmail.com>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+To: John Fastabend <john.fastabend@gmail.com>
+Cc: Stanislav Fomichev <sdf@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Donald Hunter <donald.hunter@gmail.com>, bpf <bpf@vger.kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+	Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo <haoluo@google.com>, 
+	Jiri Olsa <jolsa@kernel.org>, Network Development <netdev@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi!
+On Tue, Jun 27, 2023 at 4:33=E2=80=AFPM John Fastabend <john.fastabend@gmai=
+l.com> wrote:
+>
+> Yeah I think so and then carry a couple different object files
+> for the environment around. We do this already for some things.
+> Its not ideal but it works. I think a good end goal would be
+>
+>  int bpf_devtx_request_timestamp(...)
+>  {
+>         set_ts =3D dlsym( dl_handle, request-timestamp);
+>         return set_ts(...)
+>  }
+>
+> Then we could at attach time take that dlsym and rewrite it.
 
-I have run the fair and impartial statistical analysis (!! :)) script
-against the mailing list traffic and git history for the 6.5 release.
-
-6.5 statistics
---------------
-
-The cycle started on April 26th and ended on June 27th, it was the same
-length as the previous release cycle.
-
-We have seen total of 15235 messages on the list (246 / day) which is
-5% lower than last time (but 9% higher than 6.3). The number of commits
-directly applied by netdev maintainers increased slightly but remains
-close to 18 commits a day for the 3rd release in a row.
-
-We have seen 778 people/aliases on the list during 6.5 development
-which is up 7% from last time. The distribution of the roles these=20
-people play remains stable - with 45% who posted patches but never
-replied to a thread started by another person, 33% were only replying
-and never posting patches, and 20% who did both.
-
-The number of commits which go into the tree with at least one
-Review/Ack tag has decreased by 6% and is now at 60% (53% of which do
-not come from the same email domain as the author). 6.4 was particularly
-good in terms of reviews, and 6.5 is still ~4% better than 6.3 but the
-decline is obviously sad to see.
-
-Rankings
---------
-
-Top reviewers (thr):                 Top reviewers (msg):               =20
-   1 ( +1) [46] Simon Horman            1 ( +1) [73] Simon Horman       =20
-   2 ( -1) [27] Jakub Kicinski          2 ( -1) [50] Jakub Kicinski     =20
-   3 (   ) [15] Andrew Lunn             3 (   ) [34] Andrew Lunn        =20
-   4 ( +4) [ 9] Paolo Abeni             4 ( +4) [14] Eric Dumazet       =20
-   5 ( -1) [ 8] Eric Dumazet            5 ( +5) [14] Russell King       =20
-   6 ( +5) [ 7] Russell King            6 (   ) [14] Vladimir Oltean    =20
-   7 ( -1) [ 4] Krzysztof Kozlowski     7 ( -2) [13] Krzysztof Kozlowski=20
-   8 (***) [ 4] Jiri Pirko              8 (***) [12] Jiri Pirko         =20
-   9 (   ) [ 4] Vladimir Oltean         9 ( +5) [12] Paolo Abeni        =20
-  10 (+27) [ 4] Maciej Fijalkowski     10 ( +5) [10] Michael S. Tsirkin =20
-  11 ( +8) [ 4] David Ahern            11 (+18) [ 7] David Ahern        =20
-  12 (+12) [ 4] Stephen Hemminger      12 (+37) [ 7] Maciej Fijalkowski =20
-
-Simon rightfully takes the top reviewer position, with Andrew firmly
-holding the #3 spot. Thank you both for all the hard work!
-Maciej, David Ahern and Jiri Pirko have also been active reviewing,
-and enter the top 12 for 6.5, thank you!
-
-
-Top authors (thr):                   Top authors (msg):                 =20
-   1 (   ) [6] Jakub Kicinski           1 ( +1) [33] David Howells      =20
-   2 (   ) [4] Eric Dumazet             2 ( -1) [22] Saeed Mahameed     =20
-   3 ( +1) [4] Tony Nguyen              3 ( +4) [18] Tony Nguyen        =20
-   4 (+36) [4] David Howells            4 (+29) [18] Russell King       =20
-   5 (+23) [4] Russell King             5 ( +1) [16] Jakub Kicinski     =20
-   6 (+14) [3] Kuniyuki Iwashima        6 (***) [14] Bartosz Golaszewski=20
-   7 (***) [3] Christophe JAILLET       7 (+32) [13] Marc Kleine-Budde  =20
-   8 (+29) [2] Stephen Rothwell         8 (***) [11] Maciej Fijalkowski =20
-   9 ( -6) [2] Vladimir Oltean          9 ( +7) [ 9] Pablo Neira Ayuso  =20
-  10 ( -3) [2] Daniel Golle            10 ( -2) [ 9] Ar=C4=B1n=C3=A7 =C3=9C=
-NAL         =20
-
-The top author list continues to change a lot release to release.
-Notably David Howells tops the patch posting count, with the large
-sendpage effort. Russell King authored various patches improving=20
-the infrastructure and common code for embedded drivers (general phylink
-improvements, SFP rate selection, C73 auto-neg, mdiodev pcs helpers).
-Kuniyuki sent quite a few fixes for IP and core layers of the stack.
-I make the list mostly due to YNL work.
-
-
-Company rankings
-----------------
-
-Top reviewers (thr):                 Top reviewers (msg):               =20
-   1 ( +1) [46] Corigine                1 ( +1) [73] Corigine           =20
-   2 ( -1) [32] Meta                    2 ( -1) [64] Meta               =20
-   3 ( +1) [22] RedHat                  3 ( +1) [56] RedHat             =20
-   4 ( -1) [19] Intel                   4 ( -1) [41] Intel              =20
-   5 ( +2) [15] Andrew Lunn             5 ( +1) [34] Andrew Lunn        =20
-   6 ( -1) [15] Google                  6 ( +1) [32] nVidia             =20
-   7 ( -1) [14] nVidia                  7 ( -2) [30] Google             =20
-
-Simon's efforts put Corigine at #1 but overall no major movement.
-In fact companies at #8 have half of the review volume of #7, so
-the top #7 corp reviewers may be the most stable of all rankings
-for a long time.
-
-
-Top authors (thr):                   Top authors (msg):                 =20
-   1 ( +1) [16] Intel                   1 ( +2) [79] Intel              =20
-   2 ( -1) [16] RedHat                  2 ( -1) [57] RedHat             =20
-   3 ( +1) [ 8] nVidia                  3 ( -1) [46] nVidia             =20
-   4 ( -1) [ 7] Meta                    4 ( +7) [23] Oracle             =20
-   5 (   ) [ 7] Google                  5 ( +1) [21] Meta               =20
-   6 ( +4) [ 6] Huawei                  6 (+27) [18] Microchip          =20
-   7 (   ) [ 6] AMD                     7 ( +7) [16] Pengutronix        =20
-
-Intel takes #1 for patches sent because of the additional volume=20
-of iwl-next patches which now reach netdev. David Howells keeps
-Red Hat at #2.
-
-
-Changes
--------
-
-A sidebar before the last ranking - the company "scores" - because=20
-the way scores are calculated has changed. The "score" statistics used
-to be very lenient, counting a single review as equal to 3 patches:
-
-score =3D review_threads * 10 + (review_msgs - 1) * 2=20
-      - author_threads *  3 - (author_msgs / 2)
-
-The formula now ignores the number of patch sets (threads) but=20
-counts authored messages 8 times heavier:
-
-score =3D review_threads * 10 + (review_msgs - 1) * 2
-                            - (author_msgs * 4)
-
-There is little science to this. The goal used to be to reprimand
-companies which bombard us with patches (mostly stupid automated
-"fixes"). That problem has thankfully stopped.
-
-We can now set a more ambitious goal of a fair balance between code
-authorship and reviews. We want companies which produce code to still
-have a chance making it in the top positive scores, but at the same
-time negative scores to include companies which *do* review, just not
-enough.
-
-With that out of the way here are the rankings according to the new
-formula:
-
-Top balance scores (positive):        Bottom balance scores (negative):    =
-         =20
-   1 ( +1) [595] Corigine               1 (***) [55] Bartosz Golaszewski=20
-   2 ( -1) [359] Meta                   2 (***) [42] Intel              =20
-   3 ( +3) [204] Andrew Lunn            3 (***) [40] Bootlin            =20
-   4 (   ) [166] Google                 4 (***) [32] Pengutronix        =20
-   5 (   ) [101] RedHat                 5 (***) [30] Ar=C4=B1n=C3=A7 =C3=9C=
-NAL         =20
-   6 ( +2) [ 88] Linaro                 6 ( +9) [29] Trustnetic         =20
-   7 ( +9) [ 53] Enfabrica          =20
-   8 (+14) [ 38] Microsoft          =20
-   9 ( +1) [ 37] NXP                =20
-  10 (***) [ 34] Linux Foundation   =20
-  11 (+16) [ 33] Mojatatu           =20
-  12 ( -1) [ 24] Oracle             =20
-
-On the left side we can easily map to the individuals responsible=20
-for their company's position, so I won't cover most.
-Greg KH and Linus apparently respond to enough emails to put Linux
-Foundation at #10 :)
-It's good to see Pedro and Jamal (Mojatatu) make #11.
-
-On the right side we see Bartosz, Bootlin, and Pengutronix, so a lot=20
-of Open Source contractors who don't review other people's code,
-at least not on netdev.=20
-Intel makes the list at #2 because of the large volume of iwl-next
-postings which wasn't balanced with a sufficient increase in reviews.
-Arinc made one too many quick reposts of his series and makes the list=20
-at #5 ;)
-
-
-Another interesting (to me?) way of looking at this is to see in which
-percentile of review balance "score" the top code producers rank:
-
-How top authors rank in scores:
-  1  p99 [-42]  Intel
-  2   p0 [101]  RedHat
-  3   p3 [ 16]  nVidia
-  4   p2 [ 23]  Oracle
-  5   p0 [358]  Meta
-  6  p37 [  0]  Microchip
-  7  p99 [-32]  Pengutronix
-  8  p98 [-28]  AMD
-  9  p99 [-56]  Bartosz Golaszewski
- 10  p92 [ -9]  Huawei
- 11  p99 [-40]  Bootlin
- 12   p4 [ 10]  Broadcom
- 13   p0 [165]  Google
- 14  p19 [  1]  Isovalent
- 15  p96 [-24]  Alibaba
-
-The distribution is rather bi-modal, with most companies either doing
-great (<p5) or poorly (>p95). But it is possible to strike a more even
-balance (Microchip and Isovalent).
-
-Code: https://github.com/kuba-moo/ml-stat
-
-
-Thanks to everyone for a productive release cycle! Hopefully we can
-all find some time to catch a breath during the merge window and come
-back strong for the next one.. and the one after that.. and...
+Sounds like we need polymorphic kfuncs.
+Same kfunc name called by bpf prog, but implementation would
+change depending on {attach_btf_id, prog_type, etc}.
+The existing bpf_xdp_metadata_rx_hash is almost that.
+Except it's driver specific.
+We should probably generalize this mechanism.
 
