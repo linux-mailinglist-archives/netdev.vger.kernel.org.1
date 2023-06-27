@@ -1,166 +1,169 @@
-Return-Path: <netdev+bounces-14207-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14208-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F21973F869
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:11:42 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id DBB1573F878
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:13:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 462CD28102A
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:11:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 93D77281021
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:13:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A913168A5;
-	Tue, 27 Jun 2023 09:11:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB4BD168B1;
+	Tue, 27 Jun 2023 09:13:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E19010F9
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:11:39 +0000 (UTC)
-Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2052.outbound.protection.outlook.com [40.107.7.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC3DE2D4F;
-	Tue, 27 Jun 2023 02:11:23 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A/QtkBXAbM60dO5WqHzIkeIXdO6NTT+uomjFkd3+VygyUgjqPO9O064RBNJMV8KhzWWOxWxyXMY268XzPtmLX1EUrQSMubepub9Qvp/NzAGGUx+XG081Px1ClsxK/VZwNKevDpqzdJ1WICKgonODQjCf/PBBwmOxnfyhocfzkwEfqqVo0TcZFQuvhy3hmROGn6O0LiLLQ3oGtj11xs6ke02WXfI529CdxRqNcbkAtmHuXN4ZPaE2o3uzSyVZBQubdqfWtE+gpQffdsOIRdzSd+eiHAb7xSzScpjo5/CwCRgQCz67nB1z3gpL4mluk/PMkTDmu8O7g2LbBIudx2FLBg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=voVqYPY0BKfPHCX+ZRboN12I+vP4ZaP2jImwH437K6o=;
- b=ikIHxuIyODw4CnbqcMDImxk7MrlrsVz85JVafcUguRXaPtiRvjY0/0wQriicKVTdfrTLSjeD9T4Gc3MEF48BYxtlqkLDymSXaQoqFnZ3yoSyKaJeYezYbU/O1l14cBCgJMyd6h2nfsgymbU4MP4qBh8+QQPPE7OvEINhuYIeQUY/cGrkBQQYC9CH1N8jQ0Wwycv3csZ2URo3DjMif1jmjwqgLA9rvfvdfuAlFLur8yN7aDqV1uZTqkaIXz0QN5QG5G7oens/bz0OVaVC5jeeZp3OpWSHrft9p6jiler/lZaH240YHGy5H7oCWxeWOSd37pHA2weFaAoQODsDxxV5cA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=voVqYPY0BKfPHCX+ZRboN12I+vP4ZaP2jImwH437K6o=;
- b=R770rnpI6i3wqHVjSoiPdGOeYJ4wrh9UeGktuDpwzzaAk493CyofghCbfBvBl3sZQbA7iuQIWjnvsRbq4tbvj44ekthsKi4TBzOELDG34AcqXrc0mmoRifkTlJB5GhhOYN7XSL+BLyuP8CGN24IC0iFSwzMcOS2FN3lO5iV0c3Q=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by AM7PR04MB6775.eurprd04.prod.outlook.com (2603:10a6:20b:102::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Tue, 27 Jun
- 2023 09:11:21 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6521.026; Tue, 27 Jun 2023
- 09:11:21 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Jose Abreu <Jose.Abreu@synopsys.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Russell King <linux@armlinux.org.uk>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org,
-	Harini Katakam <harini.katakam@amd.com>
-Subject: [PATCH net] net: phy: mscc: fix packet loss due to RGMII delays
-Date: Tue, 27 Jun 2023 12:11:09 +0300
-Message-Id: <20230627091109.3374701-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0173.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b4::20) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DB3EE168A2
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:13:24 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D8BFD;
+	Tue, 27 Jun 2023 02:13:23 -0700 (PDT)
+Received: from pps.filterd (m0356517.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35R96B9i008761;
+	Tue, 27 Jun 2023 09:13:04 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=eRYl3tInGhDOkzzXnyLKjP4RygjUjtbP4SrRO0c+vWQ=;
+ b=qDMffMBt8L6VJlwG8tURp2ZwilOX9K/rqLsrvTLNcHcNumo5bXR85n2fT0V+E8EjUk5Y
+ MlWgFliseuH0ILUWdMKcO74nbfFS/WBE7JHU1CjKECJJGNRi3wHYo6DeppuQ3OdJdQrn
+ Vbi1W3l1URgOENUohIs1eHwzBsJ1jkOe8pkB2S/b45Od2XToIs9s3TTdIAJ5lmd7Dpv/
+ Kr47XyYy/CdcVx1PLxDAOnJIcagSMolnzSck45iCfK6vIL0+ZJ4rMkjXu9OHE0C6CyVN
+ /LX4QweXpJ/o2Jw3gyZosKjZq3kQrz/FcGOCH/SxTFGXM6U/+vnhzy9/MS8svLtRjepB 3Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfvq8rabp-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 Jun 2023 09:13:03 +0000
+Received: from m0356517.ppops.net (m0356517.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35R96GKB009302;
+	Tue, 27 Jun 2023 09:13:03 GMT
+Received: from ppma06fra.de.ibm.com (48.49.7a9f.ip4.static.sl-reverse.com [159.122.73.72])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rfvq8raar-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 Jun 2023 09:13:03 +0000
+Received: from pps.filterd (ppma06fra.de.ibm.com [127.0.0.1])
+	by ppma06fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35R3BSQ5025785;
+	Tue, 27 Jun 2023 09:13:00 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+	by ppma06fra.de.ibm.com (PPS) with ESMTPS id 3rdqre1bqm-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 Jun 2023 09:13:00 +0000
+Received: from smtpav04.fra02v.mail.ibm.com (smtpav04.fra02v.mail.ibm.com [10.20.54.103])
+	by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35R9CwrH65798408
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 27 Jun 2023 09:12:58 GMT
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 2A85F2004B;
+	Tue, 27 Jun 2023 09:12:58 +0000 (GMT)
+Received: from smtpav04.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id D7F0C20040;
+	Tue, 27 Jun 2023 09:12:57 +0000 (GMT)
+Received: from [9.152.212.248] (unknown [9.152.212.248])
+	by smtpav04.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Tue, 27 Jun 2023 09:12:57 +0000 (GMT)
+Message-ID: <43a1f34a6b1c5a14519f3967dff5eb42e82ee88d.camel@linux.ibm.com>
+Subject: Re: [PATCH v5 00/44] treewide: Remove I/O port accessors for
+ HAS_IOPORT=n
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Arnd Bergmann <arnd@arndb.de>, Richard Cochran
+ <richardcochran@gmail.com>,
+        Heiko Carstens <hca@linux.ibm.com>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+        Bjorn Helgaas
+ <bhelgaas@google.com>,
+        Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
+ <u.kleine-koenig@pengutronix.de>,
+        Mauro Carvalho Chehab
+ <mchehab@kernel.org>,
+        Alan Stern <stern@rowland.harvard.edu>,
+        "Rafael J .
+ Wysocki" <rafael@kernel.org>,
+        Geert Uytterhoeven <geert@linux-m68k.org>,
+        Paul Walmsley <paul.walmsley@sifive.com>,
+        Palmer Dabbelt
+ <palmer@dabbelt.com>,
+        Albert Ou <aou@eecs.berkeley.edu>, linux-kernel@vger.kernel.org,
+        Linux-Arch <linux-arch@vger.kernel.org>, linux-pci@vger.kernel.org,
+        Netdev <netdev@vger.kernel.org>
+Date: Tue, 27 Jun 2023 11:12:57 +0200
+In-Reply-To: <7b5c40f3-d25b-4082-807d-4d75dc38886d@app.fastmail.com>
+References: <20230522105049.1467313-1-schnelle@linux.ibm.com>
+	 <7b5c40f3-d25b-4082-807d-4d75dc38886d@app.fastmail.com>
+Content-Type: text/plain; charset="UTF-8"
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: fZujSueKmVHDxjYCpP51RL3hPXVzRXrP
+X-Proofpoint-ORIG-GUID: XqQNy_k3bnezF-iSHCzgIlhzyUZTuwmi
+Content-Transfer-Encoding: quoted-printable
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM7PR04MB6775:EE_
-X-MS-Office365-Filtering-Correlation-Id: 52416892-03b6-4ba0-8b1d-08db76ee790c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	ZZxW9hAIbgu+aSCmxm5HftOQSt1IplUhf6wsTgEuju55T4QSEDHYfNPZSU6pcRdfTeVBdcG9OBNf/tZrCBUy+X+NKUVOSXZBYU5m16CQu4JgcO/IgLZL1oyhDm7Ew2b3VTMalkBLQhyXpsMOhsYGgAefMGj80vLu4eUHeKM7IB6FdNRlGZVChN3A4YEKWH5bw5iEvkh5OOWc+87lRrLtWFQpkPs0skfo+/E/Hc0IijpvnEQYVPsiK/OC0YNXOpqvRyvmIZ14lmAG9S/iGnfb6H3cbVBwCuLyWERlxDbqaJ2+mM9pjx1xjM/Jkp1nQuk699Ud7h4X9ybL/60z07LQKPA97gQJL3BGBcybjMMUtKzqeZwS28o0y+b8n26pmsn8iMTEdJCS0n1GeraGyUk4oe5azRV2hyGJGHLfDiKVCfHGhErbS3qPcVRbnebFtVTa0aVE5J6tf51W7ceOhhkuMdP81+2PyBk9PiL2C11Z/47sqj6yIYh41iZFrNaVR6qnOE9UwYSM6FGV6q9UXJOu9pALIcjnwi/ADSyw0AO50E3wBYe9REccsBKVzWbxIKv19D2KpLabLiatEpru0CuB2zDVfe9vfsC4dRtVpDNFRiqfqGHJ/+Q2G5n4xsgBs1Pf
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(396003)(376002)(136003)(366004)(346002)(451199021)(83380400001)(52116002)(6486002)(478600001)(54906003)(6666004)(1076003)(66556008)(66946007)(2906002)(6512007)(186003)(6506007)(26005)(66476007)(38350700002)(7416002)(44832011)(316002)(41300700001)(38100700002)(8676002)(5660300002)(8936002)(36756003)(4326008)(6916009)(86362001)(2616005);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?RtMaxjJfok8/b36e4/SvdVI9G7J4WI3+dhz4wkEXThTqb2be6NhO0QuRTQA+?=
- =?us-ascii?Q?1elfeMgYGa+Ko+YLs/7db2iFPM+lLnuXXZ6LrVDSNTrVmKf6Jow2/215uSY4?=
- =?us-ascii?Q?531Qo4S7tAPZKtue1awrufZf5kQmej2FUkmU1Sjr6sBSdN7RLxppRQfChi7s?=
- =?us-ascii?Q?6wBdCjwqFI73kxilWAm4SXL6sP5gpwGAetxg1s0cdMTTwWs+2vTHhvTehYFj?=
- =?us-ascii?Q?BtpcP/EyfnNsY7lnGTkS7DDUEpP6QJWdr0EmS5CHsMGsRM7RIZF7yiCE3pfv?=
- =?us-ascii?Q?9HGmnc2ILILWgAAHgKuwBvPFwILqkHchp6IiyMRUEF1p3Re2q9zg8O/NYMX9?=
- =?us-ascii?Q?4Is988ANerKTdERH5fSq5fci++U8ddH6zIABlF+yEUijYZqfu1aJsG8k3rD6?=
- =?us-ascii?Q?2ZjHn5QouPlrrQxqNDu1yYBTSxGkMn/4AJmFZaUiKIWrgFFvSFNCgBFDClne?=
- =?us-ascii?Q?fkFjsPqemqZmSOgth3+N7KLFe9WPcASIcUlSJ8WHQr8HHH90E197XZG4zW9g?=
- =?us-ascii?Q?XFVMxXTgcd2LnN5Rt+OT5S+ittPeONy4fJjeO/e40cZnKrnWw8pDt/MovvjF?=
- =?us-ascii?Q?u1bfXc9OrOpPC4tcinBIX2obB0P2I7We4IvgzWVUEyQsyIeeYFJglOEk4ZcU?=
- =?us-ascii?Q?7C7WyCY7TP6oKZlkXb0V+E8jhwF4iV2H+FWCri2SVsmfZT0H6KptPKKf2mCt?=
- =?us-ascii?Q?BtNtWxo/FF6m2gPJgw6VMRKL3cbbGoJIstb8SqWrBnLaB4WMYLdIf1tGVbqP?=
- =?us-ascii?Q?jlhsTppywK51hlBo/UiesrJJPu6ILN9mU5GYmY68vYRlTN3W+Bc20dNmfoHC?=
- =?us-ascii?Q?+EtXRU9l5BkdQOyVbkOFhxZrtHm49xGjgi8GJXkoDcuKIj6ytoDf3jI0ZmIF?=
- =?us-ascii?Q?n52PBQhq2cYeRULwqKP4nz8gpI9t0b291LQQAJ5ptIlx9MQGRGHstkZSX9QV?=
- =?us-ascii?Q?Jwz81PHvV3ozkXf78Phv7WynFu5mitMjTMJZjQmAKqD3Pysop6VIifmVDPjq?=
- =?us-ascii?Q?yMWNHTtgUlyeXnZiCWGH57oJYAvzoO1qWznS9myH9OfHUn1tJk7CPAxjNjxU?=
- =?us-ascii?Q?sEtxSrbYiDW6jnwUnt2l93mpLfwzOQjk6v7rNIqjaHm8+GNvwLMYFz1fSGt8?=
- =?us-ascii?Q?aIJPmXo/2vWW7cX085x87O2G7x91lcPy+KAA/Am/Y5vKAUBiyAfod/la7Blh?=
- =?us-ascii?Q?n+oBPqDm2i29D0fhTeuJwVDT93UcIKQLwf+c8YQ4uN5untt0Fom95ssVQbOM?=
- =?us-ascii?Q?UteRFrPgBsEb6ZzcQeEwpYlruvLKGAw4qZ2BcBZozUQLCANqzx7ArnMjhEy4?=
- =?us-ascii?Q?+wfcQMRvkht69pWZ6u/F7Sdxlv1/SA+apN23NB4w+YA6wPXY9tI+3gVGcqdn?=
- =?us-ascii?Q?rJ4OsjM483TLHS9y+ef8+9hzu+MAh0fCu+MI0+8n4rZqqAqcwuxntWLQbjob?=
- =?us-ascii?Q?aW8v6rHtWoEUMJG3Cuy8DRs1MhPjQoDQ/z6b19SfyzWOelCfFCOLhMsPdW5F?=
- =?us-ascii?Q?Dg9HCzFkcXp1gbtGd4ZoyFti295qORuRP0ndasCFYvyhSCPe4bYAxkxZi9Rm?=
- =?us-ascii?Q?7OG22SbRwguEZhuiyKe01epE5df0FluVxXXAZ8lKLwRioU/TTjMulY60Ex0/?=
- =?us-ascii?Q?hg=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 52416892-03b6-4ba0-8b1d-08db76ee790c
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 27 Jun 2023 09:11:21.1105
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MAF7Rds7rPWodRQ3/4Oao2svKsFxaQiu/FeIstxXAYP0QXmCkEpqztRSlO9yVNM5O+oaN/WrEYMylGEZHwe/ug==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM7PR04MB6775
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-27_05,2023-06-26_03,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 spamscore=0
+ malwarescore=0 impostorscore=0 mlxscore=0 bulkscore=0 adultscore=0
+ clxscore=1011 priorityscore=1501 lowpriorityscore=0 suspectscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306270086
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Two deadly typos break RX and TX traffic on the VSC8502 PHY using RGMII
-if phy-mode = "rgmii-id" or "rgmii-txid", and no "tx-internal-delay-ps"
-override exists. The negative error code from phy_get_internal_delay()
-does not get overridden with the delay deduced from the phy-mode, and
-later gets committed to hardware. Also, the rx_delay gets overridden by
-what should have been the tx_delay.
+On Mon, 2023-05-22 at 13:29 +0200, Arnd Bergmann wrote:
+> On Mon, May 22, 2023, at 12:50, Niklas Schnelle wrote:
+>=20
+> > A few patches have already been applied but I've kept those which are n=
+ot yet
+> > in v6.4-rc3.
+> >=20
+> > This version is based on v6.4-rc3 and is also available on my kernel.or=
+g tree
+> > in the has_ioport_v5:
+> >=20
+> > https://git.kernel.org/pub/scm/linux/kernel/git/niks/linux.git
+>=20
+> I think it would be best if as many patches as possible get merged
+> into v6.5 through the individidual subsystems, though I can take
+> whatever is left through the asm-generic tree.
+>=20
+> Since the goal is to have maintainers pick up part of this, I would
+> recommend splitting the series per subsystem, having either a
+> separate patch or a small series for each maintainer that should
+> pick them up.
+>=20
+> More importantly, I think you should rebase the series against
+> linux-next in order to find and drop the patches that are queued
+> up for 6.5 already. The patches will be applied into branches
+> that are based on 6.4-rc of course, but basing on linux-next
+> is usually the easiest when targeting multiple maintainer
+> trees.
+>=20
+> Maybe let's give it another week to have more maintainers pick
+> up stuff from v5, and then send out a v6 as separate submissions.
+>=20
+>     Arnd
 
-Fixes: dbb050d2bfc8 ("phy: mscc: Add support for RGMII delay configuration")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- drivers/net/phy/mscc/mscc_main.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Hi Arnd and All,
 
-diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
-index 669a4a7a28ce..4171f01d34e5 100644
---- a/drivers/net/phy/mscc/mscc_main.c
-+++ b/drivers/net/phy/mscc/mscc_main.c
-@@ -563,9 +563,9 @@ static int vsc85xx_update_rgmii_cntl(struct phy_device *phydev, u32 rgmii_cntl,
- 	if (tx_delay < 0) {
- 		if (phydev->interface == PHY_INTERFACE_MODE_RGMII_TXID ||
- 		    phydev->interface == PHY_INTERFACE_MODE_RGMII_ID)
--			rx_delay = RGMII_CLK_DELAY_2_0_NS;
-+			tx_delay = RGMII_CLK_DELAY_2_0_NS;
- 		else
--			rx_delay = RGMII_CLK_DELAY_0_2_NS;
-+			tx_delay = RGMII_CLK_DELAY_0_2_NS;
- 	}
- 
- 	reg_val |= rx_delay << rgmii_rx_delay_pos;
--- 
-2.34.1
+I'm sorry there hasn't been an updated in a long time and we're missing
+v6.5. I've been quite busy with other work and life. Speaking of, I
+will be mostly out for around a month starting some time mid to end
+July as, if all goes well, I'm expecting to become a dad. That said, I
+haven't forgotten about this and your overall plan of sending per-
+subsystem patches sounds good, just haven't had the time to also
+incorporate the feedback.
 
+Thanks,
+Niklas
 
