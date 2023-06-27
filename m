@@ -1,107 +1,84 @@
-Return-Path: <netdev+bounces-14223-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14225-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5181573FA0B
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:19:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8AC2973FA3F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0C7E4281068
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:19:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 44F1628107C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FD8C174E7;
-	Tue, 27 Jun 2023 10:19:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBAF5BA33;
+	Tue, 27 Jun 2023 10:30:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0ACE2171CF;
-	Tue, 27 Jun 2023 10:19:51 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB983E3;
-	Tue, 27 Jun 2023 03:19:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=hHK2zVsOPsYddg/sW13UtUauH4zY0IBI+dg4QZPPeok=; b=CpHjAc92fm6gtpOtfhLpNGfe5f
-	b3dgrXyTuwCU2D10IChbFpAQLVAsA+0qm9sWDAxTJMjHNWBD01h4vhW3slzFiN7cpi5nSpcyVXXis
-	im1Xn8hGgWaRKfTkgq0/Gr2yyJgguKFxYiOtRu7a9lPq+S45NZcAvzghjer+pDy1k7Kn8fnJxetuC
-	qwvwdG19mGcjetUzXoVVjvfbliw6tQz8W70DMTelmkE6giAFAvldyeDTunQ7/GYwqjdxAmODaVptW
-	R2n/SsGubS/ZJxtyYsdfg2n3yLzGUh1c3owPMeZAtI7FUvS/vPkGsBydkS6aTyW4Ah5+0bwwQZlX6
-	b3uVed1Q==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qE5nT-000O7h-DK; Tue, 27 Jun 2023 12:19:43 +0200
-Received: from [85.1.206.226] (helo=linux.home)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qE5nS-00020f-Gv; Tue, 27 Jun 2023 12:19:42 +0200
-Subject: Re: [PATCH bpf-next v3 2/7] net: export inet_lookup_reuseport and
- inet6_lookup_reuseport
-To: Lorenz Bauer <lmb@isovalent.com>, Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org,
- davem@davemloft.net, dsahern@kernel.org, edumazet@google.com,
- haoluo@google.com, hemanthmalla@gmail.com, joe@wand.net.nz,
- john.fastabend@gmail.com, jolsa@kernel.org, kpsingh@kernel.org,
- kuba@kernel.org, linux-kernel@vger.kernel.org,
- linux-kselftest@vger.kernel.org, martin.lau@linux.dev, mykolal@fb.com,
- netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com, shuah@kernel.org,
- song@kernel.org, willemdebruijn.kernel@gmail.com, yhs@fb.com
-References: <20230613-so-reuseport-v3-2-907b4cbb7b99@isovalent.com>
- <20230626173249.57682-1-kuniyu@amazon.com>
- <CAN+4W8hnPzhuKPorSjHeOQHFgAuk=A9oa1hW5jckUPoF=5zEQQ@mail.gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <e21aa61a-803b-bb82-d56e-2db0c839477b@iogearbox.net>
-Date: Tue, 27 Jun 2023 12:19:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BCFCB17AAA
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 10:30:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 34D5FC433C0;
+	Tue, 27 Jun 2023 10:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687861820;
+	bh=R38voaZXR74g7j6AGu6e9jUGzSMGKBcf62IbBXvdPZM=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=LzMywWKqASFwoVLn4+bEW1NKWiQTMUosUJvWxZMvHXxEPkzewAPkv0SIK2VMdLp5u
+	 v1pChSNqGxycB1mK1Dhgg42rZmumKr5okb0Bo5ZS7EozHCl+njQVDKkiwgXlz8Vtd7
+	 Eo+fspgOvKa8GYyGsxfE7hWtegcQkLDCJg/3lI1tSQKDbELrIOcwwtq3CTtWVwtz+M
+	 Uvns7WL9XI+0wNDFJIzROXCLxgFthbUKqRFwTz2FW+XNv6OZl2v1U4RFA9FzZGOVtV
+	 OyWNBpwJ0WkfKCtsTrtgSXaVl3pDk5Nny0pWlUdR/SA+ya0ZLFW3Tn59fi+Anqu17h
+	 qj/fnyxNY+4pA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 12ECDE537FF;
+	Tue, 27 Jun 2023 10:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAN+4W8hnPzhuKPorSjHeOQHFgAuk=A9oa1hW5jckUPoF=5zEQQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26952/Tue Jun 27 09:29:10 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Subject: Re: [PATCH net v2] ipvlan: Fix return value of ipvlan_queue_xmit()
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168786182007.31138.6869118162868476838.git-patchwork-notify@kernel.org>
+Date: Tue, 27 Jun 2023 10:30:20 +0000
+References: <20230626093347.7492-1-cambda@linux.alibaba.com>
+In-Reply-To: <20230626093347.7492-1-cambda@linux.alibaba.com>
+To: Cambda Zhu <cambda@linux.alibaba.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, fengtao40@huawei.com,
+ lucien.xin@gmail.com, luwei32@huawei.com, maheshb@google.com,
+ xuanzhuo@linux.alibaba.com, dust.li@linux.alibaba.com,
+ tonylu@linux.alibaba.com
 
-On 6/27/23 10:56 AM, Lorenz Bauer wrote:
-> On Mon, Jun 26, 2023 at 6:33 PM Kuniyuki Iwashima <kuniyu@amazon.com> wrote:
->>
->> From: Lorenz Bauer <lmb@isovalent.com>
->> Date: Mon, 26 Jun 2023 16:08:59 +0100
->>> Rename the existing reuseport helpers for IPv4 and IPv6 so that they
->>> can be invoked in the follow up commit. Export them so that DCCP which
->>> may be built as a module can access them.
->>
->> We need not export the functions unless there is a real user.
->>
->> I added a deprecation notice for DCCP recently, so I bet DCCP
->> will not get SO_REUSEPORT support.
->> https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git/commit/?id=b144fcaf46d4
-> 
-> Misleading commit message, it turns out that ipv6 as a module also
-> needs (the v6 functions at least) to be EXPORT_SYMBOL'd. That's
-> because of some special shenanigans where inet6_hashtables.c is linked
-> into vmlinux even when CONFIG_IPV6=m.
-> 
-> Also not sure how to work around this: DCCP may be deprecated but
-> without the export a module build of it fails.
+Hello:
 
-If it breaks the build, then we need to export it.
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
+
+On Mon, 26 Jun 2023 17:33:47 +0800 you wrote:
+> ipvlan_queue_xmit() should return NET_XMIT_XXX, but
+> ipvlan_xmit_mode_l2/l3() returns rx_handler_result_t or NET_RX_XXX
+> in some cases. ipvlan_rcv_frame() will only return RX_HANDLER_CONSUMED
+> in ipvlan_xmit_mode_l2/l3() because 'local' is true. It's equal to
+> NET_XMIT_SUCCESS. But dev_forward_skb() can return NET_RX_SUCCESS or
+> NET_RX_DROP, and returning NET_RX_DROP(NET_XMIT_DROP) will increase
+> both ipvlan and ipvlan->phy_dev drops counter.
+> 
+> [...]
+
+Here is the summary with links:
+  - [net,v2] ipvlan: Fix return value of ipvlan_queue_xmit()
+    https://git.kernel.org/netdev/net/c/8a9922e7be6d
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
