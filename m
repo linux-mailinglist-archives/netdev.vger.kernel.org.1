@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-14310-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14309-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B29CC74017D
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:40:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BC79E74016F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:40:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 774072810D0
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:40:45 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42FD32810D0
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:40:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C8AAF1373;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 22F9B13069;
 	Tue, 27 Jun 2023 16:40:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0057613060
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F144A1373
 	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:40:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 89248C433CA;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 80DF6C433C0;
 	Tue, 27 Jun 2023 16:40:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687884023;
-	bh=qhrqoZJFyYeTAaz2UcFPn+tuC4Uk12bbLWZIw6uJLXs=;
+	bh=w2D8t/VMojgXK2lyS/fzG64h7GtDArWYUhSoj2MxT6g=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=EQvvOvi+96/TuRH9LmV8Y1eNJvyjEYMhPLpj7laewCMm6GM8uAdqfdvwoCCZrpHLk
-	 GYGf5ZGxhgfYW+KOEEc2/8THrJG9UMidHdommOF9qgIFHhhLhnfWZ7wh81uzu+2W0v
-	 Sh2VSNtQYMvlsLtNlUKXuTuUUnex+CCx8JWqX59XC1tXBmPxiF5mvA6kBr3KC6NJpf
-	 6U0kZjLJnMGFettylShCCnz5l0V1+dRXnVooV0V5uzQyu329seMXlDkjOH4YsNKuN6
-	 teWvGrbTtcJjjiLbiUvKCZ+a55BYIVBYFtHjRJ1KJYFNis6IwGRUiX0/g+vIdv9+cp
-	 oN6PhlkjjHbBg==
+	b=gdH4Dxn4O6Sm7VyNt7gislO5aeozvVcdKcUFy9kqRWtDSr84bcb49NnPfYPGbVeF4
+	 10GdBwppLYYT6BKgn0vmgVWpAWBG+tMBJG9RPYYeY12Nm0ioOqxmGtUMaZBdrQZmfm
+	 wNR+F/NMVT93eymf5zwMT5lCTlAFQY4yqynxltzMHpZcYkSzTdJC7cKPv7zxu5Mqxe
+	 6dkA95gLSm/Hv/OLVK0+6mnu6w6ziDonPbgrjsZjObxXb6aHmlMcgvN2ro+/PSIZSH
+	 zzG0qzRX2BMqeKaSzBiGdk3eFGD47ROTUcmWrbMS/7yFfqci1cxeB5cQxzkvXpayZQ
+	 JQ+nABONfu5PQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6E6D3E53800;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 61DEFE53807;
 	Tue, 27 Jun 2023 16:40:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,39 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net-next v3] libceph: Partially revert changes to support
- MSG_SPLICE_PAGES
+Subject: Re: [PATCH v1 net-next] Revert "af_unix: Call scm_recv() only after
+ scm_set_cred()."
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168788402344.21860.17593461290392483933.git-patchwork-notify@kernel.org>
+ <168788402338.21860.15081782447341175410.git-patchwork-notify@kernel.org>
 Date: Tue, 27 Jun 2023 16:40:23 +0000
-References: <3199652.1687873788@warthog.procyon.org.uk>
-In-Reply-To: <3199652.1687873788@warthog.procyon.org.uk>
-To: David Howells <dhowells@redhat.com>
-Cc: idryomov@gmail.com, netdev@vger.kernel.org, xiubli@redhat.com,
- jlayton@kernel.org, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, axboe@kernel.dk, willy@infradead.org,
- ceph-devel@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230626205837.82086-1-kuniyu@amazon.com>
+In-Reply-To: <20230626205837.82086-1-kuniyu@amazon.com>
+To: Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, kuni1840@gmail.com, netdev@vger.kernel.org,
+ konradybcio@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net-next.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 27 Jun 2023 14:49:48 +0100 you wrote:
-> Fix the mishandling of MSG_DONTWAIT and also reinstates the per-page
-> checking of the source pages (which might have come from a DIO write by
-> userspace) by partially reverting the changes to support MSG_SPLICE_PAGES
-> and doing things a little differently.  In messenger_v1:
+On Mon, 26 Jun 2023 13:58:37 -0700 you wrote:
+> This reverts commit 3f5f118bb657f94641ea383c7c1b8c09a5d46ea2.
 > 
->  (1) The ceph_tcp_sendpage() is resurrected and the callers reverted to use
->      that.
+> Konrad reported that desktop environment below cannot be reached after
+> commit 3f5f118bb657 ("af_unix: Call scm_recv() only after scm_set_cred().")
+> 
+>   - postmarketOS (Alpine Linux w/ musl 1.2.4)
+>   - busybox 1.36.1
+>   - GNOME 44.1
+>   - networkmanager 1.42.6
+>   - openrc 0.47
 > 
 > [...]
 
 Here is the summary with links:
-  - [net-next,v3] libceph: Partially revert changes to support MSG_SPLICE_PAGES
-    https://git.kernel.org/netdev/net-next/c/5da4d7b8e6df
+  - [v1,net-next] Revert "af_unix: Call scm_recv() only after scm_set_cred()."
+    https://git.kernel.org/netdev/net-next/c/9d797ee2dce1
 
 You are awesome, thank you!
 -- 
