@@ -1,127 +1,104 @@
-Return-Path: <netdev+bounces-14241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9565073FBA3
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:04:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9EF1773FBD3
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:14:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DC46528108C
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:04:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 085F628102F
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 12:14:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 36BB917ACC;
-	Tue, 27 Jun 2023 12:04:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D66517AD6;
+	Tue, 27 Jun 2023 12:13:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A5E710F9
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 12:04:00 +0000 (UTC)
-Received: from mail-pf1-x42c.google.com (mail-pf1-x42c.google.com [IPv6:2607:f8b0:4864:20::42c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D0BC21A2;
-	Tue, 27 Jun 2023 05:03:59 -0700 (PDT)
-Received: by mail-pf1-x42c.google.com with SMTP id d2e1a72fcca58-666ecb21f86so4317819b3a.3;
-        Tue, 27 Jun 2023 05:03:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F9491775D
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 12:13:58 +0000 (UTC)
+Received: from mail-ed1-x52e.google.com (mail-ed1-x52e.google.com [IPv6:2a00:1450:4864:20::52e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E05CC198D;
+	Tue, 27 Jun 2023 05:13:56 -0700 (PDT)
+Received: by mail-ed1-x52e.google.com with SMTP id 4fb4d7f45d1cf-51d9695ec29so2490608a12.1;
+        Tue, 27 Jun 2023 05:13:56 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687867439; x=1690459439;
-        h=message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=o3gH56krg3o+MhlxD3hH4pcrR2ZlnqXpJb3pt9aQMK8=;
-        b=rNwSRvie7WyEG+pwqLd6vSajpf0wrN6PYm8gTlZvVjI6ipe6Z/mFHnxmIGPzzs/n79
-         mRtzEd9fdwpLJ6eRbxQ+c/hIEPiSr738JbnpgnWKSV7fiR9g84H+xlJwVsgEOBC8SvKw
-         g9yvG0UkovX3y8W0uwJp459SVihQ/cy8hAzSLozpCkjDvz77CZMKTR/g7TNkQlY24qA9
-         gweTLiA5vT3ITQvrtC4Ogmby+ZG6yATtjAxA6QujivGASYVxim1O/ZBlNGEH1mALkUy0
-         zc3qA6JLMKL9Q/0cilpVw5ebLqdZ+qDSVFtlU175UAtfjsnF0GtGTJYvdheCkBAu3lse
-         ITUA==
+        d=gmail.com; s=20221208; t=1687868035; x=1690460035;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=5JluRheYFSTMbD9G/QvMPc64BdYHqfR2I9ADndd/+5I=;
+        b=Rd55CZxfu7gs/4ZVot2QuJRNc8NhdFoaC95yVDbf4SmQZAoVD4SYU7loDD8lB9YBjM
+         PiIvOJJk3QWw4RusjFy+D9SjaFxwUuSJZJPVusRjOxR/oqQVX2FF1CAUILgkctD2jHET
+         55jk70AMAogZ3urr8cqY/H4sFMjZopV/7cpC2tMJ/jFwRgH19c96h0WfdJJ7reeWfV4F
+         Q7UpSu4DJ4h3rw38qldEqOgbcwqextUsa7RKynRaKUrEHPOiWIHPpkWewyS8udqfOkE+
+         yjKNFhF9PloTPAIyr6hKRprZSRNFMhTKgGbQNe1hMN4BH5IUkktx7UlPlrRPiX5R8UrB
+         KAVQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687867439; x=1690459439;
-        h=message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=o3gH56krg3o+MhlxD3hH4pcrR2ZlnqXpJb3pt9aQMK8=;
-        b=DA21u2Ar7rCiC42ww6Is0QnR/DE8QwnY2jauRIbDGk0tD+1B/IhUd7Z+fWRbj1Ytop
-         Z+0VG+QUO9raxzmNbRrU3BPES9hiMk1O3vdyrHiPKzkGJcyzecdbb886Y1B6mJIA2n88
-         xTyRuFTzOt1IBzjJ807Mbr6CJ857pw2R/djs0ZBmf0ubV8shvpAcqJqqeZnca0+HvqpQ
-         kTEY2ExpGY9elKvIk3w4GElrlXZ352guig6yc6LnbD5vd75ynCddHYwMemzunQZI6x94
-         7m41Cw1I7xoboh8x73pOTwKl3v5cm8sanC9Lg4nJ+ZaCYvCwgkqzSItwhS5/AYzp6eQ+
-         cRNQ==
-X-Gm-Message-State: AC+VfDzIqZTlIfd6wEFfJZ6ilPCT28qiQsT7gWYdn05sLKL1pUGPTke5
-	gNIZfhEioAAdEHT3eqE8JFo=
-X-Google-Smtp-Source: ACHHUZ49W2zaNIcmJi8JAs2DXc8eeTd9ey71hUrdOoyhe6DkxAobvyhpyeQRaPR2fYsKwGApeg7LKA==
-X-Received: by 2002:a05:6a20:54aa:b0:112:2843:b546 with SMTP id i42-20020a056a2054aa00b001122843b546mr39998128pzk.58.1687867439166;
-        Tue, 27 Jun 2023 05:03:59 -0700 (PDT)
-Received: from 377044c6c369.cse.ust.hk (191host097.mobilenet.cse.ust.hk. [143.89.191.97])
-        by smtp.gmail.com with ESMTPSA id t4-20020a62ea04000000b0064d27a28451sm5296018pfh.100.2023.06.27.05.03.56
+        d=1e100.net; s=20221208; t=1687868035; x=1690460035;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5JluRheYFSTMbD9G/QvMPc64BdYHqfR2I9ADndd/+5I=;
+        b=Kq8GdI6rR8p6AftyXh0BjHvSSCcIKKRUqG3zZaKlp1Efr3R1llvOYa8GSQ1J94gLeq
+         E7KR478CDCTv5YCmtST52l2ra09CqZjr7nNbKquiPZDSrjkMS9gG27Tn+/SK993BaH3L
+         gpKRnpCqtyqGRDRC7dhy3EoVrXIGvgXHy/FuRcptFUT3VLvTSj+Ij+tPKz3hHJmHCNDK
+         EKLaueF3PoiSDBRa0ODNYGy0mPGSkAkCyy75SLqvglQsWpAV9M1j35gUzU/tlsX0j3R/
+         Y727h9DzEZFaM4JPaqRol8L3m6p5MkVcZlAUi/uAUe9/s7VlbhCOWVxSdC3VUO0AiP7X
+         6hXg==
+X-Gm-Message-State: AC+VfDw6NJLn+eGf10Xc+pQoheYJUNySjUuwOlhWF/CY51HHDAS7Xak1
+	76ELdIPkPzIaC+zWMUSQt9A=
+X-Google-Smtp-Source: ACHHUZ7K+8Eqa+/dcc8+SGtIm9wCcgEBcZEEJyhng/bI9SJ5VzYprFMTw21gc6LIq/28+qqEOTeq4w==
+X-Received: by 2002:a05:6402:330:b0:51d:988b:d63f with SMTP id q16-20020a056402033000b0051d988bd63fmr3561643edw.22.1687868034825;
+        Tue, 27 Jun 2023 05:13:54 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id a15-20020aa7d90f000000b0051bc5adc942sm3783491edr.47.2023.06.27.05.13.53
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 27 Jun 2023 05:03:58 -0700 (PDT)
-From: Chengfeng Ye <dg573847474@gmail.com>
-To: marcelo.leitner@gmail.com,
-	lucien.xin@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: linux-sctp@vger.kernel.org,
-	netdev@vger.kernel.org,
+        Tue, 27 Jun 2023 05:13:54 -0700 (PDT)
+Date: Tue, 27 Jun 2023 15:13:52 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Jose Abreu <Jose.Abreu@synopsys.com>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Heiner Kallweit <hkallweit1@gmail.com>,
+	Russell King <linux@armlinux.org.uk>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org,
-	Chengfeng Ye <dg573847474@gmail.com>
-Subject: [PATCH] sctp: fix potential deadlock on &net->sctp.addr_wq_lock
-Date: Tue, 27 Jun 2023 12:03:40 +0000
-Message-Id: <20230627120340.19432-1-dg573847474@gmail.com>
-X-Mailer: git-send-email 2.17.1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	Harini Katakam <harini.katakam@amd.com>
+Subject: Re: [PATCH net] net: phy: mscc: fix packet loss due to RGMII delays
+Message-ID: <20230627121352.tsqycdvzyqqpdejb@skbuf>
+References: <20230627091109.3374701-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230627091109.3374701-1-vladimir.oltean@nxp.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-As &net->sctp.addr_wq_lock is also acquired by the timer
-sctp_addr_wq_timeout_handler() in protocal.c, the same lock acquisition
-at sctp_auto_asconf_init() seems should disable irq since it is called
-from sctp_accept() under process context.
+On Tue, Jun 27, 2023 at 12:11:09PM +0300, Vladimir Oltean wrote:
+> Two deadly typos break RX and TX traffic on the VSC8502 PHY using RGMII
+> if phy-mode = "rgmii-id" or "rgmii-txid", and no "tx-internal-delay-ps"
+> override exists. The negative error code from phy_get_internal_delay()
+> does not get overridden with the delay deduced from the phy-mode, and
+> later gets committed to hardware. Also, the rx_delay gets overridden by
+> what should have been the tx_delay.
+> 
+> Fixes: dbb050d2bfc8 ("phy: mscc: Add support for RGMII delay configuration")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
 
-Possible deadlock scenario:
-sctp_accept()
-    -> sctp_sock_migrate()
-    -> sctp_auto_asconf_init()
-    -> spin_lock(&net->sctp.addr_wq_lock)
-        <timer interrupt>
-        -> sctp_addr_wq_timeout_handler()
-        -> spin_lock_bh(&net->sctp.addr_wq_lock); (deadlock here)
-
-This flaw was found using an experimental static analysis tool we are
-developing for irq-related deadlock.
-
-The tentative patch fix the potential deadlock by spin_lock_bh().
-
-Signed-off-by: Chengfeng Ye <dg573847474@gmail.com>
----
- net/sctp/socket.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
-
-diff --git a/net/sctp/socket.c b/net/sctp/socket.c
-index cda8c2874691..b2c7d17ff848 100644
---- a/net/sctp/socket.c
-+++ b/net/sctp/socket.c
-@@ -364,9 +364,9 @@ static void sctp_auto_asconf_init(struct sctp_sock *sp)
- 	struct net *net = sock_net(&sp->inet.sk);
- 
- 	if (net->sctp.default_auto_asconf) {
--		spin_lock(&net->sctp.addr_wq_lock);
-+		spin_lock_bh(&net->sctp.addr_wq_lock);
- 		list_add_tail(&sp->auto_asconf_list, &net->sctp.auto_asconf_splist);
--		spin_unlock(&net->sctp.addr_wq_lock);
-+		spin_unlock_bh(&net->sctp.addr_wq_lock);
- 		sp->do_auto_asconf = 1;
- 	}
- }
--- 
-2.17.1
-
+I may have mis-targeted this patch towards "net" while the "net-next"
+pull request has not been yet sent out. Can patchwork be instructed to
+re-run the tests on net-next?
 
