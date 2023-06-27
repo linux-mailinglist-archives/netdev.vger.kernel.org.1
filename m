@@ -1,95 +1,92 @@
-Return-Path: <netdev+bounces-14228-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14229-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4270873FAA2
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:00:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CA473FAB6
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 13:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2B0C61C209BF
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:00:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B789281000
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 11:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4949174D3;
-	Tue, 27 Jun 2023 11:00:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B92EE174FF;
+	Tue, 27 Jun 2023 11:04:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1222B10F9
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 11:00:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 84088C433C9;
-	Tue, 27 Jun 2023 11:00:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687863622;
-	bh=BYNUTlfP7f+F3b9ynsAQKbHDC50G0DCol5Tq/g0IjEA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=c8hZ+o1ZTaRX/xB01+g4P7JfO861D0RV5G0GltHcQ2Rz0zuG9lKMMrlUfL82cSBLX
-	 WiiVBQRO12aUUVXYjm/NjzOn9U4EOk8L5j4iezAIEyxFRRftURYxADNU/QQWJQAFtT
-	 QAFDFsVq7sBGY4LWu0jBjBx7Qmg+rOQK+6c/viFHvpQIzeK19feI18omLW0u0yXL26
-	 DM0LZfflveOaGwqZXdf8MCPuc0ACDk6mXRGIj4RsoepLv66SSemQyXD68aBGQ+hssr
-	 qDTrolVXIbEbsKTr6dM4gG9ixTHYF1cwgyZia8gOKS5rv+M3GsMLoFcTN3pvShrh0n
-	 Yd5TESiq/jCyg==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6240CE5380A;
-	Tue, 27 Jun 2023 11:00:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E02C16427;
+	Tue, 27 Jun 2023 11:04:13 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06EF91BE8;
+	Tue, 27 Jun 2023 04:04:12 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qE6UK-0003PI-Kq; Tue, 27 Jun 2023 13:04:00 +0200
+Date: Tue, 27 Jun 2023 13:04:00 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Daniel Xu <dxu@dxuuu.xyz>
+Cc: edumazet@google.com, dsahern@kernel.org, kuba@kernel.org, fw@strlen.de,
+	pabeni@redhat.com, pablo@netfilter.org, davem@davemloft.net,
+	kadlec@netfilter.org, daniel@iogearbox.net,
+	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: Re: [PATCH bpf-next 3/7] netfilter: defrag: Add glue hooks for
+ enabling/disabling defrag
+Message-ID: <20230627110400.GG3207@breakpoint.cc>
+References: <cover.1687819413.git.dxu@dxuuu.xyz>
+ <66d1eaeb17721b1274eb4c1991a3725e47c912c5.1687819413.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] lib/ts_bm: reset initial match offset for every block
- of text
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168786362239.16210.6293213397519316594.git-patchwork-notify@kernel.org>
-Date: Tue, 27 Jun 2023 11:00:22 +0000
-References: <20230627065304.66394-2-pablo@netfilter.org>
-In-Reply-To: <20230627065304.66394-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <66d1eaeb17721b1274eb4c1991a3725e47c912c5.1687819413.git.dxu@dxuuu.xyz>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Daniel Xu <dxu@dxuuu.xyz> wrote:
+> diff --git a/net/ipv4/netfilter/nf_defrag_ipv4.c b/net/ipv4/netfilter/nf_defrag_ipv4.c
+> index e61ea428ea18..436e629b0969 100644
+> --- a/net/ipv4/netfilter/nf_defrag_ipv4.c
+> +++ b/net/ipv4/netfilter/nf_defrag_ipv4.c
+> @@ -7,6 +7,7 @@
+>  #include <linux/ip.h>
+>  #include <linux/netfilter.h>
+>  #include <linux/module.h>
+> +#include <linux/rcupdate.h>
+>  #include <linux/skbuff.h>
+>  #include <net/netns/generic.h>
+>  #include <net/route.h>
+> @@ -113,17 +114,24 @@ static void __net_exit defrag4_net_exit(struct net *net)
+>  	}
+>  }
+>  
+> +static struct nf_defrag_v4_hook defrag_hook = {
+> +	.enable = nf_defrag_ipv4_enable,
+> +	.disable = nf_defrag_ipv4_disable,
+> +};
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
+Nit: static const, same for v6.
 
-On Tue, 27 Jun 2023 08:52:59 +0200 you wrote:
-> From: Jeremy Sowden <jeremy@azazel.net>
-> 
-> The `shift` variable which indicates the offset in the string at which
-> to start matching the pattern is initialized to `bm->patlen - 1`, but it
-> is not reset when a new block is retrieved.  This means the implemen-
-> tation may start looking at later and later positions in each successive
-> block and miss occurrences of the pattern at the beginning.  E.g.,
-> consider a HTTP packet held in a non-linear skb, where the HTTP request
-> line occurs in the second block:
-> 
-> [...]
+>  static struct pernet_operations defrag4_net_ops = {
+>  	.exit = defrag4_net_exit,
+>  };
+>  
+>  static int __init nf_defrag_init(void)
+>  {
+> +	rcu_assign_pointer(nf_defrag_v4_hook, &defrag_hook);
+>  	return register_pernet_subsys(&defrag4_net_ops);
 
-Here is the summary with links:
-  - [net,1/6] lib/ts_bm: reset initial match offset for every block of text
-    https://git.kernel.org/netdev/net/c/6f67fbf8192d
-  - [net,2/6] netfilter: conntrack: dccp: copy entire header to stack buffer, not just basic one
-    https://git.kernel.org/netdev/net/c/ff0a3a7d52ff
-  - [net,3/6] linux/netfilter.h: fix kernel-doc warnings
-    https://git.kernel.org/netdev/net/c/f18e7122cc73
-  - [net,4/6] netfilter: nf_conntrack_sip: fix the ct_sip_parse_numerical_param() return value.
-    https://git.kernel.org/netdev/net/c/f188d3008748
-  - [net,5/6] netfilter: nf_tables: unbind non-anonymous set if rule construction fails
-    https://git.kernel.org/netdev/net/c/3e70489721b6
-  - [net,6/6] netfilter: nf_tables: fix underflow in chain reference counter
-    https://git.kernel.org/netdev/net/c/b389139f12f2
-
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
-
-
+register_pernet failure results in nf_defrag_v4_hook pointing to
+garbage.
 
