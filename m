@@ -1,105 +1,98 @@
-Return-Path: <netdev+bounces-14318-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14319-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 629007401BA
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 18:56:05 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63C467401DA
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:03:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7ED291C204F6
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:56:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF8F81C20A96
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 17:03:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0455D13077;
-	Tue, 27 Jun 2023 16:56:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 651CF1307C;
+	Tue, 27 Jun 2023 17:03:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8E0913064
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 16:56:01 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 718361BEA
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 09:56:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687884959;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zxcgu3g1LzEJDjlBVeiHHZ7/xQjIq5XoswU3EPAmCdo=;
-	b=A0spJxuEDq4xKC8TFf9yIQf/UI17YynTO0BBO9MDohrKtX2aE1kVgBH0urQY9JKtNVKZpU
-	Panhz4OfjxTf4P7VjUSAu9IdvR9yABxMZctajS+f7zxBM+pE13Zw5qgATMfxYMYnY0EauF
-	MmF/MvEVA0+NuWHrW9fgz3n4eKGga+Q=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-361-vzW8LbBLPjKGUB8TJ3-Ntg-1; Tue, 27 Jun 2023 12:55:56 -0400
-X-MC-Unique: vzW8LbBLPjKGUB8TJ3-Ntg-1
-Received: from smtp.corp.redhat.com (int-mx05.intmail.prod.int.rdu2.redhat.com [10.11.54.5])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 70F083C14AA5;
-	Tue, 27 Jun 2023 16:55:52 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id BD05FF5CC7;
-	Tue, 27 Jun 2023 16:55:49 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com>
-References: <7337a904-231d-201d-397a-7bbe7cae929f@gmail.com> <ecbb5d7e-7238-28e2-1a17-686325e2bb50@gmail.com> <4c49176f-147a-4283-f1b1-32aac7b4b996@gmail.com> <20230522121125.2595254-1-dhowells@redhat.com> <20230522121125.2595254-9-dhowells@redhat.com> <2267272.1686150217@warthog.procyon.org.uk> <5a9d4ffb-a569-3f60-6ac8-070ab5e5f5ad@gmail.com> <776549.1687167344@warthog.procyon.org.uk>
-To: Tariq Toukan <ttoukan.linux@gmail.com>
-Cc: dhowells@redhat.com, netdev@vger.kernel.org,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Paolo Abeni <pabeni@redhat.com>,
-    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
-    David Ahern <dsahern@kernel.org>,
-    Matthew Wilcox <willy@infradead.org>,
-    Al Viro <viro@zeniv.linux.org.uk>,
-    Christoph Hellwig <hch@infradead.org>, Jens Axboe <axboe@kernel.dk>,
-    Jeff Layton <jlayton@kernel.org>,
-    Christian Brauner <brauner@kernel.org>,
-    Chuck Lever III <chuck.lever@oracle.com>,
-    Linus Torvalds <torvalds@linux-foundation.org>,
-    linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org,
-    linux-mm@kvack.org, Boris Pismenny <borisp@nvidia.com>,
-    John Fastabend <john.fastabend@gmail.com>,
-    Gal Pressman <gal@nvidia.com>, ranro@nvidia.com, samiram@nvidia.com,
-    drort@nvidia.com, Tariq Toukan <tariqt@nvidia.com>
-Subject: Re: [PATCH net-next v10 08/16] tls: Inline do_tcp_sendpages()
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 562D113064
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 17:03:49 +0000 (UTC)
+Received: from smtp-fw-80008.amazon.com (smtp-fw-80008.amazon.com [99.78.197.219])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB361715
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 10:03:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1687885425; x=1719421425;
+  h=from:to:cc:subject:date:message-id:in-reply-to:
+   references:mime-version:content-transfer-encoding;
+  bh=JOGbQAa6vQegG44rS59W/htQM6VMZJ4uwPQo1WT/hkY=;
+  b=sKXFy/8r/waKWMwCLb5zdqzUQiX1kH3BLsN1D5ozMfDY/bnnO+ONXFZW
+   laAL/b8MvosY63xmYVrEHOHU8QCeoI5Qvlh4r/rkdwGI627knxZ46KoAZ
+   /ZxRUShT3J52jgYs5ufqTRQ0bfF1dNhdHMuKw/QEFb1NO/eb32ebC96yr
+   s=;
+X-IronPort-AV: E=Sophos;i="6.01,163,1684800000"; 
+   d="scan'208";a="12802835"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-iad-1a-m6i4x-47cc8a4c.us-east-1.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-80008.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 17:03:40 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (iad12-ws-svc-p26-lb9-vlan2.iad.amazon.com [10.40.163.34])
+	by email-inbound-relay-iad-1a-m6i4x-47cc8a4c.us-east-1.amazon.com (Postfix) with ESMTPS id C3B21160BD1;
+	Tue, 27 Jun 2023 17:03:37 +0000 (UTC)
+Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Tue, 27 Jun 2023 17:03:37 +0000
+Received: from 88665a182662.ant.amazon.com.com (10.106.101.41) by
+ EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Tue, 27 Jun 2023 17:03:34 +0000
+From: Kuniyuki Iwashima <kuniyu@amazon.com>
+To: <kuba@kernel.org>
+CC: <davem@davemloft.net>, <edumazet@google.com>, <konradybcio@kernel.org>,
+	<kuni1840@gmail.com>, <kuniyu@amazon.com>, <netdev@vger.kernel.org>,
+	<pabeni@redhat.com>
+Subject: Re: [PATCH v1 net-next] Revert "af_unix: Call scm_recv() only after scm_set_cred()."
+Date: Tue, 27 Jun 2023 10:03:24 -0700
+Message-ID: <20230627170324.63272-1-kuniyu@amazon.com>
+X-Mailer: git-send-email 2.30.2
+In-Reply-To: <20230627094245.01753815@kernel.org>
+References: <20230627094245.01753815@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <3280196.1687884949.1@warthog.procyon.org.uk>
-Date: Tue, 27 Jun 2023 17:55:49 +0100
-Message-ID: <3280197.1687884949@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.5
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.106.101.41]
+X-ClientProxiedBy: EX19D042UWB002.ant.amazon.com (10.13.139.175) To
+ EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Precedence: Bulk
+X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tariq Toukan <ttoukan.linux@gmail.com> wrote:
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Tue, 27 Jun 2023 09:42:45 -0700
+> On Mon, 26 Jun 2023 13:58:37 -0700 Kuniyuki Iwashima wrote:
+> > Regarding to the warning of SO_PASSPIDFD, I'll post another patch to
+> > suppress it by skipping SCM_PIDFD if scm->pid == NULL in scm_pidfd_recv().
+> 
+> > Sorry for bothering, but can this make it to the v6.5 train to
+> > avoid regression reports ?
+> 
+> I'm merging the trees now, could you send the follow up soon?
+> Could you respin Alexander's fix for me as well (make it a two patch
+> series?):
+> https://lore.kernel.org/all/20230626215951.563715-1-aleksandr.mikhalitsyn@canonical.com/
+> It trivially conflicts after applying this patch.
 
-> WARNING: CPU: 2 PID: 93427 at net/core/skbuff.c:7013
+I see.  I'll post 2 patches soon.
 
-Is that this line for you:
-
-			} else if (WARN_ON_ONCE(!sendpage_ok(page))) {
-
-If so, it's not slab data, but we've got a page with a 0 refcount from
-somewhere.
-
-David
-
+Thank you, Jakub!
 
