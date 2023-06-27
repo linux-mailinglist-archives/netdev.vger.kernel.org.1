@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-14336-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14337-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 44FA17403B2
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 21:01:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 805277403B4
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 21:02:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E98222810C7
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:01:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 190FB2810F3
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 19:01:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 335204A23;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 363BC4A24;
 	Tue, 27 Jun 2023 19:01:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1FAF1306E
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DBA1FC4
 	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 834ADC433C8;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 8609DC433CA;
 	Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1687892513;
-	bh=bGvMc1yTWDTMtingXAKSAxWvQtLuTim0DetY04msz+Q=;
+	bh=pd5ltRiIOaj/yKrVyXhVz/cvhptO3VIDm67Rl/G6O3w=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=TW4V6UOvZ5YhON1NiFHfCs3+vixNsfTuZ5V/A17O6UkpjXBHU4RmbmR6FS4Ny4l9F
-	 5fdKbtyHR9krZys/3VtlrBFHgvis5pHDHXwBkLCGnblI8MIEBLlXYz80GrvU2/XyvP
-	 ed+HMQFv2EbxPJ790pCGvak5AXT/vlOr7IJLKiY1P6bltHScUC6sy9xQ026gIKbxN8
-	 WPTQUHtHQqknHL9sNhHHxf4rKoCheNLWT0Qc4jHHH5+dBf8/gTxXm9ZbM60fznlO0L
-	 WYqsg4ZdDpR9IwozaP7KUW4NHmHFzyPnMvnG+kdasT/I9QtDojV6vWIRrYfKXs8NPc
-	 M7QNQpsbyFtiA==
+	b=hu99a1SWwpcgIUDdVf7+kAjL0QITH77k2W2SSELAO6KDmkUvtU0rnRrwkXISvXaS2
+	 1+S9tUbZidslBPc7VO9enIKPIwC4VAuBpvuyZSHlU+JO9gOZsmK5Z5zXnYsBEH8pOA
+	 v08UdZMQi+L4/AhGcZKh0yDQ5v45TeLr7Bu/j2IDHqhrBoUZ3GlU8h9e9HpnhFjZAS
+	 /VPpaYooNuc5jyqCarUFfsJMOwYMX3IzXx/gJAbAj6jQ1Sufhfa0k+ebb0n6pjnd6u
+	 A6mp0Eww6G/vVF08cndZhzK1zYTfPIsALhJWOiHP8b4QW+LnvK6MO3Me0XFsZP5+lF
+	 hiKckaMgNmavQ==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 65714E5380A;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 598EEC64457;
 	Tue, 27 Jun 2023 19:01:53 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,39 +41,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v1 net-next 0/2] af_unix: Followup fixes for SO_PASSPIDFD.
+Subject: Re: [PATCH] Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth
+ drivers
 From: patchwork-bot+bluetooth@kernel.org
 Message-Id: 
- <168789251341.11348.5241440174968893552.git-patchwork-notify@kernel.org>
+ <168789251335.11348.15831606026121795757.git-patchwork-notify@kernel.org>
 Date: Tue, 27 Jun 2023 19:01:53 +0000
-References: <20230627174314.67688-1-kuniyu@amazon.com>
-In-Reply-To: <20230627174314.67688-1-kuniyu@amazon.com>
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, alexander@mihalicyn.com, brauner@kernel.org,
- luiz.von.dentz@intel.com, kuni1840@gmail.com, netdev@vger.kernel.org,
- linux-bluetooth@vger.kernel.org
+References: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+In-Reply-To: <20230621060949.5760-1-krzysztof.kozlowski@linaro.org>
+To: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+Cc: marcel@holtmann.org, johan.hedberg@gmail.com, luiz.dentz@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
+ linux-bluetooth@vger.kernel.org, netdev@vger.kernel.org,
+ devicetree@vger.kernel.org, linux-kernel@vger.kernel.org
 
 Hello:
 
-This series was applied to bluetooth/bluetooth-next.git (master)
+This patch was applied to bluetooth/bluetooth-next.git (master)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Tue, 27 Jun 2023 10:43:12 -0700 you wrote:
-> This series fixes 2 issues introduced by commit 5e2ff6704a27 ("scm: add
-> SO_PASSPIDFD and SCM_PIDFD").
+On Wed, 21 Jun 2023 08:09:49 +0200 you wrote:
+> The Devicetree bindings should be picked up by subsystem maintainers,
+> but respective pattern for Bluetooth drivers was missing.
 > 
-> The 1st patch fixes a warning in scm_pidfd_recv() reported by syzkaller.
-> The 2nd patch fixes a regression that bluetooth can't be built as module.
-> 
-> 
-> [...]
+> Signed-off-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
+> ---
+>  MAINTAINERS | 1 +
+>  1 file changed, 1 insertion(+)
 
 Here is the summary with links:
-  - [v1,net-next,1/2] af_unix: Skip SCM_PIDFD if scm->pid is NULL.
-    https://git.kernel.org/bluetooth/bluetooth-next/c/603fc57ab70c
-  - [v1,net-next,2/2] net: scm: introduce and use scm_recv_unix helper
-    https://git.kernel.org/bluetooth/bluetooth-next/c/a9c49cc2f5b5
+  - Bluetooth: MAINTAINERS: add Devicetree bindings to Bluetooth drivers
+    https://git.kernel.org/bluetooth/bluetooth-next/c/533bbc7ce562
 
 You are awesome, thank you!
 -- 
