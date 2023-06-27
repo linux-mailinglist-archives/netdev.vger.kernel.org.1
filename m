@@ -1,55 +1,58 @@
-Return-Path: <netdev+bounces-14283-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14284-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3445B73FEB8
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:46:23 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A588373FEB9
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 16:46:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DD8832810EC
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:46:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61A08280FE3
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 14:46:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FF9719514;
-	Tue, 27 Jun 2023 14:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28B1B19934;
+	Tue, 27 Jun 2023 14:45:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83B951991E
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:45:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D3E518000
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 14:45:28 +0000 (UTC)
 Received: from mail2-relais-roc.national.inria.fr (mail2-relais-roc.national.inria.fr [192.134.164.83])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70D530DF;
-	Tue, 27 Jun 2023 07:45:23 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1548835A6;
+	Tue, 27 Jun 2023 07:45:25 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
   d=inria.fr; s=dc;
   h=from:to:cc:subject:date:message-id:in-reply-to:
    references:mime-version:content-transfer-encoding;
-  bh=15aAN7iRIzM2PQnXvJBcm1gB/dKFeQxYgsMIxD38BXs=;
-  b=ig3FVSP0tAKQyeuBH3vlirUPjrltMfU0GOMhVPqQ5WN3DfvpLzYobNB6
-   U2LPadL/tt9g+aj/Kk4AooQeQjjtACA4irPnGUwrKbGAZq7IzSlOEfR4m
-   kPXxOICFaXOIBapdcSnR7+BOcCB/kmTT7WOW2aUo7dUnRJU3LFcGKAwCE
-   A=;
+  bh=rUzmkjTakIf1l5Hdr1TLtSGZWZezFJIK9Clkpx3VPN4=;
+  b=YU2muZyAimuOaNCN/40I/rQBJ4UKO7cZzX4Ns4xfMNxcNtf60stG8vLV
+   OUQT7SM9PQDqEiNQb+GJRV7tsNdaMhbSut5FfSyOzxaZDsiUfbnN8/yiX
+   zL2fR+ESjZuSBV6CTlVOC54xtEJBTZW28IAqKnqEDsce1t7x/6m+mZ0e+
+   k=;
 Authentication-Results: mail2-relais-roc.national.inria.fr; dkim=none (message not signed) header.i=none; spf=SoftFail smtp.mailfrom=Julia.Lawall@inria.fr; dmarc=fail (p=none dis=none) d=inria.fr
 X-IronPort-AV: E=Sophos;i="6.01,162,1684792800"; 
-   d="scan'208";a="114936341"
+   d="scan'208";a="114936345"
 Received: from i80.paris.inria.fr (HELO i80.paris.inria.fr.) ([128.93.90.48])
-  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 16:43:52 +0200
+  by mail2-relais-roc.national.inria.fr with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 27 Jun 2023 16:43:53 +0200
 From: Julia Lawall <Julia.Lawall@inria.fr>
-To: Claudiu Manoil <claudiu.manoil@nxp.com>
+To: "K. Y. Srinivasan" <kys@microsoft.com>
 Cc: kernel-janitors@vger.kernel.org,
 	keescook@chromium.org,
 	christophe.jaillet@wanadoo.fr,
 	kuba@kernel.org,
-	Vladimir Oltean <vladimir.oltean@nxp.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	Dexuan Cui <decui@microsoft.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
 	Paolo Abeni <pabeni@redhat.com>,
+	linux-hyperv@vger.kernel.org,
 	netdev@vger.kernel.org,
 	linux-kernel@vger.kernel.org
-Subject: [PATCH v2 18/24] net: enetc: use vmalloc_array and vcalloc
-Date: Tue, 27 Jun 2023 16:43:33 +0200
-Message-Id: <20230627144339.144478-19-Julia.Lawall@inria.fr>
+Subject: [PATCH v2 22/24] net: mana: use vmalloc_array and vcalloc
+Date: Tue, 27 Jun 2023 16:43:37 +0200
+Message-Id: <20230627144339.144478-23-Julia.Lawall@inria.fr>
 X-Mailer: git-send-email 2.20.1
 In-Reply-To: <20230627144339.144478-1-Julia.Lawall@inria.fr>
 References: <20230627144339.144478-1-Julia.Lawall@inria.fr>
@@ -119,28 +122,19 @@ v2: Use vmalloc_array and vcalloc instead of array_size.
 This also leaves a multiplication of a constant by a sizeof
 as is.  Two patches are thus dropped from the series.
 
- drivers/net/ethernet/freescale/enetc/enetc.c |    4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+ drivers/net/ethernet/microsoft/mana/hw_channel.c |    2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff -u -p a/drivers/net/ethernet/freescale/enetc/enetc.c b/drivers/net/ethernet/freescale/enetc/enetc.c
---- a/drivers/net/ethernet/freescale/enetc/enetc.c
-+++ b/drivers/net/ethernet/freescale/enetc/enetc.c
-@@ -1789,7 +1789,7 @@ static int enetc_alloc_tx_resource(struc
- 	res->bd_count = bd_count;
- 	res->bd_size = sizeof(union enetc_tx_bd);
+diff -u -p a/drivers/net/ethernet/microsoft/mana/hw_channel.c b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+--- a/drivers/net/ethernet/microsoft/mana/hw_channel.c
++++ b/drivers/net/ethernet/microsoft/mana/hw_channel.c
+@@ -627,7 +627,7 @@ static int mana_hwc_establish_channel(st
+ 	if (WARN_ON(cq->id >= gc->max_num_cqs))
+ 		return -EPROTO;
  
--	res->tx_swbd = vzalloc(bd_count * sizeof(*res->tx_swbd));
-+	res->tx_swbd = vcalloc(bd_count, sizeof(*res->tx_swbd));
- 	if (!res->tx_swbd)
- 		return -ENOMEM;
- 
-@@ -1877,7 +1877,7 @@ static int enetc_alloc_rx_resource(struc
- 	if (extended)
- 		res->bd_size *= 2;
- 
--	res->rx_swbd = vzalloc(bd_count * sizeof(struct enetc_rx_swbd));
-+	res->rx_swbd = vcalloc(bd_count, sizeof(struct enetc_rx_swbd));
- 	if (!res->rx_swbd)
+-	gc->cq_table = vzalloc(gc->max_num_cqs * sizeof(struct gdma_queue *));
++	gc->cq_table = vcalloc(gc->max_num_cqs, sizeof(struct gdma_queue *));
+ 	if (!gc->cq_table)
  		return -ENOMEM;
  
 
