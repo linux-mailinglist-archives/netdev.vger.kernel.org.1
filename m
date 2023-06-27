@@ -1,173 +1,220 @@
-Return-Path: <netdev+bounces-14176-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14177-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9462973F5BE
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:31:29 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 030BE73F5FE
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 09:48:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 938EC1C20491
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 07:31:28 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9B3D280FD0
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 07:48:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8376DA94B;
-	Tue, 27 Jun 2023 07:31:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4743BA23;
+	Tue, 27 Jun 2023 07:48:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 705DBA922
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 07:31:26 +0000 (UTC)
-Received: from desiato.infradead.org (desiato.infradead.org [IPv6:2001:8b0:10b:1:d65d:64ff:fe57:4e05])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B2FEF1FCD;
-	Tue, 27 Jun 2023 00:31:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=desiato.20200630; h=In-Reply-To:Content-Transfer-Encoding:
-	Content-Type:MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:
-	Sender:Reply-To:Content-ID:Content-Description;
-	bh=XQpa9c5hGVf8V5MZIB+d15K6Y/YiH5GoQw4fpAih31c=; b=KrtBPNpF+/+Tvnv2Z7JXUi4f/S
-	nZb2l3/seqDyn86tl2FfkGPi5EPd2K4TCsiUhgXLfa1O9f+TTU+cLhuR74Muo9mDVrhsXZAWmYx8l
-	VyVdZhRJYhA+3dbd4lrfj4lWkGpHr+gPXdQjB/csHH88IEv1EpdjmCizemHKD4PY5MEGQHo/pRjwL
-	igyxgnZXRGwnad91S1V0f+pKr+LYehCS9U319UfqfDStSJeIkz1AgvLxUluSzRGzYADOb76MRx3Su
-	lyXeV2eaNAyEvYBq8j0X3JkoaPXEIICJRsp+0383NqG35INqi7T6Aoxo6nIXOgq1Zt9p+nsO15H7p
-	YbR8by3g==;
-Received: from j130084.upc-j.chello.nl ([24.132.130.84] helo=noisy.programming.kicks-ass.net)
-	by desiato.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qE39r-004ZqJ-2r;
-	Tue, 27 Jun 2023 07:30:40 +0000
-Received: from hirez.programming.kicks-ass.net (hirez.programming.kicks-ass.net [192.168.1.225])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature RSA-PSS (4096 bits) server-digest SHA256)
-	(Client did not present a certificate)
-	by noisy.programming.kicks-ass.net (Postfix) with ESMTPS id 33F733002D6;
-	Tue, 27 Jun 2023 09:30:35 +0200 (CEST)
-Received: by hirez.programming.kicks-ass.net (Postfix, from userid 1000)
-	id 14A37248044D4; Tue, 27 Jun 2023 09:30:35 +0200 (CEST)
-Date: Tue, 27 Jun 2023 09:30:35 +0200
-From: Peter Zijlstra <peterz@infradead.org>
-To: Bagas Sanjaya <bagasdotme@gmail.com>
-Cc: "Steven Rostedt (Google)" <rostedt@goodmis.org>,
-	Pablo Neira Ayuso <pablo@netfilter.org>,
-	Jozsef Kadlecsik <kadlec@netfilter.org>,
-	Florian Westphal <fw@strlen.de>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Lingutla Chandrasekhar <clingutla@codeaurora.org>,
-	Frederic Weisbecker <frederic@kernel.org>,
-	"J. Avila" <elavila@google.com>,
-	Vivek Anand <vivekanand754@gmail.com>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Thomas Renninger <trenn@suse.com>, Shuah Khan <shuah@kernel.org>,
-	Borislav Petkov <bp@alien8.de>,
-	Josh Poimboeuf <jpoimboe@kernel.org>,
-	Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
-	Linux Regressions <regressions@lists.linux.dev>,
-	Linux Netfilter Development <netfilter-devel@vger.kernel.org>,
-	Netfilter Core Developers <coreteam@netfilter.org>,
-	Linux Networking <netdev@vger.kernel.org>,
-	Linux Power Management <linux-pm@vger.kernel.org>, x86@kernel.org
-Subject: Re: Fwd: High cpu usage caused by kernel process when upgraded to
- linux 5.19.17 or later
-Message-ID: <20230627073035.GV4253@hirez.programming.kicks-ass.net>
-References: <01ac399d-f793-49d4-844b-72cd8e0034df@gmail.com>
- <ZJpJkL3dPXxgw6RK@debian.me>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D4172846A
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 07:48:17 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C2C9310FB
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 00:48:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1687852094;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=whaOhWVIaKHzUbZWclTPzFtnTVD/3jITld51dEdWQ0A=;
+	b=BAQLESFKI/ZF+hLWY+XZnNuSmJUDb94G/tNxeErXp/i/BfKCVKpPA2rHkqmTPsy+2ZNWBh
+	D2FsGzSHofTqRKrzehVlbOGAE+llpFfS1eS+2Buegiix1DRASdcoCn+ci6r7DXrWpmNcCN
+	+KpNOyxMiJ9N1GvMXLP0Sd5/bS2UmG4=
+Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
+ [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-365-TqocsM8gMO6_64a-G6_Qeg-1; Tue, 27 Jun 2023 03:48:11 -0400
+X-MC-Unique: TqocsM8gMO6_64a-G6_Qeg-1
+Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-988e344bed9so380281066b.0
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 00:48:11 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687852090; x=1690444090;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=whaOhWVIaKHzUbZWclTPzFtnTVD/3jITld51dEdWQ0A=;
+        b=cQ0J7RV/cJM5W+d4ksvdy1ZJtoGnw2StPJZHHfALfr9T0FBJM3O0WEUlB2uiEpv67S
+         3BsbcXXiruPirEJb4mY0BfsHi8+7UOZ5/Sns7v4PTwRRpIfoCRWdqYb2x+xddnMP3J5B
+         KQKdOf/QVJsZdDI37Yyh6tRDY4LxHPv+yx8YGiue+yvl8dnxZYirl52y2rN1T6vXhOlR
+         bpDwERlKMrghEhRTN4NyIo5359GtvWDNGm0QuCxUr21N5PxWNjsv2W7DSammDgWrvmu+
+         vL/IG47ekm8tfr+bQ9hOt66+iWI6hnu6kJV4qySSMeVUaxtJHxaJgyvazbqjLaggTrSi
+         cSHg==
+X-Gm-Message-State: AC+VfDyD1ngf1Qqm9d9AAoNpI716dORBN0lPNpnU6ZfCAcR+GPKjx1ow
+	/c4/xMw/BjPFSoLy727vlXTXjDs5UKwQgfNKmblZhAl1ULAcptdaYKKfB6Ar9Kxyj2ordJkxvuz
+	BmIR6ih9oQZIT+TYc
+X-Received: by 2002:a17:906:da84:b0:988:f307:aea7 with SMTP id xh4-20020a170906da8400b00988f307aea7mr21595739ejb.7.1687852090428;
+        Tue, 27 Jun 2023 00:48:10 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5ob/ReyhK7BIZNcKDNmnYWuzv3zeM/wIdMcpgjlvuvypLCy8x/HUywv68r17c73ooOglaGQw==
+X-Received: by 2002:a17:906:da84:b0:988:f307:aea7 with SMTP id xh4-20020a170906da8400b00988f307aea7mr21595713ejb.7.1687852090093;
+        Tue, 27 Jun 2023 00:48:10 -0700 (PDT)
+Received: from sgarzare-redhat (host-87-11-6-160.retail.telecomitalia.it. [87.11.6.160])
+        by smtp.gmail.com with ESMTPSA id s16-20020a170906355000b00991ba677d92sm2190941eja.84.2023.06.27.00.48.08
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 27 Jun 2023 00:48:09 -0700 (PDT)
+Date: Tue, 27 Jun 2023 09:48:06 +0200
+From: Stefano Garzarella <sgarzare@redhat.com>
+To: Arseniy Krasnov <avkrasnov@sberdevices.ru>
+Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
+	oxffffaa@gmail.com
+Subject: Re: [RFC PATCH v1 2/4] virtio/vsock: support MSG_PEEK for
+ SOCK_SEQPACKET
+Message-ID: <4pcexfrdtuisz53c4sb4pse4cyjw7zsuwtqsnnul23njo4ab5l@4jvdk6buxmj3>
+References: <20230618062451.79980-1-AVKrasnov@sberdevices.ru>
+ <20230618062451.79980-3-AVKrasnov@sberdevices.ru>
+ <yiy3kssoiyzs6ehnlo7g2xsb26zee5vih3jpgyc7i3dvfcyfpv@xvokxez3lzpo>
+ <9553a82f-ce31-e2e0-ff62-8abd2a6b639b@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=iso-8859-1; format=flowed
 Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
-In-Reply-To: <ZJpJkL3dPXxgw6RK@debian.me>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <9553a82f-ce31-e2e0-ff62-8abd2a6b639b@sberdevices.ru>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 09:29:36AM +0700, Bagas Sanjaya wrote:
-> On Fri, Jun 23, 2023 at 07:58:51AM +0700, Bagas Sanjaya wrote:
-> > Hi,
-> >=20
-> > I notice a regression report on Bugzilla [1]. Quoting from it:
-> >=20
-> > > kernel process "kworker/events_power_efficient" uses a lot of cpu pow=
-er (100% on ESXI 6.7, ~30% on ESXI 7.0U3 or later) after upgrading from 5.1=
-7.3 to 5.19.17 or later.
-> > >=20
-> > > dmesg log:
-> > > [ 2430.973102]  </TASK>
-> > > [ 2430.973131] Sending NMI from CPU 1 to CPUs 0:
-> > > [ 2430.973241] NMI backtrace for cpu 0
-> > > [ 2430.973247] CPU: 0 PID: 22 Comm: kworker/0:1 Not tainted 6.3.3 #1
-> > > [ 2430.973254] Hardware name: VMware, Inc. VMware Virtual Platform/44=
-0BX Desktop Reference Platform, BIOS 6.00 11/12/2020
-> > > [ 2430.973258] Workqueue: events_power_efficient htable_gc [xt_hashli=
-mit]
-> > > [ 2430.973275] RIP: 0010:preempt_count_sub+0x2e/0xa0
-> > > [ 2430.973289] Code: 36 01 85 c9 75 1b 65 8b 15 a7 da f8 5e 89 d1 81 =
-e1 ff ff ff 7f 39 f9 7c 16 81 ff fe 00 00 00 76 3b f7 df 65 01 3d 8a da f8 =
-5e <c3> cc cc cc cc e8 98 aa 25 00 85 c0 74 f2 8b 15 da 71 ed 00 85 d2
-> > > [ 2430.973294] RSP: 0018:ffffb15ec00dbe58 EFLAGS: 00000297
-> > > [ 2430.973299] RAX: 0000000000000000 RBX: ffffb15ec12ad000 RCX: 00000=
-00000000001
-> > > [ 2430.973302] RDX: 0000000080000001 RSI: ffffffffa1c3313b RDI: 00000=
-000ffffffff
-> > > [ 2430.973306] RBP: dead000000000122 R08: 0000000000000010 R09: 00007=
-46e65696369
-> > > [ 2430.973309] R10: 8080808080808080 R11: 0000000000000018 R12: 00000=
-00000000000
-> > > [ 2430.973312] R13: 0000000000001e2b R14: ffffb15ec12ad048 R15: ffff9=
-1c279c26a05
-> > > [ 2430.973316] FS:  0000000000000000(0000) GS:ffff91c279c00000(0000) =
-knlGS:0000000000000000
-> > > [ 2430.973320] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > > [ 2430.973324] CR2: 000055fc138890e0 CR3: 000000010810e002 CR4: 00000=
-000001706f0
-> > > [ 2430.973374] Call Trace:
-> > > [ 2430.973388]  <TASK>
-> > > [ 2430.973390]  __local_bh_enable_ip+0x32/0x70
-> > > [ 2430.973413]  htable_selective_cleanup+0x95/0xc0 [xt_hashlimit]
-> > > [ 2430.973428]  htable_gc+0xf/0x30 [xt_hashlimit]
-> > > [ 2430.973440]  process_one_work+0x1d4/0x360
-> > > [ 2430.973459]  ? process_one_work+0x360/0x360
-> > > [ 2430.973467]  worker_thread+0x25/0x3b0
-> > > [ 2430.973476]  ? process_one_work+0x360/0x360
-> > > [ 2430.973483]  kthread+0xe1/0x110
-> > > [ 2430.973499]  ? kthread_complete_and_exit+0x20/0x20
-> > > [ 2430.973507]  ret_from_fork+0x1f/0x30
-> > > [ 2430.973526]  </TASK>
-> >=20
-> > See Bugzilla for the full thread and perf output.
-> >=20
-> > Anyway, I'm tracking it in regzbot so that it doesn't fall through
-> > cracks unnoticed:
-> >=20
-> > #regzbot introduced: v5.17.3..v5.19.17 https://bugzilla.kernel.org/show=
-_bug.cgi?id=3D217586
-> > #regzbot title: kworker/events_power_efficient utilizes full CPU power =
-after kernel upgrade
-> >=20
->=20
-> The reporter had found the culprit (see Bugzilla for more information), t=
-hus
-> telling regzbot:
->=20
-> #regzbot introduced: 6ad0ad2bf8a67e
-> #regzbot title: retbleed reporting causes high cpu utilization due to kwo=
-rker/events_power_efficient
-> #regzbot link: https://lore.kernel.org/all/PH0PR05MB8448A203A909959FAC754=
-B7AAF439@PH0PR05MB8448.namprd05.prod.outlook.com/
-> #regzbot link: 6ad0ad2bf8a67e
+On Tue, Jun 27, 2023 at 07:34:29AM +0300, Arseniy Krasnov wrote:
+>
+>
+>On 26.06.2023 19:28, Stefano Garzarella wrote:
+>> On Sun, Jun 18, 2023 at 09:24:49AM +0300, Arseniy Krasnov wrote:
+>>> This adds support of MSG_PEEK flag for SOCK_SEQPACKET type of socket.
+>>> Difference with SOCK_STREAM is that this callback returns either length
+>>> of the message or error.
+>>>
+>>> Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
+>>> ---
+>>> net/vmw_vsock/virtio_transport_common.c | 63 +++++++++++++++++++++++--
+>>> 1 file changed, 60 insertions(+), 3 deletions(-)
+>>>
+>>> diff --git a/net/vmw_vsock/virtio_transport_common.c b/net/vmw_vsock/virtio_transport_common.c
+>>> index 2ee40574c339..352d042b130b 100644
+>>> --- a/net/vmw_vsock/virtio_transport_common.c
+>>> +++ b/net/vmw_vsock/virtio_transport_common.c
+>>> @@ -460,6 +460,63 @@ virtio_transport_stream_do_dequeue(struct vsock_sock *vsk,
+>>>     return err;
+>>> }
+>>>
+>>> +static ssize_t
+>>> +virtio_transport_seqpacket_do_peek(struct vsock_sock *vsk,
+>>> +                   struct msghdr *msg)
+>>> +{
+>>> +    struct virtio_vsock_sock *vvs = vsk->trans;
+>>> +    struct sk_buff *skb;
+>>> +    size_t total, len;
+>>> +
+>>> +    spin_lock_bh(&vvs->rx_lock);
+>>> +
+>>> +    if (!vvs->msg_count) {
+>>> +        spin_unlock_bh(&vvs->rx_lock);
+>>> +        return 0;
+>>> +    }
+>>> +
+>>> +    total = 0;
+>>> +    len = msg_data_left(msg);
+>>> +
+>>> +    skb_queue_walk(&vvs->rx_queue, skb) {
+>>> +        struct virtio_vsock_hdr *hdr;
+>>> +
+>>> +        if (total < len) {
+>>> +            size_t bytes;
+>>> +            int err;
+>>> +
+>>> +            bytes = len - total;
+>>> +            if (bytes > skb->len)
+>>> +                bytes = skb->len;
+>>> +
+>>> +            spin_unlock_bh(&vvs->rx_lock);
+>>> +
+>>> +            /* sk_lock is held by caller so no one else can dequeue.
+>>> +             * Unlock rx_lock since memcpy_to_msg() may sleep.
+>>> +             */
+>>> +            err = memcpy_to_msg(msg, skb->data, bytes);
+>>> +            if (err)
+>>> +                return err;
+>>> +
+>>> +            spin_lock_bh(&vvs->rx_lock);
+>>> +        }
+>>> +
+>>> +        total += skb->len;
+>>> +        hdr = virtio_vsock_hdr(skb);
+>>> +
+>>> +        if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOM) {
+>>> +            if (le32_to_cpu(hdr->flags) & VIRTIO_VSOCK_SEQ_EOR)
+>>> +                msg->msg_flags |= MSG_EOR;
+>>> +
+>>> +            break;
+>>> +        }
+>>> +    }
+>>> +
+>>> +    spin_unlock_bh(&vvs->rx_lock);
+>>> +
+>>> +    return total;
+>>
+>> Should we return the minimum between total and len?
+>
+>I guess no, because seqpacket dequeue callback always returns length of message,
+>then, in af_vsock.c we return either number of bytes read or length of message
+>depending on MSG_TRUNC flags.
 
-Is there a problem other than that IBRS is slow and slower still on
-shitty virt?
+Right! We should always return the total lenght of the packet.
 
-Does booting with: "spectre_v2=3Dretpoline retbleed=3Doff" make it go away?
+Thanks,
+Stefano
 
-I can't tell from this. Also, please don't use bugzilla.
+>
+>Thanks, Arseniy
+>
+>>
+>> Thanks,
+>> Stefano
+>>
+>>> +}
+>>> +
+>>> static int virtio_transport_seqpacket_do_dequeue(struct vsock_sock *vsk,
+>>>                          struct msghdr *msg,
+>>>                          int flags)
+>>> @@ -554,9 +611,9 @@ virtio_transport_seqpacket_dequeue(struct vsock_sock *vsk,
+>>>                    int flags)
+>>> {
+>>>     if (flags & MSG_PEEK)
+>>> -        return -EOPNOTSUPP;
+>>> -
+>>> -    return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
+>>> +        return virtio_transport_seqpacket_do_peek(vsk, msg);
+>>> +    else
+>>> +        return virtio_transport_seqpacket_do_dequeue(vsk, msg, flags);
+>>> }
+>>> EXPORT_SYMBOL_GPL(virtio_transport_seqpacket_dequeue);
+>>>
+>>> -- 
+>>> 2.25.1
+>>>
+>>
+>
+
 
