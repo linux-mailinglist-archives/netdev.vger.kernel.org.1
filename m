@@ -1,76 +1,77 @@
-Return-Path: <netdev+bounces-14185-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14186-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8CD8273F669
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:04:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E99F573F66C
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 10:05:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AEEF31C20AC9
-	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 08:04:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9FC96281096
+	for <lists+netdev@lfdr.de>; Tue, 27 Jun 2023 08:05:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C0B216427;
-	Tue, 27 Jun 2023 08:03:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8171D168BB;
+	Tue, 27 Jun 2023 08:03:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 004F413AC1
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 08:03:44 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C3AF7E71
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:03:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 760A3168B1
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 08:03:46 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59DE8CC
+	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:03:45 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687853023;
+	s=mimecast20190719; t=1687853024;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=eV3eQXIpI7GK86spQgbBgb9YP8fkr4Uc5ICkyIAxi2s=;
-	b=crV9CRlsp76WN5Zbiq8J+oWAv6aeMWDQelHPRFCI9RcwFhZVnD2UrNObVpQHklRmyIuFoO
-	XUroYVSWu8tRX9UpjpgOXmf4G9xK1pYtdVTikr5H6TMKu4hypPkcuZMIHUkgZK1z/wnP1t
-	le0fvKsH61Uy77Dso/+UnqER6oL86sA=
+	bh=+Sijha0YXJUjNDfHLb+Azz4YINEqeJlQ8jO8DuRzjtc=;
+	b=COsHtKR8SM6M8zk168LjKZ9hemNlDG1tiEEOKs3HYkqt6tCt0uigehlDVpukHPlELdaQfi
+	iYLkhQc2q+grhVL68c7N+cKZEs30ICltvnlNHlieXhd8Z5K+L/9JjVxZ5KDa/w4F57dikV
+	nNLu2nd0qn56VI7nYE8hJm9k/Re+Os8=
 Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
  [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-557-HtNc6_ykOJKH6HLTvI5Nug-1; Tue, 27 Jun 2023 04:03:40 -0400
-X-MC-Unique: HtNc6_ykOJKH6HLTvI5Nug-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b6af6868baso3195331fa.2
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:03:39 -0700 (PDT)
+ us-mta-112-VhGc0KezM7632g8_NeB71w-1; Tue, 27 Jun 2023 04:03:42 -0400
+X-MC-Unique: VhGc0KezM7632g8_NeB71w-1
+Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b6a64d1fb2so12778971fa.2
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 01:03:41 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687853019; x=1690445019;
+        d=1e100.net; s=20221208; t=1687853021; x=1690445021;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=eV3eQXIpI7GK86spQgbBgb9YP8fkr4Uc5ICkyIAxi2s=;
-        b=N7aEenZeCcu/Yok4DeV7ZU9ckzLPNJ9IYQqRAAbwMmtHyBBjiSvTQdPoSjDv/dPav0
-         W32kmlWUHZzEklM1zTfuQwWauDseI/OjEakDb6D78ItC/0z3ocN7+z74g9wqpbkZD+n8
-         oNmgCwk1lLq/JaZrQkUwpYg4BCiWaHriONpGXUkhWxzPV1uRBjFgz6GETFXBLfPAAQLm
-         aj35uaov4PuiAyZP7sPLRqht7MKhsyrWsBy6T6QyEpvY+ROROgROipk47gH17vm0Qj1D
-         OhqviUJjOYuQTBwECbfxkviG1L4dtlGeZWnkgiAbwEJjkvj15Ihq0V9qAQosQWCmJvL6
-         ru/w==
-X-Gm-Message-State: AC+VfDzYe/uJcNWC3ihftf2jS7/f6D8otkY8k06n2azYVSolKkVL876/
-	RkPVVDIlO2ACCqFA+CevzcjecLfTIXFiUMCQHcdcPxHVlEHg1B67LdAPr6NVMKx/co1rs6HMDPG
-	/APahVrXZbiZoWoWWVqh3uolbKje7aN+H
-X-Received: by 2002:a05:651c:8f:b0:2b6:a17b:a120 with SMTP id 15-20020a05651c008f00b002b6a17ba120mr3522009ljq.22.1687853018833;
-        Tue, 27 Jun 2023 01:03:38 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5xju1Kw8PXR4eNgtQmaSoMhLrIsFLXo1LyKXcgnZgXB4na1UrEhIvvI/ONUbs4VdgeXtddNPmkh0ZyvZ27O0Q=
-X-Received: by 2002:a05:651c:8f:b0:2b6:a17b:a120 with SMTP id
- 15-20020a05651c008f00b002b6a17ba120mr3521994ljq.22.1687853018639; Tue, 27 Jun
- 2023 01:03:38 -0700 (PDT)
+        bh=+Sijha0YXJUjNDfHLb+Azz4YINEqeJlQ8jO8DuRzjtc=;
+        b=K0AFAAERfSkwq+K8mwbLcalNXd2J3xXjN3v9rfjPWAm4bxOXDea1udWx6HbLKsVqxY
+         X4ppuRxio159K8vh3Ntuwoq6AnnEgYtbDVxWWn+BnUNEY2G+wDTo4xII5FHNqoqtnecF
+         bR2jiPVpYfSnINowi1ZYzAHeyC3aZYs6sEcWVup8cgzaN6TaoTO9W9cRVmT0/SQLOhjo
+         DBS4WQpYKOcUllekVeYjO3uVV2fALT+BWvwOPRjw+CquDMXwgN4Ncued/tU3F/XbRV3v
+         Fi5X6evIu6h7BMvXCo/CI6VFPLIuNO8w+wrp/BxbMC7mH67uhqs1H7U7Q88YbM7K+Ipl
+         epsg==
+X-Gm-Message-State: AC+VfDxusQoc85aKYntLIYKd2eqWDTVY4h19fs1HVoSBs8FuH5khvw5y
+	AZoBUP6NmZ1uEZ/j+NQJKaX1w5PyUhvHhW8SsclUqZA0OMds4OYhLBnBmTtJBH31wV18HFU/Q1U
+	EUesO1ZL0ZvSAaH5ZDGaCF6xArkN/CJOE
+X-Received: by 2002:a2e:9619:0:b0:2b6:a59c:5e02 with SMTP id v25-20020a2e9619000000b002b6a59c5e02mr3038563ljh.20.1687853020808;
+        Tue, 27 Jun 2023 01:03:40 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5bcmfHyMmURgW7H/N4Q0xvQrGAHQn5HeoHqiK6eNWEjZw8/c0ufCAuMNVB1pTSagyYRiNhsx+f+VI3S81N0Bs=
+X-Received: by 2002:a2e:9619:0:b0:2b6:a59c:5e02 with SMTP id
+ v25-20020a2e9619000000b002b6a59c5e02mr3038552ljh.20.1687853020520; Tue, 27
+ Jun 2023 01:03:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com> <20230602092206.50108-4-xuanzhuo@linux.alibaba.com>
-In-Reply-To: <20230602092206.50108-4-xuanzhuo@linux.alibaba.com>
+References: <20230602092206.50108-1-xuanzhuo@linux.alibaba.com> <20230602092206.50108-5-xuanzhuo@linux.alibaba.com>
+In-Reply-To: <20230602092206.50108-5-xuanzhuo@linux.alibaba.com>
 From: Jason Wang <jasowang@redhat.com>
-Date: Tue, 27 Jun 2023 16:03:26 +0800
-Message-ID: <CACGkMEtFiutSpM--2agR1YhS0MxreH4vFFAEdCaC6E8qxyjZ4g@mail.gmail.com>
-Subject: Re: [PATCH vhost v10 03/10] virtio_ring: split: support add premapped buf
+Date: Tue, 27 Jun 2023 16:03:29 +0800
+Message-ID: <CACGkMEuoBtQ+=kJJk84Vs2sk7WAdh8O3d2wJLM-yBFAtkgLEUA@mail.gmail.com>
+Subject: Re: [PATCH vhost v10 04/10] virtio_ring: packed: support add
+ premapped buf
 To: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 Cc: virtualization@lists.linux-foundation.org, 
 	"Michael S. Tsirkin" <mst@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
@@ -94,103 +95,100 @@ m> wrote:
 >
 > Signed-off-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
 > ---
->  drivers/virtio/virtio_ring.c | 46 ++++++++++++++++++++++--------------
->  1 file changed, 28 insertions(+), 18 deletions(-)
+>  drivers/virtio/virtio_ring.c | 36 ++++++++++++++++++++++++++----------
+>  1 file changed, 26 insertions(+), 10 deletions(-)
 >
 > diff --git a/drivers/virtio/virtio_ring.c b/drivers/virtio/virtio_ring.c
-> index 2afdfb9e3e30..18212c3e056b 100644
+> index 18212c3e056b..dc109fbc05a5 100644
 > --- a/drivers/virtio/virtio_ring.c
 > +++ b/drivers/virtio/virtio_ring.c
-> @@ -598,8 +598,12 @@ static inline int virtqueue_add_split(struct virtque=
-ue *_vq,
+> @@ -1299,9 +1299,13 @@ static int virtqueue_add_indirect_packed(struct vr=
+ing_virtqueue *vq,
+>
+>         for (n =3D 0; n < out_sgs + in_sgs; n++) {
 >                 for (sg =3D sgs[n]; sg; sg =3D sg_next(sg)) {
->                         dma_addr_t addr;
->
-> -                       if (vring_map_one_sg(vq, sg, DMA_TO_DEVICE, &addr=
-))
-> -                               goto unmap_release;
-> +                       if (vq->premapped) {
-> +                               addr =3D sg_dma_address(sg);
-> +                       } else {
-> +                               if (vring_map_one_sg(vq, sg, DMA_TO_DEVIC=
-E, &addr))
-> +                                       goto unmap_release;
-> +                       }
-
-Btw, I wonder whether or not it would be simple to implement the
-vq->premapped check inside vring_map_one_sg() assuming the
-!use_dma_api is done there as well.
-
->
->                         prev =3D i;
->                         /* Note that we trust indirect descriptor
-> @@ -614,8 +618,12 @@ static inline int virtqueue_add_split(struct virtque=
-ue *_vq,
->                 for (sg =3D sgs[n]; sg; sg =3D sg_next(sg)) {
->                         dma_addr_t addr;
->
-> -                       if (vring_map_one_sg(vq, sg, DMA_FROM_DEVICE, &ad=
-dr))
-> -                               goto unmap_release;
-> +                       if (vq->premapped) {
-> +                               addr =3D sg_dma_address(sg);
-> +                       } else {
-> +                               if (vring_map_one_sg(vq, sg, DMA_FROM_DEV=
+> -                       if (vring_map_one_sg(vq, sg, n < out_sgs ?
+> -                                            DMA_TO_DEVICE : DMA_FROM_DEV=
 ICE, &addr))
+> -                               goto unmap_release;
+> +                       if (vq->premapped) {
+> +                               addr =3D sg_dma_address(sg);
+> +                       } else {
+> +                               if (vring_map_one_sg(vq, sg, n < out_sgs =
+?
+> +                                                    DMA_TO_DEVICE : DMA_=
+FROM_DEVICE, &addr))
 > +                                       goto unmap_release;
 > +                       }
 >
->                         prev =3D i;
->                         /* Note that we trust indirect descriptor
-> @@ -689,21 +697,23 @@ static inline int virtqueue_add_split(struct virtqu=
-eue *_vq,
+>                         desc[i].flags =3D cpu_to_le16(n < out_sgs ?
+>                                                 0 : VRING_DESC_F_WRITE);
+> @@ -1369,10 +1373,12 @@ static int virtqueue_add_indirect_packed(struct v=
+ring_virtqueue *vq,
 >         return 0;
 >
 >  unmap_release:
 > -       err_idx =3D i;
 > +       if (!vq->premapped) {
+> +               err_idx =3D i;
+>
+> -       for (i =3D 0; i < err_idx; i++)
+> -               vring_unmap_desc_packed(vq, &desc[i]);
+> +               for (i =3D 0; i < err_idx; i++)
+> +                       vring_unmap_desc_packed(vq, &desc[i]);
+> +       }
+>
+>         kfree(desc);
+>
+> @@ -1447,9 +1453,13 @@ static inline int virtqueue_add_packed(struct virt=
+queue *_vq,
+>                 for (sg =3D sgs[n]; sg; sg =3D sg_next(sg)) {
+>                         dma_addr_t addr;
+>
+> -                       if (vring_map_one_sg(vq, sg, n < out_sgs ?
+> -                                            DMA_TO_DEVICE : DMA_FROM_DEV=
+ICE, &addr))
+> -                               goto unmap_release;
+> +                       if (vq->premapped) {
+> +                               addr =3D sg_dma_address(sg);
+> +                       } else {
+> +                               if (vring_map_one_sg(vq, sg, n < out_sgs =
+?
+> +                                                    DMA_TO_DEVICE : DMA_=
+FROM_DEVICE, &addr))
+> +                                       goto unmap_release;
+> +                       }
+>
+>                         flags =3D cpu_to_le16(vq->packed.avail_used_flags=
+ |
+>                                     (++c =3D=3D total_sg ? 0 : VRING_DESC=
+_F_NEXT) |
+> @@ -1512,11 +1522,17 @@ static inline int virtqueue_add_packed(struct vir=
+tqueue *_vq,
+>         return 0;
+>
+>  unmap_release:
+> +       vq->packed.avail_used_flags =3D avail_used_flags;
+> +
+> +       if (vq->premapped) {
 
-Can vq->premapped be true here? The label is named as "unmap_relase"
-which implies "map" beforehand which seems not the case for
-premapping.
+Similar to the split path, I think we can't hit vq->premapped here.
 
 Thanks
 
 
-> +               err_idx =3D i;
->
-> -       if (indirect)
-> -               i =3D 0;
-> -       else
-> -               i =3D head;
-> -
-> -       for (n =3D 0; n < total_sg; n++) {
-> -               if (i =3D=3D err_idx)
-> -                       break;
-> -               if (indirect) {
-> -                       vring_unmap_one_split_indirect(vq, &desc[i]);
-> -                       i =3D virtio16_to_cpu(_vq->vdev, desc[i].next);
-> -               } else
-> -                       i =3D vring_unmap_one_split(vq, i);
-> +               if (indirect)
-> +                       i =3D 0;
-> +               else
-> +                       i =3D head;
+> +               END_USE(vq);
+> +               return -EIO;
+> +       }
 > +
-> +               for (n =3D 0; n < total_sg; n++) {
-> +                       if (i =3D=3D err_idx)
-> +                               break;
-> +                       if (indirect) {
-> +                               vring_unmap_one_split_indirect(vq, &desc[=
-i]);
-> +                               i =3D virtio16_to_cpu(_vq->vdev, desc[i].=
-next);
-> +                       } else
-> +                               i =3D vring_unmap_one_split(vq, i);
-> +               }
->         }
+>         err_idx =3D i;
+>         i =3D head;
+>         curr =3D vq->free_head;
 >
->         if (indirect)
+> -       vq->packed.avail_used_flags =3D avail_used_flags;
+>
+>         for (n =3D 0; n < total_sg; n++) {
+>                 if (i =3D=3D err_idx)
 > --
 > 2.32.0.3.g01195cf9f
 >
