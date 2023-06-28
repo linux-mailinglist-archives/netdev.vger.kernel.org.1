@@ -1,157 +1,116 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7517C740B03
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:19:35 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232716AbjF1ITP (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 04:19:15 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:37350 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233760AbjF1IMi (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:12:38 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687939903;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=4cTND2wcrFvf5T3HdGEC88WLZ2tC38KyAB0FmRrOrTk=;
-        b=APlIzu0aF5zOHR51ZpdPPAiQCOBIXIbgWfWn8IPNq5MuIw1NFYiT2ENRDPgqOmSiV/mWdO
-        8l70Q7cyhM65lKUU0FJxnWAUuNZZF4CbJYabIpRtsWFzfpUgBV7mx/Lc8Jxz8SfMY39tQj
-        zJZSJxPG9C+b0lAA1f8E+yD6PtQcfKw=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-153-cxoqUg5HMEiO8GiyC5EpeA-1; Wed, 28 Jun 2023 04:11:40 -0400
-X-MC-Unique: cxoqUg5HMEiO8GiyC5EpeA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b6990c799dso30552751fa.0
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 01:11:40 -0700 (PDT)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7842E740ADE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:12:39 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B025F280ED6
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 08:12:37 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E89AC6FA2;
+	Wed, 28 Jun 2023 08:12:35 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD20D23A1
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 08:12:35 +0000 (UTC)
+Received: from mail-yw1-x112f.google.com (mail-yw1-x112f.google.com [IPv6:2607:f8b0:4864:20::112f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940024C1C;
+	Wed, 28 Jun 2023 01:12:34 -0700 (PDT)
+Received: by mail-yw1-x112f.google.com with SMTP id 00721157ae682-5768a7e3adbso10996957b3.0;
+        Wed, 28 Jun 2023 01:12:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687939954; x=1690531954;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=M/F4R2xIwhAteDzm26GEr3kEl3pSlXhCeAsnchT8YT0=;
+        b=TtzQfna7QT2BvJR5Z0EzlNkXatiyhK7kSS/wrXDnPn6DbRXPLQ37ZY/Jwb2Z9VCiKX
+         xaD/UA42fWbVueyaYU5oengpDLFo+Pv7n+NibeSURhnulZAB4XPUyfVd3EopxVyI+YvP
+         IQ4gktTBwH344w1zoATsc7CfP7kbNBAOaG1UPLJaDzzBxddCDlqhP+1ZfQHJg+Oi6ESE
+         1Gw6gypghTyMRis7qiggm5epq4grFWV+kEhtfoytY5+UirWh4ah8nYjXYu96f995bI+E
+         09XQXZWDmUlV77uuHAqUU3OBb/F/LSpQBI75FfkdnS64RobLZa0ewxHq/JSHeNi+JAug
+         eZLA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687939899; x=1690531899;
+        d=1e100.net; s=20221208; t=1687939954; x=1690531954;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=4cTND2wcrFvf5T3HdGEC88WLZ2tC38KyAB0FmRrOrTk=;
-        b=B13Ubs/5oew0N2fdPP9/dUFrnPZSuOkpTCGysF/kHmydqtmMIe4WoAIkAhwmsGjcH4
-         jRcvPKs5unuuoMlMjQI3PliiID7nFdVufBF3dRfw5qUssOIFRaV1sz/ZQKCAPiU2c8rF
-         gJDfaf/6OYs1U//1VEcDSbpSiOpvss27B+1aft006siulGQleSqlChJdHMpA7r1NnLum
-         WvYbyHtlYCtkxTDTU7SDNMS7+XdRZQ9863VmaCgeeMaK6r9oy7GY0/jQADXN3wh8UQBK
-         Tb1nRpy8EHJouFM0dZNboVT7UmX+wQvn5Fn8Lj4WUqcglptrXl4B0KJdkqViZuDsf7jA
-         zfNg==
-X-Gm-Message-State: AC+VfDx6T5VjwmSl56l/5mktcTV4V1hE+GJVmV9rQo5qtvfquZ8Jckr2
-        +JoWMpDR+n4kWmiG+7iEj0roPlx9jg8Rthv5n98ZaSrEEFKGwSpsNBIdA9RubOa91109sd9mO7x
-        eCUNbSni1KsX6i3iv3dMT6PfVSOVQgHuV
-X-Received: by 2002:a2e:b0c3:0:b0:2b6:a75b:c5f2 with SMTP id g3-20020a2eb0c3000000b002b6a75bc5f2mr5105443ljl.32.1687939899075;
-        Wed, 28 Jun 2023 01:11:39 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4hL8AvEQrWFOAL7w+oejp5DdV0UlLp5XupFg/wppPG5fuNsIH20ieYEPTpEECGwRrlsQbTp1I7XJfrVR4E4LE=
-X-Received: by 2002:a2e:b0c3:0:b0:2b6:a75b:c5f2 with SMTP id
- g3-20020a2eb0c3000000b002b6a75bc5f2mr5105426ljl.32.1687939898789; Wed, 28 Jun
- 2023 01:11:38 -0700 (PDT)
+        bh=M/F4R2xIwhAteDzm26GEr3kEl3pSlXhCeAsnchT8YT0=;
+        b=F2V97fkI3FYzL2Cbs8jvb4+bfenU38OBHu9SR9GZ4k9PfZ3MwGkPzD8tVemTYW1pV6
+         SSRwcDWPm1hMMx3OKBzIatrVK3ZnrFcq9ItzisGnYg9GtR/kYsAkHrFz0aoaQrzfA3+L
+         Sm5CrYdjTgLiUBdse19LfiJkV1vK3l/YHAf8mYIH52wxkzS1C5+INglVxLRqN/0J5g8h
+         vWA9s+M/zy20cjndXn1l+KzN4ziC9NxlYHImqVp9HvzYqvUKFp3EHpVSwL20wJUiU8uS
+         BRNII3ZA6OiDTBZnkFy3Z6lD313jFJuD/dCjyYKiYrGm31gTQam6OqrtiYh5QX+vTPX1
+         EK9g==
+X-Gm-Message-State: ABy/qLayFTYRglJ6YIhzMP8Au3NAE4Wg0MAL22GOXzsGVMpxLSYH3tNC
+	xtjb+nL8aeBAqFFWFIQXLtZy9ggYXng0LPbICFc=
+X-Google-Smtp-Source: APBJJlFZg1vdM0bJKcJW2dZtFWmRG/uWyW1nykdLe6Drgc1ce5ksLQ54e8wjqbpPEeF3txbVgDIOJU1iYRycd8Q+CZQ=
+X-Received: by 2002:a25:2007:0:b0:b9e:c516:6e32 with SMTP id
+ g7-20020a252007000000b00b9ec5166e32mr603794ybg.24.1687939953777; Wed, 28 Jun
+ 2023 01:12:33 -0700 (PDT)
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-4-lulu@redhat.com>
-In-Reply-To: <20230628065919.54042-4-lulu@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 28 Jun 2023 16:11:27 +0800
-Message-ID: <CACGkMEs2V2gqGOv1jd-ZrT-9HHnSU6dhC=1zUojHRDGCeG2E7w@mail.gmail.com>
-Subject: Re: [RFC 3/4] vduse: Add the function for get/free the mapp pages
-To:     Cindy Lu <lulu@redhat.com>
-Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
-        xieyongji@bytedance.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+References: <20230627035000.1295254-1-moritzf@google.com> <ZJrc5xjeHp5vYtAO@boxer>
+ <35db66a9-d478-4b15-ad30-bfc4cded0b5c@lunn.ch> <CAFyOScpRDOvVrCsrwdxFstoNf1tOEnGbPSt5XDM1PKhCDyUGaw@mail.gmail.com>
+ <ZJr1Ifp9cOlfcqbE@boxer> <9a42d3d3-a142-4e4a-811b-0b3b931e798b@lunn.ch>
+In-Reply-To: <9a42d3d3-a142-4e4a-811b-0b3b931e798b@lunn.ch>
+From: Moritz Fischer <moritz.fischer.private@gmail.com>
+Date: Wed, 28 Jun 2023 10:12:22 +0200
+Message-ID: <CAJYdmeOatYbZo616HZv_peyqQRa38gtF9eT483wKNkG8gfN84g@mail.gmail.com>
+Subject: Re: [PATCH net v3] net: lan743x: Don't sleep in atomic context
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Moritz Fischer <moritzf@google.com>, 
+	netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org, 
+	edumazet@google.com, davem@davemloft.net, bryan.whitehead@microchip.com, 
+	UNGLinuxDriver@microchip.com, stable@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
-X-Mailing-List: netdev@vger.kernel.org
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Jun 28, 2023 at 2:59=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> From: Your Name <you@example.com>
->
-> Add the function for get/free pages, ad this info
-> will saved in dev->reconnect_info
+Hi Andrew,
 
-I think this should be squashed to patch 2 otherwise it fixes a bug
-that is introduced in patch 2?
+On Tue, Jun 27, 2023 at 4:51=E2=80=AFPM Andrew Lunn <andrew@lunn.ch> wrote:
+>
+> > Side note would be that I don't see much value in iopoll.h's macros
+> > returning
+> >
+> >       (cond) ? 0 : -ETIMEDOUT; \
+> >
+> > this could be just !!cond but given the count of the callsites...probab=
+ly
+> > better to leave it as is.
+>
+> The general pattern everywhere in linux is:
+>
+>     err =3D foo(bar);
+>     if (err)
+>         return err;
+>
+> We want functions to return meaningful error codes, otherwise the
+> caller needs to figure out an error code and return it. Having iopoll
+> return an error code means we have consistency. Otherwise i would
+> expect some developers to decide on EIO, ETIMEDOUT, EINVAL, maybe
+> ENXIO?
 
->
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  drivers/vdpa/vdpa_user/vduse_dev.c | 35 ++++++++++++++++++++++++++++++
->  1 file changed, 35 insertions(+)
->
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
-vduse_dev.c
-> index 1b833bf0ae37..3df1256eccb4 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -1313,6 +1313,35 @@ static struct vduse_dev *vduse_dev_get_from_minor(=
-int minor)
->         return dev;
->  }
->
-> +int vduse_get_vq_reconnnect(struct vduse_dev *dev, u16 idx)
-> +{
-> +       struct vdpa_reconnect_info *area;
-> +       void *addr =3D (void *)get_zeroed_page(GFP_KERNEL);
-> +
-> +       area =3D &dev->reconnect_info[idx];
-> +
-> +       area->addr =3D virt_to_phys(addr);
-> +       area->vaddr =3D (unsigned long)addr;
-> +       area->size =3D PAGE_SIZE;
-> +       area->index =3D idx;
-> +
-> +       return 0;
-> +}
-> +
-> +int vduse_free_vq_reconnnect(struct vduse_dev *dev, u16 idx)
-> +{
-> +       struct vdpa_reconnect_info *area;
-> +
-> +       area =3D &dev->reconnect_info[idx];
-> +       if ((area->size =3D=3D PAGE_SIZE) && (area->addr !=3D NULL)) {
-> +               free_page(area->vaddr);
-> +               area->size =3D 0;
-> +               area->addr =3D 0;
-> +               area->vaddr =3D 0;
-> +       }
-> +
-> +       return 0;
-> +}
->
->  static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
->  {
-> @@ -1446,6 +1475,10 @@ static int vduse_destroy_dev(char *name)
->                 mutex_unlock(&dev->lock);
->                 return -EBUSY;
->         }
-> +       for (int i =3D 0; i < dev->vq_num; i++) {
-> +
-> +               vduse_free_vq_reconnnect(dev, i);
-> +       }
->         dev->connected =3D true;
->         mutex_unlock(&dev->lock);
->
-> @@ -1583,6 +1616,8 @@ static int vduse_create_dev(struct vduse_dev_config=
- *config,
->                 INIT_WORK(&dev->vqs[i].kick, vduse_vq_kick_work);
->                 spin_lock_init(&dev->vqs[i].kick_lock);
->                 spin_lock_init(&dev->vqs[i].irq_lock);
-> +
-> +               vduse_get_vq_reconnnect(dev, i);
+Can you clarify if you suggest to leave this alone as-is in patch, or
+replace with something returning one of the errors above?
 
-Can we delay the allocated until fault?
+If the former, anything else missing in the patch?
 
-Thanks
-
->         }
->
->         ret =3D idr_alloc(&vduse_idr, dev, 1, VDUSE_DEV_MAX, GFP_KERNEL);
-> --
-> 2.34.3
->
+Thanks,
+Moritz
 
