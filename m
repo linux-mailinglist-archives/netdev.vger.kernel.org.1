@@ -2,105 +2,122 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7044A7414B8
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 17:17:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4DA687414DC
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 17:25:35 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231322AbjF1PPv (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 11:15:51 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:29366 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S231439AbjF1PPu (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 11:15:50 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687965302;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=No+atwHziLwh2Mwoi0urFa3UAgrtvH7xWcC0P7lfeTw=;
-        b=N4gqItXeAok0P+qunHYUmyt2nH2RLQ9puGSLOoNLqZvKwJmrar9D+roxhMGqQJQvSM7+KI
-        j5lx5W2i3VSeD0VP1HOp+tIatllHzRFSEqmqctJl8VgpeBof1pfZrnnbfwSTHb2+EieBdw
-        pcY36V4ThesVJ6rGZySpzTkk9Whi5e8=
-Received: from mail-qt1-f198.google.com (mail-qt1-f198.google.com
- [209.85.160.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-64-4eiCVQ_KNSi6D2y2mvu1xg-1; Wed, 28 Jun 2023 11:14:55 -0400
-X-MC-Unique: 4eiCVQ_KNSi6D2y2mvu1xg-1
-Received: by mail-qt1-f198.google.com with SMTP id d75a77b69052e-40320c2d93dso2024911cf.0
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 08:14:49 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687965289; x=1690557289;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=No+atwHziLwh2Mwoi0urFa3UAgrtvH7xWcC0P7lfeTw=;
-        b=VV3z9rHgxDjOkrrLN53YXopl8Ce8YiFt4sI5SgRjRSHcGB/t4PBMAF89h4JsYuhisF
-         shGVTWvxL872Guw+zCWqOPhRqEd+yU+lwN19VDCbQvlralOjNSM8opaWfu1pYlkisQNW
-         LGYfo855b/9IAZ04iQc0W/yHU1DF+M2I7zkubMB8+b4AT1Er74v5zfxjclH1UnZ5i78H
-         zXX4g48FLC1adNMEkELa7WLk0DuGOiGA3I2YONWUsRa+8a0K1zkwMWw3supM5lWTlthC
-         RzsoWBZpb7hFZudqLQTwP00D1jF7KZMkcyW9Hnh5vKu2ZxZa/0CIXZHPQsH99htLxxes
-         LgIQ==
-X-Gm-Message-State: AC+VfDw5BtM09KbthJpQ+E/E2oPhiqZrP/yFA6ASUDXCpTX4rZ4o4R3s
-        mnae4KpLtBZA8+CBo7bQArx3jyNsY8xUpFXobYM/JFScs3b/ie+r4R5c0g0KtwZLERYxpvn3jRQ
-        tCYnpPgZ77a90GWN9
-X-Received: by 2002:a05:622a:1896:b0:3f6:a8e2:127b with SMTP id v22-20020a05622a189600b003f6a8e2127bmr46133qtc.5.1687965289133;
-        Wed, 28 Jun 2023 08:14:49 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5HF4kf3dF/wJd/JhG2BMQuizzHpnpWbJZjxT53l4SvDgK1eWSqKwllWtY5fNhmd2RvU2RI8g==
-X-Received: by 2002:a05:622a:1896:b0:3f6:a8e2:127b with SMTP id v22-20020a05622a189600b003f6a8e2127bmr46114qtc.5.1687965288898;
-        Wed, 28 Jun 2023 08:14:48 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-226-127.dyn.eolo.it. [146.241.226.127])
-        by smtp.gmail.com with ESMTPSA id a3-20020a05622a02c300b00400e687174csm3560628qtx.54.2023.06.28.08.14.47
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 08:14:48 -0700 (PDT)
-Message-ID: <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-From:   Paolo Abeni <pabeni@redhat.com>
-To:     Ian Kumlien <ian.kumlien@gmail.com>
-Cc:     Alexander Lobakin <aleksander.lobakin@intel.com>,
-        intel-wired-lan <intel-wired-lan@lists.osuosl.org>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Eric Dumazet <edumazet@google.com>,
-        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Date:   Wed, 28 Jun 2023 17:14:45 +0200
-In-Reply-To: <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
-         <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
-         <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com>
-         <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
-         <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
-         <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
-         <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
-         <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
-         <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
-         <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
-         <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
-         <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
-         <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
-         <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
-         <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
-         <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
-         <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        id S231630AbjF1PZR (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 11:25:17 -0400
+Received: from mail-bn8nam11on2100.outbound.protection.outlook.com ([40.107.236.100]:31392
+        "EHLO NAM11-BN8-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S232213AbjF1PY5 (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 11:24:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=W6T7yqjNp8/VwkS3r+djx1f6wJSVQ2xrUsM1QtDpfzsBQGfZT+MwaMmqbg4heHhsU0WmGWhYeKoWYntDRUL0Bjpt4Hj67O7Dm6R48Eya/Cml42XdythU7whTWjHHDstmvKzHHYvCTvPRR8xGplexvs4gdDlcqw+0qWO8vq0B9deeU1bizlNsPwAa06p6yesx1LjFtLqI7RcKpcFZZ9dfPIAv7rxlrzgrRiBUJLEbXy3akMVTMQYgg9TykkQFhON2zzI5Zsmu4NK7Ak+J26XYX91CZwO77wmNwxiylwWj7DDDze3VJGRmLQ++3zMPenHoSmmqA75FW46qsF4rI1D9tw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Lj93QyC8z4s1I7VxrOH/kuBGZudukU54muW/mIx1etI=;
+ b=g+xhEirbYkwbi3PSK9lNF8zdjN4aIzM/JsWGMV7/fkyoL0IC7LiRGuWPQBl5zZrHRWcEzxZMBw65QlZkz/tCq4S2hpAXKpJBVH6WuWq/f5rhq1HNdaqh43BNLu8r1c4JDG9WSFaiCvbzJzk7vacM6090JabP/nSuDrwoNS3lEaqyrkDXATM6p+HuzeSdZggf9J8Yt+2vViOP+ieq7SpWobs7chFfvKruy0Uc4/gJSmE0zZWuuPQhKNOhTek4MJHGBiPTjSZKhnrtivtkFYTAjXAynTSOJ8nbAp3emjgVqbVMOkUNEVHyFipazNFwuPoMnHaeb3K6TByNspYtUQ5lGg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Lj93QyC8z4s1I7VxrOH/kuBGZudukU54muW/mIx1etI=;
+ b=ENvcK1AmHGQXbjdMTTJM8/vszXSqmL0BET9UGi7KAvfyiZdLtkNM3OZ0mNwVxYXkySCDT3CsG2VbOr0OfpVydQNQspb25f/gUHZIjltQBEkxoE9Mxf96zzb4D/9BIdd79FvZ1Ez31mOjhdq0HaUhMLrpkc2rqvB+juCKapMcDxY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SA1PR13MB4829.namprd13.prod.outlook.com (2603:10b6:806:1a1::19) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Wed, 28 Jun
+ 2023 15:24:54 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Wed, 28 Jun 2023
+ 15:24:53 +0000
+Date:   Wed, 28 Jun 2023 17:24:45 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Zhengchao Shao <shaozhengchao@huawei.com>
+Cc:     netdev@vger.kernel.org, linux-rdma@vger.kernel.org,
+        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, borisp@nvidia.com, saeedm@nvidia.com,
+        leon@kernel.org, tariqt@nvidia.com, lkayal@nvidia.com,
+        yuehaibing@huawei.com
+Subject: Re: [PATCH net] net/mlx5e: fix double free in
+ mlx5e_destroy_flow_table
+Message-ID: <ZJxQvYh/k/5yEDAi@corigine.com>
+References: <20230628005934.1524909-1-shaozhengchao@huawei.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628005934.1524909-1-shaozhengchao@huawei.com>
+X-ClientProxiedBy: AM9P195CA0001.EURP195.PROD.OUTLOOK.COM
+ (2603:10a6:20b:21f::6) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SA1PR13MB4829:EE_
+X-MS-Office365-Filtering-Correlation-Id: ae3f99dc-dbba-451e-c66a-08db77ebd289
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: CPE3IAk/wk6kBJxprTGyMPAO+eYLkHdP2gjhyAiZ+2qq3gR332PCwoOpKU5Dg6Ni5pFV15IfeiTReoAj6Ls12IXfcHNx6dFLUuvqArMYGMbfHTppgICryUTKdtnmp6Qo32pGWuWbklNp7p8ZLsR1Iits6Vx55AuBWSENAS2dM1eID2Q4NbkSeOgAUt6y0Eqwa9LdppuGb+cBPW5yfu/7V558h769QtfKx4IYheWM/9gRJ6Kskn2cfDhvXAoeNekKljQn8tLjtDtjXXXBDkq/iGVXMv8r2nOmHk7/IRX8DqK3G5CKSBgXmSQ+cnQOtR6NywcBuCXZ5/JDMCIvvkcmwRUcPOpR5qjDTtU/34XCx0RjW0c8TJFx7qc6+L85OSs/lzmD9CUGmUXW0k7vHbcFrom2F9w8CDK2w3wihqXTFvUjV89CrPxtMYf+BeHYKpWLBmLQMDDzuPkSwTqR0rJczcYTt+7PifWiUjA7RAfUOK2fWSpGTbvm1A+0xzlmTIs0F+E1EaE4VNCG4qVtKhtv7vWr1iA6NqiYrdrYEWhqL+p2RY9MpuaQT3hNzhFWEM6j2f0gxQ4Or4gdUg0+y/5Ynos5EhdfCpwg+YBW3aXRzQ0=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(39830400003)(346002)(136003)(376002)(451199021)(4744005)(2906002)(6666004)(6486002)(2616005)(38100700002)(6506007)(186003)(86362001)(41300700001)(478600001)(66556008)(316002)(6916009)(66476007)(4326008)(36756003)(8936002)(66946007)(6512007)(7416002)(44832011)(8676002)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?pcc2Z9jrlkLTfzRIBdJfSW3/Xdenlh3HUyoYskMkuY+eU/cP01nSJoG5FA1U?=
+ =?us-ascii?Q?Yan4ofapcfHJrfNGMVY/1TaxOPxQVmt6va/EaHnompJGZ5C6ffn+BKq1KUcX?=
+ =?us-ascii?Q?rtnctOWI2e8rhHuPdfw46M4lp0ZG1OsHwuU//fwC5zqmnpdwNb4xjx1QkcEn?=
+ =?us-ascii?Q?GrK8m5HYIuCEBCouWKXfQK8RD0sWdZASXfKwzA0X4qS++6VE/jI95Qnh76mm?=
+ =?us-ascii?Q?X9ZxcFbnH+8eDVA+A90O52Gb6mV3rqYjb3lFNBNIiYuJSkpyi7J3UGEDJpUk?=
+ =?us-ascii?Q?2S7N8AoH1gQKEIRDrhAD2x9C9v9AwRMjsMZU5v92epWPLFdGeV0XaQ5tvyO/?=
+ =?us-ascii?Q?dJcj/VElRZTtxZpqxgXo+oC7zhYusksLOVY0xo9qwYkIiuj3OOMB2OyRHG+D?=
+ =?us-ascii?Q?l4HptxoxZo+b4vNy61w3Fj7qZTNFZLJfD8BdZe79LqgvaK/JZYLz86hdQV0Y?=
+ =?us-ascii?Q?yvLjxq2Wo/OXQj/qgEsMHEFo3npSzJ1kWNUPtk8n8D+LJGnb3oX3m6vWDOMV?=
+ =?us-ascii?Q?46hbA1jn3L9oA54VvX2k3ZozRsN5uAW8dZrWf9y8rOSTI3vFCQfDsOGxcVn3?=
+ =?us-ascii?Q?ix3i+KddPqJc/icCbqvIOJNHc99pJm/LRgp+V1MCz/lVAkbT8Wr2JGWyZlYs?=
+ =?us-ascii?Q?503lsqouBNqcrX4UKzt6gvDD3wVpg7xLeN0Mz9Xz5hIAtbekVRD6cr1i+xba?=
+ =?us-ascii?Q?fg7UQ1WD3xtpLCurlbfvfSrXn3tc5CWBe4Y2tPYdM4Yry9bSUUDEBAKNcosV?=
+ =?us-ascii?Q?kt6T1ckU/hMbRIyX1MhvP5LJmnqM9POfCymSutyGK6K3qY62HkQls5IhnncM?=
+ =?us-ascii?Q?W9g8KUsqWBHLiHWAGLhqzuOcQU9nba2LCayDPd/q8Hq3MREtirVCzaHY5PeP?=
+ =?us-ascii?Q?LuvcikkRWBL0epanPz31jYwsaMOvJl4nvgDcacDgpwZScRWT2mo5EOm1PFOB?=
+ =?us-ascii?Q?3OgFngG7N/hPZ7eJmvOHvxAGCDnXak383Jc2c8iMeyZFQYSefkfirRWay4kP?=
+ =?us-ascii?Q?MV9bZ4oSLzTyk45HghNiKixp6Wfq+YRHkhowiw2NUfI0Iilj+miY5D+x0av4?=
+ =?us-ascii?Q?JMCNum6tjkpEhLeteuISUSWaNYiyHH5rKl7NtXXW6semdUDK7Mh3Wnm4kYJf?=
+ =?us-ascii?Q?HHiOh0dZf4FeCILu6ULu6TKsymKejalEpdN0uRbqlczYTLuiTevyX+EgoXl1?=
+ =?us-ascii?Q?A3u8q0iLg0XXlkSlOlexJCLMMF/m7XFDFlx0acRGUm0aAcwYvN4sllM2wrVB?=
+ =?us-ascii?Q?fm/eqrW3/4ef7dHSG3F2XpveAz4BiHEgcAFuEAzf4K8L2CgExQAECu7pm+1V?=
+ =?us-ascii?Q?d003odQB/gL2EaEDMV6oE7Ca04kwG5c0fL3bTH8OwbazUkTEdBf9VkWPdiYz?=
+ =?us-ascii?Q?NI8PYRrTaLx6Hud/jFdZusbUZkfQOFfekil3q0ygx3vJkaUi2x/ouTTPhPmM?=
+ =?us-ascii?Q?uEcRgAioJUwAKv+HaMI4KrxWakaJQEolKEq7vQf8aFmL2mUHgFHcofjFUgai?=
+ =?us-ascii?Q?AIBqtDbGHgOsap4ViIGsI8UZ2+f4yv9RSVB3ucO192kTmM2aovTn5eRfgfce?=
+ =?us-ascii?Q?prs5SB4VEfyWocOF3uyVX80mZIvMd9tpGWsYI6W978a/K6muwJisS7XypV/Q?=
+ =?us-ascii?Q?gmQsuC5zJIL/IOYyliWBs8gy2kv2HT1hsLNgFaZyfpdLnVO6rVOewIemFIUB?=
+ =?us-ascii?Q?o1KuZA=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: ae3f99dc-dbba-451e-c66a-08db77ebd289
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 15:24:53.7725
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: EAdhcsSt9R4EAkhLhBi2FEZW0u1GIQVxkkCe2kATwW3jR4dbrvAL55ctATaYiwRElpZqnZbRRTUJuVtuK/91fVTMzk/iwLPDfgqBcdXI8OM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR13MB4829
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-On Wed, 2023-06-28 at 14:04 +0200, Ian Kumlien wrote:
-> So have some hits, would it be better without your warn on? ... Things
-> are a bit slow atm - lets just say that i noticed the stacktraces
-> because a stream stuttered =3D)
+On Wed, Jun 28, 2023 at 08:59:34AM +0800, Zhengchao Shao wrote:
+> In function accel_fs_tcp_create_groups(), when the ft->g memory is
+> successfully allocated but the 'in' memory fails to be allocated, the
+> memory pointed to by ft->g is released once. And in function
+> accel_fs_tcp_create_table, mlx5e_destroy_flow_table is called to release
+> the memory pointed to by ft->g again. This will cause double free problem.
+> 
+> Fixes: c062d52ac24c ("net/mlx5e: Receive flow steering framework for accelerated TCP flows")
+> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
 
-Sorry, I screwed-up completely a newly added check.
-
-If you have Kasan enabled you can simply and more safely remove my 2nd
-patch. Kasan should be able to catch all the out-of-buffer scenarios
-such checks were intended to prevent.
-
-Cheers,
-
-Paolo
-
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
