@@ -1,150 +1,307 @@
-Return-Path: <netdev+bounces-14406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D50C740A30
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:00:34 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5F8A81C208C6
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 08:00:33 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8B4C63C8;
-	Wed, 28 Jun 2023 08:00:30 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D830863BC
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 08:00:30 +0000 (UTC)
-Received: from mail-lf1-x12a.google.com (mail-lf1-x12a.google.com [IPv6:2a00:1450:4864:20::12a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17C8DA3;
-	Wed, 28 Jun 2023 01:00:26 -0700 (PDT)
-Received: by mail-lf1-x12a.google.com with SMTP id 2adb3069b0e04-4fb7589b187so4825469e87.1;
-        Wed, 28 Jun 2023 01:00:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687939224; x=1690531224;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=gCiVnIiBTWxP9T/l4gc5KqB15PzobXDfsgWHGo4kW6w=;
-        b=Atk/FL/9Z6Wadg6fR1BZpsHoBVs6dAZnOoJjIoGnbqSpNasB218H73bm4pxhxs3VJx
-         umDvYrlu+7+G8C8UAfPJ0XS4+z1oEcsDGqLppe+qNkUYfPT5jOgL6HGEu+kO867kcmUJ
-         UCyf9Apq1cJtI1nV2bqz9cuYXog2xB/uMEUbmiXB2viAp1hs/GkFLkkRBdaW0+bzTzcz
-         zUqPyuhfXJsjyRkwsp0NFQM15rXajW4l8ZPaCszNYqmQnVcQlnHDbS14qFQGRdaxp+OH
-         XCCg1srlakVE1oL75m3yR0bYWQGBlYmngkaeMZNazjFf3iNORBJKNdO3zxZxxsArQBQC
-         d1tg==
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id C417E740A98
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:07:54 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S232778AbjF1IHq (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 04:07:46 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:44616 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232388AbjF1IE7 (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:04:59 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687939449;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=okTCgNevFM4Q9r4XEhG7CpsoJKn2JJ2bnI0cjLYaScs=;
+        b=LxKowSO4ood0lqDuJB7V75avfAHitSEj+ek902PU5BO6VWAP2hsX+cbpU9zSbbvdBvGtoK
+        LpTsBlCg/yw9AGg1ULTSRyM5W/CCm2CCtrt1tg18s8EFvB1DigZrDqeOs7x50Ve6Yn3w5j
+        L2HHq0Q83XHH0Cv0vqOIhnHFAzbf6q4=
+Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
+ [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-609-yTyfrWZTN1qmAIun6CojEg-1; Wed, 28 Jun 2023 00:02:30 -0400
+X-MC-Unique: yTyfrWZTN1qmAIun6CojEg-1
+Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb76659d37so2641441e87.2
+        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 21:02:29 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687939224; x=1690531224;
-        h=in-reply-to:references:to:from:subject:cc:message-id:date
-         :content-transfer-encoding:mime-version:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=gCiVnIiBTWxP9T/l4gc5KqB15PzobXDfsgWHGo4kW6w=;
-        b=ktuESsELloTCOHTx2ryoHmJLm6qZ5rd4OUnAbTX4HXVwwOz2De1qDt1YLjcpLHqYu/
-         rA2/Vcgze4sZOI7wkwlmLVR5dtSXfbW/Cfg12kTR3eNtbsyrrLJt+VxIniZPkQLwVT0B
-         bYSXQ1IRainzlmNBQf+tHsx6G0FaqLB+o1B39ATMYtvZ1yF8AJwzmkgZC8ZXvF3n6idq
-         mKyMdHycxb3hzjJo6V0IyDRNqdqDISKcM4AYNVO+y4PMnXfOoVbU3c2cbkCbHNffXIRx
-         srwFbreXkaMgNwFzfr2e/NEatBT1s6MnO9MNOiorStTOLPpb1xRdq5QpfiK9BNlmIbTz
-         mgIQ==
-X-Gm-Message-State: AC+VfDwsa77V3RNcFkYRKJR/siziZa+nnL+VXG3RD63iamdGK2UnI8lN
-	nYie6YgtNUIq1CwLVAjO8Ek=
-X-Google-Smtp-Source: ACHHUZ5JfjpLByN+xk3+nw7l3otdzAnIQaT9fCpC3MJlEf/M7GLH4UUGnbVSdzEN0B0XtGlgO5VAxw==
-X-Received: by 2002:a05:6512:b0e:b0:4f8:75cf:fdd7 with SMTP id w14-20020a0565120b0e00b004f875cffdd7mr16303621lfu.22.1687939223949;
-        Wed, 28 Jun 2023 01:00:23 -0700 (PDT)
-Received: from localhost (freebox.vlq16.iliad.fr. [213.36.7.13])
-        by smtp.gmail.com with ESMTPSA id u8-20020a05600c210800b003f9b4330880sm13048436wml.29.2023.06.28.01.00.23
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 28 Jun 2023 01:00:23 -0700 (PDT)
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
+        d=1e100.net; s=20221208; t=1687924948; x=1690516948;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=okTCgNevFM4Q9r4XEhG7CpsoJKn2JJ2bnI0cjLYaScs=;
+        b=ac49mgMtjekUKvJkEdS5DENVO8qp+QRcFljSwdyYRcgP5JSJUaKyYC/yrqrCUgEC1q
+         55gZLSykQ7FtxCM6opNos0HPnwYZwAaKlJD7TyF/TAViYdN+fGZ0x5XycYS6h6Ou2PZD
+         wnn5Huxo7TAZZUEnrNzq25G07cbOSvb+dSK0sDMHmtJirHzdB3B3JtDqkFnl57cSEpt0
+         Ve1lTFQCy22N8hdjNrJ0DtH7aDa5IPCxB3mayrQTuSWoVcGP6hZhMz1O9HKN05xUuaZP
+         RBsZPsz6dlyc4JIivC0x1mUIW9VjbAg79ZPDEFMXpTzaesk0GDnlPEXvyKcQqOYpBbBM
+         DT9w==
+X-Gm-Message-State: AC+VfDwCrqUcpN5UOMl0TZjLvyNt0AUpf8LGU/hbp7vMDPo10ZEWpBiq
+        hONnF6AenD3LFoRx60Oz5qzJGSp68L6dhmbCzqCUUmwIRSA8B8GF2Dz+jPT1IePl1HDBysHDhaD
+        Pd8lAwv78HRh+Zxr7ce6Z9Aux82UXGhd1
+X-Received: by 2002:a05:6512:33c4:b0:4fb:89e2:fc27 with SMTP id d4-20020a05651233c400b004fb89e2fc27mr2270864lfg.54.1687924948496;
+        Tue, 27 Jun 2023 21:02:28 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7zI16kNAYV0OSTLGcIvbLMh//xqwXP89mPwyBjc+DUycBjq4D81BFpFH6CfEw+o0EFQcJRUN+v8jRnTY8PTp4=
+X-Received: by 2002:a05:6512:33c4:b0:4fb:89e2:fc27 with SMTP id
+ d4-20020a05651233c400b004fb89e2fc27mr2270855lfg.54.1687924948180; Tue, 27 Jun
+ 2023 21:02:28 -0700 (PDT)
+MIME-Version: 1.0
+References: <20230628030506.2213-1-hengqi@linux.alibaba.com>
+ <20230628030506.2213-2-hengqi@linux.alibaba.com> <CACGkMEv7aVH0dgdd6N3RMH+57BWuxnq9NR8sPzD9wRQZ5TZRFQ@mail.gmail.com>
+ <c6411922-51ad-3d8f-88aa-28883b44573d@linux.alibaba.com>
+In-Reply-To: <c6411922-51ad-3d8f-88aa-28883b44573d@linux.alibaba.com>
+From:   Jason Wang <jasowang@redhat.com>
+Date:   Wed, 28 Jun 2023 12:02:17 +0800
+Message-ID: <CACGkMEu=Cs5DFP+EFqxUXaiqz7vewhQ5zMMtChGpR_oGjrvMCg@mail.gmail.com>
+Subject: Re: [PATCH net-next v4 1/2] virtio-net: support coexistence of XDP
+ and GUEST_CSUM
+To:     Heng Qi <hengqi@linux.alibaba.com>
+Cc:     netdev@vger.kernel.org, bpf@vger.kernel.org,
+        "Michael S . Tsirkin" <mst@redhat.com>,
+        "David S . Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Alexei Starovoitov <ast@kernel.org>,
+        Daniel Borkmann <daniel@iogearbox.net>,
+        Jesper Dangaard Brouer <hawk@kernel.org>,
+        John Fastabend <john.fastabend@gmail.com>,
+        Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=UTF-8
-Date: Wed, 28 Jun 2023 10:00:23 +0200
-Message-Id: <CTO4IM6NQZ4N.6DC89N410CDS@syracuse>
-Cc: "opensource.kernel@vivo.com" <opensource.kernel@vivo.com>
-Subject: =?utf-8?q?Re:_[PATCH]_wifi=EF=BC=9Amac80211:_Replace_the_ternary_conditio?= =?utf-8?q?nal_operator_with_max()?=
-From: "Nicolas Escande" <nico.escande@gmail.com>
-To: "Ping-Ke Shih" <pkshih@realtek.com>, "You Kangren"
- <youkangren@vivo.com>, "Johannes Berg" <johannes@sipsolutions.net>, "David
- S. Miller" <davem@davemloft.net>, "Eric Dumazet" <edumazet@google.com>,
- "Jakub Kicinski" <kuba@kernel.org>, "Paolo Abeni" <pabeni@redhat.com>,
- "open list:MAC80211" <linux-wireless@vger.kernel.org>, "open
- list:NETWORKING [GENERAL]" <netdev@vger.kernel.org>, "open list"
- <linux-kernel@vger.kernel.org>
-X-Mailer: aerc 0.15.1
-References: <20230626104829.1896-1-youkangren@vivo.com>
- <9e4e3bf85ed945e7b0c8d5d389065670@realtek.com>
-In-Reply-To: <9e4e3bf85ed945e7b0c8d5d389065670@realtek.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-On Wed Jun 28, 2023 at 3:48 AM CEST, Ping-Ke Shih wrote:
+On Wed, Jun 28, 2023 at 11:42=E2=80=AFAM Heng Qi <hengqi@linux.alibaba.com>=
+ wrote:
 >
 >
-> > -----Original Message-----
-> > From: You Kangren <youkangren@vivo.com>
-> > Sent: Monday, June 26, 2023 6:48 PM
-> > To: Johannes Berg <johannes@sipsolutions.net>; David S. Miller <davem@d=
-avemloft.net>; Eric Dumazet
-> > <edumazet@google.com>; Jakub Kicinski <kuba@kernel.org>; Paolo Abeni <p=
-abeni@redhat.com>; open
-> > list:MAC80211 <linux-wireless@vger.kernel.org>; open list:NETWORKING [G=
-ENERAL] <netdev@vger.kernel.org>;
-> > open list <linux-kernel@vger.kernel.org>
-> > Cc: opensource.kernel@vivo.com; youkangren@vivo.com
-> > Subject: [PATCH] wifi=EF=BC=9Amac80211: Replace the ternary conditional=
- operator with max()
 >
-> The semicolon of "wifi=EF=BC=9A" is different from others.
+> =E5=9C=A8 2023/6/28 =E4=B8=8A=E5=8D=8811:22, Jason Wang =E5=86=99=E9=81=
+=93:
+> > On Wed, Jun 28, 2023 at 11:05=E2=80=AFAM Heng Qi <hengqi@linux.alibaba.=
+com> wrote:
+> >> We are now re-probing the csum related fields and trying
+> >> to have XDP and RX hw checksum capabilities coexist on the
+> >> XDP path. For the benefit of:
+> >> 1. RX hw checksum capability can be used if XDP is loaded.
+> >> 2. Avoid packet loss when loading XDP in the vm-vm scenario.
+> >>
+> >> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+> >> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+> >> ---
+> >> v3->v4:
+> >>    - Rewrite some comments.
+> >>
+> >> v2->v3:
+> >>    - Use skb_checksum_setup() instead of virtnet_flow_dissect_udp_tcp(=
+).
+> >>      Essentially equivalent.
+> >>
+> >>   drivers/net/virtio_net.c | 82 +++++++++++++++++++++++++++++++++-----=
+--
+> >>   1 file changed, 69 insertions(+), 13 deletions(-)
+> >>
+> >> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> >> index 5a7f7a76b920..a47342f972b5 100644
+> >> --- a/drivers/net/virtio_net.c
+> >> +++ b/drivers/net/virtio_net.c
+> >> @@ -1568,6 +1568,41 @@ static void virtio_skb_set_hash(const struct vi=
+rtio_net_hdr_v1_hash *hdr_hash,
+> >>          skb_set_hash(skb, __le32_to_cpu(hdr_hash->hash_value), rss_ha=
+sh_type);
+> >>   }
+> >>
+> >> +static int virtnet_set_csum_after_xdp(struct virtnet_info *vi,
+> >> +                                     struct sk_buff *skb,
+> >> +                                     __u8 flags)
+> >> +{
+> >> +       int err =3D 0;
+> >> +
+> >> +       /* When XDP program is loaded, the vm-vm scenario on the same =
+host,
+> >> +        * packets marked VIRTIO_NET_HDR_F_NEEDS_CSUM without a comple=
+te checksum
+> >> +        * will travel. Although these packets are safe from the point=
+ of
+> >> +        * view of the vm, in order to be successfully forwarded on th=
+e upper
+> >> +        * layer and to avoid packet loss caused by XDP modification,
+> >> +        * we re-probe the necessary checksum related information:
+> >> +        * skb->csum_{start, offset}, pseudo-header checksum.
+> >> +        *
+> >> +        * If the received packet is marked VIRTIO_NET_HDR_F_DATA_VALI=
+D:
+> >> +        * when _F_GUEST_CSUM is negotiated, the device validates the =
+checksum
+> >> +        * and virtio-net sets skb->ip_summed to CHECKSUM_UNNECESSARY;
+> >> +        * otherwise, virtio-net hands over to the stack to validate t=
+he checksum.
+> >> +        */
+> >> +       if (flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) {
+> >> +               /* No need to care about SCTP because virtio-net curre=
+ntly doesn't
+> >> +                * support SCTP CRC checksum offloading, that is, SCTP=
+ packets have
+> >> +                * complete checksums.
+> >> +                */
+> >> +               err =3D skb_checksum_setup(skb, true);
+> > A second thought, any reason why a checksum is a must here. Could we si=
+mply:
 >
-> >=20
-> > Replace the ternary conditional operator with max() to make the code cl=
-ean
-> >=20
-> > Signed-off-by: You Kangren <youkangren@vivo.com>
-> > ---
-> >  net/mac80211/tdls.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> >=20
-> > diff --git a/net/mac80211/tdls.c b/net/mac80211/tdls.c
-> > index a4af3b7675ef..9f8b0842a616 100644
-> > --- a/net/mac80211/tdls.c
-> > +++ b/net/mac80211/tdls.c
-> > @@ -946,7 +946,7 @@ ieee80211_tdls_build_mgmt_packet_data(struct ieee80=
-211_sub_if_data *sdata,
-> >         int ret;
-> >         struct ieee80211_link_data *link;
-> >=20
-> > -       link_id =3D link_id >=3D 0 ? link_id : 0;
-> > +       link_id =3D max(link_id, 0);
->
-> Original logic means "if link_id < 0, then use default link (0)" instead =
-of
-> "always use link_id larger than or equal to 0". So, I think max(link_id, =
-0) could
-> cause misunderstanding.=20
+> When net.ipv4.ip_forward sysctl is enabled, such packets may be
+> forwarded (return to the tx path) at the IP layer.
+> If the device has the tx hw checksum offloading cap, packets will have
+> complete checksums based on our calculated 'check' value.
 
-I feel the same way, max() implies we want the 'highest' link whereas for m=
-e the
-actual code really means 'prefer the non default' (zero) link.
+Actually, I mean why can't we offload the checksum to the hardware in this =
+case?
 
 >
-> >         rcu_read_lock();
-> >         link =3D rcu_dereference(sdata->link[link_id]);
-> >         if (WARN_ON(!link))
-> > --
-> > 2.39.0
-> >=20
-> >=20
-> > ------Please consider the environment before printing this e-mail.
+> >
+> > 1) probe the csum_start/offset
+> > 2) leave it as CHECKSUM_PARTIAL
+> >
+> > ?
+>
+> The reason is as I explained above.
+>
+> >
+> >> +       } else if (flags & VIRTIO_NET_HDR_F_DATA_VALID) {
+> >> +               /* XDP guarantees that packets marked as VIRTIO_NET_HD=
+R_F_DATA_VALID
+> >> +                * still have correct checksum after they are processe=
+d.
+> >> +                */
+> > Do you mean it's the charge of the XDP program to calculate the csum
+> > in this case? Seems strange.
+>
+> Packet with complete checksum (and has been verified by rx device
+> because it has VIRTIO_NET_HDR_F_DATA_VALID)
+> when modified by XDP, XDP program should use the helper provided by XDP
+> core to make the checksum correct,
 
+Could you give me a pointer to that helper? Btw, is there a way for
+the XDP program to know whether the csum has been verified by the
+device? ( I guess not).
+
+Thanks
+
+
+> otherwise, VIRTIO_NET_HDR_F_DATA_VALID has been cleared and skb
+> ->ip_summed=3DCHECKSUM_NONE, so the stack
+> will re-verify the checksum, causing packet loss due to wrong checksum.
+>
+> Thanks.
+>
+> >
+> > Thanks
+> >
+> >> +               skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> >> +       }
+> >> +
+> >> +       return err;
+> >> +}
+> >> +
+> >>   static void receive_buf(struct virtnet_info *vi, struct receive_queu=
+e *rq,
+> >>                          void *buf, unsigned int len, void **ctx,
+> >>                          unsigned int *xdp_xmit,
+> >> @@ -1576,6 +1611,7 @@ static void receive_buf(struct virtnet_info *vi,=
+ struct receive_queue *rq,
+> >>          struct net_device *dev =3D vi->dev;
+> >>          struct sk_buff *skb;
+> >>          struct virtio_net_hdr_mrg_rxbuf *hdr;
+> >> +       __u8 flags;
+> >>
+> >>          if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+> >>                  pr_debug("%s: short packet %i\n", dev->name, len);
+> >> @@ -1584,6 +1620,12 @@ static void receive_buf(struct virtnet_info *vi=
+, struct receive_queue *rq,
+> >>                  return;
+> >>          }
+> >>
+> >> +       /* XDP may modify/overwrite the packet, including the virtnet =
+hdr,
+> >> +        * so save the flags of the virtnet hdr before XDP processing.
+> >> +        */
+> >> +       if (unlikely(vi->xdp_enabled))
+> >> +               flags =3D ((struct virtio_net_hdr_mrg_rxbuf *)buf)->hd=
+r.flags;
+> >> +
+> >>          if (vi->mergeable_rx_bufs)
+> >>                  skb =3D receive_mergeable(dev, vi, rq, buf, ctx, len,=
+ xdp_xmit,
+> >>                                          stats);
+> >> @@ -1595,23 +1637,37 @@ static void receive_buf(struct virtnet_info *v=
+i, struct receive_queue *rq,
+> >>          if (unlikely(!skb))
+> >>                  return;
+> >>
+> >> -       hdr =3D skb_vnet_hdr(skb);
+> >> -       if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
+> >> -               virtio_skb_set_hash((const struct virtio_net_hdr_v1_ha=
+sh *)hdr, skb);
+> >> -
+> >> -       if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> >> -               skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> >> +       if (unlikely(vi->xdp_enabled)) {
+> >> +               /* Required to do this before re-probing and calculati=
+ng
+> >> +                * the pseudo-header checksum.
+> >> +                */
+> >> +               skb->protocol =3D eth_type_trans(skb, dev);
+> >> +               skb_reset_network_header(skb);
+> >> +               if (virtnet_set_csum_after_xdp(vi, skb, flags) < 0) {
+> >> +                       pr_debug("%s: errors occurred in setting parti=
+al csum",
+> >> +                                dev->name);
+> >> +                       goto frame_err;
+> >> +               }
+> >> +       } else {
+> >> +               hdr =3D skb_vnet_hdr(skb);
+> >> +               if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash=
+_report)
+> >> +                       virtio_skb_set_hash((const struct virtio_net_h=
+dr_v1_hash *)hdr, skb);
+> >> +
+> >> +               if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+> >> +                       skb->ip_summed =3D CHECKSUM_UNNECESSARY;
+> >> +
+> >> +               if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+> >> +                                         virtio_is_little_endian(vi->=
+vdev))) {
+> >> +                       net_warn_ratelimited("%s: bad gso: type: %u, s=
+ize: %u\n",
+> >> +                                            dev->name, hdr->hdr.gso_t=
+ype,
+> >> +                                            hdr->hdr.gso_size);
+> >> +                       goto frame_err;
+> >> +               }
+> >>
+> >> -       if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+> >> -                                 virtio_is_little_endian(vi->vdev))) =
+{
+> >> -               net_warn_ratelimited("%s: bad gso: type: %u, size: %u\=
+n",
+> >> -                                    dev->name, hdr->hdr.gso_type,
+> >> -                                    hdr->hdr.gso_size);
+> >> -               goto frame_err;
+> >> +               skb->protocol =3D eth_type_trans(skb, dev);
+> >>          }
+> >>
+> >>          skb_record_rx_queue(skb, vq2rxq(rq->vq));
+> >> -       skb->protocol =3D eth_type_trans(skb, dev);
+> >>          pr_debug("Receiving skb proto 0x%04x len %i type %i\n",
+> >>                   ntohs(skb->protocol), skb->len, skb->pkt_type);
+> >>
+> >> --
+> >> 2.19.1.6.gb485710b
+> >>
+>
 
