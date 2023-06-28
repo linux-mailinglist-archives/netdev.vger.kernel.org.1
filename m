@@ -2,153 +2,307 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id AF57F740C85
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:20:13 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 04B7C740C89
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:21:33 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S233729AbjF1JT6 (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 05:19:58 -0400
-Received: from mail-bn8nam12on2089.outbound.protection.outlook.com ([40.107.237.89]:6720
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232672AbjF1JDX (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Wed, 28 Jun 2023 05:03:23 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Zck9Rtr180hOQIy9GQZqggge5SzWJnwqMQmgY6rntZXxLBq76iEqiz3yrEg8OIRuLVyHj5k+TgJDOzOv+Q0aQycwBOEv25K7NSFitH54JhdcW7o0CGLVmnzcvPDCF+vVpH/EMMXZeJc1RxsRYY7FeltK7qGXoi/9aPFypqaf2llatKGh9Od/P0j2yreq+IBLXjlxwmQGZg6Bfjet/v7rov5K8rwyGq9qR+BBKIi3HRjYZXa/2bMHznP6WTtjzLzp1/XV3laMpbsEhk+/Zrk2j9EToSJ27+rNQNMeYMQaFgg6eMLQbswuX5LE9ORzaMiU0zv96gg+l4TrxqrraG6SSw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TOhVo1AQEQtnGgcme5lNm6a1q3RJBO8mfLvJcRot5Gc=;
- b=GnTOaokfUT485EF+RGXbOojkORFapVHYSBK7zZt/G7DY1E1GatdZmixEf5GE/Di+tS2Rr+UUeDTl2IcUActm5RUDFplN1e78kynqBxnH49TaOxd1cffmEgrRorflNzxfR6B5vh0jJoKdS+JQQqch17Pn+ugFpcR2aDLs4z2xADz7oJxZWkzThi37KHXMdOQAjffKZ0qqNZ3/67YesbEKcR2UOui1WQT8bg2So0oDRKBUWhTuL/ZetTFyipNVEZ1i1BL9dRU4k2s5BHP18pS263Yp/TDSKZjNMC+2IvHLIBHzVV5PMQ/ETcXypyZBOTSorZZH95/I/h9rh42a/EKung==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TOhVo1AQEQtnGgcme5lNm6a1q3RJBO8mfLvJcRot5Gc=;
- b=jELWln5rox2kZJkfI/cvDjlLVxa+bAuq+zQPLTCfD5LfQ4IqnefijUlG9N5gm5xPkAYgdOk0bSAgogSmNe/YkOjOfmbC817Q3YdrUCNEaZC1KZrbru2RklhkQlxN4iXCV1IkTPR+5Dgy32mVRZr25Nm3NPEn/+mbiM0DgYrdfdg7SAy7j+MqWQwbNZ+6k3WrE2FDjfR7C1vNo9NS4Qe3BWlueqVP9t/8tNEfs8rVhDO7OHSvU6fLtQo/UzPrY+UaXBt+coIdSxoYbHldoeW56ejzeINFbp75y4IYw1tPvyAx3kVxCEM306okT9m8/UKbFI9WkvfRY6nIaumrMXPmFA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com (2603:10b6:930:24::22)
- by CH3PR12MB9251.namprd12.prod.outlook.com (2603:10b6:610:1bd::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.26; Wed, 28 Jun
- 2023 09:03:21 +0000
-Received: from CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::66d8:40d2:14ed:7697]) by CY5PR12MB6179.namprd12.prod.outlook.com
- ([fe80::66d8:40d2:14ed:7697%5]) with mapi id 15.20.6500.045; Wed, 28 Jun 2023
- 09:03:21 +0000
-Date:   Wed, 28 Jun 2023 12:03:14 +0300
-From:   Ido Schimmel <idosch@nvidia.com>
-To:     Zhengchao Shao <shaozhengchao@huawei.com>
-Cc:     netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, petrm@nvidia.com,
-        jiri@resnulli.us, vadimp@nvidia.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net] mlxsw: minimal: fix potential memory leak in
- mlxsw_m_linecards_init
-Message-ID: <ZJv3Uis/ePiRKIfc@shredder>
-References: <20230628005410.1524682-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628005410.1524682-1-shaozhengchao@huawei.com>
-X-ClientProxiedBy: VI1P195CA0096.EURP195.PROD.OUTLOOK.COM
- (2603:10a6:802:59::49) To CY5PR12MB6179.namprd12.prod.outlook.com
- (2603:10b6:930:24::22)
+        id S234226AbjF1JUY (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 05:20:24 -0400
+Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:32203 "EHLO
+        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S235693AbjF1JHO (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 05:07:14 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+        s=mimecast20190719; t=1687943189;
+        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+         content-transfer-encoding:content-transfer-encoding:
+         in-reply-to:in-reply-to:references:references;
+        bh=9Mt+AGh8pL9GItdGuqz+S5zOSB1kzaQK/lmag+rkrIs=;
+        b=KK1FzOMqURE4S/wL68F51h7oMCjjRr51/RHhRGsUpgLf2mnad/1eVWtCSdLTWQwJ+Ii2P5
+        zbc3NO1tUS4opW2QpYpUj2MEsSjcKqFFiTqVjAczb2lxO4oS/VxuVgz+WsQt2BVLnIMqIi
+        g5kiZzbHaQKylrgiJ5mS+dYCRuoiIzc=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-303-8Zqm8Q3gNqmfJXZiFwoBPw-1; Wed, 28 Jun 2023 05:06:28 -0400
+X-MC-Unique: 8Zqm8Q3gNqmfJXZiFwoBPw-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-765ad67e600so58306385a.0
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:06:28 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687943188; x=1690535188;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=9Mt+AGh8pL9GItdGuqz+S5zOSB1kzaQK/lmag+rkrIs=;
+        b=jzFo3HoLAMN8k4ylcCz1fYphR/FZmbYybxDweQmI4ayP6VGlJ9Op5N7s0B/8UAboY5
+         D3uZiuHM2yjSirLHrVd3SltIjqs+GmQeM2tiK/OH6ilh9Fy9RthFxUXR4J26yxFe0Vxd
+         1gDaSQ0n0WGNuPHbgkzlhppPwzBi3Usba+p+dvY+JwEjt6h2fNAZmbs0CRhA+6dQb7Gr
+         /siu5NaX+dYjVMLAtNOMPG9pE/SVuddp4r9qLPVhfLhm0ZI8vE2FVukXMjo6Ahc+VXfC
+         w4HHeRtrIkaHNpBMk03EhA+Sy6tBb0sqfdoEss8fIbw4f8VDT1qbYgiBFXZn41H2++IR
+         vgTw==
+X-Gm-Message-State: AC+VfDz1Ci7atIM5DPw36XKNt98/6pIXMZI5OoTB+Ir9+c2kvBhlXJbt
+        ghjKhws/O2u90WyuWiAVXwhCSVvKba1WRfyog8I8a3y7yIn38kyqDJnosuEQxKB/Y+9fOfZk8Kv
+        CfjXHj79N0ks5a5iQ
+X-Received: by 2002:a05:620a:190e:b0:765:3b58:99ab with SMTP id bj14-20020a05620a190e00b007653b5899abmr6305766qkb.4.1687943187641;
+        Wed, 28 Jun 2023 02:06:27 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7Pi+d+bIvaIEDtLwWVvkne70c3lcUzJGi2BHechnsH7bQHg9u9IfRMS66e/7JSp3u01eCa+w==
+X-Received: by 2002:a05:620a:190e:b0:765:3b58:99ab with SMTP id bj14-20020a05620a190e00b007653b5899abmr6305743qkb.4.1687943187280;
+        Wed, 28 Jun 2023 02:06:27 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-226-127.dyn.eolo.it. [146.241.226.127])
+        by smtp.gmail.com with ESMTPSA id pe34-20020a05620a852200b007623c96430csm3426449qkn.111.2023.06.28.02.06.25
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jun 2023 02:06:26 -0700 (PDT)
+Message-ID: <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+From:   Paolo Abeni <pabeni@redhat.com>
+To:     Ian Kumlien <ian.kumlien@gmail.com>
+Cc:     Alexander Lobakin <aleksander.lobakin@intel.com>,
+        intel-wired-lan <intel-wired-lan@lists.osuosl.org>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Eric Dumazet <edumazet@google.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date:   Wed, 28 Jun 2023 11:06:23 +0200
+In-Reply-To: <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
+References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+         <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+         <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com>
+         <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+         <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
+         <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+         <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+         <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
+         <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+         <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+         <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
+         <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
+         <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
+         <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CY5PR12MB6179:EE_|CH3PR12MB9251:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8b5b5e3a-812e-43dd-5878-08db77b685e4
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: YNx+RmOhh8NZEDf1PelysPU9iLkhgNxkD+E3IPD8KC5xTt1QATp1uT8/hlyYzfrNH3BNkR/eISenRm7o3/BDTHB4jx8T8koI4M0iIAlFUiAWb1nP2rUvKozpok0Kzy1fCsM0R9L26ScrKDRVsN61CpjIa+UTdST7n2Jn/dgvhnDPh7GP2FIC9yrIKfyLrHOCw/iadyHrb6v/LcT9MFK+beai1DhwMQdA3TzeJoq05vjnnfjVCDItAeq2GX7ziPe7gkqNM5ZCO1qYWTt2x1GqTmNbibRJKbRHpIMtLDvLSMzYwLhjG9L2qm2HkfC1rR3vmo+m1s6ZwIUz/Wj3jKhF421fpf+bdqbkpdMfklTR5fxTpqntjq/ZXZCxhmrFBCbphp8kQAd3M6P+VZ8gqaoFwfo1Tl+NdX8YU7xmPGFKlg7gnhfnfkbcW0s8cHYg3DobGzA5lCDrtjiWzHnCtXnAwrwhYOo3G5MP+LJEdHPQ8kgJpEaxol5XUTOdZ26zhWuq97i/0a6CPgyrorN4nFfXVKRU27HwaTVljIW6zrsIAIB6qfWxofwLMaVKH1JhmR3l
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CY5PR12MB6179.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(7916004)(136003)(366004)(39860400002)(396003)(346002)(376002)(451199021)(6512007)(26005)(86362001)(33716001)(41300700001)(6916009)(66556008)(4326008)(66946007)(66476007)(8936002)(316002)(38100700002)(8676002)(5660300002)(6506007)(6486002)(9686003)(186003)(83380400001)(6666004)(2906002)(478600001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?4/ibIJzhBIfUiSeWBi/UX7gj91QuJYfZrpN3P+gC3QYVN14YmlHB1JxfVpQa?=
- =?us-ascii?Q?6U2Pa9qGH5d/tJi8S1ZQGpO07IXvcYTdOsVNQcL7WvVgpyFguquHa1z/SeKw?=
- =?us-ascii?Q?4jTECvHX+SAGH6FFOmB79cJ0pjJHwTwiXaN1efulWxuEJgVSKYfR0xi/M0EL?=
- =?us-ascii?Q?blLBF66uINR0FHC/Opsy5OkQ9vECf4d0yfTdipJpX6CSj0Lyks0aJ6QzaQT0?=
- =?us-ascii?Q?A4eu/C7Kd/C5WPfqDkws6ZzOUjRnvuxycPCKR2ui7HwzLvX3Z87EhiNPe/k/?=
- =?us-ascii?Q?uG1h12blKUqOgnR6/Ux+Sk2k/ye4IPmezr9Easkr4s78QreNOSYMMtrFriaa?=
- =?us-ascii?Q?cUcjM93Iab6sLRVi2TrFcNcsB+/6rlki9We9Nq8x4lQVPfRL7BcRReVfxazt?=
- =?us-ascii?Q?BGaVEl1NoiuBAK/Xkm8opPrRR+hCnegOLOx0HPPIX0g4dxb0MQw3uRwKVtyR?=
- =?us-ascii?Q?7EoEKUcs78cJqe36n+S+tpt4qUSva7nJmMWW2FRsNPDuGG1BrkO7pxbIy3F5?=
- =?us-ascii?Q?chOGJgSp/00pmrH+Uq8dV8Rj2wqHfEHuLcA1nDZMq439pGko84GgxW8pP6EY?=
- =?us-ascii?Q?Ux0RCeyI0MpzaPdT3DJFq/bGo9BtS9CX1L3OFUaBt5Na8DLswiZQ69NnCNvb?=
- =?us-ascii?Q?FAS6KRKIOson4IJuCiRVpaeFNYohYAHHenHyb0RNI1SToKNpvTy+VG8m3dD5?=
- =?us-ascii?Q?p4ogbqfm80ax0wfU9HsSz3K3tidfepZCWdH6uulWXmYMmqmFXHPNE+xZuXRH?=
- =?us-ascii?Q?xfzy0xsmCFuaQKmiXl5a67Q+JM37kmkfXglPVf9kFp+OUF1n2AfR9jaHseIm?=
- =?us-ascii?Q?x+RynE8CvmUHU9N2wMhSpbZni8ToaFFa6lV0cc2xJvJonHbEHoROpn5zVOXh?=
- =?us-ascii?Q?96aIBtkbQ1pUIf2n8mbOFJcDgSxmDrblw1NV6K90T1Lh9aSfD+DAe2fchnj8?=
- =?us-ascii?Q?VZv3LIS7of4D3gorMJbzZ7DcEMajNAUwCj16s4uVf9ZTl21r3CGxZxvzsUAn?=
- =?us-ascii?Q?hSKIB6Ty1R8c7pGOOjfrXERc6xnLJwubxETLTSZVX10tkCKNkZtVD23qViKA?=
- =?us-ascii?Q?QuCvq1p0VRqz4tBKC25uJwWkLfH5Mt0XqPNHQ2+58eWdSTH15gTmi0Tql+c8?=
- =?us-ascii?Q?ct71AS4DTU33dvEyAfj7IExgI6QzWGYA2idWn4L/f7rwhWHUd4Yj3LAjXmAU?=
- =?us-ascii?Q?FXjTU9ws5KMQbujIJAAhUCv5U5FYavHCA6A54ZFdWrulfmN8/Ur1XJHLHN1f?=
- =?us-ascii?Q?2aIo39ix20DE/WVRqoH8HVQI+euxy0BbXxDLSieCKx6X/o7jqT85GRCyxRR7?=
- =?us-ascii?Q?Ns566z163zEO+2gSB/TWZUN0nlUVu8p82t2K+QyySFG3qB+FRnS8LN8tsyVV?=
- =?us-ascii?Q?V6pyXzoYGVqCMHfG/ljSHuotEnTHP2BtnRl1wmcpeaexA4+BOoQcfgkukKLN?=
- =?us-ascii?Q?azZ7s13W4OM71ME3zlspS38SFH+XtQOqpgKhXv42/N63oEiV9n1mudp7HEf0?=
- =?us-ascii?Q?V1uFcugQxJTuIQYLLh/xLWWPtstEPHVREER23wQC+K4sx6S4Ke8wGjoQzQfh?=
- =?us-ascii?Q?9UGP8Y5Zilc0cSnF8H8SKPu6X4HmCyxO6CVgZt2c?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8b5b5e3a-812e-43dd-5878-08db77b685e4
-X-MS-Exchange-CrossTenant-AuthSource: CY5PR12MB6179.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 09:03:21.7951
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 31QPOFmVWLLTTXEYPqZaMaEVZgYFuGBicSrzd8752tlvcYHQoOkSGJi1lnLc8QFHmciKb3gSJ8VLniuCz/5J+w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR12MB9251
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 08:54:10AM +0800, Zhengchao Shao wrote:
-> when allocating mlxsw_m->line_cards[] failed in mlxsw_m_linecards_init,
+Hello,
 
-s/when/When/
-s/allocating/the allocation of/
-s/failed/fails/
+On Wed, 2023-06-28 at 09:37 +0200, Ian Kumlien wrote:
+> Been running all night but eventually it crashed again...
+>=20
+> [21753.055795] Out of memory: Killed process 970 (qemu-system-x86)
+> total-vm:4709488kB, anon-rss:2172652kB, file-rss:4608kB,
+> shmem-rss:0kB, UID:77 pgtables:4800kB oom_score_adj:0
+> [24249.061154] general protection fault, probably for non-canonical
+> address 0xb0746d4e6bee35e2: 0000 [#1] PREEMPT SMP NOPTI
+> [24249.072138] CPU: 0 PID: 893 Comm: napi/eno1-68 Tainted: G        W
+>         6.4.0-dirty #366
+> [24249.080670] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
+> BIOS 1.7a 10/13/2022
+> [24249.088852] RIP: 0010:kmem_cache_alloc_bulk (mm/slub.c:377
+> mm/slub.c:388 mm/slub.c:395 mm/slub.c:3963 mm/slub.c:4026)
+> [24249.094086] Code: 0f 84 46 ff ff ff 65 ff 05 a4 bd e4 47 48 8b 4d
+> 00 65 48 03 0d e8 5f e3 47 9c 5e fa 45 31 d2 eb 2f 8b 45 28 48 01 d0
+> 48 89 c7 <48> 8b 00 48 33 85 b8 00 00 00 48 0f cf 48 31 f8 48 89 01 49
+> 89 17
+> All code
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>    0: 0f 84 46 ff ff ff    je     0xffffffffffffff4c
+>    6: 65 ff 05 a4 bd e4 47 incl   %gs:0x47e4bda4(%rip)        # 0x47e4bdb=
+1
+>    d: 48 8b 4d 00          mov    0x0(%rbp),%rcx
+>   11: 65 48 03 0d e8 5f e3 add    %gs:0x47e35fe8(%rip),%rcx        # 0x47=
+e36001
+>   18: 47
+>   19: 9c                    pushf
+>   1a: 5e                    pop    %rsi
+>   1b: fa                    cli
+>   1c: 45 31 d2              xor    %r10d,%r10d
+>   1f: eb 2f                jmp    0x50
+>   21: 8b 45 28              mov    0x28(%rbp),%eax
+>   24: 48 01 d0              add    %rdx,%rax
+>   27: 48 89 c7              mov    %rax,%rdi
+>   2a:* 48 8b 00              mov    (%rax),%rax <-- trapping instruction
+>   2d: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
+>   34: 48 0f cf              bswap  %rdi
+>   37: 48 31 f8              xor    %rdi,%rax
+>   3a: 48 89 01              mov    %rax,(%rcx)
+>   3d: 49 89 17              mov    %rdx,(%r15)
+>=20
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>    0: 48 8b 00              mov    (%rax),%rax
+>    3: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
+>    a: 48 0f cf              bswap  %rdi
+>    d: 48 31 f8              xor    %rdi,%rax
+>   10: 48 89 01              mov    %rax,(%rcx)
+>   13: 49 89 17              mov    %rdx,(%r15)
+> [24249.112951] RSP: 0018:ffff9fc303973d20 EFLAGS: 00010086
+> [24249.118275] RAX: b0746d4e6bee35e2 RBX: 0000000000000001 RCX: ffff8d5a2=
+fa31da0
+> [24249.125501] RDX: b0746d4e6bee3572 RSI: 0000000000000286 RDI: b0746d4e6=
+bee35e2
+> [24249.132730] RBP: ffff8d56c016d500 R08: 0000000000000400 R09: ffff8d56e=
+de0e67a
+> [24249.139958] R10: 0000000000000001 R11: ffff8d56c59d88c0 R12: 000000000=
+0000010
+> [24249.147187] R13: 0000000000000820 R14: ffff8d5a2fa2a810 R15: ffff8d5a2=
+fa2a818
+> [24249.154415] FS:  0000000000000000(0000) GS:ffff8d5a2fa00000(0000)
+> knlGS:0000000000000000
+> [24249.162620] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [24249.168471] CR2: 00007f0f3f7f8760 CR3: 0000000102466000 CR4: 000000000=
+03526f0
+> [24249.175717] Call Trace:
+> [24249.178268]  <TASK>
+> [24249.180476] ? die_addr (arch/x86/kernel/dumpstack.c:421
+> arch/x86/kernel/dumpstack.c:460)
+> [24249.183907] ? exc_general_protection (arch/x86/kernel/traps.c:783
+> arch/x86/kernel/traps.c:728)
+> [24249.188726] ? asm_exc_general_protection
+> (./arch/x86/include/asm/idtentry.h:564)
+> [24249.193720] ? kmem_cache_alloc_bulk (mm/slub.c:377 mm/slub.c:388
+> mm/slub.c:395 mm/slub.c:3963 mm/slub.c:4026)
+> [24249.198361] ? netif_receive_skb_list_internal (net/core/dev.c:5729)
+> [24249.203960] napi_skb_cache_get (net/core/skbuff.c:338)
+> [24249.208078] __napi_build_skb (net/core/skbuff.c:517)
+> [24249.211934] napi_build_skb (net/core/skbuff.c:541)
+> [24249.215616] ixgbe_poll
+> (drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:2165
+> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:2361
+> drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:3178)
+> [24249.219305] __napi_poll (net/core/dev.c:6498)
+> [24249.222905] napi_threaded_poll (./include/linux/netpoll.h:89
+> net/core/dev.c:6640)
+> [24249.227197] ? __napi_poll (net/core/dev.c:6625)
+> [24249.231050] kthread (kernel/kthread.c:379)
+> [24249.234300] ? kthread_complete_and_exit (kernel/kthread.c:332)
+> [24249.239207] ret_from_fork (arch/x86/entry/entry_64.S:314)
+> [24249.242892]  </TASK>
+> [24249.245185] Modules linked in: chaoskey
+> [24249.249133] ---[ end trace 0000000000000000 ]---
+> [24249.270157] pstore: backend (erst) writing error (-28)
+> [24249.275408] RIP: 0010:kmem_cache_alloc_bulk (mm/slub.c:377
+> mm/slub.c:388 mm/slub.c:395 mm/slub.c:3963 mm/slub.c:4026)
+> [24249.280660] Code: 0f 84 46 ff ff ff 65 ff 05 a4 bd e4 47 48 8b 4d
+> 00 65 48 03 0d e8 5f e3 47 9c 5e fa 45 31 d2 eb 2f 8b 45 28 48 01 d0
+> 48 89 c7 <48> 8b 00 48 33 85 b8 00 00 00 48 0f cf 48 31 f8 48 89 01 49
+> 89 17
+> All code
+> =3D=3D=3D=3D=3D=3D=3D=3D
+>    0: 0f 84 46 ff ff ff    je     0xffffffffffffff4c
+>    6: 65 ff 05 a4 bd e4 47 incl   %gs:0x47e4bda4(%rip)        # 0x47e4bdb=
+1
+>    d: 48 8b 4d 00          mov    0x0(%rbp),%rcx
+>   11: 65 48 03 0d e8 5f e3 add    %gs:0x47e35fe8(%rip),%rcx        # 0x47=
+e36001
+>   18: 47
+>   19: 9c                    pushf
+>   1a: 5e                    pop    %rsi
+>   1b: fa                    cli
+>   1c: 45 31 d2              xor    %r10d,%r10d
+>   1f: eb 2f                jmp    0x50
+>   21: 8b 45 28              mov    0x28(%rbp),%eax
+>   24: 48 01 d0              add    %rdx,%rax
+>   27: 48 89 c7              mov    %rax,%rdi
+>   2a:* 48 8b 00              mov    (%rax),%rax <-- trapping instruction
+>   2d: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
+>   34: 48 0f cf              bswap  %rdi
+>   37: 48 31 f8              xor    %rdi,%rax
+>   3a: 48 89 01              mov    %rax,(%rcx)
+>   3d: 49 89 17              mov    %rdx,(%r15)
+>=20
+> Code starting with the faulting instruction
+> =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+>    0: 48 8b 00              mov    (%rax),%rax
+>    3: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
+>    a: 48 0f cf              bswap  %rdi
+>    d: 48 31 f8              xor    %rdi,%rax
+>   10: 48 89 01              mov    %rax,(%rcx)
+>   13: 49 89 17              mov    %rdx,(%r15)
+> [24249.299578] RSP: 0018:ffff9fc303973d20 EFLAGS: 00010086
+> [24249.304917] RAX: b0746d4e6bee35e2 RBX: 0000000000000001 RCX: ffff8d5a2=
+fa31da0
+> [24249.312161] RDX: b0746d4e6bee3572 RSI: 0000000000000286 RDI: b0746d4e6=
+bee35e2
+> [24249.319407] RBP: ffff8d56c016d500 R08: 0000000000000400 R09: ffff8d56e=
+de0e67a
+> [24249.326651] R10: 0000000000000001 R11: ffff8d56c59d88c0 R12: 000000000=
+0000010
+> [24249.333896] R13: 0000000000000820 R14: ffff8d5a2fa2a810 R15: ffff8d5a2=
+fa2a818
+> [24249.341141] FS:  0000000000000000(0000) GS:ffff8d5a2fa00000(0000)
+> knlGS:0000000000000000
+> [24249.349356] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+> [24249.355206] CR2: 00007f0f3f7f8760 CR3: 0000000102466000 CR4: 000000000=
+03526f0
+> [24249.362452] Kernel panic - not syncing: Fatal exception in interrupt
+> [24249.566854] Kernel Offset: 0x36e00000 from 0xffffffff81000000
+> (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
+> [24249.594124] ---[ end Kernel panic - not syncing: Fatal exception in
+> interrupt ]---
+>=20
+> It's also odd that i get a OOM - it only seems to happen when i enable
+> rx-gro-list=C2=A0
 
-> the memory pointed by mlxsw_m->line_cards is not released, which will
-> cause memory leak. Memory release processing is added to the incorrect
-> path.
+Unfortunately, not the result I was looking for. That leads to more
+questions then answer, I'm sorry.
 
-Last sentence should be reworded to imperative mood.
+How long did the host keep going with rx-gro-list enabled?
 
-Personally, I would reword the commit message to something like:
+Did you observe the WARN_ON() introduced by the tentative fix?
 
-"
-The line cards array is not freed in the error path of
-mlxsw_m_linecards_init(), which can lead to a memory leak. Fix by
-freeing the array in the error path, thereby making the error path
-identical to mlxsw_m_linecards_fini().
-"
+> - it's also odd because this machine always has ~8GB of
+> memory available
 
-Thanks
+It looks like there is a memory leak somewhere, and I don't think the
+tentative fixup introduced such issue.
 
-> 
-> Fixes: 01328e23a476 ("mlxsw: minimal: Extend module to port mapping with slot index")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  drivers/net/ethernet/mellanox/mlxsw/minimal.c | 1 +
->  1 file changed, 1 insertion(+)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlxsw/minimal.c b/drivers/net/ethernet/mellanox/mlxsw/minimal.c
-> index 6b56eadd736e..6b98c3287b49 100644
-> --- a/drivers/net/ethernet/mellanox/mlxsw/minimal.c
-> +++ b/drivers/net/ethernet/mellanox/mlxsw/minimal.c
-> @@ -417,6 +417,7 @@ static int mlxsw_m_linecards_init(struct mlxsw_m *mlxsw_m)
->  err_kmalloc_array:
->  	for (i--; i >= 0; i--)
->  		kfree(mlxsw_m->line_cards[i]);
-> +	kfree(mlxsw_m->line_cards);
->  err_kcalloc:
->  	kfree(mlxsw_m->ports);
->  	return err;
-> -- 
-> 2.34.1
-> 
+It looks like the above splat is due to a slab corruption, which in
+turn could be unrelated from the mentioned leak, but it could/should=20
+be related to rx-gro-list.=20
+
+Could you please run the test with both kmemleak and kasan enabled?
+
+Additionally could you please disclose if you have non trivial
+netfilter and/or bridge filter and/or tc rules possibly modifying the
+incoming/egress packets?
+
+If kasan is not an option, could you please apply the debug the patch
+below? (on top of the previous one)
+
+Thanks!
+
+Paolo
+---
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6c5915efbc17..94adca27b205 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4295,6 +4295,8 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb,
+ 		delta_len +=3D nskb->len;
+=20
+ 		skb_push(nskb, -skb_network_offset(nskb) + offset);
++		if (WARN_ON_ONCE(nskb->data - skb->head > skb->tail))
++			goto err_linearize;
+=20
+ 		skb_release_head_state(nskb);
+ 		len_diff =3D skb_network_header_len(nskb) - skb_network_header_len(skb);
+@@ -4302,6 +4304,11 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb=
+,
+=20
+ 		skb_headers_offset_update(nskb, skb_headroom(nskb) - skb_headroom(skb));
+ 		nskb->transport_header +=3D len_diff;
++		if (WARN_ON_ONCE(tnl_hlen > skb_headroom(nskb)))
++			goto err_linearize;
++		if (WARN_ON_ONCE(skb_headroom(nskb) + offset > nskb->tail))
++			goto err_linearize;
++
+ 		skb_copy_from_linear_data_offset(skb, -tnl_hlen,
+ 						 nskb->data - tnl_hlen,
+ 						 offset + tnl_hlen);
+
+
