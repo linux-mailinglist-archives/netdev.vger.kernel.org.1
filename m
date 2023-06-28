@@ -1,195 +1,230 @@
-Return-Path: <netdev+bounces-14434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 601D0741336
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 16:02:34 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 435991C204F6
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 14:02:33 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37094C2DC;
-	Wed, 28 Jun 2023 14:02:31 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298B8BA2F
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 14:02:30 +0000 (UTC)
-Received: from mail-lf1-x136.google.com (mail-lf1-x136.google.com [IPv6:2a00:1450:4864:20::136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 63AF43A98
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 07:02:27 -0700 (PDT)
-Received: by mail-lf1-x136.google.com with SMTP id 2adb3069b0e04-4faaaa476a9so6165447e87.2
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 07:02:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1687960945; x=1690552945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=NeJJDtPNApCUCSNLbnRFD2Juhjv5XOx3haoMLR3t3E0=;
-        b=ZK23Wz5Z8GgdygT07do/GeGr7NCgPtbZJrbEsqK+sYNbzD9dq931xi8plPBr2KO/YC
-         c2ElDHPq2AXJLH8RWwZpB9knsmuQiwkA75793nzLpisqpqvUa59/U20kPPeRdhQAkFFo
-         EcsePNHr4CjPy3GTkqp1HQZS4o+ge1jZitdNMcjjH282ksos55LbhmkEg5xKNUQUAHkW
-         6elrjwozhdUiF5BEcoPrNlp7uOlNgyP51atS4qs5XQofDSmEJm98Sjm1IBUOaK7EQWtK
-         w84yxmQahBhA3t//6ifI1+JN4mdssr5CTku4Y6hA7S2ImLAYmYaBhDJ+IlVLNrGKFrhO
-         3CqQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687960945; x=1690552945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NeJJDtPNApCUCSNLbnRFD2Juhjv5XOx3haoMLR3t3E0=;
-        b=TY2sAfmX1qASydVJIh3sopnrM7VyS6tujXrH1flwjtePqdbRIikC/oKQIePQaZ1rFI
-         AMCMhCCD18+OLv5Jad5xW6FwYiL0o/Tn2+ey1IDEe/c54bwjcBWyzR/uJZ0XKBYTPxO9
-         +OH95nxdUDWZcah3Y1iB5+Tp8gH6lxi/8z2bZKI5UyWty0YkGbtpFuCRcLv1ruILJWsb
-         B6y8dHVsEuaEZz5oCp02VfTgWqd0GCTJvjSOHLIzTLWLWJqsq9LSSUIUGNcTbTY3Ta4W
-         L3bXZhJDOaBFwccYf6dFBghMHSQMcucEgBMYlAx8L9tk9RlmMPlwkz2Qqxaxh8cwq21h
-         nsEA==
-X-Gm-Message-State: AC+VfDxHTgGix8Rp0OZUT0cCiQsnr8u419sqiDoS+Pb6AhMzsj2fm5rm
-	w1UALa+XXsL7oK59W98c2+7MwA==
-X-Google-Smtp-Source: ACHHUZ5ZxgNTxIxoQXOSx9k7rDEhnxIvqJQLYYOVQL1GcheSfi0K/9HAYhI29JpjcdxZaZ1hTbJv2w==
-X-Received: by 2002:a05:6512:3412:b0:4fb:242:6e00 with SMTP id i18-20020a056512341200b004fb02426e00mr7754216lfr.41.1687960945439;
-        Wed, 28 Jun 2023 07:02:25 -0700 (PDT)
-Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id k8-20020a7bc408000000b003fba87298cesm4354984wmi.45.2023.06.28.07.02.24
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 07:02:24 -0700 (PDT)
-Date: Wed, 28 Jun 2023 16:02:23 +0200
-From: Jiri Pirko <jiri@resnulli.us>
-To: Vadim Fedorenko <vadim.fedorenko@linux.dev>
-Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"vadfed@meta.com" <vadfed@meta.com>,
-	"jonathan.lemon@gmail.com" <jonathan.lemon@gmail.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"corbet@lwn.net" <corbet@lwn.net>,
-	"davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>,
-	"Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
-	"M, Saeed" <saeedm@nvidia.com>, "leon@kernel.org" <leon@kernel.org>,
-	"richardcochran@gmail.com" <richardcochran@gmail.com>,
-	"sj@kernel.org" <sj@kernel.org>,
-	"javierm@redhat.com" <javierm@redhat.com>,
-	"ricardo.canuelo@collabora.com" <ricardo.canuelo@collabora.com>,
-	"mst@redhat.com" <mst@redhat.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>,
-	"Michalik, Michal" <michal.michalik@intel.com>,
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
-	"jacek.lawrynowicz@linux.intel.com" <jacek.lawrynowicz@linux.intel.com>,
-	"airlied@redhat.com" <airlied@redhat.com>,
-	"ogabbay@kernel.org" <ogabbay@kernel.org>,
-	"arnd@arndb.de" <arnd@arndb.de>,
-	"nipun.gupta@amd.com" <nipun.gupta@amd.com>,
-	"axboe@kernel.dk" <axboe@kernel.dk>,
-	"linux@zary.sk" <linux@zary.sk>,
-	"masahiroy@kernel.org" <masahiroy@kernel.org>,
-	"benjamin.tissoires@redhat.com" <benjamin.tissoires@redhat.com>,
-	"geert+renesas@glider.be" <geert+renesas@glider.be>,
-	"Olech, Milena" <milena.olech@intel.com>,
-	"kuniyu@amazon.com" <kuniyu@amazon.com>,
-	"liuhangbin@gmail.com" <liuhangbin@gmail.com>,
-	"hkallweit1@gmail.com" <hkallweit1@gmail.com>,
-	"razor@blackwall.org" <razor@blackwall.org>,
-	"idosch@nvidia.com" <idosch@nvidia.com>,
-	"lucien.xin@gmail.com" <lucien.xin@gmail.com>,
-	"nicolas.dichtel@6wind.com" <nicolas.dichtel@6wind.com>,
-	"phil@nwl.cc" <phil@nwl.cc>,
-	"claudiajkang@gmail.com" <claudiajkang@gmail.com>,
-	"linux-doc@vger.kernel.org" <linux-doc@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>,
-	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>,
-	poros <poros@redhat.com>, mschmidt <mschmidt@redhat.com>,
-	"linux-clk@vger.kernel.org" <linux-clk@vger.kernel.org>
-Subject: Re: [RFC PATCH v9 00/10] Create common DPLL configuration API
-Message-ID: <ZJw9b9RQamu0cLN+@nanopsycho>
-References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
- <ZJq3a6rl6dnPMV17@nanopsycho>
- <DM6PR11MB4657084DDD7554663F86C1C19B24A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <DM6PR11MB4657A1ACB586AD9B45C7996E9B24A@DM6PR11MB4657.namprd11.prod.outlook.com>
- <2e9ce197-2732-d061-b11d-4f4513af6abc@linux.dev>
- <ZJwxHucKMwCQMMVM@nanopsycho>
- <4ebfa74e-8998-a1af-e6b9-3701008900ec@linux.dev>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id C427B74133E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 16:03:02 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S232304AbjF1OCw (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 10:02:52 -0400
+Received: from mx0b-001b2d01.pphosted.com ([148.163.158.5]:35700 "EHLO
+        mx0b-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S232512AbjF1OB2 (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 10:01:28 -0400
+Received: from pps.filterd (m0360072.ppops.net [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SDwCaC011560;
+        Wed, 28 Jun 2023 14:01:17 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=/wLhX1HyhLq2YcKKsuaTl/6E5npNMHyTZmuJ0bSjbvA=;
+ b=oMd5EMLNVJBrRqU8ky7kByuIDSJmGbDOfUV9dda2l+f4pR0Lyj3T6jYBAD/W31rWB3Qk
+ EUxRgbFITs/Fh5tjpt1SFolCytpu4HuKv3efmuFmJT1djfH1ATG0ouAye15ahWenh0u1
+ yyGIur2BCBINgG615TLKgeqBwJlPkzQVuHVFXB0y0M/4ngtSoV+AtiiUUmwMSHRzLMRY
+ CMp0Q5hENjcl3v1OydpVrkDFzkeNMpR4AIhLFW7w0Ya60u33pZ1SD0sFnmgSH/XrAlHu
+ 2y4jtV01e6SWEgCgcrsZwwjPYnL4N0nB8gAu7XH62Me/6mp9QwZQpD4pgTpxX3lq7S7/ Zg== 
+Received: from pps.reinject (localhost [127.0.0.1])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rgp3nga5g-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Jun 2023 14:01:15 +0000
+Received: from m0360072.ppops.net (m0360072.ppops.net [127.0.0.1])
+        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35SDpv9G025098;
+        Wed, 28 Jun 2023 14:01:15 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rgp3nga44-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Jun 2023 14:01:15 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+        by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35SAt8Q5001850;
+        Wed, 28 Jun 2023 14:01:13 GMT
+Received: from smtprelay01.fra02v.mail.ibm.com ([9.218.2.227])
+        by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3rdr451y2e-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Jun 2023 14:01:13 +0000
+Received: from smtpav05.fra02v.mail.ibm.com (smtpav05.fra02v.mail.ibm.com [10.20.54.104])
+        by smtprelay01.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35SE198W20841206
+        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+        Wed, 28 Jun 2023 14:01:09 GMT
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id A1A5120043;
+        Wed, 28 Jun 2023 14:01:09 +0000 (GMT)
+Received: from smtpav05.fra02v.mail.ibm.com (unknown [127.0.0.1])
+        by IMSVA (Postfix) with ESMTP id 6DFC82004D;
+        Wed, 28 Jun 2023 14:01:09 +0000 (GMT)
+Received: from [9.155.198.239] (unknown [9.155.198.239])
+        by smtpav05.fra02v.mail.ibm.com (Postfix) with ESMTP;
+        Wed, 28 Jun 2023 14:01:09 +0000 (GMT)
+Message-ID: <6282d9ad-59b0-5648-74da-7923b07843b4@linux.ibm.com>
+Date:   Wed, 28 Jun 2023 16:01:09 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Subject: Re: [PATCH] s390/lcs: Remove FDDI option
+To:     Alexandra Winter <wintera@linux.ibm.com>,
+        David Miller <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        Eric Dumazet <edumazet@google.com>
+Cc:     Randy Dunlap <rdunlap@infradead.org>,
+        Simon Horman <simon.horman@corigine.com>,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>
+References: <20230628135736.13339-1-wintera@linux.ibm.com>
+Content-Language: en-US
+From:   Christian Borntraeger <borntraeger@linux.ibm.com>
+In-Reply-To: <20230628135736.13339-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: Z_QObUGkYSLknpdyq1kgbDzZldOQsaev
+X-Proofpoint-GUID: t6AR6Q4nkHAxKXyyyY6hc-3BSwEMBOXq
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <4ebfa74e-8998-a1af-e6b9-3701008900ec@linux.dev>
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-28_09,2023-06-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxscore=0 spamscore=0
+ lowpriorityscore=0 adultscore=0 malwarescore=0 bulkscore=0 suspectscore=0
+ phishscore=0 mlxlogscore=999 classifier=spam adjust=0 reason=mlx
+ scancount=1 engine=8.12.0-2305260000 definitions=main-2306280120
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-Wed, Jun 28, 2023 at 03:22:00PM CEST, vadim.fedorenko@linux.dev wrote:
->On 28/06/2023 14:09, Jiri Pirko wrote:
->> Wed, Jun 28, 2023 at 01:11:19PM CEST, vadim.fedorenko@linux.dev wrote:
->> > On 28/06/2023 10:27, Kubalewski, Arkadiusz wrote:
->> > > > From: Kubalewski, Arkadiusz
->> > > > Sent: Wednesday, June 28, 2023 11:15 AM
->> > > > 
->> > > > > From: Jiri Pirko <jiri@resnulli.us>
->> > > > > Sent: Tuesday, June 27, 2023 12:18 PM
->> > > > > 
->> > > > > Fri, Jun 23, 2023 at 02:38:10PM CEST, arkadiusz.kubalewski@intel.com
->> > > > wrote:
->> > > > > 
->> > > > > > v8 -> v9:
->> > > > > 
->> > > > > Could you please address all the unresolved issues from v8 and send v10?
->> > > > > I'm not reviewing this one.
->> > > > > 
->> > > > > Thanks!
->> > > > 
->> > > > Sure, will do, but first missing to-do/discuss list:
->> > > > 1) remove mode_set as not used by any driver
->> > > > 2) remove "no-added-value" static functions descriptions in
->> > > >     dpll_core/dpll_netlink
->> > > > 3) merge patches [ 03/10, 04/10, 05/10 ] into patches that are compiling
->> > > >     after each patch apply
->> > > > 4) remove function return values descriptions/lists
->> > > > 5) Fix patch [05/10]:
->> > > >     - status Supported
->> > > >     - additional maintainers
->> > > >     - remove callback:
->> > > >       int (*source_pin_idx_get)(...) from `struct dpll_device_ops`
->> > > > 6) Fix patch [08/10]: rethink ice mutex locking scheme
->> > > > 7) Fix patch [09/10]: multiple comments on
->> > > > https://lore.kernel.org/netdev/ZIQu+%2Fo4J0ZBspVg@nanopsycho/#t
->> > > > 8) add PPS DPLL phase offset to the netlink get-device API
->> > > > 
->> > > > Thank you!
->> > > > Arkadiusz
->> > > 
->> > > If someone has any objections please state them now, I will work on
->> > > all above except 5) and 7).
->> > > Vadim, could you take care of those 2 points?
->> > > 
->> > Yeah, sure, I'll update 5 and 7.
->> > I'm not sure about 8) - do we really need this info, I believe every
->> > supported DPLL device exports PTP device as well. But I'm Ok to add this
->> > feature too.
->> 
->> Could you add the notification work while you are at it? I don't want
->> that to be forgotten. Thanks!
->
->Sure, Jiri, I'm working on it for ptp_ocp.
+Am 28.06.23 um 15:57 schrieb Alexandra Winter:
+> The last s390 machine that supported FDDI was z900 ('7th generation',
+> released in 2000). The oldest machine generation currently supported by
+> the Linux kernel is MARCH_Z10 (released 2008). If there is still a usecase
+> for connecting a Linux on s390 instance to a LAN Channel Station (LCS), it
+> can only do so via Ethernet.
+> 
+> Randy Dunlap[1] found that LCS over FDDI has never worked, when FDDI
+> was compiled as module. Instead of fixing that, remove the FDDI option
+> from the lcs driver.
+> 
+> While at it, make the CONFIG_LCS description a bit more helpful.
+> 
+> References:
+> [1] https://lore.kernel.org/netdev/20230621213742.8245-1-rdunlap@infradead.org/
+> 
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
 
-Yep, cool!
+Makes perfect sense given the complexity.
 
->
->> > 
->> > > Thank you!
->> > > Arkadiusz
->> > 
->
+Acked-by: Christian Borntraeger <borntraeger@linux.ibm.com>
 
+
+> ---
+>   drivers/s390/net/Kconfig |  5 ++---
+>   drivers/s390/net/lcs.c   | 39 ++++++---------------------------------
+>   2 files changed, 8 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+> index 9c67b97faba2..74760c1a163b 100644
+> --- a/drivers/s390/net/Kconfig
+> +++ b/drivers/s390/net/Kconfig
+> @@ -5,12 +5,11 @@ menu "S/390 network device drivers"
+>   config LCS
+>   	def_tristate m
+>   	prompt "Lan Channel Station Interface"
+> -	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +	depends on CCW && NETDEVICES && ETHERNET
+>   	help
+>   	  Select this option if you want to use LCS networking on IBM System z.
+> -	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+>   	  To compile as a module, choose M. The module name is lcs.
+> -	  If you do not know what it is, it's safe to choose Y.
+> +	  If you do not use LCS, choose N.
+>   
+>   config CTCM
+>   	def_tristate m
+> diff --git a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
+> index 9fd8e6f07a03..a1f2acd6fb8f 100644
+> --- a/drivers/s390/net/lcs.c
+> +++ b/drivers/s390/net/lcs.c
+> @@ -17,7 +17,6 @@
+>   #include <linux/if.h>
+>   #include <linux/netdevice.h>
+>   #include <linux/etherdevice.h>
+> -#include <linux/fddidevice.h>
+>   #include <linux/inetdevice.h>
+>   #include <linux/in.h>
+>   #include <linux/igmp.h>
+> @@ -36,10 +35,6 @@
+>   #include "lcs.h"
+>   
+>   
+> -#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
+> -#error Cannot compile lcs.c without some net devices switched on.
+> -#endif
+> -
+>   /*
+>    * initialization string for output
+>    */
+> @@ -1601,19 +1596,11 @@ lcs_startlan_auto(struct lcs_card *card)
+>   	int rc;
+>   
+>   	LCS_DBF_TEXT(2, trace, "strtauto");
+> -#ifdef CONFIG_ETHERNET
+>   	card->lan_type = LCS_FRAME_TYPE_ENET;
+>   	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+>   	if (rc == 0)
+>   		return 0;
+>   
+> -#endif
+> -#ifdef CONFIG_FDDI
+> -	card->lan_type = LCS_FRAME_TYPE_FDDI;
+> -	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+> -	if (rc == 0)
+> -		return 0;
+> -#endif
+>   	return -EIO;
+>   }
+>   
+> @@ -1806,22 +1793,16 @@ lcs_get_frames_cb(struct lcs_channel *channel, struct lcs_buffer *buffer)
+>   			card->stats.rx_errors++;
+>   			return;
+>   		}
+> -		/* What kind of frame is it? */
+> -		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL) {
+> -			/* Control frame. */
+> +		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL)
+>   			lcs_get_control(card, (struct lcs_cmd *) lcs_hdr);
+> -		} else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET ||
+> -			   lcs_hdr->type == LCS_FRAME_TYPE_TR ||
+> -			   lcs_hdr->type == LCS_FRAME_TYPE_FDDI) {
+> -			/* Normal network packet. */
+> +		else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET)
+>   			lcs_get_skb(card, (char *)(lcs_hdr + 1),
+>   				    lcs_hdr->offset - offset -
+>   				    sizeof(struct lcs_header));
+> -		} else {
+> -			/* Unknown frame type. */
+> -			; // FIXME: error message ?
+> -		}
+> -		/* Proceed to next frame. */
+> +		else
+> +			dev_info_once(&card->dev->dev,
+> +				      "Unknown frame type %d\n",
+> +				      lcs_hdr->type);
+>   		offset = lcs_hdr->offset;
+>   		lcs_hdr->offset = LCS_ILLEGAL_OFFSET;
+>   		lcs_hdr = (struct lcs_header *) (buffer->data + offset);
+> @@ -2140,18 +2121,10 @@ lcs_new_device(struct ccwgroup_device *ccwgdev)
+>   		goto netdev_out;
+>   	}
+>   	switch (card->lan_type) {
+> -#ifdef CONFIG_ETHERNET
+>   	case LCS_FRAME_TYPE_ENET:
+>   		card->lan_type_trans = eth_type_trans;
+>   		dev = alloc_etherdev(0);
+>   		break;
+> -#endif
+> -#ifdef CONFIG_FDDI
+> -	case LCS_FRAME_TYPE_FDDI:
+> -		card->lan_type_trans = fddi_type_trans;
+> -		dev = alloc_fddidev(0);
+> -		break;
+> -#endif
+>   	default:
+>   		LCS_DBF_TEXT(3, setup, "errinit");
+>   		pr_err(" Initialization failed\n");
