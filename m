@@ -1,193 +1,107 @@
-Return-Path: <netdev+bounces-14438-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14439-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 36E2A7414EF
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 17:28:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334FF7414F5
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 17:29:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E66B8280DF4
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:28:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1A59A1C2031A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:29:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59E1ED306;
-	Wed, 28 Jun 2023 15:28:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EEA47C8EB;
+	Wed, 28 Jun 2023 15:29:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4B7C4D2E3;
-	Wed, 28 Jun 2023 15:28:02 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC707268E;
-	Wed, 28 Jun 2023 08:28:00 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@breakpoint.cc>)
-	id 1qEX5L-00082H-J5; Wed, 28 Jun 2023 17:27:59 +0200
-From: Florian Westphal <fw@strlen.de>
-To: <bpf@vger.kernel.org>
-Cc: "ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev, dxu@dxuuu.xyz"@breakpoint.cc,
-	<netdev@vger.kernel.org>,
-	Florian Westphal <fw@strlen.de>
-Subject: [PATCH bpf-next v4 2/2] selftests/bpf: Add bpf_program__attach_netfilter helper test
-Date: Wed, 28 Jun 2023 17:27:38 +0200
-Message-Id: <20230628152738.22765-3-fw@strlen.de>
-X-Mailer: git-send-email 2.39.3
-In-Reply-To: <20230628152738.22765-1-fw@strlen.de>
-References: <20230628152738.22765-1-fw@strlen.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E356BC8E3
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 15:29:51 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 74C9F268E;
+	Wed, 28 Jun 2023 08:29:48 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=qvuSyp7Pgubh7X2uYtTckk5E96WXw9yx8a7ad2phyoE=; b=d4gOg6G8/Yj2ZeR0Ny0H+Z4L+F
+	rnUWrxAV2mn/anSVRM8tnDj9kb1rwAgTy4w7zIMKAE0Enx1h0c4XYwi22QzLHNvRP17aUqr9eazE/
+	JKvhDe+wev1SUuwtSU3o444yiKG9AqufILPBPtAgabwIbii4HFcfjwMRjpg00A1oGM4Qly3TS7m59
+	h+S4ajQRIKpJnfSUv5J4Xm5YbenM+l2r7OsjkcySshFBaZCqXHBYeIPyYn/YKJYeoXsc212RFtGWl
+	ewOkZiiuKDGsXA7klj4l31xJf0c7wu9ru35gsv8I+U3OtPFcWhLwf2ygm8ahqHV6m4rQxpGb2tG/v
+	ABGilttA==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qEX74-00Fzrz-2c;
+	Wed, 28 Jun 2023 15:29:46 +0000
+Message-ID: <79116003-1c43-fedb-75ec-744e55a94660@infradead.org>
+Date: Wed, 28 Jun 2023 08:29:44 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+Content-Language: en-US
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Simon Horman <simon.horman@corigine.com>
+Cc: linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+ <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+ <ZJP99hSRt5MakBXC@corigine.com>
+ <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
+ <7f585168-7296-58aa-7fdb-c2aa08f346f4@infradead.org>
+ <510b6216-35e5-5ea1-525f-5fab35b901e0@infradead.org>
+ <a05a7c3a-0f2f-c3be-3630-6774a26b994f@linux.ibm.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <a05a7c3a-0f2f-c3be-3630-6774a26b994f@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-3.8 required=5.0 tests=ANY_BOUNCE_MESSAGE,BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,VBOUNCE_MESSAGE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Call bpf_program__attach_netfilter() with different
-protocol/hook/priority combinations.
 
-Test fails if supposedly-illegal attachments work
-(e.g., bogus protocol family, illegal priority and so on) or if a
-should-work attachment fails.  Expected output:
 
- ./test_progs -t netfilter_link_attach
- #145/1   netfilter_link_attach/allzero:OK
- #145/2   netfilter_link_attach/invalid-pf:OK
- #145/3   netfilter_link_attach/invalid-hooknum:OK
- #145/4   netfilter_link_attach/invalid-priority-min:OK
- #145/5   netfilter_link_attach/invalid-priority-max:OK
- #145/6   netfilter_link_attach/invalid-flags:OK
- #145/7   netfilter_link_attach/invalid-inet-not-supported:OK
- #145/8   netfilter_link_attach/attach ipv4:OK
- #145/9   netfilter_link_attach/attach ipv6:OK
+On 6/28/23 06:41, Alexandra Winter wrote:
+> 
+> 
+> On 28.06.23 07:06, Randy Dunlap wrote:
+>> Hi Alexandra, Simon, others,
+>>
+>> Here is v2 of this patch. I will send it formally after the merge window closes.
+>>
+>> Thanks for all of your help.
+>> ---
+> 
+> Thank you for the patch, Randy.
+> 
+> As suggested by Christian Bornträger, I did some research, whether the FDDI part of the LCS driver
+> could be removed. And actually there is no s390 machine above the minimum architecture level that
+> can have an FDDI interface.
+> I will send a patch to remove the FDDI option from the lcs driver.
+> 
+> I apologize that I was not aware of that earlier. And thank you again for pointing out the issue
+> with FDDI as a module.
 
-Signed-off-by: Florian Westphal <fw@strlen.de>
----
- .../bpf/prog_tests/netfilter_link_attach.c    | 86 +++++++++++++++++++
- .../bpf/progs/test_netfilter_link_attach.c    | 14 +++
- 2 files changed, 100 insertions(+)
- create mode 100644 tools/testing/selftests/bpf/prog_tests/netfilter_link_attach.c
- create mode 100644 tools/testing/selftests/bpf/progs/test_netfilter_link_attach.c
+No problem. Thanks for the new patch.
+I will trash all of my LCS patches. :)
 
-diff --git a/tools/testing/selftests/bpf/prog_tests/netfilter_link_attach.c b/tools/testing/selftests/bpf/prog_tests/netfilter_link_attach.c
-new file mode 100644
-index 000000000000..4297a2a4cb11
---- /dev/null
-+++ b/tools/testing/selftests/bpf/prog_tests/netfilter_link_attach.c
-@@ -0,0 +1,86 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+#include <netinet/in.h>
-+#include <linux/netfilter.h>
-+
-+#include "test_progs.h"
-+#include "test_netfilter_link_attach.skel.h"
-+
-+struct nf_link_test {
-+	__u32 pf;
-+	__u32 hooknum;
-+	__s32 priority;
-+	__u32 flags;
-+
-+	bool expect_success;
-+	const char * const name;
-+};
-+
-+static const struct nf_link_test nf_hook_link_tests[] = {
-+	{ .name = "allzero", },
-+	{ .pf = NFPROTO_NUMPROTO, .name = "invalid-pf", },
-+	{ .pf = NFPROTO_IPV4, .hooknum = 42, .name = "invalid-hooknum", },
-+	{ .pf = NFPROTO_IPV4, .priority = INT_MIN, .name = "invalid-priority-min", },
-+	{ .pf = NFPROTO_IPV4, .priority = INT_MAX, .name = "invalid-priority-max", },
-+	{ .pf = NFPROTO_IPV4, .flags = UINT_MAX, .name = "invalid-flags", },
-+
-+	{ .pf = NFPROTO_INET, .priority = 1, .name = "invalid-inet-not-supported", },
-+
-+	{ .pf = NFPROTO_IPV4, .priority = -10000, .expect_success = true, .name = "attach ipv4", },
-+	{ .pf = NFPROTO_IPV6, .priority =  10001, .expect_success = true, .name = "attach ipv6", },
-+};
-+
-+void test_netfilter_link_attach(void)
-+{
-+	struct test_netfilter_link_attach *skel;
-+	struct bpf_program *prog;
-+	LIBBPF_OPTS(bpf_netfilter_opts, opts);
-+	int i;
-+
-+	skel = test_netfilter_link_attach__open_and_load();
-+	if (!ASSERT_OK_PTR(skel, "test_netfilter_link_attach__open_and_load"))
-+		goto out;
-+
-+	prog = skel->progs.nf_link_attach_test;
-+	if (!ASSERT_OK_PTR(prog, "attach program"))
-+		goto out;
-+
-+	for (i = 0; i < ARRAY_SIZE(nf_hook_link_tests); i++) {
-+		struct bpf_link *link;
-+
-+		if (!test__start_subtest(nf_hook_link_tests[i].name))
-+			continue;
-+
-+#define X(opts, m, i)	opts.m = nf_hook_link_tests[(i)].m
-+		X(opts, pf, i);
-+		X(opts, hooknum, i);
-+		X(opts, priority, i);
-+		X(opts, flags, i);
-+#undef X
-+		link = bpf_program__attach_netfilter(prog, &opts);
-+		if (nf_hook_link_tests[i].expect_success) {
-+			struct bpf_link *link2;
-+
-+			if (!ASSERT_OK_PTR(link, "program attach successful"))
-+				continue;
-+
-+			link2 = bpf_program__attach_netfilter(prog, &opts);
-+			ASSERT_ERR_PTR(link2, "attach program with same pf/hook/priority");
-+
-+			if (!ASSERT_OK(bpf_link__destroy(link), "link destroy"))
-+				break;
-+
-+			link2 = bpf_program__attach_netfilter(prog, &opts);
-+			if (!ASSERT_OK_PTR(link2, "program reattach successful"))
-+				continue;
-+			if (!ASSERT_OK(bpf_link__destroy(link2), "link destroy"))
-+				break;
-+		} else {
-+			ASSERT_ERR_PTR(link, "program load failure");
-+		}
-+	}
-+
-+out:
-+	test_netfilter_link_attach__destroy(skel);
-+}
-+
-diff --git a/tools/testing/selftests/bpf/progs/test_netfilter_link_attach.c b/tools/testing/selftests/bpf/progs/test_netfilter_link_attach.c
-new file mode 100644
-index 000000000000..03a475160abe
---- /dev/null
-+++ b/tools/testing/selftests/bpf/progs/test_netfilter_link_attach.c
-@@ -0,0 +1,14 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+
-+#include "vmlinux.h"
-+#include <bpf/bpf_helpers.h>
-+
-+#define NF_ACCEPT 1
-+
-+SEC("netfilter")
-+int nf_link_attach_test(struct bpf_nf_ctx *ctx)
-+{
-+	return NF_ACCEPT;
-+}
-+
-+char _license[] SEC("license") = "GPL";
 -- 
-2.39.3
-
+~Randy
 
