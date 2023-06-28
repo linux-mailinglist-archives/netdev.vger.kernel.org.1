@@ -1,181 +1,327 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14442-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 7740B741773
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 19:48:44 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S229747AbjF1Rsi (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 13:48:38 -0400
-Received: from mail-bn8nam12on2041.outbound.protection.outlook.com ([40.107.237.41]:24891
-        "EHLO NAM12-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229732AbjF1Rsf (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Wed, 28 Jun 2023 13:48:35 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Bd1fA4iqYuayxruZEl1G7HuBrMCL4I1g2DK0F5cRMIt0eaOzEhLxBqC0yZ8whWeYpIyH+/NoDUw5596kw+VleqAuccSpUM2AwI+XZYV3sQXeouge02BaayYKnOmB9EgdiJ22Z69zmYG/Uz+K4EyaPWUHrRjhMtEDUbMM+yJJemlRH8ytZYQqXHnhYwaHx0vO4FapuTPSzTZpc95DzVNgBpYTuOWfWJryNp2GqBiW/k8RWvaL2O86wVMg+lmjivj1YNtvut2c1xFFYTR93n21oIITqe/qpEjaunjHeW9aDPEPE/uk79AWB98mnqVMgPCq31uaWZEQR2A23WEZgfq/mA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sD0vzjlQBs5bO1J19+Lz2NHMNz7FQUbjBqpd86qeeYA=;
- b=RAkcgL/tugOqWDAOUzPVIfL99hK3XQt6OpIMVr/cpDQfLU13hM5GceegmFEuSxhOehfLIrb3xJS+YiTL90UQXfo+EteTXB7NhtokkCDI0ar6UjbgzvmxfqCUamYhjCezoSlaD/sXTmIKCTAkGVGc8IgpMXIGhHvGYpmQjVXSQzrP/wXl/N7Kyp4cCAJjWaAEsplEzhc5YDZscqXe6EbnF3W1YNPCzl2TSE70DNkD7IUyL6IskULR4CR5w3iuyaLvBocW4EhjeUjoH1Zn8tDcQfIXetFonrKFPoqFzHr7Yo4Wo18tySVUMPsWIvILfeLRj4Xaqkj9AAkc4Va9SnpxOg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sD0vzjlQBs5bO1J19+Lz2NHMNz7FQUbjBqpd86qeeYA=;
- b=q/05xIruFvIbr80UVkRY5W+VwjDk+Np8MF7Oumu5e9V6R4ig9ACLmu9kgodcfpRaYhFsQ3XgysCypyEcGa0LT4vjscGukAtT38EXSMstZVWKXvEBTaMmuT4EZm7pSN92YBnmZORyZN9iF6F1d7IfWwa0k9cUuUGmd9N6HGj01j+XOYslTB9fPnCQtyKwwZtdKWgSqgH9u8twAJbpNoshVH5oNngfgflXtBScVsMappcRoMDnrRoi0vFPb9laqivtByqMiemKLLhT07PiLCy6vbKuFRD7mTqBKwPM9jv+ZDznq6lKswxPOphwe4hd+htE2rogRASDzxyE8g+OLTTiRg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com (2603:10b6:a03:61::28)
- by MW3PR12MB4505.namprd12.prod.outlook.com (2603:10b6:303:5a::24) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
- 2023 17:48:32 +0000
-Received: from BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::ecb0:2f8e:c4bf:b471]) by BYAPR12MB2743.namprd12.prod.outlook.com
- ([fe80::ecb0:2f8e:c4bf:b471%7]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
- 17:48:32 +0000
-From:   Rahul Rameshbabu <rrameshbabu@nvidia.com>
-To:     Andrew Lunn <andrew@lunn.ch>
-Cc:     netdev@vger.kernel.org, Richard Cochran <richardcochran@gmail.com>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Saeed Mahameed <saeed@kernel.org>,
-        Gal Pressman <gal@nvidia.com>,
-        "David S. Miller" <davem@davemloft.net>,
-        lkft-triage@lists.linaro.org, LTP List <ltp@lists.linux.it>,
-        Nathan Chancellor <nathan@kernel.org>,
-        Naresh Kamboju <naresh.kamboju@linaro.org>,
-        Linux Kernel Functional Testing <lkft@linaro.org>
-Subject: Re: [PATCH net v1] ptp: Make max_phase_adjustment sysfs device
- attribute invisible when not supported
-References: <20230627232139.213130-1-rrameshbabu@nvidia.com>
-        <7fa02bc1-64bd-483d-b3e9-f4ffe0bbb9fb@lunn.ch> <87ilb8ba1d.fsf@nvidia.com>
-        <0e82eff0-16ba-49b0-933d-26f49515d434@lunn.ch>
-Date:   Wed, 28 Jun 2023 10:48:21 -0700
-In-Reply-To: <0e82eff0-16ba-49b0-933d-26f49515d434@lunn.ch> (Andrew Lunn's
-        message of "Wed, 28 Jun 2023 16:35:41 +0200")
-Message-ID: <87ilb7qxzu.fsf@nvidia.com>
-User-Agent: Gnus/5.13 (Gnus v5.13) Emacs/28.2 (gnu/linux)
-Content-Type: text/plain
-X-ClientProxiedBy: BY5PR13CA0006.namprd13.prod.outlook.com
- (2603:10b6:a03:180::19) To BYAPR12MB2743.namprd12.prod.outlook.com
- (2603:10b6:a03:61::28)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BYAPR12MB2743:EE_|MW3PR12MB4505:EE_
-X-MS-Office365-Filtering-Correlation-Id: f2f29ae7-1250-434c-dbff-08db77ffe38e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 8UXaIPn72Q5IaqlKFta702tv9GjGyhqEbjLCff3Af5Ap5qL4AKNgv7Qcp5GTIpEVnYtEh++JMJ4bIAkaSHkzIMHe+DGLUjQ5BgukIfRPNoyYmaCeYsMcEYlpstGAlGsxGymM7f62NC/A/rYk+EfqcLXsGSs+jkvf7JmdgAYo4m6BlxHHdDQ/LFzWrRiih1b1A3cGHqZyzvLzpogalQHmkhuOdEHg5X1FS+TVKZ3YWvAH1jKJ0xbpjtBrkkf+YX76/z5/FEpcGXdLVgZS7F3Ys7H1EU3x0np0dxlOD/hqs9AB+qUjXbsyQuoe5zC0LaP62+Czz810GULlz7OGJg++tWh98T1LloItvPjzWYV3HwpLniZdVtoPH26Pty5HJRdVElrTViwzNf7rIjH0GVY6IP1hMfsiSFBDi3hqqbpGuCKIf9U7sWFrsMwD+PZXH2RNZilTsL/j/oYZl+yOSTap8uyemUdh/j+l+QUiq/IrZCx++LHim93Y0iCVtKxQFwLPAMkwZql695lJGoptSKwqp6GbMYx9/k6TQnBsl6FLwpiwUQ//ZkUk6c/8kAXOwwWAI0xVFbgTKWionmiqxFVCm42qZ4Kg5LKC52kSsB6xQrQ=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BYAPR12MB2743.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(136003)(396003)(39860400002)(376002)(346002)(451199021)(66556008)(7416002)(6916009)(5660300002)(36756003)(66476007)(86362001)(8676002)(316002)(41300700001)(38100700002)(8936002)(66946007)(4326008)(966005)(6506007)(26005)(6512007)(2906002)(186003)(478600001)(54906003)(6486002)(83380400001)(2616005)(6666004);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?UiSJQGj1QLHf4j06S5B6AqYvrb4JUbRMq/92a++sYVDir40oiEn4JGbD1ifa?=
- =?us-ascii?Q?JxTl/sXu8tYYq02JRjwS5piPApe8RQt0EWGIUQJWxNJDjTpp7l5bg9H1GzJC?=
- =?us-ascii?Q?BdVKcpEwUtSISboCPzhmvImMt5tWWae+XZYtxDfICqvM2yhEcSEjxxMG8AbZ?=
- =?us-ascii?Q?u2kYF3xiQuWtq0VspmAkUjqUmb5nQQ8R2iUF1HxeeDQzSOCy1eR2FUPnmjrn?=
- =?us-ascii?Q?/cvK2eg3wgFH+qkuLAp1VwBfNr4IQZFJLcOBhvofpd/ZZOdig6WB1T/GBFne?=
- =?us-ascii?Q?UiCxu5l/PXyhvnXifDji+bT4uOXzuu4B2rS4Qvqw6UWA0LHpG8fcR5CziO5d?=
- =?us-ascii?Q?2Dv/1x+sMItYB1GsG9LjusW9vtteEbIVi43emluxoheXXgjug11KTItD5/ec?=
- =?us-ascii?Q?V1XHQRaRkZsHGJ28hrVMoMMVi2LlY64cuP0/PD4g/4D2BrJgFuxycRanJp1B?=
- =?us-ascii?Q?/T1PlxNAfAaVEBo0xrvlt9R2xM+jrLGBF1/OWxHwYTOFds1EV8kfL/QnRsUt?=
- =?us-ascii?Q?OVX3NQAaykNbf0E1KG9WMRgvfWbww5VQQAZZ73hVgl7TDiHpvDQnB2R7bJtC?=
- =?us-ascii?Q?MIx3hOy0RsJTc1dn8ke7HIYdUKeYomygux6jTMg97+rrICQUKZUqwIpaj+IE?=
- =?us-ascii?Q?vLdRZXUswhc17Oe7Oxuu30k9QM9py6IF19XMsngOS3bfS58RVDfSPacVZoUM?=
- =?us-ascii?Q?mzCWfbzDUf4KJ4FQP2m2NWqbZ+hGII61LLPqacBPxZlUjmg76nlfJ7O0JWai?=
- =?us-ascii?Q?N2SQnhCxoWg1pVywyq6EA0tXK5NZonU295HIXpcivN22JgKDbRJhfXXcz6Z6?=
- =?us-ascii?Q?MbmXGr3PTmzU9WXuwMfxi2sy5FdwsxccvTpJKPye6mUhodpw/uDcLsEip0FL?=
- =?us-ascii?Q?/66MQpz+QbyKGcyTZzo9RhJZpU9TFdDJEoiazzwuLRZoQ81dx+K9ucV42+DR?=
- =?us-ascii?Q?k659IvTID9IhPEK3dWAgzoj2t9GlJW9nJoNqWrb7Vdn4grg4RYszhRNQCQ6C?=
- =?us-ascii?Q?bacwJCMT4wjSYm5FJvYCUcUCDnxMt1KjC2Czdf3hznLl+Kel6QZ05PNRVwHp?=
- =?us-ascii?Q?mgHZs9KKyO89XjSHGs0l9t+511BwIFftkqbSejimcuLzucawTk6paOz83s+h?=
- =?us-ascii?Q?c9aNFJETIBd9qmA6LdAHgiwq97QYesTzizJOPBEVA/2P2ztuEeVk9AzzVruw?=
- =?us-ascii?Q?ZhSvlgpZlySUKKSH+Njog3Uwy9FxgwF2WlAEgCV+ZcYSo6WU6Bl3OP757kwq?=
- =?us-ascii?Q?sPoiGLeNCbE8WEEFZeD1M3tCRr+rU/pTUZiLDrSee4wBoOZBjFmgMERL9hHT?=
- =?us-ascii?Q?Jf+l9aAfuiGZ1fB7ExtCCyiqK7IXjfsnycMP7NEIjbCXxX35N2nG+VPblpx4?=
- =?us-ascii?Q?jDQ819vCkZZPOg1jYoY1EfMP+7gZjysYwLVYmizykNKix6By98SQVS3qv4N7?=
- =?us-ascii?Q?s95gSnsUm4eMsXMdCpQFKGXLdcsyckEJyAXIiykOlqaHfkK0ZJCXzsYma8zm?=
- =?us-ascii?Q?coe8V3jOfpSecfvoW8cSGtp2NZIQXEa7aIK4PE+lYZJa5wvDKU5L0rr0LXEF?=
- =?us-ascii?Q?FrJ3QM8V19+BHqDe5tXvpofDTODCyAAZ7Ko3W2hdyCX8F0Ex/Mm21p4kz9xg?=
- =?us-ascii?Q?pw=3D=3D?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f2f29ae7-1250-434c-dbff-08db77ffe38e
-X-MS-Exchange-CrossTenant-AuthSource: BYAPR12MB2743.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 17:48:32.4060
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: wt8VLIH2ZmZTGGi7zkiNu1LGB9ZR9dMtbn8BExuHv7G0slB+MSwAES+sWBmDzWXEhYcUwAsw1X4191NX2g84mQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW3PR12MB4505
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 76080741796
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 19:57:34 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD9BE280D53
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 17:57:32 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0F0D51A;
+	Wed, 28 Jun 2023 17:57:28 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B202322E;
+	Wed, 28 Jun 2023 17:57:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D52BC433C8;
+	Wed, 28 Jun 2023 17:57:26 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687975046;
+	bh=sGdzZoRjT4g9yAAnk8VSoH0g5CyKtglm3SrmHU5ORDE=;
+	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
+	b=D/0hBH9uJQN8Jdo9CnGQEc5TKh9J735dfGksJZVxVBgthgIAXpcDlEe6C+wuHcPiM
+	 dz24j6pQ2SN4SKKD2QPw8BX9XnjL9SpBir7RxxDBr2W/txornvQ2vWCQ58pl/eHqGE
+	 ih2Lwe6fkh7Gr7UXETu0WiQss41IHxgxl8bDBmSiexEnGmCtYRaV65DJBvLTXe1GBV
+	 wNJIrNfAHYrOMEDhJCpxLcO07kSLIAtu4y2EvQlPrfTgytedeyYe6AU9MHpyDkbRv8
+	 GEM+KY8q6H6qcV8fQm0+Ydet9MrsSFQcMLahwRpretom2khUcbVHcQECNhBiGGhb4C
+	 TjLyYxPmuZvpQ==
+Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
+	id 23F50CE39D4; Wed, 28 Jun 2023 10:57:26 -0700 (PDT)
+Date: Wed, 28 Jun 2023 10:57:26 -0700
+From: "Paul E. McKenney" <paulmck@kernel.org>
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: daniel@iogearbox.net, andrii@kernel.org, void@manifault.com,
+	houtao@huaweicloud.com, tj@kernel.org, rcu@vger.kernel.org,
+	netdev@vger.kernel.org, bpf@vger.kernel.org, kernel-team@fb.com
+Subject: Re: [PATCH v3 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
+ similar to kfree_rcu().
+Message-ID: <6f8e0e91-44b4-4d0e-8df3-c1e765653255@paulmck-laptop>
+Reply-To: paulmck@kernel.org
+References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
+ <20230628015634.33193-13-alexei.starovoitov@gmail.com>
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628015634.33193-13-alexei.starovoitov@gmail.com>
 
-On Wed, 28 Jun, 2023 16:35:41 +0200 Andrew Lunn <andrew@lunn.ch> wrote:
->> > I also wounder if this really is something for net. How do you think
->> > this patch matches against the stable rules?
->> 
->> Apologize in advance but not sure I am following along. The commit for
->> the patch the introduces the problematic logic has made its way to net
->> and this patch is a fix. Therefore, isn't net the right tree to target?
->
-> Humm. So c3b60ab7a4df is in net-next, and the tag net-next-6.5. So it
-> was passed to Linus yesterday for merging. You would like this fix
-> merged either before -rc1, or just after -rc1.
+On Tue, Jun 27, 2023 at 06:56:33PM -0700, Alexei Starovoitov wrote:
+> From: Alexei Starovoitov <ast@kernel.org>
+> 
+> Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
+> Unlike bpf_mem_[cache_]free() that links objects for immediate reuse into
+> per-cpu free list the _rcu() flavor waits for RCU grace period and then moves
+> objects into free_by_rcu_ttrace list where they are waiting for RCU
+> task trace grace period to be freed into slab.
+> 
+> The life cycle of objects:
+> alloc: dequeue free_llist
+> free: enqeueu free_llist
+> free_rcu: enqueue free_by_rcu -> waiting_for_gp
+> free_llist above high watermark -> free_by_rcu_ttrace
+> after RCU GP waiting_for_gp -> free_by_rcu_ttrace
+> free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
+> 
+> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+> ---
+>  include/linux/bpf_mem_alloc.h |   2 +
+>  kernel/bpf/memalloc.c         | 129 +++++++++++++++++++++++++++++++++-
+>  2 files changed, 128 insertions(+), 3 deletions(-)
+> 
+> diff --git a/include/linux/bpf_mem_alloc.h b/include/linux/bpf_mem_alloc.h
+> index 3929be5743f4..d644bbb298af 100644
+> --- a/include/linux/bpf_mem_alloc.h
+> +++ b/include/linux/bpf_mem_alloc.h
+> @@ -27,10 +27,12 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma);
+>  /* kmalloc/kfree equivalent: */
+>  void *bpf_mem_alloc(struct bpf_mem_alloc *ma, size_t size);
+>  void bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr);
+> +void bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
+>  
+>  /* kmem_cache_alloc/free equivalent: */
+>  void *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma);
+>  void bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr);
+> +void bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
+>  void bpf_mem_cache_raw_free(void *ptr);
+>  void *bpf_mem_cache_alloc_flags(struct bpf_mem_alloc *ma, gfp_t flags);
+>  
+> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
+> index 40524d9454c7..3081d06a434c 100644
+> --- a/kernel/bpf/memalloc.c
+> +++ b/kernel/bpf/memalloc.c
+> @@ -101,6 +101,15 @@ struct bpf_mem_cache {
+>  	bool draining;
+>  	struct bpf_mem_cache *tgt;
+>  
+> +	/* list of objects to be freed after RCU GP */
+> +	struct llist_head free_by_rcu;
+> +	struct llist_node *free_by_rcu_tail;
+> +	struct llist_head waiting_for_gp;
+> +	struct llist_node *waiting_for_gp_tail;
+> +	struct rcu_head rcu;
+> +	atomic_t call_rcu_in_progress;
+> +	struct llist_head free_llist_extra_rcu;
+> +
+>  	/* list of objects to be freed after RCU tasks trace GP */
+>  	struct llist_head free_by_rcu_ttrace;
+>  	struct llist_head waiting_for_gp_ttrace;
+> @@ -344,6 +353,69 @@ static void free_bulk(struct bpf_mem_cache *c)
+>  	do_call_rcu_ttrace(tgt);
+>  }
+>  
+> +static void __free_by_rcu(struct rcu_head *head)
+> +{
+> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
+> +	struct bpf_mem_cache *tgt = c->tgt;
+> +	struct llist_node *llnode;
+> +
+> +	llnode = llist_del_all(&c->waiting_for_gp);
+> +	if (!llnode)
+> +		goto out;
+> +
+> +	llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace);
+> +
+> +	/* Objects went through regular RCU GP. Send them to RCU tasks trace */
+> +	do_call_rcu_ttrace(tgt);
+> +out:
+> +	atomic_set(&c->call_rcu_in_progress, 0);
+> +}
+> +
+> +static void check_free_by_rcu(struct bpf_mem_cache *c)
+> +{
+> +	struct llist_node *llnode, *t;
+> +	unsigned long flags;
+> +
+> +	/* drain free_llist_extra_rcu */
+> +	if (unlikely(!llist_empty(&c->free_llist_extra_rcu))) {
+> +		inc_active(c, &flags);
+> +		llist_for_each_safe(llnode, t, llist_del_all(&c->free_llist_extra_rcu))
+> +			if (__llist_add(llnode, &c->free_by_rcu))
+> +				c->free_by_rcu_tail = llnode;
+> +		dec_active(c, flags);
+> +	}
+> +
+> +	if (llist_empty(&c->free_by_rcu))
+> +		return;
+> +
+> +	if (atomic_xchg(&c->call_rcu_in_progress, 1)) {
+> +		/*
+> +		 * Instead of kmalloc-ing new rcu_head and triggering 10k
+> +		 * call_rcu() to hit rcutree.qhimark and force RCU to notice
+> +		 * the overload just ask RCU to hurry up. There could be many
+> +		 * objects in free_by_rcu list.
+> +		 * This hint reduces memory consumption for an artifical
+> +		 * benchmark from 2 Gbyte to 150 Mbyte.
+> +		 */
+> +		rcu_request_urgent_qs_task(current);
 
-It can be after -rc1. I understand your point now from this elaboration.
-Since the change is not heading towards a final release yet but a
-release candidate, it's not an "urgent" patch to be applied before -rc1.
+I have been going back and forth on whether rcu_request_urgent_qs_task()
+needs to throttle calls to itself, for example, to pay attention to only
+one invocation per jiffy.  The theory here is that RCU's state machine
+normally only advances about once per jiffy anyway.
 
->
-> We are in the grey area where it is less clear which tree it should be
-> against. So it is good to explain after the --- what your intention
-> is, so the Maintainers get a heads up and understand what you are
-> trying to achieve.
+The main risk of *not* throttling is if several CPUs were to invoke
+rcu_request_urgent_qs_task() in tight loops while those same CPUs were
+undergoing interrupt storms, which would result in heavy lock contention
+in __rcu_irq_enter_check_tick().  This is not exactly a common-case
+scenario, but on the other hand, if you are having this degree of trouble,
+should RCU really be adding lock contention to your troubles?
 
-Agreed, I could have used git notes for that in my patch generation.
-Noted for the future. Just to be clear, my intention is for this fix to
-make its way before the final 6.5 release (before the changes make their
-way to an end user since the NULL pointer dereference when reading that
-sysfs node from a PHC not supporting phase adjustment is problematic). I
-think the issue being present in a release candidate is a minor problem.
-Would I still keep the Fixes tag however if targeting net-next? I
-remember this email from Jakub where if a Fixes tag is used, the patch
-should end up in net rather than net-next. However, I fear that without
-a Fixes tag, targeting net-next would cause me to miss applying this
-fix before the 6.5 release.
+Thoughts?
 
-Link: https://lore.kernel.org/netdev/20230607091909.321fc5d7@kernel.org/
+							Thanx, Paul
 
------ BEGIN QUOTE -----
-  We'll obviously apply our own judgment but submitter should send all
-  fixes against net.
------- END QUOTE ------
+> +		return;
+> +	}
+> +
+> +	WARN_ON_ONCE(!llist_empty(&c->waiting_for_gp));
+> +
+> +	inc_active(c, &flags);
+> +	WRITE_ONCE(c->waiting_for_gp.first, __llist_del_all(&c->free_by_rcu));
+> +	c->waiting_for_gp_tail = c->free_by_rcu_tail;
+> +	dec_active(c, flags);
+> +
+> +	if (unlikely(READ_ONCE(c->draining))) {
+> +		free_all(llist_del_all(&c->waiting_for_gp), !!c->percpu_size);
+> +		atomic_set(&c->call_rcu_in_progress, 0);
+> +	} else {
+> +		call_rcu_hurry(&c->rcu, __free_by_rcu);
+> +	}
+> +}
+> +
+>  static void bpf_mem_refill(struct irq_work *work)
+>  {
+>  	struct bpf_mem_cache *c = container_of(work, struct bpf_mem_cache, refill_work);
+> @@ -358,6 +430,8 @@ static void bpf_mem_refill(struct irq_work *work)
+>  		alloc_bulk(c, c->batch, NUMA_NO_NODE);
+>  	else if (cnt > c->high_watermark)
+>  		free_bulk(c);
+> +
+> +	check_free_by_rcu(c);
+>  }
+>  
+>  static void notrace irq_work_raise(struct bpf_mem_cache *c)
+> @@ -486,6 +560,9 @@ static void drain_mem_cache(struct bpf_mem_cache *c)
+>  	free_all(llist_del_all(&c->waiting_for_gp_ttrace), percpu);
+>  	free_all(__llist_del_all(&c->free_llist), percpu);
+>  	free_all(__llist_del_all(&c->free_llist_extra), percpu);
+> +	free_all(__llist_del_all(&c->free_by_rcu), percpu);
+> +	free_all(__llist_del_all(&c->free_llist_extra_rcu), percpu);
+> +	free_all(llist_del_all(&c->waiting_for_gp), percpu);
+>  }
+>  
+>  static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
+> @@ -498,8 +575,8 @@ static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
+>  
+>  static void free_mem_alloc(struct bpf_mem_alloc *ma)
+>  {
+> -	/* waiting_for_gp_ttrace lists was drained, but __free_rcu might
+> -	 * still execute. Wait for it now before we freeing percpu caches.
+> +	/* waiting_for_gp[_ttrace] lists were drained, but RCU callbacks
+> +	 * might still execute. Wait for them.
+>  	 *
+>  	 * rcu_barrier_tasks_trace() doesn't imply synchronize_rcu_tasks_trace(),
+>  	 * but rcu_barrier_tasks_trace() and rcu_barrier() below are only used
+> @@ -508,7 +585,8 @@ static void free_mem_alloc(struct bpf_mem_alloc *ma)
+>  	 * rcu_trace_implies_rcu_gp(), it will be OK to skip rcu_barrier() by
+>  	 * using rcu_trace_implies_rcu_gp() as well.
+>  	 */
+> -	rcu_barrier_tasks_trace();
+> +	rcu_barrier(); /* wait for __free_by_rcu */
+> +	rcu_barrier_tasks_trace(); /* wait for __free_rcu */
+>  	if (!rcu_trace_implies_rcu_gp())
+>  		rcu_barrier();
+>  	free_mem_alloc_no_barrier(ma);
+> @@ -561,6 +639,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
+>  			irq_work_sync(&c->refill_work);
+>  			drain_mem_cache(c);
+>  			rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
+> +			rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
+>  		}
+>  		/* objcg is the same across cpus */
+>  		if (c->objcg)
+> @@ -577,6 +656,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
+>  				irq_work_sync(&c->refill_work);
+>  				drain_mem_cache(c);
+>  				rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
+> +				rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
+>  			}
+>  		}
+>  		if (c->objcg)
+> @@ -661,6 +741,27 @@ static void notrace unit_free(struct bpf_mem_cache *c, void *ptr)
+>  		irq_work_raise(c);
+>  }
+>  
+> +static void notrace unit_free_rcu(struct bpf_mem_cache *c, void *ptr)
+> +{
+> +	struct llist_node *llnode = ptr - LLIST_NODE_SZ;
+> +	unsigned long flags;
+> +
+> +	c->tgt = *(struct bpf_mem_cache **)llnode;
+> +
+> +	local_irq_save(flags);
+> +	if (local_inc_return(&c->active) == 1) {
+> +		if (__llist_add(llnode, &c->free_by_rcu))
+> +			c->free_by_rcu_tail = llnode;
+> +	} else {
+> +		llist_add(llnode, &c->free_llist_extra_rcu);
+> +	}
+> +	local_dec(&c->active);
+> +	local_irq_restore(flags);
+> +
+> +	if (!atomic_read(&c->call_rcu_in_progress))
+> +		irq_work_raise(c);
+> +}
+> +
+>  /* Called from BPF program or from sys_bpf syscall.
+>   * In both cases migration is disabled.
+>   */
+> @@ -694,6 +795,20 @@ void notrace bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr)
+>  	unit_free(this_cpu_ptr(ma->caches)->cache + idx, ptr);
+>  }
+>  
+> +void notrace bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
+> +{
+> +	int idx;
+> +
+> +	if (!ptr)
+> +		return;
+> +
+> +	idx = bpf_mem_cache_idx(ksize(ptr - LLIST_NODE_SZ));
+> +	if (idx < 0)
+> +		return;
+> +
+> +	unit_free_rcu(this_cpu_ptr(ma->caches)->cache + idx, ptr);
+> +}
+> +
+>  void notrace *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma)
+>  {
+>  	void *ret;
+> @@ -710,6 +825,14 @@ void notrace bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr)
+>  	unit_free(this_cpu_ptr(ma->cache), ptr);
+>  }
+>  
+> +void notrace bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
+> +{
+> +	if (!ptr)
+> +		return;
+> +
+> +	unit_free_rcu(this_cpu_ptr(ma->cache), ptr);
+> +}
+> +
+>  /* Directly does a kfree() without putting 'ptr' back to the free_llist
+>   * for reuse and without waiting for a rcu_tasks_trace gp.
+>   * The caller must first go through the rcu_tasks_trace gp for 'ptr'
+> -- 
+> 2.34.1
+> 
 
-I personally think this fix is "worthy" of targeting net based on the
-discussion Jakub previously provided, given the impact of reading the
-sysfs node on a system without this patch on PHCs that do not support
-phase adjustment.
-
->
-> I actually thought you were trying to fix an older issue, something in
-> 6.4 or older, which is what net is mostly used for. Under those
-> conditions, the stable rules apply. Things like, is this fixing an
-> issue which really effects users....
-
-Right, this was caught before it made its way to general users. I was
-basing targeting net still from the previous conversation about Fixes
-tags.
-
->
->        Andrew
-
-Thanks,
-
-Rahul Rameshbabu
