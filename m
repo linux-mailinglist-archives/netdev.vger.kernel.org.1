@@ -1,132 +1,102 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14445-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 6D11974187B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:01:06 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231347AbjF1S72 (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 14:59:28 -0400
-Received: from mga07.intel.com ([134.134.136.100]:31378 "EHLO mga07.intel.com"
-        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S231543AbjF1S5y (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Wed, 28 Jun 2023 14:57:54 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687978674; x=1719514674;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Jh6Yo68JB6oWFdtn/7iL8FqvlLcXmL6Fp0vlENpUr+0=;
-  b=JXAWgxXO/IPmWVr0JmXU7wbWIrILizHRa6eD7h0xB8Eiouk26C6jk5s7
-   tEFaeOaJfgl7GI81B2CFJMqjX3wET7QGxSXIbhpAGEvtYlFctPVsYO4BP
-   yVHxI59JbJvhgHcHixu+uKJr9Prf69AiUephnNHOoS80li8Lg0pnymkWB
-   ogWabBoZP7Gnws5SaEj0hiVQJOxnPaH6m0/WxgwdBL2POoLB+E5F36FE2
-   TbO3TZknbtHH7qZFKULnINlhs5rs/agB+FNQqbFD0oz4OKa2C2/+xou6W
-   g/JzQIRi2iRQRcWrdjJiQUQI5PHVeHpStegjcab5JMzoxaqNU6w7yfN5a
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="427946144"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="427946144"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 11:57:54 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="717069119"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="717069119"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 28 Jun 2023 11:57:51 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-        (envelope-from <lkp@intel.com>)
-        id 1qEaMQ-000DRd-38;
-        Wed, 28 Jun 2023 18:57:50 +0000
-Date:   Thu, 29 Jun 2023 02:57:23 +0800
-From:   kernel test robot <lkp@intel.com>
-To:     Revanth Kumar Uppala <ruppala@nvidia.com>, linux@armlinux.org.uk,
-        andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org
-Cc:     oe-kbuild-all@lists.linux.dev, linux-tegra@vger.kernel.org,
-        Revanth Kumar Uppala <ruppala@nvidia.com>,
-        Narayan Reddy <narayanr@nvidia.com>
-Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
-Message-ID: <202306290253.b8D3gQf8-lkp@intel.com>
-References: <20230628124326.55732-4-ruppala@nvidia.com>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628124326.55732-4-ruppala@nvidia.com>
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1426C741872
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 20:58:45 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C1A61C203B1
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 18:58:43 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D7B710797;
+	Wed, 28 Jun 2023 18:58:39 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 248E9D53A;
+	Wed, 28 Jun 2023 18:58:38 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BE34294E;
+	Wed, 28 Jun 2023 11:58:37 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b69e6cce7dso2341521fa.2;
+        Wed, 28 Jun 2023 11:58:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687978716; x=1690570716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7Pp3/6WHOX3IhCc8i+jwBDxBIWCrCEEZYNsbdhw2Vzw=;
+        b=kgOuC/NLgkBG5JldvkeV+tBAlM+B9NFfIH9O4aGGaoBZOE7oc66SQJLaHj4ERhZmPh
+         wZkOTTHK4PUL3fItkOi/fSIL8JsWCynhWfUwNY8HAPdwPGwQjSf+ZCYAalC+PGFBx67I
+         c782945YUvOPTn4d3EbeDqip024QyN/U0c7GUwuIlmkYIELt8P8NTExxXd0wG0RN2ZPS
+         Ui12zouCNxytvV4F2ii6kbh0JxyC/VKLle2p9QjFc0nweyHbZUpFNCCUjL3gOlu8BsSM
+         lcNh4Q8N3gTbq+dvcIa/ProtpWjm3QbOXLXepNI0Uqa+DKDju3SgcBwvXLdVScQYWE1k
+         ESyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687978716; x=1690570716;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=7Pp3/6WHOX3IhCc8i+jwBDxBIWCrCEEZYNsbdhw2Vzw=;
+        b=ckoHKplD25HvgYMRpiMst9E6LxhmkB2rGA6JDXlnKrlkx9CpcAMCROEWz0+kDGWr6W
+         PLyS3oXmVlTo48GdGV2AdXTXQp7NX+qxNcDjlaFOV9Ir+OUij2dSKqzhS45sTXeky5yO
+         jmLgAVfADptKKhPCy5xRj+XcrX/ycwICxkgMgE8g8DsWr8jX8rNyyw6HmPJV6LYqCeKm
+         zuP+SxM9BnVW+gJWZqiMMSVnfqiC29lr+SLqPSYePhOT9BH+tlkaFkMJzrXYTxjFYRjo
+         2k0/kkKkky+hyJ5TTUTBExBz0efoMGiIvW8e7ESAhN8rNxz+gUuTqSRb8xL3/SW0rrlg
+         FFBw==
+X-Gm-Message-State: AC+VfDwDfXha6uqh8HD5K9ZyDQN5juiIWcVlBxAw32O2X4nbkm7ZT28c
+	olb0I4LwJerGPVk6boJchLwrp0WvpkKE5x4xrz4Plm+k
+X-Google-Smtp-Source: ACHHUZ7MgzQGhT0lFe9/3LXZJAkDu1+MCARStQWQGqvkRxaBkspbafFeITgCyHqIpUd1CzkmIcfYTn4jCt/lmfkPKu0=
+X-Received: by 2002:a2e:8443:0:b0:2b1:edfe:8171 with SMTP id
+ u3-20020a2e8443000000b002b1edfe8171mr21883013ljh.36.1687978715441; Wed, 28
+ Jun 2023 11:58:35 -0700 (PDT)
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
+ <20230628015634.33193-7-alexei.starovoitov@gmail.com> <ZJxWR9SZ5lya+MN+@corigine.com>
+In-Reply-To: <ZJxWR9SZ5lya+MN+@corigine.com>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 28 Jun 2023 11:58:23 -0700
+Message-ID: <CAADnVQJcQif0ZvOeF4YD+KzR3Vp85qL=K=eyKkUvFhc4G_pgoA@mail.gmail.com>
+Subject: Re: [PATCH v3 bpf-next 06/13] bpf: Further refactor alloc_bulk().
+To: Simon Horman <simon.horman@corigine.com>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	David Vernet <void@manifault.com>, Hou Tao <houtao@huaweicloud.com>, 
+	"Paul E. McKenney" <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Kernel Team <kernel-team@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hi Revanth,
+On Wed, Jun 28, 2023 at 8:48=E2=80=AFAM Simon Horman <simon.horman@corigine=
+.com> wrote:
+>
+> On Tue, Jun 27, 2023 at 06:56:27PM -0700, Alexei Starovoitov wrote:
+> > From: Alexei Starovoitov <ast@kernel.org>
+> >
+> > In certain scenarios alloc_bulk() migth be taking free objects mainly f=
+rom
+>
+> Hi Alexi,
+>
+> checkpatch --codespell flags: 'migth' -> 'might'
+> It also flags some typos in several other patches in this series.
+> But it seems silly to flag them individually. So I'll leave this topic he=
+re.
 
-kernel test robot noticed the following build warnings:
+Thanks for flagging.
+Did you find this manually? bpf/netdev CI doesn't report such things.
 
-[auto build test WARNING on net/main]
-[also build test WARNING on net-next/main linus/master horms-ipvs/master v6.4 next-20230628]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Revanth-Kumar-Uppala/net-phy-aquantia-Enable-MAC-Controlled-EEE/20230628-204746
-base:   net/main
-patch link:    https://lore.kernel.org/r/20230628124326.55732-4-ruppala%40nvidia.com
-patch subject: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
-config: i386-randconfig-i013-20230628 (https://download.01.org/0day-ci/archive/20230629/202306290253.b8D3gQf8-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230629/202306290253.b8D3gQf8-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306290253.b8D3gQf8-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/net/phy/aquantia_main.c: In function 'aqr_handle_interrupt':
->> drivers/net/phy/aquantia_main.c:476:29: warning: unused variable 'priv' [-Wunused-variable]
-     476 |         struct aqr107_priv *priv = phydev->priv;
-         |                             ^~~~
-
-
-vim +/priv +476 drivers/net/phy/aquantia_main.c
-
-   473	
-   474	static irqreturn_t aqr_handle_interrupt(struct phy_device *phydev)
-   475	{
- > 476		struct aqr107_priv *priv = phydev->priv;
-   477		int irq_status;
-   478		int ret;
-   479	
-   480		ret = phy_read_mmd(phydev, MDIO_MMD_C22EXT, MDIO_C22EXT_GBE_PHY_SGMII_TX_ALARM1);
-   481		if (ret < 0) {
-   482			phy_error(phydev);
-   483			return IRQ_NONE;
-   484		}
-   485	
-   486		if ((ret & MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK) ==
-   487		    MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK) {
-   488			/* Disable the WoL */
-   489			ret = aqr113c_wol_disable(phydev);
-   490			if (ret < 0)
-   491				return IRQ_NONE;
-   492		}
-   493	
-   494		irq_status = phy_read_mmd(phydev, MDIO_MMD_AN,
-   495					  MDIO_AN_TX_VEND_INT_STATUS2);
-   496		if (irq_status < 0) {
-   497			phy_error(phydev);
-   498			return IRQ_NONE;
-   499		}
-   500	
-   501		if (!(irq_status & MDIO_AN_TX_VEND_INT_STATUS2_MASK))
-   502			return IRQ_NONE;
-   503	
-   504		phy_trigger_machine(phydev);
-   505	
-   506		return IRQ_HANDLED;
-   507	}
-   508	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
