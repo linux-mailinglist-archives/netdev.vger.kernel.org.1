@@ -1,116 +1,71 @@
-Return-Path: <netdev+bounces-14455-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14456-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 943497419FC
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:02:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C4BD7419FD
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:03:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C56A81C203B6
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:02:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E544A280CC3
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:03:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0EF81118B;
-	Wed, 28 Jun 2023 21:02:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AD711181;
+	Wed, 28 Jun 2023 21:03:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D554A11181
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:02:17 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87CA810F5
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 14:02:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687986135;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=x9506tjdRUpf919lvfhcv2C6YbXpf1fvzNXoPxI/AF8=;
-	b=OBzE8YKEz9Nh9e8OfQSjKHcPuyCMRQmzgwRrHJPwyh+DF9LlmZhEnZf2aiEGsgMpIxwMyk
-	NaWJLmzJrR9gg4JF26+sD6EucXwR5UYPM6NX4oFTk+a77msheDM2xkxRJfwc7jetixv0CX
-	2ufLSaL9UxRM395MUdQJp0vY6VNo2ZM=
-Received: from mail-wm1-f70.google.com (mail-wm1-f70.google.com
- [209.85.128.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-365-O5SxSL_sPHSCYtBO5tpP6g-1; Wed, 28 Jun 2023 17:02:09 -0400
-X-MC-Unique: O5SxSL_sPHSCYtBO5tpP6g-1
-Received: by mail-wm1-f70.google.com with SMTP id 5b1f17b1804b1-3fa83859fa4so1721875e9.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 14:02:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687986128; x=1690578128;
-        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x9506tjdRUpf919lvfhcv2C6YbXpf1fvzNXoPxI/AF8=;
-        b=HLm3tJz1AgafOwXVdg2ZbF3rWXTnUtYIgr6A+MLw9fTJP0a9hpzTsfTi5KSxVDnfUr
-         1AVk/c/5TbjvVDcEMN5jaXpit4aL3InqCh6Edxetd846nF870ebINg75de9UoJDZIm24
-         1UjDyRdeu+iqL0Wg4sII6WNxAfMC0vJNtTjSjVyMLOSW3q+0WR7+oSWuZaX9HB8HObog
-         Uv/6ZgX2aqTUuuuzqH7d/l9pn+/uPXBjze7rOLPq8//vgL1asKoVVip85xYGBE87zLKc
-         xMFmWPV7dTR9n8cbf0GGfQSW2NMqyBm9RmlNg3DjdFoERrA9X8gRWROyicNWAJNN6roM
-         Wqig==
-X-Gm-Message-State: AC+VfDzo+pa1wnCif6a4hva2QCBApRjv3pChVhC834BolrzhWqbzUjbN
-	ChwfEru3fJOueG32k+zYLik2Zrmp+VG+FxQREb5EHmKJDNtu16a1QqF6RJSr46DLQcPx3wEUg3c
-	i92Q13io104UH6LeO
-X-Received: by 2002:a1c:750a:0:b0:3f5:878:c0c2 with SMTP id o10-20020a1c750a000000b003f50878c0c2mr25649661wmc.3.1687986128201;
-        Wed, 28 Jun 2023 14:02:08 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ555s0Uauaywa+YUbpgGLrI/eB4NrymjZvBeM3Ccx8OEyCLZQopFxpFybHVInNG5cu5CiBqYg==
-X-Received: by 2002:a1c:750a:0:b0:3f5:878:c0c2 with SMTP id o10-20020a1c750a000000b003f50878c0c2mr25649640wmc.3.1687986127792;
-        Wed, 28 Jun 2023 14:02:07 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id h2-20020a1ccc02000000b003fa74bff02asm14621588wmb.26.2023.06.28.14.02.07
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 14:02:07 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 51EA7BC0244; Wed, 28 Jun 2023 23:02:06 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Maciej Fijalkowski <maciej.fijalkowski@intel.com>
-Cc: Magnus Karlsson <magnus.karlsson@gmail.com>, Jakub Kicinski
- <kuba@kernel.org>, bpf@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, netdev@vger.kernel.org,
- magnus.karlsson@intel.com, bjorn@kernel.org, tirthendu.sarkar@intel.com,
- simon.horman@corigine.com
-Subject: Re: [PATCH v4 bpf-next 15/22] xsk: add multi-buffer documentation
-In-Reply-To: <ZJx9WkB/dfB5EFjE@boxer>
-References: <20230615172606.349557-1-maciej.fijalkowski@intel.com>
- <20230615172606.349557-16-maciej.fijalkowski@intel.com>
- <87zg4uca21.fsf@toke.dk>
- <CAJ8uoz2hfXzu29KEgqm3rNm+hayDtUkJatFVA0n4nZz6F9de0w@mail.gmail.com>
- <87o7l9c58j.fsf@toke.dk>
- <CAJ8uoz1j9t=yO6mrMEseRYDQQkn0vf1gWbwOv7z9X0qX0O0LVw@mail.gmail.com>
- <20230621133424.0294f2a3@kernel.org>
- <CAJ8uoz3N1EVZAJZpe_R7rOQGpab4_yoWGPU7PB8PeKP9tvQWHg@mail.gmail.com>
- <875y7flq8w.fsf@toke.dk> <ZJx9WkB/dfB5EFjE@boxer>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Wed, 28 Jun 2023 23:02:06 +0200
-Message-ID: <87edlvgv1t.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050162C9D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:03:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B592C433C0;
+	Wed, 28 Jun 2023 21:03:18 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687986198;
+	bh=taogyxlxQ+1K0qg3OBjrm+rufktyEbtN8eOpF9xqVs4=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LFfWFIv7+YiMyacNyyYzut9KsthSQqThgNliTfbLNy4YZ+9+Ol5Ik3KRG5yVNSOGW
+	 76Wfao5gzVsy3J4lDOLwd6VHbBSgBiqCmLAgQuKikHqGOqhSxcegMILVA9AFFqGVzg
+	 NhyUQzAz4YhEN0OA4tzMM5MKDF/60+8OqpuOJBzCb1Sf0nPe0w8008JW1C7Tg+0uRr
+	 c9DTXcNIHuM8L+QyABiMyPjOZTNniK4x9+Rj6Exs6QAKIXxXLR84zwAG2krgiTOWFZ
+	 PM54kYMGxDztyH1eB6OeODcSiNUN/JCPvDHnaQIulyl+IXjiKupUlQByQhs+Uwd16j
+	 QjOAu8FvPd6fg==
+Date: Wed, 28 Jun 2023 14:03:17 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: Boris Pismenny <borisp@nvidia.com>, John Fastabend
+ <john.fastabend@gmail.com>, glider@google.com, herbert@gondor.apana.org.au,
+ linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com, syzbot
+ <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>, Eric Biggers
+ <ebiggers@kernel.org>, Aviad Yehezkel <aviadye@nvidia.com>, Daniel Borkmann
+ <daniel@iogearbox.net>, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>
+Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
+Message-ID: <20230628140317.756e61d3@kernel.org>
+In-Reply-To: <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+References: <0000000000008a7ae505aef61db1@google.com>
+	<20200911170150.GA889@sol.localdomain>
+	<c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-> diff --git a/net/core/netdev-genl.c b/net/core/netdev-genl.c
-> index a4270fafdf11..b24244f768e3 100644
-> --- a/net/core/netdev-genl.c
-> +++ b/net/core/netdev-genl.c
-> @@ -19,6 +19,8 @@ netdev_nl_dev_fill(struct net_device *netdev, struct sk_buff *rsp,
->  		return -EMSGSIZE;
->  
->  	if (nla_put_u32(rsp, NETDEV_A_DEV_IFINDEX, netdev->ifindex) ||
-> +	    nla_put_u32(rsp, NETDEV_A_DEV_XDP_ZC_MAX_SEGS,
-> +			netdev->xdp_zc_max_segs) ||
+On Wed, 28 Jun 2023 22:48:01 +0900 Tetsuo Handa wrote:
+> syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
+> that bytes to encrypt/decrypt is multiple of block size for that cipher but
+> tls_alloc_encrypted_msg() is not initializing padding bytes when
+> required_size is not multiple of block cipher's block size.
 
-Should this be omitted if the driver doesn't support zero-copy at all?
+Sounds odd, so crypto layer reads beyond what we submitted as 
+the buffer? I don't think the buffer needs to be aligned, so
+the missing bits may well fall into a different (unmapped?) page.
 
--Toke
-
+This needs more careful investigation. Always zeroing the input 
+is just covering up the real issue.
 
