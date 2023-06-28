@@ -1,194 +1,96 @@
-Return-Path: <netdev+bounces-14398-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14399-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 10B887408B5
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 04:53:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E627A7408C5
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 05:05:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5654281045
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:53:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A84D281191
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 03:05:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D5D187D;
-	Wed, 28 Jun 2023 02:53:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D45841FCA;
+	Wed, 28 Jun 2023 03:05:12 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086091847
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:53:12 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865B61BD9;
-	Tue, 27 Jun 2023 19:53:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=dlpR/21Irur/vl2Bba6LPVcNg/tvhnzdXj8x/ntUtHk=; b=h9543rTXTZgDs/8RTl0Bz0B9yE
-	M116oqVCVPUSJCywA3/wGRMWSC5PootiKkuuCIVj4ZLCgyIOapcZqDjfLOWkI/zgqJSN2o+fG3m+5
-	LNi4LObBb3C7+Tstoj9H5/0jL1jcqEwdfXrHwtiJUzjkCxWtGJQUlfpBhl61Jqtop/8glW6Ccw6yE
-	s5dG7olz8uyRhgbdhV7y4VtfVDkINgMoKAG0nYF8+mfcvCHdM63tNzCb0I5PpzLqzy9zDRsZZhIVM
-	hFO0dw/qPTsAF7ZlKIL9PIHWAqdHkD6kuAAWAv5XjnO0XghWj9KoDCmoz5lsjXByoki6omg+BeCHV
-	YW2hbj2A==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qELIr-00EdQb-1N;
-	Wed, 28 Jun 2023 02:53:09 +0000
-Message-ID: <7f585168-7296-58aa-7fdb-c2aa08f346f4@infradead.org>
-Date: Tue, 27 Jun 2023 19:53:08 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A16D1C37;
+	Wed, 28 Jun 2023 03:05:12 +0000 (UTC)
+Received: from out30-124.freemail.mail.aliyun.com (out30-124.freemail.mail.aliyun.com [115.124.30.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38CF51730;
+	Tue, 27 Jun 2023 20:05:10 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R571e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018046059;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0Vm7vXNi_1687921506;
+Received: from localhost(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0Vm7vXNi_1687921506)
+          by smtp.aliyun-inc.com;
+          Wed, 28 Jun 2023 11:05:07 +0800
+From: Heng Qi <hengqi@linux.alibaba.com>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org,
+	"Michael S . Tsirkin" <mst@redhat.com>,
+	Jason Wang <jasowang@redhat.com>
+Cc: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Alexei Starovoitov <ast@kernel.org>,
+	Daniel Borkmann <daniel@iogearbox.net>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	John Fastabend <john.fastabend@gmail.com>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [PATCH net-next v4 0/2] virtio-net: avoid conflicts between XDP and GUEST_CSUM
+Date: Wed, 28 Jun 2023 11:05:04 +0800
+Message-Id: <20230628030506.2213-1-hengqi@linux.alibaba.com>
+X-Mailer: git-send-email 2.19.1.6.gb485710b
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
- module
-Content-Language: en-US
-To: Alexandra Winter <wintera@linux.ibm.com>,
- Simon Horman <simon.horman@corigine.com>
-Cc: linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
- Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
- netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
- Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
- <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
- Sven Schnelle <svens@linux.ibm.com>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
-References: <20230621213742.8245-1-rdunlap@infradead.org>
- <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
- <ZJP99hSRt5MakBXC@corigine.com>
- <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-9.9 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
-Sorry for the delay.
+virtio-net needs to clear the VIRTIO_NET_F_GUEST_CSUM feature when
+loading XDP. The main reason for doing this is that received packets
+marked with VIRTIO_NET_HDR_F_NEEDS_CSUM are not compatible with
+XDP programs, that is, we cannot guarantee that the csum_{start, offset}
+fields are correct after XDP processing.
 
-On 6/22/23 05:16, Alexandra Winter wrote:
-> 
-> 
-> On 22.06.23 09:53, Simon Horman wrote:
->> On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
->>>
->>>
->>> On 21.06.23 23:37, Randy Dunlap wrote:
->>>> Require FDDI to be built-in if it is used. LCS needs FDDI to be
->>>> built-in to build without errors.
->>>>
->>>> Prevents these build errors:
->>>> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
->>>> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
->>>> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
->>>>
->>>> This FDDI requirement effectively restores the previous condition
->>>> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
->>>> testing for CONFIG_FDDI_MODULE.
->>>>
->>>> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
-> [...]
->>
->>> 2) I wonder whether
->>>
->>>   	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
->>>  +	depends on FDDI || FDDI=n
->>>
->>> would do what we want here:
->>> When FDDI is a loadable module, LCS mustn't be built-in.
->>>
->>> I will do some experiments and let you know.
->>
->> It does seem to on my side.
->> But checking would be much appreciated.
->  
-> 
-> Here are my experiments:
-> 
-> Current net-next:
-> -----------------
-> if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
-> 
-> drivers/s390/net/KConfig:
-> config LCS
-> 	def_tristate m
-> 	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-> 
-> .config:
-> ETHERNET  |  FDDI | LCS choices | LCS | compile
-> --------------------------------------------------------
-> n		m	m,n	  m	success (failed before Randy's fix)
-> y		m	y,m,n	  m	success (failed before Randy's fix)
-> y		m		  y	fails: undefined reference to `fddi_type_trans'
-> 
-> 
-> Simon's proposal:
-> -----------------
->         depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-> +       depends on FDDI=y || FDDI=n
-> 
-> ETHERNET  |  FDDI | LCS choices | LCS | compile
-> --------------------------------------------------------
-> n		m	-
-> y		m	-
-> y		m	-
-> y		n	y,m,n	  y	success
-> y		n	y,m,n	  m	success
-> y		y	y,m,n	  m	success
-> 
-> 
-> Alexandra's proposal:
-> ---------------------
->         depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-> +       depends on FDDI || FDDI=n
-> 
-> ETHERNET  |  FDDI | LCS choices | LCS | compile
-> --------------------------------------------------------
-> n		m	m,n	  m	success
-> y		m	m,n	  m	success
-> y		n	y,m,n	  y	success
-> y		n	y,m,n	  m	success
-> y		y	y,m,n	  m	success
-> 
-> -----------------------------------------------------------
-> 
-> Seems that 
-> 	A[tristate] depends on B[tristate]
-> means that A cannot be 'higher' than B.
-> Meaning, if B=n -> A= must be n
-> 	if B=m -> A can be m or n
-> 	if B=y -> A can be y or m or n
+There is also an existing problem, in the same host vm-vm (eg
+[vm]<->[ovs vhost-user]<->[vm]) scenario, loading XDP will cause packet loss.
 
-Looks correct.
+To solve the above problems, we have discussed in the [1] proposal, and
+now try to solve it through the method of reprobing fields suggested
+by Jason.
 
-> Although I did not find documentation confirming that.
+[1] https://lists.oasis-open.org/archives/virtio-dev/202305/msg00318.html
 
-I think that it's in Documentation/kbuild/kconfig-language.rst,
-under "Menu dependencies", but not quite in that format. :)
+---
+v3->v4:
+  - Rewrite some comments for patch [1/2].
 
-> 
-> @Randy, do you want give a v2 a try with that?
+v2->v3:
+  - Use skb_checksum_setup() instead of virtnet_flow_dissect_udp_tcp(). @Jason Wang
 
-Sure, I'll try that.
+v1->v2:
+  - Squash v1's patch [1/4] and patch [2/4] into v2's patch [1/3]. @Michael S. Tsirkin
+  - Some minor modifications.
 
-> I guess then it is safe to delete from drivers/s390/net/lcs.c
-> -#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
-> -#error Cannot compile lcs.c without some net devices switched on.
-> -#endif
+Heng Qi (2):
+  virtio-net: support coexistence of XDP and GUEST_CSUM
+  virtio-net: remove GUEST_CSUM check for XDP
 
-Yes, I was planning to do that as well.
+ drivers/net/virtio_net.c | 86 ++++++++++++++++++++++++++++++++--------
+ 1 file changed, 70 insertions(+), 16 deletions(-)
 
-Thanks for the time that you have spent on this.
 -- 
-~Randy
+2.19.1.6.gb485710b
+
 
