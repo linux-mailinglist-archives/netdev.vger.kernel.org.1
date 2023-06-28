@@ -1,146 +1,113 @@
-Return-Path: <netdev+bounces-14386-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14387-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5942C740873
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 04:35:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E9EF740880
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 04:43:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1473B2811DB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:35:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 04A9B1C20BAA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:43:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE30E7E1;
-	Wed, 28 Jun 2023 02:35:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDEA7E1;
+	Wed, 28 Jun 2023 02:43:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AFBAF1FAB
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:35:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33E0C113
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 19:35:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1687919710;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=dRFSqjQ8goVbgezkdLbcR17PF9Y4JZ+FcQZ0y0X5sGQ=;
-	b=UU/q/H2VC/4SgJi41WmXlouT1og/lrf+jpjWfUtkCr6VCEFoawa4j3815XP3VW53j0fLt5
-	ZqJA6MGdrKWxCynwf6Qy79pFoKq+A3EOX7CItoRZgbMEMz+fD4Q4D/gNRiV9bliTqwPf4S
-	wIW5Q5bsnNsFI1CWZSYHUSSyitrP7vY=
-Received: from mail-lf1-f69.google.com (mail-lf1-f69.google.com
- [209.85.167.69]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-108-AUNc19CXO5-Wbm7Ub8vh0g-1; Tue, 27 Jun 2023 22:35:09 -0400
-X-MC-Unique: AUNc19CXO5-Wbm7Ub8vh0g-1
-Received: by mail-lf1-f69.google.com with SMTP id 2adb3069b0e04-4fb76659d54so2852980e87.1
-        for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 19:35:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687919707; x=1690511707;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=dRFSqjQ8goVbgezkdLbcR17PF9Y4JZ+FcQZ0y0X5sGQ=;
-        b=X2mIHvtmMdhhdnWySdWdUzV9+x36ZQkp/E/KTVW+gg7zGVYZQDrcmAyoUKWFW0GWEJ
-         gcQv8dmjKzSessmipjQXNfMdZVqWtXkRKIJk0UUpQ4nPQ6l65szgQIROGIDKf26sNtFz
-         6+/5yQWgHmk8OlOWmgkZvx5ezVSlEg65Wxwvp2iw4UMal151behEPGX7EPD1GZn+BI++
-         E0BlakOY7g6Bj/G21/CxDi5FyIe8Zpb1JDENdDvOQ5jcnGlYe0g96gGH66V4XlMvemdp
-         hZttjbE7cMtQbiaZaJrDaNtyBrAq1+T1sZzIVqCXF77uX3Ios6pY3TpfV8XWSuQvcvuZ
-         DGSw==
-X-Gm-Message-State: AC+VfDxiZXNmc8ezgqPNvn8tVFThBYRUkyl7BFefl8KV1rjGZCNNSz/N
-	dBYHZ6f1r6R5BfSSFN124Yv76d8yBFM+sGJdXBlQbc6NyFI6tqpkR4vhgFuL0nxaTKYj6hvz+da
-	0X4quz0SLjUaSQyHyyl6RgRLxntLv3tCSuveXDvFRhqO8lQ==
-X-Received: by 2002:a05:6512:1284:b0:4f9:5ca0:9334 with SMTP id u4-20020a056512128400b004f95ca09334mr13621880lfs.34.1687919706917;
-        Tue, 27 Jun 2023 19:35:06 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5xylHTvh/QQtP38BdSnzUfN0JkrGyzTKp0POais1RFAfmEoycQEQtV+DQPp1OpEQfGy/r+jgJaS3aGfUM8vzg=
-X-Received: by 2002:a05:6512:1284:b0:4f9:5ca0:9334 with SMTP id
- u4-20020a056512128400b004f95ca09334mr13621868lfs.34.1687919706658; Tue, 27
- Jun 2023 19:35:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1132815B6
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:43:37 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id C40B42950;
+	Tue, 27 Jun 2023 19:43:35 -0700 (PDT)
+Received: from localhost.localdomain (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id D81EF6032EB52;
+	Wed, 28 Jun 2023 10:42:44 +0800 (CST)
+X-MD-Sfrom: yunchuan@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: wuych <yunchuan@nfschina.com>
+To: andrew@lunn.ch,
+	f.fainelli@gmail.com,
+	olteanv@gmail.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	irusskikh@marvell.com,
+	yisen.zhuang@huawei.com,
+	salil.mehta@huawei.com,
+	jesse.brandeburg@intel.com,
+	anthony.l.nguyen@intel.com,
+	steve.glendinning@shawell.net,
+	iyappan@os.amperecomputing.com,
+	keyur@os.amperecomputing.com,
+	quan@os.amperecomputing.com,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	mostrows@earthlink.net,
+	xeb@mail.ru,
+	qiang.zhao@nxp.com
+Cc: yangyingliang@huawei.com,
+	yunchuan@nfschina.com,
+	linux@rempel-privat.de,
+	ansuelsmth@gmail.com,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linuxppc-dev@lists.ozlabs.org,
+	kernel-janitors@vger.kernel.org
+Subject: [PATCH net-next 00/10] Remove unnecessary (void*) conversions
+Date: Wed, 28 Jun 2023 10:41:21 +0800
+Message-Id: <20230628024121.1439149-1-yunchuan@nfschina.com>
+X-Mailer: git-send-email 2.30.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230627113652.65283-1-maxime.coquelin@redhat.com> <20230627113652.65283-3-maxime.coquelin@redhat.com>
-In-Reply-To: <20230627113652.65283-3-maxime.coquelin@redhat.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Wed, 28 Jun 2023 10:34:55 +0800
-Message-ID: <CACGkMEuKyeFoaAfVfBKMv43sdX7GQDQyDLO-+eukg29t+0Ef0g@mail.gmail.com>
-Subject: Re: [PATCH v1 2/2] vduse: enable Virtio-net device type
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: xieyongji@bytedance.com, mst@redhat.com, david.marchand@redhat.com, 
-	lulu@redhat.com, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 7:37=E2=80=AFPM Maxime Coquelin
-<maxime.coquelin@redhat.com> wrote:
->
-> This patch adds Virtio-net device type to the supported
-> devices types. Initialization fails if the device does
-> not support VIRTIO_F_VERSION_1 feature, in order to
-> guarantee the configuration space is read-only.
->
-> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+Remove (void*) conversions under "drivers/net" directory.
+According to the suggestion[1] of Jakub Kicinski, send these patches
+in series of 10. 
 
-Acked-by: Jason Wang <jasowang@redhat.com>
+wuych (10):
+  net: dsa: ar9331: remove unnecessary (void*) conversions
+  net: dsa: qca8k: remove unnecessary (void*) conversions
+  atlantic:hw_atl2:hw_atl2_utils_fw: Remove unnecessary (void*)
+    conversions
+  ice: Remove unnecessary (void*) conversions
+  ethernet: smsc: remove unnecessary (void*) conversions
+  net: hns: Remove unnecessary (void*) conversions
+  net: hns3: remove unnecessary (void*) conversions
+  net: mdio: Remove unnecessary (void*) conversions
+  net: ppp: remove unnecessary (void*) conversions
+  net: wan: Remove unnecessary (void*) conversions
 
-Thanks
+ drivers/net/dsa/qca/ar9331.c                     | 16 ++++++++--------
+ drivers/net/dsa/qca/qca8k-8xxx.c                 |  2 +-
+ drivers/net/dsa/qca/qca8k-common.c               |  6 +++---
+ .../aquantia/atlantic/hw_atl2/hw_atl2_utils_fw.c |  2 +-
+ .../net/ethernet/hisilicon/hns3/hns3_ethtool.c   |  2 +-
+ drivers/net/ethernet/hisilicon/hns_mdio.c        | 10 +++++-----
+ drivers/net/ethernet/intel/ice/ice_main.c        |  4 ++--
+ drivers/net/ethernet/smsc/smsc911x.c             |  4 ++--
+ drivers/net/ethernet/smsc/smsc9420.c             |  4 ++--
+ drivers/net/mdio/mdio-xgene.c                    |  8 ++++----
+ drivers/net/ppp/pppoe.c                          |  4 ++--
+ drivers/net/ppp/pptp.c                           |  4 ++--
+ drivers/net/wan/fsl_ucc_hdlc.c                   |  2 +-
+ 13 files changed, 34 insertions(+), 34 deletions(-)
 
-> ---
->  drivers/vdpa/vdpa_user/vduse_dev.c | 6 ++++++
->  1 file changed, 6 insertions(+)
->
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
-vduse_dev.c
-> index c1c2f4c711ae..89088fa27026 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -142,6 +142,7 @@ static struct workqueue_struct *vduse_irq_bound_wq;
->
->  static u32 allowed_device_id[] =3D {
->         VIRTIO_ID_BLOCK,
-> +       VIRTIO_ID_NET,
->  };
->
->  static inline struct vduse_dev *vdpa_to_vduse(struct vdpa_device *vdpa)
-> @@ -1668,6 +1669,10 @@ static bool features_is_valid(struct vduse_dev_con=
-fig *config)
->                         (config->features & (1ULL << VIRTIO_BLK_F_CONFIG_=
-WCE)))
->                 return false;
->
-> +       if ((config->device_id =3D=3D VIRTIO_ID_NET) &&
-> +                       !(config->features & (1ULL << VIRTIO_F_VERSION_1)=
-))
-> +               return false;
-> +
->         return true;
->  }
->
-> @@ -2023,6 +2028,7 @@ static const struct vdpa_mgmtdev_ops vdpa_dev_mgmtd=
-ev_ops =3D {
->
->  static struct virtio_device_id id_table[] =3D {
->         { VIRTIO_ID_BLOCK, VIRTIO_DEV_ANY_ID },
-> +       { VIRTIO_ID_NET, VIRTIO_DEV_ANY_ID },
->         { 0 },
->  };
->
-> --
-> 2.41.0
->
+[1] https://lore.kernel.org/all/20230518194627.4f9a6b04@kernel.org/
+-- 
+2.30.2
 
 
