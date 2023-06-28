@@ -1,52 +1,48 @@
-Return-Path: <netdev+bounces-14456-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14457-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C4BD7419FD
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:03:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B3D6741A07
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:06:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E544A280CC3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:03:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74A6E280C56
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:06:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69AD711181;
-	Wed, 28 Jun 2023 21:03:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9A9CB11187;
+	Wed, 28 Jun 2023 21:06:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 050162C9D
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:03:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4B592C433C0;
-	Wed, 28 Jun 2023 21:03:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC1711181
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:06:13 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5F815C433C9;
+	Wed, 28 Jun 2023 21:06:13 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687986198;
-	bh=taogyxlxQ+1K0qg3OBjrm+rufktyEbtN8eOpF9xqVs4=;
+	s=k20201202; t=1687986373;
+	bh=Ng9MErV+FXt3w7E3mEz9cVU8xZAj3zXrh381lvQcwJ4=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=LFfWFIv7+YiMyacNyyYzut9KsthSQqThgNliTfbLNy4YZ+9+Ol5Ik3KRG5yVNSOGW
-	 76Wfao5gzVsy3J4lDOLwd6VHbBSgBiqCmLAgQuKikHqGOqhSxcegMILVA9AFFqGVzg
-	 NhyUQzAz4YhEN0OA4tzMM5MKDF/60+8OqpuOJBzCb1Sf0nPe0w8008JW1C7Tg+0uRr
-	 c9DTXcNIHuM8L+QyABiMyPjOZTNniK4x9+Rj6Exs6QAKIXxXLR84zwAG2krgiTOWFZ
-	 PM54kYMGxDztyH1eB6OeODcSiNUN/JCPvDHnaQIulyl+IXjiKupUlQByQhs+Uwd16j
-	 QjOAu8FvPd6fg==
-Date: Wed, 28 Jun 2023 14:03:17 -0700
+	b=keaCDoxUZKxIZ0GIampVPP5V5J0kz0F6JiH28+AzKQUD11QXAvcmD+iB8DtEeJSsx
+	 A9cdAh1P7UnPPlMaFIo3s1V2HMYVtQKNBK1R2hNyJWzkgVr9OqR+hGhPVPHelENQfY
+	 /8OK+u+WQjfNnKFDiqRvVsC4306fj1UgHLWZTYAbBQESpQDzkbPhobzGdfkOfjFADf
+	 txwJtkbsC8RcYeaVAj4/0KdNcRqVDsagvNdsTlO9Tvx2fL2RXSYLCl6PF0HwZOep9b
+	 PizFD1q7G7B1pDU4OCOijEgQRTmhM57apqRM5uGo9ciONblPiATY5UiWVAVK5c0tuc
+	 hnOqkMypa8VXg==
+Date: Wed, 28 Jun 2023 14:06:12 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-Cc: Boris Pismenny <borisp@nvidia.com>, John Fastabend
- <john.fastabend@gmail.com>, glider@google.com, herbert@gondor.apana.org.au,
- linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com, syzbot
- <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>, Eric Biggers
- <ebiggers@kernel.org>, Aviad Yehezkel <aviadye@nvidia.com>, Daniel Borkmann
- <daniel@iogearbox.net>, netdev@vger.kernel.org, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>
-Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-Message-ID: <20230628140317.756e61d3@kernel.org>
-In-Reply-To: <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
-References: <0000000000008a7ae505aef61db1@google.com>
-	<20200911170150.GA889@sol.localdomain>
-	<c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
+To: Shannon Nelson <shannon.nelson@amd.com>
+Cc: "Keller, Jacob E" <jacob.e.keller@intel.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>, "davem@davemloft.net" <davem@davemloft.net>,
+ "brett.creeley@amd.com" <brett.creeley@amd.com>, "drivers@pensando.io"
+ <drivers@pensando.io>, "nitya.sunkad@amd.com" <nitya.sunkad@amd.com>
+Subject: Re: [PATCH net] ionic: remove WARN_ON to prevent panic_on_warn
+Message-ID: <20230628140612.4736ed58@kernel.org>
+In-Reply-To: <1b33f325-c104-8b0c-099f-f2d2e98fed66@amd.com>
+References: <20230628170050.21290-1-shannon.nelson@amd.com>
+	<CO1PR11MB50899225D4BCFFA435A96FB6D624A@CO1PR11MB5089.namprd11.prod.outlook.com>
+	<1b33f325-c104-8b0c-099f-f2d2e98fed66@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -56,16 +52,26 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Wed, 28 Jun 2023 22:48:01 +0900 Tetsuo Handa wrote:
-> syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
-> that bytes to encrypt/decrypt is multiple of block size for that cipher but
-> tls_alloc_encrypted_msg() is not initializing padding bytes when
-> required_size is not multiple of block cipher's block size.
+On Wed, 28 Jun 2023 11:26:18 -0700 Shannon Nelson wrote:
+> > This message could potentially use a bit more explanation since it
+> > doesn't look like you removed all the WARN_ONs in the driver, and
+> > it might help to explain why this particular WARN_ON was
+> > problematic. I don't think that would be worth a re-roll on its own
+> > though.  
+> 
+> There has been recent mention of not using WARNxxx macros because so 
+> many folks have been setting panic_on_warn [1].  This is intended to 
+> help mitigate the possibility of unnecessarily killing a machine when
+> we can adjust and continue.
+> [1]:
+> https://lore.kernel.org/netdev/2023060820-atom-doorstep-9442@gregkh/
+> 
+> I believe the only other WARNxxx in this driver is a WARN_ON_ONCE in 
+> ionic_regs.h which can be addressed in a separate patch.
+> 
+> Neither of these are ever expected to be hit, but also neither should 
+> ever kill a machine.
 
-Sounds odd, so crypto layer reads beyond what we submitted as 
-the buffer? I don't think the buffer needs to be aligned, so
-the missing bits may well fall into a different (unmapped?) page.
-
-This needs more careful investigation. Always zeroing the input 
-is just covering up the real issue.
+An explanation that this warning may in fact be hit and how in 
+the commit message would be good.
 
