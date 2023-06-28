@@ -2,121 +2,131 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 591B6741866
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 20:56:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 6D11974187B
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:01:06 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232327AbjF1S4S (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 14:56:18 -0400
-Received: from smtp-fw-9105.amazon.com ([207.171.188.204]:55113 "EHLO
-        smtp-fw-9105.amazon.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S232708AbjF1SyN (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 14:54:13 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1687978454; x=1719514454;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=Sj4D9/YhFa5gm+2Xbpetvt8RuR2FgzUgdFX5Vd7PyHk=;
-  b=H+bRP7RkcTc9SPLVmZV4zgn12WQ4P9+hzkw5GJF2Yp2VzVfoHdgs7eFf
-   5qWaxRGKJY9OpU5gzj8kdBpZQYNkXedh85MfdM8hgcJT5x8KTVT5B+Nxk
-   3HPK3h4hKYLPgwyS0R57ygybpgfV6z5ZDgE8UtKr7Dlne/e1KxLVGpIYO
-   8=;
-X-IronPort-AV: E=Sophos;i="6.01,166,1684800000"; 
-   d="scan'208";a="657569115"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-9105.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 18:54:09 +0000
-Received: from EX19MTAUWC002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-        by email-inbound-relay-pdx-2b-m6i4x-cadc3fbd.us-west-2.amazon.com (Postfix) with ESMTPS id 07C7DA0A9B;
-        Wed, 28 Jun 2023 18:54:06 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC002.ant.amazon.com (10.250.64.143) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Wed, 28 Jun 2023 18:54:06 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.50) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA) id 15.2.1118.30;
- Wed, 28 Jun 2023 18:54:00 +0000
-From:   Kuniyuki Iwashima <kuniyu@amazon.com>
-To:     <lmb@isovalent.com>
-CC:     <andrii@kernel.org>, <ast@kernel.org>, <bpf@vger.kernel.org>,
-        <daniel@iogearbox.net>, <davem@davemloft.net>,
-        <dsahern@kernel.org>, <edumazet@google.com>, <haoluo@google.com>,
-        <hemanthmalla@gmail.com>, <joe@cilium.io>, <joe@wand.net.nz>,
-        <john.fastabend@gmail.com>, <jolsa@kernel.org>,
-        <kpsingh@kernel.org>, <kuba@kernel.org>, <kuniyu@amazon.com>,
-        <linux-kernel@vger.kernel.org>, <linux-kselftest@vger.kernel.org>,
-        <martin.lau@linux.dev>, <mykolal@fb.com>, <netdev@vger.kernel.org>,
-        <pabeni@redhat.com>, <sdf@google.com>, <shuah@kernel.org>,
-        <song@kernel.org>, <willemdebruijn.kernel@gmail.com>, <yhs@fb.com>
-Subject: Re: [PATCH bpf-next v4 6/7] bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign
-Date:   Wed, 28 Jun 2023 11:53:52 -0700
-Message-ID: <20230628185352.76923-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230613-so-reuseport-v4-6-4ece76708bba@isovalent.com>
-References: <20230613-so-reuseport-v4-6-4ece76708bba@isovalent.com>
+        id S231347AbjF1S72 (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 14:59:28 -0400
+Received: from mga07.intel.com ([134.134.136.100]:31378 "EHLO mga07.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231543AbjF1S5y (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 14:57:54 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687978674; x=1719514674;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=Jh6Yo68JB6oWFdtn/7iL8FqvlLcXmL6Fp0vlENpUr+0=;
+  b=JXAWgxXO/IPmWVr0JmXU7wbWIrILizHRa6eD7h0xB8Eiouk26C6jk5s7
+   tEFaeOaJfgl7GI81B2CFJMqjX3wET7QGxSXIbhpAGEvtYlFctPVsYO4BP
+   yVHxI59JbJvhgHcHixu+uKJr9Prf69AiUephnNHOoS80li8Lg0pnymkWB
+   ogWabBoZP7Gnws5SaEj0hiVQJOxnPaH6m0/WxgwdBL2POoLB+E5F36FE2
+   TbO3TZknbtHH7qZFKULnINlhs5rs/agB+FNQqbFD0oz4OKa2C2/+xou6W
+   g/JzQIRi2iRQRcWrdjJiQUQI5PHVeHpStegjcab5JMzoxaqNU6w7yfN5a
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="427946144"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="427946144"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 11:57:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="717069119"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="717069119"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga002.jf.intel.com with ESMTP; 28 Jun 2023 11:57:51 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+        (envelope-from <lkp@intel.com>)
+        id 1qEaMQ-000DRd-38;
+        Wed, 28 Jun 2023 18:57:50 +0000
+Date:   Thu, 29 Jun 2023 02:57:23 +0800
+From:   kernel test robot <lkp@intel.com>
+To:     Revanth Kumar Uppala <ruppala@nvidia.com>, linux@armlinux.org.uk,
+        andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org
+Cc:     oe-kbuild-all@lists.linux.dev, linux-tegra@vger.kernel.org,
+        Revanth Kumar Uppala <ruppala@nvidia.com>,
+        Narayan Reddy <narayanr@nvidia.com>
+Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
+Message-ID: <202306290253.b8D3gQf8-lkp@intel.com>
+References: <20230628124326.55732-4-ruppala@nvidia.com>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.50]
-X-ClientProxiedBy: EX19D035UWA001.ant.amazon.com (10.13.139.101) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628124326.55732-4-ruppala@nvidia.com>
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-From: Lorenz Bauer <lmb@isovalent.com>
-Date: Wed, 28 Jun 2023 10:48:21 +0100
-> diff --git a/include/net/inet6_hashtables.h b/include/net/inet6_hashtables.h
-> index a6722d6ef80f..7d677b89f269 100644
-> --- a/include/net/inet6_hashtables.h
-> +++ b/include/net/inet6_hashtables.h
-> @@ -103,6 +103,46 @@ static inline struct sock *__inet6_lookup(struct net *net,
->  				     daddr, hnum, dif, sdif);
->  }
->  
-> +static inline
-> +struct sock *inet6_steal_sock(struct net *net, struct sk_buff *skb, int doff,
-> +			      const struct in6_addr *saddr, const __be16 sport,
-> +			      const struct in6_addr *daddr, const __be16 dport,
-> +			      bool *refcounted, inet6_ehashfn_t *ehashfn)
-> +{
-> +	struct sock *sk, *reuse_sk;
-> +	bool prefetched;
-> +
-> +	sk = skb_steal_sock(skb, refcounted, &prefetched);
-> +	if (!sk)
-> +		return NULL;
-> +
-> +	if (!prefetched)
-> +		return sk;
-> +
-> +	if (sk->sk_protocol == IPPROTO_TCP) {
-> +		if (sk->sk_state != TCP_LISTEN)
-> +			return sk;
-> +	} else if (sk->sk_protocol == IPPROTO_UDP) {
-> +		if (sk->sk_state != TCP_CLOSE)
-> +			return sk;
-> +	} else {
-> +		return sk;
-> +	}
-> +
-> +	reuse_sk = inet6_lookup_reuseport(net, sk, skb, doff,
-> +					  saddr, sport, daddr, ntohs(dport),
-> +					  ehashfn);
-> +	if (!reuse_sk || reuse_sk == sk)
-> +		return sk;
-> +
-> +	/* We've chosen a new reuseport sock which is never refcounted. This
-> +	 * implies that sk also isn't refcounted.
-> +	 */
-> +	WARN_ON_ONCE(*refcounted);
+Hi Revanth,
 
-One more nit.
+kernel test robot noticed the following build warnings:
 
-WARN_ON_ONCE() should be tested before inet6?_lookup_reuseport() not to
-miss the !reuse_sk case.
+[auto build test WARNING on net/main]
+[also build test WARNING on net-next/main linus/master horms-ipvs/master v6.4 next-20230628]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Revanth-Kumar-Uppala/net-phy-aquantia-Enable-MAC-Controlled-EEE/20230628-204746
+base:   net/main
+patch link:    https://lore.kernel.org/r/20230628124326.55732-4-ruppala%40nvidia.com
+patch subject: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
+config: i386-randconfig-i013-20230628 (https://download.01.org/0day-ci/archive/20230629/202306290253.b8D3gQf8-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230629/202306290253.b8D3gQf8-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306290253.b8D3gQf8-lkp@intel.com/
+
+All warnings (new ones prefixed by >>):
+
+   drivers/net/phy/aquantia_main.c: In function 'aqr_handle_interrupt':
+>> drivers/net/phy/aquantia_main.c:476:29: warning: unused variable 'priv' [-Wunused-variable]
+     476 |         struct aqr107_priv *priv = phydev->priv;
+         |                             ^~~~
 
 
-> +
-> +	return reuse_sk;
-> +}
+vim +/priv +476 drivers/net/phy/aquantia_main.c
+
+   473	
+   474	static irqreturn_t aqr_handle_interrupt(struct phy_device *phydev)
+   475	{
+ > 476		struct aqr107_priv *priv = phydev->priv;
+   477		int irq_status;
+   478		int ret;
+   479	
+   480		ret = phy_read_mmd(phydev, MDIO_MMD_C22EXT, MDIO_C22EXT_GBE_PHY_SGMII_TX_ALARM1);
+   481		if (ret < 0) {
+   482			phy_error(phydev);
+   483			return IRQ_NONE;
+   484		}
+   485	
+   486		if ((ret & MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK) ==
+   487		    MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK) {
+   488			/* Disable the WoL */
+   489			ret = aqr113c_wol_disable(phydev);
+   490			if (ret < 0)
+   491				return IRQ_NONE;
+   492		}
+   493	
+   494		irq_status = phy_read_mmd(phydev, MDIO_MMD_AN,
+   495					  MDIO_AN_TX_VEND_INT_STATUS2);
+   496		if (irq_status < 0) {
+   497			phy_error(phydev);
+   498			return IRQ_NONE;
+   499		}
+   500	
+   501		if (!(irq_status & MDIO_AN_TX_VEND_INT_STATUS2_MASK))
+   502			return IRQ_NONE;
+   503	
+   504		phy_trigger_machine(phydev);
+   505	
+   506		return IRQ_HANDLED;
+   507	}
+   508	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
