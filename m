@@ -1,195 +1,193 @@
-Return-Path: <netdev+bounces-14403-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C5DF17408E9
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 05:28:04 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B467E7409E9
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 09:54:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBD111C20BCB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 03:28:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 08C1528120D
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 07:54:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C79F3D8E;
-	Wed, 28 Jun 2023 03:28:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 375C563BC;
+	Wed, 28 Jun 2023 07:54:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 85C9F1847
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 03:28:01 +0000 (UTC)
-Received: from smtpbgbr2.qq.com (smtpbgbr2.qq.com [54.207.22.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8A492D59
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 20:27:57 -0700 (PDT)
-X-QQ-mid: bizesmtp75t1687922868t4zcm1pu
-Received: from wxdbg.localdomain.com ( [115.195.149.82])
-	by bizesmtp.qq.com (ESMTP) with 
-	id ; Wed, 28 Jun 2023 11:27:39 +0800 (CST)
-X-QQ-SSF: 01400000000000K0Z000000A0000000
-X-QQ-FEAT: /rrU+puPB7Qg0gWFHF7QfplVYhRIbiNcsstP0MUuCJ+SW+tVowi/vF90xSYxN
-	lpgMnei7D1d9MnVMqVh5+4feaA39ieDGsyVEXQ5G2cu0o5OBHOXo2E3qGlpZimWi0gnvjyv
-	z92kSZD0WveNgNjSTda+zxQhsxgrSIGBK7kehs5fYjqLucTi9yjQfa+GyWi/LdYFAgwWadi
-	c9zlet8UzVfe7KPzZY8v0VxjlZ1khxe4eOFr7SgzP+3vtFHdrRps2EMs8Qpw88KjKRrogfx
-	V49VRj+mY3KGB0bIv67ZbiWf2TPmoI+uP2AQnpQBq6TT9cZJPohSBKxyfNnLgt6jpG9hZDW
-	XWiTCbATKREUsfH91vM+zBqkXYONVb/4se9cf0c+WpjxicGp+549VaYQGihoQ==
-X-QQ-GoodBg: 2
-X-BIZMAIL-ID: 9325640479167527740
-From: Jiawen Wu <jiawenwu@trustnetic.com>
-To: netdev@vger.kernel.org
-Cc: mengyuanlou@net-swift.com,
-	Jiawen Wu <jiawenwu@trustnetic.com>
-Subject: [PATCH net v2] net: txgbe: change LAN reset mode
-Date: Wed, 28 Jun 2023 11:42:04 +0800
-Message-Id: <20230628034204.213193-1-jiawenwu@trustnetic.com>
-X-Mailer: git-send-email 2.27.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2C8DD2563
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 07:54:11 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AB2D52D72;
+	Wed, 28 Jun 2023 00:54:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:References:Cc:To:From:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=hVxHcQDl4192w9qi7Ylg1NcjDzorbdlRCndnD2dfwgQ=; b=vmfnbxTtOhtOhGHRjex1Rz+I7Z
+	I/2VKIGIH73E60M8aqp169FEN9Bd4ii/ZTTB0jVb7bj8xJO1eoOEG3w/i6GhsRSAMvLOuPAjK2DWf
+	jym6TL2Ysxzyh576Vz98Pyz0fxXGQ3bdeEDtvpThWMWLqdigWzGZ+tjLSTUfAcGFxSq8rXI1elKdV
+	tQo8qYyIP6qXzhagvJXsg95FOHA+CLdTXdR8UocGW/mCyQZIdyaubInOl3M8A3MhCVGJxIq950PkN
+	QJ3wW4bcQEamrZum50yKwXV8svYgk37SBUNl9SUkbmcvdlxlIdJZSiHzdtOj/qXQFJWqaqvfgR5Zh
+	MwBzIUwg==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qENNr-00EqSq-0y;
+	Wed, 28 Jun 2023 05:06:27 +0000
+Message-ID: <510b6216-35e5-5ea1-525f-5fab35b901e0@infradead.org>
+Date: Tue, 27 Jun 2023 22:06:26 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-QQ-SENDSIZE: 520
-Feedback-ID: bizesmtp:trustnetic.com:qybglogicsvrgz:qybglogicsvrgz5a-1
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+Content-Language: en-US
+From: Randy Dunlap <rdunlap@infradead.org>
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Simon Horman <simon.horman@corigine.com>
+Cc: linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ Simon Horman <simon.horman@corigine.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+ <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+ <ZJP99hSRt5MakBXC@corigine.com>
+ <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
+ <7f585168-7296-58aa-7fdb-c2aa08f346f4@infradead.org>
+In-Reply-To: <7f585168-7296-58aa-7fdb-c2aa08f346f4@infradead.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The old way to do LAN reset is sending reset command to firmware. Once
-firmware performs reset, it reconfigures what it needs.
+Hi Alexandra, Simon, others,
 
-In the new firmware versions, veto bit is introduced for NCSI/LLDP to
-block PHY domain in LAN reset. At this point, writing register of LAN
-reset directly makes the same effect as the old way. And it does not
-reset MNG domain, so that veto bit does not change.
+Here is v2 of this patch. I will send it formally after the merge window closes.
 
-And this change is compatible with old firmware versions, since veto
-bit was never used.
-
-Fixes: b08012568ebb ("net: txgbe: Reset hardware")
-Signed-off-by: Jiawen Wu <jiawenwu@trustnetic.com>
+Thanks for all of your help.
 ---
- drivers/net/ethernet/wangxun/libwx/wx_hw.c    | 65 -------------------
- drivers/net/ethernet/wangxun/libwx/wx_hw.h    |  1 -
- drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c |  8 +--
- 3 files changed, 4 insertions(+), 70 deletions(-)
 
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.c b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-index 39a9aeee7aab..8f5bba0778c6 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.c
-@@ -431,71 +431,6 @@ int wx_read_ee_hostif_buffer(struct wx *wx,
- }
- EXPORT_SYMBOL(wx_read_ee_hostif_buffer);
+From: Randy Dunlap <rdunlap@infradead.org>
+Subject: [PATCH v2 net] s390/net: lcs: use IS_ENABLED() for kconfig detection
+
+When CONFIG_ETHERNET is disabled and CONFIG_FDDI=m, lcs.s has build
+errors or warnings:
+
+../drivers/s390/net/lcs.c:40:2: error: #error Cannot compile lcs.c without some net devices switched on.
+   40 | #error Cannot compile lcs.c without some net devices switched on.
+../drivers/s390/net/lcs.c: In function 'lcs_startlan_auto':
+../drivers/s390/net/lcs.c:1601:13: warning: unused variable 'rc' [-Wunused-variable]
+ 1601 |         int rc;
+
+Solve this by using IS_ENABLED(CONFIG_symbol) instead of ifdef
+CONFIG_symbol. The latter only works for builtin (=y) values
+while IS_ENABLED() works for builtin or modular values.
+
+Modify the LCS Kconfig entry to allow combinations of builtin and
+modular drivers to work as long as LCS <= FDDI (where n < m < y)
+if FDDI is enabled. If FDDI is not enabled, ETHERNET must be =y,
+so LCS can be builtin or modular since ETHERNET is a bool.
+
+Remove the #error directive in the source file since the Kconfig
+modification prevents that error combination.
+
+Tested successfully with all possible combinations of ETHERNET, FDDI,
+and LCS.
+
+Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+Signed-off-by: Randy Dunlap <rdunlap@infradead.org>
+Suggested-by: Alexandra Winter <wintera@linux.ibm.com>
+Cc: Wenjia Zhang <wenjia@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org
+Cc: netdev@vger.kernel.org
+Cc: Heiko Carstens <hca@linux.ibm.com>
+Cc: Vasily Gorbik <gor@linux.ibm.com>
+Cc: Alexander Gordeev <agordeev@linux.ibm.com>
+Cc: Christian Borntraeger <borntraeger@linux.ibm.com>
+Cc: Sven Schnelle <svens@linux.ibm.com>
+Cc: Simon Horman <simon.horman@corigine.com>
+Cc: David S. Miller <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+---
+ drivers/s390/net/Kconfig |    1 +
+ drivers/s390/net/lcs.c   |   13 ++++---------
+ 2 files changed, 5 insertions(+), 9 deletions(-)
+
+diff -- a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+--- a/drivers/s390/net/Kconfig
++++ b/drivers/s390/net/Kconfig
+@@ -6,6 +6,7 @@ config LCS
+ 	def_tristate m
+ 	prompt "Lan Channel Station Interface"
+ 	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
++	depends on FDDI || FDDI=n
+ 	help
+ 	  Select this option if you want to use LCS networking on IBM System z.
+ 	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+diff -- a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
+--- a/drivers/s390/net/lcs.c
++++ b/drivers/s390/net/lcs.c
+@@ -35,11 +35,6 @@
  
--/**
-- *  wx_calculate_checksum - Calculate checksum for buffer
-- *  @buffer: pointer to EEPROM
-- *  @length: size of EEPROM to calculate a checksum for
-- *  Calculates the checksum for some buffer on a specified length.  The
-- *  checksum calculated is returned.
-- **/
--static u8 wx_calculate_checksum(u8 *buffer, u32 length)
--{
--	u8 sum = 0;
--	u32 i;
--
--	if (!buffer)
--		return 0;
--
--	for (i = 0; i < length; i++)
--		sum += buffer[i];
--
--	return (u8)(0 - sum);
--}
--
--/**
-- *  wx_reset_hostif - send reset cmd to fw
-- *  @wx: pointer to hardware structure
-- *
-- *  Sends reset cmd to firmware through the manageability
-- *  block.
-- **/
--int wx_reset_hostif(struct wx *wx)
--{
--	struct wx_hic_reset reset_cmd;
--	int ret_val = 0;
--	int i;
--
--	reset_cmd.hdr.cmd = FW_RESET_CMD;
--	reset_cmd.hdr.buf_len = FW_RESET_LEN;
--	reset_cmd.hdr.cmd_or_resp.cmd_resv = FW_CEM_CMD_RESERVED;
--	reset_cmd.lan_id = wx->bus.func;
--	reset_cmd.reset_type = (u16)wx->reset_type;
--	reset_cmd.hdr.checksum = 0;
--	reset_cmd.hdr.checksum = wx_calculate_checksum((u8 *)&reset_cmd,
--						       (FW_CEM_HDR_LEN +
--							reset_cmd.hdr.buf_len));
--
--	for (i = 0; i <= FW_CEM_MAX_RETRIES; i++) {
--		ret_val = wx_host_interface_command(wx, (u32 *)&reset_cmd,
--						    sizeof(reset_cmd),
--						    WX_HI_COMMAND_TIMEOUT,
--						    true);
--		if (ret_val != 0)
--			continue;
--
--		if (reset_cmd.hdr.cmd_or_resp.ret_status ==
--		    FW_CEM_RESP_STATUS_SUCCESS)
--			ret_val = 0;
--		else
--			ret_val = -EFAULT;
--
--		break;
--	}
--
--	return ret_val;
--}
--EXPORT_SYMBOL(wx_reset_hostif);
--
- /**
-  *  wx_init_eeprom_params - Initialize EEPROM params
-  *  @wx: pointer to hardware structure
-diff --git a/drivers/net/ethernet/wangxun/libwx/wx_hw.h b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-index 1f93ca32c921..0c4756e6ee06 100644
---- a/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-+++ b/drivers/net/ethernet/wangxun/libwx/wx_hw.h
-@@ -14,7 +14,6 @@ int wx_host_interface_command(struct wx *wx, u32 *buffer,
- int wx_read_ee_hostif(struct wx *wx, u16 offset, u16 *data);
- int wx_read_ee_hostif_buffer(struct wx *wx,
- 			     u16 offset, u16 words, u16 *data);
--int wx_reset_hostif(struct wx *wx);
- void wx_init_eeprom_params(struct wx *wx);
- void wx_get_mac_addr(struct wx *wx, u8 *mac_addr);
- void wx_init_rx_addrs(struct wx *wx);
-diff --git a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-index 12405d71c5ee..6bb4bf00c231 100644
---- a/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-+++ b/drivers/net/ethernet/wangxun/txgbe/txgbe_hw.c
-@@ -260,16 +260,16 @@ static void txgbe_reset_misc(struct wx *wx)
- int txgbe_reset_hw(struct wx *wx)
- {
- 	int status;
-+	u32 val;
+ #include "lcs.h"
  
- 	/* Call adapter stop to disable tx/rx and clear interrupts */
- 	status = wx_stop_adapter(wx);
- 	if (status != 0)
- 		return status;
- 
--	if (!(((wx->subsystem_device_id & WX_NCSI_MASK) == WX_NCSI_SUP) ||
--	      ((wx->subsystem_device_id & WX_WOL_MASK) == WX_WOL_SUP)))
--		wx_reset_hostif(wx);
 -
-+	val = WX_MIS_RST_LAN_RST(wx->bus.func);
-+	wr32(wx, WX_MIS_RST, val | rd32(wx, WX_MIS_RST));
-+	WX_WRITE_FLUSH(wx);
- 	usleep_range(10, 100);
+-#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
+-#error Cannot compile lcs.c without some net devices switched on.
+-#endif
+-
+ /*
+  * initialization string for output
+  */
+@@ -1601,14 +1596,14 @@ lcs_startlan_auto(struct lcs_card *card)
+ 	int rc;
  
- 	status = wx_check_flash_load(wx, TXGBE_SPI_ILDR_STATUS_LAN_SW_RST(wx->bus.func));
--- 
-2.27.0
+ 	LCS_DBF_TEXT(2, trace, "strtauto");
+-#ifdef CONFIG_ETHERNET
++#if IS_ENABLED(CONFIG_ETHERNET)
+ 	card->lan_type = LCS_FRAME_TYPE_ENET;
+ 	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+ 	if (rc == 0)
+ 		return 0;
+ 
+ #endif
+-#ifdef CONFIG_FDDI
++#if IS_ENABLED(CONFIG_FDDI)
+ 	card->lan_type = LCS_FRAME_TYPE_FDDI;
+ 	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+ 	if (rc == 0)
+@@ -2140,13 +2135,13 @@ lcs_new_device(struct ccwgroup_device *c
+ 		goto netdev_out;
+ 	}
+ 	switch (card->lan_type) {
+-#ifdef CONFIG_ETHERNET
++#if IS_ENABLED(CONFIG_ETHERNET)
+ 	case LCS_FRAME_TYPE_ENET:
+ 		card->lan_type_trans = eth_type_trans;
+ 		dev = alloc_etherdev(0);
+ 		break;
+ #endif
+-#ifdef CONFIG_FDDI
++#if IS_ENABLED(CONFIG_FDDI)
+ 	case LCS_FRAME_TYPE_FDDI:
+ 		card->lan_type_trans = fddi_type_trans;
+ 		dev = alloc_fddidev(0);
 
 
