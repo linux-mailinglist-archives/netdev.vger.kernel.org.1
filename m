@@ -2,100 +2,89 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 9E28F740A7B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:06:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id B1A3E740AD7
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:12:13 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231487AbjF1IG1 (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 04:06:27 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:47663 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232635AbjF1ICw (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:02:52 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687939321;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JAxb7d8d9hAo9Ep6Vle9AGPfDkrTVJl7Nk2Fi7I0ejI=;
-        b=iPnOD3cO34trA79QROPmXXFfLnFyFR1PbHWH4K29UoghN2DoG6SfKuKgdPNf0VVyyR8tzi
-        DxlMiSut+9TWldpVbBQpgbju/HkEt5IIuoEMKP/+Hq5HpiogJ3hVK/EUtVtHZzScbhOheB
-        zTHG/U4RU08DchEWW/rTwdhQMCTFCXM=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-325-3YrzZBg_P96LFy3lVXhYaA-1; Wed, 28 Jun 2023 03:00:05 -0400
-X-MC-Unique: 3YrzZBg_P96LFy3lVXhYaA-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 327188ED600;
-        Wed, 28 Jun 2023 07:00:05 +0000 (UTC)
-Received: from server.redhat.com (ovpn-13-142.pek2.redhat.com [10.72.13.142])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9FB7540BB4D;
-        Wed, 28 Jun 2023 07:00:01 +0000 (UTC)
-From:   Cindy Lu <lulu@redhat.com>
-To:     lulu@redhat.com, jasowang@redhat.com, mst@redhat.com,
-        maxime.coquelin@redhat.com, xieyongji@bytedance.com,
-        kvm@vger.kernel.org, linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Subject: [RFC 4/4] vduse: update the vq_info in ioctl
-Date:   Wed, 28 Jun 2023 14:59:19 +0800
-Message-Id: <20230628065919.54042-5-lulu@redhat.com>
-In-Reply-To: <20230628065919.54042-1-lulu@redhat.com>
-References: <20230628065919.54042-1-lulu@redhat.com>
+        id S233954AbjF1IMI (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 04:12:08 -0400
+Received: from szxga03-in.huawei.com ([45.249.212.189]:16304 "EHLO
+        szxga03-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233829AbjF1IKF (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:10:05 -0400
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.55])
+        by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4QrY3g602pzLn30;
+        Wed, 28 Jun 2023 15:23:59 +0800 (CST)
+Received: from [10.67.102.37] (10.67.102.37) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Wed, 28 Jun
+ 2023 15:26:04 +0800
+Subject: Re: [PATCH net-next 07/10] net: hns3: remove unnecessary (void*)
+ conversions
+To:     wuych <yunchuan@nfschina.com>, <yisen.zhuang@huawei.com>,
+        <salil.mehta@huawei.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>
+References: <20230628024510.1440567-1-yunchuan@nfschina.com>
+CC:     <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <kernel-janitors@vger.kernel.org>
+From:   Hao Lan <lanhao@huawei.com>
+Message-ID: <408a4d7b-5dbf-fa3b-357d-1cd736f92e83@huawei.com>
+Date:   Wed, 28 Jun 2023 15:26:04 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:45.0) Gecko/20100101
+ Thunderbird/45.7.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+In-Reply-To: <20230628024510.1440567-1-yunchuan@nfschina.com>
+Content-Type: text/plain; charset="windows-1252"
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.67.102.37]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-From: Your Name <you@example.com>
 
-in VDUSE_VQ_GET_INFO, driver will sync the last_avail_idx
-with reconnect info, I have olny test the split mode, so
-only use this here, will add more information later
 
-Signed-off-by: Cindy Lu <lulu@redhat.com>
----
- drivers/vdpa/vdpa_user/vduse_dev.c | 16 ++++++++++++++++
- 1 file changed, 16 insertions(+)
+On 2023/6/28 10:45, wuych wrote:
+> Pointer variables of void * type do not require type cast.
+> 
+> Signed-off-by: wuych <yunchuan@nfschina.com>
+> ---
+>  drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> index 51d1278b18f6..1df941ef86e3 100644
+> --- a/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> +++ b/drivers/net/ethernet/hisilicon/hns3/hns3_ethtool.c
+> @@ -570,7 +570,7 @@ static void hns3_get_strings(struct net_device *netdev, u32 stringset, u8 *data)
+>  
+>  static u64 *hns3_get_stats_tqps(struct hnae3_handle *handle, u64 *data)
+>  {
+> -	struct hns3_nic_priv *nic_priv = (struct hns3_nic_priv *)handle->priv;
+> +	struct hns3_nic_priv *nic_priv = handle->priv;
+>  	struct hnae3_knic_private_info *kinfo = &handle->kinfo;
+>  	struct hns3_enet_ring *ring;
+>  	u8 *stat;
+> 
 
-diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/vduse_dev.c
-index 3df1256eccb4..b8e453eac0ce 100644
---- a/drivers/vdpa/vdpa_user/vduse_dev.c
-+++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-@@ -141,6 +141,11 @@ static u32 allowed_device_id[] = {
- 	VIRTIO_ID_NET,
- };
- 
-+struct vhost_reconnect_vring {
-+	uint16_t last_avail_idx;
-+	bool avail_wrap_counter;
-+};
-+
- static inline struct vduse_dev *vdpa_to_vduse(struct vdpa_device *vdpa)
+Hi wuych,
+Thank you for your patch.
+nit: the local variable declarations could be reverse xmas tree
+longest line to shortest line. One option being:
+ static u64 *hns3_get_stats_tqps(struct hnae3_handle *handle, u64 *data)
  {
- 	struct vduse_vdpa *vdev = container_of(vdpa, struct vduse_vdpa, vdpa);
-@@ -1176,6 +1181,17 @@ static long vduse_dev_ioctl(struct file *file, unsigned int cmd,
- 				vq->state.split.avail_index;
- 
- 		vq_info.ready = vq->ready;
-+		struct vdpa_reconnect_info *area;
-+
-+		area = &dev->reconnect_info[index];
-+		struct vhost_reconnect_vring *log_reconnect;
-+
-+		log_reconnect = (struct vhost_reconnect_vring *)area->vaddr;
-+		if (log_reconnect->last_avail_idx !=
-+		    vq_info.split.avail_index) {
-+			vq_info.split.avail_index =
-+				log_reconnect->last_avail_idx;
-+		}
- 
- 		ret = -EFAULT;
- 		if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
--- 
-2.34.3
+-	struct hns3_nic_priv *nic_priv = (struct hns3_nic_priv *)handle->priv;
+ 	struct hnae3_knic_private_info *kinfo = &handle->kinfo;
++	struct hns3_nic_priv *nic_priv = handle->priv;
+ 	struct hns3_enet_ring *ring;
+ 	u8 *stat;
+and elsewhere in other patchs.
 
+By the way, the net-next branch is currently closed, and you need to wait for
+the merge window to open before merging patches.
+
+Reviewed-by: Hao Lan <lanhao@huawei.com>
+
+Yours,
+Hao Lan
