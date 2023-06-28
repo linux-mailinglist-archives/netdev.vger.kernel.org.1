@@ -2,172 +2,143 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 10496740BF6
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:56:17 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id A34A0740D1C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:39:40 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231860AbjF1Izx (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 04:55:53 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:40699 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233685AbjF1IJp (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:09:45 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687939735;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=JpBHuqgFMq924SVEU5PVhg79o4Lnwc8I8AxFIOnjXWg=;
-        b=ggWEdtNaWoZW1N5CzCyW+uEIlPe7cMOjsDlrz9wC8ynafBTGpG6fMnWoNpJYHcypuwiHCK
-        wSlaALJRh+f3YdelB3oBrvFLlrY75txQFdNErDabkJBLQk78Dl0suNiDQr9RRwzwZJQjeI
-        /VsFFHOJgNdzzMtUPb5VTc2alFV2H2I=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-390-u0PDKsexPduLAO41nEgxAw-1; Wed, 28 Jun 2023 04:08:53 -0400
-X-MC-Unique: u0PDKsexPduLAO41nEgxAw-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b69b2eb3f7so28147711fa.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 01:08:53 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687939732; x=1690531732;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=JpBHuqgFMq924SVEU5PVhg79o4Lnwc8I8AxFIOnjXWg=;
-        b=LNdpgJuUvUrcj4MTlhsrA2naKpyMBOrDvbPN2oTyXnEynNhwwjx/O0mqCkOMA+C0uO
-         gZToXttItjNLy4/jTjEltXWBqwOJ2Rt64c6mTPDV0H3i5Oa1WZpucmp+wCEymmBtfQYo
-         xMUVrfMSEjotDrhvU7jgftoitxyc+K/90NpgdTTq2AeyHbmtQ1X9dZ2aXtylXUx/PsW6
-         b3NI4ZarAaKOrhxCoflAJSbOz6Xg8kKjlmySSmiZs2MZ21PpCcn9uIAHYKndoEeqZj8c
-         E938eUopiZv3xPA//urVGhihDYo+P42raF9+4UqgHpfujFsbNGFL9uLmg36q9JfHLdFP
-         qPKA==
-X-Gm-Message-State: AC+VfDzlodypMlT3H3c2Oi3JS5QgfPj7zdpwhHiClYCdARHNTNBgbgmM
-        t17+BuQYVgdIVm6RRiKp0jNbvSQq26DTvNkP3eODa2SUINfEGzhuA8vmI7TTt9YlED4hPfv15l9
-        rqVQhDkZHyFH5w838MVfsjbYgOO4eamda
-X-Received: by 2002:a2e:6a10:0:b0:2b6:a76b:c39e with SMTP id f16-20020a2e6a10000000b002b6a76bc39emr4223206ljc.35.1687939731900;
-        Wed, 28 Jun 2023 01:08:51 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5+2Gicsdplyts+dFUSGHhnRnz2PbkDycBiBNT+Jwcbz1g8KzKNLvTR0NgEfWGTD+ab672YFJAqtl48gc9cCKM=
-X-Received: by 2002:a2e:6a10:0:b0:2b6:a76b:c39e with SMTP id
- f16-20020a2e6a10000000b002b6a76bc39emr4223191ljc.35.1687939731611; Wed, 28
- Jun 2023 01:08:51 -0700 (PDT)
+        id S234533AbjF1Jim (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 05:38:42 -0400
+Received: from dggsgout11.his.huawei.com ([45.249.212.51]:7590 "EHLO
+        dggsgout11.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233473AbjF1IJV (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:09:21 -0400
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QrZ3x11gQz4f468f;
+        Wed, 28 Jun 2023 16:09:17 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+        by APP2 (Coremail) with SMTP id Syh0CgDXt9Wq6ptkXUONMg--.704S2;
+        Wed, 28 Jun 2023 16:09:17 +0800 (CST)
+Subject: Re: [PATCH v2 bpf-next 09/13] bpf: Allow reuse from
+ waiting_for_gp_ttrace list.
+To:     Alexei Starovoitov <ast@meta.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc:     Daniel Borkmann <daniel@iogearbox.net>,
+        Andrii Nakryiko <andrii@kernel.org>,
+        David Vernet <void@manifault.com>,
+        "Paul E. McKenney" <paulmck@kernel.org>, Tejun Heo <tj@kernel.org>,
+        rcu@vger.kernel.org, Network Development <netdev@vger.kernel.org>,
+        bpf <bpf@vger.kernel.org>, Kernel Team <kernel-team@fb.com>
+References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
+ <20230624031333.96597-10-alexei.starovoitov@gmail.com>
+ <9cc35513-5522-9229-469b-7d691c9790e1@huaweicloud.com>
+ <CAADnVQJViJh47Cze186XCS0_jeQMb1wu6BfVZiQL6982a_hhfg@mail.gmail.com>
+ <417e4d9c-7b69-0b9a-07e3-9af4b3b3299f@huaweicloud.com>
+ <2bf11b56-7494-c0a9-09d4-c9e41aaba850@meta.com>
+From:   Hou Tao <houtao@huaweicloud.com>
+Message-ID: <957dd5cd-0855-1197-7045-4cb1590bd753@huaweicloud.com>
+Date:   Wed, 28 Jun 2023 16:09:14 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-3-lulu@redhat.com>
-In-Reply-To: <20230628065919.54042-3-lulu@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 28 Jun 2023 16:08:39 +0800
-Message-ID: <CACGkMEuzrFP96qcFL0M=nGiQ9t57-EzOhZmB3No-8T8pMAWTxw@mail.gmail.com>
-Subject: Re: [RFC 2/4] vduse: Add file operation for mmap
-To:     Cindy Lu <lulu@redhat.com>
-Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
-        xieyongji@bytedance.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <2bf11b56-7494-c0a9-09d4-c9e41aaba850@meta.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 8bit
+Content-Language: en-US
+X-CM-TRANSID: Syh0CgDXt9Wq6ptkXUONMg--.704S2
+X-Coremail-Antispam: 1UD129KBjvJXoWxXr18uF4ruF17urWUXw13Jwb_yoW5AryDpr
+        48tFy5GryUJrWIyr1DKr1UGFyUtr48J3WDX3yUXFyftr15XFn0gF1xWrWjgr13Aw48Gry7
+        tr4kXryxZr15A3DanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+        9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+        6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+        vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_tr0E3s1l84ACjcxK6xIIjxv20xvEc7Cj
+        xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+        0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+        6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Gr0_Cr1lOx8S6xCaFV
+        Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+        e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+        Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+        6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+        kF7I0E14v26r4j6F4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+        14v26r4j6F4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr1j6F4UJbIYCTnIWIevJa73UjIFyT
+        uYvjxUzAwIDUUUU
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 2:59=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+Hi,
+
+On 6/28/2023 8:59 AM, Alexei Starovoitov wrote:
+> On 6/26/23 12:16 AM, Hou Tao wrote:
+>> Hi,
+>>
+>> On 6/26/2023 12:42 PM, Alexei Starovoitov wrote:
+>>> On Sun, Jun 25, 2023 at 8:30 PM Hou Tao <houtao@huaweicloud.com> wrote:
+>>>> Hi,
+>>>>
+>>>> On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
+>>>>> From: Alexei Starovoitov <ast@kernel.org>
+>>>>>
+>>>>> alloc_bulk() can reuse elements from free_by_rcu_ttrace.
+>>>>> Let it reuse from waiting_for_gp_ttrace as well to avoid
+>>>>> unnecessary kmalloc().
+>>>>>
+>>>>> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+>>>>> ---
+>>>>>   kernel/bpf/memalloc.c | 9 +++++++++
+>>>>>   1 file changed, 9 insertions(+)
+>>>>>
+SNIP
+>>        // free A (from c1), ..., last free X (allocated from c0)
+>>      P3: unit_free(c1)
+>>          // the last freed element X is from c0
+>>          c1->tgt = c0
+>>          c1->free_llist->first -> X -> Y -> ... -> A
+>>      P3: free_bulk(c1)
+>>          enque_to_free(c0)
+>>              c0->free_by_rcu_ttrace->first -> A -> ... -> Y -> X
+>>          __llist_add_batch(c0->waiting_for_gp_ttrace)
+>>              c0->waiting_for_gp_ttrace = A -> ... -> Y -> X
 >
-> From: Your Name <you@example.com>
+> In theory that's possible, but for this to happen one cpu needs
+> to be thousand times slower than all others and since there is no
+> preemption in llist_del_first I don't think we need to worry about it.
+
+Not sure whether or not such case will be possible in a VM, after all,
+the CPU X is just a thread in host and it may be preempted in any time
+and with any duration.
+> Also with removal of _tail optimization the above
+> llist_add_batch(waiting_for_gp_ttrace)
+> will become a loop, so reused element will be at the very end
+> instead of top, so one cpu to million times slower which is not
+> realistic.
+
+It is still possible A will be added back as
+waiting_for_gp_ttrace->first after switching to llist_add() as shown
+below. My questions is how much is the benefit for reusing from
+waiting_for_gp_ttrace ?
+
+    // free A (from c1), ..., last free X (allocated from c0) 
+    P3: unit_free(c1)
+        // the last freed element X is allocated from c0
+        c1->tgt = c0
+        c1->free_llist->first -> A -> ... -> Y
+        c1->free_llist_extra -> X
+
+    P3: free_bulk(c1)
+        enque_to_free(c0) 
+            c0->free_by_rcu_ttrace->first -> Y -> ... A
+            c0->free_by_rcu_ttrace->first -> X -> Y -> ... A
+
+        llist_add(c0->waiting_for_gp_ttrace)
+            c0->waiting_for_gp_ttrace = A -> .. -> Y -> X
+
 >
-> Add the operation for mmap, The user space APP will
-> use this function to map the pages to userspace
-
-Please be specific in the log. E.g why and what the main goal for this mmap=
-.
-
->
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  drivers/vdpa/vdpa_user/vduse_dev.c | 49 ++++++++++++++++++++++++++++++
->  1 file changed, 49 insertions(+)
->
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
-vduse_dev.c
-> index f845dc46b1db..1b833bf0ae37 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -1313,6 +1313,54 @@ static struct vduse_dev *vduse_dev_get_from_minor(=
-int minor)
->         return dev;
->  }
->
-> +
-> +static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
-> +{
-> +       struct vduse_dev *dev =3D vmf->vma->vm_file->private_data;
-> +       struct vm_area_struct *vma =3D vmf->vma;
-> +       u16 index =3D vma->vm_pgoff;
-> +
-> +       struct vdpa_reconnect_info *info;
-> +       info =3D &dev->reconnect_info[index];
-> +
-> +       vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
-> +       if (remap_pfn_range(vma, vmf->address & PAGE_MASK, PFN_DOWN(info-=
->addr),
-> +                           PAGE_SIZE, vma->vm_page_prot))
-
-I'm not sure if this can work e.g do we want to use separate pages for
-each virtqueue (I think the answer is yes).
-
-> +               return VM_FAULT_SIGBUS;
-> +       return VM_FAULT_NOPAGE;
-> +}
-> +
-> +static const struct vm_operations_struct vduse_vm_ops =3D {
-> +       .fault =3D vduse_vm_fault,
-> +};
-> +
-> +static int vduse_mmap(struct file *file, struct vm_area_struct *vma)
-> +{
-> +       struct vduse_dev *dev =3D file->private_data;
-> +       struct vdpa_reconnect_info *info;
-> +       unsigned long index =3D vma->vm_pgoff;
-> +
-> +       if (vma->vm_end - vma->vm_start !=3D PAGE_SIZE)
-> +               return -EINVAL;
-> +       if ((vma->vm_flags & VM_SHARED) =3D=3D 0)
-> +               return -EINVAL;
-> +
-> +       if (index > 65535)
-> +               return -EINVAL;
-> +
-> +       info =3D &dev->reconnect_info[index];
-> +       if (info->addr & (PAGE_SIZE - 1))
-> +               return -EINVAL;
-> +       if (vma->vm_end - vma->vm_start !=3D info->size) {
-> +               return -ENOTSUPP;
-> +       }
-
-How can userspace know the correct size (info->size) here?
-
-> +
-> +       vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDUMP=
-);
-
-Why do you need VM_IO, VM_PFNMAP and VM_DONTDUMP here?
-
-Thanks
-
-> +       vma->vm_ops =3D &vduse_vm_ops;
-> +
-> +       return 0;
-> +}
-> +
->  static int vduse_dev_open(struct inode *inode, struct file *file)
->  {
->         int ret;
-> @@ -1345,6 +1393,7 @@ static const struct file_operations vduse_dev_fops =
-=3D {
->         .unlocked_ioctl =3D vduse_dev_ioctl,
->         .compat_ioctl   =3D compat_ptr_ioctl,
->         .llseek         =3D noop_llseek,
-> +       .mmap           =3D vduse_mmap,
->  };
->
->  static struct vduse_dev *vduse_dev_create(void)
-> --
-> 2.34.3
->
+>> P1:
+>>      // A is added back as first again
+>>      // but llist_del_first() didn't know
+>>      try_cmpxhg(&c0->waiting_for_gp_ttrace->first, A, B)
+>>      // c0->waiting_for_gp_trrace is corrupted
+>>      c0->waiting_for_gp_ttrace->first = B
+>>
 
