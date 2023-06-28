@@ -1,127 +1,99 @@
-Return-Path: <netdev+bounces-14421-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 08F1C740DCC
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:52:44 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B85222807BD
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 09:52:42 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EA04A93F;
-	Wed, 28 Jun 2023 09:50:56 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9081723A1
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 09:50:56 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E87435AE;
-	Wed, 28 Jun 2023 02:50:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=pfjacbNuUwNkrWAeX5Ew7Qz/kZoiz3IcmwDj95RMCcU=; b=tXJSifE16qh8I4CRy5NBp/XIYX
-	2GwwbwIoEpaBUvWf/xRX5/W2QDGoOfYvCt/iARxSA8EKGG4Cnjy+Kr3tr5BcMDzZLjw1vi9IDV46y
-	1ao7vzotqEPWi12kqEQRipNiimnRZ4u5m/BEDyTlKFXbfH9vXutfJQKiva3H3fJD+51ucfpS4TO8D
-	jubHGiI/FFT6xo57D9ufPAQeuNkD7XKAnNAMYW4dAgmNp13AboEGdJv0TJt1h8osmD+sQhjAao6q7
-	zwcZA+WIdrahy/4QkavoMuu01xZgh6XeA9Hgt4daBaEV15xnGX2Pg6RKcNiIstSUHvCg3UbzqliS0
-	QGitV93A==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:33168)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qERoy-00071a-19;
-	Wed, 28 Jun 2023 10:50:44 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qERov-0006eS-Aj; Wed, 28 Jun 2023 10:50:41 +0100
-Date: Wed, 28 Jun 2023 10:50:41 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: wuych <yunchuan@nfschina.com>
-Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
-	quan@os.amperecomputing.com, andrew@lunn.ch, hkallweit1@gmail.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next 08/10] net: mdio: Remove unnecessary (void*)
- conversions
-Message-ID: <ZJwCcWgi0d6kEepI@shell.armlinux.org.uk>
-References: <20230628024517.1440644-1-yunchuan@nfschina.com>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 923AB740DFE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 12:03:50 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S229886AbjF1KDq (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 06:03:46 -0400
+Received: from szxga01-in.huawei.com ([45.249.212.187]:41484 "EHLO
+        szxga01-in.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S232059AbjF1Jsp (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 05:48:45 -0400
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+        by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4QrcGM19MYzqV3L;
+        Wed, 28 Jun 2023 17:48:27 +0800 (CST)
+Received: from [10.174.178.66] (10.174.178.66) by
+ dggpeml500026.china.huawei.com (7.185.36.106) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 28 Jun 2023 17:48:43 +0800
+Message-ID: <fc381683-00b8-ffae-b225-35317e538ac1@huawei.com>
+Date:   Wed, 28 Jun 2023 17:48:42 +0800
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628024517.1440644-1-yunchuan@nfschina.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.0.2
+Subject: Re: [PATCH net] mlxsw: minimal: fix potential memory leak in
+ mlxsw_m_linecards_init
+To:     Ido Schimmel <idosch@nvidia.com>
+CC:     <netdev@vger.kernel.org>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <petrm@nvidia.com>, <jiri@resnulli.us>, <vadimp@nvidia.com>,
+        <yuehaibing@huawei.com>
+References: <20230628005410.1524682-1-shaozhengchao@huawei.com>
+ <ZJv3Uis/ePiRKIfc@shredder>
+From:   shaozhengchao <shaozhengchao@huawei.com>
+In-Reply-To: <ZJv3Uis/ePiRKIfc@shredder>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.174.178.66]
+X-ClientProxiedBy: dggems704-chm.china.huawei.com (10.3.19.181) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-Hi,
 
-I think you missed one case:
 
-        if (mdio_id == XGENE_MDIO_RGMII) {
-                mdio_bus->read = xgene_mdio_rgmii_read;
-                mdio_bus->write = xgene_mdio_rgmii_write;
-                mdio_bus->priv = (void __force *)pdata;
+On 2023/6/28 17:03, Ido Schimmel wrote:
+> On Wed, Jun 28, 2023 at 08:54:10AM +0800, Zhengchao Shao wrote:
+>> when allocating mlxsw_m->line_cards[] failed in mlxsw_m_linecards_init,
+> 
+Hi Ido:
+> s/when/When/
+> s/allocating/the allocation of/
+> s/failed/fails/
+> 
+>> the memory pointed by mlxsw_m->line_cards is not released, which will
+>> cause memory leak. Memory release processing is added to the incorrect
+>> path.
+> 
+> Last sentence should be reworded to imperative mood.
+> 
+> Personally, I would reword the commit message to something like:
+> 
+> "
+> The line cards array is not freed in the error path of
+> mlxsw_m_linecards_init(), which can lead to a memory leak. Fix by
+> freeing the array in the error path, thereby making the error path
+> identical to mlxsw_m_linecards_fini().
+> "
+> 
+	Thank you for your reply. I will send v2.
 
-This cast using __force is also not required.
-
-On Wed, Jun 28, 2023 at 10:45:17AM +0800, wuych wrote:
-> @@ -211,7 +211,7 @@ static void xgene_enet_wr_mdio_csr(void __iomem *base_addr,
->  static int xgene_xfi_mdio_write(struct mii_bus *bus, int phy_id,
->  				int reg, u16 data)
->  {
-> -	void __iomem *addr = (void __iomem *)bus->priv;
-> +	void __iomem *addr = bus->priv;
->  	int timeout = 100;
->  	u32 status, val;
->  
-> @@ -234,7 +234,7 @@ static int xgene_xfi_mdio_write(struct mii_bus *bus, int phy_id,
->  
->  static int xgene_xfi_mdio_read(struct mii_bus *bus, int phy_id, int reg)
->  {
-> -	void __iomem *addr = (void __iomem *)bus->priv;
-> +	void __iomem *addr = bus->priv;
->  	u32 data, status, val;
->  	int timeout = 100;
-
-These probably cause Sparse to warn whether or not the cast is there.
-
-Given that in this case, bus->priv is initialised via:
-
-                mdio_bus->priv = (void __force *)pdata->mdio_csr_addr;
-
-I think the simple thing is to _always_ initialise mdio_bus->priv
-to point at pdata, and have xgene_xfi_mdio_*() always do:
-
-	struct xgene_mdio_pdata *pdata = bus->priv;
-	void __iomem *addr = pdata->mdio_csr_addr;
-
-The extra access will be dwarfed by the time taken to perform the
-access.
-
-This change should be made with a separate patch and not combined with
-the patch removing the casts in xgene_mdio_rgmii_*().
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
-
+Zhengchao Shao
+> Thanks
+> 
+>>
+>> Fixes: 01328e23a476 ("mlxsw: minimal: Extend module to port mapping with slot index")
+>> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+>> ---
+>>   drivers/net/ethernet/mellanox/mlxsw/minimal.c | 1 +
+>>   1 file changed, 1 insertion(+)
+>>
+>> diff --git a/drivers/net/ethernet/mellanox/mlxsw/minimal.c b/drivers/net/ethernet/mellanox/mlxsw/minimal.c
+>> index 6b56eadd736e..6b98c3287b49 100644
+>> --- a/drivers/net/ethernet/mellanox/mlxsw/minimal.c
+>> +++ b/drivers/net/ethernet/mellanox/mlxsw/minimal.c
+>> @@ -417,6 +417,7 @@ static int mlxsw_m_linecards_init(struct mlxsw_m *mlxsw_m)
+>>   err_kmalloc_array:
+>>   	for (i--; i >= 0; i--)
+>>   		kfree(mlxsw_m->line_cards[i]);
+>> +	kfree(mlxsw_m->line_cards);
+>>   err_kcalloc:
+>>   	kfree(mlxsw_m->ports);
+>>   	return err;
+>> -- 
+>> 2.34.1
+>>
