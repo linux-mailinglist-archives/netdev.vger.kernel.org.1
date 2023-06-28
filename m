@@ -1,124 +1,223 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14430-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 06D327412C3
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:42:51 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231749AbjF1NmQ (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 09:42:16 -0400
-Received: from mx0a-001b2d01.pphosted.com ([148.163.156.1]:44858 "EHLO
-        mx0a-001b2d01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229501AbjF1NmP (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 09:42:15 -0400
-Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SDUbtL021362;
-        Wed, 28 Jun 2023 13:41:35 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=pp1;
- bh=u0Qd7Mi5Q42tm2xnqxhRAfFdIueDZ16m47hmhgl0Fdg=;
- b=VW2Kr8AtUTxVbLg+B5xmlqEXH8fcKmYxQHCjsxrwuP8iET29pwHb1NBMa65CX56M1SNh
- gI6ttCOTucJXWF41MRzqnfnjGG0GuHkI2N0JGFH193dLGEGXTJLzy9HmfvUq8+rzyH9E
- PFtiznhS86+iiKvJ6mAjRC99ywOPyaoTiyesl81+p1SjUXdBW/baglknCfLxbnULLuhy
- pag4hXWudKI55wLwjFxwul0HEy1AlCAq3Yj82TnZKFWMtPJNLRPytRDNHgfCIQ3zIn7y
- EVC8EXQhmdBDOYVAgEzuVy2m54ByORWwSisqZGD7KvbQak0u7T+PT7PdDwo/nMBYDfh7 lg== 
-Received: from pps.reinject (localhost [127.0.0.1])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rgnteghb0-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 13:41:35 +0000
-Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
-        by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35SDWNjd023915;
-        Wed, 28 Jun 2023 13:41:34 GMT
-Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
-        by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rgntegh8q-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 13:41:34 +0000
-Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
-        by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35SBRBxV007291;
-        Wed, 28 Jun 2023 13:41:31 GMT
-Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
-        by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3rdr452j6n-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 13:41:31 +0000
-Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
-        by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35SDfRCI41550130
-        (version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-        Wed, 28 Jun 2023 13:41:27 GMT
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B1BF120043;
-        Wed, 28 Jun 2023 13:41:27 +0000 (GMT)
-Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
-        by IMSVA (Postfix) with ESMTP id B24CE20040;
-        Wed, 28 Jun 2023 13:41:26 +0000 (GMT)
-Received: from [9.171.10.167] (unknown [9.171.10.167])
-        by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
-        Wed, 28 Jun 2023 13:41:26 +0000 (GMT)
-Message-ID: <a05a7c3a-0f2f-c3be-3630-6774a26b994f@linux.ibm.com>
-Date:   Wed, 28 Jun 2023 15:41:26 +0200
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
- module
-To:     Randy Dunlap <rdunlap@infradead.org>,
-        Simon Horman <simon.horman@corigine.com>
-Cc:     linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
-        Wenjia Zhang <wenjia@linux.ibm.com>,
-        linux-s390@vger.kernel.org, netdev@vger.kernel.org,
-        Heiko Carstens <hca@linux.ibm.com>,
-        Vasily Gorbik <gor@linux.ibm.com>,
-        Alexander Gordeev <agordeev@linux.ibm.com>,
-        Christian Borntraeger <borntraeger@linux.ibm.com>,
-        Sven Schnelle <svens@linux.ibm.com>,
-        "David S . Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-References: <20230621213742.8245-1-rdunlap@infradead.org>
- <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
- <ZJP99hSRt5MakBXC@corigine.com>
- <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
- <7f585168-7296-58aa-7fdb-c2aa08f346f4@infradead.org>
- <510b6216-35e5-5ea1-525f-5fab35b901e0@infradead.org>
-Content-Language: en-US
-From:   Alexandra Winter <wintera@linux.ibm.com>
-In-Reply-To: <510b6216-35e5-5ea1-525f-5fab35b901e0@infradead.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-TM-AS-GCONF: 00
-X-Proofpoint-GUID: Ew8dw-WLMZw9y1snxnhb174TagLqwCvA
-X-Proofpoint-ORIG-GUID: rcr6kvi0Y8dIFdlXI8A5FT4zron55KQK
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-28_09,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 mlxlogscore=524
- lowpriorityscore=0 adultscore=0 priorityscore=1501 impostorscore=0
- suspectscore=0 bulkscore=0 mlxscore=0 phishscore=0 clxscore=1015
- spamscore=0 malwarescore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306280120
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8533E7412C6
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:43:21 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 603F61C20621
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 13:43:20 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DF231C14A;
+	Wed, 28 Jun 2023 13:43:17 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D45A3C148
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 13:43:17 +0000 (UTC)
+Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1CDFA198E;
+	Wed, 28 Jun 2023 06:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
+	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
+	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
+	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
+	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
+	bh=1wmmspi530xOoe8Q2zeo6bhbHaaSxwUw61R++tDFKPw=; b=oopEw3VJIyih2qocq3vY8C/2YT
+	pOPePbf6Nrt+hrjXNJydNkzprEvq732RObAYk4w0kPbTYnTzapgxI2QAsNpp+zE2EdqMihwd22At3
+	yoPX/p9pax0i1RY4YzOp7EzHJb35WlY0ZSRkBSaOkXjogTOeQCuIsSeWJ0hqgTL+qj+Ammn/i17dz
+	CnFUd1dnRyFgJpkbQQweUsqgAE47spf7+7sOY6VrepnCJjt7xIRwTHcbBcz/8dpojNWBten3o4lue
+	aYDCRX5qT/e5gZ5Wfx6ifRVm59t4ZJe0XvPAkBurwT+iN0ObLWA8AhsVnKdAXjcVvVgXQPc4srQlT
+	DqNw4/Zg==;
+Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:58088)
+	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
+	(Exim 4.96)
+	(envelope-from <linux@armlinux.org.uk>)
+	id 1qEVRy-0007YY-0i;
+	Wed, 28 Jun 2023 14:43:14 +0100
+Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
+	(envelope-from <linux@shell.armlinux.org.uk>)
+	id 1qEVRx-0006oj-8w; Wed, 28 Jun 2023 14:43:13 +0100
+Date: Wed, 28 Jun 2023 14:43:13 +0100
+From: "Russell King (Oracle)" <linux@armlinux.org.uk>
+To: Revanth Kumar Uppala <ruppala@nvidia.com>
+Cc: andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org,
+	linux-tegra@vger.kernel.org, Narayan Reddy <narayanr@nvidia.com>
+Subject: Re: [PATCH 4/4] net: phy: aqr113c: Enable Wake-on-LAN (WOL)
+Message-ID: <ZJw48a4eH0em8kjW@shell.armlinux.org.uk>
+References: <20230628124326.55732-1-ruppala@nvidia.com>
+ <20230628124326.55732-4-ruppala@nvidia.com>
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628124326.55732-4-ruppala@nvidia.com>
+Sender: Russell King (Oracle) <linux@armlinux.org.uk>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
+On Wed, Jun 28, 2023 at 06:13:26PM +0530, Revanth Kumar Uppala wrote:
+> @@ -109,6 +134,10 @@
+>  #define VEND1_GLOBAL_CFG_10M			0x0310
+>  #define VEND1_GLOBAL_CFG_100M			0x031b
+>  #define VEND1_GLOBAL_CFG_1G			0x031c
+> +#define VEND1_GLOBAL_SYS_CONFIG_SGMII   (BIT(0) | BIT(1))
+> +#define VEND1_GLOBAL_SYS_CONFIG_AN      BIT(3)
+> +#define VEND1_GLOBAL_SYS_CONFIG_XFI     BIT(8)
 
+My understanding is that bits 2:0 are a _bitfield_ and not individual
+bits, which contain the following values:
 
-On 28.06.23 07:06, Randy Dunlap wrote:
-> Hi Alexandra, Simon, others,
-> 
-> Here is v2 of this patch. I will send it formally after the merge window closes.
-> 
-> Thanks for all of your help.
-> ---
+0 - 10GBASE-R (XFI if you really want to call it that)
+3 - SGMII
+4 - OCSGMII (2.5G)
+6 - 5GBASE-R (XFI5G if you really want to call it that)
 
-Thank you for the patch, Randy.
+Bit 3 controls whether the SGMII control word is used, and this is the
+only applicable mode.
 
-As suggested by Christian Bornträger, I did some research, whether the FDDI part of the LCS driver
-could be removed. And actually there is no s390 machine above the minimum architecture level that
-can have an FDDI interface.
-I will send a patch to remove the FDDI option from the lcs driver.
+Bit 8 is already defined - it's part of the rate adaption mode field,
+see VEND1_GLOBAL_CFG_RATE_ADAPT and VEND1_GLOBAL_CFG_RATE_ADAPT_PAUSE.
 
-I apologize that I was not aware of that earlier. And thank you again for pointing out the issue
-with FDDI as a module.
+These bits apply to all the VEND1_GLOBAL_CFG_* registers, so these
+should be defined after the last register (0x031f).
 
-Alexandra
+> +static int aqr113c_wol_enable(struct phy_device *phydev)
+> +{
+> +	struct aqr107_priv *priv = phydev->priv;
+> +	u16 val;
+> +	int ret;
+> +
+> +	/* Disables all advertised speeds except for the WoL
+> +	 * speed (100BASE-TX FD or 1000BASE-T)
+> +	 * This is set as per the APP note from Marvel
+> +	 */
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_AN, MDIO_AN_10GBT_CTRL,
+> +			       MDIO_AN_LD_LOOP_TIMING_ABILITY);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_read_mmd(phydev, MDIO_MMD_AN, MDIO_AN_VEND_PROV);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	val = (ret & MDIO_AN_VEND_MASK) |
+> +	      (MDIO_AN_VEND_PROV_AQRATE_DWN_SHFT_CAP | MDIO_AN_VEND_PROV_1000BASET_FULL);
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_AN, MDIO_AN_VEND_PROV, val);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Enable the magic frame and wake up frame detection for the PHY */
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT, MDIO_C22EXT_GBE_PHY_RSI1_CTRL6,
+> +			       MDIO_C22EXT_RSI_WAKE_UP_FRAME_DETECTION);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT, MDIO_C22EXT_GBE_PHY_RSI1_CTRL7,
+> +			       MDIO_C22EXT_RSI_MAGIC_PKT_FRAME_DETECTION);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Set the WoL enable bit */
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_AN, MDIO_AN_RSVD_VEND_PROV1,
+> +			       MDIO_MMD_AN_WOL_ENABLE);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Set the WoL INT_N trigger bit */
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT, MDIO_C22EXT_GBE_PHY_RSI1_CTRL8,
+> +			       MDIO_C22EXT_RSI_WOL_FCS_MONITOR_MODE);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Enable Interrupt INT_N Generation at pin level */
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_C22EXT, MDIO_C22EXT_GBE_PHY_SGMII_TX_INT_MASK1,
+> +			       MDIO_C22EXT_SGMII0_WAKE_UP_FRAME_MASK |
+> +			       MDIO_C22EXT_SGMII0_MAGIC_PKT_FRAME_MASK);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_INT_STD_MASK,
+> +			       VEND1_GLOBAL_INT_STD_MASK_ALL);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_set_bits_mmd(phydev, MDIO_MMD_VEND1, VEND1_GLOBAL_INT_VEND_MASK,
+> +			       VEND1_GLOBAL_INT_VEND_MASK_GBE);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Set the system interface to SGMII */
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +			    VEND1_GLOBAL_CFG_100M, VEND1_GLOBAL_SYS_CONFIG_SGMII |
+> +			    VEND1_GLOBAL_SYS_CONFIG_AN);
+
+How do you know that SGMII should be used for 100M?
+
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +			    VEND1_GLOBAL_CFG_1G, VEND1_GLOBAL_SYS_CONFIG_SGMII |
+> +			    VEND1_GLOBAL_SYS_CONFIG_AN);
+
+How do you know that SGMII should be used for 1G?
+
+Doesn't this depend on the configuration of the host MAC and the
+capabilities of it? If the host MAC only supports 10G, doesn't this
+break stuff?
+
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* restart auto-negotiation */
+> +	genphy_c45_restart_aneg(phydev);
+> +	priv->wol_status = 1;
+> +
+> +	return 0;
+> +}
+> +
+> +static int aqr113c_wol_disable(struct phy_device *phydev)
+> +{
+> +	struct aqr107_priv *priv = phydev->priv;
+> +	int ret;
+> +
+> +	/* Disable the WoL enable bit */
+> +	ret = phy_clear_bits_mmd(phydev, MDIO_MMD_AN, MDIO_AN_RSVD_VEND_PROV1,
+> +				 MDIO_MMD_AN_WOL_ENABLE);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	/* Restore the SERDES/System Interface back to the XFI mode */
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +			    VEND1_GLOBAL_CFG_100M, VEND1_GLOBAL_SYS_CONFIG_XFI);
+> +	if (ret < 0)
+> +		return ret;
+> +
+> +	ret = phy_write_mmd(phydev, MDIO_MMD_VEND1,
+> +			    VEND1_GLOBAL_CFG_1G, VEND1_GLOBAL_SYS_CONFIG_XFI);
+> +	if (ret < 0)
+> +		return ret;
+
+Conversely, how do you know that configuring 100M/1G to use 10GBASE-R on
+the host interface is how the PHY was provisioned in firmware? I think
+at the very least, you should be leaving these settings alone until you
+know that the system is entering a low power mode, saving the settings,
+and restoring them when you wake up.
+
+-- 
+RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
+FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+
