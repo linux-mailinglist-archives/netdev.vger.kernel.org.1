@@ -1,79 +1,60 @@
-Return-Path: <netdev+bounces-14435-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCA8374139F
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 16:19:37 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA5C61C203AB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 14:19:35 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E06E5C2E7;
-	Wed, 28 Jun 2023 14:19:33 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7EACC122
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 14:19:32 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 98BCFC433C8;
-	Wed, 28 Jun 2023 14:19:31 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687961972;
-	bh=yrVlAWiwxFJi/PSUnLEvi1oEGkS0sNHufr0RPMimCWE=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=YM1IppAygzGHN4bX7d7k6Q2VpMqf5//MszBZC+ih6wU75AtTQ74afbl1qmk+6t1Rv
-	 MMVMDEyz45sK6IV5iE2ddrwcMiNbbnK7+EMYQXQtuAeNXwDLzyFUlvbpdQoIXLklzp
-	 HEfAtDBLEossqE8WvxDajNU1kRioww6Cf1sRB441Kweah2/4Unnb/TzGEwADLZnUPA
-	 X8aiQIQXw0eizjV037noLjdItbiQFa0LaTE2BrptArYy0HBQph5tfeq4qPcNqaE8Lp
-	 P5md2kIb6rlvkoc0SzH2s1BEPc2kB0Bc7ubHbUnDB2iPlK99S6iZ+/5jSsvdsDmSkg
-	 SrPLI/4D9xOPg==
-Message-ID: <b45cedc6-3dbe-5cbb-1938-5c33cf9fc70d@kernel.org>
-Date: Wed, 28 Jun 2023 08:19:30 -0600
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 9F0FA7413CC
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 16:23:24 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S231336AbjF1OWi (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 10:22:38 -0400
+Received: from vps0.lunn.ch ([156.67.10.101]:40130 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231406AbjF1OWA (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 10:22:00 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+        s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+        Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+        bh=gFgr/WMjZrt5gb+UL2h9yo8fjkel+XtAbJzfGHXFrS4=; b=R3B0o/JcRiSjAqcrMKc03AhyQP
+        vNlGFXxaLKaBfCNnguF1GGX4PWButD92hefQHm1SXzgk7VE9CgTyLot8OEAgiE9loNECeEe8V0ZHi
+        ywsIR3QgBnFirHbzdJSjKXgJXMBP4zikg7NovwnDiIyHYZlS1ZsCIJCsyMsgLhc8q1Bo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+        (envelope-from <andrew@lunn.ch>)
+        id 1qEW2u-0007kP-Gf; Wed, 28 Jun 2023 16:21:24 +0200
+Date:   Wed, 28 Jun 2023 16:21:24 +0200
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Moritz Fischer <moritz.fischer.private@gmail.com>
+Cc:     Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+        Moritz Fischer <moritzf@google.com>, netdev@vger.kernel.org,
+        pabeni@redhat.com, kuba@kernel.org, edumazet@google.com,
+        davem@davemloft.net, bryan.whitehead@microchip.com,
+        UNGLinuxDriver@microchip.com, stable@vger.kernel.org
+Subject: Re: [PATCH net v3] net: lan743x: Don't sleep in atomic context
+Message-ID: <6f79e4a6-de12-4c45-9899-d3e07d846c0e@lunn.ch>
+References: <20230627035000.1295254-1-moritzf@google.com>
+ <ZJrc5xjeHp5vYtAO@boxer>
+ <35db66a9-d478-4b15-ad30-bfc4cded0b5c@lunn.ch>
+ <CAFyOScpRDOvVrCsrwdxFstoNf1tOEnGbPSt5XDM1PKhCDyUGaw@mail.gmail.com>
+ <ZJr1Ifp9cOlfcqbE@boxer>
+ <9a42d3d3-a142-4e4a-811b-0b3b931e798b@lunn.ch>
+ <CAJYdmeOatYbZo616HZv_peyqQRa38gtF9eT483wKNkG8gfN84g@mail.gmail.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
- Gecko/20100101 Thunderbird/102.12.0
-Subject: Re: [PATCH v3 1/1] gro: decrease size of CB
-To: Gal Pressman <gal@nvidia.com>, Richard Gobert <richardbgobert@gmail.com>,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, aleksander.lobakin@intel.com, lixiaoyan@google.com,
- lucien.xin@gmail.com, alexanderduyck@fb.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230601160924.GA9194@debian> <20230601161407.GA9253@debian>
- <f83d79d6-f8d7-a229-941a-7d7427975160@nvidia.com>
- <fe5c86d1-1fd5-c717-e40c-c9cc102624ed@kernel.org>
- <b3908ce2-43e1-b56d-5d1d-48a932a2a016@nvidia.com>
-Content-Language: en-US
-From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <b3908ce2-43e1-b56d-5d1d-48a932a2a016@nvidia.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAJYdmeOatYbZo616HZv_peyqQRa38gtF9eT483wKNkG8gfN84g@mail.gmail.com>
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-On 6/28/23 6:42 AM, Gal Pressman wrote:
-> On 27/06/2023 17:21, David Ahern wrote:
->> On 6/26/23 2:55 AM, Gal Pressman wrote:
->>> I believe this commit broke gro over udp tunnels.
->>> I'm running iperf tcp traffic over geneve interfaces and the bandwidth
->>> is pretty much zero.
->>>
->>
->> Could you add a test script to tools/testing/selftests/net? It will help
->> catch future regressions.
->>
+> Can you clarify if you suggest to leave this alone as-is in patch, or
+> replace with something returning one of the errors above?
 > 
-> I'm checking internally, someone from the team might be able to work on
-> this, though I'm not sure that a test that verifies bandwidth makes much
-> sense as a selftest.
-> 
+> If the former, anything else missing in the patch?
 
-With veth and namespaces I expect up to 25-30G performance levels,
-depending on the test. When something fundamental breaks like this patch
-a drop to < 1G would be a red flag, so there is value to the test.
+I think the patch is O.K. Sorting out the ugly macro is a bigger job,
+not something for this patch.
 
+Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+
+    Andrew
