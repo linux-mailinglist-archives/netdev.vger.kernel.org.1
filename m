@@ -1,280 +1,166 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14413-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 37479740D2A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:39:45 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S230494AbjF1JjA (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 05:39:00 -0400
-Received: from mail-bn8nam04on2092.outbound.protection.outlook.com ([40.107.100.92]:2784
-        "EHLO NAM04-BN8-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S234799AbjF1JdI (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Wed, 28 Jun 2023 05:33:08 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PIr75OPT75PtSSSmfs6eIlsDCJcNYmHZ+Fq5MGtQyRLRWD26AotGS+KBcKenE+qbxTKwu/vVvmfI8Xew5OVxU+64cpyMlRHFd6FFB7M0NGXI/+9+EIsZo1igY8qEC2eD73q/3OBQwUi5+cq4pY+brWgbEtdf51UUL57qCxKd7CKg8tP4H/kyznzHZ3veJu4cZTfJ6R3qizLxhWeJND4MOz1RPG3aKyOd8Fcy5U4WJHISq3BCFZo/BSpUPgSY57c90zfQYhOBtlnYh8BnXihT+3QuqK8b8M8akVV9mfCx9GLEjgdEkKUHURwpWO741YD0yPWf6yjqF5wXhGfaG0Oo9g==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=TjSRQTW6XGeft8RU0JtnPzeNw9OKrnWqpKMGEO1ePTc=;
- b=ESHCIGmcMW8H3rCInYZerhyONR/Frv/7gt/6tR0Uf2cHp+ty6rJAKXX52UP5lvY4e1s+0XWkCBqQ8ehd+uM1aNiNFH3wGzvgtGvokZvIy+WMYOTyzH/DGMVNUFAafgO0y8/KZHS03CE3wd6F0xEcCRAwGFQsj355x7LJME/oLPn/JM5G1MPzGH/QkatdrOmyKM3g9ldB2WpbWmdrwgRlVWDp+ggAHpWz3zkc3aev1YG1rb8uIbjVQYta8uENqUkHn3iyf6l3GtXyVUK3kSaGl4VFBMnV9k+INxgL0uW6btKpmZeCTI7i8k811BfvRDDiKyzkltLoRFAhKTtaRrHD+Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6881C740D84
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:48:53 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 450E81C209B2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 09:48:52 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6E24A950;
+	Wed, 28 Jun 2023 09:48:40 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B501FA94D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 09:48:40 +0000 (UTC)
+Received: from mail-wm1-x330.google.com (mail-wm1-x330.google.com [IPv6:2a00:1450:4864:20::330])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 03FE9212D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:48:37 -0700 (PDT)
+Received: by mail-wm1-x330.google.com with SMTP id 5b1f17b1804b1-3fa9850bfebso31213475e9.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:48:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=TjSRQTW6XGeft8RU0JtnPzeNw9OKrnWqpKMGEO1ePTc=;
- b=rsF+OQkHMmw2YtWoOJIw5p9y9HGs3KCNz414mJvnZlfTNgyTGmS06UXlqg/Qb9XeggTpyHm0qewREqnUh8wovmioKdVTemL2EJfUw1h7bmOKtJHpzCOTiv0Utq/0MCozIFSOqCAFX/AItPRNZdW4CXB8QSQLT2UsmCyWAlwFI9Y=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
- PH7PR13MB6294.namprd13.prod.outlook.com (2603:10b6:510:235::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 28 Jun
- 2023 09:33:04 +0000
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::eb7b:880f:dc82:c8d1]) by DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::eb7b:880f:dc82:c8d1%4]) with mapi id 15.20.6521.026; Wed, 28 Jun 2023
- 09:33:04 +0000
-From:   Louis Peens <louis.peens@corigine.com>
-To:     David Miller <davem@davemloft.net>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>
-Cc:     Simon Horman <simon.horman@corigine.com>,
-        Yinjun Zhang <yinjun.zhang@corigine.com>,
-        netdev@vger.kernel.org, stable@vger.kernel.org,
-        oss-drivers@corigine.com
-Subject: [PATCH net] nfp: clean mc addresses in application firmware when driver exits
-Date:   Wed, 28 Jun 2023 11:32:28 +0200
-Message-Id: <20230628093228.12388-1-louis.peens@corigine.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: JNXP275CA0011.ZAFP275.PROD.OUTLOOK.COM (2603:1086:0:19::23)
- To DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|PH7PR13MB6294:EE_
-X-MS-Office365-Filtering-Correlation-Id: 6b69bff6-923a-4a01-5316-08db77baabef
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: ujs4wVjXCVkehmjFYw4zZYPEZ6B36/AiTRXvVjP1sZGojbqa+SmGjq8yusOXnR9eLFFUPdp/hEsuasydngPdTlkxvdVv1JWgF+AsgFJr5CZsOSC5oh+AxdRKIWUOtTUvukCnirv/cpLm/UKAZOAmHLfq7lN1GcNzwYV5px6YvYRbqLOrzgDsF7vRZmkHGoOgHchvjcECduwX0STYoA/jWHVl4tUTGDTtT7lwTXB0aHNrOmTjlWmhJXUzd1ECmIH7k7KLPc5W1b0aEaL59T+Bno0LPVVGVRcgu8y2ovQPXriNDI04+gwNGbjCOjYqALLjqiS2uAfapj3TGz7WIbp1IYM0OEJ6oEWdkrZcH4uf4BB3ZIWKUxwdCxiT9Mctv0gXC3tS2jfaDz3K+drv+2SF4FRdHM1+0Q0vCq3xbRa1Dd8ZTzHyVh8HPiCQRqAxpD4F7mpw7wh6rWlSUY1r4YpsVeBSJDEY/sUq0MuU02GlIEq4JfvFHhi+WG8j7E0x1WaBgm0keD8J4dBO8MUwB4n8FmDbRv3dyKllLP5Lb3+zR/fxMgFDi6SdTFC21oZsSbKnCvuEA/AI0NJC8hNWHlKQI3wVFOSYbaj2IlHeAAWr0F4GGecJLVbzVbdWmP0ofZ393hwY5n/xK3s7TypGkOCufIOJz2GO3y1Jem+8mY4+jU4=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39840400004)(136003)(376002)(366004)(346002)(451199021)(44832011)(5660300002)(66946007)(66556008)(4326008)(66476007)(478600001)(36756003)(316002)(8936002)(8676002)(2906002)(110136005)(54906003)(41300700001)(6486002)(52116002)(186003)(38350700002)(86362001)(26005)(6506007)(6512007)(6666004)(1076003)(107886003)(2616005)(38100700002)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?0oEGZyqUWWuHHjAe6F/3P0lasjEjHW9+rJ0XDJB4/mAo1lJyIVuo0FGw8RzR?=
- =?us-ascii?Q?lfBV5bE3ba1AlHL1WxRNk/kQnHGJjy7aMR7FFLj30FlUxjBWhODTYx25IGig?=
- =?us-ascii?Q?CjvfVIS+qfsf64fEt9Yk52e/x1Y0foYeTIv0D6Jd3acO3oo21NGs/re3g5Py?=
- =?us-ascii?Q?PUmbAbRD/9TuzaMQke9WVJuPJpTLm/HMmqK34LrX2xVSe/hp5WN0zZbZSu/H?=
- =?us-ascii?Q?S0rkD2hK/vhqgMpv04+T8A2RP/gkEcGr9/QADmdjf/NJW1XhHZ1G9rM7xzWj?=
- =?us-ascii?Q?pUxs8Kxr07bUcByMwoGCrL05jlDU1Y3OrJMtMjkmPv2+kDea4U5nADlyglph?=
- =?us-ascii?Q?/lLRerWoGqkNcFOROZdWMOkBcJgluwJ+Zv8AiJ8pv9Xkvosmn49j9wBMA4DA?=
- =?us-ascii?Q?NKLIYIDZdx3i7zr5E9xMTQLiravhvAvvlx2cwXm3hUnXR0QISUZLC08mpOJz?=
- =?us-ascii?Q?L/bQG0whI4z3mMMBDfO7SgRufzltrch1RsVYzjCF2Ui2PTTQLeZ+TZqCueCM?=
- =?us-ascii?Q?zb5OU/W+RdKPdNxWoaYRzbBYPFKGe+keY3Avc1RzNVCJbtrD18B1H8LkUOp/?=
- =?us-ascii?Q?scSlAL0lNnrVd0Ts3aX5TnG/fqCOgolI2p4IQaZfHpT2xLfMRjZhURGof8XV?=
- =?us-ascii?Q?o3ylwLKMYzckKudyAbjNTTFx3TQ4Z1fGUrhpucwnQKSiNvUeiqLtDHkWwWX5?=
- =?us-ascii?Q?4X53sGlHdVQ+VfyVgQGYSo1pZwK3etPsDeibHCPRpO9zpumcKThMPdnADKJj?=
- =?us-ascii?Q?SqffSia8aQstgZfMgVQwyMYd+YYvkWntormXB751Ja3gwzh8G8zVeyxKsTt2?=
- =?us-ascii?Q?0m9LPiavBnz/8xISdCCx2R0cW8Q05RasyL5u+LxSDKUEQ1bhYD9lNiAz61MM?=
- =?us-ascii?Q?+ASty4fW/iArLm7E6nws4jMk+my6Yk2Y0AN7K6ODpz690CjZ5Nksfw+Cboi4?=
- =?us-ascii?Q?fc1l3cFmXxvhOTeu7bVFLazRvYl+AqfNve3cO85NdCXVuySle2O1EvLtnpMd?=
- =?us-ascii?Q?HCA+RLESOS7hN19n0oluyk3lKmNxO95HJV08+zpLZ9ImHAeQmM187kXNqEz0?=
- =?us-ascii?Q?5v5fwlcBJw9LWeBMTtStxwAHhoyJSZNOw7ATj+9wJQhKJN9fLNKUoERz2Frp?=
- =?us-ascii?Q?8ZZc0LyRvb1J/Yyb36v4vpn+Mr7tN9YXbb4Y1V0KRvfc2L5lpOCwPna7VLhG?=
- =?us-ascii?Q?vCPM1EOHLiwHSSo9U0uvlMRR1hzXNUcckuo+vwCxq3vzqygJs+A2qkB1O7g0?=
- =?us-ascii?Q?I3zIvleuuSmHGctwCdDFeTZVtjp79+E7vnI/MAEoLam8Ww/XENhgESRhCI+I?=
- =?us-ascii?Q?5XgA5TEtrOG15Hr46BYv/2HrZd7HXWzC7FlXOOzq1BLTK1cY1Uoy00p0KUZL?=
- =?us-ascii?Q?WyWP+zVFjZP3xgYj7N8RWdYdm1CUHe7sDRQ+TdIqL0U0HedpCKLWyIgo7sdY?=
- =?us-ascii?Q?2Aw/3WQRnOT/X9uBFZSHpoyscdqKT3z3BdUvtS5Dw7neerVYRUIpBlEmSB0Q?=
- =?us-ascii?Q?/ndBX6wcy//ezGyNbR8gVuOQ7QKdzhukFjv8dhL9+UmnlEgS8d0HTctwu2Ui?=
- =?us-ascii?Q?6YmDRkfB0MeNxSiVBtq4ACetiPQg0sPTxNKUtwIIcTbUHK3kbJXg5FNiYic4?=
- =?us-ascii?Q?1w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 6b69bff6-923a-4a01-5316-08db77baabef
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 09:33:03.9225
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: R7jB65dKC7m94q3WtXJiMfqCaxxfp/pf0umls7E108JdTGfpuZ0gQ78P6cxAZPBX/ujrCONr7LgMbcG25CgNc7VfAY6frK8L0gvTU6qMvCs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB6294
+        d=isovalent.com; s=google; t=1687945716; x=1690537716;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=FP6EIORZPJxzFsIqvOxDq19SJKXWVqMsImue+SKUFg8=;
+        b=XsjxTyPkJ3bOYJQSpzHK71Ql/BG/qCVbF4SB/59ookNrppeeken42JlBoGr5NHXNIh
+         z5IbxM+mlAVvX+9Zundma7f7rcvVCCcbEuFkhhOuF371COKodPCbgnyvza8yDvStMuIs
+         cY2wVRlR0PGT0lTJF+lBmQbSBJDngLEdidJa888k6igCPGkx3KhX+byDoZneoELdMQTS
+         EF8B74wwJTrdqRVRX+v5KmlY0xBEfeYc72B1CHnJLEES+EmAIPTcnpm9I0R9hg94sBWZ
+         2i/kux9PGuhd/MDx93JduKCKm+pQIutwlEXMrmSwoALEysgTm/Zma6x57ASw6zwUbx6B
+         6Y9Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687945716; x=1690537716;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=FP6EIORZPJxzFsIqvOxDq19SJKXWVqMsImue+SKUFg8=;
+        b=CWYTuAut0MQa7kpLA0YH4o0naFhUAJxtZC3PmZ5VjpIz8JpBa63e8u/o5sqbtGsSrX
+         A71/igpKFEjGiotDViVx9R7Jz1UrMSB3TwnzF163hkLjLWfXYMHOz/wgOQRyZFQPLBa2
+         4Hi124dnDWCaF3v6fCket4UelyePqbypX1N+a/RDrUPWiYmTEAD2o8qDp/sLpGZaDEU4
+         VmlWTcbfnUAkkaTVlTWiwt+61jIxxyg92myVcSIbbULV8xlGwCXlr03Tb8D5V4HfZAsj
+         jnBIriQk+RG9YSkQKklT8Sj2fD6TKfazasfbr1LeuAA4WZHMQ52B3CHrWmxBQXwcrBj1
+         XtSA==
+X-Gm-Message-State: AC+VfDyh4iB5QYQUY+8PUbcq2yfZHkKL1Kha2XnbWofUWhNmOuqYmcaW
+	5Vi/5tW27LMiiwUErBEEayqF0B8/9sO7O6XQIEId4Q==
+X-Google-Smtp-Source: ACHHUZ7wPIusenCR7v9NN3XspUt/PsXwcRvhGF4plXfCXn9cqoUqOXtN00e6OOtxQAfdg+FxvGhXgQ==
+X-Received: by 2002:a7b:c017:0:b0:3f5:ffe3:46a7 with SMTP id c23-20020a7bc017000000b003f5ffe346a7mr24250845wmb.9.1687945716240;
+        Wed, 28 Jun 2023 02:48:36 -0700 (PDT)
+Received: from [192.168.1.193] (f.c.7.0.0.0.0.0.0.0.0.0.0.0.0.0.f.f.6.2.a.5.a.7.0.b.8.0.1.0.0.2.ip6.arpa. [2001:8b0:7a5a:26ff::7cf])
+        by smtp.gmail.com with ESMTPSA id k26-20020a7bc41a000000b003fbb1a9586esm1187613wmi.15.2023.06.28.02.48.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jun 2023 02:48:36 -0700 (PDT)
+From: Lorenz Bauer <lmb@isovalent.com>
+Subject: [PATCH bpf-next v4 0/7] Add SO_REUSEPORT support for TC
+ bpf_sk_assign
+Date: Wed, 28 Jun 2023 10:48:15 +0100
+Message-Id: <20230613-so-reuseport-v4-0-4ece76708bba@isovalent.com>
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIAN8BnGQC/32OQQ7CIBBFr9KwFkOhluDKexgXDE4tiUIDSGqa3
+ l3Kyhjj8ufNf38WEjFYjOTYLCRgttF6V0K3a4gZtbshtdeSCWdcsL4VNHoa8Blx8iFRVNwceN9
+ KgUhKBXRECkE7M26lz9sNTwEHO9e1M4FpoA7nRC6FjDYmH171jcwr/72YOWUUpOmVFl1ZFicbf
+ dZ3dGlv/KPKsvgnEEWgmITOAEhQ6luwrusbyAOISBYBAAA=
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, David Ahern <dsahern@kernel.org>, 
+ Willem de Bruijn <willemdebruijn.kernel@gmail.com>, 
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, 
+ Andrii Nakryiko <andrii@kernel.org>, 
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>, 
+ Yonghong Song <yhs@fb.com>, John Fastabend <john.fastabend@gmail.com>, 
+ KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>, 
+ Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, 
+ Joe Stringer <joe@wand.net.nz>, Mykola Lysenko <mykolal@fb.com>, 
+ Shuah Khan <shuah@kernel.org>, Kuniyuki Iwashima <kuniyu@amazon.com>
+Cc: Hemanth Malla <hemanthmalla@gmail.com>, netdev@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, bpf@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, Lorenz Bauer <lmb@isovalent.com>, 
+ Joe Stringer <joe@cilium.io>
+X-Mailer: b4 0.12.2
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-From: Yinjun Zhang <yinjun.zhang@corigine.com>
+We want to replace iptables TPROXY with a BPF program at TC ingress.
+To make this work in all cases we need to assign a SO_REUSEPORT socket
+to an skb, which is currently prohibited. This series adds support for
+such sockets to bpf_sk_assing.
 
-The configured mc addresses are not removed from application firmware
-when driver exits. This will cause resource leak when repeatedly
-creating and destroying VFs.
+I did some refactoring to cut down on the amount of duplicate code. The
+key to this is to use INDIRECT_CALL in the reuseport helpers. To show
+that this approach is not just beneficial to TC sk_assign I removed
+duplicate code for bpf_sk_lookup as well.
 
-Now use list to track configured mc addresses and remove them when
-corresponding driver exits.
+Joint work with Daniel Borkmann.
 
-Fixes: e20aa071cd95 ("nfp: fix schedule in atomic context when sync mc address")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
-Acked-by: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
+Signed-off-by: Lorenz Bauer <lmb@isovalent.com>
 ---
- drivers/net/ethernet/netronome/nfp/nfp_net.h  |  8 +++
- .../ethernet/netronome/nfp/nfp_net_common.c   | 66 +++++++++++++++++--
- 2 files changed, 67 insertions(+), 7 deletions(-)
+Changes in v4:
+- WARN_ON_ONCE if reuseport socket is refcounted (Kuniyuki)
+- Use inet[6]_ehashfn_t to shorten function declarations (Kuniyuki)
+- Shuffle documentation patch around (Kuniyuki)
+- Update commit message to explain why IPv6 needs EXPORT_SYMBOL
+- Link to v3: https://lore.kernel.org/r/20230613-so-reuseport-v3-0-907b4cbb7b99@isovalent.com
 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net.h b/drivers/net/ethernet/netronome/nfp/nfp_net.h
-index 939cfce15830..b079b7a92a1d 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net.h
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net.h
-@@ -621,6 +621,7 @@ struct nfp_net_dp {
-  * @mbox_amsg.lock:	Protect message list
-  * @mbox_amsg.list:	List of message to process
-  * @mbox_amsg.work:	Work to process message asynchronously
-+ * @mc_list:		List of multicast mac address
-  * @app_priv:		APP private data for this vNIC
-  */
- struct nfp_net {
-@@ -728,6 +729,8 @@ struct nfp_net {
- 		struct work_struct work;
- 	} mbox_amsg;
- 
-+	struct list_head mc_list;
-+
- 	void *app_priv;
- };
- 
-@@ -738,6 +741,11 @@ struct nfp_mbox_amsg_entry {
- 	char msg[];
- };
- 
-+struct nfp_mc_entry {
-+	struct list_head list;
-+	u8 addr[ETH_ALEN];
-+};
-+
- int nfp_net_sched_mbox_amsg_work(struct nfp_net *nn, u32 cmd, const void *data, size_t len,
- 				 int (*cb)(struct nfp_net *, struct nfp_mbox_amsg_entry *));
- 
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index 49f2f081ebb5..ccc49b330b51 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -1380,9 +1380,8 @@ static void nfp_net_mbox_amsg_work(struct work_struct *work)
- 	}
- }
- 
--static int nfp_net_mc_cfg(struct nfp_net *nn, struct nfp_mbox_amsg_entry *entry)
-+static int _nfp_net_mc_cfg(struct nfp_net *nn, unsigned char *addr, u32 cmd)
- {
--	unsigned char *addr = entry->msg;
- 	int ret;
- 
- 	ret = nfp_net_mbox_lock(nn, NFP_NET_CFG_MULTICAST_SZ);
-@@ -1394,12 +1393,30 @@ static int nfp_net_mc_cfg(struct nfp_net *nn, struct nfp_mbox_amsg_entry *entry)
- 	nn_writew(nn, nn->tlv_caps.mbox_off + NFP_NET_CFG_MULTICAST_MAC_LO,
- 		  get_unaligned_be16(addr + 4));
- 
--	return nfp_net_mbox_reconfig_and_unlock(nn, entry->cmd);
-+	return nfp_net_mbox_reconfig_and_unlock(nn, cmd);
-+}
-+
-+static void nfp_net_mc_clean(struct nfp_net *nn)
-+{
-+	struct nfp_mc_entry *entry, *tmp;
-+
-+	list_for_each_entry_safe(entry, tmp, &nn->mc_list, list) {
-+		_nfp_net_mc_cfg(nn, entry->addr, NFP_NET_CFG_MBOX_CMD_MULTICAST_DEL);
-+		list_del(&entry->list);
-+		kfree(entry);
-+	}
-+}
-+
-+static int nfp_net_mc_cfg(struct nfp_net *nn, struct nfp_mbox_amsg_entry *entry)
-+{
-+	return _nfp_net_mc_cfg(nn, entry->msg, entry->cmd);
- }
- 
- static int nfp_net_mc_sync(struct net_device *netdev, const unsigned char *addr)
- {
- 	struct nfp_net *nn = netdev_priv(netdev);
-+	struct nfp_mc_entry *entry, *tmp;
-+	int err;
- 
- 	if (netdev_mc_count(netdev) > NFP_NET_CFG_MAC_MC_MAX) {
- 		nn_err(nn, "Requested number of MC addresses (%d) exceeds maximum (%d).\n",
-@@ -1407,16 +1424,48 @@ static int nfp_net_mc_sync(struct net_device *netdev, const unsigned char *addr)
- 		return -EINVAL;
- 	}
- 
--	return nfp_net_sched_mbox_amsg_work(nn, NFP_NET_CFG_MBOX_CMD_MULTICAST_ADD, addr,
--					    NFP_NET_CFG_MULTICAST_SZ, nfp_net_mc_cfg);
-+	list_for_each_entry_safe(entry, tmp, &nn->mc_list, list) {
-+		if (ether_addr_equal(entry->addr, addr)) /* already existed */
-+			return 0;
-+	}
-+
-+	entry = kmalloc(sizeof(*entry), GFP_ATOMIC);
-+	if (!entry)
-+		return -ENOMEM;
-+
-+	err = nfp_net_sched_mbox_amsg_work(nn, NFP_NET_CFG_MBOX_CMD_MULTICAST_ADD, addr,
-+					   NFP_NET_CFG_MULTICAST_SZ, nfp_net_mc_cfg);
-+	if (!err) {
-+		ether_addr_copy(entry->addr, addr);
-+		list_add_tail(&entry->list, &nn->mc_list);
-+	} else {
-+		kfree(entry);
-+	}
-+
-+	return err;
- }
- 
- static int nfp_net_mc_unsync(struct net_device *netdev, const unsigned char *addr)
- {
- 	struct nfp_net *nn = netdev_priv(netdev);
-+	struct nfp_mc_entry *entry, *tmp;
-+	int err;
-+
-+	list_for_each_entry_safe(entry, tmp, &nn->mc_list, list) {
-+		if (ether_addr_equal(entry->addr, addr)) {
-+			err = nfp_net_sched_mbox_amsg_work(nn, NFP_NET_CFG_MBOX_CMD_MULTICAST_DEL,
-+							   addr, NFP_NET_CFG_MULTICAST_SZ,
-+							   nfp_net_mc_cfg);
-+			if (!err) {
-+				list_del(&entry->list);
-+				kfree(entry);
-+			}
-+
-+			return err;
-+		}
-+	}
- 
--	return nfp_net_sched_mbox_amsg_work(nn, NFP_NET_CFG_MBOX_CMD_MULTICAST_DEL, addr,
--					    NFP_NET_CFG_MULTICAST_SZ, nfp_net_mc_cfg);
-+	return -ENOENT;
- }
- 
- static void nfp_net_set_rx_mode(struct net_device *netdev)
-@@ -2687,6 +2736,8 @@ int nfp_net_init(struct nfp_net *nn)
- 			goto err_clean_mbox;
- 
- 		nfp_net_ipsec_init(nn);
-+
-+		INIT_LIST_HEAD(&nn->mc_list);
- 	}
- 
- 	nfp_net_vecs_init(nn);
-@@ -2718,5 +2769,6 @@ void nfp_net_clean(struct nfp_net *nn)
- 	nfp_net_ipsec_clean(nn);
- 	nfp_ccm_mbox_clean(nn);
- 	flush_work(&nn->mbox_amsg.work);
-+	nfp_net_mc_clean(nn);
- 	nfp_net_reconfig_wait_posted(nn);
- }
+Changes in v3:
+- Fix warning re udp_ehashfn and udp6_ehashfn (Simon)
+- Return higher scoring connected UDP reuseport sockets (Kuniyuki)
+- Fix ipv6 module builds
+- Link to v2: https://lore.kernel.org/r/20230613-so-reuseport-v2-0-b7c69a342613@isovalent.com
+
+Changes in v2:
+- Correct commit abbrev length (Kuniyuki)
+- Reduce duplication (Kuniyuki)
+- Add checks on sk_state (Martin)
+- Split exporting inet[6]_lookup_reuseport into separate patch (Eric)
+
+---
+Daniel Borkmann (1):
+      selftests/bpf: Test that SO_REUSEPORT can be used with sk_assign helper
+
+Lorenz Bauer (6):
+      udp: re-score reuseport groups when connected sockets are present
+      net: export inet_lookup_reuseport and inet6_lookup_reuseport
+      net: remove duplicate reuseport_lookup functions
+      net: document inet[6]_lookup_reuseport sk_state requirements
+      net: remove duplicate sk_lookup helpers
+      bpf, net: Support SO_REUSEPORT sockets with bpf_sk_assign
+
+ include/net/inet6_hashtables.h                     |  81 ++++++++-
+ include/net/inet_hashtables.h                      |  74 +++++++-
+ include/net/sock.h                                 |   7 +-
+ include/uapi/linux/bpf.h                           |   3 -
+ net/core/filter.c                                  |   2 -
+ net/ipv4/inet_hashtables.c                         |  67 ++++---
+ net/ipv4/udp.c                                     |  88 ++++-----
+ net/ipv6/inet6_hashtables.c                        |  70 +++++---
+ net/ipv6/udp.c                                     |  98 ++++------
+ tools/include/uapi/linux/bpf.h                     |   3 -
+ tools/testing/selftests/bpf/network_helpers.c      |   3 +
+ .../selftests/bpf/prog_tests/assign_reuse.c        | 197 +++++++++++++++++++++
+ .../selftests/bpf/progs/test_assign_reuse.c        | 142 +++++++++++++++
+ 13 files changed, 656 insertions(+), 179 deletions(-)
+---
+base-commit: 970308a7b544fa1c7ee98a2721faba3765be8dd8
+change-id: 20230613-so-reuseport-e92c526173ee
+
+Best regards,
 -- 
-2.34.1
+Lorenz Bauer <lmb@isovalent.com>
+
 
