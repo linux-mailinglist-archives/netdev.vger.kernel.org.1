@@ -1,99 +1,85 @@
-Return-Path: <netdev+bounces-14428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D93F4741288
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:33:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A1EC74129C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:37:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C7159280D82
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 13:33:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A7EFA1C203DB
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 13:37:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11F0AC142;
-	Wed, 28 Jun 2023 13:33:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2F03C148;
+	Wed, 28 Jun 2023 13:37:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 060F7C12E
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 13:33:51 +0000 (UTC)
-Received: from pandora.armlinux.org.uk (pandora.armlinux.org.uk [IPv6:2001:4d48:ad52:32c8:5054:ff:fe00:142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F72BE6C;
-	Wed, 28 Jun 2023 06:33:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=armlinux.org.uk; s=pandora-2019; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description:Resent-Date:
-	Resent-From:Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID:List-Id:
-	List-Help:List-Unsubscribe:List-Subscribe:List-Post:List-Owner:List-Archive;
-	bh=sKQ2ZYLWE38psHNkLxXDehP/4I0z5AYg3CmqnrxtrtU=; b=oXNiyGZO4XpWSZpSv/b5IaW0dT
-	eTeEUBpJDFw9OKseUwsaqRg4XkeUqb82kF8x4mfri1fKZLvGL7VmQjYrhM10INLLOMjRsIN7JjJLn
-	6i+q4VQkdeNnf257lR8ocXftOHewGgX5Mkg10I07bjQ+6CDp1cjNIsx2PccsUz5MWB0AUX9lLto4+
-	nOiQjKeAWZKgTsf/3RgE8c6o4e+Qrt7Z4fn2lt+g+4C6Dkqx+HsW1yRUuVqYTfUHtvnkx5LzvzWsh
-	iQ/e1S0KJO8uN5rFG0/FDePVDVPE+CxgUvVO/ZtRsBmh6EPVx7NW65J9gaJ2yGqnSJkWXn3NcO2yq
-	voE0Hmqg==;
-Received: from shell.armlinux.org.uk ([fd8f:7570:feb6:1:5054:ff:fe00:4ec]:39496)
-	by pandora.armlinux.org.uk with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.96)
-	(envelope-from <linux@armlinux.org.uk>)
-	id 1qEVIq-0007XG-0c;
-	Wed, 28 Jun 2023 14:33:48 +0100
-Received: from linux by shell.armlinux.org.uk with local (Exim 4.94.2)
-	(envelope-from <linux@shell.armlinux.org.uk>)
-	id 1qEVIp-0006nk-J1; Wed, 28 Jun 2023 14:33:47 +0100
-Date: Wed, 28 Jun 2023 14:33:47 +0100
-From: "Russell King (Oracle)" <linux@armlinux.org.uk>
-To: Revanth Kumar Uppala <ruppala@nvidia.com>
-Cc: andrew@lunn.ch, hkallweit1@gmail.com, netdev@vger.kernel.org,
-	linux-tegra@vger.kernel.org
-Subject: Re: [PATCH 3/4] net: phy: aquantia: Poll for TX ready at PHY system
- side
-Message-ID: <ZJw2u6BIShe2ZGsw@shell.armlinux.org.uk>
-References: <20230628124326.55732-1-ruppala@nvidia.com>
- <20230628124326.55732-3-ruppala@nvidia.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C734EC12E
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 13:37:00 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 607362D69
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 06:36:59 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4f954d7309fso1288165e87.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 06:36:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687959417; x=1690551417;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=c69lPkigCz+sbD7n3KTlhgYNivhfv3My0q2Cb4AieDg=;
+        b=VxlG8Toj5jD4DEmax68TNpLODmpljqTLHeWE7NpzXySJ+ypb986Qzjee8+JiqeHmk2
+         sdUHwKLmWUOrxr4iPQefgs510fjWAPqazxJC1Hv2+Ep5EJMn6la7Hr851VvL4ovPaKy1
+         JTQnvSRC6/HYgj4qr5YWwWAjnUpwbWvwvzmV3A6wKPNDZ/jVxjCW2lw75lc/Re6X8mLk
+         I3M6t+5xh9l8Iv+A9UPrkhSKPpxTs02rIPda/deSniAL40inc7vYfkEATtng4PwUg+jm
+         kp7A4Gw6z3H8S8WfGEuI4L1yKfr2/Q2WQ2oAd/nbVhMnba8rZbbXnLSrrT7mnGX++//f
+         BK/Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687959417; x=1690551417;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=c69lPkigCz+sbD7n3KTlhgYNivhfv3My0q2Cb4AieDg=;
+        b=VIUnEn+2Y9T+gXuiNej5CvIMuwF52vHIKgR63GrEI7M98nDCslD7yISM1MVWLF0U0y
+         fVTK6boVT5T6HA38mLMWt31cko35cNksGuqz5N1PJRpAKRQRSVlHNRQlYA0O8kWWfi7q
+         22GxXJCEvng+yduX381jSDQtlUqfe+P65xbnCHBcjnXNeOGvkChSbW2nmiX9sMO3NFKD
+         OAU/fxZxYBXSnCKri1JNc0QpYduSfM1HYNr5iSNZ4226s5McuJZU9+Bt7WWQXFthLskf
+         Rztl4CO2a7/x9Sik+z7ufRQfAos0kui6nipRKwqTviM/cuJUWnpTGuoJGmXI8g9PzejS
+         9pVg==
+X-Gm-Message-State: AC+VfDwZ/bLDN7z1st88vdFYMxwkmoLC9ZKATkCyBYNz6Sp5c3UYbtAa
+	sLxnqdKdaoplhTX54Or//FejqIedlBjKHL/rG79gCYpi61I=
+X-Google-Smtp-Source: ACHHUZ4b63twVktw9OV9rgviDlIugKQa9P+nQA7wqA42lICa8QHV19SItZNM/w+6zEtEADTuynSWlTAF2CCC328CKzY=
+X-Received: by 2002:a05:6512:220e:b0:4f8:a80c:896a with SMTP id
+ h14-20020a056512220e00b004f8a80c896amr738438lfu.7.1687959417216; Wed, 28 Jun
+ 2023 06:36:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628124326.55732-3-ruppala@nvidia.com>
-Sender: Russell King (Oracle) <linux@armlinux.org.uk>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+From: Nayan Gadre <beejoy.nayan@gmail.com>
+Date: Wed, 28 Jun 2023 19:06:45 +0530
+Message-ID: <CABTgHBsEfgr8wQNF-YGR9mWMOb3bSESRdO4YVL+8+V6VA-PVuw@mail.gmail.com>
+Subject: Routing in case of GRE interface under a bridge
+To: netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 28, 2023 at 06:13:25PM +0530, Revanth Kumar Uppala wrote:
-> +	/* Lane bring-up failures are seen during interface up, as interface
-> +	 * speed settings are configured while the PHY is still initializing.
-> +	 * To resolve this, poll until PHY system side interface gets ready
-> +	 * and the interface speed settings are configured.
-> +	 */
-> +	ret = phy_read_mmd_poll_timeout(phydev, MDIO_MMD_PHYXS, MDIO_PHYXS_VEND_IF_STATUS,
-> +					val, (val & MDIO_PHYXS_VEND_IF_STATUS_TX_READY),
-> +					20000, 2000000, false);
+Hi,
 
-What does this actually mean when the condition succeeds? Does it mean
-that the system interface is now fully configured (but may or may not
-have link)?
+I have a "l2gre0" and "eth0" interface under the bridge "br0". If a
+packet comes to eth0 interface with a destination IP address say
+10.10.10.1 which is not known on the Linux system, as there is no
+route for 10.10.10.1, will the l2gre0 interface encapsulate this
+packet and send it across the tunnel ?
+The other endpoint is on a different Linux system with another l2gre0
+interface having IP address 10.10.10.1
 
-If that's correct, then that's fine. If it doesn't succeed because
-the system interface doesn't have link, then that would be very bad,
-because _this_ function needs to return so the MAC side can then be
-configured to gain link with the PHY with the appropriate link
-parameters.
-
-The comment doesn't make it clear which it is.
-
-Thanks.
-
--- 
-RMK's Patch system: https://www.armlinux.org.uk/developer/patches/
-FTTP is here! 80Mbps down 10Mbps up. Decent connectivity at last!
+Thanks
+N Gadre
 
