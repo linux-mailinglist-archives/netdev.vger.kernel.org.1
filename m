@@ -1,181 +1,96 @@
-Return-Path: <netdev+bounces-14447-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9347B74189F
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:07:14 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 424B2280D3B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 19:07:13 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DD7A1079A;
-	Wed, 28 Jun 2023 19:07:11 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DD4110795
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 19:07:09 +0000 (UTC)
-Received: from smtp-8fab.mail.infomaniak.ch (smtp-8fab.mail.infomaniak.ch [IPv6:2001:1600:3:17::8fab])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B0531BD4
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 12:07:06 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Qrrfv5k2jzMpr2X;
-	Wed, 28 Jun 2023 19:07:03 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Qrrft3slkzMpr45;
-	Wed, 28 Jun 2023 21:07:02 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1687979223;
-	bh=KJ0S+L/apssQg9gVVF2ykqWTCwTmUCmj7dvjStIHKE4=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=qc+2YsQ/acg0yqOzp1GFW+zEWdVRSGNNf+1kvYGvPpzPdHVPyoyErXqEr8wpg7d5B
-	 oOZzDO2Bg0CePIGEKCJ76XAxZ37Df1G/40oPzkwpLw2ngKveSzCqkxIJKfJFOWcPRA
-	 nt3B4Gx4Npn4i4YDIdfxr7oQxTwydRYB3wYcTB5w=
-Message-ID: <618f11b6-7766-95b1-8fef-679de21b1fa2@digikod.net>
-Date: Wed, 28 Jun 2023 21:07:01 +0200
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 884207418BE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:16:35 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S231721AbjF1TQd (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 15:16:33 -0400
+Received: from mx0b-0031df01.pphosted.com ([205.220.180.131]:37622 "EHLO
+        mx0b-0031df01.pphosted.com" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229622AbjF1TQc (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 15:16:32 -0400
+Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
+        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SIWEEx005881;
+        Wed, 28 Jun 2023 19:16:22 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=qcppdkim1;
+ bh=FQwzeHmbIM0Euxm6oEsZxszzIMDVVE6jcsQBFWvDU8s=;
+ b=C/135k2Y6pKLmmNhUc5Oi9I95FAYMd3ReWtv+Iw86I+TYjRGrNVrN5IAAPi9It5JTSxh
+ KYU9O+G9qGCKT6iZ7mN2OZ1g/smeS0rAFubf/+ktNsJUiNm4Okpri3Mbll116v4imJf6
+ i40r8GrqDFf9V89PsFQF6UC1ATkh0T4sLC7DX6cfOQ+fZgOmrc4qRL6ABVL5/H+8U1FI
+ 6r83Ozs3N8l0eq/Sv71BG2XRi7gGEJrQ1F8BqT5CJWp+j4j254sEJYNyIFp33H2+wVPo
+ gUuSI9QedoEaYx8vTyXTdVmhjfEFduhLUoNsMcb6Gv+ivUfj7fVNUVi/aIEFEdUw2HOo OA== 
+Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rg7x3tf9c-1
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Jun 2023 19:16:22 +0000
+Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
+        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 35SJGLIg016766
+        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+        Wed, 28 Jun 2023 19:16:21 GMT
+Received: from jhugo-lnx.qualcomm.com (10.80.80.8) by
+ nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.7; Wed, 28 Jun 2023 12:16:19 -0700
+From:   Jeffrey Hugo <quic_jhugo@quicinc.com>
+To:     <quic_subashab@quicinc.com>, <quic_stranche@quicinc.com>,
+        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>, <corbet@lwn.net>, <andersson@kernel.org>
+CC:     <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>,
+        Jeffrey Hugo <quic_jhugo@quicinc.com>
+Subject: [PATCH] docs: networking: Update codeaurora references for rmnet
+Date:   Wed, 28 Jun 2023 13:16:06 -0600
+Message-ID: <20230628191606.25483-1-quic_jhugo@quicinc.com>
+X-Mailer: git-send-email 2.40.1
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v9 00/12] Network support for Landlock - allowed list of
- protocols
-Content-Language: en-US
-To: =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack@google.com>
-Cc: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>,
- =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack3000@gmail.com>,
- willemdebruijn.kernel@gmail.com, linux-security-module@vger.kernel.org,
- netdev@vger.kernel.org, netfilter-devel@vger.kernel.org,
- yusongping@huawei.com, artem.kuzin@huawei.com, Jeff Xu <jeffxu@google.com>,
- Jorge Lucangeli Obes <jorgelo@chromium.org>,
- Allen Webb <allenwebb@google.com>, Dmitry Torokhov <dtor@google.com>
-References: <20230116085818.165539-1-konstantin.meskhidze@huawei.com>
- <Y/fl5iEbkL5Pj5cJ@galopp> <c20fc9eb-518e-84b4-0dd5-7b97c0825259@huawei.com>
- <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net>
- <b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net>
- <ZJvy2SViorgc+cZI@google.com>
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <ZJvy2SViorgc+cZI@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01a.na.qualcomm.com (10.47.209.196)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: JdkZxa_cpm4G8N6Qmh1659DTuz0zTIEv
+X-Proofpoint-GUID: JdkZxa_cpm4G8N6Qmh1659DTuz0zTIEv
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-28_13,2023-06-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
+ spamscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 mlxscore=0
+ adultscore=0 mlxlogscore=999 lowpriorityscore=0 phishscore=0 bulkscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306280168
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
+source.codeaurora.org is no longer accessible and so the reference link
+in the documentation is not useful.  The content was mirrored over to
+Code Linaro so lets update the references to point there instead.
 
-On 28/06/2023 10:44, Günther Noack wrote:
-> Hello!
-> 
-> On Mon, Jun 26, 2023 at 05:29:34PM +0200, Mickaël Salaün wrote:
->> Here is a design to be able to only allow a set of network protocols and
->> deny everything else. This would be complementary to Konstantin's patch
->> series which addresses fine-grained access control.
->>
->> First, I want to remind that Landlock follows an allowed list approach with
->> a set of (growing) supported actions (for compatibility reasons), which is
->> kind of an allow-list-on-a-deny-list. But with this proposal, we want to be
->> able to deny everything, which means: supported, not supported, known and
->> unknown protocols.
->>
->> We could add a new "handled_access_socket" field to the landlock_ruleset
->> struct, which could contain a LANDLOCK_ACCESS_SOCKET_CREATE flag.
->>
->> If this field is set, users could add a new type of rules:
->> struct landlock_socket_attr {
->>      __u64 allowed_access;
->>      int domain; // see socket(2)
->>      int type; // see socket(2)
->> }
->>
->> The allowed_access field would only contain LANDLOCK_ACCESS_SOCKET_CREATE at
->> first, but it could grow with other actions (which cannot be handled with
->> seccomp):
->> - use: walk through all opened FDs and mark them as allowed or denied
->> - receive: hook on received FDs
->> - send: hook on sent FDs
->>
->> We might also use the same approach for non-socket objects that can be
->> identified with some meaningful properties.
->>
->> What do you think?
-> 
-> This sounds like a good plan to me - it would make it possible to restrict new
-> socket creation using protocols that were not intended to be used, and I also
-> think it would fit the Landlock model nicely.
-> 
-> Small remark on the side: The security_socket_create() hook does not only get
-> invoked as a result of socket(2), but also as a part of accept(2) - so this
-> approach might already prevent new connections very effectively.
+Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
+---
+ .../networking/device_drivers/cellular/qualcomm/rmnet.rst     | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Indeed. We could also differentiate socket(2) from accept(2) with a 
-dedicated LANDLOCK_ACCESS_SOCKET_ACCEPT right. This would enable to 
-create a bind socket, sandbox the process and deny new socket(2) calls, 
-but still allows to call accept(2) and receive new connections.
-
-BTW, unix socket path opening should be considered too.
-
-> 
-> Spelling out some scenarios, so that we are sure that we are on the same page:
-> 
-> A)
-> 
-> A program that does not need networking could specify a ruleset where
-> LANDLOCK_ACCESS_SOCKET_CREATE is handled, and simply not permit anything.
-
-This is correct, except if the process receive a socket FD or open a 
-unix socket path.
-
-
-> 
-> B)
-> 
-> A program that runs a TCP server could specify a ruleset where
-> LANDLOCK_NET_BIND_TCP, LANDLOCK_NET_CONNECT_TCP and
-
-s/LANDLOCK_NET_CONNECT_TCP/LANDLOCK_ACCESS_NET_CONNECT_TCP/
-
-> LANDLOCK_ACCESS_SOCKET_CREATE are handled, and where the following rules are added:
-> 
->    /* From Konstantin's patch set */
->    struct landlock_net_service_attr bind_attr = {
->      .allowed_access = LANDLOCK_NET_BIND_TCP,
->      .port = 8080,
->    };
-> 
->    /* From Mickaël's proposal */
->    struct landlock_socket_attr sock_inet_attr = {
->      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->      .domain = AF_INET,
->      .type = SOCK_STREAM,
->    }
-> 
->    struct landlock_socket_attr sock_inet6_attr = {
->      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
->      .domain = AF_INET6,
->       .type = SOCK_STREAM,
->    }
-> 
-> That should then be enough to bind and listen on ports, whereas outgoing
-> connections with TCP and anything using other network protocols would not be
-> permitted.
-> 
-> (Alternatively, it could bind() the socket early, *then enable Landlock* and
-> leave out the rule for BIND_TCP, only permitting SOCKET_CREATE for IPv4 and
-> IPv6, so that listen() and accept() work on the already-bound socket.)
-
-correct
-
-> 
-> Overall, this sounds like an excellent approach to me. 👍
-> 
-> —Günther
-> 
+diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+index 4118384cf8eb..a3d91034ef30 100644
+--- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
++++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
+@@ -191,7 +191,7 @@ MAP header|IP Packet|Optional padding|MAP header|Command Packet|Optional pad...
+ ==========================
+ 
+ rmnet userspace configuration is done through netlink library librmnetctl
+-and command line utility rmnetcli. Utility is hosted in codeaurora forum git.
++and command line utility rmnetcli. Utility is hosted in Code Linaro git.
+ The driver uses rtnl_link_ops for communication.
+ 
+-https://source.codeaurora.org/quic/la/platform/vendor/qcom-opensource/dataservices/tree/rmnetctl
++https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/dataservices/
+-- 
+2.40.1
 
