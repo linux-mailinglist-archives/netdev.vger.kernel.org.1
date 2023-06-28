@@ -1,119 +1,129 @@
-Return-Path: <netdev+bounces-14459-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14460-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DEA7741AD8
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:27:42 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E1301741B05
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:34:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 509521C20847
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:27:41 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10E71280D03
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:34:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41FA411192;
-	Wed, 28 Jun 2023 21:27:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C8B11195;
+	Wed, 28 Jun 2023 21:34:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3596111181
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:27:39 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C7B0210E;
-	Wed, 28 Jun 2023 14:27:37 -0700 (PDT)
-Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SKvbk6023817;
-	Wed, 28 Jun 2023 21:27:30 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=E3xlbiz/oogAND8NeoIkYwev4is3nvBY4FThkGBj8FE=;
- b=XtVIcGh8VJ6UKsTFvY7ms5HTjqCoAYOSNAy46dOgojaA8RyfcGiJBKpJMEGWvC5wIySk
- TMQAPJevIK0cykkym1sOu0e4XFS1dgRtXFxY36/a/cP3OQ0n4fYCQkN1w4sh+2KPgwyZ
- 5Z3yB9mPSB3TApPHLlDUmmMSieYndNKzapbHbe8FlxnOPq2oej0bo9aTlr1s6Eucy2GI
- cYhJw6ckzXOkmh3CDcfSSfLtm8+ENxGCpD9yOVQcTf116i/kGDjHuGGr0Xh33IJicPqz
- Obu2u7ghu5eF+B5iJMoNSNYg/Dpq1n6DTSd5AGUQAYEPWf6XfOjyf7g6Clp+EAykz3QH dw== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rgaxctb4u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Jun 2023 21:27:29 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-	by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 35SLRTeM021207
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 28 Jun 2023 21:27:29 GMT
-Received: from [10.110.17.251] (10.80.80.8) by nalasex01a.na.qualcomm.com
- (10.47.209.196) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.7; Wed, 28 Jun
- 2023 14:27:28 -0700
-Message-ID: <b1e956cb-431f-197f-09de-7e407faffbf8@quicinc.com>
-Date: Wed, 28 Jun 2023 15:27:07 -0600
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C3EC14D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:34:10 +0000 (UTC)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B671FE4;
+	Wed, 28 Jun 2023 14:34:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687988049; x=1719524049;
+  h=from:to:cc:subject:in-reply-to:references:date:
+   message-id:mime-version;
+  bh=2zFRPcPqSdw/rQupEM6m4agW4/QKfyjYyUa1kit0f1s=;
+  b=UIa1fHs2Zs9fdB87YCNRFAuxiWbmg/365ZNADpyUTOAtzHvLgfO5lBUK
+   wxw67CFmygXg+ogUUMNSmnnNLywwAJ0Au4bjzmidC/nbeyA6beV653ui/
+   lSYP1SiJBy5+Qb4mDjF7U7L2U0i/tqr98wyd7l0MXuKC+xLb3kZz6wVk/
+   4nCnAFdauRuLIoNlwLs9RgXmrPzHLU9plxZuBFcUBTmly0A3B2lUc86t9
+   D2mOHA42J2FRRrzQU0rztrUyjmIDZ8kycv95abvSgM7JDW6P8UmVR+wzU
+   xTd3Fit49RtYOAk49V48l7GcxjvapcCmElyyuz4oLkqLm/WUSy1+cpXET
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="351758361"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="351758361"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 14:34:08 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="787172958"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="787172958"
+Received: from vcostago-desk1.jf.intel.com (HELO vcostago-desk1) ([10.54.70.17])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 14:34:07 -0700
+From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+To: Florian Kauer <florian.kauer@linutronix.de>, Jesse Brandeburg
+ <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, Vedang Patel <vedang.patel@intel.com>, Maciej
+ Fijalkowski <maciej.fijalkowski@intel.com>, Jithu Joseph
+ <jithu.joseph@intel.com>, Andre Guedes <andre.guedes@intel.com>, Simon
+ Horman <simon.horman@corigine.com>
+Cc: netdev@vger.kernel.org, kurt@linutronix.de,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+Subject: Re: [Intel-wired-lan] [PATCH net v2] igc: Prevent garbled TX queue
+ with XDP ZEROCOPY
+In-Reply-To: <20230628091148.62256-1-florian.kauer@linutronix.de>
+References: <20230628091148.62256-1-florian.kauer@linutronix.de>
+Date: Wed, 28 Jun 2023 14:34:07 -0700
+Message-ID: <87a5wjqnjk.fsf@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH] docs: networking: Update codeaurora references for rmnet
-To: Jeffrey Hugo <quic_jhugo@quicinc.com>, <quic_stranche@quicinc.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <corbet@lwn.net>, <andersson@kernel.org>
-CC: <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-References: <20230628191606.25483-1-quic_jhugo@quicinc.com>
-Content-Language: en-US
-From: "Subash Abhinov Kasiviswanathan (KS)" <quic_subashab@quicinc.com>
-In-Reply-To: <20230628191606.25483-1-quic_jhugo@quicinc.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: _P_HTuEuZSWqggrLcQn07mEd5sXWKPas
-X-Proofpoint-ORIG-GUID: _P_HTuEuZSWqggrLcQn07mEd5sXWKPas
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-28_14,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 lowpriorityscore=0
- suspectscore=0 mlxscore=0 clxscore=1011 priorityscore=1501 bulkscore=0
- malwarescore=0 mlxlogscore=999 spamscore=0 adultscore=0 phishscore=0
- impostorscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2306280190
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/28/2023 1:16 PM, Jeffrey Hugo wrote:
-> source.codeaurora.org is no longer accessible and so the reference link
-> in the documentation is not useful.  The content was mirrored over to
-> Code Linaro so lets update the references to point there instead.
-> 
-> Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
-> ---
->   .../networking/device_drivers/cellular/qualcomm/rmnet.rst     | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
-> 
-> diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-> index 4118384cf8eb..a3d91034ef30 100644
-> --- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-> +++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-> @@ -191,7 +191,7 @@ MAP header|IP Packet|Optional padding|MAP header|Command Packet|Optional pad...
->   ==========================
->   
->   rmnet userspace configuration is done through netlink library librmnetctl
-> -and command line utility rmnetcli. Utility is hosted in codeaurora forum git.
-> +and command line utility rmnetcli. Utility is hosted in Code Linaro git.
->   The driver uses rtnl_link_ops for communication.
->   
-> -https://source.codeaurora.org/quic/la/platform/vendor/qcom-opensource/dataservices/tree/rmnetctl
-> +https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/dataservices/
+Florian Kauer <florian.kauer@linutronix.de> writes:
 
-I've discussed this with Jeffrey - I'll send a v2 which points to 
-iproute2 instead as it has a rmnet module for configuration.
+> In normal operation, each populated queue item has
+> next_to_watch pointing to the last TX desc of the packet,
+> while each cleaned item has it set to 0. In particular,
+> next_to_use that points to the next (necessarily clean)
+> item to use has next_to_watch set to 0.
+>
+> When the TX queue is used both by an application using
+> AF_XDP with ZEROCOPY as well as a second non-XDP application
+> generating high traffic, the queue pointers can get in
+> an invalid state where next_to_use points to an item
+> where next_to_watch is NOT set to 0.
+>
+> However, the implementation assumes at several places
+> that this is never the case, so if it does hold,
+> bad things happen. In particular, within the loop inside
+> of igc_clean_tx_irq(), next_to_clean can overtake next_to_use.
+> Finally, this prevents any further transmission via
+> this queue and it never gets unblocked or signaled.
+> Secondly, if the queue is in this garbled state,
+> the inner loop of igc_clean_tx_ring() will never terminate,
+> completely hogging a CPU core.
+>
+> The reason is that igc_xdp_xmit_zc() reads next_to_use
+> before acquiring the lock, and writing it back
+> (potentially unmodified) later. If it got modified
+> before locking, the outdated next_to_use is written
+> pointing to an item that was already used elsewhere
+> (and thus next_to_watch got written).
+>
+> Fixes: 9acf59a752d4 ("igc: Enable TX via AF_XDP zero-copy")
+> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+> Tested-by: Kurt Kanzenbach <kurt@linutronix.de>
+> ---
+
+This patch doesn't directly apply because there's a small conflict with
+commit 95b681485563 ("igc: Avoid transmit queue timeout for XDP"),
+but really easy to solve.
+
+Anyway, good catch:
+
+Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
+
+
+Cheers,
+-- 
+Vinicius
 
