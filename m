@@ -1,83 +1,78 @@
-Return-Path: <netdev+bounces-14448-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14449-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A305D741901
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:44:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4DFF7741938
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 22:04:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39572280D6A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 19:44:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 553341C203BA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 20:04:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6FFEF107B1;
-	Wed, 28 Jun 2023 19:44:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16E90107BF;
+	Wed, 28 Jun 2023 20:04:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCC510795
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 19:44:11 +0000 (UTC)
-Received: from mail-lf1-x131.google.com (mail-lf1-x131.google.com [IPv6:2a00:1450:4864:20::131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 680DD1BE6;
-	Wed, 28 Jun 2023 12:44:09 -0700 (PDT)
-Received: by mail-lf1-x131.google.com with SMTP id 2adb3069b0e04-4f957a45b10so39308e87.0;
-        Wed, 28 Jun 2023 12:44:09 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 077D2107B1
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:04:14 +0000 (UTC)
+Received: from mail-oo1-xc2b.google.com (mail-oo1-xc2b.google.com [IPv6:2607:f8b0:4864:20::c2b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 008F62132;
+	Wed, 28 Jun 2023 13:04:12 -0700 (PDT)
+Received: by mail-oo1-xc2b.google.com with SMTP id 006d021491bc7-5658573b1faso230092eaf.1;
+        Wed, 28 Jun 2023 13:04:12 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687981447; x=1690573447;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=24xzpN7HM7t7BscRHE2SgUACQ+eIA8sq8IN33K3tmOQ=;
-        b=WODHj/yYpYvcJQVjjp07mXGyIyXIxAnE1y3kleyMU/+wK0u6GzGJ5IYJvZ49WjJJXG
-         hMixzSrwu9JbRf9Ujwch7ub8/obzcnE5N33y8jjIuOdKdQFky22pQKevW2CC6blz/Ma+
-         bDIhm8XS56ISmfuFjV61BT/98AUOOJ0RQL1f8TWUrWdH+iYlmRdM31YeT0/jpX3IQ+V1
-         vAIL9wjb6JMLeZskH77MSHE6qBmeXbHjZAPW/BPpKqmLVZqbjaJJL6VVjd2xZywH5CuW
-         BJU28FW4UJoU6vnIOYtJ7G7jJosBSdg41eFJtcoexLU5AiBMGLg/lKdUvW7vpwT5G1To
-         wg/A==
+        d=gmail.com; s=20221208; t=1687982652; x=1690574652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=LShLkpq2kaVqJKc1RK3ziSqQG3OYar6M393HgmIhy/8=;
+        b=Nf/hOwO44fgI+3JqQ5xwEDzpvwhyz/UvKI22RcOemapDYUN73aNR19jOZzpp5kBr8/
+         +dSHso9z9TCUvzhpH2lCPAwO9SxrLfudERiUELZmeBi+zlut9sqlVkLrNeiHuYEmw2fr
+         Zb1rm251xybGYVje071GAnLOmUUfq5M9pkminAP5guOQMPulJABm//oZokmrZYNsBgi7
+         Lz/Kpa3Aet/hWFDVaEU1ckVv1pJYwFwcTly7GxjhZqfrA5fdKGc1gYa+fMuvWxB6W5l+
+         plj39ze8CJV6jhMFbR8cJZZMOKsdZxgnqAdmD2KJqGqoxojcbF5Q72qP9Z/8WyVDw3f4
+         qIOg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687981447; x=1690573447;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=24xzpN7HM7t7BscRHE2SgUACQ+eIA8sq8IN33K3tmOQ=;
-        b=EQxGEe643WO5b9lHbsOqIlplkJD9nWe3AjI38nntm4ahj8mogrHjKANXKRcSkl6jED
-         6X3suw6YY967TIO9ZOGkr28kJDjCGUEDKVsOSE+4rweXVkdyPNgbxnTAWPEyG3pakXgT
-         hEC1ggsnehln6gMyZSn/nBfgpllmoW1UOFJbIsZ2WmxlUkaoPY1w5X0ontO082T/8Z4z
-         ANYCPIHjB1TTs2HdhaHTWToSmprI8Mj3bNXaB1juwTg0dgYglpcTS4VKIK5qu6YhaKQq
-         no/qK3+qTnIJnAnOULxoE5JKwHsY8DWOQg/B1YtE7lEacAbDT1ZOlM18svhmwCH1k8yH
-         fkpg==
-X-Gm-Message-State: ABy/qLYQJ3IQbsRUBz0HUlUEmRC9GMJSHD62htFBP6XOLg2VUMgEqc+A
-	2xcnAmJzrABRp4DgGieIopzIvYIGMSXDiA==
-X-Google-Smtp-Source: APBJJlFSUHsJAN2mbCaOU0cBBFdkIkZMd/h4saQH5B9IruyRKs57bLyadu4DN0LdTjo8BOGyFmb8/A==
-X-Received: by 2002:a05:6512:3194:b0:4fb:99c6:8533 with SMTP id i20-20020a056512319400b004fb99c68533mr85285lfe.33.1687981447038;
-        Wed, 28 Jun 2023 12:44:07 -0700 (PDT)
-Received: from WBEC325.dom.local ([185.188.71.122])
-        by smtp.gmail.com with ESMTPSA id q6-20020ac246e6000000b004fb915e8b93sm355434lfo.201.2023.06.28.12.44.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 12:44:02 -0700 (PDT)
-From: Pawel Dembicki <paweldembicki@gmail.com>
-To: netdev@vger.kernel.org
-Cc: Pawel Dembicki <paweldembicki@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	Vladimir Oltean <olteanv@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] net: dsa: vsc73xx: fix MTU configuration
-Date: Wed, 28 Jun 2023 21:43:27 +0200
-Message-Id: <20230628194327.1765644-1-paweldembicki@gmail.com>
-X-Mailer: git-send-email 2.34.1
+        d=1e100.net; s=20221208; t=1687982652; x=1690574652;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=LShLkpq2kaVqJKc1RK3ziSqQG3OYar6M393HgmIhy/8=;
+        b=Ib99nmnCxjCraHfoPrIuM/LGtyXkENa26v0L4AY3F61B4OGzG7hfdw3+PV7EV7F22+
+         /rocNRm3+xr7yEYrfG0Nf84XKFi66E0w16ZK6Kz8w9STAZLOuwMxMF+Yq/ESYRMsQE0C
+         X00+QaEYk+7dRQtcKUstCMSGlc88iqFnbCp/S003iTLs1YuZni9+VepaDNEmmwuUcQdb
+         Q8fAJMAX6FKGdLGT9ZBEuMXMJS5sWPm9Ejk5RPKTaxJPR4Q6tM2rZTXu/00xVni0dYQX
+         XATj74eOZT4Vq4JSq+7qqdKKjIcCMsmAEfCTlP/4Ts8MI4I1B+MaKBWY6OjwK/THtSVC
+         SDuA==
+X-Gm-Message-State: ABy/qLaDDziq21dup/A8lH9CD+97WooO09ZjFCG14Fs1wGeujpxUcDNf
+	75LxorLBV+pTJ9Rd0fJQcYa0jrgzSaFgcnLSox4=
+X-Google-Smtp-Source: APBJJlHi2R8anXXdjkOvNtmXPZjlvtDN/IY4GwitUMXvKUUw+9jFBMn6gVxSeTKynpLCuuho5J6zmkcFklRGgDBnNSc=
+X-Received: by 2002:a05:6359:69c:b0:134:e603:116e with SMTP id
+ ei28-20020a056359069c00b00134e603116emr744826rwb.6.1687982652055; Wed, 28 Jun
+ 2023 13:04:12 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
+References: <20230625115343.1603330-1-paweldembicki@gmail.com>
+ <20230625115343.1603330-7-paweldembicki@gmail.com> <20230625145445.ialdexs2wxu6lu73@skbuf>
+In-Reply-To: <20230625145445.ialdexs2wxu6lu73@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Wed, 28 Jun 2023 22:04:00 +0200
+Message-ID: <CAJN1Kky+uYT198htPD7QOr249LjEXHjCZoE0JW4k8CvhpGkCqg@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 7/7] net: dsa: vsc73xx: fix MTU configuration
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -85,51 +80,80 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Switch in MAXLEN register stores the maximum size of a data frame.
-The MTU size is 18 bytes smaller than the frame size.
+niedz., 25 cze 2023 o 16:54 Vladimir Oltean <olteanv@gmail.com> napisa=C5=
+=82(a):
+>
+> On Sun, Jun 25, 2023 at 01:53:42PM +0200, Pawel Dembicki wrote:
+> > Switch in MAXLEN register store maximum size of data frame.
+> > MTU size is 18 bytes smaller than frame size.
+> >
+> > Current settings causes problems with packet forwarding.
+> > This patch fix MTU settings to proper values.
+> >
+> > Fixes: fb77ffc6ec86 ("net: dsa: vsc73xx: make the MTU configurable")
+> > Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> > ---
+>
+> Please split this patch from the rest of the series and re-target it
+> towards net.git.
+>
 
-The current settings are causing problems with packet forwarding.
-This patch fixes the MTU settings to proper values.
+I resend it.
+https://lore.kernel.org/netdev/20230628194327.1765644-1-paweldembicki@gmail=
+.com/
 
-Fixes: fb77ffc6ec86 ("net: dsa: vsc73xx: make the MTU configurable")
-Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
-Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+--
+Pawel Dembicki
 
----
-In my first attempt, I sent it to net-next [0], but I was asked to resend
-it to net.
-
-[0]https://lore.kernel.org/netdev/20230625115343.1603330-7-paweldembicki@gmail.com/
-
- drivers/net/dsa/vitesse-vsc73xx-core.c | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
-
-diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/vitesse-vsc73xx-core.c
-index ae55167ce0a6..ef1a4a7c47b2 100644
---- a/drivers/net/dsa/vitesse-vsc73xx-core.c
-+++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
-@@ -1025,17 +1025,17 @@ static int vsc73xx_change_mtu(struct dsa_switch *ds, int port, int new_mtu)
- 	struct vsc73xx *vsc = ds->priv;
- 
- 	return vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port,
--			     VSC73XX_MAXLEN, new_mtu);
-+			     VSC73XX_MAXLEN, new_mtu + ETH_HLEN + ETH_FCS_LEN);
- }
- 
- /* According to application not "VSC7398 Jumbo Frames" setting
-- * up the MTU to 9.6 KB does not affect the performance on standard
-+ * up the frame size to 9.6 KB does not affect the performance on standard
-  * frames. It is clear from the application note that
-  * "9.6 kilobytes" == 9600 bytes.
-  */
- static int vsc73xx_get_max_mtu(struct dsa_switch *ds, int port)
- {
--	return 9600;
-+	return 9600 - ETH_HLEN - ETH_FCS_LEN;
- }
- 
- static const struct dsa_switch_ops vsc73xx_ds_ops = {
--- 
-2.34.1
-
+> > v2:
+> >   - fix commit message style issue
+> >
+> >  drivers/net/dsa/vitesse-vsc73xx-core.c | 7 ++++---
+> >  1 file changed, 4 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/v=
+itesse-vsc73xx-core.c
+> > index c946464489ab..59bb3dbe780a 100644
+> > --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> > +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> > @@ -979,17 +979,18 @@ static int vsc73xx_change_mtu(struct dsa_switch *=
+ds, int port, int new_mtu)
+> >       struct vsc73xx *vsc =3D ds->priv;
+> >
+> >       return vsc73xx_write(vsc, VSC73XX_BLOCK_MAC, port,
+> > -                          VSC73XX_MAXLEN, new_mtu);
+> > +                          VSC73XX_MAXLEN, new_mtu + ETH_HLEN + ETH_FCS=
+_LEN);
+> >  }
+> >
+> >  /* According to application not "VSC7398 Jumbo Frames" setting
+> > - * up the MTU to 9.6 KB does not affect the performance on standard
+> > + * up the frame size to 9.6 KB does not affect the performance on stan=
+dard
+> >   * frames. It is clear from the application note that
+> >   * "9.6 kilobytes" =3D=3D 9600 bytes.
+> >   */
+> >  static int vsc73xx_get_max_mtu(struct dsa_switch *ds, int port)
+> >  {
+> > -     return 9600;
+> > +     /* max mtu =3D 9600 - ETH_HLEN - ETH_FCS_LEN */
+> > +     return 9582;
+>
+> This can also be:
+>
+>         return 9600 - ETH_HLEN - ETH_FCS_LEN;
+>
+> since the arithmetic is on constants, it can be evaluated at compile
+> time and it results in the same generated code, but the comment is no
+> longer necessary.
+>
+> >  }
+> >
+> >  static void vsc73xx_port_stp_state_set(struct dsa_switch *ds, int port=
+,
+> > --
+> > 2.34.1
+> >
+>
 
