@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-14465-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14466-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3D19741C86
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 01:38:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A532741C87
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 01:39:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0DDD280D0B
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:38:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AB2ED280D15
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:38:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 66DC311190;
-	Wed, 28 Jun 2023 23:38:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4CEDC11C8E;
+	Wed, 28 Jun 2023 23:38:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59DEB11185
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 23:38:19 +0000 (UTC)
-Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 38D4E1BDF
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 16:38:18 -0700 (PDT)
-Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1b80ddce748so661635ad.3
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 16:38:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 422D011C8D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 23:38:20 +0000 (UTC)
+Received: from mail-pl1-x633.google.com (mail-pl1-x633.google.com [IPv6:2607:f8b0:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1682C132
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 16:38:19 -0700 (PDT)
+Received: by mail-pl1-x633.google.com with SMTP id d9443c01a7336-1b7f68f1c9eso830455ad.2
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 16:38:19 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687995497; x=1690587497;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1687995498; x=1690587498;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=Y+7VmZFDHYdTl/J7POY8Q85vpg2oR4oUgRKjOWkmrcQ=;
-        b=bWKr/eOf67zNMKDTWsMNLC9U/VX/qZ9T+sL93jrCi3BXD9XKBhIal8UQAokECwjtik
-         JsZgOh+3zpiC+G9zgfrBTttcWwy75k56h+4KBtohkkb97F2OXiwaJYzDwFgH7EPMjqWC
-         ItNjcyGxMcVsP4bIqDoFn534bRsu1JgZ5eF1GGzn18i8fozpjpiMDLKdYwlM6xFH+jYT
-         x1m6yjALxo8JNQmKsdyb3bUl9+9tyJyOT7tUIypmc1Uj8Bxag3GIEGS37k7qBAmQsWky
-         O4u4kQTq9WIK6zewmXh43FBhWXZBQ+ImsHok1lY9pY8v6zoMbHG6t+0R5u34Kw0n90cq
-         qBfw==
+        bh=/wdihvrzaNzfkenF/sT5C6HaVtdcbKpLpvWCmR3w9p0=;
+        b=AsRVJ8IvduiV3hj/peoMROOMcxLoCRGsThOGogkB8unacNnc96346xlk0LfcZTuqOl
+         HZt/LX2UMrVakHKcdRIOKv0k0ap/5JxZI9PttM4ZRrLJQ6Oo/YiEVwZmp85U1MmijiQ4
+         1tRAL2AJO/O/Ts3oOW/iTgiN9bSJ5VIHAph2o3v8AlpEYS9f7Meu540rGvbvREwMDz/A
+         S5ILo/hrC/hlK03wY0TEvZNE6hczHyjS0xVELsuOohRDycTImBD0zk1ZkTwe+264Gg3l
+         1Xob3wVr14kg9hvLHGD15mFjqEWlcnEjCPwRmqX5nOIXcMhISEeUXqb0cT8b6LVE7ugj
+         gFUA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687995497; x=1690587497;
+        d=1e100.net; s=20221208; t=1687995498; x=1690587498;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Y+7VmZFDHYdTl/J7POY8Q85vpg2oR4oUgRKjOWkmrcQ=;
-        b=cN72MhJBW0MO1B1SvOuoeI5J1nq4tx+b7GGgLyhj/fba6Pol5aY+O8OH4GG2A9aeYX
-         yjkF335yPQg+LbSqqQ5Nb1nqF4APfJGoqBEIPfKPFcny0wM7RY0Eo4X0Dyeh1ootxh8L
-         MtIWLgg2tDyZBUk2BXLMFtYHOLjHnrv9cgWdOPr2NQ5drsnv7CW34ir3XHjcjXQiDKbJ
-         f/PwrObouZnnFgWGPx0EqiBfc97rwJbxkYl+hRU4njiWTcKFVDONNzYKc1X2so6b+cdY
-         gnVMbJ+lwasrNcVVHztftlcSaxTQ6hAhb1U4/vL3QvRA0Bg1qc+/TJkQ5RNJv5GUXAam
-         Nw0w==
-X-Gm-Message-State: AC+VfDwVeFCffSoBHWUv0/VyuLqZr9K0CSfvyhGjoMiqdZMyc8MH1GEo
-	QOY7cK+AwlscI5t4z4OJhQ6kyYZCyz0xCZamZx6FnQ==
-X-Google-Smtp-Source: ACHHUZ7pvaMXIGblilwJCRl+wfu7npl7dJzWXvFGJ7euCvihE+UshanpnhC9aCr/9dFnCf7g7+0Nhw==
-X-Received: by 2002:a17:902:7591:b0:1b1:76c2:296a with SMTP id j17-20020a170902759100b001b176c2296amr8985472pll.60.1687995497381;
-        Wed, 28 Jun 2023 16:38:17 -0700 (PDT)
+        bh=/wdihvrzaNzfkenF/sT5C6HaVtdcbKpLpvWCmR3w9p0=;
+        b=fqUwO7dJ0JTGc6kUbQPHsoAGpJir0AfEufTjF3Fe7nGXfdMB52kqIwP+LDVGau9gGC
+         myDtzNyVflO9w/9ugKml3WpgFQMsorDs+pI6KpTqmowQfAVAZlfi2s9NqrlCJcLr0hcd
+         YT9Nhi63Qqi39frh5IDzMWhtB7bb1AMONIUS+bYiiSqNPS3tIRR3DAuoL4lFX267+8eF
+         Cg6H58YFJb5LTGWSpDUAhfPUoKOAgfX61n0oH5LLjqS0Spa/pcV11hxKXfJNLBxE20BH
+         Zf9nElDN3z9njDNfATgR5ALY/zOduM0ANVl8OYGCgWO60+YHKTH0DOhmx81PPL2nslXJ
+         UiZA==
+X-Gm-Message-State: AC+VfDwxgL5rDlYvDC1/BZf5lEPEcba8EykVtafPWDuBGfyZg2tk9RE5
+	InVLEGb+Z6vg7Iw3sgzOOaIuQVqA5P+Tsps+Nrs1jw==
+X-Google-Smtp-Source: ACHHUZ48Dkps2meH2qyUxoU3vKeZ5BuidUQqoyF256KGS/g4J4f71FauKLYAqwrtRCQro0Nr5WdTrQ==
+X-Received: by 2002:a17:902:c951:b0:1b5:219a:cbbd with SMTP id i17-20020a170902c95100b001b5219acbbdmr16867272pla.3.1687995498414;
+        Wed, 28 Jun 2023 16:38:18 -0700 (PDT)
 Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
-        by smtp.gmail.com with ESMTPSA id s18-20020a170902a51200b001b7fb1a8200sm6437196plq.258.2023.06.28.16.38.16
+        by smtp.gmail.com with ESMTPSA id s18-20020a170902a51200b001b7fb1a8200sm6437196plq.258.2023.06.28.16.38.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 16:38:16 -0700 (PDT)
+        Wed, 28 Jun 2023 16:38:17 -0700 (PDT)
 From: Stephen Hemminger <stephen@networkplumber.org>
 To: netdev@vger.kernel.org
 Cc: Stephen Hemminger <stephen@networkplumber.org>
-Subject: [PATCH iproute2 1/5] dcb: fully initialize flag table
-Date: Wed, 28 Jun 2023 16:38:09 -0700
-Message-Id: <20230628233813.6564-2-stephen@networkplumber.org>
+Subject: [PATCH iproute2 2/5] fix fallthrough warnings
+Date: Wed, 28 Jun 2023 16:38:10 -0700
+Message-Id: <20230628233813.6564-3-stephen@networkplumber.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230628233813.6564-1-stephen@networkplumber.org>
 References: <20230628233813.6564-1-stephen@networkplumber.org>
@@ -78,54 +78,42 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-And make the flag table const since only used for lookup.
+In lib/utils.c comment for fallthrough was in wrong place
+and one was missing in xfrm_state.
 
 Signed-off-by: Stephen Hemminger <stephen@networkplumber.org>
 ---
- dcb/dcb_dcbx.c | 16 ++++++++--------
- 1 file changed, 8 insertions(+), 8 deletions(-)
+ ip/xfrm_state.c | 1 +
+ lib/utils.c     | 3 +--
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-diff --git a/dcb/dcb_dcbx.c b/dcb/dcb_dcbx.c
-index 244b671b893b..9e3dd2a0af87 100644
---- a/dcb/dcb_dcbx.c
-+++ b/dcb/dcb_dcbx.c
-@@ -42,12 +42,12 @@ struct dcb_dcbx_flag {
- 	const char *key_json;
- };
- 
--static struct dcb_dcbx_flag dcb_dcbx_flags[] = {
--	{DCB_CAP_DCBX_HOST, "host"},
--	{DCB_CAP_DCBX_LLD_MANAGED, "lld-managed", "lld_managed"},
--	{DCB_CAP_DCBX_VER_CEE, "cee"},
--	{DCB_CAP_DCBX_VER_IEEE, "ieee"},
--	{DCB_CAP_DCBX_STATIC, "static"},
-+static const struct dcb_dcbx_flag dcb_dcbx_flags[] = {
-+	{DCB_CAP_DCBX_HOST, "host", NULL },
-+	{DCB_CAP_DCBX_LLD_MANAGED, "lld-managed", "lld_managed" },
-+	{DCB_CAP_DCBX_VER_CEE, "cee", NULL },
-+	{DCB_CAP_DCBX_VER_IEEE, "ieee", NULL },
-+	{DCB_CAP_DCBX_STATIC, "static", NULL },
- };
- 
- static void dcb_dcbx_print(__u8 dcbx)
-@@ -60,7 +60,7 @@ static void dcb_dcbx_print(__u8 dcbx)
- 
- 		bit--;
- 		for (i = 0; i < ARRAY_SIZE(dcb_dcbx_flags); i++) {
--			struct dcb_dcbx_flag *flag = &dcb_dcbx_flags[i];
-+			const struct dcb_dcbx_flag *flag = &dcb_dcbx_flags[i];
- 
- 			if (flag->value == 1 << bit) {
- 				print_bool(PRINT_JSON, flag->key_json ?: flag->key_fp,
-@@ -123,7 +123,7 @@ static int dcb_cmd_dcbx_set(struct dcb *dcb, const char *dev, int argc, char **a
+diff --git a/ip/xfrm_state.c b/ip/xfrm_state.c
+index a7b3d0e14156..9be65b2f8461 100644
+--- a/ip/xfrm_state.c
++++ b/ip/xfrm_state.c
+@@ -660,6 +660,7 @@ static int xfrm_state_modify(int cmd, unsigned int flags, int argc, char **argv)
+ 		case XFRM_MODE_BEET:
+ 			if (req.xsinfo.id.proto == IPPROTO_ESP)
+ 				break;
++			/* fallthrough */
+ 		default:
+ 			fprintf(stderr, "MODE value is invalid with XFRM-PROTO value \"%s\"\n",
+ 				strxf_xfrmproto(req.xsinfo.id.proto));
+diff --git a/lib/utils.c b/lib/utils.c
+index 01f3a5f7e4ea..b1f273054906 100644
+--- a/lib/utils.c
++++ b/lib/utils.c
+@@ -985,9 +985,8 @@ const char *rt_addr_n2a_r(int af, int len,
+ 			return inet_ntop(AF_INET6, &sa->sin6.sin6_addr,
+ 					 buf, buflen);
  		}
- 
- 		for (i = 0; i < ARRAY_SIZE(dcb_dcbx_flags); i++) {
--			struct dcb_dcbx_flag *flag = &dcb_dcbx_flags[i];
-+			const struct dcb_dcbx_flag *flag = &dcb_dcbx_flags[i];
- 
- 			if (matches(*argv, flag->key_fp) == 0) {
- 				dcbx |= flag->value;
+-
+-		/* fallthrough */
+ 	}
++		/* fallthrough */
+ 	default:
+ 		return "???";
+ 	}
 -- 
 2.39.2
 
