@@ -1,327 +1,208 @@
-Return-Path: <netdev+bounces-14442-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 76080741796
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 19:57:34 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CD9BE280D53
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 17:57:32 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD0F0D51A;
-	Wed, 28 Jun 2023 17:57:28 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B202322E;
-	Wed, 28 Jun 2023 17:57:26 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D52BC433C8;
-	Wed, 28 Jun 2023 17:57:26 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687975046;
-	bh=sGdzZoRjT4g9yAAnk8VSoH0g5CyKtglm3SrmHU5ORDE=;
-	h=Date:From:To:Cc:Subject:Reply-To:References:In-Reply-To:From;
-	b=D/0hBH9uJQN8Jdo9CnGQEc5TKh9J735dfGksJZVxVBgthgIAXpcDlEe6C+wuHcPiM
-	 dz24j6pQ2SN4SKKD2QPw8BX9XnjL9SpBir7RxxDBr2W/txornvQ2vWCQ58pl/eHqGE
-	 ih2Lwe6fkh7Gr7UXETu0WiQss41IHxgxl8bDBmSiexEnGmCtYRaV65DJBvLTXe1GBV
-	 wNJIrNfAHYrOMEDhJCpxLcO07kSLIAtu4y2EvQlPrfTgytedeyYe6AU9MHpyDkbRv8
-	 GEM+KY8q6H6qcV8fQm0+Ydet9MrsSFQcMLahwRpretom2khUcbVHcQECNhBiGGhb4C
-	 TjLyYxPmuZvpQ==
-Received: by paulmck-ThinkPad-P17-Gen-1.home (Postfix, from userid 1000)
-	id 23F50CE39D4; Wed, 28 Jun 2023 10:57:26 -0700 (PDT)
-Date: Wed, 28 Jun 2023 10:57:26 -0700
-From: "Paul E. McKenney" <paulmck@kernel.org>
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: daniel@iogearbox.net, andrii@kernel.org, void@manifault.com,
-	houtao@huaweicloud.com, tj@kernel.org, rcu@vger.kernel.org,
-	netdev@vger.kernel.org, bpf@vger.kernel.org, kernel-team@fb.com
-Subject: Re: [PATCH v3 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
- similar to kfree_rcu().
-Message-ID: <6f8e0e91-44b4-4d0e-8df3-c1e765653255@paulmck-laptop>
-Reply-To: paulmck@kernel.org
-References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
- <20230628015634.33193-13-alexei.starovoitov@gmail.com>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 432107417BA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 20:01:16 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S232241AbjF1R65 (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 13:58:57 -0400
+Received: from mga18.intel.com ([134.134.136.126]:14120 "EHLO mga18.intel.com"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S232464AbjF1R5q (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 13:57:46 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1687975066; x=1719511066;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ddEXX1+WbwKlzeT/KLkPSUFr3LahD4h0zeJT18nrNaA=;
+  b=HY1Z6CGV6HTi+0oFYry1BfsGb5C9A2gelxxhh6qBo/dL/u9pMe6HOvBb
+   K3B/b00DXicM869Mz9sRVme0XbS2v34BVc70AN9y/kZ0Dy74JlposS5Mo
+   8BpNfpwQ+slZ8+4qSkTxjKTiggqz6kX1aG4jPXQ93LduIgR4BEt/IWmWa
+   pd/M4jaotuCy1biTfRCSe1EWPJ5IDoHaS4+bSEJPsIAHnUsX3X8otNDPN
+   JvFe6dc58mzieUHI0hcOXNTGeI9Dlo7ZSVuNwhSq6Npzfm9whgyKrZ2Yu
+   haD8nO0W2/EgSsQ50FsqHKRxS/umZjBNCeC2NRbsH50JZywS4bP+ibK1B
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="346685814"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="346685814"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 10:57:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="717050484"
+X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
+   d="scan'208";a="717050484"
+Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
+  by orsmga002.jf.intel.com with ESMTP; 28 Jun 2023 10:57:42 -0700
+Received: from orsmsx612.amr.corp.intel.com (10.22.229.25) by
+ ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 28 Jun 2023 10:57:42 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx612.amr.corp.intel.com (10.22.229.25) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 28 Jun 2023 10:57:42 -0700
+Received: from NAM04-BN8-obe.outbound.protection.outlook.com (104.47.74.45) by
+ edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 28 Jun 2023 10:57:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=gviFECU/mEuDNxg4Jw4gK8kMTcGIGq9xleGsSyn38wJt8KmMRRjjK8fazQWfNe/2j8KkA7lcnyQwmZ+pxLgUXoVCEvAgZRGPdXDZD1KQT2EsIELq1DRoGBkPxnG8uhVRgxapKZ8XP3JckQ5rS3TVbdl7NKq7FO2MPCPCIHwFV2Wab6qg3qPgPDfSWmB/ylgaTFS3bP40IfyoJFeZB22aODKTbr+GaArcKxm4dQ3xWc8kEHWvYLxpaKr3vXEluIark3gXuqwXuxyC03TlP3kPh/0+CcnzzEgjKBaqDHmk/YIsKNTE7uYRaEX4xZtKy3ReA4eyG7jAusKpqYGBatuvPA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=E9FIbIp7Uytdhe4NiwCjqLgvhqdbxyI2elvawo/YStM=;
+ b=BBU7c6MVysMBEDPtZj0M+Rr1fC3Uqh6P7EXPqGXnBX5717CLIlnORr4HBBG8mGTITf0kK4AC6PfGZYF/mobwbVdhVGDYKmqJxMQ7+ndt/et5lsAu9QPlqF6eNP5mGXwubneZXyBXtwwbP5yMGhbxGS8UNLt75C6ebdf+UruQNWRhM7hrqmXboVowJC6gRkBHQHKS15e1OSvBaXe3Rm/dWT/gce2dm2RyM4X541DpNuy2h2M+wT7C6is8qTPOqXe53kNUMqmFr7QvHRX/bQuRX1Yka2Wm2lmyd9tcfHyySr/PasNNIjjvqgui0ARH8J5xjTEmfHkI+0nzCm7uO8C2ZQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by DS7PR11MB7806.namprd11.prod.outlook.com (2603:10b6:8:db::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Wed, 28 Jun
+ 2023 17:57:39 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4e5a:e4d6:5676:b0ab]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4e5a:e4d6:5676:b0ab%5]) with mapi id 15.20.6521.026; Wed, 28 Jun 2023
+ 17:57:39 +0000
+From:   "Keller, Jacob E" <jacob.e.keller@intel.com>
+To:     Shannon Nelson <shannon.nelson@amd.com>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "kuba@kernel.org" <kuba@kernel.org>
+CC:     "brett.creeley@amd.com" <brett.creeley@amd.com>,
+        "drivers@pensando.io" <drivers@pensando.io>,
+        "nitya.sunkad@amd.com" <nitya.sunkad@amd.com>
+Subject: RE: [PATCH net] ionic: remove WARN_ON to prevent panic_on_warn
+Thread-Topic: [PATCH net] ionic: remove WARN_ON to prevent panic_on_warn
+Thread-Index: AQHZqeJYVYOGpB+TjUe8QF/+3gn02q+gfp7Q
+Date:   Wed, 28 Jun 2023 17:57:39 +0000
+Message-ID: <CO1PR11MB50899225D4BCFFA435A96FB6D624A@CO1PR11MB5089.namprd11.prod.outlook.com>
+References: <20230628170050.21290-1-shannon.nelson@amd.com>
+In-Reply-To: <20230628170050.21290-1-shannon.nelson@amd.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: CO1PR11MB5089:EE_|DS7PR11MB7806:EE_
+x-ms-office365-filtering-correlation-id: 92185614-7ee6-408e-986a-08db780129aa
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: R1VDksjy5/XnloqZYCC0VRQ1ZW9q0sCkt4cJjvzBk9E8RwTswVs/X69z2fM0r2enN+Q9fFARwY/3jUsVLPIUDPlnUgphiu2Qybb1Lre6Q1JaGIjdI/s4AZLIHNAHZHfXTvnR8CaORlemRCy7DNnRpepJG2M3Trrn3zLHCded+hkccYtvngfC0z9VqEtF7C/UthZXbLtJhXKKVudOJLcy6Rbz25OwMBSS1QC/QXecxY6pgN/037l/oEEyJnepHp8Hfp6cKdB7GLTBz8aRUN+DaAVskvroeOFomvvS2dennNqOX0WWHG0zw2GE3SKBgmDWe0yUJJJT+7BJ9yY5CArSLDL+/ApBUxPAh0BmCZrUvYQSKnbaAzMgt0ahyK4sABMZWXYqSskEKEYDtOFOzWa+TuFs3RFIjXBRA1knkHSm3JHMeH5EggmWa56xGkea6MIsoFmOc0ljnlVclpOGSlX4IJasDQJFTbMtQQI3tB0P+Z+sc73gTTD7fWKKkx2VjAwZhi8SV/S3S1KyMveBK/VpNMhiT01NeNxH5sWWqOIj2cy/E3Wo0r7/OjoVqrqubgs8ktKWl3ef/cQbkYgkyP4/dDfBU0Yy0XwIE1zux4+8cSOLclRKnLBTof+unyDMjZhS
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(396003)(39860400002)(376002)(366004)(451199021)(26005)(66556008)(66476007)(38070700005)(6506007)(110136005)(7696005)(54906003)(478600001)(9686003)(186003)(2906002)(53546011)(83380400001)(71200400001)(5660300002)(52536014)(33656002)(122000001)(66946007)(82960400001)(55016003)(38100700002)(76116006)(64756008)(86362001)(316002)(8676002)(8936002)(41300700001)(4326008)(66446008);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?6wlcvkmIFqkkSy/Ylr5hmV7Ecxk9CTpl2jX+RS01N6l+TzAeNBFBAUVOhRLC?=
+ =?us-ascii?Q?8lSZtCP+zhSFMwWYo6Ce7aIKn2U609y0M5If+CuAqgMyRMXGqShT6solP49X?=
+ =?us-ascii?Q?7xzeK4YaJCYz99vAUdPj0V0T29wUhqYqafki65OWege7NXoI9vZqzzlnIrFf?=
+ =?us-ascii?Q?qNBAH5TeAfHH0SaWJtmC2XNwYwNlwl7iSx30EScOZ9WyQhDrf2ftx+qs4lmA?=
+ =?us-ascii?Q?BGzrLVS1f7Iv2VH29K6j8291CnCRXAWIayzdVvf3LEGADoL1c1B2rL7hHSSV?=
+ =?us-ascii?Q?6esiNzs/osEsIe1Ha8MuVQFubf2iMD2USjpIHoIO1DQeK4aTdGhdQFbXURE7?=
+ =?us-ascii?Q?yQ73SKGrk8/4plit8/y2ci0Zt/Q4C6RmCQhfphPDPiMvBXZQEMfzztBQyvj3?=
+ =?us-ascii?Q?tfgA4s27nciYoQ8iLdDrQMuKKh1aohyCOWl1AriCtr832VYNDlUKhfdnrtoi?=
+ =?us-ascii?Q?Dpv/XULPKeCgj5vs4ShTYAyMibLxcU+hBfxEWIHaiI4PlQRYU+whr9GyggEe?=
+ =?us-ascii?Q?bBTb9ygHJD1ehMSask6Dd0QK79hrTeLkxEth8m1L3ZojR8bsUDVA/jjK5Jbp?=
+ =?us-ascii?Q?aqTG6HcGcNEeVEOFWJ28GqvSwfNhLpeRa17MT5XqkWwdfieMbm0zIpY4oZHU?=
+ =?us-ascii?Q?kqYw9NBUaAUkdiaEkPInHVecZ/C+QxXR9NNrEL1XTEviU9tBAvsLNzNQ72GV?=
+ =?us-ascii?Q?jX5ChgFFEGOR5U6VY9FVE045uBZBSjqi05Qm34BeLqGUsthi2vYiaFAM1swL?=
+ =?us-ascii?Q?vNqYOSCOa4Twwz1nOP5xwTEylP5hLELzMJmtkXxV6D7o1mGSoIID70T7jKaP?=
+ =?us-ascii?Q?sYyKvufqrYEFQaH9fqEQcli02Vi+3/ZOo5wEjRGyUCo3MF7By1aaGctOCDvl?=
+ =?us-ascii?Q?mf2fD4AgG83X1cUN769szPoWySY1G3PXiwSWbhoF1FYFbnDRYj91EUKqDFcF?=
+ =?us-ascii?Q?dKLT/0gyy5bjd792S5VJgr8+xfBSuft770GgXz54NRrUZYomgkcdAN5ZddS5?=
+ =?us-ascii?Q?Cpi3Jmhp2lx4XAFdb7EL0lP0rqI8QdthbFf8St82QAqzTkoeAE0/nXT0EFPU?=
+ =?us-ascii?Q?sElU2WYtJlh4rfeJTZcZwCIaglYLQqJ2BhW+J+Nb4+OgYzOzkCXncsvaTOpT?=
+ =?us-ascii?Q?KBL2I8Gdzk7ja/52x0JzEJ+cWXDyvhejNThmpI2KB0XLsxcmDGplrFRF4S3O?=
+ =?us-ascii?Q?/Te6owZFxJ/fXyJY48fsxUSckl9x3HYWxZMTJe3/a/k4UbtzMS+0F6g+RRxf?=
+ =?us-ascii?Q?FwKK+Yfn1xXbsyDuyG+yV6jk34P1iHDs1F2p7l8urqajg/Da9KvamJTZoH5A?=
+ =?us-ascii?Q?fGwx0Pc+4cMZ8AjLi1+nDrM3IWlU0Ob8fMvQR6sfSV9F3bxZM54Ti8b+lqxb?=
+ =?us-ascii?Q?4+qtCP/mgvPLwXAs8tgUAP04mIIlbMoOZ/t+3TRknkxySgMq/qqfvDbpYi1D?=
+ =?us-ascii?Q?4p6a1ZC5eTc3pvYvi4xD0j4FhsH9aJuPbaUSKWmjZc70WoAzC3RxrhwpRdtg?=
+ =?us-ascii?Q?/Vv0+UtKnjT7NHWT3Yb4GbP5//M1/aZ6FJwiEpyc3yV3w8oWHzPwghyJZiyA?=
+ =?us-ascii?Q?FbCAH08sB3/4gplTc6NfBgC84ma9qD2T9QG7eD//?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230628015634.33193-13-alexei.starovoitov@gmail.com>
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 92185614-7ee6-408e-986a-08db780129aa
+X-MS-Exchange-CrossTenant-originalarrivaltime: 28 Jun 2023 17:57:39.2377
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: 6C/chXrxlOXGA6Ub1wOOfQkY87eFqIr3n68/XGdiYoy0I9nz4oMg6jjXAH21JpA4CyAhUTNxSYlyL7hjT5+XfFY0mfsuHjEoWSzpXMFq/fU=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS7PR11MB7806
+X-OriginatorOrg: intel.com
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-On Tue, Jun 27, 2023 at 06:56:33PM -0700, Alexei Starovoitov wrote:
-> From: Alexei Starovoitov <ast@kernel.org>
-> 
-> Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
-> Unlike bpf_mem_[cache_]free() that links objects for immediate reuse into
-> per-cpu free list the _rcu() flavor waits for RCU grace period and then moves
-> objects into free_by_rcu_ttrace list where they are waiting for RCU
-> task trace grace period to be freed into slab.
-> 
-> The life cycle of objects:
-> alloc: dequeue free_llist
-> free: enqeueu free_llist
-> free_rcu: enqueue free_by_rcu -> waiting_for_gp
-> free_llist above high watermark -> free_by_rcu_ttrace
-> after RCU GP waiting_for_gp -> free_by_rcu_ttrace
-> free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
-> 
-> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+
+
+> -----Original Message-----
+> From: Shannon Nelson <shannon.nelson@amd.com>
+> Sent: Wednesday, June 28, 2023 10:01 AM
+> To: netdev@vger.kernel.org; davem@davemloft.net; kuba@kernel.org
+> Cc: brett.creeley@amd.com; drivers@pensando.io; nitya.sunkad@amd.com;
+> Shannon Nelson <shannon.nelson@amd.com>
+> Subject: [PATCH net] ionic: remove WARN_ON to prevent panic_on_warn
+>=20
+> From: Nitya Sunkad <nitya.sunkad@amd.com>
+>=20
+> Remove instances of WARN_ON to prevent problematic panic_on_warn use
+> resulting in kernel panics.
+>=20
+
+This message could potentially use a bit more explanation since it doesn't =
+look like you removed all the WARN_ONs in the driver, and it might help to =
+explain why this particular WARN_ON was problematic. I don't think that wou=
+ld be worth a re-roll on its own though.
+
+> Fixes: 77ceb68e29cc ("ionic: Add notifyq support")
+> Signed-off-by: Nitya Sunkad <nitya.sunkad@amd.com>
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 > ---
->  include/linux/bpf_mem_alloc.h |   2 +
->  kernel/bpf/memalloc.c         | 129 +++++++++++++++++++++++++++++++++-
->  2 files changed, 128 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/bpf_mem_alloc.h b/include/linux/bpf_mem_alloc.h
-> index 3929be5743f4..d644bbb298af 100644
-> --- a/include/linux/bpf_mem_alloc.h
-> +++ b/include/linux/bpf_mem_alloc.h
-> @@ -27,10 +27,12 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma);
->  /* kmalloc/kfree equivalent: */
->  void *bpf_mem_alloc(struct bpf_mem_alloc *ma, size_t size);
->  void bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr);
-> +void bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
->  
->  /* kmem_cache_alloc/free equivalent: */
->  void *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma);
->  void bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr);
-> +void bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
->  void bpf_mem_cache_raw_free(void *ptr);
->  void *bpf_mem_cache_alloc_flags(struct bpf_mem_alloc *ma, gfp_t flags);
->  
-> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
-> index 40524d9454c7..3081d06a434c 100644
-> --- a/kernel/bpf/memalloc.c
-> +++ b/kernel/bpf/memalloc.c
-> @@ -101,6 +101,15 @@ struct bpf_mem_cache {
->  	bool draining;
->  	struct bpf_mem_cache *tgt;
->  
-> +	/* list of objects to be freed after RCU GP */
-> +	struct llist_head free_by_rcu;
-> +	struct llist_node *free_by_rcu_tail;
-> +	struct llist_head waiting_for_gp;
-> +	struct llist_node *waiting_for_gp_tail;
-> +	struct rcu_head rcu;
-> +	atomic_t call_rcu_in_progress;
-> +	struct llist_head free_llist_extra_rcu;
-> +
->  	/* list of objects to be freed after RCU tasks trace GP */
->  	struct llist_head free_by_rcu_ttrace;
->  	struct llist_head waiting_for_gp_ttrace;
-> @@ -344,6 +353,69 @@ static void free_bulk(struct bpf_mem_cache *c)
->  	do_call_rcu_ttrace(tgt);
->  }
->  
-> +static void __free_by_rcu(struct rcu_head *head)
-> +{
-> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
-> +	struct bpf_mem_cache *tgt = c->tgt;
-> +	struct llist_node *llnode;
-> +
-> +	llnode = llist_del_all(&c->waiting_for_gp);
-> +	if (!llnode)
-> +		goto out;
-> +
-> +	llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace);
-> +
-> +	/* Objects went through regular RCU GP. Send them to RCU tasks trace */
-> +	do_call_rcu_ttrace(tgt);
-> +out:
-> +	atomic_set(&c->call_rcu_in_progress, 0);
-> +}
-> +
-> +static void check_free_by_rcu(struct bpf_mem_cache *c)
-> +{
-> +	struct llist_node *llnode, *t;
-> +	unsigned long flags;
-> +
-> +	/* drain free_llist_extra_rcu */
-> +	if (unlikely(!llist_empty(&c->free_llist_extra_rcu))) {
-> +		inc_active(c, &flags);
-> +		llist_for_each_safe(llnode, t, llist_del_all(&c->free_llist_extra_rcu))
-> +			if (__llist_add(llnode, &c->free_by_rcu))
-> +				c->free_by_rcu_tail = llnode;
-> +		dec_active(c, flags);
-> +	}
-> +
-> +	if (llist_empty(&c->free_by_rcu))
-> +		return;
-> +
-> +	if (atomic_xchg(&c->call_rcu_in_progress, 1)) {
-> +		/*
-> +		 * Instead of kmalloc-ing new rcu_head and triggering 10k
-> +		 * call_rcu() to hit rcutree.qhimark and force RCU to notice
-> +		 * the overload just ask RCU to hurry up. There could be many
-> +		 * objects in free_by_rcu list.
-> +		 * This hint reduces memory consumption for an artifical
-> +		 * benchmark from 2 Gbyte to 150 Mbyte.
-> +		 */
-> +		rcu_request_urgent_qs_task(current);
-
-I have been going back and forth on whether rcu_request_urgent_qs_task()
-needs to throttle calls to itself, for example, to pay attention to only
-one invocation per jiffy.  The theory here is that RCU's state machine
-normally only advances about once per jiffy anyway.
-
-The main risk of *not* throttling is if several CPUs were to invoke
-rcu_request_urgent_qs_task() in tight loops while those same CPUs were
-undergoing interrupt storms, which would result in heavy lock contention
-in __rcu_irq_enter_check_tick().  This is not exactly a common-case
-scenario, but on the other hand, if you are having this degree of trouble,
-should RCU really be adding lock contention to your troubles?
-
-Thoughts?
-
-							Thanx, Paul
-
-> +		return;
-> +	}
-> +
-> +	WARN_ON_ONCE(!llist_empty(&c->waiting_for_gp));
-> +
-> +	inc_active(c, &flags);
-> +	WRITE_ONCE(c->waiting_for_gp.first, __llist_del_all(&c->free_by_rcu));
-> +	c->waiting_for_gp_tail = c->free_by_rcu_tail;
-> +	dec_active(c, flags);
-> +
-> +	if (unlikely(READ_ONCE(c->draining))) {
-> +		free_all(llist_del_all(&c->waiting_for_gp), !!c->percpu_size);
-> +		atomic_set(&c->call_rcu_in_progress, 0);
-> +	} else {
-> +		call_rcu_hurry(&c->rcu, __free_by_rcu);
-> +	}
-> +}
-> +
->  static void bpf_mem_refill(struct irq_work *work)
+>  drivers/net/ethernet/pensando/ionic/ionic_lif.c | 4 +++-
+>  1 file changed, 3 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> index 7c20a44e549b..d401d86f1f7a 100644
+> --- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> +++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+> @@ -475,7 +475,9 @@ static void ionic_qcqs_free(struct ionic_lif *lif)
+>  static void ionic_link_qcq_interrupts(struct ionic_qcq *src_qcq,
+>  				      struct ionic_qcq *n_qcq)
 >  {
->  	struct bpf_mem_cache *c = container_of(work, struct bpf_mem_cache, refill_work);
-> @@ -358,6 +430,8 @@ static void bpf_mem_refill(struct irq_work *work)
->  		alloc_bulk(c, c->batch, NUMA_NO_NODE);
->  	else if (cnt > c->high_watermark)
->  		free_bulk(c);
-> +
-> +	check_free_by_rcu(c);
->  }
->  
->  static void notrace irq_work_raise(struct bpf_mem_cache *c)
-> @@ -486,6 +560,9 @@ static void drain_mem_cache(struct bpf_mem_cache *c)
->  	free_all(llist_del_all(&c->waiting_for_gp_ttrace), percpu);
->  	free_all(__llist_del_all(&c->free_llist), percpu);
->  	free_all(__llist_del_all(&c->free_llist_extra), percpu);
-> +	free_all(__llist_del_all(&c->free_by_rcu), percpu);
-> +	free_all(__llist_del_all(&c->free_llist_extra_rcu), percpu);
-> +	free_all(llist_del_all(&c->waiting_for_gp), percpu);
->  }
->  
->  static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
-> @@ -498,8 +575,8 @@ static void free_mem_alloc_no_barrier(struct bpf_mem_alloc *ma)
->  
->  static void free_mem_alloc(struct bpf_mem_alloc *ma)
->  {
-> -	/* waiting_for_gp_ttrace lists was drained, but __free_rcu might
-> -	 * still execute. Wait for it now before we freeing percpu caches.
-> +	/* waiting_for_gp[_ttrace] lists were drained, but RCU callbacks
-> +	 * might still execute. Wait for them.
->  	 *
->  	 * rcu_barrier_tasks_trace() doesn't imply synchronize_rcu_tasks_trace(),
->  	 * but rcu_barrier_tasks_trace() and rcu_barrier() below are only used
-> @@ -508,7 +585,8 @@ static void free_mem_alloc(struct bpf_mem_alloc *ma)
->  	 * rcu_trace_implies_rcu_gp(), it will be OK to skip rcu_barrier() by
->  	 * using rcu_trace_implies_rcu_gp() as well.
->  	 */
-> -	rcu_barrier_tasks_trace();
-> +	rcu_barrier(); /* wait for __free_by_rcu */
-> +	rcu_barrier_tasks_trace(); /* wait for __free_rcu */
->  	if (!rcu_trace_implies_rcu_gp())
->  		rcu_barrier();
->  	free_mem_alloc_no_barrier(ma);
-> @@ -561,6 +639,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
->  			irq_work_sync(&c->refill_work);
->  			drain_mem_cache(c);
->  			rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
-> +			rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
->  		}
->  		/* objcg is the same across cpus */
->  		if (c->objcg)
-> @@ -577,6 +656,7 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma)
->  				irq_work_sync(&c->refill_work);
->  				drain_mem_cache(c);
->  				rcu_in_progress += atomic_read(&c->call_rcu_ttrace_in_progress);
-> +				rcu_in_progress += atomic_read(&c->call_rcu_in_progress);
->  			}
->  		}
->  		if (c->objcg)
-> @@ -661,6 +741,27 @@ static void notrace unit_free(struct bpf_mem_cache *c, void *ptr)
->  		irq_work_raise(c);
->  }
->  
-> +static void notrace unit_free_rcu(struct bpf_mem_cache *c, void *ptr)
-> +{
-> +	struct llist_node *llnode = ptr - LLIST_NODE_SZ;
-> +	unsigned long flags;
-> +
-> +	c->tgt = *(struct bpf_mem_cache **)llnode;
-> +
-> +	local_irq_save(flags);
-> +	if (local_inc_return(&c->active) == 1) {
-> +		if (__llist_add(llnode, &c->free_by_rcu))
-> +			c->free_by_rcu_tail = llnode;
-> +	} else {
-> +		llist_add(llnode, &c->free_llist_extra_rcu);
-> +	}
-> +	local_dec(&c->active);
-> +	local_irq_restore(flags);
-> +
-> +	if (!atomic_read(&c->call_rcu_in_progress))
-> +		irq_work_raise(c);
-> +}
-> +
->  /* Called from BPF program or from sys_bpf syscall.
->   * In both cases migration is disabled.
->   */
-> @@ -694,6 +795,20 @@ void notrace bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr)
->  	unit_free(this_cpu_ptr(ma->caches)->cache + idx, ptr);
->  }
->  
-> +void notrace bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
-> +{
-> +	int idx;
-> +
-> +	if (!ptr)
-> +		return;
-> +
-> +	idx = bpf_mem_cache_idx(ksize(ptr - LLIST_NODE_SZ));
-> +	if (idx < 0)
-> +		return;
-> +
-> +	unit_free_rcu(this_cpu_ptr(ma->caches)->cache + idx, ptr);
-> +}
-> +
->  void notrace *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma)
->  {
->  	void *ret;
-> @@ -710,6 +825,14 @@ void notrace bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr)
->  	unit_free(this_cpu_ptr(ma->cache), ptr);
->  }
->  
-> +void notrace bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr)
-> +{
-> +	if (!ptr)
-> +		return;
-> +
-> +	unit_free_rcu(this_cpu_ptr(ma->cache), ptr);
-> +}
-> +
->  /* Directly does a kfree() without putting 'ptr' back to the free_llist
->   * for reuse and without waiting for a rcu_tasks_trace gp.
->   * The caller must first go through the rcu_tasks_trace gp for 'ptr'
-> -- 
-> 2.34.1
-> 
+> -	if (WARN_ON(n_qcq->flags & IONIC_QCQ_F_INTR)) {
+> +	if (n_qcq->flags & IONIC_QCQ_F_INTR) {
+> +		dev_warn(n_qcq->q.dev, "%s: n_qcq->flags and
+> IONIC_QCQ_F_INTR set\n",
+> +			 __func__);
+
+What calls this function? It feels a bit weird that the only action this co=
+de takes was in a WARN_ON state. Definitely agree this shouldn't be WARN_ON=
+.
+
+WARN_ON is something which should be used for a highly unexpected state tha=
+t we are unsure of how to recover from (even if you go on to further protec=
+t bad accesses in order to avoid completely hosing the system when not on a=
+ panic_on_warn system).
+
+This change makes sense to me.
+
+Reviewed-by: Jacob Keller <Jacob.e.keller@intel.com>
+
+Thanks,
+Jake
+
+>  		ionic_intr_free(n_qcq->cq.lif->ionic, n_qcq->intr.index);
+>  		n_qcq->flags &=3D ~IONIC_QCQ_F_INTR;
+>  	}
+> --
+> 2.17.1
 
