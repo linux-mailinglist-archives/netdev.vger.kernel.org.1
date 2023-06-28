@@ -1,419 +1,217 @@
-Return-Path: <netdev+bounces-14354-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14356-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9E408740747
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:45:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C734174074A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:52:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40B9828116A
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 00:45:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A6A481C20B2E
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 00:52:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 59D59A4E;
-	Wed, 28 Jun 2023 00:45:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73719A4E;
+	Wed, 28 Jun 2023 00:52:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43C6C7E2
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 00:45:02 +0000 (UTC)
-Received: from smtp-out1-05.simnet.is (smtp-out1-05.simnet.is [194.105.231.8])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC29B2728
-	for <netdev@vger.kernel.org>; Tue, 27 Jun 2023 17:44:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=simnet.is; i=@simnet.is; q=dns/txt; s=sel1;
-  t=1687913099; x=1719449099;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ee/9/ZZUQ+Rn6p+2OhA86NW317R66sLFxUiZW0gSiWY=;
-  b=Q1Rnj5VVPB/lYicbOAlujnJPOEUFFloisUwjSaIE+58196UNPd9mSsnA
-   iAGmYtk5rGGLH6UAw5++C/EAEuZdQEFeiXgvx0ZbqUmW134Zzt/bGEVtv
-   pqEpfP2Bm6sT+f6pFwAuxsSLv8NelfqHZ/2IH7haw6fMu/yobjp5UaYAZ
-   kj4im1+o19zypZidA4BkRuFvUzSy91znthfgvmjF13wRzExPy6uh91rG/
-   kswzAEMXd4HMnktxSbHIBe7QjqHJh+afP4MNV8dx0l/60f6QrSpMT3W3O
-   GDyF/fG7bkCtJN8ZyQb+3zdzxHSczCsRJvTg1JjsEOUWnTPE/xztGamae
-   g==;
-Authentication-Results: smtp-out-05.simnet.is; dkim=none (message not signed) header.i=none
-X-SBRS: 4.4
-X-IPAS-Result: =?us-ascii?q?A2ETAAC7fZtkkFnoacJaHAEBAQEBAQcBARIBAQQEAQFAg?=
- =?us-ascii?q?TsHAQELAYIKKHWBXIghhE6GToIlJR4DhXGLQYFQim8UgXkBAQEPMRMEAQEEA?=
- =?us-ascii?q?4FMgzMChhAnNAkOAQIEAQEBAQMCAwEBAQEBAQMBAQYBAQEBAQEGBgIQAQEBA?=
- =?us-ascii?q?QEBIB4QDieFLzkNhF0sCAVZAQEdAQEBAQM6PxALEQMBAgEuED8IBhOCfgGCX?=
- =?us-ascii?q?K9peIE0gQGCYzWwDoFogUIBkWw8BoINglGBbz6ECoZ8BIIThzuBUA4MOYIug?=
- =?us-ascii?q?zSCLwcyCYFaMYl6gShvgR6BIHoCCQIRZ4EICF+Bbj4CDVULC2OBHIJSAgIRJ?=
- =?us-ascii?q?xMUQRJ4HQMHA4EFEC8HBDIfCQYJGBgXJQZRBQItJAkTFUEEg1gKgQ0/FQ4Rg?=
- =?us-ascii?q?loiAgc2PxtRgm0JFw49RwNEHUADez01FB8GJ0iBVzCBSyQkoRqCZBEzAVgsC?=
- =?us-ascii?q?iuBHAVkBEAykjcCAQcKjwOhEYE3hBKLfYMLhAeGe4dXg25MgQqLFoYoDDmRf?=
- =?us-ascii?q?pgfjV2VHQ8DGYUWgUEighYsBxoIMIMiCUkZD49IAQQDh1guijYBdTsCBwsBA?=
- =?us-ascii?q?QMJhkuEH14BAQ?=
-IronPort-PHdr: A9a23:e6VioxySx+tqKZDXCzPyngc9DxPP2p3vOxINr506l/cWL+K4/pHkM
- VCZ5O4+xFPKXICO7fVChqKWtq37QmUP7N6Ht2xKa51DURIJyI0WkgUsDdTDCBj9K/jnBxE=
-IronPort-Data: A9a23:i9sK2aMnIUDxer/vrR1wl8FynXyQoLVcMsEvi/4bfWQNrUp03zMGz
- WtLXTqBO/qJYWPweYp2Ooi/oR4AvZ7Vn4A2HnM5pCpnJ55ogZOeXIzGdC8cHM8zwunrFh8PA
- xA2M4GYRCwMZiaA4E3ratANlFEkvYmQXL3wFeXYDS54QA5gWU8JhAlq8wIDqtcAbeORXUXV4
- Lsen+WFYAX+g2AubTpPg06+gEoHUMra6WJwUmMWPZinjHeG/1EJAZQWI72GLneQauG4ycbjG
- o4vZJnglo/o109F5uGNy94XQWVWKlLmBjViv1INM0SUbreukQRpukozHKJ0hU66EFxllfgpo
- DlGncTYpQvEosQgMQnSOvVVO3gWAEFIxFPICX+y7+y+zGieSiPt7MxgMRk6bYYe3ekiVAmi9
- dRAQNwMRg6CnP7z0rO+UvNrltVmdJKtIoIEpjdh1lk1D95/EMyFGv2Xo4UDhnFg16iiHt6HD
- yYdQTBuahvBbBxUEkwWDZQzgKGpnRETdhUJ8A7E+/druAA/yiRJ8ua2MpnZWOaSH8JYghaZh
- 2/U71zmV0Ry2Nu3kmbVoy392ocjhxjTQ54fDL218NZsjUGMwXYQEBkLUFG2u7++kEHWc9RSN
- 0AZ5AIwoqUosk+mVN/wW1u/unHsg/IHc8RRCPF/+gCI0rDT8xfcXjNCUD9adJonr6faWADGy
- HeOko3JKD9K6ITNSF2k+IrMoWO5Pw8aeDpqiTA/cSMJ5NzqoYcWhx3JT8p+HKPdsjETMWyoq
- 9xthHVl74j/nfLnxI3loA6X2WzESozhC1dlvlqGAQpJ+ysgPNbNWmC+1bTMxdd7RGpzZnCCo
- WIJitKfhAzlJc/VzERhrM0rG6u15/uMKyG0vLKCN4cg7Cjo6X+mZZpX8CA7fBwvLMcfZXnoe
- yc/WD+9BrcPYxNGjoctOupd7vjGK4C7TrwJsdiOP7JzjmBZLlPvwc2XTRf4M5rRuEYti7ojH
- pyQbNyhC30XYYw+kmrpF7ZFj+V7lnxmrY82eXwd50n/uVZ5TCPPIYrpzHPXN4jVEYvd+l6Oo
- ow32zWil0oCOAEBXsUn2dVPfQFVfCRT6WHers1Tf6aDLGJb9JIJVpfsLUcaU9U9xcx9z76Yl
- lnjARUw4ASk2hX6xfCiNiwLhEXHBswk/BrW/EUEYT6V5pTUSdn3tvZHJ8VmItHKNoVLlJZJc
- hXMQO3Yatwnd9gN0211gUXVxGC6SCmWuA==
-IronPort-HdrOrdr: A9a23:wQSxjaGd4kwQY0i0pLqE6ceALOsnbusQ8zAXPo5KOH5om+ij5r
- iTdZUgpGbJYVkqOU3I9erhBEDEewKmyXcX2/h2AV7BZniDhILAFugLhuGOr1KPJ8S9zJ876U
- 4KSdkaNDSfNykYsfrH
-X-Talos-CUID: 9a23:sxu0gWHaLhqq2pvoqmJg+RA0N8MAKkSFzVjpLXLgBTZiTpqaHAo=
-X-Talos-MUID: 9a23:vhfsQQqTLWRoytS3o6EezwlAapxqoKiMMlhXlpga68ilOD5gAyjI2Q==
-X-IronPort-Anti-Spam-Filtered: true
-X-IronPort-AV: E=Sophos;i="6.01,163,1684800000"; 
-   d="scan'208";a="90496543"
-Received: from vist-zimproxy-03.vist.is ([194.105.232.89])
-  by smtp-out-05.simnet.is with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 00:44:55 +0000
-Received: from localhost (localhost [127.0.0.1])
-	by vist-zimproxy-03.vist.is (Postfix) with ESMTP id 5E72F412AEA5;
-	Wed, 28 Jun 2023 00:44:55 +0000 (GMT)
-Received: from vist-zimproxy-03.vist.is ([127.0.0.1])
-	by localhost (vist-zimproxy-03.vist.is [127.0.0.1]) (amavisd-new, port 10032)
-	with ESMTP id S0WOO8u70JZq; Wed, 28 Jun 2023 00:44:54 +0000 (GMT)
-Received: from localhost (localhost [127.0.0.1])
-	by vist-zimproxy-03.vist.is (Postfix) with ESMTP id 1A7E6412AEA7;
-	Wed, 28 Jun 2023 00:44:54 +0000 (GMT)
-Received: from vist-zimproxy-03.vist.is ([127.0.0.1])
-	by localhost (vist-zimproxy-03.vist.is [127.0.0.1]) (amavisd-new, port 10026)
-	with ESMTP id UIzWVgDQw9eQ; Wed, 28 Jun 2023 00:44:54 +0000 (GMT)
-Received: from kassi.invalid.is.lan (85-220-7-150.dsl.dynamic.simnet.is [85.220.7.150])
-	by vist-zimproxy-03.vist.is (Postfix) with ESMTPS id D4734412AE9B;
-	Wed, 28 Jun 2023 00:44:53 +0000 (GMT)
-Received: from bg by kassi.invalid.is.lan with local (Exim 4.96)
-	(envelope-from <bingigis@simnet.is>)
-	id 1qEJIj-00013w-1o;
-	Wed, 28 Jun 2023 00:44:53 +0000
-Date: Wed, 28 Jun 2023 00:44:53 +0000
-From: Bjarni Ingi Gislason <bjarniig@simnet.is>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: tc.8:  some remarks and a patch for the manual
-Message-ID: <ZJuChT7GPgEpORaQ@localhost>
-References: <168764283038.2838.1146738227989939935.reportbug@kassi.invalid.is.lan>
- <20230627103849.7bce7b54@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AA111376;
+	Wed, 28 Jun 2023 00:52:53 +0000 (UTC)
+Received: from mx0b-00082601.pphosted.com (mx0b-00082601.pphosted.com [67.231.153.30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00656296D;
+	Tue, 27 Jun 2023 17:52:47 -0700 (PDT)
+Received: from pps.filterd (m0109332.ppops.net [127.0.0.1])
+	by mx0a-00082601.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35RHWVTt012721;
+	Tue, 27 Jun 2023 17:52:13 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=meta.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=s2048-2021-q4;
+ bh=DZ9/07S7dLQJQXGPEr5HMtOLW3PKJGYAONlnq0w5EE4=;
+ b=gSFwnjPPkFC5w0zYbq4iqwfb94HHjeHpyWFjSgAnhJ9iZt//kGBfGWBIehEt9ILAvAnx
+ Qje2IEw6HGf+OGolrlQpqN93HF7vNIMVBJkZo+J72+8cgbNYOd1tIyy5KnWAoo+nxpW8
+ zFqefTmlD5eIuGo0Ql6zqGnaP+9l6IdzmKiyGOaa59JX0HA1vNGsmnqQRWsKoLeQqaQI
+ kktgYBKE6T0dtdeemHV8dH4NrRHVlIfO3MXuGdgLhslpIAOO174DSXz8HH4gTCKQ78Gm
+ Kg2J7choT2f5JEJcCQLsMHt3NJ60esNzORtqqWh59OjJq/GpOmc5CdT+tU1qOZfBc0i6 /w== 
+Received: from nam11-bn8-obe.outbound.protection.outlook.com (mail-bn8nam11lp2169.outbound.protection.outlook.com [104.47.58.169])
+	by mx0a-00082601.pphosted.com (PPS) with ESMTPS id 3rfvqjq23s-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 27 Jun 2023 17:52:13 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BeDZqQwk1r5JvmJ42IMVlYAnMNRNPbf2ro6p669hJX+/tCn74UJZnz+xJOqlMywLABbRnjTr9c4acUrAgAeXQ/qlFV1urB9pSQrOK68JlVTfEcIvYVVaafDA+5RxsoNCIaFLe133cSvwgHgoLz21mFj95BOJy9wAoUZ5voL45KALFjFVGTKSSroxz2d+wZri3sSNClPkV6eKhx5WwWzKkaExc0VXNx8c5aS/j976F8RSclBnmevYtuqrj97JO0hVNyUSkTL1UnHLyzH4vse3ssYI+rygoc9lItl+ozaL40t4Z7ucNMiZfWxfknPpH8Js/To+ngCnTCxzAeNWy9eMdw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=DZ9/07S7dLQJQXGPEr5HMtOLW3PKJGYAONlnq0w5EE4=;
+ b=QjPLGokt7f/7ZdzEjw1B+fLDJBvTgvTBl/3GDQb37AeuCguniDfymFbVmp8Ep2E6F0C2emI6zVYsYPSxgG4Lk/8bLX0gYMsmzTaFk6q6mzt9jX1X7WMU24e2a3I3C9HRsWk03Vyt+ExgzQ4CL41ZqPGagSJ48+CXv/++64DOGu15lF0eeHft1HOGgnUmkzOJQYxthD54uhwl+rtbMRoRstXuu2WCIEKvEBygEWBk8n+f2cR2oVINn9atf1PJSqYYu5o6+SsLrq8e0XbY4dqKzL6FvFUkrHNQJIJ5IqPk1fK37H4D6d/a5QsMajBSvs6TfYtJEahNAl5QJUCwqTMp5Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=meta.com; dmarc=pass action=none header.from=meta.com;
+ dkim=pass header.d=meta.com; arc=none
+Received: from SA1PR15MB4902.namprd15.prod.outlook.com (2603:10b6:806:1d1::12)
+ by SA1PR15MB4756.namprd15.prod.outlook.com (2603:10b6:806:19f::24) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
+ 2023 00:52:11 +0000
+Received: from SA1PR15MB4902.namprd15.prod.outlook.com
+ ([fe80::3b4a:9ff0:1438:b7a6]) by SA1PR15MB4902.namprd15.prod.outlook.com
+ ([fe80::3b4a:9ff0:1438:b7a6%5]) with mapi id 15.20.6521.024; Wed, 28 Jun 2023
+ 00:52:11 +0000
+Message-ID: <d0e0c583-48a7-715c-8bdd-15e0d061f126@meta.com>
+Date: Tue, 27 Jun 2023 17:52:08 -0700
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH v2 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
+ similar to kfree_rcu().
+To: Hou Tao <houtao@huaweicloud.com>,
+        Alexei Starovoitov <alexei.starovoitov@gmail.com>,
+        daniel@iogearbox.net, andrii@kernel.org, void@manifault.com,
+        paulmck@kernel.org
+Cc: tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, kernel-team@fb.com
+References: <20230624031333.96597-1-alexei.starovoitov@gmail.com>
+ <20230624031333.96597-13-alexei.starovoitov@gmail.com>
+ <8f2d98bb-51b8-b61f-1f6d-59410befc55e@huaweicloud.com>
+Content-Language: en-US
+From: Alexei Starovoitov <ast@meta.com>
+In-Reply-To: <8f2d98bb-51b8-b61f-1f6d-59410befc55e@huaweicloud.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-ClientProxiedBy: BYAPR21CA0028.namprd21.prod.outlook.com
+ (2603:10b6:a03:114::38) To SA1PR15MB4902.namprd15.prod.outlook.com
+ (2603:10b6:806:1d1::12)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230627103849.7bce7b54@hermes.local>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SA1PR15MB4902:EE_|SA1PR15MB4756:EE_
+X-MS-Office365-Filtering-Correlation-Id: 7a725deb-2257-481e-e786-08db7771e84c
+X-FB-Source: Internal
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	kkwAKXs9u7WXhnbfH1TRmKnWHJEMPPDeRym/6bZWofHferNZa5G4H7z32sCZSlydrA/BjcewOFUu01W1YUdpZi2R/sBl/x7hsawgQTqVYZVMzTivnJsSRcK9a0z2PfmnRyQw73trR81Dta9jgQqYZIkabSFSOabjZQhjujpC9tUUFAeVEZ2BQtN7N6lz8H5BpFDwGsg7Tb7WjCvOkLvqTNCeGVvTQdDZ1zmKvFezHAV8imkKG/BLB2nxpMpw5nk9VQtzMi7+hUeJ8yxsALECKj4KrPsfk3q6kD8LA5Ev001E6pg0FeRzRyv6BuPvm80+KxklOoJA9l9IHzXJAcwNsvfoUG+giygbPydp5v59/npmsTE4OKqZkbWbCw++9OIcvVN6sWXxDDLytHXOt45y/a/eT6NXA11Ulbp6Pm2qgOaxguALLVzl+sA+WC1MTimfJN4+7thgaOaI+xOeZrSowIXTWbqgkY1Xv7T7FShxRomv752WUMsCwliNj4xdkX+znoXDgptEqzOeSW/o2TyEaqr99vtetzBn90O+Bn+OUG5McrR4NZ0hWoy8pxAhdQvqhA+Jo6XNk34HZqBML6fohW9SX136YTOJn9FeWSBYpJbRHtCqmzWt5ylXW67tE7/wBcrk/4JCzrQgjW1M7d6A8Q==
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SA1PR15MB4902.namprd15.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(136003)(39860400002)(396003)(366004)(451199021)(2906002)(86362001)(6666004)(6486002)(38100700002)(53546011)(83380400001)(2616005)(186003)(110136005)(41300700001)(31696002)(6512007)(4326008)(36756003)(478600001)(66476007)(66946007)(66556008)(316002)(31686004)(6506007)(7416002)(5660300002)(8676002)(8936002)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?utf-8?B?NEoxQmY4Qm5xUVcrRmIxOGNQVTJMVWx5OWpxNFhEZDVsKy8rMlk5T3k4TWhS?=
+ =?utf-8?B?NnFHZ3RVdmU0bWpvY2IwSytsYXdNSEdNTE82NFM3UWh6Rm1lNjgzcW94dTZG?=
+ =?utf-8?B?ZmtzTElKOGNjb2t2TXJPcHhObVhjb3BPZ1ZvbmRoSXFIb0lhd3FyNzNVKzNH?=
+ =?utf-8?B?U2NrNTRQMFN2SFhla1NNaG5WMDhhTkQ3OUxtNHR5bk9ZS3ZNa3Ewa3IxRWVw?=
+ =?utf-8?B?VmZvZkZPcGwyVm1TQVRiT3QrNGlOMWZ2Q3Zsc2I4Y2tVOGU2N0UrRFlkN2FM?=
+ =?utf-8?B?QVdVRndIN00vcVFNUGZMVDhBaDBCOXNQRnNTTWx4TENmSmZ2dnlxS05VWWRx?=
+ =?utf-8?B?NjRpYlFCSFpZeExNcndrcXlYelpNNzZJMkxyTHpFRUdRQUorK3g0a2dyNFhk?=
+ =?utf-8?B?SDhUM2hqK1lxb1NxQlRBUTM0RDFXS0VWSWVHclJOWDY4M2NYTEdwdTZqTGRP?=
+ =?utf-8?B?ZzA2RDRiYWd1NitNTG9EUDBJS1ZSR2Z5V3A1VmFVTVFWVWh0aEZIR0tEdVYw?=
+ =?utf-8?B?NytCNkFnTThTeGNsOHdHM1htYk94Q293VUhNQ2c4bVVLSXpmNXBab0s5M2l0?=
+ =?utf-8?B?YkllSGcvQlp1dWJxbk9kaVQ4b013b3pYdmg5cjU5MmNlL1BPTFhLTFpmcnRM?=
+ =?utf-8?B?WUluaGo5NUs0ZnE4MjBDai8rd2tiNVEwbEIzbm5NaWhkNzEycjZLZHhYZFhI?=
+ =?utf-8?B?WGRhcUVJbWZEaWJCWitXSkZLaFB4OHVISkkxL090a0VhVzFFUEp6RTl2c3JC?=
+ =?utf-8?B?NFB0c1M1ak5oQSszcFBQT29VSWpvUk5xVHVIR056cjVtOGY1VjJPakUyajUv?=
+ =?utf-8?B?eXJPL2Yzd0VkNXIxWFZPMWtBd2NObjdQQUpkQmpVM1BWcm9BZ3YzV0ZnR0hL?=
+ =?utf-8?B?Tk5vd0NMU1FCU3NjcUJRSWxCUENnc1ROUlBveGxqYitwTnliY05vWEdOT2Qw?=
+ =?utf-8?B?YS9wZUZ0VWRjdGw2d3BCMVByaURjNWhNK3ViNUFjNTYyY3FlY0dPVWVMMzEr?=
+ =?utf-8?B?OVBIdnliREdJdUVFZ1RZaGozRUdMTVdCbjJnUWFtb3Z0VDFWVy84RjBTaGs0?=
+ =?utf-8?B?ak5OMHZFWDMrcVUvaVBTZFlMR0Vsb1BqcnNqTVp5cm1KM1pSUjZNRnNwZDZx?=
+ =?utf-8?B?Y05CTXNVRVZTWkM3NWhYWmQzcHVFenpmR1gycFZaWUpCdS9hc2VyR255UkNF?=
+ =?utf-8?B?dmxxMmQ0aE9OVGVVZkZZU1JSNnpJVXRmQ3cvOEl4b1hGZ2p6eDdlbVZLWnc4?=
+ =?utf-8?B?NzRsL1lySG0vbFI3T1J3dkRvT3ErMlFoTHc2NUh2a2daRjErUUhrTXlXS25F?=
+ =?utf-8?B?ZVFRQmV2VE1hNW1neFVRWXhxVXp6V0lGRTNYcUVzQ0RqQ0hyUWFBVG1NQ0Ns?=
+ =?utf-8?B?b0VvbUtuTFZ1SXhURkpPL3k1Qm4vcGcvR0pvVWpUdnlSbldXNDdOVEFYWTgy?=
+ =?utf-8?B?WjdkWFVzaGZPRWZuZVdVQ3dLb3dmN0pLaVNnUWl2L0xXelZodVp5QU5YcllP?=
+ =?utf-8?B?Mmt3Rmg1YUZHai9Xei9nY280N1JIQTI1b2RYZDEyeTZuRk5GZXZ0ditrN3Zi?=
+ =?utf-8?B?R3k2LzlrMUxuT25uVnNZRktoVUd2ZnVFV0E2ZlV6T1ZlakoydERaVGlDcVph?=
+ =?utf-8?B?N2xWZG55cUpEMkZaeUhWSE1DZTRQWHVrT3NlYmlKcW4rNStKOG1TMzF1V0ln?=
+ =?utf-8?B?UVI2ZGdkeEh3eTdhNUFwUElwWGN4aENOaVo1VjdzL1pYYjNLS0pSc1RaUlZT?=
+ =?utf-8?B?WHZjMTI0d1pLWVM3S0IzYUNQMXhSUW81YW5LZVJVam0wbVZoOXdoUDBhOG1h?=
+ =?utf-8?B?bG1hV25id2dJM0hIZTF1Yis2SkFRL3VvMU5DSGhIRkJUcTdxdlQyU3NSQzAx?=
+ =?utf-8?B?SzBKNWJtMzcvZ1Jlcmo4MERoYUF0c1VoRHA3UGFtZkNhemhjNWVNdjNta3RQ?=
+ =?utf-8?B?V0NkVVFCRWgyU3czcmhZSEdCTDFINlFsZWhRNEpEVU14V3hWYnZ3bHppOSs5?=
+ =?utf-8?B?N2pnWEt1N1JSODZIOSs5NkNXaG9IWlpZaWpEOTk1UWw3M0xIemxoVXVkQ0pK?=
+ =?utf-8?B?V3RZQkVJVU8rZ2F3RWQ2eTBHSzlkazV6c1ZqbGNWMW54djBSbDhvV3AyQVBh?=
+ =?utf-8?B?QXA3WjlMSFY3WWJWY1J2Qi9NS090UEtiSzdad3VVczNKR296UG9jUXNZWDdB?=
+ =?utf-8?B?b0E9PQ==?=
+X-OriginatorOrg: meta.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 7a725deb-2257-481e-e786-08db7771e84c
+X-MS-Exchange-CrossTenant-AuthSource: SA1PR15MB4902.namprd15.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 00:52:11.7681
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 8ae927fe-1255-47a7-a2af-5f3a069daaa2
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: cH0pP8jw5EN8K/UurbWDWslC+DozODKUuClLV3vytrQW0nzB6A68Gly2fgphP8NK
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR15MB4756
+X-Proofpoint-ORIG-GUID: p1M8ZFWbXJJAvb64GOcVe-GQBVKAXQbS
+X-Proofpoint-GUID: p1M8ZFWbXJJAvb64GOcVe-GQBVKAXQbS
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-27_16,2023-06-27_01,2023-05-22_02
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 10:38:49AM -0700, Stephen Hemminger wrote:
-> On Sat, 24 Jun 2023 21:43:21 +0000
-> Bjarni Ingi Gislason <bjarniig@simnet.is> wrote:
+On 6/23/23 11:49 PM, Hou Tao wrote:
+> Hi,
 > 
-> > Package: iproute2
-> > Version: 6.3.0
-> > Severity: minor
-> > Tags: patch
-> > 
-> > Dear Maintainer,
-> > 
-> > here are some notes and a patch.
-> > 
-> > The difference between the formatted outputs can be seen with:
-> > 
-> >   nroff -man <file1> > <out1>
-> >   nroff -man <file2> > <out2>
-> >   diff -u <out1> <out2>
-> > 
-> > and for groff, using
-> > 
-> > "groff -man -Z" instead of "nroff -man"
+> On 6/24/2023 11:13 AM, Alexei Starovoitov wrote:
+>> From: Alexei Starovoitov <ast@kernel.org>
+>>
+> SNIP
+>>   
+>> +static void __free_by_rcu(struct rcu_head *head)
+>> +{
+>> +	struct bpf_mem_cache *c = container_of(head, struct bpf_mem_cache, rcu);
+>> +	struct bpf_mem_cache *tgt = c->tgt;
+>> +	struct llist_node *llnode;
+>> +
+>> +	if (unlikely(READ_ONCE(c->draining)))
+>> +		goto out;
+>> +
+>> +	llnode = llist_del_all(&c->waiting_for_gp);
+>> +	if (!llnode)
+>> +		goto out;
+>> +
+>> +	if (llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu_ttrace))
+>> +		tgt->free_by_rcu_ttrace_tail = c->waiting_for_gp_tail;
+> Got a null-ptr dereference oops when running multiple test_maps and
+> htab-mem benchmark after hacking htab to use bpf_mem_cache_free_rcu().
+> And I think it happened as follow:
 > 
-> Overall this looks fine but:
-> 1. Make the commit message more succinct and clearer, don't need to write a letter.
-> 2. Lines with starting with # get ignored by git when committing
-> 3. Missing Signed-Off-by which is required for all iproute2 patches.
+> // c->tgt
+> P1: __free_by_rcu()
+>          // c->tgt is the same as P1
+>          P2: __free_by_rcu()
 > 
-> Running checkpatch on this patch will show these things.
+> // return true
+> P1: llist_add_batch(&tgt->free_by_rcu_ttrace)
+>          // return false
+>          P2: llist_add_batch(&tgt->free_by_rcu_ttrace)
+>          P2: do_call_rcu_ttrace
+>          // return false
+>          P2: xchg(tgt->call_rcu_ttrace_in_progress, 1)
+>          // llnode is not NULL
+>          P2: llnode = llist_del_all(&c->free_by_rcu_ttrace)
+>          // BAD: c->free_by_rcu_ttrace_tail is NULL, so oops
+>          P2: __llist_add_batch(llnode, c->free_by_rcu_ttrace_tail)
+> 
+> P1: tgt->free_by_rcu_ttrace_tail = X
+> 
+> I don't have a good fix for the problem except adding a spin-lock for
+> free_by_rcu_ttrace and free_by_rcu_ttrace_tail.
 
-  Here is a simplified patch based on the latest "iproute2" repository.
-
-  Output from "checkpatch.pl" when run in the "git/iproute2" directory
-with the patch:
-
-Must be run from the top-level dir. of a kernel tree
-
-Patch:
-
-From fc0bd90193ff11babb96bf8ae5658177e3465aeb Mon Sep 17 00:00:00 2001
-From: Bjarni Ingi Gislason <bjarniig@simnet.is>
-Date: Wed, 28 Jun 2023 00:30:51 +0000
-Subject: [PATCH] iproute2/man/man8/tc.8: some editorial changes to the man
- page
-
-  Improve the layout of the man page according to the "man-page(7)"
-guidelines, the output of "mandoc -lint T", the output of
-"groff -ww -z -rSTYLECHECK=3", that of a shell script, and typographical
-conventions.
-
-Signed-off-by: Bjarni Ingi Gislason <bjarniig@simnet.is>
----
- man/man8/tc.8 | 86 ++++++++++++++++++++++++++++-----------------------
- 1 file changed, 48 insertions(+), 38 deletions(-)
-
-diff --git a/man/man8/tc.8 b/man/man8/tc.8
-index d436d464..e9d5d566 100644
---- a/man/man8/tc.8
-+++ b/man/man8/tc.8
-@@ -18,7 +18,7 @@ tc \- show / manipulate traffic control settings
- \fIBLOCK_INDEX\fR ] qdisc
- [ qdisc specific parameters ]
- .P
--
-+.
- .B tc
- .RI "[ " OPTIONS " ]"
- .B class [ add | change | replace | delete | show ] dev
-@@ -29,7 +29,7 @@ tc \- show / manipulate traffic control settings
- \fIclass-id\fR ] qdisc
- [ qdisc specific parameters ]
- .P
--
-+.
- .B tc
- .RI "[ " OPTIONS " ]"
- .B filter [ add | change | replace | delete | get ] dev
-@@ -121,13 +121,13 @@ tc \- show / manipulate traffic control settings
- .P
- .ti 8
- .IR OPTIONS " := {"
--\fB[ -force ] -b\fR[\fIatch\fR] \fB[ filename ] \fR|
--\fB[ \fB-n\fR[\fIetns\fR] name \fB] \fR|
--\fB[ \fB-N\fR[\fIumeric\fR] \fB] \fR|
--\fB[ \fB-nm \fR| \fB-nam\fR[\fIes\fR] \fB] \fR|
--\fB[ \fR{ \fB-cf \fR| \fB-c\fR[\fIonf\fR] \fR} \fB[ filename ] \fB] \fR
--\fB[ -t\fR[imestamp\fR] \fB\] \fR| \fB[ -t\fR[short\fR] \fR| \fB[
---o\fR[neline\fR] \fB]\fR }
-+\fB[ \-force ] \-b\fR[\fIatch\fR] \fB[ filename ] \fR|
-+\fB[ \fB\-n\fR[\fIetns\fR] name \fB] \fR|
-+\fB[ \fB\-N\fR[\fIumeric\fR] \fB] \fR|
-+\fB[ \fB\-nm \fR| \fB\-nam\fR[\fIes\fR] \fB] \fR|
-+\fB[ \fR{ \fB\-cf \fR| \fB\-c\fR[\fIonf\fR] \fR} \fB[ filename ] \fB]\fR
-+\fB[ \-t\fR[imestamp\fR] \fB] \fR| \fB[ \-t\fR[short\fR] \fR| \fB[
-+\-o\fR[neline\fR] \fB]\fR }
- 
- .ti 8
- .IR FORMAT " := {"
-@@ -147,9 +147,10 @@ of the following:
- 
- .TP
- SHAPING
--When traffic is shaped, its rate of transmission is under control. Shaping may
--be more than lowering the available bandwidth - it is also used to smooth out
--bursts in traffic for better network behaviour. Shaping occurs on egress.
-+When traffic is shaped, its rate of transmission is under control.
-+Shaping may be more than lowering the available bandwidth \(en
-+it is also used to smooth out bursts in traffic for better network
-+behaviour. Shaping occurs on egress.
- 
- .TP
- SCHEDULING
-@@ -186,9 +187,9 @@ First In, First Out queue. It does however store traffic when the network interf
- can't handle it momentarily.
- 
- .SH CLASSES
--Some qdiscs can contain classes, which contain further qdiscs - traffic may
-+Some qdiscs can contain classes, which contain further qdiscs \(en traffic may
- then be enqueued in any of the inner qdiscs, which are within the
--.B classes.
-+.BR classes .
- When the kernel tries to dequeue a packet from such a
- .B classful qdisc
- it can come from any of the classes. A qdisc may for example prioritize
-@@ -207,7 +208,7 @@ available. This differs per qdisc.
- 
- It is important to notice that filters reside
- .B within
--qdiscs - they are not masters of what happens.
-+qdiscs \(en they are not masters of what happens.
- 
- The available filters are:
- .TP
-@@ -326,7 +327,8 @@ separate queue with less priority so that bulk traffic does not affect the
- latency of critical traffic.
- .TP
- ingress
--This is a special qdisc as it applies to incoming traffic on an interface, allowing for it to be filtered and policed.
-+This is a special qdisc as it applies to incoming traffic on an
-+interface, allowing for it to be filtered and policed.
- .TP
- mqprio
- The Multiqueue Priority Qdisc is a simple queuing discipline that allows
-@@ -427,7 +429,12 @@ bandwidth-sharing bands to implement the transmission selection described in
- 802.1Qaz.
- .TP
- HFSC
--Hierarchical Fair Service Curve guarantees precise bandwidth and delay allocation for leaf classes and allocates excess bandwidth fairly. Unlike HTB, it makes use of packet dropping to achieve low delays which interactive sessions benefit from.
-+Hierarchical Fair Service Curve guarantees precise bandwidth
-+and delay allocation for leaf classes and allocates excess bandwidth
-+fairly.
-+Unlike HTB,
-+it makes use of packet dropping to achieve low delays
-+which interactive sessions benefit from.
- .TP
- HTB
- The Hierarchy Token Bucket implements a rich linksharing hierarchy of
-@@ -655,8 +662,9 @@ parameter.
- 
- .TP
- delete
--A qdisc can be deleted by specifying its handle, which may also be 'root'. All subclasses and their leaf qdiscs
--are automatically deleted, as well as any filters attached to them.
-+A qdisc can be deleted by specifying its handle, which may also be 'root'.
-+All subclasses and their leaf qdiscs are automatically deleted,
-+as well as any filters attached to them.
- 
- .TP
- change
-@@ -704,9 +712,10 @@ read commands from provided file or standard input and invoke them.
- First failure will cause termination of tc.
- 
- .TP
--.BR "\-force"
-+.B \-force
- don't terminate tc on errors in batch mode.
--If there were any errors during execution of the commands, the application return code will be non zero.
-+If there were any errors during execution of the commands,
-+the application return code will be non zero.
- 
- .TP
- .BR "\-o" , " \-oneline"
-@@ -729,15 +738,15 @@ to the specified network namespace
- Actually it just simplifies executing of:
- 
- .B ip netns exec
--.IR NETNS
-+.I NETNS
- .B tc
--.RI "[ " OPTIONS " ] " OBJECT " { " COMMAND " | "
-+.RI "[ " OPTIONS " ] " OBJECT " { " COMMAND " |"
- .BR help " }"
- 
- to
- 
- .B tc
--.RI "-n[etns] " NETNS " [ " OPTIONS " ] " OBJECT " { " COMMAND " | "
-+.RI "\-n[etns] " NETNS " [ " OPTIONS " ] " OBJECT " { " COMMAND " |"
- .BR help " }"
- 
- .TP
-@@ -748,7 +757,7 @@ converting it to human readable name.
- .TP
- .BR "\-cf" , " \-conf " <FILENAME>
- specifies path to the config file. This option is used in conjunction with other options (e.g.
--.BR -nm ")."
-+.BR \-nm ")."
- 
- .TP
- .BR "\-t", " \-timestamp"
-@@ -781,15 +790,15 @@ for u32 filter, decode offset and mask values to equivalent filter commands base
- In JSON output, add whitespace to improve readability.
- 
- .TP
--.BR "\-iec"
--print rates in IEC units (ie. 1K = 1024).
-+.B \-iec
-+print rates in IEC units (i.e. 1\~K = 1024).
- 
- .TP
- .BR "\-g", " \-graph"
- shows classes as ASCII graph. Prints generic stats info under each class if
--.BR "-s"
-+.B \-s
- option was specified. Classes can be filtered only by
--.BR "dev"
-+.B dev
- option.
- 
- .TP
-@@ -806,7 +815,7 @@ precedence. This flag is ignored if
- is also given.
- 
- .TP
--.BR "\-j", " \-json"
-+.BR \-j ", " \-json
- Display results in JSON format.
- 
- .TP
-@@ -814,7 +823,7 @@ Display results in JSON format.
- resolve class name from
- .B /etc/iproute2/tc_cls
- file or from file specified by
--.B -cf
-+.B \-cf
- option. This file is just a mapping of
- .B classid
- to class name:
-@@ -838,13 +847,13 @@ to class name:
- .RS
- .B tc
- will not fail if
--.B -nm
-+.B \-nm
- was specified without
--.B -cf
-+.B \-cf
- option but
- .B /etc/iproute2/tc_cls
- file does not exist, which makes it possible to pass
--.B -nm
-+.B \-nm
- option for creating
- .B tc
- alias.
-@@ -857,13 +866,13 @@ cookie, etc.) and stats. This option is currently only supported by
- .BR "tc filter show " and " tc actions ls " commands.
- 
- .SH "EXAMPLES"
--.PP
--tc -g class show dev eth0
-+.
-+tc \-g class show dev eth0
- .RS 4
- Shows classes as ASCII graph on eth0 interface.
- .RE
- .PP
--tc -g -s class show dev eth0
-+tc \-g \-s class show dev eth0
- .RS 4
- Shows classes as ASCII graph with stats info under each class.
- .RE
-@@ -905,7 +914,8 @@ was written by Alexey N. Kuznetsov and added in Linux 2.2.
- .BR tc-tcindex (8),
- .BR tc-u32 (8),
- .br
--.RB "User documentation at " http://lartc.org/ ", but please direct bugreports and patches to: " <netdev@vger.kernel.org>
-+.RB "User documentation at " http://lartc.org/ ", \
-+but please direct bugreports and patches to: " <netdev@vger.kernel.org>
- 
- .SH AUTHOR
- Manpage maintained by bert hubert (ahu@ds9a.nl)
--- 
-2.40.1
-
+null-ptr is probably something else, since the race window is
+extremely tiny.
+In my testing this optimization doesn't buy much.
+So I'll just drop _tail optimization and switch to for_each(del_all)
+to move elements. We can revisit later.
 
 
