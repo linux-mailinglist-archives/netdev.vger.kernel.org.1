@@ -2,134 +2,69 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id EB0AE740B05
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:19:47 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 680FC740B02
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 10:19:16 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232942AbjF1ITj (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 04:19:39 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.133.124]:24504 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S233777AbjF1IOT (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:14:19 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687940009;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=2B1ynmbT0UkVLiBLPkihB9uufQdZmbcV3Hls/wgSG4U=;
-        b=A5qeOayM0dK13lLqMZ8/Jec4IukNslQCV4l1FpqSjGoauOrmk9Cwz54ZPgio/f31g0RTsP
-        fkO5x7fa9zNdJdBplHzUP/vAuFELJqJM9LzhIDlV5oETVkAAx8yDbp7BKTeON2BkiIXZC/
-        wM77R6tNappoED1Rx3klwUlBdyYUwBY=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-124-eNWdh1maPWmThJ6mLpfoyA-1; Wed, 28 Jun 2023 04:13:27 -0400
-X-MC-Unique: eNWdh1maPWmThJ6mLpfoyA-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2b6b98ac356so6970711fa.1
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 01:13:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687940006; x=1690532006;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=2B1ynmbT0UkVLiBLPkihB9uufQdZmbcV3Hls/wgSG4U=;
-        b=Y3yr5neBxa3f3AkxtbasI0WRpvdgsG24bgu6o8HgTNYNCjrB+eoQ22MHVD+231RTfN
-         1n4lYZhz0WTcx4dwk17zXpQ6QXBE6F6UEkr2WFCJfQWS8ewvrmobbHHhQaHfeiscyEcp
-         Z3C9Rr+7NTswKb62WoQgQfd+Vn3E76J7q3fk6kKQOfMquL5UslkWYfAa8gAbQsCW7WpE
-         SCbxffXcp/5Ex7UQGK2+fbCMjbIEykdrLXicIx9gS6iGB9mPfkuDZCBajMDVQTZvZfU7
-         YLmqdwKcPZa4FjW7O41eD0C1IgUbxBWTBKnK0vkV8QythhBeKxY6o1cIxlqbSy49Trmr
-         iztA==
-X-Gm-Message-State: AC+VfDzxcty1iZPZi8X/i32Vglnm8aiEjxapCG1IU1b2/9qqHxd9DheO
-        AACwHaI4IwkX5eRbRagTdkdqJIpKzY5pk8nqrWcPT2WGWRdnYyqbgStbNXavehleARQHcrVj0FM
-        GLyoVk0l7DrhjjX8l8ssTRPcmVbEfDJSv
-X-Received: by 2002:a2e:9943:0:b0:2b6:9909:79b6 with SMTP id r3-20020a2e9943000000b002b6990979b6mr6308002ljj.40.1687940006183;
-        Wed, 28 Jun 2023 01:13:26 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ5hUOUptmy1cz/bmc0SQBwJ16zCTf1sq+b8bGF74Opubi8l0hmlcMZJAcxolSBWuUoW13vUTOVfJelNLYP6OGc=
-X-Received: by 2002:a2e:9943:0:b0:2b6:9909:79b6 with SMTP id
- r3-20020a2e9943000000b002b6990979b6mr6307993ljj.40.1687940005910; Wed, 28 Jun
- 2023 01:13:25 -0700 (PDT)
+        id S230469AbjF1IS0 (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 04:18:26 -0400
+Received: from dggsgout11.his.huawei.com ([45.249.212.51]:7591 "EHLO
+        dggsgout11.his.huawei.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
+        with ESMTP id S233595AbjF1IOY (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 04:14:24 -0400
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+        by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4QrZ9m1QnTz4f3jMJ;
+        Wed, 28 Jun 2023 16:14:20 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+        by APP1 (Coremail) with SMTP id cCh0CgBnhzHa65tkpkgbMA--.49136S2;
+        Wed, 28 Jun 2023 16:14:21 +0800 (CST)
+Subject: Re: [PATCH v3 bpf-next 11/13] selftests/bpf: Improve test coverage of
+ bpf_mem_alloc.
+To:     Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc:     tj@kernel.org, rcu@vger.kernel.org, netdev@vger.kernel.org,
+        bpf@vger.kernel.org, kernel-team@fb.com, daniel@iogearbox.net,
+        andrii@kernel.org, void@manifault.com, paulmck@kernel.org
+References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
+ <20230628015634.33193-12-alexei.starovoitov@gmail.com>
+From:   Hou Tao <houtao@huaweicloud.com>
+Message-ID: <36014508-54cd-278c-accf-e5d71cade6d1@huaweicloud.com>
+Date:   Wed, 28 Jun 2023 16:14:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 MIME-Version: 1.0
-References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-5-lulu@redhat.com>
-In-Reply-To: <20230628065919.54042-5-lulu@redhat.com>
-From:   Jason Wang <jasowang@redhat.com>
-Date:   Wed, 28 Jun 2023 16:13:14 +0800
-Message-ID: <CACGkMEtN7pE4FK2-504JC3A1tcfPjy9QejJiTyvXD7nt49KLvA@mail.gmail.com>
-Subject: Re: [RFC 4/4] vduse: update the vq_info in ioctl
-To:     Cindy Lu <lulu@redhat.com>
-Cc:     mst@redhat.com, maxime.coquelin@redhat.com,
-        xieyongji@bytedance.com, kvm@vger.kernel.org,
-        linux-kernel@vger.kernel.org,
-        virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+In-Reply-To: <20230628015634.33193-12-alexei.starovoitov@gmail.com>
+Content-Type: text/plain; charset=utf-8
+Content-Transfer-Encoding: 7bit
+Content-Language: en-US
+X-CM-TRANSID: cCh0CgBnhzHa65tkpkgbMA--.49136S2
+X-Coremail-Antispam: 1UD129KBjDUn29KB7ZKAUJUUUUU529EdanIXcx71UUUUU7v73
+        VFW2AGmfu7bjvjm3AaLaJ3UjIYCTnIWjp_UUUYV7kC6x804xWl14x267AKxVW8JVW5JwAF
+        c2x0x2IEx4CE42xK8VAvwI8IcIk0rVWrJVCq3wAFIxvE14AKwVWUJVWUGwA2ocxC64kIII
+        0Yj41l84x0c7CEw4AK67xGY2AK021l84ACjcxK6xIIjxv20xvE14v26w1j6s0DM28EF7xv
+        wVC0I7IYx2IY6xkF7I0E14v26r4UJVWxJr1l84ACjcxK6I8E87Iv67AKxVW0oVCq3wA2z4
+        x0Y4vEx4A2jsIEc7CjxVAFwI0_GcCE3s1le2I262IYc4CY6c8Ij28IcVAaY2xG8wAqx4xG
+        64xvF2IEw4CE5I8CrVC2j2WlYx0E2Ix0cI8IcVAFwI0_JrI_JrylYx0Ex4A2jsIE14v26r
+        4j6F4UMcvjeVCFs4IE7xkEbVWUJVW8JwACjcxG0xvEwIxGrwACI402YVCY1x02628vn2kI
+        c2xKxwCYjI0SjxkI62AI1cAE67vIY487MxAIw28IcxkI7VAKI48JMxC20s026xCaFVCjc4
+        AY6r1j6r4UMI8I3I0E5I8CrVAFwI0_Jr0_Jr4lx2IqxVCjr7xvwVAFwI0_JrI_JrWlx4CE
+        17CEb7AF67AKxVWUtVW8ZwCIc40Y0x0EwIxGrwCI42IY6xIIjxv20xvE14v26r1j6r1xMI
+        IF0xvE2Ix0cI8IcVCY1x0267AKxVW8JVWxJwCI42IY6xAIw20EY4v20xvaj40_Wr1j6rW3
+        Jr1lIxAIcVC2z280aVAFwI0_Gr0_Cr1lIxAIcVC2z280aVCY1x0267AKxVW8Jr0_Cr1UYx
+        BIdaVFxhVjvjDU0xZFpf9x07UCg4fUUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 3:00=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
->
-> From: Your Name <you@example.com>
->
-> in VDUSE_VQ_GET_INFO, driver will sync the last_avail_idx
-> with reconnect info, I have olny test the split mode, so
 
-Typo, should be "only".
 
-> only use this here, will add more information later
+On 6/28/2023 9:56 AM, Alexei Starovoitov wrote:
+> From: Alexei Starovoitov <ast@kernel.org>
 >
-> Signed-off-by: Cindy Lu <lulu@redhat.com>
-> ---
->  drivers/vdpa/vdpa_user/vduse_dev.c | 16 ++++++++++++++++
->  1 file changed, 16 insertions(+)
+> bpf_obj_new() calls bpf_mem_alloc(), but doing alloc/free of 8 elements
+> is not triggering watermark conditions in bpf_mem_alloc.
+> Increase to 200 elements to make sure alloc_bulk/free_bulk is exercised.
 >
-> diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_user/=
-vduse_dev.c
-> index 3df1256eccb4..b8e453eac0ce 100644
-> --- a/drivers/vdpa/vdpa_user/vduse_dev.c
-> +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> @@ -141,6 +141,11 @@ static u32 allowed_device_id[] =3D {
->         VIRTIO_ID_NET,
->  };
->
-> +struct vhost_reconnect_vring {
-> +       uint16_t last_avail_idx;
-> +       bool avail_wrap_counter;
-> +};
-
-Should this belong to uAPI?
-
-> +
->  static inline struct vduse_dev *vdpa_to_vduse(struct vdpa_device *vdpa)
->  {
->         struct vduse_vdpa *vdev =3D container_of(vdpa, struct vduse_vdpa,=
- vdpa);
-> @@ -1176,6 +1181,17 @@ static long vduse_dev_ioctl(struct file *file, uns=
-igned int cmd,
->                                 vq->state.split.avail_index;
->
->                 vq_info.ready =3D vq->ready;
-> +               struct vdpa_reconnect_info *area;
-> +
-> +               area =3D &dev->reconnect_info[index];
-> +               struct vhost_reconnect_vring *log_reconnect;
-> +
-> +               log_reconnect =3D (struct vhost_reconnect_vring *)area->v=
-addr;
-
-What if userspace doesn't do mmap()?
-
-Thanks
-
-> +               if (log_reconnect->last_avail_idx !=3D
-> +                   vq_info.split.avail_index) {
-> +                       vq_info.split.avail_index =3D
-> +                               log_reconnect->last_avail_idx;
-> +               }
->
->                 ret =3D -EFAULT;
->                 if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
-> --
-> 2.34.3
->
+> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+Acked-by: Hou Tao <houtao1@huawei.com>
 
