@@ -1,129 +1,113 @@
-Return-Path: <netdev+bounces-14460-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14461-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1301741B05
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:34:14 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 07E53741B12
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:44:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 10E71280D03
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:34:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4DEA8280CFA
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:44:51 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 03C8B11195;
-	Wed, 28 Jun 2023 21:34:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6A65411199;
+	Wed, 28 Jun 2023 21:44:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6C3EC14D
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:34:10 +0000 (UTC)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78B671FE4;
-	Wed, 28 Jun 2023 14:34:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1687988049; x=1719524049;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=2zFRPcPqSdw/rQupEM6m4agW4/QKfyjYyUa1kit0f1s=;
-  b=UIa1fHs2Zs9fdB87YCNRFAuxiWbmg/365ZNADpyUTOAtzHvLgfO5lBUK
-   wxw67CFmygXg+ogUUMNSmnnNLywwAJ0Au4bjzmidC/nbeyA6beV653ui/
-   lSYP1SiJBy5+Qb4mDjF7U7L2U0i/tqr98wyd7l0MXuKC+xLb3kZz6wVk/
-   4nCnAFdauRuLIoNlwLs9RgXmrPzHLU9plxZuBFcUBTmly0A3B2lUc86t9
-   D2mOHA42J2FRRrzQU0rztrUyjmIDZ8kycv95abvSgM7JDW6P8UmVR+wzU
-   xTd3Fit49RtYOAk49V48l7GcxjvapcCmElyyuz4oLkqLm/WUSy1+cpXET
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="351758361"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="351758361"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 14:34:08 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="787172958"
-X-IronPort-AV: E=Sophos;i="6.01,166,1684825200"; 
-   d="scan'208";a="787172958"
-Received: from vcostago-desk1.jf.intel.com (HELO vcostago-desk1) ([10.54.70.17])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 28 Jun 2023 14:34:07 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Florian Kauer <florian.kauer@linutronix.de>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Vedang Patel <vedang.patel@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Jithu Joseph
- <jithu.joseph@intel.com>, Andre Guedes <andre.guedes@intel.com>, Simon
- Horman <simon.horman@corigine.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH net v2] igc: Prevent garbled TX queue
- with XDP ZEROCOPY
-In-Reply-To: <20230628091148.62256-1-florian.kauer@linutronix.de>
-References: <20230628091148.62256-1-florian.kauer@linutronix.de>
-Date: Wed, 28 Jun 2023 14:34:07 -0700
-Message-ID: <87a5wjqnjk.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA44C14D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 21:44:49 +0000 (UTC)
+Received: from mail-wr1-x432.google.com (mail-wr1-x432.google.com [IPv6:2a00:1450:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF51E9F;
+	Wed, 28 Jun 2023 14:44:46 -0700 (PDT)
+Received: by mail-wr1-x432.google.com with SMTP id ffacd0b85a97d-3113dabc549so12665f8f.1;
+        Wed, 28 Jun 2023 14:44:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1687988685; x=1690580685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=fKzFZfaCpIoHAU5rSccfZbDpsuCI+g7GveCYDJ1hj0o=;
+        b=W6dPC3eK7fUY3GpiM0Jyugi5l2Mioi7QOOvGIeasVOq+1ObrJ8q5P3TC4IkwMMTBi9
+         rRnYYX7Jf/kxwm27Mf571kylJxLaTAk0By130ihnyE2Q6+Hd3mudVzWuBaXkbFPphpZP
+         nuUeyvKtK6yi/LIxo0tKoTiaqBMDxGj8hmg26hj5IOBSyAiuUOg/mWhyBaMmEE3/w0IK
+         Ofpm0cPSXzs8iaWyN5oQfvhZRMToPLw2OvnJd/L9tCc2HNY3HxlHIacXQKGtWm+QHZ4K
+         j3ckThviq0Fot9JPX8zY4sctPntlWIvKb02aPKXcJLGvA4MJw9Dphj6c5F21DCFQkqQ1
+         8n2A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1687988685; x=1690580685;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=fKzFZfaCpIoHAU5rSccfZbDpsuCI+g7GveCYDJ1hj0o=;
+        b=SMHPj3zQDWbHoqLzTdByvBmoIZ4OZc7ayEYhSm0RT7gKbUkcS/fBjk3Sc1mTdJhw+J
+         rUFdfK0WzUSCfNha77w2NLQq422xCQH+nkEQWqVBGRm5s6ZEjp5O8PnAjOuW1ER4+Pk4
+         I0oSUIduxQ38Nwph01GsRpsVjjvZQYVi1RyAwqlp4AYQipZAGlmimGGykIWoI/NCNf00
+         xq6giUjZV3gc/dXzfUd5nEv5gkJPpxHh0VwJhMPq9S754z1s7RObil+Rqrj8UKeruIJP
+         D37AphWlU2sVWhl4iBywxitLeag4WI9qTZElUePfk0FV22yCVYSDEc/xHkyM7jZPnWKG
+         cjnA==
+X-Gm-Message-State: AC+VfDziCIIzfW4tagvqwDAbStYlTrM+T6ogLq6QzCSNS5TeOt0ofTmu
+	yRA4ntcGDHXYm9X9spBX8gI=
+X-Google-Smtp-Source: ACHHUZ5t5ivp1MYSN2+SF4n9QuvhQTqNCVa9Oqryzx+g6lCeu6T10FRsZV+vD/CDlu0pny2ytzX5Yg==
+X-Received: by 2002:a5d:4a42:0:b0:313:f366:2c68 with SMTP id v2-20020a5d4a42000000b00313f3662c68mr10556457wrs.26.1687988685001;
+        Wed, 28 Jun 2023 14:44:45 -0700 (PDT)
+Received: from skbuf ([188.25.159.134])
+        by smtp.gmail.com with ESMTPSA id b15-20020a5d45cf000000b003140c8aa4fdsm2566541wrs.35.2023.06.28.14.44.44
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jun 2023 14:44:44 -0700 (PDT)
+Date: Thu, 29 Jun 2023 00:44:42 +0300
+From: Vladimir Oltean <olteanv@gmail.com>
+To: Pawel Dembicki <paweldembicki@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] net: dsa: vsc73xx: fix MTU configuration
+Message-ID: <20230628214442.5wucuusl6pqudllk@skbuf>
+References: <20230628194327.1765644-1-paweldembicki@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628194327.1765644-1-paweldembicki@gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Florian Kauer <florian.kauer@linutronix.de> writes:
-
-> In normal operation, each populated queue item has
-> next_to_watch pointing to the last TX desc of the packet,
-> while each cleaned item has it set to 0. In particular,
-> next_to_use that points to the next (necessarily clean)
-> item to use has next_to_watch set to 0.
->
-> When the TX queue is used both by an application using
-> AF_XDP with ZEROCOPY as well as a second non-XDP application
-> generating high traffic, the queue pointers can get in
-> an invalid state where next_to_use points to an item
-> where next_to_watch is NOT set to 0.
->
-> However, the implementation assumes at several places
-> that this is never the case, so if it does hold,
-> bad things happen. In particular, within the loop inside
-> of igc_clean_tx_irq(), next_to_clean can overtake next_to_use.
-> Finally, this prevents any further transmission via
-> this queue and it never gets unblocked or signaled.
-> Secondly, if the queue is in this garbled state,
-> the inner loop of igc_clean_tx_ring() will never terminate,
-> completely hogging a CPU core.
->
-> The reason is that igc_xdp_xmit_zc() reads next_to_use
-> before acquiring the lock, and writing it back
-> (potentially unmodified) later. If it got modified
-> before locking, the outdated next_to_use is written
-> pointing to an item that was already used elsewhere
-> (and thus next_to_watch got written).
->
-> Fixes: 9acf59a752d4 ("igc: Enable TX via AF_XDP zero-copy")
-> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> Tested-by: Kurt Kanzenbach <kurt@linutronix.de>
+On Wed, Jun 28, 2023 at 09:43:27PM +0200, Pawel Dembicki wrote:
+> Switch in MAXLEN register stores the maximum size of a data frame.
+> The MTU size is 18 bytes smaller than the frame size.
+> 
+> The current settings are causing problems with packet forwarding.
+> This patch fixes the MTU settings to proper values.
+> 
+> Fixes: fb77ffc6ec86 ("net: dsa: vsc73xx: make the MTU configurable")
+> Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> 
 > ---
+> In my first attempt, I sent it to net-next [0], but I was asked to resend
+> it to net.
+> 
+> [0]https://lore.kernel.org/netdev/20230625115343.1603330-7-paweldembicki@gmail.com/
 
-This patch doesn't directly apply because there's a small conflict with
-commit 95b681485563 ("igc: Avoid transmit queue timeout for XDP"),
-but really easy to solve.
+Just like you had marked those earlier patches as "[PATCH net-next]",
+this should have also been marked as "[PATCH v2 net]". Patchwork does
+complain about that and deduced the wrong tree, but accepted it anyway
+and otherwise ran its tests.
+https://patchwork.kernel.org/project/netdevbpf/patch/20230628194327.1765644-1-paweldembicki@gmail.com/
 
-Anyway, good catch:
+I don't believe there is any reason to resend this patch.
 
-Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-
-
-Cheers,
--- 
-Vinicius
+Reviewed-by: Vladimir Oltean <olteanv@gmail.com>
 
