@@ -1,347 +1,193 @@
-Return-Path: <netdev+bounces-14423-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C307741056
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 13:47:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9F867412CD
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:44:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9EE2F280DFB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 11:47:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D7A0B1C203D8
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 13:44:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECBB9BE47;
-	Wed, 28 Jun 2023 11:47:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E5393C14A;
+	Wed, 28 Jun 2023 13:44:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D81D3BA32
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 11:47:39 +0000 (UTC)
-Received: from mail-vs1-xe2b.google.com (mail-vs1-xe2b.google.com [IPv6:2607:f8b0:4864:20::e2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8CE2D58;
-	Wed, 28 Jun 2023 04:47:37 -0700 (PDT)
-Received: by mail-vs1-xe2b.google.com with SMTP id ada2fe7eead31-443628ee79dso1222606137.1;
-        Wed, 28 Jun 2023 04:47:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D8FD4C2C5
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 13:44:22 +0000 (UTC)
+Received: from mail-wr1-x42a.google.com (mail-wr1-x42a.google.com [IPv6:2a00:1450:4864:20::42a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C6DD10D5;
+	Wed, 28 Jun 2023 06:44:20 -0700 (PDT)
+Received: by mail-wr1-x42a.google.com with SMTP id ffacd0b85a97d-313f3a6db22so3355406f8f.3;
+        Wed, 28 Jun 2023 06:44:20 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1687952856; x=1690544856;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=nTx6dc94v45Ci191SZrpBnP46s4McjqVM14Xcmp+cwA=;
-        b=pBHZ6PqUk8o9PV83lzeFbnTOsp2kW0XqgInNP8Bwva2+COXL1WZ4Xg3NNvBizYJZOo
-         IBBn5wRebQB8ckJDRQK+cdIki2gA2xCvcv37AV0uDVD+t6Zs/4tTC1lUw8V6lp60cUyQ
-         gDkRXWKmLh1EAsjWYQlO9Vvmf7VyKtj5t0w2tU25fRyEiXZ1VGGd9stdXbzSoB0Y3FLm
-         t0IkV1OeWd7NyBY1dPKvfmDuJtmmX4JK7ShJL4wKk5RPC26pOySj8rAQhbf0wF9PcfPy
-         aS0FqsIBwgVcxzSAkBnPn2DObm49UiWBltOEs8O9zT5SMHu8iJPRKOahflfVXvVOg0Tl
-         U12Q==
+        d=gmail.com; s=20221208; t=1687959858; x=1690551858;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:from:to:cc:subject:date:message-id:reply-to;
+        bh=pkZ4Zk9tAZpHeEqo4A+NgvCmbBndm0e9GG6xIrH5rjE=;
+        b=dYl5OQyHPiC73mFKbGw4iyDezvBYIsSa+UfNh9oob2WV+a6XY9grfH5d8Uzl244D3V
+         vCRLW4s3Hbl+IGLBdW9kJlSWHyizOEU+0C1Ngqmh7C/MLM/qxZXvNrbA7ixHg6opyNMi
+         9R9PUx5kRUj8JzOrNEEXzZ0ThzD2ISWZLG5ejrVgi86TQbWqQpvzx9XumrUXv/Yrd3b/
+         CFbHheugUzq+AOnLpFhjOgX78uqVTDmtYWqP3umi03ir5CuP9QtrvBGNIYHbNel08erZ
+         w/qKCx83kGn6twiHMyL9TSoiuZ90obwxubStVEuEWlBHcthqZbomzooynZbRPfKoi/em
+         rTUg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1687952856; x=1690544856;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=nTx6dc94v45Ci191SZrpBnP46s4McjqVM14Xcmp+cwA=;
-        b=OCcdmhxN3rk8llwi5sKF23fvNv5A60wJWc9/GSIIcwKO1CADd9E/4sxyzEgae6IZgH
-         ilRWugaA1NYe9MJHgUFxwytU4fdXz5NwAE/eVmiyfZy464z4lf6kfVr85i3pUaaVqZe1
-         2KfVUgxirBT6t29tE8M6XSAMzUu+r+qO9uWuYf8QkFgySYbLBVyOk6vvLTbrQ22SQndV
-         OInfuc9XvfIRJAVamlpiE9oz4XztJE6HDxCxRNAJ1ojgfHuktGp7GaFmFTe8YG9kH3Fh
-         Xjfdcpe71BKK8IeKuQ/3+7Xo6ic2K8TgMktcqSw24KxECWM9vbZD6468lNCZdMvLT96n
-         66Qg==
-X-Gm-Message-State: AC+VfDyEAyE5tJ0n6/6rRhm2QFaXDnX9yZCJC1SM0D3pJmsYoEpEkRqq
-	obe8q9bk2oHtfT+T1uEbY4GsrVNDh5LtSxJTEuY=
-X-Google-Smtp-Source: ACHHUZ4Bsud4xzdHL5UUZqC9ssBS5SLCGQ8rC4W6QQKwZA2T3g1I1MyE8OOTipwDRUkmxCFWUXXrjEKsNfK3EGOYZpw=
-X-Received: by 2002:a67:ee4d:0:b0:440:ae17:f86b with SMTP id
- g13-20020a67ee4d000000b00440ae17f86bmr15120248vsp.12.1687952856502; Wed, 28
- Jun 2023 04:47:36 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1687959858; x=1690551858;
+        h=in-reply-to:content-disposition:mime-version:references:subject:cc
+         :to:from:date:message-id:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=pkZ4Zk9tAZpHeEqo4A+NgvCmbBndm0e9GG6xIrH5rjE=;
+        b=JOwU4GDfe1zc1UsuKtEjCNB5xJtckZdoPvn1p3QFB1R6F9Ra+fxCSfk3d7fua9CgRw
+         GYZuT7kzNE9pYTTBAc6hmYQoye/C/TWLKDzTIuyxDkAQ20NJq0C4Mxhbc5AuD31FilUn
+         SS+guHQLdyqKfSwNRajQ/HEYUzIG85N3hzIMAcq7jRrCndDb752Uiv8uVw+ND27f+IEm
+         rOKZBRchQUbXow+44zb/CGmoqkDTEIWCiGA3b+2u0XjQwFiBM5KV0wlYABWYEsOUE5RB
+         vDkF9dPinkhXsJ/4LI2uNDztkFjzavcjLy7VxWAqMtk2AriqahtikiTEX8SDcBrxK8Va
+         hHjQ==
+X-Gm-Message-State: AC+VfDzf6pUXF+JmXDmkXuppYPJ4cRl0CZbtL3H8beepWxdl8wKFshuk
+	6xQ0PCYVuDhKRhwpP+4f+a4=
+X-Google-Smtp-Source: ACHHUZ4yoZuCEXCbzh2LtK2M3mTGFYYuTeSht2OyGAH3ft0/DXeF0obKLM4NYBEpjmH6O2NQ3kk8YQ==
+X-Received: by 2002:a5d:4851:0:b0:313:f4b9:99cc with SMTP id n17-20020a5d4851000000b00313f4b999ccmr6567903wrs.68.1687959858188;
+        Wed, 28 Jun 2023 06:44:18 -0700 (PDT)
+Received: from Ansuel-xps. (93-34-93-173.ip49.fastwebnet.it. [93.34.93.173])
+        by smtp.gmail.com with ESMTPSA id x11-20020adfdd8b000000b00313ecd3714csm10551969wrl.19.2023.06.28.06.44.17
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jun 2023 06:44:17 -0700 (PDT)
+Message-ID: <649c3931.df0a0220.136ab.2fb7@mx.google.com>
+X-Google-Original-Message-ID: <ZJuDsafM60FbylKy@Ansuel-xps.>
+Date: Wed, 28 Jun 2023 02:49:53 +0200
+From: Christian Marangi <ansuelsmth@gmail.com>
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Atin Bainada <hi@atinb.me>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: Re: [net-next PATCH RFC] net: dsa: qca8k: make learning configurable
+ and keep off if standalone
+References: <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230623114005.9680-1-ansuelsmth@gmail.com>
+ <20230625115803.6xykp4wiqqdwwzv4@skbuf>
+ <6499c31c.df0a0220.e2acb.5549@mx.google.com>
+ <20230626173056.zq77nilzrr5djns5@skbuf>
+ <6499d3f5.050a0220.3becf.7296@mx.google.com>
+ <20230627094916.maywojwztzdek5y2@skbuf>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
- <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
- <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
- <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
- <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
- <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
- <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
- <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
- <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
- <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
- <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
- <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com> <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
-In-Reply-To: <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Wed, 28 Jun 2023 13:47:24 +0200
-Message-ID: <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230627094916.maywojwztzdek5y2@skbuf>
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DATE_IN_PAST_12_24,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 28, 2023 at 11:06=E2=80=AFAM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
->
-> Hello,
->
-> On Wed, 2023-06-28 at 09:37 +0200, Ian Kumlien wrote:
-> > Been running all night but eventually it crashed again...
-> >
-> > [21753.055795] Out of memory: Killed process 970 (qemu-system-x86)
-> > total-vm:4709488kB, anon-rss:2172652kB, file-rss:4608kB,
-> > shmem-rss:0kB, UID:77 pgtables:4800kB oom_score_adj:0
-> > [24249.061154] general protection fault, probably for non-canonical
-> > address 0xb0746d4e6bee35e2: 0000 [#1] PREEMPT SMP NOPTI
-> > [24249.072138] CPU: 0 PID: 893 Comm: napi/eno1-68 Tainted: G        W
-> >         6.4.0-dirty #366
-> > [24249.080670] Hardware name: Supermicro Super Server/A2SDi-12C-HLN4F,
-> > BIOS 1.7a 10/13/2022
-> > [24249.088852] RIP: 0010:kmem_cache_alloc_bulk (mm/slub.c:377
-> > mm/slub.c:388 mm/slub.c:395 mm/slub.c:3963 mm/slub.c:4026)
-> > [24249.094086] Code: 0f 84 46 ff ff ff 65 ff 05 a4 bd e4 47 48 8b 4d
-> > 00 65 48 03 0d e8 5f e3 47 9c 5e fa 45 31 d2 eb 2f 8b 45 28 48 01 d0
-> > 48 89 c7 <48> 8b 00 48 33 85 b8 00 00 00 48 0f cf 48 31 f8 48 89 01 49
-> > 89 17
-> > All code
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> >    0: 0f 84 46 ff ff ff    je     0xffffffffffffff4c
-> >    6: 65 ff 05 a4 bd e4 47 incl   %gs:0x47e4bda4(%rip)        # 0x47e4b=
-db1
-> >    d: 48 8b 4d 00          mov    0x0(%rbp),%rcx
-> >   11: 65 48 03 0d e8 5f e3 add    %gs:0x47e35fe8(%rip),%rcx        # 0x=
-47e36001
-> >   18: 47
-> >   19: 9c                    pushf
-> >   1a: 5e                    pop    %rsi
-> >   1b: fa                    cli
-> >   1c: 45 31 d2              xor    %r10d,%r10d
-> >   1f: eb 2f                jmp    0x50
-> >   21: 8b 45 28              mov    0x28(%rbp),%eax
-> >   24: 48 01 d0              add    %rdx,%rax
-> >   27: 48 89 c7              mov    %rax,%rdi
-> >   2a:* 48 8b 00              mov    (%rax),%rax <-- trapping instructio=
-n
-> >   2d: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
-> >   34: 48 0f cf              bswap  %rdi
-> >   37: 48 31 f8              xor    %rdi,%rax
-> >   3a: 48 89 01              mov    %rax,(%rcx)
-> >   3d: 49 89 17              mov    %rdx,(%r15)
-> >
-> > Code starting with the faulting instruction
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >    0: 48 8b 00              mov    (%rax),%rax
-> >    3: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
-> >    a: 48 0f cf              bswap  %rdi
-> >    d: 48 31 f8              xor    %rdi,%rax
-> >   10: 48 89 01              mov    %rax,(%rcx)
-> >   13: 49 89 17              mov    %rdx,(%r15)
-> > [24249.112951] RSP: 0018:ffff9fc303973d20 EFLAGS: 00010086
-> > [24249.118275] RAX: b0746d4e6bee35e2 RBX: 0000000000000001 RCX: ffff8d5=
-a2fa31da0
-> > [24249.125501] RDX: b0746d4e6bee3572 RSI: 0000000000000286 RDI: b0746d4=
-e6bee35e2
-> > [24249.132730] RBP: ffff8d56c016d500 R08: 0000000000000400 R09: ffff8d5=
-6ede0e67a
-> > [24249.139958] R10: 0000000000000001 R11: ffff8d56c59d88c0 R12: 0000000=
-000000010
-> > [24249.147187] R13: 0000000000000820 R14: ffff8d5a2fa2a810 R15: ffff8d5=
-a2fa2a818
-> > [24249.154415] FS:  0000000000000000(0000) GS:ffff8d5a2fa00000(0000)
-> > knlGS:0000000000000000
-> > [24249.162620] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [24249.168471] CR2: 00007f0f3f7f8760 CR3: 0000000102466000 CR4: 0000000=
-0003526f0
-> > [24249.175717] Call Trace:
-> > [24249.178268]  <TASK>
-> > [24249.180476] ? die_addr (arch/x86/kernel/dumpstack.c:421
-> > arch/x86/kernel/dumpstack.c:460)
-> > [24249.183907] ? exc_general_protection (arch/x86/kernel/traps.c:783
-> > arch/x86/kernel/traps.c:728)
-> > [24249.188726] ? asm_exc_general_protection
-> > (./arch/x86/include/asm/idtentry.h:564)
-> > [24249.193720] ? kmem_cache_alloc_bulk (mm/slub.c:377 mm/slub.c:388
-> > mm/slub.c:395 mm/slub.c:3963 mm/slub.c:4026)
-> > [24249.198361] ? netif_receive_skb_list_internal (net/core/dev.c:5729)
-> > [24249.203960] napi_skb_cache_get (net/core/skbuff.c:338)
-> > [24249.208078] __napi_build_skb (net/core/skbuff.c:517)
-> > [24249.211934] napi_build_skb (net/core/skbuff.c:541)
-> > [24249.215616] ixgbe_poll
-> > (drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:2165
-> > drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:2361
-> > drivers/net/ethernet/intel/ixgbe/ixgbe_main.c:3178)
-> > [24249.219305] __napi_poll (net/core/dev.c:6498)
-> > [24249.222905] napi_threaded_poll (./include/linux/netpoll.h:89
-> > net/core/dev.c:6640)
-> > [24249.227197] ? __napi_poll (net/core/dev.c:6625)
-> > [24249.231050] kthread (kernel/kthread.c:379)
-> > [24249.234300] ? kthread_complete_and_exit (kernel/kthread.c:332)
-> > [24249.239207] ret_from_fork (arch/x86/entry/entry_64.S:314)
-> > [24249.242892]  </TASK>
-> > [24249.245185] Modules linked in: chaoskey
-> > [24249.249133] ---[ end trace 0000000000000000 ]---
-> > [24249.270157] pstore: backend (erst) writing error (-28)
-> > [24249.275408] RIP: 0010:kmem_cache_alloc_bulk (mm/slub.c:377
-> > mm/slub.c:388 mm/slub.c:395 mm/slub.c:3963 mm/slub.c:4026)
-> > [24249.280660] Code: 0f 84 46 ff ff ff 65 ff 05 a4 bd e4 47 48 8b 4d
-> > 00 65 48 03 0d e8 5f e3 47 9c 5e fa 45 31 d2 eb 2f 8b 45 28 48 01 d0
-> > 48 89 c7 <48> 8b 00 48 33 85 b8 00 00 00 48 0f cf 48 31 f8 48 89 01 49
-> > 89 17
-> > All code
-> > =3D=3D=3D=3D=3D=3D=3D=3D
-> >    0: 0f 84 46 ff ff ff    je     0xffffffffffffff4c
-> >    6: 65 ff 05 a4 bd e4 47 incl   %gs:0x47e4bda4(%rip)        # 0x47e4b=
-db1
-> >    d: 48 8b 4d 00          mov    0x0(%rbp),%rcx
-> >   11: 65 48 03 0d e8 5f e3 add    %gs:0x47e35fe8(%rip),%rcx        # 0x=
-47e36001
-> >   18: 47
-> >   19: 9c                    pushf
-> >   1a: 5e                    pop    %rsi
-> >   1b: fa                    cli
-> >   1c: 45 31 d2              xor    %r10d,%r10d
-> >   1f: eb 2f                jmp    0x50
-> >   21: 8b 45 28              mov    0x28(%rbp),%eax
-> >   24: 48 01 d0              add    %rdx,%rax
-> >   27: 48 89 c7              mov    %rax,%rdi
-> >   2a:* 48 8b 00              mov    (%rax),%rax <-- trapping instructio=
-n
-> >   2d: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
-> >   34: 48 0f cf              bswap  %rdi
-> >   37: 48 31 f8              xor    %rdi,%rax
-> >   3a: 48 89 01              mov    %rax,(%rcx)
-> >   3d: 49 89 17              mov    %rdx,(%r15)
-> >
-> > Code starting with the faulting instruction
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
-=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> >    0: 48 8b 00              mov    (%rax),%rax
-> >    3: 48 33 85 b8 00 00 00 xor    0xb8(%rbp),%rax
-> >    a: 48 0f cf              bswap  %rdi
-> >    d: 48 31 f8              xor    %rdi,%rax
-> >   10: 48 89 01              mov    %rax,(%rcx)
-> >   13: 49 89 17              mov    %rdx,(%r15)
-> > [24249.299578] RSP: 0018:ffff9fc303973d20 EFLAGS: 00010086
-> > [24249.304917] RAX: b0746d4e6bee35e2 RBX: 0000000000000001 RCX: ffff8d5=
-a2fa31da0
-> > [24249.312161] RDX: b0746d4e6bee3572 RSI: 0000000000000286 RDI: b0746d4=
-e6bee35e2
-> > [24249.319407] RBP: ffff8d56c016d500 R08: 0000000000000400 R09: ffff8d5=
-6ede0e67a
-> > [24249.326651] R10: 0000000000000001 R11: ffff8d56c59d88c0 R12: 0000000=
-000000010
-> > [24249.333896] R13: 0000000000000820 R14: ffff8d5a2fa2a810 R15: ffff8d5=
-a2fa2a818
-> > [24249.341141] FS:  0000000000000000(0000) GS:ffff8d5a2fa00000(0000)
-> > knlGS:0000000000000000
-> > [24249.349356] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [24249.355206] CR2: 00007f0f3f7f8760 CR3: 0000000102466000 CR4: 0000000=
-0003526f0
-> > [24249.362452] Kernel panic - not syncing: Fatal exception in interrupt
-> > [24249.566854] Kernel Offset: 0x36e00000 from 0xffffffff81000000
-> > (relocation range: 0xffffffff80000000-0xffffffffbfffffff)
-> > [24249.594124] ---[ end Kernel panic - not syncing: Fatal exception in
-> > interrupt ]---
-> >
-> > It's also odd that i get a OOM - it only seems to happen when i enable
-> > rx-gro-list
->
-> Unfortunately, not the result I was looking for. That leads to more
-> questions then answer, I'm sorry.
+On Tue, Jun 27, 2023 at 12:49:16PM +0300, Vladimir Oltean wrote:
+> On Mon, Jun 26, 2023 at 07:59:41PM +0200, Christian Marangi wrote:
+> > > Hmm, so ping works but this doesn't? That's strange, because send_uc_ipv4()
+> > > also pings. Have you run with bash -x to see why it fails?
+> > > 
+> > 
+> > I just run with bash -x and I also mod the script to not delete the
+> > tcpdump. Limiting the script to only this test the dump is just 2 ICMPv6
+> > packet and no output from tcpdump aside from
+> > 
+> > tcpdump: listening on lan1, link-type EN10MB (Ethernet), snapshot length 65535 bytes
+> > 3 packets captured
+> > 5 packets received by filter
+> > 0 packets dropped by kernel
+> > 
+> > I feel like this is important so I think I should focus on understanding
+> > why this doesn't work? Any clue?
+> 
+> No clue. I'd put a "bash" instruction in send_uc_ipv4(), which would act
+> as a sort of break point for the script (opens an interactive sub-shell),
+> then run it again with bash -x, manually repeat the command that failed,
+> investigate why it failed and hit Ctrl-d when I'm done.
 
-I understand you...
+Hi, I wasted a day to only notice that the problem was in busybox not
+supporting 0.x value and that is what selfttest script use. Another
+thing to check. Also the confusing part of this is that we don't check
+if ping_do return error and the test just fails (while in reality the
+ping command was never executed)
 
-> How long did the host keep going with rx-gro-list enabled?
+Anyway I'm fixing all kind of bugs and I even found an even hw
+limitation with the FDB table with mgmt packet...
 
-Well, hours...
+Also I implemented fdb_insolation following the implementation done on
+felix with reserving VID at the end...
+About this I wonder if it might be a good idea to expose some generic
+API from DSA?
 
-reboot   system boot  6.4.0-dirty      Wed Jun 28 04:20 - 13:39  (09:19)
-reboot   system boot  6.4.0-dirty      Tue Jun 27 21:31 - 13:39  (16:08)
+qca8k require a reserved VID for VLAN unaware port and with
+fdb_isolation even more VID are reserved. DSA have no idea about this so
+I wonder if there is a chance of VID clash? I feel like we need
+something to declare a range of reserved VID so that they gets rejected
+when applied. (about this I think I should return -EINVAL if fdb/mbd
+insert are asked with a reserved VID)
 
-So, lets imagine a few seconds to login and enable everything
+Anyway by fixing that interval problem (enabling support in busybox as
+it's disabled by default in a OpenWRT system)
+This is the new output of the local_termination.sh 
 
-> Did you observe the WARN_ON() introduced by the tentative fix?
+TAP version 13
+1..1
+# selftests: drivers/net/dsa: local_termination.sh
+# TEST: lan1: Unicast IPv4 to primary MAC address                     [ OK ]
+# TEST: lan1: Unicast IPv4 to macvlan MAC address                     [ OK ]
+# TEST: lan1: Unicast IPv4 to unknown MAC address                     [FAIL]
+#       reception succeeded, but should have failed
+# TEST: lan1: Unicast IPv4 to unknown MAC address, promisc            [ OK ]
+# TEST: lan1: Unicast IPv4 to unknown MAC address, allmulti           [FAIL]
+#       reception succeeded, but should have failed
+# TEST: lan1: Multicast IPv4 to joined group                          [ OK ]
+# TEST: lan1: Multicast IPv4 to unknown group                         [FAIL]
+#       reception succeeded, but should have failed
+# TEST: lan1: Multicast IPv4 to unknown group, promisc                [ OK ]
+# TEST: lan1: Multicast IPv4 to unknown group, allmulti               [ OK ]
+# TEST: lan1: Multicast IPv6 to joined group                          [ OK ]
+# TEST: lan1: Multicast IPv6 to unknown group                         [FAIL]
+#       reception succeeded, but should have failed
+# TEST: lan1: Multicast IPv6 to unknown group, promisc                [ OK ]
+# TEST: lan1: Multicast IPv6 to unknown group, allmulti               [ OK ]
+# TEST: br0: Unicast IPv4 to primary MAC address                      [ OK ]
+# TEST: br0: Unicast IPv4 to macvlan MAC address                      [ OK ]
+# TEST: br0: Unicast IPv4 to unknown MAC address                      [FAIL]
+#       reception succeeded, but should have failed
+# TEST: br0: Unicast IPv4 to unknown MAC address, promisc             [ OK ]
+# TEST: br0: Unicast IPv4 to unknown MAC address, allmulti            [FAIL]
+#       reception succeeded, but should have failed
+# TEST: br0: Multicast IPv4 to joined group                           [ OK ]
+# TEST: br0: Multicast IPv4 to unknown group                          [FAIL]
+#       reception succeeded, but should have failed
+# TEST: br0: Multicast IPv4 to unknown group, promisc                 [ OK ]
+# TEST: br0: Multicast IPv4 to unknown group, allmulti                [ OK ]
+# TEST: br0: Multicast IPv6 to joined group                           [ OK ]
+# TEST: br0: Multicast IPv6 to unknown group                          [FAIL]
+#       reception succeeded, but should have failed
+# TEST: br0: Multicast IPv6 to unknown group, promisc                 [ OK ]
+# TEST: br0: Multicast IPv6 to unknown group, allmulti                [ OK ]
+not ok 1 selftests: drivers/net/dsa: local_termination.sh # exit=1
 
-I could only see the console, so saw nothing...
+Seems good aside from the reception secceeded that I think the kernel
+just drops right?
 
-> > - it's also odd because this machine always has ~8GB of
-> > memory available
->
-> It looks like there is a memory leak somewhere, and I don't think the
-> tentative fixup introduced such issue.
+The switch have a way to control FLOOD per port but maybe the correct
+feature to use is the VLAN leaky? Where the setting can be set by both
+FDB/MBD and per port.
 
-I agree, it was there before...
+Sorry if I described some fix and implementation without proposing the
+patch but I would like some comments on what the tool returned.
 
-> It looks like the above splat is due to a slab corruption, which in
-> turn could be unrelated from the mentioned leak, but it could/should
-> be related to rx-gro-list.
-
-Agreed =3D)
-
-> Could you please run the test with both kmemleak and kasan enabled?
-
-Machine-slowdown-enabled^tm
-
-> Additionally could you please disclose if you have non trivial
-> netfilter and/or bridge filter and/or tc rules possibly modifying the
-> incoming/egress packets?
-
-I only have basic reject accept rules, some snat/dnat pairs, but i
-don't see it ending up in "non trivial" ;)
-
-> If kasan is not an option, could you please apply the debug the patch
-> below? (on top of the previous one)
-
-I actually did both, if it's unrelated we should know as well..
-
-I hope i have something for you before tomorrow, else there will be a
-bit of a break until next week
-
-> Thanks!
->
-> Paolo
-> ---
-> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
-> index 6c5915efbc17..94adca27b205 100644
-> --- a/net/core/skbuff.c
-> +++ b/net/core/skbuff.c
-> @@ -4295,6 +4295,8 @@ struct sk_buff *skb_segment_list(struct sk_buff *sk=
-b,
->                 delta_len +=3D nskb->len;
->
->                 skb_push(nskb, -skb_network_offset(nskb) + offset);
-> +               if (WARN_ON_ONCE(nskb->data - skb->head > skb->tail))
-> +                       goto err_linearize;
->
->                 skb_release_head_state(nskb);
->                 len_diff =3D skb_network_header_len(nskb) - skb_network_h=
-eader_len(skb);
-> @@ -4302,6 +4304,11 @@ struct sk_buff *skb_segment_list(struct sk_buff *s=
-kb,
->
->                 skb_headers_offset_update(nskb, skb_headroom(nskb) - skb_=
-headroom(skb));
->                 nskb->transport_header +=3D len_diff;
-> +               if (WARN_ON_ONCE(tnl_hlen > skb_headroom(nskb)))
-> +                       goto err_linearize;
-> +               if (WARN_ON_ONCE(skb_headroom(nskb) + offset > nskb->tail=
-))
-> +                       goto err_linearize;
-> +
->                 skb_copy_from_linear_data_offset(skb, -tnl_hlen,
->                                                  nskb->data - tnl_hlen,
->                                                  offset + tnl_hlen);
->
->
+-- 
+	Ansuel
 
