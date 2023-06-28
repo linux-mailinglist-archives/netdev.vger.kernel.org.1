@@ -2,68 +2,56 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 0700B7413F0
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 16:40:55 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 930A57413FE
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 16:44:24 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231326AbjF1OkT (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 10:40:19 -0400
-Received: from vps0.lunn.ch ([156.67.10.101]:40252 "EHLO vps0.lunn.ch"
+        id S229993AbjF1OoH (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 10:44:07 -0400
+Received: from vps0.lunn.ch ([156.67.10.101]:40258 "EHLO vps0.lunn.ch"
         rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
-        id S230340AbjF1OkR (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Wed, 28 Jun 2023 10:40:17 -0400
+        id S229789AbjF1OoF (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 10:44:05 -0400
 DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
         s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
         References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
         Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
         Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-        bh=cW+45nW3hJrB+ORXPsF9u401T/nSilM4vjgp2/JRVK8=; b=U1WferOlqrpgddhvvlvTWes0zc
-        gz9sFpyiKouuyXJTUYNzdFHYS6e6yVbKtT8Fkilt/42PZXz2BDJyjoEp+Q596vjZztfSB1KA5oUT3
-        w0vosHmfbAFtJLPTH97RuCn3S9Mc5r/aU/LSSbblgfHMV0vEIB88AAaMTA20vfI+hZ7c=;
+        bh=CfJzgWWOQxipXmzttg2EGQA2mqNhb59x9OMQ0r6tDo8=; b=AH0/M6s1mqVYhjXgo62xpBmRUz
+        W/cnkHOiO1eFkxxKCvheTFRTS5XAFppax6A4X3mEjYSHXrOCmmRuC0TBMKgVqSB340wq4qX7MiJ1g
+        AUCwkAEZn9HmZ4vZpL9h1Jt9qIUrRtqStW67q85Aq6mzHwAuOKeLeqAxoCwypwciF+A8=;
 Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
         (envelope-from <andrew@lunn.ch>)
-        id 1qEWKW-0007sj-0E; Wed, 28 Jun 2023 16:39:36 +0200
-Date:   Wed, 28 Jun 2023 16:39:35 +0200
+        id 1qEWOn-0007u7-DT; Wed, 28 Jun 2023 16:44:01 +0200
+Date:   Wed, 28 Jun 2023 16:44:01 +0200
 From:   Andrew Lunn <andrew@lunn.ch>
-To:     yunchuan <yunchuan@nfschina.com>
-Cc:     Hao Lan <lanhao@huawei.com>, f.fainelli@gmail.com,
-        olteanv@gmail.com, davem@davemloft.net, edumazet@google.com,
-        kuba@kernel.org, pabeni@redhat.com, irusskikh@marvell.com,
-        yisen.zhuang@huawei.com, salil.mehta@huawei.com,
-        jesse.brandeburg@intel.com, anthony.l.nguyen@intel.com,
-        steve.glendinning@shawell.net, iyappan@os.amperecomputing.com,
-        keyur@os.amperecomputing.com, quan@os.amperecomputing.com,
-        hkallweit1@gmail.com, linux@armlinux.org.uk,
-        mostrows@earthlink.net, xeb@mail.ru, qiang.zhao@nxp.com,
-        yangyingliang@huawei.com, linux@rempel-privat.de,
-        ansuelsmth@gmail.com, netdev@vger.kernel.org,
-        linux-kernel@vger.kernel.org, intel-wired-lan@lists.osuosl.org,
-        linuxppc-dev@lists.ozlabs.org, kernel-janitors@vger.kernel.org
-Subject: Re: [PATCH net-next 00/10] Remove unnecessary (void*) conversions
-Message-ID: <ecd70c28-1629-4b6c-96fc-a0b8f8713a04@lunn.ch>
-References: <1f5652f7-7eb2-11f0-4a07-c87f2992e509@huawei.com>
- <734b846f-3235-f2e3-db06-6e852803cd7f@nfschina.com>
- <badb3550-e157-4a31-9e49-ad184990c06d@lunn.ch>
+To:     Jiawen Wu <jiawenwu@trustnetic.com>
+Cc:     netdev@vger.kernel.org, mengyuanlou@net-swift.com
+Subject: Re: [PATCH net v2] net: txgbe: change LAN reset mode
+Message-ID: <516f2276-e93b-4a90-a82f-8849d5bd3ccc@lunn.ch>
+References: <20230628034204.213193-1-jiawenwu@trustnetic.com>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <badb3550-e157-4a31-9e49-ad184990c06d@lunn.ch>
+In-Reply-To: <20230628034204.213193-1-jiawenwu@trustnetic.com>
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 04:37:43PM +0200, Andrew Lunn wrote:
-> > Hi, Hao Lan,
-> > 
-> > Sorry for that, I just compiled these patches in the mainline branch.
-> > I know now, it's also necessary to compile patches in net and net-next
-> > branch.
-> > Thanks for your reply!
+On Wed, Jun 28, 2023 at 11:42:04AM +0800, Jiawen Wu wrote:
+> The old way to do LAN reset is sending reset command to firmware. Once
+> firmware performs reset, it reconfigures what it needs.
 > 
-> net-next is also closed at the moment due to the merge window. Please
-> wait two weeks before reposting, by which time net-next will be open
-> again.
+> In the new firmware versions, veto bit is introduced for NCSI/LLDP to
+> block PHY domain in LAN reset. At this point, writing register of LAN
+> reset directly makes the same effect as the old way. And it does not
+> reset MNG domain, so that veto bit does not change.
+> 
+> And this change is compatible with old firmware versions, since veto
+> bit was never used.
 
-Your email threading also seems to be broken, there is no
-threading. That might cause pathworks an issue.
+You are posting this for net, so i assume you want this back ported.
+What is the real user observed problem here?
+
+https://www.kernel.org/doc/Documentation/process/stable-kernel-rules.rst
 
 	Andrew
