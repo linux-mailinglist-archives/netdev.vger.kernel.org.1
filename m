@@ -2,95 +2,227 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 884207418BE
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:16:35 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id ACED57418DD
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 21:30:47 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231721AbjF1TQd (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 15:16:33 -0400
-Received: from mx0b-0031df01.pphosted.com ([205.220.180.131]:37622 "EHLO
-        mx0b-0031df01.pphosted.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S229622AbjF1TQc (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 15:16:32 -0400
-Received: from pps.filterd (m0279873.ppops.net [127.0.0.1])
-        by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SIWEEx005881;
-        Wed, 28 Jun 2023 19:16:22 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=qcppdkim1;
- bh=FQwzeHmbIM0Euxm6oEsZxszzIMDVVE6jcsQBFWvDU8s=;
- b=C/135k2Y6pKLmmNhUc5Oi9I95FAYMd3ReWtv+Iw86I+TYjRGrNVrN5IAAPi9It5JTSxh
- KYU9O+G9qGCKT6iZ7mN2OZ1g/smeS0rAFubf/+ktNsJUiNm4Okpri3Mbll116v4imJf6
- i40r8GrqDFf9V89PsFQF6UC1ATkh0T4sLC7DX6cfOQ+fZgOmrc4qRL6ABVL5/H+8U1FI
- 6r83Ozs3N8l0eq/Sv71BG2XRi7gGEJrQ1F8BqT5CJWp+j4j254sEJYNyIFp33H2+wVPo
- gUuSI9QedoEaYx8vTyXTdVmhjfEFduhLUoNsMcb6Gv+ivUfj7fVNUVi/aIEFEdUw2HOo OA== 
-Received: from nalasppmta02.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-        by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rg7x3tf9c-1
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 19:16:22 +0000
-Received: from nalasex01a.na.qualcomm.com (nalasex01a.na.qualcomm.com [10.47.209.196])
-        by NALASPPMTA02.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 35SJGLIg016766
-        (version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-        Wed, 28 Jun 2023 19:16:21 GMT
-Received: from jhugo-lnx.qualcomm.com (10.80.80.8) by
- nalasex01a.na.qualcomm.com (10.47.209.196) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.7; Wed, 28 Jun 2023 12:16:19 -0700
-From:   Jeffrey Hugo <quic_jhugo@quicinc.com>
-To:     <quic_subashab@quicinc.com>, <quic_stranche@quicinc.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <corbet@lwn.net>, <andersson@kernel.org>
-CC:     <netdev@vger.kernel.org>, <linux-doc@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>,
-        Jeffrey Hugo <quic_jhugo@quicinc.com>
-Subject: [PATCH] docs: networking: Update codeaurora references for rmnet
-Date:   Wed, 28 Jun 2023 13:16:06 -0600
-Message-ID: <20230628191606.25483-1-quic_jhugo@quicinc.com>
-X-Mailer: git-send-email 2.40.1
+        id S231243AbjF1TaD (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 15:30:03 -0400
+Received: from smtp-bc09.mail.infomaniak.ch ([45.157.188.9]:57359 "EHLO
+        smtp-bc09.mail.infomaniak.ch" rhost-flags-OK-OK-OK-OK)
+        by vger.kernel.org with ESMTP id S229865AbjF1T33 (ORCPT
+        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 15:29:29 -0400
+Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
+        by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Qrs8l2vlDzMqLwv;
+        Wed, 28 Jun 2023 19:29:27 +0000 (UTC)
+Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Qrs8j4TQkzMpr3d;
+        Wed, 28 Jun 2023 21:29:25 +0200 (CEST)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
+        s=20191114; t=1687980567;
+        bh=hAnmaCdWInZceBpLGvjbkOIYDBEwZT5oj3tx79kJGAA=;
+        h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
+        b=Y5bDPc4aOY1Z9QUZZ7nmDkDD9VK2VnZDY8xp52365w0BHUIx/qkIhSr2EOgwRCMIY
+         ybLGIvWl/ARvBhzCCJGNOMiMoGmZPmiRGe/+PcA8HSAPfAjWpS9ZJYDWHWNvPXqhUf
+         6xL05/hnOhyiecxAImFYlyUNX4alMFmHBvjs4FkE=
+Message-ID: <43e8acb2-d696-c001-b54b-d2b7cf244de7@digikod.net>
+Date:   Wed, 28 Jun 2023 21:29:24 +0200
 MIME-Version: 1.0
+User-Agent: 
+Subject: Re: [PATCH v9 00/12] Network support for Landlock - allowed list of
+ protocols
+Content-Language: en-US
+To:     Jeff Xu <jeffxu@chromium.org>,
+        =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack@google.com>
+Cc:     "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>,
+        =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack3000@gmail.com>,
+        willemdebruijn.kernel@gmail.com,
+        linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+        netfilter-devel@vger.kernel.org, yusongping@huawei.com,
+        artem.kuzin@huawei.com, Jeff Xu <jeffxu@google.com>,
+        Jorge Lucangeli Obes <jorgelo@chromium.org>,
+        Allen Webb <allenwebb@google.com>,
+        Dmitry Torokhov <dtor@google.com>
+References: <20230116085818.165539-1-konstantin.meskhidze@huawei.com>
+ <Y/fl5iEbkL5Pj5cJ@galopp> <c20fc9eb-518e-84b4-0dd5-7b97c0825259@huawei.com>
+ <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net>
+ <b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net>
+ <ZJvy2SViorgc+cZI@google.com>
+ <CABi2SkX-dzUO6NnbyqfrAg7Bbn+Ne=Xi1qC1XMrzHqVEVucQ0Q@mail.gmail.com>
+From:   =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+In-Reply-To: <CABi2SkX-dzUO6NnbyqfrAg7Bbn+Ne=Xi1qC1XMrzHqVEVucQ0Q@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01a.na.qualcomm.com (10.47.209.196)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-ORIG-GUID: JdkZxa_cpm4G8N6Qmh1659DTuz0zTIEv
-X-Proofpoint-GUID: JdkZxa_cpm4G8N6Qmh1659DTuz0zTIEv
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-28_13,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1011 impostorscore=0
- spamscore=0 priorityscore=1501 suspectscore=0 malwarescore=0 mlxscore=0
- adultscore=0 mlxlogscore=999 lowpriorityscore=0 phishscore=0 bulkscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306280168
+X-Infomaniak-Routing: alpha
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-source.codeaurora.org is no longer accessible and so the reference link
-in the documentation is not useful.  The content was mirrored over to
-Code Linaro so lets update the references to point there instead.
 
-Signed-off-by: Jeffrey Hugo <quic_jhugo@quicinc.com>
----
- .../networking/device_drivers/cellular/qualcomm/rmnet.rst     | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+On 28/06/2023 19:03, Jeff Xu wrote:
+> Hello,
+> 
+> Thanks for writing up the example for an incoming TCP connection ! It
+> helps with the context.
+> 
+> Since I'm late to this thread, one thing I want to ask:  all the APIs
+> proposed so far are at the process level, we don't have any API that
+> applies restriction to socket fd itself, right ? this is what I
+> thought, but I would like to get confirmation.
 
-diff --git a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-index 4118384cf8eb..a3d91034ef30 100644
---- a/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-+++ b/Documentation/networking/device_drivers/cellular/qualcomm/rmnet.rst
-@@ -191,7 +191,7 @@ MAP header|IP Packet|Optional padding|MAP header|Command Packet|Optional pad...
- ==========================
- 
- rmnet userspace configuration is done through netlink library librmnetctl
--and command line utility rmnetcli. Utility is hosted in codeaurora forum git.
-+and command line utility rmnetcli. Utility is hosted in Code Linaro git.
- The driver uses rtnl_link_ops for communication.
- 
--https://source.codeaurora.org/quic/la/platform/vendor/qcom-opensource/dataservices/tree/rmnetctl
-+https://git.codelinaro.org/clo/la/platform/vendor/qcom-opensource/dataservices/
--- 
-2.40.1
+Restriction are applied to actions, not to already existing/opened FDs. 
+We could add a way to restrict opened FDs, but I don't think this is the 
+right approach because sandboxing is a deliberate action from a process, 
+and it should already take care of its FDs.
 
+
+> 
+> On Wed, Jun 28, 2023 at 2:09 AM Günther Noack <gnoack@google.com> wrote:
+>>
+>> Hello!
+>>
+>> On Mon, Jun 26, 2023 at 05:29:34PM +0200, Mickaël Salaün wrote:
+>>> Here is a design to be able to only allow a set of network protocols and
+>>> deny everything else. This would be complementary to Konstantin's patch
+>>> series which addresses fine-grained access control.
+>>>
+>>> First, I want to remind that Landlock follows an allowed list approach with
+>>> a set of (growing) supported actions (for compatibility reasons), which is
+>>> kind of an allow-list-on-a-deny-list. But with this proposal, we want to be
+>>> able to deny everything, which means: supported, not supported, known and
+>>> unknown protocols.
+>>>
+>>> We could add a new "handled_access_socket" field to the landlock_ruleset
+>>> struct, which could contain a LANDLOCK_ACCESS_SOCKET_CREATE flag.
+>>>
+>>> If this field is set, users could add a new type of rules:
+>>> struct landlock_socket_attr {
+>>>      __u64 allowed_access;
+>>>      int domain; // see socket(2)
+>>>      int type; // see socket(2)
+>>> }
+>>>
+>>> The allowed_access field would only contain LANDLOCK_ACCESS_SOCKET_CREATE at
+>>> first, but it could grow with other actions (which cannot be handled with
+>>> seccomp):
+>>> - use: walk through all opened FDs and mark them as allowed or denied
+>>> - receive: hook on received FDs
+>>> - send: hook on sent FDs
+>>>
+>>> We might also use the same approach for non-socket objects that can be
+>>> identified with some meaningful properties.
+>>>
+>>> What do you think?
+>>
+>> This sounds like a good plan to me - it would make it possible to restrict new
+>> socket creation using protocols that were not intended to be used, and I also
+>> think it would fit the Landlock model nicely.
+>>
+>> Small remark on the side: The security_socket_create() hook does not only get
+>> invoked as a result of socket(2), but also as a part of accept(2) - so this
+>> approach might already prevent new connections very effectively.
+>>
+> That is an interesting aspect that might be worth discussing more.
+> seccomp is per syscall, landlock doesn't necessarily follow the same,
+> another design is to add more logic in Landlock, e.g.
+> LANDLOCK_ACCESS_SOCKET_PROTOCOL which will apply to all of the socket
+> calls (socket/bind/listen/accept/connect). App dev might feel it is
+> easier to use.
+
+seccomp restricts the use of the syscall interface, whereas Landlock 
+restricts the use of kernel objects (i.e. the semantic).
+
+We need to find a good tradeoff between a lot of access rights and a few 
+grouping different actions. This should make sense from a developer 
+point of view according to its knowledge and use of the kernel 
+interfaces (potential wrapped with high level libraries), but also to 
+the semantic of the sandbox and the security guarantees we want to provide.
+
+We should also keep in mind that high level Landlock libraries can take 
+care of potential coarse-grained use of restrictions.
+
+
+> 
+>> Spelling out some scenarios, so that we are sure that we are on the same page:
+>>
+>> A)
+>>
+>> A program that does not need networking could specify a ruleset where
+>> LANDLOCK_ACCESS_SOCKET_CREATE is handled, and simply not permit anything.
+>>
+>> B)
+>>
+>> A program that runs a TCP server could specify a ruleset where
+>> LANDLOCK_NET_BIND_TCP, LANDLOCK_NET_CONNECT_TCP and
+>> LANDLOCK_ACCESS_SOCKET_CREATE are handled, and where the following rules are added:
+>>
+>>    /* From Konstantin's patch set */
+>>    struct landlock_net_service_attr bind_attr = {
+>>      .allowed_access = LANDLOCK_NET_BIND_TCP,
+>>      .port = 8080,
+>>    };
+>>
+>>    /* From Mickaël's proposal */
+>>    struct landlock_socket_attr sock_inet_attr = {
+>>      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>      .domain = AF_INET,
+>>      .type = SOCK_STREAM,
+>>    }
+>>
+>>    struct landlock_socket_attr sock_inet6_attr = {
+>>      .allowed_access = LANDLOCK_ACCESS_SOCKET_CREATE,
+>>      .domain = AF_INET6,
+>>       .type = SOCK_STREAM,
+>>    }
+>>
+>> That should then be enough to bind and listen on ports, whereas outgoing
+>> connections with TCP and anything using other network protocols would not be
+>> permitted.
+>>
+> TCP server is an interesting case. From a security perspective, a
+> process cares if it is acting as a server or client in TCP, a server
+> might only want to accept an incoming TCP connection, never initiate
+> an outgoing TCP connection, and a client is the opposite.
+> 
+> Processes can restrict outgoing/incoming TCP connection by seccomp for
+> accept(2) or connect(2),  though I feel Landlock can do this more
+> naturally for app dev, and at per-protocol level.  seccomp doesn't
+> provide per-protocol granularity.
+
+Right, seccomp cannot filter TCP ports.
+
+> 
+> For bind(2), iirc, it can be used for a server to assign dst port of
+> incoming TCP connection, also by a client to assign a src port of an
+> outgoing TCP connection. LANDLOCK_NET_BIND_TCP will apply to both
+> cases, right ? this might not be a problem, just something to keep
+> note.
+
+Good point. I think it is in line with the rule definition: to allow to 
+bind on a specific port. However, if clients want to set the source port 
+to a (legitimate) value, then that would be an issue because we cannot 
+allow a whole range of ports (e.g., >= 1024). I'm not sure if this 
+practice would be deemed "legitimate" though. Do you know client 
+applications using bind?
+
+Konstantin, we should have a test for this case anyway.
+
+
+> 
+>> (Alternatively, it could bind() the socket early, *then enable Landlock* and
+>> leave out the rule for BIND_TCP, only permitting SOCKET_CREATE for IPv4 and
+>> IPv6, so that listen() and accept() work on the already-bound socket.)
+>>
+> For this approach, LANDLOCK_ACCESS_SOCKET_PROTOCOL is a better name,
+> so dev is fully aware it is not just applied to socket create.
+
+I don't get the semantic of LANDLOCK_ACCESS_SOCKET_PROTOCOL. What does 
+PROTOCOL mean?
+
+> 
+>> Overall, this sounds like an excellent approach to me. 👍
+>>
+>> —Günther
+>>
+>> --
+>> Sent using Mutt 🐕 Woof Woof
+> 
+> -Jeff
