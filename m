@@ -1,80 +1,194 @@
-Return-Path: <netdev+bounces-14397-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14398-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9251D7408A8
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 04:47:02 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 10B887408B5
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 04:53:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4CFE62811F0
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:47:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E5654281045
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:53:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9FE1847;
-	Wed, 28 Jun 2023 02:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 13D5D187D;
+	Wed, 28 Jun 2023 02:53:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F20A85387
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:45:56 +0000 (UTC)
-Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 8B8A73C0C;
-	Tue, 27 Jun 2023 19:45:39 -0700 (PDT)
-Received: from localhost.localdomain (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPA id D2295604D937E;
-	Wed, 28 Jun 2023 10:45:36 +0800 (CST)
-X-MD-Sfrom: yunchuan@nfschina.com
-X-MD-SrcIP: 180.167.10.98
-From: wuych <yunchuan@nfschina.com>
-To: qiang.zhao@nxp.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com
-Cc: netdev@vger.kernel.org,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	kernel-janitors@vger.kernel.org,
-	wuych <yunchuan@nfschina.com>
-Subject: [PATCH net-next 10/10] net: wan: Remove unnecessary (void*) conversions
-Date: Wed, 28 Jun 2023 10:45:35 +0800
-Message-Id: <20230628024535.1440803-1-yunchuan@nfschina.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 086091847
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 02:53:12 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 865B61BD9;
+	Tue, 27 Jun 2023 19:53:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=dlpR/21Irur/vl2Bba6LPVcNg/tvhnzdXj8x/ntUtHk=; b=h9543rTXTZgDs/8RTl0Bz0B9yE
+	M116oqVCVPUSJCywA3/wGRMWSC5PootiKkuuCIVj4ZLCgyIOapcZqDjfLOWkI/zgqJSN2o+fG3m+5
+	LNi4LObBb3C7+Tstoj9H5/0jL1jcqEwdfXrHwtiJUzjkCxWtGJQUlfpBhl61Jqtop/8glW6Ccw6yE
+	s5dG7olz8uyRhgbdhV7y4VtfVDkINgMoKAG0nYF8+mfcvCHdM63tNzCb0I5PpzLqzy9zDRsZZhIVM
+	hFO0dw/qPTsAF7ZlKIL9PIHWAqdHkD6kuAAWAv5XjnO0XghWj9KoDCmoz5lsjXByoki6omg+BeCHV
+	YW2hbj2A==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qELIr-00EdQb-1N;
+	Wed, 28 Jun 2023 02:53:09 +0000
+Message-ID: <7f585168-7296-58aa-7fdb-c2aa08f346f4@infradead.org>
+Date: Tue, 27 Jun 2023 19:53:08 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] s390/net: lcs: fix build errors when FDDI is a loadable
+ module
+Content-Language: en-US
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ Simon Horman <simon.horman@corigine.com>
+Cc: linux-kernel@vger.kernel.org, kernel test robot <lkp@intel.com>,
+ Wenjia Zhang <wenjia@linux.ibm.com>, linux-s390@vger.kernel.org,
+ netdev@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>,
+ Vasily Gorbik <gor@linux.ibm.com>, Alexander Gordeev
+ <agordeev@linux.ibm.com>, Christian Borntraeger <borntraeger@linux.ibm.com>,
+ Sven Schnelle <svens@linux.ibm.com>, "David S . Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+References: <20230621213742.8245-1-rdunlap@infradead.org>
+ <98375832-3d29-1f03-145f-8d6e763dd2d2@linux.ibm.com>
+ <ZJP99hSRt5MakBXC@corigine.com>
+ <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <3da03251-21ac-b41f-593d-cbc9ac9f86f6@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Pointer variables of void * type do not require type cast.
+Hi,
+Sorry for the delay.
 
-Signed-off-by: wuych <yunchuan@nfschina.com>
----
- drivers/net/wan/fsl_ucc_hdlc.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+On 6/22/23 05:16, Alexandra Winter wrote:
+> 
+> 
+> On 22.06.23 09:53, Simon Horman wrote:
+>> On Thu, Jun 22, 2023 at 09:15:24AM +0200, Alexandra Winter wrote:
+>>>
+>>>
+>>> On 21.06.23 23:37, Randy Dunlap wrote:
+>>>> Require FDDI to be built-in if it is used. LCS needs FDDI to be
+>>>> built-in to build without errors.
+>>>>
+>>>> Prevents these build errors:
+>>>> s390-linux-ld: drivers/s390/net/lcs.o: in function `lcs_new_device':
+>>>> drivers/s390/net/lcs.c:2150: undefined reference to `fddi_type_trans'
+>>>> s390-linux-ld: drivers/s390/net/lcs.c:2151: undefined reference to `alloc_fddidev'
+>>>>
+>>>> This FDDI requirement effectively restores the previous condition
+>>>> before the blamed patch, when #ifdef CONFIG_FDDI was used, without
+>>>> testing for CONFIG_FDDI_MODULE.
+>>>>
+>>>> Fixes: 128272336120 ("s390/net: lcs: use IS_ENABLED() for kconfig detection")
+> [...]
+>>
+>>> 2) I wonder whether
+>>>
+>>>   	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+>>>  +	depends on FDDI || FDDI=n
+>>>
+>>> would do what we want here:
+>>> When FDDI is a loadable module, LCS mustn't be built-in.
+>>>
+>>> I will do some experiments and let you know.
+>>
+>> It does seem to on my side.
+>> But checking would be much appreciated.
+>  
+> 
+> Here are my experiments:
+> 
+> Current net-next:
+> -----------------
+> if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
+> 
+> drivers/s390/net/KConfig:
+> config LCS
+> 	def_tristate m
+> 	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> 
+> .config:
+> ETHERNET  |  FDDI | LCS choices | LCS | compile
+> --------------------------------------------------------
+> n		m	m,n	  m	success (failed before Randy's fix)
+> y		m	y,m,n	  m	success (failed before Randy's fix)
+> y		m		  y	fails: undefined reference to `fddi_type_trans'
+> 
+> 
+> Simon's proposal:
+> -----------------
+>         depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +       depends on FDDI=y || FDDI=n
+> 
+> ETHERNET  |  FDDI | LCS choices | LCS | compile
+> --------------------------------------------------------
+> n		m	-
+> y		m	-
+> y		m	-
+> y		n	y,m,n	  y	success
+> y		n	y,m,n	  m	success
+> y		y	y,m,n	  m	success
+> 
+> 
+> Alexandra's proposal:
+> ---------------------
+>         depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +       depends on FDDI || FDDI=n
+> 
+> ETHERNET  |  FDDI | LCS choices | LCS | compile
+> --------------------------------------------------------
+> n		m	m,n	  m	success
+> y		m	m,n	  m	success
+> y		n	y,m,n	  y	success
+> y		n	y,m,n	  m	success
+> y		y	y,m,n	  m	success
+> 
+> -----------------------------------------------------------
+> 
+> Seems that 
+> 	A[tristate] depends on B[tristate]
+> means that A cannot be 'higher' than B.
+> Meaning, if B=n -> A= must be n
+> 	if B=m -> A can be m or n
+> 	if B=y -> A can be y or m or n
 
-diff --git a/drivers/net/wan/fsl_ucc_hdlc.c b/drivers/net/wan/fsl_ucc_hdlc.c
-index 47c2ad7a3e42..91e37c3dcbee 100644
---- a/drivers/net/wan/fsl_ucc_hdlc.c
-+++ b/drivers/net/wan/fsl_ucc_hdlc.c
-@@ -350,7 +350,7 @@ static int uhdlc_init(struct ucc_hdlc_private *priv)
- static netdev_tx_t ucc_hdlc_tx(struct sk_buff *skb, struct net_device *dev)
- {
- 	hdlc_device *hdlc = dev_to_hdlc(dev);
--	struct ucc_hdlc_private *priv = (struct ucc_hdlc_private *)hdlc->priv;
-+	struct ucc_hdlc_private *priv = hdlc->priv;
- 	struct qe_bd *bd;
- 	u16 bd_status;
- 	unsigned long flags;
+Looks correct.
+
+> Although I did not find documentation confirming that.
+
+I think that it's in Documentation/kbuild/kconfig-language.rst,
+under "Menu dependencies", but not quite in that format. :)
+
+> 
+> @Randy, do you want give a v2 a try with that?
+
+Sure, I'll try that.
+
+> I guess then it is safe to delete from drivers/s390/net/lcs.c
+> -#if !IS_ENABLED(CONFIG_ETHERNET) && !IS_ENABLED(CONFIG_FDDI)
+> -#error Cannot compile lcs.c without some net devices switched on.
+> -#endif
+
+Yes, I was planning to do that as well.
+
+Thanks for the time that you have spent on this.
 -- 
-2.30.2
-
+~Randy
 
