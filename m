@@ -1,74 +1,64 @@
-Return-Path: <netdev+bounces-14352-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14353-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62A17740724
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:20:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A39E74072C
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 02:24:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 922B1281171
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 00:20:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9BFAF281126
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 00:24:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A5811106;
-	Wed, 28 Jun 2023 00:20:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C3C1A49;
+	Wed, 28 Jun 2023 00:24:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 753C110EE
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 00:20:33 +0000 (UTC)
-X-Greylist: delayed 405 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 27 Jun 2023 17:20:24 PDT
-Received: from mail.stusta.mhn.de (mail.stusta.mhn.de [141.84.69.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CB61326B3;
-	Tue, 27 Jun 2023 17:20:24 -0700 (PDT)
-Received: from [127.0.0.1] (localhost [127.0.0.1])
-	by mail.stusta.mhn.de (Postfix) with ESMTPSA id 4QrMW26G5kz2W;
-	Wed, 28 Jun 2023 02:13:34 +0200 (CEST)
-Date: Wed, 28 Jun 2023 02:13:32 +0200
-From: Tobias Heider <me@tobhe.de>
-To: Siva Reddy Kallam <siva.kallam@broadcom.com>
-Cc: Prashant Sreedharan <prashant@broadcom.com>,
-	Michael Chan <mchan@broadcom.com>, netdev@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH] Add MODULE_FIRMWARE() for FIRMWARE_TG357766.
-Message-ID: <ZJt7LKzjdz8+dClx@tobhe.de>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C06F07EA;
+	Wed, 28 Jun 2023 00:24:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id CC8F1C433C8;
+	Wed, 28 Jun 2023 00:24:47 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1687911888;
+	bh=kNj6AorbsM1YciTdwmI1fpkirwD9mi885PoKVJqM0Q8=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=TcVAY72nXw9KX8BaBPGUEd9Y5wOnDqWkYWeXfrAgMNUdudOg8boIKjWTAj+hjb53j
+	 cuATadt7B9u7VCjz1zU1cCYYZnFQ6nRoLe9+2B9ThAZh6IuWrH39wFEIZEzHXNEQEJ
+	 ow2wbu6eySWIq+I1z6FZQTCzZMErq3zddWjhhO+sqVr+jFknMY+j3aNHF3zMHWOvXJ
+	 /tXH85OvvMCePnIxfmqgWeuP3tlYBV9+xgKfZnk8BpzF6J3fuRykOSX393zGEmijxc
+	 2Bt9BJFc+tXcV+4VUwZrlYQ9/s+jccstDTGWcicj+I/IRd2zkp7gkUm0Q8jb0pw5bt
+	 IacrvXegkM4HQ==
+Date: Tue, 27 Jun 2023 17:24:46 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: torvalds@linux-foundation.org
+Cc: davem@davemloft.net, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, pabeni@redhat.com, bpf@vger.kernel.org
+Subject: Re: [GIT PULL] Networking for v6.5
+Message-ID: <20230627172446.5d42f023@kernel.org>
+In-Reply-To: <20230627115925.4e55f199@kernel.org>
+References: <20230627184830.1205815-1-kuba@kernel.org>
+	<20230627115925.4e55f199@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
-	HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-Fixes a bug where on the M1 mac mini initramfs-tools fails to
-include the necessary firmware into the initrd.
+On Tue, 27 Jun 2023 11:59:25 -0700 Jakub Kicinski wrote:
+> On Tue, 27 Jun 2023 11:48:30 -0700 Jakub Kicinski wrote:
+> > WiFi 7 and sendpage changes are the biggest pieces of work for
+> > this release. The latter will definitely require fixes but
+> > I think that we got it to a reasonable point.  
+> 
+> I forgot to mention a conflict, there's a trivial one because of
+> adjacent changes in fs/splice.c. Stephen has the resolution:
+> https://lore.kernel.org/all/20230613125939.595e50b8@canb.auug.org.au/
 
-Signed-off-by: Tobias Heider <me@tobhe.de>
----
- drivers/net/ethernet/broadcom/tg3.c | 1 +
- 1 file changed, 1 insertion(+)
-
-diff --git a/drivers/net/ethernet/broadcom/tg3.c b/drivers/net/ethernet/broadcom/tg3.c
-index 58747292521d..a52cf9aae498 100644
---- a/drivers/net/ethernet/broadcom/tg3.c
-+++ b/drivers/net/ethernet/broadcom/tg3.c
-@@ -224,6 +224,7 @@ MODULE_AUTHOR("David S. Miller (davem@redhat.com) and Jeff Garzik (jgarzik@pobox
- MODULE_DESCRIPTION("Broadcom Tigon3 ethernet driver");
- MODULE_LICENSE("GPL");
- MODULE_FIRMWARE(FIRMWARE_TG3);
-+MODULE_FIRMWARE(FIRMWARE_TG357766);
- MODULE_FIRMWARE(FIRMWARE_TG3TSO);
- MODULE_FIRMWARE(FIRMWARE_TG3TSO5);
- 
--- 
-2.39.2
-
+Another one will surface once you pull asm-generic from Arnd:
+https://lore.kernel.org/all/20230609104037.56648990@canb.auug.org.au/
 
