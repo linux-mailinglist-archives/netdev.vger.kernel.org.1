@@ -2,95 +2,60 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3E11C7412FB
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:50:21 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 9C89774131A
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 15:56:11 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231254AbjF1NtM (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 09:49:12 -0400
-Received: from www262.sakura.ne.jp ([202.181.97.72]:56003 "EHLO
-        www262.sakura.ne.jp" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231267AbjF1NtA (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 09:49:00 -0400
-Received: from fsav113.sakura.ne.jp (fsav113.sakura.ne.jp [27.133.134.240])
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTP id 35SDm20A095922;
-        Wed, 28 Jun 2023 22:48:02 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Received: from www262.sakura.ne.jp (202.181.97.72)
- by fsav113.sakura.ne.jp (F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp);
- Wed, 28 Jun 2023 22:48:02 +0900 (JST)
-X-Virus-Status: clean(F-Secure/fsigk_smtp/550/fsav113.sakura.ne.jp)
-Received: from [192.168.1.6] (M106072142033.v4.enabler.ne.jp [106.72.142.33])
-        (authenticated bits=0)
-        by www262.sakura.ne.jp (8.15.2/8.15.2) with ESMTPSA id 35SDm2QM095917
-        (version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=NO);
-        Wed, 28 Jun 2023 22:48:02 +0900 (JST)
-        (envelope-from penguin-kernel@I-love.SAKURA.ne.jp)
-Message-ID: <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
-Date:   Wed, 28 Jun 2023 22:48:01 +0900
+        id S231788AbjF1Nyd (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 09:54:33 -0400
+Received: from vps0.lunn.ch ([156.67.10.101]:40062 "EHLO vps0.lunn.ch"
+        rhost-flags-OK-OK-OK-OK) by vger.kernel.org with ESMTP
+        id S231607AbjF1Nyb (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 09:54:31 -0400
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+        s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+        References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+        Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+        Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+        bh=P6cmuf0SSytqlSR57AgCub75y1mIBY9HtWI98JRc4Ro=; b=CTpEX1KXuRrEeKE13i+ulrC6Wi
+        /tk9CEPFXGgtxro+Y9Eg44QpKBywR2qNeN2qZzp+2yke97uRMxkarp/Jp/uBPAsP5Emy7jrTe+CYD
+        Zfcegwkx4rK7NWgo1VKkTsRQmcCXMhrvsEUrIq2thDjNS7kaT+GNwOId6CDr4LTlo8yg=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+        (envelope-from <andrew@lunn.ch>)
+        id 1qEVcq-0007bE-1u; Wed, 28 Jun 2023 15:54:28 +0200
+Date:   Wed, 28 Jun 2023 15:54:28 +0200
+From:   Andrew Lunn <andrew@lunn.ch>
+To:     Revanth Kumar Uppala <ruppala@nvidia.com>
+Cc:     linux@armlinux.org.uk, hkallweit1@gmail.com,
+        netdev@vger.kernel.org, linux-tegra@vger.kernel.org,
+        Narayan Reddy <narayanr@nvidia.com>
+Subject: Re: [PATCH 2/4] net: phy: aquantia: Enable MAC Controlled EEE
+Message-ID: <57493101-413c-4f68-a064-f25e75fc2783@lunn.ch>
+References: <20230628124326.55732-1-ruppala@nvidia.com>
+ <20230628124326.55732-2-ruppala@nvidia.com>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-Content-Language: en-US
-To:     Boris Pismenny <borisp@nvidia.com>,
-        John Fastabend <john.fastabend@gmail.com>,
-        Jakub Kicinski <kuba@kernel.org>
-Cc:     glider@google.com, herbert@gondor.apana.org.au,
-        linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com,
-        syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>,
-        Eric Biggers <ebiggers@kernel.org>,
-        Aviad Yehezkel <aviadye@nvidia.com>,
-        Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Paolo Abeni <pabeni@redhat.com>
-References: <0000000000008a7ae505aef61db1@google.com>
- <20200911170150.GA889@sol.localdomain>
-From:   Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-In-Reply-To: <20200911170150.GA889@sol.localdomain>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230628124326.55732-2-ruppala@nvidia.com>
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
-that bytes to encrypt/decrypt is multiple of block size for that cipher but
-tls_alloc_encrypted_msg() is not initializing padding bytes when
-required_size is not multiple of block cipher's block size.
+On Wed, Jun 28, 2023 at 06:13:24PM +0530, Revanth Kumar Uppala wrote:
+> Enable MAC controlled energy efficient ethernet (EEE) so that MAC can
+> keep the PHY in EEE sleep mode when link utilization is low to reduce
+> energy consumption.
 
-In order to make sure that padding bytes are automatically initialized,
-enable __GFP_ZERO flag when setsockopt(SOL_TCP, TCP_ULP, "tls") is called.
+This needs more explanation. Is this 'SmartEEE', in that the PHY is
+doing EEE without the SoC MAC being involved?
 
-Reported-by: syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>
-Closes: https://syzkaller.appspot.com/bug?extid=828dfc12440b4f6f305d
-Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
----
-According to C reproducer, this problem happens when bpf_exec_tx_verdict() is
-called with lower 4 bits of required_size being 0001 and does not happen when
-being 0100. Thus, I assumed that this problem is caused by lack of initializing
-padding bytes.
-But I couldn't figure out why KMSAN reports this problem when bpf_exec_tx_verdict()
-is called with lower 4 bits of required_size being 0001 for the second time and
-does not report this problem when bpf_exec_tx_verdict() is called with lower
-4 bits of required_size being 0001 for the first time. More deeper problem exists?
-KMSAN reporting this problem when accessing u64 relevant?
+Ideally, you should only do SmartEEE, if the SoC MAC is dumb and does
+not have EEE itself. I guess if you are doing rate adaptation, or
+MACSEC in the PHY, then you might be forced to use SmartEEE since the
+SoC MAC is somewhat decoupled from the PHY.
 
- net/tls/tls_main.c | 1 +
- 1 file changed, 1 insertion(+)
+At the moment, we don't have a good story for SmartEEE. It should be
+configured in the same way as normal EEE, ethtool --set-eee etc. I've
+got a rewrite of normal EEE in the works. Once that is merged i hope
+SmartEEE will be next.
 
-diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-index f2e7302a4d96..cd5366966864 100644
---- a/net/tls/tls_main.c
-+++ b/net/tls/tls_main.c
-@@ -1025,6 +1025,7 @@ static int tls_init(struct sock *sk)
- 	struct tls_context *ctx;
- 	int rc = 0;
- 
-+	sk->sk_allocation |= __GFP_ZERO;
- 	tls_build_proto(sk);
- 
- #ifdef CONFIG_TLS_TOE
--- 
-2.34.1
-
+    Andrew
