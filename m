@@ -2,222 +2,118 @@ Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 01505741662
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 18:29:33 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTP id 4272D7416E2
+	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 19:01:21 +0200 (CEST)
 Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231869AbjF1Q3F (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Wed, 28 Jun 2023 12:29:05 -0400
-Received: from us-smtp-delivery-124.mimecast.com ([170.10.129.124]:49999 "EHLO
-        us-smtp-delivery-124.mimecast.com" rhost-flags-OK-OK-OK-OK)
-        by vger.kernel.org with ESMTP id S232003AbjF1Q2q (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Wed, 28 Jun 2023 12:28:46 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-        s=mimecast20190719; t=1687969677;
-        h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-         to:to:cc:cc:mime-version:mime-version:
-         content-transfer-encoding:content-transfer-encoding:
-         in-reply-to:in-reply-to:references:references;
-        bh=U0bXzb+BMLDoiDj4GZKob0kl2ubT/6YNFYd1U+Ay0CY=;
-        b=DuNAogEjlq2jCj/CR450wR7dRDBc1m+0tyK1pYtoEQ8gTt0H51FinLNAp+VV9nx6Vg4sqJ
-        1naaNfves4RTVuf1h97OQcOuUOkefmH2635rWJlwODJ3+xgLPKAzR2TK2hnkO/Rtt5WH1b
-        qHNqkwLP71x5YFODF2paKSvIQ7Pat8I=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-265-6Mjks7zvN7Cw6nVQWNDQpw-1; Wed, 28 Jun 2023 12:27:52 -0400
-X-MC-Unique: 6Mjks7zvN7Cw6nVQWNDQpw-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-        (using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-        (No client certificate requested)
-        by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 134C28E469F;
-        Wed, 28 Jun 2023 16:27:18 +0000 (UTC)
-Received: from RHTPC1VM0NT.lan (unknown [10.22.32.232])
-        by smtp.corp.redhat.com (Postfix) with ESMTP id 9823640D1A4;
-        Wed, 28 Jun 2023 16:27:17 +0000 (UTC)
-From:   Aaron Conole <aconole@redhat.com>
-To:     netdev@vger.kernel.org
-Cc:     dev@openvswitch.org, Pravin Shelar <pshelar@ovn.org>,
-        "David S. Miller" <davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        Eelco Chaudron <echaudro@redhat.com>,
-        Ilya Maximets <i.maximets@ovn.org>, shuah@kernel.org,
-        linux-kselftest@vger.kernel.org
-Subject: [PATCH net-next 4/4] selftests: openvswitch: add ct-nat test case with ipv4
-Date:   Wed, 28 Jun 2023 12:27:14 -0400
-Message-Id: <20230628162714.392047-5-aconole@redhat.com>
-In-Reply-To: <20230628162714.392047-1-aconole@redhat.com>
-References: <20230628162714.392047-1-aconole@redhat.com>
+        id S230086AbjF1RBL (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Wed, 28 Jun 2023 13:01:11 -0400
+Received: from mail-bn1nam02on2070.outbound.protection.outlook.com ([40.107.212.70]:2118
+        "EHLO NAM02-BN1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S229732AbjF1RBK (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Wed, 28 Jun 2023 13:01:10 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=IjD+p6umgK/HBrCYE6NZEwMQz3yYLQUa13QIajKiawxzM+G6Uk95W0jfAbqnvhZcMV3ySZ1uFJMCP978chIg246FR3rxeWGEj9n/y+39ZAGmuofYh1SYCzBeI30m7dI8Fad19p6KrPE+8QgQORtrM87yg5NmKKUzIrvqY6JAgR9i7iv4AWharg9hZL7Pn8foKIcmeUj/vTAoMeq9lmef5C0bp3rmwNyI88P1QFuXq/NJOEoOpBpRqdBvLuEHLuISqFDSe8RlH9/9GQ4NASvVMj0uX99ypCO6NmWLkagGK1OMxX8idYvxhjSOn0kLORAYEmbZlRsLTi8nBeJA07/uew==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=vtsNmeWErRor7rnPOuI1iLIitm3CxZBE0qVFgOmXb2g=;
+ b=A8fF/yNN7yu5GAW2NedN37o+0KOu/D/N2HbOkdQ3zgGvM9aJc3JieSWDOYMfgkgOLm6Ryeu6cDmhGrM8eCgxdqU5qgSpyGNcLo6lD4CeMeQ6UqeloVjHFF0/ATyEWsR+GQKRL3DKAC8WuAtrhLdgNlm3BWkxX1VMqwp35xQBuDom6dn9ZAQReD7ik7wXyj+0WKgOOzR6A/2GNuCpMAlmD8nRq2XwKGyyRUAadPLAvw5grou/rK33sPV0DcsgXpL1mp7Re+irbe1gvH07BSEfzq9uDHNxYc4pJ3x2ZYqxZCSr4YbU6R5E2eKMzls1swJ1LQn+S6Y+jUixqN4HScw+/w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=vger.kernel.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=vtsNmeWErRor7rnPOuI1iLIitm3CxZBE0qVFgOmXb2g=;
+ b=oDGVJdRz8SqepR/MV5JSCbP6JCaoKtlyhu50jbncBQCenPniNug57co6Tv6BqNAHumg7Tw7PfS8gu5kgUDYksWZCNVDNaNtcATwL+0iQWfbPEM4PJmAKoR54pHZltEtkaxMUTLkX7qkyO4kluGqiDwsZv38jQYt+yqTM/fZ6LFw=
+Received: from MW4PR03CA0027.namprd03.prod.outlook.com (2603:10b6:303:8f::32)
+ by DM4PR12MB5168.namprd12.prod.outlook.com (2603:10b6:5:397::8) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Wed, 28 Jun
+ 2023 17:01:07 +0000
+Received: from CO1NAM11FT100.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:8f:cafe::47) by MW4PR03CA0027.outlook.office365.com
+ (2603:10b6:303:8f::32) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.20 via Frontend
+ Transport; Wed, 28 Jun 2023 17:01:07 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT100.mail.protection.outlook.com (10.13.175.133) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6500.48 via Frontend Transport; Wed, 28 Jun 2023 17:01:07 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Wed, 28 Jun
+ 2023 12:01:05 -0500
+From:   Shannon Nelson <shannon.nelson@amd.com>
+To:     <netdev@vger.kernel.org>, <davem@davemloft.net>, <kuba@kernel.org>
+CC:     <brett.creeley@amd.com>, <drivers@pensando.io>,
+        <nitya.sunkad@amd.com>, Shannon Nelson <shannon.nelson@amd.com>
+Subject: [PATCH net] ionic: remove WARN_ON to prevent panic_on_warn
+Date:   Wed, 28 Jun 2023 10:00:50 -0700
+Message-ID: <20230628170050.21290-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB03.amd.com (10.181.40.144) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT100:EE_|DM4PR12MB5168:EE_
+X-MS-Office365-Filtering-Correlation-Id: 205802e1-c95a-4a99-b4ad-08db77f94423
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 1iSQJR6DB6r6bz3d1OwZQ3wIWUOeNosMZ7VZraMiKiEkYUVU6aGRF/AEwdCqkVDb/T68RzLGJyxQlkzJJFVvPnnObcyKZmXtjNijRBpkhvj7CLEuWiCdUOEocBZnNGMDntO+/a4HkG+FquZbahXm9D9R4HFEA6cQelsq4voTGVRmNks7LVD988Q/HBmpeal/UJ50/LMJHfWcJBinhgOIUEOUvx1J7J2u4w6cd21mwQZVYNH1M7i/9Gj2tO+IBRdZTvF+gfXWukPfKCdjugBR8QF1GxeEWGl8LUju6GVLIORB0ZWD/TNlCO1Fc5cvxlkr4GKAWVoFa5MqTwxGxeDdIXO8pOMslWabdb8OIBYUdHKCVyGNuP24L3L3f57Pa+4JN9oX7olng82cSeCiiUIcB+hKDw45GVXTk9YAJ78+VkJi/Yg/blg0Suu2yDeGjFQHzuVv0DrAMUaIO6thCT/5t5W9JXHzr2ufrLrkurSV6+aBWW7P6WUFEtd+3rMnNywwScusignzMSHQI62v4jxRmqxZYHReinifiQURkuH2AiG69UPB79bX7fsHSbDh0fY1V7/eHTdtNVpzjSSMp6oBT1zLAoFJNXF8njYDyglR1TCBA8dRMLcdQXO5UkJw+YaZEiudc7hLcY2CIlEiXwR+5U4YSkqEspp2HKctULF0fRY2lQSfZ1g61+KgMndR/jhrp7ILfoYtNp7sDlL1D69mPW/7xS8lLbk9Xs52dVN+WV3xWIxSZzfaAwTQ9lzH1fMn6uFsxHPAAhbor49rxev6bQ==
+X-Forefront-Antispam-Report: CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(39860400002)(396003)(136003)(451199021)(46966006)(36840700001)(40470700004)(40460700003)(2906002)(186003)(40480700001)(82310400005)(82740400003)(83380400001)(81166007)(2616005)(16526019)(47076005)(6666004)(26005)(336012)(86362001)(426003)(1076003)(356005)(36860700001)(110136005)(41300700001)(54906003)(70206006)(478600001)(316002)(36756003)(4326008)(70586007)(44832011)(5660300002)(8676002)(8936002)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 28 Jun 2023 17:01:07.5091
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 205802e1-c95a-4a99-b4ad-08db77f94423
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource: CO1NAM11FT100.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR12MB5168
 Precedence: bulk
 List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
 
-Building on the previous work, add a very simplistic NAT case
-using ipv4.  This just tests dnat transformation
+From: Nitya Sunkad <nitya.sunkad@amd.com>
 
-Signed-off-by: Aaron Conole <aconole@redhat.com>
+Remove instances of WARN_ON to prevent problematic panic_on_warn use
+resulting in kernel panics.
+
+Fixes: 77ceb68e29cc ("ionic: Add notifyq support")
+Signed-off-by: Nitya Sunkad <nitya.sunkad@amd.com>
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
 ---
- .../selftests/net/openvswitch/openvswitch.sh  | 64 +++++++++++++++++++
- .../selftests/net/openvswitch/ovs-dpctl.py    | 60 +++++++++++++++++
- 2 files changed, 124 insertions(+)
+ drivers/net/ethernet/pensando/ionic/ionic_lif.c | 4 +++-
+ 1 file changed, 3 insertions(+), 1 deletion(-)
 
-diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-index 40a66c72af0f0..dced4f612a78c 100755
---- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
-+++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
-@@ -14,6 +14,7 @@ tests="
- 	arp_ping				eth-arp: Basic arp ping between two NS
- 	ct_connect_v4				ip4-ct-xon: Basic ipv4 tcp connection using ct
- 	connect_v4				ip4-xon: Basic ipv4 ping between two NS
-+	nat_connect_v4				ip4-nat-xon: Basic ipv4 tcp connection via NAT
- 	netlink_checks				ovsnl: validate netlink attrs and settings
- 	upcall_interfaces			ovs: test the upcall interfaces"
- 
-@@ -300,6 +301,69 @@ test_connect_v4 () {
- 	return 0
- }
- 
-+# nat_connect_v4 test
-+#  - client has 1500 byte MTU
-+#  - server has 1500 byte MTU
-+#  - use ICMP to ping in each direction
-+#  - only allow CT state stuff to pass through new in c -> s
-+test_nat_connect_v4 () {
-+	which nc >/dev/null 2>/dev/null || return $ksft_skip
-+
-+	sbx_add "test_nat_connect_v4" || return $?
-+
-+	ovs_add_dp "test_nat_connect_v4" nat4 || return 1
-+	info "create namespaces"
-+	for ns in client server; do
-+		ovs_add_netns_and_veths "test_nat_connect_v4" "nat4" "$ns" \
-+		    "${ns:0:1}0" "${ns:0:1}1" || return 1
-+	done
-+
-+	ip netns exec client ip addr add 172.31.110.10/24 dev c1
-+	ip netns exec client ip link set c1 up
-+	ip netns exec server ip addr add 172.31.110.20/24 dev s1
-+	ip netns exec server ip link set s1 up
-+
-+	ip netns exec client ip route add default via 172.31.110.20
-+
-+	ovs_add_flow "test_nat_connect_v4" nat4 \
-+		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
-+	ovs_add_flow "test_nat_connect_v4" nat4 \
-+		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
-+	ovs_add_flow "test_nat_connect_v4" nat4 \
-+		"ct_state(-trk),in_port(1),eth(),eth_type(0x0800),ipv4(dst=192.168.0.20)" \
-+		"ct(commit,nat(dst=172.31.110.20)),recirc(0x1)"
-+	ovs_add_flow "test_nat_connect_v4" nat4 \
-+		"ct_state(-trk),in_port(2),eth(),eth_type(0x0800),ipv4()" \
-+		"ct(commit,nat),recirc(0x2)"
-+
-+	ovs_add_flow "test_nat_connect_v4" nat4 \
-+		"recirc_id(0x1),ct_state(+trk-inv),in_port(1),eth(),eth_type(0x0800),ipv4()" "2"
-+	ovs_add_flow "test_nat_connect_v4" nat4 \
-+		"recirc_id(0x2),ct_state(+trk-inv),in_port(2),eth(),eth_type(0x0800),ipv4()" "1"
-+
-+	# do a ping
-+	ovs_sbx "test_nat_connect_v4" ip netns exec client ping 192.168.0.20 -c 3 || return 1
-+
-+	# create an echo server in 'server'
-+	echo "server" | \
-+		ovs_netns_spawn_daemon "test_nat_connect_v4" "server" \
-+				nc -lvnp 4443
-+	ovs_sbx "test_nat_connect_v4" ip netns exec client nc -i 1 -zv 192.168.0.20 4443 || return 1
-+
-+	# Now test in the other direction (should fail)
-+	echo "client" | \
-+		ovs_netns_spawn_daemon "test_nat_connect_v4" "client" \
-+				nc -lvnp 4443
-+	ovs_sbx "test_nat_connect_v4" ip netns exec client nc -i 1 -zv 172.31.110.10 4443
-+	if [ $? == 0 ]; then
-+	   info "connect to client was successful"
-+	   return 1
-+	fi
-+
-+	info "done..."
-+	return 0
-+}
-+
- # netlink_validation
- # - Create a dp
- # - check no warning with "old version" simulation
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-index 704cb4adf79a9..12ba5265b88fb 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -511,6 +511,66 @@ class ovsactions(nla):
-                         else:
-                             ctact["attrs"].append([scan[1], None])
-                         actstr = actstr[strspn(actstr, ", ") :]
-+                    # it seems strange to put this here, but nat() is a complex
-+                    # sub-action and this lets it sit anywhere in the ct() action
-+                    if actstr.startswith("nat"):
-+                        actstr = actstr[3:]
-+                        natact = ovsactions.ctact.natattr()
-+
-+                        if actstr.startswith("("):
-+                            t = None
-+                            actstr = actstr[1:]
-+                            if actstr.startswith("src"):
-+                                t = "OVS_NAT_ATTR_SRC"
-+                                actstr = actstr[3:]
-+                            elif actstr.startswith("dst"):
-+                                t = "OVS_NAT_ATTR_DST"
-+                                actstr = actstr[3:]
-+
-+                            actstr, ip_block_min = parse_extract_field(
-+                                actstr, "=", "([0-9a-fA-F:\.]+)", str, False
-+                            )
-+                            actstr, ip_block_max = parse_extract_field(
-+                                actstr, "-", "([0-9a-fA-F:\.]+)", str, False
-+                            )
-+                            actstr, proto_min = parse_extract_field(
-+                                actstr, ":", "(\d+)", int, False
-+                            )
-+                            actstr, proto_max = parse_extract_field(
-+                                actstr, "-", "(\d+)", int, False
-+                            )
-+                            if t is not None:
-+                                natact["attrs"].append([t, None])
-+
-+                                if ip_block_min is not None:
-+                                    natact["attrs"].append(
-+                                        ["OVS_NAT_ATTR_IP_MIN", ip_block_min]
-+                                    )
-+                                if ip_block_max is not None:
-+                                    natact["attrs"].append(
-+                                        ["OVS_NAT_ATTR_IP_MAX", ip_block_max]
-+                                    )
-+                                if proto_min is not None:
-+                                    natact["attrs"].append(
-+                                        ["OVS_NAT_ATTR_PROTO_MIN", proto_min]
-+                                    )
-+                                if proto_max is not None:
-+                                    natact["attrs"].append(
-+                                        ["OVS_NAT_ATTR_PROTO_MAX", proto_max]
-+                                    )
-+
-+                            for natscan in (
-+                                ("persist", "OVS_NAT_ATTR_PERSISTENT"),
-+                                ("hash", "OVS_NAT_ATTR_PROTO_HASH"),
-+                                ("random", "OVS_NAT_ATTR_PROTO_RANDOM"),
-+                            ):
-+                                if actstr.startswith(natscan[0]):
-+                                    actstr = actstr[len(natscan[0]) :]
-+                                    natact["attrs"].append([natscan[1], None])
-+                                    actstr = actstr[strspn(actstr, ", ") :]
-+
-+                        ctact["attrs"].append(["OVS_CT_ATTR_NAT", natact])
-+                        actstr = actstr[strspn(actstr, ",) ") :]
- 
-                 self["attrs"].append(["OVS_ACTION_ATTR_CT", ctact])
-                 actstr = actstr[strspn(actstr, "), ") :]
+diff --git a/drivers/net/ethernet/pensando/ionic/ionic_lif.c b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+index 7c20a44e549b..d401d86f1f7a 100644
+--- a/drivers/net/ethernet/pensando/ionic/ionic_lif.c
++++ b/drivers/net/ethernet/pensando/ionic/ionic_lif.c
+@@ -475,7 +475,9 @@ static void ionic_qcqs_free(struct ionic_lif *lif)
+ static void ionic_link_qcq_interrupts(struct ionic_qcq *src_qcq,
+ 				      struct ionic_qcq *n_qcq)
+ {
+-	if (WARN_ON(n_qcq->flags & IONIC_QCQ_F_INTR)) {
++	if (n_qcq->flags & IONIC_QCQ_F_INTR) {
++		dev_warn(n_qcq->q.dev, "%s: n_qcq->flags and IONIC_QCQ_F_INTR set\n",
++			 __func__);
+ 		ionic_intr_free(n_qcq->cq.lif->ionic, n_qcq->intr.index);
+ 		n_qcq->flags &= ~IONIC_QCQ_F_INTR;
+ 	}
 -- 
-2.40.1
+2.17.1
 
