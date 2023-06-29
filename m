@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-14525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14523-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4748C74242A
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:47:15 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4CF80742428
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:46:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 778AB1C2098A
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:47:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E0FE1C20A19
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:46:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F9B2111BC;
-	Thu, 29 Jun 2023 10:45:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E729AC14D;
+	Thu, 29 Jun 2023 10:45:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51411111B1
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:45:56 +0000 (UTC)
-Received: from mail-qv1-xf33.google.com (mail-qv1-xf33.google.com [IPv6:2607:f8b0:4864:20::f33])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D522A1FCB
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:45:53 -0700 (PDT)
-Received: by mail-qv1-xf33.google.com with SMTP id 6a1803df08f44-6355e774d0aso4454396d6.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:45:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DAE8310961
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:45:55 +0000 (UTC)
+Received: from mail-qk1-x72d.google.com (mail-qk1-x72d.google.com [IPv6:2607:f8b0:4864:20::72d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 05DE71FD7
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:45:55 -0700 (PDT)
+Received: by mail-qk1-x72d.google.com with SMTP id af79cd13be357-765a7768f1dso57315285a.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:45:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688035552; x=1690627552;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688035554; x=1690627554;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=OLJTf91kf9mBMFKTG4CoNQ02ft7+5tLeK9pmMvMG+Lc=;
-        b=gViAHYjqGByZC302QIEO5tpzwomfDbYLCP391dbQkZ64W8X+Z2B9siZvvIxB8lgY87
-         SAK9SdYOOVf6IBRpchiuBBDq/Tq1/46poBhj8QQsGwrKrSOQ59VDr8yRDCy30AZ17ZVo
-         pvLoz/FvfCOndXf403WTYN3HCo44LbUzzu3ycmTBE8i4tekfF6NyNAAy7BWdEKAmCP6N
-         yogVCM+4wuFMmiR7yOTWwLb7kUnrgh6Mt7mya+hck5muDCj9NE9ww6EzTThPwu/hqay0
-         Nt0FsHD42bJqYmp7sehNNscWbVLYdaaJHAO6a/kiz7jQg/wHtIUjfjRNU9PjMYyKUUDK
-         hMcg==
+        bh=GZ4RY/IF0/2FGn2l5ILgU9CCqZOHuGvuT5AQ/VhiInE=;
+        b=wjcSWfHO8wXcD3+N6SEhrIbQ1bWlvtRmhwI2iC5Cl/vlypXi9jcarAjnYK95b8YFcx
+         cDE0sP+PvqF/jy6YvwrCQ0CmguXeLCRtl/1j+ImiFtz4F9ijq74Iz408mK8H83NXdVXq
+         hsRiaFEFxoZB2pr9RaR3SBdZwDNFe8eYsHMeSiiUKugos4fEySpONWWQ4w+y4jpebG4s
+         Ffy2XR/f9QpeZgxBXaOvMVXLHdd8PVMPYG5ArvH0TvEAewQDGOQ2wRZen7lzuBoJ7N4q
+         +bZgfg/CUxfPG8jqRd/dwZn5foP+xcR9xk4IRR1xnORfytWS4/uw8WuGS2mUcliatm5M
+         rYeg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688035552; x=1690627552;
+        d=1e100.net; s=20221208; t=1688035554; x=1690627554;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=OLJTf91kf9mBMFKTG4CoNQ02ft7+5tLeK9pmMvMG+Lc=;
-        b=LYgMJgQ3nyAgWRtb5JEp/j1kRLG99qbAhXcTodQHujIBwl/qlO6/ZwIStTMI0fkzHg
-         yFrzy5WqaO7D5Tv8xfg382YPUukC6g+RX34Ur+AxJA65B8z4wm5mnL477ftN7hRgfBIq
-         fMBuBcYEeLjgc5C0BLcvH4QQk2hk7hBxnEzcpKHSDXNkpTyc33+7J8Hzf7NjSkSk/9+u
-         n0zQLV5RRJreaQqOIbVTrF87dsd6l/EOKhNk17AsFCIqaKJSCkShklXCqsr5bJQ9kuwI
-         Q7Uu9udkVTmpXb4xnISw+R1b+RXuqy5A4MkKrlQM764cw34Cpl1TiyPA4eQb9ahmqfho
-         YRtg==
-X-Gm-Message-State: AC+VfDxS4U9AlkAvQS1hpcWp5ht193WVk2szM0OOSJXC/ksoNFrWj9k3
-	ljGEBEOS7Onmsm4x6MTh8vgAKS5sHjY/yfe4QgY=
-X-Google-Smtp-Source: ACHHUZ5Nm3EYR4CS1Zd3YpbdD+sI8gb+5XJx/8hF1U2F/1yDkfSwDb64SxK4E9gSbWNfw5m7lDiOoQ==
-X-Received: by 2002:ad4:5aea:0:b0:630:228b:f83d with SMTP id c10-20020ad45aea000000b00630228bf83dmr39807592qvh.44.1688035552603;
-        Thu, 29 Jun 2023 03:45:52 -0700 (PDT)
+        bh=GZ4RY/IF0/2FGn2l5ILgU9CCqZOHuGvuT5AQ/VhiInE=;
+        b=L42xTLXwXNF4REIwjq+frWtz/WuNE9CbL0J/+i/NNXX98NuIFVONxLEU8XcCGRtAVJ
+         t2xgX5sej8cmk6lF5yIeUfCdTmWo9DSyeE7UVzy81NwSlAyta8538Nrw2w1rLT0mnlDh
+         laUOyceSFvf0CUuGdQlFIXn5H71jfA3g1H3U4yQbUTx5elyx4E9pwaln9gO/saD7cQEx
+         +i/uYxIa2hobaPmUqzaZTT2xm1AiYmch2+IgtFu1Znnel3FqaeymHHqNgfyAXjPIb4oS
+         rLgVxk4V8KyFqf+5AZ3RDRSo9lsNrVXnb8G6gFxl5Z5jpR043AIaam96HaG43gIny3q7
+         KPRw==
+X-Gm-Message-State: AC+VfDw1z1Sy6MtzI0k2e3c8LKchOiAGO+XBA/d3DuySXEdibPYK9Qcc
+	Y9lrOdhNhum4rMG+82DrNKNxYzFIbXXvxnSTHDg=
+X-Google-Smtp-Source: ACHHUZ4R7hqlTFJNS2KLcubRuRdVg3mCZva1IPqQxkgZDHWN5waAjeO3uPMvRNdjutlr+ecnq+jqCQ==
+X-Received: by 2002:a05:6214:e6c:b0:635:abf1:e93e with SMTP id jz12-20020a0562140e6c00b00635abf1e93emr14613744qvb.29.1688035553851;
+        Thu, 29 Jun 2023 03:45:53 -0700 (PDT)
 Received: from majuu.waya (bras-base-oshwon9577w-grc-12-142-114-148-137.dsl.bell.ca. [142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id o9-20020a056214180900b006362d4eeb6esm538453qvw.144.2023.06.29.03.45.51
+        by smtp.gmail.com with ESMTPSA id o9-20020a056214180900b006362d4eeb6esm538453qvw.144.2023.06.29.03.45.52
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 03:45:52 -0700 (PDT)
+        Thu, 29 Jun 2023 03:45:53 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -79,9 +79,9 @@ Cc: deb.chatterjee@intel.com,
 	mattyk@nvidia.com,
 	kernel@mojatatu.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v3 net-next 04/21] net/sched: act_api: export generic tc action searcher
-Date: Thu, 29 Jun 2023 06:45:21 -0400
-Message-Id: <20230629104538.40863-5-jhs@mojatatu.com>
+Subject: [PATCH RFC v3 net-next 05/21] net/sched: act_api: add struct p4tc_action_ops as a parameter to lookup callback
+Date: Thu, 29 Jun 2023 06:45:22 -0400
+Message-Id: <20230629104538.40863-6-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230629104538.40863-1-jhs@mojatatu.com>
 References: <20230629104538.40863-1-jhs@mojatatu.com>
@@ -98,54 +98,45 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In P4TC we need to query the tc actions directly in a net namespace.
-Therefore export __tcf_idr_search().
+For P4TC dynamic actions, we require information from struct tc_action_ops,
+specifically the action kind, to find and locate the dynamic action
+information for the lookup operation.
 
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/act_api.h | 2 ++
- net/sched/act_api.c   | 6 +++---
- 2 files changed, 5 insertions(+), 3 deletions(-)
+ include/net/act_api.h | 3 ++-
+ net/sched/act_api.c   | 2 +-
+ 2 files changed, 3 insertions(+), 2 deletions(-)
 
 diff --git a/include/net/act_api.h b/include/net/act_api.h
-index 363f7f8b5..c2236274a 100644
+index c2236274a..19770e8af 100644
 --- a/include/net/act_api.h
 +++ b/include/net/act_api.h
-@@ -190,6 +190,8 @@ int tcf_generic_walker(struct tc_action_net *tn, struct sk_buff *skb,
- 		       const struct tc_action_ops *ops,
- 		       struct netlink_ext_ack *extack);
- int tcf_idr_search(struct tc_action_net *tn, struct tc_action **a, u32 index);
-+int __tcf_idr_search(struct net *net, const struct tc_action_ops *ops,
-+		     struct tc_action **a, u32 index);
- int tcf_idr_create(struct tc_action_net *tn, u32 index, struct nlattr *est,
- 		   struct tc_action **a, const struct tc_action_ops *ops,
- 		   int bind, bool cpustats, u32 flags);
+@@ -115,7 +115,8 @@ struct tc_action_ops {
+ 		       struct tcf_result *); /* called under RCU BH lock*/
+ 	int     (*dump)(struct sk_buff *, struct tc_action *, int, int);
+ 	void	(*cleanup)(struct tc_action *);
+-	int     (*lookup)(struct net *net, struct tc_action **a, u32 index);
++	int     (*lookup)(struct net *net, const struct tc_action_ops *ops,
++			  struct tc_action **a, u32 index);
+ 	int     (*init)(struct net *net, struct nlattr *nla,
+ 			struct nlattr *est, struct tc_action **act,
+ 			struct tcf_proto *tp,
 diff --git a/net/sched/act_api.c b/net/sched/act_api.c
-index 6749f8d94..19d948fd0 100644
+index 19d948fd0..42af73eaa 100644
 --- a/net/sched/act_api.c
 +++ b/net/sched/act_api.c
-@@ -722,9 +722,8 @@ static int __tcf_generic_walker(struct net *net, struct sk_buff *skb,
- 	return tcf_generic_walker(tn, skb, cb, type, ops, extack);
- }
- 
--static int __tcf_idr_search(struct net *net,
--			    const struct tc_action_ops *ops,
--			    struct tc_action **a, u32 index)
-+int __tcf_idr_search(struct net *net, const struct tc_action_ops *ops,
-+		     struct tc_action **a, u32 index)
- {
+@@ -728,7 +728,7 @@ int __tcf_idr_search(struct net *net, const struct tc_action_ops *ops,
  	struct tc_action_net *tn = net_generic(net, ops->net_id);
  
-@@ -733,6 +732,7 @@ static int __tcf_idr_search(struct net *net,
+ 	if (unlikely(ops->lookup))
+-		return ops->lookup(net, a, index);
++		return ops->lookup(net, ops, a, index);
  
  	return tcf_idr_search(tn, a, index);
  }
-+EXPORT_SYMBOL(__tcf_idr_search);
- 
- static int tcf_idr_delete_index(struct tcf_idrinfo *idrinfo, u32 index)
- {
 -- 
 2.34.1
 
