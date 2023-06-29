@@ -1,125 +1,307 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14662-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 34B19742E1A
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:09:35 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232438AbjF2UDW (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Thu, 29 Jun 2023 16:03:22 -0400
-Received: from mail-dm6nam10on2118.outbound.protection.outlook.com ([40.107.93.118]:26976
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S232598AbjF2UC2 (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Thu, 29 Jun 2023 16:02:28 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=nInHeFCh1Djgtk/jHw2PW1Mf+kSbv3BL2mbzSN0Hjem+toV5ID3amZ+ufkp4gw2g+vEDbBsG6TuGZTYCS84tAKcaQfBs1OAhWJRoufBE5Uz+K9thNkZmg8S4LgKC6u0mvpxAWk4RPETfYFhIioCLVHyI5Muh9nDe4Qx2ROClri3WEoR88JGTuFTNeCz8j8Po0jQ2hHb107tIKj3UvWs1x3h9pQj32NXiTuEwz3e9fBrArypMoffo6/geBYfJdszUMH17xR1dXocczz85kGjgFSctm/v9O8IBO6CJB0pYrHb9O48+kB7s1le8/JdA6SKribQa6T3WEiv9J5fGc3Wmuw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SoeqDa8z7pYQft36pC9VjnS2MlTeRKA7/nP3fn6Gfv4=;
- b=R67+jsIpwft3/w3jw2KRgQ5blnmmu0ZwmluRde2NK/MNiG1C4FCIoOFDO4t4jiHA+L5iwMHBzigDoVUXeJI3SYztQcqNjyDjHHciGQIsuVDQl4MISr2MZETla4xNt//0wZXIB7f2O7ea/hXpQmKaSLC8Y7UVgRvaku7uuyuLd+t5OvvlDgp6Vyxtk6oD/DwXAr6H9ni3a3J8nT0h+3c8fpOOuqvGAg0aVZsCcWCDv0QzyEkxfbGJ736FMT1ysXQbQYqFc4YsMzhx67JqXmUWzWG5hJXZoGMntL5HfZ4vqKjq2c3CDfGTKUG+rEVtMLSB2NDMAo+FIUWQLuOAN7y5Mg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 02740742E34
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:18:28 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 997641C20A97
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:18:26 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6010715498;
+	Thu, 29 Jun 2023 20:18:24 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 487CF15486
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 20:18:24 +0000 (UTC)
+Received: from mail-ua1-x932.google.com (mail-ua1-x932.google.com [IPv6:2607:f8b0:4864:20::932])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E554212C;
+	Thu, 29 Jun 2023 13:18:21 -0700 (PDT)
+Received: by mail-ua1-x932.google.com with SMTP id a1e0cc1a2514c-7948540a736so201926241.1;
+        Thu, 29 Jun 2023 13:18:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SoeqDa8z7pYQft36pC9VjnS2MlTeRKA7/nP3fn6Gfv4=;
- b=MSLpw8Gd11jmX1kZ/KVgxj9UcfmbGzFjEi40YxbduS0fvFYBY4WKWomoec+P5GWmysLYdykspr7in4+7J39biGvm57VhwuBrXfGt8ZKMdo35X6u6ynfERcgUmGtmHB3sdB0yNQRMn4dTRX6aI7/hGmWXieYmlTjg/wGyymzilHg=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH7PR13MB5453.namprd13.prod.outlook.com (2603:10b6:510:138::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 29 Jun
- 2023 20:02:24 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 29 Jun 2023
- 20:02:24 +0000
-Date:   Thu, 29 Jun 2023 22:02:17 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Lin Ma <linma@zju.edu.cn>
-Cc:     steffen.klassert@secunet.com, herbert@gondor.apana.org.au,
-        davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, netdev@vger.kernel.org, tgraf@suug.ch
-Subject: Re: [PATCH v1] net: xfrm: Amend XFRMA_SEC_CTX nla_policy structure
-Message-ID: <ZJ3jSTQFww87vLYn@corigine.com>
-References: <20230627055255.1233458-1-linma@zju.edu.cn>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230627055255.1233458-1-linma@zju.edu.cn>
-X-ClientProxiedBy: AM0PR02CA0012.eurprd02.prod.outlook.com
- (2603:10a6:208:3e::25) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB5453:EE_
-X-MS-Office365-Filtering-Correlation-Id: 11fdab43-81df-4c84-c654-08db78dbc14e
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: B3E/KgLyFDjmvPKKtrD4nfeMEgriTVHNiWyTGpXGzcSUwJqRIU8inxH0W7On0it1W+XBRDQul+hubwm6pKCw30leFupiGkcv2cyuEn+3y9dMo+vSDKjIWy04x3dxCOeYekGra+9hrxW+JkQIM7h2q3O0hIaCm0mYpK4/QXaSUaCrU4SQkBuOyasObtr5dLhK/6kc8xOV5DNJ/2KcQGxzInGnVdS8/cQlwCTTz5NNk+KrGDX1M3oKaUTJlmB82AhG303GjVyXMiI0/HAcSpG9RmhgJmFh7XOwRrHTQYwKuvTjKlFPYlW4mOLaieGThLcB/xEoUhJ+St9yyBT7cLU1ovbIiBzBqW1JbO9uHcyzE81xgekzs1KhCAr2qMqWVJwq1WG6HxPDMpa9Bk+G04OLEZvbO5zMeHndWnF17ad7Rh+Tr0LO07UjTTH9Os9WR48au+FnmFIrIXprsVGcmoIQ8S4c3VAPbsZUbqxtFfjuuPPfhv9iDTi9aLl/pVdtB4nMIOLwEF++G4zm84Zv1LaGkMXbIOh8OxpytbRKv19/qszhQcUNmlo5I7cmK6fdtjRUErDbrxBKz7qvlcA9M7E3hVzJjR2CIpLxgIq3WjJ4w28=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(396003)(136003)(346002)(376002)(39840400004)(451199021)(6512007)(36756003)(5660300002)(86362001)(44832011)(41300700001)(66946007)(6916009)(8936002)(66476007)(8676002)(316002)(4326008)(66556008)(38100700002)(478600001)(6486002)(2906002)(4744005)(6506007)(186003)(2616005)(83380400001)(6666004);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?XsRY8WKIA7YiSE/uC2iHFTJi8uttzc4ZS4P3ktp1CvBNJl/aJwo/iPhuBShZ?=
- =?us-ascii?Q?qGdBdFwdW7FUE9mkrKA8xN3+XBNuUVbpSi1ZxtKa3NQp26MPD9BrrnI/m2z1?=
- =?us-ascii?Q?A5qfGSxaMRFMuDXoxEJK0dNNW3PnEmhn6ofSG5oiuOnhyQKNPpvvPXNUrV9H?=
- =?us-ascii?Q?Q8ltN5+ely9xRSp5ahX6mimF1i5+lVeQBcjjUCE7WUX/YHhsTW2MuSiqxkx3?=
- =?us-ascii?Q?6opyJZpto0NU2SROguQPPkNZkcue7qM9aduFhxdvWSWheHXFIqZiz/tzPljM?=
- =?us-ascii?Q?/V0zZlVntmk6TH3eEJafZyaWTUNSQVJlOIKKgO5y588W2/A6eLpcvAGmZbup?=
- =?us-ascii?Q?szA+BO7w3CePeBL+7UjuO7Kfl6SSl77mamRW8gGKNBmcNBNNtHq8mQcvjAOg?=
- =?us-ascii?Q?lB+A65B/xzJ3gLvi3d92avph/+4MdqqIXNb5q36RLL2iZHr96h84epDjFZYH?=
- =?us-ascii?Q?VGDqe/tp+/Xm75M7DvaqKGofDdeoTlkTD3MDvaJ9GzvGeyno0ST1sDbhbnqs?=
- =?us-ascii?Q?2pWxMQfG5xibAiDkm4nM3AEucVN3f1bD2rpmGBzPCMyDedeVPfqN7Nyf6bRs?=
- =?us-ascii?Q?2fNGgwyRjsDmHe2wfIU5FNgyr4UPggqM9xBxZonPceBs8cG77uZoY6lR3aI6?=
- =?us-ascii?Q?y9UXHt3LHI/33xTvUp2ebwJjgKiM0QB4xy8zpVHaElugHPx39I2P3ajFuNY2?=
- =?us-ascii?Q?7LYyNaXG2haeYUWidiigtoJTRruMNWNNsDr2cNdTJtiN9Z02M4Rbedns6ra7?=
- =?us-ascii?Q?uviEJlHq5HsLkLw9SWhJsqOJWpiZf5KwtJ+DIJGfR6ZIjMSCRRjNYJxEFRoU?=
- =?us-ascii?Q?CdNDG94aj5nfy9Dz7Levw34ARdv/aIGc7DEcbLOdvQh00M3CwwN8Lxd3JbOk?=
- =?us-ascii?Q?QYn7XVHyFC/KS1xEdoDhqmnR11rZnpxsqIeYXWT4GbOrVD+9X58ZPE4vr8vN?=
- =?us-ascii?Q?lWikCtRrZWRC19KVQF09HXHTBouWdmiUWeun2LFbc0g4VzHoJtJQJvcNhEn9?=
- =?us-ascii?Q?iKwRsQDdqqiBYMPnLBVaB5rQv6ujgkPnbDjRSZrV78bfK7MZRbXF9eYU2DQ6?=
- =?us-ascii?Q?4Fc5XNf3hX9R7JZXx0Mc3K0nP34L6Ypf2kTW/BBP+YrhYOQBd1UB6BpjvKlV?=
- =?us-ascii?Q?R9b/FNhhQdUmRxUDptEcg2wnshbZKz0wnOiPmKe/ilSJgNz+5Ker4MGSQEym?=
- =?us-ascii?Q?CqZ314JgexXOsRdUoc17UaWhjuDszxYnWzcVpz4rVRPzWupNagCub5iDUto8?=
- =?us-ascii?Q?b6VvylUnfRQed/TNhdTssmSbjON8cHFGs/RQgryVQCYKPp6qWnoBbWR8lqSQ?=
- =?us-ascii?Q?O4Ta4ebPT8u3FEeCejd6BJGi7dDv72/Ojfz+VfDZCdQkiTtAWFfzibN2sbJQ?=
- =?us-ascii?Q?rfGSQJQvLmC5DRWv5a1pcGLXbQiLrbUCdeDi29cYbWpMZvqefMMmx1AyCqaj?=
- =?us-ascii?Q?YvGFmKGAJ6Xylg40NRJ0M+WGmRCyVqlhf60nfRkgkENkVikANkFnyZ4Otlf+?=
- =?us-ascii?Q?KzdzceCoAf2hhh0Ky5Ck+M/IoI1XHgkHxoXUdmrl2oKmG6X+tMD2QYefmAGO?=
- =?us-ascii?Q?G8VuvCX+ycUC9STzc0rWoRC5HnA7pfJeNJrHSpabMF8S6+fANcM0BEQvNDBF?=
- =?us-ascii?Q?zVRpknNpAzw5n9yOtk4E6jfMkQMFlA/f9hYDZhQCx+k5iErN7iewKYHZMMeR?=
- =?us-ascii?Q?praejQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 11fdab43-81df-4c84-c654-08db78dbc14e
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2023 20:02:24.0616
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: AUPKg2//7Yl/tlpGDbC/S2AMrZpMu2D7TJDTl5cWnm7D38W4cVlUDxpTt7SWXDCzoxLrZn1z8xysIYJ8uCCd6xRBtuaH07FpHa9wGendofY=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB5453
+        d=gmail.com; s=20221208; t=1688069900; x=1690661900;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=mUWhvTvfHqgopfY1uSN+qHK2KI5XDnK/yjYuoUEXk2U=;
+        b=c62PoVKbgzWOEFkUff8ELJGV2zMwglcbj6FoMzCObDjQW1+iyOknR3B035XLnoaMZn
+         //nk+lN6h4P8ladqgPGcQNrUJW+69NyYColAxb5oYJKipb3HGoEKbeCNsvmCM2UwhNwx
+         pIBejsOrGskixePDLpKm4h4ssj2oULquaoG1b16kFh1C7EfQr5cE/6DkxlM5cpxbon8U
+         zJvnpiIMstFI2x1HLCZFSx4KnWWGbmtwP887Hw3mONd/3BxqgI6HwiwPN1nGVdfzfgwc
+         417Cax2KKCnkBjF4iBA9ZM6Uif8RGzgvHtFGyPndywQ4WJLuQ8hnQFb8EpjGPuAT3C2P
+         +EyQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688069900; x=1690661900;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mUWhvTvfHqgopfY1uSN+qHK2KI5XDnK/yjYuoUEXk2U=;
+        b=aCw+POVIwBFLOZJCwD4L3xYlT6cjpqM479uSyQW78kQ3f3N7FaIl5YP9tXANrF0Lca
+         QcIG8Qyj6zlV8BGcxtWQlWlbLTq8UpUMgtT8zpGS342zdQlVozaXw4dTNKGgWRk+foB9
+         lHKRD59hgHiFbDKktmrMx6A2FtTduw4OOs8aRFty5X+1tsy/sJTIMjSNBAoKXTb/NgRz
+         C3VQsdJqvVMmjslDo17UcGT7ssqO39ywhmlbxNPR+k/fwIQ6F9HF0KBr5GfUbpwOOEpP
+         0j3VJkkbNMtAetSf5xmOzcaNAgXxvgC/efoi1yizM3bCRw9kMx0CWLLxoJX0RZVEvoHW
+         frjQ==
+X-Gm-Message-State: ABy/qLbAm3hldSVP6tD63HcsH3Dx3ZFAFZArN0m0VdRDsylmD+T/n0ao
+	/e3wnrhFIn3f40YAA4CtQKFuiScNz1E+YQUTtIs=
+X-Google-Smtp-Source: APBJJlF2KtirkA/fsOxG+VVCxOYyMAlfWTo0z5/eLCxCwSDN4XvjA6NOIND+fHMuzuo+zt6UMFjmqk4ekPCsi+BydAQ=
+X-Received: by 2002:a05:6102:3a42:b0:443:7935:6eb5 with SMTP id
+ c2-20020a0561023a4200b0044379356eb5mr810115vsu.15.1688069900058; Thu, 29 Jun
+ 2023 13:18:20 -0700 (PDT)
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+References: <20230625115343.1603330-1-paweldembicki@gmail.com>
+ <20230625115343.1603330-6-paweldembicki@gmail.com> <20230625150552.sljrgm6rqodmefq5@skbuf>
+In-Reply-To: <20230625150552.sljrgm6rqodmefq5@skbuf>
+From: =?UTF-8?Q?Pawe=C5=82_Dembicki?= <paweldembicki@gmail.com>
+Date: Thu, 29 Jun 2023 22:18:08 +0200
+Message-ID: <CAJN1KkycUbLLWSTACr=xpuxLG7Arn3L0O0+z2VtyovnFx9s5QA@mail.gmail.com>
+Subject: Re: [PATCH net-next v2 6/7] net: dsa: vsc73xx: Add vlan filtering
+To: Vladimir Oltean <olteanv@gmail.com>
+Cc: netdev@vger.kernel.org, Linus Walleij <linus.walleij@linaro.org>, 
+	Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 01:52:55PM +0800, Lin Ma wrote:
-> According to all consumers code of attrs[XFRMA_SEC_CTX], like
-> 
-> * verify_sec_ctx_len(), convert to xfrm_user_sec_ctx*
-> * xfrm_state_construct(), call security_xfrm_state_alloc whose prototype
-> is int security_xfrm_state_alloc(.., struct xfrm_user_sec_ctx *sec_ctx);
-> * copy_from_user_sec_ctx(), convert to xfrm_user_sec_ctx *
-> ...
-> 
-> It seems that the exptected parsing result for XFRMA_SEC_CTX should be
+niedz., 25 cze 2023 o 17:05 Vladimir Oltean <olteanv@gmail.com> napisa=C5=
+=82(a):
+>
+> On Sun, Jun 25, 2023 at 01:53:41PM +0200, Pawel Dembicki wrote:
+> > This patch implement vlan filtering for vsc73xx driver.
+> >
+> > After vlan filtering start, switch is reconfigured from QinQ to simple
+> > vlan aware mode. It's required, because VSC73XX chips haven't support
+> > for inner vlan tag filter.
+> >
+> > Reviewed-by: Linus Walleij <linus.walleij@linaro.org>
+> > Signed-off-by: Pawel Dembicki <paweldembicki@gmail.com>
+> > ---
+> > v2:
+> >   - no changes done
+> >
+> >  drivers/net/dsa/vitesse-vsc73xx-core.c | 101 +++++++++++++++++++++++++
+> >  1 file changed, 101 insertions(+)
+> >
+> > diff --git a/drivers/net/dsa/vitesse-vsc73xx-core.c b/drivers/net/dsa/v=
+itesse-vsc73xx-core.c
+> > index 457eb7fddf4c..c946464489ab 100644
+> > --- a/drivers/net/dsa/vitesse-vsc73xx-core.c
+> > +++ b/drivers/net/dsa/vitesse-vsc73xx-core.c
+> > @@ -1226,6 +1226,30 @@ static int vsc73xx_port_set_double_vlan_aware(st=
+ruct dsa_switch *ds, int port)
+> >       return ret;
+> >  }
+> >
+> > +static int
+> > +vsc73xx_port_vlan_filtering(struct dsa_switch *ds, int port,
+> > +                         bool vlan_filtering, struct netlink_ext_ack *=
+extack)
+> > +{
+> > +     int ret, i;
+> > +
+> > +     if (vlan_filtering) {
+> > +             vsc73xx_port_set_vlan_conf(ds, port, VSC73XX_VLAN_AWARE);
+> > +     } else {
+> > +             if (port =3D=3D CPU_PORT)
+> > +                     vsc73xx_port_set_vlan_conf(ds, port, VSC73XX_DOUB=
+LE_VLAN_CPU_AWARE);
+> > +             else
+> > +                     vsc73xx_port_set_vlan_conf(ds, port, VSC73XX_DOUB=
+LE_VLAN_AWARE);
+> > +     }
+>
+> Why do you need ports to be double VLAN aware when vlan_filtering=3D0?
+> Isn't VLAN_TCI_IGNORE_ENA sufficient to ignore the 802.1Q header from
+> incoming packets, and set up the PVIDs of user ports as egress-tagged on
+> the CPU port?
+>
 
-Hi Lin Ma,
+Because I want to forward tagged and untagged frames when
+vlan_filtering is off.  If I set VSC73XX_DOUBLE_VLAN_AWARE, I can put
+all (tagged and untagged) traffic into the outer vlan, called by the
+datasheet as "MAN space". In QinQ mode, it is possible to ignore what
+goes from a particular port but it is possible to separate traffic
+from different ports.
 
-a minor nit via checkpatch.pl --codespell: exptected -> expected
+> > +
+> > +     for (i =3D 0; i <=3D 3072; i++) {
+> > +             ret =3D vsc73xx_port_update_vlan_table(ds, port, i, 0);
+> > +             if (ret)
+> > +                     return ret;
+> > +     }
+>
+> What is the purpose of this?
 
-...
+I want to be sure that the table is cleared when vlan awareness is changed.
+
+>
+> > +
+> > +     return ret;
+> > +}
+> > +
+> >  static int vsc73xx_vlan_set_untagged(struct dsa_switch *ds, int port, =
+u16 vid,
+> >                                    bool port_vlan)
+> >  {
+> > @@ -1304,6 +1328,80 @@ static int vsc73xx_vlan_set_pvid(struct dsa_swit=
+ch *ds, int port, u16 vid,
+> >       return 0;
+> >  }
+> >
+> > +static int vsc73xx_port_vlan_add(struct dsa_switch *ds, int port,
+> > +                              const struct switchdev_obj_port_vlan *vl=
+an,
+> > +                              struct netlink_ext_ack *extack)
+> > +{
+> > +     bool untagged =3D vlan->flags & BRIDGE_VLAN_INFO_UNTAGGED;
+> > +     bool pvid =3D vlan->flags & BRIDGE_VLAN_INFO_PVID;
+> > +     int ret;
+> > +
+> > +     /* Be sure to deny alterations to the configuration done by tag_8=
+021q.
+> > +      */
+> > +     if (vid_is_dsa_8021q(vlan->vid)) {
+> > +             NL_SET_ERR_MSG_MOD(extack,
+> > +                                "Range 3072-4095 reserved for dsa_8021=
+q operation");
+> > +             return -EBUSY;
+> > +     }
+> > +
+> > +     if (untagged && port !=3D CPU_PORT) {
+> > +             ret =3D vsc73xx_vlan_set_untagged(ds, port, vlan->vid, tr=
+ue);
+> > +             if (ret)
+> > +                     return ret;
+> > +     }
+> > +     if (pvid && port !=3D CPU_PORT) {
+>
+> Missing logic to change hardware PVID only while VLAN-aware, and to
+> restore the tag_8021q PVID when the bridge VLAN awareness gets disabled.
+> DSA does not resolve the conflicts on resources between .port_vlan_add()
+> and .tag_8021q_vlan_add(), the driver must do that.
+>
+> > +             ret =3D vsc73xx_vlan_set_pvid(ds, port, vlan->vid, true);
+> > +             if (ret)
+> > +                     return ret;
+> > +     }
+> > +
+> > +     ret =3D vsc73xx_port_update_vlan_table(ds, port, vlan->vid, 1);
+> > +
+> > +     return ret;
+>
+> Style: return vsc73xx_port_update_vlan_table(...)
+>
+> > +}
+> > +
+> > +static int vsc73xx_port_vlan_del(struct dsa_switch *ds, int port,
+> > +                              const struct switchdev_obj_port_vlan *vl=
+an)
+> > +{
+> > +     struct vsc73xx *vsc =3D ds->priv;
+> > +     u16 vlan_no;
+> > +     int ret;
+> > +     u32 val;
+> > +
+> > +     ret =3D
+> > +         vsc73xx_port_update_vlan_table(ds, port, vlan->vid, 0);
+>
+> Style: single line
+>
+> > +     if (ret)
+> > +             return ret;
+> > +
+> > +     vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_TXUPDCFG, &val=
+);
+> > +
+> > +     if (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_ENA) {
+> > +             vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port,
+> > +                          VSC73XX_TXUPDCFG, &val);
+> > +             vlan_no =3D (val & VSC73XX_TXUPDCFG_TX_UNTAGGED_VID) >>
+> > +                       VSC73XX_TXUPDCFG_TX_UNTAGGED_VID_SHIFT;
+> > +             if (vlan_no =3D=3D vlan->vid) {
+> > +                     vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> > +                                         VSC73XX_TXUPDCFG,
+> > +                                         VSC73XX_TXUPDCFG_TX_UNTAGGED_=
+VID_ENA,
+> > +                                         0);
+> > +                     vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> > +                                         VSC73XX_TXUPDCFG,
+> > +                                         VSC73XX_TXUPDCFG_TX_UNTAGGED_=
+VID, 0);
+> > +             }
+> > +     }
+> > +
+> > +     vsc73xx_read(vsc, VSC73XX_BLOCK_MAC, port, VSC73XX_CAT_PORT_VLAN,=
+ &val);
+> > +     vlan_no =3D val & VSC73XX_CAT_PORT_VLAN_VLAN_VID;
+> > +     if (vlan_no && vlan_no =3D=3D vlan->vid) {
+> > +             vsc73xx_update_bits(vsc, VSC73XX_BLOCK_MAC, port,
+> > +                                 VSC73XX_CAT_PORT_VLAN,
+> > +                                 VSC73XX_CAT_PORT_VLAN_VLAN_VID, 0);
+>
+> As documented in Documentation/networking/switchdev.rst:
+>
+> When the bridge has VLAN filtering enabled and a PVID is not configured o=
+n the
+> ingress port, untagged and 802.1p tagged packets must be dropped. When th=
+e bridge
+> has VLAN filtering enabled and a PVID exists on the ingress port, untagge=
+d and
+> priority-tagged packets must be accepted and forwarded according to the
+> bridge's port membership of the PVID VLAN. When the bridge has VLAN filte=
+ring
+> disabled, the presence/lack of a PVID should not influence the packet
+> forwarding decision.
+>
+> Setting the hardware PVID to 0 when the bridge PVID is deleted sounds
+> like it accomplishes none of those.
+>
+
+My bad. I should just set VSC73XX_CAT_DROP_UNTAGGED_ENA here.
+
+> > +     }
+> > +
+> > +     return 0;
+> > +}
+> > +
+> >  static void vsc73xx_update_forwarding_map(struct vsc73xx *vsc)
+> >  {
+> >       int i;
+> > @@ -1524,6 +1622,9 @@ static const struct dsa_switch_ops vsc73xx_ds_ops=
+ =3D {
+> >       .port_change_mtu =3D vsc73xx_change_mtu,
+> >       .port_max_mtu =3D vsc73xx_get_max_mtu,
+> >       .port_stp_state_set =3D vsc73xx_port_stp_state_set,
+> > +     .port_vlan_filtering =3D vsc73xx_port_vlan_filtering,
+> > +     .port_vlan_add =3D vsc73xx_port_vlan_add,
+> > +     .port_vlan_del =3D vsc73xx_port_vlan_del,
+> >       .tag_8021q_vlan_add =3D vsc73xx_tag_8021q_vlan_add,
+> >       .tag_8021q_vlan_del =3D vsc73xx_tag_8021q_vlan_del,
+> >  };
+> > --
+> > 2.34.1
+> >
+>
+
+Thank you for such detailed responses and clarifying for me many issues.
+
+--
+Pawel Dembicki
+
