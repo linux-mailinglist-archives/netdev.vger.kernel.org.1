@@ -1,122 +1,183 @@
-Return-Path: <netdev+bounces-14613-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14614-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B8E85742ABD
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:41:59 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C1F32742AC6
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:45:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B7E280E89
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:41:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67944280E8F
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:45:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19038291E;
-	Thu, 29 Jun 2023 16:41:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8FC0111C8F;
+	Thu, 29 Jun 2023 16:45:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095322572
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:41:55 +0000 (UTC)
-Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13476171E
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 09:41:53 -0700 (PDT)
-Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561eb6c66f6so7016167b3.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 09:41:53 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DC148814
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:45:30 +0000 (UTC)
+Received: from mail-pf1-x433.google.com (mail-pf1-x433.google.com [IPv6:2607:f8b0:4864:20::433])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC79430E4;
+	Thu, 29 Jun 2023 09:45:28 -0700 (PDT)
+Received: by mail-pf1-x433.google.com with SMTP id d2e1a72fcca58-666e6ecb52dso615631b3a.2;
+        Thu, 29 Jun 2023 09:45:28 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688056912; x=1690648912;
-        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+        d=gmail.com; s=20221208; t=1688057128; x=1690649128;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:from:to:cc:subject
          :date:message-id:reply-to;
-        bh=UG3PTb5MAF8cAGQF47HGQin+88efRORfN4c39hK/1YE=;
-        b=VYX15G65lQIXuzdX41l7NofbTeXCaqOFq+6xy+WpwfksDgl/i3Vx6ZPsDrL7zhrYuk
-         wtFPIjh/43CpK/NkKUu8m1lm4AMojbEvktTW0EK7EhHgl0olFh2N+skDhsjAWQYV1VUb
-         xWcBDmf8qecuwRNfGnJ16eEP+lutsJktZNm0T1vWRmrUkvqKIZmaKC1qKsWdiDU3byw8
-         qNpj/+sJqroRfvO4R1S/x2fqEu4OVNxoImh3DvkzCekFr8bEEYBnuLiWAhNmBo29M+Ve
-         hMZ/LhG+7fgrRS2Tgj/gJVGVzvvP01rRHaXPbaD2EYfpQj7RW9aUtZg6c5aZabQYPjk6
-         5aMQ==
+        bh=Yd3prj50qZ/KXnCa8qhFKXz7uId1ym/Cpfqr4ubT/HA=;
+        b=N5xoyrp5avc3HurYxvthHNLsVQm/uZXxqZllpagQ27jIT51RcR3cDeJw8MCQbz4HAJ
+         ux4uSctLUrtajYlEbPw4TAn6Qzi1a8rJtN66nWBfrhKST0pCyaj6hhXuniXbeM8e0bFT
+         0q+BgwaVEA52OgJYbAwrukd4E8dRjkPfIBVVhSIljbUoVdFMP925VodAT1ZAQMrs84vp
+         11xBWTbZL6twldaS5zmeDY0TWDZ2c7TOFtbkC2LuO2xRgXJOOjzPd0qByga2izTxrYx/
+         sefErWYRKPw9vLtNxl4zaMOYgkNO/wQFT6frx57gSqSHfsyVmw2FKI3Km2U+zp0qcAnf
+         qPow==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688056912; x=1690648912;
-        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+        d=1e100.net; s=20221208; t=1688057128; x=1690649128;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=UG3PTb5MAF8cAGQF47HGQin+88efRORfN4c39hK/1YE=;
-        b=HkSEw3MhdyHBAJZV9qo2bDjRRU2qkuyLH9carvkYvH5KKVVxmhD9jIY1BGeDV5HtZW
-         Bs1q1mnjuiXgWNSPmytFKbfcrXCAAc61VvzWatZCf5pQraB0M18CH+DQYUBpgbiGa0Mu
-         1RQFcaQRuB0mIXMtIyA2Th02wuxx7k0vs9uG4Lzn7EK3bus0zDenm+zyBvhU7XmebdVF
-         HOGjWLCT9urgZmxhnknkC1CApeq4FwAFjtNR/3PdlqETKr7uU80ldNcdv7JGHRoyEl1Q
-         bZeJhd0W8X4llwxa3dSXHLLl3s8rvENuD8s+3vqX3/LPLfpbk+fueBUn+navSSzsfBqh
-         JtPA==
-X-Gm-Message-State: AC+VfDyKgoiVpo2pFJnAAy9X5YZSSA2bkReBgTX/NRauqGLl8qovTnuO
-	BkpRJheOkjehFniKjsfZRS0RjHImD1bL8Q==
-X-Google-Smtp-Source: ACHHUZ7NV0KsL3dggY/tBxurjHkISlHrlcyEZmMxw4A1aSge1LpU39dQ9buz5dzMiMt/tlvoUdyDfrzbIPhZZw==
-X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
- (user=edumazet job=sendgmr) by 2002:a81:b106:0:b0:56d:7a5:2887 with SMTP id
- p6-20020a81b106000000b0056d07a52887mr15444628ywh.2.1688056912299; Thu, 29 Jun
- 2023 09:41:52 -0700 (PDT)
-Date: Thu, 29 Jun 2023 16:41:50 +0000
+        bh=Yd3prj50qZ/KXnCa8qhFKXz7uId1ym/Cpfqr4ubT/HA=;
+        b=gX2s++/bYDOTOHdNwZYTleL06sQ/so3UNME8o815NzxIX3RdKoOnAJXq5tQLoyTRnI
+         ptmEOMLwnCQvu+XyyCJ1rpS9kqE8fZz8krDri7+N55UtMih5RfROTZOEduOhrSkNljlz
+         SKo2S2bc9RsUfupttlLNyDlrDNpdCGYDf8tmUWQ3WonvF58p4I3cE1Xwa8hqyGax1mth
+         d5pnaiMBIhvh+6v+IDCukYn8b4tHfKnZN6O3uvsnBAHptph4tqVrc6NVgx3i6uiSdrDW
+         zTXo25NW6lXAFrnxnMzP09pJbmGXqZi6Z4FklejHvGWSCMZMnrkZhIKcRug0iHyzaoK/
+         JOtQ==
+X-Gm-Message-State: ABy/qLY78gW9XIiwpU6Sk0a1j5H6ezlkKjekATWDuQ2Fc5dw1niN7Ps1
+	JQXGDGzcPXxWWM+E9diJGo4=
+X-Google-Smtp-Source: APBJJlHm8gXrhUfVyIiRiRVp7jCrMzNCrriCXnUx/mhM9josnKId++QykLG9IipART+7qFUgDlfakw==
+X-Received: by 2002:a05:6a00:188c:b0:681:89eb:9c9b with SMTP id x12-20020a056a00188c00b0068189eb9c9bmr542386pfh.11.1688057128107;
+        Thu, 29 Jun 2023 09:45:28 -0700 (PDT)
+Received: from ?IPv6:2605:59c8:448:b800:82ee:73ff:fe41:9a02? ([2605:59c8:448:b800:82ee:73ff:fe41:9a02])
+        by smtp.googlemail.com with ESMTPSA id a25-20020aa78659000000b0067738f65039sm6593188pfo.83.2023.06.29.09.45.27
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 09:45:27 -0700 (PDT)
+Message-ID: <69e827e239dab9fd7986ee43cef599d024c8535f.camel@gmail.com>
+Subject: Re: [PATCH RFC net-next 2/4] net: page_pool: avoid calling no-op
+ externals when possible
+From: Alexander H Duyck <alexander.duyck@gmail.com>
+To: Alexander Lobakin <aleksander.lobakin@intel.com>, "David S. Miller"
+	 <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	 <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>
+Cc: Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba
+ <larysa.zaremba@intel.com>, Yunsheng Lin <linyunsheng@huawei.com>,
+ Alexander Duyck <alexanderduyck@fb.com>, Jesper Dangaard Brouer
+ <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ netdev@vger.kernel.org,  linux-kernel@vger.kernel.org
+Date: Thu, 29 Jun 2023 09:45:26 -0700
+In-Reply-To: <20230629152305.905962-3-aleksander.lobakin@intel.com>
+References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
+	 <20230629152305.905962-3-aleksander.lobakin@intel.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230629164150.2068747-1-edumazet@google.com>
-Subject: [PATCH net] tcp: annotate data races in __tcp_oow_rate_limited()
-From: Eric Dumazet <edumazet@google.com>
-To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
-	Paolo Abeni <pabeni@redhat.com>
-Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
-	Eric Dumazet <edumazet@google.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+MIME-Version: 1.0
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-request sockets are lockless, __tcp_oow_rate_limited() could be called
-on the same object from different cpus. This is harmless.
+On Thu, 2023-06-29 at 17:23 +0200, Alexander Lobakin wrote:
+> Turned out page_pool_put{,_full}_page() can burn quite a bunch of cycles
+> even when on DMA-coherent platforms (like x86) with no active IOMMU or
+> swiotlb, just for the call ladder.
+> Indeed, it's
+>=20
+> page_pool_put_page()
+>   page_pool_put_defragged_page()                  <- external
+>     __page_pool_put_page()
+>       page_pool_dma_sync_for_device()             <- non-inline
+>         dma_sync_single_range_for_device()
+>           dma_sync_single_for_device()            <- external
+>             dma_direct_sync_single_for_device()
+>               dev_is_dma_coherent()               <- exit
+>=20
+> For the inline functions, no guarantees the compiler won't uninline them
+> (they're clearly not one-liners and sometimes compilers uninline even
+> 2 + 2). The first external call is necessary, but the rest 2+ are done
+> for nothing each time, plus a bunch of checks here and there.
+> Since Page Pool mappings are long-term and for one "device + addr" pair
+> dma_need_sync() will always return the same value (basically, whether it
+> belongs to an swiotlb pool), addresses can be tested once right after
+> they're obtained and the result can be reused until the page is unmapped.
+> Define new PP flag, which will mean "do DMA syncs for device, but only
+> when needed" and turn it on by default when the driver asks to sync
+> pages. When a page is mapped, check whether it needs syncs and if so,
+> replace that "sync when needed" back to "always do syncs" globally for
+> the whole pool (better safe than sorry). As long as a pool has no pages
+> requiring DMA syncs, this cuts off a good piece of calls and checks.
+> On my x86_64, this gives from 2% to 5% performance benefit with no
+> negative impact for cases when IOMMU is on and the shortcut can't be
+> used.
+>=20
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  include/net/page_pool.h |  3 +++
+>  net/core/page_pool.c    | 10 ++++++++++
+>  2 files changed, 13 insertions(+)
+>=20
+> diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+> index 829dc1f8ba6b..ff3772fab707 100644
+> --- a/include/net/page_pool.h
+> +++ b/include/net/page_pool.h
+> @@ -23,6 +23,9 @@
+>  					* Please note DMA-sync-for-CPU is still
+>  					* device driver responsibility
+>  					*/
+> +#define PP_FLAG_DMA_MAYBE_SYNC	BIT(2) /* Internal, should not be used in
+> +					* drivers
+> +					*/
+>  #define PP_FLAG_ALL		(PP_FLAG_DMA_MAP |\
+>  				 PP_FLAG_DMA_SYNC_DEV)
+> =20
+> diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+> index dff0b4fa2316..498e058140b3 100644
+> --- a/net/core/page_pool.c
+> +++ b/net/core/page_pool.c
+> @@ -197,6 +197,10 @@ static int page_pool_init(struct page_pool *pool,
+>  		/* pool->p.offset has to be set according to the address
+>  		 * offset used by the DMA engine to start copying rx data
+>  		 */
+> +
+> +		/* Try to avoid calling no-op syncs */
+> +		pool->p.flags |=3D PP_FLAG_DMA_MAYBE_SYNC;
+> +		pool->p.flags &=3D ~PP_FLAG_DMA_SYNC_DEV;
+>  	}
+> =20
+>  #ifdef CONFIG_PAGE_POOL_STATS
+> @@ -341,6 +345,12 @@ static bool page_pool_dma_map(struct page_pool *pool=
+, struct page *page)
+> =20
+>  	page_pool_set_dma_addr(page, dma);
+> =20
+> +	if ((pool->p.flags & PP_FLAG_DMA_MAYBE_SYNC) &&
+> +	    dma_need_sync(pool->p.dev, dma)) {
+> +		pool->p.flags |=3D PP_FLAG_DMA_SYNC_DEV;
+> +		pool->p.flags &=3D ~PP_FLAG_DMA_MAYBE_SYNC;
+> +	}
+> +
+>  	if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+>  		page_pool_dma_sync_for_device(pool, page, pool->p.max_len);
+> =20
 
-Add READ_ONCE()/WRITE_ONCE() annotations to avoid a KCSAN report.
+I am pretty sure the logic is flawed here. The problem is
+dma_needs_sync depends on the DMA address being used. In the worst case
+scenario we could have a device that has something like a 32b DMA
+address space on a system with over 4GB of memory. In such a case the
+higher addresses would need to be synced because they will go off to a
+swiotlb bounce buffer while the lower addresses wouldn't.
 
-Fixes: 4ce7e93cb3fe ("tcp: rate limit ACK sent by SYN_RECV request sockets")
-Signed-off-by: Eric Dumazet <edumazet@google.com>
----
- net/ipv4/tcp_input.c | 12 +++++++++---
- 1 file changed, 9 insertions(+), 3 deletions(-)
-
-diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
-index 6f072095211efc9c3b3a561f67750ae454fd576b..57c8af1859c16eba5e952a23ea959b628006f9c1 100644
---- a/net/ipv4/tcp_input.c
-+++ b/net/ipv4/tcp_input.c
-@@ -3590,8 +3590,11 @@ static int tcp_ack_update_window(struct sock *sk, const struct sk_buff *skb, u32
- static bool __tcp_oow_rate_limited(struct net *net, int mib_idx,
- 				   u32 *last_oow_ack_time)
- {
--	if (*last_oow_ack_time) {
--		s32 elapsed = (s32)(tcp_jiffies32 - *last_oow_ack_time);
-+	/* Paired with the WRITE_ONCE() in this function. */
-+	u32 val = READ_ONCE(*last_oow_ack_time);
-+
-+	if (val) {
-+		s32 elapsed = (s32)(tcp_jiffies32 - val);
- 
- 		if (0 <= elapsed &&
- 		    elapsed < READ_ONCE(net->ipv4.sysctl_tcp_invalid_ratelimit)) {
-@@ -3600,7 +3603,10 @@ static bool __tcp_oow_rate_limited(struct net *net, int mib_idx,
- 		}
- 	}
- 
--	*last_oow_ack_time = tcp_jiffies32;
-+	/* Paired with the prior READ_ONCE() and with itself,
-+	 * as we might be lockless.
-+	 */
-+	WRITE_ONCE(*last_oow_ack_time, tcp_jiffies32);
- 
- 	return false;	/* not rate-limited: go ahead, send dupack now! */
- }
--- 
-2.41.0.255.g8b1d071c50-goog
-
+If you were to store a flag like this it would have to be generated per
+page.
 
