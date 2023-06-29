@@ -1,155 +1,245 @@
-Return-Path: <netdev+bounces-14555-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14556-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 130E1742583
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:16:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C0E3174258E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:17:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 445341C20A60
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:16:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F1B8F1C20432
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:17:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CF3014293;
-	Thu, 29 Jun 2023 12:16:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C407313AC2;
+	Thu, 29 Jun 2023 12:17:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6B6111AC
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:16:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 72C73BC
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:16:13 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688040972;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=xRtfZg4SPW/dfExfHKxyTm+z8to08LGorkhnQOIa1Ew=;
-	b=DcXCcey3hZQkbG7IOdhT4/gA367sqKMgOz7kmRT3lXwccO6FcRg1ZyjjL8FOcFsa1XDwhp
-	YUZNvWnJR+bpfUn4EH07EkBEGs4fgJCt53mjC0WgBUETTb/F2m8Q5J8NYi6l30NKssgIE5
-	fxQ5AjZNxUCJizzbVQfxdcFofdrsetk=
-Received: from mail-ej1-f70.google.com (mail-ej1-f70.google.com
- [209.85.218.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-191-jLIk2pK7Na24qdSBue6XxA-1; Thu, 29 Jun 2023 08:16:11 -0400
-X-MC-Unique: jLIk2pK7Na24qdSBue6XxA-1
-Received: by mail-ej1-f70.google.com with SMTP id a640c23a62f3a-98864f473c7so43278066b.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:16:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B856F14A9C
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:17:40 +0000 (UTC)
+Received: from mail-lj1-x236.google.com (mail-lj1-x236.google.com [IPv6:2a00:1450:4864:20::236])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C01201FD8
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:17:38 -0700 (PDT)
+Received: by mail-lj1-x236.google.com with SMTP id 38308e7fff4ca-2b69e6d324aso9047151fa.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:17:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688041057; x=1690633057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=aRgbl2vZs1dkdGZZQ9jbazn3qlA9otdxsn88YMN/JXU=;
+        b=XSBdmeumr27+esuy8pI61QQElLyAgnWXjH8DhOj7gr/8wpaS9ZHuVDNmFKXu9z5FSB
+         jbpS9NZW/BwB1L1O/7QzKG7AMsypj27ETu13jwewF5uS415ZxaNuoywj4I7iyclNgLSG
+         FJvFtkoa80WJAJ5sILJexmuOqSEm4IbyhzrvW3QORTz/3/H0FyAqq4bjpCRPkuYE9FJz
+         8JZ1DczbQPAeuBdi2bVepvMjhqWlpBxH6rn/PBY6IL0N9lN6DOV/pZBA06hi0MnwpqWp
+         Y3m0QlUPEDExWvbLQ9AAjC2PWYxIWlQgKE0ki4sD4bOsCfyoBwqqtBV9Jz8hFOMQnGQf
+         SXbg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688040970; x=1690632970;
-        h=content-transfer-encoding:mime-version:message-id:date:references
-         :in-reply-to:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1688041057; x=1690633057;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=xRtfZg4SPW/dfExfHKxyTm+z8to08LGorkhnQOIa1Ew=;
-        b=fU1qdEBGzqEfqJeoyQoEnT6GzPzdI7aSCKUC26lHnttdcAdpgW4rKNde75Jg9rHQrR
-         JZLmtwGMJ5TG7P1Nz5d2+m8JH51vlY8+vglgv2dwM4rZpATxin4xfG/v9+4ZRGj7aF/J
-         6mOmearA9MkrziuVGp8M6pK14OfYh/SMa1J9Hrchq8zl/tUO8W2FxIs/B0L9ehkOAa0z
-         czkgLAAxZO+pnQvKjGV7d43jkxmNWdxSKJeNorHtjGsNHn98jbA9wXMIk2Dm6kLwDMHf
-         medqrZC9DF/BSH46rQkZgc02eyXTi4GRdDT7uYSVSsJk5dj7xQTuOIyI7E/qr2jslPu3
-         ReJA==
-X-Gm-Message-State: AC+VfDwx8Fs9NQGL4fx3Se5i8vKK03XegOGD6MRP30bhXkiZcyQnlFlN
-	ZZxTh0G+/MThonMrNpqkLtKMz2PqeM/5vaNGfjIEBDfoer7YwYNO4l4EON5mPVxDSjpp7oC0mOK
-	hK0RkfA6iAuSkNwSs
-X-Received: by 2002:a17:907:7ba5:b0:982:9b01:a57c with SMTP id ne37-20020a1709077ba500b009829b01a57cmr35983868ejc.12.1688040970192;
-        Thu, 29 Jun 2023 05:16:10 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ440Dob8tg/t5hFb4HMywtZ2vhJhTJbVaJ/t/Vr2iJNg951ErahzdstJyCHl3lyIqlaAIFN+A==
-X-Received: by 2002:a17:907:7ba5:b0:982:9b01:a57c with SMTP id ne37-20020a1709077ba500b009829b01a57cmr35983845ejc.12.1688040969798;
-        Thu, 29 Jun 2023 05:16:09 -0700 (PDT)
-Received: from alrua-x1.borgediget.toke.dk ([45.145.92.2])
-        by smtp.gmail.com with ESMTPSA id qq2-20020a17090720c200b00992aea2c55dsm589147ejb.153.2023.06.29.05.16.08
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 05:16:09 -0700 (PDT)
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 940D2BC0450; Thu, 29 Jun 2023 14:16:08 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: Daniel Xu <dxu@dxuuu.xyz>, bpf@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
- coreteam@netfilter.org, netfilter-devel@vger.kernel.org, fw@strlen.de,
- daniel@iogearbox.net, dsahern@kernel.org
-Subject: Re: [PATCH bpf-next 0/7] Support defragmenting IPv(4|6) packets in BPF
-In-Reply-To: <20230627154439.GA18285@breakpoint.cc>
-References: <cover.1687819413.git.dxu@dxuuu.xyz> <874jmthtiu.fsf@toke.dk>
- <20230627154439.GA18285@breakpoint.cc>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Thu, 29 Jun 2023 14:16:08 +0200
-Message-ID: <87o7kyfoqf.fsf@toke.dk>
+        bh=aRgbl2vZs1dkdGZZQ9jbazn3qlA9otdxsn88YMN/JXU=;
+        b=GIhhJR2jUtRmrtbFp4PouU3r5EasL/H3BvqjntuQQRMYh34Rd6dqMxprH299nvLSnU
+         bR63L2RNpbP9xn9U3uHDEPsKdUDkD4DHHfQhoZ/Zd1IGp+a3B/HG6pPSG5NzsIjVXu7S
+         SekTIqvWdn9uWiHgJ0fAsfY4PxH+Y6uyRBy9t0OzhWE1XAT8zk5mJnTt98YPNpvRTKVv
+         5p4ge+387z2GWuVXeP0UNDW/6eHNuaivp7HfjUBFpozsRCq5+E9nbvrPPUCWLFnb+IEp
+         kPfxC4bORp3oSagm/wAfx38Jtt2ojt/AE6QMFAuNu/+M2l3lgVgJNESTqjqNviQC3qN0
+         YSMw==
+X-Gm-Message-State: ABy/qLYdHhKsGNyeVfNrFOTr5yAuY0k5x3r8u30bO8nPO9P4CnRdZNVG
+	WXSRa9LrSzJTf3VFeIJUDhSpMCt15HgTY8TCJ/XcT0D1yT4=
+X-Google-Smtp-Source: APBJJlHPBLdIqYYSE80yWDL8rxe9DEfugkreKK0VlY5MUuyYtUMLP097qBkRC7LHHky19LuHhdGRtCxmieIjvob6GCw=
+X-Received: by 2002:a05:651c:1054:b0:2b6:c8ba:90dc with SMTP id
+ x20-20020a05651c105400b002b6c8ba90dcmr1080579ljm.36.1688041056851; Thu, 29
+ Jun 2023 05:17:36 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+References: <20230628121150.47778-1-liangchen.linux@gmail.com> <5b81338a-f784-d73e-170c-d12af38692cb@huawei.com>
+In-Reply-To: <5b81338a-f784-d73e-170c-d12af38692cb@huawei.com>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Thu, 29 Jun 2023 20:17:23 +0800
+Message-ID: <CAKhg4tJkprS+dFcpLALP_e1kpHJ-DwabOMFaXxsPx+7O0c-geQ@mail.gmail.com>
+Subject: Re: [PATCH net-next] skbuff: Optimize SKB coalescing for page pool case
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: ilias.apalodimas@linaro.org, hawk@kernel.org, kuba@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Florian Westphal <fw@strlen.de> writes:
-
-> Toke H=C3=B8iland-J=C3=B8rgensen <toke@redhat.com> wrote:
->> > The basic idea is we bump a refcnt on the netfilter defrag module and
->> > then run the bpf prog after the defrag module runs. This allows bpf
->> > progs to transparently see full, reassembled packets. The nice thing
->> > about this is that progs don't have to carry around logic to detect
->> > fragments.
->>=20
->> One high-level comment after glancing through the series: Instead of
->> allocating a flag specifically for the defrag module, why not support
->> loading (and holding) arbitrary netfilter modules in the UAPI?
+On Thu, Jun 29, 2023 at 2:53=E2=80=AFPM Yunsheng Lin <linyunsheng@huawei.co=
+m> wrote:
 >
-> How would that work/look like?
+> On 2023/6/28 20:11, Liang Chen wrote:
+> > In order to address the issues encountered with commit 1effe8ca4e34
+> > ("skbuff: fix coalescing for page_pool fragment recycling"), the
+> > combination of the following condition was excluded from skb coalescing=
+:
+> >
+> > from->pp_recycle =3D 1
+> > from->cloned =3D 1
+> > to->pp_recycle =3D 1
+> >
+> > However, with page pool environments, the aforementioned combination ca=
+n
+> > be quite common. In scenarios with a higher number of small packets, it
+> > can significantly affect the success rate of coalescing. For example,
+> > when considering packets of 256 bytes size, our comparison of coalescin=
+g
+> > success rate is as follows:
 >
-> defrag (and conntrack) need special handling because loading these
-> modules has no effect on the datapath.
+> As skb_try_coalesce() only allow coaleascing when 'to' skb is not cloned.
 >
-> Traditionally, yes, loading was enough, but now with netns being
-> ubiquitous we don't want these to get enabled unless needed.
+> Could you give more detailed about the testing when we have a non-cloned
+> 'to' skb and a cloned 'from' skb? As both of them should be belong to the
+> same flow.
 >
-> Ignoring bpf, this happens when user adds nftables/iptables rules
-> that check for conntrack state, use some form of NAT or use e.g. tproxy.
+> I had the below patchset trying to do something similar as this patch doe=
+s:
+> https://lore.kernel.org/all/20211009093724.10539-5-linyunsheng@huawei.com=
+/
 >
-> For bpf a flag during link attachment seemed like the best way
-> to go.
-
-Right, I wasn't disputing that having a flag to load a module was a good
-idea. On the contrary, I was thinking we'd need many more of these
-if/when BPF wants to take advantage of more netfilter code. Say, if a
-BPF module wants to call into TPROXY, that module would also need go be
-loaded and kept around, no?
-
-I was thinking something along the lines of just having a field
-'netfilter_modules[]' where userspace could put an arbitrary number of
-module names into, and we'd load all of them and put a ref into the
-bpf_link. In principle, we could just have that be a string array of
-module names, but that's probably a bit cumbersome (and, well, building
-a generic module loader interface into the bpf_like API is not
-desirable either). But maybe with an explicit ENUM?
-
-> At the moment I only see two flags for this, namely
-> "need defrag" and "need conntrack".
+> It seems this patch is only trying to optimize a specific case for skb
+> coalescing, So if skb coalescing between non-cloned and cloned skb is a
+> common case, then it might worth optimizing.
 >
-> For conntrack, we MIGHT be able to not need a flag but
-> maybe verifier could "guess" based on kfuncs used.
 
-If the verifier can just identify the modules from the kfuncs and do the
-whole thing automatically, that would of course be even better from an
-ease-of-use PoV. Not sure what that would take, though? I seem to recall
-having discussions around these lines before that fell down on various
-points.
+Sure, Thanks for the information! The testing is just a common iperf
+test as below.
 
-> But for defrag, I don't think its good to add a dummy do-nothing
-> kfunc just for expressing the dependency on bpf prog side.
+iperf3 -c <server IP> -i 5 -f g -t 0 -l 128
 
-Agreed.
+We observed the frequency of each combination of the pp (page pool)
+and clone condition when entering skb_try_coalesce. The results
+motivated us to propose such an optimization, as we noticed that case
+11 (from pp/clone=3D1/1 and to pp/clone =3D 1/0) occurs quite often.
 
--Toke
++-------------+--------------+--------------+--------------+--------------+
+|   from/to   | pp/clone=3D0/0 | pp/clone=3D0/1 | pp/clone=3D1/0 | pp/clone=
+=3D1/1 |
++-------------+--------------+--------------+--------------+--------------+
+|pp/clone=3D0/0 | 0            | 1            | 2            | 3           =
+ |
+|pp/clone=3D0/1 | 4            | 5            | 6            | 7           =
+ |
+|pp/clone=3D1/0 | 8            | 9            | 10           | 11          =
+ |
+|pp/clone=3D1/1 | 12           | 13           | 14           | 15          =
+ |
+|+------------+--------------+--------------+--------------+--------------+
 
+
+packet size 128:
+total : 152903
+0 : 0            (0%)
+1 : 0            (0%)
+2 : 0            (0%)
+3 : 0            (0%)
+4 : 0            (0%)
+5 : 0            (0%)
+6 : 0            (0%)
+7 : 0            (0%)
+8 : 0            (0%)
+9 : 0            (0%)
+10 : 20681       (13%)
+11 : 90136       (58%)
+12 : 0           (0%)
+13 : 0           (0%)
+14 : 0           (0%)
+15 : 42086       (27%)
+
+Thanks,
+Liang
+
+
+>
+> >
+> > Without page pool: 70%
+> > With page pool: 13%
+> >
+>
+> ...
+>
+> > diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+> > index 126f9e294389..05e5d8ead63b 100644
+> > --- a/include/net/page_pool.h
+> > +++ b/include/net/page_pool.h
+> > @@ -399,4 +399,25 @@ static inline void page_pool_nid_changed(struct pa=
+ge_pool *pool, int new_nid)
+> >               page_pool_update_nid(pool, new_nid);
+> >  }
+> >
+> > +static inline bool page_pool_is_pp_page(struct page *page)
+> > +{
+> > +     return (page->pp_magic & ~0x3UL) =3D=3D PP_SIGNATURE;
+> > +}
+> > +
+> > +static inline bool page_pool_is_pp_page_frag(struct page *page)> +{
+> > +     return !!(page->pp->p.flags & PP_FLAG_PAGE_FRAG);
+> > +}
+> > +
+> > +static inline void page_pool_page_ref(struct page *page)
+> > +{
+> > +     struct page *head_page =3D compound_head(page);
+>
+> It seems we could avoid adding head_page here:
+> page =3D compound_head(page);
+>
+> > +
+> > +     if (page_pool_is_pp_page(head_page) &&
+> > +                     page_pool_is_pp_page_frag(head_page))
+> > +             atomic_long_inc(&head_page->pp_frag_count);
+> > +     else
+> > +             get_page(head_page);
+>
+> page_ref_inc() should be enough here instead of get_page()
+> as compound_head() have been called.
+>
+> > +}
+> > +
+> >  #endif /* _NET_PAGE_POOL_H */
+> > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > index 6c5915efbc17..9806b091f0f6 100644
+> > --- a/net/core/skbuff.c
+> > +++ b/net/core/skbuff.c
+> > @@ -5666,8 +5666,7 @@ bool skb_try_coalesce(struct sk_buff *to, struct =
+sk_buff *from,
+> >        * !@to->pp_recycle but its tricky (due to potential race with
+> >        * the clone disappearing) and rare, so not worth dealing with.
+> >        */
+> > -     if (to->pp_recycle !=3D from->pp_recycle ||
+> > -         (from->pp_recycle && skb_cloned(from)))
+> > +     if (to->pp_recycle !=3D from->pp_recycle)
+> >               return false;
+> >
+> >       if (len <=3D skb_tailroom(to)) {
+> > @@ -5724,8 +5723,12 @@ bool skb_try_coalesce(struct sk_buff *to, struct=
+ sk_buff *from,
+> >       /* if the skb is not cloned this does nothing
+> >        * since we set nr_frags to 0.
+> >        */
+> > -     for (i =3D 0; i < from_shinfo->nr_frags; i++)
+> > -             __skb_frag_ref(&from_shinfo->frags[i]);
+> > +     if (from->pp_recycle)
+> > +             for (i =3D 0; i < from_shinfo->nr_frags; i++)
+> > +                     page_pool_page_ref(skb_frag_page(&from_shinfo->fr=
+ags[i]));
+> > +     else
+> > +             for (i =3D 0; i < from_shinfo->nr_frags; i++)
+> > +                     __skb_frag_ref(&from_shinfo->frags[i]);
+> >
+> >       to->truesize +=3D delta;
+> >       to->len +=3D len;
+> >
 
