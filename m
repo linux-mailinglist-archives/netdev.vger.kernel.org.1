@@ -1,297 +1,137 @@
-Return-Path: <netdev+bounces-14511-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14510-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1F5CF74226F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:43:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BE0074226E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:42:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CFD24280CF1
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 08:43:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9AD1280D3B
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 08:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DB7CE5253;
-	Thu, 29 Jun 2023 08:42:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D7FFF5253;
+	Thu, 29 Jun 2023 08:42:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA58AA956
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 08:42:48 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 27BD83AB1;
-	Thu, 29 Jun 2023 01:42:47 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35SMgtsB010660;
-	Thu, 29 Jun 2023 01:42:33 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=8vh9drfoE//Wja2HZcHd6Lppah/54NtYMIzQIB/vdrg=;
- b=io1JIdS+knBhDDkPXAsi2pBis562b+5HTP6Tu4jDviezXZ6FWFniOyUYwYmhmX3vAO23
- 24YJ22qTz1WZgJ6sHtIDumpXWGmpPl/dwWWoDvUuHXZWMkxFzN9xkpX9iTzRLRb+pFXN
- xwlsmVcImR7LHMRI480kHclgaU6TcOZ/xK96HyTdInfDF4hTV4H58nEp89/K/rSx4rDX
- fpZGa+NKwX+qucQPF64J1hbz5V9q0dDjvx9vAAHMiSP5DrksP2kio/7TGVX/g3XNfoo3
- gMh4FseM0DLs/k7pghXv+x2CSuFqvjyUjbIbLa4ASlOMum3R6UMaEpbqKHv/UO97DV4E aQ== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rgcugnt74-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 29 Jun 2023 01:42:33 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 29 Jun
- 2023 01:42:31 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 29 Jun 2023 01:42:31 -0700
-Received: from setup-1.sclab.marvell.com (unknown [10.106.25.74])
-	by maili.marvell.com (Postfix) with ESMTP id 974A33F7041;
-	Thu, 29 Jun 2023 01:42:31 -0700 (PDT)
-From: Sathesh Edara <sedara@marvell.com>
-To: <linux-kernel@vger.kernel.org>, <sburla@marvell.com>, <vburru@marvell.com>,
-        <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <netdev@vger.kernel.org>, <hgani@marvell.com>
-CC: <sedara@marvell.com>
-Subject: [net-next PATCH] octeon_ep: Add control plane host and firmware versions.
-Date: Thu, 29 Jun 2023 01:42:27 -0700
-Message-ID: <20230629084227.98848-1-sedara@marvell.com>
-X-Mailer: git-send-email 2.37.3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6507184
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 08:42:42 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8BF59294E
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:42:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688028159;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Y7uH2v60++wlSFd3mdA5C25peNy3bqIH/P5Zip2EcJY=;
+	b=Alr/EKmhy79bwZ4O9Q7RJfYzqgYu7h5Af1xyuy8aVNI1RCX674wCfylb/e5nxm7S1sBPIf
+	M/+pIMQ5unn9KQ2tSpBxLCbCwazE8QO9w4nk70IJ25SSfoHh7EpKl0cbshZRZkbF9NBEt7
+	XFcJaXoUnBQBj9WFzQPWquMapAQXY5A=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-498-5HN0utTyNPSZVsfbJ0DDqA-1; Thu, 29 Jun 2023 04:42:38 -0400
+X-MC-Unique: 5HN0utTyNPSZVsfbJ0DDqA-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-313ecc94e23so41574f8f.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:42:37 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688028157; x=1690620157;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Y7uH2v60++wlSFd3mdA5C25peNy3bqIH/P5Zip2EcJY=;
+        b=RDoncShatadP3zKD3B31unQBUm7NJNzCk8HyjB/5evvOgahW6nLURS35YeyU3Eb8qM
+         DfU7rZDUPMOn0/w72PwIB0QIcX7vGbtvsgan/zba1dmudx1rWweSiD5wsVbHNObBbnTH
+         C5AOtTxpHzbiujFTCkSNS8+Uhr+36U0ug6eRdw+OaXniv5dV4ZNyDBYIHVmtv/EnptbR
+         xZG/APxmlhEI/zqgZqZTf3tiPVqFD88N1Pk4pIcbAVKyDfX60vJXsnFLVD/kaf139yxA
+         N7q2bgqoiN76+IXzqgOfeehLpa4VC6NNSkPMjYvm1y6OCgTejrvTEdqYn+9w6APBXwJC
+         GxzQ==
+X-Gm-Message-State: AC+VfDy6XFSTOaBZC625IKNPawKnmfYzPANNvea7HDv8NDivDaQh5+Fx
+	WwYRRNFasA8CU0l/D5f+UQR4JkNUyglybY3CLHLfcl0JK3U3WgpqUoviz0LsUwwjfHlpvn296Us
+	mcSx754uyfiqTXjMW
+X-Received: by 2002:a1c:ed17:0:b0:3f5:f543:d81f with SMTP id l23-20020a1ced17000000b003f5f543d81fmr38947298wmh.3.1688028157032;
+        Thu, 29 Jun 2023 01:42:37 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ6+iH2URekcBBIFaPW3s8y3AcFdwpt0qhkGkVRHNjX6kI62bNLzHfSyF8zFoO0Ym2TuJLWyPg==
+X-Received: by 2002:a1c:ed17:0:b0:3f5:f543:d81f with SMTP id l23-20020a1ced17000000b003f5f543d81fmr38947276wmh.3.1688028156751;
+        Thu, 29 Jun 2023 01:42:36 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-196.dyn.eolo.it. [146.241.231.196])
+        by smtp.gmail.com with ESMTPSA id r15-20020adfe68f000000b003111025ec67sm15279253wrm.25.2023.06.29.01.42.35
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 01:42:36 -0700 (PDT)
+Message-ID: <36c95dd6babb2202f70594d5dde13493af62dcad.camel@redhat.com>
+Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell on
+ receiving packets
+From: Paolo Abeni <pabeni@redhat.com>
+To: longli@linuxonhyperv.com, Jason Gunthorpe <jgg@ziepe.ca>, Leon
+ Romanovsky <leon@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>,
+ Dexuan Cui <decui@microsoft.com>, "K. Y. Srinivasan" <kys@microsoft.com>,
+ Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>
+Cc: linux-rdma@vger.kernel.org, linux-hyperv@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, Long Li
+	 <longli@microsoft.com>, stable@vger.kernel.org
+Date: Thu, 29 Jun 2023 10:42:34 +0200
+In-Reply-To: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
+References: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: GWmPjLIxuFyW1TjxQcq82WZnY1MgKkUT
-X-Proofpoint-ORIG-GUID: GWmPjLIxuFyW1TjxQcq82WZnY1MgKkUT
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-28_14,2023-06-27_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Implement control plane mailbox versions for host and firmware.
-Versions are published in info area of control mailbox bar4
-memory structure.Firmware will publish minimum and maximum
-supported versions.Host will validate itself against the
-firmware version range before using the control plane mailbox.
-Control plane mailbox apis will check for firmware version
-before sending any control commands to firmware.Notifications
-from firmware will similarly be checked for host version
-compatibility.
+On Mon, 2023-06-26 at 16:57 -0700, longli@linuxonhyperv.com wrote:
+> From: Long Li <longli@microsoft.com>
+>=20
+> It's inefficient to ring the doorbell page every time a WQE is posted to
+> the received queue. Excessive MMIO writes result in CPU spending more
+> time waiting on LOCK instructions (atomic operations), resulting in
+> poor scaling performance.
+>=20
+> Move the code for ringing doorbell page to where after we have posted all
+> WQEs to the receive queue during a callback from napi_poll().
+>=20
+> With this change, tests showed an improvement from 120G/s to 160G/s on a
+> 200G physical link, with 16 or 32 hardware queues.
+>=20
+> Tests showed no regression in network latency benchmarks on single
+> connection.
+>=20
+> While we are making changes in this code path, change the code for
+> ringing doorbell to set the WQE_COUNT to 0 for Receive Queue. The
+> hardware specification specifies that it should set to 0. Although
+> currently the hardware doesn't enforce the check, in the future releases
+> it may do.
+>=20
+> Cc: stable@vger.kernel.org
+> Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network=
+ Adapter (MANA)")
 
-Signed-off-by: Sathesh Edara <sedara@marvell.com>
----
- .../marvell/octeon_ep/octep_ctrl_mbox.c       |  9 ++++-
- .../marvell/octeon_ep/octep_ctrl_mbox.h       |  6 +++
- .../marvell/octeon_ep/octep_ctrl_net.c        | 39 ++++++++++++++++++-
- .../marvell/octeon_ep/octep_ctrl_net.h        | 16 ++++++++
- 4 files changed, 67 insertions(+), 3 deletions(-)
+Uhmmm... this looks like a performance improvement to me, more suitable
+for the net-next tree ?!? (Note that net-next is closed now).
 
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
-index 035ead7935c7..c46179b5de6f 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.c
-@@ -37,7 +37,9 @@
- 
- #define OCTEP_CTRL_MBOX_INFO_MAGIC_NUM(m)	(m)
- #define OCTEP_CTRL_MBOX_INFO_BARMEM_SZ(m)	((m) + 8)
-+#define OCTEP_CTRL_MBOX_INFO_HOST_VERSION(m)   ((m) + 16)
- #define OCTEP_CTRL_MBOX_INFO_HOST_STATUS(m)	((m) + 24)
-+#define OCTEP_CTRL_MBOX_INFO_FW_VERSION(m)     ((m) + 136)
- #define OCTEP_CTRL_MBOX_INFO_FW_STATUS(m)	((m) + 144)
- 
- #define OCTEP_CTRL_MBOX_H2FQ_INFO(m)	((m) + OCTEP_CTRL_MBOX_INFO_SZ)
-@@ -71,7 +73,7 @@ static u32 octep_ctrl_mbox_circq_depth(u32 pi, u32 ci, u32 sz)
- 
- int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
- {
--	u64 magic_num, status;
-+	u64 magic_num, status, fw_versions;
- 
- 	if (!mbox)
- 		return -EINVAL;
-@@ -93,6 +95,9 @@ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
- 		return -EINVAL;
- 	}
- 
-+	fw_versions = readq(OCTEP_CTRL_MBOX_INFO_FW_VERSION(mbox->barmem));
-+	mbox->min_fw_version = ((fw_versions & 0xffffffff00000000ull) >> 32);
-+	mbox->max_fw_version = (fw_versions & 0xffffffff);
- 	mbox->barmem_sz = readl(OCTEP_CTRL_MBOX_INFO_BARMEM_SZ(mbox->barmem));
- 
- 	writeq(OCTEP_CTRL_MBOX_STATUS_INIT,
-@@ -110,6 +115,7 @@ int octep_ctrl_mbox_init(struct octep_ctrl_mbox *mbox)
- 			  OCTEP_CTRL_MBOX_TOTAL_INFO_SZ +
- 			  mbox->h2fq.sz;
- 
-+	writeq(mbox->version, OCTEP_CTRL_MBOX_INFO_HOST_VERSION(mbox->barmem));
- 	/* ensure ready state is seen after everything is initialized */
- 	wmb();
- 	writeq(OCTEP_CTRL_MBOX_STATUS_READY,
-@@ -255,6 +261,7 @@ int octep_ctrl_mbox_uninit(struct octep_ctrl_mbox *mbox)
- 	if (!mbox->barmem)
- 		return -EINVAL;
- 
-+	writeq(0, OCTEP_CTRL_MBOX_INFO_HOST_VERSION(mbox->barmem));
- 	writeq(OCTEP_CTRL_MBOX_STATUS_INVALID,
- 	       OCTEP_CTRL_MBOX_INFO_HOST_STATUS(mbox->barmem));
- 	/* ensure uninit state is written before uninitialization */
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
-index 9c4ff0fba6a0..7f8135788efc 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_mbox.h
-@@ -121,6 +121,8 @@ struct octep_ctrl_mbox_q {
- };
- 
- struct octep_ctrl_mbox {
-+	/* control plane version */
-+	u64 version;
- 	/* size of bar memory */
- 	u32 barmem_sz;
- 	/* pointer to BAR memory */
-@@ -133,6 +135,10 @@ struct octep_ctrl_mbox {
- 	struct mutex h2fq_lock;
- 	/* lock for f2hq */
- 	struct mutex f2hq_lock;
-+	/* Min control plane version supported by firmware */
-+	u32 min_fw_version;
-+	/* Max control plane version supported by firmware */
-+	u32 max_fw_version;
- };
- 
- /* Initialize control mbox.
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-index 1cc6af2feb38..ee5ea4d2bda1 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.c
-@@ -14,6 +14,9 @@
- #include "octep_main.h"
- #include "octep_ctrl_net.h"
- 
-+/* Control plane version */
-+#define OCTEP_CP_VERSION_CURRENT	OCTEP_CP_VERSION(1, 0, 0)
-+
- static const u32 req_hdr_sz = sizeof(union octep_ctrl_net_req_hdr);
- static const u32 mtu_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_mtu);
- static const u32 mac_sz = sizeof(struct octep_ctrl_net_h2f_req_cmd_mac);
-@@ -41,7 +44,13 @@ static int octep_send_mbox_req(struct octep_device *oct,
- 			       struct octep_ctrl_net_wait_data *d,
- 			       bool wait_for_response)
- {
--	int err, ret;
-+	int err, ret, cmd;
-+
-+	/* check if firmware is compatible for this request */
-+	cmd = d->data.req.hdr.s.cmd;
-+	if (octep_ctrl_net_h2f_cmd_versions[cmd] > oct->ctrl_mbox.max_fw_version ||
-+	    octep_ctrl_net_h2f_cmd_versions[cmd] < oct->ctrl_mbox.min_fw_version)
-+		return -EOPNOTSUPP;
- 
- 	err = octep_ctrl_mbox_send(&oct->ctrl_mbox, &d->msg);
- 	if (err < 0)
-@@ -73,6 +82,14 @@ static int octep_send_mbox_req(struct octep_device *oct,
- 	return 0;
- }
- 
-+static int validate_fw_version(struct octep_ctrl_mbox *ctrl_mbox)
-+{
-+	if (ctrl_mbox->version < ctrl_mbox->min_fw_version ||
-+	    ctrl_mbox->version > ctrl_mbox->max_fw_version)
-+		return -EINVAL;
-+	return 0;
-+}
-+
- int octep_ctrl_net_init(struct octep_device *oct)
- {
- 	struct octep_ctrl_mbox *ctrl_mbox;
-@@ -84,12 +101,22 @@ int octep_ctrl_net_init(struct octep_device *oct)
- 
- 	/* Initialize control mbox */
- 	ctrl_mbox = &oct->ctrl_mbox;
-+	ctrl_mbox->version = OCTEP_CP_VERSION_CURRENT;
- 	ctrl_mbox->barmem = CFG_GET_CTRL_MBOX_MEM_ADDR(oct->conf);
- 	ret = octep_ctrl_mbox_init(ctrl_mbox);
- 	if (ret) {
- 		dev_err(&pdev->dev, "Failed to initialize control mbox\n");
- 		return ret;
- 	}
-+	dev_info(&pdev->dev, "Control plane versions host: %llx, firmware: %x:%x\n",
-+		 ctrl_mbox->version, ctrl_mbox->min_fw_version,
-+		 ctrl_mbox->max_fw_version);
-+	ret = validate_fw_version(ctrl_mbox);
-+	if (ret < 0) {
-+		dev_err(&pdev->dev, "Control plane version mismatch\n");
-+		octep_ctrl_mbox_uninit(ctrl_mbox);
-+		return -EINVAL;
-+	}
- 	oct->ctrl_mbox_ifstats_offset = ctrl_mbox->barmem_sz;
- 
- 	return 0;
-@@ -273,9 +300,17 @@ static int process_mbox_notify(struct octep_device *oct,
- {
- 	struct net_device *netdev = oct->netdev;
- 	struct octep_ctrl_net_f2h_req *req;
-+	int cmd;
- 
- 	req = (struct octep_ctrl_net_f2h_req *)msg->sg_list[0].msg;
--	switch (req->hdr.s.cmd) {
-+	cmd = req->hdr.s.cmd;
-+
-+	/* check if we support this command */
-+	if (octep_ctrl_net_f2h_cmd_versions[cmd] > OCTEP_CP_VERSION_CURRENT ||
-+	    octep_ctrl_net_f2h_cmd_versions[cmd] < OCTEP_CP_VERSION_CURRENT)
-+		return -EOPNOTSUPP;
-+
-+	switch (cmd) {
- 	case OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS:
- 		if (netif_running(netdev)) {
- 			if (req->link.state) {
-diff --git a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-index 37880dd79116..dd4f055fa8da 100644
---- a/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-+++ b/drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-@@ -7,6 +7,8 @@
- #ifndef __OCTEP_CTRL_NET_H__
- #define __OCTEP_CTRL_NET_H__
- 
-+#include "octep_cp_version.h"
-+
- #define OCTEP_CTRL_NET_INVALID_VFID	(-1)
- 
- /* Supported commands */
-@@ -39,12 +41,26 @@ enum octep_ctrl_net_h2f_cmd {
- 	OCTEP_CTRL_NET_H2F_CMD_LINK_STATUS,
- 	OCTEP_CTRL_NET_H2F_CMD_RX_STATE,
- 	OCTEP_CTRL_NET_H2F_CMD_LINK_INFO,
-+	OCTEP_CTRL_NET_H2F_CMD_MAX
-+};
-+
-+/* Control plane version in which OCTEP_CTRL_NET_H2F_CMD was added */
-+static const u32 octep_ctrl_net_h2f_cmd_versions[OCTEP_CTRL_NET_H2F_CMD_MAX] = {
-+	[OCTEP_CTRL_NET_H2F_CMD_INVALID ... OCTEP_CTRL_NET_H2F_CMD_LINK_INFO] =
-+	 OCTEP_CP_VERSION(1, 0, 0)
- };
- 
- /* Supported fw to host commands */
- enum octep_ctrl_net_f2h_cmd {
- 	OCTEP_CTRL_NET_F2H_CMD_INVALID = 0,
- 	OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS,
-+	OCTEP_CTRL_NET_F2H_CMD_MAX
-+};
-+
-+/* Control plane version in which OCTEP_CTRL_NET_F2H_CMD was added */
-+static const u32 octep_ctrl_net_f2h_cmd_versions[OCTEP_CTRL_NET_F2H_CMD_MAX] = {
-+	[OCTEP_CTRL_NET_F2H_CMD_INVALID ... OCTEP_CTRL_NET_F2H_CMD_LINK_STATUS] =
-+	 OCTEP_CP_VERSION(1, 0, 0)
- };
- 
- union octep_ctrl_net_req_hdr {
--- 
-2.37.3
+In any case you must avoid empty lines in the tag area.
+
+If you really intend targeting the -net tree, please repost fixing the
+above and explicitly specifying the target tree in the subj prefix.
+
+thanks!
+
+Paolo
 
 
