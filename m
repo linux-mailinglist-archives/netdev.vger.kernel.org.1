@@ -1,164 +1,106 @@
-Return-Path: <netdev+bounces-14484-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id DAF37741ECE
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:42:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98BC0741EE4
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:50:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 99A971C20930
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:42:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CA0B31C20481
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:50:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D58B1FAE;
-	Thu, 29 Jun 2023 03:42:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E8C275233;
+	Thu, 29 Jun 2023 03:49:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 582CC1FAD;
-	Thu, 29 Jun 2023 03:42:46 +0000 (UTC)
-Received: from mail-lj1-x229.google.com (mail-lj1-x229.google.com [IPv6:2a00:1450:4864:20::229])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 552312728;
-	Wed, 28 Jun 2023 20:42:44 -0700 (PDT)
-Received: by mail-lj1-x229.google.com with SMTP id 38308e7fff4ca-2b6a084a34cso2881171fa.1;
-        Wed, 28 Jun 2023 20:42:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688010162; x=1690602162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wr149jZoNPWXuN3QHy5A1rvPR4vA8OIAR36UxjCf/SA=;
-        b=rwSqMVC8T5Rx1SRIA3yNto/INYUm6JZvH+MR2NTn3iYgnmO2idbdBrZTPXjC9eAQRk
-         NwKLWhQ3HmWcJTnKqnhkRYWlJfAbzVnSX5aL5rarctM1LxX6XjHMoveXJ1tVZqRUVCZz
-         j/EM+oc/QWq5MwD+NRtTCm0mm2KqPKReEV+aX7gt+riaLM1R+5pGchjKTGaqEvfZPwRL
-         tDr/qojRO/wp4dt55E6ZorMn5oImdLLQ2hmyS1sjcH9kbgS+QqQ/820n3vvNDlYpLcaS
-         +6AzDw5nFWt0majLak73aaIaOhHvMpZQ4E2qkIHTRnsHftsxjEMgnBpcgdZP6Q1U6ZQr
-         Gzww==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688010162; x=1690602162;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wr149jZoNPWXuN3QHy5A1rvPR4vA8OIAR36UxjCf/SA=;
-        b=JBfFKKVgAOQyL8eRsKLYUj94ZZuUiagjWbUtICeqBp/G6GmHCceizDKe9OogcrGAYZ
-         AA7PdtrCnVJ7GlE7pw0LO6dtOrqmhQVAcJoKt6+Qwgex30WhROlgeG/u/SPnqyd1uu0D
-         PjYP7qTzD4LWkxC8eZwPZslpUwF50tLV/cst5uRmyaRD/10LThtPd4o4dEeMqXmVbLg3
-         AROJSJlAwM+fTsU95tBFP8AvTe0g1j/y6IYj/8hDUr2cJjz6j6HhzFZvaBylnRdnvurz
-         3hQno10VX/2hzfyxtXZiqZTqrfLAfVWymGDV3NkzFdiOxwHDP3VWANazqHBEoR5zjyUh
-         AQ5Q==
-X-Gm-Message-State: AC+VfDyhbuaWkm3ODisa0JR7DhGXdVstq9f/Jx8/sNA91P6I9E/WqBx4
-	z1oCJFCcDHF52IVQw4yVG2WFaoQ/bJY7i0qdVxA=
-X-Google-Smtp-Source: ACHHUZ75OV1yg39k+UNCOrVGppDdjMiIKg9L95G0FO/zmcjy6aEDejVpRZNUf6xxTI9Ie721nq7UOLqJqfdqbuJ1crA=
-X-Received: by 2002:a2e:b602:0:b0:2b5:7f93:b3ae with SMTP id
- r2-20020a2eb602000000b002b57f93b3aemr17941211ljn.38.1688010162270; Wed, 28
- Jun 2023 20:42:42 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D92AC5225
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:49:27 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C1E6F272D;
+	Wed, 28 Jun 2023 20:49:25 -0700 (PDT)
+Received: from pps.filterd (m0279866.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35T3e9ox003236;
+	Thu, 29 Jun 2023 03:49:07 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=qcppdkim1;
+ bh=QNEB0DBltSLS10Mp5KhryDGdmT/xI1ynZUs/jysRrQk=;
+ b=jD0zOlrlfghslqLU+8esTioSUdwOzdueDUePz8YMAh57FpoeK7br47gCHeYkEogT5SwN
+ hAghNwr3P4K4zpKPQHOsIdcUKf6HTGoXy8n4B6HP7Y1LlPtRKDbhYKNpa9vfxVHPsaJ1
+ wzP7lLSLE9QFpl/muGWnTVzuB+zonQ6S2PD8XmxCyRLqIcjghKmv9c4AJXKXDseyIbVv
+ 6eAS8mc65c7Sxm6CBqGSW1KHK1ByFtLNAsKTJnrNugHaXBFzHjC+HqXDeldQycw2UfmT
+ EInZQvUfW7iTJ9Bj9JTXOg2QDChNZ4dXL+wbup+bO5kczPAkABlSwhw0qnlXVUCbb6tI eg== 
+Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rgfp3tc0t-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Jun 2023 03:49:07 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 35T3n6wQ021634
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Jun 2023 03:49:06 GMT
+Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
+ nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.986.42; Wed, 28 Jun 2023 20:49:03 -0700
+From: Luo Jie <quic_luoj@quicinc.com>
+To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <linux@armlinux.org.uk>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+        <quic_sricharan@quicinc.com>, Luo Jie <quic_luoj@quicinc.com>
+Subject: [PATCH 0/3] net: phy: at803x: support qca8081 1G version chip
+Date: Thu, 29 Jun 2023 11:48:43 +0800
+Message-ID: <20230629034846.30600-1-quic_luoj@quicinc.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
- <20230628015634.33193-13-alexei.starovoitov@gmail.com> <57ceda87-e882-54b0-057a-2767c4395122@huaweicloud.com>
-In-Reply-To: <57ceda87-e882-54b0-057a-2767c4395122@huaweicloud.com>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 28 Jun 2023 20:42:31 -0700
-Message-ID: <CAADnVQ+V_SiZynZfGMWjSqkKb+8xggvBUmy7oTFUcvGq_2CcLg@mail.gmail.com>
-Subject: Re: [PATCH v3 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
- similar to kfree_rcu().
-To: Hou Tao <houtao@huaweicloud.com>
-Cc: Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Kernel Team <kernel-team@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>, 
-	"Paul E. McKenney" <paulmck@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: dKDfZuQcpqdeSMEHxqnn1vKM47qirvvY
+X-Proofpoint-ORIG-GUID: dKDfZuQcpqdeSMEHxqnn1vKM47qirvvY
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-28_14,2023-06-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=545
+ clxscore=1011 suspectscore=0 bulkscore=0 malwarescore=0 impostorscore=0
+ phishscore=0 lowpriorityscore=0 priorityscore=1501 mlxscore=0 spamscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306290032
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 28, 2023 at 7:24=E2=80=AFPM Hou Tao <houtao@huaweicloud.com> wr=
-ote:
->
-> Hi,
->
-> On 6/28/2023 9:56 AM, Alexei Starovoitov wrote:
-> > From: Alexei Starovoitov <ast@kernel.org>
-> >
-> > Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
-> > Unlike bpf_mem_[cache_]free() that links objects for immediate reuse in=
-to
-> > per-cpu free list the _rcu() flavor waits for RCU grace period and then=
- moves
-> > objects into free_by_rcu_ttrace list where they are waiting for RCU
-> > task trace grace period to be freed into slab.
-> >
-> > The life cycle of objects:
-> > alloc: dequeue free_llist
-> > free: enqeueu free_llist
-> > free_rcu: enqueue free_by_rcu -> waiting_for_gp
-> > free_llist above high watermark -> free_by_rcu_ttrace
-> > after RCU GP waiting_for_gp -> free_by_rcu_ttrace
-> > free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
-> >
-> > Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-> SNIP
-> >
-> > +static void __free_by_rcu(struct rcu_head *head)
-> > +{
-> > +     struct bpf_mem_cache *c =3D container_of(head, struct bpf_mem_cac=
-he, rcu);
-> > +     struct bpf_mem_cache *tgt =3D c->tgt;
-> > +     struct llist_node *llnode;
-> > +
-> > +     llnode =3D llist_del_all(&c->waiting_for_gp);
-> > +     if (!llnode)
-> > +             goto out;
-> > +
-> > +     llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu=
-_ttrace);
-> > +
-> > +     /* Objects went through regular RCU GP. Send them to RCU tasks tr=
-ace */
-> > +     do_call_rcu_ttrace(tgt);
->
-> I still got report about leaked free_by_rcu_ttrace without adding any
-> extra hack except using bpf_mem_cache_free_rcu() in htab.
+This patch series add supporting qca8081 1G version chip, the 1G version
+chip can be identified by the register mmd7.0x901d bit0.
 
-Please share the steps to repro.
+In addition, qca8081 does not support 1000BaseX mode and the fifo reset
+is added on the link changed, which assert the fifo on the link down,
+deassert the fifo on the link up.
 
-> When bpf ma is freed through free_mem_alloc(), the following sequence
-> may lead to leak of free_by_rcu_ttrace:
->
-> P1: bpf_mem_alloc_destroy()
->     P2: __free_by_rcu()
->
->     // got false
->     P2: read c->draining
->
-> P1: c->draining =3D true
-> P1: llist_del_all(&c->free_by_rcu_ttrace)
->
->     // add to free_by_rcu_ttrace again
->     P2: llist_add_batch(..., &tgt->free_by_rcu_ttrace)
->         P2: do_call_rcu_ttrace()
->             // call_rcu_ttrace_in_progress is 1, so xchg return 1
->             // and it doesn't being moved to waiting_for_gp_ttrace
->             P2: atomic_xchg(&c->call_rcu_ttrace_in_progress, 1)
->
-> // got 1
-> P1: atomic_read(&c->call_rcu_ttrace_in_progress)
-> // objects in free_by_rcu_ttrace is leaked
->
-> I think the race could be fixed by checking c->draining in
-> do_call_rcu_ttrace() when atomic_xchg() returns 1 as shown below:
+Luo Jie (3):
+  net: phy: at803x: support qca8081 1G chip type
+  net: phy: at803x: remove 1000BaseX mode of qca8081
+  net: phy: at803x: add qca8081 fifo reset on the link down
 
-If the theory of the bug holds true then the fix makes sense,
-but did you repro without fix and cannot repro with the fix?
-We should not add extra code based on a hunch.
+ drivers/net/phy/at803x.c | 79 +++++++++++++++++++++++++++++-----------
+ 1 file changed, 58 insertions(+), 21 deletions(-)
+
+
+base-commit: ae230642190a51b85656d6da2df744d534d59544
+-- 
+2.17.1
+
 
