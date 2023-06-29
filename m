@@ -1,164 +1,109 @@
-Return-Path: <netdev+bounces-14574-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14575-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9C714742756
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 15:26:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3AC8A742761
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 15:28:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 67D501C2029F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 13:26:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A9601C20A1A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 13:28:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E624107A6;
-	Thu, 29 Jun 2023 13:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F8CF107AE;
+	Thu, 29 Jun 2023 13:28:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3F29E11192
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 13:26:40 +0000 (UTC)
-Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B098C2D4A;
-	Thu, 29 Jun 2023 06:26:39 -0700 (PDT)
-Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35TDGKLk015851;
-	Thu, 29 Jun 2023 13:26:18 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
- from : to : cc : date : in-reply-to : references : content-type :
- content-transfer-encoding : mime-version; s=pp1;
- bh=QsIE4YvZg+MuKCPLsytxLGBxlXmOrHMoeFDnva0uOEY=;
- b=ELtgLYVfVrWbrHzSUpHP46dmIfUtiIsPOaTfZ/v7RTnGLVViRBe7AZdaRf7qpZiKh19m
- jSbKFimF+R3TTmfzEzM/47DqzdwRKqHtQYEJP3m1fKltkkfPq0SzDFRTM0gAmBvVPjo7
- G21LYQPfzbhqtCmb6VpNBPV+Y3/fcVykD99woxFt74d0fTbnYKfdVVpvZJHshPLA6wMq
- PCDo7akSZcg9x8PYqPv3Aze2NC4jdGf5ZMvBz4D1MgCrhrIowYqmA9F94lAIEbiHUz+q
- a3/j1AHSLhflgYNardOulyKefteNmn1Asu0xJBAKd4A2Ll240unw1VC8domCzeK9tsp1 aw== 
-Received: from pps.reinject (localhost [127.0.0.1])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rhapqr7mj-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Jun 2023 13:26:18 +0000
-Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
-	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35TDGZfU017050;
-	Thu, 29 Jun 2023 13:26:17 GMT
-Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
-	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rhapqr7kn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Jun 2023 13:26:17 +0000
-Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
-	by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35T3p0UE004735;
-	Thu, 29 Jun 2023 13:26:15 GMT
-Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
-	by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rdr453c1u-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Jun 2023 13:26:15 +0000
-Received: from smtpav01.fra02v.mail.ibm.com (smtpav01.fra02v.mail.ibm.com [10.20.54.100])
-	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35TDQDxd41484622
-	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Thu, 29 Jun 2023 13:26:13 GMT
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 087F32004B;
-	Thu, 29 Jun 2023 13:26:13 +0000 (GMT)
-Received: from smtpav01.fra02v.mail.ibm.com (unknown [127.0.0.1])
-	by IMSVA (Postfix) with ESMTP id 09C7720040;
-	Thu, 29 Jun 2023 13:26:12 +0000 (GMT)
-Received: from [9.171.48.121] (unknown [9.171.48.121])
-	by smtpav01.fra02v.mail.ibm.com (Postfix) with ESMTP;
-	Thu, 29 Jun 2023 13:26:11 +0000 (GMT)
-Message-ID: <cf4f1ec3873b6c4b92ddb347d5bd3c2e2f03bf00.camel@linux.ibm.com>
-Subject: Re: [PATCH v5 00/44] treewide: Remove I/O port accessors for
- HAS_IOPORT=n
-From: Niklas Schnelle <schnelle@linux.ibm.com>
-To: Arnd Bergmann <arnd@arndb.de>, Richard Cochran
- <richardcochran@gmail.com>,
-        Heiko Carstens <hca@linux.ibm.com>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-        Bjorn Helgaas
- <bhelgaas@google.com>,
-        Uwe =?ISO-8859-1?Q?Kleine-K=F6nig?=
- <u.kleine-koenig@pengutronix.de>,
-        Mauro Carvalho Chehab
- <mchehab@kernel.org>,
-        Alan Stern <stern@rowland.harvard.edu>,
-        "Rafael J .
- Wysocki" <rafael@kernel.org>,
-        Geert Uytterhoeven <geert@linux-m68k.org>,
-        Paul Walmsley <paul.walmsley@sifive.com>,
-        Palmer Dabbelt
- <palmer@dabbelt.com>,
-        Albert Ou <aou@eecs.berkeley.edu>, linux-kernel@vger.kernel.org,
-        Linux-Arch <linux-arch@vger.kernel.org>, linux-pci@vger.kernel.org,
-        Netdev <netdev@vger.kernel.org>
-Date: Thu, 29 Jun 2023 15:26:11 +0200
-In-Reply-To: <de4fe7d1-a0ae-40eb-a9d4-434802083e70@app.fastmail.com>
-References: <20230522105049.1467313-1-schnelle@linux.ibm.com>
-	 <7b5c40f3-d25b-4082-807d-4d75dc38886d@app.fastmail.com>
-	 <43a1f34a6b1c5a14519f3967dff5eb42e82ee88d.camel@linux.ibm.com>
-	 <de4fe7d1-a0ae-40eb-a9d4-434802083e70@app.fastmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.3 (3.48.3-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5294E11C83
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 13:28:06 +0000 (UTC)
+Received: from eu-smtp-delivery-151.mimecast.com (eu-smtp-delivery-151.mimecast.com [185.58.85.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8556630F7
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 06:28:04 -0700 (PDT)
+Received: from AcuMS.aculab.com (156.67.243.121 [156.67.243.121]) by
+ relay.mimecast.com with ESMTP with both STARTTLS and AUTH (version=TLSv1.2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_CBC_SHA384) id
+ uk-mta-146-72SqaBN2NJKYGBr_JEE1Lg-1; Thu, 29 Jun 2023 14:28:02 +0100
+X-MC-Unique: 72SqaBN2NJKYGBr_JEE1Lg-1
+Received: from AcuMS.Aculab.com (10.202.163.4) by AcuMS.aculab.com
+ (10.202.163.4) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 29 Jun
+ 2023 14:28:00 +0100
+Received: from AcuMS.Aculab.com ([::1]) by AcuMS.aculab.com ([::1]) with mapi
+ id 15.00.1497.048; Thu, 29 Jun 2023 14:28:00 +0100
+From: David Laight <David.Laight@ACULAB.COM>
+To: 'Ping-Ke Shih' <pkshih@realtek.com>, You Kangren <youkangren@vivo.com>,
+	Johannes Berg <johannes@sipsolutions.net>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, "open list:MAC80211"
+	<linux-wireless@vger.kernel.org>, "open list:NETWORKING [GENERAL]"
+	<netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+CC: "opensource.kernel@vivo.com" <opensource.kernel@vivo.com>
+Subject: =?utf-8?B?UkU6IFtQQVRDSF0gd2lmae+8mm1hYzgwMjExOiBSZXBsYWNlIHRoZSB0ZXJu?=
+ =?utf-8?Q?ary_conditional_operator_with_max()?=
+Thread-Topic: =?utf-8?B?W1BBVENIXSB3aWZp77yabWFjODAyMTE6IFJlcGxhY2UgdGhlIHRlcm5hcnkg?=
+ =?utf-8?Q?conditional_operator_with_max()?=
+Thread-Index: AQHZqBvNKITprNb9K06+yWJl2zb8J6+fcjiAgAJYBtA=
+Date: Thu, 29 Jun 2023 13:28:00 +0000
+Message-ID: <9ea9d91e8ec94edda19bd57e835e0a79@AcuMS.aculab.com>
+References: <20230626104829.1896-1-youkangren@vivo.com>
+ <9e4e3bf85ed945e7b0c8d5d389065670@realtek.com>
+In-Reply-To: <9e4e3bf85ed945e7b0c8d5d389065670@realtek.com>
+Accept-Language: en-GB, en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-exchange-transport-fromentityheader: Hosted
+x-originating-ip: [10.202.205.107]
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-TM-AS-GCONF: 00
-X-Proofpoint-ORIG-GUID: BxIZCkNvLWM-htSxEtD_VuqrJkpEhI2T
-X-Proofpoint-GUID: ukF1eiTpCrqXSEgzF4YcIcJY7PrWlXJe
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-29_03,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 mlxlogscore=999
- impostorscore=0 phishscore=0 malwarescore=0 bulkscore=0 lowpriorityscore=0
- mlxscore=0 suspectscore=0 priorityscore=1501 spamscore=0 adultscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306290117
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: aculab.com
+Content-Language: en-US
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: base64
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, 2023-06-27 at 14:53 +0200, Arnd Bergmann wrote:
-> On Tue, Jun 27, 2023, at 11:12, Niklas Schnelle wrote:
-> > On Mon, 2023-05-22 at 13:29 +0200, Arnd Bergmann wrote:
-> > >=20
-> > > Maybe let's give it another week to have more maintainers pick
-> > > up stuff from v5, and then send out a v6 as separate submissions.
-> > >=20
-> > >     Arnd
-> >=20
-> > Hi Arnd and All,
-> >=20
-> > I'm sorry there hasn't been an updated in a long time and we're missing
-> > v6.5. I've been quite busy with other work and life. Speaking of, I
-> > will be mostly out for around a month starting some time mid to end
-> > July as, if all goes well, I'm expecting to become a dad. That said, I
-> > haven't forgotten about this and your overall plan of sending per-
-> > subsystem patches sounds good, just haven't had the time to also
-> > incorporate the feedback.
->=20
-> Ok, thanks for letting us know. I just checked to see that about half
-> of your series has already made it into linux-next and is likely to
-> be part of v6.5 or already in v6.4.
->=20
-> Maybe you can start out by taking a pass at just resending the ones
-> that don't need any changes and can just get picked up after -rc1,
-> and then I'll try to have a look at whatever remains after that.
->=20
->     Arnd
+RnJvbTogUGluZy1LZSBTaGloDQo+IFNlbnQ6IDI4IEp1bmUgMjAyMyAwMjo0OQ0KPiANCj4gPiAt
+LS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiA+IEZyb206IFlvdSBLYW5ncmVuIDx5b3VrYW5n
+cmVuQHZpdm8uY29tPg0KPiA+IFNlbnQ6IE1vbmRheSwgSnVuZSAyNiwgMjAyMyA2OjQ4IFBNDQo+
+ID4gVG86IEpvaGFubmVzIEJlcmcgPGpvaGFubmVzQHNpcHNvbHV0aW9ucy5uZXQ+OyBEYXZpZCBT
+LiBNaWxsZXIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+OyBFcmljIER1bWF6ZXQNCj4gPiA8ZWR1bWF6
+ZXRAZ29vZ2xlLmNvbT47IEpha3ViIEtpY2luc2tpIDxrdWJhQGtlcm5lbC5vcmc+OyBQYW9sbyBB
+YmVuaSA8cGFiZW5pQHJlZGhhdC5jb20+OyBvcGVuDQo+ID4gbGlzdDpNQUM4MDIxMSA8bGludXgt
+d2lyZWxlc3NAdmdlci5rZXJuZWwub3JnPjsgb3BlbiBsaXN0Ok5FVFdPUktJTkcgW0dFTkVSQUxd
+DQo+IDxuZXRkZXZAdmdlci5rZXJuZWwub3JnPjsNCj4gPiBvcGVuIGxpc3QgPGxpbnV4LWtlcm5l
+bEB2Z2VyLmtlcm5lbC5vcmc+DQo+ID4gQ2M6IG9wZW5zb3VyY2Uua2VybmVsQHZpdm8uY29tOyB5
+b3VrYW5ncmVuQHZpdm8uY29tDQo+ID4gU3ViamVjdDogW1BBVENIXSB3aWZp77yabWFjODAyMTE6
+IFJlcGxhY2UgdGhlIHRlcm5hcnkgY29uZGl0aW9uYWwgb3BlcmF0b3Igd2l0aCBtYXgoKQ0KPiAN
+Cj4gVGhlIHNlbWljb2xvbiBvZiAid2lmae+8miIgaXMgZGlmZmVyZW50IGZyb20gb3RoZXJzLg0K
+PiANCj4gPg0KPiA+IFJlcGxhY2UgdGhlIHRlcm5hcnkgY29uZGl0aW9uYWwgb3BlcmF0b3Igd2l0
+aCBtYXgoKSB0byBtYWtlIHRoZSBjb2RlIGNsZWFuDQo+ID4NCj4gPiBTaWduZWQtb2ZmLWJ5OiBZ
+b3UgS2FuZ3JlbiA8eW91a2FuZ3JlbkB2aXZvLmNvbT4NCj4gPiAtLS0NCj4gPiAgbmV0L21hYzgw
+MjExL3RkbHMuYyB8IDIgKy0NCj4gPiAgMSBmaWxlIGNoYW5nZWQsIDEgaW5zZXJ0aW9uKCspLCAx
+IGRlbGV0aW9uKC0pDQo+ID4NCj4gPiBkaWZmIC0tZ2l0IGEvbmV0L21hYzgwMjExL3RkbHMuYyBi
+L25ldC9tYWM4MDIxMS90ZGxzLmMNCj4gPiBpbmRleCBhNGFmM2I3Njc1ZWYuLjlmOGIwODQyYTYx
+NiAxMDA2NDQNCj4gPiAtLS0gYS9uZXQvbWFjODAyMTEvdGRscy5jDQo+ID4gKysrIGIvbmV0L21h
+YzgwMjExL3RkbHMuYw0KPiA+IEBAIC05NDYsNyArOTQ2LDcgQEAgaWVlZTgwMjExX3RkbHNfYnVp
+bGRfbWdtdF9wYWNrZXRfZGF0YShzdHJ1Y3QgaWVlZTgwMjExX3N1Yl9pZl9kYXRhICpzZGF0YSwN
+Cj4gPiAgICAgICAgIGludCByZXQ7DQo+ID4gICAgICAgICBzdHJ1Y3QgaWVlZTgwMjExX2xpbmtf
+ZGF0YSAqbGluazsNCj4gPg0KPiA+IC0gICAgICAgbGlua19pZCA9IGxpbmtfaWQgPj0gMCA/IGxp
+bmtfaWQgOiAwOw0KPiA+ICsgICAgICAgbGlua19pZCA9IG1heChsaW5rX2lkLCAwKTsNCj4gDQo+
+IE9yaWdpbmFsIGxvZ2ljIG1lYW5zICJpZiBsaW5rX2lkIDwgMCwgdGhlbiB1c2UgZGVmYXVsdCBs
+aW5rICgwKSIgaW5zdGVhZCBvZg0KPiAiYWx3YXlzIHVzZSBsaW5rX2lkIGxhcmdlciB0aGFuIG9y
+IGVxdWFsIHRvIDAiLiBTbywgSSB0aGluayBtYXgobGlua19pZCwgMCkgY291bGQNCj4gY2F1c2Ug
+bWlzdW5kZXJzdGFuZGluZy4NCg0KVGhlIGNsZWFyZXN0IGlzIHByb2JhYmx5Og0KCWlmIChsaW5r
+X2lkIDwgMCkNCgkJbGlua19pZCA9IDA7DQoNClRoZSBjb21waWxlciBjb3VsZCBlYXNpbHkgZ2Vu
+ZXJhdGUgdGhlIHNhbWUgY29kZSAoY29tcGFyZSBhbmQgY29uZGl0aW9uYWwNCm1vdmUpLg0KDQoJ
+RGF2aWQNCg0KLQ0KUmVnaXN0ZXJlZCBBZGRyZXNzIExha2VzaWRlLCBCcmFtbGV5IFJvYWQsIE1v
+dW50IEZhcm0sIE1pbHRvbiBLZXluZXMsIE1LMSAxUFQsIFVLDQpSZWdpc3RyYXRpb24gTm86IDEz
+OTczODYgKFdhbGVzKQ0K
 
-
-Oh yeah looks better than I anticipated. I seem to have picked an odd
-base commit for "tty: serial: .." because of which Greg couldn't apply
-it so res-ending + rebase might be enough for that. By my count it
-looks like only "usb: pci-quirksL ..." needs real work and possibly the
-"drm: .." part though the discussion around cirrus doesn't look like it
-would require much work. So I'll do rebase/re-send of the easy ones
-tomorrow/next week.
-
-Thanks,
-Niklas
 
