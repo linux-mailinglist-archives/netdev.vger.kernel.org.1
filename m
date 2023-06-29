@@ -1,133 +1,135 @@
-Return-Path: <netdev+bounces-14505-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14506-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0FD167420C0
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 09:07:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BFEB74218B
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 09:59:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B764280C3E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 07:07:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 923A91C2099A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 07:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CEE36538D;
-	Thu, 29 Jun 2023 07:07:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 693E5846B;
+	Thu, 29 Jun 2023 07:59:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C127F46A5
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 07:07:45 +0000 (UTC)
-Received: from galois.linutronix.de (Galois.linutronix.de [193.142.43.55])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390D52116;
-	Thu, 29 Jun 2023 00:07:43 -0700 (PDT)
-Message-ID: <b64dc5c7-600c-66db-d125-2d747a21c1d8@linutronix.de>
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020; t=1688022461;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uYKNMkC/e+EOiXeiis2Yv6NPhSLq1jyIWmFHBR4MTyo=;
-	b=rCwVstUWg5fN/FdCzmGYqSASXpxhRHT+gCl5DHf9/rhTbngXszmfvJwWfcvL1zrCCc2Ejk
-	ZwmVkxUh3PJC0ESM7DWY7IKrcAclzBFMp50cKHsQDF7J53hd4l+fa37ySK71rRuWtBYz2f
-	avwejKEusPI5faNbTQN8FqCTdDO6Jm31WmFhG1+7KJeGQxt6oZJPTo12S6KZeJz71giBB/
-	eEvAMIi+2vvxFNGEfPlx8Bi0vveNvvE9IQHwp7SZwPnggLf/ahmrY9chZIGFOfWWs5EBYQ
-	q6DiQoOribKDkJKtZbf46MAT+c3QYrsWHRByk6ijYsC0irH+CbiRKiD4nWUDqw==
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=linutronix.de;
-	s=2020e; t=1688022461;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=uYKNMkC/e+EOiXeiis2Yv6NPhSLq1jyIWmFHBR4MTyo=;
-	b=+Ot956sT7XnMLaiu4aDJD905nJStIalGNQcLZn7ixdjhgopMiyA1f+LMH57VaK5VGYSaBT
-	sXtukp/7Sn7gsSAw==
-Date: Thu, 29 Jun 2023 09:07:40 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 59FAD79FA
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 07:59:44 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF01E5253;
+	Thu, 29 Jun 2023 00:59:40 -0700 (PDT)
+Received: from pps.filterd (m0353722.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35T7kldJ025415;
+	Thu, 29 Jun 2023 07:59:23 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : date :
+ subject : to : cc : references : from : in-reply-to : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=s+WHj7KtXMkj7J2taiGcgx8uAykZlRdNfTv1hCqfDDM=;
+ b=gWFYj1i/F6wk/XHgOzz5GN1wSqBbC2UHr9SkzR0S0eL2gOwtqJ0kUvE38VlbF/9D2H3B
+ Rn6VaqAwkAmX/+rU0VBB6bllTQFW+ugqcVQwCrT3imaYYTTRrUu4BFpvwsKi3ojjoqHg
+ MBzSkvdvO/8ApHPDSMrsrHmMFemtHZuxdsSaCxVxLDwVYFuItAZXzQhlLYySnQUeDG3v
+ pIBkFHTk5NA9tjcasadMdRb5H7BKdEiGWP0VRqjw1Mlsa1pdaz+tDZki7h2O0+rH6wHI
+ EjLJQs0oIVZ1/t2Rv7y9W8jNuQ5gUWnJMW/Nvy/Kjn9uWf6cyfAoTDIOpVm2p8fhlEpO LQ== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rh5v4g822-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Jun 2023 07:59:22 +0000
+Received: from m0353722.ppops.net (m0353722.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35T7l1S7025980;
+	Thu, 29 Jun 2023 07:59:22 GMT
+Received: from ppma02fra.de.ibm.com (47.49.7a9f.ip4.static.sl-reverse.com [159.122.73.71])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rh5v4g818-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Jun 2023 07:59:22 +0000
+Received: from pps.filterd (ppma02fra.de.ibm.com [127.0.0.1])
+	by ppma02fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 35T28sqC023337;
+	Thu, 29 Jun 2023 07:59:20 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma02fra.de.ibm.com (PPS) with ESMTPS id 3rdr452d3n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 29 Jun 2023 07:59:20 +0000
+Received: from smtpav06.fra02v.mail.ibm.com (smtpav06.fra02v.mail.ibm.com [10.20.54.105])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 35T7xGxB40895066
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 29 Jun 2023 07:59:16 GMT
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 79C0920043;
+	Thu, 29 Jun 2023 07:59:16 +0000 (GMT)
+Received: from smtpav06.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id EB25720040;
+	Thu, 29 Jun 2023 07:59:15 +0000 (GMT)
+Received: from [9.171.10.251] (unknown [9.171.10.251])
+	by smtpav06.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu, 29 Jun 2023 07:59:15 +0000 (GMT)
+Message-ID: <c589f29d-5ce5-9fc2-1a2d-3e5181a14bdd@linux.ibm.com>
+Date: Thu, 29 Jun 2023 09:59:15 +0200
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH] s390/lcs: Remove FDDI option
+Content-Language: en-US
+To: Simon Horman <simon.horman@corigine.com>
+Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+        Randy Dunlap <rdunlap@infradead.org>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>
+References: <20230628135736.13339-1-wintera@linux.ibm.com>
+ <ZJyT1aWFGqHjxofQ@corigine.com>
+From: Alexandra Winter <wintera@linux.ibm.com>
+In-Reply-To: <ZJyT1aWFGqHjxofQ@corigine.com>
+Content-Type: text/plain; charset=UTF-8
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: pBa_oyxnma8jlVeMNBGAHR7_d2ZqLc7i
+X-Proofpoint-ORIG-GUID: fZz0xX2PQ--4Mgr1AwV-mL42OT6947mi
+Content-Transfer-Encoding: 7bit
+X-Proofpoint-UnRewURL: 0 URL was un-rewritten
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [Intel-wired-lan] [PATCH net v2] igc: Prevent garbled TX queue
- with XDP ZEROCOPY
-Content-Language: en-US
-To: Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Vedang Patel <vedang.patel@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Jithu Joseph <jithu.joseph@intel.com>, Andre Guedes
- <andre.guedes@intel.com>, Simon Horman <simon.horman@corigine.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20230628091148.62256-1-florian.kauer@linutronix.de>
- <87a5wjqnjk.fsf@intel.com>
-From: Florian Kauer <florian.kauer@linutronix.de>
-In-Reply-To: <87a5wjqnjk.fsf@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-28_14,2023-06-27_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0 impostorscore=0
+ lowpriorityscore=0 clxscore=1015 mlxlogscore=508 bulkscore=0 phishscore=0
+ malwarescore=0 adultscore=0 mlxscore=0 priorityscore=1501 suspectscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306290066
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Vinicius,
 
-On 28.06.23 23:34, Vinicius Costa Gomes wrote:
-> Florian Kauer <florian.kauer@linutronix.de> writes:
-> 
->> In normal operation, each populated queue item has
->> next_to_watch pointing to the last TX desc of the packet,
->> while each cleaned item has it set to 0. In particular,
->> next_to_use that points to the next (necessarily clean)
->> item to use has next_to_watch set to 0.
->>
->> When the TX queue is used both by an application using
->> AF_XDP with ZEROCOPY as well as a second non-XDP application
->> generating high traffic, the queue pointers can get in
->> an invalid state where next_to_use points to an item
->> where next_to_watch is NOT set to 0.
->>
->> However, the implementation assumes at several places
->> that this is never the case, so if it does hold,
->> bad things happen. In particular, within the loop inside
->> of igc_clean_tx_irq(), next_to_clean can overtake next_to_use.
->> Finally, this prevents any further transmission via
->> this queue and it never gets unblocked or signaled.
->> Secondly, if the queue is in this garbled state,
->> the inner loop of igc_clean_tx_ring() will never terminate,
->> completely hogging a CPU core.
->>
->> The reason is that igc_xdp_xmit_zc() reads next_to_use
->> before acquiring the lock, and writing it back
->> (potentially unmodified) later. If it got modified
->> before locking, the outdated next_to_use is written
->> pointing to an item that was already used elsewhere
->> (and thus next_to_watch got written).
->>
->> Fixes: 9acf59a752d4 ("igc: Enable TX via AF_XDP zero-copy")
->> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
->> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
->> Tested-by: Kurt Kanzenbach <kurt@linutronix.de>
->> ---
-> 
-> This patch doesn't directly apply because there's a small conflict with
-> commit 95b681485563 ("igc: Avoid transmit queue timeout for XDP"),
-> but really easy to solve.
-> 
-> Anyway, good catch:
-> 
-> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
 
-I am sorry, that was bad timing. I prepared the initial patch on Friday and overlooked the merge.
-Shall I send a v3 or will someone else take care of the conflict resolution?
+On 28.06.23 22:11, Simon Horman wrote:
+> [text from Jakub]
+> 
+> ## Form letter - net-next-closed
+> 
+> The merge window for v6.5 has begun and therefore net-next is closed
+> for new drivers, features, code refactoring and optimizations.
+> We are currently accepting bug fixes only.
+> 
+> Please repost when net-next reopens after July 10th.
+> 
+> RFC patches sent for review only are obviously welcome at any time.
+> 
+> See: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
+> --
+> pw-bot: defer
 
-Greetings,
-Florian
+Thank you Simon for the information.
+
+So http://vger.kernel.org/~davem/net-next.html
+is no longer relevant?
+(I was using that page to check, whether net-next was still open.)
 
