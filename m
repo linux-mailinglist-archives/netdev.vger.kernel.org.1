@@ -1,141 +1,122 @@
-Return-Path: <netdev+bounces-14611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14613-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BA5DB742A9E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:25:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B8E85742ABD
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:41:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E87571C20AF6
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:25:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 15B7E280E89
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:41:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD73C134C2;
-	Thu, 29 Jun 2023 16:25:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 19038291E;
+	Thu, 29 Jun 2023 16:41:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE7CF12B6F
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:25:47 +0000 (UTC)
-Received: from mga05.intel.com (mga05.intel.com [192.55.52.43])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33D1E30C5;
-	Thu, 29 Jun 2023 09:25:46 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688055946; x=1719591946;
-  h=from:to:cc:subject:in-reply-to:references:date:
-   message-id:mime-version;
-  bh=GMipEncNpFuzbp3Y+IWzNKkgCXn6RBM75OjxnGRggWw=;
-  b=NrPWlEWiIdpeni7tO1fYdsoTPccIGc/5658ie7TTX66Cab2seFiCcs/v
-   XWT19BaAoLCq2Z0KAPWqyEDZQkk3bVYA0Ywo57C6AjsjCoA8oPe60meyu
-   TdGk3wqn/tCvxX3ayeyTaSs69oQBgp5OSh50puV1hAQV7hcDPwFrO9Siy
-   2GFQBxyURt8WPdy1yIheJofxgqjDxIm065sEuqbTu8gIA1dJFDoxsMimF
-   ERn5VheCu8rtfgCd3+JoXGb70wpOavIAFIjss5eEhuhTQDOx8OMsdatgQ
-   2qIUuyenYhte9vVzB0mk+ihXZKYGAH7Xu1qeULFdmhXx3zOvmeTHOYMI+
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="448535718"
-X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
-   d="scan'208";a="448535718"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by fmsmga105.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 09:25:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="752704992"
-X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
-   d="scan'208";a="752704992"
-Received: from pdurugk-mobl1.amr.corp.intel.com (HELO vcostago-mobl3) ([10.209.78.99])
-  by orsmga001-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 09:25:43 -0700
-From: Vinicius Costa Gomes <vinicius.gomes@intel.com>
-To: Florian Kauer <florian.kauer@linutronix.de>, Jesse Brandeburg
- <jesse.brandeburg@intel.com>, Tony Nguyen <anthony.l.nguyen@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, Vedang Patel <vedang.patel@intel.com>, Maciej
- Fijalkowski <maciej.fijalkowski@intel.com>, Jithu Joseph
- <jithu.joseph@intel.com>, Andre Guedes <andre.guedes@intel.com>, Simon
- Horman <simon.horman@corigine.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-Subject: Re: [Intel-wired-lan] [PATCH net v2] igc: Prevent garbled TX queue
- with XDP ZEROCOPY
-In-Reply-To: <b64dc5c7-600c-66db-d125-2d747a21c1d8@linutronix.de>
-References: <20230628091148.62256-1-florian.kauer@linutronix.de>
- <87a5wjqnjk.fsf@intel.com>
- <b64dc5c7-600c-66db-d125-2d747a21c1d8@linutronix.de>
-Date: Thu, 29 Jun 2023 09:25:43 -0700
-Message-ID: <87edlup75k.fsf@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 095322572
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:41:55 +0000 (UTC)
+Received: from mail-yw1-x1149.google.com (mail-yw1-x1149.google.com [IPv6:2607:f8b0:4864:20::1149])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13476171E
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 09:41:53 -0700 (PDT)
+Received: by mail-yw1-x1149.google.com with SMTP id 00721157ae682-561eb6c66f6so7016167b3.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 09:41:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688056912; x=1690648912;
+        h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=UG3PTb5MAF8cAGQF47HGQin+88efRORfN4c39hK/1YE=;
+        b=VYX15G65lQIXuzdX41l7NofbTeXCaqOFq+6xy+WpwfksDgl/i3Vx6ZPsDrL7zhrYuk
+         wtFPIjh/43CpK/NkKUu8m1lm4AMojbEvktTW0EK7EhHgl0olFh2N+skDhsjAWQYV1VUb
+         xWcBDmf8qecuwRNfGnJ16eEP+lutsJktZNm0T1vWRmrUkvqKIZmaKC1qKsWdiDU3byw8
+         qNpj/+sJqroRfvO4R1S/x2fqEu4OVNxoImh3DvkzCekFr8bEEYBnuLiWAhNmBo29M+Ve
+         hMZ/LhG+7fgrRS2Tgj/gJVGVzvvP01rRHaXPbaD2EYfpQj7RW9aUtZg6c5aZabQYPjk6
+         5aMQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688056912; x=1690648912;
+        h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=UG3PTb5MAF8cAGQF47HGQin+88efRORfN4c39hK/1YE=;
+        b=HkSEw3MhdyHBAJZV9qo2bDjRRU2qkuyLH9carvkYvH5KKVVxmhD9jIY1BGeDV5HtZW
+         Bs1q1mnjuiXgWNSPmytFKbfcrXCAAc61VvzWatZCf5pQraB0M18CH+DQYUBpgbiGa0Mu
+         1RQFcaQRuB0mIXMtIyA2Th02wuxx7k0vs9uG4Lzn7EK3bus0zDenm+zyBvhU7XmebdVF
+         HOGjWLCT9urgZmxhnknkC1CApeq4FwAFjtNR/3PdlqETKr7uU80ldNcdv7JGHRoyEl1Q
+         bZeJhd0W8X4llwxa3dSXHLLl3s8rvENuD8s+3vqX3/LPLfpbk+fueBUn+navSSzsfBqh
+         JtPA==
+X-Gm-Message-State: AC+VfDyKgoiVpo2pFJnAAy9X5YZSSA2bkReBgTX/NRauqGLl8qovTnuO
+	BkpRJheOkjehFniKjsfZRS0RjHImD1bL8Q==
+X-Google-Smtp-Source: ACHHUZ7NV0KsL3dggY/tBxurjHkISlHrlcyEZmMxw4A1aSge1LpU39dQ9buz5dzMiMt/tlvoUdyDfrzbIPhZZw==
+X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
+ (user=edumazet job=sendgmr) by 2002:a81:b106:0:b0:56d:7a5:2887 with SMTP id
+ p6-20020a81b106000000b0056d07a52887mr15444628ywh.2.1688056912299; Thu, 29 Jun
+ 2023 09:41:52 -0700 (PDT)
+Date: Thu, 29 Jun 2023 16:41:50 +0000
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Message-ID: <20230629164150.2068747-1-edumazet@google.com>
+Subject: [PATCH net] tcp: annotate data races in __tcp_oow_rate_limited()
+From: Eric Dumazet <edumazet@google.com>
+To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, 
+	Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
+	Eric Dumazet <edumazet@google.com>
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Florian Kauer <florian.kauer@linutronix.de> writes:
+request sockets are lockless, __tcp_oow_rate_limited() could be called
+on the same object from different cpus. This is harmless.
 
-> Hi Vinicius,
->
-> On 28.06.23 23:34, Vinicius Costa Gomes wrote:
->> Florian Kauer <florian.kauer@linutronix.de> writes:
->> 
->>> In normal operation, each populated queue item has
->>> next_to_watch pointing to the last TX desc of the packet,
->>> while each cleaned item has it set to 0. In particular,
->>> next_to_use that points to the next (necessarily clean)
->>> item to use has next_to_watch set to 0.
->>>
->>> When the TX queue is used both by an application using
->>> AF_XDP with ZEROCOPY as well as a second non-XDP application
->>> generating high traffic, the queue pointers can get in
->>> an invalid state where next_to_use points to an item
->>> where next_to_watch is NOT set to 0.
->>>
->>> However, the implementation assumes at several places
->>> that this is never the case, so if it does hold,
->>> bad things happen. In particular, within the loop inside
->>> of igc_clean_tx_irq(), next_to_clean can overtake next_to_use.
->>> Finally, this prevents any further transmission via
->>> this queue and it never gets unblocked or signaled.
->>> Secondly, if the queue is in this garbled state,
->>> the inner loop of igc_clean_tx_ring() will never terminate,
->>> completely hogging a CPU core.
->>>
->>> The reason is that igc_xdp_xmit_zc() reads next_to_use
->>> before acquiring the lock, and writing it back
->>> (potentially unmodified) later. If it got modified
->>> before locking, the outdated next_to_use is written
->>> pointing to an item that was already used elsewhere
->>> (and thus next_to_watch got written).
->>>
->>> Fixes: 9acf59a752d4 ("igc: Enable TX via AF_XDP zero-copy")
->>> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
->>> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
->>> Tested-by: Kurt Kanzenbach <kurt@linutronix.de>
->>> ---
->> 
->> This patch doesn't directly apply because there's a small conflict with
->> commit 95b681485563 ("igc: Avoid transmit queue timeout for XDP"),
->> but really easy to solve.
->> 
->> Anyway, good catch:
->> 
->> Acked-by: Vinicius Costa Gomes <vinicius.gomes@intel.com>
->
-> I am sorry, that was bad timing. I prepared the initial patch on Friday and overlooked the merge.
-> Shall I send a v3 or will someone else take care of the conflict
-> resolution?
+Add READ_ONCE()/WRITE_ONCE() annotations to avoid a KCSAN report.
 
-I think it's easier if you send a v3.
+Fixes: 4ce7e93cb3fe ("tcp: rate limit ACK sent by SYN_RECV request sockets")
+Signed-off-by: Eric Dumazet <edumazet@google.com>
+---
+ net/ipv4/tcp_input.c | 12 +++++++++---
+ 1 file changed, 9 insertions(+), 3 deletions(-)
 
-
-Cheers,
+diff --git a/net/ipv4/tcp_input.c b/net/ipv4/tcp_input.c
+index 6f072095211efc9c3b3a561f67750ae454fd576b..57c8af1859c16eba5e952a23ea959b628006f9c1 100644
+--- a/net/ipv4/tcp_input.c
++++ b/net/ipv4/tcp_input.c
+@@ -3590,8 +3590,11 @@ static int tcp_ack_update_window(struct sock *sk, const struct sk_buff *skb, u32
+ static bool __tcp_oow_rate_limited(struct net *net, int mib_idx,
+ 				   u32 *last_oow_ack_time)
+ {
+-	if (*last_oow_ack_time) {
+-		s32 elapsed = (s32)(tcp_jiffies32 - *last_oow_ack_time);
++	/* Paired with the WRITE_ONCE() in this function. */
++	u32 val = READ_ONCE(*last_oow_ack_time);
++
++	if (val) {
++		s32 elapsed = (s32)(tcp_jiffies32 - val);
+ 
+ 		if (0 <= elapsed &&
+ 		    elapsed < READ_ONCE(net->ipv4.sysctl_tcp_invalid_ratelimit)) {
+@@ -3600,7 +3603,10 @@ static bool __tcp_oow_rate_limited(struct net *net, int mib_idx,
+ 		}
+ 	}
+ 
+-	*last_oow_ack_time = tcp_jiffies32;
++	/* Paired with the prior READ_ONCE() and with itself,
++	 * as we might be lockless.
++	 */
++	WRITE_ONCE(*last_oow_ack_time, tcp_jiffies32);
+ 
+ 	return false;	/* not rate-limited: go ahead, send dupack now! */
+ }
 -- 
-Vinicius
+2.41.0.255.g8b1d071c50-goog
+
 
