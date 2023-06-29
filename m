@@ -1,79 +1,137 @@
-Return-Path: <netdev+bounces-14594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FF5E742967
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 17:22:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D00D742971
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 17:24:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3F5E280C9C
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 15:22:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 926011C202DC
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 15:24:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1490B12B76;
-	Thu, 29 Jun 2023 15:22:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5797112B7A;
+	Thu, 29 Jun 2023 15:24:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AD5A8111BB
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 15:22:42 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 10AEDC433C0;
-	Thu, 29 Jun 2023 15:22:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688052162;
-	bh=6h13JFmAV8S+mzKVdSd8cTenQr9Vc4RacTrMUMCF2fs=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=MtEOOpqujpm+m8cdjCBsPFL3vEWkH7YHUgBW8BSUwW4Xg2KoybG3erjWssA/5dh9J
-	 szbF92545ps9Puqiv69fybiKQbJrdNrFof/SxdofXue8TlWx76xiS+oRXRdUbRVg3O
-	 MOMXaVImFMGk3HwbKw/mVY2Z9SYfgPv/P04w4szVKh0YW2H7ZQPtJ0GtLvGMmqi7Oz
-	 wrhh/K2KZ0rOJazsfnY/3stw4yulwmM3IHiwE+wwVRovHM13lbMgLgMWIjj5c1nQst
-	 uS/sy5VorlsiQuBKMkpEKZMlKjW51ly+5aCGjud+HUTypxVMPhb/M2PzXCoqFZrHb9
-	 AJL74/uOoWzMw==
-Date: Thu, 29 Jun 2023 08:22:41 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2023-06-27
-Message-ID: <20230629082241.56eefe0b@kernel.org>
-In-Reply-To: <CABBYNZLBAr72WCysVEFS9hdycYu4JRH2=SiP_SVBh08vukhh4Q@mail.gmail.com>
-References: <20230627191004.2586540-1-luiz.dentz@gmail.com>
-	<20230628193854.6fabbf6d@kernel.org>
-	<CABBYNZLBAr72WCysVEFS9hdycYu4JRH2=SiP_SVBh08vukhh4Q@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4CD6112B76
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 15:24:00 +0000 (UTC)
+Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7E1632D4E;
+	Thu, 29 Jun 2023 08:23:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688052238; x=1719588238;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=VzjkOhOXv+HmibhXRaAGBTDw64W/2tLIdcg3hf/qhFQ=;
+  b=jQmBEq5++85J8Z/786TkVo6Ng86TsL0oJQFSt7/ifYQuSkiC4TMDydBi
+   0cxvzMrxlfWXoEEB9MC0f4FLPPdzNf8/137WCQVNEuPhnxt7L+hGlIjV/
+   GiIjoTjiHDNqNbwMnK487Tt41c/XMPPFoQcklTnwXfbst7zBo5kNCLHD+
+   r0BEg/Xmf4tqSBatc43hSDu6RsMZE582CGXVgtJZCDLsxH85XDWE4m6fQ
+   DwvZASKNkuwkbkLHiGWAxQltmCDm600HwuOuhMLPeVeGlclxw6DYUiwqo
+   2aTGP/y/eVvVCbJLrgYxWP9Cs9XR4GK8NxUN0sgPvL35SRHZrGUWjgW+g
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="346920562"
+X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
+   d="scan'208";a="346920562"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 08:23:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="830573763"
+X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
+   d="scan'208";a="830573763"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmsmga002.fm.intel.com with ESMTP; 29 Jun 2023 08:23:50 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RFC net-next 0/4] net: page_pool: a couple assorted optimizations
+Date: Thu, 29 Jun 2023 17:23:01 +0200
+Message-ID: <20230629152305.905962-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 28 Jun 2023 22:01:05 -0700 Luiz Augusto von Dentz wrote:
-> >  a8d0b0440b7f ("Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations")
-> >  349cae7e8d84 ("Bluetooth: btusb: Add device 6655:8771 to device tables")
-> >  afdbe6303877 ("Bluetooth: btqca: use le32_to_cpu for ver.soc_id")
-> >  d1b10da77355 ("Bluetooth: L2CAP: Fix use-after-free")
-> >  c1121a116d5f ("Bluetooth: fix invalid-bdaddr quirk for non-persistent setup")
-> >  2f8b38e5eba4 ("Bluetooth: fix use-bdaddr-property quirk")
-> >  317af9ba6fff ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb")
-> >  a6cfe4261f5e ("Bluetooth: hci_bcm: do not mark valid bd_addr as invalid")
-> >  20b3370a6bfb ("Bluetooth: ISO: use hci_sync for setting CIG parameters")
-> >  29a3b409a3f2 ("Bluetooth: hci_event: fix Set CIG Parameters error status handling")
-> >  48d15256595b ("Bluetooth: MGMT: Fix marking SCAN_RSP as not connectable")
-> >  f145eeb779c3 ("Bluetooth: ISO: Rework sync_interval to be sync_factor")
-> >  0d39e82e1a7b ("Bluetooth: hci_sysfs: make bt_class a static const structure")
-> >  8649851b1945 ("Bluetooth: hci_event: Fix parsing of CIS Established Event")
-> >  5b611951e075 ("Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally")
-> >  00b51ce9f603 ("Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + memcpy")
-> >
-> > You can throw in a few more things you think are important and are
-> > unlikely to cause regressions.  
-> 
-> Yeah, those seem to be the most important ones, do you want me to redo
-> the pull-request or perhaps you can just cherry-pick them?
+Here's spin off the IAVF PP series[0], with 2 runtime (hotpath) and 1
+compile-time optimizations. They're based and tested on top of the
+hybrid PP allocation series[1], but don't require it to work and
+in general independent of it and each other.
 
-Nothing to add to that list?
-Let me see if I can cherry-pick them cleanly.
+Per-patch breakdown:
+ #1: already was on the lists, but this time it's done the other way, the
+     one that Alex Duyck proposed during the review of the previous series.
+     Slightly reduce amount of C preprocessing by stopping including
+     <net/page_pool.h> to <linux/skbuff.h> (which is included in the
+     half of the kernel sources). Especially useful with the abovementioned
+     series applied, as it makes page_pool.h heavier;
+ #2: don't call to DMA sync externals when they won't do anything anyway
+     by doing some heuristics a bit earlier (when allocating a new page),
+     also was on the lists;
+ #3: new, prereq to #4. Add NAPI state flag, which would indicate
+     napi->poll() is running right now, so that napi->list_owner would
+     point to the CPU where it's being run, not just scheduled;
+ #4: new. In addition to recycling skb PP pages directly when @napi_safe
+     is set, check for the flag from #3, which will mean the same if
+     ->list_owner is pointing to us. This allows to use direct recycling
+     anytime we're inside a NAPI polling loop or GRO stuff going right
+     after it, covering way more cases than is right now.
+
+(complete tree with [1] + this + [0] is available here: [2])
+
+[0] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lobakin@intel.com
+[1] https://lore.kernel.org/netdev/20230629120226.14854-1-linyunsheng@huawei.com
+[2] https://github.com/alobakin/linux/commits/iavf-pp-frag
+
+Alexander Lobakin (4):
+  net: skbuff: don't include <net/page_pool.h> to <linux/skbuff.h>
+  net: page_pool: avoid calling no-op externals when possible
+  net: add flag to indicate NAPI/GRO is running right now
+  net: skbuff: always recycle PP pages directly when inside a NAPI loop
+
+ drivers/net/ethernet/engleder/tsnep_main.c    |  1 +
+ drivers/net/ethernet/freescale/fec_main.c     |  1 +
+ .../marvell/octeontx2/nic/otx2_common.c       |  1 +
+ .../ethernet/marvell/octeontx2/nic/otx2_pf.c  |  1 +
+ .../ethernet/mellanox/mlx5/core/en/params.c   |  1 +
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  1 +
+ drivers/net/wireless/mediatek/mt76/mt76.h     |  1 +
+ include/linux/netdevice.h                     |  2 +
+ include/linux/skbuff.h                        |  3 +-
+ include/net/page_pool.h                       |  5 +-
+ net/core/dev.c                                | 23 +++++--
+ net/core/page_pool.c                          | 62 +++++++------------
+ net/core/skbuff.c                             | 29 +++++++++
+ 13 files changed, 83 insertions(+), 48 deletions(-)
+
+---
+Really curious about #3. Implementing the idea correctly (this or other
+way) potentially unblocks a lot more interesting stuff (besides #4).
+-- 
+2.41.0
+
 
