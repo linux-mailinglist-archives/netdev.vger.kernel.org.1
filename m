@@ -1,142 +1,231 @@
-Return-Path: <netdev+bounces-14487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14489-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0CCB7741EE2
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:50:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8A050741EE8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:52:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 480DF280D5F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:50:05 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40558280CFE
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:52:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF1044C9A;
-	Thu, 29 Jun 2023 03:49:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352B51FD0;
+	Thu, 29 Jun 2023 03:52:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B42874C99
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:49:27 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 86184273B;
-	Wed, 28 Jun 2023 20:49:26 -0700 (PDT)
-Received: from pps.filterd (m0279870.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35T3buJU008598;
-	Thu, 29 Jun 2023 03:49:16 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-type; s=qcppdkim1;
- bh=UsZZNOMcEsr6zHnCwEOy39/yVjTTEJoQuHl0GKi18Co=;
- b=ScFU1tXyLOrXZHKP3/qBvOfztYw94gTcasrHcObtYwPDUxy39RfkzlNLjsl2aGlve5dG
- ArAVItQA+PkGuutv5w0Qkv8EkUHeG6OVR3nb1FhElrEPq5p60UzCFnR1c+80Lgy08jHr
- MPGkN3lAzBBMwSdlrbu9Dq3Z2XLAnpZtSAszqe01o+Tub6fi9pOUh3fcPnH7oJPck3yP
- ym6wSFJyS2DPFoCJYaktg/9NF1+EqPxx82Or4+AspMxpURgdYCGmhZIU7Vr99wcDIV3x
- 7X3kkCqVzu48FlK/4atZRreJFf+kzdPf98K1d91Ur55OZYyzNbKlJ1ZJ7eQbPz3+nzu8 LA== 
-Received: from nalasppmta03.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rh0aag602-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Jun 2023 03:49:15 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA03.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 35T3nEMS021687
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Thu, 29 Jun 2023 03:49:14 GMT
-Received: from akronite-sh-dev02.qualcomm.com (10.80.80.8) by
- nalasex01c.na.qualcomm.com (10.47.97.35) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.986.42; Wed, 28 Jun 2023 20:49:12 -0700
-From: Luo Jie <quic_luoj@quicinc.com>
-To: <andrew@lunn.ch>, <hkallweit1@gmail.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <linux@armlinux.org.uk>
-CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        <quic_sricharan@quicinc.com>, Luo Jie <quic_luoj@quicinc.com>
-Subject: [PATCH 3/3] net: phy: at803x: add qca8081 fifo reset on the link down
-Date: Thu, 29 Jun 2023 11:48:46 +0800
-Message-ID: <20230629034846.30600-4-quic_luoj@quicinc.com>
-X-Mailer: git-send-email 2.17.1
-In-Reply-To: <20230629034846.30600-1-quic_luoj@quicinc.com>
-References: <20230629034846.30600-1-quic_luoj@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1DA1FB9;
+	Thu, 29 Jun 2023 03:52:27 +0000 (UTC)
+Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F06D297C;
+	Wed, 28 Jun 2023 20:52:26 -0700 (PDT)
+Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fb77f21c63so347121e87.2;
+        Wed, 28 Jun 2023 20:52:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688010744; x=1690602744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=G/mShnN9MUl1H+Uj5ppePaa4sMACmwUz9u37+BJFKZE=;
+        b=BVEN9r7qrjVLVv6PkvHynYjAu6Rjd6ivk1td+rcqFxtYPiFqgHpDVeUxPVXNorBeSb
+         WvG5QrrjFJmYfqLE+coobGParakanK7ubUkKygoomHbksDcn9TPUlxtOyqoFF2i6xRtL
+         wqeabKDvK/TI+ADiNqHg9jWm8Yvimae2yNxWaziwSXsd9lUJlAAD4V7sDigJRglpctL3
+         gQu4Ws31EET/KAFLc2lgKaTO64KRySyYNjqTU54K6+xfdI3yY5FhukB43BG0Pdd227Tr
+         QsOUmIIq2cXDEM+yxnA2UgXg0+MgInEApDd0EB5o/xjdQzrSWlDGxdHiWWCwLGrbOV6w
+         lNvg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688010744; x=1690602744;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=G/mShnN9MUl1H+Uj5ppePaa4sMACmwUz9u37+BJFKZE=;
+        b=A0TIiNPBNm7YOAFdDrqtGr2tt/fgYQ+hyB+NThgTg2Su6O4PcVJkkKS9BCVqOuTGRh
+         btV36/dV5Zoiz5hCRtHWo4eVX3PachnaC8sVYMySWxx7wg28cvxsgmRtFiZpjkUHybIs
+         dW6eZKc4bj1+AVIzn4DsPJQ9EECdmZgaXZQT8HLXQwdmfJlRDpwfUXWu3cpi1O3n+8yp
+         kaH9QNdOhw0N75ruMxMmpxEbn1cfyjZoRo/IUKKcU3Kg71dXqn7QSEodWvAVUYdx/+JN
+         gihUpMntuTwfRZfzUwTsL4zHj5tk+Ek2li6ER7DFXjCOxtm3pEN6Wf9WIWcQXKealZsK
+         6CYA==
+X-Gm-Message-State: AC+VfDx0lt4nDMpDyCt1mYkAdQyDVEqx1a5nYjfHIxY2GBjeN+RMwK40
+	uLDfzMSZUQobDg2YodZe7HtCtEjmdbY1ujVIkHY=
+X-Google-Smtp-Source: ACHHUZ4k+FMX1pP2TTmE1EQ6BD+dsv0O4YCLc/H6iUPCtg1z5Tm4nCtOkeTgKJYpXHPT/qdL5j9P/vLchyo7pE+Smyk=
+X-Received: by 2002:a05:6512:3d06:b0:4fb:7be5:8f4e with SMTP id
+ d6-20020a0565123d0600b004fb7be58f4emr8145248lfv.6.1688010744064; Wed, 28 Jun
+ 2023 20:52:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: 7BYEfI2D6UCswZP0I9C8Et4V0Lu7pKVx
-X-Proofpoint-ORIG-GUID: 7BYEfI2D6UCswZP0I9C8Et4V0Lu7pKVx
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-06-28_14,2023-06-27_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 bulkscore=0
- priorityscore=1501 phishscore=0 spamscore=0 lowpriorityscore=0
- suspectscore=0 mlxscore=0 clxscore=1015 impostorscore=0 mlxlogscore=999
- malwarescore=0 adultscore=0 classifier=spam adjust=0 reason=mlx
- scancount=1 engine=8.12.0-2305260000 definitions=main-2306290032
+References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
+ <20230628015634.33193-13-alexei.starovoitov@gmail.com> <6f8e0e91-44b4-4d0e-8df3-c1e765653255@paulmck-laptop>
+In-Reply-To: <6f8e0e91-44b4-4d0e-8df3-c1e765653255@paulmck-laptop>
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Date: Wed, 28 Jun 2023 20:52:12 -0700
+Message-ID: <CAADnVQJq+NA0denwyr56jYz73n5BnkKF_GtY0zpwqsSvCrGs6Q@mail.gmail.com>
+Subject: Re: [PATCH v3 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
+ similar to kfree_rcu().
+To: "Paul E. McKenney" <paulmck@kernel.org>
+Cc: Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
+	David Vernet <void@manifault.com>, Hou Tao <houtao@huaweicloud.com>, Tejun Heo <tj@kernel.org>, 
+	rcu@vger.kernel.org, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Kernel Team <kernel-team@fb.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The qca8081 fifo needs to be reset on link down and released
-on the link up in case of any abnormal issue such as the
-packet blocked on the PHY.
+On Wed, Jun 28, 2023 at 10:57=E2=80=AFAM Paul E. McKenney <paulmck@kernel.o=
+rg> wrote:
+>
+> On Tue, Jun 27, 2023 at 06:56:33PM -0700, Alexei Starovoitov wrote:
+> > From: Alexei Starovoitov <ast@kernel.org>
+> >
+> > Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
+> > Unlike bpf_mem_[cache_]free() that links objects for immediate reuse in=
+to
+> > per-cpu free list the _rcu() flavor waits for RCU grace period and then=
+ moves
+> > objects into free_by_rcu_ttrace list where they are waiting for RCU
+> > task trace grace period to be freed into slab.
+> >
+> > The life cycle of objects:
+> > alloc: dequeue free_llist
+> > free: enqeueu free_llist
+> > free_rcu: enqueue free_by_rcu -> waiting_for_gp
+> > free_llist above high watermark -> free_by_rcu_ttrace
+> > after RCU GP waiting_for_gp -> free_by_rcu_ttrace
+> > free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
+> >
+> > Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+> > ---
+> >  include/linux/bpf_mem_alloc.h |   2 +
+> >  kernel/bpf/memalloc.c         | 129 +++++++++++++++++++++++++++++++++-
+> >  2 files changed, 128 insertions(+), 3 deletions(-)
+> >
+> > diff --git a/include/linux/bpf_mem_alloc.h b/include/linux/bpf_mem_allo=
+c.h
+> > index 3929be5743f4..d644bbb298af 100644
+> > --- a/include/linux/bpf_mem_alloc.h
+> > +++ b/include/linux/bpf_mem_alloc.h
+> > @@ -27,10 +27,12 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma=
+);
+> >  /* kmalloc/kfree equivalent: */
+> >  void *bpf_mem_alloc(struct bpf_mem_alloc *ma, size_t size);
+> >  void bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr);
+> > +void bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
+> >
+> >  /* kmem_cache_alloc/free equivalent: */
+> >  void *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma);
+> >  void bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr);
+> > +void bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
+> >  void bpf_mem_cache_raw_free(void *ptr);
+> >  void *bpf_mem_cache_alloc_flags(struct bpf_mem_alloc *ma, gfp_t flags)=
+;
+> >
+> > diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
+> > index 40524d9454c7..3081d06a434c 100644
+> > --- a/kernel/bpf/memalloc.c
+> > +++ b/kernel/bpf/memalloc.c
+> > @@ -101,6 +101,15 @@ struct bpf_mem_cache {
+> >       bool draining;
+> >       struct bpf_mem_cache *tgt;
+> >
+> > +     /* list of objects to be freed after RCU GP */
+> > +     struct llist_head free_by_rcu;
+> > +     struct llist_node *free_by_rcu_tail;
+> > +     struct llist_head waiting_for_gp;
+> > +     struct llist_node *waiting_for_gp_tail;
+> > +     struct rcu_head rcu;
+> > +     atomic_t call_rcu_in_progress;
+> > +     struct llist_head free_llist_extra_rcu;
+> > +
+> >       /* list of objects to be freed after RCU tasks trace GP */
+> >       struct llist_head free_by_rcu_ttrace;
+> >       struct llist_head waiting_for_gp_ttrace;
+> > @@ -344,6 +353,69 @@ static void free_bulk(struct bpf_mem_cache *c)
+> >       do_call_rcu_ttrace(tgt);
+> >  }
+> >
+> > +static void __free_by_rcu(struct rcu_head *head)
+> > +{
+> > +     struct bpf_mem_cache *c =3D container_of(head, struct bpf_mem_cac=
+he, rcu);
+> > +     struct bpf_mem_cache *tgt =3D c->tgt;
+> > +     struct llist_node *llnode;
+> > +
+> > +     llnode =3D llist_del_all(&c->waiting_for_gp);
+> > +     if (!llnode)
+> > +             goto out;
+> > +
+> > +     llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu=
+_ttrace);
+> > +
+> > +     /* Objects went through regular RCU GP. Send them to RCU tasks tr=
+ace */
+> > +     do_call_rcu_ttrace(tgt);
+> > +out:
+> > +     atomic_set(&c->call_rcu_in_progress, 0);
+> > +}
+> > +
+> > +static void check_free_by_rcu(struct bpf_mem_cache *c)
+> > +{
+> > +     struct llist_node *llnode, *t;
+> > +     unsigned long flags;
+> > +
+> > +     /* drain free_llist_extra_rcu */
+> > +     if (unlikely(!llist_empty(&c->free_llist_extra_rcu))) {
+> > +             inc_active(c, &flags);
+> > +             llist_for_each_safe(llnode, t, llist_del_all(&c->free_lli=
+st_extra_rcu))
+> > +                     if (__llist_add(llnode, &c->free_by_rcu))
+> > +                             c->free_by_rcu_tail =3D llnode;
+> > +             dec_active(c, flags);
+> > +     }
+> > +
+> > +     if (llist_empty(&c->free_by_rcu))
+> > +             return;
+> > +
+> > +     if (atomic_xchg(&c->call_rcu_in_progress, 1)) {
+> > +             /*
+> > +              * Instead of kmalloc-ing new rcu_head and triggering 10k
+> > +              * call_rcu() to hit rcutree.qhimark and force RCU to not=
+ice
+> > +              * the overload just ask RCU to hurry up. There could be =
+many
+> > +              * objects in free_by_rcu list.
+> > +              * This hint reduces memory consumption for an artifical
+> > +              * benchmark from 2 Gbyte to 150 Mbyte.
+> > +              */
+> > +             rcu_request_urgent_qs_task(current);
+>
+> I have been going back and forth on whether rcu_request_urgent_qs_task()
+> needs to throttle calls to itself, for example, to pay attention to only
+> one invocation per jiffy.  The theory here is that RCU's state machine
+> normally only advances about once per jiffy anyway.
+>
+> The main risk of *not* throttling is if several CPUs were to invoke
+> rcu_request_urgent_qs_task() in tight loops while those same CPUs were
+> undergoing interrupt storms, which would result in heavy lock contention
+> in __rcu_irq_enter_check_tick().  This is not exactly a common-case
+> scenario, but on the other hand, if you are having this degree of trouble=
+,
+> should RCU really be adding lock contention to your troubles?
 
-Signed-off-by: Luo Jie <quic_luoj@quicinc.com>
----
- drivers/net/phy/at803x.c | 17 +++++++++++++++++
- 1 file changed, 17 insertions(+)
-
-diff --git a/drivers/net/phy/at803x.c b/drivers/net/phy/at803x.c
-index 29aab7eaaa90..5dc707eaf18c 100644
---- a/drivers/net/phy/at803x.c
-+++ b/drivers/net/phy/at803x.c
-@@ -276,6 +276,9 @@
- #define QCA808X_PHY_MMD7_CHIP_TYPE		0x901d
- #define QCA808X_PHY_CHIP_TYPE_1G		BIT(0)
- 
-+#define QCA8081_PHY_SERDES_MMD1_FIFO_CTRL	0x9072
-+#define QCA8081_PHY_FIFO_RSTN			BIT(11)
-+
- MODULE_DESCRIPTION("Qualcomm Atheros AR803x and QCA808X PHY driver");
- MODULE_AUTHOR("Matus Ujhelyi");
- MODULE_LICENSE("GPL");
-@@ -1808,6 +1811,16 @@ static int qca808x_config_init(struct phy_device *phydev)
- 			QCA808X_ADC_THRESHOLD_MASK, QCA808X_ADC_THRESHOLD_100MV);
- }
- 
-+static int qca808x_fifo_reset(struct phy_device *phydev)
-+{
-+	/* Reset serdes fifo on link down, Release serdes fifo on link up,
-+	 * the serdes address is phy address added by 1.
-+	 */
-+	return mdiobus_c45_modify_changed(phydev->mdio.bus, phydev->mdio.addr + 1,
-+			MDIO_MMD_PMAPMD, QCA8081_PHY_SERDES_MMD1_FIFO_CTRL,
-+			QCA8081_PHY_FIFO_RSTN, phydev->link ? QCA8081_PHY_FIFO_RSTN : 0);
-+}
-+
- static int qca808x_read_status(struct phy_device *phydev)
- {
- 	int ret;
-@@ -1827,6 +1840,10 @@ static int qca808x_read_status(struct phy_device *phydev)
- 	if (ret < 0)
- 		return ret;
- 
-+	ret = qca808x_fifo_reset(phydev);
-+	if (ret < 0)
-+		return ret;
-+
- 	if (phydev->link) {
- 		if (phydev->speed == SPEED_2500)
- 			phydev->interface = PHY_INTERFACE_MODE_2500BASEX;
--- 
-2.17.1
-
+I see spin_lock in __rcu_irq_enter_check_tick(), but I didn't observe
+it in practice even when I was calling rcu_request_urgent_qs_task()
+in multiple places through bpf_mem_alloc.
+I left it only in one place (this patch),
+because it was enough to 'hurry up the RCU' and make the difference.
+rdp =3D this_cpu_ptr(&rcu_data); is percpu, so I'm not sure why
+you think that the contention is possible.
+I think we should avoid extra logic either in RCU or in bpf_mem_alloc
+to keep the code simple, since contention is hypothetical at this point.
+I've tried preempt and no preempt configs. With and without debug.
 
