@@ -1,53 +1,47 @@
-Return-Path: <netdev+bounces-14643-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02A23742C9A
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:03:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1890D742C9C
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:03:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF1961C20964
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:02:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1D3F41C20AC4
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:03:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 877441428D;
-	Thu, 29 Jun 2023 19:01:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A98141429E;
+	Thu, 29 Jun 2023 19:01:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1D65415483
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 19:01:41 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 84788C433CC;
-	Thu, 29 Jun 2023 19:01:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 929F415486
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 19:01:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFC02C433C0;
+	Thu, 29 Jun 2023 19:01:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688065300;
-	bh=Cl2JZtp7JTFAtrbbJEFEFkb7VgCs98txtHTIsGFO6tQ=;
+	s=k20201202; t=1688065304;
+	bh=qOWJR5B/v04A70X7Ke3al4vL7mXxqeyOb4QdNArum5Y=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nnmuD8p2YQFfTe1sZS7MzA6AoWYngdie9FeSRP0FRc2KT5gtag1b6FwCNAutLuCib
-	 GudWkkYldYQ9F+9DeWqnxgQkSTFhlUIATwn/dYzmsx0fyUv/xVIKISJBoDFK6KTpRv
-	 xTbtRi4Rp0HD7oiRGzZ9RNZ/zTS+Z9fhnL2rw+Ig8vBrQ58NnT5731S+XhwdP/YQjD
-	 jPRiFYNUpyE7HVqKKoqsbLmZOms8015MFOAW43zSg+qcnIMWnzr5UPM0Y1DymDyJiD
-	 8sbH+bRfkkNMvDs6DpWkqqcllqI0LkteWWVw2TC192Oh3ZeLbhKRWMVwlKBh9yS5sg
-	 83k8iPkUGCOOw==
+	b=NXeZ0vn7BheUN+kKrgbuYIMFQw/qrDrL1Mqb2Z1o+KE8XBZmQFrODOSZq02nsjydO
+	 jc6+B+W8ibTdAkFAoBaWjiZrYRulm+mvvBZ3qS0bgn5TjfHtJuFWyM6dgdtGDPTJXH
+	 +/t5WgM+u38OBzXGTv372ywZOBGnrl1FkrqFJSv6TboTAghcV2UgG2Ea7e56ZiFdxP
+	 lv39WUA3e9LtRMWclsGox2ufPK3wkncMUcegxBhEjkENu72Udv3fcemCSbRNUjBRxi
+	 irIj58z0qZFzIhILNl+6f+HW3O9dGD1HXC//dq40YMnrbLUTgLS/cI1kfSAd8Ao4y2
+	 AkbT3PjudGrww==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
 Cc: Juerg Haefliger <juerg.haefliger@canonical.com>,
+	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
 	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	michael.hennerich@analog.com,
-	alex.aring@gmail.com,
-	stefan@datenfreihafen.org,
-	miquel.raynal@bootlin.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	linux-wpan@vger.kernel.org,
+	shangxiaojing@huawei.com,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.1 05/12] ieee802154/adf7242: Add MODULE_FIRMWARE macro
-Date: Thu, 29 Jun 2023 15:01:25 -0400
-Message-Id: <20230629190134.907949-5-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.1 06/12] nfc: fdp: Add MODULE_FIRMWARE macros
+Date: Thu, 29 Jun 2023 15:01:26 -0400
+Message-Id: <20230629190134.907949-6-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230629190134.907949-1-sashal@kernel.org>
 References: <20230629190134.907949-1-sashal@kernel.org>
@@ -64,28 +58,30 @@ Content-Transfer-Encoding: 8bit
 
 From: Juerg Haefliger <juerg.haefliger@canonical.com>
 
-[ Upstream commit f593a94b530aee4c7f2511c9e48eb495dff03991 ]
+[ Upstream commit eb09fc2d14163c0c217846cfabec3d0cce7c8f8c ]
 
-The module loads firmware so add a MODULE_FIRMWARE macro to provide that
+The module loads firmware so add MODULE_FIRMWARE macros to provide that
 information via modinfo.
 
 Signed-off-by: Juerg Haefliger <juerg.haefliger@canonical.com>
+Reviewed-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
 Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/ieee802154/adf7242.c | 2 ++
- 1 file changed, 2 insertions(+)
+ drivers/nfc/fdp/fdp.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ieee802154/adf7242.c b/drivers/net/ieee802154/adf7242.c
-index 5cf218c674a5a..c246370cd48c6 100644
---- a/drivers/net/ieee802154/adf7242.c
-+++ b/drivers/net/ieee802154/adf7242.c
-@@ -1349,3 +1349,5 @@ module_spi_driver(adf7242_driver);
- MODULE_AUTHOR("Michael Hennerich <michael.hennerich@analog.com>");
- MODULE_DESCRIPTION("ADF7242 IEEE802.15.4 Transceiver Driver");
+diff --git a/drivers/nfc/fdp/fdp.c b/drivers/nfc/fdp/fdp.c
+index f12f903a9dd13..da3e2dce8e70a 100644
+--- a/drivers/nfc/fdp/fdp.c
++++ b/drivers/nfc/fdp/fdp.c
+@@ -762,3 +762,6 @@ EXPORT_SYMBOL(fdp_nci_remove);
  MODULE_LICENSE("GPL");
+ MODULE_DESCRIPTION("NFC NCI driver for Intel Fields Peak NFC controller");
+ MODULE_AUTHOR("Robert Dolca <robert.dolca@intel.com>");
 +
-+MODULE_FIRMWARE(FIRMWARE);
++MODULE_FIRMWARE(FDP_OTP_PATCH_NAME);
++MODULE_FIRMWARE(FDP_RAM_PATCH_NAME);
 -- 
 2.39.2
 
