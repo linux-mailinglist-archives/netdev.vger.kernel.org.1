@@ -1,124 +1,62 @@
-Return-Path: <netdev+bounces-14609-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3E00742A65
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:13:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57579742A67
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:15:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9CA3A280EC8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:13:54 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 885AB1C20AD1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:15:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8236F12B9E;
-	Thu, 29 Jun 2023 16:13:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A47F212B9E;
+	Thu, 29 Jun 2023 16:15:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7620E12B97
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:13:52 +0000 (UTC)
-Received: from mail-io1-f52.google.com (mail-io1-f52.google.com [209.85.166.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3D161FD7;
-	Thu, 29 Jun 2023 09:13:50 -0700 (PDT)
-Received: by mail-io1-f52.google.com with SMTP id ca18e2360f4ac-783549ef058so35570639f.2;
-        Thu, 29 Jun 2023 09:13:50 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688055230; x=1690647230;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=VFdEMQN79kKvi2kqq2FWX13+T3/lc6iF08TGlcclIMM=;
-        b=OK+qIdB41FgCJ5pG0D3wR8kaHODBj3KThJHXW7cipoe965k4ffNQgDeZQluY3Ea/xb
-         QrQfrRRrZKU7ezqscg+t/l1r4BGvEkMvp1+IVbP6CK2VS1U8FwDVegS2qdPuMlo4SRSl
-         /QCbhEtrxsU4xY6JFA8aKQWjm29PciwUb43uKHLAQ9XJ7F/zuDsdOzD5n/bdaG4LHkGx
-         adougrsnsmMsuLjdXliEMP0kDNmNmEzBqf9J/JzRuyC4/xAeR3I/Q2/yx1bDcnKu93g2
-         ZDq0GR3UL8Somazck3T3PwMn965lwafvEYcRCiyHaJVMiVeW6lWaeYdxFJaZDXtv4FIV
-         r0pw==
-X-Gm-Message-State: AC+VfDwNkJGnhPCSIakK672k6s3v+BhmWwisLuUvb+UA/XOekHYXyN+E
-	Z4iU1R8CQWqN4O4XZMRcBA==
-X-Google-Smtp-Source: ACHHUZ7L2K0rZJQWVeqYf2S62Sl0/yPlkbfb3EeaeI4ZoJX8fp5J5T7DRDWdMHB2JIzwO9Yj9chBGQ==
-X-Received: by 2002:a5e:c606:0:b0:785:cb8d:f1c5 with SMTP id f6-20020a5ec606000000b00785cb8df1c5mr15334iok.12.1688055230020;
-        Thu, 29 Jun 2023 09:13:50 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id k5-20020a02cb45000000b0040bbcee6b57sm1708532jap.133.2023.06.29.09.13.48
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 09:13:49 -0700 (PDT)
-Received: (nullmailer pid 3129978 invoked by uid 1000);
-	Thu, 29 Jun 2023 16:13:47 -0000
-Date: Thu, 29 Jun 2023 10:13:47 -0600
-From: Rob Herring <robh@kernel.org>
-To: =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <zajec5@gmail.com>
-Cc: Rob Herring <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>, netdev@vger.kernel.org, Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>, Srinivas Kandagatla <srinivas.kandagatla@linaro.org>, linux-mtd@lists.infradead.org, Christian Marangi <ansuelsmth@gmail.com>, =?utf-8?B?UmFmYcWCIE1pxYJlY2tp?= <rafal@milecki.pl>, linux-arm-kernel@lists.infradead.org, devicetree@vger.kernel.org, linux-kernel@vger.kernel.org, Miquel Raynal <miquel.raynal@bootlin.com>
-Subject: Re: [PATCH V4] dt-bindings: nvmem: fixed-cell: add compatible for
- MAC cells
-Message-ID: <168805522630.3129899.14135828731809373225.robh@kernel.org>
-References: <20230627204630.9476-1-zajec5@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECA60134AF
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:15:00 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 17EA1C433C0;
+	Thu, 29 Jun 2023 16:15:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688055300;
+	bh=ZZ0x/hfKHeOr7h69Wp129mhxshiks3zVTS8Y7lb2+Dk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=PFhVcRaysQqUKb92I6zVf3GTwCJFBnGsYiGsW7XDdQLB1Pmk28lq78fhcQmj/mHAx
+	 7wJ+Oi3uiV6f0WQ0ZgyPlB9lup3N8ZsMRWbvPfG6pX8FRiBSa3HcdxujBYAzVX9LHV
+	 ATdClk7KBcfPVW6IUCJgbL2iHQDD5uq8g1fHBXNwl5+LUosSHeMD3GkNQrYys6wE1J
+	 tpi7rGqRKY2VH/zGf5uI2UJ3QhzOetvBUo8GQgy3kxha+tdPg1JLxuMNPCfr0EOtDk
+	 ny8dxnVDuhujbG+/LlFCdNaNrKJ/bEKWC4wpZ37Yx9/qufkr7E9XsdoaYUonVDNIML
+	 kmDNBbN9PZJ+g==
+Date: Thu, 29 Jun 2023 09:14:59 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tobias Heider <me@tobhe.de>
+Cc: Paolo Abeni <pabeni@redhat.com>, Michael Chan
+ <michael.chan@broadcom.com>, Siva Reddy Kallam <siva.kallam@broadcom.com>,
+ Prashant Sreedharan <prashant@broadcom.com>, Michael Chan
+ <mchan@broadcom.com>, netdev@vger.kernel.org, "David S. Miller"
+ <davem@davemloft.net>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH] Add MODULE_FIRMWARE() for FIRMWARE_TG357766.
+Message-ID: <20230629091459.5e442d21@kernel.org>
+In-Reply-To: <ZJ2JARrRUUd4YRvX@tobhe.de>
+References: <ZJt7LKzjdz8+dClx@tobhe.de>
+	<CACKFLinEbG_VVcMTPVuHeoQ6OLtPRaG7q2U5rvqPqdvk7T2HwA@mail.gmail.com>
+	<aa84a2f559a246b82779198d3ca60205691baa94.camel@redhat.com>
+	<ZJ2JARrRUUd4YRvX@tobhe.de>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230627204630.9476-1-zajec5@gmail.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
+On Thu, 29 Jun 2023 15:37:05 +0200 Tobias Heider wrote:
+> Would "Fixes: c4dab50697ff ("video: remove unnecessary platform_set_drvdata()")"
+> work?
 
-On Tue, 27 Jun 2023 22:46:30 +0200, Rafał Miłecki wrote:
-> From: Rafał Miłecki <rafal@milecki.pl>
-> 
-> A lot of home routers have NVMEM fixed cells containing MAC address that
-> need some further processing. In ~99% cases MAC needs to be:
-> 1. Optionally parsed from ASCII format
-> 2. Increased by a vendor-picked value
-> 
-> There was already an attempt to design a binding for that at NVMEM
-> device level in the past. It wasn't accepted though as it didn't really
-> fit NVMEM device layer.
-> 
-> The introduction of NVMEM fixed-cells layout seems to be an opportunity
-> to provide a relevant binding in a clean way.
-> 
-> This commit adds a *generic* compatible string: "mac-base". As always it
-> needs to be carefully reviewed.
-> 
-> OpenWrt project currently supports ~300 home routers that have NVMEM
-> cell with binary-stored base MAC.T hose devices are manufactured by
-> multiple vendors. There are TP-Link devices (76 of them), Netgear (19),
-> D-Link (11), OpenMesh (9), EnGenius (8), GL.iNet (8), ZTE (7),
-> Xiaomi (5), Ubiquiti (6) and more. Those devices don't share an
-> architecture or SoC.
-> 
-> Another 200 devices have base MAC stored in an ASCII format (not all
-> those devices have been converted to DT though).
-> 
-> It would be impractical to provide unique "compatible" strings for NVMEM
-> layouts of all those devices. It seems like a valid case for allowing a
-> generic binding instead. Even if this binding will not be sufficient for
-> some further devices it seems to be useful enough as it is.
-> 
-> Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
-> ---
-> V2: Drop "mac-ascii" as length can be checked instead
->     Fix "allOf" by adding required: [ compatible ]
-> V3: Fix cell length in "description" (thank you Rob!)
-> V4: Fix cell length (12 → 6) in fixed-layout.yaml example as well
-> ---
->  .../bindings/nvmem/layouts/fixed-cell.yaml    | 26 +++++++++++++++++++
->  .../bindings/nvmem/layouts/fixed-layout.yaml  | 12 +++++++++
->  .../devicetree/bindings/nvmem/nvmem.yaml      |  5 +++-
->  3 files changed, 42 insertions(+), 1 deletion(-)
-> 
-
-Reviewed-by: Rob Herring <robh@kernel.org>
-
+Modulo the text in the brackets but yes ;) I'll add when applying.
 
