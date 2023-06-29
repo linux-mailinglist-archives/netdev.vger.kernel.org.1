@@ -1,179 +1,148 @@
-Return-Path: <netdev+bounces-14546-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14547-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC5097424F4
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 13:29:25 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C98C2742515
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 13:43:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76623280CD6
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 11:29:24 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A425F1C20998
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 11:43:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EEF510953;
-	Thu, 29 Jun 2023 11:29:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 63FB710959;
+	Thu, 29 Jun 2023 11:43:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 63ADAD51C
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 11:29:22 +0000 (UTC)
-Received: from mail-pf1-x42a.google.com (mail-pf1-x42a.google.com [IPv6:2607:f8b0:4864:20::42a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3C12A30EF
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 04:29:20 -0700 (PDT)
-Received: by mail-pf1-x42a.google.com with SMTP id d2e1a72fcca58-666e3b15370so406563b3a.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 04:29:20 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688038160; x=1690630160;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=ZfFuThe/qoMIzWjTwGboo239F1nJd90UWgAoB6QoOsc=;
-        b=hGNohoohoand6sYmOE6Fyi221R8jV942yuGsQFCDjACZgO8QG+ccaRDHsCrEI9M3WO
-         irZQYSIDlhoKaajGW/85gVO8z28CAC3eBYJbB1IlM0fsKvPXiOMNCMyECXQu0MFK9IVT
-         Na8ZcqO1uCTTJPiKVCQbad8EqpE42YbLGKfj15SVvTn9RiAGRox7y58x8k7Sfv6qldXf
-         pKmTyKXy2SS0Zy7Bn0oYi62TX8cNqSLMOOkFpxgZask4TcwiVtl2cGFp/o4hl3evUtgG
-         2u7sZQm6sjWNWGfc+P/yK6/VQkfSazqD8ztd8ygfbpPoWz4pO/l1eIN3ZniLBL8qi2Fn
-         cZMA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 543CF8479
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 11:43:08 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E3C8E30F1
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 04:43:06 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688038986;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y15OWebfaiW59FJ+qInNbhfef5kwQoVQI8NNiLBthAo=;
+	b=XqwiGpcdjnAeYWnV8SdYo0qsnllstCo28d5JDLXhScMIQybhGQUadv4wig/TmPUAQm8xIw
+	dbDs1OQBIJj/mV1jayKP6H6O80h2iIkvHhCSlSEqr6NNymDdoUjjPl2LcINM9i/i68YvFq
+	vAF6Mkd2PsmEzA5ozelpi7Rh7rsZcGc=
+Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
+ [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-340-YRDNXPzhP8KS1FwlWhVbuQ-1; Thu, 29 Jun 2023 07:43:04 -0400
+X-MC-Unique: YRDNXPzhP8KS1FwlWhVbuQ-1
+Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-313f10072daso305582f8f.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 04:43:04 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688038160; x=1690630160;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ZfFuThe/qoMIzWjTwGboo239F1nJd90UWgAoB6QoOsc=;
-        b=GBjx6shSa6oI0KlwgOh6i76x/nRan7O7QaKGTvWY7Y/887X2706tQTrg7HNFECpw4v
-         RpoEABQFen5dZiElPaq0Kejkddc+BCd/z5N53fxYzCPjxlhRNrFkM7gHgdJjyHN3YUgc
-         GZxSAssha+HWlunCXfnHOR3QN/KJJDRkT2MOWX9ZGeyKE8Hwx2ejIjHmfYTqcOs1kQYm
-         avCzrKJrLyWIYdcpSi+x1yxfJN40HSvjShdkU+nuQTEYKf31Xay19UqP7km0gRFeJSFu
-         tnZT2qp0Dmpxbv10gfQKpaJQZafFpAt7wFqxKlY962wDZwnod47muVBFN26hBSFnv7ra
-         Sn5w==
-X-Gm-Message-State: AC+VfDw3YzQHQun/pEh1UQihthgZMrU4Ul58OjeI/ViB1lZXAaGrWSc8
-	WARz1Dz9vBVJghJgA2kCteU=
-X-Google-Smtp-Source: ACHHUZ4Xk/z/bHUiwLYrZYqWdxImDCmhy4j0eyvPIpQ8LIQkywIimLFSdtx8SVfbS8hUjsGaqR99XQ==
-X-Received: by 2002:a05:6a20:1609:b0:105:94e5:f5c5 with SMTP id l9-20020a056a20160900b0010594e5f5c5mr28539912pzj.56.1688038159515;
-        Thu, 29 Jun 2023 04:29:19 -0700 (PDT)
-Received: from debian.me ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id v26-20020aa7809a000000b006589cf6d88bsm8566325pff.145.2023.06.29.04.29.18
+        d=1e100.net; s=20221208; t=1688038984; x=1690630984;
+        h=mime-version:message-id:date:references:in-reply-to:subject:cc:to
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=y15OWebfaiW59FJ+qInNbhfef5kwQoVQI8NNiLBthAo=;
+        b=PHaPbi/UvGDHgAcHDEIWLejta5XXZ0BrCdCnQOgEAbAC+ZudAzuyMxDaPik4AxLMHB
+         whx9Tq+CviHb2xORRP4QQYPNaTfiOPqp+uPgzeWnsySZ0sif5vp8lWnczEKjLfIb93AM
+         4swq4asBsnLB/0y+DMTrzVCz0ND0W/+joBj/Z7T6tiGpE43uqZoKcVmgvjvXoY8vIYv+
+         HmeAkJynijdlmaCAgJaibUBCDJJ0YQgOHhUj2zrq2tOyuNOHxGp5YwW1d24Ni+xxIdRR
+         4PtOfL2J2+v/fmtpaDTWFgj7MwES0vyvCVzknVSCaBxd7WXGIN5fAESk/D93w0G8WN0U
+         K6Gg==
+X-Gm-Message-State: ABy/qLZT7na9AqY/ekv6W9fUQLikMRaWLOBDYnu/GO9NipCSgirCh00e
+	eTqZ9HP2Ro+m6cP2HI2UVqJK9Z5+3zEXq6WGYdFQNkaHw4987hkvHVv1PIoShp14ZOyNe0aOa0v
+	lVgaLUgJrbsrWuTxB
+X-Received: by 2002:adf:f9c5:0:b0:314:1648:9d7d with SMTP id w5-20020adff9c5000000b0031416489d7dmr1221854wrr.64.1688038983388;
+        Thu, 29 Jun 2023 04:43:03 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlG7J8oHmuSA1tYQISlBEGlzDG7d8VpmhOoliF95zZLhSrKIxd5jaunlWPs4R3lBde5sswQ7FQ==
+X-Received: by 2002:adf:f9c5:0:b0:314:1648:9d7d with SMTP id w5-20020adff9c5000000b0031416489d7dmr1221834wrr.64.1688038982858;
+        Thu, 29 Jun 2023 04:43:02 -0700 (PDT)
+Received: from alrua-x1.borgediget.toke.dk ([2a0c:4d80:42:443::2])
+        by smtp.gmail.com with ESMTPSA id u13-20020a5d514d000000b0030e56a9ff25sm15545151wrt.31.2023.06.29.04.43.02
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 04:29:18 -0700 (PDT)
-Received: by debian.me (Postfix, from userid 1000)
-	id 8F47D80F639E; Thu, 29 Jun 2023 18:29:15 +0700 (WIB)
-Date: Thu, 29 Jun 2023 18:29:15 +0700
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-To: Martin Zaharinov <micron10@gmail.com>, netdev <netdev@vger.kernel.org>,
-	Eric Dumazet <edumazet@google.com>
-Cc: Linux Regressions <regressions@lists.linux.dev>
-Subject: Re: Bug Report with kernel 6.3.5
-Message-ID: <ZJ1rC8WieLkJLHFl@debian.me>
-References: <20F611B6-2C76-4BD3-852D-8828D27F88EC@gmail.com>
- <ZHwkQcouxweYYhTX@debian.me>
+        Thu, 29 Jun 2023 04:43:02 -0700 (PDT)
+Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
+	id 811F5BC043D; Thu, 29 Jun 2023 13:43:01 +0200 (CEST)
+From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>
+To: Jakub Kicinski <kuba@kernel.org>, John Fastabend <john.fastabend@gmail.com>
+Cc: Stanislav Fomichev <sdf@google.com>, Alexei Starovoitov
+ <alexei.starovoitov@gmail.com>, Donald Hunter <donald.hunter@gmail.com>,
+ bpf <bpf@vger.kernel.org>, Alexei Starovoitov <ast@kernel.org>, Daniel
+ Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>,
+ Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
+ Yonghong Song <yhs@fb.com>, KP Singh <kpsingh@kernel.org>, Hao Luo
+ <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>, Network Development
+ <netdev@vger.kernel.org>
+Subject: Re: [RFC bpf-next v2 11/11] net/mlx5e: Support TX timestamp metadata
+In-Reply-To: <20230628115204.595dea8c@kernel.org>
+References: <20230622195757.kmxqagulvu4mwhp6@macbook-pro-8.dhcp.thefacebook.com>
+ <CAKH8qBvJmKwgdrLkeT9EPnCiTu01UAOKvPKrY_oHWySiYyp4nQ@mail.gmail.com>
+ <CAADnVQKfcGT9UaHtAmWKywtuyP9+_NX0_mMaR0m9D0-a=Ymf5Q@mail.gmail.com>
+ <CAKH8qBuJpybiTFz9vx+M+5DoGuK-pPq6HapMKq7rZGsngsuwkw@mail.gmail.com>
+ <CAADnVQ+611dOqVFuoffbM_cnOf62n6h+jaB1LwD2HWxS5if2CA@mail.gmail.com>
+ <m2bkh69fcp.fsf@gmail.com> <649637e91a709_7bea820894@john.notmuch>
+ <CAADnVQKUVDEg12jOc=5iKmfN-aHvFEtvFKVEDBFsmZizwkXT4w@mail.gmail.com>
+ <20230624143834.26c5b5e8@kernel.org> <ZJeUlv/omsyXdO/R@google.com>
+ <ZJoExxIaa97JGPqM@google.com>
+ <CAADnVQKePtxk6Nn=M6in6TTKaDNnMZm-g+iYzQ=mPoOh8peoZQ@mail.gmail.com>
+ <CAKH8qBv-jU6TUcWrze5VeiVhiJ-HUcpHX7rMJzN5o2tXFkS8kA@mail.gmail.com>
+ <649b581ded8c1_75d8a208c@john.notmuch>
+ <20230628115204.595dea8c@kernel.org>
+X-Clacks-Overhead: GNU Terry Pratchett
+Date: Thu, 29 Jun 2023 13:43:01 +0200
+Message-ID: <87y1k2fq9m.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: multipart/signed; micalg=pgp-sha512;
-	protocol="application/pgp-signature"; boundary="TZC7wl6DVJTO11zM"
-Content-Disposition: inline
-In-Reply-To: <ZHwkQcouxweYYhTX@debian.me>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Jakub Kicinski <kuba@kernel.org> writes:
 
---TZC7wl6DVJTO11zM
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: quoted-printable
+> On Tue, 27 Jun 2023 14:43:57 -0700 John Fastabend wrote:
+>> What I think would be the most straight-forward thing and most flexible
+>> is to create a <drvname>_devtx_submit_skb(<drivname>descriptor, sk_buff)
+>> and <drvname>_devtx_submit_xdp(<drvname>descriptor, xdp_frame) and then
+>> corresponding calls for <drvname>_devtx_complete_{skb|xdp}() Then you
+>> don't spend any cycles building the metadata thing or have to even
+>> worry about read kfuncs. The BPF program has read access to any
+>> fields they need. And with the skb, xdp pointer we have the context
+>> that created the descriptor and generate meaningful metrics.
+>
+> Sorry but this is not going to happen without my nack. DPDK was a much
+> cleaner bifurcation point than trying to write datapath drivers in BPF.
+> Users having to learn how to render descriptors for all the NICs
+> and queue formats out there is not reasonable. Isovalent hired
+> a lot of former driver developers so you may feel like it's a good
+> idea, as a middleware provider. But for the rest of us the matrix
+> of HW x queue format x people writing BPF is too large. If we can
+> write some poor man's DPDK / common BPF driver library to be selected
+> at linking time - we can as well provide a generic interface in
+> the kernel itself. Again, we never merged explicit DPDK support, 
+> your idea is strictly worse.
 
-On Sun, Jun 04, 2023 at 12:42:25PM +0700, Bagas Sanjaya wrote:
-> On Sun, Jun 04, 2023 at 07:51:36AM +0300, Martin Zaharinov wrote:
-> > Hi Team one bug report=20
-> >=20
-> > after upgrade from kernel 6.2.12 to 6.3.5=20
-> > After fell hour system get this error.
-> >=20
-> > If is possible to check.
-> >=20
-> >=20
-> > Jun  4 01:46:52  [12810.275218][  T587] INFO: task nginx:3977 blocked f=
-or more than 609 seconds.
-> > Jun  4 01:46:52  [12810.275350][  T587]       Tainted: G           O   =
-    6.3.5 #1
-> > Jun  4 01:46:52  [12810.275436][  T587] "echo 0 > /proc/sys/kernel/hung=
-_task_timeout_secs" disables this message.
-> > Jun  4 01:46:52  [12810.275527][  T587] task:nginx         state:D stac=
-k:0     pid:3977  ppid:1      flags:0x00000006
-> > Jun  4 01:46:52  [12810.275624][  T587] Call Trace:
-> > Jun  4 01:46:52  [12810.275707][  T587]  <TASK>
-> > Jun  4 01:46:52  [12810.275786][  T587]  __schedule+0x352/0x820
-> > Jun  4 01:46:52  [12810.275878][  T587]  schedule_preempt_disabled+0x61=
-/0xe0
-> > Jun  4 01:46:52  [12810.275963][  T587]  __mutex_lock.constprop.0+0x481=
-/0x7a0
-> > Jun  4 01:46:52  [12810.276049][  T587]  ? __lock_sock_fast+0x1a/0xc0
-> > Jun  4 01:46:52  [12810.276135][  T587]  ? lock_sock_nested+0x1a/0xc0
-> > Jun  4 01:46:52  [12810.276217][  T587]  ? inode_wait_for_writeback+0x7=
-7/0xd0
-> > Jun  4 01:46:52  [12810.276307][  T587]  eventpoll_release_file+0x41/0x=
-90
-> > Jun  4 01:46:52  [12810.276416][  T587]  __fput+0x1d9/0x240
-> > Jun  4 01:46:52  [12810.276517][  T587]  task_work_run+0x51/0x80
-> > Jun  4 01:46:52  [12810.276624][  T587]  exit_to_user_mode_prepare+0x12=
-3/0x130
-> > Jun  4 01:46:52  [12810.276732][  T587]  syscall_exit_to_user_mode+0x21=
-/0x110
-> > Jun  4 01:46:52  [12810.276847][  T587]  entry_SYSCALL_64_after_hwframe=
-+0x46/0xb0
-> > Jun  4 01:46:52  [12810.276954][  T587] RIP: 0033:0x15037529155a
-> > Jun  4 01:46:52  [12810.277056][  T587] RSP: 002b:000015036bbb6400 EFLA=
-GS: 00000293 ORIG_RAX: 0000000000000003
-> > Jun  4 01:46:52  [12810.277185][  T587] RAX: 0000000000000000 RBX: 0000=
-15036bbb7420 RCX: 000015037529155a
-> > Jun  4 01:46:52  [12810.277311][  T587] RDX: 0000000000000000 RSI: 0000=
-000000000000 RDI: 0000000000000013
-> > Jun  4 01:46:52  [12810.277440][  T587] RBP: 00001503647343d0 R08: 1999=
-999999999999 R09: 0000000000000000
-> > Jun  4 01:46:52  [12810.277567][  T587] R10: 000015037531baa0 R11: 0000=
-000000000293 R12: 0000000000000ba5
-> > Jun  4 01:46:52  [12810.277693][  T587] R13: 0000150348731f48 R14: 0000=
-000000000000 R15: 000000001f5b06b0
-> > Jun  4 01:46:52  [12810.277820][  T587]  </TASK>
-> >=20
->=20
-> Can you clearly describe this regression? And your nginx setup? And most
-> importantly, can you please bisect between v6.2 and v6.3 to find the
-> culprit? Can you also check the mainline?
->=20
-> Anyway, thanks for the regression report. I'm adding it to regzbot:
->=20
-> #regzbot ^introduced: v6.2.12..v6.3.5
-> #regzbot title: nginx blocked for more than 10 minutes on 6.3.5
->=20
+I agree: we're writing an operating system kernel here. The *whole
+point* of an operating system is to provide an abstraction over
+different types of hardware and provide a common API so users don't have
+to deal with the hardware details.
 
-No reply from Martin (MIA), thus removing from regzbot tracking:
+I feel like there's some tension between "BPF as a dataplane API" and
+"BPF as a kernel extension language" here, especially as the BPF
+subsystem has grown more features in the latter direction. In my mind,
+XDP is still very much a dataplane API; in fact that's one of the main
+selling points wrt DPDK: you can get high performance networking but
+still take advantage of the kernel drivers and other abstractions that
+the kernel provides. If you're going for raw performance and the ability
+to twiddle every tiny detail of the hardware, DPDK fills that niche
+quite nicely (and also shows us the pains of going that route).
 
-#regzbot inconclusive: reporter MIA when being asked to provide regression =
-details
+-Toke
 
-Thanks.
-
---=20
-An old man doll... just what I always wanted! - Clara
-
---TZC7wl6DVJTO11zM
-Content-Type: application/pgp-signature; name="signature.asc"
-
------BEGIN PGP SIGNATURE-----
-
-iHUEABYKAB0WIQSSYQ6Cy7oyFNCHrUH2uYlJVVFOowUCZJ1rBwAKCRD2uYlJVVFO
-o98vAQCfmPM0/FgOA6TnBKdHZKH7NpIqApgAM7RSqDd1ff7fYQEA2jh5tomQyWRj
-9PcS4byaAkXqO13KyoqSebAaELNx0Q8=
-=P9rd
------END PGP SIGNATURE-----
-
---TZC7wl6DVJTO11zM--
 
