@@ -1,211 +1,388 @@
-Return-Path: <netdev+bounces-14496-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14497-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B21AA741F94
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 07:12:49 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51EF5741FAE
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 07:17:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1AC4280D66
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:12:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7B10B1C20976
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:17:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E58C4C9C;
-	Thu, 29 Jun 2023 05:12:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E23A55225;
+	Thu, 29 Jun 2023 05:17:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB681FC8
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:12:45 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702A7194;
-	Wed, 28 Jun 2023 22:12:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
-	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
-	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
-	bh=31mXj0LrDJBbkDjYY0JkRdmBEMX8kHpGdSb2KzkvoJQ=; b=XLK3Lbg/zIF8PgmNRjDb4LeAqM
-	dhWKbW4uqaBS6nyCgIOc5Z4o/AdTb7Jr23+7eQkotQCYbg/o4bfsR29Qao6H95J9RbmbI4Rh1loxf
-	F5wsj7fJegKx1Ucvlkk53tt+OjxNpMsJACzmOR3eF2MdKVeGsEW+3M7qwiM0e4VQIdC5y+q1s3Kfy
-	6P54xmH+SGD79V+E/9HNUPSymGimv1XntcL6gGpJ7rJdTXQ8BFkS+I+1Yy4iZVZ0Ns1Y2XpGBKCmY
-	Ji274SUByvkipntcYcoqzg03tSSUnM9EvLJ2YpXWtQgp8xIi+GGgTW5B66AIKvHLRFZhHVVQtGLAH
-	vb+CthVg==;
-Received: from [2601:1c2:980:9ec0::2764]
-	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
-	id 1qEjxJ-00HZxc-1y;
-	Thu, 29 Jun 2023 05:12:33 +0000
-Message-ID: <3135e933-09cb-e397-972b-d66c48bbf772@infradead.org>
-Date: Wed, 28 Jun 2023 22:12:32 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF97F4C9A;
+	Thu, 29 Jun 2023 05:17:13 +0000 (UTC)
+Received: from out30-97.freemail.mail.aliyun.com (out30-97.freemail.mail.aliyun.com [115.124.30.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 87AAF199E;
+	Wed, 28 Jun 2023 22:17:09 -0700 (PDT)
+X-Alimail-AntiSpam:AC=PASS;BC=-1|-1;BR=01201311R181e4;CH=green;DM=||false|;DS=||;FP=0|-1|-1|-1|0|-1|-1|-1;HT=ay29a033018045192;MF=hengqi@linux.alibaba.com;NM=1;PH=DS;RN=13;SR=0;TI=SMTPD_---0VmCv5Bb_1688015823;
+Received: from 30.221.149.251(mailfrom:hengqi@linux.alibaba.com fp:SMTPD_---0VmCv5Bb_1688015823)
+          by smtp.aliyun-inc.com;
+          Thu, 29 Jun 2023 13:17:04 +0800
+Message-ID: <913f0d9e-9281-e204-e8c7-3f7bb9b492c1@linux.alibaba.com>
+Date: Thu, 29 Jun 2023 13:17:01 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.2
-Subject: Re: [PATCH] s390/lcs: Remove FDDI option
-Content-Language: en-US
-To: Alexandra Winter <wintera@linux.ibm.com>,
- David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: Simon Horman <simon.horman@corigine.com>,
- Christian Borntraeger <borntraeger@linux.ibm.com>, netdev@vger.kernel.org,
- linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>
-References: <20230628135736.13339-1-wintera@linux.ibm.com>
-From: Randy Dunlap <rdunlap@infradead.org>
-In-Reply-To: <20230628135736.13339-1-wintera@linux.ibm.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH net-next v4 1/2] virtio-net: support coexistence of XDP
+ and GUEST_CSUM
+To: Jason Wang <jasowang@redhat.com>
+Cc: netdev@vger.kernel.org, bpf@vger.kernel.org,
+ "Michael S . Tsirkin" <mst@redhat.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>,
+ Daniel Borkmann <daniel@iogearbox.net>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ John Fastabend <john.fastabend@gmail.com>,
+ Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+References: <20230628030506.2213-1-hengqi@linux.alibaba.com>
+ <20230628030506.2213-2-hengqi@linux.alibaba.com>
+ <CACGkMEv7aVH0dgdd6N3RMH+57BWuxnq9NR8sPzD9wRQZ5TZRFQ@mail.gmail.com>
+ <c6411922-51ad-3d8f-88aa-28883b44573d@linux.alibaba.com>
+ <CACGkMEu=Cs5DFP+EFqxUXaiqz7vewhQ5zMMtChGpR_oGjrvMCg@mail.gmail.com>
+ <20230628045626.GA32321@h68b04307.sqa.eu95>
+ <CACGkMEt6Kb60Akn=aJjzJQg6Zg8F_24ezqAtwPOZxiu4-f7E3g@mail.gmail.com>
+ <620af708-42a0-f711-cd7c-43362751c842@linux.alibaba.com>
+ <CACGkMEufm08ym32Ft4ss7AzOjFaEoa5_CuZB29xF9qc3B2ZAhA@mail.gmail.com>
+ <CACGkMEukz+XZcNb4xrjV=jcUcpJsQQtkDphaapbVU5jz-wRcsg@mail.gmail.com>
+From: Heng Qi <hengqi@linux.alibaba.com>
+In-Reply-To: <CACGkMEukz+XZcNb4xrjV=jcUcpJsQQtkDphaapbVU5jz-wRcsg@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-10.0 required=5.0 tests=BAYES_00,
+	ENV_AND_HDR_SPF_MATCH,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-On 6/28/23 06:57, Alexandra Winter wrote:
-> The last s390 machine that supported FDDI was z900 ('7th generation',
-> released in 2000). The oldest machine generation currently supported by
-> the Linux kernel is MARCH_Z10 (released 2008). If there is still a usecase
-> for connecting a Linux on s390 instance to a LAN Channel Station (LCS), it
-> can only do so via Ethernet.
-> 
-> Randy Dunlap[1] found that LCS over FDDI has never worked, when FDDI
-> was compiled as module. Instead of fixing that, remove the FDDI option
-> from the lcs driver.
-> 
-> While at it, make the CONFIG_LCS description a bit more helpful.
-> 
-> References:
-> [1] https://lore.kernel.org/netdev/20230621213742.8245-1-rdunlap@infradead.org/
-> 
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+在 2023/6/29 下午12:11, Jason Wang 写道:
+> On Thu, Jun 29, 2023 at 12:03 PM Jason Wang <jasowang@redhat.com> wrote:
+>> On Wed, Jun 28, 2023 at 6:02 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>
+>>>
+>>> 在 2023/6/28 下午2:50, Jason Wang 写道:
+>>>> On Wed, Jun 28, 2023 at 12:56 PM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>> On Wed, Jun 28, 2023 at 12:02:17PM +0800, Jason Wang wrote:
+>>>>>> On Wed, Jun 28, 2023 at 11:42 AM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>>>>
+>>>>>>> 在 2023/6/28 上午11:22, Jason Wang 写道:
+>>>>>>>> On Wed, Jun 28, 2023 at 11:05 AM Heng Qi <hengqi@linux.alibaba.com> wrote:
+>>>>>>>>> We are now re-probing the csum related fields and trying
+>>>>>>>>> to have XDP and RX hw checksum capabilities coexist on the
+>>>>>>>>> XDP path. For the benefit of:
+>>>>>>>>> 1. RX hw checksum capability can be used if XDP is loaded.
+>>>>>>>>> 2. Avoid packet loss when loading XDP in the vm-vm scenario.
+>>>>>>>>>
+>>>>>>>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
+>>>>>>>>> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+>>>>>>>>> ---
+>>>>>>>>> v3->v4:
+>>>>>>>>>      - Rewrite some comments.
+>>>>>>>>>
+>>>>>>>>> v2->v3:
+>>>>>>>>>      - Use skb_checksum_setup() instead of virtnet_flow_dissect_udp_tcp().
+>>>>>>>>>        Essentially equivalent.
+>>>>>>>>>
+>>>>>>>>>     drivers/net/virtio_net.c | 82 +++++++++++++++++++++++++++++++++-------
+>>>>>>>>>     1 file changed, 69 insertions(+), 13 deletions(-)
+>>>>>>>>>
+>>>>>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+>>>>>>>>> index 5a7f7a76b920..a47342f972b5 100644
+>>>>>>>>> --- a/drivers/net/virtio_net.c
+>>>>>>>>> +++ b/drivers/net/virtio_net.c
+>>>>>>>>> @@ -1568,6 +1568,41 @@ static void virtio_skb_set_hash(const struct virtio_net_hdr_v1_hash *hdr_hash,
+>>>>>>>>>            skb_set_hash(skb, __le32_to_cpu(hdr_hash->hash_value), rss_hash_type);
+>>>>>>>>>     }
+>>>>>>>>>
+>>>>>>>>> +static int virtnet_set_csum_after_xdp(struct virtnet_info *vi,
+>>>>>>>>> +                                     struct sk_buff *skb,
+>>>>>>>>> +                                     __u8 flags)
+>>>>>>>>> +{
+>>>>>>>>> +       int err = 0;
+>>>>>>>>> +
+>>>>>>>>> +       /* When XDP program is loaded, the vm-vm scenario on the same host,
+>>>>>>>>> +        * packets marked VIRTIO_NET_HDR_F_NEEDS_CSUM without a complete checksum
+>>>>>>>>> +        * will travel. Although these packets are safe from the point of
+>>>>>>>>> +        * view of the vm, in order to be successfully forwarded on the upper
+>>>>>>>>> +        * layer and to avoid packet loss caused by XDP modification,
+>>>>>>>>> +        * we re-probe the necessary checksum related information:
+>>>>>>>>> +        * skb->csum_{start, offset}, pseudo-header checksum.
+>>>>>>>>> +        *
+>>>>>>>>> +        * If the received packet is marked VIRTIO_NET_HDR_F_DATA_VALID:
+>>>>>>>>> +        * when _F_GUEST_CSUM is negotiated, the device validates the checksum
+>>>>>>>>> +        * and virtio-net sets skb->ip_summed to CHECKSUM_UNNECESSARY;
+>>>>>>>>> +        * otherwise, virtio-net hands over to the stack to validate the checksum.
+>>>>>>>>> +        */
+>>>>>>>>> +       if (flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) {
+>>>>>>>>> +               /* No need to care about SCTP because virtio-net currently doesn't
+>>>>>>>>> +                * support SCTP CRC checksum offloading, that is, SCTP packets have
+>>>>>>>>> +                * complete checksums.
+>>>>>>>>> +                */
+>>>>>>>>> +               err = skb_checksum_setup(skb, true);
+>>>>>>>> A second thought, any reason why a checksum is a must here. Could we simply:
+>>>>>>> When net.ipv4.ip_forward sysctl is enabled, such packets may be
+>>>>>>> forwarded (return to the tx path) at the IP layer.
+>>>>>>> If the device has the tx hw checksum offloading cap, packets will have
+>>>>>>> complete checksums based on our calculated 'check' value.
+>>>>>> Actually, I mean why can't we offload the checksum to the hardware in this case?
+>>>>> Yes that's what I explained:)
+>>>>>
+>>>>> Checksum of udp/tcp includes the pseudo-header checksum and the checksum of the entire udp/tcp payload.
+>>>>> When tx checksum offloading is enabled, the upper layer will only calculate the pseudo-header checksum,
+>>>>> and the rest of the checksum of the entire udp/tcp payload will be calculated by hardware.
+>>>>>
+>>>>>
+>>>>> Please see udp_send_skb():
+>>>>>
+>>>>> "
+>>>>>           } else if (skb->ip_summed == CHECKSUM_PARTIAL) { /* UDP hardware csum */
+>>>>> csum_partial:
+>>>>>
+>>>>>                   udp4_hwcsum(skb, fl4->saddr, fl4->daddr);
+>>>>>                   goto send;
+>>>>>
+>>>>>           } else
+>>>>>                   csum = udp_csum(skb);
+>>>>>
+>>>>>           /* add protocol-dependent pseudo-header */
+>>>>>           uh->check = csum_tcpudp_magic(fl4->saddr, fl4->daddr, len,
+>>>>>                                         sk->sk_protocol, csum);
+>>>>>           if (uh->check == 0)
+>>>>>                   uh->check = CSUM_MANGLED_0;
+>>>>>
+>>>>> send:
+>>>>>           err = ip_send_skb(sock_net(sk), skb);
+>>>>> "
+>>>> Ok, so I think what I missed is that the CHECKSUM_PARTIAL is set up by
+>>>> skb_checksum_setup() so we don't even need to care about that.
+>>> Yes. It works fine after skb_checksum_setup().
+>>>
+>>>>>>>> 1) probe the csum_start/offset
+>>>>>>>> 2) leave it as CHECKSUM_PARTIAL
+>>>>>>>>
+>>>>>>>> ?
+>>>>>>> The reason is as I explained above.
+>>>>>>>
+>>>>>>>>> +       } else if (flags & VIRTIO_NET_HDR_F_DATA_VALID) {
+>>>>>>>>> +               /* XDP guarantees that packets marked as VIRTIO_NET_HDR_F_DATA_VALID
+>>>>>>>>> +                * still have correct checksum after they are processed.
+>>>>>>>>> +                */
+>>>>>>>> Do you mean it's the charge of the XDP program to calculate the csum
+>>>>>>>> in this case? Seems strange.
+>>>>>>> Packet with complete checksum (and has been verified by rx device
+>>>>>>> because it has VIRTIO_NET_HDR_F_DATA_VALID)
+>>>>>>> when modified by XDP, XDP program should use the helper provided by XDP
+>>>>>>> core to make the checksum correct,
+>>>>>> Could you give me a pointer to that helper?
+>>>>> bpf_csum_diff(),
+>>>> Ok.
+>>>>
+>>>>> bpf_{l3,l4}_csum_replace()
+>>>> This seems not to be a helpr for XDP but for other bpf like cls.
+>>> Yes.
+>>>
+>>>>>> Btw, is there a way for
+>>>>>> the XDP program to know whether the csum has been verified by the
+>>>>>> device? ( I guess not).
+>>>>>>
+>>>>> Not. But we only do this (mark skb->ip_summed = CHECKSUM_UNNECESSARY) for packets with VIRTIO_NET_HDR_F_DATA_VALID now.
+>>>> So if I understand you correctly, you meant for the XDP program that
+>>>> wants to modify the packet:
+>>>>
+>>>> 1) check whether the checksum is valid
+>>>> 2) if yes, recalculate the checksum after the modification
+>>>> 3) if not, just do nothing for the checksum and the driver need to
+>>>> re-probe the csum_start/offset
+>>>>
+>>>> ?
+>>> I don't think we need to make many assumptions about the behavior of XDP
+>>> programs.
+>>> Because we are out of control for various users using XDP.
+>> Exactly, but this patch seems to assume the XDP behaviour as you said previously
+>>
+>> """
+>>>>>>> Packet with complete checksum (and has been verified by rx device
+>>>>>>> because it has VIRTIO_NET_HDR_F_DATA_VALID)
+>>>>>>> when modified by XDP, XDP program should use the helper provided by XDP
+>>>>>>> core to make the checksum correct,
+>> """
+>>
+>> ?
+>>
+>>> The core purpose of this patch is to:
+>>> #1 Solve the packet loss problem caused by loading XDP between vm-vm on
+>>> the same host (scenario with partial checksum).
+>> So we disabled guest_csum and the host (e.g TAP) will do checksum for
+>> us. Otherwise it should be a bug of the host.
+>>
+>> Thanks
+> Btw, it looks to me that this patch doesn't fix the XDP_TX path?
+> Should we do that or it's not related at all?
+
+No need. When XDP returns XDP_TX or other drivers REDIRECT xdp_frame to 
+virtio-net (now ndo_xdp_xmit(), that is, virtnet_xdp_xmit() is called),
+it will all go to __virtnet_xdp_xmit_one(). Now see the commen[1] and 
+see commit[2]:
+
+These checksums must be calculated by the XDP layers and skb-> 
+ip_summed=CHECK_NONE,
+which means that sw has calculated the complete checksums, and there is 
+no need for hardware checksum offloading.
 
 
-Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+[1]   /* Zero header and leave csum up to XDP layers */
+[2]  commit 56434a01b12e99eb60908f5f2b27b90726d0a183
+       Author: John Fastabend <john.fastabend@gmail.com>
+       Date:   Thu Dec 15 12:14:13 2016 -0800
+
+     virtio_net: add XDP_TX support
+
+     This adds support for the XDP_TX action to virtio_net. When an XDP
+     program is run and returns the XDP_TX action the virtio_net XDP
+     implementation will transmit the packet on a TX queue that aligns
+     with the current CPU that the XDP packet was processed on.
+
+     Before sending the packet the header is zeroed.  Also XDP is expected
+     to handle checksum correctly so no checksum offload  support is
+     provided.
+
 
 Thanks.
 
-> ---
->  drivers/s390/net/Kconfig |  5 ++---
->  drivers/s390/net/lcs.c   | 39 ++++++---------------------------------
->  2 files changed, 8 insertions(+), 36 deletions(-)
-> 
-> diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
-> index 9c67b97faba2..74760c1a163b 100644
-> --- a/drivers/s390/net/Kconfig
-> +++ b/drivers/s390/net/Kconfig
-> @@ -5,12 +5,11 @@ menu "S/390 network device drivers"
->  config LCS
->  	def_tristate m
->  	prompt "Lan Channel Station Interface"
-> -	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
-> +	depends on CCW && NETDEVICES && ETHERNET
->  	help
->  	  Select this option if you want to use LCS networking on IBM System z.
-> -	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
->  	  To compile as a module, choose M. The module name is lcs.
-> -	  If you do not know what it is, it's safe to choose Y.
-> +	  If you do not use LCS, choose N.
->  
->  config CTCM
->  	def_tristate m
-> diff --git a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
-> index 9fd8e6f07a03..a1f2acd6fb8f 100644
-> --- a/drivers/s390/net/lcs.c
-> +++ b/drivers/s390/net/lcs.c
-> @@ -17,7 +17,6 @@
->  #include <linux/if.h>
->  #include <linux/netdevice.h>
->  #include <linux/etherdevice.h>
-> -#include <linux/fddidevice.h>
->  #include <linux/inetdevice.h>
->  #include <linux/in.h>
->  #include <linux/igmp.h>
-> @@ -36,10 +35,6 @@
->  #include "lcs.h"
->  
->  
-> -#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
-> -#error Cannot compile lcs.c without some net devices switched on.
-> -#endif
-> -
->  /*
->   * initialization string for output
->   */
-> @@ -1601,19 +1596,11 @@ lcs_startlan_auto(struct lcs_card *card)
->  	int rc;
->  
->  	LCS_DBF_TEXT(2, trace, "strtauto");
-> -#ifdef CONFIG_ETHERNET
->  	card->lan_type = LCS_FRAME_TYPE_ENET;
->  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
->  	if (rc == 0)
->  		return 0;
->  
-> -#endif
-> -#ifdef CONFIG_FDDI
-> -	card->lan_type = LCS_FRAME_TYPE_FDDI;
-> -	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
-> -	if (rc == 0)
-> -		return 0;
-> -#endif
->  	return -EIO;
->  }
->  
-> @@ -1806,22 +1793,16 @@ lcs_get_frames_cb(struct lcs_channel *channel, struct lcs_buffer *buffer)
->  			card->stats.rx_errors++;
->  			return;
->  		}
-> -		/* What kind of frame is it? */
-> -		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL) {
-> -			/* Control frame. */
-> +		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL)
->  			lcs_get_control(card, (struct lcs_cmd *) lcs_hdr);
-> -		} else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET ||
-> -			   lcs_hdr->type == LCS_FRAME_TYPE_TR ||
-> -			   lcs_hdr->type == LCS_FRAME_TYPE_FDDI) {
-> -			/* Normal network packet. */
-> +		else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET)
->  			lcs_get_skb(card, (char *)(lcs_hdr + 1),
->  				    lcs_hdr->offset - offset -
->  				    sizeof(struct lcs_header));
-> -		} else {
-> -			/* Unknown frame type. */
-> -			; // FIXME: error message ?
-> -		}
-> -		/* Proceed to next frame. */
-> +		else
-> +			dev_info_once(&card->dev->dev,
-> +				      "Unknown frame type %d\n",
-> +				      lcs_hdr->type);
->  		offset = lcs_hdr->offset;
->  		lcs_hdr->offset = LCS_ILLEGAL_OFFSET;
->  		lcs_hdr = (struct lcs_header *) (buffer->data + offset);
-> @@ -2140,18 +2121,10 @@ lcs_new_device(struct ccwgroup_device *ccwgdev)
->  		goto netdev_out;
->  	}
->  	switch (card->lan_type) {
-> -#ifdef CONFIG_ETHERNET
->  	case LCS_FRAME_TYPE_ENET:
->  		card->lan_type_trans = eth_type_trans;
->  		dev = alloc_etherdev(0);
->  		break;
-> -#endif
-> -#ifdef CONFIG_FDDI
-> -	case LCS_FRAME_TYPE_FDDI:
-> -		card->lan_type_trans = fddi_type_trans;
-> -		dev = alloc_fddidev(0);
-> -		break;
-> -#endif
->  	default:
->  		LCS_DBF_TEXT(3, setup, "errinit");
->  		pr_err(" Initialization failed\n");
 
--- 
-~Randy
+>
+> Thanks
+>
+>>> #2 For scenarios other than #1, virtio-net with this patch is already
+>>> consistent with other existing NIC drivers (simple such as
+>>> ixgbe[1]/bnxt[2]/mvneta[3]/..):
+>>> the rx side only needs to have NETIF_F_RXCSUM and the device has
+>>> verified the packet has a valid checksum.
+>>> Then skb converted from xdp_buff (XDP returns XDP_PASS) can have
+>>> skb->ip_summed = CHECKSUM_UNNECESSARY.
+>>>
+>>> If the comment for DATA_VALID is confusing, I'll just remove it.
+>>>
+>>> [1] ixgbe_clean_rx_irq()-> ixgbe_run_xdp()-> ixgbe_process_skb_fields()
+>>> ->ixgbe_rx_checksum()
+>>> [2] bnxt_xdp_build_skb()
+>>> [3] mvneta_swbm_build_skb
+>>>
+>>> Thanks.
+>>>
+>>>> Thanks
+>>>>
+>>>>> Thanks.
+>>>>>
+>>>>>> Thanks
+>>>>>>
+>>>>>>
+>>>>>>> otherwise, VIRTIO_NET_HDR_F_DATA_VALID has been cleared and skb
+>>>>>>> ->ip_summed=CHECKSUM_NONE, so the stack
+>>>>>>> will re-verify the checksum, causing packet loss due to wrong checksum.
+>>>>>>>
+>>>>>>> Thanks.
+>>>>>>>
+>>>>>>>> Thanks
+>>>>>>>>
+>>>>>>>>> +               skb->ip_summed = CHECKSUM_UNNECESSARY;
+>>>>>>>>> +       }
+>>>>>>>>> +
+>>>>>>>>> +       return err;
+>>>>>>>>> +}
+>>>>>>>>> +
+>>>>>>>>>     static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>>>>>>                            void *buf, unsigned int len, void **ctx,
+>>>>>>>>>                            unsigned int *xdp_xmit,
+>>>>>>>>> @@ -1576,6 +1611,7 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>>>>>>            struct net_device *dev = vi->dev;
+>>>>>>>>>            struct sk_buff *skb;
+>>>>>>>>>            struct virtio_net_hdr_mrg_rxbuf *hdr;
+>>>>>>>>> +       __u8 flags;
+>>>>>>>>>
+>>>>>>>>>            if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
+>>>>>>>>>                    pr_debug("%s: short packet %i\n", dev->name, len);
+>>>>>>>>> @@ -1584,6 +1620,12 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>>>>>>                    return;
+>>>>>>>>>            }
+>>>>>>>>>
+>>>>>>>>> +       /* XDP may modify/overwrite the packet, including the virtnet hdr,
+>>>>>>>>> +        * so save the flags of the virtnet hdr before XDP processing.
+>>>>>>>>> +        */
+>>>>>>>>> +       if (unlikely(vi->xdp_enabled))
+>>>>>>>>> +               flags = ((struct virtio_net_hdr_mrg_rxbuf *)buf)->hdr.flags;
+>>>>>>>>> +
+>>>>>>>>>            if (vi->mergeable_rx_bufs)
+>>>>>>>>>                    skb = receive_mergeable(dev, vi, rq, buf, ctx, len, xdp_xmit,
+>>>>>>>>>                                            stats);
+>>>>>>>>> @@ -1595,23 +1637,37 @@ static void receive_buf(struct virtnet_info *vi, struct receive_queue *rq,
+>>>>>>>>>            if (unlikely(!skb))
+>>>>>>>>>                    return;
+>>>>>>>>>
+>>>>>>>>> -       hdr = skb_vnet_hdr(skb);
+>>>>>>>>> -       if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
+>>>>>>>>> -               virtio_skb_set_hash((const struct virtio_net_hdr_v1_hash *)hdr, skb);
+>>>>>>>>> -
+>>>>>>>>> -       if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+>>>>>>>>> -               skb->ip_summed = CHECKSUM_UNNECESSARY;
+>>>>>>>>> +       if (unlikely(vi->xdp_enabled)) {
+>>>>>>>>> +               /* Required to do this before re-probing and calculating
+>>>>>>>>> +                * the pseudo-header checksum.
+>>>>>>>>> +                */
+>>>>>>>>> +               skb->protocol = eth_type_trans(skb, dev);
+>>>>>>>>> +               skb_reset_network_header(skb);
+>>>>>>>>> +               if (virtnet_set_csum_after_xdp(vi, skb, flags) < 0) {
+>>>>>>>>> +                       pr_debug("%s: errors occurred in setting partial csum",
+>>>>>>>>> +                                dev->name);
+>>>>>>>>> +                       goto frame_err;
+>>>>>>>>> +               }
+>>>>>>>>> +       } else {
+>>>>>>>>> +               hdr = skb_vnet_hdr(skb);
+>>>>>>>>> +               if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash_report)
+>>>>>>>>> +                       virtio_skb_set_hash((const struct virtio_net_hdr_v1_hash *)hdr, skb);
+>>>>>>>>> +
+>>>>>>>>> +               if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
+>>>>>>>>> +                       skb->ip_summed = CHECKSUM_UNNECESSARY;
+>>>>>>>>> +
+>>>>>>>>> +               if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+>>>>>>>>> +                                         virtio_is_little_endian(vi->vdev))) {
+>>>>>>>>> +                       net_warn_ratelimited("%s: bad gso: type: %u, size: %u\n",
+>>>>>>>>> +                                            dev->name, hdr->hdr.gso_type,
+>>>>>>>>> +                                            hdr->hdr.gso_size);
+>>>>>>>>> +                       goto frame_err;
+>>>>>>>>> +               }
+>>>>>>>>>
+>>>>>>>>> -       if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
+>>>>>>>>> -                                 virtio_is_little_endian(vi->vdev))) {
+>>>>>>>>> -               net_warn_ratelimited("%s: bad gso: type: %u, size: %u\n",
+>>>>>>>>> -                                    dev->name, hdr->hdr.gso_type,
+>>>>>>>>> -                                    hdr->hdr.gso_size);
+>>>>>>>>> -               goto frame_err;
+>>>>>>>>> +               skb->protocol = eth_type_trans(skb, dev);
+>>>>>>>>>            }
+>>>>>>>>>
+>>>>>>>>>            skb_record_rx_queue(skb, vq2rxq(rq->vq));
+>>>>>>>>> -       skb->protocol = eth_type_trans(skb, dev);
+>>>>>>>>>            pr_debug("Receiving skb proto 0x%04x len %i type %i\n",
+>>>>>>>>>                     ntohs(skb->protocol), skb->len, skb->pkt_type);
+>>>>>>>>>
+>>>>>>>>> --
+>>>>>>>>> 2.19.1.6.gb485710b
+>>>>>>>>>
+
 
