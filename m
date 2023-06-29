@@ -1,297 +1,399 @@
-Return-Path: <netdev+bounces-14482-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14483-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 96F1A741EA6
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:19:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DF017741EAD
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:20:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEECC280D36
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:19:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0E18B1C204E8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:20:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 29F1C1851;
-	Thu, 29 Jun 2023 03:19:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E102D1855;
+	Thu, 29 Jun 2023 03:20:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 195B21FAD
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:19:09 +0000 (UTC)
-Received: from mail-oo1-xc2c.google.com (mail-oo1-xc2c.google.com [IPv6:2607:f8b0:4864:20::c2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CDFF12713
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:19:07 -0700 (PDT)
-Received: by mail-oo1-xc2c.google.com with SMTP id 006d021491bc7-563531a3ad2so140819eaf.3
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:19:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688008747; x=1690600747;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=APmjph+zNksYOqRT2uL1eVQxQmKXOai2Qn3Rh4F3dOg=;
-        b=d7nfZxAEpGiW3h5ETdktdiyETtBL+cYJpnb4rO93t2QNnsTHfiF2tqOssKOmtMohvr
-         tnyA/iNYHGBqo/0CNu0pYLyaAoRzhh94kIFlcmK0jFd7xIRM9Kl3eXFKG6mGntkGiDND
-         fgrECbmmqtC/ze5d/njKeFEGxaCLyD7aF3EZ8=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CE87B1FAD
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:20:36 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A069C295D
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:20:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688008833;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=C847EGUrdqxVrqfFw1LBCKXsSidk17jhy+GW2Xvh8nI=;
+	b=NoGmjVOzH2oZ3WXDTiFppebu67rT7wCLNp/Edor1C+siBXRdmUigI+WuJSu3qASya7cTyu
+	k2ESq7ClUPdQsLpXZ98BGHxTNBzEX74d7KXspPp+b64wZeIzbl0YUpivcA1BO/2sjHrpMv
+	SEQfrnrD+peY7vJfLDO9w4XSNNsT8SI=
+Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
+ [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-665-UkD8ojiaOHOiWAHwDQ8edw-1; Wed, 28 Jun 2023 23:20:31 -0400
+X-MC-Unique: UkD8ojiaOHOiWAHwDQ8edw-1
+Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-4fb736a7746so318012e87.3
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:20:31 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688008747; x=1690600747;
+        d=1e100.net; s=20221208; t=1688008830; x=1690600830;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=APmjph+zNksYOqRT2uL1eVQxQmKXOai2Qn3Rh4F3dOg=;
-        b=d0irv7zWsmFmB2RvioWmCZHAniLaV2P/pdbMyrrVApWos7ReDbKG7h02yR7SB8eDCs
-         VbatiZDHSWMcrHPHf3iE7cpiccbG7cD0Wv5LAkYzXNqSI75NqIp0jUNNQFOAVyKspXAo
-         u9flIqh0+HLDnEbEHsk3yBAesD8/i/JAumCTMiheBmlKZ51KLV80oE9Fwum4G+wIayqi
-         eD15L+sQKGV1jsTABETQviJcH/2LFDqwehsec6vsRYBHwjnNn7iWDaeZFxBgfu794yDi
-         EeLNCdKp/yufscKAMdxJPPFyii8Cqw8gA/wGcwcA8UAQ7vhX4HzylIrF9n7xzTvDrHkS
-         UHhA==
-X-Gm-Message-State: AC+VfDzGmsC/XDZ/A4NgOxBXTbCXznLOllUQdXhSzDJPJ4nEumT8L4TH
-	op+ydj7kWcuefpISFwWdC6r1ksd1TnrcElK2RAS6cQ==
-X-Google-Smtp-Source: ACHHUZ7PBhkgCUJGfmCv1eJZwo06+bK2N2WIUA5YdL+qs6O0jkUvGc0LCODjm3wF9r00YNjBPXSAMa8tITBQIDMTBJM=
-X-Received: by 2002:a4a:a7c2:0:b0:563:2507:3173 with SMTP id
- n2-20020a4aa7c2000000b0056325073173mr11839201oom.5.1688008747101; Wed, 28 Jun
- 2023 20:19:07 -0700 (PDT)
+        bh=C847EGUrdqxVrqfFw1LBCKXsSidk17jhy+GW2Xvh8nI=;
+        b=Z9TPUBLJzuOYbIuybqCSxgMgoV9Adgnbk3QohQBc1Jb0rhzyhRW5aAhTtFnUS7XbzO
+         emUqbtXn9+azT4J6CXYxkAdO0JXQooQj9KjB2og9sWCCYL0dXTaciTcGoQgEmR0Dsple
+         xZ7QKB6EjmsTJmX0JJvF4+FafUO2VaPxdmLHdUbTzP3V+wB/RKJIVCqFSWedSCicSw0E
+         Gpb75R9InBKTa1YBNRsi0nz1hC8B+p0ZTZDC08x8Sd5IeMpDZheOPfD3KzlSdiKtOX4u
+         reSjWw+ti32B97KBB/QgAzRkAI2KjbX8RgHpZu94+2AJJ+HlUiFH1o0EX14OQuapiaYC
+         rkGw==
+X-Gm-Message-State: AC+VfDz8mj5NaqXXniCt1cU+mCB9yCYwSb/sniaK54PpNa8Rh23kgTPG
+	cQ2tjLZ5H69KjuRzCJSVDGHpieT9cVp2w/fU3RJo5Z2J3VIyDO463J2d0RaQ9NhSqtX4ikZE39u
+	q2XlMQ3NUE9zEvOmsYe8BVylMZ/zwDcHU
+X-Received: by 2002:a19:5f44:0:b0:4f6:2317:f387 with SMTP id a4-20020a195f44000000b004f62317f387mr19425144lfj.35.1688008830220;
+        Wed, 28 Jun 2023 20:20:30 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7A4ns/TdSRlQkma0fVdfYjsBbD/XKG6hmD+EMizVgr6A9kvJ+XcgGTf234JNmcmpMJJYQg2Hz3YW+zckNXips=
+X-Received: by 2002:a19:5f44:0:b0:4f6:2317:f387 with SMTP id
+ a4-20020a195f44000000b004f62317f387mr19425133lfj.35.1688008829881; Wed, 28
+ Jun 2023 20:20:29 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230116085818.165539-1-konstantin.meskhidze@huawei.com>
- <Y/fl5iEbkL5Pj5cJ@galopp> <c20fc9eb-518e-84b4-0dd5-7b97c0825259@huawei.com>
- <3e113e1c-4c7b-af91-14c2-11b6ffb4d3ef@digikod.net> <b8a2045a-e7e8-d141-7c01-bf47874c7930@digikod.net>
- <ZJvy2SViorgc+cZI@google.com> <CABi2SkX-dzUO6NnbyqfrAg7Bbn+Ne=Xi1qC1XMrzHqVEVucQ0Q@mail.gmail.com>
- <43e8acb2-d696-c001-b54b-d2b7cf244de7@digikod.net>
-In-Reply-To: <43e8acb2-d696-c001-b54b-d2b7cf244de7@digikod.net>
-From: Jeff Xu <jeffxu@chromium.org>
-Date: Wed, 28 Jun 2023 20:18:56 -0700
-Message-ID: <CABi2SkV1Q-cvMScEtcsHbgNRuGc39eJo6KT=GwUxsWPpFGSR4A@mail.gmail.com>
-Subject: Re: [PATCH v9 00/12] Network support for Landlock - allowed list of protocols
-To: =?UTF-8?B?TWlja2HDq2wgU2FsYcO8bg==?= <mic@digikod.net>
-Cc: =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack@google.com>, 
-	"Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>, =?UTF-8?Q?G=C3=BCnther_Noack?= <gnoack3000@gmail.com>, 
-	willemdebruijn.kernel@gmail.com, linux-security-module@vger.kernel.org, 
-	netdev@vger.kernel.org, netfilter-devel@vger.kernel.org, 
-	yusongping@huawei.com, artem.kuzin@huawei.com, Jeff Xu <jeffxu@google.com>, 
-	Jorge Lucangeli Obes <jorgelo@chromium.org>, Allen Webb <allenwebb@google.com>, 
-	Dmitry Torokhov <dtor@google.com>
+References: <20230524081842.3060-1-jasowang@redhat.com> <20230524081842.3060-2-jasowang@redhat.com>
+ <20230524050604-mutt-send-email-mst@kernel.org> <CACGkMEvm=MJz5e2C_7U=yjrvoo7pxsr=tRAL29OdxJDWhvtiSQ@mail.gmail.com>
+ <20230525033750-mutt-send-email-mst@kernel.org> <CACGkMEtCA0-NY=qq_FnGzoY+VXmixGmBV3y80nZWO=NmxdRWmw@mail.gmail.com>
+ <20230528073139-mutt-send-email-mst@kernel.org> <CACGkMEvcjjGRfNYeZaG0hS8R2fnpve62QFv_ReRTXxCUKwf36w@mail.gmail.com>
+ <CACGkMEtgZ_=L2noqdADgNTr_E7s3adw=etvcFt3G7ZERQq43_g@mail.gmail.com> <20230628093334-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230628093334-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 29 Jun 2023 11:20:18 +0800
+Message-ID: <CACGkMEvR71nDWLyGoxVR1vsAqP+t93Pdv5ixFY4dXowWNBrzEQ@mail.gmail.com>
+Subject: Re: [PATCH V3 net-next 1/2] virtio-net: convert rx mode setting to
+ use workqueue
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: xuanzhuo@linux.alibaba.com, davem@davemloft.net, edumazet@google.com, 
+	kuba@kernel.org, pabeni@redhat.com, virtualization@lists.linux-foundation.org, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	alvaro.karsz@solid-run.com
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-resend.
+On Wed, Jun 28, 2023 at 9:34=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Wed, May 31, 2023 at 09:07:25AM +0800, Jason Wang wrote:
+> > On Mon, May 29, 2023 at 9:21=E2=80=AFAM Jason Wang <jasowang@redhat.com=
+> wrote:
+> > >
+> > > On Sun, May 28, 2023 at 7:39=E2=80=AFPM Michael S. Tsirkin <mst@redha=
+t.com> wrote:
+> > > >
+> > > > On Fri, May 26, 2023 at 09:31:34AM +0800, Jason Wang wrote:
+> > > > > On Thu, May 25, 2023 at 3:41=E2=80=AFPM Michael S. Tsirkin <mst@r=
+edhat.com> wrote:
+> > > > > >
+> > > > > > On Thu, May 25, 2023 at 11:43:34AM +0800, Jason Wang wrote:
+> > > > > > > On Wed, May 24, 2023 at 5:15=E2=80=AFPM Michael S. Tsirkin <m=
+st@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Wed, May 24, 2023 at 04:18:41PM +0800, Jason Wang wrote:
+> > > > > > > > > This patch convert rx mode setting to be done in a workqu=
+eue, this is
+> > > > > > > > > a must for allow to sleep when waiting for the cvq comman=
+d to
+> > > > > > > > > response since current code is executed under addr spin l=
+ock.
+> > > > > > > > >
+> > > > > > > > > Signed-off-by: Jason Wang <jasowang@redhat.com>
+> > > > > > > > > ---
+> > > > > > > > > Changes since V1:
+> > > > > > > > > - use RTNL to synchronize rx mode worker
+> > > > > > > > > ---
+> > > > > > > > >  drivers/net/virtio_net.c | 55 ++++++++++++++++++++++++++=
++++++++++++---
+> > > > > > > > >  1 file changed, 52 insertions(+), 3 deletions(-)
+> > > > > > > > >
+> > > > > > > > > diff --git a/drivers/net/virtio_net.c b/drivers/net/virti=
+o_net.c
+> > > > > > > > > index 56ca1d270304..5d2f1da4eaa0 100644
+> > > > > > > > > --- a/drivers/net/virtio_net.c
+> > > > > > > > > +++ b/drivers/net/virtio_net.c
+> > > > > > > > > @@ -265,6 +265,12 @@ struct virtnet_info {
+> > > > > > > > >       /* Work struct for config space updates */
+> > > > > > > > >       struct work_struct config_work;
+> > > > > > > > >
+> > > > > > > > > +     /* Work struct for config rx mode */
+> > > > > > > >
+> > > > > > > > With a bit less abbreviation maybe? setting rx mode?
+> > > > > > >
+> > > > > > > That's fine.
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > +     struct work_struct rx_mode_work;
+> > > > > > > > > +
+> > > > > > > > > +     /* Is rx mode work enabled? */
+> > > > > > > >
+> > > > > > > > Ugh not a great comment.
+> > > > > > >
+> > > > > > > Any suggestions for this. E.g we had:
+> > > > > > >
+> > > > > > >         /* Is delayed refill enabled? */
+> > > > > >
+> > > > > > /* OK to queue work setting RX mode? */
+> > > > >
+> > > > > Ok.
+> > > > >
+> > > > > >
+> > > > > >
+> > > > > > > >
+> > > > > > > > > +     bool rx_mode_work_enabled;
+> > > > > > > > > +
+> > > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > >       /* Does the affinity hint is set for virtqueues? */
+> > > > > > > > >       bool affinity_hint_set;
+> > > > > > > > >
+> > > > > > > > > @@ -388,6 +394,20 @@ static void disable_delayed_refill(s=
+truct virtnet_info *vi)
+> > > > > > > > >       spin_unlock_bh(&vi->refill_lock);
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > > +static void enable_rx_mode_work(struct virtnet_info *vi)
+> > > > > > > > > +{
+> > > > > > > > > +     rtnl_lock();
+> > > > > > > > > +     vi->rx_mode_work_enabled =3D true;
+> > > > > > > > > +     rtnl_unlock();
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > > > +static void disable_rx_mode_work(struct virtnet_info *vi=
+)
+> > > > > > > > > +{
+> > > > > > > > > +     rtnl_lock();
+> > > > > > > > > +     vi->rx_mode_work_enabled =3D false;
+> > > > > > > > > +     rtnl_unlock();
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > > >  static void virtqueue_napi_schedule(struct napi_struct *=
+napi,
+> > > > > > > > >                                   struct virtqueue *vq)
+> > > > > > > > >  {
+> > > > > > > > > @@ -2341,9 +2361,11 @@ static int virtnet_close(struct ne=
+t_device *dev)
+> > > > > > > > >       return 0;
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > > -static void virtnet_set_rx_mode(struct net_device *dev)
+> > > > > > > > > +static void virtnet_rx_mode_work(struct work_struct *wor=
+k)
+> > > > > > > > >  {
+> > > > > > > > > -     struct virtnet_info *vi =3D netdev_priv(dev);
+> > > > > > > > > +     struct virtnet_info *vi =3D
+> > > > > > > > > +             container_of(work, struct virtnet_info, rx_=
+mode_work);
+> > > > > > > > > +     struct net_device *dev =3D vi->dev;
+> > > > > > > > >       struct scatterlist sg[2];
+> > > > > > > > >       struct virtio_net_ctrl_mac *mac_data;
+> > > > > > > > >       struct netdev_hw_addr *ha;
+> > > > > > > > > @@ -2356,6 +2378,8 @@ static void virtnet_set_rx_mode(str=
+uct net_device *dev)
+> > > > > > > > >       if (!virtio_has_feature(vi->vdev, VIRTIO_NET_F_CTRL=
+_RX))
+> > > > > > > > >               return;
+> > > > > > > > >
+> > > > > > > > > +     rtnl_lock();
+> > > > > > > > > +
+> > > > > > > > >       vi->ctrl->promisc =3D ((dev->flags & IFF_PROMISC) !=
+=3D 0);
+> > > > > > > > >       vi->ctrl->allmulti =3D ((dev->flags & IFF_ALLMULTI)=
+ !=3D 0);
+> > > > > > > > >
+> > > > > > > > > @@ -2373,14 +2397,19 @@ static void virtnet_set_rx_mode(s=
+truct net_device *dev)
+> > > > > > > > >               dev_warn(&dev->dev, "Failed to %sable allmu=
+lti mode.\n",
+> > > > > > > > >                        vi->ctrl->allmulti ? "en" : "dis")=
+;
+> > > > > > > > >
+> > > > > > > > > +     netif_addr_lock_bh(dev);
+> > > > > > > > > +
+> > > > > > > > >       uc_count =3D netdev_uc_count(dev);
+> > > > > > > > >       mc_count =3D netdev_mc_count(dev);
+> > > > > > > > >       /* MAC filter - use one buffer for both lists */
+> > > > > > > > >       buf =3D kzalloc(((uc_count + mc_count) * ETH_ALEN) =
++
+> > > > > > > > >                     (2 * sizeof(mac_data->entries)), GFP_=
+ATOMIC);
+> > > > > > > > >       mac_data =3D buf;
+> > > > > > > > > -     if (!buf)
+> > > > > > > > > +     if (!buf) {
+> > > > > > > > > +             netif_addr_unlock_bh(dev);
+> > > > > > > > > +             rtnl_unlock();
+> > > > > > > > >               return;
+> > > > > > > > > +     }
+> > > > > > > > >
+> > > > > > > > >       sg_init_table(sg, 2);
+> > > > > > > > >
+> > > > > > > > > @@ -2401,6 +2430,8 @@ static void virtnet_set_rx_mode(str=
+uct net_device *dev)
+> > > > > > > > >       netdev_for_each_mc_addr(ha, dev)
+> > > > > > > > >               memcpy(&mac_data->macs[i++][0], ha->addr, E=
+TH_ALEN);
+> > > > > > > > >
+> > > > > > > > > +     netif_addr_unlock_bh(dev);
+> > > > > > > > > +
+> > > > > > > > >       sg_set_buf(&sg[1], mac_data,
+> > > > > > > > >                  sizeof(mac_data->entries) + (mc_count * =
+ETH_ALEN));
+> > > > > > > > >
+> > > > > > > > > @@ -2408,9 +2439,19 @@ static void virtnet_set_rx_mode(st=
+ruct net_device *dev)
+> > > > > > > > >                                 VIRTIO_NET_CTRL_MAC_TABLE=
+_SET, sg))
+> > > > > > > > >               dev_warn(&dev->dev, "Failed to set MAC filt=
+er table.\n");
+> > > > > > > > >
+> > > > > > > > > +     rtnl_unlock();
+> > > > > > > > > +
+> > > > > > > > >       kfree(buf);
+> > > > > > > > >  }
+> > > > > > > > >
+> > > > > > > > > +static void virtnet_set_rx_mode(struct net_device *dev)
+> > > > > > > > > +{
+> > > > > > > > > +     struct virtnet_info *vi =3D netdev_priv(dev);
+> > > > > > > > > +
+> > > > > > > > > +     if (vi->rx_mode_work_enabled)
+> > > > > > > > > +             schedule_work(&vi->rx_mode_work);
+> > > > > > > > > +}
+> > > > > > > > > +
+> > > > > > > >
+> > > > > > > > >  static int virtnet_vlan_rx_add_vid(struct net_device *de=
+v,
+> > > > > > > > >                                  __be16 proto, u16 vid)
+> > > > > > > > >  {
+> > > > > > > > > @@ -3181,6 +3222,8 @@ static void virtnet_freeze_down(str=
+uct virtio_device *vdev)
+> > > > > > > > >
+> > > > > > > > >       /* Make sure no work handler is accessing the devic=
+e */
+> > > > > > > > >       flush_work(&vi->config_work);
+> > > > > > > > > +     disable_rx_mode_work(vi);
+> > > > > > > > > +     flush_work(&vi->rx_mode_work);
+> > > > > > > > >
+> > > > > > > > >       netif_tx_lock_bh(vi->dev);
+> > > > > > > > >       netif_device_detach(vi->dev);
+> > > > > > > >
+> > > > > > > > Hmm so queued rx mode work will just get skipped
+> > > > > > > > and on restore we get a wrong rx mode.
+> > > > > > > > Any way to make this more robust?
+> > > > > > >
+> > > > > > > It could be done by scheduling a work on restore.
+> > > > >
+> > > > > Rethink this, I think we don't need to care about this case since=
+ the
+> > > > > user processes should have been frozened.
+> > > >
+> > > > Yes but not the workqueue. Want to switch to system_freezable_wq?
+> > >
+> > > Yes, I will do it in v2.
+> >
+> > Actually, this doesn't work. Freezable workqueue can only guarantee
+> > when being freezed the new work will be queued and not scheduled until
+> > thaw. So the ktrhead that is executing the workqueue is not freezable.
+> > The busy loop (even with cond_resched()) will force suspend in this
+> > case.
+> >
+> > I wonder if we should switch to using a dedicated kthread for
+> > virtio-net then we can allow it to be frozen.
+> >
+> > Thanks
+> >
+>
+> So what's the plan then?
 
-On Wed, Jun 28, 2023 at 12:29=E2=80=AFPM Micka=C3=ABl Sala=C3=BCn <mic@digi=
-kod.net> wrote:
->
->
-> On 28/06/2023 19:03, Jeff Xu wrote:
-> > Hello,
-> >
-> > Thanks for writing up the example for an incoming TCP connection ! It
-> > helps with the context.
-> >
-> > Since I'm late to this thread, one thing I want to ask:  all the APIs
-> > proposed so far are at the process level, we don't have any API that
-> > applies restriction to socket fd itself, right ? this is what I
-> > thought, but I would like to get confirmation.
->
-> Restriction are applied to actions, not to already existing/opened FDs.
-> We could add a way to restrict opened FDs, but I don't think this is the
-> right approach because sandboxing is a deliberate action from a process,
-> and it should already take care of its FDs.
->
->
-> >
-> > On Wed, Jun 28, 2023 at 2:09=E2=80=AFAM G=C3=BCnther Noack <gnoack@goog=
-le.com> wrote:
-> >>
-> >> Hello!
-> >>
-> >> On Mon, Jun 26, 2023 at 05:29:34PM +0200, Micka=C3=ABl Sala=C3=BCn wro=
-te:
-> >>> Here is a design to be able to only allow a set of network protocols =
-and
-> >>> deny everything else. This would be complementary to Konstantin's pat=
-ch
-> >>> series which addresses fine-grained access control.
-> >>>
-> >>> First, I want to remind that Landlock follows an allowed list approac=
-h with
-> >>> a set of (growing) supported actions (for compatibility reasons), whi=
-ch is
-> >>> kind of an allow-list-on-a-deny-list. But with this proposal, we want=
- to be
-> >>> able to deny everything, which means: supported, not supported, known=
- and
-> >>> unknown protocols.
-> >>>
-> >>> We could add a new "handled_access_socket" field to the landlock_rule=
-set
-> >>> struct, which could contain a LANDLOCK_ACCESS_SOCKET_CREATE flag.
-> >>>
-> >>> If this field is set, users could add a new type of rules:
-> >>> struct landlock_socket_attr {
-> >>>      __u64 allowed_access;
-> >>>      int domain; // see socket(2)
-> >>>      int type; // see socket(2)
-> >>> }
-> >>>
-> >>> The allowed_access field would only contain LANDLOCK_ACCESS_SOCKET_CR=
-EATE at
-> >>> first, but it could grow with other actions (which cannot be handled =
-with
-> >>> seccomp):
-> >>> - use: walk through all opened FDs and mark them as allowed or denied
-> >>> - receive: hook on received FDs
-> >>> - send: hook on sent FDs
-> >>>
-> >>> We might also use the same approach for non-socket objects that can b=
-e
-> >>> identified with some meaningful properties.
-> >>>
-> >>> What do you think?
-> >>
-> >> This sounds like a good plan to me - it would make it possible to rest=
-rict new
-> >> socket creation using protocols that were not intended to be used, and=
- I also
-> >> think it would fit the Landlock model nicely.
-> >>
-> >> Small remark on the side: The security_socket_create() hook does not o=
-nly get
-> >> invoked as a result of socket(2), but also as a part of accept(2) - so=
- this
-> >> approach might already prevent new connections very effectively.
-> >>
-> > That is an interesting aspect that might be worth discussing more.
-> > seccomp is per syscall, landlock doesn't necessarily follow the same,
-> > another design is to add more logic in Landlock, e.g.
-> > LANDLOCK_ACCESS_SOCKET_PROTOCOL which will apply to all of the socket
-> > calls (socket/bind/listen/accept/connect). App dev might feel it is
-> > easier to use.
->
-> seccomp restricts the use of the syscall interface, whereas Landlock
-> restricts the use of kernel objects (i.e. the semantic).
->
-> We need to find a good tradeoff between a lot of access rights and a few
-> grouping different actions. This should make sense from a developer
-> point of view according to its knowledge and use of the kernel
-> interfaces (potential wrapped with high level libraries), but also to
-> the semantic of the sandbox and the security guarantees we want to provid=
-e.
->
-> We should also keep in mind that high level Landlock libraries can take
-> care of potential coarse-grained use of restrictions.
->
->
-> >
-> >> Spelling out some scenarios, so that we are sure that we are on the sa=
-me page:
-> >>
-> >> A)
-> >>
-> >> A program that does not need networking could specify a ruleset where
-> >> LANDLOCK_ACCESS_SOCKET_CREATE is handled, and simply not permit anythi=
-ng.
-> >>
-> >> B)
-> >>
-> >> A program that runs a TCP server could specify a ruleset where
-> >> LANDLOCK_NET_BIND_TCP, LANDLOCK_NET_CONNECT_TCP and
-> >> LANDLOCK_ACCESS_SOCKET_CREATE are handled, and where the following rul=
-es are added:
-> >>
-> >>    /* From Konstantin's patch set */
-> >>    struct landlock_net_service_attr bind_attr =3D {
-> >>      .allowed_access =3D LANDLOCK_NET_BIND_TCP,
-> >>      .port =3D 8080,
-> >>    };
-> >>
-> >>    /* From Micka=C3=ABl's proposal */
-> >>    struct landlock_socket_attr sock_inet_attr =3D {
-> >>      .allowed_access =3D LANDLOCK_ACCESS_SOCKET_CREATE,
-> >>      .domain =3D AF_INET,
-> >>      .type =3D SOCK_STREAM,
-> >>    }
-> >>
-> >>    struct landlock_socket_attr sock_inet6_attr =3D {
-> >>      .allowed_access =3D LANDLOCK_ACCESS_SOCKET_CREATE,
-> >>      .domain =3D AF_INET6,
-> >>       .type =3D SOCK_STREAM,
-> >>    }
-> >>
-> >> That should then be enough to bind and listen on ports, whereas outgoi=
-ng
-> >> connections with TCP and anything using other network protocols would =
-not be
-> >> permitted.
-> >>
-> > TCP server is an interesting case. From a security perspective, a
-> > process cares if it is acting as a server or client in TCP, a server
-> > might only want to accept an incoming TCP connection, never initiate
-> > an outgoing TCP connection, and a client is the opposite.
-> >
-> > Processes can restrict outgoing/incoming TCP connection by seccomp for
-> > accept(2) or connect(2),  though I feel Landlock can do this more
-> > naturally for app dev, and at per-protocol level.  seccomp doesn't
-> > provide per-protocol granularity.
->
-> Right, seccomp cannot filter TCP ports.
->
-> >
-> > For bind(2), iirc, it can be used for a server to assign dst port of
-> > incoming TCP connection, also by a client to assign a src port of an
-> > outgoing TCP connection. LANDLOCK_NET_BIND_TCP will apply to both
-> > cases, right ? this might not be a problem, just something to keep
-> > note.
->
-> Good point. I think it is in line with the rule definition: to allow to
-> bind on a specific port. However, if clients want to set the source port
-> to a (legitimate) value, then that would be an issue because we cannot
-> allow a whole range of ports (e.g., >=3D 1024). I'm not sure if this
-> practice would be deemed "legitimate" though. Do you know client
-> applications using bind?
->
-> Konstantin, we should have a test for this case anyway.
->
->
-> >
-> >> (Alternatively, it could bind() the socket early, *then enable Landloc=
-k* and
-> >> leave out the rule for BIND_TCP, only permitting SOCKET_CREATE for IPv=
-4 and
-> >> IPv6, so that listen() and accept() work on the already-bound socket.)
-> >>
-> > For this approach, LANDLOCK_ACCESS_SOCKET_PROTOCOL is a better name,
-> > so dev is fully aware it is not just applied to socket create.
->
-> I don't get the semantic of LANDLOCK_ACCESS_SOCKET_PROTOCOL. What does
-> PROTOCOL mean?
->
-I meant checking family + type of socket, and apply to all of
-socket(2),bind(2),accept(2),connect(2),listen(2), maybe
-send(2)/recv(2) too.
+I plan to send a new version that doesn't take special care to freeze.
+And address the freeze on top, probably with a dedicated kthread that
+can be frozen and respond to things like SIGKILL (which is somehow
+similar to what we want to solve for vhost).
 
-s/LANDLOCK_ACCESS_SOCKET_CREATE/LANDLOCK_ACCESS_SOCKET_TYPE.
+Thanks
 
-This implies the kernel will check on socket fd's property (family +
-type) at those calls, this applies to
-a - the socket fd is created within the process, after landlock is applied.
-b - created in process prior to landlock is applied.
-c - created out of process then passed into this process,
+>
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > > > And that the reason we don't
+> > > > > even need to hold RTNL here.
+> > > > >
+> > > > > Thanks
+> > > > >
+> > > > > > >
+> > > > > > > Thanks
+> > > > > >
+> > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > @@ -3203,6 +3246,7 @@ static int virtnet_restore_up(struc=
+t virtio_device *vdev)
+> > > > > > > > >       virtio_device_ready(vdev);
+> > > > > > > > >
+> > > > > > > > >       enable_delayed_refill(vi);
+> > > > > > > > > +     enable_rx_mode_work(vi);
+> > > > > > > > >
+> > > > > > > > >       if (netif_running(vi->dev)) {
+> > > > > > > > >               err =3D virtnet_open(vi->dev);
+> > > > > > > > > @@ -4002,6 +4046,7 @@ static int virtnet_probe(struct vir=
+tio_device *vdev)
+> > > > > > > > >       vdev->priv =3D vi;
+> > > > > > > > >
+> > > > > > > > >       INIT_WORK(&vi->config_work, virtnet_config_changed_=
+work);
+> > > > > > > > > +     INIT_WORK(&vi->rx_mode_work, virtnet_rx_mode_work);
+> > > > > > > > >       spin_lock_init(&vi->refill_lock);
+> > > > > > > > >
+> > > > > > > > >       if (virtio_has_feature(vdev, VIRTIO_NET_F_MRG_RXBUF=
+)) {
+> > > > > > > > > @@ -4110,6 +4155,8 @@ static int virtnet_probe(struct vir=
+tio_device *vdev)
+> > > > > > > > >       if (vi->has_rss || vi->has_rss_hash_report)
+> > > > > > > > >               virtnet_init_default_rss(vi);
+> > > > > > > > >
+> > > > > > > > > +     enable_rx_mode_work(vi);
+> > > > > > > > > +
+> > > > > > > > >       /* serialize netdev register + virtio_device_ready(=
+) with ndo_open() */
+> > > > > > > > >       rtnl_lock();
+> > > > > > > > >
+> > > > > > > > > @@ -4207,6 +4254,8 @@ static void virtnet_remove(struct v=
+irtio_device *vdev)
+> > > > > > > > >
+> > > > > > > > >       /* Make sure no work handler is accessing the devic=
+e. */
+> > > > > > > > >       flush_work(&vi->config_work);
+> > > > > > > > > +     disable_rx_mode_work(vi);
+> > > > > > > > > +     flush_work(&vi->rx_mode_work);
+> > > > > > > > >
+> > > > > > > > >       unregister_netdev(vi->dev);
+> > > > > > > > >
+> > > > > > > > > --
+> > > > > > > > > 2.25.1
+> > > > > > > >
+> > > > > >
+> > > >
+>
 
-> >
-> >> Overall, this sounds like an excellent approach to me. =F0=9F=91=8D
-> >>
-> >> =E2=80=94G=C3=BCnther
-> >>
-> >> --
-> >> Sent using Mutt =F0=9F=90=95 Woof Woof
-> >
-> > -Jeff
 
