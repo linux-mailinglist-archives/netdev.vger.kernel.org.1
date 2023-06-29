@@ -1,143 +1,211 @@
-Return-Path: <netdev+bounces-14495-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14496-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 70061741F6F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 07:01:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B21AA741F94
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 07:12:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ECD9B280D43
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:01:35 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E1AC4280D66
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:12:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F3A203D7A;
-	Thu, 29 Jun 2023 05:01:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E58C4C9C;
+	Thu, 29 Jun 2023 05:12:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3EEE19A
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:01:33 +0000 (UTC)
-Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1D605171E;
-	Wed, 28 Jun 2023 22:01:32 -0700 (PDT)
-Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b6c3921c8bso3597141fa.3;
-        Wed, 28 Jun 2023 22:01:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688014890; x=1690606890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vBKFq44jqGOdxh6U47zYYsb7gN9jnHSeJzC8D5qBkgE=;
-        b=SApxTIr8GoNPoT59+Bjfs0rjXok08C6fm8z8R5hZ1r2Rxi0ZnYQbGv0hhQX2pTSHc3
-         ffNDoSIOs98WOHaTurMcw5ns6YVYJ90qVksYsUVAPZyK1cszU6AHoCe7kMsVAF08Ese0
-         zzdt6TvGprbfPbfOlH7OzxHI3czMvxbHdYXRBg9JbvuWE8fIjftmL0V6b2YvNPRc4R3E
-         DwAbDanu9lnyibeV8ApHhflScq8CPPoRWyGmd5SdITyxfrdEFB8RdLbEld4Gnqh0Ozz0
-         Xgq+zWWbI22pdrkpC/S2QH1Y6o2LTeogJnFlfounQ68/ktdzpo7G6us92EJRPKzfoAGf
-         3tsw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688014890; x=1690606890;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vBKFq44jqGOdxh6U47zYYsb7gN9jnHSeJzC8D5qBkgE=;
-        b=VJyq5BzHaoSwjgorlqVyBX8mqXr28MGm86C2TTS4WucG1PzBH1vZfJeSDeKgBC79qc
-         ZASiaVuWdaGCduHxe/ilgqkhMlZEPNSP0buSi3yAy9ydWyG6aYEYun49AJgZyFQ3rESW
-         lWn4AGa6cA0w5w7IYZs5BSzA3Q6AH9qdJB/qYFKjHX1aqNhkkaEajeZSOTfZC993ICrn
-         Vsh0+x5QcR/N3M3P4A3DZUB4JAkIBMyzBIrmr6OGQtuHYNplKDoFj94LBREtVA7RvYVT
-         6Lj3DQ4RGs549PZT3qKuHt8bx8EBIZ8UWTEnYoLlKieopFdWBLGbHLhcw1efkhYp9yg5
-         3hpA==
-X-Gm-Message-State: AC+VfDxuatma7Bw5Kqaxz185ioP6F9XoNdGh7/5yBaPhdYUJG7We5W5S
-	Vv3ClIfFCF+lKZroOCUy6eBmkKraMv3bCPetsyLKQxUs6S8=
-X-Google-Smtp-Source: ACHHUZ4XrkcJTsYLEcKpSPkUIrDNVjAuVFs6SJ6ehXLxXdfkGxitABJfRAYGA+zaaBUaNlaa+1z6avt0Ute2EeWknJU=
-X-Received: by 2002:a2e:9917:0:b0:2b6:b65d:471d with SMTP id
- v23-20020a2e9917000000b002b6b65d471dmr4392608lji.43.1688014890017; Wed, 28
- Jun 2023 22:01:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AB681FC8
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:12:45 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 702A7194;
+	Wed, 28 Jun 2023 22:12:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=31mXj0LrDJBbkDjYY0JkRdmBEMX8kHpGdSb2KzkvoJQ=; b=XLK3Lbg/zIF8PgmNRjDb4LeAqM
+	dhWKbW4uqaBS6nyCgIOc5Z4o/AdTb7Jr23+7eQkotQCYbg/o4bfsR29Qao6H95J9RbmbI4Rh1loxf
+	F5wsj7fJegKx1Ucvlkk53tt+OjxNpMsJACzmOR3eF2MdKVeGsEW+3M7qwiM0e4VQIdC5y+q1s3Kfy
+	6P54xmH+SGD79V+E/9HNUPSymGimv1XntcL6gGpJ7rJdTXQ8BFkS+I+1Yy4iZVZ0Ns1Y2XpGBKCmY
+	Ji274SUByvkipntcYcoqzg03tSSUnM9EvLJ2YpXWtQgp8xIi+GGgTW5B66AIKvHLRFZhHVVQtGLAH
+	vb+CthVg==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qEjxJ-00HZxc-1y;
+	Thu, 29 Jun 2023 05:12:33 +0000
+Message-ID: <3135e933-09cb-e397-972b-d66c48bbf772@infradead.org>
+Date: Wed, 28 Jun 2023 22:12:32 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230627191004.2586540-1-luiz.dentz@gmail.com> <20230628193854.6fabbf6d@kernel.org>
-In-Reply-To: <20230628193854.6fabbf6d@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Wed, 28 Jun 2023 22:01:05 -0700
-Message-ID: <CABBYNZLBAr72WCysVEFS9hdycYu4JRH2=SiP_SVBh08vukhh4Q@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2023-06-27
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH] s390/lcs: Remove FDDI option
+Content-Language: en-US
+To: Alexandra Winter <wintera@linux.ibm.com>,
+ David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: Simon Horman <simon.horman@corigine.com>,
+ Christian Borntraeger <borntraeger@linux.ibm.com>, netdev@vger.kernel.org,
+ linux-s390@vger.kernel.org, Heiko Carstens <hca@linux.ibm.com>
+References: <20230628135736.13339-1-wintera@linux.ibm.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230628135736.13339-1-wintera@linux.ibm.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub,
 
-On Wed, Jun 28, 2023 at 7:38=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Tue, 27 Jun 2023 12:10:04 -0700 Luiz Augusto von Dentz wrote:
-> > bluetooth-next pull request for net-next:
-> >
-> >  - Add Reialtek devcoredump support
-> >  - Add support for device 6655:8771
-> >  - Add extended monitor tracking by address filter
-> >  - Add support for connecting multiple BISes
-> >  - Add support to reset via ACPI DSM for Intel controllers
-> >  - Add support for MT7922 used in Asus Ally
-> >  - Add support Mediatek MT7925
-> >  - Fixes for use-after-free in L2CAP
->
-> As you probably realized these came in a little late for our main pull
-> request for this merge window. Can we cut this down a little bit?
-> Stick to the fixes and changes which you have the most confidence in
-> and try to keep the new lines under 1k LoC?
 
-Yeah, sorry about that I had a business trip which sort of messed up
-the pull request.
+On 6/28/23 06:57, Alexandra Winter wrote:
+> The last s390 machine that supported FDDI was z900 ('7th generation',
+> released in 2000). The oldest machine generation currently supported by
+> the Linux kernel is MARCH_Z10 (released 2008). If there is still a usecase
+> for connecting a Linux on s390 instance to a LAN Channel Station (LCS), it
+> can only do so via Ethernet.
+> 
+> Randy Dunlap[1] found that LCS over FDDI has never worked, when FDDI
+> was compiled as module. Instead of fixing that, remove the FDDI option
+> from the lcs driver.
+> 
+> While at it, make the CONFIG_LCS description a bit more helpful.
+> 
+> References:
+> [1] https://lore.kernel.org/netdev/20230621213742.8245-1-rdunlap@infradead.org/
+> 
+> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
 
-> I had a look thru and these changes look like stuff we can definitely
-> pull:
->
->  a8d0b0440b7f ("Bluetooth: btrtl: Add missing MODULE_FIRMWARE declaration=
-s")
->  349cae7e8d84 ("Bluetooth: btusb: Add device 6655:8771 to device tables")
->  afdbe6303877 ("Bluetooth: btqca: use le32_to_cpu for ver.soc_id")
->  d1b10da77355 ("Bluetooth: L2CAP: Fix use-after-free")
->  c1121a116d5f ("Bluetooth: fix invalid-bdaddr quirk for non-persistent se=
-tup")
->  2f8b38e5eba4 ("Bluetooth: fix use-bdaddr-property quirk")
->  317af9ba6fff ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_=
-cb")
->  a6cfe4261f5e ("Bluetooth: hci_bcm: do not mark valid bd_addr as invalid"=
-)
->  20b3370a6bfb ("Bluetooth: ISO: use hci_sync for setting CIG parameters")
->  29a3b409a3f2 ("Bluetooth: hci_event: fix Set CIG Parameters error status=
- handling")
->  48d15256595b ("Bluetooth: MGMT: Fix marking SCAN_RSP as not connectable"=
-)
->  f145eeb779c3 ("Bluetooth: ISO: Rework sync_interval to be sync_factor")
->  0d39e82e1a7b ("Bluetooth: hci_sysfs: make bt_class a static const struct=
-ure")
->  8649851b1945 ("Bluetooth: hci_event: Fix parsing of CIS Established Even=
-t")
->  5b611951e075 ("Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Al=
-ly")
->  00b51ce9f603 ("Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + m=
-emcpy")
->
-> You can throw in a few more things you think are important and are
-> unlikely to cause regressions.
 
-Yeah, those seem to be the most important ones, do you want me to redo
-the pull-request or perhaps you can just cherry-pick them?
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
 
---=20
-Luiz Augusto von Dentz
+Thanks.
+
+> ---
+>  drivers/s390/net/Kconfig |  5 ++---
+>  drivers/s390/net/lcs.c   | 39 ++++++---------------------------------
+>  2 files changed, 8 insertions(+), 36 deletions(-)
+> 
+> diff --git a/drivers/s390/net/Kconfig b/drivers/s390/net/Kconfig
+> index 9c67b97faba2..74760c1a163b 100644
+> --- a/drivers/s390/net/Kconfig
+> +++ b/drivers/s390/net/Kconfig
+> @@ -5,12 +5,11 @@ menu "S/390 network device drivers"
+>  config LCS
+>  	def_tristate m
+>  	prompt "Lan Channel Station Interface"
+> -	depends on CCW && NETDEVICES && (ETHERNET || FDDI)
+> +	depends on CCW && NETDEVICES && ETHERNET
+>  	help
+>  	  Select this option if you want to use LCS networking on IBM System z.
+> -	  This device driver supports FDDI (IEEE 802.7) and Ethernet.
+>  	  To compile as a module, choose M. The module name is lcs.
+> -	  If you do not know what it is, it's safe to choose Y.
+> +	  If you do not use LCS, choose N.
+>  
+>  config CTCM
+>  	def_tristate m
+> diff --git a/drivers/s390/net/lcs.c b/drivers/s390/net/lcs.c
+> index 9fd8e6f07a03..a1f2acd6fb8f 100644
+> --- a/drivers/s390/net/lcs.c
+> +++ b/drivers/s390/net/lcs.c
+> @@ -17,7 +17,6 @@
+>  #include <linux/if.h>
+>  #include <linux/netdevice.h>
+>  #include <linux/etherdevice.h>
+> -#include <linux/fddidevice.h>
+>  #include <linux/inetdevice.h>
+>  #include <linux/in.h>
+>  #include <linux/igmp.h>
+> @@ -36,10 +35,6 @@
+>  #include "lcs.h"
+>  
+>  
+> -#if !defined(CONFIG_ETHERNET) && !defined(CONFIG_FDDI)
+> -#error Cannot compile lcs.c without some net devices switched on.
+> -#endif
+> -
+>  /*
+>   * initialization string for output
+>   */
+> @@ -1601,19 +1596,11 @@ lcs_startlan_auto(struct lcs_card *card)
+>  	int rc;
+>  
+>  	LCS_DBF_TEXT(2, trace, "strtauto");
+> -#ifdef CONFIG_ETHERNET
+>  	card->lan_type = LCS_FRAME_TYPE_ENET;
+>  	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+>  	if (rc == 0)
+>  		return 0;
+>  
+> -#endif
+> -#ifdef CONFIG_FDDI
+> -	card->lan_type = LCS_FRAME_TYPE_FDDI;
+> -	rc = lcs_send_startlan(card, LCS_INITIATOR_TCPIP);
+> -	if (rc == 0)
+> -		return 0;
+> -#endif
+>  	return -EIO;
+>  }
+>  
+> @@ -1806,22 +1793,16 @@ lcs_get_frames_cb(struct lcs_channel *channel, struct lcs_buffer *buffer)
+>  			card->stats.rx_errors++;
+>  			return;
+>  		}
+> -		/* What kind of frame is it? */
+> -		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL) {
+> -			/* Control frame. */
+> +		if (lcs_hdr->type == LCS_FRAME_TYPE_CONTROL)
+>  			lcs_get_control(card, (struct lcs_cmd *) lcs_hdr);
+> -		} else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET ||
+> -			   lcs_hdr->type == LCS_FRAME_TYPE_TR ||
+> -			   lcs_hdr->type == LCS_FRAME_TYPE_FDDI) {
+> -			/* Normal network packet. */
+> +		else if (lcs_hdr->type == LCS_FRAME_TYPE_ENET)
+>  			lcs_get_skb(card, (char *)(lcs_hdr + 1),
+>  				    lcs_hdr->offset - offset -
+>  				    sizeof(struct lcs_header));
+> -		} else {
+> -			/* Unknown frame type. */
+> -			; // FIXME: error message ?
+> -		}
+> -		/* Proceed to next frame. */
+> +		else
+> +			dev_info_once(&card->dev->dev,
+> +				      "Unknown frame type %d\n",
+> +				      lcs_hdr->type);
+>  		offset = lcs_hdr->offset;
+>  		lcs_hdr->offset = LCS_ILLEGAL_OFFSET;
+>  		lcs_hdr = (struct lcs_header *) (buffer->data + offset);
+> @@ -2140,18 +2121,10 @@ lcs_new_device(struct ccwgroup_device *ccwgdev)
+>  		goto netdev_out;
+>  	}
+>  	switch (card->lan_type) {
+> -#ifdef CONFIG_ETHERNET
+>  	case LCS_FRAME_TYPE_ENET:
+>  		card->lan_type_trans = eth_type_trans;
+>  		dev = alloc_etherdev(0);
+>  		break;
+> -#endif
+> -#ifdef CONFIG_FDDI
+> -	case LCS_FRAME_TYPE_FDDI:
+> -		card->lan_type_trans = fddi_type_trans;
+> -		dev = alloc_fddidev(0);
+> -		break;
+> -#endif
+>  	default:
+>  		LCS_DBF_TEXT(3, setup, "errinit");
+>  		pr_err(" Initialization failed\n");
+
+-- 
+~Randy
 
