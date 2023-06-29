@@ -1,57 +1,58 @@
-Return-Path: <netdev+bounces-14490-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14491-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D0AF9741EED
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:54:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2BF17741EEE
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:54:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C93B1C204E8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:54:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C5071C20972
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:54:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC52D1FD7;
-	Thu, 29 Jun 2023 03:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DB6B1FD7;
+	Thu, 29 Jun 2023 03:54:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6811FB9
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:54:02 +0000 (UTC)
-Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 561BE2D7B
-	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:54:00 -0700 (PDT)
-Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-666ecf9a081so236887b3a.2
-        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:54:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 816774C90
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:54:09 +0000 (UTC)
+Received: from mail-pg1-x52b.google.com (mail-pg1-x52b.google.com [IPv6:2607:f8b0:4864:20::52b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 516A530C7
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:54:08 -0700 (PDT)
+Received: by mail-pg1-x52b.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so188861a12.1
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:54:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=chromium.org; s=google; t=1688010840; x=1690602840;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=PgRCWuAL+JILQAuJVgnpzN1VGDR5+ycwundGmuPsvAc=;
-        b=Zp7/05od1Hzmg3DamsY4xVwfn6tMykIurlQXX5Rz4Xuof4ze/XQSv561GpHeqSpoKh
-         2v+EzzaIXKRz/2+ZwPdbePYm00aj+7lpLYrNJ4hAYEhBfPYw1efyvEasC85ra7aPmZY2
-         HvVIPX6DZQ3ldkpxDKKby+eFfCylabLuTSQA0=
+        d=chromium.org; s=google; t=1688010847; x=1690602847;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=g2AHgNaBFK8JfNASOhLGds08CbGR9PY3Il9QtABWRh4=;
+        b=et3Vu15oD0I0/VTYf3k59eeXyPxFA0clBBCUdHY1eXEFWGvj23bz+/zkFatUsDfBch
+         IR+g/aHslPcC8iJreUR+tFMscRb6bLCjoLCrLTg+pc5CL/NHCvLT1Bez57oah4Kzbj9N
+         G9klaQXXF9rXjC7VFINlryTVLbGlwBCQ2vrcM=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688010840; x=1690602840;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=PgRCWuAL+JILQAuJVgnpzN1VGDR5+ycwundGmuPsvAc=;
-        b=OXfkRUWV3twp0OR+x4Edaawv77H7aklA7J+YDCNgYUxhINMyDvB0jz81+H3wRZUJZ5
-         x7ZlpP0DG3XTooMRxLLSgXAtSDrMWDUHZ9bUQponUy9Eo0WbON13EP0Zc/c+V+MCvP1W
-         8FHjXDJiIeVd69aRwUgpczNzjF2Py09vH+8QMT1/7e8i0q0Iix8V+USug8Pt1XK0xLKb
-         PI4E44TsdE5mWaKpddfJe2rpNYFRh1aT8Iarlt212DmpRCuSAFB+hZEO+8RtnDrrr7a0
-         qte9Gkqf1aabSWhoeTO3K4mSeYAlU/IHoi1rGjOh1f+ldEpEMs5Xp6GuDWKGOehu8Zfv
-         uzrg==
-X-Gm-Message-State: AC+VfDwduqRKvDqP7jKSUW/Zd5Inj44a9wzrmyvkfc+0094YAAIzN7x3
-	tFijgfGl+ZuoykUaefztx0bPSQ==
-X-Google-Smtp-Source: ACHHUZ6y8ticW17Bm2FXqsOoVj+oMchk8icLpia+Wu94tK8W+NMrPIcN6NkM7fNXF21kuk4TIlr51g==
-X-Received: by 2002:a05:6a20:1605:b0:115:83f:fce1 with SMTP id l5-20020a056a20160500b00115083ffce1mr48159642pzj.5.1688010839715;
-        Wed, 28 Jun 2023 20:53:59 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688010847; x=1690602847;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=g2AHgNaBFK8JfNASOhLGds08CbGR9PY3Il9QtABWRh4=;
+        b=PEAiqCmnnrfyl1Fgl59vlmoTdM/wTKt9gqXcQqzl7flKSIDwqNnZecrG7gVfWgSg9Y
+         s1A/QmRY+0jSdC4vCv5Pi2yBY8PIKlDHoeZI2ja3QUe9OsSvuEruXm8+aMzI31P02M3/
+         1WEiqQ2ETaLT7R8BrNqnalbZuGwRudAvu4N6DbNesFPraNEUFFtLn5VmBcBNjN8QbwZn
+         0MaIsEAyNnRn6tKY/RtUk9mpMAerWVNUgUIiVIz4YXKTMih+rzSny7MvSJ6UY/dZH+w7
+         dfD5Vp2a5cUoL+fX0QUiLAKw/mv49hefWAsQvIknuJBUDZB9fJ0grT2kc9XNUCOzwJpX
+         2ZaQ==
+X-Gm-Message-State: AC+VfDxYQ42ejL6fxe5hQExJ2txtwJDXHOrH57VWKFcCm6tC0atzRdTh
+	5a5PWDyfZw9OFe6nJiJBeEiohQ==
+X-Google-Smtp-Source: ACHHUZ6ERoeG3uQAKmubsGmF14KTacE2DDCjpJbY0mZaPsbsZ/WEjLnqr+/Rj0L6NaJstrbDu/M8GA==
+X-Received: by 2002:a05:6a20:7d96:b0:12b:fe14:907e with SMTP id v22-20020a056a207d9600b0012bfe14907emr5996043pzj.20.1688010847675;
+        Wed, 28 Jun 2023 20:54:07 -0700 (PDT)
 Received: from kuabhs-cdev.c.googlers.com.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
-        by smtp.gmail.com with ESMTPSA id r19-20020a634413000000b005579f12a238sm7019842pga.86.2023.06.28.20.53.58
+        by smtp.gmail.com with ESMTPSA id r19-20020a634413000000b005579f12a238sm7019842pga.86.2023.06.28.20.54.07
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 28 Jun 2023 20:53:59 -0700 (PDT)
+        Wed, 28 Jun 2023 20:54:07 -0700 (PDT)
 From: Abhishek Kumar <kuabhs@chromium.org>
 To: johannes.berg@intel.com,
 	kvalo@kernel.org
@@ -59,16 +60,13 @@ Cc: linux-kernel@vger.kernel.org,
 	kuabhs@chromium.org,
 	netdev@vger.kernel.org,
 	ath10k@lists.infradead.org,
-	linux-wireless@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Paolo Abeni <pabeni@redhat.com>
-Subject: [PATCH 1/2] wifi: cfg80211: call reg_call_notifier on beacon hints
-Date: Thu, 29 Jun 2023 03:52:54 +0000
-Message-ID: <20230629035254.1.I059fe585f9f9e896c2d51028ef804d197c8c009e@changeid>
+	linux-wireless@vger.kernel.org
+Subject: [PATCH 2/2] ath10k: mac: enable WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON on ath10k
+Date: Thu, 29 Jun 2023 03:52:55 +0000
+Message-ID: <20230629035254.2.I23c5e51afcc6173299bb2806c8c38364ad15dd63@changeid>
 X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
+In-Reply-To: <20230629035254.1.I059fe585f9f9e896c2d51028ef804d197c8c009e@changeid>
+References: <20230629035254.1.I059fe585f9f9e896c2d51028ef804d197c8c009e@changeid>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -83,96 +81,32 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Currently the channel property updates are not propagated to
-driver. This causes issues in the discovery of hidden SSIDs and
-fails to connect to them.
-This change defines a new wiphy flag which when enabled by vendor
-driver, the reg_call_notifier callback will be trigger on beacon
-hints. This ensures that the channel property changes are visible
-to the vendor driver. The vendor changes the channels for active
-scans. This fixes the discovery issue of hidden SSID.
+Enabling this flag, ensures that reg_call_notifier is called
+on beacon hints from handle_reg_beacon in cfg80211. This call
+propagates the channel property changes to ath10k driver, thus
+changing the channel property from passive scan to active scan
+based on beacon hints.
+Once the channels are rightly changed from passive to active,the
+connection to hidden SSID does not fail.
 
 Signed-off-by: Abhishek Kumar <kuabhs@chromium.org>
 ---
 
- include/net/cfg80211.h |  3 +++
- net/wireless/reg.c     | 20 ++++++++++++--------
- 2 files changed, 15 insertions(+), 8 deletions(-)
+ drivers/net/wireless/ath/ath10k/mac.c | 1 +
+ 1 file changed, 1 insertion(+)
 
-diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
-index 9e04f69712b1..48e6ebcdacb3 100644
---- a/include/net/cfg80211.h
-+++ b/include/net/cfg80211.h
-@@ -4783,6 +4783,8 @@ struct cfg80211_ops {
-  * @WIPHY_FLAG_SUPPORTS_EXT_KCK_32: The device supports 32-byte KCK keys.
-  * @WIPHY_FLAG_NOTIFY_REGDOM_BY_DRIVER: The device could handle reg notify for
-  *	NL80211_REGDOM_SET_BY_DRIVER.
-+ * @WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON: reg_call_notifier() is called if driver
-+ *	set this flag to update channels on beacon hints.
-  */
- enum wiphy_flags {
- 	WIPHY_FLAG_SUPPORTS_EXT_KEK_KCK		= BIT(0),
-@@ -4809,6 +4811,7 @@ enum wiphy_flags {
- 	WIPHY_FLAG_SUPPORTS_5_10_MHZ		= BIT(22),
- 	WIPHY_FLAG_HAS_CHANNEL_SWITCH		= BIT(23),
- 	WIPHY_FLAG_NOTIFY_REGDOM_BY_DRIVER	= BIT(24),
-+	WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON     = BIT(25),
- };
+diff --git a/drivers/net/wireless/ath/ath10k/mac.c b/drivers/net/wireless/ath/ath10k/mac.c
+index 7675858f069b..12df3228b120 100644
+--- a/drivers/net/wireless/ath/ath10k/mac.c
++++ b/drivers/net/wireless/ath/ath10k/mac.c
+@@ -10033,6 +10033,7 @@ int ath10k_mac_register(struct ath10k *ar)
  
- /**
-diff --git a/net/wireless/reg.c b/net/wireless/reg.c
-index 26f11e4746c0..c76bfaad650b 100644
---- a/net/wireless/reg.c
-+++ b/net/wireless/reg.c
-@@ -2149,6 +2149,13 @@ static bool reg_is_world_roaming(struct wiphy *wiphy)
- 	return false;
- }
+ 	ar->hw->wiphy->features |= NL80211_FEATURE_STATIC_SMPS;
+ 	ar->hw->wiphy->flags |= WIPHY_FLAG_IBSS_RSN;
++	ar->hw->wiphy->flags |= WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON;
  
-+static void reg_call_notifier(struct wiphy *wiphy,
-+			      struct regulatory_request *request)
-+{
-+	if (wiphy->reg_notifier)
-+		wiphy->reg_notifier(wiphy, request);
-+}
-+
- static void handle_reg_beacon(struct wiphy *wiphy, unsigned int chan_idx,
- 			      struct reg_beacon *reg_beacon)
- {
-@@ -2156,6 +2163,7 @@ static void handle_reg_beacon(struct wiphy *wiphy, unsigned int chan_idx,
- 	struct ieee80211_channel *chan;
- 	bool channel_changed = false;
- 	struct ieee80211_channel chan_before;
-+	struct regulatory_request *lr = get_last_request();
- 
- 	sband = wiphy->bands[reg_beacon->chan.band];
- 	chan = &sband->channels[chan_idx];
-@@ -2181,8 +2189,11 @@ static void handle_reg_beacon(struct wiphy *wiphy, unsigned int chan_idx,
- 		channel_changed = true;
- 	}
- 
--	if (channel_changed)
-+	if (channel_changed) {
- 		nl80211_send_beacon_hint_event(wiphy, &chan_before, chan);
-+		if (wiphy->flags & WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON)
-+			reg_call_notifier(wiphy, lr);
-+	}
- }
- 
- /*
-@@ -2325,13 +2336,6 @@ static void reg_process_ht_flags(struct wiphy *wiphy)
- 		reg_process_ht_flags_band(wiphy, wiphy->bands[band]);
- }
- 
--static void reg_call_notifier(struct wiphy *wiphy,
--			      struct regulatory_request *request)
--{
--	if (wiphy->reg_notifier)
--		wiphy->reg_notifier(wiphy, request);
--}
--
- static bool reg_wdev_chan_valid(struct wiphy *wiphy, struct wireless_dev *wdev)
- {
- 	struct cfg80211_chan_def chandef = {};
+ 	if (ar->ht_cap_info & WMI_HT_CAP_DYNAMIC_SMPS)
+ 		ar->hw->wiphy->features |= NL80211_FEATURE_DYNAMIC_SMPS;
 -- 
 2.41.0.162.gfafddb0af9-goog
 
