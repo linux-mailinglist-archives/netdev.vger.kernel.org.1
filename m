@@ -1,210 +1,154 @@
-Return-Path: <netdev+bounces-14517-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8755A7423AF
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:05:48 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6E57C1C203D8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:05:47 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118A0BE68;
-	Thu, 29 Jun 2023 10:05:45 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 00A2DC121
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:05:44 +0000 (UTC)
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FC4244A7
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:05:42 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-401f4408955so194421cf.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:05:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688033141; x=1690625141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=53kXaqEUom5GCaioc4bl7JRGZ5sp8FvMcIkzS408jNI=;
-        b=oUcEzcSDnOtplpv6jr7yAxIcwth23qX90Q/ADDC/r0ol4cdG/0WFE/LdRD6cVTtjrl
-         YrCH4cLIHg22THQELbD30RZlUqdNrkkZcp7Qmc7Pdb1JVZYlqoq1NtcoabY1L0QAixuA
-         Zt1b5DGKDC0jUHCrb0L8d1+zIeaCmOi0zh64cs15dSnj9/ifjwlx8CwRWbAq1BV/aMt4
-         pHgGBIe/8l5JQV692ZFmrsguXxN9NEC0e0s8f0qgl0OmP3vYrm3Jv2Y+Yvo0YeIDG+ql
-         XPUM6dQZcHRzRQq8FC9R83l8YMuRN8gD7ywdVokBWyY1I+LNYXmWSDz6E0LjbaQkFJoF
-         THzg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688033141; x=1690625141;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=53kXaqEUom5GCaioc4bl7JRGZ5sp8FvMcIkzS408jNI=;
-        b=gRQrdAtXFeQn1SfUg/y/aIhI21WrfAC6H/qRuRlTt5xchYVw9jiwiS+F2k2KhogcvN
-         FqFh2TY2N4a++R7H2cv2dlfCKUa6PCqVgDhTvLgFwUQTdac7k3gPtHTrma0CzTPG3DHt
-         f/mqgma4417cQoj9ZkPBgGKgWe+FgpQZkyNn2089VXnT9Mq6r3p+I4cLp7CRbO7Jylcn
-         DZT1FLfx3fYpN9eymyDvd+mBFZxHLzoH+XkKpsEDrSCBZwN4EI247R3bMrIwHJeeSCJG
-         /617XVOI+lbqZlcgfO1a4Q9NVLO3VODLzrzLZtodKZzoUR5PapgM3bofbSFJSqII0lxW
-         ry/A==
-X-Gm-Message-State: AC+VfDwIpvLNVqs5DRRHMTZ6ghoezkCg1qPK9yFrz2Noi0HWT0uhAFu8
-	KPoVFFXV+9YfMAdSMuE0E3+ZSlfWUMw8z35840mCEw==
-X-Google-Smtp-Source: ACHHUZ4cDKzyvP+R/YnJL96VIhWmdoovDKEZEFSvG71MjFqTZDs/6dSXFDfbObtnZQUeifbTFq5sMUFwBMdAezyQsMg=
-X-Received: by 2002:a05:622a:1393:b0:3de:1aaa:42f5 with SMTP id
- o19-20020a05622a139300b003de1aaa42f5mr480089qtk.15.1688033140929; Thu, 29 Jun
- 2023 03:05:40 -0700 (PDT)
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 5FC697423DA
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:20:04 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S231191AbjF2KUA (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Thu, 29 Jun 2023 06:20:00 -0400
+Received: from mail-am7eur03on2053.outbound.protection.outlook.com ([40.107.105.53]:34528
+        "EHLO EUR03-AM7-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S230487AbjF2KT5 (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Thu, 29 Jun 2023 06:19:57 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AR30PqmpGGKFyMJ8+Jh0AIZ5Ny0l3Q7d/u7tmh6wKuuNgQNb/Qmeb03WYJwBabWMNpVb8lFSiJXnwCtKeTZ3R3r6Ngr2qSZQL4M2adnCFPoDYZnT4pxLkEjt8eQC6nmQTrNr9mzEHWEIiYaFc9huNqBV7dVurNi4U3diaUxd4OK+Mc9mLvjbtqMNYdkeazuH1LHGFaTkHxd+zMwHoH42n3oeH6Jhx3d7/IlKEekxh+asUt+O/b4swA0Pp+uTmSA4hSUwd95pDCX8haaCtRAomRgJSbhfj0fwYqn0IH4JkstzQKnNYSvCqr265FHUEG9pUA1lPQoW6d62UOdgRTnLWA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jrGcGVFZRryAg+bPbtwRdLEE6nCvxkgYLSqKRBl7t/w=;
+ b=ObZ75XZB/YrX1ob6u9ZfknMmg8foV7pm1b8P61D3HIYlzDsefy1xIuwenHi6abax2oksjIcUw4e4XYppvEboYAgw2eWF0rDBJHdPlBUD3LU2g2B6WJGH3D58s0Ajqv9yY+HtYiDWO5gPv0RVp90iHj2RwViBfJlk9XNeB9duSWQGhH+zbPrZ3xKmBDaLgHqXk2hEDM4GjB3SdZD6AXRHErmhYz/0S3R5Rt6T26q1IybjFVtyPEeGsJaHGVKnr8nHjn8NjhWdGcvjfNrYGaFsNi7wPi1jBXS4KeoMucG3LeLpR1qlcOTiKht+8ncErEMHq+bhySgteUfLtQ+RfjCErQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jrGcGVFZRryAg+bPbtwRdLEE6nCvxkgYLSqKRBl7t/w=;
+ b=WkJkpPzzdmGWPUcsQ/zpTc1ekTarEX/gc7+LsqYVamUbujiEUtkAunP00WKRvlhCKroIGFqaE1EeMUskEl/P6/xHnqab0wrmtoKPlvN/gNdw9SmYcBg6pX15B85xsJ91G7KAFxp37uHcrZFEuvwGw1ttREUyfN0ecHfzdfM04FY=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AS8PR04MB8644.eurprd04.prod.outlook.com (2603:10a6:20b:42b::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Thu, 29 Jun
+ 2023 10:19:54 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6521.036; Thu, 29 Jun 2023
+ 10:19:54 +0000
+Date:   Thu, 29 Jun 2023 13:19:50 +0300
+From:   Vladimir Oltean <vladimir.oltean@nxp.com>
+To:     Paolo Abeni <pabeni@redhat.com>
+Cc:     netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+        Florian Fainelli <f.fainelli@gmail.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>,
+        Jakub Kicinski <kuba@kernel.org>, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v2 net 1/2] net: dsa: sja1105: always enable the
+ INCL_SRCPT option
+Message-ID: <20230629101950.7s3kagwvkzlnu7ao@skbuf>
+References: <20230627094207.3385231-1-vladimir.oltean@nxp.com>
+ <20230627094207.3385231-2-vladimir.oltean@nxp.com>
+ <f494387c8d55d9b1d5a3e88beedeeb448f2e6cc3.camel@redhat.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <f494387c8d55d9b1d5a3e88beedeeb448f2e6cc3.camel@redhat.com>
+X-ClientProxiedBy: FR2P281CA0015.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a::25) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 MIME-Version: 1.0
-References: <20230629015844.800280-1-samjonas@amazon.com>
-In-Reply-To: <20230629015844.800280-1-samjonas@amazon.com>
-From: Eric Dumazet <edumazet@google.com>
-Date: Thu, 29 Jun 2023 12:05:29 +0200
-Message-ID: <CANn89i+6d9K1VwNK1Joc-Yb_4jAfV_YFzk=z_K2_Oy+xJHSn_g@mail.gmail.com>
-Subject: Re: [PATCH net] net/ipv6: Reduce chance of collisions in inet6_hashfn()
-To: Samuel Mendoza-Jonas <samjonas@amazon.com>
-Cc: netdev@vger.kernel.org, Stewart Smith <trawets@amazon.com>, 
-	"David S . Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org, 
-	benh@amazon.com, stable@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AS8PR04MB8644:EE_
+X-MS-Office365-Filtering-Correlation-Id: d18d7fa1-aa91-4a98-9668-08db788a61ce
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: WWCMhGbKDefBZ6bKtS9IF6sN+uWPfnRB4dFIM5CXCWSfoqCvWHdnbN5TgPQIel7fnmwE7jGslJy9B+apoLVa6SquDF8Mw7ODt0sZE773vFwMi0EhCL8eZLAL6TV8xBHfwNoDf3xrTBxzZyh4Jcg87L9T5ngbow7EJFi1OrIvuBT11ifDgTTnRo2pNNQNStyXpunC/wfQfzTn/zeBui/4Ia6z7B2Yi6XVPKO91Fkyr2dujrjVZ0445DsvU+BlAyN89HHdwr5fU/izYknppTLep4zVZGbEu7Y/cVuAyk3Z355D8RH/DBzn/piQDMgJ3Vb7AAsfDGPZ+LYDSZaKUMDFyjtSC/C8jK5wJqEmWyfHWLyjit6UTFd7KZrRlhPOEz9zmfC1xbxVgRNEucSpXjckYRUM/DYqowJfciAHZJf64YwOJ4Ay8cZkMlNVQwKMejhrT79uSMOx3wovdQqYW+ubGZYiz6E8R8H6M7SIgHiWPKHFQYgmPILl4d5B9hRN1RT1PkoRlgi1vbAzivU/xKIvTgayuSYWKjNOkk7KWL2UDfWVHssjzCOM/80Fz1XU5mCB
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(39860400002)(396003)(366004)(376002)(136003)(346002)(451199021)(6666004)(1076003)(478600001)(9686003)(6486002)(6506007)(6512007)(186003)(26005)(54906003)(86362001)(33716001)(2906002)(83380400001)(6916009)(4326008)(66946007)(66556008)(66476007)(8676002)(5660300002)(8936002)(44832011)(38100700002)(316002)(41300700001);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?MkCsxeoi4p2Jjc+YmGvYJMz/t8MKLatWD3diNknLcYi1Jnva4gZpPgrSHa+S?=
+ =?us-ascii?Q?hPUeHNRaEqAbYj9ZXS9cGZzJRNvP3MXIA0gLUiTQSn1gmUNHPByiVvblGrX7?=
+ =?us-ascii?Q?JxqeO0pmL2mhj8JfjpKQjVlE200dPdKFdge/bjG+i3Ngg1FKm7EgbIpKW+gK?=
+ =?us-ascii?Q?Ubm95qdW82OfEdgyGKippRu4EhEd38Vl9epG9bCwxMnA6kFTOoxejwM9ym9u?=
+ =?us-ascii?Q?3SP20s8QdoPCoHHFtbzIwILvFA2tzaZtYeiCjEoCOOC6YS6ceIP1lOEp8NIF?=
+ =?us-ascii?Q?3ZJ5t54ogsPh7ybM41XIbQlPPgWXqmZDaS8OJsK3ZRvK9PPBF3Pil50b7A53?=
+ =?us-ascii?Q?0bYx0nn9Dlt6+AQ3WnUcgKsr9/zmKU33WHYj+vXZzA988XYzyi2DF+BlbXSi?=
+ =?us-ascii?Q?E3rif2PXT3mf3W5/Yh8SnBRYRSZP8CP32s2fcUKa3VL61SPrYHKCRgTfUNoJ?=
+ =?us-ascii?Q?lot+HnRmBuVfV5GDg9iQZMTQ8gscC+Cy1j1ditOO7zDdGCB9up5O9rntoR3W?=
+ =?us-ascii?Q?uF1cbvr1MX01MzVs9nmGi5YAErUyRCcVAduMmxiplxvK0y+e6IJuzmdF7Jp4?=
+ =?us-ascii?Q?xQCKDUVgRt5VlyzGrbCkhy+TXBaUyBFwlzSK6Pqq1/AEzSfSTnevAhYcmKUz?=
+ =?us-ascii?Q?XdN9I78fge0Yf3qPTCtXN0P74LcC1N+fMqn7kEgsB0DnBlRHQ9VJtpBE6fYO?=
+ =?us-ascii?Q?LardYJj8yKPx3HhjpEtOOH5iIJY/vedX09ap1liogy+QDV2X1+sE0YpOZ2hW?=
+ =?us-ascii?Q?5wapd5bx2zq7iXXA+g/ef9uxZNzNXTqjrD5+I3kDKLoaJl0oigOsiLTUADG/?=
+ =?us-ascii?Q?VFz163I3/X/dYgIg7slpBYG2mA9AznCgNUeYavnI3yTZAc/D1Gdr7UR0LCkH?=
+ =?us-ascii?Q?Zu952W4YOILnFcun4V5PyEjFVP7/99w1E6nBwrpSl37kCmCGZ4o3EA3CCrzP?=
+ =?us-ascii?Q?iwY7EH8QTrJFAC/qT0Mqy0qle7OY+jAAJ+mfhSsTJfOo7LZud01ejWO+4bOz?=
+ =?us-ascii?Q?pvakyf1z07oLcL2NAAGkIIwizZeqsA6odCW0lZ0Y76/H/G3zbOzVWy+LHvXc?=
+ =?us-ascii?Q?J0xoiaR3Wa5IwBtO8CgfcMjpg3jqRXc1OfxhnU1MKYp2BRnY+243vvXBMrV+?=
+ =?us-ascii?Q?Wiq16mS9paOOHcCb5eocQSa9fNdZQCTKscP54b3nXzFZX0jQ0VbQBTf9cP9+?=
+ =?us-ascii?Q?NXSAtbVu5cOAMM7nCbtYkgNZL0Uak/Lf+uA/5nCMt6f10JBlPbOuJpw1Zb1g?=
+ =?us-ascii?Q?DW7tF5/MfXlbk9xskzVNlZe/hv6JvcmIG99j5DdTmbCCBudYepesl4/UMhhf?=
+ =?us-ascii?Q?vmpGLuhcxC+0jqIu3rXCqnIuf4wecVq3FR6OO0a2hnwE2c9hhjJXRZeH7CtJ?=
+ =?us-ascii?Q?N8axQWsCwrvtFJA9ParV9tfov00sIBqsb6/7UePY2+M7vuK3lEOZ8/7KUOoV?=
+ =?us-ascii?Q?VpVp5aL2RylSbK4nG859tYkk0l3MzucLLbvtomJIMua7bQfVSw+7mKcr4O2j?=
+ =?us-ascii?Q?lpc4D1Jb19w9Fobee24vCEDADW/gfi4W7EbahTYpB/5rX1Y9HzoqvWS/5oXi?=
+ =?us-ascii?Q?jPyMicrSSSOJAnHOckaijrjmdu1+04d8vq620GiCs6RT9MroheyKIfFwj29u?=
+ =?us-ascii?Q?Rg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: d18d7fa1-aa91-4a98-9668-08db788a61ce
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2023 10:19:54.6834
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JcyWmzhKPVdXbRa0EWO4spJpLw9617oWIPNauapeVg+582MHJIJS4oHdRTtrGnqfRrllTCFZvA1ulgU7DX2u7A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AS8PR04MB8644
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-On Thu, Jun 29, 2023 at 3:59=E2=80=AFAM Samuel Mendoza-Jonas
-<samjonas@amazon.com> wrote:
+On Thu, Jun 29, 2023 at 11:36:38AM +0200, Paolo Abeni wrote:
+> > The big drawback with INCL_SRCPT is that it makes it impossible to
+> > distinguish between an original MAC DA of 01:80:C2:XX:YY:ZZ and
+> > 01:80:C2:AA:BB:ZZ, because the tagger just patches MAC DA bytes 3 and 4
+> > with zeroes. Only if PTP RX timestamping is enabled, the switch will
+> > generate a META follow-up frame containing the RX timestamp and the
+> > original bytes 3 and 4 of the MAC DA. Those will be used to patch up the
+> > original packet. Nonetheless, in the absence of PTP RX timestamping, we
+> > have to live with this limitation, since it is more important to have
+> > the more precise source port information for link-local traffic.
+> 
+> What if 2 different DSA are under the same linux bridge, so that the
+> host has to forward in S/W the received frames? (and DA is incomplete)
+> 
+> It looks like that such frames will never reach the relevant
+> destination?
+> 
+> Is such setup possible/relevant?
+> 
+> Thanks,
+> 
+> Paolo
 >
-> From: Stewart Smith <trawets@amazon.com>
->
-> For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
-> table with a hash over the source & destination addresses and ports.
-> However, the IPv6 hash is insufficient and can lead to a high rate of
-> collisions.
->
-> The IPv6 hash used an XOR to fit everything into the 96 bits for the
-> fast jenkins hash, meaning it is possible for an external entity to
-> ensure the hash collides, thus falling back to a linear search in the
-> bucket, which is slow.
->
-> We take the approach of hash half the data; hash the other half; and
-> then hash them together. We do this with 3x jenkins hashes rather than
-> 2x to calculate the hashing value for the connection covering the full
-> length of the addresses and ports.
->
 
-...
+They will have an incorrect MAC DA, with all the consequences of that.
 
-> While this may look like it adds overhead, the reality of modern CPUs
-> means that this is unmeasurable in real world scenarios.
->
-> In simulating with llvm-mca, the increase in cycles for the hashing code
-> was ~5 cycles on Skylake (from a base of ~50), and an extra ~9 on
-> Nehalem (base of ~62).
->
-> In commit dd6d2910c5e0 ("netfilter: conntrack: switch to siphash")
-> netfilter switched from a jenkins hash to a siphash, but even the faster
-> hsiphash is a more significant overhead (~20-30%) in some preliminary
-> testing. So, in this patch, we keep to the more conservative approach to
-> ensure we don't add much overhead per SYN.
->
-> In testing, this results in a consistently even spread across the
-> connection buckets. In both testing and real-world scenarios, we have
-> not found any measurable performance impact.
->
-> Cc: stable@vger.kernel.org
-> Fixes: 08dcdbf6a7b9 ("ipv6: use a stronger hash for tcp")
-> Fixes: b3da2cf37c5c ("[INET]: Use jhash + random secret for ehash.")
-> Signed-off-by: Stewart Smith <trawets@amazon.com>
-> Signed-off-by: Samuel Mendoza-Jonas <samjonas@amazon.com>
-> ---
->  include/net/ipv6.h          | 4 +---
->  net/ipv6/inet6_hashtables.c | 5 ++++-
->  2 files changed, 5 insertions(+), 4 deletions(-)
->
-> diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-> index 7332296eca44..f9bb54869d82 100644
-> --- a/include/net/ipv6.h
-> +++ b/include/net/ipv6.h
-> @@ -752,9 +752,7 @@ static inline u32 ipv6_addr_hash(const struct in6_add=
-r *a)
->  /* more secured version of ipv6_addr_hash() */
->  static inline u32 __ipv6_addr_jhash(const struct in6_addr *a, const u32 =
-initval)
->  {
-> -       u32 v =3D (__force u32)a->s6_addr32[0] ^ (__force u32)a->s6_addr3=
-2[1];
-> -
-> -       return jhash_3words(v,
-> +       return jhash_3words((__force u32)a->s6_addr32[1],
->                             (__force u32)a->s6_addr32[2],
->                             (__force u32)a->s6_addr32[3],
->                             initval);
+Given the fact that the incl_srcpt was enabled up until now for the
+vlan_filtering=1 bridge case only, this was already possible to see.
+However it was never reported to me as being a problem, unlike what
+is being fixed here.
 
-Hmmm... see my following comment.
+I see no other escape than to unconditionally enable the send_meta
+options as well, so that the overwritten MAC DA bytes can always be
+reconstructed from the upcoming meta frames, even though the RX
+timestamp (main payload of those meta frames) may or may not be useful.
+Doing that might also have the benefit that it simplifies the code,
+removing the need for tagger_data->rxtstamp_set_state() and
+tagger_data->rxtstamp_get_state(), because with that simplification,
+the tagger will always expect meta frames.
 
-> diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-> index b64b49012655..bb7198081974 100644
-> --- a/net/ipv6/inet6_hashtables.c
-> +++ b/net/ipv6/inet6_hashtables.c
-> @@ -33,7 +33,10 @@ u32 inet6_ehashfn(const struct net *net,
->         net_get_random_once(&inet6_ehash_secret, sizeof(inet6_ehash_secre=
-t));
->         net_get_random_once(&ipv6_hash_secret, sizeof(ipv6_hash_secret));
->
-> -       lhash =3D (__force u32)laddr->s6_addr32[3];
-> +       lhash =3D jhash_3words((__force u32)laddr->s6_addr32[3],
-> +                           (((u32)lport) << 16) | (__force u32)fport,
-> +                           (__force u32)faddr->s6_addr32[0],
-> +                           ipv6_hash_secret);
-
-This seems wrong to me.
-
-Reusing ipv6_hash_secret and other keys twice is not good, I am sure
-some security researchers
-would love this...
-
-Please just change __ipv6_addr_jhash(), so that all users can benefit
-from a more secure version ?
-It also leaves lhash / fhash names relevant here.
-
-We will probably have to switch to sip (or other stronger hash than
-jhash)  at some point, it is a tradeoff.
-
-We might also add a break in the loop when a bucket exceeds a given
-safety length,
-because attackers can eventually exploit hashes after some point.
-
-The following patch looks much saner to me.
-
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 7332296eca44b84dca1bbecb545f6824a0e8ed3d..2acc4c808d45d1c1bb1c5076e79=
-842e136203e4c
-100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -752,12 +752,8 @@ static inline u32 ipv6_addr_hash(const struct in6_addr=
- *a)
- /* more secured version of ipv6_addr_hash() */
- static inline u32 __ipv6_addr_jhash(const struct in6_addr *a, const
-u32 initval)
- {
--       u32 v =3D (__force u32)a->s6_addr32[0] ^ (__force u32)a->s6_addr32[=
-1];
--
--       return jhash_3words(v,
--                           (__force u32)a->s6_addr32[2],
--                           (__force u32)a->s6_addr32[3],
--                           initval);
-+       return jhash2((__force const u32 *)a->s6_addr32,
-+                     ARRAY_SIZE(a->s6_addr32), initval);
- }
-
+Because of the lack of complaints, I was considering that as net-next
+material though.
