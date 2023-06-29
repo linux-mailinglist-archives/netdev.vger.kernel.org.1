@@ -1,157 +1,120 @@
-Return-Path: <netdev+bounces-14472-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14473-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75E8F741DD7
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:59:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6339C741DDE
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 04:00:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C793280D29
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 01:59:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC2B1C203BC
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 02:00:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4676111F;
-	Thu, 29 Jun 2023 01:59:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06141111F;
+	Thu, 29 Jun 2023 02:00:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0951118
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:59:11 +0000 (UTC)
-Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C08982681;
-	Wed, 28 Jun 2023 18:59:09 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1688003949; x=1719539949;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=Z5ADgpgRcm7ildcG3JRpr/Zcwf95I9lu4+eIDLt2QIQ=;
-  b=hikrSbtCH2THGVDVNMfIqYzS9KMdkZyiZeAZi4CmawK2tsOoglkgKkmu
-   +rG3RFSzU2z0j0nTjY8aIyZ1bMcjClPUwfnxXOnw84XJxPV8XH/XC2NFs
-   uGHf0PSHvShuz/cQ/N6T8eNnEVdOTT3REL6JCNYxUrd1QK841dvZIlQtd
-   E=;
-X-IronPort-AV: E=Sophos;i="6.01,167,1684800000"; 
-   d="scan'208";a="348439320"
-Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com) ([10.25.36.210])
-  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 01:59:09 +0000
-Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
-	by email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com (Postfix) with ESMTPS id 24CC08064F;
-	Thu, 29 Jun 2023 01:59:08 +0000 (UTC)
-Received: from EX19D001UWA002.ant.amazon.com (10.13.138.236) by
- EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.26; Thu, 29 Jun 2023 01:59:07 +0000
-Received: from u46989501580c5c.ant.amazon.com (10.88.130.162) by
- EX19D001UWA002.ant.amazon.com (10.13.138.236) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Thu, 29 Jun 2023 01:59:06 +0000
-From: Samuel Mendoza-Jonas <samjonas@amazon.com>
-To: <netdev@vger.kernel.org>
-CC: Stewart Smith <trawets@amazon.com>, "David S . Miller"
-	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, <benh@amazon.com>,
-	<stable@vger.kernel.org>, Samuel Mendoza-Jonas <samjonas@amazon.com>
-Subject: [PATCH net] net/ipv6: Reduce chance of collisions in inet6_hashfn()
-Date: Wed, 28 Jun 2023 18:58:44 -0700
-Message-ID: <20230629015844.800280-1-samjonas@amazon.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E530115A8
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:00:02 +0000 (UTC)
+Received: from mail.nfschina.com (unknown [42.101.60.195])
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 63D9A2961;
+	Wed, 28 Jun 2023 19:00:00 -0700 (PDT)
+Received: from [172.30.11.106] (unknown [180.167.10.98])
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 92556604A13F4;
+	Thu, 29 Jun 2023 09:59:57 +0800 (CST)
+Message-ID: <325f00e3-1dfd-f77b-9795-6f89e44c0417@nfschina.com>
+Date: Thu, 29 Jun 2023 09:59:56 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.88.130.162]
-X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
- EX19D001UWA002.ant.amazon.com (10.13.138.236)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
+ Thunderbird/91.8.0
+Subject: Re: [PATCH net-next 08/10] net: mdio: Remove unnecessary (void*)
+ conversions
+Content-Language: en-US
+To: "Russell King (Oracle)" <linux@armlinux.org.uk>
+Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
+ quan@os.amperecomputing.com, andrew@lunn.ch, hkallweit1@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ kernel-janitors@vger.kernel.org
+X-MD-Sfrom: yunchuan@nfschina.com
+X-MD-SrcIP: 180.167.10.98
+From: yunchuan <yunchuan@nfschina.com>
+In-Reply-To: <ZJwCcWgi0d6kEepI@shell.armlinux.org.uk>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Stewart Smith <trawets@amazon.com>
+On 2023/6/28 17:50, Russell King (Oracle) wrote:
+> Hi,
+>
+> I think you missed one case:
+>
+>          if (mdio_id == XGENE_MDIO_RGMII) {
+>                  mdio_bus->read = xgene_mdio_rgmii_read;
+>                  mdio_bus->write = xgene_mdio_rgmii_write;
+>                  mdio_bus->priv = (void __force *)pdata;
+>
+> This cast using __force is also not required.
+>
+> On Wed, Jun 28, 2023 at 10:45:17AM +0800, wuych wrote:
+>> @@ -211,7 +211,7 @@ static void xgene_enet_wr_mdio_csr(void __iomem *base_addr,
+>>   static int xgene_xfi_mdio_write(struct mii_bus *bus, int phy_id,
+>>   				int reg, u16 data)
+>>   {
+>> -	void __iomem *addr = (void __iomem *)bus->priv;
+>> +	void __iomem *addr = bus->priv;
+>>   	int timeout = 100;
+>>   	u32 status, val;
+>>   
+>> @@ -234,7 +234,7 @@ static int xgene_xfi_mdio_write(struct mii_bus *bus, int phy_id,
+>>   
+>>   static int xgene_xfi_mdio_read(struct mii_bus *bus, int phy_id, int reg)
+>>   {
+>> -	void __iomem *addr = (void __iomem *)bus->priv;
+>> +	void __iomem *addr = bus->priv;
+>>   	u32 data, status, val;
+>>   	int timeout = 100;
+> These probably cause Sparse to warn whether or not the cast is there.
 
-For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
-table with a hash over the source & destination addresses and ports.
-However, the IPv6 hash is insufficient and can lead to a high rate of
-collisions.
+Hi, Russell King,
 
-The IPv6 hash used an XOR to fit everything into the 96 bits for the
-fast jenkins hash, meaning it is possible for an external entity to
-ensure the hash collides, thus falling back to a linear search in the
-bucket, which is slow.
+I didn't notice this Sparse warning.
+Should I remove this cast although it cause Sparse warning?
+>
+> Given that in this case, bus->priv is initialised via:
+>
+>                  mdio_bus->priv = (void __force *)pdata->mdio_csr_addr;
+>
+> I think the simple thing is to _always_ initialise mdio_bus->priv
+> to point at pdata, and have xgene_xfi_mdio_*() always do:
+>
+> 	struct xgene_mdio_pdata *pdata = bus->priv;
+> 	void __iomem *addr = pdata->mdio_csr_addr;
+>
+> The extra access will be dwarfed by the time taken to perform the
+> access.
+>
+> This change should be made with a separate patch and not combined with
+> the patch removing the casts in xgene_mdio_rgmii_*().
+yeah, this change is great.
+I will send a separate patch as your suggestion If we can ignore Sparse 
+warning.
+Thanks for your suggestion!
 
-We take the approach of hash half the data; hash the other half; and
-then hash them together. We do this with 3x jenkins hashes rather than
-2x to calculate the hashing value for the connection covering the full
-length of the addresses and ports.
+wuych
 
-While this may look like it adds overhead, the reality of modern CPUs
-means that this is unmeasurable in real world scenarios.
-
-In simulating with llvm-mca, the increase in cycles for the hashing code
-was ~5 cycles on Skylake (from a base of ~50), and an extra ~9 on
-Nehalem (base of ~62).
-
-In commit dd6d2910c5e0 ("netfilter: conntrack: switch to siphash")
-netfilter switched from a jenkins hash to a siphash, but even the faster
-hsiphash is a more significant overhead (~20-30%) in some preliminary
-testing. So, in this patch, we keep to the more conservative approach to
-ensure we don't add much overhead per SYN.
-
-In testing, this results in a consistently even spread across the
-connection buckets. In both testing and real-world scenarios, we have
-not found any measurable performance impact.
-
-Cc: stable@vger.kernel.org
-Fixes: 08dcdbf6a7b9 ("ipv6: use a stronger hash for tcp")
-Fixes: b3da2cf37c5c ("[INET]: Use jhash + random secret for ehash.")
-Signed-off-by: Stewart Smith <trawets@amazon.com>
-Signed-off-by: Samuel Mendoza-Jonas <samjonas@amazon.com>
----
- include/net/ipv6.h          | 4 +---
- net/ipv6/inet6_hashtables.c | 5 ++++-
- 2 files changed, 5 insertions(+), 4 deletions(-)
-
-diff --git a/include/net/ipv6.h b/include/net/ipv6.h
-index 7332296eca44..f9bb54869d82 100644
---- a/include/net/ipv6.h
-+++ b/include/net/ipv6.h
-@@ -752,9 +752,7 @@ static inline u32 ipv6_addr_hash(const struct in6_addr *a)
- /* more secured version of ipv6_addr_hash() */
- static inline u32 __ipv6_addr_jhash(const struct in6_addr *a, const u32 initval)
- {
--	u32 v = (__force u32)a->s6_addr32[0] ^ (__force u32)a->s6_addr32[1];
--
--	return jhash_3words(v,
-+	return jhash_3words((__force u32)a->s6_addr32[1],
- 			    (__force u32)a->s6_addr32[2],
- 			    (__force u32)a->s6_addr32[3],
- 			    initval);
-diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
-index b64b49012655..bb7198081974 100644
---- a/net/ipv6/inet6_hashtables.c
-+++ b/net/ipv6/inet6_hashtables.c
-@@ -33,7 +33,10 @@ u32 inet6_ehashfn(const struct net *net,
- 	net_get_random_once(&inet6_ehash_secret, sizeof(inet6_ehash_secret));
- 	net_get_random_once(&ipv6_hash_secret, sizeof(ipv6_hash_secret));
- 
--	lhash = (__force u32)laddr->s6_addr32[3];
-+	lhash = jhash_3words((__force u32)laddr->s6_addr32[3],
-+			    (((u32)lport) << 16) | (__force u32)fport,
-+			    (__force u32)faddr->s6_addr32[0],
-+			    ipv6_hash_secret);
- 	fhash = __ipv6_addr_jhash(faddr, ipv6_hash_secret);
- 
- 	return __inet6_ehashfn(lhash, lport, fhash, fport,
--- 
-2.25.1
-
+>
+> Thanks.
+>
 
