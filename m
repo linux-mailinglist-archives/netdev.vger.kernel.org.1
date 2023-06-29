@@ -1,131 +1,90 @@
-Return-Path: <netdev+bounces-14542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 062D5742467
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:53:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 16BFF742497
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 13:00:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B51BA280DD6
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:53:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B4BA1C209A7
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 11:00:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C104C2C2;
-	Thu, 29 Jun 2023 10:51:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23891D52C;
+	Thu, 29 Jun 2023 11:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA1D8473
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:51:00 +0000 (UTC)
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF03A35A7;
-	Thu, 29 Jun 2023 03:50:58 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-440954dc5fcso194125137.2;
-        Thu, 29 Jun 2023 03:50:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688035858; x=1690627858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=1Bc1SqEnFsskSLnHHMk9CYcfhixRzxz4BpTXdjjVyoI=;
-        b=H5kYKgzRi3u4fLHhcDn3/9RT2+SXXz1L45No9cl2Up2JuZim36+ixeOpcKNsRrsQpQ
-         XVSk4/XTl610ymeWvNNtDYD4icqSqrKzbByxbL1rkL0Xu9li0qynzBnL4czPkzEzh2y4
-         rmEnLoJ0IIcW5o64XF9zMkUPb5sMYVr66ni+1R4ryOTyEFsdcByfvUxvbHDiVbrPC57P
-         O6OyT4cvRzO3wa/g7tVg2dn4YakPO61TpxpM7+ngc8z4u1dUT0Q8PaLeFUBhcfDi+fzI
-         I+G7QuTQro0yQ732af8DTzF3jVE/xkThSFHf2I7bIAZVLk0F9qJt2HrDoqCGN6kvQYCm
-         AKxg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688035858; x=1690627858;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=1Bc1SqEnFsskSLnHHMk9CYcfhixRzxz4BpTXdjjVyoI=;
-        b=JCZYTyJ19noACPcVtORHI5ZRMn6S/on7uYwFxcY9ayaRLiv0eyX+lefxW/yvEyMaCZ
-         dECSGPD/r/Yr6FipUWRyTiDd3cJdJ32BczudZqTu8ujc9Gin7p28IHNhR7G1GQOnmC25
-         x9sd/zwoxfhjy4lK7vaJnZLNghX1kGeWKhvkoAMy94+rbbUDe+yhagfOE9320t2MJArE
-         4mhf1/OQD/UyOQWeL+5LKfcWJ48295GjsMg7SV2vccUFW+4PzxYu2V+Y7+56LHwYIS3n
-         LigDFv68IYUM0kUvzKAPkOEKWQLZ5uH7OsKUyVush8T5k1KCFjiUyM50WBonBQOUQTRj
-         UAxA==
-X-Gm-Message-State: ABy/qLYz+PS24RdoTzm3VbJ3Vm5egK0a66oc5UMV7VX6jEtpr0fHdgPi
-	L4bAPJ+Krj4vtkSh3A6d3MjBOPwLKx7kK6Wk24E=
-X-Google-Smtp-Source: APBJJlEI+aDMiN1O2bKvv1N1CDEkTi6TIeFcVBvKGU9Za8J9APmDK/p2ETUabeXwv1eI5gPcw/3jX6FRYrhKDg+O0Ao=
-X-Received: by 2002:a05:6102:e55:b0:444:c1f6:5e3a with SMTP id
- p21-20020a0561020e5500b00444c1f65e3amr367807vst.25.1688035857761; Thu, 29 Jun
- 2023 03:50:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86F7C15C9
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 11:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id E95A4C433CA;
+	Thu, 29 Jun 2023 11:00:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688036423;
+	bh=e9jePG6UyxbYwxB7xMCdKQwO1kR2D8zWNv2+CMxFbYE=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=Q1QwvUN6mvDTIkJz220KZYRgC8ST3XF/abvxj+7NOW1AwOXPz334USfiMws8OYgnX
+	 +xSQcVzx8COPaWhcA2sIS+8EAIo2rigsJKMs4N0uHJxQd7VBNVgCPbcz+dB8G6L7n8
+	 GbaMzZvRNchmoYOunjYi+Iybx1wJnsw6fa1DzIpUuIIiCaeVCreBCDq2yfVi+K6xII
+	 WaBxGSAu63CjKOy/Qk4pSYY6t4v4SZzQYvjreuXk2v28Z23JMp1WBXpDuCM5eMlGWE
+	 HTGntm3B6YeFdnbQn3cBHkifpXslLMsIs3YiWb3nSKgBWoXn3jQ/4eKD6my5I/R5MO
+	 sqjnYukFKBd2g==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id C8CBEC41671;
+	Thu, 29 Jun 2023 11:00:22 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
- <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
- <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
- <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
- <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
- <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
- <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
- <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
- <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
- <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
- <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
- <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
- <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
- <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
- <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
- <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com> <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
-In-Reply-To: <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Thu, 29 Jun 2023 12:50:45 +0200
-Message-ID: <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH v2 net 0/3] Fix PTP packet drops with ocelot-8021q DSA tag
+ protocol
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168803642280.5822.10953805337271532475.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Jun 2023 11:00:22 +0000
+References: <20230627163114.3561597-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20230627163114.3561597-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
+ davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
+ UNGLinuxDriver@microchip.com, xiaoliang.yang_1@nxp.com,
+ richardcochran@gmail.com, atenart@kernel.org, linux-kernel@vger.kernel.org
 
-On Wed, Jun 28, 2023 at 10:18=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com=
-> wrote:
->
-> On Wed, Jun 28, 2023 at 5:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
-rote:
-> >
-> > On Wed, 2023-06-28 at 14:04 +0200, Ian Kumlien wrote:
-> > > So have some hits, would it be better without your warn on? ... Thing=
-s
-> > > are a bit slow atm - lets just say that i noticed the stacktraces
-> > > because a stream stuttered =3D)
-> >
-> > Sorry, I screwed-up completely a newly added check.
->
-> Thats ok
->
-> > If you have Kasan enabled you can simply and more safely remove my 2nd
-> > patch. Kasan should be able to catch all the out-of-buffer scenarios
-> > such checks were intended to prevent.
->
-> I thought I'd run without any of the patches, preparing for that now,
-> but i have to stop testing tomorrow and will continue on monday if i
-> don't catch anything
+Hello:
 
-So, KASAN caught the null pointer derefs, as expected, but it caught
-two of them which i didn't expect.
+This series was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-Anyway, I'm off for the weekend so, I hope to be able to send
-something better on Monday, fyi
+On Tue, 27 Jun 2023 19:31:11 +0300 you wrote:
+> Changes in v2:
+> - Distinguish between L2 and L4 PTP packets
+> v1 at:
+> https://lore.kernel.org/netdev/20230626154003.3153076-1-vladimir.oltean@nxp.com/
+> 
+> Patch 3/3 fixes an issue with the ocelot/felix driver, where it would
+> drop PTP traffic on RX unless hardware timestamping for that packet type
+> was enabled.
+> 
+> [...]
 
-> > Cheers,
-> >
-> > Paolo
-> >
+Here is the summary with links:
+  - [v2,net,1/3] net: mscc: ocelot: don't report that RX timestamping is enabled by default
+    https://git.kernel.org/netdev/net/c/4fd44b82b7ac
+  - [v2,net,2/3] net: mscc: ocelot: don't keep PTP configuration of all ports in single structure
+    https://git.kernel.org/netdev/net/c/45d0fcb5bc95
+  - [v2,net,3/3] net: dsa: felix: don't drop PTP frames with tag_8021q when RX timestamping is disabled
+    https://git.kernel.org/netdev/net/c/2edcfcbb3c59
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
