@@ -1,61 +1,61 @@
-Return-Path: <netdev+bounces-14534-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14532-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7C69D742447
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:50:22 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id BF6C0742440
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:49:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DF5B1C20442
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:50:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE5DA1C2098A
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:49:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94BBE16421;
-	Thu, 29 Jun 2023 10:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12C1E1640D;
+	Thu, 29 Jun 2023 10:46:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 793D916419
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:46:12 +0000 (UTC)
-Received: from mail-qv1-xf31.google.com (mail-qv1-xf31.google.com [IPv6:2607:f8b0:4864:20::f31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FC61FC1
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:46:07 -0700 (PDT)
-Received: by mail-qv1-xf31.google.com with SMTP id 6a1803df08f44-635e6f8bf77so4671676d6.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:46:07 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01EA016408
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:46:10 +0000 (UTC)
+Received: from mail-vk1-xa2c.google.com (mail-vk1-xa2c.google.com [IPv6:2607:f8b0:4864:20::a2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A1E51BFE
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:46:08 -0700 (PDT)
+Received: by mail-vk1-xa2c.google.com with SMTP id 71dfb90a1353d-47169fc1a40so178298e0c.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:46:08 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688035566; x=1690627566;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688035567; x=1690627567;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=qMmQBpOfJVnvpQSXXEmQO7/e37wa5sJ+CrQsC+jV+2o=;
-        b=r1DuNVTxmymsCzPgC2bKVObFoOuugfURPuCfOohomLOeAcla8CfIfZxQpETg1WSjXT
-         idnyLuDYRd1SqrTfAZthBudKZR4FG2dfuXzR1HHu0qE/oLszpek4vEJW+JE3J5EFa3zY
-         5/t3KVOUP+rl0WmyMnAtk8j7z6ZzYvFi8A/NlW82dXqTSpx7Uxcs+wFK5MEGyzT2IxHz
-         3k61nlaS6Uvns50AeWRKo3YysHM1PRED4vJZ2B4WHM5at0orrmwYbA6fK7zPMcNDYqiA
-         ZVkAyF711zaIcD8VviQyRjEk7Clw89D2OhBg1YFlU27iwG9DPBdLYTMaoYO45XQmVEVr
-         qi3Q==
+        bh=hitOgdwPcbAX5DOATV4/9U48QXEwoVPWjPpSLoiwyZI=;
+        b=plN70QX12EHYfZR4V9e6JRpcSlFicDUuIX27iye9y+o3H/L3yioKyaxxITDXS9CLw9
+         IGoztQKwERf4RKqqT2NTXfgjqaLe4d7xAiRVlzpm3oTyHQCk7CTD0vAlWutluTn0yOXu
+         QPDb3+roULnp2Vfl2ikJ67bM1YEjJf1yN342NmnNDfVj94MyGZmYd0pBTlLl1GJxLP6p
+         68AnQB5UrBnk1kf+eWb8nc+m0QmjeAJrCkn1ZHX3yk22XKLE4iD+AwgfhcHtxue7FtV+
+         7fYcvrBGfjXYvcOax2+vY/XzQ/oUCHGA78GXAgX+whTfqFZnDIbGgRTuOSSFNnGO4JfV
+         sb5A==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688035566; x=1690627566;
+        d=1e100.net; s=20221208; t=1688035567; x=1690627567;
         h=content-transfer-encoding:mime-version:references:in-reply-to
          :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=qMmQBpOfJVnvpQSXXEmQO7/e37wa5sJ+CrQsC+jV+2o=;
-        b=Xnq2vwefLi2aWEJ3fvXB5u9DKduPnt2G8wdbJHs74oYZ3dhgEfUYFBCCZIdp/HM2zK
-         70aVu7/qG9nmqPG7R/gcaifO2Vc4yiHZ6ECu5FPhsOqeeZ7P7XGIg5iv7ev9pj+xQaNa
-         n/IEXaQdc8YsbM2Ump7AMAVA6AqzBo4TBdAPu4HCk34YnFMB/uNr3v3w555z2gFMzOUv
-         XnMTeI/4OsYxUsMZbhA18MROIWDC3YglvEVy5kAdOLxsNtJX9QKXHX+0bW3UZcQwtwO1
-         Cm+P1YiexnSpPzbjsOo0ttBVAuAY5Nom3BConk7FCPAvUWUoiFh7ee+D39qOVlgFSHH6
-         l3gw==
-X-Gm-Message-State: ABy/qLb4RsOG/U9jCg98vWtEUE/cLSHi+5m8kY6b68iXDEhdwdUIbkpT
-	FSC3+kGUrSn51t6yqw4baUtHadXrIgvOsqKcXDc=
-X-Google-Smtp-Source: APBJJlFldzXWHMoTiH4DCh9qcf/mn+FYHfrJNDiUm97di50jmFwFal7Ad295q1eY/s0QErpJv7mw3g==
-X-Received: by 2002:ad4:5ecf:0:b0:636:41e6:ae01 with SMTP id jm15-20020ad45ecf000000b0063641e6ae01mr123413qvb.40.1688035565058;
-        Thu, 29 Jun 2023 03:46:05 -0700 (PDT)
+        bh=hitOgdwPcbAX5DOATV4/9U48QXEwoVPWjPpSLoiwyZI=;
+        b=LvBSzs24LnyHrsWcyeOazGG99p4MBGy9E4T0tOTK/9XBDJrK+AhSaX2aV+c1UA7vF4
+         Q1WJiEZ0MEJ1WUx0ZAqw4NlPc0cXSwQNmaLl3ERQTL8EXH+A6TYJ+g0ZHgFzlSsZbjA5
+         Tcfpk2eVT8qEktDZefpcXZmLE8/f8cXfY0SBhPhDib10rpKYsdhLBYrh31PHVcxAW3hi
+         dZ/r0YI8XYTmVTOulqPnKAR2OlCCq1Wq9q5A0mkVwcOZMeCkHocNo7ShTtPlGcz0QIzX
+         pCaTw0QOnmzQeCTLVeb1RINm+tl5gZqbWDw9lmOTdPvObTDLjpFcHP9jDupDVNCr/NQV
+         G2iw==
+X-Gm-Message-State: AC+VfDwOD7pxzPzpdSspp83D7jDXzRTR69asI2Q9Iy+4ZOyAhICn23pO
+	wmdLtU1i/MTkGpXBULvDtfd6OvyGhcevBb51Ve0=
+X-Google-Smtp-Source: ACHHUZ7M2e91ZG1NhmNjLlbDw5K2qvJEd0o4YyVMXyI7E7XSTl9o8qfWIVVGlJTn0bfVUXn45uWk9Q==
+X-Received: by 2002:a67:e9c6:0:b0:443:68c0:44ad with SMTP id q6-20020a67e9c6000000b0044368c044admr4766252vso.25.1688035566495;
+        Thu, 29 Jun 2023 03:46:06 -0700 (PDT)
 Received: from majuu.waya (bras-base-oshwon9577w-grc-12-142-114-148-137.dsl.bell.ca. [142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id o9-20020a056214180900b006362d4eeb6esm538453qvw.144.2023.06.29.03.46.03
+        by smtp.gmail.com with ESMTPSA id o9-20020a056214180900b006362d4eeb6esm538453qvw.144.2023.06.29.03.46.05
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 03:46:04 -0700 (PDT)
+        Thu, 29 Jun 2023 03:46:05 -0700 (PDT)
 From: Jamal Hadi Salim <jhs@mojatatu.com>
 To: netdev@vger.kernel.org
 Cc: deb.chatterjee@intel.com,
@@ -79,9 +79,9 @@ Cc: deb.chatterjee@intel.com,
 	mattyk@nvidia.com,
 	kernel@mojatatu.com,
 	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v3 net-next 12/21] p4tc: add table entry create, update, get, delete, flush and dump
-Date: Thu, 29 Jun 2023 06:45:29 -0400
-Message-Id: <20230629104538.40863-13-jhs@mojatatu.com>
+Subject: [PATCH RFC v3 net-next 13/21] p4tc: add set of P4TC table lookup kfuncs
+Date: Thu, 29 Jun 2023 06:45:30 -0400
+Message-Id: <20230629104538.40863-14-jhs@mojatatu.com>
 X-Mailer: git-send-email 2.34.1
 In-Reply-To: <20230629104538.40863-1-jhs@mojatatu.com>
 References: <20230629104538.40863-1-jhs@mojatatu.com>
@@ -98,172 +98,63 @@ X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Tables are conceptually similar to TCAMs and this implementation could be
-labelled as an "algorithmic" TCAM. Tables have a key of a specific size,
-maximum number of entries and masks allowed. The basic P4 key types
-are supported (exact, LPM, ternary, and ranges) although the kernel side is
-oblivious of all that and sees only bit blobs which it masks before a
-lookup is performed.
+We add an initial set of kfuncs to allow interactions from eBPF programs
+to the P4TC domain.
 
-This commit allows users to create, update, delete, get, flush and dump
-table _entries_ (templates were described in earlier patch).
+- bpf_skb_p4tc_tbl_lookup: Used to lookup a table entry from a BPF
+program installed in TC. To find the table entry we take in an skb, the
+pipeline ID, the table ID, a key and a key size.
+We use the skb to get the network namespace structure where all the
+pipelines are stored. After that we use the pipeline ID and the table
+ID, to find the table. We then use the key to search for the entry.
+We return an entry on success and NULL on failure.
 
-For example, a user issuing the following command:
+- bpf_xdp_p4tc_tbl_lookup: Used to lookup a table entry from a BPF
+program installed in XDP. To find the table entry we take in an skb, the
+pipeline ID, the table ID, a key and a key size.
+We use struct xdp_md to get the network namespace structure where all
+the pipelines are stored. After that we use the pipeline ID and the table
+ID, to find the table. We then use the key to search for the entry.
+We return an entry on success and NULL on failure.
 
-tc p4runtime create myprog/table/cb/tname  \
-  dstAddr 10.10.10.0/24 srcAddr 192.168.0.0/16 prio 16 \
-  action myprog/cb/send param port type dev port1
+To load the eBPF program that uses the bpf_skb_p4tc_tbl_lookup kfunc into
+TC, we issue the following command:
 
-indicates we are creating a table entry in table "tname" on a pipeline
-named "myprog"
+tc filter add dev $P0 ingress protocol any prio 1 p4 pname redirect_srcip \
+     action bpf obj $PROGNAME.o section p4prog/tc
 
-User space tc will create a key which has a value of 0x0a0a0a00c0a00000
-(10.10.10.0 concatenated with 192.168.0.0) and a mask value of
-0xffffff00ffff0000 (/24 concatenated with /16) that will be sent to the
-kernel. In addition a priority field of 16 is passed to the kernel as
-well as the action definition.
-The priority field is needed to disambiguate in case two entries
-match. In that case, the kernel will choose the one with lowest priority
-number.
+To load the eBPF program that uses the bpf_xdp_p4tc_tbl_lookup into XDP,
+we first need to load it into XDP using, for example, the ip command:
 
-Note that table entries can only be created once the pipeline template is
-sealed.
+ip link set $P0 xdp obj $PROGNAME.o section p4prog/xdp verbose
 
-If the user wanted to, for example, add an action to our just created
-entry, they'd issue the following command:
+Then we pin it:
 
-tc p4runtime update myprog/table/cb/tname srcAddr 10.10.10.0/24 \
-dstAddr 192.168.0.0/16 prio 16 action myprog/cb/send param port type dev
-port5
+bpftool prog pin id $ID pin /tmp/
 
-In this case, the user needs to specify the pipeline name, the table name,
-the key and the priority, so that we can locate the table entry.
+After that we create the P4 filter and reference the XDP program:
 
-If the user wanted to, for example, get the table entry that we just
-updated, they'd issue the following command:
+tc filter add dev $P0 ingress protocol any prio 1 p4 pname redirect_srcip \
+     action bpf obj $PROGNAME.o section p4prog/tc
 
-tc p4runtime get myprog/table/cb/tname srcAddr 10.10.10.0/24 \
-dstAddr 192.168.0.0/16 prio 16
+To load the eBPF program that uses the bpf_xdp_p4tc_tbl_lookup into XDP,
+we first need to load it into XDP using, for example, the ip command:
 
-Note that, again, we need to specify the pipeline name, the table name,
-the key and the priority, so that we can locate the table entry.
+ip link set $P0 xdp obj $PROGNAME.o section p4prog/xdp verbose
 
-If the user wanted to delete the table entry we created, they'd issue the
-following command:
+Then we pin it:
 
-tc p4runtime del myprog/table/cb/tname srcAddr 10.10.10.0/24 \
-  dstAddr 192.168.0.0/16 prio 16
+bpftool prog pin id $ID pin /tmp/
 
-Note that, again, we need to specify the pipeline name, the table
-name, the key and the priority, so that we can
-locate the table entry.
+After that we create the P4 filter and reference the XDP program:
 
-We can also flush all the table entries from a specific table.
-To flush the table entries of table tname ane pipeline ptables,
-the user would issue the following command:
+$TC filter add dev $P0 ingress protocol ip prio 1 p4 pname redirect_srcip \
+     prog xdp pinned /tmp/xdp_p4prog prog_cookie 22
 
-tc p4runtime del myprog/table/cb/tname
-
-We can also dump all the table entries from a specific table .
-To dump the table entries of table tname and pipeline myprog, the user
-would issue the following command:
-
-tc p4runtime get myprog/table/cb/tname
-
-__Table Entry Permissions__
-
-Table entries can have permissions specified when they are being added.
-Caveat: we are doing a lot more than what P4 defines because we feel it is
-necessary.
-
-Table entry permissions build on the table permissions provided when a
-table is created via the template (see earlier patch).
-
-We have two types of permissions: Control path vs datapath.
-The template definition can set either one. For example, one could allow
-for adding table entries by the datapath in case of PNA add-on-miss is
-needed. By default tables entries have control plane RUD, meaning the
-control plane can Read, Update or Delete entries. By default, as well,
-the control plane can create new entries unless specified otherwise by
-the template.
-
-Lets see an example of defining a table "tname" at template time:
-
-$TC p4template create table/ptables/cb/tname tblid 1 keysz 64
-permissions 0x3C9 ...
-
-Above is setting the table tname's permission to be 0x3C9 is equivalent to
-CRUD--R--X meaning:
-
-The control plane can Create, Read, Update, Delete
-The datapath can only Read and Execute table entries.
-If one was to dump this table with:
-
-$TC p4template get table/ptables/cb/tname
-
-The output would be the following:
-
-pipeline name ptables id 22
-table id 1
-table name cb/tname
-key_sz 64
-max entries 256
-masks 8
-table entries 0
-permissions CRUD--R--X
-
-The expressed permissions above are probably the most practical for most
-use cases.
-
-__Constant Tables And P4-programmed Defined Entries__
-
-If one wanted to restrict the table to be an equivalent to a "const" then
-the permissions would be set to be: -R----R--X
-
-In such a case, typically the P4 program will have some entries defined
-(see the famous P4 calc example). The "initial entries" specified in the P4
-program will have to be added by the template (as generated by the
-compiler), as such:
-
-$TC p4template update table/ptables/cb/tname
-entry srcAddr 10.10.10.10/24 dstAddr 1.1.1.0/24 prio 17
-
-This table cannot be updated at runtime. Any attempt to add an entry of a
-table which is read-only at runtime will get a permission denied response
-back from the kernel.
-
-Note: If one was to create an equivalent for PNA add-on-miss feature for
-this table, then the template would issue table permissions as: -R---CR--X
-PNA doesn't specify whether the datapath can also delete or update entries,
-but if it did then more appropriate permissions will be: -R----XCRUDX
-
-__Mix And Match of RW vs Constant Entries__
-Lets look at other scenarios; lets say the table has CRUD--R--X permissions
-as defined by the template...
-At runtime the user could add entries which are "const" - by specifying the
-entry's permission as -R---R--X example:
-
-$TC p4runtime create ptables/table/cb/tname srcAddr 10.10.10.10/24 \
-dstAddr 1.1.1.0/24 prio 17 permissions 0x109 action drop
-
-or not specify permissions at all as such:
-
-$TC p4runtime create ptables/table/cb/tname srcAddr 10.10.10.10/24 \
-dstAddr 1.1.1.0/24 prio 17 \
-action drop
-
-in which case the table's permissions defined at template time( CRUD--R--X)
-are assumed; meaning the table entry can be deleted or updated by the
-control plane.
-
-__Entries permissions Allowed On A Table Entry Creation At Runtime__
-
-When an entry is added with expressed permissions it has at most to have
-what the template table definition expressed but could ask for less
-permission. For example, assuming a table with templated specified
-permissions of CR-D--R--X:
-An entry created at runtime with permission of -R----R--X is allowed but an
-entry with -RUD--R--X will be rejected.
+Note that we also specify a "prog_cookie", which is used to verify
+whether the eBPF program has executed or not before we reach the P4
+classifier. The eBPF program sets this cookie by using the kfunc
+bpf_p4tc_set_cookie.
 
 Co-developed-by: Victor Nogueira <victor@mojatatu.com>
 Signed-off-by: Victor Nogueira <victor@mojatatu.com>
@@ -271,2481 +162,659 @@ Co-developed-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
 ---
- include/net/p4tc.h                |   79 +-
- include/uapi/linux/p4tc.h         |   45 +-
- include/uapi/linux/rtnetlink.h    |    7 +
- net/sched/p4tc/Makefile           |    3 +-
- net/sched/p4tc/p4tc_pipeline.c    |   12 +
- net/sched/p4tc/p4tc_runtime_api.c |  136 ++
- net/sched/p4tc/p4tc_table.c       |   51 +-
- net/sched/p4tc/p4tc_tbl_entry.c   | 1906 +++++++++++++++++++++++++++++
- net/sched/p4tc/p4tc_tmpl_api.c    |    4 +-
- security/selinux/nlmsgtab.c       |    5 +-
- 10 files changed, 2237 insertions(+), 11 deletions(-)
- create mode 100644 net/sched/p4tc/p4tc_runtime_api.c
- create mode 100644 net/sched/p4tc/p4tc_tbl_entry.c
+ include/linux/bitops.h          |   1 +
+ include/net/p4tc.h              |  54 ++++++++++-
+ net/sched/Kconfig               |   1 +
+ net/sched/p4tc/Makefile         |   2 +-
+ net/sched/p4tc/p4tc_action.c    |   1 +
+ net/sched/p4tc/p4tc_bpf.c       | 115 ++++++++++++++++++++++
+ net/sched/p4tc/p4tc_pipeline.c  |  46 +++++++++
+ net/sched/p4tc/p4tc_table.c     |  19 ++++
+ net/sched/p4tc/p4tc_tbl_entry.c | 164 +++++++++++++++++++++++++++++++-
+ net/sched/p4tc/p4tc_tmpl_api.c  |   2 +
+ 10 files changed, 402 insertions(+), 3 deletions(-)
+ create mode 100644 net/sched/p4tc/p4tc_bpf.c
 
+diff --git a/include/linux/bitops.h b/include/linux/bitops.h
+index 2ba557e06..290c2399a 100644
+--- a/include/linux/bitops.h
++++ b/include/linux/bitops.h
+@@ -19,6 +19,7 @@
+ #define BITS_TO_LONGS(nr)	__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(long))
+ #define BITS_TO_U64(nr)		__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(u64))
+ #define BITS_TO_U32(nr)		__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(u32))
++#define BITS_TO_U16(nr)		__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(u16))
+ #define BITS_TO_BYTES(nr)	__KERNEL_DIV_ROUND_UP(nr, BITS_PER_TYPE(char))
+ 
+ extern unsigned int __sw_hweight8(unsigned int w);
 diff --git a/include/net/p4tc.h b/include/net/p4tc.h
-index ca16c79ff..2b2e80f98 100644
+index 2b2e80f98..544a2cf8a 100644
 --- a/include/net/p4tc.h
 +++ b/include/net/p4tc.h
-@@ -84,6 +84,7 @@ struct p4tc_pipeline {
- 	u32                         num_created_acts;
- 	refcount_t                  p_ref;
- 	refcount_t                  p_ctrl_ref;
-+	refcount_t                  p_entry_deferal_ref;
- 	u16                         num_tables;
- 	u16                         curr_tables;
- 	u8                          p_state;
-@@ -158,15 +159,15 @@ struct p4tc_table {
+@@ -32,6 +32,12 @@
+ 
+ #define P4TC_HDRFIELD_IS_VALIDITY_BIT 0x1
+ 
++struct p4tc_percpu_scratchpad {
++	u32 prog_cookie;
++};
++
++DECLARE_PER_CPU(struct p4tc_percpu_scratchpad, p4tc_percpu_scratchpad);
++
+ struct p4tc_dump_ctx {
+ 	u32 ids[P4TC_PATH_MAX];
+ 	struct rhashtable_iter *iter;
+@@ -91,8 +97,26 @@ struct p4tc_pipeline {
+ 	refcount_t                  p_hdrs_used;
+ };
+ 
++#define P4TC_PIPELINE_MAX_ARRAY 32
++
++struct p4tc_table;
++
++struct p4tc_tbl_cache_key {
++	u32 pipeid;
++	u32 tblid;
++};
++
++extern const struct rhashtable_params tbl_cache_ht_params;
++
++int p4tc_tbl_cache_insert(struct net *net, u32 pipeid, struct p4tc_table *table);
++void p4tc_tbl_cache_remove(struct net *net, struct p4tc_table *table);
++struct p4tc_table *p4tc_tbl_cache_lookup(struct net *net, u32 pipeid, u32 tblid);
++
++#define P4TC_TBLS_CACHE_SIZE 32
++
+ struct p4tc_pipeline_net {
+-	struct idr pipeline_idr;
++	struct list_head  tbls_cache[P4TC_TBLS_CACHE_SIZE];
++	struct idr        pipeline_idr;
+ };
+ 
+ int tcf_p4_tmpl_generic_dump(struct sk_buff *skb, struct p4tc_dump_ctx *ctx,
+@@ -139,8 +163,20 @@ static inline int p4tc_action_destroy(struct tc_action **acts)
+ 
+ #define P4TC_PERMISSIONS_UNINIT (1 << P4TC_PERM_MAX_BIT)
+ 
++#define P4TC_MAX_PARAM_DATA_SIZE 124
++
++struct p4tc_table_entry_act_bpf {
++	u32 act_id;
++	u8 params[P4TC_MAX_PARAM_DATA_SIZE];
++} __packed;
++
++struct p4tc_parser_buffer_act_bpf {
++	u16 hdrs[BITS_TO_U16(HEADER_MAX_LEN)];
++};
++
+ struct p4tc_table_defact {
+ 	struct tc_action **default_acts;
++	struct p4tc_table_entry_act_bpf *defact_bpf;
+ 	/* Will have 2 5 bits blocks containing CRUDX (Create, read, update,
+ 	 * delete, execute) permissions for control plane and data plane.
+ 	 * The first 5 bits are for control and the next five are for data plane.
+@@ -157,6 +193,7 @@ struct p4tc_table_perm {
+ 
+ struct p4tc_table {
  	struct p4tc_template_common         common;
++	struct list_head                    tbl_cache_node;
  	struct list_head                    tbl_acts_list;
  	struct idr                          tbl_masks_idr;
--	struct idr                          tbl_prio_idr;
-+	struct ida                          tbl_prio_idr;
- 	struct rhltable                     tbl_entries;
-+	struct p4tc_table_entry             *tbl_const_entry;
- 	struct p4tc_table_defact __rcu      *tbl_default_hitact;
- 	struct p4tc_table_defact __rcu      *tbl_default_missact;
- 	struct p4tc_table_perm __rcu        *tbl_permissions;
- 	struct p4tc_table_entry_mask __rcu  **tbl_masks_array;
- 	unsigned long __rcu                 *tbl_free_masks_bitmap;
- 	spinlock_t                          tbl_masks_idr_lock;
--	spinlock_t                          tbl_prio_idr_lock;
- 	int                                 tbl_num_postacts;
- 	int                                 tbl_num_preacts;
- 	u32                                 tbl_count;
-@@ -181,6 +182,7 @@ struct p4tc_table {
- 	refcount_t                          tbl_ref;
- 	refcount_t                          tbl_entries_ref;
- 	u16                                 tbl_type;
-+	u16                                 PAD0;
- };
+ 	struct ida                          tbl_prio_idr;
+@@ -239,6 +276,11 @@ extern const struct p4tc_template_ops p4tc_act_ops;
  
- extern const struct p4tc_template_ops p4tc_table_ops;
-@@ -235,6 +237,64 @@ struct p4tc_table_act {
+ extern const struct rhashtable_params entry_hlt_params;
  
- extern const struct p4tc_template_ops p4tc_act_ops;
++struct p4tc_table_entry_act_bpf_params {
++	u32 pipeid;
++	u32 tblid;
++};
++
+ struct p4tc_table_entry;
+ struct p4tc_table_entry_work {
+ 	struct work_struct   work;
+@@ -258,6 +300,7 @@ struct p4tc_table_entry_value {
+ 	u32                              prio;
+ 	int                              num_acts;
+ 	struct tc_action                 **acts;
++	struct p4tc_table_entry_act_bpf  *act_bpf;
+ 	refcount_t                       entries_ref;
+ 	u32                              permissions;
+ 	struct p4tc_table_entry_tm __rcu *tm;
+@@ -290,10 +333,19 @@ static inline void *p4tc_table_entry_value(struct p4tc_table_entry *entry)
+ extern const struct nla_policy p4tc_root_policy[P4TC_ROOT_MAX + 1];
+ extern const struct nla_policy p4tc_policy[P4TC_MAX + 1];
  
-+extern const struct rhashtable_params entry_hlt_params;
++struct p4tc_table_entry *
++p4tc_table_entry_lookup_direct(struct p4tc_table *table,
++			       struct p4tc_table_entry_key *key);
 +
-+struct p4tc_table_entry;
-+struct p4tc_table_entry_work {
-+	struct work_struct   work;
-+	struct p4tc_pipeline *pipeline;
-+	struct p4tc_table_entry *entry;
-+	bool defer_deletion;
-+};
 +
-+struct p4tc_table_entry_key {
-+	u32 keysz;
-+	/* Key start */
-+	u32 maskid;
-+	unsigned char fa_key[] __aligned(8);
-+};
-+
-+struct p4tc_table_entry_value {
-+	u32                              prio;
-+	int                              num_acts;
-+	struct tc_action                 **acts;
-+	refcount_t                       entries_ref;
-+	u32                              permissions;
-+	struct p4tc_table_entry_tm __rcu *tm;
-+	struct p4tc_table_entry_work     *entry_work;
-+};
-+
-+struct p4tc_table_entry_mask {
-+	struct rcu_head	 rcu;
-+	u32              sz;
-+	u32              mask_index;
-+	refcount_t       mask_ref;
-+	u32              mask_id;
-+	unsigned char fa_value[] __aligned(8);
-+};
-+
-+struct p4tc_table_entry {
-+	struct rcu_head rcu;
-+	struct rhlist_head ht_node;
-+	struct p4tc_table_entry_key key;
-+	/* fallthrough: key data + value */
-+};
-+
-+#define P4TC_KEYSZ_BYTES(bits) round_up(BITS_TO_BYTES(bits), 8)
-+
-+static inline void *p4tc_table_entry_value(struct p4tc_table_entry *entry)
-+{
-+	return entry->key.fa_key + P4TC_KEYSZ_BYTES(entry->key.keysz);
-+}
-+
-+extern const struct nla_policy p4tc_root_policy[P4TC_ROOT_MAX + 1];
-+extern const struct nla_policy p4tc_policy[P4TC_MAX + 1];
-+
-+int __tcf_table_entry_del(struct p4tc_pipeline *pipeline,
-+			  struct p4tc_table *table,
-+			  struct p4tc_table_entry_key *key,
-+			  struct p4tc_table_entry_mask *mask, u32 prio);
-+
+ int __tcf_table_entry_del(struct p4tc_pipeline *pipeline,
+ 			  struct p4tc_table *table,
+ 			  struct p4tc_table_entry_key *key,
+ 			  struct p4tc_table_entry_mask *mask, u32 prio);
++struct p4tc_table_entry_act_bpf *
++tcf_table_entry_create_act_bpf(struct tc_action *action,
++			       struct netlink_ext_ack *extack);
++int register_p4tc_tbl_bpf(void);
+ 
  struct p4tc_parser {
  	char parser_name[PARSERNAMSIZ];
- 	struct idr hdr_fields_idr;
-@@ -330,6 +390,21 @@ struct p4tc_table *tcf_table_get(struct p4tc_pipeline *pipeline,
- 				 struct netlink_ext_ack *extack);
- void tcf_table_put_ref(struct p4tc_table *table);
+diff --git a/net/sched/Kconfig b/net/sched/Kconfig
+index ea57a4c7b..d071f9075 100644
+--- a/net/sched/Kconfig
++++ b/net/sched/Kconfig
+@@ -678,6 +678,7 @@ config NET_EMATCH_IPT
  
-+void tcf_table_entry_destroy_hash(void *ptr, void *arg);
-+
-+struct p4tc_table_entry *
-+tcf_table_const_entry_cu(struct net *net, struct nlattr *arg,
-+			 struct p4tc_pipeline *pipeline,
-+			 struct p4tc_table *table,
-+			 struct netlink_ext_ack *extack);
-+int p4tca_table_get_entry_fill(struct sk_buff *skb, struct p4tc_table *table,
-+			       struct p4tc_table_entry *entry, u32 tbl_id);
-+int p4tc_ctl_table_n(struct sk_buff *skb, struct nlmsghdr *n,
-+		     int cmd, char *p_name, struct nlattr *nla,
-+		     struct netlink_ext_ack *extack);
-+int p4tc_ctl_dump_1(struct sk_buff *skb, struct netlink_callback *cb,
-+		    struct nlattr *arg, char *p_name);
-+
- struct p4tc_parser *tcf_parser_create(struct p4tc_pipeline *pipeline,
- 				      const char *parser_name,
- 				      u32 parser_inst_id,
-diff --git a/include/uapi/linux/p4tc.h b/include/uapi/linux/p4tc.h
-index acde500cd..2dc36e8c7 100644
---- a/include/uapi/linux/p4tc.h
-+++ b/include/uapi/linux/p4tc.h
-@@ -123,10 +123,19 @@ enum {
- 	P4TC_OBJ_HDR_FIELD,
- 	P4TC_OBJ_ACT,
- 	P4TC_OBJ_TABLE,
-+	P4TC_OBJ_TABLE_ENTRY,
- 	__P4TC_OBJ_MAX,
- };
- #define P4TC_OBJ_MAX __P4TC_OBJ_MAX
- 
-+/* P4 runtime Object types */
-+enum {
-+	P4TC_OBJ_RUNTIME_UNSPEC,
-+	P4TC_OBJ_RUNTIME_TABLE,
-+	__P4TC_OBJ_RUNTIME_MAX,
-+};
-+#define P4TC_OBJ_RUNTIMEMAX __P4TC_OBJ_RUNTIMEMAX
-+
- /* P4 attributes */
- enum {
- 	P4TC_UNSPEC,
-@@ -217,7 +226,7 @@ enum {
- 	P4TC_TABLE_POSTACTIONS, /* nested table postactions */
- 	P4TC_TABLE_DEFAULT_HIT, /* nested default hit action attributes */
- 	P4TC_TABLE_DEFAULT_MISS, /* nested default miss action attributes */
--	P4TC_TABLE_OPT_ENTRY, /* nested const table entry*/
-+	P4TC_TABLE_CONST_ENTRY, /* nested const table entry*/
- 	P4TC_TABLE_ACTS_LIST, /* nested table actions list */
- 	__P4TC_TABLE_MAX
- };
-@@ -277,6 +286,40 @@ struct tc_act_dyna {
- 	tc_gen;
- };
- 
-+struct p4tc_table_entry_tm {
-+	__u64 created;
-+	__u64 lastused;
-+	__u64 firstused;
-+	__u16 who_created;
-+	__u16 who_updated;
-+	__u16 permissions;
-+};
-+
-+/* Table entry attributes */
-+enum {
-+	P4TC_ENTRY_UNSPEC,
-+	P4TC_ENTRY_TBLNAME, /* string */
-+	P4TC_ENTRY_KEY_BLOB, /* Key blob */
-+	P4TC_ENTRY_MASK_BLOB, /* Mask blob */
-+	P4TC_ENTRY_PRIO, /* u32 */
-+	P4TC_ENTRY_ACT, /* nested actions */
-+	P4TC_ENTRY_TM, /* entry data path timestamps */
-+	P4TC_ENTRY_WHODUNNIT, /* tells who's modifying the entry */
-+	P4TC_ENTRY_CREATE_WHODUNNIT, /* tells who created the entry */
-+	P4TC_ENTRY_UPDATE_WHODUNNIT, /* tells who updated the entry last */
-+	P4TC_ENTRY_PERMISSIONS, /* entry CRUDX permissions */
-+	P4TC_ENTRY_PAD,
-+	__P4TC_ENTRY_MAX
-+};
-+#define P4TC_ENTRY_MAX (__P4TC_ENTRY_MAX - 1)
-+
-+enum {
-+	P4TC_ENTITY_UNSPEC,
-+	P4TC_ENTITY_KERNEL,
-+	P4TC_ENTITY_TC,
-+	P4TC_ENTITY_MAX
-+};
-+
- #define P4TC_RTA(r) \
- 	((struct rtattr *)(((char *)(r)) + NLMSG_ALIGN(sizeof(struct p4tcmsg))))
- 
-diff --git a/include/uapi/linux/rtnetlink.h b/include/uapi/linux/rtnetlink.h
-index 41a4046e7..c06fe3d8f 100644
---- a/include/uapi/linux/rtnetlink.h
-+++ b/include/uapi/linux/rtnetlink.h
-@@ -201,6 +201,13 @@ enum {
- 	RTM_GETP4TEMPLATE,
- #define RTM_GETP4TEMPLATE	RTM_GETP4TEMPLATE
- 
-+	RTM_P4TC_CREATE = 128,
-+#define RTM_P4TC_CREATE	RTM_P4TC_CREATE
-+	RTM_P4TC_DEL,
-+#define RTM_P4TC_DEL		RTM_P4TC_DEL
-+	RTM_P4TC_GET,
-+#define RTM_P4TC_GET		RTM_P4TC_GET
-+
- 	__RTM_MAX,
- #define RTM_MAX		(((__RTM_MAX + 3) & ~3) - 1)
- };
+ config NET_P4_TC
+ 	bool "P4 TC support"
++	depends on DEBUG_INFO_BTF
+ 	select NET_CLS_ACT
+ 	help
+ 	  Say Y here if you want to use P4 features on top of TC.
 diff --git a/net/sched/p4tc/Makefile b/net/sched/p4tc/Makefile
-index 182ad141b..c9e2555a8 100644
+index c9e2555a8..161a515ad 100644
 --- a/net/sched/p4tc/Makefile
 +++ b/net/sched/p4tc/Makefile
-@@ -1,4 +1,5 @@
- # SPDX-License-Identifier: GPL-2.0
+@@ -2,4 +2,4 @@
  
  obj-y := p4tc_types.o p4tc_pipeline.o p4tc_tmpl_api.o \
--	p4tc_parser_api.o p4tc_hdrfield.o p4tc_action.o p4tc_table.o
-+	p4tc_parser_api.o p4tc_hdrfield.o p4tc_action.o p4tc_table.o \
-+	p4tc_tbl_entry.o p4tc_runtime_api.o
-diff --git a/net/sched/p4tc/p4tc_pipeline.c b/net/sched/p4tc/p4tc_pipeline.c
-index 04505dbc5..6c687ee54 100644
---- a/net/sched/p4tc/p4tc_pipeline.c
-+++ b/net/sched/p4tc/p4tc_pipeline.c
-@@ -108,7 +108,16 @@ static int tcf_pipeline_put(struct net *net,
- 	struct p4tc_act *act;
- 	unsigned long tbl_id;
- 
-+	if (!refcount_dec_if_one(&pipeline->p_ctrl_ref)) {
-+		if (pipeline_net) {
-+			put_net(pipeline_net);
-+			NL_SET_ERR_MSG(extack, "Can't delete referenced pipeline");
-+			return -EBUSY;
-+		}
-+	}
+ 	p4tc_parser_api.o p4tc_hdrfield.o p4tc_action.o p4tc_table.o \
+-	p4tc_tbl_entry.o p4tc_runtime_api.o
++	p4tc_tbl_entry.o p4tc_runtime_api.o p4tc_bpf.o
+diff --git a/net/sched/p4tc/p4tc_action.c b/net/sched/p4tc/p4tc_action.c
+index 676e1b0d9..abbf8cb83 100644
+--- a/net/sched/p4tc/p4tc_action.c
++++ b/net/sched/p4tc/p4tc_action.c
+@@ -28,6 +28,7 @@
+ #include <net/p4tc.h>
+ #include <net/sch_generic.h>
+ #include <net/sock.h>
 +
- 	if (pipeline_net && !refcount_dec_if_one(&pipeline->p_ref)) {
-+		refcount_set(&pipeline->p_ctrl_ref, 1);
- 		NL_SET_ERR_MSG(extack, "Can't delete referenced pipeline");
- 		return -EBUSY;
- 	}
-@@ -260,6 +269,9 @@ static struct p4tc_pipeline *tcf_pipeline_create(struct net *net,
- 	pipeline->net = net;
+ #include <net/tc_act/p4tc.h>
  
- 	refcount_set(&pipeline->p_ref, 1);
-+	refcount_set(&pipeline->p_ctrl_ref, 1);
-+	refcount_set(&pipeline->p_hdrs_used, 1);
-+	refcount_set(&pipeline->p_entry_deferal_ref, 1);
- 
- 	pipeline->common.ops = (struct p4tc_template_ops *)&p4tc_pipeline_ops;
- 
-diff --git a/net/sched/p4tc/p4tc_runtime_api.c b/net/sched/p4tc/p4tc_runtime_api.c
+ static LIST_HEAD(dynact_list);
+diff --git a/net/sched/p4tc/p4tc_bpf.c b/net/sched/p4tc/p4tc_bpf.c
 new file mode 100644
-index 000000000..a4050096b
+index 000000000..adfdc678f
 --- /dev/null
-+++ b/net/sched/p4tc/p4tc_runtime_api.c
-@@ -0,0 +1,136 @@
++++ b/net/sched/p4tc/p4tc_bpf.c
+@@ -0,0 +1,115 @@
 +// SPDX-License-Identifier: GPL-2.0-or-later
 +/*
-+ * net/sched/p4tc_runtime_api.c P4 TC RUNTIME API
-+ *
-+ * Copyright (c) 2022-2023, Mojatatu Networks
-+ * Copyright (c) 2022-2023, Intel Corporation.
++ * Copyright (c) 2022, Mojatatu Networks
++ * Copyright (c) 2022, Intel Corporation.
 + * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
 + *              Victor Nogueira <victor@mojatatu.com>
 + *              Pedro Tammela <pctammela@mojatatu.com>
 + */
 +
++#include <linux/bpf_verifier.h>
++#include <linux/bpf.h>
++#include <linux/btf.h>
++#include <linux/filter.h>
++#include <linux/mutex.h>
 +#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/string.h>
-+#include <linux/errno.h>
-+#include <linux/slab.h>
-+#include <linux/skbuff.h>
-+#include <linux/init.h>
-+#include <linux/kmod.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <linux/bitmap.h>
-+#include <net/net_namespace.h>
-+#include <net/sock.h>
-+#include <net/sch_generic.h>
-+#include <net/pkt_cls.h>
++#include <linux/btf_ids.h>
++#include <linux/net_namespace.h>
 +#include <net/p4tc.h>
-+#include <net/netlink.h>
-+#include <net/flow_offload.h>
++#include <linux/netdevice.h>
++#include <net/sock.h>
++#include <linux/filter.h>
 +
-+static int tc_ctl_p4_root(struct sk_buff *skb, struct nlmsghdr *n, int cmd,
-+			  struct netlink_ext_ack *extack)
++BTF_ID_LIST(btf_p4tc_ids)
++BTF_ID(struct, p4tc_table_entry_act_bpf)
++BTF_ID(struct, p4tc_table_entry_act_bpf_params)
++
++#define ENTRY_KEY_OFFSET (offsetof(struct p4tc_table_entry_key, fa_key))
++
++struct p4tc_table_entry_act_bpf *
++__bpf_p4tc_tbl_lookup(struct net *caller_net,
++		      struct p4tc_table_entry_act_bpf_params *params,
++		      void *key, const u32 key__sz)
 +{
-+	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
-+	char *p_name = NULL;
-+	int ret = 0;
-+	struct nlattr *tb[P4TC_ROOT_MAX + 1];
++	struct p4tc_table_entry_key *entry_key = (struct p4tc_table_entry_key *)key;
++	const u32 pipeid = params->pipeid;
++	const u32 tblid = params->tblid;
++	struct p4tc_table_entry_value *value;
++	struct p4tc_table_entry *entry;
++	struct p4tc_table *table;
 +
-+	ret = nlmsg_parse(n, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
-+			  p4tc_root_policy, extack);
-+	if (ret < 0)
-+		return ret;
++	entry_key->keysz = (key__sz - ENTRY_KEY_OFFSET) << 3;
 +
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ROOT)) {
-+		NL_SET_ERR_MSG(extack, "Netlink P4TC table attributes missing");
-+		return -EINVAL;
++	table = p4tc_tbl_cache_lookup(caller_net, pipeid, tblid);
++	if (!table)
++		return NULL;
++
++	entry = p4tc_table_entry_lookup_direct(table, entry_key);
++	if (!entry) {
++		struct p4tc_table_defact *defact;
++
++		defact = rcu_dereference(table->tbl_default_missact);
++		return defact ? defact->defact_bpf : NULL;
 +	}
 +
-+	if (tb[P4TC_ROOT_PNAME])
-+		p_name = nla_data(tb[P4TC_ROOT_PNAME]);
++	value = p4tc_table_entry_value(entry);
 +
-+	switch (t->obj) {
-+	case P4TC_OBJ_RUNTIME_TABLE:
-+		return p4tc_ctl_table_n(skb, n, cmd, p_name, tb[P4TC_ROOT],
-+					extack);
-+	default:
-+		NL_SET_ERR_MSG(extack, "Unknown P4 runtime object type");
-+		return -EOPNOTSUPP;
-+	}
++	return value->act_bpf;
 +}
 +
-+static int tc_ctl_p4_get(struct sk_buff *skb, struct nlmsghdr *n,
-+			 struct netlink_ext_ack *extack)
++struct p4tc_table_entry_act_bpf *
++bpf_skb_p4tc_tbl_lookup(struct __sk_buff *skb_ctx,
++			struct p4tc_table_entry_act_bpf_params *params,
++			void *key, const u32 key__sz)
 +{
-+	return tc_ctl_p4_root(skb, n, RTM_P4TC_GET, extack);
++	struct sk_buff *skb = (struct sk_buff *)skb_ctx;
++	struct net *caller_net;
++
++	caller_net = skb->dev ? dev_net(skb->dev) : sock_net(skb->sk);
++
++	return __bpf_p4tc_tbl_lookup(caller_net, params, key, key__sz);
 +}
 +
-+static int tc_ctl_p4_delete(struct sk_buff *skb, struct nlmsghdr *n,
-+			    struct netlink_ext_ack *extack)
++struct p4tc_table_entry_act_bpf *
++bpf_xdp_p4tc_tbl_lookup(struct xdp_md *xdp_ctx,
++			struct p4tc_table_entry_act_bpf_params *params,
++			void *key, const u32 key__sz)
 +{
-+	if (!netlink_capable(skb, CAP_NET_ADMIN))
-+		return -EPERM;
++	struct xdp_buff *ctx = (struct xdp_buff *)xdp_ctx;
++	struct net *caller_net;
 +
-+	return tc_ctl_p4_root(skb, n, RTM_P4TC_DEL, extack);
++	caller_net = dev_net(ctx->rxq->dev);
++
++	return __bpf_p4tc_tbl_lookup(caller_net, params, key, key__sz);
 +}
 +
-+static int tc_ctl_p4_cu(struct sk_buff *skb, struct nlmsghdr *n,
-+			struct netlink_ext_ack *extack)
++void bpf_p4tc_set_cookie(u32 cookie)
++{
++	struct p4tc_percpu_scratchpad *pad;
++
++	pad = this_cpu_ptr(&p4tc_percpu_scratchpad);
++	pad->prog_cookie = cookie;
++}
++
++BTF_SET8_START(p4tc_tbl_kfunc_set)
++BTF_ID_FLAGS(func, bpf_skb_p4tc_tbl_lookup, KF_RET_NULL);
++BTF_ID_FLAGS(func, bpf_xdp_p4tc_tbl_lookup, KF_RET_NULL);
++BTF_ID_FLAGS(func, bpf_p4tc_set_cookie, 0);
++BTF_SET8_END(p4tc_tbl_kfunc_set)
++
++static const struct btf_kfunc_id_set p4tc_table_kfunc_set = {
++	.owner = THIS_MODULE,
++	.set   = &p4tc_tbl_kfunc_set,
++};
++
++int register_p4tc_tbl_bpf(void)
 +{
 +	int ret;
 +
-+	if (!netlink_capable(skb, CAP_NET_ADMIN))
-+		return -EPERM;
-+
-+	ret = tc_ctl_p4_root(skb, n, RTM_P4TC_CREATE, extack);
++	ret = register_btf_kfunc_id_set(BPF_PROG_TYPE_SCHED_ACT,
++					&p4tc_table_kfunc_set);
++	ret = ret ?: register_btf_kfunc_id_set(BPF_PROG_TYPE_XDP,
++					       &p4tc_table_kfunc_set);
 +
 +	return ret;
 +}
-+
-+static int tc_ctl_p4_dump(struct sk_buff *skb, struct netlink_callback *cb)
-+{
-+	char *p_name = NULL;
-+	int ret = 0;
-+	struct nlattr *tb[P4TC_ROOT_MAX + 1];
-+	struct p4tcmsg *t;
-+
-+	ret = nlmsg_parse(cb->nlh, sizeof(struct p4tcmsg), tb, P4TC_ROOT_MAX,
-+			  p4tc_root_policy, cb->extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (NL_REQ_ATTR_CHECK(cb->extack, NULL, tb, P4TC_ROOT)) {
-+		NL_SET_ERR_MSG(cb->extack,
-+			       "Netlink P4TC Runtime attributes missing");
-+		return -EINVAL;
-+	}
-+
-+	if (tb[P4TC_ROOT_PNAME])
-+		p_name = nla_data(tb[P4TC_ROOT_PNAME]);
-+
-+	t = nlmsg_data(cb->nlh);
-+
-+	switch (t->obj) {
-+	case P4TC_OBJ_RUNTIME_TABLE:
-+		return p4tc_ctl_dump_1(skb, cb, tb[P4TC_ROOT], p_name);
-+	default:
-+		NL_SET_ERR_MSG_FMT(cb->extack,
-+				   "Unknown p4 runtime object type %u\n",
-+				   t->obj);
-+		return -ENOENT;
-+	}
-+}
-+
-+static int __init p4tc_tbl_init(void)
-+{
-+	rtnl_register(PF_UNSPEC, RTM_P4TC_CREATE, tc_ctl_p4_cu, NULL,
-+		      RTNL_FLAG_DOIT_UNLOCKED);
-+	rtnl_register(PF_UNSPEC, RTM_P4TC_DEL, tc_ctl_p4_delete, NULL,
-+		      RTNL_FLAG_DOIT_UNLOCKED);
-+	rtnl_register(PF_UNSPEC, RTM_P4TC_GET, tc_ctl_p4_get, tc_ctl_p4_dump,
-+		      RTNL_FLAG_DOIT_UNLOCKED);
+diff --git a/net/sched/p4tc/p4tc_pipeline.c b/net/sched/p4tc/p4tc_pipeline.c
+index 6c687ee54..b36035840 100644
+--- a/net/sched/p4tc/p4tc_pipeline.c
++++ b/net/sched/p4tc/p4tc_pipeline.c
+@@ -37,9 +37,52 @@ static __net_init int pipeline_init_net(struct net *net)
+ 
+ 	idr_init(&pipe_net->pipeline_idr);
+ 
++	for (int i = 0; i < P4TC_TBLS_CACHE_SIZE; i++)
++		INIT_LIST_HEAD(&pipe_net->tbls_cache[i]);
 +
 +	return 0;
 +}
 +
-+subsys_initcall(p4tc_tbl_init);
++static inline size_t p4tc_tbl_cache_hash(u32 pipeid, u32 tblid)
++{
++	return (pipeid + tblid) % P4TC_TBLS_CACHE_SIZE;
++}
++
++struct p4tc_table *p4tc_tbl_cache_lookup(struct net *net, u32 pipeid, u32 tblid)
++{
++	size_t hash = p4tc_tbl_cache_hash(pipeid, tblid);
++	struct p4tc_pipeline_net *pipe_net;
++	struct p4tc_table *pos, *tmp;
++	struct net_generic *ng;
++
++	/* RCU read lock is already being held */
++	ng = rcu_dereference(net->gen);
++	pipe_net = ng->ptr[pipeline_net_id];
++
++	list_for_each_entry_safe(pos, tmp, &pipe_net->tbls_cache[hash],
++				 tbl_cache_node) {
++		if (pos->common.p_id == pipeid && pos->tbl_id == tblid)
++			return pos;
++	}
++
++	return NULL;
++}
++
++int p4tc_tbl_cache_insert(struct net *net, u32 pipeid, struct p4tc_table *table)
++{
++	struct p4tc_pipeline_net *pipe_net = net_generic(net, pipeline_net_id);
++	size_t hash = p4tc_tbl_cache_hash(pipeid, table->tbl_id);
++
++	list_add_tail(&table->tbl_cache_node, &pipe_net->tbls_cache[hash]);
++
+ 	return 0;
+ }
+ 
++void p4tc_tbl_cache_remove(struct net *net, struct p4tc_table *table)
++{
++	list_del(&table->tbl_cache_node);
++}
++
+ static int tcf_pipeline_put(struct net *net,
+ 			    struct p4tc_template_common *template,
+ 			    bool unconditional_purgeline,
+@@ -618,6 +661,9 @@ static void tcf_pipeline_init(void)
+ 	__tcf_pipeline_init();
+ }
+ 
++DEFINE_PER_CPU(struct p4tc_percpu_scratchpad, p4tc_percpu_scratchpad);
++EXPORT_PER_CPU_SYMBOL_GPL(p4tc_percpu_scratchpad);
++
+ const struct p4tc_template_ops p4tc_pipeline_ops = {
+ 	.init = tcf_pipeline_init,
+ 	.cu = tcf_pipeline_cu,
 diff --git a/net/sched/p4tc/p4tc_table.c b/net/sched/p4tc/p4tc_table.c
-index 3ed19ad79..3ef76a84e 100644
+index 3ef76a84e..dfc93278b 100644
 --- a/net/sched/p4tc/p4tc_table.c
 +++ b/net/sched/p4tc/p4tc_table.c
-@@ -103,7 +103,7 @@ static const struct nla_policy p4tc_table_policy[P4TC_TABLE_MAX + 1] = {
- 	[P4TC_TABLE_DEFAULT_HIT] = { .type = NLA_NESTED },
- 	[P4TC_TABLE_DEFAULT_MISS] = { .type = NLA_NESTED },
- 	[P4TC_TABLE_ACTS_LIST] = { .type = NLA_NESTED },
--	[P4TC_TABLE_OPT_ENTRY] = { .type = NLA_NESTED },
-+	[P4TC_TABLE_CONST_ENTRY] = { .type = NLA_NESTED },
- };
- 
- static int _tcf_table_fill_nlmsg(struct sk_buff *skb, struct p4tc_table *table)
-@@ -204,6 +204,16 @@ static int _tcf_table_fill_nlmsg(struct sk_buff *skb, struct p4tc_table *table)
- 	}
- 	nla_nest_end(skb, nested_tbl_acts);
- 
-+	if (table->tbl_const_entry) {
-+		struct nlattr *const_nest;
-+
-+		const_nest = nla_nest_start(skb, P4TC_TABLE_CONST_ENTRY);
-+		p4tca_table_get_entry_fill(skb, table, table->tbl_const_entry,
-+					   table->tbl_id);
-+		nla_nest_end(skb, const_nest);
-+	}
-+	table->tbl_const_entry = NULL;
-+
- 	if (nla_put(skb, P4TC_TABLE_INFO, sizeof(parm), &parm))
- 		goto out_nlmsg_trim;
- 	nla_nest_end(skb, nest);
-@@ -339,8 +349,11 @@ static inline int _tcf_table_put(struct net *net, struct nlattr **tb,
- 
- 	tcf_table_acts_list_destroy(&table->tbl_acts_list);
- 
-+	rhltable_free_and_destroy(&table->tbl_entries,
-+				  tcf_table_entry_destroy_hash, table);
-+
- 	idr_destroy(&table->tbl_masks_idr);
--	idr_destroy(&table->tbl_prio_idr);
-+	ida_destroy(&table->tbl_prio_idr);
- 
- 	perm = rcu_replace_pointer_rtnl(table->tbl_permissions, NULL);
- 	kfree_rcu(perm, rcu);
-@@ -741,6 +754,7 @@ static struct p4tc_table *tcf_table_create(struct net *net, struct nlattr **tb,
- 					   struct p4tc_pipeline *pipeline,
- 					   struct netlink_ext_ack *extack)
+@@ -244,6 +244,7 @@ static inline void p4tc_table_defact_destroy(struct p4tc_table_defact *defact)
  {
-+	struct rhashtable_params table_hlt_params = entry_hlt_params;
- 	struct p4tc_table_parm *parm;
- 	struct p4tc_table *table;
- 	char *tblname;
-@@ -944,9 +958,19 @@ static struct p4tc_table *tcf_table_create(struct net *net, struct nlattr **tb,
- 	refcount_set(&table->tbl_entries_ref, 1);
+ 	if (defact) {
+ 		p4tc_action_destroy(defact->default_acts);
++		kfree(defact->defact_bpf);
+ 		kfree(defact);
+ 	}
+ }
+@@ -351,6 +352,7 @@ static inline int _tcf_table_put(struct net *net, struct nlattr **tb,
  
- 	idr_init(&table->tbl_masks_idr);
--	idr_init(&table->tbl_prio_idr);
-+	ida_init(&table->tbl_prio_idr);
- 	spin_lock_init(&table->tbl_masks_idr_lock);
--	spin_lock_init(&table->tbl_prio_idr_lock);
-+
-+	table_hlt_params.max_size = table->tbl_max_entries;
-+	if (table->tbl_max_entries > U16_MAX)
-+		table_hlt_params.nelem_hint = U16_MAX / 4 * 3;
-+	else
-+		table_hlt_params.nelem_hint = table->tbl_max_entries / 4 * 3;
-+
-+	if (rhltable_init(&table->tbl_entries, &table_hlt_params) < 0) {
-+		ret = -EINVAL;
-+		goto defaultacts_destroy;
-+	}
+ 	rhltable_free_and_destroy(&table->tbl_entries,
+ 				  tcf_table_entry_destroy_hash, table);
++	p4tc_tbl_cache_remove(net, table);
  
+ 	idr_destroy(&table->tbl_masks_idr);
+ 	ida_destroy(&table->tbl_prio_idr);
+@@ -483,6 +485,7 @@ static int tcf_table_init_default_act(struct net *net, struct nlattr **tb,
+ 	}
+ 
+ 	if (tb[P4TC_TABLE_DEFAULT_ACTION]) {
++		struct p4tc_table_entry_act_bpf *act_bpf;
+ 		struct tc_action **default_acts;
+ 
+ 		if (!p4tc_ctrl_update_ok(curr_permissions)) {
+@@ -511,6 +514,15 @@ static int tcf_table_init_default_act(struct net *net, struct nlattr **tb,
+ 			ret = -EINVAL;
+ 			goto default_act_free;
+ 		}
++		act_bpf = tcf_table_entry_create_act_bpf(default_acts[0],
++							 extack);
++		if (IS_ERR(act_bpf)) {
++			tcf_action_destroy(default_acts, TCA_ACT_UNBIND);
++			kfree(default_acts);
++			ret = -EINVAL;
++			goto default_act_free;
++		}
++		(*default_act)->defact_bpf = act_bpf;
+ 		(*default_act)->default_acts = default_acts;
+ 	}
+ 
+@@ -972,12 +984,19 @@ static struct p4tc_table *tcf_table_create(struct net *net, struct nlattr **tb,
+ 		goto defaultacts_destroy;
+ 	}
+ 
++	ret = p4tc_tbl_cache_insert(net, pipeline->common.p_id, table);
++	if (ret < 0)
++		goto entries_hashtable_destroy;
++
  	pipeline->curr_tables += 1;
  
-@@ -954,6 +978,10 @@ static struct p4tc_table *tcf_table_create(struct net *net, struct nlattr **tb,
+ 	table->common.ops = (struct p4tc_template_ops *)&p4tc_table_ops;
  
  	return table;
  
-+defaultacts_destroy:
-+	p4tc_table_defact_destroy(table->tbl_default_missact);
-+	p4tc_table_defact_destroy(table->tbl_default_hitact);
++entries_hashtable_destroy:
++	rhltable_destroy(&table->tbl_entries);
 +
- idr_rm:
- 	idr_remove(&pipeline->p_tbl_idr, table->tbl_id);
- 
-@@ -1102,6 +1130,21 @@ static struct p4tc_table *tcf_table_update(struct net *net, struct nlattr **tb,
- 		}
- 	}
- 
-+	if (tb[P4TC_TABLE_CONST_ENTRY]) {
-+		struct p4tc_table_entry *entry;
-+
-+		/* Workaround to make this work */
-+		entry = tcf_table_const_entry_cu(net,
-+						 tb[P4TC_TABLE_CONST_ENTRY],
-+						 pipeline, table, extack);
-+		if (IS_ERR(entry)) {
-+			ret = PTR_ERR(entry);
-+			goto free_perm;
-+		}
-+
-+		table->tbl_const_entry = entry;
-+	}
-+
- 	if (default_hitact) {
- 		struct p4tc_table_defact *hitact;
- 
+ defaultacts_destroy:
+ 	p4tc_table_defact_destroy(table->tbl_default_missact);
+ 	p4tc_table_defact_destroy(table->tbl_default_hitact);
 diff --git a/net/sched/p4tc/p4tc_tbl_entry.c b/net/sched/p4tc/p4tc_tbl_entry.c
-new file mode 100644
-index 000000000..999167a10
---- /dev/null
+index 999167a10..f8acff389 100644
+--- a/net/sched/p4tc/p4tc_tbl_entry.c
 +++ b/net/sched/p4tc/p4tc_tbl_entry.c
-@@ -0,0 +1,1906 @@
-+// SPDX-License-Identifier: GPL-2.0-or-later
-+/*
-+ * net/sched/p4tc_tbl_entry.c P4 TC TABLE ENTRY
-+ *
-+ * Copyright (c) 2022-2023, Mojatatu Networks
-+ * Copyright (c) 2022-2023, Intel Corporation.
-+ * Authors:     Jamal Hadi Salim <jhs@mojatatu.com>
-+ *              Victor Nogueira <victor@mojatatu.com>
-+ *              Pedro Tammela <pctammela@mojatatu.com>
-+ */
-+
-+#include <linux/types.h>
-+#include <linux/kernel.h>
-+#include <linux/string.h>
-+#include <linux/errno.h>
-+#include <linux/slab.h>
-+#include <linux/skbuff.h>
-+#include <linux/init.h>
-+#include <linux/kmod.h>
-+#include <linux/err.h>
-+#include <linux/module.h>
-+#include <linux/bitmap.h>
-+#include <net/net_namespace.h>
-+#include <net/sock.h>
-+#include <net/sch_generic.h>
-+#include <net/pkt_cls.h>
-+#include <net/p4tc.h>
-+#include <net/netlink.h>
-+#include <net/flow_offload.h>
-+
-+#define SIZEOF_MASKID (sizeof(((struct p4tc_table_entry_key *)0)->maskid))
-+
-+#define STARTOF_KEY(key) (&((key)->maskid))
-+
-+static u32 p4tc_entry_hash_fn(const void *data, u32 len, u32 seed)
-+{
-+	const struct p4tc_table_entry_key *key = data;
-+	u32 keysz;
-+
-+	/* The key memory area is always zero allocated aligned to 8 */
-+	keysz = round_up(SIZEOF_MASKID + (key->keysz >> 3), 4);
-+
-+	return jhash2(STARTOF_KEY(key), keysz / sizeof(u32), seed);
-+}
-+
-+static int p4tc_entry_hash_cmp(struct rhashtable_compare_arg *arg,
-+			       const void *ptr)
-+{
-+	const struct p4tc_table_entry_key *key = arg->key;
-+	const struct p4tc_table_entry *entry = ptr;
-+	u32 keysz;
-+
-+	keysz = SIZEOF_MASKID + (entry->key.keysz >> 3);
-+
-+	return memcmp(STARTOF_KEY(&entry->key), STARTOF_KEY(key), keysz);
-+}
-+
-+static u32 p4tc_entry_obj_hash_fn(const void *data, u32 len, u32 seed)
-+{
-+	const struct p4tc_table_entry *entry = data;
-+
-+	return p4tc_entry_hash_fn(&entry->key, len, seed);
-+}
-+
-+const struct rhashtable_params entry_hlt_params = {
-+	.obj_cmpfn = p4tc_entry_hash_cmp,
-+	.obj_hashfn = p4tc_entry_obj_hash_fn,
-+	.hashfn = p4tc_entry_hash_fn,
-+	.head_offset = offsetof(struct p4tc_table_entry, ht_node),
-+	.key_offset = offsetof(struct p4tc_table_entry, key),
-+	.automatic_shrinking = true,
-+};
-+
+@@ -94,6 +94,103 @@ p4tc_entry_lookup(struct p4tc_table *table, struct p4tc_table_entry_key *key,
+ 	return NULL;
+ }
+ 
 +static struct p4tc_table_entry *
-+p4tc_entry_lookup(struct p4tc_table *table, struct p4tc_table_entry_key *key,
-+		  u32 prio) __must_hold(RCU)
++__p4tc_entry_lookup(struct p4tc_table *table, struct p4tc_table_entry_key *key)
++	__must_hold(RCU)
 +{
++	struct p4tc_table_entry *entry = NULL;
++	u32 smallest_prio = U32_MAX;
 +	struct rhlist_head *tmp, *bucket_list;
-+	struct p4tc_table_entry *entry;
++	struct p4tc_table_entry *entry_curr;
 +
 +	bucket_list =
 +		rhltable_lookup(&table->tbl_entries, key, entry_hlt_params);
 +	if (!bucket_list)
 +		return NULL;
 +
-+	rhl_for_each_entry_rcu(entry, tmp, bucket_list, ht_node) {
++	rhl_for_each_entry_rcu(entry_curr, tmp, bucket_list, ht_node) {
 +		struct p4tc_table_entry_value *value =
-+			p4tc_table_entry_value(entry);
-+
-+		if (value->prio == prio)
-+			return entry;
-+	}
-+
-+	return NULL;
-+}
-+
-+#define tcf_table_entry_mask_find_byid(table, id) \
-+	(idr_find(&(table)->tbl_masks_idr, id))
-+
-+static void gen_exact_mask(u8 *mask, u32 mask_size)
-+{
-+	int i;
-+
-+	for (i = 0; i < mask_size; i++)
-+		mask[i] = 0xFF;
-+}
-+
-+static int p4tca_table_get_entry_keys(struct sk_buff *skb,
-+				      struct p4tc_table *table,
-+				      struct p4tc_table_entry *entry)
-+{
-+	unsigned char *b = nlmsg_get_pos(skb);
-+	int ret = -ENOMEM;
-+	struct p4tc_table_entry_mask *mask;
-+	u32 key_sz_bytes;
-+
-+	if (table->tbl_type == P4TC_TABLE_TYPE_EXACT) {
-+		u8 mask_value[BITS_TO_BYTES(P4TC_MAX_KEYSZ)] = { 0 };
-+
-+		key_sz_bytes = BITS_TO_BYTES(entry->key.keysz);
-+		if (nla_put(skb, P4TC_ENTRY_KEY_BLOB, key_sz_bytes,
-+			    entry->key.fa_key))
-+			goto out_nlmsg_trim;
-+
-+		gen_exact_mask(mask_value, key_sz_bytes);
-+		if (nla_put(skb, P4TC_ENTRY_MASK_BLOB, key_sz_bytes, mask_value))
-+			goto out_nlmsg_trim;
-+	} else {
-+		key_sz_bytes = BITS_TO_BYTES(entry->key.keysz);
-+		if (nla_put(skb, P4TC_ENTRY_KEY_BLOB, key_sz_bytes,
-+			    entry->key.fa_key))
-+			goto out_nlmsg_trim;
-+
-+		mask = tcf_table_entry_mask_find_byid(table, entry->key.maskid);
-+		if (nla_put(skb, P4TC_ENTRY_MASK_BLOB, key_sz_bytes,
-+			    mask->fa_value))
-+			goto out_nlmsg_trim;
-+	}
-+
-+	return 0;
-+
-+out_nlmsg_trim:
-+	nlmsg_trim(skb, b);
-+	return ret;
-+}
-+
-+static void p4tc_table_entry_tm_dump(struct p4tc_table_entry_tm *dtm,
-+				     struct p4tc_table_entry_tm *stm)
-+{
-+	unsigned long now = jiffies;
-+
-+	dtm->created = stm->created ?
-+		jiffies_to_clock_t(now - stm->created) : 0;
-+	dtm->lastused = stm->lastused ?
-+		jiffies_to_clock_t(now - stm->lastused) : 0;
-+	dtm->firstused = stm->firstused ?
-+		jiffies_to_clock_t(now - stm->firstused) : 0;
-+}
-+
-+#define P4TC_ENTRY_MAX_IDS (P4TC_PATH_MAX - 1)
-+
-+int p4tca_table_get_entry_fill(struct sk_buff *skb, struct p4tc_table *table,
-+			       struct p4tc_table_entry *entry, u32 tbl_id)
-+{
-+	unsigned char *b = nlmsg_get_pos(skb);
-+	int ret = -ENOMEM;
-+	struct p4tc_table_entry_value *value;
-+	struct p4tc_table_entry_tm dtm, *tm;
-+	struct nlattr *nest, *nest_acts;
-+	u32 ids[P4TC_ENTRY_MAX_IDS];
-+
-+	ids[P4TC_TBLID_IDX - 1] = tbl_id;
-+
-+	if (nla_put(skb, P4TC_PATH, P4TC_ENTRY_MAX_IDS * sizeof(u32), ids))
-+		goto out_nlmsg_trim;
-+
-+	nest = nla_nest_start(skb, P4TC_PARAMS);
-+	if (!nest)
-+		goto out_nlmsg_trim;
-+
-+	value = p4tc_table_entry_value(entry);
-+
-+	if (nla_put_u32(skb, P4TC_ENTRY_PRIO, value->prio))
-+		goto out_nlmsg_trim;
-+
-+	if (p4tca_table_get_entry_keys(skb, table, entry) < 0)
-+		goto out_nlmsg_trim;
-+
-+	if (value->acts) {
-+		nest_acts = nla_nest_start(skb, P4TC_ENTRY_ACT);
-+		if (tcf_action_dump(skb, value->acts, 0, 0, false) < 0)
-+			goto out_nlmsg_trim;
-+		nla_nest_end(skb, nest_acts);
-+	}
-+
-+	if (nla_put_u16(skb, P4TC_ENTRY_PERMISSIONS, value->permissions))
-+		goto out_nlmsg_trim;
-+
-+	tm = rtnl_dereference(value->tm);
-+
-+	if (nla_put_u8(skb, P4TC_ENTRY_CREATE_WHODUNNIT, tm->who_created))
-+		goto out_nlmsg_trim;
-+
-+	if (tm->who_updated) {
-+		if (nla_put_u8(skb, P4TC_ENTRY_UPDATE_WHODUNNIT,
-+			       tm->who_updated))
-+			goto out_nlmsg_trim;
-+	}
-+
-+	p4tc_table_entry_tm_dump(&dtm, tm);
-+	if (nla_put_64bit(skb, P4TC_ENTRY_TM, sizeof(dtm), &dtm,
-+			  P4TC_ENTRY_PAD))
-+		goto out_nlmsg_trim;
-+
-+	nla_nest_end(skb, nest);
-+
-+	return skb->len;
-+
-+out_nlmsg_trim:
-+	nlmsg_trim(skb, b);
-+	return ret;
-+}
-+
-+static const struct nla_policy p4tc_entry_policy[P4TC_ENTRY_MAX + 1] = {
-+	[P4TC_ENTRY_TBLNAME] = { .type = NLA_STRING },
-+	[P4TC_ENTRY_KEY_BLOB] = { .type = NLA_BINARY },
-+	[P4TC_ENTRY_MASK_BLOB] = { .type = NLA_BINARY },
-+	[P4TC_ENTRY_PRIO] = { .type = NLA_U32 },
-+	[P4TC_ENTRY_ACT] = { .type = NLA_NESTED },
-+	[P4TC_ENTRY_TM] = { .type = NLA_BINARY,
-+			    .len = sizeof(struct p4tc_table_entry_tm) },
-+	[P4TC_ENTRY_WHODUNNIT] = { .type = NLA_U8 },
-+	[P4TC_ENTRY_CREATE_WHODUNNIT] = { .type = NLA_U8 },
-+	[P4TC_ENTRY_UPDATE_WHODUNNIT] = { .type = NLA_U8 },
-+	[P4TC_ENTRY_PERMISSIONS] = NLA_POLICY_MAX(NLA_U16, P4TC_MAX_PERMISSION),
-+};
-+
-+static struct p4tc_table_entry_mask *
-+tcf_table_entry_mask_find_byvalue(struct p4tc_table *table,
-+				  struct p4tc_table_entry_mask *mask)
-+{
-+	struct p4tc_table_entry_mask *mask_cur;
-+	unsigned long mask_id, tmp;
-+
-+	idr_for_each_entry_ul(&table->tbl_masks_idr, mask_cur, tmp, mask_id) {
-+		if (mask_cur->sz == mask->sz) {
-+			u32 mask_sz_bytes = BITS_TO_BYTES(mask->sz);
-+			void *curr_mask_value = mask_cur->fa_value;
-+			void *mask_value = mask->fa_value;
-+
-+			if (memcmp(curr_mask_value, mask_value, mask_sz_bytes) == 0)
-+				return mask_cur;
++			p4tc_table_entry_value(entry_curr);
++		if (value->prio <= smallest_prio) {
++			smallest_prio = value->prio;
++			entry = entry_curr;
 +		}
 +	}
-+
-+	return NULL;
-+}
-+
-+static void __tcf_table_entry_mask_del(struct p4tc_table *table,
-+				       struct p4tc_table_entry_mask *mask)
-+{
-+	if (table->tbl_type == P4TC_TABLE_TYPE_TERNARY) {
-+		table->tbl_masks_array[mask->mask_index] = NULL;
-+		bitmap_set(table->tbl_free_masks_bitmap, mask->mask_index, 1);
-+	} else if (table->tbl_type == P4TC_TABLE_TYPE_LPM) {
-+		int i;
-+
-+		for (i = mask->mask_index; i < table->tbl_curr_num_masks - 1; i++)
-+			table->tbl_masks_array[i] = table->tbl_masks_array[i + 1];
-+
-+		table->tbl_masks_array[table->tbl_curr_num_masks - 1] = NULL;
-+	}
-+
-+	table->tbl_curr_num_masks--;
-+}
-+
-+static void tcf_table_entry_mask_del(struct p4tc_table *table,
-+				     struct p4tc_table_entry *entry)
-+{
-+	const u32 mask_id = entry->key.maskid;
-+	struct p4tc_table_entry_mask *mask_found;
-+
-+	/* Will always be found */
-+	mask_found = tcf_table_entry_mask_find_byid(table, mask_id);
-+
-+	/* Last reference, can delete */
-+	if (refcount_dec_if_one(&mask_found->mask_ref)) {
-+		spin_lock_bh(&table->tbl_masks_idr_lock);
-+		idr_remove(&table->tbl_masks_idr, mask_found->mask_id);
-+		__tcf_table_entry_mask_del(table, mask_found);
-+		spin_unlock_bh(&table->tbl_masks_idr_lock);
-+		kfree_rcu(mask_found, rcu);
-+	} else {
-+		if (!refcount_dec_not_one(&mask_found->mask_ref))
-+			pr_warn("Mask was deleted in parallel");
-+	}
-+}
-+
-+static inline u32 p4tc_ffs(u8 *ptr, size_t len)
-+{
-+	int i;
-+
-+	for (i = 0; i < len; i++) {
-+		int pos = ffs(ptr[i]);
-+
-+		if (pos)
-+			return (i * 8) + pos;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline u32 p4tc_fls(u8 *ptr, size_t len)
-+{
-+	int i;
-+
-+	for (i = len - 1; i >= 0; i--) {
-+		int pos = fls(ptr[i]);
-+
-+		if (pos)
-+			return (i * 8) + pos;
-+	}
-+
-+	return 0;
-+}
-+
-+static inline u32 find_lpm_mask(struct p4tc_table *table, u8 *ptr)
-+{
-+	u32 ret;
-+#if defined(__LITTLE_ENDIAN_BITFIELD)
-+	ret = p4tc_fls(ptr, BITS_TO_BYTES(table->tbl_keysz));
-+#else
-+	ret = p4tc_ffs(ptr, BITS_TO_BYTES(table->tbl_keysz));
-+#endif
-+	return ret ?: table->tbl_keysz;
-+}
-+
-+static inline int p4tc_table_lpm_mask_insert(struct p4tc_table *table,
-+					     struct p4tc_table_entry_mask *mask)
-+{
-+	const u32 nmasks = table->tbl_curr_num_masks ?: 1;
-+	int pos;
-+
-+	for (pos = 0; pos < nmasks; pos++) {
-+		u32 mask_value = find_lpm_mask(table, mask->fa_value);
-+
-+		if (table->tbl_masks_array[pos]) {
-+			u32 array_mask_value;
-+			u8 *fa_value;
-+
-+			fa_value = table->tbl_masks_array[pos]->fa_value;
-+
-+			array_mask_value = find_lpm_mask(table, fa_value);
-+
-+			if (mask_value > array_mask_value) {
-+				/* shift masks to the right (will keep invariant) */
-+				u32 tail = nmasks;
-+
-+				while (tail > pos + 1) {
-+					table->tbl_masks_array[tail] =
-+						table->tbl_masks_array[tail - 1];
-+					tail--;
-+				}
-+				table->tbl_masks_array[pos + 1] =
-+					table->tbl_masks_array[pos];
-+				/* assign to pos */
-+				break;
-+			}
-+		} else {
-+			/* pos is empty, assign to pos */
-+			break;
-+		}
-+	}
-+
-+	mask->mask_index = pos;
-+	table->tbl_masks_array[pos] = mask;
-+	table->tbl_curr_num_masks++;
-+
-+	return 0;
-+}
-+
-+static inline int
-+p4tc_table_ternary_mask_insert(struct p4tc_table *table,
-+			       struct p4tc_table_entry_mask *mask)
-+{
-+	unsigned long pos =
-+		find_first_bit(table->tbl_free_masks_bitmap, P4TC_MAX_TMASKS);
-+	if (pos == P4TC_MAX_TMASKS)
-+		return -ENOSPC;
-+
-+	mask->mask_index = pos;
-+	table->tbl_masks_array[pos] = mask;
-+	bitmap_clear(table->tbl_free_masks_bitmap, pos, 1);
-+	table->tbl_curr_num_masks++;
-+
-+	return 0;
-+}
-+
-+static inline int p4tc_table_add_mask_array(struct p4tc_table *table,
-+					    struct p4tc_table_entry_mask *mask)
-+{
-+	if (table->tbl_max_masks < table->tbl_curr_num_masks + 1)
-+		return -ENOSPC;
-+
-+	switch (table->tbl_type) {
-+	case P4TC_TABLE_TYPE_TERNARY:
-+		return p4tc_table_ternary_mask_insert(table, mask);
-+	case P4TC_TABLE_TYPE_LPM:
-+		return p4tc_table_lpm_mask_insert(table, mask);
-+	default:
-+		return -ENOSPC;
-+	}
-+}
-+
-+/* TODO: Ordering optimisation for LPM */
-+static struct p4tc_table_entry_mask *
-+tcf_table_entry_mask_add(struct p4tc_table *table,
-+			 struct p4tc_table_entry *entry,
-+			 struct p4tc_table_entry_mask *mask)
-+{
-+	struct p4tc_table_entry_mask *mask_found;
-+	int ret;
-+
-+	mask_found = tcf_table_entry_mask_find_byvalue(table, mask);
-+	/* Only add mask if it was not already added */
-+	if (!mask_found) {
-+		struct p4tc_table_entry_mask *nmask;
-+		size_t mask_sz_bytes = BITS_TO_BYTES(mask->sz);
-+
-+		nmask = kzalloc(struct_size(mask_found, fa_value, mask_sz_bytes), GFP_ATOMIC);
-+		if (!nmask)
-+			return ERR_PTR(-ENOMEM);
-+
-+		memcpy(nmask->fa_value, mask->fa_value, mask_sz_bytes);
-+
-+		nmask->mask_id = 1;
-+		nmask->sz = mask->sz;
-+		refcount_set(&nmask->mask_ref, 1);
-+
-+		spin_lock_bh(&table->tbl_masks_idr_lock);
-+		ret = idr_alloc_u32(&table->tbl_masks_idr, nmask,
-+				    &nmask->mask_id, UINT_MAX, GFP_ATOMIC);
-+		if (ret < 0)
-+			goto unlock;
-+
-+		ret = p4tc_table_add_mask_array(table, nmask);
-+		if (ret < 0)
-+			goto unlock;
-+unlock:
-+		spin_unlock_bh(&table->tbl_masks_idr_lock);
-+		if (ret < 0) {
-+			kfree(nmask);
-+			return ERR_PTR(ret);
-+		}
-+		entry->key.maskid = nmask->mask_id;
-+		mask_found = nmask;
-+	} else {
-+		if (!refcount_inc_not_zero(&mask_found->mask_ref))
-+			return ERR_PTR(-EBUSY);
-+		entry->key.maskid = mask_found->mask_id;
-+	}
-+
-+	return mask_found;
-+}
-+
-+static void tcf_table_entry_del_act(struct p4tc_table_entry *entry)
-+{
-+	struct p4tc_table_entry_value *value = p4tc_table_entry_value(entry);
-+
-+	p4tc_action_destroy(value->acts);
-+	kfree(entry);
-+}
-+
-+static void tcf_table_entry_del_act_work(struct work_struct *work)
-+{
-+	struct p4tc_table_entry_work *entry_work =
-+		container_of(work, typeof(*entry_work), work);
-+	struct p4tc_pipeline *pipeline = entry_work->pipeline;
-+
-+	tcf_table_entry_del_act(entry_work->entry);
-+	put_net(pipeline->net);
-+
-+	refcount_dec(&entry_work->pipeline->p_entry_deferal_ref);
-+
-+	kfree(entry_work);
-+}
-+
-+static void tcf_table_entry_put(struct p4tc_table_entry *entry)
-+{
-+	struct p4tc_table_entry_value *value = p4tc_table_entry_value(entry);
-+	struct p4tc_table_entry_tm *tm;
-+
-+	tm = rcu_dereference(value->tm);
-+	kfree(tm);
-+
-+	if (value->acts) {
-+		struct p4tc_table_entry_work *entry_work = value->entry_work;
-+		struct p4tc_pipeline *pipeline = entry_work->pipeline;
-+		struct net *net;
-+
-+		if (entry_work->defer_deletion) {
-+			net = get_net(pipeline->net);
-+			refcount_inc(&entry_work->pipeline->p_entry_deferal_ref);
-+			schedule_work(&entry_work->work);
-+		} else {
-+			kfree(entry_work);
-+			tcf_table_entry_del_act(entry);
-+		}
-+	} else {
-+		kfree(value->entry_work);
-+		kfree(entry);
-+	}
-+}
-+
-+static void tcf_table_entry_put_rcu(struct rcu_head *rcu)
-+{
-+	struct p4tc_table_entry *entry;
-+
-+	entry = container_of(rcu, struct p4tc_table_entry, rcu);
-+
-+	tcf_table_entry_put(entry);
-+}
-+
-+static int __tcf_table_entry_destroy(struct p4tc_table *table,
-+				     struct p4tc_table_entry *entry,
-+				     bool remove_from_hash)
-+{
-+	struct p4tc_table_entry_value *value = p4tc_table_entry_value(entry);
-+
-+	if (remove_from_hash)
-+		rhltable_remove(&table->tbl_entries, &entry->ht_node,
-+				entry_hlt_params);
-+
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT)
-+		tcf_table_entry_mask_del(table, entry);
-+
-+	if (value->entry_work->defer_deletion) {
-+		call_rcu(&entry->rcu, tcf_table_entry_put_rcu);
-+	} else {
-+		synchronize_rcu();
-+		tcf_table_entry_put(entry);
-+	}
-+
-+	return 0;
-+}
-+
-+static int tcf_table_entry_destroy(struct p4tc_table *table,
-+				   struct p4tc_table_entry *entry,
-+				   bool remove_from_hash)
-+{
-+	struct p4tc_table_entry_value *value = p4tc_table_entry_value(entry);
-+
-+	/* Entry was deleted in parallel */
-+	if (!refcount_dec_if_one(&value->entries_ref))
-+		return -EBUSY;
-+
-+	ida_free(&table->tbl_prio_idr, value->prio);
-+
-+	return __tcf_table_entry_destroy(table, entry, remove_from_hash);
-+}
-+
-+static int tcf_table_entry_destroy_noida(struct p4tc_table *table,
-+					 struct p4tc_table_entry *entry)
-+{
-+	struct p4tc_table_entry_value *value = p4tc_table_entry_value(entry);
-+
-+	/* Entry was deleted in parallel */
-+	if (!refcount_dec_if_one(&value->entries_ref))
-+		return -EBUSY;
-+
-+	return __tcf_table_entry_destroy(table, entry, true);
-+}
-+
-+/* Only deletes entries when called from pipeline delete, which means
-+ * pipeline->p_ref will already be 0, so no need to use that refcount.
-+ */
-+void tcf_table_entry_destroy_hash(void *ptr, void *arg)
-+{
-+	struct p4tc_table_entry *entry = ptr;
-+	struct p4tc_table *table = arg;
-+	struct p4tc_table_entry_value *value;
-+
-+	value = p4tc_table_entry_value(entry);
-+
-+	refcount_dec(&table->tbl_entries_ref);
-+
-+	value->entry_work->defer_deletion = false;
-+	tcf_table_entry_destroy(table, entry, false);
-+}
-+
-+static void tcf_table_entry_put_table(struct p4tc_pipeline *pipeline,
-+				      struct p4tc_table *table)
-+{
-+	/* If we are here, it means that this was just incremented, so it should be > 1 */
-+	WARN_ON(!refcount_dec_not_one(&table->tbl_ctrl_ref));
-+	WARN_ON(!refcount_dec_not_one(&pipeline->p_ctrl_ref));
-+}
-+
-+static int tcf_table_entry_get_table(struct net *net,
-+				     struct p4tc_pipeline **pipeline,
-+				     struct p4tc_table **table,
-+				     struct nlattr **tb, u32 *ids, char *p_name,
-+				     struct netlink_ext_ack *extack)
-+	__must_hold(RCU)
-+{
-+	u32 pipeid, tbl_id;
-+	char *tblname;
-+	int ret;
-+
-+	pipeid = ids[P4TC_PID_IDX];
-+
-+	*pipeline = tcf_pipeline_find_byany(net, p_name, pipeid, extack);
-+	if (IS_ERR(*pipeline)) {
-+		ret = PTR_ERR(*pipeline);
-+		goto out;
-+	}
-+
-+	if (!refcount_inc_not_zero(&((*pipeline)->p_ctrl_ref))) {
-+		NL_SET_ERR_MSG(extack, "Pipeline is stale");
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	tbl_id = ids[P4TC_TBLID_IDX];
-+
-+	tblname = tb[P4TC_ENTRY_TBLNAME] ? nla_data(tb[P4TC_ENTRY_TBLNAME]) : NULL;
-+	*table = tcf_table_find_byany(*pipeline, tblname, tbl_id, extack);
-+	if (IS_ERR(*table)) {
-+		ret = PTR_ERR(*table);
-+		goto dec_pipeline_refcount;
-+	}
-+	if (!refcount_inc_not_zero(&((*table)->tbl_ctrl_ref))) {
-+		NL_SET_ERR_MSG(extack, "Table is marked for deletion");
-+		ret = -EBUSY;
-+		goto dec_pipeline_refcount;
-+	}
-+
-+	return 0;
-+
-+/* If we are here, it means that this was just incremented, so it should be > 1 */
-+dec_pipeline_refcount:
-+	WARN_ON(!refcount_dec_not_one(&((*pipeline)->p_ctrl_ref)));
-+
-+out:
-+	return ret;
-+}
-+
-+static void tcf_table_entry_assign_key_exact(struct p4tc_table_entry_key *key,
-+					     u8 *keyblob)
-+{
-+	memcpy(key->fa_key, keyblob, BITS_TO_BYTES(key->keysz));
-+}
-+
-+static void
-+tcf_table_entry_assign_key_generic(struct p4tc_table_entry_key *key,
-+				   struct p4tc_table_entry_mask *mask,
-+				   u8 *keyblob, u8 *maskblob)
-+{
-+	u32 keysz = BITS_TO_BYTES(key->keysz);
-+
-+	memcpy(key->fa_key, keyblob, keysz);
-+	memcpy(mask->fa_value, maskblob, keysz);
-+}
-+
-+static void tcf_table_entry_assign_key(struct p4tc_table *table,
-+				       struct p4tc_table_entry_key *key,
-+				       struct p4tc_table_entry_mask *mask,
-+				       u8 *keyblob, u8 *maskblob)
-+{
-+	if (table->tbl_type == P4TC_TABLE_TYPE_EXACT)
-+		tcf_table_entry_assign_key_exact(key, keyblob);
-+	else
-+		tcf_table_entry_assign_key_generic(key, mask, keyblob,
-+						   maskblob);
-+}
-+
-+static int tcf_table_entry_extract_key(struct p4tc_table *table,
-+				       struct nlattr **tb,
-+				       struct p4tc_table_entry_key *key,
-+				       struct p4tc_table_entry_mask *mask,
-+				       struct netlink_ext_ack *extack)
-+{
-+	u32 keysz;
-+
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ENTRY_KEY_BLOB)) {
-+		NL_SET_ERR_MSG(extack, "Must specify key blobs");
-+		return -EINVAL;
-+	}
-+
-+	if (NL_REQ_ATTR_CHECK(extack, NULL, tb, P4TC_ENTRY_MASK_BLOB)) {
-+		NL_SET_ERR_MSG(extack, "Must specify mask blobs");
-+		return -EINVAL;
-+	}
-+
-+	keysz = nla_len(tb[P4TC_ENTRY_KEY_BLOB]);
-+	if (BITS_TO_BYTES(key->keysz) != keysz) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Key blob size and table key size differ");
-+		return -EINVAL;
-+	}
-+
-+	if (keysz != nla_len(tb[P4TC_ENTRY_MASK_BLOB])) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Key and mask blob must have the same length");
-+		return -EINVAL;
-+	}
-+
-+	tcf_table_entry_assign_key(table, key, mask,
-+				   nla_data(tb[P4TC_ENTRY_KEY_BLOB]),
-+				   nla_data(tb[P4TC_ENTRY_MASK_BLOB]));
-+
-+	return 0;
-+}
-+
-+static void tcf_table_entry_build_key(struct p4tc_table *table,
-+				      struct p4tc_table_entry_key *key,
-+				      struct p4tc_table_entry_mask *mask)
-+{
-+	int i;
-+
-+	if (table->tbl_type == P4TC_TABLE_TYPE_EXACT)
-+		return;
-+
-+	key->maskid = mask->mask_id;
-+
-+	for (i = 0; i < BITS_TO_BYTES(key->keysz); i++)
-+		key->fa_key[i] &= mask->fa_value[i];
-+}
-+
-+static int ___tcf_table_entry_del(struct p4tc_pipeline *pipeline,
-+				  struct p4tc_table *table,
-+				  struct p4tc_table_entry *entry,
-+				  bool from_control)
-+	__must_hold(RCU)
-+{
-+	struct p4tc_table_entry_value *value = p4tc_table_entry_value(entry);
-+	int ret = 0;
-+
-+	if (from_control) {
-+		if (!p4tc_ctrl_delete_ok(value->permissions))
-+			return -EPERM;
-+	} else {
-+		if (!p4tc_data_delete_ok(value->permissions))
-+			return -EPERM;
-+	}
-+
-+	if (!refcount_dec_not_one(&table->tbl_entries_ref))
-+		return -EBUSY;
-+
-+	if (tcf_table_entry_destroy(table, entry, true) < 0) {
-+		ret = -EBUSY;
-+		goto inc_entries_ref;
-+	}
-+
-+	goto out;
-+
-+inc_entries_ref:
-+	WARN_ON(!refcount_inc_not_zero(&table->tbl_entries_ref));
-+
-+out:
-+	return ret;
-+}
-+
-+/* Internal function which will be called by the data path */
-+int __tcf_table_entry_del(struct p4tc_pipeline *pipeline,
-+			  struct p4tc_table *table,
-+			  struct p4tc_table_entry_key *key,
-+			  struct p4tc_table_entry_mask *mask, u32 prio)
-+{
-+	struct p4tc_table_entry_value *value;
-+	struct p4tc_table_entry *entry;
-+	int ret;
-+
-+	tcf_table_entry_build_key(table, key, mask);
-+
-+	entry = p4tc_entry_lookup(table, key, prio);
-+	if (!entry)
-+		return -ENOENT;
-+
-+	value = p4tc_table_entry_value(entry);
-+
-+	value->entry_work->defer_deletion = true;
-+	ret = ___tcf_table_entry_del(pipeline, table, entry, false);
-+
-+	return ret;
-+}
-+
-+static int tcf_table_entry_gd(struct net *net, struct sk_buff *skb,
-+			      struct nlmsghdr *n, struct nlattr *arg, u32 *ids,
-+			      struct p4tc_nl_pname *nl_pname,
-+			      struct netlink_ext_ack *extack)
-+{
-+	struct nlattr *tb[P4TC_ENTRY_MAX + 1] = { NULL };
-+	struct p4tc_table_entry_mask *mask = NULL;
-+	struct p4tc_table_entry *entry = NULL;
-+	struct p4tc_pipeline *pipeline = NULL;
-+	struct p4tc_table_entry_mask *new_mask;
-+	struct p4tc_table_entry_value *value;
-+	struct p4tc_table_entry_key *key;
-+	struct p4tc_table *table;
-+	u32 keysz_bytes;
-+	u32 keysz_bits;
-+	u32 prio;
-+	int ret;
-+
-+	ret = nla_parse_nested(tb, P4TC_ENTRY_MAX, arg, p4tc_entry_policy,
-+			       extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_ENTRY_PRIO)) {
-+		NL_SET_ERR_MSG(extack, "Must specify table entry priority");
-+		return -EINVAL;
-+	}
-+	prio = nla_get_u32(tb[P4TC_ENTRY_PRIO]);
-+
-+	rcu_read_lock();
-+	ret = tcf_table_entry_get_table(net, &pipeline, &table, tb, ids,
-+					nl_pname->data, extack);
-+	rcu_read_unlock();
-+	if (ret < 0)
-+		return ret;
-+
-+	if (n->nlmsg_type == RTM_P4TC_DEL && !pipeline_sealed(pipeline)) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Unable to delete table entry in unsealed pipeline");
-+		ret = -EINVAL;
-+		goto table_put;
-+	}
-+
-+	keysz_bits = table->tbl_keysz;
-+	keysz_bytes = P4TC_KEYSZ_BYTES(table->tbl_keysz);
-+
-+	key = kzalloc(struct_size(key, fa_key, keysz_bytes), GFP_KERNEL);
-+	if (!key) {
-+		NL_SET_ERR_MSG(extack, "Unable to allocate key");
-+		ret = -ENOMEM;
-+		goto table_put;
-+	}
-+
-+	key->keysz = keysz_bits;
-+
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT) {
-+		mask = kzalloc(struct_size(mask, fa_value, keysz_bytes),
-+			       GFP_KERNEL);
-+		if (!mask) {
-+			NL_SET_ERR_MSG(extack, "Failed to allocate mask");
-+			ret = -ENOMEM;
-+			goto free_key;
-+		}
-+		mask->sz = key->keysz;
-+	}
-+
-+	ret = tcf_table_entry_extract_key(table, tb, key, mask, extack);
-+	if (ret < 0) {
-+		if (table->tbl_type != P4TC_TABLE_TYPE_EXACT)
-+			kfree(mask);
-+		goto free_key;
-+	}
-+
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT) {
-+		new_mask = tcf_table_entry_mask_find_byvalue(table, mask);
-+		kfree(mask);
-+		if (!new_mask) {
-+			NL_SET_ERR_MSG(extack, "Unable to find entry");
-+			ret = -ENOENT;
-+			goto free_key;
-+		} else {
-+			mask = new_mask;
-+		}
-+	}
-+
-+	tcf_table_entry_build_key(table, key, mask);
-+
-+	rcu_read_lock();
-+	entry = p4tc_entry_lookup(table, key, prio);
-+	if (!entry) {
-+		NL_SET_ERR_MSG(extack, "Unable to find entry");
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	value = p4tc_table_entry_value(entry);
-+	if (n->nlmsg_type == RTM_P4TC_GET) {
-+		if (!p4tc_ctrl_read_ok(value->permissions)) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Permission denied: Unable to read table entry");
-+			ret = -EINVAL;
-+			goto unlock;
-+		}
-+	}
-+
-+	if (p4tca_table_get_entry_fill(skb, table, entry, table->tbl_id) <= 0) {
-+		NL_SET_ERR_MSG(extack, "Unable to fill table entry attributes");
-+		ret = -EINVAL;
-+		goto unlock;
-+	}
-+
-+	if (n->nlmsg_type == RTM_P4TC_DEL) {
-+		value->entry_work->defer_deletion = true;
-+		ret = ___tcf_table_entry_del(pipeline, table, entry, true);
-+		if (ret < 0)
-+			goto unlock;
-+	}
-+
-+	if (!ids[P4TC_PID_IDX])
-+		ids[P4TC_PID_IDX] = pipeline->common.p_id;
-+
-+	if (!nl_pname->passed)
-+		strscpy(nl_pname->data, pipeline->common.name, PIPELINENAMSIZ);
-+
-+	ret = 0;
-+
-+	goto unlock;
-+
-+unlock:
-+	rcu_read_unlock();
-+
-+free_key:
-+	kfree(key);
-+
-+table_put:
-+	tcf_table_entry_put_table(pipeline, table);
-+
-+	return ret;
-+}
-+
-+static int tcf_table_entry_flush(struct net *net, struct sk_buff *skb,
-+				 struct nlmsghdr *n, struct nlattr *arg,
-+				 u32 *ids, struct p4tc_nl_pname *nl_pname,
-+				 struct netlink_ext_ack *extack)
-+{
-+	struct nlattr *tb[P4TC_ENTRY_MAX + 1] = { NULL };
-+	unsigned char *b = nlmsg_get_pos(skb);
-+	int ret = 0;
-+	int i = 0;
-+	u32 arg_ids[P4TC_PATH_MAX - 1];
-+	struct p4tc_pipeline *pipeline;
-+	struct p4tc_table_entry *entry;
-+	struct rhashtable_iter iter;
-+	struct p4tc_table *table;
-+
-+	if (arg) {
-+		ret = nla_parse_nested(tb, P4TC_ENTRY_MAX, arg,
-+				       p4tc_entry_policy, extack);
-+		if (ret < 0)
-+			return ret;
-+	}
-+
-+	rcu_read_lock();
-+	ret = tcf_table_entry_get_table(net, &pipeline, &table, tb, ids,
-+					nl_pname->data, extack);
-+	rcu_read_unlock();
-+	if (ret < 0)
-+		return ret;
-+
-+	if (!ids[P4TC_TBLID_IDX])
-+		arg_ids[P4TC_TBLID_IDX - 1] = table->tbl_id;
-+
-+	if (nla_put(skb, P4TC_PATH, sizeof(arg_ids), arg_ids)) {
-+		ret = -ENOMEM;
-+		goto out_nlmsg_trim;
-+	}
-+
-+	rhltable_walk_enter(&table->tbl_entries, &iter);
-+	do {
-+		rhashtable_walk_start(&iter);
-+
-+		while ((entry = rhashtable_walk_next(&iter)) && !IS_ERR(entry)) {
-+			struct p4tc_table_entry_value *value =
-+				p4tc_table_entry_value(entry);
-+			if (!p4tc_ctrl_delete_ok(value->permissions)) {
-+				ret = -EPERM;
-+				continue;
-+			}
-+
-+			if (!refcount_dec_not_one(&table->tbl_entries_ref)) {
-+				NL_SET_ERR_MSG(extack, "Table entry is stale");
-+				ret = -EBUSY;
-+				rhashtable_walk_stop(&iter);
-+				goto walk_exit;
-+			}
-+
-+			value->entry_work->defer_deletion = true;
-+			if (tcf_table_entry_destroy(table, entry, true) < 0) {
-+				ret = -EBUSY;
-+				continue;
-+			}
-+			i++;
-+		}
-+
-+		rhashtable_walk_stop(&iter);
-+	} while (entry == ERR_PTR(-EAGAIN));
-+
-+walk_exit:
-+	rhashtable_walk_exit(&iter);
-+
-+	nla_put_u32(skb, P4TC_COUNT, i);
-+
-+	if (ret < 0) {
-+		if (i == 0) {
-+			if (!extack->_msg)
-+				NL_SET_ERR_MSG(extack,
-+					       "Unable to flush any entries");
-+			goto out_nlmsg_trim;
-+		} else {
-+			if (!extack->_msg)
-+				NL_SET_ERR_MSG(extack,
-+					       "Unable to flush all entries");
-+		}
-+	}
-+
-+	if (!ids[P4TC_PID_IDX])
-+		ids[P4TC_PID_IDX] = pipeline->common.p_id;
-+
-+	if (!nl_pname->passed)
-+		strscpy(nl_pname->data, pipeline->common.name, PIPELINENAMSIZ);
-+
-+	ret = 0;
-+	goto table_put;
-+
-+out_nlmsg_trim:
-+	nlmsg_trim(skb, b);
-+
-+/* If we are here, it means that this was just incremented, so it should be > 1 */
-+table_put:
-+	tcf_table_entry_put_table(pipeline, table);
-+
-+	return ret;
-+}
-+
-+/* Invoked from both control and data path */
-+static int __tcf_table_entry_create(struct p4tc_pipeline *pipeline,
-+				    struct p4tc_table *table,
-+				    struct p4tc_table_entry *entry,
-+				    struct p4tc_table_entry_mask *mask,
-+				    u16 whodunnit, bool from_control)
-+	__must_hold(RCU)
-+{
-+	struct p4tc_table_entry_mask *mask_found = NULL;
-+	struct p4tc_table_entry_work *entry_work;
-+	struct p4tc_table_entry_value *value;
-+	struct p4tc_table_perm *tbl_perm;
-+	struct p4tc_table_entry_tm *dtm;
-+	u16 permissions;
-+	int ret;
-+
-+	value = p4tc_table_entry_value(entry);
-+	refcount_set(&value->entries_ref, 1);
-+
-+	tbl_perm = rcu_dereference(table->tbl_permissions);
-+	permissions = tbl_perm->permissions;
-+	if (from_control) {
-+		if (!p4tc_ctrl_create_ok(permissions))
-+			return -EPERM;
-+	} else {
-+		if (!p4tc_data_create_ok(permissions))
-+			return -EPERM;
-+	}
-+
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT) {
-+		mask_found = tcf_table_entry_mask_add(table, entry, mask);
-+		if (IS_ERR(mask_found)) {
-+			ret = PTR_ERR(mask_found);
-+			goto out;
-+		}
-+	}
-+
-+	tcf_table_entry_build_key(table, &entry->key, mask_found);
-+
-+	if (!refcount_inc_not_zero(&table->tbl_entries_ref)) {
-+		ret = -EBUSY;
-+		goto rm_masks_idr;
-+	}
-+
-+	if (p4tc_entry_lookup(table, &entry->key, value->prio)) {
-+		ret = -EEXIST;
-+		goto dec_entries_ref;
-+	}
-+
-+	dtm = kzalloc(sizeof(*dtm), GFP_ATOMIC);
-+	if (!dtm) {
-+		ret = -ENOMEM;
-+		goto dec_entries_ref;
-+	}
-+
-+	dtm->who_created = whodunnit;
-+	dtm->created = jiffies;
-+	dtm->firstused = 0;
-+	dtm->lastused = jiffies;
-+
-+	rcu_assign_pointer(value->tm, dtm);
-+
-+	entry_work = kzalloc(sizeof(*entry_work), GFP_ATOMIC);
-+	if (!entry_work) {
-+		ret = -ENOMEM;
-+		goto free_tm;
-+	}
-+
-+	entry_work->pipeline = pipeline;
-+	entry_work->entry = entry;
-+	value->entry_work = entry_work;
-+
-+	INIT_WORK(&entry_work->work, tcf_table_entry_del_act_work);
-+
-+	if (rhltable_insert(&table->tbl_entries, &entry->ht_node,
-+			    entry_hlt_params) < 0) {
-+		ret = -EBUSY;
-+		goto free_entry_work;
-+	}
-+
-+	return 0;
-+
-+free_entry_work:
-+	kfree(entry_work);
-+
-+free_tm:
-+	kfree(dtm);
-+/*If we are here, it means that this was just incremented, so it should be > 1 */
-+dec_entries_ref:
-+	WARN_ON(!refcount_dec_not_one(&table->tbl_entries_ref));
-+
-+rm_masks_idr:
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT)
-+		tcf_table_entry_mask_del(table, entry);
-+
-+out:
-+	return ret;
-+}
-+
-+/* Invoked from both control and data path  */
-+static int __tcf_table_entry_update(struct p4tc_pipeline *pipeline,
-+				    struct p4tc_table *table,
-+				    struct p4tc_table_entry *entry,
-+				    struct p4tc_table_entry_mask *mask,
-+				    u16 whodunnit, bool from_control)
-+	__must_hold(RCU)
-+{
-+	struct p4tc_table_entry_mask *mask_found = NULL;
-+	struct p4tc_table_entry_work *entry_work;
-+	struct p4tc_table_entry_value *value_old;
-+	struct p4tc_table_entry_value *value;
-+	struct p4tc_table_entry *entry_old;
-+	struct p4tc_table_entry_tm *tm_old;
-+	struct p4tc_table_entry_tm *tm;
-+	int ret;
-+
-+	value = p4tc_table_entry_value(entry);
-+	refcount_set(&value->entries_ref, 1);
-+
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT) {
-+		mask_found = tcf_table_entry_mask_add(table, entry, mask);
-+		if (IS_ERR(mask_found)) {
-+			ret = PTR_ERR(mask_found);
-+			goto out;
-+		}
-+	}
-+
-+	tcf_table_entry_build_key(table, &entry->key, mask_found);
-+
-+	entry_old = p4tc_entry_lookup(table, &entry->key, value->prio);
-+	if (!entry_old) {
-+		ret = -ENOENT;
-+		goto rm_masks_idr;
-+	}
-+
-+	value_old = p4tc_table_entry_value(entry_old);
-+
-+	if (from_control) {
-+		if (!p4tc_ctrl_update_ok(value_old->permissions)) {
-+			ret = -EPERM;
-+			goto rm_masks_idr;
-+		}
-+	} else {
-+		if (!p4tc_data_update_ok(value_old->permissions)) {
-+			ret = -EPERM;
-+			goto rm_masks_idr;
-+		}
-+	}
-+
-+	if (refcount_read(&value_old->entries_ref) > 1) {
-+		ret = -EBUSY;
-+		goto rm_masks_idr;
-+	}
-+
-+	tm = kzalloc(sizeof(*tm), GFP_ATOMIC);
-+	if (!tm) {
-+		ret = -ENOMEM;
-+		goto rm_masks_idr;
-+	}
-+
-+	tm_old = rcu_dereference_protected(value_old->tm, 1);
-+	*tm = *tm_old;
-+
-+	tm->lastused = jiffies;
-+	tm->who_updated = whodunnit;
-+
-+	if (value->permissions == P4TC_PERMISSIONS_UNINIT)
-+		value->permissions = value_old->permissions;
-+
-+	rcu_assign_pointer(value->tm, tm);
-+
-+	entry_work = kzalloc(sizeof(*(entry_work)), GFP_ATOMIC);
-+	if (!entry_work) {
-+		ret = -ENOMEM;
-+		goto free_tm;
-+	}
-+
-+	entry_work->pipeline = pipeline;
-+	entry_work->entry = entry;
-+	value->entry_work = entry_work;
-+
-+	INIT_WORK(&entry_work->work, tcf_table_entry_del_act_work);
-+
-+	if (rhltable_insert(&table->tbl_entries, &entry->ht_node,
-+			    entry_hlt_params) < 0) {
-+		ret = -EEXIST;
-+		goto free_entry_work;
-+	}
-+
-+	value_old->entry_work->defer_deletion = true;
-+	if (tcf_table_entry_destroy_noida(table, entry_old) < 0) {
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	return 0;
-+
-+free_entry_work:
-+	kfree(entry_work);
-+
-+free_tm:
-+	kfree(tm);
-+
-+rm_masks_idr:
-+	if (table->tbl_type != P4TC_TABLE_TYPE_EXACT)
-+		tcf_table_entry_mask_del(table, entry);
-+
-+out:
-+	return ret;
-+}
-+
-+#define P4TC_DEFAULT_TENTRY_PERMISSIONS                           \
-+	(P4TC_CTRL_PERM_R | P4TC_CTRL_PERM_U | P4TC_CTRL_PERM_D | \
-+	 P4TC_DATA_PERM_R | P4TC_DATA_PERM_X)
-+
-+static bool tcf_table_check_entry_acts(struct p4tc_table *table,
-+				       struct tc_action *entry_acts[],
-+				       struct list_head *allowed_acts,
-+				       int num_entry_acts)
-+{
-+	struct p4tc_table_act *table_act;
-+	int i;
-+
-+	for (i = 0; i < num_entry_acts; i++) {
-+		const struct tc_action *entry_act = entry_acts[i];
-+
-+		list_for_each_entry(table_act, allowed_acts, node) {
-+			if (table_act->ops->id == entry_act->ops->id &&
-+			    !(table_act->flags & BIT(P4TC_TABLE_ACTS_DEFAULT_ONLY)))
-+				return true;
-+		}
-+	}
-+
-+	return false;
-+}
-+
-+static struct p4tc_table_entry *__tcf_table_entry_cu(struct net *net, u32 flags,
-+						     struct nlattr **tb,
-+						     struct p4tc_pipeline *pipeline,
-+						     struct p4tc_table *table,
-+						     struct netlink_ext_ack *extack)
-+{
-+	u8 __mask[sizeof(struct p4tc_table_entry_mask) +
-+		  BITS_TO_BYTES(P4TC_MAX_KEYSZ)] = { 0 };
-+	struct p4tc_table_entry_mask *mask = (void *)&__mask;
-+	u8 whodunnit = P4TC_ENTITY_UNSPEC;
-+	int ret = 0;
-+	struct p4tc_table_entry_value *value;
-+	struct p4tc_table_entry *entry;
-+	u32 keysz_bytes;
-+	u32 keysz_bits;
-+	u32 entrysz;
-+	u32 prio;
-+
-+	prio = tb[P4TC_ENTRY_PRIO] ? nla_get_u32(tb[P4TC_ENTRY_PRIO]) : 0;
-+	if (flags & NLM_F_REPLACE) {
-+		if (!prio) {
-+			NL_SET_ERR_MSG(extack, "Must specify entry priority");
-+			return ERR_PTR(-EINVAL);
-+		}
-+	} else {
-+		if (prio)
-+			ret = ida_alloc_range(&table->tbl_prio_idr, prio,
-+					      prio, GFP_ATOMIC);
-+		else
-+			ret = ida_alloc_min(&table->tbl_prio_idr, 1,
-+					    GFP_ATOMIC);
-+		if (ret < 0) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Unable to allocate priority");
-+			return ERR_PTR(ret);
-+		}
-+		prio = ret;
-+
-+		if (refcount_read(&table->tbl_entries_ref) > table->tbl_max_entries) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Table instance max entries reached");
-+			return ERR_PTR(-EINVAL);
-+		}
-+	}
-+
-+	whodunnit = nla_get_u8(tb[P4TC_ENTRY_WHODUNNIT]);
-+
-+	keysz_bits = table->tbl_keysz;
-+	keysz_bytes = P4TC_KEYSZ_BYTES(keysz_bits);
-+
-+	/* Entry memory layout:
-+	 * { entry | key __aligned(8) | value }
-+	 */
-+	entrysz = sizeof(*entry) + keysz_bytes +
-+		  sizeof(struct p4tc_table_entry_value);
-+
-+	entry = kzalloc(entrysz, GFP_KERNEL);
-+	if (!entry) {
-+		NL_SET_ERR_MSG(extack, "Unable to allocate table entry");
-+		ret = -ENOMEM;
-+		goto idr_rm;
-+	}
-+
-+	entry->key.keysz = keysz_bits;
-+	mask->sz = keysz_bits;
-+
-+	ret = tcf_table_entry_extract_key(table, tb, &entry->key, mask, extack);
-+	if (ret < 0)
-+		goto free_entry;
-+
-+	value = p4tc_table_entry_value(entry);
-+	value->prio = prio;
-+
-+	if (tb[P4TC_ENTRY_PERMISSIONS]) {
-+		const u16 tblperm =
-+			rcu_dereference(table->tbl_permissions)->permissions;
-+		u16 nlperm;
-+
-+		nlperm = nla_get_u16(tb[P4TC_ENTRY_PERMISSIONS]);
-+		if (p4tc_ctrl_create_ok(nlperm) ||
-+		    p4tc_data_create_ok(nlperm)) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Create permission for table entry doesn't make sense");
-+			ret = -EINVAL;
-+			goto free_entry;
-+		}
-+		if (!p4tc_data_read_ok(nlperm)) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Data path read permission must be set");
-+			ret = -EINVAL;
-+			goto free_entry;
-+		}
-+		if (!p4tc_data_exec_ok(nlperm)) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Data path execute permissions for entry must be set");
-+			ret = -EINVAL;
-+			goto free_entry;
-+		}
-+
-+		if (~tblperm & nlperm) {
-+			NL_SET_ERR_MSG(extack,
-+				       "Trying to set permission bits which aren't allowed by table");
-+			ret = -EINVAL;
-+			goto free_entry;
-+		}
-+		value->permissions = nlperm;
-+	} else {
-+		if (flags & NLM_F_REPLACE)
-+			value->permissions = P4TC_PERMISSIONS_UNINIT;
-+		else
-+			value->permissions = P4TC_DEFAULT_TENTRY_PERMISSIONS;
-+	}
-+
-+	if (tb[P4TC_ENTRY_ACT]) {
-+		value->acts = kcalloc(TCA_ACT_MAX_PRIO,
-+				      sizeof(struct tc_action *), GFP_KERNEL);
-+		if (!value->acts) {
-+			ret = -ENOMEM;
-+			goto free_entry;
-+		}
-+
-+		ret = p4tc_action_init(net, tb[P4TC_ENTRY_ACT], value->acts,
-+				       table->common.p_id,
-+				       TCA_ACT_FLAGS_NO_RTNL, extack);
-+		if (ret < 0) {
-+			kfree(value->acts);
-+			value->acts = NULL;
-+			goto free_entry;
-+		}
-+
-+		value->num_acts = ret;
-+
-+		if (!tcf_table_check_entry_acts(table, value->acts,
-+						&table->tbl_acts_list, ret)) {
-+			ret = -EPERM;
-+			NL_SET_ERR_MSG(extack,
-+				       "Action is not allowed as entry action");
-+			goto free_acts;
-+		}
-+	}
-+
-+	rcu_read_lock();
-+	if (flags & NLM_F_REPLACE)
-+		ret = __tcf_table_entry_update(pipeline, table, entry, mask,
-+					       whodunnit, true);
-+	else
-+		ret = __tcf_table_entry_create(pipeline, table, entry, mask,
-+					       whodunnit, true);
-+	if (ret < 0) {
-+		rcu_read_unlock();
-+		goto free_acts;
-+	}
-+	rcu_read_unlock();
 +
 +	return entry;
-+
-+free_acts:
-+	p4tc_action_destroy(value->acts);
-+
-+free_entry:
-+	kfree(entry);
-+
-+idr_rm:
-+	if (!(flags & NLM_F_REPLACE))
-+		ida_free(&table->tbl_prio_idr, prio);
-+
-+	return ERR_PTR(ret);
 +}
 +
-+static int tcf_table_entry_cu(struct sk_buff *skb, struct net *net, u32 flags,
-+			      struct nlattr *arg, u32 *ids,
-+			      struct p4tc_nl_pname *nl_pname,
-+			      struct netlink_ext_ack *extack)
++static struct p4tc_table_entry *
++__p4tc_entry_lookup_fast(struct p4tc_table *table, struct p4tc_table_entry_key *key)
++	__must_hold(RCU)
 +{
-+	struct nlattr *tb[P4TC_ENTRY_MAX + 1] = { NULL };
-+	struct p4tc_pipeline *pipeline;
-+	struct p4tc_table_entry *entry;
-+	struct p4tc_table *table;
-+	int ret;
++	struct p4tc_table_entry *entry_curr;
++	struct rhlist_head *bucket_list;
 +
-+	ret = nla_parse_nested(tb, P4TC_ENTRY_MAX, arg, p4tc_entry_policy,
-+			       extack);
-+	if (ret < 0)
-+		return ret;
++	bucket_list =
++		rhltable_lookup(&table->tbl_entries, key, entry_hlt_params);
++	if (!bucket_list)
++		return NULL;
 +
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_ENTRY_WHODUNNIT)) {
-+		NL_SET_ERR_MSG(extack, "Must specify whodunnit attribute");
-+		return -EINVAL;
-+	}
++	rht_entry(entry_curr, bucket_list, ht_node);
 +
-+	rcu_read_lock();
-+	ret = tcf_table_entry_get_table(net, &pipeline, &table, tb, ids,
-+					nl_pname->data, extack);
-+	rcu_read_unlock();
-+	if (ret < 0)
-+		return ret;
++	return entry_curr;
++}
 +
-+	if (!pipeline_sealed(pipeline)) {
-+		NL_SET_ERR_MSG(extack,
-+			       "Need to seal pipeline before issuing runtime command");
-+		ret = -EINVAL;
-+		goto table_put;
-+	}
++static void mask_key(const struct p4tc_table_entry_mask *mask, u8 *masked_key,
++		     u8 *skb_key)
++{
++	int i;
 +
-+	entry = __tcf_table_entry_cu(net, flags, tb, pipeline, table, extack);
-+	if (IS_ERR(entry)) {
-+		ret = PTR_ERR(entry);
-+		goto table_put;
-+	}
-+
-+	if (p4tca_table_get_entry_fill(skb, table, entry, table->tbl_id) <= 0)
-+		NL_SET_ERR_MSG(extack, "Unable to fill table entry attributes");
-+
-+	if (!nl_pname->passed)
-+		strscpy(nl_pname->data, pipeline->common.name, PIPELINENAMSIZ);
-+
-+	if (!ids[P4TC_PID_IDX])
-+		ids[P4TC_PID_IDX] = pipeline->common.p_id;
-+
-+table_put:
-+	tcf_table_entry_put_table(pipeline, table);
-+	return ret;
++	for (i = 0; i < BITS_TO_BYTES(mask->sz); i++)
++		masked_key[i] = skb_key[i] & mask->fa_value[i];
 +}
 +
 +struct p4tc_table_entry *
-+tcf_table_const_entry_cu(struct net *net,
-+			 struct nlattr *arg,
-+			 struct p4tc_pipeline *pipeline,
-+			 struct p4tc_table *table,
-+			 struct netlink_ext_ack *extack)
++p4tc_table_entry_lookup_direct(struct p4tc_table *table,
++			       struct p4tc_table_entry_key *key)
 +{
-+	struct nlattr *tb[P4TC_ENTRY_MAX + 1] = { NULL };
-+	int ret;
-+
-+	ret = nla_parse_nested(tb, P4TC_ENTRY_MAX, arg, p4tc_entry_policy,
-+			       extack);
-+	if (ret < 0)
-+		return ERR_PTR(ret);
-+
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_ENTRY_WHODUNNIT)) {
-+		NL_SET_ERR_MSG(extack, "Must specify whodunnit attribute");
-+		return ERR_PTR(-EINVAL);
-+	}
-+
-+	return __tcf_table_entry_cu(net, 0, tb, pipeline, table, extack);
-+}
-+
-+static int tc_ctl_p4_cu_1(struct net *net, struct sk_buff *skb,
-+			  struct nlmsghdr *n, u32 *ids, struct nlattr *nla,
-+			  struct p4tc_nl_pname *nl_pname,
-+			  struct netlink_ext_ack *extack)
-+{
-+	int ret = 0;
-+	struct nlattr *tb[P4TC_MAX + 1];
-+	u32 *arg_ids;
-+
-+	ret = nla_parse_nested(tb, P4TC_MAX, nla, p4tc_policy, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, P4TC_PATH)) {
-+		NL_SET_ERR_MSG(extack, "Must specify object path");
-+		return -EINVAL;
-+	}
-+
-+	if (NL_REQ_ATTR_CHECK(extack, nla, tb, P4TC_PARAMS)) {
-+		NL_SET_ERR_MSG(extack, "Must specify object attributes");
-+		return -EINVAL;
-+	}
-+
-+	arg_ids = nla_data(tb[P4TC_PATH]);
-+	memcpy(&ids[P4TC_TBLID_IDX], arg_ids, nla_len(tb[P4TC_PATH]));
-+
-+	return tcf_table_entry_cu(skb, net, n->nlmsg_flags, tb[P4TC_PARAMS],
-+				  ids, nl_pname, extack);
-+}
-+
-+static int tc_ctl_p4_delete_1(struct net *net, struct sk_buff *skb,
-+			      struct nlmsghdr *n, struct nlattr *arg, u32 *ids,
-+			      struct p4tc_nl_pname *nl_pname,
-+			      struct netlink_ext_ack *extack)
-+{
-+	int ret = 0;
-+	struct nlattr *tb[P4TC_MAX + 1];
-+	u32 *arg_ids;
-+
-+	ret = nla_parse_nested(tb, P4TC_MAX, arg, p4tc_policy, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_PATH)) {
-+		NL_SET_ERR_MSG(extack, "Must specify object path");
-+		return -EINVAL;
-+	}
-+
-+	arg_ids = nla_data(tb[P4TC_PATH]);
-+	memcpy(&ids[P4TC_TBLID_IDX], arg_ids, nla_len(tb[P4TC_PATH]));
-+	if (n->nlmsg_flags & NLM_F_ROOT) {
-+		ret = tcf_table_entry_flush(net, skb, n, tb[P4TC_PARAMS], ids,
-+					    nl_pname, extack);
-+	} else {
-+		if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_PARAMS)) {
-+			NL_SET_ERR_MSG(extack, "Must specify parameters");
-+			return -EINVAL;
-+		}
-+		ret = tcf_table_entry_gd(net, skb, n, tb[P4TC_PARAMS], ids,
-+					 nl_pname, extack);
-+	}
-+
-+	return ret;
-+}
-+
-+static int tc_ctl_p4_get_1(struct net *net, struct sk_buff *skb,
-+			   struct nlmsghdr *n, u32 *ids, struct nlattr *arg,
-+			   struct p4tc_nl_pname *nl_pname,
-+			   struct netlink_ext_ack *extack)
-+{
-+	int ret = 0;
-+	struct nlattr *tb[P4TC_MAX + 1];
-+	u32 *arg_ids;
-+
-+	ret = nla_parse_nested(tb, P4TC_MAX, arg, p4tc_policy, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_PATH)) {
-+		NL_SET_ERR_MSG(extack, "Must specify object path");
-+		return -EINVAL;
-+	}
-+
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_PARAMS)) {
-+		NL_SET_ERR_MSG(extack, "Must specify parameters");
-+		return -EINVAL;
-+	}
-+
-+	arg_ids = nla_data(tb[P4TC_PATH]);
-+	memcpy(&ids[P4TC_TBLID_IDX], arg_ids, nla_len(tb[P4TC_PATH]));
-+
-+	return tcf_table_entry_gd(net, skb, n, tb[P4TC_PARAMS], ids, nl_pname,
-+				  extack);
-+}
-+
-+int p4tc_ctl_table_n(struct sk_buff *skb, struct nlmsghdr *n,
-+		     int cmd, char *p_name, struct nlattr *nla,
-+		     struct netlink_ext_ack *extack)
-+{
-+	struct p4tcmsg *t = (struct p4tcmsg *)nlmsg_data(n);
-+	struct net *net = sock_net(skb->sk);
-+	u32 portid = NETLINK_CB(skb).portid;
-+	u32 ids[P4TC_PATH_MAX] = { 0 };
-+	int ret = 0;
-+	struct nlattr *p4tca[P4TC_MSGBATCH_SIZE + 1];
-+	struct p4tc_nl_pname nl_pname;
-+	struct sk_buff *new_skb;
-+	struct p4tcmsg *t_new;
-+	struct nlmsghdr *nlh;
-+	struct nlattr *pnatt;
-+	struct nlattr *root;
-+	int ret_send;
++	struct p4tc_table_entry *entry = NULL;
++	u32 smallest_prio = U32_MAX;
++	const struct p4tc_table_entry_mask **masks_array;
 +	int i;
 +
-+	ret = nla_parse_nested(p4tca, P4TC_MSGBATCH_SIZE, nla, NULL, extack);
-+	if (ret < 0)
-+		return ret;
++	if (table->tbl_type == P4TC_TABLE_TYPE_EXACT)
++		return __p4tc_entry_lookup_fast(table, key);
 +
-+	if (!p4tca[1]) {
-+		NL_SET_ERR_MSG(extack, "No elements in root table array");
-+		return -EINVAL;
-+	}
++	masks_array =
++		(const struct p4tc_table_entry_mask **)rcu_dereference(table->tbl_masks_array);
++	for (i = 0; i < table->tbl_curr_num_masks; i++) {
++		u8 __mkey[sizeof(*key) + BITS_TO_BYTES(P4TC_MAX_KEYSZ)];
++		const struct p4tc_table_entry_mask *mask = masks_array[i];
++		struct p4tc_table_entry_key *mkey = (void *)&__mkey;
++		struct p4tc_table_entry *entry_curr = NULL;
 +
-+	new_skb = alloc_skb(NLMSG_GOODSIZE, GFP_KERNEL);
-+	if (!new_skb)
-+		return -ENOBUFS;
++		mkey->keysz = key->keysz;
++		mkey->maskid = mask->mask_id;
++		mask_key(mask, mkey->fa_key, key->fa_key);
 +
-+	nlh = nlmsg_put(new_skb, portid, n->nlmsg_seq, cmd, sizeof(*t),
-+			n->nlmsg_flags);
-+	if (!nlh)
-+		goto out;
++		if (table->tbl_type == P4TC_TABLE_TYPE_LPM) {
++			entry_curr = __p4tc_entry_lookup_fast(table, mkey);
++			if (entry_curr)
++				return entry_curr;
++		} else {
++			entry_curr = __p4tc_entry_lookup(table, mkey);
 +
-+	t_new = nlmsg_data(nlh);
-+	t_new->pipeid = t->pipeid;
-+	t_new->obj = t->obj;
-+	ids[P4TC_PID_IDX] = t_new->pipeid;
-+
-+	pnatt = nla_reserve(new_skb, P4TC_ROOT_PNAME, PIPELINENAMSIZ);
-+	if (!pnatt) {
-+		ret = -ENOMEM;
-+		goto out;
-+	}
-+
-+	nl_pname.data = nla_data(pnatt);
-+	if (!p_name) {
-+		/* Filled up by the operation or forced failure */
-+		memset(nl_pname.data, 0, PIPELINENAMSIZ);
-+		nl_pname.passed = false;
-+	} else {
-+		strscpy(nl_pname.data, p_name, PIPELINENAMSIZ);
-+		nl_pname.passed = true;
-+	}
-+
-+	net = maybe_get_net(net);
-+	if (!net) {
-+		NL_SET_ERR_MSG(extack, "Net namespace is going down");
-+		ret = -EBUSY;
-+		goto out;
-+	}
-+
-+	root = nla_nest_start(new_skb, P4TC_ROOT);
-+	for (i = 1; i < P4TC_MSGBATCH_SIZE + 1 && p4tca[i]; i++) {
-+		struct nlattr *nest = nla_nest_start(new_skb, i);
-+
-+		if (cmd == RTM_P4TC_GET)
-+			ret = tc_ctl_p4_get_1(net, new_skb, nlh, ids, p4tca[i],
-+					      &nl_pname, extack);
-+		else if (cmd == RTM_P4TC_CREATE)
-+			ret = tc_ctl_p4_cu_1(net, new_skb, nlh, ids, p4tca[i],
-+					     &nl_pname, extack);
-+		else if (cmd == RTM_P4TC_DEL)
-+			ret = tc_ctl_p4_delete_1(net, new_skb, nlh, p4tca[i],
-+						 ids, &nl_pname, extack);
-+
-+		if (ret < 0) {
-+			if (i == 1) {
-+				goto put_net;
-+			} else {
-+				nla_nest_cancel(new_skb, nest);
-+				break;
++			if (entry_curr) {
++				struct p4tc_table_entry_value *value =
++					p4tc_table_entry_value(entry_curr);
++				if (value->prio <= smallest_prio) {
++					smallest_prio = value->prio;
++					entry = entry_curr;
++				}
 +			}
 +		}
-+		nla_nest_end(new_skb, nest);
 +	}
-+	nla_nest_end(new_skb, root);
 +
-+	if (!t_new->pipeid)
-+		t_new->pipeid = ids[P4TC_PID_IDX];
-+
-+	nlmsg_end(new_skb, nlh);
-+
-+	if (cmd == RTM_P4TC_GET)
-+		ret_send = rtnl_unicast(new_skb, net, portid);
-+	else
-+		ret_send = rtnetlink_send(new_skb, net, portid, RTNLGRP_TC,
-+					  n->nlmsg_flags & NLM_F_ECHO);
-+
-+	put_net(net);
-+
-+	return ret_send ? ret_send : ret;
-+
-+put_net:
-+	put_net(net);
-+
-+out:
-+	kfree_skb(new_skb);
-+	return ret;
++	return entry;
 +}
 +
-+int tcf_table_entry_dump(struct sk_buff *skb, struct nlattr *arg, u32 *ids,
-+			 struct netlink_callback *cb, char **p_name,
-+			 struct netlink_ext_ack *extack)
+ #define tcf_table_entry_mask_find_byid(table, id) \
+ 	(idr_find(&(table)->tbl_masks_idr, id))
+ 
+@@ -498,6 +595,8 @@ static void tcf_table_entry_put(struct p4tc_table_entry *entry)
+ 		struct p4tc_pipeline *pipeline = entry_work->pipeline;
+ 		struct net *net;
+ 
++		kfree(value->act_bpf);
++
+ 		if (entry_work->defer_deletion) {
+ 			net = get_net(pipeline->net);
+ 			refcount_inc(&entry_work->pipeline->p_entry_deferal_ref);
+@@ -1379,6 +1478,8 @@ static struct p4tc_table_entry *__tcf_table_entry_cu(struct net *net, u32 flags,
+ 	}
+ 
+ 	if (tb[P4TC_ENTRY_ACT]) {
++		struct p4tc_table_entry_act_bpf *act_bpf;
++
+ 		value->acts = kcalloc(TCA_ACT_MAX_PRIO,
+ 				      sizeof(struct tc_action *), GFP_KERNEL);
+ 		if (!value->acts) {
+@@ -1404,6 +1505,14 @@ static struct p4tc_table_entry *__tcf_table_entry_cu(struct net *net, u32 flags,
+ 				       "Action is not allowed as entry action");
+ 			goto free_acts;
+ 		}
++
++		act_bpf = tcf_table_entry_create_act_bpf(value->acts[0],
++							 extack);
++		if (IS_ERR(act_bpf)) {
++			ret = PTR_ERR(act_bpf);
++			goto free_acts;
++		}
++		value->act_bpf = act_bpf;
+ 	}
+ 
+ 	rcu_read_lock();
+@@ -1415,12 +1524,15 @@ static struct p4tc_table_entry *__tcf_table_entry_cu(struct net *net, u32 flags,
+ 					       whodunnit, true);
+ 	if (ret < 0) {
+ 		rcu_read_unlock();
+-		goto free_acts;
++		goto free_act_bpf;
+ 	}
+ 	rcu_read_unlock();
+ 
+ 	return entry;
+ 
++free_act_bpf:
++	kfree(value->act_bpf);
++
+ free_acts:
+ 	p4tc_action_destroy(value->acts);
+ 
+@@ -1434,6 +1546,56 @@ static struct p4tc_table_entry *__tcf_table_entry_cu(struct net *net, u32 flags,
+ 	return ERR_PTR(ret);
+ }
+ 
++struct p4tc_table_entry_act_bpf *
++tcf_table_entry_create_act_bpf(struct tc_action *action,
++			       struct netlink_ext_ack *extack)
 +{
-+	struct nlattr *tb[P4TC_ENTRY_MAX + 1] = { NULL };
-+	struct p4tc_dump_ctx *ctx = (void *)cb->ctx;
-+	unsigned char *b = nlmsg_get_pos(skb);
-+	struct p4tc_pipeline *pipeline = NULL;
-+	struct p4tc_table_entry *entry = NULL;
-+	struct net *net = sock_net(skb->sk);
-+	int i = 0;
-+	struct p4tc_table *table;
-+	int ret;
++	size_t tot_params_sz = 0;
++	int num_params = 0;
++	struct p4tc_act_param *params[P4TC_MSGBATCH_SIZE];
++	struct p4tc_table_entry_act_bpf *act_bpf;
++	struct tcf_p4act_params *act_params;
++	struct p4tc_act_param *param;
++	unsigned long param_id, tmp;
++	struct tcf_p4act *p4act;
++	u8 *params_cursor;
++	int i;
 +
-+	net = maybe_get_net(net);
-+	if (!net) {
-+		NL_SET_ERR_MSG(extack, "Net namespace is going down");
-+		return -EBUSY;
-+	}
++	p4act = to_p4act(action);
 +
-+	if (arg) {
-+		ret = nla_parse_nested(tb, P4TC_ENTRY_MAX, arg,
-+				       p4tc_entry_policy, extack);
-+		if (ret < 0) {
-+			kfree(ctx->iter);
-+			goto net_put;
-+		}
-+	}
++	act_params = rcu_dereference(p4act->params);
 +
-+	rcu_read_lock();
-+	ret = tcf_table_entry_get_table(net, &pipeline, &table, tb, ids,
-+					*p_name, extack);
-+	rcu_read_unlock();
-+	if (ret < 0) {
-+		kfree(ctx->iter);
-+		goto net_put;
-+	}
++	idr_for_each_entry_ul(&act_params->params_idr, param, tmp, param_id) {
++		const struct p4tc_type *type = param->type;
 +
-+	if (!ctx->iter) {
-+		ctx->iter = kzalloc(sizeof(*ctx->iter), GFP_KERNEL);
-+		if (!ctx->iter) {
-+			ret = -ENOMEM;
-+			goto table_put;
++		if (tot_params_sz > P4TC_MAX_PARAM_DATA_SIZE) {
++			NL_SET_ERR_MSG(extack, "Maximum parameter byte size reached");
++			return ERR_PTR(-EINVAL);
 +		}
 +
-+		rhltable_walk_enter(&table->tbl_entries, ctx->iter);
++		tot_params_sz += BITS_TO_BYTES(type->container_bitsz);
++		params[num_params] = param;
++		num_params++;
 +	}
 +
-+	ret = -ENOMEM;
-+	rhashtable_walk_start(ctx->iter);
-+	do {
-+		for (i = 0; i < P4TC_MSGBATCH_SIZE &&
-+		     (entry = rhashtable_walk_next(ctx->iter)) &&
-+		     !IS_ERR(entry); i++) {
-+			struct p4tc_table_entry_value *value =
-+				p4tc_table_entry_value(entry);
-+			struct nlattr *count;
++	act_bpf = kzalloc(sizeof(*act_bpf), GFP_KERNEL);
++	if (!act_bpf)
++		return ERR_PTR(-ENOMEM);
 +
-+			if (!p4tc_ctrl_read_ok(value->permissions)) {
-+				i--;
-+				continue;
-+			}
++	act_bpf->act_id = p4act->act_id;
++	params_cursor = (u8 *)act_bpf + sizeof(act_bpf->act_id);
++	for (i = 0; i < num_params; i++) {
++		const struct p4tc_act_param *param = params[i];
++		const struct p4tc_type *type = param->type;
++		const u32 type_bytesz = BITS_TO_BYTES(type->container_bitsz);
 +
-+			count = nla_nest_start(skb, i + 1);
-+			if (!count) {
-+				rhashtable_walk_stop(ctx->iter);
-+				goto table_put;
-+			}
-+			ret = p4tca_table_get_entry_fill(skb, table, entry,
-+							 table->tbl_id);
-+			if (ret == 0) {
-+				NL_SET_ERR_MSG(extack,
-+					       "Failed to fill notification attributes for table entry");
-+				goto walk_done;
-+			} else if (ret == -ENOMEM) {
-+				ret = 1;
-+				nla_nest_cancel(skb, count);
-+				rhashtable_walk_stop(ctx->iter);
-+				goto table_put;
-+			}
-+			nla_nest_end(skb, count);
-+		}
-+	} while (entry == ERR_PTR(-EAGAIN));
-+	rhashtable_walk_stop(ctx->iter);
-+
-+	if (!i) {
-+		rhashtable_walk_exit(ctx->iter);
-+
-+		ret = 0;
-+		kfree(ctx->iter);
-+
-+		goto table_put;
++		memcpy(params_cursor, param->value, type_bytesz);
++		params_cursor += type_bytesz;
 +	}
 +
-+	if (!*p_name)
-+		*p_name = pipeline->common.name;
-+
-+	if (!ids[P4TC_PID_IDX])
-+		ids[P4TC_PID_IDX] = pipeline->common.p_id;
-+
-+	ret = skb->len;
-+
-+	goto table_put;
-+
-+walk_done:
-+	rhashtable_walk_stop(ctx->iter);
-+	rhashtable_walk_exit(ctx->iter);
-+	kfree(ctx->iter);
-+
-+	nlmsg_trim(skb, b);
-+
-+table_put:
-+	tcf_table_entry_put_table(pipeline, table);
-+
-+net_put:
-+	put_net(net);
-+
-+	return ret;
++	return act_bpf;
 +}
 +
-+int p4tc_ctl_dump_1(struct sk_buff *skb, struct netlink_callback *cb,
-+		    struct nlattr *arg, char *p_name)
-+{
-+	struct netlink_ext_ack *extack = cb->extack;
-+	u32 portid = NETLINK_CB(cb->skb).portid;
-+	const struct nlmsghdr *n = cb->nlh;
-+	u32 ids[P4TC_PATH_MAX] = { 0 };
-+	struct nlattr *tb[P4TC_MAX + 1];
-+	struct p4tcmsg *t_new;
-+	struct nlmsghdr *nlh;
-+	struct nlattr *root;
-+	struct p4tcmsg *t;
-+	u32 *arg_ids;
-+	int ret;
-+
-+	ret = nla_parse_nested(tb, P4TC_MAX, arg, p4tc_policy, extack);
-+	if (ret < 0)
-+		return ret;
-+
-+	nlh = nlmsg_put(skb, portid, n->nlmsg_seq, RTM_P4TC_GET, sizeof(*t),
-+			n->nlmsg_flags);
-+	if (!nlh)
-+		return -ENOSPC;
-+
-+	t = (struct p4tcmsg *)nlmsg_data(n);
-+	t_new = nlmsg_data(nlh);
-+	t_new->pipeid = t->pipeid;
-+	t_new->obj = t->obj;
-+
-+	if (NL_REQ_ATTR_CHECK(extack, arg, tb, P4TC_PATH)) {
-+		NL_SET_ERR_MSG(extack, "Must specify object path");
-+		return -EINVAL;
-+	}
-+
-+	ids[P4TC_PID_IDX] = t_new->pipeid;
-+	arg_ids = nla_data(tb[P4TC_PATH]);
-+	memcpy(&ids[P4TC_TBLID_IDX], arg_ids, nla_len(tb[P4TC_PATH]));
-+
-+	root = nla_nest_start(skb, P4TC_ROOT);
-+	ret = tcf_table_entry_dump(skb, tb[P4TC_PARAMS], ids, cb, &p_name,
-+				   extack);
-+	if (ret <= 0)
-+		goto out;
-+	nla_nest_end(skb, root);
-+
-+	if (p_name) {
-+		if (nla_put_string(skb, P4TC_ROOT_PNAME, p_name)) {
-+			ret = -1;
-+			goto out;
-+		}
-+	}
-+
-+	if (!t_new->pipeid)
-+		t_new->pipeid = ids[P4TC_PID_IDX];
-+
-+	nlmsg_end(skb, nlh);
-+
-+	return skb->len;
-+
-+out:
-+	nlmsg_cancel(skb, nlh);
-+	return ret;
-+}
+ static int tcf_table_entry_cu(struct sk_buff *skb, struct net *net, u32 flags,
+ 			      struct nlattr *arg, u32 *ids,
+ 			      struct p4tc_nl_pname *nl_pname,
 diff --git a/net/sched/p4tc/p4tc_tmpl_api.c b/net/sched/p4tc/p4tc_tmpl_api.c
-index 7776cbf81..ddc7a3ea8 100644
+index ddc7a3ea8..71d7b2a78 100644
 --- a/net/sched/p4tc/p4tc_tmpl_api.c
 +++ b/net/sched/p4tc/p4tc_tmpl_api.c
-@@ -27,12 +27,12 @@
- #include <net/netlink.h>
- #include <net/flow_offload.h>
+@@ -582,6 +582,8 @@ static int __init p4tc_template_init(void)
+ 			op->init();
+ 	}
  
--static const struct nla_policy p4tc_root_policy[P4TC_ROOT_MAX + 1] = {
-+const struct nla_policy p4tc_root_policy[P4TC_ROOT_MAX + 1] = {
- 	[P4TC_ROOT] = { .type = NLA_NESTED },
- 	[P4TC_ROOT_PNAME] = { .type = NLA_STRING, .len = PIPELINENAMSIZ },
- };
++	register_p4tc_tbl_bpf();
++
+ 	return 0;
+ }
  
--static const struct nla_policy p4tc_policy[P4TC_MAX + 1] = {
-+const struct nla_policy p4tc_policy[P4TC_MAX + 1] = {
- 	[P4TC_PATH] = { .type = NLA_BINARY,
- 			.len = P4TC_PATH_MAX * sizeof(u32) },
- 	[P4TC_PARAMS] = { .type = NLA_NESTED },
-diff --git a/security/selinux/nlmsgtab.c b/security/selinux/nlmsgtab.c
-index 0a8daf2f8..208e5e258 100644
---- a/security/selinux/nlmsgtab.c
-+++ b/security/selinux/nlmsgtab.c
-@@ -97,6 +97,9 @@ static const struct nlmsg_perm nlmsg_route_perms[] = {
- 	{ RTM_CREATEP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
- 	{ RTM_DELP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
- 	{ RTM_GETP4TEMPLATE,	NETLINK_ROUTE_SOCKET__NLMSG_READ },
-+	{ RTM_P4TC_CREATE,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
-+	{ RTM_P4TC_DEL,	NETLINK_ROUTE_SOCKET__NLMSG_WRITE },
-+	{ RTM_P4TC_GET,	NETLINK_ROUTE_SOCKET__NLMSG_READ },
- };
- 
- static const struct nlmsg_perm nlmsg_tcpdiag_perms[] = {
-@@ -179,7 +182,7 @@ int selinux_nlmsg_lookup(u16 sclass, u16 nlmsg_type, u32 *perm)
- 		 * structures at the top of this file with the new mappings
- 		 * before updating the BUILD_BUG_ON() macro!
- 		 */
--		BUILD_BUG_ON(RTM_MAX != (RTM_CREATEP4TEMPLATE + 3));
-+		BUILD_BUG_ON(RTM_MAX != (RTM_P4TC_CREATE + 3));
- 		err = nlmsg_perm(nlmsg_type, perm, nlmsg_route_perms,
- 				 sizeof(nlmsg_route_perms));
- 		break;
 -- 
 2.34.1
 
