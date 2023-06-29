@@ -1,117 +1,141 @@
-Return-Path: <netdev+bounces-14673-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14674-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CF11D742F4E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 23:10:34 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EC0BF742F6D
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 23:23:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7F5AF280ED0
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:10:33 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B0438280D8E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:23:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1249FBF6;
-	Thu, 29 Jun 2023 21:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D3ADBFBFD;
+	Thu, 29 Jun 2023 21:23:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8EE20846B
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 21:10:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7FC5FBF6
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 21:23:11 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0DFE42D4C
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 14:10:29 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 89AC22D4C
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 14:23:10 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688073028;
+	s=mimecast20190719; t=1688073789;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=MGOWLH5yYZOQguU6z0SZDCNOwqtS2A+CXlPEXU7v820=;
-	b=Yut570b8ekLKcuP2MfKu+jr0N1n4tLzy7mAPrRD8XgTq0QWzQEyc0v7wjsAePxKaPhLoE5
-	v6QoZRqmOMnAe/GFYRcZlVhpgtp3ssH+0/mRTZkyb89v0ONM/lbyWFqjjUvAasdxObgyKT
-	Gr5IpTnuPDrmQcTOL0YrV03TmpoaXNY=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-413-ETeYhFV2Oz6pA_ZfkU_uYw-1; Thu, 29 Jun 2023 17:10:27 -0400
-X-MC-Unique: ETeYhFV2Oz6pA_ZfkU_uYw-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-5771e0959f7so9774407b3.3
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 14:10:27 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688073026; x=1690665026;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=MGOWLH5yYZOQguU6z0SZDCNOwqtS2A+CXlPEXU7v820=;
-        b=Ce+yWDIxzhzNcHnUjJnk2NuosG2wt8XchZZdr5A8KXwSbYSRJey4h/BGlTm0FRmPfk
-         MGnQoOsffRVCPcqLzgXQhpna9KLHTmLncPk28E9+pW+gFk8zogaeRaLgyRcVa6VHwcag
-         +R+kc9o4NZuCYIeTbHB9fN0zjCfR+DsaTzQJ7pG9LtBaK1RY3LfESPYlHn940pv5T7DL
-         +mgpcL/h5dKZsE8fIsAecriI2UbCk45TW7z1ArJEotfIFeTIH/xv4mQb1eUgqdb3T7zM
-         3s6fDJ/klUIloW6HnMeVW/DtnMdKgW7gjiVq120SFdfjMGuYS27AxM1lFe3KHUfk4cEX
-         UMGA==
-X-Gm-Message-State: ABy/qLZN7ln+GfpOE2WXAXpX2VSLY0ua0CMew3QGVfUkHU24UBNnV5lo
-	E6xrOxYOH6EYtqOJHUO1bkmb8Q23S0iiiLsXIfs3Ch72EwV0zJvbu1wTQvllfOJt16RrnPhKHBp
-	3MLB5jute2lw7bTcV
-X-Received: by 2002:a05:690c:360d:b0:56d:a2d:d08c with SMTP id ft13-20020a05690c360d00b0056d0a2dd08cmr400006ywb.51.1688073026766;
-        Thu, 29 Jun 2023 14:10:26 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFexhIe4+FSUhftLbXEZ7SljYaaxr3sHvF+qUjRjfjmLU8owbauYcWADujmTq/eC0LfyIjjVg==
-X-Received: by 2002:a05:690c:360d:b0:56d:a2d:d08c with SMTP id ft13-20020a05690c360d00b0056d0a2dd08cmr399983ywb.51.1688073026548;
-        Thu, 29 Jun 2023 14:10:26 -0700 (PDT)
-Received: from halaney-x13s ([2600:1700:1ff0:d0e0::22])
-        by smtp.gmail.com with ESMTPSA id a205-20020a8166d6000000b0057020aa41basm3041764ywc.65.2023.06.29.14.10.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 14:10:25 -0700 (PDT)
-Date: Thu, 29 Jun 2023 16:10:23 -0500
-From: Andrew Halaney <ahalaney@redhat.com>
-To: Andrew Lunn <andrew@lunn.ch>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, joabreu@synopsys.com,
-	alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
-	bhupesh.sharma@linaro.org, vkoul@kernel.org,
-	bartosz.golaszewski@linaro.org
-Subject: Re: [PATCH 3/3] net: stmmac: dwmac-qcom-ethqos: Log more errors in
- probe
-Message-ID: <20230629211023.pznzgue6arn7fzfl@halaney-x13s>
-References: <20230629191725.1434142-1-ahalaney@redhat.com>
- <20230629191725.1434142-3-ahalaney@redhat.com>
- <e9157117-bd7a-4b75-841e-090103f75d22@lunn.ch>
+	bh=xEvn4mNBJjxGCfxtSjAM8jMyMTbXVbbppuQzIKpSf88=;
+	b=g2NDTPW9eJqTM9r0n9wEd+GFhChfcyF6+WIM86kD6qzEEzGSJz5fHLd08uS7KoB5cwkOoE
+	QujRXJ0bBSOpHsfmQrVZlNy/P8xyEd13Mm35PgTMHmLT6ZHan46P6e4lrvreLSZziaoj7Z
+	BlnxA0/laAb/QcpMEjJRGPNsK+AE1yI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-113-Mn4whvRiN6qoD5RPWRCUAg-1; Thu, 29 Jun 2023 17:23:05 -0400
+X-MC-Unique: Mn4whvRiN6qoD5RPWRCUAg-1
+Received: from smtp.corp.redhat.com (int-mx04.intmail.prod.int.rdu2.redhat.com [10.11.54.4])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8FDE381DB6C;
+	Thu, 29 Jun 2023 21:23:04 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.4])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 3ED20200B402;
+	Thu, 29 Jun 2023 21:23:02 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <a1b7984a-d0a0-087c-2db9-6dbb6400a2bb@grimberg.me>
+References: <a1b7984a-d0a0-087c-2db9-6dbb6400a2bb@grimberg.me> <20230620145338.1300897-1-dhowells@redhat.com> <20230620145338.1300897-11-dhowells@redhat.com> <253mt0il43o.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
+To: Sagi Grimberg <sagi@grimberg.me>
+Cc: dhowells@redhat.com, Aurelien Aptel <aaptel@nvidia.com>,
+    netdev@vger.kernel.org, Alexander Duyck <alexander.duyck@gmail.com>,
+    "David S. Miller" <davem@davemloft.net>,
+    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+    Paolo Abeni <pabeni@redhat.com>,
+    Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+    David Ahern <dsahern@kernel.org>,
+    Matthew Wilcox <willy@infradead.org>, Jens Axboe <axboe@kernel.dk>,
+    linux-mm@kvack.org, linux-kernel@vger.kernel.org,
+    Willem de Bruijn <willemb@google.com>,
+    Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
+    Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>,
+    linux-nvme@lists.infradead.org
+Subject: Re: [PATCH net-next v3 10/18] nvme/host: Use sendmsg(MSG_SPLICE_PAGES) rather then sendpage
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <e9157117-bd7a-4b75-841e-090103f75d22@lunn.ch>
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <55022.1688073781.1@warthog.procyon.org.uk>
+Content-Transfer-Encoding: quoted-printable
+Date: Thu, 29 Jun 2023 22:23:01 +0100
+Message-ID: <55023.1688073781@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.4
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 29, 2023 at 10:32:24PM +0200, Andrew Lunn wrote:
-> On Thu, Jun 29, 2023 at 02:14:18PM -0500, Andrew Halaney wrote:
-> > These are useful to see when debugging a probe failure.
-> 
-> Since this is used for debugging, maybe netdev_dbg(). Anybody actually
-> doing debugging should be able to turn that on.
-> 
+Sagi Grimberg <sagi@grimberg.me> wrote:
 
-In my opinion it is better to use dev_err_probe() as done here because:
+> simple way to check is to run:
+> nvme_trtype=3Dtcp ./check nvme
 
-1. If it's -EPROBE_DEFER it will be under debug level already
-2. If it's anything else, its an error and the logs are useful
+It says a lot of:
 
-I've ran into both ends of this now (failure of a platform dependency to
-load, be it a bug in the driver, or just failing to select said driver),
-and I've seen issues where new integrators (say you're bringing up a new
-board) leave something out, etc, and run into issues because of that.
+nvme/002 (create many subsystems and test discovery)         [not run]
+    nvme is not available
+    nvme_trtype=3Dtcp is not supported in this test
+nvme/003 (test if we're sending keep-alives to a discovery controller) [no=
+t run]
+    nvme is not available
+nvme/004 (test nvme and nvmet UUID NS descriptors)           [not run]
+    nvme is not available
+nvme/005 (reset local loopback target)                       [not run]
+    nvme is not available
+...
 
-Thanks,
-Andrew
+I have the following NVMe config:
+
+# NVME Support
+CONFIG_NVME_COMMON=3Dy
+CONFIG_NVME_CORE=3Dy
+CONFIG_BLK_DEV_NVME=3Dy
+CONFIG_NVME_MULTIPATH=3Dy
+# CONFIG_NVME_VERBOSE_ERRORS is not set
+# CONFIG_NVME_HWMON is not set
+CONFIG_NVME_FABRICS=3Dy
+# CONFIG_NVME_RDMA is not set
+# CONFIG_NVME_FC is not set
+CONFIG_NVME_TCP=3Dy
+CONFIG_NVME_AUTH=3Dy
+CONFIG_NVME_TARGET=3Dy
+CONFIG_NVME_TARGET_PASSTHRU=3Dy
+CONFIG_NVME_TARGET_LOOP=3Dy
+# CONFIG_NVME_TARGET_RDMA is not set
+# CONFIG_NVME_TARGET_FC is not set
+CONFIG_NVME_TARGET_TCP=3Dy
+CONFIG_NVME_TARGET_AUTH=3Dy
+# end of NVME Support
+CONFIG_RTC_NVMEM=3Dy
+CONFIG_NVMEM=3Dy
+# CONFIG_NVMEM_SYSFS is not set
+# CONFIG_NVMEM_LAYOUT_SL28_VPD is not set
+# CONFIG_NVMEM_LAYOUT_ONIE_TLV is not set
+# CONFIG_NVMEM_RMEM is not set
+
+Can you tell me what I'm missing?
+
+David
 
 
