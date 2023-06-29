@@ -1,73 +1,85 @@
-Return-Path: <netdev+bounces-14665-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14668-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A0702742E50
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:29:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id DBD4D742E63
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:32:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D19A31C20AA5
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:29:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97545280D65
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:32:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD22A154B1;
-	Thu, 29 Jun 2023 20:29:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47488168B3;
+	Thu, 29 Jun 2023 20:32:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF7CF14265
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 20:29:38 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 809DF2682;
-	Thu, 29 Jun 2023 13:29:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=dO7hmIBOrzfcsHDi0fyYC7YAlquxnjdeIh7cab91GmU=; b=VHiiSWZ4h708fyUTJkrjSCti1o
-	tozxn2uTuIc4bjtaJR7lKIwkYTeIO2LA8gKJlStGlzmsbA37aiCi0mZ7J4+kemdAaqZnhjuGuhEu3
-	nQFFl/X5/x+EZcOU28dnSk4gfeWEiacci/0a8E12GfLaWXbUzpBuzkm68bwjRVEaidzI=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qEyGk-000FkW-Sx; Thu, 29 Jun 2023 22:29:34 +0200
-Date: Thu, 29 Jun 2023 22:29:34 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Andrew Halaney <ahalaney@redhat.com>
-Cc: linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-	mcoquelin.stm32@gmail.com, pabeni@redhat.com, kuba@kernel.org,
-	edumazet@google.com, davem@davemloft.net, joabreu@synopsys.com,
-	alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
-	bhupesh.sharma@linaro.org, vkoul@kernel.org,
-	bartosz.golaszewski@linaro.org
-Subject: Re: [PATCH 2/3] net: stmmac: dwmac-qcom-ethqos: Use dev_err_probe()
-Message-ID: <7c0b2987-743f-4bb6-9783-a5484f6ded0d@lunn.ch>
-References: <20230629191725.1434142-1-ahalaney@redhat.com>
- <20230629191725.1434142-2-ahalaney@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A6AF168AF
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 20:32:03 +0000 (UTC)
+Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BE06830C4
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 13:32:01 -0700 (PDT)
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-507-i-UpUp2gMSGmNxdPbJ99cw-1; Thu, 29 Jun 2023 16:30:09 -0400
+X-MC-Unique: i-UpUp2gMSGmNxdPbJ99cw-1
+Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id B05B5185A791;
+	Thu, 29 Jun 2023 20:30:05 +0000 (UTC)
+Received: from wsfd-netdev-vmhost.ntdv.lab.eng.bos.redhat.com (wsfd-netdev-vmhost.ntdv.lab.eng.bos.redhat.com [10.19.188.17])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 8D2CEC478C7;
+	Thu, 29 Jun 2023 20:30:05 +0000 (UTC)
+From: Eric Garver <eric@garver.life>
+To: netdev@vger.kernel.org
+Cc: dev@openvswitch.org,
+	Pravin B Shelar <pshelar@ovn.org>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [PATCH net-next 0/2] net: openvswitch: add drop action
+Date: Thu, 29 Jun 2023 16:30:03 -0400
+Message-Id: <20230629203005.2137107-1-eric@garver.life>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230629191725.1434142-2-ahalaney@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
+X-Mimecast-Spam-Score: 0
+X-Mimecast-Originator: garver.life
+Content-Transfer-Encoding: quoted-printable
+Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
+X-Spam-Status: No, score=-0.3 required=5.0 tests=BAYES_00,FROM_SUSPICIOUS_NTLD,
+	FROM_SUSPICIOUS_NTLD_FP,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NEUTRAL,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 29, 2023 at 02:14:17PM -0500, Andrew Halaney wrote:
-> Using dev_err_probe() logs to devices_deferred which is helpful
-> when debugging.
-> 
-> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+Prior to this series the "drop" action was implicit by an empty set of
+actions. This series adds support for an explicit drop action. The
+primary motivation is to allow passing xlate_error from userspace such
+that xlater_error can be passed to kfree_skb_reason() and therefore
+traced.                                                              =20
 
-Reviewed-by: Andrew Lunn <andrew@lunn.ch>
+Eric Garver (2):
+  net: openvswitch: add drop reasons
+  net: openvswitch: add drop action
 
-    Andrew
+ include/net/dropreason.h                      |  6 ++++
+ include/uapi/linux/openvswitch.h              |  2 ++
+ net/openvswitch/actions.c                     | 13 +++++++
+ net/openvswitch/datapath.c                    | 17 ++++++++++
+ net/openvswitch/drop.h                        | 34 +++++++++++++++++++
+ net/openvswitch/flow_netlink.c                | 12 ++++++-
+ .../selftests/net/openvswitch/ovs-dpctl.py    |  3 ++
+ 7 files changed, 86 insertions(+), 1 deletion(-)
+ create mode 100644 net/openvswitch/drop.h
+
+--=20
+2.39.0
+
 
