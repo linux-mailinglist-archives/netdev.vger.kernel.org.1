@@ -1,125 +1,79 @@
-Return-Path: <netdev+bounces-14592-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14593-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82F047428D2
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:49:57 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 248EB7428E9
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 16:53:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 310C6280E49
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:49:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 563841C20AF1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:53:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7991A111BB;
-	Thu, 29 Jun 2023 14:49:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5BBA9125CF;
+	Thu, 29 Jun 2023 14:53:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6DBA2257C
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 14:49:54 +0000 (UTC)
-Received: from mail-lf1-f42.google.com (mail-lf1-f42.google.com [209.85.167.42])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BDCFC1FC1;
-	Thu, 29 Jun 2023 07:49:51 -0700 (PDT)
-Received: by mail-lf1-f42.google.com with SMTP id 2adb3069b0e04-4f14e14dc00so209083e87.1;
-        Thu, 29 Jun 2023 07:49:51 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688050190; x=1690642190;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=2+V2QoP1g+tUtgNa3Zg1YUxv30ED+AV1SxmDuok5KeI=;
-        b=JDZStez5PKlC3FpshYjQz+hLy8Pzak6gseFnGS1kTqKMqCUBxUBafP5NemXuSvGDhn
-         sdfG3xGlXaHMSxjyEGezZKJ9uhDROd5xoGrfIBf6kGdSNbZie0PF6/cNTt2qu4qmxYly
-         6X28ojwOV71RWWQ68Vv3NsUOJGQ0zvAahh+kCSkvd5D7rlez+8doHiSuyVvBxs96t+0L
-         0wvD7dE09TiIjaoEOrpqwSrQg/BxNmfvq9juV4f8dibvOr2UBYBiGVRzbtpJC90sXuig
-         49w0bhXEuXAajC5UtX/w3eJfkTPq6Sq0qXYbR7n9uASj/we9BF6PAMkzR55b6RSldNwe
-         vF3w==
-X-Gm-Message-State: ABy/qLYH1K3JiRzT6T4MYSBouAg4wXr7O0tJ085zncVeCabeU0I/fZkR
-	s4KAW5hcOaMHa+Hm4Nc3A5M=
-X-Google-Smtp-Source: APBJJlHFD7hzN7Y6/gs5D8g7Wgnjk2WzxoDiPG1+WoxbmItuuVfbd1xLD5VmbMR/3dURiDtF7IasRQ==
-X-Received: by 2002:ac2:5499:0:b0:4fb:8cb9:7ad8 with SMTP id t25-20020ac25499000000b004fb8cb97ad8mr120263lfk.2.1688050189484;
-        Thu, 29 Jun 2023 07:49:49 -0700 (PDT)
-Received: from [10.100.102.14] (46-116-229-137.bb.netvision.net.il. [46.116.229.137])
-        by smtp.gmail.com with ESMTPSA id c6-20020a05600c0ac600b003f9c0a7c6bcsm16709186wmr.0.2023.06.29.07.49.47
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 29 Jun 2023 07:49:48 -0700 (PDT)
-Message-ID: <a1b7984a-d0a0-087c-2db9-6dbb6400a2bb@grimberg.me>
-Date: Thu, 29 Jun 2023 17:49:46 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D130B111BB;
+	Thu, 29 Jun 2023 14:53:22 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 595152D62;
+	Thu, 29 Jun 2023 07:53:20 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qEt1H-0007I0-3C; Thu, 29 Jun 2023 16:53:15 +0200
+Date: Thu, 29 Jun 2023 16:53:15 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Toke =?iso-8859-15?Q?H=F8iland-J=F8rgensen?= <toke@redhat.com>
+Cc: Florian Westphal <fw@strlen.de>, Daniel Xu <dxu@dxuuu.xyz>,
+	bpf@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, linux-kselftest@vger.kernel.org,
+	coreteam@netfilter.org, netfilter-devel@vger.kernel.org,
+	daniel@iogearbox.net, dsahern@kernel.org
+Subject: Re: [PATCH bpf-next 0/7] Support defragmenting IPv(4|6) packets in
+ BPF
+Message-ID: <20230629145315.GB10165@breakpoint.cc>
+References: <cover.1687819413.git.dxu@dxuuu.xyz>
+ <874jmthtiu.fsf@toke.dk>
+ <20230627154439.GA18285@breakpoint.cc>
+ <87o7kyfoqf.fsf@toke.dk>
+ <20230629132141.GA10165@breakpoint.cc>
+ <87leg2fia0.fsf@toke.dk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net-next v3 10/18] nvme/host: Use
- sendmsg(MSG_SPLICE_PAGES) rather then sendpage
-Content-Language: en-US
-To: Aurelien Aptel <aaptel@nvidia.com>, David Howells <dhowells@redhat.com>,
- netdev@vger.kernel.org
-Cc: Alexander Duyck <alexander.duyck@gmail.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
- David Ahern <dsahern@kernel.org>, Matthew Wilcox <willy@infradead.org>,
- Jens Axboe <axboe@kernel.dk>, linux-mm@kvack.org,
- linux-kernel@vger.kernel.org, Willem de Bruijn <willemb@google.com>,
- Keith Busch <kbusch@kernel.org>, Jens Axboe <axboe@fb.com>,
- Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>,
- linux-nvme@lists.infradead.org
-References: <20230620145338.1300897-1-dhowells@redhat.com>
- <20230620145338.1300897-11-dhowells@redhat.com>
- <253mt0il43o.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
-From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <253mt0il43o.fsf@mtr-vdi-124.i-did-not-set--mail-host-address--so-tickle-me>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=iso-8859-15
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <87leg2fia0.fsf@toke.dk>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Toke Høiland-Jørgensen <toke@redhat.com> wrote:
+> Florian Westphal <fw@strlen.de> writes:
+> As for the original question, that's answered by your point above: If
+> those two modules are the only ones that are likely to need this, then a
+> flag for each is fine by me - that was the key piece I was missing (I'm
+> not a netfilter expert, as you well know).
 
-> Hi David,
-> 
-> David Howells <dhowells@redhat.com> writes:
->> When transmitting data, call down into TCP using a single sendmsg with
->> MSG_SPLICE_PAGES to indicate that content should be spliced rather than
->> performing several sendmsg and sendpage calls to transmit header, data
->> pages and trailer.
-> 
-> This series makes my kernel crash.
-> 
->  From the current net-next main branch:
-> 
-> commit 9ae440b8fdd6772b6c007fa3d3766530a09c9045 (HEAD)
-> Merge: b545a13ca9b2 b848b26c6672
-> Author: Jakub Kicinski <kuba@kernel.org>
-> Date:   Sat Jun 24 15:50:21 2023 -0700
-> 
->      Merge branch 'splice-net-switch-over-users-of-sendpage-and-remove-it'
-> 
-> 
-> Steps to reproduce:
-> 
-> * connect a remote nvme null block device (nvmet) with 1 IO queue to keep
->    things simple
-> * open /dev/nvme0n1 with O_RDWR|O_DIRECT|O_SYNC
-> * write() a 8k buffer or 4k buffer
+No problem, I was worried I was missing an important piece of kfunc
+plumbing :-)
 
-Most likely this also reproduces with blktests?
-https://github.com/osandov/blktests
+You do raise a good point though.  With kfuncs, module is pinned.
+So, should a "please turn on defrag for this bpf_link" pin
+the defrag modules too?
 
-simple way to check is to run:
-nvme_trtype=tcp ./check nvme
-
-This runs nvme tests over nvme-tcp.
-
-No need for network, disk or anything. It runs
-both nvme and nvmet over the lo device..
+For plain netfilter we don't do that, i.e. you can just do
+"rmmod nf_defrag_ipv4".  But I suspect that for the new bpf-link
+defrag we probably should grab a reference to prevent unwanted
+functionality breakage of the bpf prog.
 
