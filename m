@@ -1,226 +1,173 @@
-Return-Path: <netdev+bounces-14669-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14666-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id ADDCC742E67
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:32:37 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4E3B742E59
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:30:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9E0641C20B5A
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:32:36 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 21CD01C20B3E
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:30:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CCF05171D1;
-	Thu, 29 Jun 2023 20:32:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4975E12B62;
+	Thu, 29 Jun 2023 20:30:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BF658171CC
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 20:32:03 +0000 (UTC)
-Received: from us-smtp-delivery-44.mimecast.com (us-smtp-delivery-44.mimecast.com [205.139.111.44])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFC3E30DF
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 13:32:01 -0700 (PDT)
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-205-VV3UmycvMBqzWEaIfccp4Q-1; Thu, 29 Jun 2023 16:30:08 -0400
-X-MC-Unique: VV3UmycvMBqzWEaIfccp4Q-1
-Received: from smtp.corp.redhat.com (int-mx08.intmail.prod.int.rdu2.redhat.com [10.11.54.8])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 0E7FC1C07546;
-	Thu, 29 Jun 2023 20:30:06 +0000 (UTC)
-Received: from wsfd-netdev-vmhost.ntdv.lab.eng.bos.redhat.com (wsfd-netdev-vmhost.ntdv.lab.eng.bos.redhat.com [10.19.188.17])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id E138CC00049;
-	Thu, 29 Jun 2023 20:30:05 +0000 (UTC)
-From: Eric Garver <eric@garver.life>
-To: netdev@vger.kernel.org
-Cc: dev@openvswitch.org,
-	Pravin B Shelar <pshelar@ovn.org>,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: [PATCH net-next 2/2] net: openvswitch: add drop action
-Date: Thu, 29 Jun 2023 16:30:05 -0400
-Message-Id: <20230629203005.2137107-3-eric@garver.life>
-In-Reply-To: <20230629203005.2137107-1-eric@garver.life>
-References: <20230629203005.2137107-1-eric@garver.life>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A4591640F;
+	Thu, 29 Jun 2023 20:30:52 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B440268F;
+	Thu, 29 Jun 2023 13:30:51 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=JCG9TzY8s/hwSq5LLBsUgQBXA+fGn+gT6MXU6Bs/KnA=; b=pMG6K5G0ytzxyPJfLoFF63Bx5a
+	BMLkltsOqSA0j6GkKHO6VbW45H5CCGDEdc+QDsnvZEzcpgAmQlwY75o9MTcE2QayuDDIPjDgAQ16g
+	7+ry/JQuQsXA1FwWTdrUXvnHeOXv/wUKnn9RmZKOD0VsGQj+PJuRuidtNFy5k7xZ6V/IGbIN2zVLI
+	w91DTciMkgdgY9TBveXDsjMilbD+bCYdxPirNV4jIgHjGs4xfx3KmtI0LFN0HIkwSQWj/W8QcRqdL
+	YqNEVrSbCP3FONwE881oekdRZBahoDfP7DOnTslWpPG7JeB0FGmMF3tO1vos528tW9E2qbI49THn0
+	lmIIKpkw==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qEyHs-0025KP-0t;
+	Thu, 29 Jun 2023 20:30:44 +0000
+Message-ID: <dc48e465-c422-d9c4-a28e-7ed97950e1c8@infradead.org>
+Date: Thu, 29 Jun 2023 13:30:42 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.8
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: garver.life
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
-X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,FROM_SUSPICIOUS_NTLD,
-	RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_NEUTRAL,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.2
+Subject: Re: [PATCH v5 RFC 5/6] page_pool: update document about frag API
+Content-Language: en-US
+To: Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+ kuba@kernel.org, pabeni@redhat.com
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ Lorenzo Bianconi <lorenzo@kernel.org>,
+ Alexander Duyck <alexander.duyck@gmail.com>,
+ Liang Chen <liangchen.linux@gmail.com>,
+ Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Eric Dumazet <edumazet@google.com>, Jonathan Corbet <corbet@lwn.net>,
+ Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>,
+ John Fastabend <john.fastabend@gmail.com>, linux-doc@vger.kernel.org,
+ bpf@vger.kernel.org
+References: <20230629120226.14854-1-linyunsheng@huawei.com>
+ <20230629120226.14854-6-linyunsheng@huawei.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230629120226.14854-6-linyunsheng@huawei.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This adds an explicit drop action. This is used by OVS to drop packets
-for which it cannot determine what to do. An explicit action in the
-kernel allows passing the reason _why_ the packet is being dropped. We
-can then use perf tracing to match on the drop reason.
+Hi--
 
-e.g. trace all OVS dropped skbs
+On 6/29/23 05:02, Yunsheng Lin wrote:
+> As more drivers begin to use the frag API, update the
+> document about how to decide which API to use for the
+> driver author.
+> 
+> Also it seems there is a similar document in page_pool.h,
+> so remove it to avoid the duplication.
+> 
+> Signed-off-by: Yunsheng Lin <linyunsheng@huawei.com>
+> CC: Lorenzo Bianconi <lorenzo@kernel.org>
+> CC: Alexander Duyck <alexander.duyck@gmail.com>
+> CC: Liang Chen <liangchen.linux@gmail.com>
+> CC: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  Documentation/networking/page_pool.rst | 34 ++++++++++++++++++++++----
+>  include/net/page_pool.h                | 22 -----------------
+>  2 files changed, 29 insertions(+), 27 deletions(-)
+> 
+> diff --git a/Documentation/networking/page_pool.rst b/Documentation/networking/page_pool.rst
+> index 873efd97f822..18b13d659c98 100644
+> --- a/Documentation/networking/page_pool.rst
+> +++ b/Documentation/networking/page_pool.rst
+> @@ -4,12 +4,27 @@
+>  Page Pool API
+>  =============
+>  
+> -The page_pool allocator is optimized for the XDP mode that uses one frame
+> -per-page, but it can fallback on the regular page allocator APIs.
+> +The page_pool allocator is optimized for recycling page or page frag used by skb
+> +packet and xdp frame.
 
- # perf trace -e skb:kfree_skb --filter=3D"reason >=3D 0x30000"
- [..]
- 106.023 ping/2465 skb:kfree_skb(skbaddr: 0xffffa0e8765f2000, \
-  location:0xffffffffc0d9b462, protocol: 2048, reason: 196610)
+That sentence could use some adjectives. Choose singular or plural:
 
-reason: 196610 --> 0x30002 (OVS_XLATE_RECURSION_TOO_DEEP)
+> +The page_pool allocator is optimized for recycling a page or page frag used by an skb
+> +packet or xdp frame.
 
-Signed-off-by: Eric Garver <eric@garver.life>
----
- include/uapi/linux/openvswitch.h                    |  2 ++
- net/openvswitch/actions.c                           | 13 +++++++++++++
- net/openvswitch/flow_netlink.c                      | 12 +++++++++++-
- .../testing/selftests/net/openvswitch/ovs-dpctl.py  |  3 +++
- 4 files changed, 29 insertions(+), 1 deletion(-)
+or
 
-diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswi=
-tch.h
-index e94870e77ee9..a967dbca3574 100644
---- a/include/uapi/linux/openvswitch.h
-+++ b/include/uapi/linux/openvswitch.h
-@@ -965,6 +965,7 @@ struct check_pkt_len_arg {
-  * start of the packet or at the start of the l3 header depending on the v=
-alue
-  * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
-  * argument.
-+ * @OVS_ACTION_ATTR_DROP: Explicit drop action.
-  *
-  * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  No=
-t all
-  * fields within a header are modifiable, e.g. the IPv4 protocol and fragm=
-ent
-@@ -1002,6 +1003,7 @@ enum ovs_action_attr {
- =09OVS_ACTION_ATTR_CHECK_PKT_LEN, /* Nested OVS_CHECK_PKT_LEN_ATTR_*. */
- =09OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
- =09OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
-+=09OVS_ACTION_ATTR_DROP,         /* u32 xlate_error. */
-=20
- =09__OVS_ACTION_ATTR_MAX,=09      /* Nothing past this will be accepted
- =09=09=09=09       * from userspace. */
-diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-index cab1e02b63e0..4ad9a45dc042 100644
---- a/net/openvswitch/actions.c
-+++ b/net/openvswitch/actions.c
-@@ -32,6 +32,7 @@
- #include "vport.h"
- #include "flow_netlink.h"
- #include "openvswitch_trace.h"
-+#include "drop.h"
-=20
- struct deferred_action {
- =09struct sk_buff *skb;
-@@ -1477,6 +1478,18 @@ static int do_execute_actions(struct datapath *dp, s=
-truct sk_buff *skb,
- =09=09=09=09return dec_ttl_exception_handler(dp, skb,
- =09=09=09=09=09=09=09=09 key, a);
- =09=09=09break;
-+
-+=09=09case OVS_ACTION_ATTR_DROP:
-+=09=09=09u32 reason =3D nla_get_u32(a);
-+
-+=09=09=09reason |=3D SKB_DROP_REASON_SUBSYS_OPENVSWITCH <<
-+=09=09=09=09=09SKB_DROP_REASON_SUBSYS_SHIFT;
-+
-+=09=09=09if (reason =3D=3D OVS_XLATE_OK)
-+=09=09=09=09break;
-+
-+=09=09=09kfree_skb_reason(skb, reason);
-+=09=09=09return 0;
- =09=09}
-=20
- =09=09if (unlikely(err)) {
-diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.=
-c
-index 41116361433d..23d39eae9a0d 100644
---- a/net/openvswitch/flow_netlink.c
-+++ b/net/openvswitch/flow_netlink.c
-@@ -39,6 +39,7 @@
- #include <net/erspan.h>
-=20
- #include "flow_netlink.h"
-+#include "drop.h"
-=20
- struct ovs_len_tbl {
- =09int len;
-@@ -61,6 +62,7 @@ static bool actions_may_change_flow(const struct nlattr *=
-actions)
- =09=09case OVS_ACTION_ATTR_RECIRC:
- =09=09case OVS_ACTION_ATTR_TRUNC:
- =09=09case OVS_ACTION_ATTR_USERSPACE:
-+=09=09case OVS_ACTION_ATTR_DROP:
- =09=09=09break;
-=20
- =09=09case OVS_ACTION_ATTR_CT:
-@@ -2394,7 +2396,7 @@ static void ovs_nla_free_nested_actions(const struct =
-nlattr *actions, int len)
- =09/* Whenever new actions are added, the need to update this
- =09 * function should be considered.
- =09 */
--=09BUILD_BUG_ON(OVS_ACTION_ATTR_MAX !=3D 23);
-+=09BUILD_BUG_ON(OVS_ACTION_ATTR_MAX !=3D 24);
-=20
- =09if (!actions)
- =09=09return;
-@@ -3182,6 +3184,7 @@ static int __ovs_nla_copy_actions(struct net *net, co=
-nst struct nlattr *attr,
- =09=09=09[OVS_ACTION_ATTR_CHECK_PKT_LEN] =3D (u32)-1,
- =09=09=09[OVS_ACTION_ATTR_ADD_MPLS] =3D sizeof(struct ovs_action_add_mpls)=
-,
- =09=09=09[OVS_ACTION_ATTR_DEC_TTL] =3D (u32)-1,
-+=09=09=09[OVS_ACTION_ATTR_DROP] =3D sizeof(u32),
- =09=09};
- =09=09const struct ovs_action_push_vlan *vlan;
- =09=09int type =3D nla_type(a);
-@@ -3453,6 +3456,13 @@ static int __ovs_nla_copy_actions(struct net *net, c=
-onst struct nlattr *attr,
- =09=09=09skip_copy =3D true;
- =09=09=09break;
-=20
-+=09=09case OVS_ACTION_ATTR_DROP:
-+=09=09=09if (nla_get_u32(a) >=3D
-+=09=09=09    u32_get_bits(OVS_XLATE_MAX,
-+=09=09=09=09=09 ~SKB_DROP_REASON_SUBSYS_MASK))
-+=09=09=09=09return -EINVAL;
-+=09=09=09break;
-+
- =09=09default:
- =09=09=09OVS_NLERR(log, "Unknown Action type %d", type);
- =09=09=09return -EINVAL;
-diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/t=
-esting/selftests/net/openvswitch/ovs-dpctl.py
-index 1c8b36bc15d4..526ebad7d514 100644
---- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-+++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-@@ -115,6 +115,7 @@ class ovsactions(nla):
-         ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
-         ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
-         ("OVS_ACTION_ATTR_DEC_TTL", "none"),
-+        ("OVS_ACTION_ATTR_DROP", "uint32"),
-     )
-=20
-     class ctact(nla):
-@@ -261,6 +262,8 @@ class ovsactions(nla):
-                     print_str +=3D "recirc(0x%x)" % int(self.get_attr(fiel=
-d[0]))
-                 elif field[0] =3D=3D "OVS_ACTION_ATTR_TRUNC":
-                     print_str +=3D "trunc(%d)" % int(self.get_attr(field[0=
-]))
-+                elif field[0] =3D=3D "OVS_ACTION_ATTR_DROP":
-+                    print_str +=3D "drop"
-             elif field[1] =3D=3D "flag":
-                 if field[0] =3D=3D "OVS_ACTION_ATTR_CT_CLEAR":
-                     print_str +=3D "ct_clear"
---=20
-2.39.0
+> +The page_pool allocator is optimized for recycling pages or page frags used by skb
+> +packets or xdp frames.
 
+Now that I have written them, I prefer the latter one (plural). FWIW.
+
+>  
+> -Basic use involves replacing alloc_pages() calls with the
+> -page_pool_alloc_pages() call.  Drivers should use page_pool_dev_alloc_pages()
+> -replacing dev_alloc_pages().
+> +Basic use involves replacing napi_alloc_frag() and alloc_pages() calls with
+> +page_pool_cache_alloc() and page_pool_alloc(), which allocate memory with or
+> +without page splitting depending on the requested memory size.
+> +
+> +If the driver knows that it always requires full pages or its allocates are
+
+                                                                 allocations are
+
+> +always smaller than half a page, it can use one of the more specific API calls:
+> +
+> +1. page_pool_alloc_pages(): allocate memory without page splitting when driver
+> +   knows that the memory it need is always bigger than half of the page
+> +   allocated from page pool. There is no cache line dirtying for 'struct page'
+> +   when a page is recycled back to the page pool.
+> +
+> +2. page_pool_alloc_frag(): allocate memory with page splitting when driver knows
+> +   that the memory it need is always smaller than or equal to half of the page
+> +   allocated from page pool. Page splitting enables memory saving and thus avoid
+
+                                                                     and thus avoids
+
+> +   TLB/cache miss for data access, but there also is some cost to implement page
+> +   splitting, mainly some cache line dirtying/bouncing for 'struct page' and
+> +   atomic operation for page->pp_frag_count.
+>  
+>  API keeps track of in-flight pages, in order to let API user know
+>  when it is safe to free a page_pool object.  Thus, API users
+> @@ -93,6 +108,15 @@ a page will cause no race conditions is enough.
+>  * page_pool_dev_alloc_pages(): Get a page from the page allocator or page_pool
+>    caches.
+>  
+> +* page_pool_dev_alloc_frag(): Get a page frag from the page allocator or
+> +  page_pool caches.
+> +
+> +* page_pool_dev_alloc(): Get a page or page frag from the page allocator or
+> +  page_pool caches.
+> +
+> +* page_pool_dev_cache_alloc(): Get a cache from the page allocator or page_pool
+> +  caches.
+> +
+>  * page_pool_get_dma_addr(): Retrieve the stored DMA address.
+>  
+>  * page_pool_get_dma_dir(): Retrieve the stored DMA direction.
+
+Thanks for adding the documentation.
+
+-- 
+~Randy
 
