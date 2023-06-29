@@ -1,231 +1,179 @@
-Return-Path: <netdev+bounces-14489-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14490-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8A050741EE8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:52:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D0AF9741EED
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 05:54:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 40558280CFE
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:52:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C93B1C204E8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:54:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 352B51FD0;
-	Thu, 29 Jun 2023 03:52:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EC52D1FD7;
+	Thu, 29 Jun 2023 03:54:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F1DA1FB9;
-	Thu, 29 Jun 2023 03:52:27 +0000 (UTC)
-Received: from mail-lf1-x129.google.com (mail-lf1-x129.google.com [IPv6:2a00:1450:4864:20::129])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2F06D297C;
-	Wed, 28 Jun 2023 20:52:26 -0700 (PDT)
-Received: by mail-lf1-x129.google.com with SMTP id 2adb3069b0e04-4fb77f21c63so347121e87.2;
-        Wed, 28 Jun 2023 20:52:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE6811FB9
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:54:02 +0000 (UTC)
+Received: from mail-pf1-x42e.google.com (mail-pf1-x42e.google.com [IPv6:2607:f8b0:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 561BE2D7B
+	for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:54:00 -0700 (PDT)
+Received: by mail-pf1-x42e.google.com with SMTP id d2e1a72fcca58-666ecf9a081so236887b3a.2
+        for <netdev@vger.kernel.org>; Wed, 28 Jun 2023 20:54:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688010744; x=1690602744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=G/mShnN9MUl1H+Uj5ppePaa4sMACmwUz9u37+BJFKZE=;
-        b=BVEN9r7qrjVLVv6PkvHynYjAu6Rjd6ivk1td+rcqFxtYPiFqgHpDVeUxPVXNorBeSb
-         WvG5QrrjFJmYfqLE+coobGParakanK7ubUkKygoomHbksDcn9TPUlxtOyqoFF2i6xRtL
-         wqeabKDvK/TI+ADiNqHg9jWm8Yvimae2yNxWaziwSXsd9lUJlAAD4V7sDigJRglpctL3
-         gQu4Ws31EET/KAFLc2lgKaTO64KRySyYNjqTU54K6+xfdI3yY5FhukB43BG0Pdd227Tr
-         QsOUmIIq2cXDEM+yxnA2UgXg0+MgInEApDd0EB5o/xjdQzrSWlDGxdHiWWCwLGrbOV6w
-         lNvg==
+        d=chromium.org; s=google; t=1688010840; x=1690602840;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=PgRCWuAL+JILQAuJVgnpzN1VGDR5+ycwundGmuPsvAc=;
+        b=Zp7/05od1Hzmg3DamsY4xVwfn6tMykIurlQXX5Rz4Xuof4ze/XQSv561GpHeqSpoKh
+         2v+EzzaIXKRz/2+ZwPdbePYm00aj+7lpLYrNJ4hAYEhBfPYw1efyvEasC85ra7aPmZY2
+         HvVIPX6DZQ3ldkpxDKKby+eFfCylabLuTSQA0=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688010744; x=1690602744;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=G/mShnN9MUl1H+Uj5ppePaa4sMACmwUz9u37+BJFKZE=;
-        b=A0TIiNPBNm7YOAFdDrqtGr2tt/fgYQ+hyB+NThgTg2Su6O4PcVJkkKS9BCVqOuTGRh
-         btV36/dV5Zoiz5hCRtHWo4eVX3PachnaC8sVYMySWxx7wg28cvxsgmRtFiZpjkUHybIs
-         dW6eZKc4bj1+AVIzn4DsPJQ9EECdmZgaXZQT8HLXQwdmfJlRDpwfUXWu3cpi1O3n+8yp
-         kaH9QNdOhw0N75ruMxMmpxEbn1cfyjZoRo/IUKKcU3Kg71dXqn7QSEodWvAVUYdx/+JN
-         gihUpMntuTwfRZfzUwTsL4zHj5tk+Ek2li6ER7DFXjCOxtm3pEN6Wf9WIWcQXKealZsK
-         6CYA==
-X-Gm-Message-State: AC+VfDx0lt4nDMpDyCt1mYkAdQyDVEqx1a5nYjfHIxY2GBjeN+RMwK40
-	uLDfzMSZUQobDg2YodZe7HtCtEjmdbY1ujVIkHY=
-X-Google-Smtp-Source: ACHHUZ4k+FMX1pP2TTmE1EQ6BD+dsv0O4YCLc/H6iUPCtg1z5Tm4nCtOkeTgKJYpXHPT/qdL5j9P/vLchyo7pE+Smyk=
-X-Received: by 2002:a05:6512:3d06:b0:4fb:7be5:8f4e with SMTP id
- d6-20020a0565123d0600b004fb7be58f4emr8145248lfv.6.1688010744064; Wed, 28 Jun
- 2023 20:52:24 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688010840; x=1690602840;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=PgRCWuAL+JILQAuJVgnpzN1VGDR5+ycwundGmuPsvAc=;
+        b=OXfkRUWV3twp0OR+x4Edaawv77H7aklA7J+YDCNgYUxhINMyDvB0jz81+H3wRZUJZ5
+         x7ZlpP0DG3XTooMRxLLSgXAtSDrMWDUHZ9bUQponUy9Eo0WbON13EP0Zc/c+V+MCvP1W
+         8FHjXDJiIeVd69aRwUgpczNzjF2Py09vH+8QMT1/7e8i0q0Iix8V+USug8Pt1XK0xLKb
+         PI4E44TsdE5mWaKpddfJe2rpNYFRh1aT8Iarlt212DmpRCuSAFB+hZEO+8RtnDrrr7a0
+         qte9Gkqf1aabSWhoeTO3K4mSeYAlU/IHoi1rGjOh1f+ldEpEMs5Xp6GuDWKGOehu8Zfv
+         uzrg==
+X-Gm-Message-State: AC+VfDwduqRKvDqP7jKSUW/Zd5Inj44a9wzrmyvkfc+0094YAAIzN7x3
+	tFijgfGl+ZuoykUaefztx0bPSQ==
+X-Google-Smtp-Source: ACHHUZ6y8ticW17Bm2FXqsOoVj+oMchk8icLpia+Wu94tK8W+NMrPIcN6NkM7fNXF21kuk4TIlr51g==
+X-Received: by 2002:a05:6a20:1605:b0:115:83f:fce1 with SMTP id l5-20020a056a20160500b00115083ffce1mr48159642pzj.5.1688010839715;
+        Wed, 28 Jun 2023 20:53:59 -0700 (PDT)
+Received: from kuabhs-cdev.c.googlers.com.com (242.67.247.35.bc.googleusercontent.com. [35.247.67.242])
+        by smtp.gmail.com with ESMTPSA id r19-20020a634413000000b005579f12a238sm7019842pga.86.2023.06.28.20.53.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 28 Jun 2023 20:53:59 -0700 (PDT)
+From: Abhishek Kumar <kuabhs@chromium.org>
+To: johannes.berg@intel.com,
+	kvalo@kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	kuabhs@chromium.org,
+	netdev@vger.kernel.org,
+	ath10k@lists.infradead.org,
+	linux-wireless@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Johannes Berg <johannes@sipsolutions.net>,
+	Paolo Abeni <pabeni@redhat.com>
+Subject: [PATCH 1/2] wifi: cfg80211: call reg_call_notifier on beacon hints
+Date: Thu, 29 Jun 2023 03:52:54 +0000
+Message-ID: <20230629035254.1.I059fe585f9f9e896c2d51028ef804d197c8c009e@changeid>
+X-Mailer: git-send-email 2.41.0.162.gfafddb0af9-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628015634.33193-1-alexei.starovoitov@gmail.com>
- <20230628015634.33193-13-alexei.starovoitov@gmail.com> <6f8e0e91-44b4-4d0e-8df3-c1e765653255@paulmck-laptop>
-In-Reply-To: <6f8e0e91-44b4-4d0e-8df3-c1e765653255@paulmck-laptop>
-From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Date: Wed, 28 Jun 2023 20:52:12 -0700
-Message-ID: <CAADnVQJq+NA0denwyr56jYz73n5BnkKF_GtY0zpwqsSvCrGs6Q@mail.gmail.com>
-Subject: Re: [PATCH v3 bpf-next 12/13] bpf: Introduce bpf_mem_free_rcu()
- similar to kfree_rcu().
-To: "Paul E. McKenney" <paulmck@kernel.org>
-Cc: Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, 
-	David Vernet <void@manifault.com>, Hou Tao <houtao@huaweicloud.com>, Tejun Heo <tj@kernel.org>, 
-	rcu@vger.kernel.org, Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Kernel Team <kernel-team@fb.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 28, 2023 at 10:57=E2=80=AFAM Paul E. McKenney <paulmck@kernel.o=
-rg> wrote:
->
-> On Tue, Jun 27, 2023 at 06:56:33PM -0700, Alexei Starovoitov wrote:
-> > From: Alexei Starovoitov <ast@kernel.org>
-> >
-> > Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
-> > Unlike bpf_mem_[cache_]free() that links objects for immediate reuse in=
-to
-> > per-cpu free list the _rcu() flavor waits for RCU grace period and then=
- moves
-> > objects into free_by_rcu_ttrace list where they are waiting for RCU
-> > task trace grace period to be freed into slab.
-> >
-> > The life cycle of objects:
-> > alloc: dequeue free_llist
-> > free: enqeueu free_llist
-> > free_rcu: enqueue free_by_rcu -> waiting_for_gp
-> > free_llist above high watermark -> free_by_rcu_ttrace
-> > after RCU GP waiting_for_gp -> free_by_rcu_ttrace
-> > free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
-> >
-> > Signed-off-by: Alexei Starovoitov <ast@kernel.org>
-> > ---
-> >  include/linux/bpf_mem_alloc.h |   2 +
-> >  kernel/bpf/memalloc.c         | 129 +++++++++++++++++++++++++++++++++-
-> >  2 files changed, 128 insertions(+), 3 deletions(-)
-> >
-> > diff --git a/include/linux/bpf_mem_alloc.h b/include/linux/bpf_mem_allo=
-c.h
-> > index 3929be5743f4..d644bbb298af 100644
-> > --- a/include/linux/bpf_mem_alloc.h
-> > +++ b/include/linux/bpf_mem_alloc.h
-> > @@ -27,10 +27,12 @@ void bpf_mem_alloc_destroy(struct bpf_mem_alloc *ma=
-);
-> >  /* kmalloc/kfree equivalent: */
-> >  void *bpf_mem_alloc(struct bpf_mem_alloc *ma, size_t size);
-> >  void bpf_mem_free(struct bpf_mem_alloc *ma, void *ptr);
-> > +void bpf_mem_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
-> >
-> >  /* kmem_cache_alloc/free equivalent: */
-> >  void *bpf_mem_cache_alloc(struct bpf_mem_alloc *ma);
-> >  void bpf_mem_cache_free(struct bpf_mem_alloc *ma, void *ptr);
-> > +void bpf_mem_cache_free_rcu(struct bpf_mem_alloc *ma, void *ptr);
-> >  void bpf_mem_cache_raw_free(void *ptr);
-> >  void *bpf_mem_cache_alloc_flags(struct bpf_mem_alloc *ma, gfp_t flags)=
-;
-> >
-> > diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
-> > index 40524d9454c7..3081d06a434c 100644
-> > --- a/kernel/bpf/memalloc.c
-> > +++ b/kernel/bpf/memalloc.c
-> > @@ -101,6 +101,15 @@ struct bpf_mem_cache {
-> >       bool draining;
-> >       struct bpf_mem_cache *tgt;
-> >
-> > +     /* list of objects to be freed after RCU GP */
-> > +     struct llist_head free_by_rcu;
-> > +     struct llist_node *free_by_rcu_tail;
-> > +     struct llist_head waiting_for_gp;
-> > +     struct llist_node *waiting_for_gp_tail;
-> > +     struct rcu_head rcu;
-> > +     atomic_t call_rcu_in_progress;
-> > +     struct llist_head free_llist_extra_rcu;
-> > +
-> >       /* list of objects to be freed after RCU tasks trace GP */
-> >       struct llist_head free_by_rcu_ttrace;
-> >       struct llist_head waiting_for_gp_ttrace;
-> > @@ -344,6 +353,69 @@ static void free_bulk(struct bpf_mem_cache *c)
-> >       do_call_rcu_ttrace(tgt);
-> >  }
-> >
-> > +static void __free_by_rcu(struct rcu_head *head)
-> > +{
-> > +     struct bpf_mem_cache *c =3D container_of(head, struct bpf_mem_cac=
-he, rcu);
-> > +     struct bpf_mem_cache *tgt =3D c->tgt;
-> > +     struct llist_node *llnode;
-> > +
-> > +     llnode =3D llist_del_all(&c->waiting_for_gp);
-> > +     if (!llnode)
-> > +             goto out;
-> > +
-> > +     llist_add_batch(llnode, c->waiting_for_gp_tail, &tgt->free_by_rcu=
-_ttrace);
-> > +
-> > +     /* Objects went through regular RCU GP. Send them to RCU tasks tr=
-ace */
-> > +     do_call_rcu_ttrace(tgt);
-> > +out:
-> > +     atomic_set(&c->call_rcu_in_progress, 0);
-> > +}
-> > +
-> > +static void check_free_by_rcu(struct bpf_mem_cache *c)
-> > +{
-> > +     struct llist_node *llnode, *t;
-> > +     unsigned long flags;
-> > +
-> > +     /* drain free_llist_extra_rcu */
-> > +     if (unlikely(!llist_empty(&c->free_llist_extra_rcu))) {
-> > +             inc_active(c, &flags);
-> > +             llist_for_each_safe(llnode, t, llist_del_all(&c->free_lli=
-st_extra_rcu))
-> > +                     if (__llist_add(llnode, &c->free_by_rcu))
-> > +                             c->free_by_rcu_tail =3D llnode;
-> > +             dec_active(c, flags);
-> > +     }
-> > +
-> > +     if (llist_empty(&c->free_by_rcu))
-> > +             return;
-> > +
-> > +     if (atomic_xchg(&c->call_rcu_in_progress, 1)) {
-> > +             /*
-> > +              * Instead of kmalloc-ing new rcu_head and triggering 10k
-> > +              * call_rcu() to hit rcutree.qhimark and force RCU to not=
-ice
-> > +              * the overload just ask RCU to hurry up. There could be =
-many
-> > +              * objects in free_by_rcu list.
-> > +              * This hint reduces memory consumption for an artifical
-> > +              * benchmark from 2 Gbyte to 150 Mbyte.
-> > +              */
-> > +             rcu_request_urgent_qs_task(current);
->
-> I have been going back and forth on whether rcu_request_urgent_qs_task()
-> needs to throttle calls to itself, for example, to pay attention to only
-> one invocation per jiffy.  The theory here is that RCU's state machine
-> normally only advances about once per jiffy anyway.
->
-> The main risk of *not* throttling is if several CPUs were to invoke
-> rcu_request_urgent_qs_task() in tight loops while those same CPUs were
-> undergoing interrupt storms, which would result in heavy lock contention
-> in __rcu_irq_enter_check_tick().  This is not exactly a common-case
-> scenario, but on the other hand, if you are having this degree of trouble=
-,
-> should RCU really be adding lock contention to your troubles?
+Currently the channel property updates are not propagated to
+driver. This causes issues in the discovery of hidden SSIDs and
+fails to connect to them.
+This change defines a new wiphy flag which when enabled by vendor
+driver, the reg_call_notifier callback will be trigger on beacon
+hints. This ensures that the channel property changes are visible
+to the vendor driver. The vendor changes the channels for active
+scans. This fixes the discovery issue of hidden SSID.
 
-I see spin_lock in __rcu_irq_enter_check_tick(), but I didn't observe
-it in practice even when I was calling rcu_request_urgent_qs_task()
-in multiple places through bpf_mem_alloc.
-I left it only in one place (this patch),
-because it was enough to 'hurry up the RCU' and make the difference.
-rdp =3D this_cpu_ptr(&rcu_data); is percpu, so I'm not sure why
-you think that the contention is possible.
-I think we should avoid extra logic either in RCU or in bpf_mem_alloc
-to keep the code simple, since contention is hypothetical at this point.
-I've tried preempt and no preempt configs. With and without debug.
+Signed-off-by: Abhishek Kumar <kuabhs@chromium.org>
+---
+
+ include/net/cfg80211.h |  3 +++
+ net/wireless/reg.c     | 20 ++++++++++++--------
+ 2 files changed, 15 insertions(+), 8 deletions(-)
+
+diff --git a/include/net/cfg80211.h b/include/net/cfg80211.h
+index 9e04f69712b1..48e6ebcdacb3 100644
+--- a/include/net/cfg80211.h
++++ b/include/net/cfg80211.h
+@@ -4783,6 +4783,8 @@ struct cfg80211_ops {
+  * @WIPHY_FLAG_SUPPORTS_EXT_KCK_32: The device supports 32-byte KCK keys.
+  * @WIPHY_FLAG_NOTIFY_REGDOM_BY_DRIVER: The device could handle reg notify for
+  *	NL80211_REGDOM_SET_BY_DRIVER.
++ * @WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON: reg_call_notifier() is called if driver
++ *	set this flag to update channels on beacon hints.
+  */
+ enum wiphy_flags {
+ 	WIPHY_FLAG_SUPPORTS_EXT_KEK_KCK		= BIT(0),
+@@ -4809,6 +4811,7 @@ enum wiphy_flags {
+ 	WIPHY_FLAG_SUPPORTS_5_10_MHZ		= BIT(22),
+ 	WIPHY_FLAG_HAS_CHANNEL_SWITCH		= BIT(23),
+ 	WIPHY_FLAG_NOTIFY_REGDOM_BY_DRIVER	= BIT(24),
++	WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON     = BIT(25),
+ };
+ 
+ /**
+diff --git a/net/wireless/reg.c b/net/wireless/reg.c
+index 26f11e4746c0..c76bfaad650b 100644
+--- a/net/wireless/reg.c
++++ b/net/wireless/reg.c
+@@ -2149,6 +2149,13 @@ static bool reg_is_world_roaming(struct wiphy *wiphy)
+ 	return false;
+ }
+ 
++static void reg_call_notifier(struct wiphy *wiphy,
++			      struct regulatory_request *request)
++{
++	if (wiphy->reg_notifier)
++		wiphy->reg_notifier(wiphy, request);
++}
++
+ static void handle_reg_beacon(struct wiphy *wiphy, unsigned int chan_idx,
+ 			      struct reg_beacon *reg_beacon)
+ {
+@@ -2156,6 +2163,7 @@ static void handle_reg_beacon(struct wiphy *wiphy, unsigned int chan_idx,
+ 	struct ieee80211_channel *chan;
+ 	bool channel_changed = false;
+ 	struct ieee80211_channel chan_before;
++	struct regulatory_request *lr = get_last_request();
+ 
+ 	sband = wiphy->bands[reg_beacon->chan.band];
+ 	chan = &sband->channels[chan_idx];
+@@ -2181,8 +2189,11 @@ static void handle_reg_beacon(struct wiphy *wiphy, unsigned int chan_idx,
+ 		channel_changed = true;
+ 	}
+ 
+-	if (channel_changed)
++	if (channel_changed) {
+ 		nl80211_send_beacon_hint_event(wiphy, &chan_before, chan);
++		if (wiphy->flags & WIPHY_FLAG_CHANNEL_CHANGE_ON_BEACON)
++			reg_call_notifier(wiphy, lr);
++	}
+ }
+ 
+ /*
+@@ -2325,13 +2336,6 @@ static void reg_process_ht_flags(struct wiphy *wiphy)
+ 		reg_process_ht_flags_band(wiphy, wiphy->bands[band]);
+ }
+ 
+-static void reg_call_notifier(struct wiphy *wiphy,
+-			      struct regulatory_request *request)
+-{
+-	if (wiphy->reg_notifier)
+-		wiphy->reg_notifier(wiphy, request);
+-}
+-
+ static bool reg_wdev_chan_valid(struct wiphy *wiphy, struct wireless_dev *wdev)
+ {
+ 	struct cfg80211_chan_def chandef = {};
+-- 
+2.41.0.162.gfafddb0af9-goog
+
 
