@@ -1,65 +1,73 @@
-Return-Path: <netdev+bounces-14562-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14561-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3A8E742698
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:36:56 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 667E0742688
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:36:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2E7D01C209FB
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:36:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 972001C20AC0
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:36:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F37AC2572;
-	Thu, 29 Jun 2023 12:36:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF74A23C1;
+	Thu, 29 Jun 2023 12:36:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E6504256E
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:36:53 +0000 (UTC)
-Received: from mga11.intel.com (mga11.intel.com [192.55.52.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 594652D50;
-	Thu, 29 Jun 2023 05:36:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688042212; x=1719578212;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Ew+sBiq1mrKtsMPMdcupe/wT5WsBH3u6CrMymQX01MM=;
-  b=Jf4HBrr5ph29FkY8RMHhKs3R+7oqafj/KgstfzShG7J05AV1o72bPfHK
-   Ko7lqXsLfUZH6CfpBA3byOJIIJcjB5QKxcjHehOCM6cNgIJceGr/hBoN/
-   LS1ijXGI05ASzHEjV96xVKcOz+txO4vHVr5qqO+1PJ3CtUVSPgDAprbT0
-   svLvHGIN8IDFdAmUFoxY/4YqUP70inSzCz/pMbVuOqSWsBXV1cZs1Tywl
-   bW5OanYBNV+OG3nzroWZ8Dw9caMpVR1TteG7OJ1IH4wCG1fruFzsiV9rV
-   YSPHfHO/+Opbd7ol4EL1UCNikU05ib0pNlIF7pJI5j/Zq7yTfR2Hjc0Bw
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="359580931"
-X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
-   d="scan'208";a="359580931"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by fmsmga102.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 05:36:29 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10755"; a="830515630"
-X-IronPort-AV: E=Sophos;i="6.01,168,1684825200"; 
-   d="scan'208";a="830515630"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by fmsmga002.fm.intel.com with ESMTP; 29 Jun 2023 05:36:26 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qEqsr-000E9V-2w;
-	Thu, 29 Jun 2023 12:36:25 +0000
-Date: Thu, 29 Jun 2023 20:35:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Sathesh Edara <sedara@marvell.com>, linux-kernel@vger.kernel.org,
-	sburla@marvell.com, vburru@marvell.com, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	netdev@vger.kernel.org, hgani@marvell.com
-Cc: oe-kbuild-all@lists.linux.dev, sedara@marvell.com
-Subject: Re: [net-next PATCH] octeon_ep: Add control plane host and firmware
- versions.
-Message-ID: <202306292050.kg5Y1BXr-lkp@intel.com>
-References: <20230629084227.98848-1-sedara@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B293E23A4
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:36:24 +0000 (UTC)
+Received: from mail-wr1-x42e.google.com (mail-wr1-x42e.google.com [IPv6:2a00:1450:4864:20::42e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 61C931719;
+	Thu, 29 Jun 2023 05:36:23 -0700 (PDT)
+Received: by mail-wr1-x42e.google.com with SMTP id ffacd0b85a97d-3141c3a7547so322438f8f.2;
+        Thu, 29 Jun 2023 05:36:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688042181; x=1690634181;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=lKUH0S0w28bkNr/phN4PL7GSXdBXwOj3huBewXtJjxg=;
+        b=aQD8uGeW4GkxU7IWOfw7meHAcgJJesTOtsGIHP1F7AASR09TA2urUiSX8KSYYpcB9j
+         UNW02WQUi1mcuwEx0hnhXrTMgmtQadAELc6X70xng7Nrtp59jAlyh2eUI4kIQ4eaDI0i
+         V1WSs2gaGqbFa/mAa8Dkt3fPzZZ6PXa0vIQDJPqm0txEHixwnDGtQ3YZpM1bYznjkGQo
+         LnBZj+hxyjZzakSy8ExRiC412XKVCgyXNa92GZGVOe+J2PkCIAibIh/D9AtWpWM6JgXy
+         kjp81eYEqKmzKlAK7l9nJNua0scmR8udqXzuevg+CzNx2es5e5EQxxp8ET7V7TaGl7zd
+         iB5w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688042181; x=1690634181;
+        h=user-agent:in-reply-to:content-disposition:mime-version:references
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=lKUH0S0w28bkNr/phN4PL7GSXdBXwOj3huBewXtJjxg=;
+        b=TYFZbtqP0IWyjENgPhdFzLJTWKzYk3iIbiTD9MfZGmjBZQ98WkFoOkmr+yLKmHRnQV
+         i7h9yCzBirfWmN4mUYHxmdwStuOH7wvV8g40Ees3pt96xEDM5oe+y2OvmViYT0D64flh
+         cmT44Ehh4swK167W6ZKyezSH5T9llQtPdkHEkKg44SVvL68vPBtT95qm+2wggw2Jj64S
+         NTbN5hnk1IUXmZuMLJUZR+S3pRDjkfINs16AV1qXmZxZEN0qIgq37ZfzpKSBmMqrC+Y0
+         lqhKUWPrIRMVlVTNutaPq0t15YanOr4KNbItN4WGa5pPY2sJkhgS/JZG3r61Ao62Wx71
+         ehng==
+X-Gm-Message-State: ABy/qLYzVbpUL6KOzYIFym4+odDMSgiuWNIgZEf6IjmLFwJMrgB2AYkk
+	oT3wUZ2L84qP1JPcyajImJg=
+X-Google-Smtp-Source: APBJJlEVdVpN/BISqZx6WTPbF3QoJThxqXl6TmdlcdBn4g3omb8ZT2ouZEvIaG3xzmoXlbGxTA5RTA==
+X-Received: by 2002:adf:fd4e:0:b0:314:1318:18b7 with SMTP id h14-20020adffd4e000000b00314131818b7mr1943643wrs.19.1688042180855;
+        Thu, 29 Jun 2023 05:36:20 -0700 (PDT)
+Received: from debian ([89.238.191.199])
+        by smtp.gmail.com with ESMTPSA id f2-20020a5d5682000000b00313ec7dd652sm12930949wrv.44.2023.06.29.05.36.12
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 05:36:20 -0700 (PDT)
+Date: Thu, 29 Jun 2023 14:36:02 +0200
+From: Richard Gobert <richardbgobert@gmail.com>
+To: Gal Pressman <gal@nvidia.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+	pabeni@redhat.com, aleksander.lobakin@intel.com,
+	lixiaoyan@google.com, lucien.xin@gmail.com, alexanderduyck@fb.com,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH v3 1/1] gro: decrease size of CB
+Message-ID: <20230629123559.GA12573@debian>
+References: <20230601160924.GA9194@debian>
+ <20230601161407.GA9253@debian>
+ <f83d79d6-f8d7-a229-941a-7d7427975160@nvidia.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,49 +76,47 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230629084227.98848-1-sedara@marvell.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+In-Reply-To: <f83d79d6-f8d7-a229-941a-7d7427975160@nvidia.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Sathesh,
+> On 01/06/2023 19:14, Richard Gobert wrote:
+> > The GRO control block (NAPI_GRO_CB) is currently at its maximum size.
+> > This commit reduces its size by putting two groups of fields that are
+> > used only at different times into a union.
+> > 
+> > Specifically, the fields frag0 and frag0_len are the fields that make up
+> > the frag0 optimisation mechanism, which is used during the initial
+> > parsing of the SKB.
+> > 
+> > The fields last and age are used after the initial parsing, while the
+> > SKB is stored in the GRO list, waiting for other packets to arrive.
+> > 
+> > There was one location in dev_gro_receive that modified the frag0 fields
+> > after setting last and age. I changed this accordingly without altering
+> > the code behaviour.
+> > 
+> > Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
+> 
+> Hello Richard,
+> 
+> I believe this commit broke gro over udp tunnels.
+> I'm running iperf tcp traffic over geneve interfaces and the bandwidth
+> is pretty much zero.
+> 
+> Turning off gro on the receiving side (or reverting this commit)
+> resolves the issue.
 
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Sathesh-Edara/octeon_ep-Add-control-plane-host-and-firmware-versions/20230629-164335
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230629084227.98848-1-sedara%40marvell.com
-patch subject: [net-next PATCH] octeon_ep: Add control plane host and firmware versions.
-config: alpha-allyesconfig (https://download.01.org/0day-ci/archive/20230629/202306292050.kg5Y1BXr-lkp@intel.com/config)
-compiler: alpha-linux-gcc (GCC) 12.3.0
-reproduce: (https://download.01.org/0day-ci/archive/20230629/202306292050.kg5Y1BXr-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306292050.kg5Y1BXr-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from drivers/net/ethernet/marvell/octeon_ep/octep_main.c:18:
->> drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h:10:10: fatal error: octep_cp_version.h: No such file or directory
-      10 | #include "octep_cp_version.h"
-         |          ^~~~~~~~~~~~~~~~~~~~
-   compilation terminated.
-
-
-vim +10 drivers/net/ethernet/marvell/octeon_ep/octep_ctrl_net.h
-
-     9	
-  > 10	#include "octep_cp_version.h"
-    11	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Sorry for the late response.
+I am starting to look into it right now. Can you please share more details about your setup?
+- I'd like to see the output of these commands:
+  ethtool -k
+  sysctl net
+- The iperf command
+- Your network topology
 
