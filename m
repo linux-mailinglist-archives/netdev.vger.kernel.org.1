@@ -1,96 +1,89 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14515-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id 3CD49742394
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:01:06 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S232117AbjF2KAq (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Thu, 29 Jun 2023 06:00:46 -0400
-Received: from linux.microsoft.com ([13.77.154.182]:42492 "EHLO
-        linux.microsoft.com" rhost-flags-OK-OK-OK-OK) by vger.kernel.org
-        with ESMTP id S231858AbjF2J6p (ORCPT
-        <rfc822;netdev@vger.kernel.org>); Thu, 29 Jun 2023 05:58:45 -0400
-Received: by linux.microsoft.com (Postfix, from userid 1134)
-        id F30CC208395B; Thu, 29 Jun 2023 02:58:43 -0700 (PDT)
-DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com F30CC208395B
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
-        s=default; t=1688032724;
-        bh=XGi0Xfbla6zy1W1JQmGRgBhHp8TXf7aa805AEzMwfpM=;
-        h=From:To:Cc:Subject:Date:From;
-        b=OqwpSIc2mI4wBBiJZzndArFVjfoCtY2cq4zL2esKlYkJPPdr1gh+dgYOWAiVO1jSD
-         0xibWswzVhybPzZhec0OUQmb8i/v+11mIBm6hnhSdcGP/ior5rW23WnoiNIYQ9nQkG
-         WIqgGFAZ7kam3SJpyRsX8DL5BCMRDquwmrliljw8=
-From:   Shradha Gupta <shradhagupta@linux.microsoft.com>
-To:     linux-kernel@vger.kernel.org, linux-hyperv@vger.kernel.org,
-        netdev@vger.kernel.org
-Cc:     Shradha Gupta <shradhagupta@linux.microsoft.com>,
-        Eric Dumazet <edumazet@google.com>,
-        Jakub Kicinski <kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "K. Y. Srinivasan" <kys@microsoft.com>,
-        Haiyang Zhang <haiyangz@microsoft.com>,
-        Wei Liu <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-        Long Li <longli@microsoft.com>,
-        Michael Kelley <mikelley@microsoft.com>,
-        "David S. Miller" <davem@davemloft.net>
-Subject: [PATCH] hv_netvsc: support a new host capability AllowRscDisabledStatus
-Date:   Thu, 29 Jun 2023 02:58:39 -0700
-Message-Id: <1688032719-22847-1-git-send-email-shradhagupta@linux.microsoft.com>
-X-Mailer: git-send-email 1.8.3.1
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2370D742391
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:00:27 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79989280CF1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:00:25 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9FD4CBA20;
+	Thu, 29 Jun 2023 10:00:23 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CA553FEA
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:00:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 5E0E1C433C9;
+	Thu, 29 Jun 2023 10:00:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688032821;
+	bh=6BSYODeXAvBc1bYzqyJYg+UUhE64/mpp9Tu40F5CwoU=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=oDHVOrr/5JM70o8y0DmxBWIVGGiaWWXfzS94TATG7gX18UJiEXtcnfnbjgS14itYd
+	 RjDupaiQALNLc4zEyV9ElOhba0fYXYHoDfJ8tZlsfgOg1DJaaeZZK48ThBknPuQxOc
+	 /7gEQdxojynYXj5ZWNDMbsuGzHRw6KBoX5a+8Wna1pZuuPXLPuKXxMndlqBCyoRav7
+	 mGuQVJGE6lMiPKEWQdF9qjiHgVRjXoivbJ/ASo3o5t76qKE40VFbLNBe5mw9QHMw4u
+	 5oN9H5Ihhy4pdzSmD/s49gZuNXWuInDrpEWATZHph7ul1/wK8ZNnhRUc3KEzn2s27h
+	 gp9+ZfzIrhcnA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 40A04C395D8;
+	Thu, 29 Jun 2023 10:00:21 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH] sctp: fix potential deadlock on &net->sctp.addr_wq_lock
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168803282125.4865.3870530612120862542.git-patchwork-notify@kernel.org>
+Date: Thu, 29 Jun 2023 10:00:21 +0000
+References: <20230627120340.19432-1-dg573847474@gmail.com>
+In-Reply-To: <20230627120340.19432-1-dg573847474@gmail.com>
+To: Chengfeng Ye <dg573847474@gmail.com>
+Cc: marcelo.leitner@gmail.com, lucien.xin@gmail.com, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ linux-sctp@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org
 
-A future Azure host update has the potential to change RSC behavior
-in the VMs. To avoid this invisble change, Vswitch will check the
-netvsc version of a VM before sending its RSC capabilities, and will
-always indicate that the host performs RSC if the VM doesn't have an
-updated netvsc driver regardless of the actual host RSC capabilities.
-Netvsc now advertises a new capability: AllowRscDisabledStatus
-The host will check for this capability before sending RSC status,
-and if a VM does not have this capability it will send RSC enabled
-status regardless of host RSC settings
+Hello:
 
-Signed-off-by: Shradha Gupta <shradhagupta@linux.microsoft.com>
----
- drivers/net/hyperv/hyperv_net.h | 3 +++
- drivers/net/hyperv/netvsc.c     | 8 ++++++++
- 2 files changed, 11 insertions(+)
+This patch was applied to netdev/net.git (main)
+by Paolo Abeni <pabeni@redhat.com>:
 
-diff --git a/drivers/net/hyperv/hyperv_net.h b/drivers/net/hyperv/hyperv_net.h
-index dd5919ec408b..218e0f31dd66 100644
---- a/drivers/net/hyperv/hyperv_net.h
-+++ b/drivers/net/hyperv/hyperv_net.h
-@@ -572,6 +572,9 @@ struct nvsp_2_vsc_capability {
- 			u64 teaming:1;
- 			u64 vsubnetid:1;
- 			u64 rsc:1;
-+			u64 timestamp:1;
-+			u64 reliablecorrelationid:1;
-+			u64 allowrscdisabledstatus:1;
- 		};
- 	};
- } __packed;
-diff --git a/drivers/net/hyperv/netvsc.c b/drivers/net/hyperv/netvsc.c
-index da737d959e81..2eb1e85ba940 100644
---- a/drivers/net/hyperv/netvsc.c
-+++ b/drivers/net/hyperv/netvsc.c
-@@ -619,6 +619,14 @@ static int negotiate_nvsp_ver(struct hv_device *device,
- 	init_packet->msg.v2_msg.send_ndis_config.mtu = ndev->mtu + ETH_HLEN;
- 	init_packet->msg.v2_msg.send_ndis_config.capability.ieee8021q = 1;
- 
-+	/* Don't need a version check while setting this bit because if we
-+	 * have a New VM on an old host, the VM will set the bit but the host
-+	 * won't check it. If we have an old VM on a new host, the host will
-+	 * check the bit, see its zero, and it'll know the VM has an
-+	 * older NetVsc
-+	 */
-+	init_packet->msg.v2_msg.send_ndis_config.capability.allowrscdisabledstatus = 1;
-+
- 	if (nvsp_ver >= NVSP_PROTOCOL_VERSION_5) {
- 		if (hv_is_isolation_supported())
- 			netdev_info(ndev, "SR-IOV not advertised by guests on the host supporting isolation\n");
+On Tue, 27 Jun 2023 12:03:40 +0000 you wrote:
+> As &net->sctp.addr_wq_lock is also acquired by the timer
+> sctp_addr_wq_timeout_handler() in protocal.c, the same lock acquisition
+> at sctp_auto_asconf_init() seems should disable irq since it is called
+> from sctp_accept() under process context.
+> 
+> Possible deadlock scenario:
+> sctp_accept()
+>     -> sctp_sock_migrate()
+>     -> sctp_auto_asconf_init()
+>     -> spin_lock(&net->sctp.addr_wq_lock)
+>         <timer interrupt>
+>         -> sctp_addr_wq_timeout_handler()
+>         -> spin_lock_bh(&net->sctp.addr_wq_lock); (deadlock here)
+> 
+> [...]
+
+Here is the summary with links:
+  - sctp: fix potential deadlock on &net->sctp.addr_wq_lock
+    https://git.kernel.org/netdev/net/c/6feb37b3b06e
+
+You are awesome, thank you!
 -- 
-2.34.1
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
