@@ -1,90 +1,76 @@
-Return-Path: <netdev+bounces-14476-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 77216741E5F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 04:39:01 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 866BB741E67
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 04:40:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7E0E280D42
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 02:38:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C62F9280D30
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 02:40:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4E0010EB;
-	Thu, 29 Jun 2023 02:38:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 049CA10EB;
+	Thu, 29 Jun 2023 02:40:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9509110E9
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:38:56 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id BF7E5C433C8;
-	Thu, 29 Jun 2023 02:38:55 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688006336;
-	bh=ylwDwkKV9fMuVJB/d6A8dgc/Rg1OxojDlaLYI3RcT/w=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=pfUlPNCAN5NWRq4sjaXqNj6oL9y2TqZjsmvm1QfQVIqU1gcQvwa8FNjeZK5Ilxrze
-	 b6XebV441VAPaSOcawn5asWLedEhfcd44isiFiayl09qDM8n9UCwnLBHGS7BP2ztqi
-	 t+LC/Uzdh1LFdCXx5aAWwHo6OHAvbaZiVWAeGOoPAiBVTNqCsJr6iLhhWCXTgTckSi
-	 bwwgXPSNoKooMX4Bhzh6nIHy/6XbsP5uLsmhIGZWJdFhXix2UnB3b148ke7kaIwkKA
-	 WrAvhLMYBBtcJEe3OixC3pA46wqzXeBRaCqQP+cJREmBYDjZsFeg2f5zwLHcsNJZ0d
-	 ZPCLakfa20Vag==
-Date: Wed, 28 Jun 2023 19:38:54 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: Re: pull request: bluetooth-next 2023-06-27
-Message-ID: <20230628193854.6fabbf6d@kernel.org>
-In-Reply-To: <20230627191004.2586540-1-luiz.dentz@gmail.com>
-References: <20230627191004.2586540-1-luiz.dentz@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAEFC1842
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:40:18 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6E59268F;
+	Wed, 28 Jun 2023 19:40:16 -0700 (PDT)
+Received: from dggpeml500026.china.huawei.com (unknown [172.30.72.54])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Qs2hn1JlRzTlXQ;
+	Thu, 29 Jun 2023 10:39:21 +0800 (CST)
+Received: from huawei.com (10.175.101.6) by dggpeml500026.china.huawei.com
+ (7.185.36.106) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Thu, 29 Jun
+ 2023 10:40:13 +0800
+From: Zhengchao Shao <shaozhengchao@huawei.com>
+To: <netdev@vger.kernel.org>, <linux-rdma@vger.kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <richardcochran@gmail.com>
+CC: <saeedm@nvidia.com>, <leon@kernel.org>, <lkayal@nvidia.com>,
+	<tariqt@nvidia.com>, <gal@nvidia.com>, <rrameshbabu@nvidia.com>,
+	<vadfed@meta.com>, <ayal@nvidia.com>, <eranbe@nvidia.com>,
+	<weiyongjun1@huawei.com>, <yuehaibing@huawei.com>, <shaozhengchao@huawei.com>
+Subject: [PATCH net 0/2] fix two memory leak issues for mlx5en driver
+Date: Thu, 29 Jun 2023 10:46:40 +0800
+Message-ID: <20230629024642.2228767-1-shaozhengchao@huawei.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.101.6]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ dggpeml500026.china.huawei.com (7.185.36.106)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, 27 Jun 2023 12:10:04 -0700 Luiz Augusto von Dentz wrote:
-> bluetooth-next pull request for net-next:
-> 
->  - Add Reialtek devcoredump support
->  - Add support for device 6655:8771
->  - Add extended monitor tracking by address filter
->  - Add support for connecting multiple BISes
->  - Add support to reset via ACPI DSM for Intel controllers
->  - Add support for MT7922 used in Asus Ally
->  - Add support Mediatek MT7925
->  - Fixes for use-after-free in L2CAP
+Fix two memory leak issues for mlx5en driver:
+1. fix memory leak in mlx5e_fs_tt_redirect_any_create
+2. fix memory leak in mlx5e_ptp_open
 
-As you probably realized these came in a little late for our main pull
-request for this merge window. Can we cut this down a little bit?
-Stick to the fixes and changes which you have the most confidence in
-and try to keep the new lines under 1k LoC?
+Zhengchao Shao (2):
+  net/mlx5e: fix memory leak in mlx5e_fs_tt_redirect_any_create
+  net/mlx5e: fix memory leak in mlx5e_ptp_open
 
-I had a look thru and these changes look like stuff we can definitely
-pull:
+ drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c | 4 ++--
+ drivers/net/ethernet/mellanox/mlx5/core/en/ptp.c            | 6 ++++--
+ 2 files changed, 6 insertions(+), 4 deletions(-)
 
- a8d0b0440b7f ("Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations")
- 349cae7e8d84 ("Bluetooth: btusb: Add device 6655:8771 to device tables")
- afdbe6303877 ("Bluetooth: btqca: use le32_to_cpu for ver.soc_id")
- d1b10da77355 ("Bluetooth: L2CAP: Fix use-after-free")
- c1121a116d5f ("Bluetooth: fix invalid-bdaddr quirk for non-persistent setup")
- 2f8b38e5eba4 ("Bluetooth: fix use-bdaddr-property quirk")
- 317af9ba6fff ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb")
- a6cfe4261f5e ("Bluetooth: hci_bcm: do not mark valid bd_addr as invalid")
- 20b3370a6bfb ("Bluetooth: ISO: use hci_sync for setting CIG parameters")
- 29a3b409a3f2 ("Bluetooth: hci_event: fix Set CIG Parameters error status handling")
- 48d15256595b ("Bluetooth: MGMT: Fix marking SCAN_RSP as not connectable")
- f145eeb779c3 ("Bluetooth: ISO: Rework sync_interval to be sync_factor")
- 0d39e82e1a7b ("Bluetooth: hci_sysfs: make bt_class a static const structure")
- 8649851b1945 ("Bluetooth: hci_event: Fix parsing of CIS Established Event")
- 5b611951e075 ("Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally")
- 00b51ce9f603 ("Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + memcpy")
+-- 
+2.34.1
 
-You can throw in a few more things you think are important and are
-unlikely to cause regressions.
 
