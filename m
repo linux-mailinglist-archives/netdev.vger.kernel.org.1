@@ -1,165 +1,120 @@
-Return-Path: <netdev+bounces-14660-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev-owner@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3FEDC742D00
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:18:31 +0200 (CEST)
-Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 71CDF1C20B7E
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:18:30 +0000 (UTC)
-Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7B7A114AA2;
-	Thu, 29 Jun 2023 19:18:09 +0000 (UTC)
-X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
-	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
-	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6AD4914A83
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 19:18:08 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F3BF946B1
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:18:06 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688066286;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=YCceMk07Z77c7iGv0vMNdhiFvW89N91YRXanb/xg6cQ=;
-	b=dbw/GRy/ppvpcrIJA+UvpmnK6mnlb3nyXjJWy7e6uWDAFlLPO/XIM16tbm5SXUYXyFFOmn
-	TBBFNM4TzRt6BKcGc1ChNB/JAIdEvmp+rG2lX8wWDwo3+X2pl6hrSM5bhMRvGq6PYXOExJ
-	KPbx5OtuIfrADZPNfOSvF5hIjLIDYWw=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-18-rzJPCfB3Mg-n26HMTUwV8w-1; Thu, 29 Jun 2023 15:18:04 -0400
-X-MC-Unique: rzJPCfB3Mg-n26HMTUwV8w-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-57059f90cc5so8892807b3.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:18:04 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688066284; x=1690658284;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=YCceMk07Z77c7iGv0vMNdhiFvW89N91YRXanb/xg6cQ=;
-        b=l0AGLDpYtXW50X/2AmBeQLp7ec6d1AyZVGgIzw1FQDUQFU0hivR9focE43bBnAJEtT
-         f30kZM/N2GZb+K1Z/v6HzisXyYZtintP2hF7bSYnFlmbSMYY7Tuv2bXsTvV1IquDvnkR
-         YCQNmT2maVaCabdHZOvvYoMAcLJRq2H33RdWnQij2AdKlITgrNfr7FyK63KxCpVGySyI
-         ivWkZso+n42lTWP5cXYOuJOpD5dwKI+QoC8P7Q5G9QrhHJLUMsU1bN17xvC+qSu+zOJG
-         ux9B0bkzUdHWgTzBr0VwrIUkTBvjvKEQ/RoqRJAkiw74QnIkmGefT5my5izDkAlIbMcG
-         owHg==
-X-Gm-Message-State: ABy/qLb2WM3zBN/cgBbYFcanxO7H/p1DbZd2taETaPIGMGJDmx8w6wEe
-	H1giRNqzukgMhSb+YqxHlUK9zJOxDDTNAmangM91SAk3ptAruVrAch/TwNRx2YNARTfCDsKWdP0
-	lMPvYpohBjYUxJ7MO
-X-Received: by 2002:a81:88c7:0:b0:56d:43bd:5513 with SMTP id y190-20020a8188c7000000b0056d43bd5513mr352221ywf.5.1688066284373;
-        Thu, 29 Jun 2023 12:18:04 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGdHXzFMRozd6nGxf58W0Xv/QopKQ9WchA/okhijXMBtBl5YPN9hN+ACX/VQ9/Q0R3vF2Wxng==
-X-Received: by 2002:a81:88c7:0:b0:56d:43bd:5513 with SMTP id y190-20020a8188c7000000b0056d43bd5513mr352198ywf.5.1688066284148;
-        Thu, 29 Jun 2023 12:18:04 -0700 (PDT)
-Received: from halaney-x13s.redhat.com ([2600:1700:1ff0:d0e0::22])
-        by smtp.gmail.com with ESMTPSA id w127-20020a0ded85000000b0057085b18cddsm3052478ywe.54.2023.06.29.12.18.03
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 12:18:03 -0700 (PDT)
-From: Andrew Halaney <ahalaney@redhat.com>
-To: linux-kernel@vger.kernel.org
-Cc: linux-arm-kernel@lists.infradead.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	netdev@vger.kernel.org,
-	mcoquelin.stm32@gmail.com,
-	pabeni@redhat.com,
-	kuba@kernel.org,
-	edumazet@google.com,
-	davem@davemloft.net,
-	joabreu@synopsys.com,
-	alexandre.torgue@foss.st.com,
-	peppe.cavallaro@st.com,
-	bhupesh.sharma@linaro.org,
-	vkoul@kernel.org,
-	bartosz.golaszewski@linaro.org,
-	Andrew Halaney <ahalaney@redhat.com>
-Subject: [PATCH 3/3] net: stmmac: dwmac-qcom-ethqos: Log more errors in probe
-Date: Thu, 29 Jun 2023 14:14:18 -0500
-Message-ID: <20230629191725.1434142-3-ahalaney@redhat.com>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230629191725.1434142-1-ahalaney@redhat.com>
-References: <20230629191725.1434142-1-ahalaney@redhat.com>
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
+	by mail.lfdr.de (Postfix) with ESMTP id 4AB50742D96
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:33:03 +0200 (CEST)
+Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
+        id S231727AbjF2TWg (ORCPT <rfc822;lists+netdev@lfdr.de>);
+        Thu, 29 Jun 2023 15:22:36 -0400
+Received: from mail-co1nam11on2103.outbound.protection.outlook.com ([40.107.220.103]:51969
+        "EHLO NAM11-CO1-obe.outbound.protection.outlook.com"
+        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
+        id S231712AbjF2TWP (ORCPT <rfc822;netdev@vger.kernel.org>);
+        Thu, 29 Jun 2023 15:22:15 -0400
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=G1XI1sfeg7abdSypVyjK4bxopkCTMwVUlTh7JOiwcsSXI4Gi1XZJ4rTIwyD1mTOdwZUm+cH2GSobRaTVUxn/MgX6vr18mvQ7XASGgC2K88zm7Sk3x3g8qGKgfdCbLJl2+QaWPmJXfoDhYoiTNiK9/vLK18YV0cUf7iaVKyc4L4nH7A4jEYhGF0xsAqRXNJsQAb4amHxVO40WTDoOyzjS2lRin9gK8+xWPu31s3P6uBkFZV5WXKoD50jYE9oEAlwXIkRKLb3MLDziY7R5i9miNd9xRG5z0fPxuNa8BibyrcXePNUzAzHFUGmGIRFdzAGGpc5isIHow1AaXznNSX6spA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=8+4UHBJAoE7kuvnEIP9Z0BgeZtzKdHA94RPBZy7UUgY=;
+ b=ch6n24PRnKDCIEliR8HMjkWkkyknBdF0bCA3Rip8mXE5U0dVBy0/l9j4wBG13C5cz52tzWBCFEmw/Dv0v0hPL4tJRjuwitM3CS3n4VpAgY1BeImjOwHfRwjdMzSmaI2et03Gp7dSkHCi3/eC3frXnKfykULKVqm3yYn9lYSNVppDEdRLODmtQIW0GzsnJi80NSZ+PBxl0YDBQE4wBbgafYdgEMs5DQNFV1rJGXfeQ9S4icAFlzcNohuVpu8PRvMcQ3SGg5tt69FHTrjoJuSNmKHs24Tngu12TG/HuBYroC05uT4Jx5OkKlwlVLd3w1nrKPQlfg+4p6GRC+Ymyqd+2w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=8+4UHBJAoE7kuvnEIP9Z0BgeZtzKdHA94RPBZy7UUgY=;
+ b=YkPp6hvkoNqhNuJmJKGCN/WQ0yDEcJVnp+E8i8RLWWmlHkHIXd07gDcpo0RXBGeCO7J/5B3q0ZBbS1P2p6/WFX7q8nEExDUBksxY4MvYnkESwcCbq84uTQPF8iPd6k/nvImA9ZtzHf/REdUmDkpfENf9NnNsMxG1tgXXAT/ETgQ=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by BN0PR13MB5197.namprd13.prod.outlook.com (2603:10b6:408:154::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Thu, 29 Jun
+ 2023 19:22:12 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 29 Jun 2023
+ 19:22:12 +0000
+Date:   Thu, 29 Jun 2023 21:22:06 +0200
+From:   Simon Horman <simon.horman@corigine.com>
+To:     Eric Dumazet <edumazet@google.com>
+Cc:     "David S . Miller" <davem@davemloft.net>,
+        Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
+        eric.dumazet@gmail.com
+Subject: Re: [PATCH net] tcp: annotate data races in __tcp_oow_rate_limited()
+Message-ID: <ZJ3Z3jBp98dbFG3k@corigine.com>
+References: <20230629164150.2068747-1-edumazet@google.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230629164150.2068747-1-edumazet@google.com>
+X-ClientProxiedBy: AS4P250CA0019.EURP250.PROD.OUTLOOK.COM
+ (2603:10a6:20b:5e3::10) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 MIME-Version: 1.0
-Content-type: text/plain
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BN0PR13MB5197:EE_
+X-MS-Office365-Filtering-Correlation-Id: f806b0cb-b8ad-4ef0-d17c-08db78d62413
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 5leUU7xSZidnPDIP9yvCjgkL0sERW+6hSRk+lJZsOmk0V7yzJeEO7EJv0aGMvAg3tzleFr5yLiMuqO1zZKRWjiYCHy7py1YeCm3vwtb5P2Ua4KL7l0I0iIUKj4RxLgjh3pPkc14jvzI02k6U8KfmUZP29g+lw5SUjK2/SjlMuGB0HagYuBY5Mv/Av+qe3KvjiC6dGM3zh6eOLgdDChrWYlLnl5bg40ZLSgMmqMndOh2GKmFsdW//XPEYvxU4N04pViR1NOwgAx+H17TFwpp+nsG6xzh1lqLywbCRQ/1BRnr/I7UKNHnpyKRnAgGtzgSilvjyaqbIoCEDhenfmn8N5S1x2mU7NUkMWP5dNpD9jGomy8OEWLWXt+yB9MuCiSveTkNvS4dz8Wf4F3HElX3t0JQayUWMuHRNL+x23dohpEXpvrMRGRfatVMKzS00pPE32KEzHkYUbjlpgJ7bXCLOkv7kwkxGP6q3gqQZNkZRlFsg5fXoXZDlV+WE0AWAMzuHKDFwl9fOG/78x5fPyMoCUzRG6wwYYaVjpHUyXvqZ28bW1y8zjPoTcqYFZDZm4UYdvT01sDp0AZUC8d90oQBqAPDLEyAqgj9X/aQwyLVz5i4=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(376002)(136003)(346002)(39840400004)(451199021)(6486002)(6666004)(44832011)(8676002)(8936002)(478600001)(5660300002)(86362001)(41300700001)(316002)(4326008)(6916009)(54906003)(66946007)(66556008)(66476007)(2906002)(4744005)(186003)(26005)(6512007)(6506007)(2616005)(38100700002)(83380400001)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?Q79T2nNPb8euGn2j99iU7P8WhR7X5DWktKv940H2cXw10blEQr9RMNmoR1QP?=
+ =?us-ascii?Q?ipJj0yVsVfprD+P9jABtBZzp32xo0Z40qYVXyqcA7Di+CpFoHg5fg0tSHTCd?=
+ =?us-ascii?Q?qg3R1rZnSGnJp4u/XG1pZK572IfhvqK95sEqd8Utj2kOuG8rIXN4C3CWr4OR?=
+ =?us-ascii?Q?Z/woXkg15kRI8UKqq3DjdgkUxWqiYNB7MBDGix/2Tr8mgbhfIz/DpbXlzEgz?=
+ =?us-ascii?Q?gxp1xg/i2n6KXF1Udbh6bFupGjOxn7OIHuXzz1YOldu1d6X55GobzDXPx2Vk?=
+ =?us-ascii?Q?jX7C10VByW1SCQNIHnxRelYm3TLVSI+ZANZwTF/oqXn9zGFk5rGCVnhj+r2h?=
+ =?us-ascii?Q?fKBeqUNSgBdfu2OcqjqX3ZDHFzlewgOLSIXYmaOzgXKD1PdEopU1AQd9Nfk8?=
+ =?us-ascii?Q?i3zGF5PNSmYuUNVhZGxIv2znnGypgJVQsBAjhpOQU2xAsERuMlzg07Z91uad?=
+ =?us-ascii?Q?ysM14uoIcObWLQtyxNJac0StMcE99PJMH+LEDgBFyKohjKfeZpqSrJfWGAmH?=
+ =?us-ascii?Q?Ej5O/LhB5TB61xjb9+OFIqTcaeEa/FmjiNuLmP1TAIXWjfCVI0gzuaNifVFb?=
+ =?us-ascii?Q?Zqi9VqmT3yDatb41uVoytFUYDZqJJ6z5W4DUGhLGu/ymtl2L2gntvBBC8/TO?=
+ =?us-ascii?Q?oI1gsxhEzUTTbqqQ+p1TbELj8pbBbDHi6NjqcRCsDkUR5T/TXKa/iIXLmsSQ?=
+ =?us-ascii?Q?d/6y2jPfyiZf8J0y7z4u9KD5U6fA8neWPmQGWkMLURwCg+sznSStHrnC9nko?=
+ =?us-ascii?Q?3RDMoLnlJ84IeK/FX3i7ASvsvuYDAz9fAauX82+y34KvEvDFTx8JFZ6U8QJB?=
+ =?us-ascii?Q?r1cKNL9odjnsV2obS7s0mNJ3aoyNvwUOViR2GV2H5u51MKUa4qcL1J77J8QH?=
+ =?us-ascii?Q?61UAPXXUhwN9lpyW43YZIrj2LmvYiZoK4I/FBk+A5JFuK7E9zo5PBY812mSX?=
+ =?us-ascii?Q?LOH0i6r1nFa1y54MalLrlTzdXWiNY3fDVosQWGm8PEYBzHH+7fHfnmZdjOpl?=
+ =?us-ascii?Q?aL+ut+dpfzIaA9oezRZuwgIX3NH2DKmzCBMuxaj3V70fvMrRDj+HVOoLU5hj?=
+ =?us-ascii?Q?XwuCd5uxQB9OmWG4qkeNWR2w5jUFlOzoAiTz1PWgjRsRVIXwKPz1aE1mOLBw?=
+ =?us-ascii?Q?oRgRN9vKIIZO2QCc9QV6dcWyrj7XHA6nOeeaQlkMUvcamcB1MNXf1BLiAGGX?=
+ =?us-ascii?Q?0dlBGFDdGaX4NZTmMowJmImWbneNRWLiIfaUVNfvSCOpJ/HwquOjpBUiyG4A?=
+ =?us-ascii?Q?VJVSgZ/GHRS50MT89DIusOFHSM2prrpSza909xDanBq/serxG7Muq5lagWq5?=
+ =?us-ascii?Q?KA0zVoGphFT6vRJMx6KgwDLj58ivWsKBoyPMws8PmUqQAOEf2AhcmQBvS7LI?=
+ =?us-ascii?Q?Wc5PguC0k0Az+sG0Vy+8HeWks4AF9D8Y4Fqef0hj+zKuzfOXhIVsp5bpQ2qV?=
+ =?us-ascii?Q?A/EwUGhVcEtDF9Y624DQ46jvyASzRg5LgqkItSQ5cBctK0dtwS+MmloSCU1b?=
+ =?us-ascii?Q?k0s+NyKY42WEkVsLfy6dSIqJ4MWGE2ukVUwg1NmC5ESDRkAs/Lx9iSnBqrUV?=
+ =?us-ascii?Q?0XhjUQhcpm4t8hodj54euLWNQJUFsRxxHx462raAdCE7s9cHQXrO43vwQMh2?=
+ =?us-ascii?Q?cw=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: f806b0cb-b8ad-4ef0-d17c-08db78d62413
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2023 19:22:12.8008
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IjNEYUrl8PZrf8zEix4Cfx8SevgzNE9voUdiP2ojBOSCDylxOsPBJDLIQcVRLep9qDK5le1cC9Zrz4ypdFidajwyM4Wypr5Jh5kAbX+UKz0=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB5197
+Precedence: bulk
+List-ID: <netdev.vger.kernel.org>
+X-Mailing-List: netdev@vger.kernel.org
 
-These are useful to see when debugging a probe failure.
+On Thu, Jun 29, 2023 at 04:41:50PM +0000, Eric Dumazet wrote:
+> request sockets are lockless, __tcp_oow_rate_limited() could be called
+> on the same object from different cpus. This is harmless.
+> 
+> Add READ_ONCE()/WRITE_ONCE() annotations to avoid a KCSAN report.
+> 
+> Fixes: 4ce7e93cb3fe ("tcp: rate limit ACK sent by SYN_RECV request sockets")
+> Signed-off-by: Eric Dumazet <edumazet@google.com>
 
-Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
----
- .../ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c    | 14 ++++++++++----
- 1 file changed, 10 insertions(+), 4 deletions(-)
-
-diff --git a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-index a40869b2dd64..d792b7dd9fc3 100644
---- a/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-+++ b/drivers/net/ethernet/stmicro/stmmac/dwmac-qcom-ethqos.c
-@@ -706,7 +706,8 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 
- 	ret = stmmac_get_platform_resources(pdev, &stmmac_res);
- 	if (ret)
--		return ret;
-+		return dev_err_probe(dev, ret,
-+				     "Failed to get platform resources\n");
- 
- 	plat_dat = devm_stmmac_probe_config_dt(pdev, stmmac_res.mac);
- 	if (IS_ERR(plat_dat)) {
-@@ -735,13 +736,16 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 		ethqos->configure_func = ethqos_configure_sgmii;
- 		break;
- 	default:
-+		dev_err(dev, "Unsupported phy mode %s\n",
-+			phy_modes(ethqos->phy_mode));
- 		return -EINVAL;
- 	}
- 
- 	ethqos->pdev = pdev;
- 	ethqos->rgmii_base = devm_platform_ioremap_resource_byname(pdev, "rgmii");
- 	if (IS_ERR(ethqos->rgmii_base))
--		return PTR_ERR(ethqos->rgmii_base);
-+		return dev_err_probe(dev, PTR_ERR(ethqos->rgmii_base),
-+				     "Failed to map rgmii resource\n");
- 
- 	ethqos->mac_base = stmmac_res.addr;
- 
-@@ -753,7 +757,8 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 
- 	ethqos->link_clk = devm_clk_get(dev, data->link_clk_name ?: "rgmii");
- 	if (IS_ERR(ethqos->link_clk))
--		return PTR_ERR(ethqos->link_clk);
-+		return dev_err_probe(dev, PTR_ERR(ethqos->link_clk),
-+				     "Failed to get link_clk\n");
- 
- 	ret = ethqos_clks_config(ethqos, true);
- 	if (ret)
-@@ -765,7 +770,8 @@ static int qcom_ethqos_probe(struct platform_device *pdev)
- 
- 	ethqos->serdes_phy = devm_phy_optional_get(dev, "serdes");
- 	if (IS_ERR(ethqos->serdes_phy))
--		return PTR_ERR(ethqos->serdes_phy);
-+		return dev_err_probe(dev, PTR_ERR(ethqos->serdes_phy),
-+				     "Failed to get serdes phy\n");
- 
- 	ethqos->speed = SPEED_1000;
- 	ethqos_update_link_clk(ethqos, SPEED_1000);
--- 
-2.41.0
-
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
