@@ -1,395 +1,186 @@
-Return-Path: <netdev+bounces-14679-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14680-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EA40E7430CD
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 00:57:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id CA416743113
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 01:26:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B9FEF1C20B34
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 22:57:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D34051C20A97
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 23:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 47C2B101F0;
-	Thu, 29 Jun 2023 22:57:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8CFEC10784;
+	Thu, 29 Jun 2023 23:26:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2BA05101E4
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 22:57:06 +0000 (UTC)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 109FB1FD8
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 15:57:04 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688079425; x=1719615425;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=Sot15ZusZgl5Q8RuumvSgYebRWa3GISjcm0NGSMOPOs=;
-  b=EgDlEx75m6WiUZ9QUw8wO5jSUdI9RwPeDegZ9VcMFMJZGvTYL5XgThw6
-   V/OnsvqeiPqQV7842bT6f5W8AUwmkffektkLY4uSkIZgBqdwKkEs7BCJp
-   hT3sencUvVw2iUrJc24F+FzAy/FKmqcIea349AMK24AMUASpv7HD1sZaq
-   4jas96sYwii+jZcEaeI15D3zhYwY2+yBRHULxQ9CZeIrrjOIVshjkOl3y
-   UCJkGIZTSHSXm+rL/CVgSkH5NnAezOHKSluXtkLuUz6Q7zaRILTGFvdCP
-   9KaQuDhlbmoAkslweZ0z8O1rcNG5wixuQZsFzX3Q+oUPJTicOToUvZtRd
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="352073956"
-X-IronPort-AV: E=Sophos;i="6.01,169,1684825200"; 
-   d="scan'208";a="352073956"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 15:57:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="807526054"
-X-IronPort-AV: E=Sophos;i="6.01,169,1684825200"; 
-   d="scan'208";a="807526054"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by FMSMGA003.fm.intel.com with ESMTP; 29 Jun 2023 15:57:02 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qF0ZR-000ETd-1F;
-	Thu, 29 Jun 2023 22:57:01 +0000
-Date: Fri, 30 Jun 2023 06:56:54 +0800
-From: kernel test robot <lkp@intel.com>
-To: Eric Garver <eric@garver.life>, netdev@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	dev@openvswitch.org, Pravin B Shelar <pshelar@ovn.org>,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: Re: [PATCH net-next 2/2] net: openvswitch: add drop action
-Message-ID: <202306300609.tdRdZscy-lkp@intel.com>
-References: <20230629203005.2137107-3-eric@garver.life>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6FE5D8489
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 23:26:26 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2079.outbound.protection.outlook.com [40.107.94.79])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EB2B43595
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 16:26:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LU/bUjZpxD8E8AtN8Spnpv1fdxqz3cXD2gq13iJ3wN7aJVru/VK381MI5I4U654ubWTIkEjHXkmwXh4cq0vdactFuPGlZdD10x+Yq3fhs4nHuBe2+WcB1CIMw1WVhLQE9GGxZs0FFYvbDugy2ZFAff+710vQJGjMcEKERxwD71U8XD5VSn2GR+wmyRsCe2XxfTE1hU+BXdnjFhSCZc9FCL8lCeVB0mmoqGruAOKxb/nLyXyH5aV0x+sXKk0Hg0hXVHxwSU9ajmnBNoDg7/sso3TQyO+yJBUHwpWEW4x5bA1nzNk65vaE/DPMTo2K0/WKvSVjjpleV1FyCty9AQCeiQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=qVJIhvI05sx5WyUEWy8wE11t/peN4zGQDfM5PLY+fYI=;
+ b=nKLeKxLKDJSYoUa5k5QB9DzAVkyFHPirbk0CsN0nkDAqdAIuXVrH8C5u1GAZLYKvCsHmJVF4wqFZ6QNfP0UmCjXh1JNdeYmGJNMt8lBwSWt4pqG4abcUzHHK5ZriMMlsOIBsikLyCYb0hw5rWwkh+Z3GVsy+NokQkDgXrcbl2XguVkzrwoP4w5fK9c5VNlM+GcVx9upSbtojoj7W5FMIKoxxAV24LyVdMo6abnlayIgmGK4zc62WXR0b/3pbxj0mpjjR9h92Dqk/i+7vEgJgd1VEPXdQHG9DBEJ9NqD43X/Qbeo9bgnA+SCKp3wPNLuTK+6Lfw3lo5rljFNlQt2yYg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
+ dkim=pass header.d=nvidia.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
+ s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=qVJIhvI05sx5WyUEWy8wE11t/peN4zGQDfM5PLY+fYI=;
+ b=bPJE08oy6ol4xPt1xyBpVBGmzS2q3e9OCO9jOh0Nik9h4jTbyBeworWWloSDioePMr4VkPt0ououBBXti5wMwHuDbVfGvJiRGx1n6iV1qpozUgoUj8aaK0GFnfb07Td+MfHXz5WUcrM77iRMA6xUGftv53nggalX7CbUZ0g1g4rAqOSGm/p3OrkadsN71i00N7MkFZYa2phogWLL4zBSX30QPNSYw5X65mrMFO9kyBNSWaiGb+nylv6UCabvsl+4r9bERNUYl8vKuF+prAj5Bt+7qw+xrvOXty/SwuP0nO8hz9fvgOajX9c2fUwSU9g+nPmD4NcnqTdZPbS2YuHPog==
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com (2603:10b6:302:12::28)
+ by LV8PR12MB9111.namprd12.prod.outlook.com (2603:10b6:408:189::18) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.23; Thu, 29 Jun
+ 2023 23:26:20 +0000
+Received: from MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::92c6:4b21:586d:dabc]) by MW2PR12MB4667.namprd12.prod.outlook.com
+ ([fe80::92c6:4b21:586d:dabc%4]) with mapi id 15.20.6521.024; Thu, 29 Jun 2023
+ 23:26:20 +0000
+From: Chaitanya Kulkarni <chaitanyak@nvidia.com>
+To: David Howells <dhowells@redhat.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+CC: Aurelien Aptel <aaptel@nvidia.com>, Sagi Grimberg <sagi@grimberg.me>,
+	Willem de Bruijn <willemb@google.com>, Keith Busch <kbusch@kernel.org>, Jens
+ Axboe <axboe@fb.com>, Christoph Hellwig <hch@lst.de>, Chaitanya Kulkarni
+	<chaitanyak@nvidia.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>, Matthew Wilcox
+	<willy@infradead.org>, "linux-nvme@lists.infradead.org"
+	<linux-nvme@lists.infradead.org>
+Subject: Re: [PATCH net] nvme-tcp: Fix comma-related oops
+Thread-Topic: [PATCH net] nvme-tcp: Fix comma-related oops
+Thread-Index: AQHZqtNiVDA7aYUlK0meRBPKbShojK+ibJEA
+Date: Thu, 29 Jun 2023 23:26:20 +0000
+Message-ID: <93daa35c-3150-f14e-d9a4-1fa83a0bb506@nvidia.com>
+References: <59062.1688075273@warthog.procyon.org.uk>
+In-Reply-To: <59062.1688075273@warthog.procyon.org.uk>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+user-agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nvidia.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: MW2PR12MB4667:EE_|LV8PR12MB9111:EE_
+x-ms-office365-filtering-correlation-id: 4fdc2e22-2131-4420-c8c2-08db78f83efc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ qnLX9RPio+CHeBWGE9iMGdmWdyabs1bt/RVQDCgNsbjRPcty++2zvU8+t5N2I2kC//K9c/V57EBrNQs9sBs2kVXG1jyK6YDslXiRAPSsOtdd8QjYNeQRQglxGc3Iw5wxTyJ7XaWy5MdFG+OVHE7QauzmsYN1zz7ky7qeZhpFRKcWRI0UaVv+uTdryaZ0SxSSD0Ec8NByHKHA/jiZmkF0LFF++6PPdQNyQoj3hyiohCa83hT2ACsph4Jj3iawhkjxj2OElvvrFWPo1JMHrpuJP7e2MERLxGgxlwdmjgXQSzHuT+Nlw1wB2TrhXTpeETRDTkJ85UzQ6DvGa/Vub4rD303U3uuP+iuYbMDn9enN8vH37Pr2IK5O8xrLF/t1yE4+nV4FgULYED3Oia515aSMJ0tIyTrBXxv9IvGB7ugWRIQBji85tlo+3hGYwMYCmg/rBZVivr5EJ2VlpOqfhEhW8B39a2D70mEWuCfPSnDzzrJb0SC2HOqXp0jwGOyvVV3+LNMCs4eElbtgYLKMS33f/HNgH1qRdc7hjAb97Dn8+ueRmgJwOzHJQN1KhPycTY1aE7yVs1uCNjpGwlG3Nlh7DPI17mYtk4FRuGZJ/nkeMfpmSPsrhfgrzoFfh5g0Z9jY4a5e6hIRMKwMXGDnsmiuHehCjEzUqEgY60TujVgPPgn0N7LJAbnq0jYr0ebL7U+RbjMEsA8BYh6/pK7+3loEer9Ncm4GIjvs+F4jTKDWkeo=
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:MW2PR12MB4667.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(376002)(366004)(39860400002)(396003)(346002)(451199021)(6512007)(110136005)(966005)(6486002)(478600001)(186003)(2616005)(54906003)(83380400001)(53546011)(2906002)(71200400001)(6506007)(86362001)(41300700001)(7416002)(122000001)(36756003)(5660300002)(31696002)(66946007)(4326008)(66556008)(38070700005)(316002)(76116006)(91956017)(66476007)(8936002)(38100700002)(64756008)(66446008)(8676002)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?utf-8?B?UnRDNXArSmVkdEhXN3hMWHBkWDUveVhIcy9oMUhvcjJWdHRLSFNwZFFNS2I2?=
+ =?utf-8?B?UGVXK2I5aTZwdExiQTI3ZHhHbWlnVjIxNHFuc050dG8wWTNNWmUyVCtnRzBn?=
+ =?utf-8?B?dUVmajBVNG82R2VWdStLRWhyM3NRNE9QUzNQYmVkbE5rS1MzdFo3UmxyVmdR?=
+ =?utf-8?B?bmgxTXJWOXZ2eWx1K1hMdjlKVjJPY0ZFVGtXd0htV3FjOG9ZOU5pNDFYZFlU?=
+ =?utf-8?B?V1J0eEI2OXIrai9WTUcwK1pRWktnRHROa24yckUxNTc3L0NuelRmS3NublRo?=
+ =?utf-8?B?UzdZcU5NQ3hkRXV5dTlYbndIaXdTMWQrMS9jbXZGMVJJTCtpN2c5NEVqZ0E4?=
+ =?utf-8?B?S0dULzNZcGxDVHZNNnlCRDdmZU9iRks4QVZ5QUZRWWZQVjNoSUNMWWxFcDFR?=
+ =?utf-8?B?RE5VcU1vL013K0FFMVV6akl5U2NubXg1N1pOaVZRQ2lrSytLV0J2Q1JwczJY?=
+ =?utf-8?B?dThqL3kramZwVFFYSTd6QXo5VDJYUmxZWnlpZzFaMWVoRm9HMTRDQWdPWDIw?=
+ =?utf-8?B?RFo1VWJHdXRxWmNSdzF3ajVXSmlkcTczMmZwdjFKZktKVGt5RGgxb3NITVFP?=
+ =?utf-8?B?dGlKSFBCcEpQMlpST3RXeDVHeUozTUNMSUkxNU5JcXhKbC9LUzRtZEphcWJN?=
+ =?utf-8?B?bzZHQlBzbXF0aWNQUUdwL3VxQlZ1S21rSGRFL2dRMVRxYmdGWGJURldsdGFn?=
+ =?utf-8?B?K2dzaDF3TDNIVUh3c1Z5T3VMcnVuNytJdmNNUnNtWVRkQjY1Sm8reVkzdVY0?=
+ =?utf-8?B?UElsRFNWaGc1VUM2RW1YTytUVlhTSlhwK3ZYdTk4cjNoVThxcjM4dXk4VHAx?=
+ =?utf-8?B?NEJ5MkJNWHVxSFBWSU05WXlmdWZidDBpTG9OS21XdUd3Z1R5NlBsSi8vT0pU?=
+ =?utf-8?B?RTRPTmgweWQ1ZXFrSlQ4czBOWlViSUszRXpaYURUb0t6bm1FbXN0cWtITWNF?=
+ =?utf-8?B?UlRLOC9CQnBYc2VjKy9uV0dVZFFpN3FkaVhNN3piY295dkRzUTU5aHp4d3VP?=
+ =?utf-8?B?NHBhTlFpemdnVXdyeU13dzBpSm13Z2pBeEUvOHdMRGhlK3RJS2lNZXZMNllY?=
+ =?utf-8?B?NzZmdUU0NDVpMStqbjAvZFRSbTQ2VVFOYmtUcWdnZmVPODlQWUt5cnBJWUxF?=
+ =?utf-8?B?R05Md0VHc0FuWUQwNjR6SXczTmJXQjVkRE1QTjlvZFhhSTQyaG91djFaYTBn?=
+ =?utf-8?B?ZktjR3NROVFiV0EwWUdrYWZ4ZHEvd1JmVVU3clhVK05pWEpyMko2RzJmVEtP?=
+ =?utf-8?B?ZnZEc3ZlaEdkWkJIN3pnT1RMQi9OTmhjRzYrMVRqWTA5UTFiSElLbWhLcERC?=
+ =?utf-8?B?eUdpT0lwMy9pWTlXTjBpSHdwM0RaTGpXaHpIVGZlOWNUS3JIdnV0dCsxTDhl?=
+ =?utf-8?B?NGUxaU5WMkp6T3RMZUFuUVdpT29NRmF2VVV5NHA0MGI1UitKV3VXbkZDbVlZ?=
+ =?utf-8?B?emJLeWxsOVJ5MmVNSkswZUhVc0NsMFdXN3EwRXNBSW9MU2g0RWdHVkJrVzhl?=
+ =?utf-8?B?TXlBQ1l0VHo3bmZVZ2s1Rnp2Y2FBS1VzQW0xNEp6T0JPKzVCNE16REVnQzdi?=
+ =?utf-8?B?NnlDMDFoMnNLSHdhRk9qREEySXN2ckhZWGsvdGpMQjdEeVdJWWd4OC80bCta?=
+ =?utf-8?B?MTRtdWxuM1l0bnZnUDZUR2FiekxpRGs2ZFRtS1MyYS9pVVIzd1Q0K3gvcnZG?=
+ =?utf-8?B?Wmp3cEpWZnRhTm9Qa2QzZnpzMVVlVmVzMTFRSEVVZmE4OWIyVWZqVXlaWVJZ?=
+ =?utf-8?B?dUUybm9lam9mcDhqSG0zWTZtS1RkQUdRdlptWmF0bzRZeFRBaGZmd3QzYjgv?=
+ =?utf-8?B?UGI2NCtnVThBb0VJS0w0ZmxFOXNXZVpxekhibVJaaFgyaWdhVXVuYXR6bFdM?=
+ =?utf-8?B?ZWRIVGwzeStFaXV4M3ZMUW5mQVFnaXRQWnR1WFcxMjFVbVdFM2Q0elFGc3o3?=
+ =?utf-8?B?VVI1K0JrY1NtK3NKVmJobWx1Yjhqb1crajk0MVZDWWRJL0drb3dvR0hld0ts?=
+ =?utf-8?B?RTJMWmdGR21NdzBDaGtVR2w3aGxEYlJCQVo3akU2TGpJTUJRc0JKRHlwN1RL?=
+ =?utf-8?B?b1VKRXNJbmY1dTd4bmJteVpKYVhoOGxiMmZBc3F2bTBPR3Q1ck5VQU04WXU4?=
+ =?utf-8?B?TE1ISE5zT0lXVFJYZFFBaE9nTTNWdDdVUHlBNGIxWU93czE3R2d0SjZFeUFR?=
+ =?utf-8?Q?V71+pXukPtoV4Q8IRFeG3/ZeJVb4KX+DVAHYegW6mksp?=
+Content-Type: text/plain; charset="utf-8"
+Content-ID: <5F68FFBF5A934945A76EF784BA4CBBFA@namprd12.prod.outlook.com>
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230629203005.2137107-3-eric@garver.life>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-OriginatorOrg: Nvidia.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: MW2PR12MB4667.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4fdc2e22-2131-4420-c8c2-08db78f83efc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 29 Jun 2023 23:26:20.6417
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 43083d15-7273-40c1-b7db-39efd9ccc17a
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: k4GAei7cws05e27BeCYFpZXe805bRffRdR6Otjk+CTCx4vfvWGD7Xic3bfv3oN8uYqSEu8z0aRNBj/x0ImpuVw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR12MB9111
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
-
-kernel test robot noticed the following build errors:
-
-[auto build test ERROR on net-next/main]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Eric-Garver/net-openvswitch-add-drop-reasons/20230630-043307
-base:   net-next/main
-patch link:    https://lore.kernel.org/r/20230629203005.2137107-3-eric%40garver.life
-patch subject: [PATCH net-next 2/2] net: openvswitch: add drop action
-config: hexagon-randconfig-r045-20230629 (https://download.01.org/0day-ci/archive/20230630/202306300609.tdRdZscy-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce: (https://download.01.org/0day-ci/archive/20230630/202306300609.tdRdZscy-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306300609.tdRdZscy-lkp@intel.com/
-
-All errors (new ones prefixed by >>):
-
-   In file included from net/openvswitch/actions.c:8:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:547:31: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     547 |         val = __raw_readb(PCI_IOBASE + addr);
-         |                           ~~~~~~~~~~ ^
-   include/asm-generic/io.h:560:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     560 |         val = __le16_to_cpu((__le16 __force)__raw_readw(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:37:51: note: expanded from macro '__le16_to_cpu'
-      37 | #define __le16_to_cpu(x) ((__force __u16)(__le16)(x))
-         |                                                   ^
-   In file included from net/openvswitch/actions.c:8:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:573:61: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     573 |         val = __le32_to_cpu((__le32 __force)__raw_readl(PCI_IOBASE + addr));
-         |                                                         ~~~~~~~~~~ ^
-   include/uapi/linux/byteorder/little_endian.h:35:51: note: expanded from macro '__le32_to_cpu'
-      35 | #define __le32_to_cpu(x) ((__force __u32)(__le32)(x))
-         |                                                   ^
-   In file included from net/openvswitch/actions.c:8:
-   In file included from include/linux/skbuff.h:17:
-   In file included from include/linux/bvec.h:10:
-   In file included from include/linux/highmem.h:12:
-   In file included from include/linux/hardirq.h:11:
-   In file included from ./arch/hexagon/include/generated/asm/hardirq.h:1:
-   In file included from include/asm-generic/hardirq.h:17:
-   In file included from include/linux/irq.h:20:
-   In file included from include/linux/io.h:13:
-   In file included from arch/hexagon/include/asm/io.h:334:
-   include/asm-generic/io.h:584:33: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     584 |         __raw_writeb(value, PCI_IOBASE + addr);
-         |                             ~~~~~~~~~~ ^
-   include/asm-generic/io.h:594:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     594 |         __raw_writew((u16 __force)cpu_to_le16(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
-   include/asm-generic/io.h:604:59: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
-     604 |         __raw_writel((u32 __force)cpu_to_le32(value), PCI_IOBASE + addr);
-         |                                                       ~~~~~~~~~~ ^
->> net/openvswitch/actions.c:1483:4: error: expected expression
-    1483 |                         u32 reason = nla_get_u32(a);
-         |                         ^
->> net/openvswitch/actions.c:1485:4: error: use of undeclared identifier 'reason'
-    1485 |                         reason |= SKB_DROP_REASON_SUBSYS_OPENVSWITCH <<
-         |                         ^
-   net/openvswitch/actions.c:1488:8: error: use of undeclared identifier 'reason'
-    1488 |                         if (reason == OVS_XLATE_OK)
-         |                             ^
-   net/openvswitch/actions.c:1488:8: error: use of undeclared identifier 'reason'
-   net/openvswitch/actions.c:1488:8: error: use of undeclared identifier 'reason'
-   net/openvswitch/actions.c:1491:26: error: use of undeclared identifier 'reason'
-    1491 |                         kfree_skb_reason(skb, reason);
-         |                                               ^
-   6 warnings and 6 errors generated.
-
-
-vim +1483 net/openvswitch/actions.c
-
-  1285	
-  1286	/* Execute a list of actions against 'skb'. */
-  1287	static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
-  1288				      struct sw_flow_key *key,
-  1289				      const struct nlattr *attr, int len)
-  1290	{
-  1291		const struct nlattr *a;
-  1292		int rem;
-  1293	
-  1294		for (a = attr, rem = len; rem > 0;
-  1295		     a = nla_next(a, &rem)) {
-  1296			int err = 0;
-  1297	
-  1298			if (trace_ovs_do_execute_action_enabled())
-  1299				trace_ovs_do_execute_action(dp, skb, key, a, rem);
-  1300	
-  1301			switch (nla_type(a)) {
-  1302			case OVS_ACTION_ATTR_OUTPUT: {
-  1303				int port = nla_get_u32(a);
-  1304				struct sk_buff *clone;
-  1305	
-  1306				/* Every output action needs a separate clone
-  1307				 * of 'skb', In case the output action is the
-  1308				 * last action, cloning can be avoided.
-  1309				 */
-  1310				if (nla_is_last(a, rem)) {
-  1311					do_output(dp, skb, port, key);
-  1312					/* 'skb' has been used for output.
-  1313					 */
-  1314					return 0;
-  1315				}
-  1316	
-  1317				clone = skb_clone(skb, GFP_ATOMIC);
-  1318				if (clone)
-  1319					do_output(dp, clone, port, key);
-  1320				OVS_CB(skb)->cutlen = 0;
-  1321				break;
-  1322			}
-  1323	
-  1324			case OVS_ACTION_ATTR_TRUNC: {
-  1325				struct ovs_action_trunc *trunc = nla_data(a);
-  1326	
-  1327				if (skb->len > trunc->max_len)
-  1328					OVS_CB(skb)->cutlen = skb->len - trunc->max_len;
-  1329				break;
-  1330			}
-  1331	
-  1332			case OVS_ACTION_ATTR_USERSPACE:
-  1333				output_userspace(dp, skb, key, a, attr,
-  1334							     len, OVS_CB(skb)->cutlen);
-  1335				OVS_CB(skb)->cutlen = 0;
-  1336				break;
-  1337	
-  1338			case OVS_ACTION_ATTR_HASH:
-  1339				execute_hash(skb, key, a);
-  1340				break;
-  1341	
-  1342			case OVS_ACTION_ATTR_PUSH_MPLS: {
-  1343				struct ovs_action_push_mpls *mpls = nla_data(a);
-  1344	
-  1345				err = push_mpls(skb, key, mpls->mpls_lse,
-  1346						mpls->mpls_ethertype, skb->mac_len);
-  1347				break;
-  1348			}
-  1349			case OVS_ACTION_ATTR_ADD_MPLS: {
-  1350				struct ovs_action_add_mpls *mpls = nla_data(a);
-  1351				__u16 mac_len = 0;
-  1352	
-  1353				if (mpls->tun_flags & OVS_MPLS_L3_TUNNEL_FLAG_MASK)
-  1354					mac_len = skb->mac_len;
-  1355	
-  1356				err = push_mpls(skb, key, mpls->mpls_lse,
-  1357						mpls->mpls_ethertype, mac_len);
-  1358				break;
-  1359			}
-  1360			case OVS_ACTION_ATTR_POP_MPLS:
-  1361				err = pop_mpls(skb, key, nla_get_be16(a));
-  1362				break;
-  1363	
-  1364			case OVS_ACTION_ATTR_PUSH_VLAN:
-  1365				err = push_vlan(skb, key, nla_data(a));
-  1366				break;
-  1367	
-  1368			case OVS_ACTION_ATTR_POP_VLAN:
-  1369				err = pop_vlan(skb, key);
-  1370				break;
-  1371	
-  1372			case OVS_ACTION_ATTR_RECIRC: {
-  1373				bool last = nla_is_last(a, rem);
-  1374	
-  1375				err = execute_recirc(dp, skb, key, a, last);
-  1376				if (last) {
-  1377					/* If this is the last action, the skb has
-  1378					 * been consumed or freed.
-  1379					 * Return immediately.
-  1380					 */
-  1381					return err;
-  1382				}
-  1383				break;
-  1384			}
-  1385	
-  1386			case OVS_ACTION_ATTR_SET:
-  1387				err = execute_set_action(skb, key, nla_data(a));
-  1388				break;
-  1389	
-  1390			case OVS_ACTION_ATTR_SET_MASKED:
-  1391			case OVS_ACTION_ATTR_SET_TO_MASKED:
-  1392				err = execute_masked_set_action(skb, key, nla_data(a));
-  1393				break;
-  1394	
-  1395			case OVS_ACTION_ATTR_SAMPLE: {
-  1396				bool last = nla_is_last(a, rem);
-  1397	
-  1398				err = sample(dp, skb, key, a, last);
-  1399				if (last)
-  1400					return err;
-  1401	
-  1402				break;
-  1403			}
-  1404	
-  1405			case OVS_ACTION_ATTR_CT:
-  1406				if (!is_flow_key_valid(key)) {
-  1407					err = ovs_flow_key_update(skb, key);
-  1408					if (err)
-  1409						return err;
-  1410				}
-  1411	
-  1412				err = ovs_ct_execute(ovs_dp_get_net(dp), skb, key,
-  1413						     nla_data(a));
-  1414	
-  1415				/* Hide stolen IP fragments from user space. */
-  1416				if (err)
-  1417					return err == -EINPROGRESS ? 0 : err;
-  1418				break;
-  1419	
-  1420			case OVS_ACTION_ATTR_CT_CLEAR:
-  1421				err = ovs_ct_clear(skb, key);
-  1422				break;
-  1423	
-  1424			case OVS_ACTION_ATTR_PUSH_ETH:
-  1425				err = push_eth(skb, key, nla_data(a));
-  1426				break;
-  1427	
-  1428			case OVS_ACTION_ATTR_POP_ETH:
-  1429				err = pop_eth(skb, key);
-  1430				break;
-  1431	
-  1432			case OVS_ACTION_ATTR_PUSH_NSH: {
-  1433				u8 buffer[NSH_HDR_MAX_LEN];
-  1434				struct nshhdr *nh = (struct nshhdr *)buffer;
-  1435	
-  1436				err = nsh_hdr_from_nlattr(nla_data(a), nh,
-  1437							  NSH_HDR_MAX_LEN);
-  1438				if (unlikely(err))
-  1439					break;
-  1440				err = push_nsh(skb, key, nh);
-  1441				break;
-  1442			}
-  1443	
-  1444			case OVS_ACTION_ATTR_POP_NSH:
-  1445				err = pop_nsh(skb, key);
-  1446				break;
-  1447	
-  1448			case OVS_ACTION_ATTR_METER:
-  1449				if (ovs_meter_execute(dp, skb, key, nla_get_u32(a))) {
-  1450					consume_skb(skb);
-  1451					return 0;
-  1452				}
-  1453				break;
-  1454	
-  1455			case OVS_ACTION_ATTR_CLONE: {
-  1456				bool last = nla_is_last(a, rem);
-  1457	
-  1458				err = clone(dp, skb, key, a, last);
-  1459				if (last)
-  1460					return err;
-  1461	
-  1462				break;
-  1463			}
-  1464	
-  1465			case OVS_ACTION_ATTR_CHECK_PKT_LEN: {
-  1466				bool last = nla_is_last(a, rem);
-  1467	
-  1468				err = execute_check_pkt_len(dp, skb, key, a, last);
-  1469				if (last)
-  1470					return err;
-  1471	
-  1472				break;
-  1473			}
-  1474	
-  1475			case OVS_ACTION_ATTR_DEC_TTL:
-  1476				err = execute_dec_ttl(skb, key);
-  1477				if (err == -EHOSTUNREACH)
-  1478					return dec_ttl_exception_handler(dp, skb,
-  1479									 key, a);
-  1480				break;
-  1481	
-  1482			case OVS_ACTION_ATTR_DROP:
-> 1483				u32 reason = nla_get_u32(a);
-  1484	
-> 1485				reason |= SKB_DROP_REASON_SUBSYS_OPENVSWITCH <<
-  1486						SKB_DROP_REASON_SUBSYS_SHIFT;
-  1487	
-  1488				if (reason == OVS_XLATE_OK)
-  1489					break;
-  1490	
-  1491				kfree_skb_reason(skb, reason);
-  1492				return 0;
-  1493			}
-  1494	
-  1495			if (unlikely(err)) {
-  1496				kfree_skb(skb);
-  1497				return err;
-  1498			}
-  1499		}
-  1500	
-  1501		consume_skb(skb);
-  1502		return 0;
-  1503	}
-  1504	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+T24gNi8yOS8yMDIzIDI6NDcgUE0sIERhdmlkIEhvd2VsbHMgd3JvdGU6DQo+IEZpeCBhIGNvbW1h
+IHRoYXQgc2hvdWxkIGJlIGEgc2VtaWNvbG9uLiAgVGhlIGNvbW1hIGlzIGF0IHRoZSBlbmQgb2Yg
+YW4NCj4gaWYtYm9keSBhbmQgdGh1cyBtYWtlcyB0aGUgc3RhdGVtZW50IGFmdGVyIChhIGJ2ZWNf
+c2V0X3BhZ2UoKSkgY29uZGl0aW9uYWwNCj4gdG9vLCByZXN1bHRpbmcgaW4gYW4gb29wcyBiZWNh
+dXNlIHdlIGRpZG4ndCBmaWxsIG91dCB0aGUgYmlvX3ZlY1tdOg0KPiANCj4gICAgICBCVUc6IGtl
+cm5lbCBOVUxMIHBvaW50ZXIgZGVyZWZlcmVuY2UsIGFkZHJlc3M6IDAwMDAwMDAwMDAwMDAwMDgN
+Cj4gICAgICAjUEY6IHN1cGVydmlzb3IgcmVhZCBhY2Nlc3MgaW4ga2VybmVsIG1vZGUNCj4gICAg
+ICAjUEY6IGVycm9yX2NvZGUoMHgwMDAwKSAtIG5vdC1wcmVzZW50IHBhZ2UNCj4gICAgICAuLi4N
+Cj4gICAgICBXb3JrcXVldWU6IG52bWVfdGNwX3dxIG52bWVfdGNwX2lvX3dvcmsgW252bWVfdGNw
+XQ0KPiAgICAgIFJJUDogMDAxMDpza2Jfc3BsaWNlX2Zyb21faXRlcisweGYxLzB4MzcwDQo+ICAg
+ICAgLi4uDQo+ICAgICAgQ2FsbCBUcmFjZToNCj4gICAgICAgdGNwX3NlbmRtc2dfbG9ja2VkKzB4
+M2E2LzB4ZGQwDQo+ICAgICAgIHRjcF9zZW5kbXNnKzB4MzEvMHg1MA0KPiAgICAgICBpbmV0X3Nl
+bmRtc2crMHg0Ny8weDgwDQo+ICAgICAgIHNvY2tfc2VuZG1zZysweDk5LzB4YjANCj4gICAgICAg
+bnZtZV90Y3BfdHJ5X3NlbmRfZGF0YSsweDE0OS8weDQ5MCBbbnZtZV90Y3BdDQo+ICAgICAgIG52
+bWVfdGNwX3RyeV9zZW5kKzB4MWI3LzB4MzAwIFtudm1lX3RjcF0NCj4gICAgICAgbnZtZV90Y3Bf
+aW9fd29yaysweDQwLzB4YzAgW252bWVfdGNwXQ0KPiAgICAgICBwcm9jZXNzX29uZV93b3JrKzB4
+MjFjLzB4NDMwDQo+ICAgICAgIHdvcmtlcl90aHJlYWQrMHg1NC8weDNlMA0KPiAgICAgICBrdGhy
+ZWFkKzB4ZjgvMHgxMzANCj4gDQo+IEZpeGVzOiA3NzY5ODg3ODE3YzMgKCJudm1lLXRjcDogVXNl
+IHNlbmRtc2coTVNHX1NQTElDRV9QQUdFUykgcmF0aGVyIHRoZW4gc2VuZHBhZ2UiKQ0KPiBSZXBv
+cnRlZC1ieTogQXVyZWxpZW4gQXB0ZWwgPGFhcHRlbEBudmlkaWEuY29tPg0KPiBMaW5rOiBodHRw
+czovL2xvcmUua2VybmVsLm9yZy9yLzI1M210MGlsNDNvLmZzZkBtdHItdmRpLTEyNC5pLWRpZC1u
+b3Qtc2V0LS1tYWlsLWhvc3QtYWRkcmVzcy0tc28tdGlja2xlLW1lLw0KPiBTaWduZWQtb2ZmLWJ5
+OiBEYXZpZCBIb3dlbGxzIDxkaG93ZWxsc0ByZWRoYXQuY29tPg0KPiBjYzogU2FnaSBHcmltYmVy
+ZyA8c2FnaUBncmltYmVyZy5tZT4NCj4gY2M6IFdpbGxlbSBkZSBCcnVpam4gPHdpbGxlbWJAZ29v
+Z2xlLmNvbT4NCj4gY2M6IEtlaXRoIEJ1c2NoIDxrYnVzY2hAa2VybmVsLm9yZz4NCj4gY2M6IEpl
+bnMgQXhib2UgPGF4Ym9lQGZiLmNvbT4NCj4gY2M6IENocmlzdG9waCBIZWxsd2lnIDxoY2hAbHN0
+LmRlPg0KPiBjYzogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlhLmNvbT4NCj4gY2M6ICJE
+YXZpZCBTLiBNaWxsZXIiIDxkYXZlbUBkYXZlbWxvZnQubmV0Pg0KPiBjYzogRXJpYyBEdW1hemV0
+IDxlZHVtYXpldEBnb29nbGUuY29tPg0KPiBjYzogSmFrdWIgS2ljaW5za2kgPGt1YmFAa2VybmVs
+Lm9yZz4NCj4gY2M6IFBhb2xvIEFiZW5pIDxwYWJlbmlAcmVkaGF0LmNvbT4NCj4gY2M6IEplbnMg
+QXhib2UgPGF4Ym9lQGtlcm5lbC5kaz4NCj4gY2M6IEplbnMgQXhib2UgPGF4Ym9lQGtlcm5lbC5k
+az4NCj4gY2M6IE1hdHRoZXcgV2lsY294IDx3aWxseUBpbmZyYWRlYWQub3JnPg0KPiBjYzogbGlu
+dXgtbnZtZUBsaXN0cy5pbmZyYWRlYWQub3JnDQo+IGNjOiBuZXRkZXZAdmdlci5rZXJuZWwub3Jn
+DQo+IC0tLQ0KPg0KDQpSZXZpZXdlZC1ieTogQ2hhaXRhbnlhIEt1bGthcm5pIDxrY2hAbnZpZGlh
+LmNvbT4NCg0KLWNrDQoNCg0K
 
