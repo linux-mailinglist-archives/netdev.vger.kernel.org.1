@@ -1,86 +1,132 @@
-Return-Path: <netdev+bounces-14512-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14513-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6CF9E742317
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 11:20:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2B89B742356
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 11:36:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C1F3280D23
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 09:20:25 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6F69C280D30
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 09:36:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43C96A92D;
-	Thu, 29 Jun 2023 09:20:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B751FA95F;
+	Thu, 29 Jun 2023 09:36:48 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D68F228F2
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 09:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 1789FC433C9;
-	Thu, 29 Jun 2023 09:20:21 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688030421;
-	bh=sjrhlxMoc3gMI+6YuwBO+Xl5zd/guz3kTM9x73kxq5c=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=eIea9TTtxrkRQxhJ1gdDnA2cjP6IXlLy3ZL8VD0rolkFQXuD99lrPLSpABAkDLRUI
-	 KEgLn6I3Mdlo7MTJZW98tVMYFYc3qzIt/zXXat9RGIBA8waFSiswEm5FGHPAwyhHbF
-	 vTK9KUv/qhUpmRGBj/sUZObI9qW2TI+EV2jJxprduanXBpHQpVc7CjFXg+XlhuJmRA
-	 JdT+4mRxaxV7GbSCaPVxE8aYXHtTih/MPRy0WD8BdxfZ1lOMjgsEDa2OUf0pQiKMYi
-	 5FjdQ5uiShVcX89m/OLbnJEa03wZ5HqSllc+MSPibMA3+6vgneRV+qBPYFMfNug5+P
-	 7TswPHR3Sifow==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id EF516C41671;
-	Thu, 29 Jun 2023 09:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC101A92D
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 09:36:48 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBF62ED
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:36:46 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688031405;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=kYG1165Me8KXJ6bBjdSoZbHbdY4Mqr1aH4o7+E05ySg=;
+	b=T/AtyCbSSyKZvMdySiBMy+Kb2T7J5mAwjeC9sjtacVSlzrxbRxCTzp3+y4NAtg7xAJEZ7X
+	7jVedLeNqPR7+CWrCLAefKCVB/kAeu8BBIVtcYU+9LaPFLi883mqDZgD9zqNDIe7nZUqYz
+	NgpHy8Sjf/rM8LPIwjiqTkVRAcarsoU=
+Received: from mail-qv1-f71.google.com (mail-qv1-f71.google.com
+ [209.85.219.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-590-P64FJrbrMw-uKDl79EtXlg-1; Thu, 29 Jun 2023 05:36:44 -0400
+X-MC-Unique: P64FJrbrMw-uKDl79EtXlg-1
+Received: by mail-qv1-f71.google.com with SMTP id 6a1803df08f44-635eb5b04e1so1257216d6.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:36:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688031403; x=1690623403;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=kYG1165Me8KXJ6bBjdSoZbHbdY4Mqr1aH4o7+E05ySg=;
+        b=XNVktcu3cYwjyIIHWpzI6SpzXDDWGTOCMtD6jJa3W4tvupP+feTNDQErKNeThkPYkw
+         nwKwXF/z8UqJ1H2H84LFlUYaXi6o226wgTJKzSfBTw8qNUjH5YkDEUC6ZO4SwK191vXL
+         XjWCBa5/UJ1uEq9NYSjUgvU5DYLthf5u7YbA/ZxGvDIl+OPoyuq3onrNtEQ8y0GqQ+2v
+         JIIBzoB7xebTHy3naa42bofThvjeZ4bEAVpni+1TFA4ZCmQT/VFjtWWSVhN7rVMgikAH
+         IZY/ZJOSKbI7/Eyhb6oZb4LaW0qhA4S+Yc4RjhQ6Kbz08EAbmRq04ndFUU31dIOD2CD+
+         Zgbg==
+X-Gm-Message-State: AC+VfDy4Hg2X0PVmmOijKevPgmBAOlfuCNCjtjfy9AOYInILQKCjx5rC
+	MIUL34Ls1d6FmrDEAx01staqAXs4BBjphE5QlzpDXDV/d7O1jbAjxsOI7D0JKpyfjfn8aMRMCN1
+	boPVTup+nM0OWNhtQ
+X-Received: by 2002:a05:6214:2685:b0:635:d9d0:cccf with SMTP id gm5-20020a056214268500b00635d9d0cccfmr15599002qvb.4.1688031403302;
+        Thu, 29 Jun 2023 02:36:43 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ4BmkCKu61s65/tlTA6LaHGRA7CUgp6qEKNNQ7/tTCVQYIODra+A0gDSS6lCTkjsGr5mKXp1Q==
+X-Received: by 2002:a05:6214:2685:b0:635:d9d0:cccf with SMTP id gm5-20020a056214268500b00635d9d0cccfmr15598986qvb.4.1688031403003;
+        Thu, 29 Jun 2023 02:36:43 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-231-196.dyn.eolo.it. [146.241.231.196])
+        by smtp.gmail.com with ESMTPSA id j5-20020a056214032500b00636056961c6sm1532031qvu.75.2023.06.29.02.36.40
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 02:36:42 -0700 (PDT)
+Message-ID: <f494387c8d55d9b1d5a3e88beedeeb448f2e6cc3.camel@redhat.com>
+Subject: Re: [PATCH v2 net 1/2] net: dsa: sja1105: always enable the
+ INCL_SRCPT option
+From: Paolo Abeni <pabeni@redhat.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, Florian Fainelli <f.fainelli@gmail.com>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ linux-kernel@vger.kernel.org
+Date: Thu, 29 Jun 2023 11:36:38 +0200
+In-Reply-To: <20230627094207.3385231-2-vladimir.oltean@nxp.com>
+References: <20230627094207.3385231-1-vladimir.oltean@nxp.com>
+	 <20230627094207.3385231-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net v3] net: lan743x: Don't sleep in atomic context
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168803042097.16415.15204725768156666010.git-patchwork-notify@kernel.org>
-Date: Thu, 29 Jun 2023 09:20:20 +0000
-References: <20230627035000.1295254-1-moritzf@google.com>
-In-Reply-To: <20230627035000.1295254-1-moritzf@google.com>
-To: Moritz Fischer <moritzf@google.com>
-Cc: netdev@vger.kernel.org, pabeni@redhat.com, kuba@kernel.org,
- edumazet@google.com, davem@davemloft.net, bryan.whitehead@microchip.com,
- UNGLinuxDriver@microchip.com, mdf@kernel.org, stable@vger.kernel.org
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+On Tue, 2023-06-27 at 12:42 +0300, Vladimir Oltean wrote:
+> Link-local traffic on bridged SJA1105 ports is sometimes tagged by the
+> hardware with source port information (when the port is under a VLAN
+> aware bridge).
+>=20
+> The tag_8021q source port identification has become more loose
+> ("imprecise") and will report a plausible rather than exact bridge port,
+> when under a bridge (be it VLAN-aware or VLAN-unaware). But link-local
+> traffic always needs to know the precise source port.
+>=20
+> Modify the driver logic (and therefore: the tagging protocol itself) to
+> always include the source port information with link-local packets,
+> regardless of whether the port is standalone, under a VLAN-aware or
+> VLAN-unaware bridge. This makes it possible for the tagging driver to
+> give priority to that information over the tag_8021q VLAN header.
+>=20
+> The big drawback with INCL_SRCPT is that it makes it impossible to
+> distinguish between an original MAC DA of 01:80:C2:XX:YY:ZZ and
+> 01:80:C2:AA:BB:ZZ, because the tagger just patches MAC DA bytes 3 and 4
+> with zeroes. Only if PTP RX timestamping is enabled, the switch will
+> generate a META follow-up frame containing the RX timestamp and the
+> original bytes 3 and 4 of the MAC DA. Those will be used to patch up the
+> original packet. Nonetheless, in the absence of PTP RX timestamping, we
+> have to live with this limitation, since it is more important to have
+> the more precise source port information for link-local traffic.
 
-This patch was applied to netdev/net.git (main)
-by Paolo Abeni <pabeni@redhat.com>:
+What if 2 different DSA are under the same linux bridge, so that the
+host has to forward in S/W the received frames? (and DA is incomplete)
 
-On Tue, 27 Jun 2023 03:50:00 +0000 you wrote:
-> dev_set_rx_mode() grabs a spin_lock, and the lan743x implementation
-> proceeds subsequently to go to sleep using readx_poll_timeout().
-> 
-> Introduce a helper wrapping the readx_poll_timeout_atomic() function
-> and use it to replace the calls to readx_polL_timeout().
-> 
-> Fixes: 23f0703c125b ("lan743x: Add main source files for new lan743x driver")
-> Cc: stable@vger.kernel.org
-> Cc: Bryan Whitehead <bryan.whitehead@microchip.com>
-> Cc: UNGLinuxDriver@microchip.com
-> Signed-off-by: Moritz Fischer <moritzf@google.com>
-> 
-> [...]
+It looks like that such frames will never reach the relevant
+destination?
 
-Here is the summary with links:
-  - [net,v3] net: lan743x: Don't sleep in atomic context
-    https://git.kernel.org/netdev/net/c/7a8227b2e76b
+Is such setup possible/relevant?
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Thanks,
 
+Paolo
 
 
