@@ -1,69 +1,157 @@
-Return-Path: <netdev+bounces-14471-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14472-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07537741CA9
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 01:58:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 75E8F741DD7
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 03:59:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E66351C2082C
-	for <lists+netdev@lfdr.de>; Wed, 28 Jun 2023 23:58:15 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C793280D29
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 01:59:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55091DCBB;
-	Wed, 28 Jun 2023 23:58:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4676111F;
+	Thu, 29 Jun 2023 01:59:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AF011DCAC;
-	Wed, 28 Jun 2023 23:58:09 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 9FDBCC433C0;
-	Wed, 28 Jun 2023 23:58:09 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1687996689;
-	bh=N8+ozCHnJlm7x262G/IWW5P1T59+/h3535cMtXvyhpQ=;
-	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
-	b=cgRff7dFf07j+tMUD6o1QH2Mj7Y3C6vKUtmURBqNEYjBdN2LjF+H/oDvnsd2dhqzR
-	 VNS+bDtfEn94gQ3UROZ8zdp3pD04rE4rikS7l3wB+lrjPu16Mb6VWFiYLVM5Qv6tm+
-	 JEMg+Ii4ED2788zdHIi5MfQT/X//bLK2aMJa7T2R6HhSDg5sRUSM9xncOyPyQRpWvm
-	 zIeGFMvrdu/ZOnVgJX6YBUciroacdFzUYuC0NyFikmvOASBYCS+cShGUxcmM36bA3x
-	 TKztOUYJg/axWmZKYtBU730BMiU3TUHaZnLscpqjvlIfBzLJyIdA2PUSyr4X/3ouXE
-	 LdZI9dRqicC3A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8A944C0C40E;
-	Wed, 28 Jun 2023 23:58:09 +0000 (UTC)
-Subject: Re: [GIT PULL] Networking for v6.5
-From: pr-tracker-bot@kernel.org
-In-Reply-To: <20230627184830.1205815-1-kuba@kernel.org>
-References: <20230627184830.1205815-1-kuba@kernel.org>
-X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
-X-PR-Tracked-Message-Id: <20230627184830.1205815-1-kuba@kernel.org>
-X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.5
-X-PR-Tracked-Commit-Id: ae230642190a51b85656d6da2df744d534d59544
-X-PR-Merge-Tree: torvalds/linux.git
-X-PR-Merge-Refname: refs/heads/master
-X-PR-Merge-Commit-Id: 3a8a670eeeaa40d87bd38a587438952741980c18
-Message-Id: <168799668955.4861.7004023441610460029.pr-tracker-bot@kernel.org>
-Date: Wed, 28 Jun 2023 23:58:09 +0000
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com, bpf@vger.kernel.org
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC0951118
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:59:11 +0000 (UTC)
+Received: from smtp-fw-9102.amazon.com (smtp-fw-9102.amazon.com [207.171.184.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C08982681;
+	Wed, 28 Jun 2023 18:59:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
+  t=1688003949; x=1719539949;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Z5ADgpgRcm7ildcG3JRpr/Zcwf95I9lu4+eIDLt2QIQ=;
+  b=hikrSbtCH2THGVDVNMfIqYzS9KMdkZyiZeAZi4CmawK2tsOoglkgKkmu
+   +rG3RFSzU2z0j0nTjY8aIyZ1bMcjClPUwfnxXOnw84XJxPV8XH/XC2NFs
+   uGHf0PSHvShuz/cQ/N6T8eNnEVdOTT3REL6JCNYxUrd1QK841dvZIlQtd
+   E=;
+X-IronPort-AV: E=Sophos;i="6.01,167,1684800000"; 
+   d="scan'208";a="348439320"
+Received: from pdx4-co-svc-p1-lb2-vlan2.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com) ([10.25.36.210])
+  by smtp-border-fw-9102.sea19.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 29 Jun 2023 01:59:09 +0000
+Received: from EX19MTAUWA002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan2.pdx.amazon.com [10.236.137.194])
+	by email-inbound-relay-pdx-2a-m6i4x-1cca8d67.us-west-2.amazon.com (Postfix) with ESMTPS id 24CC08064F;
+	Thu, 29 Jun 2023 01:59:08 +0000 (UTC)
+Received: from EX19D001UWA002.ant.amazon.com (10.13.138.236) by
+ EX19MTAUWA002.ant.amazon.com (10.250.64.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Thu, 29 Jun 2023 01:59:07 +0000
+Received: from u46989501580c5c.ant.amazon.com (10.88.130.162) by
+ EX19D001UWA002.ant.amazon.com (10.13.138.236) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.30; Thu, 29 Jun 2023 01:59:06 +0000
+From: Samuel Mendoza-Jonas <samjonas@amazon.com>
+To: <netdev@vger.kernel.org>
+CC: Stewart Smith <trawets@amazon.com>, "David S . Miller"
+	<davem@davemloft.net>, David Ahern <dsahern@kernel.org>, Eric Dumazet
+	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+	<pabeni@redhat.com>, <linux-kernel@vger.kernel.org>, <benh@amazon.com>,
+	<stable@vger.kernel.org>, Samuel Mendoza-Jonas <samjonas@amazon.com>
+Subject: [PATCH net] net/ipv6: Reduce chance of collisions in inet6_hashfn()
+Date: Wed, 28 Jun 2023 18:58:44 -0700
+Message-ID: <20230629015844.800280-1-samjonas@amazon.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.88.130.162]
+X-ClientProxiedBy: EX19D041UWA002.ant.amazon.com (10.13.139.121) To
+ EX19D001UWA002.ant.amazon.com (10.13.138.236)
+Precedence: Bulk
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-The pull request you sent on Tue, 27 Jun 2023 11:48:30 -0700:
+From: Stewart Smith <trawets@amazon.com>
 
-> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git tags/net-next-6.5
+For both IPv4 and IPv6 incoming TCP connections are tracked in a hash
+table with a hash over the source & destination addresses and ports.
+However, the IPv6 hash is insufficient and can lead to a high rate of
+collisions.
 
-has been merged into torvalds/linux.git:
-https://git.kernel.org/torvalds/c/3a8a670eeeaa40d87bd38a587438952741980c18
+The IPv6 hash used an XOR to fit everything into the 96 bits for the
+fast jenkins hash, meaning it is possible for an external entity to
+ensure the hash collides, thus falling back to a linear search in the
+bucket, which is slow.
 
-Thank you!
+We take the approach of hash half the data; hash the other half; and
+then hash them together. We do this with 3x jenkins hashes rather than
+2x to calculate the hashing value for the connection covering the full
+length of the addresses and ports.
 
+While this may look like it adds overhead, the reality of modern CPUs
+means that this is unmeasurable in real world scenarios.
+
+In simulating with llvm-mca, the increase in cycles for the hashing code
+was ~5 cycles on Skylake (from a base of ~50), and an extra ~9 on
+Nehalem (base of ~62).
+
+In commit dd6d2910c5e0 ("netfilter: conntrack: switch to siphash")
+netfilter switched from a jenkins hash to a siphash, but even the faster
+hsiphash is a more significant overhead (~20-30%) in some preliminary
+testing. So, in this patch, we keep to the more conservative approach to
+ensure we don't add much overhead per SYN.
+
+In testing, this results in a consistently even spread across the
+connection buckets. In both testing and real-world scenarios, we have
+not found any measurable performance impact.
+
+Cc: stable@vger.kernel.org
+Fixes: 08dcdbf6a7b9 ("ipv6: use a stronger hash for tcp")
+Fixes: b3da2cf37c5c ("[INET]: Use jhash + random secret for ehash.")
+Signed-off-by: Stewart Smith <trawets@amazon.com>
+Signed-off-by: Samuel Mendoza-Jonas <samjonas@amazon.com>
+---
+ include/net/ipv6.h          | 4 +---
+ net/ipv6/inet6_hashtables.c | 5 ++++-
+ 2 files changed, 5 insertions(+), 4 deletions(-)
+
+diff --git a/include/net/ipv6.h b/include/net/ipv6.h
+index 7332296eca44..f9bb54869d82 100644
+--- a/include/net/ipv6.h
++++ b/include/net/ipv6.h
+@@ -752,9 +752,7 @@ static inline u32 ipv6_addr_hash(const struct in6_addr *a)
+ /* more secured version of ipv6_addr_hash() */
+ static inline u32 __ipv6_addr_jhash(const struct in6_addr *a, const u32 initval)
+ {
+-	u32 v = (__force u32)a->s6_addr32[0] ^ (__force u32)a->s6_addr32[1];
+-
+-	return jhash_3words(v,
++	return jhash_3words((__force u32)a->s6_addr32[1],
+ 			    (__force u32)a->s6_addr32[2],
+ 			    (__force u32)a->s6_addr32[3],
+ 			    initval);
+diff --git a/net/ipv6/inet6_hashtables.c b/net/ipv6/inet6_hashtables.c
+index b64b49012655..bb7198081974 100644
+--- a/net/ipv6/inet6_hashtables.c
++++ b/net/ipv6/inet6_hashtables.c
+@@ -33,7 +33,10 @@ u32 inet6_ehashfn(const struct net *net,
+ 	net_get_random_once(&inet6_ehash_secret, sizeof(inet6_ehash_secret));
+ 	net_get_random_once(&ipv6_hash_secret, sizeof(ipv6_hash_secret));
+ 
+-	lhash = (__force u32)laddr->s6_addr32[3];
++	lhash = jhash_3words((__force u32)laddr->s6_addr32[3],
++			    (((u32)lport) << 16) | (__force u32)fport,
++			    (__force u32)faddr->s6_addr32[0],
++			    ipv6_hash_secret);
+ 	fhash = __ipv6_addr_jhash(faddr, ipv6_hash_secret);
+ 
+ 	return __inet6_ehashfn(lhash, lport, fhash, fport,
 -- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/prtracker.html
+2.25.1
+
 
