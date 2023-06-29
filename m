@@ -1,158 +1,110 @@
-Return-Path: <netdev+bounces-14563-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14564-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5950574269F
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:38:47 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AA3387426A2
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 14:39:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1487C280BE9
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:38:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB7F41C20A85
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:39:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68C9A23C8;
-	Thu, 29 Jun 2023 12:38:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E9E3723C4;
+	Thu, 29 Jun 2023 12:39:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57CD623C4
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:38:44 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 921912952
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:38:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688042321;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=eyjed+n6vJ2GKQu5IWKEiyVp5EbB8rMW7EJ9oglJpcs=;
-	b=etpxNrBrZBhhGHQfWW/TMYf5x+o3hooFdC0ebqSa8vv4KDymaCaX/bzHn+N1RxkNarGR7Z
-	tqXrhtqBdj+PgyZSUt700qx3CSGiLZrYLL8jK2PHexgPw5HGjDa8bPo/cxaH/jVH/jTWPi
-	so0OO5/LDwsJEBJU7W3MLbSY/0qvKLg=
-Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
- [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-bzxT3Li8P0e48Zh2gMHzPQ-1; Thu, 29 Jun 2023 08:38:40 -0400
-X-MC-Unique: bzxT3Li8P0e48Zh2gMHzPQ-1
-Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-76721ad9ed7so13672685a.1
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:38:40 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCF0B2565
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:39:00 +0000 (UTC)
+Received: from mail-oa1-f72.google.com (mail-oa1-f72.google.com [209.85.160.72])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3B31730C4
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:38:59 -0700 (PDT)
+Received: by mail-oa1-f72.google.com with SMTP id 586e51a60fabf-1b07f55975bso800883fac.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 05:38:59 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688042320; x=1690634320;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=1e100.net; s=20221208; t=1688042338; x=1690634338;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=eyjed+n6vJ2GKQu5IWKEiyVp5EbB8rMW7EJ9oglJpcs=;
-        b=h6lTgbBbOqoPUmbd/eaNqQlDeRNcqGDygySwOEVTpIYxLske5EA6g37l2iJfZtbUhj
-         sbbh2yePTgLETTfbrQAJzmNqK4HKnw4Gow5UmeciQJ8d7RKkIvkwHgFOVx7RXHz5awgG
-         UkNtH1agK/w7kE2IRXt0qvAkdgEa76jkbGc8mN39Y5ZkckPGZ7AySvfSzP/Jmh1UHKcd
-         7l4XCItHzlOn1ylEonjMRpdLWBsyH0GV1vZ7ZnU98ACZoMeeSJ84nK6yZA4f5jBL/sLJ
-         9zx1TMu0NdQ8fCAF3zuF6i3MFNAAjZTHBvy4Co+lUymGkaUJj0ZtGHpQaJBr/budK9rE
-         BHZA==
-X-Gm-Message-State: AC+VfDwNk1FUUNZYBp0B9BsueQDb60HImKJplr0PS3DyC65SFTZ2Y9V2
-	t7mD9ArvVPaIZ4CPdxlj8BL1NbkrRmGq4MmIl6JbT2Szo2uNl83+DBUsiKJetNv8u99dDWTQR2O
-	g8KHJcto797UhC+VUtugpn7Ga
-X-Received: by 2002:a05:620a:2a13:b0:762:41d6:c3dc with SMTP id o19-20020a05620a2a1300b0076241d6c3dcmr50289600qkp.0.1688042319844;
-        Thu, 29 Jun 2023 05:38:39 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ6ThMNPYxWx8urdYfE3Ljj3ILrdnC9+Z11L9FWiMBmDEx49tx+y0HEXiZETIiDlQyjMoZwwiw==
-X-Received: by 2002:a05:620a:2a13:b0:762:41d6:c3dc with SMTP id o19-20020a05620a2a1300b0076241d6c3dcmr50289573qkp.0.1688042319516;
-        Thu, 29 Jun 2023 05:38:39 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-231-196.dyn.eolo.it. [146.241.231.196])
-        by smtp.gmail.com with ESMTPSA id 20-20020a05620a071400b007671cafbf5csm1940570qkc.85.2023.06.29.05.38.37
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 05:38:38 -0700 (PDT)
-Message-ID: <756bda986e5b9946e2035926dc0370d14138fd20.camel@redhat.com>
-Subject: Re: [PATCH v2 net 1/2] net: dsa: sja1105: always enable the
- INCL_SRCPT option
-From: Paolo Abeni <pabeni@redhat.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
- <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
- Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
- linux-kernel@vger.kernel.org
-Date: Thu, 29 Jun 2023 14:38:35 +0200
-In-Reply-To: <20230629101950.7s3kagwvkzlnu7ao@skbuf>
-References: <20230627094207.3385231-1-vladimir.oltean@nxp.com>
-	 <20230627094207.3385231-2-vladimir.oltean@nxp.com>
-	 <f494387c8d55d9b1d5a3e88beedeeb448f2e6cc3.camel@redhat.com>
-	 <20230629101950.7s3kagwvkzlnu7ao@skbuf>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        bh=ri2JYlOaYtHZafIZo32KQWGFk/pE2ILLD0nllNwVvcY=;
+        b=AXj9rZKhGcG3VkiGYu1Hd2H1DLq3mPqxZXPtULAdq+ccFi1r4vPGHvTzu51EWZAXHs
+         /cCYATFKu7eF/Z2vVS7dpSEi19Yk9Xuez2Y2TKqJVwehVC77XQ5pW3GfthBNL1bbgvFN
+         EIkL/YaU4fYuD9MirBBYW7jJ317SkGWWkaVVnw8+tTS9gt97joBLcr7Fvnr2420MBH0z
+         fG/RTUkFs+blW8ViDBaUn/hu5Gb7xuQEU6tPz4GHFguw8JlVUVGaPhFLLoXx7zPqg0se
+         t/wp75onqWXTdbF2bCepOADjhryIN9yoZtLrVrBJt/01oFAsSsYnN4ot96XXNnyVwCj1
+         F8Jw==
+X-Gm-Message-State: AC+VfDwHVFUHs2k0rQJBiP24LPTEvvzD++/KFB8IJPJegWErqScNJg1L
+	2OBagN2bPPtL7pQvLSoqPz/9v09VjcwtQquNIQyJocAyiNzs
+X-Google-Smtp-Source: ACHHUZ73ccHNHkmGrMMtxxSN3oXu2sgCguKlQYncB65UvJPrG+qPRGx7VoGLcr1d4BraqUGMopM6mznJ+zSjV7rFkTz1912DUf+B
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a05:6870:ed8e:b0:1a9:85e9:9376 with SMTP id
+ fz14-20020a056870ed8e00b001a985e99376mr4008056oab.0.1688042338607; Thu, 29
+ Jun 2023 05:38:58 -0700 (PDT)
+Date: Thu, 29 Jun 2023 05:38:58 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000f56b8d05ff43fb21@google.com>
+Subject: [syzbot] Monthly net report (Jun 2023)
+From: syzbot <syzbot+list6f38086e094c5ae7bf42@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 2023-06-29 at 13:19 +0300, Vladimir Oltean wrote:
-> On Thu, Jun 29, 2023 at 11:36:38AM +0200, Paolo Abeni wrote:
-> > > The big drawback with INCL_SRCPT is that it makes it impossible to
-> > > distinguish between an original MAC DA of 01:80:C2:XX:YY:ZZ and
-> > > 01:80:C2:AA:BB:ZZ, because the tagger just patches MAC DA bytes 3 and=
- 4
-> > > with zeroes. Only if PTP RX timestamping is enabled, the switch will
-> > > generate a META follow-up frame containing the RX timestamp and the
-> > > original bytes 3 and 4 of the MAC DA. Those will be used to patch up =
-the
-> > > original packet. Nonetheless, in the absence of PTP RX timestamping, =
-we
-> > > have to live with this limitation, since it is more important to have
-> > > the more precise source port information for link-local traffic.
-> >=20
-> > What if 2 different DSA are under the same linux bridge, so that the
-> > host has to forward in S/W the received frames? (and DA is incomplete)
-> >=20
-> > It looks like that such frames will never reach the relevant
-> > destination?
-> >=20
-> > Is such setup possible/relevant?
-> >=20
-> > Thanks,
-> >=20
-> > Paolo
-> >=20
->=20
-> They will have an incorrect MAC DA, with all the consequences of that.
->=20
-> Given the fact that the incl_srcpt was enabled up until now for the
-> vlan_filtering=3D1 bridge case only, this was already possible to see.
-> However it was never reported to me as being a problem, unlike what
-> is being fixed here.
+Hello net maintainers/developers,
 
-Ok, the above sounds like a good enough reply to me.
+This is a 31-day syzbot report for the net subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/net
 
-> I see no other escape than to unconditionally enable the send_meta
-> options as well, so that the overwritten MAC DA bytes can always be
-> reconstructed from the upcoming meta frames, even though the RX
-> timestamp (main payload of those meta frames) may or may not be useful.
-> Doing that might also have the benefit that it simplifies the code,
-> removing the need for tagger_data->rxtstamp_set_state() and
-> tagger_data->rxtstamp_get_state(), because with that simplification,
-> the tagger will always expect meta frames.
->=20
-> Because of the lack of complaints, I was considering that as net-next
-> material though.
+During the period, 8 new issues were detected and 15 were fixed.
+In total, 78 issues are still open and 1279 have been fixed so far.
 
-[I'm mixing replies to your 2 emails here, I hope overall this is still
-human parsable ;) ]
+Some of the still happening issues:
 
-Quickly skimming over the patch you shared I *think* it could be -net
-material, too. Given the mentioned lack of complains for the potential
-issue, I think it could be a follow-up to this series.
+Ref  Crashes Repro Title
+<1>  6422    Yes   WARNING in dev_watchdog (2)
+                   https://syzkaller.appspot.com/bug?extid=d55372214aff0faa1f1f
+<2>  3717    Yes   KMSAN: uninit-value in eth_type_trans (2)
+                   https://syzkaller.appspot.com/bug?extid=0901d0cc75c3d716a3a3
+<3>  838     Yes   INFO: task hung in switchdev_deferred_process_work (2)
+                   https://syzkaller.appspot.com/bug?extid=8ecc009e206a956ab317
+<4>  516     Yes   INFO: task hung in rtnetlink_rcv_msg
+                   https://syzkaller.appspot.com/bug?extid=8218a8a0ff60c19b8eae
+<5>  431     Yes   KMSAN: uninit-value in IP6_ECN_decapsulate
+                   https://syzkaller.appspot.com/bug?extid=bf7e6250c7ce248f3ec9
+<6>  424     No    KMSAN: uninit-value in __hw_addr_add_ex
+                   https://syzkaller.appspot.com/bug?extid=cec7816c907e0923fdcc
+<7>  326     Yes   WARNING in kcm_write_msgs
+                   https://syzkaller.appspot.com/bug?extid=52624bdfbf2746d37d70
+<8>  249     Yes   KASAN: slab-out-of-bounds Read in decode_session6
+                   https://syzkaller.appspot.com/bug?extid=2bcc71839223ec82f056
+<9>  193     Yes   general protection fault in scatterwalk_copychunks (4)
+                   https://syzkaller.appspot.com/bug?extid=66e3ea42c4b176748b9c
+<10> 172     Yes   BUG: corrupted list in p9_fd_cancelled (2)
+                   https://syzkaller.appspot.com/bug?extid=1d26c4ed77bc6c5ed5e6
 
-I'm applying it right now.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Thanks!
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-Paolo
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
+You may send multiple commands in a single email message.
 
