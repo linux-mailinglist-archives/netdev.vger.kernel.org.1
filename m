@@ -1,138 +1,131 @@
-Return-Path: <netdev+bounces-14539-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14542-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E215742456
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:52:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 062D5742467
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 12:53:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5EC461C20AAC
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:52:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B51BA280DD6
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:53:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F961171C0;
-	Thu, 29 Jun 2023 10:46:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6C104C2C2;
+	Thu, 29 Jun 2023 10:51:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 135D0171B7
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:46:22 +0000 (UTC)
-Received: from mail-qv1-xf36.google.com (mail-qv1-xf36.google.com [IPv6:2607:f8b0:4864:20::f36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 792CC1FE3
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:46:20 -0700 (PDT)
-Received: by mail-qv1-xf36.google.com with SMTP id 6a1803df08f44-635e5b06aaeso4511146d6.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 03:46:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5CA1D8473
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 10:51:00 +0000 (UTC)
+Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF03A35A7;
+	Thu, 29 Jun 2023 03:50:58 -0700 (PDT)
+Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-440954dc5fcso194125137.2;
+        Thu, 29 Jun 2023 03:50:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688035579; x=1690627579;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1688035858; x=1690627858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=IxozgYPIJezgNc0ZLNNqct8fkxA6ty7Q7qbLZpS6mBU=;
-        b=iGXn5rBHbJXhLQxjBkP14xXgoNgSYRFMuOdaSMizFqwzC7vZFdiwJFqcjsqSYvv31f
-         fKIHb6cbBftS8mZJXlZZZTPicKvHOrAqpQ+bJysZ00bAAelGuzj6gbUTwfRAgsuRF784
-         3HuVyn3/J6rJn00LVezyVBwBTrdt4gl5LJcHij4C7zSApymXAQJqm3ga4nXZrmMRt85b
-         fLp6Drtkp4OkLDv/fWsi0/sA9Ip749ei6e2G1/P5jk7L4hAkxIbEySWVRXQYlcw2m7IJ
-         +DYTWRYJN1dfuCMBgPKiy6k7Z3J40S1OAFKAumuUhS0OZn2nv/etmPyJhJuAJ4nhL9RO
-         Fi/w==
+        bh=1Bc1SqEnFsskSLnHHMk9CYcfhixRzxz4BpTXdjjVyoI=;
+        b=H5kYKgzRi3u4fLHhcDn3/9RT2+SXXz1L45No9cl2Up2JuZim36+ixeOpcKNsRrsQpQ
+         XVSk4/XTl610ymeWvNNtDYD4icqSqrKzbByxbL1rkL0Xu9li0qynzBnL4czPkzEzh2y4
+         rmEnLoJ0IIcW5o64XF9zMkUPb5sMYVr66ni+1R4ryOTyEFsdcByfvUxvbHDiVbrPC57P
+         O6OyT4cvRzO3wa/g7tVg2dn4YakPO61TpxpM7+ngc8z4u1dUT0Q8PaLeFUBhcfDi+fzI
+         I+G7QuTQro0yQ732af8DTzF3jVE/xkThSFHf2I7bIAZVLk0F9qJt2HrDoqCGN6kvQYCm
+         AKxg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688035579; x=1690627579;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1688035858; x=1690627858;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=IxozgYPIJezgNc0ZLNNqct8fkxA6ty7Q7qbLZpS6mBU=;
-        b=bejLmItteJTC+K3indA+BJ9xOY8AFKc2ziddmtLkJgfXcTauXnCnUgXWXsD1Q45G2W
-         x6lParhIHCOfrnSbjUTpdWRx1jgddg3ryaGtaBZpSCjN5LPNpnokyrziwvGQXUn174QL
-         tJZI4dRR2KXhUiUsg04tUqvYZMZho30KLtak4+s/V0ht7t1aaI1cTJBjQggCoHcFUl0r
-         13zEVAhv44zPToSP43PrCDVUwzG67Kj233vjOMmsw9VjNHaKCb7caeaOlijWYbUGb1Gx
-         crJ4KWZ1M55C8DdEB4uaTdgk7quX5rxeozGTP7Nz7IDwdHwBtL4uSNXTBPssDK3SyG3A
-         X0uQ==
-X-Gm-Message-State: AC+VfDyXqD9pSwyGU55btjvZn3bdZKClSRTI1mDd/IqUQG5LvmTMSf3r
-	yjE0vnqHC+cRg6AtjtMK+A4MjYqenCPMeu4CdHk=
-X-Google-Smtp-Source: ACHHUZ5ED4ayyRbYy3tNvBZ0aVNWyGYCUVxe3HNzqWG5GZs1scGruaKW+0xqDIjjZYEcFyeF0kFHXw==
-X-Received: by 2002:ad4:5d4d:0:b0:632:b37:3327 with SMTP id jk13-20020ad45d4d000000b006320b373327mr35983104qvb.56.1688035579091;
-        Thu, 29 Jun 2023 03:46:19 -0700 (PDT)
-Received: from majuu.waya (bras-base-oshwon9577w-grc-12-142-114-148-137.dsl.bell.ca. [142.114.148.137])
-        by smtp.gmail.com with ESMTPSA id o9-20020a056214180900b006362d4eeb6esm538453qvw.144.2023.06.29.03.46.17
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 03:46:18 -0700 (PDT)
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: deb.chatterjee@intel.com,
-	anjali.singhai@intel.com,
-	namrata.limaye@intel.com,
-	tom@sipanda.io,
-	mleitner@redhat.com,
-	Mahesh.Shirshyad@amd.com,
-	Vipin.Jain@amd.com,
-	tomasz.osinski@intel.com,
-	jiri@resnulli.us,
-	xiyou.wangcong@gmail.com,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	vladbu@nvidia.com,
-	simon.horman@corigine.com,
-	khalidm@nvidia.com,
-	toke@redhat.com,
-	mattyk@nvidia.com,
-	kernel@mojatatu.com,
-	john.andy.fingerhut@intel.com
-Subject: [PATCH RFC v3 net-next 21/21] MAINTAINERS: add p4tc entry
-Date: Thu, 29 Jun 2023 06:45:38 -0400
-Message-Id: <20230629104538.40863-22-jhs@mojatatu.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230629104538.40863-1-jhs@mojatatu.com>
-References: <20230629104538.40863-1-jhs@mojatatu.com>
+        bh=1Bc1SqEnFsskSLnHHMk9CYcfhixRzxz4BpTXdjjVyoI=;
+        b=JCZYTyJ19noACPcVtORHI5ZRMn6S/on7uYwFxcY9ayaRLiv0eyX+lefxW/yvEyMaCZ
+         dECSGPD/r/Yr6FipUWRyTiDd3cJdJ32BczudZqTu8ujc9Gin7p28IHNhR7G1GQOnmC25
+         x9sd/zwoxfhjy4lK7vaJnZLNghX1kGeWKhvkoAMy94+rbbUDe+yhagfOE9320t2MJArE
+         4mhf1/OQD/UyOQWeL+5LKfcWJ48295GjsMg7SV2vccUFW+4PzxYu2V+Y7+56LHwYIS3n
+         LigDFv68IYUM0kUvzKAPkOEKWQLZ5uH7OsKUyVush8T5k1KCFjiUyM50WBonBQOUQTRj
+         UAxA==
+X-Gm-Message-State: ABy/qLYz+PS24RdoTzm3VbJ3Vm5egK0a66oc5UMV7VX6jEtpr0fHdgPi
+	L4bAPJ+Krj4vtkSh3A6d3MjBOPwLKx7kK6Wk24E=
+X-Google-Smtp-Source: APBJJlEI+aDMiN1O2bKvv1N1CDEkTi6TIeFcVBvKGU9Za8J9APmDK/p2ETUabeXwv1eI5gPcw/3jX6FRYrhKDg+O0Ao=
+X-Received: by 2002:a05:6102:e55:b0:444:c1f6:5e3a with SMTP id
+ p21-20020a0561020e5500b00444c1f65e3amr367807vst.25.1688035857761; Thu, 29 Jun
+ 2023 03:50:57 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+ <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+ <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+ <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+ <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+ <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
+ <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+ <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+ <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
+ <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
+ <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
+ <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
+ <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
+ <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
+ <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
+ <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com> <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
+In-Reply-To: <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Thu, 29 Jun 2023 12:50:45 +0200
+Message-ID: <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
+	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-P4TC is currently maintained by Mojatatu Networks.
+On Wed, Jun 28, 2023 at 10:18=E2=80=AFPM Ian Kumlien <ian.kumlien@gmail.com=
+> wrote:
+>
+> On Wed, Jun 28, 2023 at 5:15=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> w=
+rote:
+> >
+> > On Wed, 2023-06-28 at 14:04 +0200, Ian Kumlien wrote:
+> > > So have some hits, would it be better without your warn on? ... Thing=
+s
+> > > are a bit slow atm - lets just say that i noticed the stacktraces
+> > > because a stream stuttered =3D)
+> >
+> > Sorry, I screwed-up completely a newly added check.
+>
+> Thats ok
+>
+> > If you have Kasan enabled you can simply and more safely remove my 2nd
+> > patch. Kasan should be able to catch all the out-of-buffer scenarios
+> > such checks were intended to prevent.
+>
+> I thought I'd run without any of the patches, preparing for that now,
+> but i have to stop testing tomorrow and will continue on monday if i
+> don't catch anything
 
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
-Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
----
- MAINTAINERS | 14 ++++++++++++++
- 1 file changed, 14 insertions(+)
+So, KASAN caught the null pointer derefs, as expected, but it caught
+two of them which i didn't expect.
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index ebd26b3ca..32f6cd30a 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -15782,6 +15782,20 @@ T:	git git://git.kernel.org/pub/scm/linux/kernel/git/mszeredi/vfs.git
- F:	Documentation/filesystems/overlayfs.rst
- F:	fs/overlayfs/
- 
-+P4TC
-+M:	Victor Nogueira <victor@mojatatu.com>
-+M:	Jamal Hadi Salim <jhs@mojatatu.com>
-+M:	Pedro Tammela <pctammela@mojatatu.com>
-+L:	netdev@vger.kernel.org
-+S:	Supported
-+F:	include/net/p4tc.h
-+F:	include/net/p4tc_types.h
-+F:	include/net/tc_act/p4tc.h
-+F:	include/uapi/linux/p4tc.h
-+F:	net/sched/cls_p4.c
-+F:	net/sched/p4tc/
-+F:	tools/testing/selftests/tc-testing/tc-tests/p4tc/
-+
- P54 WIRELESS DRIVER
- M:	Christian Lamparter <chunkeey@googlemail.com>
- L:	linux-wireless@vger.kernel.org
--- 
-2.34.1
+Anyway, I'm off for the weekend so, I hope to be able to send
+something better on Monday, fyi
 
+> > Cheers,
+> >
+> > Paolo
+> >
 
