@@ -1,88 +1,90 @@
-Return-Path: <netdev+bounces-14507-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14508-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 117547421D5
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:13:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D4FA742207
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 10:22:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8CFA4280D90
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 08:13:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 39D25280D90
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 08:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A439F8801;
-	Thu, 29 Jun 2023 08:13:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 324C88814;
+	Thu, 29 Jun 2023 08:22:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9825F848D
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 08:13:50 +0000 (UTC)
-Received: from mail-wm1-x32b.google.com (mail-wm1-x32b.google.com [IPv6:2a00:1450:4864:20::32b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE36E3A81
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:13:46 -0700 (PDT)
-Received: by mail-wm1-x32b.google.com with SMTP id 5b1f17b1804b1-3fbc060a2caso1022925e9.3
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:13:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1E8F68801
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 08:22:39 +0000 (UTC)
+Received: from mail-wr1-x42b.google.com (mail-wr1-x42b.google.com [IPv6:2a00:1450:4864:20::42b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66A523A8E
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:22:38 -0700 (PDT)
+Received: by mail-wr1-x42b.google.com with SMTP id ffacd0b85a97d-313f3a6db22so428674f8f.3
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 01:22:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1688026425; x=1690618425;
+        d=resnulli-us.20221208.gappssmtp.com; s=20221208; t=1688026957; x=1690618957;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=XCNcU+qQjqANE7miJnt/rRYeXCcZNW96kSXkJVN64sA=;
-        b=t+jCRgWMe9clsMdvABkCIyCYTsRENxOd2x1gINk9t8cwUOVP4GpHwYsveP15/BaTxa
-         IiY4bWtoAXAchtgGBvWVBSVHajfMyXWMfg8mH09pnBnYrxbBszocjJo87KBBFuLdyr8w
-         gDwrrJMKhMocvsJEE+7i6hMpn6aw274D3+HbNb8XDLOh+TxC3BZS79vlWTwn34U7DwIo
-         UrNO+xXIyioiE15XYWLzIOxMxZF4seSi5sOpw+1uwvmqFJjPMEFdZ2BjQAT25raMMQuc
-         Hd/KixDUkzG8rXkE/gv8cxwnI39xp/f05IZEtVkXU+ZL/rGRqJy4MJyAOvyOgom44ue+
-         K2zQ==
+        bh=pnekQegzwsRisctNnmboo1Flv3vcYES0Lp+fckFN5sY=;
+        b=QAmw8VvKPSKCa2K72rY2EW7V5lfX1lj+u/ACfv1Lx26QU/dIWS9faLaO9CZ17mMODc
+         b6o/klntMdQqnroCYdNwla8FudZSYjpcRttWd5o8K5Gtlq9bcYQWm/SHdoKkCAhs9WW1
+         KXp3TvZhEX/NLfsF/peaplmVa7L8ChKCi2Ykc2Gy4gLnFbYvgeDYufZ+b6ZIUq7lR9Ik
+         grbNHJXGfMr3ChwJ3EnstUMChWbIT3wqtJDUA5u81A23t9LYLCAoU41TZxGUmHOcBrE/
+         P1MM/p/SDZM9S2D59RbMaL94BIUGSkPWAhGmwBDC37C/V4VyCgZN200t/RgDEX7n3TaO
+         GkNw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688026425; x=1690618425;
+        d=1e100.net; s=20221208; t=1688026957; x=1690618957;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=XCNcU+qQjqANE7miJnt/rRYeXCcZNW96kSXkJVN64sA=;
-        b=W8RGBkwGlqipLqO7DjTNZhbM5gaAw3XtlZ858qHXkaV5TkpgvVXfqf6Z1cZTnAhGdi
-         0/AWWKr8fxYnjt2ZC3IvDLSpSGJ/KPAyK+xTbLc9DkMIv8bHxy+KWJ4lDEgd73rMSwB6
-         TK9a10Th9JaKnpef+4c2/Wz8k9X1Z7o5yq8UYFpg2Iil99jvtDu2gtlV66G+s6XR9tVB
-         XMDpoG/zGtLayd4liTWKoL2eTGTGEkPIcBGnYTv4eUBqbIeLV/45dY6wlGzz7hofCfmf
-         mq71/pbbVeStPN5HxW0JNAZvAUv7iYuBKjT3m2b1SWgj8WsLX0aNTiaWRpaOiLI/Tecp
-         pNGQ==
-X-Gm-Message-State: AC+VfDyvAXhb4jVVd29HTH/L+2fg/cLNY5DdoHxYiQSalcDD0OhdEwQF
-	yOVi/pJE8QTVHsOI9f45tMrkoQ==
-X-Google-Smtp-Source: ACHHUZ4Hq/Ygv5bP0PW9CWoZ78vG28FdK9CR3U+nUITIwO8dut4OijbZB0fTo6rEzYqGldh55avUEQ==
-X-Received: by 2002:a1c:7417:0:b0:3f9:b87c:10db with SMTP id p23-20020a1c7417000000b003f9b87c10dbmr20901942wmc.3.1688026425228;
-        Thu, 29 Jun 2023 01:13:45 -0700 (PDT)
+        bh=pnekQegzwsRisctNnmboo1Flv3vcYES0Lp+fckFN5sY=;
+        b=g2wQ15vSwcntXPvsGA9gcXAUyBe5m6vrtx4gyZdBdkyC95+Pe8CaOp5zLDuWGdk5Yv
+         yjeX5PXvqm7yoLXRBA/KyJhIDZfT9Sy4Dfax6YHyzzkwa5tnht8YFAxD5LBl4d5IeyL5
+         vPH+nfNLacDqdQQLYJXl+IRRDZoGghH6iZuFWlnFGKJfOIbDNmNAYmerGDacBfKMrx9I
+         5jz9DL/W08B0Yo/rXj+HnM3M4PDNmrEhz/VC/lwR84GioUVpmgneHBB/qY+znp5ZGWHk
+         9OX7/r103UEnbYPXBLhAI8jJt4MvjNmCCYUCu/hBTB1R3jhcP122RybYgraMJwq19BNn
+         6m1Q==
+X-Gm-Message-State: AC+VfDxBwD/M8dObddcmcJ0fTI6vrCszynuqWYUr4kjqdc0FiDc8Vj9X
+	uoBgfpBScJYlHHKyfsDcofoeQQ==
+X-Google-Smtp-Source: ACHHUZ4JXzVgHJuPgHk885EhxpRoKdPImG5fW7Lkuhbe5Byutu+bzpvcBvxdLy7fTClkzPvy9enJ1Q==
+X-Received: by 2002:a5d:4985:0:b0:313:f5f0:8efa with SMTP id r5-20020a5d4985000000b00313f5f08efamr8300725wrq.18.1688026956848;
+        Thu, 29 Jun 2023 01:22:36 -0700 (PDT)
 Received: from localhost (host-213-179-129-39.customer.m-online.net. [213.179.129.39])
-        by smtp.gmail.com with ESMTPSA id g11-20020a7bc4cb000000b003fbab76165asm5145964wmk.48.2023.06.29.01.13.44
+        by smtp.gmail.com with ESMTPSA id j9-20020a5d4649000000b0030aefa3a957sm15272550wrs.28.2023.06.29.01.22.35
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 01:13:44 -0700 (PDT)
-Date: Thu, 29 Jun 2023 10:13:43 +0200
+        Thu, 29 Jun 2023 01:22:36 -0700 (PDT)
+Date: Thu, 29 Jun 2023 10:22:34 +0200
 From: Jiri Pirko <jiri@resnulli.us>
-To: Arkadiusz Kubalewski <arkadiusz.kubalewski@intel.com>
-Cc: kuba@kernel.org, vadfed@meta.com, jonathan.lemon@gmail.com,
-	pabeni@redhat.com, corbet@lwn.net, davem@davemloft.net,
-	edumazet@google.com, vadfed@fb.com, jesse.brandeburg@intel.com,
-	anthony.l.nguyen@intel.com, saeedm@nvidia.com, leon@kernel.org,
-	richardcochran@gmail.com, sj@kernel.org, javierm@redhat.com,
-	ricardo.canuelo@collabora.com, mst@redhat.com, tzimmermann@suse.de,
-	michal.michalik@intel.com, gregkh@linuxfoundation.org,
-	jacek.lawrynowicz@linux.intel.com, airlied@redhat.com,
-	ogabbay@kernel.org, arnd@arndb.de, nipun.gupta@amd.com,
-	axboe@kernel.dk, linux@zary.sk, masahiroy@kernel.org,
-	benjamin.tissoires@redhat.com, geert+renesas@glider.be,
-	milena.olech@intel.com, kuniyu@amazon.com, liuhangbin@gmail.com,
-	hkallweit1@gmail.com, andy.ren@getcruise.com, razor@blackwall.org,
-	idosch@nvidia.com, lucien.xin@gmail.com, nicolas.dichtel@6wind.com,
-	phil@nwl.cc, claudiajkang@gmail.com, linux-doc@vger.kernel.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	intel-wired-lan@lists.osuosl.org, linux-rdma@vger.kernel.org,
-	linux-arm-kernel@lists.infradead.org, poros@redhat.com,
-	mschmidt@redhat.com, linux-clk@vger.kernel.org,
-	vadim.fedorenko@linux.dev
-Subject: Re: [RFC PATCH v9 03/10] dpll: core: Add DPLL framework base
- functions
-Message-ID: <ZJ09N2TI4wHrA4rB@nanopsycho>
-References: <20230623123820.42850-1-arkadiusz.kubalewski@intel.com>
- <20230623123820.42850-4-arkadiusz.kubalewski@intel.com>
+To: Vitaly Grinberg <vgrinber@redhat.com>
+Cc: "Kubalewski, Arkadiusz" <arkadiusz.kubalewski@intel.com>,
+	David Airlie <airlied@redhat.com>, andy.ren@getcruise.com,
+	anthony.l.nguyen@intel.com, arnd@arndb.de, axboe@kernel.dk,
+	Benjamin Tissoires <benjamin.tissoires@redhat.com>,
+	claudiajkang@gmail.com, corbet@lwn.net, davem@davemloft.net,
+	edumazet@google.com, geert+renesas@glider.be,
+	gregkh@linuxfoundation.org, hkallweit1@gmail.com, idosch@nvidia.com,
+	intel-wired-lan@lists.osuosl.org, jacek.lawrynowicz@linux.intel.com,
+	Javier Martinez Canillas <javierm@redhat.com>,
+	jesse.brandeburg@intel.com, jonathan.lemon@gmail.com,
+	kuba@kernel.org, kuniyu@amazon.com, leon@kernel.org,
+	linux-arm-kernel@lists.infradead.org, linux-clk@vger.kernel.org,
+	linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, linux@zary.sk, liuhangbin@gmail.com,
+	lucien.xin@gmail.com, masahiroy@kernel.org,
+	michal.michalik@intel.com, milena.olech@intel.com,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Michael Tsirkin <mst@redhat.com>, netdev@vger.kernel.org,
+	nicolas.dichtel@6wind.com, nipun.gupta@amd.com, ogabbay@kernel.org,
+	Paolo Abeni <pabeni@redhat.com>, phil@nwl.cc,
+	Petr Oros <poros@redhat.com>, razor@blackwall.org,
+	ricardo.canuelo@collabora.com, richardcochran@gmail.com,
+	saeedm@nvidia.com, sj@kernel.org, tzimmermann@suse.de,
+	vadfed@fb.com, vadfed@meta.com, vadim.fedorenko@linux.dev
+Subject: Re: [RFC PATCH v8 00/10] Create common DPLL configuration API
+Message-ID: <ZJ0/StDYFANB1COA@nanopsycho>
+References: <CACLnSDhkUA=19905RKk=f1WBkd3jTEDcvytJCgavi90FroXb5w@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -91,51 +93,21 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230623123820.42850-4-arkadiusz.kubalewski@intel.com>
+In-Reply-To: <CACLnSDhkUA=19905RKk=f1WBkd3jTEDcvytJCgavi90FroXb5w@mail.gmail.com>
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fri, Jun 23, 2023 at 02:38:13PM CEST, arkadiusz.kubalewski@intel.com wrote:
->From: Vadim Fedorenko <vadim.fedorenko@linux.dev>
->
+Thu, Jun 22, 2023 at 09:44:19AM CEST, vgrinber@redhat.com wrote:
+>Hi,
+>Could it be possible to add PPS DPLL phase offset to the netlink API? We
+>are relying on it in the E810-based grandmaster implementation.
 
-One thing I forgot to point out the last time:
-
-[...]	
-	
->+int
->+dpll_pin_register(struct dpll_device *dpll, struct dpll_pin *pin,
->+		  const struct dpll_pin_ops *ops, void *priv)
->+{
->+	int ret;
->+
->+	if (WARN_ON(!ops) ||
->+	    WARN_ON(!ops->state_on_dpll_get) ||
->+	    WARN_ON(!ops->direction_get))
-
-Please add check that you don't register to dpll instance which is
-unregistered. Similar check needs to be added to pin_on_pin register.
-
-Also, make sure you don't unregister dpll device/pin which has child
-pins registered under it.
+In which driver you need to implement this?
 
 
->+		return -EINVAL;
->+
->+	mutex_lock(&dpll_lock);
->+	if (WARN_ON(!(dpll->module == pin->module &&
->+		      dpll->clock_id == pin->clock_id)))
->+		ret = -EINVAL;
->+	else
->+		ret = __dpll_pin_register(dpll, pin, ops, priv);
->+	mutex_unlock(&dpll_lock);
->+
->+	return ret;
->+}
-
-[...]
+>Thanks,
+>Vitaly
 
