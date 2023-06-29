@@ -1,130 +1,83 @@
-Return-Path: <netdev+bounces-14622-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14623-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3DCE8742BA3
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:59:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1BBB4742BA8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:59:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8C4A5280E22
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 17:59:13 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4BAA91C20AD1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 17:59:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B063D13AF6;
-	Thu, 29 Jun 2023 17:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5004513AFA;
+	Thu, 29 Jun 2023 17:59:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 90E6913AC3;
-	Thu, 29 Jun 2023 17:59:09 +0000 (UTC)
-Received: from out5-smtp.messagingengine.com (out5-smtp.messagingengine.com [66.111.4.29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4694EE49;
-	Thu, 29 Jun 2023 10:59:08 -0700 (PDT)
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailout.nyi.internal (Postfix) with ESMTP id 99BFF5C030F;
-	Thu, 29 Jun 2023 13:59:07 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute6.internal (MEProxy); Thu, 29 Jun 2023 13:59:07 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:content-type:date
-	:date:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to; s=fm1; t=
-	1688061547; x=1688147947; bh=zcTZxE9rpOoRkiMqNrWJKVYoGMOyFfMOjEX
-	rxqdBCO0=; b=QOcUfjyvHJ6D2L3Dlwp0WTQ344bF9/0nbhpJze8piFkWG8+MkX+
-	UOCg6rcslYY1EqcOC9he1B8AmiuhRwPu0c2DeD7QPI0hWv/1sYtWjycs1MDaWBfY
-	mY+9LtflSl5HTTi2SXulWzPe+sOwJQGOzk7LLeObAaWQOjlLOx1Y0CImH1dXkCYa
-	+p/ajyTPybxU/CG5mpPwuZ5D2CO7rrhj1mxhl9sG48oG6LGHk40C1J7Uo/WE8/zo
-	y/P1NFDLv3zKD9xTfd8TYmlMsUe0+56nnDxgyNm7rksmrEnE2MqOv3KFYr9o6mb/
-	6HimsdiRxljAD0epXrfU2FI5ifeO98xrRgQ==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:content-type:date:date:feedback-id:feedback-id
-	:from:from:in-reply-to:in-reply-to:message-id:mime-version
-	:references:reply-to:sender:subject:subject:to:to:x-me-proxy
-	:x-me-proxy:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=
-	1688061547; x=1688147947; bh=zcTZxE9rpOoRkiMqNrWJKVYoGMOyFfMOjEX
-	rxqdBCO0=; b=KvDjFlOX3It/jB2DidOzLexu8tyDdbcVc97bseorb+kgeE6Cp+t
-	xGOuDCM0m5yGblZCDv8LYKshsajzIOIC8/TmFYxCcQeo/LwnR6uN2cb1t85vLXM8
-	w8KWP9sQqPmxhc0iZXCacKSbIRDZUdlTzzMAWXpR18Hau423nXMoGGllJOmdsJq4
-	IahcQpjXUnAKpCxqQ4CIcsk6fs+Qoyqwj6dRfDI8z1+2Wzcxqa1itwWI48h3v6Mu
-	7GKFr5iEe0+FvG3kXsrrxnAJLVbgREk1y+TmVJtGh2JES8ZaDKKYTVdoU8szn/m0
-	H3cBGwJOcsa3wYE24ChLDIpLLVaRKygqdsA==
-X-ME-Sender: <xms:asadZDjkKMaWuDTze6cFuJbqwcwnWbMh16BQlZdyNeTgGDdC3P9hIg>
-    <xme:asadZACYCVgLwjQtSadOrI9bn_iBQmGEFgioAGdIDwu78UbZ2eHW8piFHKvOnmDxC
-    lzZ_eb7jn4zaeTISw>
-X-ME-Received: <xmr:asadZDEQBjLJcoOU0ux7N7J5jGQEa_C4EYqpuOP4j7RmLSicnzRv7_bZd90I6ttiIqCtB3PythTSGUeEhICiJED0CWun6AZxXU-_>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrtdeggdduudelucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    gfrhhlucfvnfffucdlvdefmdenucfjughrpeffhffvvefukfhfgggtugfgjgestheksfdt
-    tddtudenucfhrhhomhepffgrnhhivghlucgiuhcuoegugihusegugihuuhhurdighiiiqe
-    enucggtffrrghtthgvrhhnpedufeeitdeiheffueffleffgeehgeejkeetkefgtdekfeej
-    heffjedtgfekieetleenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrih
-    hlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:asadZARXMG_Xg5rfhd2yeyDHqx1XwQBXhhaBr0DDozekyiC_-39tvw>
-    <xmx:asadZAxptrHuJMR4cUkl-YO_rGhERLHkICobjSNACkhSoTozdLe1iw>
-    <xmx:asadZG4eAk216siHH6UQI0kuyExIcLUmG4Ty_24wADoCLFTcg360rQ>
-    <xmx:a8adZPlmja08QxHviOqdJjap12poRut-N_BKnVIyu1k6y7RXWpoQ5Q>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 29 Jun 2023 13:59:06 -0400 (EDT)
-Date: Thu, 29 Jun 2023 11:59:04 -0600
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: Florian Westphal <fw@strlen.de>
-Cc: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@redhat.com>, 
-	bpf@vger.kernel.org, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, coreteam@netfilter.org, netfilter-devel@vger.kernel.org, 
-	daniel@iogearbox.net, dsahern@kernel.org
-Subject: Re: [PATCH bpf-next 0/7] Support defragmenting IPv(4|6) packets in
- BPF
-Message-ID: <nk6jl4hqougwim4sfgnm6rleh64dqad6qbqghbmjcfi6o7qrae@q3jtw34azrml>
-References: <cover.1687819413.git.dxu@dxuuu.xyz>
- <874jmthtiu.fsf@toke.dk>
- <20230627154439.GA18285@breakpoint.cc>
- <87o7kyfoqf.fsf@toke.dk>
- <20230629132141.GA10165@breakpoint.cc>
- <87leg2fia0.fsf@toke.dk>
- <20230629145315.GB10165@breakpoint.cc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F2903134C9
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 17:59:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E65BC433C0;
+	Thu, 29 Jun 2023 17:59:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688061582;
+	bh=xeGig3ReUOO8qDN/BrObaTpjIyCxfRS1L93AP6EdMSQ=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=HhVpV+Td3XXnYgIk0mnfhNA712MfsypchvO8JSHhHfsmygntQrtktPYGrqvBTs4Gs
+	 4W8jrLoUl7Rr9pAGP3olKMMtGRMmhng6U8BtS85uBOMsLn7d4QsEWpGJwwghPeTNEw
+	 p3cxbUULyTqYsD5pYhsm3CQ+MyDJL384kKdaOXbDlp/1QfJNFlIl0cpQi8VS+5HX2K
+	 xZRuPFk74m6MPvQWTjE/f7EZt0zXxX5luKmKTw3KNR1hBjgDPEiTFkX2P0F7JGcVze
+	 bKwtlLwM35HT6eixNeARDiW+ySeCFu6VZXMNnbmREyVa4sf5MuHcAg9YATjdPSqSuo
+	 u7z33ruUnh6NQ==
+Date: Thu, 29 Jun 2023 10:59:41 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
+Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: Re: pull request: bluetooth-next 2023-06-27
+Message-ID: <20230629105941.1f7fed9c@kernel.org>
+In-Reply-To: <20230629082241.56eefe0b@kernel.org>
+References: <20230627191004.2586540-1-luiz.dentz@gmail.com>
+	<20230628193854.6fabbf6d@kernel.org>
+	<CABBYNZLBAr72WCysVEFS9hdycYu4JRH2=SiP_SVBh08vukhh4Q@mail.gmail.com>
+	<20230629082241.56eefe0b@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=iso-8859-1
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230629145315.GB10165@breakpoint.cc>
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Thu, Jun 29, 2023 at 04:53:15PM +0200, Florian Westphal wrote:
-> Toke Høiland-Jørgensen <toke@redhat.com> wrote:
-> > Florian Westphal <fw@strlen.de> writes:
-> > As for the original question, that's answered by your point above: If
-> > those two modules are the only ones that are likely to need this, then a
-> > flag for each is fine by me - that was the key piece I was missing (I'm
-> > not a netfilter expert, as you well know).
+On Thu, 29 Jun 2023 08:22:41 -0700 Jakub Kicinski wrote:
+> On Wed, 28 Jun 2023 22:01:05 -0700 Luiz Augusto von Dentz wrote:
+> > >  a8d0b0440b7f ("Bluetooth: btrtl: Add missing MODULE_FIRMWARE declarations")
+> > >  349cae7e8d84 ("Bluetooth: btusb: Add device 6655:8771 to device tables")
+> > >  afdbe6303877 ("Bluetooth: btqca: use le32_to_cpu for ver.soc_id")
+> > >  d1b10da77355 ("Bluetooth: L2CAP: Fix use-after-free")
+> > >  c1121a116d5f ("Bluetooth: fix invalid-bdaddr quirk for non-persistent setup")
+> > >  2f8b38e5eba4 ("Bluetooth: fix use-bdaddr-property quirk")
+> > >  317af9ba6fff ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_ready_cb")
+> > >  a6cfe4261f5e ("Bluetooth: hci_bcm: do not mark valid bd_addr as invalid")
+> > >  20b3370a6bfb ("Bluetooth: ISO: use hci_sync for setting CIG parameters")
+> > >  29a3b409a3f2 ("Bluetooth: hci_event: fix Set CIG Parameters error status handling")
+> > >  48d15256595b ("Bluetooth: MGMT: Fix marking SCAN_RSP as not connectable")
+> > >  f145eeb779c3 ("Bluetooth: ISO: Rework sync_interval to be sync_factor")
+> > >  0d39e82e1a7b ("Bluetooth: hci_sysfs: make bt_class a static const structure")
+> > >  8649851b1945 ("Bluetooth: hci_event: Fix parsing of CIS Established Event")
+> > >  5b611951e075 ("Bluetooth: btusb: Add MT7922 bluetooth ID for the Asus Ally")
+> > >  00b51ce9f603 ("Bluetooth: hci_conn: Use kmemdup() to replace kzalloc + memcpy")
+> > >
+> > > You can throw in a few more things you think are important and are
+> > > unlikely to cause regressions.    
+> > 
+> > Yeah, those seem to be the most important ones, do you want me to redo
+> > the pull-request or perhaps you can just cherry-pick them?  
 > 
-> No problem, I was worried I was missing an important piece of kfunc
-> plumbing :-)
-> 
-> You do raise a good point though.  With kfuncs, module is pinned.
-> So, should a "please turn on defrag for this bpf_link" pin
-> the defrag modules too?
-> 
-> For plain netfilter we don't do that, i.e. you can just do
-> "rmmod nf_defrag_ipv4".  But I suspect that for the new bpf-link
-> defrag we probably should grab a reference to prevent unwanted
-> functionality breakage of the bpf prog.
+> Nothing to add to that list?
+> Let me see if I can cherry-pick them cleanly.
 
-Ack. Will add to v3.
-
-Thanks,
-Daniel
+I pushed these to net now, hopefully I didn't mess it up :)
 
