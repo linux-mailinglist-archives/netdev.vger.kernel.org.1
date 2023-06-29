@@ -1,31 +1,31 @@
-Return-Path: <netdev+bounces-14473-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14474-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6339C741DDE
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 04:00:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 73A4F741DFB
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 04:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DFC2B1C203BC
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 02:00:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A48801C203D8
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 02:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 06141111F;
-	Thu, 29 Jun 2023 02:00:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9585E139B;
+	Thu, 29 Jun 2023 02:10:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E530115A8
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:00:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 865DC1380
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 02:10:55 +0000 (UTC)
 Received: from mail.nfschina.com (unknown [42.101.60.195])
-	by lindbergh.monkeyblade.net (Postfix) with SMTP id 63D9A2961;
-	Wed, 28 Jun 2023 19:00:00 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with SMTP id 6ADF61FEB;
+	Wed, 28 Jun 2023 19:10:53 -0700 (PDT)
 Received: from [172.30.11.106] (unknown [180.167.10.98])
-	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 92556604A13F4;
-	Thu, 29 Jun 2023 09:59:57 +0800 (CST)
-Message-ID: <325f00e3-1dfd-f77b-9795-6f89e44c0417@nfschina.com>
-Date: Thu, 29 Jun 2023 09:59:56 +0800
+	by mail.nfschina.com (Maildata Gateway V2.8.8) with ESMTPSA id 23C4C604D34EE;
+	Thu, 29 Jun 2023 10:10:39 +0800 (CST)
+Message-ID: <72784932-8390-4f82-fbaa-5086804025df@nfschina.com>
+Date: Thu, 29 Jun 2023 10:10:38 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -34,87 +34,57 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:91.0) Gecko/20100101
  Thunderbird/91.8.0
-Subject: Re: [PATCH net-next 08/10] net: mdio: Remove unnecessary (void*)
- conversions
+Subject: Re: [PATCH net-next 00/10] Remove unnecessary (void*) conversions
 Content-Language: en-US
-To: "Russell King (Oracle)" <linux@armlinux.org.uk>
-Cc: iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
- quan@os.amperecomputing.com, andrew@lunn.ch, hkallweit1@gmail.com,
+To: Andrew Lunn <andrew@lunn.ch>
+Cc: Hao Lan <lanhao@huawei.com>, f.fainelli@gmail.com, olteanv@gmail.com,
  davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ pabeni@redhat.com, irusskikh@marvell.com, yisen.zhuang@huawei.com,
+ salil.mehta@huawei.com, jesse.brandeburg@intel.com,
+ anthony.l.nguyen@intel.com, steve.glendinning@shawell.net,
+ iyappan@os.amperecomputing.com, keyur@os.amperecomputing.com,
+ quan@os.amperecomputing.com, hkallweit1@gmail.com, linux@armlinux.org.uk,
+ mostrows@earthlink.net, xeb@mail.ru, qiang.zhao@nxp.com,
+ yangyingliang@huawei.com, linux@rempel-privat.de, ansuelsmth@gmail.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linuxppc-dev@lists.ozlabs.org,
  kernel-janitors@vger.kernel.org
 X-MD-Sfrom: yunchuan@nfschina.com
 X-MD-SrcIP: 180.167.10.98
 From: yunchuan <yunchuan@nfschina.com>
-In-Reply-To: <ZJwCcWgi0d6kEepI@shell.armlinux.org.uk>
+In-Reply-To: <ecd70c28-1629-4b6c-96fc-a0b8f8713a04@lunn.ch>
 Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,RDNS_NONE,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/6/28 17:50, Russell King (Oracle) wrote:
-> Hi,
->
-> I think you missed one case:
->
->          if (mdio_id == XGENE_MDIO_RGMII) {
->                  mdio_bus->read = xgene_mdio_rgmii_read;
->                  mdio_bus->write = xgene_mdio_rgmii_write;
->                  mdio_bus->priv = (void __force *)pdata;
->
-> This cast using __force is also not required.
->
-> On Wed, Jun 28, 2023 at 10:45:17AM +0800, wuych wrote:
->> @@ -211,7 +211,7 @@ static void xgene_enet_wr_mdio_csr(void __iomem *base_addr,
->>   static int xgene_xfi_mdio_write(struct mii_bus *bus, int phy_id,
->>   				int reg, u16 data)
->>   {
->> -	void __iomem *addr = (void __iomem *)bus->priv;
->> +	void __iomem *addr = bus->priv;
->>   	int timeout = 100;
->>   	u32 status, val;
->>   
->> @@ -234,7 +234,7 @@ static int xgene_xfi_mdio_write(struct mii_bus *bus, int phy_id,
->>   
->>   static int xgene_xfi_mdio_read(struct mii_bus *bus, int phy_id, int reg)
->>   {
->> -	void __iomem *addr = (void __iomem *)bus->priv;
->> +	void __iomem *addr = bus->priv;
->>   	u32 data, status, val;
->>   	int timeout = 100;
-> These probably cause Sparse to warn whether or not the cast is there.
+On 2023/6/28 22:39, Andrew Lunn wrote:
+> On Wed, Jun 28, 2023 at 04:37:43PM +0200, Andrew Lunn wrote:
+>>> Hi, Hao Lan,
+>>>
+>>> Sorry for that, I just compiled these patches in the mainline branch.
+>>> I know now, it's also necessary to compile patches in net and net-next
+>>> branch.
+>>> Thanks for your reply!
+>> net-next is also closed at the moment due to the merge window. Please
+>> wait two weeks before reposting, by which time net-next will be open
+>> again.
 
-Hi, Russell King,
+Hi, Andrew Lunn,
 
-I didn't notice this Sparse warning.
-Should I remove this cast although it cause Sparse warning?
->
-> Given that in this case, bus->priv is initialised via:
->
->                  mdio_bus->priv = (void __force *)pdata->mdio_csr_addr;
->
-> I think the simple thing is to _always_ initialise mdio_bus->priv
-> to point at pdata, and have xgene_xfi_mdio_*() always do:
->
-> 	struct xgene_mdio_pdata *pdata = bus->priv;
-> 	void __iomem *addr = pdata->mdio_csr_addr;
->
-> The extra access will be dwarfed by the time taken to perform the
-> access.
->
-> This change should be made with a separate patch and not combined with
-> the patch removing the casts in xgene_mdio_rgmii_*().
-yeah, this change is great.
-I will send a separate patch as your suggestion If we can ignore Sparse 
-warning.
-Thanks for your suggestion!
+Understand, and thanks for your reminding!
+
+> Your email threading also seems to be broken, there is no
+> threading. That might cause pathworks an issue.
+Sometimes it doesn't work, but I also receive email from email list.
+So I can read your email from email list although something is broken.
+Thanks again！
 
 wuych
 
 >
-> Thanks.
->
+> 	Andrew
 
