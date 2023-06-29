@@ -1,138 +1,153 @@
-Return-Path: <netdev+bounces-14632-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14633-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A597D742BF0
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:34:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 46739742C03
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 20:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 60196280C55
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:34:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 75F29280CE1
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 18:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B926BF9ED;
-	Thu, 29 Jun 2023 18:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA42A12B7C;
+	Thu, 29 Jun 2023 18:43:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB89113AD4
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 18:34:53 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E16A61719;
-	Thu, 29 Jun 2023 11:34:48 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b69ed7d050so16189111fa.2;
-        Thu, 29 Jun 2023 11:34:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A801A12B63
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 18:43:05 +0000 (UTC)
+Received: from mail-ej1-x633.google.com (mail-ej1-x633.google.com [IPv6:2a00:1450:4864:20::633])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EC5B92693
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 11:43:03 -0700 (PDT)
+Received: by mail-ej1-x633.google.com with SMTP id a640c23a62f3a-991c786369cso124073366b.1
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 11:43:03 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688063687; x=1690655687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ad4G5blKLDpsOnQFvBn9APXDoavlfkj0FLRAwkigTTc=;
-        b=dnGMhhe4w2F/vWdTYzVNCYH4mWjFkbR3z0RO9qyiIX2fdTovD877uZJuAMwnnzGrqC
-         iAvX4NFn13UuJylv5HlrPypdBvJyREA8mIy6ggBvOk18iQFLh0iwax+QenQsB0p0Bk6q
-         DirpJZ/ZbeCDQKD7dI9zYL+etKzr28VkBW56fO0SX3dwdKUckGMSmtfI7XISanpAvZU3
-         lHfeli6xNuDRhqqDD/r5mj2dsD3O+uc5Hcv1zLbXkrnVd/+3apQT+ralAzEQUuJcCQFu
-         XGicCVIW2wY2nPiUgQnK5z/yRAYtEjvsSNIFbM1jRVPT61fpwt7xmfl9cvnAaIvneghC
-         nUDg==
+        d=linux-foundation.org; s=google; t=1688064182; x=1690656182;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:from:to:cc:subject:date:message-id:reply-to;
+        bh=mmhtpqqkJ1KWVH50RxZoMJvMId6WkP/xoN83CJAGivM=;
+        b=HMvzagF0myuZ+UEdT1gsNRXhKxGSBimD2rqEuTr2VRNZ9qRno9HbCh6BzpHJy28qbH
+         KluJwSPOl8jfxmmq1Qp/P0x58Sv9de2mRH4oS1qbqFLdwHyaar456CsbLQUT10Goc3Bo
+         cMJfyTsXV3cekEN8+x/aSW6zoSGGaAr3oceeA=
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688063687; x=1690655687;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ad4G5blKLDpsOnQFvBn9APXDoavlfkj0FLRAwkigTTc=;
-        b=TA5OvHsmthiVs9xM/q7rsA4Rsa2U+IiR8kJ1btfPtsbJnxQwCYHc+na0V024mk25VP
-         crgIFvqbCuzjbJsOICZVtONa0Vg2pUvVYRz91C1/ch20iQ0FcEwBQN3Os4EWRaf5EnAn
-         vvNytw402Vob9642ANcZRC2WVXmyDxjpY4RAf2OlEelBurqSbVSeI7hakxE2arHqzlR4
-         K+ILjNsXFtcAUWjI4GgagFXmKSv3Lwk9+IDK2SvMlMrVMX/1KLt3GD6sj5Jl5A7FffGe
-         ITBoOiGjubmV8T7fjokfTWLU2RFZsjas+I0R1AmBRk9ClvOw2NHEvya78S5/lDL/rDVw
-         xnAw==
-X-Gm-Message-State: ABy/qLZa9mUYk6Tgyrp/L6kZ4iPdmqFA87ugAwjfVmkyWLRjg9UYO3oV
-	CykrpELh3NK3g1s5h9pxHp3hMCDmdE7hNhonjf4=
-X-Google-Smtp-Source: APBJJlGcryx1LzHvJlXYH/fskMS+YAxHAkWWFVWkiEk/8ArAMjb1VTtNjBIznNPa5zEiVASht5peZDU8KzzOc7UXpoQ=
-X-Received: by 2002:a2e:800b:0:b0:2b6:bbb9:b560 with SMTP id
- j11-20020a2e800b000000b002b6bbb9b560mr452432ljg.0.1688063686820; Thu, 29 Jun
- 2023 11:34:46 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688064182; x=1690656182;
+        h=cc:to:subject:message-id:date:from:in-reply-to:references
+         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=mmhtpqqkJ1KWVH50RxZoMJvMId6WkP/xoN83CJAGivM=;
+        b=LmV/ack3kik5QwNgEZIhSVB2o3Q6CRxtTwmoV7uSh+rkvFRL4Bap63/An0TsOjyU2s
+         //0Dr7W6DYncXLvocoQ7PaB5bZL/pBplxISVpOOoE3pbGCnJGaa9lbNmZgv3fdBIyMT9
+         vm0X6lRkgK9X4OFm4+ZhKqaJShXX7EWMAratn0MoNCjEyfAuDCSwzyzrm2sD8h0VdNsk
+         RYx6Ma5IPy1/c6Hp6m4cWkYkHd/QoT+kO4CSDSggb0OfCF9ZnQlFMftmk5C+aJFf/Iaw
+         59Q4jeBeAK5VGgmp7twP4h2iotDibM0qn5s0LisZf6EI4FCStOn48ZEahA+DmlEGpr8I
+         OVBg==
+X-Gm-Message-State: ABy/qLa7Gif/w57DDb0uL0eLCBRXOBbQdJg1Ub6ZPp6zzR0wtsbFCmOl
+	bSl44fny4sXv5coghsD9DUdqslrx2UrY/tf6zGvDSlhE
+X-Google-Smtp-Source: APBJJlGZACsnBlfTv0PZ4s9lV42lSsLiQXq6Q05ZEeExR4CUD7GgQX3/nkTK3slyjnV9giu+ba3v7Q==
+X-Received: by 2002:a17:906:1152:b0:960:ddba:e5c6 with SMTP id i18-20020a170906115200b00960ddbae5c6mr182884eja.22.1688064182182;
+        Thu, 29 Jun 2023 11:43:02 -0700 (PDT)
+Received: from mail-ed1-f45.google.com (mail-ed1-f45.google.com. [209.85.208.45])
+        by smtp.gmail.com with ESMTPSA id kt19-20020a170906aad300b009894b476310sm7157455ejb.163.2023.06.29.11.43.01
+        for <netdev@vger.kernel.org>
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 29 Jun 2023 11:43:01 -0700 (PDT)
+Received: by mail-ed1-f45.google.com with SMTP id 4fb4d7f45d1cf-5149aafef44so1099241a12.0
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 11:43:01 -0700 (PDT)
+X-Received: by 2002:aa7:c690:0:b0:51d:9693:5124 with SMTP id
+ n16-20020aa7c690000000b0051d96935124mr81608edq.19.1688064180790; Thu, 29 Jun
+ 2023 11:43:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230627191004.2586540-1-luiz.dentz@gmail.com>
- <20230628193854.6fabbf6d@kernel.org> <CABBYNZLBAr72WCysVEFS9hdycYu4JRH2=SiP_SVBh08vukhh4Q@mail.gmail.com>
- <20230629082241.56eefe0b@kernel.org> <20230629105941.1f7fed9c@kernel.org>
-In-Reply-To: <20230629105941.1f7fed9c@kernel.org>
-From: Luiz Augusto von Dentz <luiz.dentz@gmail.com>
-Date: Thu, 29 Jun 2023 11:34:34 -0700
-Message-ID: <CABBYNZ+mg1iB_N3-FnVCH8O6j=EAs1BTZjGcG_dwU2oOGk-T+w@mail.gmail.com>
-Subject: Re: pull request: bluetooth-next 2023-06-27
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, linux-bluetooth@vger.kernel.org, 
-	netdev@vger.kernel.org
+References: <20230629155433.4170837-1-dhowells@redhat.com> <CAHk-=wiDwfyj0CCupT-oEToqsNLcbsTQdcgDupF=ZETUjJQJtQ@mail.gmail.com>
+ <4bd92932-c9d2-4cc8-b730-24c749087e39@mattwhitlock.name> <CAHk-=whYWEUU69nY6k4j1_EQnQDNPy4TqAMvpf1UA111UDdmYg@mail.gmail.com>
+In-Reply-To: <CAHk-=whYWEUU69nY6k4j1_EQnQDNPy4TqAMvpf1UA111UDdmYg@mail.gmail.com>
+From: Linus Torvalds <torvalds@linux-foundation.org>
+Date: Thu, 29 Jun 2023 11:42:44 -0700
+X-Gmail-Original-Message-ID: <CAHk-=wgG_2cmHgZwKjydi7=iimyHyN8aessnbM9XQ9ufbaUz9g@mail.gmail.com>
+Message-ID: <CAHk-=wgG_2cmHgZwKjydi7=iimyHyN8aessnbM9XQ9ufbaUz9g@mail.gmail.com>
+Subject: Re: [RFC PATCH 0/4] splice: Fix corruption in data spliced to pipe
+To: Matt Whitlock <kernel@mattwhitlock.name>
+Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, 
+	Matthew Wilcox <willy@infradead.org>, Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>, 
+	linux-fsdevel@kvack.org, linux-mm@kvack.org, linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Jakub,
-
-On Thu, Jun 29, 2023 at 10:59=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> w=
-rote:
+On Thu, 29 Jun 2023 at 11:19, Linus Torvalds
+<torvalds@linux-foundation.org> wrote:
 >
-> On Thu, 29 Jun 2023 08:22:41 -0700 Jakub Kicinski wrote:
-> > On Wed, 28 Jun 2023 22:01:05 -0700 Luiz Augusto von Dentz wrote:
-> > > >  a8d0b0440b7f ("Bluetooth: btrtl: Add missing MODULE_FIRMWARE decla=
-rations")
-> > > >  349cae7e8d84 ("Bluetooth: btusb: Add device 6655:8771 to device ta=
-bles")
-> > > >  afdbe6303877 ("Bluetooth: btqca: use le32_to_cpu for ver.soc_id")
-> > > >  d1b10da77355 ("Bluetooth: L2CAP: Fix use-after-free")
-> > > >  c1121a116d5f ("Bluetooth: fix invalid-bdaddr quirk for non-persist=
-ent setup")
-> > > >  2f8b38e5eba4 ("Bluetooth: fix use-bdaddr-property quirk")
-> > > >  317af9ba6fff ("Bluetooth: L2CAP: Fix use-after-free in l2cap_sock_=
-ready_cb")
-> > > >  a6cfe4261f5e ("Bluetooth: hci_bcm: do not mark valid bd_addr as in=
-valid")
-> > > >  20b3370a6bfb ("Bluetooth: ISO: use hci_sync for setting CIG parame=
-ters")
-> > > >  29a3b409a3f2 ("Bluetooth: hci_event: fix Set CIG Parameters error =
-status handling")
-> > > >  48d15256595b ("Bluetooth: MGMT: Fix marking SCAN_RSP as not connec=
-table")
-> > > >  f145eeb779c3 ("Bluetooth: ISO: Rework sync_interval to be sync_fac=
-tor")
-> > > >  0d39e82e1a7b ("Bluetooth: hci_sysfs: make bt_class a static const =
-structure")
-> > > >  8649851b1945 ("Bluetooth: hci_event: Fix parsing of CIS Establishe=
-d Event")
-> > > >  5b611951e075 ("Bluetooth: btusb: Add MT7922 bluetooth ID for the A=
-sus Ally")
-> > > >  00b51ce9f603 ("Bluetooth: hci_conn: Use kmemdup() to replace kzall=
-oc + memcpy")
-> > > >
-> > > > You can throw in a few more things you think are important and are
-> > > > unlikely to cause regressions.
-> > >
-> > > Yeah, those seem to be the most important ones, do you want me to red=
-o
-> > > the pull-request or perhaps you can just cherry-pick them?
-> >
-> > Nothing to add to that list?
-> > Let me see if I can cherry-pick them cleanly.
+> Now, we also have SPLICE_F_GIFT. [..]
 >
-> I pushed these to net now, hopefully I didn't mess it up :)
+> Now, I would actually not disagree with removing that part. It's
+> scary. But I think we don't really have any users (ok, fuse and some
+> random console driver?)
 
-Great, thanks. I guess I will change the frequency we do pull request
-to net-next going forward, perhaps something doing it
-bi-weekly/monthly would be better to avoid risking missing the merge
-window if that happens to conflict with some event, etc.
+Side note: maybe I should clarify. I have grown to pretty much hate
+splice() over the years, just because it's been a constant source of
+sorrow in so many ways.
 
---=20
-Luiz Augusto von Dentz
+So I'd personally be perfectly ok with just making vmsplice() be
+exactly the same as write, and turn all of vmsplice() into just "it's
+a read() if the pipe is open for read, and a write if it's open for
+writing".
+
+IOW, effectively get rid of vmsplice() entirely, just leaving it as a
+legacy name for an interface.
+
+What I *absolutely* don't want to see is to make vmsplice() even more
+complicated, and actively slower in the process. Unmapping it from the
+source, removing it from the VM, is all just crazy talk.
+
+If you want to be really crazy, I can tell you how to make for some
+truly stupendously great benchmarks: make a plain "write()" system
+call look up the physical page, check if it's COW'able, and if so,
+mark it read-only in the source and steal the page. Now write() has
+taken a snapshot of the source, and can use that page for the pipe
+buffer as-is. It won't change, because if the user writes to it, the
+user will just take a page fault and force a COW.
+
+Then, to complete the thing, make 'read()' of a pipe able to just take
+the page, and insert it into the destination VM (it's ok to make it
+writable at that point).
+
+You can get *wonderful* performance numbers from benchmarks with that.
+
+I know, because I did exactly that long long ago. So long ago that I
+think I had a i486 that had memory throughput measured in megabytes.
+And my pipe throughput benchmark got gigabytes per second!
+
+Of course, that benchmark relied entirely on the source of the write()
+never actually writing to the page, and the reader never actually
+bothering to touch the page. So it was gigabytes on a pretty bad
+benchmark. But it was quite impressive.
+
+I don't think those patches ever got posted publicly, because while
+very impressive on benchmarks, it obviously was absolutely horrendous
+in real life, because in real life the source of the pipe data would
+(a) not usually be page-aligned anyway, and (b) even if it was and
+triggered this wonderful case, it would then re-use the buffer and
+take a COW fault, and now the overhead of faulting, allocating a new
+page, copying said page, was obviously higher than just doing all that
+in the pipe write() code without any faulting overhead.
+
+But splice() (and vmsplice()) does conceptually come from that kind of
+background.
+
+It's just that it was never as lovely and as useful as it promised to
+be. So I'd actually be more than happy to just say "let's decommission
+splice entirely, just keeping the interfaces alive for backwards
+compatibility"
+
+                     Linus
 
