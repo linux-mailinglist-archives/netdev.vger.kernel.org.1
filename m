@@ -1,54 +1,49 @@
-Return-Path: <netdev+bounces-14654-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14655-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9293C742CEF
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:06:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D1849742CF0
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:06:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4E598280F41
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:06:27 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B33C280CE3
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:06:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E99014A9F;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33E40171B2;
 	Thu, 29 Jun 2023 19:02:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5403D171A3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BAF75171A4
 	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 19:02:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F2A6BC433C9;
-	Thu, 29 Jun 2023 19:02:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 71A93C433C0;
+	Thu, 29 Jun 2023 19:02:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1688065344;
-	bh=/kPk5yCCMKFj2yL0QTfGjODE2MZonSrFdVLwwbFs1wU=;
+	bh=MTEs6JMdDkcU4g/x5LfgVjhEfeizBLf8LKzKbz7NxS4=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nlh7vvECcQyha7WhPSOG6321RdkkrwN6iFGcya0N7HF/uFqkXB+DunhQKsZXJSjqI
-	 tovibrBDztXL+0FvA0QDhh3Id7TwgoK8U+f5mcFgHxK9LVBOK5F3eXPzw7k3Zhj5Tl
-	 XaJMaE39qKMCe1zavO6g61JbGJQlgeKF92QaAX1x0Khk2AFjX5fsJ++LOlz3LaHuu8
-	 jTw8OGib0MS6IXzrDy7zJIoHoRZrYXltd6jraNqth/LN29TL2L6u1zt3YLvwY0Hbzu
-	 JWCkq1mTLsB3GTzYgMJ8BerQV2+sig/tc62SBRB6QXpiIESZR6Os+I2gIcfFEtgLPo
-	 wOT1P/3PETTLQ==
+	b=F65wvtKAQGAsfed8Z4rFfYiMz/vnLdn7SMZCU8Xv4slwC9lxBPyXi7s34SpQIJB5G
+	 WB3wcP3NgbEoO1XZI9RRqjquY3scYy0ZxJXTui8i6oOTVJLmSHoGjlnqp7dIOKc+8N
+	 o05pd5cdzh3j5Jn+Xx/suUFsdyDyjTd6wrs4Qk+irrZhxXzn0QBBUcl6YuvMEnw0b9
+	 r+1ppHpRw6mFdCyxKXqfd/EROxvV+dIEWqNZU0eTIUEJCz9Tkunt+K6hpcVpS17DY6
+	 NiZLn6dTnmcZ/GlCspASez6bsID1etF4C32xiW37B8FCdggmmKi0qZdMapEYydgQyu
+	 dNaaCiYie9Wmw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Yasushi SHOJI <yasushi.shoji@gmail.com>,
-	Yasushi SHOJI <yashi@spacecubics.com>,
-	Marc Kleine-Budde <mkl@pengutronix.de>,
+Cc: Rasmus Villemoes <linux@rasmusvillemoes.dk>,
+	Jacob Keller <jacob.e.keller@intel.com>,
+	"David S . Miller" <davem@davemloft.net>,
 	Sasha Levin <sashal@kernel.org>,
-	wg@grandegger.com,
-	davem@davemloft.net,
 	edumazet@google.com,
 	kuba@kernel.org,
 	pabeni@redhat.com,
-	mailhol.vincent@wanadoo.fr,
-	socketcan@hartkopp.net,
-	linux-can@vger.kernel.org,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 4.19 4/5] can: mcba_usb: Fix termination command argument
-Date: Thu, 29 Jun 2023 15:02:18 -0400
-Message-Id: <20230629190219.908379-4-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 4.19 5/5] net: loopback: use NET_NAME_PREDICTABLE for name_assign_type
+Date: Thu, 29 Jun 2023 15:02:19 -0400
+Message-Id: <20230629190219.908379-5-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230629190219.908379-1-sashal@kernel.org>
 References: <20230629190219.908379-1-sashal@kernel.org>
@@ -63,79 +58,47 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 4.19.287
 Content-Transfer-Encoding: 8bit
 
-From: Yasushi SHOJI <yasushi.shoji@gmail.com>
+From: Rasmus Villemoes <linux@rasmusvillemoes.dk>
 
-[ Upstream commit 1a8e3bd25f1e789c8154e11ea24dc3ec5a4c1da0 ]
+[ Upstream commit 31d929de5a112ee1b977a89c57de74710894bbbf ]
 
-Microchip USB Analyzer can activate the internal termination resistors
-by setting the "termination" option ON, or OFF to to deactivate them.
-As I've observed, both with my oscilloscope and captured USB packets
-below, you must send "0" to turn it ON, and "1" to turn it OFF.
+When the name_assign_type attribute was introduced (commit
+685343fc3ba6, "net: add name_assign_type netdev attribute"), the
+loopback device was explicitly mentioned as one which would make use
+of NET_NAME_PREDICTABLE:
 
-From the schematics in the user's guide, I can confirm that you must
-drive the CAN_RES signal LOW "0" to activate the resistors.
+    The name_assign_type attribute gives hints where the interface name of a
+    given net-device comes from. These values are currently defined:
+...
+      NET_NAME_PREDICTABLE:
+        The ifname has been assigned by the kernel in a predictable way
+        that is guaranteed to avoid reuse and always be the same for a
+        given device. Examples include statically created devices like
+        the loopback device [...]
 
-Reverse the argument value of usb_msg.termination to fix this.
+Switch to that so that reading /sys/class/net/lo/name_assign_type
+produces something sensible instead of returning -EINVAL.
 
-These are the two commands sequence, ON then OFF.
-
-> No.     Time           Source                Destination           Protocol Length Info
->       1 0.000000       host                  1.3.1                 USB      46     URB_BULK out
->
-> Frame 1: 46 bytes on wire (368 bits), 46 bytes captured (368 bits)
-> USB URB
-> Leftover Capture Data: a80000000000000000000000000000000000a8
->
-> No.     Time           Source                Destination           Protocol Length Info
->       2 4.372547       host                  1.3.1                 USB      46     URB_BULK out
->
-> Frame 2: 46 bytes on wire (368 bits), 46 bytes captured (368 bits)
-> USB URB
-> Leftover Capture Data: a80100000000000000000000000000000000a9
-
-Signed-off-by: Yasushi SHOJI <yashi@spacecubics.com>
-Link: https://lore.kernel.org/all/20221124152504.125994-1-yashi@spacecubics.com
-Signed-off-by: Marc Kleine-Budde <mkl@pengutronix.de>
+Signed-off-by: Rasmus Villemoes <linux@rasmusvillemoes.dk>
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+Signed-off-by: David S. Miller <davem@davemloft.net>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- drivers/net/can/usb/mcba_usb.c | 10 +++++++---
- 1 file changed, 7 insertions(+), 3 deletions(-)
+ drivers/net/loopback.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/drivers/net/can/usb/mcba_usb.c b/drivers/net/can/usb/mcba_usb.c
-index ea1de06009d6d..093458fbde68b 100644
---- a/drivers/net/can/usb/mcba_usb.c
-+++ b/drivers/net/can/usb/mcba_usb.c
-@@ -58,6 +58,10 @@
- #define MCBA_VER_REQ_USB 1
- #define MCBA_VER_REQ_CAN 2
+diff --git a/drivers/net/loopback.c b/drivers/net/loopback.c
+index d192936b76cff..7863918592db9 100644
+--- a/drivers/net/loopback.c
++++ b/drivers/net/loopback.c
+@@ -210,7 +210,7 @@ static __net_init int loopback_net_init(struct net *net)
+ 	int err;
  
-+/* Drive the CAN_RES signal LOW "0" to activate R24 and R25 */
-+#define MCBA_VER_TERMINATION_ON 0
-+#define MCBA_VER_TERMINATION_OFF 1
-+
- #define MCBA_SIDL_EXID_MASK 0x8
- #define MCBA_DLC_MASK 0xf
- #define MCBA_DLC_RTR_MASK 0x40
-@@ -480,7 +484,7 @@ static void mcba_usb_process_ka_usb(struct mcba_priv *priv,
- 		priv->usb_ka_first_pass = false;
- 	}
- 
--	if (msg->termination_state)
-+	if (msg->termination_state == MCBA_VER_TERMINATION_ON)
- 		priv->can.termination = MCBA_TERMINATION_ENABLED;
- 	else
- 		priv->can.termination = MCBA_TERMINATION_DISABLED;
-@@ -800,9 +804,9 @@ static int mcba_set_termination(struct net_device *netdev, u16 term)
- 	};
- 
- 	if (term == MCBA_TERMINATION_ENABLED)
--		usb_msg.termination = 1;
-+		usb_msg.termination = MCBA_VER_TERMINATION_ON;
- 	else
--		usb_msg.termination = 0;
-+		usb_msg.termination = MCBA_VER_TERMINATION_OFF;
- 
- 	mcba_usb_xmit_cmd(priv, (struct mcba_usb_msg *)&usb_msg);
+ 	err = -ENOMEM;
+-	dev = alloc_netdev(0, "lo", NET_NAME_UNKNOWN, loopback_setup);
++	dev = alloc_netdev(0, "lo", NET_NAME_PREDICTABLE, loopback_setup);
+ 	if (!dev)
+ 		goto out;
  
 -- 
 2.39.2
