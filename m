@@ -1,137 +1,142 @@
-Return-Path: <netdev-owner@vger.kernel.org>
+Return-Path: <netdev+bounces-14661-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from out1.vger.email (out1.vger.email [IPv6:2620:137:e000::1:20])
-	by mail.lfdr.de (Postfix) with ESMTP id E565D742DB8
-	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:40:23 +0200 (CEST)
-Received: (majordomo@vger.kernel.org) by vger.kernel.org via listexpand
-        id S231202AbjF2TkL (ORCPT <rfc822;lists+netdev@lfdr.de>);
-        Thu, 29 Jun 2023 15:40:11 -0400
-Received: from mail-dm6nam10on2090.outbound.protection.outlook.com ([40.107.93.90]:51105
-        "EHLO NAM10-DM6-obe.outbound.protection.outlook.com"
-        rhost-flags-OK-OK-OK-FAIL) by vger.kernel.org with ESMTP
-        id S229742AbjF2TkK (ORCPT <rfc822;netdev@vger.kernel.org>);
-        Thu, 29 Jun 2023 15:40:10 -0400
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=Joa4ZjrucHKaj7cXIFEdSigtRSB5il5bAapsXsmWzBP313j2yQKw4SbT2QbCPqFBouwIZEepwsUtsLMaQETGviyS/vjSBx7yW3TJx9dtJc4GlEWtv2FYxrTR8pE6k63GtwVdD1EUiDL4FM2x4oq77RKV6JnTV3DdgwjJTetdNhUSwm5QtblUbwYfRGfmwACsEND2BUgYEgkWUF4zNy3yFlphVul4UIGBQaW0HhfUKkxboI9rimgSfvXTun0BGrZcP5ERncrPwlG0+dHnWzprEBmI99rKjfu5MA2iiGXN3XVKJcd7c1ghbWm6QcPiw2tBRuarX6Z5P5Vo9QNvbzEF/w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tIWRn2+Da3yu9uiVYvGeI1cIa7PojfDx0sd9Zlbmb3I=;
- b=Cwt0iLrx5iprgigqu4yDZ9oVYChfqrihm2AeTYaDztnVeYk4jEORMK51PJYwr3ERoI1xjksPQ+tJJuTdXo1/VlzGgzmZDV0NLibQJHMYk9h2kTw3y9pjPwbCPaXxRbsgHDOoiV6qdZFyCGXtARd5c9qNEYzEhxp9OaXNfINrbUmrkyBXm+cuHs7gkRV334PklaKtDsDFWwOXzn01cWlVKBnnqx9DAe5S1CXsV2BIishRstm/BysxPtVkgkAwW0yBp8X6zYP3XdliViZgcSJ6TJ5GbGUXBbSrBHqd8RddkhNSFVWmxEb7vcoxFNmbH32IdhH7TLPVcQeidO3bygZf+g==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 98562742DE6
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 21:57:56 +0200 (CEST)
+Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D1DBB1C204F6
+	for <lists+netdev@lfdr.de>; Thu, 29 Jun 2023 19:57:55 +0000 (UTC)
+Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A400414AB3;
+	Thu, 29 Jun 2023 19:57:53 +0000 (UTC)
+X-Original-To: netdev@vger.kernel.org
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9414A14298
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 19:57:53 +0000 (UTC)
+Received: from mail-ej1-x62b.google.com (mail-ej1-x62b.google.com [IPv6:2a00:1450:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F9ED30EE
+	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:57:50 -0700 (PDT)
+Received: by mail-ej1-x62b.google.com with SMTP id a640c23a62f3a-98e011f45ffso119459966b.3
+        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 12:57:50 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=tIWRn2+Da3yu9uiVYvGeI1cIa7PojfDx0sd9Zlbmb3I=;
- b=D/n/CcmlZu9E30Pl899jshGs0MIYXVsZ0XXkhAxUdA4IqX8RWHUkw5xZfP98ZNAu+9e6l3bLo+FMtct67LUpvZFTRsSJtCt3aHqoZb1jaz6DaTOemw+5lNVNVwKvZUDWCPF9u/di/MarvAa5XNlCuQuAGUBHF0Ju+hkwlzs+B0w=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SJ2PR13MB6428.namprd13.prod.outlook.com (2603:10b6:a03:55a::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6500.44; Thu, 29 Jun
- 2023 19:40:06 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6521.023; Thu, 29 Jun 2023
- 19:40:05 +0000
-Date:   Thu, 29 Jun 2023 21:39:57 +0200
-From:   Simon Horman <simon.horman@corigine.com>
-To:     Andrew Halaney <ahalaney@redhat.com>
-Cc:     linux-kernel@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
-        linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org,
-        mcoquelin.stm32@gmail.com, pabeni@redhat.com, kuba@kernel.org,
-        edumazet@google.com, davem@davemloft.net, joabreu@synopsys.com,
-        alexandre.torgue@foss.st.com, peppe.cavallaro@st.com,
-        bhupesh.sharma@linaro.org, vkoul@kernel.org,
-        bartosz.golaszewski@linaro.org
-Subject: Re: [PATCH 1/3] net: stmmac: dwmac-qcom-ethqos: Return
- device_get_phy_mode() errors properly
-Message-ID: <ZJ3eDZcWUz2vBK6q@corigine.com>
-References: <20230629191725.1434142-1-ahalaney@redhat.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230629191725.1434142-1-ahalaney@redhat.com>
-X-ClientProxiedBy: AM0PR10CA0080.EURPRD10.PROD.OUTLOOK.COM
- (2603:10a6:208:15::33) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ2PR13MB6428:EE_
-X-MS-Office365-Filtering-Correlation-Id: acf61677-15a3-4154-fe6c-08db78d8a3a1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zJtRfInCWAIh/FSSG3XBbwBz86DkTwz59prvW2BT5KhGtHznHbA08pi02EcQ1jAeVlQD+7lGeH9QBYz1akTmzpmzqHFyovbdottlSuoZHHM5SCS6N883Sa/LJ7tj5jJidcLwOK8Xx8i7teoffOQ+86mp5sNoIcjdNLqGBxtdjDfF6hIXPL8qvAR4r3M2yxq6xw2jnpeAmEjzDqyN2akhLNeeJwErTzq1lE5prCRElZpeld0YgEzJs1FnqCtYAd+4EDXjSQENusvVisGPFonxRHeHUeFgGB/ysMHsUBA+JQUClzyflsPwcxDA54jnHz7nUm6WJLR16GpVw3+B0XbIo+dmEu1N8GroaLYAk4vTdwIyeu5RitSL5eq9ibWjhIQwukpzI5BQP856wB4Lveqv7QrNJzlMSIXAgftDYMuxff7RVGZKM6JF9RDjpHQjgte0b4p+gLumrjUSacIeVK+oJikBqHBWsR5pWpIEpnk3CIlLhR29K+VJduQl/uAUOddVWzwtyHXD2fEw3Myzjh2veYvuhJJsXMQAgWe77Lr+P9NLNi4qMlYDXg5WJSFZIXldIb0PdcYNiopDlN/GQWj7nCvs0HOTWVnFpaLvE3MKrlU=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(39840400004)(376002)(136003)(346002)(396003)(451199021)(7416002)(44832011)(66476007)(66556008)(66946007)(36756003)(8936002)(478600001)(2906002)(316002)(4326008)(8676002)(6916009)(5660300002)(6512007)(6506007)(6666004)(966005)(4744005)(86362001)(41300700001)(38100700002)(6486002)(2616005)(186003)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?jmJ7URcIPt2U13F+L2ufAFBBjL6LMulZUEDQzGsdgyrqsF/S4x1w9XHT6IsH?=
- =?us-ascii?Q?XmP49cFR2cfjeZtvqXwB4KZf2Q+5+si2jIGn9Cy2mLnU2IhfWuDlDw+5ZUvD?=
- =?us-ascii?Q?bXEfm1tdLkAs7oS4he7xmue0nwfvHRMiuVNv6Bi0p/MqXH2Z74ItFo8RoPA0?=
- =?us-ascii?Q?bbhhqOsS5DXNsoYgyIEoH3m5GfKe6MCer/6pB6NQg5OUmfV3A1QH2MvqhpOq?=
- =?us-ascii?Q?CeDab2xEvJLKKLQLNVlOElEb+gKWqhmCsnTOf3IbNrKbX3TKIXl0V5iuGG7U?=
- =?us-ascii?Q?5qbImJXZ0sn4OcIofJZwLOsIXAypTiYHPgpcESNHlphIT3UtM5nbvfMk1UM0?=
- =?us-ascii?Q?DZ9WkfrjlipiVWfIccl6aLyy5T7sH+fVVV9P1yKeicE1DVgXRAnsjOfPr4C5?=
- =?us-ascii?Q?xRqjBPmSpDN4s/beMqengp3oLEP+PjoZE4tZhytMOKojn92uLl2fBQ9DgZZK?=
- =?us-ascii?Q?voJX4aQfml047roxnEnY1V4y+bvi8lU5mx7b7AMFf+nAjbRn1fN2aMyZpARm?=
- =?us-ascii?Q?4LfQf5x12+oLNl2tF8cxf7y0ZDOGv6YgZf/3Ica7oOaSvEtEE9pwMAwORgs5?=
- =?us-ascii?Q?Xljz5NHSIeEuBWncpRTnNhzNWGfxUhIViuIF9UxiQObhKfUAwk9OfLXoo/Bc?=
- =?us-ascii?Q?2/TCB3UMm/AVqmuhGSxd2L9ebncjiRUXM2C/rolNwkrqz9bCLpukRFSWJ7AE?=
- =?us-ascii?Q?9Xwe2VKnbH1791gywOuoOkLj6L3lUB3f4ADiKR+mQPfDsYmP5KMFE02/5Q8C?=
- =?us-ascii?Q?fggO9Wv4auZRLSjB8SneF6FVMV5UB7dJr7GpJWJL+AR2hArnVxl3MpoJzRGc?=
- =?us-ascii?Q?EqH/UpTzy+57k4PsJxXPKELbmQ575tC8ouZ6AyXhqrRmKpXvzZCzrUkRV8C7?=
- =?us-ascii?Q?XouJYWXrfBMo34H8/UN1QDWyVrq1TJIgA0SBHoJhGz5kiwSrlyfu+/vwccI3?=
- =?us-ascii?Q?ncyCDoRDkf3alkEInueKvEEdV+6Kl49dpaQjLluwtzSSsFWZ0bED3h+AHPhp?=
- =?us-ascii?Q?z9FskmfWnGmeK+o6BJ7F9BQDFCjAz6iotAaPVW9gbERARoNrmKjdMZzUPqlU?=
- =?us-ascii?Q?naxAYnTE3NHI6ttfXcxHE6AV3KoYtsA4/Ol6t6uIyxoF4pOTujYBv35RlzxI?=
- =?us-ascii?Q?C3eWu41UJLzWZvrTSkoQhCkcoZc5PZecVV4OlBXvqZjY64Z4lGB51TdDO3VG?=
- =?us-ascii?Q?K0feiQpY/rfAw3xzRJ/y3zUUpDiwf7HZumYluixmVkHLFN18fU+sxRKyLhvr?=
- =?us-ascii?Q?bH35zH32Gt1YbDn1jjcrsuzUz8gNnYXfWqtsYz+yW3Ku5x6rzdCT9eXUgBxe?=
- =?us-ascii?Q?Jmllw3KKZZA2igDHNLrncMnciYIXuijhLLjzxgZWpfcIq5xf/Yv+MSxdeqdI?=
- =?us-ascii?Q?9JfeJLZd7Kudkg621TLLMGFVf7ABSjlmISR31HOZ2FGDXhkbloJmBL77QzuY?=
- =?us-ascii?Q?kGfmRSjeCjrgK3qz3c+2CE/a8kVCr2UuuijGrli+b84233uOpvFJ8c6vrPw2?=
- =?us-ascii?Q?/zK0VS4Ftiunw3VKzY+ZfjcesQZUQxqGk5Pnsf9SCT1qMMcjyEHgsWNQK9My?=
- =?us-ascii?Q?x54K142YhbweWUVQlLabAk8iaLPnHiS7ECAmS0RG2DA7p3oZUQS9m/F5JeXm?=
- =?us-ascii?Q?Ku12kDdMfSAQSvem5ouq6y6c+wbov+rsHESJwniuAOwIMzH5DIV3PsipmvO2?=
- =?us-ascii?Q?uBIQ0w=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: acf61677-15a3-4154-fe6c-08db78d8a3a1
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 29 Jun 2023 19:40:05.8617
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dUqnLTaRRPzA+jJz68DbrSWo3OSU7OZECONr0KlMq/Kbp5O3jz1QJ/0AsdCqkOvRWYf4QKu/AZfC8JpgUH7imqlEo2W+QdGc6rjHO9oehEc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ2PR13MB6428
+        d=googlemail.com; s=20221208; t=1688068669; x=1690660669;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=T0XkjhHzkhxu75WseH55j4BVqaCsCyE2UEVh4FAZMq0=;
+        b=CTvJZqI1Dwdpg/tnGpKsTzpneynUdZ96feKAykzeRl80scNrkoLFWkhJb3FeLv4OxY
+         tIkSneQlJTya7FgP67vau9dbU+dVCfQVekhHvypNEUQFqrqmtoq+0yFhLVWfrt96fc+i
+         eOGheUKBu9yINWDzGXxqnIORENoV/0K/EJelWPS1tT8XS04RlXsJ4F7G25Xn8MqgSwpT
+         AWyjfxHjUCcJlkt4i27SxC/N0okUSZI/rW3aKYcli6Yv/9+LUW/tdntTPYA7oivMgO5p
+         Jq0iNCaRmKZFDSxn/ZFqdj5lJP3hHh3dhawx9iPgXwIzJkwmYyCx2lSW/1QK+smvWmmZ
+         gC7Q==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688068669; x=1690660669;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:sender:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=T0XkjhHzkhxu75WseH55j4BVqaCsCyE2UEVh4FAZMq0=;
+        b=NFb+30jjUrXBoJcKoXj63yybS8iDIxgYIUO33A0S7JGiyW23JtPBAZsvwFV0nU9IZD
+         Ft+jftF1Bl/yoRs/3pn3vrVlB/aN/koD9YNY14GD5OHxCvlH8lElfE7gN6tBYIIXcddR
+         T8fLLEiXVr2IU3mirwg+vMKHCNSzyabzjpGK0OxNcs8SgeD6Ca8XBhIe4TTDosqj2qt7
+         KPT6m9jTSVC9DtLhy2gK2mB524je3ehab6XkMcghKC/EKE5GIHB49RwdP1pp/BzPCTNj
+         ZbplYoYlfG2BtiglrHUhu2W8m+VsE1aNnYrc928FVHWKyHAkWAtNZbuR2YxamNJ1nyY5
+         xzMA==
+X-Gm-Message-State: AC+VfDySDvnuCR5jCJvbi77PIYHgCi2tvR41TR51AaA5uhGo8TnPDCVU
+	hSX3CycYh4wUX915G+R/5BzpPdYdAvOMoQ==
+X-Google-Smtp-Source: APBJJlH51k4XmcC0DNNNrUMdzVpKTe39SvSTPyqTfU51E5eHtWW9h9kbwmDjIs4urxndmJcD/wAPGg==
+X-Received: by 2002:a17:906:8699:b0:973:d06d:545f with SMTP id g25-20020a170906869900b00973d06d545fmr328889ejx.24.1688068668668;
+        Thu, 29 Jun 2023 12:57:48 -0700 (PDT)
+Received: from localhost.localdomain (p200300c1c74c0400ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c74c:400:ba85:84ff:febf:2b17])
+        by smtp.gmail.com with ESMTPSA id j8-20020a170906830800b00977eec7b7e8sm7153010ejx.68.2023.06.29.12.57.47
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 29 Jun 2023 12:57:47 -0700 (PDT)
+Sender: Zahari Doychev <zahari.doychev@googlemail.com>
+From: Zahari Doychev <zahari.doychev@linux.com>
+To: netdev@vger.kernel.org
+Cc: dsahern@gmail.com,
+	stephen@networkplumber.org,
+	hmehrtens@maxlinear.com,
+	aleksander.lobakin@intel.com,
+	simon.horman@corigine.com,
+	idosch@idosch.org,
+	Zahari Doychev <zdoychev@maxlinear.com>
+Subject: [PATCH iproute2-next] f_flower: simplify cfm dump function
+Date: Thu, 29 Jun 2023 21:57:36 +0200
+Message-ID: <20230629195736.675018-1-zahari.doychev@linux.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
-List-ID: <netdev.vger.kernel.org>
 X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, Jun 29, 2023 at 02:14:16PM -0500, Andrew Halaney wrote:
-> Other than -ENODEV, other errors resulted in -EINVAL being returned
-> instead of the actual error.
-> 
-> Signed-off-by: Andrew Halaney <ahalaney@redhat.com>
+From: Zahari Doychev <zdoychev@maxlinear.com>
 
-Hi Andrew,
+The standard print function can be used to print the cfm attributes in
+both standard and json use cases. In this way no string buffer is needed
+which simplifies the code.
 
-I'm assuming this series is targeted at 'net-next', as opposed to 'net',
-which is for fixes. In any case, the target tree should be included in the
-subject.
+Signed-off-by: Zahari Doychev <zdoychev@maxlinear.com>
+---
+ tc/f_flower.c | 20 ++++++--------------
+ 1 file changed, 6 insertions(+), 14 deletions(-)
 
-        Subject: [PATCH net-next v2 1/3] ...
+diff --git a/tc/f_flower.c b/tc/f_flower.c
+index 6da5028a..c71394f7 100644
+--- a/tc/f_flower.c
++++ b/tc/f_flower.c
+@@ -2816,9 +2816,6 @@ static void flower_print_arp_op(const char *name,
+ static void flower_print_cfm(struct rtattr *attr)
+ {
+ 	struct rtattr *tb[TCA_FLOWER_KEY_CFM_OPT_MAX + 1];
+-	struct rtattr *v;
+-	SPRINT_BUF(out);
+-	size_t sz = 0;
+ 
+ 	if (!attr || !(attr->rta_type & NLA_F_NESTED))
+ 		return;
+@@ -2830,20 +2827,15 @@ static void flower_print_cfm(struct rtattr *attr)
+ 	print_string(PRINT_FP, NULL, "  cfm", NULL);
+ 	open_json_object("cfm");
+ 
+-	v = tb[TCA_FLOWER_KEY_CFM_MD_LEVEL];
+-	if (v) {
+-		sz += sprintf(out, " mdl %u", rta_getattr_u8(v));
+-		print_hhu(PRINT_JSON, "mdl", NULL, rta_getattr_u8(v));
+-	}
++	if (tb[TCA_FLOWER_KEY_CFM_MD_LEVEL])
++		print_hhu(PRINT_ANY, "mdl", " mdl %u",
++			  rta_getattr_u8(tb[TCA_FLOWER_KEY_CFM_MD_LEVEL]));
+ 
+-	v = tb[TCA_FLOWER_KEY_CFM_OPCODE];
+-	if (v) {
+-		sprintf(out + sz, " op %u", rta_getattr_u8(v));
+-		print_hhu(PRINT_JSON, "op", NULL, rta_getattr_u8(v));
+-	}
++	if (tb[TCA_FLOWER_KEY_CFM_OPCODE])
++		print_hhu(PRINT_ANY, "op", " op %u",
++			  rta_getattr_u8(tb[TCA_FLOWER_KEY_CFM_OPCODE]));
+ 
+ 	close_json_object();
+-	print_string(PRINT_FP, "cfm", "%s", out);
+ }
+ 
+ static int flower_print_opt(struct filter_util *qu, FILE *f,
+-- 
+2.41.0
 
-If it is for net-next, then please repost when net-next reopens after July 10th.
 
-Link: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#development-cycle
-
-Also, it usually best to provide a cover-letter for patch-sets with more than
-once patch.
-
---
-pw-bot: deferred
