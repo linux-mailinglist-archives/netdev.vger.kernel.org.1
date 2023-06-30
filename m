@@ -1,145 +1,163 @@
-Return-Path: <netdev+bounces-14822-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14823-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB39E74401E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 18:50:55 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 18B3A744022
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 18:53:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 27A1C1C20BFA
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:50:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3B0381C20BE9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:53:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28C4B16432;
-	Fri, 30 Jun 2023 16:50:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 057DA1643E;
+	Fri, 30 Jun 2023 16:53:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1CFF0168AD
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 16:50:52 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E21673AAF
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 09:50:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688143851;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=jXsxRCKTcFnH6tZm3WnmJviu/bPYYkz5AVx2X61PXao=;
-	b=C2m/dblPj+tCalPFx01QkIw893rbQJptGRyvYEaznDW7/u5+2hsWJxFH8fAJT9a41lf5Y8
-	c6JxEdnVXBXw2JVD4johYvmnI26xaKea1F4snC7NZ69je95Krpvkxn0n47irb3zAWCN2jH
-	u0CtzQzYaSSPEfy+IEkIfQZNKjhl+D4=
-Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
- [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-163-8Km4rewcPI-qX0YsQuwZ8Q-1; Fri, 30 Jun 2023 12:50:45 -0400
-X-MC-Unique: 8Km4rewcPI-qX0YsQuwZ8Q-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 4594E3813F2A;
-	Fri, 30 Jun 2023 16:50:45 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 2ED3D4CD0C2;
-	Fri, 30 Jun 2023 16:50:44 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-In-Reply-To: <CAHk-=wjixHw6n_R5TQWW1r0a+GgFAPGw21KMj6obkzr3qXXbYA@mail.gmail.com>
-References: <CAHk-=wjixHw6n_R5TQWW1r0a+GgFAPGw21KMj6obkzr3qXXbYA@mail.gmail.com> <20230629155433.4170837-1-dhowells@redhat.com> <CAHk-=wiDwfyj0CCupT-oEToqsNLcbsTQdcgDupF=ZETUjJQJtQ@mail.gmail.com> <4bd92932-c9d2-4cc8-b730-24c749087e39@mattwhitlock.name> <CAHk-=whYWEUU69nY6k4j1_EQnQDNPy4TqAMvpf1UA111UDdmYg@mail.gmail.com> <ZJ3OoCcSxZzzgUur@casper.infradead.org>
-To: Linus Torvalds <torvalds@linux-foundation.org>
-Cc: dhowells@redhat.com, Matthew Wilcox <willy@infradead.org>,
-    Matt Whitlock <kernel@mattwhitlock.name>, netdev@vger.kernel.org,
-    Dave Chinner <david@fromorbit.com>, Jens Axboe <axboe@kernel.dk>,
-    linux-fsdevel@kvack.org, linux-mm@kvack.org,
-    linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH 0/4] splice: Fix corruption in data spliced to pipe
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DFD79168B0
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 16:53:08 +0000 (UTC)
+Received: from EUR04-HE1-obe.outbound.protection.outlook.com (mail-he1eur04on2074.outbound.protection.outlook.com [40.107.7.74])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DFF443AAF;
+	Fri, 30 Jun 2023 09:53:06 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=oCBUOkF6POgnf+a0nFwH+xcCcqyPR9rLudxseM4VWfHe+FUuDoJh8BRAH+3EFYdmggcadwBJgHg5Pp+gk4zW+1Qy4jeS1DDS5/j121wcPxxTybDb4IN0I9CRuvhTiwGJTeG8arvj7yx3oQQ7rNEG5vz/nO4xpbKZ73hG+mJc2ticgUybuFZGt1RjmPx4p7XENBJY6HqOHRHRy2VgpBc0BQlD82Jlpj5fT4E30xNwlSxZEK04ejitnXLa6NV76ZeQegTeP7JU/3VMuVmhZcx8RwDqC/dxjycp/ve3Uaspje1r/hKhnWQ2LJOSjBk11OJ6uJiP5uPUxBSOjF4GleaHzg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mu7oh/L1Tb54N0kOgu1lgeW1eLRDI9ZG6rgyZpaxgMg=;
+ b=mbNasMqrfABN6NxW9H/9w624sOQ5fc1jfT1YE/5BXDT2AynoPlLAox9+mEcUke1SW2I3bVOdgYzz4CwpFm7A2J0Q2dIco37gIWKTeEIZr9V48lVBPse/Efzi6GvhFfAsj+DLTAiGu8q9DDJtemzkHdrysj0Dc2+KWzQrgxFhT8167i6TK1OMF7aK3B0Latm8XkbvzBx5rBMkKHBy81uRKTgyTiWYgpV6kDtV62zYXJI9NkgFwNP9MYzTyU8IuP2cO2/jA2UHAUA5tbPDe6F1LVUxTY99f1l9qO2eF/xcumFfxlhSGmVQN7FE6AVa6N549Vbq2hfW/RV4QXr6RV4lCQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mu7oh/L1Tb54N0kOgu1lgeW1eLRDI9ZG6rgyZpaxgMg=;
+ b=DaII0QvGmvdbGmgkukJCChzNhox/Dvzmrfxr3wTye0ZLuElwjFPnnP4ZVk3StyXLHqUBdJtr5mK/U+EjLUtissBx/MY3FwAaGIGdPUA0MA3ORRfhIkiQL0CdiGYIsaKygyn+C8mbEhKFsgA1rvHhtak4ewoBonLNmq5XPzs8xEo=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by AM9PR04MB7618.eurprd04.prod.outlook.com (2603:10a6:20b:2dc::13) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Fri, 30 Jun
+ 2023 16:53:04 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
+ 16:53:04 +0000
+Date: Fri, 30 Jun 2023 19:53:00 +0300
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: Simon Horman <simon.horman@corigine.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 2/2] net: dsa: sja1105: always enable the send_meta
+ options
+Message-ID: <20230630165300.jmy7duyrqj3gzjmp@skbuf>
+References: <20230629141453.1112919-1-vladimir.oltean@nxp.com>
+ <20230629141453.1112919-3-vladimir.oltean@nxp.com>
+ <ZJ7aG/tzAxutRoeo@corigine.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZJ7aG/tzAxutRoeo@corigine.com>
+X-ClientProxiedBy: FR0P281CA0055.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:49::15) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="us-ascii"
-Content-ID: <663488.1688143843.1@warthog.procyon.org.uk>
-Date: Fri, 30 Jun 2023 17:50:43 +0100
-Message-ID: <663489.1688143843@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|AM9PR04MB7618:EE_
+X-MS-Office365-Filtering-Correlation-Id: aeffe937-5f57-4524-12db-08db798a78a4
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	GIoFGm+MNq78K43MKZcpOtnodHPTBxe7vdhT5L6zz7gVgMti9zZ+NODKLEaMVnSdRBnzCjc51uN3vMHd3M2QtkWLq1MubdWBcmf/SWwgqN+SzZ4fhk5ipUdOg1N8YUVBaZjxB/eU18255H8bWvIh3Ju3CoiBpmoOOcMwsrXTHEg2a3Hb8OIvq4ZujVDZ2OpBEqepFpG99ZDsSzI+IwBeF4+v5KeWQtmj9yWTUZH75Rd5egvvSTlCiHDgF6cT1Qzt276aVC6mLjj5QQDc6MP1r+JsgzXwqrU1oyzpkqdOspTaYwov5feZ22QxKaBkG4FBBnNfDEmlXTo7UdzIaWmrOqwYOGtHXRBhfJVs+B4wIsTc3tMLRp9YWCyOAn643am4ZcXnnsz32ydntuWqwdREqy7wMW9vv6SrryX1Fqfz5DsNaKNam8ODADLyTSt0GEw/dLLoow3vAerCAD74YL8/EzU++6PRb2wYeFUbg0FV1S84a4m8hcsFcOPwxkEQ9y5Rzhs1M6ZyMjAG2O1JIIAK6MPKJEhdc3pKXdri4xjhYv3ZGIPUBghw23oDiRRnVWYx
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(4636009)(346002)(396003)(376002)(39860400002)(136003)(366004)(451199021)(6512007)(86362001)(83380400001)(44832011)(9686003)(6506007)(26005)(1076003)(2906002)(186003)(41300700001)(38100700002)(33716001)(5660300002)(8676002)(8936002)(54906003)(6666004)(316002)(4326008)(6916009)(6486002)(478600001)(66476007)(66556008)(66946007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?WCpbz6hHQ1i4JXLALIyOF9szcQf3yXe60pyyPUwT1EOf2rRGV9R9ymTeABGr?=
+ =?us-ascii?Q?90wgcCRLSHkXHG2psnb+GqOJk+Iw8DZJgrU6YHhkNbAbodzIdKxa1IN8H9Oy?=
+ =?us-ascii?Q?os0Q+lnNvdOWqRRMhUc/ld8jj7qn7LJj03fmNw0o/1bjNoKZc6M/1vZqoQJT?=
+ =?us-ascii?Q?3FxrQiFPm5B3QBAAvXyiLB+hRCL56fdCtjylYXChCiCZPlycFiVml+nkz4cz?=
+ =?us-ascii?Q?2eCk0jZxtM1T5ROe62s1jTU7s/j30YPj9z7gT/Fhs5DAmMNsYw5o7/C4WRm0?=
+ =?us-ascii?Q?H2mU59HA0E6QNn+rVgT9834Aw65YYnezCusaSZPSJa7Bu1/f5yVZLlRfl7vo?=
+ =?us-ascii?Q?UEIuKkpIpHEUnF5MVaGJmKoInLvz3+5gElPUPGktWxovGGGkdXGXN6ECeigz?=
+ =?us-ascii?Q?oueRSKc3B4BcM2wzJDtgSYXGN9NfzRx94HxR5sPipVp2rQusLWyOYIKjyThv?=
+ =?us-ascii?Q?5L1+8YTu+NsVLrDmsKzjcq6/6oFLMYiPQfWfZC1zBi6YcbfiMUPsZlEeV8Vf?=
+ =?us-ascii?Q?1fPisCH/WG4TU++gKr//qTz3DN0mdjEckwcLmWNMWF2E5SyQOLyIYuDAIHoK?=
+ =?us-ascii?Q?YYlqWq95xQQ2GPSYMdt7rr6MvNDpJruqL9BjRqlktNgKP+sWdZ0OgZ7VfeQl?=
+ =?us-ascii?Q?OuybjCns3u577Edq2z2Oq7XXnRuw86WWgm3bMEK3osez88zvSZMB5p6lauYU?=
+ =?us-ascii?Q?/Z8wd00xE/RgEF9SaBsJXjkl1+4ts/NYdhV1NW5Dktcu/1VMy4LnMYitQCwR?=
+ =?us-ascii?Q?4R7Kt3lLQ5VLAcG+elrOPA7fbJIpSIXj/dY5ZRIBW1tuUCJo4trv3PR++akQ?=
+ =?us-ascii?Q?7rRVl25LgdWdY/bbUypfZrtVgmr2/KDZsLPfqHUTPmycbyYADyMmXgb/ULDS?=
+ =?us-ascii?Q?rkGKsJhq6UrN9YWe6QN2j3sYMgaWrQ6lzouDjtzQd3e9QPv8O4NUu6+4bVRG?=
+ =?us-ascii?Q?TqHWGAZy/Si6ptiCIB/qU3rcJh9JO3RRxioHiQtXn3LC/0PyjjRVnXjYHIYb?=
+ =?us-ascii?Q?fd7oxajzo0osmXOFFIRYCcQZtqdYfzbIxZeEVGV7SICNfoVWwdiqjVg0u5dg?=
+ =?us-ascii?Q?pRSy3QaN+oDDbv5d1WJkCwRhXFv4ZpXaH1MFLfJSuf5IeRN9vCnUnUIjHtUV?=
+ =?us-ascii?Q?gOhylBJCUFq4fursVvvqhxPcRmWfun/gG2LNeNDm4W5TUfx00Ab95LAmH5gF?=
+ =?us-ascii?Q?+XKSQnSh4aSKfg2GBzqKRjjLuR4umN7tbfb+6wkwmjzNtTGzH2YIW+4Pqzrk?=
+ =?us-ascii?Q?vSCOhX4gMc4rWR6PLOEO3k/wZPYyYT8PE1hGzOusGjjVnWUJTuOFFuo+DQIC?=
+ =?us-ascii?Q?EFhZxvwsKFarKQ6Zq90WCmqDGc5QnqEOqYdefvqLLI2si7hhYYDJ8fiVWvaz?=
+ =?us-ascii?Q?lUYhbKIP8H+SzfcxsIUZNtamycgbyIW+oemA7swAO2dBVxyQOYxeJayQqZNI?=
+ =?us-ascii?Q?il3bsz0JYBoR3RoD3qhWTa2GS9nwEPR2jvAkvB8V+y13GznRrgsQldKY5jai?=
+ =?us-ascii?Q?2qQZkTFMMsq5LjEJREg9bboEVaMp04xQKT3FDuwetrZQWzjplV+vKh8v5Hgp?=
+ =?us-ascii?Q?h1txwc1CiKqwyMxs8HUGeeJF4+SRRdwLfh/Z3t+Eb9JQdtHOmQ3F3E5B67JG?=
+ =?us-ascii?Q?dg=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: aeffe937-5f57-4524-12db-08db798a78a4
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 16:53:04.1027
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IGDCOcy4Mw/+SoMz7iUmM2u9HqyY4SQ/dlwvDbHbB/kapUIedt8tYt/fs65349nyyzwVPUDRuXAKgLl9AcfHrw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR04MB7618
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Linus Torvalds <torvalds@linux-foundation.org> wrote:
+Hi Simon,
 
+On Fri, Jun 30, 2023 at 03:35:23PM +0200, Simon Horman wrote:
+> Hi Vladimir,
 > 
-> Quite the reverse. I'd be willing to *simplify* splice() by just
-> saying "it was all a mistake", and just turning it into wrappers
-> around read/write. But those patches would have to be radical
-> simplifications, not adding yet more crud on top of the pain that is
-> splice().
+> this patch isn't that big, so I'm ok with it.  But it also isn't that
+> small, so I'd just like to mention that a different approach might be a
+> small patch that enables meta frame generation unconditionally, as a fix.
+> And then, later, some cleanup, which seems to comprise most of this patch.
 > 
-> Because it will hurt performance. And I'm ok with that as long as it
-> comes with huge simplifications. What I'm *not* ok with is "I mis-used
-> splice, now I want splice to act differently, so let's make it even
-> more complicated".
+> I do admit that I didn't try this. So it might not be sensible.  And as I
+> said, I am ok with this patch. But I did think it was worth mentioning.
+> 
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+> 
+> ...
 
-If we want to go down the simplification route, then the patches I posted
-might be a good start.
+Thanks for the feedback.
 
-The idea I tried to work towards is that the pipe only ever contains private
-pages in it that only the pipe has a ref on and that no one else can access
-until they come out the other end again.  I got rid of the ->confirm() pipe
-buf op and would like to kill off all of the others too.
+You're saying that it's preferable to leave sja1105_rxtstamp_set_state()
+and sja1105_rxtstamp_get_state() where they are, accessible through
+tagger_data->rxtstamp_set_state() and tagger_data->rxtstamp_get_state(),
+but to only call tagger_data->rxtstamp_set_state() once, statically with
+"true", and to never call tagger_data->rxtstamp_get_state()?
 
-I simplified splice() by:
-
- - Making sure any candidate pages are uptodate right up front.
-
- - Allowing automatic stealing of pages from the pagecache if no one else is
-   using them.  This should avoid losing a chunk of the performance that
-   splice is supposed to gain - but if you're serving pages repeatedly in a
-   webserver with this, it's going to be a problem.
-
-   Possibly this should be contingent on SPLICE_F_MOVE - though the manpage
-   says "*from* the pipe" implying it's only usable on the output side.
-
- - Copying in every other circumstance.
-
-I simplified vmsplice() by:
-
- - If SPLICE_F_GIFT is set, attempting to steal whole pages in the buffer up
-   front if not in use by anyone else.
-
- - Copying in every other circumstance.
-
-That said, there are still sources that I didn't touch yet that attempt to
-insert pages into a pipe: relayfs (which does some accounting stuff based on
-the final consumption of the pages it inserted), sockets (which don't allow
-inserted pages to be stolen) and notifications (which don't want to allocate
-at notification time - but I can deal with that).  And there's tee() (which
-would need to copy the data).  And pipe-to-pipe splice (which could steal
-whole pages, but would otherwise have to copy).
-
-
-If you would prefer to go for utter simplification, we could make sendfile()
-from a buffered file just call sendmsg() directly with MSG_SPLICE_PAGES set
-and ignore the pipe entirely (I'm tempted to do this anyway) and then make
-splice() to a pipe just do copy_splice_read() and vmsplice() to a pipe do
-writev().
-
-I wonder how much splice() is used compared to sendfile().
-
-
-I would prefer to leave splice() and vmsplice() as they are now and adjust the
-documentation.  As you say, they can be considered a type of zerocopy.
-
-David
-
+I probably could, but I'd have to delay the tagger_data->rxtstamp_set_state()
+call until sja1105_connect_tag_protocol(); it's not going to be available
+earlier. And this is going to be just filler code that I will then delete
+as soon as net-next reopens.
 
