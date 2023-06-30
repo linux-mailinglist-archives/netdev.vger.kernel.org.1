@@ -1,154 +1,466 @@
-Return-Path: <netdev+bounces-14790-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14791-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 39EE0743D1F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:00:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E553743D38
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:10:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id DEB0C2810AD
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:00:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 49F72280F68
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:09:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E536156E7;
-	Fri, 30 Jun 2023 14:00:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6D184156EC;
+	Fri, 30 Jun 2023 14:09:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EB60E156D8
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 14:00:06 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2125.outbound.protection.outlook.com [40.107.244.125])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E6252118;
-	Fri, 30 Jun 2023 07:00:05 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AM4+XrdaAeDE/ucs6K2DCQ7RwOYX0dLPqf6Q0UdxcfpActH4YXG/n9ppfmsv7NG5i+SMsUgvmiyG6u527TKmNfowKhiuz2m2A+x829o2hXzszMrIH6eq9Dcq+woRXQgtx2mNA7FkrTM2bArx2EruLUg4YHAF6RGYqpJjI4pgoQ5SvDI8W0wt9WtvCrknj/QLHCGq3VNXlzfhYsjz3f+JGliREvuHadc1E6J4blTIamDxAomcP/dWppCyQ2avmjd1tNUkDOqpcYcncPiTrNgr3IQkg4xVR4iJcibhGxpyjRDblXwj9HA6kMFIDYbMsENNoIR4JQxscVKkslqO16peHQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=QAuWr/Xibrzo6rNgDJjIXpXi6wFVKNWM5h6Dwh08G14=;
- b=NUwct7kMULo1aDQJH32tiFKH8tnNYuWfMCubp7hPKPVWKeDU5eZBJFUszUOTCNpaFZHvg0Zmyk5uUQP4rXoEDqSTy4RIxHzlp7TkbcSu+o10YIuAeHNTN0hxT+225S5jcP2cDJRxMKa6/TEtR5sdpgGD1h6azx9gQY6PyZ8IuCo/8aZw24tvy+sL037S5WdXRjpTup1DoJllw8MfHaGa6lq8oc6NX6BQJWzPocTO/dht9U2oUIAsJAl/5Bp7uEDWHL8ZJ+1j7z+StGE0vuGEFH7TTbWwwQ2hGjRykh5sy8a4yJmPl1f9v5IxfgfwnYOyzQhWLqQl31ISuzBLdJYgSw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=QAuWr/Xibrzo6rNgDJjIXpXi6wFVKNWM5h6Dwh08G14=;
- b=Z/k+0aVmqgRu68Lr6J2z9Aat0gkOhUHSh3xwdPXrS4Qx0id/ZoQU+FmXWSf8DAji3Gj+TJ1IMP63voU56hWIC45ryJtLsnFJF/OCYeQzE0iyXwFEVhom9DYHzimX6XEFMKDAH6GFVrJ67IxaLhKqiJpqav16dr3EFyHU+bVXMM8=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by SJ0PR13MB5722.namprd13.prod.outlook.com (2603:10b6:a03:409::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6455.32; Fri, 30 Jun
- 2023 13:58:58 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
- 13:58:58 +0000
-Date: Fri, 30 Jun 2023 15:58:52 +0200
-From: Simon Horman <simon.horman@corigine.com>
-To: Davide Tronchin <davide.tronchin.94@gmail.com>
-Cc: oliver@neukum.org, netdev@vger.kernel.org, pabeni@redhat.com,
-	marco.demarco@posteo.net, linux-usb@vger.kernel.org,
-	kuba@kernel.org
-Subject: Re: [PATCH] net: usb: cdc_ether: add u-blox 0x1313 composition.
-Message-ID: <ZJ7fnIKQcD3C7jOT@corigine.com>
-References: <20230629103736.23861-1-davide.tronchin.94@gmail.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230629103736.23861-1-davide.tronchin.94@gmail.com>
-X-ClientProxiedBy: AM9P192CA0016.EURP192.PROD.OUTLOOK.COM
- (2603:10a6:20b:21d::21) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B8DF156D8
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 14:09:57 +0000 (UTC)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DF7E3C0E;
+	Fri, 30 Jun 2023 07:09:50 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688134190; x=1719670190;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=87HWBjxPKH1eCSf8y/PM6kHwdjnnl/CXZEzOqA7rh38=;
+  b=DwA/ykdbg4yP4wZ+yqPtdNg5TQ0duTF+4idFgA1Pjulqf5ouzq0OtnBI
+   I9z/c4LIzHxXfe7INSb8e3I/EkCYj2a8VEji1iKIn8DGR7sY7KvrDGPVc
+   ZZtZQCxT7/NFNgokp1WvJ/2tz8GHKExyDAWQ4vQktktHVOnsjV5qFqJbI
+   V2n5HIcsuxtuFuu5mf3brQVKvQDnuo3ABJHVv2jlD+lBJ5qle1mF9wNFB
+   3tPELNdduNz0GRrWuUodhbtcE5FADbvayNjXhjSsXQEZLKeoGK2vXDJlB
+   UCb27i789ffNpTt8KM+Lmi4KpLv++acMBSRI8PLqHU8gTo7b/NTWhLIEt
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="362442642"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="362442642"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 07:09:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="841882631"
+X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
+   d="scan'208";a="841882631"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga004.jf.intel.com with ESMTP; 30 Jun 2023 07:09:28 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qFEoS-000F1Z-00;
+	Fri, 30 Jun 2023 14:09:28 +0000
+Date: Fri, 30 Jun 2023 22:08:32 +0800
+From: kernel test robot <lkp@intel.com>
+To: Evan Quan <evan.quan@amd.com>, rafael@kernel.org, lenb@kernel.org,
+	Alexander.Deucher@amd.com, Christian.Koenig@amd.com,
+	Xinhui.Pan@amd.com, airlied@gmail.com, daniel@ffwll.ch,
+	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, Mario.Limonciello@amd.com,
+	mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com,
+	tzimmermann@suse.de, hdegoede@redhat.com, jingyuwang_vip@163.com,
+	Lijo.Lazar@amd.com, jim.cromie@gmail.com, bellosilicio@gmail.com,
+	andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au,
+	arnd@arndb.de
+Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
+	netdev@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-kernel@vger.kernel.org, dri-devel@lists.freedesktop.org,
+	linux-acpi@vger.kernel.org
+Subject: Re: [PATCH V5 4/9] wifi: mac80211: Add support for ACPI WBRF
+Message-ID: <202306302133.Px6k3Lmq-lkp@intel.com>
+References: <20230630103240.1557100-5-evan.quan@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB5722:EE_
-X-MS-Office365-Filtering-Correlation-Id: 169ce541-2c86-4457-a4f1-08db79722674
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	2i6AJ/lNkPr/XtJXlyixTHdenGLldNTH9E6TZw//bk0tHN/cKggyDJNBVGL9FqwR3BeCIhMauvUVkBB4ZLA/YefPW4Pg/B6vDCFwJ3ZicXwZjitZEvKL2SM6m5TOTEppWdSLZDE+mjlIkC9rr1kcahBCLe7kKomzx+OLaJwync7SQ6033/+i2fcBInNyEpEzHO8YN0rT4SbY3YN7kcS0JYApRptcAnMgO5tzQ2uXFP+U+CKKT4U+S2DikpPn3I95C6DdDSG0yg5Lf/oGD1crf0MQ+g8DkDwZZ7c2M1IqWe4vs7o/+wx/j4MJdDx/Et+fGPKhNHYAC72aDnl3F0ElkpqVlqugASy9m8M0PAsbCu38V8c5i32hjK6ybo5Xh1E95s8KEnDJRqg9kYlHhOht/zvai3WCxWWC8Lzl54VuUQKnFD8hm3I/LF8ny//hbJIbY6ui5Uvk5NFWGbJE76fKjcz7z4gllRe2WbKQLbED/iAINpjq2iO6/yjNQVlJ/abOCKU3DamVl6J20vTloSvJ3mPcy+HHL6UWdStOVYAEB5YgyA9wHvLhoe/Yp3W0q+i4zTZf413RgOGmN74QVkqfybkK+H6R/lVZH1mcQkb8s9M=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(366004)(396003)(39840400004)(451199021)(5660300002)(8676002)(6486002)(8936002)(44832011)(186003)(2616005)(38100700002)(2906002)(4744005)(478600001)(41300700001)(86362001)(36756003)(316002)(6916009)(6506007)(66476007)(66556008)(6666004)(6512007)(66946007)(4326008);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?4H5rm8f6LbVemDGRH3OIalNY3AIjJcdO6qEgvTWuls3UQoCIwk8WUwzzfOUm?=
- =?us-ascii?Q?zwyTulR1LveC2k2b8iaacamttAoc/zb0+iQtqsCawddAtoHwIapEH2y2HUt+?=
- =?us-ascii?Q?VbRBFoHy2fpCWJ9Som4ua4ul3xi6QtiN7iCDwSYr9x7JRWrCzHaM6u0HLzmF?=
- =?us-ascii?Q?5nF+3HxFu6QrZ4e8W8NyoJgIuIM7U1hHyh7aKRD2eisUqe2z1UyWemf9h+4F?=
- =?us-ascii?Q?qfGK5+Ldcj/l9HU3Tvm0fV3aShiCXfph91MkSx2jd5toXjuQ8P/I8NXvPnbn?=
- =?us-ascii?Q?J6fFHVnFNYDxUYusBdbg8YEifxIlUmCfAlNfVjelC6ofMcRCtExDm46W9iXg?=
- =?us-ascii?Q?erq6YSAZKlYT9SDo77i8XVickmvi9HdEP45FmgFSSL4WbeCmjdccuLOaAldF?=
- =?us-ascii?Q?ijEjS+T+H2vy2/H5NrcXMx+S5Gwr9rQsv39ImzWW2CUQC/wv7SbbUE6eFmpa?=
- =?us-ascii?Q?Aht2f1NOF3i1JTxQG6NWkA2eq2d88OTmaXZgzbw08cd0kIA9ukzkXqRXkwKx?=
- =?us-ascii?Q?Vzb0spvbVYBi+x9trNVrY6N4zOyl0lo5T6R17ZPcir8GMhLt4zReYvYLrhML?=
- =?us-ascii?Q?AWnAhjV/gzcWiAFJH7xjkF43ts7x4Dw5NiQeY/uM0ToC31Cby9OsJOnM6pIg?=
- =?us-ascii?Q?VX45hAD63A14m2OvFIr4nanxtvMJF9xSmJUfzKRrGPVTPBFggcK7TzAri79X?=
- =?us-ascii?Q?LAESOM0Kfk9kZnoUcu17Xhb4Pk5tGJq6e9TSypPNOCL6Ew3t4/Tp6rIhsJfw?=
- =?us-ascii?Q?tCimOxDSNsdSgbbNSLynphArzSkvV2Q+CUO66KVOyYEbDZJwNqdnAgK9kFzm?=
- =?us-ascii?Q?k/ko7TJE5Ck4rdXTVloAUomnDVhYJK7z6WnhGuswhQi7g1TZIxLjULVIxCLb?=
- =?us-ascii?Q?T6fpljMpboV0lToGlsgSdBAnWi+n2v+4geU4kqX0s/tJ/eno/nAshrorhjrT?=
- =?us-ascii?Q?qJqR83M0Gg0QJ+imwx+IIS8Vdw9wPGcUuEm9WtmW1y8GTJrc6Vb9lHmkoDF1?=
- =?us-ascii?Q?VMdK1nVbG/hL/SX/McMDZ8k/dj7rnCct7k70rY6zIw+aFjLM1BPS41kWzZkG?=
- =?us-ascii?Q?tTlT3bL1xXquPuFFxaZMAkukkK+5VTmbKkHsnzguvUWdbjriGIL7WP7UIRL5?=
- =?us-ascii?Q?2i5FdunMpnQo2wtVES+yFvzaQiT7LNUEcsP3V5us97bJ4foHhtRvRuosR5pC?=
- =?us-ascii?Q?zUAEcqtwdthp1ZXy6/jOsvIGUw9m26okJE/dtIYTGNiTKW1cIj3sJ9fOhxZC?=
- =?us-ascii?Q?wlyMbxwzFN54CHMY3Q09dE49sNJs3MTApzrRUS5w3e8gmcgwIF8sXwYcwT1k?=
- =?us-ascii?Q?x2Cf+XhKjGxpHVlf3fo4LXysyFB8Oe3MV2sVk380TFOkSeoHuzabqtZKox1x?=
- =?us-ascii?Q?gZzXdMes8PM+4qRi0V9Cvu6KOmGYnP9kib5F1dqeAdE8WlqsJ9VCuxMO3OeA?=
- =?us-ascii?Q?M/RFfMcgon9EHhwtReox3Z3DYku7lha7VcLwXl06rMgNvRKYBCWRHCDBqJ2x?=
- =?us-ascii?Q?6v+4EeFt/B6ma4V4+r5cClV1YGxdNDtf3gBB+bLeF51oDYIcdMUgPcd06QKV?=
- =?us-ascii?Q?KWPG3soc/uYw4WZhjpFcWUZUBlte4edxr0b0f1KURqAMFFZTu1wz5frGGFOM?=
- =?us-ascii?Q?vq8jGWptdu9YvVzRMaTPJysXj6luVf22qgWHU9Jlq5cg3LxF8yupOwH9V36w?=
- =?us-ascii?Q?qMVu2g=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 169ce541-2c86-4457-a4f1-08db79722674
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 13:58:58.3414
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: ezn38opMLH2EoqZzqUqkwnQQGRr/zf5uPHjFhd25N0cvvdxOYt8CqoPIYfFbnScK2MEtp4HfR/Xz2DCQ6WTJkgas32ubYsCkVANML4T+2wQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB5722
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630103240.1557100-5-evan.quan@amd.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 29, 2023 at 12:37:36PM +0200, Davide Tronchin wrote:
-> Add CDC-ECM support for LARA-R6 01B.
-> 
-> The new LARA-R6 product variant identified by the "01B" string can be
-> configured (by AT interface) in three different USB modes:
-> * Default mode (Vendor ID: 0x1546 Product ID: 0x1311) with 4 serial
-> interfaces
-> * RmNet mode (Vendor ID: 0x1546 Product ID: 0x1312) with 4 serial
-> interfaces and 1 RmNet virtual network interface
-> * CDC-ECM mode (Vendor ID: 0x1546 Product ID: 0x1313) with 4 serial
-> interface and 1 CDC-ECM virtual network interface
-> The first 4 interfaces of all the 3 configurations (default, RmNet, ECM)
-> are the same.
-> 
-> In CDC-ECM mode LARA-R6 01B exposes the following interfaces:
-> If 0: Diagnostic
-> If 1: AT parser
-> If 2: AT parser
-> If 3: AT parset/alternative functions
-> If 4: CDC-ECM interface
-> 
-> Signed-off-by: Davide Tronchin <davide.tronchin.94@gmail.com>
+Hi Evan,
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+kernel test robot noticed the following build errors:
 
+[auto build test ERROR on wireless-next/main]
+[also build test ERROR on wireless/main linus/master v6.4]
+[cannot apply to drm-misc/drm-misc-next next-20230630]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
+
+url:    https://github.com/intel-lab-lkp/linux/commits/Evan-Quan/drivers-core-Add-support-for-Wifi-band-RF-mitigations/20230630-183633
+base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
+patch link:    https://lore.kernel.org/r/20230630103240.1557100-5-evan.quan%40amd.com
+patch subject: [PATCH V5 4/9] wifi: mac80211: Add support for ACPI WBRF
+config: powerpc-randconfig-r025-20230630 (https://download.01.org/0day-ci/archive/20230630/202306302133.Px6k3Lmq-lkp@intel.com/config)
+compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
+reproduce: (https://download.01.org/0day-ci/archive/20230630/202306302133.Px6k3Lmq-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202306302133.Px6k3Lmq-lkp@intel.com/
+
+All errors (new ones prefixed by >>):
+
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:87:1: note: expanded from here
+      87 | __do_insw
+         | ^
+   arch/powerpc/include/asm/io.h:615:56: note: expanded from macro '__do_insw'
+     615 | #define __do_insw(p, b, n)      readsw((PCI_IO_ADDR)_IO_BASE+(p), (b), (n))
+         |                                        ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rx.c:15:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:47:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      47 | DEF_PCI_AC_NORET(insl, (unsigned long p, void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      48 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:89:1: note: expanded from here
+      89 | __do_insl
+         | ^
+   arch/powerpc/include/asm/io.h:616:56: note: expanded from macro '__do_insl'
+     616 | #define __do_insl(p, b, n)      readsl((PCI_IO_ADDR)_IO_BASE+(p), (b), (n))
+         |                                        ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rx.c:15:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:49:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      49 | DEF_PCI_AC_NORET(outsb, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      50 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:91:1: note: expanded from here
+      91 | __do_outsb
+         | ^
+   arch/powerpc/include/asm/io.h:617:58: note: expanded from macro '__do_outsb'
+     617 | #define __do_outsb(p, b, n)     writesb((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rx.c:15:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:51:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      51 | DEF_PCI_AC_NORET(outsw, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      52 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:93:1: note: expanded from here
+      93 | __do_outsw
+         | ^
+   arch/powerpc/include/asm/io.h:618:58: note: expanded from macro '__do_outsw'
+     618 | #define __do_outsw(p, b, n)     writesw((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rx.c:15:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:53:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      53 | DEF_PCI_AC_NORET(outsl, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      54 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:95:1: note: expanded from here
+      95 | __do_outsl
+         | ^
+   arch/powerpc/include/asm/io.h:619:58: note: expanded from macro '__do_outsl'
+     619 | #define __do_outsl(p, b, n)     writesl((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rx.c:26:
+>> net/mac80211/ieee80211_i.h:2655:48: error: void function 'ieee80211_add_wbrf' should not return a value [-Wreturn-type]
+    2655 |                                       struct cfg80211_chan_def *chandef) { return 0; }
+         |                                                                            ^      ~
+   6 warnings and 1 error generated.
+--
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:47:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      47 | DEF_PCI_AC_NORET(insl, (unsigned long p, void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      48 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:87:1: note: expanded from here
+      87 | __do_insl
+         | ^
+   arch/powerpc/include/asm/io.h:616:56: note: expanded from macro '__do_insl'
+     616 | #define __do_insl(p, b, n)      readsl((PCI_IO_ADDR)_IO_BASE+(p), (b), (n))
+         |                                        ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rc80211_minstrel_ht.c:6:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:49:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      49 | DEF_PCI_AC_NORET(outsb, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      50 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:89:1: note: expanded from here
+      89 | __do_outsb
+         | ^
+   arch/powerpc/include/asm/io.h:617:58: note: expanded from macro '__do_outsb'
+     617 | #define __do_outsb(p, b, n)     writesb((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rc80211_minstrel_ht.c:6:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:51:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      51 | DEF_PCI_AC_NORET(outsw, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      52 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:91:1: note: expanded from here
+      91 | __do_outsw
+         | ^
+   arch/powerpc/include/asm/io.h:618:58: note: expanded from macro '__do_outsw'
+     618 | #define __do_outsw(p, b, n)     writesw((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rc80211_minstrel_ht.c:6:
+   In file included from include/linux/netdevice.h:38:
+   In file included from include/net/net_namespace.h:43:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:53:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      53 | DEF_PCI_AC_NORET(outsl, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      54 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:93:1: note: expanded from here
+      93 | __do_outsl
+         | ^
+   arch/powerpc/include/asm/io.h:619:58: note: expanded from macro '__do_outsl'
+     619 | #define __do_outsl(p, b, n)     writesl((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/rc80211_minstrel_ht.c:15:
+   In file included from net/mac80211/rate.h:16:
+>> net/mac80211/ieee80211_i.h:2655:48: error: void function 'ieee80211_add_wbrf' should not return a value [-Wreturn-type]
+    2655 |                                       struct cfg80211_chan_def *chandef) { return 0; }
+         |                                                                            ^      ~
+   6 warnings and 1 error generated.
+--
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:47:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      47 | DEF_PCI_AC_NORET(insl, (unsigned long p, void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      48 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:126:1: note: expanded from here
+     126 | __do_insl
+         | ^
+   arch/powerpc/include/asm/io.h:616:56: note: expanded from macro '__do_insl'
+     616 | #define __do_insl(p, b, n)      readsl((PCI_IO_ADDR)_IO_BASE+(p), (b), (n))
+         |                                        ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/ht.c:15:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:49:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      49 | DEF_PCI_AC_NORET(outsb, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      50 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:128:1: note: expanded from here
+     128 | __do_outsb
+         | ^
+   arch/powerpc/include/asm/io.h:617:58: note: expanded from macro '__do_outsb'
+     617 | #define __do_outsb(p, b, n)     writesb((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/ht.c:15:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:51:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      51 | DEF_PCI_AC_NORET(outsw, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      52 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:130:1: note: expanded from here
+     130 | __do_outsw
+         | ^
+   arch/powerpc/include/asm/io.h:618:58: note: expanded from macro '__do_outsw'
+     618 | #define __do_outsw(p, b, n)     writesw((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/ht.c:15:
+   In file included from include/linux/ieee80211.h:19:
+   In file included from include/linux/if_ether.h:19:
+   In file included from include/linux/skbuff.h:17:
+   In file included from include/linux/bvec.h:10:
+   In file included from include/linux/highmem.h:12:
+   In file included from include/linux/hardirq.h:11:
+   In file included from arch/powerpc/include/asm/hardirq.h:6:
+   In file included from include/linux/irq.h:20:
+   In file included from include/linux/io.h:13:
+   In file included from arch/powerpc/include/asm/io.h:677:
+   arch/powerpc/include/asm/io-defs.h:53:1: warning: performing pointer arithmetic on a null pointer has undefined behavior [-Wnull-pointer-arithmetic]
+      53 | DEF_PCI_AC_NORET(outsl, (unsigned long p, const void *b, unsigned long c),
+         | ^~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+      54 |                  (p, b, c), pio, p)
+         |                  ~~~~~~~~~~~~~~~~~~
+   arch/powerpc/include/asm/io.h:674:3: note: expanded from macro 'DEF_PCI_AC_NORET'
+     674 |                 __do_##name al;                                 \
+         |                 ^~~~~~~~~~~~~~
+   <scratch space>:132:1: note: expanded from here
+     132 | __do_outsl
+         | ^
+   arch/powerpc/include/asm/io.h:619:58: note: expanded from macro '__do_outsl'
+     619 | #define __do_outsl(p, b, n)     writesl((PCI_IO_ADDR)_IO_BASE+(p),(b),(n))
+         |                                         ~~~~~~~~~~~~~~~~~~~~~^
+   In file included from net/mac80211/ht.c:18:
+>> net/mac80211/ieee80211_i.h:2655:48: error: void function 'ieee80211_add_wbrf' should not return a value [-Wreturn-type]
+    2655 |                                       struct cfg80211_chan_def *chandef) { return 0; }
+         |                                                                            ^      ~
+   6 warnings and 1 error generated.
+..
+
+
+vim +/ieee80211_add_wbrf +2655 net/mac80211/ieee80211_i.h
+
+  2630	
+  2631	u8 ieee80211_ie_len_eht_cap(struct ieee80211_sub_if_data *sdata, u8 iftype);
+  2632	u8 *ieee80211_ie_build_eht_cap(u8 *pos,
+  2633				       const struct ieee80211_sta_he_cap *he_cap,
+  2634				       const struct ieee80211_sta_eht_cap *eht_cap,
+  2635				       u8 *end,
+  2636				       bool for_ap);
+  2637	
+  2638	void
+  2639	ieee80211_eht_cap_ie_to_sta_eht_cap(struct ieee80211_sub_if_data *sdata,
+  2640					    struct ieee80211_supported_band *sband,
+  2641					    const u8 *he_cap_ie, u8 he_cap_len,
+  2642					    const struct ieee80211_eht_cap_elem *eht_cap_ie_elem,
+  2643					    u8 eht_cap_len,
+  2644					    struct link_sta_info *link_sta);
+  2645	
+  2646	#ifdef CONFIG_WBRF
+  2647	void ieee80211_check_wbrf_support(struct ieee80211_local *local);
+  2648	void ieee80211_add_wbrf(struct ieee80211_local *local,
+  2649				struct cfg80211_chan_def *chandef);
+  2650	void ieee80211_remove_wbrf(struct ieee80211_local *local,
+  2651				   struct cfg80211_chan_def *chandef);
+  2652	#else
+  2653	static inline void ieee80211_check_wbrf_support(struct ieee80211_local *local) { }
+  2654	static inline void ieee80211_add_wbrf(struct ieee80211_local *local,
+> 2655					      struct cfg80211_chan_def *chandef) { return 0; }
+  2656	static inline void ieee80211_remove_wbrf(struct ieee80211_local *local,
+  2657						 struct cfg80211_chan_def *chandef) { }
+  2658	#endif /* CONFIG_WBRF */
+  2659	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
