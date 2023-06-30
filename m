@@ -1,225 +1,176 @@
-Return-Path: <netdev+bounces-14772-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14773-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A42E8743C08
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:39:55 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 979D9743C11
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:42:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FD2B1C20B91
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:39:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3497A2810CA
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:42:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F764101E2;
-	Fri, 30 Jun 2023 12:39:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DACB6101E2;
+	Fri, 30 Jun 2023 12:42:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 655001FAA
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 12:39:52 +0000 (UTC)
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B28F91B4;
-	Fri, 30 Jun 2023 05:39:50 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688128790; x=1719664790;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=ZPS9YYzxaThZERRS6ro2TLYluNr0xa2RsBlwCpJv2P4=;
-  b=Wi5vUeLJ0MIypdWg9zXAJuFrBSQpOE7wTGm7yeqlBE9luPmEOVWCeBwx
-   eNRvvGcePvllW3VKwjA8QIzUDbN9zWpDbWJRkGMrM0+8lFM7pcmuRlgUT
-   4k7ZDLs+duKee0lU/TFlZbZ06LiKfLMytRw9Y9uRlfaVkM7MEV58Tysgk
-   Ivz7HocY1Qi5GebNI4CzTuPJHEXcDnMA2lZj6WmrBjLCA9c8tKh/WY1YU
-   csz7znfTzUYC9BXTTmCJ9htW6UNJn0AvRIH3etcQoAB4rrBkjR+D+xe53
-   6oe7cSl5ZikITo1EvY9rgokoh7WPr3VigMWjZZvl40jm9ouvnPwSPjn/m
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="426070665"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="426070665"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 05:39:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10756"; a="787711713"
-X-IronPort-AV: E=Sophos;i="6.01,170,1684825200"; 
-   d="scan'208";a="787711713"
-Received: from orsmsx602.amr.corp.intel.com ([10.22.229.15])
-  by fmsmga004.fm.intel.com with ESMTP; 30 Jun 2023 05:39:49 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX602.amr.corp.intel.com (10.22.229.15) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 30 Jun 2023 05:39:49 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Fri, 30 Jun 2023 05:39:48 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.41) by
- edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Fri, 30 Jun 2023 05:39:46 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EmyucAfm1VI9NoeQZqKAWI0/65FUtK+9HvM8mwxW9YBdFzMn/nDi9/tn5O8ReOU8/KRa6h+4Y9yvn+maCBX1mXCY51NN+4ZapQWvADlmuzL2wbmTFmEX5nxxePvvYV1j5qOp5oWAnTvJ/mAZ+yNpEIj3mGja7XWdh00sLzFlUDP1e0as64GjaDIgE9okbHa09usU6Hx8GaDUjoDvCZP9BGUE1ajkTIfrQVt2i3uPqfbddNQhv/QxhBp7mEtI5k6DtBilXA+90Fg4sdBS3fv7kRLjF+0ohirK/8qmJDlCJ3jJuFh+mRphS43Ko6HJ6HpSytnOa5VjArr7OsgSXEN9ow==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=JCU9DHlBkf10MyK/SGtkUk2LKLdDsgDSpdmlK77PIyI=;
- b=e6AYOsvXGI9BCWjSQ3hbD0r6cSCAQdoudPQ1uK2NaFV4oi65K8tsbGWbHuT8X7G3VSKro4MJp863qg0wvlGYtWq8bhYNmCkKMjjSVOqBGtz+5VRCmIwu0XRZ7yiBXNma3MArwT7K+ZVczWZptle5hMze7Naos4RbDMbt5Tw9scYMturfpLElJh0KZmrIU/9JZoIhKJ8ufV5vXa1rp2MYFvx8XY48uadVYj2EabiNaP4Il12FM/K/cTeoiuhIHMVVc/qQoUz7k7LSllkQ4sOX7XTE1cglXUw8jIusK1AvqMqqi+J1Sc+kUxM2x9VKZXDwwgxd/9cBFwJ0UD1XcQQOoQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by DM6PR11MB4547.namprd11.prod.outlook.com (2603:10b6:5:2a1::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.15; Fri, 30 Jun
- 2023 12:39:44 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::82b6:7b9d:96ce:9325]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::82b6:7b9d:96ce:9325%7]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
- 12:39:44 +0000
-Message-ID: <6d79614b-1258-08be-1bd8-cb02ffd9dc6e@intel.com>
-Date: Fri, 30 Jun 2023 14:39:07 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH RFC net-next 1/4] net: skbuff: don't include
- <net/page_pool.h> to <linux/skbuff.h>
-Content-Language: en-US
-To: Alexander H Duyck <alexander.duyck@gmail.com>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	Larysa Zaremba <larysa.zaremba@intel.com>, Yunsheng Lin
-	<linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, "Jesper
- Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
-	<ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
- <20230629152305.905962-2-aleksander.lobakin@intel.com>
- <b7dda3fe88bb3d302b1cbb2016387d5e98e2f946.camel@gmail.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <b7dda3fe88bb3d302b1cbb2016387d5e98e2f946.camel@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0235.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b2::20) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7F2614AB8
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 12:42:19 +0000 (UTC)
+Received: from mail-lj1-x22b.google.com (mail-lj1-x22b.google.com [IPv6:2a00:1450:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BCFBC212C
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 05:42:17 -0700 (PDT)
+Received: by mail-lj1-x22b.google.com with SMTP id 38308e7fff4ca-2b698dd515dso28370411fa.3
+        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 05:42:17 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688128936; x=1690720936;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=HbDHpcHBGV/GXKRXQp6C7hY79PoxtwM87bmH3IPRUy8=;
+        b=S95nMNVjz21JUfBjntZ0OBElDugcT8Z1TpM/i6HCRSAH4biC7zVwu8l5DEomnXW6Qy
+         O+xptjJ87ZL6y8b+OS3dXV9KKGrT2yEBQ5b1SM9KdqcOwXrQSrkvhWDxINH7qcTPz3vs
+         3VDZu5mzPBx74+1YmlQv8nFYdG/cdAs0cMllcDYh++lsPyBVV+qOeXlPnQ3uyyI4bmPq
+         ZceMvMn6oxxMym30xxlKu3KAXQVqiAQuG1Orn+jzi5WMx8FrWjqmQObSTKjmHrYtI8BD
+         B21zqOk5NDrwBWYCgw6JDeTqVKg45lu1XHYyX0jJhgpQrp4pEWx9qDi6SyqobUmgGoaV
+         ctuw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688128936; x=1690720936;
+        h=to:references:message-id:content-transfer-encoding:cc:date
+         :in-reply-to:from:subject:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=HbDHpcHBGV/GXKRXQp6C7hY79PoxtwM87bmH3IPRUy8=;
+        b=Cup411kOJurQhBSN73AIqkHFqZ/FE5y3iLJwVrVpVNWDg8c9DfxgXSj4WE7HtJk8Kv
+         GBwhBOg3FiEtvaCwxDbSUw1sobzRegLq3NNOPKjyjAd3xwNqUiL/1Ebyb+4pib0NmW5q
+         GTvEeGIhlTHdjhr+rle5reqGidR31qnJ+zL+mjvTaLChT5ICfNlDOG1hLD2/NUXiu1u4
+         Zz6bbqyRQMB5Htq3lsC1oHyLs3WWUG/+hO+oehhqZf0QZ3wGqWmiwVviTR2xrIFhyDtP
+         2gb9jEa8uShCen1VLF7VQb+HVTOZ+m4G59/EUSHizjOHj136RA5eTMlfBk3/DXUxVR9+
+         fUyA==
+X-Gm-Message-State: ABy/qLa1qMsHxNK4rNVekX+H5ob4Tqo3ENGbFZnjn33nr5lA+VREXKIv
+	H5+1ZswrmSMIKgOBR/eTzq8=
+X-Google-Smtp-Source: APBJJlGTiAqSH2cksLdLr5lwKG+bvn2CYh0FyAsb9QJcO53Qx04dR+oUXUNEydEGJKBlJr21oFERJg==
+X-Received: by 2002:a2e:3512:0:b0:2b6:d5af:1160 with SMTP id z18-20020a2e3512000000b002b6d5af1160mr839056ljz.28.1688128935594;
+        Fri, 30 Jun 2023 05:42:15 -0700 (PDT)
+Received: from smtpclient.apple ([178.254.237.20])
+        by smtp.gmail.com with ESMTPSA id d14-20020a170906370e00b00992e265a22dsm721727ejc.136.2023.06.30.05.42.14
+        (version=TLS1_2 cipher=ECDHE-ECDSA-AES128-GCM-SHA256 bits=128/128);
+        Fri, 30 Jun 2023 05:42:15 -0700 (PDT)
+Content-Type: text/plain;
+	charset=us-ascii
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DM6PR11MB4547:EE_
-X-MS-Office365-Filtering-Correlation-Id: 42ad393e-8c04-4c80-0f96-08db796714f8
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: C8OMAG19A23iUB5onq0qEXgfe3y6xrwIqwHQ/UvptIIJZ7Hk6iSI5+nyBTBjiNDC/ou4e9MfEN4B+2eYBaoGsWucr9nhrDUUqBnwQXWSLOE8e4uouYd1desOYQvbMc49x98PcpPTTS1scMIRaecete+qd3JIvdaaw45rYnp8FgMhMgFgXGpq4Mc4bRLPjC9Y4ipu7Huhvh3ZzLsEgxqdT8/r83CeVEDYQykuiygra914hKpkTRw2eE3jEeGpQqX1eCCIkE1MXigDxCYIxxjRKfsdOM7pQHR/XO/1D7hc3ze9erSY63lkkTOxcVjA4ujcX2FetE8SJEQLS/xoyzOb7VQCZaBmGq/ydE/9Hp8VcCUYJBEySHyioAMBsjAG8NRlbU4PkwKcmOcIg9ou8iIqZLUKS3ba7wcpkNDfnP3XXwY0v9VlHs8Z9yw1hFwSc+6nPoN8wgRNr5kozEdkV9hS/e2sOdm1unP6/bUzhbKgbYhgQ3BQEB668PiUgt8Y86mbiwLbQk8hMh+qofpSfJwx7oxOR8uC+CSOiCtOCmk3egP3pN1z0VwYlKSOXa/Y+xgqghv1cPj6VGc2PtopMm9rsQWDBIkAfeE/YKvIjg5l7L6vce2BfEk7Ta3+fo/Fls3OQ/BMzXTpz8ygngDlgmQWzw==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(136003)(376002)(39860400002)(346002)(366004)(451199021)(66946007)(83380400001)(2906002)(186003)(2616005)(316002)(6916009)(54906003)(6666004)(66476007)(66556008)(4326008)(478600001)(6512007)(26005)(7416002)(5660300002)(8936002)(6506007)(6486002)(8676002)(41300700001)(38100700002)(82960400001)(31696002)(36756003)(86362001)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?cm5DeXZxR09jZEREWGw2clRsYmsxeXAza09McnF4WThvMHQvT3RKVE11Vzho?=
- =?utf-8?B?bE9EMHFsS3VCd3loekh1ZnJ2OXZxK0dVOG9naEpGTXZ6WjFUWlB4RlRhQlli?=
- =?utf-8?B?Q1k1Zmt1NHBGenluRDlMRDh2REFBNFZRVEFXaFNSYXN0NHBFODZGSHJvaVNl?=
- =?utf-8?B?N1JTMHErTFdIRE1qRS93b1E3M0psQ1kyLzIzRmdxVUlMVTZacE5YZmZ0SDVF?=
- =?utf-8?B?S0x0UHR0cnF3VEhkdFQ5SGVBMlY5eTVvQ0pNeGFzTEI5dzQwQkxJeXdkTDRp?=
- =?utf-8?B?d2NHdWRYZm10NnowZmtheTdiSkVuSnpvMXl4YnFsV1ZjdDNucEI3aW1jcmIy?=
- =?utf-8?B?NG16VHVmMExnaW5wbmp4SU5HbjNSa29QOFhpbVdqNTRYbEtrUkN6UGoxV0Vt?=
- =?utf-8?B?Vks5ZGtSNjZabCs3T1RzVFllUHBsL2NUeVJLQ1dabTViNXJjV0x2TkFCNVNG?=
- =?utf-8?B?VW00UGl1NWNuRDRNWVJvUjV2cmpOb1NlMTdHeUs1SGlIUzVJQlA2eDM5Yzdh?=
- =?utf-8?B?Q09aSHF2TUN4R01TS2xORTI2cERMSUNNaTVOSlhSV2ZVOGZNb0JPUmFjUTFC?=
- =?utf-8?B?cEE0SXpwVTMxSndrMUdsNzdid3JHRGRVT08zZlUvMGx0cFRCZWRnWkpaR05P?=
- =?utf-8?B?Rk5ERk1yK1BBMmhscUszREt6SDJwZlA5dmgzRjdYbm0xVFdHRmQ4ODZkS2gz?=
- =?utf-8?B?M3FhWkVIWUtCQ1kwUUhDemVleG1ObCtYd1hGcFRidkRRZ3daVUZiTm40amJs?=
- =?utf-8?B?Rkc1ZTBENEZaMFRra1kwWWUvK3o4MFNPR2RSYmNQRmVsaVhHNCtPRE8vWE5Z?=
- =?utf-8?B?QXU2Uk9Lcy9VSEV5bUFCeFpQUG03NWhESnNMQUpOOWp0bm1lWDFxbktZZWtx?=
- =?utf-8?B?RGVmWG1lcGI0WVJ6cGx1Zkl3MjhXTHZJZURTRjYzVnpLZXp6QStLN1RvL0pk?=
- =?utf-8?B?bjE2SGpabmxndTlScEFVMy95Q2lnb3hQRm9ETTFjMTN2NHh4a3lLd1pHWW55?=
- =?utf-8?B?dXBJYWFnSFloTHp5Q1JINktOL2srM0lTOHVxYnk4c3N3TlAxZ1ZUaWdNWlF6?=
- =?utf-8?B?OGJZa1QwTDcwald1dEFXaU10NWVTam9vd1RlME1LbWRtSmdlMFpUS0R0a211?=
- =?utf-8?B?ZTdxMmVIa3RDM3FaWk1IYUt2RndocEdLZmhCLzZiWnBUNFJxeU9KRzJpTmhL?=
- =?utf-8?B?bkxQSWZuNXREbmVCZEsxMnBvTEFSRzg2THRMTjVYWDlhZ09qUXo2SWNpWXVX?=
- =?utf-8?B?c2J3SlVBbnlpMytZMmpOVWFONkg0T1drVm8yNlU5UjN4ZzhteDZkZTFKc1hm?=
- =?utf-8?B?eVcwQmZ5S1Q2Z2NtWWFtZ3Y0emhvSUdiQUttazJveDAyQlE0eldrWFIvbEp1?=
- =?utf-8?B?UzZIYWUxcHNKcXk3QXdOcmt4dnRHOHRQL0dEVWdPanA3MTBxVDgzemVDSDA4?=
- =?utf-8?B?elFMQVJGcGdDSHNuRFFMdGFoYnJVdE12d2pFU2g1OUZoNTFMcTVGNDdDeFNJ?=
- =?utf-8?B?OWZ3ZVJERngrcURIamg1T2ZNaTJqNXU1Tkx5K1pJZHU4UWRlRGhmL3JIclVB?=
- =?utf-8?B?Y1dsdmJVWnRmRmdMRmpOVjUrMVU0TVhiclpkdWVpdWQyTExFMWRucVVWWndE?=
- =?utf-8?B?YlZQdkJndlY4a0t4U1dvWkorSWRvTFJwVGxiSWo0TjViWGRzUjVyWnNSN2hH?=
- =?utf-8?B?UFB3WlQ3WmlneXlHZlN3MGF5aUhkcVZKRlZpY3ZrWUNXUVVmczlYSEZaSkJD?=
- =?utf-8?B?b1o5ajJxTTlMUFVib2l6RksxYkFUdWhhYVFGUmRPNnNvOS93TDZpUGpjSlRG?=
- =?utf-8?B?RVRreG1nR0hJWmRpa29nNGw4d2UzMUNvM3lNd2pxVHNnc2NKZDkyKzcyV2Iy?=
- =?utf-8?B?SFBubFRyRDNSMGlPUFdHUEVkMzQ5ckExNkhLZ2xZVE9FRUdUUDhxZDRORW5k?=
- =?utf-8?B?SSsxbWY5MUdjNkRaKytqdi8yd2RUbklDNEROM3RTRmdvTEU1a2thOFdBcmRi?=
- =?utf-8?B?c0xXT05mQ1F5SUhqTWJOMWlscTV1cmVSeG5ieXJ1b1dkeDlMYWk5dGcvTjFP?=
- =?utf-8?B?WnhDTTU1K3RyaEFCUFNBZWg2WVlsUFpMSm5FcE16OGY5TWpRc013NmRTTnVT?=
- =?utf-8?B?RThKQmdGVi9NMzQ1SFplS3ZndnhIWTZ6Tzg2YTlnUHhtV1lIQ3VzVFo3RkQr?=
- =?utf-8?B?L1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 42ad393e-8c04-4c80-0f96-08db796714f8
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 12:39:44.6709
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: dPz7i05A8B4A0veBhlMbuQhagSxS6KOufZAbltns0sV/mWkRwaJXxQhLgnZQYMSrB8pY6VE/kZqF50b5rzneZWVVaNT8JHNxUE3tCDcovDg=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM6PR11MB4547
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0 (Mac OS X Mail 16.0 \(3731.600.7\))
+Subject: Re: Bug Report with kernel 6.3.5
+From: Martin Zaharinov <micron10@gmail.com>
+In-Reply-To: <ZJ1rC8WieLkJLHFl@debian.me>
+Date: Fri, 30 Jun 2023 15:42:04 +0300
+Cc: netdev <netdev@vger.kernel.org>,
+ Eric Dumazet <edumazet@google.com>,
+ Linux Regressions <regressions@lists.linux.dev>
+Content-Transfer-Encoding: quoted-printable
+Message-Id: <F8555BEF-15B3-4CFF-8156-D5B1D6C24736@gmail.com>
+References: <20F611B6-2C76-4BD3-852D-8828D27F88EC@gmail.com>
+ <ZHwkQcouxweYYhTX@debian.me> <ZJ1rC8WieLkJLHFl@debian.me>
+To: Bagas Sanjaya <bagasdotme@gmail.com>
+X-Mailer: Apple Mail (2.3731.600.7)
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Alexander H Duyck <alexander.duyck@gmail.com>
-Date: Thu, 29 Jun 2023 09:55:15 -0700
+Hi Bagas,
 
-> On Thu, 2023-06-29 at 17:23 +0200, Alexander Lobakin wrote:
->> Currently, touching <net/page_pool.h> triggers a rebuild of more than
->> a half of the kernel. That's because it's included in <linux/skbuff.h>.
->> And each new include to page_pool.h adds more [useless] data for the
->> toolchain to process per each source file from that pile.
+Close for now , if i collect new info will update here .
 
-[...]
-
->> +bool page_pool_return_skb_page(struct page *page, bool napi_safe)
->> +{
->> +	struct napi_struct *napi;
->> +	struct page_pool *pp;
->> +	bool allow_direct;
->> +
->> +	page = compound_head(page);
->> +	pp = page->pp;
-> 
-> So this is just assuming that any page we pass thru is a page pool
-> page. The problem is there may be some other pointer stored here that
-> could cause issues.
-
-But that is exactly what you suggested in the previous revision's
-thread... Hey! :D
-
-"I suspect we could look at pulling parts of it out as well. The
-pp_magic check should always be succeeding unless we have pages getting
-routed the wrong way somewhere. So maybe we should look at pulling it
-out and moving it to another part of the path such as
-__page_pool_put_page() and making it a bit more visible to catch those
-cases".
-
-Anyway, since some drivers still mix PP pages with non-PP ones (mt76
-IIRC, maybe more), I feel the check for magic is still relevant. I just
-believed you and forgot about that T.T
-
-> 
-> I would suggest creating an accessor as mentioned above to verify it is
-> a page pool page before you access page->pp.
-> 
->> +
->> +	/* Allow direct recycle if we have reasons to believe that we are
-[...]
 
 Thanks,
-Olek
+Martin
+
+> On 29 Jun 2023, at 14:29, Bagas Sanjaya <bagasdotme@gmail.com> wrote:
+>=20
+> On Sun, Jun 04, 2023 at 12:42:25PM +0700, Bagas Sanjaya wrote:
+>> On Sun, Jun 04, 2023 at 07:51:36AM +0300, Martin Zaharinov wrote:
+>>> Hi Team one bug report=20
+>>>=20
+>>> after upgrade from kernel 6.2.12 to 6.3.5=20
+>>> After fell hour system get this error.
+>>>=20
+>>> If is possible to check.
+>>>=20
+>>>=20
+>>> Jun  4 01:46:52  [12810.275218][  T587] INFO: task nginx:3977 =
+blocked for more than 609 seconds.
+>>> Jun  4 01:46:52  [12810.275350][  T587]       Tainted: G           O =
+      6.3.5 #1
+>>> Jun  4 01:46:52  [12810.275436][  T587] "echo 0 > =
+/proc/sys/kernel/hung_task_timeout_secs" disables this message.
+>>> Jun  4 01:46:52  [12810.275527][  T587] task:nginx         state:D =
+stack:0     pid:3977  ppid:1      flags:0x00000006
+>>> Jun  4 01:46:52  [12810.275624][  T587] Call Trace:
+>>> Jun  4 01:46:52  [12810.275707][  T587]  <TASK>
+>>> Jun  4 01:46:52  [12810.275786][  T587]  __schedule+0x352/0x820
+>>> Jun  4 01:46:52  [12810.275878][  T587]  =
+schedule_preempt_disabled+0x61/0xe0
+>>> Jun  4 01:46:52  [12810.275963][  T587]  =
+__mutex_lock.constprop.0+0x481/0x7a0
+>>> Jun  4 01:46:52  [12810.276049][  T587]  ? =
+__lock_sock_fast+0x1a/0xc0
+>>> Jun  4 01:46:52  [12810.276135][  T587]  ? =
+lock_sock_nested+0x1a/0xc0
+>>> Jun  4 01:46:52  [12810.276217][  T587]  ? =
+inode_wait_for_writeback+0x77/0xd0
+>>> Jun  4 01:46:52  [12810.276307][  T587]  =
+eventpoll_release_file+0x41/0x90
+>>> Jun  4 01:46:52  [12810.276416][  T587]  __fput+0x1d9/0x240
+>>> Jun  4 01:46:52  [12810.276517][  T587]  task_work_run+0x51/0x80
+>>> Jun  4 01:46:52  [12810.276624][  T587]  =
+exit_to_user_mode_prepare+0x123/0x130
+>>> Jun  4 01:46:52  [12810.276732][  T587]  =
+syscall_exit_to_user_mode+0x21/0x110
+>>> Jun  4 01:46:52  [12810.276847][  T587]  =
+entry_SYSCALL_64_after_hwframe+0x46/0xb0
+>>> Jun  4 01:46:52  [12810.276954][  T587] RIP: 0033:0x15037529155a
+>>> Jun  4 01:46:52  [12810.277056][  T587] RSP: 002b:000015036bbb6400 =
+EFLAGS: 00000293 ORIG_RAX: 0000000000000003
+>>> Jun  4 01:46:52  [12810.277185][  T587] RAX: 0000000000000000 RBX: =
+000015036bbb7420 RCX: 000015037529155a
+>>> Jun  4 01:46:52  [12810.277311][  T587] RDX: 0000000000000000 RSI: =
+0000000000000000 RDI: 0000000000000013
+>>> Jun  4 01:46:52  [12810.277440][  T587] RBP: 00001503647343d0 R08: =
+1999999999999999 R09: 0000000000000000
+>>> Jun  4 01:46:52  [12810.277567][  T587] R10: 000015037531baa0 R11: =
+0000000000000293 R12: 0000000000000ba5
+>>> Jun  4 01:46:52  [12810.277693][  T587] R13: 0000150348731f48 R14: =
+0000000000000000 R15: 000000001f5b06b0
+>>> Jun  4 01:46:52  [12810.277820][  T587]  </TASK>
+>>>=20
+>>=20
+>> Can you clearly describe this regression? And your nginx setup? And =
+most
+>> importantly, can you please bisect between v6.2 and v6.3 to find the
+>> culprit? Can you also check the mainline?
+>>=20
+>> Anyway, thanks for the regression report. I'm adding it to regzbot:
+>>=20
+>> #regzbot ^introduced: v6.2.12..v6.3.5
+>> #regzbot title: nginx blocked for more than 10 minutes on 6.3.5
+>>=20
+>=20
+> No reply from Martin (MIA), thus removing from regzbot tracking:
+>=20
+> #regzbot inconclusive: reporter MIA when being asked to provide =
+regression details
+>=20
+> Thanks.
+>=20
+> --=20
+> An old man doll... just what I always wanted! - Clara
+
+
 
