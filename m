@@ -1,162 +1,151 @@
-Return-Path: <netdev+bounces-14794-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14795-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12716743D81
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:30:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D58CB743DCA
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:45:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 085121C20BCF
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:30:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C31F91C20C06
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:45:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41AFC156FE;
-	Fri, 30 Jun 2023 14:30:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D74914299;
+	Fri, 30 Jun 2023 14:45:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36459154A2
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 14:30:39 +0000 (UTC)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D404E3AA4;
-	Fri, 30 Jun 2023 07:30:37 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688135437; x=1719671437;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=9I8VS6WX/BF/j754AYm46KpzU8aeLTf85BRuBqO8fhg=;
-  b=aTqd5pXEry3xOwcRJ7AK5KOnPgX9h2JA1F97OqgcXnwPex759UDa6rx9
-   U71lXZsUrTMER6w/wqS3ifwWzGwvwKsql3QN9wvxU6Xlyb+2ABgNpHi+6
-   XVGwDx4SpylU1AMVgCYB0lbV6VJpimq0I8ZN5JJlBZjCKJG0RX8SpDxur
-   rujDGpB8ASjgGFWaStwJNKnB8H7zOfCAc66CdqTZBF96jqb7iSf3appCL
-   i2KGWoH2SM0TW2nZQ8Bhwht+SaEb8FdzQkubkm7NiAI4UEAe0oZMeoUYi
-   ibOW8Gty1PQ0bEGwNAjaw6QrEXwltHXCIkHMfOO/glBoEUWJOfdSKbvWM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="352226619"
-X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
-   d="scan'208";a="352226619"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 30 Jun 2023 07:30:36 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10757"; a="717821775"
-X-IronPort-AV: E=Sophos;i="6.01,171,1684825200"; 
-   d="scan'208";a="717821775"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by orsmga002.jf.intel.com with ESMTP; 30 Jun 2023 07:30:29 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qFF8m-000F2T-1o;
-	Fri, 30 Jun 2023 14:30:28 +0000
-Date: Fri, 30 Jun 2023 22:29:35 +0800
-From: kernel test robot <lkp@intel.com>
-To: Evan Quan <evan.quan@amd.com>, rafael@kernel.org, lenb@kernel.org,
-	Alexander.Deucher@amd.com, Christian.Koenig@amd.com,
-	Xinhui.Pan@amd.com, airlied@gmail.com, daniel@ffwll.ch,
-	johannes@sipsolutions.net, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, Mario.Limonciello@amd.com,
-	mdaenzer@redhat.com, maarten.lankhorst@linux.intel.com,
-	tzimmermann@suse.de, hdegoede@redhat.com, jingyuwang_vip@163.com,
-	Lijo.Lazar@amd.com, jim.cromie@gmail.com, bellosilicio@gmail.com,
-	andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au,
-	arnd@arndb.de
-Cc: oe-kbuild-all@lists.linux.dev, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org, linux-kernel@vger.kernel.org,
-	dri-devel@lists.freedesktop.org, linux-acpi@vger.kernel.org
-Subject: Re: [PATCH V5 7/9] drm/amd/pm: add flood detection for wbrf events
-Message-ID: <202306302258.ZdzWnrmF-lkp@intel.com>
-References: <20230630103240.1557100-8-evan.quan@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2C4E55E
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 14:45:28 +0000 (UTC)
+Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6961C1FC2;
+	Fri, 30 Jun 2023 07:45:23 -0700 (PDT)
+Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6b723aedd3dso1385100a34.3;
+        Fri, 30 Jun 2023 07:45:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688136322; x=1690728322;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=WCqsP8XO7B1p8RAxtSlO/FnCPRr08EENqWwOAf3sC+E=;
+        b=qVdXzBH8WjUA9L1VyNci3etKoSEHQuU9KN6Ex1ShfYvadQztuThYEV56Gg4N91bmI6
+         J/Wch61VIWZrHssyTcvMFzrgeAPUxoTdiFUUFKPEhdXd7vm/8BMrL8+bu1mYXbnEI8Zh
+         LHqV/O+rv+jZfOlkPmO7UoraWrlQdgzV0538MFq9ZT10MeKkBWQAWGpUUk+d1HXxn58v
+         KcMWYWDhMM4FJ5NHjDf+Ly3U722Kg3UcUERKULJEvx1aLXpBFjo82vo1qwz11sU2Swb0
+         gr+gfaT61PggH/y6Yh4RW66ify9PifAG38GqxiuK4ChVRiXqnJqCCg268Ho7r39rghIY
+         SLxA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688136322; x=1690728322;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=WCqsP8XO7B1p8RAxtSlO/FnCPRr08EENqWwOAf3sC+E=;
+        b=d1AOdZdGyht/zxzvzGFqnbXuBEZsrkHFt7BINiqxO4F5DpTLm6GqLjABPdk7TLUJAU
+         s5auOS0VOze1O/trSCxS+h3xgB9fe5pHamAZoWRTcLpSTs+buiunSAD8auIVQj1JfVJk
+         FtxOFgIRvnwkMvF9EqduvVefhkIF7Sm9UQ5afvecdd7EdGtSU20nphD+Ey3asvFldESG
+         EnRu9PwAhsKPWDeLLDx0SkZbeG08x7QW3J4rRer2Xss7FRJlbaLXraNEmVivgUPzjrzg
+         s1IF2qfiqvS48ExEagAiyO5wK6oXqFkEVkLl+ma6sZJ2QVxA2ToFXiZF33Zs3gWCHjTB
+         F0Eg==
+X-Gm-Message-State: AC+VfDy3kPzbLY3FR7v3Jw/3p1DSl3Pws3O5+du2VXSiD0f2rrU8LTQJ
+	AXyTuSmpM4YzcHJm92/WfYSRll272Qx9kTkgN7U=
+X-Google-Smtp-Source: ACHHUZ6x47k+BXIygzeqymMPvPthnxGZSrYcX5eKzXrClNt885Eq14YiHr7/Dt7QMj+OWwLY3sc41XGYcU6gqVwOeU0=
+X-Received: by 2002:a9d:6f0a:0:b0:6b7:4411:505d with SMTP id
+ n10-20020a9d6f0a000000b006b74411505dmr3021676otq.4.1688136322562; Fri, 30 Jun
+ 2023 07:45:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230630103240.1557100-8-evan.quan@amd.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
+ <20230629152305.905962-3-aleksander.lobakin@intel.com> <69e827e239dab9fd7986ee43cef599d024c8535f.camel@gmail.com>
+ <ac4a8761-410e-e8cc-d6b2-d56b820a7888@intel.com>
+In-Reply-To: <ac4a8761-410e-e8cc-d6b2-d56b820a7888@intel.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Fri, 30 Jun 2023 07:44:45 -0700
+Message-ID: <CAKgT0UfZCGnWgOH96E4GV3ZP6LLbROHM7SHE8NKwq+exX+Gk_Q@mail.gmail.com>
+Subject: Re: [PATCH RFC net-next 2/4] net: page_pool: avoid calling no-op
+ externals when possible
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
+	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Evan,
+On Fri, Jun 30, 2023 at 5:30=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
+>
+> From: Alexander H Duyck <alexander.duyck@gmail.com>
+> Date: Thu, 29 Jun 2023 09:45:26 -0700
+>
+> > On Thu, 2023-06-29 at 17:23 +0200, Alexander Lobakin wrote:
+> >> Turned out page_pool_put{,_full}_page() can burn quite a bunch of cycl=
+es
+> >> even when on DMA-coherent platforms (like x86) with no active IOMMU or
+> >> swiotlb, just for the call ladder.
+> >> Indeed, it's
+>
+> [...]
+>
+> >> @@ -341,6 +345,12 @@ static bool page_pool_dma_map(struct page_pool *p=
+ool, struct page *page)
+> >>
+> >>      page_pool_set_dma_addr(page, dma);
+> >>
+> >> +    if ((pool->p.flags & PP_FLAG_DMA_MAYBE_SYNC) &&
+> >> +        dma_need_sync(pool->p.dev, dma)) {
+> >> +            pool->p.flags |=3D PP_FLAG_DMA_SYNC_DEV;
+> >> +            pool->p.flags &=3D ~PP_FLAG_DMA_MAYBE_SYNC;
+> >> +    }
+> >> +
+> >>      if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
+> >>              page_pool_dma_sync_for_device(pool, page, pool->p.max_len=
+);
+> >>
+> >
+> > I am pretty sure the logic is flawed here. The problem is
+> > dma_needs_sync depends on the DMA address being used. In the worst case
+> > scenario we could have a device that has something like a 32b DMA
+> > address space on a system with over 4GB of memory. In such a case the
+> > higher addresses would need to be synced because they will go off to a
+> > swiotlb bounce buffer while the lower addresses wouldn't.
+> >
+> > If you were to store a flag like this it would have to be generated per
+> > page.
+>
+> I know when DMA might need syncing :D That's the point of this shortcut:
+> if at least one page needs syncing, I disable it for the whole pool.
+> It's a "better safe than sorry".
+> Using a per-page flag involves more changes and might hurt some
+> scenarios/setups. For example, non-coherent systems, where you always
+> need to do syncs. The idea was to give some improvement when possible,
+> otherwise just fallback to what we have today.
 
-kernel test robot noticed the following build warnings:
+I am not a fan of having the page pool force the syncing either. Last
+I knew I thought the PP_FLAG_DMA_SYNC_DEV was meant to be set by the
+driver, not by the page pool API itself. The big reason for that being
+that the driver in many cases will have to take care of the DMA sync
+itself instead of letting the allocator take care of it.
 
-[auto build test WARNING on wireless-next/main]
-[also build test WARNING on wireless/main v6.4]
-[cannot apply to drm-misc/drm-misc-next linus/master next-20230630]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Evan-Quan/drivers-core-Add-support-for-Wifi-band-RF-mitigations/20230630-183633
-base:   https://git.kernel.org/pub/scm/linux/kernel/git/wireless/wireless-next.git main
-patch link:    https://lore.kernel.org/r/20230630103240.1557100-8-evan.quan%40amd.com
-patch subject: [PATCH V5 7/9] drm/amd/pm: add flood detection for wbrf events
-config: x86_64-buildonly-randconfig-r003-20230630 (https://download.01.org/0day-ci/archive/20230630/202306302258.ZdzWnrmF-lkp@intel.com/config)
-compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
-reproduce: (https://download.01.org/0day-ci/archive/20230630/202306302258.ZdzWnrmF-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202306302258.ZdzWnrmF-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
-   drivers/gpu/drm/amd/amdgpu/../pm/swsmu/amdgpu_smu.c: In function 'smu_wbrf_init':
->> drivers/gpu/drm/amd/amdgpu/../pm/swsmu/amdgpu_smu.c:1336:31: warning: unused variable 'adev' [-Wunused-variable]
-    1336 |         struct amdgpu_device *adev = smu->adev;
-         |                               ^~~~
-
-
-vim +/adev +1336 drivers/gpu/drm/amd/amdgpu/../pm/swsmu/amdgpu_smu.c
-
-19fbe240b2627a Evan Quan 2023-06-30  1324  
-19fbe240b2627a Evan Quan 2023-06-30  1325  /**
-19fbe240b2627a Evan Quan 2023-06-30  1326   * smu_wbrf_init - init driver wbrf support
-19fbe240b2627a Evan Quan 2023-06-30  1327   *
-19fbe240b2627a Evan Quan 2023-06-30  1328   * @smu: smu_context pointer
-19fbe240b2627a Evan Quan 2023-06-30  1329   *
-19fbe240b2627a Evan Quan 2023-06-30  1330   * Verifies the AMD ACPI interfaces and registers with the wbrf
-19fbe240b2627a Evan Quan 2023-06-30  1331   * notifier chain if wbrf feature is supported.
-19fbe240b2627a Evan Quan 2023-06-30  1332   * Returns 0 on success, error on failure.
-19fbe240b2627a Evan Quan 2023-06-30  1333   */
-19fbe240b2627a Evan Quan 2023-06-30  1334  static int smu_wbrf_init(struct smu_context *smu)
-19fbe240b2627a Evan Quan 2023-06-30  1335  {
-19fbe240b2627a Evan Quan 2023-06-30 @1336  	struct amdgpu_device *adev = smu->adev;
-19fbe240b2627a Evan Quan 2023-06-30  1337  	int ret;
-19fbe240b2627a Evan Quan 2023-06-30  1338  
-19fbe240b2627a Evan Quan 2023-06-30  1339  	if (!smu->wbrf_supported)
-19fbe240b2627a Evan Quan 2023-06-30  1340  		return 0;
-19fbe240b2627a Evan Quan 2023-06-30  1341  
-0b8224d2686865 Evan Quan 2023-06-30  1342  	INIT_DELAYED_WORK(&smu->wbrf_delayed_work,
-0b8224d2686865 Evan Quan 2023-06-30  1343  			  smu_wbrf_delayed_work_handler);
-0b8224d2686865 Evan Quan 2023-06-30  1344  
-19fbe240b2627a Evan Quan 2023-06-30  1345  	smu->wbrf_notifier.notifier_call = smu_wbrf_event_handler;
-19fbe240b2627a Evan Quan 2023-06-30  1346  	ret = wbrf_register_notifier(&smu->wbrf_notifier);
-19fbe240b2627a Evan Quan 2023-06-30  1347  	if (ret)
-19fbe240b2627a Evan Quan 2023-06-30  1348  		return ret;
-19fbe240b2627a Evan Quan 2023-06-30  1349  
-19fbe240b2627a Evan Quan 2023-06-30  1350  	/*
-19fbe240b2627a Evan Quan 2023-06-30  1351  	 * Some wifiband exclusion ranges may be already there
-19fbe240b2627a Evan Quan 2023-06-30  1352  	 * before our driver loaded. To make sure our driver
-19fbe240b2627a Evan Quan 2023-06-30  1353  	 * is awared of those exclusion ranges.
-19fbe240b2627a Evan Quan 2023-06-30  1354  	 */
-0b8224d2686865 Evan Quan 2023-06-30  1355  	schedule_delayed_work(&smu->wbrf_delayed_work,
-0b8224d2686865 Evan Quan 2023-06-30  1356  			      msecs_to_jiffies(SMU_WBRF_EVENT_HANDLING_PACE));
-19fbe240b2627a Evan Quan 2023-06-30  1357  
-0b8224d2686865 Evan Quan 2023-06-30  1358  	return 0;
-19fbe240b2627a Evan Quan 2023-06-30  1359  }
-19fbe240b2627a Evan Quan 2023-06-30  1360  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Basically we are just trading off the dma_need_sync cost versus the
+page_pool_dma_sync_for_device cost. If we think it is a win to call
+dma_need_sync for every frame then maybe we should look at folding it
+into page_pool_dma_sync_for_device itself since that is the only
+consumer of it it or just fold it into the PP_FLAG_DMA_SYNC_DEV if
+statement after the flag check rather than adding yet another flag
+that will likely always be true for most devices. Otherwise you are
+just adding overhead for the non-exception case and devices that don't
+bother setting PP_FLAG_DMA_SYNC_DEV.
 
