@@ -1,57 +1,43 @@
-Return-Path: <netdev+bounces-14761-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14762-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 35A4A743B0F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 13:43:44 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95AB0743B1F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 13:49:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D87A2280FCC
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 11:43:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6AD8C1C20946
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 11:49:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF7C813ACD;
-	Fri, 30 Jun 2023 11:43:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79F4713AF6;
+	Fri, 30 Jun 2023 11:49:50 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC37B101F8
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 11:43:40 +0000 (UTC)
-Received: from mail-io1-xd29.google.com (mail-io1-xd29.google.com [IPv6:2607:f8b0:4864:20::d29])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 405F8EE
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 04:43:39 -0700 (PDT)
-Received: by mail-io1-xd29.google.com with SMTP id ca18e2360f4ac-78362f57500so75058939f.3
-        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 04:43:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688125418; x=1690717418;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=NY+pHNYX++uPw0GdIA88Fg8qrzeAw3i64xZ2DUGb+XU=;
-        b=mALpn/INM320JwgmXJ3mgi71Kga4fYNP3E4PyKcnacXgjqCZRO9ehSeO2U/6xeTMK/
-         Zg1jidL3NDiwkrdriXpnVrieaXHFWnt2fp6OCr+5G7c0kFpeigOrXUC/y+3Vxg0IIL94
-         mlvZHvcCe7kqOnT3WC9QngqI5aa+STAHICCNpBdjZL3jm5dXGQA2LP8Ms0cs6hCRdW1l
-         fqeIRILF8eW1Qk6bF5dYSMiuG2nAqS/2jx3aFuCI2gAjbiXbJGPXisWOST/5rqyB6e15
-         h3p6y4GGIaY+hYicx5CPBoWvzFPzM2PTnQebRGyfZhG6KJZ/IyinQEmt+68MVZcuyg9D
-         8TZw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688125418; x=1690717418;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=NY+pHNYX++uPw0GdIA88Fg8qrzeAw3i64xZ2DUGb+XU=;
-        b=MC1O1izxr+wD1fLjccM1yrItllU5Glv9PpoFIfVN5Fd9YNbsYwcZZO1fKw7COf51YX
-         l9oqAa7YI/Uso1lHp9I7v48OxfHFgY0s5WdGLkYGJh6nVHdbnga5gNIL7TOYY4hPnjLk
-         xgYPiE+5iYx7DvfdV4WxGyxJX1eJEu4cY9eBDSNKNO2DNk3z9ArOCWDwwXR3t9fGE4v2
-         4eJggSw5fOI4OSwuzsHqTCD5eKNi30wI8PV0jH0ix+3Ki0SfIGCDn9ow0nEUw62yxbAs
-         ZXONIIYsCb+TvrVGRmfw29DBGdxbARaDRsLKx5tLefNaKhgxFJJIqUN1Ofe3sLmx6E27
-         JQOw==
-X-Gm-Message-State: AC+VfDxWGliZKS8/OkTedXikb6SNoPGagn/FRiB2PX7/Gr8Vowjq3ZO3
-	mvKG54rp4WW4MnU3W2mGMxtJ9cOJt2UBSjY+0Nngsw==
-X-Google-Smtp-Source: ACHHUZ7S5AQ4Drl3wvgUZEsizLAitrLmIDVn8VCrMpfr0mmLA3IalJKmWl+w1jOIERtY09bBZvP50K083lArebc8PQs=
-X-Received: by 2002:a5d:8183:0:b0:776:fd07:3c96 with SMTP id
- u3-20020a5d8183000000b00776fd073c96mr2933630ion.7.1688125418565; Fri, 30 Jun
- 2023 04:43:38 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F03B4C8DF
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 11:49:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 668C3C43391;
+	Fri, 30 Jun 2023 11:49:48 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688125788;
+	bh=VdAfzLBbSkl+/YOzY755sG4yaX5WI2D5q5ibxkkxAKk=;
+	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
+	b=GiCd4pLmfDbfJDGvKDW5FZF+CySd/jhR7uMQMdEb/ctKBJYw+FxWlDJ7mk6xqlsp2
+	 DQhdmtL2+pDknGFDoU5dEATE1jtEJEOtHNzk2rd6EYmW5FLtivVCGYHAC8U46tgB+7
+	 BxYKul+eBmpxDoaacU8YtakVRHrrIAXM/kw3XJ/a0F5KCRtVrbCXAbBSnbotqlw3XF
+	 3ec8GYmtF0KzeLBz+yLrLws36FXSaDkL7cMsDRMABGdMd/lhwchLIVYrccCzIi8DyX
+	 R99ZCOUIXsnvfAYYuek/apbt6M4zpAoAi4P9SrscqKNSEgKJhkh/fQT+mJrE4mm3Rd
+	 yj+eMeh9uECqg==
+Received: by mail-lf1-f47.google.com with SMTP id 2adb3069b0e04-4fb77f21c63so2843826e87.2;
+        Fri, 30 Jun 2023 04:49:48 -0700 (PDT)
+X-Gm-Message-State: ABy/qLbSv1KwA9LXCGYvziaupiCokS+j2kywcAXCzyODR7rAeu57a0Ri
+	1sJ/4uhhqEdm62Vg4P6PlXXRfuRkWF8Wx1GfBDs=
+X-Google-Smtp-Source: APBJJlHBoc1DIeaLKxAanV/6/skMuHbWNDym/NZzDpmifmrua6+uTG/2cmMrV0KS8rAbbx/9MWmJns4BByOHrgrVeTQ=
+X-Received: by 2002:a05:6512:3d0f:b0:4f8:5bf7:db05 with SMTP id
+ d15-20020a0565123d0f00b004f85bf7db05mr2278533lfv.27.1688125786347; Fri, 30
+ Jun 2023 04:49:46 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -64,14 +50,14 @@ References: <0000000000008a7ae505aef61db1@google.com> <20200911170150.GA889@sol.
  <59e1d5c0-aedb-7b5b-f37f-0c20185d7e9b@I-love.SAKURA.ne.jp>
  <CAMj1kXGHRUUFYL09Lm-mO6MfGc19rC=-7mSJ1eDTcbw7QuEkaw@mail.gmail.com>
  <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
- <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
- <f5c2d592-4b97-93f8-b62e-402eeeaa70d9@I-love.SAKURA.ne.jp> <CAMj1kXH6STkFX-SocCiqRgFwkQFZEG=DW6hu6H9W7Egxm2icrw@mail.gmail.com>
-In-Reply-To: <CAMj1kXH6STkFX-SocCiqRgFwkQFZEG=DW6hu6H9W7Egxm2icrw@mail.gmail.com>
-From: Alexander Potapenko <glider@google.com>
-Date: Fri, 30 Jun 2023 13:43:02 +0200
-Message-ID: <CAG_fn=X2kbdxAC0EAPQnpQU12Vqz0DjAt2Y=HsEmWuTsPbJojw@mail.gmail.com>
+ <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com> <CAG_fn=VFa2yeiZmdyuVRmZYtWn6Tkox8UVrOrCv4tEec3BFYbQ@mail.gmail.com>
+In-Reply-To: <CAG_fn=VFa2yeiZmdyuVRmZYtWn6Tkox8UVrOrCv4tEec3BFYbQ@mail.gmail.com>
+From: Ard Biesheuvel <ardb@kernel.org>
+Date: Fri, 30 Jun 2023 13:49:34 +0200
+X-Gmail-Original-Message-ID: <CAMj1kXEdwjN7Q8tKVxHz98zQ4EsWVSdLZ5tQaV-nXxc9hwRYjQ@mail.gmail.com>
+Message-ID: <CAMj1kXEdwjN7Q8tKVxHz98zQ4EsWVSdLZ5tQaV-nXxc9hwRYjQ@mail.gmail.com>
 Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-To: Ard Biesheuvel <ardb@kernel.org>
+To: Alexander Potapenko <glider@google.com>
 Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Boris Pismenny <borisp@nvidia.com>, 
 	John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, herbert@gondor.apana.org.au, 
 	linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
@@ -81,36 +67,127 @@ Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Boris Pismenny <borisp@nv
 	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
 	Paolo Abeni <pabeni@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_DKIM_WL,
-	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: quoted-printable
 
-> > >>>
-> > >>> Could you please share your kernel config and the resulting kernel log
-> > >>> when running the reproducer? I'll try to reproduce locally as well,
-> > >>> and see if I can figure out what is going on in the crypto layer
-> > >>
-> > >> The config together with the repro is available at
-> > >> https://syzkaller.appspot.com/bug?extid=828dfc12440b4f6f305d, see the
-> > >> latest row of the "Crashes" table that contains a C repro.
-> >
-> > Kernel is commit e6bc8833d80f of https://github.com/google/kmsan/commits/master .
+On Fri, 30 Jun 2023 at 13:38, Alexander Potapenko <glider@google.com> wrote=
+:
 >
-> That commit does not exist in that repo. Does it matter?
+> On Fri, Jun 30, 2023 at 12:18=E2=80=AFPM Ard Biesheuvel <ardb@kernel.org>=
+ wrote:
+> >
+> > On Fri, 30 Jun 2023 at 12:11, Alexander Potapenko <glider@google.com> w=
+rote:
+> > >
+> > > On Fri, Jun 30, 2023 at 12:02=E2=80=AFPM Ard Biesheuvel <ardb@kernel.=
+org> wrote:
+> > > >
+> > > > On Fri, 30 Jun 2023 at 11:53, Tetsuo Handa
+> > > > <penguin-kernel@i-love.sakura.ne.jp> wrote:
+> > > > >
+> > > > > On 2023/06/30 18:36, Ard Biesheuvel wrote:
+> > > > > > Why are you sending this now?
+> > > > >
+> > > > > Just because this is currently top crasher and I can reproduce lo=
+cally.
+> > > > >
+> > > > > > Do you have a reproducer for this issue?
+> > > > >
+> > > > > Yes. https://syzkaller.appspot.com/text?tag=3DReproC&x=3D12931621=
+900000 works.
+> > > > >
+> > > >
+> > > > Could you please share your kernel config and the resulting kernel =
+log
+> > > > when running the reproducer? I'll try to reproduce locally as well,
+> > > > and see if I can figure out what is going on in the crypto layer
+> > >
+> > > The config together with the repro is available at
+> > > https://syzkaller.appspot.com/bug?extid=3D828dfc12440b4f6f305d, see t=
+he
+> > > latest row of the "Crashes" table that contains a C repro.
+> >
+> > Could you explain why that bug contains ~50 reports that seem entirely
+> > unrelated?
+>
+> These are some unfortunate effects of syzbot trying to deduplicate
+> bugs. There's a tradeoff between reporting every single crash
+> separately and grouping together those that have e.g. the same origin.
+> Applying this algorithm transitively results in bigger clusters
+> containing unwanted reports.
+> We'll look closer.
+>
+> > AIUI, this actual issue has not been reproduced since
+> > 2020??
+>
+> Oh, sorry, I misread the table and misinformed you. The topmost row of
+> the table is indeed the _oldest_ one.
+> Another manifestation of the bug was on 2023/05/23
+> (https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D146f66b1280000)
+>
 
-Apologies for this mess.
-https://github.com/google/kmsan/commits/master is force-updated once a
-week to point to the latest release candidate with KMSAN-specific
-patches.
-Older releases are called e.g. kmsan-v6.4-rc7.
-Right now there's only one patch required to run torvalds/master with
-KMSAN (https://github.com/google/kmsan/commit/e6bc8833d80f).
-That patch will hit upstream in v6.5-rc1, after which I am going to
-switch syzbot to test upstream.
+That one has nothing to do with networking, so I don't see how this
+patch would affect it.
 
-For such a long-standing bug the exact version of KMSAN shouldn't matter.
+>
+> >
+> > > Config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&x=3Dee5=
+f7a0b2e48ed66
+> > > Report: https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D1325=
+260d900000
+> > > Syz repro: https://syzkaller.appspot.com/text?tag=3DReproSyz&x=3D11af=
+973e900000
+> > > C repro: https://syzkaller.appspot.com/text?tag=3DReproC&x=3D163a1e45=
+900000
+> > >
+> > > The bug is reproducible for me locally as well (and Tetsuo's patch
+> > > makes it disappear, although I have no opinion on its correctness).
+> >
+> > What I'd like to do is run a kernel plus initrd locally in OVMF and
+> > reproduce the issue - can I do that without all the syzkaller
+> > machinery?
+>
+> You can build the kernel from the config linked above, that's what I
+> did to reproduce it locally.
+> As for initrd, there are disk images attached to the reports, will that h=
+elp?
+>
+> E.g.
+>   $ wget https://storage.googleapis.com/syzbot-assets/79bb4ff7cc58/disk-f=
+93f2fed.raw.xz
+>   $ unxz disk-f93f2fed.raw.xz
+>   $ qemu-system-x86_64 -smp 2,sockets=3D2,cores=3D1 -m 4G -drive
+> file=3Ddisk-f93f2fed.raw -snapshot -nographic -enable-kvm
+>
+> lets me boot syzkaller with the disk/kernel from that report of 2023/05/2=
+3.
+> Adding "-net user,hostfwd=3Dtcp::10022-:22 -net nic,model=3De1000" I am
+> also able to SSH into the machine (there's no password):
+>
+> $ ssh -o "StrictHostKeyChecking no"  -p 10022     root@localhost
+>
+> Then the repro can be downloaded and executed:
+>
+> $ wget "https://syzkaller.appspot.com/text?tag=3DReproC&x=3D163a1e4590000=
+0" -O t.c
+> $ gcc t.c -static -o t
+> $ scp -o "StrictHostKeyChecking no" -P 10022   t  root@localhost:
+> $ ssh -o "StrictHostKeyChecking no"  -p 10022     root@localhost ./t
+>
+> Within a couple minutes the kernel crashes with the report:
+>
+> [  151.522472][ T5865] =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=
+=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
+> [  151.523843][ T5865] BUG: KMSAN: uninit-value in aes_encrypt+0x15cc/0x1=
+db0
+> [  151.525120][ T5865]  aes_encrypt+0x15cc/0x1db0
+> [  151.526113][ T5865]  aesti_encrypt+0x7d/0xf0
+> [  151.527057][ T5865]  crypto_cipher_encrypt_one+0x112/0x200
+> [  151.528224][ T5865]  crypto_cbcmac_digest_update+0x301/0x4b0
+>
+
+OK, thanks for the instructions.
+
+Out of curiosity - does the stack trace you cut off here include the
+BPF routine mentioned in the report?
 
