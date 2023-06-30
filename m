@@ -1,233 +1,159 @@
-Return-Path: <netdev+bounces-14752-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14754-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DE3907439B0
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:37:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 334FC7439CA
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:43:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0EE972810D3
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 10:37:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 087771C208DE
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 10:43:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD669134C2;
-	Fri, 30 Jun 2023 10:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB72E125A3;
+	Fri, 30 Jun 2023 10:43:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B978C14288
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:36:07 +0000 (UTC)
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2040.outbound.protection.outlook.com [40.107.236.40])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85B954681;
-	Fri, 30 Jun 2023 03:35:38 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=an9t2hp4OGSK7KXcymIj9sZ+OTaVXcigFQrMAbCM4j5i+ojBaFwa5dUaC5U+7nIbWnDAgCmmMBg4sIi0PR92EuzqwF9BalYvK/RndsueVJIrzWwyFfjpgacZloVXT0ZUQss1RN1CBxCGKnfegyh6MqEHXUxdAsIOAYCJI0CzeRJY2Um7F90hEGgydpeerNCY1SYp+amgJBo0VGy2ZkiJrsq2e4j0ohmCdTmujxInztfsoBobQPCnvhsQDMdVDaxDUlUfrqU1PP8TpFdP+aQGxpr5D287mYdVwv9793ORNuqO3ZcA6TnF1Rj6TFkFdbSg7fA3Dhe2ZDaqXVjrj2cvHw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cfth29BrWZrzk+qu1CaoTQ6BbwxlunM+2D18Jm9HX9w=;
- b=hSj67nbxuuLhLIPfDzXeffrQCMVv5jOBhY1cS4tZOhs1DawN1uB0pWUarap8wqYN1GUFTMARSHWxoCPfXFHJsjhI2M1ekpT0bAQmO9fWWMWMxH6gl/phD5UFnp1S5C+TmgXSf+jfYcfbbmc4sFJTv43GgCvlMCVTHlms43ZBoPYia5WFz0uzonopp+S9XQLPvUfHHpTdJJ6fxg2n/qpHAkGvgmWH3+FvGB5XYNWsSGwvRJuQpiqSC2ApgobWP7hnwagbsmlCITc9Po0PPQh1oifEZADqsIOLuTa1Lz/iMBEQYcFasPDQ6kcpelvFdcGgpcmkwrH5DfNPB5ZfclE3yQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
- 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
- (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
- dkim=none (message not signed); arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=cfth29BrWZrzk+qu1CaoTQ6BbwxlunM+2D18Jm9HX9w=;
- b=fdj7mstPKgfFd6nme2B0SKu4II8yZUXtIPwkn7cJVZHFA9zLxctlcDmHnXoQWexrrP+qpwEiNrztr8kl8N8ny8n/wyeIGeR3EskHWmDmVE0k2Ft5PLDdIJWIMdhdiX9OWlSztEfpS5F9rUy9dBCOJCoLchvzbLqtFvnhrS39XuA=
-Received: from DS7PR03CA0238.namprd03.prod.outlook.com (2603:10b6:5:3ba::33)
- by IA1PR12MB8357.namprd12.prod.outlook.com (2603:10b6:208:3ff::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 30 Jun
- 2023 10:35:34 +0000
-Received: from DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
- (2603:10b6:5:3ba:cafe::a3) by DS7PR03CA0238.outlook.office365.com
- (2603:10b6:5:3ba::33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.22 via Frontend
- Transport; Fri, 30 Jun 2023 10:35:34 +0000
-X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
- smtp.mailfrom=amd.com; dkim=none (message not signed)
- header.d=none;dmarc=pass action=none header.from=amd.com;
-Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
- 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
- client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
-Received: from SATLEXMB04.amd.com (165.204.84.17) by
- DM6NAM11FT066.mail.protection.outlook.com (10.13.173.179) with Microsoft SMTP
- Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.20.6500.49 via Frontend Transport; Fri, 30 Jun 2023 10:35:33 +0000
-Received: from equan-buildpc.amd.com (10.180.168.240) by SATLEXMB04.amd.com
- (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Fri, 30 Jun
- 2023 05:35:26 -0500
-From: Evan Quan <evan.quan@amd.com>
-To: <rafael@kernel.org>, <lenb@kernel.org>, <Alexander.Deucher@amd.com>,
-	<Christian.Koenig@amd.com>, <Xinhui.Pan@amd.com>, <airlied@gmail.com>,
-	<daniel@ffwll.ch>, <johannes@sipsolutions.net>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<Mario.Limonciello@amd.com>, <mdaenzer@redhat.com>,
-	<maarten.lankhorst@linux.intel.com>, <tzimmermann@suse.de>,
-	<hdegoede@redhat.com>, <jingyuwang_vip@163.com>, <Lijo.Lazar@amd.com>,
-	<jim.cromie@gmail.com>, <bellosilicio@gmail.com>, <andrealmeid@igalia.com>,
-	<trix@redhat.com>, <jsg@jsg.id.au>, <arnd@arndb.de>
-CC: <linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
-	<amd-gfx@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
-	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, Evan Quan
-	<evan.quan@amd.com>, Mario Limonciello <mario.limonciello@amd.com>
-Subject: [PATCH V5 9/9] drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
-Date: Fri, 30 Jun 2023 18:32:40 +0800
-Message-ID: <20230630103240.1557100-10-evan.quan@amd.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230630103240.1557100-1-evan.quan@amd.com>
-References: <20230630103240.1557100-1-evan.quan@amd.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDF06101E9
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:43:17 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67D9C3ABD
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 03:43:16 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688121795;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mSmMChIzFsnctBY/ntNdQM0sRE6MR8Uu4qXuBm6oUrY=;
+	b=SUzVbRKlcR76Je5aGnbk3+A9ALRyOBrCH8M8ziBFZjXyyQHv+HyzMpob75ClOcMhmlD4uP
+	qAsjxX0HJptCVn/6woW5tcVtbt9vuyWmmspJaHfoFFlsIpgB9UT7UQDXcSNyoN5jdCLwgY
+	HJ4+0tUWaT3BaBZIYVa7yLmSXk6WJ1s=
+Received: from mail-qt1-f200.google.com (mail-qt1-f200.google.com
+ [209.85.160.200]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-479-VVzg68PUN8apafeikQ1vDg-1; Fri, 30 Jun 2023 06:37:04 -0400
+X-MC-Unique: VVzg68PUN8apafeikQ1vDg-1
+Received: by mail-qt1-f200.google.com with SMTP id d75a77b69052e-4009ad15222so3937441cf.1
+        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 03:37:04 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688121424; x=1690713424;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=mSmMChIzFsnctBY/ntNdQM0sRE6MR8Uu4qXuBm6oUrY=;
+        b=UNT6h+aXFTxYDC485Vr/jFk0sJaNlAUubAEYHFsRgGypdkQe+as6jnj4N9V0awUpo5
+         5U28EC2Kw6P19PyWjBS2zOyDP26X7+Sy0FtMRYdohxO0bBavKdOv7yX+DXO5qT7hbbuH
+         etFH3PiG8kNiWKKBieT2un/7yJ8c63+GhQwlqc3UeG3hUlrbIDekwrFOPpc4HZ88ZTUp
+         fEqxki3g/MLD8zOaZhWoHd5yYsONqEDrLdq9Ggi/Rtt8P/di5fDgcgWVLwcZ0Nf2gNFu
+         aY+b99bjXmrksT9JDchlSyQ/B/hQItKsMrn5jIJ30zF8jA023QwyENGTa/D5KWEZVAJz
+         ThwQ==
+X-Gm-Message-State: AC+VfDzJT6G7I+26haoj3YJXajYlUckxGUx5ivQ9ohOlVy8IGaXMqtOB
+	3MR/Y/NPFNLb+9T4R4zNUuTLzXhMgL88H26e7hGWEfrXSD4srYthzhsMS4K5l7II1wwtdpLO7/j
+	/tybQHlQD5gF7GotY
+X-Received: by 2002:a05:622a:1819:b0:400:a9a4:8517 with SMTP id t25-20020a05622a181900b00400a9a48517mr2536803qtc.4.1688121423751;
+        Fri, 30 Jun 2023 03:37:03 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ7dr4NVZJGnbWpLNO5IGOyHWOg9Nxt/DgSxcc/RdlVezoQPlU7ziI3vkR1ZVcAPcj0V3cyAZg==
+X-Received: by 2002:a05:622a:1819:b0:400:a9a4:8517 with SMTP id t25-20020a05622a181900b00400a9a48517mr2536779qtc.4.1688121423483;
+        Fri, 30 Jun 2023 03:37:03 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-247-156.dyn.eolo.it. [146.241.247.156])
+        by smtp.gmail.com with ESMTPSA id cc23-20020a05622a411700b003f7fd3ce69fsm5015184qtb.59.2023.06.30.03.37.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jun 2023 03:37:03 -0700 (PDT)
+Message-ID: <e5c3e5e5033290c2228bbad0307334a964eb065e.camel@redhat.com>
+Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell on
+ receiving packets
+From: Paolo Abeni <pabeni@redhat.com>
+To: Long Li <longli@microsoft.com>, "longli@linuxonhyperv.com"
+ <longli@linuxonhyperv.com>, Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky
+ <leon@kernel.org>, Ajay Sharma <sharmaajay@microsoft.com>, Dexuan Cui
+ <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
+ <haiyangz@microsoft.com>, Wei Liu <wei.liu@kernel.org>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
+ <kuba@kernel.org>
+Cc: "linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>, 
+	"linux-hyperv@vger.kernel.org"
+	 <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	 <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	 <linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
+	 <stable@vger.kernel.org>
+Date: Fri, 30 Jun 2023 12:36:58 +0200
+In-Reply-To: <PH7PR21MB3263B266E381BA15DCE45820CE25A@PH7PR21MB3263.namprd21.prod.outlook.com>
+References: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
+	 <36c95dd6babb2202f70594d5dde13493af62dcad.camel@redhat.com>
+	 <PH7PR21MB3263B266E381BA15DCE45820CE25A@PH7PR21MB3263.namprd21.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.180.168.240]
-X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
- (10.181.40.145)
-X-EOPAttributedMessage: 0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6NAM11FT066:EE_|IA1PR12MB8357:EE_
-X-MS-Office365-Filtering-Correlation-Id: ec17b99f-5e18-4126-1f48-08db7955bc37
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	Gc9QSWXbnkwvEF9SJSkxyi880uE5eYjV8yoxgAYdLgwTMNrCCZ+gPx8N4GQOpcc53RubPd2v35iOyQPyoLbVDRhpETZV3rq8SF7m5H1ZNKUMxM2r6R6INe3JMjeIOSGOH/+uqPalyyBZiUBYqhKpIGz1qOKvfKUZqsruv1VAuUO1WYdmDkyfjD3ysWTVoDZYV9oCOyg5SUd5KUkm2z8m8zEsarP5yj83J7jH9rA3Yawv/woBIG4EZX/0029wkM4IoCWLhAaW36KZhMZUSNFyCZtb4ZtO6y9bTEh3TWTUvVNjBI62rq2SZ6VQMdpnktJGI8Cvvq5xmVHrtzdbUJ6X6kP0UNZYV9UKk/V0WJhH05RXoQmhBc9FF3CNtBc33tSod/OGZFn/5Xs8x7qk/j1QRTEPmNnF341EAgpDicStTm+E2Q3op6rpLCftM/iXCXSFlSfl8yFDg1yzVcKTLZM9XXXZU13pbKvW8ZGve2RVJcd2lGvbtQQmxZrSXCc292i/eXMBDcvbFcy/h/2+hcRoXBxLCuPPQYc2DcIoazgpGLZdRevIt6jroJeSIN8x/Q2Sj0SOWmRkmwfPL9mL3+O5W3kTGRaq1TgDHJJE8Rz26bT/cLGu6rM+aAcru2GyNl1OLfXyDBXQqha/47N3RgLlaGeSzNVodJL9DRWKLGD2aveZD6IpvdOd1QoWCSYnDrlIXg+/aMjZ3TcUJT5H49By/uG6U1wUL3CNP3znSjnAUdRHYQsUww9Rd6Tj3qZe2bdmW6So3ww+agFgARimksPMt0bqxHiExhM6GKvqnBChvJfpNib9WMVkx9JYNQumirnQSa+byb0kdWWnXNLlp2hCZw==
-X-Forefront-Antispam-Report:
-	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(39860400002)(376002)(346002)(451199021)(46966006)(36840700001)(40470700004)(426003)(83380400001)(336012)(47076005)(316002)(6666004)(110136005)(8676002)(7696005)(4326008)(8936002)(41300700001)(40460700003)(36860700001)(36756003)(54906003)(40480700001)(82310400005)(82740400003)(86362001)(81166007)(356005)(921005)(2616005)(70586007)(44832011)(7416002)(5660300002)(478600001)(70206006)(2906002)(186003)(16526019)(26005)(1076003)(2101003)(83996005)(36900700001);DIR:OUT;SFP:1101;
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 10:35:33.9186
- (UTC)
-X-MS-Exchange-CrossTenant-Network-Message-Id: ec17b99f-5e18-4126-1f48-08db7955bc37
-X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
-X-MS-Exchange-CrossTenant-AuthSource:
-	DM6NAM11FT066.eop-nam11.prod.protection.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Anonymous
-X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR12MB8357
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Fulfill the SMU13.0.7 support for Wifi RFI mitigation feature.
+On Thu, 2023-06-29 at 18:18 +0000, Long Li wrote:
+> > Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell
+> > on receiving
+> > packets
+> >=20
+> > On Mon, 2023-06-26 at 16:57 -0700, longli@linuxonhyperv.com wrote:
+> > > From: Long Li <longli@microsoft.com>
+> > >=20
+> > > It's inefficient to ring the doorbell page every time a WQE is
+> > > posted
+> > > to the received queue. Excessive MMIO writes result in CPU
+> > > spending
+> > > more time waiting on LOCK instructions (atomic operations),
+> > > resulting
+> > > in poor scaling performance.
+> > >=20
+> > > Move the code for ringing doorbell page to where after we have
+> > > posted
+> > > all WQEs to the receive queue during a callback from napi_poll().
+> > >=20
+> > > With this change, tests showed an improvement from 120G/s to
+> > > 160G/s on
+> > > a 200G physical link, with 16 or 32 hardware queues.
+> > >=20
+> > > Tests showed no regression in network latency benchmarks on
+> > > single
+> > > connection.
+> > >=20
+> > > While we are making changes in this code path, change the code
+> > > for
+> > > ringing doorbell to set the WQE_COUNT to 0 for Receive Queue. The
+> > > hardware specification specifies that it should set to 0.
+> > > Although
+> > > currently the hardware doesn't enforce the check, in the future
+> > > releases it may do.
+> > >=20
+> > > Cc: stable@vger.kernel.org
+> > > Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure
+> > > Network Adapter (MANA)")
+> >=20
+> > Uhmmm... this looks like a performance improvement to me, more
+> > suitable for
+> > the net-next tree ?!? (Note that net-next is closed now).
+>=20
+> This issue is a blocker for usage on 200G physical link. I think it
+> can be categorized as a fix.
 
-Signed-off-by: Evan Quan <evan.quan@amd.com>
-Reviewed-by: Mario Limonciello <mario.limonciello@amd.com>
----
- .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  | 59 +++++++++++++++++++
- 1 file changed, 59 insertions(+)
+Let me ask the question the other way around: is there any specific
+reason to have this fix into 6.5 and all the way back to 5.13?
+Especially the latest bit (CC-ing stable) looks at least debatable.
 
-diff --git a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-index bba621615abf..4a680756208b 100644
---- a/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-+++ b/drivers/gpu/drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c
-@@ -126,6 +126,7 @@ static struct cmn2asic_msg_mapping smu_v13_0_7_message_map[SMU_MSG_MAX_COUNT] =
- 	MSG_MAP(AllowGpo,			PPSMC_MSG_SetGpoAllow,           0),
- 	MSG_MAP(GetPptLimit,			PPSMC_MSG_GetPptLimit,                 0),
- 	MSG_MAP(NotifyPowerSource,		PPSMC_MSG_NotifyPowerSource,           0),
-+	MSG_MAP(EnableUCLKShadow,		PPSMC_MSG_EnableUCLKShadow,            0),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_clk_map[SMU_CLK_COUNT] = {
-@@ -206,6 +207,7 @@ static struct cmn2asic_mapping smu_v13_0_7_table_map[SMU_TABLE_COUNT] = {
- 	TAB_MAP(DRIVER_SMU_CONFIG),
- 	TAB_MAP(ACTIVITY_MONITOR_COEFF),
- 	[SMU_TABLE_COMBO_PPTABLE] = {1, TABLE_COMBO_PPTABLE},
-+	TAB_MAP(WIFIBAND),
- };
- 
- static struct cmn2asic_mapping smu_v13_0_7_pwr_src_map[SMU_POWER_SOURCE_COUNT] = {
-@@ -488,6 +490,9 @@ static int smu_v13_0_7_tables_init(struct smu_context *smu)
- 	               AMDGPU_GEM_DOMAIN_VRAM);
- 	SMU_TABLE_INIT(tables, SMU_TABLE_COMBO_PPTABLE, MP0_MP1_DATA_REGION_SIZE_COMBOPPTABLE,
- 			PAGE_SIZE, AMDGPU_GEM_DOMAIN_VRAM);
-+	SMU_TABLE_INIT(tables, SMU_TABLE_WIFIBAND,
-+		       sizeof(WifiBandEntryTable_t), PAGE_SIZE,
-+		       AMDGPU_GEM_DOMAIN_VRAM);
- 
- 	smu_table->metrics_table = kzalloc(sizeof(SmuMetricsExternal_t), GFP_KERNEL);
- 	if (!smu_table->metrics_table)
-@@ -1722,6 +1727,57 @@ static int smu_v13_0_7_set_df_cstate(struct smu_context *smu,
- 					       NULL);
- }
- 
-+static bool smu_v13_0_7_wbrf_support_check(struct smu_context *smu)
-+{
-+	return smu->smc_fw_version > 0x00524600;
-+}
-+
-+static int smu_v13_0_7_set_wbrf_exclusion_ranges(struct smu_context *smu,
-+						 struct exclusion_range *exclusion_ranges)
-+{
-+	WifiBandEntryTable_t wifi_bands;
-+	int valid_entries = 0;
-+	int ret, i;
-+
-+	memset(&wifi_bands, 0, sizeof(wifi_bands));
-+	for (i = 0; i < ARRAY_SIZE(wifi_bands.WifiBandEntry); i++) {
-+		if (!exclusion_ranges[i].start &&
-+		    !exclusion_ranges[i].end)
-+			break;
-+
-+		/* PMFW expects the inputs to be in Mhz unit */
-+		wifi_bands.WifiBandEntry[valid_entries].LowFreq =
-+			DIV_ROUND_DOWN_ULL(exclusion_ranges[i].start, HZ_IN_MHZ);
-+		wifi_bands.WifiBandEntry[valid_entries++].HighFreq =
-+			DIV_ROUND_UP_ULL(exclusion_ranges[i].end, HZ_IN_MHZ);
-+	}
-+	wifi_bands.WifiBandEntryNum = valid_entries;
-+
-+	/*
-+	 * Per confirm with PMFW team, WifiBandEntryNum = 0 is a valid setting.
-+	 * Considering the scenarios below:
-+	 * - At first the wifi device adds an exclusion range e.g. (2400,2500) to
-+	 *   BIOS and our driver gets notified. We will set WifiBandEntryNum = 1
-+	 *   and pass the WifiBandEntry (2400, 2500) to PMFW.
-+	 *
-+	 * - Later the wifi device removes the wifiband list added above and
-+	 *   our driver gets notified again. At this time, driver will set
-+	 *   WifiBandEntryNum = 0 and pass an empty WifiBandEntry list to PMFW.
-+	 *   - PMFW may still need to do some uclk shadow update(e.g. switching
-+	 *     from shadow clock back to primary clock) on receiving this.
-+	 */
-+
-+	ret = smu_cmn_update_table(smu,
-+				   SMU_TABLE_WIFIBAND,
-+				   0,
-+				   (void *)(&wifi_bands),
-+				   true);
-+	if (ret)
-+		dev_err(smu->adev->dev, "Failed to set wifiband!");
-+
-+	return ret;
-+}
-+
- static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.get_allowed_feature_mask = smu_v13_0_7_get_allowed_feature_mask,
- 	.set_default_dpm_table = smu_v13_0_7_set_default_dpm_table,
-@@ -1787,6 +1843,9 @@ static const struct pptable_funcs smu_v13_0_7_ppt_funcs = {
- 	.set_mp1_state = smu_v13_0_7_set_mp1_state,
- 	.set_df_cstate = smu_v13_0_7_set_df_cstate,
- 	.gpo_control = smu_v13_0_gpo_control,
-+	.is_asic_wbrf_supported = smu_v13_0_7_wbrf_support_check,
-+	.enable_uclk_shadow = smu_v13_0_enable_uclk_shadow,
-+	.set_wbrf_exclusion_ranges = smu_v13_0_7_set_wbrf_exclusion_ranges,
- };
- 
- void smu_v13_0_7_set_ppt_funcs(struct smu_context *smu)
--- 
-2.34.1
+Thanks,
+
+Paolo
 
 
