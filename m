@@ -1,100 +1,130 @@
-Return-Path: <netdev+bounces-14768-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14763-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 85DB2743B56
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:00:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3CFD4743B2B
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 13:52:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B9C0B280BE7
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:00:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4924B1C20BA5
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 11:52:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF49314A8E;
-	Fri, 30 Jun 2023 12:00:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 39F5D13AF6;
+	Fri, 30 Jun 2023 11:52:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E37D5134B5
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 12:00:41 +0000 (UTC)
-X-Greylist: delayed 550 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 30 Jun 2023 05:00:40 PDT
-Received: from mail.kmu-office.ch (mail.kmu-office.ch [178.209.48.109])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A1BF10F8
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 05:00:40 -0700 (PDT)
-Received: from webmail.kmu-office.ch (unknown [IPv6:2a02:418:6a02::a3])
-	by mail.kmu-office.ch (Postfix) with ESMTPSA id 8B3E85C07E5;
-	Fri, 30 Jun 2023 13:51:26 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=agner.ch; s=dkim;
-	t=1688125886;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=7kAWbnLhfLrWH8lbXCU9besEQHlswAdYILd+P4iFqpA=;
-	b=meH9qwt2jIvyxNVTC20Ih0TsySycDwnYVd+Xkgw166sLfVQkdKdntVBrNlr5mwDO9kWWXk
-	9ZX0IgZGYDp8t8/gBXfFumQXkrL4mUINEftUNZyBeLvrxNhvikmMWHoHpS0vPDx22bPM3m
-	fWv8P4hJFHJAv1VpJkGn0GQT+Lr91U8=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2361314265
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 11:52:25 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 558CA3AAB
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 04:52:23 -0700 (PDT)
+Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.56])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4Qstrh2HrfzMpcK;
+	Fri, 30 Jun 2023 19:49:08 +0800 (CST)
+Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
+ (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 30 Jun
+ 2023 19:52:20 +0800
+Subject: Re: [PATCH net-next] skbuff: Optimize SKB coalescing for page pool
+ case
+To: Liang Chen <liangchen.linux@gmail.com>
+CC: <ilias.apalodimas@linaro.org>, <hawk@kernel.org>, <kuba@kernel.org>,
+	<davem@davemloft.net>, <edumazet@google.com>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>
+References: <20230628121150.47778-1-liangchen.linux@gmail.com>
+ <5b81338a-f784-d73e-170c-d12af38692cb@huawei.com>
+ <CAKhg4tJkprS+dFcpLALP_e1kpHJ-DwabOMFaXxsPx+7O0c-geQ@mail.gmail.com>
+ <CAKhg4t+RUeoTv_OnD5nMAXWeATqRC+tcyzbnz_jXBQGzd90rpQ@mail.gmail.com>
+From: Yunsheng Lin <linyunsheng@huawei.com>
+Message-ID: <c04ee7cd-63a2-e35b-515c-726c10072f0e@huawei.com>
+Date: Fri, 30 Jun 2023 19:52:19 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
+ Thunderbird/52.2.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Date: Fri, 30 Jun 2023 13:51:25 +0200
-From: Stefan Agner <stefan@agner.ch>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, dsahern@kernel.org, kuba@kernel.org,
- pabeni@redhat.com, netdev@vger.kernel.org, john.carr@unrouted.co.uk,
- linux-kernel@vger.kernel.org
-Subject: Re: [RFC PATCH] ipv6: add option to explicitly enable reachability
- test
-In-Reply-To: <CANn89iKxcqDO3-LyuroUkFUfG2dtZOLE4n2UJQ3y-ft5BRm30g@mail.gmail.com>
-References: <b9182b02829b158d55acc53a0bcec1ed667b2668.1680000784.git.stefan@agner.ch>
- <CANn89iKxcqDO3-LyuroUkFUfG2dtZOLE4n2UJQ3y-ft5BRm30g@mail.gmail.com>
-Message-ID: <f2b8dc05f1c73c0f0625a695b25c2886@agner.ch>
-X-Sender: stefan@agner.ch
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <CAKhg4t+RUeoTv_OnD5nMAXWeATqRC+tcyzbnz_jXBQGzd90rpQ@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
+X-Originating-IP: [10.69.30.204]
+X-ClientProxiedBy: dggems705-chm.china.huawei.com (10.3.19.182) To
+ dggpemm500005.china.huawei.com (7.185.36.74)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Eric,
+On 2023/6/29 20:19, Liang Chen wrote:
+> On Thu, Jun 29, 2023 at 8:17 PM Liang Chen <liangchen.linux@gmail.com> wrote:
+>>
+>> On Thu, Jun 29, 2023 at 2:53 PM Yunsheng Lin <linyunsheng@huawei.com> wrote:
+>>>
+>>> On 2023/6/28 20:11, Liang Chen wrote:
+>>>> In order to address the issues encountered with commit 1effe8ca4e34
+>>>> ("skbuff: fix coalescing for page_pool fragment recycling"), the
+>>>> combination of the following condition was excluded from skb coalescing:
+>>>>
+>>>> from->pp_recycle = 1
+>>>> from->cloned = 1
+>>>> to->pp_recycle = 1
+>>>>
+>>>> However, with page pool environments, the aforementioned combination can
+>>>> be quite common. In scenarios with a higher number of small packets, it
+>>>> can significantly affect the success rate of coalescing. For example,
+>>>> when considering packets of 256 bytes size, our comparison of coalescing
+>>>> success rate is as follows:
+>>>
+>>> As skb_try_coalesce() only allow coaleascing when 'to' skb is not cloned.
+>>>
+>>> Could you give more detailed about the testing when we have a non-cloned
+>>> 'to' skb and a cloned 'from' skb? As both of them should be belong to the
+>>> same flow.
+>>>
+>>> I had the below patchset trying to do something similar as this patch does:
+>>> https://lore.kernel.org/all/20211009093724.10539-5-linyunsheng@huawei.com/
+>>>
+>>> It seems this patch is only trying to optimize a specific case for skb
+>>> coalescing, So if skb coalescing between non-cloned and cloned skb is a
+>>> common case, then it might worth optimizing.
+>>>
+>>
+>> Sure, Thanks for the information! The testing is just a common iperf
+>> test as below.
+>>
+>> iperf3 -c <server IP> -i 5 -f g -t 0 -l 128
+>>
+>> We observed the frequency of each combination of the pp (page pool)
+>> and clone condition when entering skb_try_coalesce. The results
+>> motivated us to propose such an optimization, as we noticed that case
+>> 11 (from pp/clone=1/1 and to pp/clone = 1/0) occurs quite often.
+>>
+>> +-------------+--------------+--------------+--------------+--------------+
+>> |   from/to   | pp/clone=0/0 | pp/clone=0/1 | pp/clone=1/0 | pp/clone=1/1 |
+>> +-------------+--------------+--------------+--------------+--------------+
+>> |pp/clone=0/0 | 0            | 1            | 2            | 3            |
+>> |pp/clone=0/1 | 4            | 5            | 6            | 7            |
+>> |pp/clone=1/0 | 8            | 9            | 10           | 11           |
+>> |pp/clone=1/1 | 12           | 13           | 14           | 15           |
+>> |+------------+--------------+--------------+--------------+--------------+
 
-On 2023-03-28 19:54, Eric Dumazet wrote:
-> On Tue, Mar 28, 2023 at 5:39 PM Stefan Agner <stefan@agner.ch> wrote:
->>
->> Systems which act as host as well as router might prefer the host
->> behavior. Currently the kernel does not allow to use IPv6 forwarding
->> globally and at the same time use route reachability probing.
->>
->> Add a compile time flag to enable route reachability probe in any
->> case.
->>
->> Signed-off-by: Stefan Agner <stefan@agner.ch>
->> ---
->> My use case is a OpenThread device which at the same time can also act as a
->> client communicating with Thread devices. Thread Border routers use the Route
->> Information mechanism to publish routes with a lifetime of up to 1800s. If
->> one of the Thread Border router goes offline, the lack of reachability probing
->> currenlty leads to outages of up to 30 minutes.
->>
->> Not sure if the chosen method is acceptable. Maybe a runtime flag is preferred?
-> 
-> I guess so. Because distros would have to choose a compile option.
-> 
-> Not a new sysfs, only an IFLA_INET6_REACHABILITY_PROBE ?
->
 
-Wouldn't that be a per interface config? From what I can tell currently
-the reachability probing is disabled when IPv6 forwarding is enabled on
-a global level only. So I'd need something which disables that behavior
-on a global only as well.
+I run the iperf test, it seems there is only one skb_clone() calling for each
+round, and I was using 'iperf', not 'iperf3'.
+Is there any app like tcpdump running? It seems odd that the skb from the rx
+need to be cloned for a common iperf test, which app or configuration is causing
+the cloning?
 
---
-Stefan
+Maybe using the ftrace to see the skb_clone() calling?
+echo skb_clone > set_ftrace_filter
+echo function > current_tracer
 
