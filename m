@@ -1,255 +1,123 @@
-Return-Path: <netdev+bounces-14872-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id DFFC57442C9
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 21:40:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2938C7442D9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 21:46:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A34592811CA
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:40:24 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D04A52811A5
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:46:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B8917736;
-	Fri, 30 Jun 2023 19:40:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0B68917738;
+	Fri, 30 Jun 2023 19:46:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA4B1772A;
-	Fri, 30 Jun 2023 19:40:18 +0000 (UTC)
-Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 276FA3C3C;
-	Fri, 30 Jun 2023 12:40:16 -0700 (PDT)
-Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fa93d61d48so25684395e9.0;
-        Fri, 30 Jun 2023 12:40:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688154014; x=1690746014;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=U6pnTwJKxb2Jp5JkpBaLoHKFY7M4ibIn04BA+G59EYg=;
-        b=GnYFHnHbHeh67Ewq22wobUeXiEPGvNiZYMQE+/Tt0YO8b55MUWr1L4/Fp2qu6aPW5z
-         RJvIIcBdHd5zDsT9WmBNbRVdjk05ObOXl0Ze+uroUPUjHwzaDFOhti87+VyMsHJAJV7O
-         YnFtDN/CsVIWam3/lEECcYG0zum+XDJtFvP6L2PZoXQyteRTR0KRrD5jlpBxUeelZKTn
-         Vhk6Xw4Gp+bAS/xi1PReVGaOapjkF0yBaHFQqnQP4ImZOI6fabv9QiHtLF5kSvSwTE71
-         CmeCNfBGKJkxaBmPvnNg1KNPBdCuXgyMCs0+gNJwupvhdMv6h9NrVXZwNQrfI7uZVDzv
-         u+Eg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688154014; x=1690746014;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=U6pnTwJKxb2Jp5JkpBaLoHKFY7M4ibIn04BA+G59EYg=;
-        b=ZjvVTnKcewDLPGN7gD5x6JfQDBuZTCQGT7mzZBpADKaq1D6qfQwpzSGaQ4IU7CM/LB
-         T3llxxogHg4wsGIO6wmTwh1sPUismqUFXHwnTE5xS9Pit0o88M13Zx5/GLucxXXeEqV8
-         ajXz+owV0zlC5u12vOkrxM2kPG7vl1lfeoao4jSb+61Y04VTyh0mj0E11bspE7pmLNGK
-         MMR8ollF+mKSbs4/mj05o5eGthAND5F4kDfwALzE9zKhZphVTo+bOhbVYhYjgKoJPoDY
-         iqmWRjCOkBd+Ze+TC++PE0S530UlCMERgiDxxku4l6u9OxNc3H0kWAmNltkamXqXNHMh
-         VlPQ==
-X-Gm-Message-State: AC+VfDyzuqG680A0j18ZLxF5KxSUsLXkhHZE2anlmOFkDmzN+piPlhqX
-	wOCPI8zMEH6koolznY5hhponOOZWNNNc/pmUf9vr5sHFOkA=
-X-Google-Smtp-Source: ACHHUZ60SjUzyBWIZcv4aguG2YXeIZyv6UTTr1qF4Wyreq4/BL70LFZGDpsjjTRAq1/b9km7vJZ7kIpJmVzoLCPNmc8=
-X-Received: by 2002:a05:600c:ac6:b0:3fb:b3aa:1c88 with SMTP id
- c6-20020a05600c0ac600b003fbb3aa1c88mr2666744wmr.26.1688154014182; Fri, 30 Jun
- 2023 12:40:14 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96A55168B7
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 19:46:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 86A6BC433C0;
+	Fri, 30 Jun 2023 19:46:42 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1688154403;
+	bh=gfQj8jVN5q/PonemZN8J295XoGYEGQSCSEtYdv+9wtY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=v8T/Kt9cIGNf6FVPOKdfmrGKexeJcdW/UtZdCGsZQ1rZcXHjyf//G3omtM7GEaKhq
+	 oEIP5eTSkYK+WmnYc0XSq6QnFFRlsOTVLYzO9psKlNboVoNhgw87ympysb+rP0/ttd
+	 uKtklTeojsW+U64/v4G5mU1WsOt/sYG18dLnoSIc=
+Date: Fri, 30 Jun 2023 21:46:40 +0200
+From: Greg KH <gregkh@linuxfoundation.org>
+To: Long Li <longli@microsoft.com>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+	"longli@linuxonhyperv.com" <longli@linuxonhyperv.com>,
+	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
+	Ajay Sharma <sharmaajay@microsoft.com>,
+	Dexuan Cui <decui@microsoft.com>, KY Srinivasan <kys@microsoft.com>,
+	Haiyang Zhang <haiyangz@microsoft.com>,
+	Wei Liu <wei.liu@kernel.org>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	"linux-rdma@vger.kernel.org" <linux-rdma@vger.kernel.org>,
+	"linux-hyperv@vger.kernel.org" <linux-hyperv@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"stable@vger.kernel.org" <stable@vger.kernel.org>
+Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell on
+ receiving packets
+Message-ID: <2023063001-agenda-spent-83c6@gregkh>
+References: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
+ <36c95dd6babb2202f70594d5dde13493af62dcad.camel@redhat.com>
+ <PH7PR21MB3263B266E381BA15DCE45820CE25A@PH7PR21MB3263.namprd21.prod.outlook.com>
+ <e5c3e5e5033290c2228bbad0307334a964eb065e.camel@redhat.com>
+ <PH7PR21MB326330931CFDDA96E287E470CE2AA@PH7PR21MB3263.namprd21.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628152738.22765-1-fw@strlen.de> <20230628152738.22765-2-fw@strlen.de>
-In-Reply-To: <20230628152738.22765-2-fw@strlen.de>
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 30 Jun 2023 12:40:02 -0700
-Message-ID: <CAEf4BzZKPVwGMhJgQgAJBxsiiaSzq5SFYLACTO9fq_w5RPdm7A@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 1/2] tools: libbpf: add netfilter link attach helper
-To: Florian Westphal <fw@strlen.de>
-Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <PH7PR21MB326330931CFDDA96E287E470CE2AA@PH7PR21MB3263.namprd21.prod.outlook.com>
 
-On Wed, Jun 28, 2023 at 8:27=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
-te:
->
-> Add new api function: bpf_program__attach_netfilter.
->
-> It takes a bpf program (netfilter type), and a pointer to a option struct
-> that contains the desired attachment (protocol family, priority, hook
-> location, ...).
->
-> It returns a pointer to a 'bpf_link' structure or NULL on error.
->
-> Next patch adds new netfilter_basic test that uses this function to
-> attach a program to a few pf/hook/priority combinations.
->
-> v2: change name and use bpf_link_create.
->
-> Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-> Link: https://lore.kernel.org/bpf/CAEf4BzZrmUv27AJp0dDxBDMY_B8e55-wLs8DUK=
-K69vCWsCG_pQ@mail.gmail.com/
-> Link: https://lore.kernel.org/bpf/CAEf4BzZ69YgrQW7DHCJUT_X+GqMq_ZQQPBwopa=
-JJVGFD5=3Dd5Vg@mail.gmail.com/
-> Signed-off-by: Florian Westphal <fw@strlen.de>
-> ---
->  tools/lib/bpf/bpf.c      |  6 ++++++
->  tools/lib/bpf/bpf.h      |  6 ++++++
->  tools/lib/bpf/libbpf.c   | 42 ++++++++++++++++++++++++++++++++++++++++
->  tools/lib/bpf/libbpf.h   | 15 ++++++++++++++
->  tools/lib/bpf/libbpf.map |  1 +
->  5 files changed, 70 insertions(+)
->
-> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
-> index ed86b37d8024..1b4f85f3c5b1 100644
-> --- a/tools/lib/bpf/bpf.c
-> +++ b/tools/lib/bpf/bpf.c
-> @@ -741,6 +741,12 @@ int bpf_link_create(int prog_fd, int target_fd,
->                 if (!OPTS_ZEROED(opts, tracing))
->                         return libbpf_err(-EINVAL);
->                 break;
-> +       case BPF_NETFILTER:
-> +               attr.link_create.netfilter.pf =3D OPTS_GET(opts, netfilte=
-r.pf, 0);
-> +               attr.link_create.netfilter.hooknum =3D OPTS_GET(opts, net=
-filter.hooknum, 0);
-> +               attr.link_create.netfilter.priority =3D OPTS_GET(opts, ne=
-tfilter.priority, 0);
-> +               attr.link_create.netfilter.flags =3D OPTS_GET(opts, netfi=
-lter.flags, 0);
+On Fri, Jun 30, 2023 at 05:31:48PM +0000, Long Li wrote:
+> > Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell on
+> > receiving packets
+> > 
+> > On Thu, 2023-06-29 at 18:18 +0000, Long Li wrote:
+> > > > Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell
+> > > > on receiving packets
+> > > >
+> > > > On Mon, 2023-06-26 at 16:57 -0700, longli@linuxonhyperv.com wrote:
+> > > > > From: Long Li <longli@microsoft.com>
+> > > > >
+> > > > > It's inefficient to ring the doorbell page every time a WQE is
+> > > > > posted to the received queue. Excessive MMIO writes result in CPU
+> > > > > spending more time waiting on LOCK instructions (atomic
+> > > > > operations), resulting in poor scaling performance.
+> > > > >
+> > > > > Move the code for ringing doorbell page to where after we have
+> > > > > posted all WQEs to the receive queue during a callback from
+> > > > > napi_poll().
+> > > > >
+> > > > > With this change, tests showed an improvement from 120G/s to
+> > > > > 160G/s on a 200G physical link, with 16 or 32 hardware queues.
+> > > > >
+> > > > > Tests showed no regression in network latency benchmarks on single
+> > > > > connection.
+> > > > >
+> > > > > While we are making changes in this code path, change the code for
+> > > > > ringing doorbell to set the WQE_COUNT to 0 for Receive Queue. The
+> > > > > hardware specification specifies that it should set to 0.
+> > > > > Although
+> > > > > currently the hardware doesn't enforce the check, in the future
+> > > > > releases it may do.
+> > > > >
+> > > > > Cc: stable@vger.kernel.org
+> > > > > Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure
+> > > > > Network Adapter (MANA)")
+> > > >
+> > > > Uhmmm... this looks like a performance improvement to me, more
+> > > > suitable for the net-next tree ?!? (Note that net-next is closed
+> > > > now).
+> > >
+> > > This issue is a blocker for usage on 200G physical link. I think it
+> > > can be categorized as a fix.
+> > 
+> > Let me ask the question the other way around: is there any specific reason to
+> > have this fix into 6.5 and all the way back to 5.13?
+> > Especially the latest bit (CC-ing stable) looks at least debatable.
+> 
+> There are many deployed Linux distributions with MANA driver on kernel 5.15 and kernel 6.1. (those kernels are longterm) They need this fix to achieve the performance target.
 
-there should have also done this check:
+Why can't they be upgraded to get that performance target, and all the
+other goodness that those kernels have?  We don't normally backport new
+features, right?
 
-if (!OPTS_ZEROED(opts, netfilter))
-    return libbpf_err(-EINVAL);
+thanks,
 
- just like in other cases. I added it while applying to bpf-next, thanks.
-
-
-> +               break;
->         default:
->                 if (!OPTS_ZEROED(opts, flags))
->                         return libbpf_err(-EINVAL);
-> diff --git a/tools/lib/bpf/bpf.h b/tools/lib/bpf/bpf.h
-> index 9aa0ee473754..c676295ab9bf 100644
-> --- a/tools/lib/bpf/bpf.h
-> +++ b/tools/lib/bpf/bpf.h
-> @@ -349,6 +349,12 @@ struct bpf_link_create_opts {
->                 struct {
->                         __u64 cookie;
->                 } tracing;
-> +               struct {
-> +                       __u32 pf;
-> +                       __u32 hooknum;
-> +                       __s32 priority;
-> +                       __u32 flags;
-> +               } netfilter;
->         };
->         size_t :0;
->  };
-> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
-> index 214f828ece6b..f193eca16382 100644
-> --- a/tools/lib/bpf/libbpf.c
-> +++ b/tools/lib/bpf/libbpf.c
-> @@ -11811,6 +11811,48 @@ static int attach_iter(const struct bpf_program =
-*prog, long cookie, struct bpf_l
->         return libbpf_get_error(*link);
->  }
->
-> +struct bpf_link *bpf_program__attach_netfilter(const struct bpf_program =
-*prog,
-> +                                              const struct bpf_netfilter=
-_opts *opts)
-> +{
-> +       LIBBPF_OPTS(bpf_link_create_opts, lopts);
-> +       struct bpf_link *link;
-> +       int prog_fd, link_fd;
-> +
-> +       if (!OPTS_VALID(opts, bpf_netfilter_opts))
-> +               return libbpf_err_ptr(-EINVAL);
-> +
-> +       prog_fd =3D bpf_program__fd(prog);
-> +       if (prog_fd < 0) {
-> +               pr_warn("prog '%s': can't attach before loaded\n", prog->=
-name);
-> +               return libbpf_err_ptr(-EINVAL);
-> +       }
-> +
-> +       link =3D calloc(1, sizeof(*link));
-> +       if (!link)
-> +               return libbpf_err_ptr(-ENOMEM);
-> +
-> +       link->detach =3D &bpf_link__detach_fd;
-> +
-> +       lopts.netfilter.pf =3D OPTS_GET(opts, pf, 0);
-> +       lopts.netfilter.hooknum =3D OPTS_GET(opts, hooknum, 0);
-> +       lopts.netfilter.priority =3D OPTS_GET(opts, priority, 0);
-> +       lopts.netfilter.flags =3D OPTS_GET(opts, flags, 0);
-> +
-> +       link_fd =3D bpf_link_create(prog_fd, 0, BPF_NETFILTER, &lopts);
-> +       if (link_fd < 0) {
-> +               char errmsg[STRERR_BUFSIZE];
-> +
-> +               link_fd =3D -errno;
-> +               free(link);
-> +               pr_warn("prog '%s': failed to attach to netfilter: %s\n",
-> +                       prog->name, libbpf_strerror_r(link_fd, errmsg, si=
-zeof(errmsg)));
-> +               return libbpf_err_ptr(link_fd);
-> +       }
-> +       link->fd =3D link_fd;
-> +
-> +       return link;
-> +}
-> +
->  struct bpf_link *bpf_program__attach(const struct bpf_program *prog)
->  {
->         struct bpf_link *link =3D NULL;
-> diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
-> index 754da73c643b..10642ad69d76 100644
-> --- a/tools/lib/bpf/libbpf.h
-> +++ b/tools/lib/bpf/libbpf.h
-> @@ -718,6 +718,21 @@ LIBBPF_API struct bpf_link *
->  bpf_program__attach_freplace(const struct bpf_program *prog,
->                              int target_fd, const char *attach_func_name)=
-;
->
-> +struct bpf_netfilter_opts {
-> +       /* size of this struct, for forward/backward compatibility */
-> +       size_t sz;
-> +
-> +       __u32 pf;
-> +       __u32 hooknum;
-> +       __s32 priority;
-> +       __u32 flags;
-> +};
-> +#define bpf_netfilter_opts__last_field flags
-> +
-> +LIBBPF_API struct bpf_link *
-> +bpf_program__attach_netfilter(const struct bpf_program *prog,
-> +                             const struct bpf_netfilter_opts *opts);
-> +
->  struct bpf_map;
->
->  LIBBPF_API struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_=
-map *map);
-> diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
-> index 7521a2fb7626..d9ec4407befa 100644
-> --- a/tools/lib/bpf/libbpf.map
-> +++ b/tools/lib/bpf/libbpf.map
-> @@ -395,4 +395,5 @@ LIBBPF_1.2.0 {
->  LIBBPF_1.3.0 {
->         global:
->                 bpf_obj_pin_opts;
-> +               bpf_program__attach_netfilter;
->  } LIBBPF_1.2.0;
-> --
-> 2.39.3
->
+greg k-h
 
