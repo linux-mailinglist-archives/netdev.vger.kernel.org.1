@@ -1,45 +1,50 @@
-Return-Path: <netdev+bounces-14803-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14804-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67E96743EED
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 17:32:15 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 228E0743EF5
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 17:33:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 22A5E280F8F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 15:32:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 084B01C20BE9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 15:33:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57B1B16421;
-	Fri, 30 Jun 2023 15:32:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1388316423;
+	Fri, 30 Jun 2023 15:33:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E2A0616415
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 15:32:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 37EE9C433C8;
-	Fri, 30 Jun 2023 15:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2B7416415
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 15:33:32 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3B676C433C0;
+	Fri, 30 Jun 2023 15:33:32 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688139130;
-	bh=AaZqyPu4KBOIBEEtN7KU734n/yfJRfTaIKV/pcXHMI8=;
+	s=k20201202; t=1688139212;
+	bh=YY8/bCzFCPE57qh5AkwPDAgLNjakHgRTdvWZmqV57VA=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=GWkZU+NBE41XcbwVwdV3ZqQxJF1C0sDONYK/q0gkBc2mYZ86dnEMCJBYRdvBdpWTZ
-	 /IY5xBnjRyatC/zVUooQpVgyk7rbJQEVukFcqEA1+oASVvNBHy/MD6DUIZTXecQ1Yd
-	 2g8o6ut49TDe7nn/YdRRCI/MmHfzkXmInTyR4NgJN2iCxVndPhu/r8S4GLlHbwVHpb
-	 e6NO4AtYUZieIYMr8HkhTlKgsy46tjaXaj+ao2NVUlSGmap+5Cg7013PKXqkAqtEPh
-	 mIrpyy5ryVJSChhFFvAfjyjieKw4WFoJnIV3Zh/JMMvRcn0QNO4+Ez96FeHpynWYlL
-	 GucCEsuGsWLMQ==
-Date: Fri, 30 Jun 2023 08:32:09 -0700
+	b=N0pfFcCIgh98mjmTeDC+Ct7EH9/QWz0a+kmyDggfq2pot8qPAmQzP5NFMihIKxdZW
+	 BWzVVCfZV9n0+Q8FueNNWgczPYTwZ01TrAKswY9PeEXrHy86UfpKgv+doXgRNLJMzS
+	 oqPyBCbUATh78OKXk79CksnzhR0BSYGaypf+VqPlFARQdcv1c8JGGUhXmwWTzSz11+
+	 unx+4qBkRBDfRHwUr8WOvI+BgUwEr7rJlwKU0Bk0mDCmYmwXKL14f/82GbSGaBjiKO
+	 1n7OYVkddAp0S1B8L4B2rRNKbE97MUDTMtofMLeF6Sh7OuldwkNuIWRNyLel4rvpUe
+	 eIK6zxP3sXBvQ==
+Date: Fri, 30 Jun 2023 08:33:31 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Zqiang <qiang.zhang1211@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, pabeni@redhat.com,
- netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH v2] net: Destroy previously created kthreads after
- failing to set napi threaded mode
-Message-ID: <20230630083209.05efaeaf@kernel.org>
-In-Reply-To: <20230630054353.28934-1-qiang.zhang1211@gmail.com>
-References: <20230630054353.28934-1-qiang.zhang1211@gmail.com>
+To: Keith Busch <kbusch@kernel.org>
+Cc: David Howells <dhowells@redhat.com>, netdev@vger.kernel.org, Aurelien
+ Aptel <aaptel@nvidia.com>, Sagi Grimberg <sagi@grimberg.me>, Willem de
+ Bruijn <willemb@google.com>, Jens Axboe <axboe@fb.com>, Christoph Hellwig
+ <hch@lst.de>, Chaitanya Kulkarni <kch@nvidia.com>, "David S. Miller"
+ <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+ <pabeni@redhat.com>, Jens Axboe <axboe@kernel.dk>, Matthew Wilcox
+ <willy@infradead.org>, linux-nvme@lists.infradead.org
+Subject: Re: [PATCH net] nvme-tcp: Fix comma-related oops
+Message-ID: <20230630083331.6e1527bd@kernel.org>
+In-Reply-To: <ZJ7yyEiUWBTf8cCp@kbusch-mbp.dhcp.thefacebook.com>
+References: <59062.1688075273@warthog.procyon.org.uk>
+	<ZJ7yyEiUWBTf8cCp@kbusch-mbp.dhcp.thefacebook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -49,20 +54,10 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 30 Jun 2023 13:43:53 +0800 Zqiang wrote:
-> When setting 1 to enable napi threaded mode, will traverse dev->napi_list
-> and create kthread for napi->thread, if creation fails, the dev->threaded
-> will be set to false and we will clear NAPI_STATE_THREADED bit for all
-> napi->state in dev->napi_list, even if some napi that has successfully
-> created the kthread before. as a result, for successfully created napi
-> kthread, they will never be used.
-> 
-> This commit therefore destroy previously created napi->thread if setting
-> napi threaded mode fails.
+On Fri, 30 Jun 2023 09:20:40 -0600 Keith Busch wrote:
+> We don't have this breaking commit in the nvme tree just yet, so feel
+> free to take the fix through net if this can't wait for the next nvme
+> rebase (we're based on the block tree).
 
-Please don't send two patches in less than 24h, unless someone asks you
-to on the list. A lot of people read the list from the oldest postings,
-won't notice the newer one, and it will split the discussion.
--- 
-pw-bot: cr
+Ack, will do, thanks! We'll most likely send it in a PR later today.
 
