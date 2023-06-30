@@ -1,123 +1,234 @@
-Return-Path: <netdev+bounces-14734-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14735-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5850A743873
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 11:37:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0D628743892
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 11:45:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 058AB280FBF
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 09:37:10 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 415611C20B87
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 09:45:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D36B101D7;
-	Fri, 30 Jun 2023 09:37:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32596101EA;
+	Fri, 30 Jun 2023 09:45:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A72E1FB8
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 09:37:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E1E58C433AB;
-	Fri, 30 Jun 2023 09:37:05 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688117825;
-	bh=NvISiXV+qNhfVjOdFA0oj/36t4SVSoQAe2nCdjSVIMg=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=dQspoZx13mxkWw3Lj4TBmT6UEUkj+SCv8Lmn23Y2WXcTo7qawU2gZLhMYxLeHyL/F
-	 OULv8gwNTiagnBLymK7EMKrKDZEopP41CuIpG2r68c6URM9GKbUnmfoeYf9NVlIYql
-	 gkOY6yJVKPA76AieVNAkBmz1Amfq0ge30ZdcZd2f3RnnEbwkjFI2C8jMhRObfOoZUa
-	 NFzIL96E8xyd0NjgyyCTFityDy+M41QpYRrqmGucuEMS9L2RCRspPw3aeoYSZ7AGIW
-	 7iEGmNvLx8bYw+cDslC1evuby/g5lBAdBt+flwtgeK6/3/N5Z5n/E1E98g5HPMPF+q
-	 9ZVrVQ0PZxTrQ==
-Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-4fb7dc16ff0so2626843e87.2;
-        Fri, 30 Jun 2023 02:37:05 -0700 (PDT)
-X-Gm-Message-State: ABy/qLaDAhv7g968syhRI69IwNTTUFmIKGKtBhcICZ4QQ4QO1Oy8lz9F
-	TwAVHSL6S2U5PdJzwq/N8Ggv6boW/pvNtYgapZk=
-X-Google-Smtp-Source: APBJJlGbO447UI8+8twcUUt9AmQN1aCCqPJVZYCruX+uaMq5bRXMYi1QAyHd0C/pXRJJ1RP9glerAKI5vjKUrkxacqE=
-X-Received: by 2002:a05:6512:55c:b0:4fb:8603:f6aa with SMTP id
- h28-20020a056512055c00b004fb8603f6aamr1466400lfl.11.1688117823714; Fri, 30
- Jun 2023 02:37:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26CE2101D7
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 09:45:14 +0000 (UTC)
+Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F4ED10B;
+	Fri, 30 Jun 2023 02:45:13 -0700 (PDT)
+Received: from pps.filterd (m0279872.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35U8TtwQ024825;
+	Fri, 30 Jun 2023 09:44:57 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=from : to : cc :
+ subject : date : message-id; s=qcppdkim1;
+ bh=m8GkzGGB8Y/Nd6gD6JDaZOx78tepjwbsym4/wVw+4dM=;
+ b=CDp3B69oegF+HOCX19SYzVDBNBSEOq++516NVcTqeiYaXPxhOS+bcTr9cTPT3PkiDJsy
+ 3+HlQmv0dBrgJIjzibf+2SJJVs1OzdKg+Qb4S+T6OXbFxCZZuu6f12XN5p1w8ZufU3tl
+ sjr591RVOMh8FTuxxVhhApTyq4MKWyE4igOm2R+1UjJKZPNtrUAwaPjyWir48RV2x9YM
+ F4dTOTh0RPWh4DMW+hUTp9IIOBoH7sl+Yj+uCTQInHeTlV76vrZoGBtLcFhbnvjfHX8o
+ y8C8yMAdiMIIMfCXQwoRKw7O985MI9uZkOsEl77X2fnWDBPZqfCZavcOHEr/sVHRBAME nw== 
+Received: from apblrppmta01.qualcomm.com (blr-bdr-fw-01_GlobalNAT_AllZones-Outside.qualcomm.com [103.229.18.19])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rh7aetqac-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 30 Jun 2023 09:44:57 +0000
+Received: from pps.filterd (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTP id 35U9eeUB004943;
+	Fri, 30 Jun 2023 09:44:53 GMT
+Received: from pps.reinject (localhost [127.0.0.1])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTPS id 3rdsjm5ucb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NO);
+	Fri, 30 Jun 2023 09:44:53 +0000
+Received: from APBLRPPMTA01.qualcomm.com (APBLRPPMTA01.qualcomm.com [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 35U9iqx5009498;
+	Fri, 30 Jun 2023 09:44:52 GMT
+Received: from hu-sgudaval-hyd.qualcomm.com (hu-vpernami-hyd.qualcomm.com [10.213.107.240])
+	by APBLRPPMTA01.qualcomm.com (PPS) with ESMTP id 35U9ipi2009491;
+	Fri, 30 Jun 2023 09:44:52 +0000
+Received: by hu-sgudaval-hyd.qualcomm.com (Postfix, from userid 2370923)
+	id 08A2F4BD9; Fri, 30 Jun 2023 15:14:51 +0530 (+0530)
+From: Vivek Pernamitta <quic_vpernami@quicinc.com>
+To: mhi@lists.linux.dev
+Cc: mrana@quicinc.com, quic_qianyu@quicinc.com,
+        manivannan.sadhasivam@linaro.org,
+        Vivek Pernamitta <quic_vpernami@quicinc.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>,
+        netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
+        linux-kernel@vger.kernel.org (open list)
+Subject: [PATCH V1] net: mhi : Add support to enable ethernet interface
+Date: Fri, 30 Jun 2023 15:14:41 +0530
+Message-Id: <1688118281-13032-1-git-send-email-quic_vpernami@quicinc.com>
+X-Mailer: git-send-email 2.7.4
+X-QCInternal: smtphost
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: pgMviZbwroaeKlBLZdiEeWL_tbDTCS54
+X-Proofpoint-ORIG-GUID: pgMviZbwroaeKlBLZdiEeWL_tbDTCS54
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-30_05,2023-06-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 adultscore=0 mlxlogscore=742
+ malwarescore=0 phishscore=0 bulkscore=0 lowpriorityscore=0 spamscore=0
+ clxscore=1011 suspectscore=0 priorityscore=1501 impostorscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2306300081
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-References: <0000000000008a7ae505aef61db1@google.com> <20200911170150.GA889@sol.localdomain>
- <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
-In-Reply-To: <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 30 Jun 2023 11:36:51 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
-Message-ID: <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
-Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-To: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>
-Cc: Boris Pismenny <borisp@nvidia.com>, John Fastabend <john.fastabend@gmail.com>, 
-	Jakub Kicinski <kuba@kernel.org>, glider@google.com, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
-	syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Aviad Yehezkel <aviadye@nvidia.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
 
-On Wed, 28 Jun 2023 at 15:49, Tetsuo Handa
-<penguin-kernel@i-love.sakura.ne.jp> wrote:
->
-> syzbot is reporting uninit-value at aes_encrypt(), for block cipher assumes
-> that bytes to encrypt/decrypt is multiple of block size for that cipher but
-> tls_alloc_encrypted_msg() is not initializing padding bytes when
-> required_size is not multiple of block cipher's block size.
->
-> In order to make sure that padding bytes are automatically initialized,
-> enable __GFP_ZERO flag when setsockopt(SOL_TCP, TCP_ULP, "tls") is called.
->
-> Reported-by: syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>
-> Closes: https://syzkaller.appspot.com/bug?extid=828dfc12440b4f6f305d
+Add support to enable ethernet interface for MHI SWIP channels.
 
-Maybe I am missing something, but this syzkaller report appears to b a
-huge collection of uninit-value reports, of which only one is related
-to bpx_tx_verdict(), and that one has nor reproducer.
+Signed-off-by: Vivek Pernamitta <quic_vpernami@quicinc.com>
+---
+ drivers/net/mhi_net.c | 53 ++++++++++++++++++++++++++++++++++++++-------------
+ 1 file changed, 40 insertions(+), 13 deletions(-)
 
-So even if this would be the right fix, I don't think closing that
-issue makes sense, so? The issue refers to a couple of other
-occcurences of uninit-value in aesti_encrypt, which do seem related.
+diff --git a/drivers/net/mhi_net.c b/drivers/net/mhi_net.c
+index 3d322ac..0a47e15 100644
+--- a/drivers/net/mhi_net.c
++++ b/drivers/net/mhi_net.c
+@@ -11,6 +11,7 @@
+ #include <linux/netdevice.h>
+ #include <linux/skbuff.h>
+ #include <linux/u64_stats_sync.h>
++#include <linux/etherdevice.h>
+ 
+ #define MHI_NET_MIN_MTU		ETH_MIN_MTU
+ #define MHI_NET_MAX_MTU		0xffff
+@@ -38,10 +39,12 @@ struct mhi_net_dev {
+ 	u32 rx_queue_sz;
+ 	int msg_enable;
+ 	unsigned int mru;
++	bool ethernet_if;
+ };
+ 
+ struct mhi_device_info {
+ 	const char *netname;
++	bool ethernet_if;
+ };
+ 
+ static int mhi_ndo_open(struct net_device *ndev)
+@@ -140,6 +143,14 @@ static void mhi_net_setup(struct net_device *ndev)
+ 	ndev->tx_queue_len = 1000;
+ }
+ 
++static void mhi_ethernet_setup(struct net_device *ndev)
++{
++	ndev->netdev_ops = &mhi_netdev_ops;
++	ether_setup(ndev);
++	ndev->min_mtu = ETH_MIN_MTU;
++	ndev->max_mtu = ETH_MAX_MTU;
++}
++
+ static struct sk_buff *mhi_net_skb_agg(struct mhi_net_dev *mhi_netdev,
+ 				       struct sk_buff *skb)
+ {
+@@ -209,16 +220,22 @@ static void mhi_net_dl_callback(struct mhi_device *mhi_dev,
+ 			mhi_netdev->skbagg_head = NULL;
+ 		}
+ 
+-		switch (skb->data[0] & 0xf0) {
+-		case 0x40:
+-			skb->protocol = htons(ETH_P_IP);
+-			break;
+-		case 0x60:
+-			skb->protocol = htons(ETH_P_IPV6);
+-			break;
+-		default:
+-			skb->protocol = htons(ETH_P_MAP);
+-			break;
++		if (mhi_netdev->ethernet_if) {
++			skb_copy_to_linear_data(skb, skb->data,
++						mhi_res->bytes_xferd);
++			skb->protocol = eth_type_trans(skb, mhi_netdev->ndev);
++		} else {
++			switch (skb->data[0] & 0xf0) {
++			case 0x40:
++				skb->protocol = htons(ETH_P_IP);
++				break;
++			case 0x60:
++				skb->protocol = htons(ETH_P_IPV6);
++				break;
++			default:
++				skb->protocol = htons(ETH_P_MAP);
++				break;
++			}
+ 		}
+ 
+ 		u64_stats_update_begin(&mhi_netdev->stats.rx_syncp);
+@@ -301,11 +318,17 @@ static void mhi_net_rx_refill_work(struct work_struct *work)
+ 		schedule_delayed_work(&mhi_netdev->rx_refill, HZ / 2);
+ }
+ 
+-static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
++static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev, bool eth_dev)
+ {
+ 	struct mhi_net_dev *mhi_netdev;
+ 	int err;
+ 
++	if (eth_dev) {
++		eth_random_addr(ndev->dev_addr);
++		if (!is_valid_ether_addr(ndev->dev_addr))
++			return -EADDRNOTAVAIL;
++	}
++
+ 	mhi_netdev = netdev_priv(ndev);
+ 
+ 	dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+@@ -313,6 +336,7 @@ static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev)
+ 	mhi_netdev->mdev = mhi_dev;
+ 	mhi_netdev->skbagg_head = NULL;
+ 	mhi_netdev->mru = mhi_dev->mhi_cntrl->mru;
++	mhi_netdev->ethernet_if = eth_dev;
+ 
+ 	INIT_DELAYED_WORK(&mhi_netdev->rx_refill, mhi_net_rx_refill_work);
+ 	u64_stats_init(&mhi_netdev->stats.rx_syncp);
+@@ -356,13 +380,14 @@ static int mhi_net_probe(struct mhi_device *mhi_dev,
+ 	int err;
+ 
+ 	ndev = alloc_netdev(sizeof(struct mhi_net_dev), info->netname,
+-			    NET_NAME_PREDICTABLE, mhi_net_setup);
++			    NET_NAME_PREDICTABLE, info->ethernet_if ?
++			    mhi_ethernet_setup : mhi_net_setup);
+ 	if (!ndev)
+ 		return -ENOMEM;
+ 
+ 	SET_NETDEV_DEV(ndev, &mhi_dev->dev);
+ 
+-	err = mhi_net_newlink(mhi_dev, ndev);
++	err = mhi_net_newlink(mhi_dev, ndev, info->ethernet_if);
+ 	if (err) {
+ 		free_netdev(ndev);
+ 		return err;
+@@ -380,10 +405,12 @@ static void mhi_net_remove(struct mhi_device *mhi_dev)
+ 
+ static const struct mhi_device_info mhi_hwip0 = {
+ 	.netname = "mhi_hwip%d",
++	.ethernet_if = false,
+ };
+ 
+ static const struct mhi_device_info mhi_swip0 = {
+ 	.netname = "mhi_swip%d",
++	.ethernet_if = false,
+ };
+ 
+ static const struct mhi_device_id mhi_net_id_table[] = {
+-- 
+2.7.4
 
-> Signed-off-by: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
-> ---
-> According to C reproducer, this problem happens when bpf_exec_tx_verdict() is
-> called with lower 4 bits of required_size being 0001 and does not happen when
-> being 0100. Thus, I assumed that this problem is caused by lack of initializing
-> padding bytes.
-> But I couldn't figure out why KMSAN reports this problem when bpf_exec_tx_verdict()
-> is called with lower 4 bits of required_size being 0001 for the second time and
-> does not report this problem when bpf_exec_tx_verdict() is called with lower
-> 4 bits of required_size being 0001 for the first time. More deeper problem exists?
-> KMSAN reporting this problem when accessing u64 relevant?
->
-
-As Eric pointed out as well, zeroing the allocation papers over the problem.
-
-Why are you sending this now? Do you have a reproducer for this issue?
-
->  net/tls/tls_main.c | 1 +
->  1 file changed, 1 insertion(+)
->
-> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-> index f2e7302a4d96..cd5366966864 100644
-> --- a/net/tls/tls_main.c
-> +++ b/net/tls/tls_main.c
-> @@ -1025,6 +1025,7 @@ static int tls_init(struct sock *sk)
->         struct tls_context *ctx;
->         int rc = 0;
->
-> +       sk->sk_allocation |= __GFP_ZERO;
->         tls_build_proto(sk);
->
->  #ifdef CONFIG_TLS_TOE
-> --
-> 2.34.1
->
 
