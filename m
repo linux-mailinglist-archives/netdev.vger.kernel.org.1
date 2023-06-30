@@ -1,193 +1,174 @@
-Return-Path: <netdev+bounces-14819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14820-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5B19B744006
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 18:44:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8166A74400F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 18:47:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F4B01C20BEE
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:44:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 50F261C20BB8
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:47:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DFA316414;
-	Fri, 30 Jun 2023 16:44:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3EA7316425;
+	Fri, 30 Jun 2023 16:47:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6208B156D6
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 16:44:20 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A6413A9B
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 09:44:17 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fba545d743so23770235e9.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 09:44:17 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mobile-devices.fr; s=google; t=1688143455; x=1690735455;
-        h=content-transfer-encoding:subject:cc:to:content-language:user-agent
-         :mime-version:date:message-id:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=qKBfccrJBTzwPsKp9F16ppy62jt1IusEq5OosFTqNhM=;
-        b=L6uyS6gSmWW0LEFcLhBaGROe2QRiYaL5y2vDxaVytgFCbKcVwWTCDIKI+xSYkdawQJ
-         R8XXgwEJxEFFaP50qF891/Gyfh9xxsYNXvw1gGeBXUYKSbV9m9NNW2r+yYfanocUQKVr
-         VVqrtDu1iM9SsWUOUnm4fUhooVa2yUDT55ctE=
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E94514299
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 16:47:05 +0000 (UTC)
+Received: from mail-io1-f43.google.com (mail-io1-f43.google.com [209.85.166.43])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 96C9D10FB;
+	Fri, 30 Jun 2023 09:47:03 -0700 (PDT)
+Received: by mail-io1-f43.google.com with SMTP id ca18e2360f4ac-783544a1c90so86487439f.1;
+        Fri, 30 Jun 2023 09:47:03 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688143455; x=1690735455;
-        h=content-transfer-encoding:subject:cc:to:content-language:user-agent
-         :mime-version:date:message-id:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=qKBfccrJBTzwPsKp9F16ppy62jt1IusEq5OosFTqNhM=;
-        b=dXTuo35yeBi4Ex5RmOlVOuGtjiJP6zJAl/N5/o/540ZZb6iJsC6kR8JPBnyON0ikgG
-         sMuV7Jd/MCyqAwa+WbxHX306iZWrmBC2+dmTOmYXrY+NTVKNx7muOVjIa2FWeKETDCg6
-         rmU9h2sFV+qV2AB5+7CU9ZZvrV4oKa+k/pX6yGQhiXVDBWKhaWYWcdBH3xooM8X6Kjgj
-         XhYv6nwAn0h3mQX1fBfgfISV00xgNrNgMabS+9glMnpv4lrZalui6JTvgFslX5BvcHol
-         3Gzc/n/2j7Uvq9tswLs6tpHyaQ6wYYGYz83Esz5sm41M738hMZYXd1BhYC9+8Jw9g0a2
-         fhBw==
-X-Gm-Message-State: AC+VfDxWSBJOYfXsw+r4aE6PBpUWmZYZOobv7w/PQBhiu4ZO0i1sPmP3
-	RNwsrRwDOz89b+SIXNRwjF9Cug==
-X-Google-Smtp-Source: ACHHUZ4ByD+2TUO16Ne5E+K5eO4TL2k30sTEafqHWqmMmDw/d9Kd3NmTMrAYwXB8L2/yVvPuGaQGWw==
-X-Received: by 2002:a1c:770b:0:b0:3fa:9538:963e with SMTP id t11-20020a1c770b000000b003fa9538963emr2410893wmi.36.1688143455489;
-        Fri, 30 Jun 2023 09:44:15 -0700 (PDT)
-Received: from [10.42.42.90] (static-css-cqn-143221.business.bouyguestelecom.com. [176.149.143.221])
-        by smtp.gmail.com with ESMTPSA id t25-20020a7bc3d9000000b003fbb8c7c799sm4666532wmj.30.2023.06.30.09.44.15
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 30 Jun 2023 09:44:15 -0700 (PDT)
-From: Maxime Jayat <maxime.jayat@mobile-devices.fr>
-X-Google-Original-From: Maxime Jayat <maxime.jayat@munic.io>
-Message-ID: <11328958-453f-447f-9af8-3b5824dfb041@munic.io>
-Date: Fri, 30 Jun 2023 18:44:14 +0200
+        d=1e100.net; s=20221208; t=1688143623; x=1690735623;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=d6DGhP0NKduRLIremGdPnWFJvBxfZB29kWmtTlgPqSY=;
+        b=WvpL7lOAuKkgFxaWAFLZ5Tv69C21jl0O0F4s5WOhee/h42pmUQOxC3epSSokUdnXeB
+         55MBtoft6M5b/qQOxQoaZHCAD9eUFagU0aOCz56jpa5Hoa3xehnUSPHqT6q7y8irfTKJ
+         ftoCHJjXRv5MLpvTsri4RMjsMQS4r6os16CKbA/3ClQbIXYeE/gNi2W074PWGN5TJd9C
+         z8JFBkgvLCGt6gzI+VnfMapniCWciBPkm+qWB7Q5PQc7Lwi30YH1rsDlRyOzv2dDc+4q
+         jD2JOwgJCci3+Uh+6cUiM3wsemmG0FFMGuXdm95er55l1mLsUxyb7aEvgomzBLhDIouE
+         gj/Q==
+X-Gm-Message-State: AC+VfDzseNRarC1PJjDvdbQQEB0R+2BZeidfrTR2Ddu09Y6od4/glC/V
+	ZF7cFH063RRfwH93mnmDaRaysu2e0A==
+X-Google-Smtp-Source: ACHHUZ6OwIYPczmqbgzkEpt6HyXVM0dPvYAT8oKibXf2XmJsco67c0AQJfN7FfdjPE7jY6RKcJU0ng==
+X-Received: by 2002:a5d:9a09:0:b0:77e:249e:d84 with SMTP id s9-20020a5d9a09000000b0077e249e0d84mr3330170iol.5.1688143622820;
+        Fri, 30 Jun 2023 09:47:02 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id el16-20020a0566384d9000b0042aebf02107sm2091962jab.138.2023.06.30.09.47.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 30 Jun 2023 09:47:01 -0700 (PDT)
+Received: (nullmailer pid 1884430 invoked by uid 1000);
+	Fri, 30 Jun 2023 16:46:59 -0000
+Date: Fri, 30 Jun 2023 10:46:59 -0600
+From: Rob Herring <robh@kernel.org>
+To: Sarath Babu Naidu Gaddam <sarath.babu.naidu.gaddam@amd.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, krzysztof.kozlowski+dt@linaro.org, sbhatta@marvell.com, linux@armlinux.org.uk, michal.simek@amd.com, radhey.shyam.pandey@amd.com, netdev@vger.kernel.org, devicetree@vger.kernel.org, linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, anirudha.sarangi@amd.com, harini.katakam@amd.com, git@amd.com
+Subject: Re: [PATCH net-next V4 1/3] dt-bindings: net: xlnx,axi-ethernet:
+ Introduce DMA support
+Message-ID: <20230630164659.GA1877117-robh@kernel.org>
+References: <20230630053844.1366171-1-sarath.babu.naidu.gaddam@amd.com>
+ <20230630053844.1366171-2-sarath.babu.naidu.gaddam@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Content-Language: en-US
-To: Oliver Hartkopp <socketcan@hartkopp.net>,
- Marc Kleine-Budde <mkl@pengutronix.de>, Michal Sojka <michal.sojka@cvut.cz>
-Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org, "Dae R. Jeong" <threeearcat@gmail.com>,
- Hillf Danton <hdanton@sina.com>
-Subject: can: isotp: epoll breaks isotp_sendmsg
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630053844.1366171-2-sarath.babu.naidu.gaddam@amd.com>
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Fri, Jun 30, 2023 at 11:08:42AM +0530, Sarath Babu Naidu Gaddam wrote:
+> From: Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>
+> 
+> The axiethernet will use dmaengine framework to communicate
+> with dma controller IP instead of built-in dma programming sequence.
 
-There is something not clear happening with the non-blocking behavior
-of ISO-TP sockets in the TX path, but more importantly, using epoll now
-completely breaks isotp_sendmsg.
-I believe it is related to
-79e19fa79c ("can: isotp: isotp_ops: fix poll() to not report false 
-EPOLLOUT events"),
-but actually is probably deeper than that.
+What's dmaengine framework? This is a binding patch about the h/w.
 
-I don't completely understand what is exactly going on, so I am sharing
-the problem I face:
+> 
+> To request dma transmit and receive channels the axiethernet uses
+> generic dmas, dma-names properties.
+> 
+> Axiethernet may use AXI DMA or MCDMA. DMA has only two channels
+> where as MCDMA has 16 Tx, 16 Rx channels. To uniquely identify each
+> channel, we are using 'chan' suffix. Depending on the usecase AXI
+> ethernet driver can request any combination of multichannel DMA
+> channels.
 
-With an ISO-TP socket in non-blocking mode, using epoll seems to make
-isotp_sendmsg always return -EAGAIN.
+The DMA provider is outside the scope of the binding. Instead, describe 
+how Axiethernet can use 2 or 32 channels.
 
-I have a non-blocking socket + epoll version of can-utils isotpsend 
-available for
-testing at https://gist.github.com/MJayat/4857da43ab154e4ba644d2446b5fa46d
-With this version I do the following test:
+> 
+> Example:
+> dma-names = tx_chan0, rx_chan0, tx_chan1, rx_chan1;
+> 
+> Also to support the backward compatibility, use "dmas" property to
+> identify as it should use dmaengine framework or legacy
+> driver(built-in dma programming).
+> 
+> At this point it is recommended to use dmaengine framework but it's
+> optional. Once the solution is stable will make dmas as
+> required properties.
+> 
+> Signed-off-by: Radhey Shyam Pandey <radhey.shyam.pandey@xilinx.com>
+> Signed-off-by: Sarath Babu Naidu Gaddam <sarath.babu.naidu.gaddam@amd.com>
+> 
+> ---
+> Changes in V4:
+> 1) Updated commit description about tx/rx channels name.
+> 2) Removed "dt-bindings" and "dmaengine" strings in subject.
+> 3) Extended dmas and dma-names to support MCDMA channel names.
+> 1) Remove "driver" from commit message.
+> 2) Use pattern/regex for dma-names property.
+> 
+> Changes in V3:
+> 1) Reverted reg and interrupts property to  support backward compatibility.
+> 2) Moved dmas and dma-names properties from Required properties.
+> 
+> Changes in V2:
+> - None.
+> ---
+>  .../bindings/net/xlnx,axi-ethernet.yaml          | 16 ++++++++++++++++
+>  1 file changed, 16 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml b/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+> index 1d33d80af11c..ea203504b8d4 100644
+> --- a/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+> +++ b/Documentation/devicetree/bindings/net/xlnx,axi-ethernet.yaml
+> @@ -122,6 +122,20 @@ properties:
+>        and "phy-handle" should point to an external PHY if exists.
+>      maxItems: 1
+>  
+> +  dmas:
+> +    minItems: 2
+> +    maxItems: 32
+> +    description: DMA Channel phandle and DMA request line number
 
-isotprecv -l -m 0x80 -s 7e8 -d 7e0 vcan0 &
-echo "01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f" | strace ./isotpsend 
--l10 -s 7E0 -d 7E8 vcan0
+Drop this description. That's every 'dmas' property. Instead define what 
+each entry is.
 
-I get:
-...
-15:37:02.456849 epoll_ctl(4, EPOLL_CTL_ADD, 3, 
-{events=EPOLLIN|EPOLLOUT|EPOLLRDHUP, data={u32=0, u64=0}}) = 0 <0.000249>
-15:37:02.457839 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.000200>
-15:37:02.458838 write(3, 
-"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 15) = -1 
-EAGAIN (Resource temporarily unavailable) <0.000278>
-15:37:02.459908 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.000250>
-15:37:02.460879 write(3, 
-"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 15) = -1 
-EAGAIN (Resource temporarily unavailable) <0.000272>
-15:37:02.461831 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.000199>
-...
-impossible to write on the socket, and busy-looping.
+> +
+> +  dma-names:
+> +    items:
+> +      pattern: "^[tr]x_chan[0-9]|1[0-5]$"
 
-With a change to epoll_ctl flags, now including EPOLLET, I get:
-...
-15:36:22.443689 epoll_ctl(4, EPOLL_CTL_ADD, 3, 
-{events=EPOLLIN|EPOLLOUT|EPOLLRDHUP|EPOLLET, data={u32=0, u64=0}}) = 0 
-<0.000171>
-15:36:22.444514 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.000188>
-15:36:22.445413 write(3, 
-"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 15) = -1 
-EAGAIN (Resource temporarily unavailable) <0.000175>
-15:36:22.446335 epoll_wait(4, [], 1, 2000) = 0 <2.026006>
-...
-epoll_wait now blocks indefinitely.
+I think you need some parentheses. Does a channel 10 or higher name 
+validate?
 
-By reverting 79e19fa79c, I get better results but still incorrect:
-...
-15:41:43.890880 epoll_ctl(4, EPOLL_CTL_ADD, 3, 
-{events=EPOLLIN|EPOLLOUT|EPOLLRDHUP, data={u32=0, u64=0}}) = 0 <0.000200>
-15:41:43.892011 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.000408>
-15:41:43.893148 write(3, 
-"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 15) = 15 
-<0.000458>
-15:41:43.894405 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.000257>
-15:41:43.895385 write(3, 
-"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 15) = 15 
-<0.128429>
-15:41:44.028757 epoll_wait(4, [{events=EPOLLOUT, data={u32=0, u64=0}}], 
-1, 2000) = 1 <0.001886>
-15:41:44.040858 write(3, 
-"\x01\x02\x03\x04\x05\x06\x07\x08\x09\x0a\x0b\x0c\x0d\x0e\x0f", 15) = 15 
-<0.108069>
-...
-It is then possible to write on the socket but the write is blocking, 
-which is
-not the expected behavior for a non-blocking socket.
-
-I don't know how to solve the problem. To me, using wq_has_sleeper seems 
-weird.
-The implementation of isotp_poll feels weird too (calling both 
-datagram_poll and
-poll_wait?). But I am not sure what would be the correct implementation.
-
-Note that this behavior is currently on all linux-stable branches. I am
-currently testing on v6.1.36 but I know it is failing on v6.3 too.
-
-My actual use-case is in Async Rust using tokio. Not using epoll is not an
-option and a non-blocking socket that sometimes blocks can be terrible for
-the performance of the whole application. Our embedded target runs with the
-out-of-tree module on an older linux version, but my colleagues with 
-up-to-date
-linux stable kernels have recently been prevented from running tests on 
-their
-PC.
-
-Is there someone with a good idea of how to proceed to fix this?
-I'll probably keep digging but I don't think I can spend so much time on 
-this,
-so any help is appreciated.
-
-Thanks,
-Maxime
-
-
+> +    description:
+> +      Should be "tx_chan0", "tx_chan1" ... "tx_chan15" for DMA Tx channel
+> +      Should be "rx_chan0", "rx_chan1" ... "rx_chan15" for DMA Rx channel
+> +    minItems: 2
+> +    maxItems: 32
+> +
+>  required:
+>    - compatible
+>    - interrupts
+> @@ -143,6 +157,8 @@ examples:
+>          clocks = <&axi_clk>, <&axi_clk>, <&pl_enet_ref_clk>, <&mgt_clk>;
+>          phy-mode = "mii";
+>          reg = <0x40c00000 0x40000>,<0x50c00000 0x40000>;
+> +        dmas = <&xilinx_dma 0>, <&xilinx_dma 1>;
+> +        dma-names = "tx_chan0", "rx_chan0";
+>          xlnx,rxcsum = <0x2>;
+>          xlnx,rxmem = <0x800>;
+>          xlnx,txcsum = <0x2>;
+> -- 
+> 2.25.1
+> 
 
