@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-14865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BECAF744210
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 20:18:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 908A3744211
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 20:18:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EE5141C20C36
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 18:18:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 555EB2811B8
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 18:18:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F9E117AC8;
-	Fri, 30 Jun 2023 18:15:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D045A17AD7;
+	Fri, 30 Jun 2023 18:15:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7011117ABB
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 18:15:55 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 35A91C433D9;
-	Fri, 30 Jun 2023 18:15:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8F18117AA7
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 18:15:56 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 486A0C43215;
+	Fri, 30 Jun 2023 18:15:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688148955;
-	bh=J5azMA4gAKCKdBOSKSIqmmi2MSMIkVnyQS78BzXQSfY=;
+	s=k20201202; t=1688148956;
+	bh=qwlRmjzIpDCqT90LR6GJgKMGFDLXKlV9IVZ1wUmbfmA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=j/sxfmiNLOmWGKMFxfn5evZzz2nEDjKIlDDoXW6sjE8g2tr0vxVQySz09VZKELWct
-	 8ClQ+iny7tZ33MjWIsFxMY2Z0ib3FSWDNGaP4NdKc4fYdbLB3dBpJWI2JlH4sK5JUT
-	 ibcQaPuXwU/+UYWx96Gl+nBel8QTxBAQWepy+e0RLc06Vns3Vds4mfVi5pGcn0RD4T
-	 MFPyAd2stmVjbkpsQjo8mkWi2h9t6c+nrnvJGatZk00/n5uajajacSmcD7BMGn3y67
-	 BjZE0h7mHJDP7q9Fvr8Y5rpkVOua4EG+icjRDtpgcx3WbziBFp1YNmT59iUQOAXHCs
-	 X5fc0lVFmnhrA==
+	b=G0X6jcobY1kqJ8s6lOwkdao1l+p4PhMiezA5DkwaSuwRlCsu8LCMKIx0Vd84icxpW
+	 omGwgsDK5Ck5uKwXW6ZbLCSRekWkFg5AepkZ6B6wsmaE6i7XU53+gp6b39Jd/+Vx2z
+	 x61UWhNajaOPj6JADak0Qqaa3Hwoh71ZABDvgIkuuW46yYtIL4Ftj4EPKybCpyCcYF
+	 lZErUxictE1n0/8YxoQJ9RmamRugZbITUk99b9F+IELUn7TD0OQsZXUa5qCeWptJh0
+	 Qk24T4WoXbqIc5TfSA97EKOy9d6DlmFYUOrv2L8PFGeoksEsi5R917ZRA7thoYp5G8
+	 gyuTNKP7tlhnw==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,11 +38,10 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Maher Sanalla <msanalla@nvidia.com>,
-	Shay Drory <shayd@nvidia.com>
-Subject: [net 8/9] net/mlx5: Query hca_cap_2 only when supported
-Date: Fri, 30 Jun 2023 11:15:43 -0700
-Message-ID: <20230630181544.82958-9-saeed@kernel.org>
+	Dragos Tatulea <dtatulea@nvidia.com>
+Subject: [net 9/9] net/mlx5e: RX, Fix page_pool page fragment tracking for XDP
+Date: Fri, 30 Jun 2023 11:15:44 -0700
+Message-ID: <20230630181544.82958-10-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230630181544.82958-1-saeed@kernel.org>
 References: <20230630181544.82958-1-saeed@kernel.org>
@@ -54,37 +53,119 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Maher Sanalla <msanalla@nvidia.com>
+From: Dragos Tatulea <dtatulea@nvidia.com>
 
-On vport enable, where fw's hca caps are queried, the driver queries
-hca_caps_2 without checking if fw truly supports them, causing a false
-failure of vfs vport load and blocking SRIOV enablement on old devices
-such as CX4 where hca_caps_2 support is missing.
+Currently mlx5e releases pages directly to the page_pool for XDP_TX and
+does page fragment counting for XDP_REDIRECT. RX pages from the
+page_pool are leaking on XDP_REDIRECT because the xdp core will release
+only one fragment out of MLX5E_PAGECNT_BIAS_MAX and subsequently the page
+is marked as "skip release" which avoids the driver release.
 
-Thus, add a check for the said caps support before accessing them.
+A fix would be to take an extra fragment for XDP_REDIRECT and not set the
+"skip release" bit so that the release on the driver side can handle the
+remaining bias fragments. But this would be a shortsighted solution.
+Instead, this patch converges the two XDP paths (XDP_TX and XDP_REDIRECT) to
+always do fragment tracking. The "skip release" bit is no longer
+necessary for XDP.
 
-Fixes: e5b9642a33be ("net/mlx5: E-Switch, Implement devlink port function cmds to control migratable")
-Signed-off-by: Maher Sanalla <msanalla@nvidia.com>
-Reviewed-by: Shay Drory <shayd@nvidia.com>
+Fixes: 6f5742846053 ("net/mlx5e: RX, Enable skb page recycling through the page_pool")
+Signed-off-by: Dragos Tatulea <dtatulea@nvidia.com>
+Reviewed-by: Tariq Toukan <tariqt@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/eswitch.c | 3 +++
- 1 file changed, 3 insertions(+)
+ .../net/ethernet/mellanox/mlx5/core/en/xdp.c  |  3 +-
+ .../net/ethernet/mellanox/mlx5/core/en_rx.c   | 32 +++++++------------
+ 2 files changed, 13 insertions(+), 22 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-index faec7d7a4400..243c455f1029 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
-@@ -807,6 +807,9 @@ static int mlx5_esw_vport_caps_get(struct mlx5_eswitch *esw, struct mlx5_vport *
- 	hca_caps = MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capability);
- 	vport->info.roce_enabled = MLX5_GET(cmd_hca_cap, hca_caps, roce);
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+index f0e6095809fa..40589cebb773 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/xdp.c
+@@ -662,8 +662,7 @@ static void mlx5e_free_xdpsq_desc(struct mlx5e_xdpsq *sq,
+ 				/* No need to check ((page->pp_magic & ~0x3UL) == PP_SIGNATURE)
+ 				 * as we know this is a page_pool page.
+ 				 */
+-				page_pool_put_defragged_page(page->pp,
+-							     page, -1, true);
++				page_pool_recycle_direct(page->pp, page);
+ 			} while (++n < num);
  
-+	if (!MLX5_CAP_GEN_MAX(esw->dev, hca_cap_2))
-+		goto out_free;
+ 			break;
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+index a9575219e455..41d37159e027 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en_rx.c
+@@ -1751,11 +1751,11 @@ mlx5e_skb_from_cqe_nonlinear(struct mlx5e_rq *rq, struct mlx5e_wqe_frag_info *wi
+ 
+ 	prog = rcu_dereference(rq->xdp_prog);
+ 	if (prog && mlx5e_xdp_handle(rq, prog, &mxbuf)) {
+-		if (test_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
++		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
+ 			struct mlx5e_wqe_frag_info *pwi;
+ 
+ 			for (pwi = head_wi; pwi < wi; pwi++)
+-				pwi->flags |= BIT(MLX5E_WQE_FRAG_SKIP_RELEASE);
++				pwi->frag_page->frags++;
+ 		}
+ 		return NULL; /* page/packet was consumed by XDP */
+ 	}
+@@ -1825,12 +1825,8 @@ static void mlx5e_handle_rx_cqe(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ 			      rq, wi, cqe, cqe_bcnt);
+ 	if (!skb) {
+ 		/* probably for XDP */
+-		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
+-			/* do not return page to cache,
+-			 * it will be returned on XDP_TX completion.
+-			 */
+-			wi->flags |= BIT(MLX5E_WQE_FRAG_SKIP_RELEASE);
+-		}
++		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags))
++			wi->frag_page->frags++;
+ 		goto wq_cyc_pop;
+ 	}
+ 
+@@ -1876,12 +1872,8 @@ static void mlx5e_handle_rx_cqe_rep(struct mlx5e_rq *rq, struct mlx5_cqe64 *cqe)
+ 			      rq, wi, cqe, cqe_bcnt);
+ 	if (!skb) {
+ 		/* probably for XDP */
+-		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
+-			/* do not return page to cache,
+-			 * it will be returned on XDP_TX completion.
+-			 */
+-			wi->flags |= BIT(MLX5E_WQE_FRAG_SKIP_RELEASE);
+-		}
++		if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags))
++			wi->frag_page->frags++;
+ 		goto wq_cyc_pop;
+ 	}
+ 
+@@ -2060,12 +2052,12 @@ mlx5e_skb_from_cqe_mpwrq_nonlinear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *w
+ 	if (prog) {
+ 		if (mlx5e_xdp_handle(rq, prog, &mxbuf)) {
+ 			if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags)) {
+-				int i;
++				struct mlx5e_frag_page *pfp;
 +
- 	memset(query_ctx, 0, query_out_sz);
- 	err = mlx5_vport_get_other_func_cap(esw->dev, vport->vport, query_ctx,
- 					    MLX5_CAP_GENERAL_2);
++				for (pfp = head_page; pfp < frag_page; pfp++)
++					pfp->frags++;
+ 
+-				for (i = 0; i < sinfo->nr_frags; i++)
+-					/* non-atomic */
+-					__set_bit(page_idx + i, wi->skip_release_bitmap);
+-				return NULL;
++				wi->linear_page.frags++;
+ 			}
+ 			mlx5e_page_release_fragmented(rq, &wi->linear_page);
+ 			return NULL; /* page/packet was consumed by XDP */
+@@ -2163,7 +2155,7 @@ mlx5e_skb_from_cqe_mpwrq_linear(struct mlx5e_rq *rq, struct mlx5e_mpw_info *wi,
+ 				 cqe_bcnt, &mxbuf);
+ 		if (mlx5e_xdp_handle(rq, prog, &mxbuf)) {
+ 			if (__test_and_clear_bit(MLX5E_RQ_FLAG_XDP_XMIT, rq->flags))
+-				__set_bit(page_idx, wi->skip_release_bitmap); /* non-atomic */
++				frag_page->frags++;
+ 			return NULL; /* page/packet was consumed by XDP */
+ 		}
+ 
 -- 
 2.41.0
 
