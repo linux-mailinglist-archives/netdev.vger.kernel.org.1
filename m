@@ -1,239 +1,181 @@
-Return-Path: <netdev+bounces-14881-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14883-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0DC03744498
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 00:16:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BEF847444C6
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 00:20:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6E70E28122F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 22:16:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92A471C20C5F
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 22:20:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E7B961775E;
-	Fri, 30 Jun 2023 22:16:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498881775B;
+	Fri, 30 Jun 2023 22:20:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CF6D117753;
-	Fri, 30 Jun 2023 22:16:09 +0000 (UTC)
-Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B79FE3C34;
-	Fri, 30 Jun 2023 15:16:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=infradead.org; s=bombadil.20210309; h=Sender:In-Reply-To:Content-Type:
-	MIME-Version:References:Message-ID:Subject:Cc:To:From:Date:Reply-To:
-	Content-Transfer-Encoding:Content-ID:Content-Description;
-	bh=lAGAJ28n1AlcMoZYeCm9uRz7rvcCocSlQtZJp9kS4hM=; b=MDK5OMbWDIQ7k5BUsVfTTCeUKK
-	ykHg2ksytfiKty5DqeoojsJgI19pnpO3bU4G0Nu4GjG2hEs2ZxnYXR7D6/oVlp5Pe2D5JneqmFcdb
-	aqUSSmtLLmtBD1hqWecPq0g6kKIyzG4SS3mQ1IFdkZFT8q1yIbLznGNVCRFkmuvgVZewrQL+j94VD
-	WaM6JFD5ZLKSStA4y0A2mjB/5tQW5fCKp810bYosB6+mCMAVZBJndIY7cGkKy5/JBuK2Tl+F43Ugr
-	599NI5n1vZXoqkj6Re0aIa5xI5fj+j2Mg09LQQtRQAZLHqXoNHWcWfm/2CAipcBnuw9FG3zZ4Gpbp
-	XVBvS0Ww==;
-Received: from mcgrof by bombadil.infradead.org with local (Exim 4.96 #2 (Red Hat Linux))
-	id 1qFMM7-004egi-0d;
-	Fri, 30 Jun 2023 22:12:43 +0000
-Date: Fri, 30 Jun 2023 15:12:43 -0700
-From: Luis Chamberlain <mcgrof@kernel.org>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: Jeremy Kerr <jk@ozlabs.org>, Arnd Bergmann <arnd@arndb.de>,
-	Michael Ellerman <mpe@ellerman.id.au>,
-	Nicholas Piggin <npiggin@gmail.com>,
-	Christophe Leroy <christophe.leroy@csgroup.eu>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	Arve =?iso-8859-1?B?SGr4bm5lduVn?= <arve@android.com>,
-	Todd Kjos <tkjos@android.com>, Martijn Coenen <maco@android.com>,
-	Joel Fernandes <joel@joelfernandes.org>,
-	Christian Brauner <brauner@kernel.org>,
-	Carlos Llamas <cmllamas@google.com>,
-	Suren Baghdasaryan <surenb@google.com>,
-	Dennis Dalessandro <dennis.dalessandro@cornelisnetworks.com>,
-	Jason Gunthorpe <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>,
-	Brad Warrum <bwarrum@linux.ibm.com>,
-	Ritu Agarwal <rituagar@linux.ibm.com>,
-	Eric Van Hensbergen <ericvh@kernel.org>,
-	Latchesar Ionkov <lucho@ionkov.net>,
-	Dominique Martinet <asmadeus@codewreck.org>,
-	Christian Schoenebeck <linux_oss@crudebyte.com>,
-	David Sterba <dsterba@suse.com>,
-	David Howells <dhowells@redhat.com>,
-	Marc Dionne <marc.dionne@auristor.com>,
-	Alexander Viro <viro@zeniv.linux.org.uk>,
-	Ian Kent <raven@themaw.net>,
-	Luis de Bethencourt <luisbg@kernel.org>,
-	Salah Triki <salah.triki@gmail.com>,
-	"Tigran A. Aivazian" <aivazian.tigran@gmail.com>,
-	Eric Biederman <ebiederm@xmission.com>,
-	Kees Cook <keescook@chromium.org>, Chris Mason <clm@fb.com>,
-	Josef Bacik <josef@toxicpanda.com>, Xiubo Li <xiubli@redhat.com>,
-	Ilya Dryomov <idryomov@gmail.com>, Jan Harkes <jaharkes@cs.cmu.edu>,
-	coda@cs.cmu.edu, Joel Becker <jlbec@evilplan.org>,
-	Christoph Hellwig <hch@lst.de>, Nicolas Pitre <nico@fluxnic.net>,
-	"Rafael J. Wysocki" <rafael@kernel.org>,
-	Tyler Hicks <code@tyhicks.com>, Ard Biesheuvel <ardb@kernel.org>,
-	Gao Xiang <xiang@kernel.org>, Chao Yu <chao@kernel.org>,
-	Yue Hu <huyue2@coolpad.com>, Jeffle Xu <jefflexu@linux.alibaba.com>,
-	Namjae Jeon <linkinjeon@kernel.org>,
-	Sungjong Seo <sj1557.seo@samsung.com>, Jan Kara <jack@suse.com>,
-	Theodore Ts'o <tytso@mit.edu>,
-	Andreas Dilger <adilger.kernel@dilger.ca>,
-	Jaegeuk Kim <jaegeuk@kernel.org>,
-	OGAWA Hirofumi <hirofumi@mail.parknet.co.jp>,
-	Miklos Szeredi <miklos@szeredi.hu>,
-	Bob Peterson <rpeterso@redhat.com>,
-	Andreas Gruenbacher <agruenba@redhat.com>,
-	Richard Weinberger <richard@nod.at>,
-	Anton Ivanov <anton.ivanov@cambridgegreys.com>,
-	Johannes Berg <johannes@sipsolutions.net>,
-	Mikulas Patocka <mikulas@artax.karlin.mff.cuni.cz>,
-	Mike Kravetz <mike.kravetz@oracle.com>,
-	Muchun Song <muchun.song@linux.dev>,
-	David Woodhouse <dwmw2@infradead.org>,
-	Dave Kleikamp <shaggy@kernel.org>, Tejun Heo <tj@kernel.org>,
-	Trond Myklebust <trond.myklebust@hammerspace.com>,
-	Anna Schumaker <anna@kernel.org>,
-	Chuck Lever <chuck.lever@oracle.com>,
-	Ryusuke Konishi <konishi.ryusuke@gmail.com>,
-	Anton Altaparmakov <anton@tuxera.com>,
-	Konstantin Komarov <almaz.alexandrovich@paragon-software.com>,
-	Mark Fasheh <mark@fasheh.com>,
-	Joseph Qi <joseph.qi@linux.alibaba.com>,
-	Bob Copeland <me@bobcopeland.com>,
-	Mike Marshall <hubcap@omnibond.com>,
-	Martin Brandenburg <martin@omnibond.com>,
-	Iurii Zaikin <yzaikin@google.com>, Tony Luck <tony.luck@intel.com>,
-	"Guilherme G. Piccoli" <gpiccoli@igalia.com>,
-	Anders Larsen <al@alarsen.net>, Steve French <sfrench@samba.org>,
-	Paulo Alcantara <pc@manguebit.com>,
-	Ronnie Sahlberg <lsahlber@redhat.com>,
-	Shyam Prasad N <sprasad@microsoft.com>, Tom Talpey <tom@talpey.com>,
-	Sergey Senozhatsky <senozhatsky@chromium.org>,
-	Phillip Lougher <phillip@squashfs.org.uk>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Masami Hiramatsu <mhiramat@kernel.org>,
-	Evgeniy Dushistov <dushistov@mail.ru>,
-	Hans de Goede <hdegoede@redhat.com>,
-	"Darrick J. Wong" <djwong@kernel.org>,
-	Damien Le Moal <dlemoal@kernel.org>,
-	Naohiro Aota <naohiro.aota@wdc.com>,
-	Johannes Thumshirn <jth@kernel.org>,
-	Alexei Starovoitov <ast@kernel.org>,
-	Daniel Borkmann <daniel@iogearbox.net>,
-	Andrii Nakryiko <andrii@kernel.org>,
-	Martin KaFai Lau <martin.lau@linux.dev>, Song Liu <song@kernel.org>,
-	Yonghong Song <yhs@fb.com>,
-	John Fastabend <john.fastabend@gmail.com>,
-	KP Singh <kpsingh@kernel.org>, Stanislav Fomichev <sdf@google.com>,
-	Hao Luo <haoluo@google.com>, Jiri Olsa <jolsa@kernel.org>,
-	Hugh Dickins <hughd@google.com>,
-	Andrew Morton <akpm@linux-foundation.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35219174F0
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 22:20:27 +0000 (UTC)
+Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2082.outbound.protection.outlook.com [40.107.22.82])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AA0BC;
+	Fri, 30 Jun 2023 15:20:25 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=TDRE2ABPPfff0DmNRi9h12HZY+lGEDzxjyB3dMoHPMrI0HiKt9SDdB4yaR+H5yBk21FfN3kTY/G6ZQI8wWiNVFa0pLxrOIzAEBUbZj6TwqGR1XJu5r9cxovuUDVXn7XimUrw8BkRrScoeuguiSOxPWLZwDD4uFRlW70dhnpxGqVWZlDeuD28aRPAxkdFutTc24xWWQPRst/vZBNnYUXDvrMcFpALzJ8CUiPNlW9HIFr0fkjgpZx4tcEqoUKFb6VWAzYJfru9mSO/eidAuMdzjrAa7Dv+UQvV+6k9D5keH2Z2Sr+QAKaeMTOoz13cayBNn0kJi/jBN3HTewwkL8Nfhw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=PNAU4tG4LDKaLE4dOcpQmzsvys6jZl+KhJmIziYWRfw=;
+ b=MfiJvcIktXN6uxO6HNx5SIpsxiqoRpHbBg0zCbaqKIHIgQ+71WoBiDJlaiTI9SE5MeLV8Gs6/2u5TRywzfvY35IOi0JIWfafnLJRqClw0xXIdn+9fp4LR6N7MJjK5AYHzY3Ox9t0CYmbyepA8GHPXcvSdV3DY0zgb3p6MBLuMgE7nB5FVzn0eFuOnkVxVJHioEvNuV52OIQ3Z60B3E9jjuchToA5XCMnDrjbIw8vBriED+cA7R2NAieU6h1OEaMlFr2wXE5PfSnA5Lab+oo6XoHRIhichPigLDtvy44UljxRknidia2SPh/2WZ2Y3XTi8Inbg9Q8CZ0xqxlJce/ZNg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
+ header.d=nxp.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=PNAU4tG4LDKaLE4dOcpQmzsvys6jZl+KhJmIziYWRfw=;
+ b=MAXuKwsTe0ZrCyS3rOS+xzYCga8OxspcEcXLtAj1jdP5Ia2RQgnjy8uBp0TlOjoJIp3Qc2DKJrWPJQ8eYp4u8lVAW86GGe3KIxAYCcFqcChHirgAXW7HWO8hRbdDOyL0yjJFf7TnsmkSX5lA3lVOpx+2LPEVrcIENhNRrMOIyWI=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=nxp.com;
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
+ by DU2PR04MB8552.eurprd04.prod.outlook.com (2603:10a6:10:2d7::5) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Fri, 30 Jun
+ 2023 22:20:22 +0000
+Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
+ ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
+ 22:20:22 +0000
+From: Vladimir Oltean <vladimir.oltean@nxp.com>
+To: netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
 	"David S. Miller" <davem@davemloft.net>,
 	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	John Johansen <john.johansen@canonical.com>,
-	Paul Moore <paul@paul-moore.com>, James Morris <jmorris@namei.org>,
-	"Serge E. Hallyn" <serge@hallyn.com>,
-	Stephen Smalley <stephen.smalley.work@gmail.com>,
-	Eric Paris <eparis@parisplace.org>, Juergen Gross <jgross@suse.com>,
-	Ruihan Li <lrh2000@pku.edu.cn>,
-	Laurent Pinchart <laurent.pinchart+renesas@ideasonboard.com>,
-	Wolfram Sang <wsa+renesas@sang-engineering.com>,
-	Udipto Goswami <quic_ugoswami@quicinc.com>,
-	Linyu Yuan <quic_linyyuan@quicinc.com>,
-	John Keeping <john@keeping.me.uk>,
-	Andrzej Pietrasiewicz <andrzej.p@collabora.com>,
-	Dan Carpenter <error27@gmail.com>, Yuta Hayama <hayama@lineo.co.jp>,
-	Jozef Martiniak <jomajm@gmail.com>, Jens Axboe <axboe@kernel.dk>,
-	Alan Stern <stern@rowland.harvard.edu>,
-	Sandeep Dhavale <dhavale@google.com>,
-	Dave Chinner <dchinner@redhat.com>,
-	Johannes Weiner <hannes@cmpxchg.org>,
-	ZhangPeng <zhangpeng362@huawei.com>,
-	Viacheslav Dubeyko <slava@dubeyko.com>,
-	Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>,
-	Aditya Garg <gargaditya08@live.com>,
-	Erez Zadok <ezk@cs.stonybrook.edu>,
-	Yifei Liu <yifeliu@cs.stonybrook.edu>, Yu Zhe <yuzhe@nfschina.com>,
-	"Matthew Wilcox (Oracle)" <willy@infradead.org>,
-	Oleg Kanatov <okanatov@gmail.com>,
-	"Dr. David Alan Gilbert" <linux@treblig.org>,
-	Jiangshan Yi <yijiangshan@kylinos.cn>, xu xin <cgel.zte@gmail.com>,
-	Stefan Roesch <shr@devkernel.io>,
-	Zhihao Cheng <chengzhihao1@huawei.com>,
-	"Liam R. Howlett" <Liam.Howlett@oracle.com>,
-	Alexey Dobriyan <adobriyan@gmail.com>,
-	Minghao Chi <chi.minghao@zte.com.cn>,
-	Seth Forshee <sforshee@digitalocean.com>,
-	Zeng Jingxiang <linuszeng@tencent.com>,
-	Bart Van Assche <bvanassche@acm.org>,
-	Mimi Zohar <zohar@linux.ibm.com>,
-	Roberto Sassu <roberto.sassu@huawei.com>,
-	Zhang Yi <yi.zhang@huawei.com>, Tom Rix <trix@redhat.com>,
-	"Fabio M. De Francesco" <fmdefrancesco@gmail.com>,
-	Chen Zhongjin <chenzhongjin@huawei.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>,
-	Rik van Riel <riel@surriel.com>,
-	Jingyu Wang <jingyuwang_vip@163.com>, Hangyu Hua <hbh25y@gmail.com>,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-	autofs@vger.kernel.org, linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	cluster-devel@redhat.com, linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
-	ocfs2-devel@oss.oracle.com, linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org, linux-unionfs@vger.kernel.org,
-	linux-hardening@vger.kernel.org, reiserfs-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org, samba-technical@lists.samba.org,
-	linux-trace-kernel@vger.kernel.org, linux-xfs@vger.kernel.org,
-	bpf@vger.kernel.org, netdev@vger.kernel.org,
-	apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org
-Subject: Re: [PATCH 01/79] fs: add ctime accessors infrastructure
-Message-ID: <ZJ9TW9MQmlqmbRU/@bombadil.infradead.org>
-References: <20230621144507.55591-1-jlayton@kernel.org>
- <20230621144507.55591-2-jlayton@kernel.org>
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: dsa: tag_sja1105: fix source port decoding in vlan_filtering=0 bridge mode
+Date: Sat,  1 Jul 2023 01:20:10 +0300
+Message-Id: <20230630222010.1691671-1-vladimir.oltean@nxp.com>
+X-Mailer: git-send-email 2.34.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: FR0P281CA0182.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:ab::13) To AM0PR04MB6452.eurprd04.prod.outlook.com
+ (2603:10a6:208:16d::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230621144507.55591-2-jlayton@kernel.org>
-Sender: Luis Chamberlain <mcgrof@infradead.org>
-X-Spam-Status: No, score=-4.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DU2PR04MB8552:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5b312475-9ca8-4905-cb78-08db79b831e3
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	NRIsjJ61weVo75Kz3/zvC1vbltHSaR0tapymMc75wLsNHIZeBxI3WRl3nL7anPZGyARpjhVoLW6KTuPdlvRMzyX25LLL9FkDb+tY/wsh/OkSxanujE5WMu4gjR7nOZacNAPVwbWGjSZ5AW9bielwZ6R+3dke5+neTt5dYOS1vqM/Gxst015hvV+l0PiZGX9KinrZiFgd9aomS9PriY2tGu6jad37dEWWZtSBZO9g+hYrCGuXnCKztFx9xxEuHxiLKmRK65jUoGebGiMIppvgCz1tzE1QCsBpLCB6su6683kQJiVrO4clAM+FXpU7wua2wJYbdY7U/b+2A04kx/QhHbG5iVYPdZMHQDmgxoZa2tTlDadLlFB094QSVRw4n3GYkP4m/nLazPc5AVITV4TciE4KZ9XXG8t8q12bLS05xINz1iDmiMtwYWelN3QA7z9ZPP9KBXV3Rri7CptA3/CGhMj0L+EGm55nsScocwcr31PsMbp/BltAhLkPYaCtegDUADMzCUK/i+cxJ3Tmc491kQLruIf9uvejFrHMSc+wLTy0hmPUB2nccocSntbA1ZgpL8eXIBzySw/cy4AIYAxhZa2mgp2y9bgVXotTeOs14KDWTAglA24qzRvxXq16LfzK
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(39860400002)(376002)(396003)(346002)(451199021)(52116002)(6666004)(6486002)(83380400001)(2616005)(186003)(26005)(1076003)(6506007)(5660300002)(86362001)(8676002)(44832011)(36756003)(2906002)(66946007)(54906003)(66556008)(66476007)(38350700002)(38100700002)(8936002)(316002)(4326008)(6916009)(41300700001)(478600001)(6512007);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?H8+PZ9QEC5QEWknLWLWfXvWXN7ksABjpknKKZHxbCcbazgWQpmL8VB36Pghp?=
+ =?us-ascii?Q?HFp+M3BzlowIHkS8UTicHDPRfutDV2cGYDp4BRzpF1aMbNNZVMzcuMkSJLkY?=
+ =?us-ascii?Q?YVyhH3d7hvEKIGg64CNVADtsCp5uQLRo+rTULobsVLaDJh2wb+n7xxc3kII4?=
+ =?us-ascii?Q?CcWtfmjXCDpjPPvzfUWX4gpBru6LoQusyp2lfTX5HJyP0IjsVb1/gXWyBlbm?=
+ =?us-ascii?Q?J5MFSZIlh+YlOHokAyW/9d0LmmANdQaz8STlqJ8tq1EC1mfAiTY8VPR5CWb3?=
+ =?us-ascii?Q?otTcn38xwHfymigInIsdneGI+sQVz9oSGuSe9IbWlugaPZZR3TY4lF/dLyce?=
+ =?us-ascii?Q?ek+6LgglW/jKA93bfJ47gOEamPcGtF0HlOg1ONTo2x+ayMqYqfhnLlDlDE6+?=
+ =?us-ascii?Q?zV+gQXUnwCzgnj31z1Tx4bQ+PE17riQ4zD4wEc6S61r6aTkWEIOmYHkUtflj?=
+ =?us-ascii?Q?I4IUbEuWz6A6jHgqGpdWsyvAaV3EVSPBRlIDwAx7o+eDnBDOqhSj5aqcfk1q?=
+ =?us-ascii?Q?GVQsVWcUU8d/41F7T10vHV30lYFvL1LYXcgsBkNpxzpkL56jqmQbV3QIydbP?=
+ =?us-ascii?Q?ZsjJRZtKsO855DSplj9CtPCYxHB7ehPsZ5rcu7QIQa7qNMZ2ZHcknzLzwBOY?=
+ =?us-ascii?Q?K/SIUODUXaJil03NUtXzRylXu8/xQPnt8gtLFDVoY81YCF6evmgM5CWSxNqe?=
+ =?us-ascii?Q?17lcQDafngSx8TTtNApxSQAkQF1g4BtJuTpQz+aOTvuCvx/1reOACNTK4bPb?=
+ =?us-ascii?Q?6TpYlt7TzoZEYBS957RHjJOZQUfiepZyv7gGfgowzrE4A/x3cCqwu1pdCNZL?=
+ =?us-ascii?Q?T1aciToih45Y2himVKZ6bMxFG1RPnlj0kIFU+soJNjkUrwRzUSbjJM2IAZ4m?=
+ =?us-ascii?Q?T/UB6g6iy2tdCFUf6JzIZXxjC7NScg3Hu3zZ71BG3GTLtK4SZEoc+tYMspzW?=
+ =?us-ascii?Q?cnOb+G0RaMzLoYtUC4YLFkzYjw5Esfrvh/wUp16fUX5pN8Ge/bv5vNhUm6N/?=
+ =?us-ascii?Q?U+3WKwMZQy/WFJxeyAsjV3TNgqUaVcILnklSdF8ROcmbydyaiQoD0WB4VpNu?=
+ =?us-ascii?Q?x4FV0hVqZVWg8oqFRy53E9HIrgTU+JN3FsKqvwGg5fYR86834sR1eHznYMYR?=
+ =?us-ascii?Q?Se7uWrnIo/gVq5HTn4fU8PZhyMt7u11mTbP0YIB0gEXYDsnpG0CZHRtYmXgV?=
+ =?us-ascii?Q?wOWyxRxs0Z5+yubZpbilNIDE0W/ecFD66XrnIM31Gb0iGVqpwk/mE7PK8/wz?=
+ =?us-ascii?Q?rBsbCyHLTzw0hrrE1XCTGNHtbFxSdEJhRTx6gryLHuH0p2dtFlfL83ubAU1U?=
+ =?us-ascii?Q?3JdFGXZ979WqbHPL2woW9bXw1SvV8ibPMoLGjZt6+m8QkyqekQ6dbgvWgdlf?=
+ =?us-ascii?Q?ROM1A1HWKIfdYqpY8jbnj0rjGm09pSv37ShlL21z4pT4dwSUxKv/gQ9xbPWz?=
+ =?us-ascii?Q?fiRMsaGHR/7Kf5HHlAwIx3M9qE34lCi3lot6GrSkZNWbKzpKgCqQaTcAqCQR?=
+ =?us-ascii?Q?5qoSRpucqZS79jDRd/QjCt/+FtVKUPlILV1mOIznUuh335f7jrWFn2r/AMN9?=
+ =?us-ascii?Q?PTUkRJcNbhZBxNqC+kPHQabkCCEL4mBDAxbRpa1W0d8QgSREzoqOJJ7i67f8?=
+ =?us-ascii?Q?KQ=3D=3D?=
+X-OriginatorOrg: nxp.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5b312475-9ca8-4905-cb78-08db79b831e3
+X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 22:20:22.2990
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: JrX/w2JwFJpP+Ph4XUhb1t/mg9v1xCzO4nWwqPsMIxtuFBfSwE/KOCTSfa+E6hkExUyS1ssqVkVlrINPks8JAA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8552
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
 	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 21, 2023 at 10:45:06AM -0400, Jeff Layton wrote:
-> struct timespec64 has unused bits in the tv_nsec field that can be used
-> for other purposes. In future patches, we're going to change how the
-> inode->i_ctime is accessed in certain inodes in order to make use of
-> them. In order to do that safely though, we'll need to eradicate raw
-> accesses of the inode->i_ctime field from the kernel.
-> 
-> Add new accessor functions for the ctime that we can use to replace them.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+There was a regression introduced by the blamed commit, where pinging to
+a VLAN-unaware bridge would fail with the repeated message "Couldn't
+decode source port" coming from the tagging protocol driver.
 
-Reviewed-by: Luis Chamberlain <mcgrof@kernel.org>
+When receiving packets with a bridge_vid as determined by
+dsa_tag_8021q_bridge_join(), dsa_8021q_rcv() will decode:
+- source_port = 0 (which isn't really valid, more like "don't know")
+- switch_id = 0 (which isn't really valid, more like "don't know")
+- vbid = value in range 1-7
 
-  Luis
+Since the blamed patch has reversed the order of the checks, we are now
+going to believe that source_port != -1 and switch_id != -1, so they're
+valid, but they aren't.
+
+The minimal solution to the problem is to only populate source_port and
+switch_id with what dsa_8021q_rcv() came up with, if the vbid is zero,
+i.e. the source port information is trustworthy.
+
+Fixes: c1ae02d87689 ("net: dsa: tag_sja1105: always prefer source port information from INCL_SRCPT")
+Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+---
+ net/dsa/tag_sja1105.c | 9 ++++++---
+ 1 file changed, 6 insertions(+), 3 deletions(-)
+
+diff --git a/net/dsa/tag_sja1105.c b/net/dsa/tag_sja1105.c
+index 796e4b88f63b..f480ffffa8c3 100644
+--- a/net/dsa/tag_sja1105.c
++++ b/net/dsa/tag_sja1105.c
+@@ -531,11 +531,14 @@ static struct sk_buff *sja1105_rcv(struct sk_buff *skb,
+ 		 * if available. This allows us to not overwrite a valid source
+ 		 * port and switch ID with zeroes when receiving link-local
+ 		 * frames from a VLAN-unaware bridged port (non-zero vbid) or a
+-		 * VLAN-aware bridged port (non-zero vid).
++		 * VLAN-aware bridged port (non-zero vid). Furthermore, the
++		 * tag_8021q source port information is only of trust when the
++		 * vbid is 0 (precise port). Otherwise, tmp_source_port and
++		 * tmp_switch_id will be zeroes.
+ 		 */
+-		if (source_port == -1)
++		if (vbid == 0 && source_port == -1)
+ 			source_port = tmp_source_port;
+-		if (switch_id == -1)
++		if (vbid == 0 && switch_id == -1)
+ 			switch_id = tmp_switch_id;
+ 	} else if (source_port == -1 && switch_id == -1) {
+ 		/* Packets with no source information have no chance of
+-- 
+2.34.1
+
 
