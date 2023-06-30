@@ -1,119 +1,184 @@
-Return-Path: <netdev+bounces-14742-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14743-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E49C743932
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:18:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CD2E74396B
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 12:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A9977280E7D
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 10:18:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CADFD1C20961
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 10:34:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0D7B111A1;
-	Fri, 30 Jun 2023 10:18:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B2CDE847F;
+	Fri, 30 Jun 2023 10:33:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7446F101C7
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:18:15 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id E7F7CC433C9;
-	Fri, 30 Jun 2023 10:18:14 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688120294;
-	bh=qayM9oDvTxb6Xm9+IkHuSoW95s/Sz5bR3jRGXkuJO58=;
-	h=References:In-Reply-To:From:Date:Subject:To:Cc:From;
-	b=SOMLE+INYiJ/acA/1G0GDI9Nk0eD+qUeVm/P78PDMCShmxklOilp8PCpsvV96tjF6
-	 chGnze4z5z+9g1jFh3fQczUXBEPS/zcDdmW6LQkDyWSCpfFhXyz6Bm5Pxppdne4DCa
-	 9kuwukULHA8cBeMJHPY5dm3pr5bg2dZ4yElNTFHksFj33ayNtWuWemSPCEfLreyGG5
-	 EzjFaqBU0NHpNP5q1eFioEG9YiqmLO2m7TUAFnel0UsF0yDPQC3BiEErEABv4ZIKoz
-	 fCvkMA6xBC3zw02FDrQOVGisGNnKh4A3a9MHnvZ7jIuYI/n4xlW3DKML+Z9EwHWTH5
-	 GB0Al6XTNL5lg==
-Received: by mail-lf1-f41.google.com with SMTP id 2adb3069b0e04-4fba03becc6so1465660e87.0;
-        Fri, 30 Jun 2023 03:18:14 -0700 (PDT)
-X-Gm-Message-State: AC+VfDwToh3xTVmVWOBD0+n3WceHRMVwQO285FyyIwXUSLQq47Y3saHi
-	Pd11CBjwkK9QQyIklK0DhtH/q//lsMTPLIgwGz8=
-X-Google-Smtp-Source: ACHHUZ62yhrg41OHYzO4jrmZmKlJ6tK+5JXq/WaWUIgKYUeiQTh9M/8eJuf0/P2mCB1KfN6YWSXtThd0s/Yqdt4Dius=
-X-Received: by 2002:a05:6512:3d87:b0:4fb:7bf8:51c8 with SMTP id
- k7-20020a0565123d8700b004fb7bf851c8mr2590243lfv.1.1688120292812; Fri, 30 Jun
- 2023 03:18:12 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9FEBA17D4
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:33:59 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2083.outbound.protection.outlook.com [40.107.237.83])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3F9435A0;
+	Fri, 30 Jun 2023 03:33:57 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=V5Npd76DPhbP60VXzKTU/NXTmms4e2uO6ywXtyR+b46TdJTq1VCV64vdjhHePrT1t3vLklKTamolN9Jf7/g0gse09oAVA8CRo5jkc8sRxar3B5EKkBbdoDWZxYW4m6iiZbzH6jst7LQozFOGeEOj/d09IILuVVb/XA6vcPmAa9D+7GP+JXQPEPF7ZjqkVVDDV3pC28gNJvsTXc/E6kV/ouOGwtpMruVgpXNTRkregunytf91BulWiQZIryXDg83YQzYkhj/6UqTxbpw73msQNwVtb7LXNTYaCZRrCt698jGLTWE//pkBmwwFztTCRLGcDLZstTaIe76QJVxhfNg8tA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=TL4c+OPviGSQDv5O67ryfWB2soQ+mY/5e75OBRUsY/k=;
+ b=NlU4j3vDPvt2IqRCdQpiaT8Mp9phhS76NqKKKKo4NGYFtkfRnWZvpWR94xkyHj9cFzhpV2XjV220Fy2SyO2R4MAe7xDpEUNZcpdhggZ7EQjMEjbhrxgScwhoKIQDC1za02DiOP0aLQVY/H/6gi+sipfPSO8hqV/QJrN+AT9jYpIvdYGj3McMpPJTqN4WoMatEWFQQcIe1EK/lJ0OMc3Mn53EUOEYgpfpoIVfgvspPL6PxKCloiTBXneyIXdQ2gRU5xw10LvfuM1W2mlsMNgiV7tOvt1jBZZWBCUbE1/A7s41+mKeWRA4QOq1lm/g+C7ir+TOKTnsG29U52sFByn+mw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=kernel.org smtp.mailfrom=amd.com; dmarc=pass
+ (p=quarantine sp=quarantine pct=100) action=none header.from=amd.com;
+ dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=TL4c+OPviGSQDv5O67ryfWB2soQ+mY/5e75OBRUsY/k=;
+ b=XXwOxY8AGnXx6GCE697xIYNe0tXTAvR0fGXYdfZ7a5BB/sFHZthfxQTihZdRjh3IyrmYGRqlFVbHmXDwmC7aj1NDe1kKHCCa1wnGKemQCZZc0rcQxCaklUEZjR8rLbMLXANr716B3qaPXbeQ4GzSW1oXzkmL1Ib62x2IQ7aGKdw=
+Received: from DM6PR21CA0001.namprd21.prod.outlook.com (2603:10b6:5:174::11)
+ by SA1PR12MB7409.namprd12.prod.outlook.com (2603:10b6:806:29c::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.21; Fri, 30 Jun
+ 2023 10:33:54 +0000
+Received: from DM6NAM11FT089.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:5:174:cafe::8b) by DM6PR21CA0001.outlook.office365.com
+ (2603:10b6:5:174::11) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.13 via Frontend
+ Transport; Fri, 30 Jun 2023 10:33:54 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ DM6NAM11FT089.mail.protection.outlook.com (10.13.173.82) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6521.43 via Frontend Transport; Fri, 30 Jun 2023 10:33:54 +0000
+Received: from equan-buildpc.amd.com (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Fri, 30 Jun
+ 2023 05:33:46 -0500
+From: Evan Quan <evan.quan@amd.com>
+To: <rafael@kernel.org>, <lenb@kernel.org>, <Alexander.Deucher@amd.com>,
+	<Christian.Koenig@amd.com>, <Xinhui.Pan@amd.com>, <airlied@gmail.com>,
+	<daniel@ffwll.ch>, <johannes@sipsolutions.net>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<Mario.Limonciello@amd.com>, <mdaenzer@redhat.com>,
+	<maarten.lankhorst@linux.intel.com>, <tzimmermann@suse.de>,
+	<hdegoede@redhat.com>, <jingyuwang_vip@163.com>, <Lijo.Lazar@amd.com>,
+	<jim.cromie@gmail.com>, <bellosilicio@gmail.com>, <andrealmeid@igalia.com>,
+	<trix@redhat.com>, <jsg@jsg.id.au>, <arnd@arndb.de>
+CC: <linux-kernel@vger.kernel.org>, <linux-acpi@vger.kernel.org>,
+	<amd-gfx@lists.freedesktop.org>, <dri-devel@lists.freedesktop.org>,
+	<linux-wireless@vger.kernel.org>, <netdev@vger.kernel.org>, Evan Quan
+	<evan.quan@amd.com>
+Subject: [PATCH V5 0/9] Enable Wifi RFI interference mitigation feature support
+Date: Fri, 30 Jun 2023 18:32:31 +0800
+Message-ID: <20230630103240.1557100-1-evan.quan@amd.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <0000000000008a7ae505aef61db1@google.com> <20200911170150.GA889@sol.localdomain>
- <c16e9ab9-13e0-b911-e33a-c9ae81e93a8d@I-love.SAKURA.ne.jp>
- <CAMj1kXFqYozjJ+qPeSApESb0Cb6CUaGXBrs5LP81ERRvb3+TAw@mail.gmail.com>
- <59e1d5c0-aedb-7b5b-f37f-0c20185d7e9b@I-love.SAKURA.ne.jp>
- <CAMj1kXGHRUUFYL09Lm-mO6MfGc19rC=-7mSJ1eDTcbw7QuEkaw@mail.gmail.com> <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
-In-Reply-To: <CAG_fn=X+eU=-WLXASidBCHWS3L7RvtN=mx3Bj8GD9GcA=Htf2w@mail.gmail.com>
-From: Ard Biesheuvel <ardb@kernel.org>
-Date: Fri, 30 Jun 2023 12:18:01 +0200
-X-Gmail-Original-Message-ID: <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
-Message-ID: <CAMj1kXFrsc7bsjo2i0=9AqVNSCvXEnYAukzoXeaYEH9EpNviBA@mail.gmail.com>
-Subject: Re: [PATCH] net: tls: enable __GFP_ZERO upon tls_init()
-To: Alexander Potapenko <glider@google.com>
-Cc: Tetsuo Handa <penguin-kernel@i-love.sakura.ne.jp>, Boris Pismenny <borisp@nvidia.com>, 
-	John Fastabend <john.fastabend@gmail.com>, Jakub Kicinski <kuba@kernel.org>, herbert@gondor.apana.org.au, 
-	linux-crypto@vger.kernel.org, syzkaller-bugs@googlegroups.com, 
-	syzbot <syzbot+828dfc12440b4f6f305d@syzkaller.appspotmail.com>, 
-	Eric Biggers <ebiggers@kernel.org>, Aviad Yehezkel <aviadye@nvidia.com>, 
-	Daniel Borkmann <daniel@iogearbox.net>, netdev@vger.kernel.org, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6NAM11FT089:EE_|SA1PR12MB7409:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2700e21f-017c-4738-c7a5-08db795580ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	RnqiAibPXjfzzv4xCdE+nfvuAPJSXqID5S+2FhTdOGBOJO7gR1JeEqy++NXQdCukP3hxvjlhtwTOE8oecAnTqnHbUO6R7554/My0vbJh6OQ5zlQdZ/fHdGhA4H7HkLzoK9geRgi2xs1NwxL6i0nzZutRvFiUDL9YNb131I+BFEzzJVPO9bG0Ybtl4Lmosn7EGMUAG4ifEFb3/HUfvpMDB4tzNPTjo/xn88DLvGf7+ClPv5P1ew+ApCDuzD9FLAgVnuj7pjXPqYHPF1Wiu575yptnCo+5q2SXHU36ANbg3Nzt+j+yTBXl7sBGTsobiH+D2JBJW+thfB+CKOOwrqiQWS9XQ5bm2DuQFMxeIx/DfGvyQ5YvJy/5xxtXFwZz2f498hIU0u/8OZPNIU+GjVR9m8Qm7WSH4gFtUcoVDfbSxnaT+OkRpPCVuXUFVLWAVRWl4JhW6XEBuaPOBNb2DixPPu8yK1XFCMETkXPleGsPAWw0B61M6llpdjA46Mq/bpOqHmRyHU57jl/ie3d16I3HRgQJBEgpjnGIBU2JnHYZIPoFLaULUfcnYpshjPQN7PwRTEWevVAnoJ3NWb7CR3k9GiD8hI1D119jYTR5WLZJc0pyg4/l0gxBe8McECWCoAU9AhkrbjtyxtuidJjJdiCpvauS/+lmH/cSN+8RSwXNHQEVv3kUfCunASIWLEqNGKaj6rpRXCe4TlD+AhXuQ1ze4plpSj57HPvWsQtdLQYr7kFtaY0+jULN1OxXR1WMgyJ4KerLUKqCBOAKxuWpDgL9kf1Rfy+xvFyqBZmhONXU7Uw4oxe6H1ZZQDKeK1n8NpTVZMNLjjGgOJBydrcGYq4+zQ==
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(396003)(346002)(39860400002)(451199021)(40470700004)(46966006)(36840700001)(82310400005)(36860700001)(478600001)(54906003)(16526019)(6666004)(7696005)(2616005)(110136005)(426003)(336012)(83380400001)(1076003)(186003)(26005)(2906002)(47076005)(40480700001)(7416002)(86362001)(921005)(44832011)(4326008)(70206006)(41300700001)(356005)(40460700003)(5660300002)(36756003)(70586007)(82740400003)(81166007)(316002)(8676002)(8936002)(2101003)(36900700001)(83996005);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 10:33:54.4589
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2700e21f-017c-4738-c7a5-08db795580ee
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	DM6NAM11FT089.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR12MB7409
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 30 Jun 2023 at 12:11, Alexander Potapenko <glider@google.com> wrote=
-:
->
-> On Fri, Jun 30, 2023 at 12:02=E2=80=AFPM Ard Biesheuvel <ardb@kernel.org>=
- wrote:
-> >
-> > On Fri, 30 Jun 2023 at 11:53, Tetsuo Handa
-> > <penguin-kernel@i-love.sakura.ne.jp> wrote:
-> > >
-> > > On 2023/06/30 18:36, Ard Biesheuvel wrote:
-> > > > Why are you sending this now?
-> > >
-> > > Just because this is currently top crasher and I can reproduce locall=
-y.
-> > >
-> > > > Do you have a reproducer for this issue?
-> > >
-> > > Yes. https://syzkaller.appspot.com/text?tag=3DReproC&x=3D129316219000=
-00 works.
-> > >
-> >
-> > Could you please share your kernel config and the resulting kernel log
-> > when running the reproducer? I'll try to reproduce locally as well,
-> > and see if I can figure out what is going on in the crypto layer
->
-> The config together with the repro is available at
-> https://syzkaller.appspot.com/bug?extid=3D828dfc12440b4f6f305d, see the
-> latest row of the "Crashes" table that contains a C repro.
+Due to electrical and mechanical constraints in certain platform designs there may
+be likely interference of relatively high-powered harmonics of the (G-)DDR memory
+clocks with local radio module frequency bands used by Wifi 6/6e/7. To mitigate
+possible RFI interference producers can advertise the frequencies in use and
+consumers can use this information to avoid using these frequencies for
+sensitive features.
 
-Could you explain why that bug contains ~50 reports that seem entirely
-unrelated? AIUI, this actual issue has not been reproduced since
-2020??
+The whole patch set is based on Linux 6.4. With some brief introductions as below:
+Patch1 - 2:  Core functionality setup for WBRF feature support
+Patch3 - 4:  Bring WBRF support to wifi subsystem.
+Patch5 - 9:  Bring WBRF support to AMD graphics driver.
 
+Evan Quan (9):
+  drivers core: Add support for Wifi band RF mitigations
+  driver core: add ACPI based WBRF mechanism introduced by AMD
+  cfg80211: expose nl80211_chan_width_to_mhz for wide sharing
+  wifi: mac80211: Add support for ACPI WBRF
+  drm/amd/pm: update driver_if and ppsmc headers for coming wbrf feature
+  drm/amd/pm: setup the framework to support Wifi RFI mitigation feature
+  drm/amd/pm: add flood detection for wbrf events
+  drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.0
+  drm/amd/pm: enable Wifi RFI mitigation feature support for SMU13.0.7
 
-> Config: https://syzkaller.appspot.com/text?tag=3DKernelConfig&x=3Dee5f7a0=
-b2e48ed66
-> Report: https://syzkaller.appspot.com/text?tag=3DCrashReport&x=3D1325260d=
-900000
-> Syz repro: https://syzkaller.appspot.com/text?tag=3DReproSyz&x=3D11af973e=
-900000
-> C repro: https://syzkaller.appspot.com/text?tag=3DReproC&x=3D163a1e459000=
-00
->
-> The bug is reproducible for me locally as well (and Tetsuo's patch
-> makes it disappear, although I have no opinion on its correctness).
+ drivers/acpi/Makefile                         |   2 +
+ drivers/acpi/amd_wbrf.c                       | 236 +++++++++++++++++
+ drivers/base/Kconfig                          |  37 +++
+ drivers/base/Makefile                         |   1 +
+ drivers/base/wbrf.c                           | 250 ++++++++++++++++++
+ drivers/gpu/drm/amd/amdgpu/amdgpu.h           |   1 +
+ drivers/gpu/drm/amd/amdgpu/amdgpu_drv.c       |  19 ++
+ drivers/gpu/drm/amd/pm/swsmu/amdgpu_smu.c     | 214 +++++++++++++++
+ drivers/gpu/drm/amd/pm/swsmu/inc/amdgpu_smu.h |  33 +++
+ .../inc/pmfw_if/smu13_driver_if_v13_0_0.h     |  14 +-
+ .../inc/pmfw_if/smu13_driver_if_v13_0_7.h     |  14 +-
+ .../pm/swsmu/inc/pmfw_if/smu_v13_0_0_ppsmc.h  |   3 +-
+ .../pm/swsmu/inc/pmfw_if/smu_v13_0_7_ppsmc.h  |   3 +-
+ drivers/gpu/drm/amd/pm/swsmu/inc/smu_types.h  |   3 +-
+ drivers/gpu/drm/amd/pm/swsmu/inc/smu_v13_0.h  |   3 +
+ .../gpu/drm/amd/pm/swsmu/smu13/smu_v13_0.c    |   9 +
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_0_ppt.c  |  60 +++++
+ .../drm/amd/pm/swsmu/smu13/smu_v13_0_7_ppt.c  |  59 +++++
+ drivers/gpu/drm/amd/pm/swsmu/smu_internal.h   |   3 +
+ include/linux/acpi_amd_wbrf.h                 |  38 +++
+ include/linux/ieee80211.h                     |   1 +
+ include/linux/wbrf.h                          |  67 +++++
+ include/net/cfg80211.h                        |   8 +
+ net/mac80211/Makefile                         |   2 +
+ net/mac80211/chan.c                           |   9 +
+ net/mac80211/ieee80211_i.h                    |  19 ++
+ net/mac80211/main.c                           |   2 +
+ net/mac80211/wbrf.c                           | 103 ++++++++
+ net/wireless/chan.c                           |   3 +-
+ 29 files changed, 1210 insertions(+), 6 deletions(-)
+ create mode 100644 drivers/acpi/amd_wbrf.c
+ create mode 100644 drivers/base/wbrf.c
+ create mode 100644 include/linux/acpi_amd_wbrf.h
+ create mode 100644 include/linux/wbrf.h
+ create mode 100644 net/mac80211/wbrf.c
 
-What I'd like to do is run a kernel plus initrd locally in OVMF and
-reproduce the issue - can I do that without all the syzkaller
-machinery?
+-- 
+2.34.1
+
 
