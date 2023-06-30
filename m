@@ -1,134 +1,100 @@
-Return-Path: <netdev+bounces-14842-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C40427440D3
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:06:20 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4B80F7440E2
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:08:54 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 80BB428107A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 17:06:19 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0707128103A
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 17:08:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D6FB6171A4;
-	Fri, 30 Jun 2023 17:06:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23499171AF;
+	Fri, 30 Jun 2023 17:08:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C28CD14ABE
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 17:06:17 +0000 (UTC)
-Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0948744B5
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:06:01 -0700 (PDT)
-Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-401d1d967beso12581cf.0
-        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:06:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688144761; x=1690736761;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=riTO/grPDZ55sJUFtDGs5IWfkc5C+Aycg7bgbdVos2Y=;
-        b=J+xjce26LqPHzQlJe9gjYeRpnYUWDRWXYT8KsGJNQhnUTvq+j9TGe14XcPRzeYl8xL
-         8s/K8PdnRY+nvBc5sHNxYdeh092trMHegb/RezXScKwk6ie35Vnld2Y1EqOKj3+1HcVz
-         HYXkfZFl5BSQx9OYkI2bifbyc2qT3DsOFB6rZKQfpFUEjkROxKtu4E5FOb9kU84/9pIw
-         wZQMMA17RtfMY0KqHDw0+n3Q0FUuUmwWOpBTA69kq7V4Ysr8DATAA36rh2g0sglemSLW
-         NLVRhxa98EHsZ2f54ry2UCtSTgKq6Mmjm50kUunMcsg2wRdeEcxyX5olKlEQHkoeY01P
-         5Phw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688144761; x=1690736761;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=riTO/grPDZ55sJUFtDGs5IWfkc5C+Aycg7bgbdVos2Y=;
-        b=a0p2cnZWMMA70O1qVe3mBgQDXto+cHeu0pe93Krvf0GCsHWF4JwCtGD3jdy0jKA4QW
-         m8iz3RYHfW3mK66dVF8ucC+SztdySLKrMqtT3GzTCdw6GfN4BqELAnxiA/x2w8sEwfuN
-         M4EqbMx9hRf/3KanyNdypnrEEwW5uSL1EXd4nC5yEX/MAYRlyfYW4gyzDfowbta2zq95
-         JYrOhMayqnqocv/zm/5/8AopJl/FW9wntDM90KyzkFp44ePleX4Pvp9WSk+N54P5/T9h
-         3GzucZwjlpBksfDbn7vPvJn7pk0hpgP/wq/sgOD7BaOmzYeGB+7kjSvrzumraH0L+zaj
-         Cxyw==
-X-Gm-Message-State: AC+VfDyW/x6rtCWxXg8h1ZyH11SEXDlXzYl5RKAI4rQrFAS6mrzJH/IZ
-	eGQSQaBy+SxZPv7scsUkPIv1ROKZR0X799DEp6+hNw==
-X-Google-Smtp-Source: ACHHUZ7EBR/F2cUDeM6l6y75iwLl3JZ2XTNrUHGID7YOV5/wjDUKmLuM0lqYNotZGcjFUcGk2mu1lV3y2BRvJu1sbX8=
-X-Received: by 2002:a05:622a:ca:b0:3d6:5f1b:1e7c with SMTP id
- p10-20020a05622a00ca00b003d65f1b1e7cmr796100qtw.9.1688144760712; Fri, 30 Jun
- 2023 10:06:00 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1336C168DA
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 17:08:50 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5994D35B6
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:08:49 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=JKbZAJo+Gsc90i9iVK6YnrqT3QsBEPyAupa061obTYg=; b=MQwJg5YclFPstdYVmNIU+l2PAt
+	J5ooiOuLK14cB8u4xgexYmR7w88OSdIat0CnGYxA9qX5rM/sd4DPNqPnzLiVWwTJRf3uYOBTCHZxm
+	bLGp3m4CrjvP2C3WDM5h5jqUcF8okkkBj+HKu28mHFQyqaHcjCy+SJpX9EDOr8j5wD/o=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qFHbz-000KCG-9U; Fri, 30 Jun 2023 19:08:47 +0200
+Date: Fri, 30 Jun 2023 19:08:47 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
+Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
+Subject: Re: Disable TX path on eth I/F from driver?
+Message-ID: <56dac46c-37f8-431b-82b2-bfa75e9e63a2@lunn.ch>
+References: <e267c94aad6f2a7f0427832d13afc60e6bcd5c6e.camel@infinera.com>
+ <abb946fd-3acd-4353-8cda-72773914455d@lunn.ch>
+ <377d93c3816a3c63269b894e3d865baace175966.camel@infinera.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230630153759.3349299-1-maze@google.com>
-In-Reply-To: <20230630153759.3349299-1-maze@google.com>
-From: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
-Date: Fri, 30 Jun 2023 19:05:48 +0200
-Message-ID: <CANP3RGdLCJjx1bfk=dBh_rgVH_6RpxoUukM+UgYF5E8rrkVF9A@mail.gmail.com>
-Subject: Re: [PATCH] FYI 6.4 xfrm_prepare_input/xfrm_inner_mode_encap_remove
- WARN_ON hit - related to ESPinUDP
-To: =?UTF-8?Q?Maciej_=C5=BBenczykowski?= <zenczykowski@gmail.com>
-Cc: Linux Network Development Mailing List <netdev@vger.kernel.org>, Herbert Xu <herbert@gondor.apana.org.au>, 
-	Steffen Klassert <steffen.klassert@secunet.com>, Benedict Wong <benedictwong@google.com>, 
-	Lorenzo Colitti <lorenzo@google.com>, Yan Yan <evitayan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,USER_IN_DEF_SPF_WL
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <377d93c3816a3c63269b894e3d865baace175966.camel@infinera.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 5:38=E2=80=AFPM Maciej =C5=BBenczykowski <maze@goog=
-le.com> wrote:
-> Steffan, this isn't of course a patch meant for inclusion, instead just a=
- WARN_ON hit report.
+On Fri, Jun 30, 2023 at 04:57:31PM +0000, Joakim Tjernlund wrote:
+> On Fri, 2023-06-30 at 18:50 +0200, Andrew Lunn wrote:
+> > On Fri, Jun 30, 2023 at 03:48:15PM +0000, Joakim Tjernlund wrote:
+> > > We have a few eth I/F that is for monitoring only, if any TX one gets:
+> > > NETDEV WATCHDOG: trap0 (xr-ccip): transmit queue 0 timed out
+> > > [   55.903074] WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:477 dev_watchdog+0x138/0x160
+> > > [   55.911380] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.15.109-00161-g1268ae25c302-dirty #7
+> > > <long trace snipped>
+> > > 
+> > > I would like to, from within the driver, disable the TX path so the IP stack cannot TX any
+> > > pkgs but cannot find a way to do so.
+> > > Is there a way(to at least avid the NETDEV WATCHDOG msg) disable TX?
+> > > On kernel 5.15
+> > 
+> > Have you tried using TC or iptables to just unconditionally drop all
+> > packets?
+> > 
+> 
+> No, this is an embedded target with no iptables/TC
+> Would be much nicer if I could do this in driver.
 
-Sorry for the name typo (it's Stefan in Polish).
+I would argue it is much uglier. You need to hack the kernel driver to
+throw away packets, vs just installing a couple extra packages and us
+a supported mechanism to throw packets away.
 
-> The patch is simply what prints the following extra info:
->
-> xfrm_prepare_input: XFRM_MODE_SKB_CB(skb)->protocol: 17
-> xfrm_inner_mode_encap_remove: x->props.mode: 1 XFRM_MODE_SKB_SB(skb)->pro=
-tocol:17
->
-> (note: XFRM_MODE_TUNNEL=3D1 IPPROTO_UDP=3D17)
->
-> Hit on Linux 6.4 by:
->   https://cs.android.com/android/platform/superproject/+/master:kernel/te=
-sts/net/test/xfrm_test.py
->
-> likely related to line 230:
->   encap_sock.setsockopt(IPPROTO_UDP, xfrm.UDP_ENCAP, xfrm.UDP_ENCAP_ESPIN=
-UDP)
->
-> I'm not the author of these tests, and I know very little about XFRM.
-> As such, I'm not sure if there isn't a bug in the tests themselves...
-> maybe we're generating invalid packets that aren't meant to be decapsulat=
-ed???
->
-> Or are we missing some sort of assignment inside of the ESP in UDP decap =
-codepath?
->
-> Somewhere in the vicinity of xfrm4_udp_encap_rcv / xfrm4_rcv_encap
-> (and the v6 equivalents)
+Anyway, if you want to hack the driver, simply replace its
+.ndo_start_xmit with
 
-I've done some bisection (well more like educated guesswork)
-and the regression (if one should call it that?) is caused by 6.4
+https://elixir.bootlin.com/linux/v6.4/source/drivers/net/dummy.c#L59
 
-commit 5f24f41e8ea62a6a9095f9bbafb8b3aebe265c68
-Author: Herbert Xu <herbert@gondor.apana.org.au>
-    xfrm: Remove inner/outer modes from input path
+static netdev_tx_t dummy_xmit(struct sk_buff *skb, struct net_device *dev)
+{
+	dev_lstats_add(dev, skb->len);
 
-The xfrm tests pass either way, but with the above reverted it no
-longer triggers the WARN_ON.
+	skb_tx_timestamp(skb);
+	dev_kfree_skb(skb);
+	return NETDEV_TX_OK;
+}
 
-$ git log --decorate --oneline --graph -n 3
-* da7dc0870b19 (HEAD) Revert "xfrm: Remove inner/outer modes from
-input path"  <-- passes, doesn't warn
-* 51d5381c5809 ANDROID: net: xfrm: make PF_KEY SHA256 use
-RFC-compliant truncation.  <-- passes, does warn
-* 5f24f41e8ea6 xfrm: Remove inner/outer modes from input path  <--
-passes xfrm, fails pf_key, warns
+	Andrew
 
