@@ -1,70 +1,66 @@
-Return-Path: <netdev+bounces-14883-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14884-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BEF847444C6
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 00:20:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AFE67444E9
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 00:35:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 92A471C20C5F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 22:20:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4107A1C20BC1
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 22:35:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 498881775B;
-	Fri, 30 Jun 2023 22:20:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 24E7D8820;
+	Fri, 30 Jun 2023 22:35:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35219174F0
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 22:20:27 +0000 (UTC)
-Received: from EUR05-AM6-obe.outbound.protection.outlook.com (mail-am6eur05on2082.outbound.protection.outlook.com [40.107.22.82])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57AA0BC;
-	Fri, 30 Jun 2023 15:20:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1824720EB
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 22:35:34 +0000 (UTC)
+Received: from EUR03-AM7-obe.outbound.protection.outlook.com (mail-am7eur03on2131.outbound.protection.outlook.com [40.107.105.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1175F3C01;
+	Fri, 30 Jun 2023 15:35:33 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=TDRE2ABPPfff0DmNRi9h12HZY+lGEDzxjyB3dMoHPMrI0HiKt9SDdB4yaR+H5yBk21FfN3kTY/G6ZQI8wWiNVFa0pLxrOIzAEBUbZj6TwqGR1XJu5r9cxovuUDVXn7XimUrw8BkRrScoeuguiSOxPWLZwDD4uFRlW70dhnpxGqVWZlDeuD28aRPAxkdFutTc24xWWQPRst/vZBNnYUXDvrMcFpALzJ8CUiPNlW9HIFr0fkjgpZx4tcEqoUKFb6VWAzYJfru9mSO/eidAuMdzjrAa7Dv+UQvV+6k9D5keH2Z2Sr+QAKaeMTOoz13cayBNn0kJi/jBN3HTewwkL8Nfhw==
+ b=BZoRw0qpqZLfkfcxNx6DJ3hW8VZKEOxH4prAQ8RjSK/Pv4vvZSkQGiVJJod44cekgvoaSujYpRqdVe6tLVwcXkScCsO7Jw5ssqQVmW/TL5kbziRRwk+Oi54St3G+2XGv2X45OyXGHAKnKujb/itheAQcZXZZrHU5/ZSZTi7dfGNJ88BRxjJDvcf6WdjQOOAi44N8rj4yLKcRdzue0mgc/ggdGYK8t449UtSgJuD79JZ5bEMS/9S2DAMSlxvyoenTHnbYNh6Y8FElPFQwnW/zwyyD7/SyZ7/ShGlr+GzAPKNQSXGdY3u8+rsVcd6l/pv4Bt5c8CthXHK8HUvdiFQBbg==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=PNAU4tG4LDKaLE4dOcpQmzsvys6jZl+KhJmIziYWRfw=;
- b=MfiJvcIktXN6uxO6HNx5SIpsxiqoRpHbBg0zCbaqKIHIgQ+71WoBiDJlaiTI9SE5MeLV8Gs6/2u5TRywzfvY35IOi0JIWfafnLJRqClw0xXIdn+9fp4LR6N7MJjK5AYHzY3Ox9t0CYmbyepA8GHPXcvSdV3DY0zgb3p6MBLuMgE7nB5FVzn0eFuOnkVxVJHioEvNuV52OIQ3Z60B3E9jjuchToA5XCMnDrjbIw8vBriED+cA7R2NAieU6h1OEaMlFr2wXE5PfSnA5Lab+oo6XoHRIhichPigLDtvy44UljxRknidia2SPh/2WZ2Y3XTi8Inbg9Q8CZ0xqxlJce/ZNg==
+ bh=hKAVY2BJw0Z3yET/eE2eSiJDvutEBXQjAhgEVZxMlPY=;
+ b=hCbLTQd82HjQ5y0gn/5/eYUSFC9gFpiybGxsNEtydCS1jqkOBFsNJ9twH1wZD5D6RH//ZVjhBVvIO7bmEbXN7qGJ1ds256vqGuWucsA4x1Pqkht3yiewEqYoPxJeqCd97zdBrSXV2+OxTEwNQ9TAsSUUDcJBjbsVDYGvPn4fPA+0ymVQHwLseHVxdUhEjcKFPvva75zYCYqRDQ3eQWRFdP89j5mzx4JkaT3Eyia6NTftgNDwEi8xga7YkROjJkhTOJtRIZQA/Wqm25GkIZtrvAecMJv9DbLkJZD9TGsDm7ifKcauk++egDhEdJAHOhpnZ+8S/WVB+13Lb7yspTZPSA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
+ smtp.mailfrom=cvut.cz; dmarc=pass action=none header.from=cvut.cz; dkim=pass
+ header.d=cvut.cz; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=cvut.cz; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=PNAU4tG4LDKaLE4dOcpQmzsvys6jZl+KhJmIziYWRfw=;
- b=MAXuKwsTe0ZrCyS3rOS+xzYCga8OxspcEcXLtAj1jdP5Ia2RQgnjy8uBp0TlOjoJIp3Qc2DKJrWPJQ8eYp4u8lVAW86GGe3KIxAYCcFqcChHirgAXW7HWO8hRbdDOyL0yjJFf7TnsmkSX5lA3lVOpx+2LPEVrcIENhNRrMOIyWI=
+ bh=hKAVY2BJw0Z3yET/eE2eSiJDvutEBXQjAhgEVZxMlPY=;
+ b=Wk9N/RFdZrIWDB3Ga7cy7ckS/HhuHQpXF9wH5ZOpJ96TDVDjJqbBlO/xxX9Ma7I8+8kO1tRsGgoP4Xh+m9Y0d5wEdQpQOqPtBP/NK3H63zKsl8RnQve62Oq7xo+i4nlUTbNB+qgoI+x2ugBopycGyyRMwjvKp4FYhOgrMt3WJg+UlNgTnIgxIbg8m99bHEvRboqWHFqB05ewYb0i4wIDqvzChMNk4kTNjxLbg04ZZ3Nlnx0XMvzW0bs5ySnDwLiDzA51MvSsUE7k1LzSkvd+rLAUztTMNRkNwU44bSLOBjJAGpw43cj4CzE7HHEvT7Y3Rlrzi2PYWv3+bu/IRv2RNQ==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com (2603:10a6:208:16d::21)
- by DU2PR04MB8552.eurprd04.prod.outlook.com (2603:10a6:10:2d7::5) with
- Microsoft SMTP Server (version=TLS1_2,
+ header.d=none;dmarc=none action=none header.from=cvut.cz;
+Received: from AM6PR0602MB3749.eurprd06.prod.outlook.com
+ (2603:10a6:209:1e::32) by AM9PR06MB8019.eurprd06.prod.outlook.com
+ (2603:10a6:20b:3a5::21) with Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Fri, 30 Jun
- 2023 22:20:22 +0000
-Received: from AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c40e:d76:fd88:f460]) by AM0PR04MB6452.eurprd04.prod.outlook.com
- ([fe80::c40e:d76:fd88:f460%5]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
- 22:20:22 +0000
-From: Vladimir Oltean <vladimir.oltean@nxp.com>
-To: netdev@vger.kernel.org
-Cc: Andrew Lunn <andrew@lunn.ch>,
-	Florian Fainelli <f.fainelli@gmail.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	linux-kernel@vger.kernel.org
-Subject: [PATCH net] net: dsa: tag_sja1105: fix source port decoding in vlan_filtering=0 bridge mode
-Date: Sat,  1 Jul 2023 01:20:10 +0300
-Message-Id: <20230630222010.1691671-1-vladimir.oltean@nxp.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
+ 2023 22:35:25 +0000
+Received: from AM6PR0602MB3749.eurprd06.prod.outlook.com
+ ([fe80::ae5:23c0:ec83:bedf]) by AM6PR0602MB3749.eurprd06.prod.outlook.com
+ ([fe80::ae5:23c0:ec83:bedf%6]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
+ 22:35:21 +0000
+From: Michal Sojka <michal.sojka@cvut.cz>
+To: Maxime Jayat <maxime.jayat@mobile-devices.fr>, Oliver Hartkopp
+ <socketcan@hartkopp.net>, Marc Kleine-Budde <mkl@pengutronix.de>
+Cc: linux-can@vger.kernel.org, netdev@vger.kernel.org,
+ linux-kernel@vger.kernel.org, "Dae R. Jeong" <threeearcat@gmail.com>,
+ Hillf Danton <hdanton@sina.com>
+Subject: Re: can: isotp: epoll breaks isotp_sendmsg
+In-Reply-To: <11328958-453f-447f-9af8-3b5824dfb041@munic.io>
+References: <11328958-453f-447f-9af8-3b5824dfb041@munic.io>
+Date: Sat, 01 Jul 2023 00:35:18 +0200
+Message-ID: <87cz1czihl.fsf@steelpick.2x.cz>
 Content-Type: text/plain
-X-ClientProxiedBy: FR0P281CA0182.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:ab::13) To AM0PR04MB6452.eurprd04.prod.outlook.com
- (2603:10a6:208:16d::21)
+X-ClientProxiedBy: VI1PR0102CA0032.eurprd01.prod.exchangelabs.com
+ (2603:10a6:802::45) To AM6PR0602MB3749.eurprd06.prod.outlook.com
+ (2603:10a6:209:1e::32)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -72,56 +68,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: AM0PR04MB6452:EE_|DU2PR04MB8552:EE_
-X-MS-Office365-Filtering-Correlation-Id: 5b312475-9ca8-4905-cb78-08db79b831e3
+X-MS-TrafficTypeDiagnostic: AM6PR0602MB3749:EE_|AM9PR06MB8019:EE_
+X-MS-Office365-Filtering-Correlation-Id: 5144e4f1-8102-4848-11fb-08db79ba4985
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	NRIsjJ61weVo75Kz3/zvC1vbltHSaR0tapymMc75wLsNHIZeBxI3WRl3nL7anPZGyARpjhVoLW6KTuPdlvRMzyX25LLL9FkDb+tY/wsh/OkSxanujE5WMu4gjR7nOZacNAPVwbWGjSZ5AW9bielwZ6R+3dke5+neTt5dYOS1vqM/Gxst015hvV+l0PiZGX9KinrZiFgd9aomS9PriY2tGu6jad37dEWWZtSBZO9g+hYrCGuXnCKztFx9xxEuHxiLKmRK65jUoGebGiMIppvgCz1tzE1QCsBpLCB6su6683kQJiVrO4clAM+FXpU7wua2wJYbdY7U/b+2A04kx/QhHbG5iVYPdZMHQDmgxoZa2tTlDadLlFB094QSVRw4n3GYkP4m/nLazPc5AVITV4TciE4KZ9XXG8t8q12bLS05xINz1iDmiMtwYWelN3QA7z9ZPP9KBXV3Rri7CptA3/CGhMj0L+EGm55nsScocwcr31PsMbp/BltAhLkPYaCtegDUADMzCUK/i+cxJ3Tmc491kQLruIf9uvejFrHMSc+wLTy0hmPUB2nccocSntbA1ZgpL8eXIBzySw/cy4AIYAxhZa2mgp2y9bgVXotTeOs14KDWTAglA24qzRvxXq16LfzK
+	ih11j8Rkw/kW4ulFkZJHwkYwetP+R1BFwzhwBmaBFudYWpYPa8bGRqp5ydJP9COFGjBd0RDFQpyb9wXhRPu2YqeqpsTvf2oNlRwZkOYUiJqLwURArY53ISZ1L1ckcN4CRYjtt9Ykj5FV24M2piTp86Nj9zEF/GKg0HzGmqGH2et65jxQHlTR4TmxFpxvYZBepwcegSXag/+iqbNzes1NVrmj7Z1gsRBRsBS2mzKweCjP2jRjHHZbDx8oXY2iGT/ruuxTyT02UH3zRCZTuyXINbviHbDkdwYPX0XzizQIGm4U6MImp8vmYEalv3fxzEQxqk0j+KLfaJmu33+xIIgecCYnieRwQDdjFv9TvvnHEgNgYrewt1bVH0FJCpnFgtRcs1GJ8e4bgZL1/SOvvQq7rsOTr2qBm14A8eikgokdO3k1VUdpfEXg0dFENXJc3e5bcqydOSXpM2BK8xmi5jwYSLa0Kz6V+lfLL+sKuDpAZz+0zvO/FTFyfVAGhUYdLNM3HlD29I+n/L9tgJi/JTca5r2VynlR1pBtQc0jItiNklnFAuzDuzCVyIl0Do6VlsC/
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM0PR04MB6452.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(39860400002)(376002)(396003)(346002)(451199021)(52116002)(6666004)(6486002)(83380400001)(2616005)(186003)(26005)(1076003)(6506007)(5660300002)(86362001)(8676002)(44832011)(36756003)(2906002)(66946007)(54906003)(66556008)(66476007)(38350700002)(38100700002)(8936002)(316002)(4326008)(6916009)(41300700001)(478600001)(6512007);DIR:OUT;SFP:1101;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM6PR0602MB3749.eurprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(396003)(376002)(366004)(39850400004)(346002)(451199021)(54906003)(110136005)(4326008)(8676002)(8936002)(5660300002)(478600001)(6486002)(66946007)(6666004)(66476007)(66556008)(786003)(316002)(41300700001)(6512007)(38100700002)(186003)(6506007)(26005)(44832011)(9686003)(86362001)(83380400001)(2906002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?H8+PZ9QEC5QEWknLWLWfXvWXN7ksABjpknKKZHxbCcbazgWQpmL8VB36Pghp?=
- =?us-ascii?Q?HFp+M3BzlowIHkS8UTicHDPRfutDV2cGYDp4BRzpF1aMbNNZVMzcuMkSJLkY?=
- =?us-ascii?Q?YVyhH3d7hvEKIGg64CNVADtsCp5uQLRo+rTULobsVLaDJh2wb+n7xxc3kII4?=
- =?us-ascii?Q?CcWtfmjXCDpjPPvzfUWX4gpBru6LoQusyp2lfTX5HJyP0IjsVb1/gXWyBlbm?=
- =?us-ascii?Q?J5MFSZIlh+YlOHokAyW/9d0LmmANdQaz8STlqJ8tq1EC1mfAiTY8VPR5CWb3?=
- =?us-ascii?Q?otTcn38xwHfymigInIsdneGI+sQVz9oSGuSe9IbWlugaPZZR3TY4lF/dLyce?=
- =?us-ascii?Q?ek+6LgglW/jKA93bfJ47gOEamPcGtF0HlOg1ONTo2x+ayMqYqfhnLlDlDE6+?=
- =?us-ascii?Q?zV+gQXUnwCzgnj31z1Tx4bQ+PE17riQ4zD4wEc6S61r6aTkWEIOmYHkUtflj?=
- =?us-ascii?Q?I4IUbEuWz6A6jHgqGpdWsyvAaV3EVSPBRlIDwAx7o+eDnBDOqhSj5aqcfk1q?=
- =?us-ascii?Q?GVQsVWcUU8d/41F7T10vHV30lYFvL1LYXcgsBkNpxzpkL56jqmQbV3QIydbP?=
- =?us-ascii?Q?ZsjJRZtKsO855DSplj9CtPCYxHB7ehPsZ5rcu7QIQa7qNMZ2ZHcknzLzwBOY?=
- =?us-ascii?Q?K/SIUODUXaJil03NUtXzRylXu8/xQPnt8gtLFDVoY81YCF6evmgM5CWSxNqe?=
- =?us-ascii?Q?17lcQDafngSx8TTtNApxSQAkQF1g4BtJuTpQz+aOTvuCvx/1reOACNTK4bPb?=
- =?us-ascii?Q?6TpYlt7TzoZEYBS957RHjJOZQUfiepZyv7gGfgowzrE4A/x3cCqwu1pdCNZL?=
- =?us-ascii?Q?T1aciToih45Y2himVKZ6bMxFG1RPnlj0kIFU+soJNjkUrwRzUSbjJM2IAZ4m?=
- =?us-ascii?Q?T/UB6g6iy2tdCFUf6JzIZXxjC7NScg3Hu3zZ71BG3GTLtK4SZEoc+tYMspzW?=
- =?us-ascii?Q?cnOb+G0RaMzLoYtUC4YLFkzYjw5Esfrvh/wUp16fUX5pN8Ge/bv5vNhUm6N/?=
- =?us-ascii?Q?U+3WKwMZQy/WFJxeyAsjV3TNgqUaVcILnklSdF8ROcmbydyaiQoD0WB4VpNu?=
- =?us-ascii?Q?x4FV0hVqZVWg8oqFRy53E9HIrgTU+JN3FsKqvwGg5fYR86834sR1eHznYMYR?=
- =?us-ascii?Q?Se7uWrnIo/gVq5HTn4fU8PZhyMt7u11mTbP0YIB0gEXYDsnpG0CZHRtYmXgV?=
- =?us-ascii?Q?wOWyxRxs0Z5+yubZpbilNIDE0W/ecFD66XrnIM31Gb0iGVqpwk/mE7PK8/wz?=
- =?us-ascii?Q?rBsbCyHLTzw0hrrE1XCTGNHtbFxSdEJhRTx6gryLHuH0p2dtFlfL83ubAU1U?=
- =?us-ascii?Q?3JdFGXZ979WqbHPL2woW9bXw1SvV8ibPMoLGjZt6+m8QkyqekQ6dbgvWgdlf?=
- =?us-ascii?Q?ROM1A1HWKIfdYqpY8jbnj0rjGm09pSv37ShlL21z4pT4dwSUxKv/gQ9xbPWz?=
- =?us-ascii?Q?fiRMsaGHR/7Kf5HHlAwIx3M9qE34lCi3lot6GrSkZNWbKzpKgCqQaTcAqCQR?=
- =?us-ascii?Q?5qoSRpucqZS79jDRd/QjCt/+FtVKUPlILV1mOIznUuh335f7jrWFn2r/AMN9?=
- =?us-ascii?Q?PTUkRJcNbhZBxNqC+kPHQabkCCEL4mBDAxbRpa1W0d8QgSREzoqOJJ7i67f8?=
- =?us-ascii?Q?KQ=3D=3D?=
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 5b312475-9ca8-4905-cb78-08db79b831e3
-X-MS-Exchange-CrossTenant-AuthSource: AM0PR04MB6452.eurprd04.prod.outlook.com
+	=?us-ascii?Q?vOzU4929Dp+ioscsozFG8zmjcYIthIS5C3z0TtnHhq+4j9n3u18npEjiNl+A?=
+ =?us-ascii?Q?KATeKbWPPM2oHyh/VxyVhBCkE+QwbvQu1yRR5ZgNJNmviSIXl1T6SgMIG8Ne?=
+ =?us-ascii?Q?0cAHmOjZiZy52JpPtekylIKAtAg1vHOLB4GLd621wbTaoRGS3IwLWySsrNIJ?=
+ =?us-ascii?Q?iWwvZMo20K1LzTaPEz3SvCTGWsyHqkCsl4u7lkpNayFpHSTUb9Ogy2zaR/Jo?=
+ =?us-ascii?Q?3dY9RLFnLJsD2CS1yJuCLa5RwK5Q8TwSS0U6hJ9SeXn702ajUXvNmdbsHMrM?=
+ =?us-ascii?Q?jB6bXiIrdXqM1era6t/CbP0nbln8Zprbs9eq3aubVwAG6ISYcA5oBPTGAENG?=
+ =?us-ascii?Q?d2jcARp3qGpOBBfwEL27Wg32X9tuKTcqjEU1nBmIsvy/aQfCK4AZ/cJtjiml?=
+ =?us-ascii?Q?hR6EMEFl/bh3bxsWc9hFOcbEnJhPKnjkF7b/DNym3WvFpAKc27YBP/cm+pDX?=
+ =?us-ascii?Q?iO9FYxSEBDdSsJeLoP6BShq4RTdyjyU8pk8uVXm87leGoctHvVCBUf3xMwwc?=
+ =?us-ascii?Q?cdh6f2/36ZB4l4NZ1uv9j/DXA5vL+VLi4hrVC+En09KVmVKk84Iwt2XOy8Ff?=
+ =?us-ascii?Q?mLebUOIc1VfmFaul0cbKgGXGKThvouWJcB37pwx6W7qkgkUP/7kZK2LPaPgA?=
+ =?us-ascii?Q?vTKw7Uw+5QhF3beJYsm1kHU4KP+a1bX1HDi60/L7rssI/kFuNigWLzsvJ62U?=
+ =?us-ascii?Q?/+DL6B6JemIBx/nwGRCyoYOau+eS6gdPxK2WfTkeXKZFxuyEM7CDMZ/hTeri?=
+ =?us-ascii?Q?94C1+UV3oqVr8PL80E80bK1xX6ZozwjpJEV9J3/Drsw9L7Lf1auV7IuED6Z/?=
+ =?us-ascii?Q?HBwBwE2WBjXwu6bgZNs6DZ9Ga7gBh+W/tXFwYstI7RSwisGvwKukC6mgFxEk?=
+ =?us-ascii?Q?5iwDtbQyb9cn/JtCOoqJer3Y4kOXjpVCv34p5KHE0ppkGkTv9lEjlFEjotvC?=
+ =?us-ascii?Q?GjJIFiueqduLPuye9Z+zetxlg+QzE6SVQcEvp69O37o4V09zmepRMQyWw8g1?=
+ =?us-ascii?Q?/zqda6PSJt9z7PSe99vVSzPBKnT2wnAfuOB44v+IZ7VzYsp2G/IhtwHlgpMe?=
+ =?us-ascii?Q?0lG8WQkANENM/IEsBayaJsco4fcXKev6TiFsrvh5iryV6O1UFYovxrVnPtf7?=
+ =?us-ascii?Q?H9gQMZOa63hVeNWuLcDQRg2n5H4L7hdwUITrXWWbVCpm54fqPKr/kwweFo4e?=
+ =?us-ascii?Q?JfbX+e4VwuuUZC5CIrx7u5wI7K1YJ5Bv2hgivfeENVbwirK8b4DfIq88JRbx?=
+ =?us-ascii?Q?1Y551w4s3tHZ4E2J48z6kmGokYqAFbh5q2rPVGbvOKfMXcJdEdel5APmdTOg?=
+ =?us-ascii?Q?+n1BwuNmAjapYMIcxA7/Y2hd3we/I67T24UJb/LpEaaGIB3LmwVEf9KXlpl8?=
+ =?us-ascii?Q?6mJY5/+M0vJS0cMjgfIhKCVkONZJtUW1JdLWohW+nYk/gIujQmQ8xT5ran9I?=
+ =?us-ascii?Q?QJw34Ar4v42S7yfYLzKLBQo1j0qmw+JPpyCANk9s9h6U7L837l9XRRZ+Y0wg?=
+ =?us-ascii?Q?iBwZ7XZOl4Gesaj6WS0gpNBnld6PxGmlxTMtgItz+BmioyQdeRTjTwHOxwqA?=
+ =?us-ascii?Q?1i49rf8zF1OPRwc2sZ2VQsCwEJqJ3asJhyTIzXyK?=
+X-OriginatorOrg: cvut.cz
+X-MS-Exchange-CrossTenant-Network-Message-Id: 5144e4f1-8102-4848-11fb-08db79ba4985
+X-MS-Exchange-CrossTenant-AuthSource: AM6PR0602MB3749.eurprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 22:20:22.2990
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 22:35:20.8753
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
+X-MS-Exchange-CrossTenant-Id: f345c406-5268-43b0-b19f-5862fa6833f8
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: JrX/w2JwFJpP+Ph4XUhb1t/mg9v1xCzO4nWwqPsMIxtuFBfSwE/KOCTSfa+E6hkExUyS1ssqVkVlrINPks8JAA==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DU2PR04MB8552
+X-MS-Exchange-CrossTenant-UserPrincipalName: fL6aGrQ6PVrgVkFk1K5p/+ZzD+bqTQNhpWRNxFKQR41RLxP/fItWg3BvNdQ4K4jA
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: AM9PR06MB8019
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
@@ -129,53 +124,69 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-There was a regression introduced by the blamed commit, where pinging to
-a VLAN-unaware bridge would fail with the repeated message "Couldn't
-decode source port" coming from the tagging protocol driver.
+Hi Maxime,
 
-When receiving packets with a bridge_vid as determined by
-dsa_tag_8021q_bridge_join(), dsa_8021q_rcv() will decode:
-- source_port = 0 (which isn't really valid, more like "don't know")
-- switch_id = 0 (which isn't really valid, more like "don't know")
-- vbid = value in range 1-7
+On Fri, Jun 30 2023, Maxime Jayat wrote:
+> Hi,
+>
+> There is something not clear happening with the non-blocking behavior
+> of ISO-TP sockets in the TX path, but more importantly, using epoll now
+> completely breaks isotp_sendmsg.
+> I believe it is related to
+> 79e19fa79c ("can: isotp: isotp_ops: fix poll() to not report false 
+> EPOLLOUT events"),
+> but actually is probably deeper than that.
+>
+> I don't completely understand what is exactly going on, so I am sharing
+> the problem I face:
+>
+> With an ISO-TP socket in non-blocking mode, using epoll seems to make
+> isotp_sendmsg always return -EAGAIN.
 
-Since the blamed patch has reversed the order of the checks, we are now
-going to believe that source_port != -1 and switch_id != -1, so they're
-valid, but they aren't.
+That's definitely not expected behavior. I tested the patch only with
+poll, hoping that epoll would behave the same.
 
-The minimal solution to the problem is to only populate source_port and
-switch_id with what dsa_8021q_rcv() came up with, if the vbid is zero,
-i.e. the source port information is trustworthy.
+[...]
 
-Fixes: c1ae02d87689 ("net: dsa: tag_sja1105: always prefer source port information from INCL_SRCPT")
-Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
----
- net/dsa/tag_sja1105.c | 9 ++++++---
- 1 file changed, 6 insertions(+), 3 deletions(-)
+>
+> By reverting 79e19fa79c, I get better results but still incorrect:
 
-diff --git a/net/dsa/tag_sja1105.c b/net/dsa/tag_sja1105.c
-index 796e4b88f63b..f480ffffa8c3 100644
---- a/net/dsa/tag_sja1105.c
-+++ b/net/dsa/tag_sja1105.c
-@@ -531,11 +531,14 @@ static struct sk_buff *sja1105_rcv(struct sk_buff *skb,
- 		 * if available. This allows us to not overwrite a valid source
- 		 * port and switch ID with zeroes when receiving link-local
- 		 * frames from a VLAN-unaware bridged port (non-zero vbid) or a
--		 * VLAN-aware bridged port (non-zero vid).
-+		 * VLAN-aware bridged port (non-zero vid). Furthermore, the
-+		 * tag_8021q source port information is only of trust when the
-+		 * vbid is 0 (precise port). Otherwise, tmp_source_port and
-+		 * tmp_switch_id will be zeroes.
- 		 */
--		if (source_port == -1)
-+		if (vbid == 0 && source_port == -1)
- 			source_port = tmp_source_port;
--		if (switch_id == -1)
-+		if (vbid == 0 && switch_id == -1)
- 			switch_id = tmp_switch_id;
- 	} else if (source_port == -1 && switch_id == -1) {
- 		/* Packets with no source information have no chance of
--- 
-2.34.1
+[...]
 
+> It is then possible to write on the socket but the write is blocking,
+> which is not the expected behavior for a non-blocking socket.
+
+Yes, incorrect behavior was why we made the commit in question, however
+we saw write() returning -EAGAIN when it shouldn't.
+
+> I don't know how to solve the problem. To me, using wq_has_sleeper seems 
+> weird.
+
+Agreed. I've never tried to understand how synchronization works here.
+Hopefully, Oliver knows more.
+
+> The implementation of isotp_poll feels weird too (calling both 
+> datagram_poll and
+> poll_wait?). But I am not sure what would be the correct
+> implementation.
+
+I understand it as follows (which might be wrong - someone, please
+correct me), isotp_poll() should register the file with all waitqueues
+it can wait on. so->wait is one and sock->sq.wait (used by
+datagram_poll) is another. The former is definitely used for TX, the
+latter is probably used because skb_recv_datagram() is called for RX.
+But so->wait is also used for RX and there might proabbly be be some
+inconsistency between those.
+
+> My actual use-case is in Async Rust using tokio.
+
+Our initial motivation was also Rust and tokio however than I did
+testing only with simple C programs. I'm definitely interested in having
+this working.
+
+I'll try to look at this in more detail during the weekend. It's too
+late for me today.
+
+Best regards,
+-Michal
 
