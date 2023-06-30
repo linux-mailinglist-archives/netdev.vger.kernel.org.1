@@ -1,100 +1,298 @@
-Return-Path: <netdev+bounces-14843-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14845-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B80F7440E2
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:08:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id EDF21744132
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:27:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0707128103A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 17:08:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C82061C20C22
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 17:27:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 23499171AF;
-	Fri, 30 Jun 2023 17:08:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 88509171D8;
+	Fri, 30 Jun 2023 17:27:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1336C168DA
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 17:08:50 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5994D35B6
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:08:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=JKbZAJo+Gsc90i9iVK6YnrqT3QsBEPyAupa061obTYg=; b=MQwJg5YclFPstdYVmNIU+l2PAt
-	J5ooiOuLK14cB8u4xgexYmR7w88OSdIat0CnGYxA9qX5rM/sd4DPNqPnzLiVWwTJRf3uYOBTCHZxm
-	bLGp3m4CrjvP2C3WDM5h5jqUcF8okkkBj+HKu28mHFQyqaHcjCy+SJpX9EDOr8j5wD/o=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qFHbz-000KCG-9U; Fri, 30 Jun 2023 19:08:47 +0200
-Date: Fri, 30 Jun 2023 19:08:47 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Joakim Tjernlund <Joakim.Tjernlund@infinera.com>
-Cc: "netdev@vger.kernel.org" <netdev@vger.kernel.org>
-Subject: Re: Disable TX path on eth I/F from driver?
-Message-ID: <56dac46c-37f8-431b-82b2-bfa75e9e63a2@lunn.ch>
-References: <e267c94aad6f2a7f0427832d13afc60e6bcd5c6e.camel@infinera.com>
- <abb946fd-3acd-4353-8cda-72773914455d@lunn.ch>
- <377d93c3816a3c63269b894e3d865baace175966.camel@infinera.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 722A8125C9
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 17:27:25 +0000 (UTC)
+Received: from refb02.tmes.trendmicro.eu (refb02.tmes.trendmicro.eu [18.185.115.58])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 604B32100
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 10:27:20 -0700 (PDT)
+Received: from 104.47.7.176_.trendmicro.com (unknown [172.21.19.113])
+	by refb02.tmes.trendmicro.eu (Postfix) with ESMTPS id A7F9A108FEBFF
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 17:12:32 +0000 (UTC)
+Received: from 104.47.7.176_.trendmicro.com (unknown [172.21.178.36])
+	by repost01.tmes.trendmicro.eu (Postfix) with SMTP id 4D1DA10000B8F;
+	Fri, 30 Jun 2023 17:12:31 +0000 (UTC)
+X-TM-MAIL-RECEIVED-TIME: 1688145148.926000
+X-TM-MAIL-UUID: ecc4e6de-1b24-41d7-9602-6e0885476716
+Received: from DEU01-BE0-obe.outbound.protection.outlook.com (unknown [104.47.7.176])
+	by repre01.tmes.trendmicro.eu (Trend Micro Email Security) with ESMTPS id E254E10000E20;
+	Fri, 30 Jun 2023 17:12:28 +0000 (UTC)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=LcicaTdYXgJ2Q9pcX8iu5zv+a2OKAQaqWkHAypkYVUv7sq9/T6IgB9S94TIzF6Abhf5XN3X+/mO+o/75Dl/8GSymlsFtg7Ov3nwL7v3A7STFe/xwkWeDAkXRxZkkjUEaxRowxvOf88Ieq94rncbnEXjpcsNhB5QGefszybw1mokTxRUhhA/wwmS0XbG05VuuYB7WGWhqSmMZjSwuJzFiKVWI4x/2GzPlhJI9N9pZSAWxruIUxGaf5EAZroxncpRMzoBK1QMjXPt1EXoVglY8vGZejsLIrbntyJSe24jhIdTNvrKjEaqXbjPTxJ9zrr8VILCmpcPGOQb1bgaTj9EHHg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=HdO2lE+LOBQ7ZjewmLPpUugGZYDZX1sH1iViVOdfHXY=;
+ b=UfeidBGrk25sl6arl7pnTs8d8571EpXJXGiV1pv/EjcF0K6Un7/3UCJ+ycbC/JbKfGCVy9aTLCFdSjlVXfToNEGAXKXjHeippkmGB/qAIHSQiYyJWdCVGMpOLC+V/wXZDKW8Zlpc2epLpjAkFmhz5kRW6tKNI91YvNn1AUgvhfdKzQuS2xeqIuHW5qbJMPt8s6UnNnRWN/plw5qgWv6W1PgBo96BFhWQmZWRydH+hm4p4F6IDh+kSOzKC5zfFobLgEfaHvWVKaNeK6jUNFTrXVDR8EjDd3rCtsXAHnwmbDTjQutwi8PopnQ95B+4YNzcUMB7F8rfDJHxX1/06Vy90Q==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 217.66.60.4) smtp.rcpttodomain=arm.com smtp.mailfrom=opensynergy.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=opensynergy.com; dkim=none (message not signed); arc=none
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 217.66.60.4)
+ smtp.mailfrom=opensynergy.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=opensynergy.com;
+Received-SPF: Pass (protection.outlook.com: domain of opensynergy.com
+ designates 217.66.60.4 as permitted sender) receiver=protection.outlook.com;
+ client-ip=217.66.60.4; helo=SR-MAIL-03.open-synergy.com; pr=C
+From: Peter Hilber <peter.hilber@opensynergy.com>
+To: virtualization@lists.linux-foundation.org,
+	virtio-dev@lists.oasis-open.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Cc: Peter Hilber <peter.hilber@opensynergy.com>,
+	"Christopher S. Hall" <christopher.s.hall@intel.com>,
+	Daniel Lezcano <daniel.lezcano@linaro.org>,
+	Jason Wang <jasowang@redhat.com>,
+	John Stultz <jstultz@google.com>,
+	Marc Zyngier <maz@kernel.org>,
+	Mark Rutland <mark.rutland@arm.com>,
+	"Michael S. Tsirkin" <mst@redhat.com>,
+	netdev@vger.kernel.org,
+	Richard Cochran <richardcochran@gmail.com>,
+	Stephen Boyd <sboyd@kernel.org>,
+	Thomas Gleixner <tglx@linutronix.de>,
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>
+Subject: [RFC PATCH 0/7] Add virtio_rtc module and related changes
+Date: Fri, 30 Jun 2023 19:10:43 +0200
+Message-Id: <20230630171052.985577-1-peter.hilber@opensynergy.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <377d93c3816a3c63269b894e3d865baace175966.camel@infinera.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: AM6EUR05FT048:EE_|BEZP281MB2773:EE_
+Content-Type: text/plain
+X-MS-Office365-Filtering-Correlation-Id: 4c79124b-aad8-415c-7527-08db798d2de0
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	PgYi7Fjn10lvcHHaVkT3xtyqb3hUjIRRpj27QrOPX+QDSBQ9dS15ey2gtQfI3pUDtavqN9EB0lNz6PqRG2IsHBywhzeoBm823QDBCKjOSuMoaybPq4Q6yRDi3rA2++eR64BAkEQa/DyluqOqTe2KJ4kpSlqoaNR49O8bruLXCeIH0a3j7g5II5bNE86SjaP+4KyatDWoj8FpqspcOgd6m3jVIHRs/fivdZC0V5yihxIXfkg4WyBDGKZix1DBVlqDzb0Df0H+sSC0nLRl0uW0J5tZmGyrZM4euhAhx4DHXxRs0ryzUr6Fk1GpTO2z4wRqNe9STXCjXKaTj4wWkd39f9qvyCrxqcz6ERWRwIOjkI/5IlO1WN+dLxvwS9Ou8cGDIRumUdPrKoKRMz6GjjU3R3BZnNcquPZ/9zoQ9N1z6b2qG6mfuU7xsCUVbSN19PYrYDddFVQSsSOzZLZzLDn84OZz7Lhg9xg6lIqPE6V2SJj1i6GRFMJD0CozmoK1SJGURX9nsxrOqub9QmaLt9kpi65eRZh7I1Y+U+1gUgrORjRMRovXB3FzMBfaDdp5Uedi7apR1kd0jFxnpi63Gc24IJPo7dRFqdnSDNAtRbzmxYj23tyVW4h7HSyPJK05x+0lRUd2fHWYoNwyiY16gsg/fj+O6qnEdaX3E+5VBVmmDeWNdIgYihmTVUgBezYBZaJ35WBafLeAX8uUZ8Z04Pf03cXEXbj6SlymPJtawsEvFWpGyOsuA23PIOFxjsg1FILkVSnieC8DjWsJzEGQPhcQIyvbgh6eT5CCNYqz3/PWlIKPZdsBYGJurgK2iEduiJRH
+X-Forefront-Antispam-Report:
+	CIP:217.66.60.4;CTRY:DE;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SR-MAIL-03.open-synergy.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(396003)(39840400004)(376002)(136003)(346002)(451199021)(46966006)(36840700001)(41300700001)(82310400005)(186003)(2616005)(83380400001)(81166007)(336012)(1076003)(47076005)(26005)(36860700001)(966005)(40480700001)(54906003)(86362001)(478600001)(316002)(2906002)(42186006)(36756003)(70586007)(70206006)(4326008)(5660300002)(7416002)(44832011)(8936002)(8676002)(36900700001);DIR:OUT;SFP:1102;
+X-OriginatorOrg: opensynergy.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 17:12:26.9310
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c79124b-aad8-415c-7527-08db798d2de0
+X-MS-Exchange-CrossTenant-Id: 800fae25-9b1b-4edc-993d-c939c4e84a64
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=800fae25-9b1b-4edc-993d-c939c4e84a64;Ip=[217.66.60.4];Helo=[SR-MAIL-03.open-synergy.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	AM6EUR05FT048.eop-eur05.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BEZP281MB2773
+X-TM-AS-ERS: 104.47.7.176-0.0.0.0
+X-TMASE-Version: StarCloud-1.3-9.1.1011-27724.001
+X-TMASE-Result: 10--21.904400-4.000000
+X-TMASE-MatchedRID: QkBk6NM3bYntZDpZlNWg4O3qPLdU3cUZmmVIK8ewxWFzGLNi78J47a1E
+	3eK47PQv8NnPKwQ6MAXIfQ4ROYO30qR3czjQoJVEzHEBgfJ+fh7XT+yjPvIHsSPyEm8irOu0hto
+	XpFBNnP0hNGbe+yEJt2s6L9BEkSPmik3s3JIv+NL24vmE69obUuZaGzHq+v3RvISQdexW7wlJus
+	yl/yyXJshX3ePBhmH9FAYnhafAyPf3/e1f1P1EBXzRkrQz4xEZXEX7ABoMsg2XYoGYte3R6uKgz
+	T/C1UJV14kqJij0HUVjAv+2f9eNNtEGCeLQeM4pOPwPJT+A+aKJa69fq6pvWqFqih+YTZsXbbVF
+	KI0Q90Cf1UKFSLOBJveAK/DlpM8DO8W+8t9FmIHHfwwbjh/dN0CkBGbPTuJGvnGHhmr9238mm1Q
+	XaIrWncO1oHRChDtjynqv1hVDlo9PfXLU39GOm+sfkPrj7CaqXpSxZKDDzFgLDzQJD3kt0DFA5d
+	FB9NsjmPP9edzaP5qx6frpJFf/MOEt1Iuwj4gXsZIjJc0QK/Yyep+wopoUNa3/rEOakn8sT0BRZ
+	NI+YwbANog326X8vgFaXg5vJyaC8J0BxWW1D95qBJKosT8FWDnxJqun3snzJQhrLH5KSJ0=
+X-TMASE-XGENCLOUD: 2a743da6-ac22-4058-955b-c93c50018bcc-0-0-200-0
+X-TM-Deliver-Signature: 3643810533B55FE489482FDFA1BD4FCE
+X-TM-Addin-Auth: Q7PgLWEeSdzvCNfWq2rJPuhGUJCD88VJzCDy377dGoz1njPjMAh3WgItGne
+	E2wE2oTIs+WW/VFGKtU5qo0uaSIMvaNWsusYYsg7xZ16AWgGe7uknGkVdNqPbN0TkCaRAMinZLd
+	uQyd1n5dR965J55dEUDnXJuLof2efX6L1QU6BtB3WYkC2SrmyeK9h1cVe7gl1BApvd9ZunZNpyh
+	P5Ka9NQPiuBPMI8Ina/T7O62VxTKrFRzhjMo9j5l+0mShbgFhEyHw4hwxgoR3F1dVWTpEvBJH90
+	hXq66OY1Qh33e5g=.Jt4xSX+jWK2BJvivHcC4QNTr169gz/W6he7aZGC2L96bcpqS6RY1NZSqBK
+	niEQGL/5j6GsfdRhQZwLOcQwzYzxw00SVjvg35OPvszWlGedUFEafCsxwpdJq2gyKmE4PR1ilRX
+	+1pa7R2UgWurVtBwTA0bi3zeCUhrPuWrI7Jld/L1UJQe6JxXi//6OAjxA/XApIN55duhcv3KXAP
+	x9oOZxkfe/OwQp+DtOljscCvKlyiW4TuYqA1nt2iHRTPn5KVz2pyKDCBRnPmRGC1T6PQP1wfRmU
+	H0CDlhPVHQ9z47T7kVDGsk965W8D5KMicZNnEFqTQL67e7QNsBowgUNMUNA==
+X-TM-Addin-ProductCode: EMS
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple; d=opensynergy.com;
+	s=TM-DKIM-20210503141657; t=1688145151;
+	bh=Wl+SLhjbrbxWDdL7TjpfJUiywTbYu/HsOyULxhWqCDA=; l=8586;
+	h=From:To:Date;
+	b=xIZgv9Mp5fcfNUAM51asPNipC/MOFFbXWjFCQSEKPWB5Q0H90PYC2CvQy8UGoH57+
+	 /HQcxHo/GFnJT0A4jjvUBTQ1oo8QqS27KT3BWc9iAs+6wK5z0QSg1ERtvXKFrohZbW
+	 MaQZormkb74FYKHCoDXFMbJ5nieYpg5u6dJPo0dtdXbOCHPhu2lSqE+sOOyuYmJSTl
+	 DS3JJB3olBTOCRK4ufj3lbULiorEO2Ub5qN0MIPCN2jMZ3vqGecc2Vze0NdSxnxZV6
+	 0jGVsOWmNPnNb1YB10335LaHBcS85Txe1wkzMD7TBjNLYkvSdzdMuke2qflvs4jK04
+	 v89HNHxGJN3Kg==
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 04:57:31PM +0000, Joakim Tjernlund wrote:
-> On Fri, 2023-06-30 at 18:50 +0200, Andrew Lunn wrote:
-> > On Fri, Jun 30, 2023 at 03:48:15PM +0000, Joakim Tjernlund wrote:
-> > > We have a few eth I/F that is for monitoring only, if any TX one gets:
-> > > NETDEV WATCHDOG: trap0 (xr-ccip): transmit queue 0 timed out
-> > > [   55.903074] WARNING: CPU: 0 PID: 0 at net/sched/sch_generic.c:477 dev_watchdog+0x138/0x160
-> > > [   55.911380] CPU: 0 PID: 0 Comm: swapper/0 Not tainted 5.15.109-00161-g1268ae25c302-dirty #7
-> > > <long trace snipped>
-> > > 
-> > > I would like to, from within the driver, disable the TX path so the IP stack cannot TX any
-> > > pkgs but cannot find a way to do so.
-> > > Is there a way(to at least avid the NETDEV WATCHDOG msg) disable TX?
-> > > On kernel 5.15
-> > 
-> > Have you tried using TC or iptables to just unconditionally drop all
-> > packets?
-> > 
-> 
-> No, this is an embedded target with no iptables/TC
-> Would be much nicer if I could do this in driver.
+This patch series adds the virtio_rtc module, and related bugfixes and
+small interface extensions. The virtio_rtc module implements a driver
+compatible with the proposed Virtio RTC device specification [1]. The
+Virtio RTC (Real Time Clock) device provides information about current
+time. The device can provide different clocks, e.g. for the UTC or TAI time
+standards, or for physical time elapsed since some past epoch. The driver
+can read the clocks with simple or more accurate methods.
 
-I would argue it is much uglier. You need to hack the kernel driver to
-throw away packets, vs just installing a couple extra packages and us
-a supported mechanism to throw packets away.
+This patch series depends, through its arm_arch_timer patch, on patch
+"arm64/arch_timer: Provide noinstr sched_clock_read() functions" [3] which
+seems not to be available with all development branches yet. Pull [2] for
+an equivalent series on top of mst/linux-next, which should apply without
+the above patch. Pull [5] for an equivalent series on top of
+tip/timers/core. Pull [6] for an equivalent series on top of
+tip/sched/core.
 
-Anyway, if you want to hack the driver, simply replace its
-.ndo_start_xmit with
+The series first fixes some bugs in the get_device_system_crosststamp()
+interpolation code, which is required for reliable virtio_rtc operation.
+Next, expose some Arm Generic Timer clocksource details for virtio_rtc.
+Last, add the virtio_rtc implementation.
 
-https://elixir.bootlin.com/linux/v6.4/source/drivers/net/dummy.c#L59
+For the Virtio RTC device, there is currently a proprietary implementation,
+which has been used for provisional testing.
 
-static netdev_tx_t dummy_xmit(struct sk_buff *skb, struct net_device *dev)
-{
-	dev_lstats_add(dev, skb->len);
+virtio_rtc exposes clocks as PTP clocks to userspace, similar to ptp_kvm.
+If both the Virtio RTC device and this driver have special support for the
+current clocksource, time synchronization programs can use
+cross-timestamping using ioctl PTP_SYS_OFFSET_PRECISE2 aka
+PTP_SYS_OFFSET_PRECISE. Similar to ptp_kvm, system time synchronization
+with single-digit ns precision is possible with a quiescent reference clock
+(from the Virtio RTC device). This works even when the Virtio device
+response is slow compared to ptp_kvm hypercalls.
 
-	skb_tx_timestamp(skb);
-	dev_kfree_skb(skb);
-	return NETDEV_TX_OK;
-}
+The following illustrates a test using PTP_SYS_OFFSET_PRECISE, with
+interspersed strace log and chrony [4] refclocks log, on arm64. In the
+example, chrony tracks a virtio_rtc PTP clock ("PHCV", /dev/ptp0). The raw
+offset between the virtio_rtc clock and CLOCK_REALTIME is 0 to 1 ns. At the
+device side, the Virtio RTC device artificially delays both the clock read
+request, and the response, by 50 ms. Cross-timestamp interpolation still
+works with this delay. chrony also monitors a ptp_kvm clock ("PHCK",
+/dev/ptp3) for comparison, which yields a similar offset.
 
-	Andrew
+	ioctl(5</dev/ptp3>, PTP_SYS_OFFSET_PRECISE, 0xffffe86691c8) = 0 <0.000329>
+	===============================================================================
+	   Date (UTC) Time         Refid  DP L P  Raw offset   Cooked offset      Disp.
+	===============================================================================
+	2023-06-29 18:49:55.595742 PHCK    0 N 0  1.000000e-09  8.717931e-10  5.500e-08
+	2023-06-29 18:49:55.595742 PHCK    - N -       -        8.717931e-10  5.500e-08
+	ioctl(6</dev/ptp0>, PTP_SYS_OFFSET_PRECISE, 0xffffe86691c8) = 0 <0.101545>
+	2023-06-29 18:49:56.147766 PHCV    0 N 0  1.000000e-09  8.801870e-10  5.500e-08
+	2023-06-29 18:49:56.147766 PHCV    - N -       -        8.801870e-10  5.500e-08
+	ioctl(5</dev/ptp3>, PTP_SYS_OFFSET_PRECISE, 0xffffe86691c8) = 0 <0.000195>
+	2023-06-29 18:49:56.202446 PHCK    0 N 0  1.000000e-09  7.364180e-10  5.500e-08
+	2023-06-29 18:49:56.202446 PHCK    - N -       -        7.364180e-10  5.500e-08
+	ioctl(6</dev/ptp0>, PTP_SYS_OFFSET_PRECISE, 0xffffe86691c8) = 0 <0.101484>
+	2023-06-29 18:49:56.754641 PHCV    0 N 0  0.000000e+00 -2.617368e-10  5.500e-08
+	2023-06-29 18:49:56.754641 PHCV    - N -       -       -2.617368e-10  5.500e-08
+	ioctl(5</dev/ptp3>, PTP_SYS_OFFSET_PRECISE, 0xffffe86691c8) = 0 <0.000270>
+	2023-06-29 18:49:56.809282 PHCK    0 N 0  1.000000e-09  7.779321e-10  5.500e-08
+	2023-06-29 18:49:56.809282 PHCK    - N -       -        7.779321e-10  5.500e-08
+	ioctl(6</dev/ptp0>, PTP_SYS_OFFSET_PRECISE, 0xffffe86691c8) = 0 <0.101510>
+	2023-06-29 18:49:57.361376 PHCV    0 N 0  0.000000e+00 -2.198794e-10  5.500e-08
+	2023-06-29 18:49:57.361376 PHCV    - N -       -       -2.198794e-10  5.500e-08
+
+This patch series only adds special support for the Arm Generic Timer
+clocksource. At the driver side, it should be easy to support more
+clocksources.
+
+Without special support for the current clocksource, time synchronization
+programs can still use ioctl PTP_SYS_OFFSET_EXTENDED2 aka
+PTP_SYS_OFFSET_EXTENDED. In this case, precision will generally be worse
+and will depend on the Virtio device response characteristics.
+
+The following illustrates a test using PTP_SYS_OFFSET_EXTENDED, with
+interspersed strace log and chrony refclocks log, on x86-64 (with `ts'
+values omitted):
+
+	ioctl(5, PTP_SYS_OFFSET_EXTENDED, {n_samples=10, ts=OMITTED}) = 0
+	===============================================================================
+	   Date (UTC) Time         Refid  DP L P  Raw offset   Cooked offset      Disp.
+	===============================================================================
+	2023-06-28 14:11:26.697782 PHCV    0 N 0  3.318200e-05  3.450891e-05  4.611e-06
+	2023-06-28 14:11:26.697782 PHCV    - N -       -        3.450891e-05  4.611e-06
+	ioctl(5, PTP_SYS_OFFSET_EXTENDED, {n_samples=10, ts=OMITTED}) = 0
+	2023-06-28 14:11:27.208763 PHCV    0 N 0 -3.792800e-05 -4.023965e-05  4.611e-06
+	2023-06-28 14:11:27.208763 PHCV    - N -       -       -4.023965e-05  4.611e-06
+	ioctl(5, PTP_SYS_OFFSET_EXTENDED, {n_samples=10, ts=OMITTED}) = 0
+	2023-06-28 14:11:27.722818 PHCV    0 N 0 -3.328600e-05 -3.134404e-05  4.611e-06
+	2023-06-28 14:11:27.722818 PHCV    - N -       -       -3.134404e-05  4.611e-06
+	ioctl(5, PTP_SYS_OFFSET_EXTENDED, {n_samples=10, ts=OMITTED}) = 0
+	2023-06-28 14:11:28.233572 PHCV    0 N 0 -4.966900e-05 -4.584331e-05  4.611e-06
+	2023-06-28 14:11:28.233572 PHCV    - N -       -       -4.584331e-05  4.611e-06
+	ioctl(5, PTP_SYS_OFFSET_EXTENDED, {n_samples=10, ts=OMITTED}) = 0
+	2023-06-28 14:11:28.742737 PHCV    0 N 0  4.902700e-05  5.361388e-05  4.611e-06
+	2023-06-28 14:11:28.742737 PHCV    - N -       -        5.361388e-05  4.611e-06
+
+The following udev rule can be used to get a symlink /dev/ptp_virtio to the
+UTC clock:
+
+	SUBSYSTEM=="ptp", ATTR{clock_name}=="Virtio PTP UTC", SYMLINK += "ptp_virtio"
+
+The following chrony configuration directive can then be added in
+/etc/chrony/chrony.conf to synchronize to the Virtio UTC clock:
+
+	refclock PHC /dev/ptp_virtio refid PHCV poll -1 dpoll -1
+
+This patch series adds virtio_rtc not in drivers/ptp, but as a generic
+Virtio driver. In the near future, virtio_rtc should be extended with an
+RTC Class driver, along with extensions to the Virtio RTC device draft spec
+to support RTC alarms.
+
+Feedback is greatly appreciated.
+
+[1] https://lists.oasis-open.org/archives/virtio-comment/202306/msg00592.html
+[2] https://github.com/OpenSynergy/linux virtio-rtc-v1-on-mst-vhost-linux-next
+[3] https://lore.kernel.org/r/20230519102715.435618812@infradead.org
+[4] https://chrony.tuxfamily.org/
+[5] https://github.com/OpenSynergy/linux virtio-rtc-v1-on-tip-timers-core
+[6] https://github.com/OpenSynergy/linux virtio-rtc-v1-on-tip-sched-core
+
+
+Peter Hilber (7):
+  timekeeping: Fix cross-timestamp interpolation on counter wrap
+  timekeeping: Fix cross-timestamp interpolation corner case decision
+  timekeeping: Fix cross-timestamp interpolation for non-x86
+  clocksource: arm_arch_timer: Export counter type, clocksource
+  virtio_rtc: Add module and driver core
+  virtio_rtc: Add PTP clocks
+  virtio_rtc: Add Arm Generic Timer cross-timestamping
+
+ MAINTAINERS                          |   7 +
+ drivers/clocksource/arm_arch_timer.c |  16 +
+ drivers/virtio/Kconfig               |  43 ++
+ drivers/virtio/Makefile              |   4 +
+ drivers/virtio/virtio_rtc_arm.c      |  44 ++
+ drivers/virtio/virtio_rtc_driver.c   | 841 +++++++++++++++++++++++++++
+ drivers/virtio/virtio_rtc_internal.h |  85 +++
+ drivers/virtio/virtio_rtc_ptp.c      | 384 ++++++++++++
+ include/clocksource/arm_arch_timer.h |  19 +
+ include/uapi/linux/virtio_rtc.h      | 159 +++++
+ kernel/time/timekeeping.c            |  20 +-
+ 11 files changed, 1615 insertions(+), 7 deletions(-)
+ create mode 100644 drivers/virtio/virtio_rtc_arm.c
+ create mode 100644 drivers/virtio/virtio_rtc_driver.c
+ create mode 100644 drivers/virtio/virtio_rtc_internal.h
+ create mode 100644 drivers/virtio/virtio_rtc_ptp.c
+ create mode 100644 include/uapi/linux/virtio_rtc.h
+
+
+base-commit: 6352a698ca5bf26a9199202666b16cf741f579f6
+-- 
+2.39.2
+
 
