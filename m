@@ -1,128 +1,111 @@
-Return-Path: <netdev+bounces-14715-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14716-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4D920743499
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 07:55:29 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id C362F7434F4
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 08:29:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 001441C20AD1
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 05:55:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0902F1C20AF8
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 06:29:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936853D8B;
-	Fri, 30 Jun 2023 05:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 441B7538B;
+	Fri, 30 Jun 2023 06:28:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829CC20F1
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 05:55:25 +0000 (UTC)
-Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABCB1FE8;
-	Thu, 29 Jun 2023 22:55:23 -0700 (PDT)
-Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6b5d7e60015so1242115a34.0;
-        Thu, 29 Jun 2023 22:55:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688104523; x=1690696523;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=cSBES6sO0S+ucqilKRRgFBUV0LjEF9eAIEf/oosxqIY=;
-        b=b0pUhDBA3um+86U8PMrx4K7f8bppC1N0d3y+rFjs4R+VPLZ8YOjK1KQZiXYrPf1GRa
-         Unqff7WbSGrlMFqAUMXAvZygexK5/CrDqlesqi5bo3cmCpNe0ZkYdqu0gvv+lFyJhkE/
-         BqQV87A/9PsUr9GoBEXfByeTHq7AimxwwQKpPePMXJj4jwwLktOFkpOEM/olRIoFFT5i
-         /r0hbkLe6DvnmaFs9CyvwypoBvoZdm2vv7MmoliAxeY4+oS96uwzaKnpVKZjvmbOkNg5
-         wmfMlxygyDIFcoo63JmqeGcMobiikjgQ40sxVn86VJmGqHQyQHdog3n3qytoPt5AdB/K
-         Xglw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688104523; x=1690696523;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=cSBES6sO0S+ucqilKRRgFBUV0LjEF9eAIEf/oosxqIY=;
-        b=O6J2kdM/gleslHImcu85LiN7uKUgBp1h29AhDdG7UMz9oPH7p12FVRjDJMUh7KK1h1
-         kGiox8ZZp5eFZ1vAh7vt4ypsWgCPUHN7BIqBOFOa4DxsmDp9aK/3/FS3AR4CH9Vtn+JM
-         n5FQiZS7aQxFe6xtQsnR3nGU5ZupFFqUhdJhSuDa1XDFaq+72IsEDd1CHB7hBQdvIB5r
-         rOeRrE6Zogb39e/O1UwXaufj9Ov61uWiE+4p5w7Ly+eKVZMzylZ1WQiv4hAj01odKi6U
-         2/Ok4TCYqP0qMxGCLwLfoEDo65jDGSg/gGrMN3E58utHWK20Nn9NhQoxQYYOVYpJ3sKZ
-         XDOg==
-X-Gm-Message-State: AC+VfDwPMOZzlVD8o4+kxq6Yz3HRNPWYe5a0vE2EvVfUKTUEM/toBkYS
-	3Yg/6HnZNsIp1MrCCaEPVRqXN56BFwy6kunAF8E=
-X-Google-Smtp-Source: ACHHUZ6MGlFcc4BSao10wMY/aeDrw4Ttrm9C+qRs9GGoDIvp8DsVfjBqa+jsURtKymgoNPmZVyMnH6vsAzPmDfvD1iw=
-X-Received: by 2002:a05:6830:1059:b0:6b5:c745:7797 with SMTP id
- b25-20020a056830105900b006b5c7457797mr2169875otp.30.1688104523153; Thu, 29
- Jun 2023 22:55:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 387DE5388
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 06:28:58 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10BBD2D63;
+	Thu, 29 Jun 2023 23:28:56 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35U2CEBx013690;
+	Thu, 29 Jun 2023 23:28:51 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-type; s=pfpt0220;
+ bh=9Bvkz/qrPlZ1RuCWBWAW2Wv28bCFJ/X2QQfgD7njmkI=;
+ b=RwYcHKfIb+UuyTi4jSYDiVk31wPuBDSsj2xFsngki6pSWGcDwJdyqH8lSBFbuaorTdI8
+ hwjDaA6xySSVnAFncy3fVc1b05Fj55QcbmjbOnXXYmL3wRFcVIGHakY3z9aTyy4u8+nm
+ DCyRLxc5B5y+//avxhj30TT/liqHSgUnKin8aSwq5xpwqss9O01hw0Yu2yVJKph0+utP
+ lA+8oDcri/PYUv8Vr4Z0EOlHnb5iYF4mcvVOjqTIk+VirDPOmF3d/Rie5scBRP+epksY
+ tS9OBqUhLNwAA/mSVEYJZfERJ3wEeHGjrWFhkS4uRNBaywdDOeryeu5988ArfwV4HZzu 3Q== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rhp2egqsu-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Thu, 29 Jun 2023 23:28:51 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 29 Jun
+ 2023 23:28:49 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Thu, 29 Jun 2023 23:28:49 -0700
+Received: from hyd1soter3.marvell.com (unknown [10.29.37.12])
+	by maili.marvell.com (Postfix) with ESMTP id C17353F707B;
+	Thu, 29 Jun 2023 23:28:45 -0700 (PDT)
+From: Hariprasad Kelam <hkelam@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <davem@davemloft.net>, <sgoutham@marvell.com>, <lcherian@marvell.com>,
+        <gakula@marvell.com>, <jerinj@marvell.com>, <sbhatta@marvell.com>
+Subject: [net Patch 0/4] octeontx2-af: MAC block fixes for CN10KB
+Date: Fri, 30 Jun 2023 11:58:41 +0530
+Message-ID: <20230630062845.26606-1-hkelam@marvell.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230630032653.26426-1-qiang.zhang1211@gmail.com> <CANn89i+Yw_3FEjo_dYSknhmyfoOCD-1S0OSRR_GoyMjQPjcu6w@mail.gmail.com>
-In-Reply-To: <CANn89i+Yw_3FEjo_dYSknhmyfoOCD-1S0OSRR_GoyMjQPjcu6w@mail.gmail.com>
-From: Z qiang <qiang.zhang1211@gmail.com>
-Date: Fri, 30 Jun 2023 13:55:11 +0800
-Message-ID: <CALm+0cXo-Bra_5M53c024+tnO-VTZJvO=4MhhVf-KUTb0ZGmfA@mail.gmail.com>
-Subject: Re: [PATCH] net: Destroy previously created kthreads after failing to
- set napi threaded mode
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Wei Wang <weiwan@google.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: bLmbOZyAaLRUZXOc1RY3xwcPm4QM9Q1d
+X-Proofpoint-GUID: bLmbOZyAaLRUZXOc1RY3xwcPm4QM9Q1d
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-06-30_03,2023-06-27_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 1:33=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
-wrote:
->
-> On Fri, Jun 30, 2023 at 5:27=E2=80=AFAM Zqiang <qiang.zhang1211@gmail.com=
-> wrote:
-> >
-> > When setting 1 to enable napi threaded mode, will traverse dev->napi_li=
-st
-> > and create kthread for napi->thread, if creation fails, the dev->thread=
-ed
-> > will be set to false and we will clear NAPI_STATE_THREADED bit for all
-> > napi->state in dev->napi_list, even if some napi that has successfully
-> > created the kthread before. as a result, for successfully created napi
-> > kthread, they will never be used.
-> >
-> > This commit therefore destroy previously created napi->thread if settin=
-g
-> > napi threaded mode fails.
-> >
->
-> I am not sure we need this, because these kthreads are not leaked at
-> present time.
->
-> pktgen also creates unused kthreads (one per cpu), even if in most
-> cases only one of them is used.
->
-> Leaving kthreads makes it possible to eventually succeed to enable
-> napi threaded mode
-> after several tries, for devices with 64 or more queues...
->
+This patch set contains fixes for the issues encountered in testing
+CN10KB MAC block RPM_USX.
 
-Thanks for the reply,   I understand the approach in this way.
-But for successfully created napi kthreads, should NAPI_STATE_THREADED
-bits not be cleared ?
+Patch1: firmware to kernel communication is not working due to wrong
+        interrupt configuration. CSR addresses are corrected.
 
-Thanks
-Zqiang
+Patch2: NIX to RVU PF mapping errors encountered due to wrong firmware
+        config. Corrects this mapping error.
 
->
-> This would target net-next.
->
-> If you claim to fix a bug (thus targeting net tree), we would need a Fixe=
-s: tag.
->
->
-> Thanks.
+Patch3: Driver is trying to access non exist cgx/lmac which is resulting
+        in kernel panic. Address this issue by adding proper checks.
+
+Patch4: MAC features are not getting reset on FLR. Fix the issue by
+        resetting the stale config.
+
+
+
+Hariprasad Kelam (4):
+  octeontx2-af: cn10kb: fix interrupt csr addresses
+  octeontx2-af: Fix mapping for NIX block from CGX connection
+  octeontx2-af: Add validation before accessing cgx and lmac
+  octeontx2-af: Reset MAC features in FLR
+
+ .../net/ethernet/marvell/octeontx2/af/cgx.c   | 33 +++++++++++++++++--
+ .../net/ethernet/marvell/octeontx2/af/cgx.h   |  2 ++
+ .../marvell/octeontx2/af/lmac_common.h        |  3 ++
+ .../net/ethernet/marvell/octeontx2/af/rpm.c   | 32 +++++++++++++++---
+ .../net/ethernet/marvell/octeontx2/af/rpm.h   |  5 ++-
+ .../net/ethernet/marvell/octeontx2/af/rvu.c   |  1 +
+ .../net/ethernet/marvell/octeontx2/af/rvu.h   | 12 +++++++
+ .../ethernet/marvell/octeontx2/af/rvu_cgx.c   | 20 ++++++++++-
+ 8 files changed, 99 insertions(+), 9 deletions(-)
+
+--
+2.17.1
 
