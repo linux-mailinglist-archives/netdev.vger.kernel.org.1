@@ -1,151 +1,144 @@
-Return-Path: <netdev+bounces-14795-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14796-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D58CB743DCA
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:45:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0643F743E02
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 16:58:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C31F91C20C06
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:45:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 278122810EE
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 14:58:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D74914299;
-	Fri, 30 Jun 2023 14:45:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5CF12156FE;
+	Fri, 30 Jun 2023 14:58:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7E2C4E55E
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 14:45:28 +0000 (UTC)
-Received: from mail-ot1-x336.google.com (mail-ot1-x336.google.com [IPv6:2607:f8b0:4864:20::336])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6961C1FC2;
-	Fri, 30 Jun 2023 07:45:23 -0700 (PDT)
-Received: by mail-ot1-x336.google.com with SMTP id 46e09a7af769-6b723aedd3dso1385100a34.3;
-        Fri, 30 Jun 2023 07:45:23 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688136322; x=1690728322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=WCqsP8XO7B1p8RAxtSlO/FnCPRr08EENqWwOAf3sC+E=;
-        b=qVdXzBH8WjUA9L1VyNci3etKoSEHQuU9KN6Ex1ShfYvadQztuThYEV56Gg4N91bmI6
-         J/Wch61VIWZrHssyTcvMFzrgeAPUxoTdiFUUFKPEhdXd7vm/8BMrL8+bu1mYXbnEI8Zh
-         LHqV/O+rv+jZfOlkPmO7UoraWrlQdgzV0538MFq9ZT10MeKkBWQAWGpUUk+d1HXxn58v
-         KcMWYWDhMM4FJ5NHjDf+Ly3U722Kg3UcUERKULJEvx1aLXpBFjo82vo1qwz11sU2Swb0
-         gr+gfaT61PggH/y6Yh4RW66ify9PifAG38GqxiuK4ChVRiXqnJqCCg268Ho7r39rghIY
-         SLxA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688136322; x=1690728322;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=WCqsP8XO7B1p8RAxtSlO/FnCPRr08EENqWwOAf3sC+E=;
-        b=d1AOdZdGyht/zxzvzGFqnbXuBEZsrkHFt7BINiqxO4F5DpTLm6GqLjABPdk7TLUJAU
-         s5auOS0VOze1O/trSCxS+h3xgB9fe5pHamAZoWRTcLpSTs+buiunSAD8auIVQj1JfVJk
-         FtxOFgIRvnwkMvF9EqduvVefhkIF7Sm9UQ5afvecdd7EdGtSU20nphD+Ey3asvFldESG
-         EnRu9PwAhsKPWDeLLDx0SkZbeG08x7QW3J4rRer2Xss7FRJlbaLXraNEmVivgUPzjrzg
-         s1IF2qfiqvS48ExEagAiyO5wK6oXqFkEVkLl+ma6sZJ2QVxA2ToFXiZF33Zs3gWCHjTB
-         F0Eg==
-X-Gm-Message-State: AC+VfDy3kPzbLY3FR7v3Jw/3p1DSl3Pws3O5+du2VXSiD0f2rrU8LTQJ
-	AXyTuSmpM4YzcHJm92/WfYSRll272Qx9kTkgN7U=
-X-Google-Smtp-Source: ACHHUZ6x47k+BXIygzeqymMPvPthnxGZSrYcX5eKzXrClNt885Eq14YiHr7/Dt7QMj+OWwLY3sc41XGYcU6gqVwOeU0=
-X-Received: by 2002:a9d:6f0a:0:b0:6b7:4411:505d with SMTP id
- n10-20020a9d6f0a000000b006b74411505dmr3021676otq.4.1688136322562; Fri, 30 Jun
- 2023 07:45:22 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DDE314299;
+	Fri, 30 Jun 2023 14:58:15 +0000 (UTC)
+Received: from relay5-d.mail.gandi.net (relay5-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::225])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5BEC19B5;
+	Fri, 30 Jun 2023 07:58:12 -0700 (PDT)
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id E6CF81C0002;
+	Fri, 30 Jun 2023 14:58:07 +0000 (UTC)
+From: Ilya Maximets <i.maximets@ovn.org>
+To: netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
+	Magnus Karlsson <magnus.karlsson@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-doc@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Jason Wang <jasowang@redhat.com>,
+	Stefan Hajnoczi <stefanha@redhat.com>,
+	Ilya Maximets <i.maximets@ovn.org>
+Subject: [RFC bpf-next] xsk: honor SO_BINDTODEVICE on bind
+Date: Fri, 30 Jun 2023 16:58:31 +0200
+Message-Id: <20230630145831.2988845-1-i.maximets@ovn.org>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
- <20230629152305.905962-3-aleksander.lobakin@intel.com> <69e827e239dab9fd7986ee43cef599d024c8535f.camel@gmail.com>
- <ac4a8761-410e-e8cc-d6b2-d56b820a7888@intel.com>
-In-Reply-To: <ac4a8761-410e-e8cc-d6b2-d56b820a7888@intel.com>
-From: Alexander Duyck <alexander.duyck@gmail.com>
-Date: Fri, 30 Jun 2023 07:44:45 -0700
-Message-ID: <CAKgT0UfZCGnWgOH96E4GV3ZP6LLbROHM7SHE8NKwq+exX+Gk_Q@mail.gmail.com>
-Subject: Re: [PATCH RFC net-next 2/4] net: page_pool: avoid calling no-op
- externals when possible
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>, 
-	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, netdev@vger.kernel.org, 
-	linux-kernel@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_PASS,SPF_NEUTRAL,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 5:30=E2=80=AFAM Alexander Lobakin
-<aleksander.lobakin@intel.com> wrote:
->
-> From: Alexander H Duyck <alexander.duyck@gmail.com>
-> Date: Thu, 29 Jun 2023 09:45:26 -0700
->
-> > On Thu, 2023-06-29 at 17:23 +0200, Alexander Lobakin wrote:
-> >> Turned out page_pool_put{,_full}_page() can burn quite a bunch of cycl=
-es
-> >> even when on DMA-coherent platforms (like x86) with no active IOMMU or
-> >> swiotlb, just for the call ladder.
-> >> Indeed, it's
->
-> [...]
->
-> >> @@ -341,6 +345,12 @@ static bool page_pool_dma_map(struct page_pool *p=
-ool, struct page *page)
-> >>
-> >>      page_pool_set_dma_addr(page, dma);
-> >>
-> >> +    if ((pool->p.flags & PP_FLAG_DMA_MAYBE_SYNC) &&
-> >> +        dma_need_sync(pool->p.dev, dma)) {
-> >> +            pool->p.flags |=3D PP_FLAG_DMA_SYNC_DEV;
-> >> +            pool->p.flags &=3D ~PP_FLAG_DMA_MAYBE_SYNC;
-> >> +    }
-> >> +
-> >>      if (pool->p.flags & PP_FLAG_DMA_SYNC_DEV)
-> >>              page_pool_dma_sync_for_device(pool, page, pool->p.max_len=
-);
-> >>
-> >
-> > I am pretty sure the logic is flawed here. The problem is
-> > dma_needs_sync depends on the DMA address being used. In the worst case
-> > scenario we could have a device that has something like a 32b DMA
-> > address space on a system with over 4GB of memory. In such a case the
-> > higher addresses would need to be synced because they will go off to a
-> > swiotlb bounce buffer while the lower addresses wouldn't.
-> >
-> > If you were to store a flag like this it would have to be generated per
-> > page.
->
-> I know when DMA might need syncing :D That's the point of this shortcut:
-> if at least one page needs syncing, I disable it for the whole pool.
-> It's a "better safe than sorry".
-> Using a per-page flag involves more changes and might hurt some
-> scenarios/setups. For example, non-coherent systems, where you always
-> need to do syncs. The idea was to give some improvement when possible,
-> otherwise just fallback to what we have today.
+Initial creation of an AF_XDP socket requires CAP_NET_RAW capability.
+A privileged process might create the socket and pass it to a
+non-privileged process for later use.  However, that process will be
+able to bind the socket to any network interface.  Even though it will
+not be able to receive any traffic without modification of the BPF map,
+the situation is not ideal.
 
-I am not a fan of having the page pool force the syncing either. Last
-I knew I thought the PP_FLAG_DMA_SYNC_DEV was meant to be set by the
-driver, not by the page pool API itself. The big reason for that being
-that the driver in many cases will have to take care of the DMA sync
-itself instead of letting the allocator take care of it.
+Sockets already have a mechanism that can be used to restrict what
+interface they can be attached to.  That is SO_BINDTODEVICE.
 
-Basically we are just trading off the dma_need_sync cost versus the
-page_pool_dma_sync_for_device cost. If we think it is a win to call
-dma_need_sync for every frame then maybe we should look at folding it
-into page_pool_dma_sync_for_device itself since that is the only
-consumer of it it or just fold it into the PP_FLAG_DMA_SYNC_DEV if
-statement after the flag check rather than adding yet another flag
-that will likely always be true for most devices. Otherwise you are
-just adding overhead for the non-exception case and devices that don't
-bother setting PP_FLAG_DMA_SYNC_DEV.
+To change the binding the process will need CAP_NET_RAW.
+
+Make xsk_bind() honor the SO_BINDTODEVICE in order to allow safer
+workflow when non-privileged process is using AF_XDP.
+
+Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+---
+
+Posting as an RFC for now to probably get some feedback.
+Will re-post once the tree is open.
+
+ Documentation/networking/af_xdp.rst | 9 +++++++++
+ net/xdp/xsk.c                       | 6 ++++++
+ 2 files changed, 15 insertions(+)
+
+diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
+index 247c6c4127e9..1cc35de336a4 100644
+--- a/Documentation/networking/af_xdp.rst
++++ b/Documentation/networking/af_xdp.rst
+@@ -433,6 +433,15 @@ start N bytes into the buffer leaving the first N bytes for the
+ application to use. The final option is the flags field, but it will
+ be dealt with in separate sections for each UMEM flag.
+ 
++SO_BINDTODEVICE setsockopt
++--------------------------
++
++This is a generic SOL_SOCKET option that can be used to tie AF_XDP
++socket to a particular network interface.  It is useful when a socket
++is created by a privileged process and passed to a non-privileged one.
++Once the option is set, kernel will refuse attempts to bind that socket
++to a different interface.  Updating the value requires CAP_NET_RAW.
++
+ XDP_STATISTICS getsockopt
+ -------------------------
+ 
+diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
+index 5a8c0dd250af..386ff641db0f 100644
+--- a/net/xdp/xsk.c
++++ b/net/xdp/xsk.c
+@@ -886,6 +886,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+ 	struct sock *sk = sock->sk;
+ 	struct xdp_sock *xs = xdp_sk(sk);
+ 	struct net_device *dev;
++	int bound_dev_if;
+ 	u32 flags, qid;
+ 	int err = 0;
+ 
+@@ -899,6 +900,11 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
+ 		      XDP_USE_NEED_WAKEUP))
+ 		return -EINVAL;
+ 
++	bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
++
++	if (bound_dev_if && bound_dev_if != sxdp->sxdp_ifindex)
++		return -EINVAL;
++
+ 	rtnl_lock();
+ 	mutex_lock(&xs->mutex);
+ 	if (xs->state != XSK_READY) {
+-- 
+2.40.1
+
 
