@@ -1,53 +1,53 @@
-Return-Path: <netdev+bounces-14783-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14784-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id A4BAE743CC7
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 15:29:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 320B2743CDE
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 15:36:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D23021C2093E
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 13:29:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 68FFC1C20878
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 13:36:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C4B2A156C7;
-	Fri, 30 Jun 2023 13:29:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 49A3D156CF;
+	Fri, 30 Jun 2023 13:35:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6226154B9
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 13:29:36 +0000 (UTC)
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2138.outbound.protection.outlook.com [40.107.220.138])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6506B170E;
-	Fri, 30 Jun 2023 06:29:35 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 36B03156C7
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 13:35:58 +0000 (UTC)
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (mail-co1nam11on2121.outbound.protection.outlook.com [40.107.220.121])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 81BBB421F;
+	Fri, 30 Jun 2023 06:35:47 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dntjOS3vo6AtsS62A0cIYhlCVR3BkGvUXvsgzs3gmz6KpwzWy5cfR7Ke8FaQfE3PymNqFaeFmteBJjcM4tsoqec7Ln+q86wzRGBug3gTsrVC0k+JK02EA6phx90sXV51GbdXd79993BTN3wrAuWpmOzjn0gHb/+O0wuW9su/BhP5uW7pvKxQtrdw9VrULV7iLrnMq1FgJKds+/l5tentJV1eVpRM12CZ4YeWuFVGJSh5G5P2Q7eZy46Rz6Y7Ps4YBHZLuf2CKe7AC+LTDMDYh0H7UoaEAtqRWVYpaivcGfto4tz/lsxaboK7Nq8NtDFKs9GRtLtQyokCDAyaAbwjeQ==
+ b=Syx+i1+F9ux/ELnWrdRRUjqM7QvXxm90eH1kxfZthR1qvqXvjTM9IErQtPWf3OU/HHR+7muKWXvj8vNQKjL0z5ElUTgFJO433wKVML0V275rRJDUsInuudasqXVTlrp6RCcgVtCq7QGKqWACOl9n7nI7uE45fQoTLX0uUYjP2ayaVHShy2ksuYXqMHeX1ITDqh6xFJMM5fJuUZ2V6ZIUcy19nRiiCLv9Vj1jud1LfAdoiuSX20y4/tKDmB2Ici2VmOMgEYQp+gT4ovNdr2T6Atexjw8JH2/7hVAifGny0zKBRD6OYq4jbSwAUVqVDLZ+dyzZ62wf66mcl0WOdxSfdA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=sAB7sIDgzQe7EhV78Alk29UXC8OSsbgPwvJ+50MCzYs=;
- b=jf4ZxJ4NGLbzC69EeNz96nrnz0pgtwu4TyUG6R4wJoIGl+5DTcUiRls6EGXoDunCmbZ3TnpGhqgGuevksrgAB3+lm4ycQsi06/awWAR3BXe5d7zNQQ83+SucCoI4ayZyY2yUrvpEUoaHi/zQcL3nCPAgq4Eq17TRwqOnCaS4Gw7KUzyVb4ojKo4a3jS4y1D7cC/KNOharZqfscYwGXIqq7bUlPKdcZNjOQLNNQAwNclgl23XCQGeBsvueQwFqhA9zMX03W9KqK2xHWRK3QRwfY4As75mss8kfcUceCzjqmPo+MDJ4dtZcPk9IloSRsipP8t10XIS7fFfnyhKy4FnIw==
+ bh=WGFToYSIqfakO6XytJMxZX8qXMqwCL0hiPBcXlH5cgw=;
+ b=DL64C3zHiagaWDnRTHncy2GRxaKvHYlHilljOR1iz/V7WjsmKfcMKnVrF8RoZkWH7Lr+RXpPQMptFWpG/rnjO4KAkwdtiVTFPwiTjDohMkoyx8X2Ft7vkWsxZgxqPtlcbkAOgYWPaeUyCAyqs6TKKbUDWM75FxOBAFqQBxa6CpMSgGlmNsPpr2GI7BLJxYt7/Z1xbOZyrr/Oq8u/jGEf6DB99XmB2bHAx/h0aNFpJlbMtJ/gH1rzIWeaLJX7v9hJdEWV13fwu0efQropPVs3ChZ7i2Hsl2chrPkQ5vdqeq4UGfKpWZ0vJL2iczTxiPkHemvatDVP8T7Os5YPLIyHkA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
  dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=sAB7sIDgzQe7EhV78Alk29UXC8OSsbgPwvJ+50MCzYs=;
- b=WsmbZ/hGzzJFVSUnb7oMfLbw+A58mVf5QiSW0DB/McNuASXZ7YZYERmKmSnEzTlDBrLCPsbi8jy8QOjZbZ3mCllRL/Zbc35RMLBuuGgPJ6nePcLuGfmU8KjhxUxPnIWKpRx5/gd7DqQPCev3BnXBpKA2pepFXtRgghItz9jsCrw=
+ bh=WGFToYSIqfakO6XytJMxZX8qXMqwCL0hiPBcXlH5cgw=;
+ b=cvLviQsegr/x3Oe2v3Mibi+8pGltv6Gk/OqiMdJkpvdemAAJnSmCY1pikUx8zzXlBU8W6X471k1mTEm3ttMVT3WalaIvKOlnuu3cd+gpwtiGLl/PTn9+mRRDPanezYa2aRh8ftZn9OGMAdjYIar9ULdp6O2CpeyQTgBAgmPbNvc=
 Authentication-Results: dkim=none (message not signed)
  header.d=none;dmarc=none action=none header.from=corigine.com;
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by CH2PR13MB3768.namprd13.prod.outlook.com (2603:10b6:610:95::15) with
+ by PH7PR13MB5619.namprd13.prod.outlook.com (2603:10b6:510:139::16) with
  Microsoft SMTP Server (version=TLS1_2,
  cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.19; Fri, 30 Jun
- 2023 13:29:31 +0000
+ 2023 13:35:43 +0000
 Received: from PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
  ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
- 13:29:31 +0000
-Date: Fri, 30 Jun 2023 15:29:25 +0200
+ 13:35:41 +0000
+Date: Fri, 30 Jun 2023 15:35:23 +0200
 From: Simon Horman <simon.horman@corigine.com>
 To: Vladimir Oltean <vladimir.oltean@nxp.com>
 Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
@@ -56,16 +56,16 @@ Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
 	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
 	linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net 1/2] net: dsa: tag_sja1105: fix MAC DA patching from
- meta frames
-Message-ID: <ZJ7YtXGLZDuV+az1@corigine.com>
+Subject: Re: [PATCH net 2/2] net: dsa: sja1105: always enable the send_meta
+ options
+Message-ID: <ZJ7aG/tzAxutRoeo@corigine.com>
 References: <20230629141453.1112919-1-vladimir.oltean@nxp.com>
- <20230629141453.1112919-2-vladimir.oltean@nxp.com>
+ <20230629141453.1112919-3-vladimir.oltean@nxp.com>
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230629141453.1112919-2-vladimir.oltean@nxp.com>
-X-ClientProxiedBy: AM0PR03CA0074.eurprd03.prod.outlook.com
- (2603:10a6:208:69::15) To PH0PR13MB4842.namprd13.prod.outlook.com
+In-Reply-To: <20230629141453.1112919-3-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: AM0PR10CA0019.EURPRD10.PROD.OUTLOOK.COM
+ (2603:10a6:208:17c::29) To PH0PR13MB4842.namprd13.prod.outlook.com
  (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -74,76 +74,111 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH2PR13MB3768:EE_
-X-MS-Office365-Filtering-Correlation-Id: b1743f72-3ace-4b9d-d40b-08db796e097e
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB5619:EE_
+X-MS-Office365-Filtering-Correlation-Id: cde2cf67-5adc-4a1e-b9a5-08db796ee5f6
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
 X-Microsoft-Antispam-Message-Info:
-	sP31QXd9ivrVpJTQ00wkEZhZBE+1UcYEtW2GIDXWseb79ORDtga/wcgSmalDBUx+Q7ZzY7mH1+RkpdiJ9HS1jm7lm49IlZxcG8WRuA/jhaS852wqPTMc+a33ze4W/CKWrRQa63mg4uJJJtTxG3iR3z9uXpY4pbr7O0idR9sKeI510qXkeMLwszwXaqrkkrMNkRo2iC0W8YLjfJSBj3vI8DI/duLfTjmkFPI7lvDi+9JiWL0+B9dWfwxOqUWtnPbx1WKZpbYGt7Vqh4zG0jdXVawE8URfwrYS2Zgml+hLDbBNS7K4vx/b++xCS9iy6cv86tWh2ugZNuXWSAsow1XJp1IUzRsLcarPZpkNgb3FYVWM4UGRFJVPF9RRc6YbF90bmvkfDI9/DKVBWAZOxDyaPESJx7E7Uv2wIG4v3hZK9oktbSxK6g9g5ZfA6+dE6TnSRIy6axf6QLpkzH9yL5/aEtuYgWYNwTPrG1MvlPyqKcQqiz9v4RXpa42j5u+EpojMXyrW0IUZ7ACtC8g0J088rwR0swd6hXVq+/xsE3rAK8WJUrXygF8zZ/sq3h2Xyv3BGeDuh6vr6POwFx+FXhnu/wgAOVrMyZ9zl6R9zIZfHIB3w4Q4OfnMH+Hwvo+DrE6ig+O/BvxBgjZext0kU8uiVA==
+	Ee2bypC3zM6XLp8SdGFYi688e3cRZdt8pWXuugJIkhKBO8G+4I5ixcIxlxdcNfdY3vu/b4I/n3lAICs15VQNMea3QkfCzLfR59rlZ29vm3wJ+a5rkFb5qixCSvhZZFJ88hCvqii8I+wRO5o/B3AhrKB6Ssldn0/J+K4Dbj56BPswp1WL7CA/SCKBPFHoJRTYKQ81OomJzW6Pb8qoXNHI3XqsMbXou//NsORfj8CgQJLUrCtL6k9zXl5tDY+JtgcZfGXABDH0+wsBeoJf/UJFvYjaDKR9cy9ILNLxSkD9bqWBe40JmEPOxKP1NNciDHDkQh4U0I+YHnhzRjJloSDlkHo8lvsIpbWPvw+j33VtTxkOwzScFzP9qfP8k5HvHMGwKGNbuI11e8H8RrU8uJm28JwLsNvD6XnyJvmxfKbRNF47X/C0+rYSilesPy5D/X82HWvGExU8F/WZTJJcdV/sL1Y7+pLNa9L0/F3fiYVL2LAaLdG6/xeCO2NenhN0U9X4Vu8LxzJYh/h51/GSZM9sLKHxhXVC0PQ3bs7vyh0Samh9Y+S32+U4HUyNKnh4MM8i/OT49kQbyWBI3rcGwJHJz6OfZzPIDrOE5O3JLgPxBzA=
 X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39840400004)(346002)(136003)(376002)(366004)(396003)(451199021)(6486002)(6666004)(44832011)(8936002)(8676002)(478600001)(5660300002)(86362001)(41300700001)(316002)(6916009)(4326008)(54906003)(66556008)(66476007)(66946007)(2906002)(4744005)(186003)(6512007)(6506007)(2616005)(38100700002)(36756003)(67856001);DIR:OUT;SFP:1102;
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(376002)(346002)(366004)(39840400004)(136003)(451199021)(86362001)(54906003)(8936002)(8676002)(5660300002)(6506007)(44832011)(6486002)(478600001)(66946007)(66556008)(66476007)(6916009)(4326008)(6512007)(41300700001)(316002)(6666004)(186003)(2616005)(2906002)(83380400001)(36756003)(38100700002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?X3SH0cBneBYAwcxsuaCuPtHVLfc4OLQiuCWsr/ygGe3LCrah5OKDgpX4Edy6?=
- =?us-ascii?Q?RcDscR4Itm2+B4iS4FdDLZySzHW3iY70Xmm1RRvvIFEXDEjLIm8hQuDrg6BX?=
- =?us-ascii?Q?NsyVYanYYcuLBw2R+Arx3upUMrKtIFmshgOn/7yNs/6lHCQF+/sF2ofF5wWK?=
- =?us-ascii?Q?e39plKcmAs7izN/rlHGkv9OrR3eojLWwnRMiGhQaiCy0NU7jA1O3uWB3jn5A?=
- =?us-ascii?Q?xLQVWRem4gUZq3e3B81K8+rW1EtiZIEzb22jYglK00yN7Mg/YEnjhpCmOnTA?=
- =?us-ascii?Q?qyN6Luxvho3zM+zl22GDakC9XxzD19l/l49PfDd6gQ/Xw1hyt1Uc9tHL/nMt?=
- =?us-ascii?Q?vc/5i3knmII8lHP7dCd0509YD79Dz6DLPNBsSL86VzUaVFpHOy6xXrUwd1cY?=
- =?us-ascii?Q?kzU6WdNsD8rVKCvs6GozzGmxk5H//PWL3eFFSyioSaxumlGgpjo5ITduzR9P?=
- =?us-ascii?Q?BzrxfAl/28RXIOr1bMbpUYVh4iX1ZI8ABAd9nEpzE0VvjQ+Y7SZN7f+EoYpq?=
- =?us-ascii?Q?a7bUdr5JhTaD6zW9mAw1ZOJg46misNOUeE/DuDInCPn1OH9D/28Z2bowAa9R?=
- =?us-ascii?Q?ZLqXBI+kusM4EFs5KOpsTnhnwqeD4ENQSbcWYxa+/seAynrBh2dJjIY3k3C3?=
- =?us-ascii?Q?Q0e5yV3QhhfyC5YTMRig12yyPZ0Lwz0mi6JR1u3dQ3oiedRyxnLf1BewQup9?=
- =?us-ascii?Q?+J4sXdE93wMvztheyWH4GY/pcf/r0ETjK30K+NwDG72G1Dz9yTqJ96lNgV4t?=
- =?us-ascii?Q?y16azea9It2Gea6z4teaN9YQMjAzXV+vMNfDNHcLRQ92E0n49GdyLDl42DJo?=
- =?us-ascii?Q?z7Q/ImKuV+zbM74Hs5TL8x1L7mWbwujetTO3/r2PiGFM3e69P8tnQsNIrrjo?=
- =?us-ascii?Q?82FxTKrg5QB208/PT/Ort9Vooa9zFqQO4p4NwfvpjeYrKODiDNihU4MmX5/i?=
- =?us-ascii?Q?9K0+AVajS/qAJUoFMVFjD43wCDZYRvQXm9XCMegusPVv/0XIdX607wBlpjRG?=
- =?us-ascii?Q?YP/yCTQW3p008P8UfN4/2M2B8DVMIFRBKzFmfRcROlweeCmm/BHMi7UObQYY?=
- =?us-ascii?Q?68p2ZYDfVLDRcrV3HQOa9FD1wx+KySEBNOJo3OBk0g6dhzlTnqwrBAvWW8qH?=
- =?us-ascii?Q?H2Pkp/88xTwtASZiUEgpO4SiKwD+5Tt1hpSv02faz4iJYR+l1WBzX714Gqpw?=
- =?us-ascii?Q?KsU5emSxjW72OqId7mQxJ+HTeGDQ9B15xkPrbVEAsMRGqnPnkHQHyk0dJc0r?=
- =?us-ascii?Q?PCDxnhof7wGoOVmW6QKs18dplf0vwckzwwSDIKMjYPX+Hcb8SCrSKJs7w1sj?=
- =?us-ascii?Q?+OATD8E79QpYwl92QwPq3aiySjIcAVUhAIO/KYwwMnHV0rKev2uT3h+VGUrq?=
- =?us-ascii?Q?asKoo2tZ6aNNQl8fyi0QsZnGpTsztCbo9hvY38sb95gC3hvHaRCn6KVMY7xY?=
- =?us-ascii?Q?aPs+kazzozRNLecWHVstWYsOHu7vvYV+7uMSBnl86ScKEnAD0xJ5EwSj2O6c?=
- =?us-ascii?Q?2x8dE8jj3L/VijjTZwpX8TBiD5cIPB5tP1QUoAVFNn7sieXmFOYWdrdKXF8Y?=
- =?us-ascii?Q?2sumNw9nbfvigjypj+JhiEV3q/alFihn9YYWm29QcaQv6jZr7HsnE5lWVbx1?=
- =?us-ascii?Q?iVfqp4LovSwR66gFp4S6grchx3q6QjZs0PRGI0/9QYfEfq5puDsfG5J7CItA?=
- =?us-ascii?Q?IM7Wcg=3D=3D?=
+	=?us-ascii?Q?vwzhsLP+DVhVYrokX9gV06BEXnjto5pIpi4L6XBZ+5Qx7ue6+d7zhexYIXaU?=
+ =?us-ascii?Q?fkDh1aH3LFBRAgtjm91QW9wFbww7ZYUBuvyCvfSxzJDnCUxfJwgeyAgkVWCS?=
+ =?us-ascii?Q?J97mQ73ZnUwm0MrjKX5D1qOS7U93QuoYNg8hKlRPOp0NI+BFeO28TzbI5Fus?=
+ =?us-ascii?Q?6qhqZfVuMW0KElWG/FErS/c3alim6Rhe0u8/giT/E5zO4qLn4GJPd3XUTNyg?=
+ =?us-ascii?Q?1wb26wm/FtCBTeHoCBGtg0O9/ubtCSK52daOK8u99O1nk8z+8F1kIWDkwCxe?=
+ =?us-ascii?Q?yItFlvmYR8KC1Yfi7rz1PBpr9YLYarWFLn1pSmOrbqIBEDMAeSvhBGbNByJP?=
+ =?us-ascii?Q?IR1UXFgQe0rnfNf/5AyiGW2jmvgzYCM9DxA2acgN+HzeECfXuvCx9dri3Oja?=
+ =?us-ascii?Q?Nr94CW/FsaDQbRlfT1BL8a3vtoK0iUrmcrx7kUfl0AK20Muv3iVHLze7BW6i?=
+ =?us-ascii?Q?HNsWAGmJlk01bEgDJCXbXaKl2AwayqtqH4Cn2D/oblmUfOvpMuIt3C7MDr+x?=
+ =?us-ascii?Q?1jGVNSXDosThgeFVX9xMsZhlLIAX8YrtQfyUU4+LCFIjScmLpuwGEr9WywmV?=
+ =?us-ascii?Q?OgvwxDH5pZM9BpXuv19Nx30Gs5UZyzGOd3b2FhAfAJkjWhiffaSnU0ZbQHp9?=
+ =?us-ascii?Q?4WiLGEQ8mDwfN/qY+E09GpQM8/mKlmBS37qTpefyE5stp09M8J/hw2qk8+HQ?=
+ =?us-ascii?Q?N76dPMwayV1kMZL6oaTDpuehVadxr4TSmjXcaZ11BjnMyXm9dJfDrHWIUWZ3?=
+ =?us-ascii?Q?vLt93RYt3RcCvtb9o8YhTbWTCKMjqf43iabmZGqDoWR8dj1DY5GfsjVPsp/e?=
+ =?us-ascii?Q?JmbBAVRh3jurFIIFB8Gs067Ba/tXKw+o0UXNiRsnd491/97PAv1vYgZezw3m?=
+ =?us-ascii?Q?tnF0mnzp0fejClVjkxE2GvhwA0onAi+t7WeFG0fKb+KNtJl9nJdG3Sscmmgq?=
+ =?us-ascii?Q?f75v5oEKg3P9IL0rJ9e1GwCDqM+Cd9N40BE8/R8+gE4PSPfAsTibSjHtErLP?=
+ =?us-ascii?Q?paddVK9tJmcrd8vYu/jyhBnrVEnwvw+oZ1MSPF0E1trYyewu+Na63EsOReLY?=
+ =?us-ascii?Q?3oe+LyyYLBW4kaiYTTlPrcJKCeQIBKANxx3He03DFxkJ5DNcCM3rie50fXJ8?=
+ =?us-ascii?Q?7URtiHiqiqvNKH18/KiWBJb5YO4CWSsosgjyhB8Wehzz1vF/SUfWhB1Auu3h?=
+ =?us-ascii?Q?80AaiKKHgkDkdXkRhOrvUnShi+HlNb7fCwWV6xKZVzPMSL/WRWUuuX/tcFus?=
+ =?us-ascii?Q?NxAciRNzNjVUan5YDeeEVQndwPbLBEVraRAGUxZm5SB42v55wIYu5PbWp646?=
+ =?us-ascii?Q?KywwbeYqo25XBZvyLeIvkfDr4NR5phcsZr96eVngQi7B/DAZRyiK89D2TQYz?=
+ =?us-ascii?Q?l3OklFMzU03wgeOjSzCiB0TAmPKzckKY9IZSRaynRjlDeqp2wgQamAByMtCv?=
+ =?us-ascii?Q?JK4+PmWjdKc2oSGmepCv32FQXxEdOV+IUutXh6psHtYyPaKpekLN1IKDylrf?=
+ =?us-ascii?Q?hLwLiknwXrckCPWd43mmqX/LkZnhFH+lzQSh5Lz9hefJUAauY1N1C10BTKd0?=
+ =?us-ascii?Q?OX0unnblymIYKQnaAJLIGUJssxwJSXeSqRPeep/VZ9qU4iD62A8MDTlY6FUz?=
+ =?us-ascii?Q?V4U72gTn4bHMKxLEOLMhyc03leFJrqdhN/iwUb6oGpHGpIU+li6nn/Puze0R?=
+ =?us-ascii?Q?fM5w+Q=3D=3D?=
 X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b1743f72-3ace-4b9d-d40b-08db796e097e
+X-MS-Exchange-CrossTenant-Network-Message-Id: cde2cf67-5adc-4a1e-b9a5-08db796ee5f6
 X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 13:29:31.7240
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 13:35:41.5837
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
 X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: MrKtuHIw6ecb7x37DPoaOdzzctuEeDFhWIPmUNSVeI/15U8E8E7eXPePwPzFJxZyzfmfPga7bMGnvprUi5egb/61vxI9lsSjENNKkOlUYSs=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB3768
+X-MS-Exchange-CrossTenant-UserPrincipalName: 3X22N0I1+RTDzBJ9ILdhqQuJEdT7cPgIqEWAXv6C6aMuXwpw4FIQJGOfcgyxjygsez1bCcwdCh9EiZoAhOqLzujm3sqLNJMyuD6UVlCzsvQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB5619
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 29, 2023 at 05:14:52PM +0300, Vladimir Oltean wrote:
-> The SJA1105 manual says that at offset 4 into the meta frame payload we
-> have "MAC destination byte 2" and at offset 5 we have "MAC destination
-> byte 1". These are counted from the LSB, so byte 1 is h_dest[ETH_HLEN-2]
-> aka h_dest[4] and byte 2 is h_dest[ETH_HLEN-3] aka h_dest[3].
+On Thu, Jun 29, 2023 at 05:14:53PM +0300, Vladimir Oltean wrote:
+> incl_srcpt has the limitation, mentioned in commit b4638af8885a ("net:
+> dsa: sja1105: always enable the INCL_SRCPT option"), that frames with a
+> MAC DA of 01:80:c2:xx:yy:zz will be received as 01:80:c2:00:00:zz unless
+> PTP RX timestamping is enabled.
 > 
-> The sja1105_meta_unpack() function decodes these the other way around,
-> so a frame with MAC DA 01:80:c2:11:22:33 is received by the network
-> stack as having 01:80:c2:22:11:33.
+> The incl_srcpt option was initially unconditionally enabled, then that
+> changed with commit 42824463d38d ("net: dsa: sja1105: Limit use of
+> incl_srcpt to bridge+vlan mode"), then again with b4638af8885a ("net:
+> dsa: sja1105: always enable the INCL_SRCPT option"). Bottom line is that
+> it now needs to be always enabled, otherwise the driver does not have a
+> reliable source of information regarding source_port and switch_id for
+> link-local traffic (tag_8021q VLANs may be imprecise since now they
+> identify an entire bridging domain when ports are not standalone).
 > 
-> Fixes: e53e18a6fe4d ("net: dsa: sja1105: Receive and decode meta frames")
+> If we accept that PTP RX timestamping (and therefore, meta frame
+> generation) is always enabled in hardware, then that limitation could be
+> avoided and packets with any MAC DA can be properly received, because
+> meta frames do contain the original bytes from the MAC DA of their
+> associated link-local packet.
+> 
+> This change enables meta frame generation unconditionally, which also
+> has the nice side effects of simplifying the switch control path
+> (a switch reset is no longer required on hwtstamping settings change)
+> and the tagger data path (it no longer needs to be informed whether to
+> expect meta frames or not - it always does).
+> 
+> Fixes: 227d07a07ef1 ("net: dsa: sja1105: Add support for traffic through standalone ports")
 > Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
+> ---
+>  drivers/net/dsa/sja1105/sja1105.h      |  2 +-
+>  drivers/net/dsa/sja1105/sja1105_main.c |  5 ++-
+>  drivers/net/dsa/sja1105/sja1105_ptp.c  | 48 +++-----------------------
+>  include/linux/dsa/sja1105.h            |  4 ---
+>  net/dsa/tag_sja1105.c                  | 45 ------------------------
+>  5 files changed, 7 insertions(+), 97 deletions(-)
+
+Hi Vladimir,
+
+this patch isn't that big, so I'm ok with it.  But it also isn't that
+small, so I'd just like to mention that a different approach might be a
+small patch that enables meta frame generation unconditionally, as a fix.
+And then, later, some cleanup, which seems to comprise most of this patch.
+
+I do admit that I didn't try this. So it might not be sensible.  And as I
+said, I am ok with this patch. But I did think it was worth mentioning.
 
 Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
+...
 
