@@ -1,501 +1,136 @@
-Return-Path: <netdev+bounces-14728-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14729-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7311F7435D3
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 09:35:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6ED0F74365A
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 10:02:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B49D3280FC6
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 07:35:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4AEA81C20B71
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 08:02:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86A2E8BEB;
-	Fri, 30 Jun 2023 07:35:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 04A628F50;
+	Fri, 30 Jun 2023 08:02:09 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F32F187E
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 07:35:30 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A04322705
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 00:35:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688110523;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=yvzZRKpw3ApeLTYKDB5Db4szpWf9nkwkkEGTxj7vByA=;
-	b=BmvLaIZuXGBx3DV33Ecbpn05/tZh6Gu9fLxBXdnEK7VPibPC2y8AanHRcSj0QDGdKp364a
-	MHX7cyq3K5SU4ziGpu/nilJUVdL1KodJHkzgo0nBBvksQtNdo+PSh21R+wOKGuNrvIuzWt
-	vYrGcbaSLyBLEuD+EZmFzmF1zlyvong=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-550-Cddtiq_yMyCNmfFMzO2DuQ-1; Fri, 30 Jun 2023 03:35:22 -0400
-X-MC-Unique: Cddtiq_yMyCNmfFMzO2DuQ-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b6ae3cb20cso15609461fa.3
-        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 00:35:21 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688110520; x=1690702520;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=yvzZRKpw3ApeLTYKDB5Db4szpWf9nkwkkEGTxj7vByA=;
-        b=JLePXXJJ0UnFmh+5kou/eLTuxdys5Xvk1GadUx70eFqeYWBZz/SrvGaX5F7pLWcWQ2
-         2YiDjF8NkjivGPh4wBstKSdPIDF4hZpzJGTYYcf/8NwFgGVFUNotb82ihoaBlwHPxd6G
-         XHxgfU9okX/fo5ulDAWoKSQjGMoy/nI6eg57seupv6kG6tUr8vzFauqDckQ/nd54BSPc
-         WuUWWEB5h4WcaicW+RF1n4oUp1CMuLpeMcqSl6tHn1MNA69LGv0gR9mzw0th9a2WYSXd
-         jcgI8hCzKtn4mW6O56zxyMBTNCC8qLu8VVzBQ3OwSd9thsBHtitj0KhGJhT2cshp5JTg
-         WvzQ==
-X-Gm-Message-State: ABy/qLawKfAHiOkXVVXceSSqesI3OtnMNB+bA9gjq/wDOxBBswjf6kYH
-	EVgQWa1GxAXJXISLE6BJ7hZnHwRZz7KSrAvcrzBIlW9OdShJkHvqMXjQinrUidxUIjlgyc5PYyN
-	1yCXYZ8NqkTeQisC8tXfzCA/atpWzWhhT
-X-Received: by 2002:a2e:9844:0:b0:2b6:cd6a:17f7 with SMTP id e4-20020a2e9844000000b002b6cd6a17f7mr1538190ljj.20.1688110520479;
-        Fri, 30 Jun 2023 00:35:20 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHmy2wRmgzS5X0oeLsjKhyHqRY65CB4fGDqnkVmGQ45hSJXzqcq1rMA7IliihuDVCT9jaj0hiO3sbePpF8neyw=
-X-Received: by 2002:a2e:9844:0:b0:2b6:cd6a:17f7 with SMTP id
- e4-20020a2e9844000000b002b6cd6a17f7mr1538167ljj.20.1688110520030; Fri, 30 Jun
- 2023 00:35:20 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4AAB187E
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 08:02:07 +0000 (UTC)
+Received: from a.mx.secunet.com (a.mx.secunet.com [62.96.220.36])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA5F82D55
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 01:02:05 -0700 (PDT)
+Received: from localhost (localhost [127.0.0.1])
+	by a.mx.secunet.com (Postfix) with ESMTP id 86B5320743;
+	Fri, 30 Jun 2023 10:02:03 +0200 (CEST)
+X-Virus-Scanned: by secunet
+Received: from a.mx.secunet.com ([127.0.0.1])
+	by localhost (a.mx.secunet.com [127.0.0.1]) (amavisd-new, port 10024)
+	with ESMTP id osIJu4QKTxTk; Fri, 30 Jun 2023 10:02:02 +0200 (CEST)
+Received: from mailout1.secunet.com (mailout1.secunet.com [62.96.220.44])
+	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
+	(No client certificate requested)
+	by a.mx.secunet.com (Postfix) with ESMTPS id 9513E206E9;
+	Fri, 30 Jun 2023 10:02:02 +0200 (CEST)
+Received: from cas-essen-02.secunet.de (unknown [10.53.40.202])
+	by mailout1.secunet.com (Postfix) with ESMTP id 8EEC180004A;
+	Fri, 30 Jun 2023 10:02:02 +0200 (CEST)
+Received: from mbx-essen-01.secunet.de (10.53.40.197) by
+ cas-essen-02.secunet.de (10.53.40.202) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 30 Jun 2023 10:02:02 +0200
+Received: from gauss2.secunet.de (10.182.7.193) by mbx-essen-01.secunet.de
+ (10.53.40.197) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Fri, 30 Jun
+ 2023 10:02:02 +0200
+Received: by gauss2.secunet.de (Postfix, from userid 1000)
+	id DB5CF3182B0C; Fri, 30 Jun 2023 10:02:01 +0200 (CEST)
+Date: Fri, 30 Jun 2023 10:02:01 +0200
+From: Steffen Klassert <steffen.klassert@secunet.com>
+To: Lin Ma <linma@zju.edu.cn>
+CC: <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<netdev@vger.kernel.org>, <tgraf@suug.ch>, <simon.horman@corigine.com>
+Subject: Re: [PATCH v3] net: xfrm: Amend XFRMA_SEC_CTX nla_policy structure
+Message-ID: <ZJ6L+chlwapjZO+A@gauss3.secunet.de>
+References: <20230630012241.2822225-1-linma@zju.edu.cn>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628030506.2213-1-hengqi@linux.alibaba.com>
- <20230628030506.2213-2-hengqi@linux.alibaba.com> <CACGkMEv7aVH0dgdd6N3RMH+57BWuxnq9NR8sPzD9wRQZ5TZRFQ@mail.gmail.com>
- <c6411922-51ad-3d8f-88aa-28883b44573d@linux.alibaba.com> <CACGkMEu=Cs5DFP+EFqxUXaiqz7vewhQ5zMMtChGpR_oGjrvMCg@mail.gmail.com>
- <20230628045626.GA32321@h68b04307.sqa.eu95> <CACGkMEt6Kb60Akn=aJjzJQg6Zg8F_24ezqAtwPOZxiu4-f7E3g@mail.gmail.com>
- <620af708-42a0-f711-cd7c-43362751c842@linux.alibaba.com> <CACGkMEufm08ym32Ft4ss7AzOjFaEoa5_CuZB29xF9qc3B2ZAhA@mail.gmail.com>
- <20230629054740.GA77232@h68b04307.sqa.eu95>
-In-Reply-To: <20230629054740.GA77232@h68b04307.sqa.eu95>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 30 Jun 2023 15:35:08 +0800
-Message-ID: <CACGkMEtASF=yFBroLadN=qeMhHZndwydM76xMshED50UzH8Z8w@mail.gmail.com>
-Subject: Re: [PATCH net-next v4 1/2] virtio-net: support coexistence of XDP
- and GUEST_CSUM
-To: Heng Qi <hengqi@linux.alibaba.com>
-Cc: netdev@vger.kernel.org, bpf@vger.kernel.org, 
-	"Michael S . Tsirkin" <mst@redhat.com>, "David S . Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Alexei Starovoitov <ast@kernel.org>, 
-	Daniel Borkmann <daniel@iogearbox.net>, Jesper Dangaard Brouer <hawk@kernel.org>, 
-	John Fastabend <john.fastabend@gmail.com>, Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230630012241.2822225-1-linma@zju.edu.cn>
+X-ClientProxiedBy: cas-essen-01.secunet.de (10.53.40.201) To
+ mbx-essen-01.secunet.de (10.53.40.197)
+X-EXCLAIMER-MD-CONFIG: 2c86f778-e09b-4440-8b15-867914633a10
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jun 29, 2023 at 1:47=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.com> =
-wrote:
->
-> On Thu, Jun 29, 2023 at 12:03:28PM +0800, Jason Wang wrote:
-> > On Wed, Jun 28, 2023 at 6:02=E2=80=AFPM Heng Qi <hengqi@linux.alibaba.c=
-om> wrote:
-> > >
-> > >
-> > >
-> > > =E5=9C=A8 2023/6/28 =E4=B8=8B=E5=8D=882:50, Jason Wang =E5=86=99=E9=
-=81=93:
-> > > > On Wed, Jun 28, 2023 at 12:56=E2=80=AFPM Heng Qi <hengqi@linux.alib=
-aba.com> wrote:
-> > > >> On Wed, Jun 28, 2023 at 12:02:17PM +0800, Jason Wang wrote:
-> > > >>> On Wed, Jun 28, 2023 at 11:42=E2=80=AFAM Heng Qi <hengqi@linux.al=
-ibaba.com> wrote:
-> > > >>>>
-> > > >>>>
-> > > >>>> =E5=9C=A8 2023/6/28 =E4=B8=8A=E5=8D=8811:22, Jason Wang =E5=86=
-=99=E9=81=93:
-> > > >>>>> On Wed, Jun 28, 2023 at 11:05=E2=80=AFAM Heng Qi <hengqi@linux.=
-alibaba.com> wrote:
-> > > >>>>>> We are now re-probing the csum related fields and trying
-> > > >>>>>> to have XDP and RX hw checksum capabilities coexist on the
-> > > >>>>>> XDP path. For the benefit of:
-> > > >>>>>> 1. RX hw checksum capability can be used if XDP is loaded.
-> > > >>>>>> 2. Avoid packet loss when loading XDP in the vm-vm scenario.
-> > > >>>>>>
-> > > >>>>>> Signed-off-by: Heng Qi <hengqi@linux.alibaba.com>
-> > > >>>>>> Reviewed-by: Xuan Zhuo <xuanzhuo@linux.alibaba.com>
-> > > >>>>>> ---
-> > > >>>>>> v3->v4:
-> > > >>>>>>     - Rewrite some comments.
-> > > >>>>>>
-> > > >>>>>> v2->v3:
-> > > >>>>>>     - Use skb_checksum_setup() instead of virtnet_flow_dissect=
-_udp_tcp().
-> > > >>>>>>       Essentially equivalent.
-> > > >>>>>>
-> > > >>>>>>    drivers/net/virtio_net.c | 82 +++++++++++++++++++++++++++++=
-++++-------
-> > > >>>>>>    1 file changed, 69 insertions(+), 13 deletions(-)
-> > > >>>>>>
-> > > >>>>>> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net=
-.c
-> > > >>>>>> index 5a7f7a76b920..a47342f972b5 100644
-> > > >>>>>> --- a/drivers/net/virtio_net.c
-> > > >>>>>> +++ b/drivers/net/virtio_net.c
-> > > >>>>>> @@ -1568,6 +1568,41 @@ static void virtio_skb_set_hash(const s=
-truct virtio_net_hdr_v1_hash *hdr_hash,
-> > > >>>>>>           skb_set_hash(skb, __le32_to_cpu(hdr_hash->hash_value=
-), rss_hash_type);
-> > > >>>>>>    }
-> > > >>>>>>
-> > > >>>>>> +static int virtnet_set_csum_after_xdp(struct virtnet_info *vi=
-,
-> > > >>>>>> +                                     struct sk_buff *skb,
-> > > >>>>>> +                                     __u8 flags)
-> > > >>>>>> +{
-> > > >>>>>> +       int err =3D 0;
-> > > >>>>>> +
-> > > >>>>>> +       /* When XDP program is loaded, the vm-vm scenario on t=
-he same host,
-> > > >>>>>> +        * packets marked VIRTIO_NET_HDR_F_NEEDS_CSUM without =
-a complete checksum
-> > > >>>>>> +        * will travel. Although these packets are safe from t=
-he point of
-> > > >>>>>> +        * view of the vm, in order to be successfully forward=
-ed on the upper
-> > > >>>>>> +        * layer and to avoid packet loss caused by XDP modifi=
-cation,
-> > > >>>>>> +        * we re-probe the necessary checksum related informat=
-ion:
-> > > >>>>>> +        * skb->csum_{start, offset}, pseudo-header checksum.
-> > > >>>>>> +        *
-> > > >>>>>> +        * If the received packet is marked VIRTIO_NET_HDR_F_D=
-ATA_VALID:
-> > > >>>>>> +        * when _F_GUEST_CSUM is negotiated, the device valida=
-tes the checksum
-> > > >>>>>> +        * and virtio-net sets skb->ip_summed to CHECKSUM_UNNE=
-CESSARY;
-> > > >>>>>> +        * otherwise, virtio-net hands over to the stack to va=
-lidate the checksum.
-> > > >>>>>> +        */
-> > > >>>>>> +       if (flags & VIRTIO_NET_HDR_F_NEEDS_CSUM) {
-> > > >>>>>> +               /* No need to care about SCTP because virtio-n=
-et currently doesn't
-> > > >>>>>> +                * support SCTP CRC checksum offloading, that =
-is, SCTP packets have
-> > > >>>>>> +                * complete checksums.
-> > > >>>>>> +                */
-> > > >>>>>> +               err =3D skb_checksum_setup(skb, true);
-> > > >>>>> A second thought, any reason why a checksum is a must here. Cou=
-ld we simply:
-> > > >>>> When net.ipv4.ip_forward sysctl is enabled, such packets may be
-> > > >>>> forwarded (return to the tx path) at the IP layer.
-> > > >>>> If the device has the tx hw checksum offloading cap, packets wil=
-l have
-> > > >>>> complete checksums based on our calculated 'check' value.
-> > > >>> Actually, I mean why can't we offload the checksum to the hardwar=
-e in this case?
-> > > >> Yes that's what I explained:)
-> > > >>
-> > > >> Checksum of udp/tcp includes the pseudo-header checksum and the ch=
-ecksum of the entire udp/tcp payload.
-> > > >> When tx checksum offloading is enabled, the upper layer will only =
-calculate the pseudo-header checksum,
-> > > >> and the rest of the checksum of the entire udp/tcp payload will be=
- calculated by hardware.
-> > > >>
-> > > >>
-> > > >> Please see udp_send_skb():
-> > > >>
-> > > >> "
-> > > >>          } else if (skb->ip_summed =3D=3D CHECKSUM_PARTIAL) { /* U=
-DP hardware csum */
-> > > >> csum_partial:
-> > > >>
-> > > >>                  udp4_hwcsum(skb, fl4->saddr, fl4->daddr);
-> > > >>                  goto send;
-> > > >>
-> > > >>          } else
-> > > >>                  csum =3D udp_csum(skb);
-> > > >>
-> > > >>          /* add protocol-dependent pseudo-header */
-> > > >>          uh->check =3D csum_tcpudp_magic(fl4->saddr, fl4->daddr, l=
-en,
-> > > >>                                        sk->sk_protocol, csum);
-> > > >>          if (uh->check =3D=3D 0)
-> > > >>                  uh->check =3D CSUM_MANGLED_0;
-> > > >>
-> > > >> send:
-> > > >>          err =3D ip_send_skb(sock_net(sk), skb);
-> > > >> "
-> > > > Ok, so I think what I missed is that the CHECKSUM_PARTIAL is set up=
- by
-> > > > skb_checksum_setup() so we don't even need to care about that.
-> > >
-> > > Yes. It works fine after skb_checksum_setup().
-> > >
-> > > >
-> > > >>>>> 1) probe the csum_start/offset
-> > > >>>>> 2) leave it as CHECKSUM_PARTIAL
-> > > >>>>>
-> > > >>>>> ?
-> > > >>>> The reason is as I explained above.
-> > > >>>>
-> > > >>>>>> +       } else if (flags & VIRTIO_NET_HDR_F_DATA_VALID) {
-> > > >>>>>> +               /* XDP guarantees that packets marked as VIRTI=
-O_NET_HDR_F_DATA_VALID
-> > > >>>>>> +                * still have correct checksum after they are =
-processed.
-> > > >>>>>> +                */
-> > > >>>>> Do you mean it's the charge of the XDP program to calculate the=
- csum
-> > > >>>>> in this case? Seems strange.
-> > > >>>> Packet with complete checksum (and has been verified by rx devic=
-e
-> > > >>>> because it has VIRTIO_NET_HDR_F_DATA_VALID)
-> > > >>>> when modified by XDP, XDP program should use the helper provided=
- by XDP
-> > > >>>> core to make the checksum correct,
-> > > >>> Could you give me a pointer to that helper?
-> > > >> bpf_csum_diff(),
-> > > > Ok.
-> > > >
-> > > >> bpf_{l3,l4}_csum_replace()
-> > > > This seems not to be a helpr for XDP but for other bpf like cls.
-> > >
-> > > Yes.
-> > >
-> > > >
-> > > >>> Btw, is there a way for
-> > > >>> the XDP program to know whether the csum has been verified by the
-> > > >>> device? ( I guess not).
-> > > >>>
-> > > >> Not. But we only do this (mark skb->ip_summed =3D CHECKSUM_UNNECES=
-SARY) for packets with VIRTIO_NET_HDR_F_DATA_VALID now.
-> > > > So if I understand you correctly, you meant for the XDP program tha=
-t
-> > > > wants to modify the packet:
-> > > >
-> > > > 1) check whether the checksum is valid
-> > > > 2) if yes, recalculate the checksum after the modification
-> > > > 3) if not, just do nothing for the checksum and the driver need to
-> > > > re-probe the csum_start/offset
-> > > >
-> > > > ?
-> > >
-> > > I don't think we need to make many assumptions about the behavior of =
-XDP
-> > > programs.
-> > > Because we are out of control for various users using XDP.
-> >
-> > Exactly, but this patch seems to assume the XDP behaviour as you said p=
-reviously
-> >
->
-> Let me sum it up:
-> When getting a skb from XDP_PASS, rx virtio-net will have the following
-> scenarios:
-> 1. In a virtualized environment such as vm-vhost_user-vm, vhost-user or
-> some backends find that no physical link is required to reach the
-> destination, then they will save the cost of calculating the complete
-> checksum on the tx device side. That is, the device
-> directly sends the packet with the pseudo-header checksum, and the
-> rx side directly receives the packet with the pseudo-header checksum.
-> This is a problem we have to deal with, but other hardware
-> NICs don't have this problem (veth actually also has this problem,
-> which I mentioned in the proposal).
->
-> 2. If the packet has passed through the physical link, it means
-> that the received packet has a complete checksum and not only a
-> pseudo-header checksum. At this time, virtio-net only needs to be
-> consistent with other NIC driver behaviors:
->
->   2.1 If the device has verified the checksum, mark
->       skb->ip_summend=3DCHECKSUM_UNNECESSARY after XDP processing;
->   2.2 If the device does not verify the checksum, after XDP processing,
->       skb->ip_summend=3DCHECKSUM_NONE, the checksum is verified by the st=
-ack.
+On Fri, Jun 30, 2023 at 09:22:41AM +0800, Lin Ma wrote:
+> According to all consumers code of attrs[XFRMA_SEC_CTX], like
+> 
+> * verify_sec_ctx_len(), convert to xfrm_user_sec_ctx*
+> * xfrm_state_construct(), call security_xfrm_state_alloc whose prototype
+> is int security_xfrm_state_alloc(.., struct xfrm_user_sec_ctx *sec_ctx);
+> * copy_from_user_sec_ctx(), convert to xfrm_user_sec_ctx *
+> ...
+> 
+> It seems that the expected parsing result for XFRMA_SEC_CTX should be
+> structure xfrm_user_sec_ctx, and the current xfrm_sec_ctx is confusing
+> and misleading (Luckily, they happen to have same size 8 bytes).
+> 
+> This commit amend the policy structure to xfrm_user_sec_ctx to avoid
+> ambiguity.
+> 
+> Fixes: cf5cb79f6946 ("[XFRM] netlink: Establish an attribute policy")
+> Signed-off-by: Lin Ma <linma@zju.edu.cn>
+> ---
+> V1 -> V2: also amend compat_policy XFRMA_SEC_CTX
+> V2 -> V3: fix typo
+> 
+>  net/xfrm/xfrm_compat.c | 2 +-
+>  net/xfrm/xfrm_user.c   | 3 ++-
+>  2 files changed, 3 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/xfrm/xfrm_compat.c b/net/xfrm/xfrm_compat.c
+> index 8cbf45a8bcdc..655fe4ff8621 100644
+> --- a/net/xfrm/xfrm_compat.c
+> +++ b/net/xfrm/xfrm_compat.c
+> @@ -108,7 +108,7 @@ static const struct nla_policy compat_policy[XFRMA_MAX+1] = {
+>  	[XFRMA_ALG_COMP]	= { .len = sizeof(struct xfrm_algo) },
+>  	[XFRMA_ENCAP]		= { .len = sizeof(struct xfrm_encap_tmpl) },
+>  	[XFRMA_TMPL]		= { .len = sizeof(struct xfrm_user_tmpl) },
+> -	[XFRMA_SEC_CTX]		= { .len = sizeof(struct xfrm_sec_ctx) },
+> +	[XFRMA_SEC_CTX]		= { .len = sizeof(struct xfrm_user_sec_ctx) },
+>  	[XFRMA_LTIME_VAL]	= { .len = sizeof(struct xfrm_lifetime_cur) },
+>  	[XFRMA_REPLAY_VAL]	= { .len = sizeof(struct xfrm_replay_state) },
+>  	[XFRMA_REPLAY_THRESH]	= { .type = NLA_U32 },
+> diff --git a/net/xfrm/xfrm_user.c b/net/xfrm/xfrm_user.c
+> index c34a2a06ca94..0c997a114d13 100644
+> --- a/net/xfrm/xfrm_user.c
+> +++ b/net/xfrm/xfrm_user.c
+> @@ -3015,7 +3015,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+>  	[XFRMA_ALG_COMP]	= { .len = sizeof(struct xfrm_algo) },
+>  	[XFRMA_ENCAP]		= { .len = sizeof(struct xfrm_encap_tmpl) },
+>  	[XFRMA_TMPL]		= { .len = sizeof(struct xfrm_user_tmpl) },
+> -	[XFRMA_SEC_CTX]		= { .len = sizeof(struct xfrm_sec_ctx) },
+> +	[XFRMA_SEC_CTX]		= { .len = sizeof(struct xfrm_user_sec_ctx) },
+>  	[XFRMA_LTIME_VAL]	= { .len = sizeof(struct xfrm_lifetime_cur) },
+>  	[XFRMA_REPLAY_VAL]	= { .len = sizeof(struct xfrm_replay_state) },
+>  	[XFRMA_REPLAY_THRESH]	= { .type = NLA_U32 },
+> @@ -3035,6 +3035,7 @@ const struct nla_policy xfrma_policy[XFRMA_MAX+1] = {
+>  	[XFRMA_SET_MARK]	= { .type = NLA_U32 },
+>  	[XFRMA_SET_MARK_MASK]	= { .type = NLA_U32 },
+>  	[XFRMA_IF_ID]		= { .type = NLA_U32 },
+> +	[XFRMA_MTIMER_THRESH]	= { .type = NLA_U32 },
 
-This doesn't answer my question, let me ask you differently.
-
-Let's take xdp_tx_iptunnel_kern.c as an example. With your patch, can
-it work when we receive a packet with partial csum? If not, it breaks
-existing applications.
-
-Thanks
-
->
-> Thanks.
->
->
-> > """
-> > > >>>> Packet with complete checksum (and has been verified by rx devic=
-e
-> > > >>>> because it has VIRTIO_NET_HDR_F_DATA_VALID)
-> > > >>>> when modified by XDP, XDP program should use the helper provided=
- by XDP
-> > > >>>> core to make the checksum correct,
-> > """
-> >
-> > ?
-> >
-> > >
-> > > The core purpose of this patch is to:
-> > > #1 Solve the packet loss problem caused by loading XDP between vm-vm =
-on
-> > > the same host (scenario with partial checksum).
-> >
-> > So we disabled guest_csum and the host (e.g TAP) will do checksum for
-> > us. Otherwise it should be a bug of the host.
-> >
-> > Thanks
-> >
-> > > #2 For scenarios other than #1, virtio-net with this patch is already
-> > > consistent with other existing NIC drivers (simple such as
-> > > ixgbe[1]/bnxt[2]/mvneta[3]/..):
-> > > the rx side only needs to have NETIF_F_RXCSUM and the device has
-> > > verified the packet has a valid checksum.
-> > > Then skb converted from xdp_buff (XDP returns XDP_PASS) can have
-> > > skb->ip_summed =3D CHECKSUM_UNNECESSARY.
-> > >
-> > > If the comment for DATA_VALID is confusing, I'll just remove it.
-> > >
-> > > [1] ixgbe_clean_rx_irq()-> ixgbe_run_xdp()-> ixgbe_process_skb_fields=
-()
-> > > ->ixgbe_rx_checksum()
-> > > [2] bnxt_xdp_build_skb()
-> > > [3] mvneta_swbm_build_skb
-> > >
-> > > Thanks.
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > >> Thanks.
-> > > >>
-> > > >>> Thanks
-> > > >>>
-> > > >>>
-> > > >>>> otherwise, VIRTIO_NET_HDR_F_DATA_VALID has been cleared and skb
-> > > >>>> ->ip_summed=3DCHECKSUM_NONE, so the stack
-> > > >>>> will re-verify the checksum, causing packet loss due to wrong ch=
-ecksum.
-> > > >>>>
-> > > >>>> Thanks.
-> > > >>>>
-> > > >>>>> Thanks
-> > > >>>>>
-> > > >>>>>> +               skb->ip_summed =3D CHECKSUM_UNNECESSARY;
-> > > >>>>>> +       }
-> > > >>>>>> +
-> > > >>>>>> +       return err;
-> > > >>>>>> +}
-> > > >>>>>> +
-> > > >>>>>>    static void receive_buf(struct virtnet_info *vi, struct rec=
-eive_queue *rq,
-> > > >>>>>>                           void *buf, unsigned int len, void **=
-ctx,
-> > > >>>>>>                           unsigned int *xdp_xmit,
-> > > >>>>>> @@ -1576,6 +1611,7 @@ static void receive_buf(struct virtnet_i=
-nfo *vi, struct receive_queue *rq,
-> > > >>>>>>           struct net_device *dev =3D vi->dev;
-> > > >>>>>>           struct sk_buff *skb;
-> > > >>>>>>           struct virtio_net_hdr_mrg_rxbuf *hdr;
-> > > >>>>>> +       __u8 flags;
-> > > >>>>>>
-> > > >>>>>>           if (unlikely(len < vi->hdr_len + ETH_HLEN)) {
-> > > >>>>>>                   pr_debug("%s: short packet %i\n", dev->name,=
- len);
-> > > >>>>>> @@ -1584,6 +1620,12 @@ static void receive_buf(struct virtnet_=
-info *vi, struct receive_queue *rq,
-> > > >>>>>>                   return;
-> > > >>>>>>           }
-> > > >>>>>>
-> > > >>>>>> +       /* XDP may modify/overwrite the packet, including the =
-virtnet hdr,
-> > > >>>>>> +        * so save the flags of the virtnet hdr before XDP pro=
-cessing.
-> > > >>>>>> +        */
-> > > >>>>>> +       if (unlikely(vi->xdp_enabled))
-> > > >>>>>> +               flags =3D ((struct virtio_net_hdr_mrg_rxbuf *)=
-buf)->hdr.flags;
-> > > >>>>>> +
-> > > >>>>>>           if (vi->mergeable_rx_bufs)
-> > > >>>>>>                   skb =3D receive_mergeable(dev, vi, rq, buf, =
-ctx, len, xdp_xmit,
-> > > >>>>>>                                           stats);
-> > > >>>>>> @@ -1595,23 +1637,37 @@ static void receive_buf(struct virtnet=
-_info *vi, struct receive_queue *rq,
-> > > >>>>>>           if (unlikely(!skb))
-> > > >>>>>>                   return;
-> > > >>>>>>
-> > > >>>>>> -       hdr =3D skb_vnet_hdr(skb);
-> > > >>>>>> -       if (dev->features & NETIF_F_RXHASH && vi->has_rss_hash=
-_report)
-> > > >>>>>> -               virtio_skb_set_hash((const struct virtio_net_h=
-dr_v1_hash *)hdr, skb);
-> > > >>>>>> -
-> > > >>>>>> -       if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VALID)
-> > > >>>>>> -               skb->ip_summed =3D CHECKSUM_UNNECESSARY;
-> > > >>>>>> +       if (unlikely(vi->xdp_enabled)) {
-> > > >>>>>> +               /* Required to do this before re-probing and c=
-alculating
-> > > >>>>>> +                * the pseudo-header checksum.
-> > > >>>>>> +                */
-> > > >>>>>> +               skb->protocol =3D eth_type_trans(skb, dev);
-> > > >>>>>> +               skb_reset_network_header(skb);
-> > > >>>>>> +               if (virtnet_set_csum_after_xdp(vi, skb, flags)=
- < 0) {
-> > > >>>>>> +                       pr_debug("%s: errors occurred in setti=
-ng partial csum",
-> > > >>>>>> +                                dev->name);
-> > > >>>>>> +                       goto frame_err;
-> > > >>>>>> +               }
-> > > >>>>>> +       } else {
-> > > >>>>>> +               hdr =3D skb_vnet_hdr(skb);
-> > > >>>>>> +               if (dev->features & NETIF_F_RXHASH && vi->has_=
-rss_hash_report)
-> > > >>>>>> +                       virtio_skb_set_hash((const struct virt=
-io_net_hdr_v1_hash *)hdr, skb);
-> > > >>>>>> +
-> > > >>>>>> +               if (hdr->hdr.flags & VIRTIO_NET_HDR_F_DATA_VAL=
-ID)
-> > > >>>>>> +                       skb->ip_summed =3D CHECKSUM_UNNECESSAR=
-Y;
-> > > >>>>>> +
-> > > >>>>>> +               if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
-> > > >>>>>> +                                         virtio_is_little_end=
-ian(vi->vdev))) {
-> > > >>>>>> +                       net_warn_ratelimited("%s: bad gso: typ=
-e: %u, size: %u\n",
-> > > >>>>>> +                                            dev->name, hdr->h=
-dr.gso_type,
-> > > >>>>>> +                                            hdr->hdr.gso_size=
-);
-> > > >>>>>> +                       goto frame_err;
-> > > >>>>>> +               }
-> > > >>>>>>
-> > > >>>>>> -       if (virtio_net_hdr_to_skb(skb, &hdr->hdr,
-> > > >>>>>> -                                 virtio_is_little_endian(vi->=
-vdev))) {
-> > > >>>>>> -               net_warn_ratelimited("%s: bad gso: type: %u, s=
-ize: %u\n",
-> > > >>>>>> -                                    dev->name, hdr->hdr.gso_t=
-ype,
-> > > >>>>>> -                                    hdr->hdr.gso_size);
-> > > >>>>>> -               goto frame_err;
-> > > >>>>>> +               skb->protocol =3D eth_type_trans(skb, dev);
-> > > >>>>>>           }
-> > > >>>>>>
-> > > >>>>>>           skb_record_rx_queue(skb, vq2rxq(rq->vq));
-> > > >>>>>> -       skb->protocol =3D eth_type_trans(skb, dev);
-> > > >>>>>>           pr_debug("Receiving skb proto 0x%04x len %i type %i\=
-n",
-> > > >>>>>>                    ntohs(skb->protocol), skb->len, skb->pkt_ty=
-pe);
-> > > >>>>>>
-> > > >>>>>> --
-> > > >>>>>> 2.19.1.6.gb485710b
-> > > >>>>>>
-> > >
->
-
+The above line is apparently missing, but does it really belong to this
+patch? At least it is not mentioned in the commit message.
 
