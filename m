@@ -1,109 +1,255 @@
-Return-Path: <netdev+bounces-14871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14872-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A1CE27442BF
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 21:37:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DFFC57442C9
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 21:40:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 972D62811A5
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:37:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A34592811CA
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 19:40:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB4E917720;
-	Fri, 30 Jun 2023 19:37:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70B8917736;
+	Fri, 30 Jun 2023 19:40:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB7A2174F5
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 19:37:10 +0000 (UTC)
-Received: from mail-lj1-x22f.google.com (mail-lj1-x22f.google.com [IPv6:2a00:1450:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3333A3ABF
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 12:37:08 -0700 (PDT)
-Received: by mail-lj1-x22f.google.com with SMTP id 38308e7fff4ca-2b5e7dba43cso36491281fa.1
-        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 12:37:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EA4B1772A;
+	Fri, 30 Jun 2023 19:40:18 +0000 (UTC)
+Received: from mail-wm1-x336.google.com (mail-wm1-x336.google.com [IPv6:2a00:1450:4864:20::336])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 276FA3C3C;
+	Fri, 30 Jun 2023 12:40:16 -0700 (PDT)
+Received: by mail-wm1-x336.google.com with SMTP id 5b1f17b1804b1-3fa93d61d48so25684395e9.0;
+        Fri, 30 Jun 2023 12:40:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=googlemail.com; s=20221208; t=1688153826; x=1690745826;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=/+Mkiq1H8AQsshdPHlngN5syzAkvmDSEm7qP0aIR3p4=;
-        b=BPyVz6YCA3G7U+g+d1ik7sG4EXP9V6gMtYzhwdeNoT0RJrfpfFgLmH2ZCU6RrgqA4g
-         o+6vS6SA8/heYQmjpXepvuGIL68gXYLAFzdxGUK0BV3T50IbwL3wCPcq/8Nfc/j/5UEn
-         O7VZoIBuIgmIIvcpyBeIKmnN2bl0dUAt0E5ZTdwm7c3LJdV7kJRIG2Uxa9wB2YqknobY
-         UglbEchlUKIuAgiJR641+aqsJP1XgAj8/oj6uDrBKQsoPqk5oO1WPsowpifIOzywaEm9
-         Y83M8shMtvT1KoLkY2R1tGYGOQlYE3od5pkP/+Dtq9gOtqrmeYK7L+Pn2uoJah+YDW1H
-         lPWA==
+        d=gmail.com; s=20221208; t=1688154014; x=1690746014;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=U6pnTwJKxb2Jp5JkpBaLoHKFY7M4ibIn04BA+G59EYg=;
+        b=GnYFHnHbHeh67Ewq22wobUeXiEPGvNiZYMQE+/Tt0YO8b55MUWr1L4/Fp2qu6aPW5z
+         RJvIIcBdHd5zDsT9WmBNbRVdjk05ObOXl0Ze+uroUPUjHwzaDFOhti87+VyMsHJAJV7O
+         YnFtDN/CsVIWam3/lEECcYG0zum+XDJtFvP6L2PZoXQyteRTR0KRrD5jlpBxUeelZKTn
+         Vhk6Xw4Gp+bAS/xi1PReVGaOapjkF0yBaHFQqnQP4ImZOI6fabv9QiHtLF5kSvSwTE71
+         CmeCNfBGKJkxaBmPvnNg1KNPBdCuXgyMCs0+gNJwupvhdMv6h9NrVXZwNQrfI7uZVDzv
+         u+Eg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688153826; x=1690745826;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:sender:x-gm-message-state:from:to:cc
+        d=1e100.net; s=20221208; t=1688154014; x=1690746014;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=/+Mkiq1H8AQsshdPHlngN5syzAkvmDSEm7qP0aIR3p4=;
-        b=jA3W2lh/9onRGn7v6QTNGGwegN8BOpOheOHsZxbBZtWZcS4Uz4TWei47hzbQu0bm8i
-         dOzFy/+SNz9kpLxBnGKdzLNjX6usEDBtbL0THzp4QA+iAl9jdZHctPvtFQByTFB83oXf
-         jTMPDjSbAHvJpTfms8SSU3qN2l/aJw4DCTkBM6cJGDsxLcXH6pGutEGilV+gXldPeY5L
-         mekVThJOZbijsE5/K6TDsRiA1AMF1w4scfyBa+aGNYBTCyntnl4LkVZgjRBLh9Lxu4/x
-         GJuJ1FpO7TqojvMmhK9noU4LwBWIx0WZ6c8ZX3suHdMOSJ93xP58SKggQrg/fHwDM7Vt
-         Op4w==
-X-Gm-Message-State: ABy/qLZSBSouTg1JvzKC+nPUwWvGfOXIQ2Z5NDX6SuVYL/DP4yJ8mAUD
-	6sDaUqNB6gIEw//Jve2iZJoR+c3lbBEZWA==
-X-Google-Smtp-Source: APBJJlFEbHsZSSQ5+OVZFXWAx3oUk0JpzBTy2MI8H53jRUQyfUxbZqshp6J7iDldZN+vyQOb5PtN/w==
-X-Received: by 2002:a2e:998e:0:b0:2b6:cd2d:388c with SMTP id w14-20020a2e998e000000b002b6cd2d388cmr2756738lji.22.1688153825953;
-        Fri, 30 Jun 2023 12:37:05 -0700 (PDT)
-Received: from tycho (p200300c1c74c0400ba8584fffebf2b17.dip0.t-ipconnect.de. [2003:c1:c74c:400:ba85:84ff:febf:2b17])
-        by smtp.gmail.com with ESMTPSA id a18-20020a1709063a5200b00988f168811bsm8370973ejf.135.2023.06.30.12.37.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 30 Jun 2023 12:37:05 -0700 (PDT)
-Sender: Zahari Doychev <zahari.doychev@googlemail.com>
-Date: Fri, 30 Jun 2023 21:37:03 +0200
-From: Zahari Doychev <zahari.doychev@linux.com>
-To: Petr Machata <me@pmachata.org>
-Cc: netdev@vger.kernel.org, dsahern@gmail.com, stephen@networkplumber.org, 
-	hmehrtens@maxlinear.com, aleksander.lobakin@intel.com, simon.horman@corigine.com, 
-	idosch@idosch.org, Zahari Doychev <zdoychev@maxlinear.com>
-Subject: Re: [PATCH iproute2-next] f_flower: simplify cfm dump function
-Message-ID: <6duucu3iqlcp2idmncdakshwc6on7p5saj4qvlfb5zoqq7thbn@vqowawr7tgxm>
-References: <20230629195736.675018-1-zahari.doychev@linux.com>
- <87leg1xkax.fsf@nvidia.com>
+        bh=U6pnTwJKxb2Jp5JkpBaLoHKFY7M4ibIn04BA+G59EYg=;
+        b=ZjvVTnKcewDLPGN7gD5x6JfQDBuZTCQGT7mzZBpADKaq1D6qfQwpzSGaQ4IU7CM/LB
+         T3llxxogHg4wsGIO6wmTwh1sPUismqUFXHwnTE5xS9Pit0o88M13Zx5/GLucxXXeEqV8
+         ajXz+owV0zlC5u12vOkrxM2kPG7vl1lfeoao4jSb+61Y04VTyh0mj0E11bspE7pmLNGK
+         MMR8ollF+mKSbs4/mj05o5eGthAND5F4kDfwALzE9zKhZphVTo+bOhbVYhYjgKoJPoDY
+         iqmWRjCOkBd+Ze+TC++PE0S530UlCMERgiDxxku4l6u9OxNc3H0kWAmNltkamXqXNHMh
+         VlPQ==
+X-Gm-Message-State: AC+VfDyzuqG680A0j18ZLxF5KxSUsLXkhHZE2anlmOFkDmzN+piPlhqX
+	wOCPI8zMEH6koolznY5hhponOOZWNNNc/pmUf9vr5sHFOkA=
+X-Google-Smtp-Source: ACHHUZ60SjUzyBWIZcv4aguG2YXeIZyv6UTTr1qF4Wyreq4/BL70LFZGDpsjjTRAq1/b9km7vJZ7kIpJmVzoLCPNmc8=
+X-Received: by 2002:a05:600c:ac6:b0:3fb:b3aa:1c88 with SMTP id
+ c6-20020a05600c0ac600b003fbb3aa1c88mr2666744wmr.26.1688154014182; Fri, 30 Jun
+ 2023 12:40:14 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <87leg1xkax.fsf@nvidia.com>
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+References: <20230628152738.22765-1-fw@strlen.de> <20230628152738.22765-2-fw@strlen.de>
+In-Reply-To: <20230628152738.22765-2-fw@strlen.de>
+From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+Date: Fri, 30 Jun 2023 12:40:02 -0700
+Message-ID: <CAEf4BzZKPVwGMhJgQgAJBxsiiaSzq5SFYLACTO9fq_w5RPdm7A@mail.gmail.com>
+Subject: Re: [PATCH bpf-next v4 1/2] tools: libbpf: add netfilter link attach helper
+To: Florian Westphal <fw@strlen.de>
+Cc: bpf@vger.kernel.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 01:22:45PM +0200, Petr Machata wrote:
-> 
-> Zahari Doychev <zahari.doychev@linux.com> writes:
-> 
-> > From: Zahari Doychev <zdoychev@maxlinear.com>
-> >
-> > The standard print function can be used to print the cfm attributes in
-> > both standard and json use cases. In this way no string buffer is needed
-> > which simplifies the code.
-> 
-> This looks correct, but please make sure that the diff between the old
-> and the new way is empty in both JSON and FP mode.
+On Wed, Jun 28, 2023 at 8:27=E2=80=AFAM Florian Westphal <fw@strlen.de> wro=
+te:
+>
+> Add new api function: bpf_program__attach_netfilter.
+>
+> It takes a bpf program (netfilter type), and a pointer to a option struct
+> that contains the desired attachment (protocol family, priority, hook
+> location, ...).
+>
+> It returns a pointer to a 'bpf_link' structure or NULL on error.
+>
+> Next patch adds new netfilter_basic test that uses this function to
+> attach a program to a few pf/hook/priority combinations.
+>
+> v2: change name and use bpf_link_create.
+>
+> Suggested-by: Andrii Nakryiko <andrii.nakryiko@gmail.com>
+> Link: https://lore.kernel.org/bpf/CAEf4BzZrmUv27AJp0dDxBDMY_B8e55-wLs8DUK=
+K69vCWsCG_pQ@mail.gmail.com/
+> Link: https://lore.kernel.org/bpf/CAEf4BzZ69YgrQW7DHCJUT_X+GqMq_ZQQPBwopa=
+JJVGFD5=3Dd5Vg@mail.gmail.com/
+> Signed-off-by: Florian Westphal <fw@strlen.de>
+> ---
+>  tools/lib/bpf/bpf.c      |  6 ++++++
+>  tools/lib/bpf/bpf.h      |  6 ++++++
+>  tools/lib/bpf/libbpf.c   | 42 ++++++++++++++++++++++++++++++++++++++++
+>  tools/lib/bpf/libbpf.h   | 15 ++++++++++++++
+>  tools/lib/bpf/libbpf.map |  1 +
+>  5 files changed, 70 insertions(+)
+>
+> diff --git a/tools/lib/bpf/bpf.c b/tools/lib/bpf/bpf.c
+> index ed86b37d8024..1b4f85f3c5b1 100644
+> --- a/tools/lib/bpf/bpf.c
+> +++ b/tools/lib/bpf/bpf.c
+> @@ -741,6 +741,12 @@ int bpf_link_create(int prog_fd, int target_fd,
+>                 if (!OPTS_ZEROED(opts, tracing))
+>                         return libbpf_err(-EINVAL);
+>                 break;
+> +       case BPF_NETFILTER:
+> +               attr.link_create.netfilter.pf =3D OPTS_GET(opts, netfilte=
+r.pf, 0);
+> +               attr.link_create.netfilter.hooknum =3D OPTS_GET(opts, net=
+filter.hooknum, 0);
+> +               attr.link_create.netfilter.priority =3D OPTS_GET(opts, ne=
+tfilter.priority, 0);
+> +               attr.link_create.netfilter.flags =3D OPTS_GET(opts, netfi=
+lter.flags, 0);
 
-I have done that. The diff between the two is empty.
+there should have also done this check:
 
-thanks
+if (!OPTS_ZEROED(opts, netfilter))
+    return libbpf_err(-EINVAL);
 
-> 
-> > Signed-off-by: Zahari Doychev <zdoychev@maxlinear.com>
-> 
-> Reviewed-by: Petr Machata <me@pmachata.org>
-> 
+ just like in other cases. I added it while applying to bpf-next, thanks.
+
+
+> +               break;
+>         default:
+>                 if (!OPTS_ZEROED(opts, flags))
+>                         return libbpf_err(-EINVAL);
+> diff --git a/tools/lib/bpf/bpf.h b/tools/lib/bpf/bpf.h
+> index 9aa0ee473754..c676295ab9bf 100644
+> --- a/tools/lib/bpf/bpf.h
+> +++ b/tools/lib/bpf/bpf.h
+> @@ -349,6 +349,12 @@ struct bpf_link_create_opts {
+>                 struct {
+>                         __u64 cookie;
+>                 } tracing;
+> +               struct {
+> +                       __u32 pf;
+> +                       __u32 hooknum;
+> +                       __s32 priority;
+> +                       __u32 flags;
+> +               } netfilter;
+>         };
+>         size_t :0;
+>  };
+> diff --git a/tools/lib/bpf/libbpf.c b/tools/lib/bpf/libbpf.c
+> index 214f828ece6b..f193eca16382 100644
+> --- a/tools/lib/bpf/libbpf.c
+> +++ b/tools/lib/bpf/libbpf.c
+> @@ -11811,6 +11811,48 @@ static int attach_iter(const struct bpf_program =
+*prog, long cookie, struct bpf_l
+>         return libbpf_get_error(*link);
+>  }
+>
+> +struct bpf_link *bpf_program__attach_netfilter(const struct bpf_program =
+*prog,
+> +                                              const struct bpf_netfilter=
+_opts *opts)
+> +{
+> +       LIBBPF_OPTS(bpf_link_create_opts, lopts);
+> +       struct bpf_link *link;
+> +       int prog_fd, link_fd;
+> +
+> +       if (!OPTS_VALID(opts, bpf_netfilter_opts))
+> +               return libbpf_err_ptr(-EINVAL);
+> +
+> +       prog_fd =3D bpf_program__fd(prog);
+> +       if (prog_fd < 0) {
+> +               pr_warn("prog '%s': can't attach before loaded\n", prog->=
+name);
+> +               return libbpf_err_ptr(-EINVAL);
+> +       }
+> +
+> +       link =3D calloc(1, sizeof(*link));
+> +       if (!link)
+> +               return libbpf_err_ptr(-ENOMEM);
+> +
+> +       link->detach =3D &bpf_link__detach_fd;
+> +
+> +       lopts.netfilter.pf =3D OPTS_GET(opts, pf, 0);
+> +       lopts.netfilter.hooknum =3D OPTS_GET(opts, hooknum, 0);
+> +       lopts.netfilter.priority =3D OPTS_GET(opts, priority, 0);
+> +       lopts.netfilter.flags =3D OPTS_GET(opts, flags, 0);
+> +
+> +       link_fd =3D bpf_link_create(prog_fd, 0, BPF_NETFILTER, &lopts);
+> +       if (link_fd < 0) {
+> +               char errmsg[STRERR_BUFSIZE];
+> +
+> +               link_fd =3D -errno;
+> +               free(link);
+> +               pr_warn("prog '%s': failed to attach to netfilter: %s\n",
+> +                       prog->name, libbpf_strerror_r(link_fd, errmsg, si=
+zeof(errmsg)));
+> +               return libbpf_err_ptr(link_fd);
+> +       }
+> +       link->fd =3D link_fd;
+> +
+> +       return link;
+> +}
+> +
+>  struct bpf_link *bpf_program__attach(const struct bpf_program *prog)
+>  {
+>         struct bpf_link *link =3D NULL;
+> diff --git a/tools/lib/bpf/libbpf.h b/tools/lib/bpf/libbpf.h
+> index 754da73c643b..10642ad69d76 100644
+> --- a/tools/lib/bpf/libbpf.h
+> +++ b/tools/lib/bpf/libbpf.h
+> @@ -718,6 +718,21 @@ LIBBPF_API struct bpf_link *
+>  bpf_program__attach_freplace(const struct bpf_program *prog,
+>                              int target_fd, const char *attach_func_name)=
+;
+>
+> +struct bpf_netfilter_opts {
+> +       /* size of this struct, for forward/backward compatibility */
+> +       size_t sz;
+> +
+> +       __u32 pf;
+> +       __u32 hooknum;
+> +       __s32 priority;
+> +       __u32 flags;
+> +};
+> +#define bpf_netfilter_opts__last_field flags
+> +
+> +LIBBPF_API struct bpf_link *
+> +bpf_program__attach_netfilter(const struct bpf_program *prog,
+> +                             const struct bpf_netfilter_opts *opts);
+> +
+>  struct bpf_map;
+>
+>  LIBBPF_API struct bpf_link *bpf_map__attach_struct_ops(const struct bpf_=
+map *map);
+> diff --git a/tools/lib/bpf/libbpf.map b/tools/lib/bpf/libbpf.map
+> index 7521a2fb7626..d9ec4407befa 100644
+> --- a/tools/lib/bpf/libbpf.map
+> +++ b/tools/lib/bpf/libbpf.map
+> @@ -395,4 +395,5 @@ LIBBPF_1.2.0 {
+>  LIBBPF_1.3.0 {
+>         global:
+>                 bpf_obj_pin_opts;
+> +               bpf_program__attach_netfilter;
+>  } LIBBPF_1.2.0;
+> --
+> 2.39.3
+>
 
