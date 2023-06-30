@@ -1,181 +1,200 @@
-Return-Path: <netdev+bounces-14877-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14878-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E3F37744333
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 22:34:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AEF54744351
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 22:39:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 805D11C20C3F
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 20:34:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84F061C20C45
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 20:39:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F0086168B3;
-	Fri, 30 Jun 2023 20:34:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 41574168B3;
+	Fri, 30 Jun 2023 20:39:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D7787646
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 20:34:38 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 14A8A2952;
-	Fri, 30 Jun 2023 13:34:36 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35UIxIc0007380;
-	Fri, 30 Jun 2023 20:34:07 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2023-03-30;
- bh=WaeXEi+jszNL6GF9HzRLwwCzUhqXR31gZbRAaGNM6kM=;
- b=E8WOKlrQAPvHfGCNjvVHti9nqEKFZl+8iOrm6cTm7cs9NAb+Gm7l/cfc7SS3fw3cmOix
- QJt34cYwh1xJ92BcUvC51i25PiYdsYzYZb4xgzonEAeYMVu5wlKHeb4Hhcw320QkXE92
- gzzLD2u+zpbVxpaG59UYONJPOm2Hzf+A4OCokcyhgNno2Kb+XodqnIUZnEkzdjBgxQeE
- aAgr5AVSAUCN+YwKKLZ4rLSjB7dg7ADYFavmjm1nBzrhiH895XBVu54dIpxHteTXjdIV
- 0vEinCBYpV+Gw3jeT10ZKwc21foEKLLAiPgcaxDvR0CZ06NR698EK+vdMePHIJJIufou lQ== 
-Received: from phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta03.appoci.oracle.com [138.1.37.129])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rds1uj3mn-1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27AB4174C4
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 20:39:27 +0000 (UTC)
+Received: from mx0b-00069f02.pphosted.com (mx0b-00069f02.pphosted.com [205.220.177.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59CCC3AA4;
+	Fri, 30 Jun 2023 13:39:26 -0700 (PDT)
+Received: from pps.filterd (m0246632.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 35UIxLQ0020422;
+	Fri, 30 Jun 2023 20:39:10 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=from : to : cc :
+ subject : date : message-id : references : in-reply-to : content-type :
+ content-id : content-transfer-encoding : mime-version; s=corp-2023-03-30;
+ bh=I/HiidgF395Ny2sfpJSq105jEJjfTpRvRzaSNYQkaZI=;
+ b=0TZmhvQfKQ3yE+3e4d30P+DZBJ9efh+huxBmmZ3nxgtbkogGN2y8luhMxwkQ0eLYU0dR
+ 7XJqx7Gg7kIvXVsnLipKEydzzKncyulBr4MpF1DWgUjQ+pViKTzTG03BbmuK0ik+8hH1
+ Sg6sKACHfs8xjPiVZP7IRt2j3dJ4GDMHfXtcO37u+H5tyQuZFTWAr1r7ZknA20hThCYV
+ 259g83QgMjThTE+HKADYEZMRexUsoc+IeglrzC/EXTThulcFqbYsxqhE6u/RAgYA4HNc
+ Cxg7nMvVNmNskvr9mtPklwTzIosIztSr1zTrnzIfG8XDNZv4SR8uv5TwnoVBMzk1ZBfp kA== 
+Received: from phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (phxpaimrmta01.appoci.oracle.com [138.1.114.2])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rf40eg4pd-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 30 Jun 2023 20:34:06 +0000
-Received: from pps.filterd (phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35UKGlsC013057;
-	Fri, 30 Jun 2023 20:34:06 GMT
-Received: from nam02-dm3-obe.outbound.protection.outlook.com (mail-dm3nam02lp2043.outbound.protection.outlook.com [104.47.56.43])
-	by phxpaimrmta03.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3rdpx9kwtg-1
+	Fri, 30 Jun 2023 20:39:10 +0000
+Received: from pps.filterd (phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com [127.0.0.1])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 35UJ4ViM008768;
+	Fri, 30 Jun 2023 20:39:09 GMT
+Received: from nam12-bn8-obe.outbound.protection.outlook.com (mail-bn8nam12lp2173.outbound.protection.outlook.com [104.47.55.173])
+	by phxpaimrmta01.imrmtpd1.prodappphxaev1.oraclevcn.com (PPS) with ESMTPS id 3rdpx9c4s3-1
 	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 30 Jun 2023 20:34:06 +0000
+	Fri, 30 Jun 2023 20:39:09 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=SZuheJlLtC1MhinPUUenSW/WVNThckcb6+mEh/GloEVUy7GoxlaKk+wLKJceMVNzba+Vz7Ej1IgAKothpx2tn7mdlLV20Iq6TCR3wPQmV+zNZdOVM85ni7sFrnBBKdoOa7/XEHVMVJEJobnpRHcgJl9hyxuUhn2gdZE9cGvl8ZEYA2eNXgd0+rerTFQLKQpB/vGTABiy5/mlaSd05m6QI3sQK6yGHtrnYOSQOjuHiLDzLnjj12BM2refnufG0hWv94/UTJUKIl5mrHzR3X6ocPXhXj5SzZMg+3+n4J//qCaqzBNigX+w/Gmp6llPoFnzm5LPYZomQe9daPgwFDjqsw==
+ b=SnXZ4dU12327PDNNreX3pUtbElwLiiPTIsGdKtQbn1K/MDExQ6wKOZAQDxrdjS/CRr/SfaYLtDMWULnv3dMcE5UvATLtrU712WuWdVb+VgDFDnbl2MpDVykE1k3QtO/g/uIT+I0jX8REQBPOhkXeZuBl3qS8kGFwFERaIqWWyMgcJXwAl0SWG0oxxnXOUFJNwQBfo45gxv7tPx+nl6/nt3PagAcou0/1OZ0RMXDIXL55E1ML2vGTn+/uU7luyIutKaIkoC2ys2FLvYsHKCOUMNILJG4ZGENczhZAHzJHi7/+yNmT/rPgma1VQShr4lIaQiZRUw02D8Zff1xtw6EsUQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=WaeXEi+jszNL6GF9HzRLwwCzUhqXR31gZbRAaGNM6kM=;
- b=a2qzv61zRVugA2Z30+iAb/T80O1Zn2vaaQ81goXXBgpe5J6c/vuAKwPX2MClFpJOpIUotvAgiqxNXZ/EyLhE3c1lB7HnfkoN6tEK/bq47MYGJtERGZDUORMvXre+dIIPSdioYXfpj0+//SCt/hJEpNZkZF9G73L9uDcCrJ0JK4NrIdMARVQKmbzcmCIdo+iEkErDiUk0MrBHrdYtUBH6vsw4cmEVDVxnyf+ktjl4AHDhx4T1i3gYEi5qad+ckiCphKgyIpd/rpAzTKeaUtND1yKTjJM96JDUL7R0U1Zg8GV4mNJ5QX/2aiahmZaa8eXd306ZzVGyZ3j/LVrKMPs3aA==
+ bh=I/HiidgF395Ny2sfpJSq105jEJjfTpRvRzaSNYQkaZI=;
+ b=FuLIS8NLPyNCmEBRecqM6iFgt9y6hmYTFBFylZsdkpR+xoUbWyJ5oy4Xd16sPZmB4CGysooOrILH1a9dXteU92aGQrh5I8k9iUbGeu2jfBayXazG6sFuDOpZlZMFPHHONmACSWJyvrcGz6ENZZ6LRDjys70jEomcv6dmHrxAmlAjtkg1+HlxgOzZUfXS3OSNv44d1mu8jW+yFiiP/BECKa79XcZbI/bsADV8y3cyOl+iwZPspEdwc5TsuFvZAGZZphHTN8nckTHA6Gw54dwC3vEPBxCxzHOe3D+8xvBikcQEOxOmwXF6/fOUL2DlesCcbmz3TWh0r/V9dBkOZi4jLw==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
  dkim=pass header.d=oracle.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
  d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=WaeXEi+jszNL6GF9HzRLwwCzUhqXR31gZbRAaGNM6kM=;
- b=ar0w1lXyOFTfdNRfkNv0iwQmCpi5sS1a5mYtdIwQ5E8meWIVrfvXMUmWxNqqJiOlDulgXbH8kDiI4yizlX5DzK7nS4CTEc8WJup8RIEs3d9gCm/rWx1WDgYUeyUsq0iiXHN154q7ZdRHYm8z5fhfMj6kP8WXflhDfYMnqIbjdBk=
-Received: from BL0PR10MB3011.namprd10.prod.outlook.com (2603:10b6:208:7e::29)
- by IA1PR10MB7312.namprd10.prod.outlook.com (2603:10b6:208:3fc::5) with
+ bh=I/HiidgF395Ny2sfpJSq105jEJjfTpRvRzaSNYQkaZI=;
+ b=whbeNEupJJ+RryZTKOhrXjLYkH+EMHJYCgUFQ069xRKqstjbpUyEMrmoenG5F/BThrCUDxpzUPlK7/xXpfuDTMwZnNthLiaB7DyVZm4ebCWoQ+mnpHSABrfdcFuEl3ddHcYafDPSESkYCBHTEvljs9tyEsIUhAPJLp5gBQpSNr8=
+Received: from BY5PR10MB4129.namprd10.prod.outlook.com (2603:10b6:a03:210::21)
+ by MN0PR10MB6005.namprd10.prod.outlook.com (2603:10b6:208:3cb::20) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.15; Fri, 30 Jun
- 2023 20:34:03 +0000
-Received: from BL0PR10MB3011.namprd10.prod.outlook.com
- ([fe80::de2:4e3f:62c2:865b]) by BL0PR10MB3011.namprd10.prod.outlook.com
- ([fe80::de2:4e3f:62c2:865b%3]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
- 20:34:03 +0000
-Date: Fri, 30 Jun 2023 16:34:00 -0400
-From: "Liam R. Howlett" <Liam.Howlett@Oracle.com>
-To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Cc: davem@davemloft.net, david@fries.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, zbr@ioremap.net, brauner@kernel.org,
-        johannes@sipsolutions.net, ecree.xilinx@gmail.com, leon@kernel.org,
-        keescook@chromium.org, socketcan@hartkopp.net, petrm@nvidia.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-        akpm@linux-foundation.org
-Subject: Re: [PATCH v6 4/6] connector/cn_proc: Performance improvements
-Message-ID: <20230630203400.k4yuaecr2p5upn5k@revolver>
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6521.24; Fri, 30 Jun
+ 2023 20:39:06 +0000
+Received: from BY5PR10MB4129.namprd10.prod.outlook.com
+ ([fe80::ec9b:ef74:851b:6aa9]) by BY5PR10MB4129.namprd10.prod.outlook.com
+ ([fe80::ec9b:ef74:851b:6aa9%5]) with mapi id 15.20.6544.019; Fri, 30 Jun 2023
+ 20:39:06 +0000
+From: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+To: Liam Howlett <liam.howlett@oracle.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>,
+        "david@fries.net"
+	<david@fries.net>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "zbr@ioremap.net" <zbr@ioremap.net>,
+        "brauner@kernel.org"
+	<brauner@kernel.org>,
+        "johannes@sipsolutions.net"
+	<johannes@sipsolutions.net>,
+        "ecree.xilinx@gmail.com"
+	<ecree.xilinx@gmail.com>,
+        "leon@kernel.org" <leon@kernel.org>,
+        "keescook@chromium.org" <keescook@chromium.org>,
+        "socketcan@hartkopp.net"
+	<socketcan@hartkopp.net>,
+        "petrm@nvidia.com" <petrm@nvidia.com>,
+        "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+        "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+        "akpm@linux-foundation.org" <akpm@linux-foundation.org>
+Subject: Re: [PATCH v6 2/6] netlink: Add new netlink_release function
+Thread-Topic: [PATCH v6 2/6] netlink: Add new netlink_release function
+Thread-Index: AQHZnxnAVSNdqRlk20e9RoW+ctTleq+j4zEAgAAEbwA=
+Date: Fri, 30 Jun 2023 20:39:06 +0000
+Message-ID: <61C9FA78-37BB-4178-B118-AC143988AE19@oracle.com>
 References: <20230614234129.3264175-1-anjali.k.kulkarni@oracle.com>
- <20230614234129.3264175-5-anjali.k.kulkarni@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230614234129.3264175-5-anjali.k.kulkarni@oracle.com>
-User-Agent: NeoMutt/20220429
-X-ClientProxiedBy: YT3PR01CA0120.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:85::13) To BL0PR10MB3011.namprd10.prod.outlook.com
- (2603:10b6:208:7e::29)
+ <20230614234129.3264175-3-anjali.k.kulkarni@oracle.com>
+ <20230630202314.fprtrdvopjvr54me@revolver>
+In-Reply-To: <20230630202314.fprtrdvopjvr54me@revolver>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: BY5PR10MB4129:EE_|MN0PR10MB6005:EE_
+x-ms-office365-filtering-correlation-id: 27ebc638-9f27-45f4-0d63-08db79aa0ca6
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ vMGheybXxi4guMq5wUwMM2TDfHeJYEKkz9BmsRvVlUEcCi9cdMDnKFmqxEG+X5dr9CyVZa3UrP7xoNZTe8fkukXlGNDrSPUzOdumvVBtkkW/soNHHbT8SQaxjwEFxbw1tFj39usbMYFsoGYB0wPLO1ZpMpUTlZ9lFMtzNCKaJQzu2b15TqHMNj8S8EOcCYbHlDgmUTzAsd5aMgj+IRWMROikJ4AcJdnekrvaHrhl4NI2y9TsAeCaiRPO4hoWvec1BRHYu2SYWO5XN40+/ilagTCX9fUejcZ5AiKO4aW+tnTott3sKdj/RTIasDw/dv9SfMUekO6kIQWv1JsLVp75tNzCtRu1YICpqfMSMH5HcYCcphCqRs3wyQrYBtNxe6Y2113iMMMA3ZZb4X/L73RZcb4Y/0oZ2s9MPbfZ6UTQVLTLBHwy+FAOwIMOO4+x1HISJ386YZPMGoKSklJPGUUqaHAOvf4R9q7+fvC9LO9COJnc0OCt16xVgfW8ei3NYvyQHccTYClobn9Sc1Gwu4DsW3ZxLVv8UPlJx9sEu3aRjVWFlpyUdpE+z79Q+LX77VxJxjvLIv+N82kaHVgf3HLQ764fCyyPeP1XjF6y8A4CE2pscSzOhAZCBmQ3l/sYYSFI+6TLtsq9PpBHXdbwxDyHmQ==
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BY5PR10MB4129.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(39860400002)(396003)(376002)(366004)(451199021)(83380400001)(37006003)(54906003)(478600001)(6486002)(38070700005)(66946007)(2906002)(33656002)(186003)(26005)(71200400001)(66446008)(66476007)(6512007)(53546011)(64756008)(6506007)(66556008)(41300700001)(38100700002)(7416002)(5660300002)(76116006)(8676002)(6862004)(316002)(36756003)(8936002)(6636002)(91956017)(122000001)(4326008)(86362001)(2616005)(45980500001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?us-ascii?Q?G76Z5tBKo3Fnr6ixPOgfGxoENDtKyKG20ZDN3yUWcZuI1bAKAY5Cu0UinweN?=
+ =?us-ascii?Q?QQEvpGDCkKNr9DdY6G5LHzHSHCur5TQaA1eOubbv1WdG6ag+AEPqaOw4nzhW?=
+ =?us-ascii?Q?TL0tyZAHOO/qrS9DHzdtPzmHx5AvN6adTVbyBIyiTyIYii2m1K5ccWNa7ML4?=
+ =?us-ascii?Q?5gOiPyCqMJH8JxoVdUM5N6VTQC6zd9Q3skVSvjLvYgWstDhCqKh5kNtS3fXW?=
+ =?us-ascii?Q?+sQz1tnjDu14ZRTQ2mufDVgJWuuryBRaPN9dxpIehkPYmNnVmcun8W+WDAO9?=
+ =?us-ascii?Q?g69jKNYCUkm+vMUTnAt9iM6UyksGoWEx4VYA+20ojXLs/Y0PxOotLzrkLJrY?=
+ =?us-ascii?Q?BkbRHtlw4IevFvC3xs9Wel8SznetQvocarzNs6RjtboedTgYv6jt2Ui0+zvP?=
+ =?us-ascii?Q?kCrA/cS/eObnOvdAfqD9VV5TzYmJBPulTDoVRayjw07yusiFONKUGZfWEcKa?=
+ =?us-ascii?Q?4NanSrfa/6BG2E2X5Cw+N30tc8M0KJURZ7JZppViVANpvcN8LBDu+unV3S3L?=
+ =?us-ascii?Q?oQcMhfT7bG1dg7u8Kg4egi1QHTPajLPOY9L8QS2x3ggzAU3z1CvbxhTQLFPK?=
+ =?us-ascii?Q?GhYjqw3nKSHgcTp8QDKW3/R1lC4qWkllgb2e4lSJ5LVJexig3Y4hwMeBwKYm?=
+ =?us-ascii?Q?OzEs6hDvJR1/oNaWEMM3TLuzMRnpZsMrlH8Yq1fpTZb+oI6lrKIXO18fxYJY?=
+ =?us-ascii?Q?x8TBHHnuEZZbVebYJULYbgiMe9dzQYritwopTvIPBJ/rS4/Huqwxaoc2eMjo?=
+ =?us-ascii?Q?oO8CvB+EXnbJw75CtwoAUtVw+19fhxY9OsI8KwyPPmEXqUAn8WJ7MrzGItL4?=
+ =?us-ascii?Q?DhUL+uxGX8sr1f8a7ZArxftwW/2n8M1QOTGULUbDqhdlNqE5Hw5rlgzIPIwk?=
+ =?us-ascii?Q?lib/oxH6f1eBk5Eq1WSH8XNc0UgtoCSSgkIqYBfgWeFUOXpNUC4zhgw8Ph7m?=
+ =?us-ascii?Q?oo3nG9Tv0THwnDzuQkP+nH2hAW2AnVzZAgKzq0Hw2jyjWAi2HMUfgeULihVX?=
+ =?us-ascii?Q?4br9+kYNR+BY7W6I2Ihmi6F5cMuaACXnJ9c1iW7ZsIGJxTt400JNmySweuth?=
+ =?us-ascii?Q?MbwP+tOKB8jGbolkVdA8jSxPFqopFYxozOak2Ehf0KyDD0DC7Je4LMxsJohH?=
+ =?us-ascii?Q?7SmabOQ2nDdNwI04CU++qHkDT6QyIWQrglgNY3jZ3qf4OQnCaE62kkgwL4Hk?=
+ =?us-ascii?Q?uA/7I6CkGrxA7qHl4RXtEOrH9QfXgnqOhenHoGpdN1o3CvYNvonrkDZXmUC+?=
+ =?us-ascii?Q?l4UL2wEw9OaD/nHP5N/qbWvbFDo3wtS18yhQvKoEa/A8JW84AQA216vQFKIH?=
+ =?us-ascii?Q?6FPhgthOGV3El7OcQWDloQvo/uRu0z7vhE5Y2w+NR8izJQyyAWChQexQyZHD?=
+ =?us-ascii?Q?x3Htjz2DLZwcsPanN9dD+TNQuMPSIRiyKi2ifgBelowrZm7ey0SQbO+wMZ9s?=
+ =?us-ascii?Q?yNPr9DFQ7ENIP7Vw10FiXFS/x8+Xh77ZFZfVWZvsJ5ODLTVGwEDm5+Mqh0Sw?=
+ =?us-ascii?Q?ko+FebeuGacxiXLDw9nvayR01bvFN8VIy125NVYjAbHjDxk78MhBWKbf3fNd?=
+ =?us-ascii?Q?q437MsATBcxDI014FB9o+kDD7roLIiMuHeGUDSJJQr4eo032WCnKqc2Gn20U?=
+ =?us-ascii?Q?NA=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <B6D3A00F4D46F041967163E0E585D4EB@namprd10.prod.outlook.com>
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: BL0PR10MB3011:EE_|IA1PR10MB7312:EE_
-X-MS-Office365-Filtering-Correlation-Id: 12778aaf-1058-4c75-d0cd-08db79a957d6
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	pCGJVEErcFyh6nhm3iyBq7KjJ0+xR/ApGeATiXTI0I9CHXe1tkTKBvYmMc/IbzMeRzO6PA96hhh21JX8RLpOzZJBKxmLrX/RdO6fOXD70mN9/PCHYFFFE0+dFxFeK2FCIxSG4J5+Kv7FWudeNwLl9YT7UhwL/vH9jjbBTa7ZA4iKkydTKnug9R6BcCr8PqdywBTbEnzzz2Kf6cqwnBegC0Zgmf32OCdl2IzwrY802t8yHCqN9T9OdH+c2mZWeUQX/nimqzUoM/br9lPHyEHRVgwI0rTNtbMKtqpiQdUBzd6FrJPTGOADFnHyF8M0rrG9dZEXZCd4mWLV9TwnvYK4kg1X8N4K/Bv7r5pdS7V/iM0V/PEN6FWiLI3RgdU1XlTMQQ0hL2uhG9DovHDsQldTrLrKw2UrkeCE8Hct/BxhxJMZZg19faiItf/fFAr640HJrG3vr8UzsfPZiXkKt4xKy1pU0nUEgkK2dikA0EVnSLavORZbkfi9Wnx0co+CqxXRAVNDfuoOxkQeyqGgPZT2SkqwWhaJR5EKduOLiDw7Yy76eeXE9kCOLdf4+JfiUU1b
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:BL0PR10MB3011.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(346002)(376002)(39860400002)(136003)(366004)(396003)(451199021)(6486002)(478600001)(38100700002)(6506007)(2906002)(26005)(186003)(6512007)(9686003)(66476007)(1076003)(33716001)(6636002)(316002)(8936002)(6862004)(66946007)(8676002)(41300700001)(7416002)(5660300002)(4326008)(66556008)(86362001)(83380400001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?BQvfVcQFzN2cWeRmWyX5QK9WF23t628nrUJkfLL+tvX1p94hs/6VJPcr6Plc?=
- =?us-ascii?Q?MH5lMBMRg+cUqnxy9mI3kvMM6stMeMgR4cerdORMZbrVr0DZ22G+SV4Ss/HF?=
- =?us-ascii?Q?e7S2JgSOKYfEP7otjkT7kzjnifcMqnw944NeGqsRiY80XX861XNIXmg2O82B?=
- =?us-ascii?Q?gVNgL04gx8JlkiSM17CdjkC6QP35z1O+lTlYv1qERx+1f+aO6AxylZ+RZ2bX?=
- =?us-ascii?Q?QgqIIBo72vX5vM/vMS8nsi8oi0vk04+Jl6XCUTjBerx6RIs5tEOZkv8xcwRX?=
- =?us-ascii?Q?o/l1hA5WejAAbgDQvLp+8CbZSYCr4Ap/4y2qSFI29iJU2WHRkPR1MRQAOTOv?=
- =?us-ascii?Q?G8eenNGgT49NeASukVleUmH3zh2QMvzIzCwJeKAUq2nJSNeEamhMUMUwgegB?=
- =?us-ascii?Q?CotF/uXj3hKasypt2GUKpqRiqCJeDrEHMjN5S1zrPIToDMqY09sW35xGkyWr?=
- =?us-ascii?Q?N+2VenQw5v7UtuZfbX8Uw6jG6vivAvdnVTeJkHHOno1/L9Wm6jLnbYUNOg+8?=
- =?us-ascii?Q?IL9C6WSl3eI8ea0fLyOJ/NeLNO3Yz+hf+dP6W5zVYtCgWYvE3grGUtDGY05Y?=
- =?us-ascii?Q?8gT+VIEzj9BsffQn8fnpbgepFWQdEQDQqIp5u5pmzomyuLaJSrJl9xqvkdRu?=
- =?us-ascii?Q?qSjJjmq476KY1qNxgIxhgWKeGrFmNKBHOClb5Y+UsrLyScLEEv4ov+OkVnnf?=
- =?us-ascii?Q?pJScxn1nuh2cgcqYGIJRlRjeY/SmwH6QEwbJTzwwJAD7KapYN4hjBzk7KdaI?=
- =?us-ascii?Q?9GQF0jC5yi16szDXBqpV+ij+XdeLs0k7OZa4LTlRJKt1mjTP2LRMA+gugmEL?=
- =?us-ascii?Q?gMUBBcJz6qG2zmWs7BGK1yudslogw4OzA7uq6qfJ2jbhTAYIDtT2yGpTcaX/?=
- =?us-ascii?Q?GKbd0AiJVds433X4xbE74JaI6DMPAKcZijFXHgF1fQBQnvMqrMX+yvvWBLgY?=
- =?us-ascii?Q?CyUVGet8XMx/XLNZH5zNOFz6aUiPfMap8QzvSUI43yHBTAInMm5z6vSAZ6/h?=
- =?us-ascii?Q?hiBdKTN8ZYeKAN8wTc6dXIqhF4r++VFXGKEN6ub7rbvXUZX0isdCf1KGmJUE?=
- =?us-ascii?Q?IoaOPQah0/rSab3hysPgdsKJl3hpXQHeY/gizsZeJh9OF730rWZpZEz/14uf?=
- =?us-ascii?Q?+aS4mtSR6oj6B7pTu5FKW09NN7bYSfRagW1mZkIeRg0DE+8PMFnkxST2pxQi?=
- =?us-ascii?Q?FUOVLCPI7LB0WoZ7CPp+vrkBPB+n6Bo9DUfnaZ+IYliAbRtu0SMcJIDkrFxw?=
- =?us-ascii?Q?cJwFkT6pCHHZHH++K52XtYeSXU/nt8BNFur5pKEKYG4tkBkv6/i8Qe9/+1Wo?=
- =?us-ascii?Q?XrdJdLlBXJnYBgNcgosghIQXE4gebhGnsKdV8NYYmdDjgvtj+8SAFe5PfMTB?=
- =?us-ascii?Q?DGCLQ0YWO5U7NX3xTQWoyV7HtrsMCbfkw94gwLbWaEkSX21oLb8b2yqNsbnQ?=
- =?us-ascii?Q?54STA6UCIHnH1daGfrVsqwYje/GHgj/jGMM/nf04Dsf3y9R+cVJrpqf9W+7s?=
- =?us-ascii?Q?J7z+9IIhy1lFPSSEAyuBM+AWb3UqPCyEvOlaxQS73xs0fi0SwHJykfsZ5pIV?=
- =?us-ascii?Q?wy2R33qNw6S6MpfOr/FwzP9MOGBKuKmUIHhDPyuVfXRKAHPsaJSe+hkV7AQD?=
- =?us-ascii?Q?sw=3D=3D?=
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
 X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	=?us-ascii?Q?OYGNnFyiS1AfVfh0ghnMdxTjo6fQWl4ptQ8qIptOnw5+z3wWBW72wTfevogS?=
- =?us-ascii?Q?5fCXthPCSgxreLuHMpkfOv2siBiQBegWff/t6qJMU5CIk25vgaffA8oDmQp0?=
- =?us-ascii?Q?rvybHhrxIUcm/KgaPvDhCo7SI7ego+3jp3NyYIia7G3Bc0P3Cep8dZgSoVD9?=
- =?us-ascii?Q?84PD5lDM6ZIkpQOAz3BaQC4UskoMSYuy0rTyrz56jC/Oo781fTga77sq77pA?=
- =?us-ascii?Q?1ID+DJEtGUWokhyQvSVlj5KoViMq80ZWe0wzQbPNYV8Otwh5nmMCmyHb1QC7?=
- =?us-ascii?Q?xL+7nDin2v1fNCRklzYlVi9mHU/13BIFYvX4G5WRASmS4ra6vUIYd43WFmxL?=
- =?us-ascii?Q?eUxKLuy5A2jy5O1UWx+LjRzuCiDtyuN+NiZgijKtR9aQ+PugRls8yP7oPE6G?=
- =?us-ascii?Q?KBIMv52dtaJiIcJFLuWNGYQMCwTReqhaV6Ds+rWn5JkRf3Oe1vpGBvus9BoR?=
- =?us-ascii?Q?hFV5vYSvzbqRHbyg509KuBaOZow7u/GxwbEz6ySQMP3vlaNpU4PLJFifbbUc?=
- =?us-ascii?Q?69MONrtZq6UbDuc8QSbB6MZ3HDUxFNqEKsN/zKMG50Dv5gSr1BUlv8GMBGLA?=
- =?us-ascii?Q?WGCszYp/WjrVePYno02LX4o+Kt3kXRss0fAPw/Dkh9eIPQU/F2/+TBig+P7f?=
- =?us-ascii?Q?nzMa7SrD+Qdr6uGT8D54RZWbnJKzExSV3101frITLfhYOMcPDxaEMQMF8zFP?=
- =?us-ascii?Q?JE+p5lJ6VmGFKEJI2bBo8uBXBqcX8w9q1cbAMIfbyFRjIlaKDuhCnwh9Vx33?=
- =?us-ascii?Q?xqXeNlVzkguE2VtJEXwulcWemb/M3BhgwC2TV6sJA8rIkTeYUo9jLV43lOam?=
- =?us-ascii?Q?jIrV8nxMQLc/CW1hU1rlas9JX1ltCKrJKkDkH33xb2gpu1yszU/vstaNn5Ph?=
- =?us-ascii?Q?JU3nf4C8B0SDvA7jI/TBl/AVl3PVMTVRn7SYgbrPtxafKgEVMZZJdtUYuUj2?=
- =?us-ascii?Q?1ViQHE8PYAMBtA09WdZFceSyiokBs5EgmUv+nHzyeH0Qe0O2qOq+NSp2ytT8?=
- =?us-ascii?Q?g17ZQ7F7kedzpJcWiOa+ajbOEyYFrZWz5owfxL53xmjiXnYLmbMtVrRxkOlJ?=
- =?us-ascii?Q?pMvVJwttzRZt64j0h79NmzDPJlKfVapA4iBWrSRwP63QZLDnm8dJc/uEkNFN?=
- =?us-ascii?Q?VTOZ/R9PQK7gG/3HZMF/4/+HOCo4ayQ/uFKxOdpctVkuJJyTspwioMQ=3D?=
+	=?us-ascii?Q?tgjNPNXKqfF/flzJ5MRnOQI93RecUVqhnxkJcIcdx/cvebtb+5Sklmgv9hBu?=
+ =?us-ascii?Q?B7x2LqQTYNM2eIWAoYd+8+FiV5fWRuqR+NpOGCP4rC+jsiydc+0C0+8JCyvi?=
+ =?us-ascii?Q?MBs/A2HUXSHmXEl+/g5mM6AGu85jCO6UG/OMxv6Na/D9xTNzbw7ZfjDgfN51?=
+ =?us-ascii?Q?CrcLC2EUriiUYR2jdjJsSeLPd5eRq0QqKe+Ne6hNTjHe5nxegcqxMX1Gj8Vc?=
+ =?us-ascii?Q?TJhIEc5aWvp86GHTY7dz6pyQDX/shKj3cP5qNxHmMr0eAhZjE5aE05uViyZq?=
+ =?us-ascii?Q?jouWm5ZxqzsLfxPBh//+RVEXVdsHPU0gDIiSBylaRhazkXq2MZR+oEa7YTvu?=
+ =?us-ascii?Q?2RsVNAwgJJU/WPZ7CWtEtcoS+MXwXCEBl9FwvlJgdK6DTI5a/96Nn6fNcyGb?=
+ =?us-ascii?Q?RNLAXo+3uCR2xtFyTrNOnnwXMQWRq0FWYqppoaHkKKGvt0OzQwZ3fu3LfUUl?=
+ =?us-ascii?Q?bGjI5ltUTVTzN4EUAFDDKNT4cvg+buKKoncj/j01KnmKJWLzyJ8m7c0wj3Ye?=
+ =?us-ascii?Q?IND5CJfa7nJKAI4X4fBGnhT9fOYxzCpfj9r7D6sNhdTJt7qLBc2tS3bJz+ds?=
+ =?us-ascii?Q?plgH9waoIopK2FlD+agezvi0lB35zEbQKc/uGrOsn9mXarOxFamUCtkwSx1U?=
+ =?us-ascii?Q?YyjQUjowkgS1eB/lKYIOU1iNWtlUyBUq1rNeN6OWbz1yoP56hipNiYoxiqg+?=
+ =?us-ascii?Q?gA7zgumsXNHIYZcdvxQH40vjKdx0LHj6ObBrk5ioz6v2THgZD8kHrz/zR09Q?=
+ =?us-ascii?Q?C63rL0ed1V1iJZQ1q/toazW6vAdnajc8LWdGhLb4fpmtgAxxisVZeF7+HCnt?=
+ =?us-ascii?Q?OE0g7CT3xEjrP6RuY2S1uTJYbj5N2/cy0OywnmWggkX8b4cfP0vAx98nelzA?=
+ =?us-ascii?Q?PhP7XU7rJqe8cwqpk98SEOvDZl67HDwi1tFjMN87r66NzDkTDoDVSpg0Y9Kn?=
+ =?us-ascii?Q?M0Gy28dC2FX9vN5MsfaFwrm3GDdf37MOetFNGZvhbiA055K7vnU94xgJnQoI?=
+ =?us-ascii?Q?lIYqYfT3pLaO2a6O6tYzZRqx4hz5kXO0M16EPzxgXTAScO9nVmm8rVFoqWRe?=
+ =?us-ascii?Q?JY31RTwl+zlujNt5iFB3ihE58tSAd/0rZmtRcBqm8TFfa2yYeWBNubzE9dlo?=
+ =?us-ascii?Q?ezhlw3OamEViAeTXG6C+Rx7JrZwEDJscqIqPshmDmOWgYrqSONJQHG0=3D?=
 X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 12778aaf-1058-4c75-d0cd-08db79a957d6
-X-MS-Exchange-CrossTenant-AuthSource: BL0PR10MB3011.namprd10.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 30 Jun 2023 20:34:03.4949
+X-MS-Exchange-CrossTenant-AuthSource: BY5PR10MB4129.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 27ebc638-9f27-45f4-0d63-08db79aa0ca6
+X-MS-Exchange-CrossTenant-originalarrivaltime: 30 Jun 2023 20:39:06.6068
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: fcGpXmArWaOomzJrKK0diFIe7Dx/XSHyZykaqwdIV06X8K4NBl4gtAkeE0+HcBC3hEZEdunMMXmdb7TySe7zGw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: IA1PR10MB7312
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: /XlXX1GNJz5B+d1HEzDt1tKMeKn0XK4tTMKyR7IOtMQOw/Hnjjqzgp+9i7FoXbJ9AsJxTLqSyW4aZZIVS6fHBLk1YGNb5gSFJv9v96rm+3o=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN0PR10MB6005
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-06-30_12,2023-06-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 spamscore=0 adultscore=0 bulkscore=0
- suspectscore=0 mlxscore=0 phishscore=0 malwarescore=0 mlxlogscore=999
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2306300180
-X-Proofpoint-GUID: R0A6u3mmUn7O7invq5eBrMEjw6jbrpDk
-X-Proofpoint-ORIG-GUID: R0A6u3mmUn7O7invq5eBrMEjw6jbrpDk
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 mlxlogscore=999 adultscore=0
+ malwarescore=0 suspectscore=0 spamscore=0 bulkscore=0 mlxscore=0
+ phishscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2306300180
+X-Proofpoint-GUID: 4EhJtKwrCP3JhYEg1igky961oOUrZ05p
+X-Proofpoint-ORIG-GUID: 4EhJtKwrCP3JhYEg1igky961oOUrZ05p
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
 	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -183,226 +202,115 @@ X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-* Anjali Kulkarni <anjali.k.kulkarni@oracle.com> [230614 19:41]:
-> This patch adds the capability to filter messages sent by the proc
-> connector on the event type supplied in the message from the client
-> to the connector. The client can register to listen for an event type
-> given in struct proc_input.
-> 
-> This event based filteting will greatly enhance performance - handling
-> 8K exits takes about 70ms, whereas 8K-forks + 8K-exits takes about 150ms
-> & handling 8K-forks + 8K-exits + 8K-execs takes 200ms. There are currently
-> 9 different types of events, and we need to listen to all of them. Also,
-> measuring the time using pidfds for monitoring 8K process exits took
-> much longer - 200ms, as compared to 70ms using only exit notifications of
-> proc connector.
-> 
-> We also add a new event type - PROC_EVENT_NONZERO_EXIT, which is
-> only sent by kernel to a listening application when any process exiting,
-> has a non-zero exit status. This will help the clients like Oracle DB,
-> where a monitoring process wants notfications for non-zero process exits
-> so it can cleanup after them.
-> 
-> This kind of a new event could also be useful to other applications like
-> Google's lmkd daemon, which needs a killed process's exit notification.
-> 
-> The patch takes care that existing clients using old mechanism of not
-> sending the event type work without any changes.
-> 
-> cn_filter function checks to see if the event type being notified via
-> proc connector matches the event type requested by client, before
-> sending(matches) or dropping(does not match) a packet.
-> 
-> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-> ---
->  drivers/connector/cn_proc.c  | 64 ++++++++++++++++++++++++++++++++----
->  include/uapi/linux/cn_proc.h | 19 +++++++++++
->  2 files changed, 77 insertions(+), 6 deletions(-)
-> 
-> diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
-> index 84f38d2bd4b9..825d5f506919 100644
-> --- a/drivers/connector/cn_proc.c
-> +++ b/drivers/connector/cn_proc.c
-> @@ -50,21 +50,47 @@ static DEFINE_PER_CPU(struct local_event, local_event) = {
->  
->  static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
->  {
-> +	uintptr_t val;
-> +	__u32 what, exit_code, *ptr;
->  	enum proc_cn_mcast_op mc_op;
 
-I guess reverse xmas tree would be requested here as well?
 
->  
-> -	if (!dsk)
-> +	if (!dsk || !data)
->  		return 0;
->  
-> +	ptr = (__u32 *)data;
-> +	what = *ptr++;
-> +	exit_code = *ptr;
-> +	val = ((struct proc_input *)(dsk->sk_user_data))->event_type;
->  	mc_op = ((struct proc_input *)(dsk->sk_user_data))->mcast_op;
->  
->  	if (mc_op == PROC_CN_MCAST_IGNORE)
->  		return 1;
->  
-> -	return 0;
-> +	if ((__u32)val == PROC_EVENT_ALL)
-> +		return 0;
-> +
-> +	/*
-> +	 * Drop packet if we have to report only non-zero exit status
-> +	 * (PROC_EVENT_NONZERO_EXIT) and exit status is 0
-> +	 */
-> +	if (((__u32)val & PROC_EVENT_NONZERO_EXIT) &&
-> +	    (what == PROC_EVENT_EXIT)) {
-> +		if (exit_code)
-> +			return 0;
-> +		else
+> On Jun 30, 2023, at 1:23 PM, Liam Howlett <liam.howlett@oracle.com> wrote=
+:
+>=20
+> * Anjali Kulkarni <anjali.k.kulkarni@oracle.com> [230614 19:41]:
+>> A new function netlink_release is added in netlink_sock to store the
+>> protocol's release function. This is called when the socket is deleted.
+>> This can be supplied by the protocol via the release function in
+>> netlink_kernel_cfg. This is being added for the NETLINK_CONNECTOR
+>> protocol, so it can free it's data when socket is deleted.
+>>=20
+>> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+>> ---
+>> include/linux/netlink.h | 1 +
+>> net/netlink/af_netlink.c | 6 ++++++
+>> net/netlink/af_netlink.h | 4 ++++
+>> 3 files changed, 11 insertions(+)
+>>=20
+>> diff --git a/include/linux/netlink.h b/include/linux/netlink.h
+>> index d73cfe5b6bc2..0db4ffe6186b 100644
+>> --- a/include/linux/netlink.h
+>> +++ b/include/linux/netlink.h
+>> @@ -50,6 +50,7 @@ struct netlink_kernel_cfg {
+>> 	struct mutex	*cb_mutex;
+>> 	int		(*bind)(struct net *net, int group);
+>> 	void		(*unbind)(struct net *net, int group);
+>> +	void (*release) (struct sock *sk, unsigned long *groups);
+>> };
+>>=20
+>> struct sock *__netlink_kernel_create(struct net *net, int unit,
+>> diff --git a/net/netlink/af_netlink.c b/net/netlink/af_netlink.c
+>> index e75e5156e4ac..383c10c6e6e3 100644
+>> --- a/net/netlink/af_netlink.c
+>> +++ b/net/netlink/af_netlink.c
+>> @@ -677,6 +677,7 @@ static int netlink_create(struct net *net, struct so=
+cket *sock, int protocol,
+>> 	struct netlink_sock *nlk;
+>> 	int (*bind)(struct net *net, int group);
+>> 	void (*unbind)(struct net *net, int group);
+>> +	void (*release)(struct sock *sock, unsigned long *groups);
+>> 	int err =3D 0;
+>>=20
+>> 	sock->state =3D SS_UNCONNECTED;
+>> @@ -704,6 +705,7 @@ static int netlink_create(struct net *net, struct so=
+cket *sock, int protocol,
+>> 	cb_mutex =3D nl_table[protocol].cb_mutex;
+>> 	bind =3D nl_table[protocol].bind;
+>> 	unbind =3D nl_table[protocol].unbind;
+>> +	release =3D nl_table[protocol].release;
+>> 	netlink_unlock_table();
+>>=20
+>> 	if (err < 0)
+>> @@ -719,6 +721,7 @@ static int netlink_create(struct net *net, struct so=
+cket *sock, int protocol,
+>> 	nlk->module =3D module;
+>> 	nlk->netlink_bind =3D bind;
+>> 	nlk->netlink_unbind =3D unbind;
+>> +	nlk->netlink_release =3D release;
+>> out:
+>> 	return err;
+>>=20
+>> @@ -763,6 +766,8 @@ static int netlink_release(struct socket *sock)
+>> 	 * OK. Socket is unlinked, any packets that arrive now
+>> 	 * will be purged.
+>> 	 */
+>> +	if (nlk->netlink_release)
+>> +		nlk->netlink_release(sk, nlk->groups);
+>>=20
+>> 	/* must not acquire netlink_table_lock in any way again before unbind
+>> 	 * and notifying genetlink is done as otherwise it might deadlock
+>> @@ -2091,6 +2096,7 @@ __netlink_kernel_create(struct net *net, int unit,=
+ struct module *module,
+>> 		if (cfg) {
+>> 			nl_table[unit].bind =3D cfg->bind;
+>> 			nl_table[unit].unbind =3D cfg->unbind;
+>> +			nl_table[unit].release =3D cfg->release;
+>> 			nl_table[unit].flags =3D cfg->flags;
+>> 		}
+>> 		nl_table[unit].registered =3D 1;
+>> diff --git a/net/netlink/af_netlink.h b/net/netlink/af_netlink.h
+>> index 90a3198a9b7f..cb2688aa347a 100644
+>> --- a/net/netlink/af_netlink.h
+>> +++ b/net/netlink/af_netlink.h
+>> @@ -42,6 +42,8 @@ struct netlink_sock {
+>> 	void			(*netlink_rcv)(struct sk_buff *skb);
+>> 	int			(*netlink_bind)(struct net *net, int group);
+>> 	void			(*netlink_unbind)(struct net *net, int group);
+>> +	void			(*netlink_release)(struct sock *sk,
+>> +						 unsigned long *groups);
+>> 	struct module		*module;
+>>=20
+>> 	struct rhash_head	node;
+>> @@ -64,6 +66,8 @@ struct netlink_table {
+>> 	struct module		*module;
+>> 	int			(*bind)(struct net *net, int group);
+>> 	void			(*unbind)(struct net *net, int group);
+>> +	void (*release)(struct sock *sk,=20
+>=20
+> The line above ends in a space.
+>=20
 
-Nit: don't really need the else here.
+Thanks, will fix in v7.
 
-> +			return 1;
-> +	}
-> +
-> +	if ((__u32)val & what)
-> +		return 0;
-> +
-> +	return 1;
->  }
->  
->  static inline void send_msg(struct cn_msg *msg)
->  {
-> +	__u32 filter_data[2];
-> +
->  	local_lock(&local_event.lock);
->  
->  	msg->seq = __this_cpu_inc_return(local_event.count) - 1;
-> @@ -76,8 +102,16 @@ static inline void send_msg(struct cn_msg *msg)
->  	 *
->  	 * If cn_netlink_send() fails, the data is not sent.
->  	 */
-> +	filter_data[0] = ((struct proc_event *)msg->data)->what;
-> +	if (filter_data[0] == PROC_EVENT_EXIT) {
-> +		filter_data[1] =
-> +		((struct proc_event *)msg->data)->event_data.exit.exit_code;
-> +	} else {
-> +		filter_data[1] = 0;
-> +	}
-> +
->  	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
-> -			     cn_filter, NULL);
-> +			     cn_filter, (void *)filter_data);
->  
->  	local_unlock(&local_event.lock);
->  }
-> @@ -357,12 +391,15 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
->  
->  /**
->   * cn_proc_mcast_ctl
-> - * @data: message sent from userspace via the connector
-> + * @msg: message sent from userspace via the connector
-> + * @nsp: NETLINK_CB of the client's socket buffer
->   */
->  static void cn_proc_mcast_ctl(struct cn_msg *msg,
->  			      struct netlink_skb_parms *nsp)
->  {
->  	enum proc_cn_mcast_op mc_op = 0, prev_mc_op = 0;
-> +	struct proc_input *pinput = NULL;
-> +	enum proc_cn_event ev_type = 0;
->  	int err = 0, initial = 0;
->  	struct sock *sk = NULL;
->  
-> @@ -381,10 +418,21 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
->  		goto out;
->  	}
->  
-> -	if (msg->len == sizeof(mc_op))
-> +	if (msg->len == sizeof(*pinput)) {
-> +		pinput = (struct proc_input *)msg->data;
-> +		mc_op = pinput->mcast_op;
-> +		ev_type = pinput->event_type;
-> +	} else if (msg->len == sizeof(mc_op)) {
->  		mc_op = *((enum proc_cn_mcast_op *)msg->data);
-> -	else
-> +		ev_type = PROC_EVENT_ALL;
-> +	} else {
->  		return;
-> +	}
-> +
-> +	ev_type = valid_event((enum proc_cn_event)ev_type);
-> +
-> +	if (ev_type == PROC_EVENT_NONE)
-> +		ev_type = PROC_EVENT_ALL;
->  
->  	if (nsp->sk) {
->  		sk = nsp->sk;
-> @@ -396,6 +444,8 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
->  			prev_mc_op =
->  			((struct proc_input *)(sk->sk_user_data))->mcast_op;
->  		}
-> +		((struct proc_input *)(sk->sk_user_data))->event_type =
-> +			ev_type;
->  		((struct proc_input *)(sk->sk_user_data))->mcast_op = mc_op;
->  	}
->  
-> @@ -407,6 +457,8 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
->  	case PROC_CN_MCAST_IGNORE:
->  		if (!initial && (prev_mc_op != PROC_CN_MCAST_IGNORE))
->  			atomic_dec(&proc_event_num_listeners);
-> +		((struct proc_input *)(sk->sk_user_data))->event_type =
-> +			PROC_EVENT_NONE;
->  		break;
->  	default:
->  		err = EINVAL;
-> diff --git a/include/uapi/linux/cn_proc.h b/include/uapi/linux/cn_proc.h
-> index 6a06fb424313..f2afb7cc4926 100644
-> --- a/include/uapi/linux/cn_proc.h
-> +++ b/include/uapi/linux/cn_proc.h
-> @@ -30,6 +30,15 @@ enum proc_cn_mcast_op {
->  	PROC_CN_MCAST_IGNORE = 2
->  };
->  
-> +#define PROC_EVENT_ALL (PROC_EVENT_FORK | PROC_EVENT_EXEC | PROC_EVENT_UID |  \
-> +			PROC_EVENT_GID | PROC_EVENT_SID | PROC_EVENT_PTRACE | \
-> +			PROC_EVENT_COMM | PROC_EVENT_NONZERO_EXIT |           \
-> +			PROC_EVENT_COREDUMP | PROC_EVENT_EXIT)
-> +
-> +/*
-> + * If you add an entry in proc_cn_event, make sure you add it in
-> + * PROC_EVENT_ALL above as well.
-> + */
->  enum proc_cn_event {
->  	/* Use successive bits so the enums can be used to record
->  	 * sets of events as well
-> @@ -45,15 +54,25 @@ enum proc_cn_event {
->  	/* "next" should be 0x00000400 */
->  	/* "last" is the last process event: exit,
->  	 * while "next to last" is coredumping event
-> +	 * before that is report only if process dies
-> +	 * with non-zero exit status
->  	 */
-> +	PROC_EVENT_NONZERO_EXIT = 0x20000000,
->  	PROC_EVENT_COREDUMP = 0x40000000,
->  	PROC_EVENT_EXIT = 0x80000000
->  };
->  
->  struct proc_input {
->  	enum proc_cn_mcast_op mcast_op;
-> +	enum proc_cn_event event_type;
->  };
->  
-> +static inline enum proc_cn_event valid_event(enum proc_cn_event ev_type)
-> +{
-> +	ev_type &= PROC_EVENT_ALL;
-> +	return ev_type;
-> +}
-> +
->  /*
->   * From the user's point of view, the process
->   * ID is the thread group ID and thread ID is the internal
-> -- 
-> 2.41.0
-> 
+>> +					 unsigned long *groups);
+>> 	int			registered;
+>> };
+>>=20
+>> --=20
+>> 2.41.0
+
 
