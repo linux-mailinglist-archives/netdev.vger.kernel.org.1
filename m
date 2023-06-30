@@ -1,165 +1,128 @@
-Return-Path: <netdev+bounces-14714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1CB1E74348A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 07:46:00 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4D920743499
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 07:55:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5C5A280EC1
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 05:45:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 001441C20AD1
+	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 05:55:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1626920F1;
-	Fri, 30 Jun 2023 05:45:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 936853D8B;
+	Fri, 30 Jun 2023 05:55:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 02BCD1FDD
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 05:45:56 +0000 (UTC)
-Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 949CB3AA7
-	for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 22:45:46 -0700 (PDT)
-Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-307d20548adso1692265f8f.0
-        for <netdev@vger.kernel.org>; Thu, 29 Jun 2023 22:45:46 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 829CC20F1
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 05:55:25 +0000 (UTC)
+Received: from mail-ot1-x334.google.com (mail-ot1-x334.google.com [IPv6:2607:f8b0:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EABCB1FE8;
+	Thu, 29 Jun 2023 22:55:23 -0700 (PDT)
+Received: by mail-ot1-x334.google.com with SMTP id 46e09a7af769-6b5d7e60015so1242115a34.0;
+        Thu, 29 Jun 2023 22:55:23 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688103945; x=1690695945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=o9DamHqoQRTGEPHmJjYoXKs4p/juuPvPGTamt5VWg8Y=;
-        b=a8Wcpk7EDnnZwIgwD2HX0WSZBy+1oa/bj7pOqmvTOZzbvUL/OiML4GAVM3UU9WJuJB
-         WxDiHNh4mr+EQ6SVUllGP1thPRm2M/PLa/cmrHZklfYVaoD9MEK2It1U12hX0y2wZxtH
-         NKG24iqSMHcbvcB2Yb278McTlYFmBlKtJLMlWrIdoTiJFMXNwzOGXZNBYReowDLio1MF
-         77GmQ7EUb/90uMkL6Wdcu2te4qPDKn7sx8AKOkdulebFP/Q51zXUVU4s1fBnN+DlBFpW
-         +BNyTYv4B5hvX38cIcYfdVLgJTVCzfpAdBmceCOeOiND1sOdgbfCZ7LJdEWSRrwj7xYb
-         wG6Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688103945; x=1690695945;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1688104523; x=1690696523;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=o9DamHqoQRTGEPHmJjYoXKs4p/juuPvPGTamt5VWg8Y=;
-        b=kQx7HuVv7NoitovzFhLwaoshgh6/Xutvu+iRWNJbcIpYwWfeM7I2fKuBogybajKeNR
-         nSfSSDNERnxzcDMeVPz4VOEFj2ute+ssGIRitNd1BnPS279uGKmxjjfAo6PHdJ/fMCsy
-         WNLe2bglPun3YNB821zg0zKv5a1ZawgjQBSNG7g3Ghg7jctN3oqdpHUNw2oe2lE8HYOM
-         GH1RiUaD7WXCHn0AbDdg2rbh91KjrEPjoG2NAT/GkzsvBN69ptsrIlAhtiyfTqswBPbt
-         7KCegbQiB27FrJsuQLp4woCD682jaeFvelY4JzY4jVMVItaD2hsp24JCrUCYrVbaWFNE
-         abcw==
-X-Gm-Message-State: ABy/qLYrPCUkW9YwgcobUxl4jcEftAj3lXpIQLMjYWvVPsIf/U5MyMN7
-	JGskMJJFbuM3+H8O6p5CRothUg==
-X-Google-Smtp-Source: APBJJlH41vjtNXK96kxURDA38odJVMBPwEkTkxM5vYTyKgQj30uXZ5l3+v9GL1D6Vdu8EmbRSr2Deg==
-X-Received: by 2002:a5d:6512:0:b0:314:a03:c7a0 with SMTP id x18-20020a5d6512000000b003140a03c7a0mr1442004wru.9.1688103944951;
-        Thu, 29 Jun 2023 22:45:44 -0700 (PDT)
-Received: from localhost ([102.36.222.112])
-        by smtp.gmail.com with ESMTPSA id j9-20020a5d4649000000b0030aefa3a957sm17413602wrs.28.2023.06.29.22.45.41
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 29 Jun 2023 22:45:42 -0700 (PDT)
-Date: Fri, 30 Jun 2023 08:45:38 +0300
-From: Dan Carpenter <dan.carpenter@linaro.org>
-To: Sai Krishna Gajula <saikrishnag@marvell.com>
-Cc: "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>,
-	"kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	Sunil Kovvuri Goutham <sgoutham@marvell.com>,
-	"maciej.fijalkowski@intel.com" <maciej.fijalkowski@intel.com>,
-	Naveen Mamindlapalli <naveenm@marvell.com>
-Subject: Re: [net PATCH v2] octeontx2-af: Move validation of ptp pointer
- before its usage
-Message-ID: <5e222335-5baa-4ce8-a90b-69a865f29b1a@kadam.mountain>
-References: <20230609115806.2625564-1-saikrishnag@marvell.com>
- <880d628e-18bf-44a1-a55f-ffbe1777dd2b@kadam.mountain>
- <BY3PR18MB470788B4096D586DEB9A3B22A023A@BY3PR18MB4707.namprd18.prod.outlook.com>
- <3894dd38-377b-4691-907b-ec3d47fddffd@kadam.mountain>
- <SA1PR18MB4709E390AC13A1EF5F652165A02AA@SA1PR18MB4709.namprd18.prod.outlook.com>
+        bh=cSBES6sO0S+ucqilKRRgFBUV0LjEF9eAIEf/oosxqIY=;
+        b=b0pUhDBA3um+86U8PMrx4K7f8bppC1N0d3y+rFjs4R+VPLZ8YOjK1KQZiXYrPf1GRa
+         Unqff7WbSGrlMFqAUMXAvZygexK5/CrDqlesqi5bo3cmCpNe0ZkYdqu0gvv+lFyJhkE/
+         BqQV87A/9PsUr9GoBEXfByeTHq7AimxwwQKpPePMXJj4jwwLktOFkpOEM/olRIoFFT5i
+         /r0hbkLe6DvnmaFs9CyvwypoBvoZdm2vv7MmoliAxeY4+oS96uwzaKnpVKZjvmbOkNg5
+         wmfMlxygyDIFcoo63JmqeGcMobiikjgQ40sxVn86VJmGqHQyQHdog3n3qytoPt5AdB/K
+         Xglw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688104523; x=1690696523;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=cSBES6sO0S+ucqilKRRgFBUV0LjEF9eAIEf/oosxqIY=;
+        b=O6J2kdM/gleslHImcu85LiN7uKUgBp1h29AhDdG7UMz9oPH7p12FVRjDJMUh7KK1h1
+         kGiox8ZZp5eFZ1vAh7vt4ypsWgCPUHN7BIqBOFOa4DxsmDp9aK/3/FS3AR4CH9Vtn+JM
+         n5FQiZS7aQxFe6xtQsnR3nGU5ZupFFqUhdJhSuDa1XDFaq+72IsEDd1CHB7hBQdvIB5r
+         rOeRrE6Zogb39e/O1UwXaufj9Ov61uWiE+4p5w7Ly+eKVZMzylZ1WQiv4hAj01odKi6U
+         2/Ok4TCYqP0qMxGCLwLfoEDo65jDGSg/gGrMN3E58utHWK20Nn9NhQoxQYYOVYpJ3sKZ
+         XDOg==
+X-Gm-Message-State: AC+VfDwPMOZzlVD8o4+kxq6Yz3HRNPWYe5a0vE2EvVfUKTUEM/toBkYS
+	3Yg/6HnZNsIp1MrCCaEPVRqXN56BFwy6kunAF8E=
+X-Google-Smtp-Source: ACHHUZ6MGlFcc4BSao10wMY/aeDrw4Ttrm9C+qRs9GGoDIvp8DsVfjBqa+jsURtKymgoNPmZVyMnH6vsAzPmDfvD1iw=
+X-Received: by 2002:a05:6830:1059:b0:6b5:c745:7797 with SMTP id
+ b25-20020a056830105900b006b5c7457797mr2169875otp.30.1688104523153; Thu, 29
+ Jun 2023 22:55:23 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <SA1PR18MB4709E390AC13A1EF5F652165A02AA@SA1PR18MB4709.namprd18.prod.outlook.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230630032653.26426-1-qiang.zhang1211@gmail.com> <CANn89i+Yw_3FEjo_dYSknhmyfoOCD-1S0OSRR_GoyMjQPjcu6w@mail.gmail.com>
+In-Reply-To: <CANn89i+Yw_3FEjo_dYSknhmyfoOCD-1S0OSRR_GoyMjQPjcu6w@mail.gmail.com>
+From: Z qiang <qiang.zhang1211@gmail.com>
+Date: Fri, 30 Jun 2023 13:55:11 +0800
+Message-ID: <CALm+0cXo-Bra_5M53c024+tnO-VTZJvO=4MhhVf-KUTb0ZGmfA@mail.gmail.com>
+Subject: Re: [PATCH] net: Destroy previously created kthreads after failing to
+ set napi threaded mode
+To: Eric Dumazet <edumazet@google.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Wei Wang <weiwan@google.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 05:19:27AM +0000, Sai Krishna Gajula wrote:
-> 
-> > -----Original Message-----
-> > From: Dan Carpenter <dan.carpenter@linaro.org>
-> > Sent: Friday, June 23, 2023 5:14 PM
-> > To: Sai Krishna Gajula <saikrishnag@marvell.com>
-> > Cc: davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> > pabeni@redhat.com; netdev@vger.kernel.org; linux-
-> > kernel@vger.kernel.org; Sunil Kovvuri Goutham <sgoutham@marvell.com>;
-> > maciej.fijalkowski@intel.com; Naveen Mamindlapalli
-> > <naveenm@marvell.com>
-> > Subject: Re: [net PATCH v2] octeontx2-af: Move validation of ptp
-> > pointer before its usage
-> > 
-> > On Fri, Jun 23, 2023 at 11:28:19AM +0000, Sai Krishna Gajula wrote:
-> > > > This probe function is super weird how it returns success on the failure
-> > path.
-> > > > One concern, I had initially was that if anything returns
-> > > > -EPROBE_DEFER then we cannot recover.  That's not possible in the
-> > > > current code, but it makes me itch...  But here is a different crash.
-> > > >
-> > >
-> > > In few circumstances, the PTP device is probed before the AF device in
-> > > the driver. In such instance, -EPROBE_DEFER is used.
-> > > -- EDEFER_PROBE is useful when probe order changes. Ex: AF driver probes
-> > before PTP.
-> > >
-> > 
-> > You're describing how -EPROBE_DEFER is *supposed* to work.  But that's not
-> > what this driver does.
-> > 
-> > If the AF driver is probed before the PTP driver then ptp_probe() should
-> > return -EPROBE_DEFER and that would allow the kernel to automatically retry
-> > ptp_probe() later.  But instead of that, ptp_probe() returns success.  So I
-> > guess the user would have to manually rmmod it and insmod it again?  So,
-> > what I'm saying I don't understand why we can't do this in the normal way.
-> > 
-> > The other thing I'm saying is that the weird return success on error stuff
-> > hasn't been tested or we would have discovered the crash through testing.
-> > 
-> > regards,
-> > dan carpenter
-> 
-> As suggested, we will return error in ptp_probe in case of any
-> failure conditions. In this case AF driver continues without PTP support.
+On Fri, Jun 30, 2023 at 1:33=E2=80=AFPM Eric Dumazet <edumazet@google.com> =
+wrote:
+>
+> On Fri, Jun 30, 2023 at 5:27=E2=80=AFAM Zqiang <qiang.zhang1211@gmail.com=
+> wrote:
+> >
+> > When setting 1 to enable napi threaded mode, will traverse dev->napi_li=
+st
+> > and create kthread for napi->thread, if creation fails, the dev->thread=
+ed
+> > will be set to false and we will clear NAPI_STATE_THREADED bit for all
+> > napi->state in dev->napi_list, even if some napi that has successfully
+> > created the kthread before. as a result, for successfully created napi
+> > kthread, they will never be used.
+> >
+> > This commit therefore destroy previously created napi->thread if settin=
+g
+> > napi threaded mode fails.
+> >
+>
+> I am not sure we need this, because these kthreads are not leaked at
+> present time.
+>
+> pktgen also creates unused kthreads (one per cpu), even if in most
+> cases only one of them is used.
+>
+> Leaving kthreads makes it possible to eventually succeed to enable
+> napi threaded mode
+> after several tries, for devices with 64 or more queues...
+>
 
-I'm concerned about the "AF driver continues without PTP support".
+Thanks for the reply,   I understand the approach in this way.
+But for successfully created napi kthreads, should NAPI_STATE_THREADED
+bits not be cleared ?
 
-> When the AF driver is probed before PTP driver , we will defer the AF
-> probe. Hope these changes are inline with your view.
-> I will send a v3 patch with these changes. 
-> 
+Thanks
+Zqiang
 
-I don't really understand the situation.  You have two drivers.
-Normally, the relationship is very simple where you have to load one
-before you can load the other.  But here it sounds like the relationships
-are very complicated and you are loading one in a degraded state for
-some reason...
-
-When drivers are loaded that happens in drivers/base/dd.c.  We start
-with a list of drivers to probe.  Then if any of them return
--EPROBE_DEFER, we put them on deferred_probe_pending_list.  Then as soon
-as we manage to probe another driver successfully we put the drivers on
-deferred_probe_pending_list onto another list and start trying to probe
-them again.
-
-That process continues until we've gone through the list of drivers and
-nothing succeeds.
-
-regards,
-dan carpenter
+>
+> This would target net-next.
+>
+> If you claim to fix a bug (thus targeting net tree), we would need a Fixe=
+s: tag.
+>
+>
+> Thanks.
 
