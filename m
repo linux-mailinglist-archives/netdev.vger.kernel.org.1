@@ -1,75 +1,185 @@
-Return-Path: <netdev+bounces-14962-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14963-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 375BE7449C6
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:34:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E8E7449E2
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:37:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8B567280FE7
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:34:27 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 85E9A1C208D1
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:37:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B38DAC15E;
-	Sat,  1 Jul 2023 14:34:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9151BC15E;
+	Sat,  1 Jul 2023 14:37:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7CC4C14F
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:34:25 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6EC5B99;
-	Sat,  1 Jul 2023 07:34:24 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=2nT/Q2r3OF8MPGSXSxANqp6p/AG3+1hk6myLkolAw04=; b=6bdjw3ehmO1ACbKSqJPNU3t1+9
-	1GzL/Hf8OiaTxBG1VTPou99bw8AX4vbaY1q1QfTbfD13jAAgPZ+geT0MFPIAJ4ZyzFoZb5IaX/UgQ
-	67+lRRLzR3Pd/9/1FtAwReaOsiDrL8iGeWna+cNpP2gBuu6BUGFlZHz3QATpnTOJdA2E=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qFbfz-000N8O-J9; Sat, 01 Jul 2023 16:34:15 +0200
-Date: Sat, 1 Jul 2023 16:34:15 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: phy: at803x: add qca8081 fifo reset on the link
- down
-Message-ID: <d4043e1f-d683-48c2-af79-9fea14ab7cc1@lunn.ch>
-References: <20230629034846.30600-1-quic_luoj@quicinc.com>
- <20230629034846.30600-4-quic_luoj@quicinc.com>
- <e1cf3666-fecc-4272-b91b-5921ada45ade@lunn.ch>
- <0f3990de-7c72-99d8-5a93-3b7eaa066e49@quicinc.com>
- <924ebd8b-2e1f-4060-8c66-4f4746e88696@lunn.ch>
- <7144731c-f4ae-99b6-d32a-1d0e39bc9ee7@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 864D7C2C0
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:37:16 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4EAC535B7;
+	Sat,  1 Jul 2023 07:37:12 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QtZVF6fSlz6J6pr;
+	Sat,  1 Jul 2023 22:35:33 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Sat, 1 Jul 2023 15:37:09 +0100
+Message-ID: <1073d016-4c70-6309-5ee1-026eec8e76f8@huawei.com>
+Date: Sat, 1 Jul 2023 17:37:08 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <7144731c-f4ae-99b6-d32a-1d0e39bc9ee7@quicinc.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11 03/12] landlock: Refactor
+ landlock_find_rule/insert_rule
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-4-konstantin.meskhidze@huawei.com>
+ <7ccd6600-c171-136d-82b5-8555b81ea7ba@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <7ccd6600-c171-136d-82b5-8555b81ea7ba@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500003.china.huawei.com (7.191.162.67) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Hi Andrew,
-> This block includes MII and MMD1 registers, which mainly configure the PLL
-> clocks, reset and calibration of the interface sgmii, there is no related
-> Clause 73 control register in this block.
 
-O.K. What does it have in the MII ID registers? Does Linux think it is
-a PHY and instantiating an generic PHY driver for it?
 
-	Andrew
+6/26/2023 9:40 PM, Mickaël Salaün пишет:
+> 
+> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
+>> Add a new landlock_key union and landlock_id structure to support
+>> a socket port rule type. A struct landlock_id identifies a unique entry
+>> in a ruleset: either a kernel object (e.g inode) or typed data (e.g TCP
+>> port). There is one red-black tree per key type.
+>> 
+>> This patch also adds is_object_pointer() and get_root() helpers.
+>> is_object_pointer() returns true if key type is LANDLOCK_KEY_INODE.
+>> get_root() helper returns a red_black tree root pointer according to
+>> a key type.
+>> 
+>> Refactor landlock_insert_rule() and landlock_find_rule() to support coming
+>> network modifications. Adding or searching a rule in ruleset can now be
+>> done thanks to a Landlock ID argument passed to these helpers.
+>> 
+>> Co-developed-by: Mickaël Salaün <mic@digikod.net>
+>> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> ---
+>> 
+>> Changes since v10:
+>> * None.
+>> 
+>> Changes since v9:
+>> * Splits commit.
+>> * Refactors commit message.
+>> * Minor fixes.
+>> 
+>> Changes since v8:
+>> * Refactors commit message.
+>> * Removes inlining.
+>> * Minor fixes.
+>> 
+>> Changes since v7:
+>> * Completes all the new field descriptions landlock_key,
+>>    landlock_key_type, landlock_id.
+>> * Refactors commit message, adds a co-developer.
+>> 
+>> Changes since v6:
+>> * Adds union landlock_key, enum landlock_key_type, and struct
+>>    landlock_id.
+>> * Refactors ruleset functions and improves switch/cases: create_rule(),
+>>    insert_rule(), get_root(), is_object_pointer(), free_rule(),
+>>    landlock_find_rule().
+>> * Refactors landlock_append_fs_rule() functions to support new
+>>    landlock_id type.
+>> 
+>> Changes since v5:
+>> * Formats code with clang-format-14.
+>> 
+>> Changes since v4:
+>> * Refactors insert_rule() and create_rule() functions by deleting
+>> rule_type from their arguments list, it helps to reduce useless code.
+>> 
+>> Changes since v3:
+>> * Splits commit.
+>> * Refactors landlock_insert_rule and landlock_find_rule functions.
+>> * Rename new_ruleset->root_inode.
+>> 
+>> ---
+>>   security/landlock/fs.c      |  21 +++---
+>>   security/landlock/ruleset.c | 134 ++++++++++++++++++++++++++----------
+>>   security/landlock/ruleset.h |  65 ++++++++++++++---
+>>   3 files changed, 166 insertions(+), 54 deletions(-)
+> 
+> [...]
+> 
+>> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+>> index 1f3188b4e313..deab37838f5b 100644
+>> --- a/security/landlock/ruleset.c
+>> +++ b/security/landlock/ruleset.c
+> 
+> [...]
+> 
+>> @@ -316,21 +368,29 @@ static int inherit_ruleset(struct landlock_ruleset *const parent,
+>>   			   struct landlock_ruleset *const child)
+>>   {
+>>   	struct landlock_rule *walker_rule, *next_rule;
+>> +	struct rb_root *parent_root;
+>>   	int err = 0;
+>> 
+>>   	might_sleep();
+>>   	if (!parent)
+>>   		return 0;
+>> 
+>> +	parent_root = get_root(parent, LANDLOCK_KEY_INODE);
+>> +	if (IS_ERR(parent_root))
+>> +		return PTR_ERR(parent_root);
+>> +
+>>   	/* Locks @child first because we are its only owner. */
+>>   	mutex_lock(&child->lock);
+>>   	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
+>> 
+>>   	/* Copies the @parent tree. */
+>>   	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule,
+>> -					     &parent->root, node) {
+>> -		err = insert_rule(child, walker_rule->object,
+>> -				  &walker_rule->layers,
+>> +					     parent_root, node) {
+>> +		const struct landlock_id id = {
+>> +			.key = walker_rule->key,
+>> +			.type = LANDLOCK_KEY_INODE,
+>> +		};
+> 
+> Please add a line break here instead of in a the following refactoring
+> commit.
+
+   Ok. Will be addded.
+> 
+> 
+>> +		err = insert_rule(child, id, &walker_rule->layers,
+>>   				  walker_rule->num_layers);
+>>   		if (err)
+>>   			goto out_unlock;
+> .
 
