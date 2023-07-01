@@ -1,323 +1,103 @@
-Return-Path: <netdev+bounces-14965-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14966-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16ECA7449EE
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:38:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id CCAED744A1F
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 125C01C20C5A
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:38:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A89C281117
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ECA6BC2D6;
-	Sat,  1 Jul 2023 14:38:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D148EC2E9;
+	Sat,  1 Jul 2023 14:52:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E1CFDC8C0
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:38:27 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 242E73A92;
-	Sat,  1 Jul 2023 07:38:24 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QtZV96ndWz6D9Bf;
-	Sat,  1 Jul 2023 22:35:29 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sat, 1 Jul 2023 15:38:21 +0100
-Message-ID: <46883829-2099-5323-233b-86abc3fc311d@huawei.com>
-Date: Sat, 1 Jul 2023 17:38:20 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E0A566F
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:52:03 +0000 (UTC)
+Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A5A35AB
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 07:52:00 -0700 (PDT)
+Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-39eab4bcee8so2190262b6e.0
+        for <netdev@vger.kernel.org>; Sat, 01 Jul 2023 07:52:00 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688223119; x=1690815119;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=y4Vvz+NxgmcnglJSaOiYfOTqGa31XUnul9o/nLqp0XE=;
+        b=TraCPekw+6Oe3ikNwgm3vM964y9Sbne4iTDEpK4i5iF9lLAP0D1jcuBZNwCjFFSDau
+         PGy1uup79ZF6Sxqu0u09tchQh8NgqGDQOp2ON+jniNYsJT1ZGnsdGmLsQozLmG/Q1wlO
+         sNY7QxlXpMyE6IHpCpFHEsSZhJDY2KoxyrWuqW8uVgy8FnV81ct8B7YJw2I+UKw/0r9y
+         q0/C6z8gx8/nD0OKypORt5XjD2QP6EYyb10W6qYDvA+pYJ2wLjf8Sgz8S5H/2pYaCLWE
+         fmmceCtxRGZxcsCyDe3EMd310hgKUm2uT4vs1fGZidOEJg5jSksGxaBuAMNUhtqEZMNG
+         gyxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688223119; x=1690815119;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y4Vvz+NxgmcnglJSaOiYfOTqGa31XUnul9o/nLqp0XE=;
+        b=TzoBHRpQUw1W+JyuzhF146P2VmG2Ge6UnZ9Ip66CTqSUVmSFmHEWtCrwAPNBMelWpd
+         7cSi/NOiBOLTF80Le8dmevRh8rQR6CwlSYptKstTlSFQTIwCI8Wo3pcLlLhKuM85D679
+         tnMKn03JqdbunG6FYNprXUGoCE9mapOq7EQrx3FazmfXKckw/3uuU6NlbRDAeAcyx20i
+         STGrp87KnYHz0s0sqf0HiwMYxTnyMDAI7Bt1uEd4vMpW2PSS4dpIyzxHSdpwaelTpQga
+         3odwvhlGvVsl1PqvDIYxn1xAA/1vOs4q3TCELro48iaRGZ3cUsoKahMrALIcVkRE7MC2
+         9U9g==
+X-Gm-Message-State: AC+VfDz0c0UwLqo0sYN/aJvwVNmZOFyYxsaDDJTRqamAN9yRmgyoGblO
+	gUk9LxYq2k1iimw/NXqQls0IlctqDdJp6JVZ7xM=
+X-Google-Smtp-Source: ACHHUZ6PNmFZc/xS1JswIpF3V0olKqDpyBkNeSAl5b7FCMH2cc9Yzo4FCbz0HCWAUUH+AgP4jj3wAZ21cAsq41JyoKU=
+X-Received: by 2002:a54:4713:0:b0:39e:5892:8539 with SMTP id
+ k19-20020a544713000000b0039e58928539mr5965518oik.9.1688223119551; Sat, 01 Jul
+ 2023 07:51:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v11 03/12] landlock: Refactor
- landlock_find_rule/insert_rule
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-4-konstantin.meskhidze@huawei.com>
- <64e21175-77ab-9a91-2997-43411b93cdaa@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <64e21175-77ab-9a91-2997-43411b93cdaa@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml100005.china.huawei.com (7.191.160.25) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230502043150.17097-1-glipus@gmail.com> <20230620192313.02df5db3@kernel.org>
+ <20230701100347.eqijafwdsc6mc6lb@skbuf>
+In-Reply-To: <20230701100347.eqijafwdsc6mc6lb@skbuf>
+From: Max Georgiev <glipus@gmail.com>
+Date: Sat, 1 Jul 2023 08:51:48 -0600
+Message-ID: <CAP5jrPGcrL6TvNV2QeaHowEETyMH=9u9q5iw2F86qbzdj3uRFg@mail.gmail.com>
+Subject: Re: [RFC PATCH net-next v6 0/5] New NDO methods ndo_hwtstamp_get/set
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, kory.maincent@bootlin.com, netdev@vger.kernel.org, 
+	maxime.chevallier@bootlin.com, vadim.fedorenko@linux.dev, 
+	richardcochran@gmail.com, gerhard@engleder-embedded.com, liuhangbin@gmail.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Sat, Jul 1, 2023 at 4:03=E2=80=AFAM Vladimir Oltean <vladimir.oltean@nxp=
+.com> wrote:
+>
+> On Tue, Jun 20, 2023 at 07:23:13PM -0700, Jakub Kicinski wrote:
+> > On Mon,  1 May 2023 22:31:45 -0600 Maxim Georgiev wrote:
+> > > This stack of patches introduces a couple of new NDO methods,
+> > > ndo_hwtstamp_get and ndo_hwtstamp_set. These new methods can be
+> > > implemented by NIC drivers to allow setting and querying HW
+> > > timestamp settings. Drivers implementing these methods will
+> > > not need to handle SIOCGHWTSTAMP/SIOCSHWTSTAMP IOCTLs.
+> > > The new NDO methods will handle copying request parameters
+> > > between user address space and kernel space.
+> >
+> > Maxim, any ETA on the next version? Should we let someone take over?
+> > It's been over a month since v6 posting.
+>
+> Assuming Maxim does not respond, can I try to take over? I may have some
+> time this weekend to play with some PTP related stuff.
 
-
-6/26/2023 9:58 PM, Mickaël Salaün пишет:
-> Complementary review:
-> 
-> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
->> Add a new landlock_key union and landlock_id structure to support
->> a socket port rule type. A struct landlock_id identifies a unique entry
->> in a ruleset: either a kernel object (e.g inode) or typed data (e.g TCP
->> port). There is one red-black tree per key type.
->> 
->> This patch also adds is_object_pointer() and get_root() helpers.
->> is_object_pointer() returns true if key type is LANDLOCK_KEY_INODE.
->> get_root() helper returns a red_black tree root pointer according to
->> a key type.
->> 
->> Refactor landlock_insert_rule() and landlock_find_rule() to support coming
->> network modifications. Adding or searching a rule in ruleset can now be
->> done thanks to a Landlock ID argument passed to these helpers.
->> 
->> Co-developed-by: Mickaël Salaün <mic@digikod.net>
->> Signed-off-by: Mickaël Salaün <mic@digikod.net>
->> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> ---
->> 
->> Changes since v10:
->> * None.
->> 
->> Changes since v9:
->> * Splits commit.
->> * Refactors commit message.
->> * Minor fixes.
->> 
->> Changes since v8:
->> * Refactors commit message.
->> * Removes inlining.
->> * Minor fixes.
->> 
->> Changes since v7:
->> * Completes all the new field descriptions landlock_key,
->>    landlock_key_type, landlock_id.
->> * Refactors commit message, adds a co-developer.
->> 
->> Changes since v6:
->> * Adds union landlock_key, enum landlock_key_type, and struct
->>    landlock_id.
->> * Refactors ruleset functions and improves switch/cases: create_rule(),
->>    insert_rule(), get_root(), is_object_pointer(), free_rule(),
->>    landlock_find_rule().
->> * Refactors landlock_append_fs_rule() functions to support new
->>    landlock_id type.
->> 
->> Changes since v5:
->> * Formats code with clang-format-14.
->> 
->> Changes since v4:
->> * Refactors insert_rule() and create_rule() functions by deleting
->> rule_type from their arguments list, it helps to reduce useless code.
->> 
->> Changes since v3:
->> * Splits commit.
->> * Refactors landlock_insert_rule and landlock_find_rule functions.
->> * Rename new_ruleset->root_inode.
->> 
->> ---
->>   security/landlock/fs.c      |  21 +++---
->>   security/landlock/ruleset.c | 134 ++++++++++++++++++++++++++----------
->>   security/landlock/ruleset.h |  65 ++++++++++++++---
->>   3 files changed, 166 insertions(+), 54 deletions(-)
->> 
->> diff --git a/security/landlock/fs.c b/security/landlock/fs.c
->> index a0c9c927fdf9..9a8e70f65a88 100644
->> --- a/security/landlock/fs.c
->> +++ b/security/landlock/fs.c
->> @@ -158,7 +158,9 @@ int landlock_append_fs_rule(struct landlock_ruleset *const ruleset,
->>   			    access_mask_t access_rights)
->>   {
->>   	int err;
->> -	struct landlock_object *object;
->> +	struct landlock_id id = {
->> +		.type = LANDLOCK_KEY_INODE,
->> +	};
->> 
->>   	/* Files only get access rights that make sense. */
->>   	if (!d_is_dir(path->dentry) &&
->> @@ -170,17 +172,17 @@ int landlock_append_fs_rule(struct landlock_ruleset *const ruleset,
->>   	/* Transforms relative access rights to absolute ones. */
->>   	access_rights |= LANDLOCK_MASK_ACCESS_FS &
->>   			 ~landlock_get_fs_access_mask(ruleset, 0);
->> -	object = get_inode_object(d_backing_inode(path->dentry));
->> -	if (IS_ERR(object))
->> -		return PTR_ERR(object);
->> +	id.key.object = get_inode_object(d_backing_inode(path->dentry));
->> +	if (IS_ERR(id.key.object))
->> +		return PTR_ERR(id.key.object);
->>   	mutex_lock(&ruleset->lock);
->> -	err = landlock_insert_rule(ruleset, object, access_rights);
->> +	err = landlock_insert_rule(ruleset, id, access_rights);
->>   	mutex_unlock(&ruleset->lock);
->>   	/*
->>   	 * No need to check for an error because landlock_insert_rule()
->>   	 * increments the refcount for the new object if needed.
->>   	 */
->> -	landlock_put_object(object);
->> +	landlock_put_object(id.key.object);
->>   	return err;
->>   }
->> 
->> @@ -197,6 +199,9 @@ find_rule(const struct landlock_ruleset *const domain,
->>   {
->>   	const struct landlock_rule *rule;
->>   	const struct inode *inode;
->> +	struct landlock_id id = {
->> +		.type = LANDLOCK_KEY_INODE,
->> +	};
->> 
->>   	/* Ignores nonexistent leafs. */
->>   	if (d_is_negative(dentry))
->> @@ -204,8 +209,8 @@ find_rule(const struct landlock_ruleset *const domain,
->> 
->>   	inode = d_backing_inode(dentry);
->>   	rcu_read_lock();
->> -	rule = landlock_find_rule(
->> -		domain, rcu_dereference(landlock_inode(inode)->object));
->> +	id.key.object = rcu_dereference(landlock_inode(inode)->object);
->> +	rule = landlock_find_rule(domain, id);
->>   	rcu_read_unlock();
->>   	return rule;
->>   }
->> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
->> index 1f3188b4e313..deab37838f5b 100644
->> --- a/security/landlock/ruleset.c
->> +++ b/security/landlock/ruleset.c
->> @@ -35,7 +35,7 @@ static struct landlock_ruleset *create_ruleset(const u32 num_layers)
->>   		return ERR_PTR(-ENOMEM);
->>   	refcount_set(&new_ruleset->usage, 1);
->>   	mutex_init(&new_ruleset->lock);
->> -	new_ruleset->root = RB_ROOT;
->> +	new_ruleset->root_inode = RB_ROOT;
->>   	new_ruleset->num_layers = num_layers;
->>   	/*
->>   	 * hierarchy = NULL
->> @@ -68,8 +68,18 @@ static void build_check_rule(void)
->>   	BUILD_BUG_ON(rule.num_layers < LANDLOCK_MAX_NUM_LAYERS);
->>   }
->> 
->> +static bool is_object_pointer(const enum landlock_key_type key_type)
->> +{
->> +	switch (key_type) {
->> +	case LANDLOCK_KEY_INODE:
->> +		return true;
->> +	}
->> +	WARN_ON_ONCE(1);
->> +	return false;
->> +}
->> +
->>   static struct landlock_rule *
->> -create_rule(struct landlock_object *const object,
->> +create_rule(const struct landlock_id id,
->>   	    const struct landlock_layer (*const layers)[], const u32 num_layers,
->>   	    const struct landlock_layer *const new_layer)
->>   {
->> @@ -90,8 +100,13 @@ create_rule(struct landlock_object *const object,
->>   	if (!new_rule)
->>   		return ERR_PTR(-ENOMEM);
->>   	RB_CLEAR_NODE(&new_rule->node);
->> -	landlock_get_object(object);
->> -	new_rule->object = object;
->> +	if (is_object_pointer(id.type)) {
->> +		/* This should be catched by insert_rule(). */
->> +		WARN_ON_ONCE(!id.key.object);
->> +		landlock_get_object(id.key.object);
->> +	}
->> +
->> +	new_rule->key = id.key;
->>   	new_rule->num_layers = new_num_layers;
->>   	/* Copies the original layer stack. */
->>   	memcpy(new_rule->layers, layers,
->> @@ -102,12 +117,29 @@ create_rule(struct landlock_object *const object,
->>   	return new_rule;
->>   }
->> 
->> -static void free_rule(struct landlock_rule *const rule)
->> +static struct rb_root *get_root(struct landlock_ruleset *const ruleset,
->> +				const enum landlock_key_type key_type)
->> +{
->> +	struct rb_root *root = NULL;
->> +
->> +	switch (key_type) {
->> +	case LANDLOCK_KEY_INODE:
->> +		root = &ruleset->root_inode;
->> +		break;
->> +	}
->> +	if (WARN_ON_ONCE(!root))
->> +		return ERR_PTR(-EINVAL);
->> +	return root;
->> +}
->> +
->> +static void free_rule(struct landlock_rule *const rule,
->> +		      const enum landlock_key_type key_type)
->>   {
->>   	might_sleep();
->>   	if (!rule)
->>   		return;
->> -	landlock_put_object(rule->object);
->> +	if (is_object_pointer(key_type))
->> +		landlock_put_object(rule->key.object);
->>   	kfree(rule);
->>   }
->> 
->> @@ -129,8 +161,8 @@ static void build_check_ruleset(void)
->>    * insert_rule - Create and insert a rule in a ruleset
->>    *
->>    * @ruleset: The ruleset to be updated.
->> - * @object: The object to build the new rule with.  The underlying kernel
->> - *          object must be held by the caller.
->> + * @id: The ID to build the new rule with.  The underlying kernel object, if
->> + *      any, must be held by the caller.
->>    * @layers: One or multiple layers to be copied into the new rule.
->>    * @num_layers: The number of @layers entries.
->>    *
->> @@ -144,26 +176,37 @@ static void build_check_ruleset(void)
->>    * access rights.
->>    */
->>   static int insert_rule(struct landlock_ruleset *const ruleset,
->> -		       struct landlock_object *const object,
->> +		       const struct landlock_id id,
->>   		       const struct landlock_layer (*const layers)[],
->> -		       size_t num_layers)
->> +		       const size_t num_layers)
->>   {
->>   	struct rb_node **walker_node;
->>   	struct rb_node *parent_node = NULL;
->>   	struct landlock_rule *new_rule;
->> +	struct rb_root *root;
->> 
->>   	might_sleep();
->>   	lockdep_assert_held(&ruleset->lock);
->> -	if (WARN_ON_ONCE(!object || !layers))
->> +	if (WARN_ON_ONCE(!layers))
->>   		return -ENOENT;
->> -	walker_node = &(ruleset->root.rb_node);
->> +
->> +	if (is_object_pointer(id.type)) {
->> +		if (WARN_ON_ONCE(!id.key.object))
-> 
-> This would be simpler:
-> 
-> if (is_object_pointer(id.type) && WARN_ON_ONCE(!id.key.object))
-> 	return -ENOENT;
->  
-   Yep. Thank you for the tip.
-> 
->> +			return -ENOENT;
->> +	}
->> +
-> .
+Yes, it looks like I hold back everyone.
+Vladimir, you are welcome to take over this patch stack.
 
