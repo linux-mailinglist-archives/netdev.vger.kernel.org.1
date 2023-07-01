@@ -1,103 +1,312 @@
-Return-Path: <netdev+bounces-14966-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14967-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CCAED744A1F
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:52:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B1C8A744A23
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:52:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0A89C281117
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:52:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E1FD71C20749
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:52:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D148EC2E9;
-	Sat,  1 Jul 2023 14:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 069DBC2E9;
+	Sat,  1 Jul 2023 14:52:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0E0A566F
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:52:03 +0000 (UTC)
-Received: from mail-oi1-x22f.google.com (mail-oi1-x22f.google.com [IPv6:2607:f8b0:4864:20::22f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 46A5A35AB
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 07:52:00 -0700 (PDT)
-Received: by mail-oi1-x22f.google.com with SMTP id 5614622812f47-39eab4bcee8so2190262b6e.0
-        for <netdev@vger.kernel.org>; Sat, 01 Jul 2023 07:52:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688223119; x=1690815119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=y4Vvz+NxgmcnglJSaOiYfOTqGa31XUnul9o/nLqp0XE=;
-        b=TraCPekw+6Oe3ikNwgm3vM964y9Sbne4iTDEpK4i5iF9lLAP0D1jcuBZNwCjFFSDau
-         PGy1uup79ZF6Sxqu0u09tchQh8NgqGDQOp2ON+jniNYsJT1ZGnsdGmLsQozLmG/Q1wlO
-         sNY7QxlXpMyE6IHpCpFHEsSZhJDY2KoxyrWuqW8uVgy8FnV81ct8B7YJw2I+UKw/0r9y
-         q0/C6z8gx8/nD0OKypORt5XjD2QP6EYyb10W6qYDvA+pYJ2wLjf8Sgz8S5H/2pYaCLWE
-         fmmceCtxRGZxcsCyDe3EMd310hgKUm2uT4vs1fGZidOEJg5jSksGxaBuAMNUhtqEZMNG
-         gyxQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688223119; x=1690815119;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=y4Vvz+NxgmcnglJSaOiYfOTqGa31XUnul9o/nLqp0XE=;
-        b=TzoBHRpQUw1W+JyuzhF146P2VmG2Ge6UnZ9Ip66CTqSUVmSFmHEWtCrwAPNBMelWpd
-         7cSi/NOiBOLTF80Le8dmevRh8rQR6CwlSYptKstTlSFQTIwCI8Wo3pcLlLhKuM85D679
-         tnMKn03JqdbunG6FYNprXUGoCE9mapOq7EQrx3FazmfXKckw/3uuU6NlbRDAeAcyx20i
-         STGrp87KnYHz0s0sqf0HiwMYxTnyMDAI7Bt1uEd4vMpW2PSS4dpIyzxHSdpwaelTpQga
-         3odwvhlGvVsl1PqvDIYxn1xAA/1vOs4q3TCELro48iaRGZ3cUsoKahMrALIcVkRE7MC2
-         9U9g==
-X-Gm-Message-State: AC+VfDz0c0UwLqo0sYN/aJvwVNmZOFyYxsaDDJTRqamAN9yRmgyoGblO
-	gUk9LxYq2k1iimw/NXqQls0IlctqDdJp6JVZ7xM=
-X-Google-Smtp-Source: ACHHUZ6PNmFZc/xS1JswIpF3V0olKqDpyBkNeSAl5b7FCMH2cc9Yzo4FCbz0HCWAUUH+AgP4jj3wAZ21cAsq41JyoKU=
-X-Received: by 2002:a54:4713:0:b0:39e:5892:8539 with SMTP id
- k19-20020a544713000000b0039e58928539mr5965518oik.9.1688223119551; Sat, 01 Jul
- 2023 07:51:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF897C8D9
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:52:10 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7CE8A35AB;
+	Sat,  1 Jul 2023 07:52:08 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QtZqT60p8z6J6pM;
+	Sat,  1 Jul 2023 22:50:29 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Sat, 1 Jul 2023 15:52:05 +0100
+Message-ID: <12b5f33d-e2f5-3a12-c4f7-0164b6f36fba@huawei.com>
+Date: Sat, 1 Jul 2023 17:52:04 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230502043150.17097-1-glipus@gmail.com> <20230620192313.02df5db3@kernel.org>
- <20230701100347.eqijafwdsc6mc6lb@skbuf>
-In-Reply-To: <20230701100347.eqijafwdsc6mc6lb@skbuf>
-From: Max Georgiev <glipus@gmail.com>
-Date: Sat, 1 Jul 2023 08:51:48 -0600
-Message-ID: <CAP5jrPGcrL6TvNV2QeaHowEETyMH=9u9q5iw2F86qbzdj3uRFg@mail.gmail.com>
-Subject: Re: [RFC PATCH net-next v6 0/5] New NDO methods ndo_hwtstamp_get/set
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, kory.maincent@bootlin.com, netdev@vger.kernel.org, 
-	maxime.chevallier@bootlin.com, vadim.fedorenko@linux.dev, 
-	richardcochran@gmail.com, gerhard@engleder-embedded.com, liuhangbin@gmail.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11 04/12] landlock: Refactor merge/inherit_ruleset
+ functions
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-5-konstantin.meskhidze@huawei.com>
+ <3b52ba0c-d013-b7a9-0f08-2e6d677a1df0@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <3b52ba0c-d013-b7a9-0f08-2e6d677a1df0@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 1, 2023 at 4:03=E2=80=AFAM Vladimir Oltean <vladimir.oltean@nxp=
-.com> wrote:
->
-> On Tue, Jun 20, 2023 at 07:23:13PM -0700, Jakub Kicinski wrote:
-> > On Mon,  1 May 2023 22:31:45 -0600 Maxim Georgiev wrote:
-> > > This stack of patches introduces a couple of new NDO methods,
-> > > ndo_hwtstamp_get and ndo_hwtstamp_set. These new methods can be
-> > > implemented by NIC drivers to allow setting and querying HW
-> > > timestamp settings. Drivers implementing these methods will
-> > > not need to handle SIOCGHWTSTAMP/SIOCSHWTSTAMP IOCTLs.
-> > > The new NDO methods will handle copying request parameters
-> > > between user address space and kernel space.
-> >
-> > Maxim, any ETA on the next version? Should we let someone take over?
-> > It's been over a month since v6 posting.
->
-> Assuming Maxim does not respond, can I try to take over? I may have some
-> time this weekend to play with some PTP related stuff.
 
-Yes, it looks like I hold back everyone.
-Vladimir, you are welcome to take over this patch stack.
+
+6/26/2023 9:40 PM, Mickaël Salaün пишет:
+> 
+> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
+>> Refactor merge_ruleset() and inherit_ruleset() functions to support
+>> new rule types. This patch adds merge_tree() and inherit_tree()
+>> helpers. They use a specific ruleset's red-black tree according to
+>> a key type argument.
+>> 
+>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> ---
+>> 
+>> Changes since v10:
+>> * Refactors merge_tree() function.
+>> 
+>> Changes since v9:
+>> * None
+>> 
+>> Changes since v8:
+>> * Refactors commit message.
+>> * Minor fixes.
+>> 
+>> Changes since v7:
+>> * Adds missed lockdep_assert_held it inherit_tree() and merge_tree().
+>> * Fixes comment.
+>> 
+>> Changes since v6:
+>> * Refactors merge_ruleset() and inherit_ruleset() functions to support
+>>    new rule types.
+>> * Renames tree_merge() to merge_tree() (and reorder arguments), and
+>>    tree_copy() to inherit_tree().
+>> 
+>> Changes since v5:
+>> * Refactors some logic errors.
+>> * Formats code with clang-format-14.
+>> 
+>> Changes since v4:
+>> * None
+>> 
+>> ---
+>>   security/landlock/ruleset.c | 122 +++++++++++++++++++++++-------------
+>>   1 file changed, 79 insertions(+), 43 deletions(-)
+>> 
+>> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+>> index deab37838f5b..e4f449fdd6dd 100644
+>> --- a/security/landlock/ruleset.c
+>> +++ b/security/landlock/ruleset.c
+>> @@ -302,36 +302,22 @@ static void put_hierarchy(struct landlock_hierarchy *hierarchy)
+>>   	}
+>>   }
+>> 
+>> -static int merge_ruleset(struct landlock_ruleset *const dst,
+>> -			 struct landlock_ruleset *const src)
+>> +static int merge_tree(struct landlock_ruleset *const dst,
+>> +		      struct landlock_ruleset *const src,
+>> +		      const enum landlock_key_type key_type)
+>>   {
+>>   	struct landlock_rule *walker_rule, *next_rule;
+>>   	struct rb_root *src_root;
+>>   	int err = 0;
+>> 
+>>   	might_sleep();
+>> -	/* Should already be checked by landlock_merge_ruleset() */
+>> -	if (WARN_ON_ONCE(!src))
+>> -		return 0;
+>> -	/* Only merge into a domain. */
+>> -	if (WARN_ON_ONCE(!dst || !dst->hierarchy))
+>> -		return -EINVAL;
+>> +	lockdep_assert_held(&dst->lock);
+>> +	lockdep_assert_held(&src->lock);
+>> 
+>> -	src_root = get_root(src, LANDLOCK_KEY_INODE);
+>> +	src_root = get_root(src, key_type);
+>>   	if (IS_ERR(src_root))
+>>   		return PTR_ERR(src_root);
+>> 
+>> -	/* Locks @dst first because we are its only owner. */
+>> -	mutex_lock(&dst->lock);
+>> -	mutex_lock_nested(&src->lock, SINGLE_DEPTH_NESTING);
+>> -
+>> -	/* Stacks the new layer. */
+>> -	if (WARN_ON_ONCE(src->num_layers != 1 || dst->num_layers < 1)) {
+>> -		err = -EINVAL;
+>> -		goto out_unlock;
+>> -	}
+>> -	dst->access_masks[dst->num_layers - 1] = src->access_masks[0];
+>> -
+>>   	/* Merges the @src tree. */
+>>   	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule, src_root,
+>>   					     node) {
+>> @@ -340,23 +326,52 @@ static int merge_ruleset(struct landlock_ruleset *const dst,
+>>   		} };
+>>   		const struct landlock_id id = {
+>>   			.key = walker_rule->key,
+>> -			.type = LANDLOCK_KEY_INODE,
+>> +			.type = key_type,
+>>   		};
+>> 
+>> -		if (WARN_ON_ONCE(walker_rule->num_layers != 1)) {
+>> -			err = -EINVAL;
+>> -			goto out_unlock;
+>> -		}
+>> -		if (WARN_ON_ONCE(walker_rule->layers[0].level != 0)) {
+>> -			err = -EINVAL;
+>> -			goto out_unlock;
+>> -		}
+>> +		if (WARN_ON_ONCE(walker_rule->num_layers != 1))
+>> +			return -EINVAL;
+>> +
+>> +		if (WARN_ON_ONCE(walker_rule->layers[0].level != 0))
+>> +			return -EINVAL;
+>> +
+>>   		layers[0].access = walker_rule->layers[0].access;
+>> 
+>>   		err = insert_rule(dst, id, &layers, ARRAY_SIZE(layers));
+>>   		if (err)
+>> -			goto out_unlock;
+>> +			return err;
+>> +	}
+>> +	return err;
+>> +}
+>> +
+>> +static int merge_ruleset(struct landlock_ruleset *const dst,
+>> +			 struct landlock_ruleset *const src)
+>> +{
+>> +	int err = 0;
+>> +
+>> +	might_sleep();
+>> +	/* Should already be checked by landlock_merge_ruleset() */
+>> +	if (WARN_ON_ONCE(!src))
+>> +		return 0;
+>> +	/* Only merge into a domain. */
+>> +	if (WARN_ON_ONCE(!dst || !dst->hierarchy))
+>> +		return -EINVAL;
+>> +
+>> +	/* Locks @dst first because we are its only owner. */
+>> +	mutex_lock(&dst->lock);
+>> +	mutex_lock_nested(&src->lock, SINGLE_DEPTH_NESTING);
+>> +
+>> +	/* Stacks the new layer. */
+>> +	if (WARN_ON_ONCE(src->num_layers != 1 || dst->num_layers < 1)) {
+>> +		err = -EINVAL;
+>> +		goto out_unlock;
+>>   	}
+>> +	dst->access_masks[dst->num_layers - 1] = src->access_masks[0];
+>> +
+>> +	/* Merges the @src inode tree. */
+>> +	err = merge_tree(dst, src, LANDLOCK_KEY_INODE);
+>> +	if (err)
+>> +		goto out_unlock;
+>> 
+>>   out_unlock:
+>>   	mutex_unlock(&src->lock);
+>> @@ -364,43 +379,64 @@ static int merge_ruleset(struct landlock_ruleset *const dst,
+>>   	return err;
+>>   }
+>> 
+>> -static int inherit_ruleset(struct landlock_ruleset *const parent,
+>> -			   struct landlock_ruleset *const child)
+>> +static int inherit_tree(struct landlock_ruleset *const parent,
+>> +			struct landlock_ruleset *const child,
+>> +			const enum landlock_key_type key_type)
+>>   {
+>>   	struct landlock_rule *walker_rule, *next_rule;
+>>   	struct rb_root *parent_root;
+>>   	int err = 0;
+>> 
+>>   	might_sleep();
+>> -	if (!parent)
+>> -		return 0;
+>> +	lockdep_assert_held(&parent->lock);
+>> +	lockdep_assert_held(&child->lock);
+>> 
+>> -	parent_root = get_root(parent, LANDLOCK_KEY_INODE);
+>> +	parent_root = get_root(parent, key_type);
+>>   	if (IS_ERR(parent_root))
+>>   		return PTR_ERR(parent_root);
+>> 
+>> -	/* Locks @child first because we are its only owner. */
+>> -	mutex_lock(&child->lock);
+>> -	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
+>> -
+>> -	/* Copies the @parent tree. */
+>> +	/* Copies the @parent inode or network tree. */
+>>   	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule,
+>>   					     parent_root, node) {
+>>   		const struct landlock_id id = {
+>>   			.key = walker_rule->key,
+>> -			.type = LANDLOCK_KEY_INODE,
+>> +			.type = key_type,
+>>   		};
+>> +
+>>   		err = insert_rule(child, id, &walker_rule->layers,
+>>   				  walker_rule->num_layers);
+>>   		if (err)
+>> -			goto out_unlock;
+>> +			return err;
+>>   	}
+>> +	return err;
+>> +}
+>> +
+>> +static int inherit_ruleset(struct landlock_ruleset *const parent,
+>> +			   struct landlock_ruleset *const child)
+>> +{
+>> +	int err = 0;
+>> +
+>> +	might_sleep();
+>> +	if (!parent)
+>> +		return 0;
+>> +
+>> +	/* Locks @child first because we are its only owner. */
+>> +	mutex_lock(&child->lock);
+>> +	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
+>> +
+>> +	/* Copies the @parent inode tree. */
+>> +	err = inherit_tree(parent, child, LANDLOCK_KEY_INODE);
+>> +	if (err)
+>> +		goto out_unlock;
+>> 
+>>   	if (WARN_ON_ONCE(child->num_layers <= parent->num_layers)) {
+>>   		err = -EINVAL;
+>>   		goto out_unlock;
+>>   	}
+>> -	/* Copies the parent layer stack and leaves a space for the new layer. */
+>> +	/*
+>> +	 * Copies the parent layer stack and leaves a space
+>> +	 * for the new layer.
+>> +	 */
+> 
+> Did that get formatted because of clang-format? The original line exceed
+> the 80 columns limit, but it is not caught by different version of
+> clang-format I tested. Anyway, we should remove this hunk for now
+> because it has no link with the current patch.
+
+   Yep. I format every patch with clnag-format.
+   I will remove this hunk and let it be as it was.
+> 
+> 
+>>   	memcpy(child->access_masks, parent->access_masks,
+>>   	       flex_array_size(parent, access_masks, parent->num_layers));
+>> 
+>> --
+>> 2.25.1
+>> 
+> .
 
