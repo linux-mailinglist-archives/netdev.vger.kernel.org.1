@@ -1,67 +1,46 @@
-Return-Path: <netdev+bounces-14970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 23522744A51
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 17:45:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E1463744A84
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 18:21:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CEE3D1C208BA
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 15:45:06 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DABC1C208D1
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:21:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CFAA5C8EE;
-	Sat,  1 Jul 2023 15:45:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AA8D2E8;
+	Sat,  1 Jul 2023 16:21:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C2C7EC2EF
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 15:45:04 +0000 (UTC)
-Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C6242686;
-	Sat,  1 Jul 2023 08:45:03 -0700 (PDT)
-Received: from pps.filterd (m0279867.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 361FgEAi015314;
-	Sat, 1 Jul 2023 15:44:53 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=h/XryedWCGvhLgCpbQHnyuG4JAfrMRU14lrm6sbrl0c=;
- b=Eb4nAKUmAMYLNBw8VRE1mV8AO6xxmTDSrz1SgAtpAclvk9ugwt0sDGQhJJ4F9zzSvQ2G
- otVLYf3ZE/k1ijHhtFo7vh1h4gO8Ux5HkxeC0fVa/GM74NXY97a0/rBoDBv7Bm+TR4uS
- WsHma16V5BT9/HJofqIApO+bX42jpgR2ewgFVXdNQJ6xSoQrQ4vmoErmX43pMas8GITJ
- QqtDN4pQms1ABEMpf7+lKEz6MgYO17FTlRtbCdSmDq/XT24h/KrwSwY7Deb2uHCbT1qD
- tCEUj9JB3E5LnuWRczB1LG7nL8dxp+0EGhqanDpUmJSGn19RiXqTADmF42ZoIRAePt6b QA== 
-Received: from nalasppmta01.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rj9umh5kf-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 01 Jul 2023 15:44:52 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA01.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 361FiqBN029610
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sat, 1 Jul 2023 15:44:52 GMT
-Received: from [10.253.13.42] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.7; Sat, 1 Jul 2023
- 08:44:46 -0700
-Message-ID: <49f8ca40-e079-ad00-256e-08a61ffced22@quicinc.com>
-Date: Sat, 1 Jul 2023 23:44:34 +0800
-Precedence: bulk
-X-Mailing-List: netdev@vger.kernel.org
-List-Id: <netdev.vger.kernel.org>
-List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
-List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D52C8F5
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 16:21:35 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9964A10DC;
+	Sat,  1 Jul 2023 09:21:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=9PVVUcb5RkwFUjMyrKy1zG2bSIkmM/JEyEAWV9cGkZ8=; b=tcEWTOzM+VUgGcLfG7qPNzcJgm
+	aFwCefY9v4aGd6IpO37Sivc+M5B6+rIeayxeVKYHfhS7J/8aTrrwiCtl5Fl+kvJ14sIIE7stQ4VbL
+	lo33g5f9u98sY8vpRKNmmUvBjihWBl98MavpYqksC7+mVodbn8lk7oLXuD2aCc+x2vMo=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qFdLW-000NLQ-89; Sat, 01 Jul 2023 18:21:14 +0200
+Date: Sat, 1 Jul 2023 18:21:14 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
 Subject: Re: [PATCH 3/3] net: phy: at803x: add qca8081 fifo reset on the link
  down
-Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <hkallweit1@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <linux@armlinux.org.uk>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Message-ID: <34ef466e-df95-4be4-8366-64baf5f04cca@lunn.ch>
 References: <20230629034846.30600-1-quic_luoj@quicinc.com>
  <20230629034846.30600-4-quic_luoj@quicinc.com>
  <e1cf3666-fecc-4272-b91b-5921ada45ade@lunn.ch>
@@ -69,46 +48,34 @@ References: <20230629034846.30600-1-quic_luoj@quicinc.com>
  <924ebd8b-2e1f-4060-8c66-4f4746e88696@lunn.ch>
  <7144731c-f4ae-99b6-d32a-1d0e39bc9ee7@quicinc.com>
  <d4043e1f-d683-48c2-af79-9fea14ab7cc1@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <d4043e1f-d683-48c2-af79-9fea14ab7cc1@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01a.na.qualcomm.com (10.52.223.231) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: hnzGu5DvQj1kn3Mc_mXq6crkiUPKWeeR
-X-Proofpoint-ORIG-GUID: hnzGu5DvQj1kn3Mc_mXq6crkiUPKWeeR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-01_12,2023-06-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
- priorityscore=1501 clxscore=1015 bulkscore=0 phishscore=0 malwarescore=0
- mlxlogscore=474 adultscore=0 mlxscore=0 impostorscore=0 suspectscore=0
- lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307010151
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+ <49f8ca40-e079-ad00-256e-08a61ffced22@quicinc.com>
+Precedence: bulk
+X-Mailing-List: netdev@vger.kernel.org
+List-Id: <netdev.vger.kernel.org>
+List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
+List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <49f8ca40-e079-ad00-256e-08a61ffced22@quicinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+> Hi Andrew,
+> it is the PLL related registers, there is no PHY ID existed in MII register
+> 2, 3 of this block, so it can't be instantiated as the generic PHY device.
 
+Well, phylib is going to scan those ID registers, and if it finds
+something other than 0xffff 0xffff in those two ID registers it is
+going to think a PHY is there. And then if there is no driver using
+that ID, it will instantiate a generic PHY.
 
-On 7/1/2023 10:34 PM, Andrew Lunn wrote:
->> Hi Andrew,
->> This block includes MII and MMD1 registers, which mainly configure the PLL
->> clocks, reset and calibration of the interface sgmii, there is no related
->> Clause 73 control register in this block.
-> 
-> O.K. What does it have in the MII ID registers? Does Linux think it is
-> a PHY and instantiating an generic PHY driver for it?
-> 
-> 	Andrew
-Hi Andrew,
-it is the PLL related registers, there is no PHY ID existed in MII 
-register 2, 3 of this block, so it can't be instantiated as the generic 
-PHY device.
+You might be able to see this in /sys/bus/mdio_bus, especially if you
+don't have a DT node representing the MDIO bus.
+
+      Andrew
 
