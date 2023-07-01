@@ -1,77 +1,77 @@
-Return-Path: <netdev+bounces-14947-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14948-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 507C7744832
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 11:24:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 23684744837
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 11:25:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84BCB1C208E2
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 09:24:17 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 407421C2089C
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 09:25:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2F9B45666;
-	Sat,  1 Jul 2023 09:24:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4F39C5669;
+	Sat,  1 Jul 2023 09:25:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C11525C
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 09:24:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42F8B5666
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 09:25:45 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 78CA0170C
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 02:24:13 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 34649B7
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 02:25:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688203452;
+	s=mimecast20190719; t=1688203542;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Eam9D8S2vBmtyoziYyOMxULmlaRFIIksD/jzBqUMocE=;
-	b=G+I5V4KxLI2SJVRcw/EHwJQR1FwvLq+UCvuetsWFLxKhCDolIglZyrHKxuGdIMZnUfc3zS
-	/S3bQdrBP9v+1zU/jZBiI7Kz5b9uGzCH/9AVGE5G3yIvec1bPtolykzjZbnQRWoyoKqjSo
-	77FTDf44kN5kD4gcR5B0aNH+blbvSaw=
-Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
- [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=nM2gJH27BA1TX1GMcZ4aVIIbGI0tWJqJTUWx2rBsc7Y=;
+	b=SDqNKL3VogUNUe2kve6IUzARwtyTImauBH8aMZBSJOMJ+YpJz7SgxuGS3/cI7aCixYHM2i
+	mfJ6dHr0om3tBzByT7UrhGJUgFZMgcwNJRA8LaMWhs04CBn10aJ6PtID92YIUs9gsrvS4i
+	tairWStGz3gPzZzMAHf9Noc6/Mk9THA=
+Received: from mail-wm1-f69.google.com (mail-wm1-f69.google.com
+ [209.85.128.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-576-FCIcmuACNlCeTTYbzzmQzA-1; Sat, 01 Jul 2023 05:24:11 -0400
-X-MC-Unique: FCIcmuACNlCeTTYbzzmQzA-1
-Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fa8d203eccso11789785e9.1
-        for <netdev@vger.kernel.org>; Sat, 01 Jul 2023 02:24:11 -0700 (PDT)
+ us-mta-88-4Ial6gZsP8e_LaERQAz-fw-1; Sat, 01 Jul 2023 05:25:41 -0400
+X-MC-Unique: 4Ial6gZsP8e_LaERQAz-fw-1
+Received: by mail-wm1-f69.google.com with SMTP id 5b1f17b1804b1-3fbb18e9bd9so12683205e9.0
+        for <netdev@vger.kernel.org>; Sat, 01 Jul 2023 02:25:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688203450; x=1690795450;
+        d=1e100.net; s=20221208; t=1688203540; x=1690795540;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Eam9D8S2vBmtyoziYyOMxULmlaRFIIksD/jzBqUMocE=;
-        b=GIMhvhO0X/qJ9gqnPxtBGpIdpUhtidxrjRYSuHVocQNQgdikrUxaa5rZpYgTQxwwLU
-         hc/Bt/akv3Bce+UUqjSeYvLNWQZVLaDK0FOWBjEj+KPW7JLbFt+V7VMyoCtC6GnpkOY6
-         JqdKoXESCW2/DhajZt7uRFiJazEszXLqpZFaA1cTP/PRhFWGpCXoB9JLLyJClaFqmco/
-         Xozqty9a0yBHMJ9NslE3FKwesy/p+h8A/hH0c6G8hxKvRQ5nZ2Jn5qlXryKdb7rMK0Te
-         FaykFItjfpsp3DPc6XBseNVccynn1vPiuvSjCz4bUO2rIPCIVgKekvN/5RG0p2T7lOJ2
-         l3hg==
-X-Gm-Message-State: ABy/qLalRP65F0dMOHhuR/VON2CsuTOM4UMdq2MP73zgz7vlJgQOGrmk
-	dm/6pxyffDeroapW84ZQYxgLhYxU4LqYxRQsRzyGVXn/zCC7dYnAnhkpV/HlxbHlIDtWNzGVp2k
-	YFD2abhAhwRUa2voloDIQpsng+TIoD8pe
-X-Received: by 2002:adf:db51:0:b0:314:98f:2495 with SMTP id f17-20020adfdb51000000b00314098f2495mr4469385wrj.12.1688203450352;
-        Sat, 01 Jul 2023 02:24:10 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGIdkfDOc47sFDmHvOGwO7sKRLp+s5TlQ1vRnFa8KPeI4WqTZSk8JFSJCDQoRIXQtilqW6JCSYyLbGTn5trX7o=
-X-Received: by 2002:adf:db51:0:b0:314:98f:2495 with SMTP id
- f17-20020adfdb51000000b00314098f2495mr4469373wrj.12.1688203450037; Sat, 01
- Jul 2023 02:24:10 -0700 (PDT)
+        bh=nM2gJH27BA1TX1GMcZ4aVIIbGI0tWJqJTUWx2rBsc7Y=;
+        b=Xc7I4p7ZdELkbgdhezZoD2dRwFVeKX9p7zucs4/WC4mE02Vk2MDu+lxIEZdWL8cgGN
+         gVQtwqIo6BVunCnyd+LAwRYpMXt9ho4LKSvijZ7zXcLJ/oykW4aJi/HJfLBO+glt3sw0
+         Pi8PQnJnE89GxVXHOFNpl4vEU7q8r9cK/O9mf1vN0nqou7PVLqnWajsxh+sRMxwsqFsi
+         fmfkk9xH947QDww88Tw9elB5ZEhI0n1cJ2hq3tA4F0WjlxrTwnTR2SxVzCr41kC0V3Pv
+         6wul6HIevu65Bp1pIyTX5DlUrrwvEsmfZqXS86qVO67THF5GOz5kMNcX32k6JqhZ2Wbx
+         AGsw==
+X-Gm-Message-State: AC+VfDwq0TuZqZNEuMy00IuZzsIcB9ztl2kKMEOk/vvO3mc92ekenyiu
+	yEkCArlbB6CB4yzThEuocWNiMkrwOxdtVpj+dysCKC/M2lgjhZS/yomYSX0QZCFC1ehBNXqGT+5
+	6OtzZ1XYAIrIgFqaNGL89diTgsf84Aprm
+X-Received: by 2002:a1c:7704:0:b0:3f7:e7a2:25f6 with SMTP id t4-20020a1c7704000000b003f7e7a225f6mr4603083wmi.17.1688203540068;
+        Sat, 01 Jul 2023 02:25:40 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5KzgKvHpVpKm2J9bTSz5FU00R9I8bsGrKxINJmgolQkkcaBACIb7a7IhgcPxRbwrkEM1Oxeq1bSGVq3ZuXx0s=
+X-Received: by 2002:a1c:7704:0:b0:3f7:e7a2:25f6 with SMTP id
+ t4-20020a1c7704000000b003f7e7a225f6mr4603078wmi.17.1688203539779; Sat, 01 Jul
+ 2023 02:25:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-3-lulu@redhat.com>
- <CACGkMEuzrFP96qcFL0M=nGiQ9t57-EzOhZmB3No-8T8pMAWTxw@mail.gmail.com>
-In-Reply-To: <CACGkMEuzrFP96qcFL0M=nGiQ9t57-EzOhZmB3No-8T8pMAWTxw@mail.gmail.com>
+References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-2-lulu@redhat.com>
+ <CACGkMEvTyxvEkdMbYqZG3T4ZGm2G36hYqPidbTNzLB=bUgSr0A@mail.gmail.com>
+In-Reply-To: <CACGkMEvTyxvEkdMbYqZG3T4ZGm2G36hYqPidbTNzLB=bUgSr0A@mail.gmail.com>
 From: Cindy Lu <lulu@redhat.com>
-Date: Sat, 1 Jul 2023 17:23:29 +0800
-Message-ID: <CACLfguXHpCVuU-X9XZBOsuusELVBQsTa0L5LiJ59BSuiNx=ARg@mail.gmail.com>
-Subject: Re: [RFC 2/4] vduse: Add file operation for mmap
+Date: Sat, 1 Jul 2023 17:24:57 +0800
+Message-ID: <CACLfguWx2hjNyyVC_JM1VBCGj3AqRZsygHJ3JGcb8erknBo-sA@mail.gmail.com>
+Subject: Re: [RFC 1/4] vduse: Add the struct to save the vq reconnect info
 To: Jason Wang <jasowang@redhat.com>
 Cc: mst@redhat.com, maxime.coquelin@redhat.com, xieyongji@bytedance.com, 
 	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
@@ -85,114 +85,60 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jun 28, 2023 at 4:08=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+On Wed, Jun 28, 2023 at 4:04=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
 ote:
 >
 > On Wed, Jun 28, 2023 at 2:59=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
 > >
 > > From: Your Name <you@example.com>
+>
+> It looks to me your git is not properly configured.
+>
 > >
-> > Add the operation for mmap, The user space APP will
-> > use this function to map the pages to userspace
->
-> Please be specific in the log. E.g why and what the main goal for this mm=
-ap.
->
+> > this struct is to save the reconnect info struct, in this
+> > struct saved the page info that alloc to save the
+> > reconnect info
 > >
 > > Signed-off-by: Cindy Lu <lulu@redhat.com>
 > > ---
-> >  drivers/vdpa/vdpa_user/vduse_dev.c | 49 ++++++++++++++++++++++++++++++
-> >  1 file changed, 49 insertions(+)
+> >  drivers/vdpa/vdpa_user/vduse_dev.c | 7 +++++++
+> >  1 file changed, 7 insertions(+)
 > >
 > > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
 r/vduse_dev.c
-> > index f845dc46b1db..1b833bf0ae37 100644
+> > index 26b7e29cb900..f845dc46b1db 100644
 > > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
 > > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
-> > @@ -1313,6 +1313,54 @@ static struct vduse_dev *vduse_dev_get_from_mino=
-r(int minor)
-> >         return dev;
-> >  }
-> >
-> > +
-> > +static vm_fault_t vduse_vm_fault(struct vm_fault *vmf)
-> > +{
-> > +       struct vduse_dev *dev =3D vmf->vma->vm_file->private_data;
-> > +       struct vm_area_struct *vma =3D vmf->vma;
-> > +       u16 index =3D vma->vm_pgoff;
-> > +
-> > +       struct vdpa_reconnect_info *info;
-> > +       info =3D &dev->reconnect_info[index];
-> > +
-> > +       vma->vm_page_prot =3D pgprot_noncached(vma->vm_page_prot);
-> > +       if (remap_pfn_range(vma, vmf->address & PAGE_MASK, PFN_DOWN(inf=
-o->addr),
-> > +                           PAGE_SIZE, vma->vm_page_prot))
->
-> I'm not sure if this can work e.g do we want to use separate pages for
-> each virtqueue (I think the answer is yes).
->
-yes, this map the separate pages per vq, beads on my test this works
-> > +               return VM_FAULT_SIGBUS;
-> > +       return VM_FAULT_NOPAGE;
-> > +}
-> > +
-> > +static const struct vm_operations_struct vduse_vm_ops =3D {
-> > +       .fault =3D vduse_vm_fault,
+> > @@ -72,6 +72,12 @@ struct vduse_umem {
+> >         struct page **pages;
+> >         struct mm_struct *mm;
+> >  };
+> > +struct vdpa_reconnect_info {
+> > +       u32 index;
+> > +       phys_addr_t addr;
+> > +       unsigned long vaddr;
+> > +       phys_addr_t size;
 > > +};
-> > +
-> > +static int vduse_mmap(struct file *file, struct vm_area_struct *vma)
-> > +{
-> > +       struct vduse_dev *dev =3D file->private_data;
-> > +       struct vdpa_reconnect_info *info;
-> > +       unsigned long index =3D vma->vm_pgoff;
-> > +
-> > +       if (vma->vm_end - vma->vm_start !=3D PAGE_SIZE)
-> > +               return -EINVAL;
-> > +       if ((vma->vm_flags & VM_SHARED) =3D=3D 0)
-> > +               return -EINVAL;
-> > +
-> > +       if (index > 65535)
-> > +               return -EINVAL;
-> > +
-> > +       info =3D &dev->reconnect_info[index];
-> > +       if (info->addr & (PAGE_SIZE - 1))
-> > +               return -EINVAL;
-> > +       if (vma->vm_end - vma->vm_start !=3D info->size) {
-> > +               return -ENOTSUPP;
-> > +       }
 >
-> How can userspace know the correct size (info->size) here?
->
-I had hard code the size in userpace , I will add the new ioctl of get
-the map size
-Thanks
-cindy
-> > +
-> > +       vm_flags_set(vma, VM_IO | VM_PFNMAP | VM_DONTEXPAND | VM_DONTDU=
-MP);
->
-> Why do you need VM_IO, VM_PFNMAP and VM_DONTDUMP here?
+> Please add comments to explain each field. And I think this should be
+> a part of uAPI?
 >
 > Thanks
 >
-> > +       vma->vm_ops =3D &vduse_vm_ops;
-> > +
-> > +       return 0;
-> > +}
-> > +
-> >  static int vduse_dev_open(struct inode *inode, struct file *file)
-> >  {
-> >         int ret;
-> > @@ -1345,6 +1393,7 @@ static const struct file_operations vduse_dev_fop=
-s =3D {
-> >         .unlocked_ioctl =3D vduse_dev_ioctl,
-> >         .compat_ioctl   =3D compat_ptr_ioctl,
-> >         .llseek         =3D noop_llseek,
-> > +       .mmap           =3D vduse_mmap,
+Will add the new ioctl for this information
+Thanks
+Cindy
+> >
+> >  struct vduse_dev {
+> >         struct vduse_vdpa *vdev;
+> > @@ -106,6 +112,7 @@ struct vduse_dev {
+> >         u32 vq_align;
+> >         struct vduse_umem *umem;
+> >         struct mutex mem_lock;
+> > +       struct vdpa_reconnect_info reconnect_info[64];
 > >  };
 > >
-> >  static struct vduse_dev *vduse_dev_create(void)
+> >  struct vduse_dev_msg {
 > > --
 > > 2.34.3
 > >
