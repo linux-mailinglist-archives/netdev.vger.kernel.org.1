@@ -1,49 +1,49 @@
-Return-Path: <netdev+bounces-14907-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14914-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DD6E7446FD
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 08:40:07 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2F947744705
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 08:42:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F3D428103D
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 06:40:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 601451C20CAD
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 06:42:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85F6F3C27;
-	Sat,  1 Jul 2023 06:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B2D48832;
+	Sat,  1 Jul 2023 06:39:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 785703C24
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 06:39:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 201AC5676
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 06:39:40 +0000 (UTC)
 Received: from mx1.sberdevices.ru (mx2.sberdevices.ru [45.89.224.132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E9E4423A;
-	Fri, 30 Jun 2023 23:39:13 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 76D66423A;
+	Fri, 30 Jun 2023 23:39:34 -0700 (PDT)
 Received: from p-infra-ksmg-sc-msk02 (localhost [127.0.0.1])
-	by mx1.sberdevices.ru (Postfix) with ESMTP id 5B4E0120013;
-	Sat,  1 Jul 2023 09:28:48 +0300 (MSK)
-DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 5B4E0120013
+	by mx1.sberdevices.ru (Postfix) with ESMTP id 88B55120014;
+	Sat,  1 Jul 2023 09:28:49 +0300 (MSK)
+DKIM-Filter: OpenDKIM Filter v2.11.0 mx1.sberdevices.ru 88B55120014
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=sberdevices.ru;
-	s=mail; t=1688192928;
-	bh=HekjpGnl2zxNT3T4PtMzqPreuhYkvcvhGbre4mbN788=;
+	s=mail; t=1688192929;
+	bh=tAX9BS9Qmyzlmpr1k17sJ0Kzs+6bGB2QVrF/rbwEyDA=;
 	h=From:To:Subject:Date:Message-ID:MIME-Version:Content-Type:From;
-	b=YS9Y/4Nq7QyLj3q0n+STThG3zG7NIO38sMUdlqQsBxBY+Cs1l5DBwRZsSAsRN4qRD
-	 shFpx71KLAqGJBbdewqAEsO6Va/sEsGXmIuRwGzoRuR01heD8DhBDgiJj0mchqHtz4
-	 TBOtk/TfvNg1yBztQsG4uG86DGGCjLD4/YResK+CY5bXUNKtyO2xJkn/LZk+C9Ywjn
-	 ixaYrmI/Mh/Sj4akm2f2g+fFG4qF+8Ec5fZ+VMTZ9Sg+hqFeh1XTYoTORvnX3XtqdN
-	 0Ftws5OlfFrST+0RHu1x0uO7wyt/sNSAUL1BoWeztc0/gjgDYdAGx9H7aYiY9HlBVG
-	 QeRWR9VkFy61w==
+	b=DeNDBFfpH9IbbeqVzIvq/we2164xAwwjrKwlFH+Dmnq2ALgwrGUuw3tYz/xsDshbM
+	 f5lfBjuZk+iHsxiKiMxySwecX6WFoc93NmNLuPghjYUFBWBXDsBrGG1Oaj0BPjHE5b
+	 epwl2FwoIzFf4iS0NIMlK/6tsS/3CE5RbHTOiqwJUnDHIZZsdtVg4s/AwZ9/7atxed
+	 EcHa8n625gGiTEzV+Dva/q5pWjtANlW/vGqh2IqLEBRCpl6y/TDHtwl/g/QmppQkYp
+	 tc0kbqoy1taoo6I7RpiJQBt10bcjY54G31G009/VvCyeIsy9Znu4MwsCfbUFvlYfpa
+	 k+xm0Rt16aaYg==
 Received: from p-i-exch-sc-m01.sberdevices.ru (p-i-exch-sc-m01.sberdevices.ru [172.16.192.107])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
 	by mx1.sberdevices.ru (Postfix) with ESMTPS;
-	Sat,  1 Jul 2023 09:28:47 +0300 (MSK)
+	Sat,  1 Jul 2023 09:28:48 +0300 (MSK)
 Received: from localhost.localdomain (100.64.160.123) by
  p-i-exch-sc-m01.sberdevices.ru (172.16.192.107) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 1 Jul 2023 09:28:22 +0300
+ 15.2.1118.30; Sat, 1 Jul 2023 09:28:23 +0300
 From: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 To: Stefan Hajnoczi <stefanha@redhat.com>, Stefano Garzarella
 	<sgarzare@redhat.com>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
@@ -54,9 +54,9 @@ CC: <kvm@vger.kernel.org>, <virtualization@lists.linux-foundation.org>,
 	<netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
 	<kernel@sberdevices.ru>, <oxffffaa@gmail.com>, <avkrasnov@sberdevices.ru>,
 	Arseniy Krasnov <AVKrasnov@sberdevices.ru>
-Subject: [RFC PATCH v5 09/17] vsock: enable SOCK_SUPPORT_ZC bit
-Date: Sat, 1 Jul 2023 09:23:02 +0300
-Message-ID: <20230701062310.3397129-10-AVKrasnov@sberdevices.ru>
+Subject: [RFC PATCH v5 10/17] vhost/vsock: support MSG_ZEROCOPY for transport
+Date: Sat, 1 Jul 2023 09:23:03 +0300
+Message-ID: <20230701062310.3397129-11-AVKrasnov@sberdevices.ru>
 X-Mailer: git-send-email 2.35.0
 In-Reply-To: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
 References: <20230701062310.3397129-1-AVKrasnov@sberdevices.ru>
@@ -94,40 +94,42 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This bit is used by io_uring in case of zerocopy tx mode. io_uring code
-checks, that socket has this feature. This patch sets it in two places:
-1) For socket in 'connect()' call.
-2) For new socket which is returned by 'accept()' call.
+Add 'msgzerocopy_allow()' callback for vhost transport.
 
 Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 ---
- net/vmw_vsock/af_vsock.c | 6 ++++++
- 1 file changed, 6 insertions(+)
+ Changelog:
+ v4 -> v5:
+  * Move 'msgzerocopy_allow' right after seqpacket callbacks.
 
-diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
-index 033006e1b5ad..da22ae0ef477 100644
---- a/net/vmw_vsock/af_vsock.c
-+++ b/net/vmw_vsock/af_vsock.c
-@@ -1406,6 +1406,9 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
- 			goto out;
- 		}
+ drivers/vhost/vsock.c | 7 +++++++
+ 1 file changed, 7 insertions(+)
+
+diff --git a/drivers/vhost/vsock.c b/drivers/vhost/vsock.c
+index cb00e0e059e4..3fd0ab0c0edc 100644
+--- a/drivers/vhost/vsock.c
++++ b/drivers/vhost/vsock.c
+@@ -398,6 +398,11 @@ static bool vhost_vsock_more_replies(struct vhost_vsock *vsock)
+ 	return val < vq->num;
+ }
  
-+		if (vsock_msgzerocopy_allow(transport))
-+			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
++static bool vhost_transport_msgzerocopy_allow(void)
++{
++	return true;
++}
 +
- 		err = vsock_auto_bind(vsk);
- 		if (err)
- 			goto out;
-@@ -1560,6 +1563,9 @@ static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
- 		} else {
- 			newsock->state = SS_CONNECTED;
- 			sock_graft(connected, newsock);
-+			if (vsock_msgzerocopy_allow(vconnected->transport))
-+				set_bit(SOCK_SUPPORT_ZC,
-+					&connected->sk_socket->flags);
- 		}
+ static bool vhost_transport_seqpacket_allow(u32 remote_cid);
  
- 		release_sock(connected);
+ static struct virtio_transport vhost_transport = {
+@@ -431,6 +436,8 @@ static struct virtio_transport vhost_transport = {
+ 		.seqpacket_allow          = vhost_transport_seqpacket_allow,
+ 		.seqpacket_has_data       = virtio_transport_seqpacket_has_data,
+ 
++		.msgzerocopy_allow        = vhost_transport_msgzerocopy_allow,
++
+ 		.notify_poll_in           = virtio_transport_notify_poll_in,
+ 		.notify_poll_out          = virtio_transport_notify_poll_out,
+ 		.notify_recv_init         = virtio_transport_notify_recv_init,
 -- 
 2.25.1
 
