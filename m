@@ -1,52 +1,52 @@
-Return-Path: <netdev+bounces-14896-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14899-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56FA5744623
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 04:53:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7C07E74462B
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 05:21:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 786C41C20C5A
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 02:53:30 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A58FA1C20BD7
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 03:21:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6724A65D;
-	Sat,  1 Jul 2023 02:53:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C10517F3;
+	Sat,  1 Jul 2023 03:21:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A59217D5
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 02:53:28 +0000 (UTC)
-Received: from mail-yb1-xb49.google.com (mail-yb1-xb49.google.com [IPv6:2607:f8b0:4864:20::b49])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 415AE44A4
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 19:48:27 -0700 (PDT)
-Received: by mail-yb1-xb49.google.com with SMTP id 3f1490d57ef6-bb2fae9b286so2390456276.3
-        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 19:48:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8176417F2
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 03:21:53 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3129A5275
+	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 20:21:00 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53450fa3a18so2510872a12.0
+        for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 20:21:00 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688179706; x=1690771706;
+        d=google.com; s=20221208; t=1688181659; x=1690773659;
         h=cc:to:from:subject:message-id:mime-version:date:from:to:cc:subject
          :date:message-id:reply-to;
         bh=2wiAgAbJ3Wjk7juSdNsz+B6N/zmZMeaxN1RCHIrworw=;
-        b=v1GkwW4nC+pVReYvqFnYNcwxPf2Y9B5iZ93DnaYI3lpFTLnOEqDVAlMPcHBrDFQuVp
-         SJjqHzBtxtaFgZsYCLvVUYLgSOUXJGyj9au2rls2sG9NT/wxh1nYPfE51flcoVE1lvSe
-         /zM5udXJ3T4YGizkRntPmdW2GwLED/BESksWtA+yXpqLEIxt5ydt+MNJdxdqX/a6saPC
-         QygS3pepp3W0k68HQSD4whDX8j4BcVaj/r7u/QonPV1qv3rD05ttnbAnRvv3FXFWnmVZ
-         etReit6VJmOshaKtMLUZ3cTSiBplBUXR+sqvpMKJhAayFrYyHnXhVzHOl+1gNc0GJ3Vf
-         nIYQ==
+        b=ayNA2qgoAZKEbNFZPrN3iJn3DGGJnhmNmpFN+oRqd13ms2MPowL2KdWQE6idLNjmrd
+         e+FfdtazHrvK4OmHUjWZvGu38BEaMOHZSy6UkiXqdf8i9Twdi3VWXYow1WFcB0VNIZey
+         MdNz8NLlzqJfSwumlxBTvVVIU/kwVqs3WuLNReogQ6MzqkZb7D0APXrCaSIU31pr6l6z
+         j8uCz1GQ4HrfrKpznDPmO+X3nQicxPW07IePQWKSofEHqQkBxkqW7UYa0C9spSsz7WUs
+         Gbgt632HkvV9D2evfw+f9sBj1O/A1RV/ZgJdqmj7aSgYJUSzm1ZXMwKw1s9ys6GBN+K7
+         R+bg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688179706; x=1690771706;
+        d=1e100.net; s=20221208; t=1688181659; x=1690773659;
         h=cc:to:from:subject:message-id:mime-version:date:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
         bh=2wiAgAbJ3Wjk7juSdNsz+B6N/zmZMeaxN1RCHIrworw=;
-        b=NbJaSY7AQS6N2Nsmz1+8i0JouazVklB+07cX4Ey+qkFaUmRXGeYlIZTTWLIkCiESDD
-         GbTf/69EVvoqwn8kcrkWhtpbWEqdeVxpXfjdsdxaVEVMjzEVgHIA+dlPgNcJlfkNJslG
-         lZGFf+nAA8sZkEFcgieaEM0OMUe23/hpVvduCg0lvPcPMuPmf5ZlBFS5atIwN0h6df+H
-         E17p17XsQEbMJGXAEMweIdPQZc4oHOcEL+iqrm4ByLKd/Q2wvMQP/cOfoelNReC1lo/I
-         OrN0JIcZ7TVQeqzgg7EvSpCU15kI0YfY5pgfIisYKNAYL1V6mNOiqea0G74oHRHuThAt
-         vzvQ==
-X-Gm-Message-State: ABy/qLZPI+Cu2UOgIb0PtPw2+AmmzjGr150GAvIcdgW3sIv76wOgV36n
-	aZAvj/qneuJI+Do8AKoPb3W2SXqwnFuXsw==
+        b=cWgaQ6hu9CuOc28iRPTSdAYJ5UisA2Jq9GrPyXovpvv+XVC9mP3g1EXAuDR/phzjEy
+         Jx1qoyq6DqpfX61Q7nl73SWMgH8QtkccCRTqRobzzNd7XlWeqRURpS98LfGe+3a2xKGg
+         ZTPt/RFOLF1L6YB+Q6cZe7bSFOLA0d0qxPoNW27+CNTNB8y5e5uBaj0+BbWRt1jxVDyb
+         HmVhayK2F+FuTgPLwVHlv5ZM95KUfl7xoeFotxI6aUvbOCHWGgV2QM4IErHvO5pg0vJw
+         C+KaqDw6WQZEr/uTlI6VMTan2AtPuQbXcT1i99HMWyIRlumYJf4db62ne1wutEnqoBau
+         Fk7w==
+X-Gm-Message-State: AC+VfDw0Tn0fDCDRFUO4zuJep9P+5wPtVIDsBlmRpZnC7oti2YE8ueT5
+	tCimLmEv7vRHcpanB6PcK0/42InmG5mcXw==
 X-Google-Smtp-Source: APBJJlGbwjoRXF7vacvhH66Iu43FGmpxCA2Jtx/7qBuDnjy/Xv/cMzkDA580jYYvHSn/vDiXVoLiZwVAGHDBNw==
 X-Received: from edumazet1.c.googlers.com ([fda3:e722:ac3:cc00:2b:7d90:c0a8:395a])
  (user=edumazet job=sendgmr) by 2002:a25:346:0:b0:bac:adb8:a605 with SMTP id
@@ -68,6 +68,12 @@ To: "David S . Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
 Cc: netdev@vger.kernel.org, eric.dumazet@gmail.com, 
 	Eric Dumazet <edumazet@google.com>, syzbot <syzkaller@googlegroups.com>
 Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
 After blamed commit, we must be more careful about using
 skb_transport_offset(), as reminded us by syzbot:
