@@ -1,88 +1,118 @@
-Return-Path: <netdev+bounces-14886-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14887-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 245B6744547
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 01:38:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 35FAB744580
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 02:20:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 55A6C1C20B5A
-	for <lists+netdev@lfdr.de>; Fri, 30 Jun 2023 23:38:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 33E431C20C50
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 00:20:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F0A0AD45;
-	Fri, 30 Jun 2023 23:38:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 11481193;
+	Sat,  1 Jul 2023 00:20:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56BA7AD21
-	for <netdev@vger.kernel.org>; Fri, 30 Jun 2023 23:38:06 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 23459C433C8;
-	Fri, 30 Jun 2023 23:38:06 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688168286;
-	bh=aDoGh6BHxlBh8t8fWNrlX4oW9QEZMOk3iSMADxRRBXo=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=gjxEOHFtQDjhnWQdK9QdGAprDJKS6adNgQsHCKsmOTrUk0tHMJ0hkwvzDLfzNtYp8
-	 icQEI1wly+b79kcGi5TeSAte360WuGtIWKvvG1p8K8UFr6elCYdKgiAttgVntvJGmw
-	 I/mf+Ob2ls5a1zagzuBdqNtx3rGOoiyX2vu7bpawkLhJ2rFDhLfBEsH/ex4SBSRy6x
-	 waEhg1HGyj/3ZRdvfVQgU54X19N7XHmK/IXWc4Lg3gF/LyRJnSqk92av9VeAZ7GrsG
-	 SWosTlvCtf3qucEgi0NbdTaMuke2O3MRoCLbt2dZBc5+dAxd2aess/d8te8pvKpjx+
-	 ioP351LYUGItA==
-Date: Fri, 30 Jun 2023 16:38:05 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Long Li <longli@microsoft.com>
-Cc: Greg KH <gregkh@linuxfoundation.org>, Paolo Abeni <pabeni@redhat.com>,
- "longli@linuxonhyperv.com" <longli@linuxonhyperv.com>, Jason Gunthorpe
- <jgg@ziepe.ca>, Leon Romanovsky <leon@kernel.org>, Ajay Sharma
- <sharmaajay@microsoft.com>, Dexuan Cui <decui@microsoft.com>, KY Srinivasan
- <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, Wei Liu
- <wei.liu@kernel.org>, "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, "linux-hyperv@vger.kernel.org"
- <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "stable@vger.kernel.org"
- <stable@vger.kernel.org>
-Subject: Re: [Patch v3] net: mana: Batch ringing RX queue doorbell on
- receiving packets
-Message-ID: <20230630163805.79c0bdf5@kernel.org>
-In-Reply-To: <PH7PR21MB3263330E6A32D81D52B955FBCE2AA@PH7PR21MB3263.namprd21.prod.outlook.com>
-References: <1687823827-15850-1-git-send-email-longli@linuxonhyperv.com>
-	<36c95dd6babb2202f70594d5dde13493af62dcad.camel@redhat.com>
-	<PH7PR21MB3263B266E381BA15DCE45820CE25A@PH7PR21MB3263.namprd21.prod.outlook.com>
-	<e5c3e5e5033290c2228bbad0307334a964eb065e.camel@redhat.com>
-	<PH7PR21MB326330931CFDDA96E287E470CE2AA@PH7PR21MB3263.namprd21.prod.outlook.com>
-	<2023063001-agenda-spent-83c6@gregkh>
-	<PH7PR21MB3263330E6A32D81D52B955FBCE2AA@PH7PR21MB3263.namprd21.prod.outlook.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F0475188
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 00:20:41 +0000 (UTC)
+Received: from vps0.lunn.ch (unknown [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124083A9B;
+	Fri, 30 Jun 2023 17:20:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=RSoC/5hYUUQ3sGJr52lBB+aV7IzoV8b72rkry2pxCQg=; b=yAyplwTga+cJQhNVxS4WCa0avC
+	XATcUdMc7wgQTO46g7k9dcH2lTxfJGRCofunObU6mN+84w113eNMP2VoKVQEFW1R1wTRQT0i64hLW
+	KT9C9WzHFOqZAlNELVDobW+4G2P/rybEr2j3erhGyjDcrRq59amX2UprnR8BcrFLmzDQ=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qFOKp-000LM8-66; Sat, 01 Jul 2023 02:19:31 +0200
+Date: Sat, 1 Jul 2023 02:19:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Evan Quan <evan.quan@amd.com>
+Cc: rafael@kernel.org, lenb@kernel.org, Alexander.Deucher@amd.com,
+	Christian.Koenig@amd.com, Xinhui.Pan@amd.com, airlied@gmail.com,
+	daniel@ffwll.ch, johannes@sipsolutions.net, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	Mario.Limonciello@amd.com, mdaenzer@redhat.com,
+	maarten.lankhorst@linux.intel.com, tzimmermann@suse.de,
+	hdegoede@redhat.com, jingyuwang_vip@163.com, Lijo.Lazar@amd.com,
+	jim.cromie@gmail.com, bellosilicio@gmail.com,
+	andrealmeid@igalia.com, trix@redhat.com, jsg@jsg.id.au,
+	arnd@arndb.de, linux-kernel@vger.kernel.org,
+	linux-acpi@vger.kernel.org, amd-gfx@lists.freedesktop.org,
+	dri-devel@lists.freedesktop.org, linux-wireless@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: Re: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Message-ID: <7e7db6eb-4f46-407a-8d1f-16688554ad80@lunn.ch>
+References: <20230630103240.1557100-1-evan.quan@amd.com>
+ <20230630103240.1557100-2-evan.quan@amd.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630103240.1557100-2-evan.quan@amd.com>
+X-Spam-Status: No, score=-1.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RDNS_NONE,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 30 Jun 2023 20:42:28 +0000 Long Li wrote:
-> > > 5.15 and kernel 6.1. (those kernels are longterm) They need this fix to achieve
-> > > the performance target.
-> > 
-> > Why can't they be upgraded to get that performance target, and all the other
-> > goodness that those kernels have?  We don't normally backport new features,
-> > right?  
+> Drivers/subsystems contributing frequencies:
 > 
-> I think this should be considered as a fix, not a new feature.
-> 
-> MANA is designed to be 200GB full duplex at the start.  Due to lack of
-> hardware testing capability at early stage of the project, we could only test 100GB
-> for the Linux driver. When hardware is fully capable of reaching designed spec,
-> this bug in the Linux driver shows up.
+> 1) During probe, check `wbrf_supported_producer` to see if WBRF supported
+>    for the device.
 
-That part we understand.
+What is the purpose of this stage? Why would it not be supported for
+this device?
 
-If I were you I'd try to convince Greg and Paolo that the change is
-small and significant for user experience. And answer Greg's question
-why upgrading the kernel past 6.1 is a challenge in your environment.
+> +#ifdef CONFIG_WBRF
+> +bool wbrf_supported_producer(struct device *dev);
+> +int wbrf_add_exclusion(struct device *adev,
+> +		       struct wbrf_ranges_in *in);
+> +int wbrf_remove_exclusion(struct device *dev,
+> +			  struct wbrf_ranges_in *in);
+> +int wbrf_retrieve_exclusions(struct device *dev,
+> +			     struct wbrf_ranges_out *out);
+> +bool wbrf_supported_consumer(struct device *dev);
+> +
+> +int wbrf_register_notifier(struct notifier_block *nb);
+> +int wbrf_unregister_notifier(struct notifier_block *nb);
+> +#else
+> +static inline bool wbrf_supported_producer(struct device *dev) { return false; }
+> +static inline int wbrf_add_exclusion(struct device *adev,
+> +				     struct wbrf_ranges_in *in) { return -ENODEV; }
+> +static inline int wbrf_remove_exclusion(struct device *dev,
+> +					struct wbrf_ranges_in *in) { return -ENODEV; }
+
+The normal aim of stubs is that so long as it is not expected to be
+fatal if the functionality is missing, the caller should not care if
+it is missing. So i would expect these to return 0, indicating
+everything worked as expected.
+
+> +static inline int wbrf_retrieve_exclusions(struct device *dev,
+> +					   struct wbrf_ranges_out *out) { return -ENODEV; }
+
+This is more complex. Ideally you want to return an empty set, so
+there is nothing to do. So i think the stub probably wants to do a
+memset and then return 0.
+
+> +static inline bool wbrf_supported_consumer(struct device *dev) { return false; }
+> +static inline int wbrf_register_notifier(struct notifier_block *nb) { return -ENODEV; }
+> +static inline int wbrf_unregister_notifier(struct notifier_block *nb) { return -ENODEV; }
+
+And these can just return 0.
+
+    Andrew
 
