@@ -1,106 +1,156 @@
-Return-Path: <netdev+bounces-14972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E3B8744AE9
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 21:07:39 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 766D1744AF5
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 21:38:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56C531C2088E
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 19:07:38 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 27E98280EC8
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 19:38:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C83CD510;
-	Sat,  1 Jul 2023 19:07:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27720D534;
+	Sat,  1 Jul 2023 19:38:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF23C2EF
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 19:07:35 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 786CF1710;
-	Sat,  1 Jul 2023 12:07:34 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-98de21518fbso341018866b.0;
-        Sat, 01 Jul 2023 12:07:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 148B7D510
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 19:38:26 +0000 (UTC)
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (mail-bn8nam11on2100.outbound.protection.outlook.com [40.107.236.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95E36199B;
+	Sat,  1 Jul 2023 12:38:24 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=bGuWdRzbWSHFEd5uCLWQJPh4/eKnCXxCL/J6fCvMqLNEj0Mq//iKql6llm2YpRGG2rU5KttTw24BxrGLdz/l6bdiri1/GYO+43pqARAI2nj9zdeH3fPSKL/z9H0TYARqhaAzCNZS5E+gYc1VePTnuYVnvCnltyA2ubH+r2yEmAs7mNDdy9wCBoJ4NlK2u6YksdBmjOixkRy8/6uPiDbWTNFe5HYhpxrBye+3j+S1Mk4jWp4JoivKDKcipTVktUzT4FQnRPOiXE9xzWeORBVxS2S3D54M6al2wgw/vZyMbWVK9WoKc0oGGR/RDdXQ6ZiIrnREeJ8p+9+Q3ePo0B/mhQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=jWLPc02dvV0Q9UAmyL5XaibXG5cOE5p6aoUfyv1eigM=;
+ b=UaSwYhOtDORNpBTc74IeCjmA/1vzxneZuZW3to2bL8dvQ6P6hLA6667t7y17Y77Q52eQpffm8i+nu+8B1oLQOJp2H6eXE0XZJzBABwCq5+nX+EZ8m6w8YgDBMMajQ0yydMdXj9F6xRWy0VLU9y5X4yxEyX5i0Zu2H9xMnQC86XUA8breBdaFp3Q9RK76FdcM5QwJjK0Ti24lWLU27edWEv/E1ziYZl3PD/eMIS+jb02BGehwTSim343950N0tf0zkTjartCtrU9AhVokKH4BM+hiQNqjyGUSmei716teX80eFBpM3KN7q7a43go4z7vTeqE7KLBvzyRD60xgbniCCA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688238453; x=1690830453;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=bX/i0mHNTV00ab1SFTJ1jI7uVLuMRqDQB1VZHYQEjNs=;
-        b=PdTEY2J0Zvl+CBJDdJ6OS+HpggZcJ7yA/F+XAJJejPGqecYp7tzOo9kmzcARlA8jPd
-         7omvd4byZPccp3t57CCGyXNHlVfhoTNgeAUJCfDtzz41baX+aGTZDsHch/mybqQLhps4
-         61FGnbGZp66S/6U6CHwI1/ZGCzs3+MxYoZQ6MdFgjI7V2a5fxthMVMPM9VlnT794V7U9
-         piANfdilrBO7ENcgzVHWeuRe5jr6YB7LupHEnVBQb7vuVqUx6yEZpicNLojNyx4YrzU0
-         9ZxYbi+dInMu7Ru1Mz6uM4gyZkqZX+SMYZke3bzSnktBXcAB8nitlhw3kTq+nlcw0XHE
-         aktg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688238453; x=1690830453;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=bX/i0mHNTV00ab1SFTJ1jI7uVLuMRqDQB1VZHYQEjNs=;
-        b=Fpj+4E6qirNmLquh4oSzEbiVymCxpyUHYa9muB96dhCgeeFIcyQUVG7ca2DW8bXDEn
-         zxmNQa/UerbmqVhRWiRcGSN6GYevkPGE5wk7UV/fJ4FDaVihmGvue8sg5NeSwbvGwtDb
-         3Pf5qpuTq9VFIMbUHag7BJ25HsTZcl4kqrQwIMM4aKUd++KvoZe0uY6W88PudZVhparS
-         lxs93AGagvWT6mfoPU0S+547Cx6rnTjnbfrDT1fw5y4uPSlfASng/XqZBWCRpuefrDeC
-         kMHhlhWSJ3x31gh2ZldxRpKdyn7Vm9sXMKqauPgBdmGSdtd3WTy5oIYU+yi9TauQ5tOt
-         JDNA==
-X-Gm-Message-State: ABy/qLZoW71JKr0UankgVGstqvDuoywkKJquewisYZB4qwUDlwJaOZHr
-	oEUDjZKDCbmanwpuL7gdmwk=
-X-Google-Smtp-Source: ACHHUZ6omcfkIxZRLXA2gpUB1C+HvSks0LRIXKnKVI9EGAJVEnWPw/RS7n3FbP7gxEHFc0V/dBN6DQ==
-X-Received: by 2002:a17:906:bcc1:b0:98e:1deb:caf8 with SMTP id lw1-20020a170906bcc100b0098e1debcaf8mr3990662ejb.57.1688238452588;
-        Sat, 01 Jul 2023 12:07:32 -0700 (PDT)
-Received: from localhost ([2a02:168:633b:1:9d6a:15a4:c7d1:a0f0])
-        by smtp.gmail.com with ESMTPSA id k25-20020a17090666d900b009737b8d47b6sm9562030ejp.203.2023.07.01.12.07.31
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sat, 01 Jul 2023 12:07:32 -0700 (PDT)
-Date: Sat, 1 Jul 2023 21:07:12 +0200
-From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
-To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com,
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com,
-	artem.kuzin@huawei.com
-Subject: Re: [PATCH v11 10/12] selftests/landlock: Add 11 new test suites
- dedicated to network
-Message-ID: <20230701.acb4d98c59a0@gnoack.org>
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=jWLPc02dvV0Q9UAmyL5XaibXG5cOE5p6aoUfyv1eigM=;
+ b=CEyNEDIMeaYTIATf61+xwB4e+aUftSR5+ex712wctdxfK0BIYL47dxQOd79m3NgnaZAGgWoJFLrm1YYeOGPuG2XpYS3NnbenEd1slHZnBcpXbmpRpA6+Ne6P+H9unNDC143m2IRSFsQHFAoirjHVJRDDJOrvIHK8M5OIB9zIiLc=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by SJ0PR13MB6122.namprd13.prod.outlook.com (2603:10b6:a03:4eb::7) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Sat, 1 Jul
+ 2023 19:38:20 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.024; Sat, 1 Jul 2023
+ 19:38:20 +0000
+Date: Sat, 1 Jul 2023 21:38:06 +0200
+From: Simon Horman <simon.horman@corigine.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] net: dsa: tag_sja1105: fix source port decoding in
+ vlan_filtering=0 bridge mode
+Message-ID: <ZKCAngK+ngGrrG3q@corigine.com>
+References: <20230630222010.1691671-1-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230630222010.1691671-1-vladimir.oltean@nxp.com>
+X-ClientProxiedBy: AS4P190CA0049.EURP190.PROD.OUTLOOK.COM
+ (2603:10a6:20b:656::20) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|SJ0PR13MB6122:EE_
+X-MS-Office365-Filtering-Correlation-Id: a875202f-5301-41bb-e65a-08db7a6ab99b
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	CjGLQYrlkO9xyAmJ6kYu5eDA9Mx8KouePv/15J4eb1AE7w4FFDtyGTpCAiVc7kfP06lU34UQqKySP87q3kOZsQk3XfjGSD+63OTWE3DGVfu37Vc/iVuqPaCXBiFLfkRJ4UlN8+K8yIVsbaG+t79vqNr+k3QpvWx0+ryqKrsxAMIYLAalDh0OVorc7jrWwBAsvasd6LZxcA/r01sAqD0DT8lZD13AYICpDoO85SEkRaU0AkgRhi6lVrh1SO7XCrpGvnppXH404xrKc4LsjeCnWQdr2yV9fyuX+4u4kinIybdGE/5aGzlzQX/xU+S90leGTxDkfa01JQ3WluxXiiP9rqL5P3F6OQkRHYjeyTBkJJk7Y9H0fMeNH5J2deVhWqX9cvbRslj8wt2Ct0o4BLTx67hQldasGPMZu/4m45ovVLSLpQBthAaEvCTpfULtQWAwSUqgwfuH2fKsViikRRuGUCtXm3/YX6zAvKlozCkALNo1Ipm3fAaaAX7G4Q7sLudcgh77e4kWe19WJRxAMbPqDt1sxFfq43NfEceQajfL5S7sF4vr78QarzvexdicLxwl25fWwKMoJq3j+cQHOD/F6sVWMcQAAdehS7dyy0jtHozfnELv4BMgLPoIEPFcdNeFTRX9H8ksL5yg7sba2ATYYg==
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(376002)(396003)(136003)(39830400003)(366004)(451199021)(41300700001)(38100700002)(6486002)(6666004)(2616005)(83380400001)(6506007)(26005)(186003)(6512007)(54906003)(86362001)(478600001)(316002)(2906002)(36756003)(66476007)(6916009)(4326008)(66556008)(66946007)(8676002)(8936002)(44832011)(5660300002)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?MB3W1hlrcJVZyTuId1sWbK46dgSU6CPy1i1mNqCy57AobItQzLJeBOUiwPPU?=
+ =?us-ascii?Q?WQOk42iAo41uw7jerpGDKQLZrg+CN8mR/PjlMonEZjooFmfvMtG1DMBD9sVD?=
+ =?us-ascii?Q?ctWKClWXJ7lQfodqa8Bpe7msxqYfG9FV6CBKasZsxHYdfvVAaQVCE/qqI/gK?=
+ =?us-ascii?Q?7DqFiXVbhIu6Mbcoc42TlmJKNxi0swMZ0TATe5BVtkVtxLEhwHVuoo2WVEwc?=
+ =?us-ascii?Q?ymS012XaTIwMYLp/qwx2qKxgUQDMRDMLTRTPMvnWc4zKbJAzWr82hIgME6nt?=
+ =?us-ascii?Q?YMqlpxxkP0GCRBqaHKflRDsgOWkFHbazc3wVis9ls/t9afMYYAntiR/0eVXi?=
+ =?us-ascii?Q?YambRBfH8TS8r0S/InJ0b/6GEJ6xx//gtHqyzg+6Qw0Az+vUWd/+J/wq/Mut?=
+ =?us-ascii?Q?aXkgdqb8v0Ol695dYhNiLGP21JE8KiT2IdKYaFftNnjcXkZOCrKakpjhWzep?=
+ =?us-ascii?Q?21fjPRUCo58wtGrgRDcg5TD9NkX++Ry+1LxZ51pJgP77NzX/Ecb3KnjbpG4e?=
+ =?us-ascii?Q?Htofsd/mqjgMo0/MRLbEpcEFKOuSQDxWWx4esE05PcrwFdeZcdeDqYccE1yH?=
+ =?us-ascii?Q?kEEUVDgxFXnYjjhXERWc9f+Yer+9BVFe3JTP4V+1xf4wPCK2WO2VRd3NHLwU?=
+ =?us-ascii?Q?0kyu4uR8eY+/9byjjs5VdDcBgWM+p6AJZMrOy5sHDA1LujawQzQws9cYGCfH?=
+ =?us-ascii?Q?9W25n+SY2k2HrH1mLJgpyq+pDA2//yrPlswSjYnfjFEFKy6hIO3w3UOD0fDB?=
+ =?us-ascii?Q?4IgylcZPzSEwdDCJVMxykRrORux5DJDuvrbCcDQlh/2wfa4+CwDvL0bc52mm?=
+ =?us-ascii?Q?gHnn7IwMGeU6OnafYeVU/VeMUjgGyE5gx9S1Dvbp4GyhBlEfk2zjx0WcNusw?=
+ =?us-ascii?Q?kLoz7y2D0CJg0tH7NHzFuHe8EyRWKIolQNHn4IQoEidT5Nm+eNNlciAgCcQu?=
+ =?us-ascii?Q?DNUFOsIZk+Pmp/KYdew02C8toqxJaHqjArzcgvIlgkBt3n3iFrzQnfLjUkGs?=
+ =?us-ascii?Q?96kteqp5xiZ27FLfR69yRQ9a5vy+8VEV58Xwdbf1qc1+EVQ+5lTXH6tGbaOI?=
+ =?us-ascii?Q?lbb6CnuZEHi94SRvrUwpHkIpynJxiFYgljV4VghHxpSv60Z53E9PzHPD4Zcp?=
+ =?us-ascii?Q?iJSIP03lp2NCJWYrMb35t4N/0eKjZcK930saUjDPl2r2G8M9nRvv9MAdobEz?=
+ =?us-ascii?Q?E608nIVfitsl93rTKY1t0uWrNZSOQunY6CxMdEmCWVZrLUqVHb0l/taPTx57?=
+ =?us-ascii?Q?Rxm7HKbjv3wqsd0bFMvwZxoTY+zd8PLfOc6LLhbGWQEncoS6eBenIVx4qstE?=
+ =?us-ascii?Q?Hx2UfzcrWta+Yj3OJEPGekTCGVasUxRdj+YWpg+v2x7JvCaVQf9DOoNovi88?=
+ =?us-ascii?Q?NADVqjqbbMB97lb6ynRLPHGbEqVY4eTq0jkl444JBTUaDRXRUmm+u9LH9BKA?=
+ =?us-ascii?Q?x0/NKuf1pqacLNfdIOwfr8xzxk0P2b37H3dhaWet22wJsLh0JPMJeZVqeUma?=
+ =?us-ascii?Q?lF120A1OBXnI5/r4jTJZxF2tYX0yS/3LOs5zD4Y/jfPpL6AOUYuSFIlOEjVx?=
+ =?us-ascii?Q?yT4YoYbFv/+CweWF92EirAJJPNxgd4k7pzEiO+GupxFuqwd6MQK/v9uXcrqj?=
+ =?us-ascii?Q?Bg=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a875202f-5301-41bb-e65a-08db7a6ab99b
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 01 Jul 2023 19:38:20.4071
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: VfQp+bljRIhrBBmRNcTiCcMXMVfV47NRuSYjVfNfU7BtUuIcCtihJjh/9OAtCBnCaX1986EBZWzv/Rj5nFlroomW+MdkwGrec6Icw5kFzqk=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR13MB6122
 X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi!
+On Sat, Jul 01, 2023 at 01:20:10AM +0300, Vladimir Oltean wrote:
+> There was a regression introduced by the blamed commit, where pinging to
+> a VLAN-unaware bridge would fail with the repeated message "Couldn't
+> decode source port" coming from the tagging protocol driver.
+> 
+> When receiving packets with a bridge_vid as determined by
+> dsa_tag_8021q_bridge_join(), dsa_8021q_rcv() will decode:
+> - source_port = 0 (which isn't really valid, more like "don't know")
+> - switch_id = 0 (which isn't really valid, more like "don't know")
+> - vbid = value in range 1-7
+> 
+> Since the blamed patch has reversed the order of the checks, we are now
+> going to believe that source_port != -1 and switch_id != -1, so they're
+> valid, but they aren't.
+> 
+> The minimal solution to the problem is to only populate source_port and
+> switch_id with what dsa_8021q_rcv() came up with, if the vbid is zero,
+> i.e. the source port information is trustworthy.
+> 
+> Fixes: c1ae02d87689 ("net: dsa: tag_sja1105: always prefer source port information from INCL_SRCPT")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
-On Tue, May 16, 2023 at 12:13:37AM +0800, Konstantin Meskhidze wrote:
-> +TEST_F(inet, bind)
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
 
-If you are using TEST_F() and you are enforcing a Landlock ruleset
-within that test, doesn't that mean that the same Landlock ruleset is
-now also enabled on other tests that get run after that test?
-
-Most of the other Landlock selftests use TEST_F_FORK() for that
-reason, so that the Landlock enforcement stays local to the specific
-test, and does not accidentally influence the observed behaviour in
-other tests.
-
-The same question applies to other test functions in this file as
-well.
-
-–Günther
 
