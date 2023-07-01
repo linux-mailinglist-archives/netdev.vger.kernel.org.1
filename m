@@ -1,137 +1,164 @@
-Return-Path: <netdev+bounces-14944-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14945-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 83BCF74480C
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 10:34:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 47354744829
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 11:15:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BDC7D1C20CD3
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 08:34:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D8690281242
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 09:15:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B70B83D86;
-	Sat,  1 Jul 2023 08:34:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 10CE3525C;
+	Sat,  1 Jul 2023 09:15:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB2D52F45
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 08:34:06 +0000 (UTC)
-Received: from mail-ej1-x62a.google.com (mail-ej1-x62a.google.com [IPv6:2a00:1450:4864:20::62a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4611128
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 01:34:03 -0700 (PDT)
-Received: by mail-ej1-x62a.google.com with SMTP id a640c23a62f3a-992f6d7c7fbso134982566b.3
-        for <netdev@vger.kernel.org>; Sat, 01 Jul 2023 01:34:03 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688200442; x=1690792442;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=ln71CslK+wNkG4luuwS7YiYZydBZMEVnpr27Fg4FgP0=;
-        b=Q2NkimT1scuu/IiVNGHS7pfdg2HjllvWeMMG8MZCygBWNeAyBQ4YZlE8VlWTun+qm+
-         qAbWN2xzkTCjjrRMRq4i/pkcFfBg+mP6KaYVMrm+rGQW/5BLU29xi6PRhNSTh4G5aqrd
-         3+OuNyObya/Nb6RQWikgKOie/dcsMauAim2cQxxYHcBAjUokVadSDDKl3HnHHeOfUaCX
-         OQgjXn6Hu5AgIDFGXiBgTt4h1H26pwj4DbfK4eeTE9f52jY3HuljAk97JnPocjfJpSRA
-         cUJ68KOn2nq3XIGz6rhz/YEBKQaS8xAi9gUoebuRWndad1Mrh8JEs5PQ8Qtq37iI3FmB
-         IFZg==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F190B3C1E
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 09:15:48 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C75ACB9
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 02:15:42 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688202941;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=GfITF5Nr6pfDtbVnEECtEIPAa7wQ6lj7+UWe+mAgDnM=;
+	b=a3DsB2jHdJqDvovN7Gke7WbgRAJxJJnSe6CxVbps6O9UxTczeb7Smduv2juv9zSJkGfImI
+	Lcy115Js4H2Szm+RpMTNuvHUjCLapz+BxoiBed8n2zfe+geIDZkWz55PDujWPakFXv+hSw
+	AO1LGt0k/zXjcfdgdPOIIGO/5DZKzVs=
+Received: from mail-wr1-f71.google.com (mail-wr1-f71.google.com
+ [209.85.221.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-635-2_hrKKOVPAarWYtHyE4TMA-1; Sat, 01 Jul 2023 05:15:40 -0400
+X-MC-Unique: 2_hrKKOVPAarWYtHyE4TMA-1
+Received: by mail-wr1-f71.google.com with SMTP id ffacd0b85a97d-3112808cd0cso1466409f8f.0
+        for <netdev@vger.kernel.org>; Sat, 01 Jul 2023 02:15:40 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688200442; x=1690792442;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ln71CslK+wNkG4luuwS7YiYZydBZMEVnpr27Fg4FgP0=;
-        b=Bk6ULL3gaUoMd4/1UXRc0hGpnzDBBSCKVaLwBUjTRN76plV+R01sQ8xxiuUI15d2sj
-         ZRZbH5tFzqr2A5/VbIa140lPQW57JS09c7wuAvAhme1t9fMYfmrWy3SBT0bay6fBLnex
-         HsOH7wXO1yGnuisI6ySEc6MckdyJudN9Ci7DqWyqWDF+jSCb2olCGJXP08g29zEhTHi5
-         h4YicNS1fipv0l5GQVOBCVXDMtpy2MXqkqaEjP2gL5KWu716epahOnhmnwJ5IH+9/UuJ
-         EgU35wZsq615cEkyn5nIbiJ023tt8FvI9PHPAC8jhidHUwUXTO4z8EmEVHdXw7mnNfoG
-         GpNw==
-X-Gm-Message-State: ABy/qLYmVuuKLxZA0J8ypgvijSX+drzwaDbe1SAukSzZLoUYPahkCd9J
-	xw/VJL1G0S+2TAEGIiiEOtBxKg==
-X-Google-Smtp-Source: APBJJlHxmuqetckhUv6v1CC+aVS7a9zdw4R4oa+2xmoDW0Qz3S/5/qPZdv0AD3U+alxjTqLMoko7jw==
-X-Received: by 2002:a17:906:854c:b0:98c:cc3c:194e with SMTP id h12-20020a170906854c00b0098ccc3c194emr3250372ejy.52.1688200442264;
-        Sat, 01 Jul 2023 01:34:02 -0700 (PDT)
-Received: from [192.168.10.214] ([217.169.179.6])
-        by smtp.gmail.com with ESMTPSA id w6-20020a17090633c600b0098748422178sm8908124eja.56.2023.07.01.01.34.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Jul 2023 01:34:01 -0700 (PDT)
-Message-ID: <e5bd4f01-0b00-4d70-c642-4fdfc0a139fc@linaro.org>
-Date: Sat, 1 Jul 2023 10:34:00 +0200
+        d=1e100.net; s=20221208; t=1688202939; x=1690794939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=GfITF5Nr6pfDtbVnEECtEIPAa7wQ6lj7+UWe+mAgDnM=;
+        b=VH69YtcReIu4jSXc5F88X0xPWGxURtYdGUnNbRBPoFJIMR5xCqdURK07xCnzDOEwzG
+         BaoYfoyMfHTxhIUZlvllSIWD7cMi3LscxnmzqYA7sNlmvYBGQkmlxLg9ycTGO0vb8Zb5
+         D1mHGit3tesdW31cPxQ2XudxqzHzIdWyAfn9jr1R3nh2QS8f+4l3PQmBUjA54TwWXXDW
+         vDLq4rpZh0cyDhIOaQmPV+FxeFUiNk0afknY6G0ykHFG3iPbFaRVclioa0dZ+nD4D59f
+         xpsPF6twr/kj98qT/uJmywxjNc52qeOVLkmBZggBVlrsYdiMqTCjTB2CscvmbTGK6wyD
+         zFtw==
+X-Gm-Message-State: ABy/qLas/81QPTt2URndMW678P77u8BHLydd0JLyFg/kzVUhOWFbcprV
+	qPMIDopYaGIyVVxafDEBsFiKrJ4SGExsVtBPy0GA+iidQF7A8e0U5OFjw3FMjcIsLgZ7il1Hrcg
+	WRAsKLQuEhNpI/joEVgrwCiQd+1DYwUmH
+X-Received: by 2002:a5d:694a:0:b0:314:23b:dc56 with SMTP id r10-20020a5d694a000000b00314023bdc56mr3505218wrw.71.1688202939204;
+        Sat, 01 Jul 2023 02:15:39 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEGrNYok3BYAD44hlBqMA6GsZ4KoVuajbLDpOjK3Z46B5D8ua2rbfifRAqAiXpimAzGEQ+tG2Cn3Y3orabRcxE=
+X-Received: by 2002:a5d:694a:0:b0:314:23b:dc56 with SMTP id
+ r10-20020a5d694a000000b00314023bdc56mr3505207wrw.71.1688202938703; Sat, 01
+ Jul 2023 02:15:38 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 5/6] can: tcan4x5x: Add support for tcan4552/4553
-Content-Language: en-US
-To: Markus Schneider-Pargmann <msp@baylibre.com>,
- Marc Kleine-Budde <mkl@pengutronix.de>
-Cc: Wolfgang Grandegger <wg@grandegger.com>, Rob Herring
- <robh+dt@kernel.org>, Krzysztof Kozlowski
- <krzysztof.kozlowski+dt@linaro.org>, "David S . Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Conor Dooley <conor+dt@kernel.org>,
- Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
- Michal Kubiak <michal.kubiak@intel.com>, Vivek Yadav
- <vivek.2311@samsung.com>, linux-can@vger.kernel.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, linux-kernel@vger.kernel.org,
- Simon Horman <simon.horman@corigine.com>
-References: <20230621093103.3134655-1-msp@baylibre.com>
- <20230621093103.3134655-6-msp@baylibre.com>
- <32557326-650c-192d-9a82-ca5451b01f70@linaro.org>
- <20230621123158.fd3pd6i7aefawobf@blmsp>
- <21f12495-ffa9-a0bf-190a-11b6ae30ca45@linaro.org>
- <20230622122339.6tkajdcenj5r3vdm@blmsp>
- <e2cc150b-49e3-7f2f-ce7f-a5982d129346@linaro.org>
- <20230627142300.heju4qccian5hsjk@blmsp>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230627142300.heju4qccian5hsjk@blmsp>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-5-lulu@redhat.com>
+ <CACGkMEtN7pE4FK2-504JC3A1tcfPjy9QejJiTyvXD7nt49KLvA@mail.gmail.com>
+In-Reply-To: <CACGkMEtN7pE4FK2-504JC3A1tcfPjy9QejJiTyvXD7nt49KLvA@mail.gmail.com>
+From: Cindy Lu <lulu@redhat.com>
+Date: Sat, 1 Jul 2023 17:14:57 +0800
+Message-ID: <CACLfguV4PYpxJEtodWqnYwQ1WJrpjTx1XMqJOsDYsvNrfUKr1A@mail.gmail.com>
+Subject: Re: [RFC 4/4] vduse: update the vq_info in ioctl
+To: Jason Wang <jasowang@redhat.com>
+Cc: mst@redhat.com, maxime.coquelin@redhat.com, xieyongji@bytedance.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 27/06/2023 16:23, Markus Schneider-Pargmann wrote:
-
->>> The version information is always readable for that chip, regardless of
->>> state and wake GPIOs as far as I know. So yes it is possible to setup
->>> the GPIOs based on the content of the ID register.
->>>
->>> I personally would prefer separate compatibles. The binding
->>> documentation needs to address that wake and state GPIOs are not
->>> available for tcan4552/4553. I think having compatibles that are for
->>> these chips would make sense then. However this is my opinion, you are
->>> the maintainer.
->>
->> We do not talk about compatibles in the bindings here. This is
->> discussion about your driver. The entire logic of validating DTB is
->> flawed and not needed. Detect the variant and act based on this.
-> 
-> I thought it was about the bindings, sorry.
-> 
-> So to summarize the compatibles ti,tcan4552 and ti,tcan4553 are fine.
-> But the driver should use the ID register for detection and not compare
-> the detected variant with the given compatible?
-> 
-> In my opinion it is useful to have an error messages that says there is
-> something wrong with the devicetree as this can be very helpful for the
-> developers who bringup new devices. This helps to quickly find issues
-> with the devicetree.
-
-That's not a current policy for other drivers, so this shouldn't be
-really special. Kernel is poor in validating DTS. It's not its job. It's
-the job of the DT schema.
-
-Best regards,
-Krzysztof
+On Wed, Jun 28, 2023 at 4:13=E2=80=AFPM Jason Wang <jasowang@redhat.com> wr=
+ote:
+>
+> On Wed, Jun 28, 2023 at 3:00=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
+> >
+> > From: Your Name <you@example.com>
+> >
+> > in VDUSE_VQ_GET_INFO, driver will sync the last_avail_idx
+> > with reconnect info, I have olny test the split mode, so
+>
+> Typo, should be "only".
+>
+sure will change this
+> > only use this here, will add more information later
+> >
+> > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > ---
+> >  drivers/vdpa/vdpa_user/vduse_dev.c | 16 ++++++++++++++++
+> >  1 file changed, 16 insertions(+)
+> >
+> > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_use=
+r/vduse_dev.c
+> > index 3df1256eccb4..b8e453eac0ce 100644
+> > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > @@ -141,6 +141,11 @@ static u32 allowed_device_id[] =3D {
+> >         VIRTIO_ID_NET,
+> >  };
+> >
+> > +struct vhost_reconnect_vring {
+> > +       uint16_t last_avail_idx;
+> > +       bool avail_wrap_counter;
+> > +};
+>
+> Should this belong to uAPI?
+>
+will change this
+> > +
+> >  static inline struct vduse_dev *vdpa_to_vduse(struct vdpa_device *vdpa=
+)
+> >  {
+> >         struct vduse_vdpa *vdev =3D container_of(vdpa, struct vduse_vdp=
+a, vdpa);
+> > @@ -1176,6 +1181,17 @@ static long vduse_dev_ioctl(struct file *file, u=
+nsigned int cmd,
+> >                                 vq->state.split.avail_index;
+> >
+> >                 vq_info.ready =3D vq->ready;
+> > +               struct vdpa_reconnect_info *area;
+> > +
+> > +               area =3D &dev->reconnect_info[index];
+> > +               struct vhost_reconnect_vring *log_reconnect;
+> > +
+> > +               log_reconnect =3D (struct vhost_reconnect_vring *)area-=
+>vaddr;
+>
+> What if userspace doesn't do mmap()?
+>
+> Thanks
+>
+sure will add the check for this
+Thanks
+Cindy
+> > +               if (log_reconnect->last_avail_idx !=3D
+> > +                   vq_info.split.avail_index) {
+> > +                       vq_info.split.avail_index =3D
+> > +                               log_reconnect->last_avail_idx;
+> > +               }
+> >
+> >                 ret =3D -EFAULT;
+> >                 if (copy_to_user(argp, &vq_info, sizeof(vq_info)))
+> > --
+> > 2.34.3
+> >
+>
 
 
