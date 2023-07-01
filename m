@@ -1,81 +1,106 @@
-Return-Path: <netdev+bounces-14971-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14972-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1463744A84
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 18:21:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E3B8744AE9
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 21:07:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DABC1C208D1
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:21:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56C531C2088E
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 19:07:38 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 08AA8D2E8;
-	Sat,  1 Jul 2023 16:21:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C83CD510;
+	Sat,  1 Jul 2023 19:07:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8D52C8F5
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 16:21:35 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9964A10DC;
-	Sat,  1 Jul 2023 09:21:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=9PVVUcb5RkwFUjMyrKy1zG2bSIkmM/JEyEAWV9cGkZ8=; b=tcEWTOzM+VUgGcLfG7qPNzcJgm
-	aFwCefY9v4aGd6IpO37Sivc+M5B6+rIeayxeVKYHfhS7J/8aTrrwiCtl5Fl+kvJ14sIIE7stQ4VbL
-	lo33g5f9u98sY8vpRKNmmUvBjihWBl98MavpYqksC7+mVodbn8lk7oLXuD2aCc+x2vMo=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qFdLW-000NLQ-89; Sat, 01 Jul 2023 18:21:14 +0200
-Date: Sat, 1 Jul 2023 18:21:14 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Jie Luo <quic_luoj@quicinc.com>
-Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH 3/3] net: phy: at803x: add qca8081 fifo reset on the link
- down
-Message-ID: <34ef466e-df95-4be4-8366-64baf5f04cca@lunn.ch>
-References: <20230629034846.30600-1-quic_luoj@quicinc.com>
- <20230629034846.30600-4-quic_luoj@quicinc.com>
- <e1cf3666-fecc-4272-b91b-5921ada45ade@lunn.ch>
- <0f3990de-7c72-99d8-5a93-3b7eaa066e49@quicinc.com>
- <924ebd8b-2e1f-4060-8c66-4f4746e88696@lunn.ch>
- <7144731c-f4ae-99b6-d32a-1d0e39bc9ee7@quicinc.com>
- <d4043e1f-d683-48c2-af79-9fea14ab7cc1@lunn.ch>
- <49f8ca40-e079-ad00-256e-08a61ffced22@quicinc.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEF23C2EF
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 19:07:35 +0000 (UTC)
+Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 786CF1710;
+	Sat,  1 Jul 2023 12:07:34 -0700 (PDT)
+Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-98de21518fbso341018866b.0;
+        Sat, 01 Jul 2023 12:07:34 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688238453; x=1690830453;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=bX/i0mHNTV00ab1SFTJ1jI7uVLuMRqDQB1VZHYQEjNs=;
+        b=PdTEY2J0Zvl+CBJDdJ6OS+HpggZcJ7yA/F+XAJJejPGqecYp7tzOo9kmzcARlA8jPd
+         7omvd4byZPccp3t57CCGyXNHlVfhoTNgeAUJCfDtzz41baX+aGTZDsHch/mybqQLhps4
+         61FGnbGZp66S/6U6CHwI1/ZGCzs3+MxYoZQ6MdFgjI7V2a5fxthMVMPM9VlnT794V7U9
+         piANfdilrBO7ENcgzVHWeuRe5jr6YB7LupHEnVBQb7vuVqUx6yEZpicNLojNyx4YrzU0
+         9ZxYbi+dInMu7Ru1Mz6uM4gyZkqZX+SMYZke3bzSnktBXcAB8nitlhw3kTq+nlcw0XHE
+         aktg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688238453; x=1690830453;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=bX/i0mHNTV00ab1SFTJ1jI7uVLuMRqDQB1VZHYQEjNs=;
+        b=Fpj+4E6qirNmLquh4oSzEbiVymCxpyUHYa9muB96dhCgeeFIcyQUVG7ca2DW8bXDEn
+         zxmNQa/UerbmqVhRWiRcGSN6GYevkPGE5wk7UV/fJ4FDaVihmGvue8sg5NeSwbvGwtDb
+         3Pf5qpuTq9VFIMbUHag7BJ25HsTZcl4kqrQwIMM4aKUd++KvoZe0uY6W88PudZVhparS
+         lxs93AGagvWT6mfoPU0S+547Cx6rnTjnbfrDT1fw5y4uPSlfASng/XqZBWCRpuefrDeC
+         kMHhlhWSJ3x31gh2ZldxRpKdyn7Vm9sXMKqauPgBdmGSdtd3WTy5oIYU+yi9TauQ5tOt
+         JDNA==
+X-Gm-Message-State: ABy/qLZoW71JKr0UankgVGstqvDuoywkKJquewisYZB4qwUDlwJaOZHr
+	oEUDjZKDCbmanwpuL7gdmwk=
+X-Google-Smtp-Source: ACHHUZ6omcfkIxZRLXA2gpUB1C+HvSks0LRIXKnKVI9EGAJVEnWPw/RS7n3FbP7gxEHFc0V/dBN6DQ==
+X-Received: by 2002:a17:906:bcc1:b0:98e:1deb:caf8 with SMTP id lw1-20020a170906bcc100b0098e1debcaf8mr3990662ejb.57.1688238452588;
+        Sat, 01 Jul 2023 12:07:32 -0700 (PDT)
+Received: from localhost ([2a02:168:633b:1:9d6a:15a4:c7d1:a0f0])
+        by smtp.gmail.com with ESMTPSA id k25-20020a17090666d900b009737b8d47b6sm9562030ejp.203.2023.07.01.12.07.31
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sat, 01 Jul 2023 12:07:32 -0700 (PDT)
+Date: Sat, 1 Jul 2023 21:07:12 +0200
+From: =?iso-8859-1?Q?G=FCnther?= Noack <gnoack3000@gmail.com>
+To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+Cc: mic@digikod.net, willemdebruijn.kernel@gmail.com,
+	linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
+	netfilter-devel@vger.kernel.org, yusongping@huawei.com,
+	artem.kuzin@huawei.com
+Subject: Re: [PATCH v11 10/12] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Message-ID: <20230701.acb4d98c59a0@gnoack.org>
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
+Content-Type: text/plain; charset=utf-8
 Content-Disposition: inline
-In-Reply-To: <49f8ca40-e079-ad00-256e-08a61ffced22@quicinc.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> Hi Andrew,
-> it is the PLL related registers, there is no PHY ID existed in MII register
-> 2, 3 of this block, so it can't be instantiated as the generic PHY device.
+Hi!
 
-Well, phylib is going to scan those ID registers, and if it finds
-something other than 0xffff 0xffff in those two ID registers it is
-going to think a PHY is there. And then if there is no driver using
-that ID, it will instantiate a generic PHY.
+On Tue, May 16, 2023 at 12:13:37AM +0800, Konstantin Meskhidze wrote:
+> +TEST_F(inet, bind)
 
-You might be able to see this in /sys/bus/mdio_bus, especially if you
-don't have a DT node representing the MDIO bus.
+If you are using TEST_F() and you are enforcing a Landlock ruleset
+within that test, doesn't that mean that the same Landlock ruleset is
+now also enabled on other tests that get run after that test?
 
-      Andrew
+Most of the other Landlock selftests use TEST_F_FORK() for that
+reason, so that the Landlock enforcement stays local to the specific
+test, and does not accidentally influence the observed behaviour in
+other tests.
+
+The same question applies to other test functions in this file as
+well.
+
+–Günther
 
