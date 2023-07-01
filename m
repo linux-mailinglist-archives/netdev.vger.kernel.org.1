@@ -1,97 +1,82 @@
-Return-Path: <netdev+bounces-14960-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14961-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A92BA744981
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:04:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 811987449B8
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:31:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCD881C208D1
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:04:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 645EE1C20914
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:31:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B45EAC138;
-	Sat,  1 Jul 2023 14:04:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 829C4C14F;
+	Sat,  1 Jul 2023 14:31:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5AE66BE61
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:04:53 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B5CB9C433C7;
-	Sat,  1 Jul 2023 14:04:52 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688220292;
-	bh=0a1wkf4GkN7YqEKDNpJPawNYSozTD0sDD+H2t8RHceM=;
-	h=From:To:Subject:In-Reply-To:References:Date:From;
-	b=aMncBe0VSmxeusUZeIgGx4gUCKD/0t2v7nOgvwWenADjRK56VhBvzT2z8pV9pQvli
-	 QB8F3vSwpWhzje62Sw/zgsrd65ZjbB2ECoPXaRswE0lpXnfU9SVCB9QMpF1QHQkhOe
-	 OsjBaN1M4hrjfcobckwSDNTCNN/gqAnkdLbQeqqazVzPnD8ttghF8pRJc9cqDG/baI
-	 Xa+IVZn8YC2QXExmB4W4PbeVacsGpwhe5qJUV7smvrdPaNPD6bPfX4AhzxaLjL7+nf
-	 b/WbahouV9D4+MfQl6oKzmoiijV3kd49jlJkvYqB4nv/iAXDOiR1YLHgRF7pgP7JBA
-	 cG2T4AUyjvERA==
-Received: by alrua-x1.borgediget.toke.dk (Postfix, from userid 1000)
-	id 4126FBC0943; Sat,  1 Jul 2023 16:04:50 +0200 (CEST)
-From: Toke =?utf-8?Q?H=C3=B8iland-J=C3=B8rgensen?= <toke@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "netdev-driver-reviewers@vger.kernel.org"
- <netdev-driver-reviewers@vger.kernel.org>
-Subject: Re: [ANN] pw-bot now recognizes all MAINTAINTERS
-In-Reply-To: <20230630085838.3325f097@kernel.org>
-References: <20230630085838.3325f097@kernel.org>
-X-Clacks-Overhead: GNU Terry Pratchett
-Date: Sat, 01 Jul 2023 16:04:50 +0200
-Message-ID: <871qhreni5.fsf@toke.dk>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 768C48830
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:31:03 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A47FC35AB;
+	Sat,  1 Jul 2023 07:30:57 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=UrDZd01sY17XlPpwW8xUpVN2IB66JmwiqhYlu+kmtRQ=; b=g4Ja9GZy2jHlncKMd7gzAhhx6+
+	n7kqR7ool2GLwQldH2udK0P8VRqNLHxvz0Hj8ec9zXPArf0DDiCUx9cRcpbIyvgZI6NtvBws52OU+
+	2QYCozry/7SqpsOu9xJljfjioUolX7uN3LqBbo8dRRMlZVLWKXvrVZdkuP61YTlWXU8M=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qFbcZ-000N7J-I4; Sat, 01 Jul 2023 16:30:43 +0200
+Date: Sat, 1 Jul 2023 16:30:43 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Jie Luo <quic_luoj@quicinc.com>
+Cc: hkallweit1@gmail.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, linux@armlinux.org.uk,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH 1/3] net: phy: at803x: support qca8081 1G chip type
+Message-ID: <3e0477e6-f96e-4842-a0c2-b2cb744ee83a@lunn.ch>
+References: <20230629034846.30600-1-quic_luoj@quicinc.com>
+ <20230629034846.30600-2-quic_luoj@quicinc.com>
+ <48e41540-6857-4f61-bcc5-4d0a6dbb9ec1@lunn.ch>
+ <b735b442-8818-c66e-5498-9faa2e4984f2@quicinc.com>
+ <c2e8eeac-7e2b-48fa-bdf8-fa036e40a8a2@lunn.ch>
+ <bcedc53f-9393-2bd5-4f37-5a3f02c41887@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <bcedc53f-9393-2bd5-4f37-5a3f02c41887@quicinc.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Jakub Kicinski <kuba@kernel.org> writes:
+> There are MMD device 1, 3, 7 in qca8081 PHY, the PMA abilities
+> 10/100/1000/2500 are compliant with genphy_c45_pma_read_abilities, but the
+> MDIO_AN_STAT1_ABLE does not exist in MMD7.1 register.
+> 
+> so the genphy_c45_pma_read_abilities can't be fully supported by qca8081
+> phy, sorry for this misunderstanding.
 
-> Hi!
->
-> tl;dr pw-bot now cross references the files touched by a *series* with
-> MAINTAINERS and gives access to all patchwork states to people listed
-> as maintainers (email addrs must match!)
->
->
-> During the last merge window we introduced a new pw-bot which acts on
-> simple commands included in the emails to set the patchwork state
-> appropriately:
->
-> https://lore.kernel.org/all/20230508092327.2619196f@kernel.org/
-> https://www.kernel.org/doc/html/next/process/maintainer-netdev.html#updating-patch-status
->
-> This is useful in multiple ways, the two main ones are that (1) general
-> maintainers have to do less clicking in patchwork, and that (2) we have
-> a log of state changes, which should help answer the question "why 
-> is my patch in state X":
->
-> https://patchwork.hopto.org/pw-bot.html
->
-> The bot acts automatically on emails from the kbuild bot. Author of 
-> the series can also discard it from patchwork (but not bring it back).
-> Apart from that maintainers and select reviewers had access rights
-> to the commands. Now the bot has been extended to understand who the
-> maintainers are on series-by-series basis, by consulting MAINTAINERS.
-> Anyone who is listed as a maintainer of any files touched by the series
-> should be able to change the state of the series, both discarding it
-> (e.g. changes-requested) and bringing it back (new, under-review).
->
-> The main caveat is that the command must be sent from the email listed
-> in MAINTAINERS. I've started hacking on aliasing emails but I don't
-> want to invest too much time unless it's actually a problem, so please
-> LMK if this limitation is stopping anyone from using the bot.
+If all you are missing is MDIO_AN_STAT1_ABLE, then i assume you are
+missing Autoneg? So have your tried using
+genphy_c45_pma_read_abilities() and then just doing:
 
-Very cool! Follow-up question: are you expecting subsystem maintainers
-to make use of this, or can we continue to rely on your benevolent
-curation of patchwork states and only consider this an optional add-on? :)
+                        linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+                                         phydev->supported);
 
-Also, this only applies to the netdevbpf patchwork instance, right?
+with a comment explaining why.
 
--Toke
+	Andrew					 
 
