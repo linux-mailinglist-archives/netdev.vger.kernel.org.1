@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-14952-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26E647448DB
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:20:28 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CD237448E0
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:20:52 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A7671C208CC
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 12:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6AC4E281197
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 12:20:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D03F8837;
-	Sat,  1 Jul 2023 12:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 14385BE61;
+	Sat,  1 Jul 2023 12:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F49D79DC
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B89C5CA1
 	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 12:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 93D08C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A983DC433CA;
 	Sat,  1 Jul 2023 12:20:22 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1688214022;
-	bh=j/F3EMJmjt1TzwbrXWlUlIvyAVC9WhXfUj+oiJF+y4U=;
+	bh=80qZ2OoLhTkgmsH8csyzGV5MLoKizYyCcM53np1bR1Q=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=j21R695fzgXGo42ajgxlOziLZtRqvaNrpkC/b4v+yj9eC5iodwW+ZzEt7Y0aTYXw6
-	 An5NR2hsIkoLlNnGxdlJuqMGtvz3BDjjblGoalf3huASnz2WkWs0WSOAxnQjgZGjWQ
-	 fN7JxeC73BMQo66rgUfG/9Lr1tpSXKV5Bmfy03SCjpDbZ/S1BW4/NmrlxTGpyqF3Mc
-	 +RDj6gaywXoSRt3Mu1q9U7OuN+nmJmr2Mu2acTD0B4lY+EFN0FKVUNsL6zSMSy3mka
-	 IXaSfU/tVYEHoQVqMxcr/XVZj4KauNylaweGB6kI2kd2eZ9JPH0WDbhAyJl2hisI39
-	 xSOi3fSv6Nl4Q==
+	b=fewzkHW2pSC11zrKRLJVHuvAnyykZ8OQv4VtTpMiQiy1AP4fAdat9HWQ/T3l4i2Rg
+	 IfoPebxT8OC5SJN6M1w+Ux3ztYi1bRqL0OZS858SCE2Z4A7AL568rb9YwHTgl8eiyv
+	 xVBy4sCSrO17ni+bz0JhrQv2q/YHZKMUhVcOJnXKYigl3F2uUnc9P6snlv53HtDCx1
+	 GtXZJw2Rtk52sc6ks0scG7w9KuhpO7hvMowSnLMXP38/R6SlZlBjvhQQogA3vJ+G4S
+	 tvruGLGLTM1WX90/dnsQLlBjbjFOsWxZAlXh4On0uU3ImA1Dcg3/hBQmGO9Svvv2Nx
+	 C2enkverHXXfg==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 79282C6445B;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8BC64C691F0;
 	Sat,  1 Jul 2023 12:20:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,33 +41,41 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] docs: netdev: broaden mailbot to all MAINTAINERS
+Subject: Re: [PATCH] net: usb: cdc_ether: add u-blox 0x1313 composition.
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168821402249.27463.14270246072324876114.git-patchwork-notify@kernel.org>
+ <168821402256.27463.17009519930792690898.git-patchwork-notify@kernel.org>
 Date: Sat, 01 Jul 2023 12:20:22 +0000
-References: <20230630160025.114692-1-kuba@kernel.org>
-In-Reply-To: <20230630160025.114692-1-kuba@kernel.org>
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: davem@davemloft.net, netdev@vger.kernel.org, edumazet@google.com,
- pabeni@redhat.com, linux-doc@vger.kernel.org, corbet@lwn.net
+References: <20230629103736.23861-1-davide.tronchin.94@gmail.com>
+In-Reply-To: <20230629103736.23861-1-davide.tronchin.94@gmail.com>
+To: Davide Tronchin <davide.tronchin.94@gmail.com>
+Cc: oliver@neukum.org, netdev@vger.kernel.org, pabeni@redhat.com,
+ marco.demarco@posteo.net, linux-usb@vger.kernel.org, kuba@kernel.org
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Fri, 30 Jun 2023 09:00:25 -0700 you wrote:
-> Reword slightly now that all MAINTAINERS have access to the commands.
+On Thu, 29 Jun 2023 12:37:36 +0200 you wrote:
+> Add CDC-ECM support for LARA-R6 01B.
 > 
-> Signed-off-by: Jakub Kicinski <kuba@kernel.org>
-> ---
->  Documentation/process/maintainer-netdev.rst | 7 +++++--
->  1 file changed, 5 insertions(+), 2 deletions(-)
+> The new LARA-R6 product variant identified by the "01B" string can be
+> configured (by AT interface) in three different USB modes:
+> * Default mode (Vendor ID: 0x1546 Product ID: 0x1311) with 4 serial
+> interfaces
+> * RmNet mode (Vendor ID: 0x1546 Product ID: 0x1312) with 4 serial
+> interfaces and 1 RmNet virtual network interface
+> * CDC-ECM mode (Vendor ID: 0x1546 Product ID: 0x1313) with 4 serial
+> interface and 1 CDC-ECM virtual network interface
+> The first 4 interfaces of all the 3 configurations (default, RmNet, ECM)
+> are the same.
+> 
+> [...]
 
 Here is the summary with links:
-  - [net] docs: netdev: broaden mailbot to all MAINTAINERS
-    https://git.kernel.org/netdev/net/c/d5dc39459bda
+  - net: usb: cdc_ether: add u-blox 0x1313 composition.
+    https://git.kernel.org/netdev/net/c/1b0fce8c8e69
 
 You are awesome, thank you!
 -- 
