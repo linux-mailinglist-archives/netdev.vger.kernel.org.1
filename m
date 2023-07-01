@@ -1,184 +1,119 @@
-Return-Path: <netdev+bounces-14968-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14969-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A58B9744A2E
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 16:55:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5E96744A4F
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 17:43:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5C650281130
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 14:55:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8A35D1C208FE
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 15:43:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF307C2F0;
-	Sat,  1 Jul 2023 14:55:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3F9DAC8E2;
+	Sat,  1 Jul 2023 15:43:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C3AA24415
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 14:55:02 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 506ED35B3;
-	Sat,  1 Jul 2023 07:55:01 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QtZs11kMNz6D8dQ;
-	Sat,  1 Jul 2023 22:51:49 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sat, 1 Jul 2023 15:54:58 +0100
-Message-ID: <53bc02e9-d3b1-cb35-0b92-0edf8d9d6e58@huawei.com>
-Date: Sat, 1 Jul 2023 17:54:58 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2DC1AC2F0
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 15:43:15 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9CC3D2686;
+	Sat,  1 Jul 2023 08:43:14 -0700 (PDT)
+Received: from pps.filterd (m0279864.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 361Fh07t007599;
+	Sat, 1 Jul 2023 15:43:00 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=HsTlqbRDu878dBuVfAk94J55u/pYjdRaAf6D7p8jU6Q=;
+ b=grwX/0YBSlftntGXyg7x1BV/tT1QdNfjVBClVdUKgS9BEob0fSE0gXzacrHQ5mW7fHsK
+ 6nFKJB3QFtRO3aYyrqTvJjcIt0fDEQh9mmNi3OGfR/s2Cp867V2bZhNFGN7N9SJdxjhk
+ IXnT+OnljBSzVdV3Mh32LDeFQB53xW9gHpNOOX69wFVuUIxSI+m9B9L2WFGDs0o/8FL8
+ AMFw7qVhiYyKvjtjQgFKptNgC/q9slb1OlEzWWxl76UYl3oOYBNUWuTEFYXpzew8lyV3
+ tQYPFLS2FtQ+5pfoDGWT38SRFg4blpKSuJ261v3069FyYj0mnog3PUUBbaodLQ+fiWcT Aw== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rjday0wgy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 01 Jul 2023 15:43:00 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 361Fgx99010931
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Sat, 1 Jul 2023 15:42:59 GMT
+Received: from [10.253.13.42] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.7; Sat, 1 Jul 2023
+ 08:42:57 -0700
+Message-ID: <48ad596c-07ee-9721-7ae5-c524d8f4d3e7@quicinc.com>
+Date: Sat, 1 Jul 2023 23:42:55 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v11 08/12] landlock: Add network rules and TCP hooks
- support
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-9-konstantin.meskhidze@huawei.com>
- <fc490ec3-12ff-bca1-1c5e-44d09c54b8a4@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <fc490ec3-12ff-bca1-1c5e-44d09c54b8a4@digikod.net>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 1/3] net: phy: at803x: support qca8081 1G chip type
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <hkallweit1@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <linux@armlinux.org.uk>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20230629034846.30600-1-quic_luoj@quicinc.com>
+ <20230629034846.30600-2-quic_luoj@quicinc.com>
+ <48e41540-6857-4f61-bcc5-4d0a6dbb9ec1@lunn.ch>
+ <b735b442-8818-c66e-5498-9faa2e4984f2@quicinc.com>
+ <c2e8eeac-7e2b-48fa-bdf8-fa036e40a8a2@lunn.ch>
+ <bcedc53f-9393-2bd5-4f37-5a3f02c41887@quicinc.com>
+ <3e0477e6-f96e-4842-a0c2-b2cb744ee83a@lunn.ch>
+Content-Language: en-US
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <3e0477e6-f96e-4842-a0c2-b2cb744ee83a@lunn.ch>
 Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml500006.china.huawei.com (7.191.161.198) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-ORIG-GUID: Dis-XQJFY7mbb182TlV2frv8KhZe_duP
+X-Proofpoint-GUID: Dis-XQJFY7mbb182TlV2frv8KhZe_duP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-01_12,2023-06-30_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 clxscore=1015 impostorscore=0
+ malwarescore=0 phishscore=0 spamscore=0 suspectscore=0 lowpriorityscore=0
+ bulkscore=0 mlxlogscore=560 mlxscore=0 priorityscore=1501 adultscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2307010150
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
 
-6/26/2023 9:41 PM, Mickaël Salaün пишет:
+On 7/1/2023 10:30 PM, Andrew Lunn wrote:
+>> There are MMD device 1, 3, 7 in qca8081 PHY, the PMA abilities
+>> 10/100/1000/2500 are compliant with genphy_c45_pma_read_abilities, but the
+>> MDIO_AN_STAT1_ABLE does not exist in MMD7.1 register.
+>>
+>> so the genphy_c45_pma_read_abilities can't be fully supported by qca8081
+>> phy, sorry for this misunderstanding.
 > 
-> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
->> This commit adds network rules support in the ruleset management
->> helpers and the landlock_create_ruleset syscall.
->> Refactor user space API to support network actions. Add new network
->> access flags, network rule and network attributes. Increment Landlock
->> ABI version. Expand access_masks_t to u32 to be sure network access
->> rights can be stored. Implement socket_bind() and socket_connect()
->> LSM hooks, which enables to restrict TCP socket binding and connection
->> to specific ports.
->> 
->> Co-developed-by: Mickaël Salaün <mic@digikod.net>
+> If all you are missing is MDIO_AN_STAT1_ABLE, then i assume you are
+> missing Autoneg? So have your tried using
+> genphy_c45_pma_read_abilities() and then just doing:
 > 
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
+>                          linkmode_set_bit(ETHTOOL_LINK_MODE_Autoneg_BIT,
+>                                           phydev->supported);
 > 
+> with a comment explaining why.
 > 
->> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> ---
->> 
->> Changes since v10:
->> * Removes "packed" attribute.
->> * Applies Mickaёl's patch with some refactoring.
->> * Deletes get_port() and check_addrlen() helpers.
->> * Refactors check_socket_access() by squashing get_port() and
->> check_addrlen() helpers into it.
->> * Fixes commit message.
->> 
->> Changes since v9:
->> * Changes UAPI port field to __u64.
->> * Moves shared code into check_socket_access().
->> * Adds get_raw_handled_net_accesses() and
->> get_current_net_domain() helpers.
->> * Minor fixes.
->> 
->> Changes since v8:
->> * Squashes commits.
->> * Refactors commit message.
->> * Changes UAPI port field to __be16.
->> * Changes logic of bind/connect hooks with AF_UNSPEC families.
->> * Adds address length checking.
->> * Minor fixes.
->> 
->> Changes since v7:
->> * Squashes commits.
->> * Increments ABI version to 4.
->> * Refactors commit message.
->> * Minor fixes.
->> 
->> Changes since v6:
->> * Renames landlock_set_net_access_mask() to landlock_add_net_access_mask()
->>    because it OR values.
->> * Makes landlock_add_net_access_mask() more resilient incorrect values.
->> * Refactors landlock_get_net_access_mask().
->> * Renames LANDLOCK_MASK_SHIFT_NET to LANDLOCK_SHIFT_ACCESS_NET and use
->>    LANDLOCK_NUM_ACCESS_FS as value.
->> * Updates access_masks_t to u32 to support network access actions.
->> * Refactors landlock internal functions to support network actions with
->>    landlock_key/key_type/id types.
->> 
->> Changes since v5:
->> * Gets rid of partial revert from landlock_add_rule
->> syscall.
->> * Formats code with clang-format-14.
->> 
->> Changes since v4:
->> * Refactors landlock_create_ruleset() - splits ruleset and
->> masks checks.
->> * Refactors landlock_create_ruleset() and landlock mask
->> setters/getters to support two rule types.
->> * Refactors landlock_add_rule syscall add_rule_path_beneath
->> function by factoring out get_ruleset_from_fd() and
->> landlock_put_ruleset().
->> 
->> Changes since v3:
->> * Splits commit.
->> * Adds network rule support for internal landlock functions.
->> * Adds set_mask and get_mask for network.
->> * Adds rb_root root_net_port.
->> 
->> ---
->>   include/uapi/linux/landlock.h                |  48 +++++
->>   security/landlock/Kconfig                    |   1 +
->>   security/landlock/Makefile                   |   2 +
->>   security/landlock/limits.h                   |   6 +-
->>   security/landlock/net.c                      | 174 +++++++++++++++++++
->>   security/landlock/net.h                      |  26 +++
->>   security/landlock/ruleset.c                  |  52 +++++-
->>   security/landlock/ruleset.h                  |  63 +++++--
->>   security/landlock/setup.c                    |   2 +
->>   security/landlock/syscalls.c                 |  72 +++++++-
->>   tools/testing/selftests/landlock/base_test.c |   2 +-
->>   11 files changed, 425 insertions(+), 23 deletions(-)
->>   create mode 100644 security/landlock/net.c
->>   create mode 100644 security/landlock/net.h
->> 
-> 
-> [...]
-> 
->> diff --git a/security/landlock/net.c b/security/landlock/net.c
->> new file mode 100644
->> index 000000000000..f8d2be53ac0d
->> --- /dev/null
->> +++ b/security/landlock/net.c
->> @@ -0,0 +1,174 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Landlock LSM - Network management and hooks
->> + *
->> + * Copyright © 2022 Huawei Tech. Co., Ltd.
->> + * Copyright © 2022 Microsoft Corporation
-> 
-> You can replace these dates with "2022-2023", and same for all your
-> other "2022" I guess.
-   Ok. Thanks. I will change the dates.
-> .
+> 	Andrew					
+Thanks Andrew for this suggestion, i will verify this code and update 
+the patch series.
 
