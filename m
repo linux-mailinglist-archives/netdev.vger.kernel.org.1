@@ -1,127 +1,81 @@
-Return-Path: <netdev+bounces-14974-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14975-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8EE98744B95
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 00:19:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54450744BA3
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 00:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 327C7280ED2
-	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 22:19:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E4D91C208CB
+	for <lists+netdev@lfdr.de>; Sat,  1 Jul 2023 22:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6F53ADDC7;
-	Sat,  1 Jul 2023 22:19:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 840FDBE61;
+	Sat,  1 Jul 2023 22:30:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 61FDE2F32
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 22:19:17 +0000 (UTC)
-X-Greylist: delayed 1293 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 01 Jul 2023 15:19:16 PDT
-Received: from hall.aurel32.net (hall.aurel32.net [IPv6:2001:bc8:30d7:100::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BC291AC
-	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 15:19:16 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=aurel32.net
-	; s=202004.hall; h=In-Reply-To:Content-Type:MIME-Version:References:
-	Message-ID:Subject:Cc:To:From:Date:Content-Transfer-Encoding:From:Reply-To:
-	Subject:Content-ID:Content-Description:X-Debbugs-Cc;
-	bh=ESQh2Q+J0+KOjCLAOqWvKR9Wn07hny/kQnYrkVfd2nY=; b=mAwVwZr09EuuZKp7Y+ECNtX51Y
-	oI3ITdXfeLoYBRrKusNNTP+RcyoFKTvFyEg8vaAKa6DQ4l8cENWzCoJhljV4y1CloXdDTyRXtjnZH
-	J/SNNfOAYXZXfg1vQIQbQvfEIIStc3YA63+ysm+rMCw5qWtgEmP/l8BOP+RCAa5dLbSTOz3z8Gz1E
-	B4rlSZ1QcYSpSSCVFOGS0Y/8Nc6jDHOy92CtMjZ36Q83AHZNT/tHIq3pLJR3tlQQFSleuH3G+f0aS
-	Vh84GN/g9VrjftL4T+mipsknLVqp7N/JG/F/zUg5BK8Fu9dzLLCERPnHv77CyYQNuyIP2QMLaLdLP
-	+ebmeOeg==;
-Received: from [2a01:e34:ec5d:a741:8a4c:7c4e:dc4c:1787] (helo=ohm.rr44.fr)
-	by hall.aurel32.net with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <aurelien@aurel32.net>)
-	id 1qFib4-00F8qC-PV; Sat, 01 Jul 2023 23:57:38 +0200
-Received: from aurel32 by ohm.rr44.fr with local (Exim 4.96)
-	(envelope-from <aurelien@aurel32.net>)
-	id 1qFib4-00FE57-0Y;
-	Sat, 01 Jul 2023 23:57:38 +0200
-Date: Sat, 1 Jul 2023 23:57:38 +0200
-From: Aurelien Jarno <aurelien@aurel32.net>
-To: Guo Samin <samin.guo@starfivetech.com>
-Cc: Jakub Kicinski <kuba@kernel.org>, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Peter Geis <pgwipeout@gmail.com>,
-	Yanhong Wang <yanhong.wang@starfivetech.com>
-Subject: Re: [PATCH v6 0/8] Add Ethernet driver for StarFive JH7110 SoC
-Message-ID: <ZKChUuUpCgh/jPSU@aurel32.net>
-Mail-Followup-To: Guo Samin <samin.guo@starfivetech.com>,
-	Jakub Kicinski <kuba@kernel.org>, linux-riscv@lists.infradead.org,
-	netdev@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	"David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Emil Renner Berthing <kernel@esmil.dk>,
-	Richard Cochran <richardcochran@gmail.com>,
-	Andrew Lunn <andrew@lunn.ch>,
-	Heiner Kallweit <hkallweit1@gmail.com>,
-	Peter Geis <pgwipeout@gmail.com>,
-	Yanhong Wang <yanhong.wang@starfivetech.com>
-References: <20230313034645.5469-1-samin.guo@starfivetech.com>
- <20230313173330.797bf8e7@kernel.org>
- <51102144-1533-d2f7-5fde-e01160a6f49e@starfivetech.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 25F06ECC
+	for <netdev@vger.kernel.org>; Sat,  1 Jul 2023 22:30:20 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 946A3C433C8;
+	Sat,  1 Jul 2023 22:30:20 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688250620;
+	bh=XKvEY1s/4NgyGawd9b7DLxASqX98ovtpZCCY9OoHgfQ=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=huFAWafmjSsmst9RsPVQLT15CY+h/s+9zB5ouL+uvK3XI1/3k4elzVK4Eo7ro5EXD
+	 QQaFEBYKnDnnInWM5qT3+1RJ0Ho70xSzXrY13+ROqaUv4JSebvoq0sfeCNuPfk/TwH
+	 5DqvUYBBuPkBzLSp3sEYhF19gw0gARlQ7rYratta+roxcnYSW2duQ01Q+j9Sx9HJwa
+	 XirV5/JplHw4yEqKADfmh4Yh5CSvFFxYdNmr2G69+kavFUuAlJTEIP3mFSzX2A3fpD
+	 YPKvtmqJOt9IDeuII8GK6NU+1TdnRsn1KfQQDU+/xnctXrRdYJPBf6baPhkqveowMz
+	 IZOLaMahnYQ4Q==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 7CF67C6445A;
+	Sat,  1 Jul 2023 22:30:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <51102144-1533-d2f7-5fde-e01160a6f49e@starfivetech.com>
-User-Agent: Mutt/2.2.9 (2022-11-12)
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH ethtool] netlink: fix duplex setting
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168825062050.15743.16961942454098369013.git-patchwork-notify@kernel.org>
+Date: Sat, 01 Jul 2023 22:30:20 +0000
+References: <ZJrDT9k52oFTf/vs@lenoch>
+In-Reply-To: <ZJrDT9k52oFTf/vs@lenoch>
+To: Ladislav Michl <oss-lists@triops.cz>
+Cc: mkubecek@suse.cz, netdev@vger.kernel.org
 
-Hi,
+Hello:
 
-On 2023-03-15 09:31, Guo Samin wrote:
-> Re: [PATCH v6 0/8] Add Ethernet driver for StarFive JH7110 SoC
-> From: Jakub Kicinski <kuba@kernel.org>
-> to: Samin Guo <samin.guo@starfivetech.com>
-> data: 2023/3/14
+This patch was applied to ethtool/ethtool.git (master)
+by Michal Kubecek <mkubecek@suse.cz>:
+
+On Tue, 27 Jun 2023 13:09:03 +0200 you wrote:
+> From: Ladislav Michl <ladis@linux-mips.org>
 > 
-> > On Mon, 13 Mar 2023 11:46:37 +0800 Samin Guo wrote:
-> >> This series adds ethernet support for the StarFive JH7110 RISC-V SoC.
-> >> The series includes MAC driver. The MAC version is dwmac-5.20 (from
-> >> Synopsys DesignWare). For more information and support, you can visit
-> >> RVspace wiki[1].
-> > 
-> > I'm guessing the first 6 patches need to go via networking and patches
-> > 7 and 8 via riscv trees? Please repost those separately, otherwise
-> > the series won't apply and relevant CIs can't run on it.
+> nl_parse_lookup_u8 handler is used with duplex_values defined as
+> lookup_entry_u32. While it still works on little endian machines,
+> duplex is always 0 (DUPLEX_HALF) on big endian ones...
 > 
-> Hi Jakub,
+> Fixes: 392b12e38747 ("netlink: add netlink handler for sset (-s)")
+> Signed-off-by: Ladislav Michl <ladis@linux-mips.org>
 > 
-> 	Thanks a lot, I will repost those separately.
+> [...]
 
-Unless I am mistaken, this patches haven't been reposted since them.
-Could you please do that?
+Here is the summary with links:
+  - [ethtool] netlink: fix duplex setting
+    https://git.kernel.org/pub/scm/network/ethtool/ethtool.git/commit/?id=f493e6381c8a
 
-Thanks
-Aurelien
-
+You are awesome, thank you!
 -- 
-Aurelien Jarno                          GPG: 4096R/1DDD8C9B
-aurelien@aurel32.net                     http://aurel32.net
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
