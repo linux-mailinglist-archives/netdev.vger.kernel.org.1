@@ -1,110 +1,82 @@
-Return-Path: <netdev+bounces-14991-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14992-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 07677744DC0
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 15:42:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81E77744DFE
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 15:46:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3FFA1C20510
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 13:42:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 723071C2084D
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 13:46:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9C7CC20FF;
-	Sun,  2 Jul 2023 13:42:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3858A2101;
+	Sun,  2 Jul 2023 13:46:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8D56820FE
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 13:42:54 +0000 (UTC)
-Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59854E55;
-	Sun,  2 Jul 2023 06:42:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688305373; x=1719841373;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=UK/nzE9dIxgjFsCrj7Qj4taBTpYmWjk/fOAoL8aT+a8=;
-  b=HbG6wspr+sm+MlF1m56EfzLrkqojL3/iuEvoBaWW57OIX+Slgg0U5WLt
-   oYLhf0XSvmLh2DzlfYRp2hhtltLT1FNmQNnDvKuFNL/hq21C6lvUwqJ8n
-   miEehIXgj/SLO044vykPyxLXfnMW5O365MhwKZqZVtv2gCYtJGya1w1tJ
-   Qxdo65qSgZajmYfLRtxQGWo82tWOb7ADhOdaawRG2Tjqj9noA2RIk3WT5
-   eTUvKitrPcxy2HNDTT+/tpWmcs2mufc2fCJVrwwuAKWeucHzRzfqYss+U
-   kHX6GpVgdQfHPX4Y0CzYsHaDKe4lbFtxwRlXzVO2JhjvGSynPgiWZdeOq
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="393440818"
-X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
-   d="scan'208";a="393440818"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2023 06:42:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="964889090"
-X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
-   d="scan'208";a="964889090"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.249.95.54]) ([10.249.95.54])
-  by fmsmga006-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2023 06:42:49 -0700
-Message-ID: <ec3f0f2d-c8d4-3df7-7ff4-5c841a050be3@linux.intel.com>
-Date: Sun, 2 Jul 2023 16:42:46 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A43F20FE
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 13:46:28 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9EBB3E55
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 06:46:26 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=IK4VDT+SmmuMfZmYpgZ8ApnQVcn+Rr1grO6m4P5rCIM=; b=lNs6NbNYj9JRLAXb5wQay4wpYF
+	OOkvjD1VmWii65J55ojjwk9bXkZg6GkTSpjurQGKEHILgW15+JyvzTK6esLokqQQaS8Lyy06USrPn
+	wDf8pERIjvJAbip6FQMek3PQjvof0hG888CLN9XTDusg52CBZyvuAQv88N9yFs+0CH0A=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qFxPE-000PSc-3y; Sun, 02 Jul 2023 15:46:24 +0200
+Date: Sun, 2 Jul 2023 15:46:24 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Abhiram V <abhi.raa.man.v@gmail.com>
+Cc: netdev@vger.kernel.org
+Subject: Re: Custom Kernel Module for PRP (https://github.com/ramv33/prp) -
+ problem with removal of RCT using skb_trim
+Message-ID: <504969a9-94f5-4175-a846-37c39ec0f06c@lunn.ch>
+References: <CAHaZnwP-KHYkVnWjsa_8cXq+-EJH1dWGMKwSkvu6GAU5MhgJnA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [Intel-wired-lan] [PATCH net v2 1/6] igc: Rename qbv_enable to
- taprio_offload_enable
-Content-Language: en-US
-To: Florian Kauer <florian.kauer@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Tan Tee Min <tee.min.tan@linux.intel.com>,
- Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
- Aravindhan Gunasekaran <aravindhan.gunasekaran@intel.com>,
- Malli C <mallikarjuna.chilakala@intel.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20230619100858.116286-1-florian.kauer@linutronix.de>
- <20230619100858.116286-2-florian.kauer@linutronix.de>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20230619100858.116286-2-florian.kauer@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <CAHaZnwP-KHYkVnWjsa_8cXq+-EJH1dWGMKwSkvu6GAU5MhgJnA@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/19/2023 13:08, Florian Kauer wrote:
-> In the current implementation the flags adapter->qbv_enable
-> and IGC_FLAG_TSN_QBV_ENABLED have a similar name, but do not
-> have the same meaning. The first one is used only to indicate
-> taprio offload (i.e. when igc_save_qbv_schedule was called),
-> while the second one corresponds to the Qbv mode of the hardware.
-> However, the second one is also used to support the TX launchtime
-> feature, i.e. ETF qdisc offload. This leads to situations where
-> adapter->qbv_enable is false, but the flag IGC_FLAG_TSN_QBV_ENABLED
-> is set. This is prone to confusion.
+> To strip the RCT, I call skb_trim as follows (as given in the HSR module):
 > 
-> The rename should reduce this confusion. Since it is a pure
-> rename, it has no impact on functionality.
+>              skb_trim(skb, skb->len - PRP_RCTLEN /* 6 */);
 > 
-> Fixes: e17090eb2494 ("igc: allow BaseTime 0 enrollment for Qbv")
-> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
->   drivers/net/ethernet/intel/igc/igc.h      | 2 +-
->   drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
->   drivers/net/ethernet/intel/igc/igc_tsn.c  | 2 +-
->   3 files changed, 3 insertions(+), 3 deletions(-)
+> I have used skb_dump both before and after the call to skb_trim and
+> verified that the length is being reduced and that the tailroom is
+> increased by 6 bytes. The problem is that when I call skb_trim, the
+> packet is not received by the upper layers. Without calling skb_trim,
+> the packet is received correctly but the RCT is consumed by the
+> applications which should not be the case.
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+Maybe try using:
+
+https://github.com/nhorman/dropwatch
+
+to find out where the packet is being dropped. From where, you should
+be able to figure out why it is being dropped.
+
+You might also want to play with ethool -K. Turn off everything, at
+both the Tx and Rx node, and see if it makes a difference. e.g. maybe
+IP header checksum is being offloaded, and it calculates the CRC
+including the RCT.
+
+	Andrew
 
