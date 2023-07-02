@@ -1,118 +1,154 @@
-Return-Path: <netdev+bounces-14985-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14986-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DFDD744D27
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 12:01:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 54D1E744D7C
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 13:57:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 42D78280D84
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 10:01:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 447E61C20839
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 11:57:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1037617ED;
-	Sun,  2 Jul 2023 10:01:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B5E11C05;
+	Sun,  2 Jul 2023 11:57:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01CD017D3
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 10:01:06 +0000 (UTC)
-Received: from mx0b-0031df01.pphosted.com (mx0b-0031df01.pphosted.com [205.220.180.131])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7061612A;
-	Sun,  2 Jul 2023 03:01:05 -0700 (PDT)
-Received: from pps.filterd (m0279868.ppops.net [127.0.0.1])
-	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 362A0htD025062;
-	Sun, 2 Jul 2023 10:00:43 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=qcppdkim1;
- bh=5NmKF6Dtx0WFynYD1yu40PVvG4JCk6q71/bw+brbYBQ=;
- b=InBenrzxEFA2ymyHsGBsP/PdrU4oMr75nYfwf3+iyT1UP31Kf4cXDSqlVVwUnAtxdduq
- eDKCcnNfAAD3g+n6qfQNS2FHdnOSPiD879YZxjo+tLARMm2MK7VhvJ7AOBGpRBG+x2mb
- vxiDYUbZf1nJ++cSGg0IIe/meDEkRlJYkxedwey4NrmbwdoDyIHVtToQhdZUnBdC15HN
- koU+ryVVDC8fhDxWZVgwthQNQ9oilyMRVjq6RfOxoJIRWl56dgV/WDyrbsENRHhQRepn
- /BSx4YQ7VELIRtv1XUkV49mUK+OGPeMsuevBv1NYtes0I8pdNk0Tjl+GOdQOXZqXhqnM oA== 
-Received: from nalasppmta05.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
-	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rjbfqj17y-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 02 Jul 2023 10:00:42 +0000
-Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
-	by NALASPPMTA05.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 362A0fR8023359
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Sun, 2 Jul 2023 10:00:41 GMT
-Received: from [10.253.13.42] (10.80.80.8) by nalasex01c.na.qualcomm.com
- (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.7; Sun, 2 Jul 2023
- 03:00:39 -0700
-Message-ID: <a5929836-2da4-af9b-7310-73bdc05c8e83@quicinc.com>
-Date: Sun, 2 Jul 2023 18:00:36 +0800
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8A3F21C04
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 11:57:23 +0000 (UTC)
+Received: from mail-pl1-x62b.google.com (mail-pl1-x62b.google.com [IPv6:2607:f8b0:4864:20::62b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E67E73;
+	Sun,  2 Jul 2023 04:57:22 -0700 (PDT)
+Received: by mail-pl1-x62b.google.com with SMTP id d9443c01a7336-1b82bf265b2so15577465ad.0;
+        Sun, 02 Jul 2023 04:57:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688299042; x=1690891042;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=7qagKLZGa10wVvAq9nJ5ZILI98Y2jy96AWT9f4TfrO8=;
+        b=Lp2sEjNT5bKhVCBgHl3nADK0T6dCzbAGMULQ8a01f0WSYh5V+VyzpqN6nRviRXY14l
+         TuGij9y1QDbB5weNaxnndCHewGgNzjQctmmwA9p10EraO6jqGyd4Y9mSs3iXpc0eMQ0f
+         mhqA80KUShZ6yE+rTLGzQcrp5XD3ZyYA/5W3IASKWR5MxWvgZJCWILuEPI/wtdBUpq7h
+         jS3zBfTPXVGAyWplOa3qj8l5StQhaGEi+dRHM+o80rS8CQdAgMFAIqrr2/dwywj7cf3N
+         /Pwv97UPtiwTZdTWV2IxxVSbbaPt1rPPOzN2PbXcrZd3x7dJK8bFOsbp+3tDdGPiN0XA
+         KVeQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688299042; x=1690891042;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=7qagKLZGa10wVvAq9nJ5ZILI98Y2jy96AWT9f4TfrO8=;
+        b=N8wJOHLbU+84Ilz5ELGGORJJm4YF0Le2m86kGI0rj+JRF585sN95tsgX7N8bSF/HaB
+         zJmW83RKd4QIYaE8KtbuS5oL76Iig35iMHaj/EvXjMZUOmzd0g0ysheX4zx6nSSjboIc
+         FDYsKbpjdHqUNw8yw6XKm7AzHzXxe6o4lVlRnEmenoYQ85PpzbzTAIBTR3WjXjDPTOvf
+         GnZ58OoWTDUNpchRtMG0af8bRoODwLwO4l2T5CoXifTuEbAGaLAKxaFdgh3jYB5WfGZU
+         cIGXR9etvjW2jpBNvMIH/LR5NzwpTPKsb+l2lBdj/PGdzdWgDnhcS+wEGJcMW69LyQzK
+         r4rA==
+X-Gm-Message-State: ABy/qLblAd4Dbsmd+5ALIpkV/8vp2oAlHl5pJy71VHNZjFZFLL+0yLYR
+	Daj1vBq0alfYzPPqMfAdXaA=
+X-Google-Smtp-Source: APBJJlE4CbVvUaMvQBQttUFOCXJMSfMnxOJ3T5YMiAeUk7XAACrdXab8dfLsDFAcYWm09mkvHX3dOQ==
+X-Received: by 2002:a17:902:d4c4:b0:1b8:2c6f:3247 with SMTP id o4-20020a170902d4c400b001b82c6f3247mr6252238plg.4.1688299041674;
+        Sun, 02 Jul 2023 04:57:21 -0700 (PDT)
+Received: from [192.168.0.103] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id y13-20020a170902ed4d00b001b8932d77d7sm490425plb.279.2023.07.02.04.57.10
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 02 Jul 2023 04:57:21 -0700 (PDT)
+Message-ID: <79196679-fb65-e5ad-e836-2c43447cfacd@gmail.com>
+Date: Sun, 2 Jul 2023 18:57:05 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH 3/3] net: phy: at803x: add qca8081 fifo reset on the link
- down
+Subject: Re: Fwd: RCU stalls with wireguard over bonding over igb on Linux
+ 6.3.0+
 Content-Language: en-US
-To: Andrew Lunn <andrew@lunn.ch>
-CC: <hkallweit1@gmail.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <linux@armlinux.org.uk>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-References: <20230629034846.30600-1-quic_luoj@quicinc.com>
- <20230629034846.30600-4-quic_luoj@quicinc.com>
- <e1cf3666-fecc-4272-b91b-5921ada45ade@lunn.ch>
- <0f3990de-7c72-99d8-5a93-3b7eaa066e49@quicinc.com>
- <924ebd8b-2e1f-4060-8c66-4f4746e88696@lunn.ch>
- <7144731c-f4ae-99b6-d32a-1d0e39bc9ee7@quicinc.com>
- <d4043e1f-d683-48c2-af79-9fea14ab7cc1@lunn.ch>
- <49f8ca40-e079-ad00-256e-08a61ffced22@quicinc.com>
- <34ef466e-df95-4be4-8366-64baf5f04cca@lunn.ch>
-From: Jie Luo <quic_luoj@quicinc.com>
-In-Reply-To: <34ef466e-df95-4be4-8366-64baf5f04cca@lunn.ch>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Eric DeVolder <eric.devolder@oracle.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>, David R <david@unsolicited.net>,
+ Boris Ostrovsky <boris.ovstrosky@oracle.com>,
+ Miguel Luis <miguel.luis@oracle.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
+ Boqun Feng <boqun.feng@gmail.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
+ x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>,
+ Thorsten Leemhuis <regressions@leemhuis.info>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux RCU <rcu@vger.kernel.org>,
+ Wireguard Mailing List <wireguard@lists.zx2c4.com>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux ACPI <linux-acpi@vger.kernel.org>,
+ Manuel 'satmd' Leiner <manuel.leiner@gmx.de>
+References: <e5b76a4f-81ae-5b09-535f-114149be5069@gmail.com>
+In-Reply-To: <e5b76a4f-81ae-5b09-535f-114149be5069@gmail.com>
+Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.80.80.8]
-X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
- nalasex01c.na.qualcomm.com (10.47.97.35)
-X-QCInternal: smtphost
-X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
-X-Proofpoint-GUID: wgnCkkoHbDD_nWmzAIDnJ0jGv4qPCOrR
-X-Proofpoint-ORIG-GUID: wgnCkkoHbDD_nWmzAIDnJ0jGv4qPCOrR
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-02_08,2023-06-30_01,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0 bulkscore=0
- mlxlogscore=661 phishscore=0 clxscore=1015 impostorscore=0 mlxscore=0
- spamscore=0 lowpriorityscore=0 priorityscore=1501 malwarescore=0
- adultscore=0 classifier=spam adjust=0 reason=mlx scancount=1
- engine=8.12.0-2305260000 definitions=main-2307020093
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+[also Cc: original reporter]
 
+On 7/2/23 10:31, Bagas Sanjaya wrote:
+> Hi,
+> 
+> I notice a regression report on Bugzilla [1]. Quoting from it:
+> 
+>> I've spent the last week on debugging a problem with my attempt to upgrade my kernel from 6.2.8 to 6.3.8 (now also with 6.4.0 too).
+>>
+>> The lenghty and detailed bug reports with all aspects of git bisect are at
+>> https://bugs.gentoo.org/909066
+>>
+>> A summary:
+>> - if I do not configure wg0, the kernel does not hang
+>> - if I use a kernel older than commit fed8d8773b8ea68ad99d9eee8c8343bef9da2c2c, it does not hang
+>>
+>> The commit refers to code that seems unrelated to the problem for my naiive eye.
+>>
+>> The hardware is a Dell PowerEdge R620 running Gentoo ~amd64.
+>>
+>> I have so far excluded:
+>> - dracut for generating the initramfs is the same version over all kernels
+>> - linux-firmware has been the same
+>> - CPU microcode has been the same
+>>
+>> It's been a long time since I seriously involved with software development and I have been even less involved with kernel development.
+>>
+>> Gentoo maintainers recommended me to open a bug with upstream, so here I am.
+>>
+>> I currently have no idea how to make progress, but I'm willing to try things.
+> 
+> See Bugzilla for the full thread.
+> 
+> Anyway, I'm adding it to regzbot to make sure it doesn't fall through cracks
+> unnoticed:
+> 
+> #regzbot introduced: fed8d8773b8ea6 https://bugzilla.kernel.org/show_bug.cgi?id=217620
+> #regzbot title: correcting acpi_is_processor_usable() check causes RCU stalls with wireguard over bonding+igb
+> #regzbot link: https://bugs.gentoo.org/909066
+> 
 
-On 7/2/2023 12:21 AM, Andrew Lunn wrote:
->> Hi Andrew,
->> it is the PLL related registers, there is no PHY ID existed in MII register
->> 2, 3 of this block, so it can't be instantiated as the generic PHY device.
-> 
-> Well, phylib is going to scan those ID registers, and if it finds
-> something other than 0xffff 0xffff in those two ID registers it is
-> going to think a PHY is there. And then if there is no driver using
-> that ID, it will instantiate a generic PHY.
-> 
-> You might be able to see this in /sys/bus/mdio_bus, especially if you
-> don't have a DT node representing the MDIO bus.
-> 
->        Andrew
-Okay, understand it. thanks Andrew for pointing this.
-i will check it.
+satmd: Can you repeat bisection to confirm that fed8d8773b8ea6 is
+really the culprit?
+
+Thorsten: It seems like the reporter concluded bisection to the
+(possibly) incorrect culprit. What can I do in this case besides
+asking to repeat bisection?
+
+-- 
+An old man doll... just what I always wanted! - Clara
+
 
