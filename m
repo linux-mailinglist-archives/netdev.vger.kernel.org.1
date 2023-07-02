@@ -1,63 +1,31 @@
-Return-Path: <netdev+bounces-14987-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14988-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA57744D8B
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 14:13:33 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A938744D98
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 14:37:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 52416280CF5
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 12:13:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9C699280CFE
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 12:37:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0EB1E1C2D;
-	Sun,  2 Jul 2023 12:13:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5493F1FC9;
+	Sun,  2 Jul 2023 12:37:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 024421C04
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 12:13:29 +0000 (UTC)
-Received: from mail-pf1-x430.google.com (mail-pf1-x430.google.com [IPv6:2607:f8b0:4864:20::430])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8AB0E73;
-	Sun,  2 Jul 2023 05:13:26 -0700 (PDT)
-Received: by mail-pf1-x430.google.com with SMTP id d2e1a72fcca58-666ecf9a081so2787053b3a.2;
-        Sun, 02 Jul 2023 05:13:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688300006; x=1690892006;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vudbneyh5amlB4z/hjEg2kh8mq89mabibesrDE7OD1s=;
-        b=DQF0vQEwTZm8Zhqubzz0/nOFbE7PT5ekj0ujozi8GUbmatpmKXwlNUYv+O1k6lfCrp
-         u9q3sKI2PYPwl/rQgddi/YqX0Mq3s9kE5pFJcWoqi/DLoqe9JpDl1ML2etydSY/07g9C
-         w1l2alCysL3UL9ia8c/NuzaNYzyweUjqvSD/IIq62aQ18EHhQyy9t0fAaxfA61itBDlv
-         YvsVkhPZmrhxqaLehOhExG2nxfFfW/MQtmwQzHDBIuHZADL+KQJtqorCL7pPRlLqQmtU
-         SS47Vwu3OV+xOxfagSLq1XXSBteqYfPoJ35Kd2z7YxrngyY/KlX5PBgcMkI/T7XqCw2c
-         DdNg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688300006; x=1690892006;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=vudbneyh5amlB4z/hjEg2kh8mq89mabibesrDE7OD1s=;
-        b=KYykWC7KQnQiB0sk5jyj8ic64zLUaMmRzUYcCdB9YhZ3VZJSoe4o+Mn99LW7VUzfOq
-         gBE0Hol/vn4MW4bUP7tZtGbmZ+yVltOBU2p35QZcEett62u51rT1b+PJ8wh9VMqUSLha
-         U/C3isWvB8C/pOoIzFVbj7Ii5reWuWDyG50DanUaAD8PukpUfOpe0TRW5zmISi4EA18k
-         v0Ml3nogCZkiTl7bN27cRenavn6JM8/s+BFN5cYvJkx1UzHnmjhbR6x92aOtgFvFXU42
-         AOwMeAPAwnHPUrMwj26pVXjEhEX69yHef9KqaJEXteLG6Yut0MsFcdpjWEFAYCFozA03
-         JplA==
-X-Gm-Message-State: ABy/qLYI8Ly1dxIkLbpDBnhmqFfp1rPuIEPOgxnjHZwjlFj+SZtrplsM
-	2GDFoB9JKtqcTzWZjyxsadY=
-X-Google-Smtp-Source: APBJJlGAwoTaYP/5ZAs1gTB/kctY9tt1kXkLpAl+wW0iwuTI7cUuoIUoFng9hsTELVCezx4xSv5i2Q==
-X-Received: by 2002:a05:6a00:1341:b0:674:6dd4:8337 with SMTP id k1-20020a056a00134100b006746dd48337mr11833992pfu.12.1688300006187;
-        Sun, 02 Jul 2023 05:13:26 -0700 (PDT)
-Received: from [192.168.0.103] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id x14-20020a056a00270e00b005d22639b577sm8566434pfv.165.2023.07.02.05.13.19
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Jul 2023 05:13:25 -0700 (PDT)
-Message-ID: <a5cdc7f8-b340-d372-2971-0d24b01de217@gmail.com>
-Date: Sun, 2 Jul 2023 19:13:14 +0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3DFF51840
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 12:37:32 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 940A312A;
+	Sun,  2 Jul 2023 05:37:30 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qFwKN-0000ey-Ek; Sun, 02 Jul 2023 14:37:19 +0200
+Message-ID: <10f2a5ee-91e2-1241-9e3b-932c493e61b6@leemhuis.info>
+Date: Sun, 2 Jul 2023 14:37:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -66,84 +34,99 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Content-Language: en-US
-To: Johannes Berg <johannes.berg@intel.com>,
- Gregory Greenman <gregory.greenman@intel.com>,
- =?UTF-8?B?TmlrbMSBdnMgS2/EvGVzxYZpa292cw==?= <pinkflames.linux@gmail.com>,
- Nate Watterson <nwatters@codeaurora.org>, Robin Murphy
- <robin.murphy@arm.com>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>,
- Linux IO Memory Management Unit <iommu@lists.linux.dev>
-Cc: Linux Wireless <linux-wireless@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: iwlwifi causes dma-iommu.c:693 __iommu_dma_unmap since commit
- 19898ce9cf8a
+Subject: Re: Fwd: RCU stalls with wireguard over bonding over igb on Linux
+ 6.3.0+
+Content-Language: en-US, de-DE
+To: Bagas Sanjaya <bagasdotme@gmail.com>,
+ Eric DeVolder <eric.devolder@oracle.com>,
+ "Borislav Petkov (AMD)" <bp@alien8.de>, David R <david@unsolicited.net>,
+ Boris Ostrovsky <boris.ovstrosky@oracle.com>,
+ Miguel Luis <miguel.luis@oracle.com>, "Paul E. McKenney"
+ <paulmck@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
+ Boqun Feng <boqun.feng@gmail.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
+ Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
+ "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
+ Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
+ Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
+ "H. Peter Anvin" <hpa@zytor.com>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux RCU <rcu@vger.kernel.org>,
+ Wireguard Mailing List <wireguard@lists.zx2c4.com>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux ACPI <linux-acpi@vger.kernel.org>,
+ Manuel 'satmd' Leiner <manuel.leiner@gmx.de>
+References: <e5b76a4f-81ae-5b09-535f-114149be5069@gmail.com>
+ <79196679-fb65-e5ad-e836-2c43447cfacd@gmail.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <79196679-fb65-e5ad-e836-2c43447cfacd@gmail.com>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688301450;33a91d3a;
+X-HE-SMSGID: 1qFwKN-0000ey-Ek
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On 02.07.23 13:57, Bagas Sanjaya wrote:
+> [also Cc: original reporter]
 
-I notice a regression report on Bugzilla [1]: Quoting from it:
+BTW: I think you CCed too many developers here. There are situations
+where this can makes sense, but it's rare. And if you do this too often
+people might start to not really look into your mails or might even
+ignore them completely.
 
-> Since commit 19898ce9cf8a the iwlwifi has generated three possibly identical kernel stack traces for me. Because I only use the Bluetooth but not the Wi-Fi functionality, this is not a big deal for me but I thought such an issue is worth reporting nontheless.
-> 
-> All three traces point at **drivers/iommu/dma-iommu.c:693 __iommu_dma_unmap+0x150/0x160**.
-> 
-> I'm attaching to this bug report the three stack traces along with other possibly relevant dmesg parts. Sorry in advance for not cutting at the cut here markers which resulted in considerably longer text but I suspected that the PCI, ACPI, memory and possibly iwlwifi related messages may be of importance, too. If I should cut the stack traces out and attach them as three distinct files (and diff to see if there's any change between them) let me know. I can provide a full (but redacted) dmesg output of a git master build, if required as well.
-> 
-> I did try booting a much more recent git master build with *iommu.passthrough=0 iommu.strict=0* on the kernel command line but that did not seem to make any difference.
-> 
-> ```
-> 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 is the first bad commit
-> commit 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2
-> Author: Johannes Berg <johannes.berg@intel.com>
-> Date:   Wed Jun 21 13:12:07 2023 +0300
-> 
->     wifi: iwlwifi: split 22000.c into multiple files
->     
->     Split the configuration list in 22000.c into four new files,
->     per new device family, so we don't have this huge unusable
->     file. Yes, this duplicates a few small things, but that's
->     still much better than what we have now.
->     
->     Signed-off-by: Johannes Berg <johannes.berg@intel.com>
->     Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
->     Link: https://lore.kernel.org/r/20230621130443.7543603b2ee7.Ia8dd54216d341ef1ddc0531f2c9aa30d30536a5d@changeid
->     Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> 
->  drivers/net/wireless/intel/iwlwifi/Makefile     |   1 +
->  drivers/net/wireless/intel/iwlwifi/cfg/22000.c  | 939 +-----------------------
->  drivers/net/wireless/intel/iwlwifi/cfg/ax210.c  | 452 ++++++++++++
->  drivers/net/wireless/intel/iwlwifi/cfg/bz.c     | 523 +++++++++++++
->  drivers/net/wireless/intel/iwlwifi/cfg/sc.c     | 214 ++++++
->  drivers/net/wireless/intel/iwlwifi/iwl-config.h |   2 +
->  drivers/net/wireless/intel/iwlwifi/pcie/drv.c   |   3 +
->  7 files changed, 1206 insertions(+), 928 deletions(-)
->  create mode 100644 drivers/net/wireless/intel/iwlwifi/cfg/ax210.c
->  create mode 100644 drivers/net/wireless/intel/iwlwifi/cfg/bz.c
->  create mode 100644 drivers/net/wireless/intel/iwlwifi/cfg/sc.c
-> ```
-> 
+Normally it's enough to write the mail to (1) the people in the
+signed-off-by-chain, (2) the maintainers of the subsystem that merged a
+commit, and (3) the lists for all affected subsystems; leave it up to
+developers from the first two groups to CC the maintainers of the third
+group.
 
-See Bugzilla for the full thread and attached dmesg.
+> On 7/2/23 10:31, Bagas Sanjaya wrote:
+>> I notice a regression report on Bugzilla [1]. Quoting from it:
+>>
+>>> I've spent the last week on debugging a problem with my attempt to upgrade my kernel from 6.2.8 to 6.3.8 (now also with 
+> [...]
+>> See Bugzilla for the full thread.
+>>
+>> Anyway, I'm adding it to regzbot to make sure it doesn't fall through cracks
+>> unnoticed:
+>>
+>> #regzbot introduced: fed8d8773b8ea6 https://bugzilla.kernel.org/show_bug.cgi?id=217620
+>> #regzbot title: correcting acpi_is_processor_usable() check causes RCU stalls with wireguard over bonding+igb
+>> #regzbot link: https://bugs.gentoo.org/909066
 
-Anyway, I'm adding it to regzbot to ensure that it doesn't fall through
-cracks unnoticed:
+> satmd: Can you repeat bisection to confirm that fed8d8773b8ea6 is
+> really the culprit?
 
-#regzbot introduced: 19898ce9cf8a33 https://bugzilla.kernel.org/show_bug.cgi?id=217622
-#regzbot title: dma-iommu.c:693 __iommu_dma_unmap bug trace due to 22000.c split
+I'd be careful to ask people that, as that might mean a lot of work for
+them. Best to leave things like that to developers, unless it's pretty
+obvious that something went sideways.
 
-Thanks.
+> Thorsten: It seems like the reporter concluded bisection to the
+> (possibly) incorrect culprit.
 
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217622
+What makes your think so? I just looked at bugzilla and it (for now)
+seems reverting fed8d8773b8ea6 ontop of 6.4 fixed things for the
+reporter, which is a pretty strong indicator that this change really
+causes the trouble somehow.
 
--- 
-An old man doll... just what I always wanted! - Clara
+/me really wonders what's he's missing
+
+> What can I do in this case besides
+> asking to repeat bisection?
+
+Not much apart from updating regzbot state (e.g. something like "regzbot
+introduced v6.3..v6.4") and a reply to your initial report (ideally with
+a quick apology) to let everyone know it was a false alarm.
+
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
