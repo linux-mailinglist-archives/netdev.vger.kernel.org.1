@@ -1,141 +1,100 @@
-Return-Path: <netdev+bounces-14980-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14981-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2F1C744C1D
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 05:32:18 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 12E47744C8B
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 09:49:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B091280E19
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 03:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 038D3280E43
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 07:49:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD34816;
-	Sun,  2 Jul 2023 03:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 60B60138C;
+	Sun,  2 Jul 2023 07:49:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0C9927F7
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 03:32:09 +0000 (UTC)
-Received: from mail-pj1-x1031.google.com (mail-pj1-x1031.google.com [IPv6:2607:f8b0:4864:20::1031])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C4DC1703;
-	Sat,  1 Jul 2023 20:32:08 -0700 (PDT)
-Received: by mail-pj1-x1031.google.com with SMTP id 98e67ed59e1d1-262e81f6154so1566132a91.2;
-        Sat, 01 Jul 2023 20:32:08 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54A42136A
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 07:49:42 +0000 (UTC)
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 155D010E5
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 00:49:41 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-543c692db30so2701754a12.3
+        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 00:49:41 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688268728; x=1690860728;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
+        d=bytedance.com; s=google; t=1688284179; x=1690876179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=ZhN94lMUNnHFPAhVfo+rHKI0yY7VxURxglHWp96Srwg=;
-        b=H1lg1nuWSIDnWqY4UVAXcXDJAvhU1YHPpPrusiQohNNE5GvwsK4w5d69Q7qkFYlCoQ
-         84Fxd+lbFB7/3yFhjBHEutcwet2ZEWFcyPyx9Aiuz2AvTnO0DuUHAzVoq6G1FspI2tte
-         n9rLvN+0COGioC0U1u981OUG9XFc6lhXnN8I/qBfkElWhYTtUu6u3S2CF4dAMVi4KAnv
-         LtzVHkclYvagZB1hY7ZPMEONvED3cxV5uNqWv41hLLykZAZsPnIFRZfMy+hSSgBmAHwi
-         gi3FnH1A2+JRvnqN3YD4PpzxbfUlw6fwQtvaX5GDyVPDSLN608urxpB41kGVdFjezpSy
-         yjZA==
+        bh=OvxoQCcibS+AeU+E0ygHuM6m7OcRFNmks4L94pMdxYI=;
+        b=ZtZXwH2MeGsjV8yFfBnJjWlbkQzmf4oSMr3YNv3pBErULIxGVXHyX3fa05xeDAaUcR
+         FtoTrbYdH97gMy7NhtyE8jKvgcB1m+5PJkZ4pXFp36b0WrwMVW6GCTQcPyG4IlQXpqXQ
+         H/ebOzOmkPiqEc0GPETYzScw6NtBD80CoFCeZsaEbxFyao3c8ckIcEa0TOig5Yem7olB
+         ZcWNGsHW1+0NGnU8lRyK3+5ISROloHE8U32K27k2x/fwd5k1v7bGEMkA1AQWRJwFJDL/
+         L+31h03h+9svZnYKFBNrm7BV89IrZm+nrmZcwQLIpy4JgKzUOM0XNEe/tCbIVfif9nfS
+         gkIA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688268728; x=1690860728;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=ZhN94lMUNnHFPAhVfo+rHKI0yY7VxURxglHWp96Srwg=;
-        b=cJDrCuXmL64fXmOU+uKy6y50G5CVpsMbwclaBAS5i/OZfDaWtwKepCcMVfpch5urOx
-         B2eXxyGT6/LSYJ45x083w2/iI7iT/MA5Sj7t5jD3QzBJBf/ZhWhllIS9MW5PL5ms5iFQ
-         na+cbVmg93EsZbc/HPyKD+NADzssswWnSADJfBWpbxX18E4LPvEJQ2ygsQOQrzdNQCj6
-         Iqc3eA2es1zCkfYcAWXC0cGaXcOO8CbIL5LBV7+EBrhpzuy0ukDWuSo947H5+G/+cedm
-         MugHzalTbGk9QUDDrrY+2Wm6zD+Jf8TgzkQ1drtwYSAtvKECYQh0Yo1W287m2ISItO8e
-         DcqQ==
-X-Gm-Message-State: ABy/qLY/uF1GPib/ILMUC6ccpZnWsNtegwa+oemEKVoDtWAnhAVUQuO3
-	3IejLWXHJ4y2FaLuVN29aRI=
-X-Google-Smtp-Source: APBJJlHZiamPWt4nUWriHFvnZ613G5ox0ZTDJ3hV30nK4Q6VIh6/Ew5xaB6xL5oCJQI9wAnlyBBErA==
-X-Received: by 2002:a17:903:244a:b0:1b7:cee1:60c4 with SMTP id l10-20020a170903244a00b001b7cee160c4mr5800588pls.59.1688268727745;
-        Sat, 01 Jul 2023 20:32:07 -0700 (PDT)
-Received: from [192.168.0.103] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id w10-20020a1709029a8a00b001b567bb970esm12931622plp.84.2023.07.01.20.32.01
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sat, 01 Jul 2023 20:32:07 -0700 (PDT)
-Message-ID: <e5b76a4f-81ae-5b09-535f-114149be5069@gmail.com>
-Date: Sun, 2 Jul 2023 10:31:56 +0700
+        d=1e100.net; s=20221208; t=1688284179; x=1690876179;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=OvxoQCcibS+AeU+E0ygHuM6m7OcRFNmks4L94pMdxYI=;
+        b=RMpfEnwJbB/6wvQMDZPQ8kZiNYYtfQZ1F/tphUj/IE2VVBzdpm31fI5ZlOjibsQNS3
+         LLMzu30UB9xBOklOwRJ1ZVi8ZeLViaFRh48o70UloOki0XuNgD5xz3z43oUotokfOfdd
+         o6eXmuh9LycH3VDh9T4wM5oZXrMMLVbxkgHX7afKU6aCXCU20MLp2aXJ6p1B2eThsCQN
+         zyyaYTk78Rm9iDS3x6D68VwJBvoq09Ef/5EoMfNs0MSqxbxoNUsAN8LfFs/LZCvkk7LM
+         dK20gTir5vOJC+NHSAUEuf8hakVY7iUU4dS1c1xVvmN2goykBFr5DBvl2QXfe0DZ+w1t
+         DN9Q==
+X-Gm-Message-State: ABy/qLZuzSqwqhsl2fo8wfn1nrcl4wOsBevi+8oUshX21jZ8HbUt0Po3
+	jX7V/Zuc7t0B/rvSsz9u+omhIcUa23WYJtLKvYis
+X-Google-Smtp-Source: APBJJlGufhzK/2ECRJBm7gDRrro6kXoBCSrchWDG2fH7jB9xtkPCg+JFTBP6i6pSVuIMpszBV7lZcb+qPuqMMarDNGE=
+X-Received: by 2002:a05:6a20:8e14:b0:123:4ffe:4018 with SMTP id
+ y20-20020a056a208e1400b001234ffe4018mr9366994pzj.60.1688284179674; Sun, 02
+ Jul 2023 00:49:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US
-To: Eric DeVolder <eric.devolder@oracle.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>, David R <david@unsolicited.net>,
- Boris Ostrovsky <boris.ovstrosky@oracle.com>,
- Miguel Luis <miguel.luis@oracle.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
- Boqun Feng <boqun.feng@gmail.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Borislav Petkov <bp@alien8.de>, Dave Hansen <dave.hansen@linux.intel.com>,
- x86@kernel.org, "H. Peter Anvin" <hpa@zytor.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux RCU <rcu@vger.kernel.org>,
- Wireguard Mailing List <wireguard@lists.zx2c4.com>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux ACPI <linux-acpi@vger.kernel.org>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: RCU stalls with wireguard over bonding over igb on Linux 6.3.0+
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+References: <20230627113652.65283-1-maxime.coquelin@redhat.com> <20230627113652.65283-2-maxime.coquelin@redhat.com>
+In-Reply-To: <20230627113652.65283-2-maxime.coquelin@redhat.com>
+From: Yongji Xie <xieyongji@bytedance.com>
+Date: Sun, 2 Jul 2023 15:49:28 +0800
+Message-ID: <CACycT3vvOaNcrigbaqbGKJM9KxKR3nGmOQRDUfd1e08+XDp1rA@mail.gmail.com>
+Subject: Re: [PATCH v1 1/2] vduse: validate block features only with block devices
+To: Maxime Coquelin <maxime.coquelin@redhat.com>
+Cc: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>, 
+	David Marchand <david.marchand@redhat.com>, Cindy Lu <lulu@redhat.com>, 
+	linux-kernel <linux-kernel@vger.kernel.org>, 
+	virtualization <virtualization@lists.linux-foundation.org>, Netdev <netdev@vger.kernel.org>, 
+	xuanzhuo@linux.alibaba.com, Eugenio Perez Martin <eperezma@redhat.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+On Tue, Jun 27, 2023 at 7:37=E2=80=AFPM Maxime Coquelin
+<maxime.coquelin@redhat.com> wrote:
+>
+> This patch is preliminary work to enable network device
+> type support to VDUSE.
+>
+> As VIRTIO_BLK_F_CONFIG_WCE shares the same value as
+> VIRTIO_NET_F_HOST_TSO4, we need to restrict its check
+> to Virtio-blk device type.
+>
+> Signed-off-by: Maxime Coquelin <maxime.coquelin@redhat.com>
+> ---
 
-I notice a regression report on Bugzilla [1]. Quoting from it:
+Reviewed-by: Xie Yongji <xieyongji@bytedance.com>
 
-> I've spent the last week on debugging a problem with my attempt to upgrade my kernel from 6.2.8 to 6.3.8 (now also with 6.4.0 too).
-> 
-> The lenghty and detailed bug reports with all aspects of git bisect are at
-> https://bugs.gentoo.org/909066
-> 
-> A summary:
-> - if I do not configure wg0, the kernel does not hang
-> - if I use a kernel older than commit fed8d8773b8ea68ad99d9eee8c8343bef9da2c2c, it does not hang
-> 
-> The commit refers to code that seems unrelated to the problem for my naiive eye.
-> 
-> The hardware is a Dell PowerEdge R620 running Gentoo ~amd64.
-> 
-> I have so far excluded:
-> - dracut for generating the initramfs is the same version over all kernels
-> - linux-firmware has been the same
-> - CPU microcode has been the same
-> 
-> It's been a long time since I seriously involved with software development and I have been even less involved with kernel development.
-> 
-> Gentoo maintainers recommended me to open a bug with upstream, so here I am.
-> 
-> I currently have no idea how to make progress, but I'm willing to try things.
-
-See Bugzilla for the full thread.
-
-Anyway, I'm adding it to regzbot to make sure it doesn't fall through cracks
-unnoticed:
-
-#regzbot introduced: fed8d8773b8ea6 https://bugzilla.kernel.org/show_bug.cgi?id=217620
-#regzbot title: correcting acpi_is_processor_usable() check causes RCU stalls with wireguard over bonding+igb
-#regzbot link: https://bugs.gentoo.org/909066
-
-Thanks.
-
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217620
-
--- 
-An old man doll... just what I always wanted! - Clara
+Thanks,
+Yongji
 
