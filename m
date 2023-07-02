@@ -1,76 +1,66 @@
-Return-Path: <netdev+bounces-14989-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 097EC744DB9
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 15:37:22 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0741D744DBB
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 15:37:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC3F21C204F0
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 13:37:20 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3BA8280CBE
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 13:37:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C61C520FF;
-	Sun,  2 Jul 2023 13:37:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5C5C2101;
+	Sun,  2 Jul 2023 13:37:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B2F3C20FE
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 13:37:18 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 267D0126
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 06:37:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688305034;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=Fscz16jdu5EOdDpNFofgtOkAvApauMfws1a+RHlsQn0=;
-	b=bqeo8LtrpydN8VC2qwddEFpcycLwhrbnIww6vqV/wB6qO9EyliH/c9a0h3rBAFIjFcQN1B
-	KRg+e2CZbvDOtiO0c9BrAoRHLYmVSCwb7E8tQ83EWs4YykVBKkU/dCavmwbG1NtiH6fjh+
-	Rp38ZlCft/tq20LsRM5Li/xxt9rY5Ls=
-Received: from mail-ej1-f71.google.com (mail-ej1-f71.google.com
- [209.85.218.71]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-660-CEn26MqpMXGkL3R0tmaGoQ-1; Sun, 02 Jul 2023 09:37:13 -0400
-X-MC-Unique: CEn26MqpMXGkL3R0tmaGoQ-1
-Received: by mail-ej1-f71.google.com with SMTP id a640c23a62f3a-978a991c3f5so259969766b.0
-        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 06:37:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688305032; x=1690897032;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Fscz16jdu5EOdDpNFofgtOkAvApauMfws1a+RHlsQn0=;
-        b=kCArk4aGGszm7a0Fz6SUXN2IwXBTh+J2moAKyXflyWPAlRtWYP1qCPgS8oPBTLB6tk
-         zz8Y/5otD06tbXys/ZrPnkVmXezvmDvjDuBboLmC6OqTU5E6X2GEoqqCZUPd+88aycm6
-         ryzk0eIqx670/LIsHg9mQs3hU31B99kjm3Z/3O10neDE0ByJmG9cV3Gtfycv8aSGbmZI
-         bjzslXs5HkWUM8C63A0AYgBHI4InR2XO/hI4RIk/bTZodwobLUaia7C284rlsLCwNWS9
-         eJj30d0wmIbD09AMr4fAbkaubMZ6vGdSIVbgwshT9qiWdyEhDddKU+R3O2GolttEjZso
-         dbjQ==
-X-Gm-Message-State: AC+VfDw1g5qvFHTbeGzdPoZQFlhg6ctniLoj9J5ILI+7usFkbsZFqr3I
-	8oK8eu9BhWiBV66oBcxyDJJCjNZo2ZypcXLAsZ0L0qME7Vf9IORhSBW6Y9sLjXp505jFHG/A8K5
-	7xwZcsgt3lgvfDgjZ
-X-Received: by 2002:a17:906:b811:b0:979:65f0:cced with SMTP id dv17-20020a170906b81100b0097965f0ccedmr5934779ejb.17.1688305031943;
-        Sun, 02 Jul 2023 06:37:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFGgYm6Pej4shREErdqqtoaKfnv59VDi8oQbzHD5HcPb5WjgVVGyKQF1QNN/hdRhbN02rqoIg==
-X-Received: by 2002:a17:906:b811:b0:979:65f0:cced with SMTP id dv17-20020a170906b81100b0097965f0ccedmr5934769ejb.17.1688305031706;
-        Sun, 02 Jul 2023 06:37:11 -0700 (PDT)
-Received: from redhat.com ([2.52.134.224])
-        by smtp.gmail.com with ESMTPSA id x26-20020a1709065ada00b00992025654c1sm7342793ejs.179.2023.07.02.06.37.09
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 02 Jul 2023 06:37:11 -0700 (PDT)
-Date: Sun, 2 Jul 2023 09:37:06 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Maxime Coquelin <maxime.coquelin@redhat.com>
-Cc: xieyongji@bytedance.com, jasowang@redhat.com, david.marchand@redhat.com,
-	lulu@redhat.com, linux-kernel@vger.kernel.org,
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org,
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
-Subject: Re: [PATCH v1 0/2] vduse: add support for networking devices
-Message-ID: <20230702093530-mutt-send-email-mst@kernel.org>
-References: <20230627113652.65283-1-maxime.coquelin@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA64D20FF
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 13:37:45 +0000 (UTC)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16333126;
+	Sun,  2 Jul 2023 06:37:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688305064; x=1719841064;
+  h=date:from:to:cc:subject:message-id:references:
+   mime-version:in-reply-to;
+  bh=NNYHHNeDxU7dioHFvNlo1mYkVhxo+/tO2nZb1qvzOxA=;
+  b=kTeDSRoJjm9ILvV4uNEIOK1brJqt2l0YaeODHqtleb/ZFJHDUOhJfss1
+   BrlJAxsVpDLSvOtBYI4n3o8948ZmKTHplkSTOWFje/m74b7DH0wvoqana
+   ivj6raXDQjx8qUcXATuyvIsWylsVxg/03a3SfsZn0Ql/iHnHB/4JfPdML
+   4rqiq13Ms5UXVaZn/LXK4Wa5Evn9fV5aWl5GzWM1ygcSITYedQRS9THrq
+   1tM87Atc4e5Lbfr/Glmj3A1l7wprh2fVADzMu5C4WpQdY0T3d+Fz7pb+H
+   XrdC6Nd1kIgRag/sNY4J1Z/S7enlWqBGmFUFu5zfh+YsHGq81OIogY35N
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="343035014"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="343035014"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 02 Jul 2023 06:37:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="753476256"
+X-IronPort-AV: E=Sophos;i="6.01,176,1684825200"; 
+   d="scan'208";a="753476256"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by orsmga001.jf.intel.com with ESMTP; 02 Jul 2023 06:37:40 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qFxGl-000GgD-1r;
+	Sun, 02 Jul 2023 13:37:39 +0000
+Date: Sun, 2 Jul 2023 21:37:15 +0800
+From: kernel test robot <lkp@intel.com>
+To: Vivek Pernamitta <quic_vpernami@quicinc.com>, mhi@lists.linux.dev
+Cc: oe-kbuild-all@lists.linux.dev, mrana@quicinc.com,
+	quic_qianyu@quicinc.com, manivannan.sadhasivam@linaro.org,
+	Vivek Pernamitta <quic_vpernami@quicinc.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH V1] net: mhi : Add support to enable ethernet interface
+Message-ID: <202307022148.nlp4Fazk-lkp@intel.com>
+References: <1688118281-13032-1-git-send-email-quic_vpernami@quicinc.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -79,43 +69,86 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230627113652.65283-1-maxime.coquelin@redhat.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <1688118281-13032-1-git-send-email-quic_vpernami@quicinc.com>
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jun 27, 2023 at 01:36:50PM +0200, Maxime Coquelin wrote:
-> This small series enables virtio-net device type in VDUSE.
-> With it, basic operation have been tested, both with
-> virtio-vdpa and vhost-vdpa using DPDK Vhost library series
-> adding VDUSE support using split rings layout (merged in
-> DPDK v23.07-rc1).
-> 
-> Control queue support (and so multiqueue) has also been
-> tested, but requires a Kernel series from Jason Wang
-> relaxing control queue polling [1] to function reliably.
-> 
-> [1]: https://lore.kernel.org/lkml/CACGkMEtgrxN3PPwsDo4oOsnsSLJfEmBEZ0WvjGRr3whU+QasUg@mail.gmail.com/T/
+Hi Vivek,
 
-Jason promised to post a new version of that patch.
-Right Jason?
-For now let's make sure CVQ feature flag is off?
+kernel test robot noticed the following build warnings:
 
-> RFC -> v1 changes:
-> ==================
-> - Fail device init if it does not support VERSION_1 (Jason)
-> 
-> Maxime Coquelin (2):
->   vduse: validate block features only with block devices
->   vduse: enable Virtio-net device type
-> 
->  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++----
->  1 file changed, 11 insertions(+), 4 deletions(-)
-> 
-> -- 
-> 2.41.0
+[auto build test WARNING on net-next/main]
+[also build test WARNING on net/main linus/master v6.4 next-20230630]
+[If your patch is applied to the wrong git tree, kindly drop us a note.
+And when submitting patch, we suggest to use '--base' as documented in
+https://git-scm.com/docs/git-format-patch#_base_tree_information]
 
+url:    https://github.com/intel-lab-lkp/linux/commits/Vivek-Pernamitta/net-mhi-Add-support-to-enable-ethernet-interface/20230630-174659
+base:   net-next/main
+patch link:    https://lore.kernel.org/r/1688118281-13032-1-git-send-email-quic_vpernami%40quicinc.com
+patch subject: [PATCH V1] net: mhi : Add support to enable ethernet interface
+config: i386-randconfig-i062-20230702 (https://download.01.org/0day-ci/archive/20230702/202307022148.nlp4Fazk-lkp@intel.com/config)
+compiler: gcc-12 (Debian 12.2.0-14) 12.2.0
+reproduce: (https://download.01.org/0day-ci/archive/20230702/202307022148.nlp4Fazk-lkp@intel.com/reproduce)
+
+If you fix the issue in a separate patch/commit (i.e. not just a new version of
+the same patch/commit), kindly add following tags
+| Reported-by: kernel test robot <lkp@intel.com>
+| Closes: https://lore.kernel.org/oe-kbuild-all/202307022148.nlp4Fazk-lkp@intel.com/
+
+sparse warnings: (new ones prefixed by >>)
+>> drivers/net/mhi_net.c:327:37: sparse: sparse: incorrect type in argument 1 (different modifiers) @@     expected unsigned char [usertype] *addr @@     got unsigned char const *dev_addr @@
+   drivers/net/mhi_net.c:327:37: sparse:     expected unsigned char [usertype] *addr
+   drivers/net/mhi_net.c:327:37: sparse:     got unsigned char const *dev_addr
+
+vim +327 drivers/net/mhi_net.c
+
+   320	
+   321	static int mhi_net_newlink(struct mhi_device *mhi_dev, struct net_device *ndev, bool eth_dev)
+   322	{
+   323		struct mhi_net_dev *mhi_netdev;
+   324		int err;
+   325	
+   326		if (eth_dev) {
+ > 327			eth_random_addr(ndev->dev_addr);
+   328			if (!is_valid_ether_addr(ndev->dev_addr))
+   329				return -EADDRNOTAVAIL;
+   330		}
+   331	
+   332		mhi_netdev = netdev_priv(ndev);
+   333	
+   334		dev_set_drvdata(&mhi_dev->dev, mhi_netdev);
+   335		mhi_netdev->ndev = ndev;
+   336		mhi_netdev->mdev = mhi_dev;
+   337		mhi_netdev->skbagg_head = NULL;
+   338		mhi_netdev->mru = mhi_dev->mhi_cntrl->mru;
+   339		mhi_netdev->ethernet_if = eth_dev;
+   340	
+   341		INIT_DELAYED_WORK(&mhi_netdev->rx_refill, mhi_net_rx_refill_work);
+   342		u64_stats_init(&mhi_netdev->stats.rx_syncp);
+   343		u64_stats_init(&mhi_netdev->stats.tx_syncp);
+   344	
+   345		/* Start MHI channels */
+   346		err = mhi_prepare_for_transfer(mhi_dev);
+   347		if (err)
+   348			return err;
+   349	
+   350		/* Number of transfer descriptors determines size of the queue */
+   351		mhi_netdev->rx_queue_sz = mhi_get_free_desc_count(mhi_dev, DMA_FROM_DEVICE);
+   352	
+   353		err = register_netdev(ndev);
+   354		if (err)
+   355			return err;
+   356	
+   357		return 0;
+   358	}
+   359	
+
+-- 
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
