@@ -1,98 +1,83 @@
-Return-Path: <netdev+bounces-14995-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-14996-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75070744E08
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 16:08:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 415B5744E1E
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 16:37:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 775C91C20829
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 14:08:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7CF0F280CD4
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 14:37:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E82832106;
-	Sun,  2 Jul 2023 14:08:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14DB1FB0;
+	Sun,  2 Jul 2023 14:37:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94ED2104
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 14:08:52 +0000 (UTC)
-Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E5B5E55;
-	Sun,  2 Jul 2023 07:08:51 -0700 (PDT)
-Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b88e84bfb8so5296385ad.2;
-        Sun, 02 Jul 2023 07:08:51 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 94C4017C9
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 14:37:41 +0000 (UTC)
+Received: from mail-wr1-x431.google.com (mail-wr1-x431.google.com [IPv6:2a00:1450:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C34EE5E;
+	Sun,  2 Jul 2023 07:37:40 -0700 (PDT)
+Received: by mail-wr1-x431.google.com with SMTP id ffacd0b85a97d-3142ee41fd2so933662f8f.3;
+        Sun, 02 Jul 2023 07:37:40 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688306931; x=1690898931;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=gmail.com; s=20221208; t=1688308658; x=1690900658;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+2w54nxVPO6o+8J39UnS81CRAIwBFUFMqVaCHwISr5M=;
-        b=NhA8IRXhuz+9cb9k7oJEZMFJB+zk8luptjHKRD33C9XVCRx/tJj0F9BwxZBPDFAH5c
-         pkp5zQHJirG3UYoDwjjQo4ECLz0PpXTvxNsny8j414NguTK4EYbQmKcy0pe+75oz5ilT
-         PvLRuqQ4Av8ajdzLMUeVFBOVFN5pGXLPQtQhoCYVfBGxxqJezE0C0LtWloErnPi5iC6H
-         GDK0LFeZbMkbojtMzDaSzvlZHAm0CIH2I64MkYNCHV46VDmPN2uFw+oRK37xsAZynyu2
-         YFFEScNGDXF+qtPk3dhaK2elIJwMhQxwh/RhKkGuiSglNPaNNfJvaQ8lzdAyvx3ij4sb
-         iduQ==
+        bh=1i/557JepWvhXYDwLvQtm3WxhtP92izEtjR5vRFBdEE=;
+        b=OMjwCoIMtM0NjJfGq2I9INpt/y34b8g9YdC7ObGVmNChFq40qC/QpddkuVtjxb9j3A
+         45eyHCBwiQl9VINY7PPOJFMBGtvAolGLNSd4xFBmabJ9nXPo0Ymj+gCN96CdKTZ4w7Hs
+         GIgScE0NZ9HsfbZ2Rxpt3jvHfuRHn3yf1MJCfZw4cmpsDxyxaYqSCRIrDP0zaVrZdZnS
+         9vb0A1Bto4e3nb+XBDReMTY7dVBTIxyi04Ylmye4Xyv6tbXTdkNguJqpFBj/5Jdg4ieE
+         BNcSnUNkA92Fg0xfmX+F848Z0GWvPyhp9NyfeuK9yPv4HCwcl39GdZvfPI+fvAuLqhNF
+         Z1sA==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688306931; x=1690898931;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1688308658; x=1690900658;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=+2w54nxVPO6o+8J39UnS81CRAIwBFUFMqVaCHwISr5M=;
-        b=WD2IVBIrvoTpqvJv5uzWxRItxn/jdyJvwBnp13zImOIJHYumnMKMKxf1VFvs/fhCB7
-         ynfKgucn6fJjNke3BWCq20Omrj3NGOnU4sXniDlwPT95Qpi2WzoHgUpJW9VOZ0symy+k
-         iGvchRcsxER1b3nQFPc2MmSUExx/Upc25xuH28trNp5h5p2gTZ46EdTHVDEJuT0wFAt2
-         41myRs3Docxy+ZK3Wz4WlDaU7nMUzNJztL0/ItBN0CqQ4GShcjDQaYCdOJ+fTrL8uLRN
-         yqBEbLHsMZeSj8om9+ZXEa1frOQS1/qPGKtD8L4u+3FvGgInO7gyvur1TKfn6hydUm6U
-         RyzQ==
-X-Gm-Message-State: ABy/qLaJSQOJC5bDgZkny9UTWzbbqCcendhQHR2JluxTTS+14RoSCKcb
-	8UPjl7qE7F5ZxDiTirefIEk=
-X-Google-Smtp-Source: APBJJlFa2PZ9jIdWwi9dWb1g0KHD9JH5PBgSre+nm+nmMS7SXICBfS5NfytLiK5hr6npw22hSdVnsQ==
-X-Received: by 2002:a17:902:d703:b0:1b8:9046:4bfb with SMTP id w3-20020a170902d70300b001b890464bfbmr2062798ply.9.1688306930794;
-        Sun, 02 Jul 2023 07:08:50 -0700 (PDT)
-Received: from [192.168.0.103] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id a3-20020a170902b58300b001ab2b415bdbsm13635200pls.45.2023.07.02.07.08.35
+        bh=1i/557JepWvhXYDwLvQtm3WxhtP92izEtjR5vRFBdEE=;
+        b=MxuTB2SgajhxEG55C52OT3QUPNUvDCGIhuifat+p6BliAlcTQTG04BKTUgb00NjKmw
+         6i/hw0Ej8SkkNJ8sQETVbLOr+ECIPrPEXgyVoK6bMg2SOb5CSywL7hf02WwAKCCw1PEU
+         mn/J81BW9HvMFX2t9+edJ/8OCObPIATFOQP230bgnV0h85EH5BiVTfb75+0RGcddhtAu
+         n+AjWpSh66qx+rN6bDEcGJj61Huprt4XNp2fkZjBLxSISS8d9qv1qQPvzDlGOf7vKdNX
+         Qk7rDCm+0cA8WcaAe3HY3sf4vvDO7PYpAM9fYP5HLKi/1EKG8Ky3Fy1oa20ZW6gVc9XU
+         OQwA==
+X-Gm-Message-State: ABy/qLZqOP9unIQsTAHQJI/SgkOr+/xSw5b5RCEVcdXDVmK54kQCTE2K
+	wopDM/EsYdHmQmhT/zpIE+1mXkgAcujvpQ==
+X-Google-Smtp-Source: APBJJlEBUtr/wKo72kXAHY2LJiSnrLC2l3W0GuXeD9xgWdETIDqHEj6HKavcxiwcFxjdP1qvKJkrRw==
+X-Received: by 2002:a5d:45d1:0:b0:311:3fdc:109d with SMTP id b17-20020a5d45d1000000b003113fdc109dmr6265037wrs.1.1688308658077;
+        Sun, 02 Jul 2023 07:37:38 -0700 (PDT)
+Received: from ?IPV6:2a01:cb05:86f5:6700:2cba:4a71:c713:649b? (2a01cb0586f567002cba4a71c713649b.ipv6.abo.wanadoo.fr. [2a01:cb05:86f5:6700:2cba:4a71:c713:649b])
+        by smtp.gmail.com with ESMTPSA id e17-20020a5d5951000000b00313f61889ecsm17123623wri.66.2023.07.02.07.37.36
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 02 Jul 2023 07:08:50 -0700 (PDT)
-Message-ID: <644f4551-32e8-11f9-0d4a-ad1045fdae77@gmail.com>
-Date: Sun, 2 Jul 2023 21:08:27 +0700
+        Sun, 02 Jul 2023 07:37:37 -0700 (PDT)
+Message-ID: <5b3dd32c-4177-a257-1209-1bfa918cb631@gmail.com>
+Date: Sun, 2 Jul 2023 16:37:37 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: Fwd: RCU stalls with wireguard over bonding over igb on Linux
- 6.3.0+
+Subject: Re: [PATCH net 1/2] net: dsa: tag_sja1105: fix MAC DA patching from
+ meta frames
+To: Vladimir Oltean <vladimir.oltean@nxp.com>, netdev@vger.kernel.org
+Cc: Andrew Lunn <andrew@lunn.ch>, "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, linux-kernel@vger.kernel.org
+References: <20230629141453.1112919-1-vladimir.oltean@nxp.com>
+ <20230629141453.1112919-2-vladimir.oltean@nxp.com>
 Content-Language: en-US
-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Eric DeVolder <eric.devolder@oracle.com>,
- "Borislav Petkov (AMD)" <bp@alien8.de>, David R <david@unsolicited.net>,
- Boris Ostrovsky <boris.ovstrosky@oracle.com>,
- Miguel Luis <miguel.luis@oracle.com>, "Paul E. McKenney"
- <paulmck@kernel.org>, Joel Fernandes <joel@joelfernandes.org>,
- Boqun Feng <boqun.feng@gmail.com>, "Jason A. Donenfeld" <Jason@zx2c4.com>,
- Jay Vosburgh <j.vosburgh@gmail.com>, Andy Gospodarek <andy@greyhouse.net>,
- "Rafael J. Wysocki" <rafael@kernel.org>, Len Brown <lenb@kernel.org>,
- Thomas Gleixner <tglx@linutronix.de>, Ingo Molnar <mingo@redhat.com>,
- Dave Hansen <dave.hansen@linux.intel.com>, x86@kernel.org,
- "H. Peter Anvin" <hpa@zytor.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux RCU <rcu@vger.kernel.org>,
- Wireguard Mailing List <wireguard@lists.zx2c4.com>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux ACPI <linux-acpi@vger.kernel.org>,
- Manuel 'satmd' Leiner <manuel.leiner@gmx.de>
-References: <e5b76a4f-81ae-5b09-535f-114149be5069@gmail.com>
- <79196679-fb65-e5ad-e836-2c43447cfacd@gmail.com>
- <10f2a5ee-91e2-1241-9e3b-932c493e61b6@leemhuis.info>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-In-Reply-To: <10f2a5ee-91e2-1241-9e3b-932c493e61b6@leemhuis.info>
-Content-Type: text/plain; charset=UTF-8
+From: Florian Fainelli <f.fainelli@gmail.com>
+In-Reply-To: <20230629141453.1112919-2-vladimir.oltean@nxp.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
@@ -101,77 +86,22 @@ X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/2/23 19:37, Linux regression tracking (Thorsten Leemhuis) wrote:
-> On 02.07.23 13:57, Bagas Sanjaya wrote:
->> [also Cc: original reporter]
-> 
-> BTW: I think you CCed too many developers here. There are situations
-> where this can makes sense, but it's rare. And if you do this too often
-> people might start to not really look into your mails or might even
-> ignore them completely.
-> 
-> Normally it's enough to write the mail to (1) the people in the
-> signed-off-by-chain, (2) the maintainers of the subsystem that merged a
-> commit, and (3) the lists for all affected subsystems; leave it up to
-> developers from the first two groups to CC the maintainers of the third
-> group.
-> 
 
-Hi,
 
-In this case I had to also Cc: wireguard, bonding, RCU, and x86 people,
-since this issue spans these subsystems (I naively thought). Anyway,
-thanks for detailed tip (honestly /me wonder if I forgot this later, as
-is often the case).
+On 6/29/2023 4:14 PM, Vladimir Oltean wrote:
+> The SJA1105 manual says that at offset 4 into the meta frame payload we
+> have "MAC destination byte 2" and at offset 5 we have "MAC destination
+> byte 1". These are counted from the LSB, so byte 1 is h_dest[ETH_HLEN-2]
+> aka h_dest[4] and byte 2 is h_dest[ETH_HLEN-3] aka h_dest[3].
+> 
+> The sja1105_meta_unpack() function decodes these the other way around,
+> so a frame with MAC DA 01:80:c2:11:22:33 is received by the network
+> stack as having 01:80:c2:22:11:33.
+> 
+> Fixes: e53e18a6fe4d ("net: dsa: sja1105: Receive and decode meta frames")
+> Signed-off-by: Vladimir Oltean <vladimir.oltean@nxp.com>
 
->> On 7/2/23 10:31, Bagas Sanjaya wrote:
->>> I notice a regression report on Bugzilla [1]. Quoting from it:
->>>
->>>> I've spent the last week on debugging a problem with my attempt to upgrade my kernel from 6.2.8 to 6.3.8 (now also with 
->> [...]
->>> See Bugzilla for the full thread.
->>>
->>> Anyway, I'm adding it to regzbot to make sure it doesn't fall through cracks
->>> unnoticed:
->>>
->>> #regzbot introduced: fed8d8773b8ea6 https://bugzilla.kernel.org/show_bug.cgi?id=217620
->>> #regzbot title: correcting acpi_is_processor_usable() check causes RCU stalls with wireguard over bonding+igb
->>> #regzbot link: https://bugs.gentoo.org/909066
-> 
->> satmd: Can you repeat bisection to confirm that fed8d8773b8ea6 is
->> really the culprit?
-> 
-> I'd be careful to ask people that, as that might mean a lot of work for
-> them. Best to leave things like that to developers, unless it's pretty
-> obvious that something went sideways.
-> 
-
-OK.
-
->> Thorsten: It seems like the reporter concluded bisection to the
->> (possibly) incorrect culprit.
-> 
-> What makes your think so? I just looked at bugzilla and it (for now)
-> seems reverting fed8d8773b8ea6 ontop of 6.4 fixed things for the
-> reporter, which is a pretty strong indicator that this change really
-> causes the trouble somehow.
-> 
-
-OK too.
-
-> /me really wonders what's he's missing
-> 
->> What can I do in this case besides
->> asking to repeat bisection?
-> 
-> Not much apart from updating regzbot state (e.g. something like "regzbot
-> introduced v6.3..v6.4") and a reply to your initial report (ideally with
-> a quick apology) to let everyone know it was a false alarm.
-> 
-
-OK.
-
+Reviewed-by: Florian Fainelli <florian.fainelli@broadcom.com>
 -- 
-An old man doll... just what I always wanted! - Clara
-
+Florian
 
