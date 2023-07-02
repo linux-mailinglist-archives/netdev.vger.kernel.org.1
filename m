@@ -1,41 +1,41 @@
-Return-Path: <netdev+bounces-15004-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15005-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 40723744EAF
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 18:55:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B3DDB744EBD
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 19:24:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D0ED51C20839
-	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 16:55:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7BCE31C2083F
+	for <lists+netdev@lfdr.de>; Sun,  2 Jul 2023 17:24:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 87A9328FC;
-	Sun,  2 Jul 2023 16:55:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C1303C20;
+	Sun,  2 Jul 2023 17:24:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7B355210B
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 16:55:46 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.15.3])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7C258F;
-	Sun,  2 Jul 2023 09:55:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5037F210B
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 17:24:45 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.4])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C8C2CDC;
+	Sun,  2 Jul 2023 10:24:43 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=s29768273; t=1688316915; x=1688921715; i=markus.elfring@web.de;
- bh=flCzFl53mqj6HfIawDN80wtxO3NXIioPCQrUVTp1EYI=;
+ s=s29768273; t=1688318654; x=1688923454; i=markus.elfring@web.de;
+ bh=3VZC/lv0zKGCoTmPiEW1r77DIODGvRNRvTVWKJx55CM=;
  h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
- b=JsHzxxFVaF3cqTVwPVbTOlE1oh8GZORb2Dm9tRDL0/IfimGupkrUrtMPsN3uoM0QSi0u8T3
- ynl7BDA4nZ+3z9AcHVdOqV2ycgoITgNl3AQ4kYTrcRkaG7//mRtUnv+4TQ0Vx/03YjMaghGc5
- Odp6WMCIaakJ65cT7WoHKUBNRSiIxraDkXptrAEqX0rB8ziWGTyBaabQ/fOJznH80DInm9MVK
- gBEHO46+tmx7Fti4307bECGv8+Tq1zGB01lKhsRMFHHCo4qYSYwNDbWymlEx1Wi70y+twV17l
- V71OtLcjKaqhcmxUwL4giQh6Pb14+hvi6zKyTB982pu6Nwg2Vq8Q==
+ b=lcWhT4Oo8i8VAyJnHr1GoBD9s9cdFBcv/FnEwYKhHtsgSyH1vtanSDwJy76GOFgkdnjFcKK
+ B4yetPnH/VyUm6G1tuNDVIogD2Opq/QbrhG/rBU++ZgK2TM/qn1rAHkzGEiPexl9HvkDPe8qS
+ 3bdxXkRlv+NklNT2o/p51DKqNRPmiCS77f8dCv6ItMZZ6FHBhMEuh45yd/kxxgB1cCI/RmF+I
+ 3qLGHZ9DVbqFOSPtwaajVWOzyzZ1UJnwXYXbwkyfw1BgN44B+T3QIB+jdwOFeQHckZPRKnr5j
+ 34va/DjCRFhYaXMKBvcE27WKcdspOoVkemsmjTRwJobOD5PFWkfQ==
 X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
 Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb006
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MD5jp-1q6tX82n5t-009FDB; Sun, 02
- Jul 2023 18:55:15 +0200
-Message-ID: <36b57ea5-baff-f964-3088-e1b186532cfe@web.de>
-Date: Sun, 2 Jul 2023 18:55:13 +0200
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MElVH-1qE2ib2zYR-00GMvE; Sun, 02
+ Jul 2023 19:24:14 +0200
+Message-ID: <e1ff4ee2-01a6-8ed6-325e-1aa2d289faf6@web.de>
+Date: Sun, 2 Jul 2023 19:24:12 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -58,33 +58,33 @@ To: Florian Kauer <florian.kauer@linutronix.de>,
  Tony Nguyen <anthony.l.nguyen@intel.com>,
  Vinicius Costa Gomes <vinicius.gomes@intel.com>
 Cc: LKML <linux-kernel@vger.kernel.org>
-References: <20230619100858.116286-2-florian.kauer@linutronix.de>
-Subject: Re: [PATCH net v2 1/6] igc: Rename qbv_enable to
- taprio_offload_enable
+References: <20230619100858.116286-7-florian.kauer@linutronix.de>
+Subject: Re: [PATCH net v2 6/6] igc: Fix inserting of empty frame for
+ launchtime
 Content-Language: en-GB
 From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20230619100858.116286-2-florian.kauer@linutronix.de>
+In-Reply-To: <20230619100858.116286-7-florian.kauer@linutronix.de>
 Content-Type: text/plain; charset=UTF-8
 Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:auUCEvWT9WvifEoSMz9upWpehnvmnhoa6/XeYqOPnfX1djLeSSf
- Nh7dH5eT9Ja6LCI17HDSUI5+B4nmOnkVlAT0pYVjQXoxPsGvB+62BmSgAo2Klnzx+fIlN5j
- 0q60j4Q5A/EK8yUat5A9HsdONfeaBXvy52E82NoXqoyWiWsku4JUDFfJLlBcIme0ACwyD8f
- aIqIrfIiaim8iQFCVm0CA==
-UI-OutboundReport: notjunk:1;M01:P0:sjw33rJnVBo=;Zg1GKobS4Zg5YuHttsqke7sY9Jz
- 156KPv3ly5kUq3jg6+Md6SWth+Pq7bvOZNA1p4xtV1+ayNDq4d4UsMubBRRqp4d5t3nXC24c9
- 2uqzjQ4D8WtQLEJPRkG8mvX+bTopsth2fjyhRreC0R49esHgMNtmpLFV/BVVJ4X3CfEuQekBq
- IMYSoq6BoyOieMEmfi+hb9OBEd1VPcERQjmKnj1Vv7JKl7tXvzLb4SqV2SSprJy5YOllU/FEC
- 1Qz3V91WN4Diw7hHMPVBSqN6UuNEEcx53kpeZMwpNO90O9oWeztqQO4ISe5RAx7/7zd+d1+gj
- FF1UL3rxa7QHynamjltydWmZfkwCMneZz1z9QpwLRlcUtPBHwc3EzbiYxOuTrRa0PTAvms+LZ
- uKrf+u+wrt82LO8bC1iZPCY8dBSxvmPHW6VJZNBKMoGmHcST983n3KiVi0evjw0UW5Upii75S
- IIsq1jJ129x38DVpVI+4b2ge9fChFLFZABDpQiR1kHPenAtYBIsaC8UW7YRxoLoJFIZbk4Zby
- OqJ5oU+8JwltqhlVAjvHSIu3fSDzBL1pv1t9U7vuLpD3qzyP5zcJzVpJFUOemoO7pQnJw9i84
- Ff0aWroY0BVmJmuf+YaLmkdFxq7RuJ2gl3u6IVhpNW520moF1cNCAzhGMLFPcGhE8IvpFYvBL
- bL7boZbL2PZEMBPSeZpm51NmzevPS5G2njlGVODOPasyYJ1idp1x54HQ7uC30o1b7H6uIK/Gp
- ikuQndxZHY9JrkoJr+7JdxIwxGqe09KF1+G/MiGgsMxx4OYQAhPCsGJbO2JGDbdbg35eH8iuz
- Ov7OGZb8p2PO6nsJtVRqs8zmkpK0aWv3WqcoByYgwudXz6PejN2jVm3RwArMsZACF+H/HJqPH
- jnuiqNYp47yyfCrjHPWHfiTbZ3yUrGACB2sJwp4kwtNod2oVrS9Y9zwHzrky3jAaxi/erURLI
- yOKjeEtV7E2zvMcAKfBPRqpZnKs=
+X-Provags-ID: V03:K1:+SN9Tr9ojAOvi05wXOQTAWeCqM6uOpXlnGUZ+GTDH+jFpDKH23z
+ VpZdfUHiplOjpApxo3G+X7uTJZoNw5xqv81rmipcjYop40m+JR42n89pIF+yComHX48O/li
+ bsA5c2/yKyo50PHiFdiFS0SUMQHvJK/FRo99Wxw9mSJKKe893Kl1AyQXJOCDuKdo6VB64XK
+ TdqaGf47lKk23mfY6msFA==
+UI-OutboundReport: notjunk:1;M01:P0:FLexxRKUzNA=;s6AwRy9e8hIJdm4ItsjxqApm8d3
+ W2HpRqoqO1CrOxTU6KT/M3FjM2UfZ8+ze7NaBxPGKHDiFA/aaRBlosz6WrmSI2aOdNuIPw9Vj
+ dxFHYXD4O+ssCVxrbZeWC8q7gg2/FaIK/bvkeBSAGCXFboMTiYoUsyT5hmK9mi+IkkQFiVA5S
+ B7ewgTAyhLgnH9LH7C+vp08SQp7Xf5YgqTRyPIwNVTa9gPoLXz9IyDtKFWzj1YeWmkx1edmV2
+ 1wHBRvu4OP59Td7qisf7XmCE3rECzCzc5XjBIIzuaYx2v6IEtoV1vzzShvc8CyLDr3jjxSMEU
+ eivUb52p+EaNj/QLcXHpcW+I/iqNphUlm9F9/cZzGF1oDaNKY/A1finasosA75aEl3GRnon6S
+ DCRYLg0kI+UDrEE9p+MEPGGOsaxBgLTa6J6u+j1kNQkEl4iEcon0oF5LRp6zmTNiCgiZUes63
+ wmnvgUbGO6rz3/OFvpITEPRUIlCM060JwqqSkgdk7yKSYVL2KXXT+rfhBvBpvptjafW1iLWhw
+ HeiMq+IzOu8+FHkXcN36DJSgTpzIry2umkZaLB3asb2DGS3mMuDb5t3sJdDkTgjsDn9GeyuSc
+ dKfA83lxoZgNz0VYqpGpv1n7NCznQNRbHYLQ8cfa5d80b/Un9NFKz84Z6UmgAFn6j6nBR5Nyq
+ RLPoxnOqJUoxIeotAXDiYFO5NIpTO+C3aU97wEMI2KH9Hp+usQNYgL9abCRh+IVGSPHDR0qHj
+ 1izcF+4qSawoE8Z+PJf9+78T33rfHdPdidTFuQDe2jkAAhnX9BRDIW4lzpuJ0fVgD4Y3zpiVi
+ ZnOwrlIaoKZBeH6cuan3tdV1xOg5spdRh83SAH/JD30nT1OHSnrDxSICa/KcbozqWViDQD8IB
+ IPFMgAma2lPaPnvTPtQ5ipqxPIRe4xRn+tVJie4XFmOSaXsPqNqKABq/lV+1LLSx/92LQz5BN
+ cNgMmg==
 X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
 	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
@@ -93,23 +93,14 @@ X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The rename should reduce this confusion.
+=E2=80=A6
+> This patch does not only avoid an unnecessary insertion, =E2=80=A6
 
-Would the wording =E2=80=9CReduce this confusion by renaming a variable at=
- three places=E2=80=9D
-be more appropriate for a subsequent change description?
+Would another imperative change suggestion become more desirable here?
 
 See also:
 https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
 cumentation/process/submitting-patches.rst?h=3Dv6.4#n94
-
-
->                                          Since it is a pure
-> rename, it has no impact on functionality.
->
-> Fixes: e17090eb2494 ("igc: allow BaseTime 0 enrollment for Qbv")
-
-How does such information fit together?
 
 Regards,
 Markus
