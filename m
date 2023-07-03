@@ -1,118 +1,170 @@
-Return-Path: <netdev+bounces-15080-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15081-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7013F745884
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 11:36:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CFF1745888
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 11:37:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 129C7280C6D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:36:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03A86280BE9
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:37:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 48AB82119;
-	Mon,  3 Jul 2023 09:36:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BB7A72119;
+	Mon,  3 Jul 2023 09:37:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3C64720F7
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 09:36:53 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C266D91
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 02:36:52 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-57059f90cc5so49588007b3.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 02:36:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A63F33FDF
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 09:37:07 +0000 (UTC)
+Received: from mail-lj1-x235.google.com (mail-lj1-x235.google.com [IPv6:2a00:1450:4864:20::235])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3ED7C91;
+	Mon,  3 Jul 2023 02:37:06 -0700 (PDT)
+Received: by mail-lj1-x235.google.com with SMTP id 38308e7fff4ca-2b6a152a933so63844031fa.1;
+        Mon, 03 Jul 2023 02:37:06 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688377011; x=1690969011;
-        h=content-transfer-encoding:cc:to:from:subject:references
-         :mime-version:message-id:in-reply-to:date:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1688377024; x=1690969024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=F0eZiFXW9Ju4K3xie6ZNb6cOckxZbLpuUBrtke5dHQM=;
-        b=oU/VLi2mewFAa38gcuCP9A6LzivNVNDH6YOFHLmcsvqB3MbO+n3EFO26iOpboHEnfv
-         goOkSsUHMhGGkO6C6Qt7naxU0qQo4Je2DcOtHQgdsUVu9Q3oSkuymfyTvLcJDThjjhBi
-         gYfH6R7FK0uHgIWZbjgKIsyz2cBLmIbOlBaHzQmlWLxg1xzIhTXgMSwW8spVqAQShbMo
-         hPW7M8NR9T3q84plJUu0ceDjyxX1v4GulxTLUbOn2ljDv4Y+oIqKLw14NA2U2EdO2B2c
-         SVAod3k5F/sHhR7HhBYyfhG9B0IeyaZKf+zoIzYI4jaFffzEJJabO6m8ZlE4znWyRTeD
-         ADkA==
+        bh=IRKx7iLrXB3ROQpIdqwxxhbgMJLBow+B6szAcdx+g8A=;
+        b=nhfQmJzn+VpcTHIpPBE7RABFB9J2PRzyzxmbkai6nHDbcEQPUvQH+0E2KoAnUG/WNU
+         8zYDkOkx8LTEdDgOeITVI/luL/RCOLSf3BMcVR9ILoNoP0NOkFKlXzJPPlByW8tMw4jU
+         EctJg+pEfLxaPwKnVKDY6fmOVZ21aBLpGQJ3P9n3sxquKf2KaMoeUbtxrMyque2i86Ra
+         tKxiV5TU+g7P3fK81uL4wRxLCD00PoUEEhnQIDGZrN7sua/Ie5IWc/Xh8uwjXDCniliQ
+         B1JKW3IKc49g+iap1lfW46t8ceW9jHzJlE4ICDjm5V9KKv6ycI102MAxNKRgY3tr0yg/
+         F0vQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688377011; x=1690969011;
-        h=content-transfer-encoding:cc:to:from:subject:references
-         :mime-version:message-id:in-reply-to:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=F0eZiFXW9Ju4K3xie6ZNb6cOckxZbLpuUBrtke5dHQM=;
-        b=mCJpHiZJc7y0ylNEHET9b0dzLzJnoZJHd8rJCbhXokN1FlvYdkUf8MtN2jzzoKn/3S
-         G7F2PVwJqt5EuZkYqu6lSut4yp17UwyLGJdIc19/jXFT+PPX3p3JGuz8pl8IY+YsP6xP
-         03omtHx+fteZB13V/lSAkY1u04nNfuvEb2ccNUSqRsyU7yJI/ZlCZibXiMbiOxNU47U3
-         ZEWjEGJOp2v1HlBX5YCZkk1OnkTXsaZ2zSWzD6WNBkRDXDCttivaVQgIdIbB1L7LmvU1
-         k7FkGD1j7gnbEqiOHHOYLKt8bP0UNPe1RuMC2fkaYc6FLU99o8S0s+PCUtWlhPJHPGnH
-         VzYw==
-X-Gm-Message-State: ABy/qLbdSzn+jzz/wiszjx73RBv7pfjgVl2s22vzKYVzbUMpqcxMojYH
-	8x5uf1C3A+BixfcuDHVkjC2hYzgmLyQ=
-X-Google-Smtp-Source: APBJJlF3XLqBeCJ5bRpU5duO0tUjw5cT8D4q0XoqKg5aXVoxD4B+UKNJx4piXDt7kM3ItR+2EAPuk9Huq4M=
-X-Received: from sport.zrh.corp.google.com ([2a00:79e0:9d:4:7808:ed7:57d0:c891])
- (user=gnoack job=sendgmr) by 2002:a81:b283:0:b0:577:3b0c:5b85 with SMTP id
- q125-20020a81b283000000b005773b0c5b85mr65333ywh.0.1688377011727; Mon, 03 Jul
- 2023 02:36:51 -0700 (PDT)
-Date: Mon, 3 Jul 2023 11:36:48 +0200
-In-Reply-To: <338bba9d-6afa-7c6b-2843-b116abb36859@huawei.com>
-Message-Id: <ZKKWoS+clQGLF4O4@google.com>
+        d=1e100.net; s=20221208; t=1688377024; x=1690969024;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=IRKx7iLrXB3ROQpIdqwxxhbgMJLBow+B6szAcdx+g8A=;
+        b=gYq5zcbp9YizpiGvlxn7Ks4FaqSphbrsX9RuNfoc/h2nEKikVZICFnc4obCcuodGxJ
+         ZaMCWb7CGqh245/Nh2gtgJqyDFsAobs07isIMFD8b3vn/ozgFTqIhWiFDwEgNhAfQHbZ
+         6k8e0OGN5W3S1sK0MRCHy0ayOcRK7K5yp+irWCGXkjnWuwZE5adnroK13+ryRzaTP/3i
+         Y0RjOJLPdK5sceOjbMQQyAuT9wc6uvGIi95pFObDX0brHQAWixcZIljYbsxsDrO+Fm6B
+         /4WZ3Y/wIZHenNHPBxYAzEZ+KFvGvzBWYac1mQbfXwmi3EBNKl1JrLJqXQitBvyLgIcT
+         loFA==
+X-Gm-Message-State: ABy/qLYBR/5pDEUAeY/PzRAOpYikDiX8HSGse1ao1J6eLoMKo0ISbaYT
+	2PjFZJdtzQDi/Hvhe0eoZb21Rr7gXhnccjgDN5A=
+X-Google-Smtp-Source: APBJJlGBgSgcfhj7O/Y4ie3sWmhpWIBgyJ71LVuywlAfzsbvrN4chAdYJgn6KIV67Wy162olLTkv3OWO1FW0hPCmfpE=
+X-Received: by 2002:a2e:9f4e:0:b0:2b6:e618:b5a0 with SMTP id
+ v14-20020a2e9f4e000000b002b6e618b5a0mr2058295ljk.6.1688377024117; Mon, 03 Jul
+ 2023 02:37:04 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
- <20230701.acb4d98c59a0@gnoack.org> <4a733dbd-f6e2-dc69-6c8d-47c362644462@digikod.net>
- <338bba9d-6afa-7c6b-2843-b116abb36859@huawei.com>
-Subject: Re: [PATCH v11 10/12] selftests/landlock: Add 11 new test suites
- dedicated to network
-From: "=?iso-8859-1?Q?G=FCnther?= Noack" <gnoack@google.com>
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-Cc: "=?iso-8859-1?Q?Micka=EBl_Sala=FCn?=" <mic@digikod.net>, 
-	"=?iso-8859-1?Q?G=FCnther?= Noack" <gnoack3000@gmail.com>, willemdebruijn.kernel@gmail.com, 
-	linux-security-module@vger.kernel.org, netdev@vger.kernel.org, 
-	netfilter-devel@vger.kernel.org, yusongping@huawei.com, 
-	artem.kuzin@huawei.com
-Content-Type: text/plain; charset="utf-8"
+MIME-Version: 1.0
+References: <CA+G9fYuifLivwhCh33kedtpU=6zUpTQ_uSkESyzdRKYp8WbTFQ@mail.gmail.com>
+ <ZJLzsWsIPD57pDgc@FVFF77S0Q05N> <ZJQXdFxoBNUdutYx@FVFF77S0Q05N>
+ <CA+G9fYtAutjL3KpZsQyJuk4WqS=Ydi2iyVb5jdecZ-SOuzKCmA@mail.gmail.com> <CANk7y0h+oXNhUzTFQ_Wy-iySRdBi0ezu1Y_hOBtAxmK5AG4dgA@mail.gmail.com>
+In-Reply-To: <CANk7y0h+oXNhUzTFQ_Wy-iySRdBi0ezu1Y_hOBtAxmK5AG4dgA@mail.gmail.com>
+From: Puranjay Mohan <puranjay12@gmail.com>
+Date: Mon, 3 Jul 2023 11:36:53 +0200
+Message-ID: <CANk7y0gi4o+4U6c9QmnDCJDRXNM_98or_4tO-dHOEwZ4fj3gkw@mail.gmail.com>
+Subject: Re: next: Rpi4: Unexpected kernel BRK exception at EL1
+To: Naresh Kamboju <naresh.kamboju@linaro.org>
+Cc: Mark Rutland <mark.rutland@arm.com>, Linux ARM <linux-arm-kernel@lists.infradead.org>, 
+	open list <linux-kernel@vger.kernel.org>, linux-rpi-kernel@lists.infradead.org, 
+	Netdev <netdev@vger.kernel.org>, lkft-triage@lists.linaro.org, 
+	Arnd Bergmann <arnd@arndb.de>, Dan Carpenter <dan.carpenter@linaro.org>, 
+	Linus Walleij <linus.walleij@linaro.org>, Catalin Marinas <catalin.marinas@arm.com>, 
+	Will Deacon <will@kernel.org>, Anshuman Khandual <anshuman.khandual@arm.com>, Song Liu <song@kernel.org>, 
+	Alexei Starovoitov <ast@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 03, 2023 at 11:37:13AM +0300, Konstantin Meskhidze (A) wrote:
-> 7/2/2023 11:45 AM, Micka=C3=ABl Sala=C3=BCn =D0=BF=D0=B8=D1=88=D0=B5=D1=
-=82:
-> > Initially Konstantin wrote tests with TEST_F_FORK() but I asked him to
-> > only use TEST_F() because TEST_F_FORK() is only useful when a
-> > FIXTURE_TEARDOWN() needs access rights that were dropped with a
-> > TEST_F(), e.g. to unmount mount points set up with a FIXTURE_SETUP()
-> > while Landlock restricted a test process.
-> >=20
-> > Indeed, TEST_F() already fork() to make sure there is no side effect
-> > with tests.
-> >=20
->=20
->  Hi, G=C3=BCnther
->  Yep. Micka=D1=91l asked me to replace TEST_F_FORK() with TEST_F(). Pleas=
-e check
-> this thread
->=20
-> https://lore.kernel.org/netdev/33c1f049-12e4-f06d-54c9-b54eec779e6f@digik=
-od.net/
-> T
+Hi Naresh,
 
-Ah thanks, this makes a lot of sense!
-I had not realized that TEST_F would also fork a child process,
-I should have double checked the selftest implementation.
+On Mon, Jun 26, 2023 at 11:04=E2=80=AFAM Puranjay Mohan <puranjay12@gmail.c=
+om> wrote:
+>
+> Hi Naresh,
+>
+> On Thu, Jun 22, 2023 at 2:35=E2=80=AFPM Naresh Kamboju
+> <naresh.kamboju@linaro.org> wrote:
+> >
+> > Hi Mark,
+> >
+> > On Thu, 22 Jun 2023 at 15:12, Mark Rutland <mark.rutland@arm.com> wrote=
+:
+> > >
+> > > On Wed, Jun 21, 2023 at 01:57:21PM +0100, Mark Rutland wrote:
+> > > > On Wed, Jun 21, 2023 at 06:06:51PM +0530, Naresh Kamboju wrote:
+> > > > > Following boot warnings and crashes noticed on arm64 Rpi4 device =
+running
+> > > > > Linux next-20230621 kernel.
+> > > > >
+> > > > > Reported-by: Linux Kernel Functional Testing <lkft@linaro.org>
+> > > > >
+> > > > > boot log:
+> > > > >
+> > > > > [   22.331748] Kernel text patching generated an invalid instruct=
+ion
+> > > > > at 0xffff8000835d6580!
+> > > > > [   22.340579] Unexpected kernel BRK exception at EL1
+> > > > > [   22.346141] Internal error: BRK handler: 00000000f2000100 [#1]=
+ PREEMPT SMP
+> > > >
+> > > > This indicates execution of AARCH64_BREAK_FAULT.
+> > > >
+> > > > That could be from dodgy arguments to aarch64_insn_gen_*(), or else=
+where, and
+> > > > given this is in the networking code I suspect this'll be related t=
+o BPF.
+> > > >
+> > > > Looking at next-20230621 I see commit:
+> > > >
+> > > >   49703aa2adfaff28 ("bpf, arm64: use bpf_jit_binary_pack_alloc")
+> > > >
+> > > > ... which changed the way BPF allocates memory, and has code that p=
+ads memory
+> > > > with a bunch of AARCH64_BREAK_FAULT, so it looks like that *might* =
+be related.
+> > >
+> > > For the benefit of those just looknig at this thread, there has been =
+some
+> > > discussion in the original thread for this commit. Summary and links =
+below.
+> > >
+> > > We identified a potential issue with missing cache maintenance:
+> > >
+> > >   https://lore.kernel.org/linux-arm-kernel/ZJMXqTffB22LSOkd@FVFF77S0Q=
+05N/
+> > >
+> > > Puranjay verified that was causing the problem seen here:
+> > >
+> > >   https://lore.kernel.org/linux-arm-kernel/CANk7y0h5ucxmMz4K8sGx7qogF=
+yx6PRxYxmFtwTRO7=3D0Y=3DB4ugw@mail.gmail.com/
+> > >
+> > > Alexei has dropped this commit for now:
+> > >
+> > >   https://lore.kernel.org/linux-arm-kernel/CAADnVQJqDOMABEx8JuU6r_Deh=
+yf=3DSkDfRNChx1oNfqPoo7pSrw@mail.gmail.com/
+> >
+> > Thanks for the detailed information.
+> > I am happy to test any proposed fix patches.
+>
+> I have sent the v4 of the patch series:
+> https://lore.kernel.org/bpf/20230626085811.3192402-1-puranjay12@gmail.com=
+/T/#t
+> This works on my raspberry pi 4 setup. If possible can you test this
+> on the similar setup where it was failing earlier?
 
-=E2=80=94G=C3=BCnther
+I think my previous email was missed.
+Can you test the V4 series in the same setup?
+This is still not applied to the bpf-next tree.
 
---=20
-Sent using Mutt =F0=9F=90=95 Woof Woof
+Thanks,
+Puranjay.
 
