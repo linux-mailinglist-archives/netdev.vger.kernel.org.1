@@ -1,218 +1,163 @@
-Return-Path: <netdev+bounces-15136-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15137-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2AE89745DCA
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 15:52:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9AA3F745E02
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 15:57:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BDAF1C2098B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 13:52:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F15EA280C41
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 13:57:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA63FF9E3;
-	Mon,  3 Jul 2023 13:52:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AEEFF9E8;
+	Mon,  3 Jul 2023 13:57:32 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DCFF9DA
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 13:52:03 +0000 (UTC)
-Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE20114;
-	Mon,  3 Jul 2023 06:52:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688392322; x=1719928322;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=fFuZoS7HGG+aS4Yboi793g9kSdDcevtA4isGOwdO7bM=;
-  b=RzVx73j5b3OVZYJLjaSJnxxfh4qn3dJ2+EPswJN4QTAez87oueiOzU2f
-   oNMrBQKU5kXOi7YDyYqXqSX6ieykDnMiAteQMmmlNpqJXLStG1802WjrQ
-   ItE/YZQtlchYX6VPjecV/XvFLhbzDgBwO9y7r1h9kUEVvyzHhF6KLGSaU
-   dCAEL81P4tPWphR3tM1v2L3mo9PDDu8ycm3dpWxJ71YYeegii6X8eK68R
-   fvqV49A8BF0ItKvJab2RcESfAKbgudCE90DZS1oxx+aDsw2vsgE15kF7i
-   BUVAC/H5OxU5WalvvEUyWtbRxr0j3qPoxAwJox63LZ5ZNdqWn0pXlqdzH
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="352712470"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="352712470"
-Received: from orsmga004.jf.intel.com ([10.7.209.38])
-  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 06:52:01 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="842675392"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="842675392"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by orsmga004.jf.intel.com with ESMTP; 03 Jul 2023 06:52:00 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 3 Jul 2023 06:52:00 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 3 Jul 2023 06:52:00 -0700
-Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 3 Jul 2023 06:52:00 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=J2JzTLRb0MF/y0lTNnu165W6K7vMiZ2fMBpweUKCkSBgFS8G4GtxsvIM+tGBNgoI+nzzT4AvRXlO5glnyIzQ/TyV1Qej606Kzv4y2pe4tbXcSOCnJbvyXjJlBmpATnxfZB3usltqtEp7RVVNbmW/zjAGjjeFrSXoBCYjqF6xPMmqBIuWOyV2NfRpgZXloccVLPbK57dqjnCRkdoUueUZJB4EY7KVkt54zhEnB2TUxreQi6M+lil09HjkMvLVzDv9IYKco6tUaEYEVxoqtCFEBGcLEVJv74QQg7lEJk5N9Hs48p8Dq7f7n3mTrnwrE3p0+wK2qROnAQTqdu0A1zq7Cg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Tya9jzJIgoHhtbT07L5Kz5OkqsHm3JGyqN0wWpYj6i0=;
- b=YuADu4irCajCG/uDZ/dDmncErf6v5pohca/0vqCG68/qTAQDlnS43zcjUT17ZqoCgr/Yw95SmR41My3iMa8MZoznf21taXQwmwlyNdrboZ/edKc5Aj3y4fIMHdMI4CJTzUAzMuF+P75mLkIbqewSft97Mf57NG7aNqhXKwXjyg4p/IlPhb8pEii3/Lm3mFP0tD8Xa0CmLnTo/o8W5D+nz+ZPyEeyj3jzCA2Ioi2TMHsZ4lE3DQXz3nLW+5InR0O0V6Yr1ohSsl/EcN8wkD2dS2mFiEtUA+M8+APv+xc9XmoEBvhzTsnBAzy5JRmeRxIECs7hlWIUa5865iNpMdJmfA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by SA1PR11MB7698.namprd11.prod.outlook.com (2603:10b6:806:332::15) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Mon, 3 Jul
- 2023 13:51:58 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::82b6:7b9d:96ce:9325]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::82b6:7b9d:96ce:9325%7]) with mapi id 15.20.6544.024; Mon, 3 Jul 2023
- 13:51:58 +0000
-Message-ID: <72658bca-c2b2-b3cb-64a0-35540b247a11@intel.com>
-Date: Mon, 3 Jul 2023 15:50:55 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH RFC net-next 0/4] net: page_pool: a couple assorted
- optimizations
-Content-Language: en-US
-To: Jakub Kicinski <kuba@kernel.org>
-CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
-	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
-	<maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
-	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
-	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
- Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
- <20230701170155.6f72e4b8@kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20230701170155.6f72e4b8@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0083.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:9b::7) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2CFBEDDC5
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 13:57:31 +0000 (UTC)
+Received: from smtp-out2.suse.de (smtp-out2.suse.de [IPv6:2001:67c:2178:6::1d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B69EFE52
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 06:57:30 -0700 (PDT)
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by smtp-out2.suse.de (Postfix) with ESMTPS id 720521FE8C;
+	Mon,  3 Jul 2023 13:57:29 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.de; s=susede2_rsa;
+	t=1688392649; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p/Tt9Elti8dh7KReBG2dWJCnACGgY/MFt4BEh7pqFN8=;
+	b=FvRbftZUhPNOdiJ4/B1A02p2nJrJoKszbLx2jEs1U+WWBgvMUArJJMZ/yotasU8cGg1hfc
+	RBTsGCtLJu6OUT5PqV0kIiqiWcI7uYiPc7B+Y7lqboKX04Vxcr+LA/HMvRzEnw1QYS1ITW
+	HdJjn2yiZA8Sr9PW7iiYmyM4lfAXINI=
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.de;
+	s=susede2_ed25519; t=1688392649;
+	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
+	 mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=p/Tt9Elti8dh7KReBG2dWJCnACGgY/MFt4BEh7pqFN8=;
+	b=V9PnarmzXmCa+iDukSlMLZz4uXpS/wlF1lR9moGQ/hKj8FbVqIzkn0jqu8jHwGVMYsepFr
+	g1eRD1n+3cRtudDA==
+Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
+	(No client certificate requested)
+	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 53E4113276;
+	Mon,  3 Jul 2023 13:57:29 +0000 (UTC)
+Received: from dovecot-director2.suse.de ([192.168.254.65])
+	by imap2.suse-dmz.suse.de with ESMTPSA
+	id 71UEFMnTomS1LAAAMHmgww
+	(envelope-from <hare@suse.de>); Mon, 03 Jul 2023 13:57:29 +0000
+Message-ID: <0ceb62b7-c310-cc4a-6b90-651e6b0c09ae@suse.de>
+Date: Mon, 3 Jul 2023 15:57:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SA1PR11MB7698:EE_
-X-MS-Office365-Filtering-Correlation-Id: 47a2d7f8-b056-4054-e15b-08db7bccaada
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: W8SYkG5xIf0XWB0n+GBl3nE0NQu3JDGyIdrlwjO6qHhc2ikh/FifZcGuNhv0jlh/3ocnI1+cEDv+1UmC/Dsn+6qxNBPVCiLdIe0CUO714EWR+O+rsf1uXWY8avza/uTynL0n7SNwD4ls7NdO+VZrpx/7vTencFYmEiBIbJlG4mStxrDM1fpi70iiO11H64XQ98L8Zfm7ZRBbGCwmF9J4b5+jqIedd6iMxdHUBPIFNgu/QeZJ7Iz9TyxLPd0AU2Ez8xYAk9eVmTbX5BHYpe62ADNpoDBVMKvvzpLx2tr/0WHxBViLADj+Y2TSsvFKH063vY3Q6zEHVfxM0twOm6XA4cBvb76dBErlAPy7F+rdkITULoKNb5s/FozD4c57LmV9PPzkYr6Dmk4wj/TCEl2WIgvsT+EaGQNQC9MbTBxzRrjgp65nPTdFfiJ647Jkezvujk8FyqHFK4bdCc/Z4ZaNhiqDuMNz1dURCSbi/n8N5yVnPJrbNYurKYxmjDhOacfXwrnetJzAiNvrVV9NjfL/n7OEk+xmfof8Rle+ppCwXsWvJZaLekfqDH9yjW+/mb5v63TSMwxZAicb2/DKWpvrTUDUCc4CqCx6Th0X4uPv08tn0fEhH+NvDVd+Xbdmt+9M24GnVK2toqja8lfrbuIe/Q==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(396003)(366004)(346002)(39850400004)(451199021)(8936002)(8676002)(54906003)(478600001)(26005)(6666004)(41300700001)(36756003)(6486002)(2906002)(31696002)(7416002)(5660300002)(31686004)(86362001)(316002)(6512007)(66556008)(66476007)(4326008)(38100700002)(6916009)(66946007)(6506007)(82960400001)(2616005)(186003)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R2w5S1A4M0FBbVJvK3g2WThtUG5qRU5tdkR0TnFYbDlFREJUcmcrNDJtSkxN?=
- =?utf-8?B?QVEzaXFmOGtCcXh1QzJQMmNEbUJHMk5DN0N0ZFoyZ1hjOW9PTXBqajg2NEIr?=
- =?utf-8?B?a2VXd2pMMTJDMnQyMGFqUE9sdStWWUdwOVZoa0RVK1ZDK0NkVVFzeXd4TFVh?=
- =?utf-8?B?dC9kbFBOb0V5aFpaMk41MXNSQ1N4enNxYnJWSU03NExML3BpWVVHcWI0bnl4?=
- =?utf-8?B?NVNYb0tEbjBVVlA0aEhFNWZvcnliNEgxVEl6bStab0F5SHovRUZzOHg1N2xY?=
- =?utf-8?B?djVGTnFrcVlhME1TVEFBMGJJc1hub0tUM3lNZHFhZjZnSFY4NlJuKzdDdmty?=
- =?utf-8?B?RS9ENCs3TUttZFBSOHlqTFhUd2hZZEtwNHNqNGVMOWg2TGhxNG56U3Y5MVlm?=
- =?utf-8?B?dmtLeERyTEJaZ2g5OWJzZnd1OENiVCtsN0daM2k1TXVBNW1BVFZzRWlYbnNQ?=
- =?utf-8?B?emNPZmF1Mk55UXQycVNKZVpjSG1BeSt0clAzNFRVM3dHRGxpZzdSWnVBdElU?=
- =?utf-8?B?UnE2ckVicWtFVUdxTk9UTUlpNk5NRTVyeW9xVDZvZm9zSGk4dlRVNjhnSUZY?=
- =?utf-8?B?QXZLVURJSm1PVVFIbkdNdW5IUEVNYXdUY21WNWFuUzRQV2wwRFpvQlo4YThi?=
- =?utf-8?B?SzR1QkVHRjVCOUZMaHJycXIrWUxVTDhPWXNSanFabHNtd2V2bGRRWXVkNzgz?=
- =?utf-8?B?a2tiVHE2Z2NYdU80dXhRUTVpTGxOclZZc3RwYkg0eFpYME1NQmQyam5xQWpj?=
- =?utf-8?B?bjlCQ2lwNUNLdC9vMGFMcXFkTXcraGUzTWt6aUFub3UzcW96ZHkvZUFDZ1NH?=
- =?utf-8?B?V0xTL3ZjQjBTSHlodm5UNzNsS3RQUU1uS1hWK1VwZzdHbk0yemYzOFc3djd0?=
- =?utf-8?B?U09MejMyR1N3R3dXRVNOK1JHN2w2NExVQzN1VUFpbnVBeldtTE9pdTdYajJH?=
- =?utf-8?B?dHBtVzRHTFhXNU91Zm53N0FJL1JyVjQxQUkxZXJmT1BSVElQWVFycWlySnU5?=
- =?utf-8?B?UVhXdlU2NVg0L1RiZnZMay9xWkZNU1pKTlR1UFcvd3EveHJPNFh3S3hucjF3?=
- =?utf-8?B?QmYybTJUeU9RdWNGb3BadXhQa205SnoyakhkM3FUSHlteTdCdWNOMnA0aXg5?=
- =?utf-8?B?SjdSMGFMOW9CT1RHTzlJUkRMZ0d6RjcxZWxjdHZzektBaXh3ckEyaVppWHE0?=
- =?utf-8?B?RkE3Y05XMEJsd3ZaZ0Q3Si9pa2NUNlkxV1BPQUhQQjNXSERBQzEzb2Vlb1JQ?=
- =?utf-8?B?SHBHcDFVRmdndGJjVndCWGowOVNRRkFiQXo1UnhCRDNHS3NQdVVtVlIrVDRX?=
- =?utf-8?B?NmlKcDFlVXZhb082elJFYXhmZWFUUnZ5MkM3RlI5ZzRRbG9tVUFpRjBmMko4?=
- =?utf-8?B?U1dEOXFHb3FIOW9Ob2o4M3lPc0g1NDJlenBRTkgyMWZCTlpiaTh3UXkyT2xE?=
- =?utf-8?B?TUY0bnNOSlYvcVlKSVNmcnp6cksvTFgzQm9Mc1JjbmZPbUJFK2dsbWhLeVJN?=
- =?utf-8?B?WFdDZ0RUUndYajFXRXhwdC9la2xkMSsycStGbzNqRmY1T2UzUlFqdHpKbmlv?=
- =?utf-8?B?NlpVSTVKVWxUN0xzRnFSUHdQeWVBTkhISHh4R1ZsYmxpM2FVLzY3SHcxNUgv?=
- =?utf-8?B?VzVYSEcwdFlTUm41cDgyMExXWWJpNUM3cGlqb1lqZFBuU3lvRHJTWWpZY0cz?=
- =?utf-8?B?cGRwZmZvdjE0K094Qk1jbWRMVmNVUWlwQXpTRlczcmp6RG5PNGkvM3NlaGhW?=
- =?utf-8?B?VGFrbVVUS3I3cHdiZmZod3psd3l0WFdtMS9CWFhWNVI1YkVNZ2YzWmVVZ0I4?=
- =?utf-8?B?SFNFbzZadmNoQkN3N25zTFVNODZOUG16TDU2Qmh4ZFBFSlhPL1pvdDZmU3Nt?=
- =?utf-8?B?YTZRSkRvdDZLaUFDUDg2UHhWaDhWVkJEQjFhcVpjSTFwSlIrcHRDK2xqdm1h?=
- =?utf-8?B?OHVBMjNOSjd5aDRDdWoyR3cxNHFTcXhibnR6SVlxYjFKUzRycVhMMkNQc1B6?=
- =?utf-8?B?b0RsaUVxUlFEcjhvQ1p4aE85VmFEbzFnK3Fzc2FOYUo2K0VVS3FNa0VBM0VB?=
- =?utf-8?B?UDNjNE5kRWVvd2JoWU4rU3JickRXb0pKcVRNeElJbnF0T0xkb1RZSHVJUU5G?=
- =?utf-8?B?VndUOUlRNnpvRkZEcUljRk4zeFFnVlIwSWNJbnA3WmFpSzZnNUFkY3BMejR5?=
- =?utf-8?B?RFE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 47a2d7f8-b056-4054-e15b-08db7bccaada
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2023 13:51:57.5564
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OV1KGoyzMlsNZ2K6E44AxFWo6fgt/7gt/jVsdMAMXKYeoCAURe2ZTMfwR4oZltJXplO+gDTqq6+ZFgxSlmvPR0gFxtf52qeRYF2GaVEi098=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7698
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCHv6 0/5] net/tls: fixes for NVMe-over-TLS
+Content-Language: en-US
+To: Sagi Grimberg <sagi@grimberg.me>, David Howells <dhowells@redhat.com>
+Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ linux-nvme@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <03dd8a0d-84b9-c925-9547-99f708e88997@suse.de>
+ <20230703090444.38734-1-hare@suse.de>
+ <8fbfa483-caed-870f-68ed-40855feb601f@grimberg.me>
+ <e1165086-fd99-ff43-4bca-d39dd1e46cf1@suse.de>
+ <bf72459d-c2e0-27d2-ad96-89a010f64408@suse.de>
+ <873545.1688387166@warthog.procyon.org.uk>
+ <12a716d5-d493-bea9-8c16-961291451e3d@grimberg.me>
+ <b33737ab-d923-173c-efcc-9e5c920e6dbf@suse.de>
+ <173e27fe-18bb-6194-2af3-1743bc0f8f61@grimberg.me>
+From: Hannes Reinecke <hare@suse.de>
+In-Reply-To: <173e27fe-18bb-6194-2af3-1743bc0f8f61@grimberg.me>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Jakub Kicinski <kuba@kernel.org>
-Date: Sat, 1 Jul 2023 17:01:55 -0700
-
-> On Thu, 29 Jun 2023 17:23:01 +0200 Alexander Lobakin wrote:
->>  #3: new, prereq to #4. Add NAPI state flag, which would indicate
->>      napi->poll() is running right now, so that napi->list_owner would
->>      point to the CPU where it's being run, not just scheduled;
->>  #4: new. In addition to recycling skb PP pages directly when @napi_safe
->>      is set, check for the flag from #3, which will mean the same if
->>      ->list_owner is pointing to us. This allows to use direct recycling  
->>      anytime we're inside a NAPI polling loop or GRO stuff going right
->>      after it, covering way more cases than is right now.
+On 7/3/23 15:42, Sagi Grimberg wrote:
 > 
-> You know NAPI pretty well so I'm worried I'm missing something.
-
-I wouldn't say I know it well :D
-
-> I don't think the new flag adds any value. NAPI does not have to 
-> be running, you can drop patch 3 and use in_softirq() instead of 
-> the new flag, AFAIU.
-
-That's most likely true for the patch 4 case, but I wanted to add some
-flag for wider usage.
-For example, busy polling relies on whether ->poll() returned whole
-budget to decide whether interrupts were reenabled to avoid possible
-concurrent access, but I wouldn't say it's precise enough.
-napi_complete_done() doesn't always return true.
-OTOH, the new flag or, more precisely, flag + list_owner combo would
-tell for sure.
-
+>>>> Hannes Reinecke <hare@suse.de> wrote:
+>>>>
+>>>>>> 'discover' and 'connect' works, but when I'm trying to transfer data
+>>>>>> (eg by doing a 'mkfs.xfs') the whole thing crashes horribly in
+>>>>>> sock_sendmsg() as it's trying to access invalid pages :-(
+>>>>
+>>>> Can you be more specific about the crash?
+>>>
+>>> Hannes,
+>>>
+>>> See:
+>>> [PATCH net] nvme-tcp: Fix comma-related oops
+>>
+>> Ah, right. That solves _that_ issue.
+>>
+>> But now I'm deadlocking on the tls_rx_reader_lock() (patched as to 
+>> your suggestion). Investigating.
 > 
-> The reason I did not do that is that I wasn't sure if there is no
-> weird (netcons?) case where skb gets freed from an IRQ :(
+> Are you sure it is a deadlock? or maybe you returned EAGAIN and nvme-tcp
+> does not interpret this as a transient status and simply returns from
+> io_work?
+> 
+Unfortunately, yes.
 
-Shouldn't they use dev_kfree_skb_any() or _irq()? Usage of plain
-kfree_skb() is not allowed in the TH :s
+static int tls_rx_reader_acquire(struct sock *sk, struct 
+tls_sw_context_rx *ctx,
+                                  bool nonblock)
+{
+         long timeo;
 
-Anyway, if the flag really makes no sense, I can replace it with
-in_softirq(), it's my hobby to break weird drivers :D
+         timeo = sock_rcvtimeo(sk, nonblock);
 
-Thanks,
-Olek
+         while (unlikely(ctx->reader_present)) {
+                 DEFINE_WAIT_FUNC(wait, woken_wake_function);
+
+                 ctx->reader_contended = 1;
+
+                 add_wait_queue(&ctx->wq, &wait);
+                 sk_wait_event(sk, &timeo,
+                               !READ_ONCE(ctx->reader_present), &wait);
+
+and sk_wait_event() does:
+#define sk_wait_event(__sk, __timeo, __condition, __wait)              \
+         ({      int __rc;                                              \
+                 __sk->sk_wait_pending++;                               \
+                 release_sock(__sk);                                    \
+                 __rc = __condition;                                    \
+                 if (!__rc) {                                           \
+                         *(__timeo) = wait_woken(__wait,                \
+                                                 TASK_INTERRUPTIBLE,    \
+                                                 *(__timeo));           \
+                 }                                                      \
+                 sched_annotate_sleep();                                \
+                 lock_sock(__sk);                                       \
+                 __sk->sk_wait_pending--;                               \
+                 __rc = __condition;                                    \
+                 __rc;                                                  \
+         })
+
+so not calling 'lock_sock()' in tls_tx_reader_acquire() helps only _so_ 
+much, we're still deadlocking.
+
+Cheers,
+
+Hannes
+
 
