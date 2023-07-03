@@ -1,298 +1,218 @@
-Return-Path: <netdev+bounces-15135-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15136-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 169BA745DAF
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 15:47:11 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2AE89745DCA
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 15:52:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C59E0280C21
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 13:47:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0BDAF1C2098B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 13:52:06 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 178ABF9E3;
-	Mon,  3 Jul 2023 13:46:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EA63FF9E3;
+	Mon,  3 Jul 2023 13:52:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0CBB9F9DE
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 13:46:51 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1DFC4B0
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 06:46:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=iplbo/fEUAkJ/XfK3HphxdbFvftEWvNVFS2xUmXUXUg=; b=GAJOr9CAAn/cT15xi4azYlFStV
-	i4qY9J2z1lBEOH0apYpCbH8sjG8iY9sOFXfkzgb6zXihJ2Lzn0h5JaAar/F1FMj59V4GHN9iDbIG9
-	Ce6cgAxE0pA5y54TVOzsggTjpUVZalBv36V61XTaXgzJV9RQhaycetPtnNGE4domZoBE=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qGJt7-000Tuw-3b; Mon, 03 Jul 2023 15:46:45 +0200
-Date: Mon, 3 Jul 2023 15:46:45 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stefan Eichenberger <eichest@gmail.com>
-Cc: netdev@vger.kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, francesco.dolcini@toradex.com
-Subject: Re: [PATCH v1 2/2] net: phy: marvell-88q2xxx: add driver for the
- Marvell 88Q2110 PHY
-Message-ID: <40260add-88a2-48a5-9409-ad16d9281f52@lunn.ch>
-References: <20230703124440.391970-1-eichest@gmail.com>
- <20230703124440.391970-3-eichest@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2DCFF9DA
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 13:52:03 +0000 (UTC)
+Received: from mga02.intel.com (mga02.intel.com [134.134.136.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DBE20114;
+	Mon,  3 Jul 2023 06:52:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688392322; x=1719928322;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=fFuZoS7HGG+aS4Yboi793g9kSdDcevtA4isGOwdO7bM=;
+  b=RzVx73j5b3OVZYJLjaSJnxxfh4qn3dJ2+EPswJN4QTAez87oueiOzU2f
+   oNMrBQKU5kXOi7YDyYqXqSX6ieykDnMiAteQMmmlNpqJXLStG1802WjrQ
+   ItE/YZQtlchYX6VPjecV/XvFLhbzDgBwO9y7r1h9kUEVvyzHhF6KLGSaU
+   dCAEL81P4tPWphR3tM1v2L3mo9PDDu8ycm3dpWxJ71YYeegii6X8eK68R
+   fvqV49A8BF0ItKvJab2RcESfAKbgudCE90DZS1oxx+aDsw2vsgE15kF7i
+   BUVAC/H5OxU5WalvvEUyWtbRxr0j3qPoxAwJox63LZ5ZNdqWn0pXlqdzH
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="352712470"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="352712470"
+Received: from orsmga004.jf.intel.com ([10.7.209.38])
+  by orsmga101.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 06:52:01 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="842675392"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="842675392"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by orsmga004.jf.intel.com with ESMTP; 03 Jul 2023 06:52:00 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 3 Jul 2023 06:52:00 -0700
+Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
+ orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 3 Jul 2023 06:52:00 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.173)
+ by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 3 Jul 2023 06:52:00 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=J2JzTLRb0MF/y0lTNnu165W6K7vMiZ2fMBpweUKCkSBgFS8G4GtxsvIM+tGBNgoI+nzzT4AvRXlO5glnyIzQ/TyV1Qej606Kzv4y2pe4tbXcSOCnJbvyXjJlBmpATnxfZB3usltqtEp7RVVNbmW/zjAGjjeFrSXoBCYjqF6xPMmqBIuWOyV2NfRpgZXloccVLPbK57dqjnCRkdoUueUZJB4EY7KVkt54zhEnB2TUxreQi6M+lil09HjkMvLVzDv9IYKco6tUaEYEVxoqtCFEBGcLEVJv74QQg7lEJk5N9Hs48p8Dq7f7n3mTrnwrE3p0+wK2qROnAQTqdu0A1zq7Cg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Tya9jzJIgoHhtbT07L5Kz5OkqsHm3JGyqN0wWpYj6i0=;
+ b=YuADu4irCajCG/uDZ/dDmncErf6v5pohca/0vqCG68/qTAQDlnS43zcjUT17ZqoCgr/Yw95SmR41My3iMa8MZoznf21taXQwmwlyNdrboZ/edKc5Aj3y4fIMHdMI4CJTzUAzMuF+P75mLkIbqewSft97Mf57NG7aNqhXKwXjyg4p/IlPhb8pEii3/Lm3mFP0tD8Xa0CmLnTo/o8W5D+nz+ZPyEeyj3jzCA2Ioi2TMHsZ4lE3DQXz3nLW+5InR0O0V6Yr1ohSsl/EcN8wkD2dS2mFiEtUA+M8+APv+xc9XmoEBvhzTsnBAzy5JRmeRxIECs7hlWIUa5865iNpMdJmfA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by SA1PR11MB7698.namprd11.prod.outlook.com (2603:10b6:806:332::15) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Mon, 3 Jul
+ 2023 13:51:58 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::82b6:7b9d:96ce:9325]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::82b6:7b9d:96ce:9325%7]) with mapi id 15.20.6544.024; Mon, 3 Jul 2023
+ 13:51:58 +0000
+Message-ID: <72658bca-c2b2-b3cb-64a0-35540b247a11@intel.com>
+Date: Mon, 3 Jul 2023 15:50:55 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RFC net-next 0/4] net: page_pool: a couple assorted
+ optimizations
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+	<edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Maciej Fijalkowski
+	<maciej.fijalkowski@intel.com>, Larysa Zaremba <larysa.zaremba@intel.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, Alexander Duyck
+	<alexanderduyck@fb.com>, Jesper Dangaard Brouer <hawk@kernel.org>, "Ilias
+ Apalodimas" <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
+ <20230701170155.6f72e4b8@kernel.org>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20230701170155.6f72e4b8@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR2P281CA0083.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:9b::7) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230703124440.391970-3-eichest@gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SA1PR11MB7698:EE_
+X-MS-Office365-Filtering-Correlation-Id: 47a2d7f8-b056-4054-e15b-08db7bccaada
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: W8SYkG5xIf0XWB0n+GBl3nE0NQu3JDGyIdrlwjO6qHhc2ikh/FifZcGuNhv0jlh/3ocnI1+cEDv+1UmC/Dsn+6qxNBPVCiLdIe0CUO714EWR+O+rsf1uXWY8avza/uTynL0n7SNwD4ls7NdO+VZrpx/7vTencFYmEiBIbJlG4mStxrDM1fpi70iiO11H64XQ98L8Zfm7ZRBbGCwmF9J4b5+jqIedd6iMxdHUBPIFNgu/QeZJ7Iz9TyxLPd0AU2Ez8xYAk9eVmTbX5BHYpe62ADNpoDBVMKvvzpLx2tr/0WHxBViLADj+Y2TSsvFKH063vY3Q6zEHVfxM0twOm6XA4cBvb76dBErlAPy7F+rdkITULoKNb5s/FozD4c57LmV9PPzkYr6Dmk4wj/TCEl2WIgvsT+EaGQNQC9MbTBxzRrjgp65nPTdFfiJ647Jkezvujk8FyqHFK4bdCc/Z4ZaNhiqDuMNz1dURCSbi/n8N5yVnPJrbNYurKYxmjDhOacfXwrnetJzAiNvrVV9NjfL/n7OEk+xmfof8Rle+ppCwXsWvJZaLekfqDH9yjW+/mb5v63TSMwxZAicb2/DKWpvrTUDUCc4CqCx6Th0X4uPv08tn0fEhH+NvDVd+Xbdmt+9M24GnVK2toqja8lfrbuIe/Q==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(396003)(366004)(346002)(39850400004)(451199021)(8936002)(8676002)(54906003)(478600001)(26005)(6666004)(41300700001)(36756003)(6486002)(2906002)(31696002)(7416002)(5660300002)(31686004)(86362001)(316002)(6512007)(66556008)(66476007)(4326008)(38100700002)(6916009)(66946007)(6506007)(82960400001)(2616005)(186003)(83380400001)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?R2w5S1A4M0FBbVJvK3g2WThtUG5qRU5tdkR0TnFYbDlFREJUcmcrNDJtSkxN?=
+ =?utf-8?B?QVEzaXFmOGtCcXh1QzJQMmNEbUJHMk5DN0N0ZFoyZ1hjOW9PTXBqajg2NEIr?=
+ =?utf-8?B?a2VXd2pMMTJDMnQyMGFqUE9sdStWWUdwOVZoa0RVK1ZDK0NkVVFzeXd4TFVh?=
+ =?utf-8?B?dC9kbFBOb0V5aFpaMk41MXNSQ1N4enNxYnJWSU03NExML3BpWVVHcWI0bnl4?=
+ =?utf-8?B?NVNYb0tEbjBVVlA0aEhFNWZvcnliNEgxVEl6bStab0F5SHovRUZzOHg1N2xY?=
+ =?utf-8?B?djVGTnFrcVlhME1TVEFBMGJJc1hub0tUM3lNZHFhZjZnSFY4NlJuKzdDdmty?=
+ =?utf-8?B?RS9ENCs3TUttZFBSOHlqTFhUd2hZZEtwNHNqNGVMOWg2TGhxNG56U3Y5MVlm?=
+ =?utf-8?B?dmtLeERyTEJaZ2g5OWJzZnd1OENiVCtsN0daM2k1TXVBNW1BVFZzRWlYbnNQ?=
+ =?utf-8?B?emNPZmF1Mk55UXQycVNKZVpjSG1BeSt0clAzNFRVM3dHRGxpZzdSWnVBdElU?=
+ =?utf-8?B?UnE2ckVicWtFVUdxTk9UTUlpNk5NRTVyeW9xVDZvZm9zSGk4dlRVNjhnSUZY?=
+ =?utf-8?B?QXZLVURJSm1PVVFIbkdNdW5IUEVNYXdUY21WNWFuUzRQV2wwRFpvQlo4YThi?=
+ =?utf-8?B?SzR1QkVHRjVCOUZMaHJycXIrWUxVTDhPWXNSanFabHNtd2V2bGRRWXVkNzgz?=
+ =?utf-8?B?a2tiVHE2Z2NYdU80dXhRUTVpTGxOclZZc3RwYkg0eFpYME1NQmQyam5xQWpj?=
+ =?utf-8?B?bjlCQ2lwNUNLdC9vMGFMcXFkTXcraGUzTWt6aUFub3UzcW96ZHkvZUFDZ1NH?=
+ =?utf-8?B?V0xTL3ZjQjBTSHlodm5UNzNsS3RQUU1uS1hWK1VwZzdHbk0yemYzOFc3djd0?=
+ =?utf-8?B?U09MejMyR1N3R3dXRVNOK1JHN2w2NExVQzN1VUFpbnVBeldtTE9pdTdYajJH?=
+ =?utf-8?B?dHBtVzRHTFhXNU91Zm53N0FJL1JyVjQxQUkxZXJmT1BSVElQWVFycWlySnU5?=
+ =?utf-8?B?UVhXdlU2NVg0L1RiZnZMay9xWkZNU1pKTlR1UFcvd3EveHJPNFh3S3hucjF3?=
+ =?utf-8?B?QmYybTJUeU9RdWNGb3BadXhQa205SnoyakhkM3FUSHlteTdCdWNOMnA0aXg5?=
+ =?utf-8?B?SjdSMGFMOW9CT1RHTzlJUkRMZ0d6RjcxZWxjdHZzektBaXh3ckEyaVppWHE0?=
+ =?utf-8?B?RkE3Y05XMEJsd3ZaZ0Q3Si9pa2NUNlkxV1BPQUhQQjNXSERBQzEzb2Vlb1JQ?=
+ =?utf-8?B?SHBHcDFVRmdndGJjVndCWGowOVNRRkFiQXo1UnhCRDNHS3NQdVVtVlIrVDRX?=
+ =?utf-8?B?NmlKcDFlVXZhb082elJFYXhmZWFUUnZ5MkM3RlI5ZzRRbG9tVUFpRjBmMko4?=
+ =?utf-8?B?U1dEOXFHb3FIOW9Ob2o4M3lPc0g1NDJlenBRTkgyMWZCTlpiaTh3UXkyT2xE?=
+ =?utf-8?B?TUY0bnNOSlYvcVlKSVNmcnp6cksvTFgzQm9Mc1JjbmZPbUJFK2dsbWhLeVJN?=
+ =?utf-8?B?WFdDZ0RUUndYajFXRXhwdC9la2xkMSsycStGbzNqRmY1T2UzUlFqdHpKbmlv?=
+ =?utf-8?B?NlpVSTVKVWxUN0xzRnFSUHdQeWVBTkhISHh4R1ZsYmxpM2FVLzY3SHcxNUgv?=
+ =?utf-8?B?VzVYSEcwdFlTUm41cDgyMExXWWJpNUM3cGlqb1lqZFBuU3lvRHJTWWpZY0cz?=
+ =?utf-8?B?cGRwZmZvdjE0K094Qk1jbWRMVmNVUWlwQXpTRlczcmp6RG5PNGkvM3NlaGhW?=
+ =?utf-8?B?VGFrbVVUS3I3cHdiZmZod3psd3l0WFdtMS9CWFhWNVI1YkVNZ2YzWmVVZ0I4?=
+ =?utf-8?B?SFNFbzZadmNoQkN3N25zTFVNODZOUG16TDU2Qmh4ZFBFSlhPL1pvdDZmU3Nt?=
+ =?utf-8?B?YTZRSkRvdDZLaUFDUDg2UHhWaDhWVkJEQjFhcVpjSTFwSlIrcHRDK2xqdm1h?=
+ =?utf-8?B?OHVBMjNOSjd5aDRDdWoyR3cxNHFTcXhibnR6SVlxYjFKUzRycVhMMkNQc1B6?=
+ =?utf-8?B?b0RsaUVxUlFEcjhvQ1p4aE85VmFEbzFnK3Fzc2FOYUo2K0VVS3FNa0VBM0VB?=
+ =?utf-8?B?UDNjNE5kRWVvd2JoWU4rU3JickRXb0pKcVRNeElJbnF0T0xkb1RZSHVJUU5G?=
+ =?utf-8?B?VndUOUlRNnpvRkZEcUljRk4zeFFnVlIwSWNJbnA3WmFpSzZnNUFkY3BMejR5?=
+ =?utf-8?B?RFE9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 47a2d7f8-b056-4054-e15b-08db7bccaada
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2023 13:51:57.5564
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: OV1KGoyzMlsNZ2K6E44AxFWo6fgt/7gt/jVsdMAMXKYeoCAURe2ZTMfwR4oZltJXplO+gDTqq6+ZFgxSlmvPR0gFxtf52qeRYF2GaVEi098=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7698
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> index 93b8efc792273..2913b145d5406 100644
-> --- a/drivers/net/phy/Kconfig
-> +++ b/drivers/net/phy/Kconfig
-> @@ -223,6 +223,12 @@ config MARVELL_88X2222_PHY
->  	  Support for the Marvell 88X2222 Dual-port Multi-speed Ethernet
->  	  Transceiver.
->  
-> +config MARVELL_88Q2XXX_PHY
-> +	tristate "Marvell 88Q2XXX PHY"
-> +	help
-> +	  Support for the Marvell Automotive 88Q2XXX 100/1000BASE-T1 Ethernet
-> +	  PHYs.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Sat, 1 Jul 2023 17:01:55 -0700
 
-I suggest you follow the pattern of the 88X2222.
+> On Thu, 29 Jun 2023 17:23:01 +0200 Alexander Lobakin wrote:
+>>  #3: new, prereq to #4. Add NAPI state flag, which would indicate
+>>      napi->poll() is running right now, so that napi->list_owner would
+>>      point to the CPU where it's being run, not just scheduled;
+>>  #4: new. In addition to recycling skb PP pages directly when @napi_safe
+>>      is set, check for the flag from #3, which will mean the same if
+>>      ->list_owner is pointing to us. This allows to use direct recycling  
+>>      anytime we're inside a NAPI polling loop or GRO stuff going right
+>>      after it, covering way more cases than is right now.
+> 
+> You know NAPI pretty well so I'm worried I'm missing something.
 
-	  Support for the Marvell 88Q2XXX 100/1000BASE-T1 Automotive Ethernet
-	  PHYs.
+I wouldn't say I know it well :D
 
-These entries are sorted by these strings, so should be before the
-88Q2XXX.
+> I don't think the new flag adds any value. NAPI does not have to 
+> be running, you can drop patch 3 and use in_softirq() instead of 
+> the new flag, AFAIU.
 
+That's most likely true for the patch 4 case, but I wanted to add some
+flag for wider usage.
+For example, busy polling relies on whether ->poll() returned whole
+budget to decide whether interrupts were reenabled to avoid possible
+concurrent access, but I wouldn't say it's precise enough.
+napi_complete_done() doesn't always return true.
+OTOH, the new flag or, more precisely, flag + list_owner combo would
+tell for sure.
 
-> +
->  config MAXLINEAR_GPHY
->  	tristate "Maxlinear Ethernet PHYs"
->  	select POLYNOMIAL if HWMON
-> diff --git a/drivers/net/phy/Makefile b/drivers/net/phy/Makefile
-> index f289ab16a1dab..15d1908fd5cb7 100644
-> --- a/drivers/net/phy/Makefile
-> +++ b/drivers/net/phy/Makefile
-> @@ -67,6 +67,7 @@ obj-$(CONFIG_LXT_PHY)		+= lxt.o
->  obj-$(CONFIG_MARVELL_10G_PHY)	+= marvell10g.o
->  obj-$(CONFIG_MARVELL_PHY)	+= marvell.o
->  obj-$(CONFIG_MARVELL_88X2222_PHY)	+= marvell-88x2222.o
-> +obj-$(CONFIG_MARVELL_88Q2XXX_PHY)	+= marvell-88q2xxx.o
+> 
+> The reason I did not do that is that I wasn't sure if there is no
+> weird (netcons?) case where skb gets freed from an IRQ :(
 
-These are sorted by the CONFIG_*, so it should also be before the
-88X2XXX
+Shouldn't they use dev_kfree_skb_any() or _irq()? Usage of plain
+kfree_skb() is not allowed in the TH :s
 
-> +static int mv88q2xxx_soft_reset(struct phy_device *phydev)
-> +{
-> +	phy_write_mmd(phydev, 3, 0x0900, 0x8000);
+Anyway, if the flag really makes no sense, I can replace it with
+in_softirq(), it's my hobby to break weird drivers :D
 
-Please use the #defines, e.g. MDIO_MMD_PCS.
-
-0x900 is listed in IEEE 802.3 2022. It is a standard register. Please
-add a #define for it next to all the others. You can also add BIT()
-macros for PMA/PMD reset, and maybe Tx Disable, low power.
-
-> +
-> +	return 0;
-> +}
-> +
-> +static void init_fast_ethernet(struct phy_device *phydev)
-> +{
-> +	u16 value = phy_read_mmd(phydev, 1, 0x0834);
-
-2100 is also a standard register.
-
-> +
-> +	value = value & 0xFFF0;
-> +
-> +	phy_write_mmd(phydev, 1, 0x0834, value);
-> +}
-> +
-> +static void init_gbit_ethernet(struct phy_device *phydev)
-> +{
-> +	u16 value = phy_read_mmd(phydev, 1, 0x0834);
-> +
-> +	value = (value & 0xFFF0) | 0x0001;
-> +
-> +	phy_write_mmd(phydev, 1, 0x0834, value);
-> +}
-> +
-> +static int setup_master_slave(struct phy_device *phydev)
-> +{
-> +	u16 reg_data = phy_read_mmd(phydev, 1, 0x0834);
-> +
-> +	switch (phydev->master_slave_set) {
-> +	case MASTER_SLAVE_CFG_MASTER_FORCE:
-> +	case MASTER_SLAVE_CFG_MASTER_PREFERRED:
-> +		reg_data |= 0x4000;
-> +		break;
-> +	case MASTER_SLAVE_CFG_SLAVE_PREFERRED:
-> +	case MASTER_SLAVE_CFG_SLAVE_FORCE:
-> +		reg_data &= ~0x4000;
-> +		break;
-> +	case MASTER_SLAVE_CFG_UNKNOWN:
-> +	case MASTER_SLAVE_CFG_UNSUPPORTED:
-> +		return 0;
-> +	default:
-> +		phydev_warn(phydev, "Unsupported Master/Slave mode\n");
-> +		return -EOPNOTSUPP;
-> +	}
-> +
-> +	phy_write_mmd(phydev, 1, 0x0834, reg_data);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mv88q2xxx_config_aneg(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	if (phydev->speed == SPEED_100)
-> +		init_fast_ethernet(phydev);
-> +	else if (phydev->speed == SPEED_1000)
-> +		init_gbit_ethernet(phydev);
-> +
-> +	ret = setup_master_slave(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	mv88q2xxx_soft_reset(phydev);
-> +
-> +	return 0;
-> +}
-> +
-> +static int mv88q2xxx_config_init(struct phy_device *phydev)
-> +{
-> +	return mv88q2xxx_config_aneg(phydev);
-> +}
-> +
-> +static int get_speed(struct phy_device *phydev)
-> +{
-> +	u16 value = 0;
-> +
-> +	if (phydev->autoneg)
-> +		value = (phy_read_mmd(phydev, 7, 0x801a) & 0x4000) >> 14;
-> +	else
-> +		value = (phy_read_mmd(phydev, 1, 0x0834) & 0x1);
-> +
-> +	return value ? SPEED_1000 : SPEED_100;
-> +}
-> +
-> +static int check_link(struct phy_device *phydev)
-> +{
-> +	u16 ret1, ret2;
-> +
-> +	if (phydev->speed == SPEED_1000) {
-> +		ret1 = phy_read_mmd(phydev, 3, 0x0901);
-> +		ret1 = phy_read_mmd(phydev, 3, 0x0901);
-> +		ret2 = phy_read_mmd(phydev, 7, 0x8001);
-> +	} else {
-> +		ret1 = phy_read_mmd(phydev, 3, 0x8109);
-> +		ret2 = phy_read_mmd(phydev, 3, 0x8108);
-> +	}
-> +
-> +	return (0x0 != (ret1 & 0x0004)) && (0x0 != (ret2 & 0x3000)) ? 1 : 0;
-> +}
-> +
-> +static int read_master_slave(struct phy_device *phydev)
-> +{
-> +	int reg;
-> +
-> +	phydev->master_slave_get = MASTER_SLAVE_CFG_UNKNOWN;
-> +	phydev->master_slave_state = MASTER_SLAVE_STATE_UNKNOWN;
-> +
-> +	reg = phy_read_mmd(phydev, 7, 0x8001);
-> +	if (reg & (1 << 14)) {
-> +		phydev->master_slave_get = MASTER_SLAVE_CFG_MASTER_FORCE;
-> +		phydev->master_slave_state = MASTER_SLAVE_STATE_MASTER;
-> +	} else {
-> +		phydev->master_slave_get = MASTER_SLAVE_CFG_SLAVE_FORCE;
-> +		phydev->master_slave_state = MASTER_SLAVE_STATE_SLAVE;
-> +	}
-> +
-> +	return 0;
-> +}
-> +
-> +static int mv88q2xxx_read_status(struct phy_device *phydev)
-> +{
-> +	int ret;
-> +
-> +	ret = genphy_update_link(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	phydev->link = check_link(phydev);
-> +	phydev->speed = get_speed(phydev);
-> +
-> +	ret = read_master_slave(phydev);
-> +	if (ret)
-> +		return ret;
-> +
-> +	return 0;
-> +}
-
-
-So all these functions can be placed in phy-c45.c, since they are
-generic to any 1000BaseT1 PHY. Please look at the other functions in
-there, and try the fit the patterns.
-
-Please also look at genphy_c45_pma_read_abilities() and extend it to
-detect the features of this PHY.
-
-> +static int mv88q2xxx_probe(struct phy_device *phydev)
-> +{
-> +	if (!phydev->is_c45)
-> +		return -ENODEV;
-
-Why?
-
-> +
-> +	return 0;
-> +}
-> +
-> +static int mv88q2xxxx_cable_test_start(struct phy_device *phydev)
-> +{
-> +	return 0;
-> +}
-> +
-> +static int mv88q2xxxx_cable_test_get_status(struct phy_device *phydev,
-> +					    bool *finished)
-> +{
-> +	ethnl_cable_test_result(phydev, ETHTOOL_A_CABLE_PAIR_A,
-> +				ETHTOOL_A_CABLE_RESULT_CODE_OK);
-> +	return 0;
-> +}
-
-There is no need to implement them if you don't have anything useful
-to return.
-
-> +static int mv88q2xxxx_get_sqi(struct phy_device *phydev)
-> +{
-> +	u16 value;
-> +
-> +	if (phydev->speed == SPEED_100)
-> +		value = (phy_read_mmd(phydev, 3, 0x8230) >> 12) & 0x0F;
-> +	else
-> +		value = phy_read_mmd(phydev, 3, 0xfc88) & 0x0F;
-
-This looks proprietary to this PHY. However the open alliance does
-have some standards in this area. Please check to see if they define
-registers.
-
-	Andrew
+Thanks,
+Olek
 
