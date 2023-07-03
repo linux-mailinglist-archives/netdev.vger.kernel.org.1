@@ -1,263 +1,412 @@
-Return-Path: <netdev+bounces-15102-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15096-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0909A745AA0
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:54:06 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CC3D1745A64
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:36:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 12CA3280D26
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:54:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0075D280DCD
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:36:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65556DDC2;
-	Mon,  3 Jul 2023 10:54:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639D310E8;
+	Mon,  3 Jul 2023 10:36:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5A01B3D6C
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:54:02 +0000 (UTC)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CADF9B2
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 03:53:58 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688381639; x=1719917639;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=PT7j9JuHvCUJbMIN1K9mHBRVBQUKsChO9AedL+Zk5b4=;
-  b=Npsjt0oKZznurmjH8w/NluZRo6PmD16skACMSw6exEbU2mPPxOgiMegl
-   ZHoB2G9SoAk0mJ6XBhBmLVgTmRqyLa5ZNoh3MPrKIV4EVUFWPSRXS5Nln
-   f8AlZdKmf6DcksvbrgY81hgFIn9WiZ++BufNqmLBu6udBSqbGHlapEnds
-   xaBWZDHcWoYLc+Jz2BqnO2Wp+JjHiNlYXYVfx8quRV2KHe2ftldCvbbxc
-   /z/0646558ssjBO40TB2LmGug4F20ArcCFLQYOfA5MNICBHKLAru/yVkQ
-   Us4qyiSQ9PQoYIvhS5aCWgdtLcSPsqd5YsbBYsADt0VEqqkJj5Ek3+1b6
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="365421106"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="365421106"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 03:53:58 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="831776911"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="831776911"
-Received: from wasp.igk.intel.com ([10.102.20.192])
-  by fmsmga002.fm.intel.com with ESMTP; 03 Jul 2023 03:53:56 -0700
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: intel-wired-lan@lists.osuosl.org
-Cc: netdev@vger.kernel.org,
-	piotr.raczynski@intel.com,
-	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: [PATCH iwl-net v1] ice: prevent call trace during reload
-Date: Mon,  3 Jul 2023 12:32:15 +0200
-Message-ID: <20230703103215.54570-1-michal.swiatkowski@linux.intel.com>
-X-Mailer: git-send-email 2.41.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E93A5B
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:36:30 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDFE97;
+	Mon,  3 Jul 2023 03:36:27 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Qvj3R1LYGz6J74j;
+	Mon,  3 Jul 2023 18:34:43 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 3 Jul 2023 11:36:24 +0100
+Message-ID: <55092d4f-b076-d4fc-e75f-b4981a382a78@huawei.com>
+Date: Mon, 3 Jul 2023 13:36:23 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11 08/12] landlock: Add network rules and TCP hooks
+ support
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-9-konstantin.meskhidze@huawei.com>
+ <f14174f3-d855-dba9-5dd2-40a2c5e5ac3b@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <f14174f3-d855-dba9-5dd2-40a2c5e5ac3b@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Calling ethtool during reload can lead to call trace, because VSI isn't
-configured for some time, but netdev is alive.
 
-To fix it add rtnl lock for VSI deconfig and config. Set ::num_q_vectors
-to 0 after freeing and add a check for ::tx/rx_rings in ring related
-ethtool ops.
 
-Reproduction:
-$watch -n 0.1 -d 'ethtool -g enp24s0f0np0'
-$devlink dev reload pci/0000:18:00.0 action driver_reinit
+6/26/2023 9:57 PM, Mickaël Salaün пишет:
+> Complementary review:
+> 
+> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
+>> This commit adds network rules support in the ruleset management
+>> helpers and the landlock_create_ruleset syscall.
+>> Refactor user space API to support network actions. Add new network
+>> access flags, network rule and network attributes. Increment Landlock
+>> ABI version. Expand access_masks_t to u32 to be sure network access
+>> rights can be stored. Implement socket_bind() and socket_connect()
+>> LSM hooks, which enables to restrict TCP socket binding and connection
+>> to specific ports.
+>> 
+>> Co-developed-by: Mickaël Salaün <mic@digikod.net>
+>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>> ---
+>> 
+>> Changes since v10:
+>> * Removes "packed" attribute.
+>> * Applies Mickaёl's patch with some refactoring.
+>> * Deletes get_port() and check_addrlen() helpers.
+>> * Refactors check_socket_access() by squashing get_port() and
+>> check_addrlen() helpers into it.
+>> * Fixes commit message.
+>> 
+>> Changes since v9:
+>> * Changes UAPI port field to __u64.
+>> * Moves shared code into check_socket_access().
+>> * Adds get_raw_handled_net_accesses() and
+>> get_current_net_domain() helpers.
+>> * Minor fixes.
+>> 
+>> Changes since v8:
+>> * Squashes commits.
+>> * Refactors commit message.
+>> * Changes UAPI port field to __be16.
+>> * Changes logic of bind/connect hooks with AF_UNSPEC families.
+>> * Adds address length checking.
+>> * Minor fixes.
+>> 
+>> Changes since v7:
+>> * Squashes commits.
+>> * Increments ABI version to 4.
+>> * Refactors commit message.
+>> * Minor fixes.
+>> 
+>> Changes since v6:
+>> * Renames landlock_set_net_access_mask() to landlock_add_net_access_mask()
+>>    because it OR values.
+>> * Makes landlock_add_net_access_mask() more resilient incorrect values.
+>> * Refactors landlock_get_net_access_mask().
+>> * Renames LANDLOCK_MASK_SHIFT_NET to LANDLOCK_SHIFT_ACCESS_NET and use
+>>    LANDLOCK_NUM_ACCESS_FS as value.
+>> * Updates access_masks_t to u32 to support network access actions.
+>> * Refactors landlock internal functions to support network actions with
+>>    landlock_key/key_type/id types.
+>> 
+>> Changes since v5:
+>> * Gets rid of partial revert from landlock_add_rule
+>> syscall.
+>> * Formats code with clang-format-14.
+>> 
+>> Changes since v4:
+>> * Refactors landlock_create_ruleset() - splits ruleset and
+>> masks checks.
+>> * Refactors landlock_create_ruleset() and landlock mask
+>> setters/getters to support two rule types.
+>> * Refactors landlock_add_rule syscall add_rule_path_beneath
+>> function by factoring out get_ruleset_from_fd() and
+>> landlock_put_ruleset().
+>> 
+>> Changes since v3:
+>> * Splits commit.
+>> * Adds network rule support for internal landlock functions.
+>> * Adds set_mask and get_mask for network.
+>> * Adds rb_root root_net_port.
+>> 
+>> ---
+>>   include/uapi/linux/landlock.h                |  48 +++++
+>>   security/landlock/Kconfig                    |   1 +
+>>   security/landlock/Makefile                   |   2 +
+>>   security/landlock/limits.h                   |   6 +-
+>>   security/landlock/net.c                      | 174 +++++++++++++++++++
+>>   security/landlock/net.h                      |  26 +++
+>>   security/landlock/ruleset.c                  |  52 +++++-
+>>   security/landlock/ruleset.h                  |  63 +++++--
+>>   security/landlock/setup.c                    |   2 +
+>>   security/landlock/syscalls.c                 |  72 +++++++-
+>>   tools/testing/selftests/landlock/base_test.c |   2 +-
+>>   11 files changed, 425 insertions(+), 23 deletions(-)
+>>   create mode 100644 security/landlock/net.c
+>>   create mode 100644 security/landlock/net.h
+>> 
+>> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
+>> index 81d09ef9aa50..93794759dad4 100644
+>> --- a/include/uapi/linux/landlock.h
+>> +++ b/include/uapi/linux/landlock.h
+>> @@ -31,6 +31,13 @@ struct landlock_ruleset_attr {
+>>   	 * this access right.
+>>   	 */
+>>   	__u64 handled_access_fs;
+>> +
+> 
+> Please remove this empty line.
 
-Call trace before fix:
-[66303.926205] BUG: kernel NULL pointer dereference, address: 0000000000000000
-[66303.926259] #PF: supervisor read access in kernel mode
-[66303.926286] #PF: error_code(0x0000) - not-present page
-[66303.926311] PGD 0 P4D 0
-[66303.926332] Oops: 0000 [#1] PREEMPT SMP PTI
-[66303.926358] CPU: 4 PID: 933821 Comm: ethtool Kdump: loaded Tainted: G           OE      6.4.0-rc5+ #1
-[66303.926400] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.00.01.0014.070920180847 07/09/2018
-[66303.926446] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
-[66303.926649] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
-[66303.926722] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
-[66303.926749] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
-[66303.926781] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
-[66303.926811] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
-[66303.926843] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
-[66303.926874] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
-[66303.926906] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
-[66303.926941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[66303.926967] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
-[66303.926999] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[66303.927029] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[66303.927060] PKRU: 55555554
-[66303.927075] Call Trace:
-[66303.927094]  <TASK>
-[66303.927111]  ? __die+0x23/0x70
-[66303.927140]  ? page_fault_oops+0x171/0x4e0
-[66303.927176]  ? exc_page_fault+0x7f/0x180
-[66303.927209]  ? asm_exc_page_fault+0x26/0x30
-[66303.927244]  ? ice_get_ringparam+0x22/0x50 [ice]
-[66303.927433]  rings_prepare_data+0x62/0x80
-[66303.927469]  ethnl_default_doit+0xe2/0x350
-[66303.927501]  genl_family_rcv_msg_doit.isra.0+0xe3/0x140
-[66303.927538]  genl_rcv_msg+0x1b1/0x2c0
-[66303.927561]  ? __pfx_ethnl_default_doit+0x10/0x10
-[66303.927590]  ? __pfx_genl_rcv_msg+0x10/0x10
-[66303.927615]  netlink_rcv_skb+0x58/0x110
-[66303.927644]  genl_rcv+0x28/0x40
-[66303.927665]  netlink_unicast+0x19e/0x290
-[66303.927691]  netlink_sendmsg+0x254/0x4d0
-[66303.927717]  sock_sendmsg+0x93/0xa0
-[66303.927743]  __sys_sendto+0x126/0x170
-[66303.927780]  __x64_sys_sendto+0x24/0x30
-[66303.928593]  do_syscall_64+0x5d/0x90
-[66303.929370]  ? __count_memcg_events+0x60/0xa0
-[66303.930146]  ? count_memcg_events.constprop.0+0x1a/0x30
-[66303.930920]  ? handle_mm_fault+0x9e/0x350
-[66303.931688]  ? do_user_addr_fault+0x258/0x740
-[66303.932452]  ? exc_page_fault+0x7f/0x180
-[66303.933193]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-[66303.933935] RIP: 0033:0x7f6397a7d957
-[66303.934702] Code: c7 c0 ff ff ff ff eb be 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 80 3d 8d 7c 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 69 c3 55 48 89 e5 53 48 83 ec 38 44 89 4d d0
-[66303.936290] RSP: 002b:00007fff085051b8 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-[66303.937088] RAX: ffffffffffffffda RBX: 000055bb806aa340 RCX: 00007f6397a7d957
-[66303.937878] RDX: 000000000000002c RSI: 000055bb806aa3b0 RDI: 0000000000000003
-[66303.938654] RBP: 00007fff085051e0 R08: 00007f6397b4b200 R09: 000000000000000c
-[66303.939403] R10: 0000000000000000 R11: 0000000000000202 R12: 000055bb806aa3b0
-[66303.940131] R13: 000055bb7e977bb0 R14: 00007fff08505260 R15: 000055bb7e977570
-[66303.940856]  </TASK>
-[66303.941564] Modules linked in: irdma ice(OE) openvswitch nsh nf_conncount nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 qrtr rfkill sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel vfat fat kvm mlx5_ib irqbypass ipmi_ssif rapl intel_cstate ib_uverbs iTCO_wdt intel_pmc_bxt iTCO_vendor_support ib_core intel_uncore i2c_i801 mei_me pcspkr mei lpc_ich i2c_smbus ioatdma intel_pch_thermal acpi_ipmi joydev dca ipmi_si ipmi_devintf acpi_pad acpi_power_meter ipmi_msghandler fuse loop zram xfs mlx5_core i40e mlxfw crct10dif_pclmul crc32_pclmul tls crc32c_intel polyval_clmulni polyval_generic ast ghash_clmulni_intel psample sha512_ssse3 pci_hyperv_intf i2c_algo_bit gnss wmi scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkcs8_key_parser dm_multipath [last unloaded: ice]
-[66303.946397] CR2: 0000000000000000
-[66303.946919] ---[ end trace 0000000000000000 ]---
-[66303.955966] pstore: backend (erst) writing error (-28)
-[66303.956326] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
-[66303.956765] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
-[66303.957518] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
-[66303.957901] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
-[66303.958290] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
-[66303.958683] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
-[66303.959074] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
-[66303.959473] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
-[66303.959868] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
-[66303.960268] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-[66303.960672] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
-[66303.961078] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-[66303.961490] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-[66303.961898] PKRU: 55555554
+  Ok. Thanks.
+> 
+> 
+>> +	/**
+>> +	 * @handled_access_net: Bitmask of actions (cf. `Network flags`_)
+>> +	 * that is handled by this ruleset and should then be forbidden if no
+>> +	 * rule explicitly allow them.
+>> +	 */
+>> +	__u64 handled_access_net;
+>>   };
+>> 
+>>   /*
+>> @@ -54,6 +61,11 @@ enum landlock_rule_type {
+>>   	 * landlock_path_beneath_attr .
+>>   	 */
+>>   	LANDLOCK_RULE_PATH_BENEATH = 1,
+>> +	/**
+>> +	 * @LANDLOCK_RULE_NET_SERVICE: Type of a &struct
+>> +	 * landlock_net_service_attr .
+>> +	 */
+>> +	LANDLOCK_RULE_NET_SERVICE = 2,
+>>   };
+>> 
+>>   /**
+>> @@ -79,6 +91,23 @@ struct landlock_path_beneath_attr {
+>>   	 */
+>>   } __attribute__((packed));
+>> 
+>> +/**
+>> + * struct landlock_net_service_attr - TCP subnet definition
+> 
+> s/TCP subnet definition/Network service definition/
+> 
+   Ok. Thanks.
+> 
+>> + *
+>> + * Argument of sys_landlock_add_rule().
+>> + */
+>> +struct landlock_net_service_attr {
+>> +	/**
+>> +	 * @allowed_access: Bitmask of allowed access network for services
+>> +	 * (cf. `Network flags`_).
+>> +	 */
+>> +	__u64 allowed_access;
+>> +	/**
+>> +	 * @port: Network port.
+>> +	 */
+>> +	__u64 port;
+>> +};
+>> +
+>>   /**
+>>    * DOC: fs_access
+>>    *
+>> @@ -189,4 +218,23 @@ struct landlock_path_beneath_attr {
+>>   #define LANDLOCK_ACCESS_FS_TRUNCATE			(1ULL << 14)
+>>   /* clang-format on */
+>> 
+>> +/**
+>> + * DOC: net_access
+>> + *
+>> + * Network flags
+>> + * ~~~~~~~~~~~~~~~~
+>> + *
+>> + * These flags enable to restrict a sandboxed process to a set of network
+>> + * actions.
+>> + *
+>> + * TCP sockets with allowed actions:
+>> + *
+>> + * - %LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
+>> + * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to
+>> + *   a remote port.
+>> + */
+>> +/* clang-format off */
+>> +#define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
+>> +#define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
+>> +/* clang-format on */
+>>   #endif /* _UAPI_LINUX_LANDLOCK_H */
+>> diff --git a/security/landlock/Kconfig b/security/landlock/Kconfig
+>> index 8e33c4e8ffb8..10c099097533 100644
+>> --- a/security/landlock/Kconfig
+>> +++ b/security/landlock/Kconfig
+>> @@ -3,6 +3,7 @@
+>>   config SECURITY_LANDLOCK
+>>   	bool "Landlock support"
+>>   	depends on SECURITY && !ARCH_EPHEMERAL_INODES
+>> +	select SECURITY_NETWORK
+>>   	select SECURITY_PATH
+>>   	help
+>>   	  Landlock is a sandboxing mechanism that enables processes to restrict
+>> diff --git a/security/landlock/Makefile b/security/landlock/Makefile
+>> index 7bbd2f413b3e..53d3c92ae22e 100644
+>> --- a/security/landlock/Makefile
+>> +++ b/security/landlock/Makefile
+>> @@ -2,3 +2,5 @@ obj-$(CONFIG_SECURITY_LANDLOCK) := landlock.o
+>> 
+>>   landlock-y := setup.o syscalls.o object.o ruleset.o \
+>>   	cred.o ptrace.o fs.o
+>> +
+>> +landlock-$(CONFIG_INET) += net.o
+>> \ No newline at end of file
+>> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
+>> index bafb3b8dc677..8a1a6463c64e 100644
+>> --- a/security/landlock/limits.h
+>> +++ b/security/landlock/limits.h
+>> @@ -23,6 +23,10 @@
+>>   #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
+>>   #define LANDLOCK_SHIFT_ACCESS_FS	0
+>> 
+>> -/* clang-format on */
+>> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
+>> +#define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
+>> +#define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
+>> +#define LANDLOCK_SHIFT_ACCESS_NET	LANDLOCK_NUM_ACCESS_FS
+>> 
+>> +/* clang-format on */
+> 
+> Please the empty line to make this patch clean.
 
-Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
-Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
----
- drivers/net/ethernet/intel/ice/ice_base.c    |  2 ++
- drivers/net/ethernet/intel/ice/ice_ethtool.c | 13 +++++++++++--
- drivers/net/ethernet/intel/ice/ice_main.c    | 14 ++++++++++----
- 3 files changed, 23 insertions(+), 6 deletions(-)
-
-diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
-index 1911d644dfa8..619cb07a4069 100644
---- a/drivers/net/ethernet/intel/ice/ice_base.c
-+++ b/drivers/net/ethernet/intel/ice/ice_base.c
-@@ -758,6 +758,8 @@ void ice_vsi_free_q_vectors(struct ice_vsi *vsi)
- 
- 	ice_for_each_q_vector(vsi, v_idx)
- 		ice_free_q_vector(vsi, v_idx);
-+
-+	vsi->num_q_vectors = 0;
- }
- 
- /**
-diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-index f86e814354a3..3bc597a64bdf 100644
---- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-+++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-@@ -2920,8 +2920,13 @@ ice_get_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 
- 	ring->rx_max_pending = ICE_MAX_NUM_DESC;
- 	ring->tx_max_pending = ICE_MAX_NUM_DESC;
--	ring->rx_pending = vsi->rx_rings[0]->count;
--	ring->tx_pending = vsi->tx_rings[0]->count;
-+	if (vsi->tx_rings && vsi->rx_rings) {
-+		ring->rx_pending = vsi->rx_rings[0]->count;
-+		ring->tx_pending = vsi->tx_rings[0]->count;
-+	} else {
-+		ring->rx_pending = 0;
-+		ring->tx_pending = 0;
-+	}
- 
- 	/* Rx mini and jumbo rings are not supported */
- 	ring->rx_mini_max_pending = 0;
-@@ -2955,6 +2960,10 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
- 		return -EINVAL;
- 	}
- 
-+	/* if there is no rings return (device is reloading) */
-+	if (!vsi->tx_rings || !vsi->rx_rings)
-+		return -EBUSY;
-+
- 	new_tx_cnt = ALIGN(ring->tx_pending, ICE_REQ_DESC_MULTIPLE);
- 	if (new_tx_cnt != ring->tx_pending)
- 		netdev_info(netdev, "Requested Tx descriptor count rounded up to %d\n",
-diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-index 0d8b8c6f9bd3..1b1974d42002 100644
---- a/drivers/net/ethernet/intel/ice/ice_main.c
-+++ b/drivers/net/ethernet/intel/ice/ice_main.c
-@@ -4634,9 +4634,7 @@ static int ice_start_eth(struct ice_vsi *vsi)
- 	if (err)
- 		return err;
- 
--	rtnl_lock();
- 	err = ice_vsi_open(vsi);
--	rtnl_unlock();
- 
- 	return err;
- }
-@@ -5099,13 +5097,19 @@ int ice_load(struct ice_pf *pf)
- 	params = ice_vsi_to_params(vsi);
- 	params.flags = ICE_VSI_FLAG_INIT;
- 
-+	rtnl_lock();
- 	err = ice_vsi_cfg(vsi, &params);
--	if (err)
-+	if (err) {
-+		rtnl_unlock();
- 		goto err_vsi_cfg;
-+	}
- 
- 	err = ice_start_eth(ice_get_main_vsi(pf));
--	if (err)
-+	if (err) {
-+		rtnl_unlock();
- 		goto err_start_eth;
-+	}
-+	rtnl_unlock();
- 
- 	err = ice_init_rdma(pf);
- 	if (err)
-@@ -5135,8 +5139,10 @@ void ice_unload(struct ice_pf *pf)
- {
- 	ice_deinit_features(pf);
- 	ice_deinit_rdma(pf);
-+	rtnl_lock();
- 	ice_stop_eth(ice_get_main_vsi(pf));
- 	ice_vsi_decfg(ice_get_main_vsi(pf));
-+	rtnl_unlock();
- 	ice_deinit_dev(pf);
- }
- 
--- 
-2.41.0
-
+  Ok. I will.
+> 
+> 
+>>   #endif /* _SECURITY_LANDLOCK_LIMITS_H */
+>> diff --git a/security/landlock/net.c b/security/landlock/net.c
+>> new file mode 100644
+>> index 000000000000..f8d2be53ac0d
+>> --- /dev/null
+>> +++ b/security/landlock/net.c
+>> @@ -0,0 +1,174 @@
+>> +// SPDX-License-Identifier: GPL-2.0-only
+>> +/*
+>> + * Landlock LSM - Network management and hooks
+>> + *
+>> + * Copyright © 2022 Huawei Tech. Co., Ltd.
+>> + * Copyright © 2022 Microsoft Corporation
+>> + */
+>> +
+>> +#include <linux/in.h>
+>> +#include <linux/net.h>
+>> +#include <linux/socket.h>
+>> +#include <net/ipv6.h>
+>> +
+>> +#include "common.h"
+>> +#include "cred.h"
+>> +#include "limits.h"
+>> +#include "net.h"
+>> +#include "ruleset.h"
+>> +
+>> +int landlock_append_net_rule(struct landlock_ruleset *const ruleset,
+>> +			     const u16 port, access_mask_t access_rights)
+>> +{
+>> +	int err;
+>> +	const struct landlock_id id = {
+>> +		.key.data = (__force uintptr_t)htons(port),
+>> +		.type = LANDLOCK_KEY_NET_PORT,
+>> +	};
+>> +
+>> +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
+>> +
+>> +	/* Transforms relative access rights to absolute ones. */
+>> +	access_rights |= LANDLOCK_MASK_ACCESS_NET &
+>> +			 ~landlock_get_net_access_mask(ruleset, 0);
+>> +
+>> +	mutex_lock(&ruleset->lock);
+>> +	err = landlock_insert_rule(ruleset, id, access_rights);
+>> +	mutex_unlock(&ruleset->lock);
+>> +
+>> +	return err;
+>> +}
+>> +
+>> +static access_mask_t
+>> +get_raw_handled_net_accesses(const struct landlock_ruleset *const domain)
+>> +{
+>> +	access_mask_t access_dom = 0;
+>> +	size_t layer_level;
+>> +
+>> +	for (layer_level = 0; layer_level < domain->num_layers; layer_level++)
+>> +		access_dom |= landlock_get_net_access_mask(domain, layer_level);
+>> +	return access_dom;
+>> +}
+>> +
+>> +static const struct landlock_ruleset *get_current_net_domain(void)
+>> +{
+>> +	const struct landlock_ruleset *const dom =
+>> +		landlock_get_current_domain();
+>> +
+>> +	if (!dom || !get_raw_handled_net_accesses(dom))
+>> +		return NULL;
+>> +
+>> +	return dom;
+>> +}
+>> +
+>> +static int check_socket_access(struct socket *const sock,
+>> +			       struct sockaddr *const address,
+>> +			       const int addrlen,
+>> +			       const access_mask_t access_request)
+>> +{
+>> +	__be16 port;
+>> +	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
+>> +	const struct landlock_rule *rule;
+>> +	access_mask_t handled_access;
+>> +	struct landlock_id id = {
+>> +		.type = LANDLOCK_KEY_NET_PORT,
+>> +	};
+>> +	const struct landlock_ruleset *const domain = get_current_net_domain();
+>> +
+>> +	if (WARN_ON_ONCE(!domain))
+> 
+> The WARN_ON_ONCE() needs to be removed for processes not sandboxed. This
+> should be printed when running the tests.
+> 
+  Probably during the boot stage it prints once since no process is
+  landlocked at this stage.
+  So we need to leave it like this:
+	if (!domain)
+         	return 0;
+   ????
+> 
+> 
+>> +		return 0;
+>> +	if (WARN_ON_ONCE(domain->num_layers < 1))
+>> +		return -EACCES;
+>> +
+>> +	/* Checks if it's a TCP socket. */
+>> +	if (sock->type != SOCK_STREAM)
+>> +		return 0;
+>> +
+>> +	/* Checks for minimal header length. */
+>> +	if (addrlen < offsetofend(struct sockaddr, sa_family))
+> 
+> You can use "typeof(*address)" instead of struct sockaddr, this makes it
+> easier to review.
+> 
+   Do mean to change offsetofend() by typeof(*address)??
+> 
+>> +		return -EINVAL;
+>> +
+> 
+> [...]
+> .
 
