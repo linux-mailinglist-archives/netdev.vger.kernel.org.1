@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-15190-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15191-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF7B746159
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:23:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 29A6F74615E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:25:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CC021C209C7
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:23:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 598061C209EA
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:25:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BE1101E1;
-	Mon,  3 Jul 2023 17:23:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DB44101ED;
+	Mon,  3 Jul 2023 17:25:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6B068100DC
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:23:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9880BC433C7;
-	Mon,  3 Jul 2023 17:23:52 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E152D101E1
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:25:52 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id E19CEC433C7;
+	Mon,  3 Jul 2023 17:25:50 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688405033;
-	bh=HqoN+ykT6mcx6CD/Ub4vmYOWlAUj2Sw0KQddslJPPDs=;
+	s=k20201202; t=1688405152;
+	bh=rYNHyEKxVBivZJaI/Nsw/8pEmEkG38XoEZOgA3+Gx5E=;
 	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=dqWzK3zrOi4s/PD7nVSHt10ysL9pI4UiMx8ZhJMul+Wf8QpZZ7azO7KoaO37KGPnQ
-	 35M/lCZY9wt2iu31FiNlO2x52ufOgZBw969Ge6Fr4NymYTs10AfFn64i823I6ZSCzU
-	 ztMgHEeDbyK0BmjQupnqFLgy5+8OAp+k/HM3pFyUEZ0+KmI8c06n2kkSWKQ1VRBlSn
-	 6KYo0ZBSf7Z6+kMT3VPw9GJ+yOwubUywRMHJA+7aXZRfmlFFtSWHk2liHgoiMqQ3FZ
-	 IfBKRbp1pVA+AEW2zOdecKTwPEGqJ8PD+mVLsR8d7DfG3pdZzTW+sE6dwAFXLdpRLp
-	 vKVdtwwgK4mDw==
-Message-ID: <011d3204-5c33-782c-41d1-53bf9bd2e095@kernel.org>
-Date: Mon, 3 Jul 2023 11:23:51 -0600
+	b=HRhH09xDcmyQdwdg+w9B4k0qFdh5qm8B20+2qPbVM/j6cBNpwATBWA29920ipsdqB
+	 F7J6ZGI3CQDbI6idwFIgjtEfSilmVr17LolUgwKXZ4iVZtE/opYl7ICfUIT8st5Hiv
+	 UxbpHaA7dWmEdwwciJmm+4gyUYba6rSUEZSepH3nxzXch2fsPbVSzaYGe0r4rI5wGM
+	 Ym039RUrohqsYMxJCMpB3liziGDbDIggIi4ViVYy8fZk//93aQZ1c2OmH4npo4biPW
+	 Z139jMJ6PzTzBE2Rk/CxIz4mMINsMFtO1wKBzZeV7eNjfUppPND0kRaiNMIHRjo8Sy
+	 N44lUtKIfK3tQ==
+Message-ID: <31db0e5d-4b6d-9b2e-90cc-87a15d500b2e@kernel.org>
+Date: Mon, 3 Jul 2023 11:25:50 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -78,30 +78,29 @@ References: <20230612130256.4572-1-linyunsheng@huawei.com>
  <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
  <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
  <47b79e77-461b-8fe9-41fb-b69a6b205ef2@kernel.org>
- <CANn89iKAvrf92Fy8a_M+V9eya6OHokey2_yxQ3JiCT87fKND_w@mail.gmail.com>
+ <CANn89iJLAnnvFfkmJbQ=ZFMwaqiYDOTD3-P+NpkEMzP9aKV-ig@mail.gmail.com>
 From: David Ahern <dsahern@kernel.org>
-In-Reply-To: <CANn89iKAvrf92Fy8a_M+V9eya6OHokey2_yxQ3JiCT87fKND_w@mail.gmail.com>
+In-Reply-To: <CANn89iJLAnnvFfkmJbQ=ZFMwaqiYDOTD3-P+NpkEMzP9aKV-ig@mail.gmail.com>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
 
-On 7/3/23 11:13 AM, Eric Dumazet wrote:
-> diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
-> index a2dbeb264f260e5b8923ece9aac99fe19ddfeb62..aa4133d1b1e0676e408499ea4534b51262394432
-> 100644
-> --- a/net/packet/af_packet.c
-> +++ b/net/packet/af_packet.c
-> @@ -2152,7 +2152,7 @@ static int packet_rcv(struct sk_buff *skb,
-> struct net_device *dev,
->                 }
->         }
+On 7/3/23 11:15 AM, Eric Dumazet wrote:
+> On Mon, Jul 3, 2023 at 4:45 PM David Ahern <dsahern@kernel.org> wrote:
 > 
-> -       snaplen = skb->len;
-> +       snaplen = skb->devmem ? skb_headlen(skb) : skb->len;
+>> That is my expectation. The tcpdump is just an easy example of accessing
+>> the skb page frags. skb_copy_and_csum_bits used by icmp is another
+>> example that can walk frags wanting access to device memory. You did not
+>> cause a panic or trip a WARN_ON for example with the tcpdump?
+>>
 > 
+> ICMP packets do not land on the queues having devmem buffers, for
+> obvious reasons.
 
-Ok, so you expect a flag on the skb noting the use of 'untouchable'
-memory. That aligns with my expectations based on POCs.
+I was not referring to ICMP packets coming in to the nic, but rather an
+icmp getting triggered during stack processing.
 
-Based on the above: 1) skb->head is expected to be host memory, and 2)
-the flag is a global for all frags, so no mix and match.
+> 
+> Only chosen TCP flows are steered to these queues.
+
+of course.
 
