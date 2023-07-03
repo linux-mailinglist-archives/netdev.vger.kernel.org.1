@@ -1,176 +1,159 @@
-Return-Path: <netdev+bounces-15028-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15029-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E04674556A
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:22:51 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 52F3E745577
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:25:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A133280C7D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 06:22:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A0D40280C3D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 06:25:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 78C1C7E3;
-	Mon,  3 Jul 2023 06:22:48 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE3E980E;
+	Mon,  3 Jul 2023 06:25:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 689F6A42
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 06:22:48 +0000 (UTC)
-Received: from mail-ua1-x934.google.com (mail-ua1-x934.google.com [IPv6:2607:f8b0:4864:20::934])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C0310C2
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 23:22:45 -0700 (PDT)
-Received: by mail-ua1-x934.google.com with SMTP id a1e0cc1a2514c-78f1210e27fso1363328241.1
-        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 23:22:45 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688365365; x=1690957365;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=Dh2dAhBT/r+t8dBDKmgiVOzd46bgkC5w60SC2kQomME=;
-        b=CSbXeIllDKG52Hz2y0BzvzeWTNUEc4fr1uNpd8I0jFTbwT+x3xDzfAMsPWIKx6IndK
-         bOfUdQihG5MDXKogCsRu0ZSQMmMqJLNluQnXpau1J4w9cUIMMHIL/jF+DEbhCBDpOV4D
-         UrvGya3awuDtGeA3F5CEGu7Tsy5x6It+z9gqJsw2oPuPXEPiIxuE9fQSoLE3tGreKNSn
-         n29sZy8eBYgJ3uG2O2Vor2R9NR0H8vnSeaY4+eTO2hqtFSudrrp5NWwTcNsssh4ExF2G
-         md6hi/utlTHH/EJqeqUjebheF7KLxlDoH+TCdnplsNmsiqqiOSECjVqhIKnbPUezcxIN
-         Ax/w==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BEE267E3
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 06:25:46 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F1BCC4
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 23:25:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688365540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Tpk/m1ehmImz7zaLy3aO5+IqtB88CsrdqBSdTDk04so=;
+	b=L21xEHAP78Z+Silct1kf4hjqkR84vUVrWJUGwlcdxBAyj60v54e8ckZr2T55Bc+74RHRVI
+	0Ix2naKtmyVvsVyBdGbKfdnqNAk5yVLtuJjnd0ItoCtEEXu0r87tCNiS6DKrcWABTgjHYo
+	T4UUMqitC2DoJJwKU8SHB02HP3MiDLY=
+Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
+ [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-397-Omr-6U3gO7qNRt22tWfNjQ-1; Mon, 03 Jul 2023 02:25:38 -0400
+X-MC-Unique: Omr-6U3gO7qNRt22tWfNjQ-1
+Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b6a5ceddcdso35472021fa.1
+        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 23:25:38 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688365365; x=1690957365;
+        d=1e100.net; s=20221208; t=1688365537; x=1690957537;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=Dh2dAhBT/r+t8dBDKmgiVOzd46bgkC5w60SC2kQomME=;
-        b=j7rY63c2L4ePLgychVjWk4rabeys81jCrxcmYaT7UxU+hrC1vguGvA6GrUpO0kUj+c
-         HJS/xsLjM4+qHbtE04B2PU7HncEUOSdk8lh9a3XHSSLl7b/p2xunkpvKwT2BJmVN7hs1
-         yHRRHBZQfkS9Oa4cUmrncoJRcfDhLc47duenFWNgcL1Aq9zXlmPFxV4DJOUygpMSYCFg
-         5VMxWN6N93J6QPCUvB/6iEzlAaVbPkwC/dpGP4fHLYGAHtUp8FFCDZIqvIj1+uhApZxP
-         +uzJvgZ9fCrHd3bZmFEzWg41t0Ziu8YUjbVvPtJxLpUFgEuVibi6x40BR/RqLSIc8DGX
-         ORWg==
-X-Gm-Message-State: ABy/qLZGbHQiyvuYukZpYBzGCUzpXavzdcJPCpxqfLBh3l2dAKOHcnMQ
-	52puEpurw8wfJXTfF3vqioBtAXl99T8R1s9YvP59/g==
-X-Google-Smtp-Source: APBJJlH0cEalozKdN1PxBzsfGgMveO3/o2cxZaibne5GXfrl3uwlOSKqPsgSIeVejxm1iGr09N+dbcj5d2OvkAVr1vs=
-X-Received: by 2002:a67:ee55:0:b0:443:6052:43ac with SMTP id
- g21-20020a67ee55000000b00443605243acmr3287737vsp.30.1688365364750; Sun, 02
- Jul 2023 23:22:44 -0700 (PDT)
+        bh=Tpk/m1ehmImz7zaLy3aO5+IqtB88CsrdqBSdTDk04so=;
+        b=awY6rURr1TArR2Pe6Bs7NbTr3jt7WL/VtgoLpFFEAK6s7fC9hJ8DHvYbSFOo2ZLywT
+         KPZu0vbhp8eU/jUl3tF3usW3+9rQ4mNhB9q005LnGJNTQiqB9Fh482sWnnjmmRQxsqso
+         vZqJ7uBCTEyW2BpOvaNaw1sYwWkWiHANivsEqQBEzniJnETgBdf8WkUqTcRdKvBIqzKP
+         mE3R0q5cnb359aoVfdDyT2zatioRNdSObtlFGQHqW0MjaqVz2o6roc2uazADoNhPYD1t
+         EUTburVwQicv8lBhjp8IUvZcW4VMLSz0dAnO03ivf3qhkctnhYZQCpZyz8YPdwXdRsjS
+         bTrQ==
+X-Gm-Message-State: ABy/qLYveTDwx2I+eKkqcki9Zq0SaTYdKlKl21i6x3c/xoA/IkgZcPhE
+	WVcpCkiRfCC/hQrJEztvAMVpM8sPv8BqBNTtRrcYxGhgkm1VRIowrODE+PvZeGzoCWU/dyRfWzD
+	msB0Bxg68QjzDjheIGEiMOrC02GzcaWsI
+X-Received: by 2002:a2e:3a0f:0:b0:2b6:decf:5cbf with SMTP id h15-20020a2e3a0f000000b002b6decf5cbfmr2575350lja.32.1688365537528;
+        Sun, 02 Jul 2023 23:25:37 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEtiFAUSLVKli3ZwlIzEtafXVEMpeIGVKp2Qav8LglWDEDQNJ63BHWuk/72EPyDX1VfTOgZd7pUWMPp5sL01kw=
+X-Received: by 2002:a2e:3a0f:0:b0:2b6:decf:5cbf with SMTP id
+ h15-20020a2e3a0f000000b002b6decf5cbfmr2575331lja.32.1688365537255; Sun, 02
+ Jul 2023 23:25:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230612130256.4572-1-linyunsheng@huawei.com> <20230612130256.4572-5-linyunsheng@huawei.com>
- <20230614101954.30112d6e@kernel.org> <8c544cd9-00a3-2f17-bd04-13ca99136750@huawei.com>
- <20230615095100.35c5eb10@kernel.org> <CAKgT0Uc6Xoyh3Edgt+83b+HTM5j4JDr3fuxcyL9qDk+Wwt9APg@mail.gmail.com>
- <908b8b17-f942-f909-61e6-276df52a5ad5@huawei.com> <CAKgT0UeZfbxDYaeUntrQpxHmwCh6zy0dEpjxghiCNxPxv=kdoQ@mail.gmail.com>
- <72ccf224-7b45-76c5-5ca9-83e25112c9c6@redhat.com> <20230616122140.6e889357@kernel.org>
- <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com> <20230619110705.106ec599@kernel.org>
- <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com> <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
-In-Reply-To: <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
-From: Mina Almasry <almasrymina@google.com>
-Date: Sun, 2 Jul 2023 23:22:33 -0700
-Message-ID: <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
-Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
- page_pool: remove PP_FLAG_PAGE_FRAG flag)
-To: David Ahern <dsahern@kernel.org>
-Cc: Jakub Kicinski <kuba@kernel.org>, Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com, 
-	Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
-	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
-	Salil Mehta <salil.mehta@huawei.com>, Eric Dumazet <edumazet@google.com>, 
-	Sunil Goutham <sgoutham@marvell.com>, Geetha sowjanya <gakula@marvell.com>, 
-	Subbaraya Sundeep <sbhatta@marvell.com>, hariprasad <hkelam@marvell.com>, 
-	Saeed Mahameed <saeedm@nvidia.com>, Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>, 
-	Ryder Lee <ryder.lee@mediatek.com>, Shayne Chen <shayne.chen@mediatek.com>, 
-	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>, 
-	Matthias Brugger <matthias.bgg@gmail.com>, 
-	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
-	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
-	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
-	Jonathan Lemon <jonathan.lemon@gmail.com>
+References: <20230628065919.54042-1-lulu@redhat.com> <20230628065919.54042-2-lulu@redhat.com>
+ <CACGkMEvTyxvEkdMbYqZG3T4ZGm2G36hYqPidbTNzLB=bUgSr0A@mail.gmail.com> <CACLfguWx2hjNyyVC_JM1VBCGj3AqRZsygHJ3JGcb8erknBo-sA@mail.gmail.com>
+In-Reply-To: <CACLfguWx2hjNyyVC_JM1VBCGj3AqRZsygHJ3JGcb8erknBo-sA@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Mon, 3 Jul 2023 14:25:25 +0800
+Message-ID: <CACGkMEtowYUowpsBvkYe3AUADwYgOcxbHW=-f=45u2vNTz9CUA@mail.gmail.com>
+Subject: Re: [RFC 1/4] vduse: Add the struct to save the vq reconnect info
+To: Cindy Lu <lulu@redhat.com>
+Cc: mst@redhat.com, maxime.coquelin@redhat.com, xieyongji@bytedance.com, 
+	kvm@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 2, 2023 at 9:20=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
-te:
+On Sat, Jul 1, 2023 at 5:25=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrote:
 >
-> On 6/29/23 8:27 PM, Mina Almasry wrote:
+> On Wed, Jun 28, 2023 at 4:04=E2=80=AFPM Jason Wang <jasowang@redhat.com> =
+wrote:
 > >
-> > Hello Jakub, I'm looking into device memory (peer-to-peer) networking
-> > actually, and I plan to pursue using the page pool as a front end.
+> > On Wed, Jun 28, 2023 at 2:59=E2=80=AFPM Cindy Lu <lulu@redhat.com> wrot=
+e:
+> > >
+> > > From: Your Name <you@example.com>
 > >
-> > Quick description of what I have so far:
-> > current implementation uses device memory with struct pages; I am
-> > putting all those pages in a gen_pool, and we have written an
-> > allocator that allocates pages from the gen_pool. In the driver, we
-> > use this allocator instead of alloc_page() (the driver in question is
-> > gve which currently doesn't use the page pool). When the driver is
-> > done with the p2p page, it simply decrements the refcount on it and
-> > the page is freed back to the gen_pool.
+> > It looks to me your git is not properly configured.
+> >
+> > >
+> > > this struct is to save the reconnect info struct, in this
+> > > struct saved the page info that alloc to save the
+> > > reconnect info
+> > >
+> > > Signed-off-by: Cindy Lu <lulu@redhat.com>
+> > > ---
+> > >  drivers/vdpa/vdpa_user/vduse_dev.c | 7 +++++++
+> > >  1 file changed, 7 insertions(+)
+> > >
+> > > diff --git a/drivers/vdpa/vdpa_user/vduse_dev.c b/drivers/vdpa/vdpa_u=
+ser/vduse_dev.c
+> > > index 26b7e29cb900..f845dc46b1db 100644
+> > > --- a/drivers/vdpa/vdpa_user/vduse_dev.c
+> > > +++ b/drivers/vdpa/vdpa_user/vduse_dev.c
+> > > @@ -72,6 +72,12 @@ struct vduse_umem {
+> > >         struct page **pages;
+> > >         struct mm_struct *mm;
+> > >  };
+> > > +struct vdpa_reconnect_info {
+> > > +       u32 index;
+> > > +       phys_addr_t addr;
+> > > +       unsigned long vaddr;
+> > > +       phys_addr_t size;
+> > > +};
+> >
+> > Please add comments to explain each field. And I think this should be
+> > a part of uAPI?
+> >
+> > Thanks
+> >
+> Will add the new ioctl for this information
 
-Quick update here, I was able to get my implementation working with
-the page pool as a front end with the memory provider API Jakub wrote
-here:
-https://github.com/kuba-moo/linux/tree/pp-providers
+I may miss something but having this to be part of the uAPI seems more
+than enough.
 
-The main complication indeed was the fact that my device memory pages
-are ZONE_DEVICE pages, which are incompatible with the page_pool due
-to the union in struct page. I thought of a couple of approaches to
-resolve that.
+Or what would this new ioctl do?
 
-1. Make my device memory pages non-ZONE_DEVICE pages. The issue with
-that is that if the page is not ZONE_DEVICE, put_page(page) will
-attempt to free it to the buddy allocator I think, which is not
-correct. The only places where the mm stack currently allow custom
-freeing callback (AFAIK), are for ZONE_DEVICE page where
-free_zone_device_page() will call the provided callback in
-page->pgmap->ops->page_free, and compound pages where the
-compound_dtor is specified. My device memory pages aren't compound
-pages so only ZONE_DEVICE pages do what I want.
+Thanks
 
-2. Convert the pages from ZONE_DEVICE pages to page_pool pages and
-vice versa as they're being inserted and removed from the page pool.
-This, I think, works elegantly without any issue, and is the option I
-went with. The info from ZONE_DEVICE that I care about for device
-memory TCP is the page->zone_device_data which holds the dma_addr, and
-the page->pgmap which holds the page_free op. I'm able to store both
-in my memory provider so I can swap pages from ZONE_DEVICE and
-page_pool back and forth.
-
-So far I haven't needed to make any modifications to the memory
-provider implementation Jakub has pretty much, and my functionality
-tests are passing. If there are no major objections I'll look into
-cleaning up the interface a bit and propose it for merge. This is a
-prerequisite of device memory TCP via the page_pool.
-
+> Thanks
+> Cindy
+> > >
+> > >  struct vduse_dev {
+> > >         struct vduse_vdpa *vdev;
+> > > @@ -106,6 +112,7 @@ struct vduse_dev {
+> > >         u32 vq_align;
+> > >         struct vduse_umem *umem;
+> > >         struct mutex mem_lock;
+> > > +       struct vdpa_reconnect_info reconnect_info[64];
+> > >  };
+> > >
+> > >  struct vduse_dev_msg {
+> > > --
+> > > 2.34.3
+> > >
+> >
 >
-> I take it these are typical Linux networking applications using standard
-> socket APIs (not dpdk or xdp sockets or such)? If so, what does tcpdump
-> show for those skbs with pages for the device memory?
->
 
-Yes these are using (mostly) standing socket APIs. We have small
-extensions to sendmsg() and recvmsg() to pass a reference to the
-device memory in both these cases, but that's about it.
-
-tcpdump is able to access the header of these skbs which is in host
-memory, but not the payload in device memory. Here is an example
-session with my netcat-like test for device memory TCP:
-https://pastebin.com/raw/FRjKf0kv
-
-tcpdump seems to work, and the length of the packets above is correct.
-tcpdump -A however isn't able to print the payload of the packets:
-https://pastebin.com/raw/2PcNxaZV
-
---=20
-Thanks,
-Mina
 
