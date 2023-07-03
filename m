@@ -1,338 +1,155 @@
-Return-Path: <netdev+bounces-15186-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15187-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB28C74612E
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:09:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 197A0746137
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:13:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1DB421C209C6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:09:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BDDE8280E4E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:13:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E83E7101CC;
-	Mon,  3 Jul 2023 17:09:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EAB91101CF;
+	Mon,  3 Jul 2023 17:13:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C4DD86AAA
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:09:34 +0000 (UTC)
-Received: from smtp-190a.mail.infomaniak.ch (smtp-190a.mail.infomaniak.ch [IPv6:2001:1600:4:17::190a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 65088E5D
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:09:32 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-3-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4Qvspw6JMpzMq4cG;
-	Mon,  3 Jul 2023 17:09:28 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4Qvspv6PK5zMpsPC;
-	Mon,  3 Jul 2023 19:09:27 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1688404168;
-	bh=wM9tGMnVXVH4SdglDdt9Wa57dGnrbvtZYUt5lxRDDkI=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=Fmfq+VHEOezS5WA9HKwiF7Q5ki4//SiNS6NygrGn3XIaIOGXNbWXmZGJDcWEw+ITQ
-	 r5Tyru4rx8J/VR0Wb/VzxQoPdrAbwO9q6juX+RvypQfYMoEbu5eXie2bZDPMN4nf43
-	 biSC5jMPKPEVvnJVV0ZQ8lQ27axUFiUOegdIL2xo=
-Message-ID: <6d612605-f5c8-d82e-02ec-2f72e1123f53@digikod.net>
-Date: Mon, 3 Jul 2023 19:09:26 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD56E101C0
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:13:33 +0000 (UTC)
+Received: from mail-qt1-x82c.google.com (mail-qt1-x82c.google.com [IPv6:2607:f8b0:4864:20::82c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AA9CECD
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:13:31 -0700 (PDT)
+Received: by mail-qt1-x82c.google.com with SMTP id d75a77b69052e-4036bd4fff1so49791cf.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 10:13:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688404411; x=1690996411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iHhUcDMJ3GqqYqX8PUUmG05Gp9eg0kW+H85LcvU0FfM=;
+        b=pcu1plunE/NwYXd0zKabq0kXC4lBKk8tohnsKuaUuvE/HlEsyL08J8Rrncb6tdHXMG
+         cmz9bCoXUDR/JwJsqsmr71QjeYmcARqtrt1DQSYI9zPV/Sf5pJYJl6xLdKaxJCKOgvFr
+         tnh9hlLbsw7q44xoXUaYM2Dl0zsM+CLmFGB60IzLiGOE4Gp49zPEcLGoPRuAw7HPala5
+         LXBec5FoBaHgoeX5sfQUdYjUsvGaUbSYJ1wRZy1H8aMdOztF5ksEydpAKeoXbOIbsEEp
+         30O8WuSAIYDTIkOI+/A0q8zA+SIzSI2JSocnTIfxpIswqs5WknnfbaYV8cHM0P31259d
+         HXkg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688404411; x=1690996411;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iHhUcDMJ3GqqYqX8PUUmG05Gp9eg0kW+H85LcvU0FfM=;
+        b=DxWHXBe6lrApJsQNgHYCRbbEZk4fIsF/rLxsZh17sWzS58qrYeEYVdPTNWLjLc9NiQ
+         lU3fm63boqG+aTsMnG8DxF4NX0eqiY4q9I+jq1vWEKVZbgJ9vttiuOwL3cL3Xbva3/4B
+         EtPSZLdqbyXlP8BlIrmm7n1+M9pay5fGGSAEZEnVGDm2TOrMqbVjC32Y1SjtD16wb7kl
+         TFBkugJot3ii7nI8zO+Oy8ZeZ0rppFpnNsyN0k+Qb6i2Ihc+j2l35n1x7xP/BBECu+o+
+         WpbDQ3Zc455OzbKjqKhPD2mfUBbdj2b3vhrafDnkbSY42PvAnfcAELYAeAjzJwaC8y5L
+         LQSg==
+X-Gm-Message-State: ABy/qLaADPwelcfLzFKcMPF104hayDM279SZ04qeBI3i2+vHmxzQPkio
+	MJIHWv7OBYOgdHFDTktD7sGH4K7MhmGmGiw4zuYYKg==
+X-Google-Smtp-Source: APBJJlGYc95qxttE9/8PAmxKfxDwWHEqgj+xMhW5O9ooJIFZZ/PHyQ6aNbFx0eU2JgiJSidSG/eG84BaW6wvypRKK3A=
+X-Received: by 2002:ac8:574c:0:b0:3e8:684b:195d with SMTP id
+ 12-20020ac8574c000000b003e8684b195dmr44qtx.10.1688404410592; Mon, 03 Jul 2023
+ 10:13:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v11 11/12] samples/landlock: Add network demo
-Content-Language: en-US
-To: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>,
- =?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack@google.com>
-Cc: willemdebruijn.kernel@gmail.com, gnoack3000@gmail.com,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org, yusongping@huawei.com,
- artem.kuzin@huawei.com
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-12-konstantin.meskhidze@huawei.com>
- <ZH9OFyWZ1njI7VG9@google.com>
- <d9f07165-f589-13d4-6484-1272704f1de0@huawei.com>
- <8c09fc5a-e3a5-4792-65a8-b84c6044128a@digikod.net>
- <c0713bf1-a65e-c4cd-08b9-c60bd79fc86f@huawei.com>
- <fb1d9351-355c-feb8-c2a2-419e24000049@digikod.net>
- <60e5f0ea-39fa-9f76-35bd-ec88fc489922@huawei.com>
- <1ee25561-96b8-67a6-77ca-475d12ea244d@digikod.net>
- <7df6f52c-578b-d396-7c7e-8dd63946c44e@huawei.com>
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <7df6f52c-578b-d396-7c7e-8dd63946c44e@huawei.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+References: <20230612130256.4572-1-linyunsheng@huawei.com> <20230612130256.4572-5-linyunsheng@huawei.com>
+ <20230614101954.30112d6e@kernel.org> <8c544cd9-00a3-2f17-bd04-13ca99136750@huawei.com>
+ <20230615095100.35c5eb10@kernel.org> <CAKgT0Uc6Xoyh3Edgt+83b+HTM5j4JDr3fuxcyL9qDk+Wwt9APg@mail.gmail.com>
+ <908b8b17-f942-f909-61e6-276df52a5ad5@huawei.com> <CAKgT0UeZfbxDYaeUntrQpxHmwCh6zy0dEpjxghiCNxPxv=kdoQ@mail.gmail.com>
+ <72ccf224-7b45-76c5-5ca9-83e25112c9c6@redhat.com> <20230616122140.6e889357@kernel.org>
+ <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com> <20230619110705.106ec599@kernel.org>
+ <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
+ <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org> <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
+ <47b79e77-461b-8fe9-41fb-b69a6b205ef2@kernel.org>
+In-Reply-To: <47b79e77-461b-8fe9-41fb-b69a6b205ef2@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Jul 2023 19:13:19 +0200
+Message-ID: <CANn89iKAvrf92Fy8a_M+V9eya6OHokey2_yxQ3JiCT87fKND_w@mail.gmail.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+To: David Ahern <dsahern@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com, 
+	Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
+	Salil Mehta <salil.mehta@huawei.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Mon, Jul 3, 2023 at 4:45=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
+>
+> On 7/3/23 12:22 AM, Mina Almasry wrote:
+> > tcpdump is able to access the header of these skbs which is in host
+> > memory, but not the payload in device memory. Here is an example
+> > session with my netcat-like test for device memory TCP:
+> > https://pastebin.com/raw/FRjKf0kv
+> >
+> > tcpdump seems to work, and the length of the packets above is correct.
+> > tcpdump -A however isn't able to print the payload of the packets:
+> > https://pastebin.com/raw/2PcNxaZV
+>
+> That is my expectation. The tcpdump is just an easy example of accessing
+> the skb page frags. skb_copy_and_csum_bits used by icmp is another
+> example that can walk frags wanting access to device memory. You did not
+> cause a panic or trip a WARN_ON for example with the tcpdump?
+>
 
-On 03/07/2023 14:50, Konstantin Meskhidze (A) wrote:
-> 
-> 
-> 6/22/2023 1:18 PM, Mickaël Salaün пишет:
->>
->> On 22/06/2023 10:00, Konstantin Meskhidze (A) wrote:
->>>
->>>
->>> 6/19/2023 9:19 PM, Mickaël Salaün пишет:
->>>>
->>>> On 19/06/2023 16:24, Konstantin Meskhidze (A) wrote:
->>>>>
->>>>>
->>>>> 6/13/2023 11:38 PM, Mickaël Salaün пишет:
->>>>>>
->>>>>> On 13/06/2023 12:54, Konstantin Meskhidze (A) wrote:
->>>>>>>
->>>>>>>
->>>>>>> 6/6/2023 6:17 PM, Günther Noack пишет:
->>>>>>>> Hi Konstantin!
->>>>>>>>
->>>>>>>> Apologies if some of this was discussed before, in this case,
->>>>>>>> Mickaël's review overrules my opinions from the sidelines ;)
->>>>>>>>
->>>>>>>> On Tue, May 16, 2023 at 12:13:38AM +0800, Konstantin Meskhidze wrote:
->>>>>>>>> This commit adds network demo. It's possible to allow a sandboxer to
->>>>>>>>> bind/connect to a list of particular ports restricting network
->>>>>>>>> actions to the rest of ports.
->>>>>>>>>
->>>>>>>>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->>>>>>>>
->>>>>>>>
->>>>>>>>> diff --git a/samples/landlock/sandboxer.c b/samples/landlock/sandboxer.c
->>>>>>>>> index e2056c8b902c..b0250edb6ccb 100644
->>>>>>>>> --- a/samples/landlock/sandboxer.c
->>>>>>>>> +++ b/samples/landlock/sandboxer.c
->>>>>>>>
->>>>>>>> ...
->>>>>>>>
->>>>>>>>> +static int populate_ruleset_net(const char *const env_var, const int ruleset_fd,
->>>>>>>>> +				const __u64 allowed_access)
->>>>>>>>> +{
->>>>>>>>> +	int num_ports, i, ret = 1;
->>>>>>>>
->>>>>>>> I thought the convention was normally to set ret = 0 initially and to
->>>>>>>> override it in case of error, rather than the other way around?
->>>>>>
->>>>>> Which convention? In this case, by default the return code is an error.
->>>>>>
->>>>>>
->>>>>>>>
->>>>>>>        Well, I just followed Mickaёl's way of logic here. >
->>>>>>>
->>>>>>>>> +	char *env_port_name;
->>>>>>>>> +	struct landlock_net_service_attr net_service = {
->>>>>>>>> +		.allowed_access = allowed_access,
->>>>>>>>> +		.port = 0,
->>>>>>>>> +	};
->>>>>>>>> +
->>>>>>>>> +	env_port_name = getenv(env_var);
->>>>>>>>> +	if (!env_port_name)
->>>>>>>>> +		return 0;
->>>>>>>>> +	env_port_name = strdup(env_port_name);
->>>>>>>>> +	unsetenv(env_var);
->>>>>>>>> +	num_ports = parse_port_num(env_port_name);
->>>>>>>>> +
->>>>>>>>> +	if (num_ports == 1 && (strtok(env_port_name, ENV_PATH_TOKEN) == NULL)) {
->>>>>>>>> +		ret = 0;
->>>>>>>>> +		goto out_free_name;
->>>>>>>>> +	}
->>>>>>>>
->>>>>>>> I don't understand why parse_port_num and strtok are necessary in this
->>>>>>>> program. The man-page for strsep(3) describes it as a replacement to
->>>>>>>> strtok(3) (in the HISTORY section), and it has a very short example
->>>>>>>> for how it is used.
->>>>>>>>
->>>>>>>> Wouldn't it work like this as well?
->>>>>>>>
->>>>>>>> while ((strport = strsep(&env_port_name, ":"))) {
->>>>>>>>        net_service.port = atoi(strport);
->>>>>>>>        /* etc */
->>>>>>>> }
->>>>>>>
->>>>>>>        Thanks for a tip. I think it's a better solution here. Now this
->>>>>>> commit is in Mickaёl's -next branch. I could send a one-commit patch later.
->>>>>>> Mickaёl, what do you think?
->>>>>>
->>>>>> I removed this series from -next because there is some issues (see the
->>>>>> bot's emails), but anyway, this doesn't mean these patches don't need to
->>>>>> be changed, they do. The goal of -next is to test more widely a patch
->>>>>> series and get more feedbacks, especially from bots. When this series
->>>>>> will be fully ready (and fuzzed with syzkaller), I'll push it to Linus
->>>>>> Torvalds.
->>>>>>
->>>>>> I'll review the remaining tests and sample code this week, but you can
->>>>>> still take into account the documentation review.
->>>>>
->>>>>      Hi, Mickaёl.
->>>>>
->>>>>      I have a few quetions?
->>>>>       - Are you going to fix warnings for bots, meanwhile I run syzcaller?
->>>>
->>>> No, you need to fix that with the next series (except the Signed-off-by
->>>> warnings).
->>>
->>>     Hi, Mickaёl.
->>>      As I understand its possible to check bots warnings just after you
->>> push the next V12 series again into your -next branch???
->>
->> Yes, we get bot warnings on the -next tree, but the command that
->> generate it should be reproducible.
-> 
->     Stephen Rothwell sent a few warnings he got with powerpc
-> pseries_le_defconfig. Do I need to fix it in V12 patch? How can I handle
-> it cause no warnings in current .config?
+Change for af_packet was not too hard :)
 
-Yes, this need to be fixed in the next series. Could you point to the 
-message?
+diff --git a/net/packet/af_packet.c b/net/packet/af_packet.c
+index a2dbeb264f260e5b8923ece9aac99fe19ddfeb62..aa4133d1b1e0676e408499ea453=
+4b51262394432
+100644
+--- a/net/packet/af_packet.c
++++ b/net/packet/af_packet.c
+@@ -2152,7 +2152,7 @@ static int packet_rcv(struct sk_buff *skb,
+struct net_device *dev,
+                }
+        }
 
-I'm almost done with the test, I revamped code and I'll send that tomorrow.
+-       snaplen =3D skb->len;
++       snaplen =3D skb->devmem ? skb_headlen(skb) : skb->len;
 
->>
->>
->>>
->>>>
->>>> What is your status on syzkaller? Do you need some help? I can write the
->>>> tests if it's too much.
->>>>
->>>      Sorry. To be honest I'm busy with another project. I dont know how
->>> much time it will take for me to set up and run syzkaller. I need your
->>> help here please, how you do this, some roadmap.
->>
->> Ok, no worries, I have it set up so I'll take care of it and keep you in
->> the loop with your GitHub account.
->>
->    Thank you!!
->>
->>>>
->>>>>       - I will fix documentation and sandbox demo and sent patch v12?
->>>>
->>>> Yes please. Let me a few days to send more reviews.
->>>>
->>>      Ok. Sure.
->>>>>
->>>>>>
->>>>>>
->>>>>>>
->>>>>>>>
->>>>>>>>> +
->>>>>>>>> +	for (i = 0; i < num_ports; i++) {
->>>>>>>>> +		net_service.port = atoi(strsep(&env_port_name, ENV_PATH_TOKEN));
->>>>>>>>
->>>>>>>> Naming of ENV_PATH_TOKEN:
->>>>>>>> This usage is not related to paths, maybe rename the variable?
->>>>>>>> It's also technically not the token, but the delimiter.
->>>>>>>>
->>>>>>>       What do you think of ENV_PORT_TOKEN or ENV_PORT_DELIMITER???
->>>>>>
->>>>>> You can rename ENV_PATH_TOKEN to ENV_DELIMITER for the FS and network parts.
->>>>>>
->>>>>        Ok. Got it.
->>>>>>
->>>>>>>
->>>>>>>>> +		if (landlock_add_rule(ruleset_fd, LANDLOCK_RULE_NET_SERVICE,
->>>>>>>>> +				      &net_service, 0)) {
->>>>>>>>> +			fprintf(stderr,
->>>>>>>>> +				"Failed to update the ruleset with port \"%lld\": %s\n",
->>>>>>>>> +				net_service.port, strerror(errno));
->>>>>>>>> +			goto out_free_name;
->>>>>>>>> +		}
->>>>>>>>> +	}
->>>>>>>>> +	ret = 0;
->>>>>>>>> +
->>>>>>>>> +out_free_name:
->>>>>>>>> +	free(env_port_name);
->>>>>>>>> +	return ret;
->>>>>>>>> +}
->>>>>>>>
->>>>>>>>
->>>>>>>>>      		fprintf(stderr,
->>>>>>>>>      			"Launch a command in a restricted environment.\n\n");
->>>>>>>>> -		fprintf(stderr, "Environment variables containing paths, "
->>>>>>>>> -				"each separated by a colon:\n");
->>>>>>>>> +		fprintf(stderr,
->>>>>>>>> +			"Environment variables containing paths and ports "
->>>>>>>>> +			"each separated by a colon:\n");
->>>>>>>>>      		fprintf(stderr,
->>>>>>>>>      			"* %s: list of paths allowed to be used in a read-only way.\n",
->>>>>>>>>      			ENV_FS_RO_NAME);
->>>>>>>>>      		fprintf(stderr,
->>>>>>>>> -			"* %s: list of paths allowed to be used in a read-write way.\n",
->>>>>>>>> +			"* %s: list of paths allowed to be used in a read-write way.\n\n",
->>>>>>>>>      			ENV_FS_RW_NAME);
->>>>>>>>> +		fprintf(stderr,
->>>>>>>>> +			"Environment variables containing ports are optional "
->>>>>>>>> +			"and could be skipped.\n");
->>>>>>>>
->>>>>>>> As it is, I believe the program does something different when I'm
->>>>>>>> setting these to the empty string (ENV_TCP_BIND_NAME=""), compared to
->>>>>>>> when I'm unsetting them?
->>>>>>>>
->>>>>>>> I think the case where we want to forbid all handle-able networking is
->>>>>>>> a legit and very common use case - it could be clearer in the
->>>>>>>> documentation how this is done with the tool. (And maybe the interface
->>>>>>>> could be something more explicit than setting the environment variable
->>>>>>>> to empty?)
->>>>>>
->>>>>> I'd like to keep it simple, and it should be seen as an example code,
->>>>>> not a full-feature sandboxer, but still a consistent and useful one.
->>>>>> What would you suggest?
->>>>>>
->>>>>> This sandboxer tool relies on environment variables for its
->>>>>> configuration. This is definitely not a good fit for all use cases, but
->>>>>> I think it is simple and flexible enough. One use case might be to
->>>>>> export a set of environment variables and simply call this tool. I'd
->>>>>> prefer to not deal with argument parsing, but maybe that was too
->>>>>> simplistic? We might want to revisit this approach but probably not with
->>>>>> this series.
->>>>>>
->>>>>>
->>>>>>>>
->>>>>>>>
->>>>>>>>> +	/* Removes bind access attribute if not supported by a user. */
->>>>>>>>> +	env_port_name = getenv(ENV_TCP_BIND_NAME);
->>>>>>>>> +	if (!env_port_name) {
->>>>>>>>> +		ruleset_attr.handled_access_net &=
->>>>>>>>> +			~LANDLOCK_ACCESS_NET_BIND_TCP;
->>>>>>>>> +	}
->>>>>>>>> +	/* Removes connect access attribute if not supported by a user. */
->>>>>>>>> +	env_port_name = getenv(ENV_TCP_CONNECT_NAME);
->>>>>>>>> +	if (!env_port_name) {
->>>>>>>>> +		ruleset_attr.handled_access_net &=
->>>>>>>>> +			~LANDLOCK_ACCESS_NET_CONNECT_TCP;
->>>>>>>>> +	}
->>>>>>>>
->>>>>>>> This is the code where the program does not restrict network usage,
->>>>>>>> if the corresponding environment variable is not set.
->>>>>>>
->>>>>>>        Yep. Right.
->>>>>>>>
->>>>>>>> It's slightly inconsistent with what this tool does for filesystem
->>>>>>>> paths. - If you don't specify any file paths, it will still restrict
->>>>>>>> file operations there, independent of whether that env variable was
->>>>>>>> set or not.  (Apologies if it was discussed before.)
->>>>>>>
->>>>>>>       Mickaёl wanted to make network ports optional here.
->>>>>>>       Please check:
->>>>>>>      
->>>>>>> https://lore.kernel.org/linux-security-module/179ac2ee-37ff-92da-c381-c2c716725045@digikod.net/
->>>>>>
->>>>>> Right, the rationale is for compatibility with the previous version of
->>>>>> this tool. We should not break compatibility when possible. A comment
->>>>>> should explain the rationale though.
->>>>>>
->>>>>>>
->>>>>>> https://lore.kernel.org/linux-security-module/fe3bc928-14f8-5e2b-359e-9a87d6cf5b01@digikod.net/
->>>>>>>>
->>>>>>>> —Günther
->>>>>>>>
->>>>>> .
->>>> .
->> .
+        res =3D run_filter(skb, sk, snaplen);
+        if (!res)
+@@ -2275,7 +2275,7 @@ static int tpacket_rcv(struct sk_buff *skb,
+struct net_device *dev,
+                }
+        }
+
+-       snaplen =3D skb->len;
++       snaplen =3D skb->devmem ? skb_headlen(skb) : skb->len;
+
+        res =3D run_filter(skb, sk, snaplen);
+        if (!res)
+
+
+And a generic change in pskb_may_pull() ( __pskb_pull_tail() more
+exactly) was enough to cover most other cases.
 
