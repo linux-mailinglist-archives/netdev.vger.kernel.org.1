@@ -1,138 +1,109 @@
-Return-Path: <netdev+bounces-15064-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15065-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7E2FE745764
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:34:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4877C745776
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:37:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADFE71C2088D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:34:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 79E61280CD6
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:37:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4121371;
-	Mon,  3 Jul 2023 08:34:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E3F1417F8;
+	Mon,  3 Jul 2023 08:37:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD01CA42
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:34:53 +0000 (UTC)
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D984DD;
-	Mon,  3 Jul 2023 01:34:52 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688373292; x=1719909292;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=7kbif9bfnNgRHrXrFMABWk7zXjF8D6a49xUb4z1x3J8=;
-  b=EDgGbf/46vhrppbnxJa+FD1hxPJQF3Ixnj0JzyGit15dtH/CTo3GqRk5
-   +YBVilG9wMdsBSeSpVdtxnUbsuelgAbPlTLZ1cCWNkipzy3duPpTAxbxj
-   HmWtgsXhIdv+fcplb6wSvngIvHKBHeWrF2yGaSrbgbIhZVCejhCY6PLwW
-   qb25/z95k0M8Tbbgr54AOrhlYnUrTo0gjAsow1aSZRhE3plJUsLvqlZHP
-   99lnWHYEqonKtaNuw3btRNNYkiG1Yah4ARinIFuVJ9jxwiJ3IO0eYn3uz
-   nOjjuPmsjPsnZr6QAMhU0C2LnE3/ZLE8ngm8BBl0TAE/IX2zBfyjN71PM
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="426508743"
-X-IronPort-AV: E=Sophos;i="6.01,177,1684825200"; 
-   d="scan'208";a="426508743"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 01:34:52 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="788447778"
-X-IronPort-AV: E=Sophos;i="6.01,177,1684825200"; 
-   d="scan'208";a="788447778"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.13.12.63]) ([10.13.12.63])
-  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 01:34:47 -0700
-Message-ID: <f14f0d50-2569-0d47-91d6-23c1f99712ad@linux.intel.com>
-Date: Mon, 3 Jul 2023 11:34:44 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D94451371
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:37:19 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5B193D1;
+	Mon,  3 Jul 2023 01:37:18 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.200])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4QvfN74vpmz6D8cQ;
+	Mon,  3 Jul 2023 16:33:59 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 3 Jul 2023 09:37:14 +0100
+Message-ID: <338bba9d-6afa-7c6b-2843-b116abb36859@huawei.com>
+Date: Mon, 3 Jul 2023 11:37:13 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [Intel-wired-lan] [PATCH net v2 2/6] igc: Do not enable taprio
- offload for invalid arguments
-Content-Language: en-US
-To: Florian Kauer <florian.kauer@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Tan Tee Min <tee.min.tan@linux.intel.com>,
- Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
- Aravindhan Gunasekaran <aravindhan.gunasekaran@intel.com>,
- Malli C <mallikarjuna.chilakala@intel.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20230619100858.116286-1-florian.kauer@linutronix.de>
- <20230619100858.116286-3-florian.kauer@linutronix.de>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20230619100858.116286-3-florian.kauer@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11 10/12] selftests/landlock: Add 11 new test suites
+ dedicated to network
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>,
+	=?UTF-8?Q?G=c3=bcnther_Noack?= <gnoack3000@gmail.com>
+CC: <willemdebruijn.kernel@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
+ <20230701.acb4d98c59a0@gnoack.org>
+ <4a733dbd-f6e2-dc69-6c8d-47c362644462@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <4a733dbd-f6e2-dc69-6c8d-47c362644462@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/19/2023 13:08, Florian Kauer wrote:
-> Only set adapter->taprio_offload_enable after validating the arguments.
-> Otherwise, it stays set even if the offload was not enabled.
-> Since the subsequent code does not get executed in case of invalid
-> arguments, it will not be read at first.
-> However, by activating and then deactivating another offload
-> (e.g. ETF/TX launchtime offload), taprio_offload_enable is read
-> and erroneously keeps the offload feature of the NIC enabled.
-> 
-> This can be reproduced as follows:
-> 
->      # TAPRIO offload (flags == 0x2) and negative base-time leading to expected -ERANGE
->      sudo tc qdisc replace dev enp1s0 parent root handle 100 stab overhead 24 taprio \
-> 	    num_tc 1 \
-> 	    map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 \
-> 	    queues 1@0 \
-> 	    base-time -1000 \
-> 	    sched-entry S 01 300000 \
-> 	    flags 0x2
-> 
->      # IGC_TQAVCTRL is 0x0 as expected (iomem=relaxed for reading register)
->      sudo pcimem /sys/bus/pci/devices/0000:01:00.0/resource0 0x3570 w*1
-> 
->      # Activate ETF offload
->      sudo tc qdisc replace dev enp1s0 parent root handle 6666 mqprio \
-> 	    num_tc 3 \
-> 	    map 2 2 1 0 2 2 2 2 2 2 2 2 2 2 2 2 \
-> 	    queues 1@0 1@1 2@2 \
-> 	    hw 0
->      sudo tc qdisc add dev enp1s0 parent 6666:1 etf \
-> 	    clockid CLOCK_TAI \
-> 	    delta 500000 \
-> 	    offload
-> 
->      # IGC_TQAVCTRL is 0x9 as expected
->      sudo pcimem /sys/bus/pci/devices/0000:01:00.0/resource0 0x3570 w*1
-> 
->      # Deactivate ETF offload again
->      sudo tc qdisc delete dev enp1s0 parent 6666:1
-> 
->      # IGC_TQAVCTRL should now be 0x0 again, but is observed as 0x9
->      sudo pcimem /sys/bus/pci/devices/0000:01:00.0/resource0 0x3570 w*1
-> 
-> Fixes: e17090eb2494 ("igc: allow BaseTime 0 enrollment for Qbv")
-> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
->   1 file changed, 2 insertions(+), 2 deletions(-)
 
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+7/2/2023 11:45 AM, Mickaël Salaün пишет:
+> 
+> On 01/07/2023 21:07, Günther Noack wrote:
+>> Hi!
+>> 
+>> On Tue, May 16, 2023 at 12:13:37AM +0800, Konstantin Meskhidze wrote:
+>>> +TEST_F(inet, bind)
+>> 
+>> If you are using TEST_F() and you are enforcing a Landlock ruleset
+>> within that test, doesn't that mean that the same Landlock ruleset is
+>> now also enabled on other tests that get run after that test?
+>> 
+>> Most of the other Landlock selftests use TEST_F_FORK() for that
+>> reason, so that the Landlock enforcement stays local to the specific
+>> test, and does not accidentally influence the observed behaviour in
+>> other tests.
+> 
+> Initially Konstantin wrote tests with TEST_F_FORK() but I asked him to
+> only use TEST_F() because TEST_F_FORK() is only useful when a
+> FIXTURE_TEARDOWN() needs access rights that were dropped with a
+> TEST_F(), e.g. to unmount mount points set up with a FIXTURE_SETUP()
+> while Landlock restricted a test process.
+> 
+> Indeed, TEST_F() already fork() to make sure there is no side effect
+> with tests.
+> 
+
+  Hi, Günther
+  Yep. Mickaёl asked me to replace TEST_F_FORK() with TEST_F(). Please 
+check this thread
+ 
+https://lore.kernel.org/netdev/33c1f049-12e4-f06d-54c9-b54eec779e6f@digikod.net/
+T
+>> 
+>> The same question applies to other test functions in this file as
+>> well.
+>> 
+>> –Günther
+> .
 
