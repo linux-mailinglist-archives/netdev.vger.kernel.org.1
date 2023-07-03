@@ -1,109 +1,130 @@
-Return-Path: <netdev+bounces-15033-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15034-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8DF637455CC
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:15:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C582745642
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:44:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BBBE51C2083D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 07:15:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F9561C2083D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 07:44:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5224819;
-	Mon,  3 Jul 2023 07:15:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2DD04A45;
+	Mon,  3 Jul 2023 07:44:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B99B8803
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 07:15:21 +0000 (UTC)
-Received: from mail-oa1-x2b.google.com (mail-oa1-x2b.google.com [IPv6:2001:4860:4864:20::2b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F13B4E51
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 00:15:19 -0700 (PDT)
-Received: by mail-oa1-x2b.google.com with SMTP id 586e51a60fabf-1b06ea7e7beso3812294fac.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 00:15:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688368518; x=1690960518;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=IAZeTOZazbGFZSDmndWdfTDNm2nB8DtY7mHI7XdQ7lk=;
-        b=fwrYNJNQGr2V0i3pfa9Vg8VYK7yIzXp54Mx+sp9Ejgte1Va2hgY8F+rZDIsw+Y9Q6a
-         nRp4ePOT5h7wKwqbVlcJXN9hTKgM7oyd4UeQO07XFij25ieux3InxE0J+r17kKtg+SOw
-         +KXyXKR5Ml/hsgMppG7m5Hwz9fpFa2difABUqtcE3OrYMVi1I0n2V/1/1h1l5rS9iFGB
-         5oKBkl4Fe8eFguqnOmUgoV8tPNUCW81H57jVYbBJKY+sKxUH7u5iki0WF4DTDw4yxJ6v
-         r7nRIsXBx7VZ8Ul6LRsU7Ac6dILJQPncwm9o5+FgSpMkcd1FJA/yplKZ6q8fbIuqrHw4
-         FPXg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688368518; x=1690960518;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=IAZeTOZazbGFZSDmndWdfTDNm2nB8DtY7mHI7XdQ7lk=;
-        b=cTYZelwQCRYPbY9KpoSd+xt/QrD1ire0tZ2cT3SZGkuVzJX6I5vh25MbeAklqmy7LL
-         CASNbV7dW3qP/n5Y6uTfusy6pfvozHRZ7gGYv/rJV1ZO1doyOtwON3dUL795zfqx1yG6
-         Jsh/ga/TRrQS44uypIEw/DF9JxlFKq3WhhPEJ8TGckumh/ORFoRLfKaIW6/XfJaRMRoe
-         Csy185Zetrtp4Rl05PhFdrint0dlbViYy816n0A3oW83Px3tOAMO7MykqgyK5ohnPzMl
-         zCTAMK3ti95A17I7zmyPmFKDLaB9E5dL4CBJPQUoNfNYbBuihQbxm2eozm+WSzt6R351
-         6Q4g==
-X-Gm-Message-State: ABy/qLaByP+udbGcZU3KgwFcivrmbGKecoVQr/qUcWvLQYJv3K7YNQCq
-	/KmtBOqUO+x9EMq2Qzk1IxJfMXTxb+zZvgTMPjLf7g==
-X-Google-Smtp-Source: APBJJlFl1y1DD9smdIG3z9ZwGyRcMYA2S0C03PiyGo2Yyt6cyslQgtkKycE8R19wvHB6Fw36fGyu2SOkeqKm2IpNDeM=
-X-Received: by 2002:a05:6870:6c1c:b0:188:1195:5ec5 with SMTP id
- na28-20020a0568706c1c00b0018811955ec5mr10062907oab.39.1688368518367; Mon, 03
- Jul 2023 00:15:18 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1B2F2A34
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 07:43:59 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ABE24C2
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 00:43:58 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688370237;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=+izZ056qkx9wA4inyIESYge9LDOiXeBR8mNGux+wGrY=;
+	b=P3oNtMuBn8BryPEUfLLUrjmx6u5lRpkoCLV6rykUGyuSnYxuu8tOk5rXkDF0BwYqoh2hni
+	xVL9EBL2WW1rphykHkt7hqGNszS2fYPjR5DFO7LNRE1d1hK9+RAxwyorGigE25hNMUBq6s
+	u5Ol/TYIdV/Y+Te9jJIhS7r1kOFH+Ak=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-523-yUKSl3uqMPq6z5xBHPWbzQ-1; Mon, 03 Jul 2023 03:43:54 -0400
+X-MC-Unique: yUKSl3uqMPq6z5xBHPWbzQ-1
+Received: from smtp.corp.redhat.com (int-mx02.intmail.prod.int.rdu2.redhat.com [10.11.54.2])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1C8573806707;
+	Mon,  3 Jul 2023 07:43:54 +0000 (UTC)
+Received: from [10.39.208.21] (unknown [10.39.208.21])
+	by smtp.corp.redhat.com (Postfix) with ESMTPS id BA0544087C6A;
+	Mon,  3 Jul 2023 07:43:51 +0000 (UTC)
+Message-ID: <571e2fbc-ea6a-d231-79f0-37529e05eb98@redhat.com>
+Date: Mon, 3 Jul 2023 09:43:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703053048.275709-1-matt@codeconstruct.com.au> <20230703053048.275709-2-matt@codeconstruct.com.au>
-In-Reply-To: <20230703053048.275709-2-matt@codeconstruct.com.au>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-Date: Mon, 3 Jul 2023 09:15:06 +0200
-Message-ID: <CAGE=qrrqE3Vj1Bs+cC51gKPDmsqMTyHEAJhsrGCyS_jYKf42Gw@mail.gmail.com>
-Subject: Re: [PATCH 1/3] dt-bindings: i3c: Add mctp-controller property
-To: Matt Johnston <matt@codeconstruct.com.au>
-Cc: linux-i3c@lists.infradead.org, netdev@vger.kernel.org, 
-	devicetree@vger.kernel.org, Eric Dumazet <edumazet@google.com>, 
-	"David S. Miller" <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Jeremy Kerr <jk@codeconstruct.com.au>, Alexandre Belloni <alexandre.belloni@bootlin.com>, 
-	Rob Herring <robh+dt@kernel.org>, Conor Dooley <conor+dt@kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v1 0/2] vduse: add support for networking devices
+To: Jason Wang <jasowang@redhat.com>, "Michael S. Tsirkin" <mst@redhat.com>
+Cc: xieyongji@bytedance.com, david.marchand@redhat.com, lulu@redhat.com,
+ linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org,
+ netdev@vger.kernel.org, xuanzhuo@linux.alibaba.com, eperezma@redhat.com
+References: <20230627113652.65283-1-maxime.coquelin@redhat.com>
+ <20230702093530-mutt-send-email-mst@kernel.org>
+ <CACGkMEtoW0nW8w6_Ew8qckjvpNGN_idwpU3jwsmX6JzbDknmQQ@mail.gmail.com>
+Content-Language: en-US
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+In-Reply-To: <CACGkMEtoW0nW8w6_Ew8qckjvpNGN_idwpU3jwsmX6JzbDknmQQ@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.2
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 3 Jul 2023 at 07:31, Matt Johnston <matt@codeconstruct.com.au> wrote:
->
-> This property is used to describe a I3C bus with attached MCTP I3C
-> target devices.
->
-> Signed-off-by: Matt Johnston <matt@codeconstruct.com.au>
-> ---
->  Documentation/devicetree/bindings/i3c/i3c.yaml | 4 ++++
->  1 file changed, 4 insertions(+)
->
-> diff --git a/Documentation/devicetree/bindings/i3c/i3c.yaml b/Documentation/devicetree/bindings/i3c/i3c.yaml
-> index fdb4212149e7..08731e2484f2 100644
-> --- a/Documentation/devicetree/bindings/i3c/i3c.yaml
-> +++ b/Documentation/devicetree/bindings/i3c/i3c.yaml
-> @@ -55,6 +55,10 @@ properties:
->
->        May not be supported by all controllers.
->
-> +  mctp-controller:
-> +    description: |
-> +      Indicates that this bus hosts MCTP-over-I3C target devices.
 
-I have doubts you actually tested it - there is no type/ref. Also,
-your description is a bit different than existing from dtschema. Why?
-Aren't these the same things?
+On 7/3/23 08:44, Jason Wang wrote:
+> On Sun, Jul 2, 2023 at 9:37 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+>>
+>> On Tue, Jun 27, 2023 at 01:36:50PM +0200, Maxime Coquelin wrote:
+>>> This small series enables virtio-net device type in VDUSE.
+>>> With it, basic operation have been tested, both with
+>>> virtio-vdpa and vhost-vdpa using DPDK Vhost library series
+>>> adding VDUSE support using split rings layout (merged in
+>>> DPDK v23.07-rc1).
+>>>
+>>> Control queue support (and so multiqueue) has also been
+>>> tested, but requires a Kernel series from Jason Wang
+>>> relaxing control queue polling [1] to function reliably.
+>>>
+>>> [1]: https://lore.kernel.org/lkml/CACGkMEtgrxN3PPwsDo4oOsnsSLJfEmBEZ0WvjGRr3whU+QasUg@mail.gmail.com/T/
+>>
+>> Jason promised to post a new version of that patch.
+>> Right Jason?
+> 
+> Yes.
+> 
+>> For now let's make sure CVQ feature flag is off?
+> 
+> We can do that and relax on top of my patch.
 
-Best regards,
-Krzysztof
+I agree? Do you prefer a features negotiation, or failing init (like
+done for VERSION_1) if the VDUSE application advertises CVQ?
+
+Thanks,
+Maxime
+
+> Thanks
+> 
+>>
+>>> RFC -> v1 changes:
+>>> ==================
+>>> - Fail device init if it does not support VERSION_1 (Jason)
+>>>
+>>> Maxime Coquelin (2):
+>>>    vduse: validate block features only with block devices
+>>>    vduse: enable Virtio-net device type
+>>>
+>>>   drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++----
+>>>   1 file changed, 11 insertions(+), 4 deletions(-)
+>>>
+>>> --
+>>> 2.41.0
+>>
+> 
+
 
