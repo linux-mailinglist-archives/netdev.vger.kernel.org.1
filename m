@@ -1,151 +1,180 @@
-Return-Path: <netdev+bounces-15243-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15244-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 92F4F7464D2
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 23:26:12 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 35B417464FE
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 23:43:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A4ED280DCB
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 21:26:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 65AE11C20921
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 21:43:22 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 662C9125A4;
-	Mon,  3 Jul 2023 21:26:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 353DB125CD;
+	Mon,  3 Jul 2023 21:43:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 50A3D100B3;
-	Mon,  3 Jul 2023 21:26:06 +0000 (UTC)
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 58392E62;
-	Mon,  3 Jul 2023 14:26:02 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-66872d4a141so2911439b3a.1;
-        Mon, 03 Jul 2023 14:26:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2822211CA8
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 21:43:19 +0000 (UTC)
+Received: from mail-pl1-x636.google.com (mail-pl1-x636.google.com [IPv6:2607:f8b0:4864:20::636])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66B8DE47
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 14:43:18 -0700 (PDT)
+Received: by mail-pl1-x636.google.com with SMTP id d9443c01a7336-1b89114266dso14161165ad.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 14:43:18 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688419562; x=1691011562;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=4bmKZ8Y/bfL0lMK2TktVUvKgxAR9Wdg/glmHijui0lE=;
-        b=X0JQ3sIwqpDsvmjbL/qFyefRXGKaTd5daOZPNF2QsYjbFKpMdoOlyCTdiGdXZLLbmn
-         TE9h280nCAXRyMRPToBUNcG8wns2Rneev2GL7FvLyhBReWy/YoYZwD9SoVreW50lHhuo
-         03VjIVhjvpbWh8t1UJeByciP0JY0fABpW917T7Fp7e/0UHwU3Ii09aT7mNPqV2TLCWIN
-         ZdJUuDkmCx/m/6EqLMdKHHYdpLRnGMHHW3DqQSjbxegGW+/JXhrLyHByrIle4ovAchPk
-         j3Fbs+aCtoc2liyztfxUtZA7msaF0e2rgyrcMKlvu267D/wBq3sT9TgluWPFBu20ujC+
-         xghw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688419562; x=1691011562;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+        d=ziepe.ca; s=google; t=1688420598; x=1691012598;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=4bmKZ8Y/bfL0lMK2TktVUvKgxAR9Wdg/glmHijui0lE=;
-        b=CgcVbXXve6/xLpMsGicf6Ox+bz/FRsu4CxVy6dy2cnFpU02gOYXEztTTxjyhkpOaoi
-         Ia6psj4GUa3rL1oYCtzXFXiuUsQFfJxiYV45wWqQGxJzeBLyb1sgYI/MrEV8CdypmMym
-         h6DwHySc4h1ht/LjX84FyJPs+sOj7Hv8JT9uQGJapVXGJWC4traaO3YYY8EEPhbOERC6
-         4vwW1YadZ6ESpjsL1GrijOPD+HdxnajtR/ZjIleY+8gtlhqDQ0Bnmuo670SxVkWHjUSW
-         LIz8EfT8XIj0x45qIak6SZGZlLsHKe9Ex/7bhxGHLWw8PC4BfFdE5Eju9S0srIjL5CcD
-         jXKw==
-X-Gm-Message-State: AC+VfDx5Ndkdv32CBzhZc0x6GH/GQiG//iyGWI3h6KxOEyvQrxZqqQDG
-	iwtsU4UFSN+ReQAt85g6Unc=
-X-Google-Smtp-Source: ACHHUZ67vfjG9TOTuz6vIg9/gI1HAJ/DfD0VsFRyLGeO9oxaqDjP6MJNysppVbEjM9Xymhho6qmNdw==
-X-Received: by 2002:a05:6a20:8f16:b0:12d:3d9e:2934 with SMTP id b22-20020a056a208f1600b0012d3d9e2934mr9111623pzk.44.1688419561631;
-        Mon, 03 Jul 2023 14:26:01 -0700 (PDT)
-Received: from localhost ([2605:59c8:148:ba10::41f])
-        by smtp.gmail.com with ESMTPSA id a13-20020a1709027d8d00b001acae9734c0sm15690664plm.266.2023.07.03.14.26.00
+        bh=zb/tmr/noeY2rNeZVS/rd5RWOm9XHi+842eE/ic0+a0=;
+        b=AiAmewfofTMCDjim2n5Tw+1ZtqlOIk0bXi6iRE5v5TlHNIye7/DkwQc6W3qq8LjOIp
+         Xqa4BLwykqMBs3rTWLQCqB46cY7yk3e1UlXmD3dachyhxKT3HwGyQ5ZQUBoEeRTg6FWt
+         V3FoZeb/Pfcslwv6G9ml4ZN+Vhlb3NLpYwVIhyIi4T14lqPagW7Xqsj1Vy9HAv94g+UV
+         eCE+uAt/Ww3sa8lilIbrUy2CO/y3njkzPQf1M1G2yc4qYYfB6dr/PTXL5EfFbJB+6aSL
+         RGoqXV5w3f2vXm8fzuxp5DSKfDMzQA8c3OkoqHlFbZHcWSFOF/jGyPHFIwQaqg3O6Ipn
+         SNTA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688420598; x=1691012598;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=zb/tmr/noeY2rNeZVS/rd5RWOm9XHi+842eE/ic0+a0=;
+        b=dEZDs1MrZ3Nd1jvAdTWEbEpbjcjpKKnmrvTIOFP4ogKGyVE9pfXWYM7Pmwxd6Hbgnu
+         G+exVGkSEAfxzTiGsYKJdWNsdd3TJK/ZgSuZUe2THs5pp04FoFGUNSSd8zgc/B33nAdm
+         OuEDKOAarRvYyBF9tKrteDS1jeR8UTZKEpG3d7l0yPnsocHsqb3LlMRjXB06TT2+tzG2
+         RjsvFd7V3KSgiLXo8vitCVoLVyt2+w+E37SAIPI4dASaddKBwnA4vWUXRyVwKxWgCkNW
+         iNQjDIFWHOju1uN2QNsEs9fvMIKlGvpw5jYAXZDAmhvRaSlRiaGR+J2zXlqi/VStPE2A
+         +EZw==
+X-Gm-Message-State: ABy/qLaEl/KFrt2osdoQM1I7aZBdVp5IMB+Ul7y1FFJcTV0IojFDzIOP
+	2U08I+E5OUOzV5/gdd6rkvE4SA==
+X-Google-Smtp-Source: APBJJlFY5Wk4ycN3RNcdbeJSOzZJDY4GA9boj1G/G7OddE78CxDwcF9OafgCPpqmAI1xuqydRL+o/g==
+X-Received: by 2002:a17:902:c1cd:b0:1b8:400a:48f2 with SMTP id c13-20020a170902c1cd00b001b8400a48f2mr12348909plc.62.1688420597872;
+        Mon, 03 Jul 2023 14:43:17 -0700 (PDT)
+Received: from ziepe.ca (ip-216-194-73-131.syban.net. [216.194.73.131])
+        by smtp.gmail.com with ESMTPSA id h23-20020a17090aea9700b0025dc5749b4csm14888942pjz.21.2023.07.03.14.43.17
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 14:26:01 -0700 (PDT)
-Date: Mon, 03 Jul 2023 14:25:59 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
- bpf@vger.kernel.org, 
- linux-kernel@vger.kernel.org, 
- netdev@vger.kernel.org, 
- linux-kselftest@vger.kernel.org
-Cc: =?UTF-8?B?SsO2cm4tVGhvcmJlbiBIaW56?= <jthinz@mailbox.tu-berlin.de>, 
- Alexei Starovoitov <ast@kernel.org>, 
- Daniel Borkmann <daniel@iogearbox.net>, 
- Andrii Nakryiko <andrii@kernel.org>, 
- Martin KaFai Lau <martin.lau@linux.dev>, 
- "David S. Miller" <davem@davemloft.net>, 
- Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Deepa Dinamani <deepa.kernel@gmail.com>
-Message-ID: <64a33ce7b50d2_6520520875@john.notmuch>
-In-Reply-To: <20230703175048.151683-1-jthinz@mailbox.tu-berlin.de>
-References: <20230703175048.151683-1-jthinz@mailbox.tu-berlin.de>
-Subject: RE: [PATCH 0/2] bpf, net: Allow setting SO_TIMESTAMPING* from BPF
+        Mon, 03 Jul 2023 14:43:17 -0700 (PDT)
+Received: from jgg by jggl with local (Exim 4.95)
+	(envelope-from <jgg@ziepe.ca>)
+	id 1qGRKG-000BU8-Jc;
+	Mon, 03 Jul 2023 18:43:16 -0300
+Date: Mon, 3 Jul 2023 18:43:16 -0300
+From: Jason Gunthorpe <jgg@ziepe.ca>
+To: Mina Almasry <almasrymina@google.com>
+Cc: David Ahern <dsahern@kernel.org>, Jakub Kicinski <kuba@kernel.org>,
+	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com,
+	Alexander Duyck <alexander.duyck@gmail.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net,
+	pabeni@redhat.com, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Lorenzo Bianconi <lorenzo@kernel.org>,
+	Yisen Zhuang <yisen.zhuang@huawei.com>,
+	Salil Mehta <salil.mehta@huawei.com>,
+	Eric Dumazet <edumazet@google.com>,
+	Sunil Goutham <sgoutham@marvell.com>,
+	Geetha sowjanya <gakula@marvell.com>,
+	Subbaraya Sundeep <sbhatta@marvell.com>,
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>,
+	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>,
+	Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>,
+	Sean Wang <sean.wang@mediatek.com>, Kalle Valo <kvalo@kernel.org>,
+	Matthias Brugger <matthias.bgg@gmail.com>,
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-mediatek@lists.infradead.org,
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+Message-ID: <ZKNA9Pkg2vMJjHds@ziepe.ca>
+References: <CAKgT0Uc6Xoyh3Edgt+83b+HTM5j4JDr3fuxcyL9qDk+Wwt9APg@mail.gmail.com>
+ <908b8b17-f942-f909-61e6-276df52a5ad5@huawei.com>
+ <CAKgT0UeZfbxDYaeUntrQpxHmwCh6zy0dEpjxghiCNxPxv=kdoQ@mail.gmail.com>
+ <72ccf224-7b45-76c5-5ca9-83e25112c9c6@redhat.com>
+ <20230616122140.6e889357@kernel.org>
+ <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com>
+ <20230619110705.106ec599@kernel.org>
+ <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
+ <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org>
+ <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-J=C3=B6rn-Thorben Hinz wrote:
-> BPF applications, e.g., a TCP congestion control, might benefit from
-> precise packet timestamps. These timestamps are already available in
-> __sk_buff and bpf_sock_ops, but could not be requested: A BPF program
-> was not allowed to set SO_TIMESTAMPING* on a socket. This change enable=
-s
-> BPF programs to actively request the generation of timestamps from a
-> stream socket.
-> =
+On Sun, Jul 02, 2023 at 11:22:33PM -0700, Mina Almasry wrote:
+> On Sun, Jul 2, 2023 at 9:20 PM David Ahern <dsahern@kernel.org> wrote:
+> >
+> > On 6/29/23 8:27 PM, Mina Almasry wrote:
+> > >
+> > > Hello Jakub, I'm looking into device memory (peer-to-peer) networking
+> > > actually, and I plan to pursue using the page pool as a front end.
+> > >
+> > > Quick description of what I have so far:
+> > > current implementation uses device memory with struct pages; I am
+> > > putting all those pages in a gen_pool, and we have written an
+> > > allocator that allocates pages from the gen_pool. In the driver, we
+> > > use this allocator instead of alloc_page() (the driver in question is
+> > > gve which currently doesn't use the page pool). When the driver is
+> > > done with the p2p page, it simply decrements the refcount on it and
+> > > the page is freed back to the gen_pool.
+> 
+> Quick update here, I was able to get my implementation working with
+> the page pool as a front end with the memory provider API Jakub wrote
+> here:
+> https://github.com/kuba-moo/linux/tree/pp-providers
+> 
+> The main complication indeed was the fact that my device memory pages
+> are ZONE_DEVICE pages, which are incompatible with the page_pool due
+> to the union in struct page. I thought of a couple of approaches to
+> resolve that.
+> 
+> 1. Make my device memory pages non-ZONE_DEVICE pages. 
 
-> To reuse the setget_sockopt BPF prog test for
-> bpf_{get,set}sockopt(SO_TIMESTAMPING_NEW), also implement the missing
-> getsockopt(SO_TIMESTAMPING_NEW) in the network stack.
-> =
+Hard no on this from a mm perspective.. We need P2P memory to be
+properly tagged and have the expected struct pages to be DMA mappable
+and otherwise, you totally break everything if you try to do this..
 
-> I reckon the way I added getsockopt(SO_TIMESTAMPING_NEW) causes an API
-> change: For existing users that set SO_TIMESTAMPING_NEW but queried
-> SO_TIMESTAMPING_OLD afterwards, it would now look as if no timestamping=
+> 2. Convert the pages from ZONE_DEVICE pages to page_pool pages and
+> vice versa as they're being inserted and removed from the page pool.
 
-> flags have been set. Is this an acceptable change? If not, I=E2=80=99m =
-happy to
-> change getsockopt() to only be strict about the newly-implemented
-> getsockopt(SO_TIMESTAMPING_NEW), or not distinguish between
-> SO_TIMESTAMPING_NEW and SO_TIMESTAMPING_OLD at all.
+This is kind of scary, it is very, very, fragile to rework the pages
+like this. Eg what happens when the owning device unplugs and needs to
+revoke these pages? I think it would likely crash..
 
-Yeah, I think it would be best if we keep the old behavior and let
-SO_TIMESTAMPING_OLD return timestamps for both new/old. It looks
-like it should be relatively easy to implement?
+I think it also technically breaks the DMA API as we may need to look
+into the pgmap to do cache ops on some architectures.
 
-Otherwise the series lgtm.
+I suggest you try to work with 8k folios and then the tail page's
+struct page is empty enough to store the information you need..
+Or allocate per page memory and do a memdesc like thing..
 
-> =
+Though overall, you won't find devices creating struct pages for their
+P2P memory today, so I'm not sure what the purpose is. Jonathan
+already got highly slammed for proposing code to the kernel that was
+unusable. Please don't repeat that. Other than a special NVMe use case
+the interface for P2P is DMABUF right now and it is not struct page
+backed.
 
-> J=C3=B6rn-Thorben Hinz (2):
->   net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)
->   bpf: Allow setting SO_TIMESTAMPING* with bpf_setsockopt()
-> =
+Even if we did get to struct pages for device memory, it is highly
+likely cases you are interested in will be using larger than 4k
+folios, so page pool would need to cope with this nicely as well.
 
->  include/uapi/linux/bpf.h                            | 3 ++-
->  net/core/filter.c                                   | 2 ++
->  net/core/sock.c                                     | 9 +++++++--
->  tools/include/uapi/linux/bpf.h                      | 3 ++-
->  tools/testing/selftests/bpf/progs/bpf_tracing_net.h | 2 ++
->  tools/testing/selftests/bpf/progs/setget_sockopt.c  | 4 ++++
->  6 files changed, 19 insertions(+), 4 deletions(-)
-> =
-
-> -- =
-
-> 2.39.2
-> =
-
-> =
+Jason
 
