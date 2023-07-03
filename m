@@ -1,56 +1,46 @@
-Return-Path: <netdev+bounces-15236-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15237-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F269B74641F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 22:32:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 14DCF746429
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 22:34:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 304D81C20A79
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 20:32:12 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4A89F280ED3
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 20:34:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3752E100D8;
-	Mon,  3 Jul 2023 20:32:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BFFB911C9B;
+	Mon,  3 Jul 2023 20:33:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E64392F23
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 20:32:08 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4FCA1C433C9;
-	Mon,  3 Jul 2023 20:32:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 888ED11C84
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 20:33:57 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D274CC433CC;
+	Mon,  3 Jul 2023 20:33:56 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688416328;
-	bh=wwufjRtciEQ+b3u9cVB2o8qsKDTUrArMhXbZClwa5UU=;
+	s=k20201202; t=1688416437;
+	bh=qg8LE55Eb5eQTL/7iZUZZnwLSbL18eGO83l+uTl/wTg=;
 	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rLwRCuL1fq6Cp/DK2ssr3/nP0PjTiQMy1CCd3S1byEHStDm6J7ziM3yVUpE3H30/o
-	 r88tbR3l9pJeK1B0b0gbN1nsqMW27tMaqNCmoQGlXeHafOac6ZimGx6fEq4hmpP2pp
-	 U9GzUp2900BxE/RTfphqPKlGPXq7z4cEj1OKKkuMyHCAh3rEyTnE967y5q7iKhcmIX
-	 sG56B1VlIiGNEvaNaq+Eg7c1EJtnijXF85rFCkMZEn5hlAyWNW0+UEnZ84eepEbIVa
-	 8BXpZDlb2f499+Hsh4R3UmXVMSyhVWkb4bd5w8NMYq1kxR3q4epW3XAUHs6suppIUB
-	 22oSbFCIDAyyQ==
-Date: Mon, 3 Jul 2023 13:32:07 -0700
+	b=nSt0gbtkjNVYR7WMHsuvkGTOLGmKAKUQk+paGFQsvXTryxi/NI6qMqVPxK2eh7LaW
+	 HpNBxIW04g1n2iyU+K4ndVDmafmQaXNLWChN/SiaQJYDDx4QhySMSoA7TtQ4xase1I
+	 fNd+0Gd919wHYzkyqmJAQTw+V5IDnoE/3E9ZOBY0Tzi7dzMojJScClKqfAa2yYrdbB
+	 DRIG+flWrfBdxykMNDhhrb1pOWUd6ofO5VF3KMlnr5IdK8cHyjzPLuaR7AndNw7+dw
+	 Z/p2v24gdYyoTvc43rY6sVemrq0u7qOf9HUwCDaZEghYAx40bCmA1qkpIDWPvkiQPk
+	 fnVLFu/gNEG1g==
+Date: Mon, 3 Jul 2023 13:33:55 -0700
 From: Jakub Kicinski <kuba@kernel.org>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: Alexander Duyck <alexander.duyck@gmail.com>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>, Yunsheng Lin
- <linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, "Jesper
- Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
- <ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
- <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH RFC net-next 2/4] net: page_pool: avoid calling no-op
- externals when possible
-Message-ID: <20230703133207.4f0c54ce@kernel.org>
-In-Reply-To: <413e3e21-e941-46d0-bc36-fd9715a55fc4@intel.com>
-References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
-	<20230629152305.905962-3-aleksander.lobakin@intel.com>
-	<69e827e239dab9fd7986ee43cef599d024c8535f.camel@gmail.com>
-	<ac4a8761-410e-e8cc-d6b2-d56b820a7888@intel.com>
-	<CAKgT0UfZCGnWgOH96E4GV3ZP6LLbROHM7SHE8NKwq+exX+Gk_Q@mail.gmail.com>
-	<413e3e21-e941-46d0-bc36-fd9715a55fc4@intel.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>, Florian Fainelli
+ <f.fainelli@gmail.com>, "David S. Miller" <davem@davemloft.net>, Eric
+ Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net 0/2] Fix mangled link-local MAC DAs with SJA1105 DSA
+Message-ID: <20230703133355.479c6651@kernel.org>
+In-Reply-To: <20230629141453.1112919-1-vladimir.oltean@nxp.com>
+References: <20230629141453.1112919-1-vladimir.oltean@nxp.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -60,28 +50,22 @@ MIME-Version: 1.0
 Content-Type: text/plain; charset=US-ASCII
 Content-Transfer-Encoding: 7bit
 
-On Fri, 30 Jun 2023 17:34:02 +0200 Alexander Lobakin wrote:
-> > I am not a fan of having the page pool force the syncing either. Last
-> > I knew I thought the PP_FLAG_DMA_SYNC_DEV was meant to be set by the  
+On Thu, 29 Jun 2023 17:14:51 +0300 Vladimir Oltean wrote:
+> The SJA1105 hardware tagging protocol is weird and will put DSA
+> information (source port, switch ID) in the MAC DA of the packets sent
+> to the CPU, and then send some additional (meta) packets which contain
+> the original bytes from the previous packet's MAC DA.
 > 
-> Please follow the logics of the patch.
+> The tagging protocol driver contains logic to handle this, but the meta
+> frames are optional functionality, and there are configurations when
+> they aren't received (no PTP RX timestamping). Thus, the MAC DA from
+> packets sent to the stack is not correct in all cases.
 > 
-> 1. The driver sets DMA_SYNC_DEV.
-> 2. PP tries to shortcut and replaces it with MAYBE_SYNC.
-> 3. If dma_need_sync() returns true for some page, it gets replaced back
->    to DMA_SYNC_DEV, no further dma_need_sync() calls for that pool.
+> Also, during testing it was found that the MAC DA patching procedure was
+> incorrect.
 > 
-> OR
-> 
-> 1. The driver doesn't set DMA_SYNC_DEV.
-> 2. PP doesn't turn on MAYBE_SYNC.
-> 3. No dma_need_sync() tests.
-> 
-> Where does PP force syncs for drivers which don't need them?
+> The investigation comes as a result of this discussion with Paolo:
+> https://lore.kernel.org/netdev/f494387c8d55d9b1d5a3e88beedeeb448f2e6cc3.camel@redhat.com/
 
-I think both Alex and I got confused about what's going on here.
-
-Could you reshuffle the code somehow to make it more obvious?
-Rename the flag, perhaps put it in a different field than 
-the driver-set PP flags?
+This series got eaten by vger, I think. Could you repost?
 
