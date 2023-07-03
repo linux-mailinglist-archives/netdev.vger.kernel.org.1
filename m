@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-15138-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15139-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4348E745E11
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 16:01:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5717745E33
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 16:10:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 668EF280C4F
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 14:01:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F06F280C6A
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 14:10:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4FA30F9E9;
-	Mon,  3 Jul 2023 14:01:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9F65FF9EE;
+	Mon,  3 Jul 2023 14:10:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8C5F9E8
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 14:01:27 +0000 (UTC)
-Received: from mail-wr1-f51.google.com (mail-wr1-f51.google.com [209.85.221.51])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56B81E51
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 07:01:26 -0700 (PDT)
-Received: by mail-wr1-f51.google.com with SMTP id ffacd0b85a97d-3141a9f55ceso1120225f8f.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 07:01:26 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 91164F9E9
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 14:10:31 +0000 (UTC)
+Received: from mail-wm1-f53.google.com (mail-wm1-f53.google.com [209.85.128.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0854EE6F
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 07:10:07 -0700 (PDT)
+Received: by mail-wm1-f53.google.com with SMTP id 5b1f17b1804b1-3facc7a4e8aso13076855e9.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 07:10:06 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688392885; x=1690984885;
+        d=1e100.net; s=20221208; t=1688393405; x=1690985405;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Kw/ZYjT4Lt79DlrXwSlXjlTb8p9RxjOuV//IiTZBw00=;
-        b=NewC5KJ5htsbqxRu9Gluq2GgtMVPuHgJb7UtamKBSlsQpnhUqUHsV8y/g6VVqYgqmj
-         Y3LyYr9D8YKvSI0C0Cn6LIvAS2/UR5TH6dM+HTCg4MisQxMYy8QFWCcIQ96Tabk892dT
-         /Pas1K7403LLHu7gUDlaycsvvOTjGa5q2b3BDpeItXQFCtqAXksSgRR4GQj9kZpHaYHd
-         40Z6Sw4gJCadVzHtt/1o2anxBMT6IDoqInMhyiTNXC+ef5A6MK9CKTmLGSP58T47xh13
-         FyShhc5C2Ml70Vf8mqrQ1K/lMoC55/mRzL7le9sUYMFX/g0rtr5RmD99C8uUnzASHY0f
-         IclA==
-X-Gm-Message-State: ABy/qLazOVKy0a0oDxyK/zFpV01RehUpr3vygVe70jJbs1YjorDuokt8
-	7c8f6bJxw4pGVv4DYrvoVFeqaPI4MnI=
-X-Google-Smtp-Source: APBJJlHh2SWxK7oXSwEwBZFEWy4sb+V1UKdMt8EibjmcvnW2h+PTXyycEFdv7tQzg+qyoLgyT7qqIg==
-X-Received: by 2002:adf:fc4f:0:b0:314:f14:c24f with SMTP id e15-20020adffc4f000000b003140f14c24fmr8242224wrs.0.1688392884413;
-        Mon, 03 Jul 2023 07:01:24 -0700 (PDT)
+        bh=ehUXf2LNnInGH0Vqogp/lrUNeW1dVzwZ4KWyqlQvQjw=;
+        b=QVnuZjIqZ9+XF8TaKmIXoW1wEgchzta32D7IIhRL16EPvb3GbRh4mHADbo69yprfbT
+         YDOC+8ELcFdNVpytNwq1deYzKCc5PBVlzgGY1oLmKmUBpjOkqg3rTb5K/lr+D/lNlnXy
+         tx+d3NF8Xtds7RiR6QFiXIshe4FFsnMSv8p5F/B7C4aGfPwspizmVYzzxTcmEsu+J4f7
+         Cs74fFgWNrgqp5gZgIrhu/JSxoiWC4y/CWExY8klOxIfzBcMMFU2pNrZpU8IZrwDUTro
+         QQ+YfUWcjOk8QxpGS8RpxJWbRe/1eHLaPb3AVDlSNjN70Skm2jpx0owanslkacQNQIW2
+         9ALA==
+X-Gm-Message-State: ABy/qLbFhCGIHzQAKU0LEimtrwnTFzcV2jOosvko8BGngvi4NEusaVCZ
+	pYRx2ZJjNgMOMzJ9F1RJCrzOWuGaUdM=
+X-Google-Smtp-Source: APBJJlEbzcp+DsLfYrf5pTIlP/GB3g8HY7MTBgbpx9cZ7Hoofv7LOlgy5ET3UYJql70nVsK3BwaBPg==
+X-Received: by 2002:a05:600c:1c0a:b0:3fb:a982:8f41 with SMTP id j10-20020a05600c1c0a00b003fba9828f41mr6654288wms.3.1688393405189;
+        Mon, 03 Jul 2023 07:10:05 -0700 (PDT)
 Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id c5-20020a5d4145000000b00314145e6d61sm11776621wrq.6.2023.07.03.07.01.23
+        by smtp.gmail.com with ESMTPSA id r3-20020a056000014300b00314398e4dd4sm1812292wrx.54.2023.07.03.07.10.03
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jul 2023 07:01:23 -0700 (PDT)
-Message-ID: <d8289263-2284-a229-75dd-cb1b771a00be@grimberg.me>
-Date: Mon, 3 Jul 2023 17:01:22 +0300
+        Mon, 03 Jul 2023 07:10:04 -0700 (PDT)
+Message-ID: <40509bb4-3ca4-3bb1-3c28-1b0e90aa92be@grimberg.me>
+Date: Mon, 3 Jul 2023 17:10:02 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -70,9 +70,9 @@ References: <03dd8a0d-84b9-c925-9547-99f708e88997@suse.de>
  <12a716d5-d493-bea9-8c16-961291451e3d@grimberg.me>
  <b33737ab-d923-173c-efcc-9e5c920e6dbf@suse.de>
  <173e27fe-18bb-6194-2af3-1743bc0f8f61@grimberg.me>
- <656f77b1-caf6-ea3c-6d32-54637f70a629@suse.de>
+ <0ceb62b7-c310-cc4a-6b90-651e6b0c09ae@suse.de>
 From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <656f77b1-caf6-ea3c-6d32-54637f70a629@suse.de>
+In-Reply-To: <0ceb62b7-c310-cc4a-6b90-651e6b0c09ae@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
@@ -84,6 +84,10 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
+
+On 7/3/23 16:57, Hannes Reinecke wrote:
+> On 7/3/23 15:42, Sagi Grimberg wrote:
+>>
 >>>>> Hannes Reinecke <hare@suse.de> wrote:
 >>>>>
 >>>>>>> 'discover' and 'connect' works, but when I'm trying to transfer data
@@ -106,44 +110,48 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 >> does not interpret this as a transient status and simply returns from
 >> io_work?
 >>
->>> But it brought up yet another can of worms: what _exactly_ is the 
->>> return value of ->read_sock()?
->>>
->>> There are currently two conflicting use-cases:
->>> -> Ignore the return value, and assume errors etc are signalled
->>>     via 'desc.error'.
->>>     net/strparser/strparser.c
->>>     drivers/infiniband/sw/siw
->>>     drivers/scsi/iscsi_tcp.c
->>> -> use the return value of ->read_sock(), ignoring 'desc.error':
->>>     drivers/nvme/host/tcp.c
->>>     net/ipv4/tcp.c
->>> So which one is it?
->>> Needless to say, implementations following the second style do not
->>> set 'desc.error', causing any errors there to be ignored for callers
->>> from the first style...
->>
->> I don't think ignoring the return value of read_sock makes sense because
->> it can fail outside of the recv_actor failures.
->>
-> Oh, but it's not read_actor which is expected to set desc.error.
-> Have a look at 'strp_read_sock()':
+> Unfortunately, yes.
 > 
->          /* sk should be locked here, so okay to do read_sock */
->          sock->ops->read_sock(strp->sk, &desc, strp_recv);
+> static int tls_rx_reader_acquire(struct sock *sk, struct 
+> tls_sw_context_rx *ctx,
+>                                   bool nonblock)
+> {
+>          long timeo;
 > 
->          desc.error = strp->cb.read_sock_done(strp, desc.error);
+>          timeo = sock_rcvtimeo(sk, nonblock);
 > 
-> it's the ->read_sock() callback which is expected to set desc.error.
+>          while (unlikely(ctx->reader_present)) {
+>                  DEFINE_WAIT_FUNC(wait, woken_wake_function);
+> 
+>                  ctx->reader_contended = 1;
+> 
+>                  add_wait_queue(&ctx->wq, &wait);
+>                  sk_wait_event(sk, &timeo,
+>                                !READ_ONCE(ctx->reader_present), &wait);
+> 
+> and sk_wait_event() does:
+> #define sk_wait_event(__sk, __timeo, __condition, __wait)              \
+>          ({      int __rc;                                              \
+>                  __sk->sk_wait_pending++;                               \
+>                  release_sock(__sk);                                    \
+>                  __rc = __condition;                                    \
+>                  if (!__rc) {                                           \
+>                          *(__timeo) = wait_woken(__wait,                \
+>                                                  TASK_INTERRUPTIBLE,    \
+>                                                  *(__timeo));           \
+>                  }                                                      \
+>                  sched_annotate_sleep();                                \
+>                  lock_sock(__sk);                                       \
+>                  __sk->sk_wait_pending--;                               \
+>                  __rc = __condition;                                    \
+>                  __rc;                                                  \
+>          })
+> 
+> so not calling 'lock_sock()' in tls_tx_reader_acquire() helps only _so_ 
+> much, we're still deadlocking.
 
-Then it is completely up to the consumer how it wants to interpret the
-error.
+That still is legal assuming that sock lock is taken prior to
+sk_wait_event...
 
->> But to be on the safe side, perhaps you can both return an error and set
->> desc.error?
->>
-> But why? We can easily make ->read_sock() a void function, then it's 
-> obvious that you can't check the return value.
-
-but it returns the consumed byte count, where would this info go?
+What are the blocked threads from sysrq-trigger?
 
