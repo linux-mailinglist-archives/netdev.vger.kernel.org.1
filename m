@@ -1,94 +1,91 @@
-Return-Path: <netdev+bounces-15241-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15242-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9DA787464B9
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 23:12:09 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 2A8737464C6
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 23:19:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCEDE1C204F5
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 21:12:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9ACD61C20A79
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 21:19:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6764D11CAA;
-	Mon,  3 Jul 2023 21:12:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7DB8A125A0;
+	Mon,  3 Jul 2023 21:19:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E5A101C1
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 21:12:06 +0000 (UTC)
-Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A22BE5B;
-	Mon,  3 Jul 2023 14:12:05 -0700 (PDT)
-Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-78360b822abso196709239f.2;
-        Mon, 03 Jul 2023 14:12:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EFC7100B3;
+	Mon,  3 Jul 2023 21:19:15 +0000 (UTC)
+Received: from mail-oa1-x2c.google.com (mail-oa1-x2c.google.com [IPv6:2001:4860:4864:20::2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B0745E59;
+	Mon,  3 Jul 2023 14:19:13 -0700 (PDT)
+Received: by mail-oa1-x2c.google.com with SMTP id 586e51a60fabf-1b056276889so4118788fac.2;
+        Mon, 03 Jul 2023 14:19:13 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688418724; x=1691010724;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
-        bh=c0EoX2DheebN94bt0rFrXPITU8dcwd8m1uYfEeNrV7c=;
-        b=iQLJZVNh9bIwOw+2iuKcGUN+cTi274XOHrQU3XI/VjN9FtcxsrB9c66omYyrugnM+E
-         pTqi8Url9RRsPDe5Fg31A5Lc5FhwOLeTNWTLBVO6cqp9e9WqK7nydfA8qzeWKo4ZNROl
-         io/fmExXuRCxn5swlIEDksXN9mAN2ATKZXnOiNbxnsWEUjiLX1Rr2ov6dbxxpActNidI
-         SNF+EpGIzLxllvqmDSqjADEO8X0oYtzWjhWX+OvnN/O9OkUBHlx4tLhx2tcLnA0kMpu1
-         YSphP5SZNVGcEPhHs3ICrHlGmVau3nOv5q/MCck0itkB5FdI/aaQd/+S0KKwmGbzMgrU
-         n2Ag==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688418724; x=1691010724;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+        d=gmail.com; s=20221208; t=1688419153; x=1691011153;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=c0EoX2DheebN94bt0rFrXPITU8dcwd8m1uYfEeNrV7c=;
-        b=TPzcGV3H/epyID6lFO45pMCWb/JcdYfCqWroGvk7YMu0c3fs0SAcUAPpYwMo3azizj
-         BMBqx71hX1GUmhnLA77QorLRLS1QLP9YxEVteo//JpAxnmBGViEdLbwqR+V8MtIo7Z/8
-         PHdFq3svUIcbUrfSoeHxVyPnUjf4M2wO7+gQ3Id/ahbako56xxDgk6qpMwzDJoPM628r
-         gu1Ur8vee4vVnzO+vY44fQVV8IIza4FJv2C/4/TOGSABvinxddbJbK1dmfSBK/Z4oXE+
-         kPJr5Rtkm9awvsM4n6FsoilJaCoFBaPETUQKZ/CszPo/voGoI+QFq39kkrsp0ArAd6VB
-         Q4bQ==
-X-Gm-Message-State: AC+VfDxt9eiPE5Rz+btnMq0VoVhwOoDFafI7XaBz9ZXvK+wHMMZtDhRP
-	Atx3iXrlRlqHokzsdDuHkMo=
-X-Google-Smtp-Source: ACHHUZ4OqUrXPGmlKw5P+m0ozv+5LfI/SNPwoveeJPyyu2Ucgkj95xvoM5BFIb0YyAE1aRLVqMlivw==
-X-Received: by 2002:a5e:a911:0:b0:77e:3d2f:d1f4 with SMTP id c17-20020a5ea911000000b0077e3d2fd1f4mr11268010iod.15.1688418724252;
-        Mon, 03 Jul 2023 14:12:04 -0700 (PDT)
-Received: from rivendell ([2a01:4f9:c010:5d73::1])
-        by smtp.gmail.com with ESMTPSA id g9-20020a0566380c4900b0042b068d921esm3197911jal.16.2023.07.03.14.12.00
+        bh=UpqEkaNg2J+Bvai1eAr5gemxKMDFvKrtFaY0+RQFT44=;
+        b=YNfVyPMrtM+l//4e83mxX3p1YK5+82O1BU/hVANnM1N6jc2ntbgmhK363IxtXgmU6i
+         MYkq24ujV1XDGM3ORTWfQJuonRidDMWsFFoFT9PbCFnPe47VGDgnYE8YkrWzfJm8E6np
+         0lYNyASVemcM8upnFdliO0US3UZ5OtaoyWjtSAAE+pizyQ6y+52TKFOd9ZsNvr7n+Vdc
+         ukSX+Q68u/XydWPUMP8OLc5pkSOcOUmtZJIIZowifISrhJiMxSOZF19Lb4x3E67EoV19
+         zoHO1tXWBrkMN7oK4axUj4yzx+X+XE5x3SqaO9FjkU3VN+vb3f15JZtH2AgTd/8lO2NY
+         J35w==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688419153; x=1691011153;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=UpqEkaNg2J+Bvai1eAr5gemxKMDFvKrtFaY0+RQFT44=;
+        b=MsXIesY6dc89Csu4Fq3dlQ9cJGm+IhgbTc8MEXd+NwwoQHcwh0p4MJZNsxcRG5kgyn
+         F0WRRnraHkqjNh2kGyUq4ZdMYyx2HzliQk7f3hhLoKW0w3odrKkw+F7EHPUG73v5gNXd
+         hxsxhB2TNmcvoqI/Pn2nMVQbbqkFVAzPnppVuA8gJJI23g9E4VVurXStIe1JU23J21uS
+         gCIk/EKVgwtHwQp744xZ1+Lgcy370ktm4980bZ3ATMxgCuG50d8ogoJcrxm8Z/PWR+KW
+         A1dLciq2NDp/lKWG9TGKlCRhGIVszxkPT7T0yCNGf2eL5Xy7fqZ1WuIiMTEEXIx585JI
+         xUcw==
+X-Gm-Message-State: ABy/qLYwFyxzeRWXkEn7grLql7DRmXXq3cqOEHbGLnbXZ2ZddmppJQAB
+	YtjZlwAoZYemGOMpfWVQlig=
+X-Google-Smtp-Source: APBJJlHqATpdJTKWq1iDMSIA3foxuxaBzMCf8d8gvgidQSrf4T1i9ibLte2VnDPbJLdegXQwptEYMg==
+X-Received: by 2002:a05:6870:7d8e:b0:1ad:2e18:7090 with SMTP id oq14-20020a0568707d8e00b001ad2e187090mr12419826oab.32.1688419152950;
+        Mon, 03 Jul 2023 14:19:12 -0700 (PDT)
+Received: from localhost ([2605:59c8:148:ba10::41f])
+        by smtp.gmail.com with ESMTPSA id gm4-20020a17090b100400b0025023726fc4sm14271294pjb.26.2023.07.03.14.19.11
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 14:12:03 -0700 (PDT)
-Date: Mon, 3 Jul 2023 23:11:57 +0200
-From: Enrico Mioso <mrkiko.rs@gmail.com>
-To: Jan Engelhardt <jengelh@inai.de>
-Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
-	linux-kernel@vger.kernel.org,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	Kalle Valo <kvalo@kernel.org>,
-	Oleksij Rempel <linux@rempel-privat.de>,
-	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
-	Neil Armstrong <neil.armstrong@linaro.org>,
-	Mauro Carvalho Chehab <mchehab@kernel.org>,
-	Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>,
-	Jacopo Mondi <jacopo@jmondi.org>,
-	=?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
-	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
-	linux-wireless@vger.kernel.org,
-	Ilja Van Sprundel <ivansprundel@ioactive.com>,
-	Joseph Tartaro <joseph.tartaro@ioactive.com>
-Subject: Re: [PATCH] USB: disable all RNDIS protocol drivers
-Message-ID: <ZKM5nbDnKnFZLOlY@rivendell>
-References: <20221123124620.1387499-1-gregkh@linuxfoundation.org>
- <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr>
+        Mon, 03 Jul 2023 14:19:12 -0700 (PDT)
+Date: Mon, 03 Jul 2023 14:19:11 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Ilya Maximets <i.maximets@ovn.org>, 
+ netdev@vger.kernel.org, 
+ bpf@vger.kernel.org
+Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>, 
+ Magnus Karlsson <magnus.karlsson@intel.com>, 
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>, 
+ linux-doc@vger.kernel.org, 
+ linux-kernel@vger.kernel.org, 
+ Jason Wang <jasowang@redhat.com>, 
+ Stefan Hajnoczi <stefanha@redhat.com>, 
+ Ilya Maximets <i.maximets@ovn.org>
+Message-ID: <64a33b4fcccc_6520520825@john.notmuch>
+In-Reply-To: <20230703175329.3259672-1-i.maximets@ovn.org>
+References: <20230703175329.3259672-1-i.maximets@ovn.org>
+Subject: RE: [PATCH bpf-next] xsk: honor SO_BINDTODEVICE on bind
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr>
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -96,12 +93,47 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi all!!
+Ilya Maximets wrote:
+> Initial creation of an AF_XDP socket requires CAP_NET_RAW capability.
+> A privileged process might create the socket and pass it to a
+> non-privileged process for later use.  However, that process will be
+> able to bind the socket to any network interface.  Even though it will
+> not be able to receive any traffic without modification of the BPF map,
+> the situation is not ideal.
+> 
+> Sockets already have a mechanism that can be used to restrict what
+> interface they can be attached to.  That is SO_BINDTODEVICE.
+> 
+> To change the SO_BINDTODEVICE binding the process will need CAP_NET_RAW.
+> 
+> Make xsk_bind() honor the SO_BINDTODEVICE in order to allow safer
+> workflow when non-privileged process is using AF_XDP.
+> 
+> The intended workflow is following:
+> 
+>   1. First process creates a bare socket with socket(AF_XDP, ...).
+>   2. First process loads the XSK program to the interface.
+>   3. First process adds the socket fd to a BPF map.
+>   4. First process ties socket fd to a particular interface using
+>      SO_BINDTODEVICE.
+>   5. First process sends socket fd to a second process.
+>   6. Second process allocates UMEM.
+>   7. Second process binds socket to the interface with bind(...).
+>   8. Second process sends/receives the traffic.
+> 
+> All the steps above are possible today if the first process is
+> privileged and the second one has sufficient RLIMIT_MEMLOCK and no
+> capabilities.  However, the second process will be able to bind the
+> socket to any interface it wants on step 7 and send traffic from it.
+> With the proposed change, the second process will be able to bind
+> the socket only to a specific interface chosen by the first process
+> at step 4.
+> 
+> Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
+> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+> ---
 
-I think the rndis_host USB driver might emit a warning in the dmesg, but disabling the driver wouldn't be a good idea.
-The TP-Link MR6400 V1 LTE modem and also some ZTE modems integrated in routers do use this protocol.
+LGTM.
 
-We may also distinguish between these cases and devices you might plug in - as they pose different risk levels.
-
-Enrico
+Acked-by: John Fastabend <john.fastabend@gmail.com>
 
