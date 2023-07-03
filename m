@@ -1,197 +1,249 @@
-Return-Path: <netdev+bounces-15175-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15174-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9D43B7460BE
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 18:33:40 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D2DC7460BC
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 18:33:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BB5761C20A00
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 16:33:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6DC021C20A26
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 16:33:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D61A5F9E4;
-	Mon,  3 Jul 2023 16:33:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E12AF9D3;
+	Mon,  3 Jul 2023 16:33:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7298EAE7
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 16:33:37 +0000 (UTC)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ACE4EE42;
-	Mon,  3 Jul 2023 09:33:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688402016; x=1719938016;
-  h=message-id:date:subject:to:references:cc:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=42J2/+XnPzPOz/j0aV1Z28B9IF4iNCgxeeKMyARJLK0=;
-  b=QFJKpxeTS2uQf7rgj10Ib7/zhVOOZz8Ik7O0T0iS2JOAv5edyIhAeP8M
-   aNWlp5ZRUljlY5Gl72/30jltiYkp4rC4Zc97TBK6xLS8bzjZNdlCPXMjS
-   oB9GecWH86zT2gI8dhk9ticnZz3jnDv3hsgrOfQzEHKkItM1/A4M8O69R
-   syExaHiSJTXgPmdaRvTmjZAlrO3qQgthnd/XhxPChg9TWOGjQpVAySnOH
-   AcNCQXIbQCy6qySmIBiHiHiH9gbL0tUEP6v0ZWYN/ER1glW7FsKszPPwA
-   iQc5wRNgz0F4X1AVQCKhFhCil7n5nxPuNSsGHyHoswRWo5Q3hWWs1iEGB
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="428964173"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="428964173"
-Received: from fmsmga004.fm.intel.com ([10.253.24.48])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 09:33:35 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="788581711"
-X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
-   d="scan'208";a="788581711"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by fmsmga004.fm.intel.com with ESMTP; 03 Jul 2023 09:33:35 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 3 Jul 2023 09:33:35 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Mon, 3 Jul 2023 09:33:35 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.46) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Mon, 3 Jul 2023 09:33:34 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=LO8UNSC0ZLozNizFipv9v0FE0nU8Yk/tt2Xw7dufpVNIaJjBo2lWnIdOfxzGCT2ERRO1xqC7Fx35Fgw+1oILIk+LHGVUrUDdYph/4f2wh4wxvjEsgLIgVDvg0jytV0qHzDxWHZrMdut4aVLTAOUv+pHs/229zYkTyUbK7Hh4TVjjwxr3EzTrm5miEXi1E7HZFzRXKD0/559ZV6CNfpVHPM0r4cVckT/JyHtoxv1W2ovqVi9N0fe32/OgXMlIN6zdtPMIJPIF/O9wjJl3XI5CbGugjAD8b1LXIxWUm+M0B8RRpFN8kLj0PFzjq8YlZgQuEyc80r5ynonoT3Iw9vSjzA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=qso28H1PwRjYkFkA1Jdd4fyZBcVEyj0CR8p1SOd+NKQ=;
- b=BMzawAxG2VhbpdnbowjqITNZ2wZwsvbDxCQIExlVh5QMbkLOCNCYerlPVusn0jBtidA+nb+kxETUVKrUZpnwK9keCBgaDQWfzsliMy4+ihQRP5iNBSDxJL3xoIiBvh+wM7XdXbnnRyErVmHNdi+wlHVinYV1e7fqfuFZgnUKoOFyUliFKxIUaKM6+tnaaPX0KCaLcKc+GVt1sF3ws2UlLZZWT1hUN9d726rmovBpJtDzG+AobysLsiWHI2bwXNvfs0DEwO/9oAemB/7/fFuuLHeUiVFKcKIMP4gbE8//wGuUhtQav9sotMs56flADuDSeo1mo43FykzLHoDroFiL5Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by LV8PR11MB8605.namprd11.prod.outlook.com (2603:10b6:408:1e5::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Mon, 3 Jul
- 2023 16:33:27 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::82b6:7b9d:96ce:9325]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::82b6:7b9d:96ce:9325%7]) with mapi id 15.20.6544.024; Mon, 3 Jul 2023
- 16:33:27 +0000
-Message-ID: <b6501c25-e40a-ba84-734a-577da0c2ab7a@intel.com>
-Date: Mon, 3 Jul 2023 18:32:23 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [net PATCH V2] octeontx2-pf: Add additional check for MCAM rules.
-Content-Language: en-US
-To: Suman Ghosh <sumang@marvell.com>
-References: <20230703095600.2048397-1-sumang@marvell.com>
-CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-	<hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20230703095600.2048397-1-sumang@marvell.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: BE1P281CA0077.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:78::16) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C2D9EAE7
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 16:33:05 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 906E5E49
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 09:33:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688401982;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
+	bh=o9JfmV88VU7bKRr8QoDVSiiCtWQNwua/yZVv7UwouXs=;
+	b=ehxf5cWwH3EWaryIbPYEdVXbLzEA9dRCSQNj2UeUcJvZBU/VS1wItRrXwkvirhgQwuklOJ
+	rrKzp/6zMbZuuEiXNbMqgZ9eCLO5VmC/2B9u+Js4caGubWHvMzoKbWHGOhu0FumDiMbodd
+	jaj88oHKSevrlV/mcqZ5MSrUhOGmTbU=
+Received: from mail-wm1-f72.google.com (mail-wm1-f72.google.com
+ [209.85.128.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-465-2Dt__0x6PTmEirfmWMi6DQ-1; Mon, 03 Jul 2023 12:33:01 -0400
+X-MC-Unique: 2Dt__0x6PTmEirfmWMi6DQ-1
+Received: by mail-wm1-f72.google.com with SMTP id 5b1f17b1804b1-3fb40ec952bso29325985e9.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 09:33:01 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688401980; x=1690993980;
+        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=o9JfmV88VU7bKRr8QoDVSiiCtWQNwua/yZVv7UwouXs=;
+        b=IN0xPQckPsE7QBsupPKLfSBxl4x0euNANzhPB+wiFnI0+lJKcce8Gjmx4X48OM2PBs
+         Lr5zpolUnZ0+2z5elXcLb6B8AXuyrcESsW4q1XxwDIBBsCApz5ppX6i5Nlu+lhEaIzuM
+         deChbTT9p3nMHtxsf9qVZIFuFLbaRAGltz3SrBbtu5LdKCo29+f6yesMmz2o12np2l9k
+         EJvKMXHygXnu0N++q9dOxC0382Qz6EwDrrvACrqw1ZRvlkk81mCUgP1myNVM9Geya3M2
+         6Mkvx+fcEVohS9o0cYjBQ17V20cAcHNcmQ5XQ/NLmuI8zigVmzmP3l7MjI5jNYsbKOx4
+         fMLg==
+X-Gm-Message-State: ABy/qLaWRafEJwTJl+k2aaytwTGhtYvTM2l04tbJdI3m5RCI/eyKO4OA
+	SKVREQQiUOf7RbEax/ov3xezA4YyX7TXzWfHulID0SFSFvIQPFqhKGok4sUjzypjowaTx0wAU3e
+	/JPs/HHvY+7Ceflmf
+X-Received: by 2002:a05:600c:204c:b0:3fb:c9f4:14f3 with SMTP id p12-20020a05600c204c00b003fbc9f414f3mr7664410wmg.2.1688401980558;
+        Mon, 03 Jul 2023 09:33:00 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF3hFeAuV3dUEiLC0bwfsYkvJ+BICpkbXADsRD+NAYyFyEPyRSAlNMR3Fy4eKLuXU7LTEvA3A==
+X-Received: by 2002:a05:600c:204c:b0:3fb:c9f4:14f3 with SMTP id p12-20020a05600c204c00b003fbc9f414f3mr7664400wmg.2.1688401980209;
+        Mon, 03 Jul 2023 09:33:00 -0700 (PDT)
+Received: from redhat.com ([2.52.13.33])
+        by smtp.gmail.com with ESMTPSA id m6-20020a7bce06000000b003f733c1129fsm18646129wmc.33.2023.07.03.09.32.57
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jul 2023 09:32:59 -0700 (PDT)
+Date: Mon, 3 Jul 2023 12:32:56 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Linus Torvalds <torvalds@linux-foundation.org>
+Cc: kvm@vger.kernel.org, virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	alvaro.karsz@solid-run.com, dtatulea@nvidia.com, elic@nvidia.com,
+	feliu@nvidia.com, horms@kernel.org, jasowang@redhat.com,
+	krzysztof.kozlowski@linaro.org, lingshan.zhu@intel.com,
+	maxime.coquelin@redhat.com, michael.christie@oracle.com,
+	mst@redhat.com, peng.fan@nxp.com, saeedm@nvidia.com,
+	shannon.nelson@amd.com, tianxianting.txt@alibaba-inc.com,
+	xianting.tian@linux.alibaba.com, xieyongji@bytedance.com
+Subject: [GIT PULL] virtio: features, fixes, cleanups
+Message-ID: <20230703123256-mutt-send-email-mst@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|LV8PR11MB8605:EE_
-X-MS-Office365-Filtering-Correlation-Id: a0274878-c4df-427f-7ada-08db7be33a4d
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: +ROJ1VjpRuS7HpA7ypiV6PST3t6tkfzBVUOfl9X937tYwBrM+P+1zVuFPmVOq5TzGOOEjAPDpxphZ2BaHF9HESd1UKRa9JtKsE+IJw+5jrhbPy3zWR4oQ9fIglICGQ+dPxkuATlRLtj/u90ZS3MTXM2R/hallYJkC3ZGVILTEsuoOXjgXqWGN7YAG47uXn3o9ggg+betmq1TvvD659lDUQE4GvLYHlfGxnt9fd60of//g0W0G/EYm8V7R1RUr7DrBj0ASzhByZlCKUJTQwr8OBzYIWp9DXRQshNpyPio+XqYLvq4LGq5uceM8ad7CxNY32vWP86o40R5ORMYm5JNFY1AIS97qmQfa5OoI9pOA/sJLGBZgocRpq39l/BwtEHucD8n63D2bwXDhcwCJp++VPEd8OpbkEB905SPIbtT5g8tOK3NXVznBetRTErVthBNKHV7d/GA4bntiNQGWCm/5395tES15sXb99lwxr3ALSIlfDG4P3yBgdoJktq2yKAIIfQnN6NGZEWPnKKwo30qYk1D38hmcKkWAuLu1SjWBS71jJ1ukRgYMQfw4C+AQ+cs7xkOVe61TJwZ0nzPNSq6mPE3F44LQT+MWJTVsVuxGUr+E/IOSS+bAWQh3aix2UEQn4SOKrxbVH844X4YqtirnQ==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(346002)(366004)(396003)(136003)(451199021)(41300700001)(4744005)(38100700002)(6666004)(2616005)(83380400001)(82960400001)(6506007)(26005)(186003)(6486002)(6512007)(86362001)(31696002)(478600001)(316002)(36756003)(2906002)(66476007)(6916009)(4326008)(66556008)(66946007)(8936002)(8676002)(31686004)(7416002)(5660300002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?QkJFWjVjQ3d5NU91alROcmwvc1Z4YkdRdk9tUDl2MjBMSHlSMUE5UVZjRlVh?=
- =?utf-8?B?V09DbXRXN1pDRmc5SVl0UC80YVRtNHIxR1dyMXI1dFdSQTdxUitlZ1REQ1V5?=
- =?utf-8?B?dmdjVWI5OHFSVEZoaW14bHZlMGhqSm05SGlDdXJkZmJHR1l2Q2NwenNlN3NZ?=
- =?utf-8?B?MWRHQVNKYkdQTXRmZVJjMEpZNkk3QWxHWlZYdUlIMnBqNm4wak9uRGR1Wktv?=
- =?utf-8?B?ZHlVSTVMYU9velFoRTYyRjhqdjc4Y1JZU1JidUFsRTJtT2tldkxRVEltaklr?=
- =?utf-8?B?Ty92bElqN21VcDdNb2RUWE8xL3ZSeWhrM1hvcmtnVUN5ckFmNWVaSTJZMWJV?=
- =?utf-8?B?QkMyNW5MTWt5WmVScWdEOWVkNXYrR0dqTkxXUkdSMlhEWit0NXVDWWVaSzY1?=
- =?utf-8?B?eW44eWtGNjBLOHRERnlPb2pVS2MrVytiU1VCRTk2OEZ0SXk5bG9vMmROMDJE?=
- =?utf-8?B?QUtSbm5mWlFRNTNqVkl4OU54NWJPajhNLzROa0U4MkdDdE5KSml1MTlCNlJw?=
- =?utf-8?B?bVRYeVF2NVdxbXp5cXJaYXFxV1ZxOGFoSWFGUUFxOHEvbFNkSFFDNHlMWmhs?=
- =?utf-8?B?VGtSZzNPa0tpVjZqNVJKM0Fyc3QzdG1vekdKWis0dDNadCtqd2lIejBkWFRn?=
- =?utf-8?B?SVBuc1o2Q1pYN05KL3BSaC9xaDBITGhYWnpWeXVBdDIxSTUxQnpScmVEcHZk?=
- =?utf-8?B?MmtQOFlXcUdYRDRvSC84dEtBVkJTQkt3Um5Ga2gwRUhYWVVmR2NWcms4V1pP?=
- =?utf-8?B?S1VHbDlpbGFuaVEwWFhHa00vYWhaOWRKY1hKUFEwQWdTUzFXSitMR1ZWUURr?=
- =?utf-8?B?UWlEeVBpYzYwT1UyTXVSS3hNa0ZJdHRRZDhIU0IweDlISW53TldrMEp4WUhI?=
- =?utf-8?B?RGxYR0swbG9CVHVnL0RGcWorTWtxT29YUnJ0NzQrTTY4NjNuL0NVOWtObVRa?=
- =?utf-8?B?Nk1YSmlSS3d4alZRay9qdVc3bkdRMjVZSitKd05aZ0MvL1VCNWNGazBtZnJk?=
- =?utf-8?B?T2xPS29wNDlRbnFYVXl5Y0xBUWxlNDBiYlFVTVowWmJuTkZ3SXVPeTlpL2s2?=
- =?utf-8?B?clJJODVQUkpkRnVEUGV2c1doYVNBVGhOdVk3eU9HNkp0QnhoOGx1YVhteXNm?=
- =?utf-8?B?YWlodzJlVFpXK0FRNC9ad3pORmM2Wko4SnNoWk9qT1NNU2Z1ZTNGRjRuUzlY?=
- =?utf-8?B?ekhLaEhjWFdoQ250Qk8xRFhHNE42WFhPQU1kbm96V0lsQUx4Uyt4SmxxOVkr?=
- =?utf-8?B?OFNidFp5cWVKV1lmQ01vdk1wOE9rMXJ4RkZaNDNjTGRuQTdvZ0IwbXIrOVlu?=
- =?utf-8?B?MDZGbmttUCtCUjJFTHJQL291UGcvemYvWUg4aERsQ0N6NC9LaFlpMFJNamIz?=
- =?utf-8?B?L0F2NEpudFAyc201VGdBdlRXQ2hsYzRMUlJSUVcwczJNeG4wWmsrdUxEWS84?=
- =?utf-8?B?SE1LSEZ6cS9PeVZjT3AxeTAzQW5QSVRiVCtiMVQxYkxIVU1zMEdJamNRSi82?=
- =?utf-8?B?d1BRMXQ1RWwwOVo5K0lodE01STNScUwwZHpFbnA3NWluNDZjVFVxQXJkUjBr?=
- =?utf-8?B?dEF2eC8zUStSRFZzWURYV0dhdy9DbVhKbUk0bVlxM3ZQTlZkSk9tUkc5ODVl?=
- =?utf-8?B?TStveEJ0eEFhVEk5SUJ4UGhkb294MGV0eHp4RGRkQU8vR0pXM0pvaTkyaHdH?=
- =?utf-8?B?QmRIczllQm9ReDhYQUdjaU51TlB6Njd1SkFpamQ0QVRINktwakFNbDg3Wm9R?=
- =?utf-8?B?d29lRnR5SWVYRlFzTmtiR2tPcnpsNEt1MTE2MkxmWXNOSE5iT0ErbmNxUzd6?=
- =?utf-8?B?MUE3SDR2aHJuVm82KytPamhYN3JmRUdFWmNQbzAwSGZLNndiczVub3FMUjNV?=
- =?utf-8?B?OGRRd01TVUlFalVmQmxwenl1NUZVTnNCTjg5Rk9nTkdmcUE5V3plVkg5eU5N?=
- =?utf-8?B?clZRdCtadGJscVRQTlg0bnkyYlpQa2tVN3RJZFlMdVhlTm5ia3JNVzZ2eHh4?=
- =?utf-8?B?emJsbmhkazE5L01VL0c5YzdkazVEMGUvSDkvZ3VaWjg1K250Z1hQRU1uUm42?=
- =?utf-8?B?OXNWUUxtV2VaRkRTMng3NTlIOU9MWGZMWS9ERmhKS2R4RmU3OTYxU3RBemkw?=
- =?utf-8?B?bjNCRmNqMEZZQmZFbEJqQjFKSWFxaHN6d2RHT0NtRlYybWVGcU56bWoxZHFC?=
- =?utf-8?B?OEE9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: a0274878-c4df-427f-7ada-08db7be33a4d
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 03 Jul 2023 16:33:27.2551
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: OTYQD+W2YBdKfxSHcGsGDaKgQL1x/WtFL8OOj4Ihqs0Kj3vpBZEXG2xMe1AmxhYHiB5o4TwF0PqgObbuwH6bOcSik5kQK67CGIr1d4bxw14=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: LV8PR11MB8605
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+X-Mutt-Fcc: =sent
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Suman Ghosh <sumang@marvell.com>
-Date: Mon, 3 Jul 2023 15:26:00 +0530
+Note: dropped some commits at the last moment, I did verify we get
+the same code in the end as what was in linux next for a while now.
 
-> Re: [net PATCH V2] octeontx2-pf: Add additional check for MCAM rules.
+The following changes since commit 6995e2de6891c724bfeb2db33d7b87775f913ad1:
 
-Please no periods at the end of commit messages.
+  Linux 6.4 (2023-06-25 16:29:58 -0700)
 
-> Due to hardware limitation, MCAM drop rule with
-> ether_type == 802.1Q and vlan_id == 0 is not supported. Hence rejecting
-> such rules.
-> 
-> Signed-off-by: Suman Ghosh <sumang@marvell.com>
+are available in the Git repository at:
 
-Targeted to net/fixes with no "Fixes:" tagging the blamed commit.
+  https://git.kernel.org/pub/scm/linux/kernel/git/mst/vhost.git tags/for_linus
 
-> ---
-> Changes since v1:
-> - Updated commit message
-> 
->  .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c |  7 +++++++
->  .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
->  2 files changed, 20 insertions(+)
+for you to fetch changes up to 9e396a2f434f829fb3b98a24bb8db5429320589d:
 
-[...]
+  vhost: Make parameter name match of vhost_get_vq_desc() (2023-07-03 12:15:15 -0400)
 
-Thanks,
-Olek
+----------------------------------------------------------------
+virtio: features, fixes, cleanups
+
+resume support in vdpa/solidrun
+structure size optimizations in virtio_pci
+new pds_vdpa driver
+immediate initialization mechanism for vdpa/ifcvf
+interrupt bypass for vdpa/mlx5
+multiple worker support for vhost
+viirtio net in Intel F2000X-PL support for vdpa/ifcvf
+
+fixes, cleanups all over the place
+
+Signed-off-by: Michael S. Tsirkin <mst@redhat.com>
+
+----------------------------------------------------------------
+Alvaro Karsz (1):
+      vdpa/snet: implement the resume vDPA callback
+
+Dragos Tatulea (1):
+      virtio-vdpa: Fix unchecked call to NULL set_vq_affinity
+
+Eli Cohen (1):
+      vdpa/mlx5: Support interrupt bypassing
+
+Feng Liu (1):
+      virtio_pci: Optimize virtio_pci_device structure size
+
+Krzysztof Kozlowski (1):
+      vdpa: solidrun: constify pointers to hwmon_channel_info
+
+Maxime Coquelin (1):
+      vduse: fix NULL pointer dereference
+
+Mike Christie (17):
+      vhost: create worker at end of vhost_dev_set_owner
+      vhost: dynamically allocate vhost_worker
+      vhost: add vhost_worker pointer to vhost_virtqueue
+      vhost, vhost_net: add helper to check if vq has work
+      vhost: take worker or vq instead of dev for queueing
+      vhost: take worker or vq for flushing
+      vhost: convert poll work to be vq based
+      vhost_sock: convert to vhost_vq_work_queue
+      vhost_scsi: make SCSI cmd completion per vq
+      vhost_scsi: convert to vhost_vq_work_queue
+      vhost_scsi: flush IO vqs then send TMF rsp
+      vhost: remove vhost_work_queue
+      vhost: add helper to parse userspace vring state/file
+      vhost: replace single worker pointer with xarray
+      vhost: allow userspace to create workers
+      vhost_scsi: add support for worker ioctls
+      vhost: Allow worker switching while work is queueing
+
+Peng Fan (1):
+      tools/virtio: fix build break for aarch64
+
+Shannon Nelson (11):
+      virtio: allow caller to override device id in vp_modern
+      virtio: allow caller to override device DMA mask in vp_modern
+      pds_vdpa: Add new vDPA driver for AMD/Pensando DSC
+      pds_vdpa: move enum from common to adminq header
+      pds_vdpa: new adminq entries
+      pds_vdpa: get vdpa management info
+      pds_vdpa: virtio bar setup for vdpa
+      pds_vdpa: add vdpa config client commands
+      pds_vdpa: add support for vdpa and vdpamgmt interfaces
+      pds_vdpa: subscribe to the pds_core events
+      pds_vdpa: pds_vdps.rst and Kconfig
+
+Simon Horman (1):
+      virtio: Add missing documentation for structure fields
+
+Xianting Tian (4):
+      virtio-crypto: call scheduler when we free unused buffs
+      virtio-console: call scheduler when we free unused buffs
+      virtio_bt: call scheduler when we free unused buffs
+      vhost: Make parameter name match of vhost_get_vq_desc()
+
+Zhu Lingshan (8):
+      vDPA/ifcvf: virt queue ops take immediate actions
+      vDPA/ifcvf: get_driver_features from virtio registers
+      vDPA/ifcvf: retire ifcvf_start_datapath and ifcvf_add_status
+      vDPA/ifcvf: synchronize irqs in the reset routine
+      vDPA/ifcvf: a vendor driver should not set _CONFIG_S_FAILED
+      vDPA/ifcvf: dynamic allocate vq data stores
+      vDPA/ifcvf: detect and report max allowed vq size
+      vDPA/ifcvf: implement new accessors for vq_state
+
+ .../device_drivers/ethernet/amd/pds_vdpa.rst       |  85 +++
+ .../networking/device_drivers/ethernet/index.rst   |   1 +
+ MAINTAINERS                                        |   4 +
+ drivers/bluetooth/virtio_bt.c                      |   1 +
+ drivers/char/virtio_console.c                      |   1 +
+ drivers/crypto/virtio/virtio_crypto_core.c         |   1 +
+ drivers/vdpa/Kconfig                               |  10 +
+ drivers/vdpa/Makefile                              |   1 +
+ drivers/vdpa/ifcvf/ifcvf_base.c                    | 215 +++---
+ drivers/vdpa/ifcvf/ifcvf_base.h                    |  48 +-
+ drivers/vdpa/ifcvf/ifcvf_main.c                    | 108 +--
+ drivers/vdpa/mlx5/net/mlx5_vnet.c                  | 165 ++++-
+ drivers/vdpa/mlx5/net/mlx5_vnet.h                  |  15 +
+ drivers/vdpa/pds/Makefile                          |  10 +
+ drivers/vdpa/pds/aux_drv.c                         | 140 ++++
+ drivers/vdpa/pds/aux_drv.h                         |  26 +
+ drivers/vdpa/pds/cmds.c                            | 185 +++++
+ drivers/vdpa/pds/cmds.h                            |  18 +
+ drivers/vdpa/pds/debugfs.c                         | 289 ++++++++
+ drivers/vdpa/pds/debugfs.h                         |  17 +
+ drivers/vdpa/pds/vdpa_dev.c                        | 769 +++++++++++++++++++++
+ drivers/vdpa/pds/vdpa_dev.h                        |  49 ++
+ drivers/vdpa/solidrun/snet_ctrl.c                  |   6 +
+ drivers/vdpa/solidrun/snet_hwmon.c                 |   2 +-
+ drivers/vdpa/solidrun/snet_main.c                  |  15 +
+ drivers/vdpa/solidrun/snet_vdpa.h                  |   1 +
+ drivers/vdpa/vdpa_user/vduse_dev.c                 |   6 +-
+ drivers/vhost/net.c                                |   8 +-
+ drivers/vhost/scsi.c                               | 103 +--
+ drivers/vhost/vhost.c                              | 425 ++++++++++--
+ drivers/vhost/vhost.h                              |  24 +-
+ drivers/vhost/vsock.c                              |   4 +-
+ drivers/virtio/virtio_pci_common.h                 |   7 +-
+ drivers/virtio/virtio_pci_modern_dev.c             |  33 +-
+ drivers/virtio/virtio_vdpa.c                       |   4 +-
+ include/linux/pds/pds_adminq.h                     | 247 +++++++
+ include/linux/pds/pds_common.h                     |  21 +-
+ include/linux/virtio.h                             |   5 +-
+ include/linux/virtio_pci_modern.h                  |   6 +
+ include/uapi/linux/vhost.h                         |  31 +
+ include/uapi/linux/vhost_types.h                   |  16 +
+ tools/virtio/Makefile                              |  13 +-
+ 42 files changed, 2777 insertions(+), 358 deletions(-)
+ create mode 100644 Documentation/networking/device_drivers/ethernet/amd/pds_vdpa.rst
+ create mode 100644 drivers/vdpa/pds/Makefile
+ create mode 100644 drivers/vdpa/pds/aux_drv.c
+ create mode 100644 drivers/vdpa/pds/aux_drv.h
+ create mode 100644 drivers/vdpa/pds/cmds.c
+ create mode 100644 drivers/vdpa/pds/cmds.h
+ create mode 100644 drivers/vdpa/pds/debugfs.c
+ create mode 100644 drivers/vdpa/pds/debugfs.h
+ create mode 100644 drivers/vdpa/pds/vdpa_dev.c
+ create mode 100644 drivers/vdpa/pds/vdpa_dev.h
+
 
