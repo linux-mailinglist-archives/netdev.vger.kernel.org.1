@@ -1,122 +1,138 @@
-Return-Path: <netdev+bounces-15063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3BEE74575C
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:33:30 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7E2FE745764
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:34:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 558E0280CD6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:33:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ADFE71C2088D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:34:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 478D2818;
-	Mon,  3 Jul 2023 08:33:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE4121371;
+	Mon,  3 Jul 2023 08:34:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 39C43A42
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:33:26 +0000 (UTC)
-Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9BC94DD
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 01:33:25 -0700 (PDT)
-Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fbd33a1819so60585e9.1
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 01:33:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688373204; x=1690965204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=wriP2XUrnLtI+7GWf032nay1vqXA7Kps9xjESoFP7kE=;
-        b=La84kUPlP1niN59EnYFq8q7DPZlQKSzPo2QQJikmqpprzPyCxAwb4E3IgXNjl9syuC
-         dy+Du5m0kUXDwTNE/4d47X2h+yhuH7atqEyui2Uk1p1Yok/zepI4XhGjIcv8BPpaejjt
-         7ifRc5TGcJ7nJqYm1u+jXjJDUReBJR5M8RjjooNvk1yz4yzrilCfDWLVUw4BsotNr6q+
-         ferkveled2VUO31hgxghZUjLK3cE37d6p7Ku3yhsDgJveMSyLXYXB9oQgHK6BsooNsNm
-         dLZGst2BPKcVQxBztDQQwmJjlh8LqBNf0/6MiXctIfVACrJVSZ6rMuM5p56N8BPUlswM
-         FA/Q==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688373204; x=1690965204;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=wriP2XUrnLtI+7GWf032nay1vqXA7Kps9xjESoFP7kE=;
-        b=iTvkFnrr9lwHa0ChBwslv26Dpsoh9E3KM1m2DZu9wCjw9tcK54FRoAQo89J5fedcpC
-         pjxlP12SCt3zhhQQUWhLQ80MKjgK2cK0D31IWCHaXG++9rK7U/QvqdQEgyjCky9C2Z+N
-         DR6IGOYpeWltoGA2sduFf3w8b0D4AJFIeJ7s7EvuL0h6qbQzD8FsbvyIyP0X8/Xp34UF
-         BpQhJxwboJQxFpAxh6Pa1lAt2DoTClhx2XKxfAIcw+gKYlkDl4nC1gkiXRFRCVbN0MOL
-         2EYS8fOeFZTqpwejxprv+mkE0z41lrgw3VYrW5GRM+XUZWkQcNC7p1amb5S7ZJ+Y8uCl
-         ehMQ==
-X-Gm-Message-State: ABy/qLZB3SqNODqy4pOISBUQjUz5nNpAEiBfAQ2q/N2E4sEAzSSILYRg
-	iZITZJGjU7FkIhPaI53j82HP2mGr7javvijmvCd7LHJ+H7Akn7I+Ov27UA==
-X-Google-Smtp-Source: APBJJlHCMX7Exg4kL0Im+kwDJxYL/zpztui5/XBZvyxdLBPkrE8suJFG7vi5iAaG+uYEYS0xT/xA9zGbhdTWyrNFh1I=
-X-Received: by 2002:a05:600c:3b9e:b0:3f7:e463:a0d6 with SMTP id
- n30-20020a05600c3b9e00b003f7e463a0d6mr150843wms.0.1688373204036; Mon, 03 Jul
- 2023 01:33:24 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BD01CA42
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:34:53 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8D984DD;
+	Mon,  3 Jul 2023 01:34:52 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688373292; x=1719909292;
+  h=message-id:date:mime-version:subject:to:cc:references:
+   from:in-reply-to:content-transfer-encoding;
+  bh=7kbif9bfnNgRHrXrFMABWk7zXjF8D6a49xUb4z1x3J8=;
+  b=EDgGbf/46vhrppbnxJa+FD1hxPJQF3Ixnj0JzyGit15dtH/CTo3GqRk5
+   +YBVilG9wMdsBSeSpVdtxnUbsuelgAbPlTLZ1cCWNkipzy3duPpTAxbxj
+   HmWtgsXhIdv+fcplb6wSvngIvHKBHeWrF2yGaSrbgbIhZVCejhCY6PLwW
+   qb25/z95k0M8Tbbgr54AOrhlYnUrTo0gjAsow1aSZRhE3plJUsLvqlZHP
+   99lnWHYEqonKtaNuw3btRNNYkiG1Yah4ARinIFuVJ9jxwiJ3IO0eYn3uz
+   nOjjuPmsjPsnZr6QAMhU0C2LnE3/ZLE8ngm8BBl0TAE/IX2zBfyjN71PM
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="426508743"
+X-IronPort-AV: E=Sophos;i="6.01,177,1684825200"; 
+   d="scan'208";a="426508743"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 01:34:52 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="788447778"
+X-IronPort-AV: E=Sophos;i="6.01,177,1684825200"; 
+   d="scan'208";a="788447778"
+Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.13.12.63]) ([10.13.12.63])
+  by fmsmga004-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 01:34:47 -0700
+Message-ID: <f14f0d50-2569-0d47-91d6-23c1f99712ad@linux.intel.com>
+Date: Mon, 3 Jul 2023 11:34:44 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703-unpassend-bedauerlich-492e62f1a429@brauner> <000000000000d2451605ff9093bc@google.com>
-In-Reply-To: <000000000000d2451605ff9093bc@google.com>
-From: Aleksandr Nogikh <nogikh@google.com>
-Date: Mon, 3 Jul 2023 10:33:11 +0200
-Message-ID: <CANp29Y5KParuHYw2sJdDMXXP7zaa-ss1nPN4n5x2qxGJnhtubg@mail.gmail.com>
-Subject: Re: [syzbot] [kernel?] net test error: UBSAN: array-index-out-of-bounds
- in alloc_pid
-To: syzbot <syzbot+3945b679bf589be87530@syzkaller.appspotmail.com>
-Cc: brauner@kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-15.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SORTED_RECIPS,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [Intel-wired-lan] [PATCH net v2 2/6] igc: Do not enable taprio
+ offload for invalid arguments
+Content-Language: en-US
+To: Florian Kauer <florian.kauer@linutronix.de>,
+ Jesse Brandeburg <jesse.brandeburg@intel.com>,
+ Tony Nguyen <anthony.l.nguyen@intel.com>,
+ Vinicius Costa Gomes <vinicius.gomes@intel.com>,
+ "David S . Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Tan Tee Min <tee.min.tan@linux.intel.com>,
+ Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
+ Aravindhan Gunasekaran <aravindhan.gunasekaran@intel.com>,
+ Malli C <mallikarjuna.chilakala@intel.com>
+Cc: netdev@vger.kernel.org, kurt@linutronix.de,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+References: <20230619100858.116286-1-florian.kauer@linutronix.de>
+ <20230619100858.116286-3-florian.kauer@linutronix.de>
+From: "naamax.meir" <naamax.meir@linux.intel.com>
+In-Reply-To: <20230619100858.116286-3-florian.kauer@linutronix.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 3, 2023 at 10:01=E2=80=AFAM syzbot
-<syzbot+3945b679bf589be87530@syzkaller.appspotmail.com> wrote:
->
-> > On Sun, Jul 02, 2023 at 11:19:54PM -0700, syzbot wrote:
-> >> Hello,
-> >>
-> >> syzbot found the following issue on:
-> >>
-> >> HEAD commit:    97791d3c6d0a Merge branch 'octeontx2-af-fixes'
-> >> git tree:       net
-> >> console output: https://syzkaller.appspot.com/x/log.txt?x=3D11b1a6d728=
-0000
-> >> kernel config:  https://syzkaller.appspot.com/x/.config?x=3D924167e366=
-6ff54c
-> >> dashboard link: https://syzkaller.appspot.com/bug?extid=3D3945b679bf58=
-9be87530
-> >> compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Bin=
-utils for Debian) 2.35.2
-> >>
-> >> Downloadable assets:
-> >> disk image: https://storage.googleapis.com/syzbot-assets/2bd5d64db6b8/=
-disk-97791d3c.raw.xz
-> >> vmlinux: https://storage.googleapis.com/syzbot-assets/cd31502424f2/vml=
-inux-97791d3c.xz
-> >> kernel image: https://storage.googleapis.com/syzbot-assets/33c6f22e34a=
-b/bzImage-97791d3c.xz
-> >>
-> >> IMPORTANT: if you fix the issue, please add the following tag to the c=
-ommit:
-> >> Reported-by: syzbot+3945b679bf589be87530@syzkaller.appspotmail.com
-> >
-> > #syz dup: [syzbot] [kernel?] net-next test error: UBSAN: array-index-ou=
-t-of-bounds in alloc_pid
->
-> can't find the dup bug
->
+On 6/19/2023 13:08, Florian Kauer wrote:
+> Only set adapter->taprio_offload_enable after validating the arguments.
+> Otherwise, it stays set even if the offload was not enabled.
+> Since the subsequent code does not get executed in case of invalid
+> arguments, it will not be read at first.
+> However, by activating and then deactivating another offload
+> (e.g. ETF/TX launchtime offload), taprio_offload_enable is read
+> and erroneously keeps the offload feature of the NIC enabled.
+> 
+> This can be reproduced as follows:
+> 
+>      # TAPRIO offload (flags == 0x2) and negative base-time leading to expected -ERANGE
+>      sudo tc qdisc replace dev enp1s0 parent root handle 100 stab overhead 24 taprio \
+> 	    num_tc 1 \
+> 	    map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 \
+> 	    queues 1@0 \
+> 	    base-time -1000 \
+> 	    sched-entry S 01 300000 \
+> 	    flags 0x2
+> 
+>      # IGC_TQAVCTRL is 0x0 as expected (iomem=relaxed for reading register)
+>      sudo pcimem /sys/bus/pci/devices/0000:01:00.0/resource0 0x3570 w*1
+> 
+>      # Activate ETF offload
+>      sudo tc qdisc replace dev enp1s0 parent root handle 6666 mqprio \
+> 	    num_tc 3 \
+> 	    map 2 2 1 0 2 2 2 2 2 2 2 2 2 2 2 2 \
+> 	    queues 1@0 1@1 2@2 \
+> 	    hw 0
+>      sudo tc qdisc add dev enp1s0 parent 6666:1 etf \
+> 	    clockid CLOCK_TAI \
+> 	    delta 500000 \
+> 	    offload
+> 
+>      # IGC_TQAVCTRL is 0x9 as expected
+>      sudo pcimem /sys/bus/pci/devices/0000:01:00.0/resource0 0x3570 w*1
+> 
+>      # Deactivate ETF offload again
+>      sudo tc qdisc delete dev enp1s0 parent 6666:1
+> 
+>      # IGC_TQAVCTRL should now be 0x0 again, but is observed as 0x9
+>      sudo pcimem /sys/bus/pci/devices/0000:01:00.0/resource0 0x3570 w*1
+> 
+> Fixes: e17090eb2494 ("igc: allow BaseTime 0 enrollment for Qbv")
+> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
+> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
+> ---
+>   drivers/net/ethernet/intel/igc/igc_main.c | 4 ++--
+>   1 file changed, 2 insertions(+), 2 deletions(-)
 
-#syz dup: net-next test error: UBSAN: array-index-out-of-bounds in alloc_pi=
-d
+
+Tested-by: Naama Meir <naamax.meir@linux.intel.com>
 
