@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-15062-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15061-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id ED3B2745754
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:30:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 204D7745753
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:30:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 28E821C20834
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:30:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FF3B1C20913
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:30:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 318051FA4;
-	Mon,  3 Jul 2023 08:30:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6206C80A;
+	Mon,  3 Jul 2023 08:30:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB57320F0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 074162115
 	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:30:20 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 46F7FC433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 4C6BAC433C8;
 	Mon,  3 Jul 2023 08:30:20 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1688373020;
-	bh=DUYAofIaOjiCvEN7NTlcA7wsBaCZHD7tf2PWXdXPuGY=;
+	bh=en4IMgzUw/R5Cxp3guHimSlytEJd09sz1saQQhNLWEc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=GCqKLTGmgyIvN2d5xFKAJbGfwVmOBXfFOBshSAZKygSq1M0mrcxlPhOv5QFp8lhxO
-	 +Uq/FZLQvdy9d8VHhRFvBY/b1/6jOX2yPY/FmtogbBh61hentEfZr9i0ZHXjr+xJGR
-	 7rmFoGz99uSvOrGGqfurDQB5VHiA+BbiZh4vUWSVfnnwA404B+2DgIltQoEiHu9JWT
-	 21ZTr8QTxE3JkE2yC6ZyqD/yZb2l3BXVihVBtGdCvpu3u702tJTilLxLwnl/bYevcR
-	 o5yQl+EQgLy14ARQfiEztdNzKS0bbQy/AtZ20eGmHUsmLLuuhOfTEEWgOn16pXUmcy
-	 bnhi6EDtFHoKQ==
+	b=mOZLIv2mpyvUhA9leIdespQO4uciNkfl7wH8RIxlqQK1xS/1Q/qNGbm8U4+TI0mld
+	 AeZgGsMxg2BBA/J52jJsLf4fvPRYooH44VPH1CXSxukGESPPzvJfzRIR+A4j8Gm1pB
+	 nktTkmI8CdnJkTmE9CF4EPGduUX0IFIJSpvrVDmYDQsdGYaEXwbfD1B55VSTIugOdj
+	 0n3Cyi69Kc5h4okG/UdXVvAJE/LFF+WQuvuPRmUxFq9yBsNDLkpPu2fIftyPZsbczO
+	 A7qnqee2w1FpLWLvx77dsBR26AYE7zSt+Qo+xMkYAh1E9BgiG9ctfJhiUqFt/qXsD9
+	 Eu1MU3TTH13YA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 2DB91C39563;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 3523EC64458;
 	Mon,  3 Jul 2023 08:30:20 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,36 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net] tcp: annotate data races in __tcp_oow_rate_limited()
+Subject: Re: [PATCH net] Documentation: ABI: sysfs-class-net-qmi: pass_through
+ contact update
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168837302018.15739.6916662349843984262.git-patchwork-notify@kernel.org>
+ <168837302021.15739.3452355484748361369.git-patchwork-notify@kernel.org>
 Date: Mon, 03 Jul 2023 08:30:20 +0000
-References: <20230629164150.2068747-1-edumazet@google.com>
-In-Reply-To: <20230629164150.2068747-1-edumazet@google.com>
-To: Eric Dumazet <edumazet@google.com>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- netdev@vger.kernel.org, eric.dumazet@gmail.com
+References: <1688109620-23833-1-git-send-email-quic_subashab@quicinc.com>
+In-Reply-To: <1688109620-23833-1-git-send-email-quic_subashab@quicinc.com>
+To: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
+ pabeni@redhat.com, netdev@vger.kernel.org, linux-doc@vger.kernel.org,
+ corbet@lwn.net, quic_jhugo@quicinc.com, dnlplm@gmail.com
 
 Hello:
 
 This patch was applied to netdev/net.git (main)
 by David S. Miller <davem@davemloft.net>:
 
-On Thu, 29 Jun 2023 16:41:50 +0000 you wrote:
-> request sockets are lockless, __tcp_oow_rate_limited() could be called
-> on the same object from different cpus. This is harmless.
+On Fri, 30 Jun 2023 01:20:20 -0600 you wrote:
+> Switch to the quicinc.com id.
 > 
-> Add READ_ONCE()/WRITE_ONCE() annotations to avoid a KCSAN report.
-> 
-> Fixes: 4ce7e93cb3fe ("tcp: rate limit ACK sent by SYN_RECV request sockets")
-> Signed-off-by: Eric Dumazet <edumazet@google.com>
-> 
-> [...]
+> Fixes: bd1af6b5fffd ("Documentation: ABI: sysfs-class-net-qmi: document pass-through file")
+> Signed-off-by: Subash Abhinov Kasiviswanathan <quic_subashab@quicinc.com>
+> ---
+>  Documentation/ABI/testing/sysfs-class-net-qmi | 2 +-
+>  1 file changed, 1 insertion(+), 1 deletion(-)
 
 Here is the summary with links:
-  - [net] tcp: annotate data races in __tcp_oow_rate_limited()
-    https://git.kernel.org/netdev/net/c/998127cdb469
+  - [net] Documentation: ABI: sysfs-class-net-qmi: pass_through contact update
+    https://git.kernel.org/netdev/net/c/acd9755894c9
 
 You are awesome, thank you!
 -- 
