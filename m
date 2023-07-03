@@ -1,61 +1,74 @@
-Return-Path: <netdev+bounces-15197-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15202-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C054B746193
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:53:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9CAB47461B0
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:59:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 20720280E0D
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:53:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C92AD1C209E6
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:59:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C1951078F;
-	Mon,  3 Jul 2023 17:52:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAC8107BE;
+	Mon,  3 Jul 2023 17:59:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 31DB410780;
-	Mon,  3 Jul 2023 17:52:55 +0000 (UTC)
-Received: from relay1-d.mail.gandi.net (relay1-d.mail.gandi.net [217.70.183.193])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D8ED2E42;
-	Mon,  3 Jul 2023 10:52:53 -0700 (PDT)
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B85E4240008;
-	Mon,  3 Jul 2023 17:52:49 +0000 (UTC)
-From: Ilya Maximets <i.maximets@ovn.org>
-To: netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Cc: =?UTF-8?q?Bj=C3=B6rn=20T=C3=B6pel?= <bjorn@kernel.org>,
-	Magnus Karlsson <magnus.karlsson@intel.com>,
-	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-doc@vger.kernel.org,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D086C10941
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:59:00 +0000 (UTC)
+Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BF0E66;
+	Mon,  3 Jul 2023 10:58:53 -0700 (PDT)
+Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-345a31bda6cso25663825ab.1;
+        Mon, 03 Jul 2023 10:58:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688407133; x=1690999133;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=dLDpvUuDt1pSQ6XZf1EhYr02Va2+zEjOqRg+3qDMtro=;
+        b=hDaAixqAKj4dk/htPLAEJ9KdQiPhKmUvD0Hp88xsn8w62ORQttwJNDpAwL2akcx256
+         TdMTM8A9KAdpHCrqLkqJnmh0bKaXw2k1YSR28Jllu6HTZKBRT2tsCfIOdpwmRfJkL3nK
+         7h8lCVboOp8QxR5DeBBVLyPQ0aUt0LUNhy6LM5DuwU9RTyLkwAOrMUu8xPfX0rs8soeN
+         DJgcgAj7DCX5iIANJmD4NJgv7lJSU1VD4u/8zgTji2fGy5YhnKx3g6f1N0MDZLg+Nl6L
+         jnFYLbLCs9M9PUT7wGm/qEvuxpNGTL/DZRT49qinLaFulfQfgvV/E9jiz9Rbz15P7VYY
+         S/pw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688407133; x=1690999133;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=dLDpvUuDt1pSQ6XZf1EhYr02Va2+zEjOqRg+3qDMtro=;
+        b=fWFA5AwswwCr5mlrROs4549r10VUO/sdry4oap4rSPu0ZiI5K2wZUOewO7uxcMMK4e
+         Vbw29xeLf7pF4yDHLVfReAk1gLL27ipLlrqp0/E0T36B9sMZ3yktJJmfg4biq0hvBMrt
+         EX6I7nUlfYlCKB4Pxhy4XBIq4tyZyCg7KeoVteMZzVI1Khtec74sf03yVeBLi99nIZ7g
+         BtvtYnTHNPg2C5cOxiGwYig5bFLHmqbQ91piSufCTQEBorkw77Lx3OXg0nFxUESYvsAK
+         mZJ5kbJtx/W/lVfCM35Jbn9fivsN1/h1iLoudyIWw4AqyCm488KP2a/4lfwc2AAUBonx
+         a4xA==
+X-Gm-Message-State: ABy/qLbQo6ZIxIKQLhR8H9C9pvoIqsajswSLBqdrLjYXvy/sd5JxBuwE
+	0DQktMHLmZ3OBP2oJWb/aXo=
+X-Google-Smtp-Source: APBJJlFfacAGKjTvY0YAohkxmzRehPWyKSU/NiK6UBBNJFnogIMmYKWfcRujyiXL1/QU+n/0RG/A1g==
+X-Received: by 2002:a92:d4c4:0:b0:340:b569:aec1 with SMTP id o4-20020a92d4c4000000b00340b569aec1mr10747253ilm.28.1688407132993;
+        Mon, 03 Jul 2023 10:58:52 -0700 (PDT)
+Received: from azeems-kspp.c.googlers.com.com (54.70.188.35.bc.googleusercontent.com. [35.188.70.54])
+        by smtp.gmail.com with ESMTPSA id e5-20020a92d745000000b003424b3d6d37sm7004198ilq.24.2023.07.03.10.58.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Mon, 03 Jul 2023 10:58:52 -0700 (PDT)
+From: Azeem Shaikh <azeemshaikh38@gmail.com>
+To: "David S. Miller" <davem@davemloft.net>
+Cc: linux-hardening@vger.kernel.org,
+	Azeem Shaikh <azeemshaikh38@gmail.com>,
+	linux-trace-kernel@vger.kernel.org,
 	linux-kernel@vger.kernel.org,
-	Jason Wang <jasowang@redhat.com>,
-	Stefan Hajnoczi <stefanha@redhat.com>,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: [PATCH bpf-next] xsk: honor SO_BINDTODEVICE on bind
-Date: Mon,  3 Jul 2023 19:53:29 +0200
-Message-Id: <20230703175329.3259672-1-i.maximets@ovn.org>
-X-Mailer: git-send-email 2.40.1
+	David Ahern <dsahern@kernel.org>,
+	Steven Rostedt <rostedt@goodmis.org>,
+	Kees Cook <keescook@chromium.org>,
+	netdev@vger.kernel.org
+Subject: [PATCH] net: Replace strlcpy with strscpy
+Date: Mon,  3 Jul 2023 17:58:40 +0000
+Message-ID: <20230703175840.3706231-1-azeemshaikh38@gmail.com>
+X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -63,104 +76,58 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.6 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Initial creation of an AF_XDP socket requires CAP_NET_RAW capability.
-A privileged process might create the socket and pass it to a
-non-privileged process for later use.  However, that process will be
-able to bind the socket to any network interface.  Even though it will
-not be able to receive any traffic without modification of the BPF map,
-the situation is not ideal.
+strlcpy() reads the entire source buffer first.
+This read may exceed the destination size limit.
+This is both inefficient and can lead to linear read
+overflows if a source string is not NUL-terminated [1].
+In an effort to remove strlcpy() completely [2], replace
+strlcpy() here with strscpy().
+No return values were used, so direct replacement is safe.
 
-Sockets already have a mechanism that can be used to restrict what
-interface they can be attached to.  That is SO_BINDTODEVICE.
+[1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strlcpy
+[2] https://github.com/KSPP/linux/issues/89
 
-To change the SO_BINDTODEVICE binding the process will need CAP_NET_RAW.
-
-Make xsk_bind() honor the SO_BINDTODEVICE in order to allow safer
-workflow when non-privileged process is using AF_XDP.
-
-The intended workflow is following:
-
-  1. First process creates a bare socket with socket(AF_XDP, ...).
-  2. First process loads the XSK program to the interface.
-  3. First process adds the socket fd to a BPF map.
-  4. First process ties socket fd to a particular interface using
-     SO_BINDTODEVICE.
-  5. First process sends socket fd to a second process.
-  6. Second process allocates UMEM.
-  7. Second process binds socket to the interface with bind(...).
-  8. Second process sends/receives the traffic.
-
-All the steps above are possible today if the first process is
-privileged and the second one has sufficient RLIMIT_MEMLOCK and no
-capabilities.  However, the second process will be able to bind the
-socket to any interface it wants on step 7 and send traffic from it.
-With the proposed change, the second process will be able to bind
-the socket only to a specific interface chosen by the first process
-at step 4.
-
-Acked-by: Magnus Karlsson <magnus.karlsson@intel.com>
-Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
+Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
 ---
+ include/trace/events/fib.h  |    2 +-
+ include/trace/events/fib6.h |    2 +-
+ 2 files changed, 2 insertions(+), 2 deletions(-)
 
-RFC --> PATCH:
-  * Better explained intended workflow in a commit message.
-  * Added ACK from Magnus.
-
- Documentation/networking/af_xdp.rst | 9 +++++++++
- net/xdp/xsk.c                       | 6 ++++++
- 2 files changed, 15 insertions(+)
-
-diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
-index 247c6c4127e9..1cc35de336a4 100644
---- a/Documentation/networking/af_xdp.rst
-+++ b/Documentation/networking/af_xdp.rst
-@@ -433,6 +433,15 @@ start N bytes into the buffer leaving the first N bytes for the
- application to use. The final option is the flags field, but it will
- be dealt with in separate sections for each UMEM flag.
+diff --git a/include/trace/events/fib.h b/include/trace/events/fib.h
+index 76297ecd4935..20b914250ce9 100644
+--- a/include/trace/events/fib.h
++++ b/include/trace/events/fib.h
+@@ -65,7 +65,7 @@ TRACE_EVENT(fib_table_lookup,
+ 		}
  
-+SO_BINDTODEVICE setsockopt
-+--------------------------
-+
-+This is a generic SOL_SOCKET option that can be used to tie AF_XDP
-+socket to a particular network interface.  It is useful when a socket
-+is created by a privileged process and passed to a non-privileged one.
-+Once the option is set, kernel will refuse attempts to bind that socket
-+to a different interface.  Updating the value requires CAP_NET_RAW.
-+
- XDP_STATISTICS getsockopt
- -------------------------
+ 		dev = nhc ? nhc->nhc_dev : NULL;
+-		strlcpy(__entry->name, dev ? dev->name : "-", IFNAMSIZ);
++		strscpy(__entry->name, dev ? dev->name : "-", IFNAMSIZ);
  
-diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
-index 5a8c0dd250af..386ff641db0f 100644
---- a/net/xdp/xsk.c
-+++ b/net/xdp/xsk.c
-@@ -886,6 +886,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
- 	struct sock *sk = sock->sk;
- 	struct xdp_sock *xs = xdp_sk(sk);
- 	struct net_device *dev;
-+	int bound_dev_if;
- 	u32 flags, qid;
- 	int err = 0;
+ 		if (nhc) {
+ 			if (nhc->nhc_gw_family == AF_INET) {
+diff --git a/include/trace/events/fib6.h b/include/trace/events/fib6.h
+index 4d3e607b3cde..5d7ee2610728 100644
+--- a/include/trace/events/fib6.h
++++ b/include/trace/events/fib6.h
+@@ -63,7 +63,7 @@ TRACE_EVENT(fib6_table_lookup,
+ 		}
  
-@@ -899,6 +900,11 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
- 		      XDP_USE_NEED_WAKEUP))
- 		return -EINVAL;
- 
-+	bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
-+
-+	if (bound_dev_if && bound_dev_if != sxdp->sxdp_ifindex)
-+		return -EINVAL;
-+
- 	rtnl_lock();
- 	mutex_lock(&xs->mutex);
- 	if (xs->state != XSK_READY) {
+ 		if (res->nh && res->nh->fib_nh_dev) {
+-			strlcpy(__entry->name, res->nh->fib_nh_dev->name, IFNAMSIZ);
++			strscpy(__entry->name, res->nh->fib_nh_dev->name, IFNAMSIZ);
+ 		} else {
+ 			strcpy(__entry->name, "-");
+ 		}
 -- 
-2.40.1
+2.41.0.255.g8b1d071c50-goog
+
 
 
