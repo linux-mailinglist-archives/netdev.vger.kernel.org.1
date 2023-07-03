@@ -1,135 +1,83 @@
-Return-Path: <netdev+bounces-15053-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15057-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366EC745723
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:19:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id AF0E2745737
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:21:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B1ACF280C46
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:19:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DA94A1C208E3
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:21:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1391017FD;
-	Mon,  3 Jul 2023 08:19:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1509D3D68;
+	Mon,  3 Jul 2023 08:20:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0822317F8
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:19:17 +0000 (UTC)
-Received: from rtits2.realtek.com.tw (rtits2.realtek.com [211.75.126.72])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 00734E49;
-	Mon,  3 Jul 2023 01:19:11 -0700 (PDT)
-Authenticated-By: 
-X-SpamFilter-By: ArmorX SpamTrap 5.77 with qID 3638IVLG0009537, This message is accepted by code: ctloc85258
-Received: from mail.realtek.com (rtexh36506.realtek.com.tw[172.21.6.27])
-	by rtits2.realtek.com.tw (8.15.2/2.81/5.90) with ESMTPS id 3638IVLG0009537
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES128-GCM-SHA256 bits=128 verify=FAIL);
-	Mon, 3 Jul 2023 16:18:31 +0800
-Received: from RTEXDAG01.realtek.com.tw (172.21.6.100) by
- RTEXH36506.realtek.com.tw (172.21.6.27) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.17; Mon, 3 Jul 2023 16:18:33 +0800
-Received: from RTEXMBS04.realtek.com.tw (172.21.6.97) by
- RTEXDAG01.realtek.com.tw (172.21.6.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2375.7; Mon, 3 Jul 2023 16:18:33 +0800
-Received: from RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d]) by
- RTEXMBS04.realtek.com.tw ([fe80::e138:e7f1:4709:ff4d%5]) with mapi id
- 15.01.2375.007; Mon, 3 Jul 2023 16:18:33 +0800
-From: Ping-Ke Shih <pkshih@realtek.com>
-To: David Laight <David.Laight@ACULAB.COM>, You Kangren <youkangren@vivo.com>,
-        Johannes Berg <johannes@sipsolutions.net>,
-        "David S. Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>,
-        "open list:MAC80211"
-	<linux-wireless@vger.kernel.org>,
-        "open list:NETWORKING [GENERAL]"
-	<netdev@vger.kernel.org>,
-        open list <linux-kernel@vger.kernel.org>
-CC: "opensource.kernel@vivo.com" <opensource.kernel@vivo.com>
-Subject: =?utf-8?B?UkU6IFtQQVRDSF0gd2lmae+8mm1hYzgwMjExOiBSZXBsYWNlIHRoZSB0ZXJu?= =?utf-8?Q?ary_conditional_operator_with_max()?=
-Thread-Topic: =?utf-8?B?W1BBVENIXSB3aWZp77yabWFjODAyMTE6IFJlcGxhY2UgdGhlIHRlcm5hcnkg?=
- =?utf-8?Q?conditional_operator_with_max()?=
-Thread-Index: AQHZqBvNKITprNb9K06+yWJl2zb8J6+fcjiAgAJYBtCABfI/oA==
-Date: Mon, 3 Jul 2023 08:18:33 +0000
-Message-ID: <cb6cc27d71144bef9b7827f541fbeb43@realtek.com>
-References: <20230626104829.1896-1-youkangren@vivo.com>
- <9e4e3bf85ed945e7b0c8d5d389065670@realtek.com>
- <9ea9d91e8ec94edda19bd57e835e0a79@AcuMS.aculab.com>
-In-Reply-To: <9ea9d91e8ec94edda19bd57e835e0a79@AcuMS.aculab.com>
-Accept-Language: en-US, zh-TW
-Content-Language: zh-TW
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-x-originating-ip: [172.21.69.188]
-x-kse-serverinfo: RTEXDAG01.realtek.com.tw, 9
-x-kse-antispam-interceptor-info: fallback
-x-kse-antivirus-interceptor-info: fallback
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D5E20EF
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:20:24 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A7E17C43215;
+	Mon,  3 Jul 2023 08:20:22 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688372422;
+	bh=GAdkZrdoKWD7YyzDP8ANymefO04wUe7jKXHOYI0JvAo=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=JOvpxdIGeaV0pdDRSr0O5u0avi/sD+ggbLk1bJO5icXqWRlhcCGWiUmErpMum5SN2
+	 UmenbWL94IdusSUdkoxIcOmb8uFVJVDSvRrFWDFyvfuKGj4+UkEdb4O3cBOZ67sFOs
+	 X4k0VsnwUdlE7L4UN+C8F0yolhb5FkqbVPq8VmNtHUDZ/4LiOlYT0BbrXwvjut4iM/
+	 4b8kECPQ41MhyrEat0zPWUnaBjOG4pdlfO5HN36CjEZqu2SFZVWKbS0mZOLsJjF1u+
+	 N3qbafx/sjDRzdgsXrMPXwWN+uhFVVLMVKjGBV08nyDdUK55oh2E/ECNlxWn8+0PaN
+	 V2s7G2bqmU4OA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8D0ACC691F1;
+	Mon,  3 Jul 2023 08:20:22 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-KSE-AntiSpam-Interceptor-Info: fallback
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net] net: bridge: keep ports without IFF_UNICAST_FLT in
+ BR_PROMISC mode
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168837242257.9798.3078714826638477204.git-patchwork-notify@kernel.org>
+Date: Mon, 03 Jul 2023 08:20:22 +0000
+References: <20230630164118.1526679-1-vladimir.oltean@nxp.com>
+In-Reply-To: <20230630164118.1526679-1-vladimir.oltean@nxp.com>
+To: Vladimir Oltean <vladimir.oltean@nxp.com>
+Cc: netdev@vger.kernel.org, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, roopa@nvidia.com, razor@blackwall.org,
+ idosch@nvidia.com, mst@redhat.com, vyasevic@redhat.com,
+ bridge@lists.linux-foundation.org, linux-kernel@vger.kernel.org
 
-DQoNCj4gLS0tLS1PcmlnaW5hbCBNZXNzYWdlLS0tLS0NCj4gRnJvbTogRGF2aWQgTGFpZ2h0IDxE
-YXZpZC5MYWlnaHRAQUNVTEFCLkNPTT4NCj4gU2VudDogVGh1cnNkYXksIEp1bmUgMjksIDIwMjMg
-OToyOCBQTQ0KPiBUbzogUGluZy1LZSBTaGloIDxwa3NoaWhAcmVhbHRlay5jb20+OyBZb3UgS2Fu
-Z3JlbiA8eW91a2FuZ3JlbkB2aXZvLmNvbT47IEpvaGFubmVzIEJlcmcNCj4gPGpvaGFubmVzQHNp
-cHNvbHV0aW9ucy5uZXQ+OyBEYXZpZCBTLiBNaWxsZXIgPGRhdmVtQGRhdmVtbG9mdC5uZXQ+OyBF
-cmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+Ow0KPiBKYWt1YiBLaWNpbnNraSA8a3Vi
-YUBrZXJuZWwub3JnPjsgUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPjsgb3BlbiBsaXN0
-Ok1BQzgwMjExDQo+IDxsaW51eC13aXJlbGVzc0B2Z2VyLmtlcm5lbC5vcmc+OyBvcGVuIGxpc3Q6
-TkVUV09SS0lORyBbR0VORVJBTF0gPG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc+OyBvcGVuIGxpc3QN
-Cj4gPGxpbnV4LWtlcm5lbEB2Z2VyLmtlcm5lbC5vcmc+DQo+IENjOiBvcGVuc291cmNlLmtlcm5l
-bEB2aXZvLmNvbQ0KPiBTdWJqZWN0OiBSRTogW1BBVENIXSB3aWZp77yabWFjODAyMTE6IFJlcGxh
-Y2UgdGhlIHRlcm5hcnkgY29uZGl0aW9uYWwgb3BlcmF0b3Igd2l0aCBtYXgoKQ0KPiANCj4gRnJv
-bTogUGluZy1LZSBTaGloDQo+ID4gU2VudDogMjggSnVuZSAyMDIzIDAyOjQ5DQo+ID4NCj4gPiA+
-IC0tLS0tT3JpZ2luYWwgTWVzc2FnZS0tLS0tDQo+ID4gPiBGcm9tOiBZb3UgS2FuZ3JlbiA8eW91
-a2FuZ3JlbkB2aXZvLmNvbT4NCj4gPiA+IFNlbnQ6IE1vbmRheSwgSnVuZSAyNiwgMjAyMyA2OjQ4
-IFBNDQo+ID4gPiBUbzogSm9oYW5uZXMgQmVyZyA8am9oYW5uZXNAc2lwc29sdXRpb25zLm5ldD47
-IERhdmlkIFMuIE1pbGxlciA8ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldD47IEVyaWMgRHVtYXpldA0KPiA+
-ID4gPGVkdW1hemV0QGdvb2dsZS5jb20+OyBKYWt1YiBLaWNpbnNraSA8a3ViYUBrZXJuZWwub3Jn
-PjsgUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRoYXQuY29tPjsgb3Blbg0KPiA+ID4gbGlzdDpNQUM4
-MDIxMSA8bGludXgtd2lyZWxlc3NAdmdlci5rZXJuZWwub3JnPjsgb3BlbiBsaXN0Ok5FVFdPUktJ
-TkcgW0dFTkVSQUxdDQo+ID4gPG5ldGRldkB2Z2VyLmtlcm5lbC5vcmc+Ow0KPiA+ID4gb3BlbiBs
-aXN0IDxsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnPg0KPiA+ID4gQ2M6IG9wZW5zb3VyY2Uu
-a2VybmVsQHZpdm8uY29tOyB5b3VrYW5ncmVuQHZpdm8uY29tDQo+ID4gPiBTdWJqZWN0OiBbUEFU
-Q0hdIHdpZmnvvJptYWM4MDIxMTogUmVwbGFjZSB0aGUgdGVybmFyeSBjb25kaXRpb25hbCBvcGVy
-YXRvciB3aXRoIG1heCgpDQo+ID4NCj4gPiBUaGUgc2VtaWNvbG9uIG9mICJ3aWZp77yaIiBpcyBk
-aWZmZXJlbnQgZnJvbSBvdGhlcnMuDQo+ID4NCj4gPiA+DQo+ID4gPiBSZXBsYWNlIHRoZSB0ZXJu
-YXJ5IGNvbmRpdGlvbmFsIG9wZXJhdG9yIHdpdGggbWF4KCkgdG8gbWFrZSB0aGUgY29kZSBjbGVh
-bg0KPiA+ID4NCj4gPiA+IFNpZ25lZC1vZmYtYnk6IFlvdSBLYW5ncmVuIDx5b3VrYW5ncmVuQHZp
-dm8uY29tPg0KPiA+ID4gLS0tDQo+ID4gPiAgbmV0L21hYzgwMjExL3RkbHMuYyB8IDIgKy0NCj4g
-PiA+ICAxIGZpbGUgY2hhbmdlZCwgMSBpbnNlcnRpb24oKyksIDEgZGVsZXRpb24oLSkNCj4gPiA+
-DQo+ID4gPiBkaWZmIC0tZ2l0IGEvbmV0L21hYzgwMjExL3RkbHMuYyBiL25ldC9tYWM4MDIxMS90
-ZGxzLmMNCj4gPiA+IGluZGV4IGE0YWYzYjc2NzVlZi4uOWY4YjA4NDJhNjE2IDEwMDY0NA0KPiA+
-ID4gLS0tIGEvbmV0L21hYzgwMjExL3RkbHMuYw0KPiA+ID4gKysrIGIvbmV0L21hYzgwMjExL3Rk
-bHMuYw0KPiA+ID4gQEAgLTk0Niw3ICs5NDYsNyBAQCBpZWVlODAyMTFfdGRsc19idWlsZF9tZ210
-X3BhY2tldF9kYXRhKHN0cnVjdCBpZWVlODAyMTFfc3ViX2lmX2RhdGEgKnNkYXRhLA0KPiA+ID4g
-ICAgICAgICBpbnQgcmV0Ow0KPiA+ID4gICAgICAgICBzdHJ1Y3QgaWVlZTgwMjExX2xpbmtfZGF0
-YSAqbGluazsNCj4gPiA+DQo+ID4gPiAtICAgICAgIGxpbmtfaWQgPSBsaW5rX2lkID49IDAgPyBs
-aW5rX2lkIDogMDsNCj4gPiA+ICsgICAgICAgbGlua19pZCA9IG1heChsaW5rX2lkLCAwKTsNCj4g
-Pg0KPiA+IE9yaWdpbmFsIGxvZ2ljIG1lYW5zICJpZiBsaW5rX2lkIDwgMCwgdGhlbiB1c2UgZGVm
-YXVsdCBsaW5rICgwKSIgaW5zdGVhZCBvZg0KPiA+ICJhbHdheXMgdXNlIGxpbmtfaWQgbGFyZ2Vy
-IHRoYW4gb3IgZXF1YWwgdG8gMCIuIFNvLCBJIHRoaW5rIG1heChsaW5rX2lkLCAwKSBjb3VsZA0K
-PiA+IGNhdXNlIG1pc3VuZGVyc3RhbmRpbmcuDQo+IA0KPiBUaGUgY2xlYXJlc3QgaXMgcHJvYmFi
-bHk6DQo+ICAgICAgICAgaWYgKGxpbmtfaWQgPCAwKQ0KPiAgICAgICAgICAgICAgICAgbGlua19p
-ZCA9IDA7DQo+IA0KPiBUaGUgY29tcGlsZXIgY291bGQgZWFzaWx5IGdlbmVyYXRlIHRoZSBzYW1l
-IGNvZGUgKGNvbXBhcmUgYW5kIGNvbmRpdGlvbmFsDQo+IG1vdmUpLg0KPiANCg0KVGhleSB3b3Vs
-ZCBiZSB0aGUgc2FtZSwgYnV0IHBlcnNvbmFsbHkgSSBwcmVmZXIgb3JpZ2luYWwgc2luZ2xlIG9u
-ZSBsaW5lIHN0YXRlbWVudA0KdGhhdCBpcyBjbGVhciB0byBtZS4NCg0KDQo=
+Hello:
+
+This patch was applied to netdev/net.git (main)
+by David S. Miller <davem@davemloft.net>:
+
+On Fri, 30 Jun 2023 19:41:18 +0300 you wrote:
+> According to the synchronization rules for .ndo_get_stats() as seen in
+> Documentation/networking/netdevices.rst, acquiring a plain spin_lock()
+> should not be illegal, but the bridge driver implementation makes it so.
+> 
+> After running these commands, I am being faced with the following
+> lockdep splat:
+> 
+> [...]
+
+Here is the summary with links:
+  - [net] net: bridge: keep ports without IFF_UNICAST_FLT in BR_PROMISC mode
+    https://git.kernel.org/netdev/net/c/6ca3c005d060
+
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
