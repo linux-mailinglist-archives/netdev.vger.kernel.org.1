@@ -1,248 +1,147 @@
-Return-Path: <netdev+bounces-15066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5978774577B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:38:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C716A7457AB
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:50:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 84DC71C2093A
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:38:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 77D87280CBE
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:50:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8EA3417FD;
-	Mon,  3 Jul 2023 08:38:21 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9958E1FD2;
+	Mon,  3 Jul 2023 08:50:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 831DCECD
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:38:21 +0000 (UTC)
-Received: from foss.arm.com (foss.arm.com [217.140.110.172])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 76864B6;
-	Mon,  3 Jul 2023 01:38:19 -0700 (PDT)
-Received: from usa-sjc-imap-foss1.foss.arm.com (unknown [10.121.207.14])
-	by usa-sjc-mx-foss1.foss.arm.com (Postfix) with ESMTP id D1FAA1FB;
-	Mon,  3 Jul 2023 01:39:01 -0700 (PDT)
-Received: from [10.57.38.117] (unknown [10.57.38.117])
-	by usa-sjc-imap-foss1.foss.arm.com (Postfix) with ESMTPSA id B6F6C3F73F;
-	Mon,  3 Jul 2023 01:38:16 -0700 (PDT)
-Message-ID: <36bb826d-ecff-570c-8595-e8cb41ad45cf@arm.com>
-Date: Mon, 3 Jul 2023 09:38:11 +0100
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C759ECD
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:50:02 +0000 (UTC)
+Received: from linux.microsoft.com (linux.microsoft.com [13.77.154.182])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 949DB10C7;
+	Mon,  3 Jul 2023 01:49:41 -0700 (PDT)
+Received: by linux.microsoft.com (Postfix, from userid 1099)
+	id 7CEF720AECAD; Mon,  3 Jul 2023 01:49:34 -0700 (PDT)
+DKIM-Filter: OpenDKIM Filter v2.11.0 linux.microsoft.com 7CEF720AECAD
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=linux.microsoft.com;
+	s=default; t=1688374174;
+	bh=wLvOYsL0xTLNog9Esl1IJpg/jgFjcy1xWtdfH3ZESbc=;
+	h=From:To:Cc:Subject:Date:From;
+	b=qJlSF5nCdYP0m5NBCth77epMbBD9PUok8pnsnPduqP6HFaKbBSJC0KSBX05iB8Sb0
+	 xxdrowkaHthO5XOKYwfC4/e6I2tLXTWZE+qRanRUbKzGXXCrGW02hIh6e8wh2ahiCL
+	 MmC/+4wcXVueI45GKAIoAjb2/nCQW2dMTVqawiEU=
+From: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
+To: kys@microsoft.com,
+	haiyangz@microsoft.com,
+	wei.liu@kernel.org,
+	decui@microsoft.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	longli@microsoft.com,
+	sharmaajay@microsoft.com,
+	leon@kernel.org,
+	cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com,
+	vkuznets@redhat.com,
+	tglx@linutronix.de,
+	linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org
+Cc: stable@vger.kernel.org,
+	schakrabarti@microsoft.com,
+	Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Subject: [PATCH V4 net] net: mana: Fix MANA VF unload when host is unresponsive
+Date: Mon,  3 Jul 2023 01:49:31 -0700
+Message-Id: <1688374171-10534-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-Mailer: git-send-email 1.8.3.1
+X-Spam-Status: No, score=-19.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,
+	USER_IN_DEF_SPF_WL autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: iwlwifi causes dma-iommu.c:693 __iommu_dma_unmap since
- commit 19898ce9cf8a
-Content-Language: en-GB
-To: Xi Ruoyao <xry111@xry111.site>, Bagas Sanjaya <bagasdotme@gmail.com>,
- Johannes Berg <johannes.berg@intel.com>,
- Gregory Greenman <gregory.greenman@intel.com>,
- =?UTF-8?B?TmlrbMSBdnMgS2/EvGVzxYZpa292cw==?= <pinkflames.linux@gmail.com>,
- Nate Watterson <nwatters@codeaurora.org>, Joerg Roedel <joro@8bytes.org>,
- Will Deacon <will@kernel.org>,
- Linux IO Memory Management Unit <iommu@lists.linux.dev>
-Cc: Linux Wireless <linux-wireless@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>
-References: <a5cdc7f8-b340-d372-2971-0d24b01de217@gmail.com>
- <9274d9bd3d080a457649ff5addcc1726f08ef5b2.camel@xry111.site>
-From: Robin Murphy <robin.murphy@arm.com>
-In-Reply-To: <9274d9bd3d080a457649ff5addcc1726f08ef5b2.camel@xry111.site>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-On 2023-07-03 08:54, Xi Ruoyao wrote:
-> On Sun, 2023-07-02 at 19:13 +0700, Bagas Sanjaya wrote:
->> Hi,
->>
->> I notice a regression report on Bugzilla [1]: Quoting from it:
->>
->>> Since commit 19898ce9cf8a the iwlwifi has generated three possibly
->>> identical kernel stack traces for me. Because I only use the
->>> Bluetooth but not the Wi-Fi functionality, this is not a big deal
->>> for me but I thought such an issue is worth reporting nontheless.
->>>
->>> All three traces point at **drivers/iommu/dma-iommu.c:693
->>> __iommu_dma_unmap+0x150/0x160**.
+From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
 
-That warning means that the IOMMU driver was unable to unmap the whole 
-range requested. This most often indicates that the address or size 
-passed to the unmap didn't match the corresponding map, i.e. the 
-arguments passed to dma_free_coherent() have got messed up from what was 
-originally passed to dma_alloc_coherent(). CONFIG_DMA_API_DEBUG should 
-be able to confirm that, but the root cause would be somewhere within 
-iwlwifi.
+When unloading the MANA driver, mana_dealloc_queues() waits for the MANA
+hardware to complete any inflight packets and set the pending send count
+to zero. But if the hardware has failed, mana_dealloc_queues()
+could wait forever.
 
-Thanks,
-Robin.
->>> I'm attaching to this bug report the three stack traces along with
->>> other possibly relevant dmesg parts. Sorry in advance for not
->>> cutting at the cut here markers which resulted in considerably
->>> longer text but I suspected that the PCI, ACPI, memory and possibly
->>> iwlwifi related messages may be of importance, too. If I should cut
->>> the stack traces out and attach them as three distinct files (and
->>> diff to see if there's any change between them) let me know. I can
->>> provide a full (but redacted) dmesg output of a git master build, if
->>> required as well.
->>>
->>> I did try booting a much more recent git master build with
->>> *iommu.passthrough=0 iommu.strict=0* on the kernel command line but
->>> that did not seem to make any difference.
->>>
->>> ```
->>> 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 is the first bad commit
->>> commit 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2
->>> Author: Johannes Berg <johannes.berg@intel.com>
->>> Date:   Wed Jun 21 13:12:07 2023 +0300
->>>
->>>      wifi: iwlwifi: split 22000.c into multiple files
->>>      
->>>      Split the configuration list in 22000.c into four new files,
->>>      per new device family, so we don't have this huge unusable
->>>      file. Yes, this duplicates a few small things, but that's
->>>      still much better than what we have now.
->>>      
->>>      Signed-off-by: Johannes Berg <johannes.berg@intel.com>
->>>      Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
->>>      Link:
->>> https://lore.kernel.org/r/20230621130443.7543603b2ee7.Ia8dd54216d341ef1ddc0531f2c9aa30d30536a5d@changeid
->>>      Signed-off-by: Johannes Berg <johannes.berg@intel.com>
->>>
->>>   drivers/net/wireless/intel/iwlwifi/Makefile     |   1 +
->>>   drivers/net/wireless/intel/iwlwifi/cfg/22000.c  | 939 +------------
->>> -----------
->>>   drivers/net/wireless/intel/iwlwifi/cfg/ax210.c  | 452 ++++++++++++
->>>   drivers/net/wireless/intel/iwlwifi/cfg/bz.c     | 523 +++++++++++++
->>>   drivers/net/wireless/intel/iwlwifi/cfg/sc.c     | 214 ++++++
->>>   drivers/net/wireless/intel/iwlwifi/iwl-config.h |   2 +
->>>   drivers/net/wireless/intel/iwlwifi/pcie/drv.c   |   3 +
->>>   7 files changed, 1206 insertions(+), 928 deletions(-)
->>>   create mode 100644 drivers/net/wireless/intel/iwlwifi/cfg/ax210.c
->>>   create mode 100644 drivers/net/wireless/intel/iwlwifi/cfg/bz.c
->>>   create mode 100644 drivers/net/wireless/intel/iwlwifi/cfg/sc.c
->>> ```
->>>
->>
->> See Bugzilla for the full thread and attached dmesg.
-> 
-> I can reproduce the issue with an AX210 (the firmware is named iwlwifi-
-> ty-a0-gf-a0-81.ucode).  Reverting
-> 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 (and all following commits in
-> the same series) fixes the issue.
-> 
-> I guess some error messages might be useful:
-> 
-> [    4.058873] iwlwifi 0000:2b:00.0: Error sending NVM_ACCESS_COMPLETE: time out after 2000ms.
-> [    4.060263] iwlwifi 0000:2b:00.0: Current CMD queue read_ptr 1 write_ptr 2
-> [    4.062814] iwlwifi 0000:2b:00.0: Start IWL Error Log Dump:
-> [    4.064440] iwlwifi 0000:2b:00.0: Transport status: 0x0000004A, valid: 6
-> [    4.065481] iwlwifi 0000:2b:00.0: Loaded firmware version: 81.31fc9ae6.0 ty-a0-gf-a0-81.ucode
-> [    4.066655] iwlwifi 0000:2b:00.0: 0x00000084 | NMI_INTERRUPT_UNKNOWN
-> [    4.067725] iwlwifi 0000:2b:00.0: 0x002002F0 | trm_hw_status0
-> [    4.068799] iwlwifi 0000:2b:00.0: 0x00000000 | trm_hw_status1
-> [    4.069777] iwlwifi 0000:2b:00.0: 0x004DBEE0 | branchlink2
-> [    4.070828] iwlwifi 0000:2b:00.0: 0x004D1DEA | interruptlink1
-> [    4.071823] iwlwifi 0000:2b:00.0: 0x004D1DEA | interruptlink2
-> [    4.072774] iwlwifi 0000:2b:00.0: 0x00016582 | data1
-> [    4.073714] iwlwifi 0000:2b:00.0: 0x01000000 | data2
-> [    4.074748] iwlwifi 0000:2b:00.0: 0x00000000 | data3
-> [    4.075681] iwlwifi 0000:2b:00.0: 0x00000000 | beacon time
-> [    4.076695] iwlwifi 0000:2b:00.0: 0x002097F1 | tsf low
-> [    4.077721] iwlwifi 0000:2b:00.0: 0x00000000 | tsf hi
-> [    4.078660] iwlwifi 0000:2b:00.0: 0x00000000 | time gp1
-> [    4.079680] iwlwifi 0000:2b:00.0: 0x0021B671 | time gp2
-> [    4.080678] iwlwifi 0000:2b:00.0: 0x00000001 | uCode revision type
-> [    4.081667] iwlwifi 0000:2b:00.0: 0x00000051 | uCode version major
-> [    4.082653] iwlwifi 0000:2b:00.0: 0x31FC9AE6 | uCode version minor
-> [    4.083655] iwlwifi 0000:2b:00.0: 0x00000420 | hw version
-> [    4.084636] iwlwifi 0000:2b:00.0: 0x18C80002 | board version
-> [    4.085613] iwlwifi 0000:2b:00.0: 0x8005FF00 | hcmd
-> [    4.086578] iwlwifi 0000:2b:00.0: 0x00020000 | isr0
-> [    4.087527] iwlwifi 0000:2b:00.0: 0x00000000 | isr1
-> [    4.088469] iwlwifi 0000:2b:00.0: 0x48F00002 | isr2
-> [    4.089390] iwlwifi 0000:2b:00.0: 0x00C0001C | isr3
-> [    4.090307] iwlwifi 0000:2b:00.0: 0x00000000 | isr4
-> [    4.091202] iwlwifi 0000:2b:00.0: 0x00000000 | last cmd Id
-> [    4.092083] iwlwifi 0000:2b:00.0: 0x00016582 | wait_event
-> [    4.092943] iwlwifi 0000:2b:00.0: 0x00000000 | l2p_control
-> [    4.093801] iwlwifi 0000:2b:00.0: 0x00000000 | l2p_duration
-> [    4.094639] iwlwifi 0000:2b:00.0: 0x00000000 | l2p_mhvalid
-> [    4.095525] iwlwifi 0000:2b:00.0: 0x00000000 | l2p_addr_match
-> [    4.097449] iwlwifi 0000:2b:00.0: 0x00000009 | lmpm_pmg_sel
-> [    4.098323] iwlwifi 0000:2b:00.0: 0x00000000 | timestamp
-> [    4.099165] iwlwifi 0000:2b:00.0: 0x00000024 | flow_handler
-> [    4.100024] iwlwifi 0000:2b:00.0: Start IWL Error Log Dump:
-> [    4.100832] iwlwifi 0000:2b:00.0: Transport status: 0x0000004A, valid: 7
-> [    4.101641] iwlwifi 0000:2b:00.0: 0x20000066 | NMI_INTERRUPT_HOST
-> [    4.102522] iwlwifi 0000:2b:00.0: 0x00000000 | umac branchlink1
-> [    4.103379] iwlwifi 0000:2b:00.0: 0x8046DA88 | umac branchlink2
-> [    4.104210] iwlwifi 0000:2b:00.0: 0x8048DB3A | umac interruptlink1
-> [    4.105014] iwlwifi 0000:2b:00.0: 0x8048DB3A | umac interruptlink2
-> [    4.105790] iwlwifi 0000:2b:00.0: 0x01000000 | umac data1
-> [    4.106544] iwlwifi 0000:2b:00.0: 0x8048DB3A | umac data2
-> [    4.107338] iwlwifi 0000:2b:00.0: 0x00000000 | umac data3
-> [    4.108109] iwlwifi 0000:2b:00.0: 0x00000051 | umac major
-> [    4.108855] iwlwifi 0000:2b:00.0: 0x31FC9AE6 | umac minor
-> [    4.109581] iwlwifi 0000:2b:00.0: 0x0021B66F | frame pointer
-> [    4.110349] iwlwifi 0000:2b:00.0: 0xC0886258 | stack pointer
-> [    4.111099] iwlwifi 0000:2b:00.0: 0x00000203 | last host cmd
-> [    4.111815] iwlwifi 0000:2b:00.0: 0x00000400 | isr status reg
-> [    4.112530] iwlwifi 0000:2b:00.0: IML/ROM dump:
-> [    4.113265] iwlwifi 0000:2b:00.0: 0x00000B03 | IML/ROM error/state
-> [    4.113982] iwlwifi 0000:2b:00.0: 0x000076E7 | IML/ROM data1
-> [    4.114689] iwlwifi 0000:2b:00.0: 0x00000090 | IML/ROM WFPM_AUTH_KEY_0
-> [    4.115447] iwlwifi 0000:2b:00.0: Fseq Registers:
-> [    4.116168] iwlwifi 0000:2b:00.0: 0x60000100 | FSEQ_ERROR_CODE
-> [    4.116867] iwlwifi 0000:2b:00.0: 0x80440007 | FSEQ_TOP_INIT_VERSION
-> [    4.117548] iwlwifi 0000:2b:00.0: 0x00080009 | FSEQ_CNVIO_INIT_VERSION
-> [    4.118265] iwlwifi 0000:2b:00.0: 0x0000A652 | FSEQ_OTP_VERSION
-> [    4.118946] iwlwifi 0000:2b:00.0: 0x00000002 | FSEQ_TOP_CONTENT_VERSION
-> [    4.119624] iwlwifi 0000:2b:00.0: 0x4552414E | FSEQ_ALIVE_TOKEN
-> [    4.121025] iwlwifi 0000:2b:00.0: 0x00400410 | FSEQ_CNVR_ID
-> [    4.121675] iwlwifi 0000:2b:00.0: 0x00400410 | CNVI_AUX_MISC_CHIP
-> [    4.122377] iwlwifi 0000:2b:00.0: 0x00400410 | CNVR_AUX_MISC_CHIP
-> [    4.123048] iwlwifi 0000:2b:00.0: 0x00009061 | CNVR_SCU_SD_REGS_SD_REG_DIG_DCDC_VTRIM
-> [    4.123693] iwlwifi 0000:2b:00.0: 0x00000061 | CNVR_SCU_SD_REGS_SD_REG_ACTIVE_VDIG_MIRROR
-> [    4.124383] iwlwifi 0000:2b:00.0: 0x00080009 | FSEQ_PREV_CNVIO_INIT_VERSION
-> [    4.125055] iwlwifi 0000:2b:00.0: 0x00440005 | FSEQ_WIFI_FSEQ_VERSION
-> [    4.125703] iwlwifi 0000:2b:00.0: 0x00440005 | FSEQ_BT_FSEQ_VERSION
-> [    4.126407] iwlwifi 0000:2b:00.0: 0x000000D2 | FSEQ_CLASS_TP_VERSION
-> [    4.127103] iwlwifi 0000:2b:00.0: UMAC CURRENT PC: 0x8048d640
-> [    4.127769] iwlwifi 0000:2b:00.0: LMAC1 CURRENT PC: 0xd0
-> [    4.128437] iwlwifi 0000:2b:00.0: Failed to run complete NVM access: -110
-> [    4.129134] iwlwifi 0000:2b:00.0: WRT: Collecting data: ini trigger 13 fired (delay=0ms).
-> 
-> And (part of) the stack trace:
-> 
-> [    5.071954]  iommu_dma_free+0x17/0x30
-> [    5.073232]  iwl_txq_gen2_free_memory+0x39/0x90 [iwlwifi]
-> [    5.074572]  iwl_txq_gen2_free+0x53/0xe0 [iwlwifi]
-> [    5.075954]  iwl_txq_gen2_tx_free+0x34/0x50 [iwlwifi]
-> [    5.077244]  _iwl_trans_pcie_gen2_stop_device+0x2f6/0x470 [iwlwifi]
-> [    5.078589]  iwl_trans_pcie_gen2_stop_device+0x50/0x70 [iwlwifi]
-> [    5.079993]  iwl_mvm_stop_device+0x35/0x50 [iwlmvm]
-> [    5.081307]  iwl_mvm_start_get_nvm+0x151/0x1d0 [iwlmvm]
-> [    5.082664]  iwl_op_mode_mvm_start+0x7b8/0x970 [iwlmvm]
-> [    5.084066]  _iwl_op_mode_start.isra.0+0x58/0x70 [iwlwifi]
-> [    5.085387]  iwl_opmode_register+0x68/0xd0 [iwlwifi]
-> [    5.086746]  ? 0xffffffffc0cf3000
-> [    5.088013]  iwl_mvm_init+0x21/0x1000 [iwlmvm]
-> 
-> I compared the iwlax210_2ax_cfg_ty_gf_a0 struct in the preprocessed
-> source before and after 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 change.
-> The only suspicious change is the removal of ".trans.use_tfh = true,",
-> but adding this line into iwlax210_2ax_cfg_ty_gf_a0 does not fix the
-> issue.
-> 
-> 
+Fix this by adding a timeout to the wait. Set the timeout to 120 seconds,
+which is a somewhat arbitrary value that is more than long enough for
+functional hardware to complete any sends.
+
+Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+---
+V3 -> V4:
+* Fixed the commit message to describe the context.
+* Removed the vf_unload_timeout, as it is not required.
+---
+ drivers/net/ethernet/microsoft/mana/mana_en.c | 26 ++++++++++++++++---
+ 1 file changed, 23 insertions(+), 3 deletions(-)
+
+diff --git a/drivers/net/ethernet/microsoft/mana/mana_en.c b/drivers/net/ethernet/microsoft/mana/mana_en.c
+index a499e460594b..d26f1da70411 100644
+--- a/drivers/net/ethernet/microsoft/mana/mana_en.c
++++ b/drivers/net/ethernet/microsoft/mana/mana_en.c
+@@ -2346,7 +2346,10 @@ static int mana_dealloc_queues(struct net_device *ndev)
+ {
+ 	struct mana_port_context *apc = netdev_priv(ndev);
+ 	struct gdma_dev *gd = apc->ac->gdma_dev;
++	unsigned long timeout;
+ 	struct mana_txq *txq;
++	struct sk_buff *skb;
++	struct mana_cq *cq;
+ 	int i, err;
+ 
+ 	if (apc->port_is_up)
+@@ -2363,15 +2366,32 @@ static int mana_dealloc_queues(struct net_device *ndev)
+ 	 * to false, but it doesn't matter since mana_start_xmit() drops any
+ 	 * new packets due to apc->port_is_up being false.
+ 	 *
+-	 * Drain all the in-flight TX packets
++	 * Drain all the in-flight TX packets.
++	 * A timeout of 120 seconds for all the queues is used.
++	 * This will break the while loop when h/w is not responding.
++	 * This value of 120 has been decided here considering max
++	 * number of queues.
+ 	 */
++
++	timeout = jiffies + 120 * HZ;
+ 	for (i = 0; i < apc->num_queues; i++) {
+ 		txq = &apc->tx_qp[i].txq;
+-
+-		while (atomic_read(&txq->pending_sends) > 0)
++		while (atomic_read(&txq->pending_sends) > 0 &&
++		       time_before(jiffies, timeout)) {
+ 			usleep_range(1000, 2000);
++		}
+ 	}
+ 
++	for (i = 0; i < apc->num_queues; i++) {
++		txq = &apc->tx_qp[i].txq;
++		cq = &apc->tx_qp[i].tx_cq;
++		while (atomic_read(&txq->pending_sends)) {
++			skb = skb_dequeue(&txq->pending_skbs);
++			mana_unmap_skb(skb, apc);
++			napi_consume_skb(skb, cq->budget);
++			atomic_sub(1, &txq->pending_sends);
++		}
++	}
+ 	/* We're 100% sure the queues can no longer be woken up, because
+ 	 * we're sure now mana_poll_tx_cq() can't be running.
+ 	 */
+-- 
+2.34.1
+
 
