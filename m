@@ -1,87 +1,215 @@
-Return-Path: <netdev+bounces-15113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AB143745BB6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 13:55:38 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5EF2F745B89
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 13:49:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C523280D6B
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 11:55:37 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E381D280D7F
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 11:49:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 55D5EDF56;
-	Mon,  3 Jul 2023 11:55:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DEBB5DF4E;
+	Mon,  3 Jul 2023 11:49:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 48BA7DDA5
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 11:55:35 +0000 (UTC)
-X-Greylist: delayed 377 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Mon, 03 Jul 2023 04:55:29 PDT
-Received: from mail.monkeyblade.net (shards.monkeyblade.net [IPv6:2620:137:e000::1:9])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3348810E
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 04:55:29 -0700 (PDT)
-Received: from localhost (cpc147930-brnt3-2-0-cust60.4-2.cable.virginm.net [86.15.196.61])
-	by mail.monkeyblade.net (Postfix) with ESMTPSA id 2589983844AA;
-	Mon,  3 Jul 2023 04:49:07 -0700 (PDT)
-Date: Mon, 03 Jul 2023 12:48:57 +0100 (BST)
-Message-Id: <20230703.124857.1785883665481694727.davem@davemloft.net>
-To: matt@codeconstruct.com.au
-Cc: linux-i3c@lists.infradead.org, netdev@vger.kernel.org,
- devicetree@vger.kernel.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, jk@codeconstruct.com.au, alexandre.belloni@bootlin.com,
- robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org
-Subject: Re: [PATCH 3/3] mctp i3c: MCTP I3C driver
-From: David Miller <davem@davemloft.net>
-In-Reply-To: <20230703053048.275709-4-matt@codeconstruct.com.au>
-References: <20230703053048.275709-1-matt@codeconstruct.com.au>
-	<20230703053048.275709-4-matt@codeconstruct.com.au>
-X-Mailer: Mew version 6.9 on Emacs 28.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C5461DDDB
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 11:49:23 +0000 (UTC)
+Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 47882194
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 04:49:18 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688384958; x=1719920958;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=ZnUiO8CD/WnZwe6qaGAManrsteXNhJ/DPNbm8zbXIm0=;
+  b=WbTcbDeB9W/tgZiPI/NHlm4uF5E4gkXhB7HDIODIgT2uRpYtDBuypCoi
+   43DamccvBMQozr7KeS60Do6FAgs9B2CUmH8NyLzUzG0BMGH2N84q+Ik9D
+   8qft0ZvUjT5vlraQAFxl5L33cGToko+p3iY8Fg3L+dlspvdnm24IaydjY
+   SMFXmFOLpsFEprhV57bUCaWjqo1pXY/4YM2PEVarkFh2QpMwldANKUbPG
+   6wH+uG0Euq969vrUoEKB8V1v21dinbnfRcj65EGmE8s+4Y9QQDfO7QeXz
+   s8u33iFOXZqM3OBSe4EmVuYdw+q6SYLgmmanXOUyl2ka0beW3umr8Da7Q
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="362899324"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="362899324"
+Received: from orsmga003.jf.intel.com ([10.7.209.27])
+  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 04:49:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10759"; a="668733242"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="668733242"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga003.jf.intel.com with ESMTP; 03 Jul 2023 04:49:16 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 3 Jul 2023 04:49:16 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Mon, 3 Jul 2023 04:49:15 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Mon, 3 Jul 2023 04:49:15 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.169)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Mon, 3 Jul 2023 04:49:15 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=AOOKsN8gdnl5k2Rv2gXEnsp7ixBseiDXjUrJiDm2oLiJBjn+BmeI9T7Ki0KYVkvcb2EobaAGsevGRjzKOVtdyocom9MWeGxKuZmMT0nZ8mv80Tk2YUBdjDRxcTtBvJ523d7wZIYgYzBf6Ezc1oeJt5CtjqEE4umG1p+i+9VLea/PxukarzgXcolZ1RazFNy30JKxdCcW+9AUyBJcEVNIKb1QkFq9PlWpxGBg/a0Mc+58D7qf0gHrTWnSc0exUWwb6G5jeCrbsYhAN4i4W5cuoTiTEC2SrrfwQOqkuWw3kh3HVVys4QR7ptlyTcDmqgURKurnz5fY6ehacnfen0ihuQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=uTG6XBgR0TRn+3ZYO5YMXgr9326RbltGKLstk3qit78=;
+ b=c2+gcuPZTc6QpsIgCGkGNjc7ut2/BvpPEFUvSSYV2eyTroq/D3KpuFHxe+msrFRsq5tlOSHg+tD4DMLg8uAUhIvzQv1ryinL2hBu/D7+JpebR4j9IHYYupqDwp71497CqeIPio0j4m5VQ0sMjWnMICn0+RxIqfS2HF+GPMFMGrO83DtGt1s5jC6PnrVejPfTeWF7GPmaWhbwQK9/s9PHAJyZ1UCldBPfIlfrFySaOY+ViZ0Yn0F9zY76PryQWcTfKAG0+1qvwwkxae5SVA6PSqiNmAUtVepMbNcNdOaC/nAC6CmJq64bkpBff5g1vPfqC2Zz1jZfT2iA0z8MNME2Dw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com (2603:10b6:510:30::21)
+ by DM4PR11MB7205.namprd11.prod.outlook.com (2603:10b6:8:113::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Mon, 3 Jul
+ 2023 11:49:12 +0000
+Received: from PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::fcef:c262:ba36:c42f]) by PH0PR11MB5013.namprd11.prod.outlook.com
+ ([fe80::fcef:c262:ba36:c42f%4]) with mapi id 15.20.6544.024; Mon, 3 Jul 2023
+ 11:49:12 +0000
+From: "Buvaneswaran, Sujai" <sujai.buvaneswaran@intel.com>
+To: Marcin Szycik <marcin.szycik@linux.intel.com>,
+	"intel-wired-lan@lists.osuosl.org" <intel-wired-lan@lists.osuosl.org>
+CC: "jiri@resnulli.us" <jiri@resnulli.us>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "idosch@nvidia.com" <idosch@nvidia.com>,
+	"Brandeburg, Jesse" <jesse.brandeburg@intel.com>, "simon.horman@corigine.com"
+	<simon.horman@corigine.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "davem@davemloft.net"
+	<davem@davemloft.net>
+Subject: RE: [Intel-wired-lan] [PATCH iwl-next v2 6/6] ice: Add support for
+ PFCP hardware offload in switchdev
+Thread-Topic: [Intel-wired-lan] [PATCH iwl-next v2 6/6] ice: Add support for
+ PFCP hardware offload in switchdev
+Thread-Index: AQHZmTTa8szbVpeFMUiOLLEk5dzVGq+oFiTw
+Date: Mon, 3 Jul 2023 11:49:12 +0000
+Message-ID: <PH0PR11MB5013A54736DCFB50D37036F29629A@PH0PR11MB5013.namprd11.prod.outlook.com>
+References: <20230607112606.15899-1-marcin.szycik@linux.intel.com>
+ <20230607112606.15899-7-marcin.szycik@linux.intel.com>
+In-Reply-To: <20230607112606.15899-7-marcin.szycik@linux.intel.com>
+Accept-Language: en-IN, en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PH0PR11MB5013:EE_|DM4PR11MB7205:EE_
+x-ms-office365-filtering-correlation-id: c1d5b272-ce1c-428a-66f1-08db7bbb8504
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 0GiXSgvPqvyAaw4+C6KUEa80C3+3S9L+m+nR6p1saQY2tOue65VwvC8bLUxt/BYT/eU/1uMYV9J0THuJYX/h6URHLS2VT5GswclH03TqBflVOJa8jKKF70vMVhOHzLiaXf8xWWmDwnY9R3GgbrwTAJSvEveECzKCVZFq9Z05sENqyj8ICtbVXdY4R0Ja6BxDBRVhaAEESJ3dC2Sqy6Drilke8FFQXZfGzDp8Q3l0a2E5oFBy7Z25BB5xVOdDy5Tj7nCYYunTjsc5rLbJK3KxFBgfnuBq7po5MPPwk3O8bv29SrmwhEYodxfNuRFT0IFXxBx/lmZWX2lobYEjXUbiyoPZNObeBOqcEhpsAIz+d71JokguMkSEwz0e0aN+ptR6/N6Bglepd4bJrqiXJ+6PTPNMhAz/W9Fl8d77HR+afrJ6W0nFHw3MSnm9Z/ezHbH1lPUwkOOk1HpF9AL+w/tKV8etthzGFxX3fA++Q/q2oVFTIuRzLxSpdH2g96F5QfNZXDjl61hOjE70L0YlGACNuQw0FVEDAGhwWniHfgRwGI3it0cTEHw9Atp3U1yhW97K//UQ5R4oj0nuNzZ0+jn+ZyZc4Mkp5EtjK8DYBOoAFBIjl5DQm8qRt4+C5dEUaIjy
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR11MB5013.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(346002)(396003)(376002)(136003)(366004)(451199021)(26005)(82960400001)(478600001)(9686003)(71200400001)(6506007)(86362001)(186003)(38100700002)(54906003)(64756008)(4326008)(66556008)(66946007)(66446008)(66476007)(83380400001)(110136005)(7696005)(53546011)(76116006)(316002)(122000001)(5660300002)(8676002)(8936002)(52536014)(38070700005)(41300700001)(2906002)(55016003)(33656002);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?us-ascii?Q?7FPzstdCPzq7Enid0qFdmT3uqvWLQq3Vx+TfYyS3cwBXe8xgIkxWW2EIcr4N?=
+ =?us-ascii?Q?wvY2xGwwdePuapvsqFpNKRAMez50OooFM4fZ+JwyM/jAaEHxE49gxFT7bsHH?=
+ =?us-ascii?Q?dD+uPIMWCZgtd4M64gdpOOBO/cbSntcgoeoL4xm7M6wCG3NZlxVIusURtqFR?=
+ =?us-ascii?Q?kGAHfWs/2awGaQfwxxJ3GTPEjMBzNoIlUlScnXjVF1ePIHKgHOqcwiP6b+lE?=
+ =?us-ascii?Q?Rb5yn1s55Cjb2Wox9V6gvT+URMMtiiZXo+DjUDbEP/rVrzAqTg+aXlDTJQZW?=
+ =?us-ascii?Q?N0Fqo+KbEogOyLz6Pkvf0i8DCd83AHTBKbW4VCdmfYRfHOP3f1gvRnYyQYk5?=
+ =?us-ascii?Q?6LSMe5AASw5Vu5xjUEvHQCIIumtb/7q45GTF6SThS6oRi/nMf77jVdGg4iar?=
+ =?us-ascii?Q?4d8c5wtQOVSEdkIN1BR/+6N20hE7Ro4M/lMPLW7wALMHZyJAqC7QZnHOiFTK?=
+ =?us-ascii?Q?dAs1jWPP4vMxYEvI6AgaLWEw+PSilhMFanWyZHPwjG6E7jSH4wjcNNCCPteN?=
+ =?us-ascii?Q?3CEiBGW6G28y7Z93a0z1eqz6bxEtRx8E9zIG05NMY9If5QEcppfBpwR20/qT?=
+ =?us-ascii?Q?9sKD/ELL9qzoXNKdIGTl6Tlh0/QSE1z6oHRJIRMx+fjw3j095aw1c6rZdAf+?=
+ =?us-ascii?Q?QcjoDMcOysOA/978Q7QNJ8Ksnx3zlvstSMuSFIGeK00gi8PSpeyzb/bvHW5M?=
+ =?us-ascii?Q?31C/u7msNWEH0lVw+WTMpyq3WBjbfUWPzD82jQx/X7K57/B40KTQiGv6NHqm?=
+ =?us-ascii?Q?qsFFa1a3F6HjyB3lSmh6gBFIQmv7p2JQajOvfLizH3KZcI0l72OvQW7amcwj?=
+ =?us-ascii?Q?OY7hv7r7Q5KNgS2Zs9rLNDFob9LBsKJpUOiIZaqdtm5AJKrKJVpAI4Rch62F?=
+ =?us-ascii?Q?ntgYyGMcrhnkkVRw//LrsqtdGrMn3QswFYoR+724Cgum/MGtFr7UE5VkOpbI?=
+ =?us-ascii?Q?0yo+nTS3m1Oad4hB5PPj40KG0oQww2yvJVtMpD1za+FVYv5bpg2nFIMi76Ec?=
+ =?us-ascii?Q?ad/ltuyTO+M7mwP8W1V4v2BiJKKkJnQMCEcK6GzpxxWUg7xd033SWCWGzh2h?=
+ =?us-ascii?Q?2xcpPdciRZ2fgMQeKoI7vOUlSMr++kcpz6GEG2ELRhgfaaWJPhFzzj8brySU?=
+ =?us-ascii?Q?rwDpC3k5JtjbYLf+jyn/L3n8BG2GLnQ51drJxWZo3NrRIKbqFARkzi54qnur?=
+ =?us-ascii?Q?eZIKNSeEViypcf3ZgWcn6QksCpBmV9SBlaqRWpq6IIW0peQEVkBV/IeC+8SF?=
+ =?us-ascii?Q?bYFPatM5Fz9KB7DSiBy+ySIsqAAxWj6ksOPeY/XyPJjI81A585SG5mblsdVH?=
+ =?us-ascii?Q?0zJMKNXzJu2Q7PSMarTRAUhBmBOQs9khlpcg56sLpudF6VEh0qj+mXB7WfUj?=
+ =?us-ascii?Q?BHw3b286plQQMxB5NLnWgLFeLDpMVF/eNO/GDuFGFUFtzFl7tNZDnS8NvHnq?=
+ =?us-ascii?Q?Z6JNAOTxX5B6nG9IIDSd9v6k83sJxFdIMda2p2W271hN15t8O17uDeQLNiLi?=
+ =?us-ascii?Q?AUFb1FZxuIK9PeShIlNZ6GA6BX9w3T7TFuexlFhXqqVfthGIt8vh7Ggvsu23?=
+ =?us-ascii?Q?UBDtVB+nzCE9fNEJG2g9JSHIs4Uvox+TmdYuS/Ny/1Gh6dGZVo+OeBzJ+0+F?=
+ =?us-ascii?Q?6Q=3D=3D?=
+Content-Type: text/plain; charset="us-ascii"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: Text/Plain; charset=us-ascii
-Content-Transfer-Encoding: 7bit
-X-Greylist: Sender succeeded SMTP AUTH, not delayed by milter-greylist-4.6.2 (mail.monkeyblade.net [0.0.0.0]); Mon, 03 Jul 2023 04:49:11 -0700 (PDT)
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,KHOP_HELO_FCRDNS,
+MIME-Version: 1.0
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR11MB5013.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: c1d5b272-ce1c-428a-66f1-08db7bbb8504
+X-MS-Exchange-CrossTenant-originalarrivaltime: 03 Jul 2023 11:49:12.3248
+ (UTC)
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LSLRf61DSMZ2LTUTmLJcJB6pWPAI4130/JBS/BL52XehzI4CtD6NOzw/qnUbOr+vkof7+K/dg/K/AnUr0dfXmI9DCaFrH7XADLgxdL0C/mY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM4PR11MB7205
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
 	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Matt Johnston <matt@codeconstruct.com.au>
-Date: Mon,  3 Jul 2023 13:30:48 +0800
-
-> +static void mctp_i3c_xmit(struct mctp_i3c_bus *mbus, struct sk_buff *skb)
-> +{
-> +	struct net_device_stats *stats = &mbus->ndev->stats;
-> +	struct i3c_priv_xfer xfer = { .rnw = false };
-> +	struct mctp_i3c_internal_hdr *ihdr = NULL;
-> +	struct mctp_i3c_device *mi = NULL;
-> +	u8 *data = NULL;
-> +	unsigned int data_len;
-> +	u8 addr, pec;
-> +	int rc = 0;
-> +	u64 pid;
- ...
-> +/* Returns an ERR_PTR on failure */
-> +static struct mctp_i3c_bus *mctp_i3c_bus_add(struct i3c_bus *bus)
-> +__must_hold(&busdevs_lock)
-> +{
-> +	struct mctp_i3c_bus *mbus = NULL;
-> +	struct net_device *ndev = NULL;
-> +	u8 addr[PID_SIZE];
-> +	char namebuf[IFNAMSIZ];
-> +	int rc;
-
-
-Please order local variables from longest to shortest line.
-
-Please do this for your entire submission.
-
-Thank you.
+> -----Original Message-----
+> From: Intel-wired-lan <intel-wired-lan-bounces@osuosl.org> On Behalf Of
+> Marcin Szycik
+> Sent: Wednesday, June 7, 2023 4:56 PM
+> To: intel-wired-lan@lists.osuosl.org
+> Cc: jiri@resnulli.us; netdev@vger.kernel.org; idosch@nvidia.com;
+> Brandeburg, Jesse <jesse.brandeburg@intel.com>;
+> simon.horman@corigine.com; kuba@kernel.org; pabeni@redhat.com;
+> davem@davemloft.net
+> Subject: [Intel-wired-lan] [PATCH iwl-next v2 6/6] ice: Add support for P=
+FCP
+> hardware offload in switchdev
+>=20
+> Add support for creating PFCP filters in switchdev mode. Add support for
+> parsing PFCP-specific tc options: S flag and SEID.
+>=20
+> To create a PFCP filter, a special netdev must be created and passed to t=
+c
+> command:
+>=20
+> ip link add pfcp0 type pfcp
+> tc filter add dev eth0 ingress prio 1 flower pfcp_opts \
+> 1:123/ff:fffffffffffffff0 skip_hw action mirred egress redirect dev pfcp0
+>=20
+> Changes in iproute2 are required to be able to add the pfcp netdev and us=
+e
+> pfcp_opts in tc.
+>=20
+> ICE COMMS package is required to create a filter as it contains PFCP prof=
+iles.
+>=20
+> Signed-off-by: Marcin Szycik <marcin.szycik@linux.intel.com>
+> Reviewed-by: Simon Horman <simon.horman@corigine.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice_ddp.c      |  9 ++
+>  .../net/ethernet/intel/ice/ice_flex_type.h    |  4 +-
+>  .../ethernet/intel/ice/ice_protocol_type.h    | 12 +++
+>  drivers/net/ethernet/intel/ice/ice_switch.c   | 85 +++++++++++++++++++
+>  drivers/net/ethernet/intel/ice/ice_switch.h   |  2 +
+>  drivers/net/ethernet/intel/ice/ice_tc_lib.c   | 58 +++++++++++--
+>  drivers/net/ethernet/intel/ice/ice_tc_lib.h   |  5 ++
+>  7 files changed, 168 insertions(+), 7 deletions(-)
+>=20
+Tested-by: Sujai Buvaneswaran <sujai.buvaneswaran@intel.com>
 
