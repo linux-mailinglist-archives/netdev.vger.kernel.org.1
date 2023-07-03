@@ -1,189 +1,117 @@
-Return-Path: <netdev+bounces-15188-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15189-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 703D7746139
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:14:58 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 63FC8746143
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 96A851C209C6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:14:57 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EAB7C280E1E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:16:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B77A101D0;
-	Mon,  3 Jul 2023 17:14:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4B619101DD;
+	Mon,  3 Jul 2023 17:16:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8E991101C0
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:14:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C47ECD
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:14:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688404493;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type;
-	bh=x5uYhFfluJ3BcMLS5I6088sXdiD5/LEYRuaBE/DPa58=;
-	b=XjM/+mZDVuqldBQq+d16K9QSGPXz4PcJAO0NH5lWU38m3vFuQBfo702RTFyrIioy2wXWNW
-	/JLUItbCuWJFRXMeG4gS2M4PoR1jM4RlfpaxOjOTJhyj/nikIqrMEvIQvNDWXPshMzvzH5
-	8NbM3EuDpQkQ1l0lDOvnwSuEN6efH3I=
-Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
- [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-330-G1QemwrQOv6igbVY9k0OWg-1; Mon, 03 Jul 2023 13:14:52 -0400
-X-MC-Unique: G1QemwrQOv6igbVY9k0OWg-1
-Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-403429b3331so22966201cf.3
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 10:14:52 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EE59101C0
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:16:07 +0000 (UTC)
+Received: from mail-qt1-x82a.google.com (mail-qt1-x82a.google.com [IPv6:2607:f8b0:4864:20::82a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4F201E59
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:16:01 -0700 (PDT)
+Received: by mail-qt1-x82a.google.com with SMTP id d75a77b69052e-4036bd4fff1so50381cf.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 10:16:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688404560; x=1690996560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=O2iHJSmnnxF29Ro2K2lEBKDHBSEStuWZBVC+tagVTag=;
+        b=47XOYlRJzFahe96ZqkfTmm/uIVH9PurvYcuJt2zic5EN3cnyH18zDOC2xCQbsXHg/L
+         MBr2Jj89/s10fPaBK8ONh/qVH7j/ATWqW393YNi0265BIjkPPQxvp0lulXWG6lYjJqxC
+         pfOCD5aZyBHRVyZZI92JMrnVt0yKXjXbRkEMQhxo2ndkUYajECq2IgK3/Yeev3o88h4B
+         24jQ5T4PDeaC4UtHsgrlhTBPZhU3OyR0pIvCwYtTELkRIwrF6BeyujE8LAs0acdbgI10
+         eF2YyczJpJLr4KQdLu9GkOkIA7zyBQifyhaI4Rcvmthi7Yoz5I+Z6u6bhZvZL5cOaCNq
+         g4jQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688404492; x=1690996492;
-        h=content-disposition:mime-version:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=x5uYhFfluJ3BcMLS5I6088sXdiD5/LEYRuaBE/DPa58=;
-        b=kGX915lNAc6mZm+lAPPkxh22hVaSiZmAr4u5Yz+LiLazNst/VOnACfVb6SngOnVHkI
-         dgyFC1XjTDo1F6+dk65Q16u5qxyOUU61ncm/2mNRwwwW8XMzLqyjlSJdSPqCZ5jcVZH0
-         rz07zfOHOFhwRhc2gd1LQf5j6F8vRYbNJAGfd9MGGbyS07r//UmADj9zWtf0NKApBrNp
-         eoYSZpqWE/1cO/X0eyYIgauXe8gRLLumC2e/eh9xdTwCCmJ8mI+wSQSKohFQcNpeq4/Y
-         ZFNyDpHZoIYWP1BP9st45aGR5up3JwtZnjIF4PV1l5U61eohKIIMbVME0uGv/Bdx0hXU
-         ziug==
-X-Gm-Message-State: AC+VfDwGKDu5ZOgIyqFqfLxjuckuWfVRWOQV1pe2E+NBqERb+XufnB92
-	oWH9CnR3kKLWij6f4S8LE+cFTmsbCIfCqLHB49jPR0aKENY4j5qVuWdHgaJVhhJi6pV2mrcX81y
-	w9EhzLSN3ZTeK6upe
-X-Received: by 2002:a05:622a:1a02:b0:3fd:db88:b0fd with SMTP id f2-20020a05622a1a0200b003fddb88b0fdmr13074024qtb.59.1688404492041;
-        Mon, 03 Jul 2023 10:14:52 -0700 (PDT)
-X-Google-Smtp-Source: ACHHUZ4Tukd1y3zBs3bIOJUSFdI2a+pfyQRxS6mRPn6nqW1g+uc8CJ7hW+IrwoH1OtjQQN/j6xOZTw==
-X-Received: by 2002:a05:622a:1a02:b0:3fd:db88:b0fd with SMTP id f2-20020a05622a1a0200b003fddb88b0fdmr13074010qtb.59.1688404491780;
-        Mon, 03 Jul 2023 10:14:51 -0700 (PDT)
-Received: from debian ([193.212.224.150])
-        by smtp.gmail.com with ESMTPSA id ci7-20020a05622a260700b00401e22b9fcesm9141646qtb.53.2023.07.03.10.14.49
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 10:14:51 -0700 (PDT)
-Date: Mon, 3 Jul 2023 19:14:46 +0200
-From: Guillaume Nault <gnault@redhat.com>
-To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
-Cc: netdev@vger.kernel.org, Dmitry Kozlov <xeb@mail.ru>
-Subject: [PATCH net] pptp: Fix fib lookup calls.
-Message-ID: <5cab1bbf6faba3277dab8fc36adfadc9cbf8722c.1688404432.git.gnault@redhat.com>
+        d=1e100.net; s=20221208; t=1688404560; x=1690996560;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=O2iHJSmnnxF29Ro2K2lEBKDHBSEStuWZBVC+tagVTag=;
+        b=FQqi8uuwyvfbLSYLrwwmy9p3cf7NkbrdunsX0QoCTuWG+sYF/ldSgoM0CUaIQUe6l/
+         Mn9sIglNtImMOBSHZxZzP/sf6lk/fdJeKwdTSOrClo2c1EbxeDv0yU6paUPBsdQduZVs
+         wi5zwjIpsGVacKbJDSgvSPC6BIG0cLhRxJaLm7PEwcS1HENbF9J6fG/0N2CRYSJWz0es
+         9SVWBp/SDEVOK9zIlvFWWUV7SlsEheqmhyF61Rn6EvTGH/e3RXCngZrRpxpcZL7jP9Bz
+         PnqMPLnmJhOgPMZ5MS2EtgeFuHzxUgk0o+OI6FIkqW0yeQdgsMiXnPuw4VZWPunkmtGG
+         +E9A==
+X-Gm-Message-State: ABy/qLbB0Kfp1sRMkmR2DC17Id5AmKlw0V8sH5R/vvKqHqK0YsrRszqn
+	n4DSpo3lqZUQSf2WwLMoqIWZMLFMCAVlGYk3JO/HxA==
+X-Google-Smtp-Source: APBJJlEAkEot4YdZ7WBMguqh2+qizaqMNrvnDRoFX8TWve6Wd/8zmhq/dGKscf1MYzgs71C4RNIb3wdeASZ6Vhyhjvc=
+X-Received: by 2002:a05:622a:1705:b0:3fa:45ab:22a5 with SMTP id
+ h5-20020a05622a170500b003fa45ab22a5mr298105qtk.27.1688404559885; Mon, 03 Jul
+ 2023 10:15:59 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230612130256.4572-1-linyunsheng@huawei.com> <20230612130256.4572-5-linyunsheng@huawei.com>
+ <20230614101954.30112d6e@kernel.org> <8c544cd9-00a3-2f17-bd04-13ca99136750@huawei.com>
+ <20230615095100.35c5eb10@kernel.org> <CAKgT0Uc6Xoyh3Edgt+83b+HTM5j4JDr3fuxcyL9qDk+Wwt9APg@mail.gmail.com>
+ <908b8b17-f942-f909-61e6-276df52a5ad5@huawei.com> <CAKgT0UeZfbxDYaeUntrQpxHmwCh6zy0dEpjxghiCNxPxv=kdoQ@mail.gmail.com>
+ <72ccf224-7b45-76c5-5ca9-83e25112c9c6@redhat.com> <20230616122140.6e889357@kernel.org>
+ <eadebd58-d79a-30b6-87aa-1c77acb2ec17@redhat.com> <20230619110705.106ec599@kernel.org>
+ <CAHS8izOySGEcXmMg3Gbb5DS-D9-B165gNpwf5a+ObJ7WigLmHg@mail.gmail.com>
+ <5e0ac5bb-2cfa-3b58-9503-1e161f3c9bd5@kernel.org> <CAHS8izP2fPS56uXKMCnbKnPNn=xhTd0SZ1NRUgnAvyuSeSSjGA@mail.gmail.com>
+ <47b79e77-461b-8fe9-41fb-b69a6b205ef2@kernel.org>
+In-Reply-To: <47b79e77-461b-8fe9-41fb-b69a6b205ef2@kernel.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Mon, 3 Jul 2023 19:15:48 +0200
+Message-ID: <CANn89iJLAnnvFfkmJbQ=ZFMwaqiYDOTD3-P+NpkEMzP9aKV-ig@mail.gmail.com>
+Subject: Re: Memory providers multiplexing (Was: [PATCH net-next v4 4/5]
+ page_pool: remove PP_FLAG_PAGE_FRAG flag)
+To: David Ahern <dsahern@kernel.org>
+Cc: Mina Almasry <almasrymina@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Jesper Dangaard Brouer <jbrouer@redhat.com>, brouer@redhat.com, 
+	Alexander Duyck <alexander.duyck@gmail.com>, Yunsheng Lin <linyunsheng@huawei.com>, davem@davemloft.net, 
+	pabeni@redhat.com, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Lorenzo Bianconi <lorenzo@kernel.org>, Yisen Zhuang <yisen.zhuang@huawei.com>, 
+	Salil Mehta <salil.mehta@huawei.com>, Sunil Goutham <sgoutham@marvell.com>, 
+	Geetha sowjanya <gakula@marvell.com>, Subbaraya Sundeep <sbhatta@marvell.com>, 
+	hariprasad <hkelam@marvell.com>, Saeed Mahameed <saeedm@nvidia.com>, 
+	Leon Romanovsky <leon@kernel.org>, Felix Fietkau <nbd@nbd.name>, Ryder Lee <ryder.lee@mediatek.com>, 
+	Shayne Chen <shayne.chen@mediatek.com>, Sean Wang <sean.wang@mediatek.com>, 
+	Kalle Valo <kvalo@kernel.org>, Matthias Brugger <matthias.bgg@gmail.com>, 
+	AngeloGioacchino Del Regno <angelogioacchino.delregno@collabora.com>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	linux-rdma@vger.kernel.org, linux-wireless@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, linux-mediatek@lists.infradead.org, 
+	Jonathan Lemon <jonathan.lemon@gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PPTP uses pppox sockets (struct pppox_sock). These sockets don't embed
-an inet_sock structure, so it's invalid to call inet_sk() on them.
+On Mon, Jul 3, 2023 at 4:45=E2=80=AFPM David Ahern <dsahern@kernel.org> wro=
+te:
 
-Therefore, the ip_route_output_ports() call in pptp_connect() has two
-problems:
+> That is my expectation. The tcpdump is just an easy example of accessing
+> the skb page frags. skb_copy_and_csum_bits used by icmp is another
+> example that can walk frags wanting access to device memory. You did not
+> cause a panic or trip a WARN_ON for example with the tcpdump?
+>
 
-  * The tos variable is set with RT_CONN_FLAGS(sk), which calls
-    inet_sk() on the pppox socket.
+ICMP packets do not land on the queues having devmem buffers, for
+obvious reasons.
 
-  * ip_route_output_ports() tries to retrieve routing flags using
-    inet_sk_flowi_flags(), which is also going to call inet_sk() on the
-    pppox socket.
-
-While PPTP doesn't use inet sockets, it's actually really layered on
-top of IP and therefore needs a proper way to do fib lookups. So let's
-define pptp_route_output() to get a struct rtable from a pptp socket.
-Let's also replace the ip_route_output_ports() call of pptp_xmit() for
-consistency.
-
-In practice, this means that:
-
-  * pptp_connect() sets ->flowi4_tos and ->flowi4_flags to zero instead
-    of using bits of unrelated struct pppox_sock fields.
-
-  * pptp_xmit() now respects ->sk_mark and ->sk_uid.
-
-  * pptp_xmit() now calls the security_sk_classify_flow() security
-    hook, thus allowing to set ->flowic_secid.
-
-  * pptp_xmit() now passes the pppox socket to xfrm_lookup_route().
-
-Found by code inspection.
-
-Fixes: 00959ade36ac ("PPTP: PPP over IPv4 (Point-to-Point Tunneling Protocol)")
-Signed-off-by: Guillaume Nault <gnault@redhat.com>
----
- drivers/net/ppp/pptp.c | 31 ++++++++++++++++++++-----------
- 1 file changed, 20 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ppp/pptp.c b/drivers/net/ppp/pptp.c
-index 0fe78826c8fa..32183f24e63f 100644
---- a/drivers/net/ppp/pptp.c
-+++ b/drivers/net/ppp/pptp.c
-@@ -24,6 +24,7 @@
- #include <linux/in.h>
- #include <linux/ip.h>
- #include <linux/rcupdate.h>
-+#include <linux/security.h>
- #include <linux/spinlock.h>
- 
- #include <net/sock.h>
-@@ -128,6 +129,23 @@ static void del_chan(struct pppox_sock *sock)
- 	spin_unlock(&chan_lock);
- }
- 
-+static struct rtable *pptp_route_output(struct pppox_sock *po,
-+					struct flowi4 *fl4)
-+{
-+	struct sock *sk = &po->sk;
-+	struct net *net;
-+
-+	net = sock_net(sk);
-+	flowi4_init_output(fl4, sk->sk_bound_dev_if, sk->sk_mark, 0,
-+			   RT_SCOPE_UNIVERSE, IPPROTO_GRE, 0,
-+			   po->proto.pptp.dst_addr.sin_addr.s_addr,
-+			   po->proto.pptp.src_addr.sin_addr.s_addr,
-+			   0, 0, sock_net_uid(net, sk));
-+	security_sk_classify_flow(sk, flowi4_to_flowi_common(fl4));
-+
-+	return ip_route_output_flow(net, fl4, sk);
-+}
-+
- static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
- {
- 	struct sock *sk = (struct sock *) chan->private;
-@@ -151,11 +169,7 @@ static int pptp_xmit(struct ppp_channel *chan, struct sk_buff *skb)
- 	if (sk_pppox(po)->sk_state & PPPOX_DEAD)
- 		goto tx_error;
- 
--	rt = ip_route_output_ports(net, &fl4, NULL,
--				   opt->dst_addr.sin_addr.s_addr,
--				   opt->src_addr.sin_addr.s_addr,
--				   0, 0, IPPROTO_GRE,
--				   RT_TOS(0), sk->sk_bound_dev_if);
-+	rt = pptp_route_output(po, &fl4);
- 	if (IS_ERR(rt))
- 		goto tx_error;
- 
-@@ -438,12 +452,7 @@ static int pptp_connect(struct socket *sock, struct sockaddr *uservaddr,
- 	po->chan.private = sk;
- 	po->chan.ops = &pptp_chan_ops;
- 
--	rt = ip_route_output_ports(sock_net(sk), &fl4, sk,
--				   opt->dst_addr.sin_addr.s_addr,
--				   opt->src_addr.sin_addr.s_addr,
--				   0, 0,
--				   IPPROTO_GRE, RT_CONN_FLAGS(sk),
--				   sk->sk_bound_dev_if);
-+	rt = pptp_route_output(po, &fl4);
- 	if (IS_ERR(rt)) {
- 		error = -EHOSTUNREACH;
- 		goto end;
--- 
-2.39.2
-
+Only chosen TCP flows are steered to these queues.
 
