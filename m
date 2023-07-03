@@ -1,45 +1,51 @@
-Return-Path: <netdev+bounces-15088-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15089-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 59710745997
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:05:31 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4E6BA7459A7
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:07:11 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 835981C208E1
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:05:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F386A280C96
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:07:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 407D8441E;
-	Mon,  3 Jul 2023 10:05:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376C2441F;
+	Mon,  3 Jul 2023 10:07:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 243221FDA;
-	Mon,  3 Jul 2023 10:05:24 +0000 (UTC)
-Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [217.70.183.194])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C77491B4;
-	Mon,  3 Jul 2023 03:05:21 -0700 (PDT)
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-X-GND-Sasl: i.maximets@ovn.org
-Received: by mail.gandi.net (Postfix) with ESMTPSA id B419D4000A;
-	Mon,  3 Jul 2023 10:05:16 +0000 (UTC)
-Message-ID: <04ed302e-067e-d372-370b-3fef1cf8c7f2@ovn.org>
-Date: Mon, 3 Jul 2023 12:06:05 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6804419
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:07:08 +0000 (UTC)
+Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7279E73
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 03:07:02 -0700 (PDT)
+Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fbb634882dso11011045e9.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 03:07:02 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688378821; x=1690970821;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=DhORNoU3ciKX2xP8peaOJGSJDkiRCI9EgxfOrsQf3GA=;
+        b=C/HCTFwDlnNM2h9AzZQbUWaPTnY0M3YCOXaz3zmX7cCmSuNU4cjPCnt7zuOx9xmggo
+         PQ6Yo9H+0h55tdmhWzvMcxFi/ghPikDzU994bDVyHjx02BryP6ijkK7q7QJRxvNCoslC
+         8uwA4i1y+RnViiiXCrfZOzn9b6CGlEDRQTePPWjZ4yXrc/9ZZCTwz/rzmPux58hDqiKN
+         pyEKtI+mJ1V1PPK3Cj/IwCmoeIp+a1EQHw+OdZoRfFzn3VrBtM5h5qcT2F5AR+8BKGTe
+         WZ17GFOg0VL+TJTb+w7LEyxZI/ezj3SID4BsQpotm0R/+8r5SE76JNJT7zceo70yGiJV
+         G3kA==
+X-Gm-Message-State: ABy/qLb5lsbfch1tjiyXwVlCb+mz8uVh+bt+YaS2YSJ4JIuGu+q/Yddq
+	5GBtVCSjBytXrlbygNmJWl0=
+X-Google-Smtp-Source: APBJJlHZsBsOfb54U+00VvImXcEPKqtex2r/HSSKxS0kYmdww2Zo1jSovvBgwP2qMZFtPyfWBNq4TQ==
+X-Received: by 2002:adf:eece:0:b0:313:edb0:e8a8 with SMTP id a14-20020adfeece000000b00313edb0e8a8mr8349414wrp.2.1688378820796;
+        Mon, 03 Jul 2023 03:07:00 -0700 (PDT)
+Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
+        by smtp.gmail.com with ESMTPSA id w11-20020adfec4b000000b0031437ec7ec1sm1914654wrn.2.2023.07.03.03.06.59
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Mon, 03 Jul 2023 03:07:00 -0700 (PDT)
+Message-ID: <1ebc60c1-c094-98a0-5735-635a8af5bf63@grimberg.me>
+Date: Mon, 3 Jul 2023 13:06:58 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -47,138 +53,55 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: i.maximets@ovn.org, netdev@vger.kernel.org, bpf@vger.kernel.org,
- =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Magnus Karlsson <magnus.karlsson@intel.com>,
- Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- linux-doc@vger.kernel.org, linux-kernel@vger.kernel.org,
- Jason Wang <jasowang@redhat.com>, Stefan Hajnoczi <stefanha@redhat.com>
+ Thunderbird/102.12.0
+Subject: Re: [PATCH 4/5] net/tls: split tls_rx_reader_lock
 Content-Language: en-US
-To: Magnus Karlsson <magnus.karlsson@gmail.com>
-References: <20230630145831.2988845-1-i.maximets@ovn.org>
- <CAJ8uoz1TGjWuJKkZ8C9ZrQB0CDasik3A=qJs=xwdQP8cbn97VQ@mail.gmail.com>
-From: Ilya Maximets <i.maximets@ovn.org>
-Subject: Re: [RFC bpf-next] xsk: honor SO_BINDTODEVICE on bind
-In-Reply-To: <CAJ8uoz1TGjWuJKkZ8C9ZrQB0CDasik3A=qJs=xwdQP8cbn97VQ@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+To: Hannes Reinecke <hare@suse.de>
+Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
+ linux-nvme@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>,
+ Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+ netdev@vger.kernel.org
+References: <20230703090444.38734-1-hare@suse.de>
+ <20230703090444.38734-5-hare@suse.de>
+From: Sagi Grimberg <sagi@grimberg.me>
+In-Reply-To: <20230703090444.38734-5-hare@suse.de>
+Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
+	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/3/23 11:48, Magnus Karlsson wrote:
-> On Fri, 30 Jun 2023 at 16:58, Ilya Maximets <i.maximets@ovn.org> wrote:
->>
->> Initial creation of an AF_XDP socket requires CAP_NET_RAW capability.
->> A privileged process might create the socket and pass it to a
->> non-privileged process for later use.  However, that process will be
->> able to bind the socket to any network interface.  Even though it will
->> not be able to receive any traffic without modification of the BPF map,
->> the situation is not ideal.
->>
->> Sockets already have a mechanism that can be used to restrict what
->> interface they can be attached to.  That is SO_BINDTODEVICE.
->>
->> To change the binding the process will need CAP_NET_RAW.
->>
->> Make xsk_bind() honor the SO_BINDTODEVICE in order to allow safer
->> workflow when non-privileged process is using AF_XDP.
+
+
+On 7/3/23 12:04, Hannes Reinecke wrote:
+> Split tls_rx_reader_{lock,unlock} into an 'acquire/release' and
+> the actual locking part.
+> With that we can use the tls_rx_reader_lock in situations where
+> the socket is already locked.
 > 
-> Rebinding an AF_XDP socket is not allowed today. Any such attempt will
-> return an error from bind. So if I understand the purpose of
-> SO_BINDTODEVICE correctly, you could say that this option is always
-> set for an AF_XDP socket and it is not possible to toggle it. The only
-> way to "rebind" an AF_XDP socket is to close it and open a new one.
-> This was a conscious design decision from day one as it would be very
-> hard to support this, especially in zero-copy mode.
-
-Hi, Magnus.
-
-The purpose of this patch is not to allow re-binding.  The use case is
-following:
-
-1. First process creates a bare socket with socket(AF_XDP, ...).
-2. First process loads the XSK program to the interface.
-3. First process adds the socket fd to a BPF map.
-4. First process sends socket fd to a second process.
-5. Second process allocates UMEM.
-6. Second process binds socket to the interface.
-
-The idea is that the first process will call SO_BINDTODEVICE before
-sending socket fd to a second process, so the second process is limited
-in to which interface it can bind the socket.
-
-Does that make sense?
-
-This workflow allows the second process to have no capabilities
-as long as it has sufficient RLIMIT_MEMLOCK.
-
-Best regards, Ilya Maximets.
-
+> Suggested-by: Sagi Grimberg <sagi@grimberg.me>
+> Signed-off-by: Hannes Reinecke <hare@suse.de>
+> ---
+>   net/tls/tls_sw.c | 38 ++++++++++++++++++++++----------------
+>   1 file changed, 22 insertions(+), 16 deletions(-)
 > 
->> Signed-off-by: Ilya Maximets <i.maximets@ovn.org>
->> ---
->>
->> Posting as an RFC for now to probably get some feedback.
->> Will re-post once the tree is open.
->>
->>  Documentation/networking/af_xdp.rst | 9 +++++++++
->>  net/xdp/xsk.c                       | 6 ++++++
->>  2 files changed, 15 insertions(+)
->>
->> diff --git a/Documentation/networking/af_xdp.rst b/Documentation/networking/af_xdp.rst
->> index 247c6c4127e9..1cc35de336a4 100644
->> --- a/Documentation/networking/af_xdp.rst
->> +++ b/Documentation/networking/af_xdp.rst
->> @@ -433,6 +433,15 @@ start N bytes into the buffer leaving the first N bytes for the
->>  application to use. The final option is the flags field, but it will
->>  be dealt with in separate sections for each UMEM flag.
->>
->> +SO_BINDTODEVICE setsockopt
->> +--------------------------
->> +
->> +This is a generic SOL_SOCKET option that can be used to tie AF_XDP
->> +socket to a particular network interface.  It is useful when a socket
->> +is created by a privileged process and passed to a non-privileged one.
->> +Once the option is set, kernel will refuse attempts to bind that socket
->> +to a different interface.  Updating the value requires CAP_NET_RAW.
->> +
->>  XDP_STATISTICS getsockopt
->>  -------------------------
->>
->> diff --git a/net/xdp/xsk.c b/net/xdp/xsk.c
->> index 5a8c0dd250af..386ff641db0f 100644
->> --- a/net/xdp/xsk.c
->> +++ b/net/xdp/xsk.c
->> @@ -886,6 +886,7 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
->>         struct sock *sk = sock->sk;
->>         struct xdp_sock *xs = xdp_sk(sk);
->>         struct net_device *dev;
->> +       int bound_dev_if;
->>         u32 flags, qid;
->>         int err = 0;
->>
->> @@ -899,6 +900,11 @@ static int xsk_bind(struct socket *sock, struct sockaddr *addr, int addr_len)
->>                       XDP_USE_NEED_WAKEUP))
->>                 return -EINVAL;
->>
->> +       bound_dev_if = READ_ONCE(sk->sk_bound_dev_if);
->> +
->> +       if (bound_dev_if && bound_dev_if != sxdp->sxdp_ifindex)
->> +               return -EINVAL;
->> +
->>         rtnl_lock();
->>         mutex_lock(&xs->mutex);
->>         if (xs->state != XSK_READY) {
->> --
->> 2.40.1
->>
->>
+> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
+> index 9aef45e870a5..d0636ea13009 100644
+> --- a/net/tls/tls_sw.c
+> +++ b/net/tls/tls_sw.c
+> @@ -1848,13 +1848,10 @@ tls_read_flush_backlog(struct sock *sk, struct tls_prot_info *prot,
+>   	return sk_flush_backlog(sk);
+>   }
+>   
+> -static int tls_rx_reader_lock(struct sock *sk, struct tls_sw_context_rx *ctx,
+> -			      bool nonblock)
+> +static int tls_rx_reader_acquire(struct sock *sk, struct tls_sw_context_rx *ctx,
+> +				 bool nonblock)
 
+Nit: I still think tls_rx_reader_enter/tls_rx_reader_exit are more
+appropriate names.
 
