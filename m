@@ -1,102 +1,94 @@
-Return-Path: <netdev+bounces-15240-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15241-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CAAD97464A9
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 23:07:02 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 9DA787464B9
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 23:12:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A68DD1C20A26
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 21:07:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CCEDE1C204F5
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 21:12:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5A7C611CAA;
-	Mon,  3 Jul 2023 21:06:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6764D11CAA;
+	Mon,  3 Jul 2023 21:12:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 42EE5100B3;
-	Mon,  3 Jul 2023 21:06:57 +0000 (UTC)
-Received: from mail-pg1-x530.google.com (mail-pg1-x530.google.com [IPv6:2607:f8b0:4864:20::530])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B4D7E70;
-	Mon,  3 Jul 2023 14:06:48 -0700 (PDT)
-Received: by mail-pg1-x530.google.com with SMTP id 41be03b00d2f7-55ba5bb0bf3so905864a12.1;
-        Mon, 03 Jul 2023 14:06:48 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 54E5A101C1
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 21:12:06 +0000 (UTC)
+Received: from mail-io1-xd2c.google.com (mail-io1-xd2c.google.com [IPv6:2607:f8b0:4864:20::d2c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A22BE5B;
+	Mon,  3 Jul 2023 14:12:05 -0700 (PDT)
+Received: by mail-io1-xd2c.google.com with SMTP id ca18e2360f4ac-78360b822abso196709239f.2;
+        Mon, 03 Jul 2023 14:12:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688418408; x=1691010408;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=0s37NzTHMUBaqLFmLcuPGyHFd30//csXthbXBR4ahCA=;
-        b=jrrCeScL4kYlEtkq3xekVTO6oZ+0cPyT6bqmExqbVucAP4WHz/eAFck7ntHOrVZvnI
-         RfHU2A12F0LjJvEqyGXtbYw+I4zqcFu7uSQ61gIsqMsx+9Xreqb6LVhR3XuYMTjJoKwJ
-         caAoK9T3CtgD2thvP/4ttX6ZMq6D4VVGWNhLO8MhpAkdJ6/ZEnm0U3HjYOif+nRBHj2B
-         n/vPWyAq/Irxzk2cP1JYYilGgD3hQBKdGo2EqEg7WNulkg57Q2iJzpWiMT9UptW2LP5T
-         R+vyHC8qeSlyZPIbjjzjuBOVmeSIT2ujSI48UIPO9lYSHFHYU5/OZiO44SQt9ngCXKpk
-         LQ1Q==
+        d=gmail.com; s=20221208; t=1688418724; x=1691010724;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=c0EoX2DheebN94bt0rFrXPITU8dcwd8m1uYfEeNrV7c=;
+        b=iQLJZVNh9bIwOw+2iuKcGUN+cTi274XOHrQU3XI/VjN9FtcxsrB9c66omYyrugnM+E
+         pTqi8Url9RRsPDe5Fg31A5Lc5FhwOLeTNWTLBVO6cqp9e9WqK7nydfA8qzeWKo4ZNROl
+         io/fmExXuRCxn5swlIEDksXN9mAN2ATKZXnOiNbxnsWEUjiLX1Rr2ov6dbxxpActNidI
+         SNF+EpGIzLxllvqmDSqjADEO8X0oYtzWjhWX+OvnN/O9OkUBHlx4tLhx2tcLnA0kMpu1
+         YSphP5SZNVGcEPhHs3ICrHlGmVau3nOv5q/MCck0itkB5FdI/aaQd/+S0KKwmGbzMgrU
+         n2Ag==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688418408; x=1691010408;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=0s37NzTHMUBaqLFmLcuPGyHFd30//csXthbXBR4ahCA=;
-        b=FZGRHQMyCd+SEur/UbD4m2gZijF1r5XAk6DzpB6M6N2ZQJJ36TAtBZQwyYKt1OA6aH
-         B5fvqIBbFxHhvK85Dc0z3IvsTkHiS2+BZ6BKlSNC53IM08zQX6o6TFD0lgIz5T8QJudg
-         PpUSFEASA9A+CMzCxWbKox/P1EMqZ8eVvkWw1NyPh6oWp0wcq/31vY6MXO263QKdfQey
-         mVSuwl3MffeVQU2G/xVpxR4Rn6JgatcAzTZPjg8YAVk6W35GkfrK0Sv/6WUBpDFJDV2S
-         DA30BfYanI0q5HFBWn1buQmVFy8roRZS11FOQdMI7R9oOnLdMskGmYCzB88CZgqF0E9F
-         bsZg==
-X-Gm-Message-State: AC+VfDxfonl/c/fgEUjXcENNwt56ocSrbg/UFnXTehW6qRMvJVh0zBMk
-	P6OOzYNYsiqLp7GdAleg8i4=
-X-Google-Smtp-Source: ACHHUZ47oCDS/VawOuS05S/BzNAIqU7kzR5VjubUQNTZC6eVHkTjWUNkjY1bpISisIJKBK3hmgQWpA==
-X-Received: by 2002:a05:6a20:54a8:b0:126:2bb7:d660 with SMTP id i40-20020a056a2054a800b001262bb7d660mr22649845pzk.7.1688418407947;
-        Mon, 03 Jul 2023 14:06:47 -0700 (PDT)
-Received: from localhost ([2605:59c8:148:ba10::41f])
-        by smtp.gmail.com with ESMTPSA id q28-20020a635c1c000000b00548d361c137sm14962708pgb.61.2023.07.03.14.06.47
+        d=1e100.net; s=20221208; t=1688418724; x=1691010724;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=c0EoX2DheebN94bt0rFrXPITU8dcwd8m1uYfEeNrV7c=;
+        b=TPzcGV3H/epyID6lFO45pMCWb/JcdYfCqWroGvk7YMu0c3fs0SAcUAPpYwMo3azizj
+         BMBqx71hX1GUmhnLA77QorLRLS1QLP9YxEVteo//JpAxnmBGViEdLbwqR+V8MtIo7Z/8
+         PHdFq3svUIcbUrfSoeHxVyPnUjf4M2wO7+gQ3Id/ahbako56xxDgk6qpMwzDJoPM628r
+         gu1Ur8vee4vVnzO+vY44fQVV8IIza4FJv2C/4/TOGSABvinxddbJbK1dmfSBK/Z4oXE+
+         kPJr5Rtkm9awvsM4n6FsoilJaCoFBaPETUQKZ/CszPo/voGoI+QFq39kkrsp0ArAd6VB
+         Q4bQ==
+X-Gm-Message-State: AC+VfDxt9eiPE5Rz+btnMq0VoVhwOoDFafI7XaBz9ZXvK+wHMMZtDhRP
+	Atx3iXrlRlqHokzsdDuHkMo=
+X-Google-Smtp-Source: ACHHUZ4OqUrXPGmlKw5P+m0ozv+5LfI/SNPwoveeJPyyu2Ucgkj95xvoM5BFIb0YyAE1aRLVqMlivw==
+X-Received: by 2002:a5e:a911:0:b0:77e:3d2f:d1f4 with SMTP id c17-20020a5ea911000000b0077e3d2fd1f4mr11268010iod.15.1688418724252;
+        Mon, 03 Jul 2023 14:12:04 -0700 (PDT)
+Received: from rivendell ([2a01:4f9:c010:5d73::1])
+        by smtp.gmail.com with ESMTPSA id g9-20020a0566380c4900b0042b068d921esm3197911jal.16.2023.07.03.14.12.00
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 14:06:47 -0700 (PDT)
-Date: Mon, 03 Jul 2023 14:06:46 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>, 
- bpf@vger.kernel.org
-Cc: Larysa Zaremba <larysa.zaremba@intel.com>, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- martin.lau@linux.dev, 
- song@kernel.org, 
- yhs@fb.com, 
- john.fastabend@gmail.com, 
- kpsingh@kernel.org, 
- sdf@google.com, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- David Ahern <dsahern@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Jesper Dangaard Brouer <brouer@redhat.com>, 
- Anatoly Burakov <anatoly.burakov@intel.com>, 
- Alexander Lobakin <alexandr.lobakin@intel.com>, 
- Magnus Karlsson <magnus.karlsson@gmail.com>, 
- Maryam Tahhan <mtahhan@redhat.com>, 
- xdp-hints@xdp-project.net, 
- netdev@vger.kernel.org, 
- Aleksander Lobakin <aleksander.lobakin@intel.com>
-Message-ID: <64a3386623163_65205208fe@john.notmuch>
-In-Reply-To: <20230703181226.19380-16-larysa.zaremba@intel.com>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-16-larysa.zaremba@intel.com>
-Subject: RE: [PATCH bpf-next v2 15/20] net, xdp: allow metadata > 32
+        Mon, 03 Jul 2023 14:12:03 -0700 (PDT)
+Date: Mon, 3 Jul 2023 23:11:57 +0200
+From: Enrico Mioso <mrkiko.rs@gmail.com>
+To: Jan Engelhardt <jengelh@inai.de>
+Cc: Greg Kroah-Hartman <gregkh@linuxfoundation.org>,
+	linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>,
+	Jacopo Mondi <jacopo@jmondi.org>,
+	=?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	Ilja Van Sprundel <ivansprundel@ioactive.com>,
+	Joseph Tartaro <joseph.tartaro@ioactive.com>
+Subject: Re: [PATCH] USB: disable all RNDIS protocol drivers
+Message-ID: <ZKM5nbDnKnFZLOlY@rivendell>
+References: <20221123124620.1387499-1-gregkh@linuxfoundation.org>
+ <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
@@ -104,40 +96,12 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Larysa Zaremba wrote:
-> From: Aleksander Lobakin <aleksander.lobakin@intel.com>
-> 
-> When using XDP hints, metadata sometimes has to be much bigger
-> than 32 bytes. Relax the restriction, allow metadata larger than 32 bytes
-> and make __skb_metadata_differs() work with bigger lengths.
-> 
-> Now size of metadata is only limited by the fact it is stored as u8
-> in skb_shared_info, so maximum possible value is 255. Other important
-> conditions, such as having enough space for xdp_frame building, are already
-> checked in bpf_xdp_adjust_meta().
-> 
-> The requirement of having its length aligned to 4 bytes is still
-> valid.
-> 
-> Signed-off-by: Aleksander Lobakin <aleksander.lobakin@intel.com>
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  include/linux/skbuff.h | 13 ++++++++-----
->  include/net/xdp.h      |  7 ++++++-
->  2 files changed, 14 insertions(+), 6 deletions(-)
-> 
-> diff --git a/include/linux/skbuff.h b/include/linux/skbuff.h
-> index 91ed66952580..cd49cdd71019 100644
-> --- a/include/linux/skbuff.h
-> +++ b/include/linux/skbuff.h
-> @@ -4209,10 +4209,13 @@ static inline bool __skb_metadata_differs(const struct sk_buff *skb_a,
->  {
->  	const void *a = skb_metadata_end(skb_a);
->  	const void *b = skb_metadata_end(skb_b);
-> -	/* Using more efficient varaiant than plain call to memcmp(). */
-> -#if defined(CONFIG_HAVE_EFFICIENT_UNALIGNED_ACCESS) && BITS_PER_LONG == 64
+Hi all!!
 
-Why are we removing the ifdef here? Its adding a runtime 'if' when its not
-necessary. I would keep the ifdef and simply add the default case
-in the switch.
+I think the rndis_host USB driver might emit a warning in the dmesg, but disabling the driver wouldn't be a good idea.
+The TP-Link MR6400 V1 LTE modem and also some ZTE modems integrated in routers do use this protocol.
+
+We may also distinguish between these cases and devices you might plug in - as they pose different risk levels.
+
+Enrico
 
