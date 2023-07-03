@@ -1,412 +1,462 @@
-Return-Path: <netdev+bounces-15096-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15097-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC3D1745A64
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:36:33 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 90190745A6B
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:37:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0075D280DCD
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:36:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6C7921C2096D
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:37:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 639D310E8;
-	Mon,  3 Jul 2023 10:36:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6DCA51FAC;
+	Mon,  3 Jul 2023 10:37:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 51E93A5B
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:36:30 +0000 (UTC)
-Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AFDFE97;
-	Mon,  3 Jul 2023 03:36:27 -0700 (PDT)
-Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.207])
-	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Qvj3R1LYGz6J74j;
-	Mon,  3 Jul 2023 18:34:43 +0800 (CST)
-Received: from [10.123.123.126] (10.123.123.126) by
- lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Mon, 3 Jul 2023 11:36:24 +0100
-Message-ID: <55092d4f-b076-d4fc-e75f-b4981a382a78@huawei.com>
-Date: Mon, 3 Jul 2023 13:36:23 +0300
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5BCD5137A
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:37:28 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E31F0114;
+	Mon,  3 Jul 2023 03:37:22 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 36373c0d019843;
+	Mon, 3 Jul 2023 03:37:16 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=FqBYtrAzX0U+UbN3dapUq9vhW6WbHsdb355eWMp4MAM=;
+ b=OJmwqfypPW/s+3Fj3V/yCtkiizhHSfXQfvpqZj/XvW9EY4g5t2KPIAs/6Fu8W/vHPbkx
+ 2cFxaql/advmG537B3e9mNQYa0dSUMS87zzH3b8qg5I5sVgIRpCEWvzFxofhUEUCeytz
+ XpjKSC2JRHmu5s3x4B7k/nU1EZSXhD2crMFjEyi1Rqd657oZ4IwxVIFhzJngE96uJV6J
+ k9cTcD9HMCdYFDrtuky58Rw2ZLSd6U6GWcpPiBnI2QIWuSqzcNvocxvFgKda/g7MzUqT
+ XcmdrA6NEJTcaaHzgeqQ9EoRG2P+2phBwdVKc1k3e01pfqRXybg5xGY9F9KVOM/7jctq xg== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rjknj4b0n-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jul 2023 03:37:15 -0700
+Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 3 Jul
+ 2023 03:37:13 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 3 Jul 2023 03:37:13 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id 74FA03F705C;
+	Mon,  3 Jul 2023 03:37:10 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [net PATCH] octeontx2-af: Fix issues with NPC field hash extract
+Date: Mon, 3 Jul 2023 16:07:07 +0530
+Message-ID: <20230703103707.2143646-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
- Thunderbird/91.4.1
-Subject: Re: [PATCH v11 08/12] landlock: Add network rules and TCP hooks
- support
-Content-Language: ru
-To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
-	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
-	<artem.kuzin@huawei.com>
-References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
- <20230515161339.631577-9-konstantin.meskhidze@huawei.com>
- <f14174f3-d855-dba9-5dd2-40a2c5e5ac3b@digikod.net>
-From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
-In-Reply-To: <f14174f3-d855-dba9-5dd2-40a2c5e5ac3b@digikod.net>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.123.123.126]
-X-ClientProxiedBy: lhrpeml100006.china.huawei.com (7.191.160.224) To
- lhrpeml500004.china.huawei.com (7.191.163.9)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Proofpoint-GUID: SKUmX4lnoGa9GWRNc5btXrfU3i0qF1XP
+X-Proofpoint-ORIG-GUID: SKUmX4lnoGa9GWRNc5btXrfU3i0qF1XP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-03_08,2023-06-30_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+1. Allow field hash configuration for both source and destination IPv6.
+2. Configure hardware parser based on hash extract feature enable flag
+   for IPv6.
+3. Fix IPv6 endianness issue while updating the source/destination IP
+   address via ntuple rule.
+4. Update hash extraction mbox message.
 
+Fixes: 56d9f5fd2246 ("octeontx2-af: Use hashed field in MCAM key")
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/af/mbox.h  |  16 ++-
+ .../marvell/octeontx2/af/rvu_npc_fs.c         |  23 ++--
+ .../marvell/octeontx2/af/rvu_npc_fs.h         |   4 +
+ .../marvell/octeontx2/af/rvu_npc_hash.c       | 118 ++++++++++--------
+ .../marvell/octeontx2/af/rvu_npc_hash.h       |  10 +-
+ 5 files changed, 105 insertions(+), 66 deletions(-)
 
-6/26/2023 9:57 PM, Mickaël Salaün пишет:
-> Complementary review:
-> 
-> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
->> This commit adds network rules support in the ruleset management
->> helpers and the landlock_create_ruleset syscall.
->> Refactor user space API to support network actions. Add new network
->> access flags, network rule and network attributes. Increment Landlock
->> ABI version. Expand access_masks_t to u32 to be sure network access
->> rights can be stored. Implement socket_bind() and socket_connect()
->> LSM hooks, which enables to restrict TCP socket binding and connection
->> to specific ports.
->> 
->> Co-developed-by: Mickaël Salaün <mic@digikod.net>
->> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
->> ---
->> 
->> Changes since v10:
->> * Removes "packed" attribute.
->> * Applies Mickaёl's patch with some refactoring.
->> * Deletes get_port() and check_addrlen() helpers.
->> * Refactors check_socket_access() by squashing get_port() and
->> check_addrlen() helpers into it.
->> * Fixes commit message.
->> 
->> Changes since v9:
->> * Changes UAPI port field to __u64.
->> * Moves shared code into check_socket_access().
->> * Adds get_raw_handled_net_accesses() and
->> get_current_net_domain() helpers.
->> * Minor fixes.
->> 
->> Changes since v8:
->> * Squashes commits.
->> * Refactors commit message.
->> * Changes UAPI port field to __be16.
->> * Changes logic of bind/connect hooks with AF_UNSPEC families.
->> * Adds address length checking.
->> * Minor fixes.
->> 
->> Changes since v7:
->> * Squashes commits.
->> * Increments ABI version to 4.
->> * Refactors commit message.
->> * Minor fixes.
->> 
->> Changes since v6:
->> * Renames landlock_set_net_access_mask() to landlock_add_net_access_mask()
->>    because it OR values.
->> * Makes landlock_add_net_access_mask() more resilient incorrect values.
->> * Refactors landlock_get_net_access_mask().
->> * Renames LANDLOCK_MASK_SHIFT_NET to LANDLOCK_SHIFT_ACCESS_NET and use
->>    LANDLOCK_NUM_ACCESS_FS as value.
->> * Updates access_masks_t to u32 to support network access actions.
->> * Refactors landlock internal functions to support network actions with
->>    landlock_key/key_type/id types.
->> 
->> Changes since v5:
->> * Gets rid of partial revert from landlock_add_rule
->> syscall.
->> * Formats code with clang-format-14.
->> 
->> Changes since v4:
->> * Refactors landlock_create_ruleset() - splits ruleset and
->> masks checks.
->> * Refactors landlock_create_ruleset() and landlock mask
->> setters/getters to support two rule types.
->> * Refactors landlock_add_rule syscall add_rule_path_beneath
->> function by factoring out get_ruleset_from_fd() and
->> landlock_put_ruleset().
->> 
->> Changes since v3:
->> * Splits commit.
->> * Adds network rule support for internal landlock functions.
->> * Adds set_mask and get_mask for network.
->> * Adds rb_root root_net_port.
->> 
->> ---
->>   include/uapi/linux/landlock.h                |  48 +++++
->>   security/landlock/Kconfig                    |   1 +
->>   security/landlock/Makefile                   |   2 +
->>   security/landlock/limits.h                   |   6 +-
->>   security/landlock/net.c                      | 174 +++++++++++++++++++
->>   security/landlock/net.h                      |  26 +++
->>   security/landlock/ruleset.c                  |  52 +++++-
->>   security/landlock/ruleset.h                  |  63 +++++--
->>   security/landlock/setup.c                    |   2 +
->>   security/landlock/syscalls.c                 |  72 +++++++-
->>   tools/testing/selftests/landlock/base_test.c |   2 +-
->>   11 files changed, 425 insertions(+), 23 deletions(-)
->>   create mode 100644 security/landlock/net.c
->>   create mode 100644 security/landlock/net.h
->> 
->> diff --git a/include/uapi/linux/landlock.h b/include/uapi/linux/landlock.h
->> index 81d09ef9aa50..93794759dad4 100644
->> --- a/include/uapi/linux/landlock.h
->> +++ b/include/uapi/linux/landlock.h
->> @@ -31,6 +31,13 @@ struct landlock_ruleset_attr {
->>   	 * this access right.
->>   	 */
->>   	__u64 handled_access_fs;
->> +
-> 
-> Please remove this empty line.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+index 5727d67e0259..f43f162e8a99 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/mbox.h
+@@ -245,9 +245,9 @@ M(NPC_MCAM_READ_BASE_RULE, 0x6011, npc_read_base_steer_rule,            \
+ M(NPC_MCAM_GET_STATS, 0x6012, npc_mcam_entry_stats,                     \
+ 				   npc_mcam_get_stats_req,              \
+ 				   npc_mcam_get_stats_rsp)              \
+-M(NPC_GET_SECRET_KEY, 0x6013, npc_get_secret_key,                     \
+-				   npc_get_secret_key_req,              \
+-				   npc_get_secret_key_rsp)              \
++M(NPC_GET_FIELD_HASH_INFO, 0x6013, npc_get_field_hash_info,             \
++				   npc_get_field_hash_info_req,              \
++				   npc_get_field_hash_info_rsp)              \
+ M(NPC_GET_FIELD_STATUS, 0x6014, npc_get_field_status,                     \
+ 				   npc_get_field_status_req,              \
+ 				   npc_get_field_status_rsp)              \
+@@ -1524,14 +1524,20 @@ struct npc_mcam_get_stats_rsp {
+ 	u8 stat_ena; /* enabled */
+ };
+ 
+-struct npc_get_secret_key_req {
++struct npc_get_field_hash_info_req {
+ 	struct mbox_msghdr hdr;
+ 	u8 intf;
+ };
+ 
+-struct npc_get_secret_key_rsp {
++struct npc_get_field_hash_info_rsp {
+ 	struct mbox_msghdr hdr;
+ 	u64 secret_key[3];
++#define NPC_MAX_HASH 2
++#define NPC_MAX_HASH_MASK 2
++	/* NPC_AF_INTF(0..1)_HASH(0..1)_MASK(0..1) */
++	u64 hash_mask[NPC_MAX_INTF][NPC_MAX_HASH][NPC_MAX_HASH_MASK];
++	/* NPC_AF_INTF(0..1)_HASH(0..1)_RESULT_CTRL */
++	u64 hash_ctrl[NPC_MAX_INTF][NPC_MAX_HASH];
+ };
+ 
+ enum ptp_op {
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+index 006beb5cf98d..12817d56bdf9 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.c
+@@ -13,11 +13,6 @@
+ #include "rvu_npc_fs.h"
+ #include "rvu_npc_hash.h"
+ 
+-#define NPC_BYTESM		GENMASK_ULL(19, 16)
+-#define NPC_HDR_OFFSET		GENMASK_ULL(15, 8)
+-#define NPC_KEY_OFFSET		GENMASK_ULL(5, 0)
+-#define NPC_LDATA_EN		BIT_ULL(7)
+-
+ static const char * const npc_flow_names[] = {
+ 	[NPC_DMAC]	= "dmac",
+ 	[NPC_SMAC]	= "smac",
+@@ -442,6 +437,7 @@ static void npc_handle_multi_layer_fields(struct rvu *rvu, int blkaddr, u8 intf)
+ static void npc_scan_ldata(struct rvu *rvu, int blkaddr, u8 lid,
+ 			   u8 lt, u64 cfg, u8 intf)
+ {
++	struct npc_mcam_kex_hash *mkex_hash = rvu->kpu.mkex_hash;
+ 	struct npc_mcam *mcam = &rvu->hw->mcam;
+ 	u8 hdr, key, nr_bytes, bit_offset;
+ 	u8 la_ltype, la_start;
+@@ -490,8 +486,21 @@ do {									       \
+ 	NPC_SCAN_HDR(NPC_SIP_IPV4, NPC_LID_LC, NPC_LT_LC_IP, 12, 4);
+ 	NPC_SCAN_HDR(NPC_DIP_IPV4, NPC_LID_LC, NPC_LT_LC_IP, 16, 4);
+ 	NPC_SCAN_HDR(NPC_IPFRAG_IPV6, NPC_LID_LC, NPC_LT_LC_IP6_EXT, 6, 1);
+-	NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 16);
+-	NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 16);
++	if (rvu->hw->cap.npc_hash_extract) {
++		if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][0])
++			NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 4);
++		else
++			NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 16);
++
++		if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][1])
++			NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 4);
++		else
++			NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 16);
++	} else {
++		NPC_SCAN_HDR(NPC_SIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 8, 16);
++		NPC_SCAN_HDR(NPC_DIP_IPV6, NPC_LID_LC, NPC_LT_LC_IP6, 24, 16);
++	}
++
+ 	NPC_SCAN_HDR(NPC_SPORT_UDP, NPC_LID_LD, NPC_LT_LD_UDP, 0, 2);
+ 	NPC_SCAN_HDR(NPC_DPORT_UDP, NPC_LID_LD, NPC_LT_LD_UDP, 2, 2);
+ 	NPC_SCAN_HDR(NPC_SPORT_TCP, NPC_LID_LD, NPC_LT_LD_TCP, 0, 2);
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h
+index bdd65ce56a32..1466def630cf 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_fs.h
+@@ -9,6 +9,10 @@
+ #define __RVU_NPC_FS_H
+ 
+ #define IPV6_WORDS	4
++#define NPC_BYTESM		GENMASK_ULL(19, 16)
++#define NPC_HDR_OFFSET		GENMASK_ULL(15, 8)
++#define NPC_KEY_OFFSET		GENMASK_ULL(5, 0)
++#define NPC_LDATA_EN		BIT_ULL(7)
+ 
+ void npc_update_entry(struct rvu *rvu, enum key_fields type,
+ 		      struct mcam_entry *entry, u64 val_lo,
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+index 20ebb9c95c73..01031ecf8278 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+@@ -78,42 +78,42 @@ static u32 rvu_npc_toeplitz_hash(const u64 *data, u64 *key, size_t data_bit_len,
+ 	return hash_out;
+ }
+ 
+-u32 npc_field_hash_calc(u64 *ldata, struct npc_mcam_kex_hash *mkex_hash,
+-			u64 *secret_key, u8 intf, u8 hash_idx)
++u32 npc_field_hash_calc(u64 *ldata, struct npc_get_field_hash_info_rsp rsp,
++			u8 intf, u8 hash_idx)
+ {
+ 	u64 hash_key[3];
+ 	u64 data_padded[2];
+ 	u32 field_hash;
+ 
+-	hash_key[0] = secret_key[1] << 31;
+-	hash_key[0] |= secret_key[2];
+-	hash_key[1] = secret_key[1] >> 33;
+-	hash_key[1] |= secret_key[0] << 31;
+-	hash_key[2] = secret_key[0] >> 33;
++	hash_key[0] = rsp.secret_key[1] << 31;
++	hash_key[0] |= rsp.secret_key[2];
++	hash_key[1] = rsp.secret_key[1] >> 33;
++	hash_key[1] |= rsp.secret_key[0] << 31;
++	hash_key[2] = rsp.secret_key[0] >> 33;
+ 
+-	data_padded[0] = mkex_hash->hash_mask[intf][hash_idx][0] & ldata[0];
+-	data_padded[1] = mkex_hash->hash_mask[intf][hash_idx][1] & ldata[1];
++	data_padded[0] = rsp.hash_mask[intf][hash_idx][0] & ldata[0];
++	data_padded[1] = rsp.hash_mask[intf][hash_idx][1] & ldata[1];
+ 	field_hash = rvu_npc_toeplitz_hash(data_padded, hash_key, 128, 159);
+ 
+-	field_hash &= mkex_hash->hash_ctrl[intf][hash_idx] >> 32;
+-	field_hash |= mkex_hash->hash_ctrl[intf][hash_idx];
++	field_hash &= FIELD_GET(GENMASK(63, 32), rsp.hash_ctrl[intf][hash_idx]);
++	field_hash |= FIELD_GET(GENMASK(31, 0), rsp.hash_ctrl[intf][hash_idx]);
+ 	return field_hash;
+ }
+ 
+-static u64 npc_update_use_hash(int lt, int ld)
++static u64 npc_update_use_hash(struct rvu *rvu, int blkaddr,
++			       u8 intf, int lid, int lt, int ld)
+ {
+-	u64 cfg = 0;
+-
+-	switch (lt) {
+-	case NPC_LT_LC_IP6:
+-		/* Update use_hash(bit-20) and bytesm1 (bit-16:19)
+-		 * in KEX_LD_CFG
+-		 */
+-		cfg = KEX_LD_CFG_USE_HASH(0x1, 0x03,
+-					  ld ? 0x8 : 0x18,
+-					  0x1, 0x0, 0x10);
+-		break;
+-	}
++	u8 hdr, key;
++	u64 cfg;
++
++	cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_LIDX_LTX_LDX_CFG(intf, lid, lt, ld));
++	hdr = FIELD_GET(NPC_HDR_OFFSET, cfg);
++	key = FIELD_GET(NPC_KEY_OFFSET, cfg);
++
++	/* Update use_hash(bit-20) to 'true' and
++	 * bytesm1(bit-16:19) to '0x3' in KEX_LD_CFG
++	 */
++	cfg = KEX_LD_CFG_USE_HASH(0x1, 0x03, hdr, 0x1, 0x0, key);
+ 
+ 	return cfg;
+ }
+@@ -132,12 +132,12 @@ static void npc_program_mkex_hash_rx(struct rvu *rvu, int blkaddr,
+ 		for (lt = 0; lt < NPC_MAX_LT; lt++) {
+ 			for (ld = 0; ld < NPC_MAX_LD; ld++) {
+ 				if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][ld]) {
+-					u64 cfg = npc_update_use_hash(lt, ld);
++					u64 cfg;
+ 
+-					hash_cnt++;
+ 					if (hash_cnt == NPC_MAX_HASH)
+ 						return;
+ 
++					cfg = npc_update_use_hash(rvu, blkaddr, intf, lid, lt, ld);
+ 					/* Set updated KEX configuration */
+ 					SET_KEX_LD(intf, lid, lt, ld, cfg);
+ 					/* Set HASH configuration */
+@@ -149,6 +149,7 @@ static void npc_program_mkex_hash_rx(struct rvu *rvu, int blkaddr,
+ 							     mkex_hash->hash_mask[intf][ld][1]);
+ 					SET_KEX_LD_HASH_CTRL(intf, ld,
+ 							     mkex_hash->hash_ctrl[intf][ld]);
++					hash_cnt++;
+ 				}
+ 			}
+ 		}
+@@ -169,12 +170,12 @@ static void npc_program_mkex_hash_tx(struct rvu *rvu, int blkaddr,
+ 		for (lt = 0; lt < NPC_MAX_LT; lt++) {
+ 			for (ld = 0; ld < NPC_MAX_LD; ld++)
+ 				if (mkex_hash->lid_lt_ld_hash_en[intf][lid][lt][ld]) {
+-					u64 cfg = npc_update_use_hash(lt, ld);
++					u64 cfg;
+ 
+-					hash_cnt++;
+ 					if (hash_cnt == NPC_MAX_HASH)
+ 						return;
+ 
++					cfg = npc_update_use_hash(rvu, blkaddr, intf, lid, lt, ld);
+ 					/* Set updated KEX configuration */
+ 					SET_KEX_LD(intf, lid, lt, ld, cfg);
+ 					/* Set HASH configuration */
+@@ -187,8 +188,6 @@ static void npc_program_mkex_hash_tx(struct rvu *rvu, int blkaddr,
+ 					SET_KEX_LD_HASH_CTRL(intf, ld,
+ 							     mkex_hash->hash_ctrl[intf][ld]);
+ 					hash_cnt++;
+-					if (hash_cnt == NPC_MAX_HASH)
+-						return;
+ 				}
+ 		}
+ 	}
+@@ -238,8 +237,8 @@ void npc_update_field_hash(struct rvu *rvu, u8 intf,
+ 			   struct flow_msg *omask)
+ {
+ 	struct npc_mcam_kex_hash *mkex_hash = rvu->kpu.mkex_hash;
+-	struct npc_get_secret_key_req req;
+-	struct npc_get_secret_key_rsp rsp;
++	struct npc_get_field_hash_info_req req;
++	struct npc_get_field_hash_info_rsp rsp;
+ 	u64 ldata[2], cfg;
+ 	u32 field_hash;
+ 	u8 hash_idx;
+@@ -250,7 +249,7 @@ void npc_update_field_hash(struct rvu *rvu, u8 intf,
+ 	}
+ 
+ 	req.intf = intf;
+-	rvu_mbox_handler_npc_get_secret_key(rvu, &req, &rsp);
++	rvu_mbox_handler_npc_get_field_hash_info(rvu, &req, &rsp);
+ 
+ 	for (hash_idx = 0; hash_idx < NPC_MAX_HASH; hash_idx++) {
+ 		cfg = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_HASHX_CFG(intf, hash_idx));
+@@ -266,39 +265,40 @@ void npc_update_field_hash(struct rvu *rvu, u8 intf,
+ 				 * is hashed to 32 bit value.
+ 				 */
+ 				case NPC_LT_LC_IP6:
+-					if (features & BIT_ULL(NPC_SIP_IPV6)) {
++					/* ld[0] == hash_idx[0] == Source IPv6
++					 * ld[1] == hash_idx[1] == Destination IPv6
++					 */
++					if ((features & BIT_ULL(NPC_SIP_IPV6)) && !hash_idx) {
+ 						u32 src_ip[IPV6_WORDS];
+ 
+ 						be32_to_cpu_array(src_ip, pkt->ip6src, IPV6_WORDS);
+-						ldata[0] = (u64)src_ip[0] << 32 | src_ip[1];
+-						ldata[1] = (u64)src_ip[2] << 32 | src_ip[3];
++						ldata[1] = (u64)src_ip[0] << 32 | src_ip[1];
++						ldata[0] = (u64)src_ip[2] << 32 | src_ip[3];
+ 						field_hash = npc_field_hash_calc(ldata,
+-										 mkex_hash,
+-										 rsp.secret_key,
++										 rsp,
+ 										 intf,
+ 										 hash_idx);
+ 						npc_update_entry(rvu, NPC_SIP_IPV6, entry,
+-								 field_hash, 0, 32, 0, intf);
++								 field_hash, 0,
++								 GENMASK(31, 0), 0, intf);
+ 						memcpy(&opkt->ip6src, &pkt->ip6src,
+ 						       sizeof(pkt->ip6src));
+ 						memcpy(&omask->ip6src, &mask->ip6src,
+ 						       sizeof(mask->ip6src));
+-						break;
+-					}
+-
+-					if (features & BIT_ULL(NPC_DIP_IPV6)) {
++					} else if ((features & BIT_ULL(NPC_DIP_IPV6)) &&
++						   !hash_idx) {
+ 						u32 dst_ip[IPV6_WORDS];
+ 
+ 						be32_to_cpu_array(dst_ip, pkt->ip6dst, IPV6_WORDS);
+-						ldata[0] = (u64)dst_ip[0] << 32 | dst_ip[1];
+-						ldata[1] = (u64)dst_ip[2] << 32 | dst_ip[3];
++						ldata[1] = (u64)dst_ip[0] << 32 | dst_ip[1];
++						ldata[0] = (u64)dst_ip[2] << 32 | dst_ip[3];
+ 						field_hash = npc_field_hash_calc(ldata,
+-										 mkex_hash,
+-										 rsp.secret_key,
++										 rsp,
+ 										 intf,
+ 										 hash_idx);
+ 						npc_update_entry(rvu, NPC_DIP_IPV6, entry,
+-								 field_hash, 0, 32, 0, intf);
++								 field_hash, 0,
++								 GENMASK(31, 0), 0, intf);
+ 						memcpy(&opkt->ip6dst, &pkt->ip6dst,
+ 						       sizeof(pkt->ip6dst));
+ 						memcpy(&omask->ip6dst, &mask->ip6dst,
+@@ -311,13 +311,13 @@ void npc_update_field_hash(struct rvu *rvu, u8 intf,
+ 	}
+ }
+ 
+-int rvu_mbox_handler_npc_get_secret_key(struct rvu *rvu,
+-					struct npc_get_secret_key_req *req,
+-					struct npc_get_secret_key_rsp *rsp)
++int rvu_mbox_handler_npc_get_field_hash_info(struct rvu *rvu,
++					     struct npc_get_field_hash_info_req *req,
++					     struct npc_get_field_hash_info_rsp *rsp)
+ {
+ 	u64 *secret_key = rsp->secret_key;
+ 	u8 intf = req->intf;
+-	int blkaddr;
++	int hash_idx, hash_mask_idx, blkaddr;
+ 
+ 	blkaddr = rvu_get_blkaddr(rvu, BLKTYPE_NPC, 0);
+ 	if (blkaddr < 0) {
+@@ -329,6 +329,20 @@ int rvu_mbox_handler_npc_get_secret_key(struct rvu *rvu,
+ 	secret_key[1] = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_SECRET_KEY1(intf));
+ 	secret_key[2] = rvu_read64(rvu, blkaddr, NPC_AF_INTFX_SECRET_KEY2(intf));
+ 
++	for (hash_idx = 0; hash_idx < NPC_MAX_HASH; hash_idx++) {
++		for (hash_mask_idx = 0; hash_mask_idx < NPC_MAX_HASH_MASK; hash_mask_idx++) {
++			rsp->hash_mask[NIX_INTF_RX][hash_idx][hash_mask_idx] =
++				GET_KEX_LD_HASH_MASK(NIX_INTF_RX, hash_idx, hash_mask_idx);
++			rsp->hash_mask[NIX_INTF_TX][hash_idx][hash_mask_idx] =
++				GET_KEX_LD_HASH_MASK(NIX_INTF_TX, hash_idx, hash_mask_idx);
++		}
++	}
++
++	for (hash_idx = 0; hash_idx < NPC_MAX_INTF; hash_idx++)
++		for (hash_mask_idx = 0; hash_mask_idx < NPC_MAX_HASH; hash_mask_idx++)
++			rsp->hash_ctrl[hash_idx][hash_mask_idx] =
++				GET_KEX_LD_HASH_CTRL(hash_idx, hash_mask_idx);
++
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+index 3efeb09c58de..fc6142aa4b92 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.h
+@@ -35,6 +35,12 @@
+ 	rvu_write64(rvu, blkaddr,	\
+ 		    NPC_AF_INTFX_HASHX_RESULT_CTRL(intf, ld), cfg)
+ 
++#define GET_KEX_LD_HASH_CTRL(intf, ld)  \
++	rvu_read64(rvu, blkaddr, NPC_AF_INTFX_HASHX_RESULT_CTRL(intf, ld))
++
++#define GET_KEX_LD_HASH_MASK(intf, ld, mask_idx)	\
++	rvu_read64(rvu, blkaddr, NPC_AF_INTFX_HASHX_MASKX(intf, ld, mask_idx))
++
+ struct npc_mcam_kex_hash {
+ 	/* NPC_AF_INTF(0..1)_LID(0..7)_LT(0..15)_LD(0..1)_CFG */
+ 	bool lid_lt_ld_hash_en[NPC_MAX_INTF][NPC_MAX_LID][NPC_MAX_LT][NPC_MAX_LD];
+@@ -56,8 +62,8 @@ void npc_update_field_hash(struct rvu *rvu, u8 intf,
+ 			   struct flow_msg *omask);
+ void npc_config_secret_key(struct rvu *rvu, int blkaddr);
+ void npc_program_mkex_hash(struct rvu *rvu, int blkaddr);
+-u32 npc_field_hash_calc(u64 *ldata, struct npc_mcam_kex_hash *mkex_hash,
+-			u64 *secret_key, u8 intf, u8 hash_idx);
++u32 npc_field_hash_calc(u64 *ldata, struct npc_get_field_hash_info_rsp rsp,
++			u8 intf, u8 hash_idx);
+ 
+ static struct npc_mcam_kex_hash npc_mkex_hash_default __maybe_unused = {
+ 	.lid_lt_ld_hash_en = {
+-- 
+2.25.1
 
-  Ok. Thanks.
-> 
-> 
->> +	/**
->> +	 * @handled_access_net: Bitmask of actions (cf. `Network flags`_)
->> +	 * that is handled by this ruleset and should then be forbidden if no
->> +	 * rule explicitly allow them.
->> +	 */
->> +	__u64 handled_access_net;
->>   };
->> 
->>   /*
->> @@ -54,6 +61,11 @@ enum landlock_rule_type {
->>   	 * landlock_path_beneath_attr .
->>   	 */
->>   	LANDLOCK_RULE_PATH_BENEATH = 1,
->> +	/**
->> +	 * @LANDLOCK_RULE_NET_SERVICE: Type of a &struct
->> +	 * landlock_net_service_attr .
->> +	 */
->> +	LANDLOCK_RULE_NET_SERVICE = 2,
->>   };
->> 
->>   /**
->> @@ -79,6 +91,23 @@ struct landlock_path_beneath_attr {
->>   	 */
->>   } __attribute__((packed));
->> 
->> +/**
->> + * struct landlock_net_service_attr - TCP subnet definition
-> 
-> s/TCP subnet definition/Network service definition/
-> 
-   Ok. Thanks.
-> 
->> + *
->> + * Argument of sys_landlock_add_rule().
->> + */
->> +struct landlock_net_service_attr {
->> +	/**
->> +	 * @allowed_access: Bitmask of allowed access network for services
->> +	 * (cf. `Network flags`_).
->> +	 */
->> +	__u64 allowed_access;
->> +	/**
->> +	 * @port: Network port.
->> +	 */
->> +	__u64 port;
->> +};
->> +
->>   /**
->>    * DOC: fs_access
->>    *
->> @@ -189,4 +218,23 @@ struct landlock_path_beneath_attr {
->>   #define LANDLOCK_ACCESS_FS_TRUNCATE			(1ULL << 14)
->>   /* clang-format on */
->> 
->> +/**
->> + * DOC: net_access
->> + *
->> + * Network flags
->> + * ~~~~~~~~~~~~~~~~
->> + *
->> + * These flags enable to restrict a sandboxed process to a set of network
->> + * actions.
->> + *
->> + * TCP sockets with allowed actions:
->> + *
->> + * - %LANDLOCK_ACCESS_NET_BIND_TCP: Bind a TCP socket to a local port.
->> + * - %LANDLOCK_ACCESS_NET_CONNECT_TCP: Connect an active TCP socket to
->> + *   a remote port.
->> + */
->> +/* clang-format off */
->> +#define LANDLOCK_ACCESS_NET_BIND_TCP			(1ULL << 0)
->> +#define LANDLOCK_ACCESS_NET_CONNECT_TCP			(1ULL << 1)
->> +/* clang-format on */
->>   #endif /* _UAPI_LINUX_LANDLOCK_H */
->> diff --git a/security/landlock/Kconfig b/security/landlock/Kconfig
->> index 8e33c4e8ffb8..10c099097533 100644
->> --- a/security/landlock/Kconfig
->> +++ b/security/landlock/Kconfig
->> @@ -3,6 +3,7 @@
->>   config SECURITY_LANDLOCK
->>   	bool "Landlock support"
->>   	depends on SECURITY && !ARCH_EPHEMERAL_INODES
->> +	select SECURITY_NETWORK
->>   	select SECURITY_PATH
->>   	help
->>   	  Landlock is a sandboxing mechanism that enables processes to restrict
->> diff --git a/security/landlock/Makefile b/security/landlock/Makefile
->> index 7bbd2f413b3e..53d3c92ae22e 100644
->> --- a/security/landlock/Makefile
->> +++ b/security/landlock/Makefile
->> @@ -2,3 +2,5 @@ obj-$(CONFIG_SECURITY_LANDLOCK) := landlock.o
->> 
->>   landlock-y := setup.o syscalls.o object.o ruleset.o \
->>   	cred.o ptrace.o fs.o
->> +
->> +landlock-$(CONFIG_INET) += net.o
->> \ No newline at end of file
->> diff --git a/security/landlock/limits.h b/security/landlock/limits.h
->> index bafb3b8dc677..8a1a6463c64e 100644
->> --- a/security/landlock/limits.h
->> +++ b/security/landlock/limits.h
->> @@ -23,6 +23,10 @@
->>   #define LANDLOCK_NUM_ACCESS_FS		__const_hweight64(LANDLOCK_MASK_ACCESS_FS)
->>   #define LANDLOCK_SHIFT_ACCESS_FS	0
->> 
->> -/* clang-format on */
->> +#define LANDLOCK_LAST_ACCESS_NET	LANDLOCK_ACCESS_NET_CONNECT_TCP
->> +#define LANDLOCK_MASK_ACCESS_NET	((LANDLOCK_LAST_ACCESS_NET << 1) - 1)
->> +#define LANDLOCK_NUM_ACCESS_NET		__const_hweight64(LANDLOCK_MASK_ACCESS_NET)
->> +#define LANDLOCK_SHIFT_ACCESS_NET	LANDLOCK_NUM_ACCESS_FS
->> 
->> +/* clang-format on */
-> 
-> Please the empty line to make this patch clean.
-
-  Ok. I will.
-> 
-> 
->>   #endif /* _SECURITY_LANDLOCK_LIMITS_H */
->> diff --git a/security/landlock/net.c b/security/landlock/net.c
->> new file mode 100644
->> index 000000000000..f8d2be53ac0d
->> --- /dev/null
->> +++ b/security/landlock/net.c
->> @@ -0,0 +1,174 @@
->> +// SPDX-License-Identifier: GPL-2.0-only
->> +/*
->> + * Landlock LSM - Network management and hooks
->> + *
->> + * Copyright © 2022 Huawei Tech. Co., Ltd.
->> + * Copyright © 2022 Microsoft Corporation
->> + */
->> +
->> +#include <linux/in.h>
->> +#include <linux/net.h>
->> +#include <linux/socket.h>
->> +#include <net/ipv6.h>
->> +
->> +#include "common.h"
->> +#include "cred.h"
->> +#include "limits.h"
->> +#include "net.h"
->> +#include "ruleset.h"
->> +
->> +int landlock_append_net_rule(struct landlock_ruleset *const ruleset,
->> +			     const u16 port, access_mask_t access_rights)
->> +{
->> +	int err;
->> +	const struct landlock_id id = {
->> +		.key.data = (__force uintptr_t)htons(port),
->> +		.type = LANDLOCK_KEY_NET_PORT,
->> +	};
->> +
->> +	BUILD_BUG_ON(sizeof(port) > sizeof(id.key.data));
->> +
->> +	/* Transforms relative access rights to absolute ones. */
->> +	access_rights |= LANDLOCK_MASK_ACCESS_NET &
->> +			 ~landlock_get_net_access_mask(ruleset, 0);
->> +
->> +	mutex_lock(&ruleset->lock);
->> +	err = landlock_insert_rule(ruleset, id, access_rights);
->> +	mutex_unlock(&ruleset->lock);
->> +
->> +	return err;
->> +}
->> +
->> +static access_mask_t
->> +get_raw_handled_net_accesses(const struct landlock_ruleset *const domain)
->> +{
->> +	access_mask_t access_dom = 0;
->> +	size_t layer_level;
->> +
->> +	for (layer_level = 0; layer_level < domain->num_layers; layer_level++)
->> +		access_dom |= landlock_get_net_access_mask(domain, layer_level);
->> +	return access_dom;
->> +}
->> +
->> +static const struct landlock_ruleset *get_current_net_domain(void)
->> +{
->> +	const struct landlock_ruleset *const dom =
->> +		landlock_get_current_domain();
->> +
->> +	if (!dom || !get_raw_handled_net_accesses(dom))
->> +		return NULL;
->> +
->> +	return dom;
->> +}
->> +
->> +static int check_socket_access(struct socket *const sock,
->> +			       struct sockaddr *const address,
->> +			       const int addrlen,
->> +			       const access_mask_t access_request)
->> +{
->> +	__be16 port;
->> +	layer_mask_t layer_masks[LANDLOCK_NUM_ACCESS_NET] = {};
->> +	const struct landlock_rule *rule;
->> +	access_mask_t handled_access;
->> +	struct landlock_id id = {
->> +		.type = LANDLOCK_KEY_NET_PORT,
->> +	};
->> +	const struct landlock_ruleset *const domain = get_current_net_domain();
->> +
->> +	if (WARN_ON_ONCE(!domain))
-> 
-> The WARN_ON_ONCE() needs to be removed for processes not sandboxed. This
-> should be printed when running the tests.
-> 
-  Probably during the boot stage it prints once since no process is
-  landlocked at this stage.
-  So we need to leave it like this:
-	if (!domain)
-         	return 0;
-   ????
-> 
-> 
->> +		return 0;
->> +	if (WARN_ON_ONCE(domain->num_layers < 1))
->> +		return -EACCES;
->> +
->> +	/* Checks if it's a TCP socket. */
->> +	if (sock->type != SOCK_STREAM)
->> +		return 0;
->> +
->> +	/* Checks for minimal header length. */
->> +	if (addrlen < offsetofend(struct sockaddr, sa_family))
-> 
-> You can use "typeof(*address)" instead of struct sockaddr, this makes it
-> easier to review.
-> 
-   Do mean to change offsetofend() by typeof(*address)??
-> 
->> +		return -EINVAL;
->> +
-> 
-> [...]
-> .
 
