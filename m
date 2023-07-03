@@ -1,132 +1,136 @@
-Return-Path: <netdev+bounces-15031-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15032-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7D0C5745591
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:45:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D083A7455CA
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:14:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4B9911C20510
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 06:45:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 612AA280C91
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 07:14:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3A6A536E;
-	Mon,  3 Jul 2023 06:45:11 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B3AC819;
+	Mon,  3 Jul 2023 07:14:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26747803
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 06:45:09 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 224AFCD
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 23:45:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688366699;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=ovluAHTmtFvydqG5OYZ6GVGeRDsdOvDwQZe/fLVcLSo=;
-	b=PiKIt3UUtdh9SKfsUFd3OdUxoUgcBdbJXWDUac3NH1zd2eYkmx+0xPnoPzPgXRIfEEEOW0
-	+jZxhEUvEfGSPnYiOYWY6VRPs1dX9LEuDjL6wnTm0g3ES3Cd2hab4j5f4b9ySx9On8oAAA
-	jzs7DbF7ijtwAysEK+CTBh4zMfJ720E=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-295-rUSzkYxQNPCl6c4dyFY7TQ-1; Mon, 03 Jul 2023 02:44:58 -0400
-X-MC-Unique: rUSzkYxQNPCl6c4dyFY7TQ-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b69e0a9cc9so33100231fa.0
-        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 23:44:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F91E803
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 07:14:19 +0000 (UTC)
+Received: from mail-pl1-f205.google.com (mail-pl1-f205.google.com [209.85.214.205])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B08C5CC
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 00:14:17 -0700 (PDT)
+Received: by mail-pl1-f205.google.com with SMTP id d9443c01a7336-1b895a9f4ccso7555755ad.2
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 00:14:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688366696; x=1690958696;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ovluAHTmtFvydqG5OYZ6GVGeRDsdOvDwQZe/fLVcLSo=;
-        b=AY8/10HGiqLRTIdR0tShJvw3R/03XvYwQs7VdDdsXDpk6+uCmNNWwMm6VjOTCd6Ab7
-         0eLzvP22qFZthmRwER2g1pSYWZsDCAaN/SEFp39pgeROYG0sJjEUMUD2yViFfgQCJ12F
-         oEvZrVoIVPNFKqKhHtAXk7r7FECagQkQ65OqF1MuBilLNMAFvNoE6zn8ackMZ+ct4DwH
-         hjrRtLPLKqB9V/3Pq5E0TcXkGm+Ty9aEk/R7JisT28WyCo13cI+wU9h/xG56KSuGtP88
-         WMZB8I7pDJn70kWpldZgwR6vnGG5kWjipbupAYsmKCp3aNEogKAHtKAjREtElahqixF5
-         c1dQ==
-X-Gm-Message-State: ABy/qLaky8e5D8xocXyxcjo5XkYFuq9c0Gr8migqAyB2l+5UskEuDl57
-	F+WdFRfuFpbswQUssz1/YcwOiJk2M817X5Ka26b6Kk/quNZntg5PAHh6BuI+d7rJ0mgOPJXSUqW
-	a1F2/hza+qMvO4hCEdEkgd9A4ALMWu0Nd
-X-Received: by 2002:a2e:910c:0:b0:2b6:a22f:9fb9 with SMTP id m12-20020a2e910c000000b002b6a22f9fb9mr6009893ljg.27.1688366696673;
-        Sun, 02 Jul 2023 23:44:56 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHlynqGGlx9Jhthcs4p2/VB3UnNVeBKpKxmHTXOyGfI54rO4NRmFnzaCGXKfgksJmq0cNXrTsUIyES6jnl+V9A=
-X-Received: by 2002:a2e:910c:0:b0:2b6:a22f:9fb9 with SMTP id
- m12-20020a2e910c000000b002b6a22f9fb9mr6009887ljg.27.1688366696399; Sun, 02
- Jul 2023 23:44:56 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688368457; x=1690960457;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=FiushiSfg6f9PKpxdTF+RiXQTOLM60T0zS1Udr4o8yA=;
+        b=daUPfrDAalvOGieyB4I5HjkQCZlh4Hi5VzTQpyYMyJWLEf7ieAZGmyITMC7CZL4iM5
+         FWtx3pEYTcCYGX2K1Cl/YqTgahoTOR9YLCn3oOcmL8CMVWdjYTbLxVwTjwzmQgntE/Ej
+         p7h9pM66oa+0Xl39fJVQZ7DqvRUtn+ggrjqOldaZgqk1lWac+uEtBCI/LrtXU1Bsen6c
+         ZVrowqdmNYBSZff6sEbw5UeHasYCSFnCJEsU4myz/IE4Oc8cNPQC9ragvQlo+eoegXX2
+         /0DDaHcSIi5QBqCmCSqSNKC4SMtTh4LcEgM0GyDKNiKpNb5s5VfJ32McIqspvrORiuyG
+         kd9w==
+X-Gm-Message-State: ABy/qLY3VjVdbQTzeN3lULUp/Lmw7JXdXOTeRLwINEO1ON0rMWi3Oteb
+	TfpYGmoSltKGB6KtkSOlQZkPGpstpEe/b7Zpm9e/3wFAj3ve
+X-Google-Smtp-Source: APBJJlE8iI+mnF0+rk8ncXvJoianUpb+0iOKs4AHlJw840u+vHHx1cGSy9kO6Yu2ghFzy5lQAcT8p2HVnAoYixfzXZkegu/rmvqV
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230627113652.65283-1-maxime.coquelin@redhat.com> <20230702093530-mutt-send-email-mst@kernel.org>
-In-Reply-To: <20230702093530-mutt-send-email-mst@kernel.org>
-From: Jason Wang <jasowang@redhat.com>
-Date: Mon, 3 Jul 2023 14:44:45 +0800
-Message-ID: <CACGkMEtoW0nW8w6_Ew8qckjvpNGN_idwpU3jwsmX6JzbDknmQQ@mail.gmail.com>
-Subject: Re: [PATCH v1 0/2] vduse: add support for networking devices
-To: "Michael S. Tsirkin" <mst@redhat.com>
-Cc: Maxime Coquelin <maxime.coquelin@redhat.com>, xieyongji@bytedance.com, 
-	david.marchand@redhat.com, lulu@redhat.com, linux-kernel@vger.kernel.org, 
-	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
-	xuanzhuo@linux.alibaba.com, eperezma@redhat.com
+X-Received: by 2002:a17:903:2906:b0:1b8:95fc:d18 with SMTP id
+ lh6-20020a170903290600b001b895fc0d18mr1569876plb.8.1688368457213; Mon, 03 Jul
+ 2023 00:14:17 -0700 (PDT)
+Date: Mon, 03 Jul 2023 00:14:17 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000246c3f05ff8fea48@google.com>
+Subject: [syzbot] [kernel?] bpf-next test error: UBSAN: array-index-out-of-bounds
+ in alloc_pid
+From: syzbot <syzbot+319a9b09e5de1ecae1e1@syzkaller.appspotmail.com>
+To: ast@kernel.org, brauner@kernel.org, daniel@iogearbox.net, 
+	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
+	syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sun, Jul 2, 2023 at 9:37=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
-wrote:
->
-> On Tue, Jun 27, 2023 at 01:36:50PM +0200, Maxime Coquelin wrote:
-> > This small series enables virtio-net device type in VDUSE.
-> > With it, basic operation have been tested, both with
-> > virtio-vdpa and vhost-vdpa using DPDK Vhost library series
-> > adding VDUSE support using split rings layout (merged in
-> > DPDK v23.07-rc1).
-> >
-> > Control queue support (and so multiqueue) has also been
-> > tested, but requires a Kernel series from Jason Wang
-> > relaxing control queue polling [1] to function reliably.
-> >
-> > [1]: https://lore.kernel.org/lkml/CACGkMEtgrxN3PPwsDo4oOsnsSLJfEmBEZ0Wv=
-jGRr3whU+QasUg@mail.gmail.com/T/
->
-> Jason promised to post a new version of that patch.
-> Right Jason?
+Hello,
 
-Yes.
+syzbot found the following issue on:
 
-> For now let's make sure CVQ feature flag is off?
+HEAD commit:    c20f9cef725b Merge branch 'libbpf: add netfilter link atta..
+git tree:       bpf-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=127adbfb280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=924167e3666ff54c
+dashboard link: https://syzkaller.appspot.com/bug?extid=319a9b09e5de1ecae1e1
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-We can do that and relax on top of my patch.
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/bf9c9608a1e0/disk-c20f9cef.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/3bde4e994bd0/vmlinux-c20f9cef.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/5d80f8634183/bzImage-c20f9cef.xz
 
-Thanks
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+319a9b09e5de1ecae1e1@syzkaller.appspotmail.com
 
->
-> > RFC -> v1 changes:
-> > =3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D=3D
-> > - Fail device init if it does not support VERSION_1 (Jason)
-> >
-> > Maxime Coquelin (2):
-> >   vduse: validate block features only with block devices
-> >   vduse: enable Virtio-net device type
-> >
-> >  drivers/vdpa/vdpa_user/vduse_dev.c | 15 +++++++++++----
-> >  1 file changed, 11 insertions(+), 4 deletions(-)
-> >
-> > --
-> > 2.41.0
->
+================================================================================
+UBSAN: array-index-out-of-bounds in kernel/pid.c:244:15
+index 1 is out of range for type 'upid [1]'
+CPU: 0 PID: 5004 Comm: syz-executor.0 Not tainted 6.4.0-syzkaller-04259-gc20f9cef725b #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x136/0x150 lib/dump_stack.c:106
+ ubsan_epilogue lib/ubsan.c:217 [inline]
+ __ubsan_handle_out_of_bounds+0xd5/0x140 lib/ubsan.c:348
+ alloc_pid+0xbe5/0xdd0 kernel/pid.c:244
+ copy_process+0x4589/0x7620 kernel/fork.c:2519
+ kernel_clone+0xeb/0x890 kernel/fork.c:2911
+ __do_sys_clone+0xba/0x100 kernel/fork.c:3054
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7ff043489fab
+Code: ed 0f 85 60 01 00 00 64 4c 8b 0c 25 10 00 00 00 45 31 c0 4d 8d 91 d0 02 00 00 31 d2 31 f6 bf 11 00 20 01 b8 38 00 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 89 00 00 00 41 89 c5 85 c0 0f 85 90 00 00
+RSP: 002b:00007ffdc29faa70 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
+RAX: ffffffffffffffda RBX: 00007ffdc29fb0c8 RCX: 00007ff043489fab
+RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
+RBP: 0000000000000000 R08: 0000000000000000 R09: 0000555555ae9400
+R10: 0000555555ae96d0 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007ffdc29fab60 R14: 00007ff0435ac9d8 R15: 000000000000000c
+ </TASK>
+================================================================================
 
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
