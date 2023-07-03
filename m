@@ -1,136 +1,158 @@
-Return-Path: <netdev+bounces-15021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15026-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBBCF7454EF
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 07:36:32 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7242974550C
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 07:45:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8529A1C204FA
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 05:36:31 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 694111C2040E
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 05:45:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 69A047F9;
-	Mon,  3 Jul 2023 05:36:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 499687F9;
+	Mon,  3 Jul 2023 05:45:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB647E3
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 05:36:29 +0000 (UTC)
-Received: from mail-pj1-f79.google.com (mail-pj1-f79.google.com [209.85.216.79])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BEC4D2107
-	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 22:36:04 -0700 (PDT)
-Received: by mail-pj1-f79.google.com with SMTP id 98e67ed59e1d1-262e04a6f5aso4012581a91.2
-        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 22:36:04 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 362DD7E3
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 05:45:13 +0000 (UTC)
+Received: from mail-lf1-x133.google.com (mail-lf1-x133.google.com [IPv6:2a00:1450:4864:20::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 35E4690
+	for <netdev@vger.kernel.org>; Sun,  2 Jul 2023 22:45:11 -0700 (PDT)
+Received: by mail-lf1-x133.google.com with SMTP id 2adb3069b0e04-4fba03becc6so4366607e87.0
+        for <netdev@vger.kernel.org>; Sun, 02 Jul 2023 22:45:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688363109; x=1690955109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=k3z7/4iM/dWZrOl5igcoZlxQftKmnq4HcL4Ni+lHR10=;
+        b=qXSjQOWLqP+DJYirpFGi8yHP0CtISotGm4MtQ3LfzUrhVqcjia/zoDM8ACsjiXSQoJ
+         EweXU+DZpyjnAmfw6au6Qxw1yvl7M8vU3SxqZtw5uvGF82uHSiG0EFaHWK7uVOtVpEEi
+         t4hia0Uz9M5tTDJgGTwd3jJF+yVzFFVPwrqd12oEc1WJ6R0q+7ROUIjL3V1Z3Yu+G/Df
+         42NFzv3nfTDjUzyeqixvjfJDU38lZnm01wa/FCv8CA/ol5Bx4vlkLnq2bdvYYRSsWKg4
+         WgFIJhTp4KHEWX9/xJBXwHkl8qvDOmUwl75lcEu1vKlwnF+lHBlTcqsUy/RgZi/YdTxK
+         XySg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688362551; x=1690954551;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=G07eNYXZVQBu1aaWjBImsvGy+41He/VOhgutSbvriqs=;
-        b=Kp7YzItsV6BeqYQphN8vi+NpK7lgzDIj2hI2xZqKjvJOSsPsJwlkVluJHlt0yAGBGU
-         ucEswOwwg1d93/feAvj/nWzC8cEEN6NNz8+TorAolDlfpMh2JqM8TRNZnlNR9FeuN0Bh
-         OdpqS6Dhwd5t/1jLIed+5ckJ7EKsi1PjX/PPHhz8N9UdzPQFKIf9n1lZw2gVX9yV5S+1
-         SuPTnib7GSH1KmKDeSppH309uw9q0GVmJ3x1wSQ0z1ukcb/ivI/wpyxvyBK64Zcrq/Sz
-         f0a6vP1pylpgKczLbml598+WIRaYd8uflm20l7NrTy07DKEyrhAmvfSKvKvfAd208Sic
-         Z1Yw==
-X-Gm-Message-State: ABy/qLZQb4BGCD5j7hOjWU6uncfU2HD6ngY4QGkdaAuMtMYNbM2ZdZvP
-	qvma04XMuGG61MGQB+A0FEy/20eEL1Fm8ro7X6gB9nwjw6B/
-X-Google-Smtp-Source: APBJJlFi+4VVk02P2ZotLw3xKlO56q0sqWSrjFMT7bfm99gBfb7tCcDJ6hpXuI++x7/4JnptX7Yq+dO7KNvs6xX+Ph/YwdOmWRT3
+        d=1e100.net; s=20221208; t=1688363109; x=1690955109;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=k3z7/4iM/dWZrOl5igcoZlxQftKmnq4HcL4Ni+lHR10=;
+        b=N60RoCIQRdjmPZ1vSDUIWewgU1rU5Ri0MPDocatVDliWeTEpRsDwzpZFc19tleHy9/
+         RbrkHuuvHzS/3rQefhpgis5+KBh+9aWO2th35syVyfI7iBPhpWTeTJXkFwqaY441KoPH
+         /3KBXJrDi3BeizZ2Ussiw0VNyk6TT2bn9r9BmfgeqcPe0xhIpGaMP+RxNLij6viPwe0M
+         3k2QSH4wQuewCxSt2D+qlyC5PI34Vm+BuAox7y803fjKStT9Ft35elNDc9tClbsY8hKT
+         RvOseIYyczp/7go0M1FH8fgfN1O7c4EMetP+ZtauSreaobnaoZLUMGqA2LXiOEdutbj3
+         Ju2A==
+X-Gm-Message-State: ABy/qLYOcKw2ENP0PJvDD4vFGXFHMM1WR04en34VT8CMw5is1gRsMaCx
+	MN/zN0UjdJKltJc6Ontcv3hN5VY6+sgS4smg8W/G5jP9IfNLUA==
+X-Google-Smtp-Source: APBJJlHLiMslvnnJLFKK18mOIRMPt8SOP9aaPIRjpMc6HPIy9smioI5N9TwvYovIpwEB+gp3IS/y9OEjoeDZ2RRqrjk=
+X-Received: by 2002:a05:6512:252b:b0:4f8:5e62:b94b with SMTP id
+ be43-20020a056512252b00b004f85e62b94bmr3287404lfb.9.1688363109173; Sun, 02
+ Jul 2023 22:45:09 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:90a:df88:b0:263:39c1:d0b2 with SMTP id
- p8-20020a17090adf8800b0026339c1d0b2mr6719572pjv.5.1688362550867; Sun, 02 Jul
- 2023 22:35:50 -0700 (PDT)
-Date: Sun, 02 Jul 2023 22:35:50 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000018bd0d05ff8e8ab2@google.com>
-Subject: [syzbot] [kernel?] net-next test error: UBSAN: array-index-out-of-bounds
- in alloc_pid
-From: syzbot <syzbot+f02ef87ef8bbb97026bd@syzkaller.appspotmail.com>
-To: brauner@kernel.org, davem@davemloft.net, kuba@kernel.org, 
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
+References: <CABTgHBsEfgr8wQNF-YGR9mWMOb3bSESRdO4YVL+8+V6VA-PVuw@mail.gmail.com>
+ <ZJ1nIzt6IE0DSPKs@shredder> <CABTgHBu24rSvuECSAHRtLj21fzwzWnYpKd5M9uL-z-_tTT0THA@mail.gmail.com>
+ <ZJ24XsOnpKZFna/d@shredder>
+In-Reply-To: <ZJ24XsOnpKZFna/d@shredder>
+From: Nayan Gadre <beejoy.nayan@gmail.com>
+Date: Mon, 3 Jul 2023 11:14:57 +0530
+Message-ID: <CABTgHBvV=dv-W2N7Jxqp3AWqq+XC3majN2oqdd26bBu4WrobHg@mail.gmail.com>
+Subject: Re: Routing in case of GRE interface under a bridge
+To: Ido Schimmel <idosch@idosch.org>
+Cc: netdev@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+On Thu, Jun 29, 2023 at 10:29=E2=80=AFPM Ido Schimmel <idosch@idosch.org> w=
+rote:
+>
+> (Please avoid top-posting).
+>
+> On Thu, Jun 29, 2023 at 09:00:21PM +0530, Nayan Gadre wrote:
+> > Yes, the l2gre0 on System A and System B is a gretap created using
+> > following command
+> >
+> > ip link add l2gre0 type gretap remote 192.168.0.10 local 192.168.0.103
+> >             --> and vice versa on System B.
+> >
+> > On system A, l2gre0 and eth0 are under a bridge br0. l2gre0 does not
+> > have an IP address.
+>
+> That's OK. It's meaningless to assign an IP address to a bridge port.
+>
+> > On system B, l2gre0 is independent but has IP address 10.10.10.1, and
+> > a DHCP server is running on it providing IP to clients connected
+> > through the tunnel.
+> >                       System A
+> >  |                               System B
+> >                                             192.168.0.103            |
+> >                      br0                         br1
+> >     |                        eth0
+> > l2gre0
+> >            eth0           l2gre0            eth1                     |
+> >                   192.168.0.10                        10.10.10.1
+> >
+> > On system A:
+> > / # ip r
+> > default via 192.168.0.10 dev br1.1
+> > 169.254.0.0/16 dev br1.1 proto kernel scope link src 169.254.32.107
+> > 192.168.0.0/24 dev br1.1 proto kernel scope link src 192.168.0.103
+> >
+> > On system B:
+> > ngadre@in01-7h4wrf3:~$ ip r
+> > default via 10.110.234.254 dev eno1 proto dhcp metric 100
+> > 10.10.10.0/24 dev l2gre0 proto kernel scope link src 10.10.10.1
+> > 192.168.0.0/24 dev enp3s0 proto kernel scope link src 192.168.0.10
+> >
+> > As we can see, on System B there is a route pointing at l2gre0.
+> > However, there is no such route on System A. Yet the packet gets
+> > encapsulated
+> > A client connected to eth0 on System A sends packet with destination
+> > 10.10.10.1 (def gateway). So I am guessing l2gre0 receives this packet
+> > since it gets flooded by br0 and even though System A not having a
+> > route to 10.10.10.0/24 it will encapsulate.
+>
+> The overlay IP address is irrelevant. System A does not inspect it, it
+> simply forwards Ethernet frames (based on DMAC) between both bridge
+> ports - eth0 and l2gre0.
+>
+> As to whether it gets flooded or not, it depends on the DMAC of the
+> frame received via eth0 and the FDB of br0. I expect the DMAC to be the
+> MAC of l2gre0 on system B. You can dump the FDB on system A using the
+> following command:
+>
+> # bridge fdb show br br0 | grep master
+>
+> > Is this the behavior in case of a bridged tunnel interface ?.
+>
+> This is the encapsulation flow on system A as I understand it from your
+> data:
+>
+> 1. Ethernet packet is forwarded by br0 from eth0 to l2gre0.
+>
+> 2. l2gre encapsulates the Ethernet packet with
+> {sip=3D192.168.0.103,dip=3D192.168.0.10,ip_proto=3D0x2f,gre (proto=3D0x65=
+58)}
+>
+> 3. Encapsulated packet is routed out of br.1 that has the most specific
+> route of 192.168.0.0/24 towards 192.168.0.10
 
-syzbot found the following issue on:
-
-HEAD commit:    3a8a670eeeaa Merge tag 'net-next-6.5' of git://git.kernel...
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=1391a15f280000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=924167e3666ff54c
-dashboard link: https://syzkaller.appspot.com/bug?extid=f02ef87ef8bbb97026bd
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/580f71d6d107/disk-3a8a670e.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/7d94a5879cd1/vmlinux-3a8a670e.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/4ef3ba2a581e/bzImage-3a8a670e.xz
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+f02ef87ef8bbb97026bd@syzkaller.appspotmail.com
-
-================================================================================
-UBSAN: array-index-out-of-bounds in kernel/pid.c:244:15
-index 1 is out of range for type 'upid [1]'
-CPU: 0 PID: 5002 Comm: syz-executor.0 Not tainted 6.4.0-syzkaller-04247-g3a8a670eeeaa #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-Call Trace:
- <TASK>
- __dump_stack lib/dump_stack.c:88 [inline]
- dump_stack_lvl+0x136/0x150 lib/dump_stack.c:106
- ubsan_epilogue lib/ubsan.c:217 [inline]
- __ubsan_handle_out_of_bounds+0xd5/0x140 lib/ubsan.c:348
- alloc_pid+0xbe5/0xdd0 kernel/pid.c:244
- copy_process+0x4589/0x7620 kernel/fork.c:2519
- kernel_clone+0xeb/0x890 kernel/fork.c:2911
- __do_sys_clone+0xba/0x100 kernel/fork.c:3054
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f8d13e89fab
-Code: ed 0f 85 60 01 00 00 64 4c 8b 0c 25 10 00 00 00 45 31 c0 4d 8d 91 d0 02 00 00 31 d2 31 f6 bf 11 00 20 01 b8 38 00 00 00 0f 05 <48> 3d 00 f0 ff ff 0f 87 89 00 00 00 41 89 c5 85 c0 0f 85 90 00 00
-RSP: 002b:00007ffd13d711a0 EFLAGS: 00000246 ORIG_RAX: 0000000000000038
-RAX: ffffffffffffffda RBX: 00007ffd13d717f8 RCX: 00007f8d13e89fab
-RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000001200011
-RBP: 0000000000000000 R08: 0000000000000000 R09: 00005555557cb400
-R10: 00005555557cb6d0 R11: 0000000000000246 R12: 0000000000000000
-R13: 00007ffd13d71290 R14: 00007f8d13fac9d8 R15: 000000000000000c
- </TASK>
-================================================================================
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+Ok, so packet is forwarded from eth0 to l2gre0, and it would be internally
+(by the kernel "br_flood/br_forward") pushed on the l2gre0 transmit
+path via  "ipgre_xmit"
 
