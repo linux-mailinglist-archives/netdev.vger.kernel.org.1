@@ -1,118 +1,131 @@
-Return-Path: <netdev+bounces-15077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15078-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2DFA2745820
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 11:13:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 00FB3745834
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 11:17:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3FBC41C20902
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:13:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DE74280CE6
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 09:17:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1506520F5;
-	Mon,  3 Jul 2023 09:13:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DA95C2100;
+	Mon,  3 Jul 2023 09:17:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C771371
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 09:13:04 +0000 (UTC)
-Received: from mail-lj1-x22e.google.com (mail-lj1-x22e.google.com [IPv6:2a00:1450:4864:20::22e])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 387D912E
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 02:13:00 -0700 (PDT)
-Received: by mail-lj1-x22e.google.com with SMTP id 38308e7fff4ca-2b69ea3b29fso65762711fa.3
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 02:13:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688375579; x=1690967579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iZrwT1Q3TAFyAuNKoN7EOZ5Cv2Yr0/LJBy2LmWg9cbY=;
-        b=EENhMT6+gEKiVaKV6FC/2yp1vEbMfTtLXmOFgN/Os0u/ruBReeC5uoDwsHyPDJhDtC
-         oS5GN0MeMDBVypbluHs9nePvDk9Cptz6TyxqSEWXy96cri6YPPRpXWYZ7PXRcjeMVCXU
-         UOUNQ6X/5tOzi04ElvfOzn1VWQFq6nS1S0ENw0hxu2ZA0WtvwdkLF/5oUFoLMex3bkG6
-         ccjfAOVBOHORjce0Vls88I0j+uL+lwLKDkdK8gnySPjIW+txSOi6bIZm/jlWVv5NNz5w
-         lJnCFr6V822R9Kwsg41Arp3XnEoPiBE7qh+Lh4kBKScSQ1YrqKTsBiHQE/6rIxwBHxpw
-         8C8w==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688375579; x=1690967579;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=iZrwT1Q3TAFyAuNKoN7EOZ5Cv2Yr0/LJBy2LmWg9cbY=;
-        b=JmQbdh9Glp33h+PvXYyCUBgoSN8RqEjl3/Z4SiGEi8W9C0CeLWmLgbiB5QoKwm9GIz
-         y5dY1x0MQkoSaJ9UmNOpFYEWf4HQ6GM3m/Z2+lgcu0CeibVlIu7uLP3xtn6uL2ozZZdv
-         OyDLwFa2fry3lKudNt8yyMHNpOsMOk7rDr/BJTH4FiTXAmF519YYDPsQHAfpco7RApZ3
-         pU+xv3V9pfVPsIZdkvldgebrPRG4NwpZEtvNsqONlqBe1iT/i2wI4Ci7BODKzE8MiEvB
-         O8RbcBZXaFEotGHG1yxZsb2W9PMsmoDQN8iKsbB4+eFD99B7IbZABl5YruFqMFaayKWG
-         A5/g==
-X-Gm-Message-State: ABy/qLZIyLGH/y+fFT9AkkN1ESb5ztOfUTGSAqK9rm9RbjjTZNs2ToWX
-	Md8LTSoSdFog4rxvb2E7rAQ9ao1jm1xkmeRrLgo=
-X-Google-Smtp-Source: APBJJlGiEIhuJWt9PkvquGJt1MeSXSJ7AVLRpXeD7L74gidR7Vr6TrY9v5r7VDPsblXIIHB68Qf9dorTg7RA+F2qXsM=
-X-Received: by 2002:a2e:9b07:0:b0:2b6:c405:f249 with SMTP id
- u7-20020a2e9b07000000b002b6c405f249mr5546164lji.1.1688375578667; Mon, 03 Jul
- 2023 02:12:58 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CB66120F7
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 09:17:52 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 564B7196;
+	Mon,  3 Jul 2023 02:17:24 -0700 (PDT)
+Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
+	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 362MwtIu021364;
+	Mon, 3 Jul 2023 02:17:11 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=tng00Oazf4CgQOGORPO+mNe41nQGiNWoJB3wfyGLgAg=;
+ b=A/Kj/5kapjjUryyVbL6tcJgFbd1y7ojGWJq9juuQozD4Jm07ciPVguEXwVO6P+qOqXFI
+ nF0ZbSpovUyCN7IE+oVSin9Esc9UtNgbEoafp2BqZjdemSnzkMzKTdsqVmYS4qliJ/7d
+ BaWuFQ8KHX37A2qfZ0mnRsLFCYQR8C92b03bDWFhXSGhxKZ0Mr0wHa4yb4LEbVB97lam
+ qdf7X91YeOxOBgjp/x++IIxi50Q1J0h4SWAMHzAp/HTapOrNMNEvmaFUEtAzejUJnibU
+ t/pOEzE9oVKy7PP+iaLSbxk0TGtQkwKF+YZ89e/EA3k5an5tzVTXSj220Ecc+CM4s+pf DA== 
+Received: from dc5-exch01.marvell.com ([199.233.59.181])
+	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rjhgnd0e9-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Mon, 03 Jul 2023 02:17:11 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
+ (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Mon, 3 Jul
+ 2023 02:17:09 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Mon, 3 Jul 2023 02:17:09 -0700
+Received: from localhost.localdomain (unknown [10.28.36.166])
+	by maili.marvell.com (Postfix) with ESMTP id C1B033F7067;
+	Mon,  3 Jul 2023 02:17:06 -0700 (PDT)
+From: Suman Ghosh <sumang@marvell.com>
+To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+        <linux-kernel@vger.kernel.org>
+CC: Suman Ghosh <sumang@marvell.com>
+Subject: [PATCH] octeontx2-pf: Add additional check for MCAM rules.
+Date: Mon, 3 Jul 2023 14:47:03 +0530
+Message-ID: <20230703091703.2003373-1-sumang@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230628121150.47778-1-liangchen.linux@gmail.com> <20230630160709.45ea4faa@kernel.org>
-In-Reply-To: <20230630160709.45ea4faa@kernel.org>
-From: Liang Chen <liangchen.linux@gmail.com>
-Date: Mon, 3 Jul 2023 17:12:46 +0800
-Message-ID: <CAKhg4t+hoOiVWMbBiD7HCu_Z5pSdCsZrev2FMEKhbWvzgHCarw@mail.gmail.com>
-Subject: Re: [PATCH net-next] skbuff: Optimize SKB coalescing for page pool case
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: ilias.apalodimas@linaro.org, hawk@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, pabeni@redhat.com, linyunsheng@huawei.com, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-ORIG-GUID: 3O2s120SbcD4h8XbK1zD6A-_jKFJ1oov
+X-Proofpoint-GUID: 3O2s120SbcD4h8XbK1zD6A-_jKFJ1oov
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-03_07,2023-06-30_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 1, 2023 at 7:07=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wro=
-te:
->
-> On Wed, 28 Jun 2023 20:11:50 +0800 Liang Chen wrote:
-> > +static inline void page_pool_page_ref(struct page *page)
-> > +{
-> > +     struct page *head_page =3D compound_head(page);
-> > +
-> > +     if (page_pool_is_pp_page(head_page) &&
-> > +                     page_pool_is_pp_page_frag(head_page))
-> > +             atomic_long_inc(&head_page->pp_frag_count);
-> > +     else
-> > +             get_page(head_page);
->
-> AFAICT this is not correct, you cannot take an extra *pp* reference
-> on a pp page, unless it is a frag. If the @to skb is a pp skb (and it
-> must be, if we get here) we will have two skbs with pp_recycle =3D 1.
-> Which means if they both get freed at the same time they will both
-> try to return / release the page.
->
-> I haven't looked at Yunsheng's v5 yet, but that's why I was asking
-> to rename the pp_frag_count to pp_ref_count. pp_frag_count is a true
-> refcount (rather than skb->pp_recycle acting as a poor man's single
-> shot refcount), so in case of frag'd pages / after Yunsheng's work
-> we will be able to take new refs.
->
-> Long story short please wait until Yunsheng's changes are finalized.
+MCAM drop rule with ether_type==802.1Q and vlan_id==0 is not supported.
 
-Sure, thanks for the information. I will wait until Yunsheng's changes
-are finalized before proposing v2.
+Signed-off-by: Suman Ghosh <sumang@marvell.com>
+---
+ .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c |  7 +++++++
+ .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
+ 2 files changed, 20 insertions(+)
 
-As for the "pp" reference, it has the test
-page_pool_is_pp_page_frag(head_page) there. So for a non-frag pp page,
-it will be a get_page call.
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+index 10e11262d48a..49ba27875111 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
+@@ -871,6 +871,13 @@ static int otx2_prepare_flow_request(struct ethtool_rx_flow_spec *fsp,
+ 			if (be16_to_cpu(fsp->m_ext.vlan_etype) != 0xFFFF)
+ 				return -EINVAL;
+ 
++			/* Drop rule with vlan_etype == 802.1Q
++			 * and vlan_id == 0 is not supported
++			 */
++			if (vlan_etype == ETH_P_8021Q && !fsp->m_ext.vlan_tci &&
++			    fsp->ring_cookie == RX_CLS_FLOW_DISC)
++				return -EINVAL;
++
+ 			vlan_etype = be16_to_cpu(fsp->h_ext.vlan_etype);
+ 			/* Only ETH_P_8021Q and ETH_P_802AD types supported */
+ 			if (vlan_etype != ETH_P_8021Q &&
+diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+index 044cc211424e..6c0fdc2bad73 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
++++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+@@ -604,6 +604,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+ 			return -EOPNOTSUPP;
+ 		}
+ 
++		if (!match.mask->vlan_id) {
++			struct flow_action_entry *act;
++			int i;
++
++			flow_action_for_each(i, act, &rule->action) {
++				if (act->id == FLOW_ACTION_DROP) {
++					netdev_err(nic->netdev, "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
++						   ntohs(match.key->vlan_tpid), match.key->vlan_id);
++					return -EOPNOTSUPP;
++				}
++			}
++		}
++
+ 		if (match.mask->vlan_id ||
+ 		    match.mask->vlan_dei ||
+ 		    match.mask->vlan_priority) {
+-- 
+2.25.1
 
-Thanks,
-Liang
 
