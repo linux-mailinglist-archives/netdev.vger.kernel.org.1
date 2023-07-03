@@ -1,74 +1,81 @@
-Return-Path: <netdev+bounces-15202-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15203-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CAB47461B0
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 19:59:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D375E7461FA
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 20:17:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C92AD1C209E6
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:59:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8E318280E61
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 18:17:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCAC8107BE;
-	Mon,  3 Jul 2023 17:59:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A241B10956;
+	Mon,  3 Jul 2023 18:17:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D086C10941
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:59:00 +0000 (UTC)
-Received: from mail-il1-x132.google.com (mail-il1-x132.google.com [IPv6:2607:f8b0:4864:20::132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B4BF0E66;
-	Mon,  3 Jul 2023 10:58:53 -0700 (PDT)
-Received: by mail-il1-x132.google.com with SMTP id e9e14a558f8ab-345a31bda6cso25663825ab.1;
-        Mon, 03 Jul 2023 10:58:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688407133; x=1690999133;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=dLDpvUuDt1pSQ6XZf1EhYr02Va2+zEjOqRg+3qDMtro=;
-        b=hDaAixqAKj4dk/htPLAEJ9KdQiPhKmUvD0Hp88xsn8w62ORQttwJNDpAwL2akcx256
-         TdMTM8A9KAdpHCrqLkqJnmh0bKaXw2k1YSR28Jllu6HTZKBRT2tsCfIOdpwmRfJkL3nK
-         7h8lCVboOp8QxR5DeBBVLyPQ0aUt0LUNhy6LM5DuwU9RTyLkwAOrMUu8xPfX0rs8soeN
-         DJgcgAj7DCX5iIANJmD4NJgv7lJSU1VD4u/8zgTji2fGy5YhnKx3g6f1N0MDZLg+Nl6L
-         jnFYLbLCs9M9PUT7wGm/qEvuxpNGTL/DZRT49qinLaFulfQfgvV/E9jiz9Rbz15P7VYY
-         S/pw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688407133; x=1690999133;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=dLDpvUuDt1pSQ6XZf1EhYr02Va2+zEjOqRg+3qDMtro=;
-        b=fWFA5AwswwCr5mlrROs4549r10VUO/sdry4oap4rSPu0ZiI5K2wZUOewO7uxcMMK4e
-         Vbw29xeLf7pF4yDHLVfReAk1gLL27ipLlrqp0/E0T36B9sMZ3yktJJmfg4biq0hvBMrt
-         EX6I7nUlfYlCKB4Pxhy4XBIq4tyZyCg7KeoVteMZzVI1Khtec74sf03yVeBLi99nIZ7g
-         BtvtYnTHNPg2C5cOxiGwYig5bFLHmqbQ91piSufCTQEBorkw77Lx3OXg0nFxUESYvsAK
-         mZJ5kbJtx/W/lVfCM35Jbn9fivsN1/h1iLoudyIWw4AqyCm488KP2a/4lfwc2AAUBonx
-         a4xA==
-X-Gm-Message-State: ABy/qLbQo6ZIxIKQLhR8H9C9pvoIqsajswSLBqdrLjYXvy/sd5JxBuwE
-	0DQktMHLmZ3OBP2oJWb/aXo=
-X-Google-Smtp-Source: APBJJlFfacAGKjTvY0YAohkxmzRehPWyKSU/NiK6UBBNJFnogIMmYKWfcRujyiXL1/QU+n/0RG/A1g==
-X-Received: by 2002:a92:d4c4:0:b0:340:b569:aec1 with SMTP id o4-20020a92d4c4000000b00340b569aec1mr10747253ilm.28.1688407132993;
-        Mon, 03 Jul 2023 10:58:52 -0700 (PDT)
-Received: from azeems-kspp.c.googlers.com.com (54.70.188.35.bc.googleusercontent.com. [35.188.70.54])
-        by smtp.gmail.com with ESMTPSA id e5-20020a92d745000000b003424b3d6d37sm7004198ilq.24.2023.07.03.10.58.52
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 10:58:52 -0700 (PDT)
-From: Azeem Shaikh <azeemshaikh38@gmail.com>
-To: "David S. Miller" <davem@davemloft.net>
-Cc: linux-hardening@vger.kernel.org,
-	Azeem Shaikh <azeemshaikh38@gmail.com>,
-	linux-trace-kernel@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	David Ahern <dsahern@kernel.org>,
-	Steven Rostedt <rostedt@goodmis.org>,
-	Kees Cook <keescook@chromium.org>,
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C2F1100DD;
+	Mon,  3 Jul 2023 18:17:10 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 575BCE60;
+	Mon,  3 Jul 2023 11:16:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688408200; x=1719944200;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=8LOkKCUf/lCFx2H2v1v9sFUPEOVkpb3UN6V5E13pSJU=;
+  b=D2dYySY2/5/SWDKTA3B7llT25gjn+dycvEXsyPSqVsaX0F8DZV6ThcQ0
+   JRAlznLcTgDO8h7Cx8tsPLw+iJWXclAuVmcS8l0Q/ie6EpKbIuGKUP21S
+   eS130EwXwigSqQFxdBJcoJespuxJEZ35SEtQTsNZJIwkoj+oIB/3MXMqU
+   0iRv0ayqA1MycWvF1upbyhKMXMEee8kqoi0oH3eIrsq6Z9uR5XUC8NpsM
+   B7KxiTw9h1XFb+wEH+ecd6eFzX/llJRFFsW6gHct+fWOg2FJ13a86mfrk
+   lsz072X7qLqGJMTdygGVkFceDnSjgIicUq8AeAO4YwvN/C2US1yTtl0tI
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="428982844"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="428982844"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 11:16:33 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="753816380"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="753816380"
+Received: from irvmail002.ir.intel.com ([10.43.11.120])
+  by orsmga001.jf.intel.com with ESMTP; 03 Jul 2023 11:16:28 -0700
+Received: from lincoln.igk.intel.com (lincoln.igk.intel.com [10.102.21.235])
+	by irvmail002.ir.intel.com (Postfix) with ESMTP id 6F16B35803;
+	Mon,  3 Jul 2023 19:16:26 +0100 (IST)
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: bpf@vger.kernel.org
+Cc: Larysa Zaremba <larysa.zaremba@intel.com>,
+	ast@kernel.org,
+	daniel@iogearbox.net,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yhs@fb.com,
+	john.fastabend@gmail.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	David Ahern <dsahern@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Willem de Bruijn <willemb@google.com>,
+	Jesper Dangaard Brouer <brouer@redhat.com>,
+	Anatoly Burakov <anatoly.burakov@intel.com>,
+	Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>,
+	Maryam Tahhan <mtahhan@redhat.com>,
+	xdp-hints@xdp-project.net,
 	netdev@vger.kernel.org
-Subject: [PATCH] net: Replace strlcpy with strscpy
-Date: Mon,  3 Jul 2023 17:58:40 +0000
-Message-ID: <20230703175840.3706231-1-azeemshaikh38@gmail.com>
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
+Subject: [PATCH bpf-next v2 00/20] XDP metadata via kfuncs for ice
+Date: Mon,  3 Jul 2023 20:12:06 +0200
+Message-ID: <20230703181226.19380-1-larysa.zaremba@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -76,58 +83,99 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-strlcpy() reads the entire source buffer first.
-This read may exceed the destination size limit.
-This is both inefficient and can lead to linear read
-overflows if a source string is not NUL-terminated [1].
-In an effort to remove strlcpy() completely [2], replace
-strlcpy() here with strscpy().
-No return values were used, so direct replacement is safe.
+This series introduces XDP hints via kfuncs [0] to the ice driver.
 
-[1] https://www.kernel.org/doc/html/latest/process/deprecated.html#strlcpy
-[2] https://github.com/KSPP/linux/issues/89
+Series brings the following existing hints to the ice driver:
+ - HW timestamp
+ - RX hash with type
 
-Signed-off-by: Azeem Shaikh <azeemshaikh38@gmail.com>
----
- include/trace/events/fib.h  |    2 +-
- include/trace/events/fib6.h |    2 +-
- 2 files changed, 2 insertions(+), 2 deletions(-)
+Series also introduces new hints and adds their implementation
+to ice and veth:
+ - VLAN tag with protocol
+ - Checksum level
 
-diff --git a/include/trace/events/fib.h b/include/trace/events/fib.h
-index 76297ecd4935..20b914250ce9 100644
---- a/include/trace/events/fib.h
-+++ b/include/trace/events/fib.h
-@@ -65,7 +65,7 @@ TRACE_EVENT(fib_table_lookup,
- 		}
- 
- 		dev = nhc ? nhc->nhc_dev : NULL;
--		strlcpy(__entry->name, dev ? dev->name : "-", IFNAMSIZ);
-+		strscpy(__entry->name, dev ? dev->name : "-", IFNAMSIZ);
- 
- 		if (nhc) {
- 			if (nhc->nhc_gw_family == AF_INET) {
-diff --git a/include/trace/events/fib6.h b/include/trace/events/fib6.h
-index 4d3e607b3cde..5d7ee2610728 100644
---- a/include/trace/events/fib6.h
-+++ b/include/trace/events/fib6.h
-@@ -63,7 +63,7 @@ TRACE_EVENT(fib6_table_lookup,
- 		}
- 
- 		if (res->nh && res->nh->fib_nh_dev) {
--			strlcpy(__entry->name, res->nh->fib_nh_dev->name, IFNAMSIZ);
-+			strscpy(__entry->name, res->nh->fib_nh_dev->name, IFNAMSIZ);
- 		} else {
- 			strcpy(__entry->name, "-");
- 		}
+The data above can now be accessed by XDP and userspace (AF_XDP) programs.
+They can also be checked with xdp_metadata test and xdp_hw_metadata program.
+
+[0] https://patchwork.kernel.org/project/netdevbpf/cover/20230119221536.3349901-1-sdf@google.com/
+
+v1:
+https://lore.kernel.org/all/20230512152607.992209-1-larysa.zaremba@intel.com/
+
+Changes since v1:
+- directly return RX hash, RX timestamp and RX checksum status
+  in skb-common functions
+- use intermediate enum value for checksum status in ice
+- get rid of ring structure dependency in ice kfunc implementation
+- make variables const, when possible, in ice implementation
+- use -ENODATA instead of -EOPNOTSUPP for driver implementation
+- instead of having 2 separate functions for c-tag and s-tag,
+  use 1 function that outputs both VLAN tag and protocol ID
+- improve documentation for introduced hints
+- update xdp_metadata selftest to test new hints
+- implement new hints in veth, so they can be tested in xdp_metadata
+- parse VLAN tag in xdp_hw_metadata
+
+Aleksander Lobakin (1):
+  net, xdp: allow metadata > 32
+
+Larysa Zaremba (19):
+  ice: make RX hash reading code more reusable
+  ice: make RX HW timestamp reading code more reusable
+  ice: make RX checksum checking code more reusable
+  ice: Make ptype internal to descriptor info processing
+  ice: Introduce ice_xdp_buff
+  ice: Support HW timestamp hint
+  ice: Support RX hash XDP hint
+  ice: Support XDP hints in AF_XDP ZC mode
+  xdp: Add VLAN tag hint
+  ice: Implement VLAN tag hint
+  ice: use VLAN proto from ring packet context in skb path
+  xdp: Add checksum level hint
+  ice: Implement checksum level hint
+  selftests/bpf: Allow VLAN packets in xdp_hw_metadata
+  selftests/bpf: Add flags and new hints to xdp_hw_metadata
+  veth: Implement VLAN tag and checksum level XDP hint
+  selftests/bpf: Use AF_INET for TX in xdp_metadata
+  selftests/bpf: Check VLAN tag and proto in xdp_metadata
+  selftests/bpf: check checksum level in xdp_metadata
+
+ Documentation/networking/xdp-rx-metadata.rst  |  11 +-
+ drivers/net/ethernet/intel/ice/ice.h          |   2 +
+ drivers/net/ethernet/intel/ice/ice_ethtool.c  |   2 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 412 +++++++++---------
+ drivers/net/ethernet/intel/ice/ice_lib.c      |   2 +-
+ drivers/net/ethernet/intel/ice/ice_main.c     |  23 +
+ drivers/net/ethernet/intel/ice/ice_ptp.c      |  26 +-
+ drivers/net/ethernet/intel/ice/ice_ptp.h      |  15 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.c     |  15 +-
+ drivers/net/ethernet/intel/ice/ice_txrx.h     |  29 +-
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 339 +++++++++++---
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.h |  16 +-
+ drivers/net/ethernet/intel/ice/ice_xsk.c      |  18 +-
+ drivers/net/veth.c                            |  40 ++
+ include/linux/netdevice.h                     |   3 +
+ include/linux/skbuff.h                        |  13 +-
+ include/net/xdp.h                             |  14 +-
+ kernel/bpf/offload.c                          |   4 +
+ net/core/xdp.c                                |  41 ++
+ tools/testing/selftests/bpf/network_helpers.c |  37 +-
+ tools/testing/selftests/bpf/network_helpers.h |   3 +
+ .../selftests/bpf/prog_tests/xdp_metadata.c   | 195 ++++-----
+ .../selftests/bpf/progs/xdp_hw_metadata.c     |  45 +-
+ .../selftests/bpf/progs/xdp_metadata.c        |  11 +
+ tools/testing/selftests/bpf/xdp_hw_metadata.c |  42 +-
+ tools/testing/selftests/bpf/xdp_metadata.h    |  36 +-
+ 26 files changed, 953 insertions(+), 441 deletions(-)
+
 -- 
-2.41.0.255.g8b1d071c50-goog
-
+2.41.0
 
 
