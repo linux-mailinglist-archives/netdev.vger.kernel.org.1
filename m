@@ -1,51 +1,51 @@
-Return-Path: <netdev+bounces-15089-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15090-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4E6BA7459A7
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:07:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7B1E37459AF
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 12:09:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F386A280C96
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:07:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3469A280C57
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:09:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 376C2441F;
-	Mon,  3 Jul 2023 10:07:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8E0E84430;
+	Mon,  3 Jul 2023 10:08:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B6804419
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:07:08 +0000 (UTC)
-Received: from mail-wm1-f47.google.com (mail-wm1-f47.google.com [209.85.128.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B7279E73
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 03:07:02 -0700 (PDT)
-Received: by mail-wm1-f47.google.com with SMTP id 5b1f17b1804b1-3fbb634882dso11011045e9.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 03:07:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 838B93D9E
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 10:08:59 +0000 (UTC)
+Received: from mail-lf1-f50.google.com (mail-lf1-f50.google.com [209.85.167.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4FE8AE60
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 03:08:54 -0700 (PDT)
+Received: by mail-lf1-f50.google.com with SMTP id 2adb3069b0e04-4f8680d8bf2so1032855e87.1
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 03:08:54 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688378821; x=1690970821;
+        d=1e100.net; s=20221208; t=1688378932; x=1690970932;
         h=content-transfer-encoding:in-reply-to:from:references:cc:to
          :content-language:subject:user-agent:mime-version:date:message-id
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=DhORNoU3ciKX2xP8peaOJGSJDkiRCI9EgxfOrsQf3GA=;
-        b=C/HCTFwDlnNM2h9AzZQbUWaPTnY0M3YCOXaz3zmX7cCmSuNU4cjPCnt7zuOx9xmggo
-         PQ6Yo9H+0h55tdmhWzvMcxFi/ghPikDzU994bDVyHjx02BryP6ijkK7q7QJRxvNCoslC
-         8uwA4i1y+RnViiiXCrfZOzn9b6CGlEDRQTePPWjZ4yXrc/9ZZCTwz/rzmPux58hDqiKN
-         pyEKtI+mJ1V1PPK3Cj/IwCmoeIp+a1EQHw+OdZoRfFzn3VrBtM5h5qcT2F5AR+8BKGTe
-         WZ17GFOg0VL+TJTb+w7LEyxZI/ezj3SID4BsQpotm0R/+8r5SE76JNJT7zceo70yGiJV
-         G3kA==
-X-Gm-Message-State: ABy/qLb5lsbfch1tjiyXwVlCb+mz8uVh+bt+YaS2YSJ4JIuGu+q/Yddq
-	5GBtVCSjBytXrlbygNmJWl0=
-X-Google-Smtp-Source: APBJJlHZsBsOfb54U+00VvImXcEPKqtex2r/HSSKxS0kYmdww2Zo1jSovvBgwP2qMZFtPyfWBNq4TQ==
-X-Received: by 2002:adf:eece:0:b0:313:edb0:e8a8 with SMTP id a14-20020adfeece000000b00313edb0e8a8mr8349414wrp.2.1688378820796;
-        Mon, 03 Jul 2023 03:07:00 -0700 (PDT)
+        bh=ZIR8G9dzW/AHDz3A+/3A/KLqgX8fR2nJsyJYwvgO7jI=;
+        b=ehqrc/SZSKYwNGwbWTQJqEc5zY5HfJPsuzk2Wew/cFmFOZeV6OwEfKoebmxZZt4TBN
+         7e2cXSMfrK6e0dFgtlFRVbq1wbPNNDYBuD0O2jOr8aK6k0e0Ozu433iJyAz1roBvb6FX
+         ZsT9itxv13WHE4BzJ9WIftwW9hlS380ub4HAbnKPuBWcO0GzIR5QWNlTtJTtMNIxVMtW
+         2NAgjXczn4iH4uodLwF0HBt9B2Du9H5iHTqq4bUPk6HDq10N4buoib5ZnQfejeyKjHWM
+         LamilwMkpzjKXKkdjJW1A2hJ3n+T8q6npU/+PS2o1yzyddw6Hwi2DX2ULmciCHxKFsJr
+         gPPw==
+X-Gm-Message-State: ABy/qLaC4pZfneGbUZOOK/HG2qt8UjXC92ms2BqhSjL4LkgqC3Z9dE8R
+	SojvgL8Eq2uC/WNoVSgBjk0=
+X-Google-Smtp-Source: APBJJlHK1xgbTuhYhj3/thCZfGiGdkoW0Qx43BOTsuwy7eDxRkdpEkSLp2kCh/wynItpDfIM9b96bg==
+X-Received: by 2002:a19:7601:0:b0:4fb:9477:f713 with SMTP id c1-20020a197601000000b004fb9477f713mr3833933lff.6.1688378932063;
+        Mon, 03 Jul 2023 03:08:52 -0700 (PDT)
 Received: from [192.168.64.192] (bzq-219-42-90.isdn.bezeqint.net. [62.219.42.90])
-        by smtp.gmail.com with ESMTPSA id w11-20020adfec4b000000b0031437ec7ec1sm1914654wrn.2.2023.07.03.03.06.59
+        by smtp.gmail.com with ESMTPSA id 5-20020a05600c024500b003fbb00599e4sm14651466wmj.2.2023.07.03.03.08.50
         (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Mon, 03 Jul 2023 03:07:00 -0700 (PDT)
-Message-ID: <1ebc60c1-c094-98a0-5735-635a8af5bf63@grimberg.me>
-Date: Mon, 3 Jul 2023 13:06:58 +0300
+        Mon, 03 Jul 2023 03:08:51 -0700 (PDT)
+Message-ID: <8fbfa483-caed-870f-68ed-40855feb601f@grimberg.me>
+Date: Mon, 3 Jul 2023 13:08:50 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -54,7 +54,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
  Thunderbird/102.12.0
-Subject: Re: [PATCH 4/5] net/tls: split tls_rx_reader_lock
+Subject: Re: [PATCHv6 0/5] net/tls: fixes for NVMe-over-TLS
 Content-Language: en-US
 To: Hannes Reinecke <hare@suse.de>
 Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
@@ -62,9 +62,8 @@ Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>,
  Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
  netdev@vger.kernel.org
 References: <20230703090444.38734-1-hare@suse.de>
- <20230703090444.38734-5-hare@suse.de>
 From: Sagi Grimberg <sagi@grimberg.me>
-In-Reply-To: <20230703090444.38734-5-hare@suse.de>
+In-Reply-To: <20230703090444.38734-1-hare@suse.de>
 Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 7bit
 X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
@@ -78,30 +77,15 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 
 
 On 7/3/23 12:04, Hannes Reinecke wrote:
-> Split tls_rx_reader_{lock,unlock} into an 'acquire/release' and
-> the actual locking part.
-> With that we can use the tls_rx_reader_lock in situations where
-> the socket is already locked.
+> Hi all,
 > 
-> Suggested-by: Sagi Grimberg <sagi@grimberg.me>
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> ---
->   net/tls/tls_sw.c | 38 ++++++++++++++++++++++----------------
->   1 file changed, 22 insertions(+), 16 deletions(-)
-> 
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index 9aef45e870a5..d0636ea13009 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -1848,13 +1848,10 @@ tls_read_flush_backlog(struct sock *sk, struct tls_prot_info *prot,
->   	return sk_flush_backlog(sk);
->   }
->   
-> -static int tls_rx_reader_lock(struct sock *sk, struct tls_sw_context_rx *ctx,
-> -			      bool nonblock)
-> +static int tls_rx_reader_acquire(struct sock *sk, struct tls_sw_context_rx *ctx,
-> +				 bool nonblock)
+> here are some small fixes to get NVMe-over-TLS up and running.
+> The first three are just minor modifications to have MSG_EOR handled
+> for TLS (and adding a test for it), but the last two implement the
+> ->read_sock() callback for tls_sw and that, I guess, could do with
+> some reviews.
+> It does work with my NVMe-TLS test harness, but what do I know :-)
 
-Nit: I still think tls_rx_reader_enter/tls_rx_reader_exit are more
-appropriate names.
+Hannes, have you tested nvme/tls with the MSG_SPLICE_PAGES series from
+david?
 
