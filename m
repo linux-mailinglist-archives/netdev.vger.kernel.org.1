@@ -1,161 +1,310 @@
-Return-Path: <netdev+bounces-15152-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15153-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id CD92C745F90
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:11:52 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 68EC4745F96
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 17:12:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A9D61C204F9
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 15:11:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1DB65280A76
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 15:12:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37C13100A6;
-	Mon,  3 Jul 2023 15:11:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3C712100A9;
+	Mon,  3 Jul 2023 15:12:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29C09100A3
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 15:11:24 +0000 (UTC)
-Received: from mail-oa1-x34.google.com (mail-oa1-x34.google.com [IPv6:2001:4860:4864:20::34])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85081114
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:11:22 -0700 (PDT)
-Received: by mail-oa1-x34.google.com with SMTP id 586e51a60fabf-1b05d63080cso4680972fac.2
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 08:11:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688397081; x=1690989081;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=+T00GBwuyZ5EBjQMl3HlnUXfbDwtPDiAoLiMp41bcFI=;
-        b=Gsz378OoYeiMZsqtalJquOHU8bvhgF4Wc4BX/4ve+dprrUIWWoMHfrlQnjfVhDusOp
-         3GyysxBCpx1nTg9gCwZq9onDCcVQJiXrB8Xvj9ByhORk4YFnt+2JrzNK8GGlzslc1Aqd
-         fsf5op9XL5YbLCtVghjmpG6EMmNwmEkYXobOIuixQf0OJSoy3e44mqWRIFCCn2UgY5aQ
-         nLVhz2Ew3bvBxKNUjCHxH2PDAgUFERqRz7E+YIg59y7lU2bBDFH7tlXXLL+Ne9npwkSu
-         6Q6H+YKINGr2RfiPdLnMfL8M3f/RugtUINOEBAah1y32+k9mAOwzzCBmvlcGOpy1V9lV
-         RxAA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688397081; x=1690989081;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=+T00GBwuyZ5EBjQMl3HlnUXfbDwtPDiAoLiMp41bcFI=;
-        b=Jd2iUxiMcdylaY4FU264193kjeDN0sTG01GRmonLzy9vy43VTvOU0zc/Jkd5tw7cGp
-         v9b40B/ZUa9dzd1pUMRZIhZJLdDsFf/1tA4r+jkBPD1go/d7C1eXyeJ6xz/l78KIgNe1
-         eC6Bqi01ww0fyEIVJ8xTRh+Ruh49lwa221Ep0kLnLPcPXFIb9Dgy/pZ64JisBL7BxOTK
-         bk1hbyAnThTWP/B6Vu7C7bO1eH3MUA8UOpol0JS2TCZGO0cOccpNuyEwRxfk7E8RUlJF
-         Fp4rX3J5Jzv5qdkRCXYopL+JByPkdZVQWzTinbDCb8LkTRMjTbxu1+1PC/fEMKNbNjVD
-         YqwQ==
-X-Gm-Message-State: ABy/qLb6n/6LbBGErxaJL7QBj/ZSPoX7sEbS/z5MLyPzFEnAI7H0PA0Y
-	evVYOr3RYyjDlPY7larFZzix671WS3ZW1QWQXrw=
-X-Google-Smtp-Source: ACHHUZ58pq4NkOEKgl2jeP/0K+Jgqq/vZuH6S1qwL7nXLD8yG2Oi8gSEA0IoB0BkgHJQicpdOc5ojw==
-X-Received: by 2002:a05:6870:e891:b0:18e:b6d5:7451 with SMTP id q17-20020a056870e89100b0018eb6d57451mr12211597oan.13.1688397081706;
-        Mon, 03 Jul 2023 08:11:21 -0700 (PDT)
-Received: from rogue-one.tail33bf8.ts.net ([2804:14d:5c5e:44fb:7e4b:4854:9cb2:8ddc])
-        by smtp.gmail.com with ESMTPSA id cm9-20020a056870b60900b0019f188355a8sm12452600oab.17.2023.07.03.08.11.18
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 08:11:21 -0700 (PDT)
-From: Pedro Tammela <pctammela@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	shuah@kernel.org,
-	shaozhengchao@huawei.com,
-	victor@mojatatu.com,
-	simon.horman@corigine.com,
-	Pedro Tammela <pctammela@mojatatu.com>
-Subject: [PATCH net 2/2] selftests: tc-testing: add tests for qfq mtu sanity check
-Date: Mon,  3 Jul 2023 12:10:38 -0300
-Message-Id: <20230703151038.157771-3-pctammela@mojatatu.com>
-X-Mailer: git-send-email 2.39.2
-In-Reply-To: <20230703151038.157771-1-pctammela@mojatatu.com>
-References: <20230703151038.157771-1-pctammela@mojatatu.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28D8F100A4
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 15:12:23 +0000 (UTC)
+Received: from mga17.intel.com (mga17.intel.com [192.55.52.151])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 192C7EE;
+	Mon,  3 Jul 2023 08:12:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688397142; x=1719933142;
+  h=date:from:to:cc:subject:message-id;
+  bh=W0xbU9nEE3TH0xg7aDTg6qtQ4+f5eySxUTOggB2dw2Q=;
+  b=H2vXYsE6b3akL4zVRk9lz2eH0gKJaDz2gpWzA0n2f7Pj0M8pg+d+0EsX
+   /z0EM0Nj8X4nh5OykhdSnc8S5mxv0/Pl2/JpGJa9UVCZh7HXXvvnb5SEF
+   9DW1lsPRXdJSnXHYiXEeoHxpBZzKH/bbA0vPsgZIdQxpmDgSrQOqz/rhf
+   eXjXl6mJNim3Pvlb6tiQvmrADQqlAbUaI6HyIlRNTHH7W61zC5EMEYghJ
+   EuWh2Fxq9fu7Eb/sx3jy+wPLIImdhSdABD5AiDuJb4ikPCuVAAtj8xTIs
+   CYjJGtYVCnoHrJh2Co3Azl1fNl0vA+o1GPKtxDY+w5EFrGkO+6dlD/AfU
+   Q==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="343239953"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="343239953"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga107.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 08:12:17 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="788557478"
+X-IronPort-AV: E=Sophos;i="6.01,178,1684825200"; 
+   d="scan'208";a="788557478"
+Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
+  by fmsmga004.fm.intel.com with ESMTP; 03 Jul 2023 08:12:13 -0700
+Received: from kbuild by 783282924a45 with local (Exim 4.96)
+	(envelope-from <lkp@intel.com>)
+	id 1qGLDo-000HR9-2I;
+	Mon, 03 Jul 2023 15:12:12 +0000
+Date: Mon, 03 Jul 2023 23:11:26 +0800
+From: kernel test robot <lkp@intel.com>
+To: Andrew Morton <akpm@linux-foundation.org>
+Cc: Linux Memory Management List <linux-mm@kvack.org>,
+ kunit-dev@googlegroups.com, kvmarm@lists.linux.dev,
+ linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
+ linux-bluetooth@vger.kernel.org, linux-kselftest@vger.kernel.org,
+ linux-parisc@vger.kernel.org, linux-rdma@vger.kernel.org,
+ linux-riscv@lists.infradead.org, linux-usb@vger.kernel.org,
+ netdev@vger.kernel.org
+Subject: [linux-next:master] BUILD REGRESSION
+ 296d53d8f84ce50ffaee7d575487058c8d437335
+Message-ID: <202307032309.v4K1IBoR-lkp@intel.com>
+User-Agent: s-nail v14.9.24
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
-QFQ only supports a certain bound of MTU size so make sure
-we check for this requirement in the tests.
+tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
+branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next specific files for 20230703
 
-Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
----
- .../tc-testing/tc-tests/qdiscs/qfq.json       | 48 +++++++++++++++++++
- 1 file changed, 48 insertions(+)
+Error/Warning reports:
 
-diff --git a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json
-index 147899a868d3..965da7622dac 100644
---- a/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json
-+++ b/tools/testing/selftests/tc-testing/tc-tests/qdiscs/qfq.json
-@@ -213,5 +213,53 @@
-             "$TC qdisc del dev $DUMMY handle 1: root",
-             "$IP link del dev $DUMMY type dummy"
-         ]
-+    },
-+    {
-+        "id": "85ee",
-+        "name": "QFQ with big MTU",
-+        "category": [
-+            "qdisc",
-+            "qfq"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP link add dev $DUMMY type dummy || /bin/true",
-+            "$IP link set dev $DUMMY mtu 2147483647 || /bin/true",
-+            "$TC qdisc add dev $DUMMY handle 1: root qfq"
-+        ],
-+        "cmdUnderTest": "$TC class add dev $DUMMY parent 1: classid 1:1 qfq weight 100",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC class show dev $DUMMY",
-+        "matchPattern": "class qfq 1:",
-+        "matchCount": "0",
-+        "teardown": [
-+            "$IP link del dev $DUMMY type dummy"
-+        ]
-+    },
-+    {
-+        "id": "ddfa",
-+        "name": "QFQ with small MTU",
-+        "category": [
-+            "qdisc",
-+            "qfq"
-+        ],
-+        "plugins": {
-+            "requires": "nsPlugin"
-+        },
-+        "setup": [
-+            "$IP link add dev $DUMMY type dummy || /bin/true",
-+            "$IP link set dev $DUMMY mtu 256 || /bin/true",
-+            "$TC qdisc add dev $DUMMY handle 1: root qfq"
-+        ],
-+        "cmdUnderTest": "$TC class add dev $DUMMY parent 1: classid 1:1 qfq weight 100",
-+        "expExitCode": "2",
-+        "verifyCmd": "$TC class show dev $DUMMY",
-+        "matchPattern": "class qfq 1:",
-+        "matchCount": "0",
-+        "teardown": [
-+            "$IP link del dev $DUMMY type dummy"
-+        ]
-     }
- ]
+https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306151954.Rsz6HP7h-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306301709.lvrxzyCj-lkp@intel.com
+https://lore.kernel.org/oe-kbuild-all/202306301756.x8dgyYnL-lkp@intel.com
+
+Error/Warning: (recently discovered and may have been fixed)
+
+arch/parisc/kernel/pdt.c:66:6: warning: no previous prototype for 'arch_report_meminfo' [-Wmissing-prototypes]
+drivers/bluetooth/btmtk.c:386:32: error: no member named 'dump' in 'struct hci_dev'
+drivers/bluetooth/btmtk.c:386:44: error: 'struct hci_dev' has no member named 'dump'
+drivers/char/mem.c:164:25: error: implicit declaration of function 'unxlate_dev_mem_ptr'; did you mean 'xlate_dev_mem_ptr'? [-Werror=implicit-function-declaration]
+lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+
+Unverified Error/Warning (likely false positive, please contact us if interested):
+
+arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
+drivers/clk/qcom/gpucc-sm8550.c:37:22: sparse: sparse: decimal constant 2300000000 is between LONG_MAX and ULONG_MAX. For C99 that means long long, C90 compilers are very likely to produce unsigned long (and a warning) here
+drivers/net/ethernet/mellanox/mlx5/core/lib/devcom.c:98 mlx5_devcom_register_device() error: uninitialized symbol 'tmp_dev'.
+drivers/usb/cdns3/cdns3-starfive.c:23: warning: expecting prototype for cdns3(). Prototype was for USB_STRAP_HOST() instead
+{standard input}: Error: local label `"2" (instance number 9 of a fb label)' is not defined
+
+Error/Warning ids grouped by kconfigs:
+
+gcc_recent_errors
+|-- alpha-randconfig-r025-20230703
+|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
+|-- arm-randconfig-r073-20230703
+|   `-- drivers-clk-qcom-gpucc-sm8550.c:sparse:sparse:decimal-constant-is-between-LONG_MAX-and-ULONG_MAX.-For-C99-that-means-long-long-C90-compilers-are-very-likely-to-produce-unsigned-long-(and-a-warning)-he
+|-- arm64-randconfig-r054-20230703
+|   `-- arch-arm64-kvm-mmu.c:preceding-lock-on-line
+|-- i386-randconfig-m031-20230703
+|   `-- drivers-net-ethernet-mellanox-mlx5-core-lib-devcom.c-mlx5_devcom_register_device()-error:uninitialized-symbol-tmp_dev-.
+|-- parisc-allnoconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-allyesconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-defconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-randconfig-r011-20230703
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc-randconfig-r035-20230703
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- parisc64-defconfig
+|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
+|-- riscv-allmodconfig
+|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
+|-- riscv-allyesconfig
+|   `-- drivers-usb-cdns3-cdns3-starfive.c:warning:expecting-prototype-for-cdns3().-Prototype-was-for-USB_STRAP_HOST()-instead
+|-- riscv-randconfig-r091-20230703
+|   |-- arch-riscv-kernel-signal.c:sparse:sparse:incorrect-type-in-initializer-(different-address-spaces)-expected-void-__val-got-void-noderef-__user-assigned-datap
+|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
+|-- sh-allmodconfig
+|   |-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+|   `-- standard-input:Error:local-label-(instance-number-of-a-fb-label)-is-not-defined
+|-- sh-randconfig-r015-20230703
+|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+|-- sh-randconfig-r024-20230703
+|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+|-- sh-se7619_defconfig
+|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
+`-- x86_64-buildonly-randconfig-r003-20230703
+    `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
+clang_recent_errors
+|-- arm-randconfig-r005-20230703
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- arm-randconfig-r035-20230703
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- arm64-randconfig-r026-20230703
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- hexagon-randconfig-r041-20230703
+|   |-- drivers-bluetooth-btmtk.c:error:no-member-named-dump-in-struct-hci_dev
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|-- hexagon-randconfig-r045-20230703
+|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
+`-- i386-randconfig-i011-20230703
+    `-- drivers-bluetooth-btmtk.c:error:no-member-named-dump-in-struct-hci_dev
+
+elapsed time: 747m
+
+configs tested: 136
+configs skipped: 5
+
+tested configs:
+alpha                            alldefconfig   gcc  
+alpha                            allyesconfig   gcc  
+alpha                               defconfig   gcc  
+alpha                randconfig-r002-20230703   gcc  
+alpha                randconfig-r025-20230703   gcc  
+arc                              allyesconfig   gcc  
+arc                                 defconfig   gcc  
+arc                     nsimosci_hs_defconfig   gcc  
+arc                  randconfig-r014-20230703   gcc  
+arc                  randconfig-r043-20230703   gcc  
+arm                              allmodconfig   gcc  
+arm                              allyesconfig   gcc  
+arm                                 defconfig   clang
+arm                                 defconfig   gcc  
+arm                         lpc32xx_defconfig   clang
+arm                           omap1_defconfig   clang
+arm                          pxa168_defconfig   clang
+arm                  randconfig-r005-20230703   clang
+arm                  randconfig-r035-20230703   clang
+arm                  randconfig-r046-20230703   gcc  
+arm                         socfpga_defconfig   clang
+arm                         wpcm450_defconfig   gcc  
+arm64                            alldefconfig   gcc  
+arm64                            allyesconfig   gcc  
+arm64                               defconfig   gcc  
+arm64                randconfig-r026-20230703   clang
+csky                                defconfig   gcc  
+csky                 randconfig-r006-20230703   gcc  
+csky                 randconfig-r021-20230703   gcc  
+hexagon              randconfig-r041-20230703   clang
+hexagon              randconfig-r045-20230703   clang
+i386                             allyesconfig   gcc  
+i386         buildonly-randconfig-r004-20230703   gcc  
+i386         buildonly-randconfig-r005-20230703   gcc  
+i386         buildonly-randconfig-r006-20230703   gcc  
+i386                              debian-10.3   gcc  
+i386                                defconfig   gcc  
+i386                 randconfig-i001-20230703   gcc  
+i386                 randconfig-i002-20230703   gcc  
+i386                 randconfig-i003-20230703   gcc  
+i386                 randconfig-i004-20230703   gcc  
+i386                 randconfig-i005-20230703   gcc  
+i386                 randconfig-i006-20230703   gcc  
+i386                 randconfig-i011-20230703   clang
+i386                 randconfig-i012-20230703   clang
+i386                 randconfig-i013-20230703   clang
+i386                 randconfig-i014-20230703   clang
+i386                 randconfig-i016-20230703   clang
+i386                 randconfig-r036-20230703   gcc  
+loongarch                        allmodconfig   gcc  
+loongarch                         allnoconfig   gcc  
+loongarch                           defconfig   gcc  
+m68k                             allmodconfig   gcc  
+m68k                             allyesconfig   gcc  
+m68k                         apollo_defconfig   gcc  
+m68k                                defconfig   gcc  
+m68k                 randconfig-r013-20230703   gcc  
+microblaze                          defconfig   gcc  
+mips                             allmodconfig   gcc  
+mips                             allyesconfig   gcc  
+mips                            ar7_defconfig   gcc  
+mips                           gcw0_defconfig   gcc  
+mips                           ip32_defconfig   gcc  
+mips                           jazz_defconfig   gcc  
+mips                       lemote2f_defconfig   clang
+mips                 randconfig-r023-20230703   gcc  
+mips                 randconfig-r031-20230703   clang
+nios2                               defconfig   gcc  
+openrisc             randconfig-r034-20230703   gcc  
+parisc                           allyesconfig   gcc  
+parisc                              defconfig   gcc  
+parisc               randconfig-r011-20230703   gcc  
+parisc               randconfig-r035-20230703   gcc  
+parisc64                            defconfig   gcc  
+powerpc                          allmodconfig   gcc  
+powerpc                           allnoconfig   gcc  
+powerpc                 canyonlands_defconfig   gcc  
+powerpc                     ep8248e_defconfig   gcc  
+powerpc                        icon_defconfig   clang
+powerpc                    klondike_defconfig   gcc  
+powerpc                     ksi8560_defconfig   clang
+powerpc                     mpc5200_defconfig   clang
+powerpc                     mpc83xx_defconfig   gcc  
+powerpc                  storcenter_defconfig   gcc  
+powerpc                         wii_defconfig   gcc  
+riscv                            alldefconfig   clang
+riscv                            allmodconfig   gcc  
+riscv                             allnoconfig   gcc  
+riscv                            allyesconfig   gcc  
+riscv                               defconfig   gcc  
+riscv                randconfig-r042-20230703   clang
+riscv                          rv32_defconfig   gcc  
+s390                             allmodconfig   gcc  
+s390                             allyesconfig   gcc  
+s390                                defconfig   gcc  
+s390                 randconfig-r004-20230703   gcc  
+s390                 randconfig-r033-20230703   gcc  
+s390                 randconfig-r044-20230703   clang
+sh                               allmodconfig   gcc  
+sh                         apsh4a3a_defconfig   gcc  
+sh                   randconfig-r015-20230703   gcc  
+sh                   randconfig-r024-20230703   gcc  
+sh                   randconfig-r031-20230703   gcc  
+sh                   rts7751r2dplus_defconfig   gcc  
+sh                           se7619_defconfig   gcc  
+sh                           se7751_defconfig   gcc  
+sh                  sh7785lcr_32bit_defconfig   gcc  
+sparc                            allyesconfig   gcc  
+sparc                               defconfig   gcc  
+sparc                randconfig-r022-20230703   gcc  
+sparc64              randconfig-r001-20230703   gcc  
+sparc64              randconfig-r033-20230703   gcc  
+um                               allmodconfig   clang
+um                                allnoconfig   clang
+um                               allyesconfig   clang
+um                                  defconfig   gcc  
+um                             i386_defconfig   gcc  
+um                   randconfig-r034-20230703   clang
+um                   randconfig-r036-20230703   clang
+um                           x86_64_defconfig   gcc  
+x86_64                           allyesconfig   gcc  
+x86_64       buildonly-randconfig-r001-20230703   gcc  
+x86_64       buildonly-randconfig-r002-20230703   gcc  
+x86_64       buildonly-randconfig-r003-20230703   gcc  
+x86_64                              defconfig   gcc  
+x86_64                                  kexec   gcc  
+x86_64               randconfig-x001-20230703   clang
+x86_64               randconfig-x002-20230703   clang
+x86_64               randconfig-x003-20230703   clang
+x86_64               randconfig-x004-20230703   clang
+x86_64               randconfig-x005-20230703   clang
+x86_64               randconfig-x006-20230703   clang
+x86_64                          rhel-8.3-rust   clang
+x86_64                               rhel-8.3   gcc  
+xtensa               randconfig-r003-20230703   gcc  
+xtensa               randconfig-r012-20230703   gcc  
+xtensa               randconfig-r032-20230703   gcc  
+
 -- 
-2.39.2
-
+0-DAY CI Kernel Test Service
+https://github.com/intel/lkp-tests/wiki
 
