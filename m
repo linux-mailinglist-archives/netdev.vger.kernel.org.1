@@ -1,135 +1,102 @@
-Return-Path: <netdev+bounces-15049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3CE917456EB
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:06:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28CEF7456FF
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 10:11:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 649A21C20951
-	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:06:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C33E1C2088A
+	for <lists+netdev@lfdr.de>; Mon,  3 Jul 2023 08:11:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 61ECAA52;
-	Mon,  3 Jul 2023 08:05:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2A40BA53;
+	Mon,  3 Jul 2023 08:11:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4AA72A34
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:05:54 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B19BAC433C8;
-	Mon,  3 Jul 2023 08:05:54 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688371554;
-	bh=H5Ol2bCcQqFdyg09aatCLPI6rS9AzzMNSSBC2BX7O1I=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=oIOJhIeWjUIxznyHbsEeDY5V8fSvW8F5I5Zbpq9mqcP+T9XMyqXGDJ6dnFtL+EpBE
-	 np9qw2ScLgM6bAjcqjJXKWwDm0NcSYh6kAwd3tjWQzihkTEC8PCC/wlM34zRiZ76fR
-	 IH1IfE8iJIfMYy63dWPg67elzEENbAfi73ipG9gU6GCYimHHRZ5bMbi3NScPVLVY5w
-	 cE2xhZG5eHjXKDxqe0iqx9hbVE1hByEZZAycdUD0Qwj32j6GACr3Opb5Kq0i1SMaUR
-	 nFuHse6zHojgdslFv3lrJ3tW767gbbXbcE1hXPdxFSbAuQg+xkjaqn/ISyMbad0I9F
-	 zPicWmzxLkokg==
-Received: from sofa.misterjones.org ([185.219.108.64] helo=wait-a-minute.misterjones.org)
-	by disco-boy.misterjones.org with esmtpsa  (TLS1.3) tls TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384
-	(Exim 4.95)
-	(envelope-from <maz@kernel.org>)
-	id 1qGEZD-00A68h-Sj;
-	Mon, 03 Jul 2023 09:05:52 +0100
-Date: Mon, 03 Jul 2023 09:05:52 +0100
-Message-ID: <875y71zafz.wl-maz@kernel.org>
-From: Marc Zyngier <maz@kernel.org>
-To: Neil Armstrong <neil.armstrong@linaro.org>
-Cc: Michael Turquette <mturquette@baylibre.com>,
-	Stephen Boyd <sboyd@kernel.org>,
-	Rob Herring <robh+dt@kernel.org>,
-	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
-	Conor Dooley <conor+dt@kernel.org>,
-	Daniel Lezcano <daniel.lezcano@linaro.org>,
-	Thomas Gleixner <tglx@linutronix.de>,
-	Miquel Raynal <miquel.raynal@bootlin.com>,
-	Richard Weinberger <richard@nod.at>,
-	Vignesh Raghavendra <vigneshr@ti.com>,
-	Giuseppe Cavallaro <peppe.cavallaro@st.com>,
-	Alexandre Torgue <alexandre.torgue@foss.st.com>,
-	Jose Abreu <joabreu@synopsys.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Maxime Coquelin <mcoquelin.stm32@gmail.com>,
-	Linus Walleij <linus.walleij@linaro.org>,
-	Bartosz Golaszewski <brgl@bgdev.pl>,
-	Andy Shevchenko <andy@kernel.org>,
-	Sebastian Reichel <sre@kernel.org>,
-	linux-kernel@vger.kernel.org,
-	linux-clk@vger.kernel.org,
-	devicetree@vger.kernel.org,
-	linux-mtd@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org,
-	linux-gpio@vger.kernel.org,
-	linux-pm@vger.kernel.org,
-	linux-oxnas@groups.io,
-	Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>,
-	Arnd Bergmann <arnd@arndb.de>,
-	Daniel Golle <daniel@makrotopia.org>
-Subject: Re: [PATCH v2 13/15] irqchip: irq-versatile-fpga: remove obsolete oxnas compatible
-In-Reply-To: <20230630-topic-oxnas-upstream-remove-v2-13-fb6ab3dea87c@linaro.org>
-References: <20230630-topic-oxnas-upstream-remove-v2-0-fb6ab3dea87c@linaro.org>
-	<20230630-topic-oxnas-upstream-remove-v2-13-fb6ab3dea87c@linaro.org>
-User-Agent: Wanderlust/2.15.9 (Almost Unreal) SEMI-EPG/1.14.7 (Harue)
- FLIM-LB/1.14.9 (=?UTF-8?B?R29qxY0=?=) APEL-LB/10.8 EasyPG/1.0.0 Emacs/28.2
- (x86_64-pc-linux-gnu) MULE/6.0 (HANACHIRUSATO)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 19067A52
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 08:11:05 +0000 (UTC)
+Received: from imap5.colo.codethink.co.uk (imap5.colo.codethink.co.uk [78.40.148.171])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1661BC;
+	Mon,  3 Jul 2023 01:11:03 -0700 (PDT)
+Received: from [167.98.27.226] (helo=[10.35.6.111])
+	by imap5.colo.codethink.co.uk with esmtpsa  (Exim 4.94.2 #2 (Debian))
+	id 1qGEeB-001yr9-Kb; Mon, 03 Jul 2023 09:10:59 +0100
+Message-ID: <988325dc-79ff-6a8d-9fb5-7f2a167cf37b@codethink.co.uk>
+Date: Mon, 3 Jul 2023 09:10:59 +0100
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0 (generated by SEMI-EPG 1.14.7 - "Harue")
-Content-Type: text/plain; charset=US-ASCII
-X-SA-Exim-Connect-IP: 185.219.108.64
-X-SA-Exim-Rcpt-To: neil.armstrong@linaro.org, mturquette@baylibre.com, sboyd@kernel.org, robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, daniel.lezcano@linaro.org, tglx@linutronix.de, miquel.raynal@bootlin.com, richard@nod.at, vigneshr@ti.com, peppe.cavallaro@st.com, alexandre.torgue@foss.st.com, joabreu@synopsys.com, davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, mcoquelin.stm32@gmail.com, linus.walleij@linaro.org, brgl@bgdev.pl, andy@kernel.org, sre@kernel.org, linux-kernel@vger.kernel.org, linux-clk@vger.kernel.org, devicetree@vger.kernel.org, linux-mtd@lists.infradead.org, netdev@vger.kernel.org, linux-stm32@st-md-mailman.stormreply.com, linux-arm-kernel@lists.infradead.org, linux-gpio@vger.kernel.org, linux-pm@vger.kernel.org, linux-oxnas@groups.io, krzysztof.kozlowski@linaro.org, arnd@arndb.de, daniel@makrotopia.org
-X-SA-Exim-Mail-From: maz@kernel.org
-X-SA-Exim-Scanned: No (on disco-boy.misterjones.org); SAEximRunCond expanded to false
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: net: macb: sparse warning fixes
+Content-Language: en-GB
+To: Nicolas Ferre <nicolas.ferre@microchip.com>, netdev@vger.kernel.org,
+ pabeni@redhat.com, kuba@kernel.org, edumazet@google.com, davem@davemloft.net
+Cc: linux-kernel@vger.kernel.org, claudiu.beznea@microchip.com
+References: <20230622130507.606713-1-ben.dooks@codethink.co.uk>
+ <66f00ffc-571b-86b3-5c35-b9ce566cc149@microchip.com>
+From: Ben Dooks <ben.dooks@codethink.co.uk>
+Organization: Codethink Limited.
+In-Reply-To: <66f00ffc-571b-86b3-5c35-b9ce566cc149@microchip.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri, 30 Jun 2023 17:58:38 +0100,
-Neil Armstrong <neil.armstrong@linaro.org> wrote:
+On 23/06/2023 14:16, Nicolas Ferre wrote:
+> Hi Ben,
 > 
-> Due to lack of maintenance and stall of development for a few years now,
-> and since no new features will ever be added upstream, remove support
-> for OX810 and OX820 IRQ controller.
+> On 22/06/2023 at 15:05, Ben Dooks wrote:
+>> These are 3 hopefully easy patches for fixing sparse errors due to
+>> endian-ness warnings. There are still some left, but there are not
+>> as easy as they mix host and network fields together.
+>>
+>> For example, gem_prog_cmp_regs() has two u32 variables that it does
+>> bitfield manipulation on for the tcp ports and these are __be16 into
+>> u32, so not sure how these are meant to be changed. I've also no hardware
+>> to test on, so even if these did get changed then I can't check if it is
+>> working pre/post change.
 > 
-> Acked-by: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-> Acked-by: Linus Walleij <linus.walleij@linaro.org>
-> Acked-by: Arnd Bergmann <arnd@arndb.de>
-> Acked-by: Daniel Golle <daniel@makrotopia.org>
-> Signed-off-by: Neil Armstrong <neil.armstrong@linaro.org>
-> ---
->  drivers/irqchip/irq-versatile-fpga.c | 1 -
->  1 file changed, 1 deletion(-)
+> Do you know if there could be any impact on performance (even if limited)?
+
+There shouldn't be, these are either constants so should be compile time
+sorted or they are just using the swap code the wrong way round... same
+values, just the wrong endian markers going in/out.
+
+The only device with a macb I've got is an unmatched, so don't even know
+if I can test any of this.
+
+The filter code I would like to get some feedback on, as I didn't want
+to do any modifications without being able to test.
+
+> Best regards,
+>    Nicolas
 > 
-> diff --git a/drivers/irqchip/irq-versatile-fpga.c b/drivers/irqchip/irq-versatile-fpga.c
-> index ba543ed9c154..5018a06060e6 100644
-> --- a/drivers/irqchip/irq-versatile-fpga.c
-> +++ b/drivers/irqchip/irq-versatile-fpga.c
-> @@ -242,5 +242,4 @@ static int __init fpga_irq_of_init(struct device_node *node,
->  }
->  IRQCHIP_DECLARE(arm_fpga, "arm,versatile-fpga-irq", fpga_irq_of_init);
->  IRQCHIP_DECLARE(arm_fpga_sic, "arm,versatile-sic", fpga_irq_of_init);
-> -IRQCHIP_DECLARE(ox810se_rps, "oxsemi,ox810se-rps-irq", fpga_irq_of_init);
->  #endif
-
-Acked-by: Marc Zyngier <maz@kernel.org>
-
-Feel free to route this via the SoC tree as part of the removal
-series.
-
-Thanks,
-
-	M.
+>> Also gem_writel and gem_writel_n, it is not clear if both of these are
+>> meant to be host order or not.
+>>
+>> Ben Dooks (3):
+>>    net: macb: check constant to define and fix __be32 warnings
+>>    net: macb: add port constant to fix __be16 warnings
+>>    net: macb: fix __be32 warnings in debug code
+>>
+>>   drivers/net/ethernet/cadence/macb_main.c | 25 +++++++++++++-----------
+>>   1 file changed, 14 insertions(+), 11 deletions(-)
+> 
 
 -- 
-Without deviation from the norm, progress is not possible.
+Ben Dooks				http://www.codethink.co.uk/
+Senior Engineer				Codethink - Providing Genius
+
+https://www.codethink.co.uk/privacy.html
+
 
