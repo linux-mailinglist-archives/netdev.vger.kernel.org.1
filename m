@@ -1,185 +1,137 @@
-Return-Path: <netdev+bounces-15387-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15388-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF60B747443
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:41:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 81736747446
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:41:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB9701C209F7
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:41:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B26931C20A65
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:41:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CBEBD63B2;
-	Tue,  4 Jul 2023 14:40:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 940AF63B5;
+	Tue,  4 Jul 2023 14:41:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B6F45567B
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:40:58 +0000 (UTC)
-Received: from NAM04-MW2-obe.outbound.protection.outlook.com (mail-mw2nam04on2092.outbound.protection.outlook.com [40.107.101.92])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3BCA5E49;
-	Tue,  4 Jul 2023 07:40:57 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=bUDY75HLeHShUZwVbQ2d9eXrDwipaNiK8rIUIiirnUW3tis2xqn6u+RvW64n1lRNK6cgSBsK3jcN2adCuLgqG4+A1ssmMdRINOK5SnO3beVuVMXz7aY6wHKe78eMA3Z6l9rDD/5tjKWbt9Id9jxEq4oTnI95IXBRoCh4MNMrxYRm7qMK7tWpaj/FA4RV0o8LD96RY8cUpmRD+zhFg2QJL1Tu3rQBukWED5/4/gxAcPtorPqn8FHyTwnfCHdZKwVt0mduneSi8cC0n2N9rsoGK7y708RqFMV3osjfFq2JhxMCIi1ya/sXe3vtZ5WMAAvQPdeOgHeiOJZS04jWwCpXmg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=SLp3GBo42GQ5XnOWZadPk3UUdg/tTVNenWCRk9X/vS0=;
- b=l/RIyqhW39jOlVykZoWht9HYJfFYdC3GdLelCR0OmU/PucRlg0C362ien5tf69vwNN1GiTHQJs/nUPiJyvdZ61ggrpRatZvKQLoO0ZpBJwxZ+bRyWe3WlUCkIYCTsG2rpWIgCd0mhiOwN8EDqdUCRukq4kyvORI9F4p/ZXhhGP0C+9/e5zwUdvDX8CKl/6IbHTg4ohcPQJWxAcPORYEIR/aYW+T4cAuCvzBiLawdmmPsxKrBaXJmogiIUWvXdMnyUdep4gpTMSwCC5WHic3t0LQHSVhnKf7n0JH6M6iZfSwVWx7F1BgsnobieBmJzb+06JJH3/QwsF6aYtQuuSQnwg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=SLp3GBo42GQ5XnOWZadPk3UUdg/tTVNenWCRk9X/vS0=;
- b=RcoQlT9198KR84ci9Ie0d4G55IevIns/LxaKQSlUeNYZ9rQUNYgotXNHRWbbrv0jKkaE4Mxm6q0ZP3vTiXAmBaghC70qpDCUMc95460RFbPYkH8fHL88KQny6aq9iG8yB/Xr2ZcSGG7N8V+GCxe+PGtm+xGVhY7rmW+o4aJLlIc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BN0PR13MB5231.namprd13.prod.outlook.com (2603:10b6:408:15a::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
- 2023 14:40:54 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 14:40:54 +0000
-Date: Tue, 4 Jul 2023 15:40:44 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Zhengchao Shao <shaozhengchao@huawei.com>
-Cc: netdev@vger.kernel.org, linux-rdma@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	valex@nvidia.com, kliteyn@nvidia.com, mbloch@nvidia.com,
-	danielj@nvidia.com, erezsh@mellanox.com, saeedm@nvidia.com,
-	leon@kernel.org, weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net] net/mlx5: DR, fix memory leak in
- mlx5dr_cmd_create_reformat_ctx
-Message-ID: <ZKQvbCkdeVWWCzEw@corigine.com>
-References: <20230704033308.3773764-1-shaozhengchao@huawei.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230704033308.3773764-1-shaozhengchao@huawei.com>
-X-ClientProxiedBy: LO4P123CA0619.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:294::19) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86EC5A2C
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:41:55 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5F42B2;
+	Tue,  4 Jul 2023 07:41:53 -0700 (PDT)
+Received: from pps.filterd (m0353728.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 364EUDT6015334;
+	Tue, 4 Jul 2023 14:41:49 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=nChxNNSHb/syOCZ/ct/RYuUp1fIn+QTX1UNXCOOtrQE=;
+ b=ORX0qPnBWrvDuZfUM2MYqPjy30NvJoB6xVYWhCSEhDkqPkf8WPHhdviXZFf2NX9NNLJd
+ nXbbc/Yq9X09tKR47xthzezHtgQnZn7exhgdVeQDYYPrRkO+KTkT5efBxvWX25Nwj8T6
+ pJReDdT15VybjLwmhNbDEYl3uLKgKWWbYJKyS/GlQM/W9cBe0tj8TBzQD6ztbGOOI4Mg
+ z8qoV9iRpD5m6VTMEDuuN5EeibeyGgCenRsgnhbkJOsqkiTA/bWutXIMYRMO/nJ5EOgh
+ ChaUu7EKboO/xe6s8vqr3zdAQdWXxO1mdt9NxtXAYL52Eao/eqemacUK8axG2BRuvIL3 /w== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rmn840bkb-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jul 2023 14:41:49 +0000
+Received: from m0353728.ppops.net (m0353728.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 364EXEfj025123;
+	Tue, 4 Jul 2023 14:41:45 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rmn840bbt-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jul 2023 14:41:43 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+	by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 364DOQXQ020983;
+	Tue, 4 Jul 2023 14:41:37 GMT
+Received: from smtprelay06.fra02v.mail.ibm.com ([9.218.2.230])
+	by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rjbs4sgsn-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jul 2023 14:41:37 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay06.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 364EfXqx40895174
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Tue, 4 Jul 2023 14:41:33 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 76A0F20040;
+	Tue,  4 Jul 2023 14:41:33 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 60FEA20043;
+	Tue,  4 Jul 2023 14:41:33 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTPS;
+	Tue,  4 Jul 2023 14:41:33 +0000 (GMT)
+Received: by tuxmaker.boeblingen.de.ibm.com (Postfix, from userid 55271)
+	id DB779E092F; Tue,  4 Jul 2023 16:41:32 +0200 (CEST)
+From: Alexandra Winter <wintera@linux.ibm.com>
+To: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+        Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>
+Cc: netdev@vger.kernel.org, linux-s390@vger.kernel.org,
+        Heiko Carstens <hca@linux.ibm.com>,
+        Thorsten Winkler <twinkler@linux.ibm.com>,
+        Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>
+Subject: [PATCH net] s390/qeth: Fix vipa deletion
+Date: Tue,  4 Jul 2023 16:41:21 +0200
+Message-Id: <20230704144121.3737032-1-wintera@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BN0PR13MB5231:EE_
-X-MS-Office365-Filtering-Correlation-Id: f21e8a3d-6f16-4b71-5b20-08db7c9cabcc
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	yVnOhOqznl8f/bwDOXbVx9Qe/tWVQEvDaYYm4tr/wP9oqXdwIqATEHG+EDU9GI21fB+rJh6cviVpDYxlsAAQllclD3IBTCFKpQ9ruB6TXwSL7XsRPLyEvXMj7jDeuGPkeGbJifRDqrVLgbB97lkZU05i5DvxXWKobC89+j8RrYs1YQjGii6OgwJ4KU2N6saJ4FNfcWwKaIV7zEsBxdz2/cy8TqUDXBeWgIuuhlppcXWfpZMoUCPzxY5WTvGdamSzIGZSSwBDLPbEw/bqKBshRI252FlAazT2H3AcNNpx7hwQHSVBKBObkhhHG5XBlf8nI/xncdOf02fe/HlFL9SyDpEC1z5e7gKpCk74/UPd4bBgdS2Im6x1ESQQummNLrJDz8ZFpYnhNrqQh107kH5dvLvhcF8qLUfIq0ImQLj9kPQzafhdqnEy8VagLG2ebvd+EdAS0GSPSoZn8H+pljGGOfZXNbljEOGUMmvKVn3ZuRuum+kCgFvSCGcB15GX8HfDqNb57c0bMaj5ySrKzof4KtJBJ4wkNpm4nf03ZklnDxQc/eEBDyMD/R/hOr4sZNqj14S99AEBv193HLIJdTs0YrQPY2htFWDQjRHF7YVk8l0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39840400004)(136003)(396003)(346002)(366004)(451199021)(6486002)(86362001)(478600001)(5660300002)(7416002)(4326008)(66476007)(66946007)(6916009)(66556008)(186003)(6512007)(44832011)(36756003)(26005)(2616005)(6666004)(2906002)(6506007)(83380400001)(8676002)(316002)(8936002)(41300700001)(38100700002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?QWY5c/08WWOg3VoTisjlGpmmnFpZ2D5Qgye0bjtmfN++deDE9t9L+Mtwn/GD?=
- =?us-ascii?Q?H1VlS3voAqePs5UFMMJ6IvbUly9xWzOsrxzMc6jjFjOTXBRABZv0BJz/peXU?=
- =?us-ascii?Q?1V57WZs2yOsRen/e/OoIv/QlJats/8F2SIVRQv2hu7NCWPbx5DEnD+EF7Qen?=
- =?us-ascii?Q?+Nf6wj3LuuPs62L1lGSbnsEBxwla/aEs4aQC5G9v5yNpdoRFmj9/J2uGiCNR?=
- =?us-ascii?Q?2pvHzVrmMtoIOIdWOvl3wDR1Dmw7oa/Et3dmRMXORC/ILi2PW7zMbOEK6p8w?=
- =?us-ascii?Q?2DQYpHdQg1chqx0GWUm07mKF6SG6whSmpUa39k/2KvuQPYysKzYEInMpBVoF?=
- =?us-ascii?Q?qh1vy2sCZiXmOr+PvpA7zdSSmiRMF2KrfGrjdMkcyhl/TmmuJfKVweS+F8pE?=
- =?us-ascii?Q?O2IvSST7RtHgomQzpNawMjl2udcG4LsiUlJsCWzDPXL9aB9+wKnhlT+rDe7v?=
- =?us-ascii?Q?VQz88iFdns1f0iDC4r+iqhJrnv8dc+VIlG+R/gopnUF1yDxAerSiZ9tJOxXZ?=
- =?us-ascii?Q?RrG61vWjwy8sZl35U1V7xh7SrqZlHW3Nxf0lD6PMzm3Zvh9YU7spVBbya7kX?=
- =?us-ascii?Q?P+xkwojmnINt3m01WOYE9idCCNjADt1ehPE8XMZA6SFHLdOjDam2eBMQ9lbD?=
- =?us-ascii?Q?7SfRBVHSc55hWXmkaYlcot5Hjvn5+IfLa0BMGPf9nQr0oddtYdgfbRYpF+ZL?=
- =?us-ascii?Q?bSbQg3sZKdtN0B9NDj57j/U5JJjC3aLxwgpT/1aZYp0YzcLtezWt/vtqkJ3Y?=
- =?us-ascii?Q?lllzXM9M+7UzpkB7j1zfr7d9tC6MRUG4190Ki5M2cuCuyUdCYBYihjpea7Kg?=
- =?us-ascii?Q?6Vo2950GhGL+B5CGcZT+J/VtPaSKezrHI+qT0O8ACh3xFDUjOBND1CPTUCgt?=
- =?us-ascii?Q?6EMV7zOxGGqQRogFAH/KnV6tg3RptTTz2TEDnf/ET1Bz7JtzaHKEdgJ8/8VJ?=
- =?us-ascii?Q?Ad8b/nA5L5ZK1qXv8+K8CmbMhmUmtXcUDpGYRctKtX+PL7prHp73A0opjX2Z?=
- =?us-ascii?Q?LA7KfqLffd4wRMq3GjlCyCT5lidJKxP3FF15VNWU5bovbmSME8iDnO9E+Zr6?=
- =?us-ascii?Q?5qOlCJ1vA256uQLGqooynOAjBKXjWNOqfTsEEuS8vEFq6zKML3LjSsXhoqo0?=
- =?us-ascii?Q?A0SpWRn37pasYQB7Q6m1lS0txXZmR0Uu30a1JBcPEr5LdzzziVlvuZ3/NBaw?=
- =?us-ascii?Q?FNp6GcgBlj8tOPwH7suL+GNkdBSS2EhOvDjeucOIfIHi7ZO0t2b60HjZdK9L?=
- =?us-ascii?Q?/iTInNreoEGpPJYUKLEEdurPkUGhrwkB+i2dRIGobGkFjmPtdgDgAbZMU0hR?=
- =?us-ascii?Q?E9/9zKcr07538YVF+TInUMz+/lLqOJWTsdrqaQBAMmTVcrbDdLgwxvdvo6ft?=
- =?us-ascii?Q?wvCxbK0pXrdpABux3AvVbeIM8H0GLLpin1Em9wMPXM9CyTTHv0g0YcxCmE6o?=
- =?us-ascii?Q?Zq6mEw4B5v8oALPvtRsEqRYBqi9RqF/mPZkgBX/kcoz9sGYpgToo4Zk00u6G?=
- =?us-ascii?Q?FX7b1CPBMY9IOLsatXEBGO5nBj5A/8YanbnykVZnpnxwuEkcgveuOwaNvLdY?=
- =?us-ascii?Q?w6o3CsuIsKAbZsQ4xRSCnBCfP/LaIduhRNS2ijK2c5u9Ky2u1PfVHRTbjIpJ?=
- =?us-ascii?Q?xQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f21e8a3d-6f16-4b71-5b20-08db7c9cabcc
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 14:40:54.3650
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 0wZHNSwcciCGnq8TSvAcoh8NuI/E5e9Korxia+pAxiadgLFHnRx6oyqO3pzOWgoPaDact+IduCtJvJd+hh+sWViTb2qPf3nqTWKcMP20yQ0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN0PR13MB5231
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: l0pHQOnuZXIDIGiVAi2gIaQIiREUWrZP
+X-Proofpoint-GUID: _C5bJKoqmorlVZrgNTNytMccNNMblXVu
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-04_09,2023-07-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ impostorscore=0 clxscore=1015 lowpriorityscore=0 phishscore=0 bulkscore=0
+ adultscore=0 malwarescore=0 suspectscore=0 mlxscore=0 spamscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307040125
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 04, 2023 at 11:33:08AM +0800, Zhengchao Shao wrote:
-> when mlx5_cmd_exec failed in mlx5dr_cmd_create_reformat_ctx, the memory
-> pointed by 'in' is not released, which will cause memory leak. Move memory
-> release after mlx5_cmd_exec.
-> 
-> Fixes: 1d9186476e12 ("net/mlx5: DR, Add direct rule command utilities")
-> Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> ---
->  drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c | 2 +-
->  1 file changed, 1 insertion(+), 1 deletion(-)
-> 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> index 7491911ebcb5..cf5820744e99 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> @@ -563,11 +563,11 @@ int mlx5dr_cmd_create_reformat_ctx(struct mlx5_core_dev *mdev,
->  		memcpy(pdata, reformat_data, reformat_size);
->  
->  	err = mlx5_cmd_exec(mdev, in, inlen, out, sizeof(out));
-> +	kvfree(in);
->  	if (err)
->  		return err;
->  
->  	*reformat_id = MLX5_GET(alloc_packet_reformat_context_out, out, packet_reformat_id);
-> -	kvfree(in);
->  
->  	return err;
->  }
+From: Thorsten Winkler <twinkler@linux.ibm.com>
 
-Hi Zhengchao Shao,
+Change boolean parameter of function "qeth_l3_vipa_store" inside the
+"qeth_l3_dev_vipa_del4_store" function from "true" to "false" because
+"true" is used for adding a virtual ip address and "false" for deleting.
 
-I agree this is a correct fix.
-However, I think a more idiomatic approach to this problem
-would be to use a goto label. Something like this (completely untested!).
+Fixes: 2390166a6b45 ("s390/qeth: clean up L3 sysfs code")
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-index 7491911ebcb5..8c2a34a0d6be 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-@@ -564,11 +564,12 @@ int mlx5dr_cmd_create_reformat_ctx(struct mlx5_core_dev *mdev,
- 
- 	err = mlx5_cmd_exec(mdev, in, inlen, out, sizeof(out));
- 	if (err)
--		return err;
-+		goto err_free_in;
- 
- 	*reformat_id = MLX5_GET(alloc_packet_reformat_context_out, out, packet_reformat_id);
--	kvfree(in);
- 
-+err_free_in:
-+	kvfree(in);
- 	return err;
+Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+Signed-off-by: Thorsten Winkler <twinkler@linux.ibm.com>
+Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+---
+ drivers/s390/net/qeth_l3_sys.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/drivers/s390/net/qeth_l3_sys.c b/drivers/s390/net/qeth_l3_sys.c
+index 9f90a860ca2c..a6b64228ead2 100644
+--- a/drivers/s390/net/qeth_l3_sys.c
++++ b/drivers/s390/net/qeth_l3_sys.c
+@@ -625,7 +625,7 @@ static QETH_DEVICE_ATTR(vipa_add4, add4, 0644,
+ static ssize_t qeth_l3_dev_vipa_del4_store(struct device *dev,
+ 		struct device_attribute *attr, const char *buf, size_t count)
+ {
+-	return qeth_l3_vipa_store(dev, buf, true, count, QETH_PROT_IPV4);
++	return qeth_l3_vipa_store(dev, buf, false, count, QETH_PROT_IPV4);
  }
  
+ static QETH_DEVICE_ATTR(vipa_del4, del4, 0200, NULL,
+-- 
+2.39.2
+
 
