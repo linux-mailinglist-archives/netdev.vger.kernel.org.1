@@ -1,96 +1,110 @@
-Return-Path: <netdev+bounces-15385-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15386-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B47EC74741B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:29:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0A21674742E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:34:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5D8D1C209C7
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:29:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8D6A5280FE6
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:34:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF82D63B9;
-	Tue,  4 Jul 2023 14:29:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E97D6567B;
+	Tue,  4 Jul 2023 14:34:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3DDD814
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:29:00 +0000 (UTC)
-Received: from mail-ed1-x52c.google.com (mail-ed1-x52c.google.com [IPv6:2a00:1450:4864:20::52c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9418AE49
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 07:28:59 -0700 (PDT)
-Received: by mail-ed1-x52c.google.com with SMTP id 4fb4d7f45d1cf-51d80c5c834so10191653a12.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 07:28:59 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688480938; x=1691072938;
-        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=vGiy98QCO7ZtSd6I9GDg+GBkDb4CtqmQBijOnAOBgrw=;
-        b=JmEsJqcImU//YdKRN0AdD3iJ6/7QXx27j/bDf0t+yXgOx/ROBNalYlEl9/S+jWJMsg
-         dy8B612raf1TXhtPCmvGbAF/HzeLbEIEzu7uoJ6dQCibzGxj4TBPNRJpNCk9/5XfpMuD
-         DKcbnuweCAnFp+nn51+g/3+pZZyfA39r5EBmLWxrMo9Wi738C9mz9eT8BZCkX7GF+5WA
-         BlKhZMv8EyN4maKd8KxdFetAR21IeBnfAl+/r7S/AU1XHzVDUBlgrfCg66UGIkrUbobG
-         2Ow9DvIWb38Sfzk0dkmAAVt36RLlPiByNkQyTC0pA7Ol6TsH7lEvZ8CoFzC01eZYwtVw
-         PeVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688480938; x=1691072938;
-        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=vGiy98QCO7ZtSd6I9GDg+GBkDb4CtqmQBijOnAOBgrw=;
-        b=WXoLd2QnrpLWu55tNXnyBdDeahYCsGIprCPeTJj16LFJ4UjJ9nDoXqoF8Rht2M2ddw
-         2LbiE0gdeeNc+wQxGNLTTem85OuzWcFL1i/UVFkNR2+CHspJysTX7MO1FzNw7Tnoa7rR
-         ra8kHpN/z3uCmzT0CvjnBQqpsMo3KnbYrZnVPHxZvw+MESfO9xo7HqrEblqKuvEeoxsG
-         2bY0qcCsUxI5UICWtnqLWuToyeoQCC/iuaWU8kNTbB4slc2XtoG16v2oQnrm4BU8Ukbq
-         KUOeurkY2CensHm0xJyeJ/5xd0XCnsCwOlwvPHMASB9JxnSWguSe5qQKWgBJ89Mqq81R
-         K4bg==
-X-Gm-Message-State: ABy/qLYnJuxiptYUO8l9C09l+glfYRh46YV1FkZaTswM1GQpnPfz1T8Z
-	LoAIpWmelKPNEfFZF8DgB0ofdVppZiKXM824LnDAJwBlXKA=
-X-Google-Smtp-Source: APBJJlHFIzBM7PKK0kOkgj7CFmHWBCfSHC8fUnBMieBuuqkqYnFu2izAZSDS9iaex7fW+V84uNTBPW8lp0y7ZXkcQh4=
-X-Received: by 2002:a05:6402:12d4:b0:51d:a012:ec2 with SMTP id
- k20-20020a05640212d400b0051da0120ec2mr12053556edx.3.1688480937877; Tue, 04
- Jul 2023 07:28:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DDD58A2C
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:34:15 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF54F10C3
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 07:34:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688481254;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 in-reply-to:in-reply-to:references:references;
+	bh=gYHch/SklDJL/CopH6fHbY5oof68s+i62UNUpHYmC24=;
+	b=OJVmoghSPwnbmW05G9nuWZSQpv0XNdDhggPRrakKxgVCeGFea/h7Tr/ddMjRgeoB1wrayh
+	BxsciYIUTJPYyAUJ+Dulbuuw6JANdO43dNVIJj587fUYU1NuSR21MhblofhY8T5RJsxp2E
+	JiYFfh/sq2LBA27JGAL0vsYHoUQx6iY=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-650-TumVCkMINnWZXNJl7_pR8g-1; Tue, 04 Jul 2023 10:34:10 -0400
+X-MC-Unique: TumVCkMINnWZXNJl7_pR8g-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 8077B1C04B40;
+	Tue,  4 Jul 2023 14:34:09 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id D0A681121314;
+	Tue,  4 Jul 2023 14:34:08 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com>
+References: <CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com>
+To: =?UTF-8?B?T25kcmVqIE1vc27DocSNZWs=?= <omosnacek@gmail.com>
+Cc: dhowells@redhat.com,
+    Linux Crypto Mailing List <linux-crypto@vger.kernel.org>,
+    Herbert Xu <herbert@gondor.apana.org.au>,
+    Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org
+Subject: Re: Regression bisected to "crypto: af_alg: Convert af_alg_sendpage() to use MSG_SPLICE_PAGES"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Sergei Antonov <saproj@gmail.com>
-Date: Tue, 4 Jul 2023 17:28:47 +0300
-Message-ID: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
-Subject: Regression: supported_interfaces filling enforcement
-To: netdev@vger.kernel.org, Vladimir Oltean <olteanv@gmail.com>, rmk+kernel@armlinux.org.uk
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <1506613.1688481248.1@warthog.procyon.org.uk>
+Date: Tue, 04 Jul 2023 15:34:08 +0100
+Message-ID: <1506614.1688481248@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello!
-This commit seems to break the mv88e6060 dsa driver:
-de5c9bf40c4582729f64f66d9cf4920d50beb897    "net: phylink: require
-supported_interfaces to be filled"
+The problem is caused by this bit in af_alg_sendmsg():
 
-The driver does not fill 'supported_interfaces'. What is the proper
-way to fix it? I managed to fix it by the following quick code.
-Comments? Recommendations?
+		/* use the existing memory in an allocated page */
+		if (ctx->merge) {
+			sgl = list_entry(ctx->tsgl_list.prev,
+					 struct af_alg_tsgl, list);
+			sg = sgl->sg + sgl->cur - 1;
+			len = min_t(size_t, len,
+				    PAGE_SIZE - sg->offset - sg->length);
 
-+static void mv88e6060_get_caps(struct dsa_switch *ds, int port,
-+                              struct phylink_config *config)
-+{
-+       __set_bit(PHY_INTERFACE_MODE_INTERNAL, config->supported_interfaces);
-+       __set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
-+}
-+
- static const struct dsa_switch_ops mv88e6060_switch_ops = {
-        .get_tag_protocol = mv88e6060_get_tag_protocol,
-        .setup          = mv88e6060_setup,
-        .phy_read       = mv88e6060_phy_read,
-        .phy_write      = mv88e6060_phy_write,
-+       .phylink_get_caps = mv88e6060_get_caps
- };
+			err = memcpy_from_msg(page_address(sg_page(sg)) +
+					      sg->offset + sg->length,
+					      msg, len);
+			if (err)
+				goto unlock;
+
+			sg->length += len;
+			ctx->merge = (sg->offset + sg->length) &
+				     (PAGE_SIZE - 1);
+
+			ctx->used += len;
+			copied += len;
+			size -= len;
+			continue;
+		}
+
+it doesn't exist in the old af_alg_sendpage() code.  It merges data supplied
+by sendmsg() into the last page in the list if there's space.  So we need a
+flag to keep track of whether the last page is appendable-to or not.
+
+David
+
 
