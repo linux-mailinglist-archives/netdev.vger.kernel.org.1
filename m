@@ -1,66 +1,64 @@
-Return-Path: <netdev+bounces-15260-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15261-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19C937466BB
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 03:01:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6DE5E7466F1
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 03:45:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E2A9280EA8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 01:00:59 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BB981C20A6F
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 01:45:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E74F39C;
-	Tue,  4 Jul 2023 01:00:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 467DE626;
+	Tue,  4 Jul 2023 01:45:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4B9388
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 01:00:57 +0000 (UTC)
-Received: from mail-pg1-f206.google.com (mail-pg1-f206.google.com [209.85.215.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CBCE5C
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 18:00:54 -0700 (PDT)
-Received: by mail-pg1-f206.google.com with SMTP id 41be03b00d2f7-55b2ab496ecso4946743a12.2
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 18:00:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 32A34620
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 01:45:10 +0000 (UTC)
+Received: from mail-pl1-f206.google.com (mail-pl1-f206.google.com [209.85.214.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9D2D5E54
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 18:45:08 -0700 (PDT)
+Received: by mail-pl1-f206.google.com with SMTP id d9443c01a7336-1b890ca6718so22698885ad.0
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 18:45:08 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688432454; x=1691024454;
+        d=1e100.net; s=20221208; t=1688435108; x=1691027108;
         h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=e4dIGmrJnerN2APUK9vIkWuNtSLXO20WTEc2d/iDcUI=;
-        b=T4KxKfi1nqjj1Q4Mdw8JZOFvfLYZghOkobZZpFL4PR1r680ewS/fDEkq1hJ8bOHrIC
-         ebxDiAb8Qi2/z8eZA0bMPdGjFQWFSKjcLRv3GdACjOgvenTulGbev3jepWFZJ5hzwaCq
-         jAXGyOx2irbotONgfn+iGZSl2H2UgkDnNVQwxvMdJBAqIDlNE7VyyU2mQsf9O2Tyoezb
-         6HrXNeUDWW5dlQC9LkYrFCMGNKH9tYVQifTsEayDilcEeo1D7F/1BBtoyX7vdhkTRaz8
-         uwux+0ZDDlgRlRFcEsiXNQXrdotYQzeXfB4cYju6OMmSq8nfVcVgnSbgUP9AAAhjWPF+
-         A8ag==
-X-Gm-Message-State: ABy/qLaGmp0ETjtPeioin6X7A1yza0ae+ejCX2a7wa5FAANbA4p1gRJi
-	iUt63vbtm/V9xtX/G0HRSWCqA83gmk0sz2zYojIcVFKnAp3w
-X-Google-Smtp-Source: APBJJlHCOJtR1+j9evnXwzg9q/NGJZBqKkw5h5lASg8ub/FShATqVSjFXkhuXC8hRPQYGdEYUZWBve53gFBIvx/3BpJzDQRrx3d7
+        bh=H2Ze2c0Kq8hkSX1P9VUvavVjaGi6+MVhTGXkCivFU20=;
+        b=XanuFqMY2z8T6r8xGZGRSL62L0ebIMSkM3jhF1RMkec6wXFvgLzPMnmbjybWRgkffw
+         E+vtZFcjAcB64dmMnFHpibzY6DwMm4xqCm8HnemnEvkR7AwGCZTRc5NHA4MYLvjHo2t0
+         s6pTX0vFYxew1Yq/v9+K701OH5U+i+rBZcZndQB9G1XwxWxe4j4jxU4c+sJnRpd7hmBn
+         Y2qCUsYTXFFh8eBmbtj2jXgPdfz+7vj7ype3AvSOrnLS/ukeL0/htMPPRnbBAlOYB1Zy
+         724yrXqE5uirUUw4woNydmIykQIcEmGAMJkWC9nBOFkzK39ogk/JwY06CXiUN1NockiP
+         Bi1Q==
+X-Gm-Message-State: ABy/qLYKVCCqbfCNCcfBQOpPtJ2tkcbYcrvG6CoIYulh3L6QeqmZvXz7
+	NMRuyEyXmc4F84BJnjBH/K+PH4SR3y80jVYBbQAKqui/vNur
+X-Google-Smtp-Source: APBJJlE8AUmlax/N+jsu5a1mZQ8ukTFM+k/kgAiaz2tEeINfzgIlfRTNchLLvZv8mG+tQ/hCFEyRf6wmUezeiU6BuC2I1bTQOupI
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a63:561b:0:b0:54f:d553:fbe6 with SMTP id
- k27-20020a63561b000000b0054fd553fbe6mr6790216pgb.2.1688432453963; Mon, 03 Jul
- 2023 18:00:53 -0700 (PDT)
-Date: Mon, 03 Jul 2023 18:00:53 -0700
+X-Received: by 2002:a17:902:ef8d:b0:1b3:cbd9:c686 with SMTP id
+ iz13-20020a170902ef8d00b001b3cbd9c686mr9724739plb.4.1688435108181; Mon, 03
+ Jul 2023 18:45:08 -0700 (PDT)
+Date: Mon, 03 Jul 2023 18:45:08 -0700
 X-Google-Appengine-App-Id: s~syzkaller
 X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a557cb05ff9ed03b@google.com>
-Subject: [syzbot] [ext4?] general protection fault in ext4_finish_bio
-From: syzbot <syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com>
-To: adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Message-ID: <000000000000d97d9305ff9f6e87@google.com>
+Subject: [syzbot] [block?] KASAN: slab-out-of-bounds Read in bio_split_rw
+From: syzbot <syzbot+6f66f3e78821b0fff882@syzkaller.appspotmail.com>
+To: axboe@kernel.dk, linux-block@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
 	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
@@ -68,90 +66,59 @@ Hello,
 
 syzbot found the following issue on:
 
-HEAD commit:    ae230642190a Merge branch 'af_unix-followup-fixes-for-so_p..
-git tree:       net-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=11fe4cb8a80000
+HEAD commit:    3674fbf0451d Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=110c779f280000
 kernel config:  https://syzkaller.appspot.com/x/.config?x=c9bf1936936ca698
-dashboard link: https://syzkaller.appspot.com/bug?extid=689ec3afb1ef07b766b2
+dashboard link: https://syzkaller.appspot.com/bug?extid=6f66f3e78821b0fff882
 compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136b9d48a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10223cb8a80000
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16223cb8a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f13920a80000
 
 Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8c060db03f09/disk-ae230642.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/1b9b937ece91/vmlinux-ae230642.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/0c7eb1c82bf0/bzImage-ae230642.xz
+disk image: https://storage.googleapis.com/syzbot-assets/42ed556782c3/disk-3674fbf0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1913e16e8565/vmlinux-3674fbf0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/469804b58a7c/bzImage-3674fbf0.xz
 
 IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com
+Reported-by: syzbot+6f66f3e78821b0fff882@syzkaller.appspotmail.com
 
-general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
-KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
-CPU: 1 PID: 2858 Comm: kworker/u4:5 Not tainted 6.4.0-rc7-syzkaller-01948-gae230642190a #0
+==================================================================
+BUG: KASAN: slab-out-of-bounds in bio_split_rw+0x7e7/0x8b0 block/blk-merge.c:286
+Read of size 8 at addr ffff88807a302100 by task syz-executor144/5006
+
+CPU: 1 PID: 5006 Comm: syz-executor144 Not tainted 6.4.0-rc7-syzkaller-01944-g3674fbf0451d #0
 Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-Workqueue: ext4-rsv-conversion ext4_end_io_rsv_work
-RIP: 0010:_compound_head include/linux/page-flags.h:245 [inline]
-RIP: 0010:bio_first_folio include/linux/bio.h:284 [inline]
-RIP: 0010:ext4_finish_bio+0xdc/0x1090 fs/ext4/page-io.c:104
-Code: c1 ea 03 80 3c 02 00 0f 85 43 0f 00 00 48 8b 45 00 48 8d 78 08 48 89 04 24 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 4c 0f 00 00 48 8b 04 24 31 ff 4c 8b 60 08 4c 89
-RSP: 0018:ffffc9000d047b60 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: ffffffff8234c972 RDI: 0000000000000008
-RBP: ffff88807d609100 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000094001 R12: ffff888074f111e0
-R13: dffffc0000000000 R14: 0000000000000001 R15: ffff888074c416b0
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020241040 CR3: 0000000024e17000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
 Call Trace:
  <TASK>
- ext4_release_io_end+0x118/0x3b0 fs/ext4/page-io.c:160
- ext4_end_io_end fs/ext4/page-io.c:194 [inline]
- ext4_do_flush_completed_IO fs/ext4/page-io.c:259 [inline]
- ext4_end_io_rsv_work+0x156/0x670 fs/ext4/page-io.c:273
- process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
- kthread+0x344/0x440 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
- </TASK>
-Modules linked in:
----[ end trace 0000000000000000 ]---
-RIP: 0010:_compound_head include/linux/page-flags.h:245 [inline]
-RIP: 0010:bio_first_folio include/linux/bio.h:284 [inline]
-RIP: 0010:ext4_finish_bio+0xdc/0x1090 fs/ext4/page-io.c:104
-Code: c1 ea 03 80 3c 02 00 0f 85 43 0f 00 00 48 8b 45 00 48 8d 78 08 48 89 04 24 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 4c 0f 00 00 48 8b 04 24 31 ff 4c 8b 60 08 4c 89
-RSP: 0018:ffffc9000d047b60 EFLAGS: 00010202
-RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: 0000000000000001 RSI: ffffffff8234c972 RDI: 0000000000000008
-RBP: ffff88807d609100 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000094001 R12: ffff888074f111e0
-R13: dffffc0000000000 R14: 0000000000000001 R15: ffff888074c416b0
-FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020241040 CR3: 000000007a4d9000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-----------------
-Code disassembly (best guess):
-   0:	c1 ea 03             	shr    $0x3,%edx
-   3:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
-   7:	0f 85 43 0f 00 00    	jne    0xf50
-   d:	48 8b 45 00          	mov    0x0(%rbp),%rax
-  11:	48 8d 78 08          	lea    0x8(%rax),%rdi
-  15:	48 89 04 24          	mov    %rax,(%rsp)
-  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
-  20:	fc ff df
-  23:	48 89 fa             	mov    %rdi,%rdx
-  26:	48 c1 ea 03          	shr    $0x3,%rdx
-* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
-  2e:	0f 85 4c 0f 00 00    	jne    0xf80
-  34:	48 8b 04 24          	mov    (%rsp),%rax
-  38:	31 ff                	xor    %edi,%edi
-  3a:	4c 8b 60 08          	mov    0x8(%rax),%r12
-  3e:	4c                   	rex.WR
-  3f:	89                   	.byte 0x89
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_address_description.constprop.0+0x2c/0x3c0 mm/kasan/report.c:351
+ print_report mm/kasan/report.c:462 [inline]
+ kasan_report+0x11c/0x130 mm/kasan/report.c:572
+ bio_split_rw+0x7e7/0x8b0 block/blk-merge.c:286
+ __bio_split_to_limits+0x235/0x9b0 block/blk-merge.c:370
+ blk_mq_submit_bio+0x235/0x1f50 block/blk-mq.c:2940
+ __submit_bio+0xfc/0x310 block/blk-core.c:594
+ __submit_bio_noacct_mq block/blk-core.c:673 [inline]
+ submit_bio_noacct_nocheck+0x7f9/0xb40 block/blk-core.c:702
+ submit_bio_noacct+0x945/0x19f0 block/blk-core.c:801
+ ext4_io_submit+0xa6/0x140 fs/ext4/page-io.c:378
+ ext4_do_writepages+0x141c/0x3290 fs/ext4/inode.c:2723
+ ext4_writepages+0x304/0x770 fs/ext4/inode.c:2792
+ do_writepages+0x1a8/0x640 mm/page-writeback.c:2551
+ filemap_fdatawrite_wbc mm/filemap.c:390 [inline]
+ filemap_fdatawrite_wbc+0x147/0x1b0 mm/filemap.c:380
+ __filemap_fdatawrite_range+0xb8/0xf0 mm/filemap.c:423
+ filemap_write_and_wait_range mm/filemap.c:678 [inline]
+ filemap_write_and_wait_range+0xa1/0x120 mm/filemap.c:669
+ __iomap_dio_rw+0x65f/0x1f90 fs/iomap/direct-io.c:569
+ iomap_dio_rw+0x40/0xa0 fs/iomap/direct-io.c:688
+ ext4_dio_read_iter fs/ext4/file.c:94 [inline]
+ ext4_file_read_iter+0x4be/0x690 fs/ext4/file.c:145
+ call_read_iter include/linux/fs.h:1862 [inline]
+ generic_file_splice_read+0x182/0x4b0 fs/splice.c:420
+ do_splice_to+0x1b9/0x240 fs/splice.c:1007
 
 
 ---
