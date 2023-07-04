@@ -1,324 +1,227 @@
-Return-Path: <netdev+bounces-15337-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15338-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2943D746E42
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 12:08:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id EEE93746E48
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 12:10:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D3212280EB0
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 10:08:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9A9F4280D2A
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 10:10:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC72653B8;
-	Tue,  4 Jul 2023 10:08:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B5B0253B8;
+	Tue,  4 Jul 2023 10:10:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDC2053A5;
-	Tue,  4 Jul 2023 10:08:24 +0000 (UTC)
-Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5790FE9;
-	Tue,  4 Jul 2023 03:08:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688465302; x=1720001302;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=ARfz7h7CWYpuw4O/m+uipmxFRdHOX/GoAR3IkMoVUo4=;
-  b=Vb6af1nd1Tbu+wXV6fL6AU6F4IfakjHX4uyoUM8Pgej0+5n6K5djVLma
-   9DeZgekMpKGnbpUUvwwn31fchke0kpxUXj2THQhpUQoqP2Y6cA+vUcuR/
-   IiRNrO/RYQonaw3qrIQdAqdsNcEfyc3SdY+ldnht0FbeBkv442X7lFvLH
-   LvdN6DQtzspPPad04oTXSjGkiFG/JdSASSaVB+QHFUSt2LAWka4xZtvFu
-   J7X7/Mi8O7zhY6Hvv8Reo1XWU2GNf/JxVYDak/RC/BJ0KEZrYk7rGMYsu
-   XZj56Y1qpSVBOAjdBecLWNVHsNJHzWvK585jW7r96aD2UAiA2HQYlXw1A
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="429126041"
-X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="429126041"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 03:08:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="748376503"
-X-IronPort-AV: E=Sophos;i="6.01,180,1684825200"; 
-   d="scan'208";a="748376503"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga008.jf.intel.com with ESMTP; 04 Jul 2023 03:08:21 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 4 Jul 2023 03:08:21 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Tue, 4 Jul 2023 03:08:20 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Tue, 4 Jul 2023 03:08:20 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.176)
- by edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Tue, 4 Jul 2023 03:08:20 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OpmjR2hbste7IPGqfeiKWrWjrpvxJunhmbdW31pcajm1Xdgbznym3TBRc55Pc2qOcC65CjmTS2m8sXcqWdhKnklncQItbt3AJjyLVEre6hJJVBuxm6UtekgW3DI5goKB6rzig9U/ed0JwJPE+10u0UPba+qQovUx+qPaWdLPaEiCiRIxceSRaSQrb1utLDF3Ni/GY9hbZ+GCk29j4LgkRLTm+W8oIxA0YnhJyfGAvgCTrf5ZCbBYpEsq2zhYwmVlXeIV8RyHMRUIUiBVBP3TFtRhDN7blMwSjiIq/2Oc1hNw9D3mchxjM8lQ65HlXwFeKo9VRrlbU4Aj6hA7+e22GQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=N5rXi8FCepJHP1E0nxsdAhSDJCB7zaKW9fxkWn3BiTA=;
- b=Ng0rLcQArnmnMWSEMSUMTe8HjvlcQEUV2YaAfpyU7EN0lI+X3hH6dk9j0vYjDjFYrTWnvko8E5s9pjSNg6xgmX7ry8JHreLw1KN3Kw0sNnWhyFAzQgQejjiqsDG127Zc/g/HvsRgLc0pP5mR60rYEzLZsbolHmLXU0NTk5a/e+nCTelZR29mxLEcbCDQ+pYVsA8l67BHj+/HKDX06FgNWx8PIJUy4MipWtPyBUGawl1MWr++jMtX3J4xISVNXRDcatl+3mPR7lAOvsR5f7hx9W/B5MPf6rWtasmqBV6iLMVVORW+0N+caUTuvEdhTB3r1DMpGJPEKXXIjQKIrsudsQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by MN2PR11MB4711.namprd11.prod.outlook.com (2603:10b6:208:24e::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
- 2023 10:08:18 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe%6]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 10:08:17 +0000
-Date: Tue, 4 Jul 2023 12:04:33 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: <bpf@vger.kernel.org>
-CC: <ast@kernel.org>, <daniel@iogearbox.net>, <andrii@kernel.org>,
-	<martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
-	<john.fastabend@gmail.com>, <kpsingh@kernel.org>, <sdf@google.com>,
-	<haoluo@google.com>, <jolsa@kernel.org>, David Ahern <dsahern@gmail.com>,
-	Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
-	Jesper Dangaard Brouer <brouer@redhat.com>, Anatoly Burakov
-	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
-	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v2 02/20] ice: make RX HW timestamp reading code
- more reusable
-Message-ID: <ZKPusRXixdVEe1gb@lincoln>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-3-larysa.zaremba@intel.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <20230703181226.19380-3-larysa.zaremba@intel.com>
-X-ClientProxiedBy: FR3P281CA0173.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a0::15) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A0E8C53A5
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 10:10:23 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8E351135
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 03:10:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688465419;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=rwDSntNr5wEEbcV6kdAG97wPrmyPp7RMUEimzXt++K8=;
+	b=abnUNb+i/GqeEqVfEScUrBcHwzTphUg8EtnUfcpNu1uAwFvboTGJQV/IiJDHamIz3vmWD9
+	SfchWsErnnk7eJmDkhZx/aqoTFHiTTTEIi3CJxmgEEalFXucaOJ/ub0+7L5l3+26L/L7OA
+	tCJBR8mu1ejD9awpElbZLBgqpenRrnI=
+Received: from mail-qk1-f199.google.com (mail-qk1-f199.google.com
+ [209.85.222.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-7-_LKrBCTZOCyDmGr2s-b8VA-1; Tue, 04 Jul 2023 06:10:15 -0400
+X-MC-Unique: _LKrBCTZOCyDmGr2s-b8VA-1
+Received: by mail-qk1-f199.google.com with SMTP id af79cd13be357-7672918d8a4so159348085a.0
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 03:10:14 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688465414; x=1691057414;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=rwDSntNr5wEEbcV6kdAG97wPrmyPp7RMUEimzXt++K8=;
+        b=XZI61NGjsKSWeqWyGqRSBPt+b4tVYHQG0+ruwUP7+eUB0rtoiQ9n/U5f9NRsJxkGQY
+         gbWn68wxCHie+xALrRp1Zfu7XMTiZdkIhbInH0sOL8TudKIy73YVXHBfqZUdZdMiOCJM
+         tgQa9WohZdIjUkd8QDEgTRCE7vQKFl6c5oZ5FBZJcxkui5CoMBLq/wOzL427AYYtCnUr
+         vjEqDmIT5W7az9TgqfJc+kPgwjieGqfgGjfbC2yWTXBmo5F6JjYNYXqyEkX7dPij5FOA
+         G03r2vWXwIMhoPzzfV4svdiUGvp0j89HHHsWL/s6XPI9aPaYzH+gLfR6WRd6tbNUxXlY
+         BZsg==
+X-Gm-Message-State: AC+VfDxfoUY4bHyyvudXoh62gAeYIgNPpBHlSq1Ik1RKA0KDQxK1VgQG
+	j+99teWw37Nh/+zdNpTPRDL1xIVB28cLeeRWPUsmqKGrvPXMwTVN0mY6eDBxxFyw0uANPT5eT0U
+	suaLzwdk5G6JL95Gg7l3Hlmge
+X-Received: by 2002:a05:620a:45a7:b0:767:1a23:137 with SMTP id bp39-20020a05620a45a700b007671a230137mr15037648qkb.2.1688465414356;
+        Tue, 04 Jul 2023 03:10:14 -0700 (PDT)
+X-Google-Smtp-Source: ACHHUZ5lFZqFiRa5rblBT821TamXePsU5poL/pAZQagGwI12ATgJwdlndUduhu0Q/jSAUq02yi0A2Q==
+X-Received: by 2002:a05:620a:45a7:b0:767:1a23:137 with SMTP id bp39-20020a05620a45a700b007671a230137mr15037629qkb.2.1688465414006;
+        Tue, 04 Jul 2023 03:10:14 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-247-156.dyn.eolo.it. [146.241.247.156])
+        by smtp.gmail.com with ESMTPSA id g16-20020a05620a13d000b0076753219bb1sm4115061qkl.29.2023.07.04.03.10.11
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 03:10:13 -0700 (PDT)
+Message-ID: <92a4d42491a2c219192ae86fa04b579ea3676d8c.camel@redhat.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+From: Paolo Abeni <pabeni@redhat.com>
+To: Ian Kumlien <ian.kumlien@gmail.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, intel-wired-lan
+ <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, Eric
+ Dumazet <edumazet@google.com>, "netdev@vger.kernel.org"
+ <netdev@vger.kernel.org>,  "linux-kernel@vger.kernel.org"
+ <linux-kernel@vger.kernel.org>
+Date: Tue, 04 Jul 2023 12:10:10 +0200
+In-Reply-To: <CAA85sZs_H3Dc-mYnj8J5VBEwUJwbHUupP+U-4eG20nfAHBtv4w@mail.gmail.com>
+References: 
+	<CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+	 <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+	 <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com>
+	 <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+	 <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
+	 <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+	 <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+	 <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
+	 <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+	 <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+	 <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
+	 <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
+	 <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
+	 <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
+	 <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
+	 <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
+	 <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
+	 <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com>
+	 <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
+	 <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
+	 <CAA85sZs_H3Dc-mYnj8J5VBEwUJwbHUupP+U-4eG20nfAHBtv4w@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|MN2PR11MB4711:EE_
-X-MS-Office365-Filtering-Correlation-Id: 1e865502-8cc7-4cd2-83e5-08db7c7693ba
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: wcr3mM5OQeWWQOLG8UARzjs5olnyJV7/t21saBRSFeUz2qV8Q4RD/eyw0ZYR5Y3cv3VROq50+X8dqauC6dKv2GtqGlCt1ssnt/E1M51zPqCAGLKQrNEoLMURVSUcwCQAW92EY0sOV8RvCFMXa/Maahqkon0ibWkQQcnKkmNs+LKJBKTgZ13GbD1PwWU7tywrh4O3CKXCx20iteHa4/n0FIKVUN4PLWfGCV9AhMw432OXbu6IWqrrulIhfOKEWZOLMowiQOy3Ey0uCVp2rY6ZVIHStcTRaZchlzxJ2DWWcD57uZans8GJwSvOthlz5ezxVR4rpJR+TbS6p1sl68Gs3fRtca+U3iJThfjTZp+xcoDQv4JBqB3lo3LpBAS4GiVywm8+MJJbhaXba6+NS7739u5ZVkB9d8PdAoE+7AfRDfa7taBVjOfWfvnhusQBw5brXCRETn0nP1Wl0pFxi7R8ooE+LWlI2hN3jxnJ/e+pr4mBu8lv/eZPAK4WrS/HuhlQ8uKd4g3n9cAnD2Wzlj9Mfzf9H6itBgXfpf+VIo2tg8AYnyL4UlUfMVp6cjQXlNWn
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(136003)(396003)(376002)(366004)(39860400002)(346002)(451199021)(41300700001)(26005)(7416002)(5660300002)(478600001)(66476007)(4326008)(86362001)(6916009)(66556008)(66946007)(82960400001)(6512007)(186003)(44832011)(9686003)(6486002)(6666004)(2906002)(6506007)(33716001)(8676002)(316002)(8936002)(83380400001)(38100700002)(54906003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?gP8lOBqBv33zI03qGMKSAzvLztqHBYA+TakA/VfCjwjVb+9xG0tKjQdVcM5D?=
- =?us-ascii?Q?VptK5MXhU/o11pK5l3cc4CcvGIDFm408J5IPSWKIDHdhrKTJbjW4w80dJc/P?=
- =?us-ascii?Q?qQts/+9kHnihM97dTKggcju7oktbPr7t5KQP04h3L3JF5YaIr8rnDYv/wTIX?=
- =?us-ascii?Q?Q0VErgQtwpUGBYsHP7kq5bBje7HyaTlCtbSmkGQhzvWw8QwNR8vISjuoLigY?=
- =?us-ascii?Q?+tpD0FtKGUTEXs1HRmpYiP7pKCyc1xTDetPN4IeJmaIu2XSBE1eGGURoMhhY?=
- =?us-ascii?Q?bJsDdIo3vVfCmEFgYbUOHy59ki25S9YBQ3nvdHkidrYUc+A7xqRKmU9j7LsO?=
- =?us-ascii?Q?T5RdCqWPPdVxaZiZ7iDH7NwD2xrzUvRBAUALEVDrj17C39JSqoEPsGuUdkC6?=
- =?us-ascii?Q?AiKFSnFDgXll/ewGBVtHIpJ2vh5uKy6eMUH0Apv8lZEAQouITIsHkX9Jjxnx?=
- =?us-ascii?Q?nNznS83LMkeoPnL2Px37rQdktHjaixrMvU6Gv/PQjPcycT4gm8s2HAxtF+2r?=
- =?us-ascii?Q?+Vx1QMK4Z3iuhMgEmqzIQfpbckhO/zEIZIq1D6kQDoxXjG/SpjGcJO7HZTHm?=
- =?us-ascii?Q?jhJHKIH2E0HHCS4LkB4+Yt0wNBlgdWM7QoALD7AUIE/6irRKOU6MHsFLufWB?=
- =?us-ascii?Q?FuWr8FOYGvP8EYnyiZwL7D3WpV1qUb+0M2Odrft4g4l0fPWACv+3isp98dZ5?=
- =?us-ascii?Q?OXva3jUUKgu99T4VF7/eFL5BJ3FWTC6MPI7hZJscttuUIn5lSTQ2+je0BzQN?=
- =?us-ascii?Q?k0XLR6sZuw2ggtCpRw8dR3LVzP1SZQgxfuC2c/xxnRy7lQJwoY4LRicWA9Hr?=
- =?us-ascii?Q?Wbn7yFw+QNf2vvgFmeJ3nbuz+WeATPFZze/SDlIz63+OjZxI8SmBnvCgKKQZ?=
- =?us-ascii?Q?E5qVMmYnYusNP3JlBOCN5xwM6ORip8J5wbFvPF4/CE0w02ZX9RjjyVGgYgBl?=
- =?us-ascii?Q?EL95Q6XLjaJ1wKbxGK/9j/EmlmNxecH8N+WnxbnZwFPAT2nhvlplyLp7G2C3?=
- =?us-ascii?Q?ceGxZ8nuctrYswbYyZNG9eBeyXBtDDMfl/yxHbWpxOALJTpZ7kpcFvbGGpfP?=
- =?us-ascii?Q?h3HYK99Eijb7ikBwFvAUaPSjTtYZ273n5RuS3o0N4NYLP/RyzY8QWd0EUxDb?=
- =?us-ascii?Q?WBXr5zS9JYkH3CQ2eTEbgeMb3oH61dj+ogqD8Yupt4kuzwAlW5SHF5IoNExo?=
- =?us-ascii?Q?E7BwHn6iYeDENd68aZdoHVcVDZj/cODHXRtCDFDvZnEuU8b1ePLWUyDrXAuv?=
- =?us-ascii?Q?R/OkX9dncazRygy7pjS2VL+gyfdAyqMzQh4Dab204uwO44w9P3xHUZfTxEhw?=
- =?us-ascii?Q?PzxuUKhPLbhIEaUk1Ngcsn5IkUKhZjtRs/68/+uytTF67dHNC7ojtOFzOp4m?=
- =?us-ascii?Q?JDFINQZU4QfpXtXejSMGGtLA5+wsgMjdfRWP+hJW+KYk6r7D4pi0znCRRPGf?=
- =?us-ascii?Q?J9LcyoWWbB+1yc/WYwQkbTJhjCZlvzcbObMtDAnNe1NofmfFLk6v0pgQ+6u9?=
- =?us-ascii?Q?0G9k6RvC1jdMtueZLLklGblMS+zkH34mQEzKSpgt2wNOofD+KX9+S8nPIAgb?=
- =?us-ascii?Q?EoD64KLPYTwH7ZyKMoRBsEbhxYqIQWdTMH1R8bPfRn7pIe/RxWS83KzkxfFR?=
- =?us-ascii?Q?5g=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 1e865502-8cc7-4cd2-83e5-08db7c7693ba
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 10:08:13.1739
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 2uoIxGnM+wtCt68zy2TB/hDkquM+cRb37+P6UjN1ULay5kn97DZf3C4jHNbf+8qGER7K1iQEYgM+duDFRKJ1LpMqrDvSIxsreha6VnqlA2E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR11MB4711
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 03, 2023 at 08:12:08PM +0200, Larysa Zaremba wrote:
-> Previously, we only needed RX HW timestamp in skb path,
-> hence all related code was written with skb in mind.
-> But with the addition of XDP hints via kfuncs to the ice driver,
-> the same logic will be needed in .xmo_() callbacks.
-> 
-> Put generic process of reading RX HW timestamp from a descriptor
-> into a separate function.
-> Move skb-related code into another source file.
-> 
-> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> ---
->  drivers/net/ethernet/intel/ice/ice_ptp.c      | 24 ++++++------------
->  drivers/net/ethernet/intel/ice/ice_ptp.h      | 15 ++++++-----
->  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 25 ++++++++++++++++++-
->  3 files changed, 41 insertions(+), 23 deletions(-)
-> 
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> index 81d96a40d5a7..a31333972c68 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> @@ -2147,30 +2147,24 @@ int ice_ptp_set_ts_config(struct ice_pf *pf, struct ifreq *ifr)
->  }
->  
->  /**
-> - * ice_ptp_rx_hwtstamp - Check for an Rx timestamp
-> - * @rx_ring: Ring to get the VSI info
-> + * ice_ptp_get_rx_hwts - Get packet Rx timestamp
->   * @rx_desc: Receive descriptor
-> - * @skb: Particular skb to send timestamp with
-> + * @cached_time: Cached PHC time
->   *
->   * The driver receives a notification in the receive descriptor with timestamp.
-> - * The timestamp is in ns, so we must convert the result first.
->   */
-> -void
-> -ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
-> -		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb)
-> +u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
-> +			u64 cached_time)
->  {
-> -	struct skb_shared_hwtstamps *hwtstamps;
-> -	u64 ts_ns, cached_time;
->  	u32 ts_high;
-> +	u64 ts_ns;
->  
->  	if (!(rx_desc->wb.time_stamp_low & ICE_PTP_TS_VALID))
-> -		return;
-> -
-> -	cached_time = READ_ONCE(rx_ring->cached_phctime);
-> +		return 0;
->  
->  	/* Do not report a timestamp if we don't have a cached PHC time */
->  	if (!cached_time)
-> -		return;
-> +		return 0;
->  
->  	/* Use ice_ptp_extend_32b_ts directly, using the ring-specific cached
->  	 * PHC value, rather than accessing the PF. This also allows us to
-> @@ -2181,9 +2175,7 @@ ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
->  	ts_high = le32_to_cpu(rx_desc->wb.flex_ts.ts_high);
->  	ts_ns = ice_ptp_extend_32b_ts(cached_time, ts_high);
->  
-> -	hwtstamps = skb_hwtstamps(skb);
-> -	memset(hwtstamps, 0, sizeof(*hwtstamps));
-> -	hwtstamps->hwtstamp = ns_to_ktime(ts_ns);
-> +	return ts_ns;
->  }
->  
->  /**
-> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.h b/drivers/net/ethernet/intel/ice/ice_ptp.h
-> index 995a57019ba7..523eefbfdf95 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_ptp.h
-> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.h
-> @@ -268,9 +268,8 @@ void ice_ptp_extts_event(struct ice_pf *pf);
->  s8 ice_ptp_request_ts(struct ice_ptp_tx *tx, struct sk_buff *skb);
->  enum ice_tx_tstamp_work ice_ptp_process_ts(struct ice_pf *pf);
->  
-> -void
-> -ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
-> -		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb);
-> +u64 ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc,
-> +			u64 cached_time);
->  void ice_ptp_reset(struct ice_pf *pf);
->  void ice_ptp_prepare_for_reset(struct ice_pf *pf);
->  void ice_ptp_init(struct ice_pf *pf);
-> @@ -304,9 +303,13 @@ static inline bool ice_ptp_process_ts(struct ice_pf *pf)
->  {
->  	return true;
->  }
-> -static inline void
-> -ice_ptp_rx_hwtstamp(struct ice_rx_ring *rx_ring,
-> -		    union ice_32b_rx_flex_desc *rx_desc, struct sk_buff *skb) { }
+On Mon, 2023-07-03 at 11:37 +0200, Ian Kumlien wrote:
+> So, got back, switched to 6.4.1 and reran with kmemleak and kasan
+>=20
+> I got the splat from:
+> diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> index cea28d30abb5..701c1b5cf532 100644
+> --- a/net/core/skbuff.c
+> +++ b/net/core/skbuff.c
+> @@ -4328,6 +4328,9 @@ struct sk_buff *skb_segment_list(struct sk_buff *sk=
+b,
+>=20
+>         skb->prev =3D tail;
+>=20
+> +       if (WARN_ON_ONCE(!skb->next))
+> +               goto err_linearize;
 > +
-> +static inline u64
-> +ice_ptp_get_rx_hwts(const union ice_32b_rx_flex_desc *rx_desc, u64 cached_time)
-> +{
-> +	return 0;
-> +}
-> +
->  static inline void ice_ptp_reset(struct ice_pf *pf) { }
->  static inline void ice_ptp_prepare_for_reset(struct ice_pf *pf) { }
->  static inline void ice_ptp_init(struct ice_pf *pf) { }
-> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> index 8f7f6d78f7bf..d4d27057d17b 100644
-> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> @@ -185,6 +185,29 @@ ice_rx_csum(struct ice_rx_ring *ring, struct sk_buff *skb,
->  	ring->vsi->back->hw_csum_rx_error++;
->  }
->  
-> +/**
-> + * ice_ptp_rx_hwts_to_skb - Put RX timestamp into skb
-> + * @rx_ring: Ring to get the VSI info
-> + * @rx_desc: Receive descriptor
-> + * @skb: Particular skb to send timestamp with
-> + *
-> + * The timestamp is in ns, so we must convert the result first.
-> + */
-> +static void
-> +ice_ptp_rx_hwts_to_skb(struct ice_rx_ring *rx_ring,
-> +		       const union ice_32b_rx_flex_desc *rx_desc,
-> +		       struct sk_buff *skb)
-> +{
-> +	u64 ts_ns, cached_time;
-> +
-> +	cached_time = READ_ONCE(rx_ring->pkt_ctx.cached_phctime);
+>         if (skb_needs_linearize(skb, features) &&
+>             __skb_linearize(skb))
+>                 goto err_linearize;
+>=20
+> I'm just happy i ran with dmesg -W since there was only minimal output
+> on the console:
+> [39914.833696] rcu: INFO: rcu_preempt self-detected stall on CPU
+> [39914.839598] rcu:     2-....: (20997 ticks this GP)
+> idle=3Ddd64/1/0x4000000000000000 softirq=3D4633489/4633489 fqs=3D4687
+> [39914.849839] rcu:     (t=3D21017 jiffies g=3D18175157 q=3D45473 ncpus=
+=3D12)
+> [39977.862108] rcu: INFO: rcu_preempt self-detected stall on CPU
+> [39977.868002] rcu:     2-....: (84001 ticks this GP)
+> idle=3Ddd64/1/0x4000000000000000 softirq=3D4633489/4633489 fqs=3D28434
+> [39977.878340] rcu:     (t=3D84047 jiffies g=3D18175157 q=3D263477 ncpus=
+=3D12)
+> [40040.892521] rcu: INFO: rcu_preempt self-detected stall on CPU
+> [40040.898414] rcu:     2-....: (147006 ticks this GP)
+> idle=3Ddd64/1/0x4000000000000000 softirq=3D4633489/4633489 fqs=3D53043
+> [40040.908831] rcu:     (t=3D147079 jiffies g=3D18175157 q=3D464422 ncpus=
+=3D12)
+> [40065.080842] ixgbe 0000:06:00.1 eno2: Reset adapter
 
-CI has pointed out this line is messed up and this is correct, a mistake while 
-separating patches, should be 'READ_ONCE(rx_ring->cached_phctime)' in this 
-patch, will fix in v3.
+Ouch, just another slightly different issue, apparently :(
 
-> +	ts_ns = ice_ptp_get_rx_hwts(rx_desc, cached_time);
-> +
-> +	*skb_hwtstamps(skb) = (struct skb_shared_hwtstamps){
-> +		.hwtstamp	= ns_to_ktime(ts_ns),
-> +	};
-> +}
-> +
->  /**
->   * ice_process_skb_fields - Populate skb header fields from Rx descriptor
->   * @rx_ring: Rx descriptor ring packet is being transacted on
-> @@ -209,7 +232,7 @@ ice_process_skb_fields(struct ice_rx_ring *rx_ring,
->  	ice_rx_csum(rx_ring, skb, rx_desc, ptype);
->  
->  	if (rx_ring->ptp_rx)
-> -		ice_ptp_rx_hwtstamp(rx_ring, rx_desc, skb);
-> +		ice_ptp_rx_hwts_to_skb(rx_ring, rx_desc, skb);
->  }
->  
->  /**
-> -- 
-> 2.41.0
-> 
+I'll try some wild guesses. The rcu stall could cause the OOM observed
+in the previous tests. Here we the OOM did not trigger because due to
+kasan/kmemleak the kernel is able to process a lesser number of packets
+in the same period of time.
+
+[...]
+> [39914.857231] skb_segment (net/core/skbuff.c:4519)
+
+I *think* this could be looping "forever", if gso_size becomes 0, which
+is in turn completely unexpected ...
+
+
+> [39914.857257] ? write_profile (kernel/stacktrace.c:83)
+> [39914.857296] ? pskb_extract (net/core/skbuff.c:4360)
+> [39914.857320] ? rt6_score_route (net/ipv6/route.c:713 (discriminator 1))
+> [39914.857346] ? llist_add_batch (lib/llist.c:33 (discriminator 14))
+> [39914.857379] __udp_gso_segment (net/ipv4/udp_offload.c:290)
+> [39914.857413] ? ip6_dst_destroy (net/ipv6/route.c:788)
+> [39914.857442] udp6_ufo_fragment (net/ipv6/udp_offload.c:47)
+> [39914.857472] ? udp6_gro_complete (net/ipv6/udp_offload.c:20)
+> [39914.857498] ? ipv6_gso_pull_exthdrs (net/ipv6/ip6_offload.c:53)
+> [39914.857528] ipv6_gso_segment (net/ipv6/ip6_offload.c:119
+> net/ipv6/ip6_offload.c:74)
+> [39914.857557] ? ipv6_gso_pull_exthdrs (net/ipv6/ip6_offload.c:76)
+> [39914.857583] ? nft_update_chain_stats (net/netfilter/nf_tables_core.c:2=
+54)
+> [39914.857612] ? fib6_select_path (net/ipv6/route.c:458)
+> [39914.857643] skb_mac_gso_segment (net/core/gro.c:141)
+> [39914.857673] ? skb_eth_gso_segment (net/core/gro.c:127)
+> [39914.857702] ? ipv6_skip_exthdr (net/ipv6/exthdrs_core.c:190)
+> [39914.857726] ? kasan_save_stack (mm/kasan/common.c:47)
+> [39914.857758] __skb_gso_segment (net/core/dev.c:3401 (discriminator 2))
+> [39914.857787] udpv6_queue_rcv_skb (./include/net/udp.h:492
+> net/ipv6/udp.c:796 net/ipv6/udp.c:787)
+> [39914.857816] __udp6_lib_rcv (net/ipv6/udp.c:906 net/ipv6/udp.c:1013)
+
+... but this means we are processing a multicast packet, likely skb is
+cloned. If one of the clone instance enters simultaneusly
+skb_segment_list() the latter would inconditionally call:
+
+	skb_gso_reset(skb);
+
+clearing the gso area in the shared info and causing unexpected results
+(possibly the memory corruption observed before, and the above RCU
+stall) for the other clone instances.
+
+Assuming there are no other issues and that the above is not just a
+side effect of ENOCOFFEE here, the following should possibly solve,
+could you please add it to your testbed? (still with kasan+previous
+patch, kmemleak is possibly not needed).
+
+Thanks!
+---
+diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+index 6c5915efbc17..ac1ca6c7bff9 100644
+--- a/net/core/skbuff.c
++++ b/net/core/skbuff.c
+@@ -4263,6 +4263,11 @@ struct sk_buff *skb_segment_list(struct sk_buff *skb=
+,
+=20
+ 	skb_shinfo(skb)->frag_list =3D NULL;
+=20
++	/* later code will clear the gso area in the shared info */
++	err =3D skb_header_unclone(skb, GFP_ATOMIC);
++	if (err)
++		goto err_linearize;
++
+ 	while (list_skb) {
+ 		nskb =3D list_skb;
+ 		list_skb =3D list_skb->next;
+
 
