@@ -1,231 +1,79 @@
-Return-Path: <netdev+bounces-15289-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15287-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 11B667469F8
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 08:48:24 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id D19EF7469E8
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 08:47:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 666AE280F0F
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 06:48:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5EDB280ED3
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 06:47:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C9451104;
-	Tue,  4 Jul 2023 06:48:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E0C8B7E3;
+	Tue,  4 Jul 2023 06:47:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46DB51103
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 06:48:02 +0000 (UTC)
-Received: from mail-pf1-f197.google.com (mail-pf1-f197.google.com [209.85.210.197])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B22D10FC
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 23:47:33 -0700 (PDT)
-Received: by mail-pf1-f197.google.com with SMTP id d2e1a72fcca58-66a44bf4651so6169088b3a.1
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 23:47:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688453247; x=1691045247;
-        h=cc:to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=ACIBrwixBjWpiuudARGyb9TqOdMNUjtG62uNvT31qwI=;
-        b=WFH9g44DrYMb+wWfO7wAfrBSo2KNmA//CbT8C7EDsDS5vJMHNmrBU05aCqn7skRO7K
-         p1srR1rQj64dOwcqlhrV9MdzYpfFSbDFMa7wLgtJpgvmyBkfI05uWVC4X5XENjriz03C
-         g3m2JvnF5ePk+MEwJK/np3p5NJhMqGJxvcttM72H/4AAw6IH4l5GhGEwpjsaGQZkaslK
-         F0WZxjzaRzOJYdfwZDWNxLF2zXyyxU13slQLT4EjNvd3IPKPfJjIK+Yw+zz56DVgrW8r
-         Tj8xy1aexWYlXns6UVhF4VbTC/2lmMlqU+olALR0lfjLr7Tnnva/XpB4qUrncP1Prjs2
-         UfEg==
-X-Gm-Message-State: AC+VfDw9dVVPIamVkyCbOVjASn6LsOH/92JcZBl0lCILMcteKQVatnmY
-	olFNMp+HSzu5+QQ2uItJnoqYi5vCFHgw4NHr9qS/0qIQN/ca
-X-Google-Smtp-Source: ACHHUZ4Gpgjn42qIrs/aUUCL9ENRyznyVbIaqmBiEl9n7unYwO7oqG5AEd5e+DIhhnRWaWvju73GeCWeYo+w2C316h50NXfH/Lvr
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9C4DD7C
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 06:47:34 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9D424C433C8;
+	Tue,  4 Jul 2023 06:47:33 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
+	s=korg; t=1688453254;
+	bh=NKrgqMucYEDaZ3CZ4vWlOu9Bpv3mE+2DG7gfJNFcPwY=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=CiF0+pTUEjiABNYtUnUCtbcuLin2yOxkmmIszTzS6elUqzFrs2i1PkNechNBDjFov
+	 KQk640h3FVDpDJZ4wIKqSd/vRyJnvTluls3jYVb1/rDGlC/KYjRJm04xemR0vaxuuG
+	 qT4pbWxAM57tdXt6/gqrnGsVfN7GBGBdQh+ybd0A=
+Date: Tue, 4 Jul 2023 07:47:31 +0100
+From: Greg Kroah-Hartman <gregkh@linuxfoundation.org>
+To: Enrico Mioso <mrkiko.rs@gmail.com>
+Cc: Jan Engelhardt <jengelh@inai.de>, linux-kernel@vger.kernel.org,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	Kalle Valo <kvalo@kernel.org>,
+	Oleksij Rempel <linux@rempel-privat.de>,
+	Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>,
+	Neil Armstrong <neil.armstrong@linaro.org>,
+	Mauro Carvalho Chehab <mchehab@kernel.org>,
+	Andrzej Pietrasiewicz <andrzejtp2010@gmail.com>,
+	Jacopo Mondi <jacopo@jmondi.org>,
+	=?utf-8?Q?=C5=81ukasz?= Stelmach <l.stelmach@samsung.com>,
+	Laurent Pinchart <laurent.pinchart@ideasonboard.com>,
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org,
+	linux-wireless@vger.kernel.org,
+	Ilja Van Sprundel <ivansprundel@ioactive.com>,
+	Joseph Tartaro <joseph.tartaro@ioactive.com>
+Subject: Re: [PATCH] USB: disable all RNDIS protocol drivers
+Message-ID: <2023070430-fragment-remember-2fdd@gregkh>
+References: <20221123124620.1387499-1-gregkh@linuxfoundation.org>
+ <n9108s34-9rn0-3n8q-r3s5-51r9647331ns@vanv.qr>
+ <ZKM5nbDnKnFZLOlY@rivendell>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:aa7:8685:0:b0:666:8f6c:c8ad with SMTP id
- d5-20020aa78685000000b006668f6cc8admr12033599pfo.2.1688453247045; Mon, 03 Jul
- 2023 23:47:27 -0700 (PDT)
-Date: Mon, 03 Jul 2023 23:47:26 -0700
-In-Reply-To: <20230704064710.3189-1-astrajoan@yahoo.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000002937705ffa3a80b@google.com>
-Subject: Re: [PATCH] can: j1939: prevent deadlock by changing j1939_socks_lock
- to rwlock
-From: syzbot <syzbot+1591462f226d9cbf0564@syzkaller.appspotmail.com>
-To: astrajoan@yahoo.com
-Cc: astrajoan@yahoo.com, davem@davemloft.net, edumazet@google.com, 
-	ivan.orlov0322@gmail.com, kernel@pengutronix.de, kuba@kernel.org, 
-	linux-can@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	linux@rempel-privat.de, mkl@pengutronix.de, netdev@vger.kernel.org, 
-	pabeni@redhat.com, robin@protonic.nl, skhan@linuxfoundation.org, 
-	socketcan@hartkopp.net, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <ZKM5nbDnKnFZLOlY@rivendell>
 
-> The following 3 locks would race against each other, causing the
-> deadlock situation in the Syzbot bug report:
->
-> - j1939_socks_lock
-> - active_session_list_lock
-> - sk_session_queue_lock
->
-> A reasonable fix is to change j1939_socks_lock to an rwlock, since in
-> the rare situations where a write lock is required for the linked list
-> that j1939_socks_lock is protecting, the code does not attempt to
-> acquire any more locks. This would break the circular lock dependency,
-> where, for example, the current thread already locks j1939_socks_lock
-> and attempts to acquire sk_session_queue_lock, and at the same time,
-> another thread attempts to acquire j1939_socks_lock while holding
-> sk_session_queue_lock.
->
-> NOTE: This patch along does not fix the unregister_netdevice bug
-> reported by Syzbot; instead, it solves a deadlock situation to prepare
-> for one or more further patches to actually fix the Syzbot bug, which
-> appears to be a reference counting problem within the j1939 codebase.
->
-> #syz test:
+On Mon, Jul 03, 2023 at 11:11:57PM +0200, Enrico Mioso wrote:
+> Hi all!!
+> 
+> I think the rndis_host USB driver might emit a warning in the dmesg, but disabling the driver wouldn't be a good idea.
+> The TP-Link MR6400 V1 LTE modem and also some ZTE modems integrated in routers do use this protocol.
+> 
+> We may also distinguish between these cases and devices you might plug in - as they pose different risk levels.
 
-This crash does not have a reproducer. I cannot test it.
+Again, you have to fully trust the other side of an RNDIS connection,
+any hints on how to have the kernel determine that?
 
-> https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git master
->
-> Signed-off-by: Ziqi Zhao <astrajoan@yahoo.com>
-> ---
->  net/can/j1939/j1939-priv.h |  2 +-
->  net/can/j1939/main.c       |  2 +-
->  net/can/j1939/socket.c     | 25 +++++++++++++------------
->  3 files changed, 15 insertions(+), 14 deletions(-)
->
-> diff --git a/net/can/j1939/j1939-priv.h b/net/can/j1939/j1939-priv.h
-> index 16af1a7f80f6..74f15592d170 100644
-> --- a/net/can/j1939/j1939-priv.h
-> +++ b/net/can/j1939/j1939-priv.h
-> @@ -86,7 +86,7 @@ struct j1939_priv {
->  	unsigned int tp_max_packet_size;
->  
->  	/* lock for j1939_socks list */
-> -	spinlock_t j1939_socks_lock;
-> +	rwlock_t j1939_socks_lock;
->  	struct list_head j1939_socks;
->  
->  	struct kref rx_kref;
-> diff --git a/net/can/j1939/main.c b/net/can/j1939/main.c
-> index ecff1c947d68..a6fb89fa6278 100644
-> --- a/net/can/j1939/main.c
-> +++ b/net/can/j1939/main.c
-> @@ -274,7 +274,7 @@ struct j1939_priv *j1939_netdev_start(struct net_device *ndev)
->  		return ERR_PTR(-ENOMEM);
->  
->  	j1939_tp_init(priv);
-> -	spin_lock_init(&priv->j1939_socks_lock);
-> +	rwlock_init(&priv->j1939_socks_lock);
->  	INIT_LIST_HEAD(&priv->j1939_socks);
->  
->  	mutex_lock(&j1939_netdev_lock);
-> diff --git a/net/can/j1939/socket.c b/net/can/j1939/socket.c
-> index feaec4ad6d16..a8b981dc2065 100644
-> --- a/net/can/j1939/socket.c
-> +++ b/net/can/j1939/socket.c
-> @@ -80,16 +80,16 @@ static void j1939_jsk_add(struct j1939_priv *priv, struct j1939_sock *jsk)
->  	jsk->state |= J1939_SOCK_BOUND;
->  	j1939_priv_get(priv);
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	write_lock_bh(&priv->j1939_socks_lock);
->  	list_add_tail(&jsk->list, &priv->j1939_socks);
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	write_unlock_bh(&priv->j1939_socks_lock);
->  }
->  
->  static void j1939_jsk_del(struct j1939_priv *priv, struct j1939_sock *jsk)
->  {
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	write_lock_bh(&priv->j1939_socks_lock);
->  	list_del_init(&jsk->list);
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	write_unlock_bh(&priv->j1939_socks_lock);
->  
->  	j1939_priv_put(priv);
->  	jsk->state &= ~J1939_SOCK_BOUND;
-> @@ -329,13 +329,13 @@ bool j1939_sk_recv_match(struct j1939_priv *priv, struct j1939_sk_buff_cb *skcb)
->  	struct j1939_sock *jsk;
->  	bool match = false;
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		match = j1939_sk_recv_match_one(jsk, skcb);
->  		if (match)
->  			break;
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  
->  	return match;
->  }
-> @@ -344,11 +344,11 @@ void j1939_sk_recv(struct j1939_priv *priv, struct sk_buff *skb)
->  {
->  	struct j1939_sock *jsk;
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		j1939_sk_recv_one(jsk, skb);
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  }
->  
->  static void j1939_sk_sock_destruct(struct sock *sk)
-> @@ -484,6 +484,7 @@ static int j1939_sk_bind(struct socket *sock, struct sockaddr *uaddr, int len)
->  
->  		priv = j1939_netdev_start(ndev);
->  		dev_put(ndev);
-> +
->  		if (IS_ERR(priv)) {
->  			ret = PTR_ERR(priv);
->  			goto out_release_sock;
-> @@ -1078,12 +1079,12 @@ void j1939_sk_errqueue(struct j1939_session *session,
->  	}
->  
->  	/* spread RX notifications to all sockets subscribed to this session */
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		if (j1939_sk_recv_match_one(jsk, &session->skcb))
->  			__j1939_sk_errqueue(session, &jsk->sk, type);
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  };
->  
->  void j1939_sk_send_loop_abort(struct sock *sk, int err)
-> @@ -1271,7 +1272,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
->  	struct j1939_sock *jsk;
->  	int error_code = ENETDOWN;
->  
-> -	spin_lock_bh(&priv->j1939_socks_lock);
-> +	read_lock_bh(&priv->j1939_socks_lock);
->  	list_for_each_entry(jsk, &priv->j1939_socks, list) {
->  		jsk->sk.sk_err = error_code;
->  		if (!sock_flag(&jsk->sk, SOCK_DEAD))
-> @@ -1279,7 +1280,7 @@ void j1939_sk_netdev_event_netdown(struct j1939_priv *priv)
->  
->  		j1939_sk_queue_drop_all(priv, jsk, error_code);
->  	}
-> -	spin_unlock_bh(&priv->j1939_socks_lock);
-> +	read_unlock_bh(&priv->j1939_socks_lock);
->  }
->  
->  static int j1939_sk_no_ioctlcmd(struct socket *sock, unsigned int cmd,
-> -- 
-> 2.34.1
->
+thanks,
+
+greg k-h
 
