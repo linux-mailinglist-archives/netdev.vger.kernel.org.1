@@ -1,287 +1,112 @@
-Return-Path: <netdev+bounces-15275-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15276-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8FE2746885
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 06:52:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1205374688A
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 06:54:27 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 09D311C20A78
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 04:52:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C9F39280D3F
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 04:54:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D9E32634;
-	Tue,  4 Jul 2023 04:52:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1883F634;
+	Tue,  4 Jul 2023 04:54:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CAEB5398
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 04:52:46 +0000 (UTC)
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9964AFA
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 21:52:44 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688446364; x=1719982364;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=xNvNmEI9BYCFzgyK93CODaNDI8KRv6kM00qJov/Ol3Q=;
-  b=VmanE837dhVelqgrm3hsPbaiXB5ji7DLjyFgyLnrguTEfA07VbcBiOUX
-   lfMf77AwDNqC5X509L5FN0weXGiqTBa0ilhV3DYuY5hi/SrI4RWKIJnae
-   4tag9RSfilu3LljIWjYkeycbutDTGWYfuX7NaCQgUqAaydJqfEuO+LlOj
-   4YLpTD565z6tn9jyZCX9N2wWIkIG6P3uNiWD3+TCOsdcD8Dr5vZWGIuiD
-   VQC/j2HjGKE9eGDWFauObtxSJ+swTZlHOHURzGllcRdAoD1Su+VYDoYnr
-   42C1A+gk5fHrKUtSmFT0TOEchrBGPv35MbdZc8W/Xz6J/yMuDZ5ynV/mh
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="426716882"
-X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="426716882"
-Received: from orsmga006.jf.intel.com ([10.7.209.51])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 21:52:44 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10760"; a="695999632"
-X-IronPort-AV: E=Sophos;i="6.01,179,1684825200"; 
-   d="scan'208";a="695999632"
-Received: from unknown (HELO localhost.localdomain) ([10.237.112.144])
-  by orsmga006-auth.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 03 Jul 2023 21:52:42 -0700
-Date: Tue, 4 Jul 2023 06:52:34 +0200
-From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-To: Alexander Lobakin <aleksander.lobakin@intel.com>
-Cc: intel-wired-lan@lists.osuosl.org, netdev@vger.kernel.org,
-	Przemek Kitszel <przemyslaw.kitszel@intel.com>
-Subject: Re: [Intel-wired-lan] [PATCH iwl-net v1] ice: prevent call trace
- during reload
-Message-ID: <ZKOlcXErkz/2l4Aq@localhost.localdomain>
-References: <20230703103215.54570-1-michal.swiatkowski@linux.intel.com>
- <03256fdc-66d7-fc1b-2252-bb2af136c62a@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0BFF27ED
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 04:54:23 +0000 (UTC)
+Received: from mail-lj1-x230.google.com (mail-lj1-x230.google.com [IPv6:2a00:1450:4864:20::230])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9071DFA
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 21:54:22 -0700 (PDT)
+Received: by mail-lj1-x230.google.com with SMTP id 38308e7fff4ca-2b699a2fe86so85385261fa.3
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 21:54:22 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688446461; x=1691038461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4XSavZWH+SR9Y0pv5ixwnMo8WcTRio+BHQaD3Nrkpm4=;
+        b=ELoy7bmXrbbwjMaBS/QFpQRQwK5530aR/ApPnLvmQDq4Oiu5+2BCrnFPZxsqcGcjEi
+         aXDWwoGUXbRXo8O8+RANVwuhcrkvYMAFficoewGT05BFsLqI89RqBUphMFeb92NEP4yH
+         Mqg1azBRXd0u6Skjp8xK0kNnWqsCLJc9C/QTfSM/z0p49QATUAvioqQqiMNue1i81aeb
+         jSub5NBoNKceOfNMm8GWz6LROHBossL3+SHC5dlwQltyeXWEmzyenxaEjTSuG+hiYpXI
+         l2xHRkXq17aTfa+MZ1Co0GGsflo/K6w6FycNo0k1pWK0iGui34dPIdgx19B81Tgq4Q3n
+         16kg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688446461; x=1691038461;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4XSavZWH+SR9Y0pv5ixwnMo8WcTRio+BHQaD3Nrkpm4=;
+        b=Blaoof0UHHPX3aogK36LrAJ1kyJMbhWuBXst1395tIWUo1gnVUQQoubEtGNFFID+ef
+         KHqea/uP47f/CzMYMt5LMxTgxLtv/3cW7PF9Xu4/GpD+JWLL0/MmpNehvSZZbQ82eYX4
+         d5aYU84rAdEUCPFmsxcCuGazr4H8PFTdvFKNWt5/EOrbRJbCmPBQz0E160pHpjfRnnZC
+         FpjamP0K9arZfnW4uw4YZcRoP3f6OruNQZsSSnhz+QYo1neMVeH+m6BSpq2nyj5350FD
+         hJy3za9AKhBC6s3jv7tPiOgQdxsuipvDo5/FdMEhoYqvUTBi6OnnaMGa528BKEPu17lI
+         +OBw==
+X-Gm-Message-State: ABy/qLbD1DESrYefmtQuMJd5YpU8AMfTEM90ETE99Ru+3KDZynuQsVnW
+	MMSjoynAj13LtB1A57Sv6rW8st1EaRtuJEVfRFU=
+X-Google-Smtp-Source: APBJJlHdWOXwQN2qD5TbHUQ1sm3MN9GaRsUsq2nhe8hDluWdNBQoOeyWT1lHfA1UiE/+Sg3b6kZGFWst+P32YWQbQFg=
+X-Received: by 2002:a2e:9c14:0:b0:2b6:f009:d1b with SMTP id
+ s20-20020a2e9c14000000b002b6f0090d1bmr1432449lji.49.1688446460568; Mon, 03
+ Jul 2023 21:54:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <03256fdc-66d7-fc1b-2252-bb2af136c62a@intel.com>
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230628121150.47778-1-liangchen.linux@gmail.com>
+ <20230630160709.45ea4faa@kernel.org> <CAKhg4t+hoOiVWMbBiD7HCu_Z5pSdCsZrev2FMEKhbWvzgHCarw@mail.gmail.com>
+ <20230703115326.69f8953b@kernel.org> <8fb342b4-a843-6d67-b72f-19f2da38cfaa@huawei.com>
+In-Reply-To: <8fb342b4-a843-6d67-b72f-19f2da38cfaa@huawei.com>
+From: Liang Chen <liangchen.linux@gmail.com>
+Date: Tue, 4 Jul 2023 12:54:08 +0800
+Message-ID: <CAKhg4tJ+b4cdHeAv0D63sdw9p0kPyfo5LvoW+uxu6Y1WRKFF2Q@mail.gmail.com>
+Subject: Re: [PATCH net-next] skbuff: Optimize SKB coalescing for page pool case
+To: Yunsheng Lin <linyunsheng@huawei.com>
+Cc: Jakub Kicinski <kuba@kernel.org>, ilias.apalodimas@linaro.org, hawk@kernel.org, 
+	davem@davemloft.net, edumazet@google.com, pabeni@redhat.com, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 03, 2023 at 06:22:03PM +0200, Alexander Lobakin wrote:
-> From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> Date: Mon,  3 Jul 2023 12:32:15 +0200
-> 
-> > Calling ethtool during reload can lead to call trace, because VSI isn't
-> > configured for some time, but netdev is alive.
-> > 
-> > To fix it add rtnl lock for VSI deconfig and config. Set ::num_q_vectors
-> > to 0 after freeing and add a check for ::tx/rx_rings in ring related
-> > ethtool ops.
-> > 
-> > Reproduction:
-> > $watch -n 0.1 -d 'ethtool -g enp24s0f0np0'
-> > $devlink dev reload pci/0000:18:00.0 action driver_reinit
-> > 
-> > Call trace before fix:
-> > [66303.926205] BUG: kernel NULL pointer dereference, address: 0000000000000000
-> > [66303.926259] #PF: supervisor read access in kernel mode
-> > [66303.926286] #PF: error_code(0x0000) - not-present page
-> > [66303.926311] PGD 0 P4D 0
-> > [66303.926332] Oops: 0000 [#1] PREEMPT SMP PTI
-> > [66303.926358] CPU: 4 PID: 933821 Comm: ethtool Kdump: loaded Tainted: G           OE      6.4.0-rc5+ #1
-> > [66303.926400] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.00.01.0014.070920180847 07/09/2018
-> > [66303.926446] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
-> > [66303.926649] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
-> > [66303.926722] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
-> > [66303.926749] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
-> > [66303.926781] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
-> > [66303.926811] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
-> > [66303.926843] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
-> > [66303.926874] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
-> > [66303.926906] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
-> > [66303.926941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [66303.926967] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
-> > [66303.926999] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [66303.927029] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [66303.927060] PKRU: 55555554
-> > [66303.927075] Call Trace:
-> > [66303.927094]  <TASK>
-> > [66303.927111]  ? __die+0x23/0x70
-> > [66303.927140]  ? page_fault_oops+0x171/0x4e0
-> > [66303.927176]  ? exc_page_fault+0x7f/0x180
-> > [66303.927209]  ? asm_exc_page_fault+0x26/0x30
-> > [66303.927244]  ? ice_get_ringparam+0x22/0x50 [ice]
-> > [66303.927433]  rings_prepare_data+0x62/0x80
-> > [66303.927469]  ethnl_default_doit+0xe2/0x350
-> > [66303.927501]  genl_family_rcv_msg_doit.isra.0+0xe3/0x140
-> > [66303.927538]  genl_rcv_msg+0x1b1/0x2c0
-> > [66303.927561]  ? __pfx_ethnl_default_doit+0x10/0x10
-> > [66303.927590]  ? __pfx_genl_rcv_msg+0x10/0x10
-> > [66303.927615]  netlink_rcv_skb+0x58/0x110
-> > [66303.927644]  genl_rcv+0x28/0x40
-> > [66303.927665]  netlink_unicast+0x19e/0x290
-> > [66303.927691]  netlink_sendmsg+0x254/0x4d0
-> > [66303.927717]  sock_sendmsg+0x93/0xa0
-> > [66303.927743]  __sys_sendto+0x126/0x170
-> > [66303.927780]  __x64_sys_sendto+0x24/0x30
-> > [66303.928593]  do_syscall_64+0x5d/0x90
-> > [66303.929370]  ? __count_memcg_events+0x60/0xa0
-> > [66303.930146]  ? count_memcg_events.constprop.0+0x1a/0x30
-> > [66303.930920]  ? handle_mm_fault+0x9e/0x350
-> > [66303.931688]  ? do_user_addr_fault+0x258/0x740
-> > [66303.932452]  ? exc_page_fault+0x7f/0x180
-> > [66303.933193]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
-> 
-> I'd stop here, the info below is not likely to be useful, but inflate
-> the commit message a bunch :D
-> 
-
-Will cut it in next version
-
-> > [66303.933935] RIP: 0033:0x7f6397a7d957
-> > [66303.934702] Code: c7 c0 ff ff ff ff eb be 66 2e 0f 1f 84 00 00 00 00 00 90 f3 0f 1e fa 80 3d 8d 7c 0c 00 00 41 89 ca 74 10 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 69 c3 55 48 89 e5 53 48 83 ec 38 44 89 4d d0
-> > [66303.936290] RSP: 002b:00007fff085051b8 EFLAGS: 00000202 ORIG_RAX: 000000000000002c
-> > [66303.937088] RAX: ffffffffffffffda RBX: 000055bb806aa340 RCX: 00007f6397a7d957
-> > [66303.937878] RDX: 000000000000002c RSI: 000055bb806aa3b0 RDI: 0000000000000003
-> > [66303.938654] RBP: 00007fff085051e0 R08: 00007f6397b4b200 R09: 000000000000000c
-> > [66303.939403] R10: 0000000000000000 R11: 0000000000000202 R12: 000055bb806aa3b0
-> > [66303.940131] R13: 000055bb7e977bb0 R14: 00007fff08505260 R15: 000055bb7e977570
-> > [66303.940856]  </TASK>
-> > [66303.941564] Modules linked in: irdma ice(OE) openvswitch nsh nf_conncount nf_nat nf_conntrack nf_defrag_ipv6 nf_defrag_ipv4 qrtr rfkill sunrpc intel_rapl_msr intel_rapl_common intel_uncore_frequency intel_uncore_frequency_common isst_if_common skx_edac nfit libnvdimm x86_pkg_temp_thermal intel_powerclamp coretemp kvm_intel vfat fat kvm mlx5_ib irqbypass ipmi_ssif rapl intel_cstate ib_uverbs iTCO_wdt intel_pmc_bxt iTCO_vendor_support ib_core intel_uncore i2c_i801 mei_me pcspkr mei lpc_ich i2c_smbus ioatdma intel_pch_thermal acpi_ipmi joydev dca ipmi_si ipmi_devintf acpi_pad acpi_power_meter ipmi_msghandler fuse loop zram xfs mlx5_core i40e mlxfw crct10dif_pclmul crc32_pclmul tls crc32c_intel polyval_clmulni polyval_generic ast ghash_clmulni_intel psample sha512_ssse3 pci_hyperv_intf i2c_algo_bit gnss wmi scsi_dh_rdac scsi_dh_emc scsi_dh_alua pkcs8_key_parser dm_multipath [last unloaded: ice]
-> > [66303.946397] CR2: 0000000000000000
-> > [66303.946919] ---[ end trace 0000000000000000 ]---
-> > [66303.955966] pstore: backend (erst) writing error (-28)
-> > [66303.956326] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
-> > [66303.956765] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
-> > [66303.957518] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
-> > [66303.957901] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
-> > [66303.958290] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
-> > [66303.958683] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
-> > [66303.959074] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
-> > [66303.959473] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
-> > [66303.959868] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
-> > [66303.960268] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-> > [66303.960672] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
-> > [66303.961078] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-> > [66303.961490] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-> > [66303.961898] PKRU: 55555554
-> > 
-> > Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
-> > Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
-> > Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
-> 
-> [...]
-> 
-> > @@ -2955,6 +2960,10 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
-> >  		return -EINVAL;
-> >  	}
-> >  
-> > +	/* if there is no rings return (device is reloading) */
-> 
-> "If" I guess, capital.
-> Isn't a comma after "rings" needed?
+On Tue, Jul 4, 2023 at 8:50=E2=80=AFAM Yunsheng Lin <linyunsheng@huawei.com=
+> wrote:
+>
+> On 2023/7/4 2:53, Jakub Kicinski wrote:
+> > On Mon, 3 Jul 2023 17:12:46 +0800 Liang Chen wrote:
+> >> As for the "pp" reference, it has the test
+> >> page_pool_is_pp_page_frag(head_page) there. So for a non-frag pp page,
+> >> it will be a get_page call.
+> >
+> > You don't understand - you can't put a page from a page pool in two
+> > skbs with pp_recycle set, unless the page is frag'ed.
+>
+> Agreed. I think we should disallow skb coaleasing for non-frag pp page
+> instead of calling get_page(), as there is data race when calling
+> page_pool_return_skb_page() concurrently for the same non-frag pp page.
+>
+> Even with my patchset, it may break the arch with
+> PAGE_POOL_DMA_USE_PP_FRAG_COUNT being true.
 >
 
-Correct, I will rephrase it to:
-Return if there is no rings
+Yeah, that's my fault. I thought __page_pool_put_page handles this
+elevated refcnt, but overlooked that the second skb release would
+enter page_pool_return_skb_page again, not directly calling put_page.
 
-> > +	if (!vsi->tx_rings || !vsi->rx_rings)
-> > +		return -EBUSY;
-> > +
-> >  	new_tx_cnt = ALIGN(ring->tx_pending, ICE_REQ_DESC_MULTIPLE);
-> >  	if (new_tx_cnt != ring->tx_pending)
-> >  		netdev_info(netdev, "Requested Tx descriptor count rounded up to %d\n",
-> > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
-> > index 0d8b8c6f9bd3..1b1974d42002 100644
-> > --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> > @@ -4634,9 +4634,7 @@ static int ice_start_eth(struct ice_vsi *vsi)
-> >  	if (err)
-> >  		return err;
-> >  
-> > -	rtnl_lock();
-> >  	err = ice_vsi_open(vsi);
-> > -	rtnl_unlock();
-> >  
-> >  	return err;
-> 
-> Just
-> 
-> 	return ice_vsi_open(vsi);
-> 
-> OTOH, don't you need a rollback of filters in case vsi_open() fails?
->
+Disallowing skb coalescing for non-frag pp pages sounds good; we will
+handle this problem on v2 after Yunsheng's changes are finalized.
 
-Yeah, it should be unroll, will add it
-
-> >  }
-> > @@ -5099,13 +5097,19 @@ int ice_load(struct ice_pf *pf)
-> >  	params = ice_vsi_to_params(vsi);
-> >  	params.flags = ICE_VSI_FLAG_INIT;
-> >  
-> > +	rtnl_lock();
-> >  	err = ice_vsi_cfg(vsi, &params);
-> > -	if (err)
-> > +	if (err) {
-> > +		rtnl_unlock();
-> >  		goto err_vsi_cfg;
-> > +	}
-> >  
-> >  	err = ice_start_eth(ice_get_main_vsi(pf));
-> > -	if (err)
-> > +	if (err) {
-> > +		rtnl_unlock();
-> >  		goto err_start_eth;
-> > +	}
-> > +	rtnl_unlock();
-> >  
-> >  	err = ice_init_rdma(pf);
-> >  	if (err)
-> > @@ -5135,8 +5139,10 @@ void ice_unload(struct ice_pf *pf)
-> >  {
-> >  	ice_deinit_features(pf);
-> >  	ice_deinit_rdma(pf);
-> > +	rtnl_lock();
-> >  	ice_stop_eth(ice_get_main_vsi(pf));
-> >  	ice_vsi_decfg(ice_get_main_vsi(pf));
-> > +	rtnl_unlock();
-> 
-> So you added lock/unlock pair here, but not in the ice_load()'s rollback
-> path. There, you always unlock rtnl and then perform decfg() without the
-> lock taken.
-> 
-> I think you could do it as follows:
-> 
-> err_init_rdma:
-> 	ice_vsi_close(ice_get_main_vsi(pf));
-> 	rtnl_lock();
-> err_start_eth:
-> 	ice_vsi_decfg(ice_get_main_vsi(pf));
-> err_vsi_cfg:
-> 	rtnl_unlock();
-> 	ice_deinit_dev(pf);
-> 	return err;
-> }
-> 
-> So that: 1) decfg() is protected; 2) you don't need to unlock rtnl in
-> case of failure in the main block (what you add in this patch), it will
-> be done here.
-
-Good point, I didn't think about protection in unroll. Thanks for the
-review, I will sent v2.
-
-Thanks,
-Michal
-
-> 
-> >  	ice_deinit_dev(pf);
-> >  }
-> >  
-> 
-> Thanks,
-> Olek
+> > .
+> >
 
