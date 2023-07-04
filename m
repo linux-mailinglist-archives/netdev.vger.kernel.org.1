@@ -1,210 +1,167 @@
-Return-Path: <netdev+bounces-15400-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15401-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E0A47747589
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 17:45:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 669C2747590
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 17:47:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 21A1A280ED9
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 15:45:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1C15E280E59
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 15:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EBA586AAC;
-	Tue,  4 Jul 2023 15:45:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D6646AB0;
+	Tue,  4 Jul 2023 15:47:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DE48663C2
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 15:45:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8121FE76
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 08:45:19 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688485518;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=/PUI+CtLNs4l2I0+iAQpXHNnM5sim5Or6js9Z3l/FyQ=;
-	b=BwlKMqEujySN5qmw+K5Ji2A/Mzspe0yZk0QIdbBhKkUYclIY449s27xavVxf/f22rOYcs2
-	Aj8GJ/vr5+Oy8b4+tT70dnirtcdptqtsAS9iZI9o4xCQVEDDFjmA7neUMmIZ5HY4VJ1Nkb
-	YwLyJczOgVm4IRoFmJOGvhnVIF6zUMc=
-Received: from mail-wr1-f70.google.com (mail-wr1-f70.google.com
- [209.85.221.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-649-HEx3O3STO5uruQYqbxW25Q-1; Tue, 04 Jul 2023 11:45:17 -0400
-X-MC-Unique: HEx3O3STO5uruQYqbxW25Q-1
-Received: by mail-wr1-f70.google.com with SMTP id ffacd0b85a97d-3143c941d0bso716912f8f.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 08:45:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 323296AA9
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 15:47:29 +0000 (UTC)
+Received: from mail-wm1-f49.google.com (mail-wm1-f49.google.com [209.85.128.49])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF004E75;
+	Tue,  4 Jul 2023 08:47:27 -0700 (PDT)
+Received: by mail-wm1-f49.google.com with SMTP id 5b1f17b1804b1-3fbc0609cd6so57305555e9.1;
+        Tue, 04 Jul 2023 08:47:27 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688485516; x=1691077516;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=/PUI+CtLNs4l2I0+iAQpXHNnM5sim5Or6js9Z3l/FyQ=;
-        b=ITyfI3TdGx/Vo79TWBoRosgN0cvIz3lHQVzXz9jl7pIRieuPQW62i+VAR+9i/t96m+
-         621IjWd4HpW19BYKyHFD0umF59tlGwm+EOcSwav8CJH6TKuVX7OU4zSChyS3LM5r3VjL
-         QFMFP+EuMj93DiOpBYhe2Q77nb3r00q8BUkTfCr2Mb07ZYqijt8Q1yTlmM3jQBYyGknz
-         RPnlaWeyT6d4NVC4y1zt2uXWYtEGHXXgF0Ve9D/Ry8RVyciHxjIFnwH/hrPMETJQqcE2
-         iDq2AVogjDr0WlfTdQamI8vHFF/ZIUHqLtqYbikCdffugeNTHGdtHVaozEaiR5hxIqbd
-         Jv8w==
-X-Gm-Message-State: ABy/qLbJ03HDz1JIxWqF6P+aebEAUDY4CZD+nJiZY8KFaQVIGv+bqKdX
-	hX38ZrcvRtkpRpABwII4iEZP3FMsqvaN7Fp2XahglGiFNuprG6nfuYtVznfFW9eGTISDc+5g3oC
-	glhffn2m95KZ6RkpUGofjtPrG
-X-Received: by 2002:a5d:674d:0:b0:314:13d8:8ae7 with SMTP id l13-20020a5d674d000000b0031413d88ae7mr11780930wrw.26.1688485516324;
-        Tue, 04 Jul 2023 08:45:16 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGHQsomKCUqerVJHD/653LO914nQ9p0VRaFIwyfELGloTwcXrjzg/w2GewNcsvZX5Lc+3kg9A==
-X-Received: by 2002:a5d:674d:0:b0:314:13d8:8ae7 with SMTP id l13-20020a5d674d000000b0031413d88ae7mr11780912wrw.26.1688485515962;
-        Tue, 04 Jul 2023 08:45:15 -0700 (PDT)
-Received: from redhat.com ([2.52.13.33])
-        by smtp.gmail.com with ESMTPSA id 24-20020a05600c021800b003fbe43238c6sm914770wmi.9.2023.07.04.08.45.14
+        d=1e100.net; s=20221208; t=1688485646; x=1691077646;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=7HIfHcKKD5QjLIcE3qmatua7Jxdz84IacUW1Fq893M0=;
+        b=XH4UXcwWMXuvBZEQ/92ybkSaZg4r4TPc2BDGVnIJwMN+L/mRIHPEiyONOe4aZ9iect
+         PwephRgpnb0QMVc6ehhhwkEq4CkbLeBH5iv9G/3w5SKPJ+mdhgLx1KD8Yd1/XaNNLY/0
+         OcCwKQlp7fxWty0EZ3nddoRqHcxkteJImRReub+QqiuX0pOwHK+GgQVfJBopcTaKhQET
+         C27fqftEuFkdDQXlJcIeopZ2yIJvFDnBmSLUZakSVLIxVyQMQu2gsgdIqh3tx59p7y5F
+         SQNPqRFxXR0KQEVfE4+ymN+PbSZNHvGEOsM2W+KM5USus0dvRBlc3bdJGiY9mJYihRFb
+         +KsQ==
+X-Gm-Message-State: AC+VfDx6z+m2LrLkDk7aFFKv2roAaUAJOIF5f2M4PEZJXhOsJoHxFFa/
+	z1gA86s2scMGQm/huAlBx9IoMVEdPquSWQ==
+X-Google-Smtp-Source: ACHHUZ7T5Y/PzaRv1u1C93os7Js2UEOP4LsEvjq1YdK2LO3nX+USNiNH/2D1fHzvMF49bFYz0UqyyQ==
+X-Received: by 2002:a7b:c393:0:b0:3fb:403d:90c0 with SMTP id s19-20020a7bc393000000b003fb403d90c0mr10024445wmj.39.1688485645944;
+        Tue, 04 Jul 2023 08:47:25 -0700 (PDT)
+Received: from gmail.com (fwdproxy-cln-008.fbsv.net. [2a03:2880:31ff:8::face:b00c])
+        by smtp.gmail.com with ESMTPSA id l4-20020adfe9c4000000b0031435c2600esm6591763wrn.79.2023.07.04.08.47.25
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 08:45:15 -0700 (PDT)
-Date: Tue, 4 Jul 2023 11:45:12 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
- not support it
-Message-ID: <20230704114159-mutt-send-email-mst@kernel.org>
-References: <20230703142218.362549-1-eperezma@redhat.com>
- <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org>
- <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+        Tue, 04 Jul 2023 08:47:25 -0700 (PDT)
+Date: Tue, 4 Jul 2023 08:47:23 -0700
+From: Breno Leitao <leitao@debian.org>
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>,
+	sergey.senozhatsky@gmail.com, pmladek@suse.com, tj@kernel.or,
+	Dave Jones <davej@codemonkey.org.uk>,
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>,
+	open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] netconsole: Append kernel version to message
+Message-ID: <ZKQ/C7z2RMG5a4XN@gmail.com>
+References: <20230703154155.3460313-1-leitao@debian.org>
+ <20230703124427.228f7a9e@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
+Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+In-Reply-To: <20230703124427.228f7a9e@kernel.org>
+X-Spam-Status: No, score=-1.4 required=5.0 tests=BAYES_00,
+	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,FSL_HELO_FAKE,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
-> On Tue, Jul 4, 2023 at 12:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
-> > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
-> > > > > With the current code it is accepted as long as userland send it.
-> > > > >
-> > > > > Although userland should not set a feature flag that has not been
-> > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
-> > > > > complain for it.
-> > > > >
-> > > > > Since there is no specific reason for any parent to reject that backend
-> > > > > feature bit when it has been proposed, let's control it at vdpa frontend
-> > > > > level. Future patches may move this control to the parent driver.
-> > > > >
-> > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> > > >
-> > > > Please do send v3. And again, I don't want to send "after driver ok" hack
-> > > > upstream at all, I merged it in next just to give it some testing.
-> > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > >
-> > >
-> > > Current devices do not support that semantic.
-> >
-> > Which devices specifically access the ring after DRIVER_OK but before
-> > a kick?
-> >
+On Mon, Jul 03, 2023 at 12:44:27PM -0700, Jakub Kicinski wrote:
+> On Mon,  3 Jul 2023 08:41:54 -0700 leitao@debian.org wrote:
+> > +	uname = init_utsname()->release;
+> > +
+> > +	newmsg = kasprintf(GFP_KERNEL, "%s;%s", uname, msg);
+> > +	if (!newmsg)
+> > +		/* In case of ENOMEM, just ignore this entry */
+> > +		return;
+> > +	newlen = strlen(uname) + len + 1;
+> > +
+> > +	send_ext_msg_udp(nt, newmsg, newlen);
+> > +
+> > +	kfree(newmsg);
 > 
-> Previous versions of the QEMU LM series did a spurious kick to start
-> traffic at the LM destination [1]. When it was proposed, that spurious
-> kick was removed from the series because to check for descriptors
-> after driver_ok, even without a kick, was considered work of the
-> parent driver.
-> 
-> I'm ok to go back to this spurious kick, but I'm not sure if the hw
-> will read the ring before the kick actually. I can ask.
-> 
-> Thanks!
-> 
-> [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775.html
+> You can avoid the memory allocation by putting this code into
+> send_ext_msg_udp(), I reckon? There's already a buffer there.
 
-Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
+This is doable as well, basically appending "uname" at the beginning of
+the buffer, copying the rest of the message to the buffer and sending
+the buffer to netpoll.
 
+If the message needs fragmentation, basically keep "uname" as part of
+the header, and the new header length (this_header) will be "header_len
++ uname_len"
 
+This is the code that does it. How does it sound?
 
-> > > My plan was to convert
-> > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
-> > > was not explicit enough.
-> > >
-> > > The only solution I can see to that is to trap & emulate in the vdpa
-> > > (parent?) driver, as talked in virtio-comment. But that complicates
-> > > the architecture:
-> > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > * Store vq enable state separately, at
-> > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
-> > > * Store the doorbell state separately, but do not configure it to the
-> > > device directly.
-> > >
-> > > But how to recover if the device cannot configure them at kick time,
-> > > for example?
-> > >
-> > > Maybe we can just fail if the parent driver does not support enabling
-> > > the vq after DRIVER_OK? That way no new feature flag is needed.
-> > >
-> > > Thanks!
-> > >
-> > > >
-> > > > > ---
-> > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
-> > > > > commit. Please let me know if I should send a v3 of [1] instead.
-> > > > >
-> > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
-> > > > > ---
-> > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > --- a/drivers/vhost/vdpa.c
-> > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
-> > > > >  {
-> > > > >       struct vhost_vdpa *v = filep->private_data;
-> > > > >       struct vhost_dev *d = &v->vdev;
-> > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
-> > > > >       void __user *argp = (void __user *)arg;
-> > > > >       u64 __user *featurep = argp;
-> > > > > -     u64 features;
-> > > > > +     u64 features, parent_features = 0;
-> > > > >       long r = 0;
-> > > > >
-> > > > >       if (cmd == VHOST_SET_BACKEND_FEATURES) {
-> > > > >               if (copy_from_user(&features, featurep, sizeof(features)))
-> > > > >                       return -EFAULT;
-> > > > > +             if (ops->get_backend_features)
-> > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
-> > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-> > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
-> > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) |
-> > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > +                              parent_features))
-> > > > >                       return -EOPNOTSUPP;
-> > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
-> > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > --
-> > > > > 2.39.3
-> > > >
-> >
+--
+
+diff --git a/drivers/net/netconsole.c b/drivers/net/netconsole.c
+index 4f4f79532c6c..d26bd3b785c4 100644
+--- a/drivers/net/netconsole.c
++++ b/drivers/net/netconsole.c
+@@ -36,6 +36,7 @@
+ #include <linux/inet.h>
+ #include <linux/configfs.h>
+ #include <linux/etherdevice.h>
++#include <linux/utsname.h>
+ 
+ MODULE_AUTHOR("Maintainer: Matt Mackall <mpm@selenic.com>");
+ MODULE_DESCRIPTION("Console driver for network interfaces");
+@@ -772,8 +773,10 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	const char *header, *body;
+ 	int offset = 0;
+ 	int header_len, body_len;
++	int uname_len = 0;
+ 
+-	if (msg_len <= MAX_PRINT_CHUNK) {
++	if (msg_len <= MAX_PRINT_CHUNK &&
++	    !IS_ENABLED(CONFIG_NETCONSOLE_UNAME)) {
+ 		netpoll_send_udp(&nt->np, msg, msg_len);
+ 		return;
+ 	}
+@@ -788,14 +791,31 @@ static void send_ext_msg_udp(struct netconsole_target *nt, const char *msg,
+ 	body_len = msg_len - header_len - 1;
+ 	body++;
+ 
++	if (IS_ENABLED(CONFIG_NETCONSOLE_UNAME)) {
++		/* Add uname at the beginning of buffer */
++		char *uname = init_utsname()->release;
++		/* uname_len contains the length of uname + ',' */
++		uname_len = strlen(uname) + 1;
++
++		if (uname_len + msg_len < MAX_PRINT_CHUNK) {
++			/* No fragmentation needed */
++			scnprintf(buf, MAX_PRINT_CHUNK, "%s,%s", uname, msg);
++			netpoll_send_udp(&nt->np, buf, uname_len + msg_len);
++			return;
++		}
++
++		/* The data will be fragment, prepending uname */
++		scnprintf(buf, MAX_PRINT_CHUNK, "%s,", uname);
++	}
++
+ 	/*
+ 	 * Transfer multiple chunks with the following extra header.
+ 	 * "ncfrag=<byte-offset>/<total-bytes>"
+ 	 */
+-	memcpy(buf, header, header_len);
++	memcpy(buf + uname_len, header, header_len);
+ 
+ 	while (offset < body_len) {
+-		int this_header = header_len;
++		int this_header = header_len + uname_len;
+ 		int this_chunk;
+ 
+ 		this_header += scnprintf(buf + this_header,
+-- 
+2.34.1
 
 
