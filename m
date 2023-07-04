@@ -1,186 +1,204 @@
-Return-Path: <netdev+bounces-15440-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15441-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id DA0A1747944
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:47:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id F2EF7747945
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:49:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1B7E2280A24
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:47:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ACCDC280A85
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:48:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86B2A8F7C;
-	Tue,  4 Jul 2023 20:45:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0761C1100;
+	Tue,  4 Jul 2023 20:48:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79D6379CB
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:45:05 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DB63810E6
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 13:45:02 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fbc0609cd6so59997315e9.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 13:45:02 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EF33FEB8
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:48:57 +0000 (UTC)
+Received: from NAM04-DM6-obe.outbound.protection.outlook.com (mail-dm6nam04on2097.outbound.protection.outlook.com [40.107.102.97])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99FFA99
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 13:48:56 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Fm4Ht8ccZ7B9P8j4PPNn+fDQJ+QvwHLmeuwX1JQRDfVmr1KkTBKmkiGPsmqvc0aGen99GHgJEd+KvLL7Fpi14Ck/oe0SFuwCJ0KpQcxNCnhRLCEZLCanVCqamPt6F3L9EmrpTmoBLrb/DxWYMrqkVvZ+TV9J8u+0Sr8zu1ex1CkE2sB54EOPA3I0ZAYQlSHGlnqjuiYku5EIHWjFXeZ4+kDGT2eB+eb+8YWogSoJI1BJqAXAaeMmak4zqFZKHht+3ERzZlaNfMiRZnMIHjjDMKjtRC8veV7PSH4SQi8EXlpY0cEM+7qrvPYFOwDpRx81UYf6JGKfLzDTyvkD9p1fUg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=25YvPSUHMzlg5zscKS0h5vo6vfZ/elmF8qC1fNuKJnY=;
+ b=T+q1W6YqwiDdU1cgIpfgt+Yvci94zFlF98mpubZJNv6iT8FAme5Jgu7vkZcT5WGkZtQP/eXiE/WSsdrjXygV6/Zi5cqudfqEaEpPkFRDzGlHGZmzYNR305HAmigOPJHHPbwyf7uaJ/YdumXhxubt4Xy/jeBFVITK6ILQw1O6whNUIefsmZ3HcGzqUEhnF6HoeIuITXrmv7SMX7YrSMhUF3GLb1Meg2Sp4gLPCxHpcAwpuIt+6MTRU3tzeZa5iHgWzDscha4gezVkFtShIFl5Ydn7g0GI+kHHBcIVJ4bj2FO6VIH8sAFSdO/zwK6bWLd45zPdthjgWu/qv+7kfOS/Wg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1688503501; x=1691095501;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=0GDNvib6QZmeEngLmbfD0MP/CFixjMyasw17pjt5GlM=;
-        b=abBErgxiaAQ7MZQ7fucza85sp/xYBG/N4N4qMdPT99RoNZvF5uU7rEPBMsh2vpyCuw
-         PqFgSer9YY/68iY5TRNnXstmo6KfO8O2kXzDYVl9WpffbhTnsQoqMsrM1q9djg1FnFL8
-         NpmBDbGh97C0J8m1QiyLnu0AJrSMrJ7WLBF+oheIoStrTf7eaz4uSvTxhBoAG67UzHGN
-         ljo+O7fT5WIYd6xYFqV9lONzooAGdjsLtSsqBFVLSUG+5wX+P/9RBx/h5bz8S0+SXEiP
-         u2xfBzmwhXZdH/CZ0n2y0u0Sw4FNLDZVIabcDPMe4Ee9lzfLyGvIbya/IhW3hSKayyvH
-         fmug==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688503501; x=1691095501;
-        h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
-         :mime-version:subject:date:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=0GDNvib6QZmeEngLmbfD0MP/CFixjMyasw17pjt5GlM=;
-        b=RIyJrbtdAKes3WdvwtynD/pCq9AZqIRcQbC6l7iKXKSQQcBjDFcmH2y2oNZEJDMAxl
-         Eeg3wKtRHl7iZxCVqnSimnPZK9GCbT3xY9RpJp44SPA73zrOYnYFnoAFEvaNsfiaZ6YR
-         D1zZ+ICWq47HqmBqs1GrDLFuQ58WqJYWOOUcIcLtVi9nkU1yUFo+erB04aSvBIbgBGG7
-         6XrDDZnc4HKAWFoZsYUJ7VZmF7otjjREz3fnk/hi/Ynb1iRbWGCeyDn8tQ06RiAZU0cd
-         nV664D6xoYoRdNiFBUeDYJ7AOzS+3KWbgnhYzkymYyzr2jU+RlS2ZyAd8EkR7C9ZkeCN
-         lrLg==
-X-Gm-Message-State: AC+VfDwKTiTf6tBSc+odK7pKaX5g7rR29X3JrIfRM4ydDIoAr3yTLT+R
-	YXN9jRfTwnR5FoY/4EpWmLKtWzIYAX1VKNdm3aw+Zg==
-X-Google-Smtp-Source: ACHHUZ48m5TTryjiHP5lseidA3LmSb86zf/V7P9rskuqKQ9nenuKa4+AWi9l8zb3PsBvodIiXgOp7g==
-X-Received: by 2002:a05:600c:2185:b0:3fb:c384:89ef with SMTP id e5-20020a05600c218500b003fbc38489efmr10189045wme.17.1688503501104;
-        Tue, 04 Jul 2023 13:45:01 -0700 (PDT)
-Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id y4-20020a05600c364400b003fa74bff02asm115332wmq.26.2023.07.04.13.45.00
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 13:45:00 -0700 (PDT)
-From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Tue, 04 Jul 2023 22:44:41 +0200
-Subject: [PATCH net 9/9] selftests: mptcp: pm_nl_ctl: fix 32-bit support
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=25YvPSUHMzlg5zscKS0h5vo6vfZ/elmF8qC1fNuKJnY=;
+ b=mTAGnWX/8n5sxiEn+b8fuE/Jm58KtmLFYbUJHKAMdiyl1+t/3hU4v5OWO7dTRlblSTOmrssciCmLfAhGGcTNKFzjsyTyECW8eUzkUiO1YAstRiOqMrjv4oXgTwyyqGDfbpreCh096yp4T1tBaSifvc4BWPWDmMDWFd2XybgtzZA=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by MN2PR13MB3630.namprd13.prod.outlook.com (2603:10b6:208:1e2::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
+ 2023 20:48:54 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 20:48:54 +0000
+Date: Tue, 4 Jul 2023 21:48:45 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Victor Nogueira <victor@mojatatu.com>
+Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com,
+	jiri@resnulli.us, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, pctammela@mojatatu.com,
+	kernel@mojatatu.com
+Subject: Re: [PATCH net 1/5] net: sched: cls_bpf: Undo tcf_bind_filter in
+ case of an error
+Message-ID: <ZKSFrSW2zJZYelNj@corigine.com>
+References: <20230704151456.52334-1-victor@mojatatu.com>
+ <20230704151456.52334-2-victor@mojatatu.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230704151456.52334-2-victor@mojatatu.com>
+X-ClientProxiedBy: LO4P123CA0686.GBRP123.PROD.OUTLOOK.COM
+ (2603:10a6:600:37b::18) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: 7bit
-Message-Id: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-9-d7e67c274ca5@tessares.net>
-References: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-0-d7e67c274ca5@tessares.net>
-In-Reply-To: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-0-d7e67c274ca5@tessares.net>
-To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
- Shuah Khan <shuah@kernel.org>, Florian Westphal <fw@strlen.de>, 
- Kishen Maloor <kishen.maloor@intel.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
- linux-kselftest@vger.kernel.org, 
- Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
-X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=3010;
- i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=u1k8iIN6l4SZJWpyeVyx7kGYVtesJznCZArOL3Lw7TQ=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkpITDCL61mEtunnDwk6Rf0ldwTLYb6HJX73Tgx
- 7uQFLbFrNOJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZKSEwwAKCRD2t4JPQmmg
- c5uFD/9jO/kwOJQsQZ5OUb5E0p6aN3+wVxvFP3tEM0GikY0krZwGsHqiVy5A2r4PZSGL3X3RNSQ
- sDuR604XK4njHy1QQS7t2v13YFte66oha+/rOHxPpWwg6GQ7eHjFQP8wA6O2oYCkxI+lXwW9XqY
- /5cXrv08fmiTBPjMEVQ0FQklwYCIWPT4FOVsk7kC+01gs8uhdPoECeXMvtJFAX8FZg2M71xcwSo
- fP3NhyWEj8EM4tAS7vTSC21Tm7DT5+++k2R5tDKQHjoH6rbov7Fnqttb41oDGGcGQyFVtQQL/NH
- TadguNjqtD46bbCCJk1Gt4npIySxQ3cxw6HOI1I0UMbjUujoXMAOCutgD2qnCBi5EqOcd1sKQz7
- 8lBkc2fYAKyC4m1n0eUatT6hktbQ/8CmNXg/sd1K3+u9s6QBUJ6e7zWTjqAYVoZqvkr1KVR4k5E
- onIqX5UIzRtSyrFqTzu5MbJ5HP9e/YvACev94zBJoR2Aax3BpaFjTH5FyzaNiqvNvLDjq4gHt/C
- EkmC+5O60hcky2lN96dliv7Wdb6WY4VaV3vUdsoWtaIQvvOZV2j7JrhHciqEGpJqchecXBEMF/f
- lyTu8Mkc2+kaRIBdirF0U49a6B9+mka30qMk4EDze9TpydMoQlT+rkEU5CjCxr6HJXuMVVz+c+h
- 9k6/Knvzg1m6EZg==
-X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
- fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3630:EE_
+X-MS-Office365-Filtering-Correlation-Id: 74a7b1ba-a4ce-434b-2f5a-08db7cd01455
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	1VF85VW7wxybuZG+kcB8+XEinQXXm457M2kQo74150thT7vG2hHKf9oOgBquwvvBSC13VNKYLMmGFTvJP9PYZFLK4tXIQnSfQ75qi9Ba7D+Kkm3S4yXecd8yha1yy1tQ4oqrUL/a8e7oDS2ffp7RNg3o52/EO94IJu5dZ7zTQQ0YOpNXb2rrjggT8cjudSlRFgnNiRJYXt8CZT7wAyT1BtMjHCe0+gfphEvMEhl9qoqJFZH+4PQCd4/Wkt5RzpBaBThMyjsJg1J2GNvXUGVrWuSWGiidkXqd52qS9wsdKouUVPJ1B2fNrmb9BAlQRhicaRKPyhPae2eMBj+6iMo7PLvBjnggqRrHLd19VfpdRKn1WkoSkKKQUOPPoIV1E01pAhOLNZMPVDUJokLZ57j9uBo8QFjtJZsvvVbI3ghe5nS9bU2AOfH1vna8wAE/Y9TjANKDmHRXQoOV/izcksHWzOL4SXg9j9M3hhRFW5ksCFNAHZ833F4hdaOXiof+t4y+DnL0ifT8cYDjW4SgvRhKqCh75qfUxv1DBQsObzFGDeHaOPvMXMDna5L7D4JDfB1NyZkYN38KK/CEK4YRlGcHHrhdK6ol6TA/UPKVG6VF/Gg=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(39840400004)(376002)(396003)(136003)(451199021)(41300700001)(6486002)(38100700002)(6666004)(2616005)(83380400001)(26005)(186003)(6506007)(6512007)(86362001)(2906002)(478600001)(36756003)(316002)(66946007)(66476007)(6916009)(66556008)(4326008)(8936002)(8676002)(7416002)(44832011)(5660300002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?h/TyIVCnbM8sQYCz2wpax5DHCMrr86BiPQA9wp/BVTxB0mVR6gnbV2bZR/Ui?=
+ =?us-ascii?Q?5yBgGse2Jg66dZbtBj40v1ZsafJcs9OAGU1gaspOowus0V6isWJ9UdkAs3Ja?=
+ =?us-ascii?Q?3Z+RxYvZuarIODaiB5DW20TDczcaYm7NpavPvNuvSkW8+7DFkrW6k4ZgSdMj?=
+ =?us-ascii?Q?UlfC91A0YplF9xNHZzuOePasWLXJgUxAj2Puf1/jxTmDPy2j00SHnxXoIcQd?=
+ =?us-ascii?Q?fV1s6UhzLYQ4Axf5k3J1KyzzyrTuB154pA6O7mUu0hyb2+DOVma0V5abNh6t?=
+ =?us-ascii?Q?V3RHyuvlSxZVjuDKXBk+ARU8ugbhPmuW2+IBgFE5NlO1ao63uXc4hdRhhE18?=
+ =?us-ascii?Q?qIJtlnxM/AF5pL00IOm6Qo6HLPjPqDcwZRuuYG1HXVy3BndTLU+Rd9eaqKzZ?=
+ =?us-ascii?Q?KxDR5cFe+o4Km2GDrPSok0lm5nF1KJFs5bBT4IIvkX/4ec2HfI5SMiQ21tIC?=
+ =?us-ascii?Q?JRiNkLpbsPdCnjFAEi17ovZZTnBB9dR/vzQ6dvMYUJG6dG5JtPXSOsO9Keeb?=
+ =?us-ascii?Q?sHxvkrxEBXf/TEVz8J9X0Mlhor9oMHVyRaTDkcDWuW1pZQiow3xQpq8HueRI?=
+ =?us-ascii?Q?r0CQuibCafZbIkx4r1RbHeM1MfevFP1U+eZE6C5QwPLIh0mQLTUr0pZiz1rx?=
+ =?us-ascii?Q?t8uxczM44lnzK67pCyjd1g/P2DpIRbkMOhpFymVye06UMblqB/DAF1oL97Qu?=
+ =?us-ascii?Q?zfvkMYJyL7bGeVKlKtg1PH5W1YgQLVKKzgFMKhIYL3hcWe5IP7A2t0v460Tl?=
+ =?us-ascii?Q?IJS4NMWA5DnHdI/UIPkcsSTFKE3yLmfBDri48FWXYfbiIgIOSpWVEmFuxIIx?=
+ =?us-ascii?Q?oylkFpWRl0hJC4n371N4VLVRrwK9fr++w+zaeY/PMG/J/X4LLNdR8oyQgS0g?=
+ =?us-ascii?Q?wXe2i3v6DmvDTuSUcJl5/QDuVn60AQJ50mtzc99Ntzam5JQ8sp6rnfA2K773?=
+ =?us-ascii?Q?o3h5C/xU+shUbqabLXwsOZuaEmf3DZfcf1vcISF4r4uC45l9jmpiGOlJ9m3e?=
+ =?us-ascii?Q?EFM1fFH+/eT9bDMmB8m/428GVcFtOketziOCuzeKO0a6BsRHT702FguWec1p?=
+ =?us-ascii?Q?uj9Y3MCBLgBd90qkdhOGRwpXlX7Nsxj4a7AMIzPH5CRuHH9R5UGD1v/8gw2n?=
+ =?us-ascii?Q?uEQaZRXg64L42xVG45hUB098ahFFCv3AqLj1T57jnfOWBoPk/00FgmVKk5RX?=
+ =?us-ascii?Q?1v7v4MfEBaO0Gw2JCqhM6aFcErs3hb/xOe1Peg1tG73MF086llK5RidOhLkh?=
+ =?us-ascii?Q?Ym90Hic/l/Ka4c+KAhJ/eEM4ZbLvBGVCA4wMzjkqlc3N5Zf+aNpnatzkRPp+?=
+ =?us-ascii?Q?3/hfG0SglL+F7hfGtwF9eBsMrL8Pi8NaLV03t6cmlmnqeXlWhR/zLKSJKUS1?=
+ =?us-ascii?Q?ndl65/ZwpDH+dofSXQCunPsiWC54O0FBSoUU/QLVKXCtj7/Q4awKiHn2aa4H?=
+ =?us-ascii?Q?EAAsIzcSn+5oYcwjYDT95TEIFv9+2B1JD2ksCleerWBUFMpK79Av+Qz5RhVI?=
+ =?us-ascii?Q?AWC3pAENZhlj2czlRhi1vmXqFFyMKE5JAeoCfmcr2KO2umxIqxrqLsuajLi6?=
+ =?us-ascii?Q?hH11Ksx59jhcWmBw7ukpbjZ439fA2MNhjNT65IO3900UogbbjXM+xb8q+Sof?=
+ =?us-ascii?Q?5g=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 74a7b1ba-a4ce-434b-2f5a-08db7cd01455
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 20:48:54.0693
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: MqkhMA1om0zt9n/U02jpv/NdtZxMeVjkFa+BvZbOm4dnxvy0NN5tABBkJw6a51Y1aiBnHrBK9bl8IjsteslM/xSO4ihgjgsmxECUjmYG0do=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3630
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When using pm_nl_ctl to validate userspace path-manager's behaviours, it
-was failing on 32-bit architectures ~half of the time.
+On Tue, Jul 04, 2023 at 12:14:52PM -0300, Victor Nogueira wrote:
+> If cls_bpf_offload errors out, we must also undo tcf_bind_filter that
+> was done in cls_bpf_set_parms.
+> 
+> Fix that by calling tcf_unbind_filter in errout_parms.
+> 
+> Fixes: eadb41489fd2 ("net: cls_bpf: add support for marking filters as hardware-only")
+> 
 
-pm_nl_ctl was not reporting any error but the command was not doing what
-it was expected to do. As a result, the expected linked event was not
-triggered after and the test failed.
+nit: no blank line here.
 
-This is due to the fact the token given in argument to the application
-was parsed as an integer with atoi(): in a 32-bit arch, if the number
-was bigger than INT_MAX, 2147483647 was used instead.
+> Signed-off-by: Victor Nogueira <victor@mojatatu.com>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
+> ---
+>  net/sched/cls_bpf.c | 8 ++++++--
+>  1 file changed, 6 insertions(+), 2 deletions(-)
+> 
+> diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
+> index 466c26df853a..4d9974b1b29d 100644
+> --- a/net/sched/cls_bpf.c
+> +++ b/net/sched/cls_bpf.c
+> @@ -409,7 +409,7 @@ static int cls_bpf_prog_from_efd(struct nlattr **tb, struct cls_bpf_prog *prog,
+>  static int cls_bpf_set_parms(struct net *net, struct tcf_proto *tp,
+>  			     struct cls_bpf_prog *prog, unsigned long base,
+>  			     struct nlattr **tb, struct nlattr *est, u32 flags,
+> -			     struct netlink_ext_ack *extack)
+> +			     bool *bound_to_filter, struct netlink_ext_ack *extack)
+>  {
+>  	bool is_bpf, is_ebpf, have_exts = false;
+>  	u32 gen_flags = 0;
+> @@ -451,6 +451,7 @@ static int cls_bpf_set_parms(struct net *net, struct tcf_proto *tp,
+>  	if (tb[TCA_BPF_CLASSID]) {
+>  		prog->res.classid = nla_get_u32(tb[TCA_BPF_CLASSID]);
+>  		tcf_bind_filter(tp, &prog->res, base);
+> +		*bound_to_filter = true;
+>  	}
+>  
+>  	return 0;
+> @@ -464,6 +465,7 @@ static int cls_bpf_change(struct net *net, struct sk_buff *in_skb,
+>  {
+>  	struct cls_bpf_head *head = rtnl_dereference(tp->root);
+>  	struct cls_bpf_prog *oldprog = *arg;
+> +	bool bound_to_filter = false;
+>  	struct nlattr *tb[TCA_BPF_MAX + 1];
+>  	struct cls_bpf_prog *prog;
+>  	int ret;
 
-This can simply be fixed by using strtoul() instead of atoi().
+Please use reverse xmas tree - longest line to shortest - for
+local variable declarations in Networking code.
 
-The errors have been seen "by chance" when manually looking at the
-results from LKFT.
-
-Fixes: 9a0b36509df0 ("selftests: mptcp: support MPTCP_PM_CMD_ANNOUNCE")
-Cc: stable@vger.kernel.org
-Fixes: ecd2a77d672f ("selftests: mptcp: support MPTCP_PM_CMD_REMOVE")
-Fixes: cf8d0a6dfd64 ("selftests: mptcp: support MPTCP_PM_CMD_SUBFLOW_CREATE")
-Fixes: 57cc361b8d38 ("selftests: mptcp: support MPTCP_PM_CMD_SUBFLOW_DESTROY")
-Fixes: ca188a25d43f ("selftests: mptcp: userspace PM support for MP_PRIO signals")
-Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
----
- tools/testing/selftests/net/mptcp/pm_nl_ctl.c | 10 +++++-----
- 1 file changed, 5 insertions(+), 5 deletions(-)
-
-diff --git a/tools/testing/selftests/net/mptcp/pm_nl_ctl.c b/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
-index abddf4c63e79..1887bd61bd9a 100644
---- a/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
-+++ b/tools/testing/selftests/net/mptcp/pm_nl_ctl.c
-@@ -425,7 +425,7 @@ int dsf(int fd, int pm_family, int argc, char *argv[])
- 	}
- 
- 	/* token */
--	token = atoi(params[4]);
-+	token = strtoul(params[4], NULL, 10);
- 	rta = (void *)(data + off);
- 	rta->rta_type = MPTCP_PM_ATTR_TOKEN;
- 	rta->rta_len = RTA_LENGTH(4);
-@@ -551,7 +551,7 @@ int csf(int fd, int pm_family, int argc, char *argv[])
- 	}
- 
- 	/* token */
--	token = atoi(params[4]);
-+	token = strtoul(params[4], NULL, 10);
- 	rta = (void *)(data + off);
- 	rta->rta_type = MPTCP_PM_ATTR_TOKEN;
- 	rta->rta_len = RTA_LENGTH(4);
-@@ -598,7 +598,7 @@ int remove_addr(int fd, int pm_family, int argc, char *argv[])
- 			if (++arg >= argc)
- 				error(1, 0, " missing token value");
- 
--			token = atoi(argv[arg]);
-+			token = strtoul(argv[arg], NULL, 10);
- 			rta = (void *)(data + off);
- 			rta->rta_type = MPTCP_PM_ATTR_TOKEN;
- 			rta->rta_len = RTA_LENGTH(4);
-@@ -710,7 +710,7 @@ int announce_addr(int fd, int pm_family, int argc, char *argv[])
- 			if (++arg >= argc)
- 				error(1, 0, " missing token value");
- 
--			token = atoi(argv[arg]);
-+			token = strtoul(argv[arg], NULL, 10);
- 		} else
- 			error(1, 0, "unknown keyword %s", argv[arg]);
- 	}
-@@ -1347,7 +1347,7 @@ int set_flags(int fd, int pm_family, int argc, char *argv[])
- 				error(1, 0, " missing token value");
- 
- 			/* token */
--			token = atoi(argv[arg]);
-+			token = strtoul(argv[arg], NULL, 10);
- 		} else if (!strcmp(argv[arg], "flags")) {
- 			char *tok, *str;
- 
+> @@ -505,7 +507,7 @@ static int cls_bpf_change(struct net *net, struct sk_buff *in_skb,
+>  	prog->handle = handle;
+>  
+>  	ret = cls_bpf_set_parms(net, tp, prog, base, tb, tca[TCA_RATE], flags,
+> -				extack);
+> +				&bound_to_filter, extack);
+>  	if (ret < 0)
+>  		goto errout_idr;
+>  
+> @@ -530,6 +532,8 @@ static int cls_bpf_change(struct net *net, struct sk_buff *in_skb,
+>  	return 0;
+>  
+>  errout_parms:
+> +	if (bound_to_filter)
+> +		tcf_unbind_filter(tp, &prog->res);
+>  	cls_bpf_free_parms(prog);
+>  errout_idr:
+>  	if (!oldprog)
 
 -- 
-2.40.1
+pw-bot: changes-requested
 
 
