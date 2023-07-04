@@ -1,84 +1,154 @@
-Return-Path: <netdev+bounces-15258-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15259-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02DE97466AD
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 02:50:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B32D47466AF
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 02:54:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2FE401C20A9E
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 00:50:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66EA5280E96
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 00:54:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD0A3388;
-	Tue,  4 Jul 2023 00:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6413E367;
+	Tue,  4 Jul 2023 00:54:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CADAC367
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 00:50:36 +0000 (UTC)
-Received: from szxga01-in.huawei.com (szxga01-in.huawei.com [45.249.212.187])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 24BD5136
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:50:32 -0700 (PDT)
-Received: from dggpemm500005.china.huawei.com (unknown [172.30.72.54])
-	by szxga01-in.huawei.com (SkyGuard) with ESMTP id 4Qw3zb35pXztQwT;
-	Tue,  4 Jul 2023 08:47:39 +0800 (CST)
-Received: from [10.69.30.204] (10.69.30.204) by dggpemm500005.china.huawei.com
- (7.185.36.74) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.27; Tue, 4 Jul
- 2023 08:50:29 +0800
-Subject: Re: [PATCH net-next] skbuff: Optimize SKB coalescing for page pool
- case
-To: Jakub Kicinski <kuba@kernel.org>, Liang Chen <liangchen.linux@gmail.com>
-CC: <ilias.apalodimas@linaro.org>, <hawk@kernel.org>, <davem@davemloft.net>,
-	<edumazet@google.com>, <pabeni@redhat.com>, <netdev@vger.kernel.org>
-References: <20230628121150.47778-1-liangchen.linux@gmail.com>
- <20230630160709.45ea4faa@kernel.org>
- <CAKhg4t+hoOiVWMbBiD7HCu_Z5pSdCsZrev2FMEKhbWvzgHCarw@mail.gmail.com>
- <20230703115326.69f8953b@kernel.org>
-From: Yunsheng Lin <linyunsheng@huawei.com>
-Message-ID: <8fb342b4-a843-6d67-b72f-19f2da38cfaa@huawei.com>
-Date: Tue, 4 Jul 2023 08:50:29 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; WOW64; rv:52.0) Gecko/20100101
- Thunderbird/52.2.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5345D620
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 00:54:05 +0000 (UTC)
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF6D137
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:54:01 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+	by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1qGUIm-000PWy-K8; Tue, 04 Jul 2023 10:53:57 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 04 Jul 2023 08:53:49 +0800
+Date: Tue, 4 Jul 2023 08:53:49 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>
+Cc: Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>,
+	Linux Network Development Mailing List <netdev@vger.kernel.org>,
+	Steffen Klassert <steffen.klassert@secunet.com>,
+	Benedict Wong <benedictwong@google.com>,
+	Lorenzo Colitti <lorenzo@google.com>, Yan Yan <evitayan@google.com>
+Subject: [PATCH] xfrm: Silence warnings triggerable by bad packets
+Message-ID: <ZKNtndEkrzhtmqkF@gondor.apana.org.au>
+References: <20230630153759.3349299-1-maze@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230703115326.69f8953b@kernel.org>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.69.30.204]
-X-ClientProxiedBy: dggems702-chm.china.huawei.com (10.3.19.179) To
- dggpemm500005.china.huawei.com (7.185.36.74)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <20230630153759.3349299-1-maze@google.com>
+X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
+	PDS_RDNS_DYNAMIC_FP,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,TVD_RCVD_IP,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 2023/7/4 2:53, Jakub Kicinski wrote:
-> On Mon, 3 Jul 2023 17:12:46 +0800 Liang Chen wrote:
->> As for the "pp" reference, it has the test
->> page_pool_is_pp_page_frag(head_page) there. So for a non-frag pp page,
->> it will be a get_page call.
+On Fri, Jun 30, 2023 at 08:37:58AM -0700, Maciej Żenczykowski wrote:
+> Steffan, this isn't of course a patch meant for inclusion, instead just a WARN_ON hit report.
+> The patch is simply what prints the following extra info:
 > 
-> You don't understand - you can't put a page from a page pool in two
-> skbs with pp_recycle set, unless the page is frag'ed.
-
-Agreed. I think we should disallow skb coaleasing for non-frag pp page
-instead of calling get_page(), as there is data race when calling
-page_pool_return_skb_page() concurrently for the same non-frag pp page.
-
-Even with my patchset, it may break the arch with
-PAGE_POOL_DMA_USE_PP_FRAG_COUNT being true.
-
-> .
+> xfrm_prepare_input: XFRM_MODE_SKB_CB(skb)->protocol: 17
+> xfrm_inner_mode_encap_remove: x->props.mode: 1 XFRM_MODE_SKB_SB(skb)->protocol:17
 > 
+> (note: XFRM_MODE_TUNNEL=1 IPPROTO_UDP=17)
+
+Thanks for the report.  This patch should fix the warnings:
+
+---8<---
+After the elimination of inner modes, a couple of warnings that
+were previously unreachable can now be triggered by malformed
+inbound packets.
+
+Fix this by:
+
+1. Moving the setting of skb->protocol into the decap functions.
+2. Returning -EINVAL when unexpected protocol is seen.
+
+Reported-by: Maciej Żenczykowski<maze@google.com>
+Fixes: 5f24f41e8ea6 ("xfrm: Remove inner/outer modes from input path")
+Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+
+diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
+index 815b38080401..d5ee96789d4b 100644
+--- a/net/xfrm/xfrm_input.c
++++ b/net/xfrm/xfrm_input.c
+@@ -180,6 +180,8 @@ static int xfrm4_remove_beet_encap(struct xfrm_state *x, struct sk_buff *skb)
+ 	int optlen = 0;
+ 	int err = -EINVAL;
+ 
++	skb->protocol = htons(ETH_P_IP);
++
+ 	if (unlikely(XFRM_MODE_SKB_CB(skb)->protocol == IPPROTO_BEETPH)) {
+ 		struct ip_beet_phdr *ph;
+ 		int phlen;
+@@ -232,6 +234,8 @@ static int xfrm4_remove_tunnel_encap(struct xfrm_state *x, struct sk_buff *skb)
+ {
+ 	int err = -EINVAL;
+ 
++	skb->protocol = htons(ETH_P_IP);
++
+ 	if (!pskb_may_pull(skb, sizeof(struct iphdr)))
+ 		goto out;
+ 
+@@ -267,6 +271,8 @@ static int xfrm6_remove_tunnel_encap(struct xfrm_state *x, struct sk_buff *skb)
+ {
+ 	int err = -EINVAL;
+ 
++	skb->protocol = htons(ETH_P_IPV6);
++
+ 	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
+ 		goto out;
+ 
+@@ -296,6 +302,8 @@ static int xfrm6_remove_beet_encap(struct xfrm_state *x, struct sk_buff *skb)
+ 	int size = sizeof(struct ipv6hdr);
+ 	int err;
+ 
++	skb->protocol = htons(ETH_P_IPV6);
++
+ 	err = skb_cow_head(skb, size + skb->mac_len);
+ 	if (err)
+ 		goto out;
+@@ -346,6 +354,7 @@ xfrm_inner_mode_encap_remove(struct xfrm_state *x,
+ 			return xfrm6_remove_tunnel_encap(x, skb);
+ 		break;
+ 		}
++		return -EINVAL;
+ 	}
+ 
+ 	WARN_ON_ONCE(1);
+@@ -366,19 +375,6 @@ static int xfrm_prepare_input(struct xfrm_state *x, struct sk_buff *skb)
+ 		return -EAFNOSUPPORT;
+ 	}
+ 
+-	switch (XFRM_MODE_SKB_CB(skb)->protocol) {
+-	case IPPROTO_IPIP:
+-	case IPPROTO_BEETPH:
+-		skb->protocol = htons(ETH_P_IP);
+-		break;
+-	case IPPROTO_IPV6:
+-		skb->protocol = htons(ETH_P_IPV6);
+-		break;
+-	default:
+-		WARN_ON_ONCE(1);
+-		break;
+-	}
+-
+ 	return xfrm_inner_mode_encap_remove(x, skb);
+ }
+ 
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
