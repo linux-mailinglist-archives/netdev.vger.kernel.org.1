@@ -1,154 +1,181 @@
-Return-Path: <netdev+bounces-15259-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15260-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id B32D47466AF
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 02:54:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 19C937466BB
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 03:01:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 66EA5280E96
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 00:54:08 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3E2A9280EA8
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 01:00:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6413E367;
-	Tue,  4 Jul 2023 00:54:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E74F39C;
+	Tue,  4 Jul 2023 01:00:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5345D620
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 00:54:05 +0000 (UTC)
-Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5FF6D137
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 17:54:01 -0700 (PDT)
-Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
-	by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
-	id 1qGUIm-000PWy-K8; Tue, 04 Jul 2023 10:53:57 +1000
-Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Tue, 04 Jul 2023 08:53:49 +0800
-Date: Tue, 4 Jul 2023 08:53:49 +0800
-From: Herbert Xu <herbert@gondor.apana.org.au>
-To: Maciej =?utf-8?Q?=C5=BBenczykowski?= <maze@google.com>
-Cc: Maciej =?utf-8?Q?=C5=BBenczykowski?= <zenczykowski@gmail.com>,
-	Linux Network Development Mailing List <netdev@vger.kernel.org>,
-	Steffen Klassert <steffen.klassert@secunet.com>,
-	Benedict Wong <benedictwong@google.com>,
-	Lorenzo Colitti <lorenzo@google.com>, Yan Yan <evitayan@google.com>
-Subject: [PATCH] xfrm: Silence warnings triggerable by bad packets
-Message-ID: <ZKNtndEkrzhtmqkF@gondor.apana.org.au>
-References: <20230630153759.3349299-1-maze@google.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6F4B9388
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 01:00:57 +0000 (UTC)
+Received: from mail-pg1-f206.google.com (mail-pg1-f206.google.com [209.85.215.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 66CBCE5C
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 18:00:54 -0700 (PDT)
+Received: by mail-pg1-f206.google.com with SMTP id 41be03b00d2f7-55b2ab496ecso4946743a12.2
+        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 18:00:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688432454; x=1691024454;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=e4dIGmrJnerN2APUK9vIkWuNtSLXO20WTEc2d/iDcUI=;
+        b=T4KxKfi1nqjj1Q4Mdw8JZOFvfLYZghOkobZZpFL4PR1r680ewS/fDEkq1hJ8bOHrIC
+         ebxDiAb8Qi2/z8eZA0bMPdGjFQWFSKjcLRv3GdACjOgvenTulGbev3jepWFZJ5hzwaCq
+         jAXGyOx2irbotONgfn+iGZSl2H2UgkDnNVQwxvMdJBAqIDlNE7VyyU2mQsf9O2Tyoezb
+         6HrXNeUDWW5dlQC9LkYrFCMGNKH9tYVQifTsEayDilcEeo1D7F/1BBtoyX7vdhkTRaz8
+         uwux+0ZDDlgRlRFcEsiXNQXrdotYQzeXfB4cYju6OMmSq8nfVcVgnSbgUP9AAAhjWPF+
+         A8ag==
+X-Gm-Message-State: ABy/qLaGmp0ETjtPeioin6X7A1yza0ae+ejCX2a7wa5FAANbA4p1gRJi
+	iUt63vbtm/V9xtX/G0HRSWCqA83gmk0sz2zYojIcVFKnAp3w
+X-Google-Smtp-Source: APBJJlHCOJtR1+j9evnXwzg9q/NGJZBqKkw5h5lASg8ub/FShATqVSjFXkhuXC8hRPQYGdEYUZWBve53gFBIvx/3BpJzDQRrx3d7
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <20230630153759.3349299-1-maze@google.com>
-X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
-	PDS_RDNS_DYNAMIC_FP,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,TVD_RCVD_IP,
+X-Received: by 2002:a63:561b:0:b0:54f:d553:fbe6 with SMTP id
+ k27-20020a63561b000000b0054fd553fbe6mr6790216pgb.2.1688432453963; Mon, 03 Jul
+ 2023 18:00:53 -0700 (PDT)
+Date: Mon, 03 Jul 2023 18:00:53 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a557cb05ff9ed03b@google.com>
+Subject: [syzbot] [ext4?] general protection fault in ext4_finish_bio
+From: syzbot <syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com>
+To: adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
 	version=3.4.6
-X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 08:37:58AM -0700, Maciej Żenczykowski wrote:
-> Steffan, this isn't of course a patch meant for inclusion, instead just a WARN_ON hit report.
-> The patch is simply what prints the following extra info:
-> 
-> xfrm_prepare_input: XFRM_MODE_SKB_CB(skb)->protocol: 17
-> xfrm_inner_mode_encap_remove: x->props.mode: 1 XFRM_MODE_SKB_SB(skb)->protocol:17
-> 
-> (note: XFRM_MODE_TUNNEL=1 IPPROTO_UDP=17)
+Hello,
 
-Thanks for the report.  This patch should fix the warnings:
+syzbot found the following issue on:
 
----8<---
-After the elimination of inner modes, a couple of warnings that
-were previously unreachable can now be triggered by malformed
-inbound packets.
+HEAD commit:    ae230642190a Merge branch 'af_unix-followup-fixes-for-so_p..
+git tree:       net-next
+console output: https://syzkaller.appspot.com/x/log.txt?x=11fe4cb8a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c9bf1936936ca698
+dashboard link: https://syzkaller.appspot.com/bug?extid=689ec3afb1ef07b766b2
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136b9d48a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10223cb8a80000
 
-Fix this by:
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8c060db03f09/disk-ae230642.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1b9b937ece91/vmlinux-ae230642.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/0c7eb1c82bf0/bzImage-ae230642.xz
 
-1. Moving the setting of skb->protocol into the decap functions.
-2. Returning -EINVAL when unexpected protocol is seen.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com
 
-Reported-by: Maciej Żenczykowski<maze@google.com>
-Fixes: 5f24f41e8ea6 ("xfrm: Remove inner/outer modes from input path")
-Signed-off-by: Herbert Xu <herbert@gondor.apana.org.au>
+general protection fault, probably for non-canonical address 0xdffffc0000000001: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x0000000000000008-0x000000000000000f]
+CPU: 1 PID: 2858 Comm: kworker/u4:5 Not tainted 6.4.0-rc7-syzkaller-01948-gae230642190a #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Workqueue: ext4-rsv-conversion ext4_end_io_rsv_work
+RIP: 0010:_compound_head include/linux/page-flags.h:245 [inline]
+RIP: 0010:bio_first_folio include/linux/bio.h:284 [inline]
+RIP: 0010:ext4_finish_bio+0xdc/0x1090 fs/ext4/page-io.c:104
+Code: c1 ea 03 80 3c 02 00 0f 85 43 0f 00 00 48 8b 45 00 48 8d 78 08 48 89 04 24 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 4c 0f 00 00 48 8b 04 24 31 ff 4c 8b 60 08 4c 89
+RSP: 0018:ffffc9000d047b60 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000001 RSI: ffffffff8234c972 RDI: 0000000000000008
+RBP: ffff88807d609100 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000094001 R12: ffff888074f111e0
+R13: dffffc0000000000 R14: 0000000000000001 R15: ffff888074c416b0
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020241040 CR3: 0000000024e17000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ ext4_release_io_end+0x118/0x3b0 fs/ext4/page-io.c:160
+ ext4_end_io_end fs/ext4/page-io.c:194 [inline]
+ ext4_do_flush_completed_IO fs/ext4/page-io.c:259 [inline]
+ ext4_end_io_rsv_work+0x156/0x670 fs/ext4/page-io.c:273
+ process_one_work+0x99a/0x15e0 kernel/workqueue.c:2405
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2552
+ kthread+0x344/0x440 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:_compound_head include/linux/page-flags.h:245 [inline]
+RIP: 0010:bio_first_folio include/linux/bio.h:284 [inline]
+RIP: 0010:ext4_finish_bio+0xdc/0x1090 fs/ext4/page-io.c:104
+Code: c1 ea 03 80 3c 02 00 0f 85 43 0f 00 00 48 8b 45 00 48 8d 78 08 48 89 04 24 48 b8 00 00 00 00 00 fc ff df 48 89 fa 48 c1 ea 03 <80> 3c 02 00 0f 85 4c 0f 00 00 48 8b 04 24 31 ff 4c 8b 60 08 4c 89
+RSP: 0018:ffffc9000d047b60 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: 0000000000000001 RSI: ffffffff8234c972 RDI: 0000000000000008
+RBP: ffff88807d609100 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000094001 R12: ffff888074f111e0
+R13: dffffc0000000000 R14: 0000000000000001 R15: ffff888074c416b0
+FS:  0000000000000000(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 0000000020241040 CR3: 000000007a4d9000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	c1 ea 03             	shr    $0x3,%edx
+   3:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1)
+   7:	0f 85 43 0f 00 00    	jne    0xf50
+   d:	48 8b 45 00          	mov    0x0(%rbp),%rax
+  11:	48 8d 78 08          	lea    0x8(%rax),%rdi
+  15:	48 89 04 24          	mov    %rax,(%rsp)
+  19:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  20:	fc ff df
+  23:	48 89 fa             	mov    %rdi,%rdx
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 4c 0f 00 00    	jne    0xf80
+  34:	48 8b 04 24          	mov    (%rsp),%rax
+  38:	31 ff                	xor    %edi,%edi
+  3a:	4c 8b 60 08          	mov    0x8(%rax),%r12
+  3e:	4c                   	rex.WR
+  3f:	89                   	.byte 0x89
 
-diff --git a/net/xfrm/xfrm_input.c b/net/xfrm/xfrm_input.c
-index 815b38080401..d5ee96789d4b 100644
---- a/net/xfrm/xfrm_input.c
-+++ b/net/xfrm/xfrm_input.c
-@@ -180,6 +180,8 @@ static int xfrm4_remove_beet_encap(struct xfrm_state *x, struct sk_buff *skb)
- 	int optlen = 0;
- 	int err = -EINVAL;
- 
-+	skb->protocol = htons(ETH_P_IP);
-+
- 	if (unlikely(XFRM_MODE_SKB_CB(skb)->protocol == IPPROTO_BEETPH)) {
- 		struct ip_beet_phdr *ph;
- 		int phlen;
-@@ -232,6 +234,8 @@ static int xfrm4_remove_tunnel_encap(struct xfrm_state *x, struct sk_buff *skb)
- {
- 	int err = -EINVAL;
- 
-+	skb->protocol = htons(ETH_P_IP);
-+
- 	if (!pskb_may_pull(skb, sizeof(struct iphdr)))
- 		goto out;
- 
-@@ -267,6 +271,8 @@ static int xfrm6_remove_tunnel_encap(struct xfrm_state *x, struct sk_buff *skb)
- {
- 	int err = -EINVAL;
- 
-+	skb->protocol = htons(ETH_P_IPV6);
-+
- 	if (!pskb_may_pull(skb, sizeof(struct ipv6hdr)))
- 		goto out;
- 
-@@ -296,6 +302,8 @@ static int xfrm6_remove_beet_encap(struct xfrm_state *x, struct sk_buff *skb)
- 	int size = sizeof(struct ipv6hdr);
- 	int err;
- 
-+	skb->protocol = htons(ETH_P_IPV6);
-+
- 	err = skb_cow_head(skb, size + skb->mac_len);
- 	if (err)
- 		goto out;
-@@ -346,6 +354,7 @@ xfrm_inner_mode_encap_remove(struct xfrm_state *x,
- 			return xfrm6_remove_tunnel_encap(x, skb);
- 		break;
- 		}
-+		return -EINVAL;
- 	}
- 
- 	WARN_ON_ONCE(1);
-@@ -366,19 +375,6 @@ static int xfrm_prepare_input(struct xfrm_state *x, struct sk_buff *skb)
- 		return -EAFNOSUPPORT;
- 	}
- 
--	switch (XFRM_MODE_SKB_CB(skb)->protocol) {
--	case IPPROTO_IPIP:
--	case IPPROTO_BEETPH:
--		skb->protocol = htons(ETH_P_IP);
--		break;
--	case IPPROTO_IPV6:
--		skb->protocol = htons(ETH_P_IPV6);
--		break;
--	default:
--		WARN_ON_ONCE(1);
--		break;
--	}
--
- 	return xfrm_inner_mode_encap_remove(x, skb);
- }
- 
--- 
-Email: Herbert Xu <herbert@gondor.apana.org.au>
-Home Page: http://gondor.apana.org.au/~herbert/
-PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
