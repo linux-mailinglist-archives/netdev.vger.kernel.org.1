@@ -1,147 +1,125 @@
-Return-Path: <netdev+bounces-15404-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15405-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3D5B67475BC
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 17:56:36 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 827F77475C6
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 17:58:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0842280C3F
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 15:56:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BD08E1C20A64
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 15:58:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E4D8D6ABB;
-	Tue,  4 Jul 2023 15:56:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B11376AD9;
+	Tue,  4 Jul 2023 15:58:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D914563C1
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 15:56:32 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B173E76
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 08:56:31 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688486190;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=6+ZHn5E4Ey2ZPvoR0JBGrpwDUf/hUgRLwKW3bRltrnM=;
-	b=TDgGFH/XPxAD+XORj7hgzFQ+6Y2g0VwRqkg0WNpwc/3wvjoWHW2/LXuPiESpJIm3PcRWe7
-	9oIxiw7XT34BfE3sHOBJzXXU2hF06h6pI/nXwnKbDYtuGPuHpshIgIJhnWv7DVJ3pEwpR+
-	ZoInx6TZg6yxT8lChJ6sw4nIQeGbA5E=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-48-iMiKNks1MWGc2_Z9ocmsWQ-1; Tue, 04 Jul 2023 11:56:27 -0400
-X-MC-Unique: iMiKNks1MWGc2_Z9ocmsWQ-1
-Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id D53AF805C3F;
-	Tue,  4 Jul 2023 15:56:26 +0000 (UTC)
-Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id 777A81121318;
-	Tue,  4 Jul 2023 15:56:25 +0000 (UTC)
-Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
-	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
-	Kingdom.
-	Registered in England and Wales under Company Registration No. 3798903
-From: David Howells <dhowells@redhat.com>
-To: netdev@vger.kernel.org, Herbert Xu <herbert@gondor.apana.org.au>,
-    Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>
-cc: dhowells@redhat.com, Paolo Abeni <pabeni@redhat.com>,
-    "David S. Miller" <davem@davemloft.net>,
-    Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
-    Jens Axboe <axboe@kernel.dk>, linux-crypto@vger.kernel.org,
-    linux-kernel@vger.kernel.org
-Subject: [PATCH net] crypto: af_alg: Fix merging of written data into spliced pages
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A50A76AB0
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 15:58:05 +0000 (UTC)
+Received: from mail-pl1-x629.google.com (mail-pl1-x629.google.com [IPv6:2607:f8b0:4864:20::629])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 37F3110C1
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 08:58:04 -0700 (PDT)
+Received: by mail-pl1-x629.google.com with SMTP id d9443c01a7336-1b89cb535afso9730125ad.2
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 08:58:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1688486283; x=1691078283;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=0Ob5s66nJUuWrzVmIgcpj6gX1pVOIG43sjp0smeuqRk=;
+        b=yTV0wkqS1/NR8efXnnWnTnPtMe05KXibp8pqQ7qrGhZHkRhc5dFDtTt1lCQQEQyuUW
+         I0U/A19V8OfYLMIIBS4YaW0/2gFPbGU0BJVz0OvlUm9rVRLOoIjQp7b8Q43bJwYYZRBc
+         4hlWlUDaF9uwG4nhXY1tcNXBM3ej6HAmBHkzUF0GfdyCZZksWEWNn5RK+53t6VS285dn
+         xr6/wwYpfmDmkhzKyF/+rSnYOIhQ03zjUB+xLHxqihh+28KlRcg7flHvem2BLVKidv4X
+         Rjif9fxwkS/VpS/NqXpaxy7SEOw/EIk2EWGItbyf6GCiUbw1wM+LDRgUTrJcMYOpEWkU
+         HcXw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688486283; x=1691078283;
+        h=content-transfer-encoding:mime-version:references:in-reply-to
+         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=0Ob5s66nJUuWrzVmIgcpj6gX1pVOIG43sjp0smeuqRk=;
+        b=C33UFleVAH5kJvHYbks21sQ+7Yh9q1+NwzlmvbsiB2VYqPFAj8PHyexOwGEZUea6I7
+         BVH4/F0WMWmXIblageroFXbkOwOLINzTv6xOkt5HCtEZWl42iaPpL0xwyD/2gitETt67
+         nvD7pWF15bIGJSCUWyO33ZuR39eymMQi34VLHmwRUJ6Z7y88Y2N4fCyTM/4ekTbmq3tQ
+         Y/WurB6AK0pfIIC1xaBt7G4Kjbh0b4LskiIyonCjVHUo3o3qfvXx/Vy6esOZIiYsvJnb
+         nKabEmUxYluD8Pw/hZyOVMk68Wiy+uPY5a6VBl3uZE+b3Y5tA6dNDTlPC7fyKmdpzB1l
+         zdHQ==
+X-Gm-Message-State: ABy/qLa4vhzgAh81odxyXNhQmgSuPiv5fglICpNtPqH6akmGpEeVdXl2
+	sWlX5PLvNMHFoaHkBxiiHBxBqA==
+X-Google-Smtp-Source: APBJJlETTmVVFs8YtNneUBEorttJnAIPN63N7o/Y7mFVilt6D8loeh6FMTP8QxF/HYxSqOZo7StQ2Q==
+X-Received: by 2002:a17:902:9696:b0:1b8:971c:b7b8 with SMTP id n22-20020a170902969600b001b8971cb7b8mr4827989plp.47.1688486283606;
+        Tue, 04 Jul 2023 08:58:03 -0700 (PDT)
+Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
+        by smtp.gmail.com with ESMTPSA id h6-20020a170902eec600b001ab2b4105ddsm9344591plb.60.2023.07.04.08.58.02
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 08:58:03 -0700 (PDT)
+Date: Tue, 4 Jul 2023 08:58:00 -0700
+From: Stephen Hemminger <stephen@networkplumber.org>
+To: Breno Leitao <leitao@debian.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
+ <pabeni@redhat.com>, sergey.senozhatsky@gmail.com, pmladek@suse.com,
+ tj@kernel.or, Dave Jones <davej@codemonkey.org.uk>, "open list:NETWORKING
+ DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
+Subject: Re: [PATCH] netconsole: Append kernel version to message
+Message-ID: <20230704085800.38f05b56@hermes.local>
+In-Reply-To: <ZKQ3o6byAaJfxHK+@gmail.com>
+References: <20230703154155.3460313-1-leitao@debian.org>
+	<20230703113410.6352411d@hermes.local>
+	<ZKQ3o6byAaJfxHK+@gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
-Date: Tue, 04 Jul 2023 16:56:24 +0100
-Message-ID: <1585899.1688486184@warthog.procyon.org.uk>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-=20=20=20=20
-af_alg_sendmsg() takes data-to-be-copied that's provided by write(),
-send(), sendmsg() and similar into pages that it allocates and will merge
-new data into the last page in the list, based on the value of ctx->merge.
+On Tue, 4 Jul 2023 08:15:47 -0700
+Breno Leitao <leitao@debian.org> wrote:
 
-Now that af_alg_sendmsg() accepts MSG_SPLICE_PAGES, it adds spliced pages
-directly into the list and then incorrectly appends data to them if there's
-space left because ctx->merge says that it can.  This was cleared by
-af_alg_sendpage(), but that got lost.
+> Hello Stephen,
+> 
+> On Mon, Jul 03, 2023 at 11:34:10AM -0700, Stephen Hemminger wrote:
+> > On Mon,  3 Jul 2023 08:41:54 -0700
+> > leitao@debian.org wrote:
+> >   
+> > > +config NETCONSOLE_UNAME
+> > > +	bool "Add the kernel version to netconsole lines"
+> > > +	depends on NETCONSOLE
+> > > +	default n
+> > > +	help
+> > > +	  This option causes extended netcons messages to be prepended with
+> > > +	  kernel uname version. This can be useful for monitoring a large
+> > > +	  deployment of servers, so, you can easily map outputs to kernel
+> > > +	  versions.  
+> > 
+> > This should be runtime configured like other netconsole options.
+> > Not enabled at compile time.  
+> 
+> Do you mean I should add a new option to netconsole line? This is the
+> current line format today:
+> 
+> 	[+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
+> 
+> If that is the case, I suppose I want to add something at the beginning
+> of format, that specify that uname should be sent. What about something
+> as?
+> 
+> 	[u][+][src-port]@[src-ip]/[<dev>],[tgt-port]@<tgt-ip>/[tgt-macaddr]
+> 
+> Thanks!
 
-Fix this by skipping the merge if MSG_SPLICE_PAGES is specified and
-clearing ctx->merge after MSG_SPLICE_PAGES has added stuff to the list.
-
-Fixes: bf63e250c4b1 ("crypto: af_alg: Support MSG_SPLICE_PAGES")
-Reported-by: Ondrej Mosn=C3=A1=C4=8Dek <omosnacek@gmail.com>
-Link: https://lore.kernel.org/r/CAAUqJDvFuvms55Td1c=3DXKv6epfRnnP78438nZQ-J=
-KyuCptGBiQ@mail.gmail.com/
-Signed-off-by: David Howells <dhowells@redhat.com>
-cc: Herbert Xu <herbert@gondor.apana.org.au>
-cc: Paolo Abeni <pabeni@redhat.com>
-cc: "David S. Miller" <davem@davemloft.net>
-cc: Eric Dumazet <edumazet@google.com>
-cc: Jakub Kicinski <kuba@kernel.org>
-cc: linux-crypto@vger.kernel.org
-cc: netdev@vger.kernel.org
----
- crypto/af_alg.c |    7 ++++---
- 1 file changed, 4 insertions(+), 3 deletions(-)
-
-diff --git a/crypto/af_alg.c b/crypto/af_alg.c
-index 6218c773d71c..06b15b9f661c 100644
---- a/crypto/af_alg.c
-+++ b/crypto/af_alg.c
-@@ -992,7 +992,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr *=
-msg, size_t size,
- 		ssize_t plen;
-=20
- 		/* use the existing memory in an allocated page */
--		if (ctx->merge) {
-+		if (ctx->merge && !(msg->msg_flags & MSG_SPLICE_PAGES)) {
- 			sgl =3D list_entry(ctx->tsgl_list.prev,
- 					 struct af_alg_tsgl, list);
- 			sg =3D sgl->sg + sgl->cur - 1;
-@@ -1054,6 +1054,7 @@ int af_alg_sendmsg(struct socket *sock, struct msghdr=
- *msg, size_t size,
- 			ctx->used +=3D plen;
- 			copied +=3D plen;
- 			size -=3D plen;
-+			ctx->merge =3D 0;
- 		} else {
- 			do {
- 				struct page *pg;
-@@ -1085,12 +1086,12 @@ int af_alg_sendmsg(struct socket *sock, struct msgh=
-dr *msg, size_t size,
- 				size -=3D plen;
- 				sgl->cur++;
- 			} while (len && sgl->cur < MAX_SGL_ENTS);
-+
-+			ctx->merge =3D plen & (PAGE_SIZE - 1);
- 		}
-=20
- 		if (!size)
- 			sg_mark_end(sg + sgl->cur - 1);
--
--		ctx->merge =3D plen & (PAGE_SIZE - 1);
- 	}
-=20
- 	err =3D 0;
-
+Keep it as simple as possible.
+What ever program is reading udp socket knows where it is coming from.
+The uname is really not needed.
 
