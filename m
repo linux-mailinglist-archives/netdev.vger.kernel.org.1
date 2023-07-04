@@ -1,305 +1,256 @@
-Return-Path: <netdev+bounces-15415-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15416-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7107E7477B6
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 19:23:10 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BACDF7477F2
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 19:42:35 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9B5811C20B14
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 17:23:09 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DC1B280ED3
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 17:42:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27F5D6FD2;
-	Tue,  4 Jul 2023 17:23:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BEEA7465;
+	Tue,  4 Jul 2023 17:42:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 127066FA8
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 17:23:06 +0000 (UTC)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E8CDE76;
-	Tue,  4 Jul 2023 10:23:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688491385; x=1720027385;
-  h=date:from:to:cc:subject:message-id;
-  bh=pn7pmITVLM7sFJDh3HU77nok6p6G73xphXt8S5mtBPA=;
-  b=TWKXtrI+WzbUNA/ZkQBvVloN9SMhdRoYvdX6KUpy1LSeIL3o/5aoZcrO
-   LW2+wPcBEcTYfl4kQhbJF0S44Vmc2J8aqwaZ64vP0fC8XBzjyLSD4qhR7
-   j4x8aL8Cl8QwEkDXA9/e3853qdmTR/J4ooC1qy2JhCnP9DjkQDfx73sX3
-   pht/IIvRkeRM4eTAsr+kEyElIy836otty2qyJbmTm9ezNWSOWWaw6Ia57
-   fdJ/5ofQblEakEfrNXKx4ksyexx0/EEA00G58t1z6iKpOEaidHOrVUmAr
-   B+fYlhYeVpnUCd8P5ug+YYAP1eKV4CoZPmc79ROiBWYF/5H1dFrL+sRgi
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="365731477"
-X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
-   d="scan'208";a="365731477"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 04 Jul 2023 10:23:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10761"; a="748470953"
-X-IronPort-AV: E=Sophos;i="6.01,181,1684825200"; 
-   d="scan'208";a="748470953"
-Received: from lkp-server01.sh.intel.com (HELO 783282924a45) ([10.239.97.150])
-  by orsmga008.jf.intel.com with ESMTP; 04 Jul 2023 10:23:01 -0700
-Received: from kbuild by 783282924a45 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qGjjw-000IP9-3C;
-	Tue, 04 Jul 2023 17:23:00 +0000
-Date: Wed, 05 Jul 2023 01:22:07 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- kunit-dev@googlegroups.com, kvm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-kselftest@vger.kernel.org,
- netdev@vger.kernel.org, virtualization@lists.linux-foundation.org
-Subject: [linux-next:master] BUILD REGRESSION
- 1c6f93977947dbba1fc4d250c4eb8a7d4cfdecf1
-Message-ID: <202307050151.c3vyrIHs-lkp@intel.com>
-User-Agent: s-nail v14.9.24
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7A7F07461
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 17:42:31 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 144FE10D7
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 10:42:29 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qGk2k-0005Om-Q3; Tue, 04 Jul 2023 19:42:26 +0200
+Message-ID: <f7ca15e8-2cf2-1372-e29a-d7f2a2cc09f1@leemhuis.info>
+Date: Tue, 4 Jul 2023 19:42:23 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+Subject: Re: r8169: transmit transmit queue timed out - v6.4 cycle
+Content-Language: en-US, de-DE
+To: Tobias Klausmann <tobias.klausmann@freenet.de>,
+ Heiner Kallweit <hkallweit1@gmail.com>
+Cc: Realtek linux nic maintainers <nic_swsd@realtek.com>,
+ netdev@vger.kernel.org,
+ Linux kernel regressions list <regressions@lists.linux.dev>
+References: <c3465166-f04d-fcf5-d284-57357abb3f99@freenet.de>
+ <CAFSsGVtiXSK_0M_TQm_38LabiRX7E5vR26x=cKags4ZQBqfXPQ@mail.gmail.com>
+ <e47bac0d-e802-65e1-b311-6acb26d5cf10@freenet.de>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+In-Reply-To: <e47bac0d-e802-65e1-b311-6acb26d5cf10@freenet.de>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688492549;fa5f4159;
+X-HE-SMSGID: 1qGk2k-0005Om-Q3
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 1c6f93977947dbba1fc4d250c4eb8a7d4cfdecf1  Add linux-next specific files for 20230704
+[CCing the regression list, as it should be in the loop for regressions:
+https://docs.kernel.org/admin-guide/reporting-regressions.html]
 
-Error/Warning reports:
+Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
+for once, to make this easily accessible to everyone.
 
-https://lore.kernel.org/oe-kbuild-all/202306260401.qZlYQpV2-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306301709.lvrxzyCj-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306301756.x8dgyYnL-lkp@intel.com
+Heiner, could you please give a status update? It looks like this
+regression made no progress in the past 11 days. Should this maybe be
+reverted for now if things take so long? Or am I missing something?
 
-Error/Warning: (recently discovered and may have been fixed)
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+If I did something stupid, please tell me, as explained on that page.
 
-drivers/bluetooth/btmtk.c:386:32: error: no member named 'dump' in 'struct hci_dev'
-drivers/bluetooth/btmtk.c:386:44: error: 'struct hci_dev' has no member named 'dump'
-drivers/char/mem.c:164:25: error: implicit declaration of function 'unxlate_dev_mem_ptr'; did you mean 'xlate_dev_mem_ptr'? [-Werror=implicit-function-declaration]
-drivers/mfd/max77541.c:176:18: warning: cast to smaller integer type 'enum max7754x_ids' from 'const void *' [-Wvoid-pointer-to-enum-cast]
-lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
-lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
+#regzbot poke
 
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-drivers/vhost/vhost.c:1654 vhost_vring_ioctl() error: uninitialized symbol 'vq'.
-drivers/vhost/vhost.c:1685 vhost_vring_ioctl() error: uninitialized symbol 'idx'.
-drivers/vhost/vhost.c:763 vhost_worker_ioctl() error: uninitialized symbol 'vq'.
-drivers/vhost/vhost.c:774 vhost_worker_ioctl() error: uninitialized symbol 'idx'.
-{standard input}: Error: local label `"2" (instance number 9 of a fb label)' is not defined
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- alpha-randconfig-r002-20230704
-|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-|-- loongarch-randconfig-r022-20230704
-|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-|-- m68k-randconfig-r016-20230704
-|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-|-- microblaze-randconfig-r073-20230703
-|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-|-- nios2-randconfig-r034-20230704
-|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-|-- riscv-randconfig-m031-20230703
-|   |-- drivers-vhost-vhost.c-vhost_vring_ioctl()-error:uninitialized-symbol-idx-.
-|   |-- drivers-vhost-vhost.c-vhost_vring_ioctl()-error:uninitialized-symbol-vq-.
-|   |-- drivers-vhost-vhost.c-vhost_worker_ioctl()-error:uninitialized-symbol-idx-.
-|   `-- drivers-vhost-vhost.c-vhost_worker_ioctl()-error:uninitialized-symbol-vq-.
-|-- sh-allmodconfig
-|   |-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
-|   `-- standard-input:Error:local-label-(instance-number-of-a-fb-label)-is-not-defined
-|-- sh-randconfig-r015-20230704
-|   |-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
-|-- sh-sh7710voipgw_defconfig
-|   `-- drivers-char-mem.c:error:implicit-declaration-of-function-unxlate_dev_mem_ptr
-|-- sparc-randconfig-r005-20230704
-|   `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-`-- x86_64-buildonly-randconfig-r003-20230703
-    `-- drivers-bluetooth-btmtk.c:error:struct-hci_dev-has-no-member-named-dump
-clang_recent_errors
-|-- arm64-randconfig-r033-20230704
-|   `-- drivers-mfd-max77541.c:warning:cast-to-smaller-integer-type-enum-max7754x_ids-from-const-void
-|-- hexagon-randconfig-r041-20230703
-|   |-- drivers-bluetooth-btmtk.c:error:no-member-named-dump-in-struct-hci_dev
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- hexagon-randconfig-r045-20230703
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- i386-randconfig-i011-20230703
-|   `-- drivers-bluetooth-btmtk.c:error:no-member-named-dump-in-struct-hci_dev
-`-- s390-randconfig-r006-20230704
-    |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-    `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-
-elapsed time: 734m
-
-configs tested: 148
-configs skipped: 9
-
-tested configs:
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r002-20230704   gcc  
-alpha                randconfig-r003-20230704   gcc  
-alpha                randconfig-r004-20230704   gcc  
-alpha                randconfig-r023-20230703   gcc  
-alpha                randconfig-r035-20230704   gcc  
-arc                              alldefconfig   gcc  
-arc                              allyesconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r021-20230704   gcc  
-arc                  randconfig-r043-20230703   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                                 defconfig   gcc  
-arm                  randconfig-r002-20230704   gcc  
-arm                  randconfig-r014-20230704   clang
-arm                  randconfig-r026-20230703   gcc  
-arm                  randconfig-r032-20230704   gcc  
-arm                  randconfig-r046-20230703   gcc  
-arm                         s3c6400_defconfig   gcc  
-arm                         s5pv210_defconfig   clang
-arm                           u8500_defconfig   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r033-20230704   clang
-csky                             alldefconfig   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r022-20230703   gcc  
-hexagon              randconfig-r033-20230704   clang
-hexagon              randconfig-r041-20230703   clang
-hexagon              randconfig-r045-20230703   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230703   gcc  
-i386         buildonly-randconfig-r005-20230703   gcc  
-i386         buildonly-randconfig-r006-20230703   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230704   clang
-i386                 randconfig-i002-20230704   clang
-i386                 randconfig-i003-20230704   clang
-i386                 randconfig-i004-20230704   clang
-i386                 randconfig-i005-20230704   clang
-i386                 randconfig-i006-20230704   clang
-i386                 randconfig-i011-20230703   clang
-i386                 randconfig-i012-20230703   clang
-i386                 randconfig-i013-20230703   clang
-i386                 randconfig-i014-20230703   clang
-i386                 randconfig-i015-20230703   clang
-i386                 randconfig-i016-20230703   clang
-i386                 randconfig-r005-20230704   clang
-i386                 randconfig-r032-20230704   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch            randconfig-r022-20230704   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r016-20230704   gcc  
-microblaze           randconfig-r011-20230704   gcc  
-microblaze           randconfig-r015-20230704   gcc  
-microblaze           randconfig-r023-20230704   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                           ci20_defconfig   gcc  
-mips                     decstation_defconfig   gcc  
-mips                 decstation_r4k_defconfig   gcc  
-mips                        maltaup_defconfig   clang
-mips                           mtx1_defconfig   clang
-mips                        qi_lb60_defconfig   clang
-mips                 randconfig-r013-20230704   clang
-mips                 randconfig-r031-20230704   gcc  
-nios2                               defconfig   gcc  
-nios2                randconfig-r004-20230704   gcc  
-nios2                randconfig-r006-20230704   gcc  
-nios2                randconfig-r012-20230704   gcc  
-nios2                randconfig-r034-20230704   gcc  
-openrisc                         alldefconfig   gcc  
-openrisc                  or1klitex_defconfig   gcc  
-openrisc             randconfig-r014-20230704   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r001-20230704   gcc  
-parisc               randconfig-r012-20230704   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                   microwatt_defconfig   clang
-powerpc              randconfig-r001-20230704   clang
-powerpc              randconfig-r011-20230704   gcc  
-powerpc                     tqm8560_defconfig   clang
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r024-20230704   gcc  
-riscv                randconfig-r042-20230703   clang
-riscv                          rv32_defconfig   gcc  
-s390                 randconfig-r006-20230704   clang
-s390                 randconfig-r044-20230703   clang
-sh                               allmodconfig   gcc  
-sh                   randconfig-r015-20230704   gcc  
-sh                   randconfig-r026-20230704   gcc  
-sh                   rts7751r2dplus_defconfig   gcc  
-sh                          sdk7786_defconfig   gcc  
-sh                           se7750_defconfig   gcc  
-sh                     sh7710voipgw_defconfig   gcc  
-sh                             shx3_defconfig   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r005-20230704   gcc  
-sparc                randconfig-r036-20230704   gcc  
-sparc64                             defconfig   gcc  
-sparc64              randconfig-r016-20230704   gcc  
-sparc64              randconfig-r024-20230703   gcc  
-sparc64              randconfig-r035-20230704   gcc  
-um                               alldefconfig   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                   randconfig-r025-20230704   clang
-um                   randconfig-r031-20230704   gcc  
-um                   randconfig-r034-20230704   gcc  
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230703   gcc  
-x86_64       buildonly-randconfig-r002-20230703   gcc  
-x86_64       buildonly-randconfig-r003-20230703   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-x001-20230703   clang
-x86_64               randconfig-x002-20230703   clang
-x86_64               randconfig-x003-20230703   clang
-x86_64               randconfig-x004-20230703   clang
-x86_64               randconfig-x005-20230703   clang
-x86_64               randconfig-x006-20230703   clang
-x86_64               randconfig-x011-20230703   gcc  
-x86_64               randconfig-x012-20230703   gcc  
-x86_64               randconfig-x013-20230703   gcc  
-x86_64               randconfig-x014-20230703   gcc  
-x86_64               randconfig-x015-20230703   gcc  
-x86_64               randconfig-x016-20230703   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                       common_defconfig   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+On 23.06.23 19:30, Tobias Klausmann wrote:
+> Hello,
+> 
+> ASPM is not available as per
+> 
+> "r8169 0000:03:00.0: can't disable ASPM; OS doesn't have ASPMcontrol",
+> the problem is triggered by "no-load" to ~100MBit/s load on a 1GBit/s
+> connection.
+> 
+> 
+> On 23.06.23 00:10, Heiner Kallweit wrote:
+>> Same chip version works fine for me even with ASPM L1.2. So your board
+>> may have  broken ASPM support. Any special load pattern that triggers
+>> the issue?  Can you work around the issue by disabling ASPM sub-states
+>> via sysfs attributes, starting with L1.2?
+>>
+>> Tobias Klausmann <tobias.klausmann@freenet.de> schrieb am Do., 22.
+>> Juni 2023, 15:46:
+>>
+>>     Hello all,
+>>
+>>     introduced in the 6.4 cycle r8169 show transmit queue timeouts [1].
+>>     Bisecting the problem brought me to the following commit:
+>>
+>>     2ab19de62d67e403105ba860971e5ff0d511ad15 is the first bad commit
+>>     commit 2ab19de62d67e403105ba860971e5ff0d511ad15
+>>     Author: Heiner Kallweit <hkallweit1@gmail.com>
+>>     Date:   Mon Mar 6 22:28:06 2023 +0100
+>>
+>>          r8169: remove ASPM restrictions now that ASPM is disabled during
+>>     NAPI poll
+>>
+>>          Now that  ASPM is disabled during NAPI poll, we can remove
+>>     all ASPM
+>>          restrictions. This allows for higher power savings if the
+>> network
+>>          isn't fully loaded.
+>>
+>>          Reviewed-by: Simon Horman <simon.horman@corigine.com>
+>>          Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+>>          Tested-by: Holger Hoffstätte <holger@applied-asynchrony.com>
+>>          Signed-off-by: Heiner Kallweit <hkallweit1@gmail.com>
+>>          Signed-off-by: David S. Miller <davem@davemloft.net>
+>>
+>>       drivers/net/ethernet/realtek/r8169_main.c | 27
+>>     +--------------------------
+>>       1 file changed, 1 insertion(+), 26 deletions(-)
+>>
+>>
+>>     With this commit reverted on top of v6.4-rc6, the timeouts are gone.
+>>
+>>     The NIC identifies as "03:00.0 Ethernet controller: Realtek
+>>     Semiconductor Co., Ltd. RTL8111/8168/8411 PCI Express Gigabit
+>>     Ethernet
+>>     Controller (rev 15)"
+>>
+>>     Greetings,
+>>
+>>     Tobias Klausmann
+>>
+>>
+>>     [1]:
+>>
+>>     [ 2070.918700] ------------[ cut here ]------------
+>>     [ 2070.918708] NETDEV WATCHDOG: enp3s0 (r8169): transmit queue 0
+>>     timed
+>>     out 5317 ms
+>>     [ 2070.918719] WARNING: CPU: 4 PID: 0 at net/sched/sch_generic.c:525
+>>     dev_watchdog+0x1c9/0x1d0
+>>     [ 2070.918726] Modules linked in: rfcomm(E) af_packet(E) cmac(E)
+>>     algif_hash(E) algif_skcipher(E) af_alg(E) bnep(E) btusb(E) btrtl(E)
+>>     uvcvideo(E) btbcm(E) uvc(E) btintel(E) videobuf2_vmalloc(E) btmtk(E)
+>>     videobuf2_memops(E) rtsx_usb_sdmmc(E) videobuf2_v4l2(E) bluetooth(E)
+>>     rtsx_usb_ms(E) mmc_core(E) ecdh_generic(E) memstick(E) ecc(E)
+>>     videodev(E) videobuf2_common(E) mc(E) rtsx_usb(E) qrtr(E)
+>>     nls_iso8859_1(E) nls_cp437(E) vfat(E) fat(E) joydev(E)
+>>     snd_hda_codec_realtek(E) snd_hda_codec_generic(E) ledtrig_audio(E)
+>>     snd_hda_codec_hdmi(E) ath10k_pci(E) ath10k_core(E) hid_multitouch(E)
+>>     ath(E) snd_hda_intel(E) snd_intel_dspcfg(E) iTCO_wdt(E) ee1004(E)
+>>     intel_rapl_msr(E) snd_intel_sdw_acpi(E) intel_pmc_bxt(E)
+>>     snd_hda_codec(E) mac80211(E) iTCO_vendor_support(E) r8169(E)
+>>     intel_rapl_common(E) snd_hda_core(E) intel_tcc_cooling(E) mei_hdcp(E)
+>>     x86_pkg_temp_thermal(E) acer_wmi(E) intel_powerclamp(E) cfg80211(E)
+>>     snd_hwdep(E) sparse_keymap(E) coretemp(E) snd_pcm(E) realtek(E)
+>>     i2c_i801(E) wmi_bmof(E) intel_wmi_thunderbolt(E)
+>>     [ 2070.918794]  snd_timer(E) rfkill(E) mdio_devres(E) libphy(E)
+>>     libarc4(E) efi_pstore(E) snd(E) i2c_smbus(E) soundcore(E) mei_me(E)
+>>     intel_lpss_pci(E) intel_lpss(E) mei(E) idma64(E) intel_pch_thermal(E)
+>>     thermal(E) battery(E) ac(E) acpi_pad(E) tiny_power_button(E) fuse(E)
+>>     configfs(E) dmi_sysfs(E) ip_tables(E) x_tables(E) hid_generic(E)
+>>     usbhid(E) crct10dif_pclmul(E) nouveau(E) crc32_pclmul(E)
+>>     crc32c_intel(E)
+>>     i915(E) polyval_clmulni(E) drm_ttm_helper(E) polyval_generic(E)
+>>     ghash_clmulni_intel(E) mxm_wmi(E) drm_buddy(E) sha512_ssse3(E)
+>>     i2c_algo_bit(E) aesni_intel(E) drm_display_helper(E) crypto_simd(E)
+>>     drm_kms_helper(E) syscopyarea(E) sysfillrect(E) cryptd(E)
+>>     sysimgblt(E)
+>>     cec(E) xhci_pci(E) ttm(E) xhci_hcd(E) usbcore(E) drm(E) usb_common(E)
+>>     i2c_hid_acpi(E) i2c_hid(E) video(E) wmi(E) pinctrl_sunrisepoint(E)
+>>     button(E) serio_raw(E) sg(E) dm_multipath(E) dm_mod(E)
+>>     scsi_dh_rdac(E)
+>>     scsi_dh_emc(E) scsi_dh_alua(E) msr(E) efivarfs(E)
+>>     [ 2070.918862] CPU: 4 PID: 0 Comm: swapper/4 Tainted: G
+>>     E      6.4.0-rc1-desktop-debug+ #51
+>>     [ 2070.918864] Hardware name: Acer Aspire VN7-593G/Pluto_KLS, BIOS
+>>     V1.11
+>>     08/01/2018
+>>     [ 2070.918866] RIP: 0010:dev_watchdog+0x1c9/0x1d0
+>>     [ 2070.918869] Code: d5 eb 92 48 89 ef c6 05 5a 34 96 00 01 e8 2f
+>>     d0 fb
+>>     ff 45 89 f8 44 89 f1 48 89 ee 48 89 c2 48 c7 c7 58 5c f2 91 e8 07
+>>     c6 83
+>>     ff <0f> 0b e9 74 ff ff ff 41 55 41 54 55 53 48 8b 47 50 4c 8b 28
+>> 48 85
+>>     [ 2070.918872] RSP: 0018:ffffbcec00220eb8 EFLAGS: 00010286
+>>     [ 2070.918875] RAX: 0000000000000000 RBX: ffff94f0104843dc RCX:
+>>     000000000000083f
+>>     [ 2070.918877] RDX: 0000000000000000 RSI: 00000000000000f6 RDI:
+>>     000000000000003f
+>>     [ 2070.918878] RBP: ffff94f010484000 R08: 0000000000000001 R09:
+>>     0000000000000000
+>>     [ 2070.918880] R10: ffff94f1b6aa0000 R11: ffff94f1b6aa0000 R12:
+>>     ffff94f010484488
+>>     [ 2070.918881] R13: ffff94f0031a0600 R14: 0000000000000000 R15:
+>>     00000000000014c5
+>>     [ 2070.918883] FS:  0000000000000000(0000) GS:ffff94f1b6d00000(0000)
+>>     knlGS:0000000000000000
+>>     [ 2070.918885] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+>>     [ 2070.918887] CR2: 00007f8eea510000 CR3: 000000023322e005 CR4:
+>>     00000000003706e0
+>>     [ 2070.918889] Call Trace:
+>>     [ 2070.918891]  <IRQ>
+>>     [ 2070.918893]  ? mq_change_real_num_tx+0xe0/0xe0
+>>     [ 2070.918897]  ? mq_change_real_num_tx+0xe0/0xe0
+>>     [ 2070.918899]  call_timer_fn.isra.0+0x17/0x70
+>>     [ 2070.918903]  __run_timers.part.0+0x1b2/0x200
+>>     [ 2070.918907]  ? tick_sched_do_timer+0x80/0x80
+>>     [ 2070.918910]  ? hw_breakpoint_pmu_read+0x10/0x10
+>>     [ 2070.918913]  ? ktime_get+0x33/0xa0
+>>     [ 2070.918915]  run_timer_softirq+0x21/0x50
+>>     [ 2070.918918]  __do_softirq+0xb8/0x1ea
+>>     [ 2070.918923]  irq_exit_rcu+0x75/0xa0
+>>     [ 2070.918926]  sysvec_apic_timer_interrupt+0x66/0x80
+>>     [ 2070.918929]  </IRQ>
+>>     [ 2070.918930]  <TASK>
+>>     [ 2070.918932]  asm_sysvec_apic_timer_interrupt+0x16/0x20
+>>     [ 2070.918935] RIP: 0010:cpuidle_enter_state+0xa7/0x2a0
+>>     [ 2070.918938] Code: 45 40 40 0f 84 9f 01 00 00 e8 65 00 6e ff e8
+>>     10 f8
+>>     ff ff 31 ff 49 89 c5 e8 66 64 6d ff 45 84 ff 0f 85 76 01 00 00 fb
+>>     45 85
+>>     f6 <0f> 88 be 00 00 00 49 63 ce 48 8b 04 24 48 6b d1 68 49 29 c5
+>> 48 89
+>>     [ 2070.918939] RSP: 0018:ffffbcec0012fe90 EFLAGS: 00000202
+>>     [ 2070.918942] RAX: ffff94f1b6d25d80 RBX: 0000000000000008 RCX:
+>>     0000000000000000
+>>     [ 2070.918943] RDX: 000001e22c5f9004 RSI: fffffffdc849289f RDI:
+>>     0000000000000000
+>>     [ 2070.918945] RBP: ffff94f1b6d2fa00 R08: 0000000000000002 R09:
+>>     000000002d959839
+>>     [ 2070.918946] R10: ffff94f1b6d24904 R11: 00000000000018c7 R12:
+>>     ffffffff92155720
+>>     [ 2070.918948] R13: 000001e22c5f9004 R14: 0000000000000008 R15:
+>>     0000000000000000
+>>     [ 2070.918951]  cpuidle_enter+0x24/0x40
+>>     [ 2070.918954]  do_idle+0x1c0/0x220
+>>     [ 2070.918958]  cpu_startup_entry+0x14/0x20
+>>     [ 2070.918960]  start_secondary+0x109/0x130
+>>     [ 2070.918963]  secondary_startup_64_no_verify+0xf4/0xfb
+>>     [ 2070.918966]  </TASK>
+>>     [ 2070.918968] ---[ end trace 0000000000000000 ]---
+>>     [ 2072.163726] pcieport 0000:00:1c.3: Data Link Layer Link Active not
+>>     set in 1000 msec
+>>     [ 2072.165868] r8169 0000:03:00.0 enp3s0: Can't reset secondary
+>>     PCI bus,
+>>     detach NIC
+>>
 
