@@ -1,172 +1,361 @@
-Return-Path: <netdev+bounces-15291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15293-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F3EF5746A2F
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 08:59:19 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id AD1AF746A33
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 09:00:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 24D7C280E58
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 06:59:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 63363280F25
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 06:59:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 027DC10FD;
-	Tue,  4 Jul 2023 06:59:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1ACF61392;
+	Tue,  4 Jul 2023 06:59:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E9A10647
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 06:59:15 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 13EE411F
-	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 23:59:11 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688453951;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=0IleIxpNn+PMHgV028qieppTFJnd95N2jqDTi5xYgrM=;
-	b=A1Ov6fXZa9DLfzmf8fWJFQmvD6lrPcZE/1dqsgoknYtp8W7s4/lVcprRkVBDxxbojzzv9g
-	tECaT4bjAhkRJEoI4ruoRPiarQQB8GQj3S8hAXXoOA/dhGUPT4x6NUzn+/mSH5biPEjTh6
-	/MUVUtII7JcBzG1INZUmwEESdM9pgmI=
-Received: from mail-qk1-f198.google.com (mail-qk1-f198.google.com
- [209.85.222.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-338-Nj7bkUlGPL-QqEagOZAREg-1; Tue, 04 Jul 2023 02:59:09 -0400
-X-MC-Unique: Nj7bkUlGPL-QqEagOZAREg-1
-Received: by mail-qk1-f198.google.com with SMTP id af79cd13be357-7672918d8a4so154903385a.0
-        for <netdev@vger.kernel.org>; Mon, 03 Jul 2023 23:59:09 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688453949; x=1691045949;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=0IleIxpNn+PMHgV028qieppTFJnd95N2jqDTi5xYgrM=;
-        b=C2JsDwdfoehVqij1SGw/PrKyDssrvZmh6SgArn3u7qBNUqQXs6TZAWXELCCYHX8hjM
-         5LHEmPo2PTHrGUTJyNyFcvgzkjf3vymoC9LB8Ng0S/4U+IFFo2dbGKHiJrL6dFSe7Cex
-         pWnUzcXOMtp3tG3WHkBXhcCE8CKWlEz6mBKqEqK3umkGhjVyKQRGx7+PNjwCaOSgSdeD
-         H9oeS5EdsV/qE5ft4OcwoZ7xW83xx4IpCzuDiAhGw0/TU0DBfrmUZI4ZgD82Cx8N+Ill
-         DJhLvYep4slbzsgd9oxCac70jgM2duqaUqjuRXcQvjvtqyj0MHmlFjvCWUFGuDrX+xav
-         0Ing==
-X-Gm-Message-State: ABy/qLbusKcRB1mM/h51BL+CVe+kNO4NLqE2wH1zU/bFnEHkwwf5MKGV
-	6MAMUk4BtQXqNTOaq5VRN3Kbo7nRbNoPG4Kbf6KRvFttabE65eVnp4aZbsSC35Q52mERf1p9ZFx
-	EtDk6pdc9LUuRz9Ui
-X-Received: by 2002:a05:620a:1aa4:b0:765:58ac:9458 with SMTP id bl36-20020a05620a1aa400b0076558ac9458mr14719908qkb.7.1688453949232;
-        Mon, 03 Jul 2023 23:59:09 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEzlcNLkagvW9k+kp5MGjOwZWN9zlneIyGcDYmRHiEtbwaDGwG+DfHs99YP8WgUKWv70lEQoQ==
-X-Received: by 2002:a05:620a:1aa4:b0:765:58ac:9458 with SMTP id bl36-20020a05620a1aa400b0076558ac9458mr14719893qkb.7.1688453948908;
-        Mon, 03 Jul 2023 23:59:08 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-247-156.dyn.eolo.it. [146.241.247.156])
-        by smtp.gmail.com with ESMTPSA id pe34-20020a05620a852200b007623c96430csm9632974qkn.111.2023.07.03.23.59.05
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Mon, 03 Jul 2023 23:59:08 -0700 (PDT)
-Message-ID: <8b0696a63d3f9cdcd4d9a8d933826e9ea1cb126b.camel@redhat.com>
-Subject: Re: [EXTERNAL] Re: [PATCH V4 net] net: mana: Fix MANA VF unload
- when host is unresponsive
-From: Paolo Abeni <pabeni@redhat.com>
-To: Souradeep Chakrabarti <schakrabarti@microsoft.com>, Alexander Lobakin
-	 <aleksander.lobakin@intel.com>, souradeep chakrabarti
-	 <schakrabarti@linux.microsoft.com>
-Cc: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang
- <haiyangz@microsoft.com>,  "wei.liu@kernel.org" <wei.liu@kernel.org>,
- Dexuan Cui <decui@microsoft.com>, "davem@davemloft.net"
- <davem@davemloft.net>, "edumazet@google.com" <edumazet@google.com>, 
- "kuba@kernel.org" <kuba@kernel.org>, Long Li <longli@microsoft.com>, Ajay
- Sharma <sharmaajay@microsoft.com>, "leon@kernel.org" <leon@kernel.org>, 
- "cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
- "ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
- "vkuznets@redhat.com" <vkuznets@redhat.com>,  "tglx@linutronix.de"
- <tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
- <linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
- <netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
- <linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
- <linux-rdma@vger.kernel.org>, "stable@vger.kernel.org"
- <stable@vger.kernel.org>
-Date: Tue, 04 Jul 2023 08:59:03 +0200
-In-Reply-To: <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
-References: 
-	<1688374171-10534-1-git-send-email-schakrabarti@linux.microsoft.com>
-	 <83ef6401-8736-8416-c898-2fbbb786726e@intel.com>
-	 <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0FC341368
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 06:59:41 +0000 (UTC)
+Received: from mta-64-227.siemens.flowmailer.net (mta-64-227.siemens.flowmailer.net [185.136.64.227])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5D9191AA
+	for <netdev@vger.kernel.org>; Mon,  3 Jul 2023 23:59:39 -0700 (PDT)
+Received: by mta-64-227.siemens.flowmailer.net with ESMTPSA id 2023070406593724b4010a73c48047de
+        for <netdev@vger.kernel.org>;
+        Tue, 04 Jul 2023 08:59:37 +0200
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; s=fm1;
+ d=siemens.com; i=michael.haener@siemens.com;
+ h=Date:From:Subject:To:Message-ID:MIME-Version:Content-Type:Content-Transfer-Encoding:Cc:References:In-Reply-To;
+ bh=iA6tJcmV+v1jxOI6RL3M6acqkRHFuwMTT/57dXnyXeQ=;
+ b=pPUzVpsDtsWkWJZMtKgSSBGbu89D5k4EtGvoVH4l3+X7ZWcyBO9luGdNlETPrORrA/ZdIN
+ zCB6CfeelvqJj1GZkZmuyQNWqXRD7Ez0U7WfiOzPtF0m2AGb7OM4tHxi83+HmiwYZQnDXIaw
+ SqkB6Q7kmSOn03AfRH2EFP98IgpJk=;
+From: "M. Haener" <michael.haener@siemens.com>
+To: netdev@vger.kernel.org
+Cc: Michael Haener <michael.haener@siemens.com>,
+	linux-kernel@vger.kernel.org,
+	Andrew Lunn <andrew@lunn.ch>,
+	Florian Fainelli <f.fainelli@gmail.com>,
+	Vladimir Oltean <olteanv@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Russell King <linux@armlinux.org.uk>,
+	Alexander Sverdlin <alexander.sverdlin@siemens.com>
+Subject: [PATCH v2 1/3] net: dsa: mv88e632x: Refactor serdes read
+Date: Tue,  4 Jul 2023 08:59:04 +0200
+Message-ID: <20230704065916.132486-2-michael.haener@siemens.com>
+In-Reply-To: <20230704065916.132486-1-michael.haener@siemens.com>
+References: <20230704065916.132486-1-michael.haener@siemens.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Flowmailer-Platform: Siemens
+Feedback-ID: 519:519-664519:519-21489:flowmailer
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-07-03 at 19:55 +0000, Souradeep Chakrabarti wrote:
-> > -----Original Message-----
-> > From: Alexander Lobakin <aleksander.lobakin@intel.com>
-> > Sent: Monday, July 3, 2023 10:18 PM
-> > To: souradeep chakrabarti <schakrabarti@linux.microsoft.com>
-> > Cc: KY Srinivasan <kys@microsoft.com>; Haiyang Zhang
-> > <haiyangz@microsoft.com>; wei.liu@kernel.org; Dexuan Cui
-> > <decui@microsoft.com>; davem@davemloft.net; edumazet@google.com;
-> > kuba@kernel.org; pabeni@redhat.com; Long Li <longli@microsoft.com>; Aja=
-y
-> > Sharma <sharmaajay@microsoft.com>; leon@kernel.org;
-> > cai.huoqing@linux.dev; ssengar@linux.microsoft.com; vkuznets@redhat.com=
-;
-> > tglx@linutronix.de; linux-hyperv@vger.kernel.org; netdev@vger.kernel.or=
-g;
-> > linux-kernel@vger.kernel.org; linux-rdma@vger.kernel.org;
-> > stable@vger.kernel.org; Souradeep Chakrabarti <schakrabarti@microsoft.c=
-om>
-> > Subject: [EXTERNAL] Re: [PATCH V4 net] net: mana: Fix MANA VF unload wh=
-en
-> > host is unresponsive
-> >=20
-> > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> > Date: Mon,  3 Jul 2023 01:49:31 -0700
-> >=20
-> > > From: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
-> >=20
-> > Please sync your Git name and Git mail account settings, so that your o=
-wn
-> > patches won't have "From:" when sending. From what I see, you need to
-> > correct first letters of name and surname to capital in the Git email s=
-ettings
-> > block.
-> Thank you for pointing, I will fix it.
-> >=20
-> > >=20
-> > > When unloading the MANA driver, mana_dealloc_queues() waits for the
-> > > MANA hardware to complete any inflight packets and set the pending
-> > > send count to zero. But if the hardware has failed,
-> > > mana_dealloc_queues() could wait forever.
-> > >=20
-> > > Fix this by adding a timeout to the wait. Set the timeout to 120
-> > > seconds, which is a somewhat arbitrary value that is more than long
-> > > enough for functional hardware to complete any sends.
-> > >=20
-> > > Signed-off-by: Souradeep Chakrabarti
-> > > <schakrabarti@linux.microsoft.com>
-> >=20
-> > Where's "Fixes:" tagging the blamed commit?
-> This is present from the day zero of the mana driver code.
-> It has not been introduced in the code by any commit.
->=20
+From: Michael Haener <michael.haener@siemens.com>
 
-Then the fixes tag should be:
+To avoid code duplication, the serdes read functions
+have been combined.
 
-Fixes: ca9c54d2d6a5 ("net: mana: Add a driver for Microsoft Azure Network A=
-dapter (MANA)")
+Signed-off-by: Michael Haener <michael.haener@siemens.com>
+---
+ drivers/net/dsa/mv88e6xxx/chip.c   | 13 +++++++++++++
+ drivers/net/dsa/mv88e6xxx/chip.h   |  3 +++
+ drivers/net/dsa/mv88e6xxx/serdes.c | 31 +++++++++++++++++-------------
+ drivers/net/dsa/mv88e6xxx/serdes.h | 13 +++++++++++++
+ 4 files changed, 47 insertions(+), 13 deletions(-)
 
-Cheers,
-
-Paolo
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.c b/drivers/net/dsa/mv88e6xxx/chip.c
+index 8dd82fd87fc6..d2a320c6bed7 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.c
++++ b/drivers/net/dsa/mv88e6xxx/chip.c
+@@ -4191,6 +4191,7 @@ static const struct mv88e6xxx_ops mv88e6141_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.phylink_get_caps = mv88e6341_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
+ };
+@@ -4373,6 +4374,7 @@ static const struct mv88e6xxx_ops mv88e6172_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.serdes_read = mv88e6352_serdes_read,
+ 	.serdes_get_regs_len = mv88e6352_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6352_serdes_get_regs,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+@@ -4473,6 +4475,7 @@ static const struct mv88e6xxx_ops mv88e6176_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.serdes_read = mv88e6352_serdes_read,
+ 	.serdes_irq_mapping = mv88e6352_serdes_irq_mapping,
+ 	.serdes_get_regs_len = mv88e6352_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6352_serdes_get_regs,
+@@ -4573,6 +4576,7 @@ static const struct mv88e6xxx_ops mv88e6190_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.phylink_get_caps = mv88e6390_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
+@@ -4631,6 +4635,7 @@ static const struct mv88e6xxx_ops mv88e6190x_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.phylink_get_caps = mv88e6390x_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
+@@ -4687,6 +4692,7 @@ static const struct mv88e6xxx_ops mv88e6191_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.avb_ops = &mv88e6390_avb_ops,
+ 	.ptp_ops = &mv88e6352_ptp_ops,
+ 	.phylink_get_caps = mv88e6390_phylink_get_caps,
+@@ -4740,6 +4746,7 @@ static const struct mv88e6xxx_ops mv88e6240_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.serdes_read = mv88e6352_serdes_read,
+ 	.serdes_irq_mapping = mv88e6352_serdes_irq_mapping,
+ 	.serdes_get_regs_len = mv88e6352_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6352_serdes_get_regs,
+@@ -4846,6 +4853,7 @@ static const struct mv88e6xxx_ops mv88e6290_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6390_avb_ops,
+ 	.ptp_ops = &mv88e6390_ptp_ops,
+@@ -5005,6 +5013,7 @@ static const struct mv88e6xxx_ops mv88e6341_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.phylink_get_caps = mv88e6341_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
+ };
+@@ -5150,6 +5159,7 @@ static const struct mv88e6xxx_ops mv88e6352_ops = {
+ 	.vtu_loadpurge = mv88e6352_g1_vtu_loadpurge,
+ 	.stu_getnext = mv88e6352_g1_stu_getnext,
+ 	.stu_loadpurge = mv88e6352_g1_stu_loadpurge,
++	.serdes_read = mv88e6352_serdes_read,
+ 	.serdes_irq_mapping = mv88e6352_serdes_irq_mapping,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6352_avb_ops,
+@@ -5222,6 +5232,7 @@ static const struct mv88e6xxx_ops mv88e6390_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.phylink_get_caps = mv88e6390_phylink_get_caps,
+ 	.pcs_ops = &mv88e6390_pcs_ops,
+ };
+@@ -5281,6 +5292,7 @@ static const struct mv88e6xxx_ops mv88e6390x_ops = {
+ 	.serdes_get_stats = mv88e6390_serdes_get_stats,
+ 	.serdes_get_regs_len = mv88e6390_serdes_get_regs_len,
+ 	.serdes_get_regs = mv88e6390_serdes_get_regs,
++	.serdes_read = mv88e6390_serdes_read,
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6390_avb_ops,
+ 	.ptp_ops = &mv88e6390_ptp_ops,
+@@ -5341,6 +5353,7 @@ static const struct mv88e6xxx_ops mv88e6393x_ops = {
+ 	.stu_loadpurge = mv88e6390_g1_stu_loadpurge,
+ 	.serdes_get_lane = mv88e6393x_serdes_get_lane,
+ 	.serdes_irq_mapping = mv88e6390_serdes_irq_mapping,
++	.serdes_read = mv88e6390_serdes_read,
+ 	/* TODO: serdes stats */
+ 	.gpio_ops = &mv88e6352_gpio_ops,
+ 	.avb_ops = &mv88e6390_avb_ops,
+diff --git a/drivers/net/dsa/mv88e6xxx/chip.h b/drivers/net/dsa/mv88e6xxx/chip.h
+index 44383a03ef2f..bbf1e7f6f343 100644
+--- a/drivers/net/dsa/mv88e6xxx/chip.h
++++ b/drivers/net/dsa/mv88e6xxx/chip.h
+@@ -593,6 +593,9 @@ struct mv88e6xxx_ops {
+ 	/* SERDES lane mapping */
+ 	int (*serdes_get_lane)(struct mv88e6xxx_chip *chip, int port);
+ 
++	int (*serdes_read)(struct mv88e6xxx_chip *chip, int lane, int device,
++			   int reg, u16 *val);
++
+ 	/* SERDES interrupt handling */
+ 	unsigned int (*serdes_irq_mapping)(struct mv88e6xxx_chip *chip,
+ 					   int port);
+diff --git a/drivers/net/dsa/mv88e6xxx/serdes.c b/drivers/net/dsa/mv88e6xxx/serdes.c
+index 3b4b42651fa3..5696b94c9155 100644
+--- a/drivers/net/dsa/mv88e6xxx/serdes.c
++++ b/drivers/net/dsa/mv88e6xxx/serdes.c
+@@ -17,8 +17,8 @@
+ #include "port.h"
+ #include "serdes.h"
+ 
+-static int mv88e6352_serdes_read(struct mv88e6xxx_chip *chip, int reg,
+-				 u16 *val)
++int mv88e6352_serdes_read(struct mv88e6xxx_chip *chip, int lane,
++			  int device, int reg, u16 *val)
+ {
+ 	return mv88e6xxx_phy_page_read(chip, MV88E6352_ADDR_SERDES,
+ 				       MV88E6352_SERDES_PAGE_FIBER,
+@@ -33,8 +33,8 @@ static int mv88e6352_serdes_write(struct mv88e6xxx_chip *chip, int reg,
+ 					reg, val);
+ }
+ 
+-static int mv88e6390_serdes_read(struct mv88e6xxx_chip *chip,
+-				 int lane, int device, int reg, u16 *val)
++int mv88e6390_serdes_read(struct mv88e6xxx_chip *chip,
++			  int lane, int device, int reg, u16 *val)
+ {
+ 	return mv88e6xxx_phy_read_c45(chip, lane, device, reg, val);
+ }
+@@ -109,7 +109,6 @@ int mv88e6xxx_pcs_decode_state(struct device *dev, u16 bmsr, u16 lpa,
+ 
+ 	return 0;
+ }
+-
+ struct mv88e6352_serdes_hw_stat {
+ 	char string[ETH_GSTRING_LEN];
+ 	int sizeof_stat;
+@@ -150,14 +149,16 @@ int mv88e6352_serdes_get_strings(struct mv88e6xxx_chip *chip,
+ 	return ARRAY_SIZE(mv88e6352_serdes_hw_stats);
+ }
+ 
+-static uint64_t mv88e6352_serdes_get_stat(struct mv88e6xxx_chip *chip,
++static uint64_t mv88e6352_serdes_get_stat(struct mv88e6xxx_chip *chip, int port,
+ 					  struct mv88e6352_serdes_hw_stat *stat)
+ {
+ 	u64 val = 0;
+ 	u16 reg;
+ 	int err;
++	int lane;
+ 
+-	err = mv88e6352_serdes_read(chip, stat->reg, &reg);
++	lane = mv88e6xxx_serdes_get_lane(chip, port);
++	err = mv88e6xxx_serdes_read(chip, lane, 0, stat->reg, &reg);
+ 	if (err) {
+ 		dev_err(chip->dev, "failed to read statistic\n");
+ 		return 0;
+@@ -166,7 +167,7 @@ static uint64_t mv88e6352_serdes_get_stat(struct mv88e6xxx_chip *chip,
+ 	val = reg;
+ 
+ 	if (stat->sizeof_stat == 32) {
+-		err = mv88e6352_serdes_read(chip, stat->reg + 1, &reg);
++		err = mv88e6xxx_serdes_read(chip, lane, 0, stat->reg + 1, &reg);
+ 		if (err) {
+ 			dev_err(chip->dev, "failed to read statistic\n");
+ 			return 0;
+@@ -194,7 +195,7 @@ int mv88e6352_serdes_get_stats(struct mv88e6xxx_chip *chip, int port,
+ 
+ 	for (i = 0; i < ARRAY_SIZE(mv88e6352_serdes_hw_stats); i++) {
+ 		stat = &mv88e6352_serdes_hw_stats[i];
+-		value = mv88e6352_serdes_get_stat(chip, stat);
++		value = mv88e6352_serdes_get_stat(chip, port, stat);
+ 		mv88e6xxx_port->serdes_stats[i] += value;
+ 		data[i] = mv88e6xxx_port->serdes_stats[i];
+ 	}
+@@ -226,13 +227,15 @@ void mv88e6352_serdes_get_regs(struct mv88e6xxx_chip *chip, int port, void *_p)
+ 	u16 reg;
+ 	int err;
+ 	int i;
++	int lane;
+ 
+ 	err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
+ 	if (err <= 0)
+ 		return;
+ 
++	lane = mv88e6xxx_serdes_get_lane(chip, port);
+ 	for (i = 0 ; i < 32; i++) {
+-		err = mv88e6352_serdes_read(chip, i, &reg);
++		err = mv88e6xxx_serdes_read(chip, lane, 0, i, &reg);
+ 		if (!err)
+ 			p[i] = reg;
+ 	}
+@@ -418,7 +421,7 @@ static uint64_t mv88e6390_serdes_get_stat(struct mv88e6xxx_chip *chip, int lane,
+ 	int err, i;
+ 
+ 	for (i = 0; i < 3; i++) {
+-		err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
++		err = mv88e6xxx_serdes_read(chip, lane, MDIO_MMD_PHYXS,
+ 					    stat->reg + i, &reg[i]);
+ 		if (err) {
+ 			dev_err(chip->dev, "failed to read statistic\n");
+@@ -502,7 +505,7 @@ void mv88e6390_serdes_get_regs(struct mv88e6xxx_chip *chip, int port, void *_p)
+ 		return;
+ 
+ 	for (i = 0 ; i < ARRAY_SIZE(mv88e6390_serdes_regs); i++) {
+-		err = mv88e6390_serdes_read(chip, lane, MDIO_MMD_PHYXS,
++		err = mv88e6xxx_serdes_read(chip, lane, MDIO_MMD_PHYXS,
+ 					    mv88e6390_serdes_regs[i], &reg);
+ 		if (!err)
+ 			p[i] = reg;
+@@ -521,6 +524,7 @@ int mv88e6352_serdes_set_tx_amplitude(struct mv88e6xxx_chip *chip, int port,
+ 	u16 ctrl, reg;
+ 	int err;
+ 	int i;
++	int lane;
+ 
+ 	err = mv88e6352_g2_scratch_port_has_serdes(chip, port);
+ 	if (err <= 0)
+@@ -537,7 +541,8 @@ int mv88e6352_serdes_set_tx_amplitude(struct mv88e6xxx_chip *chip, int port,
+ 	if (!found)
+ 		return -EINVAL;
+ 
+-	err = mv88e6352_serdes_read(chip, MV88E6352_SERDES_SPEC_CTRL2, &ctrl);
++	lane = mv88e6xxx_serdes_get_lane(chip, port);
++	err = mv88e6xxx_serdes_read(chip, lane, 0, MV88E6352_SERDES_SPEC_CTRL2, &ctrl);
+ 	if (err)
+ 		return err;
+ 
+diff --git a/drivers/net/dsa/mv88e6xxx/serdes.h b/drivers/net/dsa/mv88e6xxx/serdes.h
+index aac95cab46e3..9b3a5ece33e7 100644
+--- a/drivers/net/dsa/mv88e6xxx/serdes.h
++++ b/drivers/net/dsa/mv88e6xxx/serdes.h
+@@ -120,6 +120,10 @@ int mv88e6341_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6390_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6390x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
+ int mv88e6393x_serdes_get_lane(struct mv88e6xxx_chip *chip, int port);
++int mv88e6352_serdes_read(struct mv88e6xxx_chip *chip, int lane, int device,
++			  int reg, u16 *val);
++int mv88e6390_serdes_read(struct mv88e6xxx_chip *chip, int lane, int device,
++			  int reg, u16 *val);
+ unsigned int mv88e6352_serdes_irq_mapping(struct mv88e6xxx_chip *chip,
+ 					  int port);
+ unsigned int mv88e6390_serdes_irq_mapping(struct mv88e6xxx_chip *chip,
+@@ -153,6 +157,15 @@ static inline int mv88e6xxx_serdes_get_lane(struct mv88e6xxx_chip *chip,
+ 	return chip->info->ops->serdes_get_lane(chip, port);
+ }
+ 
++static inline int mv88e6xxx_serdes_read(struct mv88e6xxx_chip *chip, int lane,
++					int device, int reg, u16 *val)
++{
++	if (!chip->info->ops->serdes_read)
++		return -EOPNOTSUPP;
++
++	return chip->info->ops->serdes_read(chip, lane, device, reg, val);
++}
++
+ static inline unsigned int
+ mv88e6xxx_serdes_irq_mapping(struct mv88e6xxx_chip *chip, int port)
+ {
+-- 
+2.41.0
 
 
