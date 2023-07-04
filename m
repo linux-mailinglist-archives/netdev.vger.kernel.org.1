@@ -1,99 +1,148 @@
-Return-Path: <netdev+bounces-15406-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15407-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6DB6B747614
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 18:06:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BB136747625
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 18:12:04 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F3724280F7B
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:06:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A47A1C209A7
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:12:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 44B256ADE;
-	Tue,  4 Jul 2023 16:06:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416366D38;
+	Tue,  4 Jul 2023 16:11:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 35F9B63C1
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 16:05:58 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F21E9E7A
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 09:05:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=LuqWZGzCLPJWJ8JQY8Xtvctus15e9aHuHNNHon4DIsY=; b=PiMHqfbZd8X6VjzxeBMrcjmoDT
-	cu8XkbasMtkzVPCPyedrliObYtEgw2/XlnxotzMdv5pLV+3ajfQQzhJ+YKFOaOBVq2DiPK36rJJJx
-	oCMRyq7kycheaNNpW8z7v7F57PBjzjZRLYBjgoV8v+pFXhYge0PPPmLB3Uu4OMEBMsm8=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qGiXH-000ZY4-CN; Tue, 04 Jul 2023 18:05:51 +0200
-Date: Tue, 4 Jul 2023 18:05:51 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: netdev@vger.kernel.org
-Subject: Re: Fw: [Bug 217629] New: [regression] Wake-on-LAN broken in new
- kernel for E2400 Ethernet Controller with Qualcomm Atheros
-Message-ID: <8790dfc9-745b-4366-94e4-2618118f9dd9@lunn.ch>
-References: <20230703151314.1b2a21a6@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E4B6AB0;
+	Tue,  4 Jul 2023 16:11:58 +0000 (UTC)
+Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CD8DA;
+	Tue,  4 Jul 2023 09:11:55 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+  d=tu-berlin.de; l=3292; s=dkim-tub; t=1688487116;
+  h=message-id:subject:from:to:cc:date:in-reply-to:
+   references:content-transfer-encoding:mime-version;
+  bh=9pD4Ch4S5j+ANwqD1CPw58d4xO0OpJUusf60fgZFUbo=;
+  b=hfWY4UV33/eHHwR+FaYBf3Z/czA2f7hz/aaixxy6d1lKPsyUXAvm1jRu
+   OUCQhP8/injsL0R5m8qSZUYYV2hQ2Ex8/h/b9y+b83qi80YkOkyo1Q3bL
+   TvAqMnSmPf6dQpz/LjyrbIs029Wd1FE0PbPhQTkcxj2b93fieH7iJEU6d
+   k=;
+X-IronPort-AV: E=Sophos;i="6.01,181,1684792800"; 
+   d="scan'208";a="1396566"
+Received: from mail.tu-berlin.de ([141.23.12.141])
+  by mailrelay.tu-berlin.de with ESMTP; 04 Jul 2023 18:11:53 +0200
+Message-ID: <bdffeca8e222b0126100dec5dcd9d9b186ea6905.camel@mailbox.tu-berlin.de>
+Subject: Re: [PATCH 0/2] bpf, net: Allow setting SO_TIMESTAMPING* from BPF
+From: =?ISO-8859-1?Q?J=F6rn-Thorben?= Hinz <jthinz@mailbox.tu-berlin.de>
+To: John Fastabend <john.fastabend@gmail.com>, <bpf@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<linux-kselftest@vger.kernel.org>
+CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
+	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, "Martin KaFai
+ Lau" <martin.lau@linux.dev>, "David S. Miller" <davem@davemloft.net>, "Eric
+ Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
+ Abeni" <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Willem de Bruijn
+	<willemb@google.com>, Deepa Dinamani <deepa.kernel@gmail.com>
+Date: Tue, 4 Jul 2023 18:11:51 +0200
+In-Reply-To: <64a33ce7b50d2_6520520875@john.notmuch>
+References: <20230703175048.151683-1-jthinz@mailbox.tu-berlin.de>
+	 <64a33ce7b50d2_6520520875@john.notmuch>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4-2 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230703151314.1b2a21a6@hermes.local>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, Jul 03, 2023 at 03:13:14PM -0700, Stephen Hemminger wrote:
-> 
-> 
-> Begin forwarded message:
-> 
-> Date: Mon, 03 Jul 2023 15:40:58 +0000
-> From: bugzilla-daemon@kernel.org
-> To: stephen@networkplumber.org
-> Subject: [Bug 217629] New: [regression] Wake-on-LAN broken in new kernel for E2400 Ethernet Controller with Qualcomm Atheros
-> 
-> 
-> https://bugzilla.kernel.org/show_bug.cgi?id=217629
-> 
->             Bug ID: 217629
->            Summary: [regression] Wake-on-LAN broken in new kernel for
->                     E2400 Ethernet Controller with Qualcomm Atheros
->            Product: Networking
->            Version: 2.5
->           Hardware: All
->                 OS: Linux
->             Status: NEW
->           Severity: normal
->           Priority: P3
->          Component: Other
->           Assignee: stephen@networkplumber.org
->           Reporter: myrbourfake@gmail.com
->         Regression: No
-> 
-> I recently upgraded my pc to linux mint 21.1 (ubuntu 22.04) with kernel
-> 5.15.0.75 and I realized that wake on lan functionality is not working any
-> more. Up to Linux Mint 20.3 it was always working perfectly!
-> I have a Killer E2400 Gigabit Ethernet Controller with Qualcomm Atheros
-> AR816x/AR817x chipset.
+Thank you for the feedback.
 
-This might be a vendor kernel issue.
-drivers/net/ethernet/atheros/alx/ethtool.c ethtool_ops does not have a
-set_wol. There is no indication it has been removed. So i guess the
-vendor kernel might have additional patches adding WoL support.
+Just noticed I missed the =E2=80=9Cbpf-next=E2=80=9D designation in the sub=
+ject. Will
+add that in v2.
 
-       Andrew
+On Mon, 2023-07-03 at 14:25 -0700, John Fastabend wrote:
+> J=C3=B6rn-Thorben Hinz wrote:
+> > BPF applications, e.g., a TCP congestion control, might benefit
+> > from
+> > precise packet timestamps. These timestamps are already available
+> > in
+> > __sk_buff and bpf_sock_ops, but could not be requested: A BPF
+> > program
+> > was not allowed to set SO_TIMESTAMPING* on a socket. This change
+> > enables
+> > BPF programs to actively request the generation of timestamps from
+> > a
+> > stream socket.
+> >=20
+> > To reuse the setget_sockopt BPF prog test for
+> > bpf_{get,set}sockopt(SO_TIMESTAMPING_NEW), also implement the
+> > missing
+> > getsockopt(SO_TIMESTAMPING_NEW) in the network stack.
+> >=20
+> > I reckon the way I added getsockopt(SO_TIMESTAMPING_NEW) causes an
+> > API
+> > change: For existing users that set SO_TIMESTAMPING_NEW but queried
+> > SO_TIMESTAMPING_OLD afterwards, it would now look as if no
+> > timestamping
+> > flags have been set. Is this an acceptable change? If not, I=E2=80=99m
+> > happy to
+> > change getsockopt() to only be strict about the newly-implemented
+> > getsockopt(SO_TIMESTAMPING_NEW), or not distinguish between
+> > SO_TIMESTAMPING_NEW and SO_TIMESTAMPING_OLD at all.
+>=20
+> Yeah, I think it would be best if we keep the old behavior and let
+> SO_TIMESTAMPING_OLD return timestamps for both new/old. It looks
+> like it should be relatively easy to implement?
+Alright, I guessed that would be preferred.
+
+Yes, if there is no objection to making the added
+getsockopt(SO_TIMESTAMPING_NEW) this tiny bit more =E2=80=9Cstrict=E2=80=9D=
+, it=E2=80=99s just
+a matter of modifying the if inserted in sk_getsockopt(). (And, well,
+in the other case I would even remove this if.)
+
+>=20
+> Otherwise the series lgtm.
+Great, thanks.
+
+>=20
+> >=20
+> > J=C3=B6rn-Thorben Hinz (2):
+> > =C2=A0 net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)
+> > =C2=A0 bpf: Allow setting SO_TIMESTAMPING* with bpf_setsockopt()
+> >=20
+> > =C2=A0include/uapi/linux/bpf.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 3 ++-
+> > =C2=A0net/core/filter.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0 | 2 ++
+> > =C2=A0net/core/sock.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 9 +++++++--
+> > =C2=A0tools/include/uapi/linux/bpf.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
+=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
+=C2=A0=C2=A0=C2=A0 | 3 ++-
+> > =C2=A0tools/testing/selftests/bpf/progs/bpf_tracing_net.h | 2 ++
+> > =C2=A0tools/testing/selftests/bpf/progs/setget_sockopt.c=C2=A0 | 4 ++++
+> > =C2=A06 files changed, 19 insertions(+), 4 deletions(-)
+> >=20
+> > --=20
+> > 2.39.2
+> >=20
+
 
