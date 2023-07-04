@@ -1,148 +1,110 @@
-Return-Path: <netdev+bounces-15407-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15408-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BB136747625
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 18:12:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id ABB8D7476F0
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 18:41:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9A47A1C209A7
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:12:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 051071C20A8B
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:41:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 416366D38;
-	Tue,  4 Jul 2023 16:11:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9EFF5613F;
+	Tue,  4 Jul 2023 16:40:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 26E4B6AB0;
-	Tue,  4 Jul 2023 16:11:58 +0000 (UTC)
-Received: from mailrelay.tu-berlin.de (mailrelay.tu-berlin.de [130.149.7.70])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2CD8DA;
-	Tue,  4 Jul 2023 09:11:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=tu-berlin.de; l=3292; s=dkim-tub; t=1688487116;
-  h=message-id:subject:from:to:cc:date:in-reply-to:
-   references:content-transfer-encoding:mime-version;
-  bh=9pD4Ch4S5j+ANwqD1CPw58d4xO0OpJUusf60fgZFUbo=;
-  b=hfWY4UV33/eHHwR+FaYBf3Z/czA2f7hz/aaixxy6d1lKPsyUXAvm1jRu
-   OUCQhP8/injsL0R5m8qSZUYYV2hQ2Ex8/h/b9y+b83qi80YkOkyo1Q3bL
-   TvAqMnSmPf6dQpz/LjyrbIs029Wd1FE0PbPhQTkcxj2b93fieH7iJEU6d
-   k=;
-X-IronPort-AV: E=Sophos;i="6.01,181,1684792800"; 
-   d="scan'208";a="1396566"
-Received: from mail.tu-berlin.de ([141.23.12.141])
-  by mailrelay.tu-berlin.de with ESMTP; 04 Jul 2023 18:11:53 +0200
-Message-ID: <bdffeca8e222b0126100dec5dcd9d9b186ea6905.camel@mailbox.tu-berlin.de>
-Subject: Re: [PATCH 0/2] bpf, net: Allow setting SO_TIMESTAMPING* from BPF
-From: =?ISO-8859-1?Q?J=F6rn-Thorben?= Hinz <jthinz@mailbox.tu-berlin.de>
-To: John Fastabend <john.fastabend@gmail.com>, <bpf@vger.kernel.org>,
-	<linux-kernel@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<linux-kselftest@vger.kernel.org>
-CC: Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann
-	<daniel@iogearbox.net>, Andrii Nakryiko <andrii@kernel.org>, "Martin KaFai
- Lau" <martin.lau@linux.dev>, "David S. Miller" <davem@davemloft.net>, "Eric
- Dumazet" <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>, Shuah Khan <shuah@kernel.org>, Willem de Bruijn
-	<willemb@google.com>, Deepa Dinamani <deepa.kernel@gmail.com>
-Date: Tue, 4 Jul 2023 18:11:51 +0200
-In-Reply-To: <64a33ce7b50d2_6520520875@john.notmuch>
-References: <20230703175048.151683-1-jthinz@mailbox.tu-berlin.de>
-	 <64a33ce7b50d2_6520520875@john.notmuch>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4-2 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DA2A2CA4
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 16:40:58 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C1D110C8
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 09:40:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688488855;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:
+	 content-transfer-encoding:content-transfer-encoding;
+	bh=hsGJKlN84iS87uycG5CF0XVpQDM2M+LhZ2wWSTw/Kvs=;
+	b=JE9Rkq7cGJ3BLnIOEkNJyRf3TDFqjoySAWm9WjqIA5CTkYzP3Ini6QHLnFlgrgvz5CHOdL
+	Z93qlnBeO81OXsA/P+k05oVDvLVnx42y0eAk4/JT8MYqpFdGQ0sJwCYouXBfY1jKUFbViM
+	UI9lHmwgG0Q+Rj5Nprz1KYt24S1s8Dk=
+Received: from mimecast-mx02.redhat.com (mx3-rdu2.redhat.com
+ [66.187.233.73]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-159-fDHB3uUIPGW5sea3w8il6A-1; Tue, 04 Jul 2023 12:40:51 -0400
+X-MC-Unique: fDHB3uUIPGW5sea3w8il6A-1
+Received: from smtp.corp.redhat.com (int-mx09.intmail.prod.int.rdu2.redhat.com [10.11.54.9])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 88AA329AA39A;
+	Tue,  4 Jul 2023 16:40:51 +0000 (UTC)
+Received: from max-t490s.redhat.com (unknown [10.39.208.32])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 6D830492B02;
+	Tue,  4 Jul 2023 16:40:49 +0000 (UTC)
+From: Maxime Coquelin <maxime.coquelin@redhat.com>
+To: xieyongji@bytedance.com,
+	jasowang@redhat.com,
+	mst@redhat.com,
+	david.marchand@redhat.com,
+	lulu@redhat.com
+Cc: linux-kernel@vger.kernel.org,
+	virtualization@lists.linux-foundation.org,
+	netdev@vger.kernel.org,
+	xuanzhuo@linux.alibaba.com,
+	eperezma@redhat.com,
+	Maxime Coquelin <maxime.coquelin@redhat.com>
+Subject: [PATCH v2 0/3] vduse: add support for networking devices
+Date: Tue,  4 Jul 2023 18:40:42 +0200
+Message-ID: <20230704164045.39119-1-maxime.coquelin@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.9
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thank you for the feedback.
+This small series enables virtio-net device type in VDUSE.
+With it, basic operation have been tested, both with
+virtio-vdpa and vhost-vdpa using DPDK Vhost library series
+adding VDUSE support using split rings layout (merged in
+DPDK v23.07-rc1).
 
-Just noticed I missed the =E2=80=9Cbpf-next=E2=80=9D designation in the sub=
-ject. Will
-add that in v2.
+Control queue support (and so multiqueue) has also been
+tested, but requires a Kernel series from Jason Wang
+relaxing control queue polling [1] to function reliably,
+so while Jason rework is done, a patch is added to disable
+CVQ and features that depend on it (tested also with DPDK
+v23.07-rc1).
 
-On Mon, 2023-07-03 at 14:25 -0700, John Fastabend wrote:
-> J=C3=B6rn-Thorben Hinz wrote:
-> > BPF applications, e.g., a TCP congestion control, might benefit
-> > from
-> > precise packet timestamps. These timestamps are already available
-> > in
-> > __sk_buff and bpf_sock_ops, but could not be requested: A BPF
-> > program
-> > was not allowed to set SO_TIMESTAMPING* on a socket. This change
-> > enables
-> > BPF programs to actively request the generation of timestamps from
-> > a
-> > stream socket.
-> >=20
-> > To reuse the setget_sockopt BPF prog test for
-> > bpf_{get,set}sockopt(SO_TIMESTAMPING_NEW), also implement the
-> > missing
-> > getsockopt(SO_TIMESTAMPING_NEW) in the network stack.
-> >=20
-> > I reckon the way I added getsockopt(SO_TIMESTAMPING_NEW) causes an
-> > API
-> > change: For existing users that set SO_TIMESTAMPING_NEW but queried
-> > SO_TIMESTAMPING_OLD afterwards, it would now look as if no
-> > timestamping
-> > flags have been set. Is this an acceptable change? If not, I=E2=80=99m
-> > happy to
-> > change getsockopt() to only be strict about the newly-implemented
-> > getsockopt(SO_TIMESTAMPING_NEW), or not distinguish between
-> > SO_TIMESTAMPING_NEW and SO_TIMESTAMPING_OLD at all.
->=20
-> Yeah, I think it would be best if we keep the old behavior and let
-> SO_TIMESTAMPING_OLD return timestamps for both new/old. It looks
-> like it should be relatively easy to implement?
-Alright, I guessed that would be preferred.
+[1]: https://lore.kernel.org/lkml/CACGkMEtgrxN3PPwsDo4oOsnsSLJfEmBEZ0WvjGRr3whU+QasUg@mail.gmail.com/T/
 
-Yes, if there is no objection to making the added
-getsockopt(SO_TIMESTAMPING_NEW) this tiny bit more =E2=80=9Cstrict=E2=80=9D=
-, it=E2=80=99s just
-a matter of modifying the if inserted in sk_getsockopt(). (And, well,
-in the other case I would even remove this if.)
+v1 -> v2 changes:
+=================
+- Add a patch to disable CVQ (Michael)
 
->=20
-> Otherwise the series lgtm.
-Great, thanks.
+RFC -> v1 changes:
+==================
+- Fail device init if it does not support VERSION_1 (Jason)
 
->=20
-> >=20
-> > J=C3=B6rn-Thorben Hinz (2):
-> > =C2=A0 net: Implement missing getsockopt(SO_TIMESTAMPING_NEW)
-> > =C2=A0 bpf: Allow setting SO_TIMESTAMPING* with bpf_setsockopt()
-> >=20
-> > =C2=A0include/uapi/linux/bpf.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0 | 3 ++-
-> > =C2=A0net/core/filter.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0 | 2 ++
-> > =C2=A0net/core/sock.c=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 | 9 +++++++--
-> > =C2=A0tools/include/uapi/linux/bpf.h=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=
-=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=C2=A0=
-=C2=A0=C2=A0=C2=A0 | 3 ++-
-> > =C2=A0tools/testing/selftests/bpf/progs/bpf_tracing_net.h | 2 ++
-> > =C2=A0tools/testing/selftests/bpf/progs/setget_sockopt.c=C2=A0 | 4 ++++
-> > =C2=A06 files changed, 19 insertions(+), 4 deletions(-)
-> >=20
-> > --=20
-> > 2.39.2
-> >=20
+Maxime Coquelin (3):
+  vduse: validate block features only with block devices
+  vduse: enable Virtio-net device type
+  vduse: Temporarily disable control queue features
+
+ drivers/vdpa/vdpa_user/vduse_dev.c | 36 ++++++++++++++++++++++++++----
+ 1 file changed, 32 insertions(+), 4 deletions(-)
+
+-- 
+2.41.0
 
 
