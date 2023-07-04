@@ -1,170 +1,275 @@
-Return-Path: <netdev+bounces-15380-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15381-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AECAC7473D4
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:15:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E5EA57473E8
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:18:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76B4F280C19
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:15:21 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2928C280D6E
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:18:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA22C613E;
-	Tue,  4 Jul 2023 14:15:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1D05163A5;
+	Tue,  4 Jul 2023 14:18:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975AC613A
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:15:19 +0000 (UTC)
-Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2123.outbound.protection.outlook.com [40.107.117.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9CB10D3;
-	Tue,  4 Jul 2023 07:15:14 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=JMqUNyvnf48g3wEizlhr8x02x87sVrQnHGei59fFigPA9V9ptFcbNy5vGoyg6TXlq7vMXAZJr69N9ZRJYldyrc0MYKS0FowEvhGoLIS1Qwhr6fbDzOS1L6pKXZ7bHeNmpzhAvGkb6RP7Zhdent5hF4Wc8+BSBkTa/nRmKPNUD2tyAg7r9ckWtsjf8nK8gh9inbGhT4uf5YIazh8CXctSpOAVGkE1UpvJ9rOyNu81Bga2Jy+eN1b+NzMDdrUc63fVo2P7u9PNj37GtzF9y7LQb6yR4orFXEQzBWgRpqKZGQkANzaTOag2JPNQDH0jwupVmhuEFDF7tm7U69/fI2mjSg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7h1tp1AY3NqGS04yt6SldZtzLsJxnEukrlGFBGYdCww=;
- b=BTZtc22Lc35eOALW/7GwyXXUJU1lCA0hJyrvhx804GCzMThjDmg/DCIBXSXNSHvie5OXwm+pmXNuyvo8AzsmV2+qXIpz2NeQEHCQKBcpdUSUnXTNXLEDddRNcppKXD1LAEYl54GbuMi/iDXQ7JgMKoPVxaenFAf3vsQwpgpP6JkQ6EA8F0E8VLRt1ZN7/dS0XfBg8caFVJ8ir/+jAt1mUKXNEcHorksca4LI6WtnbciDhQV0PI5sQaUYDHaXqWaH2eeCvQqb6pf9OIaCO+EycRiFJ5rOmmnbn5TPoq2dNR8I2Pou9BcBVac0c6uzKAdjXHV7Y3djc3VQ8jIA6riBbQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=7h1tp1AY3NqGS04yt6SldZtzLsJxnEukrlGFBGYdCww=;
- b=IdfffuhWq8Nu/PKhb0R9eqwuoRwtrcOaxSnPpxMeUlIeplbzeiim8d7nDehBgpjqiUego6A9OMQxpson4SwWjIUPIeP0OeYPqiw8X/VGQWHPELOZGxPkULKqTtF1TCAn7KwXjqtMil0wiT4/IFdMdUwrbR2K4MSHKARXHGxOUwk/T7xRumRNtN4edr+04M25AcPYrLAp9j9/pjDtkpg993uZFm00SJeTaK/fBwwpKMaDxJE9FFnBhiegbWXFszgahaFVjUZWop04ogxz16e7S4/QguRy2A9o+wtqdw4my8u3FI4EeWN4Bd98WSaxEYkp+Y+QdIwkAhV+kKOt/8yRyg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
- TYSPR06MB6527.apcprd06.prod.outlook.com (2603:1096:400:474::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
- 2023 14:15:11 +0000
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::7dfd:a3ed:33ca:9cc8]) by SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::7dfd:a3ed:33ca:9cc8%6]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 14:15:11 +0000
-From: Wang Ming <machel@vivo.com>
-To: Sunil Goutham <sgoutham@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	linux-arm-kernel@lists.infradead.org,
-	netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: opensource.kernel@vivo.com,
-	Wang Ming <machel@vivo.com>
-Subject: [PATCH v1] net:thunder_bgx:Fix resource leaks in device_for_each_child_node() loops
-Date: Tue,  4 Jul 2023 22:14:47 +0800
-Message-Id: <20230704141457.4844-1-machel@vivo.com>
-X-Mailer: git-send-email 2.25.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SG2PR06CA0205.apcprd06.prod.outlook.com
- (2603:1096:4:68::13) To SG2PR06MB3743.apcprd06.prod.outlook.com
- (2603:1096:4:d0::18)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0F95063A1
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:18:12 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 236B01B6
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 07:18:11 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688480290;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=Q4W0Ogxpa8sJrFSBMqpX3IACkQSfwLXhF0ZJKwAmgao=;
+	b=Tbwx9GwAfl/FuWd2vo5/EBP5atq/GccaZ/R3mcjF2qMF+2om+HGXjR4dVr9OKLvxZnfUph
+	lONa2J9CNfYMr75Ln3ciLIEkRk/3r+SWcLMLHIEGkVmoJ751AsThvRV6fExiFZX9/Ntjn5
+	JTZRokmRkzFfg9oWdDZdriPALaM1BTg=
+Received: from mail-wr1-f72.google.com (mail-wr1-f72.google.com
+ [209.85.221.72]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-267-hvVKCYVHNkK2qUTFIi8TBA-1; Tue, 04 Jul 2023 10:18:08 -0400
+X-MC-Unique: hvVKCYVHNkK2qUTFIi8TBA-1
+Received: by mail-wr1-f72.google.com with SMTP id ffacd0b85a97d-2f2981b8364so3261892f8f.1
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 07:18:08 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688480287; x=1691072287;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Q4W0Ogxpa8sJrFSBMqpX3IACkQSfwLXhF0ZJKwAmgao=;
+        b=ErBtfHxJvjeHlwOuPxve/9zox/h07ExdJ0giLW3v4ydzmtpt77cBS94JM0rsTS3cOE
+         9S9g2ztH/ZpcRIHc8m6WA42KRKs6n2GXqxK+9yLD7WM3rGn2Y/yVl9fFIusaV1ob3Lnc
+         Cp0vmfu9CU2m9lNQ3ElAPbjJlL6dL1S1EiqEE8um0iAmA8QeDwF7oXlo6KVBKusEcnqG
+         MdXWiRX93v9iF3mfodVg9tFw2Wfdrbnxm9Pf2Aq9NCHik8/hnSytX+8d5ccGBgEAM/MQ
+         CO87gs4rrQYMUgesnx88zWw3533PlvgDa1vLNGAn9bSpA6lyfZibZ/UL7AYNs6ljxC/J
+         T12A==
+X-Gm-Message-State: ABy/qLapEgg3bzuWduT93Qa9nljoyWCD5I3sFYbYY0qu3ror8O8ATMva
+	47yX+9mH5hy89W002sTQa48T8tx3cckkZ9iyH3Fi5MNsWo5C+Q7mfwdd6tnhVnNi6xrz+CArhKn
+	mNThwwTgkoBhsZpuF
+X-Received: by 2002:a05:6000:a:b0:30f:c1c3:8173 with SMTP id h10-20020a056000000a00b0030fc1c38173mr10890230wrx.26.1688480287600;
+        Tue, 04 Jul 2023 07:18:07 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHpeSoz/H9agHQn4Iqt+dYO6GmEXxow7iabaTyxRXg7CjU9CY9DFkQO5OFPhu8Z0GhngELNMA==
+X-Received: by 2002:a05:6000:a:b0:30f:c1c3:8173 with SMTP id h10-20020a056000000a00b0030fc1c38173mr10890204wrx.26.1688480287289;
+        Tue, 04 Jul 2023 07:18:07 -0700 (PDT)
+Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id f3-20020adff443000000b00314367cf43asm6145953wrp.106.2023.07.04.07.18.05
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Tue, 04 Jul 2023 07:18:06 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <e0050610-ee6f-7c3c-a303-7cddc73cff7c@redhat.com>
+Date: Tue, 4 Jul 2023 16:18:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|TYSPR06MB6527:EE_
-X-MS-Office365-Filtering-Correlation-Id: 4c2d2e9b-5d2b-4d1c-0555-08db7c9913cf
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	G4lIL+GGZykyvdoRJQCQJDwXpIpVd4vK0Q/INmKDSRcR9ZJ4UbhS4x8llyiXv4EOVvE+iTHFRR2FZU+SIwzoWz9IOH1Se8Iik+2w/SwnasTEx0ntoj6lPY36MptT3dNaOCB4Xts7fGOFNJyQDA01TLZDtaG3zF/xBCNvXi0riXT4JfuAsEMRAKAEan0lXdnog8oOqWiX9gRHe05Q/FCJbTxdrE8IdRL6/T6dIX8Dse1Xgln0YvfjOOsEZg0UH6xv7bkvg4fqBv/a9ND9Hc03LuKDQWj+IPGoMB7MJAUch2F008QGNq+9btNM9GyxDJ+vQyFr/7WxXilV7MxhURL0sdy2SBHoi77Elgc7xO+LPxDi/LjEc1q+gqXtCoUqgCrnw/DUCxoO/HHx0ZXO11Pe0SON7N096X3O+IAKJ19mxPryu0CSeeh11WKeQ5sP3wyCyK27jvy8bHAI9B5yyA4ReN2Q2deijBBGLGSylrBoasYXZrun2SA/VedEHwmvNMq1qC7Oz2FI9ZI+Ivdpeqxpi7uUV+IvnwhvmwGDgH003yvlAkY64v9QfAHFdVKYhrNOcsHNG/QDBWlWFMIgoCbpOerKOamJGgkl54sq4M98S8/zB49z/TYW2N5GMBq5we8v
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(39860400002)(396003)(366004)(451199021)(107886003)(26005)(478600001)(1076003)(6666004)(6512007)(6506007)(86362001)(2616005)(186003)(38350700002)(38100700002)(66476007)(66556008)(4326008)(66946007)(110136005)(83380400001)(52116002)(6486002)(316002)(8676002)(8936002)(41300700001)(2906002)(5660300002)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?YCjC9m7BE31g3tIBUFwBMAlJ0RZ3YrSMkHjwQd1DHo401e3cEekYjhzJOdZO?=
- =?us-ascii?Q?vAS8QRoib+MM82ZSNYakGgSkzc4WUJBxrumcvQ1aB0mqTC2Q5UxepT69nz7/?=
- =?us-ascii?Q?Do+u9IUFbEChj98xFqsBfWDp9YXW/DSMjjjFuyGp2q269ausI8Z/95VKc1Ko?=
- =?us-ascii?Q?umAdbwaH8vPthSya6BmCKU0BUYuQOkK3isCXfNGv1nKjzF2SmEPv1B6dCM8O?=
- =?us-ascii?Q?N+LPLt3HDPDPuj25s50xbVpYWw0v8T1DtZvky5+pkJHwh1/yM09apetvCw4l?=
- =?us-ascii?Q?mF25VYQQGOV2dpDrdpNi414zH6Wt0fPHw/SwYL/fXs+FXkxq2TxKGuwESfSV?=
- =?us-ascii?Q?PQuox3ow+7FZyqKMmSRp1+84jk6kGR16PJPts/RA8EBmhVOm9FXN+sNbi932?=
- =?us-ascii?Q?xA8wSPh0EbItdSqlbxg9QqBFUkvXHnqwPO3z9K+5hOJt+vlUuRXcBjOjpxKz?=
- =?us-ascii?Q?Kecnop3ijVqjlkoo7rMI9HUGB5P3n0HX0g6+mpLbOFoUtvb0kRBUGujXMn2Y?=
- =?us-ascii?Q?5shWTWFwGW06qAONATQJBG7kYiS/3j4nxmEXZkcvyEgn7QHuGYZgJJo75uTi?=
- =?us-ascii?Q?PmjrgJgKygi+XMVtU7QFReX9BSR4AOMy/PGDR/ATzjUSvMkO4ka2pAYi0RM4?=
- =?us-ascii?Q?zjY2W/Km+57myMZ4YDt7v1H0OHh6NO0N9qAYbUTAOHpjP6QaO0+J/5ke6R+3?=
- =?us-ascii?Q?ctuZCHu4xZkZp7vrPiZNNf2oGcvHv2QcxfFA80rwuEPEewOh39FV096eIoq0?=
- =?us-ascii?Q?mH30l0Pk9K1PJypn7fo0zhN2J6o3KFCbdvjXdRQ7kKPWHT+xWNw/XMFVYWcc?=
- =?us-ascii?Q?U10kHgbBPi7GaJ/7K7N67BlMD8y3/2FmC28bUney7OTMxXdsdtKNQg6/B8nR?=
- =?us-ascii?Q?s+tpaIm7uvEcEqrlX3YLmWoL8X3bs/uJWrCfecE6sbeXjcrkSmrPDuPW+M5A?=
- =?us-ascii?Q?DCqSO9/fbnNRgDJXfLYITT51u8zjCpKsojgDP9pGFtyTzK7mwvADbFohMm9G?=
- =?us-ascii?Q?kalnc5aO23wV5q+rgMi5FHTuV5ztRXKhf+LWVgDHWjsWf0P8zelwoxPtvlMi?=
- =?us-ascii?Q?LtRmNTutvTZCKJ7DyiIGY78+p8CtTYvj1gCebaGV0BigK4kLj6eJ2CyquiwR?=
- =?us-ascii?Q?sZjfiR8w/aaRAPMmDEbBHrfSjda3KdqKyN7Z3hu7326if8dujPefdEG0mAKp?=
- =?us-ascii?Q?lEaADNv8onY/NauxAAyk7J/vvv8lSUPPKbV4Emb54W9vfttVwRer/KqnYo+d?=
- =?us-ascii?Q?bF9/WyI/n/Bqjh7Czs3A/AawxnhEoCcomWi6SUqti7jveTCGRFdU9aNxSOHr?=
- =?us-ascii?Q?l93dbjyKHFyihBnoaGyVrNkMwmM9nrOk4h2Li9IhAwLXVKosDTziv19wrPAx?=
- =?us-ascii?Q?n4wVOR4WufQWKlXn1H3HUHzqg7f6u0S6P7JHYYV6vWhKszbplEarC1UahlwW?=
- =?us-ascii?Q?AXCCpUyk3DPU1VRmFFsGZmohgA+QDT3CWrDvTwpv8woVYq0Efw0JQzINWuhh?=
- =?us-ascii?Q?tAT/G0v1Q/XiFn2yZrGMwzXHh2IxT4u9RPzL3VuFWQTvkC485vYBo4+NSPbK?=
- =?us-ascii?Q?0RO82RR6MM9Xtgz47wIfnehEt0Dtxr1FhxnccakZ?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 4c2d2e9b-5d2b-4d1c-0555-08db7c9913cf
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 14:15:10.8801
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: YnqzQmSPnlNU0+dDJWrpdiRmP/z7mtfB8yg5w2jAu9z5YhK/LXHHtqNfVQ3cT3bbzdLLjCDK9ddhGYPDHc90Pg==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6527
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: brouer@redhat.com, John Fastabend <john.fastabend@gmail.com>,
+ bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
+ andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
+ kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
+ David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
+ Willem de Bruijn <willemb@google.com>,
+ Anatoly Burakov <anatoly.burakov@intel.com>,
+ Alexander Lobakin <alexandr.lobakin@intel.com>,
+ Magnus Karlsson <magnus.karlsson@gmail.com>,
+ Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
+ netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
+Subject: Re: [PATCH bpf-next v2 09/20] xdp: Add VLAN tag hint
+Content-Language: en-US
+To: Larysa Zaremba <larysa.zaremba@intel.com>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>
+References: <20230703181226.19380-1-larysa.zaremba@intel.com>
+ <20230703181226.19380-10-larysa.zaremba@intel.com>
+ <64a32c661648e_628d32085f@john.notmuch> <ZKPW6azl0Ak27wSO@lincoln>
+ <f7aa7eb6-4600-cebf-bd09-d05fc627fd0d@redhat.com> <ZKP8KRy04IqyHXuI@lincoln>
+In-Reply-To: <ZKP8KRy04IqyHXuI@lincoln>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The device_for_each_child_node() loop in
-bgx_init_of_phy() function should have
-fwnode_handle_put() before break which could
-avoid resource leaks. 
-This patch could fix this bug.
 
-Signed-off-by: Wang Ming <machel@vivo.com>
----
- drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-index a317feb8d..dad32d36a 100644
---- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-+++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
-@@ -1478,8 +1478,10 @@ static int bgx_init_of_phy(struct bgx *bgx)
- 		 * cannot handle it, so exit the loop.
- 		 */
- 		node = to_of_node(fwn);
--		if (!node)
-+		if (!node) {
-+			fwnode_handle_put(fwn);
- 			break;
-+		}
- 
- 		of_get_mac_address(node, bgx->lmac[lmac].mac);
- 
-@@ -1503,6 +1505,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
- 		lmac++;
- 		if (lmac == bgx->max_lmac) {
- 			of_node_put(node);
-+			fwnode_handle_put(fwn);
- 			break;
- 		}
- 	}
--- 
-2.25.1
+On 04/07/2023 13.02, Larysa Zaremba wrote:
+> On Tue, Jul 04, 2023 at 12:23:45PM +0200, Jesper Dangaard Brouer wrote:
+>>
+>> On 04/07/2023 10.23, Larysa Zaremba wrote:
+>>> On Mon, Jul 03, 2023 at 01:15:34PM -0700, John Fastabend wrote:
+>>>> Larysa Zaremba wrote:
+>>>>> Implement functionality that enables drivers to expose VLAN tag
+>>>>> to XDP code.
+>>>>>
+>>>>> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+>>>>> ---
+>>>>>    Documentation/networking/xdp-rx-metadata.rst |  8 +++++++-
+>>>>>    include/linux/netdevice.h                    |  2 ++
+>>>>>    include/net/xdp.h                            |  2 ++
+>>>>>    kernel/bpf/offload.c                         |  2 ++
+>>>>>    net/core/xdp.c                               | 20 ++++++++++++++++++++
+>>>>>    5 files changed, 33 insertions(+), 1 deletion(-)
+>>>>>
+>>>>> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+>>>>> index 25ce72af81c2..ea6dd79a21d3 100644
+>>>>> --- a/Documentation/networking/xdp-rx-metadata.rst
+>>>>> +++ b/Documentation/networking/xdp-rx-metadata.rst
+>>>>> @@ -18,7 +18,13 @@ Currently, the following kfuncs are supported. In the future, as more
+>>>>>    metadata is supported, this set will grow:
+>>>>>    .. kernel-doc:: net/core/xdp.c
+>>>>> -   :identifiers: bpf_xdp_metadata_rx_timestamp bpf_xdp_metadata_rx_hash
+>>>>> +   :identifiers: bpf_xdp_metadata_rx_timestamp
+>>>>> +
+>>>>> +.. kernel-doc:: net/core/xdp.c
+>>>>> +   :identifiers: bpf_xdp_metadata_rx_hash
+>>>>> +
+>>>>> +.. kernel-doc:: net/core/xdp.c
+>>>>> +   :identifiers: bpf_xdp_metadata_rx_vlan_tag
+>>>>>    An XDP program can use these kfuncs to read the metadata into stack
+>>>>>    variables for its own consumption. Or, to pass the metadata on to other
+>> [...]
+>>>>> diff --git a/net/core/xdp.c b/net/core/xdp.c
+>>>>> index 41e5ca8643ec..f6262c90e45f 100644
+>>>>> --- a/net/core/xdp.c
+>>>>> +++ b/net/core/xdp.c
+>>>>> @@ -738,6 +738,26 @@ __bpf_kfunc int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, u32 *hash,
+>>>>>    	return -EOPNOTSUPP;
+>>>>>    }
+>>>>> +/**
+>>>>> + * bpf_xdp_metadata_rx_vlan_tag - Get XDP packet outermost VLAN tag with protocol
+>>>>> + * @ctx: XDP context pointer.
+>>>>> + * @vlan_tag: Destination pointer for VLAN tag
+>>>>> + * @vlan_proto: Destination pointer for VLAN protocol identifier in network byte order.
+>>>>> + *
+>>>>> + * In case of success, vlan_tag contains VLAN tag, including 12 least significant bytes
+>>>>> + * containing VLAN ID, vlan_proto contains protocol identifier.
+>>>>
+>>>> Above is a bit confusing to me at least.
+>>>>
+>>>> The vlan tag would be both the 16bit TPID and 16bit TCI. What fields
+>>>> are to be included here? The VlanID or the full 16bit TCI meaning the
+>>>> PCP+DEI+VID?
+>>>
+>>> It contains PCP+DEI+VID, in patch 16 ("selftests/bpf: Add flags and new hints to
+>>> xdp_hw_metadata") this is more clear, because the tag is parsed.
+>>>
+>>
+>> Do we really care about the "EtherType" proto (in VLAN speak TPID = Tag
+>> Protocol IDentifier)?
+>> I mean, it can basically only have two values[1], and we just wanted to
+>> know if it is a VLAN (that hardware offloaded/removed for us):
+> 
+> If we assume everyone follows the standard, this would be correct.
+> But apparently, some applications use some ambiguous value as a TPID [0].
+> 
+> So it is not hard to imagine, some NICs could alllow you to configure your
+> custom TPID. I am not sure if any in-tree drivers actually do this, but I think
+> it's nice to provide some flexibility on XDP level, especially considering
+> network stack stores full vlan_proto.
+>
+
+I'm buying your argument, and agree it makes sense to provide TPID in
+the call signature.  Given weird hardware exists that allow people to
+configure custom TPID.
+
+Looking through kernel defines (in uapi/linux/if_ether.h) I see evidence
+that funky QinQ EtherTypes have been used in the past:
+
+  #define ETH_P_QINQ1	0x9100		/* deprecated QinQ VLAN [ NOT AN 
+OFFICIALLY REGISTERED ID ] */
+  #define ETH_P_QINQ2	0x9200		/* deprecated QinQ VLAN [ NOT AN 
+OFFICIALLY REGISTERED ID ] */
+  #define ETH_P_QINQ3	0x9300		/* deprecated QinQ VLAN [ NOT AN 
+OFFICIALLY REGISTERED ID ] */
+
+
+> [0]
+> https://techhub.hpe.com/eginfolib/networking/docs/switches/7500/5200-1938a_l2-lan_cg/content/495503472.htm
+> 
+>>
+>>   static __always_inline int proto_is_vlan(__u16 h_proto)
+>>   {
+>> 	return !!(h_proto == bpf_htons(ETH_P_8021Q) ||
+>> 		  h_proto == bpf_htons(ETH_P_8021AD));
+>>   }
+>>
+>> [1] https://github.com/xdp-project/bpf-examples/blob/master/include/xdp/parsing_helpers.h#L75-L79
+>>
+>> Cc. Andrew Lunn, as I notice DSA have a fake VLAN define ETH_P_DSA_8021Q
+>> (in file include/uapi/linux/if_ether.h)
+>> Is this actually in use?
+>> Maybe some hardware can "VLAN" offload this?
+>>
+>>
+>>> What about rephrasing it this way:
+>>>
+>>> In case of success, vlan_proto contains VLAN protocol identifier (TPID),
+>>> vlan_tag contains the remaining 16 bits of a 802.1Q tag (PCP+DEI+VID).
+>>>
+>>
+>> Hmm, I think we can improve this further. This text becomes part of the
+>> documentation for end-users (target audience).  Thus, I think it is
+>> worth being more verbose and even mention the existing defines that we
+>> are expecting end-users to take advantage of.
+>>
+>> What about:
+>>
+>> In case of success. The VLAN EtherType is stored in vlan_proto (usually
+>> either ETH_P_8021Q or ETH_P_8021AD) also known as TPID (Tag Protocol
+>> IDentifier). The VLAN tag is stored in vlan_tag, which is a 16-bit field
+>> containing sub-fields (PCP+DEI+VID). The VLAN ID (VID) is 12-bits
+>> commonly extracted using mask VLAN_VID_MASK (0x0fff).  For the meaning
+>> of the sub-fields Priority Code Point (PCP) and Drop Eligible Indicator
+>> (DEI) (formerly CFI) please reference other documentation. Remember
+>> these 16-bit fields are stored in network-byte. Thus, transformation
+>> with byte-order helper functions like bpf_ntohs() are needed.
+>>
+> 
+> AFAIK, vlan_tag is stored in host byte order, this is how it is in skb.
+
+I'm not sure we should follow SKB storage scheme for XDP.
+
+> In ice, we receive VLAN tag in descriptor already in LE.
+> Only protocol is BE (network byte order). So I would replace the last 2
+> sentences with the following:
+> 
+> vlan_tag is stored in host byte order, so no byte order conversion is needed.
+
+Yikes, that was unexpected.  This needs to be heavily documented in docs.
+
+When parsing packets, it is in network-byte-order, else my code is wrong 
+here[1]:
+
+   [1] 
+https://github.com/xdp-project/bpf-examples/blob/master/include/xdp/parsing_helpers.h#L122
+
+I'm accessing the skb->vlan_tci here [2], and I notice I don't do any
+byte-order conversions, so fortunately I didn't make a code mistake.
+
+   [2] 
+https://github.com/xdp-project/bpf-examples/blob/master/traffic-pacing-edt/edt_pacer_vlan.c#L215
+
+> vlan_proto is stored in network byte order, the suggested way to use this value:
+> 
+> vlan_proto == bpf_htons(ETH_P_8021Q)
+> 
+>>
+>>
+
+--Jesper
 
 
