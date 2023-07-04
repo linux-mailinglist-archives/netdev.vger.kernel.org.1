@@ -1,110 +1,170 @@
-Return-Path: <netdev+bounces-15379-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15380-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 72C347473BE
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:11:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id AECAC7473D4
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 16:15:23 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 56EA81C20980
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:11:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76B4F280C19
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 14:15:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0BD4B613B;
-	Tue,  4 Jul 2023 14:11:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AA22C613E;
+	Tue,  4 Jul 2023 14:15:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1D512575
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:11:45 +0000 (UTC)
-Received: from mail-pf1-f176.google.com (mail-pf1-f176.google.com [209.85.210.176])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E555F10C1;
-	Tue,  4 Jul 2023 07:11:39 -0700 (PDT)
-Received: by mail-pf1-f176.google.com with SMTP id d2e1a72fcca58-666e97fcc60so3280333b3a.3;
-        Tue, 04 Jul 2023 07:11:39 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688479899; x=1691071899;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=gVWqdQakMSUsv5oj8nSg9QczQrmrUO38b67MhpmWVYY=;
-        b=ZH/KPRP50O9QKZQfFKaA+IfAWPHaD+Gxo1Eu3fP8ZxyDdYI3LJSQtB5pJ1LNZCP35q
-         IiV8TxAZlRORnVGaqCJdzy5BFSME/+DZq9B+IS9yAxJQ4FU3c0sHLNVg4LaQttqWg5hd
-         bM5LMjlOQJCGjfyUqstEXhs3Dd8wimOob7Q0h3RUn4qjwSxiYa/nobSPuoeZEPS9MS42
-         srKFZ70VAwX7m2pI0PgphsbWrm6lh/UXvykFGzcIugoINW1nJ0OhoX+WdVsTs9eNV23E
-         aJtRS4HrQ1C6JxK+hMqI3oWzf0iKWvVdvHE7pO3iCmyrKE+K3UE6Y5185bgItTX1QEDi
-         4JGA==
-X-Gm-Message-State: AC+VfDyguM2YZAAPdq0N9FgoO29YGFEhGKrGIR6kCa7gx3X6HXmDtixw
-	qsAUMcwhyjDMUOAki/oH7fs=
-X-Google-Smtp-Source: ACHHUZ4mKI72SACTkxfTB3tQ6Ji13XYniCvY2MHAxg/n5JeT4DfHtHYI7qLyK+rPyEqNoEPYk2/cWg==
-X-Received: by 2002:a05:6a20:1456:b0:12c:d9cc:340e with SMTP id a22-20020a056a20145600b0012cd9cc340emr10681222pzi.5.1688479899229;
-        Tue, 04 Jul 2023 07:11:39 -0700 (PDT)
-Received: from [192.168.50.14] ([98.51.102.78])
-        by smtp.gmail.com with ESMTPSA id e26-20020a62aa1a000000b00682a9325ffcsm1178509pff.5.2023.07.04.07.11.37
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 07:11:38 -0700 (PDT)
-Message-ID: <739807cf-4551-4760-83e0-a94026b5c1b8@acm.org>
-Date: Tue, 4 Jul 2023 07:11:37 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 975AC613A
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 14:15:19 +0000 (UTC)
+Received: from APC01-TYZ-obe.outbound.protection.outlook.com (mail-tyzapc01on2123.outbound.protection.outlook.com [40.107.117.123])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DF9CB10D3;
+	Tue,  4 Jul 2023 07:15:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JMqUNyvnf48g3wEizlhr8x02x87sVrQnHGei59fFigPA9V9ptFcbNy5vGoyg6TXlq7vMXAZJr69N9ZRJYldyrc0MYKS0FowEvhGoLIS1Qwhr6fbDzOS1L6pKXZ7bHeNmpzhAvGkb6RP7Zhdent5hF4Wc8+BSBkTa/nRmKPNUD2tyAg7r9ckWtsjf8nK8gh9inbGhT4uf5YIazh8CXctSpOAVGkE1UpvJ9rOyNu81Bga2Jy+eN1b+NzMDdrUc63fVo2P7u9PNj37GtzF9y7LQb6yR4orFXEQzBWgRpqKZGQkANzaTOag2JPNQDH0jwupVmhuEFDF7tm7U69/fI2mjSg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=7h1tp1AY3NqGS04yt6SldZtzLsJxnEukrlGFBGYdCww=;
+ b=BTZtc22Lc35eOALW/7GwyXXUJU1lCA0hJyrvhx804GCzMThjDmg/DCIBXSXNSHvie5OXwm+pmXNuyvo8AzsmV2+qXIpz2NeQEHCQKBcpdUSUnXTNXLEDddRNcppKXD1LAEYl54GbuMi/iDXQ7JgMKoPVxaenFAf3vsQwpgpP6JkQ6EA8F0E8VLRt1ZN7/dS0XfBg8caFVJ8ir/+jAt1mUKXNEcHorksca4LI6WtnbciDhQV0PI5sQaUYDHaXqWaH2eeCvQqb6pf9OIaCO+EycRiFJ5rOmmnbn5TPoq2dNR8I2Pou9BcBVac0c6uzKAdjXHV7Y3djc3VQ8jIA6riBbQ==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=7h1tp1AY3NqGS04yt6SldZtzLsJxnEukrlGFBGYdCww=;
+ b=IdfffuhWq8Nu/PKhb0R9eqwuoRwtrcOaxSnPpxMeUlIeplbzeiim8d7nDehBgpjqiUego6A9OMQxpson4SwWjIUPIeP0OeYPqiw8X/VGQWHPELOZGxPkULKqTtF1TCAn7KwXjqtMil0wiT4/IFdMdUwrbR2K4MSHKARXHGxOUwk/T7xRumRNtN4edr+04M25AcPYrLAp9j9/pjDtkpg993uZFm00SJeTaK/fBwwpKMaDxJE9FFnBhiegbWXFszgahaFVjUZWop04ogxz16e7S4/QguRy2A9o+wtqdw4my8u3FI4EeWN4Bd98WSaxEYkp+Y+QdIwkAhV+kKOt/8yRyg==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ TYSPR06MB6527.apcprd06.prod.outlook.com (2603:1096:400:474::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
+ 2023 14:15:11 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::7dfd:a3ed:33ca:9cc8]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::7dfd:a3ed:33ca:9cc8%6]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 14:15:11 +0000
+From: Wang Ming <machel@vivo.com>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	Wang Ming <machel@vivo.com>
+Subject: [PATCH v1] net:thunder_bgx:Fix resource leaks in device_for_each_child_node() loops
+Date: Tue,  4 Jul 2023 22:14:47 +0800
+Message-Id: <20230704141457.4844-1-machel@vivo.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2PR06CA0205.apcprd06.prod.outlook.com
+ (2603:1096:4:68::13) To SG2PR06MB3743.apcprd06.prod.outlook.com
+ (2603:1096:4:d0::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [linux-next:master] BUILD REGRESSION
- 296d53d8f84ce50ffaee7d575487058c8d437335
-Content-Language: en-US
-To: Marc Zyngier <maz@kernel.org>, kernel test robot <lkp@intel.com>
-Cc: Andrew Morton <akpm@linux-foundation.org>,
- Linux Memory Management List <linux-mm@kvack.org>,
- kunit-dev@googlegroups.com, kvmarm@lists.linux.dev,
- linux-arm-kernel@lists.infradead.org, linux-arm-msm@vger.kernel.org,
- linux-bluetooth@vger.kernel.org, linux-kselftest@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-riscv@lists.infradead.org, linux-usb@vger.kernel.org,
- netdev@vger.kernel.org
-References: <202307032309.v4K1IBoR-lkp@intel.com>
- <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
-From: Bart Van Assche <bvanassche@acm.org>
-In-Reply-To: <7d3d61c694c0e57b096ff7af6277ed6b@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,
-	FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,HEADER_FROM_DIFFERENT_DOMAINS,
-	NICE_REPLY_A,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|TYSPR06MB6527:EE_
+X-MS-Office365-Filtering-Correlation-Id: 4c2d2e9b-5d2b-4d1c-0555-08db7c9913cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	G4lIL+GGZykyvdoRJQCQJDwXpIpVd4vK0Q/INmKDSRcR9ZJ4UbhS4x8llyiXv4EOVvE+iTHFRR2FZU+SIwzoWz9IOH1Se8Iik+2w/SwnasTEx0ntoj6lPY36MptT3dNaOCB4Xts7fGOFNJyQDA01TLZDtaG3zF/xBCNvXi0riXT4JfuAsEMRAKAEan0lXdnog8oOqWiX9gRHe05Q/FCJbTxdrE8IdRL6/T6dIX8Dse1Xgln0YvfjOOsEZg0UH6xv7bkvg4fqBv/a9ND9Hc03LuKDQWj+IPGoMB7MJAUch2F008QGNq+9btNM9GyxDJ+vQyFr/7WxXilV7MxhURL0sdy2SBHoi77Elgc7xO+LPxDi/LjEc1q+gqXtCoUqgCrnw/DUCxoO/HHx0ZXO11Pe0SON7N096X3O+IAKJ19mxPryu0CSeeh11WKeQ5sP3wyCyK27jvy8bHAI9B5yyA4ReN2Q2deijBBGLGSylrBoasYXZrun2SA/VedEHwmvNMq1qC7Oz2FI9ZI+Ivdpeqxpi7uUV+IvnwhvmwGDgH003yvlAkY64v9QfAHFdVKYhrNOcsHNG/QDBWlWFMIgoCbpOerKOamJGgkl54sq4M98S8/zB49z/TYW2N5GMBq5we8v
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(39860400002)(396003)(366004)(451199021)(107886003)(26005)(478600001)(1076003)(6666004)(6512007)(6506007)(86362001)(2616005)(186003)(38350700002)(38100700002)(66476007)(66556008)(4326008)(66946007)(110136005)(83380400001)(52116002)(6486002)(316002)(8676002)(8936002)(41300700001)(2906002)(5660300002)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?YCjC9m7BE31g3tIBUFwBMAlJ0RZ3YrSMkHjwQd1DHo401e3cEekYjhzJOdZO?=
+ =?us-ascii?Q?vAS8QRoib+MM82ZSNYakGgSkzc4WUJBxrumcvQ1aB0mqTC2Q5UxepT69nz7/?=
+ =?us-ascii?Q?Do+u9IUFbEChj98xFqsBfWDp9YXW/DSMjjjFuyGp2q269ausI8Z/95VKc1Ko?=
+ =?us-ascii?Q?umAdbwaH8vPthSya6BmCKU0BUYuQOkK3isCXfNGv1nKjzF2SmEPv1B6dCM8O?=
+ =?us-ascii?Q?N+LPLt3HDPDPuj25s50xbVpYWw0v8T1DtZvky5+pkJHwh1/yM09apetvCw4l?=
+ =?us-ascii?Q?mF25VYQQGOV2dpDrdpNi414zH6Wt0fPHw/SwYL/fXs+FXkxq2TxKGuwESfSV?=
+ =?us-ascii?Q?PQuox3ow+7FZyqKMmSRp1+84jk6kGR16PJPts/RA8EBmhVOm9FXN+sNbi932?=
+ =?us-ascii?Q?xA8wSPh0EbItdSqlbxg9QqBFUkvXHnqwPO3z9K+5hOJt+vlUuRXcBjOjpxKz?=
+ =?us-ascii?Q?Kecnop3ijVqjlkoo7rMI9HUGB5P3n0HX0g6+mpLbOFoUtvb0kRBUGujXMn2Y?=
+ =?us-ascii?Q?5shWTWFwGW06qAONATQJBG7kYiS/3j4nxmEXZkcvyEgn7QHuGYZgJJo75uTi?=
+ =?us-ascii?Q?PmjrgJgKygi+XMVtU7QFReX9BSR4AOMy/PGDR/ATzjUSvMkO4ka2pAYi0RM4?=
+ =?us-ascii?Q?zjY2W/Km+57myMZ4YDt7v1H0OHh6NO0N9qAYbUTAOHpjP6QaO0+J/5ke6R+3?=
+ =?us-ascii?Q?ctuZCHu4xZkZp7vrPiZNNf2oGcvHv2QcxfFA80rwuEPEewOh39FV096eIoq0?=
+ =?us-ascii?Q?mH30l0Pk9K1PJypn7fo0zhN2J6o3KFCbdvjXdRQ7kKPWHT+xWNw/XMFVYWcc?=
+ =?us-ascii?Q?U10kHgbBPi7GaJ/7K7N67BlMD8y3/2FmC28bUney7OTMxXdsdtKNQg6/B8nR?=
+ =?us-ascii?Q?s+tpaIm7uvEcEqrlX3YLmWoL8X3bs/uJWrCfecE6sbeXjcrkSmrPDuPW+M5A?=
+ =?us-ascii?Q?DCqSO9/fbnNRgDJXfLYITT51u8zjCpKsojgDP9pGFtyTzK7mwvADbFohMm9G?=
+ =?us-ascii?Q?kalnc5aO23wV5q+rgMi5FHTuV5ztRXKhf+LWVgDHWjsWf0P8zelwoxPtvlMi?=
+ =?us-ascii?Q?LtRmNTutvTZCKJ7DyiIGY78+p8CtTYvj1gCebaGV0BigK4kLj6eJ2CyquiwR?=
+ =?us-ascii?Q?sZjfiR8w/aaRAPMmDEbBHrfSjda3KdqKyN7Z3hu7326if8dujPefdEG0mAKp?=
+ =?us-ascii?Q?lEaADNv8onY/NauxAAyk7J/vvv8lSUPPKbV4Emb54W9vfttVwRer/KqnYo+d?=
+ =?us-ascii?Q?bF9/WyI/n/Bqjh7Czs3A/AawxnhEoCcomWi6SUqti7jveTCGRFdU9aNxSOHr?=
+ =?us-ascii?Q?l93dbjyKHFyihBnoaGyVrNkMwmM9nrOk4h2Li9IhAwLXVKosDTziv19wrPAx?=
+ =?us-ascii?Q?n4wVOR4WufQWKlXn1H3HUHzqg7f6u0S6P7JHYYV6vWhKszbplEarC1UahlwW?=
+ =?us-ascii?Q?AXCCpUyk3DPU1VRmFFsGZmohgA+QDT3CWrDvTwpv8woVYq0Efw0JQzINWuhh?=
+ =?us-ascii?Q?tAT/G0v1Q/XiFn2yZrGMwzXHh2IxT4u9RPzL3VuFWQTvkC485vYBo4+NSPbK?=
+ =?us-ascii?Q?0RO82RR6MM9Xtgz47wIfnehEt0Dtxr1FhxnccakZ?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 4c2d2e9b-5d2b-4d1c-0555-08db7c9913cf
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 14:15:10.8801
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: YnqzQmSPnlNU0+dDJWrpdiRmP/z7mtfB8yg5w2jAu9z5YhK/LXHHtqNfVQ3cT3bbzdLLjCDK9ddhGYPDHc90Pg==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TYSPR06MB6527
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/4/23 00:15, Marc Zyngier wrote:
-> On 2023-07-03 16:11, kernel test robot wrote:
->> tree/branch:
->> https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git
->> master
->> branch HEAD: 296d53d8f84ce50ffaee7d575487058c8d437335  Add linux-next
->> specific files for 20230703
->>
-> 
-> [...]
-> 
->> Unverified Error/Warning (likely false positive, please contact us if
->> interested):
->>
->> arch/arm64/kvm/mmu.c:147:3-9: preceding lock on line 140
-> 
-> This *is* a false positive. The function is entered with a lock
-> held, it will exit with the lock held as well. Inside the body
-> of the function, we release and reacquire the lock.
+The device_for_each_child_node() loop in
+bgx_init_of_phy() function should have
+fwnode_handle_put() before break which could
+avoid resource leaks. 
+This patch could fix this bug.
 
-Which tool reported this message? If this message was reported by 
-sparse, has it been considered to add a __must_hold() annotation?
+Signed-off-by: Wang Ming <machel@vivo.com>
+---
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-Thanks,
-
-Bart.
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+index a317feb8d..dad32d36a 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+@@ -1478,8 +1478,10 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		 * cannot handle it, so exit the loop.
+ 		 */
+ 		node = to_of_node(fwn);
+-		if (!node)
++		if (!node) {
++			fwnode_handle_put(fwn);
+ 			break;
++		}
+ 
+ 		of_get_mac_address(node, bgx->lmac[lmac].mac);
+ 
+@@ -1503,6 +1505,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		lmac++;
+ 		if (lmac == bgx->max_lmac) {
+ 			of_node_put(node);
++			fwnode_handle_put(fwn);
+ 			break;
+ 		}
+ 	}
+-- 
+2.25.1
 
 
