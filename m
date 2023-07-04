@@ -1,150 +1,171 @@
-Return-Path: <netdev+bounces-15430-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15431-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1DDDF747917
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:43:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id B83BB74791D
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:45:00 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CCDF7280FAF
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:43:21 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F08CE1C20AB1
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:44:59 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6D77A4F;
-	Tue,  4 Jul 2023 20:43:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E4687472;
+	Tue,  4 Jul 2023 20:44:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B5D69806
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:43:19 +0000 (UTC)
-Received: from NAM11-DM6-obe.outbound.protection.outlook.com (mail-dm6nam11on2092.outbound.protection.outlook.com [40.107.223.92])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 761AE10C8;
-	Tue,  4 Jul 2023 13:43:15 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=oZb/GESilUxFznK3815tX0RHw777kZrp8Xi3lyuqAPU+kVHtVJ5aYdLQmO/Nx1H0dInIvSZZTwcYDrEP+LdHOEOo5Hw5/uMAL8o8ke4ilBV1jhn/qK+X9s3OiWsEfPWmyTTeGqmXi7QX3HWhWhHNVIe2b7la8gu0ipyvcabh3tQXSz3vLoImG7b7I3xEIMVei28xPkD5S1bkddLavjozo8sTIWl+Iw/twwCm7aAtGggZMdeMYwZeVonb/YCS3ucQ37B6djMmNZpwUNTDLIJFrECGfwWGT42pfQ8IV8MvuijvIeHYWAnUgjXzCpREDoTXaAi3AGG7LndCzNuiErZafA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3sVcUZCoogDlUOhI4yvnSU6DYn9WYBa4uiFyYHsgrdI=;
- b=Kdg8s8V+/Gs1UOmXj6hQkESrOtxTuHautRPGaggafRcPo9DDGdCroidL5oys9dMjwZfkxZtRHGjqZ6gdy9qu4FgomfYaFgXDs+IhgmrdmbP9fzsq+HUQFPp9SY8s51ZsCyUcDwmb08OoWLrneYu7pu5VxHufc1owez1t1/xYyz3PpPCS25ZlwxCgITzLahfilgEOhoXRYXjbIy75WFeFWlPfEdGnV5imY8W8/ELk7sRloNorWn10sQKJR6PUADYb5ALG0UwsDaTaXbHS6baBCVcfFRiTi+4RqxLSiiAibapFxuM0y+g4+cygcKPHEeLHqmxDv0TuKr5VLtDJ/79CcQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 130F71103
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:44:56 +0000 (UTC)
+Received: from mail-wr1-x430.google.com (mail-wr1-x430.google.com [IPv6:2a00:1450:4864:20::430])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6586B10E2
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 13:44:54 -0700 (PDT)
+Received: by mail-wr1-x430.google.com with SMTP id ffacd0b85a97d-3142860734aso30467f8f.1
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 13:44:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3sVcUZCoogDlUOhI4yvnSU6DYn9WYBa4uiFyYHsgrdI=;
- b=agNGnCJsnZqLHzSLg/lXmvgC0L5lTbx0hJihqB0cwcY/95jyCISoO+ztKjrUPcbGggTin2OzkSkQweEaWFfMM5VgVHltfU/oQ3USn75LLYRaLez+p/9zm7g1zI0DLl3x626ketomAmhGZBfgiFKpuv+S1AFXypNUva+VIAQcNuI=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by MN2PR13MB3630.namprd13.prod.outlook.com (2603:10b6:208:1e2::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Tue, 4 Jul
- 2023 20:43:12 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
- 20:43:11 +0000
-Date: Tue, 4 Jul 2023 21:43:04 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Alexandra Winter <wintera@linux.ibm.com>
-Cc: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
-	netdev@vger.kernel.org, linux-s390@vger.kernel.org,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Thorsten Winkler <twinkler@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>
-Subject: Re: [PATCH net] s390/qeth: Fix vipa deletion
-Message-ID: <ZKSEWCGDlJszBFW6@corigine.com>
-References: <20230704144121.3737032-1-wintera@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230704144121.3737032-1-wintera@linux.ibm.com>
-X-ClientProxiedBy: LO4P265CA0013.GBRP265.PROD.OUTLOOK.COM
- (2603:10a6:600:2ad::9) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+        d=tessares.net; s=google; t=1688503492; x=1691095492;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=D7p+M80U1GYeG4EQloROMoimHvJJ+Gr6Qt5RflHkHcw=;
+        b=M1UqHfYV5iTFuBkMyx2N06hk9zHxdmUXlwD5gsZVNO7zN+QaCZgniU+y2NXMwymf87
+         99Q7D0/M0PHWAmedSvH8oRKU/jz8jNWTj5Pg1rnPAPBR6+nQ1ZGxxi10hWfFTpcDywMI
+         K6nLj6BBEZnPeDX8nD3cmPmebxU2isy4Z8s1rWwnkP/8LW1I5mAxN7c2e/sR/RgwvOga
+         WZoSO9EfD8vRcZBV7mTEbCT9lzW5F9wS0pNXVC1d/HyOhAJkTCEHcLtBkGTsnHGkYiQf
+         3MvRINDYZENsjTFWTYxMb+V4L1cb/6EvqaTsOsejleS4MmQQcerlb2sQQJEjyZcvfKCs
+         veew==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688503492; x=1691095492;
+        h=cc:to:content-transfer-encoding:mime-version:message-id:date
+         :subject:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=D7p+M80U1GYeG4EQloROMoimHvJJ+Gr6Qt5RflHkHcw=;
+        b=USGmyg78vmqFPNOXtRhbK7+My3DwY/WfuTlpcqxfdRtZQXDWfuStauwHPdQ+7w8EcY
+         liBcaw62MbeqeLZfNghuynPd9II5DegTMW+fOTGUIbsWgoH2n4dcyDSYJHZbAK/Yf+yl
+         BPVaskxoOj/iLK2hqidaImzmH5jB5rmbhbIQ/vTVfGiJ3jVZczEN48Ujwip2T3oJYPKa
+         u9GPvsjIY4o5wp4BmIJ6JQYZJDqVa6byBCB908GVoSmBvjlEh/AtPxoLHXzDlQ5OkleW
+         vB480AmpfhxZBsKFmOHuU1yQQoVeUtGkIgzhqjniQOJ8xtDSWP0xwSHi/hEGnLO9zGkc
+         VnWg==
+X-Gm-Message-State: ABy/qLYoqwgALQHyggJSWKGmOB2s1slYh0RhejdxnAOe/HQoQCa3eU4O
+	+WjGKsbaHvCYKQ9g84zLU4WSosKn3wqQp7azcgU9vg==
+X-Google-Smtp-Source: APBJJlGJDEcokr+GcHU+9Qf/h2qQosHMZUQwXe9EmgGzJ3+LjM6YP7JNYrs43VTmd0jc5qdA5j+VRw==
+X-Received: by 2002:adf:e6c4:0:b0:313:f000:5de6 with SMTP id y4-20020adfe6c4000000b00313f0005de6mr304722wrm.16.1688503492711;
+        Tue, 04 Jul 2023 13:44:52 -0700 (PDT)
+Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
+        by smtp.gmail.com with ESMTPSA id y4-20020a05600c364400b003fa74bff02asm115332wmq.26.2023.07.04.13.44.51
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 13:44:52 -0700 (PDT)
+From: Matthieu Baerts <matthieu.baerts@tessares.net>
+Subject: [PATCH net 0/9] mptcp: fixes for v6.5
+Date: Tue, 04 Jul 2023 22:44:32 +0200
+Message-Id: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-0-d7e67c274ca5@tessares.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|MN2PR13MB3630:EE_
-X-MS-Office365-Filtering-Correlation-Id: 80c7c94b-8d98-4291-784e-08db7ccf4828
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	2+TLZfWBpJ5UcVYlMvwo+6LbBq6wfGxeDqmtrcEB5dJWepCAm5dH1UAgVkBs9uMsYyQAdpCg8X8mw8pmWjv8fI9YHqwYU0b0UPMDBTbhJixpznKyNpX/29KX6sHEpHwBG3iSYe1reng4ATvXq9o33OHINZ/i82Axo+WyEbBs1yx5ZIM8LNSd/gWB8OpmNNOLKzfYgWNfONQ2E48lYgmf/XFZeHpdn3HnzjTuKUKAdzuH0ycxfT3cA6I/ATJFHlv9s12FyLjaCcApkEQ6K9ovCd1PywHaTRegcKiZYLKq1HwnUpHwS8KwT0gmFKcy/tzQLxHW93ZtELzGqceamlK2kDHn8G0xf8t29WFifk/+xcraACjnOgigc9YN5yhkLVdKpVFIzoKM1ijNxzH6enkikD7F+WpItm/AJ96W0BN7BfJvGkKodER6kY5A29NlOx6hnE3rHoQbhuq9IJz3XhV+m4SsdgJPAr0r1IG0wR4GKFizrwEPzJsao7AzMo5eKfJ326kp5qwpDEqNoGEFozyHmsz7f7CH2DLDMPw/Pfw48fLiGrnIpvMdvC5hoU+0cdTKMYhCfGh31x8ih76hik4txYKbMKnpnlP7SQ1jvvYCScs=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(346002)(39840400004)(376002)(396003)(136003)(451199021)(41300700001)(6486002)(4744005)(38100700002)(6666004)(2616005)(26005)(186003)(6506007)(6512007)(86362001)(54906003)(2906002)(478600001)(36756003)(316002)(66946007)(66476007)(6916009)(66556008)(4326008)(8936002)(8676002)(7416002)(44832011)(5660300002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?994j+lfgT3R4ps3N3f4kFpTB2iKlwqabkg0rEhYshA3qegmr3FPpym5JNscR?=
- =?us-ascii?Q?MDOBlCLd5Z+baZBBXlGMkY1W7lXwlXRn6q5wWhXJDY33actgJjIzGnotTAZw?=
- =?us-ascii?Q?HiwH8x/89Zva4RZoY+IXe3BzBMOJTIbUvFo5J5ZOLB460Poi722QllZqz0dz?=
- =?us-ascii?Q?esPaP/y5RXIkr4efOmbq24f2trE6DO1RZFLaNAouVL5NHGuH2EfWjTNI+gXJ?=
- =?us-ascii?Q?jcaCiYOGrZFOXb4nokh60g7M9abCc9UZ9qwUjCcBaNqnCDiXMNSEYvWK9uIB?=
- =?us-ascii?Q?PywODZHNwNsdtouru17McSzJXzm0BWwJPa9i2M1GmExc0YVbSpuf5SDd6F80?=
- =?us-ascii?Q?wCnbfzXsD6i5aDz94Z/UbhWoQInlvA+uLhrVBQl3AZd3pnuoWQ2HRRaryX7y?=
- =?us-ascii?Q?o5i3NLc7nzmuawRyfsstpO6/VjL8BQNjWVtQAPYr06JC43rpEBaF6rfT0Rfc?=
- =?us-ascii?Q?y0IBPKlGDbLfXFyWf10viOrDtgbyHomRqtwD9YnA0DpgmkU4LJI6NlHuJjvF?=
- =?us-ascii?Q?0i1V6wRcwTAH3sNQ1N5Ur/ifWF4oTzK13ARqjQhJbNeIH8Mmlua+TpQrO5fD?=
- =?us-ascii?Q?iqaSo/7WAgLme3aTlExpmqooV3SO0pm+bd0YlDL+RZIk+Q+14gHozthpy06S?=
- =?us-ascii?Q?GBDSJMFh9G3OKjai+4/TEkjSfGhnSvuHs8e2kGhzofVOdksGJBGlPo2Sbfrs?=
- =?us-ascii?Q?938T7IqoA141IFEgOBUPYmxUgGKAq0aVgyNYfjyXWq0ctWiwC8fV4B7NTc1f?=
- =?us-ascii?Q?tgn53HR1nEfGQb73obvtQNtoYiVi9J6rw4wbaHK7NjHoqF8s1DpdKBvTrtGb?=
- =?us-ascii?Q?ps62pxkTgXSK5CFrkfX8R2uknLz87E89e/L7JAtAOm5Fx/NuB6igN7516KKs?=
- =?us-ascii?Q?NVQxkGSRqvAvfwxwerlmi7GPHbIUjW4D7Hci9fEhLw7ZXw+2NteV1dTNQk/b?=
- =?us-ascii?Q?yjqU+2WlFuQ2STJ2fP6je16WsLPkEk8qXc06o7JxiiabOE4dNz6RoQQ5Ypub?=
- =?us-ascii?Q?HMeotlCjNlUKwzWHfOvPIKWwyVg7Z6uSIUuZC2whq5UV9n4KIZdd7oxngpuS?=
- =?us-ascii?Q?9zfpWtILtVo/iwjEAxjFATJDaxL9kbeyP0Y4cOIQ2xf7QjWjJkwkV2+C6PXU?=
- =?us-ascii?Q?Jk36ydWCl7Xd8GVoalUVoWMG7l/1cW5Vvc5Nyqk/C1ByI6dTPW8OlUxL+10R?=
- =?us-ascii?Q?jnY7jr+K6WyPiJcO9L87M2Txbv4D5Nndy49RsyXn88ZYvrnGV9kNC9FAZyA1?=
- =?us-ascii?Q?Auv3OaWDVSK3lh6kwlZZb2zOhIPjZ04vLc+WdGrHoA+PH12ktP/rDfGV2lds?=
- =?us-ascii?Q?Cl1biwWNxjIi65u4JO9D5/kzLHtvMJblOPDvlYBSdi4rrAvuP0MpJERoBkZG?=
- =?us-ascii?Q?lh9/BmNi7HemguCldRfCAjLq48TGVMgcGXDX+QGgInwYn3H7nt/1uwCY2Y2k?=
- =?us-ascii?Q?Fz2jFiqnuK7iw3AeTsVBD87ac1owQwdra8RX7crVNGrWRi2niWiGuqu/StLQ?=
- =?us-ascii?Q?8MlWjg80wLattE8ky4Lzsnzm6QflJ9qsKNVARMkX1zvxqWP4KxHBySsKJQLF?=
- =?us-ascii?Q?zzDaFKS+5EIwIeK/vSCZcWiO8Q88CwD2xO5BalWCj1jZCXmbd5aVjFVXiLop?=
- =?us-ascii?Q?sQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 80c7c94b-8d98-4291-784e-08db7ccf4828
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 20:43:11.5022
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: uhgLEtPxdL9eLi6zMN7WiaIGtgtcgiQqhka/EzFdIQt3NaITZxveo9LDM10/GSsHxc9l5Z7cyB74KtlUXMcb3hiu1+OAeX7ZrhnEyMRk6ik=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: MN2PR13MB3630
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 7bit
+X-B4-Tracking: v=1; b=H4sIALCEpGQC/z2MQQ7CMAwEv1L5zEppaALlK4hDFQz40FDZBSFV/
+ XstDj3OamcWMlZho0uzkPJXTN7VoT00VF5DfTLk7kwxxGM4hQ6fyWblYUTlGfs6ihU85MeGjAQ
+ tLUqKOZxz16fUk+cm5f/Ba1dymW7rugFyB+rLfwAAAA==
+To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+ Shuah Khan <shuah@kernel.org>, Florian Westphal <fw@strlen.de>, 
+ Kishen Maloor <kishen.maloor@intel.com>
+Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+ linux-kselftest@vger.kernel.org, 
+ Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org, 
+ Christoph Paasch <cpaasch@apple.com>
+X-Mailer: b4 0.12.3
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2556;
+ i=matthieu.baerts@tessares.net; h=from:subject:message-id;
+ bh=LrpdosI7KkBh+7o63PMBiX+cMjX7K8ZvW3l5GVO0yrY=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkpITDht9FvKyasZKl31DMWpyv+rEoet2oV7wpE
+ XA80Kqe93yJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZKSEwwAKCRD2t4JPQmmg
+ c+2ZD/459QZCT25gHkqWmvZaw9TtfYOOfjkLuFEIFGf/8muDhYY55mTQBm3kysY70oNik16HBFH
+ nJETfi3nq0oQ3BxJolaRyC2oN8QK/fgHg2VfYLV8chUw+KeL3QWLN7NgCNXgtVB4lp8pTmmixVz
+ WZnMdpUkutR74JIJddykGKzmQL/XEyQ42dmkf9oQNIpQT4ujoGkKnjkQ0ZjXW6gizWTO9FO6xk/
+ HmfVDFiUmDlXwJyaH2084hWbFCbiVCf00XKFgvRmEGs4xiB/RclIdPVf8QaZcI3fg5UcRxdyrql
+ dqpCm8oTAlo+Qo1hb795aA2wWv/gG94DnMllM7mOwPJrdiL/TlsQWnRrc7kfR9Qe1S9A4IATC0P
+ v0VBQPHFKN1Dmjg+9fYMMG3z/8mBLotJh1QB2PdqsoEvF4MKXD6L1jg6COijonfGbWE+2tAlJzJ
+ 2T0hoGZDolGJzrvCTeIGkiW3X+z00+bao3BfcOgCrpw5SauPEt7ZExSYWVFoYEqpWVfNqu5rE0x
+ 8pkX6/2myChEUXOOPePFDdRXwIY8rjd6vO4pO4UJi+rWqwBlG/2PTIUSAXWjqAVM1d8ms0NeTxp
+ NArL+xGx3CicDjD3OVxVkgwVEzUDLlps/Fnea61gtD7Gtre3zzz78v9FMc6GHHlruqaMZnI+K38
+ pCoOntMnR09+xPQ==
+X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
+ fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 04, 2023 at 04:41:21PM +0200, Alexandra Winter wrote:
-> From: Thorsten Winkler <twinkler@linux.ibm.com>
-> 
-> Change boolean parameter of function "qeth_l3_vipa_store" inside the
-> "qeth_l3_dev_vipa_del4_store" function from "true" to "false" because
-> "true" is used for adding a virtual ip address and "false" for deleting.
-> 
-> Fixes: 2390166a6b45 ("s390/qeth: clean up L3 sysfs code")
-> 
+Here is a first batch of fixes for v6.5 and older.
 
-nit: no blank line here.
+The fixes are not linked to each others.
 
-> Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
-> Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
-> Signed-off-by: Thorsten Winkler <twinkler@linux.ibm.com>
-> Signed-off-by: Alexandra Winter <wintera@linux.ibm.com>
+Patch 1 ensures subflows are unhashed before cleaning the backlog to
+avoid races. This fixes another recent fix from v6.4.
 
-Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Patch 2 does not rely on implicit state check in mptcp_listen() to avoid
+races when receiving an MP_FASTCLOSE. A regression from v5.17.
+
+The rest fixes issues in the selftests.
+
+Patch 3 makes sure errors when setting up the environment are no longer
+ignored. For v5.17+.
+
+Patch 4 uses 'iptables-legacy' if available to be able to run on older
+kernels. A fix for v5.13 and newer.
+
+Patch 5 catches errors when issues are detected with packet marks. Also
+for v5.13+.
+
+Patch 6 uses the correct variable instead of an undefined one. Even if
+there was no visible impact, it can help to find regressions later. An
+issue visible in v5.19+.
+
+Patch 7 makes sure errors with some sub-tests are reported to have the
+selftest marked as failed as expected. Also for v5.19+.
+
+Patch 8 adds a kernel config that is required to execute MPTCP
+selftests. It is valid for v5.9+.
+
+Patch 9 fixes issues when validating the userspace path-manager with
+32-bit arch, an issue affecting v5.19+.
+
+Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
+---
+Matthieu Baerts (7):
+      selftests: mptcp: connect: fail if nft supposed to work
+      selftests: mptcp: sockopt: use 'iptables-legacy' if available
+      selftests: mptcp: sockopt: return error if wrong mark
+      selftests: mptcp: userspace_pm: use correct server port
+      selftests: mptcp: userspace_pm: report errors with 'remove' tests
+      selftests: mptcp: depend on SYN_COOKIES
+      selftests: mptcp: pm_nl_ctl: fix 32-bit support
+
+Paolo Abeni (2):
+      mptcp: ensure subflow is unhashed before cleaning the backlog
+      mptcp: do not rely on implicit state check in mptcp_listen()
+
+ net/mptcp/protocol.c                               |  7 +++++-
+ tools/testing/selftests/net/mptcp/config           |  1 +
+ tools/testing/selftests/net/mptcp/mptcp_connect.sh |  3 +++
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh | 29 ++++++++++++----------
+ tools/testing/selftests/net/mptcp/pm_nl_ctl.c      | 10 ++++----
+ tools/testing/selftests/net/mptcp/userspace_pm.sh  |  4 ++-
+ 6 files changed, 34 insertions(+), 20 deletions(-)
+---
+base-commit: 14bb236b29922c4f57d8c05bfdbcb82677f917c9
+change-id: 20230704-upstream-net-20230704-misc-fixes-6-5-rc1-c52608649559
+
+Best regards,
+-- 
+Matthieu Baerts <matthieu.baerts@tessares.net>
 
 
