@@ -1,124 +1,246 @@
-Return-Path: <netdev+bounces-15428-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15429-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7DF897478FB
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:27:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9A08E747906
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:30:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 553D8280F1A
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:27:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BCF761C20AB1
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:30:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B08CC847B;
-	Tue,  4 Jul 2023 20:27:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B0C077472;
+	Tue,  4 Jul 2023 20:30:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D4EE8460
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:27:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2E19AC433C8;
-	Tue,  4 Jul 2023 20:27:10 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688502430;
-	bh=iy5HUoGWTmpxSmUZjQ7hawlWnCOJsYYvnUq8MjJB9z8=;
-	h=In-Reply-To:References:Date:From:To:Cc:Subject:From;
-	b=Ci6kXfZf1O1MqOZcgOdTuORv5v8w6CmGXOKCzTuY88/inW894MEyA7DRy27w/3+4c
-	 bbmiw7pj2zPj3ikbYw1J85MatELjtHtES8+3Zo7U8p1LFu6M3dHJbNMQapbmWSHpZq
-	 qGn5kzZ55V2OhtDR6xrz5Qd9fTQ9FMTQor/I260tSYAmaFW1tvFmkXlZdGkxpS8WC/
-	 ABWzssv0KeFdaBquM7j/4FaDpPpp7slap6ld0n8sxL3KNKnbAk3aFpar5G6CFuOiv0
-	 G2uygMS+ovRqbgpGJdJgUU1+ceYYwJjT/CcSeuKp8UJNOKbQnmeprEXaqd1arfbELg
-	 0CfDZxTzTVYng==
-Received: from compute6.internal (compute6.nyi.internal [10.202.2.47])
-	by mailauth.nyi.internal (Postfix) with ESMTP id 1C55027C0054;
-	Tue,  4 Jul 2023 16:27:09 -0400 (EDT)
-Received: from imap51 ([10.202.2.101])
-  by compute6.internal (MEProxy); Tue, 04 Jul 2023 16:27:09 -0400
-X-ME-Sender: <xms:nICkZPRRjojFpFkJvcv0V_RqD_fzhm556pFt6nh4lSK-KZ778fiBSQ>
-    <xme:nICkZAw5IG_B5ttc8MD18_fLjq3a2dt_hWuyFU8enJDwBu-U313l5L6dLqRWkaVnR
-    48fUfa2VjrzVvc5F7w>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrudeggddugeekucetufdoteggodetrfdotf
-    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
-    uceurghilhhouhhtmecufedttdenucesvcftvggtihhpihgvnhhtshculddquddttddmne
-    cujfgurhepofgfggfkjghffffhvfevufgtgfesthhqredtreerjeenucfhrhhomhepfdet
-    rhhnugcuuegvrhhgmhgrnhhnfdcuoegrrhhnugeskhgvrhhnvghlrdhorhhgqeenucggtf
-    frrghtthgvrhhnpedvtddtffejfeeggefgleefgfeghfehfeefffetgffgleegudevveet
-    hfefjeevkeenucevlhhushhtvghrufhiiigvpedtnecurfgrrhgrmhepmhgrihhlfhhroh
-    hmpegrrhhnugdomhgvshhmthhprghuthhhphgvrhhsohhnrghlihhthidquddvkeehudej
-    tddvgedqvdekjedttddvieegqdgrrhhnugeppehkvghrnhgvlhdrohhrghesrghrnhgusg
-    druggv
-X-ME-Proxy: <xmx:nICkZE1qaTrVneGGwS-peGSGtKXmS6ILMKpioi0pWIyQFMAjOn-nLA>
-    <xmx:nICkZPDcQp7soEz7_-_jthVNxii_9NrAOqfkaMhmVxB5h5YiQaxPrA>
-    <xmx:nICkZIh2e35QQn6HG_6t33ZXHQTRI6GuLrcHw0IL_5gR_d8NABUzhA>
-    <xmx:nYCkZEyr0iv-kgCEOc11Wgc6kQqDjSsuhakPjPse0bizQLO1ahbvnQ>
-Feedback-ID: i36794607:Fastmail
-Received: by mailuser.nyi.internal (Postfix, from userid 501)
-	id 88EECB60086; Tue,  4 Jul 2023 16:27:08 -0400 (EDT)
-X-Mailer: MessagingEngine.com Webmail Interface
-User-Agent: Cyrus-JMAP/3.9.0-alpha0-527-gee7b8d90aa-fm-20230629.001-gee7b8d90
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2AD18BED
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:30:44 +0000 (UTC)
+Received: from NAM10-BN7-obe.outbound.protection.outlook.com (mail-bn7nam10on2125.outbound.protection.outlook.com [40.107.92.125])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8B7BBE7B;
+	Tue,  4 Jul 2023 13:30:41 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GbFDm4uZzbS9MNQnaetFXqamZEebNxl+sUizMPXWnIzdSgkAzLl2miQc57luAkyHk2vtdlXexDjHzwlFq3G/ijHs/L35t6yN/dAjCFQ/KOSELoEFaV/HsooG8xG6K3oJ0Dnypp1nQ1+aVvskHS2+P7I2oxuQLYw3CRmk8C0xm5Fs9j1qSDQdxRdn8Wnxi1qzf0JzZxhdI+CVLlzBG1TYDBhWgdeX68Cb5BOnLWzGIT5/z26W8q6svD7LmLPrKBArkNgjHpcDvg1Fa6gEjjhMBZej+fFoK9VpPIE+6gDpL4KrIpXKVYYzMAtCElKnxlW+hbK30wqMaK/qKwUBUWDaaw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=QOMo8NcpYuFvX7GsdLlFtvQPCIzFRb1hckBkwwu533k=;
+ b=l2/le8a+y9LF738CREmmBbcDPmSh2a7LnlZXcEHC6IleoITXa2ePPJMU1ClR2ut2p4nOKszaJokIdUdN9aIpBA8e09va3tQjYnwZpzbLBm8MKPH0lkR4l2TFc6z+UAPlltj7yv4aHoM3w3nQ+3VVXg8quvKpBlC1DBe0pOH992z1Gk2Gvfcy0/xTt+tku4Z7onoYXNVQFKTsvYXrFXmwQxyHRlWWiVFC+xRrHAdJofRpgOmyQi3btL7ZvnL+4ZLAK8HxsZfebZhzvuUejeANqQTrb7B7bp0wfdiaW6SeI7rUQkEdHjs3QrbFLkCOysOJlrKR12POKaaCGXYRtFypnA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=QOMo8NcpYuFvX7GsdLlFtvQPCIzFRb1hckBkwwu533k=;
+ b=SnA+UF0uFQePP+m8deAcjJUN4N7UgWb52DZv522JZJB3A96Ej9Ty5S3va7aTXqd1mvJRuA5a+KdPC/3yq1aohyKswTZodZxvNM5GrA9lgbFC+QGeFU2d95/zokZTzy5TJZ1NoY5s4u8tmYGstkU4uXuK+2pMvPibf34PG1lOrII=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by CH3PR13MB6508.namprd13.prod.outlook.com (2603:10b6:610:197::21) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Tue, 4 Jul
+ 2023 20:30:37 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6544.024; Tue, 4 Jul 2023
+ 20:30:37 +0000
+Date: Tue, 4 Jul 2023 21:30:29 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Wang Ming <machel@vivo.com>
+Cc: Sunil Goutham <sgoutham@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, opensource.kernel@vivo.com
+Subject: Re: [PATCH v1] net:thunder_bgx:Fix resource leaks in
+ device_for_each_child_node() loops
+Message-ID: <ZKSBZW1a/f2H7H41@corigine.com>
+References: <20230704141457.4844-1-machel@vivo.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230704141457.4844-1-machel@vivo.com>
+X-ClientProxiedBy: LO2P265CA0226.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:b::22) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Message-Id: <753120c5-dcf4-46ff-9319-e8aa035e2488@app.fastmail.com>
-In-Reply-To: 
- <CAF=yD-K7NiEROeHM5GzW2ArtprcYg7WFwPFz7+0LOOT2DCY_+A@mail.gmail.com>
-References: <20230703175048.151683-1-jthinz@mailbox.tu-berlin.de>
- <64a33ce7b50d2_6520520875@john.notmuch>
- <bdffeca8e222b0126100dec5dcd9d9b186ea6905.camel@mailbox.tu-berlin.de>
- <CAF=yD-K7NiEROeHM5GzW2ArtprcYg7WFwPFz7+0LOOT2DCY_+A@mail.gmail.com>
-Date: Tue, 04 Jul 2023 22:26:47 +0200
-From: "Arnd Bergmann" <arnd@kernel.org>
-To: "Willem de Bruijn" <willemdebruijn.kernel@gmail.com>,
- =?UTF-8?Q?J=C3=B6rn-Thorben_Hinz?= <jthinz@mailbox.tu-berlin.de>
-Cc: "John Fastabend" <john.fastabend@gmail.com>, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, Netdev <netdev@vger.kernel.org>,
- linux-kselftest@vger.kernel.org, "Alexei Starovoitov" <ast@kernel.org>,
- "Daniel Borkmann" <daniel@iogearbox.net>,
- "Andrii Nakryiko" <andrii@kernel.org>,
- "Martin KaFai Lau" <martin.lau@linux.dev>,
- "David S . Miller" <davem@davemloft.net>,
- "Eric Dumazet" <edumazet@google.com>, "Jakub Kicinski" <kuba@kernel.org>,
- "Paolo Abeni" <pabeni@redhat.com>, shuah <shuah@kernel.org>,
- "Willem de Bruijn" <willemb@google.com>,
- "Deepa Dinamani" <deepa.kernel@gmail.com>
-Subject: Re: [PATCH 0/2] bpf, net: Allow setting SO_TIMESTAMPING* from BPF
-Content-Type: text/plain;charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+MIME-Version: 1.0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|CH3PR13MB6508:EE_
+X-MS-Office365-Filtering-Correlation-Id: eead7932-903d-4a31-b9a6-08db7ccd8674
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	B06ohbL9PAT5S2fg6UDhB3b+8Ir7CWzAOaVhqqNhnQS4bXtn6aQTdMlhmtTgiHgeNq3Y1Qhj2LWACPOh4mxgQCtCNo9NH9xUpoDQP21Stghzg8O6AWAMi9fsXts9K0Tic9uq/LP6aIcRhAYeooGPQK6N+HY/eFCs/MERqpMdl4Torvoy1koAxi561FNMYLjzfd0DAnW1SlKFctOS9Blq+8rDiTnSd0/oJXnx2jCzKYqDwCsB8ouYBtcHgUZXzawmMs14CV2V9ogaQBxc69qi+8vOOxG/fiZw+jdLUp5iNlraxD7IbNHKd+5eM3ayEO3pwww5q/YfZoon5AKUk0BkNDqzn0yPqVCkn8zz5PNhX3vYuCTytItiPyqTB7Vtj1NSlgMOYTJ+cmNMpi5bZ5JdYF7mJuItjLXlfgltJIMO2Y7UmgUcxmQbc9rieo81JYCfxcHYdZG0CnHTAjFQe5LeHrfx0MZ1HOoFP8VNzIPyUb+u+jKw1J6LtXHJLm0XYrCNjrIsyfYCwusCE7Xxr/BmMzAUKNy/j8Kll8b+8yFSU6yX/rouNrXDOPug3LxAuEz/2PCadJNWddIa+ialvn7Elvp2cY+46dA8MtehYcQlo/8=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(366004)(396003)(136003)(39840400004)(451199021)(6666004)(6512007)(6486002)(966005)(478600001)(54906003)(2906002)(6506007)(26005)(186003)(66476007)(44832011)(6916009)(4326008)(66946007)(7416002)(41300700001)(8936002)(8676002)(5660300002)(66556008)(316002)(38100700002)(86362001)(36756003)(2616005)(83380400001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?XR6LiFRrseWhK273YPEf60iRy3KEEXH6v6bENzjdlKrR2hoSuBZ2YNrI2ER2?=
+ =?us-ascii?Q?ilFRxixToRh6/7Ij89uSSJ4G+3HbK3V7anIcwq2+81CdVEF1ScQSZZ6VRNRN?=
+ =?us-ascii?Q?gaCM6/a7fyoOgpdSdLV1zCHwGoPAtInq4gh7ZMnsyhiGEHVPiqeQ80u3Bsaq?=
+ =?us-ascii?Q?wF3/YC6EQMu5GRsGpinOJVMLLK2G1q4OiggoTLFQUSE3dVPikT7J51DnZduo?=
+ =?us-ascii?Q?o6uuKqYcjX40kGZUE5lHemYxUJrKgDNzhU41AWukXwc312OWy2r0CzJV17hF?=
+ =?us-ascii?Q?QIR0EBi04zQ6SYyOfQuKcLKtGjrf2hWdjI1u0aHxK76n+3slnPm/k/E8vgdD?=
+ =?us-ascii?Q?xrQ/P2xCDw/y3/gjrhzB3IG6BDtvrMvdpQMAp1UWNqs+uvRka8j9Flc8u2Yx?=
+ =?us-ascii?Q?ZmIaVF7Mn/AhAykMzmcQYGgT0/cuPlF1y755Vq6koCzHJJOUWjvWrPx9NQm5?=
+ =?us-ascii?Q?BN+uQgUYvEKPEYvtUHvWjdDNGr1lTKYvVdnp5iQeWKOljXS0mC7bxQHVfzQG?=
+ =?us-ascii?Q?0DGuuGOXZp1qBIdRC/TIlmtH5Xo8oaF2wtfxrcoDsIQzyTBsTR7jVfgxuyOP?=
+ =?us-ascii?Q?3hlcd5oDW0A1W+0Ekdb5eeLgDmr98PVQKRNCa9ihaXhAtpMa8KAf3GmV1xHx?=
+ =?us-ascii?Q?dj+QYm483AIcO+/L5Opi/XEr1u+/VUfGKlpTNBd7BpQ34roFRPuPheLS2tIr?=
+ =?us-ascii?Q?e+/RjC7Ni1GipxBW9O8bx5foW/XI6TcDi9aqrSA2ZAdg1JXd9/9+YkOogxYr?=
+ =?us-ascii?Q?V6GGviMscB4lpI3hnKYJoHrnOnnkVLmSNXy3ZAvoRdXp9M2GkwF2SQ2UTibQ?=
+ =?us-ascii?Q?2RrjDCoaXxQRLrP/SOGCdUpvpYoLPWUZxZ7lEXm8T135C0faMYMhxHn/Z7lC?=
+ =?us-ascii?Q?YFpnPvuBFavZ4YmqFVcAoN7kbXIDoHJ+VCpqid7eU5TW+Y3XcUbzjNakfw+D?=
+ =?us-ascii?Q?bykshJ+VoIWO3wDgVqFDDE+aneKlaluoQL+LK5Lf8Myrmrw9KI+PHtobqVij?=
+ =?us-ascii?Q?GE7n8jNkD6rmtCUDl1BjKUIIDkIDyR+8/KH89pMj+yiMAxKOZxE9ftQO4EOs?=
+ =?us-ascii?Q?0j0ABJiknLriNoN6OftGbX8rQMieRmsKbHSJTR7n9PS55KlmQ5ivEGiTLejf?=
+ =?us-ascii?Q?VDp8Xop5pfJd0FOCGF3t8AxwjpOUWS0ZwMDc7MLEzAT4x3iYQMfm31fRF3bA?=
+ =?us-ascii?Q?niCqYoOW6nsHXNMuKqgqLO8QN0PVaLlkbbqGlcRQcw8rd5I7ykx5Xiv3R5Fp?=
+ =?us-ascii?Q?6jJUAhl6nSP+zF5Z72/qBLlHOCZjDHmTboMHEhkGR0sjHPt7DzL53LGmB1+X?=
+ =?us-ascii?Q?tr7F6oUPzmRP3d2aK3YtpwetGaCJYL41snwujn/7nSmpeLAts6KvWhS5yHga?=
+ =?us-ascii?Q?G4sz9GJgDSHLpOHeiPQTiaYSnG4Rn5aZpzYz32RAaQOolYlyQWCOAeG6ZVxO?=
+ =?us-ascii?Q?rw2eSYS8kdZD7f2mXBUa6kLdbiDsZ/9Uy7vKoPS55js4hn2IZ6dAXXYRfgjn?=
+ =?us-ascii?Q?/Lvq91/X4BSqaCRpW95YSyFTKPvzuzk+JX5/Yi8XNV9H+tHHOMwSWgbrZ4aY?=
+ =?us-ascii?Q?07F873uGuYnmT3QcUIKINXG0+Rc7W721XwHl33u8zTEYGomJjbrCadsVH22L?=
+ =?us-ascii?Q?YQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: eead7932-903d-4a31-b9a6-08db7ccd8674
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 04 Jul 2023 20:30:37.0481
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: qb7EzJo0cR+kP0CQ4V8Tg9lYgNNt8Qh9UKg7uv56jm7x2zOVn6know7eTbP+KWTLGp8hA3orqgZqvgn+Lyga0Xh+KgIbe5SPAZ8xWhfHJvY=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH3PR13MB6508
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 4, 2023, at 21:36, Willem de Bruijn wrote:
->> On Mon, 2023-07-03 at 14:25 -0700, John Fastabend wrote:
->> > J=C3=B6rn-Thorben Hinz wrote:
->> Yes, if there is no objection to making the added
->> getsockopt(SO_TIMESTAMPING_NEW) this tiny bit more =E2=80=9Cstrict=E2=
-=80=9D, it=E2=80=99s just
->> a matter of modifying the if inserted in sk_getsockopt(). (And, well,
->> in the other case I would even remove this if.)
->
-> The difference is in the struct that is returned, on 32-bit platforms.
-> Both calls should always be allowed? See also
-> put_cmsg_scm_timestamping64 vs put_cmsg_scm_timestamping.
->
-> For the second patch: the _OLD/_NEW was introduced to work around
-> limitations on 32-bit platforms. This is intended to be transparent to
-> users, by defining SO_TIMESTAMPING accordingly.
->
-> Can the new BPF code always enforce the 64-bit version, that is, only
-> implement the _NEW variants? And perhaps just call it SO_TIMESTAMPING
-> directly.
+On Tue, Jul 04, 2023 at 10:14:47PM +0800, Wang Ming wrote:
+> The device_for_each_child_node() loop in
+> bgx_init_of_phy() function should have
+> fwnode_handle_put() before break which could
+> avoid resource leaks. 
+> This patch could fix this bug.
 
-I guess that depends on how the returned timestamps are interpreted.
+Hi Wang Ming,
 
-In normal userspace code, the 'struct scm_timestamping' is defined
-in terms of the libc-provided 'struct timespec'. If this is a normal
-glibc based distro binary, then it probably expects the old format.
+If this fixes a bug then it probably warrants a fixes tag.
+And it should also probably be targeted at the next tree:
 
-OTOH, if the code reading the timestamp data is in BPF code itself,
-it's probably safe to mandate that to use the time64 format and
-define the timespec type as __kernel_timespec with 64-bit members.
+	[PATCH net v2] ...
 
-     Arnd
+If so, please allow 24h to elapse before posting v2.
+
+Else it should be targeted at the net-next tree,
+and posted after net-next reopens after July 10th:
+
+	[PATCH net-next v2] ...
+
+Also, looking at git history, I think a more appropriate subject prefix
+would be 'net: thunderx: '
+
+	[PATCH net v2] net: thunderx: ...
+
+Link: https://www.kernel.org/doc/html/next/process/maintainer-netdev.html
+
+> Signed-off-by: Wang Ming <machel@vivo.com>
+> ---
+>  drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+> 
+> diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> index a317feb8d..dad32d36a 100644
+> --- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> +++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+> @@ -1478,8 +1478,10 @@ static int bgx_init_of_phy(struct bgx *bgx)
+>  		 * cannot handle it, so exit the loop.
+>  		 */
+>  		node = to_of_node(fwn);
+> -		if (!node)
+> +		if (!node) {
+> +			fwnode_handle_put(fwn);
+>  			break;
+> +		}
+>  
+>  		of_get_mac_address(node, bgx->lmac[lmac].mac);
+>  
+> @@ -1503,6 +1505,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
+>  		lmac++;
+>  		if (lmac == bgx->max_lmac) {
+>  			of_node_put(node);
+> +			fwnode_handle_put(fwn);
+>  			break;
+>  		}
+>  	}
+
+Should this change also apply to the 'goto defer' case in the same loop?
+If so, perhaps a more idiomatic approach of releasing resources
+in a ladder of goto labels is appropriate. Something like this (untested!):
+
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+index a317feb8decb..3091c96134e4 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+@@ -1469,6 +1469,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 	struct fwnode_handle *fwn;
+ 	struct device_node *node = NULL;
+ 	u8 lmac = 0;
++	int err = 0;
+ 
+ 	device_for_each_child_node(&bgx->pdev->dev, fwn) {
+ 		struct phy_device *pd;
+@@ -1479,7 +1480,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		 */
+ 		node = to_of_node(fwn);
+ 		if (!node)
+-			break;
++			goto out_handle_put;
+ 
+ 		of_get_mac_address(node, bgx->lmac[lmac].mac);
+ 
+@@ -1501,10 +1502,8 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		}
+ 
+ 		lmac++;
+-		if (lmac == bgx->max_lmac) {
+-			of_node_put(node);
+-			break;
+-		}
++		if (lmac == bgx->max_lmac)
++			goto out_node_put;
+ 	}
+ 	return 0;
+ 
+@@ -1519,8 +1518,12 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		}
+ 		lmac--;
+ 	}
++	err = -EPROBE_DEFER;
++out_node_put:
+ 	of_node_put(node);
+-	return -EPROBE_DEFER;
++out_handle_put:
++	fwnode_handle_put(fwn);
++	return err;
+ }
+ 
+ #else
+
+-- 
+pw-bot: changes-requested
+
 
