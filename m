@@ -1,240 +1,208 @@
-Return-Path: <netdev+bounces-15303-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15304-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 550FD746B49
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 09:57:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6797C746B96
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 10:10:55 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8CFF11C209CA
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 07:57:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CAB541C208F6
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 08:10:53 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 329981866;
-	Tue,  4 Jul 2023 07:56:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C708186C;
+	Tue,  4 Jul 2023 08:10:51 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 23C7F17E6
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 07:56:57 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 706EEE5F
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 00:56:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688457415;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=+QwsYV+8KHzcasoXqD88czstNAhElxwaokiJev5S4tQ=;
-	b=QRYrUwHv2iwC3V0iEpOR4BTO/mB6I2+YjLZC4S0mq6v/GoC70qe6I9muNHXshd6XcWsrey
-	eEdbCq8RvTs/bhxE3iq8q+vaFAGxtiCI1YAMo7qkFz8ZEmfCzA9xzIZkCl3th5/EE+AxHw
-	i+IQyhXFwGvlSja61cbHQwULWNBgbcw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-356-lLhZIAOfOz24xJnTBTpp6A-1; Tue, 04 Jul 2023 03:56:54 -0400
-X-MC-Unique: lLhZIAOfOz24xJnTBTpp6A-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-6364867fa8aso8691716d6.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 00:56:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 471881866
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 08:10:51 +0000 (UTC)
+Received: from mail-pj1-f80.google.com (mail-pj1-f80.google.com [209.85.216.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B442E4F
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 01:10:48 -0700 (PDT)
+Received: by mail-pj1-f80.google.com with SMTP id 98e67ed59e1d1-262e0b15ad3so7135372a91.2
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 01:10:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688457414; x=1691049414;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+        d=1e100.net; s=20221208; t=1688458247; x=1691050247;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
          :from:to:cc:subject:date:message-id:reply-to;
-        bh=+QwsYV+8KHzcasoXqD88czstNAhElxwaokiJev5S4tQ=;
-        b=DQFKdj47ahHLFmt4wOr6RpeziwIPyHWUxGVYq4BMCTRUe2jDUeaGcDvUrrsv03QE0k
-         rQcpoSQq/8QcuHgMT3OInkrr3dUYAmyNoUydugjbzGbPosdDTHFBMf7adHGpRb0OlItH
-         xbBr40h+ORhF7b6CWf3dXn9JH2SeBjjT+iqnJ6TKGRPQsg3MqACQTgf7gGi4KMEW5q09
-         MECEUmV7wFncOsCbzcT27gDUIpZXNfTROlOfk4W8uvJzaf0GJljgLLYrN93N9u3Mzy4I
-         dcQmE2YPekTO4BLu3BkjTRELD/PHG2/rVHLiLhGkbNjTBbIGbQS5Re/LgRLTDkBDyvCV
-         mmwg==
-X-Gm-Message-State: ABy/qLZ5CAhUQ/X4fZaRn/56bv2M+7JSCeO+b6HxDt/IG5sosrM+HPGu
-	1b7t8AmuK4i9lw8j0FsXfMHtdEBPeDJmVMpsQKfwt9VDrP34gkiZ8EPhIfdRu5Co+ffvyT/qxC8
-	wK+BLAhopQ29fYc7U
-X-Received: by 2002:a05:6214:4018:b0:635:ec47:bfa4 with SMTP id kd24-20020a056214401800b00635ec47bfa4mr14522707qvb.4.1688457414136;
-        Tue, 04 Jul 2023 00:56:54 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEsrSbYrFIjlPpDXHLxORCl46MfBXyKNAZB4pBK89BtTGL6AR9JTbBqa7MK387z/+I5RmdNDA==
-X-Received: by 2002:a05:6214:4018:b0:635:ec47:bfa4 with SMTP id kd24-20020a056214401800b00635ec47bfa4mr14522702qvb.4.1688457413910;
-        Tue, 04 Jul 2023 00:56:53 -0700 (PDT)
-Received: from gerbillo.redhat.com (146-241-247-156.dyn.eolo.it. [146.241.247.156])
-        by smtp.gmail.com with ESMTPSA id b7-20020a0cfb47000000b006365a41c354sm4859826qvq.132.2023.07.04.00.56.51
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 00:56:53 -0700 (PDT)
-Message-ID: <b44b9fdeafc0fb94a1e38c18732138db3726dd10.camel@redhat.com>
-Subject: Re: [PATCH 5/5] net/tls: implement ->read_sock()
-From: Paolo Abeni <pabeni@redhat.com>
-To: Hannes Reinecke <hare@suse.de>, Sagi Grimberg <sagi@grimberg.me>
-Cc: Keith Busch <kbusch@kernel.org>, Christoph Hellwig <hch@lst.de>, 
- linux-nvme@lists.infradead.org, Jakub Kicinski <kuba@kernel.org>, Eric
- Dumazet <edumazet@google.com>, netdev@vger.kernel.org, Boris Pismenny
- <boris.pismenny@gmail.com>
-Date: Tue, 04 Jul 2023 09:56:49 +0200
-In-Reply-To: <20230703090444.38734-6-hare@suse.de>
-References: <20230703090444.38734-1-hare@suse.de>
-	 <20230703090444.38734-6-hare@suse.de>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        bh=T7xwhrlzcysPZgD7raFUrW5vjIVCVs0H5URIJbA37uU=;
+        b=b30NQFyOiv4sgh01R9lV7UXiSgZc8Id8KvZjO9ydixlW+XsJVVZJOP8NhsbPEq8AhX
+         hQXWYT2r8UqCnySC3tfaBdXrs19rvtnfhWye9K2tOr8Vwzoa10FqvCg1ivEOtfL3cDUK
+         uDeNnA1oho7jqalmQsX21QYnnnd1Un+mMYUgR5kgDTlwbs+8SHt0xYzrw3NVBt/Di5Me
+         AO00wkvZQwoqAzaHbjcDZc6CglU/0V60sctNvj71h7vvyN7ylcJSj440D3I9hex6uHco
+         sHYgtRWFHYmxk2rlE+o4o8YFsoH04SV1rKm6agTDprOVJlRUZfxIRCTcwp/m+fIckMQa
+         bDBw==
+X-Gm-Message-State: ABy/qLbvwbJHqVayRn0wGagHiaIvzoBIAktbuuG9RAbUSrRn8CYg57gH
+	ax/e9hUY7BYUNfstYmJMVgohliO2xDG+S0WinEcebmrmB1iN
+X-Google-Smtp-Source: APBJJlF614BsBKSxk9mPoRcakWxeYZ7WHS+xp5jhGmJU5TV7o4+jcZEV5f0oXUJsx+7U5fnOKazTAJi2RqTP5tzo/673IeePeoDr
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Received: by 2002:a17:90a:c7d8:b0:262:fc7f:7d95 with SMTP id
+ gf24-20020a17090ac7d800b00262fc7f7d95mr9087523pjb.0.1688458247656; Tue, 04
+ Jul 2023 01:10:47 -0700 (PDT)
+Date: Tue, 04 Jul 2023 01:10:47 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000011da7605ffa4d289@google.com>
+Subject: [syzbot] [bluetooth?] BUG: sleeping function called from invalid
+ context in hci_cmd_sync_submit
+From: syzbot <syzbot+e7be5be00de0c3c2d782@syzkaller.appspotmail.com>
+To: johan.hedberg@gmail.com, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, marcel@holtmann.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Mon, 2023-07-03 at 11:04 +0200, Hannes Reinecke wrote:
-> Implement ->read_sock() function for use with nvme-tcp.
->=20
-> Signed-off-by: Hannes Reinecke <hare@suse.de>
-> Reviewed-by: Sagi Grimberg <sagi@grimberg.me>
-> Cc: Boris Pismenny <boris.pismenny@gmail.com>
-> Cc: Jakub Kicinski <kuba@kernel.org>
-> Cc: netdev@vger.kernel.org
-> ---
->  net/tls/tls.h      |  2 ++
->  net/tls/tls_main.c |  2 ++
->  net/tls/tls_sw.c   | 78 ++++++++++++++++++++++++++++++++++++++++++++++
->  3 files changed, 82 insertions(+)
->=20
-> diff --git a/net/tls/tls.h b/net/tls/tls.h
-> index 86cef1c68e03..7e4d45537deb 100644
-> --- a/net/tls/tls.h
-> +++ b/net/tls/tls.h
-> @@ -110,6 +110,8 @@ bool tls_sw_sock_is_readable(struct sock *sk);
->  ssize_t tls_sw_splice_read(struct socket *sock, loff_t *ppos,
->  			   struct pipe_inode_info *pipe,
->  			   size_t len, unsigned int flags);
-> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-> +		     sk_read_actor_t read_actor);
-> =20
->  int tls_device_sendmsg(struct sock *sk, struct msghdr *msg, size_t size)=
-;
->  void tls_device_splice_eof(struct socket *sock);
-> diff --git a/net/tls/tls_main.c b/net/tls/tls_main.c
-> index b6896126bb92..7dbb8cd8f809 100644
-> --- a/net/tls/tls_main.c
-> +++ b/net/tls/tls_main.c
-> @@ -962,10 +962,12 @@ static void build_proto_ops(struct proto_ops ops[TL=
-S_NUM_CONFIG][TLS_NUM_CONFIG]
->  	ops[TLS_BASE][TLS_SW  ] =3D ops[TLS_BASE][TLS_BASE];
->  	ops[TLS_BASE][TLS_SW  ].splice_read	=3D tls_sw_splice_read;
->  	ops[TLS_BASE][TLS_SW  ].poll		=3D tls_sk_poll;
-> +	ops[TLS_BASE][TLS_SW  ].read_sock	=3D tls_sw_read_sock;
-> =20
->  	ops[TLS_SW  ][TLS_SW  ] =3D ops[TLS_SW  ][TLS_BASE];
->  	ops[TLS_SW  ][TLS_SW  ].splice_read	=3D tls_sw_splice_read;
->  	ops[TLS_SW  ][TLS_SW  ].poll		=3D tls_sk_poll;
-> +	ops[TLS_SW  ][TLS_SW  ].read_sock	=3D tls_sw_read_sock;
-> =20
->  #ifdef CONFIG_TLS_DEVICE
->  	ops[TLS_HW  ][TLS_BASE] =3D ops[TLS_BASE][TLS_BASE];
-> diff --git a/net/tls/tls_sw.c b/net/tls/tls_sw.c
-> index d0636ea13009..dbf1c8a71f61 100644
-> --- a/net/tls/tls_sw.c
-> +++ b/net/tls/tls_sw.c
-> @@ -2202,6 +2202,84 @@ ssize_t tls_sw_splice_read(struct socket *sock,  l=
-off_t *ppos,
->  	goto splice_read_end;
->  }
-> =20
-> +int tls_sw_read_sock(struct sock *sk, read_descriptor_t *desc,
-> +		     sk_read_actor_t read_actor)
-> +{
-> +	struct tls_context *tls_ctx =3D tls_get_ctx(sk);
-> +	struct tls_sw_context_rx *ctx =3D tls_sw_ctx_rx(tls_ctx);
-> +	struct strp_msg *rxm =3D NULL;
-> +	struct tls_msg *tlm;
-> +	struct sk_buff *skb;
-> +	ssize_t copied =3D 0;
-> +	int err, used;
-> +
-> +	err =3D tls_rx_reader_acquire(sk, ctx, true);
-> +	if (err < 0)
-> +		return err;
-> +	if (!skb_queue_empty(&ctx->rx_list)) {
-> +		skb =3D __skb_dequeue(&ctx->rx_list);
-> +	} else {
-> +		struct tls_decrypt_arg darg;
-> +
-> +		err =3D tls_rx_rec_wait(sk, NULL, true, true);
-> +		if (err <=3D 0) {
-> +			tls_rx_reader_release(sk, ctx);
-> +			return err;
+Hello,
 
-You can replace the 2 lines above with:
+syzbot found the following issue on:
 
-			goto read_sock_end;
+HEAD commit:    6352a698ca5b Add linux-next specific files for 20230630
+git tree:       linux-next
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=10bce02ca80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=1ae0334a93bf3848
+dashboard link: https://syzkaller.appspot.com/bug?extid=e7be5be00de0c3c2d782
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=161dadc7280000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=158449fb280000
 
-> +		}
-> +
-> +		memset(&darg.inargs, 0, sizeof(darg.inargs));
-> +
-> +		err =3D tls_rx_one_record(sk, NULL, &darg);
-> +		if (err < 0) {
-> +			tls_err_abort(sk, -EBADMSG);
-> +			tls_rx_reader_release(sk, ctx);
-> +			return err;
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/938bb9b98868/disk-6352a698.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/4468e2b2789e/vmlinux-6352a698.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/16555dd478fa/bzImage-6352a698.xz
 
-Same here.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+e7be5be00de0c3c2d782@syzkaller.appspotmail.com
 
-> +		}
-> +
-> +		tls_rx_rec_done(ctx);
-> +		skb =3D darg.skb;
-> +	}
-> +
-> +	do {
-> +		rxm =3D strp_msg(skb);
-> +		tlm =3D tls_msg(skb);
-> +
-> +		/* read_sock does not support reading control messages */
-> +		if (tlm->control !=3D TLS_RECORD_TYPE_DATA) {
-> +			err =3D -EINVAL;
-> +			goto read_sock_requeue;
-> +		}
-> +
-> +		used =3D read_actor(desc, skb, rxm->offset, rxm->full_len);
-> +		if (used <=3D 0) {
-> +			err =3D used;
-> +			goto read_sock_end;
-> +		}
-> +
-> +		copied +=3D used;
-> +		if (used < rxm->full_len) {
-> +			rxm->offset +=3D used;
-> +			rxm->full_len -=3D used;
-> +			if (!desc->count)
-> +				goto read_sock_requeue;
-> +		} else {
-> +			consume_skb(skb);
-> +			if (desc->count && !skb_queue_empty(&ctx->rx_list))
-> +				skb =3D __skb_dequeue(&ctx->rx_list);
-> +			else
-> +				skb =3D NULL;
-> +		}
-> +	} while (skb);
-> +
-> +read_sock_end:
-> +	tls_rx_reader_release(sk, ctx);
-> +	return copied ? : err;
+Bluetooth: hci0: link tx timeout
+Bluetooth: hci0: killing stalled connection 11:aa:aa:aa:aa:aa
+BUG: sleeping function called from invalid context at kernel/locking/mutex.c:580
+in_atomic(): 0, irqs_disabled(): 0, non_block: 0, pid: 4431, name: kworker/u5:1
+preempt_count: 0, expected: 0
+RCU nest depth: 1, expected: 0
+3 locks held by kworker/u5:1/4431:
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:20 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: raw_atomic64_set include/linux/atomic/atomic-arch-fallback.h:2608 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: raw_atomic_long_set include/linux/atomic/atomic-long.h:79 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:3196 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:675 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:702 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x8fd/0x16f0 kernel/workqueue.c:2567
+ #1: ffffc900070efdb0 ((work_completion)(&hdev->tx_work)){+.+.}-{0:0}, at: process_one_work+0x930/0x16f0 kernel/workqueue.c:2571
+ #2: ffffffff8c9a2d80 (rcu_read_lock){....}-{1:2}, at: hci_link_tx_to net/bluetooth/hci_core.c:3406 [inline]
+ #2: ffffffff8c9a2d80 (rcu_read_lock){....}-{1:2}, at: __check_timeout net/bluetooth/hci_core.c:3561 [inline]
+ #2: ffffffff8c9a2d80 (rcu_read_lock){....}-{1:2}, at: __check_timeout+0x171/0x480 net/bluetooth/hci_core.c:3541
+CPU: 1 PID: 4431 Comm: kworker/u5:1 Not tainted 6.4.0-next-20230630-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Workqueue: hci0 hci_tx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0x136/0x150 lib/dump_stack.c:106
+ __might_resched+0x358/0x580 kernel/sched/core.c:10188
+ __mutex_lock_common kernel/locking/mutex.c:580 [inline]
+ __mutex_lock+0x9f/0x1350 kernel/locking/mutex.c:747
+ hci_cmd_sync_submit+0x3b/0x330 net/bluetooth/hci_sync.c:699
+ hci_cmd_sync_queue+0x7b/0xb0 net/bluetooth/hci_sync.c:739
+ hci_abort_conn+0x15b/0x330 net/bluetooth/hci_conn.c:2906
+ hci_disconnect+0xc3/0x220 net/bluetooth/hci_conn.c:258
+ hci_link_tx_to net/bluetooth/hci_core.c:3415 [inline]
+ __check_timeout net/bluetooth/hci_core.c:3561 [inline]
+ __check_timeout+0x2cc/0x480 net/bluetooth/hci_core.c:3541
+ hci_sched_le net/bluetooth/hci_core.c:3744 [inline]
+ hci_tx_work+0x82b/0x1bb0 net/bluetooth/hci_core.c:3822
+ process_one_work+0xa34/0x16f0 kernel/workqueue.c:2597
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2748
+ kthread+0x344/0x440 kernel/kthread.c:389
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
 
-WRT the return value, I think you should look at tcp_read_sock() as the
-reference. The above LGTM. Some ->read_sock() callers ignore the =20
-return value due to the specific 'read_actor' callback used.
+=============================
+[ BUG: Invalid wait context ]
+6.4.0-next-20230630-syzkaller #0 Tainted: G        W         
+-----------------------------
+kworker/u5:1/4431 is trying to lock:
+ffff888021b149b0 (&hdev->unregister_lock){+.+.}-{3:3}, at: hci_cmd_sync_submit+0x3b/0x330 net/bluetooth/hci_sync.c:699
+other info that might help us debug this:
+context-{4:4}
+3 locks held by kworker/u5:1/4431:
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: arch_atomic64_set arch/x86/include/asm/atomic64_64.h:20 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: raw_atomic64_set include/linux/atomic/atomic-arch-fallback.h:2608 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: raw_atomic_long_set include/linux/atomic/atomic-long.h:79 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: atomic_long_set include/linux/atomic/atomic-instrumented.h:3196 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: set_work_data kernel/workqueue.c:675 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: set_work_pool_and_clear_pending kernel/workqueue.c:702 [inline]
+ #0: ffff88807e8a8138 ((wq_completion)hci0#2){+.+.}-{0:0}, at: process_one_work+0x8fd/0x16f0 kernel/workqueue.c:2567
+ #1: ffffc900070efdb0 ((work_completion)(&hdev->tx_work)){+.+.}-{0:0}, at: process_one_work+0x930/0x16f0 kernel/workqueue.c:2571
+ #2: ffffffff8c9a2d80 (rcu_read_lock){....}-{1:2}, at: hci_link_tx_to net/bluetooth/hci_core.c:3406 [inline]
+ #2: ffffffff8c9a2d80 (rcu_read_lock){....}-{1:2}, at: __check_timeout net/bluetooth/hci_core.c:3561 [inline]
+ #2: ffffffff8c9a2d80 (rcu_read_lock){....}-{1:2}, at: __check_timeout+0x171/0x480 net/bluetooth/hci_core.c:3541
+stack backtrace:
+CPU: 1 PID: 4431 Comm: kworker/u5:1 Tainted: G        W          6.4.0-next-20230630-syzkaller #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Workqueue: hci0 hci_tx_work
+Call Trace:
+ <TASK>
+ __dump_stack lib/dump_stack.c:88 [inline]
+ dump_stack_lvl+0xd9/0x150 lib/dump_stack.c:106
+ print_lock_invalid_wait_context kernel/locking/lockdep.c:4758 [inline]
+ check_wait_context kernel/locking/lockdep.c:4828 [inline]
+ __lock_acquire+0x15e8/0x5e20 kernel/locking/lockdep.c:5094
+ lock_acquire kernel/locking/lockdep.c:5761 [inline]
+ lock_acquire+0x1b1/0x520 kernel/locking/lockdep.c:5726
+ __mutex_lock_common kernel/locking/mutex.c:603 [inline]
+ __mutex_lock+0x12f/0x1350 kernel/locking/mutex.c:747
+ hci_cmd_sync_submit+0x3b/0x330 net/bluetooth/hci_sync.c:699
+ hci_cmd_sync_queue+0x7b/0xb0 net/bluetooth/hci_sync.c:739
+ hci_abort_conn+0x15b/0x330 net/bluetooth/hci_conn.c:2906
+ hci_disconnect+0xc3/0x220 net/bluetooth/hci_conn.c:258
+ hci_link_tx_to net/bluetooth/hci_core.c:3415 [inline]
+ __check_timeout net/bluetooth/hci_core.c:3561 [inline]
+ __check_timeout+0x2cc/0x480 net/bluetooth/hci_core.c:3541
+ hci_sched_le net/bluetooth/hci_core.c:3744 [inline]
+ hci_tx_work+0x82b/0x1bb0 net/bluetooth/hci_core.c:3822
+ process_one_work+0xa34/0x16f0 kernel/workqueue.c:2597
+ worker_thread+0x67d/0x10c0 kernel/workqueue.c:2748
+ kthread+0x344/0x440 kernel/kthread.c:389
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+ </TASK>
+Bluetooth: hci0: command 0x0406 tx timeout
 
-WRT the deadlock you see, try to run your tests with lockdep enabled,
-it should provide valuable information on the deadlock cause, if any.
 
-Cheers,
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-Paolo
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
 
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
