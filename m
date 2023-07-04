@@ -1,65 +1,65 @@
-Return-Path: <netdev+bounces-15434-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15435-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 62CAF74793C
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:45:50 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 343DF74793D
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 22:46:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1EF78280F25
-	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:45:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 530241C20AF9
+	for <lists+netdev@lfdr.de>; Tue,  4 Jul 2023 20:46:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C179D8BED;
-	Tue,  4 Jul 2023 20:44:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C3C68C11;
+	Tue,  4 Jul 2023 20:45:00 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF5D2EB8
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:44:58 +0000 (UTC)
-Received: from mail-wm1-x329.google.com (mail-wm1-x329.google.com [IPv6:2a00:1450:4864:20::329])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2987410E2
-	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 13:44:57 -0700 (PDT)
-Received: by mail-wm1-x329.google.com with SMTP id 5b1f17b1804b1-3fbdfda88f4so14515435e9.1
-        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 13:44:57 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4A8DE8C0C
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 20:45:00 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2A5D010E6
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 13:44:58 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fbc5d5746cso66317125e9.2
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 13:44:58 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=tessares.net; s=google; t=1688503495; x=1691095495;
+        d=tessares.net; s=google; t=1688503496; x=1691095496;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=hDHxKzuw+FQN3yqmvZTInWTuCOW02pUJl6ttc2wpkgY=;
-        b=nDhOY1uFJRI7sTrPHZ2ISJa0InUVg0tW7CH5q75pO7s3duzK+LXUOe+NUypd0QJE7b
-         jY/DONqMdinpTuwZy43GxqxidM4MwIHpGWHNedMf+8XGQkjSAyUDDVYCqzI643dncPUs
-         nxXiB4MkdlqBZ2c1MCLtMVdc4t4Bt7Kxag6OfYkAufQMknRT0ymGXVTRSNflXz69UylA
-         m8ETwddi2XkrCP5IilBIuNpMXVGhvyGtCa2zKBRJw9ZqxRZImhWCp7B8G+V8eUw+WqIT
-         bcIRT+1R18xEWEEbXEMOANvdKf/zHJAHHUPstjhuinqaS3LGvGYblF8i3ePzCdubnN8j
-         7T5w==
+        bh=sbs49TeREvqiLDtiZ2Z4ZyV3x/f9tvCjUJNddKBzHqM=;
+        b=71EEytLCLqTLccLzoPuPNNeb09hv4H7omNK0iWbNSc7k+BRsAfXs7LypSn311LKrpK
+         j85zL7PrtNLLWhQh3Ni6YkxakmFLZkyoTrQ8UIXWW4+bgqE8FifXrsb74vFd5XkFoECd
+         8wKS+dZuhR8+mjsLqdKY0kmcGE6Rvpedn0JiyaL+1vRfIgPS4xZSTVPKkIITj+YQxhvr
+         EfOcxxSpNI3yWrf89stjIhEzecBYFlKA4s41NbIqME3RUdXSXeqaGxbYU5Jb06HKUrms
+         wcCC+NCp6HnHITxrzyOKtYG72LP1MvFOfpQ5riSXWr6AzR42/zDtD5I+VdRchqByZ6J7
+         I3yw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688503495; x=1691095495;
+        d=1e100.net; s=20221208; t=1688503496; x=1691095496;
         h=cc:to:in-reply-to:references:message-id:content-transfer-encoding
          :mime-version:subject:date:from:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=hDHxKzuw+FQN3yqmvZTInWTuCOW02pUJl6ttc2wpkgY=;
-        b=LrwDgg7xeyDK+gHaWUDjuDY9LsfqGfZxAUxaqMlAQ9Vv+ePPvTlqv6dGIdAAXKLd3Y
-         x1uSCV4QPBkt31YxyqypQn93ysp7Yv/hyxY+RcThTe+niNoVLydCx14kkkLW0Kcjjcwd
-         GYNTLH4oOngy251A/w7fEGpU0bEVAx8Gt8tZ+0ItiLWa0qt7svdtMJgsITpWdmgJQWjX
-         /yJ/mQlgyxbX9qqJXASmtznaRicZv+Et8gy6v7SCfZQ1G9VP/RzJDckIi8ZNSKzebFMz
-         Fxsq120Abqc9eudeRg7yJ9+P9HLqfsJz08Jn9HZmyF6I2F+wWYLgRELNTH1W4WjcFZL0
-         SxxQ==
-X-Gm-Message-State: ABy/qLavg3ZiIXvY0L65NBWxziuYF/viQmYuPc68D9pClOLJBwO4zfQc
-	zJCioAfS291tA89fKMdE6iuY8+DXq5qS03k/umBypw==
-X-Google-Smtp-Source: APBJJlEDq7kPaqBJhj2tw4QTQfhouDPD/kuwj8ANuALjc+JfzPIfriVuSKT2j98z1RnqW9eGxTcvQg==
-X-Received: by 2002:a7b:c849:0:b0:3fb:e4ce:cc74 with SMTP id c9-20020a7bc849000000b003fbe4cecc74mr922840wml.8.1688503495554;
-        Tue, 04 Jul 2023 13:44:55 -0700 (PDT)
+        bh=sbs49TeREvqiLDtiZ2Z4ZyV3x/f9tvCjUJNddKBzHqM=;
+        b=gm+DS1OfnJ1YMVkkNwaqjbx6iaM6C/NSNx/MGXtJB5RCSqX0yDsZxHGPlJ3gJldL4c
+         2boV2Rsyo3+EY9PZRdL/IPdRlTlBpNKJvXQejkctZLDUNIG9YX/IVJRuYIicmmz+LJyL
+         gUrPhdaB2iaZoBHwS4HGbrRp1A3yQHVNeCl3OwNX1IvVhrIAld2PBRJgsfrewT3JgMS6
+         /jN7nAVRmyuDSqITmZcd8Uf4E+dt0VIQ5HmbC01AdGSdSTDvYsfkQvbFfUVh2fQ7KSvK
+         +1mjg8slJSqbE1PVvMEiWVzWlWPSkrN5fn1+yzhVqb1sMVVq+jZw81HmdThakm9CFsTn
+         on0g==
+X-Gm-Message-State: AC+VfDxvrwRfGicKhjDYffNUiPIgu1+PPFGcV44OtLkneBx/CNf2CRkZ
+	OaDKkcLlLxSrXAzO1F8r/JJl+4YyV2rB2M2lfUrh3g==
+X-Google-Smtp-Source: ACHHUZ7OfLkD4EL1eZnOC6SEWIJqO7T1GYXlDxM0eers3/RaR8s/fjvsySnar7tgGhowCyYNqnPUYA==
+X-Received: by 2002:a1c:6a07:0:b0:3fa:934c:8356 with SMTP id f7-20020a1c6a07000000b003fa934c8356mr12936237wmc.10.1688503496449;
+        Tue, 04 Jul 2023 13:44:56 -0700 (PDT)
 Received: from vdi08.nix.tessares.net (static.219.156.76.144.clients.your-server.de. [144.76.156.219])
-        by smtp.gmail.com with ESMTPSA id y4-20020a05600c364400b003fa74bff02asm115332wmq.26.2023.07.04.13.44.54
+        by smtp.gmail.com with ESMTPSA id y4-20020a05600c364400b003fa74bff02asm115332wmq.26.2023.07.04.13.44.55
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Tue, 04 Jul 2023 13:44:55 -0700 (PDT)
+        Tue, 04 Jul 2023 13:44:56 -0700 (PDT)
 From: Matthieu Baerts <matthieu.baerts@tessares.net>
-Date: Tue, 04 Jul 2023 22:44:35 +0200
-Subject: [PATCH net 3/9] selftests: mptcp: connect: fail if nft supposed to
- work
+Date: Tue, 04 Jul 2023 22:44:36 +0200
+Subject: [PATCH net 4/9] selftests: mptcp: sockopt: use 'iptables-legacy'
+ if available
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -68,7 +68,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-Message-Id: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-3-d7e67c274ca5@tessares.net>
+Message-Id: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-4-d7e67c274ca5@tessares.net>
 References: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-0-d7e67c274ca5@tessares.net>
 In-Reply-To: <20230704-upstream-net-20230704-misc-fixes-6-5-rc1-v1-0-d7e67c274ca5@tessares.net>
 To: mptcp@lists.linux.dev, Mat Martineau <martineau@kernel.org>, 
@@ -80,21 +80,21 @@ Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
  linux-kselftest@vger.kernel.org, 
  Matthieu Baerts <matthieu.baerts@tessares.net>, stable@vger.kernel.org
 X-Mailer: b4 0.12.3
-X-Developer-Signature: v=1; a=openpgp-sha256; l=1735;
+X-Developer-Signature: v=1; a=openpgp-sha256; l=2360;
  i=matthieu.baerts@tessares.net; h=from:subject:message-id;
- bh=0Rssl8kPQuTQe6YW3ClerkSvvyET5dErT/6Ju+EMAIU=;
- b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkpITDsXCQh2/8B+/EEQwajr3UOcNe0KC1T1VSR
- i0nw+qmmjaJAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZKSEwwAKCRD2t4JPQmmg
- cxI4D/443M6kpFU9MXcEibFvfOqfGe5agpWmRjTJYh6sp24Jx/FKUz8oIdKF/NAAYU+93dPU23k
- ebgFzK1lBnh63Sr9L6l4zCPEjiGz2HGDn/qGRkc9KTsXvdXyKnQWlv7etoWbRtnDMdD4R/imLvN
- +4RitnVQtMHdTor3MM7U7RH5ZxhRnbXJwv9DzWwI3HoK0gAB6Rryu/uqOdaivvuviZHpWiZpv7y
- GfvU5zB7PIugU3ob8XCldTysNqz8w15gho6rmnStFGT8OCBxdBmw6vJ/Gf/djsqV8peKlIQk90r
- QAUaYwvf1ufJBeTZtf6nakm5RI+F58e4SQ4/D1RW4TJijMZUVhkMwdbysGPbFiA9zIVUh3rXZ7d
- 9rDx+3+ie7rJNV7eo1moNdFQW71D1df78NrjWue7+otlGnpFeDXgKq4m8hP/gHdnjCHwvzP/we5
- +kWDY2i38TNbQSdecl2hTBEqCfTH/wAzlGA5jAnW6zjcDFBlrOcFh0yxvX16Uz5FJ3vv0AsT8O6
- gaIMoB67IlQELv5IMHDbrjH+jXNU2WHWVQATqIug0W6oI+9WwgfKPju890uywfPiqdzsL+jCL3/
- fesPuICLiiwDZBqnjcosKs2E+MSkIBigJLYrake8h/F9EZQNml/Ie4o8D8qwiGzUCI11klKMS27
- Y2a1MOZQrAqodHg==
+ bh=hNWOoD7/LcwT6MxZn3z9Ny8SyuT+nO+3gHstFbn1a9M=;
+ b=owEBbQKS/ZANAwAIAfa3gk9CaaBzAcsmYgBkpITDErJzB3ia+oVRtyW4uFBhqIl7+o0+PF3/9
+ GfcPSzELw+JAjMEAAEIAB0WIQToy4X3aHcFem4n93r2t4JPQmmgcwUCZKSEwwAKCRD2t4JPQmmg
+ c5AtD/sHKEDly/PyEbPrTJenSQYp6qxYdSsKRj2UOokdmfmCiKDxM13u5H1sC+bIp1cLmjybPro
+ bGAOxX4kCmRzF26gYCE/fUgy6vHQc1XUYushwdYcVQcqCCiuj7bh74qdLqsYXXfbsE4xaFwmXi6
+ U0eMJ2+w3bIfq+jvqGX5ze+51ltqqWVnHK4YM8kCJlUzOMK/towrnmaOsB6rejwyPafV91Xia4l
+ 0+22YYZYKE2XJtrcfK6LYFwdA/kclrmhUE3la+quoDrFxQhsvPV7eTrlFp707atnNkVK3im7yXb
+ Uhyy06xh2uI/50D3kRuvgTXsCJyUIIb5mrmXGvFj/COI48NzYaNSuvxEprxcvbkplbwTyeKczKT
+ gEH0G2Ubg9VtHVBfs5o/e1rm2030i9DK6HeSX92OSs3TfNtelL2lpdupLlh1ZDDfzpIfnVsdR7l
+ MWczEoXNVQr9C669SFN0ORYOdY8/ZIRzASTCAFNT6DFRZj1YGXT9wCHB1XCvySEqoJ78lAgAmq5
+ pFlaFxb1Pvn1D04PIZpI+kp8J2zZB2/gXqJFLBqIkzfzIjdBKBwAPbIu8Fj9VDxbmh5OM5UaXXE
+ UM6NLfmlkzIMV2o22UG6st/3zcEIx05nLvfEW+PREMuaK6gxHvSubCzQwPp5dh2m3sSAqsGAd/Y
+ mEYSiwGdbDn6Fkw==
 X-Developer-Key: i=matthieu.baerts@tessares.net; a=openpgp;
  fpr=E8CB85F76877057A6E27F77AF6B7824F4269A073
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
@@ -104,51 +104,80 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In case of "external" errors when preparing the environment for the
-TProxy tests, the subtests were marked as skipped.
+IPTables commands using 'iptables-nft' fail on old kernels, at least
+on v5.15 because it doesn't see the default IPTables chains:
 
-This is fine but it means these errors are ignored. On MPTCP Public CI,
-we do want to catch such issues and mark the selftest as failed if there
-are such issues. We can then use mptcp_lib_fail_if_expected_feature()
-helper that has been recently added to fail if needed.
+  $ iptables -L
+  iptables/1.8.2 Failed to initialize nft: Protocol not supported
+
+As a first step before switching to NFTables, we can use iptables-legacy
+if available.
 
 Link: https://github.com/multipath-tcp/mptcp_net-next/issues/368
-Fixes: 5fb62e9cd3ad ("selftests: mptcp: add tproxy test case")
+Fixes: dc65fe82fb07 ("selftests: mptcp: add packet mark test case")
 Cc: stable@vger.kernel.org
 Acked-by: Paolo Abeni <pabeni@redhat.com>
 Signed-off-by: Matthieu Baerts <matthieu.baerts@tessares.net>
 ---
- tools/testing/selftests/net/mptcp/mptcp_connect.sh | 3 +++
- 1 file changed, 3 insertions(+)
+ tools/testing/selftests/net/mptcp/mptcp_sockopt.sh | 20 +++++++++++---------
+ 1 file changed, 11 insertions(+), 9 deletions(-)
 
-diff --git a/tools/testing/selftests/net/mptcp/mptcp_connect.sh b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-index 13561e5bc0cd..bbae40882bfa 100755
---- a/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-+++ b/tools/testing/selftests/net/mptcp/mptcp_connect.sh
-@@ -718,6 +718,7 @@ table inet mangle {
- EOF
- 	if [ $? -ne 0 ]; then
- 		echo "SKIP: $msg, could not load nft ruleset"
-+		mptcp_lib_fail_if_expected_feature "nft rules"
- 		return
+diff --git a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
+index f295a371ff14..c21bfd7f0c01 100755
+--- a/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
++++ b/tools/testing/selftests/net/mptcp/mptcp_sockopt.sh
+@@ -12,6 +12,8 @@ ksft_skip=4
+ timeout_poll=30
+ timeout_test=$((timeout_poll * 2 + 1))
+ mptcp_connect=""
++iptables="iptables"
++ip6tables="ip6tables"
+ 
+ sec=$(date +%s)
+ rndh=$(printf %x $sec)-$(mktemp -u XXXXXX)
+@@ -25,7 +27,7 @@ add_mark_rules()
+ 	local m=$2
+ 
+ 	local t
+-	for t in iptables ip6tables; do
++	for t in ${iptables} ${ip6tables}; do
+ 		# just to debug: check we have multiple subflows connection requests
+ 		ip netns exec $ns $t -A OUTPUT -p tcp --syn -m mark --mark $m -j ACCEPT
+ 
+@@ -95,14 +97,14 @@ if [ $? -ne 0 ];then
+ 	exit $ksft_skip
+ fi
+ 
+-iptables -V > /dev/null 2>&1
+-if [ $? -ne 0 ];then
++# Use the legacy version if available to support old kernel versions
++if iptables-legacy -V &> /dev/null; then
++	iptables="iptables-legacy"
++	ip6tables="ip6tables-legacy"
++elif ! iptables -V &> /dev/null; then
+ 	echo "SKIP: Could not run all tests without iptables tool"
+ 	exit $ksft_skip
+-fi
+-
+-ip6tables -V > /dev/null 2>&1
+-if [ $? -ne 0 ];then
++elif ! ip6tables -V &> /dev/null; then
+ 	echo "SKIP: Could not run all tests without ip6tables tool"
+ 	exit $ksft_skip
+ fi
+@@ -112,10 +114,10 @@ check_mark()
+ 	local ns=$1
+ 	local af=$2
+ 
+-	local tables=iptables
++	local tables=${iptables}
+ 
+ 	if [ $af -eq 6 ];then
+-		tables=ip6tables
++		tables=${ip6tables}
  	fi
  
-@@ -733,6 +734,7 @@ EOF
- 	if [ $? -ne 0 ]; then
- 		ip netns exec "$listener_ns" nft flush ruleset
- 		echo "SKIP: $msg, ip $r6flag rule failed"
-+		mptcp_lib_fail_if_expected_feature "ip rule"
- 		return
- 	fi
- 
-@@ -741,6 +743,7 @@ EOF
- 		ip netns exec "$listener_ns" nft flush ruleset
- 		ip -net "$listener_ns" $r6flag rule del fwmark 1 lookup 100
- 		echo "SKIP: $msg, ip route add local $local_addr failed"
-+		mptcp_lib_fail_if_expected_feature "ip route"
- 		return
- 	fi
- 
+ 	local counters values
 
 -- 
 2.40.1
