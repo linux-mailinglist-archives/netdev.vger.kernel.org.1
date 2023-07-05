@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-15607-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15608-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id CBF48748B29
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:00:32 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C461748B2C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:00:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 881FA281098
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:00:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4881F280D5B
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:00:50 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFB7515487;
-	Wed,  5 Jul 2023 17:58:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A14DB156C0;
+	Wed,  5 Jul 2023 17:58:24 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CA3014AA1
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:58:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5CF09C433CC;
-	Wed,  5 Jul 2023 17:58:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 73173154A0
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:58:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4375FC433BC;
+	Wed,  5 Jul 2023 17:58:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688579902;
-	bh=3dtLflWcXOJzUJkRAOfeFiPylknrvKBXexBdUvJfqZg=;
+	s=k20201202; t=1688579903;
+	bh=J5azMA4gAKCKdBOSKSIqmmi2MSMIkVnyQS78BzXQSfY=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=HY58Jp7I1v9N4etg78kb2t4nta4ARveY/YpzzZVMso4Th4cKGhvc42ibZBmC/UfJd
-	 BarRtJufqgBwGgwTSvJlJUa1AvB25bqz9XkaUQlUmCt49O9nunnHcFfOf68f66bmA2
-	 oefyuyhhGNx0VK0dTZdOehVVT1FKOOQjKbsU+hLct1ghojdC/ums3n11lkpl4hjG3X
-	 cBpRroKS2J9eK1OKhMTPEsXF5O5yK/67t5WRV3MkAoCIhQSvVOzP7OpK524q7axVJb
-	 JpH6Du0ZWZSNyNNP4etCxTHQka1JGGXk0Zu9ktQD0ah9N+g/bWdhXMhrVFzT0LkcVH
-	 bkT1Ngnm2qPFg==
+	b=EHiyJiTZu5iJiVlnxTV9Wd7nF8nn2bovzfb1hWCpHzEHRf9hh8NSZRuY28vFeMvbm
+	 SrRRbAdDNven+e5dEK311G8AzgHReF5f1fLGerdo5nHReF2crS9rF3cdgYTtv5Megs
+	 OEPyVs6dWFO7VYFxDHB71Oeou1kew2GRV3xQJleEh1uHvitt4dhwyhUmWzAYJaFgFv
+	 B3lk/TmdomlQyyw7HS/8MMrbKMR9V+B7tZGkni7KlSIpmyAEUqdWKfrwkAcZTCNHdg
+	 9e2ELQj4xu8+XG8Yi/suqOkRCOZTA4ywAj45cAJDwM5XmjF57di+wd3yASs/uDaP1S
+	 Yk0Fol2sYWe5w==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,11 +38,11 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Yevgeny Kliteynik <kliteyn@nvidia.com>,
-	Paul Blakey <paulb@nvidia.com>
-Subject: [net V2 7/9] net/mlx5e: TC, CT: Offload ct clear only once
-Date: Wed,  5 Jul 2023 10:57:55 -0700
-Message-ID: <20230705175757.284614-8-saeed@kernel.org>
+	Maher Sanalla <msanalla@nvidia.com>,
+	Shay Drory <shayd@nvidia.com>
+Subject: [net V2 8/9] net/mlx5: Query hca_cap_2 only when supported
+Date: Wed,  5 Jul 2023 10:57:56 -0700
+Message-ID: <20230705175757.284614-9-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230705175757.284614-1-saeed@kernel.org>
 References: <20230705175757.284614-1-saeed@kernel.org>
@@ -54,87 +54,37 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-From: Yevgeny Kliteynik <kliteyn@nvidia.com>
+From: Maher Sanalla <msanalla@nvidia.com>
 
-Non-clear CT action causes a flow rule split, while CT clear action
-doesn't and is just a header-rewrite to the current flow rule.
-But ct offload is done in post_parse and is per ct action instance,
-so ct clear offload is parsed multiple times, while its deleted once.
+On vport enable, where fw's hca caps are queried, the driver queries
+hca_caps_2 without checking if fw truly supports them, causing a false
+failure of vfs vport load and blocking SRIOV enablement on old devices
+such as CX4 where hca_caps_2 support is missing.
 
-Fix this by post_parsing the ct action only once per flow attribute
-(which is per flow rule) by using a offloaded ct_attr flag.
+Thus, add a check for the said caps support before accessing them.
 
-Fixes: 08fe94ec5f77 ("net/mlx5e: TC, Remove special handling of CT action")
-Signed-off-by: Paul Blakey <paulb@nvidia.com>
-Signed-off-by: Yevgeny Kliteynik <kliteyn@nvidia.com>
+Fixes: e5b9642a33be ("net/mlx5: E-Switch, Implement devlink port function cmds to control migratable")
+Signed-off-by: Maher Sanalla <msanalla@nvidia.com>
+Reviewed-by: Shay Drory <shayd@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c | 14 +++++++++++---
- drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.h |  1 +
- 2 files changed, 12 insertions(+), 3 deletions(-)
+ drivers/net/ethernet/mellanox/mlx5/core/eswitch.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
-index a254e728ac95..fadfa8b50beb 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.c
-@@ -1545,7 +1545,8 @@ mlx5_tc_ct_parse_action(struct mlx5_tc_ct_priv *priv,
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+index faec7d7a4400..243c455f1029 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/eswitch.c
+@@ -807,6 +807,9 @@ static int mlx5_esw_vport_caps_get(struct mlx5_eswitch *esw, struct mlx5_vport *
+ 	hca_caps = MLX5_ADDR_OF(query_hca_cap_out, query_ctx, capability);
+ 	vport->info.roce_enabled = MLX5_GET(cmd_hca_cap, hca_caps, roce);
  
- 	attr->ct_attr.ct_action |= act->ct.action; /* So we can have clear + ct */
- 	attr->ct_attr.zone = act->ct.zone;
--	attr->ct_attr.nf_ft = act->ct.flow_table;
-+	if (!(act->ct.action & TCA_CT_ACT_CLEAR))
-+		attr->ct_attr.nf_ft = act->ct.flow_table;
- 	attr->ct_attr.act_miss_cookie = act->miss_cookie;
- 
- 	return 0;
-@@ -1990,6 +1991,9 @@ mlx5_tc_ct_flow_offload(struct mlx5_tc_ct_priv *priv, struct mlx5_flow_attr *att
- 	if (!priv)
- 		return -EOPNOTSUPP;
- 
-+	if (attr->ct_attr.offloaded)
-+		return 0;
++	if (!MLX5_CAP_GEN_MAX(esw->dev, hca_cap_2))
++		goto out_free;
 +
- 	if (attr->ct_attr.ct_action & TCA_CT_ACT_CLEAR) {
- 		err = mlx5_tc_ct_entry_set_registers(priv, &attr->parse_attr->mod_hdr_acts,
- 						     0, 0, 0, 0);
-@@ -1999,11 +2003,15 @@ mlx5_tc_ct_flow_offload(struct mlx5_tc_ct_priv *priv, struct mlx5_flow_attr *att
- 		attr->action |= MLX5_FLOW_CONTEXT_ACTION_MOD_HDR;
- 	}
- 
--	if (!attr->ct_attr.nf_ft) /* means only ct clear action, and not ct_clear,ct() */
-+	if (!attr->ct_attr.nf_ft) { /* means only ct clear action, and not ct_clear,ct() */
-+		attr->ct_attr.offloaded = true;
- 		return 0;
-+	}
- 
- 	mutex_lock(&priv->control_lock);
- 	err = __mlx5_tc_ct_flow_offload(priv, attr);
-+	if (!err)
-+		attr->ct_attr.offloaded = true;
- 	mutex_unlock(&priv->control_lock);
- 
- 	return err;
-@@ -2021,7 +2029,7 @@ void
- mlx5_tc_ct_delete_flow(struct mlx5_tc_ct_priv *priv,
- 		       struct mlx5_flow_attr *attr)
- {
--	if (!attr->ct_attr.ft) /* no ct action, return */
-+	if (!attr->ct_attr.offloaded) /* no ct action, return */
- 		return;
- 	if (!attr->ct_attr.nf_ft) /* means only ct clear action, and not ct_clear,ct() */
- 		return;
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.h b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.h
-index 8e9316fa46d4..b66c5f98067f 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.h
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en/tc_ct.h
-@@ -29,6 +29,7 @@ struct mlx5_ct_attr {
- 	u32 ct_labels_id;
- 	u32 act_miss_mapping;
- 	u64 act_miss_cookie;
-+	bool offloaded;
- 	struct mlx5_ct_ft *ft;
- };
- 
+ 	memset(query_ctx, 0, query_out_sz);
+ 	err = mlx5_vport_get_other_func_cap(esw->dev, vport->vport, query_ctx,
+ 					    MLX5_CAP_GENERAL_2);
 -- 
 2.41.0
 
