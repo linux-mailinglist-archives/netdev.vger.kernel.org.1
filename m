@@ -1,201 +1,102 @@
-Return-Path: <netdev+bounces-15491-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15492-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 7F461747FEE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 10:42:18 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id E9BE3748039
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 10:56:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B5FC0280FEE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 08:42:16 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFF2B1C20AF4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 08:56:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EFF39442C;
-	Wed,  5 Jul 2023 08:42:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 82881442C;
+	Wed,  5 Jul 2023 08:56:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E38A820F4
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 08:42:14 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E4B7E1717
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 01:42:10 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688546530;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=zOQW6ytwkNKpldl4Gwcyl0hiPfFRDq2NpyrhoTMoIf4=;
-	b=gRyiYeVcidjlPqR6ZLC68Izamqp2Mw1u8lDu0rY/h+PYklb1YvJp8YAe209hRZVobgP3Ky
-	IquRYzQje8Qf9Ar7MgO3zRDgWstdmTmmSTCVoi4aXpKs8q2FUTrFdHFxcyYXgJvze/r3ub
-	QavQaitNtgod7iFtfXfwINCJCpV3rPo=
-Received: from mail-lf1-f70.google.com (mail-lf1-f70.google.com
- [209.85.167.70]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-410-OCOFFtCBN4OQRMwYqAwZpQ-1; Wed, 05 Jul 2023 04:42:09 -0400
-X-MC-Unique: OCOFFtCBN4OQRMwYqAwZpQ-1
-Received: by mail-lf1-f70.google.com with SMTP id 2adb3069b0e04-4fab61bb53bso6448391e87.0
-        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 01:42:08 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688546527; x=1691138527;
-        h=in-reply-to:content-transfer-encoding:content-disposition
-         :mime-version:references:message-id:subject:cc:to:from:date
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=zOQW6ytwkNKpldl4Gwcyl0hiPfFRDq2NpyrhoTMoIf4=;
-        b=J2A6uny9hzJsQaTx5mvmePx00dq/AF9FLNstZEPJ+qg4erQ6VwOwehADZ1tlqeS0rJ
-         JvRiXyySqGZPgk7CoNlWWxQG1HAgFtvvpjjVolHB9dZgLo3t8fo5+MdWP/X9AlQrIul/
-         g6d3gYtnWN/RhBBBggnAIBY/EgFGScb+LkWx0XnGctu4ib4OlsTgr3HU12tYuFs7Qrt4
-         PAlZx4/JzY17m7DjEXSYHkHWtP7CzoTy7viajotonHVNSjRizUMWcCfzakI2nvQaljB5
-         S9SnHsIdF6/TrCE/R5QUS9BptYd++aY7uyUi3kef3xH6t+YP23Zm+uAvqyxITk76ssln
-         tKGw==
-X-Gm-Message-State: ABy/qLZupAhOqu2sX95um3Lz0r3V1hKsvrJyd8XmjGIZL+VVC9Hy82aY
-	qj/kOX+pKbopXHn2TkcQ5A1HeGFxhacNDndTrg8q61ETSa4RIh78dZS877FUc6aMwolvts6bO1t
-	TSME7JqCYp6JZhPTq2XAgvBi4
-X-Received: by 2002:a05:6512:3b9c:b0:4f8:5960:49a9 with SMTP id g28-20020a0565123b9c00b004f8596049a9mr14003103lfv.23.1688546527016;
-        Wed, 05 Jul 2023 01:42:07 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlG/H5pfmSsFn72wPJaF6gCY5W2vcZpPs+es/4FECw46OZpiDrini6ap0HCP3FDgbIRy+g5z/A==
-X-Received: by 2002:a05:6512:3b9c:b0:4f8:5960:49a9 with SMTP id g28-20020a0565123b9c00b004f8596049a9mr14003085lfv.23.1688546526663;
-        Wed, 05 Jul 2023 01:42:06 -0700 (PDT)
-Received: from redhat.com ([2.52.13.33])
-        by smtp.gmail.com with ESMTPSA id p23-20020a1c7417000000b003fbb5506e54sm1460129wmc.29.2023.07.05.01.42.04
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jul 2023 01:42:06 -0700 (PDT)
-Date: Wed, 5 Jul 2023 04:42:02 -0400
-From: "Michael S. Tsirkin" <mst@redhat.com>
-To: Jason Wang <jasowang@redhat.com>
-Cc: Eugenio Perez Martin <eperezma@redhat.com>, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org,
-	Shannon Nelson <shannon.nelson@amd.com>,
-	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
- not support it
-Message-ID: <20230705044151-mutt-send-email-mst@kernel.org>
-References: <20230703142218.362549-1-eperezma@redhat.com>
- <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org>
- <CACGkMEvT4Y+-wfhyi324Y5hhAtn+ZF7cP9d=omdH-ZgdJ-4SOQ@mail.gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 76BDA46A2
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 08:56:05 +0000 (UTC)
+Received: from mout.web.de (mout.web.de [212.227.15.14])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BB2E5171A;
+	Wed,  5 Jul 2023 01:56:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
+ s=s29768273; t=1688547341; x=1689152141; i=markus.elfring@web.de;
+ bh=C1KqKjpxwKpbAikZhY1ncTEJ4kwvEy+fyvwih4CpeR4=;
+ h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
+ b=kPvEaJoT1KtY1qzb8C5npOFy9x3bEzyOlkqEowDq0KvcI1MTfm5DyzVWlCBaioIHodonZxH
+ BXzJdPtviDaZDFlvoEE5FJRfdO1OdICwvJFBbJAXDWOwgZnvZBgvZhlq031lIRVpIi1pXM/xS
+ lyd2rzAYCBVvu5HlFJ/klHzlAceHiLPR9alL1m0jBs72yfVkuOdvfb8KhibDoqgvLT4iY+KK3
+ bItP3V6mMaq6ggqAu3Lj2YlQXKilUqH59TZ/munUbJ1cZ1J1/bEdLNK6sU7s11W8mW0w7xByw
+ y0U0dnUO0JRa5AGY1qrKMeC9K/+4+T6oJy+Ncmj3FxMuwDKOSQdg==
+X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
+Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb006
+ [213.165.67.108]) with ESMTPSA (Nemesis) id 1MQxnv-1qcCkM3I8t-00OAoP; Wed, 05
+ Jul 2023 10:55:41 +0200
+Message-ID: <91519789-a7b3-65ea-8b72-e39852ec4188@web.de>
+Date: Wed, 5 Jul 2023 10:55:32 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CACGkMEvT4Y+-wfhyi324Y5hhAtn+ZF7cP9d=omdH-ZgdJ-4SOQ@mail.gmail.com>
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+To: Minjie Du <duminjie@vivo.com>, netdev@vger.kernel.org,
+ kernel-janitors@vger.kernel.org, Ariel Elior <aelior@marvell.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Jakub Kicinski <kuba@kernel.org>, Manish Chopra <manishc@marvell.com>,
+ Paolo Abeni <pabeni@redhat.com>
+Cc: opensource.kernel@vivo.com, LKML <linux-kernel@vger.kernel.org>
+References: <20230705080819.12282-1-duminjie@vivo.com>
+Subject: Re: [PATCH] drivers: qed: remove duplicate assignments
+Content-Language: en-GB
+From: Markus Elfring <Markus.Elfring@web.de>
+In-Reply-To: <20230705080819.12282-1-duminjie@vivo.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: quoted-printable
+X-Provags-ID: V03:K1:UEtH/H5mM4MU9s55C3QB3TcIqKU8mKf4jOGhbI0vZ99pv2z3Do4
+ 36FPhISNFBAwzEWKcOiJxUX7rGP7buQZm/mrR8dF1NUrtnzH6ZMr5ndYJP77qiAH3uSS/Os
+ A4+ZbiTDlpaL90jSKljShhNghQ5v5mGux2ku8mqgKqaGEdK/l/vt88fII9OuC98+WMiFWjU
+ +GCufzVlh+cpYg4w3V8lw==
+UI-OutboundReport: notjunk:1;M01:P0:YSB8ENFQZ2I=;BDYmg19FNMFO7TAWW1gX81BNiq6
+ vHmCBbEeZSBKULA+w2i3Id0wIphZJ2nJUFUPOAKlbXgkLQnzUFXyOxX/Vj6H+vRr5vT3iWuzk
+ hM0cJ2KaZsrLT74MkQigazpNDk7wdOy04842aOpUH0OBJXlAxExIxhUBnn84cCAZUumIEdn/V
+ 7EfjI3avAeWFfF26vtb+5QjEQ2lIQJUhPZbY6ebYexAzhFZCCI5OnI6+UGi8SomzL4FTQO5zk
+ wb6ah1dWYGIX6PKfmqkBPWny/wb4uL02UT938nRgdEXhWH+hwAeScn9IvKhF8aQQKEmbJsjhT
+ FK0dgWWgkzkmxyGcx9nMZRqqbdqS9fQlPvjtsfasVpwqyZsvdE6ERk22P0p59AwbJ1Zhpg5SH
+ x3DoF7CaApz1YyxkboaBrSgPI8/hqSaKFqxxef76QNAScqnEXbdT8y5iTQ91slIP3LF6IvipV
+ qcJfCQuuuCOcLJDdhFkE+XSON4Aqo5LzZvM4iyjc0H/VtTnmlmj9rZPePyIEgscQmSfD3DvYg
+ JapPQGfpv9pJ8I/o45AW2/MgaEY4btvPTdSZ7vBx6PieYsJi3zfVV/6Q7VN8ZMHW+EBkixJDB
+ o8ka87WOqHSesKsmRtZ3bNX+KrTV3QZdH8Xdp0lZgIWSg1t5hzc+zetbBsFSJFxY1aMQfBDrb
+ 7ypbDS3ga+Nq7K4YGSBfl6FZ0iZEtWMgK+zVHABNb1piMDCl622iEJeWDhuSxLgosnYYksVDb
+ Z+fzTMFmgmc8hOadHCeaYOK0sOnLoPHtBib0tBW/l+6mGnrIrq6aEM6z6sdKpeP+AF2i1ORXy
+ trO6JGM3KO50Kez7dlwIoqlhBUqD+Xe8Rx9twrlh3oN/yDx6KOyoTBYj4OPHQhT2heUIY6FB9
+ MO9EX3cGMXrP1OOzJpABjiM7O8uJ7epgPqDKLvklCh4z9GIxem8cjBeTZ9zoz6yNwBD73KPUy
+ 91zfeQ+hCDFhtJzL2vxrhY8iB6A=
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 05, 2023 at 03:55:23PM +0800, Jason Wang wrote:
-> On Tue, Jul 4, 2023 at 6:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> >
-> > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
-> > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
-> > > >
-> > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
-> > > > > With the current code it is accepted as long as userland send it.
-> > > > >
-> > > > > Although userland should not set a feature flag that has not been
-> > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
-> > > > > complain for it.
-> > > > >
-> > > > > Since there is no specific reason for any parent to reject that backend
-> > > > > feature bit when it has been proposed, let's control it at vdpa frontend
-> > > > > level. Future patches may move this control to the parent driver.
-> > > > >
-> > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
-> > > >
-> > > > Please do send v3. And again, I don't want to send "after driver ok" hack
-> > > > upstream at all, I merged it in next just to give it some testing.
-> > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > >
-> > >
-> > > Current devices do not support that semantic.
-> >
-> > Which devices specifically access the ring after DRIVER_OK but before
-> > a kick?
-> 
-> Vhost-net is one example at last. It polls a socket as well, so it
-> starts to access the ring immediately after DRIVER_OK.
-> 
-> Thanks
+Would a subject like =E2=80=9Cqed: Remove a duplicate assignment in qed_rd=
+ma_create_srq()=E2=80=9D
+be more appropriate?
 
 
-For sure but that is not vdpa.
+> make opaque_fid avoid double assignment.
 
-> >
-> > > My plan was to convert
-> > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
-> > > was not explicit enough.
-> > >
-> > > The only solution I can see to that is to trap & emulate in the vdpa
-> > > (parent?) driver, as talked in virtio-comment. But that complicates
-> > > the architecture:
-> > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > * Store vq enable state separately, at
-> > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
-> > > * Store the doorbell state separately, but do not configure it to the
-> > > device directly.
-> > >
-> > > But how to recover if the device cannot configure them at kick time,
-> > > for example?
-> > >
-> > > Maybe we can just fail if the parent driver does not support enabling
-> > > the vq after DRIVER_OK? That way no new feature flag is needed.
-> > >
-> > > Thanks!
-> > >
-> > > >
-> > > > > ---
-> > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
-> > > > > commit. Please let me know if I should send a v3 of [1] instead.
-> > > > >
-> > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
-> > > > > ---
-> > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > --- a/drivers/vhost/vdpa.c
-> > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
-> > > > >  {
-> > > > >       struct vhost_vdpa *v = filep->private_data;
-> > > > >       struct vhost_dev *d = &v->vdev;
-> > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
-> > > > >       void __user *argp = (void __user *)arg;
-> > > > >       u64 __user *featurep = argp;
-> > > > > -     u64 features;
-> > > > > +     u64 features, parent_features = 0;
-> > > > >       long r = 0;
-> > > > >
-> > > > >       if (cmd == VHOST_SET_BACKEND_FEATURES) {
-> > > > >               if (copy_from_user(&features, featurep, sizeof(features)))
-> > > > >                       return -EFAULT;
-> > > > > +             if (ops->get_backend_features)
-> > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
-> > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
-> > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
-> > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) |
-> > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > +                              parent_features))
-> > > > >                       return -EOPNOTSUPP;
-> > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
-> > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > --
-> > > > > 2.39.3
-> > > >
-> >
+Would the following change description be a bit nicer?
 
+
+Delete a duplicate statement from this function implementation.
+
+
+Regards,
+Markus
 
