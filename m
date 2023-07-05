@@ -1,124 +1,96 @@
-Return-Path: <netdev+bounces-15477-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15478-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3932747E2F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 09:24:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 37544747E55
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 09:33:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 61BD9280F67
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 07:24:42 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 64F0E280FDA
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 07:33:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3FBC41872;
-	Wed,  5 Jul 2023 07:24:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8DE1F1874;
+	Wed,  5 Jul 2023 07:33:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2FDD6138F
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 07:24:39 +0000 (UTC)
-Received: from mail-ej1-x635.google.com (mail-ej1-x635.google.com [IPv6:2a00:1450:4864:20::635])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A891110DD;
-	Wed,  5 Jul 2023 00:24:38 -0700 (PDT)
-Received: by mail-ej1-x635.google.com with SMTP id a640c23a62f3a-99364ae9596so356735066b.1;
-        Wed, 05 Jul 2023 00:24:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688541877; x=1691133877;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=yBZ2V9YkgQb75fgLLwSDoK6jYDOYm9Ulfp2E4lReMu4=;
-        b=Ft35BGtfPjUdUryqBygCiZrglZi6RQf2Uq33+EgA0PHGC9flgpkea796/5npXeaU++
-         Fih8p0t82f+/DG0P3vVkiv8BOKDDFO8KYd3a223NUyrQRCyzPihenOF/qCb3hyDFpwOw
-         RjkFpPbNfnlrOaGNK75AbYq/jninFCMWeiwYLCAXZyZrJwmBv4NZxcg0AiUVVShaeR8S
-         8oaaOAKXVRP7xLGGvvS6kyRoZci1QMmuBHVtTvY+2Pj9aFdV/EQLboUzRBt06GCj4MDc
-         CgzOd9blKo7RLN5OYBur6/Q2WG0hSwUGI6S7zz+3G6o5ctC829YZJOBXasBINlzadVee
-         LB3A==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688541877; x=1691133877;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=yBZ2V9YkgQb75fgLLwSDoK6jYDOYm9Ulfp2E4lReMu4=;
-        b=Ht2gP1QfOhKd+lV1p16gEXS4bPhBx9HJ08oeW585YX+4ZbRwa4LS3NbiC3av+6v5eI
-         GriVsPamOuYHsbEtwzV40/MWG0WwP+7gxGaUwxbZopDb9dSnbQ0MrVFzwq7yl8LWV1qy
-         SuCJnRqB3QhfsD+1L42zZVXQ/TnHmHaHplmEAN6CD5H0FJQf9eoyM6shYgoI9h7JyJTq
-         jR/jqyFyxmSLV31fuv3qbzTdCt7ojJzmsEMdywzrXRswC4XeXofPJ9vZwEdQeQm6aS7i
-         iOFEMq73r7HWrPzX0Y3cutaRgQJEtNrznOHC/fH2hcn6rWWUdRGdL2F/uiOkpAGYwElF
-         tyKg==
-X-Gm-Message-State: AC+VfDxrRBN7PGPFaBMkWyOusmQQpreX5OAKwE6Myp0aUdMIywclRvcI
-	N3ZHkV/VOMgt6uuzjibU/rFkV2TXLgZe/lLHVWpyCiemkfN2Wg==
-X-Google-Smtp-Source: APBJJlEzktWAFzDyfTdF5aq95BVbZzgxZ4ow0qDGxVedpqTLBRPqSrErSM08kh3Ba8Fnen97931YBN7ZnQZfEtTq87k=
-X-Received: by 2002:a17:907:100c:b0:973:ca9c:3e43 with SMTP id
- ox12-20020a170907100c00b00973ca9c3e43mr10435369ejb.45.1688541876875; Wed, 05
- Jul 2023 00:24:36 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7D1841872
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 07:33:36 +0000 (UTC)
+Received: from 167-179-156-38.a7b39c.syd.nbn.aussiebb.net (167-179-156-38.a7b39c.syd.nbn.aussiebb.net [167.179.156.38])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2420C10FB;
+	Wed,  5 Jul 2023 00:33:35 -0700 (PDT)
+Received: from gwarestrin.arnor.me.apana.org.au ([192.168.103.7])
+	by fornost.hmeau.com with smtp (Exim 4.94.2 #2 (Debian))
+	id 1qGx0n-000X7d-6C; Wed, 05 Jul 2023 17:33:18 +1000
+Received: by gwarestrin.arnor.me.apana.org.au (sSMTP sendmail emulation); Wed, 05 Jul 2023 15:33:10 +0800
+Date: Wed, 5 Jul 2023 15:33:10 +0800
+From: Herbert Xu <herbert@gondor.apana.org.au>
+To: David Howells <dhowells@redhat.com>
+Cc: netdev@vger.kernel.org,
+	Ondrej =?utf-8?B?TW9zbsOhxI1law==?= <omosnacek@gmail.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Jens Axboe <axboe@kernel.dk>,
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org
+Subject: Re: [PATCH net] crypto: af_alg: Fix merging of written data into
+ spliced pages
+Message-ID: <ZKUctqIKfJ31FtOr@gondor.apana.org.au>
+References: <1585899.1688486184@warthog.procyon.org.uk>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230429020951.082353595@lindbergh.monkeyblade.net>
- <CAAJw_ZueYAHQtM++4259TXcxQ_btcRQKiX93u85WEs2b2p19wA@mail.gmail.com>
- <ZE0kndhsXNBIb1g7@debian.me> <b9ab37d2-42bf-cc31-a2c0-a9b604e95530@gmail.com>
-In-Reply-To: <b9ab37d2-42bf-cc31-a2c0-a9b604e95530@gmail.com>
-From: Jeff Chua <jeff.chua.linux@gmail.com>
-Date: Wed, 5 Jul 2023 15:24:23 +0800
-Message-ID: <CAAJw_Zug6VCS5ZqTWaFSr9sd85k=tyPm9DEE+mV=AKoECZM+sQ@mail.gmail.com>
-Subject: Linux-6.5 iwlwifi crash
-To: lkml <linux-kernel@vger.kernel.org>
-Cc: Gregory Greenman <gregory.greenman@intel.com>, Kalle Valo <kvalo@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Linux Wireless <linux-wireless@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>, 
-	Linux Regressions <regressions@lists.linux.dev>, Bagas Sanjaya <bagasdotme@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <1585899.1688486184@warthog.procyon.org.uk>
+X-Spam-Status: No, score=2.7 required=5.0 tests=BAYES_00,HELO_DYNAMIC_IPADDR2,
+	PDS_RDNS_DYNAMIC_FP,RDNS_DYNAMIC,SPF_HELO_NONE,SPF_PASS,TVD_RCVD_IP,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Level: **
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Latest linux-6.4 after June 27 crash my whole linux notebook once
-iwlwifi is loaded. Anyone seeing this?
+On Tue, Jul 04, 2023 at 04:56:24PM +0100, David Howells wrote:
+>     
+> af_alg_sendmsg() takes data-to-be-copied that's provided by write(),
+> send(), sendmsg() and similar into pages that it allocates and will merge
+> new data into the last page in the list, based on the value of ctx->merge.
+> 
+> Now that af_alg_sendmsg() accepts MSG_SPLICE_PAGES, it adds spliced pages
+> directly into the list and then incorrectly appends data to them if there's
+> space left because ctx->merge says that it can.  This was cleared by
+> af_alg_sendpage(), but that got lost.
+> 
+> Fix this by skipping the merge if MSG_SPLICE_PAGES is specified and
+> clearing ctx->merge after MSG_SPLICE_PAGES has added stuff to the list.
+> 
+> Fixes: bf63e250c4b1 ("crypto: af_alg: Support MSG_SPLICE_PAGES")
+> Reported-by: Ondrej Mosnáček <omosnacek@gmail.com>
+> Link: https://lore.kernel.org/r/CAAUqJDvFuvms55Td1c=XKv6epfRnnP78438nZQ-JKyuCptGBiQ@mail.gmail.com/
+> Signed-off-by: David Howells <dhowells@redhat.com>
+> cc: Herbert Xu <herbert@gondor.apana.org.au>
+> cc: Paolo Abeni <pabeni@redhat.com>
+> cc: "David S. Miller" <davem@davemloft.net>
+> cc: Eric Dumazet <edumazet@google.com>
+> cc: Jakub Kicinski <kuba@kernel.org>
+> cc: linux-crypto@vger.kernel.org
+> cc: netdev@vger.kernel.org
+> ---
+>  crypto/af_alg.c |    7 ++++---
+>  1 file changed, 4 insertions(+), 3 deletions(-)
 
-Bisect? Or there's a patch for this?
+Thanks for fixing this David!
 
-# modprobe iwlwifi
-... Whole system frozen!
-
-
-Here's my system before the crash ...
-
-# dmesg
-cfg80211: Loading compiled-in X.509 certificates for regulatory database
-Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
-iwlwifi 0000:00:14.3: enabling device (0000 -> 0002)
-iwlwifi 0000:00:14.3: api flags index 2 larger than supported by driver
-thermal thermal_zone1: failed to read out thermal zone (-61)
-iwlwifi 0000:00:14.3: Sorry - debug buffer is only 4096K while you
-requested 65536K
-
-# lspci
-00:14.3 Network controller: Intel Corporation Alder Lake-P PCH CNVi
-WiFi (rev 01)
-
-# linux git log
-commit d528014517f2b0531862c02865b9d4c908019dc4 (HEAD -> master,
-origin/master, origin/HEAD)
-Author: Linus Torvalds <torvalds@linux-foundation.org>
-Date:   Tue Jul 4 15:05:12 2023 -0700
-
-# lsmodModule                  Size  Used by
-iwlmvm                397312  0
-mac80211              626688  1 iwlmvm
-iwlwifi               307200  1 iwlmvm
-cfg80211              413696  3 iwlmvm,iwlwifi,mac80211
-
-
-Bisect?
-
-Thanks,
-Jeff.
+I'll push it out soon.
+-- 
+Email: Herbert Xu <herbert@gondor.apana.org.au>
+Home Page: http://gondor.apana.org.au/~herbert/
+PGP Key: http://gondor.apana.org.au/~herbert/pubkey.txt
 
