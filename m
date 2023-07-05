@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-15601-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15602-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 394F9748B1C
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:58:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A6EE7748B1D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:58:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4C671280D36
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:58:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D83191C20B5A
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:58:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CDFEB13AF3;
-	Wed,  5 Jul 2023 17:58:18 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8117D1426C;
+	Wed,  5 Jul 2023 17:58:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7303713AC4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4277713AE7
 	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:58:17 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id D0765C433C7;
-	Wed,  5 Jul 2023 17:58:16 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BFAD8C433C9;
+	Wed,  5 Jul 2023 17:58:17 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688579896;
-	bh=lvm7QCPfN9SheaRCpR/H++5WVkAoN/AJof5ylAnX7ZE=;
+	s=k20201202; t=1688579897;
+	bh=AiOvjIWc6l7HOJCJDI3ZP1yivqFs7OHnrnSUUXcRC8o=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=NXdJ/H1OEmprbu/KgldZxaeKM/CzbiAIW80cGpLGyFMmi3xnejgLExwa2f749xUON
-	 Rs53IsYFvy28AHv6MrDq5vhzxMbT9hzY93dybHazyI6TbtLdQDq9dglrZ5CuXWRl1B
-	 GHUomuBSseLfw358fz3Wqcr+kgFQ3ttlWkQIQjgI7dvp8H06wwBzO3XKdVL/h4cEAW
-	 E6MVeiKBdOTB+YVPKydxXh2Oa8GrUN6pai2ytFgMfdPZBoQCSFiRy6j/zGnldQTWCi
-	 qTUQLGuyH0aV4t0aPGrDJH2oo/BOLVox/oM+8eWcUVn9lQeOcgnDW5MV7qkw9h1LTX
-	 PtQaPw+tdEmKQ==
+	b=vDo+BHKAMNcVHjOSh+mb5pw/nXF8TVfFIGTVAXM3Ip03D8ZYtuD9R+ofUiigL/mS9
+	 fVydhTZIZ0rYUgUYXjMBP0wGwXNGABcH00eFIiaZfIG7tdl2FgpyjdoT2AiprBkIVe
+	 RWZ6u/lcUJOxauWkqeJWf6S4QwWumimWwAfIf41IT9KtqT7NwCzSFvt5bHsRSbMZ5U
+	 FDFy/5agxCCnzH8Gsg+aVnMdZrT/V/tyopaGzezkhpbWBKMUyeKEh5jzKnAdw2ftnO
+	 tZ3I18AL+46n8xSyOKNu9/HFFo3KZAzLVEw/u2cPCrNkoXw4qbgXZ/ZAstqSfSStVs
+	 zb5qYXYHBIiHA==
 From: Saeed Mahameed <saeed@kernel.org>
 To: "David S. Miller" <davem@davemloft.net>,
 	Jakub Kicinski <kuba@kernel.org>,
@@ -38,10 +38,12 @@ To: "David S. Miller" <davem@davemloft.net>,
 Cc: Saeed Mahameed <saeedm@nvidia.com>,
 	netdev@vger.kernel.org,
 	Tariq Toukan <tariqt@nvidia.com>,
-	Zhengchao Shao <shaozhengchao@huawei.com>
-Subject: [net V2 1/9] net/mlx5e: fix double free in mlx5e_destroy_flow_table
-Date: Wed,  5 Jul 2023 10:57:49 -0700
-Message-ID: <20230705175757.284614-2-saeed@kernel.org>
+	Zhengchao Shao <shaozhengchao@huawei.com>,
+	Simon Horman <simon.horman@corigine.com>,
+	Rahul Rameshbabu <rrameshbabu@nvidia.com>
+Subject: [net V2 2/9] net/mlx5e: fix memory leak in mlx5e_fs_tt_redirect_any_create
+Date: Wed,  5 Jul 2023 10:57:50 -0700
+Message-ID: <20230705175757.284614-3-saeed@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230705175757.284614-1-saeed@kernel.org>
 References: <20230705175757.284614-1-saeed@kernel.org>
@@ -55,31 +57,44 @@ Content-Transfer-Encoding: 8bit
 
 From: Zhengchao Shao <shaozhengchao@huawei.com>
 
-In function accel_fs_tcp_create_groups(), when the ft->g memory is
-successfully allocated but the 'in' memory fails to be allocated, the
-memory pointed to by ft->g is released once. And in function
-accel_fs_tcp_create_table, mlx5e_destroy_flow_table is called to release
-the memory pointed to by ft->g again. This will cause double free problem.
+The memory pointed to by the fs->any pointer is not freed in the error
+path of mlx5e_fs_tt_redirect_any_create, which can lead to a memory leak.
+Fix by freeing the memory in the error path, thereby making the error path
+identical to mlx5e_fs_tt_redirect_any_destroy().
 
-Fixes: c062d52ac24c ("net/mlx5e: Receive flow steering framework for accelerated TCP flows")
+Fixes: 0f575c20bf06 ("net/mlx5e: Introduce Flow Steering ANY API")
 Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Reviewed-by: Rahul Rameshbabu <rrameshbabu@nvidia.com>
 Signed-off-by: Saeed Mahameed <saeedm@nvidia.com>
 ---
- drivers/net/ethernet/mellanox/mlx5/core/en_accel/fs_tcp.c | 1 +
- 1 file changed, 1 insertion(+)
+ drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c | 6 +++---
+ 1 file changed, 3 insertions(+), 3 deletions(-)
 
-diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/fs_tcp.c b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/fs_tcp.c
-index 88a5aed9d678..c7d191f66ad1 100644
---- a/drivers/net/ethernet/mellanox/mlx5/core/en_accel/fs_tcp.c
-+++ b/drivers/net/ethernet/mellanox/mlx5/core/en_accel/fs_tcp.c
-@@ -190,6 +190,7 @@ static int accel_fs_tcp_create_groups(struct mlx5e_flow_table *ft,
- 	in = kvzalloc(inlen, GFP_KERNEL);
- 	if  (!in || !ft->g) {
- 		kfree(ft->g);
-+		ft->g = NULL;
- 		kvfree(in);
- 		return -ENOMEM;
- 	}
+diff --git a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+index 03cb79adf912..be83ad9db82a 100644
+--- a/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
++++ b/drivers/net/ethernet/mellanox/mlx5/core/en/fs_tt_redirect.c
+@@ -594,7 +594,7 @@ int mlx5e_fs_tt_redirect_any_create(struct mlx5e_flow_steering *fs)
+ 
+ 	err = fs_any_create_table(fs);
+ 	if (err)
+-		return err;
++		goto err_free_any;
+ 
+ 	err = fs_any_enable(fs);
+ 	if (err)
+@@ -606,8 +606,8 @@ int mlx5e_fs_tt_redirect_any_create(struct mlx5e_flow_steering *fs)
+ 
+ err_destroy_table:
+ 	fs_any_destroy_table(fs_any);
+-
+-	kfree(fs_any);
++err_free_any:
+ 	mlx5e_fs_set_any(fs, NULL);
++	kfree(fs_any);
+ 	return err;
+ }
 -- 
 2.41.0
 
