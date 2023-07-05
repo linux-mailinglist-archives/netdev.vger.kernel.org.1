@@ -1,283 +1,286 @@
-Return-Path: <netdev+bounces-15590-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15587-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 354C1748A82
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:32:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C2A11748A67
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:30:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0C1A280DB1
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:32:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BCE1C20B9F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:30:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 153C4134BB;
-	Wed,  5 Jul 2023 17:32:05 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58878134AD;
+	Wed,  5 Jul 2023 17:30:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E158D9470
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:32:04 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0A5431BEF;
-	Wed,  5 Jul 2023 10:31:23 -0700 (PDT)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365ELHiM007736;
-	Wed, 5 Jul 2023 19:29:48 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=from : to : cc :
- subject : date : message-id : in-reply-to : references : mime-version :
- content-transfer-encoding : content-type; s=selector1;
- bh=oxvOgEF9cvRzCwfkDelwx7si1C+N2VuboXigLVR2SWA=;
- b=xvOY8m0QodXwBZhsM5T5ELcmsFzBcK0qMv6Qs6hI88hnRwBkFB/ysw0DZwZNS/iobXNl
- I0cYXFRnIZz7I/iEDI3bpcPn+zk0PitWpNNMHMe0z06nqOKI3FuLJP+y5wWrLgSLg7HH
- vfyeYlPA0S1CbOrphhlesXe6Lq0BftoFErxYR1F0L7yKWHqkK4+67PQghl8QfA1lyrIr
- JCnNAxreYxI5KIMus4YvhsJQHutLzJY9o/98Z2fqQyGMNquLhuUjHd2+wU+ouZea00Qi
- 5Cp9uxFBXQMIASgwij832gWHVXXvMJU4x5pqoJyREDktLaQBWkv3VHl/9R9P+8Os4giD mQ== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rna75h45d-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jul 2023 19:29:48 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 4F782100057;
-	Wed,  5 Jul 2023 19:29:48 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 4659024C434;
-	Wed,  5 Jul 2023 19:29:48 +0200 (CEST)
-Received: from localhost (10.201.21.121) by SHFDAG1NODE1.st.com (10.75.129.69)
- with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 5 Jul
- 2023 19:29:47 +0200
-From: Gatien Chevallier <gatien.chevallier@foss.st.com>
-To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <conor+dt@kernel.org>, <alexandre.torgue@foss.st.com>,
-        <vkoul@kernel.org>, <jic23@kernel.org>, <olivier.moysan@foss.st.com>,
-        <arnaud.pouliquen@foss.st.com>, <mchehab@kernel.org>,
-        <fabrice.gasnier@foss.st.com>, <andi.shyti@kernel.org>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>, <hugues.fruchet@foss.st.com>, <lee@kernel.org>,
-        <will@kernel.org>, <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>
-CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>,
-        Gatien Chevallier
-	<gatien.chevallier@foss.st.com>
-Subject: [PATCH 08/10] bus: etzpc: introduce ETZPC firewall controller driver
-Date: Wed, 5 Jul 2023 19:27:57 +0200
-Message-ID: <20230705172759.1610753-9-gatien.chevallier@foss.st.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4121B9470
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:30:31 +0000 (UTC)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657971FFB;
+	Wed,  5 Jul 2023 10:29:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688578196; x=1720114196;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=sSa39Ynd5Wfm/pwyvbZC+CkdbKauksRmdbGaQqwdQHg=;
+  b=CLuiSz6IsSjM5sHKpOw5oBQG5jR+Sklv2aofCPGqnqmz6UzOAMzv2BSF
+   kzKWT2mQ7zEmUh4jBupwwn2GYMfxWmlpfiRVZrWhJ637il8tFr+iD720G
+   4QvVN4bulNRUN0cQdc/7CL2JupZ5XDV2hcZR2sWlfEUaKVSaFP4uv9CUD
+   PGxlHkeCbok0UzauIkdQtjyZDtWFtcn114ClIiQXxojbZ6SQ6BIK0ppPy
+   nAk8oYrY4oWv1vAeqkdX4CYvXQPeAWTqANw5Imb77ZBYFNVXCCbJXeB5u
+   WadI3O7B7CEOah67xrLYNMqZNRJ2gwUOuYFv3DDKLPQOSv18yTbAvMt0M
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="365973126"
+X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
+   d="scan'208";a="365973126"
+Received: from orsmga008.jf.intel.com ([10.7.209.65])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 10:29:43 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="748810510"
+X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
+   d="scan'208";a="748810510"
+Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
+  by orsmga008.jf.intel.com with ESMTP; 05 Jul 2023 10:29:43 -0700
+Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
+ ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 5 Jul 2023 10:29:42 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 5 Jul 2023 10:29:42 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 5 Jul 2023 10:29:42 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GSHV72ox0bxE/Cs5OID/i/EbI/pxRfSYnczMLK70kT3Hl3tNl+p1tYct2lcgmreWIwpqNJlt94dLj2MXuRZFuh+g3L6CFEEtm0rbCg2EOnmIPo7eJ18JIlq8g8gqAg9E08ZGEO7yOObiVWSDq0mTx1EkbCeqwlhYDfSuiRdI2F2sXBvid66NS1032Ykyq0/up1g4qCNTpVR1iwbJ5fUYhLQu2EU+B9N/QdBRms8vtleAV6VA4e+26k66OkHTzg5czleWeLtUU5+55jc5xReUk7p6vL3sFG+f6J+47KoZ/Ku3BsS7wbz1J0GLs8Yg7TgRqx/mKRF0kcVlQ7qOTBjKMQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=S/iIrIHpi3jJ1Q7EEq0nTXEF2Ky3lBml62B6m9k7LtU=;
+ b=e3ebJcDc3WB6Xzd+DRZib/b02deKu6LfihtpC7DOJoLg1rOMthF1yVI7tXV7NVC4/uP9qsdmmyxQQiyDA6Lq1o0V2PQu7XFCJOrqDYZ5my0OTwxd9wI54SSKutDbRI+0Slgq1Ll7mXScNNxplDK0ppGJWZVIkGqFsvgJM0uPHtaYpYjTFpVTmKfdGpvr+w3QDmGWhEJAbRYhX0YP56KYU4/A2pI74nQTrmfXAzalqqHJitbp1S/Dima0K/e/fXv1s2ykEt7K/YHjc4YOaVAdanlDW20usANQsnW4jcdzGTgosEQDTByVe/WKt73Vf6c889Tv+xOQ17+iTcX/h8x8tA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
+ by PH7PR11MB6699.namprd11.prod.outlook.com (2603:10b6:510:1ad::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
+ 2023 17:29:40 +0000
+Received: from CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4e5a:e4d6:5676:b0ab]) by CO1PR11MB5089.namprd11.prod.outlook.com
+ ([fe80::4e5a:e4d6:5676:b0ab%5]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
+ 17:29:40 +0000
+Message-ID: <ca4d9186-705c-8a69-7fce-7cff884989c0@intel.com>
+Date: Wed, 5 Jul 2023 10:29:38 -0700
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net v2] nfp: clean mc addresses in application firmware
+ when closing port
+To: Yinjun Zhang <yinjun.zhang@corigine.com>, Alexander Lobakin
+	<aleksander.lobakin@intel.com>, Louis Peens <louis.peens@corigine.com>
+CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>, Simon Horman <simon.horman@corigine.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>, oss-drivers <oss-drivers@corigine.com>
+References: <20230703120116.37444-1-louis.peens@corigine.com>
+ <4012ae37-f674-9e58-ec2a-672e9136576a@intel.com>
+ <DM6PR13MB3705E98ABE2CA8B2B677E055FC2EA@DM6PR13MB3705.namprd13.prod.outlook.com>
+Content-Language: en-US
+From: Jacob Keller <jacob.e.keller@intel.com>
+In-Reply-To: <DM6PR13MB3705E98ABE2CA8B2B677E055FC2EA@DM6PR13MB3705.namprd13.prod.outlook.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: MW4PR02CA0007.namprd02.prod.outlook.com
+ (2603:10b6:303:16d::33) To CO1PR11MB5089.namprd11.prod.outlook.com
+ (2603:10b6:303:9b::16)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-05_09,2023-07-05_01,2023-05-22_02
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB6699:EE_
+X-MS-Office365-Filtering-Correlation-Id: 84c34b6f-8ba2-44e3-7562-08db7d7d69c2
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: iNqhRhtQ2Q/UrdGnZ76WiZQZ0ityJrqrm6jwnYDR4jMzHkVIYO5z9Wkszq/KnLaO3l7o5DCL5EA8+vaigsjcnwZUkB40gBhoCnVs0fSjBTQvf48wP1vF6bBOHV+swG/GZvMgBzMaIzsnomqHEfHyRPiXTsW+823IxuwMZ1m9fOO7PHEhMZ0qJ8dIINSboLGHWmeZjr5Yg+LPkQBu98TX8YUuaj2mJqnQkU44aRMHxSqj+Mnkcm99VpRBiakhweELzwgKOzrlWc4qeebkgzMASEtxkNHEpbf1mzczgSKfDaNSn1mlZ5Pkub+CxuSleWkAABLwen95pHgDEbb8JSRr3gQL5VwJhlA8jKA9nOiF3wg2/zvZVYE9gtcYXYS3Ue/cODqLeaxaQgqucWxvxddp3un6mBNS+OUJzkqrqKyfLb7mpOH3Lm+CXjxQMr+scstJHX5xVbPBPfU8Ju7Jd6Zi4iAmJCJsD3rpQslJsK1gahXXB3ZfbGGL2kAr4iFxrUgpqq9w0H50CP1qTc+ydtzpspkrKj9ml5Zq0cKVmGDKSop+gl9bKgslG5zwqVS9O/1R7kkzxRv2ROMQbvPlR28PP8dh83/BmN7jn5ofvrlYT4gTTyMnmfCHylmQGxhqOD2ZM+rytcHqA60lmKowlR/tUg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(346002)(136003)(376002)(39860400002)(451199021)(38100700002)(66476007)(66556008)(4326008)(66946007)(82960400001)(2616005)(186003)(86362001)(31696002)(6486002)(6512007)(36756003)(478600001)(26005)(53546011)(110136005)(6506007)(54906003)(8676002)(8936002)(5660300002)(31686004)(2906002)(41300700001)(316002)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TUtXTnU5cGh5VUhMTGZBR243QzZWUXQvSmZOUGNySnhNLzdmZDExOXpPWGNI?=
+ =?utf-8?B?bTdVSFJjNUhyNWl1OVdyWDVvaXpYZS81bkZoOU5ad01OK0pDNFVWSVFGUkRk?=
+ =?utf-8?B?R3ptcGJUUUJNckdqVnkzYkovM2wxUC95NU41STdBMmQwb01yV1ZYTlBZbm1F?=
+ =?utf-8?B?ZVNwQzNDT2p4citGNDlDeTVmM21sYk9lYXJoYkxDQjZKRWNlK3V1N05tS2pT?=
+ =?utf-8?B?ZmpQS0JCaERJYVM0bHpKQ0Q4dXZWR0pjRXFlVVUvMCtENldQaVd1R0VGaExm?=
+ =?utf-8?B?NG1pT1lEUVJrZ0VuOEluS0JyQlljcnJLR2lNWm5IUTdFVERiYkVJOWFQTlZi?=
+ =?utf-8?B?SkJvT1ZhRzB3blF6ZjJnUU5DZFp1N3FmZ1BLUmFERHdjek9ETmJrV3M1ZHYx?=
+ =?utf-8?B?dzFxZFNtN3ZDdVJVZExxbUU3ZS81ZGdSUUkvYldaaXNRL1lHTkF6OXAva2RZ?=
+ =?utf-8?B?bXdHdHBYb2dyVVMyclBwSzdINWZEb1VCbVhxTExjZ3dmMEo3U2Fmb01NRWhi?=
+ =?utf-8?B?Z3ZaQ0RZeEhycWRPTjFydzVUWHBscGZEcXExK2d0Z1NLSWducVhIam9FU2l6?=
+ =?utf-8?B?U0xPSXF1bTBtM0txbWtCNWhiTS9TM1dScDVCWWREdHNoOHZONmNNTSs4bGNV?=
+ =?utf-8?B?VDBiVkZFaVlxTWFwMVFrclBoY1pYWURzSGhCQ2xsUzJBaHhMdkptNGFHbVBF?=
+ =?utf-8?B?RlVlRHJWRmg1TGRKeGhrVkdxV3pVVllhSXhNKzB3SytUZUF4QnNPbmFxdjlo?=
+ =?utf-8?B?UEtYMzJQUEQ0bzVra0dlMk5nWDZxRGdCYzAzdG1ieW4rZjBkSmNxWUFFNUtF?=
+ =?utf-8?B?amc1bDdXN3E1a0FjeTVvc3ZZR3VkYWc0Nm1iV01SbVgwYW80cGN4UjMzbmh4?=
+ =?utf-8?B?dU43TFQ2dkxobCs5QXZ2WmZhSDF4aVp6eFFWc0QweVFYdzZDNkxJWTlKTnpV?=
+ =?utf-8?B?RVY3L3A4Zkk1OGNoLzdNbkxQU1ZaVHIydlVtTEFvRG93SStLVGxzcmp2Wlhq?=
+ =?utf-8?B?UG5RTDBOcmhiZks0R1dWZ0JISXNqNWxZZGFXaUtYeW5xbFdrWnF0SVFQbk5H?=
+ =?utf-8?B?dmFYWGNyay9uSmI5SVhneWllSGc2bHdac2dFWHk2QjNyMWVIb2Zuc0J3bWxp?=
+ =?utf-8?B?ajErbDk3Y1YzZEhsb2lwOTlqSXhYcDl6M2VGM3dZZnZDZHlYWVdpVWptNkh5?=
+ =?utf-8?B?emZSYmtHdkZZWGhpakxoeTloK1VmQzJrODdiWVBVdEtpTHFMelZJamdwa0Vt?=
+ =?utf-8?B?UW9ZMlFDQm1qZjhLWnh0OWsrR2s2SkpzNlhVa2FWeGdaZVp0VEI4bTBmdThK?=
+ =?utf-8?B?RzN1TTRtakVZRTR6M0ZvVW4zTXd2R3R0UEkwNWo1UG8wYTR4aDRRSCs5amZt?=
+ =?utf-8?B?ejRzdmV3Mk9KdXYrWGwvemNBSFYxMmhkeTc4WXpUZjl1SGdiQ2dyUGZ3clgz?=
+ =?utf-8?B?U3VIaXBwNm80SEg0UGt6V25iUDBqR0dmcXhLTzZOQ1FqNTRhUkxkbG1jYlQ3?=
+ =?utf-8?B?ci9UQnhiU215cTdJbk83b2I0MG91OXNIN2pMcjR5UEdLWHIzNjdvZjF0czkw?=
+ =?utf-8?B?cENydDlSaVVXNjk0VDBqUkpXZnRjeTZMM05MZFVSemtuOFV2L0ppdEw1OWM5?=
+ =?utf-8?B?azdsbkp0WTRjZEJ5WldleW9mUXFrVExMbTFrTUJReHFZYVptcEtmeWhuelBt?=
+ =?utf-8?B?NHduNTlkcy9Yb2xJN2xCS0Z1bWNOT3VORmNhVm5tNlppcFdBZkwvUVF6L0gv?=
+ =?utf-8?B?b0xHRWZUQ1hPRUIwdzgzTmZiQlNHdzRXWkNlVUNtR21Md0dIdnBHRWNZUTJ1?=
+ =?utf-8?B?TTl1dHJaOHprSnRKMld5Q0VRN3JNMzdHNXMrSTRUREVRdVlxTU9BQkJBSy9U?=
+ =?utf-8?B?bE1nN285TktuZnpUaitQaDlScXhFL0FCOEpaWHAwa3A0WDFUR3Y1SlM1QVNN?=
+ =?utf-8?B?M3JhbWQ0eGRSUndtODFwYW9GNHo3aDVscm9sS1RtTEtwWjhjckZpendUa2pE?=
+ =?utf-8?B?a0hsSmo2K3V5RTk1ZmZnUi95ZG1ZSVBKakJKNnlsVXhoYWVUNmxoeXRrRE9B?=
+ =?utf-8?B?WWdFZ3MyOVhva0RXRnI0TVlDSlN0RUtWM1hUUXlFa1o3Z0hydE9nTWZYRVpo?=
+ =?utf-8?B?WktaWFdXenRQNFdNd2ZVdEpnQXcxYkVJWlBqdmFjaWVRYURzcjQrWEx2SlpX?=
+ =?utf-8?B?c2c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 84c34b6f-8ba2-44e3-7562-08db7d7d69c2
+X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 17:29:40.3266
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: IWOyZKfZTqSHKAcg+iK12ZVGInEtKkLc0iS4Vn3eLWWY83Y7J/zTdEi1yOeFWVhmv5G/THWAx8NbiuF9+wrJQpjK2uHbBztME03Srt0IKaM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6699
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-ETZPC is a peripheral and memory firewall controller that filter accesses
-based on Arm TrustZone secure state and Arm CPU privilege execution level.
-It handles MCU isolation as well.
 
-Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
----
- MAINTAINERS               |   1 +
- drivers/bus/Makefile      |   2 +-
- drivers/bus/stm32_etzpc.c | 137 ++++++++++++++++++++++++++++++++++++++
- 3 files changed, 139 insertions(+), 1 deletion(-)
- create mode 100644 drivers/bus/stm32_etzpc.c
 
-diff --git a/MAINTAINERS b/MAINTAINERS
-index 1ea2f9f60b43..51f5bced7b9b 100644
---- a/MAINTAINERS
-+++ b/MAINTAINERS
-@@ -20126,6 +20126,7 @@ F:	drivers/media/i2c/st-mipid02.c
- ST STM32 FIREWALL
- M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
- S:	Maintained
-+F:	drivers/bus/stm32_etzpc.c
- F:	drivers/bus/stm32_firewall.c
- F:	drivers/bus/stm32_rifsc.c
- 
-diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
-index e50d18e1d141..cddd4984d6af 100644
---- a/drivers/bus/Makefile
-+++ b/drivers/bus/Makefile
-@@ -26,7 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
- obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
- obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
- obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
--obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o stm32_rifsc.o
-+obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o stm32_rifsc.o stm32_etzpc.o
- obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
- obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
- obj-$(CONFIG_OF)		+= simple-pm-bus.o
-diff --git a/drivers/bus/stm32_etzpc.c b/drivers/bus/stm32_etzpc.c
-new file mode 100644
-index 000000000000..2ef5ab738f87
---- /dev/null
-+++ b/drivers/bus/stm32_etzpc.c
-@@ -0,0 +1,137 @@
-+// SPDX-License-Identifier: GPL-2.0
-+/*
-+ * Copyright (C) 2023, STMicroelectronics - All Rights Reserved
-+ */
-+
-+#include <linux/bitfield.h>
-+#include <linux/bits.h>
-+#include <linux/device.h>
-+#include <linux/err.h>
-+#include <linux/init.h>
-+#include <linux/io.h>
-+#include <linux/kernel.h>
-+#include <linux/module.h>
-+#include <linux/of.h>
-+#include <linux/of_platform.h>
-+#include <linux/platform_device.h>
-+#include <linux/types.h>
-+
-+#include "stm32_firewall.h"
-+
-+/*
-+ * ETZPC registers
-+ */
-+#define ETZPC_DECPROT			0x10
-+#define ETZPC_HWCFGR			0x3F0
-+
-+/*
-+ * HWCFGR register
-+ */
-+#define ETZPC_HWCFGR_NUM_TZMA		GENMASK(7, 0)
-+#define ETZPC_HWCFGR_NUM_PER_SEC	GENMASK(15, 8)
-+#define ETZPC_HWCFGR_NUM_AHB_SEC	GENMASK(23, 16)
-+#define ETZPC_HWCFGR_CHUNKS1N4		GENMASK(31, 24)
-+
-+/*
-+ * ETZPC miscellaneous
-+ */
-+#define ETZPC_PROT_MASK			GENMASK(1, 0)
-+#define ETZPC_PROT_A7NS			0x3
-+#define ETZPC_DECPROT_SHIFT		1
-+
-+#define IDS_PER_DECPROT_REGS		16
-+
-+static int stm32_etzpc_grant_access(struct stm32_firewall_controller *ctrl, u32 firewall_id)
-+{
-+	u32 offset, reg_offset, sec_val;
-+
-+	if (firewall_id >= ctrl->max_entries) {
-+		dev_err(ctrl->dev, "Invalid sys bus ID %u", firewall_id);
-+		return -EINVAL;
-+	}
-+
-+	/* Check access configuration, 16 peripherals per register */
-+	reg_offset = ETZPC_DECPROT + 0x4 * (firewall_id / IDS_PER_DECPROT_REGS);
-+	offset = (firewall_id % IDS_PER_DECPROT_REGS) << ETZPC_DECPROT_SHIFT;
-+
-+	/* Verify peripheral is non-secure and attributed to cortex A7 */
-+	sec_val = (readl(ctrl->mmio + reg_offset) >> offset) & ETZPC_PROT_MASK;
-+	if (sec_val != ETZPC_PROT_A7NS) {
-+		dev_dbg(ctrl->dev, "Invalid bus configuration: reg_offset %#x, value %d\n",
-+			reg_offset, sec_val);
-+		return -EACCES;
-+	}
-+
-+	return 0;
-+}
-+
-+static void stm32_etzpc_release_access(struct stm32_firewall_controller *ctrl __maybe_unused,
-+				       u32 firewall_id __maybe_unused)
-+{
-+}
-+
-+static int stm32_etzpc_probe(struct platform_device *pdev)
-+{
-+	struct stm32_firewall_controller *etzpc_controller;
-+	struct device_node *np = pdev->dev.of_node;
-+	u32 nb_per, nb_master;
-+	struct resource *res;
-+	void __iomem *mmio;
-+	int rc;
-+
-+	etzpc_controller = devm_kzalloc(&pdev->dev, sizeof(*etzpc_controller), GFP_KERNEL);
-+	if (!etzpc_controller)
-+		return -ENOMEM;
-+
-+	res = platform_get_resource(pdev, IORESOURCE_MEM, 0);
-+	mmio = devm_ioremap_resource(&pdev->dev, res);
-+	if (IS_ERR(mmio))
-+		return PTR_ERR(mmio);
-+
-+	etzpc_controller->dev = &pdev->dev;
-+	etzpc_controller->mmio = mmio;
-+	etzpc_controller->type = STM32_PERIPHERAL_FIREWALL | STM32_MEMORY_FIREWALL;
-+	etzpc_controller->grant_access = stm32_etzpc_grant_access;
-+	etzpc_controller->release_access = stm32_etzpc_release_access;
-+
-+	/* Get number of etzpc entries*/
-+	nb_per = FIELD_GET(ETZPC_HWCFGR_NUM_PER_SEC,
-+			   readl(etzpc_controller->mmio + ETZPC_HWCFGR));
-+	nb_master = FIELD_GET(ETZPC_HWCFGR_NUM_AHB_SEC,
-+			      readl(etzpc_controller->mmio + ETZPC_HWCFGR));
-+	etzpc_controller->max_entries = nb_per + nb_master;
-+
-+	platform_set_drvdata(pdev, etzpc_controller);
-+
-+	rc = stm32_firewall_controller_register(etzpc_controller);
-+	if (rc) {
-+		dev_err(etzpc_controller->dev, "Couldn't register as a firewall controller: %d",
-+			rc);
-+		return rc;
-+	}
-+
-+	stm32_firewall_populate_bus(etzpc_controller);
-+
-+	/* Populate all allowed nodes */
-+	return of_platform_populate(np, NULL, NULL, &pdev->dev);
-+}
-+
-+static const struct of_device_id stm32_etzpc_of_match[] = {
-+	{ .compatible = "st,stm32-etzpc" },
-+	{}
-+};
-+MODULE_DEVICE_TABLE(of, stm32_etzpc_of_match);
-+
-+static struct platform_driver stm32_etzpc_driver = {
-+	.probe  = stm32_etzpc_probe,
-+	.driver = {
-+		.name = "stm32-etzpc",
-+		.of_match_table = stm32_etzpc_of_match,
-+	},
-+};
-+
-+static int __init stm32_etzpc_init(void)
-+{
-+	return platform_driver_register(&stm32_etzpc_driver);
-+}
-+arch_initcall(stm32_etzpc_init);
--- 
-2.25.1
+On 7/3/2023 6:50 PM, Yinjun Zhang wrote:
+> On Tuesday, July 4, 2023 12:11 AM, Alexander Lobakin wrote:
+>> From: Louis Peens <louis.peens@corigine.com>
+>> Date: Mon,  3 Jul 2023 14:01:16 +0200
+>>
+>>> From: Yinjun Zhang <yinjun.zhang@corigine.com>
+>>>
+>>> When moving devices from one namespace to another, mc addresses are
+>>> cleaned in software while not removed from application firmware. Thus
+>>> the mc addresses are remained and will cause resource leak.
+>>>
+>>> Now use `__dev_mc_unsync` to clean mc addresses when closing port.
+>>>
+>>> Fixes: e20aa071cd95 ("nfp: fix schedule in atomic context when sync mc
+>> address")
+>>> Cc: stable@vger.kernel.org
+>>> Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
+>>> Acked-by: Simon Horman <simon.horman@corigine.com>
+>>> Signed-off-by: Louis Peens <louis.peens@corigine.com>
+>>> ---
+>>> Changes since v1:
+>>>
+>>> * Use __dev_mc_unsyc to clean mc addresses instead of tracking mc
+>> addresses by
+>>>   driver itself.
+>>> * Clean mc addresses when closing port instead of driver exits,
+>>>   so that the issue of moving devices between namespaces can be fixed.
+>>> * Modify commit message accordingly.
+>>>
+>>>  .../ethernet/netronome/nfp/nfp_net_common.c   | 171 +++++++++---------
+>>>  1 file changed, 87 insertions(+), 84 deletions(-)
+>>
+>> [...]
+>>
+>>> +static int nfp_net_mc_sync(struct net_device *netdev, const unsigned char
+>> *addr)
+>>> +{
+>>> +	struct nfp_net *nn = netdev_priv(netdev);
+>>> +
+>>> +	if (netdev_mc_count(netdev) > NFP_NET_CFG_MAC_MC_MAX) {
+>>> +		nn_err(nn, "Requested number of MC addresses (%d)
+>> exceeds maximum (%d).\n",
+>>> +		       netdev_mc_count(netdev),
+>> NFP_NET_CFG_MAC_MC_MAX);
+>>> +		return -EINVAL;
+>>> +	}
+>>> +
+>>> +	return nfp_net_sched_mbox_amsg_work(nn,
+>> NFP_NET_CFG_MBOX_CMD_MULTICAST_ADD, addr,
+>>> +					    NFP_NET_CFG_MULTICAST_SZ,
+>> nfp_net_mc_cfg);
+>>> +}
+>>> +
+>>> +static int nfp_net_mc_unsync(struct net_device *netdev, const unsigned
+>> char *addr)
+>>> +{
+>>> +	struct nfp_net *nn = netdev_priv(netdev);
+>>> +
+>>> +	return nfp_net_sched_mbox_amsg_work(nn,
+>> NFP_NET_CFG_MBOX_CMD_MULTICAST_DEL, addr,
+>>> +					    NFP_NET_CFG_MULTICAST_SZ,
+>> nfp_net_mc_cfg);
+>>> +}
+>>
+>> You can just declare nfp_net_mc_unsync()'s prototype here, so that it
+>> will be visible to nfp_net_netdev_close(), without moving the whole set
+>> of functions. Either way works, but that one would allow avoiding big
+>> diffs not really related to fixing things going through the net-fixes tree.
+> 
+> I didn't know which was preferred. Looks like minimum change is concerned
+> more. I'll change it.
+> 
 
+net-next might prefer code re-ordering and avoiding the extra
+declaration, but net would definitely want the smaller fix.
+
+For what its worth, I double check this kind of thing by applying the
+patch to my git tree and using git's "color moved lines" options to diff.
+
+Doing so for this patch shows that the change really is a straight
+forward re-ordering without any additional changes accidentally included.
+
+Thus, I have no objection to this version as-is, but a smaller v3 with
+the prototype is also fine with me.
+
+Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
+
+Thanks,
+Jake
+
+>>
+>>> +
+>>>  /**
+>>>   * nfp_net_clear_config_and_disable() - Clear control BAR and disable NFP
+>>>   * @nn:      NFP Net device to reconfigure
+>>> @@ -1084,6 +1168,9 @@ static int nfp_net_netdev_close(struct net_device
+>> *netdev)
+>>>
+>>>  	/* Step 2: Tell NFP
+>>>  	 */
+>>> +	if (nn->cap_w1 & NFP_NET_CFG_CTRL_MCAST_FILTER)
+>>> +		__dev_mc_unsync(netdev, nfp_net_mc_unsync);
+>>> +
+>>>  	nfp_net_clear_config_and_disable(nn);
+>>>  	nfp_port_configure(netdev, false);
+>> [...]
+>>
+>> Thanks,
+>> Olek
 
