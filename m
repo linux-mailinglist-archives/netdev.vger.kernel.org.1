@@ -1,102 +1,208 @@
-Return-Path: <netdev+bounces-15557-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15558-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 58D1A7487E9
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:26:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id CB254748812
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:29:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 079961C20B6F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:26:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0CD7A281025
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:29:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD6C211C86;
-	Wed,  5 Jul 2023 15:26:10 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 440ED11CA2;
+	Wed,  5 Jul 2023 15:29:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BDEBFD526
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 15:26:10 +0000 (UTC)
-Received: from mail-pf1-x42f.google.com (mail-pf1-x42f.google.com [IPv6:2607:f8b0:4864:20::42f])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADB17170B
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 08:26:07 -0700 (PDT)
-Received: by mail-pf1-x42f.google.com with SMTP id d2e1a72fcca58-666ecf9a0ceso3396292b3a.2
-        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 08:26:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=networkplumber-org.20221208.gappssmtp.com; s=20221208; t=1688570767; x=1691162767;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=xa8l5W64uJlvGeV+OrN8NQyDk5eo1H48/yo/RAL/jPM=;
-        b=wtRhMYODWW5ptCVw3fLk0aA1jDVnCN2D3TXW/GyxF76M3TKqbLIRLr1JkLsrT8nubJ
-         Qz50poPgRue6koZQT0gYGV8idVBIvAAVJyZfI0p4YthpOpMmrFny9AX5rhScFxorqj0j
-         MJepXmZ5UimQ3SzY2ZyLDVP5dIUXoOT9oG2UDHI7XMyBBjyIl/9AkzkOEOuKhk2IH4Ga
-         zJCv6Tx20j8DRKjlycZnBru76vw+Qtq92JdWhEGKO2tDxjHYRwVMi6HV4F3E+M6Pu1m2
-         DybnTJpN6t9Mfo/Oq2hX+srsXDpcJZBAWNHzRZ/TxtF7NGiZmz0HJE/fDLe+4SlFEgRh
-         KyVQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688570767; x=1691162767;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:subject:cc:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=xa8l5W64uJlvGeV+OrN8NQyDk5eo1H48/yo/RAL/jPM=;
-        b=Lr+0GmnHdU8VBlrA2HgBi8187yhkRLZPgb6CqiqsqusTYhNlRLTsIgEw+/5+ossJ9W
-         RGeKfTtE9pGV9IX9vZegXbKqxtULVZJ2oOmORyruyzUSjuojG404zpK0zvs2qrpYlCoK
-         e8cpc9RTErqiJhr7aSnObC5rfr4R2Wn2eow/1TNURvFESRCjloQ8x9wGB5LW+zB9LBIJ
-         x/A4kN/GyIZJCwnjCSHlgxAvbuw74HWoCtYessAy+z5KRJkQOXXbtF1u73YO2vpp37yq
-         jlQ8ezlL2S/weQu9I9geab/ugC58eNP4H7h7vNpcGCMdJHmPb50ISodedyOAuPj3bURz
-         KuSA==
-X-Gm-Message-State: ABy/qLYNbSFBmSNCALRRoXFpV9WqbD9m2Mtf+4yPIKcrzcm7aLNMPxdX
-	FjPk57+WrY6/riXlqlEvr+lTow==
-X-Google-Smtp-Source: APBJJlHe03DAPIWSU5hFp5ndbVtx5g2LL1bHur1wfB7oOHBaFZExIoTqYGQzhvHF4K8+cVs6X5sMAQ==
-X-Received: by 2002:a62:7b42:0:b0:67e:bf65:ae68 with SMTP id w63-20020a627b42000000b0067ebf65ae68mr12948969pfc.3.1688570767138;
-        Wed, 05 Jul 2023 08:26:07 -0700 (PDT)
-Received: from hermes.local (204-195-120-218.wavecable.com. [204.195.120.218])
-        by smtp.gmail.com with ESMTPSA id q23-20020a62ae17000000b006758ae3952bsm15692092pff.122.2023.07.05.08.26.06
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jul 2023 08:26:06 -0700 (PDT)
-Date: Wed, 5 Jul 2023 08:26:04 -0700
-From: Stephen Hemminger <stephen@networkplumber.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
- <pabeni@redhat.com>, sergey.senozhatsky@gmail.com, pmladek@suse.com,
- tj@kernel.org, Dave Jones <davej@codemonkey.org.uk>, "open list:NETWORKING
- DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] netconsole: Append kernel version to message
-Message-ID: <20230705082604.7b104a48@hermes.local>
-In-Reply-To: <ZKU1Sy7dk8yESm4d@gmail.com>
-References: <20230703154155.3460313-1-leitao@debian.org>
-	<20230703113410.6352411d@hermes.local>
-	<ZKQ3o6byAaJfxHK+@gmail.com>
-	<20230704085800.38f05b56@hermes.local>
-	<ZKU1Sy7dk8yESm4d@gmail.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3887A111AF
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 15:29:27 +0000 (UTC)
+Received: from mailgw02.mediatek.com (unknown [210.61.82.184])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 73AB01709;
+	Wed,  5 Jul 2023 08:29:24 -0700 (PDT)
+X-UUID: b5539c481b4811eeb20a276fd37b9834-20230705
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=mediatek.com; s=dk;
+	h=Content-Type:MIME-Version:Message-ID:Date:Subject:CC:To:From; bh=NLesLJe4A/A3qoSeOMLVznOKBUY2rYk/Ty+1pFly89M=;
+	b=jS2hUJMQwDrlb5AMtfhwcmycoY0OzxrdJ7td8dw7KQIl7tO8BUB4jGlhrFBtaMWxx+vS1T4/Lk3GlISJ0oXoSBUSgR3OyPJayB5dmliIbve2K+EKEkEpboL6CEHPPUWFIpBV1Ipg7l62UG+S9BKvaazcGRQUO2MttsfTcsDkd+s=;
+X-CID-P-RULE: Release_Ham
+X-CID-O-INFO: VERSION:1.1.27,REQID:e0c576f1-77ac-400d-91a2-cefd688693e4,IP:0,U
+	RL:0,TC:0,Content:-25,EDM:0,RT:0,SF:0,FILE:0,BULK:0,RULE:Release_Ham,ACTIO
+	N:release,TS:-25
+X-CID-META: VersionHash:01c9525,CLOUDID:3e0fa9da-b4fa-43c8-9c3e-0d3fabd03ec0,B
+	ulkID:nil,BulkQuantity:0,Recheck:0,SF:102,TC:nil,Content:0,EDM:-3,IP:nil,U
+	RL:11|1,File:nil,Bulk:nil,QS:nil,BEC:nil,COL:0,OSI:0,OSA:0,AV:0,LES:1,SPR:
+	NO
+X-CID-BVR: 0
+X-CID-BAS: 0,_,0,_
+X-CID-FACTOR: TF_CID_SPAM_SNR,TF_CID_SPAM_ULN
+X-UUID: b5539c481b4811eeb20a276fd37b9834-20230705
+Received: from mtkmbs13n2.mediatek.inc [(172.21.101.108)] by mailgw02.mediatek.com
+	(envelope-from <deren.wu@mediatek.com>)
+	(Generic MTA with TLSv1.2 ECDHE-RSA-AES256-GCM-SHA384 256/256)
+	with ESMTP id 2106716047; Wed, 05 Jul 2023 23:29:18 +0800
+Received: from mtkmbs11n2.mediatek.inc (172.21.101.187) by
+ mtkmbs13n1.mediatek.inc (172.21.101.193) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.2.1118.26; Wed, 5 Jul 2023 23:29:17 +0800
+Received: from mtksdccf07.mediatek.inc (172.21.84.99) by
+ mtkmbs11n2.mediatek.inc (172.21.101.73) with Microsoft SMTP Server id
+ 15.2.1118.26 via Frontend Transport; Wed, 5 Jul 2023 23:29:17 +0800
+From: Deren Wu <deren.wu@mediatek.com>
+To: Felix Fietkau <nbd@nbd.name>, Lorenzo Bianconi <lorenzo@kernel.org>, Kalle
+ Valo <kvalo@kernel.org>, Jakub Kicinski <kuba@kernel.org>, "David S . Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>
+CC: Sean Wang <sean.wang@mediatek.com>, Ryder Lee <ryder.lee@mediatek.com>,
+	Shayne Chen <shayne.chen@mediatek.com>, linux-wireless
+	<linux-wireless@vger.kernel.org>, linux-mediatek
+	<linux-mediatek@lists.infradead.org>, <netdev@vger.kernel.org>, Quan Zhou
+	<quan.zhou@mediatek.com>, <stable@vger.kernel.org>, Leon Yen
+	<leon.yen@mediatek.com>, Deren Wu <deren.wu@mediatek.com>
+Subject: [PATCH v2] wifi: mt76: mt7921e: fix init command fail with enabled device
+Date: Wed, 5 Jul 2023 23:26:38 +0800
+Message-ID: <39fcb7cee08d4ab940d38d82f21897483212483f.1688569385.git.deren.wu@mediatek.com>
+X-Mailer: git-send-email 2.18.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-MTK: N
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,UNPARSEABLE_RELAY,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, 5 Jul 2023 02:18:03 -0700
-Breno Leitao <leitao@debian.org> wrote:
+From: Quan Zhou <quan.zhou@mediatek.com>
 
-> The uname is useful if the receiver side is looking (grepping) for
-> specific messages (warnings, oops, etc) affecting specific kernel
-> versions. If the uname is not available, the receiver needs to read boot
-> message and keep a map for source IP to kernel version. This is far from
-> ideal at a hyperscale level.
+For some cases as below, we may encounter the unpreditable chip stats
+in driver probe()
+* The system reboot flow do not work properly, such as kernel oops while
+  rebooting, and then the driver do not go back to default status at
+  this moment.
+* Similar to the flow above. If the device was enabled in BIOS or UEFI,
+  the system may switch to Linux without driver fully shutdown.
 
-At hyperscale you need a real collector (not just netcat) that can consult
-the VM database to based on IP and record the meta data there.  If you allow
-random updates and versions, things get out of control real fast and this
-won't really help much
+To avoid the problem, force push the device back to default in probe()
+* mt7921e_mcu_fw_pmctrl() : return control privilege to chip side.
+* mt7921_wfsys_reset()    : cleanup chip config before resource init.
+
+Error log
+[59007.600714] mt7921e 0000:02:00.0: ASIC revision: 79220010
+[59010.889773] mt7921e 0000:02:00.0: Message 00000010 (seq 1) timeout
+[59010.889786] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59014.217839] mt7921e 0000:02:00.0: Message 00000010 (seq 2) timeout
+[59014.217852] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59017.545880] mt7921e 0000:02:00.0: Message 00000010 (seq 3) timeout
+[59017.545893] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59020.874086] mt7921e 0000:02:00.0: Message 00000010 (seq 4) timeout
+[59020.874099] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59024.202019] mt7921e 0000:02:00.0: Message 00000010 (seq 5) timeout
+[59024.202033] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59027.530082] mt7921e 0000:02:00.0: Message 00000010 (seq 6) timeout
+[59027.530096] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59030.857888] mt7921e 0000:02:00.0: Message 00000010 (seq 7) timeout
+[59030.857904] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59034.185946] mt7921e 0000:02:00.0: Message 00000010 (seq 8) timeout
+[59034.185961] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59037.514249] mt7921e 0000:02:00.0: Message 00000010 (seq 9) timeout
+[59037.514262] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59040.842362] mt7921e 0000:02:00.0: Message 00000010 (seq 10) timeout
+[59040.842375] mt7921e 0000:02:00.0: Failed to get patch semaphore
+[59040.923845] mt7921e 0000:02:00.0: hardware init failed
+
+Cc: stable@vger.kernel.org
+Fixes: 5c14a5f944b9 ("mt76: mt7921: introduce mt7921e support")
+Tested-by: Kai-Heng Feng <kai.heng.feng@canonical.com>
+Tested-by: Juan Martinez <juan.martinez@amd.com>
+Co-developed-by: Leon Yen <leon.yen@mediatek.com>
+Signed-off-by: Leon Yen <leon.yen@mediatek.com>
+Signed-off-by: Quan Zhou <quan.zhou@mediatek.com>
+Signed-off-by: Deren Wu <deren.wu@mediatek.com>
+
+---
+v2: The v1 patch has been accpeted in wireless patchwork. However,
+    this patch is very important for existing system, we need to add
+    cc stable tag and hope this patch can be pulled to stable branch earlier.
+---
+ drivers/net/wireless/mediatek/mt76/mt7921/dma.c | 4 ----
+ drivers/net/wireless/mediatek/mt76/mt7921/mcu.c | 8 --------
+ drivers/net/wireless/mediatek/mt76/mt7921/pci.c | 8 ++++++++
+ 3 files changed, 8 insertions(+), 12 deletions(-)
+
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7921/dma.c b/drivers/net/wireless/mediatek/mt76/mt7921/dma.c
+index f0a80c2b476a..4153cd6c2a01 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/dma.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/dma.c
+@@ -231,10 +231,6 @@ int mt7921_dma_init(struct mt7921_dev *dev)
+ 	if (ret)
+ 		return ret;
+ 
+-	ret = mt7921_wfsys_reset(dev);
+-	if (ret)
+-		return ret;
+-
+ 	/* init tx queue */
+ 	ret = mt76_connac_init_tx_queues(dev->phy.mt76, MT7921_TXQ_BAND0,
+ 					 MT7921_TX_RING_SIZE,
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7921/mcu.c b/drivers/net/wireless/mediatek/mt76/mt7921/mcu.c
+index c69ce6df4956..f55caa00ac69 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/mcu.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/mcu.c
+@@ -476,12 +476,6 @@ static int mt7921_load_firmware(struct mt7921_dev *dev)
+ {
+ 	int ret;
+ 
+-	ret = mt76_get_field(dev, MT_CONN_ON_MISC, MT_TOP_MISC2_FW_N9_RDY);
+-	if (ret && mt76_is_mmio(&dev->mt76)) {
+-		dev_dbg(dev->mt76.dev, "Firmware is already download\n");
+-		goto fw_loaded;
+-	}
+-
+ 	ret = mt76_connac2_load_patch(&dev->mt76, mt7921_patch_name(dev));
+ 	if (ret)
+ 		return ret;
+@@ -504,8 +498,6 @@ static int mt7921_load_firmware(struct mt7921_dev *dev)
+ 		return -EIO;
+ 	}
+ 
+-fw_loaded:
+-
+ #ifdef CONFIG_PM
+ 	dev->mt76.hw->wiphy->wowlan = &mt76_connac_wowlan_support;
+ #endif /* CONFIG_PM */
+diff --git a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
+index 1c727870bbdb..6c512bc75685 100644
+--- a/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
++++ b/drivers/net/wireless/mediatek/mt76/mt7921/pci.c
+@@ -325,6 +325,10 @@ static int mt7921_pci_probe(struct pci_dev *pdev,
+ 	bus_ops->rmw = mt7921_rmw;
+ 	dev->mt76.bus = bus_ops;
+ 
++	ret = mt7921e_mcu_fw_pmctrl(dev);
++	if (ret)
++		goto err_free_dev;
++
+ 	ret = __mt7921e_mcu_drv_pmctrl(dev);
+ 	if (ret)
+ 		goto err_free_dev;
+@@ -333,6 +337,10 @@ static int mt7921_pci_probe(struct pci_dev *pdev,
+ 		    (mt7921_l1_rr(dev, MT_HW_REV) & 0xff);
+ 	dev_info(mdev->dev, "ASIC revision: %04x\n", mdev->rev);
+ 
++	ret = mt7921_wfsys_reset(dev);
++	if (ret)
++		goto err_free_dev;
++
+ 	mt76_wr(dev, MT_WFDMA0_HOST_INT_ENA, 0);
+ 
+ 	mt76_wr(dev, MT_PCIE_MAC_INT_ENABLE, 0xff);
+-- 
+2.18.0
+
 
