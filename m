@@ -1,107 +1,96 @@
-Return-Path: <netdev+bounces-15642-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15644-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A364F748EA4
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 22:12:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 75187748EBD
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 22:19:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D2F228104A
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:12:44 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3118B281120
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:19:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 33314156C8;
-	Wed,  5 Jul 2023 20:12:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 387C5156F1;
+	Wed,  5 Jul 2023 20:19:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 286E811CA4
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 20:12:41 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8CA06173B;
-	Wed,  5 Jul 2023 13:12:34 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qH8rY-0000L4-6w; Wed, 05 Jul 2023 22:12:32 +0200
-Date: Wed, 5 Jul 2023 22:12:32 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Cc: Florian Westphal <fw@strlen.de>, netfilter-devel@vger.kernel.org,
-	netdev@vger.kernel.org, Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH] netfilter: nf_tables: prevent OOB access in
- nft_byteorder_eval
-Message-ID: <20230705201232.GG3751@breakpoint.cc>
-References: <20230705121515.747251-1-cascardo@canonical.com>
- <20230705130336.GD3751@breakpoint.cc>
- <ZKWzx3e6frpSs8bN@quatroqueijos.cascardo.eti.br>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2B205156EE
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 20:19:16 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9F8BE198B
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:19:15 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688588355; x=1720124355;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=GiLC6jl3PqfvKmVszzcd4P8BZSIaDp/GbPYLt7mSi84=;
+  b=A6AO/CpCLCkZL0vdBJzo2mFYy419D2ANWIkBo7kDl8Qqa05Z+8HgVoo3
+   W5yXj9eVmWiUixISNdJXgrbv6TXCSql7XdIID0AtXw7fmK0x9dzj1NVf/
+   1cAXa+pvdp/h3Yd/b8o6w2gCLw1qKV4EaCkxzryBQv48nt4pQ4tewWhME
+   EVKbl8X/UgZuSOHT8zHHGMd+/WoJJpVgsrNPY1ghEX8JDsAJPVQN7z3+j
+   fr4RBe7Q/cT5MHa+cgmnLbO9u4fPEgJEaZYvNYEz7jaK2snzlwrMvcfAL
+   gJVPfreGRbdcFlijA8I/DtwWcif58ZOT/EWtXwsCYU55N5bsykl5vLn+X
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="427117962"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="427117962"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 13:19:13 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="965944740"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="965944740"
+Received: from anguy11-upstream.jf.intel.com ([10.166.9.133])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Jul 2023 13:19:12 -0700
+From: Tony Nguyen <anthony.l.nguyen@intel.com>
+To: davem@davemloft.net,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	edumazet@google.com,
+	netdev@vger.kernel.org
+Cc: Tony Nguyen <anthony.l.nguyen@intel.com>
+Subject: [PATCH net 0/2][pull request] Intel Wired LAN Driver Updates 2023-07-05 (ice)
+Date: Wed,  5 Jul 2023 13:13:44 -0700
+Message-Id: <20230705201346.49370-1-anthony.l.nguyen@intel.com>
+X-Mailer: git-send-email 2.38.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKWzx3e6frpSs8bN@quatroqueijos.cascardo.eti.br>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,T_SCC_BODY_TEXT_LINE,T_SPF_TEMPERROR autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thadeu Lima de Souza Cascardo <cascardo@canonical.com> wrote:
-> > > @@ -74,11 +77,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
-> > >  		switch (priv->op) {
-> > >  		case NFT_BYTEORDER_NTOH:
-> > >  			for (i = 0; i < priv->len / 2; i++)
-> > > -				d[i].u16 = ntohs((__force __be16)s[i].u16);
-> > > +				d16[i] = ntohs((__force __be16)s16[i]);
-> > 
-> > This on the other hand... I'd say this should mimic what the 64bit
-> > case is doing and use nft_reg_store16() nft_reg_load16() helpers for
-> > the register accesses.
-> > 
-> > something like:
-> > 
-> > for (i = 0; i < priv->len / 2; i++) {
-> >      v16 = nft_reg_load16(&src[i]);
-> >      nft_reg_store16(&dst[i], + ntohs((__force __be16)v16));
-> > }
-> > 
-> 
-> The problem here is that we cannot index the 32-bit dst and src pointers as if
-> they were 16-bit pointers. We will end up with the exact same problem we are
-> trying to fix here.
-> 
-> I can change the code to use the accessors, but they use u32 pointers, so it
-> would end up looking like:
-> 
->  		case NFT_BYTEORDER_NTOH:
->  			for (i = 0; i < priv->len / 4; i++)
-> -				d[i].u32 = ntohl((__force __be32)s[i].u32);
-> +				dst[i] = ntohl((__force __be32)src[i]);
->  			break;
->  		case NFT_BYTEORDER_HTON:
->  			for (i = 0; i < priv->len / 4; i++)
-> -				d[i].u32 = (__force __u32)htonl(s[i].u32);
-> +				dst[i] = (__force __u32)htonl(src[i]);
+This series contains updates to ice driver only.
 
-Ack, thanks.
+Sridhar fixes incorrect comparison of max Tx rate limit to occur against
+each TC value rather than the aggregate. He also resolves an issue with
+the wrong VSI being used when setting max Tx rate when TCs are enabled.
 
->  		case NFT_BYTEORDER_NTOH:
-> -			for (i = 0; i < priv->len / 2; i++)
-> -				d[i].u16 = ntohs((__force __be16)s[i].u16);
-> +			for (i = 0; i < priv->len / 2; i++) {
-> +				__be16 src16;
-> +				src16 = nft_reg_load_be16((u32 *)&s16[i]);
-> +				nft_reg_store_be16((u32 *)&d16[i], ntohs(src16));
-> +			}
+The following are changes since commit c451410ca7e3d8eeb31d141fc20c200e21754ba4:
+  Merge branch 'mptcp-fixes'
+and are available in the git repository at:
+  git://git.kernel.org/pub/scm/linux/kernel/git/tnguy/net-queue 100GbE
 
-These accessors take a registers' address, not something in-between.
+Sridhar Samudrala (2):
+  ice: Fix max_rate check while configuring TX rate limits
+  ice: Fix tx queue rate limit when TCs are configured
 
-I think your original was better after all and we need to rely on whatever
-expression filled the register to have done the right thing.
+ drivers/net/ethernet/intel/ice/ice_main.c   | 23 ++++++++++++++-------
+ drivers/net/ethernet/intel/ice/ice_tc_lib.c | 22 ++++++++++----------
+ drivers/net/ethernet/intel/ice/ice_tc_lib.h |  1 +
+ 3 files changed, 27 insertions(+), 19 deletions(-)
+
+-- 
+2.38.1
 
 
