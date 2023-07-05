@@ -1,286 +1,220 @@
-Return-Path: <netdev+bounces-15587-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15589-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2A11748A67
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:30:49 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id EBB6F748A73
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:31:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E5BCE1C20B9F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:30:48 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A24662810B0
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:31:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 58878134AD;
-	Wed,  5 Jul 2023 17:30:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1CDE99470;
+	Wed,  5 Jul 2023 17:31:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4121B9470
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:30:31 +0000 (UTC)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 657971FFB;
-	Wed,  5 Jul 2023 10:29:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688578196; x=1720114196;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=sSa39Ynd5Wfm/pwyvbZC+CkdbKauksRmdbGaQqwdQHg=;
-  b=CLuiSz6IsSjM5sHKpOw5oBQG5jR+Sklv2aofCPGqnqmz6UzOAMzv2BSF
-   kzKWT2mQ7zEmUh4jBupwwn2GYMfxWmlpfiRVZrWhJ637il8tFr+iD720G
-   4QvVN4bulNRUN0cQdc/7CL2JupZ5XDV2hcZR2sWlfEUaKVSaFP4uv9CUD
-   PGxlHkeCbok0UzauIkdQtjyZDtWFtcn114ClIiQXxojbZ6SQ6BIK0ppPy
-   nAk8oYrY4oWv1vAeqkdX4CYvXQPeAWTqANw5Imb77ZBYFNVXCCbJXeB5u
-   WadI3O7B7CEOah67xrLYNMqZNRJ2gwUOuYFv3DDKLPQOSv18yTbAvMt0M
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="365973126"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="365973126"
-Received: from orsmga008.jf.intel.com ([10.7.209.65])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 10:29:43 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="748810510"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="748810510"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga008.jf.intel.com with ESMTP; 05 Jul 2023 10:29:43 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 5 Jul 2023 10:29:42 -0700
-Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
- orsmsx611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 5 Jul 2023 10:29:42 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 5 Jul 2023 10:29:42 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=GSHV72ox0bxE/Cs5OID/i/EbI/pxRfSYnczMLK70kT3Hl3tNl+p1tYct2lcgmreWIwpqNJlt94dLj2MXuRZFuh+g3L6CFEEtm0rbCg2EOnmIPo7eJ18JIlq8g8gqAg9E08ZGEO7yOObiVWSDq0mTx1EkbCeqwlhYDfSuiRdI2F2sXBvid66NS1032Ykyq0/up1g4qCNTpVR1iwbJ5fUYhLQu2EU+B9N/QdBRms8vtleAV6VA4e+26k66OkHTzg5czleWeLtUU5+55jc5xReUk7p6vL3sFG+f6J+47KoZ/Ku3BsS7wbz1J0GLs8Yg7TgRqx/mKRF0kcVlQ7qOTBjKMQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=S/iIrIHpi3jJ1Q7EEq0nTXEF2Ky3lBml62B6m9k7LtU=;
- b=e3ebJcDc3WB6Xzd+DRZib/b02deKu6LfihtpC7DOJoLg1rOMthF1yVI7tXV7NVC4/uP9qsdmmyxQQiyDA6Lq1o0V2PQu7XFCJOrqDYZ5my0OTwxd9wI54SSKutDbRI+0Slgq1Ll7mXScNNxplDK0ppGJWZVIkGqFsvgJM0uPHtaYpYjTFpVTmKfdGpvr+w3QDmGWhEJAbRYhX0YP56KYU4/A2pI74nQTrmfXAzalqqHJitbp1S/Dima0K/e/fXv1s2ykEt7K/YHjc4YOaVAdanlDW20usANQsnW4jcdzGTgosEQDTByVe/WKt73Vf6c889Tv+xOQ17+iTcX/h8x8tA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by PH7PR11MB6699.namprd11.prod.outlook.com (2603:10b6:510:1ad::16) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
- 2023 17:29:40 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4e5a:e4d6:5676:b0ab]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4e5a:e4d6:5676:b0ab%5]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
- 17:29:40 +0000
-Message-ID: <ca4d9186-705c-8a69-7fce-7cff884989c0@intel.com>
-Date: Wed, 5 Jul 2023 10:29:38 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net v2] nfp: clean mc addresses in application firmware
- when closing port
-To: Yinjun Zhang <yinjun.zhang@corigine.com>, Alexander Lobakin
-	<aleksander.lobakin@intel.com>, Louis Peens <louis.peens@corigine.com>
-CC: David Miller <davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>, Simon Horman <simon.horman@corigine.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>, oss-drivers <oss-drivers@corigine.com>
-References: <20230703120116.37444-1-louis.peens@corigine.com>
- <4012ae37-f674-9e58-ec2a-672e9136576a@intel.com>
- <DM6PR13MB3705E98ABE2CA8B2B677E055FC2EA@DM6PR13MB3705.namprd13.prod.outlook.com>
-Content-Language: en-US
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <DM6PR13MB3705E98ABE2CA8B2B677E055FC2EA@DM6PR13MB3705.namprd13.prod.outlook.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR02CA0007.namprd02.prod.outlook.com
- (2603:10b6:303:16d::33) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 05C14134C1
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:31:37 +0000 (UTC)
+Received: from mail-pj1-x104a.google.com (mail-pj1-x104a.google.com [IPv6:2607:f8b0:4864:20::104a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4DAD21BFC
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 10:31:05 -0700 (PDT)
+Received: by mail-pj1-x104a.google.com with SMTP id 98e67ed59e1d1-2631231fed0so6865834a91.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 10:31:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688578258; x=1691170258;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=K3/LAZvr0UP5J3UHYYhwEfc8xW0A3nIvJLVo9APvzt8=;
+        b=pRFit9QJQLe1lIimcB8GFO/E7cene91cnurVg1RRGKojDlmUbJnosXt+UZsopKtYVC
+         sPakpd5iP364qy4FRCvkJYL95YwNyyUtMxlyj4qQJifGakunvCa1QkQOzPh+f96Yb9eP
+         E+Op0WNqkLJPIg2wjCvJpUR3EYMeEfzmTwlBACUpM6IqEw/zADR13yzFQ83qaYQmJCMl
+         JKTFVcHZ9Ckpw5V9+FbaOZ0NxF/YqfkeDch/zIN9W/zapNSmStM1jF0VLtrlMK2/yZT7
+         H8RzaK5rVsQ41msV8Hbsnd+lXysC2nhmD5Z1jiV8+9hOLtCBfnu6Lr/L/55b+CQYnRu8
+         ewNg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688578258; x=1691170258;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=K3/LAZvr0UP5J3UHYYhwEfc8xW0A3nIvJLVo9APvzt8=;
+        b=fsLygDDkOwQbm/XhnRKjpmsQzCLFCj0uEY/NOSDgWkql7fl545aeLU2zfoGdkR9eQO
+         QAu17sQeuAPwCi9ZfQS7+mxl4j7BpG8mlOnN/zsOa4VF/doj39/STY5DvUcmjdMrPx84
+         qL8YpvpuIXJMTwqWlg1RjdiehhPQnqvd8u8PoRdqdb+8XW9rdoCxNdFk478mxVx2s1KJ
+         fUV1HM+JH9wfiaueaPVvRhqYE0hRdgKh5rM2rqsE6+WTUVzkmqztWiydA54gLN9Ffqip
+         NqK9l30JO+m9SID6j786jr3woa07zpIYPdtxYNAWGs0U90C3yzRjduWpprlWdB6ojyAw
+         kDcw==
+X-Gm-Message-State: ABy/qLY44Ewtrf3UH3eF15Y966lPNbQqgHqgEa2L9jhSxn53iIk9r3Lw
+	uoBAPoAMpXebRUtp+aBjd55KE68=
+X-Google-Smtp-Source: APBJJlHDbI3TnMQawz+HxE4Zfg02tczSUStWMcPVjMhQSpVKuHXHQswSC3+jQ05SdtAHKsxGhdzRTUU=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a17:90a:bc97:b0:262:d9c1:dc02 with SMTP id
+ x23-20020a17090abc9700b00262d9c1dc02mr11834868pjr.1.1688578257937; Wed, 05
+ Jul 2023 10:30:57 -0700 (PDT)
+Date: Wed, 5 Jul 2023 10:30:56 -0700
+In-Reply-To: <20230703181226.19380-7-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|PH7PR11MB6699:EE_
-X-MS-Office365-Filtering-Correlation-Id: 84c34b6f-8ba2-44e3-7562-08db7d7d69c2
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: iNqhRhtQ2Q/UrdGnZ76WiZQZ0ityJrqrm6jwnYDR4jMzHkVIYO5z9Wkszq/KnLaO3l7o5DCL5EA8+vaigsjcnwZUkB40gBhoCnVs0fSjBTQvf48wP1vF6bBOHV+swG/GZvMgBzMaIzsnomqHEfHyRPiXTsW+823IxuwMZ1m9fOO7PHEhMZ0qJ8dIINSboLGHWmeZjr5Yg+LPkQBu98TX8YUuaj2mJqnQkU44aRMHxSqj+Mnkcm99VpRBiakhweELzwgKOzrlWc4qeebkgzMASEtxkNHEpbf1mzczgSKfDaNSn1mlZ5Pkub+CxuSleWkAABLwen95pHgDEbb8JSRr3gQL5VwJhlA8jKA9nOiF3wg2/zvZVYE9gtcYXYS3Ue/cODqLeaxaQgqucWxvxddp3un6mBNS+OUJzkqrqKyfLb7mpOH3Lm+CXjxQMr+scstJHX5xVbPBPfU8Ju7Jd6Zi4iAmJCJsD3rpQslJsK1gahXXB3ZfbGGL2kAr4iFxrUgpqq9w0H50CP1qTc+ydtzpspkrKj9ml5Zq0cKVmGDKSop+gl9bKgslG5zwqVS9O/1R7kkzxRv2ROMQbvPlR28PP8dh83/BmN7jn5ofvrlYT4gTTyMnmfCHylmQGxhqOD2ZM+rytcHqA60lmKowlR/tUg==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(366004)(346002)(136003)(376002)(39860400002)(451199021)(38100700002)(66476007)(66556008)(4326008)(66946007)(82960400001)(2616005)(186003)(86362001)(31696002)(6486002)(6512007)(36756003)(478600001)(26005)(53546011)(110136005)(6506007)(54906003)(8676002)(8936002)(5660300002)(31686004)(2906002)(41300700001)(316002)(83380400001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?TUtXTnU5cGh5VUhMTGZBR243QzZWUXQvSmZOUGNySnhNLzdmZDExOXpPWGNI?=
- =?utf-8?B?bTdVSFJjNUhyNWl1OVdyWDVvaXpYZS81bkZoOU5ad01OK0pDNFVWSVFGUkRk?=
- =?utf-8?B?R3ptcGJUUUJNckdqVnkzYkovM2wxUC95NU41STdBMmQwb01yV1ZYTlBZbm1F?=
- =?utf-8?B?ZVNwQzNDT2p4citGNDlDeTVmM21sYk9lYXJoYkxDQjZKRWNlK3V1N05tS2pT?=
- =?utf-8?B?ZmpQS0JCaERJYVM0bHpKQ0Q4dXZWR0pjRXFlVVUvMCtENldQaVd1R0VGaExm?=
- =?utf-8?B?NG1pT1lEUVJrZ0VuOEluS0JyQlljcnJLR2lNWm5IUTdFVERiYkVJOWFQTlZi?=
- =?utf-8?B?SkJvT1ZhRzB3blF6ZjJnUU5DZFp1N3FmZ1BLUmFERHdjek9ETmJrV3M1ZHYx?=
- =?utf-8?B?dzFxZFNtN3ZDdVJVZExxbUU3ZS81ZGdSUUkvYldaaXNRL1lHTkF6OXAva2RZ?=
- =?utf-8?B?bXdHdHBYb2dyVVMyclBwSzdINWZEb1VCbVhxTExjZ3dmMEo3U2Fmb01NRWhi?=
- =?utf-8?B?Z3ZaQ0RZeEhycWRPTjFydzVUWHBscGZEcXExK2d0Z1NLSWducVhIam9FU2l6?=
- =?utf-8?B?U0xPSXF1bTBtM0txbWtCNWhiTS9TM1dScDVCWWREdHNoOHZONmNNTSs4bGNV?=
- =?utf-8?B?VDBiVkZFaVlxTWFwMVFrclBoY1pYWURzSGhCQ2xsUzJBaHhMdkptNGFHbVBF?=
- =?utf-8?B?RlVlRHJWRmg1TGRKeGhrVkdxV3pVVllhSXhNKzB3SytUZUF4QnNPbmFxdjlo?=
- =?utf-8?B?UEtYMzJQUEQ0bzVra0dlMk5nWDZxRGdCYzAzdG1ieW4rZjBkSmNxWUFFNUtF?=
- =?utf-8?B?amc1bDdXN3E1a0FjeTVvc3ZZR3VkYWc0Nm1iV01SbVgwYW80cGN4UjMzbmh4?=
- =?utf-8?B?dU43TFQ2dkxobCs5QXZ2WmZhSDF4aVp6eFFWc0QweVFYdzZDNkxJWTlKTnpV?=
- =?utf-8?B?RVY3L3A4Zkk1OGNoLzdNbkxQU1ZaVHIydlVtTEFvRG93SStLVGxzcmp2Wlhq?=
- =?utf-8?B?UG5RTDBOcmhiZks0R1dWZ0JISXNqNWxZZGFXaUtYeW5xbFdrWnF0SVFQbk5H?=
- =?utf-8?B?dmFYWGNyay9uSmI5SVhneWllSGc2bHdac2dFWHk2QjNyMWVIb2Zuc0J3bWxp?=
- =?utf-8?B?ajErbDk3Y1YzZEhsb2lwOTlqSXhYcDl6M2VGM3dZZnZDZHlYWVdpVWptNkh5?=
- =?utf-8?B?emZSYmtHdkZZWGhpakxoeTloK1VmQzJrODdiWVBVdEtpTHFMelZJamdwa0Vt?=
- =?utf-8?B?UW9ZMlFDQm1qZjhLWnh0OWsrR2s2SkpzNlhVa2FWeGdaZVp0VEI4bTBmdThK?=
- =?utf-8?B?RzN1TTRtakVZRTR6M0ZvVW4zTXd2R3R0UEkwNWo1UG8wYTR4aDRRSCs5amZt?=
- =?utf-8?B?ejRzdmV3Mk9KdXYrWGwvemNBSFYxMmhkeTc4WXpUZjl1SGdiQ2dyUGZ3clgz?=
- =?utf-8?B?U3VIaXBwNm80SEg0UGt6V25iUDBqR0dmcXhLTzZOQ1FqNTRhUkxkbG1jYlQ3?=
- =?utf-8?B?ci9UQnhiU215cTdJbk83b2I0MG91OXNIN2pMcjR5UEdLWHIzNjdvZjF0czkw?=
- =?utf-8?B?cENydDlSaVVXNjk0VDBqUkpXZnRjeTZMM05MZFVSemtuOFV2L0ppdEw1OWM5?=
- =?utf-8?B?azdsbkp0WTRjZEJ5WldleW9mUXFrVExMbTFrTUJReHFZYVptcEtmeWhuelBt?=
- =?utf-8?B?NHduNTlkcy9Yb2xJN2xCS0Z1bWNOT3VORmNhVm5tNlppcFdBZkwvUVF6L0gv?=
- =?utf-8?B?b0xHRWZUQ1hPRUIwdzgzTmZiQlNHdzRXWkNlVUNtR21Md0dIdnBHRWNZUTJ1?=
- =?utf-8?B?TTl1dHJaOHprSnRKMld5Q0VRN3JNMzdHNXMrSTRUREVRdVlxTU9BQkJBSy9U?=
- =?utf-8?B?bE1nN285TktuZnpUaitQaDlScXhFL0FCOEpaWHAwa3A0WDFUR3Y1SlM1QVNN?=
- =?utf-8?B?M3JhbWQ0eGRSUndtODFwYW9GNHo3aDVscm9sS1RtTEtwWjhjckZpendUa2pE?=
- =?utf-8?B?a0hsSmo2K3V5RTk1ZmZnUi95ZG1ZSVBKakJKNnlsVXhoYWVUNmxoeXRrRE9B?=
- =?utf-8?B?WWdFZ3MyOVhva0RXRnI0TVlDSlN0RUtWM1hUUXlFa1o3Z0hydE9nTWZYRVpo?=
- =?utf-8?B?WktaWFdXenRQNFdNd2ZVdEpnQXcxYkVJWlBqdmFjaWVRYURzcjQrWEx2SlpX?=
- =?utf-8?B?c2c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 84c34b6f-8ba2-44e3-7562-08db7d7d69c2
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 17:29:40.3266
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: IWOyZKfZTqSHKAcg+iK12ZVGInEtKkLc0iS4Vn3eLWWY83Y7J/zTdEi1yOeFWVhmv5G/THWAx8NbiuF9+wrJQpjK2uHbBztME03Srt0IKaM=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR11MB6699
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20230703181226.19380-1-larysa.zaremba@intel.com> <20230703181226.19380-7-larysa.zaremba@intel.com>
+Message-ID: <ZKWo0BbpLfkZHbyE@google.com>
+Subject: Re: [PATCH bpf-next v2 06/20] ice: Support HW timestamp hint
+From: Stanislav Fomichev <sdf@google.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
+	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
+	xdp-hints@xdp-project.net, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-
-
-On 7/3/2023 6:50 PM, Yinjun Zhang wrote:
-> On Tuesday, July 4, 2023 12:11 AM, Alexander Lobakin wrote:
->> From: Louis Peens <louis.peens@corigine.com>
->> Date: Mon,  3 Jul 2023 14:01:16 +0200
->>
->>> From: Yinjun Zhang <yinjun.zhang@corigine.com>
->>>
->>> When moving devices from one namespace to another, mc addresses are
->>> cleaned in software while not removed from application firmware. Thus
->>> the mc addresses are remained and will cause resource leak.
->>>
->>> Now use `__dev_mc_unsync` to clean mc addresses when closing port.
->>>
->>> Fixes: e20aa071cd95 ("nfp: fix schedule in atomic context when sync mc
->> address")
->>> Cc: stable@vger.kernel.org
->>> Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
->>> Acked-by: Simon Horman <simon.horman@corigine.com>
->>> Signed-off-by: Louis Peens <louis.peens@corigine.com>
->>> ---
->>> Changes since v1:
->>>
->>> * Use __dev_mc_unsyc to clean mc addresses instead of tracking mc
->> addresses by
->>>   driver itself.
->>> * Clean mc addresses when closing port instead of driver exits,
->>>   so that the issue of moving devices between namespaces can be fixed.
->>> * Modify commit message accordingly.
->>>
->>>  .../ethernet/netronome/nfp/nfp_net_common.c   | 171 +++++++++---------
->>>  1 file changed, 87 insertions(+), 84 deletions(-)
->>
->> [...]
->>
->>> +static int nfp_net_mc_sync(struct net_device *netdev, const unsigned char
->> *addr)
->>> +{
->>> +	struct nfp_net *nn = netdev_priv(netdev);
->>> +
->>> +	if (netdev_mc_count(netdev) > NFP_NET_CFG_MAC_MC_MAX) {
->>> +		nn_err(nn, "Requested number of MC addresses (%d)
->> exceeds maximum (%d).\n",
->>> +		       netdev_mc_count(netdev),
->> NFP_NET_CFG_MAC_MC_MAX);
->>> +		return -EINVAL;
->>> +	}
->>> +
->>> +	return nfp_net_sched_mbox_amsg_work(nn,
->> NFP_NET_CFG_MBOX_CMD_MULTICAST_ADD, addr,
->>> +					    NFP_NET_CFG_MULTICAST_SZ,
->> nfp_net_mc_cfg);
->>> +}
->>> +
->>> +static int nfp_net_mc_unsync(struct net_device *netdev, const unsigned
->> char *addr)
->>> +{
->>> +	struct nfp_net *nn = netdev_priv(netdev);
->>> +
->>> +	return nfp_net_sched_mbox_amsg_work(nn,
->> NFP_NET_CFG_MBOX_CMD_MULTICAST_DEL, addr,
->>> +					    NFP_NET_CFG_MULTICAST_SZ,
->> nfp_net_mc_cfg);
->>> +}
->>
->> You can just declare nfp_net_mc_unsync()'s prototype here, so that it
->> will be visible to nfp_net_netdev_close(), without moving the whole set
->> of functions. Either way works, but that one would allow avoiding big
->> diffs not really related to fixing things going through the net-fixes tree.
+On 07/03, Larysa Zaremba wrote:
+> Use previously refactored code and create a function
+> that allows XDP code to read HW timestamp.
 > 
-> I didn't know which was preferred. Looks like minimum change is concerned
-> more. I'll change it.
+> Also, move cached_phctime into packet context, this way this data still
+> stays in the ring structure, just at the different address.
 > 
+> HW timestamp is the first supported hint in the driver,
+> so also add xdp_metadata_ops.
+> 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  drivers/net/ethernet/intel/ice/ice.h          |  2 ++
+>  drivers/net/ethernet/intel/ice/ice_ethtool.c  |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_lib.c      |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_main.c     |  1 +
+>  drivers/net/ethernet/intel/ice/ice_ptp.c      |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
+>  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 24 +++++++++++++++++++
+>  7 files changed, 31 insertions(+), 4 deletions(-)
+> 
+> diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ethernet/intel/ice/ice.h
+> index 4ba3d99439a0..7a973a2229f1 100644
+> --- a/drivers/net/ethernet/intel/ice/ice.h
+> +++ b/drivers/net/ethernet/intel/ice/ice.h
+> @@ -943,4 +943,6 @@ static inline void ice_clear_rdma_cap(struct ice_pf *pf)
+>  	set_bit(ICE_FLAG_UNPLUG_AUX_DEV, pf->flags);
+>  	clear_bit(ICE_FLAG_RDMA_ENA, pf->flags);
+>  }
+> +
+> +extern const struct xdp_metadata_ops ice_xdp_md_ops;
+>  #endif /* _ICE_H_ */
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> index 8d5cbbd0b3d5..3c3b9cbfbcd3 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+> @@ -2837,7 +2837,7 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
+>  		/* clone ring and setup updated count */
+>  		rx_rings[i] = *vsi->rx_rings[i];
+>  		rx_rings[i].count = new_rx_cnt;
+> -		rx_rings[i].cached_phctime = pf->ptp.cached_phc_time;
+> +		rx_rings[i].pkt_ctx.cached_phctime = pf->ptp.cached_phc_time;
+>  		rx_rings[i].desc = NULL;
+>  		rx_rings[i].rx_buf = NULL;
+>  		/* this is to allow wr32 to have something to write to
+> diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/ethernet/intel/ice/ice_lib.c
+> index 00e3afd507a4..eb69b0ac7956 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
+> @@ -1445,7 +1445,7 @@ static int ice_vsi_alloc_rings(struct ice_vsi *vsi)
+>  		ring->netdev = vsi->netdev;
+>  		ring->dev = dev;
+>  		ring->count = vsi->num_rx_desc;
+> -		ring->cached_phctime = pf->ptp.cached_phc_time;
+> +		ring->pkt_ctx.cached_phctime = pf->ptp.cached_phc_time;
+>  		WRITE_ONCE(vsi->rx_rings[i], ring);
+>  	}
+>  
+> diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+> index 93979ab18bc1..f21996b812ea 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_main.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_main.c
+> @@ -3384,6 +3384,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
+>  
+>  	netdev->netdev_ops = &ice_netdev_ops;
+>  	netdev->udp_tunnel_nic_info = &pf->hw.udp_tunnel_nic;
+> +	netdev->xdp_metadata_ops = &ice_xdp_md_ops;
+>  	ice_set_ethtool_ops(netdev);
+>  
+>  	if (vsi->type != ICE_VSI_PF)
+> diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> index a31333972c68..70697e4829dd 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
+> @@ -1038,7 +1038,7 @@ static int ice_ptp_update_cached_phctime(struct ice_pf *pf)
+>  		ice_for_each_rxq(vsi, j) {
+>  			if (!vsi->rx_rings[j])
+>  				continue;
+> -			WRITE_ONCE(vsi->rx_rings[j]->cached_phctime, systime);
+> +			WRITE_ONCE(vsi->rx_rings[j]->pkt_ctx.cached_phctime, systime);
+>  		}
+>  	}
+>  	clear_bit(ICE_CFG_BUSY, pf->state);
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> index d0ab2c4c0c91..4237702a58a9 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
+> @@ -259,6 +259,7 @@ enum ice_rx_dtype {
+>  
+>  struct ice_pkt_ctx {
+>  	const union ice_32b_rx_flex_desc *eop_desc;
+> +	u64 cached_phctime;
+>  };
+>  
+>  struct ice_xdp_buff {
+> @@ -354,7 +355,6 @@ struct ice_rx_ring {
+>  	struct ice_tx_ring *xdp_ring;
+>  	struct xsk_buff_pool *xsk_pool;
+>  	dma_addr_t dma;			/* physical address of ring */
+> -	u64 cached_phctime;
+>  	u16 rx_buf_len;
+>  	u8 dcb_tc;			/* Traffic class of ring */
+>  	u8 ptp_rx;
+> diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> index beb1c5bb392a..463d9e5cbe05 100644
+> --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
+> @@ -546,3 +546,27 @@ void ice_finalize_xdp_rx(struct ice_tx_ring *xdp_ring, unsigned int xdp_res,
+>  			spin_unlock(&xdp_ring->tx_lock);
+>  	}
+>  }
+> +
+> +/**
+> + * ice_xdp_rx_hw_ts - HW timestamp XDP hint handler
+> + * @ctx: XDP buff pointer
+> + * @ts_ns: destination address
+> + *
+> + * Copy HW timestamp (if available) to the destination address.
+> + */
+> +static int ice_xdp_rx_hw_ts(const struct xdp_md *ctx, u64 *ts_ns)
+> +{
+> +	const struct ice_xdp_buff *xdp_ext = (void *)ctx;
+> +	u64 cached_time;
+> +
+> +	cached_time = READ_ONCE(xdp_ext->pkt_ctx.cached_phctime);
 
-net-next might prefer code re-ordering and avoiding the extra
-declaration, but net would definitely want the smaller fix.
+I believe we have to have something like the following here:
 
-For what its worth, I double check this kind of thing by applying the
-patch to my git tree and using git's "color moved lines" options to diff.
+if (!ts_ns)
+	return -EINVAL;
 
-Doing so for this patch shows that the change really is a straight
-forward re-ordering without any additional changes accidentally included.
+IOW, I don't think verifier guarantees that those pointer args are
+non-NULL. Same for the other ice kfunc you're adding and veth changes.
 
-Thus, I have no objection to this version as-is, but a smaller v3 with
-the prototype is also fine with me.
-
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-Thanks,
-Jake
-
->>
->>> +
->>>  /**
->>>   * nfp_net_clear_config_and_disable() - Clear control BAR and disable NFP
->>>   * @nn:      NFP Net device to reconfigure
->>> @@ -1084,6 +1168,9 @@ static int nfp_net_netdev_close(struct net_device
->> *netdev)
->>>
->>>  	/* Step 2: Tell NFP
->>>  	 */
->>> +	if (nn->cap_w1 & NFP_NET_CFG_CTRL_MCAST_FILTER)
->>> +		__dev_mc_unsync(netdev, nfp_net_mc_unsync);
->>> +
->>>  	nfp_net_clear_config_and_disable(nn);
->>>  	nfp_port_configure(netdev, false);
->> [...]
->>
->> Thanks,
->> Olek
+Can you also fix it for the existing veth kfuncs? (or lmk if you prefer me
+to fix it).
 
