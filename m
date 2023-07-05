@@ -1,105 +1,129 @@
-Return-Path: <netdev+bounces-15633-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15635-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1EA40748DEE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 21:34:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE844748E0E
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 21:40:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CE39D2810F8
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:34:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB4D01C20BDD
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:40:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 030561549C;
-	Wed,  5 Jul 2023 19:34:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A2B154A5;
+	Wed,  5 Jul 2023 19:39:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4ACCDF43
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 19:34:01 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [217.72.192.78])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 351211737;
-	Wed,  5 Jul 2023 12:33:38 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=s29768273; t=1688585579; x=1689190379; i=markus.elfring@web.de;
- bh=k3bEGlJrK3mjEjmZkq0V3z4FQUWYbOJo7qMvrr3hRsc=;
- h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
- b=V5XwwkdwBasU6vINzGJ18otyce5FJXUSnPUVi4fT08dWaBNiSwrprWyzJWNWXT83InGndSs
- gA4oGywwOGlJKtHiLHkKcFuh8ClXeqTPyU4Hf5MExYhj0pAcAlqaHjPGcW4LDsF/mtxm5WkPE
- ut9NfHgsadz63cEIi7wsDHiuKeLIfmKBeBEPj4oqrrYWYfvhzo3oCaBFc9ANTCLkrarwTtX6h
- gXyRZn9G3LGwhSzrQ/e109FZrXuqsap3X+Wm1jgzNXlfm8s2CUHxAb3xMqK6hyo/maCoTjJHI
- zeXps7HARIzUxAxqvkiu3573sTau1WJPj+NLAR9tTe3YsWZaP2Gw==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb105
- [213.165.67.124]) with ESMTPSA (Nemesis) id 1MTOha-1qR07D2gJw-00U8zB; Wed, 05
- Jul 2023 21:32:59 +0200
-Message-ID: <5e126b18-1b9a-4224-5e02-9ab349e624d9@web.de>
-Date: Wed, 5 Jul 2023 21:32:57 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9628A156C0
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 19:39:46 +0000 (UTC)
+Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3A71732;
+	Wed,  5 Jul 2023 12:39:43 -0700 (PDT)
+Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-77acb04309dso353633939f.2;
+        Wed, 05 Jul 2023 12:39:43 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688585983; x=1691177983;
+        h=date:subject:message-id:references:in-reply-to:cc:to:from
+         :mime-version:content-transfer-encoding:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=OR44xsl8dcDDRHket6JLRoRPh10jvQanfxZD4Qq5o5A=;
+        b=a0CEu5mqjWGo8IGRyJ6e667dY3I/m6XXzpZ51tZxpu8RysCYjJU+tN6Pmka10t+tNL
+         oooNFqm83WP8oryCBd8YKBj9BGnVaA9OJp1YeceXV9c20ivZJK6m0jULeeECNW/v4GG9
+         x8dCy734zSFeG39mJzXskDlPq5eZtaJ+lGTdENV6NPvjk6UoBywYPERS2lDOF5BJFYp3
+         kJ+DjiwGB/OgmAVLJvysrHDOJSw+JkZTes4lHWGKWo/RqD2xbITtUJZHuTLoO01u2VQB
+         IzhWhU7AKfZVJpNIPEp9FzfucL57i3weprBCaPDmCMWC9t7laGKYAoKamyGJQhOZlKRp
+         nh+Q==
+X-Gm-Message-State: ABy/qLbAA2KurpshNzjgaeeDFzqBEK03cTCXm7X3AdjyVDtdNsxFYJrP
+	9baxSsRd22kpom7bJP+cPg==
+X-Google-Smtp-Source: APBJJlFTsATQZZbeDYi05vWkxMhLO+2kIHQFYrmGtwqcASMsu98qNuBpLmP0dT/ZyPLVLU0YF4GwxA==
+X-Received: by 2002:a6b:f208:0:b0:77e:3598:e511 with SMTP id q8-20020a6bf208000000b0077e3598e511mr177308ioh.2.1688585983078;
+        Wed, 05 Jul 2023 12:39:43 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id l10-20020a056638220a00b0042b1cd4c096sm3797893jas.74.2023.07.05.12.39.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jul 2023 12:39:42 -0700 (PDT)
+Received: (nullmailer pid 1714650 invoked by uid 1000);
+	Wed, 05 Jul 2023 19:39:32 -0000
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: 8bit
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-To: Wang Ming <machel@vivo.com>, netdev@vger.kernel.org,
- kernel-janitors@vger.kernel.org, linux-arm-kernel@lists.infradead.org,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
- Sunil Goutham <sgoutham@marvell.com>
-Cc: opensource.kernel@vivo.com, LKML <linux-kernel@vger.kernel.org>
-References: <20230705143507.4120-1-machel@vivo.com>
-Subject: Re: [PATCH net v2] net: thunderx: Fix resource leaks in a
- device_for_each_child_node() loop
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <20230705143507.4120-1-machel@vivo.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:gjIYDNaYeYt3NljkaaTd6rOJV1eu4OJwbvypFFA9sjIOYtUzhgh
- utrBGK6zMyAR0VOpMMyAlIXw+oDh7O5k6xzVWyrRbnboKvo3TSXf9Zg2OMMta9WgyIO6amL
- eUO3O/Jl2Ea2tO+D9738YrkaF/onnTF6/SGbYlWm22RZ4qJRz6UDnsZVEP9mPaMhPTGNAp6
- aUL7DwpNOVcMboVOopuCg==
-UI-OutboundReport: notjunk:1;M01:P0:T27z7aVsA1U=;ORyrSFDx63jqIWC8vssXUdlA8Lm
- JMlXj7gP9irhWCBlGJ4pJEz4QTNAgzn4c3/vRUbtUsdAbZd7IUWWlADlCruo4iNqynLfpEc6N
- 2bu7TWIcUZAcIGn6KBNK4NlZyKnSz+ad0HiJBGxJzMAxrcupYfOzq3x35M7ZXHyQ+ARc7t2G0
- 7tZYPxhXbfJkOlq3ljF+dTHGL/1CAqUk9mvQCKRVaCmJZVsYLiQupdkdne2S0DZe3rkuF+cd1
- W9LhlfEd+HQp6HCXfnWuWVmyCqZY3VXJPoFvrzJyttMwgO1dNAO0GDB+13NY7Jmxyrk7sBmYy
- OCwPwhJYStV9ZOQ8ppfVXg4e+2/D+eJ9amWFRJMwdjrf/fwbiKNVrS1y1UE+mg7S/751yDr1z
- fX42+q6w7EhA/FYtmhowM2zPPm+XnENFBHO2OCDZt8mdBD5Gl4hLvds9u82X5nWR8UGOvKgrY
- DLFpE+hNIYRibzs+526oBXNieTmQ3ERbrL6lBoDnunieB8GglWDxOZ5y6jevdo7wt5gQeO8Ga
- wDnXMRD+CfVaYSxtKYiMzicePUhQR85hvcUsK3+InJAz/+H6I9X0uJBryARC9mQaiuuoAvWwO
- 1+MmvYwTvpUi9fyGCR69dgTz6WII3xugaiP51PJXKVjY8lEQFtSH6z46yB0bKYolSc2t4x1fV
- gUuHmliBGwGD4GzjcoCkMIBsbUqbSwkWqpZCPuHJPSOkTkCRA3RuwHwma7t1/LP2uGnwYzQQK
- LLG7gz4von76n+Ti1KOE6a3SA93oAypmdxt99bzdt64+cxnz0fzO1ptXLkgRHTh7W/9VHSGq3
- yXJH7UvMUqNKkuFjEYEHjsG9jO2Ugl9EA/X+eE9q7dm6mbgshaVUu9jegQxPbHs4I2lWz4Rqf
- PUcYP4CCtSg6hb6EbwAVtUBqZPwELWdK5BAq4unWVwFrynxen9npMtTVOU90mTUp7pAGMDrQ/
- 4BzMdQ==
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+From: Rob Herring <robh@kernel.org>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: hugues.fruchet@foss.st.com, vkoul@kernel.org, linux-media@vger.kernel.org, 
+	gregkh@linuxfoundation.org, linux-phy@lists.infradead.org, lee@kernel.org, 
+	linux-kernel@vger.kernel.org, arnd@kernel.org, linux-serial@vger.kernel.org, 
+	mchehab@kernel.org, edumazet@google.com, arnaud.pouliquen@foss.st.com, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, 
+	linux-crypto@vger.kernel.org, jic23@kernel.org, pabeni@redhat.com, 
+	linux-usb@vger.kernel.org, alsa-devel@alsa-project.org, 
+	olivier.moysan@foss.st.com, fabrice.gasnier@foss.st.com, kuba@kernel.org, 
+	andi.shyti@kernel.org, alexandre.torgue@foss.st.com, conor+dt@kernel.org, 
+	richardcochran@gmail.com, will@kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, linux-mmc@vger.kernel.org, 
+	krzysztof.kozlowski+dt@linaro.org, linux-arm-kernel@lists.infradead.org, 
+	catalin.marinas@arm.com, dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	Oleksii_Moisieiev@epam.com, linux-spi@vger.kernel.org, 
+	linux-iio@vger.kernel.org, netdev@vger.kernel.org, ulf.hansson@linaro.org, 
+	devicetree@vger.kernel.org, robh+dt@kernel.org
+In-Reply-To: <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
+Message-Id: <168858597155.1714560.12250834903693245143.robh@kernel.org>
+Subject: Re: [PATCH 02/10] dt-bindings: bus: add device tree bindings for
+ RIFSC
+Date: Wed, 05 Jul 2023 13:39:32 -0600
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The device_for_each_child_node() loop in
-> bgx_init_of_phy() function should have
-> wnode_handle_put() before break
-> which could avoid resource leaks.
-> This patch could fix this bug.
 
-Please choose a better imperative change suggestion.
+On Wed, 05 Jul 2023 19:27:51 +0200, Gatien Chevallier wrote:
+> Document RIFSC (RIF security controller). RIFSC is a firewall controller
+> composed of different kinds of hardware resources.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+>  .../bindings/bus/st,stm32-rifsc.yaml          | 101 ++++++++++++++++++
+>  1 file changed, 101 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
+> 
 
-See also:
-https://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/tree/Do=
-cumentation/process/submitting-patches.rst?h=3Dv6.4#n94
+My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
+on your patch (DT_CHECKER_FLAGS is new in v5.13):
 
+yamllint warnings/errors:
 
-How do you think about to add the tag =E2=80=9CFixes=E2=80=9D?
+dtschema/dtc warnings/errors:
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml: title: 'STM32 Resource isolation framework security controller bindings' should not be valid under {'pattern': '([Bb]inding| [Ss]chema)'}
+	hint: Everything is a binding/schema, no need to say it. Describe what hardware the binding is for.
+	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
 
-Regards,
-Markus
+doc reference errors (make refcheckdocs):
+
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230705172759.1610753-3-gatien.chevallier@foss.st.com
+
+The base for the series is generally the latest rc1. A different dependency
+should be noted in *this* patch.
+
+If you already ran 'make dt_binding_check' and didn't see the above
+error(s), then make sure 'yamllint' is installed and dt-schema is up to
+date:
+
+pip3 install dtschema --upgrade
+
+Please check and re-submit after running the above command yourself. Note
+that DT_SCHEMA_FILES can be set to your schema file to speed up checking
+your schema. However, it must be unset to test all examples with your schema.
+
 
