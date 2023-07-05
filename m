@@ -1,49 +1,36 @@
-Return-Path: <netdev+bounces-15549-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15550-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 69909748552
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:45:40 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0FD7A748566
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:50:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 262D328101C
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:45:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4208F1C20959
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:50:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 650D0D30B;
-	Wed,  5 Jul 2023 13:45:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3AD76D30B;
+	Wed,  5 Jul 2023 13:50:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E41CFC8F8;
-	Wed,  5 Jul 2023 13:45:33 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id F30B0C433C7;
-	Wed,  5 Jul 2023 13:45:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688564733;
-	bh=2nZc8QuDXQtU0mJQdbBKKU3T4vyKo8XqmVijsQeBb+w=;
-	h=From:To:Cc:Subject:In-Reply-To:References:Date:From;
-	b=HHCNlWJdsDyCfJAqxVw88yhrOEwjE4+AzjYxJ5QdiR8zt2Bq3oevCi7o2fOX30Vs9
-	 vR4PqMoHxn+Lu2H8Z56jIubA19YmDBfJKFWE6sO4kkMYH0qdo6rsCG7LGu3w3/RN4t
-	 XIgbDrYMp/K5PeAmItfPHIpVfVuLJy2b65tmxMT0o3IqOBb4eVUNsNj/EjOrEB7Lms
-	 Ki+JeSy0W8UmVOzyslNJUj5BvAD4YWTGpWbPcxD71SfAeh4OxhX8/nv0wdNMxK1fTd
-	 b4Gj68qHZOwIh2u5ghqhV5kuA1UFfeWvCE/zKBicWXuF9rz5rWJUVEzb4ZcddFTEAc
-	 QJIN5x6a71C0A==
-From: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>
-To: Daniel Borkmann <daniel@iogearbox.net>, Andrii Nakryiko
- <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org,
- netdev@vger.kernel.org
-Cc: =?utf-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>, Alexei
- Starovoitov <ast@kernel.org>,
- linux-kselftest@vger.kernel.org, linux-kernel@vger.kernel.org,
- linux-riscv@lists.infradead.org
-Subject: Re: [PATCH bpf-next 0/2] BPF kselftest cross-build/RISC-V fixes
-In-Reply-To: <9ee053a4-500c-2722-d822-d137648e55e5@iogearbox.net>
-References: <20230705113926.751791-1-bjorn@kernel.org>
- <9ee053a4-500c-2722-d822-d137648e55e5@iogearbox.net>
-Date: Wed, 05 Jul 2023 15:45:30 +0200
-Message-ID: <87bkgqtqth.fsf@all.your.base.are.belong.to.us>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2D7CFC8F8
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:50:22 +0000 (UTC)
+Received: from mail.netfilter.org (mail.netfilter.org [217.70.188.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTP id 4FC58F7;
+	Wed,  5 Jul 2023 06:50:21 -0700 (PDT)
+Date: Wed, 5 Jul 2023 15:50:17 +0200
+From: Pablo Neira Ayuso <pablo@netfilter.org>
+To: Florian Westphal <fw@strlen.de>
+Cc: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>,
+	netfilter-devel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH] netfilter: nf_tables: prevent OOB access in
+ nft_byteorder_eval
+Message-ID: <ZKV1GZrKp6kf4IeU@calendula>
+References: <20230705121515.747251-1-cascardo@canonical.com>
+ <20230705130336.GD3751@breakpoint.cc>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -51,51 +38,118 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=utf-8
-Content-Transfer-Encoding: quoted-printable
+Content-Disposition: inline
+In-Reply-To: <20230705130336.GD3751@breakpoint.cc>
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Daniel Borkmann <daniel@iogearbox.net> writes:
+On Wed, Jul 05, 2023 at 03:03:36PM +0200, Florian Westphal wrote:
+> Thadeu Lima de Souza Cascardo <cascardo@canonical.com> wrote:
+> > When evaluating byteorder expressions with size 2, a union with 32-bit and
+> > 16-bit members is used. Since the 16-bit members are aligned to 32-bit,
+> > the array accesses will be out-of-bounds.
+> > 
+> > It may lead to a stack-out-of-bounds access like the one below:
+> 
+> Yes, this is broken.
+> 
+> > Using simple s32 and s16 pointers for each of these accesses fixes the
+> > problem.
+> 
+> I'm not sure this is correct.  Its certainly less wrong of course.
+> 
+> > Fixes: 96518518cc41 ("netfilter: add nftables")
+> > Cc: stable@vger.kernel.org
+> > Reported-by: Tanguy DUBROCA (@SidewayRE) from @Synacktiv working with ZDI
+> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+> > ---
+> >  net/netfilter/nft_byteorder.c | 17 ++++++++++-------
+> >  1 file changed, 10 insertions(+), 7 deletions(-)
+> > 
+> > diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
+> > index 9a85e797ed58..aa16bd2e92e2 100644
+> > --- a/net/netfilter/nft_byteorder.c
+> > +++ b/net/netfilter/nft_byteorder.c
+> > @@ -30,11 +30,14 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+> >  	const struct nft_byteorder *priv = nft_expr_priv(expr);
+> >  	u32 *src = &regs->data[priv->sreg];
+> >  	u32 *dst = &regs->data[priv->dreg];
+> > -	union { u32 u32; u16 u16; } *s, *d;
+> > +	u32 *s32, *d32;
+> > +	u16 *s16, *d16;
+> >  	unsigned int i;
+> >  
+> > -	s = (void *)src;
+> > -	d = (void *)dst;
+> > +	s32 = (void *)src;
+> > +	d32 = (void *)dst;
+> > +	s16 = (void *)src;
+> > +	d16 = (void *)dst;
+> >  
+> >  	switch (priv->size) {
+> >  	case 8: {
+> > @@ -62,11 +65,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+> >  		switch (priv->op) {
+> >  		case NFT_BYTEORDER_NTOH:
+> >  			for (i = 0; i < priv->len / 4; i++)
+> > -				d[i].u32 = ntohl((__force __be32)s[i].u32);
+> > +				d32[i] = ntohl((__force __be32)s32[i]);
+> >  			break;
+> >  		case NFT_BYTEORDER_HTON:
+> >  			for (i = 0; i < priv->len / 4; i++)
+> > -				d[i].u32 = (__force __u32)htonl(s[i].u32);
+> > +				d32[i] = (__force __u32)htonl(s32[i]);
+> >  			break;
+> 
+> Ack, this looks better, but I'd just use src[i] and dst[i] rather than
+> the weird union pointers the original has.
 
-> On 7/5/23 1:39 PM, Bj=C3=B6rn T=C3=B6pel wrote:
->> From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
->>=20
->> This series has two minor fixes, found when cross-compiling for the
->> RISC-V architecture.
->>=20
->> Some RISC-V systems do not define HAVE_EFFICIENT_UNALIGNED_ACCESS,
->> which made some of tests bail out. Fix the failing tests by adding
->> F_NEEDS_EFFICIENT_UNALIGNED_ACCESS.
->>=20
->> ...and some RISC-V systems *do* define
->> HAVE_EFFICIENT_UNALIGNED_ACCESS. In this case the autoconf.h was not
->> correctly picked up by the build system.
->
-> Looks good, applied thanks!=20
+Agreed.
 
-Thank you!
+> > @@ -74,11 +77,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+> >  		switch (priv->op) {
+> >  		case NFT_BYTEORDER_NTOH:
+> >  			for (i = 0; i < priv->len / 2; i++)
+> > -				d[i].u16 = ntohs((__force __be16)s[i].u16);
+> > +				d16[i] = ntohs((__force __be16)s16[i]);
+> 
+> This on the other hand... I'd say this should mimic what the 64bit
+> case is doing and use nft_reg_store16() nft_reg_load16() helpers for
+> the register accesses.
+> 
+> something like:
+> 
+> for (i = 0; i < priv->len / 2; i++) {
+>      v16 = nft_reg_load16(&src[i]);
+>      nft_reg_store16(&dst[i], + ntohs((__force __be16)v16));
+> }
+> [ not even compile tested ]
+> 
+> Same for the htons case.
+> 
+> On a slightly related note, some of the nftables test cases create bogus
+> conversions, e.g.:
+> 
+> # src/nft --debug=netlink add rule ip6 t c 'ct mark set ip6 dscp << 2 |
+> # 0x10'
+> ip6 t c
+>   [ payload load 2b @ network header + 0 => reg 1 ]
+>   [ bitwise reg 1 = ( reg 1 & 0x0000c00f ) ^ 0x00000000 ]
 
-> Any plans on working towards integrating riscv into upstream BPF CI?
-> Would love to see that happening. :)
+This is accessing an 8 bit-field that spans 2 bytes.
 
-Yes! I started hacking a bit on that some time back:
+>   [ bitwise reg 1 = ( reg 1 >> 0x00000006 ) ]
 
-  https://github.com/libbpf/ci/pull/87
-  https://github.com/kernel-patches/vmtest/pull/194
+Shift should come _after_ byteorder.
 
-(TL;DR: I'll continuing that work at some point.)
+>   [ byteorder reg 1 = ntoh(reg 1, 2, 1) ]	// NO-OP! should be reg 1, 2, 2) I presume?
 
-RISC-V still needs cross-compilation, and testing on qemu/TCG (on
-typically x86-hosts), which puts some constraints on the
-rootfs/cross-compilation host; For RISC-V Debian Bullseye is way too old
-(a lot packages are missing/broken). Typically for BPF it would be
-Ubuntu Kinetic (or later), or some Debian Sid snapshot.
+Yes, this should be length=2.
 
-The rootfs, the host, and the host foreign arch would need to be the
-same for "no-hassle cross-compilation on Debian derivatives" -- and at
-least younger than "Ubuntu Kinetic"-age.
+I'll take a look at this bytecode bug.
 
-AFAIU, there are some issues with rootfs version and build host
-versioning for other archs as well: https://github.com/libbpf/ci/pull/83
-
-
-Bj=C3=B6rn
+> I'd suggest to add a patch for nf-next that rejects such crap.
 
