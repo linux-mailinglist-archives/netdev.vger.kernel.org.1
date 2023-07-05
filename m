@@ -1,163 +1,146 @@
-Return-Path: <netdev+bounces-15535-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15536-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 74E6E748476
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:54:17 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E0D774848D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:03:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20DD281025
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 12:54:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5750F1C20AFE
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:03:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A50748E;
-	Wed,  5 Jul 2023 12:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5FB7464;
+	Wed,  5 Jul 2023 13:03:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A73B7491
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 12:53:56 +0000 (UTC)
-Received: from mail-pl1-f206.google.com (mail-pl1-f206.google.com [209.85.214.206])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C177C1700
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 05:53:54 -0700 (PDT)
-Received: by mail-pl1-f206.google.com with SMTP id d9443c01a7336-1b8a4e947a1so8966075ad.1
-        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 05:53:54 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688561634; x=1691153634;
-        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Iq+8TpxEHiTomBKOeW+5QxZuXjnYw6FM69rru1Is8Mw=;
-        b=FAtPxi2F3dBPGb5491AGrhbhfkpPPvE5qgInuAkj0f10B2NxyyMc9BAP73LdCmKOsN
-         P+byt1FakXGnHsXGzNXZLGNNsecOIPLNNKOX61cBi/K5wzaj99IuK9FMfc2JinJbcfjV
-         jg1nViPOvBvEAj4XbjiSw1o++enQ9xHqrmheipO6rx3Q9vRArylTgZRKn+vm8GNtQZV4
-         FQDk9VcUKCumE1in9CLQ8LGaEDOdea17napGphwZ+DOE4maEn/F5z/KTK3eKF9qFv8Gy
-         3+odchzDQWah7v07SssUnjrIU6Fic6ycmEFjFEb84UPlZYqE/J4fzw5DNhmWDGpn2L/W
-         qmWQ==
-X-Gm-Message-State: ABy/qLbAHPkHTRXXXOfaMQ3dLa/9K1dE1dQA/Ak2wQbE6UyCwz2IdI7v
-	dkKe2J3a/8V8STdwmGlSBwIbeSnTU0aMVQ4xRxb2JgHg8zQZ
-X-Google-Smtp-Source: APBJJlGe7KI03KEPVhWSwq2PoQUmcREB9w7Iy7ebAYt94qwy+CK/WLF8stcYUP8kEGM3yaGUu3VPoHMwmvEdR8SBUxjFqrPK+4m/
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECB8138F
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:03:39 +0000 (UTC)
+Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D81FDA;
+	Wed,  5 Jul 2023 06:03:38 -0700 (PDT)
+Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
+	(envelope-from <fw@strlen.de>)
+	id 1qH2AS-0006HS-Pv; Wed, 05 Jul 2023 15:03:36 +0200
+Date: Wed, 5 Jul 2023 15:03:36 +0200
+From: Florian Westphal <fw@strlen.de>
+To: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: Re: [PATCH] netfilter: nf_tables: prevent OOB access in
+ nft_byteorder_eval
+Message-ID: <20230705130336.GD3751@breakpoint.cc>
+References: <20230705121515.747251-1-cascardo@canonical.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:903:2149:b0:1b6:a2e4:c8f8 with SMTP id
- s9-20020a170903214900b001b6a2e4c8f8mr1311886ple.2.1688561634307; Wed, 05 Jul
- 2023 05:53:54 -0700 (PDT)
-Date: Wed, 05 Jul 2023 05:53:54 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <00000000000064f39a05ffbce427@google.com>
-Subject: [syzbot] [usb?] KMSAN: uninit-value in smsc95xx_eeprom_confirm_not_busy
-From: syzbot <syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com>
-To: UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com, 
-	glider@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
-	steve.glendinning@shawell.net, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230705121515.747251-1-cascardo@canonical.com>
+User-Agent: Mutt/1.10.1 (2018-07-13)
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Thadeu Lima de Souza Cascardo <cascardo@canonical.com> wrote:
+> When evaluating byteorder expressions with size 2, a union with 32-bit and
+> 16-bit members is used. Since the 16-bit members are aligned to 32-bit,
+> the array accesses will be out-of-bounds.
+> 
+> It may lead to a stack-out-of-bounds access like the one below:
 
-syzbot found the following issue on:
+Yes, this is broken.
 
-HEAD commit:    257152fe29be string: use __builtin_memcpy() in strlcpy/str..
-git tree:       https://github.com/google/kmsan.git master
-console+strace: https://syzkaller.appspot.com/x/log.txt?x=156aa484a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=d16a560a6e6eb097
-dashboard link: https://syzkaller.appspot.com/bug?extid=2c97a98a5ba9ea9c23bd
-compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15433d14a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12528ac8a80000
+> Using simple s32 and s16 pointers for each of these accesses fixes the
+> problem.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/8e2711366405/disk-257152fe.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cec15df7e485/vmlinux-257152fe.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/f212903d5649/bzImage-257152fe.xz
+I'm not sure this is correct.  Its certainly less wrong of course.
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com
+> Fixes: 96518518cc41 ("netfilter: add nftables")
+> Cc: stable@vger.kernel.org
+> Reported-by: Tanguy DUBROCA (@SidewayRE) from @Synacktiv working with ZDI
+> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+> ---
+>  net/netfilter/nft_byteorder.c | 17 ++++++++++-------
+>  1 file changed, 10 insertions(+), 7 deletions(-)
+> 
+> diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
+> index 9a85e797ed58..aa16bd2e92e2 100644
+> --- a/net/netfilter/nft_byteorder.c
+> +++ b/net/netfilter/nft_byteorder.c
+> @@ -30,11 +30,14 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+>  	const struct nft_byteorder *priv = nft_expr_priv(expr);
+>  	u32 *src = &regs->data[priv->sreg];
+>  	u32 *dst = &regs->data[priv->dreg];
+> -	union { u32 u32; u16 u16; } *s, *d;
+> +	u32 *s32, *d32;
+> +	u16 *s16, *d16;
+>  	unsigned int i;
+>  
+> -	s = (void *)src;
+> -	d = (void *)dst;
+> +	s32 = (void *)src;
+> +	d32 = (void *)dst;
+> +	s16 = (void *)src;
+> +	d16 = (void *)dst;
+>  
+>  	switch (priv->size) {
+>  	case 8: {
+> @@ -62,11 +65,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+>  		switch (priv->op) {
+>  		case NFT_BYTEORDER_NTOH:
+>  			for (i = 0; i < priv->len / 4; i++)
+> -				d[i].u32 = ntohl((__force __be32)s[i].u32);
+> +				d32[i] = ntohl((__force __be32)s32[i]);
+>  			break;
+>  		case NFT_BYTEORDER_HTON:
+>  			for (i = 0; i < priv->len / 4; i++)
+> -				d[i].u32 = (__force __u32)htonl(s[i].u32);
+> +				d32[i] = (__force __u32)htonl(s32[i]);
+>  			break;
 
-=====================================================
-BUG: KMSAN: uninit-value in smsc95xx_eeprom_confirm_not_busy+0x1eb/0x360 drivers/net/usb/smsc95xx.c:348
- smsc95xx_eeprom_confirm_not_busy+0x1eb/0x360 drivers/net/usb/smsc95xx.c:348
- smsc95xx_read_eeprom+0x59/0x670 drivers/net/usb/smsc95xx.c:367
- smsc95xx_init_mac_address drivers/net/usb/smsc95xx.c:816 [inline]
- smsc95xx_bind+0x6d8/0x22e0 drivers/net/usb/smsc95xx.c:1128
- usbnet_probe+0x1011/0x3f20 drivers/net/usb/usbnet.c:1750
- usb_probe_interface+0xc75/0x1210 drivers/usb/core/driver.c:396
- really_probe+0x506/0xf40 drivers/base/dd.c:658
- __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
- driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
- __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
- bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
- __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
- device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
- bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
- device_add+0x1b6a/0x24b0 drivers/base/core.c:3625
- usb_set_configuration+0x31c9/0x38c0 drivers/usb/core/message.c:2211
- usb_generic_driver_probe+0x109/0x2a0 drivers/usb/core/generic.c:238
- usb_probe_device+0x290/0x4a0 drivers/usb/core/driver.c:293
- really_probe+0x506/0xf40 drivers/base/dd.c:658
- __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
- driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
- __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
- bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
- __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
- device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
- bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
- device_add+0x1b6a/0x24b0 drivers/base/core.c:3625
- usb_new_device+0x15f6/0x22f0 drivers/usb/core/hub.c:2575
- hub_port_connect drivers/usb/core/hub.c:5407 [inline]
- hub_port_connect_change drivers/usb/core/hub.c:5551 [inline]
- port_event drivers/usb/core/hub.c:5711 [inline]
- hub_event+0x577b/0x78a0 drivers/usb/core/hub.c:5793
- process_one_work+0xb0d/0x1410 kernel/workqueue.c:2408
- worker_thread+0x107e/0x1d60 kernel/workqueue.c:2555
- kthread+0x3e8/0x540 kernel/kthread.c:379
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+Ack, this looks better, but I'd just use src[i] and dst[i] rather than
+the weird union pointers the original has.
 
-Local variable buf.i created at:
- smsc95xx_read_reg drivers/net/usb/smsc95xx.c:90 [inline]
- smsc95xx_eeprom_confirm_not_busy+0x92/0x360 drivers/net/usb/smsc95xx.c:342
- smsc95xx_read_eeprom+0x59/0x670 drivers/net/usb/smsc95xx.c:367
+> @@ -74,11 +77,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
+>  		switch (priv->op) {
+>  		case NFT_BYTEORDER_NTOH:
+>  			for (i = 0; i < priv->len / 2; i++)
+> -				d[i].u16 = ntohs((__force __be16)s[i].u16);
+> +				d16[i] = ntohs((__force __be16)s16[i]);
 
-CPU: 0 PID: 9 Comm: kworker/0:1 Not tainted 6.4.0-syzkaller-g257152fe29be #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-Workqueue: usb_hub_wq hub_event
-=====================================================
+This on the other hand... I'd say this should mimic what the 64bit
+case is doing and use nft_reg_store16() nft_reg_load16() helpers for
+the register accesses.
 
+something like:
 
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
+for (i = 0; i < priv->len / 2; i++) {
+     v16 = nft_reg_load16(&src[i]);
+     nft_reg_store16(&dst[i], + ntohs((__force __be16)v16));
+}
 
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+[ not even compile tested ]
 
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
+Same for the htons case.
 
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
+On a slightly related note, some of the nftables test cases create bogus
+conversions, e.g.:
 
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
+# src/nft --debug=netlink add rule ip6 t c 'ct mark set ip6 dscp << 2 |
+# 0x10'
+ip6 t c
+  [ payload load 2b @ network header + 0 => reg 1 ]
+  [ bitwise reg 1 = ( reg 1 & 0x0000c00f ) ^ 0x00000000 ]
+  [ bitwise reg 1 = ( reg 1 >> 0x00000006 ) ]
+  [ byteorder reg 1 = ntoh(reg 1, 2, 1) ]	// NO-OP! should be reg 1, 2, 2) I presume?
 
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+I'd suggest to add a patch for nf-next that rejects such crap.
 
