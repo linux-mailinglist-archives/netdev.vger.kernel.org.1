@@ -1,287 +1,226 @@
-Return-Path: <netdev+bounces-15554-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15555-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 43852748686
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 16:39:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id AAC1C748697
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 16:42:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDB86281025
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:39:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C95891C20B23
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:42:40 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACABDD530;
-	Wed,  5 Jul 2023 14:39:44 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 94FAF10946;
+	Wed,  5 Jul 2023 14:42:38 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712C23233;
-	Wed,  5 Jul 2023 14:39:44 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7A9113;
-	Wed,  5 Jul 2023 07:39:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=a3Rf4+roGcyzICjP/y+mzVOY5fi2qEb4QAdDmwYjSrY=; b=aX26S1+S9ndT/vzQo02Vq2zdDI
-	I4us3iH1FQtMqBOG3NELuDdA0BgZ09qftjKvCJGWMrEA9O3B9EXoue6iuiLiUVTGDLaGqWfu2/O4P
-	V5UrbWTffRe0hcrmWUaXEVBesPRuoUmNpSkFqfcymn3vdLfhLzl0KdjbBwW5GqQde8U5EdAQ5mocw
-	gs7C2U3udmVDnzsnVcPsF/0Ku4yB5ZAIsPl+GHDYHJc/luD8Fefdbz+LXLr/0hzWm0n315ly9CNwt
-	S3u8GDF3jlGxuFYXKwBKuU2fP1DLWXBztGs/ABsJ7btY7lA+Kg/v7RFWMVV/1wtOF5tjGHGdnC78T
-	a37xe0Sw==;
-Received: from sslproxy03.your-server.de ([88.198.220.132])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qH3fD-000Db4-9D; Wed, 05 Jul 2023 16:39:27 +0200
-Received: from [178.197.249.31] (helo=linux.home)
-	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qH3fC-000GRN-EA; Wed, 05 Jul 2023 16:39:26 +0200
-Subject: Re: [PATCH bpf-next] bpf: Introduce bpf generic log
-To: Leon Hwang <hffilwlqm@gmail.com>, ast@kernel.org
-Cc: john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20230705132058.46194-1-hffilwlqm@gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <1a205a85-ebf2-6d90-468d-4fd63ce3dd0f@iogearbox.net>
-Date: Wed, 5 Jul 2023 16:39:25 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 86BEE6FA1
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 14:42:38 +0000 (UTC)
+Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06BDA1709;
+	Wed,  5 Jul 2023 07:42:36 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688568157; x=1720104157;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=aeyGmCu6oRADhuKpnzSobnSs+iMboZlfPGYBg0HUc98=;
+  b=EIbY4XZAnrZnCf/58vOssTPmKdT9L+AFrObali3YUZcDgeDZvMgSv7BR
+   X2yFRzxYkSuyGJpThCFOWqF6LBwBJ7/bqIfaDolzvJeXuD8H1PruEs1kB
+   yCos0/lpxVQ+ofGjjlbqz4dR8xBLJ/eqg3pz+SRJXC/TaHFeJWRVgnbWc
+   MqRh6Fu/ibH0ML4/FCtAzcyyrVbqseEBftsFTfwtrI1AzE94EWsDzA0a7
+   aOlUa2iFUh6E0b3wct/1/mBBD0snsyd3rJUcWRNUtHnplfFiQdnGK2KtM
+   oTM9ODHxSKXfJP7ymVqriZFufrWywalF9DbwOZZeoZz7XCbK4I91AgdJt
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="365928623"
+X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
+   d="scan'208";a="365928623"
+Received: from orsmga002.jf.intel.com ([10.7.209.21])
+  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 07:42:36 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="719259853"
+X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
+   d="scan'208";a="719259853"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga002.jf.intel.com with ESMTP; 05 Jul 2023 07:42:35 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 5 Jul 2023 07:42:35 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 5 Jul 2023 07:42:34 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Wed, 5 Jul 2023 07:42:34 -0700
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (104.47.55.104)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Wed, 5 Jul 2023 07:42:33 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BypMbRWeCXzzdEhLYc5R0a7lWzj4iYStVwhckhgGqVgi/MKmYAHrMyquDaVgKOj40K0aFq7AJBrGWqjrGjHUsUlHJDtNf0s7etP4n7csf6kx7lVE7xrnfwIL95y2STMQyk0RF24NUq84hGsXosI/XRka8MMV17y3lwO7RHhxrJkoT1KfaD8P0wpAWk/hBN7RpJzz4L8+bgrPxNFR55XDYE6pQpJ4GcMF0viCa1EgYmmMnMZqLbkipHTDuvrg22mrIP/RjC6qdQWqBer7xcgcpjZcKvxdQW3XvDLNEAemq+53f/4u/BzMtZPud8ZJMCkMl6KW3kfT4kryAee2iTUobg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=sil9xiPwYgg8KcIM/8JQn25tc12MWLox8h56F2pWFNs=;
+ b=eihN6ys/HGFrRNZeAaJEIZd+loohSkef1OA7DpMkbbx57QyWOi5XJ0WevOdHSwkvWGRN/gbiRDK8bywNLoVjx21/3B2O/wCuYHuva2CE95PUq4uVUmi3QZY0rtZl2g7VfyOLcCozYIlfeY0RJ5EBFtaOPcdp2gKzpdIbsKC/E227zTFhzLXE56dOnlOB0SqKF3EDX4AL4IbGjXp1LmyVeYI1AW26AJ4nwW7dPARx7/9qAANa9CuJl9VEM3uc9R9rgqyMtUtcJFH9hShkHHTHtYEFSOicWayIc+GZWum2mGQu8wRMI+IK+tfvU24N13Da7Lt//HbEr941hcwyJrsYwg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by MW4PR11MB6618.namprd11.prod.outlook.com (2603:10b6:303:1ec::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
+ 2023 14:42:32 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::1ecd:561c:902a:7130]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::1ecd:561c:902a:7130%4]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
+ 14:42:32 +0000
+Message-ID: <24583594-4ccc-48aa-d468-9325c97df9a4@intel.com>
+Date: Wed, 5 Jul 2023 16:41:11 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH RFC net-next 2/4] net: page_pool: avoid calling no-op
+ externals when possible
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+CC: Alexander Duyck <alexander.duyck@gmail.com>, "David S. Miller"
+	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
+	<pabeni@redhat.com>, Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>, Yunsheng Lin
+	<linyunsheng@huawei.com>, Alexander Duyck <alexanderduyck@fb.com>, "Jesper
+ Dangaard Brouer" <hawk@kernel.org>, Ilias Apalodimas
+	<ilias.apalodimas@linaro.org>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+References: <20230629152305.905962-1-aleksander.lobakin@intel.com>
+ <20230629152305.905962-3-aleksander.lobakin@intel.com>
+ <69e827e239dab9fd7986ee43cef599d024c8535f.camel@gmail.com>
+ <ac4a8761-410e-e8cc-d6b2-d56b820a7888@intel.com>
+ <CAKgT0UfZCGnWgOH96E4GV3ZP6LLbROHM7SHE8NKwq+exX+Gk_Q@mail.gmail.com>
+ <413e3e21-e941-46d0-bc36-fd9715a55fc4@intel.com>
+ <20230703133207.4f0c54ce@kernel.org>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <20230703133207.4f0c54ce@kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: FR0P281CA0112.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a8::11) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230705132058.46194-1-hffilwlqm@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 7bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26960/Wed Jul  5 09:29:05 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|MW4PR11MB6618:EE_
+X-MS-Office365-Filtering-Correlation-Id: 2ccb7fca-8f3a-4dd4-2008-08db7d661055
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: N5Nia9zgUCdo/yAYSpGFuvBZH9iPCS4RvSl95hxwlYGqlDr2CtnBSHwZU3cgh9J/zE/5TdnzlVNwxL0bQO9f4+xHG0jhnW1cAOvOYLrCJ9lq7mKjQ6C3pMM1pZCfCmAdPKnv786yjgRUdTmITiAfzzI+4j76xNdUVR1MA9bprn29CMRYDKpqKVy34jbkDkGIHg9eQ+EJ8ByErPJbVtLGGBPOf8DjjJQniR3fngAlIViL9mybJp0Z4S2igLFXKb1P2zFibHdUu6reAyo+by1w5uMy7OezaD0jV9PU+d3Avp6eBqOEqmwtFYlvJpXBeib0OTbyLuSXfs1amX+ciD+25QZTVjwPefE3BwmLcBtgvW9ylk0j3GJLgojlYNf0Id45O+pNIBoL8fb5qV0Mb9TaEq1ZBhgEtzThWDnWvkAkkE0Arago0L9uywmMNlbKj98M0GGHCYWvhJGEDner8mLlrfQgNNFsH3qIp8Me/2htsWXln+l0dlBdBJxGUqHhAePd9wFb3EwS1d3jNqKzPtTLHjcnBbC0Ve0NvYMyYBYCFAwDyDSanoQ00sXUOCEKtFKp+sllq8y4ytAaLNoUjNnDG+LpYozjEWxR+PJIKG2uneJgQaeijx2kvyr3NSgs+O08IRAqoMiJ8keoNt5j+FPyWg==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(366004)(376002)(346002)(136003)(451199021)(186003)(82960400001)(478600001)(6512007)(6506007)(26005)(31686004)(86362001)(2616005)(6666004)(316002)(54906003)(38100700002)(6486002)(66556008)(6916009)(66946007)(4326008)(66476007)(7416002)(5660300002)(8676002)(8936002)(2906002)(41300700001)(31696002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?d3pvL0xsVHFWWmhtNStrNWc0QnpDckZWVFM4aDlPc0w0TEd4aWxxUkRrRUh1?=
+ =?utf-8?B?SWFaMzlYR1o0S1IrS3NNMzZlWjNwekFiVUplRUZFZ3FtRHlGZGFmU20ya1NL?=
+ =?utf-8?B?RUkzSmlLNlB1RStiazVHWk82bGhEMDFXamliYlZxSUpTNlRzSGg5dExGemE0?=
+ =?utf-8?B?TFRTTXN4Vkk5YXdtbmREQS9NUVdVRWV2L3pYS3RqSC9DTzk3ZXFxWUphaGR1?=
+ =?utf-8?B?Zk9SUzhHbTBSMDdFbCtYTVdqTElUZXJ5b2hjZE5DWTA5VnlMSEMxSkh4b2FQ?=
+ =?utf-8?B?UnpHVjBKenk5NDBBekVwSStXa1pyYkZFdThzMFFOb2k1WDUwc3IvcWhlZ0JE?=
+ =?utf-8?B?UDhsU0ZQRkhTVS9LZTVUM0tJQ08ybW15cDgxQzJiUW13NDliSWxrVTVCalBU?=
+ =?utf-8?B?VStZLytpYnBIZ2hpVzJHME5MNjhlQUxnYnM2dlJWaTBIMzEwWGxPbE40aTFH?=
+ =?utf-8?B?dUtwSVdxRkhKMHBkTUtZb0RHRTVRQUhpYXJpUHRXejJiaXRiUEJpRnJ5RkNL?=
+ =?utf-8?B?eWd5Vk40d0xQNWlzclY1eDR1UmhyZmlQdm1BUU4zd0RSOENyejlLQWl6UEpt?=
+ =?utf-8?B?N1NVQjU3ZExxc3dITDJHNkRadFhrYW5Gd0ZpdS9UckFlNzRna3h2ZDdxNm05?=
+ =?utf-8?B?SjBDZ0FpeXBnc1NsMzBaMGhJV09kTHhsenduajNWYm9MYUp5ZEdrbUZFR2c3?=
+ =?utf-8?B?NkpMZ2Y1RnB5N1l0MGFXSFhlQ1p3bklrY1Facy84RHFQWTdkaTl5WVVoR3hW?=
+ =?utf-8?B?c3ZyMVFHSWZZWlFvQVNkZ1VFem1nNmMybkxRK2hxaVhLUmZXNTAvZ0NPaE5F?=
+ =?utf-8?B?TDVla1dvMUFqYWVibit6UnlXcnF6V1VNakozelhmbllBcUZNUytKRC9jQ2ll?=
+ =?utf-8?B?SDUvL201UWxHYTkzVk5ISkduVUJSY013bjNYYVBzZHEvZEtLMmtBcHZkZVV5?=
+ =?utf-8?B?M1p1WEQrZE9IVkltckRKSU1IQmpJRi80VVAvWHMzY1MxbnNKekJzSFF6eXNa?=
+ =?utf-8?B?S1p2UkdsSzFSWTFzSVROalVVS2pKU01IYVRXZENCT1c3cFljaXlwREkzUGZ3?=
+ =?utf-8?B?UGRXaHAvcWlFenVkSC80ZytUVmtOSko1UG9MNDM2VDhlV1ZNbXBEaU16ZklX?=
+ =?utf-8?B?ZU9TWVRlM0hNYXhNV1BpZlhhQXZkL3FNZ1hCbjNPZEs0OThDank5TXFUSWVR?=
+ =?utf-8?B?bDh2K054bko4L2s3d2lxUEFHS0sxbXBFSGJFaFRhWVRhTi8xQ0tud0NpcjlH?=
+ =?utf-8?B?b29oM2JIZGZyZlY4SHJsQkh1Z3R1bjljc25vbHVYMFhGRE9Ec21ZUVRJNXRh?=
+ =?utf-8?B?Q3IzeXlpLzZ3VEd5aURsTXozS2E3anRuMjUrSW1JZitPT2pMb1B6ZkYzRFZ5?=
+ =?utf-8?B?S21QOEdxY2I0WTl4QU0wd0dEVW1vSkZzRFFzMHdXVTdGWEFUYnNDOXEyY0x3?=
+ =?utf-8?B?SmRveVpqUk5XQ0M5NUJXUDFYTS9PaDI4RUNRNGpvblRkU2V6QjdBYWQ4Y0l6?=
+ =?utf-8?B?clk5d0VFWDRnR2pOMGtURFpFdnlrdUhXcmtaZ1dEMEp6Y2NZeVlYdG01VGlo?=
+ =?utf-8?B?UGc4V1BDMDJ1Z05heDR4QXF1VGoveUpBYWE1WkUrTkdIYWNHVVJHaklOU0wz?=
+ =?utf-8?B?Umdtbi9WNGdoNHNXZzhndFhZakZxV0dOeFJKOERQUmZMV2FiRTFFc3Y2YW15?=
+ =?utf-8?B?UVpqZnJmK3cwaGVMTXVZSDNlNXc4YVl5YXhiYWdSang4dWtpQVhXdXNxMTJa?=
+ =?utf-8?B?bG9qTkJHR3E1emtqeGIvR3d6TXhONThJWm9FY2hSVXcyNDhoWDlxakFDSHFU?=
+ =?utf-8?B?cko5dHF3WFUwZGx6eGpXNGdySzlIV3FzWEdBamZtMzQ5cjBZMFFRMEU5aEt5?=
+ =?utf-8?B?QVI5Vlo0clJieGZxKzMvL3B3N1pCNGdJNGY1TlZzenBDVUp4Q0gwNmxvb0FB?=
+ =?utf-8?B?SC84OWcxOFRrb2UyMU1DODRpREczTkhFOFpXbjdCSVI1eVZZNzFiTTU5Mnov?=
+ =?utf-8?B?QXBDbmYvOTdtcEQ3RHJIRW94ckhKUDFjQzJzTkxLa3pJZkxnSEh3ekJHUzIr?=
+ =?utf-8?B?UXJCS0h3WW9JOUlhTVNuSnRDbWVrenV3bDNKSmNjQjFxU0xSS0R3QUFDZlRQ?=
+ =?utf-8?B?ME16WVhHYmVtMDRJUnA1bmdyeUJyN0ZCdlhmMVFtcEZ6U1FmcUE5QnNGWmsw?=
+ =?utf-8?B?L3c9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 2ccb7fca-8f3a-4dd4-2008-08db7d661055
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 14:42:32.0052
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: ZhNKqdgyKtXLdHIRl/cELFl/DtmsHJ5/N8e5VTGuSuAUgsrDvBPZaUgfPwCREr+YRXOrhHoF4Iiz1ugTxb3DRU4yTzqjTUqkIkKqG7XAvW8=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: MW4PR11MB6618
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/5/23 3:20 PM, Leon Hwang wrote:
-> Currently, excluding verifier, users are unable to obtain detailed error
-> information when issues occur in BPF syscall.
+From: Jakub Kicinski <kuba@kernel.org>
+Date: Mon, 3 Jul 2023 13:32:07 -0700
+
+> On Fri, 30 Jun 2023 17:34:02 +0200 Alexander Lobakin wrote:
+>>> I am not a fan of having the page pool force the syncing either. Last
+>>> I knew I thought the PP_FLAG_DMA_SYNC_DEV was meant to be set by the  
+>>
+>> Please follow the logics of the patch.
+>>
+>> 1. The driver sets DMA_SYNC_DEV.
+>> 2. PP tries to shortcut and replaces it with MAYBE_SYNC.
+>> 3. If dma_need_sync() returns true for some page, it gets replaced back
+>>    to DMA_SYNC_DEV, no further dma_need_sync() calls for that pool.
+>>
+>> OR
+>>
+>> 1. The driver doesn't set DMA_SYNC_DEV.
+>> 2. PP doesn't turn on MAYBE_SYNC.
+>> 3. No dma_need_sync() tests.
+>>
+>> Where does PP force syncs for drivers which don't need them?
 > 
-> To overcome this limitation, bpf generic log is introduced to provide
-> error details similar to the verifier. This enhancement will enable the
-> reporting of error details along with the corresponding errno in BPF
-> syscall.
+> I think both Alex and I got confused about what's going on here.
 > 
-> Essentially, bpf generic log functions as a mechanism similar to netlink,
-> enabling the transmission of error messages to user space. This
-> mechanism greatly enhances the usability of BPF syscall by allowing
-> users to access comprehensive error messages instead of relying solely
-> on errno.
-> 
-> This patch specifically addresses the error reporting in dev_xdp_attach()
-> . With this patch, the error messages will be transferred to user space
-> like the netlink approach. Hence, users will be able to check the error
-> message along with the errno.
-> 
-> Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
-> ---
->   include/linux/bpf.h            | 30 ++++++++++++++++++++++++++++++
->   include/uapi/linux/bpf.h       |  6 ++++++
->   kernel/bpf/log.c               | 33 +++++++++++++++++++++++++++++++++
->   net/core/dev.c                 | 11 ++++++++++-
->   tools/include/uapi/linux/bpf.h |  6 ++++++
->   5 files changed, 85 insertions(+), 1 deletion(-)
-> 
-> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
-> index f58895830..fd63f4a76 100644
-> --- a/include/linux/bpf.h
-> +++ b/include/linux/bpf.h
-> @@ -3077,4 +3077,34 @@ static inline gfp_t bpf_memcg_flags(gfp_t flags)
->   	return flags;
->   }
->   
-> +#define BPF_GENERIC_TMP_LOG_SIZE	256
-> +
-> +struct bpf_generic_log {
-> +	char		kbuf[BPF_GENERIC_TMP_LOG_SIZE];
-> +	char __user	*ubuf;
-> +	u32		len_used;
-> +	u32		len_total;
-> +};
-> +
-> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
-> +			const char *fmt, ...);
-> +static inline void bpf_generic_log_init(struct bpf_generic_log *log,
-> +			const struct bpf_generic_user_log *ulog)
-> +{
-> +	log->ubuf = (char __user *) (unsigned long) ulog->log_buf;
-> +	log->len_total = ulog->log_size;
-> +	log->len_used = 0;
-> +}
-> +
-> +#define BPF_GENERIC_LOG_WRITE(log, ulog, fmt, ...)	do {	\
-> +	const char *____fmt = (fmt);				\
-> +	bpf_generic_log_init(log, ulog);			\
-> +	bpf_generic_log_write(log, ____fmt, ##__VA_ARGS__);	\
-> +} while (0)
-> +
-> +#define BPF_GENERIC_ULOG_WRITE(ulog, fmt, ...)	do {			\
-> +	struct bpf_generic_log ____log;					\
-> +	BPF_GENERIC_LOG_WRITE(&____log, ulog, fmt, ##__VA_ARGS__);	\
-> +} while (0)
-> +
+> Could you reshuffle the code somehow to make it more obvious?
+> Rename the flag, perhaps put it in a different field than 
+> the driver-set PP flags?
 
-Could we generalize the bpf_verifier_log infra and reuse bpf_log() helper
-instead of adding something new?
+PP currently doesn't have a field for internal flags or so, so I reused
+the existing one :s But you're probably right, that would make it more
+obvious.
 
->   #endif /* _LINUX_BPF_H */
-> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
-> index 60a9d59be..34fa33493 100644
-> --- a/include/uapi/linux/bpf.h
-> +++ b/include/uapi/linux/bpf.h
-> @@ -1318,6 +1318,11 @@ struct bpf_stack_build_id {
->   	};
->   };
->   
-> +struct bpf_generic_user_log {
-> +	__aligned_u64	log_buf;    /* user supplied buffer */
-> +	__u32		log_size;   /* size of user buffer */
-> +};
-> +
->   #define BPF_OBJ_NAME_LEN 16U
->   
->   union bpf_attr {
-> @@ -1544,6 +1549,7 @@ union bpf_attr {
->   		};
->   		__u32		attach_type;	/* attach type */
->   		__u32		flags;		/* extra flags */
-> +		struct bpf_generic_user_log log; /* user log */
+1. Driver sets PP_SYNC_DEV.
+2. PP doesn't set its internal one until dma_need_sync() returns false.
+3. PP-sync-for-dev checks for the internal flag.
 
-You cannot add this here, this breaks user space, you would have to
-ad this under a xdp specific section inside the union.
+Although needs more lines to be changed :D
 
->   		union {
->   			__u32		target_btf_id;	/* btf_id of target to attach to */
->   			struct {
-> diff --git a/kernel/bpf/log.c b/kernel/bpf/log.c
-> index 850494423..be56b153b 100644
-> --- a/kernel/bpf/log.c
-> +++ b/kernel/bpf/log.c
-> @@ -325,3 +325,36 @@ __printf(2, 3) void bpf_log(struct bpf_verifier_log *log,
->   	va_end(args);
->   }
->   EXPORT_SYMBOL_GPL(bpf_log);
-> +
-> +static inline void __bpf_generic_log_write(struct bpf_generic_log *log, const char *fmt,
-> +				      va_list args)
-> +{
-> +	unsigned int n;
-> +
-> +	n = vscnprintf(log->kbuf, BPF_GENERIC_TMP_LOG_SIZE, fmt, args);
-> +
-> +	WARN_ONCE(n >= BPF_GENERIC_TMP_LOG_SIZE - 1,
-> +		  "bpf generic log truncated - local buffer too short\n");
-> +
-> +	n = min(log->len_total - log->len_used - 1, n);
-> +	log->kbuf[n] = '\0';
-> +
-> +	if (!copy_to_user(log->ubuf + log->len_used, log->kbuf, n + 1))
-> +		log->len_used += n;
-> +	else
-> +		log->ubuf = NULL;
-> +}
-> +
-> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
-> +				     const char *fmt, ...)
-> +{
-> +	va_list args;
-> +
-> +	if (!log->ubuf || !log->len_total)
-> +		return;
-> +
-> +	va_start(args, fmt);
-> +	__bpf_generic_log_write(log, fmt, args);
-> +	va_end(args);
-> +}
-> +EXPORT_SYMBOL_GPL(bpf_generic_log_write);
-> diff --git a/net/core/dev.c b/net/core/dev.c
-> index 69a3e5446..e933809c0 100644
-> --- a/net/core/dev.c
-> +++ b/net/core/dev.c
-> @@ -9409,12 +9409,20 @@ static const struct bpf_link_ops bpf_xdp_link_lops = {
->   	.update_prog = bpf_xdp_link_update,
->   };
->   
-> +static inline void bpf_xdp_link_log(const union bpf_attr *attr, struct netlink_ext_ack *extack)
-> +{
-> +	const struct bpf_generic_user_log *ulog = &attr->link_create.log;
-> +
-> +	BPF_GENERIC_ULOG_WRITE(ulog, extack->_msg);
-> +}
-> +
->   int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
->   {
->   	struct net *net = current->nsproxy->net_ns;
->   	struct bpf_link_primer link_primer;
->   	struct bpf_xdp_link *link;
->   	struct net_device *dev;
-> +	struct netlink_ext_ack extack;
->   	int err, fd;
->   
->   	rtnl_lock();
-> @@ -9440,12 +9448,13 @@ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
->   		goto unlock;
->   	}
->   
-> -	err = dev_xdp_attach_link(dev, NULL, link);
-> +	err = dev_xdp_attach_link(dev, &extack, link);
->   	rtnl_unlock();
->   
->   	if (err) {
->   		link->dev = NULL;
->   		bpf_link_cleanup(&link_primer);
-> +		bpf_xdp_link_log(attr, &extack);
->   		goto out_put_dev;
->   	}
-
-Agree that this is a useful facility to have and propagate back here.
-
-> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
-> index 60a9d59be..34fa33493 100644
-> --- a/tools/include/uapi/linux/bpf.h
-> +++ b/tools/include/uapi/linux/bpf.h
-> @@ -1318,6 +1318,11 @@ struct bpf_stack_build_id {
->   	};
->   };
->   
-> +struct bpf_generic_user_log {
-> +	__aligned_u64	log_buf;    /* user supplied buffer */
-> +	__u32		log_size;   /* size of user buffer */
-> +};
-> +
->   #define BPF_OBJ_NAME_LEN 16U
->   
->   union bpf_attr {
-> @@ -1544,6 +1549,7 @@ union bpf_attr {
->   		};
->   		__u32		attach_type;	/* attach type */
->   		__u32		flags;		/* extra flags */
-> +		struct bpf_generic_user_log log; /* user log */
->   		union {
->   			__u32		target_btf_id;	/* btf_id of target to attach to */
->   			struct {
-> 
-
+Thanks,
+Olek
 
