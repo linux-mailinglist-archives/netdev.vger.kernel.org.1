@@ -1,203 +1,468 @@
-Return-Path: <netdev+bounces-15595-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15596-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A02B2748AB5
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:36:10 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1E0AD748AC0
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:39:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BF8028106E
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:36:09 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 40FCF1C20BA5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:39:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B87134CD;
-	Wed,  5 Jul 2023 17:36:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 873E3134DA;
+	Wed,  5 Jul 2023 17:39:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1F1134CC
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:36:07 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04DE91BEB;
-	Wed,  5 Jul 2023 10:35:41 -0700 (PDT)
-Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365FaBp3003086;
-	Wed, 5 Jul 2023 19:35:16 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=shpntqm9Lb88tQ8tlCGuG2FwYoCeA99QpOjJ1mJ95MI=;
- b=B9NUeEVnBg8MdHStPnL4TOmJhyuqDrSpAiTXxO/nPPpzy04upCGkWFZloothm1IsdlaP
- X2dM2UcrLRYot6pDInpUaDfpMw4tRdOgSMjIIUt05sxIHPJTt05NtgJdfiSkjWYJGqQo
- 5Qf6gvHVZoCkeCGLEsdD07XE10xUn4T3IucwxfOuRptLSABHo82p+XsFpOmpXmiiGV0P
- XYKMcsbwul2uScBGSCEWMtTWo929/YaPT+Wh3TxrAMZmjHQzF56NlcYYWFxkdKCpyT5u
- NiyW4MLstguYxELgKwv13IwhUcKcDJWT1p8IlKqjWxQyak83KOQne1tFXm8DXME2V55K Uw== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rn8c9t3jy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jul 2023 19:35:16 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 2E6D9100057;
-	Wed,  5 Jul 2023 19:35:15 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2427D24C451;
-	Wed,  5 Jul 2023 19:35:15 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 5 Jul
- 2023 19:35:12 +0200
-Message-ID: <f8c6e86d-af6a-b61f-c642-c23cb3cfb015@foss.st.com>
-Date: Wed, 5 Jul 2023 19:35:07 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71A2C134CC
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:39:39 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7B1F0171A
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 10:39:37 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53fa00ed93dso8924698a12.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 10:39:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688578777; x=1691170777;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=LtPVBaBtFlhIS7WruAuItesp9KzlPV5ZUHpUghB6BMo=;
+        b=IArWHmD13X27gCGp2KQn4iqChxK9zJySCFYKcwOGRmVSrrm0oKV6pJtRdXvi/As15I
+         I0Mw3k3qnO7PhnQ26kSQNG9cJXa1uFVh1ne71VzT52I6fSWkWd9vRofk4XyXNGmuvdrr
+         X1RRVyAMX2WVspIzWoefL5tjXmD1ijXZwedbDZ7ap9SfrIYvv0eSm7228cIC9egjNQQE
+         7mZwI8C0Bqw/gqJW1Xc7vPTfPhJTav2ESKoImOMrMeRZsnUG87Nw522ykDBeygrAm+2l
+         wAL+phGX2MLMAr1Ny7LZ7r6h9lEbjcE1DBK8So8WLVNLgfUaRd2gJwoeZmBjpeOYbprV
+         7Afg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688578777; x=1691170777;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=LtPVBaBtFlhIS7WruAuItesp9KzlPV5ZUHpUghB6BMo=;
+        b=Bqbv+uxHl5NjkL4qyc+ml5e4nqPHbjtGCzVZvXiKHYHMYkSoJQpkojNIvduPSU9ZF4
+         GKguaaj3RzXqOjEB2UOuuwqW28FSfWLW0l6i0r4E5j4b79bH0WDvc5TVkIsfUC23cKRz
+         0bUOb3cRDw5zRd2NMCzIhjEWkhCRhGc6ihOgzjBXUREETNpIr5Rrl8d3yAkd7VUIY5St
+         RK49VmtSQeNdx14EivBy2ruhL9O0SqqcIc9TEiQR6UaFO/CE0yv/StY7YqAyMt4S/ALc
+         9YLrEMbd0yn5YlQZtpeLlgE4lSrxHzwoP7b6gbx+Q9Rc6GWcOWIJA7IDkBzhC3qJ8tXR
+         U1OQ==
+X-Gm-Message-State: ABy/qLZ9rxDw0yQSsyNtPnn38vCaHbxE7k+6r7rn3SRlzBdMz/S4DDba
+	BKf8F8S5wYA2/EOeHPSmtWBeIJY=
+X-Google-Smtp-Source: APBJJlEI8TO8IZn2km1WpNUE4W/krt+5IXz3etcW8VRaqqGoBcs4fMMID/2sIF+2tZgCr36uSAzR0xk=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a63:4443:0:b0:55a:c91e:4121 with SMTP id
+ t3-20020a634443000000b0055ac91e4121mr10080904pgk.5.1688578776981; Wed, 05 Jul
+ 2023 10:39:36 -0700 (PDT)
+Date: Wed, 5 Jul 2023 10:39:35 -0700
+In-Reply-To: <20230703181226.19380-19-larysa.zaremba@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v3 0/6] Introduce STM32 system bus
-Content-Language: en-US
-To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
-        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
-        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
-        <pabeni@redhat.com>
-CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-05_09,2023-07-05_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20230703181226.19380-1-larysa.zaremba@intel.com> <20230703181226.19380-19-larysa.zaremba@intel.com>
+Message-ID: <ZKWq142tp/tI6NI3@google.com>
+Subject: Re: [PATCH bpf-next v2 18/20] selftests/bpf: Use AF_INET for TX in xdp_metadata
+From: Stanislav Fomichev <sdf@google.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>
+Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
+	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
+	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
+	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
+	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
+	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
+	xdp-hints@xdp-project.net, netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello all,
+On 07/03, Larysa Zaremba wrote:
+> The easiest way to simulate stripped VLAN tag in veth is to send a packet
+> from VLAN interface, attached to veth. Unfortunately, this approach is
+> incompatible with AF_XDP on TX side, because VLAN interfaces do not have
+> such feature.
+> 
+> Replace AF_XDP packet generation with sending the same datagram via
+> AF_INET socket.
+> 
+> This does not change the packet contents or hints values with one notable
+> exception: rx_hash_type, which previously was expected to be 0, now is
+> expected be at least XDP_RSS_TYPE_L4.
+> 
+> Also, usage of AF_INET requires a little more complicated namespace setup,
+> therefore open_netns() helper function is divided into smaller reusable
+> pieces.
 
-I'm abandoning this series for:
-https://lore.kernel.org/lkml/20230705172759.1610753
+Ack, it's probably OK for now, but, FYI, I'm trying to extend this part
+with TX metadata:
+https://lore.kernel.org/bpf/20230621170244.1283336-10-sdf@google.com/
 
-Sorry for the noise.
+So probably long-term I'll switch it back to AF_XDP but will add
+support for requesting vlan TX "offload" from the veth.
+ 
+> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> ---
+>  tools/testing/selftests/bpf/network_helpers.c |  37 +++-
+>  tools/testing/selftests/bpf/network_helpers.h |   3 +
+>  .../selftests/bpf/prog_tests/xdp_metadata.c   | 175 +++++++-----------
+>  3 files changed, 98 insertions(+), 117 deletions(-)
+> 
+> diff --git a/tools/testing/selftests/bpf/network_helpers.c b/tools/testing/selftests/bpf/network_helpers.c
+> index a105c0cd008a..19463230ece5 100644
+> --- a/tools/testing/selftests/bpf/network_helpers.c
+> +++ b/tools/testing/selftests/bpf/network_helpers.c
+> @@ -386,28 +386,51 @@ char *ping_command(int family)
+>  	return "ping";
+>  }
+>  
+> +int get_cur_netns(void)
+> +{
+> +	int nsfd;
+> +
+> +	nsfd = open("/proc/self/ns/net", O_RDONLY);
+> +	ASSERT_GE(nsfd, 0, "open /proc/self/ns/net");
+> +	return nsfd;
+> +}
+> +
+> +int get_netns(const char *name)
+> +{
+> +	char nspath[PATH_MAX];
+> +	int nsfd;
+> +
+> +	snprintf(nspath, sizeof(nspath), "%s/%s", "/var/run/netns", name);
+> +	nsfd = open(nspath, O_RDONLY | O_CLOEXEC);
+> +	ASSERT_GE(nsfd, 0, "open /proc/self/ns/net");
+> +	return nsfd;
+> +}
+> +
+> +int set_netns(int netns_fd)
+> +{
+> +	return setns(netns_fd, CLONE_NEWNET);
+> +}
 
-Best regards,
-Gatien
+We have open_netns/close_netns in network_helpers.h that provide similar
+functionality, let's use them instead?
 
-On 1/27/23 17:40, Gatien Chevallier wrote:
-> Document STM32 System Bus. This bus is intended to control firewall
-> access for the peripherals connected to it.
-> 
-> For every peripheral, the bus checks the firewall registers to see
-> if the peripheral is configured as non-secure. If the peripheral
-> is configured as secure, the node is marked populated, so the
-> device won't be probed.
-> 
-> This is useful as a firewall configuration sanity check and avoid
-> platform crashes in case peripherals are incorrectly configured.
-> 
-> The STM32 System Bus implements the feature-domain-controller
-> bindings. It is used by peripherals to reference a domain
-> controller, in this case the firewall feature domain.
-> The bus uses the ID referenced by the feature-domains property to
-> know where to look in the firewall to get the security configuration
-> for the peripheral. This allows a device tree description rather
-> than a hardcoded peripheral table in the bus driver.
-> 
-> On STM32MP13/15 platforms, the firewall bus is represented by the
-> ETZPC node, which is responsible for the securing / MCU isolating
-> the capable peripherals.
-> 
-> STM32MP13/15 device trees are updated in this series to implement
-> the bus. All peripherals that are securable or MCU isolation capable
-> by the ETZPC are connected to the bus.
-> 
-> Changes in V2:
-> 	- Corrected YAMLS errors highlighted by Rob's robot
-> 	- Re-ordered Signed-off-by tags in two patches
-> 
-> Changes in V3:
-> 	- Document feature-domains property in YAML documentation for
-> 	concerned periperals under the System Bus
-> 	- Fix STM32 System Bus YAML documentation
-> 	- Remove STM32 System bus bindings that were currently used
-> 	as helpers for device tree
-> 	- Correct few errors in driver
-> 	- Add missing peripherals under the System Bus that were in
-> 	SoC variation device tree files
-> 	- Fix node names
-> 
-> Gatien Chevallier (5):
->    dt-bindings: treewide: add feature-domains description in binding
->      files
->    dt-bindings: bus: add STM32 System Bus
->    bus: stm32_sys_bus: add support for STM32MP15 and STM32MP13 system bus
->    ARM: dts: stm32: add ETZPC as a system bus for STM32MP15x boards
->    ARM: dts: stm32: add ETZPC as a system bus for STM32MP13x boards
-> 
-> Oleksii Moisieiev (1):
->    dt-bindings: Document common device controller bindings
-> 
->   .../devicetree/bindings/bus/st,sys-bus.yaml   |  127 +
->   .../bindings/crypto/st,stm32-hash.yaml        |    5 +
->   .../devicetree/bindings/dma/st,stm32-dma.yaml |    5 +
->   .../bindings/dma/st,stm32-dmamux.yaml         |    5 +
->   .../feature-domain-controller.yaml            |   84 +
->   .../devicetree/bindings/i2c/st,stm32-i2c.yaml |    5 +
->   .../bindings/iio/adc/st,stm32-adc.yaml        |    5 +
->   .../bindings/iio/adc/st,stm32-dfsdm-adc.yaml  |    5 +
->   .../bindings/iio/dac/st,stm32-dac.yaml        |    5 +
->   .../bindings/media/st,stm32-cec.yaml          |    5 +
->   .../bindings/media/st,stm32-dcmi.yaml         |    5 +
->   .../memory-controllers/st,stm32-fmc2-ebi.yaml |    5 +
->   .../bindings/mfd/st,stm32-lptimer.yaml        |    5 +
->   .../bindings/mfd/st,stm32-timers.yaml         |    6 +
->   .../devicetree/bindings/mmc/arm,pl18x.yaml    |    5 +
->   .../devicetree/bindings/net/stm32-dwmac.yaml  |    5 +
->   .../bindings/phy/phy-stm32-usbphyc.yaml       |    5 +
->   .../bindings/regulator/st,stm32-vrefbuf.yaml  |    5 +
->   .../devicetree/bindings/rng/st,stm32-rng.yaml |    5 +
->   .../bindings/serial/st,stm32-uart.yaml        |    5 +
->   .../bindings/sound/st,stm32-i2s.yaml          |    5 +
->   .../bindings/sound/st,stm32-sai.yaml          |    5 +
->   .../bindings/sound/st,stm32-spdifrx.yaml      |    5 +
->   .../bindings/spi/st,stm32-qspi.yaml           |    5 +
->   .../devicetree/bindings/spi/st,stm32-spi.yaml |    5 +
->   .../devicetree/bindings/usb/dwc2.yaml         |    5 +
->   MAINTAINERS                                   |    6 +
->   arch/arm/boot/dts/stm32mp131.dtsi             |  407 +--
->   arch/arm/boot/dts/stm32mp133.dtsi             |   51 +-
->   arch/arm/boot/dts/stm32mp13xc.dtsi            |   19 +-
->   arch/arm/boot/dts/stm32mp13xf.dtsi            |   18 +-
->   arch/arm/boot/dts/stm32mp151.dtsi             | 2722 +++++++++--------
->   arch/arm/boot/dts/stm32mp153.dtsi             |   52 +-
->   arch/arm/boot/dts/stm32mp15xc.dtsi            |   19 +-
->   drivers/bus/Kconfig                           |    9 +
->   drivers/bus/Makefile                          |    1 +
->   drivers/bus/stm32_sys_bus.c                   |  168 +
->   37 files changed, 2208 insertions(+), 1596 deletions(-)
->   create mode 100644 Documentation/devicetree/bindings/bus/st,sys-bus.yaml
->   create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
->   create mode 100644 drivers/bus/stm32_sys_bus.c
+> +
+>  struct nstoken {
+>  	int orig_netns_fd;
+>  };
+>  
+>  struct nstoken *open_netns(const char *name)
+>  {
+> +	struct nstoken *token;
+>  	int nsfd;
+> -	char nspath[PATH_MAX];
+>  	int err;
+> -	struct nstoken *token;
+>  
+>  	token = calloc(1, sizeof(struct nstoken));
+>  	if (!ASSERT_OK_PTR(token, "malloc token"))
+>  		return NULL;
+>  
+> -	token->orig_netns_fd = open("/proc/self/ns/net", O_RDONLY);
+> -	if (!ASSERT_GE(token->orig_netns_fd, 0, "open /proc/self/ns/net"))
+> +	token->orig_netns_fd = get_cur_netns();
+> +	if (token->orig_netns_fd < 0)
+>  		goto fail;
+>  
+> -	snprintf(nspath, sizeof(nspath), "%s/%s", "/var/run/netns", name);
+> -	nsfd = open(nspath, O_RDONLY | O_CLOEXEC);
+> -	if (!ASSERT_GE(nsfd, 0, "open netns fd"))
+> +	nsfd = get_netns(name);
+> +	if (nsfd < 0)
+>  		goto fail;
+>  
+>  	err = setns(nsfd, CLONE_NEWNET);
+> diff --git a/tools/testing/selftests/bpf/network_helpers.h b/tools/testing/selftests/bpf/network_helpers.h
+> index 694185644da6..b18b9619595c 100644
+> --- a/tools/testing/selftests/bpf/network_helpers.h
+> +++ b/tools/testing/selftests/bpf/network_helpers.h
+> @@ -58,6 +58,8 @@ int make_sockaddr(int family, const char *addr_str, __u16 port,
+>  char *ping_command(int family);
+>  int get_socket_local_port(int sock_fd);
+>  
+> +int get_cur_netns(void);
+> +int get_netns(const char *name);
+>  struct nstoken;
+>  /**
+>   * open_netns() - Switch to specified network namespace by name.
+> @@ -67,4 +69,5 @@ struct nstoken;
+>   */
+>  struct nstoken *open_netns(const char *name);
+>  void close_netns(struct nstoken *token);
+> +int set_netns(int netns_fd);
+>  #endif
+> diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> index 626c461fa34d..53b32a641e8e 100644
+> --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
+> @@ -20,7 +20,7 @@
+>  
+>  #define UDP_PAYLOAD_BYTES 4
+>  
+> -#define AF_XDP_SOURCE_PORT 1234
+> +#define UDP_SOURCE_PORT 1234
+>  #define AF_XDP_CONSUMER_PORT 8080
+>  
+>  #define UMEM_NUM 16
+> @@ -33,6 +33,12 @@
+>  #define RX_ADDR "10.0.0.2"
+>  #define PREFIX_LEN "8"
+>  #define FAMILY AF_INET
+> +#define TX_NETNS_NAME "xdp_metadata_tx"
+> +#define RX_NETNS_NAME "xdp_metadata_rx"
+> +#define TX_MAC "00:00:00:00:00:01"
+> +#define RX_MAC "00:00:00:00:00:02"
+> +
+> +#define XDP_RSS_TYPE_L4 BIT(3)
+>  
+>  struct xsk {
+>  	void *umem_area;
+> @@ -119,90 +125,28 @@ static void close_xsk(struct xsk *xsk)
+>  	munmap(xsk->umem_area, UMEM_SIZE);
+>  }
+>  
+> -static void ip_csum(struct iphdr *iph)
+> +static int generate_packet_udp(void)
+>  {
+> -	__u32 sum = 0;
+> -	__u16 *p;
+> -	int i;
+> -
+> -	iph->check = 0;
+> -	p = (void *)iph;
+> -	for (i = 0; i < sizeof(*iph) / sizeof(*p); i++)
+> -		sum += p[i];
+> -
+> -	while (sum >> 16)
+> -		sum = (sum & 0xffff) + (sum >> 16);
+> -
+> -	iph->check = ~sum;
+> -}
+> -
+> -static int generate_packet(struct xsk *xsk, __u16 dst_port)
+> -{
+> -	struct xdp_desc *tx_desc;
+> -	struct udphdr *udph;
+> -	struct ethhdr *eth;
+> -	struct iphdr *iph;
+> -	void *data;
+> -	__u32 idx;
+> -	int ret;
+> -
+> -	ret = xsk_ring_prod__reserve(&xsk->tx, 1, &idx);
+> -	if (!ASSERT_EQ(ret, 1, "xsk_ring_prod__reserve"))
+> -		return -1;
+> -
+> -	tx_desc = xsk_ring_prod__tx_desc(&xsk->tx, idx);
+> -	tx_desc->addr = idx % (UMEM_NUM / 2) * UMEM_FRAME_SIZE;
+> -	printf("%p: tx_desc[%u]->addr=%llx\n", xsk, idx, tx_desc->addr);
+> -	data = xsk_umem__get_data(xsk->umem_area, tx_desc->addr);
+> -
+> -	eth = data;
+> -	iph = (void *)(eth + 1);
+> -	udph = (void *)(iph + 1);
+> -
+> -	memcpy(eth->h_dest, "\x00\x00\x00\x00\x00\x02", ETH_ALEN);
+> -	memcpy(eth->h_source, "\x00\x00\x00\x00\x00\x01", ETH_ALEN);
+> -	eth->h_proto = htons(ETH_P_IP);
+> -
+> -	iph->version = 0x4;
+> -	iph->ihl = 0x5;
+> -	iph->tos = 0x9;
+> -	iph->tot_len = htons(sizeof(*iph) + sizeof(*udph) + UDP_PAYLOAD_BYTES);
+> -	iph->id = 0;
+> -	iph->frag_off = 0;
+> -	iph->ttl = 0;
+> -	iph->protocol = IPPROTO_UDP;
+> -	ASSERT_EQ(inet_pton(FAMILY, TX_ADDR, &iph->saddr), 1, "inet_pton(TX_ADDR)");
+> -	ASSERT_EQ(inet_pton(FAMILY, RX_ADDR, &iph->daddr), 1, "inet_pton(RX_ADDR)");
+> -	ip_csum(iph);
+> -
+> -	udph->source = htons(AF_XDP_SOURCE_PORT);
+> -	udph->dest = htons(dst_port);
+> -	udph->len = htons(sizeof(*udph) + UDP_PAYLOAD_BYTES);
+> -	udph->check = 0;
+> -
+> -	memset(udph + 1, 0xAA, UDP_PAYLOAD_BYTES);
+> -
+> -	tx_desc->len = sizeof(*eth) + sizeof(*iph) + sizeof(*udph) + UDP_PAYLOAD_BYTES;
+> -	xsk_ring_prod__submit(&xsk->tx, 1);
+> -
+> -	ret = sendto(xsk_socket__fd(xsk->socket), NULL, 0, MSG_DONTWAIT, NULL, 0);
+> -	if (!ASSERT_GE(ret, 0, "sendto"))
+> -		return ret;
+> -
+> -	return 0;
+> -}
+> -
+> -static void complete_tx(struct xsk *xsk)
+> -{
+> -	__u32 idx;
+> -	__u64 addr;
+> -
+> -	if (ASSERT_EQ(xsk_ring_cons__peek(&xsk->comp, 1, &idx), 1, "xsk_ring_cons__peek")) {
+> -		addr = *xsk_ring_cons__comp_addr(&xsk->comp, idx);
+> -
+> -		printf("%p: complete tx idx=%u addr=%llx\n", xsk, idx, addr);
+> -		xsk_ring_cons__release(&xsk->comp, 1);
+> -	}
+> +	char udp_payload[UDP_PAYLOAD_BYTES];
+> +	struct sockaddr_in rx_addr;
+> +	int sock_fd, err = 0;
+> +
+> +	/* Build a packet */
+> +	memset(udp_payload, 0xAA, UDP_PAYLOAD_BYTES);
+> +	rx_addr.sin_addr.s_addr = inet_addr(RX_ADDR);
+> +	rx_addr.sin_family = AF_INET;
+> +	rx_addr.sin_port = htons(UDP_SOURCE_PORT);
+> +
+> +	sock_fd = socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP);
+> +	if (!ASSERT_GE(sock_fd, 0, "socket(AF_INET, SOCK_DGRAM, IPPROTO_UDP)"))
+> +		return sock_fd;
+> +
+> +	err = sendto(sock_fd, udp_payload, UDP_PAYLOAD_BYTES, MSG_DONTWAIT,
+> +		     (void *)&rx_addr, sizeof(rx_addr));
+> +	ASSERT_GE(err, 0, "sendto");
+> +
+> +	close(sock_fd);
+> +	return err;
+>  }
+>  
+>  static void refill_rx(struct xsk *xsk, __u64 addr)
+> @@ -268,7 +212,8 @@ static int verify_xsk_metadata(struct xsk *xsk)
+>  	if (!ASSERT_NEQ(meta->rx_hash, 0, "rx_hash"))
+>  		return -1;
+>  
+> -	ASSERT_EQ(meta->rx_hash_type, 0, "rx_hash_type");
+> +	if (!ASSERT_NEQ(meta->rx_hash_type & XDP_RSS_TYPE_L4, 0, "rx_hash_type"))
+> +		return -1;
+>  
+>  	xsk_ring_cons__release(&xsk->rx, 1);
+>  	refill_rx(xsk, comp_addr);
+> @@ -281,40 +226,46 @@ void test_xdp_metadata(void)
+>  	struct xdp_metadata2 *bpf_obj2 = NULL;
+>  	struct xdp_metadata *bpf_obj = NULL;
+>  	struct bpf_program *new_prog, *prog;
+> -	struct nstoken *tok = NULL;
+> +	int prev_netns, rx_netns, tx_netns;
+>  	__u32 queue_id = QUEUE_ID;
+>  	struct bpf_map *prog_arr;
+> -	struct xsk tx_xsk = {};
+>  	struct xsk rx_xsk = {};
+>  	__u32 val, key = 0;
+>  	int retries = 10;
+>  	int rx_ifindex;
+> -	int tx_ifindex;
+>  	int sock_fd;
+>  	int ret;
+>  
+> -	/* Setup new networking namespace, with a veth pair. */
+> +	/* Setup new networking namespaces, with a veth pair. */
+>  
+> -	SYS(out, "ip netns add xdp_metadata");
+> -	tok = open_netns("xdp_metadata");
+> +	SYS(out, "ip netns add " TX_NETNS_NAME);
+> +	SYS(out, "ip netns add " RX_NETNS_NAME);
+> +	prev_netns = get_cur_netns();
+> +	tx_netns = get_netns(TX_NETNS_NAME);
+> +	rx_netns = get_netns(RX_NETNS_NAME);
+> +	if (prev_netns < 0 || tx_netns < 0 || rx_netns < 0)
+> +		goto close_ns;
+> +
+> +	set_netns(tx_netns);
+>  	SYS(out, "ip link add numtxqueues 1 numrxqueues 1 " TX_NAME
+>  	    " type veth peer " RX_NAME " numtxqueues 1 numrxqueues 1");
+> -	SYS(out, "ip link set dev " TX_NAME " address 00:00:00:00:00:01");
+> -	SYS(out, "ip link set dev " RX_NAME " address 00:00:00:00:00:02");
+> +	SYS(out, "ip link set " RX_NAME " netns " RX_NETNS_NAME);
+> +
+> +	SYS(out, "ip link set dev " TX_NAME " address " TX_MAC);
+>  	SYS(out, "ip link set dev " TX_NAME " up");
+> -	SYS(out, "ip link set dev " RX_NAME " up");
+>  	SYS(out, "ip addr add " TX_ADDR "/" PREFIX_LEN " dev " TX_NAME);
+> -	SYS(out, "ip addr add " RX_ADDR "/" PREFIX_LEN " dev " RX_NAME);
+>  
+> +	/* Avoid ARP calls */
+> +	SYS(out, "ip -4 neigh add " RX_ADDR " lladdr " RX_MAC " dev " TX_NAME);
+> +
+> +	set_netns(rx_netns);
+> +	SYS(out, "ip link set dev " RX_NAME " address " RX_MAC);
+> +	SYS(out, "ip link set dev " RX_NAME " up");
+> +	SYS(out, "ip addr add " RX_ADDR "/" PREFIX_LEN " dev " RX_NAME);
+>  	rx_ifindex = if_nametoindex(RX_NAME);
+> -	tx_ifindex = if_nametoindex(TX_NAME);
+>  
+>  	/* Setup separate AF_XDP for TX and RX interfaces. */
+>  
+> -	ret = open_xsk(tx_ifindex, &tx_xsk);
+> -	if (!ASSERT_OK(ret, "open_xsk(TX_NAME)"))
+> -		goto out;
+> -
+>  	ret = open_xsk(rx_ifindex, &rx_xsk);
+>  	if (!ASSERT_OK(ret, "open_xsk(RX_NAME)"))
+>  		goto out;
+> @@ -355,17 +306,16 @@ void test_xdp_metadata(void)
+>  		goto out;
+>  
+>  	/* Send packet destined to RX AF_XDP socket. */
+> -	if (!ASSERT_GE(generate_packet(&tx_xsk, AF_XDP_CONSUMER_PORT), 0,
+> -		       "generate AF_XDP_CONSUMER_PORT"))
+> +	set_netns(tx_netns);
+> +	if (!ASSERT_GE(generate_packet_udp(), 0, "generate UDP packet"))
+>  		goto out;
+>  
+>  	/* Verify AF_XDP RX packet has proper metadata. */
+> +	set_netns(rx_netns);
+>  	if (!ASSERT_GE(verify_xsk_metadata(&rx_xsk), 0,
+>  		       "verify_xsk_metadata"))
+>  		goto out;
+>  
+> -	complete_tx(&tx_xsk);
+> -
+>  	/* Make sure freplace correctly picks up original bound device
+>  	 * and doesn't crash.
+>  	 */
+> @@ -384,10 +334,11 @@ void test_xdp_metadata(void)
+>  		goto out;
+>  
+>  	/* Send packet to trigger . */
+> -	if (!ASSERT_GE(generate_packet(&tx_xsk, AF_XDP_CONSUMER_PORT), 0,
+> -		       "generate freplace packet"))
+> +	set_netns(tx_netns);
+> +	if (!ASSERT_GE(generate_packet_udp(), 0, "generate freplace packet"))
+>  		goto out;
+>  
+> +	set_netns(rx_netns);
+>  	while (!retries--) {
+>  		if (bpf_obj2->bss->called)
+>  			break;
+> @@ -397,10 +348,14 @@ void test_xdp_metadata(void)
+>  
+>  out:
+>  	close_xsk(&rx_xsk);
+> -	close_xsk(&tx_xsk);
+>  	xdp_metadata2__destroy(bpf_obj2);
+>  	xdp_metadata__destroy(bpf_obj);
+> -	if (tok)
+> -		close_netns(tok);
+> -	SYS_NOFAIL("ip netns del xdp_metadata");
+> +	set_netns(prev_netns);
+> +close_ns:
+> +	close(prev_netns);
+> +	close(tx_netns);
+> +	close(rx_netns);
+> +
+> +	SYS_NOFAIL("ip netns del " RX_NETNS_NAME);
+> +	SYS_NOFAIL("ip netns del " TX_NETNS_NAME);
+>  }
+> -- 
+> 2.41.0
 > 
 
