@@ -1,50 +1,50 @@
-Return-Path: <netdev+bounces-15635-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15636-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE844748E0E
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 21:40:02 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 321B6748E1C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 21:40:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id EB4D01C20BDD
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:40:01 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 513451C20BF4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:40:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A2A2B154A5;
-	Wed,  5 Jul 2023 19:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A3A4154AB;
+	Wed,  5 Jul 2023 19:39:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9628A156C0
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 19:39:46 +0000 (UTC)
-Received: from mail-io1-f53.google.com (mail-io1-f53.google.com [209.85.166.53])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CF3A71732;
-	Wed,  5 Jul 2023 12:39:43 -0700 (PDT)
-Received: by mail-io1-f53.google.com with SMTP id ca18e2360f4ac-77acb04309dso353633939f.2;
-        Wed, 05 Jul 2023 12:39:43 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67F6D156C0
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 19:39:53 +0000 (UTC)
+Received: from mail-io1-f51.google.com (mail-io1-f51.google.com [209.85.166.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 29740199E;
+	Wed,  5 Jul 2023 12:39:49 -0700 (PDT)
+Received: by mail-io1-f51.google.com with SMTP id ca18e2360f4ac-78666f06691so164440839f.0;
+        Wed, 05 Jul 2023 12:39:48 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688585983; x=1691177983;
+        d=1e100.net; s=20221208; t=1688585988; x=1691177988;
         h=date:subject:message-id:references:in-reply-to:cc:to:from
          :mime-version:content-transfer-encoding:x-gm-message-state:from:to
          :cc:subject:date:message-id:reply-to;
-        bh=OR44xsl8dcDDRHket6JLRoRPh10jvQanfxZD4Qq5o5A=;
-        b=a0CEu5mqjWGo8IGRyJ6e667dY3I/m6XXzpZ51tZxpu8RysCYjJU+tN6Pmka10t+tNL
-         oooNFqm83WP8oryCBd8YKBj9BGnVaA9OJp1YeceXV9c20ivZJK6m0jULeeECNW/v4GG9
-         x8dCy734zSFeG39mJzXskDlPq5eZtaJ+lGTdENV6NPvjk6UoBywYPERS2lDOF5BJFYp3
-         kJ+DjiwGB/OgmAVLJvysrHDOJSw+JkZTes4lHWGKWo/RqD2xbITtUJZHuTLoO01u2VQB
-         IzhWhU7AKfZVJpNIPEp9FzfucL57i3weprBCaPDmCMWC9t7laGKYAoKamyGJQhOZlKRp
-         nh+Q==
-X-Gm-Message-State: ABy/qLbAA2KurpshNzjgaeeDFzqBEK03cTCXm7X3AdjyVDtdNsxFYJrP
-	9baxSsRd22kpom7bJP+cPg==
-X-Google-Smtp-Source: APBJJlFTsATQZZbeDYi05vWkxMhLO+2kIHQFYrmGtwqcASMsu98qNuBpLmP0dT/ZyPLVLU0YF4GwxA==
-X-Received: by 2002:a6b:f208:0:b0:77e:3598:e511 with SMTP id q8-20020a6bf208000000b0077e3598e511mr177308ioh.2.1688585983078;
-        Wed, 05 Jul 2023 12:39:43 -0700 (PDT)
+        bh=EmigWppDMAwntmLPkpHMViFD3zfbB0BalUBHyRmY93I=;
+        b=O0Hx0DJjaXwYP+yvm0yoGbkrJfx9adX747Wx8eccbhjCijufql33tPIigemLgwYP07
+         WmdleyqbK2jthxf4WIbHBCB/D45wsSToLzMHer0D4wQ3OM1rYd8vrW8Ejea/XkxYgVlD
+         RdIFih6oJUvcTOUP3n/POr5sMXlTGRF7TtW1Tkl8Ut7J7TVlZ4vP/mLY/hcZ/Xn4MScL
+         ZZK7qu35f7CDOzEvY96oyGpv64sHtOlR9wGOmjmad/61EXZCEU7QZDfsG60G5zj9dc8N
+         KUgZujUdI+o3GqdLwoddvC7B+1M0qnJ2Ew7YJ8Uo2Ql45DJM4Yzke7qJ4wLnY+VHA4FV
+         G9jg==
+X-Gm-Message-State: ABy/qLZFlIKvxvKGqXQZTz0o/LFFOCdFQkrKPqlxpFh6gP4Gif3nQnv6
+	4sC4xEaxllPtYm8C2qF7FA==
+X-Google-Smtp-Source: APBJJlE1T+SG//kQOjsdrxPqC6WYFy+jVqYd/9wV9AIbQOA/LFJUSpnFw6o7MHDprdjfMYp8ihzVDA==
+X-Received: by 2002:a6b:3c02:0:b0:786:45f7:fb7e with SMTP id k2-20020a6b3c02000000b0078645f7fb7emr58527iob.13.1688585988126;
+        Wed, 05 Jul 2023 12:39:48 -0700 (PDT)
 Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id l10-20020a056638220a00b0042b1cd4c096sm3797893jas.74.2023.07.05.12.39.39
+        by smtp.gmail.com with ESMTPSA id d21-20020a02a495000000b0042ad887f705sm6314042jam.143.2023.07.05.12.39.43
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jul 2023 12:39:42 -0700 (PDT)
-Received: (nullmailer pid 1714650 invoked by uid 1000);
+        Wed, 05 Jul 2023 12:39:47 -0700 (PDT)
+Received: (nullmailer pid 1714652 invoked by uid 1000);
 	Wed, 05 Jul 2023 19:39:32 -0000
 Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 8bit
@@ -56,28 +56,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 From: Rob Herring <robh@kernel.org>
 To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: hugues.fruchet@foss.st.com, vkoul@kernel.org, linux-media@vger.kernel.org, 
-	gregkh@linuxfoundation.org, linux-phy@lists.infradead.org, lee@kernel.org, 
-	linux-kernel@vger.kernel.org, arnd@kernel.org, linux-serial@vger.kernel.org, 
-	mchehab@kernel.org, edumazet@google.com, arnaud.pouliquen@foss.st.com, 
-	herbert@gondor.apana.org.au, davem@davemloft.net, 
-	linux-crypto@vger.kernel.org, jic23@kernel.org, pabeni@redhat.com, 
-	linux-usb@vger.kernel.org, alsa-devel@alsa-project.org, 
-	olivier.moysan@foss.st.com, fabrice.gasnier@foss.st.com, kuba@kernel.org, 
-	andi.shyti@kernel.org, alexandre.torgue@foss.st.com, conor+dt@kernel.org, 
-	richardcochran@gmail.com, will@kernel.org, 
-	linux-stm32@st-md-mailman.stormreply.com, linux-mmc@vger.kernel.org, 
-	krzysztof.kozlowski+dt@linaro.org, linux-arm-kernel@lists.infradead.org, 
-	catalin.marinas@arm.com, dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
-	Oleksii_Moisieiev@epam.com, linux-spi@vger.kernel.org, 
-	linux-iio@vger.kernel.org, netdev@vger.kernel.org, ulf.hansson@linaro.org, 
-	devicetree@vger.kernel.org, robh+dt@kernel.org
-In-Reply-To: <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
+Cc: fabrice.gasnier@foss.st.com, jic23@kernel.org, conor+dt@kernel.org, 
+	hugues.fruchet@foss.st.com, richardcochran@gmail.com, will@kernel.org, 
+	davem@davemloft.net, vkoul@kernel.org, krzysztof.kozlowski+dt@linaro.org, 
+	linux-phy@lists.infradead.org, arnd@kernel.org, gregkh@linuxfoundation.org, 
+	linux-i2c@vger.kernel.org, linux-usb@vger.kernel.org, 
+	arnaud.pouliquen@foss.st.com, mchehab@kernel.org, olivier.moysan@foss.st.com, 
+	andi.shyti@kernel.org, alexandre.torgue@foss.st.com, kuba@kernel.org, 
+	linux-kernel@vger.kernel.org, dmaengine@vger.kernel.org, 
+	linux-mmc@vger.kernel.org, linux-serial@vger.kernel.org, 
+	alsa-devel@alsa-project.org, pabeni@redhat.com, linux-media@vger.kernel.org, 
+	linux-arm-kernel@lists.infradead.org, Oleksii_Moisieiev@epam.com, 
+	lee@kernel.org, devicetree@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, netdev@vger.kernel.org, 
+	robh+dt@kernel.org, ulf.hansson@linaro.org, catalin.marinas@arm.com, 
+	edumazet@google.com, linux-spi@vger.kernel.org, herbert@gondor.apana.org.au, 
+	linux-iio@vger.kernel.org, linux-crypto@vger.kernel.org
+In-Reply-To: <20230705172759.1610753-4-gatien.chevallier@foss.st.com>
 References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
-Message-Id: <168858597155.1714560.12250834903693245143.robh@kernel.org>
-Subject: Re: [PATCH 02/10] dt-bindings: bus: add device tree bindings for
- RIFSC
+ <20230705172759.1610753-4-gatien.chevallier@foss.st.com>
+Message-Id: <168858597253.1714602.9996873148476929300.robh@kernel.org>
+Subject: Re: [PATCH 03/10] dt-bindings: bus: add device tree bindings for
+ ETZPC
 Date: Wed, 05 Jul 2023 13:39:32 -0600
 X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
 	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
@@ -88,15 +88,15 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
 
-On Wed, 05 Jul 2023 19:27:51 +0200, Gatien Chevallier wrote:
-> Document RIFSC (RIF security controller). RIFSC is a firewall controller
-> composed of different kinds of hardware resources.
+On Wed, 05 Jul 2023 19:27:52 +0200, Gatien Chevallier wrote:
+> Document ETZPC (Extended TrustZone protection controller). ETZPC is a
+> firewall controller.
 > 
 > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 > ---
->  .../bindings/bus/st,stm32-rifsc.yaml          | 101 ++++++++++++++++++
->  1 file changed, 101 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
+>  .../bindings/bus/st,stm32-etzpc.yaml          | 90 +++++++++++++++++++
+>  1 file changed, 90 insertions(+)
+>  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml
 > 
 
 My bot found errors running 'make DT_CHECKER_FLAGS=-m dt_binding_check'
@@ -105,13 +105,14 @@ on your patch (DT_CHECKER_FLAGS is new in v5.13):
 yamllint warnings/errors:
 
 dtschema/dtc warnings/errors:
-/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml: title: 'STM32 Resource isolation framework security controller bindings' should not be valid under {'pattern': '([Bb]inding| [Ss]chema)'}
+/builds/robherring/dt-review-ci/linux/Documentation/devicetree/bindings/bus/st,stm32-etzpc.yaml: title: 'STM32 Extended TrustZone protection controller bindings' should not be valid under {'pattern': '([Bb]inding| [Ss]chema)'}
 	hint: Everything is a binding/schema, no need to say it. Describe what hardware the binding is for.
 	from schema $id: http://devicetree.org/meta-schemas/core.yaml#
+Documentation/devicetree/bindings/bus/st,stm32-etzpc.example.dtb: /example-0/etzpc@5c007000: failed to match any schema with compatible: ['st,stm32mp13-sys-bus']
 
 doc reference errors (make refcheckdocs):
 
-See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230705172759.1610753-3-gatien.chevallier@foss.st.com
+See https://patchwork.ozlabs.org/project/devicetree-bindings/patch/20230705172759.1610753-4-gatien.chevallier@foss.st.com
 
 The base for the series is generally the latest rc1. A different dependency
 should be noted in *this* patch.
