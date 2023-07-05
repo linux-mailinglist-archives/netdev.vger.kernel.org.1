@@ -1,154 +1,319 @@
-Return-Path: <netdev+bounces-15508-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15507-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C2FCF748242
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 12:36:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9BBEA74823F
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 12:36:24 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E218280F17
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 10:36:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 845E71C20A54
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 10:36:23 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 79CEE3FC8;
-	Wed,  5 Jul 2023 10:36:33 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 445FA3FC8;
+	Wed,  5 Jul 2023 10:36:21 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6638063B8
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 10:36:33 +0000 (UTC)
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2121.outbound.protection.outlook.com [40.107.255.121])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF0B8DD;
-	Wed,  5 Jul 2023 03:36:31 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EawKUI2wDF0s/rkz+Q37G7SgZexPTRH8/D/53NVA2TnkckHNky+kumxjtRzJ8tANaYNERTgyoyb3GaH/BW7+JW05ld7sw75TUGsLgijibiQf3/zK1T7vN/EbwDmBRnGYTZKW2Ex9/29I6rWqgxRUY79hS733vqZ6r/YbUO6BEuYRbYvgxDZJaBf3mJ2ydJGx9sLxgRZdN6Mp/G7djEOn72ws9LNpXXZnTi3mMPxNB7E6T6eSwfIO8oWgJL7qCCQtHO3nQ5PPg/zjAyCYz2gKOcREwBXzzPVkAC0ExtIUgyIRTkRjXYxhgMz+d852haBgfp2mk1t20pZmdJG0OSyfYg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=rZFg8q3ajWVrs9UEYy4kTEEdFVbMqkr0P0XEQtGAKZc=;
- b=Kzpo2YTsDqfiTyER25KmYwnplS90QLNojCa7JOJ6P/jZ3d55rcjUwaf9g7xWKOiPa7G9Vp3SagVmRvS42TQ7vRCi/CcF/qdtfV+YGvxPH7WwHMkQd9GaLsy62R2iF/42XscPm25iypwLzN/BjUrQfJHXrB81+pafSTZ2t4SDCnYxF24tzzTE439LkqB1/Y9nc4nu706T05iJ++xDRVsxighpOGscoUMvcwxOv5vr+hGY8Ip/jzXfAzFQAYC96a8cH/8zzOe/jvibPt4+3gehKttgdx6WSsXS4bQSxx/HEQ+q5qVPvIFE7RZTnRhBo9SDMVy3Z5QrJIk/egWBCGllRA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=rZFg8q3ajWVrs9UEYy4kTEEdFVbMqkr0P0XEQtGAKZc=;
- b=HMl4pvRlm/RsWSaMb3zr8gfOWlRhY6eVW8/SuWbPC4kS0eOgLqPf2PAa3Wqz4m/nfFqaPwASsy/VraDnHFhgriW2XP1sFSSNNd4vit7dC9fN73of/D7PDnUKDGRQzW3WQf8xQmkGnEIyMTEb5M9ya+qmGR+7ciK+T6W7DPqoFeE/AK2O0WqGJwaZCJ2VVZLrNchekjH/J8BC1ZxAEJ51FCoIKO6/4A7r+O9ST9e5nuE/yUgLhV0W9hO1upO+DilZhru9Wbrv5qrOAc29YQ/tVDCDzg3Lo3M9EYYd7HgAQJoDHverI8oPV5tTnYj0RgBwbOYfpcPb+XX1hXnKB/Y6PA==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SG2PR06MB5288.apcprd06.prod.outlook.com (2603:1096:4:1dc::9) by
- PUZPR06MB6145.apcprd06.prod.outlook.com (2603:1096:301:11a::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
- 2023 10:36:27 +0000
-Received: from SG2PR06MB5288.apcprd06.prod.outlook.com
- ([fe80::c2b:41ab:3b14:f920]) by SG2PR06MB5288.apcprd06.prod.outlook.com
- ([fe80::c2b:41ab:3b14:f920%7]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
- 10:36:27 +0000
-From: Minjie Du <duminjie@vivo.com>
-To: Markus.Elfring@web.de,
-	Ariel Elior <aelior@marvell.com>,
-	Manish Chopra <manishc@marvell.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	netdev@vger.kernel.org (open list:QLOGIC QL4xxx ETHERNET DRIVER),
-	linux-kernel@vger.kernel.org (open list)
-Cc: opensource.kernel@vivo.com,
-	Minjie Du <duminjie@vivo.com>
-Subject: [PATCH v2] qed: Remove a duplicate assignment in qed_rdma_create_srq()
-Date: Wed,  5 Jul 2023 18:35:46 +0800
-Message-Id: <20230705103547.15072-1-duminjie@vivo.com>
-X-Mailer: git-send-email 2.39.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: SGBP274CA0020.SGPP274.PROD.OUTLOOK.COM (2603:1096:4:b0::32)
- To SG2PR06MB5288.apcprd06.prod.outlook.com (2603:1096:4:1dc::9)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 329A21C08
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 10:36:20 +0000 (UTC)
+Received: from frasgout.his.huawei.com (frasgout.his.huawei.com [185.176.79.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 85262E6E;
+	Wed,  5 Jul 2023 03:36:18 -0700 (PDT)
+Received: from lhrpeml500004.china.huawei.com (unknown [172.18.147.206])
+	by frasgout.his.huawei.com (SkyGuard) with ESMTP id 4Qwwws55CCz6J6K5;
+	Wed,  5 Jul 2023 18:33:17 +0800 (CST)
+Received: from [10.123.123.126] (10.123.123.126) by
+ lhrpeml500004.china.huawei.com (7.191.163.9) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Wed, 5 Jul 2023 11:36:14 +0100
+Message-ID: <fa5301dc-f9c4-3029-a422-36b29fc076c5@huawei.com>
+Date: Wed, 5 Jul 2023 13:36:14 +0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SG2PR06MB5288:EE_|PUZPR06MB6145:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8a7acd91-616d-4d55-872d-08db7d43aff7
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	eFOroHnWvPAY0QyySoVtMqoGGH4XZnhJV5xdd2UOpKx/DkbKm53lAgD59CGDFFvBWy6I9DwbWDB2P05brvdEfvhnio9ITyTFA/nl9dPT1XjEtBCNhkPq11fZhMaGJj37pv+77gYLkRdL8I3aclfzinkgsTvpR3h+Bme9KYE7e14Koor3aeAGcSgILMw6/GuLBSnI3/56mGj/XHeoKs/5KioMVqfnzJE75160GhoJgVhhiB+yfABaikTWDT/UK2pXAAcnRhMh98KbVmVTyi7SWtAq+hkKvh+wUxs8AY92Lt4XBANx1L+/cK46742JIs+eHdJnzmiqn5jnBmKoZ3OdL/OaeIc8KM158vFweeZDD+63dxHEp/RviHjbxrg5HeU+pY/mDCGqRXPGrsj+3cCXtRHBjKNkDk6ywrkATZmyiAOuD06lsZebl2dvwIQQiEN6guVM3uirxP46fcqkJx5eSvsSgzhg/w5FSBf4oPKV5AlceaYVWsz4uHU1Y7pmHzE/lUbEQPXEa7cW3d6KEm9TfZ/+1BoxGJhY8rI+KPv4nUdGb+L0QMcLBz8HkCRmFKsBBFRIWmIpCiLL44Ajwcmebqz2XwaT2k+ZXrypzyi0WSJWjrg+UTztk5wKa8Ge8tYF
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB5288.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(366004)(136003)(376002)(346002)(451199021)(2906002)(8676002)(2616005)(86362001)(8936002)(5660300002)(6506007)(6666004)(110136005)(1076003)(26005)(478600001)(6486002)(107886003)(52116002)(186003)(6512007)(4744005)(38100700002)(38350700002)(83380400001)(4326008)(316002)(66556008)(66946007)(36756003)(66476007)(41300700001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?jNPOn14lbzm47XahL8Ai5sa+pKwUaru9WJOkSjA/XREfeAwTICbBtO4GjTMe?=
- =?us-ascii?Q?PrXYlfoNBDmfeibPnZTEc2v6DVhT+QhC6ipS5of++kQL2DN6q5scJJXKJFpa?=
- =?us-ascii?Q?6y+nTlS7BSpuok+OrIeqK3BA+6Xs+K56yZZSV5WxWy4iFNnrqVbPyi34ZO+l?=
- =?us-ascii?Q?rWDSMkU81mO+9hQ2qtzqS8Sn3cgY86IHNDqvroEYzgyHnU6/kJQgzEyOSyni?=
- =?us-ascii?Q?7jsMGzpHQze7ecNEdxuZw+xyPpPAX8lI01dzUCCmgBgd+fevRsVF6hCfFq45?=
- =?us-ascii?Q?HYs0ck4Vxgblb2BKgUimE4S0ioHpz3lHa7g86NMqI8V1rhh1h3dgAUirhbao?=
- =?us-ascii?Q?qQlf+cJGFr1++2Y3xOvLL+hzigtqzvmYmDGzypUYh3bRSpybOAA5ZunBwbfx?=
- =?us-ascii?Q?QuKwYtq72pOQA4TW4Hf90iQtgVQXZKg9jo7zXD5YfedSkAFh4WT/dm8Q1H6a?=
- =?us-ascii?Q?aZtpMRIc282p/BNeXG8tW1NpYPJLsxQ6tBiY2dwzvqLgNmf13/bvisb/Oamb?=
- =?us-ascii?Q?V6JuI6+5rInlG3+U6aoMt8afPTEj4cupkJ7geQjbhY5EEPdzeVVoh6LZ1PvN?=
- =?us-ascii?Q?VLQnW+C0wCXYTVQdZ0EoYyjqQ0Jhkjm3GOizomSp44oeF0xEGMd4MF8sDSUH?=
- =?us-ascii?Q?+OekHqExW2nCT6hp4c4FHzImrTi1c9uJBSYkNwmxVuj2n8Rex3LwH5DuM50G?=
- =?us-ascii?Q?VWHKYhkXolGYjHAHqrrWpUNAR9hSwKEraDoVtXAZ5NlHJZm5BWfiAatZ4vEp?=
- =?us-ascii?Q?LIk8E8cPj9WWEDEgC0kSnHLgALar3bgGoMHG9udckNOCMRUl6Y3HTWafjGC2?=
- =?us-ascii?Q?2tShZu5C9X7ARR3GUht2pKbI5xDJVFUKnIV8IqFR4EtNvCEbLQWfrkdHrbdK?=
- =?us-ascii?Q?l742/v4i0O99JlJHnPdTY2kDyf8l7sqZxrNe/iMfkJMcTVTCPYVPiJmtXHGd?=
- =?us-ascii?Q?Wu+BWf0KUI6tbIU9zN3ipJghb2GEWF6EJ5Na/jX554n+F59coUTxGM/KyUPX?=
- =?us-ascii?Q?Aqk8TYJeX0Ub4EMhjHF3AMBRYt04RHIcIDLS1RR28uSwArzpLwoULyBlNa8n?=
- =?us-ascii?Q?q6MMiPdM6xLgNDHfNe0Wd70/E+FLQp+XWGJWDUDrVuEf0/bNrMV/KdgqOyL/?=
- =?us-ascii?Q?3d7PbU0S9FjpQ3J8Rm23yNAshSgg6PI9c9JBpna7PV7QRq5miuAoSqXQVbcM?=
- =?us-ascii?Q?Nd5pbYRp5Rt0ZbtK3axy9KXIygX8ga4gLdBTEsTT8G/785BGDIPC5Pq6VtON?=
- =?us-ascii?Q?BiuMa3AuXmqtqMtlM0i9zg0L7zKjmFXM2D29E7TsOC8R1mWRBpKODeKmAMqJ?=
- =?us-ascii?Q?KzKHcf9oK4kspQzdZpuP2hcd3sMxr8MZRzic7uasdeHymiTdt6jZCvk6s1+N?=
- =?us-ascii?Q?mgJBc7vmTKzuVhHS/XH8qI13gjqBDSRjEFi6ZBqu/lCgntXnfhM/avyVqHch?=
- =?us-ascii?Q?QukFdNgcB5qKODoVNKwp5ha5fX6kLsgPdyD0FweVCa71MPqQIlybr0WXbF8R?=
- =?us-ascii?Q?2C1dKdHwgWb1XQxbZDhfxTGBcFrqM04St0bTFcpu5VUKmjAplMMIHyKqYNJg?=
- =?us-ascii?Q?KdVKBpjzom61uWJtIT5MidISzcOE0NH6e0oySoOQ?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8a7acd91-616d-4d55-872d-08db7d43aff7
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB5288.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 10:36:27.3989
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RCHag9Qov+sRWbOy8H7bvx1MPakQLySq6Il4swzPNSHvjprZUZ9Prm3QR9m8jxyQDqR/4oqgIUkGKW5e2NGI/w==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PUZPR06MB6145
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:91.0) Gecko/20100101
+ Thunderbird/91.4.1
+Subject: Re: [PATCH v11 04/12] landlock: Refactor merge/inherit_ruleset
+ functions
+Content-Language: ru
+To: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
+CC: <willemdebruijn.kernel@gmail.com>, <gnoack3000@gmail.com>,
+	<linux-security-module@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<netfilter-devel@vger.kernel.org>, <yusongping@huawei.com>,
+	<artem.kuzin@huawei.com>
+References: <20230515161339.631577-1-konstantin.meskhidze@huawei.com>
+ <20230515161339.631577-5-konstantin.meskhidze@huawei.com>
+ <3b52ba0c-d013-b7a9-0f08-2e6d677a1df0@digikod.net>
+ <12b5f33d-e2f5-3a12-c4f7-0164b6f36fba@huawei.com>
+ <5713efed-22cb-7029-5dce-d2bd0b204a8b@digikod.net>
+From: "Konstantin Meskhidze (A)" <konstantin.meskhidze@huawei.com>
+In-Reply-To: <5713efed-22cb-7029-5dce-d2bd0b204a8b@digikod.net>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Originating-IP: [10.123.123.126]
+X-ClientProxiedBy: lhrpeml500002.china.huawei.com (7.191.160.78) To
+ lhrpeml500004.china.huawei.com (7.191.163.9)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H2,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Delete a duplicate statement from this function implementation.
 
-Signed-off-by: Minjie Du <duminjie@vivo.com>
----
- drivers/net/ethernet/qlogic/qed/qed_rdma.c | 1 -
- 1 file changed, 1 deletion(-)
 
-diff --git a/drivers/net/ethernet/qlogic/qed/qed_rdma.c b/drivers/net/ethernet/qlogic/qed/qed_rdma.c
-index 5a5dbbb8d..41efced49 100644
---- a/drivers/net/ethernet/qlogic/qed/qed_rdma.c
-+++ b/drivers/net/ethernet/qlogic/qed/qed_rdma.c
-@@ -1795,7 +1795,6 @@ qed_rdma_create_srq(void *rdma_cxt,
- 
- 	opaque_fid = p_hwfn->hw_info.opaque_fid;
- 
--	opaque_fid = p_hwfn->hw_info.opaque_fid;
- 	init_data.opaque_fid = opaque_fid;
- 	init_data.comp_mode = QED_SPQ_MODE_EBLOCK;
- 
--- 
-2.39.0
+7/5/2023 1:16 PM, Mickaël Salaün пишет:
+> 
+> On 01/07/2023 16:52, Konstantin Meskhidze (A) wrote:
+>> 
+>> 
+>> 6/26/2023 9:40 PM, Mickaël Salaün пишет:
+>>>
+>>> On 15/05/2023 18:13, Konstantin Meskhidze wrote:
+>>>> Refactor merge_ruleset() and inherit_ruleset() functions to support
+>>>> new rule types. This patch adds merge_tree() and inherit_tree()
+>>>> helpers. They use a specific ruleset's red-black tree according to
+>>>> a key type argument.
+>>>>
+>>>> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
+>>>> ---
+>>>>
+>>>> Changes since v10:
+>>>> * Refactors merge_tree() function.
+>>>>
+>>>> Changes since v9:
+>>>> * None
+>>>>
+>>>> Changes since v8:
+>>>> * Refactors commit message.
+>>>> * Minor fixes.
+>>>>
+>>>> Changes since v7:
+>>>> * Adds missed lockdep_assert_held it inherit_tree() and merge_tree().
+>>>> * Fixes comment.
+>>>>
+>>>> Changes since v6:
+>>>> * Refactors merge_ruleset() and inherit_ruleset() functions to support
+>>>>     new rule types.
+>>>> * Renames tree_merge() to merge_tree() (and reorder arguments), and
+>>>>     tree_copy() to inherit_tree().
+>>>>
+>>>> Changes since v5:
+>>>> * Refactors some logic errors.
+>>>> * Formats code with clang-format-14.
+>>>>
+>>>> Changes since v4:
+>>>> * None
+>>>>
+>>>> ---
+>>>>    security/landlock/ruleset.c | 122 +++++++++++++++++++++++-------------
+>>>>    1 file changed, 79 insertions(+), 43 deletions(-)
+>>>>
+>>>> diff --git a/security/landlock/ruleset.c b/security/landlock/ruleset.c
+>>>> index deab37838f5b..e4f449fdd6dd 100644
+>>>> --- a/security/landlock/ruleset.c
+>>>> +++ b/security/landlock/ruleset.c
+>>>> @@ -302,36 +302,22 @@ static void put_hierarchy(struct landlock_hierarchy *hierarchy)
+>>>>    	}
+>>>>    }
+>>>>
+>>>> -static int merge_ruleset(struct landlock_ruleset *const dst,
+>>>> -			 struct landlock_ruleset *const src)
+>>>> +static int merge_tree(struct landlock_ruleset *const dst,
+>>>> +		      struct landlock_ruleset *const src,
+>>>> +		      const enum landlock_key_type key_type)
+>>>>    {
+>>>>    	struct landlock_rule *walker_rule, *next_rule;
+>>>>    	struct rb_root *src_root;
+>>>>    	int err = 0;
+>>>>
+>>>>    	might_sleep();
+>>>> -	/* Should already be checked by landlock_merge_ruleset() */
+>>>> -	if (WARN_ON_ONCE(!src))
+>>>> -		return 0;
+>>>> -	/* Only merge into a domain. */
+>>>> -	if (WARN_ON_ONCE(!dst || !dst->hierarchy))
+>>>> -		return -EINVAL;
+>>>> +	lockdep_assert_held(&dst->lock);
+>>>> +	lockdep_assert_held(&src->lock);
+>>>>
+>>>> -	src_root = get_root(src, LANDLOCK_KEY_INODE);
+>>>> +	src_root = get_root(src, key_type);
+>>>>    	if (IS_ERR(src_root))
+>>>>    		return PTR_ERR(src_root);
+>>>>
+>>>> -	/* Locks @dst first because we are its only owner. */
+>>>> -	mutex_lock(&dst->lock);
+>>>> -	mutex_lock_nested(&src->lock, SINGLE_DEPTH_NESTING);
+>>>> -
+>>>> -	/* Stacks the new layer. */
+>>>> -	if (WARN_ON_ONCE(src->num_layers != 1 || dst->num_layers < 1)) {
+>>>> -		err = -EINVAL;
+>>>> -		goto out_unlock;
+>>>> -	}
+>>>> -	dst->access_masks[dst->num_layers - 1] = src->access_masks[0];
+>>>> -
+>>>>    	/* Merges the @src tree. */
+>>>>    	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule, src_root,
+>>>>    					     node) {
+>>>> @@ -340,23 +326,52 @@ static int merge_ruleset(struct landlock_ruleset *const dst,
+>>>>    		} };
+>>>>    		const struct landlock_id id = {
+>>>>    			.key = walker_rule->key,
+>>>> -			.type = LANDLOCK_KEY_INODE,
+>>>> +			.type = key_type,
+>>>>    		};
+>>>>
+>>>> -		if (WARN_ON_ONCE(walker_rule->num_layers != 1)) {
+>>>> -			err = -EINVAL;
+>>>> -			goto out_unlock;
+>>>> -		}
+>>>> -		if (WARN_ON_ONCE(walker_rule->layers[0].level != 0)) {
+>>>> -			err = -EINVAL;
+>>>> -			goto out_unlock;
+>>>> -		}
+>>>> +		if (WARN_ON_ONCE(walker_rule->num_layers != 1))
+>>>> +			return -EINVAL;
+>>>> +
+>>>> +		if (WARN_ON_ONCE(walker_rule->layers[0].level != 0))
+>>>> +			return -EINVAL;
+>>>> +
+>>>>    		layers[0].access = walker_rule->layers[0].access;
+>>>>
+>>>>    		err = insert_rule(dst, id, &layers, ARRAY_SIZE(layers));
+>>>>    		if (err)
+>>>> -			goto out_unlock;
+>>>> +			return err;
+>>>> +	}
+>>>> +	return err;
+>>>> +}
+>>>> +
+>>>> +static int merge_ruleset(struct landlock_ruleset *const dst,
+>>>> +			 struct landlock_ruleset *const src)
+>>>> +{
+>>>> +	int err = 0;
+>>>> +
+>>>> +	might_sleep();
+>>>> +	/* Should already be checked by landlock_merge_ruleset() */
+>>>> +	if (WARN_ON_ONCE(!src))
+>>>> +		return 0;
+>>>> +	/* Only merge into a domain. */
+>>>> +	if (WARN_ON_ONCE(!dst || !dst->hierarchy))
+>>>> +		return -EINVAL;
+>>>> +
+>>>> +	/* Locks @dst first because we are its only owner. */
+>>>> +	mutex_lock(&dst->lock);
+>>>> +	mutex_lock_nested(&src->lock, SINGLE_DEPTH_NESTING);
+>>>> +
+>>>> +	/* Stacks the new layer. */
+>>>> +	if (WARN_ON_ONCE(src->num_layers != 1 || dst->num_layers < 1)) {
+>>>> +		err = -EINVAL;
+>>>> +		goto out_unlock;
+>>>>    	}
+>>>> +	dst->access_masks[dst->num_layers - 1] = src->access_masks[0];
+>>>> +
+>>>> +	/* Merges the @src inode tree. */
+>>>> +	err = merge_tree(dst, src, LANDLOCK_KEY_INODE);
+>>>> +	if (err)
+>>>> +		goto out_unlock;
+>>>>
+>>>>    out_unlock:
+>>>>    	mutex_unlock(&src->lock);
+>>>> @@ -364,43 +379,64 @@ static int merge_ruleset(struct landlock_ruleset *const dst,
+>>>>    	return err;
+>>>>    }
+>>>>
+>>>> -static int inherit_ruleset(struct landlock_ruleset *const parent,
+>>>> -			   struct landlock_ruleset *const child)
+>>>> +static int inherit_tree(struct landlock_ruleset *const parent,
+>>>> +			struct landlock_ruleset *const child,
+>>>> +			const enum landlock_key_type key_type)
+>>>>    {
+>>>>    	struct landlock_rule *walker_rule, *next_rule;
+>>>>    	struct rb_root *parent_root;
+>>>>    	int err = 0;
+>>>>
+>>>>    	might_sleep();
+>>>> -	if (!parent)
+>>>> -		return 0;
+>>>> +	lockdep_assert_held(&parent->lock);
+>>>> +	lockdep_assert_held(&child->lock);
+>>>>
+>>>> -	parent_root = get_root(parent, LANDLOCK_KEY_INODE);
+>>>> +	parent_root = get_root(parent, key_type);
+>>>>    	if (IS_ERR(parent_root))
+>>>>    		return PTR_ERR(parent_root);
+>>>>
+>>>> -	/* Locks @child first because we are its only owner. */
+>>>> -	mutex_lock(&child->lock);
+>>>> -	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
+>>>> -
+>>>> -	/* Copies the @parent tree. */
+>>>> +	/* Copies the @parent inode or network tree. */
+>>>>    	rbtree_postorder_for_each_entry_safe(walker_rule, next_rule,
+>>>>    					     parent_root, node) {
+>>>>    		const struct landlock_id id = {
+>>>>    			.key = walker_rule->key,
+>>>> -			.type = LANDLOCK_KEY_INODE,
+>>>> +			.type = key_type,
+>>>>    		};
+>>>> +
+>>>>    		err = insert_rule(child, id, &walker_rule->layers,
+>>>>    				  walker_rule->num_layers);
+>>>>    		if (err)
+>>>> -			goto out_unlock;
+>>>> +			return err;
+>>>>    	}
+>>>> +	return err;
+>>>> +}
+>>>> +
+>>>> +static int inherit_ruleset(struct landlock_ruleset *const parent,
+>>>> +			   struct landlock_ruleset *const child)
+>>>> +{
+>>>> +	int err = 0;
+>>>> +
+>>>> +	might_sleep();
+>>>> +	if (!parent)
+>>>> +		return 0;
+>>>> +
+>>>> +	/* Locks @child first because we are its only owner. */
+>>>> +	mutex_lock(&child->lock);
+>>>> +	mutex_lock_nested(&parent->lock, SINGLE_DEPTH_NESTING);
+>>>> +
+>>>> +	/* Copies the @parent inode tree. */
+>>>> +	err = inherit_tree(parent, child, LANDLOCK_KEY_INODE);
+>>>> +	if (err)
+>>>> +		goto out_unlock;
+>>>>
+>>>>    	if (WARN_ON_ONCE(child->num_layers <= parent->num_layers)) {
+>>>>    		err = -EINVAL;
+>>>>    		goto out_unlock;
+>>>>    	}
+>>>> -	/* Copies the parent layer stack and leaves a space for the new layer. */
+>>>> +	/*
+>>>> +	 * Copies the parent layer stack and leaves a space
+>>>> +	 * for the new layer.
+>>>> +	 */
+>>>
+>>> Did that get formatted because of clang-format? The original line exceed
+>>> the 80 columns limit, but it is not caught by different version of
+>>> clang-format I tested. Anyway, we should remove this hunk for now
+>>> because it has no link with the current patch.
+>> 
+>>     Yep. I format every patch with clnag-format.
+>>     I will remove this hunk and let it be as it was.
+> 
+> It's weird because clang-format doesn't touch this hunk for me. Which
+> version do you use? Do you have any specific configuration?
 
+   Sorry for misleading, its my fault. I realized that I had formated it 
+by myself (more than 80 columns length). You are right that clang-format 
+does not have to do with it - just checked it. I will remove the hunk.
+
+> .
 
