@@ -1,81 +1,160 @@
-Return-Path: <netdev+bounces-15610-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15612-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C248748B2E
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:01:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id C1DE2748B33
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:02:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 074392810E1
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:01:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F255A1C20B9C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:02:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3F413ADE;
-	Wed,  5 Jul 2023 18:00:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DABB313ADE;
+	Wed,  5 Jul 2023 18:02:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B915213AD1;
-	Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F817C433C7;
-	Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688580023;
-	bh=y/6YMs1x6DXBFCu0KRrbxNvaRbujSC9jhs5LzJRBsaw=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=bVBfXnRCPG+DAbo9duNA6EVaS7IvksF/BylquoOVg1Co6p1+4kuy6xZGHhionncIP
-	 +uXQRBrgvoCBm1ec1p2KpXcjb4CjSVNsabvcR7lnQVBsI8kZoBmIeKUBR5ibQPNMIr
-	 v4+EX4aBM79UD7VIc/gX6VqK3NXUQkGoIOzT/6+zgLM2mN+h7Sy1pZ+SU3fR3we3Dy
-	 MszJ5SOzv0C8l+z1GDsgLIzSk+cLGPPw6dJqXbCl6WKSjYEOqfdfie7Qmzwclu4gnu
-	 O4+G2VKSC9yefcSYL8ts/ZnnXz97hL5Mgu0Xa44deYruBCTULCXzs+eMP3/PQXIi2j
-	 jC3UpuzeibV6A==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10FA0C395C5;
-	Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CCDF5134A7
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 18:02:19 +0000 (UTC)
+Received: from mail-pj1-f80.google.com (mail-pj1-f80.google.com [209.85.216.80])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A12E1173F
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 11:02:17 -0700 (PDT)
+Received: by mail-pj1-f80.google.com with SMTP id 98e67ed59e1d1-262cf62e9b4so9611566a91.0
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 11:02:17 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688580137; x=1691172137;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=0gFPCCg8zvDneik0VHuBo3IySlvWosQfa0VtoeNFj+c=;
+        b=UBMe1MeQMLujXH5TxgElaIRCUh8vZ7zctyZzwEwWZN8tjoBYkzjOhPldkipK94UMEy
+         uflGteW8gIkhVElxwPpvSZ9Oq4/DVosE3IR4jL75K+1rHDNIlGv3H0LRcFI0VtrFQmIP
+         ZS+eIOK5HGhIJYlsfKC1upuKpAs6EgT0DJDdky4h+MNW7LauIXxM3m41IiqxmQ4hAwpx
+         Qf0N1BnfMcTiG+uvoO4TSZ62QnTEHZBwEAv6YKveXITOPEUS2HpC/y9bqdtgXwJYUYqv
+         NYXHQiAyMvbWzX37yT0zMtGhu4UltXdWueJcau99xiYNZlCLiFYiZX5DTVSAi+NcWtfp
+         uF4A==
+X-Gm-Message-State: ABy/qLYF7JXUubpF+MlTyyeUP7ehVcdB6917mYDxcgMrTo6BDelmamd7
+	noDCShMeoSqCA4x8ZgJQK/k2HF1gwEVdNvMjdhPxHx+SFAgr
+X-Google-Smtp-Source: APBJJlEvZo8KlDShC0mL15wRDN4gxADoIqfIGthya/Q40ebBrhQbb7IciKvbLj9ePl2PGXr1zOeHtQ/Z6IVpDJhVUn9qmQLEj4VQ
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: pull-request: bpf 2023-07-05
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168858002306.7518.1447432530903034542.git-patchwork-notify@kernel.org>
-Date: Wed, 05 Jul 2023 18:00:23 +0000
-References: <20230705171716.6494-1-daniel@iogearbox.net>
-In-Reply-To: <20230705171716.6494-1-daniel@iogearbox.net>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
- netdev@vger.kernel.org, bpf@vger.kernel.org
+X-Received: by 2002:a17:90a:9d82:b0:262:e5cb:6c12 with SMTP id
+ k2-20020a17090a9d8200b00262e5cb6c12mr13023247pjp.6.1688580137099; Wed, 05 Jul
+ 2023 11:02:17 -0700 (PDT)
+Date: Wed, 05 Jul 2023 11:02:16 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <0000000000003f2db705ffc133d2@google.com>
+Subject: [syzbot] [crypto?] WARNING in extract_iter_to_sg
+From: syzbot <syzbot+f2c120b449b209d89efa@syzkaller.appspotmail.com>
+To: davem@davemloft.net, herbert@gondor.apana.org.au, 
+	linux-crypto@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hello,
 
-This pull request was applied to netdev/net.git (main)
-by Jakub Kicinski <kuba@kernel.org>:
+syzbot found the following issue on:
 
-On Wed,  5 Jul 2023 19:17:16 +0200 you wrote:
-> Hi David, hi Jakub, hi Paolo, hi Eric,
-> 
-> The following pull-request contains BPF updates for your *net* tree.
-> 
-> We've added 2 non-merge commits during the last 1 day(s) which contain
-> a total of 3 files changed, 16 insertions(+), 4 deletions(-).
-> 
-> [...]
+HEAD commit:    3674fbf0451d Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=10e4a802a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c9bf1936936ca698
+dashboard link: https://syzkaller.appspot.com/bug?extid=f2c120b449b209d89efa
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
 
-Here is the summary with links:
-  - pull-request: bpf 2023-07-05
-    https://git.kernel.org/netdev/net/c/fdaff05b4a67
+Unfortunately, I don't have any reproducer for this issue yet.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/42ed556782c3/disk-3674fbf0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1913e16e8565/vmlinux-3674fbf0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/469804b58a7c/bzImage-3674fbf0.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+f2c120b449b209d89efa@syzkaller.appspotmail.com
+
+extract_iter_to_sg(3) unsupported
+------------[ cut here ]------------
+WARNING: CPU: 0 PID: 26699 at lib/scatterlist.c:1362 extract_iter_to_sg lib/scatterlist.c:1361 [inline]
+WARNING: CPU: 0 PID: 26699 at lib/scatterlist.c:1362 extract_iter_to_sg+0xf02/0x1960 lib/scatterlist.c:1339
+Modules linked in:
+CPU: 0 PID: 26699 Comm: syz-executor.2 Not tainted 6.4.0-rc7-syzkaller-01944-g3674fbf0451d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+RIP: 0010:extract_iter_to_sg lib/scatterlist.c:1362 [inline]
+RIP: 0010:extract_iter_to_sg+0xf02/0x1960 lib/scatterlist.c:1339
+Code: ff ff 48 c1 e3 06 48 01 c3 e9 8c fe ff ff e8 65 78 73 fd 40 0f b6 d5 48 c7 c6 e0 c7 a6 8a 48 c7 c7 00 c7 a6 8a e8 ee 58 57 fd <0f> 0b 48 c7 44 24 18 fb ff ff ff e9 1b fc ff ff e8 39 78 73 fd 48
+RSP: 0018:ffffc90009937680 EFLAGS: 00010286
+RAX: 0000000000000021 RBX: 0000000000000001 RCX: ffffc9000c714000
+RDX: 0000000000000000 RSI: ffffffff8168bc0c RDI: 0000000000000005
+RBP: 0000000000000003 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000080000000 R11: 0000000000000001 R12: ffff88802dcea248
+R13: ffff88802dcea268 R14: ffff88802dcea268 R15: ffffc90009937a40
+FS:  00007fc151532700(0000) GS:ffff8880b9800000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007fc14effe718 CR3: 000000002b366000 CR4: 00000000003506f0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ af_alg_get_rsgl+0x24d/0x7c0 crypto/af_alg.c:1249
+ _skcipher_recvmsg crypto/algif_skcipher.c:77 [inline]
+ skcipher_recvmsg+0x8ee/0xe40 crypto/algif_skcipher.c:157
+ sock_recvmsg_nosec net/socket.c:1019 [inline]
+ sock_recvmsg+0xe2/0x160 net/socket.c:1040
+ sock_read_iter+0x2bd/0x3b0 net/socket.c:1106
+ call_read_iter include/linux/fs.h:1862 [inline]
+ generic_file_splice_read+0x182/0x4b0 fs/splice.c:420
+ sock_splice_read+0xed/0x120 net/socket.c:1076
+ do_splice_to+0x1b9/0x240 fs/splice.c:1007
+ splice_file_to_pipe+0x104/0x120 fs/splice.c:1246
+ do_splice+0x10e7/0x1e50 fs/splice.c:1335
+ __do_splice+0x14e/0x270 fs/splice.c:1385
+ __do_sys_splice fs/splice.c:1596 [inline]
+ __se_sys_splice fs/splice.c:1578 [inline]
+ __x64_sys_splice+0x19c/0x250 fs/splice.c:1578
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7fc15088c389
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 f1 19 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007fc151532168 EFLAGS: 00000246 ORIG_RAX: 0000000000000113
+RAX: ffffffffffffffda RBX: 00007fc1509ac120 RCX: 00007fc15088c389
+RDX: 000000000000000f RSI: 0000000000000000 RDI: 0000000000000006
+RBP: 00007fc1508d7493 R08: 0000000000000001 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
+R13: 00007fffc693848f R14: 00007fc151532300 R15: 0000000000022000
+ </TASK>
 
 
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
