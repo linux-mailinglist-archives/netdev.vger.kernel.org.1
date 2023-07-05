@@ -1,225 +1,84 @@
-Return-Path: <netdev+bounces-15615-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15616-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01FC5748B8D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:19:25 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 437A3748B9D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:20:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AD2522804D2
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:19:23 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 000B92810D7
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:20:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0596614A83;
-	Wed,  5 Jul 2023 18:19:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 46A5C14A8D;
+	Wed,  5 Jul 2023 18:20:23 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E8277134A7
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 18:19:21 +0000 (UTC)
-Received: from smtp-relay-canonical-1.canonical.com (smtp-relay-canonical-1.canonical.com [185.125.188.121])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D9762686;
-	Wed,  5 Jul 2023 11:18:56 -0700 (PDT)
-Received: from quatroqueijos.cascardo.eti.br (1.general.cascardo.us.vpn [10.172.70.58])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange ECDHE (P-256) server-signature RSA-PSS (2048 bits) server-digest SHA256)
-	(No client certificate requested)
-	by smtp-relay-canonical-1.canonical.com (Postfix) with ESMTPSA id AAFC543081;
-	Wed,  5 Jul 2023 18:17:48 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
-	s=20210705; t=1688581070;
-	bh=cFbjoMHXNR/LDZR7PdEMcM0H+3vCZttAXTNTej+ZwjE=;
-	h=Date:From:To:Cc:Subject:Message-ID:References:MIME-Version:
-	 Content-Type:In-Reply-To;
-	b=QxUjiRTVqU31rd+GyEH9PP1JYl6oaHKe+O4LaMFAwSt0VJ1KWzV1wC2K7VVQP6d0I
-	 i29A5Xg/q7qB7V3RQO6+486YpkkbtHoPye2xDOBzOfgNpwnpgNHJm3VsAzb5vpFor4
-	 7xdklDAqTB+2vRF462G+saOmwDb/3zwPlNl9i9pAKiu5Nsi4ouB0Tkjtt/jDfSNny0
-	 EGqc+bfknLh7J4sI3QG88QXfEpMt0O0uG972xFWxXEADVmU2UJgGAhyYy4jXBBMPna
-	 RDNG28T8Iaq/cJMU43IkhETXnzA/LbcBOJp0Vm7BsUoZxSwB1l2dkEPL3L1ea9SukW
-	 LoQxHwHD9/ygg==
-Date: Wed, 5 Jul 2023 15:17:43 -0300
-From: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-To: Florian Westphal <fw@strlen.de>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH] netfilter: nf_tables: prevent OOB access in
- nft_byteorder_eval
-Message-ID: <ZKWzx3e6frpSs8bN@quatroqueijos.cascardo.eti.br>
-References: <20230705121515.747251-1-cascardo@canonical.com>
- <20230705130336.GD3751@breakpoint.cc>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AB5041428B
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 18:20:21 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 08F3BC433C7;
+	Wed,  5 Jul 2023 18:20:21 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688581221;
+	bh=JamJjeCCkOl0qbFxmtmzV9hb2vvVrB1vx3JFpdV8h7Q=;
+	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
+	b=G8cOetNb+diIwOS8l11Vp7QJLP960UCtIQxIslSHQe+0L7f2naXT8OuKUAjCO2Hnd
+	 Wve0WEmh2V7nKJq6nrH1io1U1jArvTWR/ZZD+cDUZLisRJ83PhdFySljdEqtO5gn3M
+	 /gk6QwS2NIGNNHnyBdp0t+no1yeA2r/WGWgOF4/H80Z54auL1jm9FSkTyMk7YxdglN
+	 G2UAWOJMveeDbLVsbNsAVTBV01mPYLK9YWf2V8joQO3qopGVm5ayctVL3eyt63z+pH
+	 CKcieW+TjBBZs/0Qp9UKlTob7fSkBiK9nnbPZTp9e0/kbRRBh8JqX16rfeFIPWvWsb
+	 nvKmnKN8+nctA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id DF0B7C395C5;
+	Wed,  5 Jul 2023 18:20:20 +0000 (UTC)
+Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230705130336.GD3751@breakpoint.cc>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
+Subject: Re: [PATCH net v3] nfp: clean mc addresses in application firmware when
+ closing port
+From: patchwork-bot+netdevbpf@kernel.org
+Message-Id: 
+ <168858122090.23406.18329773090141093446.git-patchwork-notify@kernel.org>
+Date: Wed, 05 Jul 2023 18:20:20 +0000
+References: <20230705052818.7122-1-louis.peens@corigine.com>
+In-Reply-To: <20230705052818.7122-1-louis.peens@corigine.com>
+To: Louis Peens <louis.peens@corigine.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ jacob.e.keller@intel.com, simon.horman@corigine.com,
+ yinjun.zhang@corigine.com, netdev@vger.kernel.org, stable@vger.kernel.org,
+ oss-drivers@corigine.com
 
-On Wed, Jul 05, 2023 at 03:03:36PM +0200, Florian Westphal wrote:
-> Thadeu Lima de Souza Cascardo <cascardo@canonical.com> wrote:
-> > When evaluating byteorder expressions with size 2, a union with 32-bit and
-> > 16-bit members is used. Since the 16-bit members are aligned to 32-bit,
-> > the array accesses will be out-of-bounds.
-> > 
-> > It may lead to a stack-out-of-bounds access like the one below:
-> 
-> Yes, this is broken.
-> 
-> > Using simple s32 and s16 pointers for each of these accesses fixes the
-> > problem.
-> 
-> I'm not sure this is correct.  Its certainly less wrong of course.
-> 
-> > Fixes: 96518518cc41 ("netfilter: add nftables")
-> > Cc: stable@vger.kernel.org
-> > Reported-by: Tanguy DUBROCA (@SidewayRE) from @Synacktiv working with ZDI
-> > Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-> > ---
-> >  net/netfilter/nft_byteorder.c | 17 ++++++++++-------
-> >  1 file changed, 10 insertions(+), 7 deletions(-)
-> > 
-> > diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-> > index 9a85e797ed58..aa16bd2e92e2 100644
-> > --- a/net/netfilter/nft_byteorder.c
-> > +++ b/net/netfilter/nft_byteorder.c
-> > @@ -30,11 +30,14 @@ void nft_byteorder_eval(const struct nft_expr *expr,
-> >  	const struct nft_byteorder *priv = nft_expr_priv(expr);
-> >  	u32 *src = &regs->data[priv->sreg];
-> >  	u32 *dst = &regs->data[priv->dreg];
-> > -	union { u32 u32; u16 u16; } *s, *d;
-> > +	u32 *s32, *d32;
-> > +	u16 *s16, *d16;
-> >  	unsigned int i;
-> >  
-> > -	s = (void *)src;
-> > -	d = (void *)dst;
-> > +	s32 = (void *)src;
-> > +	d32 = (void *)dst;
-> > +	s16 = (void *)src;
-> > +	d16 = (void *)dst;
-> >  
-> >  	switch (priv->size) {
-> >  	case 8: {
-> > @@ -62,11 +65,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
-> >  		switch (priv->op) {
-> >  		case NFT_BYTEORDER_NTOH:
-> >  			for (i = 0; i < priv->len / 4; i++)
-> > -				d[i].u32 = ntohl((__force __be32)s[i].u32);
-> > +				d32[i] = ntohl((__force __be32)s32[i]);
-> >  			break;
-> >  		case NFT_BYTEORDER_HTON:
-> >  			for (i = 0; i < priv->len / 4; i++)
-> > -				d[i].u32 = (__force __u32)htonl(s[i].u32);
-> > +				d32[i] = (__force __u32)htonl(s32[i]);
-> >  			break;
-> 
-> Ack, this looks better, but I'd just use src[i] and dst[i] rather than
-> the weird union pointers the original has.
-> 
-> > @@ -74,11 +77,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
-> >  		switch (priv->op) {
-> >  		case NFT_BYTEORDER_NTOH:
-> >  			for (i = 0; i < priv->len / 2; i++)
-> > -				d[i].u16 = ntohs((__force __be16)s[i].u16);
-> > +				d16[i] = ntohs((__force __be16)s16[i]);
-> 
-> This on the other hand... I'd say this should mimic what the 64bit
-> case is doing and use nft_reg_store16() nft_reg_load16() helpers for
-> the register accesses.
-> 
-> something like:
-> 
-> for (i = 0; i < priv->len / 2; i++) {
->      v16 = nft_reg_load16(&src[i]);
->      nft_reg_store16(&dst[i], + ntohs((__force __be16)v16));
-> }
-> 
+Hello:
 
-The problem here is that we cannot index the 32-bit dst and src pointers as if
-they were 16-bit pointers. We will end up with the exact same problem we are
-trying to fix here.
+This patch was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-I can change the code to use the accessors, but they use u32 pointers, so it
-would end up looking like:
+On Wed,  5 Jul 2023 07:28:18 +0200 you wrote:
+> From: Yinjun Zhang <yinjun.zhang@corigine.com>
+> 
+> When moving devices from one namespace to another, mc addresses are
+> cleaned in software while not removed from application firmware. Thus
+> the mc addresses are remained and will cause resource leak.
+> 
+> Now use `__dev_mc_unsync` to clean mc addresses when closing port.
+> 
+> [...]
 
-diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-index 9a85e797ed58..fd8ce6426b2b 100644
---- a/net/netfilter/nft_byteorder.c
-+++ b/net/netfilter/nft_byteorder.c
-@@ -30,11 +30,10 @@ void nft_byteorder_eval(const struct nft_expr *expr,
- 	const struct nft_byteorder *priv = nft_expr_priv(expr);
- 	u32 *src = &regs->data[priv->sreg];
- 	u32 *dst = &regs->data[priv->dreg];
--	union { u32 u32; u16 u16; } *s, *d;
- 	unsigned int i;
- 
--	s = (void *)src;
--	d = (void *)dst;
-+	u16 *s16 = (void *)src;
-+	u16 *d16 = (void *)dst;
- 
- 	switch (priv->size) {
- 	case 8: {
-@@ -62,23 +61,29 @@ void nft_byteorder_eval(const struct nft_expr *expr,
- 		switch (priv->op) {
- 		case NFT_BYTEORDER_NTOH:
- 			for (i = 0; i < priv->len / 4; i++)
--				d[i].u32 = ntohl((__force __be32)s[i].u32);
-+				dst[i] = ntohl((__force __be32)src[i]);
- 			break;
- 		case NFT_BYTEORDER_HTON:
- 			for (i = 0; i < priv->len / 4; i++)
--				d[i].u32 = (__force __u32)htonl(s[i].u32);
-+				dst[i] = (__force __u32)htonl(src[i]);
- 			break;
- 		}
- 		break;
- 	case 2:
- 		switch (priv->op) {
- 		case NFT_BYTEORDER_NTOH:
--			for (i = 0; i < priv->len / 2; i++)
--				d[i].u16 = ntohs((__force __be16)s[i].u16);
-+			for (i = 0; i < priv->len / 2; i++) {
-+				__be16 src16;
-+				src16 = nft_reg_load_be16((u32 *)&s16[i]);
-+				nft_reg_store_be16((u32 *)&d16[i], ntohs(src16));
-+			}
- 			break;
- 		case NFT_BYTEORDER_HTON:
--			for (i = 0; i < priv->len / 2; i++)
--				d[i].u16 = (__force __u16)htons(s[i].u16);
-+			for (i = 0; i < priv->len / 2; i++) {
-+				u16 src16;
-+				src16 = nft_reg_load16((u32 *)&s16[i]);
-+				nft_reg_store16((u32 *)&d16[i], (__force __u16)htons(src16));
-+			}
- 			break;
- 		}
- 		break;
+Here is the summary with links:
+  - [net,v3] nfp: clean mc addresses in application firmware when closing port
+    https://git.kernel.org/netdev/net/c/cc7eab25b1cf
 
-> [ not even compile tested ]
-> 
-> Same for the htons case.
-> 
-> On a slightly related note, some of the nftables test cases create bogus
-> conversions, e.g.:
-> 
-> # src/nft --debug=netlink add rule ip6 t c 'ct mark set ip6 dscp << 2 |
-> # 0x10'
-> ip6 t c
->   [ payload load 2b @ network header + 0 => reg 1 ]
->   [ bitwise reg 1 = ( reg 1 & 0x0000c00f ) ^ 0x00000000 ]
->   [ bitwise reg 1 = ( reg 1 >> 0x00000006 ) ]
->   [ byteorder reg 1 = ntoh(reg 1, 2, 1) ]	// NO-OP! should be reg 1, 2, 2) I presume?
-> 
-> I'd suggest to add a patch for nf-next that rejects such crap.
+You are awesome, thank you!
+-- 
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/patchwork/pwbot.html
+
+
 
