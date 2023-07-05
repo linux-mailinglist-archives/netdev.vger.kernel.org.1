@@ -1,115 +1,146 @@
-Return-Path: <netdev+bounces-15487-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15488-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CD6E747F82
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 10:24:03 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 57BF5747FC7
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 10:35:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8534C1C2042F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 08:24:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B3073281004
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 08:35:54 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4770E3D71;
-	Wed,  5 Jul 2023 08:24:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 98F781C15;
+	Wed,  5 Jul 2023 08:35:52 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B816F20E8
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 08:23:58 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5EA9CC433C8;
-	Wed,  5 Jul 2023 08:23:57 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688545438;
-	bh=jL2t6AUn6hzbYzzckYRgVf8ByWotOQ4NEXr2JAdtcG8=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=pYj6Fq/hWszOWdJeF3FLgviiHyu+RFMMAEv9MVzuLlx+/5qZkje15/10LtaGmFqts
-	 EW4sAT73wesgPmKBoIgnkjjDMQ3ofzkMuj4IccJ74fFLmAXMmrPOIIf+2s516fiMDS
-	 9kDlWt58wbmSz3X/ColOvvMhIiUHPBZaFVocdlSYd4LntXEeVDVY7Enp1y2n4X9WxU
-	 8ItoG+XjmvgpBQ0/SvbrVnEgqmnL26c5oVxRjH58gqgLL5+1my5bf4TRu/6WM7MDbx
-	 IpqL0xd/mieDiqTkIVIqEpzfT5Rl3MGHJj3/L6ahYeq4/r8v+WFnoClLmIhAIrNV4/
-	 RjDUIrGURgbHg==
-Date: Wed, 5 Jul 2023 11:23:53 +0300
-From: Leon Romanovsky <leon@kernel.org>
-To: Simon Horman <simon.horman@corigine.com>
-Cc: Zhengchao Shao <shaozhengchao@huawei.com>, netdev@vger.kernel.org,
-	linux-rdma@vger.kernel.org, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	valex@nvidia.com, kliteyn@nvidia.com, mbloch@nvidia.com,
-	danielj@nvidia.com, erezsh@mellanox.com, saeedm@nvidia.com,
-	weiyongjun1@huawei.com, yuehaibing@huawei.com
-Subject: Re: [PATCH net] net/mlx5: DR, fix memory leak in
- mlx5dr_cmd_create_reformat_ctx
-Message-ID: <20230705082353.GJ6455@unreal>
-References: <20230704033308.3773764-1-shaozhengchao@huawei.com>
- <ZKQvbCkdeVWWCzEw@corigine.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8799C17FE
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 08:35:52 +0000 (UTC)
+Received: from mx0a-0031df01.pphosted.com (mx0a-0031df01.pphosted.com [205.220.168.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 99EA9133;
+	Wed,  5 Jul 2023 01:35:49 -0700 (PDT)
+Received: from pps.filterd (m0279862.ppops.net [127.0.0.1])
+	by mx0a-0031df01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3657mcCN011803;
+	Wed, 5 Jul 2023 08:35:34 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=quicinc.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=qcppdkim1;
+ bh=b9Q5DgA18maSgdhrRWyHGDfLPIo6E2sL0af51kbX5pM=;
+ b=RVeUCbF7K4WkNmaZ/X0cM+/J9swicp2TLtTDRNCD6Lg7AnEvsY+56C1pd5iisRUMYdcx
+ mapLQ+FYflA2hgcWIKoeUu6xVbHdHnlryuVOAXHI8fZShLuj1Ta1Aoz79SbOXK+5iXon
+ EkA4/FtrnxIVo0+MoU1mEZYLDCCYSNo9gLOOUcay7RSPWDE0lBpfi0CualsHVRxuW3th
+ Wx7sm/ZRHe0hiATESDGJorCs9Qt+9bsWHwSsLJ6u8Nww8bwZ94B3+R6I7InmEgyRWhSN
+ o4gO0eIEFO9RMJWL/A4803O1bv7gqMqvIAU/4sRpPNoy8wN+CONA9MOeJoSLXo4yBM3w Ow== 
+Received: from nalasppmta04.qualcomm.com (Global_NAT1.qualcomm.com [129.46.96.20])
+	by mx0a-0031df01.pphosted.com (PPS) with ESMTPS id 3rmnw6h8sw-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jul 2023 08:35:34 +0000
+Received: from nalasex01c.na.qualcomm.com (nalasex01c.na.qualcomm.com [10.47.97.35])
+	by NALASPPMTA04.qualcomm.com (8.17.1.5/8.17.1.5) with ESMTPS id 3658ZXjo012897
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 5 Jul 2023 08:35:33 GMT
+Received: from [10.253.8.233] (10.80.80.8) by nalasex01c.na.qualcomm.com
+ (10.47.97.35) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.2.1118.7; Wed, 5 Jul 2023
+ 01:35:31 -0700
+Message-ID: <68ec9a1e-81d3-93b9-d68f-47df07db8965@quicinc.com>
+Date: Wed, 5 Jul 2023 16:35:28 +0800
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <ZKQvbCkdeVWWCzEw@corigine.com>
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH v1 1/2] net: phy: at803x: support qca8081 1G chip type
+Content-Language: en-US
+To: Andrew Lunn <andrew@lunn.ch>
+CC: <hkallweit1@gmail.com>, <linux@armlinux.org.uk>, <davem@davemloft.net>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+References: <20230704090016.7757-1-quic_luoj@quicinc.com>
+ <20230704090016.7757-2-quic_luoj@quicinc.com>
+ <66a5f898-e3fd-460a-b604-bb11a000e4e9@lunn.ch>
+From: Jie Luo <quic_luoj@quicinc.com>
+In-Reply-To: <66a5f898-e3fd-460a-b604-bb11a000e4e9@lunn.ch>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.80.80.8]
+X-ClientProxiedBy: nasanex01b.na.qualcomm.com (10.46.141.250) To
+ nalasex01c.na.qualcomm.com (10.47.97.35)
+X-QCInternal: smtphost
+X-Proofpoint-Virus-Version: vendor=nai engine=6200 definitions=5800 signatures=585085
+X-Proofpoint-GUID: E2ZpSe5mr7u-ak0tnqLCNjHJyML0soyQ
+X-Proofpoint-ORIG-GUID: E2ZpSe5mr7u-ak0tnqLCNjHJyML0soyQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-04_16,2023-07-04_01,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 priorityscore=1501
+ spamscore=0 lowpriorityscore=0 mlxscore=0 phishscore=0 impostorscore=0
+ malwarescore=0 bulkscore=0 mlxlogscore=999 adultscore=0 suspectscore=0
+ clxscore=1015 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307050078
+X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Tue, Jul 04, 2023 at 03:40:44PM +0100, Simon Horman wrote:
-> On Tue, Jul 04, 2023 at 11:33:08AM +0800, Zhengchao Shao wrote:
-> > when mlx5_cmd_exec failed in mlx5dr_cmd_create_reformat_ctx, the memory
-> > pointed by 'in' is not released, which will cause memory leak. Move memory
-> > release after mlx5_cmd_exec.
-> > 
-> > Fixes: 1d9186476e12 ("net/mlx5: DR, Add direct rule command utilities")
-> > Signed-off-by: Zhengchao Shao <shaozhengchao@huawei.com>
-> > ---
-> >  drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c | 2 +-
-> >  1 file changed, 1 insertion(+), 1 deletion(-)
-> > 
-> > diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> > index 7491911ebcb5..cf5820744e99 100644
-> > --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> > +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> > @@ -563,11 +563,11 @@ int mlx5dr_cmd_create_reformat_ctx(struct mlx5_core_dev *mdev,
-> >  		memcpy(pdata, reformat_data, reformat_size);
-> >  
-> >  	err = mlx5_cmd_exec(mdev, in, inlen, out, sizeof(out));
-> > +	kvfree(in);
-> >  	if (err)
-> >  		return err;
-> >  
-> >  	*reformat_id = MLX5_GET(alloc_packet_reformat_context_out, out, packet_reformat_id);
-> > -	kvfree(in);
-> >  
-> >  	return err;
-> >  }
-> 
-> Hi Zhengchao Shao,
-> 
-> I agree this is a correct fix.
-> However, I think a more idiomatic approach to this problem
-> would be to use a goto label. Something like this (completely untested!).
 
-Thanks, your change looks more natural to me.
+
+On 7/5/2023 7:24 AM, Andrew Lunn wrote:
+> On Tue, Jul 04, 2023 at 05:00:15PM +0800, Luo Jie wrote:
+>> The qca8081 1G chip version does not support 2.5 capability, which
+>> is distinguished from qca8081 2.5G chip according to the bit0 of
+>> register mmd7.0x901d.
+>>
+>> The fast retrain and master slave seed configs are only needed when
+>> the 2.5G capability is supported.
+>>
+>> Switch to use genphy_c45_pma_read_abilities for .get_features API.
+> 
+> It is better to have lots of small patches, each doing one thing. If
+> something regresses, a git bisect gives a much finer idea where the
+> problem is. It is also easier to review small patches with good commit
+> messages.
+> 
+> So please break this patch up.
+
+Ok, i will split this patch to small patches, thanks for the suggestion.
 
 > 
-> diff --git a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> index 7491911ebcb5..8c2a34a0d6be 100644
-> --- a/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> +++ b/drivers/net/ethernet/mellanox/mlx5/core/steering/dr_cmd.c
-> @@ -564,11 +564,12 @@ int mlx5dr_cmd_create_reformat_ctx(struct mlx5_core_dev *mdev,
->  
->  	err = mlx5_cmd_exec(mdev, in, inlen, out, sizeof(out));
->  	if (err)
-> -		return err;
-> +		goto err_free_in;
->  
->  	*reformat_id = MLX5_GET(alloc_packet_reformat_context_out, out, packet_reformat_id);
-> -	kvfree(in);
->  
-> +err_free_in:
-> +	kvfree(in);
->  	return err;
->  }
->  
+>> -	/* Configure lower ramdom seed to make phy linked as slave mode */
+>> -	ret = qca808x_phy_ms_random_seed_set(phydev);
+>> -	if (ret)
+>> -		return ret;
+>> +		/* Configure lower ramdom seed to make phy linked as slave mode */
+>> +		ret = qca808x_phy_ms_random_seed_set(phydev);
+>> +		if (ret)
+>> +			return ret;
+> 
+> Shouldn't this depend on how MDIO_MMD_AN, MDIO_AN_T1_ADV_L bit
+> MDIO_AN_T1_ADV_M_MST is set? Maybe the user wants it to prefer master
+> rather than slave?
+> 
+> I know you are just trying to move code around, but it does seem like
+> a good time to also improve the code.
+> 
+> FYI: net-next is closed at the moment. Officially you should post as
+> RFC, or wait until it opens again.
+> 
+>    Andrew
+
+Hi Andrew,
+The master/slave configuration/status is only existed in MII reg9, 10 on 
+qca8081 PHY, which is not existed in MDIO_MMD_AN or MDIO_MMD_PMAPMD, i 
+will improve this code according to the user's prefer master/slave 
+configuration in the next patch series.
+
+Thanks for the reminder of close window, i will upload the patches after 
+the open of next window.
+
 
