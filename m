@@ -1,282 +1,287 @@
-Return-Path: <netdev+bounces-15553-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15554-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6EB5A74867B
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 16:37:17 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 43852748686
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 16:39:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2815928100F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:37:16 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CDB86281025
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:39:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FACD2FC;
-	Wed,  5 Jul 2023 14:37:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACABDD530;
+	Wed,  5 Jul 2023 14:39:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1F6256FA1
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 14:37:13 +0000 (UTC)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 69A95CE;
-	Wed,  5 Jul 2023 07:37:12 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688567832; x=1720103832;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=cEtIh/0+Z4ueMopepY9PfEt321OBa8v8OILwDfcmQa8=;
-  b=ZUIV27y03P9bsuReBH0t1vMcyxh7W5rfTKZCm1KbUl60LnN3+y8oJwRt
-   rSo0d9hwfzLJRP+P+FNsU23CtfYcvhBV3dCKZfnhB9ePymSUvrUp7/6zl
-   DDVI5nPfFpa22Ou3rzW69NplBfLGHVyVIGqAGBjSisIaSGuziTmbIYj9N
-   emvPol1SF11jjtuMVMTQg365wujIDwDz4Zum468r24Y78BDTWiPfv76ar
-   ZbThNaIHnWe0aGuS6266SDETXHYXhHHRWECoc+a95enoSy2Xil2s6o68I
-   yvJdmnqxZ2e1Auq8jYIPiy9wasy+tpm113bZhGgnmEohqla3lfG6xCr73
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="366842684"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="366842684"
-Received: from orsmga003.jf.intel.com ([10.7.209.27])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 07:37:11 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="669425056"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="669425056"
-Received: from orsmsx601.amr.corp.intel.com ([10.22.229.14])
-  by orsmga003.jf.intel.com with ESMTP; 05 Jul 2023 07:37:11 -0700
-Received: from orsmsx611.amr.corp.intel.com (10.22.229.24) by
- ORSMSX601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 5 Jul 2023 07:37:10 -0700
-Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
- ORSMSX611.amr.corp.intel.com (10.22.229.24) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 5 Jul 2023 07:37:10 -0700
-Received: from ORSEDG601.ED.cps.intel.com (10.7.248.6) by
- orsmsx610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 5 Jul 2023 07:37:10 -0700
-Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
- by edgegateway.intel.com (134.134.137.102) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 5 Jul 2023 07:37:09 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=E0uYnPpP33fkH+/JrSuT/zqWZ8VJ3XnpYgVkrxmJ+t9jwpf0FhigGkVuGL0yb88KfSnCb5UePByuiJxIZFlnvHDwYvZ3hTkJ1YpN6wKXrY5tze96WyOnqkA9kFIKf7PesuIYKflKfWcFN0DRLMzQb9rq7nOykXS/7q3GZByyCzPqAYslm5GCtOtjPkGZNrElH8lvWuwNF8cEkuPNZcU/Ebc3ngqZfTBOy0hj56vUKoJ3+h5lGNijEhj00RUXNisBPGL62VsXB7si2+BpSoNN6fo6dGH7JSWoDSeu3ivKEH73cOoRk4XuDCwRns0VZNJeKEKc5PLUG821uRp8DSEOEg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=tHRX7hXrs39eexeXhgb/rpYD3EDjlFmcNW7odIYLlS4=;
- b=UPMBs6Iu8vU3RehzSXt/yfkQewABaaZ7VYcO5x2aHyyiC3WWMHsQpPNrJHPU8GDTPEEDDB74i9jHfGmqLICs1BDZwu/G9m8dupfEs8gbwe6Tm5kKgMFZWFtzhviaft9tksfj407Jx9viDz3J0saQXGICeeMe0mrygKLANVcsPevnLkVRWEWaEh4j4IoZ9NdYgUeMTb5+Rd1DSVOfIPsYwVVhxDywOfeyJBfZoaT+41Nd2jvVvS4pT+XyqU++T+l3kDwwpUqHA/NAZbDCnzcVZBqWtnZpAEFmJkgFvvtVoeKYs75U78ppgkPL3sxouXTGAHe+f9hKtGavobxrUezKaA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by SA1PR11MB7015.namprd11.prod.outlook.com (2603:10b6:806:2b8::20) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Wed, 5 Jul
- 2023 14:37:02 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::1ecd:561c:902a:7130]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::1ecd:561c:902a:7130%4]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
- 14:37:02 +0000
-Message-ID: <7e316b51-be46-96db-84cb-addd28d90b0f@intel.com>
-Date: Wed, 5 Jul 2023 16:35:41 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [EXTERNAL] Re: [PATCH V4 net] net: mana: Fix MANA VF unload when
- host is unresponsive
-Content-Language: en-US
-To: Souradeep Chakrabarti <schakrabarti@microsoft.com>, souradeep chakrabarti
-	<schakrabarti@linux.microsoft.com>
-CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
-	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>, Ajay
- Sharma <sharmaajay@microsoft.com>, "leon@kernel.org" <leon@kernel.org>,
-	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
-	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
-	"vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
-	<tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
-	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
-	<linux-rdma@vger.kernel.org>, "stable@vger.kernel.org"
-	<stable@vger.kernel.org>
-References: <1688374171-10534-1-git-send-email-schakrabarti@linux.microsoft.com>
- <83ef6401-8736-8416-c898-2fbbb786726e@intel.com>
- <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR0P281CA0165.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:b3::13) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 712C23233;
+	Wed,  5 Jul 2023 14:39:44 +0000 (UTC)
+Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C7A9113;
+	Wed,  5 Jul 2023 07:39:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
+	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
+	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
+	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
+	bh=a3Rf4+roGcyzICjP/y+mzVOY5fi2qEb4QAdDmwYjSrY=; b=aX26S1+S9ndT/vzQo02Vq2zdDI
+	I4us3iH1FQtMqBOG3NELuDdA0BgZ09qftjKvCJGWMrEA9O3B9EXoue6iuiLiUVTGDLaGqWfu2/O4P
+	V5UrbWTffRe0hcrmWUaXEVBesPRuoUmNpSkFqfcymn3vdLfhLzl0KdjbBwW5GqQde8U5EdAQ5mocw
+	gs7C2U3udmVDnzsnVcPsF/0Ku4yB5ZAIsPl+GHDYHJc/luD8Fefdbz+LXLr/0hzWm0n315ly9CNwt
+	S3u8GDF3jlGxuFYXKwBKuU2fP1DLWXBztGs/ABsJ7btY7lA+Kg/v7RFWMVV/1wtOF5tjGHGdnC78T
+	a37xe0Sw==;
+Received: from sslproxy03.your-server.de ([88.198.220.132])
+	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
+	(Exim 4.94.2)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qH3fD-000Db4-9D; Wed, 05 Jul 2023 16:39:27 +0200
+Received: from [178.197.249.31] (helo=linux.home)
+	by sslproxy03.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <daniel@iogearbox.net>)
+	id 1qH3fC-000GRN-EA; Wed, 05 Jul 2023 16:39:26 +0200
+Subject: Re: [PATCH bpf-next] bpf: Introduce bpf generic log
+To: Leon Hwang <hffilwlqm@gmail.com>, ast@kernel.org
+Cc: john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, yhs@fb.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
+ tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
+ linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+References: <20230705132058.46194-1-hffilwlqm@gmail.com>
+From: Daniel Borkmann <daniel@iogearbox.net>
+Message-ID: <1a205a85-ebf2-6d90-468d-4fd63ce3dd0f@iogearbox.net>
+Date: Wed, 5 Jul 2023 16:39:25 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
+ Thunderbird/60.7.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|SA1PR11MB7015:EE_
-X-MS-Office365-Filtering-Correlation-Id: 8c9e8176-7f1f-469d-c00a-08db7d654bb2
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: EJ3h+I/TA7vyQjQm4MJqJ5fuazP/LqSmhLBCaak+BPHt5LEh56RjUGc/J4bNvGCBOc0SU67wooE8scmdB7Ke0i+p3/5wI2tiEHNJ40lN77TffG8oxe8Z06VNO7HI21xqwQr5sMVO2xK/JcMXhXUUiMRuRn1G4SDzqDSvjRpU3P3KHavWJMe2GFbeEw5dPYnq9HfbvlIjwTePHgFN/tHF2SKmgRS9WAJjr80OVcGMR+a0R41XiVabwV2ps1QRcQpCgX54ukg6/VpX1OabYHRQ1Cs/6FgfnD2yMQwOw327Vacz2IFVIe78WbGv4WDyDCJNnE2leAPdeIG29HbU5/dN+znlwa6L9djxXwWvsux6VTAjBV7Ztt1f64bQaeyWz+8RvJx/WTBlbO1/9I1sNOocRbdniPM76TJgkTX3EzsmYvSqEWYQuWGcxa2wbnOHzN5baEMH5BOJopTIDTwL/RC3i1Sgf2uwLctKKE8hb++fg+ovxjTWQFNZ5uXn8V5gxCGqL/n8IFOGt3S0CuYYn135vZ6OK3QnnaspAk5z/gJ+WxMEnrpin6yc37lw1JLRSRRQuuzHCegnXT8/NF+IfxaGiKHTeGxvB7JxaFP8tEzLkISU81BLNyD3+k7mqjvqoDdh1BD/T62kUcmlD7s/FsiS3w==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(136003)(366004)(346002)(376002)(396003)(451199021)(6512007)(6506007)(82960400001)(66476007)(316002)(38100700002)(4326008)(66946007)(66556008)(45080400002)(2616005)(83380400001)(66899021)(186003)(26005)(478600001)(110136005)(54906003)(2906002)(31686004)(8676002)(8936002)(36756003)(5660300002)(7416002)(31696002)(86362001)(6486002)(6666004)(41300700001)(45980500001)(43740500002);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?eGZEVDNHRnhBQmIrU0FmSjdKMmU5NHhpa0JLdGxyTnFlalUvQ2pIV2xMZ3Jm?=
- =?utf-8?B?STlDb0lxS2xObDhuc28yU29tOW4vcTNtS24yUnl6UCtCcTBZVnIyQnZpL0lO?=
- =?utf-8?B?MmhKTDEvbERFaTlOS3lhSGpuczh5VnRNdnVLWEYrMG1FZGVPb05TN2x2Sncw?=
- =?utf-8?B?djQ3dWY2bitzUDVBWmtPbVduM0NjbWNLeDN2YkFnKytZWjdCTGRRb3dxalZE?=
- =?utf-8?B?QTJDdlhCY1hOYVVYMlFueG1aeSt1ZDVDSE1jeW1DemY3STQrclFpTEZoWlhN?=
- =?utf-8?B?QjJ6SElwQUlnYXYwa2JHbDlURlF5UnRwZ2NXOWRUd3BDOTMzbzhzT3VmSU1W?=
- =?utf-8?B?RXVlR3V2Ukp0S1lsdzZwWEZ1Ky8xczVYS2NXMTV5M3Jrclo4TGk2R2tWSGRm?=
- =?utf-8?B?SXJVTmNYZ0VLNTJDZFpiZS9rbkRMVDM1b253L09VM3JnWFJveEdieXRMZ3FM?=
- =?utf-8?B?cU43NENwMC9jd0VtTGpUc1lnUGcrOUVyMTducVd6WWJKOGV6Yk1BTUpQY1B2?=
- =?utf-8?B?R2JJdHc1dGJ1MStkQitZTjl2Ym9XVEJueUF5OFZrTS9SVjBuZ1M1c2tCNDZK?=
- =?utf-8?B?WER0YUZGMmpIaXdoek1kVXRVTm9HVUNYMUlSVVBWZ2JETmp4QTdTYStUWTlj?=
- =?utf-8?B?NXpXVmNXM2E1TVVZaVp1bno0VWVuazd1L25wMFJWL29zaS9iQjEwaXU1WUhU?=
- =?utf-8?B?Z1BVQVlJOEt5MitueSt2OVdxclRxNE9kQlBJcXRYR081bjhRcGpNTlQxSm5G?=
- =?utf-8?B?czJjV0RYYUlMNEY5RWpFMzVXejBWWERWSVdNWTVLWkwvbS9wRU1WQWZQTFdZ?=
- =?utf-8?B?VGgycWNoQ2JCbU1iQ0V0aWc2MUdyeWUxWnFTcDFsNWVyQktvL0ZWWjh0ZFZq?=
- =?utf-8?B?K1JOUFh3TXd0anZCdWRqQ1ZMTWFyOUtXK0xhN3J4aVdTbXBGZi9DeVdvbWJZ?=
- =?utf-8?B?LzRlQjJkQjZsWVpsWDNsM2c4OXlyNmhUd2YvYkF2SUZ6dHNleEtiSThTdWxl?=
- =?utf-8?B?Z2Y5dlh2NW5kVzNtMXpLV1VYYzhDNHZTNk0yTWpnVWo0U0xZOVNycHptZUZB?=
- =?utf-8?B?ME1KRkdHcHFZMHBoUkFEODExOFk2Vm5zV0xpV2lYZnAxbkdqTVl4QmdIcXps?=
- =?utf-8?B?THJsTXhxaEJxeEVadStRdUVyWTJuUnlOZGZUWWhlUmZZODNmN0piOVVobWRv?=
- =?utf-8?B?dWxGR1VYWENSaDBiL01mZ0tiYi9aS054dFR4VXZhZ0MrZXdKQTIyR2VVcGJz?=
- =?utf-8?B?bnFDL1lCV3htNnpsdkEwdEhrdkxTQk5tVURyVitNaFQ5RklIdDlsT3FlUDI0?=
- =?utf-8?B?YTluY2Q5bEJCcmJRTWp6WnluaEhOa1huLzlKOGtQcmYzVUtFSHRXWnVjY2JK?=
- =?utf-8?B?ZnQxR1ZJb2ViS2VOcVZ4REdzMGdMVXJDV1NEdFQ3TWxkOE91N21xdW1Kang3?=
- =?utf-8?B?NEg1dVhKTmloU1VuTWJHZFBMTnp6NG5uemF2bDUvU2J4K2tIY3pnUHpGN3FF?=
- =?utf-8?B?NFp2UGdqTTNFRUg2aVZoZzdUdUJSUHNwZFpVbmJ6Uk81eUlOVGxrRjh4am1N?=
- =?utf-8?B?VGFtYzQzREgzU0RWUCtEOTNhTUZNVUdBOFE2Q3ZVSVZvWnVsQjIrMk5MMlJU?=
- =?utf-8?B?VUJxMnVBTkFmZ3BBbmlFZWRDVDV2MGR3Q0RBRlNacVJlak5QWnhpaHlDNVpS?=
- =?utf-8?B?M2QvS1BoRzVqRjU4Q1RmbVFlYldKaTVaZlNQNjYzNXU5VCtxV1JtaWNubUNQ?=
- =?utf-8?B?UGM5ZFdLVFB4dEQxWG9lOVBpMXdtVHBCYm92Z2RXTVJBMzNLVzA1VHBtSEEz?=
- =?utf-8?B?L3hXYWxNWU1TR3Fmck5VSnJ4eU15dU9qRUhURDRodkRkaE9IbmJDanNBK0FM?=
- =?utf-8?B?UDQyc0h1UkEybTd1TnFVNk5ZSTcxOC9vZVFXcnA2UHBUcWZ4V05CSnNBWklS?=
- =?utf-8?B?UXFFdm5wQkp5RzNjNkF1anFPQStBcnRld1o1MXp5eUErS2pINDJMMkdNWDhy?=
- =?utf-8?B?UWxMSldxeUtFazYrckdobVdHelhkSG5VdkxKWlMxQlVsV01Tb242SFFIS2Ex?=
- =?utf-8?B?dUladSsvcmh4S0xwallkd0tJYnNEcGo2Lzl5K3dXOXM2TFVGR3NwRENZQUdj?=
- =?utf-8?B?ZlBKajd2TTJKUDlhcHRZc1ZaVGljN3VOYjJDUC9jWnFZT3BDY2Fpam5DdEho?=
- =?utf-8?B?Q1E9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 8c9e8176-7f1f-469d-c00a-08db7d654bb2
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 14:37:02.2074
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3AtKfE2JduWkyRwCvAOEQGN4HN9snm/tEW4ngXhVy57PpeXB5gTPFklNUxZvI4Rzds4+dYY3n+zagU8O6WClCjaec3HB1+VtQbRc071Tz+E=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SA1PR11MB7015
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <20230705132058.46194-1-hffilwlqm@gmail.com>
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Language: en-US
+Content-Transfer-Encoding: 7bit
+X-Authenticated-Sender: daniel@iogearbox.net
+X-Virus-Scanned: Clear (ClamAV 0.103.8/26960/Wed Jul  5 09:29:05 2023)
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Souradeep Chakrabarti <schakrabarti@microsoft.com>
-Date: Mon, 3 Jul 2023 19:55:06 +0000
-
+On 7/5/23 3:20 PM, Leon Hwang wrote:
+> Currently, excluding verifier, users are unable to obtain detailed error
+> information when issues occur in BPF syscall.
 > 
+> To overcome this limitation, bpf generic log is introduced to provide
+> error details similar to the verifier. This enhancement will enable the
+> reporting of error details along with the corresponding errno in BPF
+> syscall.
 > 
->> -----Original Message-----
->> From: Alexander Lobakin <aleksander.lobakin@intel.com>
->> Sent: Monday, July 3, 2023 10:18 PM
-
-[...]
-
->>>  	for (i = 0; i < apc->num_queues; i++) {
->>>  		txq = &apc->tx_qp[i].txq;
->>> -
->>> -		while (atomic_read(&txq->pending_sends) > 0)
->>> +		while (atomic_read(&txq->pending_sends) > 0 &&
->>> +		       time_before(jiffies, timeout)) {
->>>  			usleep_range(1000, 2000);> +		}
->>>  	}
->>
->> 120 seconds by 2 msec step is 60000 iterations, by 1 msec is 120000
->> iterations. I know usleep_range() often is much less precise, but still.
->> Do you really need that much time? Has this been measured during the tests
->> that it can take up to 120 seconds or is it just some random value that "should
->> be enough"?
->> If you really need 120 seconds, I'd suggest using a timer / delayed work instead
->> of wasting resources.
-> Here the intent is not waiting for 120 seconds, rather than avoid continue checking the 
-> pending_sends  of each tx queues for an indefinite time, before freeing sk_buffs.
-> The pending_sends can only get decreased for a tx queue,  if mana_poll_tx_cq()
-> gets called for a completion notification and increased by xmit.
+> Essentially, bpf generic log functions as a mechanism similar to netlink,
+> enabling the transmission of error messages to user space. This
+> mechanism greatly enhances the usability of BPF syscall by allowing
+> users to access comprehensive error messages instead of relying solely
+> on errno.
 > 
-> In this particular bug, apc->port_is_up is not set to false, causing
-> xmit to keep increasing the pending_sends for the queue and mana_poll_tx_cq()
-> not getting called for the queue.
+> This patch specifically addresses the error reporting in dev_xdp_attach()
+> . With this patch, the error messages will be transferred to user space
+> like the netlink approach. Hence, users will be able to check the error
+> message along with the errno.
 > 
-> If we see the comment in the function mana_dealloc_queues(), it mentions it :
+> Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
+> ---
+>   include/linux/bpf.h            | 30 ++++++++++++++++++++++++++++++
+>   include/uapi/linux/bpf.h       |  6 ++++++
+>   kernel/bpf/log.c               | 33 +++++++++++++++++++++++++++++++++
+>   net/core/dev.c                 | 11 ++++++++++-
+>   tools/include/uapi/linux/bpf.h |  6 ++++++
+>   5 files changed, 85 insertions(+), 1 deletion(-)
 > 
-> 2346     /* No packet can be transmitted now since apc->port_is_up is false.
-> 2347      * There is still a tiny chance that mana_poll_tx_cq() can re-enable
-> 2348      * a txq because it may not timely see apc->port_is_up being cleared
-> 2349      * to false, but it doesn't matter since mana_start_xmit() drops any
-> 2350      * new packets due to apc->port_is_up being false.
+> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
+> index f58895830..fd63f4a76 100644
+> --- a/include/linux/bpf.h
+> +++ b/include/linux/bpf.h
+> @@ -3077,4 +3077,34 @@ static inline gfp_t bpf_memcg_flags(gfp_t flags)
+>   	return flags;
+>   }
+>   
+> +#define BPF_GENERIC_TMP_LOG_SIZE	256
+> +
+> +struct bpf_generic_log {
+> +	char		kbuf[BPF_GENERIC_TMP_LOG_SIZE];
+> +	char __user	*ubuf;
+> +	u32		len_used;
+> +	u32		len_total;
+> +};
+> +
+> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
+> +			const char *fmt, ...);
+> +static inline void bpf_generic_log_init(struct bpf_generic_log *log,
+> +			const struct bpf_generic_user_log *ulog)
+> +{
+> +	log->ubuf = (char __user *) (unsigned long) ulog->log_buf;
+> +	log->len_total = ulog->log_size;
+> +	log->len_used = 0;
+> +}
+> +
+> +#define BPF_GENERIC_LOG_WRITE(log, ulog, fmt, ...)	do {	\
+> +	const char *____fmt = (fmt);				\
+> +	bpf_generic_log_init(log, ulog);			\
+> +	bpf_generic_log_write(log, ____fmt, ##__VA_ARGS__);	\
+> +} while (0)
+> +
+> +#define BPF_GENERIC_ULOG_WRITE(ulog, fmt, ...)	do {			\
+> +	struct bpf_generic_log ____log;					\
+> +	BPF_GENERIC_LOG_WRITE(&____log, ulog, fmt, ##__VA_ARGS__);	\
+> +} while (0)
+> +
+
+Could we generalize the bpf_verifier_log infra and reuse bpf_log() helper
+instead of adding something new?
+
+>   #endif /* _LINUX_BPF_H */
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 60a9d59be..34fa33493 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -1318,6 +1318,11 @@ struct bpf_stack_build_id {
+>   	};
+>   };
+>   
+> +struct bpf_generic_user_log {
+> +	__aligned_u64	log_buf;    /* user supplied buffer */
+> +	__u32		log_size;   /* size of user buffer */
+> +};
+> +
+>   #define BPF_OBJ_NAME_LEN 16U
+>   
+>   union bpf_attr {
+> @@ -1544,6 +1549,7 @@ union bpf_attr {
+>   		};
+>   		__u32		attach_type;	/* attach type */
+>   		__u32		flags;		/* extra flags */
+> +		struct bpf_generic_user_log log; /* user log */
+
+You cannot add this here, this breaks user space, you would have to
+ad this under a xdp specific section inside the union.
+
+>   		union {
+>   			__u32		target_btf_id;	/* btf_id of target to attach to */
+>   			struct {
+> diff --git a/kernel/bpf/log.c b/kernel/bpf/log.c
+> index 850494423..be56b153b 100644
+> --- a/kernel/bpf/log.c
+> +++ b/kernel/bpf/log.c
+> @@ -325,3 +325,36 @@ __printf(2, 3) void bpf_log(struct bpf_verifier_log *log,
+>   	va_end(args);
+>   }
+>   EXPORT_SYMBOL_GPL(bpf_log);
+> +
+> +static inline void __bpf_generic_log_write(struct bpf_generic_log *log, const char *fmt,
+> +				      va_list args)
+> +{
+> +	unsigned int n;
+> +
+> +	n = vscnprintf(log->kbuf, BPF_GENERIC_TMP_LOG_SIZE, fmt, args);
+> +
+> +	WARN_ONCE(n >= BPF_GENERIC_TMP_LOG_SIZE - 1,
+> +		  "bpf generic log truncated - local buffer too short\n");
+> +
+> +	n = min(log->len_total - log->len_used - 1, n);
+> +	log->kbuf[n] = '\0';
+> +
+> +	if (!copy_to_user(log->ubuf + log->len_used, log->kbuf, n + 1))
+> +		log->len_used += n;
+> +	else
+> +		log->ubuf = NULL;
+> +}
+> +
+> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
+> +				     const char *fmt, ...)
+> +{
+> +	va_list args;
+> +
+> +	if (!log->ubuf || !log->len_total)
+> +		return;
+> +
+> +	va_start(args, fmt);
+> +	__bpf_generic_log_write(log, fmt, args);
+> +	va_end(args);
+> +}
+> +EXPORT_SYMBOL_GPL(bpf_generic_log_write);
+> diff --git a/net/core/dev.c b/net/core/dev.c
+> index 69a3e5446..e933809c0 100644
+> --- a/net/core/dev.c
+> +++ b/net/core/dev.c
+> @@ -9409,12 +9409,20 @@ static const struct bpf_link_ops bpf_xdp_link_lops = {
+>   	.update_prog = bpf_xdp_link_update,
+>   };
+>   
+> +static inline void bpf_xdp_link_log(const union bpf_attr *attr, struct netlink_ext_ack *extack)
+> +{
+> +	const struct bpf_generic_user_log *ulog = &attr->link_create.log;
+> +
+> +	BPF_GENERIC_ULOG_WRITE(ulog, extack->_msg);
+> +}
+> +
+>   int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+>   {
+>   	struct net *net = current->nsproxy->net_ns;
+>   	struct bpf_link_primer link_primer;
+>   	struct bpf_xdp_link *link;
+>   	struct net_device *dev;
+> +	struct netlink_ext_ack extack;
+>   	int err, fd;
+>   
+>   	rtnl_lock();
+> @@ -9440,12 +9448,13 @@ int bpf_xdp_link_attach(const union bpf_attr *attr, struct bpf_prog *prog)
+>   		goto unlock;
+>   	}
+>   
+> -	err = dev_xdp_attach_link(dev, NULL, link);
+> +	err = dev_xdp_attach_link(dev, &extack, link);
+>   	rtnl_unlock();
+>   
+>   	if (err) {
+>   		link->dev = NULL;
+>   		bpf_link_cleanup(&link_primer);
+> +		bpf_xdp_link_log(attr, &extack);
+>   		goto out_put_dev;
+>   	}
+
+Agree that this is a useful facility to have and propagate back here.
+
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+> index 60a9d59be..34fa33493 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
+> @@ -1318,6 +1318,11 @@ struct bpf_stack_build_id {
+>   	};
+>   };
+>   
+> +struct bpf_generic_user_log {
+> +	__aligned_u64	log_buf;    /* user supplied buffer */
+> +	__u32		log_size;   /* size of user buffer */
+> +};
+> +
+>   #define BPF_OBJ_NAME_LEN 16U
+>   
+>   union bpf_attr {
+> @@ -1544,6 +1549,7 @@ union bpf_attr {
+>   		};
+>   		__u32		attach_type;	/* attach type */
+>   		__u32		flags;		/* extra flags */
+> +		struct bpf_generic_user_log log; /* user log */
+>   		union {
+>   			__u32		target_btf_id;	/* btf_id of target to attach to */
+>   			struct {
 > 
-> The value 120 seconds has been decided here based on maximum number of queues
 
-This is quite opposite to what you're saying above. How should I connect
-these two:
-
-Here the intent is not waiting for 120 seconds
-
-+
-
-The value 120 seconds has been decided here based on maximum number of
-queues
-
-?
-Can cleaning the Tx queues really last for 120 seconds?
-My understanding is that timeouts need to be sensible and not go to the
-outer space. What is the medium value you got during the tests?
-
-> are allowed in this specific hardware, it is a safe assumption.
->>
->>>
->>> +	for (i = 0; i < apc->num_queues; i++) {
->>> +		txq = &apc->tx_qp[i].txq;
->>> +		cq = &apc->tx_qp[i].tx_cq;
->>
->> cq can be just &txq->tx_cq.
-> mana_txq  structure does not have a pointer to mana_cq.
-
-Sorry, misread, my bad.
-
->>
->>> +		while (atomic_read(&txq->pending_sends)) {
->>> +			skb = skb_dequeue(&txq->pending_skbs);
->>> +			mana_unmap_skb(skb, apc);
->>> +			napi_consume_skb(skb, cq->budget);
->>
->> (you already have comment about this one)
->>
->>> +			atomic_sub(1, &txq->pending_sends);
->>> +		}
->>> +	}
->>>  	/* We're 100% sure the queues can no longer be woken up, because
->>>  	 * we're sure now mana_poll_tx_cq() can't be running.
->>>  	 */
->>
->> Thanks,
->> Olek
-Thanks,
-Olek
 
