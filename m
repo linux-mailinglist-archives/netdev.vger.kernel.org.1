@@ -1,96 +1,163 @@
-Return-Path: <netdev+bounces-15533-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15535-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E12A3748451
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:39:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 74E6E748476
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:54:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A5846280F9F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 12:39:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B20DD281025
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 12:54:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id ACB376AB1;
-	Wed,  5 Jul 2023 12:38:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 35A50748E;
+	Wed,  5 Jul 2023 12:53:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8DB2C46BD;
-	Wed,  5 Jul 2023 12:38:58 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A359129;
-	Wed,  5 Jul 2023 05:38:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=NGAR6ZIiv7c024DeENENlyWBZsZPUFDDAkTK7aDiRWY=; b=Y9Kty3Q0jfYzDgiSs/NQXlUGnN
-	W+HbPJJjBuYvAII4Pe+UlYF6bvoEno/MpdVEo5qDs/DjgZhw/rkm8krLK7kuGhRPz7dBfOuvRUnXs
-	AjNhpvPHJMNH8tO7Ok988hVTkknYH9BCQceXNy0SsOXmMgczHROb9lm8g04l2fo6/Pxx/Nk/db4/O
-	KdXGkUMDAFCFKCXtQ7OcU/JcFKVzCnsVi8huCofS68rr5QA0szwbG+IMHUgyXNj4HLEnwHYD3jmQQ
-	L8yVo3194TUwCCBDanzRqJFT8sBzo2yMUrMIyT7PKUGRs81fkyZV60f+S0egXzPjjXazzTrof2sAd
-	gjIRxCXQ==;
-Received: from sslproxy06.your-server.de ([78.46.172.3])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qH1mU-000NUt-UR; Wed, 05 Jul 2023 14:38:50 +0200
-Received: from [178.197.249.31] (helo=linux.home)
-	by sslproxy06.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qH1mU-000P5n-Cr; Wed, 05 Jul 2023 14:38:50 +0200
-Subject: Re: [PATCH bpf-next 0/2] BPF kselftest cross-build/RISC-V fixes
-To: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@kernel.org>,
- Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>,
- bpf@vger.kernel.org, netdev@vger.kernel.org
-Cc: =?UTF-8?B?QmrDtnJuIFTDtnBlbA==?= <bjorn@rivosinc.com>,
- Alexei Starovoitov <ast@kernel.org>, linux-kselftest@vger.kernel.org,
- linux-kernel@vger.kernel.org, linux-riscv@lists.infradead.org
-References: <20230705113926.751791-1-bjorn@kernel.org>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <9ee053a4-500c-2722-d822-d137648e55e5@iogearbox.net>
-Date: Wed, 5 Jul 2023 14:38:49 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2A73B7491
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 12:53:56 +0000 (UTC)
+Received: from mail-pl1-f206.google.com (mail-pl1-f206.google.com [209.85.214.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C177C1700
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 05:53:54 -0700 (PDT)
+Received: by mail-pl1-f206.google.com with SMTP id d9443c01a7336-1b8a4e947a1so8966075ad.1
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 05:53:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688561634; x=1691153634;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=Iq+8TpxEHiTomBKOeW+5QxZuXjnYw6FM69rru1Is8Mw=;
+        b=FAtPxi2F3dBPGb5491AGrhbhfkpPPvE5qgInuAkj0f10B2NxyyMc9BAP73LdCmKOsN
+         P+byt1FakXGnHsXGzNXZLGNNsecOIPLNNKOX61cBi/K5wzaj99IuK9FMfc2JinJbcfjV
+         jg1nViPOvBvEAj4XbjiSw1o++enQ9xHqrmheipO6rx3Q9vRArylTgZRKn+vm8GNtQZV4
+         FQDk9VcUKCumE1in9CLQ8LGaEDOdea17napGphwZ+DOE4maEn/F5z/KTK3eKF9qFv8Gy
+         3+odchzDQWah7v07SssUnjrIU6Fic6ycmEFjFEb84UPlZYqE/J4fzw5DNhmWDGpn2L/W
+         qmWQ==
+X-Gm-Message-State: ABy/qLbAHPkHTRXXXOfaMQ3dLa/9K1dE1dQA/Ak2wQbE6UyCwz2IdI7v
+	dkKe2J3a/8V8STdwmGlSBwIbeSnTU0aMVQ4xRxb2JgHg8zQZ
+X-Google-Smtp-Source: APBJJlGe7KI03KEPVhWSwq2PoQUmcREB9w7Iy7ebAYt94qwy+CK/WLF8stcYUP8kEGM3yaGUu3VPoHMwmvEdR8SBUxjFqrPK+4m/
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <20230705113926.751791-1-bjorn@kernel.org>
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26960/Wed Jul  5 09:29:05 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Received: by 2002:a17:903:2149:b0:1b6:a2e4:c8f8 with SMTP id
+ s9-20020a170903214900b001b6a2e4c8f8mr1311886ple.2.1688561634307; Wed, 05 Jul
+ 2023 05:53:54 -0700 (PDT)
+Date: Wed, 05 Jul 2023 05:53:54 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000064f39a05ffbce427@google.com>
+Subject: [syzbot] [usb?] KMSAN: uninit-value in smsc95xx_eeprom_confirm_not_busy
+From: syzbot <syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com>
+To: UNGLinuxDriver@microchip.com, davem@davemloft.net, edumazet@google.com, 
+	glider@google.com, kuba@kernel.org, linux-kernel@vger.kernel.org, 
+	linux-usb@vger.kernel.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	steve.glendinning@shawell.net, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/5/23 1:39 PM, Björn Töpel wrote:
-> From: Björn Töpel <bjorn@rivosinc.com>
-> 
-> This series has two minor fixes, found when cross-compiling for the
-> RISC-V architecture.
-> 
-> Some RISC-V systems do not define HAVE_EFFICIENT_UNALIGNED_ACCESS,
-> which made some of tests bail out. Fix the failing tests by adding
-> F_NEEDS_EFFICIENT_UNALIGNED_ACCESS.
-> 
-> ...and some RISC-V systems *do* define
-> HAVE_EFFICIENT_UNALIGNED_ACCESS. In this case the autoconf.h was not
-> correctly picked up by the build system.
+Hello,
 
-Looks good, applied thanks! Any plans on working towards integrating riscv
-into upstream BPF CI? Would love to see that happening. :)
+syzbot found the following issue on:
 
-Thanks,
-Daniel
+HEAD commit:    257152fe29be string: use __builtin_memcpy() in strlcpy/str..
+git tree:       https://github.com/google/kmsan.git master
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=156aa484a80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=d16a560a6e6eb097
+dashboard link: https://syzkaller.appspot.com/bug?extid=2c97a98a5ba9ea9c23bd
+compiler:       Debian clang version 15.0.7, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=15433d14a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=12528ac8a80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/8e2711366405/disk-257152fe.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/cec15df7e485/vmlinux-257152fe.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/f212903d5649/bzImage-257152fe.xz
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+2c97a98a5ba9ea9c23bd@syzkaller.appspotmail.com
+
+=====================================================
+BUG: KMSAN: uninit-value in smsc95xx_eeprom_confirm_not_busy+0x1eb/0x360 drivers/net/usb/smsc95xx.c:348
+ smsc95xx_eeprom_confirm_not_busy+0x1eb/0x360 drivers/net/usb/smsc95xx.c:348
+ smsc95xx_read_eeprom+0x59/0x670 drivers/net/usb/smsc95xx.c:367
+ smsc95xx_init_mac_address drivers/net/usb/smsc95xx.c:816 [inline]
+ smsc95xx_bind+0x6d8/0x22e0 drivers/net/usb/smsc95xx.c:1128
+ usbnet_probe+0x1011/0x3f20 drivers/net/usb/usbnet.c:1750
+ usb_probe_interface+0xc75/0x1210 drivers/usb/core/driver.c:396
+ really_probe+0x506/0xf40 drivers/base/dd.c:658
+ __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
+ driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
+ __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
+ bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
+ __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
+ device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
+ device_add+0x1b6a/0x24b0 drivers/base/core.c:3625
+ usb_set_configuration+0x31c9/0x38c0 drivers/usb/core/message.c:2211
+ usb_generic_driver_probe+0x109/0x2a0 drivers/usb/core/generic.c:238
+ usb_probe_device+0x290/0x4a0 drivers/usb/core/driver.c:293
+ really_probe+0x506/0xf40 drivers/base/dd.c:658
+ __driver_probe_device+0x2a7/0x5d0 drivers/base/dd.c:800
+ driver_probe_device+0x72/0x7b0 drivers/base/dd.c:830
+ __device_attach_driver+0x55a/0x8f0 drivers/base/dd.c:958
+ bus_for_each_drv+0x3ff/0x620 drivers/base/bus.c:457
+ __device_attach+0x3bd/0x640 drivers/base/dd.c:1030
+ device_initial_probe+0x32/0x40 drivers/base/dd.c:1079
+ bus_probe_device+0x3d8/0x5a0 drivers/base/bus.c:532
+ device_add+0x1b6a/0x24b0 drivers/base/core.c:3625
+ usb_new_device+0x15f6/0x22f0 drivers/usb/core/hub.c:2575
+ hub_port_connect drivers/usb/core/hub.c:5407 [inline]
+ hub_port_connect_change drivers/usb/core/hub.c:5551 [inline]
+ port_event drivers/usb/core/hub.c:5711 [inline]
+ hub_event+0x577b/0x78a0 drivers/usb/core/hub.c:5793
+ process_one_work+0xb0d/0x1410 kernel/workqueue.c:2408
+ worker_thread+0x107e/0x1d60 kernel/workqueue.c:2555
+ kthread+0x3e8/0x540 kernel/kthread.c:379
+ ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
+
+Local variable buf.i created at:
+ smsc95xx_read_reg drivers/net/usb/smsc95xx.c:90 [inline]
+ smsc95xx_eeprom_confirm_not_busy+0x92/0x360 drivers/net/usb/smsc95xx.c:342
+ smsc95xx_read_eeprom+0x59/0x670 drivers/net/usb/smsc95xx.c:367
+
+CPU: 0 PID: 9 Comm: kworker/0:1 Not tainted 6.4.0-syzkaller-g257152fe29be #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+Workqueue: usb_hub_wq hub_event
+=====================================================
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
