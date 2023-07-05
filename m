@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-15611-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15610-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id E2DD8748B30
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:01:37 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4C248748B2E
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 20:01:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DDAB2810E5
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:01:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 074392810E1
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:01:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64D4613AF7;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E3F413ADE;
 	Wed,  5 Jul 2023 18:00:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B9121134A7
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 63E81C43395;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B915213AD1;
+	Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 2F817C433C7;
 	Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1688580023;
-	bh=h/ra30O4s+hWWkmTlKDYomJOF1pe0BSaSd1cWrc7xIg=;
+	bh=y/6YMs1x6DXBFCu0KRrbxNvaRbujSC9jhs5LzJRBsaw=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=D1jyc+CTDI3cHTMTEPQ55IBkGANKvuQcAWdFIfnJHfQiNCiF3hQ7e7rzr02lagmag
-	 4j8OjZo8wW5nOibCRUtZzoAe/55y/GnO2nTuXjN+ASULUh1X35UXAbpzH2X8sx/gBK
-	 DaQ8Utt99iOUQgUWeYc9BjUtAfWxgY9H0VVFSMO+L2RYVuetKXj333D8jF6+lML+I9
-	 4E4s1bnsHHKOaS60wqqGHhrRU0ZhIFk1AtjsfDg68thDCUe1C1EgO945kzoGlNpp7F
-	 0mKN9KsLOuPcqa+6qKUfkWFehsHmQg2ju7yDc46RJ646+N57qiuTa0hXAIEpiFB+iW
-	 xLfnWgi05NLHQ==
+	b=bVBfXnRCPG+DAbo9duNA6EVaS7IvksF/BylquoOVg1Co6p1+4kuy6xZGHhionncIP
+	 +uXQRBrgvoCBm1ec1p2KpXcjb4CjSVNsabvcR7lnQVBsI8kZoBmIeKUBR5ibQPNMIr
+	 v4+EX4aBM79UD7VIc/gX6VqK3NXUQkGoIOzT/6+zgLM2mN+h7Sy1pZ+SU3fR3we3Dy
+	 MszJ5SOzv0C8l+z1GDsgLIzSk+cLGPPw6dJqXbCl6WKSjYEOqfdfie7Qmzwclu4gnu
+	 O4+G2VKSC9yefcSYL8ts/ZnnXz97hL5Mgu0Xa44deYruBCTULCXzs+eMP3/PQXIi2j
+	 jC3UpuzeibV6A==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 4A839C561EE;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 10FA0C395C5;
 	Wed,  5 Jul 2023 18:00:23 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,40 +41,36 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH iproute2] tc/taprio: fix parsing of "fp" option when it
- doesn't appear last
+Subject: Re: pull-request: bpf 2023-07-05
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168858002330.7518.203942230628793682.git-patchwork-notify@kernel.org>
+ <168858002306.7518.1447432530903034542.git-patchwork-notify@kernel.org>
 Date: Wed, 05 Jul 2023 18:00:23 +0000
-References: <20230705105155.51490-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20230705105155.51490-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, dsahern@kernel.org, stephen@networkplumber.org
+References: <20230705171716.6494-1-daniel@iogearbox.net>
+In-Reply-To: <20230705171716.6494-1-daniel@iogearbox.net>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+ edumazet@google.com, ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+ netdev@vger.kernel.org, bpf@vger.kernel.org
 
 Hello:
 
-This patch was applied to iproute2/iproute2.git (main)
-by Stephen Hemminger <stephen@networkplumber.org>:
+This pull request was applied to netdev/net.git (main)
+by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  5 Jul 2023 13:51:55 +0300 you wrote:
-> When installing a Qdisc this way:
+On Wed,  5 Jul 2023 19:17:16 +0200 you wrote:
+> Hi David, hi Jakub, hi Paolo, hi Eric,
 > 
-> tc qdisc replace dev $ifname handle 8001: parent root stab overhead 24 taprio \
-> 	num_tc 8 \
-> 	map 0 1 2 3 4 5 6 7 \
-> 	queues 1@0 1@1 1@2 1@3 1@4 1@5 1@6 1@7 \
-> 	base-time 0 \
-> 	sched-entry S 01 1216 \
-> 	sched-entry S fe 12368 \
-> 	fp P E E E E E E E \
-> 	flags 0x2
+> The following pull-request contains BPF updates for your *net* tree.
+> 
+> We've added 2 non-merge commits during the last 1 day(s) which contain
+> a total of 3 files changed, 16 insertions(+), 4 deletions(-).
 > 
 > [...]
 
 Here is the summary with links:
-  - [iproute2] tc/taprio: fix parsing of "fp" option when it doesn't appear last
-    https://git.kernel.org/pub/scm/network/iproute2/iproute2.git/commit/?id=e848ef0ad5d0
+  - pull-request: bpf 2023-07-05
+    https://git.kernel.org/netdev/net/c/fdaff05b4a67
 
 You are awesome, thank you!
 -- 
