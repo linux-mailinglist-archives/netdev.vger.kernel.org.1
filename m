@@ -1,168 +1,169 @@
-Return-Path: <netdev+bounces-15551-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15552-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id ABD89748594
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:59:01 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9E0D5748673
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 16:35:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3373A280FF5
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:59:00 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A8BB91C20B46
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:35:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1313ED30F;
-	Wed,  5 Jul 2023 13:58:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B4D406FA1;
+	Wed,  5 Jul 2023 14:35:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 01C70D2FC
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:58:57 +0000 (UTC)
-Received: from mail-vk1-xa36.google.com (mail-vk1-xa36.google.com [IPv6:2607:f8b0:4864:20::a36])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F6CD13E;
-	Wed,  5 Jul 2023 06:58:56 -0700 (PDT)
-Received: by mail-vk1-xa36.google.com with SMTP id 71dfb90a1353d-47dcb8a5e89so541113e0c.0;
-        Wed, 05 Jul 2023 06:58:56 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688565535; x=1691157535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=NmFh+BQT1+pGjJ/ogkEF9g/4D4Q9jOcfYFATuZt2yWQ=;
-        b=HJi4haiCbFAKGCKMOQBx1dDphE8VEGpf+ciCnU4qW+jraWtXDJ7ajtTNWFudIJTAV2
-         9YkziI0pu2awYR4WUWueHQg3NFmd7HkMzyYPCGQyBQTDA6pf3GvRf5nz+wwPZCoP0tqS
-         +py/7LH8Nnqqn2hOUfdMUfYHfsOE7dgokCSnFnyohQfqHtk0ZxIa678FoF2wWJTLIli3
-         CIWd5JL4dM1/LkhZRwELrGN7RrEqmMC5qPlPxwJSg8ArXE3XXGbHKn0vsWR4OVaqefoW
-         htlwrD62c/Vi/GyMBdfAHXHvSOEKW34w2uW662YEQ/E1kAKKlhpyJuhyaB5S60GAiLfM
-         sbjA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688565535; x=1691157535;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=NmFh+BQT1+pGjJ/ogkEF9g/4D4Q9jOcfYFATuZt2yWQ=;
-        b=ADNqLjUrEkcWLoZSzYg5IXxHW1zM3+AuJGSgj3STKMivJUcqXIeYQ2gSPWwprAdQTC
-         4/VM9VFa7lYVtQhJ1mS/TugP+usZjBpgtCevVzhBqJ1rDqQtp11hNTLoRVYHydGNch3a
-         BUdndW5G7VWeXrLxtWMVnajTq0x/AgO1zNzfWUSGU6cJi0iPfzy32MoAEEN8iRRAZYb/
-         IEIl1d4cm0ioHtjrOqzXFsWh+ZlpSdfPZ1CRQby7GNsaoxWwQ8x3fZxsYy4BicHkv01q
-         0TCcvCoDEUAbIhrfH/mHIGUF0ePUQWbqB6+2Gm9j3g6S/OqxOF8CMN9HXdIzr1xpFIyB
-         W+vg==
-X-Gm-Message-State: ABy/qLY3/jZQl0jkgypvZaJCUM6g+8MSAmN950REnAaSKpbqJVF9qqR/
-	Mi5GOYxLGltVWGYw7KJOy9yV5VhJb4wQLph7t1o=
-X-Google-Smtp-Source: APBJJlH7sDTWvrcXOuG1twI0e6GfuI+IdpsQFIfNSBMaMdkOlCrqn3cUimp07Xml2NqrSQ4RQYxjT0WjMjD9z4d4liI=
-X-Received: by 2002:a1f:9bc9:0:b0:477:4872:7f9d with SMTP id
- d192-20020a1f9bc9000000b0047748727f9dmr663119vke.4.1688565535543; Wed, 05 Jul
- 2023 06:58:55 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9F68E3233
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 14:35:26 +0000 (UTC)
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2135.outbound.protection.outlook.com [40.107.255.135])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 871311700;
+	Wed,  5 Jul 2023 07:35:23 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=QVdGt3xE+SBix9MOcEaH+6EaOcQCZYdy7HyVylsWeGjdt4R9M6lTYtgdlZA2ys8CqPi0dlU6dWdtOgc1iZoKrOcfeL9cMQL2T7DiB3AGPNP38iM6eirqgDIDNQsSm7nAD6SJRH/1PUvArT8Wa7+Y9t1RnMcUi2rAmxF+kR7rSeyICm5YUTLjN3Ut/eEY2CuRDsXezkzP3KQkYqmY7N+i3sdmSoOXpJqqevo/j+nSsBqs1kT5KiP0xcuulx5x2elqEtl88aHWL1RuoCOSA0+y28AfkawX7aLV942rbYuvRZ3VN42ZcG8JZKZE3/flIWASzTUY6m5q297rpCKV2crPLQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=gDfwI1aEwN2QLbQ8IW9TyzbFaKLc6wRCNC727c/ZjvA=;
+ b=cAZFjQXP7BRm8bUDCUon74DddCS98hqcVK1FzMkJhcA82V4JkXe3LKlEdhZ1aZXQZ25xUSH7SviycX9f+oyXp82tDAZ6wKZdKykZl5cmpPNzqozsjMTcHfoKRdlbWaZ5M371MslYG3HjvOYexK6XIj9CVBOGTJXXJAuUrpU1ORUEa5wFjAb42SdbT409RzcK7ag2tx2Fuu93nQkYGAl4MBab5jDm1Hq3IpYrZxvADlTYBhddu7QguS8Vq2zKvS7HnX6C+gsw09aoovpaBDgq4/BSiuuz6+QO2p5riojP2MXgLmnWpqsdNExl1urdQ3Kz+S1mWYO4WhbJz1kigYTkow==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=gDfwI1aEwN2QLbQ8IW9TyzbFaKLc6wRCNC727c/ZjvA=;
+ b=V3XfLLFduIv4eHB90RMIxUGq3zfarf45sZAnIqTiOyU5MhSIyc9xurCmeJObVjOkapYJQKz2BLvaXRsLM3SJ31fDGQ+/5y1GAqNha5Hsa2ZQSXYnmH9Bcdcl+HD6oX6wFw8fcSVTP5F5nWDKHXAwHAEa+7hfL6jJQKRXCkayffPUInAZyOvw++goQd2x5EW8KtAsM8gbqGnuobW4b/hNM94gggstegyxZqAeAWVyKSvxU12xl0ojze9Sf++Pi68bveZw8sAZ7wlfctpoHDbbrfyTULMRgX1VUcWprFm1koQlfUxAYlQRUr8p9jWKOVdqiR9Yj9oToTxMhD3rMZpGGA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from PS1PR0601MB3737.apcprd06.prod.outlook.com
+ (2603:1096:300:78::18) by JH0PR06MB6583.apcprd06.prod.outlook.com
+ (2603:1096:990:32::10) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
+ 2023 14:35:19 +0000
+Received: from PS1PR0601MB3737.apcprd06.prod.outlook.com
+ ([fe80::9531:2f07:fc59:94e]) by PS1PR0601MB3737.apcprd06.prod.outlook.com
+ ([fe80::9531:2f07:fc59:94e%4]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
+ 14:35:19 +0000
+From: Wang Ming <machel@vivo.com>
+To: Sunil Goutham <sgoutham@marvell.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	linux-arm-kernel@lists.infradead.org,
+	netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	Wang Ming <machel@vivo.com>
+Subject: [PATCH net v2] net:thunderx:Fix resource leaks in device_for_each_child_node() loops
+Date: Wed,  5 Jul 2023 22:34:56 +0800
+Message-Id: <20230705143507.4120-1-machel@vivo.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SG2P153CA0041.APCP153.PROD.OUTLOOK.COM (2603:1096:4:c6::10)
+ To PS1PR0601MB3737.apcprd06.prod.outlook.com (2603:1096:300:78::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
- <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
- <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
- <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
- <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
- <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
- <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
- <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
- <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
- <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
- <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
- <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
- <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
- <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
- <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
- <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com>
- <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
- <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
- <CAA85sZs_H3Dc-mYnj8J5VBEwUJwbHUupP+U-4eG20nfAHBtv4w@mail.gmail.com>
- <92a4d42491a2c219192ae86fa04b579ea3676d8c.camel@redhat.com>
- <CAA85sZvtspqfep+6rH8re98-A6rHNNWECvwqVaM=r=0NSSsGzA@mail.gmail.com>
- <dfbbe91a9c0abe8aba2c00afd3b7f7d6af801d8e.camel@redhat.com>
- <CAA85sZuQh0FMoGDFVyOad6G1UB9keodd3OCZ4d4r+xgXDArcVA@mail.gmail.com>
- <062061fc4d4d3476e3b0255803b726956686eb19.camel@redhat.com>
- <CAA85sZv9KCmw8mAzK4T-ORXB48wuLF+YXTYSWxkBhv3k_-wzcA@mail.gmail.com>
- <CAA85sZt6ssXRaZyq4awM0yTLFk62Gxbgw-0+bTKWsHwQvVzZXQ@mail.gmail.com>
- <d9bf21296a4691ac5aca11ccd832765b262f7088.camel@redhat.com>
- <CAA85sZsidN4ig=RaQ34PYFjnZGU-=zqR=r-5za=G4oeAtxDA7g@mail.gmail.com> <14cd6a50bd5de13825017b75c98cb3115e84acc1.camel@redhat.com>
-In-Reply-To: <14cd6a50bd5de13825017b75c98cb3115e84acc1.camel@redhat.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Wed, 5 Jul 2023 15:58:43 +0200
-Message-ID: <CAA85sZuZLg+L7Sr51PPaOkPKbbiywXbbKzhTyjaw12_S6CsZHQ@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
-	Eric Dumazet <edumazet@google.com>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PS1PR0601MB3737:EE_|JH0PR06MB6583:EE_
+X-MS-Office365-Filtering-Correlation-Id: 22d67199-ca64-4752-65c0-08db7d650e72
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	3O64Zkh2fSYrS+MhkAba21q6V6gboSSykO7zn1AQtNsa9urh7pmxCPev7NHzxvTqd1UrW5vwubvTyYY6ZNPl+7MjZd5bFkQ89r6MuN87/xfWIF+crcC6OGYjEasc8NCLYtLs6kg21fbQtI/VNlJO0Zqg5KPvY0eo5PYZ0tMLVggBM15Yq1o5Jdh0rYoBg9M4pN9H1cuwmzq7MdkVm+92+Ea3+InXNXCJq+iWUP9ZpG+jDGUrSEyWf9kE8KXJbgOuZGzrt7mV99guKn73pt8z3KmUVHBMZoS3DnIn0qvG7D4th77DQZWTyj2nX2eBNw7Og/d+/CqgUZ28GaiLHYFGV4IyLWcjYMfJEWb4tbECu/E62BjcI3Gso6Q4apewIb0pexvipbF3gRDeMVHkB/JCJ0o8U3OxOilF2J8fiF+pnJfY4OJjzC/52/5qzOhCwOxi25A+JmCeBCKB6AJv+Xv+hqoTsVgwRptnaC0Dw9FTMXTeVUdhbVz8lZP6ZvtJPdZzBKbPjsNmL9bQMm9BSOVq3tlPTXF5zl6Xe5YQMUafdn8AVxA/yplW8KjME3ChMIoJyw6PMqM21z1ZSJY24MUGeNqsu0gLDXO46xSnV2RZJ9mjWbKusuq1KPa5EQzkfVy/
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PS1PR0601MB3737.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(39860400002)(366004)(136003)(376002)(346002)(451199021)(2906002)(8676002)(2616005)(86362001)(8936002)(5660300002)(110136005)(478600001)(6666004)(52116002)(1076003)(26005)(6512007)(6486002)(107886003)(6506007)(186003)(38100700002)(38350700002)(83380400001)(316002)(4326008)(36756003)(66476007)(66946007)(66556008)(41300700001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?/YriYSgCxkO8upNSU8q6n0e48Irng8SvFGHz7TIPGEcIL2ufhsHp5ch1Mjrj?=
+ =?us-ascii?Q?l0N80/aGdSr0gAVJ69FXW+bOX4R4JVhyxWdsmXJ3yIwWuzDETgMmaN/v/BBu?=
+ =?us-ascii?Q?toPwd+RpFfVMWmnTLRFhtironl/XZgqozKyLt5bcWR7XrVbMZ71iQ8TmHr0c?=
+ =?us-ascii?Q?aqNpURfSWDjWnNWUdyQtDcsl71RNlO3dNY18IQPiCttdBH84+Cth4VjryvKk?=
+ =?us-ascii?Q?iXj0iX/DgaC4JjkvKar160EmOIh+XNI+ZQjC1EreR9vJrvW1rAwRX+QODBzC?=
+ =?us-ascii?Q?/UlBXbh9VC6vqek+HtGkqVSeBwPDeY78zFelm/e5JPlW5anlHHphs9U9Zgm1?=
+ =?us-ascii?Q?dv9yNFZdbw6tytXUMeU2Axj49biQ+scZXE+y93DODRhYuGAbq8OS33kLroF0?=
+ =?us-ascii?Q?60gH2kiCl0bqFpCyRoAuaYfzgQ12vGR1f0JRjnN76mDeY9JKtoD5069/SrIr?=
+ =?us-ascii?Q?JMLDMDP8Yu5UtFJGd/+Wly4AJ2/rhP6NXJufacivRV1lB4bPtBZT23mTlK6q?=
+ =?us-ascii?Q?Kf23piPnotlE3SFbrbem7/cPKnwLGd4yge5KYt3rHSpwIZJkbMt2OVQA+eU3?=
+ =?us-ascii?Q?BG+9NqOjuSlC+a88snTXLTdQsrnfFN+LJ5YPJ7K8oVRiurNkhNXPV5Tt+E0u?=
+ =?us-ascii?Q?zz9yQ3PhPV/R7HR/jrYG559pOANxUwtPXS90jia7P2vcMO03EyThISe6k2Jb?=
+ =?us-ascii?Q?3qLWPO7S9Pl+QvTsKzX/cS59bow1iGMpUiMxUiBTNw2ni4+ikSZebj20gKWy?=
+ =?us-ascii?Q?wNKX3P5+JAHR2yLWyD2ZSGECuxy/rRoOhZcZ3PLw6ua1m5VvnXfW4dl6IobW?=
+ =?us-ascii?Q?1Vp4iBitFXnPY/28aG+++EK9zh+NCiguz8oeAJzbQScmqgeSIE8/NKRG5Gnv?=
+ =?us-ascii?Q?xNEmIGw+wkQnGOp71y3V07WwRaqX20Z36UPr9P0QSBnCnWZwbnl6npx7bKrm?=
+ =?us-ascii?Q?KbiGMim0oJdycfw3y3cftSPoBMiVbnrxAmj2OSBTYCbx1jfoN2ut9yCq9z+i?=
+ =?us-ascii?Q?7ONy4YXF5vEcz80BgA3BDn3sG2pKESQLu8tUV48j/LKIJfJEhxSCJhslaOoL?=
+ =?us-ascii?Q?+29OhG3dBeUdCGDA1bKTc0/iPbdtU+oRhZkWFn8CuCYSnXeLzDrivBMs9XH+?=
+ =?us-ascii?Q?LlETX4xKGF8O056zmrKeTFD7wzsx4pGTBIa+3zOePrGo4xWo8DbvXNlAd+Qu?=
+ =?us-ascii?Q?BrsqZD3avqicyeeH8jLmt8fMuCceIg0Lq/G9tviOQgOBwKTTOrheh+NMFfKQ?=
+ =?us-ascii?Q?E1lpr8qX4JYJBGu7L/OZoHa+LLv0uB6SUV1A1LPl1QS2ZcSYhWkyDe9t9leW?=
+ =?us-ascii?Q?OeNd81L4X5BfewNqY26wsGhbf6wiV5MVKgPJVt+RLCtW40CTG5mxnmWIQc/4?=
+ =?us-ascii?Q?NPOQUj+onCq4mbiK24jmRbhpY1zu1XLfGtz7UrVBFnCamiVCjqGPXVKNyiVS?=
+ =?us-ascii?Q?hWnMa2xtcXyEt9Vq5QlaOv3Wygpic+pzCg3iaQTCipMyaAxt3ZP5KNN3m9F+?=
+ =?us-ascii?Q?cU7WF2653DQxaYdNoC4m9j4YGJ/f8MOPJ/sVOX3aEBAZuDP7Jeq97DcvE2D9?=
+ =?us-ascii?Q?w3aBhbqGb5VGvr2YC6SQZmwsGVFKcBCCMC90o3d/?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 22d67199-ca64-4752-65c0-08db7d650e72
+X-MS-Exchange-CrossTenant-AuthSource: PS1PR0601MB3737.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 14:35:19.2520
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: nZz3RPWUwLtvslYw6mjSKaPRvDcdmb+7jjDF0qjyQy60N9s57Rk+U/P0NbeATZf3NmdD6E1LCGdUZJG7a9iFBA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: JH0PR06MB6583
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 5, 2023 at 3:29=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
-e:
->
-> On Wed, 2023-07-05 at 13:32 +0200, Ian Kumlien wrote:
-> > On Wed, Jul 5, 2023 at 12:28=E2=80=AFPM Paolo Abeni <pabeni@redhat.com>=
- wrote:
-> > >
-> > > On Tue, 2023-07-04 at 16:27 +0200, Ian Kumlien wrote:
-> > > > More stacktraces.. =3D)
-> > > >
-> > > > cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
-> > > > [  411.413767] ------------[ cut here ]------------
-> > > > [  411.413792] WARNING: CPU: 9 PID: 942 at include/net/ud     p.h:5=
-09
-> > > > udpv6_queue_rcv_skb (./include/net/udp.h:509 net/ipv6/udp.c:800
-> > > > net/ipv6/udp.c:787)
-> > >
-> > > I'm really running out of ideas here...
-> > >
-> > > This is:
-> > >
-> > >         WARN_ON_ONCE(UDP_SKB_CB(skb)->partial_cov);
-> > >
-> > > sort of hint skb being shared (skb->users > 1) while enqueued in
-> > > multiple places (bridge local input and br forward/flood to tun
-> > > device). I audited the bridge mc flooding code, and I could not find
-> > > how a shared skb could land into the local input path.
-> > >
-> > > Anyway the other splats reported here and in later emails are
-> > > compatible with shared skbs.
-> > >
-> > > The above leads to another bunch of questions:
-> > > * can you reproduce the issue after disabling 'rx-gro-list' on the
-> > > ingress device? (while keeping 'rx-udp-gro-forwarding' on).
-> >
-> > With rx-gro-list off, as in never turned on, everything seems to run fi=
-ne
-> >
-> > > * do you have by chance qdiscs on top of the VM tun devices?
-> >
-> > default qdisc is fq
->
-> IIRC libvirt could reset the qdisc to noqueue for the owned tun
-> devices.
->
-> Could you please report the output of:
->
-> tc -d -s qdisc show dev <tun dev name>
+The device_for_each_child_node() loop in
+bgx_init_of_phy() function should have
+wnode_handle_put() before break
+which could avoid resource leaks.
+This patch could fix this bug.
 
-I don't have these set:
-CONFIG_NET_SCH_INGRESS
-CONFIG_NET_SCHED
+Signed-off-by: Wang Ming <machel@vivo.com>
+---
+ drivers/net/ethernet/cavium/thunder/thunder_bgx.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-so tc just gives an error...
+diff --git a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+index a317feb8decb..dad32d36a015 100644
+--- a/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
++++ b/drivers/net/ethernet/cavium/thunder/thunder_bgx.c
+@@ -1478,8 +1478,10 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		 * cannot handle it, so exit the loop.
+ 		 */
+ 		node = to_of_node(fwn);
+-		if (!node)
++		if (!node) {
++			fwnode_handle_put(fwn);
+ 			break;
++		}
+ 
+ 		of_get_mac_address(node, bgx->lmac[lmac].mac);
+ 
+@@ -1503,6 +1505,7 @@ static int bgx_init_of_phy(struct bgx *bgx)
+ 		lmac++;
+ 		if (lmac == bgx->max_lmac) {
+ 			of_node_put(node);
++			fwnode_handle_put(fwn);
+ 			break;
+ 		}
+ 	}
+-- 
+2.25.1
 
-> Thanks!
->
-> /P
->
 
