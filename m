@@ -1,247 +1,246 @@
-Return-Path: <netdev+bounces-15480-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15481-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 46461747E74
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 09:46:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 1AF1D747E8D
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 09:50:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DA5E1C209B1
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 07:46:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A8D1C281001
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 07:50:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0E65F1C16;
-	Wed,  5 Jul 2023 07:46:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E08B31875;
+	Wed,  5 Jul 2023 07:50:17 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F41A61877
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 07:46:11 +0000 (UTC)
-Received: from NAM10-DM6-obe.outbound.protection.outlook.com (mail-dm6nam10on2130.outbound.protection.outlook.com [40.107.93.130])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 67737E59
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 00:46:10 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DdQiaACUKydMzseAEhkdfEY7uCK3y5fIHbd8Sehe/Gq8Jc/SaiQAhlhIwUXHvlcSYqyS/G1jmLzHyUcAVVpV3Gm9IZreZhjly6xMyA4HRum746YIfKAnZBbrAfdHBo6Wyz4I68FCyWnlbBTDjFc/NaM0whdPhnrZsfVWoVwadh+opB8np6ZU7scVssUZidBL0ecEisXvSIqeJbAIkuMIxTWAMkG4oSiS2RXVWhrKbjhvyH8S/nDozt7UelJNwsqPMmWsJ6vIz/66UCOse9WE50MGMeR8Z1xeZYZ/LTaeVEtMM/ueuzOaCWeOE/0qcZj7fkGRNPlyubjezkBXniG9/A==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=ocAzheh+cSdUcSlLENoaIHntXgAmLJBlCjjW6KYlCJQ=;
- b=aOPolpxZjpCHdI7ta4QhbiXT/hB7QnKWNp0KkaAc/MU47Pndl3E72kV+T8bJPTD64FzcJmaJhDuBCrCIuZzdo+xm0Smh191pw6DGt7LwVUiaFlQy/MQ8oJlTkgF1j/sNt8T+GofdUeyYZHWkKdHzkwnsqAq+hDV2hPB6V9XhrgrBx8g5iif5r9d6ShEmibZ7HTjhPNWXpQ/+17kBbZWYFxtsKBs26jpsMUovgZxGbRhHKeAjknRpyWUHdQAeD3ob4m3uAkVssYP9ZTZ/0Uv9yIA4YiDzqN9Xy0A1W82Tm8VrrI8syL9yipjiTQsSpE0M9+3XhQ1jDvNPpbyxksZmPA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=ocAzheh+cSdUcSlLENoaIHntXgAmLJBlCjjW6KYlCJQ=;
- b=KyzN+P2bxJIKFqdPjLey8ARUJuPMvlzazifV67lSpMdlQXWFo7tvNyNy4OaHXO1FjfMTuPa1KiKYf6Dn1hV3qLfMdy2OYxBSiQHeFABiXrtQMk7QYh6YMpvFEqU7BCwFXZETBjWvrdKU3xAyfooWf5YBzfrVBESSTsD0CMW7dOc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by BLAPR13MB4675.namprd13.prod.outlook.com (2603:10b6:208:321::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
- 2023 07:46:05 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::eb8f:e482:76e0:fe6e%5]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
- 07:46:05 +0000
-Date: Wed, 5 Jul 2023 08:45:57 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Jamal Hadi Salim <jhs@mojatatu.com>
-Cc: Jamal Hadi Salim <hadi@mojatatu.com>,
-	Victor Nogueira <victor@mojatatu.com>, netdev@vger.kernel.org,
-	xiyou.wangcong@gmail.com, jiri@resnulli.us, davem@davemloft.net,
-	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
-	pctammela@mojatatu.com, kernel@mojatatu.com
-Subject: Re: [PATCH net 1/5] net: sched: cls_bpf: Undo tcf_bind_filter in
- case of an error
-Message-ID: <ZKUftWakv7v1C4h2@corigine.com>
-References: <20230704151456.52334-1-victor@mojatatu.com>
- <20230704151456.52334-2-victor@mojatatu.com>
- <ZKSFrSW2zJZYelNj@corigine.com>
- <CAAFAkD-WppW_Gf+Dfm=SSr62PNQwwngwXe2=XKo52AkWD=sSPA@mail.gmail.com>
- <ZKSM/tWeECfu+lKU@corigine.com>
- <CAM0EoMm_Ry7PDwwtkS15-Ri5r_mSXYznDZ3Q5b5bOQmVZSWNdQ@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
-Content-Disposition: inline
-Content-Transfer-Encoding: 8bit
-In-Reply-To: <CAM0EoMm_Ry7PDwwtkS15-Ri5r_mSXYznDZ3Q5b5bOQmVZSWNdQ@mail.gmail.com>
-X-ClientProxiedBy: LO4P123CA0038.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:152::7) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D1749137F
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 07:50:17 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5EAF31705
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 00:50:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688543413;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=y48ulS/+kKO7p+XK2cdnd8+mcOJFtW4xSVJ9cfRLRCc=;
+	b=Dk1UZScpk7GtS8sD/qYXhdbRtqkYU700Sfo24LQxvNHFgKAbJH8JlgwhxpgXC5z9PrdO4D
+	yjRwOzx6BimeXp3KP4t3APfAf7I0Wl3y8P7JsZDshRH0hKiPaKUqBXspPkhJOMcI6hwNIk
+	seLwmfhGxg9UUa8lUbYfdQP85UHYlE8=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-647-YR3jp4mMOd2iQ3Plu8jolA-1; Wed, 05 Jul 2023 03:50:12 -0400
+X-MC-Unique: YR3jp4mMOd2iQ3Plu8jolA-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-766fd51ee68so24415885a.0
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 00:50:12 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688543412; x=1691135412;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=y48ulS/+kKO7p+XK2cdnd8+mcOJFtW4xSVJ9cfRLRCc=;
+        b=YUiUJb9fzYST659FGUo1o+Euas8FDc+SEGczJQcDKeO5t/Htty5+0E+E8/P3eKJw0b
+         O+/2o/mPvcFSmoBdL01gMgst4qInWDArsOuCRLgFsZzoUEMkpNoNWYdmPOPHUcafR4o+
+         1hprvZWzGhfQZG/04YVp2jci+jasX/qfM6vBI3TmDj/UNMBOK1a57QVfqfF4b8nQbA7M
+         HtMU0m+4K04b5baNl1rvZKhC48wPqBoW6pBAbXG21jQ7T6MU80tfnKj193l+CBaxVvZb
+         cQQpeO+9od9HKUVYD7POk6hhMkNlccMTOaah6XVTCuHsHmq/Yy7C4IxLR4zWtEOg+Rdq
+         6jMw==
+X-Gm-Message-State: ABy/qLbTfAjtYuqhQIasTr86b0kZZZvn9wi7t3ksHe5VaE83XKEvMk5O
+	JliJLeqnnG5SQ47dmDbHPqZnuQqYbnpq3MLSnlfZEiNXcpQ35Uu8tPjIFqcwR8j7OKMeOfMJH4R
+	ZxKL4OKRwBIFxALJhHx9pI2e+78nAArx2
+X-Received: by 2002:a0c:f1ca:0:b0:630:14e0:982e with SMTP id u10-20020a0cf1ca000000b0063014e0982emr1588306qvl.22.1688543412147;
+        Wed, 05 Jul 2023 00:50:12 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlECWIUnOY9XKAF+JGyO1WxxEdgi7O/d6naJ/xGAnoeQMVdDnnQISxcvMK2kW8kDBCOg+K1qYyW7lCoiy4kASbU=
+X-Received: by 2002:a0c:f1ca:0:b0:630:14e0:982e with SMTP id
+ u10-20020a0cf1ca000000b0063014e0982emr1588302qvl.22.1688543411888; Wed, 05
+ Jul 2023 00:50:11 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|BLAPR13MB4675:EE_
-X-MS-Office365-Filtering-Correlation-Id: fe0d97c8-8823-469c-498b-08db7d2be34c
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	+je6fMPUvJp9f7PHQUwdKfLMZXJnTs5h/GafXv/bNELqdKPp1K9zQtcPvpb9vmcItH32jD05RLpJrgn1N/52hb/4RJbrnPOPdkhfevSKDCI4jYMrEPXq8xxZd4gQC4xYFyrwL6EXn10Iw0jlYFeCl0BEAqdvmfCFECeNHVkTKEgxGY0DOC7F/O60n3C1ol7uV6dAgbqGQiKElC3KprirGrvVmUinwvmchlhSX7XbSy8mZ5WHrdNL9D1MP7vrCTfw79CZK2eQOtDEbxmqAb15N04ITFwWw0ieC2uk9rTFU+0taOKzfXJjOAU8t7tqV9/P4DKXTDr80wAGNfV6SCgf01JSAOe6/sH2zRhip7KrntZ7LbWznH1Dbrol2EqVl2hE8d1UFyCLOgG7sYlcaVxd8soLLWzvr5WIqMBYJ4oEL8C8TYnG8ypO3A7v4jhd0jbzFBHTYNwPjEsE4+lYwirbpqPvXR6CfQJHx55dysNceWCpPQ8wtwjU85iuViVpTygrfHaZKL+CoED9ZE8i7QyDca2eAHztTCbcs03mhh3IULKPIjIP5o1B6GvvVSDgRquAD+NuYtZA29EnSfNmsInqhxjEiDee8HGyDMoo/d0b9L0=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(366004)(376002)(136003)(39840400004)(346002)(396003)(451199021)(2616005)(6666004)(6512007)(6486002)(478600001)(54906003)(53546011)(6506007)(186003)(26005)(2906002)(7416002)(8936002)(5660300002)(66946007)(66476007)(44832011)(41300700001)(8676002)(6916009)(4326008)(66556008)(316002)(38100700002)(86362001)(36756003)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?QUlKckVLZlFEMmEzVXU1VEx2ODBrOGg1Tlh3eDdicjFWVHZJcEJvc1phcGRm?=
- =?utf-8?B?M3kybUhpRnlmQnhTMmVhRkV4SWdxMGhrSDUrWjBhdlBoUlZ6TFpOWTAxd1VZ?=
- =?utf-8?B?WHdvNEZ5OFh2UldZMFZGQXhxM0NwemMwZExvSXUrK21neXFpV0ZuRG12MTVK?=
- =?utf-8?B?bi9lRHg2Yk1YWlphdFU2YUVtU01QejFMMUxaek1HeUduM25JVm1MM0pVNk12?=
- =?utf-8?B?cy80dG9jMFcvM1l5Q29wMzh0RVc5U2RCaXErWm52QjlSOGR5ZzdMUU1xeXNz?=
- =?utf-8?B?K0F4Q1dQT0F5d2NYZWI5SjRQaEJiWXdqTFB4VGNqT3NpL1FZUGU5WU1XN0pj?=
- =?utf-8?B?T3BXb2FjM0plaEx6dDFnckpnVEVEZ2xxcHlGVjNuelZhT2ZGMVlJS2c1RnMr?=
- =?utf-8?B?VHhNMWYzRjNVQUR6dzZab3dLRVVwOTlJWGlNU1lNZStWVTQ0ZTVnMnQzN2ow?=
- =?utf-8?B?NjVlVG5PRlcwU2V4dGc1VWxlbzlOTFU5eFFUUHhCRGhYVW91V2tQS0o4b3Uv?=
- =?utf-8?B?Uk1yTW45Y0MyU3RldkYzVjZLa1FFVzlJV2dPWWZRK2lNRVpreHdpaW1UQU1o?=
- =?utf-8?B?MGpGaUR6Mi9lRXdPY21HOFZ6NjYrSlZ3cUFPVGRlVTNLQmMvOXMyUnJrRm1l?=
- =?utf-8?B?TjFFL1RwVGVVcWVPTFBHZnRXRWEraVhtUFZrMFJVbWtPWW4xUnlhU2VEMzZl?=
- =?utf-8?B?MUYyUDUyTlZYUDE2TlZIeXRwQkRqWkFmSmVtNit3cmtPNzdMb2NnbmpzclBV?=
- =?utf-8?B?TVR0SWRHQzR4aFlEcXFibzJzSktIUkl5c2lnc0JEeWNuQnRRZWtPNWxqVjc1?=
- =?utf-8?B?ZnFPbytFaTFDWlorVGpKaURVbFZnelpDVXRLZHo5ZEdBSGJZVk8zTk9XN05G?=
- =?utf-8?B?ck5ZckZFL3UyMTJRWWNybldjYXNtUm53YzU3TWJLa0FOVk5PKytKR2pnQTAv?=
- =?utf-8?B?RFNIYmUzVlZLYUZuNXlOS2FQbUNYN0VmN3RxZ0FRV2RyUG5tcjFoM1VNUzd4?=
- =?utf-8?B?aENVZjJ0TmJ2WWRsQkYwRVh2WnpIQ0d1UVowVG4xemo5YjZacVNtZkZxbWlv?=
- =?utf-8?B?cEZlREs1L3dnMW8yUVlEN3NPV2RvdFlGazV5MnZUQU41cS9FOFJRMnVhQWxT?=
- =?utf-8?B?cjRhZTVIM29TQTN6T20xZ3ZPNkNTeTRqSkcvNUUyTDdCS3FNQ3hkYU9ET2hw?=
- =?utf-8?B?bGhjelVsMWFnZklIZ2k5OEZIZUlNbUhCSzZJVFJIc1lzREd1bmhIVHJ4dFJY?=
- =?utf-8?B?MU9iRWVMdnlleUcvMkFnaEptV05BbW8rVThWSWRnUFI1RGptY1JDMmZlQ1BB?=
- =?utf-8?B?N3lXcXdpT1pYc3h6aUpRWENXL3BjM0lVZFVoRXNaV3FMSDJieXkxa1E3OE9F?=
- =?utf-8?B?VFJJYmgrRkdLREx6MXJuOUUyY2hzRE85VGZFQndkY1JCb2hyWjFMd0wraDBV?=
- =?utf-8?B?SmZ1U09JenJUYlhLRkZXV2s0bGRWNzJ2THBiQlN6a2MrMWJXaThpSWxlWUFY?=
- =?utf-8?B?Q1laUzhGeDR3ZnMvVDVnKzJXTmQvSkNpT2dtZlpPdWpabzNMTDlERVpTVXJn?=
- =?utf-8?B?RktldUQ3aUsrcDlaUmUxWEMrbTU5dHA2NHI4cHNPZ0JyWDczcXY0ZjQxSmZN?=
- =?utf-8?B?RmxIRCt2aW1MaGJHNE10YTJYaVFZYkpqUVBBMHVGL0ZydDljUi8xNVpMdWV6?=
- =?utf-8?B?UXcvOW80OGE3WDU1dTVuNXZDY3kzR0xNR2dUNmRmSDZPWG4zcDhFSUpsTkhO?=
- =?utf-8?B?cUI2UVJ2UW1HeFFKaWZYaVZ3YVBPbWJqQjFnK1dsU0dZRDhDNVJRUVY5TWZN?=
- =?utf-8?B?VHF2a0tTM0pTcVMwai9oa2FxUS9lZkh3NGxXbE1DU1RFRWtrS1JhNHcyVkNF?=
- =?utf-8?B?c1o2Qm0xNmsyS2hXUXlHZWFHTjNabzROMm5HSVZxNzBOdGdJNnJWR3d5dXhr?=
- =?utf-8?B?NGN6em1BVzdIc2ZPamVVaDZ2L2M4R0VldHBQamt5a245SElsU3dWZGxDdTBH?=
- =?utf-8?B?LzVYMC9KaXNES2s4cE1KYkYvMWJQdTRrL09wS01hbHUrTnREdStvRFROVHJS?=
- =?utf-8?B?bDEzRDNGaWUwR2RDUS9XUUhkSXRVQU11cW5lTnlIRVYva3RMbFJ6V3pFV3k4?=
- =?utf-8?B?LzNoUHZIZHpmK2VWQ0s3a3dXWEc4U2d2dzc3eCt6amFuL016SnJmUSsreUp0?=
- =?utf-8?B?a0E9PQ==?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: fe0d97c8-8823-469c-498b-08db7d2be34c
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 07:46:05.6427
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: VHonMOYckkVgJZmDS95gkyJCZKnoc3kvawC5fuvtW/DhavZscZH+prm6RSRhHowjG7e72XcgZXTsxMfs7xA1i8FXf0ToDjkbPpXOcVo2pck=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR13MB4675
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230704114159-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Wed, 5 Jul 2023 15:49:58 +0800
+Message-ID: <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eugenio Perez Martin <eperezma@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Shannon Nelson <shannon.nelson@amd.com>, 
+	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 04, 2023 at 05:42:29PM -0400, Jamal Hadi Salim wrote:
-> On Tue, Jul 4, 2023 at 5:20 PM Simon Horman <simon.horman@corigine.com> wrote:
-> >
-> > On Tue, Jul 04, 2023 at 04:55:25PM -0400, Jamal Hadi Salim wrote:
-> > > On Tue, Jul 4, 2023 at 4:48 PM Simon Horman <simon.horman@corigine.com> wrote:
-> > > >
-> > > > On Tue, Jul 04, 2023 at 12:14:52PM -0300, Victor Nogueira wrote:
-> > > > > If cls_bpf_offload errors out, we must also undo tcf_bind_filter that
-> > > > > was done in cls_bpf_set_parms.
-> > > > >
-> > > > > Fix that by calling tcf_unbind_filter in errout_parms.
-> > > > >
-> > > > > Fixes: eadb41489fd2 ("net: cls_bpf: add support for marking filters as hardware-only")
-> > > > >
-> > > >
-> > > > nit: no blank line here.
-> > > >
-> > > > > Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-> > > > > Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-> > > > > Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
-> > > > > ---
-> > > > >  net/sched/cls_bpf.c | 8 ++++++--
-> > > > >  1 file changed, 6 insertions(+), 2 deletions(-)
-> > > > >
-> > > > > diff --git a/net/sched/cls_bpf.c b/net/sched/cls_bpf.c
-> > > > > index 466c26df853a..4d9974b1b29d 100644
-> > > > > --- a/net/sched/cls_bpf.c
-> > > > > +++ b/net/sched/cls_bpf.c
-> > > > > @@ -409,7 +409,7 @@ static int cls_bpf_prog_from_efd(struct nlattr **tb, struct cls_bpf_prog *prog,
-> > > > >  static int cls_bpf_set_parms(struct net *net, struct tcf_proto *tp,
-> > > > >                            struct cls_bpf_prog *prog, unsigned long base,
-> > > > >                            struct nlattr **tb, struct nlattr *est, u32 flags,
-> > > > > -                          struct netlink_ext_ack *extack)
-> > > > > +                          bool *bound_to_filter, struct netlink_ext_ack *extack)
-> > > > >  {
-> > > > >       bool is_bpf, is_ebpf, have_exts = false;
-> > > > >       u32 gen_flags = 0;
-> > > > > @@ -451,6 +451,7 @@ static int cls_bpf_set_parms(struct net *net, struct tcf_proto *tp,
-> > > > >       if (tb[TCA_BPF_CLASSID]) {
-> > > > >               prog->res.classid = nla_get_u32(tb[TCA_BPF_CLASSID]);
-> > > > >               tcf_bind_filter(tp, &prog->res, base);
-> > > > > +             *bound_to_filter = true;
-> > > > >       }
-> > > > >
-> > > > >       return 0;
-> > > > > @@ -464,6 +465,7 @@ static int cls_bpf_change(struct net *net, struct sk_buff *in_skb,
-> > > > >  {
-> > > > >       struct cls_bpf_head *head = rtnl_dereference(tp->root);
-> > > > >       struct cls_bpf_prog *oldprog = *arg;
-> > > > > +     bool bound_to_filter = false;
-> > > > >       struct nlattr *tb[TCA_BPF_MAX + 1];
-> > > > >       struct cls_bpf_prog *prog;
-> > > > >       int ret;
-> > > >
-> > > > Please use reverse xmas tree - longest line to shortest - for
-> > > > local variable declarations in Networking code.
-> > > >
+On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com>=
+ wrote:
+>
+> On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
+> > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
 > > >
-> > > I think Ed's tool is actually wrong on this Simon.
-> > > The rule I know of is: initializations first then declarations -
-> > > unless it is documented elsewhere as not the case.
+> > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
+> > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <mst@redh=
+at.com> wrote:
+> > > > >
+> > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9rez wrot=
+e:
+> > > > > > With the current code it is accepted as long as userland send i=
+t.
+> > > > > >
+> > > > > > Although userland should not set a feature flag that has not be=
+en
+> > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code=
+ will not
+> > > > > > complain for it.
+> > > > > >
+> > > > > > Since there is no specific reason for any parent to reject that=
+ backend
+> > > > > > feature bit when it has been proposed, let's control it at vdpa=
+ frontend
+> > > > > > level. Future patches may move this control to the parent drive=
+r.
+> > > > > >
+> > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER=
+_DRIVER_OK backend feature")
+> > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > >
+> > > > > Please do send v3. And again, I don't want to send "after driver =
+ok" hack
+> > > > > upstream at all, I merged it in next just to give it some testing=
+.
+> > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > >
+> > > >
+> > > > Current devices do not support that semantic.
+> > >
+> > > Which devices specifically access the ring after DRIVER_OK but before
+> > > a kick?
+> > >
 > >
-> > Hi Jamal,
+> > Previous versions of the QEMU LM series did a spurious kick to start
+> > traffic at the LM destination [1]. When it was proposed, that spurious
+> > kick was removed from the series because to check for descriptors
+> > after driver_ok, even without a kick, was considered work of the
+> > parent driver.
 > >
-> > That is not my understanding of the rule.
-> 
-> Something about mixing assignments and declarations being
-> cplusplusish. That's always how my fingers think.
-> 
-> So how would this have been done differently? This is the current patch:
-> ----
->         struct cls_bpf_head *head = rtnl_dereference(tp->root);
->         struct cls_bpf_prog *oldprog = *arg;
-> +       bool bound_to_filter = false;
->         struct nlattr *tb[TCA_BPF_MAX + 1];
->         struct cls_bpf_prog *prog;
->         int ret;
-> ----
-> 
-> Should the change be?
-> ---
->         struct cls_bpf_head *head = rtnl_dereference(tp->root);
->         struct cls_bpf_prog *oldprog = *arg;
->         struct nlattr *tb[TCA_BPF_MAX + 1];
-> +       bool bound_to_filter = false;
->         struct cls_bpf_prog *prog;
->         int ret;
-> ---
-> 
-> I dont think my gut or brain would let me type that - but if those are
-> them rules then it is Victor doing the typing ;->
+> > I'm ok to go back to this spurious kick, but I'm not sure if the hw
+> > will read the ring before the kick actually. I can ask.
+> >
+> > Thanks!
+> >
+> > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg02775.h=
+tml
+>
+> Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
 
-Hi Jamal,
+My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
+sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
 
-Let's not drag this out too long.
-But, FWIIW, my understanding is that your 2nd example matches the guidelines.
+But this reminds me one thing, as the thread is going too long, I
+wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
+supported?
 
--- 
-pw-bot: under-review
+Thanks
 
+>
+>
+>
+> > > > My plan was to convert
+> > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
+> > > > was not explicit enough.
+> > > >
+> > > > The only solution I can see to that is to trap & emulate in the vdp=
+a
+> > > > (parent?) driver, as talked in virtio-comment. But that complicates
+> > > > the architecture:
+> > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > * Store vq enable state separately, at
+> > > > vdpa->config->set_vq_ready(true), but not transmit that enable to h=
+w
+> > > > * Store the doorbell state separately, but do not configure it to t=
+he
+> > > > device directly.
+> > > >
+> > > > But how to recover if the device cannot configure them at kick time=
+,
+> > > > for example?
+> > > >
+> > > > Maybe we can just fail if the parent driver does not support enabli=
+ng
+> > > > the vq after DRIVER_OK? That way no new feature flag is needed.
+> > > >
+> > > > Thanks!
+> > > >
+> > > > >
+> > > > > > ---
+> > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/k=
+ernel/git/mst
+> > > > > > commit. Please let me know if I should send a v3 of [1] instead=
+.
+> > > > > >
+> > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email=
+-mst@kernel.org/T/
+> > > > > > ---
+> > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > >
+> > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(str=
+uct file *filep,
+> > > > > >  {
+> > > > > >       struct vhost_vdpa *v =3D filep->private_data;
+> > > > > >       struct vhost_dev *d =3D &v->vdev;
+> > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->config;
+> > > > > >       void __user *argp =3D (void __user *)arg;
+> > > > > >       u64 __user *featurep =3D argp;
+> > > > > > -     u64 features;
+> > > > > > +     u64 features, parent_features =3D 0;
+> > > > > >       long r =3D 0;
+> > > > > >
+> > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+> > > > > >               if (copy_from_user(&features, featurep, sizeof(fe=
+atures)))
+> > > > > >                       return -EFAULT;
+> > > > > > +             if (ops->get_backend_features)
+> > > > > > +                     parent_features =3D ops->get_backend_feat=
+ures(v->vdpa);
+> > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> > > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND)=
+ |
+> > > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) =
+|
+> > > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_A=
+FTER_DRIVER_OK)))
+> > > > > > +                              parent_features))
+> > > > > >                       return -EOPNOTSUPP;
+> > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND))=
+ &&
+> > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > --
+> > > > > > 2.39.3
+> > > > >
+> > >
+>
 
 
