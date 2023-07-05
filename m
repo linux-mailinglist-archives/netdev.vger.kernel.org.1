@@ -1,85 +1,191 @@
-Return-Path: <netdev+bounces-15560-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15562-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2E6BD748859
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:50:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A55C748899
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:57:36 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 74D76281011
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:50:03 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 060B1280A66
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:57:35 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AF6AA11CB3;
-	Wed,  5 Jul 2023 15:50:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BFBE125A5;
+	Wed,  5 Jul 2023 15:57:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 46A11111AF
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 15:50:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 99CC6C433C8;
-	Wed,  5 Jul 2023 15:49:59 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688572200;
-	bh=LKIw2C4zLdq/arYohsNFX5l44L3BXGn1ZG9+kkvZW5k=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=rEzT6KVm4TjVa+PkpwzsjqzovOD8U11GjzMofQOI+l7tZttDYkjFJHKgUDWemaJpD
-	 Zxa1xpb1rAL9HXuUoTOeF/8yma5F+R6tP/6W2KctPtJ0ROyfx+UdRCHkr8Q3gyTF8Z
-	 8ZQ1dZfKPNFsntZksx0mZhdXMTFiia2x1khpcGIFUZx0W9Jqkyzm3//hui+N6kDYRh
-	 GfcDjukmIZPVY86mNQhoeKAhCtXRdWRwLZeQuSViAwtP/FdjNcMeNzTRMr4Z2HaRdG
-	 Aj5GhKRYxgQFBEe7FBrDuu5DI01SXOe0KEuvaYU14+2W1Dhlah4GwOJSAbI+Zj/Ffj
-	 x02WaUUycubBw==
-Date: Wed, 5 Jul 2023 08:49:58 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Stephen Hemminger <stephen@networkplumber.org>
-Cc: Breno Leitao <leitao@debian.org>, "David S. Miller"
- <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Paolo Abeni
- <pabeni@redhat.com>, sergey.senozhatsky@gmail.com, pmladek@suse.com,
- tj@kernel.org, Dave Jones <davej@codemonkey.org.uk>, "open list:NETWORKING
- DRIVERS" <netdev@vger.kernel.org>, open list <linux-kernel@vger.kernel.org>
-Subject: Re: [PATCH] netconsole: Append kernel version to message
-Message-ID: <20230705084958.1c4854eb@kernel.org>
-In-Reply-To: <20230705082604.7b104a48@hermes.local>
-References: <20230703154155.3460313-1-leitao@debian.org>
-	<20230703113410.6352411d@hermes.local>
-	<ZKQ3o6byAaJfxHK+@gmail.com>
-	<20230704085800.38f05b56@hermes.local>
-	<ZKU1Sy7dk8yESm4d@gmail.com>
-	<20230705082604.7b104a48@hermes.local>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1024F11CB3
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 15:57:32 +0000 (UTC)
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57F5FF0;
+	Wed,  5 Jul 2023 08:57:31 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688572651; x=1720108651;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=LyPMsf3C0/NaDYzoiwx7gQCCBQX3u+0J5fs1oCvaAiY=;
+  b=SMn9aNsQZgttntTNE29U8xh63pJHrpsJF0oSxrBhq9caCy/0lzsrj/YI
+   vZTyBJSLJaK8k2yEvmvPOIxw15+qXEbN0CFtKR8SgbzxAZ5TUz12unH3c
+   7mhX1kE/W96EWbTOMGplBfVgSmNw3i10TXMy6VByWyD64tgkMN5geXXZL
+   2cZTpHafNgq40ldfasC0zJT3ZOrcSf4IS+Z+N9622aOsLrY7OjolXa6XB
+   /H75hCazFkMHACVZDXoLloBwlu6FaCGluzWDEP9TBPGcS5VYxUtCdatcL
+   3eK1E97A5TZ88eifbWITl5xN2Xc6z5C+9ebW9G3GvTlqIa2ulkxkkcMMd
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="366863368"
+X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
+   d="scan'208";a="366863368"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 08:57:30 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="789205538"
+X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
+   d="scan'208";a="789205538"
+Received: from newjersey.igk.intel.com ([10.102.20.203])
+  by fmsmga004.fm.intel.com with ESMTP; 05 Jul 2023 08:57:25 -0700
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Alexander Lobakin <aleksander.lobakin@intel.com>,
+	Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+	Michal Kubiak <michal.kubiak@intel.com>,
+	Larysa Zaremba <larysa.zaremba@intel.com>,
+	Alexander Duyck <alexanderduyck@fb.com>,
+	Yunsheng Lin <linyunsheng@huawei.com>,
+	David Christensen <drc@linux.vnet.ibm.com>,
+	Jesper Dangaard Brouer <hawk@kernel.org>,
+	Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+	Paul Menzel <pmenzel@molgen.mpg.de>,
+	netdev@vger.kernel.org,
+	intel-wired-lan@lists.osuosl.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH RFC net-next v4 0/9] net: intel: start The Great Code Dedup + Page Pool for iavf
+Date: Wed,  5 Jul 2023 17:55:42 +0200
+Message-ID: <20230705155551.1317583-1-aleksander.lobakin@intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, 5 Jul 2023 08:26:04 -0700 Stephen Hemminger wrote:
-> On Wed, 5 Jul 2023 02:18:03 -0700
-> Breno Leitao <leitao@debian.org> wrote:
-> 
-> > The uname is useful if the receiver side is looking (grepping) for
-> > specific messages (warnings, oops, etc) affecting specific kernel
-> > versions. If the uname is not available, the receiver needs to read boot
-> > message and keep a map for source IP to kernel version. This is far from
-> > ideal at a hyperscale level.  
-> 
-> At hyperscale you need a real collector (not just netcat) that can consult
-> the VM database to based on IP and record the meta data there.  If you allow
-> random updates and versions, things get out of control real fast and this
-> won't really help much
+Here's a two-shot: introduce Intel Ethernet common library (libie) and
+switch iavf to Page Pool. Details in the commit messages; here's
+summary:
 
-VM world is simpler because the orchestrator knows exactly what it's
-launching each time. Bare metal is more complicated, especially
-with modern automation designs where the DBs may contain _intended_
-state, and local host agent performs actions to bring the machine
-into the intended state.
+Not a secret there's a ton of code duplication between two and more Intel
+ethernet modules. Before introducing new changes, which would need to be
+copied over again, start decoupling the already existing duplicate
+functionality into a new module, which will be shared between several
+Intel Ethernet drivers.
+The first thing that came to my mind was "libie" -- "Intel Ethernet
+common library". Also this sounds like "lovelie" and can be expanded as
+"lib Internet Explorer" :P I'm open for anything else (but justified).
+The series is only the beginning. From now on, adding every new feature
+or doing any good driver refactoring will remove much more lines than add
+for quite some time. There's a basic roadmap with some deduplications
+planned already, not speaking of that touching every line now asks: "can
+I share this?".
+PP conversion for iavf lands within the same series as these two are tied
+closely. libie will support Page Pool model only, so a driver can't use
+much of the lib until it's converted. iavf is only the example, the rest
+will eventually be converted soon on a per-driver basis. That is when it
+gets really interesting. Stay tech.
 
-Not to mention that there may be multiple kernels at play (provisioning
-flow, bootloader / EFI, prod, kdump etc.)
+Alexander Lobakin (9):
+  net: intel: introduce Intel Ethernet common library
+  iavf: kill "legacy-rx" for good
+  iavf: drop page splitting and recycling
+  net: page_pool: add DMA-sync-for-CPU inline helpers
+  libie: add Rx buffer management (via Page Pool)
+  iavf: switch to Page Pool
+  libie: add common queue stats
+  libie: add per-queue Page Pool stats
+  iavf: switch queue stats to libie
 
-As a kernel dev I do like the 100% certainty as to which kernel version
-was running at the time of the problem.
+ MAINTAINERS                                   |   3 +-
+ drivers/net/ethernet/intel/Kconfig            |  11 +
+ drivers/net/ethernet/intel/Makefile           |   1 +
+ drivers/net/ethernet/intel/i40e/i40e_common.c | 253 --------
+ drivers/net/ethernet/intel/i40e/i40e_main.c   |   1 +
+ .../net/ethernet/intel/i40e/i40e_prototype.h  |   7 -
+ drivers/net/ethernet/intel/i40e/i40e_txrx.c   |  74 +--
+ drivers/net/ethernet/intel/i40e/i40e_type.h   |  88 ---
+ drivers/net/ethernet/intel/iavf/iavf.h        |   2 +-
+ drivers/net/ethernet/intel/iavf/iavf_common.c | 253 --------
+ .../net/ethernet/intel/iavf/iavf_ethtool.c    | 226 +------
+ drivers/net/ethernet/intel/iavf/iavf_main.c   |  44 +-
+ .../net/ethernet/intel/iavf/iavf_prototype.h  |   7 -
+ drivers/net/ethernet/intel/iavf/iavf_txrx.c   | 608 ++++--------------
+ drivers/net/ethernet/intel/iavf/iavf_txrx.h   | 176 +----
+ drivers/net/ethernet/intel/iavf/iavf_type.h   |  90 ---
+ .../net/ethernet/intel/iavf/iavf_virtchnl.c   |  20 +-
+ .../net/ethernet/intel/ice/ice_lan_tx_rx.h    | 316 ---------
+ drivers/net/ethernet/intel/ice/ice_main.c     |   1 +
+ drivers/net/ethernet/intel/ice/ice_txrx_lib.c |  74 +--
+ drivers/net/ethernet/intel/libie/Makefile     |   7 +
+ drivers/net/ethernet/intel/libie/internal.h   |  23 +
+ drivers/net/ethernet/intel/libie/rx.c         | 183 ++++++
+ drivers/net/ethernet/intel/libie/stats.c      | 190 ++++++
+ include/linux/net/intel/libie/rx.h            | 241 +++++++
+ include/linux/net/intel/libie/stats.h         | 214 ++++++
+ include/net/page_pool.h                       |  49 +-
+ 27 files changed, 1137 insertions(+), 2025 deletions(-)
+ create mode 100644 drivers/net/ethernet/intel/libie/Makefile
+ create mode 100644 drivers/net/ethernet/intel/libie/internal.h
+ create mode 100644 drivers/net/ethernet/intel/libie/rx.c
+ create mode 100644 drivers/net/ethernet/intel/libie/stats.c
+ create mode 100644 include/linux/net/intel/libie/rx.h
+ create mode 100644 include/linux/net/intel/libie/stats.h
+
+---
+Directly to net-next, has non-Intel code change (#4) :p
+
+Based on the PP "hybrid" allocation series[0] and requires it to work.
+
+From v3[1]:
+* base on the latest net-next, update bloat-o-meter and perf stats;
+* split generic PP optimizations into a separate series;
+* drop "optimize hotpath a bunch" commit: a lot of [controversial]
+  changes in one place, worth own series (Alex);
+* 02: pick Rev-by (Alex);
+* 03: move in-place recycling removal here from the dropped patch;
+* 05: new, add libie Rx buffer API separatelly from IAVF changes;
+* 05-06: use new "hybrid" allocation API from[0] to reduce memory usage
+  when a page can fit more than 1 truesize (also asked by David);
+* 06: merge with "always use order-0 page" commit to reduce diffs and
+  simplify things (Alex);
+* 09: fix page_alloc_fail counter.
+
+From v2[2]:
+* 0006: fix page_pool.h include in OcteonTX2 files (Jakub, Patchwork);
+* no functional changes.
+
+From v1[3]:
+* 0006: new (me, Jakub);
+* 0008: give the helpers more intuitive names (Jakub, Ilias);
+*  -^-: also expand their kdoc a bit for the same reason;
+*  -^-: fix kdoc copy-paste issue (Patchwork, Jakub);
+* 0011: drop `inline` from C file (Patchwork, Jakub).
+
+[0] https://lore.kernel.org/netdev/20230629120226.14854-1-linyunsheng@huawei.com
+[1] https://lore.kernel.org/netdev/20230530150035.1943669-1-aleksander.lobakin@intel.com
+[2] https://lore.kernel.org/netdev/20230525125746.553874-1-aleksander.lobakin@intel.com
+[3] https://lore.kernel.org/netdev/20230516161841.37138-1-aleksander.lobakin@intel.com
+
+-- 
+2.41.0
+
 
