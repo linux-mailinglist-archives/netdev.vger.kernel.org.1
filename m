@@ -1,238 +1,203 @@
-Return-Path: <netdev+bounces-15594-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15595-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1C496748AA8
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:35:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A02B2748AB5
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:36:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CC11A280A8C
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:35:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5BF8028106E
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:36:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0DED1134CC;
-	Wed,  5 Jul 2023 17:35:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B87134CD;
+	Wed,  5 Jul 2023 17:36:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F231712B6A
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:35:00 +0000 (UTC)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9E1401BEE;
-	Wed,  5 Jul 2023 10:34:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688578469; x=1720114469;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=RChYpsb2it1GpXwd3EWAk1T7Vp2QQluSXcyXEV/4gu8=;
-  b=U8n08yNNJzwk8oaajr5QeeKeyr/QweDh1fFC3SK00PniMsddmkireajL
-   jAE1iksM9Yb1ebjMemV2ZayfydwEyv21JvoG2sfF5OHFYQmbjTPfb+NH+
-   mPQG3Ob5RpdNoZlKot2ckrK8H/Vu22MRY8QEGS82gpOGiyGYqk/JN6Bcb
-   owulcaGbjMva7APsG7th872cuTYaDmn8Y4Mb/wPJ5MJcBbbCqUJ0iH8U/
-   UZ79yIseQHN4BF2fmNjVudwDpJ7uHams19EtWJd7372mF3SggYJiGbf60
-   OOQSR6w+zBXS6HJvltLZ+CX+cJn6hlcI3zSOnTco5CUMJH7XEzi/1/vom
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="363432609"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="363432609"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 10:34:09 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="719310121"
-X-IronPort-AV: E=Sophos;i="6.01,183,1684825200"; 
-   d="scan'208";a="719310121"
-Received: from fmsmsx601.amr.corp.intel.com ([10.18.126.81])
-  by orsmga002.jf.intel.com with ESMTP; 05 Jul 2023 10:34:09 -0700
-Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 5 Jul 2023 10:34:08 -0700
-Received: from fmsmsx603.amr.corp.intel.com (10.18.126.83) by
- fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Wed, 5 Jul 2023 10:34:08 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Wed, 5 Jul 2023 10:34:08 -0700
-Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Wed, 5 Jul 2023 10:34:06 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=DbP2HFDrrtyWFgyVhzl4imC22wKNJk02xV6qfrhSb3Z8aHxBgLXAvETJwqjdRin3kmGx+vbnbdeaIN2exm3xwU4790RYLgvuNACwoz2C+0HEZM37874Q0vgE2EH4JmIxe8ETld9UNj6c3047RgYLNQxWj6dg2Ti4AJpCj9uzCne8uwIrZUxhUfbPTFO3umO+BALOEvQMYAknRq8MDf+BCVgAcfxSsHX8qpycBErAOviUapXiDtvSLjBXncyfd4ocdfI98P8tt0NhAZwg89CVufxEkycbMjafPYqLOL4XWOAX57ddfl1EqhcJ2tGIs1lQOdqtr1B8fz6hzsYwycm0eA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=7MQ/0rilLDwO6mSk2aR2OwqmaQ5vEnXu6AP/AdWEz8A=;
- b=hAmhp+/MNHVOoFLv6hXoSyWrEWWyarJ9+KlXpCrs0lnxqYeaG0RKpPm5SxLdFYlYT7EjsBuU+JUfNx0gT04Zd1vCgvFxtapWdCEcXxwVHSqlieRew5uCSmjlwN+nNd1wJgJVcmI3GHjy9PxHPYLDzBDBEwZLYqvKfdcUylriRd971awRyf7CA56bpLCshWXRW3zhhKUJskC3hOScbHBuk9zlJLNP1mq+ti9h6paPcYdnWDihaoEzbrguaJ8+f65eELwRI8UPtAB3LC2zHMHNYwRuYgivA5TxyfmZs6X2SKCJFiIMjhERzvZtACDVBBYa5/QwBSVGqbb202WsrXG1XA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com (2603:10b6:303:9b::16)
- by CH0PR11MB5492.namprd11.prod.outlook.com (2603:10b6:610:d7::21) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Wed, 5 Jul
- 2023 17:34:04 +0000
-Received: from CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4e5a:e4d6:5676:b0ab]) by CO1PR11MB5089.namprd11.prod.outlook.com
- ([fe80::4e5a:e4d6:5676:b0ab%5]) with mapi id 15.20.6565.016; Wed, 5 Jul 2023
- 17:34:04 +0000
-Message-ID: <c9802967-abb9-6c12-0b78-c9bcb4fb56e8@intel.com>
-Date: Wed, 5 Jul 2023 10:34:03 -0700
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH net v3] nfp: clean mc addresses in application firmware
- when closing port
-Content-Language: en-US
-To: Louis Peens <louis.peens@corigine.com>, David Miller
-	<davem@davemloft.net>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni
-	<pabeni@redhat.com>
-CC: Simon Horman <simon.horman@corigine.com>, Yinjun Zhang
-	<yinjun.zhang@corigine.com>, <netdev@vger.kernel.org>,
-	<stable@vger.kernel.org>, <oss-drivers@corigine.com>
-References: <20230705052818.7122-1-louis.peens@corigine.com>
-From: Jacob Keller <jacob.e.keller@intel.com>
-In-Reply-To: <20230705052818.7122-1-louis.peens@corigine.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: MW4PR04CA0082.namprd04.prod.outlook.com
- (2603:10b6:303:6b::27) To CO1PR11MB5089.namprd11.prod.outlook.com
- (2603:10b6:303:9b::16)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC1F1134CC
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:36:07 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 04DE91BEB;
+	Wed,  5 Jul 2023 10:35:41 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365FaBp3003086;
+	Wed, 5 Jul 2023 19:35:16 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=shpntqm9Lb88tQ8tlCGuG2FwYoCeA99QpOjJ1mJ95MI=;
+ b=B9NUeEVnBg8MdHStPnL4TOmJhyuqDrSpAiTXxO/nPPpzy04upCGkWFZloothm1IsdlaP
+ X2dM2UcrLRYot6pDInpUaDfpMw4tRdOgSMjIIUt05sxIHPJTt05NtgJdfiSkjWYJGqQo
+ 5Qf6gvHVZoCkeCGLEsdD07XE10xUn4T3IucwxfOuRptLSABHo82p+XsFpOmpXmiiGV0P
+ XYKMcsbwul2uScBGSCEWMtTWo929/YaPT+Wh3TxrAMZmjHQzF56NlcYYWFxkdKCpyT5u
+ NiyW4MLstguYxELgKwv13IwhUcKcDJWT1p8IlKqjWxQyak83KOQne1tFXm8DXME2V55K Uw== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rn8c9t3jy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Wed, 05 Jul 2023 19:35:16 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 2E6D9100057;
+	Wed,  5 Jul 2023 19:35:15 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 2427D24C451;
+	Wed,  5 Jul 2023 19:35:15 +0200 (CEST)
+Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Wed, 5 Jul
+ 2023 19:35:12 +0200
+Message-ID: <f8c6e86d-af6a-b61f-c642-c23cb3cfb015@foss.st.com>
+Date: Wed, 5 Jul 2023 19:35:07 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: CO1PR11MB5089:EE_|CH0PR11MB5492:EE_
-X-MS-Office365-Filtering-Correlation-Id: e4a8eee2-e7a4-460b-0ad3-08db7d7e075b
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: zYffngGn3CjJFCR0gX4DJ24MLzJNAgtEqI9aoklnY6g1uxfpJnFxqEcoe7nfSl1PzToKIalI7b7RXX4ZcsJvTEXiaTvb+69urd32k2Q8sHVJojxuhM5TrtwDPtiJCAUnSNZBQrSQLl+SfgTKjM6r3h4ED3gOIF6hyuOQ65ZK5NEitdyCv9uF5zuKAiy3oKuUNW8ArI3q8dkVtnALDKeNlD9BUmO/Wxa8dUYBtlxfLClZsOT6/HT4eQDKXFA6OjGAwiVqo9XMjd5JuByW7HBZ+/b9sCJexr9onS4hsmf3F9gYVXOCCq82yYjOqaIC2vAgHQ0fXRu3wogE8PKZHLLd7m9to5jTiNaHo8l/XJT4Rh1lERxn1k5ThBAG0b1H7ZBDBNLYG2rGmnqYXHRwKtsmQ27BzEnX3HCHN+AocH4AkNN/yqjbNxJnSpW5E4IKScS3FUysIKRUy7wMeZjB26r/4RZhn0voLFYdLoVBCSnN2dfojdPZfUBu2XxUEqnQ4Qd2IUZvE1ElUqCfm5C2OuzIHipOYBIW00Dfl5VAYCB6ZpPZ9oDYVPLZV+Q8PthP3pEqWgpgsd2OHmwCn+VbY6eNVDhRgkla5i10Tez6j7hU4QgldcYRt3N60uCjhZUQb4GCdyAcr2OuGUiR3R1c/SpMZA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:CO1PR11MB5089.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(39860400002)(396003)(376002)(346002)(136003)(366004)(451199021)(186003)(82960400001)(478600001)(6512007)(26005)(6506007)(53546011)(31686004)(86362001)(2616005)(110136005)(316002)(83380400001)(54906003)(38100700002)(6486002)(66556008)(4326008)(66946007)(66476007)(5660300002)(8676002)(8936002)(41300700001)(2906002)(31696002)(36756003)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ak1LclN2UEtiWUd5b1BYLzBFeUZLZFgwYW1EL2VyK0VtaXRFa29WSnl6WHNZ?=
- =?utf-8?B?dmZGd3I5TUFJWXNQTWIxQndDMjQ0UitkT0NGTzJldmV5bDFCRU1mTzR5TjFS?=
- =?utf-8?B?cXlEVXhrOGs3a3BqM1NrV2xlakkrRjBlby95aCttQ3F3SWNCYXNybFY2V1Bv?=
- =?utf-8?B?TDhLdWVQZnBtYUpuQ3lsb0tqWGYyeWtzTHdlaUlQMHJjKy9rV0tBbmJUR1lU?=
- =?utf-8?B?WDNvMjdqOGdwVlpMTkw2czlQL2pGTUtiWTAvNmxpM3N6b1Ntc2Z2YUVGYW1W?=
- =?utf-8?B?ZHZiL25kNDc2NmZOclZlN2RtanlJQzlDeFZkMi82TXB5eWtVSG0vN0E1Mlli?=
- =?utf-8?B?VzB6NGlGVWVGVHdLSWdYUE5NNkxPV2pxc3IvYW1RRFI4UEtJZEczRGMyVkdI?=
- =?utf-8?B?ekozU1R1aWdWV1gzQVpyVUIyVExJQU9hRTd2SEcyaGczRU42L3Y0b0h5ZFg2?=
- =?utf-8?B?L2t0VVM2RXo3d2d4L2xiN3lwZWorSW5zWGg4YnpiRkZ2MTlrM1g4VFdYRXRH?=
- =?utf-8?B?QUk1cTV2Nm1wYUVRcC84UitKNmEzSGE5UDB3Mjk3czFqVE1HOUR0WmpJU3FP?=
- =?utf-8?B?VjExYnNJZEZsVFhmcnRpWFlkc3hVMGhoelJSbVFxb1JCQkVqT1lvZjZkWkND?=
- =?utf-8?B?bE9CRG53VUI1QnN2QktoUjdtaUcwTUgrbW1Ha2xlU0tUVXl1OGJtb3UvU0NX?=
- =?utf-8?B?bDlpS2IvWTFZeVNoNlphQU44NHRLa2hUWW85Zk5iUWx3RnU1TkRtb0Y2ZlBL?=
- =?utf-8?B?cmtZbjZRUXUzcWo2LzQxZ3V6b1RxREZMdmJiZ1d0SXBXSFQ3RHZjUFZFSldv?=
- =?utf-8?B?Rnp3enpybjlyZjRjZXdaLzh0ak1pSDFYWEpHQlFXNVlEU1I1WEpMSzBoU1o4?=
- =?utf-8?B?UXFGZ2lBbnhxMTJseWFuRWU0YmNyREROVUx3QmtnNld1MlpFaWJFRitLSG9Z?=
- =?utf-8?B?SEpOcWg3OFdONXA4YjIzaHZhYlFPM3k4WUtlSUN1Z01MNDdBbm0rcjRkSmVQ?=
- =?utf-8?B?WWptaHhrc1pveWxrSm50RmV5UUp2cUVGcWxIb1pFQ0doTjRhSXZpUXRrek1p?=
- =?utf-8?B?OHlPbEJ5SmUzM1JnTjkvdHQ4WFBRK1h1a1hKanE0OHhpaElscm52VEFwQ0kw?=
- =?utf-8?B?cDFPblhmQldPK2h3bnVzYlp1UzZUc21RaytNS000MGdQTUlKcy8rUWlpaTUr?=
- =?utf-8?B?UjFvSmlJSU9QSjFSRTdIR01ENVVYQ0l6cFFFenAwQmtydW1QSzh5enNYQXRL?=
- =?utf-8?B?M3NDSGswNkp2bWZHclNWWHo4UXJVbWg5RHVQTUN2SlJ5c29oaHlJQmc4bVNy?=
- =?utf-8?B?MXJuOVd3cmMwUmcrNGZKNGVTMDkrQWNJbjVYOEJLVFNQNEU1RGFwS1VUNXRF?=
- =?utf-8?B?dUFTVzJrZDRGSndMdUJBN3RTT3A0YTZ1VExRQm1iVjdZdERpbzRzTXR0YjBX?=
- =?utf-8?B?MndWMSszN21lNDRhanNwODNPaVR6M2k2WVE4WDQ2azQwTGlqSzgyUG1BVVpO?=
- =?utf-8?B?Qy90cGxVdnNOK29Cb2hIZ1dRTDBodDNqWjAweGNPcENxcllmeDRMYnNpVTgx?=
- =?utf-8?B?dmxXakk2YUFzeS9ydkFTYTZQUzJtS2g0NnU0TXh4S3AxRXk0VGtMRXlOUDc0?=
- =?utf-8?B?cW9Nd2VoT05uczU4cjJjN2xIRU1EcHUwVUVVWmVZN0VJZzI2MHBaSFF4N1NM?=
- =?utf-8?B?clZhYXg5SytuMWZjMmozUFg5STlKWVlTQ1pPbDhJL2FKaXhzL2lZWWtUTFZE?=
- =?utf-8?B?eXUwK1NWbld5c1IvRHZSM1pmSGY1Ykl6VjN2dnlOR2d3aVE3RnJONG82L0g1?=
- =?utf-8?B?bWZLdDJjWGRmOWQ0S2pob3Y0S2RIcjBSZUlWL09POGEvYVlDaytiN1JLYXJu?=
- =?utf-8?B?dTB5NDFZMlFHbEhsb1NYY0c5RWh2cXZWaGJKbHIyNG5CTmIzOWw5TWttejVo?=
- =?utf-8?B?ZzMxTkw5Z3ZBYk1hVTY4eGZzV1hyUU84dzRTUnh0VWVjZzBGR1p2Z2xSSDdj?=
- =?utf-8?B?cFZJUXk1RkRld2IwNk5ybmE3QUZ2VnNoZ1NnLzNiblRDVjBZeFdnRXRlT3la?=
- =?utf-8?B?bnVWSC9DOHcwTWwyRnZNWmkwc2lhWHR3Y0lhMlJ5dVV0TVI0NHBmaFRVdVZX?=
- =?utf-8?B?YlhXRUpodEdSQTlPcWRaSnh5SjNkWHpYemhLUnlwdkJOUko3MytoVVFiR1Fv?=
- =?utf-8?B?M3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: e4a8eee2-e7a4-460b-0ad3-08db7d7e075b
-X-MS-Exchange-CrossTenant-AuthSource: CO1PR11MB5089.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 17:34:04.7873
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: P9FcsUHkcnGotpddI87YcTOfFBO6FDkfR+5cdGqYYCsJTT4U9lpRri7fPE+3dXGUY77H/7mAwLs3WwJbJKhWbS1iblAuf6IWaVtkZZ93n/0=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5492
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH v3 0/6] Introduce STM32 system bus
+Content-Language: en-US
+To: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <ulf.hansson@linaro.org>, <edumazet@google.com>, <kuba@kernel.org>,
+        <pabeni@redhat.com>
+CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>
+References: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20230127164040.1047583-1-gatien.chevallier@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.121]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-05_09,2023-07-05_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hello all,
 
+I'm abandoning this series for:
+https://lore.kernel.org/lkml/20230705172759.1610753
 
-On 7/4/2023 10:28 PM, Louis Peens wrote:
-> From: Yinjun Zhang <yinjun.zhang@corigine.com>
-> 
-> When moving devices from one namespace to another, mc addresses are
-> cleaned in software while not removed from application firmware. Thus
-> the mc addresses are remained and will cause resource leak.
-> 
-> Now use `__dev_mc_unsync` to clean mc addresses when closing port.
-> 
-> Fixes: e20aa071cd95 ("nfp: fix schedule in atomic context when sync mc address")
-> Cc: stable@vger.kernel.org
-> Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
-> Acked-by: Simon Horman <simon.horman@corigine.com>
-> Signed-off-by: Louis Peens <louis.peens@corigine.com>
-> ---
+Sorry for the noise.
 
-Ah, you already posted the v3 version. This looks good to me. Given that
-this fixes not only the remove issue but also issues with assigning the
-interface to a namespace, this makes even more sense than the previous
-explanation.
+Best regards,
+Gatien
 
-Reviewed-by: Jacob Keller <jacob.e.keller@intel.com>
-
-> Changes since v2:
-> * Use function prototype to avoid moving code chunk.
+On 1/27/23 17:40, Gatien Chevallier wrote:
+> Document STM32 System Bus. This bus is intended to control firewall
+> access for the peripherals connected to it.
 > 
-> Changes since v1:
+> For every peripheral, the bus checks the firewall registers to see
+> if the peripheral is configured as non-secure. If the peripheral
+> is configured as secure, the node is marked populated, so the
+> device won't be probed.
 > 
-> * Use __dev_mc_unsyc to clean mc addresses instead of tracking mc addresses by
->   driver itself.
-> * Clean mc addresses when closing port instead of driver exits,
->   so that the issue of moving devices between namespaces can be fixed.
-> * Modify commit message accordingly.
+> This is useful as a firewall configuration sanity check and avoid
+> platform crashes in case peripherals are incorrectly configured.
 > 
->  drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 +++++
->  1 file changed, 5 insertions(+)
+> The STM32 System Bus implements the feature-domain-controller
+> bindings. It is used by peripherals to reference a domain
+> controller, in this case the firewall feature domain.
+> The bus uses the ID referenced by the feature-domains property to
+> know where to look in the firewall to get the security configuration
+> for the peripheral. This allows a device tree description rather
+> than a hardcoded peripheral table in the bus driver.
 > 
-> diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-> index 49f2f081ebb5..6b1fb5708434 100644
-> --- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-> +++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-> @@ -53,6 +53,8 @@
->  #include "crypto/crypto.h"
->  #include "crypto/fw.h"
->  
-> +static int nfp_net_mc_unsync(struct net_device *netdev, const unsigned char *addr);
-> +
->  /**
->   * nfp_net_get_fw_version() - Read and parse the FW version
->   * @fw_ver:	Output fw_version structure to read to
-> @@ -1084,6 +1086,9 @@ static int nfp_net_netdev_close(struct net_device *netdev)
->  
->  	/* Step 2: Tell NFP
->  	 */
-> +	if (nn->cap_w1 & NFP_NET_CFG_CTRL_MCAST_FILTER)
-> +		__dev_mc_unsync(netdev, nfp_net_mc_unsync);
-> +
->  	nfp_net_clear_config_and_disable(nn);
->  	nfp_port_configure(netdev, false);
->  
+> On STM32MP13/15 platforms, the firewall bus is represented by the
+> ETZPC node, which is responsible for the securing / MCU isolating
+> the capable peripherals.
+> 
+> STM32MP13/15 device trees are updated in this series to implement
+> the bus. All peripherals that are securable or MCU isolation capable
+> by the ETZPC are connected to the bus.
+> 
+> Changes in V2:
+> 	- Corrected YAMLS errors highlighted by Rob's robot
+> 	- Re-ordered Signed-off-by tags in two patches
+> 
+> Changes in V3:
+> 	- Document feature-domains property in YAML documentation for
+> 	concerned periperals under the System Bus
+> 	- Fix STM32 System Bus YAML documentation
+> 	- Remove STM32 System bus bindings that were currently used
+> 	as helpers for device tree
+> 	- Correct few errors in driver
+> 	- Add missing peripherals under the System Bus that were in
+> 	SoC variation device tree files
+> 	- Fix node names
+> 
+> Gatien Chevallier (5):
+>    dt-bindings: treewide: add feature-domains description in binding
+>      files
+>    dt-bindings: bus: add STM32 System Bus
+>    bus: stm32_sys_bus: add support for STM32MP15 and STM32MP13 system bus
+>    ARM: dts: stm32: add ETZPC as a system bus for STM32MP15x boards
+>    ARM: dts: stm32: add ETZPC as a system bus for STM32MP13x boards
+> 
+> Oleksii Moisieiev (1):
+>    dt-bindings: Document common device controller bindings
+> 
+>   .../devicetree/bindings/bus/st,sys-bus.yaml   |  127 +
+>   .../bindings/crypto/st,stm32-hash.yaml        |    5 +
+>   .../devicetree/bindings/dma/st,stm32-dma.yaml |    5 +
+>   .../bindings/dma/st,stm32-dmamux.yaml         |    5 +
+>   .../feature-domain-controller.yaml            |   84 +
+>   .../devicetree/bindings/i2c/st,stm32-i2c.yaml |    5 +
+>   .../bindings/iio/adc/st,stm32-adc.yaml        |    5 +
+>   .../bindings/iio/adc/st,stm32-dfsdm-adc.yaml  |    5 +
+>   .../bindings/iio/dac/st,stm32-dac.yaml        |    5 +
+>   .../bindings/media/st,stm32-cec.yaml          |    5 +
+>   .../bindings/media/st,stm32-dcmi.yaml         |    5 +
+>   .../memory-controllers/st,stm32-fmc2-ebi.yaml |    5 +
+>   .../bindings/mfd/st,stm32-lptimer.yaml        |    5 +
+>   .../bindings/mfd/st,stm32-timers.yaml         |    6 +
+>   .../devicetree/bindings/mmc/arm,pl18x.yaml    |    5 +
+>   .../devicetree/bindings/net/stm32-dwmac.yaml  |    5 +
+>   .../bindings/phy/phy-stm32-usbphyc.yaml       |    5 +
+>   .../bindings/regulator/st,stm32-vrefbuf.yaml  |    5 +
+>   .../devicetree/bindings/rng/st,stm32-rng.yaml |    5 +
+>   .../bindings/serial/st,stm32-uart.yaml        |    5 +
+>   .../bindings/sound/st,stm32-i2s.yaml          |    5 +
+>   .../bindings/sound/st,stm32-sai.yaml          |    5 +
+>   .../bindings/sound/st,stm32-spdifrx.yaml      |    5 +
+>   .../bindings/spi/st,stm32-qspi.yaml           |    5 +
+>   .../devicetree/bindings/spi/st,stm32-spi.yaml |    5 +
+>   .../devicetree/bindings/usb/dwc2.yaml         |    5 +
+>   MAINTAINERS                                   |    6 +
+>   arch/arm/boot/dts/stm32mp131.dtsi             |  407 +--
+>   arch/arm/boot/dts/stm32mp133.dtsi             |   51 +-
+>   arch/arm/boot/dts/stm32mp13xc.dtsi            |   19 +-
+>   arch/arm/boot/dts/stm32mp13xf.dtsi            |   18 +-
+>   arch/arm/boot/dts/stm32mp151.dtsi             | 2722 +++++++++--------
+>   arch/arm/boot/dts/stm32mp153.dtsi             |   52 +-
+>   arch/arm/boot/dts/stm32mp15xc.dtsi            |   19 +-
+>   drivers/bus/Kconfig                           |    9 +
+>   drivers/bus/Makefile                          |    1 +
+>   drivers/bus/stm32_sys_bus.c                   |  168 +
+>   37 files changed, 2208 insertions(+), 1596 deletions(-)
+>   create mode 100644 Documentation/devicetree/bindings/bus/st,sys-bus.yaml
+>   create mode 100644 Documentation/devicetree/bindings/feature-controllers/feature-domain-controller.yaml
+>   create mode 100644 drivers/bus/stm32_sys_bus.c
+> 
 
