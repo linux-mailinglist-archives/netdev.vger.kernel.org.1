@@ -1,172 +1,176 @@
-Return-Path: <netdev+bounces-15525-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15527-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id AAB89748394
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:57:09 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6573C7483F4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 14:14:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D52EA280DED
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 11:57:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3D328280FA8
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 12:14:16 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E2086FCD;
-	Wed,  5 Jul 2023 11:57:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A54586FD8;
+	Wed,  5 Jul 2023 12:14:14 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12D766FB3
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 11:57:05 +0000 (UTC)
-Received: from mail-vk1-xa30.google.com (mail-vk1-xa30.google.com [IPv6:2607:f8b0:4864:20::a30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59C441723;
-	Wed,  5 Jul 2023 04:57:00 -0700 (PDT)
-Received: by mail-vk1-xa30.google.com with SMTP id 71dfb90a1353d-47e25709402so1453090e0c.0;
-        Wed, 05 Jul 2023 04:57:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688558219; x=1691150219;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=SYzFOXrpHjMbau6LdBUr//Enq3hi9M8IF1iSIElak94=;
-        b=g6COHjjX6H1jp8F3+hb7jSPsaJqivsIH24rJGOJVcEtbKhzNF5ISzY8ii3ouLDdwcP
-         YlKNvcDTJHCk49YdLyZcOxvHeeP1GYrPIXXrzQSzOqPCWEllvjfGlhZ1eK/7+j1hTBLW
-         eAOtb8dY6Lv70Z4+i6oaKkkTLheyO0o2pBUemkz9wq/RBZ6FSL/l7TjLLYcSnfId9ebn
-         yAHVH3t1kYwr/2R1FfLOO5ZNsKP4yonuPzzw5D6Dybr1CeP5QpPpY6m9zac/uLpWBq7W
-         lDihrjhQ8hF/Qd9ro0sv26veYR8HAuvbB9gk9I+3vX8BuZZmGA4464B3fwy2NXEIK4AU
-         PzCA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688558219; x=1691150219;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=SYzFOXrpHjMbau6LdBUr//Enq3hi9M8IF1iSIElak94=;
-        b=MisjJZYCb66BMiLxeNKsZOedgB7dUmO6qox/37JBIEFyVcXC5H2JyZK80wMLvgaVzi
-         GPRa9DUCut3VRhnXYFHxUSR9UKlX8BeV15OvFUTkPnolpnfEzrOUpUtxQXSdAE+CIi1d
-         k4zvzxfJ+gOe+o9/mcRYn8UJBcCDf7gXaRWdRHXMdsd5nYsaz3MLP5CqbiICY7CiGFTk
-         yuUso9ihSzMOgUfNUU1TbdN2hBhj0EuWsA2gASCgTM+W/fGYGoNcqKSQCyr39bWvBHbV
-         IFdqlvvD850fwOnYqGdbuUuu+IqL7oybfRsctROn10/sTE8WsXBZPv2gIDx4LB8JNhTd
-         yrow==
-X-Gm-Message-State: ABy/qLa2JphGAgRFzoI8KoyFhqwB7otNoypU72tHdr2ZE9BBEPE7OTnm
-	YruDwa2oZo1mJwRb42g/mVsWz5AV+1KL1EA0V289nu48HaTWZb8q
-X-Google-Smtp-Source: APBJJlFFhOiBBRrEk3tyW0G/UO66q38pjXFSGKhoVHIsv25St86l3kpyWAQnFh8VA2c8QwfNLNINF3KnHnHTkCORxnE=
-X-Received: by 2002:a1f:4ec6:0:b0:47e:3f56:e91e with SMTP id
- c189-20020a1f4ec6000000b0047e3f56e91emr3134115vkb.15.1688558219280; Wed, 05
- Jul 2023 04:56:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953635231
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 12:14:14 +0000 (UTC)
+Received: from smtp-relay-canonical-0.canonical.com (smtp-relay-canonical-0.canonical.com [185.125.188.120])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E44F1BDF;
+	Wed,  5 Jul 2023 05:13:54 -0700 (PDT)
+Received: from localhost.localdomain (1.general.cascardo.us.vpn [10.172.70.58])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange X25519 server-signature RSA-PSS (2048 bits) server-digest SHA256)
+	(No client certificate requested)
+	by smtp-relay-canonical-0.canonical.com (Postfix) with ESMTPSA id 122AE41495;
+	Wed,  5 Jul 2023 12:13:49 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=canonical.com;
+	s=20210705; t=1688559231;
+	bh=8mO+gHO62oR5Y3zx2yeUDLrgxlGAkZdbGA7wp8GIV6M=;
+	h=From:To:Cc:Subject:Date:Message-Id:MIME-Version;
+	b=ZalshJJ2VINs221Ao6wSsOBLvK2rqlyuu0dLoEZEFVE4cAcbgAsrj1NEkolJHrd0j
+	 gFZS+ejig3wrv5UKd0gSzD5+iC5XlgY/1xOF/EQq/J479mmnqkACzUVjWlRW7XXuYO
+	 853IbXDvEkVKW7ex6u7DxPEBPO/hGmviWcYJfHWChUeFR66tRWhpY1tZlC/P8aZqSI
+	 FRAhj67iMsATEY8rEJsz1sYjRd/bqELzRvbOIzsIuQipM+hofFZve4UWd55v57Dq7T
+	 UY/N3Hjet3E71Ry/uPx/p3XwTSA3KZKnkG8ki+916WMDsJLB+43dYozqvcHj2H172x
+	 y6iJJZPrZQCpw==
+From: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+To: netfilter-devel@vger.kernel.org
+Cc: cascardo@canonical.com,
+	netdev@vger.kernel.org,
+	Pablo Neira Ayuso <pablo@netfilter.org>
+Subject: [PATCH] netfilter: nf_tables: do not ignore genmask when looking up chain by id
+Date: Wed,  5 Jul 2023 09:12:55 -0300
+Message-Id: <20230705121255.746628-1-cascardo@canonical.com>
+X-Mailer: git-send-email 2.34.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230429020951.082353595@lindbergh.monkeyblade.net>
- <CAAJw_ZueYAHQtM++4259TXcxQ_btcRQKiX93u85WEs2b2p19wA@mail.gmail.com>
- <ZE0kndhsXNBIb1g7@debian.me> <b9ab37d2-42bf-cc31-a2c0-a9b604e95530@gmail.com>
- <CAAJw_Zug6VCS5ZqTWaFSr9sd85k=tyPm9DEE+mV=AKoECZM+sQ@mail.gmail.com> <7fee3284-b9ba-58f4-8118-fe0b99ae6bf7@leemhuis.info>
-In-Reply-To: <7fee3284-b9ba-58f4-8118-fe0b99ae6bf7@leemhuis.info>
-From: Jeff Chua <jeff.chua.linux@gmail.com>
-Date: Wed, 5 Jul 2023 19:56:48 +0800
-Message-ID: <CAAJw_Zu=MPtGPARgCB2fteP+7F793YDFXE9RuzSH8EqYBS-OOw@mail.gmail.com>
-Subject: Re: Linux-6.5 iwlwifi crash
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: lkml <linux-kernel@vger.kernel.org>, 
-	Gregory Greenman <gregory.greenman@intel.com>, Kalle Valo <kvalo@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
-	Linux Wireless <linux-wireless@vger.kernel.org>, Linux Networking <netdev@vger.kernel.org>, 
-	Bagas Sanjaya <bagasdotme@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 5, 2023 at 4:37=E2=80=AFPM Linux regression tracking (Thorsten
-Leemhuis) <regressions@leemhuis.info> wrote:
->
-> Hi! Thanks for your report.
->
-> Side note: is there any relation to the thread[1] you posted this in?
+When adding a rule to a chain referring to its ID, if that chain had been
+deleted on the same batch, the rule might end up referring to a deleted
+chain.
 
-Sorry, I was just posting to the same email list that I had reported
-about a different wifi list earlier. No relation to this, but it's a
-new wifi issue.
+This will lead to a WARNING like following:
 
-> Doesn't look like it from here.
->
-> Side note: discussing multiple unrelated issues in one thread increases
-> the risk a lot that some or all of them are ignored:
-> https://linux-regtracking.leemhuis.info/post/frequent-reasons-why-linux-k=
-ernel-bug-reports-are-ignored/
->
-> [1] https://lore.kernel.org/all/ZE0kndhsXNBIb1g7@debian.me/
->
-> On 05.07.23 09:24, Jeff Chua wrote:
-> > Latest linux-6.4
->
-> What do you mean by that? From later in the mail it sounds like you mean
-> latest mainline -- is that correct?
+[   33.098431] ------------[ cut here ]------------
+[   33.098678] WARNING: CPU: 5 PID: 69 at net/netfilter/nf_tables_api.c:2037 nf_tables_chain_destroy+0x23d/0x260
+[   33.099217] Modules linked in:
+[   33.099388] CPU: 5 PID: 69 Comm: kworker/5:1 Not tainted 6.4.0+ #409
+[   33.099726] Workqueue: events nf_tables_trans_destroy_work
+[   33.100018] RIP: 0010:nf_tables_chain_destroy+0x23d/0x260
+[   33.100306] Code: 8b 7c 24 68 e8 64 9c ed fe 4c 89 e7 e8 5c 9c ed fe 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 89 c6 89 c7 c3 cc cc cc cc <0f> 0b 48 83 c4 08 5b 41 5c 41 5d 41 5e 41 5f 5d 31 c0 89 c6 89 c7
+[   33.101271] RSP: 0018:ffffc900004ffc48 EFLAGS: 00010202
+[   33.101546] RAX: 0000000000000001 RBX: ffff888006fc0a28 RCX: 0000000000000000
+[   33.101920] RDX: 0000000000000000 RSI: 0000000000000000 RDI: 0000000000000000
+[   33.102649] RBP: ffffc900004ffc78 R08: 0000000000000000 R09: 0000000000000000
+[   33.103018] R10: 0000000000000000 R11: 0000000000000000 R12: ffff8880135ef500
+[   33.103385] R13: 0000000000000000 R14: dead000000000122 R15: ffff888006fc0a10
+[   33.103762] FS:  0000000000000000(0000) GS:ffff888024c80000(0000) knlGS:0000000000000000
+[   33.104184] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[   33.104493] CR2: 00007fe863b56a50 CR3: 00000000124b0001 CR4: 0000000000770ee0
+[   33.104872] PKRU: 55555554
+[   33.104999] Call Trace:
+[   33.105113]  <TASK>
+[   33.105214]  ? show_regs+0x72/0x90
+[   33.105371]  ? __warn+0xa5/0x210
+[   33.105520]  ? nf_tables_chain_destroy+0x23d/0x260
+[   33.105732]  ? report_bug+0x1f2/0x200
+[   33.105902]  ? handle_bug+0x46/0x90
+[   33.106546]  ? exc_invalid_op+0x19/0x50
+[   33.106762]  ? asm_exc_invalid_op+0x1b/0x20
+[   33.106995]  ? nf_tables_chain_destroy+0x23d/0x260
+[   33.107249]  ? nf_tables_chain_destroy+0x30/0x260
+[   33.107506]  nf_tables_trans_destroy_work+0x669/0x680
+[   33.107782]  ? mark_held_locks+0x28/0xa0
+[   33.107996]  ? __pfx_nf_tables_trans_destroy_work+0x10/0x10
+[   33.108294]  ? _raw_spin_unlock_irq+0x28/0x70
+[   33.108538]  process_one_work+0x68c/0xb70
+[   33.108755]  ? lock_acquire+0x17f/0x420
+[   33.108977]  ? __pfx_process_one_work+0x10/0x10
+[   33.109218]  ? do_raw_spin_lock+0x128/0x1d0
+[   33.109435]  ? _raw_spin_lock_irq+0x71/0x80
+[   33.109634]  worker_thread+0x2bd/0x700
+[   33.109817]  ? __pfx_worker_thread+0x10/0x10
+[   33.110254]  kthread+0x18b/0x1d0
+[   33.110410]  ? __pfx_kthread+0x10/0x10
+[   33.110581]  ret_from_fork+0x29/0x50
+[   33.110757]  </TASK>
+[   33.110866] irq event stamp: 1651
+[   33.111017] hardirqs last  enabled at (1659): [<ffffffffa206a209>] __up_console_sem+0x79/0xa0
+[   33.111379] hardirqs last disabled at (1666): [<ffffffffa206a1ee>] __up_console_sem+0x5e/0xa0
+[   33.111740] softirqs last  enabled at (1616): [<ffffffffa1f5d40e>] __irq_exit_rcu+0x9e/0xe0
+[   33.112094] softirqs last disabled at (1367): [<ffffffffa1f5d40e>] __irq_exit_rcu+0x9e/0xe0
+[   33.112453] ---[ end trace 0000000000000000 ]---
 
-It's from linux git pull. It's 6.5-rc but I didn't write that way
-becuase Linus's branch is still 6.4 ... that 6.5-rc0 or rc1 should
-have more appropriate.
+This is due to the nft_chain_lookup_byid ignoring the genmask. After this
+change, adding the new rule will fail as it will not find the chain.
 
-> > after June 27 crash my whole linux notebook once
-> > iwlwifi is loaded. Anyone seeing this?
->
-> I haven't heard of any such problems, but that doesn't have to mean much.
+Fixes: 837830a4b439 ("netfilter: nf_tables: add NFTA_RULE_CHAIN_ID attribute")
+Cc: stable@vger.kernel.org
+Reported-by: Mingi Cho of Theori working with ZDI
+Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
+---
+ net/netfilter/nf_tables_api.c | 11 +++++++----
+ 1 file changed, 7 insertions(+), 4 deletions(-)
 
-> > Bisect? Or there's a patch for this?
-> >
-> > # modprobe iwlwifi
-> > ... Whole system frozen!
-> >
-> >
-> > Here's my system before the crash ...
-> >
-> > # dmesg
-> > cfg80211: Loading compiled-in X.509 certificates for regulatory databas=
-e
-> > Loaded X.509 cert 'sforshee: 00b28ddf47aef9cea7'
-> > iwlwifi 0000:00:14.3: enabling device (0000 -> 0002)
-> > iwlwifi 0000:00:14.3: api flags index 2 larger than supported by driver
-> > thermal thermal_zone1: failed to read out thermal zone (-61)
-> > iwlwifi 0000:00:14.3: Sorry - debug buffer is only 4096K while you
-> > requested 65536K
-> >
-> > # lspci
-> > 00:14.3 Network controller: Intel Corporation Alder Lake-P PCH CNVi
-> > WiFi (rev 01)
-> >
-> > # linux git log
-> > commit d528014517f2b0531862c02865b9d4c908019dc4 (HEAD -> master,
-> > origin/master, origin/HEAD)
-> > Author: Linus Torvalds <torvalds@linux-foundation.org>
-> > Date:   Tue Jul 4 15:05:12 2023 -0700
-> >
-> > # lsmodModule                  Size  Used by
-> > iwlmvm                397312  0
-> > mac80211              626688  1 iwlmvm
-> > iwlwifi               307200  1 iwlmvm
-> > cfg80211              413696  3 iwlmvm,iwlwifi,mac80211
-> >
-> >
-> > Bisect?
->
-> If none of the others CCed comes up with an idea within the next few
-> hours then yes please!
+diff --git a/net/netfilter/nf_tables_api.c b/net/netfilter/nf_tables_api.c
+index 9573a8fcad79..3701493e5401 100644
+--- a/net/netfilter/nf_tables_api.c
++++ b/net/netfilter/nf_tables_api.c
+@@ -2694,7 +2694,7 @@ static int nf_tables_updchain(struct nft_ctx *ctx, u8 genmask, u8 policy,
+ 
+ static struct nft_chain *nft_chain_lookup_byid(const struct net *net,
+ 					       const struct nft_table *table,
+-					       const struct nlattr *nla)
++					       const struct nlattr *nla, u8 genmask)
+ {
+ 	struct nftables_pernet *nft_net = nft_pernet(net);
+ 	u32 id = ntohl(nla_get_be32(nla));
+@@ -2705,7 +2705,8 @@ static struct nft_chain *nft_chain_lookup_byid(const struct net *net,
+ 
+ 		if (trans->msg_type == NFT_MSG_NEWCHAIN &&
+ 		    chain->table == table &&
+-		    id == nft_trans_chain_id(trans))
++		    id == nft_trans_chain_id(trans) &&
++		    nft_active_genmask(chain, genmask))
+ 			return chain;
+ 	}
+ 	return ERR_PTR(-ENOENT);
+@@ -3809,7 +3810,8 @@ static int nf_tables_newrule(struct sk_buff *skb, const struct nfnl_info *info,
+ 			return -EOPNOTSUPP;
+ 
+ 	} else if (nla[NFTA_RULE_CHAIN_ID]) {
+-		chain = nft_chain_lookup_byid(net, table, nla[NFTA_RULE_CHAIN_ID]);
++		chain = nft_chain_lookup_byid(net, table, nla[NFTA_RULE_CHAIN_ID],
++					      genmask);
+ 		if (IS_ERR(chain)) {
+ 			NL_SET_BAD_ATTR(extack, nla[NFTA_RULE_CHAIN_ID]);
+ 			return PTR_ERR(chain);
+@@ -10502,7 +10504,8 @@ static int nft_verdict_init(const struct nft_ctx *ctx, struct nft_data *data,
+ 						 genmask);
+ 		} else if (tb[NFTA_VERDICT_CHAIN_ID]) {
+ 			chain = nft_chain_lookup_byid(ctx->net, ctx->table,
+-						      tb[NFTA_VERDICT_CHAIN_ID]);
++						      tb[NFTA_VERDICT_CHAIN_ID],
++						      genmask);
+ 			if (IS_ERR(chain))
+ 				return PTR_ERR(chain);
+ 		} else {
+-- 
+2.34.1
 
-I will wait for a day, then bisect.
-
-Thank you!
-
-
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
 
