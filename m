@@ -1,173 +1,141 @@
-Return-Path: <netdev+bounces-15576-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15577-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 340E374898E
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 18:54:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F39987489D4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:06:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D6EFF28101C
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 16:54:32 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB0CF1C20B8B
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 17:06:27 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCA2E11CAE;
-	Wed,  5 Jul 2023 16:54:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B1C43125AE;
+	Wed,  5 Jul 2023 17:06:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C059E2C80;
-	Wed,  5 Jul 2023 16:54:28 +0000 (UTC)
-Received: from www62.your-server.de (www62.your-server.de [213.133.104.62])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F33DA10C3;
-	Wed,  5 Jul 2023 09:54:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
-	d=iogearbox.net; s=default2302; h=Content-Transfer-Encoding:Content-Type:
-	In-Reply-To:MIME-Version:Date:Message-ID:From:References:Cc:To:Subject:Sender
-	:Reply-To:Content-ID:Content-Description:Resent-Date:Resent-From:
-	Resent-Sender:Resent-To:Resent-Cc:Resent-Message-ID;
-	bh=NaF5ODUhgDcBSbTY5pdKmE/ptdlDITp5mTjsd0ABD2E=; b=OG0Q8LZi7U5ttEb1YIf7uOywzf
-	I+QYRZjLDRvAUSAGp1UxIbnTRn9N7wxtxArmSkuF0+0yTz5fjN1LdpiqgI7p2JaE/WdcScjGxYI4c
-	Fs3tozpzqVPlIjqJLLoSo1gtSWaV1Z4RIi3A3gr9mKjSgwcanoUPmBDofd1KwyMRsu5Wbl+Y8zsDH
-	sqw0RiiRGACtK+puZlwzScOE4qAcEuWW5oTQdIoaIvzUwBEav5xIEKoWhD2zL+bhjC4BO90mNk+YW
-	woQrxtxQCU0doqWG+KclkVvTivM3+JHleVUjT4obVkWvqk1JgwrBzQ4P/avWMi3zQeqx7tZda0j/o
-	524G2Z3w==;
-Received: from sslproxy05.your-server.de ([78.46.172.2])
-	by www62.your-server.de with esmtpsa  (TLS1.3) tls TLS_AES_256_GCM_SHA384
-	(Exim 4.94.2)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qH5ld-0009nC-1W; Wed, 05 Jul 2023 18:54:13 +0200
-Received: from [178.197.249.31] (helo=linux.home)
-	by sslproxy05.your-server.de with esmtpsa (TLSv1.3:TLS_AES_256_GCM_SHA384:256)
-	(Exim 4.92)
-	(envelope-from <daniel@iogearbox.net>)
-	id 1qH5lc-000Nft-8y; Wed, 05 Jul 2023 18:54:12 +0200
-Subject: Re: [PATCH bpf-next] bpf: Introduce bpf generic log
-To: Leon Hwang <hffilwlqm@gmail.com>, ast@kernel.org
-Cc: john.fastabend@gmail.com, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, hawk@kernel.org,
- tangyeechou@gmail.com, kernel-patches-bot@fb.com, bpf@vger.kernel.org,
- linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-References: <20230705132058.46194-1-hffilwlqm@gmail.com>
- <1a205a85-ebf2-6d90-468d-4fd63ce3dd0f@iogearbox.net>
- <a42c246a-01e1-9e7e-8260-57835c6351ae@gmail.com>
-From: Daniel Borkmann <daniel@iogearbox.net>
-Message-ID: <688cbc7b-b23e-7edd-4603-b5734eaa9bd7@iogearbox.net>
-Date: Wed, 5 Jul 2023 18:54:11 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:60.0) Gecko/20100101
- Thunderbird/60.7.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A2E5A46AB
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 17:06:24 +0000 (UTC)
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 49CA01713
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 10:06:23 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-39e86b3da52so616692b6e.0
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 10:06:23 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688576782; x=1691168782;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=KbtfJcZEFusNLF7mMa6rCHnr1a1vlN3i4OZ4C1dAjcc=;
+        b=u0lw717t3r1tyN1+xqo+Ux/UMIEx6mbnuhfVqcIGzC/HkChlt1SdtHuKM1skQJDEAV
+         FDzmzeKOzYfDsPqpPafd5ZqAgkCkWRSh7lf88prYO+1hltSFm5bh0kfyOuL3wz725kn4
+         TRCXjbdacEL5Vo86p2+wBr1NUfXO1wr9S5fbGNLyFfIdUDdkD5con7+zME+IPIe35wdQ
+         4NFPm6XoTIpjpDBhFUnkUgj1s4carYA14lyTIYa5pBzevytgHbFMe3NuIsvqUoOvpJTY
+         59gCLobWJivtGyxtyEF2nqgkRtVRyH43cPyEZt+K8rzUYF+NLBalIRt7PDIiH2cr08Xq
+         61tg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688576782; x=1691168782;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=KbtfJcZEFusNLF7mMa6rCHnr1a1vlN3i4OZ4C1dAjcc=;
+        b=hlekRX/es13QbLZ1Mx4HY6Tg9uQBufslcD5xmwrqCRPysbvaN1QsLZUoKzHngt5J0E
+         ppTEzErTaujwHL32zWV9zUUx20gIuDP1iG82AoLfAk47PXEGEhePx2359P3eLPJ2aZTM
+         9m7AorsbRgmohcxsPxmy60/V+ZqSQOYgbNpV41wz9992bhiAOACT9VaObSE5FA6aglp3
+         B0zUAn+bCNQoZTO7sEMQ8B5LzVUwd9SeIBTp1c96W6lMUBgXXLrjPNOMUkrjAjVbR4fs
+         uyrW7Gj6/0F5heYnxmFcc/+jzZWaOXD48wbYsIdL6bT7bYfjHLaYcWc0U9+p9CRUZ9ak
+         RHaQ==
+X-Gm-Message-State: ABy/qLY6/D4CDHWHKGGAq913fBabZdY1MNdihR8V5AHbwgmiZCcPILVk
+	Q92m9QzxMdj8TL5O/R5IN4IltQ==
+X-Google-Smtp-Source: APBJJlFZHq8ge87DmHDAwF0jvyl6JH+m6WYSi25c8+TJre/ue+dh2ghZqEuGwnERcCLbDXuphWUNFA==
+X-Received: by 2002:a05:6808:f0e:b0:39e:b7d8:e3f5 with SMTP id m14-20020a0568080f0e00b0039eb7d8e3f5mr1572594oiw.5.1688576782558;
+        Wed, 05 Jul 2023 10:06:22 -0700 (PDT)
+Received: from ?IPV6:2804:14d:5c5e:44fb:6862:5918:e469:cb66? ([2804:14d:5c5e:44fb:6862:5918:e469:cb66])
+        by smtp.gmail.com with ESMTPSA id k4-20020a0568080e8400b003a38eba0bcdsm5020582oil.0.2023.07.05.10.06.19
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jul 2023 10:06:22 -0700 (PDT)
+Message-ID: <4abd2ef2-582d-d8a1-dd2a-8274ecc4e54a@mojatatu.com>
+Date: Wed, 5 Jul 2023 14:06:16 -0300
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <a42c246a-01e1-9e7e-8260-57835c6351ae@gmail.com>
-Content-Type: text/plain; charset=utf-8; format=flowed
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH net] net/sched: cls_fw: Fix improper refcount update leads
+ to use-after-free
 Content-Language: en-US
-Content-Transfer-Encoding: 8bit
-X-Authenticated-Sender: daniel@iogearbox.net
-X-Virus-Scanned: Clear (ClamAV 0.103.8/26960/Wed Jul  5 09:29:05 2023)
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+To: jhs@mojatatu.com, davem@davemloft.net, kuba@kernel.org,
+ edumazet@google.com, pabeni@redhat.com
+Cc: xiyou.wangcong@gmail.com, jiri@resnulli.us, netdev@vger.kernel.org,
+ ramdhan@starlabs.sg
+References: <20230705161530.52003-1-ramdhan@starlabs.sg>
+From: Pedro Tammela <pctammela@mojatatu.com>
+In-Reply-To: <20230705161530.52003-1-ramdhan@starlabs.sg>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 7/5/23 6:20 PM, Leon Hwang wrote:
-> On 2023/7/5 22:39, Daniel Borkmann wrote:
->> On 7/5/23 3:20 PM, Leon Hwang wrote:
->>> Currently, excluding verifier, users are unable to obtain detailed error
->>> information when issues occur in BPF syscall.
->>>
->>> To overcome this limitation, bpf generic log is introduced to provide
->>> error details similar to the verifier. This enhancement will enable the
->>> reporting of error details along with the corresponding errno in BPF
->>> syscall.
->>>
->>> Essentially, bpf generic log functions as a mechanism similar to netlink,
->>> enabling the transmission of error messages to user space. This
->>> mechanism greatly enhances the usability of BPF syscall by allowing
->>> users to access comprehensive error messages instead of relying solely
->>> on errno.
->>>
->>> This patch specifically addresses the error reporting in dev_xdp_attach()
->>> . With this patch, the error messages will be transferred to user space
->>> like the netlink approach. Hence, users will be able to check the error
->>> message along with the errno.
->>>
->>> Signed-off-by: Leon Hwang <hffilwlqm@gmail.com>
->>> ---
->>>   include/linux/bpf.h            | 30 ++++++++++++++++++++++++++++++
->>>   include/uapi/linux/bpf.h       |  6 ++++++
->>>   kernel/bpf/log.c               | 33 +++++++++++++++++++++++++++++++++
->>>   net/core/dev.c                 | 11 ++++++++++-
->>>   tools/include/uapi/linux/bpf.h |  6 ++++++
->>>   5 files changed, 85 insertions(+), 1 deletion(-)
->>>
->>> diff --git a/include/linux/bpf.h b/include/linux/bpf.h
->>> index f58895830..fd63f4a76 100644
->>> --- a/include/linux/bpf.h
->>> +++ b/include/linux/bpf.h
->>> @@ -3077,4 +3077,34 @@ static inline gfp_t bpf_memcg_flags(gfp_t flags)
->>>       return flags;
->>>   }
->>>   +#define BPF_GENERIC_TMP_LOG_SIZE    256
->>> +
->>> +struct bpf_generic_log {
->>> +    char        kbuf[BPF_GENERIC_TMP_LOG_SIZE];
->>> +    char __user    *ubuf;
->>> +    u32        len_used;
->>> +    u32        len_total;
->>> +};
->>> +
->>> +__printf(2, 3) void bpf_generic_log_write(struct bpf_generic_log *log,
->>> +            const char *fmt, ...);
->>> +static inline void bpf_generic_log_init(struct bpf_generic_log *log,
->>> +            const struct bpf_generic_user_log *ulog)
->>> +{
->>> +    log->ubuf = (char __user *) (unsigned long) ulog->log_buf;
->>> +    log->len_total = ulog->log_size;
->>> +    log->len_used = 0;
->>> +}
->>> +
->>> +#define BPF_GENERIC_LOG_WRITE(log, ulog, fmt, ...)    do {    \
->>> +    const char *____fmt = (fmt);                \
->>> +    bpf_generic_log_init(log, ulog);            \
->>> +    bpf_generic_log_write(log, ____fmt, ##__VA_ARGS__);    \
->>> +} while (0)
->>> +
->>> +#define BPF_GENERIC_ULOG_WRITE(ulog, fmt, ...)    do {            \
->>> +    struct bpf_generic_log ____log;                    \
->>> +    BPF_GENERIC_LOG_WRITE(&____log, ulog, fmt, ##__VA_ARGS__);    \
->>> +} while (0)
->>> +
->>
->> Could we generalize the bpf_verifier_log infra and reuse bpf_log() helper
->> instead of adding something new?
+On 05/07/2023 13:15, jhs@mojatatu.com wrote:
+> From: M A Ramdhan <ramdhan@starlabs.sg>
 > 
+> In the event of a failure in tcf_change_indev(), fw_set_parms() will
+> immediately return an error after incrementing or decrementing
+> reference counter in tcf_bind_filter().  If attacker can control
+> reference counter to zero and make reference freed, leading to
+> use after free.
 > 
-> Yes. It's possible to reuse the bpf_verifier_log infra and reuse bpf_log()
-> helper. I'll try this way:
+> In order to prevent this, move the point of possible failure above the
+> point where the TC_FW_CLASSID is handled.
 > 
-> #define BPF_LOG_USER  BPF_LOG_LEVEL1     /* user log flag */
-> 
-> #define BPF_ULOG_WRITE(log_buf, log_size, fmt, ...) do {               \
->         const char *____fmt = (fmt);                                    \
->         struct bpf_verifier_log ____vlog;                               \
->         bpf_vlog_init(&____vlog, BPF_LOG_USER, log_buf, log_size);      \
->         bpf_log(&____vlog, ____fmt, ##__VA_ARGS__);                         \
-> } while (0)
+> Fixes: 1da177e4c3f4 ("Linux-2.6.12-rc2")
+> Reported-by: M A Ramdhan <ramdhan@starlabs.sg>
+> Signed-off-by: M A Ramdhan <ramdhan@starlabs.sg>
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 
-Could we hide all of this inside bpf_log() or better create a new bpf_log_once() wrapper,
-passing in attr so we only need to use the latter w/o the extra macros?
+LGTM,
 
-Essentially what your bpf_xdp_link_log() is doing, just that bpf_log_once(attr, extack._msg)
-would be generic and sufficient.
+Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
 
-Thanks,
-Daniel
+> ---
+>   net/sched/cls_fw.c | 10 +++++-----
+>   1 file changed, 5 insertions(+), 5 deletions(-)
+> 
+> diff --git a/net/sched/cls_fw.c b/net/sched/cls_fw.c
+> index ae9439a6c56c..8641f8059317 100644
+> --- a/net/sched/cls_fw.c
+> +++ b/net/sched/cls_fw.c
+> @@ -212,11 +212,6 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
+>   	if (err < 0)
+>   		return err;
+>   
+> -	if (tb[TCA_FW_CLASSID]) {
+> -		f->res.classid = nla_get_u32(tb[TCA_FW_CLASSID]);
+> -		tcf_bind_filter(tp, &f->res, base);
+> -	}
+> -
+>   	if (tb[TCA_FW_INDEV]) {
+>   		int ret;
+>   		ret = tcf_change_indev(net, tb[TCA_FW_INDEV], extack);
+> @@ -233,6 +228,11 @@ static int fw_set_parms(struct net *net, struct tcf_proto *tp,
+>   	} else if (head->mask != 0xFFFFFFFF)
+>   		return err;
+>   
+> +	if (tb[TCA_FW_CLASSID]) {
+> +		f->res.classid = nla_get_u32(tb[TCA_FW_CLASSID]);
+> +		tcf_bind_filter(tp, &f->res, base);
+> +	}
+> +
+>   	return 0;
+>   }
+>   
+
 
