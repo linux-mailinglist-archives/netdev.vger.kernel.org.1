@@ -1,96 +1,120 @@
-Return-Path: <netdev+bounces-15457-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15458-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EEF85747AB0
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 02:25:23 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 113FD747ADF
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 03:16:32 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 070AA280FDF
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 00:25:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A9F001C20A75
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 01:16:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE850627;
-	Wed,  5 Jul 2023 00:25:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3B37EF;
+	Wed,  5 Jul 2023 01:16:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B76A77F;
-	Wed,  5 Jul 2023 00:25:17 +0000 (UTC)
-Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF4A71B6;
-	Tue,  4 Jul 2023 17:25:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
-	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
-	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
-	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
-	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
-	bh=f7snvG4+DEFajHuJGR7PtjIGgxTVStOAGnv0m/878o0=; b=cuBXs167gwOb+SrNA9SkDYqQZw
-	JNkkzVH758LFCcxH29aSSzLEVXEsKEmcI8AZ+FS86ewlgqEhTP7QE4u51uTnPR44DbJMHGXy/3Qxi
-	R7eVB3+WdLX/jdn1kQNUDJ7Xbf7NqrQje6XhT3b44BoWD/iR9r2hHcAveZLBmrm6Il8A=;
-Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
-	(envelope-from <andrew@lunn.ch>)
-	id 1qGqKM-000ax4-Bk; Wed, 05 Jul 2023 02:25:02 +0200
-Date: Wed, 5 Jul 2023 02:25:02 +0200
-From: Andrew Lunn <andrew@lunn.ch>
-To: wei.fang@nxp.com
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, ast@kernel.org, daniel@iogearbox.net,
-	hawk@kernel.org, john.fastabend@gmail.com, shenwei.wang@nxp.com,
-	xiaoning.wang@nxp.com, netdev@vger.kernel.org, linux-imx@nxp.com,
-	linux-kernel@vger.kernel.org, bpf@vger.kernel.org
-Subject: Re: [PATCH net 3/3] net: fec: increase the size of tx ring and
- update thresholds of tx ring
-Message-ID: <0443a057-767f-4f9c-afd2-37d26b606d74@lunn.ch>
-References: <20230704082916.2135501-1-wei.fang@nxp.com>
- <20230704082916.2135501-4-wei.fang@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7273063C
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 01:16:28 +0000 (UTC)
+X-Greylist: delayed 62 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Tue, 04 Jul 2023 18:16:27 PDT
+Received: from mx-lax3-2.ucr.edu (mx-lax3-2.ucr.edu [169.235.156.37])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 41B7910DD
+	for <netdev@vger.kernel.org>; Tue,  4 Jul 2023 18:16:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=simple/simple;
+  d=ucr.edu; i=@ucr.edu; q=dns/txt; s=selector3;
+  t=1688519787; x=1720055787;
+  h=mime-version:from:date:message-id:subject:to;
+  bh=q0HvZFnTXa9fgE+7yflwyqzGdoGApfl9T11jQdopfW8=;
+  b=l7e5RPgK+b1crRFmOZ577mZqrtGOI9KCqzcUgLoAyfVeooCCID1Mq85Z
+   6d2MQa9r1Nko4fxHhTsbrmsdobh8z6izJuiQdC5yVSkvIShuTE1CerBtb
+   sh7KTjBq+vX4bLM5am37vCDClnLZjExeMmf7sVSL0m6N64nMiLXM8bEf2
+   JHlB/lFv2a6lbVNok69Lbyi/CRFFt6Nq3RY1aOSH9DDlja35s252ffR+C
+   hk//9eYn6zFz9LuJXkIa0fLEOe2P3MpUIFc/jwcdBoQWMSlK8SYmU8LgA
+   btIYxzVhupCCZiHTkBeuIqbrGI+SUCg2PqUVDa/xaVSOqZV5UWZ1QnB72
+   w==;
+Received: from mail-wr1-f69.google.com ([209.85.221.69])
+  by smtp-lax3-2.ucr.edu with ESMTP/TLS/ECDHE-RSA-AES128-GCM-SHA256; 04 Jul 2023 18:15:24 -0700
+Received: by mail-wr1-f69.google.com with SMTP id ffacd0b85a97d-31444df0fafso220585f8f.2
+        for <netdev@vger.kernel.org>; Tue, 04 Jul 2023 18:15:24 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=ucr.edu; s=rmail; t=1688519723; x=1691111723;
+        h=to:subject:message-id:date:from:mime-version:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=NIYq5ovgGYYcT2mwLIe/7Pwf4A8ZFgLTV67vPU1luuE=;
+        b=OpDKa6aazYkYIruwvWLbwnWXzbvxhbV2XYMfpy978GxqtOHauKAOZYoLYn0DnSzCp9
+         ZkBo2uz0ECn3yqxrbocDTgsrjomb0U1WSJGLsYJ8mT+MjEJyEfvRZ/JN275xRjGDN8si
+         Ntv3h3tZAfU13NivPqTFkFQuidIgK+7sldNv8=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688519723; x=1691111723;
+        h=to:subject:message-id:date:from:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=NIYq5ovgGYYcT2mwLIe/7Pwf4A8ZFgLTV67vPU1luuE=;
+        b=h6lTSBJLyPXxhi1Gg9sWhLVZnt7ZJjwuLoEGC6nl9DiM+H20f9OTZ9TIK8ZhwAEPGL
+         jd0Mt+P0pQUE/1E7VmLq00pgVTTMsq+/8joWA8aoQt8uXbFrdZVABZFiXd2Zx9yZd/BF
+         mjHXITkALlGlRZ10tDQEr0Ifv9qSnO7KdYangwdJLj2kEqYNF0I72bZkOZnlm2byMC4H
+         JW3byZSjLmxzF4QyATzi6jkQ5AxiUUE7a417AAAsewRLXNkXaVkDGza9VoV1RPkQ0FS6
+         pRPwobVlzce6L0kg5eERooZD32O0XXhB53WH+Vj3/Otl7OGdjixpyIfWpbsrhQ/aoaMs
+         W5bA==
+X-Gm-Message-State: ABy/qLZqQc3HhBUaZpQCw2v+oFwa4KBfz3ahAQtf7SeGQsnn8WcjwGVo
+	8hv30Z/gmQTcJ5h4cqUibMy2U8q0VjNWdSuV5qZM7luEgj4p8ce+6N8b7n30LPXUtzO0yOGHGlp
+	vFoQt1UJpwgcXq9wuvN2XjGgtSja5GaOcig==
+X-Received: by 2002:adf:f147:0:b0:314:38e4:2596 with SMTP id y7-20020adff147000000b0031438e42596mr5849444wro.49.1688519723015;
+        Tue, 04 Jul 2023 18:15:23 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlH0U4jLD27P3ah3ysuNk9sOys6goAlAbsY6dgFCEoGMpWROGB9rEd61YoyrMeyUAeyYjUe3bb9IYzKcnOuphfk=
+X-Received: by 2002:adf:f147:0:b0:314:38e4:2596 with SMTP id
+ y7-20020adff147000000b0031438e42596mr5849436wro.49.1688519722754; Tue, 04 Jul
+ 2023 18:15:22 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230704082916.2135501-4-wei.fang@nxp.com>
+From: Yu Hao <yhao016@ucr.edu>
+Date: Tue, 4 Jul 2023 18:15:09 -0700
+Message-ID: <CA+UBctD1E5ZLnBxkrXh3uxiKiKXphnLKiB=5whYtH73SCTESWw@mail.gmail.com>
+Subject: [PATCH] net: lan78xx: Fix possible uninit bug
+To: woojung.huh@microchip.com, UNGLinuxDriver@microchip.com, 
+	davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-usb@vger.kernel.org, 
+	linux-kernel <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> After trying various methods, I think that increase the size of tx
-> BD ring is simple and effective. Maybe the best resolution is that
-> allocate NAPI for each queue to improve the efficiency of the NAPI
-> callback, but this change is a bit big and I didn't try this method.
-> Perheps this method will be implemented in a future patch.
+The variable buf should be initialized in the function lan78xx_read_reg.
+However, there is no return value check, which means the variable buf
+could still be uninit. But there is a read later.
 
-How does this affect platforms like Vybrid with its fast Ethernet?
-Does the burst latency go up?
+Signed-off-by: Yu Hao <yhao016@ucr.edu>
+---
+ drivers/net/usb/lan78xx.c | 5 ++++-
+ 1 file changed, 4 insertions(+), 1 deletion(-)
 
-> In addtion, this patch also updates the tx_stop_threshold and the
-> tx_wake_threshold of the tx ring. In previous logic, the value of
-> tx_stop_threshold is 217, however, the value of tx_wake_threshold
-> is 147, it does not make sense that tx_wake_threshold is less than
-> tx_stop_threshold.
+diff --git a/drivers/net/usb/lan78xx.c b/drivers/net/usb/lan78xx.c
+index c458c030fadf..4c9318c92fe6 100644
+--- a/drivers/net/usb/lan78xx.c
++++ b/drivers/net/usb/lan78xx.c
+@@ -1091,8 +1091,11 @@ static int lan78xx_write_raw_otp(struct
+lan78xx_net *dev, u32 offset,
+    int i;
+    u32 buf;
+    unsigned long timeout;
++   int ret;
 
-What do these actually mean? I could imagine that as the ring fills
-you don't want to stop until it is 217/512 full. There is then some
-hysteresis, such that it has to drop below 147/512 before more can be
-added? 
+-   lan78xx_read_reg(dev, OTP_PWR_DN, &buf);
++   ret = lan78xx_read_reg(dev, OTP_PWR_DN, &buf);
++   if (ret < 0)
++       return ret;
 
-> Besides, both XDP path and 'slow path' share the
-> tx BD rings. So if tx_stop_threshold is 217, in the case of heavy
-> XDP traffic, the slow path is easily to be stopped, this will have
-> a serious impact on the slow path.
-
-Please post your iperf results for various platforms, so we can see
-the effects of this. We generally don't accept tuning patches without
-benchmarks which prove the improvements, and also show there is no
-regression. And given the wide variety of SoCs using the FEC, i expect
-testing on a number of SoCs, but Fast and 1G.
-
-	Andrew
+    if (buf & OTP_PWR_DN_PWRDN_N_) {
+        /* clear it and wait to be cleared */
+-- 
+2.34.1
 
