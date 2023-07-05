@@ -1,100 +1,118 @@
-Return-Path: <netdev+bounces-15542-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15543-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C381E74852F
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:40:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id E4773748540
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:43:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 76184280FEB
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:40:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A04D2280EE7
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:43:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AB5CDC8F3;
-	Wed,  5 Jul 2023 13:40:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EE7DCC8FD;
+	Wed,  5 Jul 2023 13:43:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DD49C8F1
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:40:37 +0000 (UTC)
-Received: from smtp.missinglinkelectronics.com (smtp.missinglinkelectronics.com [162.55.135.183])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 716139F
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 06:40:32 -0700 (PDT)
-Received: from localhost (localhost [127.0.0.1])
-	by smtp.missinglinkelectronics.com (Postfix) with ESMTP id A0B5B20623;
-	Wed,  5 Jul 2023 15:40:30 +0200 (CEST)
-X-Virus-Scanned: Debian amavisd-new at missinglinkelectronics.com
-Received: from smtp.missinglinkelectronics.com ([127.0.0.1])
-	by localhost (mail.missinglinkelectronics.com [127.0.0.1]) (amavisd-new, port 10024)
-	with ESMTP id yeu7sfGY0gLH; Wed,  5 Jul 2023 15:40:30 +0200 (CEST)
-Received: from 0.0.0.0 (p578c5bfe.dip0.t-ipconnect.de [87.140.91.254])
-	(using TLSv1.3 with cipher TLS_AES_128_GCM_SHA256 (128/128 bits)
-	 key-exchange X25519 server-signature RSA-PSS (2048 bits))
-	(No client certificate requested)
-	(Authenticated sender: joachim)
-	by smtp.missinglinkelectronics.com (Postfix) with ESMTPSA id DA06A2011C;
-	Wed,  5 Jul 2023 15:40:29 +0200 (CEST)
-Message-ID: <ed966750-482e-50e3-7c27-028e135d3208@missinglinkelectronics.com>
-Date: Wed, 5 Jul 2023 15:40:29 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E03D8AD2A
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:43:41 +0000 (UTC)
+Received: from mail-ot1-x32b.google.com (mail-ot1-x32b.google.com [IPv6:2607:f8b0:4864:20::32b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 810AABA
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 06:43:40 -0700 (PDT)
+Received: by mail-ot1-x32b.google.com with SMTP id 46e09a7af769-6b87d505e28so5606072a34.2
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 06:43:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688564619; x=1691156619;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ylf2Li3pfzZsL7TCxvWjWxxVqSGG81RTAw3x598Kqks=;
+        b=y8jfiJSZ9myuDiZpcz81RawS0ybUIRVm4avbaOo3cqPUDpwU/T7p/NkE3ustAQcUfe
+         CA+hsGWwMFUggCRWfUzyerd+8E8b2MaSs4ISioXHYmIRCymGIGwcytmY0CYP68By9t0C
+         ERKdyDiJBgg9u3mxO3981P/+8EGjPlgeSh/Abl3OTlbw/ziUcmixW3j14BNqLXsNDIlX
+         JdUW+4VOQC9Mnu+u8dxMPPu5WZezsuhN6DngoqUCNdJ9n4cQ4i627lkaFPwGstb5iBQ4
+         ngYxYWrOph1DbO5kLcE3iNJyXiy8lmYefOR1EuG/zcH5flarJfix4YxNdFxcAmy38dPF
+         7p5A==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688564619; x=1691156619;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Ylf2Li3pfzZsL7TCxvWjWxxVqSGG81RTAw3x598Kqks=;
+        b=W8Hu3bozzYzjdgCSUs8DR34QSer7aZ+rOBxw/fTtRA82hkOXyS35QFW+NF9M3h1RVg
+         AO4/IGlG5qSy5XVKNNw/jrIyIgLH330WpV3gDZmZ+zBRKEqOXhekyg2tyvuboGLiIYCf
+         8JPcqMQ5cL65SonElR6Qs2kSxtq0BY1g8eSNjwiyQ1IMrz58cg/OQaWUUYRTb6ev0YOC
+         DBwxwrliwXr61sQm/kEoZZyvwUZbD6Dadscx/sBLlhey+vKrjLorUAczlZG8wqmgGjx5
+         p9k0JFLLttIsO/5SgDvlXjgHLBh/GWHlR5Z5ZLsA7aDc2esiRlk9YoDq4wWnmMB6md50
+         HHXA==
+X-Gm-Message-State: AC+VfDwuFTFbHp96axtPVyCJgVIux7M7ZWSYOsYttkt2g8f0bSe3PoX8
+	m7YvJxwLHhTU5jIjaObY+ASCi+qDfKA/H5y2H04=
+X-Google-Smtp-Source: ACHHUZ5YctW+jzf9qybCmKLQrmKkizw0nE00P08cBu/uPUy5whl1if26om+b39qZ2KLL9Rz8zVeguA==
+X-Received: by 2002:a9d:77d0:0:b0:6b8:6c43:12ac with SMTP id w16-20020a9d77d0000000b006b86c4312acmr18550547otl.25.1688564619729;
+        Wed, 05 Jul 2023 06:43:39 -0700 (PDT)
+Received: from exu-caveira.tail33bf8.ts.net ([2804:7f1:e2c0:f126:5457:8acf:73e7:5bf2])
+        by smtp.gmail.com with ESMTPSA id n11-20020a9d740b000000b006b73b6b738esm4516450otk.36.2023.07.05.06.43.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jul 2023 06:43:39 -0700 (PDT)
+From: Victor Nogueira <victor@mojatatu.com>
+To: netdev@vger.kernel.org
+Cc: jhs@mojatatu.com,
+	xiyou.wangcong@gmail.com,
+	jiri@resnulli.us,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	pctammela@mojatatu.com,
+	simon.horman@corigine.com,
+	kernel@mojatatu.com
+Subject: [PATCH net v2 0/5] net: sched: Undo tcf_bind_filter in case of errors in set callbacks
+Date: Wed,  5 Jul 2023 10:43:24 -0300
+Message-Id: <20230705134329.102345-1-victor@mojatatu.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Subject: Re: [PATCH] net: Fix special case of empty range in
- find_next_netdev_feature()
-Content-Language: de-DE, en-US
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S . Miller" <davem@davemloft.net>, netdev@vger.kernel.org,
- Tariq Toukan <tariqt@nvidia.com>, Gal Pressman <gal@nvidia.com>
-References: <20230623142616.144923-1-joachim.foerster@missinglinkelectronics.com>
- <20230626141739.54d78c7e@kernel.org>
-From: =?UTF-8?Q?Joachim_F=c3=b6rster?=
- <joachim.foerster@missinglinkelectronics.com>
-In-Reply-To: <20230626141739.54d78c7e@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=0.5 required=5.0 tests=BAYES_00,RCVD_HELO_IP_MISMATCH,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/26/23 23:17, Jakub Kicinski wrote:
-> On Fri, 23 Jun 2023 16:26:16 +0200 Joachim Foerster wrote:
->> Fixes: 85db6352fc8a ("net: Fix features skip in for_each_netdev_feature()")
->> Cc: stable@vger.kernel.org
-> Nothing passes @feature with bit 0 set upstream, tho, right?
-> Fix looks fine, but it doesn't need the fixes tag and CC stable,
-> since its theoretical/forward looking.
-We are triggering this issue by using the inline function 
-for_each_netdev_feature() from the kernel header files in a custom 
-module running on a stable kernel involving NETIF_F_SG, which happens to 
-be bit 0. So my argument is that the function is part of the public API. 
-Or is this actually not supposed to be treated like it is public API? 
-Does this statement change the assessment in terms of tagging with CC 
-stable?
+Five different classifier (fw, bpf, u32, matchall, and flower) are
+calling tcf_bind_filter in their callbacks, but weren't undoing it by
+calling tcf_unbind_filter if their was an error after binding.
 
-Regarding the Fixes tag, I think, I made a mistake, since the previous 
-commit 3b89ea9c5902 ("net: Fix for_each_netdev_feature on Big endian") 
-on find_next_netdev_feature() already causes the issue by not 
-considering the special case of bit 0. So I will repost with fixes tag 
-updated ...
+This patch set fixes all this by calling tcf_unbind_filter in such
+cases.
 
->
-> Please repost explaining how we can hit this problem upstream
-> or with the Fixes/CC stable replaced by a sentence stating that
-> the problem can't currently be triggered.
+This set also undoes a refcount decrement in cls_u32 when an update
+fails under specific conditions which are described in patch #4.
 
+v1 -> v2:
+* Remove blank line after fixes tag
+* Fix reverse xmas tree issues pointed out by Simon
+
+Victor Nogueira (5):
+  net: sched: cls_bpf: Undo tcf_bind_filter in case of an error
+  net: sched: cls_matchall: Undo tcf_bind_filter in case of failure
+    after mall_set_parms
+  net: sched: cls_u32: Undo tcf_bind_filter if u32_replace_hw_knode
+  net: sched: cls_u32: Undo refcount decrement in case update failed
+  net: sched: cls_flower: Undo tcf_bind_filter if fl_set_key fails
+
+ net/sched/cls_bpf.c      |  8 ++++++--
+ net/sched/cls_flower.c   | 29 +++++++++++++++++++++++++----
+ net/sched/cls_matchall.c |  8 ++++++--
+ net/sched/cls_u32.c      | 32 ++++++++++++++++++++++++++------
+ 4 files changed, 63 insertions(+), 14 deletions(-)
 
 -- 
-Joachim Förster
-
-Missing Link Electronics
-http://www.missinglinkelectronics.com
-Office DE: +49 (731) 141-149-0
-Office US: +1  (408) 457-0700
+2.25.1
 
 
