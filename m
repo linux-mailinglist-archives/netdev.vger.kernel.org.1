@@ -1,146 +1,100 @@
-Return-Path: <netdev+bounces-15536-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15537-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3E0D774848D
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:03:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 63BF37484AC
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 15:10:58 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5750F1C20AFE
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:03:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 931F71C20945
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 13:10:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0C5FB7464;
-	Wed,  5 Jul 2023 13:03:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8036C79CC;
+	Wed,  5 Jul 2023 13:10:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EECB8138F
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:03:39 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3D81FDA;
-	Wed,  5 Jul 2023 06:03:38 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qH2AS-0006HS-Pv; Wed, 05 Jul 2023 15:03:36 +0200
-Date: Wed, 5 Jul 2023 15:03:36 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-Cc: netfilter-devel@vger.kernel.org, netdev@vger.kernel.org,
-	Pablo Neira Ayuso <pablo@netfilter.org>
-Subject: Re: [PATCH] netfilter: nf_tables: prevent OOB access in
- nft_byteorder_eval
-Message-ID: <20230705130336.GD3751@breakpoint.cc>
-References: <20230705121515.747251-1-cascardo@canonical.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7063C6FC8
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 13:10:55 +0000 (UTC)
+Received: from mail-pg1-f199.google.com (mail-pg1-f199.google.com [209.85.215.199])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0CDEF1712
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 06:10:53 -0700 (PDT)
+Received: by mail-pg1-f199.google.com with SMTP id 41be03b00d2f7-55b10f171e0so8569835a12.2
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 06:10:53 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688562652; x=1691154652;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=i9DrXfO3Bx6yoQaOBcaxNx+vYXYpWkO5KRCrfrKUwLo=;
+        b=fJCwz9Gdg06B944kiGcvg4WRjIFbeFHIS3+f+y5cYRTk6VlLiApHEpQFLHTOFwuN2s
+         drcIAa/oDe3Nxo4uxOZphE8+7Ci78rdbir4lVcEYKtWEoVbGXrK38OyrnI2V9qJn8fyz
+         n2Rnb6cSlDHFa5vy57ScuogiHa8beEBcaJuGjEk86wjBJRkxsEW/Rqzzrei0guGkjNkN
+         23oYNG99K08emfbASpYimXhPUO+bbJHSAU9yz3EbD4U51F+gYPageH3K8B20lRq4EOY2
+         XPVECvsOoCjiN4RaJAi26RfDwRA6PjTRwbMq8XrgMBnzY3xoGjsib9VXu9G0W2esDnew
+         FsiQ==
+X-Gm-Message-State: ABy/qLbqjPdM/Hl3SsJ6U3Ew9oftHIO2svZ25vjsrFl8JP46dINThgWw
+	8IQq72WZFYDmNQxjGDV6plEJ8OPU0ZqY2y5OLPhV0ebLacDO
+X-Google-Smtp-Source: APBJJlFgo+Osxw24cRT5M/G7iKhFQXBgrKj1j+8PRbM+GWDKDedumJno+L/5xfbh3Eb/JXk4Pdd6G6B/OKjOQ96ZLOuU1Ve33a9H
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230705121515.747251-1-cascardo@canonical.com>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Received: by 2002:a63:fe4f:0:b0:557:7f87:e5fb with SMTP id
+ x15-20020a63fe4f000000b005577f87e5fbmr9531500pgj.8.1688562652531; Wed, 05 Jul
+ 2023 06:10:52 -0700 (PDT)
+Date: Wed, 05 Jul 2023 06:10:52 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000015d25a05ffbd21d5@google.com>
+Subject: [syzbot] Monthly nfc report (Jul 2023)
+From: syzbot <syzbot+list9ab3a27a20db62b86eb3@syzkaller.appspotmail.com>
+To: linux-kernel@vger.kernel.org, linux-nfc@lists.01.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Thadeu Lima de Souza Cascardo <cascardo@canonical.com> wrote:
-> When evaluating byteorder expressions with size 2, a union with 32-bit and
-> 16-bit members is used. Since the 16-bit members are aligned to 32-bit,
-> the array accesses will be out-of-bounds.
-> 
-> It may lead to a stack-out-of-bounds access like the one below:
+Hello nfc maintainers/developers,
 
-Yes, this is broken.
+This is a 31-day syzbot report for the nfc subsystem.
+All related reports/information can be found at:
+https://syzkaller.appspot.com/upstream/s/nfc
 
-> Using simple s32 and s16 pointers for each of these accesses fixes the
-> problem.
+During the period, 1 new issues were detected and 0 were fixed.
+In total, 9 issues are still open and 17 have been fixed so far.
 
-I'm not sure this is correct.  Its certainly less wrong of course.
+Some of the still happening issues:
 
-> Fixes: 96518518cc41 ("netfilter: add nftables")
-> Cc: stable@vger.kernel.org
-> Reported-by: Tanguy DUBROCA (@SidewayRE) from @Synacktiv working with ZDI
-> Signed-off-by: Thadeu Lima de Souza Cascardo <cascardo@canonical.com>
-> ---
->  net/netfilter/nft_byteorder.c | 17 ++++++++++-------
->  1 file changed, 10 insertions(+), 7 deletions(-)
-> 
-> diff --git a/net/netfilter/nft_byteorder.c b/net/netfilter/nft_byteorder.c
-> index 9a85e797ed58..aa16bd2e92e2 100644
-> --- a/net/netfilter/nft_byteorder.c
-> +++ b/net/netfilter/nft_byteorder.c
-> @@ -30,11 +30,14 @@ void nft_byteorder_eval(const struct nft_expr *expr,
->  	const struct nft_byteorder *priv = nft_expr_priv(expr);
->  	u32 *src = &regs->data[priv->sreg];
->  	u32 *dst = &regs->data[priv->dreg];
-> -	union { u32 u32; u16 u16; } *s, *d;
-> +	u32 *s32, *d32;
-> +	u16 *s16, *d16;
->  	unsigned int i;
->  
-> -	s = (void *)src;
-> -	d = (void *)dst;
-> +	s32 = (void *)src;
-> +	d32 = (void *)dst;
-> +	s16 = (void *)src;
-> +	d16 = (void *)dst;
->  
->  	switch (priv->size) {
->  	case 8: {
-> @@ -62,11 +65,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
->  		switch (priv->op) {
->  		case NFT_BYTEORDER_NTOH:
->  			for (i = 0; i < priv->len / 4; i++)
-> -				d[i].u32 = ntohl((__force __be32)s[i].u32);
-> +				d32[i] = ntohl((__force __be32)s32[i]);
->  			break;
->  		case NFT_BYTEORDER_HTON:
->  			for (i = 0; i < priv->len / 4; i++)
-> -				d[i].u32 = (__force __u32)htonl(s[i].u32);
-> +				d32[i] = (__force __u32)htonl(s32[i]);
->  			break;
+Ref Crashes Repro Title
+<1> 109     Yes   BUG: corrupted list in nfc_llcp_unregister_device
+                  https://syzkaller.appspot.com/bug?extid=81232c4a81a886e2b580
+<2> 80      Yes   BUG: corrupted list in nfc_llcp_register_device
+                  https://syzkaller.appspot.com/bug?extid=c1d0a03d305972dbbe14
+<3> 69      Yes   INFO: task hung in nfc_rfkill_set_block
+                  https://syzkaller.appspot.com/bug?extid=3e3c2f8ca188e30b1427
+<4> 61      Yes   KASAN: use-after-free Read in nfc_llcp_find_local
+                  https://syzkaller.appspot.com/bug?extid=e7ac69e6a5d806180b40
+<5> 19      Yes   BUG: corrupted list in nfc_llcp_local_put
+                  https://syzkaller.appspot.com/bug?extid=ecb2ae7b1add2a4120de
 
-Ack, this looks better, but I'd just use src[i] and dst[i] rather than
-the weird union pointers the original has.
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
 
-> @@ -74,11 +77,11 @@ void nft_byteorder_eval(const struct nft_expr *expr,
->  		switch (priv->op) {
->  		case NFT_BYTEORDER_NTOH:
->  			for (i = 0; i < priv->len / 2; i++)
-> -				d[i].u16 = ntohs((__force __be16)s[i].u16);
-> +				d16[i] = ntohs((__force __be16)s16[i]);
+To disable reminders for individual bugs, reply with the following command:
+#syz set <Ref> no-reminders
 
-This on the other hand... I'd say this should mimic what the 64bit
-case is doing and use nft_reg_store16() nft_reg_load16() helpers for
-the register accesses.
+To change bug's subsystems, reply with:
+#syz set <Ref> subsystems: new-subsystem
 
-something like:
-
-for (i = 0; i < priv->len / 2; i++) {
-     v16 = nft_reg_load16(&src[i]);
-     nft_reg_store16(&dst[i], + ntohs((__force __be16)v16));
-}
-
-[ not even compile tested ]
-
-Same for the htons case.
-
-On a slightly related note, some of the nftables test cases create bogus
-conversions, e.g.:
-
-# src/nft --debug=netlink add rule ip6 t c 'ct mark set ip6 dscp << 2 |
-# 0x10'
-ip6 t c
-  [ payload load 2b @ network header + 0 => reg 1 ]
-  [ bitwise reg 1 = ( reg 1 & 0x0000c00f ) ^ 0x00000000 ]
-  [ bitwise reg 1 = ( reg 1 >> 0x00000006 ) ]
-  [ byteorder reg 1 = ntoh(reg 1, 2, 1) ]	// NO-OP! should be reg 1, 2, 2) I presume?
-
-I'd suggest to add a patch for nf-next that rejects such crap.
+You may send multiple commands in a single email message.
 
