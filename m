@@ -1,264 +1,61 @@
-Return-Path: <netdev+bounces-15625-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15626-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 75EDF748C9A
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 21:00:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id A2D8E748D02
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 21:05:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 817DB281131
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:00:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 742921C20BD4
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 19:05:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6BB7E14ABA;
-	Wed,  5 Jul 2023 18:59:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F08F615484;
+	Wed,  5 Jul 2023 19:05:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id ECD8E125AC;
-	Wed,  5 Jul 2023 18:59:27 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 54945C433BC;
-	Wed,  5 Jul 2023 18:59:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A95C3620
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 19:05:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D925CC433CA;
+	Wed,  5 Jul 2023 19:05:41 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688583567;
-	bh=upDmKDv+6xjSiy7POdUF+8WFopDSBgqOL9aHcGqhK2Y=;
-	h=From:To:Subject:Date:In-Reply-To:References:From;
-	b=lcNGsVlnIbVft2o9WVSu7oStzcC7UruKn4c1DTBWmjGO00DNBCt3+ZZxjK6miMMj/
-	 GBdLPvZ/RE2acwmtA26p1q8MtPtZ6AFXE1afuhwSlwu52+nzTrcPM9ox138DUXq3pP
-	 a+auUEyCQ5+EySj5vT4AGLwnwLHJre6WjBG5uo1Fk/D4NwBI39aiCvuIo2r0b4YzkK
-	 eGFkZHIr8aozqfMt+EZCLKVtueQinWQYpN5V9F3hby1Tiu5AXVWEdS37dhPfamlHdD
-	 XsiVC3GdeisubCKxKkTGzRJBTmma2JIDfH5g8iF/7cOUhrr8m/tq4qK4hAP5wOyo8R
-	 g+tGtW7J9HY7Q==
+	s=k20201202; t=1688583943;
+	bh=PupGEBmpc4BS3GR/o7WIzvxzbsSfu55Z8rACvDIEA1c=;
+	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
+	b=UeAwqR8Xl0h07N6K15EXbDERNSWmUYaYGEVGFgjnZMtepCmt1llB/o23xcjhlwLas
+	 6CiwqQJJtoCwixWGV/lVcUuZZKO6JsD8SiSt3FCk1RDYxFjY1KFUCBzxplJ4PXtI+x
+	 4/ADpSVzofY0F4F1Q2YdzkkG+4AFvl6W/8UJtqbe9omwrrQ1fV58teVyo6S+1Ndtta
+	 cpR+KOH3XFCEY6W2LvMIs1W3/oR8PY2YrCXkn6ZQIysVDp8v74+o5QHGoKYUw9IojB
+	 VwDQslscQGW9cYBZbGedv9tH1cMnorngGns+cDo2tXLg4WKBJ1PK3U4rc1mtPRAKWQ
+	 aUfgQraSQYuZg==
 From: Jeff Layton <jlayton@kernel.org>
-To: jk@ozlabs.org,
-	arnd@arndb.de,
-	mpe@ellerman.id.au,
-	npiggin@gmail.com,
-	christophe.leroy@csgroup.eu,
-	hca@linux.ibm.com,
-	gor@linux.ibm.com,
-	agordeev@linux.ibm.com,
-	borntraeger@linux.ibm.com,
-	svens@linux.ibm.com,
-	gregkh@linuxfoundation.org,
-	arve@android.com,
-	tkjos@android.com,
-	maco@android.com,
-	joel@joelfernandes.org,
-	brauner@kernel.org,
-	cmllamas@google.com,
-	surenb@google.com,
-	dennis.dalessandro@cornelisnetworks.com,
-	jgg@ziepe.ca,
-	leon@kernel.org,
-	bwarrum@linux.ibm.com,
-	rituagar@linux.ibm.com,
-	ericvh@kernel.org,
-	lucho@ionkov.net,
-	asmadeus@codewreck.org,
-	linux_oss@crudebyte.com,
-	dsterba@suse.com,
-	dhowells@redhat.com,
-	marc.dionne@auristor.com,
-	viro@zeniv.linux.org.uk,
-	raven@themaw.net,
-	luisbg@kernel.org,
-	salah.triki@gmail.com,
-	aivazian.tigran@gmail.com,
-	ebiederm@xmission.com,
-	keescook@chromium.org,
-	clm@fb.com,
-	josef@toxicpanda.com,
-	xiubli@redhat.com,
-	idryomov@gmail.com,
-	jlayton@kernel.org,
-	jaharkes@cs.cmu.edu,
-	coda@cs.cmu.edu,
-	jlbec@evilplan.org,
-	hch@lst.de,
-	nico@fluxnic.net,
-	rafael@kernel.org,
-	code@tyhicks.com,
-	ardb@kernel.org,
-	xiang@kernel.org,
-	chao@kernel.org,
-	huyue2@coolpad.com,
-	jefflexu@linux.alibaba.com,
-	linkinjeon@kernel.org,
-	sj1557.seo@samsung.com,
-	jack@suse.com,
-	tytso@mit.edu,
-	adilger.kernel@dilger.ca,
-	jaegeuk@kernel.org,
-	hirofumi@mail.parknet.co.jp,
-	miklos@szeredi.hu,
-	rpeterso@redhat.com,
-	agruenba@redhat.com,
-	richard@nod.at,
-	anton.ivanov@cambridgegreys.com,
-	johannes@sipsolutions.net,
-	mikulas@artax.karlin.mff.cuni.cz,
-	mike.kravetz@oracle.com,
-	muchun.song@linux.dev,
-	dwmw2@infradead.org,
-	shaggy@kernel.org,
-	tj@kernel.org,
-	trond.myklebust@hammerspace.com,
-	anna@kernel.org,
-	chuck.lever@oracle.com,
-	neilb@suse.de,
-	kolga@netapp.com,
-	Dai.Ngo@oracle.com,
-	tom@talpey.com,
-	konishi.ryusuke@gmail.com,
-	anton@tuxera.com,
-	almaz.alexandrovich@paragon-software.com,
-	mark@fasheh.com,
-	joseph.qi@linux.alibaba.com,
-	me@bobcopeland.com,
-	hubcap@omnibond.com,
-	martin@omnibond.com,
-	amir73il@gmail.com,
-	mcgrof@kernel.org,
-	yzaikin@google.com,
-	tony.luck@intel.com,
-	gpiccoli@igalia.com,
-	al@alarsen.net,
-	sfrench@samba.org,
-	pc@manguebit.com,
-	lsahlber@redhat.com,
-	sprasad@microsoft.com,
-	senozhatsky@chromium.org,
-	phillip@squashfs.org.uk,
-	rostedt@goodmis.org,
-	mhiramat@kernel.org,
-	dushistov@mail.ru,
-	hdegoede@redhat.com,
-	djwong@kernel.org,
-	dlemoal@kernel.org,
-	naohiro.aota@wdc.com,
-	jth@kernel.org,
-	ast@kernel.org,
-	daniel@iogearbox.net,
-	andrii@kernel.org,
-	martin.lau@linux.dev,
-	song@kernel.org,
-	yhs@fb.com,
-	john.fastabend@gmail.com,
-	kpsingh@kernel.org,
-	sdf@google.com,
-	haoluo@google.com,
-	jolsa@kernel.org,
-	hughd@google.com,
-	akpm@linux-foundation.org,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	john.johansen@canonical.com,
-	paul@paul-moore.com,
-	jmorris@namei.org,
-	serge@hallyn.com,
-	stephen.smalley.work@gmail.com,
-	eparis@parisplace.org,
-	jgross@suse.com,
-	stern@rowland.harvard.edu,
-	lrh2000@pku.edu.cn,
-	sebastian.reichel@collabora.com,
-	wsa+renesas@sang-engineering.com,
-	quic_ugoswami@quicinc.com,
-	quic_linyyuan@quicinc.com,
-	john@keeping.me.uk,
-	error27@gmail.com,
-	quic_uaggarwa@quicinc.com,
-	hayama@lineo.co.jp,
-	jomajm@gmail.com,
-	axboe@kernel.dk,
-	dhavale@google.com,
-	dchinner@redhat.com,
-	hannes@cmpxchg.org,
-	zhangpeng362@huawei.com,
-	slava@dubeyko.com,
-	gargaditya08@live.com,
-	penguin-kernel@I-love.SAKURA.ne.jp,
-	yifeliu@cs.stonybrook.edu,
-	madkar@cs.stonybrook.edu,
-	ezk@cs.stonybrook.edu,
-	yuzhe@nfschina.com,
-	willy@infradead.org,
-	okanatov@gmail.com,
-	jeffxu@chromium.org,
-	linux@treblig.org,
-	mirimmad17@gmail.com,
-	yijiangshan@kylinos.cn,
-	yang.yang29@zte.com.cn,
-	xu.xin16@zte.com.cn,
-	chengzhihao1@huawei.com,
-	shr@devkernel.io,
-	Liam.Howlett@Oracle.com,
-	adobriyan@gmail.com,
-	chi.minghao@zte.com.cn,
-	roberto.sassu@huawei.com,
-	linuszeng@tencent.com,
-	bvanassche@acm.org,
-	zohar@linux.ibm.com,
-	yi.zhang@huawei.com,
-	trix@redhat.com,
-	fmdefrancesco@gmail.com,
-	ebiggers@google.com,
-	princekumarmaurya06@gmail.com,
-	chenzhongjin@huawei.com,
-	riel@surriel.com,
-	shaozhengchao@huawei.com,
-	jingyuwang_vip@163.com,
-	linuxppc-dev@lists.ozlabs.org,
-	linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org,
-	linux-rdma@vger.kernel.org,
-	linux-usb@vger.kernel.org,
-	v9fs@lists.linux.dev,
+To: Christian Brauner <brauner@kernel.org>,
+	Trond Myklebust <trond.myklebust@hammerspace.com>,
+	Anna Schumaker <anna@kernel.org>,
+	Chuck Lever <chuck.lever@oracle.com>,
+	Neil Brown <neilb@suse.de>,
+	Olga Kornievskaia <kolga@netapp.com>,
+	Dai Ngo <Dai.Ngo@oracle.com>,
+	Tom Talpey <tom@talpey.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Al Viro <viro@zeniv.linux.org.uk>,
+	Jan Kara <jack@suse.cz>,
 	linux-fsdevel@vger.kernel.org,
-	linux-afs@lists.infradead.org,
-	autofs@vger.kernel.org,
-	linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org,
-	ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu,
-	ecryptfs@vger.kernel.org,
-	linux-efi@vger.kernel.org,
-	linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org,
-	linux-f2fs-devel@lists.sourceforge.net,
-	cluster-devel@redhat.com,
-	linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org,
-	jfs-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org,
 	linux-nfs@vger.kernel.org,
-	linux-nilfs@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net,
-	ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net,
-	devel@lists.orangefs.org,
-	linux-unionfs@vger.kernel.org,
-	linux-hardening@vger.kernel.org,
-	reiserfs-devel@vger.kernel.org,
-	linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org,
-	linux-trace-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org,
-	bpf@vger.kernel.org,
-	netdev@vger.kernel.org,
-	apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org,
-	selinux@vger.kernel.org
-Subject: [PATCH v2 92/92] fs: rename i_ctime field to __i_ctime
-Date: Wed,  5 Jul 2023 14:58:12 -0400
-Message-ID: <20230705185812.579118-4-jlayton@kernel.org>
+	netdev@vger.kernel.org
+Subject: [PATCH v2 88/92] sunrpc: convert to ctime accessor functions
+Date: Wed,  5 Jul 2023 15:01:53 -0400
+Message-ID: <20230705190309.579783-86-jlayton@kernel.org>
 X-Mailer: git-send-email 2.41.0
-In-Reply-To: <20230705185812.579118-1-jlayton@kernel.org>
-References: <20230705185812.579118-1-jlayton@kernel.org>
+In-Reply-To: <20230705190309.579783-1-jlayton@kernel.org>
+References: <20230705185755.579053-1-jlayton@kernel.org>
+ <20230705190309.579783-1-jlayton@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -267,45 +64,28 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Now that everything in-tree is converted to use the accessor functions,
-rename the i_ctime field in the inode to discourage direct access.
+In later patches, we're going to change how the inode's ctime field is
+used. Switch to using accessor functions instead of raw accesses of
+inode->i_ctime.
 
 Signed-off-by: Jeff Layton <jlayton@kernel.org>
 ---
- include/linux/fs.h | 6 +++---
- 1 file changed, 3 insertions(+), 3 deletions(-)
+ net/sunrpc/rpc_pipe.c | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-diff --git a/include/linux/fs.h b/include/linux/fs.h
-index 14e38bd900f1..b66442f91835 100644
---- a/include/linux/fs.h
-+++ b/include/linux/fs.h
-@@ -642,7 +642,7 @@ struct inode {
- 	loff_t			i_size;
- 	struct timespec64	i_atime;
- 	struct timespec64	i_mtime;
--	struct timespec64	i_ctime;
-+	struct timespec64	__i_ctime; /* use inode_*_ctime accessors! */
- 	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
- 	unsigned short          i_bytes;
- 	u8			i_blkbits;
-@@ -1485,7 +1485,7 @@ struct timespec64 inode_set_ctime_current(struct inode *inode);
-  */
- static inline struct timespec64 inode_get_ctime(const struct inode *inode)
- {
--	return inode->i_ctime;
-+	return inode->__i_ctime;
- }
- 
- /**
-@@ -1498,7 +1498,7 @@ static inline struct timespec64 inode_get_ctime(const struct inode *inode)
- static inline struct timespec64 inode_set_ctime_to_ts(struct inode *inode,
- 						      struct timespec64 ts)
- {
--	inode->i_ctime = ts;
-+	inode->__i_ctime = ts;
- 	return ts;
- }
- 
+diff --git a/net/sunrpc/rpc_pipe.c b/net/sunrpc/rpc_pipe.c
+index 0b6034fab9ab..f420d8457345 100644
+--- a/net/sunrpc/rpc_pipe.c
++++ b/net/sunrpc/rpc_pipe.c
+@@ -472,7 +472,7 @@ rpc_get_inode(struct super_block *sb, umode_t mode)
+ 		return NULL;
+ 	inode->i_ino = get_next_ino();
+ 	inode->i_mode = mode;
+-	inode->i_atime = inode->i_mtime = inode->i_ctime = current_time(inode);
++	inode->i_atime = inode->i_mtime = inode_set_ctime_current(inode);
+ 	switch (mode & S_IFMT) {
+ 	case S_IFDIR:
+ 		inode->i_fop = &simple_dir_operations;
 -- 
 2.41.0
 
