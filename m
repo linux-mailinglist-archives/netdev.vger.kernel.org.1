@@ -1,132 +1,180 @@
-Return-Path: <netdev+bounces-15462-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15463-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D3FA9747B64
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 04:09:43 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id DC4EA747BDD
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 05:38:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0C9BD1C20A47
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 02:09:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F38131C2094C
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 03:38:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A24E581C;
-	Wed,  5 Jul 2023 02:09:40 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD395A4D;
+	Wed,  5 Jul 2023 03:38:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 93CAE811
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 02:09:40 +0000 (UTC)
-Received: from mail-oo1-xc2d.google.com (mail-oo1-xc2d.google.com [IPv6:2607:f8b0:4864:20::c2d])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4C4A410D9;
-	Tue,  4 Jul 2023 19:09:39 -0700 (PDT)
-Received: by mail-oo1-xc2d.google.com with SMTP id 006d021491bc7-565d65adcf2so3659148eaf.3;
-        Tue, 04 Jul 2023 19:09:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688522978; x=1691114978;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=RSyXr8wt2ntmASjlaftTJycTyU0JD64M/HgW/H2pOqs=;
-        b=eZMqo8/SCRBx5qfVtU5/iGPTggyMi+m6cvjFi6VIFC3wQbfjLBH07alAHk0k6kOL7/
-         9YO44QJhs3uBCHqXAzo38gf8pQNnbckirskhI8w3Q5ZWPxI052rpYdw36oxCwY2tG6OW
-         vjw1xbjF2vL+O3zwy/rbXDRgZUehItq02WQmw0dejStm8lZg9BxR7lDBo5BGRdOq3z3i
-         t6z7Gzu63q1Ko3Q8GwnQ+y4DTgQXp14kSS/nccmHtKay1vHOsI/FyKcvJFPiJGd6KbAA
-         ah57Rfte1+BGOOrhmzK35ecaQWdJZTzFJjV94lkVIiBX3m/RzlAQTNPPU+8nBYGJ2Ygw
-         nLDA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688522978; x=1691114978;
-        h=content-transfer-encoding:subject:from:cc:to:content-language
-         :user-agent:mime-version:date:message-id:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=RSyXr8wt2ntmASjlaftTJycTyU0JD64M/HgW/H2pOqs=;
-        b=XBvnoBRxSBU4V9QAVedcHyVfpIv1S/8g1PmejitMs3Hr2gA6n/oIFr3qommrgnhVT3
-         bKOyb5rS+VuIRFz9yDwe60/Ud8gujruoQuvcl9SU2CWtGx4HgIXeYpi6uzpzoKO5jahH
-         Yhh8ISCNoq5IM4nZc37QkQrp5cuL+yaLX2ADlXALe7DRBX7oLYuU8NBFmuJhGDn5rnlx
-         TkFRby4RGm9EKPleq1CGFtDfLRSRSQWzAyg8xgywbFq1IInEZowtH5kwy2yb2R/E63hB
-         KLviX5qXgE8O2/cE4l+CohbMCSHRlqZB8Zi3N+B9uIregYUwUYDnzcHNvHBvmIUPLA0D
-         L6NA==
-X-Gm-Message-State: ABy/qLaKNYvP2eUpz4pmCnju4USQsVku+6pT4SUc6OFXSLOjyHsKD9aL
-	BT+nm8DznzwEVOga92fjCHw=
-X-Google-Smtp-Source: APBJJlHvCc3Ope5BY4FwHT0Mr77Uxm0rAhl9Pjar4p3dMmGJVjndYQeh1/V0YNqIdcAhmb2VdTgwmw==
-X-Received: by 2002:a05:6359:201:b0:134:f326:e819 with SMTP id ej1-20020a056359020100b00134f326e819mr10789439rwb.29.1688522978371;
-        Tue, 04 Jul 2023 19:09:38 -0700 (PDT)
-Received: from [192.168.0.103] ([103.131.18.64])
-        by smtp.gmail.com with ESMTPSA id 9-20020aa79109000000b0066a31111ccdsm10139786pfh.65.2023.07.04.19.09.33
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Tue, 04 Jul 2023 19:09:36 -0700 (PDT)
-Message-ID: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
-Date: Wed, 5 Jul 2023 09:09:32 +0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9EB7EA3D
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 03:38:39 +0000 (UTC)
+Received: from mx0b-0016f401.pphosted.com (mx0b-0016f401.pphosted.com [67.231.156.173])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 00C8E1A2;
+	Tue,  4 Jul 2023 20:38:37 -0700 (PDT)
+Received: from pps.filterd (m0045851.ppops.net [127.0.0.1])
+	by mx0b-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 364Lu0cD004348;
+	Tue, 4 Jul 2023 20:38:25 -0700
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
+ subject : date : message-id : mime-version : content-transfer-encoding :
+ content-type; s=pfpt0220; bh=wB0DSkHbuSEPjLODB+OEbokuQbKF1FQqCpHYFSRULkQ=;
+ b=gTTOJ2uosPRNJ2+X1BKLQWUREXXelWReX8YZAHESHeJ2wlsVqAzea7cmA9PO9tOH0/nV
+ 8fgx2soEUIdVETzJeacU6EDdCpXkIB4njIwPJsc2OjSoA+5zhY7357pKz/voywKPlPC7
+ kcwXATzS19/gv5amNfBylOjVFL0+yyVeuVO2kJ1xDa2cHOzSWpCyNbOkFr/p5b0DNOxb
+ 7crDqNfQeTPwXnM2EbtnrMSyvMcUWnKgoKek1LQvF/wXJukBch2NU8LSTtgQfGuwfntF
+ yuwVbWv/rTYFvBO6a7sX6LMSCgtd8gJAMpfTVYkBd39ZaREokjr6KxiBNzbdvSaAsLa6 Tg== 
+Received: from dc5-exch02.marvell.com ([199.233.59.182])
+	by mx0b-0016f401.pphosted.com (PPS) with ESMTPS id 3rjknj98h7-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
+	Tue, 04 Jul 2023 20:38:24 -0700
+Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Tue, 4 Jul
+ 2023 20:38:22 -0700
+Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
+ (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
+ Transport; Tue, 4 Jul 2023 20:38:22 -0700
+Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
+	by maili.marvell.com (Postfix) with ESMTP id 3D9A93F7057;
+	Tue,  4 Jul 2023 20:38:19 -0700 (PDT)
+From: Ratheesh Kannoth <rkannoth@marvell.com>
+To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+CC: <sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+        <kuba@kernel.org>, <pabeni@redhat.com>, <sbhatta@marvell.com>,
+        <gakula@marvell.com>, <schalla@marvell.com>, <hkelam@marvell.com>,
+        "Ratheesh
+ Kannoth" <rkannoth@marvell.com>
+Subject: [PATCH net] octeontx2-af: Promisc enable/disable through mbox
+Date: Wed, 5 Jul 2023 09:08:13 +0530
+Message-ID: <20230705033813.2744357-1-rkannoth@marvell.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Content-Language: en-US
-To: Dave Jones <davej@redhat.com>, "David S. Miller" <davem@davemloft.net>,
- Ross Maynard <bids.7405@bigpond.com>
-Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux USB <linux-usb@vger.kernel.org>
-From: Bagas Sanjaya <bagasdotme@gmail.com>
-Subject: Fwd: 3 more broken Zaurii - SL-5600, A300, C700
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Proofpoint-GUID: nf0j3nLTex24kgZEEv-YCnqWm3cbiScO
+X-Proofpoint-ORIG-GUID: nf0j3nLTex24kgZEEv-YCnqWm3cbiScO
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-04_16,2023-07-04_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+In Legacy silicon, promisc mode is only modified
+through CGX mbox messages. In CN10KB silicon, it modified
+from CGX mbox and NIX. This breaks legacy application
+behaviour. Fix this by removing call from NIX.
 
-I notice a regression report on Bugzilla [1]. Quoting from it:
+Fixes: d6c9784baf59 ("octeontx2-af: Invoke exact match functions if supported")
+Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+---
+ .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 11 ++---------
+ .../marvell/octeontx2/af/rvu_npc_hash.c       | 19 +++++++++++++++++--
+ 2 files changed, 19 insertions(+), 11 deletions(-)
 
-> The following patch broke support of 3 more Zaurus models: SL-5600, A300 and C700
-> 
-> [16adf5d07987d93675945f3cecf0e33706566005] usbnet: Remove over-broad module alias from zaurus
-> 
-> dmesg and lsusb output attached.
-
-Because the description above was vague, I asked the clarification.
-The reporter replied:
-
-> The problem is that networking to SL-5600 / A300 / C700 devices does not 
-> work. I cannot ping the devices.
-> 
-> The error is occurring in zaurus.c. dmesg is missing the following line:
-> 
-> zaurus 2-2:1.0 usb0: register 'zaurus' at usb-0000:00:1d.0-2, 
-> pseudo-MDLM (BLAN) device, 2a:01:39:93:bc:1a
-> 
-> A patch was created in 2022 to fix the same problem with the SL-6000:
-> 
-> USB: zaurus: support another broken Zaurus - 
-> [6605cc67ca18b9d583eb96e18a20f5f4e726103c]
-> 
-> Could you please create another patch for the 3 devices: SL-5600 / A300 
-> / C700?
-
-See Bugzilla for the full thread and attached dmesg and lsusb.
-
-Dave: The reporter asked to write the quirk for affected devices.
-Would you like to create it?
-
-Anyway, I'm adding this to regzbot:
-
-#regzbot introduced: 16adf5d07987d9 https://bugzilla.kernel.org/show_bug.cgi?id=217632
-#regzbot title: Removing zaurus overbroad aliases breaks 3 Zaurus devices
-
-Thanks.
-
-[1]: https://bugzilla.kernel.org/show_bug.cgi?id=217632
-
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+index 0d745ae1cc9a..04b0e885f9d2 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
+@@ -4069,21 +4069,14 @@ int rvu_mbox_handler_nix_set_rx_mode(struct rvu *rvu, struct nix_rx_mode *req,
+ 	}
+ 
+ 	/* install/uninstall promisc entry */
+-	if (promisc) {
++	if (promisc)
+ 		rvu_npc_install_promisc_entry(rvu, pcifunc, nixlf,
+ 					      pfvf->rx_chan_base,
+ 					      pfvf->rx_chan_cnt);
+-
+-		if (rvu_npc_exact_has_match_table(rvu))
+-			rvu_npc_exact_promisc_enable(rvu, pcifunc);
+-	} else {
++	else
+ 		if (!nix_rx_multicast)
+ 			rvu_npc_enable_promisc_entry(rvu, pcifunc, nixlf, false);
+ 
+-		if (rvu_npc_exact_has_match_table(rvu))
+-			rvu_npc_exact_promisc_disable(rvu, pcifunc);
+-	}
+-
+ 	return 0;
+ }
+ 
+diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+index 9f11c1e40737..7ee7bc256bde 100644
+--- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
++++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
+@@ -1164,8 +1164,10 @@ static u16 __rvu_npc_exact_cmd_rules_cnt_update(struct rvu *rvu, int drop_mcam_i
+ {
+ 	struct npc_exact_table *table;
+ 	u16 *cnt, old_cnt;
++	bool promisc;
+ 
+ 	table = rvu->hw->table;
++	promisc = table->promisc_mode[drop_mcam_idx];
+ 
+ 	cnt = &table->cnt_cmd_rules[drop_mcam_idx];
+ 	old_cnt = *cnt;
+@@ -1177,13 +1179,16 @@ static u16 __rvu_npc_exact_cmd_rules_cnt_update(struct rvu *rvu, int drop_mcam_i
+ 
+ 	*enable_or_disable_cam = false;
+ 
+-	/* If all rules are deleted, disable cam */
++	if (promisc)
++		goto done;
++
++	/* If all rules are deleted and not already in promisc mode; disable cam */
+ 	if (!*cnt && val < 0) {
+ 		*enable_or_disable_cam = true;
+ 		goto done;
+ 	}
+ 
+-	/* If rule got added, enable cam */
++	/* If rule got added and not already in promisc mode; enable cam */
+ 	if (!old_cnt && val > 0) {
+ 		*enable_or_disable_cam = true;
+ 		goto done;
+@@ -1462,6 +1467,11 @@ int rvu_npc_exact_promisc_disable(struct rvu *rvu, u16 pcifunc)
+ 	*promisc = false;
+ 	mutex_unlock(&table->lock);
+ 
++	/* Enable drop rule */
++	rvu_npc_enable_mcam_by_entry_index(rvu, drop_mcam_idx, NIX_INTF_RX, true);
++
++	dev_dbg(rvu->dev, "%s: disabled  promisc mode (cgx=%d lmac=%d)\n",
++		__func__, cgx_id, lmac_id);
+ 	return 0;
+ }
+ 
+@@ -1503,6 +1513,11 @@ int rvu_npc_exact_promisc_enable(struct rvu *rvu, u16 pcifunc)
+ 	*promisc = true;
+ 	mutex_unlock(&table->lock);
+ 
++	/*  disable drop rule */
++	rvu_npc_enable_mcam_by_entry_index(rvu, drop_mcam_idx, NIX_INTF_RX, false);
++
++	dev_dbg(rvu->dev, "%s: Enabled promisc mode (cgx=%d lmac=%d)\n",
++		__func__, cgx_id, lmac_id);
+ 	return 0;
+ }
+ 
 -- 
-An old man doll... just what I always wanted! - Clara
+2.25.1
+
 
