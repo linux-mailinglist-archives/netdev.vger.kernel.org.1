@@ -1,185 +1,121 @@
-Return-Path: <netdev+bounces-15467-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15468-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16E2E747C69
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 07:28:54 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 28794747C7E
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 07:37:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 224DD280F33
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 05:28:52 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5E6E5280F70
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 05:37:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B77DED1;
-	Wed,  5 Jul 2023 05:28:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83C3FED2;
+	Wed,  5 Jul 2023 05:37:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 28251EA5
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 05:28:49 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2112.outbound.protection.outlook.com [40.107.244.112])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 880F3E2;
-	Tue,  4 Jul 2023 22:28:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=jg/dKgIGuSBTfiPiHqNtbpzZ/jLJlcq00lwNkw1iPYftwNMYk7tuwhaA0iAe2rWDvqgzD2YX7FyLw1ghKM2DkkN+pa4p2NeA6zV9bJJLnicLhel9eS2AqhK+gaMs3o8YD08ZH5ENbFN5ABdbE+w8933z9Wmfbjp0HZSLLjvOMKYT2VcGkzOy0Axy00NfO4UkV5qnSCROFPfsob0e8rYeP7fqDBFGVT9uJKmKkqWGmJR+9OLtcWNYyL5Fq0y9vu624FnVfHqCCuVRQyC564umgWNH+Acp730ka+AqyDnLu848Wc+jgLujiAVQudrOsxc3UT6OBTCFSRDHBF6K14SyIA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=Z94uFq3Qid4lhL0r52QQv4NTix9YbJASUhgrePS5BQY=;
- b=gn9a7rPhR1Pu16iMkMRyWgRIz7J73k6jCByKads4DFkKKfAq6TYdMnGRsScYvzIMKID8LvMAAsxLgVRSJMwKvrceIjnwiWUhE+2HB1uwZmJKk7tTK18jcCprTLyJwGCeMQX4qYEyWRYSO+mieqvwlvdA1raxMWjlfoPzTYsq+6giiDvKgWqBAgTnzJzu7Gi4GSBxvwOrUgAJohRBWlBTF2apfe8vtjOYq63CYJrdypDAg1yKuq0pqGfqT+nkxZrLGcDTzvMgBElmLkxYdCZLPYpFPzhZnIAdHJA1YJz3hUY/Mnv2t1TYR5G77xQejs3IAq8FwdDIbctjhPeJdFBYyQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 778D4EA5
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 05:37:40 +0000 (UTC)
+Received: from mail-wm1-x334.google.com (mail-wm1-x334.google.com [IPv6:2a00:1450:4864:20::334])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC9EF1B2;
+	Tue,  4 Jul 2023 22:37:38 -0700 (PDT)
+Received: by mail-wm1-x334.google.com with SMTP id 5b1f17b1804b1-3fbc244d39dso84713255e9.3;
+        Tue, 04 Jul 2023 22:37:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=Z94uFq3Qid4lhL0r52QQv4NTix9YbJASUhgrePS5BQY=;
- b=QR6Nw27AOGvXiDWw1GBuw2MjtZMdAIJTQcTByhY5LFP2e+PUJgQcFWAeaoWFmxC2/M36/gHgbr1Rz/2+hpzArdqa8PiFnl36oNbxcgtC4QgCjz//yrtfFCM5XFLXxsdxei+0rKZTGE+hc4jimJ7HjEvYXpxxc7GDmpNYjtQbIsc=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com (2603:10b6:5:7b::25) by
- CH2PR13MB4410.namprd13.prod.outlook.com (2603:10b6:610:64::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6544.24; Wed, 5 Jul 2023 05:28:46 +0000
-Received: from DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::eb7b:880f:dc82:c8d1]) by DM6PR13MB4249.namprd13.prod.outlook.com
- ([fe80::eb7b:880f:dc82:c8d1%4]) with mapi id 15.20.6544.024; Wed, 5 Jul 2023
- 05:28:46 +0000
-From: Louis Peens <louis.peens@corigine.com>
-To: David Miller <davem@davemloft.net>,
+        d=gmail.com; s=20221208; t=1688535457; x=1691127457;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=n+INOy7S615L241gEHhdJ0IOGxGXI6Ocw51fSeMvLPU=;
+        b=Jok061kPq1gJXQlu8q+PGUHxn82e5V1QVedzSF4Pk0bS7UTBCxuQLpOs8W3OQv79EJ
+         h2DB2DYMfMZxUAe5Uin16J+kQpp5GbH7lnk+QcLCjI+n7ATTsif8d4F0/ZxBgGFGhRrF
+         mS3UIMpzNoUM+qnubdIPcqQoszosDQEPEe88bMmsyYuvE0s5FyZCUsePFi7Xmj8xO7yv
+         cWbklR35TpyCZDEPUrvLawfkPQjPH9AX2+o4Ztrj1w0avyhyHwv7CzEK+zk/CkXQr5dC
+         1H1rOnp08MAH2jDVh30ROHsl2gJYz9TN4hjPg7SBDLtdb5XFU5BRsBlOor0OgxbdZ323
+         3Zcg==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688535457; x=1691127457;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=n+INOy7S615L241gEHhdJ0IOGxGXI6Ocw51fSeMvLPU=;
+        b=KBoCJnAJB+J9b/W20ucZQCFdMGutGv1IDuZGQYbIosGR8KIxmmOAN/LnOhlcEOYZhH
+         yVE8VG9FiYMZPJj2jTm802vp2MA8eR+thjay50oDGZTl1oiyioAiem2NGkQ0oc4CaIk0
+         wYywJ1kWzga9k+ZS653BmEbHY/fqF3XoTG85ZtxIF83XpwO4NdkPLKAvneQGIWHAtlH5
+         CPn0zmfq9LC97/KcAGsK0vWAghrWMhPY7DgSJdXJmG1mhtt/TimHwYayUaBP9sJvFTzA
+         nAUI57ZvKTnITK1BS3ck7qPAaVzW8Ib/r7h9LvrdzgoSMd4FedWAiNtHVIfa9bHJFn60
+         rCcw==
+X-Gm-Message-State: AC+VfDyyOkhabXCMT5aS8xY3NKHjfwLfFF29K6dMDV4yhX/gPQPvPH9x
+	u5wb4NX6sSXM257xF4wcP0c=
+X-Google-Smtp-Source: ACHHUZ7zFSpkWtN4P7zpbYSN2maRSzo4sdC8M3kuxP0VRJkfMFzlJLNrl5DvbylxIHF9GqT8375QSQ==
+X-Received: by 2002:a05:600c:252:b0:3fb:b3aa:1c87 with SMTP id 18-20020a05600c025200b003fbb3aa1c87mr19891314wmj.40.1688535457128;
+        Tue, 04 Jul 2023 22:37:37 -0700 (PDT)
+Received: from mars.. ([2a02:168:6806:0:5558:4a0a:1c87:3931])
+        by smtp.gmail.com with ESMTPSA id f15-20020a7bcd0f000000b003f9bd9e3226sm1049369wmj.7.2023.07.04.22.37.36
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Tue, 04 Jul 2023 22:37:36 -0700 (PDT)
+From: Klaus Kudielka <klaus.kudielka@gmail.com>
+To: Thomas Petazzoni <thomas.petazzoni@bootlin.com>
+Cc: Klaus Kudielka <klaus.kudielka@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
 	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Jacob Keller <jacob.e.keller@intel.com>,
-	Simon Horman <simon.horman@corigine.com>,
-	Yinjun Zhang <yinjun.zhang@corigine.com>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Gregory CLEMENT <gregory.clement@bootlin.com>,
 	netdev@vger.kernel.org,
-	stable@vger.kernel.org,
-	oss-drivers@corigine.com
-Subject: [PATCH net v3] nfp: clean mc addresses in application firmware when closing port
-Date: Wed,  5 Jul 2023 07:28:18 +0200
-Message-Id: <20230705052818.7122-1-louis.peens@corigine.com>
-X-Mailer: git-send-email 2.34.1
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-ClientProxiedBy: ZR0P278CA0165.CHEP278.PROD.OUTLOOK.COM
- (2603:10a6:910:45::18) To DM6PR13MB4249.namprd13.prod.outlook.com
- (2603:10b6:5:7b::25)
+	linux-kernel@vger.kernel.org
+Subject: [PATCH net] net: mvneta: fix txq_map in case of txq_number==1
+Date: Wed,  5 Jul 2023 07:37:12 +0200
+Message-Id: <20230705053712.3914-1-klaus.kudielka@gmail.com>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR13MB4249:EE_|CH2PR13MB4410:EE_
-X-MS-Office365-Filtering-Correlation-Id: bde8c4a7-6a3f-4cd5-deec-08db7d18b449
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	0xV16X4GyZz6MOi5eKePutjMsxkhedNGm1md07dDRt6Dmm/K8OS8FWyKApRoHyiIYF3m5vlpuch7JuzOj4KenwITC0y8AT2+Ea1SVTgmqXyA2ekiXheRHC3aZnvqAdTa4TMsCiOgAKYJ5mzsEioRaOGuO47TKTePNZVnVyDBzsUg/iCZgUY3m4jxq6nED82KQFY0k7BYK744sZH+yPNb6t8h2OIapBaOQcofP17x1911WcQ6NlLHADzPuXgLzGMWWOsMlm9ZrWLtbgMSMkHpzCiu+lfx+WEon1fD0lkMGm9/Dbdh5udY4vpi7+6tw+fiz68lF8awAxZ/25VN4sYA5T/9Ou6WSeDahGLa+ksL4wJGcxssH0KKHuGAS5WMB0IFy5ebjBfwNMbUMEtjVXYkFdEagL9BrupQaeYm28+nSOquGjdRJOkxxv2ECxkPPcu8tt93tpSQ+FXWwjAd0/HBYMz8EhFNvAK1MIu3gPrmMIhOUM+ShM4JhBn/ly+OnGDVT9iw5MNfMDlU0cOINJlJMgV+wodrdAdDEX8Z4wMEJ68hcPcjU0U4juYdKKQS0S5hBsUFkPxXhiJQmEFReMcCek/VJfGleoJc/JL7hnHP/F2KhQVXIJAvALkcWUHqrbcNHTSF7UmoEJr4yh62vDH1/8iTJRDITs3GBTZIRoN/OOA=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR13MB4249.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(396003)(366004)(39840400004)(451199021)(26005)(107886003)(478600001)(6506007)(6666004)(1076003)(6512007)(86362001)(2616005)(186003)(54906003)(38350700002)(4326008)(38100700002)(66946007)(66556008)(83380400001)(110136005)(66476007)(6486002)(52116002)(316002)(8676002)(44832011)(41300700001)(2906002)(8936002)(5660300002)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?Jkaij4pmzuRuqzMJgN+quwPwZZP/PJv2/24PmjzHxqstf2l6GeEp66Dq6MqM?=
- =?us-ascii?Q?6AnqhDNjEs5x0lgYCEEKXSZuBdY70pkHdMYt6TyYCG9V/Y0EIMXo658O+u6s?=
- =?us-ascii?Q?NJ6I/A0wjwRUJTUPFlc3kdzyIOdCQNTsN1fB6hHs41T6Id30tm5RD6m87zch?=
- =?us-ascii?Q?i+d53B4m9L0G52F5VJE5M4f9x3dwMCfeHVrKxaPWIyVRzGE6IThQyhIsPl1x?=
- =?us-ascii?Q?Yub+cXgLLu15oysAeAf8izKH02GB0oNVhMKoV95Cf92BkLjAb6EwgWQhyKzq?=
- =?us-ascii?Q?ipLZ4q7wjrfK8qb3zTIX+obSzP2mA2yIUJMM45PR9fyeQXfWNr1WYIp2V/Q4?=
- =?us-ascii?Q?W0Vvc3siDebEwT/FnJimmhsinwOcQ37tZIizJbmNW1bf7IWfmj+MaY/jdNs/?=
- =?us-ascii?Q?ATQkIFWdjpPNkppbBHTf5d/0xZk88a9iU6p7n0kKuR2B5H4lHWrsObZU+U3l?=
- =?us-ascii?Q?2SQhMYamfbI4gOzddI6FNmE16hvW9AlNl0oEurBQYP18yTQdCrGQF3uUicqC?=
- =?us-ascii?Q?7Q57pzveqgOw8+7Bb5aMJ/BSdlbL9vLUYhCfYRfFmXB52WzwmEkzEn5QurNF?=
- =?us-ascii?Q?Hbn6qMNQndeQWlnfwjGPB4lfAz42AmtZl/sT/mdu19zCxJMAN+Jrx20LGNWL?=
- =?us-ascii?Q?n6193vmpH0XMvSgMaUd8k9ITJrNds95Et5Ghiw0F6aZwdF5XG1QFCZZFlS9Z?=
- =?us-ascii?Q?uK52tHi7/DUP7C3MkGrCp2QG4Py0B/aeVlr9glTccrE44/5fXCs7XQJ4tGcD?=
- =?us-ascii?Q?gt6c3BvQLdEYBOWx63Ik7zQl4oC9FJEIfMmID0eCmgTmQtOLSO5cNfIl5u4t?=
- =?us-ascii?Q?KwVaxB+9vQAYjC4qIJO2OCb6JqdLqLIah1OmAjvDU66JqbWltlfAgpT23Jce?=
- =?us-ascii?Q?gJ17ufHCAFa2N7MpdYUtPIqFcnVi8VlAeW2jY2KwCCKeve/dlOea/zYKVejv?=
- =?us-ascii?Q?BhFAQ+dY4GA5vFFR458U1WuMdxG6hGo3hPjgZeiRHe1fqikq6p9gLztBBi0K?=
- =?us-ascii?Q?NFGXV5Re7KukI0LC+ypz7qfMaOFRCL2IY98FpCrvWnymz85EnqEV07IBTL6o?=
- =?us-ascii?Q?hfp+XL5RQPaqkzEv7dqR6lRrCcjMJFtb2ZLLNas7ztQb6/eBrF8ljFr0QEuB?=
- =?us-ascii?Q?/xuzzgtqOWieNpGt76Qk+toz5LKsVZs/hPkoZ4zLCA9NFiFwIeCQHk+mvKho?=
- =?us-ascii?Q?TppbXX5CmxOGCuBcY/f9+IYuRgJhP064P+mcxcET1WkkvZ9wdr9ZiW2WkXFI?=
- =?us-ascii?Q?gZj5SL63U33xo8ZAPVFwC7r7LVZZ2DQa1eK2070CJdnRQnXXiqAGP30hqIuk?=
- =?us-ascii?Q?Z7SFMYAnBFae9Nd10AfB0Dx4IQNbBZuRA31kV6YU5z7R4/v/ZKAF465HxNgx?=
- =?us-ascii?Q?eSh5lRX84PHdtQ71mOhK9e+yGZ6KiUPSx4VNwypyr9sTc9V8raYve9b2QtVm?=
- =?us-ascii?Q?90fP/RRsVZ4QzQi6jOCqMhyIqNlHWG+0ld2zdjUdKX2txwbba8LPTv/PHAbA?=
- =?us-ascii?Q?BNpF8uOz/T5P/O94NHCstFm8Obx/eZhKiHG8WbfpAhzyim4sr15xKxhR/2cs?=
- =?us-ascii?Q?M395elMZMTfHUtoLFHVLVYtHDMEZU6a7GNUWMiAAQVefx4iI6nPStq4dwVBR?=
- =?us-ascii?Q?6g=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: bde8c4a7-6a3f-4cd5-deec-08db7d18b449
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR13MB4249.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 05 Jul 2023 05:28:46.4371
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: duOYsYZcTZp2zPoKfjwSYU/u6+cwp+0y7CMijGFRmiDPF9FDXnVGAYMtEaviLxmYhH6IAJu22G4ACxH3cm5QFGp70n5utBUwKqp6ytCWOUc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH2PR13MB4410
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Yinjun Zhang <yinjun.zhang@corigine.com>
+If we boot with mvneta.txq_number=1, the txq_map is set incorrectly:
+MVNETA_CPU_TXQ_ACCESS(1) refers to TX queue 1, but only TX queue 0 is
+initialized. Fix this.
 
-When moving devices from one namespace to another, mc addresses are
-cleaned in software while not removed from application firmware. Thus
-the mc addresses are remained and will cause resource leak.
-
-Now use `__dev_mc_unsync` to clean mc addresses when closing port.
-
-Fixes: e20aa071cd95 ("nfp: fix schedule in atomic context when sync mc address")
-Cc: stable@vger.kernel.org
-Signed-off-by: Yinjun Zhang <yinjun.zhang@corigine.com>
-Acked-by: Simon Horman <simon.horman@corigine.com>
-Signed-off-by: Louis Peens <louis.peens@corigine.com>
+Fixes: 50bf8cb6fc9c ("net: mvneta: Configure XPS support")
+Signed-off-by: Klaus Kudielka <klaus.kudielka@gmail.com>
 ---
-Changes since v2:
-* Use function prototype to avoid moving code chunk.
+ drivers/net/ethernet/marvell/mvneta.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Changes since v1:
-
-* Use __dev_mc_unsyc to clean mc addresses instead of tracking mc addresses by
-  driver itself.
-* Clean mc addresses when closing port instead of driver exits,
-  so that the issue of moving devices between namespaces can be fixed.
-* Modify commit message accordingly.
-
- drivers/net/ethernet/netronome/nfp/nfp_net_common.c | 5 +++++
- 1 file changed, 5 insertions(+)
-
-diff --git a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-index 49f2f081ebb5..6b1fb5708434 100644
---- a/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-+++ b/drivers/net/ethernet/netronome/nfp/nfp_net_common.c
-@@ -53,6 +53,8 @@
- #include "crypto/crypto.h"
- #include "crypto/fw.h"
+diff --git a/drivers/net/ethernet/marvell/mvneta.c b/drivers/net/ethernet/marvell/mvneta.c
+index 2cad76d0a50e..4401fad31fb9 100644
+--- a/drivers/net/ethernet/marvell/mvneta.c
++++ b/drivers/net/ethernet/marvell/mvneta.c
+@@ -1505,7 +1505,7 @@ static void mvneta_defaults_set(struct mvneta_port *pp)
+ 			 */
+ 			if (txq_number == 1)
+ 				txq_map = (cpu == pp->rxq_def) ?
+-					MVNETA_CPU_TXQ_ACCESS(1) : 0;
++					MVNETA_CPU_TXQ_ACCESS(0) : 0;
  
-+static int nfp_net_mc_unsync(struct net_device *netdev, const unsigned char *addr);
-+
- /**
-  * nfp_net_get_fw_version() - Read and parse the FW version
-  * @fw_ver:	Output fw_version structure to read to
-@@ -1084,6 +1086,9 @@ static int nfp_net_netdev_close(struct net_device *netdev)
- 
- 	/* Step 2: Tell NFP
- 	 */
-+	if (nn->cap_w1 & NFP_NET_CFG_CTRL_MCAST_FILTER)
-+		__dev_mc_unsync(netdev, nfp_net_mc_unsync);
-+
- 	nfp_net_clear_config_and_disable(nn);
- 	nfp_port_configure(netdev, false);
- 
+ 		} else {
+ 			txq_map = MVNETA_CPU_TXQ_ACCESS_ALL_MASK;
+@@ -4295,7 +4295,7 @@ static void mvneta_percpu_elect(struct mvneta_port *pp)
+ 		 */
+ 		if (txq_number == 1)
+ 			txq_map = (cpu == elected_cpu) ?
+-				MVNETA_CPU_TXQ_ACCESS(1) : 0;
++				MVNETA_CPU_TXQ_ACCESS(0) : 0;
+ 		else
+ 			txq_map = mvreg_read(pp, MVNETA_CPU_MAP(cpu)) &
+ 				MVNETA_CPU_TXQ_ACCESS_ALL_MASK;
 -- 
-2.34.1
+2.40.1
 
 
