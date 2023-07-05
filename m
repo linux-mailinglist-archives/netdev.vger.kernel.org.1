@@ -1,145 +1,69 @@
-Return-Path: <netdev+bounces-15671-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15672-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4B14F74919E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 01:20:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9F84B7491FD
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 01:42:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 06A102811CD
-	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 23:20:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CF3561C20C72
+	for <lists+netdev@lfdr.de>; Wed,  5 Jul 2023 23:42:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 12DB015AD7;
-	Wed,  5 Jul 2023 23:20:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B50E915AD7;
+	Wed,  5 Jul 2023 23:42:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5DCB5156F7;
-	Wed,  5 Jul 2023 23:20:10 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 26476C433C8;
-	Wed,  5 Jul 2023 23:19:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 298081548B
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:42:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPS id A0043C433C8;
+	Wed,  5 Jul 2023 23:42:42 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688599209;
-	bh=lKrue1sGsFTYklMQWRMbQ3My1e6nxD2ObDEGwR/VsF0=;
-	h=Date:Subject:To:References:From:In-Reply-To:From;
-	b=HLxmQwiZ1LmjUMMnuuRPPSyg4M265uTgwaRQNcugB9qBZelv5caqUlnlZ5FOkyCBO
-	 LA9nfmoC3VcwDcNYXdLwyrAjpQ8qAvbq7SFByp4Q0d8VX6Iv9VyTpE94IU21bzQwq7
-	 AXFUzX0mVEu7h6lf94UAW2WWe3aMpfRBaJ0VbFwIq54AZXBu03Eb370uSlX/QYxLnb
-	 UXNpYhAvkUoamOq5NO810kR9phlIz2t2HqAG1QMsAKmqwo0IMtrDOTVHIlTnm36wsc
-	 mJPYsNRjIZdhZzmDYmS/04VlnpppU6zobkiJuxMYBpvIxpIIrXPcePBFRLkFK603MQ
-	 3zkknzFWV7lIQ==
-Message-ID: <a482ca9b-9621-7363-0233-1c0bec15aa6c@kernel.org>
-Date: Thu, 6 Jul 2023 08:19:46 +0900
+	s=k20201202; t=1688600562;
+	bh=mQwSV/WhgBqTT+Gf/XxCaf8OIlzlS1QxSGJvq3DCLeg=;
+	h=Subject:From:In-Reply-To:References:Date:To:Cc:From;
+	b=HoXJEmtowHepiCJAIZUCc/fVmW4qQKtxgJvEmxxfqEoCDF3kvgwzB+3Q3Bqtaigcj
+	 dUJTloB57lezuKo4Za2aTQd21bv7Mn/WqEPQjABz8lVkxlxJJpg+YC2tI05u7PcVWx
+	 9c6Wq0mXFwi+X8I0UPbzok0yFhr+vKB/MSZUysk/G0W0hjp+awDVsH2w9tUcyqL3ei
+	 nBRNbAPvyZZmMLWefzXG7LbYdL8+0bSmxunscgnf0uEXeha7YshFWMDrD1EUQtdg7U
+	 iCW4Cpd3Abmv0Z3JyVyIUS8it7qBz+dVuJcDUyW0QncYZFXdEmHO866BkHbdhvTWEL
+	 +N2iBEukI9XgA==
+Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 8D574C0C40E;
+	Wed,  5 Jul 2023 23:42:42 +0000 (UTC)
+Subject: Re: [GIT PULL] Networking for v6.5-rc1
+From: pr-tracker-bot@kernel.org
+In-Reply-To: <20230705190945.602792-1-kuba@kernel.org>
+References: <20230705190945.602792-1-kuba@kernel.org>
+X-PR-Tracked-List-Id: <linux-kernel.vger.kernel.org>
+X-PR-Tracked-Message-Id: <20230705190945.602792-1-kuba@kernel.org>
+X-PR-Tracked-Remote: git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc1
+X-PR-Tracked-Commit-Id: cc7eab25b1cf3f9594fe61142d3523ce4d14a788
+X-PR-Merge-Tree: torvalds/linux.git
+X-PR-Merge-Refname: refs/heads/master
+X-PR-Merge-Commit-Id: 6843306689aff3aea608e4d2630b2a5a0137f827
+Message-Id: <168860056257.20183.11442487377795774975.pr-tracker-bot@kernel.org>
+Date: Wed, 05 Jul 2023 23:42:42 +0000
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: torvalds@linux-foundation.org, kuba@kernel.org, davem@davemloft.net, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, pabeni@redhat.com
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v2 92/92] fs: rename i_ctime field to __i_ctime
-Content-Language: en-US
-To: Jeff Layton <jlayton@kernel.org>, jk@ozlabs.org, arnd@arndb.de,
- mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu,
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com,
- borntraeger@linux.ibm.com, svens@linux.ibm.com, gregkh@linuxfoundation.org,
- arve@android.com, tkjos@android.com, maco@android.com,
- joel@joelfernandes.org, brauner@kernel.org, cmllamas@google.com,
- surenb@google.com, dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca,
- leon@kernel.org, bwarrum@linux.ibm.com, rituagar@linux.ibm.com,
- ericvh@kernel.org, lucho@ionkov.net, asmadeus@codewreck.org,
- linux_oss@crudebyte.com, dsterba@suse.com, dhowells@redhat.com,
- marc.dionne@auristor.com, viro@zeniv.linux.org.uk, raven@themaw.net,
- luisbg@kernel.org, salah.triki@gmail.com, aivazian.tigran@gmail.com,
- ebiederm@xmission.com, keescook@chromium.org, clm@fb.com,
- josef@toxicpanda.com, xiubli@redhat.com, idryomov@gmail.com,
- jaharkes@cs.cmu.edu, coda@cs.cmu.edu, jlbec@evilplan.org, hch@lst.de,
- nico@fluxnic.net, rafael@kernel.org, code@tyhicks.com, ardb@kernel.org,
- xiang@kernel.org, chao@kernel.org, huyue2@coolpad.com,
- jefflexu@linux.alibaba.com, linkinjeon@kernel.org, sj1557.seo@samsung.com,
- jack@suse.com, tytso@mit.edu, adilger.kernel@dilger.ca, jaegeuk@kernel.org,
- hirofumi@mail.parknet.co.jp, miklos@szeredi.hu, rpeterso@redhat.com,
- agruenba@redhat.com, richard@nod.at, anton.ivanov@cambridgegreys.com,
- johannes@sipsolutions.net, mikulas@artax.karlin.mff.cuni.cz,
- mike.kravetz@oracle.com, muchun.song@linux.dev, dwmw2@infradead.org,
- shaggy@kernel.org, tj@kernel.org, trond.myklebust@hammerspace.com,
- anna@kernel.org, chuck.lever@oracle.com, neilb@suse.de, kolga@netapp.com,
- Dai.Ngo@oracle.com, tom@talpey.com, konishi.ryusuke@gmail.com,
- anton@tuxera.com, almaz.alexandrovich@paragon-software.com, mark@fasheh.com,
- joseph.qi@linux.alibaba.com, me@bobcopeland.com, hubcap@omnibond.com,
- martin@omnibond.com, amir73il@gmail.com, mcgrof@kernel.org,
- yzaikin@google.com, tony.luck@intel.com, gpiccoli@igalia.com,
- al@alarsen.net, sfrench@samba.org, pc@manguebit.com, lsahlber@redhat.com,
- sprasad@microsoft.com, senozhatsky@chromium.org, phillip@squashfs.org.uk,
- rostedt@goodmis.org, mhiramat@kernel.org, dushistov@mail.ru,
- hdegoede@redhat.com, djwong@kernel.org, naohiro.aota@wdc.com,
- jth@kernel.org, ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org,
- martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- hughd@google.com, akpm@linux-foundation.org, davem@davemloft.net,
- edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- john.johansen@canonical.com, paul@paul-moore.com, jmorris@namei.org,
- serge@hallyn.com, stephen.smalley.work@gmail.com, eparis@parisplace.org,
- jgross@suse.com, stern@rowland.harvard.edu, lrh2000@pku.edu.cn,
- sebastian.reichel@collabora.com, wsa+renesas@sang-engineering.com,
- quic_ugoswami@quicinc.com, quic_linyyuan@quicinc.com, john@keeping.me.uk,
- error27@gmail.com, quic_uaggarwa@quicinc.com, hayama@lineo.co.jp,
- jomajm@gmail.com, axboe@kernel.dk, dhavale@google.com, dchinner@redhat.com,
- hannes@cmpxchg.org, zhangpeng362@huawei.com, slava@dubeyko.com,
- gargaditya08@live.com, penguin-kernel@I-love.SAKURA.ne.jp,
- yifeliu@cs.stonybrook.edu, madkar@cs.stonybrook.edu, ezk@cs.stonybrook.edu,
- yuzhe@nfschina.com, willy@infradead.org, okanatov@gmail.com,
- jeffxu@chromium.org, linux@treblig.org, mirimmad17@gmail.com,
- yijiangshan@kylinos.cn, yang.yang29@zte.com.cn, xu.xin16@zte.com.cn,
- chengzhihao1@huawei.com, shr@devkernel.io, Liam.Howlett@Oracle.com,
- adobriyan@gmail.com, chi.minghao@zte.com.cn, roberto.sassu@huawei.com,
- linuszeng@tencent.com, bvanassche@acm.org, zohar@linux.ibm.com,
- yi.zhang@huawei.com, trix@redhat.com, fmdefrancesco@gmail.com,
- ebiggers@google.com, princekumarmaurya06@gmail.com, chenzhongjin@huawei.com,
- riel@surriel.com, shaozhengchao@huawei.com, jingyuwang_vip@163.com,
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
- linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
- autofs@vger.kernel.org, linux-mm@kvack.org, linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org, codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org,
- linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org,
- linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com,
- linux-um@lists.infradead.org, linux-mtd@lists.infradead.org,
- jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org,
- linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net,
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev,
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
- linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org,
- reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
- samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org,
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org,
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org,
- selinux@vger.kernel.org
-References: <20230705185812.579118-1-jlayton@kernel.org>
- <20230705185812.579118-4-jlayton@kernel.org>
-From: Damien Le Moal <dlemoal@kernel.org>
-Organization: Western Digital Research
-In-Reply-To: <20230705185812.579118-4-jlayton@kernel.org>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
 
-On 7/6/23 03:58, Jeff Layton wrote:
-> Now that everything in-tree is converted to use the accessor functions,
-> rename the i_ctime field in the inode to discourage direct access.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+The pull request you sent on Wed,  5 Jul 2023 12:09:45 -0700:
 
-Looks OK to me.
+> git://git.kernel.org/pub/scm/linux/kernel/git/netdev/net.git tags/net-6.5-rc1
 
-Reviewed-by: Damien Le Moal <dlemoal@kernel.org>
+has been merged into torvalds/linux.git:
+https://git.kernel.org/torvalds/c/6843306689aff3aea608e4d2630b2a5a0137f827
+
+Thank you!
 
 -- 
-Damien Le Moal
-Western Digital Research
-
+Deet-doot-dot, I am a bot.
+https://korg.docs.kernel.org/prtracker.html
 
