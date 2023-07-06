@@ -1,59 +1,60 @@
-Return-Path: <netdev+bounces-15711-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15712-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4457B7494AF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:28:06 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 580427494C0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:44:44 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EE2A1281207
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 04:28:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7DF171C20CD3
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 04:44:43 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 120DAEC2;
-	Thu,  6 Jul 2023 04:28:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5DA34EC2;
+	Thu,  6 Jul 2023 04:44:41 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 06017EA4
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 04:28:02 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6846E1BD0;
-	Wed,  5 Jul 2023 21:28:01 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 365I3AWP030200;
-	Wed, 5 Jul 2023 21:27:53 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=HP4LiQ6LuTG/JSI25L4E4+XjHbPHi/cDQHv1hFi3YAU=;
- b=WSBOo5hmIc6GgoSEodAS8UxtiSpWOb6+wEHCPs0eF1/myhBrdHWPnWIEAMAb8ALXWlcK
- Rw+nRIBrj7IWNQSS6ocPfDoeajN7nUshUBAzPJERPKsW18SzAuOpJiYgd9wRfzoknZX5
- tJUHC/5xghGx2oUQEtIbdsqhXQQcU96OUpa93HPCp384Y6/i8nT/YoNXLWT0vkfQeiT+
- hCTHVw5UKqftLeWA2JSKYpzH8gqJnJspC9SSlE+4kuM0KOKPjECd1iHfTNircmu/qwTn
- oLgIyiszzyMBSRVmSwpg5TFnjSFZ8L0k0fI7tqS1QCpnu1IzkSUms3T39wD/MZCzeaBX kg== 
-Received: from dc5-exch02.marvell.com ([199.233.59.182])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rn3v93w7b-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Wed, 05 Jul 2023 21:27:53 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Wed, 5 Jul
- 2023 21:27:51 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Wed, 5 Jul 2023 21:27:51 -0700
-Received: from marvell-OptiPlex-7090.marvell.com (unknown [10.28.36.165])
-	by maili.marvell.com (Postfix) with ESMTP id D02B83F7066;
-	Wed,  5 Jul 2023 21:27:47 -0700 (PDT)
-From: Ratheesh Kannoth <rkannoth@marvell.com>
-To: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>
-CC: <michal.kubiak@intel.com>, <sgoutham@marvell.com>, <davem@davemloft.net>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <sbhatta@marvell.com>, <gakula@marvell.com>, <schalla@marvell.com>,
-        <hkelam@marvell.com>, Ratheesh Kannoth <rkannoth@marvell.com>
-Subject: [PATCH net v1] octeontx2-af: Promisc enable/disable through mbox
-Date: Thu, 6 Jul 2023 09:57:05 +0530
-Message-ID: <20230706042705.3235990-1-rkannoth@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4F52EA47
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 04:44:40 +0000 (UTC)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0631172B
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 21:44:39 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688618679; x=1720154679;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=i9WQHef9kqRhh4UQbpWXW4F2xGqcNiPqfVW0EHpDWkY=;
+  b=i2pA2Kn8TQyMDvCuzBITCybDu84BZ3Ys0C7+QL/Ek0nIZg2n1LzLs9iJ
+   H+7A3tu8wLxLAISAfa9qm0OP9Skx8c+ru4rP/0pmoHiRMhmxZe7rpMZOx
+   94qJw0cZp/CSc9WlOOLZqXVYPH6ir25eN75zDB/vxXaEapWfqlchM7HwK
+   htVBKtH6ejEz1Gcb96IU4JWMKVr3moJrslRRFSoNpd1jLsD9SGZtx/uKS
+   oWgPE8UjlDsjEkcB+YbDz3yqWrRKqfWw+TJZNo6GjOIl84970Vkyd0fzH
+   8WjzyFR9NNDhuRzgGrDQm1Kw17+ib2a5wztHIJxtfnl3NFVtaCIuQZGJ/
+   g==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="394259405"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="394259405"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 21:44:39 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="754614502"
+X-IronPort-AV: E=Sophos;i="6.01,184,1684825200"; 
+   d="scan'208";a="754614502"
+Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
+  by orsmga001.jf.intel.com with ESMTP; 05 Jul 2023 21:44:37 -0700
+From: Junfeng Guo <junfeng.guo@intel.com>
+To: netdev@vger.kernel.org
+Cc: jeroendb@google.com,
+	pkaligineedi@google.com,
+	shailend@google.com,
+	haiyue.wang@intel.com,
+	Junfeng Guo <junfeng.guo@intel.com>
+Subject: [PATCH net] gve: Set default duplex configuration to full
+Date: Thu,  6 Jul 2023 12:41:28 +0800
+Message-Id: <20230706044128.2726747-1-junfeng.guo@intel.com>
 X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,124 +63,38 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: wGFvuWNvoBlT3iqbu_ehh_3DD9p9PiNw
-X-Proofpoint-ORIG-GUID: wGFvuWNvoBlT3iqbu_ehh_3DD9p9PiNw
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-06_02,2023-07-05_01,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-In legacy silicon, promiscuous mode is only modified
-through CGX mbox messages. In CN10KB silicon, it is modified
-from CGX mbox and NIX. This breaks legacy application
-behaviour. Fix this by removing call from NIX.
+Current duplex mode was unset in the driver, resulting in the default
+parameter being set to 0, which corresponds to half duplex. It might
+mislead users to have incorrect expectation about the driver's
+transmission capabilities.
+Set the default duplex configuration to full, as the driver runs in
+full duplex mode at this point.
 
-Fixes: d6c9784baf59 ("octeontx2-af: Invoke exact match functions if supported")
-Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
-
+Fixes: 7e074d5a76ca ("gve: Enable Link Speed Reporting in the driver.")
+Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
 ---
-ChangeLog
+ drivers/net/ethernet/google/gve/gve_ethtool.c | 3 +++
+ 1 file changed, 3 insertions(+)
 
-v0 -> v1: Fix 80 lines checkpatch warnings
----
- .../ethernet/marvell/octeontx2/af/rvu_nix.c   | 11 ++-------
- .../marvell/octeontx2/af/rvu_npc_hash.c       | 23 +++++++++++++++++--
- 2 files changed, 23 insertions(+), 11 deletions(-)
-
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-index 0d745ae1cc9a..04b0e885f9d2 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_nix.c
-@@ -4069,21 +4069,14 @@ int rvu_mbox_handler_nix_set_rx_mode(struct rvu *rvu, struct nix_rx_mode *req,
- 	}
+diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
+index cfd4b8d284d1..50162ec9424d 100644
+--- a/drivers/net/ethernet/google/gve/gve_ethtool.c
++++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
+@@ -590,6 +590,9 @@ static int gve_get_link_ksettings(struct net_device *netdev,
+ 		err = gve_adminq_report_link_speed(priv);
  
- 	/* install/uninstall promisc entry */
--	if (promisc) {
-+	if (promisc)
- 		rvu_npc_install_promisc_entry(rvu, pcifunc, nixlf,
- 					      pfvf->rx_chan_base,
- 					      pfvf->rx_chan_cnt);
--
--		if (rvu_npc_exact_has_match_table(rvu))
--			rvu_npc_exact_promisc_enable(rvu, pcifunc);
--	} else {
-+	else
- 		if (!nix_rx_multicast)
- 			rvu_npc_enable_promisc_entry(rvu, pcifunc, nixlf, false);
- 
--		if (rvu_npc_exact_has_match_table(rvu))
--			rvu_npc_exact_promisc_disable(rvu, pcifunc);
--	}
--
- 	return 0;
- }
- 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-index 9f11c1e40737..6fe67f3a7f6f 100644
---- a/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/af/rvu_npc_hash.c
-@@ -1164,8 +1164,10 @@ static u16 __rvu_npc_exact_cmd_rules_cnt_update(struct rvu *rvu, int drop_mcam_i
- {
- 	struct npc_exact_table *table;
- 	u16 *cnt, old_cnt;
-+	bool promisc;
- 
- 	table = rvu->hw->table;
-+	promisc = table->promisc_mode[drop_mcam_idx];
- 
- 	cnt = &table->cnt_cmd_rules[drop_mcam_idx];
- 	old_cnt = *cnt;
-@@ -1177,13 +1179,18 @@ static u16 __rvu_npc_exact_cmd_rules_cnt_update(struct rvu *rvu, int drop_mcam_i
- 
- 	*enable_or_disable_cam = false;
- 
--	/* If all rules are deleted, disable cam */
-+	if (promisc)
-+		goto done;
+ 	cmd->base.speed = priv->link_speed;
 +
-+	/* If all rules are deleted and not already in promisc mode;
-+	 * disable cam
-+	 */
- 	if (!*cnt && val < 0) {
- 		*enable_or_disable_cam = true;
- 		goto done;
- 	}
- 
--	/* If rule got added, enable cam */
-+	/* If rule got added and not already in promisc mode; enable cam */
- 	if (!old_cnt && val > 0) {
- 		*enable_or_disable_cam = true;
- 		goto done;
-@@ -1462,6 +1469,12 @@ int rvu_npc_exact_promisc_disable(struct rvu *rvu, u16 pcifunc)
- 	*promisc = false;
- 	mutex_unlock(&table->lock);
- 
-+	/* Enable drop rule */
-+	rvu_npc_enable_mcam_by_entry_index(rvu, drop_mcam_idx, NIX_INTF_RX,
-+					   true);
++	cmd->base.duplex = DUPLEX_FULL;
 +
-+	dev_dbg(rvu->dev, "%s: disabled  promisc mode (cgx=%d lmac=%d)\n",
-+		__func__, cgx_id, lmac_id);
- 	return 0;
- }
- 
-@@ -1503,6 +1516,12 @@ int rvu_npc_exact_promisc_enable(struct rvu *rvu, u16 pcifunc)
- 	*promisc = true;
- 	mutex_unlock(&table->lock);
- 
-+	/*  disable drop rule */
-+	rvu_npc_enable_mcam_by_entry_index(rvu, drop_mcam_idx, NIX_INTF_RX,
-+					   false);
-+
-+	dev_dbg(rvu->dev, "%s: Enabled promisc mode (cgx=%d lmac=%d)\n",
-+		__func__, cgx_id, lmac_id);
- 	return 0;
+ 	return err;
  }
  
 -- 
