@@ -1,304 +1,183 @@
-Return-Path: <netdev+bounces-15730-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15731-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id C829D7496DA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:56:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id B06097496DC
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:56:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A59661C20D09
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:56:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 67C6128127A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:56:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8BB8E15BB;
-	Thu,  6 Jul 2023 07:56:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1C7F415BB;
+	Thu,  6 Jul 2023 07:56:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7EB2F110E
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 07:56:09 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F682121
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 00:56:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688630166;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=hySNpHyRfM9pyhg8/6aj+xHmN6E1rSwH8K6gl3I4pyE=;
-	b=iBKhiAv2/EmLW4MU5uUlu0aZ1PPMYcHHX9ZNPt/Hy+cq5JJco+JiBBXnv10f0uk1NMT99m
-	/+2FUqYYPN9mNTVlLUn8l9hA0fzgsoEDFmkCk/UnRY53lPh6ZADRHi+P3mRdtfsRQHWxl8
-	7U6A1dzYMD+EJB0XzRsL29k3luTTqC0=
-Received: from mail-lj1-f197.google.com (mail-lj1-f197.google.com
- [209.85.208.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-161-9Li2VqK8OQuMIVoTwRs7sA-1; Thu, 06 Jul 2023 03:56:05 -0400
-X-MC-Unique: 9Li2VqK8OQuMIVoTwRs7sA-1
-Received: by mail-lj1-f197.google.com with SMTP id 38308e7fff4ca-2b6fdb7eeafso3729181fa.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 00:56:05 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688630164; x=1691222164;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=hySNpHyRfM9pyhg8/6aj+xHmN6E1rSwH8K6gl3I4pyE=;
-        b=ipJhHIY4k5SIK8LT2zkkZpAl416MQs2Ttgoa/kbfhnb76plXh+Q0oZ99BLg9qZm/0P
-         6VVBHWI5+c5xGp5iRf4HeKoYL/EWqzUvOsz4u+fL/80jG9GBJptyFFBzsQWGafrfU3yH
-         1EUEBdpHm0QfXhf5yveD71c0BORD2tEgTUEF9jHXSpP2VZLYxVLs4f3wRAXtKKWNqbmr
-         kr6/arFgK0hn88Dn8QN3sgD4vR5oV+BxN3rvUY8z+ilGEZRkbIJCAp+ZF7DqUaKsK6JZ
-         3ZdCUdeUwTMViihw3fvRrhnkfbG3V1zUBzllLqU/6ljkP6SBqgs2Wdiyob40bRAqNp1e
-         oxDg==
-X-Gm-Message-State: ABy/qLYurxY0zAhEVensU93wwye3IRcuY3qMDKc3NgHTeCkLhip4vw5d
-	FWrUAwToWT1B6PAlvx/BkXFLc+shUnDV+rzwkNdjgu3DGbrGRT3NL8VgtEE+DT+YZXuiinkVNjg
-	8RtxF6kX5c768xItKIFxMPr9ReG0bPgCpC0qyVDPN
-X-Received: by 2002:a2e:a3d2:0:b0:2b6:e7d6:714d with SMTP id w18-20020a2ea3d2000000b002b6e7d6714dmr785220lje.22.1688630163900;
-        Thu, 06 Jul 2023 00:56:03 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEGqpBXE59HBwjbO7My8NVcvPAFY35DXSBKLlPiZZo3282vdH1Mirq6QjNHCyspslFcO8XqSvO+AtuZfIQIpDY=
-X-Received: by 2002:a2e:a3d2:0:b0:2b6:e7d6:714d with SMTP id
- w18-20020a2ea3d2000000b002b6e7d6714dmr785203lje.22.1688630163562; Thu, 06 Jul
- 2023 00:56:03 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8ED09184C
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 07:56:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 2782DC433C7;
+	Thu,  6 Jul 2023 07:56:24 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688630186;
+	bh=ZlAkzPnv2sgTe5Q7jCVACU0AXlFuDcsq8sC63FRaqG0=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=kJRyX4MB0Ph6oKI74Mosp/YH4a6V4P4pkGN4Wvykq/waK+yLfKjKoYUVXBoLz7Xqe
+	 2AjGWqZAUcrXgDe0t9S2b06DylO1t29ChAU+Oxr7+zYQsEHBfBwdjT/Fp7w1Hf3sC0
+	 UrOEhj8omRhuaVIqC9X1icJBsVxQrh/ZkgquSgLkSIVLdezyNQyWBJsxn+sJv93ox5
+	 J7vj2FRAK6IgQ6vB6R7/zrE48iyU3aHjRB+wgg5vu3wXSLatFOf44mcpgDNgRIlaA2
+	 kXkiXNGOLyKuFp2N60AjQhcA/zOBnw2wjb15bJZzKpijiyt/qKe9tF+ikl+za8g9Y/
+	 jkMnHok1UP3iw==
+Date: Thu, 6 Jul 2023 10:56:21 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: Tony Nguyen <anthony.l.nguyen@intel.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com,
+	edumazet@google.com, netdev@vger.kernel.org,
+	Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
+	sasha.neftin@intel.com, richardcochran@gmail.com,
+	Tan Tee Min <tee.min.tan@linux.intel.com>,
+	Chwee Lin Choong <chwee.lin.choong@intel.com>,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH net 3/6] igc: Fix TX Hang issue when QBV Gate is closed
+Message-ID: <20230706075621.GS6455@unreal>
+References: <20230705201905.49570-1-anthony.l.nguyen@intel.com>
+ <20230705201905.49570-4-anthony.l.nguyen@intel.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
- <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
-In-Reply-To: <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Thu, 6 Jul 2023 15:55:51 +0800
-Message-ID: <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230705201905.49570-4-anthony.l.nguyen@intel.com>
 
-On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperezma@redha=
-t.com> wrote:
->
-> On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.com> w=
-rote:
-> >
-> > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.c=
-om> wrote:
-> > >
-> > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@red=
-hat.com> wrote:
-> > > > >
-> > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wr=
-ote:
-> > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst=
-@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Marti=
-n wrote:
-> > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <=
-mst@redhat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9=
-rez wrote:
-> > > > > > > > > > With the current code it is accepted as long as userlan=
-d send it.
-> > > > > > > > > >
-> > > > > > > > > > Although userland should not set a feature flag that ha=
-s not been
-> > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the curr=
-ent code will not
-> > > > > > > > > > complain for it.
-> > > > > > > > > >
-> > > > > > > > > > Since there is no specific reason for any parent to rej=
-ect that backend
-> > > > > > > > > > feature bit when it has been proposed, let's control it=
- at vdpa frontend
-> > > > > > > > > > level. Future patches may move this control to the pare=
-nt driver.
-> > > > > > > > > >
-> > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENAB=
-LE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > > > > > > >
-> > > > > > > > > Please do send v3. And again, I don't want to send "after=
- driver ok" hack
-> > > > > > > > > upstream at all, I merged it in next just to give it some=
- testing.
-> > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > Current devices do not support that semantic.
-> > > > > > >
-> > > > > > > Which devices specifically access the ring after DRIVER_OK bu=
-t before
-> > > > > > > a kick?
-> > > > > > >
-> > > > > >
-> > > > > > Previous versions of the QEMU LM series did a spurious kick to =
-start
-> > > > > > traffic at the LM destination [1]. When it was proposed, that s=
-purious
-> > > > > > kick was removed from the series because to check for descripto=
-rs
-> > > > > > after driver_ok, even without a kick, was considered work of th=
-e
-> > > > > > parent driver.
-> > > > > >
-> > > > > > I'm ok to go back to this spurious kick, but I'm not sure if th=
-e hw
-> > > > > > will read the ring before the kick actually. I can ask.
-> > > > > >
-> > > > > > Thanks!
-> > > > > >
-> > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/ms=
-g02775.html
-> > > > >
-> > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, =
-no?
-> > > >
-> > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
-> > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > >
-> > > > But this reminds me one thing, as the thread is going too long, I
-> > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
-> > > > supported?
-> > > >
-> > > > Thanks
-> > >
-> > > I don't see what does one have to do with another ...
-> > >
-> > > I think with RING_RESET we had another solution, enable rings
-> > > mapping them to a zero page, then reset and re-enable later.
-> >
-> > As discussed before, this seems to have some problems:
-> >
-> > 1) The behaviour is not clarified in the document
-> > 2) zero is a valid IOVA
-> >
->
-> I think we're not on the same page here.
->
-> As I understood, rings mapped to a zero page means essentially an
-> avail ring whose avail_idx is always 0, offered to the device instead
-> of the guest's ring. Once all CVQ commands are processed, we use
-> RING_RESET to switch to the right ring, being guest's or SVQ vring.
+On Wed, Jul 05, 2023 at 01:19:02PM -0700, Tony Nguyen wrote:
+> From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+> 
+> If a user schedules a Gate Control List (GCL) to close one of
+> the QBV gates while also transmitting a packet to that closed gate,
+> TX Hang will be happen. HW would not drop any packet when the gate
+> is closed and keep queuing up in HW TX FIFO until the gate is re-opened.
+> This patch implements the solution to drop the packet for the closed
+> gate.
+> 
+> This patch will also reset the adapter to perform SW initialization
+> for each 1st Gate Control List (GCL) to avoid hang.
+> This is due to the HW design, where changing to TSN transmit mode
+> requires SW initialization. Intel Discrete I225/6 transmit mode
+> cannot be changed when in dynamic mode according to Software User
+> Manual Section 7.5.2.1. Subsequent Gate Control List (GCL) operations
+> will proceed without a reset, as they already are in TSN Mode.
+> 
+> Step to reproduce:
+> 
+> DUT:
+> 1) Configure GCL List with certain gate close.
+> 
+> BASE=$(date +%s%N)
+> tc qdisc replace dev $IFACE parent root handle 100 taprio \
+>     num_tc 4 \
+>     map 0 1 2 3 3 3 3 3 3 3 3 3 3 3 3 3 \
+>     queues 1@0 1@1 1@2 1@3 \
+>     base-time $BASE \
+>     sched-entry S 0x8 500000 \
+>     sched-entry S 0x4 500000 \
+>     flags 0x2
+> 
+> 2) Transmit the packet to closed gate. You may use udp_tai
+> application to transmit UDP packet to any of the closed gate.
+> 
+> ./udp_tai -i <interface> -P 100000 -p 90 -c 1 -t <0/1> -u 30004
+> 
+> Fixes: ec50a9d437f0 ("igc: Add support for taprio offloading")
+> Co-developed-by: Tan Tee Min <tee.min.tan@linux.intel.com>
+> Signed-off-by: Tan Tee Min <tee.min.tan@linux.intel.com>
+> Tested-by: Chwee Lin Choong <chwee.lin.choong@intel.com>
+> Signed-off-by: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
+> Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
+> ---
+>  drivers/net/ethernet/intel/igc/igc.h      |  6 +++
+>  drivers/net/ethernet/intel/igc/igc_main.c | 58 +++++++++++++++++++++--
+>  drivers/net/ethernet/intel/igc/igc_tsn.c  | 41 ++++++++++------
+>  3 files changed, 87 insertions(+), 18 deletions(-)
 
-I get this. This seems more complicated in the destination: shadow vq + ASI=
-D?
+<...>
+
+> @@ -6149,6 +6157,8 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
+>  	adapter->cycle_time = qopt->cycle_time;
+>  	adapter->base_time = qopt->base_time;
+>  
+> +	igc_ptp_read(adapter, &now);
+> +
+>  	for (n = 0; n < qopt->num_entries; n++) {
+>  		struct tc_taprio_sched_entry *e = &qopt->entries[n];
+>  
+> @@ -6183,7 +6193,10 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
+>  				ring->start_time = start_time;
+>  			ring->end_time = end_time;
+>  
+> -			queue_configured[i] = true;
+> +			if (ring->start_time >= adapter->cycle_time)
+> +				queue_configured[i] = false;
+> +			else
+> +				queue_configured[i] = true;
+>  		}
+>  
+>  		start_time += e->interval;
+> @@ -6193,8 +6206,20 @@ static int igc_save_qbv_schedule(struct igc_adapter *adapter,
+>  	 * If not, set the start and end time to be end time.
+>  	 */
+>  	for (i = 0; i < adapter->num_tx_queues; i++) {
+> +		struct igc_ring *ring = adapter->tx_ring[i];
+> +
+> +		if (!is_base_time_past(qopt->base_time, &now)) {
+> +			ring->admin_gate_closed = false;
+> +		} else {
+> +			ring->oper_gate_closed = false;
+> +			ring->admin_gate_closed = false;
+> +		}
+> +
+>  		if (!queue_configured[i]) {
+> -			struct igc_ring *ring = adapter->tx_ring[i];
+> +			if (!is_base_time_past(qopt->base_time, &now))
+> +				ring->admin_gate_closed = true;
+> +			else
+> +				ring->oper_gate_closed = true;
+>  
+>  			ring->start_time = end_time;
+>  			ring->end_time = end_time;
+> @@ -6575,6 +6600,27 @@ static const struct xdp_metadata_ops igc_xdp_metadata_ops = {
+>  	.xmo_rx_timestamp		= igc_xdp_rx_timestamp,
+>  };
+>  
+> +static enum hrtimer_restart igc_qbv_scheduling_timer(struct hrtimer *timer)
+> +{
+> +	struct igc_adapter *adapter = container_of(timer, struct igc_adapter,
+> +						   hrtimer);
+> +	unsigned int i;
+> +
+> +	adapter->qbv_transition = true;
+> +	for (i = 0; i < adapter->num_tx_queues; i++) {
+> +		struct igc_ring *tx_ring = adapter->tx_ring[i];
+> +
+> +		if (tx_ring->admin_gate_closed) {
+
+Doesn't asynchronic access to shared variable through hrtimer require some sort of locking?
 
 Thanks
 
->
->
->
-> > Thanks
-> >
-> > >
-> > > > >
-> > > > >
-> > > > >
-> > > > > > > > My plan was to convert
-> > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. So=
-rry if I
-> > > > > > > > was not explicit enough.
-> > > > > > > >
-> > > > > > > > The only solution I can see to that is to trap & emulate in=
- the vdpa
-> > > > > > > > (parent?) driver, as talked in virtio-comment. But that com=
-plicates
-> > > > > > > > the architecture:
-> > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > * Store vq enable state separately, at
-> > > > > > > > vdpa->config->set_vq_ready(true), but not transmit that ena=
-ble to hw
-> > > > > > > > * Store the doorbell state separately, but do not configure=
- it to the
-> > > > > > > > device directly.
-> > > > > > > >
-> > > > > > > > But how to recover if the device cannot configure them at k=
-ick time,
-> > > > > > > > for example?
-> > > > > > > >
-> > > > > > > > Maybe we can just fail if the parent driver does not suppor=
-t enabling
-> > > > > > > > the vq after DRIVER_OK? That way no new feature flag is nee=
-ded.
-> > > > > > > >
-> > > > > > > > Thanks!
-> > > > > > > >
-> > > > > > > > >
-> > > > > > > > > > ---
-> > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm=
-/linux/kernel/git/mst
-> > > > > > > > > > commit. Please let me know if I should send a v3 of [1]=
- instead.
-> > > > > > > > > >
-> > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-se=
-nd-email-mst@kernel.org/T/
-> > > > > > > > > > ---
-> > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > > >
-> > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.=
-c
-> > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_i=
-octl(struct file *filep,
-> > > > > > > > > >  {
-> > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
-> > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->co=
-nfig;
-> > > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > > -     u64 features;
-> > > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > > >       long r =3D 0;
-> > > > > > > > > >
-> > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
-> > > > > > > > > >               if (copy_from_user(&features, featurep, s=
-izeof(features)))
-> > > > > > > > > >                       return -EFAULT;
-> > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > +                     parent_features =3D ops->get_back=
-end_features(v->vdpa);
-> > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATU=
-RES |
-> > > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_=
-SUSPEND) |
-> > > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_=
-RESUME) |
-> > > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_=
-ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > +                              parent_features))
-> > > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_S=
-USPEND)) &&
-> > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > --
-> > > > > > > > > > 2.39.3
-> > > > > > > > >
-> > > > > > >
-> > > > >
-> > >
-> >
->
-
+> +			tx_ring->admin_gate_closed = false;
+> +			tx_ring->oper_gate_closed = true;
+> +		} else {
+> +			tx_ring->oper_gate_closed = false;
+> +		}
+> +	}
+> +	adapter->qbv_transition = false;
+> +	return HRTIMER_NORESTART;
+> +}
+> +
 
