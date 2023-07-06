@@ -1,75 +1,75 @@
-Return-Path: <netdev+bounces-15861-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15863-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 01F3474A2C9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:06:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 77A7C74A2D1
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:07:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1EBF81C20DE7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:06:54 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2D126280DE9
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:07:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0A9CDBA3F;
-	Thu,  6 Jul 2023 17:06:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A7CA7BA48;
+	Thu,  6 Jul 2023 17:07:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA77EBA3B
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:06:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 96300BA31
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:07:27 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 33DC41BE1
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:06:48 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 30B4E1BF1
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:07:24 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688663207;
+	s=mimecast20190719; t=1688663243;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=+rXpsOYTfW3vHN88u3LZ7HIcl5R2ABVLziuLdGjkMjI=;
-	b=GCt6O3qjZMs7A8kiGfGkEuYKPQpTwsa0uHOz95PYVDB/acr7RNMG/EupudjkUdsw2ulPp5
-	0yCDyyZDdpB/jWGzkgy4j8J7qEnIZ6urJUuBJQclREVzbH58KFlLs6UmqXq85arlRinU6C
-	Wn3Itu/dcditIcgU4nLGGQ9v0F1F/zY=
-Received: from mail-yw1-f199.google.com (mail-yw1-f199.google.com
- [209.85.128.199]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=By2LGKZLPMwb4okENAyVJVNIASG0Orcn6TU8PNkFNmA=;
+	b=QCKi8GRY3j+la3E9RJ972+8xz3EfEVJUKYM2/ZHuDQSowqY0mG1o0PTPtNDoexRDisP6T5
+	XTSO2wZP3JC9A9/ChUD4Q1SNqBl/Vse6eLXY2nY6JQW35T3DauwuWtul7s/hapMGKOunrE
+	N08lpwxYF5+NysL8JAhge83CRcdrktY=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-625-97heuX-tOtCCsdQwMjg5gQ-1; Thu, 06 Jul 2023 13:06:44 -0400
-X-MC-Unique: 97heuX-tOtCCsdQwMjg5gQ-1
-Received: by mail-yw1-f199.google.com with SMTP id 00721157ae682-57320c10635so10411727b3.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 10:06:44 -0700 (PDT)
+ us-mta-647-e50A4PuFM_S7SXhz3RsEcg-1; Thu, 06 Jul 2023 13:07:21 -0400
+X-MC-Unique: e50A4PuFM_S7SXhz3RsEcg-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-56ff81be091so10729967b3.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 10:07:21 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688663203; x=1691255203;
+        d=1e100.net; s=20221208; t=1688663240; x=1691255240;
         h=cc:to:subject:message-id:date:from:in-reply-to:references
          :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
          :reply-to;
-        bh=+rXpsOYTfW3vHN88u3LZ7HIcl5R2ABVLziuLdGjkMjI=;
-        b=H0igcB9nN2rW6MwiWh+lanbSq13fgHMa7zHm0JjQuTRRL2j5sYhYSeGqh5HUqHuWwi
-         0ZNSR41v1sUq+497srQXiQw0YhDzlimNgSu/WilqgLKnI0+Bg+amaiLBD2fq2n6d7MFp
-         qGkHX/+qWj4r4vqhlQR8Q37cOjw54bSSmv5lo/pTgmICz2dGvZAV9YByhjEOt5AHKOH/
-         C8JJAdqye3wTrLvHAMfuPLgNUp48QP0IyIXE+ZyaJi+4YrDHZLH/6YN8Bp4XT02Z1i6h
-         vTEHbSIYtnZCxdOuHcT6JFHL8Cnp4BX8jdwYL6K7ss3kkB9bhlXAx9OhO+v9TF7YuocP
-         MFmw==
-X-Gm-Message-State: ABy/qLYh/Qhq711XZ/AXZ9aUBqUXHWhkD2RhACti9ny8F+byHz08f3cU
-	kpjs2BDmHR6VzO0seNgU5M9RwYl0/aWQGGMHWjq/bxzhGiTp0mtaxyArnRyiovTM2+f4UFFrIV8
-	ZR9OOHr+PxUGJgswYqw5go5kZNBmVtYWl
-X-Received: by 2002:a81:920d:0:b0:579:e1ef:4145 with SMTP id j13-20020a81920d000000b00579e1ef4145mr2822088ywg.0.1688663203255;
-        Thu, 06 Jul 2023 10:06:43 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlEynJyBs0TEv0XWPhLFJboXwX3+isr6U6ChqFJarUYGiCdRZm36RXiD9i9foF/R1uEf6pWO2z+Ld3P3wlpiUTM=
-X-Received: by 2002:a81:920d:0:b0:579:e1ef:4145 with SMTP id
- j13-20020a81920d000000b00579e1ef4145mr2822068ywg.0.1688663203017; Thu, 06 Jul
- 2023 10:06:43 -0700 (PDT)
+        bh=By2LGKZLPMwb4okENAyVJVNIASG0Orcn6TU8PNkFNmA=;
+        b=IjGNdU2M+/lhPmemZvk4KSpa2nad/1/c4Xw6SkfAP0SYncYiPohLPsAZt/e/QWL57e
+         jG2dHdswXAKcgaRF0ResfUxEmVuXJWc6JpWOXL5MRp5YTsCh+8cGwnA4eSZtzF3nRzqU
+         E+CGuiBoiXleI8zYa8z8FmIwHA+d+sLSsoI7IMCP34YMWoUrNANhO7rYjNQzRA2ih8sw
+         bM6EXv7s2Z7InB4FsEkLT3WWExNbqe0/OHQ2CJvHd6qsNDn6LcMlTt31lgnv4lfs0YU4
+         biot23lFP9/AEUtDRLSuirw0TVy5PtdoqEqb56iITtPBL0GTFfCh0kGeVNMiIfaCpjA5
+         SfxQ==
+X-Gm-Message-State: ABy/qLZrTWIBeEYn2h3M0XN1ye3ubX5QUz3euVP/vk6x28cTufyzaRfx
+	bKS7ngMSCcXjoXabVJ94p5Nx2iIHZWb/w2KQ/N3l2PeiXgkR6w4W11ok39WQCyBgFPfXE956Uig
+	s/lye6c7yfvsIp4EwNmnEYKPOsykEgPn/
+X-Received: by 2002:a81:6603:0:b0:577:1d1c:7b94 with SMTP id a3-20020a816603000000b005771d1c7b94mr2806022ywc.18.1688663240651;
+        Thu, 06 Jul 2023 10:07:20 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF0iUHkbkEaZ2b9UE/eU/eJ3AYPKRAO/IOm8nOd8hCCdeMVkyBBHORmc6+nf+lV55CyTS5E7OHK18mNmK0vznc=
+X-Received: by 2002:a81:6603:0:b0:577:1d1c:7b94 with SMTP id
+ a3-20020a816603000000b005771d1c7b94mr2806008ywc.18.1688663240352; Thu, 06 Jul
+ 2023 10:07:20 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru> <20230701063947.3422088-18-AVKrasnov@sberdevices.ru>
-In-Reply-To: <20230701063947.3422088-18-AVKrasnov@sberdevices.ru>
+References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
+In-Reply-To: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
 From: Stefano Garzarella <sgarzare@redhat.com>
-Date: Thu, 6 Jul 2023 19:06:31 +0200
-Message-ID: <CAGxU2F5V8jfGnYnp3wdLR3PVwvW6ce02U+R5k1G81r2FdxCV0Q@mail.gmail.com>
-Subject: Re: [RFC PATCH v5 17/17] test/vsock: io_uring rx/tx tests
+Date: Thu, 6 Jul 2023 19:07:09 +0200
+Message-ID: <CAGxU2F4t6b1pxGebzDknvUA8w0B2J9mURzAtSSmKYDVa+zNmZA@mail.gmail.com>
+Subject: Re: [RFC PATCH v5 00/17] vsock: MSG_ZEROCOPY flag support
 To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, "David S. Miller" <davem@davemloft.net>, 
 	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
@@ -86,380 +86,287 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 01, 2023 at 09:39:47AM +0300, Arseniy Krasnov wrote:
->This adds set of tests which use io_uring for rx/tx. This test suite is
->implemented as separated util like 'vsock_test' and has the same set of
->input arguments as 'vsock_test'. These tests only cover cases of data
->transmission (no connect/bind/accept etc).
-
-Cool, thanks for adding this!
-
+On Sat, Jul 01, 2023 at 09:39:30AM +0300, Arseniy Krasnov wrote:
+>Hello,
 >
->Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->---
-> tools/testing/vsock/Makefile           |   7 +-
-> tools/testing/vsock/vsock_uring_test.c | 321 +++++++++++++++++++++++++
-> 2 files changed, 327 insertions(+), 1 deletion(-)
-> create mode 100644 tools/testing/vsock/vsock_uring_test.c
+>                           DESCRIPTION
 >
->diff --git a/tools/testing/vsock/Makefile b/tools/testing/vsock/Makefile
->index 0a78787d1d92..8621ae73051d 100644
->--- a/tools/testing/vsock/Makefile
->+++ b/tools/testing/vsock/Makefile
->@@ -1,12 +1,17 @@
-> # SPDX-License-Identifier: GPL-2.0-only
->+ifeq ($(MAKECMDGOALS),vsock_uring_test)
->+LDFLAGS = -luring
->+endif
->+
-> all: test vsock_perf
-> test: vsock_test vsock_diag_test
-> vsock_test: vsock_test.o vsock_test_zerocopy.o timeout.o control.o util.o
-> vsock_diag_test: vsock_diag_test.o timeout.o control.o util.o
-> vsock_perf: vsock_perf.o
->+vsock_uring_test: control.o util.o vsock_uring_test.o timeout.o $(LDFLAGS)
-
-Why we need `$(LDFLAGS)` in the dependencies?
-
-
+>this is MSG_ZEROCOPY feature support for virtio/vsock. I tried to follow
+>current implementation for TCP as much as possible:
 >
-> CFLAGS += -g -O2 -Werror -Wall -I. -I../../include
-> -I../../../usr/include -Wno-pointer-sign -fno-strict-overflow
-> -fno-strict-aliasing -fno-common -MMD -U_FORTIFY_SOURCE -D_GNU_SOURCE
-> .PHONY: all test clean
-> clean:
->-      ${RM} *.o *.d vsock_test vsock_diag_test
->+      ${RM} *.o *.d vsock_test vsock_diag_test vsock_uring_test
-> -include *.d
->diff --git a/tools/testing/vsock/vsock_uring_test.c b/tools/testing/vsock/vsock_uring_test.c
->new file mode 100644
->index 000000000000..7637ff510490
->--- /dev/null
->+++ b/tools/testing/vsock/vsock_uring_test.c
->@@ -0,0 +1,321 @@
->+// SPDX-License-Identifier: GPL-2.0-only
->+/* io_uring tests for vsock
->+ *
->+ * Copyright (C) 2023 SberDevices.
->+ *
->+ * Author: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
->+ */
->+
->+#include <getopt.h>
->+#include <stdio.h>
->+#include <stdlib.h>
->+#include <string.h>
->+#include <liburing.h>
->+#include <unistd.h>
->+#include <sys/mman.h>
->+#include <linux/kernel.h>
->+#include <error.h>
->+
->+#include "util.h"
->+#include "control.h"
->+
->+#define PAGE_SIZE             4096
->+#define RING_ENTRIES_NUM      4
->+
->+static struct vsock_test_data test_data_array[] = {
->+      /* All elements have page aligned base and size. */
->+      {
->+              .vecs_cnt = 3,
->+              {
->+                      { NULL, PAGE_SIZE },
->+                      { NULL, 2 * PAGE_SIZE },
->+                      { NULL, 3 * PAGE_SIZE },
->+              }
->+      },
->+      /* Middle element has both non-page aligned base and size. */
->+      {
->+              .vecs_cnt = 3,
->+              {
->+                      { NULL, PAGE_SIZE },
->+                      { (void *)1, 200  },
->+                      { NULL, 3 * PAGE_SIZE },
->+              }
->+      }
->+};
->+
->+static void vsock_io_uring_client(const struct test_opts *opts,
->+                                const struct vsock_test_data *test_data,
->+                                bool msg_zerocopy)
->+{
->+      struct io_uring_sqe *sqe;
->+      struct io_uring_cqe *cqe;
->+      struct io_uring ring;
->+      struct iovec *iovec;
->+      struct msghdr msg;
->+      int fd;
->+
->+      fd = vsock_stream_connect(opts->peer_cid, 1234);
->+      if (fd < 0) {
->+              perror("connect");
->+              exit(EXIT_FAILURE);
->+      }
->+
->+      if (msg_zerocopy)
->+              enable_so_zerocopy(fd);
->+
->+      iovec = iovec_from_test_data(test_data);
->+
->+      if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
->+              error(1, errno, "io_uring_queue_init");
->+
->+      if (io_uring_register_buffers(&ring, iovec, test_data->vecs_cnt))
->+              error(1, errno, "io_uring_register_buffers");
->+
->+      memset(&msg, 0, sizeof(msg));
->+      msg.msg_iov = iovec;
->+      msg.msg_iovlen = test_data->vecs_cnt;
->+      sqe = io_uring_get_sqe(&ring);
->+
->+      if (msg_zerocopy)
->+              io_uring_prep_sendmsg_zc(sqe, fd, &msg, 0);
->+      else
->+              io_uring_prep_sendmsg(sqe, fd, &msg, 0);
->+
->+      if (io_uring_submit(&ring) != 1)
->+              error(1, errno, "io_uring_submit");
->+
->+      if (io_uring_wait_cqe(&ring, &cqe))
->+              error(1, errno, "io_uring_wait_cqe");
->+
->+      io_uring_cqe_seen(&ring, cqe);
->+
->+      control_writeulong(iovec_hash_djb2(iovec, test_data->vecs_cnt));
->+
->+      control_writeln("DONE");
->+      io_uring_queue_exit(&ring);
->+      free_iovec_test_data(test_data, iovec);
->+      close(fd);
->+}
->+
->+static void vsock_io_uring_server(const struct test_opts *opts,
->+                                const struct vsock_test_data *test_data)
->+{
->+      unsigned long remote_hash;
->+      unsigned long local_hash;
->+      struct io_uring_sqe *sqe;
->+      struct io_uring_cqe *cqe;
->+      struct io_uring ring;
->+      struct iovec iovec;
->+      size_t data_len;
->+      void *data;
->+      int fd;
->+
->+      fd = vsock_stream_accept(VMADDR_CID_ANY, 1234, NULL);
->+      if (fd < 0) {
->+              perror("accept");
->+              exit(EXIT_FAILURE);
->+      }
->+
->+      data_len = iovec_bytes(test_data->vecs, test_data->vecs_cnt);
->+
->+      data = malloc(data_len);
->+      if (!data) {
->+              perror("malloc");
->+              exit(EXIT_FAILURE);
->+      }
->+
->+      if (io_uring_queue_init(RING_ENTRIES_NUM, &ring, 0))
->+              error(1, errno, "io_uring_queue_init");
->+
->+      sqe = io_uring_get_sqe(&ring);
->+      iovec.iov_base = data;
->+      iovec.iov_len = data_len;
->+
->+      io_uring_prep_readv(sqe, fd, &iovec, 1, 0);
->+
->+      if (io_uring_submit(&ring) != 1)
->+              error(1, errno, "io_uring_submit");
->+
->+      if (io_uring_wait_cqe(&ring, &cqe))
->+              error(1, errno, "io_uring_wait_cqe");
->+
->+      if (cqe->res != data_len) {
->+              fprintf(stderr, "expected %zu, got %u\n", data_len,
->+                      cqe->res);
->+              exit(EXIT_FAILURE);
->+      }
->+
->+      local_hash = hash_djb2(data, data_len);
->+
->+      remote_hash = control_readulong();
->+      if (remote_hash != local_hash) {
->+              fprintf(stderr, "hash mismatch\n");
->+              exit(EXIT_FAILURE);
->+      }
->+
->+      control_expectln("DONE");
->+      io_uring_queue_exit(&ring);
->+      free(data);
->+}
->+
->+void test_stream_uring_server(const struct test_opts *opts)
->+{
->+      int i;
->+
->+      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->+              vsock_io_uring_server(opts, &test_data_array[i]);
->+}
->+
->+void test_stream_uring_client(const struct test_opts *opts)
->+{
->+      int i;
->+
->+      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->+              vsock_io_uring_client(opts, &test_data_array[i], false);
->+}
->+
->+void test_stream_uring_msg_zc_server(const struct test_opts *opts)
->+{
->+      int i;
->+
->+      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->+              vsock_io_uring_server(opts, &test_data_array[i]);
->+}
->+
->+void test_stream_uring_msg_zc_client(const struct test_opts *opts)
->+{
->+      int i;
->+
->+      for (i = 0; i < ARRAY_SIZE(test_data_array); i++)
->+              vsock_io_uring_client(opts, &test_data_array[i], true);
->+}
->+
->+static struct test_case test_cases[] = {
->+      {
->+              .name = "SOCK_STREAM io_uring test",
->+              .run_server = test_stream_uring_server,
->+              .run_client = test_stream_uring_client,
->+      },
->+      {
->+              .name = "SOCK_STREAM io_uring MSG_ZEROCOPY test",
->+              .run_server = test_stream_uring_msg_zc_server,
->+              .run_client = test_stream_uring_msg_zc_client,
->+      },
->+      {},
->+};
->+
->+static const char optstring[] = "";
->+static const struct option longopts[] = {
->+      {
->+              .name = "control-host",
->+              .has_arg = required_argument,
->+              .val = 'H',
->+      },
->+      {
->+              .name = "control-port",
->+              .has_arg = required_argument,
->+              .val = 'P',
->+      },
->+      {
->+              .name = "mode",
->+              .has_arg = required_argument,
->+              .val = 'm',
->+      },
->+      {
->+              .name = "peer-cid",
->+              .has_arg = required_argument,
->+              .val = 'p',
->+      },
->+      {
->+              .name = "help",
->+              .has_arg = no_argument,
->+              .val = '?',
->+      },
->+      {},
->+};
->+
->+static void usage(void)
->+{
->+      fprintf(stderr, "Usage: vsock_uring_test [--help] [--control-host=<host>] --control-port=<port> --mode=client|server --peer-cid=<cid>\n"
->+              "\n"
->+              "  Server: vsock_uring_test --control-port=1234 --mode=server --peer-cid=3\n"
->+              "  Client: vsock_uring_test --control-host=192.168.0.1 --control-port=1234 --mode=client --peer-cid=2\n"
->+              "\n"
->+              "Run transmission tests using io_uring. Usage is the same as\n"
->+              "in ./vsock_test\n"
->+              "\n"
->+              "Options:\n"
->+              "  --help                 This help message\n"
->+              "  --control-host <host>  Server IP address to connect to\n"
->+              "  --control-port <port>  Server port to listen on/connect to\n"
->+              "  --mode client|server   Server or client mode\n"
->+              "  --peer-cid <cid>       CID of the other side\n"
->+              );
->+      exit(EXIT_FAILURE);
->+}
->+
->+int main(int argc, char **argv)
->+{
->+      const char *control_host = NULL;
->+      const char *control_port = NULL;
->+      struct test_opts opts = {
->+              .mode = TEST_MODE_UNSET,
->+              .peer_cid = VMADDR_CID_ANY,
->+      };
->+
->+      init_signals();
->+
->+      for (;;) {
->+              int opt = getopt_long(argc, argv, optstring, longopts, NULL);
->+
->+              if (opt == -1)
->+                      break;
->+
->+              switch (opt) {
->+              case 'H':
->+                      control_host = optarg;
->+                      break;
->+              case 'm':
->+                      if (strcmp(optarg, "client") == 0) {
->+                              opts.mode = TEST_MODE_CLIENT;
->+                      } else if (strcmp(optarg, "server") == 0) {
->+                              opts.mode = TEST_MODE_SERVER;
->+                      } else {
->+                              fprintf(stderr, "--mode must be \"client\" or \"server\"\n");
->+                              return EXIT_FAILURE;
->+                      }
->+                      break;
->+              case 'p':
->+                      opts.peer_cid = parse_cid(optarg);
->+                      break;
->+              case 'P':
->+                      control_port = optarg;
->+                      break;
->+              case '?':
->+              default:
->+                      usage();
->+              }
->+      }
->+
->+      if (!control_port)
->+              usage();
->+      if (opts.mode == TEST_MODE_UNSET)
->+              usage();
->+      if (opts.peer_cid == VMADDR_CID_ANY)
->+              usage();
->+
->+      if (!control_host) {
->+              if (opts.mode != TEST_MODE_SERVER)
->+                      usage();
->+              control_host = "0.0.0.0";
->+      }
->+
->+      control_init(control_host, control_port,
->+                   opts.mode == TEST_MODE_SERVER);
->+
->+      run_tests(test_cases, &opts);
->+
->+      control_cleanup();
->+
->+      return 0;
->+}
->--
->2.25.1
+>1) Sender must enable SO_ZEROCOPY flag to use this feature. Without this
+>   flag, data will be sent in "classic" copy manner and MSG_ZEROCOPY
+>   flag will be ignored (e.g. without completion).
 >
+>2) Kernel uses completions from socket's error queue. Single completion
+>   for single tx syscall (or it can merge several completions to single
+>   one). I used already implemented logic for MSG_ZEROCOPY support:
+>   'msg_zerocopy_realloc()' etc.
+>
+>Difference with copy way is not significant. During packet allocation,
+>non-linear skb is created and filled with pinned user pages.
+>There are also some updates for vhost and guest parts of transport - in
+>both cases i've added handling of non-linear skb for virtio part. vhost
+>copies data from such skb to the guest's rx virtio buffers. In the guest,
+>virtio transport fills tx virtio queue with pages from skb.
+>
+>Head of this patchset is:
+>https://git.kernel.org/pub/scm/linux/kernel/git/netdev/net-next.git/commit/?id=d20dd0ea14072e8a90ff864b2c1603bd68920b4b
+>
+>
+>This version has several limits/problems (all resolved at v5):
+>
+>1) As this feature totally depends on transport, there is no way (or it
+>   is difficult) to check whether transport is able to handle it or not
+>   during SO_ZEROCOPY setting. Seems I need to call AF_VSOCK specific
+>   setsockopt callback from setsockopt callback for SOL_SOCKET, but this
+>   leads to lock problem, because both AF_VSOCK and SOL_SOCKET callback
+>   are not considered to be called from each other. So in current version
+>   SO_ZEROCOPY is set successfully to any type (e.g. transport) of
+>   AF_VSOCK socket, but if transport does not support MSG_ZEROCOPY,
+>   tx routine will fail with EOPNOTSUPP.
+>
+>   ^^^ fixed in v5. Thanks to Bobby Eshleman.
+>
+>2) When MSG_ZEROCOPY is used, for each tx system call we need to enqueue
+>   one completion. In each completion there is flag which shows how tx
+>   was performed: zerocopy or copy. This leads that whole message must
+>   be send in zerocopy or copy way - we can't send part of message with
+>   copying and rest of message with zerocopy mode (or vice versa). Now,
+>   we need to account vsock credit logic, e.g. we can't send whole data
+>   once - only allowed number of bytes could sent at any moment. In case
+>   of copying way there is no problem as in worst case we can send single
+>   bytes, but zerocopy is more complex because smallest transmission
+>   unit is single page. So if there is not enough space at peer's side
+>   to send integer number of pages (at least one) - we will wait, thus
+>   stalling tx side. To overcome this problem i've added simple rule -
+>   zerocopy is possible only when there is enough space at another side
+>   for whole message (to check, that current 'msghdr' was already used
+>   in previous tx iterations i use 'iov_offset' field of it's iov iter).
+>
+>   ^^^
+>   Discussed as ok during v2. Link:
+>   https://lore.kernel.org/netdev/23guh3txkghxpgcrcjx7h62qsoj3xgjhfzgtbmqp2slrz3rxr4@zya2z7kwt75l/
+>
+>3) loopback transport is not supported, because it requires to implement
+>   non-linear skb handling in dequeue logic (as we "send" fragged skb
+>   and "receive" it from the same queue). I'm going to implement it in
+>   next versions.
+>
+>   ^^^ fixed in v2
+>
+>4) Current implementation sets max length of packet to 64KB. IIUC this
+>   is due to 'kmalloc()' allocated data buffers. I think, in case of
+>   MSG_ZEROCOPY this value could be increased, because 'kmalloc()' is
+>   not touched for data - user space pages are used as buffers. Also
+>   this limit trims every message which is > 64KB, thus such messages
+>   will be send in copy mode due to 'iov_offset' check in 2).
+>
+>   ^^^ fixed in v2
+>
+>                         PATCHSET STRUCTURE
+>
+>Patchset has the following structure:
+>1) Handle non-linear skbuff on receive in virtio/vhost.
+>2) Handle non-linear skbuff on send in virtio/vhost.
+>3) Updates for AF_VSOCK.
+>4) Enable MSG_ZEROCOPY support on transports.
+>5) Tests/tools/docs updates.
+>
+>                            PERFORMANCE
+>
+>Performance: it is a little bit tricky to compare performance between
+>copy and zerocopy transmissions. In zerocopy way we need to wait when
+>user buffers will be released by kernel, so it is like synchronous
+>path (wait until device driver will process it), while in copy way we
+>can feed data to kernel as many as we want, don't care about device
+>driver. So I compared only time which we spend in the 'send()' syscall.
+>Then if this value will be combined with total number of transmitted
+>bytes, we can get Gbit/s parameter. Also to avoid tx stalls due to not
+>enough credit, receiver allocates same amount of space as sender needs.
+>
+>Sender:
+>./vsock_perf --sender <CID> --buf-size <buf size> --bytes 256M [--zc]
+>
+>Receiver:
+>./vsock_perf --vsk-size 256M
+>
+>I run tests on two setups: desktop with Core i7 - I use this PC for
+>development and in this case guest is nested guest, and host is normal
+>guest. Another hardware is some embedded board with Atom - here I don't
+>have nested virtualization - host runs on hw, and guest is normal guest.
+>
+>G2H transmission (values are Gbit/s):
+>
+>   Core i7 with nested guest.            Atom with normal guest.
+>
+>*-------------------------------*   *-------------------------------*
+>|          |         |          |   |          |         |          |
+>| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+>|          |         |          |   |          |         |          |
+>*-------------------------------*   *-------------------------------*
+>|   4KB    |    3    |    10    |   |   4KB    |   0.8   |   1.9    |
+>*-------------------------------*   *-------------------------------*
+>|   32KB   |   20    |    61    |   |   32KB   |   6.8   |   20.2   |
+>*-------------------------------*   *-------------------------------*
+>|   256KB  |   33    |   244    |   |   256KB  |   7.8   |   55     |
+>*-------------------------------*   *-------------------------------*
+>|    1M    |   30    |   373    |   |    1M    |   7     |   95     |
+>*-------------------------------*   *-------------------------------*
+>|    8M    |   22    |   475    |   |    8M    |   7     |   114    |
+>*-------------------------------*   *-------------------------------*
+>
+>H2G:
+>
+>   Core i7 with nested guest.            Atom with normal guest.
+>
+>*-------------------------------*   *-------------------------------*
+>|          |         |          |   |          |         |          |
+>| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+>|          |         |          |   |          |         |          |
+>*-------------------------------*   *-------------------------------*
+>|   4KB    |   20    |    10    |   |   4KB    |   4.37  |    3     |
+>*-------------------------------*   *-------------------------------*
+>|   32KB   |   37    |    75    |   |   32KB   |   11    |   18     |
+>*-------------------------------*   *-------------------------------*
+>|   256KB  |   44    |   299    |   |   256KB  |   11    |   62     |
+>*-------------------------------*   *-------------------------------*
+>|    1M    |   28    |   335    |   |    1M    |   9     |   77     |
+>*-------------------------------*   *-------------------------------*
+>|    8M    |   27    |   417    |   |    8M    |  9.35   |  115     |
+>*-------------------------------*   *-------------------------------*
+>
+> * Let's look to the first line of both tables - where copy is better
+>   than zerocopy. I analyzed this case more deeply and found that
+>   bottleneck is function 'vhost_work_queue()'. With 4K buffer size,
+>   caller spends too much time in it with zerocopy mode (comparing to
+>   copy mode). This happens only with 4K buffer size. This function just
+>   calls 'wake_up_process()' and its internal logic does not depends on
+>   skb, so i think potential reason (may be) is interval between two
+>   calls of this function (e.g. how often it is called). Note, that
+>   'vhost_work_queue()' differs from the same function at guest's side of
+>   transport: 'virtio_transport_send_pkt()' uses 'queue_work()' which
+>   i think is more optimized for worker purposes, than direct call to
+>   'wake_up_process()'. But again - this is just my assumption.
+>
+>Loopback:
+>
+>   Core i7 with nested guest.            Atom with normal guest.
+>
+>*-------------------------------*   *-------------------------------*
+>|          |         |          |   |          |         |          |
+>| buf size |   copy  | zerocopy |   | buf size |   copy  | zerocopy |
+>|          |         |          |   |          |         |          |
+>*-------------------------------*   *-------------------------------*
+>|   4KB    |    8    |     7    |   |   4KB    |   1.8   |   1.3    |
+>*-------------------------------*   *-------------------------------*
+>|   32KB   |   38    |    44    |   |   32KB   |   10    |   10     |
+>*-------------------------------*   *-------------------------------*
+>|   256KB  |   55    |   168    |   |   256KB  |   15    |   36     |
+>*-------------------------------*   *-------------------------------*
+>|    1M    |   53    |   250    |   |    1M    |   12    |   45     |
+>*-------------------------------*   *-------------------------------*
+>|    8M    |   40    |   344    |   |    8M    |   11    |   74     |
+>*-------------------------------*   *-------------------------------*
+>
+>I analyzed performace difference more deeply for the following setup:
+>server: ./vsock_perf --vsk-size 16M
+>client: ./vsock_perf --sender 2 --bytes 16M --buf-size 16K/4K [--zc]
+>
+>In other words I send 16M of data from guest to host in copy/zerocopy
+>modes and with two different sizes of buffer - 4K and 64K. Let's see
+>to tx path for both modes - it consists of two steps:
+>
+>copy:
+>1) Allocate skb of buffer's length.
+>2) Copy data to skb from buffer.
+>
+>zerocopy:
+>1) Allocate skb with header space only.
+>2) Pin pages of the buffer and insert them to skb.
+>
+>I measured average number of ns (returned by 'ktime_get()') for each
+>step above:
+>1) Skb allocation (for both copy and zerocopy modes).
+>2) For copy mode in 'memcpy_to_msg()' - copying.
+>3) For zerocopy mode in '__zerocopy_sg_from_iter()' - pinning.
+>
+>Here are results for copy mode:
+>*-------------------------------------*
+>| buf | skb alloc | 'memcpy_to_msg()' |
+>*-------------------------------------*
+>|     |           |                   |
+>| 64K |  5000ns   |      25000ns      |
+>|     |           |                   |
+>*-------------------------------------*
+>|     |           |                   |
+>| 4K  |  800ns    |      2200ns       |
+>|     |           |                   |
+>*-------------------------------------*
+>
+>Here are results for zerocopy mode:
+>*-----------------------------------------------*
+>| buf | skb alloc | '__zerocopy_sg_from_iter()' |
+>*-----------------------------------------------*
+>|     |           |                             |
+>| 64K |  250ns    |          3500ns             |
+>|     |           |                             |
+>*-----------------------------------------------*
+>|     |           |                             |
+>| 4K  |  250ns    |          3000ns             |
+>|     |           |                             |
+>*-----------------------------------------------*
+>
+>I guess that reason of zerocopy performance is low overhead for page
+>pinning: there is big difference between 4K and 64K in case of copying
+>(25000 vs 2200), but in pinning case - just 3000 vs 3500.
+>
+>So, zerocopy is faster than classic copy mode, but of course it requires
+>specific architecture of application due to user pages pinning, buffer
+>size and alignment.
+>
+>                             NOTES
+>
+>If host fails to send data with "Cannot allocate memory", check value
+>/proc/sys/net/core/optmem_max - it is accounted during completion skb
+>allocation. Try to update it to for example 1M and try send again:
+>"echo 1048576 > /proc/sys/net/core/optmem_max" (as root).
+>
+>                            TESTING
+>
+>This patchset includes set of tests for MSG_ZEROCOPY feature. I tried to
+>cover new code as much as possible so there are different cases for
+>MSG_ZEROCOPY transmissions: with disabled SO_ZEROCOPY and several io
+>vector types (different sizes, alignments, with unmapped pages). I also
+>run tests with loopback transport and run vsockmon. In v3 i've added
+>io_uring test as separated application.
+>
+>           LET'S SPLIT PATCHSET TO MAKE REVIEW EASIER
+>
+>In v3 Stefano Garzarella <sgarzare@redhat.com> asked to split this patchset
+>for several parts, because it looks too big for review. I think in this
+>version (v4) we can do it in the following way:
+>
+>[0001 - 0005] - this is preparation for virtio/vhost part.
+>[0006 - 0009] - this is preparation for AF_VSOCK part.
+>[0010 - 0014] - these patches allows to trigger logic from the previous
+>                two parts. In addition 0014 is patch for Documentation.
+>[0015 - rest] - updates for tests, utils. This part doesn't touch kernel
+>                code and looks not critical.
+
+Great!
+
+So IIUC all the issues are fixed. I left some comments, but I think
+you can start sending the virtio/vhost preparation patches to net-next
+(when it will re-open).
+
+I just pointend out something to fix, and that maybe we can merge
+the first 2 patches.
+
+I think you can restart with v0, describing in the cover letter that
+the patches was part of this RFC.
+
+Thanks,
+Stefano
 
 
