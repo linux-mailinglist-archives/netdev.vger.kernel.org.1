@@ -1,262 +1,163 @@
-Return-Path: <netdev+bounces-15841-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15843-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3BE3474A256
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:40:04 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 42F5074A25E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:40:53 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 750B61C20D9E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:40:03 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D6DF1C20DE7
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:40:52 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4EAD49461;
-	Thu,  6 Jul 2023 16:40:01 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7F813A945;
+	Thu,  6 Jul 2023 16:40:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3A2B99444
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 16:40:01 +0000 (UTC)
-Received: from mail-pj1-x102b.google.com (mail-pj1-x102b.google.com [IPv6:2607:f8b0:4864:20::102b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A30A7E65
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:39:42 -0700 (PDT)
-Received: by mail-pj1-x102b.google.com with SMTP id 98e67ed59e1d1-262d9e75438so711631a91.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 09:39:42 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688661581; x=1691253581;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=kFy2sjaEwaWlr8ZFbISMj3FN8c+npy3dEaCsuZ+EXi8=;
-        b=Q08SZSmLnQT8bNfn4a7Jr+dSMyW4kVEHqfVTJR50XZZ6bNvmskh0vu72ia8LgZV+dU
-         H0fQS4cPVGg0pLPVJg1A6o8ndN+k9FMnchZkqc4LCMXwLUtJKxoPSQWZLEUj/CR+WSY8
-         ziu92xfwnWLdnt5sBBEQxq34an98jZhI2MwP+UBhN7xNfBNOzfWUJ/U2k8iqUK9iQEAX
-         LFKYkZWRXgv4qdSGYDkCOdd/PZE/qrR6mRSSrkI6IOLsrPLs3d4c1AXWW3nnDfJD9vmu
-         5BKArkME8wRvzUpIiXwlD0gYmS1+fA2NHAEzbm4EM7lXOAhZE/uF4WlWVEkceiv/n5xg
-         JMAg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688661581; x=1691253581;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=kFy2sjaEwaWlr8ZFbISMj3FN8c+npy3dEaCsuZ+EXi8=;
-        b=QOTHz4hykQt3Y90p6l1nRJvtaN7r5YoJ3/0jC1asvWjg1QS9pLYC/5xGHMJCPwny2j
-         dfqT+OmpA0NZnGVvfARc9GTOaJ0HYNetoyh6fSg+rHXw01/iLbXx8DUJLxpAE2PAuPmb
-         1UxSiNTTYAtiZlusnG6pqUCT/Sgwicd8pKyLtzh5kDkqisG4r0ANbcwhM0qRnihTlfxi
-         7c4qcJCC+dnCr+0/z2x8W9rhpLvv8UlbsknS9GkM4TIpJd5TQKV8ebIxZH7l9uhwDlCC
-         7q7iSiL0sImyg9jBOd0/Rf3Kc+mLT6HLTKCkbMIWMjgKZqg5U+90ChmkVk8fYbr9b9su
-         Lf2g==
-X-Gm-Message-State: ABy/qLZCGW55aewwDSqb97bOqieXGTQ+2CpodN/cQSo99kibvrjB0FhJ
-	gHkQfa+f494qs3dQuIHI8ixX+I+veO7410DxO8ePNA==
-X-Google-Smtp-Source: APBJJlGxUyUS0b83U/yKCVVN4bkrkm2QxeNINcqDwjo2nBPGtJQYFu7VEBw7V7z1pmIAPuZ4MzTOhy9w4TRUTU7lcZo=
-X-Received: by 2002:a17:90b:1e0f:b0:263:e804:3988 with SMTP id
- pg15-20020a17090b1e0f00b00263e8043988mr2342464pjb.1.1688661581507; Thu, 06
- Jul 2023 09:39:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9528C9471
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 16:40:44 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 87C77C433C8;
+	Thu,  6 Jul 2023 16:40:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688661644;
+	bh=08kbGFWZj7/oCZ95GO60uih6wNoPa9yymBlaHKTdzSQ=;
+	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
+	b=iju9vRK5EHW51RLA3WqFKbXZgyQ2i9EsaldUFMvuAfgd8r1tpH7k5+R0wVOKQVAFc
+	 E1xnHMYRiZ1wTEcC6Q3sD8fxp+py2gVra8MwarMASeqAttEq8rpRz7d+Qy02223UyI
+	 e+izhtAkKWITQ2eJhCSGEPmgD55EvsGv5W3/5P90rngQKO+C6YwKD+oJI8/HBDOdY6
+	 /K4HvSS2E5hc1mxk5fYSY4kFILAIABJmHKDPgslWMB2qiF2IOkPEP+OXdloFtjbdvA
+	 H+kq4oBmYvrmbTUwlXFpEjV8+H+zBbpJlaY5EqC3GeIeqUCpQGBXzGafyIJfgjVwBj
+	 v1rtw3T5Z00DQ==
+Date: Thu, 6 Jul 2023 19:40:39 +0300
+From: Leon Romanovsky <leon@kernel.org>
+To: "Zulkifli, Muhammad Husaini" <muhammad.husaini.zulkifli@intel.com>
+Cc: "Nguyen, Anthony L" <anthony.l.nguyen@intel.com>,
+	"davem@davemloft.net" <davem@davemloft.net>,
+	"kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"Neftin, Sasha" <sasha.neftin@intel.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>,
+	Tan Tee Min <tee.min.tan@linux.intel.com>,
+	"Choong, Chwee Lin" <chwee.lin.choong@intel.com>,
+	Naama Meir <naamax.meir@linux.intel.com>
+Subject: Re: [PATCH net 3/6] igc: Fix TX Hang issue when QBV Gate is closed
+Message-ID: <20230706164039.GV6455@unreal>
+References: <20230705201905.49570-1-anthony.l.nguyen@intel.com>
+ <20230705201905.49570-4-anthony.l.nguyen@intel.com>
+ <20230706075621.GS6455@unreal>
+ <SJ1PR11MB618043DE126BF5649BA1ED0DB82CA@SJ1PR11MB6180.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-7-larysa.zaremba@intel.com> <ZKWo0BbpLfkZHbyE@google.com>
- <ZKbOQzj1jtDeaaMp@lincoln>
-In-Reply-To: <ZKbOQzj1jtDeaaMp@lincoln>
-From: Stanislav Fomichev <sdf@google.com>
-Date: Thu, 6 Jul 2023 09:39:29 -0700
-Message-ID: <CAKH8qBvrSJF0HppJ9OVF5wRDP-qV6uVfkWBvPR9=-SpRoyvDJQ@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 06/20] ice: Support HW timestamp hint
-To: Larysa Zaremba <larysa.zaremba@intel.com>
-Cc: bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net, 
-	andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
-	john.fastabend@gmail.com, kpsingh@kernel.org, haoluo@google.com, 
-	jolsa@kernel.org, David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>, 
-	Willem de Bruijn <willemb@google.com>, Jesper Dangaard Brouer <brouer@redhat.com>, 
-	Anatoly Burakov <anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>, 
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan <mtahhan@redhat.com>, 
-	xdp-hints@xdp-project.net, netdev@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
-	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <SJ1PR11MB618043DE126BF5649BA1ED0DB82CA@SJ1PR11MB6180.namprd11.prod.outlook.com>
 
-On Thu, Jul 6, 2023 at 7:27=E2=80=AFAM Larysa Zaremba <larysa.zaremba@intel=
-.com> wrote:
->
-> On Wed, Jul 05, 2023 at 10:30:56AM -0700, Stanislav Fomichev wrote:
-> > On 07/03, Larysa Zaremba wrote:
-> > > Use previously refactored code and create a function
-> > > that allows XDP code to read HW timestamp.
+On Thu, Jul 06, 2023 at 12:43:33PM +0000, Zulkifli, Muhammad Husaini wrote:
+> Dear Leon,
+> 
+> Thanks for reviewing 😊
+> Replied inline.
+> 
+> > -----Original Message-----
+> > From: Leon Romanovsky <leon@kernel.org>
+> > Sent: Thursday, 6 July, 2023 3:56 PM
+> > To: Nguyen, Anthony L <anthony.l.nguyen@intel.com>
+> > Cc: davem@davemloft.net; kuba@kernel.org; pabeni@redhat.com;
+> > edumazet@google.com; netdev@vger.kernel.org; Zulkifli, Muhammad
+> > Husaini <muhammad.husaini.zulkifli@intel.com>; Neftin, Sasha
+> > <sasha.neftin@intel.com>; richardcochran@gmail.com; Tan Tee Min
+> > <tee.min.tan@linux.intel.com>; Choong, Chwee Lin
+> > <chwee.lin.choong@intel.com>; Naama Meir
+> > <naamax.meir@linux.intel.com>
+> > Subject: Re: [PATCH net 3/6] igc: Fix TX Hang issue when QBV Gate is closed
+> > 
+> > On Wed, Jul 05, 2023 at 01:19:02PM -0700, Tony Nguyen wrote:
+> > > From: Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>
 > > >
-> > > Also, move cached_phctime into packet context, this way this data sti=
-ll
-> > > stays in the ring structure, just at the different address.
+> > > If a user schedules a Gate Control List (GCL) to close one of the QBV
+> > > gates while also transmitting a packet to that closed gate, TX Hang
+> > > will be happen. HW would not drop any packet when the gate is closed
+> > > and keep queuing up in HW TX FIFO until the gate is re-opened.
+> > > This patch implements the solution to drop the packet for the closed
+> > > gate.
 > > >
-> > > HW timestamp is the first supported hint in the driver,
-> > > so also add xdp_metadata_ops.
+> > > This patch will also reset the adapter to perform SW initialization
+> > > for each 1st Gate Control List (GCL) to avoid hang.
+> > > This is due to the HW design, where changing to TSN transmit mode
+> > > requires SW initialization. Intel Discrete I225/6 transmit mode cannot
+> > > be changed when in dynamic mode according to Software User Manual
+> > > Section 7.5.2.1. Subsequent Gate Control List (GCL) operations will
+> > > proceed without a reset, as they already are in TSN Mode.
 > > >
-> > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > Step to reproduce:
+> > >
+> > > DUT:
+> > > 1) Configure GCL List with certain gate close.
+> > >
+> > > BASE=$(date +%s%N)
+> > > tc qdisc replace dev $IFACE parent root handle 100 taprio \
+> > >     num_tc 4 \
+> > >     map 0 1 2 3 3 3 3 3 3 3 3 3 3 3 3 3 \
+> > >     queues 1@0 1@1 1@2 1@3 \
+> > >     base-time $BASE \
+> > >     sched-entry S 0x8 500000 \
+> > >     sched-entry S 0x4 500000 \
+> > >     flags 0x2
+> > >
+> > > 2) Transmit the packet to closed gate. You may use udp_tai application
+> > > to transmit UDP packet to any of the closed gate.
+> > >
+> > > ./udp_tai -i <interface> -P 100000 -p 90 -c 1 -t <0/1> -u 30004
+> > >
+> > > Fixes: ec50a9d437f0 ("igc: Add support for taprio offloading")
+> > > Co-developed-by: Tan Tee Min <tee.min.tan@linux.intel.com>
+> > > Signed-off-by: Tan Tee Min <tee.min.tan@linux.intel.com>
+> > > Tested-by: Chwee Lin Choong <chwee.lin.choong@intel.com>
+> > > Signed-off-by: Muhammad Husaini Zulkifli
+> > > <muhammad.husaini.zulkifli@intel.com>
+> > > Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> > > Signed-off-by: Tony Nguyen <anthony.l.nguyen@intel.com>
 > > > ---
-> > >  drivers/net/ethernet/intel/ice/ice.h          |  2 ++
-> > >  drivers/net/ethernet/intel/ice/ice_ethtool.c  |  2 +-
-> > >  drivers/net/ethernet/intel/ice/ice_lib.c      |  2 +-
-> > >  drivers/net/ethernet/intel/ice/ice_main.c     |  1 +
-> > >  drivers/net/ethernet/intel/ice/ice_ptp.c      |  2 +-
-> > >  drivers/net/ethernet/intel/ice/ice_txrx.h     |  2 +-
-> > >  drivers/net/ethernet/intel/ice/ice_txrx_lib.c | 24 +++++++++++++++++=
-++
-> > >  7 files changed, 31 insertions(+), 4 deletions(-)
-> > >
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice.h b/drivers/net/ether=
-net/intel/ice/ice.h
-> > > index 4ba3d99439a0..7a973a2229f1 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice.h
-> > > +++ b/drivers/net/ethernet/intel/ice/ice.h
-> > > @@ -943,4 +943,6 @@ static inline void ice_clear_rdma_cap(struct ice_=
-pf *pf)
-> > >     set_bit(ICE_FLAG_UNPLUG_AUX_DEV, pf->flags);
-> > >     clear_bit(ICE_FLAG_RDMA_ENA, pf->flags);
-> > >  }
-> > > +
-> > > +extern const struct xdp_metadata_ops ice_xdp_md_ops;
-> > >  #endif /* _ICE_H_ */
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/n=
-et/ethernet/intel/ice/ice_ethtool.c
-> > > index 8d5cbbd0b3d5..3c3b9cbfbcd3 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
-> > > @@ -2837,7 +2837,7 @@ ice_set_ringparam(struct net_device *netdev, st=
-ruct ethtool_ringparam *ring,
-> > >             /* clone ring and setup updated count */
-> > >             rx_rings[i] =3D *vsi->rx_rings[i];
-> > >             rx_rings[i].count =3D new_rx_cnt;
-> > > -           rx_rings[i].cached_phctime =3D pf->ptp.cached_phc_time;
-> > > +           rx_rings[i].pkt_ctx.cached_phctime =3D pf->ptp.cached_phc=
-_time;
-> > >             rx_rings[i].desc =3D NULL;
-> > >             rx_rings[i].rx_buf =3D NULL;
-> > >             /* this is to allow wr32 to have something to write to
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_lib.c b/drivers/net/e=
-thernet/intel/ice/ice_lib.c
-> > > index 00e3afd507a4..eb69b0ac7956 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_lib.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_lib.c
-> > > @@ -1445,7 +1445,7 @@ static int ice_vsi_alloc_rings(struct ice_vsi *=
-vsi)
-> > >             ring->netdev =3D vsi->netdev;
-> > >             ring->dev =3D dev;
-> > >             ring->count =3D vsi->num_rx_desc;
-> > > -           ring->cached_phctime =3D pf->ptp.cached_phc_time;
-> > > +           ring->pkt_ctx.cached_phctime =3D pf->ptp.cached_phc_time;
-> > >             WRITE_ONCE(vsi->rx_rings[i], ring);
-> > >     }
-> > >
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/=
-ethernet/intel/ice/ice_main.c
-> > > index 93979ab18bc1..f21996b812ea 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_main.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_main.c
-> > > @@ -3384,6 +3384,7 @@ static void ice_set_ops(struct ice_vsi *vsi)
-> > >
-> > >     netdev->netdev_ops =3D &ice_netdev_ops;
-> > >     netdev->udp_tunnel_nic_info =3D &pf->hw.udp_tunnel_nic;
-> > > +   netdev->xdp_metadata_ops =3D &ice_xdp_md_ops;
-> > >     ice_set_ethtool_ops(netdev);
-> > >
-> > >     if (vsi->type !=3D ICE_VSI_PF)
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_ptp.c b/drivers/net/e=
-thernet/intel/ice/ice_ptp.c
-> > > index a31333972c68..70697e4829dd 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_ptp.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_ptp.c
-> > > @@ -1038,7 +1038,7 @@ static int ice_ptp_update_cached_phctime(struct=
- ice_pf *pf)
-> > >             ice_for_each_rxq(vsi, j) {
-> > >                     if (!vsi->rx_rings[j])
-> > >                             continue;
-> > > -                   WRITE_ONCE(vsi->rx_rings[j]->cached_phctime, syst=
-ime);
-> > > +                   WRITE_ONCE(vsi->rx_rings[j]->pkt_ctx.cached_phcti=
-me, systime);
-> > >             }
-> > >     }
-> > >     clear_bit(ICE_CFG_BUSY, pf->state);
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx.h b/drivers/net/=
-ethernet/intel/ice/ice_txrx.h
-> > > index d0ab2c4c0c91..4237702a58a9 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_txrx.h
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_txrx.h
-> > > @@ -259,6 +259,7 @@ enum ice_rx_dtype {
-> > >
-> > >  struct ice_pkt_ctx {
-> > >     const union ice_32b_rx_flex_desc *eop_desc;
-> > > +   u64 cached_phctime;
-> > >  };
-> > >
-> > >  struct ice_xdp_buff {
-> > > @@ -354,7 +355,6 @@ struct ice_rx_ring {
-> > >     struct ice_tx_ring *xdp_ring;
-> > >     struct xsk_buff_pool *xsk_pool;
-> > >     dma_addr_t dma;                 /* physical address of ring */
-> > > -   u64 cached_phctime;
-> > >     u16 rx_buf_len;
-> > >     u8 dcb_tc;                      /* Traffic class of ring */
-> > >     u8 ptp_rx;
-> > > diff --git a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c b/drivers/=
-net/ethernet/intel/ice/ice_txrx_lib.c
-> > > index beb1c5bb392a..463d9e5cbe05 100644
-> > > --- a/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > > +++ b/drivers/net/ethernet/intel/ice/ice_txrx_lib.c
-> > > @@ -546,3 +546,27 @@ void ice_finalize_xdp_rx(struct ice_tx_ring *xdp=
-_ring, unsigned int xdp_res,
-> > >                     spin_unlock(&xdp_ring->tx_lock);
-> > >     }
-> > >  }
-> > > +
-> > > +/**
-> > > + * ice_xdp_rx_hw_ts - HW timestamp XDP hint handler
-> > > + * @ctx: XDP buff pointer
-> > > + * @ts_ns: destination address
-> > > + *
-> > > + * Copy HW timestamp (if available) to the destination address.
-> > > + */
-> > > +static int ice_xdp_rx_hw_ts(const struct xdp_md *ctx, u64 *ts_ns)
-> > > +{
-> > > +   const struct ice_xdp_buff *xdp_ext =3D (void *)ctx;
-> > > +   u64 cached_time;
-> > > +
-> > > +   cached_time =3D READ_ONCE(xdp_ext->pkt_ctx.cached_phctime);
-> >
-> > I believe we have to have something like the following here:
-> >
-> > if (!ts_ns)
-> >       return -EINVAL;
-> >
-> > IOW, I don't think verifier guarantees that those pointer args are
-> > non-NULL.
->
-> Oh, that's a shame.
->
-> > Same for the other ice kfunc you're adding and veth changes.
-> >
-> > Can you also fix it for the existing veth kfuncs? (or lmk if you prefer=
- me
-> > to fix it).
->
-> I think I can send fixes for RX hash and timestamp in veth separately, be=
-fore
-> v3 of this patchset, code probably doesn't intersect.
->
-> But argument checks in kfuncs are a little bit a gray area for me, whethe=
-r they
-> should be sent to stable tree or not?
+> > >  drivers/net/ethernet/intel/igc/igc.h      |  6 +++
+> > >  drivers/net/ethernet/intel/igc/igc_main.c | 58
+> > > +++++++++++++++++++++--  drivers/net/ethernet/intel/igc/igc_tsn.c  |
+> > > 41 ++++++++++------
+> > >  3 files changed, 87 insertions(+), 18 deletions(-)
 
-Add a Fixes tag and they will get into the stable trees automatically I bel=
-ieve?
+<...>
+
+> > > +static enum hrtimer_restart igc_qbv_scheduling_timer(struct hrtimer
+> > > +*timer) {
+> > > +	struct igc_adapter *adapter = container_of(timer, struct igc_adapter,
+> > > +						   hrtimer);
+> > > +	unsigned int i;
+> > > +
+> > > +	adapter->qbv_transition = true;
+> > > +	for (i = 0; i < adapter->num_tx_queues; i++) {
+> > > +		struct igc_ring *tx_ring = adapter->tx_ring[i];
+> > > +
+> > > +		if (tx_ring->admin_gate_closed) {
+> > 
+> > Doesn't asynchronic access to shared variable through hrtimer require some
+> > sort of locking?
+> 
+> Yeah I agreed with you. However, IMHO, it should be saved without the lock. 
+> These variables, admin_gate_closed and oper_gate_closed, were set during the transition 
+> and setup/delete of the TC only. The qbv_transition flag has been used to protect the 
+> operation when it is in qbv transition.
+
+I have no idea what last sentence means, but igc_qbv_scheduling_timer()
+and tx_ring are global function/variables and TC setup/delete can run in
+parallel to them.
+
+Thanks
 
