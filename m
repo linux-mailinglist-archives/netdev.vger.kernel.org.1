@@ -1,66 +1,77 @@
-Return-Path: <netdev+bounces-15816-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15817-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 02809749FAA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:49:21 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 974A6749FC4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:51:18 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DF5581C20DE9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:49:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C85561C20DAF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:51:17 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 899E9A924;
-	Thu,  6 Jul 2023 14:49:15 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B8B0CA921;
+	Thu,  6 Jul 2023 14:51:15 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7AE8DA921
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 14:49:15 +0000 (UTC)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3561426AD;
-	Thu,  6 Jul 2023 07:48:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688654931; x=1720190931;
-  h=date:from:to:cc:subject:message-id:references:
-   mime-version:in-reply-to;
-  bh=WmEM0Uv0V9podpjJiFKtXB/oy3LQV9ca9bVrgASMa9o=;
-  b=IwZUrLh/yRZKOQfqDhbiyPW5WZTvVwGDMh3jE5H7VTyCG7gGEAs/JWdc
-   5RZdAsK8cYNL2JC1fTeNhRJPm9p263sSoUi3UI8rBhT2X5DArmATdxn0I
-   flfeboayu+4LtBWM5/1qV5DQxnDNpVjjoWKABQTmlD+li+YpeNNcuVPL7
-   aY4tkHRbUifXywarqemfSlJ17q2r6QZtsIcPQjyKmSDwPN6rNVQlfbDu6
-   d2EJQJhakNDfCHXPcU090uyeKR57FXbdoyMS7Lq+KMXOv2RviRBg4KCDf
-   IerfK+Oh7Tcxj5tEgmjQC1lGUvvPVyHc7baxny6QsODsU4pOcAl+Didwb
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="363657252"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="363657252"
-Received: from orsmga007.jf.intel.com ([10.7.209.58])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:48:31 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="713606831"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="713606831"
-Received: from lkp-server01.sh.intel.com (HELO c544d7fc5005) ([10.239.97.150])
-  by orsmga007.jf.intel.com with ESMTP; 06 Jul 2023 07:48:27 -0700
-Received: from kbuild by c544d7fc5005 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qHQHT-0001Ne-0E;
-	Thu, 06 Jul 2023 14:48:27 +0000
-Date: Thu, 6 Jul 2023 22:48:22 +0800
-From: kernel test robot <lkp@intel.com>
-To: Suman Ghosh <sumang@marvell.com>, sgoutham@marvell.com,
-	gakula@marvell.com, sbhatta@marvell.com, hkelam@marvell.com,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org
-Cc: llvm@lists.linux.dev, oe-kbuild-all@lists.linux.dev,
-	Suman Ghosh <sumang@marvell.com>
-Subject: Re: [PATCH V3] octeontx2-pf: Add additional check for MCAM rules
-Message-ID: <202307062220.o7LjIj48-lkp@intel.com>
-References: <20230703170054.2152662-1-sumang@marvell.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC17F79D2
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 14:51:15 +0000 (UTC)
+Received: from mail-il1-f181.google.com (mail-il1-f181.google.com [209.85.166.181])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5D6C1FD5;
+	Thu,  6 Jul 2023 07:51:13 -0700 (PDT)
+Received: by mail-il1-f181.google.com with SMTP id e9e14a558f8ab-3458a08310aso2656835ab.3;
+        Thu, 06 Jul 2023 07:51:13 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688655073; x=1691247073;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=cgnDkKPeeJQpJAr8Igz1bUHZ3qFXqLqwtv/vw0h6laQ=;
+        b=kIozDjF9k2z7Nu63E9sHCTX/pltPyr0bPhA63FccOoxaBohDe7o5lmYjG/52fAyE1/
+         pw79ttNXcoTml/v563MHKkTPkV9v/qNtSQ0SqDPz1yp4m1OYeIQyXZwF8xq4ILkivBBQ
+         bXfd+pRrt+sCq8baYVhVVJuavk4elTRlah/LKJGuMGRwxZFIrfrnqGoPIJ9D+bpkmSad
+         /fypbmbcZgocR+hklnziihUB3EznXMXbuq6bW6cENaToyTI619PeGp/xTI94SHV3rUVf
+         X4Q577jCqu7QWvQ2wpLoYvJKthtvPtkHGj7AnVrz41HF20wlGTtEWMl1SvTi4TbliaTR
+         w/Vw==
+X-Gm-Message-State: ABy/qLapwLmRPxFLgb3Ceiq4EvH2Oo+KK/hGkMaiVRH5ZjhBJ3a69gQg
+	GQ/JQhXe2MMkITqDP3vksA==
+X-Google-Smtp-Source: APBJJlF67lR6D5NqnrBz/z/xaj4p5WF0VZl589v9nUuz7XC/TU588WYs6w03reMlD4UBeRhzLPXgQw==
+X-Received: by 2002:a92:c52c:0:b0:345:d458:d227 with SMTP id m12-20020a92c52c000000b00345d458d227mr2368778ili.7.1688655072884;
+        Thu, 06 Jul 2023 07:51:12 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id g17-20020a0566380bd100b0042b3e2e5ca1sm569170jad.122.2023.07.06.07.51.09
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 07:51:12 -0700 (PDT)
+Received: (nullmailer pid 3861827 invoked by uid 1000);
+	Thu, 06 Jul 2023 14:51:08 -0000
+Date: Thu, 6 Jul 2023 08:51:08 -0600
+From: Rob Herring <robh@kernel.org>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, 
+	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org, 
+	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, mchehab@kernel.org, 
+	fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, ulf.hansson@linaro.org, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	hugues.fruchet@foss.st.com, lee@kernel.org, will@kernel.org, 
+	catalin.marinas@arm.com, arnd@kernel.org, richardcochran@gmail.com, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
+ description in binding files
+Message-ID: <20230706145108.GA3858320-robh@kernel.org>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -69,180 +80,70 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii
 Content-Disposition: inline
-In-Reply-To: <20230703170054.2152662-1-sumang@marvell.com>
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+In-Reply-To: <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi Suman,
+On Wed, Jul 05, 2023 at 07:27:53PM +0200, Gatien Chevallier wrote:
+> feature-domains is an optional property that allows a peripheral to
+> refer to one or more feature domain controller(s).
+> 
+> Description of this property is added to all peripheral binding files of
+> the peripheral under the STM32 firewall controllers. It allows an accurate
+> representation of the hardware, where various peripherals are connected
+> to this firewall bus. The firewall can then check the peripheral accesses
+> before allowing it to probe.
+> 
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+> 
+> Disclaimer: Some error with dtbs_check will be observed as I've
+> considered the property to be generic, as Rob asked
+> 
+>  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
+>  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
+>  .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
+>  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
+>  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
+>  Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
+>  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
+>  .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
+>  24 files changed, 97 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> index b767ec72a999..daf8dcaef627 100644
+> --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> @@ -50,6 +50,10 @@ properties:
+>    power-domains:
+>      maxItems: 1
+>  
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 
-kernel test robot noticed the following build warnings:
+What are the 3 entries?
 
-[auto build test WARNING on linus/master]
-[also build test WARNING on v6.4 next-20230706]
-[If your patch is applied to the wrong git tree, kindly drop us a note.
-And when submitting patch, we suggest to use '--base' as documented in
-https://git-scm.com/docs/git-format-patch#_base_tree_information]
-
-url:    https://github.com/intel-lab-lkp/linux/commits/Suman-Ghosh/octeontx2-pf-Add-additional-check-for-MCAM-rules/20230704-010247
-base:   linus/master
-patch link:    https://lore.kernel.org/r/20230703170054.2152662-1-sumang%40marvell.com
-patch subject: [PATCH V3] octeontx2-pf: Add additional check for MCAM rules
-config: arm64-allmodconfig (https://download.01.org/0day-ci/archive/20230706/202307062220.o7LjIj48-lkp@intel.com/config)
-compiler: clang version 17.0.0 (https://github.com/llvm/llvm-project.git 4a5ac14ee968ff0ad5d2cc1ffa0299048db4c88a)
-reproduce: (https://download.01.org/0day-ci/archive/20230706/202307062220.o7LjIj48-lkp@intel.com/reproduce)
-
-If you fix the issue in a separate patch/commit (i.e. not just a new version of
-the same patch/commit), kindly add following tags
-| Reported-by: kernel test robot <lkp@intel.com>
-| Closes: https://lore.kernel.org/oe-kbuild-all/202307062220.o7LjIj48-lkp@intel.com/
-
-All warnings (new ones prefixed by >>):
-
->> drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c:877:8: warning: variable 'vlan_etype' is uninitialized when used here [-Wuninitialized]
-     877 |                         if (vlan_etype == ETH_P_8021Q && !fsp->m_ext.vlan_tci &&
-         |                             ^~~~~~~~~~
-   drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c:867:17: note: initialize the variable 'vlan_etype' to silence this warning
-     867 |                 u16 vlan_etype;
-         |                               ^
-         |                                = 0
-   1 warning generated.
-
-
-vim +/vlan_etype +877 drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-
-   810	
-   811	static int otx2_prepare_flow_request(struct ethtool_rx_flow_spec *fsp,
-   812				      struct npc_install_flow_req *req)
-   813	{
-   814		struct ethhdr *eth_mask = &fsp->m_u.ether_spec;
-   815		struct ethhdr *eth_hdr = &fsp->h_u.ether_spec;
-   816		struct flow_msg *pmask = &req->mask;
-   817		struct flow_msg *pkt = &req->packet;
-   818		u32 flow_type;
-   819		int ret;
-   820	
-   821		flow_type = fsp->flow_type & ~(FLOW_EXT | FLOW_MAC_EXT | FLOW_RSS);
-   822		switch (flow_type) {
-   823		/* bits not set in mask are don't care */
-   824		case ETHER_FLOW:
-   825			if (!is_zero_ether_addr(eth_mask->h_source)) {
-   826				ether_addr_copy(pkt->smac, eth_hdr->h_source);
-   827				ether_addr_copy(pmask->smac, eth_mask->h_source);
-   828				req->features |= BIT_ULL(NPC_SMAC);
-   829			}
-   830			if (!is_zero_ether_addr(eth_mask->h_dest)) {
-   831				ether_addr_copy(pkt->dmac, eth_hdr->h_dest);
-   832				ether_addr_copy(pmask->dmac, eth_mask->h_dest);
-   833				req->features |= BIT_ULL(NPC_DMAC);
-   834			}
-   835			if (eth_hdr->h_proto) {
-   836				memcpy(&pkt->etype, &eth_hdr->h_proto,
-   837				       sizeof(pkt->etype));
-   838				memcpy(&pmask->etype, &eth_mask->h_proto,
-   839				       sizeof(pmask->etype));
-   840				req->features |= BIT_ULL(NPC_ETYPE);
-   841			}
-   842			break;
-   843		case IP_USER_FLOW:
-   844		case TCP_V4_FLOW:
-   845		case UDP_V4_FLOW:
-   846		case SCTP_V4_FLOW:
-   847		case AH_V4_FLOW:
-   848		case ESP_V4_FLOW:
-   849			ret = otx2_prepare_ipv4_flow(fsp, req, flow_type);
-   850			if (ret)
-   851				return ret;
-   852			break;
-   853		case IPV6_USER_FLOW:
-   854		case TCP_V6_FLOW:
-   855		case UDP_V6_FLOW:
-   856		case SCTP_V6_FLOW:
-   857		case AH_V6_FLOW:
-   858		case ESP_V6_FLOW:
-   859			ret = otx2_prepare_ipv6_flow(fsp, req, flow_type);
-   860			if (ret)
-   861				return ret;
-   862			break;
-   863		default:
-   864			return -EOPNOTSUPP;
-   865		}
-   866		if (fsp->flow_type & FLOW_EXT) {
-   867			u16 vlan_etype;
-   868	
-   869			if (fsp->m_ext.vlan_etype) {
-   870				/* Partial masks not supported */
-   871				if (be16_to_cpu(fsp->m_ext.vlan_etype) != 0xFFFF)
-   872					return -EINVAL;
-   873	
-   874				/* Drop rule with vlan_etype == 802.1Q
-   875				 * and vlan_id == 0 is not supported
-   876				 */
- > 877				if (vlan_etype == ETH_P_8021Q && !fsp->m_ext.vlan_tci &&
-   878				    fsp->ring_cookie == RX_CLS_FLOW_DISC)
-   879					return -EINVAL;
-   880	
-   881				vlan_etype = be16_to_cpu(fsp->h_ext.vlan_etype);
-   882				/* Only ETH_P_8021Q and ETH_P_802AD types supported */
-   883				if (vlan_etype != ETH_P_8021Q &&
-   884				    vlan_etype != ETH_P_8021AD)
-   885					return -EINVAL;
-   886	
-   887				memcpy(&pkt->vlan_etype, &fsp->h_ext.vlan_etype,
-   888				       sizeof(pkt->vlan_etype));
-   889				memcpy(&pmask->vlan_etype, &fsp->m_ext.vlan_etype,
-   890				       sizeof(pmask->vlan_etype));
-   891	
-   892				if (vlan_etype == ETH_P_8021Q)
-   893					req->features |= BIT_ULL(NPC_VLAN_ETYPE_CTAG);
-   894				else
-   895					req->features |= BIT_ULL(NPC_VLAN_ETYPE_STAG);
-   896			}
-   897	
-   898			if (fsp->m_ext.vlan_tci) {
-   899				memcpy(&pkt->vlan_tci, &fsp->h_ext.vlan_tci,
-   900				       sizeof(pkt->vlan_tci));
-   901				memcpy(&pmask->vlan_tci, &fsp->m_ext.vlan_tci,
-   902				       sizeof(pmask->vlan_tci));
-   903				req->features |= BIT_ULL(NPC_OUTER_VID);
-   904			}
-   905	
-   906			if (fsp->m_ext.data[1]) {
-   907				if (flow_type == IP_USER_FLOW) {
-   908					if (be32_to_cpu(fsp->h_ext.data[1]) != IPV4_FLAG_MORE)
-   909						return -EINVAL;
-   910	
-   911					pkt->ip_flag = be32_to_cpu(fsp->h_ext.data[1]);
-   912					pmask->ip_flag = be32_to_cpu(fsp->m_ext.data[1]);
-   913					req->features |= BIT_ULL(NPC_IPFRAG_IPV4);
-   914				} else if (fsp->h_ext.data[1] ==
-   915						cpu_to_be32(OTX2_DEFAULT_ACTION)) {
-   916					/* Not Drop/Direct to queue but use action
-   917					 * in default entry
-   918					 */
-   919					req->op = NIX_RX_ACTION_DEFAULT;
-   920				}
-   921			}
-   922		}
-   923	
-   924		if (fsp->flow_type & FLOW_MAC_EXT &&
-   925		    !is_zero_ether_addr(fsp->m_ext.h_dest)) {
-   926			ether_addr_copy(pkt->dmac, fsp->h_ext.h_dest);
-   927			ether_addr_copy(pmask->dmac, fsp->m_ext.h_dest);
-   928			req->features |= BIT_ULL(NPC_DMAC);
-   929		}
-   930	
-   931		if (!req->features)
-   932			return -EOPNOTSUPP;
-   933	
-   934		return 0;
-   935	}
-   936	
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Rob
 
