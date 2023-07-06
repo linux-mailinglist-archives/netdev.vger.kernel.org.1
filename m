@@ -1,245 +1,229 @@
-Return-Path: <netdev+bounces-15714-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15715-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C82B6749513
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:50:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9468774954D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:06:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4DEF2811BA
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 05:50:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 957C01C20CC4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:06:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B393610F1;
-	Thu,  6 Jul 2023 05:50:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84D0510F1;
+	Thu,  6 Jul 2023 06:06:02 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E993A47;
-	Thu,  6 Jul 2023 05:50:35 +0000 (UTC)
-Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF986110;
-	Wed,  5 Jul 2023 22:50:33 -0700 (PDT)
-Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-666ed230c81so375114b3a.0;
-        Wed, 05 Jul 2023 22:50:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688622633; x=1691214633;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=6KqsODTKbZmN8UTNNadCpXQZDsIrjIswwPW+/1H0i60=;
-        b=pkM3d8a2FY2p6XIJSq3BsHN/NilulK+jKTWoe15XMGMBpPQa2rSLATnNv+JmTyVoqN
-         wkRZWagfLr7x8JSNUSRM8IFXmaAm4xnmtRGxsvsr7s95JDJoHKqDZyDThqG4MHrGXj7i
-         NNQbZZhDZ+ILBscYtcrg0F7c+RneNX38uhQXNCWA6OygspHLe4ffh9eaqFqUxe4JkDyF
-         b3w8LKFdPigvyal38RHfCfHQN2xmNkbzF8QvaWI4DUMBWDfVe5ctm23gPRGqzf8fWl8D
-         o/NSI2RNaxMuQ8IuLIL4hD8zAcoj0tX60x9dpyqhTu4SgrlWUNvo8B7cPpaXSyV79yev
-         GGqw==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78CD210EF
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:06:02 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 226CE19B7
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:05:59 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688623559;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=c7F1kuoBVvdilDrsKXZBNZrXBfxZI6rHyhY9EwQm6NA=;
+	b=EK6hDm2ud2awj/rjHODTtKm1qhZVxFJ+4Vqzkpjp4fcm5THBy3/GkTR+66VV/eTi51sp1L
+	s4CrVXAoPpxSTYis0vQQm8Zmnvo7dDP/7MjanYtuZ9ooGTKtVV99dwQ2gN8NxEUPno8LCD
+	VBGMmcMC5vshe04felWlGGJCDF0WECk=
+Received: from mail-wm1-f71.google.com (mail-wm1-f71.google.com
+ [209.85.128.71]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-393-TrCu7F3HM1CEMPI6Ez_Y4Q-1; Thu, 06 Jul 2023 02:05:57 -0400
+X-MC-Unique: TrCu7F3HM1CEMPI6Ez_Y4Q-1
+Received: by mail-wm1-f71.google.com with SMTP id 5b1f17b1804b1-3fa979d0c32so1845565e9.2
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 23:05:57 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688622633; x=1691214633;
-        h=content-transfer-encoding:mime-version:subject:references
-         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
-         :cc:subject:date:message-id:reply-to;
-        bh=6KqsODTKbZmN8UTNNadCpXQZDsIrjIswwPW+/1H0i60=;
-        b=FTt7G91QTKN7Xaxm0SIEGbgisGEKNKIwHDvcxCm1XNLMRWTwYPXdiZmkFAJPlS7hxj
-         Fpc02SlNU++6ZPucpIeWU+VrJfJ42VnLLCxDr3AqkA5hPVpVLI3aUPQYcSSe4xIm1el4
-         XU8ITFduu1uuHdOOVOMrKrGd+3seJhRw4Iq1INot1SiYK0WpQEI7HqYtuhSeFB/+mqDH
-         J4GVz+9bz9g7Tj66cdoFW7Ex2GI+1eSJtCwnkk+SwCiQCXtuMEsRhYj/yD5gqMwtRzzi
-         MTWa7daEn+zH094ewh9bH7/kjwshF/GLHpk2jTMhHM8pc2flOvusfdEVVwsEN+ycVpua
-         oFPA==
-X-Gm-Message-State: ABy/qLbuI3/bzEQ9AtpgrhOfuqbFQ5EovxH3qoq7+tLWkUdNI2R5tqwd
-	i/jzixK8bArmi4xqR/XSQ6s=
-X-Google-Smtp-Source: APBJJlEktT3qq0Z6n8MOrcFoLqPhNIKKDhh5jX78z9X5sh0L4KFZern6+qAEVmsmYveHjKrFdtC3NA==
-X-Received: by 2002:a05:6a00:1a8a:b0:668:79d6:34df with SMTP id e10-20020a056a001a8a00b0066879d634dfmr1012583pfv.23.1688622632998;
-        Wed, 05 Jul 2023 22:50:32 -0700 (PDT)
-Received: from localhost ([2605:59c8:148:ba10::41f])
-        by smtp.gmail.com with ESMTPSA id ey2-20020a056a0038c200b006828a3c259fsm449353pfb.104.2023.07.05.22.50.32
+        d=1e100.net; s=20221208; t=1688623556; x=1691215556;
+        h=in-reply-to:content-transfer-encoding:content-disposition
+         :mime-version:references:message-id:subject:cc:to:from:date
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=c7F1kuoBVvdilDrsKXZBNZrXBfxZI6rHyhY9EwQm6NA=;
+        b=BJS35wJBZop/45ibno1liA9fsn08tWl1ITha6KL7AQncJ5K9YpwYeHAWELkz5CIFOR
+         /CM+04VOaHGWUQMlCQ1FNiTjKxPem3RG06AE+OisHeuZe8lxqM+w42niOFoQoCPuTtJG
+         hfl50KDr58vfe0dDJF8JvJOhGWqp+5R9prNKca+BrvXJjyVvx/qXRCK2cgA9zbFGTVwr
+         dgLOEgZl9uHoX8GxzpCtjUTmDBhjMfuj1jP+Dqaf/9YwTbU02mmtq1MHq8f6F277LLQx
+         bfMlzzNMK9oh/Yf1BXkG43dK25+2yEp62YNqh9DAoIHYtJAbMl3rTw8IhdkBeD3ePWms
+         lupw==
+X-Gm-Message-State: ABy/qLZpSMi0IqtQhUIu9KKsMra2uTEj3qfRp1uGmZQcqjMzsmT/ZHdg
+	ylF3L4oO8i0/Ph2L6is3lspUz/O6TI+g+AYRET8cst0+om2UrL4U3d4Xp1hu4FcRBbcbBJae6yu
+	n7u9dTH45H+jH8tN6
+X-Received: by 2002:a7b:c7d8:0:b0:3f8:c9a4:4998 with SMTP id z24-20020a7bc7d8000000b003f8c9a44998mr463683wmk.28.1688623556609;
+        Wed, 05 Jul 2023 23:05:56 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGrouu/voEFMZNR/vXdUDZFJea9gZ8LyKhI9fqFldR83BbNhMWMgOYIuYvluurNHedhv9Ps+A==
+X-Received: by 2002:a7b:c7d8:0:b0:3f8:c9a4:4998 with SMTP id z24-20020a7bc7d8000000b003f8c9a44998mr463673wmk.28.1688623556315;
+        Wed, 05 Jul 2023 23:05:56 -0700 (PDT)
+Received: from redhat.com ([2a06:c701:73e5:9a00:6cb0:ad0c:4846:6126])
+        by smtp.gmail.com with ESMTPSA id 1-20020a05600c228100b003fa8dbb7b5dsm1020276wmf.25.2023.07.05.23.05.54
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Wed, 05 Jul 2023 22:50:32 -0700 (PDT)
-Date: Wed, 05 Jul 2023 22:50:31 -0700
-From: John Fastabend <john.fastabend@gmail.com>
-To: Larysa Zaremba <larysa.zaremba@intel.com>, 
- Jesper Dangaard Brouer <jbrouer@redhat.com>
-Cc: John Fastabend <john.fastabend@gmail.com>, 
- brouer@redhat.com, 
- bpf@vger.kernel.org, 
- ast@kernel.org, 
- daniel@iogearbox.net, 
- andrii@kernel.org, 
- martin.lau@linux.dev, 
- song@kernel.org, 
- yhs@fb.com, 
- kpsingh@kernel.org, 
- sdf@google.com, 
- haoluo@google.com, 
- jolsa@kernel.org, 
- David Ahern <dsahern@gmail.com>, 
- Jakub Kicinski <kuba@kernel.org>, 
- Willem de Bruijn <willemb@google.com>, 
- Anatoly Burakov <anatoly.burakov@intel.com>, 
- Alexander Lobakin <alexandr.lobakin@intel.com>, 
- Magnus Karlsson <magnus.karlsson@gmail.com>, 
- Maryam Tahhan <mtahhan@redhat.com>, 
- xdp-hints@xdp-project.net, 
- netdev@vger.kernel.org, 
- "David S. Miller" <davem@davemloft.net>, 
- Alexander Duyck <alexander.duyck@gmail.com>
-Message-ID: <64a656273ee15_b20ce2087a@john.notmuch>
-In-Reply-To: <ZKQAPBcIE/iCkiX2@lincoln>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-13-larysa.zaremba@intel.com>
- <64a331c338a5a_628d3208cb@john.notmuch>
- <ZKPlZ6Z8ni5+ZJCK@lincoln>
- <9cd44759-416c-7274-f805-ee9d756f15b1@redhat.com>
- <ZKQAPBcIE/iCkiX2@lincoln>
-Subject: Re: [PATCH bpf-next v2 12/20] xdp: Add checksum level hint
+        Wed, 05 Jul 2023 23:05:55 -0700 (PDT)
+Date: Thu, 6 Jul 2023 02:05:53 -0400
+From: "Michael S. Tsirkin" <mst@redhat.com>
+To: Jason Wang <jasowang@redhat.com>
+Cc: Eugenio Perez Martin <eperezma@redhat.com>, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	Shannon Nelson <shannon.nelson@amd.com>,
+	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does
+ not support it
+Message-ID: <20230706020310-mutt-send-email-mst@kernel.org>
+References: <20230703142218.362549-1-eperezma@redhat.com>
+ <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org>
+ <CACGkMEvT4Y+-wfhyi324Y5hhAtn+ZF7cP9d=omdH-ZgdJ-4SOQ@mail.gmail.com>
+ <20230705044151-mutt-send-email-mst@kernel.org>
+ <CACGkMEu0MhQqNbrg9WkyGBboFU5RSqCs1W8LpksW4mO7hGxd7g@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-Content-Type: text/plain;
- charset=utf-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+MIME-Version: 1.0
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: 8bit
+In-Reply-To: <CACGkMEu0MhQqNbrg9WkyGBboFU5RSqCs1W8LpksW4mO7hGxd7g@mail.gmail.com>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Larysa Zaremba wrote:
-> On Tue, Jul 04, 2023 at 12:39:06PM +0200, Jesper Dangaard Brouer wrote:
-> > Cc. DaveM+Alex Duyck, as I value your insights on checksums.
-> > 
-> > On 04/07/2023 11.24, Larysa Zaremba wrote:
-> > > On Mon, Jul 03, 2023 at 01:38:27PM -0700, John Fastabend wrote:
-> > > > Larysa Zaremba wrote:
-> > > > > Implement functionality that enables drivers to expose to XDP code,
-> > > > > whether checksums was checked and on what level.
-> > > > > 
-> > > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > > > > ---
-> > > > >   Documentation/networking/xdp-rx-metadata.rst |  3 +++
-> > > > >   include/linux/netdevice.h                    |  1 +
-> > > > >   include/net/xdp.h                            |  2 ++
-> > > > >   kernel/bpf/offload.c                         |  2 ++
-> > > > >   net/core/xdp.c                               | 21 ++++++++++++++++++++
-> > > > >   5 files changed, 29 insertions(+)
-> > > > > 
-> > > > > diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
-> > > > > index ea6dd79a21d3..4ec6ddfd2a52 100644
-> > > > > --- a/Documentation/networking/xdp-rx-metadata.rst
-> > > > > +++ b/Documentation/networking/xdp-rx-metadata.rst
-> > > > > @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
-> > > > >   .. kernel-doc:: net/core/xdp.c
-> > > > >      :identifiers: bpf_xdp_metadata_rx_vlan_tag
-> > > > > +.. kernel-doc:: net/core/xdp.c
-> > > > > +   :identifiers: bpf_xdp_metadata_rx_csum_lvl
-> > > > > +
-> > > > >   An XDP program can use these kfuncs to read the metadata into stack
-> > > > >   variables for its own consumption. Or, to pass the metadata on to other
-> > > > >   consumers, an XDP program can store it into the metadata area carried
-> > > > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > > > > index 4fa4380e6d89..569563687172 100644
-> > > > > --- a/include/linux/netdevice.h
-> > > > > +++ b/include/linux/netdevice.h
-> > > > > @@ -1660,6 +1660,7 @@ struct xdp_metadata_ops {
-> > > > >   			       enum xdp_rss_hash_type *rss_type);
-> > > > >   	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tag,
-> > > > >   				   __be16 *vlan_proto);
-> > > > > +	int	(*xmo_rx_csum_lvl)(const struct xdp_md *ctx, u8 *csum_level);
-> > > > >   };
-> > > > >   /**
-> > > > > diff --git a/include/net/xdp.h b/include/net/xdp.h
-> > > > > index 89c58f56ffc6..61ed38fa79d1 100644
-> > > > > --- a/include/net/xdp.h
-> > > > > +++ b/include/net/xdp.h
-> > > > > @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
-> > > > >   			   bpf_xdp_metadata_rx_hash) \
-> > > > >   	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
-> > > > >   			   bpf_xdp_metadata_rx_vlan_tag) \
-> > > > > +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM_LVL, \
-> > > > > +			   bpf_xdp_metadata_rx_csum_lvl) \
-> > > > >   enum {
-> > > > >   #define XDP_METADATA_KFUNC(name, _) name,
-> > > > > diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
-> > > > > index 986e7becfd42..a133fb775f49 100644
-> > > > > --- a/kernel/bpf/offload.c
-> > > > > +++ b/kernel/bpf/offload.c
-> > > > > @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
-> > > > >   		p = ops->xmo_rx_hash;
-> > > > >   	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
-> > > > >   		p = ops->xmo_rx_vlan_tag;
-> > > > > +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM_LVL))
-> > > > > +		p = ops->xmo_rx_csum_lvl;
-> > > > >   out:
-> > > > >   	up_read(&bpf_devs_lock);
-> > > > > diff --git a/net/core/xdp.c b/net/core/xdp.c
-> > > > > index f6262c90e45f..c666d3e0a26c 100644
-> > > > > --- a/net/core/xdp.c
-> > > > > +++ b/net/core/xdp.c
-> > > > > @@ -758,6 +758,27 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan
-> > > > >   	return -EOPNOTSUPP;
-> > > > >   }
-> > > > > +/**
-> > > > > + * bpf_xdp_metadata_rx_csum_lvl - Get depth at which HW has checked the checksum.
-> > > > > + * @ctx: XDP context pointer.
-> > > > > + * @csum_level: Return value pointer.
-> > > > > + *
-> > > > > + * In case of success, csum_level contains depth of the last verified checksum.
-> > > > > + * If only the outermost checksum was verified, csum_level is 0, if both
-> > > > > + * encapsulation and inner transport checksums were verified, csum_level is 1,
-> > > > > + * and so on.
-> > > > > + * For more details, refer to csum_level field in sk_buff.
-> > > > > + *
-> > > > > + * Return:
-> > > > > + * * Returns 0 on success or ``-errno`` on error.
-> > > > > + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
-> > > > > + * * ``-ENODATA``    : Checksum was not validated
-> > > > > + */
-> > > > > +__bpf_kfunc int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
-> > > > 
-> > > > Istead of ENODATA should we return what would be put in the ip_summed field
-> > > > CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}? Then sig would be,
-> > 
-> > I was thinking the same, what about checksum "type".
-> > 
-> > > > 
-> > > >   bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *type, u8 *lvl);
-> > > > 
-> > > > or something like that? Or is the thought that its not really necessary?
-> > > > I don't have a strong preference but figured it was worth asking.
-> > > > 
-> > > 
-> > > I see no value in returning CHECKSUM_COMPLETE without the actual checksum value.
-> > > Same with CHECKSUM_PARTIAL and csum_start. Returning those values too would
-> > > overcomplicate the function signature.
-> > 
-> > So, this kfunc bpf_xdp_metadata_rx_csum_lvl() success is it equivilent to
-> > CHECKSUM_UNNECESSARY?
-> 
-> This is 100% true for physical NICs, it's more complicated for veth, bacause it 
-> often receives CHECKSUM_PARTIAL, which shouldn't normally apprear on RX, but is 
-> treated by the network stack as a validated checksum, because there is no way 
-> internally generated packet could be messed up. I would be grateful if you could 
-> look at the veth patch and share your opinion about this.
-> 
-> > 
-> > Looking at documentation[1] (generated from skbuff.h):
-> >  [1] https://kernel.org/doc/html/latest/networking/skbuff.html#checksumming-of-received-packets-by-device
-> > 
-> > Is the idea that we can add another kfunc (new signature) than can deal
-> > with the other types of checksums (in a later kernel release)?
+On Thu, Jul 06, 2023 at 09:56:29AM +0800, Jason Wang wrote:
+> On Wed, Jul 5, 2023 at 4:42 PM Michael S. Tsirkin <mst@redhat.com> wrote:
 > >
+> > On Wed, Jul 05, 2023 at 03:55:23PM +0800, Jason Wang wrote:
+> > > On Tue, Jul 4, 2023 at 6:38 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > >
+> > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wrote:
+> > > > > On Mon, Jul 3, 2023 at 4:52 PM Michael S. Tsirkin <mst@redhat.com> wrote:
+> > > > > >
+> > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio Pérez wrote:
+> > > > > > > With the current code it is accepted as long as userland send it.
+> > > > > > >
+> > > > > > > Although userland should not set a feature flag that has not been
+> > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current code will not
+> > > > > > > complain for it.
+> > > > > > >
+> > > > > > > Since there is no specific reason for any parent to reject that backend
+> > > > > > > feature bit when it has been proposed, let's control it at vdpa frontend
+> > > > > > > level. Future patches may move this control to the parent driver.
+> > > > > > >
+> > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK backend feature")
+> > > > > > > Signed-off-by: Eugenio Pérez <eperezma@redhat.com>
+> > > > > >
+> > > > > > Please do send v3. And again, I don't want to send "after driver ok" hack
+> > > > > > upstream at all, I merged it in next just to give it some testing.
+> > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > >
+> > > > >
+> > > > > Current devices do not support that semantic.
+> > > >
+> > > > Which devices specifically access the ring after DRIVER_OK but before
+> > > > a kick?
+> > >
+> > > Vhost-net is one example at last. It polls a socket as well, so it
+> > > starts to access the ring immediately after DRIVER_OK.
+> > >
+> > > Thanks
+> >
+> >
+> > For sure but that is not vdpa.
 > 
-> Yes, that is the idea.
+> Somehow via vp_vdpa that I'm usually testing vDPA patches.
+> 
+> The problem is that it's very hard to audit all vDPA devices now if it
+> is not defined in the spec before they are invented.
+> 
+> Thanks
 
-If we think there is a chance we might need another kfunc we should add it
-in the same kfunc. It would be unfortunate to have to do two kfuncs when
-one would work. It shouldn't cost much/anything(?) to hardcode the type for
-most cases? I think if we need it later I would advocate for updating this
-kfunc to support it. Of course then userspace will have to swivel on the
-kfunc signature.
+vp_vdpa is exactly the part that bothers me. If on the host it is backed
+by e.g. vhost-user then it does not work. And you don't know what is
+backing it.
+
+OTOH it supports RING_RESET ...
+
+So, proposal: include both this solution and for drivers
+vp_vdpa the RING_RESET trick.
+
+
+Hmm?
+
+
+
+> >
+> > > >
+> > > > > My plan was to convert
+> > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry if I
+> > > > > was not explicit enough.
+> > > > >
+> > > > > The only solution I can see to that is to trap & emulate in the vdpa
+> > > > > (parent?) driver, as talked in virtio-comment. But that complicates
+> > > > > the architecture:
+> > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > * Store vq enable state separately, at
+> > > > > vdpa->config->set_vq_ready(true), but not transmit that enable to hw
+> > > > > * Store the doorbell state separately, but do not configure it to the
+> > > > > device directly.
+> > > > >
+> > > > > But how to recover if the device cannot configure them at kick time,
+> > > > > for example?
+> > > > >
+> > > > > Maybe we can just fail if the parent driver does not support enabling
+> > > > > the vq after DRIVER_OK? That way no new feature flag is needed.
+> > > > >
+> > > > > Thanks!
+> > > > >
+> > > > > >
+> > > > > > > ---
+> > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/linux/kernel/git/mst
+> > > > > > > commit. Please let me know if I should send a v3 of [1] instead.
+> > > > > > >
+> > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-email-mst@kernel.org/T/
+> > > > > > > ---
+> > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > >
+> > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl(struct file *filep,
+> > > > > > >  {
+> > > > > > >       struct vhost_vdpa *v = filep->private_data;
+> > > > > > >       struct vhost_dev *d = &v->vdev;
+> > > > > > > +     const struct vdpa_config_ops *ops = v->vdpa->config;
+> > > > > > >       void __user *argp = (void __user *)arg;
+> > > > > > >       u64 __user *featurep = argp;
+> > > > > > > -     u64 features;
+> > > > > > > +     u64 features, parent_features = 0;
+> > > > > > >       long r = 0;
+> > > > > > >
+> > > > > > >       if (cmd == VHOST_SET_BACKEND_FEATURES) {
+> > > > > > >               if (copy_from_user(&features, featurep, sizeof(features)))
+> > > > > > >                       return -EFAULT;
+> > > > > > > +             if (ops->get_backend_features)
+> > > > > > > +                     parent_features = ops->get_backend_features(v->vdpa);
+> > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES |
+> > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSPEND) |
+> > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RESUME) |
+> > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK)))
+> > > > > > > +                              parent_features))
+> > > > > > >                       return -EOPNOTSUPP;
+> > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPEND)) &&
+> > > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > > --
+> > > > > > > 2.39.3
+> > > > > >
+> > > >
+> >
+
 
