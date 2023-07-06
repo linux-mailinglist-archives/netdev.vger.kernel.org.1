@@ -1,236 +1,104 @@
-Return-Path: <netdev+bounces-15929-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15930-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2D55674A7A5
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 01:27:23 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8BBE574A7B1
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 01:28:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2BE861C20EDE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 23:27:22 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 46B74280F54
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 23:28:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id EB458171A8;
-	Thu,  6 Jul 2023 23:26:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52783174C3;
+	Thu,  6 Jul 2023 23:26:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DC27B171A7;
-	Thu,  6 Jul 2023 23:26:23 +0000 (UTC)
-Received: from out3-smtp.messagingengine.com (out3-smtp.messagingengine.com [66.111.4.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AC5981BC3;
-	Thu,  6 Jul 2023 16:26:22 -0700 (PDT)
-Received: from compute5.internal (compute5.nyi.internal [10.202.2.45])
-	by mailout.nyi.internal (Postfix) with ESMTP id 2901B5C00E1;
-	Thu,  6 Jul 2023 19:26:22 -0400 (EDT)
-Received: from mailfrontend1 ([10.202.2.162])
-  by compute5.internal (MEProxy); Thu, 06 Jul 2023 19:26:22 -0400
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
-	:cc:content-transfer-encoding:content-type:date:date:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to; s=fm1; t=1688685982; x=
-	1688772382; bh=q+GZB03bv8FWk8Fi1TVDaCiqNoaHfJjJsc6EY7aLdqg=; b=d
-	ajqFc2+WLI+82TWCjXDI3fUTiyA1e5YSIVr/195+w77LRdYDkSQg2IP8uvcqANBQ
-	Bf99hzP2pDhGj0+NtdqC3xgMiFoTPSLDPSpe1+ZIfWuhVsXP5TNoVmCBsIkdaIBo
-	y/aCpmPlftxp+Vg68nYAvAExJg6mEmuWKZg2H4tzDYHAlCU9HZjZl5K3YM+/UOz3
-	0EQzI2mT9rvzwqKpf5pjRYD7bv+t04AEoWizCZ/8WqN12/GGYUx0q3Ey81UHJ6ga
-	UMiMcqEIRd9Nt4rSSzuqEtwmpP1EgBAuAo1d/cNr0tEGu5AD9519/8dodbPrpr8P
-	deH5gpN3JF3fRLH5g3SmA==
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
-	messagingengine.com; h=cc:cc:content-transfer-encoding
-	:content-type:date:date:feedback-id:feedback-id:from:from
-	:in-reply-to:in-reply-to:message-id:mime-version:references
-	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
-	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1688685982; x=
-	1688772382; bh=q+GZB03bv8FWk8Fi1TVDaCiqNoaHfJjJsc6EY7aLdqg=; b=Z
-	PRPVuy1Nnpk7552fuze8F7nRqZCIouBMxVE8pOBjAGtUcDDnb0bUJxw2DbPvx1OK
-	JXwSPAOT00maCUBb+5gH3UKwQhsMrm4B9h7LpHJUsO38IrBN9bHBjKXaImqqciG+
-	LV0W8q8K4cgs+ewOKK+akonksj3bT6G+rwrrJmEbP3lbiOBoMbPgHDecdxvvgm9A
-	n2sEapu2fAqC2TDbM8IjbjvDZkehGb10fOHFDt0C23sp0jPOaz6sINsYb/KUYAUk
-	jiMCa698yq2I+FPl5DfjKC5VALPC6EyNrai5N7xzOx0jOfBEnSW0U4jCZsgR4Gtu
-	x0ywPn1escick0aqFHetg==
-X-ME-Sender: <xms:nk2nZN40hwToJz5HaFo6S6jH_TEP60IYM2pAGqaTRn3mO3t08A8XIQ>
-    <xme:nk2nZK4Sr-87zhQI6mFhJTRf6-10adRqypUvLMjhlKWwIExaQOczrFE0sEE3AtQn2
-    iqjSh5ALWAp-zNImQ>
-X-ME-Received: <xmr:nk2nZEegG2ydWbrbWohcxqZV7VJmYriud2zqUPshBIKLxeoPwkKdeIQ6GhwqElbXi3ciNXz6naOB2v1SQTJgySV7sC4vb9Yn6f-VCQtF7FY>
-X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrvddtgddvudcutefuodetggdotefrodftvf
-    curfhrohhfihhlvgemucfhrghsthforghilhdpqfgfvfdpuffrtefokffrpgfnqfghnecu
-    uegrihhlohhuthemuceftddtnecufghrlhcuvffnffculdejtddmnecujfgurhephffvve
-    fufffkofgjfhgggfestdekredtredttdenucfhrhhomhepffgrnhhivghlucgiuhcuoegu
-    gihusegugihuuhhurdighiiiqeenucggtffrrghtthgvrhhnpefgfefggeejhfduieekvd
-    euteffleeifeeuvdfhheejleejjeekgfffgefhtddtteenucevlhhushhtvghrufhiiigv
-    pedunecurfgrrhgrmhepmhgrihhlfhhrohhmpegugihusegugihuuhhurdighiii
-X-ME-Proxy: <xmx:nk2nZGJ0GnKfsSbw0vfIuLoAfXkxeaQG7pMO2g_q7dr7eRTWs-qDpQ>
-    <xmx:nk2nZBJeb9yH1A6CB9LniQgSHlICd0kOzY16C5_lepn7GW0ZSpOW7w>
-    <xmx:nk2nZPzVbb_aLMVOaw-LMsKir2hJAbFoIv5WQJS_ujwFNJO5HSh6mw>
-    <xmx:nk2nZLAud1mD3mYZ3_kLodyMnQbGW32IRiSnaMXJH_2j_J3mbpo9_Q>
-Feedback-ID: i6a694271:Fastmail
-Received: by mail.messagingengine.com (Postfix) with ESMTPA; Thu,
- 6 Jul 2023 19:26:20 -0400 (EDT)
-From: Daniel Xu <dxu@dxuuu.xyz>
-To: pabeni@redhat.com,
-	edumazet@google.com,
-	kuba@kernel.org,
-	fw@strlen.de,
-	davem@davemloft.net,
-	pablo@netfilter.org,
-	kadlec@netfilter.org,
-	dsahern@kernel.org,
-	daniel@iogearbox.net
-Cc: netfilter-devel@vger.kernel.org,
-	coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org,
-	netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: [PATCH bpf-next v2 3/6] netfilter: bpf: Prevent defrag module unload while link active
-Date: Thu,  6 Jul 2023 17:25:50 -0600
-Message-ID: <81ede90e3f1468763ea5b0b6ec2971b7b1b870c1.1688685338.git.dxu@dxuuu.xyz>
-X-Mailer: git-send-email 2.41.0
-In-Reply-To: <cover.1688685338.git.dxu@dxuuu.xyz>
-References: <cover.1688685338.git.dxu@dxuuu.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4440C168A5
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 23:26:29 +0000 (UTC)
+Received: from bombadil.infradead.org (bombadil.infradead.org [IPv6:2607:7c80:54:3::133])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F3B31BD2;
+	Thu,  6 Jul 2023 16:26:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed;
+	d=infradead.org; s=bombadil.20210309; h=Content-Transfer-Encoding:
+	Content-Type:In-Reply-To:From:References:Cc:To:Subject:MIME-Version:Date:
+	Message-ID:Sender:Reply-To:Content-ID:Content-Description;
+	bh=bDdj2ImLWq3orRh5mZ0i6CkrMO5thDbEKJP5vNXEszQ=; b=XOsOwJYXZVQ33w6XPomj04Renh
+	yQFciK3I0zE9Zpzkq3abJrhB3iswgOvCHPxvjEYm27D9reaX9t91tKrcQRzF3ZEIg3mauARWtTTAq
+	mkDRH/+DHf7c/IQjBIpMU4PFnWC9fZf/Mk4YhC1PQFDfKPMfiEuFAFgfkEk5RJRjPiB+/vzjoackT
+	XUOGbqWSIFLQ12Va6M8GH4/uO7EvdbsNRrkafyM8Gy0Ocy6f6sDkMdBgAAnpJEndbyuC8i6sdMtKm
+	oesPnV5GC8cZptTn4JM6aXCMsystUzju5zYlp/j7FmgU2bYHuhRANZ4BtXwvBvgDrM42R/4mR1FSe
+	7OmlOTMw==;
+Received: from [2601:1c2:980:9ec0::2764]
+	by bombadil.infradead.org with esmtpsa (Exim 4.96 #2 (Red Hat Linux))
+	id 1qHYMh-002xMC-1W;
+	Thu, 06 Jul 2023 23:26:23 +0000
+Message-ID: <d785aec5-10b5-cc75-904c-cafdc194a8f0@infradead.org>
+Date: Thu, 6 Jul 2023 16:26:22 -0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH virtio] pds_vdpa: protect Makefile from unconfigured
+ debugfs
+Content-Language: en-US
+To: Shannon Nelson <shannon.nelson@amd.com>, jasowang@redhat.com,
+ mst@redhat.com, virtualization@lists.linux-foundation.org,
+ brett.creeley@amd.com
+Cc: netdev@vger.kernel.org, drivers@pensando.io, sfr@canb.auug.org.au,
+ linux-next@vger.kernel.org, linux-kernel@vger.kernel.org
+References: <20230706231718.54198-1-shannon.nelson@amd.com>
+From: Randy Dunlap <rdunlap@infradead.org>
+In-Reply-To: <20230706231718.54198-1-shannon.nelson@amd.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-While in practice we could handle the module being unloaded while a
-netfilter link (that requested defrag) was active, it's a better user
-experience to prevent the defrag module from going away. It would
-violate user expectations if fragmented packets started showing up if
-some other part of the system tried to unload defrag module.
 
-Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
----
- include/linux/netfilter.h                 |  3 +++
- net/ipv4/netfilter/nf_defrag_ipv4.c       |  1 +
- net/ipv6/netfilter/nf_defrag_ipv6_hooks.c |  1 +
- net/netfilter/nf_bpf_link.c               | 21 +++++++++++++++++++--
- 4 files changed, 24 insertions(+), 2 deletions(-)
 
-diff --git a/include/linux/netfilter.h b/include/linux/netfilter.h
-index 77a637b681f2..a160dc1e23bf 100644
---- a/include/linux/netfilter.h
-+++ b/include/linux/netfilter.h
-@@ -11,6 +11,7 @@
- #include <linux/wait.h>
- #include <linux/list.h>
- #include <linux/static_key.h>
-+#include <linux/module.h>
- #include <linux/netfilter_defs.h>
- #include <linux/netdevice.h>
- #include <linux/sockptr.h>
-@@ -482,12 +483,14 @@ struct nfnl_ct_hook {
- extern const struct nfnl_ct_hook __rcu *nfnl_ct_hook;
- 
- struct nf_defrag_v4_hook {
-+	struct module *owner;
- 	int (*enable)(struct net *net);
- 	void (*disable)(struct net *net);
- };
- extern const struct nf_defrag_v4_hook __rcu *nf_defrag_v4_hook;
- 
- struct nf_defrag_v6_hook {
-+	struct module *owner;
- 	int (*enable)(struct net *net);
- 	void (*disable)(struct net *net);
- };
-diff --git a/net/ipv4/netfilter/nf_defrag_ipv4.c b/net/ipv4/netfilter/nf_defrag_ipv4.c
-index 1f3e0e893b7a..fb133bf3131d 100644
---- a/net/ipv4/netfilter/nf_defrag_ipv4.c
-+++ b/net/ipv4/netfilter/nf_defrag_ipv4.c
-@@ -115,6 +115,7 @@ static void __net_exit defrag4_net_exit(struct net *net)
- }
- 
- static const struct nf_defrag_v4_hook defrag_hook = {
-+	.owner = THIS_MODULE,
- 	.enable = nf_defrag_ipv4_enable,
- 	.disable = nf_defrag_ipv4_disable,
- };
-diff --git a/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c b/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c
-index f7c7ee31c472..29d31721c9c0 100644
---- a/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c
-+++ b/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c
-@@ -98,6 +98,7 @@ static void __net_exit defrag6_net_exit(struct net *net)
- }
- 
- static const struct nf_defrag_v6_hook defrag_hook = {
-+	.owner = THIS_MODULE,
- 	.enable = nf_defrag_ipv6_enable,
- 	.disable = nf_defrag_ipv6_disable,
- };
-diff --git a/net/netfilter/nf_bpf_link.c b/net/netfilter/nf_bpf_link.c
-index 765612cb2370..8ce34696939e 100644
---- a/net/netfilter/nf_bpf_link.c
-+++ b/net/netfilter/nf_bpf_link.c
-@@ -2,6 +2,7 @@
- #include <linux/bpf.h>
- #include <linux/filter.h>
- #include <linux/kmod.h>
-+#include <linux/module.h>
- #include <linux/netfilter.h>
- 
- #include <net/netfilter/nf_bpf_link.h>
-@@ -53,6 +54,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
- 			}
- 		}
- 
-+		/* Prevent defrag module from going away while in use */
-+		if (!try_module_get(v4_hook->owner)) {
-+			err = -ENOENT;
-+			goto out_v4;
-+		}
-+
- 		err = v4_hook->enable(link->net);
- out_v4:
- 		rcu_read_unlock();
-@@ -79,6 +86,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
- 			}
- 		}
- 
-+		/* Prevent defrag module from going away while in use */
-+		if (!try_module_get(v6_hook->owner)) {
-+			err = -ENOENT;
-+			goto out_v6;
-+		}
-+
- 		err = v6_hook->enable(link->net);
- out_v6:
- 		rcu_read_unlock();
-@@ -98,8 +111,10 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
- 
- 		rcu_read_lock();
- 		v4_hook = rcu_dereference(nf_defrag_v4_hook);
--		if (v4_hook)
-+		if (v4_hook) {
- 			v4_hook->disable(link->net);
-+			module_put(v4_hook->owner);
-+		}
- 		rcu_read_unlock();
- 
- 		break;
-@@ -110,8 +125,10 @@ static void bpf_nf_disable_defrag(struct bpf_nf_link *link)
- 
- 		rcu_read_lock();
- 		v6_hook = rcu_dereference(nf_defrag_v6_hook);
--		if (v6_hook)
-+		if (v6_hook) {
- 			v6_hook->disable(link->net);
-+			module_put(v6_hook->owner);
-+		}
- 		rcu_read_unlock();
- 
- 		break;
+On 7/6/23 16:17, Shannon Nelson wrote:
+> debugfs.h protects itself from an undefined DEBUG_FS, so it is
+> not necessary to check it in the driver code or the Makefile.
+> The driver code had been updated for this, but the Makefile had
+> missed the update.
+> 
+> Link: https://lore.kernel.org/linux-next/fec68c3c-8249-7af4-5390-0495386a76f9@infradead.org/
+> Fixes: a16291b5bcbb ("pds_vdpa: Add new vDPA driver for AMD/Pensando DSC")
+> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+
+Thanks.
+
+> ---
+>  drivers/vdpa/pds/Makefile | 3 +--
+>  1 file changed, 1 insertion(+), 2 deletions(-)
+> 
+> diff --git a/drivers/vdpa/pds/Makefile b/drivers/vdpa/pds/Makefile
+> index 2e22418e3ab3..c2d314d4614d 100644
+> --- a/drivers/vdpa/pds/Makefile
+> +++ b/drivers/vdpa/pds/Makefile
+> @@ -5,6 +5,5 @@ obj-$(CONFIG_PDS_VDPA) := pds_vdpa.o
+>  
+>  pds_vdpa-y := aux_drv.o \
+>  	      cmds.o \
+> +	      debugfs.o \
+>  	      vdpa_dev.o
+> -
+> -pds_vdpa-$(CONFIG_DEBUG_FS) += debugfs.o
+
 -- 
-2.41.0
-
+~Randy
 
