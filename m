@@ -1,196 +1,159 @@
-Return-Path: <netdev+bounces-15799-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15800-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B0171749DC4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 15:32:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 553FD749E08
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 15:43:09 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DBC161C20D64
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 13:32:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F250E281322
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 13:43:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76A9A9447;
-	Thu,  6 Jul 2023 13:32:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7A26B9447;
+	Thu,  6 Jul 2023 13:42:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5B3D69444
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 13:32:04 +0000 (UTC)
-Received: from mail-yw1-x1132.google.com (mail-yw1-x1132.google.com [IPv6:2607:f8b0:4864:20::1132])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 183101BF4
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:31:55 -0700 (PDT)
-Received: by mail-yw1-x1132.google.com with SMTP id 00721157ae682-57688a146ecso8754557b3.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 06:31:55 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688650314; x=1691242314;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=vs28WbKYsMm2vLZxQF77zj7bC7bw0228Itc8NTTGeZc=;
-        b=ARRrOgrgJGqnRZW3Vg720V9D3aPE0/GlJWhXriFyTRq1pwWbfs25w3aqoRFEOLlKcQ
-         UTGXRpMlLVc9poIIk3YzM2yRPnJY1ItvYwGUGlJjwErdWVJkeIeP4P4DL+45acYdGG6m
-         M5kQ0liDRnZcp7oVopiqaRQKSmQUZ4fpAKdESiyzURAKe3o7WS72GEyMZ2fsnMV3MWdh
-         KzxJN+kTk7pU2YrN/kPXc5XvxeyLSHWscjaeo4VY5RuJh+AHSSSMBV6mn/KcMQmVFgBV
-         WW2T9Q2MMBADsKpHu+H3wCR7KdvlvH1I3z7pFxB5DBkfelHYT3jWZ6gP6nVEXI4fEsAD
-         XMHA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688650314; x=1691242314;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=vs28WbKYsMm2vLZxQF77zj7bC7bw0228Itc8NTTGeZc=;
-        b=ejTeU2XqEeNPPkenzEiZ/juZgCaDFUovRq9uDP3jkm7IoOViqY0tgg4XG+c9uZ9zdp
-         c+k9qpOCpsCC9/2Kdob0mEOwZjhky/66OXXeGUPwLeCsp30gxp1NMD0jqnlTdeQKBjao
-         9BKoa0wf1098z0kw14p8+2kfEomZRNoGz9Kz8McqXx5NmWpJFVICQYY+5mqot+RqVMNq
-         Xnu2T3y18HSRtAA8FrbcTH5Wth/FZVV2cThOGPUGyUZzzOK6Jm5uEN34Wk3wtN2/DwJy
-         TvPxlt+QqAkC0drmi0DbpCH2ZF6uQilMHFWwVB7XmwBNUfETLLZw62T/8vW25f/9XucO
-         4y+A==
-X-Gm-Message-State: ABy/qLZoCwgKB36VtLHIf5XMHtwBAXFn1IfD3iTZYjp/iIdcGyyIcCfG
-	lGyjqWx7bPwY0J2wV/lhhuuaMwPJ0sv0zaYnrQ0VDA==
-X-Google-Smtp-Source: APBJJlFCJgcWbeMcCv0C1c5vMp3tfhSGDw/QLrravDt+kVw6krLNNlkgp/WL3fdJGV5EIgxVtraZ2PErwHqRLTEFVYY=
-X-Received: by 2002:a81:4f58:0:b0:576:93f1:d118 with SMTP id
- d85-20020a814f58000000b0057693f1d118mr2085102ywb.2.1688650314074; Thu, 06 Jul
- 2023 06:31:54 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 66BE08F6E
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 13:42:54 +0000 (UTC)
+Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2110.outbound.protection.outlook.com [40.107.255.110])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6F82C1BEA;
+	Thu,  6 Jul 2023 06:42:46 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=JdcifmXfOnR4oQymq81DCUyc9UB0NBb9zL0+BXZHvKYq+jUhIvVyFjgivi3o0F0gsVn3vw+pb6fgCKewzCG/9h56SzpCHoXl8Yp/iGmd6tzDi70PQd6y2cupPZfHGLztTPduWiBPf08rOQbBSPJSACzupSTkLJwbbzLvMQDWHVbmT2T2Hs0CV7rjGeluBKiJWjhX4FBwdhiAvcm1L6aAtqhGK1/PdfhizkTF93zRBENk8YjQ32TNPXVXEjNg3CJ9/s1QeGM4uznXUQkGHywDrBDIm8maMQIw48aeuxznqveHbe7+RMrF5A81cCa0UwcpWbVCSF18DwuxdOA+l0TqQQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=paqiVsqv+bRJKbz3EnAjIaVHjiCcamW576aIKSFLeQ4=;
+ b=cSgRK7HYwjOFPV3awxwvNxOyEmVFtfbEc3VHjY648k26ofy6Q7HhV03OCBrKAJAgBDM055o1MFqyi35Er6hJIP0k/nTBDKjyaiUBVNBi/2wKGanOluAPr8Ih2n4wzy0EtRgrgynz/DoKzXWA46N0VpguXJ2b+smTk9sw4ab/5YwUT6hGtzb77rZ47+5/YQDop1tm+rxz+Vil5AH09XyWK0LpvfTAAO5fs2xYirYauBva7g9+Kia0hogBTrcTaypzK0Ny79vbCQbEC9avjA70UMgtH9Xl60xPVqlwlCdaeZQbiH5yNcFYtvDzAg+J+yQ4P1pd6SczCX6i3XgGA1bDhw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=paqiVsqv+bRJKbz3EnAjIaVHjiCcamW576aIKSFLeQ4=;
+ b=dvyfJFs5rMwnXhCv0VMvX+kv96LkAwJ7aPviSbR+7bVpSoyQrn9hKYwlQRd8Cekcey+vL5/fntLGDVI6/9fiHSeRlodcjQmf0QMGHsq7KipXAoznoY6LwEYuss1VyXGk3VRWSUDfNZB5LH8BW11/p5ewcviWJu1Rh/btBjfFhZlpmIj6AIPWFMMyPnsFuN3g8NDUOmlIo0cts3wfool0I8c4/Tgq2jp3o8aiP4EmtdqTyuabqJ210ONhh7HLC1FXYLQyidyff0YCkALpcVrmzt8vdvooBuVEMeK64JIrVtvKYYEv1YBMeA+/39MLKfzVMK3c0BJd1znXrHNQzzM9lA==
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
+ TY0PR06MB4981.apcprd06.prod.outlook.com (2603:1096:400:1af::6) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6565.17; Thu, 6 Jul 2023 13:42:40 +0000
+Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
+ ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 13:42:40 +0000
+From: Wang Ming <machel@vivo.com>
+To: Jon Maloy <jmaloy@redhat.com>,
+	Ying Xue <ying.xue@windriver.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	netdev@vger.kernel.org,
+	tipc-discussion@lists.sourceforge.net,
+	linux-kernel@vger.kernel.org
+Cc: opensource.kernel@vivo.com,
+	Wang Ming <machel@vivo.com>
+Subject: [PATCH v1] net:tipc:Remove repeated initialization
+Date: Thu,  6 Jul 2023 21:42:09 +0800
+Message-Id: <20230706134226.9119-1-machel@vivo.com>
+X-Mailer: git-send-email 2.25.1
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: TYWPR01CA0036.jpnprd01.prod.outlook.com
+ (2603:1096:400:aa::23) To SG2PR06MB3743.apcprd06.prod.outlook.com
+ (2603:1096:4:d0::18)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230607192625.22641-1-daniel@iogearbox.net> <20230607192625.22641-3-daniel@iogearbox.net>
- <CAM0EoMm25tdjxp+7Mq4fowGfCJzFRhbThHhaO7T_46vNJ9y-NQ@mail.gmail.com>
- <fe2e13a6-1fb6-c160-1d6f-31c09264911b@iogearbox.net> <CAM0EoM=FFsTNNKaMbRtuRxc8ieJgDFsBifBmZZ2_67u5=+-3BQ@mail.gmail.com>
- <CAEf4BzbuzNw4gRXSSDoHTwGH82moaSWtaX1nvmUAVx4+OgaEyw@mail.gmail.com>
- <CAM0EoM=SeFagzNMWLHqM7LRXt71pWz7BJax_4rvCnLyARDyWig@mail.gmail.com>
- <15ab0ba7-abf7-b9c3-eb5e-7a6b9fd79977@iogearbox.net> <CAM0EoMndiP6c20Q9g+dSFMh+XPJCdCAUzjHPXm6-4mmNJtAH3A@mail.gmail.com>
- <b147aa2d-6aa5-6336-1484-41c7c1032ecd@iogearbox.net>
-In-Reply-To: <b147aa2d-6aa5-6336-1484-41c7c1032ecd@iogearbox.net>
-From: Jamal Hadi Salim <jhs@mojatatu.com>
-Date: Thu, 6 Jul 2023 09:31:42 -0400
-Message-ID: <CAM0EoM=-Kk1K04wYgsiARPfqLx1a2kkq92haU9dZPP7P2mgh8g@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v2 2/7] bpf: Add fd-based tcx multi-prog infra
- with link support
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: Andrii Nakryiko <andrii.nakryiko@gmail.com>, ast@kernel.org, andrii@kernel.org, 
-	martin.lau@linux.dev, razor@blackwall.org, sdf@google.com, 
-	john.fastabend@gmail.com, kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, 
-	toke@kernel.org, davem@davemloft.net, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org, lmb@isovalent.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SG2PR06MB3743:EE_|TY0PR06MB4981:EE_
+X-MS-Office365-Filtering-Correlation-Id: bd6b4d26-5061-4157-3776-08db7e26ddd8
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	z5jiFSyaFE/z3+cc1oLYUZm0aAZUa/fhZAuyDJSlNZpjqRcuD2mk86US8AwumkyISCEX6k6OfLnbGGQ5KeBmQmqY0TXOSippJaNTtiYS9ctr9mSIzQ0jnkOrT9Olay2Rd80lXwUHq/m3aLS2OSI8fEkRZQpuanya/HTP+tZg+FuLMNyTZMmSoDWiaV7Uc4JPSrmLB2jcMrJHjYiNTebJ79JNSUJYxKO0uuaKcJhH6nS7gp0O/lQ+2N4elIp4KKO5wxTxO1Fkhf6pmnavbhSxRo1Dm2i8UisgD8d09zrnUqPVQQyJ12G7pPPHNtX9Os19E7vcFccNU5XuofI4emKZz7feCZ1yZJ8R3rYjwmxFX1FoQk92stEMZR3lpsv07kzz4GPveZctMXU8Jcb5zC4msfNQpBUWIpN2HnNFi31YZkcPhbeF9PpjLd2GeGla3c8EVFRkhJyowSiqJqm4rfWzLk2E0CjOCQZlFVjMjh9X03C9mCiaLwHwAK5a5GdA+Pjzp+OTlecpfNzH8OsqprLLGKqNNYZFvK7obj8ri28/3+EyaNgiUOfdXeClXEGycaVj+g43n88wlMkldc8G1y0JRU0eGEwv7GiLHWFCqGhzWxA3JveBcSFTgAE/8oKoekhn
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(366004)(136003)(346002)(39860400002)(451199021)(4326008)(38350700002)(110136005)(66556008)(6486002)(52116002)(6666004)(41300700001)(8936002)(8676002)(38100700002)(2616005)(66946007)(316002)(66476007)(83380400001)(186003)(478600001)(6512007)(6506007)(107886003)(1076003)(26005)(86362001)(5660300002)(2906002)(4744005)(36756003);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?MhnkSB8MmiSCW7I5O774ShNcNWFlt9dK/0oT5iH7hRkOPw4ABDP6mabIQF2Y?=
+ =?us-ascii?Q?06ivo/fI1tiDnan1k+Hu/aV6lHx/mDc0wJ8HX6Aajrg2G5mQRSj9IsN/ZvmM?=
+ =?us-ascii?Q?SGVTiQolDtNOs4m1F7m8HdUNvPxR1zlUdQJ5t7pC4rAXvUm678HZMc7cjrxt?=
+ =?us-ascii?Q?JtRdyomq06MoDE/HFncE4Hs24VyHWj8XDXfdgbGjN0Ln7WxQMpNe1nJFLLym?=
+ =?us-ascii?Q?CFRKpnVbMUFwNe6umIjaIN8sSbNtbExMIiFD/lhU4so3U8C57VLHkTCP2Oc4?=
+ =?us-ascii?Q?BweVHFpz64zAnMLZQQMEXPqhW2fl7NXbKJobXm1FBJsOiZJm0LAy3URO7MxF?=
+ =?us-ascii?Q?B69pYrXJ0C+Xpptd1ng006cKeMbbvmwjIzm5w0LeQtk9YWZYOFRvYadj15Ey?=
+ =?us-ascii?Q?I8Dv0snXQjBYrxVrvwGCihthRiD5eXFdILa5xCdijGvIrY6skcGI5hJKEbzq?=
+ =?us-ascii?Q?icLQBUhukTR9g+Ql9S3VaN0tPrzGh2LaxEXWgITJzIFdfIu6khIuT5RMojSi?=
+ =?us-ascii?Q?PaIWRPFlpyF4WliBrbzoktzfab3hqKRuYRuXhQPAnv4XBqVfIG5vIfmjwXr2?=
+ =?us-ascii?Q?Z2RdY21DU1h+sSd/TMa8Q50vI89scQhYfrBC0HO7GLPjMuOKo2Lh3KzLWw+F?=
+ =?us-ascii?Q?cxWuARu0+r5A03FiQ5fR3V4MhPUGqLGwZ4tZ4klQJKEtoxxDvn28PvH7lH2U?=
+ =?us-ascii?Q?Kz+mfnG8TOqVQ+/jmK5HIHF8UfIGO//oK6Zfyt9U95ORGELo9CE2n8CD0pPK?=
+ =?us-ascii?Q?eJCZ2Hz+G+ve0vSy361Zi4NIcddgDTk4mDs8NS99bkZpAuBOOFkKclMcEgoZ?=
+ =?us-ascii?Q?Z1Yg0F3vMI6pZBIPef8vUWX8DbTNXTJl37TEhtErbS+r/jMxbHPR9poz9gd2?=
+ =?us-ascii?Q?tz7n9xJwwg9J0DH9JAUizfuWYhzk6AAIcw0NdqrVZyVsCaUUp/UYR0QA9qwh?=
+ =?us-ascii?Q?SvdAm1ZFrlkaS7nWbQ4vir0mB8Kveni+g1syux3b+Kn4+8csejTBr7clotcC?=
+ =?us-ascii?Q?JPaw8QkXPF6IkN6PC4b0znU0r/rmt5AEJdgT76nuPE44iQS/0clKG7TGF4g/?=
+ =?us-ascii?Q?NBqpvBY/P5Q+4yq0P1SdMu2oTa37+aa3G3nh/HVrqAIV48XZNTKXFXK5sEEi?=
+ =?us-ascii?Q?ihyYTmBFHxIbIYinjDJADHYNzBAycuz3Rp/vVJ3jOrAnmRH1lt6zLXHZ1nFa?=
+ =?us-ascii?Q?7HkuglZ0X0wWXeSavU4THKiL7mmNxQTlbDiQeAGxpt8jylub54QAES01ble2?=
+ =?us-ascii?Q?ezi2+pSRVlq0VuZ0bxyni1eUYeTbQSffxiS7IC6oHo9P+XkGoVeIfVFJJ+/1?=
+ =?us-ascii?Q?N5hkqmhaskPHS++WFmcnwxpEdd0hAvgGImomglp7mqJhJFSHB59/uGKNr2hT?=
+ =?us-ascii?Q?mr1xHTeJRmoLCdXLvmK2kZFj7JA0NqXPjcd6MQZuPtbPc69Nle7G5iE5eGJu?=
+ =?us-ascii?Q?akWOKf7PGATk3l1GZVjjtwXWV658uhptQFMEJpoTVUMcxY0C5BxkqSh0LmSj?=
+ =?us-ascii?Q?M48/2PDM1VrUNvRTFAtzVZRjz7/iCw2LaF4N9w4lz2ffqsDKOTllFFuNX7od?=
+ =?us-ascii?Q?t//poiZtr+ST6T0zjRqLLnOWjyQOYHn9j5xZc8BD?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: bd6b4d26-5061-4157-3776-08db7e26ddd8
+X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 13:42:40.1214
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RSve4jzRBiaXL3HKfZsERN6WFGahVUcVQUwcSsTJY7c0J2+llU2K3g5JRsQqkSU4LbvuLJCJcfiJqYC2KLfg2A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB4981
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed, Jul 5, 2023 at 3:34=E2=80=AFAM Daniel Borkmann <daniel@iogearbox.ne=
-t> wrote:
->
-> On 7/5/23 12:38 AM, Jamal Hadi Salim wrote:
-> > On Tue, Jul 4, 2023 at 6:01=E2=80=AFPM Daniel Borkmann <daniel@iogearbo=
-x.net> wrote:
-> >> On 7/4/23 11:36 PM, Jamal Hadi Salim wrote:
-> >>> On Thu, Jun 8, 2023 at 5:25=E2=80=AFPM Andrii Nakryiko
-> >>> <andrii.nakryiko@gmail.com> wrote:
-> >>>> On Thu, Jun 8, 2023 at 12:46=E2=80=AFPM Jamal Hadi Salim <jhs@mojata=
-tu.com> wrote:
-> >>>>> On Thu, Jun 8, 2023 at 6:12=E2=80=AFAM Daniel Borkmann <daniel@ioge=
-arbox.net> wrote:
-> >>>>>> On 6/8/23 3:25 AM, Jamal Hadi Salim wrote:
-> >> [...]
-> >>>>>> BPF links are supported for XDP today, just tc BPF is one of the f=
-ew
-> >>>>>> remainders where it is not the case, hence the work of this series=
-. What
-> >>>>>> XDP lacks today however is multi-prog support. With the bpf_mprog =
-concept
-> >>>>>> that could be addressed with that common/uniform api (and Andrii e=
-xpressed
-> >>>>>> interest in integrating this also for cgroup progs), so yes, vario=
-us hook
-> >>>>>> points/program types could benefit from it.
-> >>>>>
-> >>>>> Is there some sample XDP related i could look at?  Let me describe =
-our
-> >>>>> use case: lets say we load an ebpf program foo attached to XDP of a
-> >>>>> netdev  and then something further upstream in the stack is consumi=
-ng
-> >>>>> the results of that ebpf XDP program. For some reason someone, at s=
-ome
-> >>>>> point, decides to replace the XDP prog with a different one - and t=
-he
-> >>>>> new prog does a very different thing. Could we stop the replacement
-> >>>>> with the link mechanism you describe? i.e the program is still load=
-ed
-> >>>>> but is no longer attached to the netdev.
-> >>>>
-> >>>> If you initially attached an XDP program using BPF link api
-> >>>> (LINK_CREATE command in bpf() syscall), then subsequent attachment t=
-o
-> >>>> the same interface (of a new link or program with BPF_PROG_ATTACH)
-> >>>> will fail until the current BPF link is detached through closing its
-> >>>> last fd.
-> >>>
-> >>> So this works as advertised. The problem is however not totally solve=
-d
-> >>> because it seems we need a process that's alive to hold the ownership=
-.
-> >>> If we had a daemon then that would solve it i think (we dont).
-> >>> Alternatively,  you pin the link. The pinning part can be
-> >>> circumvented, unless i misunderstood i,e anybody with the right
-> >>> permissions can remove it.
-> >>>
-> >>> Am I missing something?
-> >>
-> >> It would be either of those depending on the use case, and for pinning
-> >> removal, it would require right permissions/acls. Keep in mind that fo=
-r
-> >> your application you can also use your own bpffs mount, so you don't
-> >> need to use the default /sys/fs/bpf one in hostns.
-> >
-> > This helps for sure - doesnt 100% solve it. It would really be nice if
-> > we could tie in a kerberos-like ticketing system for ownership of the
-> > mount or something even more fine grained like a link. Doesnt have to
-> > be kerberos but anything that would allow a digest of some verifiable
-> > credentials/token to be handed to the kernel for authorization...
->
-> What is your use-case, you don't want anyone except your own orchestratio=
-n
-> application to access it, so any kind of ACLs, LSM policies or making the
-> mount only available to your container are not enough in this scenario yo=
-u
-> have in mind?
+The original code initializes 'tmp' twice,
+which causes duplicate initialization issue.
+To fix this, we remove the second initialization
+of 'tmp' and use 'parent' directly forsubsequent
+operations.
 
-It should work - it's not even a shared environment (unlike the
-situation you have to deal with). I think i got overly paranoid
-because we  have gone through a couple of debug cases where an
-installed parser (using ip) in  XDP (with a tc prog consuming the
-results) was accidentally replaced (and the tc side had expectations
-built on the removed prog). i.e end goal is two or more programs, in
-this case, one running in XDP and another at TC are interdependent; if
-you touch one you affect the other.
-In a shared environment it could be problematic because all you need
-is root access to remove things.
-If you have a second factor authentication etc then someone has to be
-both root and has more secret knowledge to displace things.
+Signed-off-by: Wang Ming <machel@vivo.com>
+---
+ net/tipc/group.c | 2 --
+ 1 file changed, 2 deletions(-)
 
-But: I do have some ulterior motive where the authentication could be
-used at policy level as well. Example someone can read-only a tc rule
-whereas someone else can read, update or even delete the rule.
+diff --git a/net/tipc/group.c b/net/tipc/group.c
+index 3e137d8c9d2f..b2f964f62c36 100644
+--- a/net/tipc/group.c
++++ b/net/tipc/group.c
+@@ -284,8 +284,6 @@ static int tipc_group_add_to_tree(struct tipc_group *grp,
+ 	n = &grp->members.rb_node;
+ 	while (*n) {
+ 		tmp = container_of(*n, struct tipc_member, tree_node);
+-		parent = *n;
+-		tmp = container_of(parent, struct tipc_member, tree_node);
+ 		nkey = (u64)tmp->node << 32 | tmp->port;
+ 		if (key < nkey)
+ 			n = &(*n)->rb_left;
+-- 
+2.25.1
 
-> I think the closest to that is probably the prototype which Lorenz recent=
-ly
-> built where the user space application's digest is validated via IMA [0].
-
-This may be sufficient for the atomicity requirement if we can lock
-things into our own ebpf fs. I will take a look - thanks.
-
-cheers,
-jamal
->    [0] http://vger.kernel.org/bpfconf2023_material/Lorenz_Bauer_-_BPF_sig=
-ning_using_fsverity_and_LSM_gatekeeper.pdf
->        https://github.com/isovalent/bpf-verity
 
