@@ -1,94 +1,119 @@
-Return-Path: <netdev+bounces-15865-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15866-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8D08E74A2EC
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:14:09 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0B42A74A308
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:23:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BE6101C20DBD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:14:08 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 37FDB1C20D35
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:23:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93ECDBA4F;
-	Thu,  6 Jul 2023 17:14:06 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BE32EBA52;
+	Thu,  6 Jul 2023 17:23:22 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 82FB2AD3B
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:14:06 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-27.smtpout.orange.fr [80.12.242.27])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0E4371BF0
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:14:03 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id HSYJqKhc3f9upHSYJqznA5; Thu, 06 Jul 2023 19:14:01 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1688663641;
-	bh=56KuZrkMbRd2J7ViCPHtCF/MZvoglrK3t93PpbFw9Sg=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=NI1Qkk5cFyNMwPvdl5dFpR6F+HQKlxywtwBxcRHHwB8l1PcNTga97/IQEky9Fnf83
-	 3MNxs7faTlWo9s1BrpxV0+2yduVgzquLEGxgFTayoiAQ8fGQxXPeRDXlPXllD35qpq
-	 JC8pZ6YyHsuAVG4M7uzmidgbQZ8+slpUSIccgyvqW0ViiJZLIAB2FtatPMbNwEuOJe
-	 Kvslkuitopvxweh2Qn2q6b+Xk/nLNxFh4C3iv8thkRujedw/XZN24MkrrcjK1YS37A
-	 MGwl1GnEKDIlgF1Zvth437FFPLY3RVnjL31ARVL954DYE1GgHFswNkY0GDSZizRDHM
-	 UGBHpjyIOWGyQ==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Thu, 06 Jul 2023 19:14:01 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <a409e348-0d15-e7f6-5d97-1ebe8341027a@wanadoo.fr>
-Date: Thu, 6 Jul 2023 19:13:59 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A7D82BA49
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:23:22 +0000 (UTC)
+Received: from mail-pg1-x52d.google.com (mail-pg1-x52d.google.com [IPv6:2607:f8b0:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 80FE01BEC
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:23:21 -0700 (PDT)
+Received: by mail-pg1-x52d.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so732402a12.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 10:23:21 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1688664200; x=1691256200;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=3w6eM1h+0P8X1QDbGu2Q17kb8M2qnV/qp1NskbLt6Z0=;
+        b=BUPdN44Pqpap981nerjdz0tmWFl99Jhx/pTjf/uNWurNdXG0E8Aya+43lFIjrQakt3
+         aTVTSRMtB6Qre/swdUDlKkB51mf/8gU0WbwhkChkq3WHXezkMH74Qiea6VOZMcvmFixL
+         m/qNgag4jj6XXQKOE7w2+lkZSjvJlz02Fh6yg=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688664200; x=1691256200;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=3w6eM1h+0P8X1QDbGu2Q17kb8M2qnV/qp1NskbLt6Z0=;
+        b=V91S08OLXCFL0mD+LAHNiZlazvMvu1tCkXG0/C2dfdjY7bi/oNCakmcEj6Yr4yIEU9
+         akrSyHV2Ft4SNIHtFuY/7CfAzYtP3bPP5hKTu7HqaaeDvUjl56Nkxgu1MeIuQtGZLqbw
+         Jw/9GmEYiccLrsDU9fIgcRHNo+3IO3NetfCMy2ArVvMsuBNC12MWbONgHB32QTSL0Dcr
+         TJCgXB8J3DKbPoxj6YgI1aM/NXZRoZOC/n58ZEvofWr8V0F6tH/9t+g2554JsrNkO90s
+         0dNae77/34YzK9hIWJHTEIO5L5e6AyycTrF5aoynHe2cRXPF4uKQjVYMdiNu8tXdtoTR
+         tKMg==
+X-Gm-Message-State: ABy/qLaaQdSZuLxjS1/rX5tBqSd3pgl70RE1bVtIcih74uBO64Wq5ibX
+	QD/x7ms0eYQUQc8m+PpdTkDujwgVPVxTIrerbMLOwQ==
+X-Google-Smtp-Source: APBJJlEnFoNgR0Za1gb6swgE7IdNVSOCrgicMUPGnWTnn3YySvdOVMl+LhVdLLfoOXeS1V3o/KJ5/A==
+X-Received: by 2002:a05:6a20:9384:b0:130:3c8b:4204 with SMTP id x4-20020a056a20938400b001303c8b4204mr2118043pzh.8.1688664200464;
+        Thu, 06 Jul 2023 10:23:20 -0700 (PDT)
+Received: from localhost ([2601:644:200:aea:502d:5846:fd1f:55e7])
+        by smtp.gmail.com with ESMTPSA id p22-20020aa78616000000b0067903510abbsm1528509pfn.163.2023.07.06.10.23.19
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 10:23:20 -0700 (PDT)
+From: Ivan Babrou <ivan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	kernel-team@cloudflare.com,
+	Ivan Babrou <ivan@cloudflare.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	David Ahern <dsahern@kernel.org>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Satoru Moriya <satoru.moriya@hds.com>
+Subject: [PATCH] udp6: add a missing call into udp_fail_queue_rcv_skb tracepoint
+Date: Thu,  6 Jul 2023 10:22:36 -0700
+Message-ID: <20230706172237.28341-1-ivan@cloudflare.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH v1] net:tipc:Remove repeated initialization
-Content-Language: fr, en-US
-To: Wang Ming <machel@vivo.com>
-Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev@vger.kernel.org,
- tipc-discussion@lists.sourceforge.net, linux-kernel@vger.kernel.org,
- opensource.kernel@vivo.com, Jakub Kicinski <kuba@kernel.org>
-References: <20230706134226.9119-1-machel@vivo.com>
- <20230706084729.12ed5725@kernel.org>
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <20230706084729.12ed5725@kernel.org>
-Content-Type: text/plain; charset=UTF-8; format=flowed
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 06/07/2023 à 17:47, Jakub Kicinski a écrit :
-> On Thu,  6 Jul 2023 21:42:09 +0800 Wang Ming wrote:
->> The original code initializes 'tmp' twice,
->> which causes duplicate initialization issue.
->> To fix this, we remove the second initialization
->> of 'tmp' and use 'parent' directly forsubsequent
->> operations.
->>
->> Signed-off-by: Wang Ming <machel@vivo.com>
-> 
-> Please stop sending the "remove repeated initialization" patches
-> to networking, thanks.
-> 
-> 
+The tracepoint has existed for 12 years, but it only covered udp
+over the legacy IPv4 protocol. Having it enabled for udp6 removes
+the unnecessary difference in error visibility.
 
-The patch also looks just bogus, as 'parent' is now always NULL when:
-    rb_link_node(&m->tree_node, parent, n);
+Signed-off-by: Ivan Babrou <ivan@cloudflare.com>
+Fixes: 296f7ea75b45 ("udp: add tracepoints for queueing skb to rcvbuf")
+---
+ net/ipv6/udp.c | 2 ++
+ 1 file changed, 2 insertions(+)
 
-is called after the while loop.
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index e5a337e6b970..debb98fb23c0 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -45,6 +45,7 @@
+ #include <net/tcp_states.h>
+ #include <net/ip6_checksum.h>
+ #include <net/ip6_tunnel.h>
++#include <trace/events/udp.h>
+ #include <net/xfrm.h>
+ #include <net/inet_hashtables.h>
+ #include <net/inet6_hashtables.h>
+@@ -680,6 +681,7 @@ static int __udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 		}
+ 		UDP6_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+ 		kfree_skb_reason(skb, drop_reason);
++		trace_udp_fail_queue_rcv_skb(rc, sk);
+ 		return -1;
+ 	}
+ 
+-- 
+2.41.0
 
-CJ
 
