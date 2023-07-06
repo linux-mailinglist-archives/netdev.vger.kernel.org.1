@@ -1,245 +1,130 @@
-Return-Path: <netdev+bounces-15719-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15720-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 52ACD749592
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:28:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 680297495A4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:33:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1FA7B1C20CF7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:28:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C1351C20C41
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:33:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC4291102;
-	Thu,  6 Jul 2023 06:28:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1060BEDA;
+	Thu,  6 Jul 2023 06:33:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC6C910EF
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:28:34 +0000 (UTC)
-Received: from mail-ej1-x636.google.com (mail-ej1-x636.google.com [IPv6:2a00:1450:4864:20::636])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4163B1737
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:28:32 -0700 (PDT)
-Received: by mail-ej1-x636.google.com with SMTP id a640c23a62f3a-98e011f45ffso30962366b.3
-        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 23:28:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linaro.org; s=google; t=1688624911; x=1691216911;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Pqu4vTxoeW2yTwRCEetSQZvh47NKMtjn0RrXMB1JAGg=;
-        b=dRSL6aukgIkfv+NlQasUhI0WW8PrgXzou5v2QVss3xqfKaQ4M1Yt2cin2pOZmhQd17
-         mLGsmRk6KQ96V2gbe6flKfOcIDP8C6aJ94MYdy2hTnRpIigR7o/uS07D4CETNP/87UAG
-         Te3mFVnmowcotJ+p+kvuGY85+Df/k9sYz1L9gl3LDrpMcUkuBaCO8WTequflxZTiDoTT
-         JMZMZqgL5RQtdtgjCToseEau/xKW62TMq6KzpDrpxszgG+HHnYaK/7KRjWMGum9WC1ss
-         tpYb7Y62RIr5F4RyB4vq3Q8QtCd9PUd2GSuCjupyh7ZdQj3zgjJEZ/rUnmhwmkQP56L0
-         GcnQ==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0297D7E8
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:33:46 +0000 (UTC)
+Received: from mail-pf1-f207.google.com (mail-pf1-f207.google.com [209.85.210.207])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754801737
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:33:45 -0700 (PDT)
+Received: by mail-pf1-f207.google.com with SMTP id d2e1a72fcca58-666e5f0d639so520180b3a.3
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 23:33:45 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688624911; x=1691216911;
-        h=content-transfer-encoding:in-reply-to:from:references:cc:to
-         :content-language:subject:user-agent:mime-version:date:message-id
+        d=1e100.net; s=20221208; t=1688625224; x=1691217224;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
          :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=Pqu4vTxoeW2yTwRCEetSQZvh47NKMtjn0RrXMB1JAGg=;
-        b=Cm0luaUXR/Y7Zp7XKib0K6IzbROnch15RRahHUVzvRed5O7bkqGOwKcs/MX05w4WtC
-         ZONxDE6Bnusk2X5HTMuOH4B4YNQr0AWc9Xg4fB+NC/r6Us30rjN2fylBhD5K696yimsH
-         TJdLTTYzmv/DX8VSgH5qoDFNHf1Ye4/rWdkirnN8Zh6fkjHXWhI6L24UClR5SMKF8aL+
-         jBBuz8sYDXEmAZdVlOqqwp/xDH1vAhvSaztPGtQPFDY+xSFdJdBPFpX5iPNDov2QAyXk
-         kAyPNyANlpJWCx8mX0UOnLTgr5Qrz1SUhvCp0criljCSot/CGS0wbSWpXhM7xh4tAQk/
-         IJjA==
-X-Gm-Message-State: ABy/qLaw3fMmTtA45rjrpuxis5mjJaLBrdhl4FwX4ppgW7ClRaiTwBKM
-	no2j4gDXvf+pKKcSBjO6blD8/g==
-X-Google-Smtp-Source: APBJJlEu2RGF4uBuUPfkX4wlSxPa3Cu2L5C0YRWwOysyPz8/vFYVscoSMwhTBIDQpkpak+dxq034Sw==
-X-Received: by 2002:a17:906:10cf:b0:991:8328:50e3 with SMTP id v15-20020a17090610cf00b00991832850e3mr696668ejv.9.1688624910680;
-        Wed, 05 Jul 2023 23:28:30 -0700 (PDT)
-Received: from [192.168.1.20] ([178.197.219.26])
-        by smtp.gmail.com with ESMTPSA id lf20-20020a170906ae5400b009920e9a3a73sm372590ejb.115.2023.07.05.23.28.26
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Wed, 05 Jul 2023 23:28:30 -0700 (PDT)
-Message-ID: <e871ad32-dfa4-067d-4f2c-207ffd42aafd@linaro.org>
-Date: Thu, 6 Jul 2023 08:28:25 +0200
+        bh=rQfgqYhN80cocuiZ4CtvhG1o5YWInCsGK0oXglBkVZQ=;
+        b=VhowF+49PruCuRodJFrCNMheIxDPHcIqZtU2TzFOBh5vy4BirOaQVfSSkMF2MiHNxA
+         wwYsCSRapguSmDsjow0tv/jdCYwajywb0iGWFX4kdBgeiwZEsst2VNGUWhiKBFLv4M0d
+         JbO96u5UmXqStzv98SOI6B5R0ZeARs3yaIoXjPx5kRCkahgbpn5uENU/9qnIINEzQ53a
+         SBE5cJ0PbplEH+rv25LysQt2ohXqOfQHcF/yTkRGLY+x+qRI10hxlWo+mzTD2TsMrCil
+         ZhSpZWz2HSapilmWGxu5HGJDfV160SlVYShPHWLcKHZlUYMaqxLr+B90kVCQoe9cxNNW
+         F/Aw==
+X-Gm-Message-State: ABy/qLZQcN/bYQx04bU+K1/jYR7ZduXsUqJYiBVQ2H6/WsrJBJXw0c9K
+	HIvgIkqZZ+HK6GCt601CHGJ9nVlnMCdwSbFWgTP3yKbhU6hX
+X-Google-Smtp-Source: APBJJlHCvDebXUaazEvvRKiHgWMrvAJwTERHZkxu7vxis5raXolCfIJxGKP2pCC+Od2nQ3qJF5UTvPJThLwz78fvvXvwcefvkXK0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH 02/10] dt-bindings: bus: add device tree bindings for
- RIFSC
-Content-Language: en-US
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>,
- Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org,
- herbert@gondor.apana.org.au, davem@davemloft.net, robh+dt@kernel.org,
- krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
- alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
- olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
- mchehab@kernel.org, fabrice.gasnier@foss.st.com, andi.shyti@kernel.org,
- ulf.hansson@linaro.org, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, hugues.fruchet@foss.st.com, lee@kernel.org,
- will@kernel.org, catalin.marinas@arm.com, arnd@kernel.org,
- richardcochran@gmail.com
-Cc: linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
- linux-stm32@st-md-mailman.stormreply.com,
- linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
- dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
- linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
- linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
- netdev@vger.kernel.org, linux-phy@lists.infradead.org,
- linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
- linux-usb@vger.kernel.org
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
-From: Krzysztof Kozlowski <krzysztof.kozlowski@linaro.org>
-In-Reply-To: <20230705172759.1610753-3-gatien.chevallier@foss.st.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+X-Received: by 2002:a05:6a00:2d9b:b0:678:e0b1:7f28 with SMTP id
+ fb27-20020a056a002d9b00b00678e0b17f28mr1181998pfb.6.1688625224084; Wed, 05
+ Jul 2023 23:33:44 -0700 (PDT)
+Date: Wed, 05 Jul 2023 23:33:43 -0700
+In-Reply-To: <0000000000007faf0005fe4f14b9@google.com>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <000000000000a3f45805ffcbb21f@google.com>
+Subject: Re: [syzbot] [ext4?] WARNING in ext4_file_write_iter
+From: syzbot <syzbot+5050ad0fb47527b1808a@syzkaller.appspotmail.com>
+To: adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 05/07/2023 19:27, Gatien Chevallier wrote:
-> Document RIFSC (RIF security controller). RIFSC is a firewall controller
-> composed of different kinds of hardware resources.
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+syzbot has found a reproducer for the following issue on:
 
-A nit, subject: drop second/last, redundant "device tree bindings for".
-The "dt-bindings" prefix is already stating that these are bindings. 4
-words of your 6 word subject is meaningless...
+HEAD commit:    6843306689af Merge tag 'net-6.5-rc1' of git://git.kernel.o..
+git tree:       net
+console output: https://syzkaller.appspot.com/x/log.txt?x=114522aca80000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=7ad417033279f15a
+dashboard link: https://syzkaller.appspot.com/bug?extid=5050ad0fb47527b1808a
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102cb190a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c49d90a80000
 
-> ---
->  .../bindings/bus/st,stm32-rifsc.yaml          | 101 ++++++++++++++++++
->  1 file changed, 101 insertions(+)
->  create mode 100644 Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
-> 
-> diff --git a/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml b/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
-> new file mode 100644
-> index 000000000000..68d585ed369c
-> --- /dev/null
-> +++ b/Documentation/devicetree/bindings/bus/st,stm32-rifsc.yaml
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/f6adc10dbd71/disk-68433066.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/5c3fa1329201/vmlinux-68433066.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/84db3452bac5/bzImage-68433066.xz
 
-Filename like compatible, unless you know list of compatibles will
-grow... but then add them.
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+5050ad0fb47527b1808a@syzkaller.appspotmail.com
 
-> @@ -0,0 +1,101 @@
-> +# SPDX-License-Identifier: (GPL-2.0-only OR BSD-2-Clause)
-> +%YAML 1.2
-> +---
-> +$id: http://devicetree.org/schemas/bus/st,stm32-rifsc.yaml#
-> +$schema: http://devicetree.org/meta-schemas/core.yaml#
-> +
-> +title: STM32 Resource isolation framework security controller bindings
+------------[ cut here ]------------
+WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_dio_write_iter fs/ext4/file.c:611 [inline]
+WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_file_write_iter+0x1470/0x1880 fs/ext4/file.c:720
+Modules linked in:
+CPU: 1 PID: 5382 Comm: syz-executor288 Not tainted 6.4.0-syzkaller-11989-g6843306689af #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+RIP: 0010:ext4_dio_write_iter fs/ext4/file.c:611 [inline]
+RIP: 0010:ext4_file_write_iter+0x1470/0x1880 fs/ext4/file.c:720
+Code: 84 03 00 00 48 8b 04 24 31 ff 8b 40 20 89 c3 89 44 24 10 83 e3 08 89 de e8 5d 5a 5b ff 85 db 0f 85 d5 fc ff ff e8 30 5e 5b ff <0f> 0b e9 c9 fc ff ff e8 24 5e 5b ff 48 8b 4c 24 40 4c 89 fa 4c 89
+RSP: 0018:ffffc9000522fc30 EFLAGS: 00010293
+RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
+RDX: ffff8880277a3b80 RSI: ffffffff82298140 RDI: 0000000000000005
+RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000001 R12: ffffffff8a832a60
+R13: 0000000000000000 R14: 0000000000000000 R15: fffffffffffffff5
+FS:  00007f154db95700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f154db74718 CR3: 000000006bcc7000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ call_write_iter include/linux/fs.h:1871 [inline]
+ new_sync_write fs/read_write.c:491 [inline]
+ vfs_write+0x981/0xda0 fs/read_write.c:584
+ ksys_write+0x122/0x250 fs/read_write.c:637
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f154dc094f9
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007f154db952f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
+RAX: ffffffffffffffda RBX: 00007f154dc924f0 RCX: 00007f154dc094f9
+RDX: 0000000000248800 RSI: 0000000020000000 RDI: 0000000000000006
+RBP: 00007f154dc5f628 R08: 0000000000000000 R09: 0000000000000000
+R10: 0000000000000000 R11: 0000000000000246 R12: 652e79726f6d656d
+R13: 656c6c616b7a7973 R14: 6465646165726874 R15: 00007f154dc924f8
+ </TASK>
 
-Drop bindings
 
-> +
-> +maintainers:
-> +  - Gatien Chevallier <gatien.chevallier@foss.st.com>
-> +
-> +description: |
-> +  Resource isolation framework (RIF) is a comprehensive set of hardware blocks
-> +  designed to enforce and manage isolation of STM32 hardware resources like
-> +  memory and peripherals.
-> +
-> +  The RIFSC (RIF security controller) is composed of three sets of registers,
-> +  each managing a specific set of hardware resources:
-> +    - RISC registers associated with RISUP logic (resource isolation device unit
-> +      for peripherals), assign all non-RIF aware peripherals to zero, one or
-> +      any security domains (secure, privilege, compartment).
-> +    - RIMC registers: associated with RIMU logic (resource isolation master
-> +      unit), assign all non RIF-aware bus master to one security domain by
-> +      setting secure, privileged and compartment information on the system bus.
-> +      Alternatively, the RISUP logic controlling the device port access to a
-> +      peripheral can assign target bus attributes to this peripheral master port
-> +      (supported attribute: CID).
-> +    - RISC registers associated with RISAL logic (resource isolation device unit
-> +      for address space - Lite version), assign address space subregions to one
-> +      security domains (secure, privilege, compartment).
-> +
-> +properties:
-> +  compatible:
-> +    const: st,stm32mp25-rifsc
-> +
-> +  reg:
-> +    maxItems: 1
-> +
-> +  "#address-cells":
-> +    const: 1
-> +
-> +  "#size-cells":
-> +    const: 1
-> +
-> +  "#feature-domain-cells":
-> +    const: 1
-> +
-> +  ranges: true
-> +
-> +  feature-domain-controller: true
-> +
-> +patternProperties:
-> +  "^.*@[0-9a-f]+$":
-> +    description: Peripherals
-> +    type: object
-> +    properties:
-> +      feature-domains:
-> +        minItems: 1
-> +        maxItems: 2
-> +        description:
-> +          The first argument must always be a phandle that references to the
-> +          firewall controller of the peripheral. The second can contain the
-> +          platform specific firewall ID of the peripheral.
-
-It does not make much sense to me to have hierarchy parent-child and via
-phandle at the same time. You express the similar relationship twice.
-
-> +
-> +required:
-> +  - compatible
-> +  - reg
-> +  - "#address-cells"
-> +  - "#size-cells"
-> +  - feature-domain-controller
-> +  - "#feature-domain-cells"
-> +  - ranges
-> +
-> +additionalProperties: false
-> +
-> +examples:
-> +  - |
-> +    // In this example, the usart2 device refers to rifsc as its domain
-> +    // controller.
-> +    // Access rights are verified before creating devices.
-> +
-> +    #include <dt-bindings/interrupt-controller/arm-gic.h>
-> +
-> +    rifsc: rifsc-bus@42080000 {
-> +        compatible = "st,stm32mp25-rifsc";
-> +        reg = <0x42080000 0x1000>;
-> +        #address-cells = <1>;
-> +        #size-cells = <1>;
-> +        ranges;
-> +        feature-domain-controller;
-> +        #feature-domain-cells = <1>;
-> +
-> +        usart2: serial@400e0000 {
-> +            compatible = "st,stm32h7-uart";
-> +            reg = <0x400e0000 0x400>;
-> +            interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
-> +            clocks = <&ck_flexgen_08>;
-> +            feature-domains = <&rifsc 32>;
-> +            status = "disabled";
-
-No status in the examples.
-
-> +        };
-> +    };
-
-Best regards,
-Krzysztof
-
+---
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
 
