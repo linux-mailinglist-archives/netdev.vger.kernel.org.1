@@ -1,220 +1,110 @@
-Return-Path: <netdev+bounces-15823-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15824-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6A33274A03F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:58:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 6406B74A065
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:05:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 980A41C20DC8
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:58:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7E1341C20BD9
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 15:05:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D99C9A947;
-	Thu,  6 Jul 2023 14:58:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 53914A939;
+	Thu,  6 Jul 2023 15:05:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C7D459453
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 14:58:36 +0000 (UTC)
-Received: from smtp-out1.suse.de (smtp-out1.suse.de [IPv6:2001:67c:2178:6::1c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E86F11BD3;
-	Thu,  6 Jul 2023 07:58:33 -0700 (PDT)
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by smtp-out1.suse.de (Postfix) with ESMTPS id 3C5C121F0F;
-	Thu,  6 Jul 2023 14:58:32 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=suse.cz; s=susede2_rsa;
-	t=1688655512; h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a3WCjuVtP408kA5MLjuqcXtfVFT/xUBAoafKmCX5mTQ=;
-	b=24baoWftvYiGQFO3002Q0+aX8kw5mHmt4Cu1N910tREAGtuxcOaRXmP0pM+lOVAJim6+VD
-	dQX99wfdHC9+7VMIIenAeKOTV3XT6+7YZiyj/RCSzIS+4DKmzNEvO8ziEQ7uku2gaTxrzh
-	E0opuusKVm/bz4GqT0HBn9z2vEqLBRg=
-DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; d=suse.cz;
-	s=susede2_ed25519; t=1688655512;
-	h=from:from:reply-to:date:date:message-id:message-id:to:to:cc:cc:
-	 mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=a3WCjuVtP408kA5MLjuqcXtfVFT/xUBAoafKmCX5mTQ=;
-	b=N/aHHWlEsq3Q8ok8VkNIK3F/VOqPWCTaj4AqfwvPqV9l0evDoZQtQa232xNNYABuuek3bk
-	kdzAUhIiYKjnxQAA==
-Received: from imap2.suse-dmz.suse.de (imap2.suse-dmz.suse.de [192.168.254.74])
-	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
-	 key-exchange X25519 server-signature ECDSA (P-521) server-digest SHA512)
-	(No client certificate requested)
-	by imap2.suse-dmz.suse.de (Postfix) with ESMTPS id 1707313A26;
-	Thu,  6 Jul 2023 14:58:32 +0000 (UTC)
-Received: from dovecot-director2.suse.de ([192.168.254.65])
-	by imap2.suse-dmz.suse.de with ESMTPSA
-	id CHDYBJjWpmRrBgAAMHmgww
-	(envelope-from <jack@suse.cz>); Thu, 06 Jul 2023 14:58:32 +0000
-Received: by quack3.suse.cz (Postfix, from userid 1000)
-	id 818C8A0707; Thu,  6 Jul 2023 16:58:31 +0200 (CEST)
-Date: Thu, 6 Jul 2023 16:58:31 +0200
-From: Jan Kara <jack@suse.cz>
-To: Jeff Layton <jlayton@kernel.org>
-Cc: jk@ozlabs.org, arnd@arndb.de, mpe@ellerman.id.au, npiggin@gmail.com,
-	christophe.leroy@csgroup.eu, hca@linux.ibm.com, gor@linux.ibm.com,
-	agordeev@linux.ibm.com, borntraeger@linux.ibm.com,
-	svens@linux.ibm.com, gregkh@linuxfoundation.org, arve@android.com,
-	tkjos@android.com, maco@android.com, joel@joelfernandes.org,
-	brauner@kernel.org, cmllamas@google.com, surenb@google.com,
-	dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca,
-	leon@kernel.org, bwarrum@linux.ibm.com, rituagar@linux.ibm.com,
-	ericvh@kernel.org, lucho@ionkov.net, asmadeus@codewreck.org,
-	linux_oss@crudebyte.com, dsterba@suse.com, dhowells@redhat.com,
-	marc.dionne@auristor.com, viro@zeniv.linux.org.uk, raven@themaw.net,
-	luisbg@kernel.org, salah.triki@gmail.com, aivazian.tigran@gmail.com,
-	ebiederm@xmission.com, keescook@chromium.org, clm@fb.com,
-	josef@toxicpanda.com, xiubli@redhat.com, idryomov@gmail.com,
-	jaharkes@cs.cmu.edu, coda@cs.cmu.edu, jlbec@evilplan.org,
-	hch@lst.de, nico@fluxnic.net, rafael@kernel.org, code@tyhicks.com,
-	ardb@kernel.org, xiang@kernel.org, chao@kernel.org,
-	huyue2@coolpad.com, jefflexu@linux.alibaba.com,
-	linkinjeon@kernel.org, sj1557.seo@samsung.com, jack@suse.com,
-	tytso@mit.edu, adilger.kernel@dilger.ca, jaegeuk@kernel.org,
-	hirofumi@mail.parknet.co.jp, miklos@szeredi.hu, rpeterso@redhat.com,
-	agruenba@redhat.com, richard@nod.at,
-	anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net,
-	mikulas@artax.karlin.mff.cuni.cz, mike.kravetz@oracle.com,
-	muchun.song@linux.dev, dwmw2@infradead.org, shaggy@kernel.org,
-	tj@kernel.org, trond.myklebust@hammerspace.com, anna@kernel.org,
-	chuck.lever@oracle.com, neilb@suse.de, kolga@netapp.com,
-	Dai.Ngo@oracle.com, tom@talpey.com, konishi.ryusuke@gmail.com,
-	anton@tuxera.com, almaz.alexandrovich@paragon-software.com,
-	mark@fasheh.com, joseph.qi@linux.alibaba.com, me@bobcopeland.com,
-	hubcap@omnibond.com, martin@omnibond.com, amir73il@gmail.com,
-	mcgrof@kernel.org, yzaikin@google.com, tony.luck@intel.com,
-	gpiccoli@igalia.com, al@alarsen.net, sfrench@samba.org,
-	pc@manguebit.com, lsahlber@redhat.com, sprasad@microsoft.com,
-	senozhatsky@chromium.org, phillip@squashfs.org.uk,
-	rostedt@goodmis.org, mhiramat@kernel.org, dushistov@mail.ru,
-	hdegoede@redhat.com, djwong@kernel.org, dlemoal@kernel.org,
-	naohiro.aota@wdc.com, jth@kernel.org, ast@kernel.org,
-	daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
-	song@kernel.org, yhs@fb.com, john.fastabend@gmail.com,
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com,
-	jolsa@kernel.org, hughd@google.com, akpm@linux-foundation.org,
-	davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, john.johansen@canonical.com, paul@paul-moore.com,
-	jmorris@namei.org, serge@hallyn.com, stephen.smalley.work@gmail.com,
-	eparis@parisplace.org, jgross@suse.com, stern@rowland.harvard.edu,
-	lrh2000@pku.edu.cn, sebastian.reichel@collabora.com,
-	wsa+renesas@sang-engineering.com, quic_ugoswami@quicinc.com,
-	quic_linyyuan@quicinc.com, john@keeping.me.uk, error27@gmail.com,
-	quic_uaggarwa@quicinc.com, hayama@lineo.co.jp, jomajm@gmail.com,
-	axboe@kernel.dk, dhavale@google.com, dchinner@redhat.com,
-	hannes@cmpxchg.org, zhangpeng362@huawei.com, slava@dubeyko.com,
-	gargaditya08@live.com, penguin-kernel@I-love.SAKURA.ne.jp,
-	yifeliu@cs.stonybrook.edu, madkar@cs.stonybrook.edu,
-	ezk@cs.stonybrook.edu, yuzhe@nfschina.com, willy@infradead.org,
-	okanatov@gmail.com, jeffxu@chromium.org, linux@treblig.org,
-	mirimmad17@gmail.com, yijiangshan@kylinos.cn,
-	yang.yang29@zte.com.cn, xu.xin16@zte.com.cn,
-	chengzhihao1@huawei.com, shr@devkernel.io, Liam.Howlett@Oracle.com,
-	adobriyan@gmail.com, chi.minghao@zte.com.cn,
-	roberto.sassu@huawei.com, linuszeng@tencent.com, bvanassche@acm.org,
-	zohar@linux.ibm.com, yi.zhang@huawei.com, trix@redhat.com,
-	fmdefrancesco@gmail.com, ebiggers@google.com,
-	princekumarmaurya06@gmail.com, chenzhongjin@huawei.com,
-	riel@surriel.com, shaozhengchao@huawei.com, jingyuwang_vip@163.com,
-	linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org,
-	linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org,
-	linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
-	linux-fsdevel@vger.kernel.org, linux-afs@lists.infradead.org,
-	autofs@vger.kernel.org, linux-mm@kvack.org,
-	linux-btrfs@vger.kernel.org, ceph-devel@vger.kernel.org,
-	codalist@coda.cs.cmu.edu, ecryptfs@vger.kernel.org,
-	linux-efi@vger.kernel.org, linux-erofs@lists.ozlabs.org,
-	linux-ext4@vger.kernel.org, linux-f2fs-devel@lists.sourceforge.net,
-	cluster-devel@redhat.com, linux-um@lists.infradead.org,
-	linux-mtd@lists.infradead.org, jfs-discussion@lists.sourceforge.net,
-	linux-nfs@vger.kernel.org, linux-nilfs@vger.kernel.org,
-	linux-ntfs-dev@lists.sourceforge.net, ntfs3@lists.linux.dev,
-	ocfs2-devel@lists.linux.dev,
-	linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org,
-	linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org,
-	reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org,
-	samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org,
-	linux-xfs@vger.kernel.org, bpf@vger.kernel.org,
-	netdev@vger.kernel.org, apparmor@lists.ubuntu.com,
-	linux-security-module@vger.kernel.org, selinux@vger.kernel.org
-Subject: Re: [PATCH v2 92/92] fs: rename i_ctime field to __i_ctime
-Message-ID: <20230706145831.iwmb7c3jerbkctda@quack3>
-References: <20230705185812.579118-1-jlayton@kernel.org>
- <20230705185812.579118-4-jlayton@kernel.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4250CA928
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 15:05:43 +0000 (UTC)
+Received: from mail-qt1-x831.google.com (mail-qt1-x831.google.com [IPv6:2607:f8b0:4864:20::831])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7D6E4173F
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 08:05:40 -0700 (PDT)
+Received: by mail-qt1-x831.google.com with SMTP id d75a77b69052e-40371070eb7so276431cf.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 08:05:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688655939; x=1691247939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=msEvTjDikrgnhkRF3xJHOMkj86YrSM0qTZJUNmF80v4=;
+        b=X4BDECg3HA6xRYn5CdWL0nOgUUnK1bioxo6zmKYJTvqxEdQ9U8HIOZAa/2QiMzqiXC
+         xgkPTQI5EcaHvb7gM8hdCN/sMNjuacB1CVFdVGw/1MJqOehOMJiHNnj9hLWg5U535ncM
+         bC/q2cccDX7zSEKUo0QrXGKfBfV62JbSEIBMggcxbxg+2nqsgeotkvzfWi4j8TdqR87Y
+         9oJxlSt0M6moa98ZDo9hyIqaTzB5VbrVtnpn/y39iprMCaMXrHb292SyAsNDNmc3drPi
+         JnFQA97PUbDF1Gh+Whn/PYp/9Z6mu/SeMfxTGtvekIIuLVJlTIyHpyMaj/jrBWQ2Myx9
+         XbSQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688655939; x=1691247939;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=msEvTjDikrgnhkRF3xJHOMkj86YrSM0qTZJUNmF80v4=;
+        b=A6ov1O39vPLEPJn080KjP2Pnk0U5Tqcr9gX8JM3+WwC4yzjfrmTMHaQiLJJKEIV70P
+         Vvgo/A+dFo2zdXmwi7VAzPffKRIn/GJ2DI0Dt2TNimwEJp534rF56HJK/IGchpXtKjBt
+         QeRux1tV4U+X19OKdIEdTCRN4ksRjJqoyAYErv6/HRVLWLvknAXmuGSMWFKLbV1qrz/f
+         Xi+8KilwvzIatUAzKpOCFI6MF5FnJNCP0qB5MdTFsGNx+FLLQgqVzxzajoc6ha4o0aEM
+         wsFNTOGveFH+vaXZezNTQ1yRREA1ixdvxil+Eu9b7SkS7y+koozDkkP70ud8uwRkqTCX
+         M50g==
+X-Gm-Message-State: ABy/qLZIiK+DQxHLDhvo5lzwK63ONaVAP5jI5uFRBAEt7VXRgUyeO98t
+	yH7Kids1o/siTIxBzLrewj5fbI6uZH3JzI7r9BBcAg==
+X-Google-Smtp-Source: APBJJlGOPYnRx4voPuHx8soGZwPPsIqGhSC2eDD71kFlff+Kq85+Ni5Sa25sG/PtaOHU+0UvpsZkC6JEc630C2fkX8Y=
+X-Received: by 2002:ac8:5994:0:b0:3f8:5b2:aeed with SMTP id
+ e20-20020ac85994000000b003f805b2aeedmr146287qte.21.1688655939226; Thu, 06 Jul
+ 2023 08:05:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230705185812.579118-4-jlayton@kernel.org>
-X-Spam-Status: No, score=-3.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_NONE,
-	SPF_SOFTFAIL,T_SCC_BODY_TEXT_LINE autolearn=unavailable
-	autolearn_force=no version=3.4.6
+References: <20230706130800.85963-1-squirrel.prog@gmail.com>
+ <CANn89iKxGVDQba1UCbpYKhNo=rZXuN2j=610DbJx0z=kWa7N3w@mail.gmail.com> <CAJfyFi3OEz2Dz9gopigkVJRa4qCToJ+ob952O_qkOFiNn08LwA@mail.gmail.com>
+In-Reply-To: <CAJfyFi3OEz2Dz9gopigkVJRa4qCToJ+ob952O_qkOFiNn08LwA@mail.gmail.com>
+From: Eric Dumazet <edumazet@google.com>
+Date: Thu, 6 Jul 2023 17:05:28 +0200
+Message-ID: <CANn89iLBO7U40gNDysTD0wCPMAsgUQV3u_T1yzv1oaa=sLKyfQ@mail.gmail.com>
+Subject: Re: [PATCH] gro: check returned skb of napi_frags_skb() against NULL
+To: Kaiyu Zhang <squirrel.prog@gmail.com>
+Cc: davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Wed 05-07-23 14:58:12, Jeff Layton wrote:
-> Now that everything in-tree is converted to use the accessor functions,
-> rename the i_ctime field in the inode to discourage direct access.
-> 
-> Signed-off-by: Jeff Layton <jlayton@kernel.org>
+On Thu, Jul 6, 2023 at 4:35=E2=80=AFPM Kaiyu Zhang <squirrel.prog@gmail.com=
+> wrote:
+>
+> Yes the network adapter needs to be fixed for passing invalid packets to =
+GRO. And a message like "dropping impossible skb" should be indicative enou=
+gh for developers to do so.
+>
+> And yet I propose this patch because an immediate system crash caused by =
+NULL pointer access after the above warning message is a bit more difficult=
+ to analyse on some test bed where developers have to restore kernel messag=
+es after a reboot .
+>
+> Furthermore, the adapter I'm working with is capable of receiving very sm=
+all packets (1 or 2 bytes). They insist this is a feature rather than a bug=
+. I can, and I will check packet length before passing them to GRO, for thi=
+s particular adapter. But maybe a non-crash warning in general might be hel=
+pful to other developers who will face the same problem and spare them some=
+ effort on debugging.
 
-Looks good. Feel free to add:
+1 or 2 bytes would still be stored in an skb, right ?
 
-Reviewed-by: Jan Kara <jack@suse.cz>
+GRO is already very slow, we do not want to make it even slower so
+that some developers can save time.
+A kernel crash would point to the NULL deref just fine.
 
-								Honza
-
-> ---
->  include/linux/fs.h | 6 +++---
->  1 file changed, 3 insertions(+), 3 deletions(-)
-> 
-> diff --git a/include/linux/fs.h b/include/linux/fs.h
-> index 14e38bd900f1..b66442f91835 100644
-> --- a/include/linux/fs.h
-> +++ b/include/linux/fs.h
-> @@ -642,7 +642,7 @@ struct inode {
->  	loff_t			i_size;
->  	struct timespec64	i_atime;
->  	struct timespec64	i_mtime;
-> -	struct timespec64	i_ctime;
-> +	struct timespec64	__i_ctime; /* use inode_*_ctime accessors! */
->  	spinlock_t		i_lock;	/* i_blocks, i_bytes, maybe i_size */
->  	unsigned short          i_bytes;
->  	u8			i_blkbits;
-> @@ -1485,7 +1485,7 @@ struct timespec64 inode_set_ctime_current(struct inode *inode);
->   */
->  static inline struct timespec64 inode_get_ctime(const struct inode *inode)
->  {
-> -	return inode->i_ctime;
-> +	return inode->__i_ctime;
->  }
->  
->  /**
-> @@ -1498,7 +1498,7 @@ static inline struct timespec64 inode_get_ctime(const struct inode *inode)
->  static inline struct timespec64 inode_set_ctime_to_ts(struct inode *inode,
->  						      struct timespec64 ts)
->  {
-> -	inode->i_ctime = ts;
-> +	inode->__i_ctime = ts;
->  	return ts;
->  }
->  
-> -- 
-> 2.41.0
-> 
--- 
-Jan Kara <jack@suse.com>
-SUSE Labs, CR
+If we continue this path, we will soon add "if (!skb) be_kind" to all
+functions accepting an skb as a parameter,
+then everything else...
 
