@@ -1,92 +1,149 @@
-Return-Path: <netdev+bounces-15749-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15750-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D100A749821
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:20:27 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5C31B749854
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:26:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 83D8E2811FD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:20:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F334E28122F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:26:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C6F0C4C9D;
-	Thu,  6 Jul 2023 09:20:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 28E555255;
+	Thu,  6 Jul 2023 09:26:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A1A91306C
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:20:22 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 5128DC433C9;
-	Thu,  6 Jul 2023 09:20:22 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688635222;
-	bh=2INGgEDHKXSagiP46fEaa51hlLtiaD991u5jIm6fMFA=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=dnAvELrg96Jne7r5x6U/AXdgJq/sleKoCjSIUFI7J3gwomD3o1fbiOHeTGARPCbVR
-	 Xs8BzNvuxd3C3jerCHxquBQ7sQwS7NqwonwEJuknOfadDHOXHUfo0+WIz2+dr/8VUF
-	 gjpXtiPtrTRZpL3Kakq6ho8DRJnOr5PNWgq9mJahvaB1S/oXGVGrRIfotEowT/SpUQ
-	 SxyYGsCSr6rVcK4g4Q5ilbMABiI5ADUHv5SBfl4F22RR7lukMPXFcEMaItBjzQitJ7
-	 m7W3qyAufJD7MHQIev4ci2VeJU4IL4Djs4mYj2Cw7hRb15WzU+1Ce3SkJUp+1PsF2x
-	 DY629x9h/YCOA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 345CCE5381B;
-	Thu,  6 Jul 2023 09:20:22 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 13F131306C
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:26:26 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DE5691BF0;
+	Thu,  6 Jul 2023 02:25:56 -0700 (PDT)
+Received: from pps.filterd (m0046660.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3668EjRL026984;
+	Thu, 6 Jul 2023 11:25:24 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=7t4eCU5gGbd6E2c3Byzad523u0UnY/0NWeRLFMO8wqQ=;
+ b=oOHQUk7YHvsQeSB7NLsvfkez0kTZlUCcLBgh3hS4SMD5Wr3XtDTxiKvSKowNqENq4C8s
+ /288tIqKzXTGt4S2InHB2hb0Amk1CNtGQGYBfWaqN77e7cTrA1nCFp/hXvhbko3GdqKF
+ L/MzEPCBqP4GZU1Fn/yzQ5JE4cj8OgCenJ0wWY5nRviDPqiXVJho5qJfaAY9qEtW3ldq
+ WNfUylY6/Hwr6gUEHKjKBvvikQWSeI38uHh3/etreV3Px9tW0l50odh6QdLz+VrpwnEn
+ 3Em2pZ9kmrlRUa/Y7HiINICLumd7trhKCCWuff7jg/l/hOAVnY6ZeQv4znQLx1ghbUAx 6w== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rnsxd0je3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jul 2023 11:25:24 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id BB767100052;
+	Thu,  6 Jul 2023 11:25:21 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id C615521685E;
+	Thu,  6 Jul 2023 11:25:21 +0200 (CEST)
+Received: from [10.201.21.122] (10.201.21.122) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Thu, 6 Jul
+ 2023 11:25:19 +0200
+Message-ID: <61d93738-4ffd-411d-d32c-912c14eea56d@foss.st.com>
+Date: Thu, 6 Jul 2023 11:25:18 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 1/6] netfilter: nf_tables: report use refcount overflow
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168863522221.622.7964673708466321007.git-patchwork-notify@kernel.org>
-Date: Thu, 06 Jul 2023 09:20:22 +0000
-References: <20230705230406.52201-2-pablo@netfilter.org>
-In-Reply-To: <20230705230406.52201-2-pablo@netfilter.org>
-To: Pablo Neira Ayuso <pablo@netfilter.org>
-Cc: netfilter-devel@vger.kernel.org, davem@davemloft.net,
- netdev@vger.kernel.org, kuba@kernel.org, pabeni@redhat.com,
- edumazet@google.com
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 07/10] arm64: dts: st: add RIFSC as a domain controller
+ for STM32MP25x boards
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>,
+        <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <robh+dt@kernel.org>, <krzysztof.kozlowski+dt@linaro.org>,
+        <conor+dt@kernel.org>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>
+CC: <linux-crypto@vger.kernel.org>, <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-8-gatien.chevallier@foss.st.com>
+Content-Language: en-US
+From: Alexandre TORGUE <alexandre.torgue@foss.st.com>
+In-Reply-To: <20230705172759.1610753-8-gatien.chevallier@foss.st.com>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.122]
+X-ClientProxiedBy: EQNCAS1NODE3.st.com (10.75.129.80) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-06_06,2023-07-06_01,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hi Gatien
 
-This series was applied to netdev/net.git (main)
-by Pablo Neira Ayuso <pablo@netfilter.org>:
-
-On Thu,  6 Jul 2023 01:04:01 +0200 you wrote:
-> Overflow use refcount checks are not complete.
+On 7/5/23 19:27, Gatien Chevallier wrote:
+> RIFSC is a firewall controller. Change its compatible so that is matches
+> the documentation and reference RIFSC as a feature-domain-controller.
 > 
-> Add helper function to deal with object reference counter tracking.
-> Report -EMFILE in case UINT_MAX is reached.
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> ---
+>   arch/arm64/boot/dts/st/stm32mp251.dtsi | 5 ++++-
+>   1 file changed, 4 insertions(+), 1 deletion(-)
 > 
-> nft_use_dec() splats in case that reference counter underflows,
-> which should not ever happen.
-> 
-> [...]
+> diff --git a/arch/arm64/boot/dts/st/stm32mp251.dtsi b/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> index 5268a4321841..62101084cab8 100644
+> --- a/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> +++ b/arch/arm64/boot/dts/st/stm32mp251.dtsi
+> @@ -106,17 +106,20 @@ soc@0 {
+>   		ranges = <0x0 0x0 0x0 0x80000000>;
+>   
+>   		rifsc: rifsc-bus@42080000 {
+> -			compatible = "simple-bus";
+> +			compatible = "st,stm32mp25-rifsc";
 
-Here is the summary with links:
-  - [net,1/6] netfilter: nf_tables: report use refcount overflow
-    https://git.kernel.org/netdev/net/c/1689f25924ad
-  - [net,2/6] netfilter: conntrack: gre: don't set assured flag for clash entries
-    https://git.kernel.org/netdev/net/c/8a9dc07ba924
-  - [net,3/6] netfilter: conntrack: Avoid nf_ct_helper_hash uses after free
-    https://git.kernel.org/netdev/net/c/6eef7a2b9338
-  - [net,4/6] netfilter: conntrack: don't fold port numbers into addresses before hashing
-    https://git.kernel.org/netdev/net/c/eaf9e7192ec9
-  - [net,5/6] netfilter: nf_tables: do not ignore genmask when looking up chain by id
-    https://git.kernel.org/netdev/net/c/515ad530795c
-  - [net,6/6] netfilter: nf_tables: prevent OOB access in nft_byteorder_eval
-    https://git.kernel.org/netdev/net/c/caf3ef7468f7
+You could keep "simple-bus" compatible (in second position). In case of 
+the RIFSC is not probed, the platform will be able to boot. If you agree 
+you can use the same for ETZPC.
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
+Cheers
+Alex
 
+>   			reg = <0x42080000 0x1000>;
+>   			#address-cells = <1>;
+>   			#size-cells = <1>;
+>   			ranges;
+> +			feature-domain-controller;
+> +			#feature-domain-cells = <1>;
+>   
+>   			usart2: serial@400e0000 {
+>   				compatible = "st,stm32h7-uart";
+>   				reg = <0x400e0000 0x400>;
+>   				interrupts = <GIC_SPI 115 IRQ_TYPE_LEVEL_HIGH>;
+>   				clocks = <&ck_flexgen_08>;
+> +				feature-domains = <&rifsc 32>;
+>   				status = "disabled";
+>   			};
+>   		};
 
 
