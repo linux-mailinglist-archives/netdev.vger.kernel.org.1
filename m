@@ -1,381 +1,285 @@
-Return-Path: <netdev+bounces-15788-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15789-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CB2D6749C0F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:42:45 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 9D72F749C23
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:43:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06A01C20D75
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:42:44 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id C15DA1C20D3D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:43:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19758F59;
-	Thu,  6 Jul 2023 12:42:39 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 85E098F59;
+	Thu,  6 Jul 2023 12:43:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EB513086;
-	Thu,  6 Jul 2023 12:42:39 +0000 (UTC)
-Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98950171D;
-	Thu,  6 Jul 2023 05:42:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 72C3F8BE1
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 12:43:44 +0000 (UTC)
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 02CAA1FDF
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 05:43:37 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688647357; x=1720183357;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=dcqITd1FT/YToV04kKsN6SHpZazkz0zC/GYQ6GRqNM4=;
-  b=kJP0XRxCO50vacazXO45ZAtweSB4XgttpKRUITAkJRNeHz/bEGosyFfU
-   E3Eg1YsHWWBRO4JgHCbbvkpI2hVF4IXbXsXmEorcx6giVLoQWPJbZKy1g
-   8Z3NlzlDft9GLqh9AUzPadfp/+7DjYk7AECeR2Ka/sIMSA150W0QId4Fu
-   aZSCaM6w/1+HML18caBWcrOWk16yoBVkkOdZuxlJ/Gns2JRJBoSfy8s8s
-   lhAVRNWL2tHknlVOlCKPAx6joLrClMk7jzYoPVJOlxCLCsI4kNXA+STaC
-   GgPqhHWoY3pygOZIpGh4Tdm7d49t3VMuc/GPslxXwOAzP5HwWrOxi1nHt
+  t=1688647417; x=1720183417;
+  h=from:to:cc:subject:date:message-id:references:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=N4KJ285DMn7f8WWUnFsPD45KND/z66nDeWd+hW50MgY=;
+  b=BUme0UyI0uzlpQQAaIyTHWjevkoaNWVHvmyY3OXQUU+z9ToU687381Wm
+   1HYZ3PuirWSwPucK6sotzdeaXcl2Be2tw/MO2XUJDYFRMN2JVtclXoRkZ
+   Jv9oO7XcecI/3YOrqMyxMYlwny9GygnKWMklzNcqLHJG4P2//zbFzdt5Q
+   xJP90n7NuoHGtU7jkbrDmYvfpjgH1YGLAXkM+FhHzKTlatlGJsbMotRvu
+   zUUi6CvgPbzD+9x7ebX8ekr6E5cPZKLsvkgjE1KUYTCKto58zjkAG1VKw
+   L0QA0pxLpQ8sxBa0uM14HQGynBX0+r+rzQCK/ak8OybSTt6SkWf/gLdY5
    A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="367082196"
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="343180829"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="367082196"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 05:42:37 -0700
+   d="scan'208";a="343180829"
+Received: from fmsmga004.fm.intel.com ([10.253.24.48])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 05:43:37 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="832926733"
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="789537123"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="832926733"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by fmsmga002.fm.intel.com with ESMTP; 06 Jul 2023 05:42:36 -0700
-Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+   d="scan'208";a="789537123"
+Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
+  by fmsmga004.fm.intel.com with ESMTP; 06 Jul 2023 05:43:37 -0700
+Received: from orsmsx610.amr.corp.intel.com (10.22.229.23) by
+ ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:42:36 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ 15.1.2507.27; Thu, 6 Jul 2023 05:43:35 -0700
+Received: from orsmsx603.amr.corp.intel.com (10.22.229.16) by
+ ORSMSX610.amr.corp.intel.com (10.22.229.23) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 05:42:36 -0700
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
- edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ 15.1.2507.27; Thu, 6 Jul 2023 05:43:35 -0700
+Received: from ORSEDG602.ED.cps.intel.com (10.7.248.7) by
+ orsmsx603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 05:43:35 -0700
+Received: from NAM11-CO1-obe.outbound.protection.outlook.com (104.47.56.175)
+ by edgegateway.intel.com (134.134.137.103) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:42:35 -0700
+ 15.1.2507.27; Thu, 6 Jul 2023 05:43:34 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=dU/S69rwjEK1doLLi6KmGfIn0Gr+jMNrLunDEZdFZnLvxINbWv2fQYQl9BKVlJhKsrGjGlXjKrFgNcoDuQvYKdiSqTKsULwoSzO1abTpe0gpmuhpK461XSc3h1LvnT78grjQpPPpQcewd4f3LuP+xg51f2fsSIwounEzOUG9q53ak9FV3RsrkCfISddErJuSFGKU/cChBnghAZ/d4Dh/fVpPbnawh+2biyytwS4ATNUdO6S9ycp25h/arxjetlSaAhAmkt2VVJqPQeiY8GJLOV2OkerFIGR6FiHxYXTql83ZSd6GJVkthlAEIskWU6eMbjXlJf7tD4tEy8NsZpxHLQ==
+ b=SKEAujJPrh65jEE01Kc4icfUqzWMUidx1pYeW/l1m6fv8Qm3Xaqb3Rys5h9/BySxj19030qWV2YjFTvYBo+DOeqNXcgr3lI7WDdmokX2TtD/CCrFir3oJivXKrEAVClLQAWAwsxUg+pdmgdAYcU4HVIrqU/ACs/xeSEaI4h2TcujUhA0t8P3mmUrrt+9I0DAWrLYLTwJlCteOZlER2knTupq1p6adTbbcjjmuTqPMbwxBW7r2DdRTvXY/X4DQl7FINlUuS4n/DfWyu8zXhKiLmEES+yeyFelT9aa/CUOoaNmg+ZE12j4n1Nk0pem6Je/sFHT986uxo9TPzGt1r/iVw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=itJtzNeQUiYmM6oAMWPI5MmiHNmH7T9Q/8NsftK3+ik=;
- b=Q3wJUaO4ON/1SGdf+cAWu/kOi5bXN9EUAabZXTw9bJAgZ6v0mCbAbgrJUP1Y6WCBdtulzDhpAU5VOElLZwx5C8D3+D2TMQwLR3TXZku+bKgJwPphE3wEFkq1rrJdv5nTJwrgf/Ro20fHvOf2J1QlOgoIZdxzzsy2kHREypNs0P/0I77j1+hMdqVV8XdelFo2yIGnYPG8Efsm/RrVIlPJt8nfdBxcUicwXAUshZp6i5YiA2uvRKS2K6OCd6Rk8j1Wd19FYFAM9AI6oTPFs3KDERIbdYoswx8AHhBfHP7e1erR/oAWMnzwbdEmMfIKc2pMXbIyOGDkCAsRRq9+5tXDKg==
+ bh=N4KJ285DMn7f8WWUnFsPD45KND/z66nDeWd+hW50MgY=;
+ b=c7MXWNcXHgZ6fR62qbw3agpMiZcvUHJ57t20Rw7amTHM1T/coM/aoPzNoVcWVFRKYvn69MaeYgfV4e+Ru7kAnRiJS2MKYLBxlJj++9ThU+a5CijNI4lWLNi5vL3v+FWhe9BXEdVh7L9kzwLSAlbFLKtEE+ZEl0vZToLRwa1COs8pvk3YowrD7GmMeB2Y8Pq1raYtLSDIpq3DxNk3JU3xY5m2eraIBu3M7NNcAY4DGQpmUMjKOl3vV5V3xDPo213c+aUc18VSzaC3ZVK7iAMxSir1flDgGlhHLR3zRQ/KSvFpa0ukQl9EsoaojpklQR/ZK4U3HV76bnYk8vnWCCTDTg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
  smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
  dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by CY5PR11MB6138.namprd11.prod.outlook.com (2603:10b6:930:2a::11) with
+Received: from SJ1PR11MB6180.namprd11.prod.outlook.com (2603:10b6:a03:459::14)
+ by SJ0PR11MB4911.namprd11.prod.outlook.com (2603:10b6:a03:2ad::14) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.24; Thu, 6 Jul
- 2023 12:42:33 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe%6]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 12:42:33 +0000
-Date: Thu, 6 Jul 2023 14:38:33 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>
-CC: John Fastabend <john.fastabend@gmail.com>, <brouer@redhat.com>,
-	<bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
-	<kpsingh@kernel.org>, <sdf@google.com>, <haoluo@google.com>,
-	<jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, Anatoly Burakov
-	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
-	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
-	"David S. Miller" <davem@davemloft.net>, Alexander Duyck
-	<alexander.duyck@gmail.com>
-Subject: Re: [xdp-hints] Re: [PATCH bpf-next v2 12/20] xdp: Add checksum
- level hint
-Message-ID: <ZKa1ydBpmDCw4Ejp@lincoln>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-13-larysa.zaremba@intel.com>
- <64a331c338a5a_628d3208cb@john.notmuch>
- <ZKPlZ6Z8ni5+ZJCK@lincoln>
- <9cd44759-416c-7274-f805-ee9d756f15b1@redhat.com>
- <ZKQAPBcIE/iCkiX2@lincoln>
- <64a656273ee15_b20ce2087a@john.notmuch>
- <3cc1d2ba-e084-8fc4-aa31-856bc532d1a7@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <3cc1d2ba-e084-8fc4-aa31-856bc532d1a7@redhat.com>
-X-ClientProxiedBy: FR3P281CA0202.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a5::6) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
+ 2023 12:43:33 +0000
+Received: from SJ1PR11MB6180.namprd11.prod.outlook.com
+ ([fe80::dfd2:5a47:bfeb:aa2e]) by SJ1PR11MB6180.namprd11.prod.outlook.com
+ ([fe80::dfd2:5a47:bfeb:aa2e%4]) with mapi id 15.20.6565.019; Thu, 6 Jul 2023
+ 12:43:33 +0000
+From: "Zulkifli, Muhammad Husaini" <muhammad.husaini.zulkifli@intel.com>
+To: Leon Romanovsky <leon@kernel.org>, "Nguyen, Anthony L"
+	<anthony.l.nguyen@intel.com>
+CC: "davem@davemloft.net" <davem@davemloft.net>, "kuba@kernel.org"
+	<kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>,
+	"edumazet@google.com" <edumazet@google.com>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "Neftin, Sasha" <sasha.neftin@intel.com>,
+	"richardcochran@gmail.com" <richardcochran@gmail.com>, Tan Tee Min
+	<tee.min.tan@linux.intel.com>, "Choong, Chwee Lin"
+	<chwee.lin.choong@intel.com>, Naama Meir <naamax.meir@linux.intel.com>
+Subject: RE: [PATCH net 3/6] igc: Fix TX Hang issue when QBV Gate is closed
+Thread-Topic: [PATCH net 3/6] igc: Fix TX Hang issue when QBV Gate is closed
+Thread-Index: AQHZr37DdC5WVrGXg0W6Xbp4c6l2jK+sX7aAgABNVlA=
+Date: Thu, 6 Jul 2023 12:43:33 +0000
+Message-ID: <SJ1PR11MB618043DE126BF5649BA1ED0DB82CA@SJ1PR11MB6180.namprd11.prod.outlook.com>
+References: <20230705201905.49570-1-anthony.l.nguyen@intel.com>
+ <20230705201905.49570-4-anthony.l.nguyen@intel.com>
+ <20230706075621.GS6455@unreal>
+In-Reply-To: <20230706075621.GS6455@unreal>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: SJ1PR11MB6180:EE_|SJ0PR11MB4911:EE_
+x-ms-office365-filtering-correlation-id: 768313af-8c5f-4513-a6eb-08db7e1e9bc2
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: mTITti8/c0wGEi/+jABos+R35Kg1/fKTwC26Mk6HrY/bEQTb7DOKqiB7XcgnEvSHLeWLrfd0P/YrAg+cbxxuVgUB2t8KC30loO8+vdrxFN/RbC2P7tMIL6u1bA3FxZacXiLTSYvIXEZxz4pZLuiY1VDuagEcQ+Yz4Psh4AWoctsXJ9E+7NuTMa3GdIVoEC0fkhZQ9fzixKXfTfWXCkgWUeck2ylIBJpJ2TDgjOPaIQzLrvdA4LQ5nxm38cX0/XP2+0I9hh7k9a4SoXc4pg/vnOkZ9DzrTfebIDcDcuJq8bjfL+nA1FaZvbRHd/XhmdElv3SFnb7BFAMIvNox5BD7f2TlgYuHd8Hzd36ewoM9n74PBqesrJ0/KyfKJeS2nnFdnqNagJ4Q/R+bPC0zMRenA9yvzwMKir0AC+nDpACP1ThUmTvzWI9Tmyjtyg47TwP1+/+eaKUiFETRQy9TZnMcLw4oVHTGg72FS8mF95efde1E92Gy6mo5D9NpWlrvryYE2POISx4xaRMg/mo499dr87IqRghEt4T7Mr2xtcsoR1zxm56727UNp5lqdr9mR5n7csYsAtSxx3d0MjEVF785gHmsIUCescLil724BjIwU/y6YpHJVRtbUIwsFte75yVr
+x-forefront-antispam-report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SJ1PR11MB6180.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(346002)(396003)(376002)(39860400002)(366004)(451199021)(33656002)(86362001)(2906002)(38070700005)(5660300002)(52536014)(55016003)(186003)(83380400001)(26005)(6506007)(53546011)(9686003)(54906003)(7696005)(4326008)(122000001)(66446008)(110136005)(82960400001)(6636002)(64756008)(316002)(66946007)(66556008)(38100700002)(76116006)(66476007)(478600001)(71200400001)(8936002)(8676002)(41300700001);DIR:OUT;SFP:1102;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: =?utf-8?B?S3MwTjR6UDJaQW5yZ2w4L21pTkdtR2w0V2R2dk1RN2RhMHJiQzY0ZTZPV0tp?=
+ =?utf-8?B?Z2dUNzdYcTZNWEE4QU9mNWkxbGZ4VUltdnBnWXpZbDJJV1N3R1NnbkN6OHVY?=
+ =?utf-8?B?azArdk5XNE9nVGxIL3dGNjJ3NHRWVzhzTzBpK3lFZGszYWFMV1pMb1N2UVlU?=
+ =?utf-8?B?NDVDRWZWaWRrNnhJdHNPT0U0TlowYklUQUJtYVR2bGZnR3g1a0xlN0hqUmlG?=
+ =?utf-8?B?UWJnbjg2SzRYTTZTY0lmMERXLyttelFDY0ludzROVnRmb2VnNUN5SlBodzlE?=
+ =?utf-8?B?dm1xV3VIL0NNaWhzaVA5KzlNV0lncGZacy80Rml5eFllVm9IRTMxTkVmYi9T?=
+ =?utf-8?B?eXdpRlRmeElSSDdOT0g0b2NKdjJSZnl0QWJQV0FSOWkxZ3B2dnNKSFhxbnY1?=
+ =?utf-8?B?WjIybEFGb0p1VHprd2JvRHYwYVo1YzFTMkM2SXdoTVpPOUtZbk5lL0hzTlFF?=
+ =?utf-8?B?UUc4cmxQZzlIUFYxeXFyYzF2S2F0Vll3clpDaGkvejdCL2JVSEpCOFYwNHV6?=
+ =?utf-8?B?UGdsUVNIN1lveEVnaXJrdWdHcC8rdjZiZ1JHb21oR1J6L2NKS2lSQnI0SFNz?=
+ =?utf-8?B?eWdhaVNDRTdEc1ViMjNIclRTcUlIdTZOUnZiaGplVUt5d1p3RitBMDlnWndL?=
+ =?utf-8?B?dXZ5OEZTZFQrYS9FVEpPY0NKTXptUVRWVVV6OU1XbFJRRkdJSTg1RzN6c0FW?=
+ =?utf-8?B?eHJDcUFxb09kVHAxRGdUWUpEamxiUXFRYm5hWHpIUUd4bXFvZnVFR0NRN1Zj?=
+ =?utf-8?B?VldvZzE2K3ozUlJoZkh6SisrL3B3NlhBRnowcDZ0M0pqakphQldkWlN6TzhC?=
+ =?utf-8?B?SVRoVURjeVBoK280YkFHM1g1NDJxRUt3ZXp0TFVXYXdLR3owK3lXdUVFUEV3?=
+ =?utf-8?B?WU1qbldNTUVFV1hlZmwzWis1bEJSazBGaVJHMzdGeDBhcDFjZkN4Y1hTRE82?=
+ =?utf-8?B?Z0dVS09uallHVW1sbEhWZzF0emVva1REQ1dQQld3ZGRmQW5KWWU3UkovU0ww?=
+ =?utf-8?B?L3dvbkJsRUhVd2NYZjV4d3d2emhCb0NHVWgxNUxic1hjR0NubnlvOFpnVmo5?=
+ =?utf-8?B?dnlnUUtDWjFUeEQxRWI2ZTVzWG5nMW5jdjZUb1o3Y1Z5L3lwNW5jSlByaGJO?=
+ =?utf-8?B?akx5NVh2MmZnS0pCaXh6V0ZtaFhvN0pnR3JRWjduTEhLQWRLMGhEQ3dKK2No?=
+ =?utf-8?B?Nk9zY05ocVltWGdzY0NZR3dGcXI1ZmxrU2p5K1F4bmdkMWdYajE3OG5SWGN5?=
+ =?utf-8?B?Tkg2Y1ZmQ25yRnhsR2kyZHVYa2UzRm1xeVl2VGhNZ2daN2RaVkxFUGl0alNV?=
+ =?utf-8?B?ZEV2aUdqSGNBYWxITmowRWJyN2xjbDZTbFMycjREa3paODVDcE1iMytRd0Jz?=
+ =?utf-8?B?SmRJa2JyZUtxU096TGlCUE1ka01KSWQ5NVhybkc5eEwxQ1RKNGh3aTNGTkt5?=
+ =?utf-8?B?SE1BVFYxMHU1TU1GY2ZaWGI4RExlUDRIbG12cmc0MEZYMlJyYml2eGRHcmRL?=
+ =?utf-8?B?RmJTbXdYVFl6LzUxV0JDZ2ErV01hTkJVTVpKTVhrVzRXM1ZYSXBVZGVTa2FS?=
+ =?utf-8?B?WEhnbmdyOGxjWEFYRExZaWtUM2xmcmFUMFB0RHZ0TyttZHArbmRSWW5ySjJm?=
+ =?utf-8?B?TXNwcHNMZWhsZGdmRHJwN05JbnAzSmthelRCSDdaOWpheEg0QmlQMGtLTXNn?=
+ =?utf-8?B?VUxtQ1l6M09DVFJGVWZLVVJQMEVzR2tBNy92S0dqeVdOUFAyVGgrTzBBL2w5?=
+ =?utf-8?B?UllYd3V1bGVBR2JWS0ZOeFUvdkxXL2NLM0RueFZmU3J4enNza2R4RzRiV1o5?=
+ =?utf-8?B?SkIvNmZFQmlTSW5yS0lTenBoSmV2Ym1nditXNXV0TGJzUTBFWlo2ZmlQWVFY?=
+ =?utf-8?B?OEdXZ2o2dkVFbUpRUE9oTlJtbUQyODFJREx2WEdXWVRQK3EwQlc5NTBnY1Ri?=
+ =?utf-8?B?VElXbTlvTitqaitlZ2pLTTN1d2lUVHEyaWtsVWhWemN4TGtkUFFCa2ZQMmhX?=
+ =?utf-8?B?ZXdTV0ROMnp1UjAxNERhQ0R2NEw5QnFqdHZnUEhsUFN1T1gxTXBlbHVhaW54?=
+ =?utf-8?B?eEExaCs3anVKcnpzaWZ6Q1hOemY5YlA0czZpUWZNVTVUODZ5YnFRYzFBdHp1?=
+ =?utf-8?B?UzlZc2pLb2xFN0VVczVFVE5ucW9UL01LR2NmNkRvUzRITVkzTVFFU1RhWVV6?=
+ =?utf-8?Q?CUvjk2GlzqCRdpGCxYcKsQQ=3D?=
+Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: base64
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|CY5PR11MB6138:EE_
-X-MS-Office365-Filtering-Correlation-Id: 03062b66-a080-44fa-2487-08db7e1e775f
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 45E3aL6TznJamS0i8zLOp3VOj2s2wYtlpPTihUR4fKum127HCo8mzlC9D5qESlAT4rYinqNY7lz5kasBp49aCj2QvjetoI+RHeQrAfR8FjeDfQTziELb/hMMArjHurTbcBMNdPEREQ2LFZ09WHli1kvmtxl/iocI/cngAAeKHRQ1mN9Arzeaabokoosonx5m/ybPKNkBB/yDaYld8QVFCij81a8My8+EaTmnUCd+JYw8azyNH+uUMGW+GuPx3x/AOG3hhJ5sNkmute1L9LeU/VdE+jyX2lQVBbkt7g72IrmZU73W9PTpYg0ZdMYa0fKmHXPY9a6Tdrt6z2bl/qHAujxQKJSZrqkecz9lClqE6Sjt7BN1n5CV+C55Ql/rBk13gredbxpT242C7Zt8AmKhJcALlU1jNWa3Ibq1/InKnIDnqIgDaJ9YKDe6qx6p5m58RUipUz+1ptckg+ODs/GybMUE1l/hq/JfivACpQNbuwQZrlE9clF5L4FQixH+9jk+qPD6UJ7Q801n2kjQKPXN+qGWKCl4y3o4DDa5WrucHYg=
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(376002)(39860400002)(396003)(136003)(346002)(451199021)(478600001)(38100700002)(9686003)(6486002)(26005)(6512007)(186003)(6506007)(82960400001)(966005)(54906003)(66946007)(4326008)(83380400001)(316002)(44832011)(6916009)(66476007)(66556008)(5660300002)(2906002)(7416002)(86362001)(66899021)(8676002)(41300700001)(8936002)(33716001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?J4HeXhO20FSfjasHyUvKyg74vRJm0hlGzZ4ESYMDJExUmQc4pikXy4czQNus?=
- =?us-ascii?Q?+KZ4cRW09V0vo7rluqhZqa3HHFY6gZ+J398dGu037pmBvY33K8IG6XXiCUu+?=
- =?us-ascii?Q?8kpKixFZlvwFLYg8P4HOrZzvepvvgX0VA5MxMF5fVHQHg3J6sNdQbik0ddHm?=
- =?us-ascii?Q?vDWef1dvufzHYLohS3V6ZYhbNnMhdU+sPSxoo3vIy6vkiWDgIaoAl8CkaTwt?=
- =?us-ascii?Q?N5dx8DWfP7Dqm52i76zUBsbuPvrw6PHubUcLH6dv2WN96MlZocUWmZbGNG1/?=
- =?us-ascii?Q?vbca9DWcUdhTBV0KarLQkvKOSKAWY1OHbhTu4HplhBxgz6GkVxqCssZR69Uy?=
- =?us-ascii?Q?U4ENMJQV0hurHVE1cNe4+jJ8MoY4BogazIKwISXr/FPecI1P1TdCi4vkDlXp?=
- =?us-ascii?Q?olToyMSFDnYssLw9tHbB1Y2f4E9ELkERjSOHbm74JFIEX5RpmUG555aVQ/mS?=
- =?us-ascii?Q?qUKuPuGmZzMZugA6Ay7ccB51ieglHnaKVRTJknn315WUTG70BxHKTwDGrTXg?=
- =?us-ascii?Q?He9kLPppJYAeo/NmLE26SmlVlr2FUrb64qIujd11TkdqGDuricBrIiltb4cs?=
- =?us-ascii?Q?6LKGGYPjTSfisSenOKqpf7o/UuBhGbZX1hKUjMGnE5P/QMj47fSPBVXZZqT1?=
- =?us-ascii?Q?DaBJOp8XGlaT2IRQoqthK7LZ+qVCyj5t8VkMvGcnsJSh0Dz9WGK+wDZ0fTcO?=
- =?us-ascii?Q?+cMraz6j4oNh9oSfldrkdSp+Yn8qRB4ezXzxIB4cr48vUB5Uaakry6IyZqcN?=
- =?us-ascii?Q?IO7EwxJ0sLJtzdqH1AGSeT16x51WKChQiwTdAwNttN70utIXYM7Znb05woIV?=
- =?us-ascii?Q?dIPM/BUdruaZPokTIzwkMjVd/IuQ/uAmrUAJaxhIb+335zvm1vio/jy5955m?=
- =?us-ascii?Q?SBpoao4bW4WqXICRAl47AQYJD5JX3wyLmBaT2csnvUgzNMuVx3pnQaDN6gwv?=
- =?us-ascii?Q?3i3C/MBHT3t17o0/Qqd2LpbaQqqPKI+MvLWZDqsyU5hXbXYraVwhKIYZMZsZ?=
- =?us-ascii?Q?tGQPaECVTtpTb3xud4NQwzfIF4vnDK1tusHbsinrfTd1p6CBusIdzNPlrJjh?=
- =?us-ascii?Q?FLwvcRm+pFYUPY1PXul69/43hYg65D+nb77D2krN7rZzwpSuvZvW1Wy9WHvq?=
- =?us-ascii?Q?+P/U7yfiDfnkeXjt/LuXyfOXIoWbi7mZ7EegzXj+zX7aBkCUTDNOPwHOGbNk?=
- =?us-ascii?Q?yq9QZLc19RsaHjG/7JTQPtJKgJ2wXIw3vdmsqN8G+KX3GGMQz547s2yASWOh?=
- =?us-ascii?Q?LSt63+LkS3xCF07/7MVQvc2m3YhWfKkgrlt4noYkFsDf3Xc6eYFCCWhjxlDm?=
- =?us-ascii?Q?urF7x7HmD+UJPG5ZakbkofWAJXFkT4chPNLEB6JPAebwLPo1yJ29gLUqnRcx?=
- =?us-ascii?Q?dIZKXSc5TheKB91jI8eNGOU2RsDELXpCHF5cNBjCKNAPv4b5NH307a6HI/8R?=
- =?us-ascii?Q?IBe8PW1Zi+ULmONzBIhevyzRlPJoHZ/PpRQ+lV6M/FTmYR07QoX6VxKm7JYK?=
- =?us-ascii?Q?QroMEftd84kumY0Z6XIkHCOQD8vM3fqSJKI0YtQ+epiLJo/dj/cCYOZfNz5O?=
- =?us-ascii?Q?fM1lO1iS1rWV1CsZSB1jjxDL/43rH8xVzvujf9Cuk+E3eSya6miMabFojGKG?=
- =?us-ascii?Q?zQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 03062b66-a080-44fa-2487-08db7e1e775f
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 12:42:32.4144
+X-MS-Exchange-CrossTenant-AuthSource: SJ1PR11MB6180.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 768313af-8c5f-4513-a6eb-08db7e1e9bc2
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 12:43:33.0366
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 1b/cjvgRDPAIRj4FJXYo730O3B+CKq53wmTGWxDUwjxuI/xcluCV74n1Pjb+u1LJnPl1nrDa70q+jjfRECBeEeyz78i2pa2MfeSnd+UxClI=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6138
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: wnl3KUSqZZ4ABJrUFnB3eiqPWU9t+uG5d19XxVyPWXeoZ6C0LTymDRxumC6awnj3d1xEGfEi9WPtCzidsoOzEcf8J71Qnx+CuMy/wZJVQrVknrkzlrh4aZ3yLFA64rdi
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR11MB4911
 X-OriginatorOrg: intel.com
 X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 06, 2023 at 11:04:49AM +0200, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 06/07/2023 07.50, John Fastabend wrote:
-> > Larysa Zaremba wrote:
-> > > On Tue, Jul 04, 2023 at 12:39:06PM +0200, Jesper Dangaard Brouer wrote:
-> > > > Cc. DaveM+Alex Duyck, as I value your insights on checksums.
-> > > > 
-> > > > On 04/07/2023 11.24, Larysa Zaremba wrote:
-> > > > > On Mon, Jul 03, 2023 at 01:38:27PM -0700, John Fastabend wrote:
-> > > > > > Larysa Zaremba wrote:
-> > > > > > > Implement functionality that enables drivers to expose to XDP code,
-> > > > > > > whether checksums was checked and on what level.
-> > > > > > > 
-> > > > > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > > > > > > ---
-> > > > > > >    Documentation/networking/xdp-rx-metadata.rst |  3 +++
-> > > > > > >    include/linux/netdevice.h                    |  1 +
-> > > > > > >    include/net/xdp.h                            |  2 ++
-> > > > > > >    kernel/bpf/offload.c                         |  2 ++
-> > > > > > >    net/core/xdp.c                               | 21 ++++++++++++++++++++
-> > > > > > >    5 files changed, 29 insertions(+)
-> > > > > > > 
-> > > > > > > diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
-> > > > > > > index ea6dd79a21d3..4ec6ddfd2a52 100644
-> > > > > > > --- a/Documentation/networking/xdp-rx-metadata.rst
-> > > > > > > +++ b/Documentation/networking/xdp-rx-metadata.rst
-> > > > > > > @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
-> > > > > > >    .. kernel-doc:: net/core/xdp.c
-> > > > > > >       :identifiers: bpf_xdp_metadata_rx_vlan_tag
-> > > > > > > +.. kernel-doc:: net/core/xdp.c
-> > > > > > > +   :identifiers: bpf_xdp_metadata_rx_csum_lvl
-> > > > > > > +
-> > > > > > >    An XDP program can use these kfuncs to read the metadata into stack
-> > > > > > >    variables for its own consumption. Or, to pass the metadata on to other
-> > > > > > >    consumers, an XDP program can store it into the metadata area carried
-> > > > > > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-> > > > > > > index 4fa4380e6d89..569563687172 100644
-> > > > > > > --- a/include/linux/netdevice.h
-> > > > > > > +++ b/include/linux/netdevice.h
-> > > > > > > @@ -1660,6 +1660,7 @@ struct xdp_metadata_ops {
-> > > > > > >    			       enum xdp_rss_hash_type *rss_type);
-> > > > > > >    	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tag,
-> > > > > > >    				   __be16 *vlan_proto);
-> > > > > > > +	int	(*xmo_rx_csum_lvl)(const struct xdp_md *ctx, u8 *csum_level);
-> > > > > > >    };
-> > > > > > >    /**
-> > > > > > > diff --git a/include/net/xdp.h b/include/net/xdp.h
-> > > > > > > index 89c58f56ffc6..61ed38fa79d1 100644
-> > > > > > > --- a/include/net/xdp.h
-> > > > > > > +++ b/include/net/xdp.h
-> > > > > > > @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
-> > > > > > >    			   bpf_xdp_metadata_rx_hash) \
-> > > > > > >    	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
-> > > > > > >    			   bpf_xdp_metadata_rx_vlan_tag) \
-> > > > > > > +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM_LVL, \
-> > > > > > > +			   bpf_xdp_metadata_rx_csum_lvl) \
-> > > > > > >    enum {
-> > > > > > >    #define XDP_METADATA_KFUNC(name, _) name,
-> > > > > > > diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
-> > > > > > > index 986e7becfd42..a133fb775f49 100644
-> > > > > > > --- a/kernel/bpf/offload.c
-> > > > > > > +++ b/kernel/bpf/offload.c
-> > > > > > > @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
-> > > > > > >    		p = ops->xmo_rx_hash;
-> > > > > > >    	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
-> > > > > > >    		p = ops->xmo_rx_vlan_tag;
-> > > > > > > +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM_LVL))
-> > > > > > > +		p = ops->xmo_rx_csum_lvl;
-> > > > > > >    out:
-> > > > > > >    	up_read(&bpf_devs_lock);
-> > > > > > > diff --git a/net/core/xdp.c b/net/core/xdp.c
-> > > > > > > index f6262c90e45f..c666d3e0a26c 100644
-> > > > > > > --- a/net/core/xdp.c
-> > > > > > > +++ b/net/core/xdp.c
-> > > > > > > @@ -758,6 +758,27 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan
-> > > > > > >    	return -EOPNOTSUPP;
-> > > > > > >    }
-> > > > > > > +/**
-> > > > > > > + * bpf_xdp_metadata_rx_csum_lvl - Get depth at which HW has checked the checksum.
-> > > > > > > + * @ctx: XDP context pointer.
-> > > > > > > + * @csum_level: Return value pointer.
-> > > > > > > + *
-> > > > > > > + * In case of success, csum_level contains depth of the last verified checksum.
-> > > > > > > + * If only the outermost checksum was verified, csum_level is 0, if both
-> > > > > > > + * encapsulation and inner transport checksums were verified, csum_level is 1,
-> > > > > > > + * and so on.
-> > > > > > > + * For more details, refer to csum_level field in sk_buff.
-> > > > > > > + *
-> > > > > > > + * Return:
-> > > > > > > + * * Returns 0 on success or ``-errno`` on error.
-> > > > > > > + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
-> > > > > > > + * * ``-ENODATA``    : Checksum was not validated
-> > > > > > > + */
-> > > > > > > +__bpf_kfunc int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
-> > > > > > 
-> > > > > > Istead of ENODATA should we return what would be put in the ip_summed field
-> > > > > > CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}? Then sig would be,
-> > > > 
-> > > > I was thinking the same, what about checksum "type".
-> > > > 
-> > > > > > 
-> > > > > >    bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *type, u8 *lvl);
-> > > > > > 
-> > > > > > or something like that? Or is the thought that its not really necessary?
-> > > > > > I don't have a strong preference but figured it was worth asking.
-> > > > > > 
-> > > > > 
-> > > > > I see no value in returning CHECKSUM_COMPLETE without the actual checksum value.
-> > > > > Same with CHECKSUM_PARTIAL and csum_start. Returning those values too would
-> > > > > overcomplicate the function signature.
-> > > > 
-> > > > So, this kfunc bpf_xdp_metadata_rx_csum_lvl() success is it equivilent to
-> > > > CHECKSUM_UNNECESSARY?
-> > > 
-> > > This is 100% true for physical NICs, it's more complicated for veth, bacause it
-> > > often receives CHECKSUM_PARTIAL, which shouldn't normally apprear on RX, but is
-> > > treated by the network stack as a validated checksum, because there is no way
-> > > internally generated packet could be messed up. I would be grateful if you could
-> > > look at the veth patch and share your opinion about this.
-> > > 
-> > > > 
-> > > > Looking at documentation[1] (generated from skbuff.h):
-> > > >   [1] https://kernel.org/doc/html/latest/networking/skbuff.html#checksumming-of-received-packets-by-device
-> > > > 
-> > > > Is the idea that we can add another kfunc (new signature) than can deal
-> > > > with the other types of checksums (in a later kernel release)?
-> > > > 
-> > > 
-> > > Yes, that is the idea.
-> > 
-> > If we think there is a chance we might need another kfunc we should add it
-> > in the same kfunc. It would be unfortunate to have to do two kfuncs when
-> > one would work. It shouldn't cost much/anything(?) to hardcode the type for
-> > most cases? I think if we need it later I would advocate for updating this
-> > kfunc to support it. Of course then userspace will have to swivel on the
-> > kfunc signature.
-> > 
-> 
-> I think it might make sense to have 3 kfuncs for checksumming.
-> As this would allow BPF-prog to focus on CHECKSUM_UNNECESSARY, and then
-> only call additional kfunc for extracting e.g csum_start  + csum_offset
-> when type is CHECKSUM_PARTIAL.
-> 
-> We could extend bpf_xdp_metadata_rx_csum_lvl() to give the csum_type
-> CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}.
-> 
->  int bpf_xdp_metadata_rx_csum_lvl(*ctx, u8 *csum_level, u8 *csum_type)
-> 
-> And then add two kfunc e.g.
->  (1) bpf_xdp_metadata_rx_csum_partial(ctx, start, offset)
->  (2) bpf_xdp_metadata_rx_csum_complete(ctx, csum)
-> 
-> Pseudo BPF-prog code:
-> 
->  err = bpf_xdp_metadata_rx_csum_lvl(ctx, level, type);
->  if (!err && type != CHECKSUM_UNNECESSARY) {
->      if (type == CHECKSUM_PARTIAL)
->          err = bpf_xdp_metadata_rx_csum_partial(ctx, start, offset);
->      if (type == CHECKSUM_COMPLETE)
->          err = bpf_xdp_metadata_rx_csum_complete(ctx, csum);
->  }
-> 
-> Looking at code, I feel we could rename [...]_csum_lvl to csum_type.
-> E.g. bpf_xdp_metadata_rx_csum_type.
->
-
-What about:
-
-union csum_info {
-	struct {
-		u16 csum_start;
-		u16 csum_offset;
-	};
-	u32 checksum;
-	u8 checksum_level;
-};
-
-bpf_xdp_metadata_rx_csum(*ctx, u8 *csum_status, union csum_info *info);
-
-One thing that is worth considering in my opinion is whether some hardware can 
-provide both CHECKSUM_UNNECESSARY and CHECKSUM_COMPLETE. Judging by [0], this 
-does occur. I such cases using an enum to represent the checksum status would 
-artificially limit the capabilities. Now, imagine the situation:
-
-- You want to use your XDP program with 2 different NICs
-
-[...]
-
-err = bpf_xdp_metadata_rx_csum(*ctx, &status, &info);
-if (!err && status == CHECKSUM_UNNECESSARY)
-	/* Do stuff */
-
-[...]
-- One NIC can both calculate CHECKSUM_COMPLETE and parse headers, another one 
-  is only able to parse headers. Those can be very similar NICs from different 
-  generation.
-- You test your program on the simpler NIC, program works fine.
-- You tests your program on the more advanced one and suddenly you need an 
-  'else if' case with some additional calculations.
-
-Please write, whether this makes sense :D and if so, we can work out a solution.
-
-> Feel free to disagree,
-> --Jesper
-> 
-> 
+RGVhciBMZW9uLA0KDQpUaGFua3MgZm9yIHJldmlld2luZyDwn5iKDQpSZXBsaWVkIGlubGluZS4N
+Cg0KPiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBMZW9uIFJvbWFub3Zza3kg
+PGxlb25Aa2VybmVsLm9yZz4NCj4gU2VudDogVGh1cnNkYXksIDYgSnVseSwgMjAyMyAzOjU2IFBN
+DQo+IFRvOiBOZ3V5ZW4sIEFudGhvbnkgTCA8YW50aG9ueS5sLm5ndXllbkBpbnRlbC5jb20+DQo+
+IENjOiBkYXZlbUBkYXZlbWxvZnQubmV0OyBrdWJhQGtlcm5lbC5vcmc7IHBhYmVuaUByZWRoYXQu
+Y29tOw0KPiBlZHVtYXpldEBnb29nbGUuY29tOyBuZXRkZXZAdmdlci5rZXJuZWwub3JnOyBadWxr
+aWZsaSwgTXVoYW1tYWQNCj4gSHVzYWluaSA8bXVoYW1tYWQuaHVzYWluaS56dWxraWZsaUBpbnRl
+bC5jb20+OyBOZWZ0aW4sIFNhc2hhDQo+IDxzYXNoYS5uZWZ0aW5AaW50ZWwuY29tPjsgcmljaGFy
+ZGNvY2hyYW5AZ21haWwuY29tOyBUYW4gVGVlIE1pbg0KPiA8dGVlLm1pbi50YW5AbGludXguaW50
+ZWwuY29tPjsgQ2hvb25nLCBDaHdlZSBMaW4NCj4gPGNod2VlLmxpbi5jaG9vbmdAaW50ZWwuY29t
+PjsgTmFhbWEgTWVpcg0KPiA8bmFhbWF4Lm1laXJAbGludXguaW50ZWwuY29tPg0KPiBTdWJqZWN0
+OiBSZTogW1BBVENIIG5ldCAzLzZdIGlnYzogRml4IFRYIEhhbmcgaXNzdWUgd2hlbiBRQlYgR2F0
+ZSBpcyBjbG9zZWQNCj4gDQo+IE9uIFdlZCwgSnVsIDA1LCAyMDIzIGF0IDAxOjE5OjAyUE0gLTA3
+MDAsIFRvbnkgTmd1eWVuIHdyb3RlOg0KPiA+IEZyb206IE11aGFtbWFkIEh1c2FpbmkgWnVsa2lm
+bGkgPG11aGFtbWFkLmh1c2FpbmkuenVsa2lmbGlAaW50ZWwuY29tPg0KPiA+DQo+ID4gSWYgYSB1
+c2VyIHNjaGVkdWxlcyBhIEdhdGUgQ29udHJvbCBMaXN0IChHQ0wpIHRvIGNsb3NlIG9uZSBvZiB0
+aGUgUUJWDQo+ID4gZ2F0ZXMgd2hpbGUgYWxzbyB0cmFuc21pdHRpbmcgYSBwYWNrZXQgdG8gdGhh
+dCBjbG9zZWQgZ2F0ZSwgVFggSGFuZw0KPiA+IHdpbGwgYmUgaGFwcGVuLiBIVyB3b3VsZCBub3Qg
+ZHJvcCBhbnkgcGFja2V0IHdoZW4gdGhlIGdhdGUgaXMgY2xvc2VkDQo+ID4gYW5kIGtlZXAgcXVl
+dWluZyB1cCBpbiBIVyBUWCBGSUZPIHVudGlsIHRoZSBnYXRlIGlzIHJlLW9wZW5lZC4NCj4gPiBU
+aGlzIHBhdGNoIGltcGxlbWVudHMgdGhlIHNvbHV0aW9uIHRvIGRyb3AgdGhlIHBhY2tldCBmb3Ig
+dGhlIGNsb3NlZA0KPiA+IGdhdGUuDQo+ID4NCj4gPiBUaGlzIHBhdGNoIHdpbGwgYWxzbyByZXNl
+dCB0aGUgYWRhcHRlciB0byBwZXJmb3JtIFNXIGluaXRpYWxpemF0aW9uDQo+ID4gZm9yIGVhY2gg
+MXN0IEdhdGUgQ29udHJvbCBMaXN0IChHQ0wpIHRvIGF2b2lkIGhhbmcuDQo+ID4gVGhpcyBpcyBk
+dWUgdG8gdGhlIEhXIGRlc2lnbiwgd2hlcmUgY2hhbmdpbmcgdG8gVFNOIHRyYW5zbWl0IG1vZGUN
+Cj4gPiByZXF1aXJlcyBTVyBpbml0aWFsaXphdGlvbi4gSW50ZWwgRGlzY3JldGUgSTIyNS82IHRy
+YW5zbWl0IG1vZGUgY2Fubm90DQo+ID4gYmUgY2hhbmdlZCB3aGVuIGluIGR5bmFtaWMgbW9kZSBh
+Y2NvcmRpbmcgdG8gU29mdHdhcmUgVXNlciBNYW51YWwNCj4gPiBTZWN0aW9uIDcuNS4yLjEuIFN1
+YnNlcXVlbnQgR2F0ZSBDb250cm9sIExpc3QgKEdDTCkgb3BlcmF0aW9ucyB3aWxsDQo+ID4gcHJv
+Y2VlZCB3aXRob3V0IGEgcmVzZXQsIGFzIHRoZXkgYWxyZWFkeSBhcmUgaW4gVFNOIE1vZGUuDQo+
+ID4NCj4gPiBTdGVwIHRvIHJlcHJvZHVjZToNCj4gPg0KPiA+IERVVDoNCj4gPiAxKSBDb25maWd1
+cmUgR0NMIExpc3Qgd2l0aCBjZXJ0YWluIGdhdGUgY2xvc2UuDQo+ID4NCj4gPiBCQVNFPSQoZGF0
+ZSArJXMlTikNCj4gPiB0YyBxZGlzYyByZXBsYWNlIGRldiAkSUZBQ0UgcGFyZW50IHJvb3QgaGFu
+ZGxlIDEwMCB0YXByaW8gXA0KPiA+ICAgICBudW1fdGMgNCBcDQo+ID4gICAgIG1hcCAwIDEgMiAz
+IDMgMyAzIDMgMyAzIDMgMyAzIDMgMyAzIFwNCj4gPiAgICAgcXVldWVzIDFAMCAxQDEgMUAyIDFA
+MyBcDQo+ID4gICAgIGJhc2UtdGltZSAkQkFTRSBcDQo+ID4gICAgIHNjaGVkLWVudHJ5IFMgMHg4
+IDUwMDAwMCBcDQo+ID4gICAgIHNjaGVkLWVudHJ5IFMgMHg0IDUwMDAwMCBcDQo+ID4gICAgIGZs
+YWdzIDB4Mg0KPiA+DQo+ID4gMikgVHJhbnNtaXQgdGhlIHBhY2tldCB0byBjbG9zZWQgZ2F0ZS4g
+WW91IG1heSB1c2UgdWRwX3RhaSBhcHBsaWNhdGlvbg0KPiA+IHRvIHRyYW5zbWl0IFVEUCBwYWNr
+ZXQgdG8gYW55IG9mIHRoZSBjbG9zZWQgZ2F0ZS4NCj4gPg0KPiA+IC4vdWRwX3RhaSAtaSA8aW50
+ZXJmYWNlPiAtUCAxMDAwMDAgLXAgOTAgLWMgMSAtdCA8MC8xPiAtdSAzMDAwNA0KPiA+DQo+ID4g
+Rml4ZXM6IGVjNTBhOWQ0MzdmMCAoImlnYzogQWRkIHN1cHBvcnQgZm9yIHRhcHJpbyBvZmZsb2Fk
+aW5nIikNCj4gPiBDby1kZXZlbG9wZWQtYnk6IFRhbiBUZWUgTWluIDx0ZWUubWluLnRhbkBsaW51
+eC5pbnRlbC5jb20+DQo+ID4gU2lnbmVkLW9mZi1ieTogVGFuIFRlZSBNaW4gPHRlZS5taW4udGFu
+QGxpbnV4LmludGVsLmNvbT4NCj4gPiBUZXN0ZWQtYnk6IENod2VlIExpbiBDaG9vbmcgPGNod2Vl
+Lmxpbi5jaG9vbmdAaW50ZWwuY29tPg0KPiA+IFNpZ25lZC1vZmYtYnk6IE11aGFtbWFkIEh1c2Fp
+bmkgWnVsa2lmbGkNCj4gPiA8bXVoYW1tYWQuaHVzYWluaS56dWxraWZsaUBpbnRlbC5jb20+DQo+
+ID4gVGVzdGVkLWJ5OiBOYWFtYSBNZWlyIDxuYWFtYXgubWVpckBsaW51eC5pbnRlbC5jb20+DQo+
+ID4gU2lnbmVkLW9mZi1ieTogVG9ueSBOZ3V5ZW4gPGFudGhvbnkubC5uZ3V5ZW5AaW50ZWwuY29t
+Pg0KPiA+IC0tLQ0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pZ2MvaWdjLmggICAg
+ICB8ICA2ICsrKw0KPiA+ICBkcml2ZXJzL25ldC9ldGhlcm5ldC9pbnRlbC9pZ2MvaWdjX21haW4u
+YyB8IDU4DQo+ID4gKysrKysrKysrKysrKysrKysrKysrLS0gIGRyaXZlcnMvbmV0L2V0aGVybmV0
+L2ludGVsL2lnYy9pZ2NfdHNuLmMgIHwNCj4gPiA0MSArKysrKysrKysrLS0tLS0tDQo+ID4gIDMg
+ZmlsZXMgY2hhbmdlZCwgODcgaW5zZXJ0aW9ucygrKSwgMTggZGVsZXRpb25zKC0pDQo+IA0KPiA8
+Li4uPg0KPiANCj4gPiBAQCAtNjE0OSw2ICs2MTU3LDggQEAgc3RhdGljIGludCBpZ2Nfc2F2ZV9x
+YnZfc2NoZWR1bGUoc3RydWN0DQo+IGlnY19hZGFwdGVyICphZGFwdGVyLA0KPiA+ICAJYWRhcHRl
+ci0+Y3ljbGVfdGltZSA9IHFvcHQtPmN5Y2xlX3RpbWU7DQo+ID4gIAlhZGFwdGVyLT5iYXNlX3Rp
+bWUgPSBxb3B0LT5iYXNlX3RpbWU7DQo+ID4NCj4gPiArCWlnY19wdHBfcmVhZChhZGFwdGVyLCAm
+bm93KTsNCj4gPiArDQo+ID4gIAlmb3IgKG4gPSAwOyBuIDwgcW9wdC0+bnVtX2VudHJpZXM7IG4r
+Kykgew0KPiA+ICAJCXN0cnVjdCB0Y190YXByaW9fc2NoZWRfZW50cnkgKmUgPSAmcW9wdC0+ZW50
+cmllc1tuXTsNCj4gPg0KPiA+IEBAIC02MTgzLDcgKzYxOTMsMTAgQEAgc3RhdGljIGludCBpZ2Nf
+c2F2ZV9xYnZfc2NoZWR1bGUoc3RydWN0DQo+IGlnY19hZGFwdGVyICphZGFwdGVyLA0KPiA+ICAJ
+CQkJcmluZy0+c3RhcnRfdGltZSA9IHN0YXJ0X3RpbWU7DQo+ID4gIAkJCXJpbmctPmVuZF90aW1l
+ID0gZW5kX3RpbWU7DQo+ID4NCj4gPiAtCQkJcXVldWVfY29uZmlndXJlZFtpXSA9IHRydWU7DQo+
+ID4gKwkJCWlmIChyaW5nLT5zdGFydF90aW1lID49IGFkYXB0ZXItPmN5Y2xlX3RpbWUpDQo+ID4g
+KwkJCQlxdWV1ZV9jb25maWd1cmVkW2ldID0gZmFsc2U7DQo+ID4gKwkJCWVsc2UNCj4gPiArCQkJ
+CXF1ZXVlX2NvbmZpZ3VyZWRbaV0gPSB0cnVlOw0KPiA+ICAJCX0NCj4gPg0KPiA+ICAJCXN0YXJ0
+X3RpbWUgKz0gZS0+aW50ZXJ2YWw7DQo+ID4gQEAgLTYxOTMsOCArNjIwNiwyMCBAQCBzdGF0aWMg
+aW50IGlnY19zYXZlX3Fidl9zY2hlZHVsZShzdHJ1Y3QNCj4gaWdjX2FkYXB0ZXIgKmFkYXB0ZXIs
+DQo+ID4gIAkgKiBJZiBub3QsIHNldCB0aGUgc3RhcnQgYW5kIGVuZCB0aW1lIHRvIGJlIGVuZCB0
+aW1lLg0KPiA+ICAJICovDQo+ID4gIAlmb3IgKGkgPSAwOyBpIDwgYWRhcHRlci0+bnVtX3R4X3F1
+ZXVlczsgaSsrKSB7DQo+ID4gKwkJc3RydWN0IGlnY19yaW5nICpyaW5nID0gYWRhcHRlci0+dHhf
+cmluZ1tpXTsNCj4gPiArDQo+ID4gKwkJaWYgKCFpc19iYXNlX3RpbWVfcGFzdChxb3B0LT5iYXNl
+X3RpbWUsICZub3cpKSB7DQo+ID4gKwkJCXJpbmctPmFkbWluX2dhdGVfY2xvc2VkID0gZmFsc2U7
+DQo+ID4gKwkJfSBlbHNlIHsNCj4gPiArCQkJcmluZy0+b3Blcl9nYXRlX2Nsb3NlZCA9IGZhbHNl
+Ow0KPiA+ICsJCQlyaW5nLT5hZG1pbl9nYXRlX2Nsb3NlZCA9IGZhbHNlOw0KPiA+ICsJCX0NCj4g
+PiArDQo+ID4gIAkJaWYgKCFxdWV1ZV9jb25maWd1cmVkW2ldKSB7DQo+ID4gLQkJCXN0cnVjdCBp
+Z2NfcmluZyAqcmluZyA9IGFkYXB0ZXItPnR4X3JpbmdbaV07DQo+ID4gKwkJCWlmICghaXNfYmFz
+ZV90aW1lX3Bhc3QocW9wdC0+YmFzZV90aW1lLCAmbm93KSkNCj4gPiArCQkJCXJpbmctPmFkbWlu
+X2dhdGVfY2xvc2VkID0gdHJ1ZTsNCj4gPiArCQkJZWxzZQ0KPiA+ICsJCQkJcmluZy0+b3Blcl9n
+YXRlX2Nsb3NlZCA9IHRydWU7DQo+ID4NCj4gPiAgCQkJcmluZy0+c3RhcnRfdGltZSA9IGVuZF90
+aW1lOw0KPiA+ICAJCQlyaW5nLT5lbmRfdGltZSA9IGVuZF90aW1lOw0KPiA+IEBAIC02NTc1LDYg
+KzY2MDAsMjcgQEAgc3RhdGljIGNvbnN0IHN0cnVjdCB4ZHBfbWV0YWRhdGFfb3BzDQo+IGlnY194
+ZHBfbWV0YWRhdGFfb3BzID0gew0KPiA+ICAJLnhtb19yeF90aW1lc3RhbXAJCT0gaWdjX3hkcF9y
+eF90aW1lc3RhbXAsDQo+ID4gIH07DQo+ID4NCj4gPiArc3RhdGljIGVudW0gaHJ0aW1lcl9yZXN0
+YXJ0IGlnY19xYnZfc2NoZWR1bGluZ190aW1lcihzdHJ1Y3QgaHJ0aW1lcg0KPiA+ICsqdGltZXIp
+IHsNCj4gPiArCXN0cnVjdCBpZ2NfYWRhcHRlciAqYWRhcHRlciA9IGNvbnRhaW5lcl9vZih0aW1l
+ciwgc3RydWN0IGlnY19hZGFwdGVyLA0KPiA+ICsJCQkJCQkgICBocnRpbWVyKTsNCj4gPiArCXVu
+c2lnbmVkIGludCBpOw0KPiA+ICsNCj4gPiArCWFkYXB0ZXItPnFidl90cmFuc2l0aW9uID0gdHJ1
+ZTsNCj4gPiArCWZvciAoaSA9IDA7IGkgPCBhZGFwdGVyLT5udW1fdHhfcXVldWVzOyBpKyspIHsN
+Cj4gPiArCQlzdHJ1Y3QgaWdjX3JpbmcgKnR4X3JpbmcgPSBhZGFwdGVyLT50eF9yaW5nW2ldOw0K
+PiA+ICsNCj4gPiArCQlpZiAodHhfcmluZy0+YWRtaW5fZ2F0ZV9jbG9zZWQpIHsNCj4gDQo+IERv
+ZXNuJ3QgYXN5bmNocm9uaWMgYWNjZXNzIHRvIHNoYXJlZCB2YXJpYWJsZSB0aHJvdWdoIGhydGlt
+ZXIgcmVxdWlyZSBzb21lDQo+IHNvcnQgb2YgbG9ja2luZz8NCg0KWWVhaCBJIGFncmVlZCB3aXRo
+IHlvdS4gSG93ZXZlciwgSU1ITywgaXQgc2hvdWxkIGJlIHNhdmVkIHdpdGhvdXQgdGhlIGxvY2su
+IA0KVGhlc2UgdmFyaWFibGVzLCBhZG1pbl9nYXRlX2Nsb3NlZCBhbmQgb3Blcl9nYXRlX2Nsb3Nl
+ZCwgd2VyZSBzZXQgZHVyaW5nIHRoZSB0cmFuc2l0aW9uIA0KYW5kIHNldHVwL2RlbGV0ZSBvZiB0
+aGUgVEMgb25seS4gVGhlIHFidl90cmFuc2l0aW9uIGZsYWcgaGFzIGJlZW4gdXNlZCB0byBwcm90
+ZWN0IHRoZSANCm9wZXJhdGlvbiB3aGVuIGl0IGlzIGluIHFidiB0cmFuc2l0aW9uLg0KDQpUaGFu
+a3MsDQpIdXNhaW5pDQoNCj4gDQo+IFRoYW5rcw0KPiANCj4gPiArCQkJdHhfcmluZy0+YWRtaW5f
+Z2F0ZV9jbG9zZWQgPSBmYWxzZTsNCj4gPiArCQkJdHhfcmluZy0+b3Blcl9nYXRlX2Nsb3NlZCA9
+IHRydWU7DQo+ID4gKwkJfSBlbHNlIHsNCj4gPiArCQkJdHhfcmluZy0+b3Blcl9nYXRlX2Nsb3Nl
+ZCA9IGZhbHNlOw0KPiA+ICsJCX0NCj4gPiArCX0NCj4gPiArCWFkYXB0ZXItPnFidl90cmFuc2l0
+aW9uID0gZmFsc2U7DQo+ID4gKwlyZXR1cm4gSFJUSU1FUl9OT1JFU1RBUlQ7DQo+ID4gK30NCj4g
+PiArDQo=
 
