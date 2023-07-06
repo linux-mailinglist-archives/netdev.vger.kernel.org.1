@@ -1,138 +1,138 @@
-Return-Path: <netdev+bounces-15871-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15873-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 56E1B74A328
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:37:41 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D984274A33C
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:39:29 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 478691C20DDC
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:37:40 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8F28D28130E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:39:28 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1F3FBE55;
-	Thu,  6 Jul 2023 17:37:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AFBBABE5B;
+	Thu,  6 Jul 2023 17:39:26 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E548EBA57
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:37:37 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C10C810C;
-	Thu,  6 Jul 2023 10:37:36 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 366GmeOb030027;
-	Thu, 6 Jul 2023 10:37:31 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=IPtGxkbPmFGDLM3aZoleuH6KTP7fOT7Q4al0VCaPr1Y=;
- b=Dr9E7xhVeMjCM9t2qJtFLsvwlf1FC+U++H9cS35QFUPa40X0DvVUM/x/xvB7hGwW/2nB
- Vwlz6uWUx5Co0yZaAj8ZTxZzgRn688zX47rpJcK98/PzSHqKNPGLabNFma7G2Saljd24
- WOeXbPUjgiM3vaAI1v3W/p/SqvEdrOGaXGe1JrVBXJd/ANXpwN05X3tbisbqWs/Lw24l
- 16BN6TC5LMUjOsUqknDk8isgYL0gyWqtDtp62QsYULO5MZLave58FDFAY3Ebnzxj9gSA
- SlnIOVLoSB70HoQ5P9LtX3Fop40ENczQGTet6NfTEk7kq8BTJDpaWrV2S08TFcKMcQrT mw== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rn3v96qm7-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 06 Jul 2023 10:37:31 -0700
-Received: from DC5-EXCH01.marvell.com (10.69.176.38) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 6 Jul
- 2023 10:37:29 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 6 Jul 2023 10:37:29 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 4604B3F703F;
-	Thu,  6 Jul 2023 10:37:26 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [PATCH V4] octeontx2-pf: Add additional check for MCAM rules
-Date: Thu, 6 Jul 2023 23:07:23 +0530
-Message-ID: <20230706173723.2226030-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A3FB39460
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:39:24 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EEDBF1FDD
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:39:05 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688665145;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=QHHbMtv2Yw061BT7CmjmxQ5Xv9gcyC1gSAWRuva95Fw=;
+	b=R9vkiv5tbCq4ATPBRFAHCZj5tKbr5x0PQGOZd3NU5L9CpyvWrLWKpSATWCsQw5o1jTbj8C
+	kjD/NmRCcuu/3jLsVS0urmp2N0Kqtd92gYiJYEaTqUL9aHks9Fsuj7H/D+27WYM8Ybi7/k
+	2Vomdje6I0slkQ01+TO54p7/QGe4eQ8=
+Received: from mail-qt1-f199.google.com (mail-qt1-f199.google.com
+ [209.85.160.199]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-106-C7NLLUu3OvijoTgK7NzSDQ-1; Thu, 06 Jul 2023 13:39:03 -0400
+X-MC-Unique: C7NLLUu3OvijoTgK7NzSDQ-1
+Received: by mail-qt1-f199.google.com with SMTP id d75a77b69052e-402fa256023so1930481cf.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 10:39:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688665143; x=1691257143;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=QHHbMtv2Yw061BT7CmjmxQ5Xv9gcyC1gSAWRuva95Fw=;
+        b=hVcH81SeVUjDjhLZ6LB8nh8WM1dzc92WKfABYcoGAjOKhcYdPHZb2o7k5gEQMg0b4l
+         IweGzv0a80Zz2FtGBW/otcSwbLfhEt3oeEJhmla/Gpri6CYrdvQBqa9dmIMuyWj31Ro2
+         uyYm0tO0/Nye21kcmdXHUv4ICSURs+y+FW1gVnm4XNslVRx8I9uBV5R1mGK0PgwVBHxl
+         flKv559DlrTSOdmrGKpa0ZylC4uz7ArHdK5YMu0YmYhyhyLAP8SfUASnAKLeqkdllRET
+         Qn8LtTQCucsW7X9fNcokHlfkv9TtghMO8elxJ2YtPfA8dSqGg4mQcgsnARcAKIoSxM7m
+         ZCOw==
+X-Gm-Message-State: ABy/qLamnGb3jWhOcj+OxoB2YOJYmWGmzq7RJIbRcdhChmZmKX4p19db
+	HLHu+u/vy++EzQY9SRwr3C676PZUxzCoXxucKGYqPmMzLoTdb5HnsEjZLjwb2EQS0UqShbNBVMK
+	IbMT55XiLb9kGkp/w
+X-Received: by 2002:a05:622a:251:b0:403:2c71:3ac with SMTP id c17-20020a05622a025100b004032c7103acmr3215756qtx.0.1688665143460;
+        Thu, 06 Jul 2023 10:39:03 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGIrVwBwkUyIKxW2YU5c9N4y7BwKpqmVhgcwOSLYf+V82LWVN/+E31wgze/mdwPbvyZ2mLIvg==
+X-Received: by 2002:a05:622a:251:b0:403:2c71:3ac with SMTP id c17-20020a05622a025100b004032c7103acmr3215738qtx.0.1688665143225;
+        Thu, 06 Jul 2023 10:39:03 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-240-43.dyn.eolo.it. [146.241.240.43])
+        by smtp.gmail.com with ESMTPSA id s15-20020ac85ccf000000b00402913ecba3sm817639qta.34.2023.07.06.10.37.52
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 10:37:54 -0700 (PDT)
+Message-ID: <f10c5eb17d6598def7ba17886e4e2e6e4aea07e0.camel@redhat.com>
+Subject: Re: [PATCH] udp6: add a missing call into udp_fail_queue_rcv_skb
+ tracepoint
+From: Paolo Abeni <pabeni@redhat.com>
+To: Ivan Babrou <ivan@cloudflare.com>, netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org, kernel-team@cloudflare.com, Willem de
+ Bruijn <willemdebruijn.kernel@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>,  David Ahern <dsahern@kernel.org>, Eric Dumazet
+ <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,  Neil Horman
+ <nhorman@tuxdriver.com>, Satoru Moriya <satoru.moriya@hds.com>
+Date: Thu, 06 Jul 2023 19:37:50 +0200
+In-Reply-To: <20230706172237.28341-1-ivan@cloudflare.com>
+References: <20230706172237.28341-1-ivan@cloudflare.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: T8O4K1BYUc23-pzr--YFwKXx3ibUiVn_
-X-Proofpoint-ORIG-GUID: T8O4K1BYUc23-pzr--YFwKXx3ibUiVn_
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-06_12,2023-07-06_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Due to hardware limitation, MCAM drop rule with
-ether_type == 802.1Q and vlan_id == 0 is not supported. Hence rejecting
-such rules.
+Hi,
 
-Fixes: dce677da57c0 ("octeontx2-pf: Add vlan-etype to ntuple filters")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
-Changes since v3:
-- moved assignment of vlan_etype before the if check
-  
- .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c |  8 ++++++++
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
- 2 files changed, 21 insertions(+)
+On Thu, 2023-07-06 at 10:22 -0700, Ivan Babrou wrote:
+> The tracepoint has existed for 12 years, but it only covered udp
+> over the legacy IPv4 protocol. Having it enabled for udp6 removes
+> the unnecessary difference in error visibility.
+>=20
+> Signed-off-by: Ivan Babrou <ivan@cloudflare.com>
+> Fixes: 296f7ea75b45 ("udp: add tracepoints for queueing skb to rcvbuf")
+> ---
+>  net/ipv6/udp.c | 2 ++
+>  1 file changed, 2 insertions(+)
+>=20
+> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+> index e5a337e6b970..debb98fb23c0 100644
+> --- a/net/ipv6/udp.c
+> +++ b/net/ipv6/udp.c
+> @@ -45,6 +45,7 @@
+>  #include <net/tcp_states.h>
+>  #include <net/ip6_checksum.h>
+>  #include <net/ip6_tunnel.h>
+> +#include <trace/events/udp.h>
+>  #include <net/xfrm.h>
+>  #include <net/inet_hashtables.h>
+>  #include <net/inet6_hashtables.h>
+> @@ -680,6 +681,7 @@ static int __udpv6_queue_rcv_skb(struct sock *sk, str=
+uct sk_buff *skb)
+>  		}
+>  		UDP6_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+>  		kfree_skb_reason(skb, drop_reason);
+> +		trace_udp_fail_queue_rcv_skb(rc, sk);
+>  		return -1;
+>  	}
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 10e11262d48a..2d7713a1a153 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -872,6 +872,14 @@ static int otx2_prepare_flow_request(struct ethtool_rx_flow_spec *fsp,
- 				return -EINVAL;
- 
- 			vlan_etype = be16_to_cpu(fsp->h_ext.vlan_etype);
-+
-+			/* Drop rule with vlan_etype == 802.1Q
-+			 * and vlan_id == 0 is not supported
-+			 */
-+			if (vlan_etype == ETH_P_8021Q && !fsp->m_ext.vlan_tci &&
-+			    fsp->ring_cookie == RX_CLS_FLOW_DISC)
-+				return -EINVAL;
-+
- 			/* Only ETH_P_8021Q and ETH_P_802AD types supported */
- 			if (vlan_etype != ETH_P_8021Q &&
- 			    vlan_etype != ETH_P_8021AD)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 044cc211424e..6c0fdc2bad73 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -604,6 +604,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 			return -EOPNOTSUPP;
- 		}
- 
-+		if (!match.mask->vlan_id) {
-+			struct flow_action_entry *act;
-+			int i;
-+
-+			flow_action_for_each(i, act, &rule->action) {
-+				if (act->id == FLOW_ACTION_DROP) {
-+					netdev_err(nic->netdev, "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
-+						   ntohs(match.key->vlan_tpid), match.key->vlan_id);
-+					return -EOPNOTSUPP;
-+				}
-+			}
-+		}
-+
- 		if (match.mask->vlan_id ||
- 		    match.mask->vlan_dei ||
- 		    match.mask->vlan_priority) {
--- 
-2.25.1
+The patch looks correct and consistency is a nice thing, but I'm
+wondering if we should instead remove the tracepoint from the UDP v4
+code? We already have drop reason and MIBs to pin-point quite
+accurately UDP drops, and the trace point does not cover a few UDPv4
+spots (e.g. mcast). WDYT?
+
+Thanks!
+
+Paolo
 
 
