@@ -1,351 +1,447 @@
-Return-Path: <netdev+bounces-15819-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15815-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2C807749FDB
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:52:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id BF546749F92
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:47:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D59832813B6
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:52:46 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E15871C20DCF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:47:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 65E40A927;
-	Thu,  6 Jul 2023 14:52:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2B919947B;
+	Thu,  6 Jul 2023 14:47:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4D076A924;
-	Thu,  6 Jul 2023 14:52:41 +0000 (UTC)
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0952D1725;
-	Thu,  6 Jul 2023 07:52:26 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688655147; x=1720191147;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=6IiGwvREJ7dHDEeC4DJhlc02DA5toSFa02EMoFFU9q8=;
-  b=Z/mzjq/YuhuQKNFcUDTqR0BBwsSNhgn4lFZv/dAX8XdYZUhOfhjX7UAD
-   nyUOF2qr2cUWSUzIOpSsp73knfApX+RHQNsAwGmJh9LIdJUKsoaxQo0Gu
-   BOPOfgcyfvS/nWYFkbZNybCwT2lYPljzJIRFcgw06p4hA09WcsEG3zYmN
-   ru5Ctp0yB5LhSOrP4cAtpDbWROOnGiv2DWlLW23+kmmNOQKuf5JfwBW9y
-   kAPfQ6Ic9I5XvnHuWm+BNdhp+b97JkEh4ovZa2ZSuBSspqa+DewEqBK5Y
-   wPbjQ2E5ebvMD+E0g0rFpqenDLUNvP3s9GVgg8JGL+g/hY4oakmMi55ds
-   g==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="427300524"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="427300524"
-Received: from fmsmga003.fm.intel.com ([10.253.24.29])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 07:50:38 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="809662566"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="809662566"
-Received: from orsmsx603.amr.corp.intel.com ([10.22.229.16])
-  by FMSMGA003.fm.intel.com with ESMTP; 06 Jul 2023 07:50:36 -0700
-Received: from orsmsx601.amr.corp.intel.com (10.22.229.14) by
- ORSMSX603.amr.corp.intel.com (10.22.229.16) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 6 Jul 2023 07:50:35 -0700
-Received: from orsedg603.ED.cps.intel.com (10.7.248.4) by
- orsmsx601.amr.corp.intel.com (10.22.229.14) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 07:50:35 -0700
-Received: from NAM02-DM3-obe.outbound.protection.outlook.com (104.47.56.46) by
- edgegateway.intel.com (134.134.137.100) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 6 Jul 2023 07:50:35 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=iub/KmKjpzP0249YQKNJ6OxnEhLPXSSuTjzWTyMHoND48/vvqBwlc/vzS0E+NmOecpX886hGbxoF5w+v7CoxfRxYCSbjL0sBmCyTvUJFJk1rJZtTFY6sMyPBkxhT+mLNjttJQLitSE8M1mbDJUG6U0MC/VVv0xIbhwSmWE5bgZwje/Pxc0s0dmdpwdFm497GPICgOYfQdtOxlYp7bLxbzUw6Sz7kdhH7JXvbys3hvnrVifh/TwzDMkxniCsn76GZMeovwr96LRcAWok58MjaBf1rW6c7fzDyjcK9mau+6fvx0mqA2I+NIW/Z5u95jH+x5Wu8QHR0bE/WOPa+EelqkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=mXXZ19P4hy2r93JsNpxgMcz6jejnPy2LiviwQxHkNOY=;
- b=HYvEF2ODg8nsRL5DmzrufRkv627F+wf/ugxual3Ed3qK/8XkwKBJKs3nmefKVojVReJZ5q36GXDv6tqHKsHwWA7/xguTK2P7x0SFqiTA4gPzoL6CrKR5+6+S6AKuQepbIjpbp6ZCzQfKhckTjIO8K2ZMFmNTnVG3x5uBl7LDwAs/K8gyKwKf2qo733juNjAUDK4ezA1VuImRdoP/WFSp9or/svtoQjAHR384SyCUQTVndgRiuF8BkGZ1b4ay55qBx5JqllryUL4oQaJtnYnYNCsi+Sx9mLIvvALZs92uq3GH9UuuHnfMjM38Fq9aJhdU1BHdi4xnMS+07BptXhLLYw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by BL3PR11MB6532.namprd11.prod.outlook.com (2603:10b6:208:38f::9) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.24; Thu, 6 Jul
- 2023 14:50:30 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe%6]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 14:50:29 +0000
-Date: Thu, 6 Jul 2023 16:46:28 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>
-CC: <brouer@redhat.com>, John Fastabend <john.fastabend@gmail.com>,
-	<bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
-	<kpsingh@kernel.org>, <sdf@google.com>, <haoluo@google.com>,
-	<jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, Anatoly Burakov
-	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
-	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
-	Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH bpf-next v2 09/20] xdp: Add VLAN tag hint
-Message-ID: <ZKbTxDKCRlnJxyf0@lincoln>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-10-larysa.zaremba@intel.com>
- <64a32c661648e_628d32085f@john.notmuch>
- <ZKPW6azl0Ak27wSO@lincoln>
- <f7aa7eb6-4600-cebf-bd09-d05fc627fd0d@redhat.com>
- <ZKP8KRy04IqyHXuI@lincoln>
- <e0050610-ee6f-7c3c-a303-7cddc73cff7c@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <e0050610-ee6f-7c3c-a303-7cddc73cff7c@redhat.com>
-X-ClientProxiedBy: BE1P281CA0433.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:81::21) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1965D9453
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 14:47:55 +0000 (UTC)
+Received: from mail-oi1-x22e.google.com (mail-oi1-x22e.google.com [IPv6:2607:f8b0:4864:20::22e])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F0D2A1BD4;
+	Thu,  6 Jul 2023 07:47:40 -0700 (PDT)
+Received: by mail-oi1-x22e.google.com with SMTP id 5614622812f47-3942c6584f0so731352b6e.3;
+        Thu, 06 Jul 2023 07:47:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688654860; x=1691246860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=4C/2EmJrGfra4zZYJgw7p/rlYIjYvx3dxI+1Hw66BZI=;
+        b=FGx0wVeblBic8B532/MxCK7NH5IvrWUgnZwsU6apUD4Sv2jX7kYVnpTdqqS1OZZYlW
+         S+RwT5+sUVcdwXC6Y3kDQmMy3iTachosiSBEdcHyQ3HkE+BHv1CFuzFo5pOE69djjUmy
+         bVomynmYtdwikx4flErk2CxbRG3XG9KriE2bp3gcWkSOPPlsRkELEOGCA5xWjdIx3XFn
+         WBt7J2iJF151Lk68SC3NcOZquhTvYpZNiAmOR2Mk2Qh98oJUEgJY2D5YWaxDcRpFiZvO
+         Y/mC0m0CDPKHT+P5MY79frW20+XeK1DzT69z2TuAt1dtXMhUnUEFJVMyuTe42xoCptRI
+         dvxQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688654860; x=1691246860;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=4C/2EmJrGfra4zZYJgw7p/rlYIjYvx3dxI+1Hw66BZI=;
+        b=MUCaxVB9WsXfDlx5KQ8Pne2/iJuMSwUzZR5Lw0i/gDPACKyh/uxecsvt69oenq7VcT
+         5LRON3XaJ0P4QTzkEicx+HTCSIB2nnnWvQIyo4iPQxujgUsu+7mAtb4ZgfwYtayHTntq
+         qQki6OE3QG/AcDza29kallq7BJQiwT2zregb8BHYUbQuo/So6MaSkROmiUzx78krDFqo
+         9rqV2tJ6bWm5b09onylNJEgO5QN2h2ojM24dS7zBCtjEYLygTegRKz2OqclIGMNH5SGc
+         eUIQBDwvR4m6AGJO9f0/zmfV8lJkeyOPAOQIzdJduTuerNt3kPpXga8CKXxppfg3XFnF
+         ZDkA==
+X-Gm-Message-State: ABy/qLZSLac6IDDm9NvD57XTnIyEwpDihkTAWCAlS+e3Yd6fdqVbkwXe
+	/GMjuX3wVm+2OaCZqbU/6CnKEcG9OBzP+83KlB0=
+X-Google-Smtp-Source: APBJJlEWuTbbrG2UmBe/gUzr9Bnv9Qc+q/O8cQZYFLJG9j5yUcF+Mpd40WXMo39HLpWL3Y3DwiX3SnCH4WnaL8MIyd0=
+X-Received: by 2002:a05:6808:612:b0:3a3:8e77:ddfd with SMTP id
+ y18-20020a056808061200b003a38e77ddfdmr1809340oih.8.1688654859960; Thu, 06 Jul
+ 2023 07:47:39 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|BL3PR11MB6532:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0aeb758f-49c3-4e79-a70a-08db7e30572b
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 16uHoVt2RCu8nwfNzSHbpVt1MlfyUrwlSPfjRVBKVIj9gvc6Fo3u82RGYwarHreHuwY/PjhKScgK/zX5LzNHld+d5PZdjsxlkg75WFP9kbA37eY0toJV5fEDYrulwzILH2VKVsIlE18OEI4DP9YqnhodcOlVQPk7RbBcZg3MOHs986M2leSX8j2P8dyLtN9rb5Js+vUcnJCubwtEmQ9qUlUOApDuGynIRoLB/8oBlZozquH/ivr068gBsuY8UwIKwLziLkXffkcImttH40NCkDR2nWDHsvmiHKV3bFOL45YLiLEqfQ6jakR7BdZ2onm8m2+z0znVUkqsqnCGPRfUbv3NIvsjF6w0z/06u6AKqzJoYYl/1StSzf5afO4tShRS3qQFvfQuefH0J+iS+WklDqqskynp6zpmNuEI25KrH+D0ezqimX8hptR2Pe9pCjL0dJHSgZqPkNhfosqL2FzVfgP/P1SVUHaMDQ4eU0g5C7FkZMwnGUR/eJOHkOH8z7SfFaK8EM7GZG8MzuMJCnH6+Kdk5cET7MIQEAZ8do/9jIPSE/GpGKiRyGWLmBaRV821J8rDIel02Folh4FeLdT0ag==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(396003)(376002)(346002)(39860400002)(136003)(451199021)(478600001)(6486002)(54906003)(6506007)(26005)(9686003)(6512007)(966005)(186003)(2906002)(66946007)(33716001)(41300700001)(316002)(66556008)(6916009)(4326008)(66476007)(7416002)(44832011)(5660300002)(8936002)(8676002)(38100700002)(82960400001)(86362001)(83380400001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?yWCVnJHQ/J7OynEub48pmqJDAnuwCCoo/fzCdmUgI1DgAYdqHbznZymcPokK?=
- =?us-ascii?Q?dTboSF/zZPolcCF8pITj7qIFWa7W4SLfKyKxJ2JR7TH38NMx5VKc6HD040yQ?=
- =?us-ascii?Q?0qNs8b5NTCXRene0qIYb+5WWsj8OLSBg1pprQrP66aATGqdR5Vop0B1BLG7s?=
- =?us-ascii?Q?UJfj0ZDn8Vo7yl41ara6SKrDR/g8/s2HNRe8Z90sqz9cpACSSzqHtNl/yvPF?=
- =?us-ascii?Q?TgtieMGkkHqNzzk3cvh2woxb2yCYJxIaeXcAX0R4R57ceA6LWSO4QJwcYZi7?=
- =?us-ascii?Q?9bs525c1h6P5stK2NUc2o/RdJacawMxikL8fgkCozdUfg+2mFZ9J8I5OW8Pw?=
- =?us-ascii?Q?jcjpdEKGrwdeuA1x9AIA283wrlbZtA2yGAZ5pJNvXJijW85gctxHVFtqzOHi?=
- =?us-ascii?Q?4adLhFb4/pNm1NpV+2N9l4WVaKH7AOJZ67nrKlFWUiaSei2VyzstKStBPVTS?=
- =?us-ascii?Q?uWmNe4Gph4rIURA3+mXA6z6msfcixga1O+pSB/K2xnB0tT4h/YWjzDzI065v?=
- =?us-ascii?Q?OpGTvfiAzw6LcYa6XugEyxU0JebiqoWOTlTtHy3EeOSOEmJ1zPtFxCzcY2HO?=
- =?us-ascii?Q?CGF8DGbXvvEoma4Y2uI6Ss/jXIpBw/mlJ51zYiYOjfmfNi+TohpE1quGi/bl?=
- =?us-ascii?Q?+e1LqLB7z6otKam4HvgE+0kMkZWMgq1yiwy2SwjBYgsIMnl72qUnYlm2cXoW?=
- =?us-ascii?Q?H+y20gtL/kUhifNzMNBVU9tSFqONCEOP3pUo/uJADi1KT1OjOyuu2OOw8DyV?=
- =?us-ascii?Q?aVFHsvupRwC5QY2SZLrZ6F+1nyRhlH5qxaszswhRH42pT6/hYmf5gnUV2PUw?=
- =?us-ascii?Q?t033GSbjpxvl+CYnnzhbrBkDvIWgaakkUF4pfzdherupH2Yb2opYOZSHwgU3?=
- =?us-ascii?Q?qS24AlKF4SANay0wWpVnVQj5JGduNVan3TOD6tigAG4ARZn7fyZPkCqnmitM?=
- =?us-ascii?Q?V1Xu/6nfRQ5Erc8Ap2dJIXvOBeJdJeW0HrdqnLVhxBm90alsQl2/1Pnw9S+q?=
- =?us-ascii?Q?jRHUXbdYsnUWswmGl6Saaw6ilXBkQPno8g/APDVTPon/cp3gILgCKReKPiA0?=
- =?us-ascii?Q?WABVNY7rScLQU4/ofO4aepi0J19lEGMgTETucLhjqgqQYLJ/b04OcRg0xCtD?=
- =?us-ascii?Q?lo1LZw9VoTLbVDcPllIrsVd1pUP/cliTJTJZPwtp+7I3KtC/1d5V/EctYGjU?=
- =?us-ascii?Q?oEQBgsmah1RpUkG9eYEEBA4orKOfCa37GBg2L/+5Y/b7ymH+8F+bEcIPnC4w?=
- =?us-ascii?Q?1Ovc6RXmoJ+NYOtWiExNzxTjwNjkm1ksmJQ3occm/IXamQOBGKP5U15/yioz?=
- =?us-ascii?Q?0UEMk+UICcWM0jtedfV03KBVKY01CB217q2ANtp2PLtzI9zM6VwyyS7Mi7j1?=
- =?us-ascii?Q?Tret+DhnnEqtg27jz0FYRhELyjk+P4Oare0o+bc2smuyq1rKNNsDNoopECVZ?=
- =?us-ascii?Q?IbCAZGsEU/SnvFCXV5K+mUGiSr8OMGi5IXj/aMbtmWv0tz1q1ofw5XCB0MJb?=
- =?us-ascii?Q?K4ddOzBuh2jT2OSwWVKHrZlKwaWLik51OipvyhA8BU1pL4j1/prMZ/AngOYC?=
- =?us-ascii?Q?i+GNccijKimPmWLp+pWN2uIvRgWAPcn2S2Yer6LGM6yuck2dYUE55+x37Wxg?=
- =?us-ascii?Q?oQ=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0aeb758f-49c3-4e79-a70a-08db7e30572b
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 14:50:29.3832
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 3x37iZsYZ7OcD1Ef+g/cCuTO7x4m2JJu3D6ardhS1ws4b1dqY6aVTWB5R/vyDdFiDM2B+2ZWYNjZJKxXRwIK21TwehluFJ7/nzfDGlfTdRQ=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BL3PR11MB6532
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230705155551.1317583-1-aleksander.lobakin@intel.com> <20230705155551.1317583-4-aleksander.lobakin@intel.com>
+In-Reply-To: <20230705155551.1317583-4-aleksander.lobakin@intel.com>
+From: Alexander Duyck <alexander.duyck@gmail.com>
+Date: Thu, 6 Jul 2023 07:47:03 -0700
+Message-ID: <CAKgT0Ue+VvnzNUuKiO1XFW6w3Ka9=SSfGBP_KpkbvR6uzqvg5A@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] [PATCH RFC net-next v4 3/9] iavf: drop page
+ splitting and recycling
+To: Alexander Lobakin <aleksander.lobakin@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, Paul Menzel <pmenzel@molgen.mpg.de>, 
+	Jesper Dangaard Brouer <hawk@kernel.org>, Larysa Zaremba <larysa.zaremba@intel.com>, netdev@vger.kernel.org, 
+	Alexander Duyck <alexanderduyck@fb.com>, Ilias Apalodimas <ilias.apalodimas@linaro.org>, 
+	linux-kernel@vger.kernel.org, Yunsheng Lin <linyunsheng@huawei.com>, 
+	Michal Kubiak <michal.kubiak@intel.com>, intel-wired-lan@lists.osuosl.org, 
+	David Christensen <drc@linux.vnet.ibm.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Tue, Jul 04, 2023 at 04:18:04PM +0200, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 04/07/2023 13.02, Larysa Zaremba wrote:
-> > On Tue, Jul 04, 2023 at 12:23:45PM +0200, Jesper Dangaard Brouer wrote:
-> > > 
-> > > On 04/07/2023 10.23, Larysa Zaremba wrote:
-> > > > On Mon, Jul 03, 2023 at 01:15:34PM -0700, John Fastabend wrote:
-> > > > > Larysa Zaremba wrote:
-> > > > > > Implement functionality that enables drivers to expose VLAN tag
-> > > > > > to XDP code.
-> > > > > > 
-> > > > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > > > > > ---
-> > > > > >    Documentation/networking/xdp-rx-metadata.rst |  8 +++++++-
-> > > > > >    include/linux/netdevice.h                    |  2 ++
-> > > > > >    include/net/xdp.h                            |  2 ++
-> > > > > >    kernel/bpf/offload.c                         |  2 ++
-> > > > > >    net/core/xdp.c                               | 20 ++++++++++++++++++++
-> > > > > >    5 files changed, 33 insertions(+), 1 deletion(-)
-> > > > > > 
-> > > > > > diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
-> > > > > > index 25ce72af81c2..ea6dd79a21d3 100644
-> > > > > > --- a/Documentation/networking/xdp-rx-metadata.rst
-> > > > > > +++ b/Documentation/networking/xdp-rx-metadata.rst
-> > > > > > @@ -18,7 +18,13 @@ Currently, the following kfuncs are supported. In the future, as more
-> > > > > >    metadata is supported, this set will grow:
-> > > > > >    .. kernel-doc:: net/core/xdp.c
-> > > > > > -   :identifiers: bpf_xdp_metadata_rx_timestamp bpf_xdp_metadata_rx_hash
-> > > > > > +   :identifiers: bpf_xdp_metadata_rx_timestamp
-> > > > > > +
-> > > > > > +.. kernel-doc:: net/core/xdp.c
-> > > > > > +   :identifiers: bpf_xdp_metadata_rx_hash
-> > > > > > +
-> > > > > > +.. kernel-doc:: net/core/xdp.c
-> > > > > > +   :identifiers: bpf_xdp_metadata_rx_vlan_tag
-> > > > > >    An XDP program can use these kfuncs to read the metadata into stack
-> > > > > >    variables for its own consumption. Or, to pass the metadata on to other
-> > > [...]
-> > > > > > diff --git a/net/core/xdp.c b/net/core/xdp.c
-> > > > > > index 41e5ca8643ec..f6262c90e45f 100644
-> > > > > > --- a/net/core/xdp.c
-> > > > > > +++ b/net/core/xdp.c
-> > > > > > @@ -738,6 +738,26 @@ __bpf_kfunc int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, u32 *hash,
-> > > > > >    	return -EOPNOTSUPP;
-> > > > > >    }
-> > > > > > +/**
-> > > > > > + * bpf_xdp_metadata_rx_vlan_tag - Get XDP packet outermost VLAN tag with protocol
-> > > > > > + * @ctx: XDP context pointer.
-> > > > > > + * @vlan_tag: Destination pointer for VLAN tag
-> > > > > > + * @vlan_proto: Destination pointer for VLAN protocol identifier in network byte order.
-> > > > > > + *
-> > > > > > + * In case of success, vlan_tag contains VLAN tag, including 12 least significant bytes
-> > > > > > + * containing VLAN ID, vlan_proto contains protocol identifier.
-> > > > > 
-> > > > > Above is a bit confusing to me at least.
-> > > > > 
-> > > > > The vlan tag would be both the 16bit TPID and 16bit TCI. What fields
-> > > > > are to be included here? The VlanID or the full 16bit TCI meaning the
-> > > > > PCP+DEI+VID?
-> > > > 
-> > > > It contains PCP+DEI+VID, in patch 16 ("selftests/bpf: Add flags and new hints to
-> > > > xdp_hw_metadata") this is more clear, because the tag is parsed.
-> > > > 
-> > > 
-> > > Do we really care about the "EtherType" proto (in VLAN speak TPID = Tag
-> > > Protocol IDentifier)?
-> > > I mean, it can basically only have two values[1], and we just wanted to
-> > > know if it is a VLAN (that hardware offloaded/removed for us):
-> > 
-> > If we assume everyone follows the standard, this would be correct.
-> > But apparently, some applications use some ambiguous value as a TPID [0].
-> > 
-> > So it is not hard to imagine, some NICs could alllow you to configure your
-> > custom TPID. I am not sure if any in-tree drivers actually do this, but I think
-> > it's nice to provide some flexibility on XDP level, especially considering
-> > network stack stores full vlan_proto.
-> > 
-> 
-> I'm buying your argument, and agree it makes sense to provide TPID in
-> the call signature.  Given weird hardware exists that allow people to
-> configure custom TPID.
-> 
-> Looking through kernel defines (in uapi/linux/if_ether.h) I see evidence
-> that funky QinQ EtherTypes have been used in the past:
-> 
->  #define ETH_P_QINQ1	0x9100		/* deprecated QinQ VLAN [ NOT AN OFFICIALLY
-> REGISTERED ID ] */
->  #define ETH_P_QINQ2	0x9200		/* deprecated QinQ VLAN [ NOT AN OFFICIALLY
-> REGISTERED ID ] */
->  #define ETH_P_QINQ3	0x9300		/* deprecated QinQ VLAN [ NOT AN OFFICIALLY
-> REGISTERED ID ] */
-> 
-> 
-> > [0]
-> > https://techhub.hpe.com/eginfolib/networking/docs/switches/7500/5200-1938a_l2-lan_cg/content/495503472.htm
-> > 
-> > > 
-> > >   static __always_inline int proto_is_vlan(__u16 h_proto)
-> > >   {
-> > > 	return !!(h_proto == bpf_htons(ETH_P_8021Q) ||
-> > > 		  h_proto == bpf_htons(ETH_P_8021AD));
-> > >   }
-> > > 
-> > > [1] https://github.com/xdp-project/bpf-examples/blob/master/include/xdp/parsing_helpers.h#L75-L79
-> > > 
-> > > Cc. Andrew Lunn, as I notice DSA have a fake VLAN define ETH_P_DSA_8021Q
-> > > (in file include/uapi/linux/if_ether.h)
-> > > Is this actually in use?
-> > > Maybe some hardware can "VLAN" offload this?
-> > > 
-> > > 
-> > > > What about rephrasing it this way:
-> > > > 
-> > > > In case of success, vlan_proto contains VLAN protocol identifier (TPID),
-> > > > vlan_tag contains the remaining 16 bits of a 802.1Q tag (PCP+DEI+VID).
-> > > > 
-> > > 
-> > > Hmm, I think we can improve this further. This text becomes part of the
-> > > documentation for end-users (target audience).  Thus, I think it is
-> > > worth being more verbose and even mention the existing defines that we
-> > > are expecting end-users to take advantage of.
-> > > 
-> > > What about:
-> > > 
-> > > In case of success. The VLAN EtherType is stored in vlan_proto (usually
-> > > either ETH_P_8021Q or ETH_P_8021AD) also known as TPID (Tag Protocol
-> > > IDentifier). The VLAN tag is stored in vlan_tag, which is a 16-bit field
-> > > containing sub-fields (PCP+DEI+VID). The VLAN ID (VID) is 12-bits
-> > > commonly extracted using mask VLAN_VID_MASK (0x0fff).  For the meaning
-> > > of the sub-fields Priority Code Point (PCP) and Drop Eligible Indicator
-> > > (DEI) (formerly CFI) please reference other documentation. Remember
-> > > these 16-bit fields are stored in network-byte. Thus, transformation
-> > > with byte-order helper functions like bpf_ntohs() are needed.
-> > > 
-> > 
-> > AFAIK, vlan_tag is stored in host byte order, this is how it is in skb.
-> 
-> I'm not sure we should follow SKB storage scheme for XDP.
+On Wed, Jul 5, 2023 at 8:57=E2=80=AFAM Alexander Lobakin
+<aleksander.lobakin@intel.com> wrote:
 >
+> As an intermediate step, remove all page splitting/recyclig code. Just
 
-I think following SKB convention is a good idea in this particular case. As I 
-have mentioned below, in ice VLAN TCI in descriptor already comes in LE, so no 
-point in converting it into BE, so somebody would use bpf_ntohs() later anyway. 
-We are not the only manufacturer that does this.
+Spelling issue: "recycling"
 
-> > In ice, we receive VLAN tag in descriptor already in LE.
-> > Only protocol is BE (network byte order). So I would replace the last 2
-> > sentences with the following:
-> > 
-> > vlan_tag is stored in host byte order, so no byte order conversion is needed.
-> 
-> Yikes, that was unexpected.  This needs to be heavily documented in docs.
-
-You mean the motivation, why it is so and not the other way around?
-
-> 
-> When parsing packets, it is in network-byte-order, else my code is wrong
-> here[1]:
-> 
->   [1] https://github.com/xdp-project/bpf-examples/blob/master/include/xdp/parsing_helpers.h#L122
-> 
-> I'm accessing the skb->vlan_tci here [2], and I notice I don't do any
-> byte-order conversions, so fortunately I didn't make a code mistake.
-> 
->   [2] https://github.com/xdp-project/bpf-examples/blob/master/traffic-pacing-edt/edt_pacer_vlan.c#L215
+> always allocate a new page and don't touch its refcount, so that it gets
+> freed by the core stack later.
+> Same for the "in-place" recycling, i.e. when an unused buffer gets
+> assigned to a first needs-refilling descriptor. In some cases, this
+> was leading to moving up to 63 &iavf_rx_buf structures around the ring
+> on a per-field basis -- not something wanted on hotpath.
+> The change allows to greatly simplify certain parts of the code:
 >
+> Function: add/remove: 0/2 grow/shrink: 1/3 up/down: 3/-494 (-491)
+>
+> Although the array of &iavf_rx_buf is barely used now and could be
+> replaced with just page pointer array, don't touch it now to not
+> complicate replacing it with libie Rx buffer struct later on.
+> No surprise perf loses up to 30% here, but that regression will go
+> away once PP lands.
+>
+> Signed-off-by: Alexander Lobakin <aleksander.lobakin@intel.com>
+> ---
+>  drivers/net/ethernet/intel/iavf/iavf_txrx.c | 151 ++------------------
+>  drivers/net/ethernet/intel/iavf/iavf_txrx.h |   8 --
+>  2 files changed, 13 insertions(+), 146 deletions(-)
+>
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.c b/drivers/net/et=
+hernet/intel/iavf/iavf_txrx.c
+> index a85b270fc769..789b10815d7f 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.c
+> @@ -723,7 +723,7 @@ static void iavf_clean_rx_ring(struct iavf_ring *rx_r=
+ing)
+>                                      DMA_FROM_DEVICE,
+>                                      IAVF_RX_DMA_ATTR);
+>
+> -               __page_frag_cache_drain(rx_bi->page, rx_bi->pagecnt_bias)=
+;
+> +               __free_pages(rx_bi->page, iavf_rx_pg_order(rx_ring));
+>
+>                 rx_bi->page =3D NULL;
+>                 rx_bi->page_offset =3D 0;
+> @@ -735,7 +735,6 @@ static void iavf_clean_rx_ring(struct iavf_ring *rx_r=
+ing)
+>         /* Zero out the descriptor ring */
+>         memset(rx_ring->desc, 0, rx_ring->size);
+>
+> -       rx_ring->next_to_alloc =3D 0;
+>         rx_ring->next_to_clean =3D 0;
+>         rx_ring->next_to_use =3D 0;
+>  }
+> @@ -791,7 +790,6 @@ int iavf_setup_rx_descriptors(struct iavf_ring *rx_ri=
+ng)
+>                 goto err;
+>         }
+>
+> -       rx_ring->next_to_alloc =3D 0;
+>         rx_ring->next_to_clean =3D 0;
+>         rx_ring->next_to_use =3D 0;
+>
+> @@ -811,9 +809,6 @@ static inline void iavf_release_rx_desc(struct iavf_r=
+ing *rx_ring, u32 val)
+>  {
+>         rx_ring->next_to_use =3D val;
+>
+> -       /* update next to alloc since we have filled the ring */
+> -       rx_ring->next_to_alloc =3D val;
+> -
+>         /* Force memory writes to complete before letting h/w
+>          * know there are new descriptors to fetch.  (Only
+>          * applicable for weak-ordered memory model archs,
+> @@ -837,12 +832,6 @@ static bool iavf_alloc_mapped_page(struct iavf_ring =
+*rx_ring,
+>         struct page *page =3D bi->page;
+>         dma_addr_t dma;
+>
+> -       /* since we are recycling buffers we should seldom need to alloc =
+*/
+> -       if (likely(page)) {
+> -               rx_ring->rx_stats.page_reuse_count++;
+> -               return true;
+> -       }
+> -
+>         /* alloc new page for storage */
+>         page =3D dev_alloc_pages(iavf_rx_pg_order(rx_ring));
+>         if (unlikely(!page)) {
+> @@ -869,9 +858,6 @@ static bool iavf_alloc_mapped_page(struct iavf_ring *=
+rx_ring,
+>         bi->page =3D page;
+>         bi->page_offset =3D IAVF_SKB_PAD;
+>
+> -       /* initialize pagecnt_bias to 1 representing we fully own page */
+> -       bi->pagecnt_bias =3D 1;
+> -
+>         return true;
+>  }
+>
+> @@ -1103,91 +1089,6 @@ static bool iavf_cleanup_headers(struct iavf_ring =
+*rx_ring, struct sk_buff *skb)
+>         return false;
+>  }
+>
+> -/**
+> - * iavf_reuse_rx_page - page flip buffer and store it back on the ring
+> - * @rx_ring: rx descriptor ring to store buffers on
+> - * @old_buff: donor buffer to have page reused
+> - *
+> - * Synchronizes page for reuse by the adapter
+> - **/
+> -static void iavf_reuse_rx_page(struct iavf_ring *rx_ring,
+> -                              struct iavf_rx_buffer *old_buff)
+> -{
+> -       struct iavf_rx_buffer *new_buff;
+> -       u16 nta =3D rx_ring->next_to_alloc;
+> -
+> -       new_buff =3D &rx_ring->rx_bi[nta];
+> -
+> -       /* update, and store next to alloc */
+> -       nta++;
+> -       rx_ring->next_to_alloc =3D (nta < rx_ring->count) ? nta : 0;
+> -
+> -       /* transfer page from old buffer to new buffer */
+> -       new_buff->dma           =3D old_buff->dma;
+> -       new_buff->page          =3D old_buff->page;
+> -       new_buff->page_offset   =3D old_buff->page_offset;
+> -       new_buff->pagecnt_bias  =3D old_buff->pagecnt_bias;
+> -}
+> -
+> -/**
+> - * iavf_can_reuse_rx_page - Determine if this page can be reused by
+> - * the adapter for another receive
+> - *
+> - * @rx_buffer: buffer containing the page
+> - *
+> - * If page is reusable, rx_buffer->page_offset is adjusted to point to
+> - * an unused region in the page.
+> - *
+> - * For small pages, @truesize will be a constant value, half the size
+> - * of the memory at page.  We'll attempt to alternate between high and
+> - * low halves of the page, with one half ready for use by the hardware
+> - * and the other half being consumed by the stack.  We use the page
+> - * ref count to determine whether the stack has finished consuming the
+> - * portion of this page that was passed up with a previous packet.  If
+> - * the page ref count is >1, we'll assume the "other" half page is
+> - * still busy, and this page cannot be reused.
+> - *
+> - * For larger pages, @truesize will be the actual space used by the
+> - * received packet (adjusted upward to an even multiple of the cache
+> - * line size).  This will advance through the page by the amount
+> - * actually consumed by the received packets while there is still
+> - * space for a buffer.  Each region of larger pages will be used at
+> - * most once, after which the page will not be reused.
+> - *
+> - * In either case, if the page is reusable its refcount is increased.
+> - **/
+> -static bool iavf_can_reuse_rx_page(struct iavf_rx_buffer *rx_buffer)
+> -{
+> -       unsigned int pagecnt_bias =3D rx_buffer->pagecnt_bias;
+> -       struct page *page =3D rx_buffer->page;
+> -
+> -       /* Is any reuse possible? */
+> -       if (!dev_page_is_reusable(page))
+> -               return false;
+> -
+> -#if (PAGE_SIZE < 8192)
+> -       /* if we are only owner of page we can reuse it */
+> -       if (unlikely((page_count(page) - pagecnt_bias) > 1))
+> -               return false;
+> -#else
+> -#define IAVF_LAST_OFFSET \
+> -       (SKB_WITH_OVERHEAD(PAGE_SIZE) - IAVF_RXBUFFER_2048)
+> -       if (rx_buffer->page_offset > IAVF_LAST_OFFSET)
+> -               return false;
+> -#endif
+> -
+> -       /* If we have drained the page fragment pool we need to update
+> -        * the pagecnt_bias and page count so that we fully restock the
+> -        * number of references the driver holds.
+> -        */
+> -       if (unlikely(!pagecnt_bias)) {
+> -               page_ref_add(page, USHRT_MAX);
+> -               rx_buffer->pagecnt_bias =3D USHRT_MAX;
+> -       }
+> -
+> -       return true;
+> -}
+> -
+>  /**
+>   * iavf_add_rx_frag - Add contents of Rx buffer to sk_buff
+>   * @rx_ring: rx descriptor ring to transact packets on
+> @@ -1216,13 +1117,6 @@ static void iavf_add_rx_frag(struct iavf_ring *rx_=
+ring,
+>
+>         skb_add_rx_frag(skb, skb_shinfo(skb)->nr_frags, rx_buffer->page,
+>                         rx_buffer->page_offset, size, truesize);
+> -
+> -       /* page is being used so we must update the page offset */
+> -#if (PAGE_SIZE < 8192)
+> -       rx_buffer->page_offset ^=3D truesize;
+> -#else
+> -       rx_buffer->page_offset +=3D truesize;
+> -#endif
+>  }
+>
+>  /**
+> @@ -1250,9 +1144,6 @@ static struct iavf_rx_buffer *iavf_get_rx_buffer(st=
+ruct iavf_ring *rx_ring,
+>                                       size,
+>                                       DMA_FROM_DEVICE);
+>
+> -       /* We have pulled a buffer for use, so decrement pagecnt_bias */
+> -       rx_buffer->pagecnt_bias--;
+> -
+>         return rx_buffer;
+>  }
+>
+> @@ -1293,23 +1184,15 @@ static struct sk_buff *iavf_build_skb(struct iavf=
+_ring *rx_ring,
+>         skb_reserve(skb, IAVF_SKB_PAD);
+>         __skb_put(skb, size);
+>
+> -       /* buffer is used by skb, update page_offset */
+> -#if (PAGE_SIZE < 8192)
+> -       rx_buffer->page_offset ^=3D truesize;
+> -#else
+> -       rx_buffer->page_offset +=3D truesize;
+> -#endif
+> -
+>         return skb;
+>  }
+>
+>  /**
+> - * iavf_put_rx_buffer - Clean up used buffer and either recycle or free
+> + * iavf_put_rx_buffer - Unmap used buffer
+>   * @rx_ring: rx descriptor ring to transact packets on
+>   * @rx_buffer: rx buffer to pull data from
+>   *
+> - * This function will clean up the contents of the rx_buffer.  It will
+> - * either recycle the buffer or unmap it and free the associated resourc=
+es.
+> + * This function will unmap the buffer after it's written by HW.
+>   */
+>  static void iavf_put_rx_buffer(struct iavf_ring *rx_ring,
+>                                struct iavf_rx_buffer *rx_buffer)
+> @@ -1317,21 +1200,10 @@ static void iavf_put_rx_buffer(struct iavf_ring *=
+rx_ring,
+>         if (!rx_buffer)
+>                 return;
+>
+> -       if (iavf_can_reuse_rx_page(rx_buffer)) {
+> -               /* hand second half of page back to the ring */
+> -               iavf_reuse_rx_page(rx_ring, rx_buffer);
+> -               rx_ring->rx_stats.page_reuse_count++;
+> -       } else {
+> -               /* we are not reusing the buffer so unmap it */
+> -               dma_unmap_page_attrs(rx_ring->dev, rx_buffer->dma,
+> -                                    iavf_rx_pg_size(rx_ring),
+> -                                    DMA_FROM_DEVICE, IAVF_RX_DMA_ATTR);
+> -               __page_frag_cache_drain(rx_buffer->page,
+> -                                       rx_buffer->pagecnt_bias);
+> -       }
+> -
+> -       /* clear contents of buffer_info */
+> -       rx_buffer->page =3D NULL;
+> +       /* we are not reusing the buffer so unmap it */
+> +       dma_unmap_page_attrs(rx_ring->dev, rx_buffer->dma,
+> +                            iavf_rx_pg_size(rx_ring),
+> +                            DMA_FROM_DEVICE, IAVF_RX_DMA_ATTR);
 
-In raw packet, VLAN TCI is in network byte order, but skb requires NIC/driver
-to convert it into host byte order before putting it into skb.
- 
-> > vlan_proto is stored in network byte order, the suggested way to use this value:
-> > 
-> > vlan_proto == bpf_htons(ETH_P_8021Q)
-> > 
-> > > 
-> > > 
-> 
-> --Jesper
-> 
+Rather than reorder all this I would just do the dma_unmap_page_attrs
+and then leave the assignment of NULL to rx_buffer->page. It should
+make this a bit easier to clean up the code below.
+
+>  }
+>
+>  /**
+> @@ -1431,15 +1303,18 @@ static int iavf_clean_rx_irq(struct iavf_ring *rx=
+_ring, int budget)
+>                 else
+>                         skb =3D iavf_build_skb(rx_ring, rx_buffer, size);
+>
+> +               iavf_put_rx_buffer(rx_ring, rx_buffer);
+> +
+
+This should stay below where it was.
+
+>                 /* exit if we failed to retrieve a buffer */
+>                 if (!skb) {
+>                         rx_ring->rx_stats.alloc_buff_failed++;
+> -                       if (rx_buffer && size)
+> -                               rx_buffer->pagecnt_bias++;
+> +                       __free_pages(rx_buffer->page,
+> +                                    iavf_rx_pg_order(rx_ring));
+> +                       rx_buffer->page =3D NULL;
+>                         break;
+>                 }
+
+This code was undoing the iavf_get_rx_buffer decrement of pagecnt_bias
+and then bailing since we have halted forward progress due to an skb
+allocation failure. As such we should just be removing the if
+statement and the increment of pagecnt_bias.
+
+>
+> -               iavf_put_rx_buffer(rx_ring, rx_buffer);
+> +               rx_buffer->page =3D NULL;
+>                 cleaned_count++;
+>
+>                 if (iavf_is_non_eop(rx_ring, rx_desc, skb))
+
+If iavf_put_rx_buffer just does the unmap and assignment of NULL then
+it could just be left here as is.
+
+> diff --git a/drivers/net/ethernet/intel/iavf/iavf_txrx.h b/drivers/net/et=
+hernet/intel/iavf/iavf_txrx.h
+> index 4b412f7662e4..2170a77f8c8d 100644
+> --- a/drivers/net/ethernet/intel/iavf/iavf_txrx.h
+> +++ b/drivers/net/ethernet/intel/iavf/iavf_txrx.h
+> @@ -266,12 +266,7 @@ struct iavf_tx_buffer {
+>  struct iavf_rx_buffer {
+>         dma_addr_t dma;
+>         struct page *page;
+> -#if (BITS_PER_LONG > 32) || (PAGE_SIZE >=3D 65536)
+>         __u32 page_offset;
+> -#else
+> -       __u16 page_offset;
+> -#endif
+> -       __u16 pagecnt_bias;
+>  };
+>
+>  struct iavf_queue_stats {
+> @@ -293,8 +288,6 @@ struct iavf_rx_queue_stats {
+>         u64 non_eop_descs;
+>         u64 alloc_page_failed;
+>         u64 alloc_buff_failed;
+> -       u64 page_reuse_count;
+> -       u64 realloc_count;
+>  };
+>
+>  enum iavf_ring_state_t {
+> @@ -374,7 +367,6 @@ struct iavf_ring {
+>         struct iavf_q_vector *q_vector; /* Backreference to associated ve=
+ctor */
+>
+>         struct rcu_head rcu;            /* to avoid race on free */
+> -       u16 next_to_alloc;
+>         struct sk_buff *skb;            /* When iavf_clean_rx_ring_irq() =
+must
+>                                          * return before it sees the EOP =
+for
+>                                          * the current packet, we save th=
+at skb
+> --
+> 2.41.0
+>
+> _______________________________________________
+> Intel-wired-lan mailing list
+> Intel-wired-lan@osuosl.org
+> https://lists.osuosl.org/mailman/listinfo/intel-wired-lan
 
