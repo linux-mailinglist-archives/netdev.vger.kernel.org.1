@@ -1,290 +1,334 @@
-Return-Path: <netdev+bounces-15726-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15727-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 295BB749601
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:06:41 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 66753749658
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:26:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3D9C2811D8
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:06:39 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6F60A1C20C24
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:26:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE110110E;
-	Thu,  6 Jul 2023 07:06:37 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1A4A3111B;
+	Thu,  6 Jul 2023 07:26:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB4D1102
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 07:06:37 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5321727
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 00:06:35 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688627194;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
-	b=WPi70VA2OFQNnPhOkqpzgUs2IzgpyuoN9KD9hPEDU78pzeX4b17JRJgP1fmx6zumQhFZRm
-	yx8ezUqy3s1J3WtOPJ+Rzo8flGyRJJ7A4I99nyfNzGTZpSKNQucyrykeODOaJe0Zd8t1Zg
-	2iT5P8/s2PchwTlSpZ+l7hVx0cwK3pQ=
-Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
- [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-544-4ZJIsGkyMoiZf8YHdd5Fkg-1; Thu, 06 Jul 2023 03:06:33 -0400
-X-MC-Unique: 4ZJIsGkyMoiZf8YHdd5Fkg-1
-Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-bd69bb4507eso515717276.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688627193; x=1691219193;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
-        b=YLSRN7QlGhEzqZCBQq1ZGSXcoaRdyYZn1ebgocV/gUO+4FMn5O1HaLXmG5HeiZK1fK
-         sTt0uuEdFTrQx1V1SPujcPEXj5Lcy2nW8IMR9KE2/33zR/avk8DT7jI2rh5S/S7crasb
-         7P1q17vPDlKXvJt49QkpAzP4SbySpWjY4bb79T8C65T0XrkfnjgJCJ+xyCYp4Anu4al2
-         dZliKnOX5mvFKo7dt7nLHqBXFmSOnJO8WPinB26VChkBrHuYVmQWAcJ/70ecEMe7QLP0
-         AzWobvQMwe+WtaBlgcneLx3PENAjJxggOwN2ea7dp+Qvr4ha7O2ifsws0nlH+lUhCIC6
-         085A==
-X-Gm-Message-State: ABy/qLbGJqIUCjb0G9UD0C5+FCSzzMyRuJTDHn6SouCJeG/6/h4GejYC
-	aqLbguHoIreUB19S3uNASk32tg33XGL836mODmb3JHhnpw+8becYlehG+arqjwoRj9ZFa4V4WNU
-	PGrH2CXeNNG7+X+J//1gaVJjOBP/3OnAzchj0AE49
-X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id s4-20020a25b944000000b00c4d96a25d96mr2165156ybm.34.1688627193147;
-        Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHx7qsljWMwc5b+pAqOOzRL+zpISDZYM3lQSEoxYQUnDdgCGQcufSPdW0EttuPM5MBdQ9P2dGHiqiplFW64hl8=
-X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id
- s4-20020a25b944000000b00c4d96a25d96mr2165135ybm.34.1688627192836; Thu, 06 Jul
- 2023 00:06:32 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 04458110E
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 07:26:09 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 390521BD8
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 00:26:04 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qHJMf-0004nH-2I; Thu, 06 Jul 2023 09:25:21 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id 3B9B51EA41D;
+	Thu,  6 Jul 2023 07:25:14 +0000 (UTC)
+Date: Thu, 6 Jul 2023 09:25:13 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Judith Mendez <jm@ti.com>
+Cc: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
+	Wolfgang Grandegger <wg@grandegger.com>,
+	"David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+	linux-can@vger.kernel.org, netdev@vger.kernel.org,
+	linux-kernel@vger.kernel.org, Schuyler Patton <spatton@ti.com>,
+	Tero Kristo <kristo@kernel.org>, Rob Herring <robh+dt@kernel.org>,
+	Krzysztof Kozlowski <krzysztof.kozlowski+dt@linaro.org>,
+	devicetree@vger.kernel.org,
+	Oliver Hartkopp <socketcan@hartkopp.net>,
+	Simon Horman <simon.horman@corigine.com>
+Subject: Re: [PATCH 2/2] can: m_can: Add hrtimer to generate software
+ interrupt
+Message-ID: <20230706-unstopped-skedaddle-7168f2b12189-mkl@pengutronix.de>
+References: <20230705195356.866774-1-jm@ti.com>
+ <20230705195356.866774-3-jm@ti.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
-In-Reply-To: <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Thu, 6 Jul 2023 09:05:56 +0200
-Message-ID: <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="tmycw3ojonpci4ns"
+Content-Disposition: inline
+In-Reply-To: <20230705195356.866774-3-jm@ti.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
-> wrote:
-> >
-> > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redha=
-t.com> wrote:
-> > > >
-> > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrot=
-e:
-> > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@r=
-edhat.com> wrote:
-> > > > > >
-> > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin =
-wrote:
-> > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <ms=
-t@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9re=
-z wrote:
-> > > > > > > > > With the current code it is accepted as long as userland =
-send it.
-> > > > > > > > >
-> > > > > > > > > Although userland should not set a feature flag that has =
-not been
-> > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the curren=
-t code will not
-> > > > > > > > > complain for it.
-> > > > > > > > >
-> > > > > > > > > Since there is no specific reason for any parent to rejec=
-t that backend
-> > > > > > > > > feature bit when it has been proposed, let's control it a=
-t vdpa frontend
-> > > > > > > > > level. Future patches may move this control to the parent=
- driver.
-> > > > > > > > >
-> > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE=
-_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
-> > > > > > > >
-> > > > > > > > Please do send v3. And again, I don't want to send "after d=
-river ok" hack
-> > > > > > > > upstream at all, I merged it in next just to give it some t=
-esting.
-> > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > >
-> > > > > > >
-> > > > > > > Current devices do not support that semantic.
-> > > > > >
-> > > > > > Which devices specifically access the ring after DRIVER_OK but =
-before
-> > > > > > a kick?
-> > > > > >
-> > > > >
-> > > > > Previous versions of the QEMU LM series did a spurious kick to st=
-art
-> > > > > traffic at the LM destination [1]. When it was proposed, that spu=
-rious
-> > > > > kick was removed from the series because to check for descriptors
-> > > > > after driver_ok, even without a kick, was considered work of the
-> > > > > parent driver.
-> > > > >
-> > > > > I'm ok to go back to this spurious kick, but I'm not sure if the =
-hw
-> > > > > will read the ring before the kick actually. I can ask.
-> > > > >
-> > > > > Thanks!
-> > > > >
-> > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg0=
-2775.html
-> > > >
-> > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no=
-?
-> > >
-> > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
-> > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > >
-> > > But this reminds me one thing, as the thread is going too long, I
-> > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
-> > > supported?
-> > >
-> > > Thanks
-> >
-> > I don't see what does one have to do with another ...
-> >
-> > I think with RING_RESET we had another solution, enable rings
-> > mapping them to a zero page, then reset and re-enable later.
->
-> As discussed before, this seems to have some problems:
->
-> 1) The behaviour is not clarified in the document
-> 2) zero is a valid IOVA
->
 
-I think we're not on the same page here.
+--tmycw3ojonpci4ns
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-As I understood, rings mapped to a zero page means essentially an
-avail ring whose avail_idx is always 0, offered to the device instead
-of the guest's ring. Once all CVQ commands are processed, we use
-RING_RESET to switch to the right ring, being guest's or SVQ vring.
+On 05.07.2023 14:53:56, Judith Mendez wrote:
+> Introduce timer polling method to MCAN since some SoCs may not
+> have M_CAN interrupt routed to A53 Linux and do not have
+> interrupt property in device tree M_CAN node.
+>=20
+> On AM62x SoC, MCANs on MCU domain do not have hardware interrupt
+> routed to A53 Linux, instead they will use timer polling method.
+>=20
+> Add an hrtimer to MCAN class device. Each MCAN will have its own
+> hrtimer instantiated if there is no hardware interrupt found in
+> device tree M_CAN node. The timer will generate a software
+> interrupt every 1 ms. In hrtimer callback, we check if there is
+> a transaction pending by reading a register, then process by
+> calling the isr if there is.
+>=20
+> Tested-by: Hiago De Franco <hiago.franco@toradex.com> # Toradex Verdin AM=
+62
+> Reviewed-by: Tony Lindgren <tony@atomide.com>
+> Signed-off-by: Judith Mendez <jm@ti.com>
+> ---
+> Changelog:
+> v9:
+> - Change add MS to HRTIMER_POLL_INTERVAL
+> - Change syntax from "=3D 0" to "!"
+> v8:
+> - Cancel hrtimer after interrupts in m_can_stop
+> - Move assignment of hrtimer_callback to m_can_class_register()
+> - Initialize irq =3D 0 if polling mode is used
 
+This change has been lost :(
 
+> - Add reson for polling mode in commit msg
+> - Remove unrelated change
+> - Remove polling flag
+> v7:
+> - Clean up m_can_platform.c if/else section after removing poll-interval
+> - Remove poll-interval from patch description
+> v6:
+> - Move hrtimer stop/start function calls to m_can_open and m_can_close to
+> support power suspend/resume
+> v5:
+> - Change dev_dbg to dev_info if hardware interrupt exists and polling
+> is enabled
+> v4:
+> - No changes
+> v3:
+> - Create a define for 1 ms polling interval
+> - Change plarform_get_irq to optional to not print error msg
+> v2:
+> - Add functionality to check for 'poll-interval' property in MCAN node=20
+> - Add 'polling' flag in driver to check if device is using polling method
+> - Check for timer polling and hardware interrupt cases, default to
+> hardware interrupt method
+> - Change ns_to_ktime() to ms_to_ktime()
+> ---
+>  drivers/net/can/m_can/m_can.c          | 32 +++++++++++++++++++++++++-
+>  drivers/net/can/m_can/m_can.h          |  3 +++
+>  drivers/net/can/m_can/m_can_platform.c | 23 +++++++++++++++---
+>  3 files changed, 54 insertions(+), 4 deletions(-)
+>=20
+> diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
+> index c5af92bcc9c9..13fd84b2e2dd 100644
+> --- a/drivers/net/can/m_can/m_can.c
+> +++ b/drivers/net/can/m_can/m_can.c
+> @@ -11,6 +11,7 @@
+>  #include <linux/bitfield.h>
+>  #include <linux/can/dev.h>
+>  #include <linux/ethtool.h>
+> +#include <linux/hrtimer.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/io.h>
+>  #include <linux/iopoll.h>
+> @@ -308,6 +309,9 @@ enum m_can_reg {
+>  #define TX_EVENT_MM_MASK	GENMASK(31, 24)
+>  #define TX_EVENT_TXTS_MASK	GENMASK(15, 0)
+> =20
+> +/* Hrtimer polling interval */
+> +#define HRTIMER_POLL_INTERVAL_MS		1
+> +
+>  /* The ID and DLC registers are adjacent in M_CAN FIFO memory,
+>   * and we can save a (potentially slow) bus round trip by combining
+>   * reads and writes to them.
+> @@ -1414,6 +1418,12 @@ static int m_can_start(struct net_device *dev)
+> =20
+>  	m_can_enable_all_interrupts(cdev);
+> =20
+> +	if (!dev->irq) {
+> +		dev_dbg(cdev->dev, "Start hrtimer\n");
+> +		hrtimer_start(&cdev->hrtimer, ms_to_ktime(HRTIMER_POLL_INTERVAL_MS),
+> +			      HRTIMER_MODE_REL_PINNED);
+> +	}
+> +
+>  	return 0;
+>  }
+> =20
+> @@ -1568,6 +1578,11 @@ static void m_can_stop(struct net_device *dev)
+>  {
+>  	struct m_can_classdev *cdev =3D netdev_priv(dev);
+> =20
+> +	if (!dev->irq) {
+> +		dev_dbg(cdev->dev, "Stop hrtimer\n");
+> +		hrtimer_cancel(&cdev->hrtimer);
+> +	}
+> +
+>  	/* disable all interrupts */
+>  	m_can_disable_all_interrupts(cdev);
+> =20
+> @@ -1793,6 +1808,18 @@ static netdev_tx_t m_can_start_xmit(struct sk_buff=
+ *skb,
+>  	return NETDEV_TX_OK;
+>  }
+> =20
+> +static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
+> +{
+> +	struct m_can_classdev *cdev =3D container_of(timer, struct
+> +						   m_can_classdev, hrtimer);
+> +
+> +	m_can_isr(0, cdev->net);
+> +
+> +	hrtimer_forward_now(timer, ms_to_ktime(HRTIMER_POLL_INTERVAL_MS));
+> +
+> +	return HRTIMER_RESTART;
+> +}
+> +
+>  static int m_can_open(struct net_device *dev)
+>  {
+>  	struct m_can_classdev *cdev =3D netdev_priv(dev);
+> @@ -1831,7 +1858,7 @@ static int m_can_open(struct net_device *dev)
+>  		err =3D request_threaded_irq(dev->irq, NULL, m_can_isr,
+>  					   IRQF_ONESHOT,
+>  					   dev->name, dev);
+> -	} else {
+> +	} else if (dev->irq) {
+>  		err =3D request_irq(dev->irq, m_can_isr, IRQF_SHARED, dev->name,
+>  				  dev);
+>  	}
+> @@ -2027,6 +2054,9 @@ int m_can_class_register(struct m_can_classdev *cde=
+v)
+>  			goto clk_disable;
+>  	}
+> =20
+> +	if (!cdev->net->irq)
+> +		cdev->hrtimer.function =3D &hrtimer_callback;
+> +
+>  	ret =3D m_can_dev_setup(cdev);
+>  	if (ret)
+>  		goto rx_offload_del;
+> diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
+> index a839dc71dc9b..2ac18ac867a4 100644
+> --- a/drivers/net/can/m_can/m_can.h
+> +++ b/drivers/net/can/m_can/m_can.h
+> @@ -15,6 +15,7 @@
+>  #include <linux/device.h>
+>  #include <linux/dma-mapping.h>
+>  #include <linux/freezer.h>
+> +#include <linux/hrtimer.h>
+>  #include <linux/interrupt.h>
+>  #include <linux/io.h>
+>  #include <linux/iopoll.h>
+> @@ -93,6 +94,8 @@ struct m_can_classdev {
+>  	int is_peripheral;
+> =20
+>  	struct mram_cfg mcfg[MRAM_CFG_NUM];
+> +
+> +	struct hrtimer hrtimer;
+>  };
+> =20
+>  struct m_can_classdev *m_can_class_allocate_dev(struct device *dev, int =
+sizeof_priv);
+> diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_c=
+an/m_can_platform.c
+> index 94dc82644113..76d11ce38220 100644
+> --- a/drivers/net/can/m_can/m_can_platform.c
+> +++ b/drivers/net/can/m_can/m_can_platform.c
+> @@ -5,6 +5,7 @@
+>  //
+>  // Copyright (C) 2018-19 Texas Instruments Incorporated - http://www.ti.=
+com/
+> =20
+> +#include <linux/hrtimer.h>
+>  #include <linux/phy/phy.h>
+>  #include <linux/platform_device.h>
+> =20
+> @@ -96,12 +97,28 @@ static int m_can_plat_probe(struct platform_device *p=
+dev)
+>  		goto probe_fail;
 
-> Thanks
->
-> >
-> > > >
-> > > >
-> > > >
-> > > > > > > My plan was to convert
-> > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorr=
-y if I
-> > > > > > > was not explicit enough.
-> > > > > > >
-> > > > > > > The only solution I can see to that is to trap & emulate in t=
-he vdpa
-> > > > > > > (parent?) driver, as talked in virtio-comment. But that compl=
-icates
-> > > > > > > the architecture:
-> > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > * Store vq enable state separately, at
-> > > > > > > vdpa->config->set_vq_ready(true), but not transmit that enabl=
-e to hw
-> > > > > > > * Store the doorbell state separately, but do not configure i=
-t to the
-> > > > > > > device directly.
-> > > > > > >
-> > > > > > > But how to recover if the device cannot configure them at kic=
-k time,
-> > > > > > > for example?
-> > > > > > >
-> > > > > > > Maybe we can just fail if the parent driver does not support =
-enabling
-> > > > > > > the vq after DRIVER_OK? That way no new feature flag is neede=
-d.
-> > > > > > >
-> > > > > > > Thanks!
-> > > > > > >
-> > > > > > > >
-> > > > > > > > > ---
-> > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/l=
-inux/kernel/git/mst
-> > > > > > > > > commit. Please let me know if I should send a v3 of [1] i=
-nstead.
-> > > > > > > > >
-> > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send=
--email-mst@kernel.org/T/
-> > > > > > > > > ---
-> > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > >
-> > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
-> > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioc=
-tl(struct file *filep,
-> > > > > > > > >  {
-> > > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
-> > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->conf=
-ig;
-> > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > -     u64 features;
-> > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > >       long r =3D 0;
-> > > > > > > > >
-> > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
-> > > > > > > > >               if (copy_from_user(&features, featurep, siz=
-eof(features)))
-> > > > > > > > >                       return -EFAULT;
-> > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > +                     parent_features =3D ops->get_backen=
-d_features(v->vdpa);
-> > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURE=
-S |
-> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SU=
-SPEND) |
-> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RE=
-SUME) |
-> > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_EN=
-ABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > +                              parent_features))
-> > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUS=
-PEND)) &&
-> > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > --
-> > > > > > > > > 2.39.3
-> > > > > > > >
-> > > > > >
-> > > >
-> >
->
+Please set "irq" to 0 during declaration.
 
+> =20
+>  	addr =3D devm_platform_ioremap_resource_byname(pdev, "m_can");
+> -	irq =3D platform_get_irq_byname(pdev, "int0");
+> -	if (IS_ERR(addr) || irq < 0) {
+> -		ret =3D -EINVAL;
+> +	if (IS_ERR(addr)) {
+> +		ret =3D PTR_ERR(addr);
+>  		goto probe_fail;
+>  	}
+> =20
+> +	if (device_property_present(mcan_class->dev, "interrupts") ||
+> +	    device_property_present(mcan_class->dev, "interrupt-names")) {
+> +		irq =3D platform_get_irq_byname(pdev, "int0");
+> +		if (irq =3D=3D -EPROBE_DEFER) {
+> +			ret =3D -EPROBE_DEFER;
+> +			goto probe_fail;
+> +		}
+> +		if (irq < 0) {
+> +			ret =3D -EINVAL;
+
+Please return the original error value.
+
+> +			goto probe_fail;
+> +		}
+> +	} else {
+> +		dev_dbg(mcan_class->dev, "Polling enabled, initialize hrtimer");
+> +		hrtimer_init(&mcan_class->hrtimer, CLOCK_MONOTONIC,
+> +			     HRTIMER_MODE_REL_PINNED);
+> +	}
+> +
+>  	/* message ram could be shared */
+>  	res =3D platform_get_resource_byname(pdev, IORESOURCE_MEM, "message_ram=
+");
+>  	if (!res) {
+> --=20
+> 2.34.1
+>=20
+>=20
+
+Marc
+
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--tmycw3ojonpci4ns
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmSmbFYACgkQvlAcSiqK
+BOgJaQgAhz4eZqUAOMPrcuu3yj+65snWRq39dbNtx7p8P3zynTmJTY/u+/5FcduW
+zPjps+bE+c+GKIPZXzsAPqVVJqxUunIFZJUC8kPEtMB1jQE9b6dGFeQlh0ssgrHg
+OfGhmKJ6IqDpOOTx5edZgBYphH0rMsoFXTiZK0QKlqjtLny0JC1iq9+zas+/YY4p
+/rbDoNFZQLcLwRAubcQHZ2ihhDvSN0kzGk89q3yCKZ489RwtGq4e+h1Ols7Sxp6+
+c0gglKT4SAETZtzOSl1O+wiKS/o8A88bPzdnWSOOhCxU2ZdouOzEEMrYyiWhZW3L
+1xrmb/4u+8uKcZb0ViUZ+LH26P8pOg==
+=mZ8A
+-----END PGP SIGNATURE-----
+
+--tmycw3ojonpci4ns--
 
