@@ -1,130 +1,311 @@
-Return-Path: <netdev+bounces-15720-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15721-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 680297495A4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:33:50 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7987B7495B0
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:36:17 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4C1351C20C41
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:33:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B967D2811F7
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:36:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1060BEDA;
-	Thu,  6 Jul 2023 06:33:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BBA72EDA;
+	Thu,  6 Jul 2023 06:36:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0297D7E8
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:33:46 +0000 (UTC)
-Received: from mail-pf1-f207.google.com (mail-pf1-f207.google.com [209.85.210.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 754801737
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:33:45 -0700 (PDT)
-Received: by mail-pf1-f207.google.com with SMTP id d2e1a72fcca58-666e5f0d639so520180b3a.3
-        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 23:33:45 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A34867E8
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:36:13 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CFEC1199E
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:36:09 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688625369;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=RW6sZxQEq7r6/MAdcOAFMIZmsNq8xRUmGtzjXz5LxLU=;
+	b=heS30NX/F4UuR0Kyl14wIf0YOGIqchhkDqcy2nuFC76XTqri3EH7Dov1pcgUMep1bZKsRN
+	B9pYfk0xerNuOiVJFJE4wuvJjLDNRVe/j/6uNf6Bm6RoCw+ydsweeaddgR9hlSM3wmhe1p
+	52XpH9syonfavtiAnRP4KgqoGnrYilI=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-451-8dsybLatMSCuFXaaTOlE-w-1; Thu, 06 Jul 2023 02:36:07 -0400
+X-MC-Unique: 8dsybLatMSCuFXaaTOlE-w-1
+Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-c64ef5bde93so344490276.0
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 23:36:07 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688625224; x=1691217224;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=rQfgqYhN80cocuiZ4CtvhG1o5YWInCsGK0oXglBkVZQ=;
-        b=VhowF+49PruCuRodJFrCNMheIxDPHcIqZtU2TzFOBh5vy4BirOaQVfSSkMF2MiHNxA
-         wwYsCSRapguSmDsjow0tv/jdCYwajywb0iGWFX4kdBgeiwZEsst2VNGUWhiKBFLv4M0d
-         JbO96u5UmXqStzv98SOI6B5R0ZeARs3yaIoXjPx5kRCkahgbpn5uENU/9qnIINEzQ53a
-         SBE5cJ0PbplEH+rv25LysQt2ohXqOfQHcF/yTkRGLY+x+qRI10hxlWo+mzTD2TsMrCil
-         ZhSpZWz2HSapilmWGxu5HGJDfV160SlVYShPHWLcKHZlUYMaqxLr+B90kVCQoe9cxNNW
-         F/Aw==
-X-Gm-Message-State: ABy/qLZQcN/bYQx04bU+K1/jYR7ZduXsUqJYiBVQ2H6/WsrJBJXw0c9K
-	HIvgIkqZZ+HK6GCt601CHGJ9nVlnMCdwSbFWgTP3yKbhU6hX
-X-Google-Smtp-Source: APBJJlHCvDebXUaazEvvRKiHgWMrvAJwTERHZkxu7vxis5raXolCfIJxGKP2pCC+Od2nQ3qJF5UTvPJThLwz78fvvXvwcefvkXK0
+        d=1e100.net; s=20221208; t=1688625367; x=1691217367;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RW6sZxQEq7r6/MAdcOAFMIZmsNq8xRUmGtzjXz5LxLU=;
+        b=HbHB9onlqAVYwrlOWYu2UbOiMAx+lZbXX8QxMF4ThFDXNnHX34Z/K8zYDyxHQAPkT/
+         UU4+Vn4zwVVqiYf4Jbwdrm/TM3R9U/XBtx0E1rBbG/Mo1JEwfWDcLdTGkOQ3eC9hqqfV
+         YeJ/PMTITVjQDsCjaGEKzJ2g3ASoh/bHexyfWPKzPdioWx2BKkHBHRTMHEn+KkdBhLaJ
+         LJLubuQCRg/UOvwGmj26VffWwC2jTcJ3d5mH0Ju4oMOkdFGvZnXEDtEt7MDSvbO/F9ZI
+         xNI5RKMvhdaPwSRPI9oCXUT8iW76dq0I4yNzrTYf1k5Hp1spBcC+/GzVmwuEDOw9lodN
+         WnLA==
+X-Gm-Message-State: ABy/qLbHZVs6pZB5jJ8iS4akXQ0iiSvksNUyyOmxKDVK/B8eEGtduVpC
+	DvwC87QCcFEb5RhfEIQtWvCmzdEQ/sUfi3wLoHrxG8UzeRQTIaQl7UOKaO6XjnO+FltvAR+zNO4
+	ikiXfZzxrQYvg6ZqES0QcSdLjelC3L5/u
+X-Received: by 2002:a25:abe4:0:b0:c5c:616:39cb with SMTP id v91-20020a25abe4000000b00c5c061639cbmr975944ybi.14.1688625367164;
+        Wed, 05 Jul 2023 23:36:07 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFECekMAxlWyeEFXBzoSN0G8Fu9nyn23my+I7VhTksunE0lAA3zV4rTA/m36+6QaByRCoLJWb4Cqj7AXCpHZng=
+X-Received: by 2002:a25:abe4:0:b0:c5c:616:39cb with SMTP id
+ v91-20020a25abe4000000b00c5c061639cbmr975933ybi.14.1688625366902; Wed, 05 Jul
+ 2023 23:36:06 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:2d9b:b0:678:e0b1:7f28 with SMTP id
- fb27-20020a056a002d9b00b00678e0b17f28mr1181998pfb.6.1688625224084; Wed, 05
- Jul 2023 23:33:44 -0700 (PDT)
-Date: Wed, 05 Jul 2023 23:33:43 -0700
-In-Reply-To: <0000000000007faf0005fe4f14b9@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000a3f45805ffcbb21f@google.com>
-Subject: Re: [syzbot] [ext4?] WARNING in ext4_file_write_iter
-From: syzbot <syzbot+5050ad0fb47527b1808a@syzkaller.appspotmail.com>
-To: adilger.kernel@dilger.ca, linux-ext4@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	netdev@vger.kernel.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <CAJaqyWd0QC6x9WHBT0x9beZyC8ZrF2y=d9HvmT0+05RtGc8_og@mail.gmail.com>
+ <eff34828-545b-956b-f400-89b585706fe4@amd.com> <20230706020603-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230706020603-mutt-send-email-mst@kernel.org>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 6 Jul 2023 08:35:30 +0200
+Message-ID: <CAJaqyWeCv6HhWni=c7xySTCyj9WAFfM3JhWL2e_mDKjHp3wPzQ@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Shannon Nelson <shannon.nelson@amd.com>, Jason Wang <jasowang@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, virtualization@lists.linux-foundation.org, 
+	kvm@vger.kernel.org
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot has found a reproducer for the following issue on:
+On Thu, Jul 6, 2023 at 8:07=E2=80=AFAM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Wed, Jul 05, 2023 at 05:07:11PM -0700, Shannon Nelson wrote:
+> > On 7/5/23 11:27 AM, Eugenio Perez Martin wrote:
+> > >
+> > > On Wed, Jul 5, 2023 at 9:50=E2=80=AFAM Jason Wang <jasowang@redhat.co=
+m> wrote:
+> > > >
+> > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@red=
+hat.com> wrote:
+> > > > >
+> > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wr=
+ote:
+> > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst=
+@redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Marti=
+n wrote:
+> > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <=
+mst@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9=
+rez wrote:
+> > > > > > > > > > With the current code it is accepted as long as userlan=
+d send it.
+> > > > > > > > > >
+> > > > > > > > > > Although userland should not set a feature flag that ha=
+s not been
+> > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the curr=
+ent code will not
+> > > > > > > > > > complain for it.
+> > > > > > > > > >
+> > > > > > > > > > Since there is no specific reason for any parent to rej=
+ect that backend
+> > > > > > > > > > feature bit when it has been proposed, let's control it=
+ at vdpa frontend
+> > > > > > > > > > level. Future patches may move this control to the pare=
+nt driver.
+> > > > > > > > > >
+> > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENAB=
+LE_AFTER_DRIVER_OK backend feature")
+> > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > > > > >
+> > > > > > > > > Please do send v3. And again, I don't want to send "after=
+ driver ok" hack
+> > > > > > > > > upstream at all, I merged it in next just to give it some=
+ testing.
+> > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > > > >
+> > > > > > > >
+> > > > > > > > Current devices do not support that semantic.
+> > > > > > >
+> > > > > > > Which devices specifically access the ring after DRIVER_OK bu=
+t before
+> > > > > > > a kick?
+> >
+> > The PDS vdpa device can deal with a call to .set_vq_ready after DRIVER_=
+OK is
+> > set.  And I'm told that our VQ activity should start without a kick.
+> >
+> > Our vdpa device FW doesn't currently have support for VIRTIO_F_RING_RES=
+ET,
+> > but I believe it could be added without too much trouble.
+> >
+> > sln
+> >
+>
+> OK it seems clear at least in the current version pds needs
+> VHOST_BACKEND_F_ENABLE_AFTER_DRIVER_OK.
+> However can we also code up the RING_RESET path as the default?
+> Then down the road vendors can choose what to do.
+>
 
-HEAD commit:    6843306689af Merge tag 'net-6.5-rc1' of git://git.kernel.o..
-git tree:       net
-console output: https://syzkaller.appspot.com/x/log.txt?x=114522aca80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=7ad417033279f15a
-dashboard link: https://syzkaller.appspot.com/bug?extid=5050ad0fb47527b1808a
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=102cb190a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=17c49d90a80000
+Yes, the RING_RESET path can be coded & tested for vp_vdpa, for
+example. I'm ok with making it the default, and let
+_F_ENABLE_AFTER_DRIVER_OK as a fallback.
 
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/f6adc10dbd71/disk-68433066.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/5c3fa1329201/vmlinux-68433066.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/84db3452bac5/bzImage-68433066.xz
+>
+>
+>
+>
+> > > > > > >
+> > > > > >
+> > > > > > Previous versions of the QEMU LM series did a spurious kick to =
+start
+> > > > > > traffic at the LM destination [1]. When it was proposed, that s=
+purious
+> > > > > > kick was removed from the series because to check for descripto=
+rs
+> > > > > > after driver_ok, even without a kick, was considered work of th=
+e
+> > > > > > parent driver.
+> > > > > >
+> > > > > > I'm ok to go back to this spurious kick, but I'm not sure if th=
+e hw
+> > > > > > will read the ring before the kick actually. I can ask.
+> > > > > >
+> > > > > > Thanks!
+> > > > > >
+> > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/ms=
+g02775.html
+> > > > >
+> > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, =
+no?
+> > > >
+> > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
+> > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > > >
+> > > > But this reminds me one thing, as the thread is going too long, I
+> > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
+> > > > supported?
+> > > >
+> > >
+> > > The problem with that is that the device needs to support all
+> > > RING_RESET, like to be able to change vq address etc after DRIVER_OK.
+> > > Not all HW support it.
+> > >
+> > > We just need the subset of having the dataplane freezed until all CVQ
+> > > commands have been consumed. I'm sure current vDPA code already
+> > > supports it in some devices, like MLX and PSD.
+> > >
+> > > Thanks!
+> > >
+> > > > Thanks
+> > > >
+> > > > >
+> > > > >
+> > > > >
+> > > > > > > > My plan was to convert
+> > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. So=
+rry if I
+> > > > > > > > was not explicit enough.
+> > > > > > > >
+> > > > > > > > The only solution I can see to that is to trap & emulate in=
+ the vdpa
+> > > > > > > > (parent?) driver, as talked in virtio-comment. But that com=
+plicates
+> > > > > > > > the architecture:
+> > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > > > * Store vq enable state separately, at
+> > > > > > > > vdpa->config->set_vq_ready(true), but not transmit that ena=
+ble to hw
+> > > > > > > > * Store the doorbell state separately, but do not configure=
+ it to the
+> > > > > > > > device directly.
+> > > > > > > >
+> > > > > > > > But how to recover if the device cannot configure them at k=
+ick time,
+> > > > > > > > for example?
+> > > > > > > >
+> > > > > > > > Maybe we can just fail if the parent driver does not suppor=
+t enabling
+> > > > > > > > the vq after DRIVER_OK? That way no new feature flag is nee=
+ded.
+> > > > > > > >
+> > > > > > > > Thanks!
+> > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > ---
+> > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm=
+/linux/kernel/git/mst
+> > > > > > > > > > commit. Please let me know if I should send a v3 of [1]=
+ instead.
+> > > > > > > > > >
+> > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-se=
+nd-email-mst@kernel.org/T/
+> > > > > > > > > > ---
+> > > > > > > > > >   drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > > > >   1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > > > >
+> > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.=
+c
+> > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_i=
+octl(struct file *filep,
+> > > > > > > > > >   {
+> > > > > > > > > >        struct vhost_vdpa *v =3D filep->private_data;
+> > > > > > > > > >        struct vhost_dev *d =3D &v->vdev;
+> > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->co=
+nfig;
+> > > > > > > > > >        void __user *argp =3D (void __user *)arg;
+> > > > > > > > > >        u64 __user *featurep =3D argp;
+> > > > > > > > > > -     u64 features;
+> > > > > > > > > > +     u64 features, parent_features =3D 0;
+> > > > > > > > > >        long r =3D 0;
+> > > > > > > > > >
+> > > > > > > > > >        if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+> > > > > > > > > >                if (copy_from_user(&features, featurep, =
+sizeof(features)))
+> > > > > > > > > >                        return -EFAULT;
+> > > > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > > > +                     parent_features =3D ops->get_back=
+end_features(v->vdpa);
+> > > > > > > > > >                if (features & ~(VHOST_VDPA_BACKEND_FEAT=
+URES |
+> > > > > > > > > >                                 BIT_ULL(VHOST_BACKEND_F=
+_SUSPEND) |
+> > > > > > > > > >                                 BIT_ULL(VHOST_BACKEND_F=
+_RESUME) |
+> > > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_=
+ENABLE_AFTER_DRIVER_OK)))
+> > > > > > > > > > +                              parent_features))
+> > > > > > > > > >                        return -EOPNOTSUPP;
+> > > > > > > > > >                if ((features & BIT_ULL(VHOST_BACKEND_F_=
+SUSPEND)) &&
+> > > > > > > > > >                     !vhost_vdpa_can_suspend(v))
+> > > > > > > > > > --
+> > > > > > > > > > 2.39.3
+> > > > > > > > >
+> > > > > > >
+> > > > >
+> > > >
+> > >
+>
 
-IMPORTANT: if you fix the issue, please add the following tag to the commit:
-Reported-by: syzbot+5050ad0fb47527b1808a@syzkaller.appspotmail.com
-
-------------[ cut here ]------------
-WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_dio_write_iter fs/ext4/file.c:611 [inline]
-WARNING: CPU: 1 PID: 5382 at fs/ext4/file.c:611 ext4_file_write_iter+0x1470/0x1880 fs/ext4/file.c:720
-Modules linked in:
-CPU: 1 PID: 5382 Comm: syz-executor288 Not tainted 6.4.0-syzkaller-11989-g6843306689af #0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
-RIP: 0010:ext4_dio_write_iter fs/ext4/file.c:611 [inline]
-RIP: 0010:ext4_file_write_iter+0x1470/0x1880 fs/ext4/file.c:720
-Code: 84 03 00 00 48 8b 04 24 31 ff 8b 40 20 89 c3 89 44 24 10 83 e3 08 89 de e8 5d 5a 5b ff 85 db 0f 85 d5 fc ff ff e8 30 5e 5b ff <0f> 0b e9 c9 fc ff ff e8 24 5e 5b ff 48 8b 4c 24 40 4c 89 fa 4c 89
-RSP: 0018:ffffc9000522fc30 EFLAGS: 00010293
-RAX: 0000000000000000 RBX: 0000000000000000 RCX: 0000000000000000
-RDX: ffff8880277a3b80 RSI: ffffffff82298140 RDI: 0000000000000005
-RBP: 0000000000000001 R08: 0000000000000005 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000001 R12: ffffffff8a832a60
-R13: 0000000000000000 R14: 0000000000000000 R15: fffffffffffffff5
-FS:  00007f154db95700(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 00007f154db74718 CR3: 000000006bcc7000 CR4: 00000000003506e0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- call_write_iter include/linux/fs.h:1871 [inline]
- new_sync_write fs/read_write.c:491 [inline]
- vfs_write+0x981/0xda0 fs/read_write.c:584
- ksys_write+0x122/0x250 fs/read_write.c:637
- do_syscall_x64 arch/x86/entry/common.c:50 [inline]
- do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
- entry_SYSCALL_64_after_hwframe+0x63/0xcd
-RIP: 0033:0x7f154dc094f9
-Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 e1 15 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
-RSP: 002b:00007f154db952f8 EFLAGS: 00000246 ORIG_RAX: 0000000000000001
-RAX: ffffffffffffffda RBX: 00007f154dc924f0 RCX: 00007f154dc094f9
-RDX: 0000000000248800 RSI: 0000000020000000 RDI: 0000000000000006
-RBP: 00007f154dc5f628 R08: 0000000000000000 R09: 0000000000000000
-R10: 0000000000000000 R11: 0000000000000246 R12: 652e79726f6d656d
-R13: 656c6c616b7a7973 R14: 6465646165726874 R15: 00007f154dc924f8
- </TASK>
-
-
----
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
 
