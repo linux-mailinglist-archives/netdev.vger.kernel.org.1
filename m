@@ -1,206 +1,256 @@
-Return-Path: <netdev+bounces-15837-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15838-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4A4FB74A1FE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:15:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 21FBB74A218
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:18:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0585C28137D
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:15:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9CED51C20C8A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:18:08 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3AFAD4A;
-	Thu,  6 Jul 2023 16:15:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 32C82AD4E;
+	Thu,  6 Jul 2023 16:18:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF89C9444;
-	Thu,  6 Jul 2023 16:15:18 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD63C433C7;
-	Thu,  6 Jul 2023 16:15:00 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688660118;
-	bh=r5Eqjb/koo4X65bgDBYxDesIkgsRAdhnfATQ4gt2Esk=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=uOgU9evq5o16T6L6tpJH1n8YSQl4p50BjR5wiJPLoKkMzHgO7DWjFII6ePLp5KpdE
-	 3SlBOVBQ0Ayb1Ck5njyhQkfK/lBmsjOnzq7A/dE1stN3VqJX7pH6IQsgFKtN1DalJo
-	 E+zh6oq4S0OPw7rIh8zXpFwi+8/fexgoqLXDvhFUUOG0TWnPj5LM1mmg7dIC7PaCB3
-	 IOEyQDVn/tGwcs+s3mZaJELn1kEqbOemjyG66rmihhs9u/EaGnd4WvmH/942idbgOQ
-	 fgiPtHR0C+lrv0o8CzKEzOTX/CaJMpmdnCKaL0ZpaSmvJsFgbp9PEliTkXRbGZddzd
-	 Fm4yxVau37qTQ==
-Message-ID: <3948ae7653d1cb7c51febcca26a35775e71a53b4.camel@kernel.org>
-Subject: Re: [PATCH v2 00/89] fs: new accessors for inode->i_ctime
-From: Jeff Layton <jlayton@kernel.org>
-To: "Eric W. Biederman" <ebiederm@xmission.com>
-Cc: jk@ozlabs.org, arnd@arndb.de, mpe@ellerman.id.au, npiggin@gmail.com, 
- christophe.leroy@csgroup.eu, hca@linux.ibm.com, gor@linux.ibm.com, 
- agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com, 
- gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
- maco@android.com,  joel@joelfernandes.org, brauner@kernel.org,
- cmllamas@google.com, surenb@google.com, 
- dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca, leon@kernel.org, 
- bwarrum@linux.ibm.com, rituagar@linux.ibm.com, ericvh@kernel.org,
- lucho@ionkov.net,  asmadeus@codewreck.org, linux_oss@crudebyte.com,
- dsterba@suse.com,  dhowells@redhat.com, marc.dionne@auristor.com,
- viro@zeniv.linux.org.uk,  raven@themaw.net, luisbg@kernel.org,
- salah.triki@gmail.com,  aivazian.tigran@gmail.com, keescook@chromium.org,
- clm@fb.com, josef@toxicpanda.com,  xiubli@redhat.com, idryomov@gmail.com,
- jaharkes@cs.cmu.edu, coda@cs.cmu.edu,  jlbec@evilplan.org, hch@lst.de,
- nico@fluxnic.net, rafael@kernel.org,  code@tyhicks.com, ardb@kernel.org,
- xiang@kernel.org, chao@kernel.org,  huyue2@coolpad.com,
- jefflexu@linux.alibaba.com, linkinjeon@kernel.org,  sj1557.seo@samsung.com,
- jack@suse.com, tytso@mit.edu, adilger.kernel@dilger.ca, 
- jaegeuk@kernel.org, hirofumi@mail.parknet.co.jp, miklos@szeredi.hu, 
- rpeterso@redhat.com, agruenba@redhat.com, richard@nod.at, 
- anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net, 
- mikulas@artax.karlin.mff.cuni.cz, mike.kravetz@oracle.com,
- muchun.song@linux.dev,  dwmw2@infradead.org, shaggy@kernel.org,
- tj@kernel.org,  trond.myklebust@hammerspace.com, anna@kernel.org,
- chuck.lever@oracle.com,  neilb@suse.de, kolga@netapp.com,
- Dai.Ngo@oracle.com, tom@talpey.com,  konishi.ryusuke@gmail.com,
- anton@tuxera.com,  almaz.alexandrovich@paragon-software.com,
- mark@fasheh.com,  joseph.qi@linux.alibaba.com, me@bobcopeland.com,
- hubcap@omnibond.com,  martin@omnibond.com, amir73il@gmail.com,
- mcgrof@kernel.org, yzaikin@google.com,  tony.luck@intel.com,
- gpiccoli@igalia.com, al@alarsen.net, sfrench@samba.org,  pc@manguebit.com,
- lsahlber@redhat.com, sprasad@microsoft.com,  senozhatsky@chromium.org,
- phillip@squashfs.org.uk, rostedt@goodmis.org,  mhiramat@kernel.org,
- dushistov@mail.ru, hdegoede@redhat.com, djwong@kernel.org, 
- dlemoal@kernel.org, naohiro.aota@wdc.com, jth@kernel.org, ast@kernel.org, 
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org,  yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- sdf@google.com,  haoluo@google.com, jolsa@kernel.org, hughd@google.com,
- akpm@linux-foundation.org,  davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com,  john.johansen@canonical.com,
- paul@paul-moore.com, jmorris@namei.org,  serge@hallyn.com,
- stephen.smalley.work@gmail.com, eparis@parisplace.org,  jgross@suse.com,
- stern@rowland.harvard.edu, lrh2000@pku.edu.cn, 
- sebastian.reichel@collabora.com, wsa+renesas@sang-engineering.com, 
- quic_ugoswami@quicinc.com, quic_linyyuan@quicinc.com, john@keeping.me.uk, 
- error27@gmail.com, quic_uaggarwa@quicinc.com, hayama@lineo.co.jp,
- jomajm@gmail.com,  axboe@kernel.dk, dhavale@google.com,
- dchinner@redhat.com, hannes@cmpxchg.org,  zhangpeng362@huawei.com,
- slava@dubeyko.com, gargaditya08@live.com, 
- penguin-kernel@I-love.SAKURA.ne.jp, yifeliu@cs.stonybrook.edu, 
- madkar@cs.stonybrook.edu, ezk@cs.stonybrook.edu, yuzhe@nfschina.com, 
- willy@infradead.org, okanatov@gmail.com, jeffxu@chromium.org,
- linux@treblig.org,  mirimmad17@gmail.com, yijiangshan@kylinos.cn,
- yang.yang29@zte.com.cn,  xu.xin16@zte.com.cn, chengzhihao1@huawei.com,
- shr@devkernel.io,  Liam.Howlett@Oracle.com, adobriyan@gmail.com,
- chi.minghao@zte.com.cn,  roberto.sassu@huawei.com, linuszeng@tencent.com,
- bvanassche@acm.org,  zohar@linux.ibm.com, yi.zhang@huawei.com,
- trix@redhat.com, fmdefrancesco@gmail.com,  ebiggers@google.com,
- princekumarmaurya06@gmail.com, chenzhongjin@huawei.com,  riel@surriel.com,
- shaozhengchao@huawei.com, jingyuwang_vip@163.com, 
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, 
- linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org,  linux-afs@lists.infradead.org,
- autofs@vger.kernel.org, linux-mm@kvack.org,  linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org,  codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
- linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com, 
- linux-um@lists.infradead.org, linux-mtd@lists.infradead.org, 
- jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org, 
- linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net, 
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org, 
- linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org, 
- reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org, 
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
- selinux@vger.kernel.org
-Date: Thu, 06 Jul 2023 12:14:58 -0400
-In-Reply-To: <87ilaxgjek.fsf@email.froward.int.ebiederm.org>
-References: <20230705185812.579118-1-jlayton@kernel.org>
-	 <a4e6cfec345487fc9ac8ab814a817c79a61b123a.camel@kernel.org>
-	 <87ilaxgjek.fsf@email.froward.int.ebiederm.org>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 260A5AD41
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 16:18:06 +0000 (UTC)
+Received: from mail-vk1-xa2f.google.com (mail-vk1-xa2f.google.com [IPv6:2607:f8b0:4864:20::a2f])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EA6701BD4;
+	Thu,  6 Jul 2023 09:18:01 -0700 (PDT)
+Received: by mail-vk1-xa2f.google.com with SMTP id 71dfb90a1353d-47e57b8498aso310287e0c.2;
+        Thu, 06 Jul 2023 09:18:01 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688660281; x=1691252281;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6trA7i/Q1+6Uh5pOaGbvlJJc0dwoyiShmt6TgrS7dQQ=;
+        b=SA0osFoY8Rg2TDWN4qQRQk2GMTbD3SoAHjED27fW7Dzb3Vs2Zgddnov7iQXOAF+WqA
+         7CWZFOzGs8NyJ/N6whbQLrBeD57Tre03a3G7tEqDjbaYgt+KG5UeRU89vyJDNQ2V+QJ1
+         PxZEnSfidXJeLdZ6kMb5HKp5ACbU/rBfPjjYWfoXV8wNtnCDTonCAG3IA8Ut4Zsugvmp
+         ykokh97BXLM/WrD3iuieWvnyC7Mo0oFscVTxd8xYFEVUvE9IC0R4OVHeFEfuLSUCf+pk
+         5jNTP3PB9scTt3vSGJGpXEYuBh8FHHjLuubupCEMHaZoHW3a+wPP9ge4qW5EGsBKxxIf
+         jjBQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688660281; x=1691252281;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=6trA7i/Q1+6Uh5pOaGbvlJJc0dwoyiShmt6TgrS7dQQ=;
+        b=ZPAFiKcUvBzcyiL921FdxnaNzfxfnvGtU75VMhXX/F+Ki/1xPPxdFjii0MdhGA9sTa
+         K0NZhh/GJWIjw5I3TRSNnY30VJj8BwaidDTbHmBtuitO19EJOHFVs4ULtN3SGNAFy2yL
+         HeUYGDR+gHtyqJJIkcaIFlzsLA+uwqYlyssxn0CO8KW0goc7GqMrcsW51JQcCYKJ8Bs2
+         C4tTiYiYwyYcxSB9OP7V4etvAE0OJ4Du4f6WPVfrrZGBSFAHunKuhF2HsFDMGpZnp3dW
+         eN2fJfkMJEJIoratWzz2KvN43ivicfYtQbaaEGenaIZ37l3X130xQMRAX5MobX2KZhO5
+         5Pmw==
+X-Gm-Message-State: ABy/qLbdZREXc2rfqqh6uwITzfb7J6xRVd+OzsUurRzNgMCPPvNrx3tg
+	SVb/uxhrfHlFwp7CbLx+c38mqAAI5cRRM4g6qoa3uaE5wnw=
+X-Google-Smtp-Source: APBJJlFkeB5xe0s3yx7qnzI0i2ss7i/hgubFrjNPzsX0wW7SaTcLfXaqstHcIwC21dRbgTg5NlwMzCFimAsvja+n8zA=
+X-Received: by 2002:a1f:5c05:0:b0:47e:19b4:85e9 with SMTP id
+ q5-20020a1f5c05000000b0047e19b485e9mr1670297vkb.0.1688660280885; Thu, 06 Jul
+ 2023 09:18:00 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+ <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+ <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+ <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+ <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+ <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
+ <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+ <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+ <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
+ <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
+ <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
+ <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
+ <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
+ <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
+ <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
+ <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com>
+ <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
+ <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
+ <CAA85sZs_H3Dc-mYnj8J5VBEwUJwbHUupP+U-4eG20nfAHBtv4w@mail.gmail.com>
+ <92a4d42491a2c219192ae86fa04b579ea3676d8c.camel@redhat.com>
+ <CAA85sZvtspqfep+6rH8re98-A6rHNNWECvwqVaM=r=0NSSsGzA@mail.gmail.com>
+ <dfbbe91a9c0abe8aba2c00afd3b7f7d6af801d8e.camel@redhat.com>
+ <CAA85sZuQh0FMoGDFVyOad6G1UB9keodd3OCZ4d4r+xgXDArcVA@mail.gmail.com>
+ <062061fc4d4d3476e3b0255803b726956686eb19.camel@redhat.com>
+ <CAA85sZv9KCmw8mAzK4T-ORXB48wuLF+YXTYSWxkBhv3k_-wzcA@mail.gmail.com>
+ <CAA85sZt6ssXRaZyq4awM0yTLFk62Gxbgw-0+bTKWsHwQvVzZXQ@mail.gmail.com>
+ <d9bf21296a4691ac5aca11ccd832765b262f7088.camel@redhat.com>
+ <CAA85sZsidN4ig=RaQ34PYFjnZGU-=zqR=r-5za=G4oeAtxDA7g@mail.gmail.com>
+ <14cd6a50bd5de13825017b75c98cb3115e84acc1.camel@redhat.com>
+ <CAA85sZuZLg+L7Sr51PPaOkPKbbiywXbbKzhTyjaw12_S6CsZHQ@mail.gmail.com>
+ <c6cf7b4c0a561700d2015c970d52fc9d92b114c7.camel@redhat.com>
+ <CAA85sZvZ_X=TqCXaPui0PDLq2pp5dw_uhga+wcXgBqudrLP9bQ@mail.gmail.com>
+ <67ff0f7901e66d1c0d418c48c9a071068b32a77d.camel@redhat.com>
+ <CANn89i+F=R71refT8K_8hPaP+uWn15GeHz+FTMYU=VPTG24WFA@mail.gmail.com> <c4e40b45b41d0476afd8989d31e6bab74c51a72a.camel@redhat.com>
+In-Reply-To: <c4e40b45b41d0476afd8989d31e6bab74c51a72a.camel@redhat.com>
+From: Ian Kumlien <ian.kumlien@gmail.com>
+Date: Thu, 6 Jul 2023 18:17:49 +0200
+Message-ID: <CAA85sZs_R3W42m8YmXO-k08bPow7zKj_eOxceEB_3MJveGMZ7A@mail.gmail.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+To: Paolo Abeni <pabeni@redhat.com>
+Cc: Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
+	Alexander Lobakin <aleksander.lobakin@intel.com>, 
+	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 2023-07-06 at 10:16 -0500, Eric W. Biederman wrote:
-> Jeff Layton <jlayton@kernel.org> writes:
->=20
-> > On Wed, 2023-07-05 at 14:58 -0400, Jeff Layton wrote:
-> > > v2:
-> > > - prepend patches to add missing ctime updates
-> > > - add simple_rename_timestamp helper function
-> > > - rename ctime accessor functions as inode_get_ctime/inode_set_ctime_=
-*
-> > > - drop individual inode_ctime_set_{sec,nsec} helpers
-> > >=20
-> > > I've been working on a patchset to change how the inode->i_ctime is
-> > > accessed in order to give us conditional, high-res timestamps for the
-> > > ctime and mtime. struct timespec64 has unused bits in it that we can =
-use
-> > > to implement this. In order to do that however, we need to wrap all
-> > > accesses of inode->i_ctime to ensure that bits used as flags are
-> > > appropriately handled.
-> > >=20
-> > > The patchset starts with reposts of some missing ctime updates that I
-> > > spotted in the tree. It then adds a new helper function for updating =
-the
-> > > timestamp after a successful rename, and new ctime accessor
-> > > infrastructure.
-> > >=20
-> > > The bulk of the patchset is individual conversions of different
-> > > subsysteme to use the new infrastructure. Finally, the patchset renam=
-es
-> > > the i_ctime field to __i_ctime to help ensure that I didn't miss
-> > > anything.
-> > >=20
-> > > This should apply cleanly to linux-next as of this morning.
-> > >=20
-> > > Most of this conversion was done via 5 different coccinelle scripts, =
-run
-> > > in succession, with a large swath of by-hand conversions to clean up =
-the
-> > > remainder.
-> > >=20
-> >=20
-> > A couple of other things I should note:
-> >=20
-> > If you sent me an Acked-by or Reviewed-by in the previous set, then I
-> > tried to keep it on the patch here, since the respun patches are mostly
-> > just renaming stuff from v1. Let me know if I've missed any.
-> >=20
-> > I've also pushed the pile to my tree as this tag:
-> >=20
-> >     https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git/t=
-ag/?h=3Dctime.20230705
-> >=20
-> > In case that's easier to work with.
->=20
-> Are there any preliminary patches showing what you want your introduced
-> accessors to turn into?  It is hard to judge the sanity of the
-> introduction of wrappers without seeing what the wrappers are ultimately
-> going to do.
->=20
-> Eric
+On Thu, Jul 6, 2023 at 4:04=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wrot=
+e:
+>
+> On Thu, 2023-07-06 at 15:56 +0200, Eric Dumazet wrote:
+> > On Thu, Jul 6, 2023 at 3:02=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> =
+wrote:
+> > >
+> > > On Thu, 2023-07-06 at 13:27 +0200, Ian Kumlien wrote:
+> > > > On Thu, Jul 6, 2023 at 10:42=E2=80=AFAM Paolo Abeni <pabeni@redhat.=
+com> wrote:
+> > > > > On Wed, 2023-07-05 at 15:58 +0200, Ian Kumlien wrote:
+> > > > > > On Wed, Jul 5, 2023 at 3:29=E2=80=AFPM Paolo Abeni <pabeni@redh=
+at.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, 2023-07-05 at 13:32 +0200, Ian Kumlien wrote:
+> > > > > > > > On Wed, Jul 5, 2023 at 12:28=E2=80=AFPM Paolo Abeni <pabeni=
+@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Tue, 2023-07-04 at 16:27 +0200, Ian Kumlien wrote:
+> > > > > > > > > > More stacktraces.. =3D)
+> > > > > > > > > >
+> > > > > > > > > > cat bug.txt | ./scripts/decode_stacktrace.sh vmlinux
+> > > > > > > > > > [  411.413767] ------------[ cut here ]------------
+> > > > > > > > > > [  411.413792] WARNING: CPU: 9 PID: 942 at include/net/=
+ud     p.h:509
+> > > > > > > > > > udpv6_queue_rcv_skb (./include/net/udp.h:509 net/ipv6/u=
+dp.c:800
+> > > > > > > > > > net/ipv6/udp.c:787)
+> > > > > > > > >
+> > > > > > > > > I'm really running out of ideas here...
+> > > > > > > > >
+> > > > > > > > > This is:
+> > > > > > > > >
+> > > > > > > > >         WARN_ON_ONCE(UDP_SKB_CB(skb)->partial_cov);
+> > > > > > > > >
+> > > > > > > > > sort of hint skb being shared (skb->users > 1) while enqu=
+eued in
+> > > > > > > > > multiple places (bridge local input and br forward/flood =
+to tun
+> > > > > > > > > device). I audited the bridge mc flooding code, and I cou=
+ld not find
+> > > > > > > > > how a shared skb could land into the local input path.
+> > > > > > > > >
+> > > > > > > > > Anyway the other splats reported here and in later emails=
+ are
+> > > > > > > > > compatible with shared skbs.
+> > > > > > > > >
+> > > > > > > > > The above leads to another bunch of questions:
+> > > > > > > > > * can you reproduce the issue after disabling 'rx-gro-lis=
+t' on the
+> > > > > > > > > ingress device? (while keeping 'rx-udp-gro-forwarding' on=
+).
+> > > > > > > >
+> > > > > > > > With rx-gro-list off, as in never turned on, everything see=
+ms to run fine
+> > > > > > > >
+> > > > > > > > > * do you have by chance qdiscs on top of the VM tun devic=
+es?
+> > > > > > > >
+> > > > > > > > default qdisc is fq
+> > > > > > >
+> > > > > > > IIRC libvirt could reset the qdisc to noqueue for the owned t=
+un
+> > > > > > > devices.
+> > > > > > >
+> > > > > > > Could you please report the output of:
+> > > > > > >
+> > > > > > > tc -d -s qdisc show dev <tun dev name>
+> > > > > >
+> > > > > > I don't have these set:
+> > > > > > CONFIG_NET_SCH_INGRESS
+> > > > > > CONFIG_NET_SCHED
+> > > > > >
+> > > > > > so tc just gives an error...
+> > > > >
+> > > > > The above is confusing. AS CONFIG_NET_SCH_DEFAULT depends on
+> > > > > CONFIG_NET_SCHED, you should not have a default qdisc, too ;)
+> > > >
+> > > > Well it's still set in sysctl - dunno if it fails
+> > > >
+> > > > > Could you please share your kernel config?
+> > > >
+> > > > Sure...
+> > > >
+> > > > As a side note, it hasn't crashed - no traces since we did the last=
+ change
+> > >
+> > > It sounds like an encouraging sing! (last famous words...). I'll wait=
+ 1
+> > > more day, than I'll submit formally...
+> > >
+> > > > For reference, this is git diff on the running kernels source tree:
+> > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > index cea28d30abb5..1b2394ebaf33 100644
+> > > > --- a/net/core/skbuff.c
+> > > > +++ b/net/core/skbuff.c
+> > > > @@ -4270,6 +4270,17 @@ struct sk_buff *skb_segment_list(struct sk_b=
+uff *skb,
+> > > >
+> > > >         skb_push(skb, -skb_network_offset(skb) + offset);
+> > > >
+> > > > +       if (WARN_ON_ONCE(skb_shared(skb))) {
+> > > > +               skb =3D skb_share_check(skb, GFP_ATOMIC);
+> > > > +               if (!skb)
+> > > > +                       goto err_linearize;
+> > > > +       }
+> > > > +
+> > > > +       /* later code will clear the gso area in the shared info */
+> > > > +       err =3D skb_header_unclone(skb, GFP_ATOMIC);
+> > > > +       if (err)
+> > > > +               goto err_linearize;
+> > > > +
+> > > >         skb_shinfo(skb)->frag_list =3D NULL;
+> > > >
+> > > >         while (list_skb) {
+> > >
+> > > ...the above check only, as the other 2 should only catch-up side
+> > > effects of lack of this one. In any case the above address a real
+> > > issue, so we likely want it no-matter-what.
+> > >
+> >
+> > Interesting, I wonder if this could also fix some syzbot reports
+> > Willem and I are investigating.
+> >
+> > Any idea of when the bug was 'added' or 'revealed' ?
+>
+> The issue specifically addressed above should be present since
+> frag_list introduction commit 3a1296a38d0c ("net: Support GRO/GSO
+> fraglist chaining."). AFAICS triggering it requires non trivial setup -
+> mcast rx on bridge with frag-list enabled and forwarding to multiple
+> ports - so perhaps syzkaller found it later due to improvements on its
+> side ?!?
 
-I have a draft version of the multigrain patches on top of the wrapper
-conversion I've already posted in my "mgctime-experimental" branch:
+I'm also a bit afraid that we just haven't triggered it - i don't see
+any warnings or anything... :/
 
-    https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git/log/?=
-h=3Dmgctime-experimental
-
-The rationale is best explained in this changelog:
-
-    https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git/commi=
-t/?h=3Dmgctime-experimental&id=3Dface437a144d3375afb7f70c233b0644b4edccba
-
-The idea will be to enable this on a per-fs basis.
---=20
-Jeff Layton <jlayton@kernel.org>
+> Cheers,
+>
+> Paolo
+>
 
