@@ -1,200 +1,273 @@
-Return-Path: <netdev+bounces-15681-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15682-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id BF1E8749344
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 03:45:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E6134749352
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 03:55:46 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id F17FD281192
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 01:45:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 957BA281160
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 01:55:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 09360A35;
-	Thu,  6 Jul 2023 01:44:57 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E893EA35;
+	Thu,  6 Jul 2023 01:55:43 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DA8AD7F;
-	Thu,  6 Jul 2023 01:44:56 +0000 (UTC)
-Received: from EUR05-DB8-obe.outbound.protection.outlook.com (mail-db8eur05on2085.outbound.protection.outlook.com [40.107.20.85])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8ECE11BD4;
-	Wed,  5 Jul 2023 18:44:52 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=AInZz415uQRIB4WMUKkqisyy/ZZSpKX5pwFwn4mIqEAvhudA0VsEB3/QAdqLnx+2ontxl3OMSgBWtaTRzfshxpnWvgLmXVPGWuUmc94YaRQsMX5Q2kamqkgXsJijDep0gdPpZZSW4iRWQGqhQ5JJ4n7mApNcKrpQvgE33O41RLs8odhLNdnyh6L30+UK5e+UQCWKbfD4BcJcwuUsTSHoP5dlEdI/3D98r/+A5LneaqVvWk4/PA3hOmdh3QoawsNlN2k3Pqnf8K6OhT1XEl5pHAaFKdfePbYD5VeMgwcMLmCHIY67QxM1yB9hZVN3fNLMp9XMQ5YKdkfWW1VzGbKGkA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=d/wQV5lxmSq9d3XoIgctzuMm4Cgtzr2llqasl3daUUY=;
- b=fb0iylAD1pHEwjpYCG9UqaJ7P4QVqZCrwq83eF/3R2x8XKz00QuJ5RJ0XoTXO+f0hMubHnVXeNHYz51UbOy/khuqetg5dmrjNwcp0xkjrVdXDpNSPVeHoTM6aDKB+llfjIF5v9yOvsiOAWQMZmtMYccCiPRq3tLfdNFpbywa/IQ9dQC9OA8TdqcvQjAEpIdohSh5m613ZCsdX/ZX94/DCJsjuIxu33eydMrqM8zdHv+3mPfFb86ZlQZuKED7y4Jjn3J7tEYJMm/v5TH8/H4DvvrleUr/9guihdIeQKbqN6nlc5XGU1CKmlRxt4Ndxk+Iji4p3A2lNz3BnhsLF8Z8nw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=d/wQV5lxmSq9d3XoIgctzuMm4Cgtzr2llqasl3daUUY=;
- b=hHSS+gpeguJQzN62NUDNG1+EFEgwKlvW8+NhmrFPeBDtv9QJqJxKrRZ2d4kYgOqDraAV2t7zlOzYYrEtLIV94hW20ooiishB2/hKhqwGRatiPljC1c+cw8hjfam+3TLDTKSjchQYvBNqiLbCNyPf3xTaWz8fzjzhJvb1tMEZY20=
-Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
- by PAXPR04MB8253.eurprd04.prod.outlook.com (2603:10a6:102:1bf::7) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
- 2023 01:44:49 +0000
-Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
- ([fe80::1edd:68cb:85d0:29e0]) by AM5PR04MB3139.eurprd04.prod.outlook.com
- ([fe80::1edd:68cb:85d0:29e0%7]) with mapi id 15.20.6544.024; Thu, 6 Jul 2023
- 01:44:49 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "hawk@kernel.org"
-	<hawk@kernel.org>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, dl-linux-imx
-	<linux-imx@nxp.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: RE: [PATCH net 3/3] net: fec: increase the size of tx ring and update
- thresholds of tx ring
-Thread-Topic: [PATCH net 3/3] net: fec: increase the size of tx ring and
- update thresholds of tx ring
-Thread-Index: AQHZrlKWMcGquWZZ5UGq1vf9jWNReK+qUaEAgAAZ9TCAAQ/2gIAAetPw
-Date: Thu, 6 Jul 2023 01:44:49 +0000
-Message-ID:
- <AM5PR04MB3139ED2B0F74BBD00B85A448882CA@AM5PR04MB3139.eurprd04.prod.outlook.com>
-References: <20230704082916.2135501-1-wei.fang@nxp.com>
-	<20230704082916.2135501-4-wei.fang@nxp.com>
-	<0443a057-767f-4f9c-afd2-37d26b606d74@lunn.ch>
-	<AM5PR04MB3139789F6CCA4BEC8A871C1D882FA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230705111119.07c3dee3@kernel.org>
-In-Reply-To: <20230705111119.07c3dee3@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM5PR04MB3139:EE_|PAXPR04MB8253:EE_
-x-ms-office365-filtering-correlation-id: f3887931-0b2d-4ede-bb06-08db7dc295de
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 561JfjSzbYFy6I1sib/cnDck/f9wL5uANu8ecT+jJ/XTPMqcdmaAEOYevJ4P5Lp8d7Soz0Z9sP7vd5o68hFlt2aR3d92RX9la8271/N+5/2JnVT4VLuRYH3D/PziGRPpBgyD0RKiu6YX7hnoP9lrbVDkO7CT8G3dWVem3yDXxm4/jRPWQRX10m7XKb+rVZxAZfdTQXtUkFzSMZD1oEX+dc9xOZIC4F7hqXqbvdAvUOKtGlASwPObN9RKZHbOkWAqyd2Z2L2EJYfTip/3i+SKVSu6zqcpqd5rRjcEDQe5DfMfkL7d9GpDZjLmgxhevJuJ6q36TdgBshBiB1TRnohp1knmd1yhZCPFJ1nrAqd7Imvi/qd7pI56cWJiJCCozjBmIyuPDy2qxHIkcAWfqQrQfL5iVV/olYFvIO5v1nD8wuL+mRgz/2LjdaSCdzxunbjnph2kjaLb/jhXG0cVty2lHqas2JWWiz7cYL5A0JX3opUt3jAGXwH7ZhjQLVHR+qs7UP/NiztC0rNDv82w176ZrTu8PGlXmTL3jVFfbJYuufpBx4f3IFZNy5LbxU1DbbMo6UI6J7bF+JHCfZKum0sh+j1JhktH4mvBlftxVoGkLk6vVuROqvEvfmVzkgkgZxZw
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(376002)(396003)(346002)(39860400002)(451199021)(44832011)(7416002)(6916009)(4326008)(66446008)(64756008)(66946007)(66476007)(66556008)(76116006)(33656002)(478600001)(2906002)(316002)(15650500001)(52536014)(8936002)(8676002)(5660300002)(41300700001)(55016003)(38070700005)(54906003)(86362001)(7696005)(53546011)(26005)(9686003)(186003)(6506007)(38100700002)(71200400001)(83380400001)(122000001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?bHBCZkdCY2NZcmFlR0N2UzhwZ1UwYzdWM0pMVWp4Zyszcnpxb1Q4UTBXRWhw?=
- =?gb2312?B?anQzUmFmcGgwVFUwaElOSEtobmk4dXpWYVoweGtDUkJjdkIrSi9BNEg2eXMw?=
- =?gb2312?B?ajE0cFlSUVc5MWFKNFU0eW9PLytYSWNmNkgrd0k1SW02bkJZNnMzOW0wM1ln?=
- =?gb2312?B?bThRZjZlUXpDamhpMTNFUWRCNlhqYk0rRFV4d1hON0Rqek5DNEU2b2c2cXZV?=
- =?gb2312?B?Rzc5K1F0ZzBHdWxPRElUcjhXYksrVnp1Tm0vOU5VTlJNelc1UzN6aVV4NDIv?=
- =?gb2312?B?NE82SitLSU1UVStyUFB4WWdsMXpmTk9WTXRCU3JMVFJBYWtsNnU1aDB5aFdO?=
- =?gb2312?B?SEdSY1FXckIrbDJtUzZoTkNwcCt2S2dGdVFOQlpaRFdLdk9LUzhTT2MwTkNh?=
- =?gb2312?B?RVZna0JjaXZxbnRBU21BdVhhUDFIQTFHZERtLzhhaVFJT1ZwYXVWRkM5dFJX?=
- =?gb2312?B?MitRcGsycmZpTm5LTFVaK0l4OTM5TnIwY1QvQTFydE1LMkJrRXNPNzc2Rk1B?=
- =?gb2312?B?VkNyanhVeGJKZmRxdnB1RUNhWnhyeHV0Vk5FYlN1bUxRN1BhcTliM1FUbDJn?=
- =?gb2312?B?V01ROG5WZXl2dUkraUhxenp0NWp3Q0hlT0l5Z2N1eTg3RGNMdmNnaGNlRFpF?=
- =?gb2312?B?dmJQMWlNM29haEJrMGhxdHRhQ1V3UTdSWkRXNmZ3ZGpsNDRJVFdmMXRzM1Yv?=
- =?gb2312?B?SklORE4xRFFFdW8zRzNsSWxYY2l0STFXNi9sZGV2WEJMUVhwRmJnN05WVUxJ?=
- =?gb2312?B?Sk53Znhyck1DMkwvOFJnQVErOXRwd0RZTVF2Vy96SzNQMTZmWExRVzJ2Ymc2?=
- =?gb2312?B?bm1ySEZvQnhxdk5Yam4rL0FYd2YrYUszR0RqQStXNGdwUm41MjliNGYwL29L?=
- =?gb2312?B?b0NiTzdGRmRSVzVQUFdoNDdWdEd5S3JtWTZKLzhMSUlCRFh4d1FZSkExelRm?=
- =?gb2312?B?NDRORlFGdDQwYTJqSlVjRDI0SVI0blUwYm9KVk5CZGRoUFVHbW1iaXY2VzBO?=
- =?gb2312?B?TnpLN3NwMFN1OGtTQ0tWTWVabmZld1did1NhaTJNQi9Ua2VOU1VKQmlDeWZB?=
- =?gb2312?B?UmdQWEhKSU1uS3lsYnFKMUtjNmFpVUVDcnFNYnpBWjUrUlpTUmduRnkvc2J1?=
- =?gb2312?B?ekZwcWhQaWNoNHgrQnhBaVFOelViQ0VUckNtejZicDFwbXYyUU9tdDRGMTVw?=
- =?gb2312?B?VEptNkFGSjZHcFpPZ1NzeW01Y0VvUUQ5OXU3c1ZUMytIazBtL3ZBL29QQjFS?=
- =?gb2312?B?YnNBcktqbjhQOHc3MC9uWHpZbmZxWnlDcDlpVlJRcms3Njlwc3hieDVFcUJZ?=
- =?gb2312?B?R3lyMlMrRGFNcG1MejYvQ1plUGQ5aWtTOFIrYUpRT1ZDWktRZC9iQXhmanF5?=
- =?gb2312?B?L3BXdjVIb0lFVDFWZVM0Z2kvSXJDd2VwTmU5aXR6YjVocFdnU20zQ1MzdnBh?=
- =?gb2312?B?aEtPUytpZVBjYTlpVnNlTEhERFZWUnRSZ0VGTmF4M2NKdzRZejJDV3BFbmtY?=
- =?gb2312?B?bkZER0ZDN3gvcWhmZTFBQitrMVkwdmpFeHhWTXY3REsyQ3N1SXV1VFJDTUtC?=
- =?gb2312?B?c0NlQ0hHaG9sNkdnMC9rVVZUTmpYUFJhVkRjczF4YWlyYTFOdSs1TWhKQzNE?=
- =?gb2312?B?VjZWcDZIc0RIWnVyQm9BcGxTaWxzRnJabEJJbHZsNWRKdFUreENVa1hvdmsw?=
- =?gb2312?B?MTgwMk92b2xYbFQyNGhBbFhYenVMdjc4Nmh5ZkQyZVBtZ04wV0Z4YnprNzMy?=
- =?gb2312?B?V3BSV2w3WE5kZDZGWTNVVEJiMWs3VkFIM0JQV0k1WGpjMVN3Q01HUHF4VWpX?=
- =?gb2312?B?UFRwYytFQVQ2U0g0SXFRTzNvSHozNTd1dHFqdlJjKzhpZUs2UWNNMzVGRE9P?=
- =?gb2312?B?RUlDdkVETHBGZ2J0RDJXWFBiZEk4YitjcEZLanlVTWhtTzdwYlZGdFF4cWxC?=
- =?gb2312?B?WUh3TkcwQWN0bnhaV09XSDh6Z2JENnRzbkZLN0xhbDRuVlhBbmpUWW92RzVR?=
- =?gb2312?B?RnNYVVQ5bXFZd3pPc3JSVDltR25Ca2w4L3k3T2FIQlVjZlVEMEFYblhsS3RN?=
- =?gb2312?B?dUV2NjI1anRGVjAva1RaTkkrVzYrVEt3OWkwN2RJSFBhcnBtT3dnbTA3d0R6?=
- =?gb2312?Q?iySQ=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D748D7F
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 01:55:43 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8451819B2
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 18:55:41 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688608540;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=u4oDji0pnQjBPZE3409rybSrvPTs16jwzEuyNSmoWi0=;
+	b=Qn+P0ijJreXwYedVmnlTJZtYVVoEmwQ5zzwZskR1CmzWzcTLAoa2pHRErc3I040G/3mqHD
+	lTtZWXA5RBGRzrnQI4UF+Qu2leMrUevsyEDKRqzjP/vztPc6iXZhyejdpOUzH5eG4hXqiy
+	1TWtebRmv5IGHHd2Ksa43jB5JtweySg=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-615-Xqfy9qEFOBiZ756ErDTS_w-1; Wed, 05 Jul 2023 21:55:39 -0400
+X-MC-Unique: Xqfy9qEFOBiZ756ErDTS_w-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b6a0772b97so1177181fa.1
+        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 18:55:39 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688608538; x=1691200538;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=u4oDji0pnQjBPZE3409rybSrvPTs16jwzEuyNSmoWi0=;
+        b=Avf5Ku8wVg0LQ/UTx5u08AoVneDr5CHHMaGZchHnJYiFOwQQj8WDQu3BrgHg2Vgh6l
+         EGSzQq3YnHC2vMhGzJKpvL56gWqvmNBd8cS2jZqh+oR7f643Qy+ybW4oVR1vrKuArmBJ
+         85GZ4eNGtPKzmmKIiUefnCmtnhHBAgkQdpmOYP7kL/OAZvoqiBG4+w9pTeVPgdxs5ORG
+         bWXtASSp1yQN3YlKmXnWt9x7elkvWcsouxeKbGd/ZJCfv2XJrB3ItpuqegLFnJiJoBQj
+         MMVPdiTNTbyODwKvmqTgumZvDu5YhJFpIQUSF5YzUPnQ5lIBmfzOf449jtH06aAMGfpP
+         0MuA==
+X-Gm-Message-State: ABy/qLbuA91AVff/JNwqBTR8WEhfZe0PzPbd5n7+ZQL5nFTeRQjX8Hjr
+	6uDi/X2kqEk782wJgYamPUGgVRblpy7yP3i40imZCbFnMrbGPDs7yUMIoAfrOJkrKHpo7G3ovsV
+	4JSaOE7Ulx31dv5MqwCVZ82iw4MvUIjG9
+X-Received: by 2002:a2e:6a05:0:b0:2b6:e10a:a9b with SMTP id f5-20020a2e6a05000000b002b6e10a0a9bmr245848ljc.26.1688608537857;
+        Wed, 05 Jul 2023 18:55:37 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHgWAJSVdWWCkpGlV699dPhWPv844SliSf2RkOP2SP0+DOWdaEzY8qOW4IMuOO9EKsYchCQiS3Os6UX/qiEM3o=
+X-Received: by 2002:a2e:6a05:0:b0:2b6:e10a:a9b with SMTP id
+ f5-20020a2e6a05000000b002b6e10a0a9bmr245839ljc.26.1688608537515; Wed, 05 Jul
+ 2023 18:55:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: f3887931-0b2d-4ede-bb06-08db7dc295de
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 01:44:49.4069
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: fYp+G7bLIy0DQSdbz/JvbKlXMt4YTkwPUdzrRC2jWWlCemehBcx3wuP9L0raVzN1iH/+75a2jN5t/TcANa2enQ==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAXPR04MB8253
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <20230705043940-mutt-send-email-mst@kernel.org>
+In-Reply-To: <20230705043940-mutt-send-email-mst@kernel.org>
+From: Jason Wang <jasowang@redhat.com>
+Date: Thu, 6 Jul 2023 09:55:26 +0800
+Message-ID: <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To: "Michael S. Tsirkin" <mst@redhat.com>
+Cc: Eugenio Perez Martin <eperezma@redhat.com>, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, Shannon Nelson <shannon.nelson@amd.com>, 
+	virtualization@lists.linux-foundation.org, kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYWt1YiBLaWNpbnNraSA8a3Vi
-YUBrZXJuZWwub3JnPg0KPiBTZW50OiAyMDIzxOo31MI2yNUgMjoxMQ0KPiBUbzogV2VpIEZhbmcg
-PHdlaS5mYW5nQG54cC5jb20+DQo+IENjOiBBbmRyZXcgTHVubiA8YW5kcmV3QGx1bm4uY2g+OyBk
-YXZlbUBkYXZlbWxvZnQubmV0Ow0KPiBlZHVtYXpldEBnb29nbGUuY29tOyBwYWJlbmlAcmVkaGF0
-LmNvbTsgYXN0QGtlcm5lbC5vcmc7DQo+IGRhbmllbEBpb2dlYXJib3gubmV0OyBoYXdrQGtlcm5l
-bC5vcmc7IGpvaG4uZmFzdGFiZW5kQGdtYWlsLmNvbTsNCj4gU2hlbndlaSBXYW5nIDxzaGVud2Vp
-LndhbmdAbnhwLmNvbT47IENsYXJrIFdhbmcNCj4gPHhpYW9uaW5nLndhbmdAbnhwLmNvbT47IG5l
-dGRldkB2Z2VyLmtlcm5lbC5vcmc7IGRsLWxpbnV4LWlteA0KPiA8bGludXgtaW14QG54cC5jb20+
-OyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBicGZAdmdlci5rZXJuZWwub3JnDQo+IFN1
-YmplY3Q6IFJlOiBbUEFUQ0ggbmV0IDMvM10gbmV0OiBmZWM6IGluY3JlYXNlIHRoZSBzaXplIG9m
-IHR4IHJpbmcgYW5kIHVwZGF0ZQ0KPiB0aHJlc2hvbGRzIG9mIHR4IHJpbmcNCj4gDQo+IE9uIFdl
-ZCwgNSBKdWwgMjAyMyAwNjoyMDoyNiArMDAwMCBXZWkgRmFuZyB3cm90ZToNCj4gPiA+ID4gSW4g
-YWRkdGlvbiwgdGhpcyBwYXRjaCBhbHNvIHVwZGF0ZXMgdGhlIHR4X3N0b3BfdGhyZXNob2xkIGFu
-ZCB0aGUNCj4gPiA+ID4gdHhfd2FrZV90aHJlc2hvbGQgb2YgdGhlIHR4IHJpbmcuIEluIHByZXZp
-b3VzIGxvZ2ljLCB0aGUgdmFsdWUgb2YNCj4gPiA+ID4gdHhfc3RvcF90aHJlc2hvbGQgaXMgMjE3
-LCBob3dldmVyLCB0aGUgdmFsdWUgb2YgdHhfd2FrZV90aHJlc2hvbGQNCj4gPiA+ID4gaXMgMTQ3
-LCBpdCBkb2VzIG5vdCBtYWtlIHNlbnNlIHRoYXQgdHhfd2FrZV90aHJlc2hvbGQgaXMgbGVzcyB0
-aGFuDQo+ID4gPiA+IHR4X3N0b3BfdGhyZXNob2xkLg0KPiA+ID4NCj4gPiA+IFdoYXQgZG8gdGhl
-c2UgYWN0dWFsbHkgbWVhbj8gSSBjb3VsZCBpbWFnaW5lIHRoYXQgYXMgdGhlIHJpbmcgZmlsbHMN
-Cj4gPiA+IHlvdSBkb24ndCB3YW50IHRvIHN0b3AgdW50aWwgaXQgaXMgMjE3LzUxMiBmdWxsLiBU
-aGVyZSBpcyB0aGVuIHNvbWUNCj4gPiA+IGh5c3RlcmVzaXMsIHN1Y2ggdGhhdCBpdCBoYXMgdG8g
-ZHJvcCBiZWxvdyAxNDcvNTEyIGJlZm9yZSBtb3JlIGNhbiBiZQ0KPiBhZGRlZD8NCj4gPiA+DQo+
-ID4gWW91IG11c3QgaGF2ZSBtaXN1bmRlcnN0b29kLCBsZXQgbWUgZXhwbGFpbiBtb3JlIGNsZWFy
-bHksIHRoZSBxdWV1ZQ0KPiA+IHdpbGwgYmUgc3RvcHBlZCB3aGVuIHRoZSBhdmFpbGFibGUgQkRz
-IGFyZSBsZXNzIHRoYW4gdHhfc3RvcF90aHJlc2hvbGQNCj4gPiAoMjE3IEJEcykuIEFuZCB0aGUg
-cXVldWUgd2lsbCBiZSB3YWtlZCB3aGVuIHRoZSBhdmFpbGFibGUgQkRzIGFyZQ0KPiA+IGdyZWF0
-ZXIgdGhhbiB0eF93YWtlX3RocmVzaG9sZA0KPiA+ICgxNDcgQkRzKS4gU28gaW4gbW9zdCBjYXNl
-cywgdGhlIGF2YWlsYWJsZSBCRHMgYXJlIGdyZWF0ZXIgdGhhbg0KPiA+IHR4X3dha2VfdGhyZXNo
-b2xkIHdoZW4gdGhlIHF1ZXVlIGlzIHN0b3BwZWQsIHRoZSBvbmx5IGVmZmVjdCBpcyB0byBkZWxh
-eQ0KPiBwYWNrZXQgc2VuZGluZy4NCj4gPiBJbiBteSBvcGluaW9uLCB0eF93YWtlX3RocmVzaG9s
-ZCBzaG91bGQgYmUgZ3JlYXRlciB0aGFuDQo+ID4gdHhfc3RvcF90aHJlc2hvbGQsIHdlIHNob3Vs
-ZCBzdG9wIHF1ZXVlIHdoZW4gdGhlIGF2YWlsYWJsZSBCRHMgYXJlIG5vdA0KPiBlbm91Z2ggZm9y
-IGEgc2tiIHRvIGJlIGF0dGFjaGVkLg0KPiA+IEFuZCB3YWtlIHRoZSBxdWV1ZSB3aGVuIHRoZSBh
-dmFpbGFibGUgQkRzIGFyZSBzdWZmaWNpZW50IGZvciBhIHNrYi4NCj4gDQo+IEJ1dCB5b3Ugc2hv
-dWxkbid0IHJlc3RhcnQgdGhlIHF1ZXVlIGZvciBhIHNpbmdsZSBwYWNrZXQgZWl0aGVyLg0KPiBS
-ZXN0YXJ0aW5nIGZvciBhIHNpbmdsZSBwYWNrZXQgd2FzdGVzIENQVSBjeWNsZXMgYXMgdGhlcmUg
-d2lsbCBiZSBtdWNoIG1vcmUNCj4gc3RvcCAvIHN0YXJ0IG9wZXJhdGlvbnMuIFR3byBsYXJnZSBw
-YWNrZXRzIHNlZW0gbGlrZSB0aGUgYWJzb2x1dGUgbWluaW11bQ0KPiByZWFzb25hYmxlIHdha2Ug
-dGhyZXNob2xkLg0KPiANCj4gU2V0dGluZyB0eF9zdG9wX3RocmVzaG9sZCB0byBNQVhfU0tCX0ZS
-QUdTIGRvZXNuJ3Qgc2VlbSByaWdodCBlaXRoZXIsIGFzDQo+IHlvdSB3b24ndCBiZSBhYmxlIHRv
-IGFjY2VwdCBhIGZ1bGwgVFNPIGZyYW1lLg0KPiANCk1heWJlIEkgc2hvdWxkIGtlZXAgdGhlIHR4
-X3N0b3BfdGhyZXNob2xkIHVuY2hhbmdlZCwgc28gdGhhdCB0aGUgcXVldWUgaXMNCnRvIGJlIHN0
-b3BwZWQgaWYgdGhlIGF2YWlsYWJsZSBCRHMgaXMgbm90IGVub3VnaCBmb3IgYSBmdWxsIFRTTyBm
-cmFtZSB0byBiZSBhdHRhY2hlZC4NCkFuZCB0aGVuIGp1c3QgY2hhbmdlIHR4X3dha2VfdGhyZXNo
-b2xkIHRvIHR4X3N0b3BfdGhyZXNob2xkICsgMSwgd2hpY2ggSSB0aGluayBpdCdzDQptb3JlIHJl
-YXNvbmFibGUuDQoNCj4gUGxlYXNlIHNwbGl0IHRoZSBjaGFuZ2UsIHRoZSBuZXRkZXZfZXJyX29u
-Y2UoKSBzaG91bGQgYmUgb25lIHBhdGNoIGFuZCB0aGVuDQo+IHRoZSBjaGFuZ2UgdG8gd2FrZSB0
-aHJlc2ggYSBzZXBhcmF0ZSBvbmUuDQpPa2F5LCB0aGFua3MhDQo=
+On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com> =
+wrote:
+>
+> On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
+> > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redhat.=
+com> wrote:
+> > >
+> > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrote:
+> > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@red=
+hat.com> wrote:
+> > > > >
+> > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin wr=
+ote:
+> > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <mst@=
+redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9rez =
+wrote:
+> > > > > > > > With the current code it is accepted as long as userland se=
+nd it.
+> > > > > > > >
+> > > > > > > > Although userland should not set a feature flag that has no=
+t been
+> > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the current =
+code will not
+> > > > > > > > complain for it.
+> > > > > > > >
+> > > > > > > > Since there is no specific reason for any parent to reject =
+that backend
+> > > > > > > > feature bit when it has been proposed, let's control it at =
+vdpa frontend
+> > > > > > > > level. Future patches may move this control to the parent d=
+river.
+> > > > > > > >
+> > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE_A=
+FTER_DRIVER_OK backend feature")
+> > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > > >
+> > > > > > > Please do send v3. And again, I don't want to send "after dri=
+ver ok" hack
+> > > > > > > upstream at all, I merged it in next just to give it some tes=
+ting.
+> > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > >
+> > > > > >
+> > > > > > Current devices do not support that semantic.
+> > > > >
+> > > > > Which devices specifically access the ring after DRIVER_OK but be=
+fore
+> > > > > a kick?
+> > > > >
+> > > >
+> > > > Previous versions of the QEMU LM series did a spurious kick to star=
+t
+> > > > traffic at the LM destination [1]. When it was proposed, that spuri=
+ous
+> > > > kick was removed from the series because to check for descriptors
+> > > > after driver_ok, even without a kick, was considered work of the
+> > > > parent driver.
+> > > >
+> > > > I'm ok to go back to this spurious kick, but I'm not sure if the hw
+> > > > will read the ring before the kick actually. I can ask.
+> > > >
+> > > > Thanks!
+> > > >
+> > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg027=
+75.html
+> > >
+> > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no?
+> >
+> > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
+> > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> >
+> > But this reminds me one thing, as the thread is going too long, I
+> > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
+> > supported?
+> >
+> > Thanks
+>
+> I don't see what does one have to do with another ...
+>
+> I think with RING_RESET we had another solution, enable rings
+> mapping them to a zero page, then reset and re-enable later.
+
+As discussed before, this seems to have some problems:
+
+1) The behaviour is not clarified in the document
+2) zero is a valid IOVA
+
+Thanks
+
+>
+> > >
+> > >
+> > >
+> > > > > > My plan was to convert
+> > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorry =
+if I
+> > > > > > was not explicit enough.
+> > > > > >
+> > > > > > The only solution I can see to that is to trap & emulate in the=
+ vdpa
+> > > > > > (parent?) driver, as talked in virtio-comment. But that complic=
+ates
+> > > > > > the architecture:
+> > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > * Store vq enable state separately, at
+> > > > > > vdpa->config->set_vq_ready(true), but not transmit that enable =
+to hw
+> > > > > > * Store the doorbell state separately, but do not configure it =
+to the
+> > > > > > device directly.
+> > > > > >
+> > > > > > But how to recover if the device cannot configure them at kick =
+time,
+> > > > > > for example?
+> > > > > >
+> > > > > > Maybe we can just fail if the parent driver does not support en=
+abling
+> > > > > > the vq after DRIVER_OK? That way no new feature flag is needed.
+> > > > > >
+> > > > > > Thanks!
+> > > > > >
+> > > > > > >
+> > > > > > > > ---
+> > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/lin=
+ux/kernel/git/mst
+> > > > > > > > commit. Please let me know if I should send a v3 of [1] ins=
+tead.
+> > > > > > > >
+> > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send-e=
+mail-mst@kernel.org/T/
+> > > > > > > > ---
+> > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > >
+> > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioctl=
+(struct file *filep,
+> > > > > > > >  {
+> > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
+> > > > > > > >       struct vhost_dev *d =3D &v->vdev;
+> > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->config=
+;
+> > > > > > > >       void __user *argp =3D (void __user *)arg;
+> > > > > > > >       u64 __user *featurep =3D argp;
+> > > > > > > > -     u64 features;
+> > > > > > > > +     u64 features, parent_features =3D 0;
+> > > > > > > >       long r =3D 0;
+> > > > > > > >
+> > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+> > > > > > > >               if (copy_from_user(&features, featurep, sizeo=
+f(features)))
+> > > > > > > >                       return -EFAULT;
+> > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > +                     parent_features =3D ops->get_backend_=
+features(v->vdpa);
+> > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURES =
+|
+> > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SUSP=
+END) |
+> > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RESU=
+ME) |
+> > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_ENAB=
+LE_AFTER_DRIVER_OK)))
+> > > > > > > > +                              parent_features))
+> > > > > > > >                       return -EOPNOTSUPP;
+> > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUSPE=
+ND)) &&
+> > > > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > > > --
+> > > > > > > > 2.39.3
+> > > > > > >
+> > > > >
+> > >
+>
+
 
