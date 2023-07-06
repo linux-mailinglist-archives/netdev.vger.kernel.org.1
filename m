@@ -1,212 +1,192 @@
-Return-Path: <netdev+bounces-15777-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15778-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id F0DA4749B47
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:00:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 0EC60749B4E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:01:25 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2DC831C20D3E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:00:58 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3E0AE1C20D8B
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:01:24 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1BC0A8F48;
-	Thu,  6 Jul 2023 12:00:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E0588F48;
+	Thu,  6 Jul 2023 12:01:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 018637483;
-	Thu,  6 Jul 2023 12:00:53 +0000 (UTC)
-Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 59E16128;
-	Thu,  6 Jul 2023 05:00:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688644851; x=1720180851;
-  h=message-id:date:subject:to:cc:references:from:
-   in-reply-to:content-transfer-encoding:mime-version;
-  bh=5jlg9gw1eYUJlAY8AdVHSHTChBZ4WQ/7HFnggESrDk8=;
-  b=ZtBe4lLt2EIafQZJihqvqebY7V1GPzqMngdwZ7J7my31YLF3nr1hoVH0
-   uVHn2XJuJfA+rJgAx156Q8SN67YQMG1cXu1cRy4byjdDC0piyFt4P4IwZ
-   J7jV2yXJiMSdOYmAQRJT/BBGNis2ytu3n+kWJRhx8/CFTHRHU3jVc+JzB
-   EswISVH8zf3PskctPV3EwI+RqRJluCUTGLVeEbp5L9zl9gYVrWIe7Gr5j
-   JFonofBumbesbOyfKINO7xj+h2Y14/Ki1r4f4LEsqWP1QvUHKxEBWbsn1
-   uDQuAtN49Lb3vWA/i0/amt1SKWcglPkAqN7DzD4x4c0IRM6exsok6q6Qq
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="427263459"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="427263459"
-Received: from orsmga002.jf.intel.com ([10.7.209.21])
-  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 05:00:50 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="719558422"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="719558422"
-Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
-  by orsmga002.jf.intel.com with ESMTP; 06 Jul 2023 05:00:49 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:00:49 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:00:48 -0700
-Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 05:00:48 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.171)
- by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:00:48 -0700
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=eu/uOzqY0Cp3abHzDVeIMqEzgXHPof6HrCjWhTXzZTo4heh7UmnksJ/eP85leys6t+svJDJhiHp7NzvdOm3pH8UEIM54sLaI59rwevRPm4HdNzySfa6gHzY7Bqnd6glj3FD1IZlnSxY//RlIysBExfsqS06KLwD0iIXyBZqDsAmUTCskDzVQcpAxsfUPDWRmtu+xooJ4CGOFr/WuJ8cCTkH5MwFJdSY67ihdsuTZwuuUHfOdMrG/3trZYQ/yO2EA2Eb5pRZHKCVFdztgObbcLghnVVsf44Esff1XVxO4bXnf9sUmEgK38VnPch1NJ3erw3kHj81vmG2iezRxsqanNw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=KjGI3ANKy3h4+db/++gd2/1X1vESJ22To1mLQh9QCZA=;
- b=lpfmVn5s6gzOve4Bm8EcjT9DzhWjUOHtsVeFgbDWtL/DImHPk/YIJZW68sgx5QFXonk8jruauO1ydyHL7TRZPFLVeLV8ViJ3Tq8KZhyywcLs8eeVZKCmrLO8yqxGocvE7btvp2thn8drxryup/J9tVQZEzCwDMBuaT5sGbJDhp7NexvjMpZ6RbFDgeG28f1Rav0WRlgaeNujsszKs2bKqQhIzo1Z1Qh+ld05wmzvFPTk+I99c6UEmcoo0w8GW/HZf8vK4M+rKnwzrib38NoQjXKYkTeTlYOOnVsM8BFrkml8o6nV0Rbpweb8T7ODdRd+61Llr0sQV6SpXDFcN1fHOw==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
- by DM8PR11MB5655.namprd11.prod.outlook.com (2603:10b6:8:28::10) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
- 2023 12:00:46 +0000
-Received: from DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::1ecd:561c:902a:7130]) by DM6PR11MB3625.namprd11.prod.outlook.com
- ([fe80::1ecd:561c:902a:7130%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 12:00:46 +0000
-Message-ID: <7df8d76c-e177-b06c-20e4-e6aacbea6471@intel.com>
-Date: Thu, 6 Jul 2023 13:59:18 +0200
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH V2 net 2/4] net: fec: recycle pages for transmitted XDP
- frames
-Content-Language: en-US
-To: <wei.fang@nxp.com>
-CC: <davem@davemloft.net>, <edumazet@google.com>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <ast@kernel.org>, <daniel@iogearbox.net>,
-	<hawk@kernel.org>, <john.fastabend@gmail.com>, <shenwei.wang@nxp.com>,
-	<xiaoning.wang@nxp.com>, <netdev@vger.kernel.org>, <linux-imx@nxp.com>,
-	<linux-kernel@vger.kernel.org>, <bpf@vger.kernel.org>
-References: <20230706081012.2278063-1-wei.fang@nxp.com>
- <20230706081012.2278063-3-wei.fang@nxp.com>
-From: Alexander Lobakin <aleksander.lobakin@intel.com>
-In-Reply-To: <20230706081012.2278063-3-wei.fang@nxp.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 698678F47
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 12:01:07 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 128381BC9;
+	Thu,  6 Jul 2023 05:01:03 -0700 (PDT)
+Received: from pps.filterd (m0353729.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 366Bkvwv025204;
+	Thu, 6 Jul 2023 12:01:03 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=message-id : subject :
+ from : to : cc : date : in-reply-to : references : content-type :
+ content-transfer-encoding : mime-version; s=pp1;
+ bh=MgFgLExdzOXDVINyezCyX4yUENhWZqwwJnX9EcPhS+k=;
+ b=d3CSNkTMZVngjGCaLvJJPXSAen9vba8RcNfFRRVUAD/pT7TV5QKQ4dVSy6QmtbvEsiqo
+ D3F1WdlkIcMI2eeKX7Ql78v5rCvyQFW2hcmj2vi9B7oliTUscB31+d4wGTQz+49hE4mI
+ Cec+KlyjO/7iPFh++dBdygNMX1DLG2Dslkn9M0vBiTUTsw7cATLgFpLFP3AH8yPeG+Q4
+ HdD/svUhr3V1nKW6KTykfH3UkOwZ0lJ0QIcAGYc4WNFAcHHFYSyTpAmmmKIFqLtlUbjG
+ vTdUefIDHQkRdNjCB6Q5ZKi7QbnRa0lfs6hDnK1wBS2LuryQnmKqszhZynICJ3P39jQN 2Q== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rnw1uga63-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jul 2023 12:01:01 +0000
+Received: from m0353729.ppops.net (m0353729.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 366BrYrf013547;
+	Thu, 6 Jul 2023 12:01:00 GMT
+Received: from ppma04ams.nl.ibm.com (63.31.33a9.ip4.static.sl-reverse.com [169.51.49.99])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rnw1uga1y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jul 2023 12:00:58 +0000
+Received: from pps.filterd (ppma04ams.nl.ibm.com [127.0.0.1])
+	by ppma04ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3660IFFs012401;
+	Thu, 6 Jul 2023 12:00:55 GMT
+Received: from smtprelay07.fra02v.mail.ibm.com ([9.218.2.229])
+	by ppma04ams.nl.ibm.com (PPS) with ESMTPS id 3rjbs4ua9p-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Thu, 06 Jul 2023 12:00:55 +0000
+Received: from smtpav03.fra02v.mail.ibm.com (smtpav03.fra02v.mail.ibm.com [10.20.54.102])
+	by smtprelay07.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 366C0qA860686700
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Thu, 6 Jul 2023 12:00:52 GMT
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3089D20043;
+	Thu,  6 Jul 2023 12:00:52 +0000 (GMT)
+Received: from smtpav03.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 60A1A2004D;
+	Thu,  6 Jul 2023 12:00:51 +0000 (GMT)
+Received: from [9.171.3.14] (unknown [9.171.3.14])
+	by smtpav03.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Thu,  6 Jul 2023 12:00:51 +0000 (GMT)
+Message-ID: <bf41a4c062f2b7f7fb63bdee2c4ef1333c624393.camel@linux.ibm.com>
+Subject: Re: [PATCH net] s390/ism: Fix locking for forwarding of IRQs and
+ events to clients
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Paolo Abeni <pabeni@redhat.com>, Alexandra Winter
+ <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Heiko
+ Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander
+ Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger
+ <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>, Jan
+ Karcher <jaka@linux.ibm.com>,
+        Stefan Raspl <raspl@linux.ibm.com>,
+        "David S.
+ Miller" <davem@davemloft.net>
+Cc: Julian Ruess <julianr@linux.ibm.com>, linux-s390@vger.kernel.org,
+        netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Date: Thu, 06 Jul 2023 14:00:51 +0200
+In-Reply-To: <c6835aae95dd18da35795d2231e9326e0d21b60b.camel@redhat.com>
+References: <20230705121722.2700998-1-schnelle@linux.ibm.com>
+	 <c6835aae95dd18da35795d2231e9326e0d21b60b.camel@redhat.com>
 Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: DB6PR0301CA0090.eurprd03.prod.outlook.com
- (2603:10a6:6:30::37) To DM6PR11MB3625.namprd11.prod.outlook.com
- (2603:10b6:5:13a::21)
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|DM8PR11MB5655:EE_
-X-MS-Office365-Filtering-Correlation-Id: 09db7053-9f1f-41bc-73e5-08db7e18a1d1
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: Mwqej1/Uaf42y25q6ktHPJuMNiBfd+HsMmnTWYoGWoGqu56CffRhIviFbLhvvFptULOPHvJPzwOOCfs3EKRw12GakmfMXAAP3e+CLDr4g2i4ii4q7x8tXy43YUKPGf9D/TQP/7dck63b7i3o4gu7WC+bOzHm6Z3Ml+mDBt5Szon+SgGHSPQir8iRiVJqo+V2FUo6owA5jTO0LZMsZn3cPhMMRza9Mdf8kuIXNzIALApIVNDSbyZ08eO7WGGKVFgAayCiX2a4+h0Fp+HjHVIspnCybNfjciH1i9gr8uPIdW3xy5nrymMyK2oQHrNj154vgI7wYGBxSfybn97nCFnD4jEBeKN5fQJLsEZwqG3jtdz3wlYaH2GAaYgveklOMU+8+sj/6HvURxVJzUaizoUCk+UIqvfi+wpgcbHPm9Gm0NdIw7VMfvlNe82Jk8JRvF40wvvIuPl15JunLEwO25szJTY9p+G2dDMJGHsgrvcK23EU91q/VyTGo7ZqFo8AZA7LHv7p2+5fTqQd5tfsaDOQfaEPwPkLyyNYENGU7xchkANn/7rOT8sVTONBbGy+o/sB1IYxeGUWU8dJrOvdCM9VzcGXypbyawhsXttR4DwSwTuwFfmJi4Ql9blUdaTAdnrjTTtbvG71h4b7Zw6jF2O9RA==
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(346002)(136003)(366004)(376002)(396003)(39860400002)(451199021)(478600001)(6666004)(6486002)(186003)(6506007)(26005)(6512007)(66946007)(2906002)(4326008)(7416002)(41300700001)(8936002)(66556008)(316002)(66476007)(8676002)(5660300002)(6916009)(38100700002)(82960400001)(36756003)(31696002)(86362001)(2616005)(83380400001)(4744005)(31686004)(43740500002)(45980500001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?ZzlhTk5xeldQQWJnaEhQWEs4Q0ExTHVFNnhYamMxZTlacG9ZTlFQQTMvTHJn?=
- =?utf-8?B?N1R1L1RNSlo1TzJiR0t3TkthWDdhN1NQSm9zTGQxYXA3ajc5Z0hpYldwZzVU?=
- =?utf-8?B?TU5yeU4vLzBncEhXUGdZb3I2a0wxZWZ5U3FDZ200aW5KTFhwSmsvV2RzaEYy?=
- =?utf-8?B?dmhLUmoxek5SZnhHZXNkbGI3dnhDRnlhSFpSYzlpbUF6d2JCc2duV2thTys2?=
- =?utf-8?B?U3BXeE12QXVSS09uZlZ0dno5dG1Kb3RURklNVjhocFNscUthRlU4WjRnVDhn?=
- =?utf-8?B?VFpWNlE2RTJQcGFOTkVaTTZUcXNDQXJYSWJZeGV1OVZSR0FiOXovc3hNdkgr?=
- =?utf-8?B?MFRWTkV1RHpyVThIWGVFTVhoRHEwMnVmd2o0dklXYnhYeTc1Rm1jbm1VTCtr?=
- =?utf-8?B?MkxuSE5XdkxXWHFMb0Z4YWs3SnhnSXY0UExzbEhxZUhXd1NyQkU5bGc3bjFq?=
- =?utf-8?B?UGtXN2NRRUFpOFFBNFdKNi85SjI3YzMwMzhtVUlvRDZEczBRanVobXVpcVIz?=
- =?utf-8?B?SStnbTFGYnZabGttT0dRYXJzc3dKM3lUTTlLcEdpNitpTC9nNlMwTkk4OHE5?=
- =?utf-8?B?NXlFZWtXcTNiTDVsSHcwSlNJdmRMU2V4Y1dDbWdhWUV5ZWxTVTdHdHJzWE1m?=
- =?utf-8?B?cFdZWEV6Y3VLcE5ycWkyS2Vma2lMTkJISUE2UmEvRVNDSzREb3ZreS92eHE3?=
- =?utf-8?B?M3NtZkJBMmh5YUd0bXJvODczY1RXYk1xS3laS0JUMysyOFByNFlhcnRSOWdJ?=
- =?utf-8?B?bkU2b3NPMjhCUlBPa01JQWc1OExYc2tSTk1pU2ovYzNKVzFwaG5YbmRkYTZM?=
- =?utf-8?B?ZUZJakVhRWtEUDg4cHVGQzRtSW9VOUFrMldVUDVJU2ZXdnFtbTVLNTdMN1FE?=
- =?utf-8?B?UGpIbldacDhYNmZMbWhPNlE0WFhrUEg3OHBmS3RiWXdFbVZmMzNHUVdjQ0tE?=
- =?utf-8?B?OXRzTUYrTHpTTFJvVnIyK0xmVWRKZGxTdnlLK3NxWjdwN2g3OUszWE1saktY?=
- =?utf-8?B?ZXFTbnNCdHhUZTREeTJ1RjFOU0lSQW05TVN6bEUycWZUN21TbmpmSk5XSE52?=
- =?utf-8?B?dFBncEVoQWhXcDlyMUl3ejQ4dTczTjI4WXBTMENBSTNFMkpSeG91YUhWZXUx?=
- =?utf-8?B?YWZvT0lSdGZ5UjNlS0ZXRy9CS0luOUxJTThYQ085WXozcWlEWUxweTZtRHJD?=
- =?utf-8?B?OS81MnRXTDh6UXIxcmc1VDhJVHl2ZkU3ZlBUek9ZUGZvaDBKL0JFblBDK0Zx?=
- =?utf-8?B?THQ1S3NQTC9JcmNmdHpGeWFWQ0F4UjJYTTdFMllKTGhSOThHQ2xJZUNWelVT?=
- =?utf-8?B?NmZOc3FTOFk4VHRoSjRZY0hjUW13NCtpVUYxM09VMk56dFJvMDhDWGxzSFY4?=
- =?utf-8?B?SFY5R3QrNUtPUFpmSmE4aHFLcFkvUDR6a01kRi9zSGZSUzZEUjE3VXYvemxv?=
- =?utf-8?B?ZTRZbU1tODhuNmkrMTlBUG5GQUkwKzkvaGNSOXBrSkZ6R0tETmZKNzdhSEtz?=
- =?utf-8?B?NWVZNkVCNThRQkZGVHpyOTVDTzB5RDJid1FzZ085c0k4SUkvSDhzckhSWTVl?=
- =?utf-8?B?MXU2NFpqL1Bza2pnMkRndnFhWFRnNXQ5K051MXpLMkUzb3NCUzlUcmVaWUIw?=
- =?utf-8?B?Yi9DaVU4a0NIUHJuWEFkSnNlRDRvNXArR2xDazBJV1YxaGE3MWl1akZkTVlS?=
- =?utf-8?B?L1k5RzBwbGJFUFFKbis5Vkk0NXlERTcxN2R1d3V2c202NnVVOFg3ZzhqWUFR?=
- =?utf-8?B?SG9OTURPNkloNlNkVkJzVGwrNzloRjZPem5mYzBvRWg4SWlLSnQvOC9QT1Zk?=
- =?utf-8?B?Rkd2WklxM3g5djAwSVl4aGptcm5QS3dWK1pLTkN3ODJzcFFnNytpVlA5aXFG?=
- =?utf-8?B?UzROUzdYZUFKRjNCcE1DTFdYS052V0xwTi9NUjhnSjhFUjM5V0dQQWl0ZWJ0?=
- =?utf-8?B?aUtmZ3JqWUtLNTVFQWVtUkdXSUtFU3Z0cDBqQVJjTHJiRkVYZ2pOUWdCN0ho?=
- =?utf-8?B?M0FrQ0lVZWVlejBMM2dReGFjSUF4WFFQZkpmeXRGaU9seTNVWW1PU1FPL0hH?=
- =?utf-8?B?STVpNmlQTUZRbjZnL1h4T01IRFdicjcvZWQ0ZkxpbnBPUnNsQ1lJMUxDbkFk?=
- =?utf-8?B?NHZaYzJaY3R2UkFrWWlGOFByZUViTkRrNkY3aitETzRmZGw4L2xMQlNqVXhN?=
- =?utf-8?B?c3c9PQ==?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 09db7053-9f1f-41bc-73e5-08db7e18a1d1
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 12:00:46.4267
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: CHJbEm4Mbk2YlZsYE+KBs4crQklWSJaGN+72ZHFoEeDERVOcerNVhMvTBMTk+GwDKBN3dzpdeAYtFl2+AJriSyp6eRJW5YR0Pr+mA2KpNUk=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DM8PR11MB5655
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-TM-AS-GCONF: 00
+X-Proofpoint-GUID: tWzEmQdFitVBYpCA-AFhCw9nIldilkBJ
+X-Proofpoint-ORIG-GUID: s_wrybLu8I4tGK9XkCtwr6o9M0-244VQ
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-06_07,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 spamscore=0
+ priorityscore=1501 malwarescore=0 lowpriorityscore=0 suspectscore=0
+ bulkscore=0 phishscore=0 mlxlogscore=575 clxscore=1015 adultscore=0
+ impostorscore=0 mlxscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307060103
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Wei Fang <wei.fang@nxp.com>
-Date: Thu,  6 Jul 2023 16:10:10 +0800
+On Thu, 2023-07-06 at 12:47 +0200, Paolo Abeni wrote:
+> On Wed, 2023-07-05 at 14:17 +0200, Niklas Schnelle wrote:
+> > The clients array references all registered clients and is protected by
+> > the clients_lock. Besides its use as general list of clients the client=
+s
+> > array is accessed in ism_handle_irq() to forward IRQs and events to
+> > clients. This use in an interrupt handler thus requires all code that
+> > takes the clients_lock to be IRQ save.
+> >=20
+> > This is problematic since the add() and remove() callbacks which are
+> > called for all clients when an ISM device is added or removed cannot be
+> > called directly while iterating over the clients array and holding the
+> > clients_lock since clients need to allocate and/or take mutexes in thes=
+e
+> > callbacks. To deal with this the calls get pushed to workqueues with
+> > additional housekeeping to be able to wait for the completion outside
+> > the clients_lock.
+> >=20
+> > Moreover while the clients_lock is taken in the IRQ handler when callin=
+g
+> > handle_event() it is incorrectly not held during the
+> > client->handle_irq() call and for the preceding clients[] access. This
+> > leaves the clients array unprotected. Similarly the accesses to
+> > ism->sba_client_arr[] in ism_register_dmb() and ism_unregister_dmb() ar=
+e
+> > also not protected by any lock. This is especially problematic as the
+> > the client ID from the ism->sba_client_arr[] is not checked against
+> > NO_CLIENT.
+> >=20
+> > Instead of expanding the use of the clients_lock further add a separate
+> > array in struct ism_dev which references clients subscribed to the
+> > device's events and IRQs. This array is protected by ism->lock which is
+> > already taken in ism_handle_irq() and can be taken outside the IRQ
+> > handler when adding/removing subscribers or the accessing
+> > ism->sba_client_arr[].
+> >=20
+> > With the clients_lock no longer accessed from IRQ context it is turned
+> > into a mutex and the add and remove workqueues plus their housekeeping
+> > can be removed in favor of simple direct calls.
+> >=20
+> > Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
+> > Tested-by: Julian Ruess <julianr@linux.ibm.com>
+> > Reviewed-by: Julian Ruess <julianr@linux.ibm.com>
+> > Reviewed-by: Alexandra Winter <wintera@linux.ibm.com>
+> > Reviewed-by: Wenjia Zhang <wenjia@linux.ibm.com>
+> > Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> > ---
+> > Note: I realize this is a rather large patch. So I'd understand if it's=
+ not
+> > acceptable as is and needs to be broken up. That said it removes more l=
+ines
+> > than it adds and the complexity of the resulting code is in my opinion =
+reduced.
+>=20
+> This is indeed unusually large for a -net patch. IMHO it would be
+> better split it in 2 separated patches: 1 introducing the ism->lock and
+> one turning the clients_lock in a mutex. The series should still target
+> -net, but should be more easily reviewable.
+>=20
+> Thanks,
+>=20
+> Paolo
+>=20
 
-> From: Wei Fang <wei.fang@nxp.com>
-> 
-> Once the XDP frames have been successfully transmitted through the
-> ndo_xdp_xmit() interface, it's the driver responsibility to free
-> the frames so that the page_pool can recycle the pages and reuse
-> them. However, this action is not implemented in the fec driver.
-> This leads to a user-visible problem that the console will print
-> the following warning log.
-
-[...]
-
-> +				if (txq->tx_buf[i].xdp) {
-> +					xdp_return_frame(txq->tx_buf[i].xdp);
-> +					txq->tx_buf[i].xdp = NULL;
-> +				}
-> +
-> +				/* restore default tx buffer type: FEC_TXBUF_T_SKB */
-> +				txq->tx_buf[i].type = FEC_TXBUF_T_SKB;
-
-Here and in the related places below: maybe set ::type dynamically when
-sending to either SKB or XDP instead of setting it only for XDP and then
-restoring each time?
-
->  			}
-> +
->  			bdp->cbd_bufaddr = cpu_to_fec32(0);
->  			bdp = fec_enet_get_nextdesc(bdp, &txq->bd);
->  		}
-[...]
+Sounds reasonable. Patch 1 would introduce and use the ism->subs[]
+array under the ism->lock and also protect the ism->sba_client_arr[]
+under that lock. Patch 2 would then turn clients_lock into a mutex and
+remove the workqueues. I think strictly speaking the second one then
+isn't a fix but let's see. @Alexandra, Wenjia, Julian I'll drop your R-
+bs as its a larger rework but I hope to end up at the same code after
+both patches so should be easy to re-revievie for you.
 
 Thanks,
-Olek
+Niklas
 
