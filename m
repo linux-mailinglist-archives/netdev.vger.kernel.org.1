@@ -1,278 +1,219 @@
-Return-Path: <netdev+bounces-15748-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15751-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 17CBF7497E9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:05:05 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 95E5A74985E
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:26:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4900F1C20C8F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:05:04 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5883328123F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:26:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71B55255;
-	Thu,  6 Jul 2023 09:04:55 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2E8DA5255;
+	Thu,  6 Jul 2023 09:26:33 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C714A3B
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:04:55 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D0B1990
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:04:54 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688634293;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=JRgRsp2FWtM1ajDRcR2lcgfKwwSkmw5MTCctZvf1Vww=;
-	b=FhWXxMFLdH2VHYst23wq/5rDmB553z2kXjS4KfOs9LeDO41PDPNkgpXiy7idVNEQgxpJfS
-	2bKmvCAZoWyf6ijGRtFPfa2ANxL/Lry4ZYvVbAW+AW9duCVLIJ+fMStINFbBd/a+0T/e48
-	W7mXpsDYYgFLPNZlr+Q+lPcSPMMti1U=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-612-Y196Gm38NeWKb_PFvEKh7g-1; Thu, 06 Jul 2023 05:04:52 -0400
-X-MC-Unique: Y196Gm38NeWKb_PFvEKh7g-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-989249538a1so34263166b.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 02:04:52 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688634291; x=1691226291;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=JRgRsp2FWtM1ajDRcR2lcgfKwwSkmw5MTCctZvf1Vww=;
-        b=gRRBrTL/KooTGLw0wHiOiP9sEgm68rzmyfmPQR74YWd/u3V3NNOHD6zXceIqM3gfVH
-         oZ4BMzXiIX1OjsEzvNW0vWrPDPigv2HwkMclUur4IhqDsNZDSYfrjVOFdunmBAO/UVak
-         hZmP4kG6cRn8du1wHpvMqjfw2ZNM+xSHkD9wAxj1Oi4zeptUZwLjUQpWRRr8YjCAqJV1
-         6ZsSskGd5I/PSovf8pmErwrxEfHz3eeLRewZG9VftfKujFBg6Gm6PLqp2NNkgU7imyQG
-         Esb8O781u6grcgOKXJQW2+86Qlqog6jRoBTExA35GpR0yHFdVipwUIM4ppOggJ0dv5Lb
-         WoSw==
-X-Gm-Message-State: ABy/qLaKxex9rirtYcQI/k/Ol2Wf/KdmajUZoagrz1UxFxVNmz3RJsax
-	ivRCmbBa23p9OINiHg6/ybvxH0DzjQgRDQCW+l6uv1rxuypx2i1Ea+ckxDtYOUqvQyPFNntRiEu
-	4Cp1JjO9//Zo8pzpU
-X-Received: by 2002:a17:906:8f:b0:971:484:6391 with SMTP id 15-20020a170906008f00b0097104846391mr936589ejc.20.1688634291257;
-        Thu, 06 Jul 2023 02:04:51 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlF8QrUyIfcWvQEKTibW2aZLt9dHEJ0HZEw3k4yx3jJ5selC58HHjh6xvrPIEGa3dNa3lU7qBA==
-X-Received: by 2002:a17:906:8f:b0:971:484:6391 with SMTP id 15-20020a170906008f00b0097104846391mr936566ejc.20.1688634290906;
-        Thu, 06 Jul 2023 02:04:50 -0700 (PDT)
-Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id s24-20020a170906169800b0096f7500502csm531220ejd.199.2023.07.06.02.04.49
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jul 2023 02:04:50 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <3cc1d2ba-e084-8fc4-aa31-856bc532d1a7@redhat.com>
-Date: Thu, 6 Jul 2023 11:04:49 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1FE587483
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:26:33 +0000 (UTC)
+Received: from mga06.intel.com (mga06b.intel.com [134.134.136.31])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C6D1F1BF3
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:26:30 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688635590; x=1720171590;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=tpxhDS4eUcvbMNVT3Hp8qJc0b+xaK7HRLOVFFXA4q1A=;
+  b=lgg6AZ07bCF70O0zlkFyczX5pM9/RZeCbRgTto7j1tlNRmNFOyXWQ9qh
+   8X8DFSIfUX8ax6BwFWkRJiMXAbOUYOuYup42kVAYfU6VJffpTroj6Zh4g
+   pjSGHvK3yA0pmdkmjsonbUALP0ByQnPRJzYjz+9Gmmu/p/IVOEeOsOei2
+   GastFS3VQfgbFC3nCZyotjPNVh8j0arYFZ4r8LSNZvqPio4V9X7e4O4LX
+   i3l0HOcdVtIM/9drgpelg/IbeHzBGB0YjcWsQ4mxtfcpLDHRAAhoPnWwm
+   bKgCv5d1DcQQTHHlT4Df7qd1SDZghwHbJmBkV46nRxYfXXcZhPe7KyaUr
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="427233149"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="427233149"
+Received: from fmsmga008.fm.intel.com ([10.253.24.58])
+  by orsmga104.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 02:25:54 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="784863739"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="784863739"
+Received: from os-delivery.igk.intel.com ([10.102.18.218])
+  by fmsmga008.fm.intel.com with ESMTP; 06 Jul 2023 02:25:51 -0700
+From: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	anthony.l.nguyen@intel.com,
+	Jedrzej Jagielski <jedrzej.jagielski@intel.com>,
+	Michal Schmidt <mschmidt@redhat.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v3] ice: Fix memory management in ice_ethtool_fdir.c
+Date: Thu,  6 Jul 2023 11:19:10 +0200
+Message-Id: <20230706091910.124498-1-jedrzej.jagielski@intel.com>
+X-Mailer: git-send-email 2.31.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: brouer@redhat.com, bpf@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com, jolsa@kernel.org, David Ahern <dsahern@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Anatoly Burakov <anatoly.burakov@intel.com>,
- Alexander Lobakin <alexandr.lobakin@intel.com>,
- Magnus Karlsson <magnus.karlsson@gmail.com>,
- Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
- netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
- Alexander Duyck <alexander.duyck@gmail.com>
-Subject: Re: [xdp-hints] Re: [PATCH bpf-next v2 12/20] xdp: Add checksum level
- hint
-Content-Language: en-US
-To: John Fastabend <john.fastabend@gmail.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>,
- Jesper Dangaard Brouer <jbrouer@redhat.com>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-13-larysa.zaremba@intel.com>
- <64a331c338a5a_628d3208cb@john.notmuch> <ZKPlZ6Z8ni5+ZJCK@lincoln>
- <9cd44759-416c-7274-f805-ee9d756f15b1@redhat.com> <ZKQAPBcIE/iCkiX2@lincoln>
- <64a656273ee15_b20ce2087a@john.notmuch>
-In-Reply-To: <64a656273ee15_b20ce2087a@john.notmuch>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Fix ethtool FDIR logic to not use memory after its release.
+In the ice_ethtool_fdir.c file there are 2 spots where code can
+refer to pointers which may be missing.
 
+In the ice_cfg_fdir_xtrct_seq() function seg may be freed but
+even then may be still used by memcpy(&tun_seg[1], seg, sizeof(*seg)).
 
-On 06/07/2023 07.50, John Fastabend wrote:
-> Larysa Zaremba wrote:
->> On Tue, Jul 04, 2023 at 12:39:06PM +0200, Jesper Dangaard Brouer wrote:
->>> Cc. DaveM+Alex Duyck, as I value your insights on checksums.
->>>
->>> On 04/07/2023 11.24, Larysa Zaremba wrote:
->>>> On Mon, Jul 03, 2023 at 01:38:27PM -0700, John Fastabend wrote:
->>>>> Larysa Zaremba wrote:
->>>>>> Implement functionality that enables drivers to expose to XDP code,
->>>>>> whether checksums was checked and on what level.
->>>>>>
->>>>>> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
->>>>>> ---
->>>>>>    Documentation/networking/xdp-rx-metadata.rst |  3 +++
->>>>>>    include/linux/netdevice.h                    |  1 +
->>>>>>    include/net/xdp.h                            |  2 ++
->>>>>>    kernel/bpf/offload.c                         |  2 ++
->>>>>>    net/core/xdp.c                               | 21 ++++++++++++++++++++
->>>>>>    5 files changed, 29 insertions(+)
->>>>>>
->>>>>> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
->>>>>> index ea6dd79a21d3..4ec6ddfd2a52 100644
->>>>>> --- a/Documentation/networking/xdp-rx-metadata.rst
->>>>>> +++ b/Documentation/networking/xdp-rx-metadata.rst
->>>>>> @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
->>>>>>    .. kernel-doc:: net/core/xdp.c
->>>>>>       :identifiers: bpf_xdp_metadata_rx_vlan_tag
->>>>>> +.. kernel-doc:: net/core/xdp.c
->>>>>> +   :identifiers: bpf_xdp_metadata_rx_csum_lvl
->>>>>> +
->>>>>>    An XDP program can use these kfuncs to read the metadata into stack
->>>>>>    variables for its own consumption. Or, to pass the metadata on to other
->>>>>>    consumers, an XDP program can store it into the metadata area carried
->>>>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
->>>>>> index 4fa4380e6d89..569563687172 100644
->>>>>> --- a/include/linux/netdevice.h
->>>>>> +++ b/include/linux/netdevice.h
->>>>>> @@ -1660,6 +1660,7 @@ struct xdp_metadata_ops {
->>>>>>    			       enum xdp_rss_hash_type *rss_type);
->>>>>>    	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tag,
->>>>>>    				   __be16 *vlan_proto);
->>>>>> +	int	(*xmo_rx_csum_lvl)(const struct xdp_md *ctx, u8 *csum_level);
->>>>>>    };
->>>>>>    /**
->>>>>> diff --git a/include/net/xdp.h b/include/net/xdp.h
->>>>>> index 89c58f56ffc6..61ed38fa79d1 100644
->>>>>> --- a/include/net/xdp.h
->>>>>> +++ b/include/net/xdp.h
->>>>>> @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
->>>>>>    			   bpf_xdp_metadata_rx_hash) \
->>>>>>    	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
->>>>>>    			   bpf_xdp_metadata_rx_vlan_tag) \
->>>>>> +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM_LVL, \
->>>>>> +			   bpf_xdp_metadata_rx_csum_lvl) \
->>>>>>    enum {
->>>>>>    #define XDP_METADATA_KFUNC(name, _) name,
->>>>>> diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
->>>>>> index 986e7becfd42..a133fb775f49 100644
->>>>>> --- a/kernel/bpf/offload.c
->>>>>> +++ b/kernel/bpf/offload.c
->>>>>> @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
->>>>>>    		p = ops->xmo_rx_hash;
->>>>>>    	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
->>>>>>    		p = ops->xmo_rx_vlan_tag;
->>>>>> +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM_LVL))
->>>>>> +		p = ops->xmo_rx_csum_lvl;
->>>>>>    out:
->>>>>>    	up_read(&bpf_devs_lock);
->>>>>> diff --git a/net/core/xdp.c b/net/core/xdp.c
->>>>>> index f6262c90e45f..c666d3e0a26c 100644
->>>>>> --- a/net/core/xdp.c
->>>>>> +++ b/net/core/xdp.c
->>>>>> @@ -758,6 +758,27 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan
->>>>>>    	return -EOPNOTSUPP;
->>>>>>    }
->>>>>> +/**
->>>>>> + * bpf_xdp_metadata_rx_csum_lvl - Get depth at which HW has checked the checksum.
->>>>>> + * @ctx: XDP context pointer.
->>>>>> + * @csum_level: Return value pointer.
->>>>>> + *
->>>>>> + * In case of success, csum_level contains depth of the last verified checksum.
->>>>>> + * If only the outermost checksum was verified, csum_level is 0, if both
->>>>>> + * encapsulation and inner transport checksums were verified, csum_level is 1,
->>>>>> + * and so on.
->>>>>> + * For more details, refer to csum_level field in sk_buff.
->>>>>> + *
->>>>>> + * Return:
->>>>>> + * * Returns 0 on success or ``-errno`` on error.
->>>>>> + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
->>>>>> + * * ``-ENODATA``    : Checksum was not validated
->>>>>> + */
->>>>>> +__bpf_kfunc int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
->>>>>
->>>>> Istead of ENODATA should we return what would be put in the ip_summed field
->>>>> CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}? Then sig would be,
->>>
->>> I was thinking the same, what about checksum "type".
->>>
->>>>>
->>>>>    bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *type, u8 *lvl);
->>>>>
->>>>> or something like that? Or is the thought that its not really necessary?
->>>>> I don't have a strong preference but figured it was worth asking.
->>>>>
->>>>
->>>> I see no value in returning CHECKSUM_COMPLETE without the actual checksum value.
->>>> Same with CHECKSUM_PARTIAL and csum_start. Returning those values too would
->>>> overcomplicate the function signature.
->>>
->>> So, this kfunc bpf_xdp_metadata_rx_csum_lvl() success is it equivilent to
->>> CHECKSUM_UNNECESSARY?
->>
->> This is 100% true for physical NICs, it's more complicated for veth, bacause it
->> often receives CHECKSUM_PARTIAL, which shouldn't normally apprear on RX, but is
->> treated by the network stack as a validated checksum, because there is no way
->> internally generated packet could be messed up. I would be grateful if you could
->> look at the veth patch and share your opinion about this.
->>
->>>
->>> Looking at documentation[1] (generated from skbuff.h):
->>>   [1] https://kernel.org/doc/html/latest/networking/skbuff.html#checksumming-of-received-packets-by-device
->>>
->>> Is the idea that we can add another kfunc (new signature) than can deal
->>> with the other types of checksums (in a later kernel release)?
->>>
->>
->> Yes, that is the idea.
-> 
-> If we think there is a chance we might need another kfunc we should add it
-> in the same kfunc. It would be unfortunate to have to do two kfuncs when
-> one would work. It shouldn't cost much/anything(?) to hardcode the type for
-> most cases? I think if we need it later I would advocate for updating this
-> kfunc to support it. Of course then userspace will have to swivel on the
-> kfunc signature.
-> 
+In the ice_add_fdir_ethtool() function struct ice_fdir_fltr *input
+may first fail to be added via ice_fdir_update_list_entry() but then
+may be deleted by ice_fdir_update_list_entry.
 
-I think it might make sense to have 3 kfuncs for checksumming.
-As this would allow BPF-prog to focus on CHECKSUM_UNNECESSARY, and then
-only call additional kfunc for extracting e.g csum_start  + csum_offset
-when type is CHECKSUM_PARTIAL.
+Terminate in both cases when the returned value of the previous
+operation is other than 0, free memory and don't use it anymore.
 
-We could extend bpf_xdp_metadata_rx_csum_lvl() to give the csum_type
-CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}.
+Replace managed memory alloc with kzalloc/kfree in
+ice_cfg_fdir_xtrct_seq() since seg/tun_seg are used only by
+ice_fdir_set_hw_fltr_rule().
 
-  int bpf_xdp_metadata_rx_csum_lvl(*ctx, u8 *csum_level, u8 *csum_type)
+Reported-by: Michal Schmidt <mschmidt@redhat.com>
+Link: https://bugzilla.redhat.com/show_bug.cgi?id=2208423
+Fixes: cac2a27cd9ab ("ice: Support IPv4 Flow Director filters")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Jedrzej Jagielski <jedrzej.jagielski@intel.com>
+---
+v2: extend CC list, fix freeing memory before return
+v3: correct typos in the commit msg
+---
+ .../net/ethernet/intel/ice/ice_ethtool_fdir.c | 62 +++++++++----------
+ 1 file changed, 28 insertions(+), 34 deletions(-)
 
-And then add two kfunc e.g.
-  (1) bpf_xdp_metadata_rx_csum_partial(ctx, start, offset)
-  (2) bpf_xdp_metadata_rx_csum_complete(ctx, csum)
-
-Pseudo BPF-prog code:
-
-  err = bpf_xdp_metadata_rx_csum_lvl(ctx, level, type);
-  if (!err && type != CHECKSUM_UNNECESSARY) {
-      if (type == CHECKSUM_PARTIAL)
-          err = bpf_xdp_metadata_rx_csum_partial(ctx, start, offset);
-      if (type == CHECKSUM_COMPLETE)
-          err = bpf_xdp_metadata_rx_csum_complete(ctx, csum);
-  }
-
-Looking at code, I feel we could rename [...]_csum_lvl to csum_type.
-E.g. bpf_xdp_metadata_rx_csum_type.
-
-Feel free to disagree,
---Jesper
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+index ead6d50fc0ad..619b32f4bc53 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool_fdir.c
+@@ -1204,21 +1204,16 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
+ 		       struct ice_rx_flow_userdef *user)
+ {
+ 	struct ice_flow_seg_info *seg, *tun_seg;
+-	struct device *dev = ice_pf_to_dev(pf);
+ 	enum ice_fltr_ptype fltr_idx;
+ 	struct ice_hw *hw = &pf->hw;
+ 	bool perfect_filter;
+ 	int ret;
+ 
+-	seg = devm_kzalloc(dev, sizeof(*seg), GFP_KERNEL);
+-	if (!seg)
+-		return -ENOMEM;
+-
+-	tun_seg = devm_kcalloc(dev, ICE_FD_HW_SEG_MAX, sizeof(*tun_seg),
+-			       GFP_KERNEL);
+-	if (!tun_seg) {
+-		devm_kfree(dev, seg);
+-		return -ENOMEM;
++	seg = kzalloc(sizeof(*seg), GFP_KERNEL);
++	tun_seg = kcalloc(ICE_FD_HW_SEG_MAX, sizeof(*tun_seg), GFP_KERNEL);
++	if (!tun_seg || !seg) {
++		ret = -ENOMEM;
++		goto exit;
+ 	}
+ 
+ 	switch (fsp->flow_type & ~FLOW_EXT) {
+@@ -1264,7 +1259,7 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
+ 		ret = -EINVAL;
+ 	}
+ 	if (ret)
+-		goto err_exit;
++		goto exit;
+ 
+ 	/* tunnel segments are shifted up one. */
+ 	memcpy(&tun_seg[1], seg, sizeof(*seg));
+@@ -1281,42 +1276,39 @@ ice_cfg_fdir_xtrct_seq(struct ice_pf *pf, struct ethtool_rx_flow_spec *fsp,
+ 				     ICE_FLOW_FLD_OFF_INVAL);
+ 	}
+ 
+-	/* add filter for outer headers */
+ 	fltr_idx = ice_ethtool_flow_to_fltr(fsp->flow_type & ~FLOW_EXT);
++
++	if (perfect_filter)
++		set_bit(fltr_idx, hw->fdir_perfect_fltr);
++	else
++		clear_bit(fltr_idx, hw->fdir_perfect_fltr);
++
++	/* add filter for outer headers */
+ 	ret = ice_fdir_set_hw_fltr_rule(pf, seg, fltr_idx,
+ 					ICE_FD_HW_SEG_NON_TUN);
+-	if (ret == -EEXIST)
+-		/* Rule already exists, free memory and continue */
+-		devm_kfree(dev, seg);
+-	else if (ret)
++	if (ret == -EEXIST) {
++		/* Rule already exists, free memory and count as success */
++		ret = 0;
++		goto exit;
++	} else if (ret) {
+ 		/* could not write filter, free memory */
+-		goto err_exit;
++		ret = -EOPNOTSUPP;
++		goto exit;
++	}
+ 
+ 	/* make tunneled filter HW entries if possible */
+ 	memcpy(&tun_seg[1], seg, sizeof(*seg));
+ 	ret = ice_fdir_set_hw_fltr_rule(pf, tun_seg, fltr_idx,
+ 					ICE_FD_HW_SEG_TUN);
+-	if (ret == -EEXIST) {
++	if (ret == -EEXIST)
+ 		/* Rule already exists, free memory and count as success */
+-		devm_kfree(dev, tun_seg);
+ 		ret = 0;
+-	} else if (ret) {
+-		/* could not write tunnel filter, but outer filter exists */
+-		devm_kfree(dev, tun_seg);
+-	}
+ 
+-	if (perfect_filter)
+-		set_bit(fltr_idx, hw->fdir_perfect_fltr);
+-	else
+-		clear_bit(fltr_idx, hw->fdir_perfect_fltr);
++exit:
++	kfree(tun_seg);
++	kfree(seg);
+ 
+ 	return ret;
+-
+-err_exit:
+-	devm_kfree(dev, tun_seg);
+-	devm_kfree(dev, seg);
+-
+-	return -EOPNOTSUPP;
+ }
+ 
+ /**
+@@ -1914,7 +1906,9 @@ int ice_add_fdir_ethtool(struct ice_vsi *vsi, struct ethtool_rxnfc *cmd)
+ 	input->comp_report = ICE_FXD_FLTR_QW0_COMP_REPORT_SW_FAIL;
+ 
+ 	/* input struct is added to the HW filter list */
+-	ice_fdir_update_list_entry(pf, input, fsp->location);
++	ret = ice_fdir_update_list_entry(pf, input, fsp->location);
++	if (ret)
++		goto release_lock;
+ 
+ 	ret = ice_fdir_write_all_fltr(pf, input, true);
+ 	if (ret)
+-- 
+2.31.1
 
 
