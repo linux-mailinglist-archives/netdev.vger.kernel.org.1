@@ -1,164 +1,290 @@
-Return-Path: <netdev+bounces-15725-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15726-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1E34C7495F0
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:52:04 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 295BB749601
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:06:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id CEC90281210
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:52:02 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C3D9C2811D8
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:06:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEA0A110C;
-	Thu,  6 Jul 2023 06:52:00 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AE110110E;
+	Thu,  6 Jul 2023 07:06:37 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A59921102
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:52:00 +0000 (UTC)
-Received: from EUR01-DB5-obe.outbound.protection.outlook.com (mail-db5eur01on2075.outbound.protection.outlook.com [40.107.15.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E61051BD3;
-	Wed,  5 Jul 2023 23:51:53 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OevxMgUU1jrzFDzFyZw4H9oWlmdRKOXEqKUkwRQWvFWlWx6brRDeTmsUWxNgwS3Jd9aGiAu2STcwc4krwT18SiN0PBg/ueh+R3hB9Umu/OZXgAx3fyj1HZy6IiCFzw6vFFTj8M+XMY2NEUJUcP/Ptb7EgtFMz4/auayesn1JJ5thKhs20XBf9ZNguYqv5WPk/1nxGghibGsAt+Gs3s1G7Jv8pTaxSmc/HFWpxjD0qDZDCNflLN3krRxD6M+21g/pTfKP+zxo10DBJEaZqSiK0RZdS0imoFGso3CpzBd1EktKCESbGBsRaV3N1zQX2/z4iR4BcW9WnXD9hmtgUE4mzg==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=B4qPY/cKDxdE4Sk+5x8cIu+k+Kj8NGxLE9QqhEat10I=;
- b=f1pOkuLeBnyFqPb/2M6OVpkE/QWS6jptCKTXgOy3sA6RB90y+KOhiLNFy8wda5/xur9xEhx5KM7sgZ/fJ9nEBM+jv2aAtjtGC13/DOCGiJ4WxKw/2UB2VqCiT6sjp+FxbYua0wOK1NCwefk7gGYXXIgGLtEkHO0gt7rD/pecTUOurDPr2LBv+hVokRMq2ZP/R1T5ETaP67J5owh8FYS5BAGuGDQOqnkEJNcRZjyEQfzZmMEQ8KmUPmrrWih4VXemvSHZyaYBgldsKA6fpbjXak/h3VV2Zo9sqImGZtzNp0m1oUkl2NtkWVa282GKFHvImZkYLkscpx5dTBeqzW7LXQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=siemens.com; dmarc=pass action=none header.from=siemens.com;
- dkim=pass header.d=siemens.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=siemens.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=B4qPY/cKDxdE4Sk+5x8cIu+k+Kj8NGxLE9QqhEat10I=;
- b=zqp8KE2yw6AtTUy+2JHdMLwzDySLEpELAFH+/iwJoGYCR46kzIHNFblCX70jM931E6ZyuEdF5MLxmomQpoeK6wpXbKNzdeSbXNSSBrE9mZ5RTek5Jll1LE84Cc3R7yWbBKDaVeSiSgA7sUWuqJ7UmNB6kmdqMXCHNWbw6yquPvUdi8wE2H9mJWbIdkdxO8K5VBvEh0+D2/yujI4iUzugYCvsOJBkEb6vjhIaWAHx6S2MwqUbMCYdVjUd8DEFfcYm3h4UKhYgp+a1LYWgGvid2P3taavTsi4CAAUE9IkYiRlu47q5XcJ7AvoomOB9zxNcTtwnUTLFLERce8mTBBg5Tw==
-Received: from DB7PR10MB2506.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:10:46::26)
- by GV1PR10MB5865.EURPRD10.PROD.OUTLOOK.COM (2603:10a6:150:54::11) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Thu, 6 Jul
- 2023 06:51:51 +0000
-Received: from DB7PR10MB2506.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::a270:2154:bf88:4c9e]) by DB7PR10MB2506.EURPRD10.PROD.OUTLOOK.COM
- ([fe80::a270:2154:bf88:4c9e%6]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 06:51:51 +0000
-From: "Haener, Michael" <michael.haener@siemens.com>
-To: "andrew@lunn.ch" <andrew@lunn.ch>
-CC: "linux@armlinux.org.uk" <linux@armlinux.org.uk>, "olteanv@gmail.com"
-	<olteanv@gmail.com>, "davem@davemloft.net" <davem@davemloft.net>,
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
-	"kuba@kernel.org" <kuba@kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, "edumazet@google.com" <edumazet@google.com>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "Sverdlin, Alexander"
-	<alexander.sverdlin@siemens.com>, "f.fainelli@gmail.com"
-	<f.fainelli@gmail.com>
-Subject: Re: [PATCH v2 0/3] net: dsa: SERDES support for mv88e632x family
-Thread-Topic: [PATCH v2 0/3] net: dsa: SERDES support for mv88e632x family
-Thread-Index: AQHZrkUWBZBED1bC10u9HajfJFJci6+pMsAAgAEQEwCAAg1QAA==
-Date: Thu, 6 Jul 2023 06:51:51 +0000
-Message-ID: <6594cbb5b83312b73127f6bf23bbf988bb40c491.camel@siemens.com>
-References: <20230704065916.132486-1-michael.haener@siemens.com>
-	 <20a135919ac7d54699d1eca5486fd640d667ad05.camel@siemens.com>
-	 <67189741-efd5-4f54-8438-66a6e2a693f5@lunn.ch>
-In-Reply-To: <67189741-efd5-4f54-8438-66a6e2a693f5@lunn.ch>
-Accept-Language: de-CH, en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-user-agent: Evolution 3.46.4 (3.46.4-1.fc37) 
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=siemens.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB7PR10MB2506:EE_|GV1PR10MB5865:EE_
-x-ms-office365-filtering-correlation-id: fa6cdb2a-205a-4f52-7b55-08db7ded7a34
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- zRNTbKw2hP4scnkqRCCXvA4OkuwWjarWxbpBcypXjksavBNuoGXRec3HsmKfaUv9pOjDV+DN23vzmCYQmU15zU5+U6uULKxDQz2XzTN5vnQZXIxiTzHMpbCNaCBwniKj72z2NdMGUK/uyW6YQme8ip1e3fd403wP9pvlyT6ZRDLhOXvhma4Ld+b84XjdfTA9Kxf9aAH+lY8tp+hYzMxfKsCTR4DYNpcBCMhOe0N9Ny7EH6JKStSJbOZ8pUbEW4dqmQ5/viAJwhFpA+efe4geeH9XO1tmvKp3Z4wguWVB2f/C+spDoblm6/Q4qtR55k7h1AqfSibdJSbnZ1iM4N5xcJz0HIL/x3yS12XZF8d1qin3SX+uF+7yZjdZTZtbscTnmYmxd4IA9r3KjEbuTlXxqO+6lJAQLhim0LKU7zN/8peGVDoZ/iXnwqN6ITCOWyMsszwwCjzEgEvVD/rBEB/cOcepP1C5aYbGCF0+Y76sd0Gc8iajkgGOtIoYzd9WrZhxJenxx497KiGi05jPhSdrYyev3YQG6lJpZSOS0SbHmoSh+B3oyQ/8LeGDG0g/ivTRlM6E1N1rNQtNt/jnrcn7blvZSO85013lubRbNNCXL4PF4ru3NW5kyhGHIt3uJ3GcIdU5mTwQxYTkFeIYUamjOg==
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB7PR10MB2506.EURPRD10.PROD.OUTLOOK.COM;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(346002)(136003)(39860400002)(366004)(396003)(451199021)(1590799018)(5660300002)(26005)(478600001)(6506007)(82960400001)(71200400001)(6512007)(2616005)(186003)(38100700002)(66556008)(54906003)(66476007)(66446008)(4326008)(6916009)(64756008)(66946007)(91956017)(76116006)(316002)(122000001)(86362001)(6486002)(8676002)(8936002)(7416002)(1580799015)(4744005)(38070700005)(41300700001)(2906002)(85202003)(36756003)(85182001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?b0lWVHNQNEozaDhXM09YOE5weU9lMk1Fa3cwZzNUNzEvZnBNbDhUNHZ4MEFw?=
- =?utf-8?B?OTA3N0doR2l3SjE2NHpIYXpSK2VhT1lIZ3NwVVloVi9LWTRKbzR3M2VtWE5u?=
- =?utf-8?B?VWJOTzFXdFRUZ1NHU0o1UlNScFBudzkrRU9lMXpZT2FlN2tnekw3NTV3MTVp?=
- =?utf-8?B?ZWRLdXhFVWFvOVlkTDZkRlVKekhPZTFqS3AwcmkzbGpLaXltTW8wZW9PK1hB?=
- =?utf-8?B?cFlCSWQ0Z2JXNUMzK2J5NkRuWHJYK2s4WjFnaFhlcEhXQTFvK2o2cjI2Tk04?=
- =?utf-8?B?dE9BQ1hPUStlRE1jZE1JQVpXcnFHTFhCVFdibW5GckI0K1JGTFpDYjZIVkRQ?=
- =?utf-8?B?N1N3ekFIdXNxbm51Qy9pc0RMcTVGZDhEMlgyb3J1NDQzUEZOYm96RTN5QkhE?=
- =?utf-8?B?ejA4OHordkQ4QzZGQmhETElaM3h1VUhNVWhBUjFmWk14WnA5dng5aE56OXVU?=
- =?utf-8?B?dHVTOXY1UVl4NVA2RVFlKzFaMHFWZUQyanB0K3ViSmhFRktKNHg5eDE2YktN?=
- =?utf-8?B?ODJuQ1YvTWovV2k0Q3N1TFNKbVhHd2Y0WVlUZVdoOEhJd2FPNlNibStEYmd1?=
- =?utf-8?B?alBULzZ2NHgwaVB3OVZ0MVJieUdDU2dkc0taaVlDS3hIMXlSRW5wRTZiWVhW?=
- =?utf-8?B?b1hTZ1NsN0RRdUJ4cXFYczE4a25pbjcvUTZMZ2ppR0xiZkVRSEJUQTVWSGpk?=
- =?utf-8?B?WTlkNjJBYW1OWVltTVFKZlhOK0x6REFSOGpPdVZRbXRRbDFJdllzSUQxeW1n?=
- =?utf-8?B?YWg5ZjM1TVBRR0hmU3huSDJrK2l6QjMzK1BuUVF2WmwwZmxkRno4Tk5BWXBC?=
- =?utf-8?B?SS9MVUhwWEE4d2ZZMldzVGR1cjRzbEROSmxvTjlySE11S3BScUkrcDduNWZt?=
- =?utf-8?B?Ry9qRVNlNHlWSmc5RGRrR29nZFR1UEg0U2t3c2poM0kzZDVuTVRmRzN1TXpt?=
- =?utf-8?B?VVBYcitQT2dKaU9HSHNwMHVYUlRTcGQyNFNiRit4elNQTlh4MTF2aTZId05y?=
- =?utf-8?B?YndQMDdsdkE0N0RBeXdzajRVeWI4bU5ScWtXS0hYZ0J6b2dqaFA5Wi8xYlNC?=
- =?utf-8?B?YTAwclpwdnp3cENiZTM4MjgvNFlvR0c0RFVzL215dVkzVHVUUEJMRzBGTWlh?=
- =?utf-8?B?LzFJWmRmL3p2bzJzU3pVQjdVRFZ4UDJpVUFCM3hlNDlaUElXdXdBSFYvdGpq?=
- =?utf-8?B?OE1IOTFQKy9rRk9NcFFVcnhEZEpUTm5ETDhVeFdUeDB3dk5zQzJMbkc5S2ZQ?=
- =?utf-8?B?ZEdaNGZhck5sa0U3cVBhMzhjdjlIeWFpQXZxKzZnMHNTTEU0cnpUazg0eTdT?=
- =?utf-8?B?UW4zeWE4eFhabXc4dzl3YmltbVZCaWlrMDliS3AwNHJWK1N5M0E2VUYrKytl?=
- =?utf-8?B?eE5PZFF5R25BNTYzNytPNTVBUC9sT1BzVVo1M050MmttMUtsSFdrc2JQL0xF?=
- =?utf-8?B?b1VRdmJraUF0eVRzZFNOYkZvcTlyL1EwWTI1bEhJT21jRm5FSUYwZzFmWkZz?=
- =?utf-8?B?dlNaZ0VIV1REQ2tZa2lSRGJNaVlySHlLL2NSVytZV2pkck9LR04rODAzN1hv?=
- =?utf-8?B?cFc5QVBWR0JlcDVGOGVtZWk4eDRuVURpYU5uWDZNM2IrSmorS3hOUmFFbzh4?=
- =?utf-8?B?TzRHV1JqN0FEdUpoaTVPYys4aUVFdWhLRU1RSjJHL0ZUcmg0UmZBZjZoZS96?=
- =?utf-8?B?ODlnOVpzVHMvZHhFaksxdW43RnJjRUFaUEdqT2dnbW8ralZjR01aMUZFY1dk?=
- =?utf-8?B?eGhUcWNwNjVaTGN2YWE2a2tPMTZ2N1NtVlpuSk5rZ003ZzJ4dkNRZTcxUkFD?=
- =?utf-8?B?ODQyZDh0NmFadVNHR3Urd080WC9oSGxGeWJIK2ZWaTVFR2VmdjNNUGVMekt6?=
- =?utf-8?B?OGNTU0lES28yNmRFVjRtTWxlYmc1aFpDMFFCTzhWMmlrc1ZEVTFVNjFlM2JD?=
- =?utf-8?B?b2lEV3pMT3RseWY4TERBNVhCMnpzbHlDMUN3VHRRNTFXRGJidXJBRlJLZWtE?=
- =?utf-8?B?N1ZDSlNqQnBmY0VRdGtPZjIxRnV6WElnSjlKNzNWaEJ2d3U1UDFFVzQxMFU1?=
- =?utf-8?B?Y0VGTm15ZWovdjA3c21PN3JLUjhpaTlISWhPYWhJMHBlaS9FeGJIM0wyUyt5?=
- =?utf-8?B?akY0aStTTWpyZVhsYkZuWTJlWlpvdlZObWQvOE1KZjk1RThraHpZdStDa2dk?=
- =?utf-8?B?T3c9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-ID: <085A5119296AA24DB9380D7A59BB7F99@EURPRD10.PROD.OUTLOOK.COM>
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9DB4D1102
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 07:06:37 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF5321727
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 00:06:35 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688627194;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
+	b=WPi70VA2OFQNnPhOkqpzgUs2IzgpyuoN9KD9hPEDU78pzeX4b17JRJgP1fmx6zumQhFZRm
+	yx8ezUqy3s1J3WtOPJ+Rzo8flGyRJJ7A4I99nyfNzGTZpSKNQucyrykeODOaJe0Zd8t1Zg
+	2iT5P8/s2PchwTlSpZ+l7hVx0cwK3pQ=
+Received: from mail-yb1-f197.google.com (mail-yb1-f197.google.com
+ [209.85.219.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-544-4ZJIsGkyMoiZf8YHdd5Fkg-1; Thu, 06 Jul 2023 03:06:33 -0400
+X-MC-Unique: 4ZJIsGkyMoiZf8YHdd5Fkg-1
+Received: by mail-yb1-f197.google.com with SMTP id 3f1490d57ef6-bd69bb4507eso515717276.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688627193; x=1691219193;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=POrI2HrupnKR3vfjjFVb4RJeA3XrZk3xd7QFOuOo4BE=;
+        b=YLSRN7QlGhEzqZCBQq1ZGSXcoaRdyYZn1ebgocV/gUO+4FMn5O1HaLXmG5HeiZK1fK
+         sTt0uuEdFTrQx1V1SPujcPEXj5Lcy2nW8IMR9KE2/33zR/avk8DT7jI2rh5S/S7crasb
+         7P1q17vPDlKXvJt49QkpAzP4SbySpWjY4bb79T8C65T0XrkfnjgJCJ+xyCYp4Anu4al2
+         dZliKnOX5mvFKo7dt7nLHqBXFmSOnJO8WPinB26VChkBrHuYVmQWAcJ/70ecEMe7QLP0
+         AzWobvQMwe+WtaBlgcneLx3PENAjJxggOwN2ea7dp+Qvr4ha7O2ifsws0nlH+lUhCIC6
+         085A==
+X-Gm-Message-State: ABy/qLbGJqIUCjb0G9UD0C5+FCSzzMyRuJTDHn6SouCJeG/6/h4GejYC
+	aqLbguHoIreUB19S3uNASk32tg33XGL836mODmb3JHhnpw+8becYlehG+arqjwoRj9ZFa4V4WNU
+	PGrH2CXeNNG7+X+J//1gaVJjOBP/3OnAzchj0AE49
+X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id s4-20020a25b944000000b00c4d96a25d96mr2165156ybm.34.1688627193147;
+        Thu, 06 Jul 2023 00:06:33 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHx7qsljWMwc5b+pAqOOzRL+zpISDZYM3lQSEoxYQUnDdgCGQcufSPdW0EttuPM5MBdQ9P2dGHiqiplFW64hl8=
+X-Received: by 2002:a25:b944:0:b0:c4d:96a2:5d96 with SMTP id
+ s4-20020a25b944000000b00c4d96a25d96mr2165135ybm.34.1688627192836; Thu, 06 Jul
+ 2023 00:06:32 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: siemens.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB7PR10MB2506.EURPRD10.PROD.OUTLOOK.COM
-X-MS-Exchange-CrossTenant-Network-Message-Id: fa6cdb2a-205a-4f52-7b55-08db7ded7a34
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 06:51:51.4022
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 38ae3bcd-9579-4fd4-adda-b42e1495d55a
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: TBI3rHDph4N7kekHyBGkw65ECOB8lcKwqJyey9m2c4XEG1JZRyG0yIU5Q7rjWW0EvtyI2zFCawlqAyxWUkTRcQ8t2iemadgadhIQ6E0+QWc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: GV1PR10MB5865
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+In-Reply-To: <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Thu, 6 Jul 2023 09:05:56 +0200
+Message-ID: <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-T24gV2VkLCAyMDIzLTA3LTA1IGF0IDAxOjMxICswMjAwLCBBbmRyZXcgTHVubiB3cm90ZToNCj4g
-T24gVHVlLCBKdWwgMDQsIDIwMjMgYXQgMDc6MTc6NTVBTSArMDAwMCwgSGFlbmVyLCBNaWNoYWVs
-IHdyb3RlOg0KPiA+IE9uIFR1ZSwgMjAyMy0wNy0wNCBhdCAwODo1OSArMDIwMCwgTS4gSGFlbmVy
-IHdyb3RlOg0KPiA+ID4gRnJvbTogTWljaGFlbCBIYWVuZXIgPG1pY2hhZWwuaGFlbmVyQHNpZW1l
-bnMuY29tPg0KPiA+ID4gDQo+ID4gPiBUaGlzIHBhdGNoIHNlcmllcyBicmluZ3MgU0VSREVTIHN1
-cHBvcnQgZm9yIHRoZSBtdjg4ZTYzMnggZmFtaWx5Lg0KPiA+IA0KPiA+IENoYW5nZWxvZzoNCj4g
-PiB2MjogcmViYXNlZCBvbnRvIFJ1c3NlbGwgS2luZ3Mgc2VyaWVzIGRzYS84OGU2eHh4L3BoeWxp
-bmsNCj4gDQo+IFJ1c3NlbGwgS2luZyB3aWxsIGJlIGludGVyZXN0ZWQgaW4gYSBUZXN0ZWQtYnk6
-IGZvciBoaXMgcGF0Y2hzZXQuDQo+IFRoYXQgd2lsbCBhbHNvIGhlbHAgZ2V0IHRoYXQgcGF0Y2hz
-ZXQgbWVyZ2VkIHNvIHlvdXJzIGNhbiB0aGVuDQo+IGZvbGxvdy4gU28gcGxlYXNlIGtlZXAgYW4g
-ZXllIG9uIHRoZSBuZXRkZXYgbGlzdCwgYW5kIHJlcG9zdCB5b3VyDQo+IHBhdGNoZXMgb25jZSBS
-dXNzZWxscyBoYXZlIGJlZW4gbWVyZ2VkLg0KPiANCj4gwqDCoMKgwqDCoMKgwqDCoEFuZHJldw0K
-DQpPbmNlIHRoZSBvdGhlciBwYXRjaCBpcyBtZXJnZWQsIEkgd2lsbCByZWJhc2UgdGhpcyBwYXRj
-aCBhbmQgcmVzdWJtaXQuDQoNCg==
+On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
+te:
+>
+> On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redhat.com=
+> wrote:
+> >
+> > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
+> > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst@redha=
+t.com> wrote:
+> > > >
+> > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Martin wrot=
+e:
+> > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin <mst@r=
+edhat.com> wrote:
+> > > > > >
+> > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez Martin =
+wrote:
+> > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirkin <ms=
+t@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=C3=A9re=
+z wrote:
+> > > > > > > > > With the current code it is accepted as long as userland =
+send it.
+> > > > > > > > >
+> > > > > > > > > Although userland should not set a feature flag that has =
+not been
+> > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the curren=
+t code will not
+> > > > > > > > > complain for it.
+> > > > > > > > >
+> > > > > > > > > Since there is no specific reason for any parent to rejec=
+t that backend
+> > > > > > > > > feature bit when it has been proposed, let's control it a=
+t vdpa frontend
+> > > > > > > > > level. Future patches may move this control to the parent=
+ driver.
+> > > > > > > > >
+> > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_ENABLE=
+_AFTER_DRIVER_OK backend feature")
+> > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.com>
+> > > > > > > >
+> > > > > > > > Please do send v3. And again, I don't want to send "after d=
+river ok" hack
+> > > > > > > > upstream at all, I merged it in next just to give it some t=
+esting.
+> > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > > >
+> > > > > > >
+> > > > > > > Current devices do not support that semantic.
+> > > > > >
+> > > > > > Which devices specifically access the ring after DRIVER_OK but =
+before
+> > > > > > a kick?
+> > > > > >
+> > > > >
+> > > > > Previous versions of the QEMU LM series did a spurious kick to st=
+art
+> > > > > traffic at the LM destination [1]. When it was proposed, that spu=
+rious
+> > > > > kick was removed from the series because to check for descriptors
+> > > > > after driver_ok, even without a kick, was considered work of the
+> > > > > parent driver.
+> > > > >
+> > > > > I'm ok to go back to this spurious kick, but I'm not sure if the =
+hw
+> > > > > will read the ring before the kick actually. I can ask.
+> > > > >
+> > > > > Thanks!
+> > > > >
+> > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-01/msg0=
+2775.html
+> > > >
+> > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK too, no=
+?
+> > >
+> > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
+> > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > >
+> > > But this reminds me one thing, as the thread is going too long, I
+> > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET is
+> > > supported?
+> > >
+> > > Thanks
+> >
+> > I don't see what does one have to do with another ...
+> >
+> > I think with RING_RESET we had another solution, enable rings
+> > mapping them to a zero page, then reset and re-enable later.
+>
+> As discussed before, this seems to have some problems:
+>
+> 1) The behaviour is not clarified in the document
+> 2) zero is a valid IOVA
+>
+
+I think we're not on the same page here.
+
+As I understood, rings mapped to a zero page means essentially an
+avail ring whose avail_idx is always 0, offered to the device instead
+of the guest's ring. Once all CVQ commands are processed, we use
+RING_RESET to switch to the right ring, being guest's or SVQ vring.
+
+
+
+> Thanks
+>
+> >
+> > > >
+> > > >
+> > > >
+> > > > > > > My plan was to convert
+> > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops. Sorr=
+y if I
+> > > > > > > was not explicit enough.
+> > > > > > >
+> > > > > > > The only solution I can see to that is to trap & emulate in t=
+he vdpa
+> > > > > > > (parent?) driver, as talked in virtio-comment. But that compl=
+icates
+> > > > > > > the architecture:
+> > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > > * Store vq enable state separately, at
+> > > > > > > vdpa->config->set_vq_ready(true), but not transmit that enabl=
+e to hw
+> > > > > > > * Store the doorbell state separately, but do not configure i=
+t to the
+> > > > > > > device directly.
+> > > > > > >
+> > > > > > > But how to recover if the device cannot configure them at kic=
+k time,
+> > > > > > > for example?
+> > > > > > >
+> > > > > > > Maybe we can just fail if the parent driver does not support =
+enabling
+> > > > > > > the vq after DRIVER_OK? That way no new feature flag is neede=
+d.
+> > > > > > >
+> > > > > > > Thanks!
+> > > > > > >
+> > > > > > > >
+> > > > > > > > > ---
+> > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub/scm/l=
+inux/kernel/git/mst
+> > > > > > > > > commit. Please let me know if I should send a v3 of [1] i=
+nstead.
+> > > > > > > > >
+> > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mutt-send=
+-email-mst@kernel.org/T/
+> > > > > > > > > ---
+> > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > > >
+> > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/vdpa.c
+> > > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlocked_ioc=
+tl(struct file *filep,
+> > > > > > > > >  {
+> > > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
+> > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
+> > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa->conf=
+ig;
+> > > > > > > > >       void __user *argp =3D (void __user *)arg;
+> > > > > > > > >       u64 __user *featurep =3D argp;
+> > > > > > > > > -     u64 features;
+> > > > > > > > > +     u64 features, parent_features =3D 0;
+> > > > > > > > >       long r =3D 0;
+> > > > > > > > >
+> > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
+> > > > > > > > >               if (copy_from_user(&features, featurep, siz=
+eof(features)))
+> > > > > > > > >                       return -EFAULT;
+> > > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > > +                     parent_features =3D ops->get_backen=
+d_features(v->vdpa);
+> > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_FEATURE=
+S |
+> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_SU=
+SPEND) |
+> > > > > > > > >                                BIT_ULL(VHOST_BACKEND_F_RE=
+SUME) |
+> > > > > > > > > -                              BIT_ULL(VHOST_BACKEND_F_EN=
+ABLE_AFTER_DRIVER_OK)))
+> > > > > > > > > +                              parent_features))
+> > > > > > > > >                       return -EOPNOTSUPP;
+> > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND_F_SUS=
+PEND)) &&
+> > > > > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > > > > --
+> > > > > > > > > 2.39.3
+> > > > > > > >
+> > > > > >
+> > > >
+> >
+>
+
 
