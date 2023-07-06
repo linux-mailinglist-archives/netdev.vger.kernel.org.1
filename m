@@ -1,170 +1,123 @@
-Return-Path: <netdev+bounces-15880-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15881-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E394774A3CF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 20:31:15 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3867374A3D3
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 20:32:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9B36F281401
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:31:14 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E725D281414
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:32:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1050A929;
-	Thu,  6 Jul 2023 18:31:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 52558AD33;
+	Thu,  6 Jul 2023 18:32:18 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4CB1C2CE
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 18:31:11 +0000 (UTC)
-X-Greylist: delayed 84 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Thu, 06 Jul 2023 11:31:02 PDT
-Received: from us-smtp-delivery-162.mimecast.com (us-smtp-delivery-162.mimecast.com [170.10.129.162])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 877A01BFC
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 11:31:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=hp.com; s=mimecast20180716;
-	t=1688668261;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding;
-	bh=i6byuPgD0BdV+edMY+7xoBI+stlHVgHroGrstvZaliE=;
-	b=NYNIXWBKf74CNt9iQqkDQygusfeSVV6ed3w9/9TJQQU32OvJ6Oxa77utJQD8LTNDTbe1uK
-	bgnRq4q4OloFLYdGWbV9Wv3iggYnh9JsWkSW3VZbPcRpyLg1Dw33OvcGSDD2CqDST5oizA
-	kcZF5WOwsQu8WtP9RJd4rlDphYLYhqY=
-Received: from g1t6220.austin.hp.com (g1t6220.austin.hp.com [15.73.96.84])
- by relay.mimecast.com with ESMTP with STARTTLS (version=TLSv1.2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-543-YG3C5vQoPEWLGQiUhrdSxA-1; Thu, 06 Jul 2023 14:29:35 -0400
-X-MC-Unique: YG3C5vQoPEWLGQiUhrdSxA-1
-Received: from g1t6217.austin.hpicorp.net (g1t6217.austin.hpicorp.net [15.67.1.144])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by g1t6220.austin.hp.com (Postfix) with ESMTPS id C072C23B;
-	Thu,  6 Jul 2023 18:29:33 +0000 (UTC)
-Received: from jam-buntu.lan (unknown [15.74.50.248])
-	by g1t6217.austin.hpicorp.net (Postfix) with ESMTP id 516B189;
-	Thu,  6 Jul 2023 18:29:32 +0000 (UTC)
-From: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
-To: linux-usb@vger.kernel.org,
-	netdev@vger.kernel.org
-Cc: davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	hayeswang@realtek.com,
-	jflf_kernel@gmx.com,
-	bjorn@mork.no,
-	svenva@chromium.org,
-	linux-kernel@vger.kernel.org,
-	eniac-xw.zhang@hp.com,
-	Alexandru Gagniuc <alexandru.gagniuc@hp.com>,
-	stable@vger.kernel.org
-Subject: [PATCH] r8152: Suspend USB device before shutdown when WoL is enabled
-Date: Thu,  6 Jul 2023 18:28:58 +0000
-Message-Id: <20230706182858.761311-1-alexandru.gagniuc@hp.com>
-X-Mailer: git-send-email 2.34.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4066815AE7
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 18:32:17 +0000 (UTC)
+Received: from mo4-p01-ob.smtp.rzone.de (mo4-p01-ob.smtp.rzone.de [85.215.255.50])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6E9B11FD9
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 11:32:14 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; t=1688668153; cv=none;
+    d=strato.com; s=strato-dkim-0002;
+    b=iBa/rYpTrhYcudjK231eDbysygTsl3c+WkEhTgyoKoThMY28w8DFhjnlehdJNGTr+P
+    kbQLEnsGCMnGCmXGP+xvAdP9+vNHbExsZmLT0Ztek6jWX8AZ3wcrX7A17NVer1weT8l9
+    MRc+/5x3B99Lxm2br11YIgUnBhYdaiGONCunPRwJLtseItYZw02b7PSmI8Ezot1PDpSO
+    X6DPXFaVWgjeiZS+tIEQCAByQ/ScxmO1EToAEH/+2f99+FRMwiTxCuWaJsNzT3P9Vb7z
+    zKYkZa68pnzalnZTqeI9zKSsGbJyTw/QSBO8tE0XCCtIU56MA/I5hQSxZ6eF6s8vsNM/
+    qYiw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; t=1688668153;
+    s=strato-dkim-0002; d=strato.com;
+    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
+    Subject:Sender;
+    bh=1NeheGUcAybSgshyvCWxGc+L75hjKHZwV+htD2/1P2c=;
+    b=ElxXTxgubhGxQMVKe3zJFOpe5MtuhJdjQEy4O3TsG9rZtb1S6Te/MtQnxAS1xlnH+Z
+    yOSwckGjJtdDK45dm644upWQEyFTWWcwU/nYVXI4EK7iSqfaZdj3FPzPddy4IDdFsrij
+    Uo+65oFCTrBZ6qarJghpexVlcrJp18+HRHhrWlhde1FxyN3Jk3zTzjjuj+n92xQVk2es
+    Zc241VwvDhH0SULwsUf2jYa93UdSOroKFfik5ApCdUWdCgH5//NVvIwR6zBeFlC2Z68g
+    JiAttaDDGJPwBOJYKwc9d9hrljVJ8vJRYN1VWJeU/giVp8b+7S1M2RUVPGp94GSj+pYl
+    4npw==
+ARC-Authentication-Results: i=1; strato.com;
+    arc=none;
+    dkim=none
+X-RZG-CLASS-ID: mo01
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; t=1688668153;
+    s=strato-dkim-0002; d=hartkopp.net;
+    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
+    Subject:Sender;
+    bh=1NeheGUcAybSgshyvCWxGc+L75hjKHZwV+htD2/1P2c=;
+    b=LrVvc9EJbH7RkfVN5NaIAR5+T223/4RkeS1e9/aSrOmKKiveudGH5WVnqqdO3Tl9Yx
+    +nduGBkiChvmQopZlZpR8l/I98EPOZCWULNzNbJ8BLPENJ2hNjd+qXoxvx4GyCRPjVSR
+    9MpG+B1Pl+IGPKM23Fn6x2ZxqnPtjwNxyvSg/ebFOm2FgDCH+OoFEqt9aXqjwlGhTft+
+    lvYo3r9NZ7dDgw3QPNaaQ1jD48p9TdntSFvDTHCwYtcBX72U6tdBUzJLZIuPQZux1OyB
+    RWuYQnXpgV8U8yDVDsij+YyejMvQwXmiUEpQWD1QHMktLZmrQUMK+R4vw263OdkzCu9W
+    NxuA==
+DKIM-Signature: v=1; a=ed25519-sha256; c=relaxed/relaxed; t=1688668153;
+    s=strato-dkim-0003; d=hartkopp.net;
+    h=In-Reply-To:From:References:To:Subject:Date:Message-ID:Cc:Date:From:
+    Subject:Sender;
+    bh=1NeheGUcAybSgshyvCWxGc+L75hjKHZwV+htD2/1P2c=;
+    b=hCIsOnMMG4pcUFQCAgXcjv8i/5koYLQwnJidKaHu3zpF7Uka4Xehk8j7EtyKZSzW4P
+    0lUSwwG5hVgXja+oG7AQ==
+X-RZG-AUTH: ":P2MHfkW8eP4Mre39l357AZT/I7AY/7nT2yrDxb8mjG14FZxedJy6qgO1qCHSa1GLptZHusl129OHEdFq0USEbDUQnQ=="
+Received: from [IPV6:2a00:6020:4a8e:5000::923]
+    by smtp.strato.de (RZmta 49.6.0 AUTH)
+    with ESMTPSA id J16f43z66ITCEfC
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256 bits))
+	(Client did not present a certificate);
+    Thu, 6 Jul 2023 20:29:12 +0200 (CEST)
+Message-ID: <2a035aab-d10a-bb6f-d056-ea93c454a51d@hartkopp.net>
+Date: Thu, 6 Jul 2023 20:29:05 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Mimecast-Spam-Score: 0
-X-Mimecast-Originator: hp.com
-Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset=WINDOWS-1252; x-default=true
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [PATCH net] can: raw: fix receiver memory leak
+To: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>,
+ mkl@pengutronix.de, davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com, linux-can@vger.kernel.org,
+ netdev@vger.kernel.org, penguin-kernel@I-love.SAKURA.ne.jp
+References: <20230705092543.648022-1-william.xuanziyang@huawei.com>
+ <2aa65b0c-2170-46c0-57a4-17b653e41f96@hartkopp.net>
+ <4880eff5-1009-add8-8c58-ac31ab6771db@huawei.com>
+Content-Language: en-US
+From: Oliver Hartkopp <socketcan@hartkopp.net>
+In-Reply-To: <4880eff5-1009-add8-8c58-ac31ab6771db@huawei.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=unavailable
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-For Wake-on-LAN to work from S5 (shutdown), the USB link must be put
-in U3 state. If it is not, and the host "disappears", the chip will
-no longer respond to WoL triggers.
+On 06.07.23 14:48, Ziyang Xuan (William) wrote:
 
-To resolve this, add a notifier block and register it as a reboot
-notifier. When WoL is enabled, work through the usb_device struct to
-get to the suspend function. Calling this function puts the link in
-the correct state for WoL to function.
+(..)
 
-Cc: stable@vger.kernel.org
-Signed-off-by: Alexandru Gagniuc <alexandru.gagniuc@hp.com>
----
- drivers/net/usb/r8152.c | 25 +++++++++++++++++++++++++
- 1 file changed, 25 insertions(+)
+>>>        }
+>>>       out:
+>>>        release_sock(sk);
+>>> +    rtnl_unlock();
+>>
+>> Would it also fix the issue when just adding the rtnl_locks to raw_bind() and raw_release() as suggested by you?
+> 
+> This patch just add rtnl_lock in raw_bind() and raw_release(). raw_setsockopt() has rtnl_lock before this. raw_notify()
+> is under rtnl_lock. My patch has been tested and solved the issue before send. I don't know if it answered your doubts.
 
-diff --git a/drivers/net/usb/r8152.c b/drivers/net/usb/r8152.c
-index 0999a58ca9d2..5623ca5c9142 100644
---- a/drivers/net/usb/r8152.c
-+++ b/drivers/net/usb/r8152.c
-@@ -20,6 +20,7 @@
- #include <net/ip6_checksum.h>
- #include <uapi/linux/mdio.h>
- #include <linux/mdio.h>
-+#include <linux/reboot.h>
- #include <linux/usb/cdc.h>
- #include <linux/suspend.h>
- #include <linux/atomic.h>
-@@ -875,6 +876,7 @@ struct r8152 {
- =09struct delayed_work schedule, hw_phy_work;
- =09struct mii_if_info mii;
- =09struct mutex control;=09/* use for hw setting */
-+=09struct notifier_block reboot_notifier;
- #ifdef CONFIG_PM_SLEEP
- =09struct notifier_block pm_notifier;
- #endif
-@@ -9609,6 +9611,25 @@ static bool rtl8152_supports_lenovo_macpassthru(stru=
-ct usb_device *udev)
- =09return 0;
- }
-=20
-+/* Suspend realtek chip before system shutdown
-+ *
-+ * For Wake-on-LAN to work from S5, the USB link must be put in U3 state. =
-If
-+ * the host otherwise "disappears", the chip will not respond to WoL trigg=
-ers.
-+ */
-+static int rtl8152_notify(struct notifier_block *nb, unsigned long code,
-+=09=09=09  void *unused)
-+{
-+=09struct r8152 *tp =3D container_of(nb, struct r8152, reboot_notifier);
-+=09struct device *dev =3D &tp->udev->dev;
-+
-+=09if (code =3D=3D SYS_POWER_OFF) {
-+=09=09if (tp->saved_wolopts && dev->type->pm->suspend)
-+=09=09=09dev->type->pm->suspend(dev);
-+=09}
-+
-+=09return NOTIFY_DONE;
-+}
-+
- static int rtl8152_probe(struct usb_interface *intf,
- =09=09=09 const struct usb_device_id *id)
- {
-@@ -9791,6 +9812,9 @@ static int rtl8152_probe(struct usb_interface *intf,
- =09else
- =09=09device_set_wakeup_enable(&udev->dev, false);
-=20
-+=09tp->reboot_notifier.notifier_call =3D rtl8152_notify;
-+=09register_reboot_notifier(&tp->reboot_notifier);
-+
- =09netif_info(tp, probe, netdev, "%s\n", DRIVER_VERSION);
-=20
- =09return 0;
-@@ -9811,6 +9835,7 @@ static void rtl8152_disconnect(struct usb_interface *=
-intf)
- =09if (tp) {
- =09=09rtl_set_unplug(tp);
-=20
-+=09=09unregister_reboot_notifier(&tp->reboot_notifier);
- =09=09unregister_netdev(tp->netdev);
- =09=09tasklet_kill(&tp->tx_tl);
- =09=09cancel_delayed_work_sync(&tp->hw_phy_work);
---=20
-2.39.1
+My question was whether adding rtnl_locks to raw_bind() and 
+raw_release() would be enough to fix the issue.
 
+Without introducing the additional ro->dev element!?
+
+Best regards,
+Oliver
 
