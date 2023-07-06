@@ -1,188 +1,266 @@
-Return-Path: <netdev+bounces-15769-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15770-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 50EC6749AC9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 13:36:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5DD16749AF8
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 13:41:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0DF5E2811EE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:36:38 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 802CC1C20C61
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:41:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7888C8C04;
-	Thu,  6 Jul 2023 11:36:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5098E8C09;
+	Thu,  6 Jul 2023 11:41:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 6C3A88C02
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 11:36:35 +0000 (UTC)
-Received: from mga18.intel.com (mga18.intel.com [134.134.136.126])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 837381727;
-	Thu,  6 Jul 2023 04:36:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3ACC18C08
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 11:41:39 +0000 (UTC)
+Received: from mga01.intel.com (mga01.intel.com [192.55.52.88])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B38701BDC;
+	Thu,  6 Jul 2023 04:41:16 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
   d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688643394; x=1720179394;
-  h=message-id:date:mime-version:subject:to:cc:references:
-   from:in-reply-to:content-transfer-encoding;
-  bh=8zcb7k+92vQ8AkY1CLmC+r+SOKYrdc1egYkxSlfdBG8=;
-  b=hUW/W82o/v2dGCvSB3Qq1aX06KAZQmouDJRHddhJGkFoICcr3LrXvXFx
-   HXsJI7H0oFUDOhB2cmREcRiUMfabVVHDFBwtBt7nEkOFaocKscEM91qLc
-   MW9GVu4xqgzeiRet88VMyfHr07nkyITa8p5SyXPxVSs3Ut+Ld2KCxewgr
-   jrnYz8uItlH0ZHxJyOHNGIlUT9EYr8LlzSD1JjA+dNy2hV8CIapoE6xVx
-   NzWbItcXdSeCB7kXu+wV2QnmqO55EIuPV7JU1Yekljxuom9YyDeD24mJ8
-   wErmvs35G42FWkkIC/+l5lXB2p17VM28ZL4C51vXptFeU6L5kIB6ZYmaF
+  t=1688643677; x=1720179677;
+  h=message-id:date:subject:to:cc:references:from:
+   in-reply-to:content-transfer-encoding:mime-version;
+  bh=nbk4uC63t0mfEQJQk73vsIw+Xu6oMrosvBay9EVVKyM=;
+  b=H+r5rnvCGHYoPOMSpBR0VOMzBzVHzIkaXuQMM3ivCT0ErkgCHJrlrpst
+   5A0h+afdyzI3dc+R8uxeYGJHrtz0CQUYvDOI0Nxrqfs0lBXbzWCtSfsWK
+   5WTOiRc0h5c3uVZN3JAMJYwUX+twE2j0LhCCRtBRzsYGWMKtIc5CvRIsV
+   gBRoIBA6q3EEIuWVg3Vh0ct7vHhqzl6f41rbTG+uG4gihAnufKqNlDZof
+   QMJFJcJ3Zx2QW1Fs0UnLk+QLkEkNGKreiI/Mu4uPYaHTewFaIW+0BMWpS
+   qHNqV3Z45jYSxE2ba7f8fTVFB7KmOfTjikN3Qdcbo5oVFTiRj9paN1YyK
    Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="348366966"
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="394335486"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="348366966"
-Received: from fmsmga002.fm.intel.com ([10.253.24.26])
-  by orsmga106.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 04:36:33 -0700
+   d="scan'208";a="394335486"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga101.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 04:40:39 -0700
 X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="832912315"
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="966190147"
 X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="832912315"
-Received: from naamamex-mobl.ger.corp.intel.com (HELO [10.251.186.106]) ([10.251.186.106])
-  by fmsmga002-auth.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 04:36:29 -0700
-Message-ID: <5ba1add3-c2a0-127b-49d8-509bc0508b59@linux.intel.com>
-Date: Thu, 6 Jul 2023 14:36:26 +0300
+   d="scan'208";a="966190147"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga006.fm.intel.com with ESMTP; 06 Jul 2023 04:40:38 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 6 Jul 2023 04:40:38 -0700
+Received: from fmsmsx602.amr.corp.intel.com (10.18.126.82) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 6 Jul 2023 04:40:38 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 04:40:38 -0700
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (104.47.55.171)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 6 Jul 2023 04:40:37 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=aWwTbwbTWb8anOs+Y+1bYJmBbE+24AMWbRhBlyGMVA9BKS+MKMb/UUr0k9HJWEBXCY03IgMifaUlPtSUxGhD3AqhrYsjhsy7HZneHu/XDN3sJe8dYVwrHWTqA/hKXTTHQx5utye13tpYDHsxW4aFgzC2nEGyREZ+xEsxiryzhSPlPu4SM7DsAybGjXTuLojSyj0nBA6GM+ELs2QdIj0QaGLbFx8NCAE2RA/Tlk2dHW1QJ2C3kIcvKH1V1OX10BAZkVzcweU9WSYQXXpLhpgRgFrqmSh7FYmgp0sCDavRAepoV5UD1ChwydeDjJpGMyxIEPZo54g4r7qscr/FKJ0mvg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=9Ofz8E/OhEeQT7tmg0SFzO+VPQ1v62k3iVWW3Kt1CU8=;
+ b=WgHCX4EZTJ31KCcRCIeYL7rJMtKoZ7z5TxZbdIu4FIJcIvLOVJHe3fVcli/VSamhSscpembm1a2FdfVQJDDuSQCqp0ffcp91SLmKUOdnKyzDiKVUoJ3CNKPoat9qUQcskIK+AnD72e7FITrKmeFHF9fkYe9JmD/mWrxJM7/N/oeerQKozbkm9bU1rlPqtBGeuQEs39A0BDnZ/rsKayc3EvGAyN9IkJbMDKVyevKk9yKG/bytUiYAEFASJlvbwLk3kBZL3P6uq0aneBL6Zx3dF6HAX8ffzQoEufzzN8+BJy1cHBQxUOmPZsXAXOtwH30WDmpRSewVwxJYkpfv8d9Jkw==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com (2603:10b6:5:13a::21)
+ by BN9PR11MB5482.namprd11.prod.outlook.com (2603:10b6:408:103::16) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.25; Thu, 6 Jul
+ 2023 11:40:36 +0000
+Received: from DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::1ecd:561c:902a:7130]) by DM6PR11MB3625.namprd11.prod.outlook.com
+ ([fe80::1ecd:561c:902a:7130%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 11:40:35 +0000
+Message-ID: <c7e4a416-9da4-7ff2-2223-589fd66f557d@intel.com>
+Date: Thu, 6 Jul 2023 13:39:07 +0200
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [EXTERNAL] Re: [PATCH V4 net] net: mana: Fix MANA VF unload when
+ host is unresponsive
+Content-Language: en-US
+To: Souradeep Chakrabarti <schakrabarti@microsoft.com>, souradeep chakrabarti
+	<schakrabarti@linux.microsoft.com>
+CC: KY Srinivasan <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>,
+	"wei.liu@kernel.org" <wei.liu@kernel.org>, Dexuan Cui <decui@microsoft.com>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, Long Li <longli@microsoft.com>, Ajay
+ Sharma <sharmaajay@microsoft.com>, "leon@kernel.org" <leon@kernel.org>,
+	"cai.huoqing@linux.dev" <cai.huoqing@linux.dev>,
+	"ssengar@linux.microsoft.com" <ssengar@linux.microsoft.com>,
+	"vkuznets@redhat.com" <vkuznets@redhat.com>, "tglx@linutronix.de"
+	<tglx@linutronix.de>, "linux-hyperv@vger.kernel.org"
+	<linux-hyperv@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-rdma@vger.kernel.org"
+	<linux-rdma@vger.kernel.org>, "stable@vger.kernel.org"
+	<stable@vger.kernel.org>
+References: <1688374171-10534-1-git-send-email-schakrabarti@linux.microsoft.com>
+ <83ef6401-8736-8416-c898-2fbbb786726e@intel.com>
+ <PUZP153MB07880E6D692FD5D13C508694CC29A@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+ <7e316b51-be46-96db-84cb-addd28d90b0f@intel.com>
+ <PUZP153MB0788A5F92E65AC9A98AF03AFCC2CA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+From: Alexander Lobakin <aleksander.lobakin@intel.com>
+In-Reply-To: <PUZP153MB0788A5F92E65AC9A98AF03AFCC2CA@PUZP153MB0788.APCP153.PROD.OUTLOOK.COM>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: 7bit
+X-ClientProxiedBy: DUZPR01CA0299.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b7::10) To DM6PR11MB3625.namprd11.prod.outlook.com
+ (2603:10b6:5:13a::21)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [Intel-wired-lan] [PATCH net v2 6/6] igc: Fix inserting of empty
- frame for launchtime
-Content-Language: en-US
-To: Florian Kauer <florian.kauer@linutronix.de>,
- Jesse Brandeburg <jesse.brandeburg@intel.com>,
- Tony Nguyen <anthony.l.nguyen@intel.com>,
- Vinicius Costa Gomes <vinicius.gomes@intel.com>,
- "David S . Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>, Tan Tee Min <tee.min.tan@linux.intel.com>,
- Muhammad Husaini Zulkifli <muhammad.husaini.zulkifli@intel.com>,
- Aravindhan Gunasekaran <aravindhan.gunasekaran@intel.com>,
- Malli C <mallikarjuna.chilakala@intel.com>
-Cc: netdev@vger.kernel.org, kurt@linutronix.de,
- intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
-References: <20230619100858.116286-1-florian.kauer@linutronix.de>
- <20230619100858.116286-7-florian.kauer@linutronix.de>
-From: "naamax.meir" <naamax.meir@linux.intel.com>
-In-Reply-To: <20230619100858.116286-7-florian.kauer@linutronix.de>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,NICE_REPLY_A,SPF_HELO_NONE,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB3625:EE_|BN9PR11MB5482:EE_
+X-MS-Office365-Filtering-Correlation-Id: b7954c41-4f5f-4462-5ed2-08db7e15d022
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: w6EXS7Qowm4X9ke7Ah+VgArmevJ49jMngaoT987pZf+PZJ57WizqberNZkkOZN1PRiB8/sArE+jdRZzYeYpQrIoo1KxcXoP48pnqc88SifgVCNhPsFG85Z75MyWmZXouoDa1CDW0FN4p8fe7qiUMOg7NPs01+hxS3hUBwnhiK5IAwfxWHwEDs67BPVOJv4GspuqPwa11XTYW6KnrljqSQFpDqeFNmknXhiUKQWv/QaW20zCGKgrbmqenqZ+yO5Izh7vy/75on9N419Kqt+nvjn/WIe6CcyCgyeFxjcM8YjaCAe+EwERU7fEXJG45YelUA0maHeqeHCw9cIFFCOZiMoFXO7bU84wgupdrAgsBVG+A0MmIAYUhBDL23Mn7gPXkkIJv9mH/xYUmNp28rzXO6pIte54b7NhWSWirgew8C5vmzaRhXksaqH2TY0qMkkdDFuWI2gpqcQ14iEjUYmeC9+dK7LPdol3zvCYBWeqWN4whE5p352HO6cpISYdrBMSQ/i4CQQCy5uPAbJW4uG6pd6bgmbURfV7NcN6zTQR+VNvDiOyfJi8irZw5NcfNAIUbNSI9dEjT9El9WbXzwjkVHh1SmVDPFeeLXID5DSeKF/Nekv4nh07lJ5oP0m4rmPdusx/9JZQuMfdF9ehnP43uPw==
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB3625.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(346002)(136003)(396003)(366004)(451199021)(5660300002)(8936002)(8676002)(66946007)(66556008)(66476007)(316002)(7416002)(4326008)(41300700001)(2906002)(54906003)(110136005)(45080400002)(6486002)(6666004)(6512007)(2616005)(66899021)(26005)(6506007)(186003)(31686004)(478600001)(82960400001)(83380400001)(36756003)(86362001)(31696002)(38100700002)(43740500002)(45980500001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?utf-8?B?UTBsT3FmUVRLaFRyaGdDaWh3bS9yN2JDQjlrdWw3YUNjeVY1VlJRY3luM05X?=
+ =?utf-8?B?U0pjTGY5TkdmaFo2ZEhRRHZQUGJNZWtsSTExb0publRWWldTN3ByN05uM2hN?=
+ =?utf-8?B?Z3pmbUdxSnZTclhwQU1UTkx3L2xtYUlhR2ZJVEtNdnlQVDF3c01vbDFxd0lr?=
+ =?utf-8?B?QXgvUEgwVVBrdTdISmdjU3lEUWlCMnpPOEJTbEE4ZWZvSHdyUGNhemxYZTI4?=
+ =?utf-8?B?NEdKSk5uS3lTNkZHM3dRYlQvemF6UVdhVlpQTVc4ZGtLM0JJelRnSlczZmtV?=
+ =?utf-8?B?Q1ZNYm5zK3VYemhxcm1hNWFWUVp0VGVIUG1EZGlGbURwK0cvVDQvUVI3VjB3?=
+ =?utf-8?B?c2VZMml5MDRqalR6bVo3dEpKSTV6Y2ZNR2RGaS9kTytrVjZUNDZ5Z0Z6Z1lE?=
+ =?utf-8?B?NTNFRnNjaWVGUkVTWEMrL2RibmVhU3g5WURSZ2taZ2poRmJpQTlYaXlpbHpj?=
+ =?utf-8?B?WWIxb2F0TkUzdVYyU2tHM2g4aWhvOXZITTlidlRqNVEyay9USUh2MEhrRDRx?=
+ =?utf-8?B?Nmd2bGxldE1ibksvdFVJWWxJZWh0UDRvN0JETXljVWN6UTZrQk1VOWkzM05o?=
+ =?utf-8?B?cWVzbVkwL1BRUkRIeVA1eUlDTkZzMG1RYXVOdHAxbWxFR2VvbUFiUU1Zd1Mx?=
+ =?utf-8?B?VkJUQkhrZkNxOTdMQjU3Ni92UHlWTVJyOUpJN2VVNjdhZkZucTVFck5rcSsr?=
+ =?utf-8?B?b1B3RE0rRW8vL1hpb3R2aGtTb2dOUzdubE1Vc2VUOWlUQ2pNM0pIeEtNTTlF?=
+ =?utf-8?B?dEpqbjE5UHJMV2g1a3NSbDk3dFBMaGZwT0laYTBRamVFb3Q1RUxWZWZQRkRh?=
+ =?utf-8?B?QkMxUjlxQlBNajlDSWdhOStXbUhrNDFOV2kxaVVETUxHcll4by9yN3hjdTlp?=
+ =?utf-8?B?MHlTWjY1SEZpbFRydWpSMGE4TmJxT2pCVHFVZVBuZHo4QjUwMFAyaWVlMGlY?=
+ =?utf-8?B?YzZaeVdmbDcrSENXR2d3Z2tnaFdGR2pzcGZYNk1NMzM2RFJTUFVxbHMxWmpU?=
+ =?utf-8?B?ZDdWM1pmN3UrejB1QklWcU5DWXEraVkvQTJuQ0JSN1pJRjg0ci9NM056SzJq?=
+ =?utf-8?B?b0Q2d1pkVmdUL0Yvd2RlN21IL2hBVkloNlJpc212MEhhVjJ4SkE1dmlFS2dj?=
+ =?utf-8?B?M0pjU01CWlBOQnNVUkM2UTZMTFhWcjd6djBETmRjQ0dySkx2RUh4bElaK0h3?=
+ =?utf-8?B?cjU3TXprcmhBblJFT1hRcEk5Z1RNclRVcGluZFhINUF6SFZocFk3bnkyV29Y?=
+ =?utf-8?B?T3NlRXV3Mi9qSkN1L3o3T2h5NlJsbHFWTUptcGMzL3IyMjVVVGZ1WWNxcUR0?=
+ =?utf-8?B?MTZCbnpLcnVWR1NLVThnbFkvcDZaeC9SL3gxVzBPaHFrcmkwQ0h6SmNsTVFB?=
+ =?utf-8?B?dmtjTFl2SzN3ejR0OEYxY1hnVTN0VXo2REhFR24xckJhVmt6VjZJVGZpMUNE?=
+ =?utf-8?B?VTJZeDBtMlJNTkUySnRvNi9KSGo5MDhBQ0FGckpLVDd4LzE0SlY2NW5mRHN0?=
+ =?utf-8?B?M0Rhd3dEMnNaSWs5ZUdiY2hUUGIrb3BERjJPRVlSM2diL3g0eThDRm8zNkpk?=
+ =?utf-8?B?SmZGaGNGaG9MbmdYdXpwcERnQUFXRUdiaE8wY1NkTUFlUW9XOFgvZkhyendN?=
+ =?utf-8?B?ZE54VlZiZE5UTTJjMG5KellmMGF0ckZvQjBNekF6L05xQy9nQThySDB1WnNF?=
+ =?utf-8?B?aEkwam5pU1BreDh6T2l4T0ZYNStnanZodFYzT3J2U0JnYXkvN0hrQkV6Q2Vs?=
+ =?utf-8?B?VTFCbnBzZmcvS1RoNmpVckoyUDV3Wk5UVktLQnAzbmhkUlRSbzFGK0s2RkF1?=
+ =?utf-8?B?RTNubXpHTWFHTlZ3Mll1WjZUM2pGV01heEJicWtkejRHZTkzdGVudzFjaXlr?=
+ =?utf-8?B?c2RLTC94c2JPdVRZY3VTZG5FUVhIbTlyVTFCR1hHcjd0RmhzN2d4a2NTMkpI?=
+ =?utf-8?B?YU9MQnVPY1BhaHB0TkxDL2VPYm5Zdm4yblFUaVpiN3dUcEJlaUZ0N2NpdFh1?=
+ =?utf-8?B?U09ydjBQVWplL0NtTkxqU3hZWTVnWFVTb2FNK2tVSTltSHZOYjFaUUVsaVlE?=
+ =?utf-8?B?MHBXckRGQ0FDMmh2K3JxVldyaFlwd3JobUFnd2NWTFBCRmh1WUIyRWdudDJN?=
+ =?utf-8?B?cHBYL0NnTlFvazk4UTBpREFNQ09iaHdianIyOGRYUjZuQ1l1UUxadlRXeHRj?=
+ =?utf-8?B?M0E9PQ==?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: b7954c41-4f5f-4462-5ed2-08db7e15d022
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB3625.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 11:40:35.6668
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 5GXgTBPUEmvhe4S8vs1G5SmWza3miZ3J9RFrXdkD75kidOw58WUulkpHIX0dsGG4bfjD5QJz+uvO5Lucrsd3jqcfSaqTNKVw5lZ66pMfR84=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5482
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
 	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 6/19/2023 13:08, Florian Kauer wrote:
-> The insertion of an empty frame was introduced with
-> commit db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
-> in order to ensure that the current cycle has at least one packet if
-> there is some packet to be scheduled for the next cycle.
-> 
-> However, the current implementation does not properly check if
-> a packet is already scheduled for the current cycle. Currently,
-> an empty packet is always inserted if and only if
-> txtime >= end_of_cycle && txtime > last_tx_cycle
-> but since last_tx_cycle is always either the end of the current
-> cycle (end_of_cycle) or the end of a previous cycle, the
-> second part (txtime > last_tx_cycle) is always true unless
-> txtime == last_tx_cycle.
-> 
-> What actually needs to be checked here is if the last_tx_cycle
-> was already written within the current cycle, so an empty frame
-> should only be inserted if and only if
-> txtime >= end_of_cycle && end_of_cycle > last_tx_cycle.
-> 
-> This patch does not only avoid an unnecessary insertion, but it
-> can actually be harmful to insert an empty packet if packets
-> are already scheduled in the current cycle, because it can lead
-> to a situation where the empty packet is actually processed
-> as the first packet in the upcoming cycle shifting the packet
-> with the first_flag even one cycle into the future, finally leading
-> to a TX hang.
-> 
-> The TX hang can be reproduced on a i225 with:
-> 
->      sudo tc qdisc replace dev enp1s0 parent root handle 100 taprio \
-> 	    num_tc 1 \
-> 	    map 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 \
-> 	    queues 1@0 \
-> 	    base-time 0 \
-> 	    sched-entry S 01 300000 \
-> 	    flags 0x1 \
-> 	    txtime-delay 500000 \
-> 	    clockid CLOCK_TAI
->      sudo tc qdisc replace dev enp1s0 parent 100:1 etf \
-> 	    clockid CLOCK_TAI \
-> 	    delta 500000 \
-> 	    offload \
-> 	    skip_sock_check
-> 
-> and traffic generator
-> 
->      sudo trafgen -i traffic.cfg -o enp1s0 --cpp -n0 -q -t1400ns
-> 
-> with traffic.cfg
-> 
->      #define ETH_P_IP        0x0800
-> 
->      {
->        /* Ethernet Header */
->        0x30, 0x1f, 0x9a, 0xd0, 0xf0, 0x0e,  # MAC Dest - adapt as needed
->        0x24, 0x5e, 0xbe, 0x57, 0x2e, 0x36,  # MAC Src  - adapt as needed
->        const16(ETH_P_IP),
-> 
->        /* IPv4 Header */
->        0b01000101, 0,   # IPv4 version, IHL, TOS
->        const16(1028),   # IPv4 total length (UDP length + 20 bytes (IP header))
->        const16(2),      # IPv4 ident
->        0b01000000, 0,   # IPv4 flags, fragmentation off
->        64,              # IPv4 TTL
->        17,              # Protocol UDP
->        csumip(14, 33),  # IPv4 checksum
-> 
->        /* UDP Header */
->        10,  0, 48, 1,   # IP Src - adapt as needed
->        10,  0, 48, 10,  # IP Dest - adapt as needed
->        const16(5555),   # UDP Src Port
->        const16(6666),   # UDP Dest Port
->        const16(1008),   # UDP length (UDP header 8 bytes + payload length)
->        csumudp(14, 34), # UDP checksum
-> 
->        /* Payload */
->        fill('W', 1000),
->      }
-> 
-> and the observed message with that is for example
-> 
->   igc 0000:01:00.0 enp1s0: Detected Tx Unit Hang
->     Tx Queue             <0>
->     TDH                  <32>
->     TDT                  <3c>
->     next_to_use          <3c>
->     next_to_clean        <32>
->   buffer_info[next_to_clean]
->     time_stamp           <ffff26a8>
->     next_to_watch        <00000000632a1828>
->     jiffies              <ffff27f8>
->     desc.status          <1048000>
-> 
-> Fixes: db0b124f02ba ("igc: Enhance Qbv scheduling by using first flag bit")
-> Signed-off-by: Florian Kauer <florian.kauer@linutronix.de>
-> Reviewed-by: Kurt Kanzenbach <kurt@linutronix.de>
-> ---
->   drivers/net/ethernet/intel/igc/igc_main.c | 2 +-
->   1 file changed, 1 insertion(+), 1 deletion(-)
+From: Souradeep Chakrabarti <schakrabarti@microsoft.com>
+Date: Thu, 6 Jul 2023 10:41:03 +0000
 
-Tested-by: Naama Meir <naamax.meir@linux.intel.com>
+> 
+> 
+>> -----Original Message-----
+>> From: Alexander Lobakin <aleksander.lobakin@intel.com>
+>> Sent: Wednesday, July 5, 2023 8:06 PM
+
+[...]
+
+>>>> 120 seconds by 2 msec step is 60000 iterations, by 1 msec is 120000
+>>>> iterations. I know usleep_range() often is much less precise, but still.
+>>>> Do you really need that much time? Has this been measured during the
+>>>> tests that it can take up to 120 seconds or is it just some random
+>>>> value that "should be enough"?
+>>>> If you really need 120 seconds, I'd suggest using a timer / delayed
+>>>> work instead of wasting resources.
+>>> Here the intent is not waiting for 120 seconds, rather than avoid
+>>> continue checking the pending_sends  of each tx queues for an indefinite time,
+>> before freeing sk_buffs.
+>>> The pending_sends can only get decreased for a tx queue,  if
+>>> mana_poll_tx_cq() gets called for a completion notification and increased by
+>> xmit.
+>>>
+>>> In this particular bug, apc->port_is_up is not set to false, causing
+>>> xmit to keep increasing the pending_sends for the queue and
+>>> mana_poll_tx_cq() not getting called for the queue.
+>>>
+>>> If we see the comment in the function mana_dealloc_queues(), it mentions it :
+>>>
+>>> 2346     /* No packet can be transmitted now since apc->port_is_up is false.
+>>> 2347      * There is still a tiny chance that mana_poll_tx_cq() can re-enable
+>>> 2348      * a txq because it may not timely see apc->port_is_up being cleared
+>>> 2349      * to false, but it doesn't matter since mana_start_xmit() drops any
+>>> 2350      * new packets due to apc->port_is_up being false.
+>>>
+>>> The value 120 seconds has been decided here based on maximum number of
+>>> queues
+>>
+>> This is quite opposite to what you're saying above. How should I connect these
+>> two:
+>>
+>> Here the intent is not waiting for 120 seconds
+>>
+>> +
+>>
+>> The value 120 seconds has been decided here based on maximum number of
+>> queues
+>>
+>> ?
+>> Can cleaning the Tx queues really last for 120 seconds?
+>> My understanding is that timeouts need to be sensible and not go to the outer
+>> space. What is the medium value you got during the tests?
+>>
+> For each queue each takes few milli second, in a normal condition. So
+> based on maximum number of allowed queues for our h/w it won't
+> go beyond a sec. 
+> The 120s only happens rarely during some NIC HW issue -unexpected.
+> So this timeout will only trigger in a very rare scenario.
+
+So set the timeout to 2 seconds if it makes no difference?
+
+>>> are allowed in this specific hardware, it is a safe assumption.
+>>>>
+>>>>>
+>>>>> +   for (i = 0; i < apc->num_queues; i++) {
+>>>>> +           txq = &apc->tx_qp[i].txq;
+>>>>> +           cq = &apc->tx_qp[i].tx_cq;
+[...]
+
+Thanks,
+Olek
 
