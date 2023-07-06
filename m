@@ -1,127 +1,191 @@
-Return-Path: <netdev+bounces-15735-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15736-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1FAF9749721
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 10:11:32 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C65CB749731
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 10:16:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3CD8B1C20D07
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:11:31 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4AA65281259
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:16:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 289A9185A;
-	Thu,  6 Jul 2023 08:11:29 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 945031861;
+	Thu,  6 Jul 2023 08:16:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 150AC1859
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 08:11:28 +0000 (UTC)
-Received: from mail-ed1-x534.google.com (mail-ed1-x534.google.com [IPv6:2a00:1450:4864:20::534])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2392B1988
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 01:11:27 -0700 (PDT)
-Received: by mail-ed1-x534.google.com with SMTP id 4fb4d7f45d1cf-51e29964942so581805a12.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 01:11:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8961D15B8
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 08:16:07 +0000 (UTC)
+Received: from mail-ed1-x52d.google.com (mail-ed1-x52d.google.com [IPv6:2a00:1450:4864:20::52d])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2AAA01BD9
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 01:16:04 -0700 (PDT)
+Received: by mail-ed1-x52d.google.com with SMTP id 4fb4d7f45d1cf-51e34ad47eeso164528a12.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 01:16:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=isovalent.com; s=google; t=1688631085; x=1691223085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=IR6/NdGhfGVRMDtpOrjbuplZoyHhi/ChIQZtoi6zZTM=;
-        b=STeCHpX3+OlrnWY3WHP0ldhz/3Dei+0SvJf+VJ/vKyNlNYR5mxb/jzlfqnh3YOI8l2
-         lvS4yjOBUsAiv4JLee7tYzvnDKwPF7y4daVoRvzsV25v1QHwnBBYrCyLRQHTYCdNUVv8
-         ahUTnrUITZOQBmkvHNfOl8N44YhyARcyNJebNEOux9U7ELzZcfNaTBNAqUHGn7laHYwX
-         BV1yqj2GH/9kkU7yqj874NhbwmMHza3f2n3RZyXrLpMO8eeOGqnFbfDV1DOTAQ91T5Io
-         6eQ/Hcubz+xwtI9dIMWlhGyfbd5u4qsP5vFL6pjSCZYexwnl+f4VOYG78uqcFH3spGCA
-         v+jQ==
+        d=shruggie-ro.20221208.gappssmtp.com; s=20221208; t=1688631362; x=1691223362;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=MwhGXVbpyW7QZfWhQZ06L6pd7GPVWoOBooUvPzw56Y0=;
+        b=ouPNzmID1yqGEv788RGmeUJ8ULIA4KpwiYj8S1vp7f3utnzQJXfxKaOeJ6IU/TU28i
+         pagKGFK2Ff9mMkwFYY1M+QKexLm9vgu2zVRBhfY+kbb1PXbrsRrpKTUjFwplSnhRf96s
+         isV9iK7WoRd8iIgun3HPNkx7QX2aYXfsP7rOo/VyjwJxCQPYahQn/EEwZmLGFuBCCdNO
+         akGqY5IGw7KvYrqZSbdR/iEvv/qRsgZObx0G/gZR2ldZPnQyqSCTAinW0JsXEzSZIPwj
+         yGQpnrUYQ9LTnYzL7UzvoDzQQhadC6uzrXTuRuO/rKLi8CkwaqIMviN6RcsPNdaEMPJ0
+         8prw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688631085; x=1691223085;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=IR6/NdGhfGVRMDtpOrjbuplZoyHhi/ChIQZtoi6zZTM=;
-        b=VQKzt1XpfdOpotYgnZY9VmSYLYb9JpQ+hZlogUpA0PZVa2AWdA/ADva2To9C3pWW5d
-         inWydmCR/NtYbe63J8dbJSazT7QwGDnmHxxLspMs1isSMb2BlXwZNnJpo1a0bclWp+zo
-         PHdzk/cmKMAsl2Yk5n17PIqeJ5TLdBiwFBReIjCaFqhNvpl2C/XilASvt2C9eqWmI5U1
-         nRNJidHsSM8bKx7+tvVYKQrFopav3vKDX0tdGnQRDHXxNzIZWVytcSaat8WYfbii+qf4
-         gKuEnIciT8aNqqUJ9KePOoRWAurxV0IChHpVYNI1P6NUjEkhEf+BNTgZCtPBs3aaHnGm
-         1UnA==
-X-Gm-Message-State: ABy/qLYsp7re/3hIVPqGMcUm16Q1cVCqyrQeHwlJkR9JdAaMrueAXpb0
-	umVhimLaiPG8mzd6L6Ad9PeaStAEiPfWJoyazY7Nrg==
-X-Google-Smtp-Source: APBJJlE7PccGGrOEgGPylmn7X0xxlAVv/W3p/wr9Xc8JG/2oayfRgYAidUKjr1Mm+9mxFiTLT3YLDAVus5yzbeLzFqM=
-X-Received: by 2002:a17:906:9e13:b0:992:b928:adb3 with SMTP id
- fp19-20020a1709069e1300b00992b928adb3mr756365ejc.54.1688631085659; Thu, 06
- Jul 2023 01:11:25 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688631362; x=1691223362;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=MwhGXVbpyW7QZfWhQZ06L6pd7GPVWoOBooUvPzw56Y0=;
+        b=GaD6mWtUGg+IBmbrAfH4JC733Vls1OtTL80GZZb3grMl4d28F206/Hot5vvtbAy6S6
+         GcO3PE8QLZxIGpYjIH36GHKmTHoORYXtfTXOWkG4TJ7pfvuYKWcVgXRVETmH7RvwO2gp
+         Egr4B3r/G6YAOk7Dmo9HnRVuYkzdLaGpuBvdWukIbIex6O8T5RPiwut0A1o1yd8ueeVY
+         qshORwtgZ7HhK9sY2uAI2sfcGwk4EXHGUla6ouH44GHtKIegVZilbA1o1THLBALlJ21s
+         zuOtlDGgTKMgdkunQn3hbIMChD03q8Et/lPGLE6E0jvpR4GOmOrtXB8p1vH/3a9YKWHr
+         3rrQ==
+X-Gm-Message-State: ABy/qLbIxssSckw1MppAPQaqKYCX9Q5tpgX39D9RTNnL37iWrIeNwXr0
+	fYXU4q5krSegj2AgpmVAnb3oE8awF3RW4+91hXeDsA==
+X-Google-Smtp-Source: APBJJlGXZ37ZNT+r0LgYupdqeE60aVZISQuMjkf12+gdCtairiP3dB62U7w0DeY7P+YZ5nKsbvSU6A==
+X-Received: by 2002:a17:906:198:b0:98d:f11e:4816 with SMTP id 24-20020a170906019800b0098df11e4816mr795357ejb.29.1688631362038;
+        Thu, 06 Jul 2023 01:16:02 -0700 (PDT)
+Received: from localhost.localdomain ([82.79.69.144])
+        by smtp.gmail.com with ESMTPSA id m8-20020a17090607c800b0099364d9f0e9sm478096ejc.102.2023.07.06.01.16.00
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 01:16:01 -0700 (PDT)
+From: Alexandru Ardelean <alex@shruggie.ro>
+To: netdev@vger.kernel.org,
+	devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org
+Cc: davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	robh+dt@kernel.org,
+	krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org,
+	andrew@lunn.ch,
+	hkallweit1@gmail.com,
+	linux@armlinux.org.uk,
+	olteanv@gmail.com,
+	alex@shruggie.ro,
+	marius.muresan@mxt.ro
+Subject: [PATCH 1/2] net: phy: mscc: add support for CLKOUT ctrl reg for VSC8531 and similar
+Date: Thu,  6 Jul 2023 11:15:53 +0300
+Message-Id: <20230706081554.1616839-1-alex@shruggie.ro>
+X-Mailer: git-send-email 2.40.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAN+4W8hLXYZuNFG+=J-FWLXWhbwT5TrHjMg5VzjQhv2NBo5VaA@mail.gmail.com>
- <20230706004044.79850-1-kuniyu@amazon.com>
-In-Reply-To: <20230706004044.79850-1-kuniyu@amazon.com>
-From: Lorenz Bauer <lmb@isovalent.com>
-Date: Thu, 6 Jul 2023 09:11:15 +0100
-Message-ID: <CAN+4W8iRH6kpDmmY8i5r1nKbckaYghmOCqRXe+4bDHE7vzVMMA@mail.gmail.com>
-Subject: Re: [PATCH bpf-next v4 6/7] bpf, net: Support SO_REUSEPORT sockets
- with bpf_sk_assign
-To: Kuniyuki Iwashima <kuniyu@amazon.com>
-Cc: andrii@kernel.org, ast@kernel.org, bpf@vger.kernel.org, 
-	daniel@iogearbox.net, davem@davemloft.net, dsahern@kernel.org, 
-	edumazet@google.com, haoluo@google.com, hemanthmalla@gmail.com, joe@cilium.io, 
-	joe@wand.net.nz, john.fastabend@gmail.com, jolsa@kernel.org, 
-	kpsingh@kernel.org, kuba@kernel.org, linux-kernel@vger.kernel.org, 
-	linux-kselftest@vger.kernel.org, martin.lau@linux.dev, mykolal@fb.com, 
-	netdev@vger.kernel.org, pabeni@redhat.com, sdf@google.com, shuah@kernel.org, 
-	song@kernel.org, willemdebruijn.kernel@gmail.com, yhs@fb.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 6, 2023 at 1:41=E2=80=AFAM Kuniyuki Iwashima <kuniyu@amazon.com=
-> wrote:
->
-> Sorry for late reply.
->
-> What we know about sk before inet6?_lookup_reuseport() are
->
->   (1) sk was full socket in bpf_sk_assign()
->   (2) sk had SOCK_RCU_FREE in bpf_sk_assign()
->   (3) sk was TCP_LISTEN here if TCP
+The VSC8531 and similar PHYs (i.e. VSC8530, VSC8531, VSC8540 & VSC8541)
+have a CLKOUT pin on the chip that can be controlled by register (13G in
+the General Purpose Registers page) that can be configured to output a
+frequency of 25, 50 or 125 Mhz.
 
-Are we looking at the same bpf_sk_assign? Confusingly there are two
-very similarly named functions. The one we care about is:
+This is useful when wanting to provide a clock source for the MAC in some
+board designs.
 
-BPF_CALL_3(bpf_sk_assign, struct sk_buff *, skb, struct sock *, sk, u64, fl=
-ags)
-{
-    if (!sk || flags !=3D 0)
-        return -EINVAL;
-    if (!skb_at_tc_ingress(skb))
-        return -EOPNOTSUPP;
-    if (unlikely(dev_net(skb->dev) !=3D sock_net(sk)))
-        return -ENETUNREACH;
-    if (sk_is_refcounted(sk) &&
-        unlikely(!refcount_inc_not_zero(&sk->sk_refcnt)))
-        return -ENOENT;
+Signed-off-by: Marius Muresan <marius.muresan@mxt.ro>
+Signed-off-by: Alexandru Ardelean <alex@shruggie.ro>
+---
 
-    skb_orphan(skb);
-    skb->sk =3D sk;
-    skb->destructor =3D sock_pfree;
+The original patch was done by Marius.
+The final (upstream) version was done by Alex.
 
-    return 0;
-}
+Tested on VSC8531.
 
-From this we can't tell what state the socket is in or whether it is
-RCU freed or not.
+ drivers/net/phy/mscc/mscc.h      |  5 ++++
+ drivers/net/phy/mscc/mscc_main.c | 40 ++++++++++++++++++++++++++++++++
+ 2 files changed, 45 insertions(+)
 
-Thanks
-Lorenz
+diff --git a/drivers/net/phy/mscc/mscc.h b/drivers/net/phy/mscc/mscc.h
+index 7a962050a4d4..4ea21921a7ba 100644
+--- a/drivers/net/phy/mscc/mscc.h
++++ b/drivers/net/phy/mscc/mscc.h
+@@ -181,6 +181,11 @@ enum rgmii_clock_delay {
+ #define VSC8502_RGMII_TX_DELAY_MASK	  0x0007
+ #define VSC8502_RGMII_RX_CLK_DISABLE	  0x0800
+ 
++/* CKLOUT Control register, for VSC8531 and similar */
++#define VSC8531_CLKOUT_CNTL		  13
++#define VSC8531_CLKOUT_CNTL_ENABLE	  BIT(15)
++#define VSC8531_CLKOUT_CNTL_FREQ_MASK	  GENMASK(14, 13)
++
+ #define MSCC_PHY_WOL_LOWER_MAC_ADDR	  21
+ #define MSCC_PHY_WOL_MID_MAC_ADDR	  22
+ #define MSCC_PHY_WOL_UPPER_MAC_ADDR	  23
+diff --git a/drivers/net/phy/mscc/mscc_main.c b/drivers/net/phy/mscc/mscc_main.c
+index 4171f01d34e5..61c1554935ce 100644
+--- a/drivers/net/phy/mscc/mscc_main.c
++++ b/drivers/net/phy/mscc/mscc_main.c
+@@ -618,6 +618,41 @@ static void vsc85xx_tr_write(struct phy_device *phydev, u16 addr, u32 val)
+ 	__phy_write(phydev, MSCC_PHY_TR_CNTL, TR_WRITE | TR_ADDR(addr));
+ }
+ 
++static int vsc8531_clkout_config(struct phy_device *phydev)
++{
++	static const u32 freq_vals[] = { 25, 50, 125 };
++	struct device *dev = &phydev->mdio.dev;
++	u16 mask, set;
++	u32 freq, i;
++	int rc;
++
++	mask = VSC8531_CLKOUT_CNTL_ENABLE | VSC8531_CLKOUT_CNTL_FREQ_MASK;
++	set = 0;
++
++	if (device_property_read_u32(dev, "vsc8531,clkout-freq-mhz", &freq) == 0) {
++		/* The indices from 'freq_vals' are used in the register */
++		for (i = 0; i < ARRAY_SIZE(freq_vals); i++) {
++			if (freq != freq_vals[i])
++				continue;
++
++			set |= VSC8531_CLKOUT_CNTL_ENABLE |
++			       FIELD_PREP(VSC8531_CLKOUT_CNTL_FREQ_MASK, i);
++			break;
++		}
++		if (set == 0)
++			dev_warn(dev,
++				 "Invalid 'vsc8531,clkout-freq-mhz' value %u\n",
++				 freq);
++	}
++
++	mutex_lock(&phydev->lock);
++	rc = phy_modify_paged(phydev, MSCC_PHY_PAGE_EXTENDED_GPIO,
++			      VSC8531_CLKOUT_CNTL, mask, set);
++	mutex_unlock(&phydev->lock);
++
++	return rc;
++}
++
+ static int vsc8531_pre_init_seq_set(struct phy_device *phydev)
+ {
+ 	int rc;
+@@ -1852,6 +1887,11 @@ static int vsc85xx_config_init(struct phy_device *phydev)
+ 		rc = vsc8531_pre_init_seq_set(phydev);
+ 		if (rc)
+ 			return rc;
++
++		rc = vsc8531_clkout_config(phydev);
++		if (rc)
++			return rc;
++
+ 	}
+ 
+ 	rc = vsc85xx_eee_init_seq_set(phydev);
+-- 
+2.40.1
+
 
