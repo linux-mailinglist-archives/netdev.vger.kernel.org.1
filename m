@@ -1,208 +1,145 @@
-Return-Path: <netdev+bounces-15757-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15758-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CE6637498D0
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:57:26 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id A01207498E5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:02:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0AFC01C20CBD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:57:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 65BCD2809D7
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 10:02:02 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4E2517483;
-	Thu,  6 Jul 2023 09:57:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A0BDE79F4;
+	Thu,  6 Jul 2023 10:01:57 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3FE7179F5
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:57:12 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DC660113
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:57:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 953AF79F2
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:01:57 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 57A2D1BEA
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 03:01:55 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688637431;
+	s=mimecast20190719; t=1688637714;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=4Zsb1SP89ZGc9tRZJIomQD8nqsVc6zy47mftdUlg5sk=;
-	b=ipyLF4aAG4gt6LkZ9PNYfxNexbVtqy8JsDVfcZeqFqrPTPWWduQsCyXrUHjQCfTE668Z6u
-	Pi6o6VMp37/2oBNwYayNcBz7mAysRDPKOa4eQ3vV3W1QIyT62D5G/xjv//qzqgBhoUhwqN
-	EqkilADWqhXIDkNER6wdFVf1iWTt38o=
-Received: from mail-lj1-f200.google.com (mail-lj1-f200.google.com
- [209.85.208.200]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=PFB/bHaV+5S4HNAEYX/AEdRm3PBRbuuOs/N7fpLg5iE=;
+	b=A2l7ieAu6OqAPIPg+NmbiXNz3+uqI9DMT0EyqhKT+9Vev1l1BPQWM0LLQguyJ0whQG1Y5b
+	YDSygl/upsmEd/nwfXHHw6nIEEQJ32QwwXe3pHR/CbGGglHPkDoIn88EI5ZHqj8zbg00bi
+	DehP2AJrVa4lvcmhCSDRKg3DMMu0WpU=
+Received: from mail-yw1-f197.google.com (mail-yw1-f197.google.com
+ [209.85.128.197]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-424-YPkoINMCMGajsfqPTaWq0w-1; Thu, 06 Jul 2023 05:57:09 -0400
-X-MC-Unique: YPkoINMCMGajsfqPTaWq0w-1
-Received: by mail-lj1-f200.google.com with SMTP id 38308e7fff4ca-2b70347bf04so4866281fa.3
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 02:57:09 -0700 (PDT)
+ us-mta-171-Sm7ci6_LPOOiC0W-Eud6YQ-1; Thu, 06 Jul 2023 06:01:50 -0400
+X-MC-Unique: Sm7ci6_LPOOiC0W-Eud6YQ-1
+Received: by mail-yw1-f197.google.com with SMTP id 00721157ae682-57059f90cc5so6229437b3.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 03:01:50 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688637428; x=1691229428;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=4Zsb1SP89ZGc9tRZJIomQD8nqsVc6zy47mftdUlg5sk=;
-        b=aSj+BiTPkYsq2PcApDnBkVZlRmBr6DDBCYflfnr8q6TTUo2rOS4QmrZhc26rZ17ZNg
-         qNPW+aWVZBJ3uFsOg7aaG3+0CJZujc/swWE2TDbw1175WJZdZGyXo08isqvkwPLB91t/
-         Ag1mkDSm8uEbRvJRtkBWc+Gyqxoz1R99fC6tqJSnFGObLK8xdcym3R4S1oGxt2nfZTOJ
-         5AKBByjcQwaQOlLCRNBolcTqT4bkmJsT2TiD0iu59kRH4sD7ZTZRzmaWI3PjI1m6Lt+I
-         +EQEz9r14dAxxgh2q3OonbJAwddpMmGbiN/giqI7Aa6wbSnGpqKj2bcR10cRaJY2jVDd
-         87DQ==
-X-Gm-Message-State: ABy/qLYVxKWh1fZxDopTw7qUd/058u2kpIzStOuR7EN/o9G1A6QD9SqV
-	cN8DSfA0Tlh0QyhWU9kmlG7ZSFqJUIMcJ/2SAI27/71R0idDHoGecCJgO86ZOB0GEupKPxYllY2
-	RHJV4NMBx/NED0FeU
-X-Received: by 2002:a2e:b04d:0:b0:2b6:a6e7:5afa with SMTP id d13-20020a2eb04d000000b002b6a6e75afamr1076069ljl.12.1688637428266;
-        Thu, 06 Jul 2023 02:57:08 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFgougTcsRRbzaKfup7nQpf8GbXN1NXXCsc8c7jqbLKRFju0/oFjZjKYnDenXAULCC5eq2cRw==
-X-Received: by 2002:a2e:b04d:0:b0:2b6:a6e7:5afa with SMTP id d13-20020a2eb04d000000b002b6a6e75afamr1076050ljl.12.1688637427940;
-        Thu, 06 Jul 2023 02:57:07 -0700 (PDT)
-Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id y17-20020aa7d511000000b0051bf57aa0c6sm561571edq.87.2023.07.06.02.57.06
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Thu, 06 Jul 2023 02:57:07 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <72f31e46-55f7-1e09-bf69-9ebde6f9e732@redhat.com>
-Date: Thu, 6 Jul 2023 11:57:06 +0200
+        d=1e100.net; s=20221208; t=1688637709; x=1691229709;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=PFB/bHaV+5S4HNAEYX/AEdRm3PBRbuuOs/N7fpLg5iE=;
+        b=FCYjhkhuq670SaPYcfbbk32YtYzATYlHwDA2yjf5BdUomAyUQ+Bjjl8X/JcNuY0NuD
+         dzEBTqca3euIe6Uj090AAx79X42yt6S13e9sg4CV131nagiWMFbVwS8iohWYIqGURH4Z
+         B48fwx7fMo1mQQoUi+GaRzIQvuANaQFNgpvCRXViKam7y13jAm5ANopBv47jYfbWqvZT
+         VZ5kuLqQzShnQGBLXeUf7u1w+a9MJs5aK+aGnCCYJ2JwovXyrmb24NKLEKzIZBtACO1K
+         Huq8gmoop2O2KgBYsm43G3z2lZSG7hz9KlXMEPaK2pYEAbkjgJ4rXdDlj7GPfJYu4mH/
+         10sA==
+X-Gm-Message-State: ABy/qLbXNvZlkfomcLGWn6vUh5ew+KmxTrrkNQyAS5/uob6eP9p0AA76
+	7CQ6z/8DYs4j4R/rlxdILOP0RlWGVMMVfShYsoQl4rUaiExmi6/2q2gOFlboSyC+c4pYHW5DPFD
+	tw2XxHOtFJSDRv1WyvSVEmT14uX2tGZim
+X-Received: by 2002:a81:8384:0:b0:56d:c97:39f4 with SMTP id t126-20020a818384000000b0056d0c9739f4mr1424689ywf.8.1688637709731;
+        Thu, 06 Jul 2023 03:01:49 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHnS8DTGuBigSC1cOUEhrHGP3AjZEn+XIDZR976mIx9TGjJA3wYtGsoU6qHdLxp+gcwyMWCUHKwipRzaY/ylEo=
+X-Received: by 2002:a81:8384:0:b0:56d:c97:39f4 with SMTP id
+ t126-20020a818384000000b0056d0c9739f4mr1424668ywf.8.1688637709450; Thu, 06
+ Jul 2023 03:01:49 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: brouer@redhat.com, bpf@vger.kernel.org, ast@kernel.org,
- daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
- song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
- haoluo@google.com, jolsa@kernel.org, David Ahern <dsahern@gmail.com>,
- Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
- Anatoly Burakov <anatoly.burakov@intel.com>,
- Alexander Lobakin <alexandr.lobakin@intel.com>,
- Magnus Karlsson <magnus.karlsson@gmail.com>,
- Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
- netdev@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 17/20] veth: Implement VLAN tag and checksum
- level XDP hint
-Content-Language: en-US
-To: Stanislav Fomichev <sdf@google.com>,
- Larysa Zaremba <larysa.zaremba@intel.com>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-18-larysa.zaremba@intel.com>
- <ZKWnbfTXp/vyHYUU@google.com>
-In-Reply-To: <ZKWnbfTXp/vyHYUU@google.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+References: <20230704234532.532c8ee7.gary@garyguo.net>
+In-Reply-To: <20230704234532.532c8ee7.gary@garyguo.net>
+From: Stefano Garzarella <sgarzare@redhat.com>
+Date: Thu, 6 Jul 2023 12:01:38 +0200
+Message-ID: <CAGxU2F4_br6e3hEELXP_wpQSZTs5FYhQ-iahiZKzMMRYWpFXdA@mail.gmail.com>
+Subject: Re: Hyper-V vsock streams do not fill the supplied buffer in full
+To: Gary Guo <gary@garyguo.net>, Dexuan Cui <decui@microsoft.com>
+Cc: "K. Y. Srinivasan" <kys@microsoft.com>, Haiyang Zhang <haiyangz@microsoft.com>, 
+	Wei Liu <wei.liu@kernel.org>, linux-hyperv@vger.kernel.org, 
+	virtualization@lists.linux-foundation.org, netdev@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+Hi Gary,
 
-On 05/07/2023 19.25, Stanislav Fomichev wrote:
-> On 07/03, Larysa Zaremba wrote:
->> In order to test VLAN tag and checksum level XDP hints in
->> hardware-independent selfttests, implement newly added XDP hints in veth
->> driver.
->>
->> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
->> ---
->>   drivers/net/veth.c | 40 ++++++++++++++++++++++++++++++++++++++++
->>   1 file changed, 40 insertions(+)
->>
->> diff --git a/drivers/net/veth.c b/drivers/net/veth.c
->> index 614f3e3efab0..a7f2b679551d 100644
->> --- a/drivers/net/veth.c
->> +++ b/drivers/net/veth.c
->> @@ -1732,6 +1732,44 @@ static int veth_xdp_rx_hash(const struct xdp_md *ctx, u32 *hash,
->>   	return 0;
->>   }
->>   
->> +static int veth_xdp_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan_tag,
->> +				__be16 *vlan_proto)
->> +{
->> +	struct veth_xdp_buff *_ctx = (void *)ctx;
->> +	struct sk_buff *skb = _ctx->skb;
->> +	int err;
->> +
->> +	if (!skb)
->> +		return -ENODATA;
->> +
-> 
-> [..]
-> 
->> +	err = __vlan_hwaccel_get_tag(skb, vlan_tag);
-> 
-> We probably need to open code __vlan_hwaccel_get_tag here. Because it
-> returns -EINVAL on !skb_vlan_tag_present where the expectation, for us,
-> I'm assuming is -ENODATA?
-> 
+On Wed, Jul 5, 2023 at 12:45=E2=80=AFAM Gary Guo <gary@garyguo.net> wrote:
+>
+> When a vsock stream is called with recvmsg with a buffer, it only fills
+> the buffer with data from the first single VM packet. Even if there are
+> more VM packets at the time and the buffer is still not completely
+> filled, it will just leave the buffer partially filled.
+>
+> This causes some issues when in WSLD which uses the vsock in
+> non-blocking mode and uses epoll.
+>
+> For stream-oriented sockets, the epoll man page [1] says that
+>
+> > For stream-oriented files (e.g., pipe, FIFO, stream socket),
+> > the condition that the read/write I/O space is exhausted can
+> > also be detected by checking the amount of data read from /
+> > written to the target file descriptor.  For example, if you
+> > call read(2) by asking to read a certain amount of data and
+> > read(2) returns a lower number of bytes, you can be sure of
+> > having exhausted the read I/O space for the file descriptor.
+>
+> This has been used as an optimisation in the wild for reducing number
+> of syscalls required for stream sockets (by asserting that the socket
+> will not have to polled to EAGAIN in edge-trigger mode, if the buffer
+> given to recvmsg is not filled completely). An example is Tokio, which
+> starting in v1.21.0 [2].
+>
+> When this optimisation combines with the behaviour of Hyper-V vsock, it
+> causes issue in this scenario:
+> * the VM host send data to the guest, and it's splitted into multiple
+>   VM packets
+> * sk_data_ready is called and epoll returns, notifying the userspace
+>   that the socket is ready
+> * userspace call recvmsg with a buffer, and it's partially filled
+> * userspace assumes that the stream socket is depleted, and if new data
+>   arrives epoll will notify it again.
+> * kernel always considers the socket to be ready, and since it's in
+>   edge-trigger mode, the epoll instance will never be notified again.
+>
+> This different realisation of the readiness causes the userspace to
+> block forever.
 
-Looking at in-tree users of __vlan_hwaccel_get_tag(), they don't use the
-err value for anything.  Thus, we can just change
-__vlan_hwaccel_get_tag() to return -ENODATA instead of -EINVAL.  (And
-also remember __vlan_get_tag() adjustmment).
+Thanks for the detailed description of the problem.
 
+I think we should fix the hvs_stream_dequeue() in
+net/vmw_vsock/hyperv_transport.c.
+We can do something similar to what we do in
+virtio_transport_stream_do_dequeue() in
+net/vmw_vsock/virtio_transport_common.c
 
-$ git diff
-diff --git a/include/linux/if_vlan.h b/include/linux/if_vlan.h
-index 6ba71957851e..fb35d7dd77a2 100644
---- a/include/linux/if_vlan.h
-+++ b/include/linux/if_vlan.h
-@@ -540,7 +540,7 @@ static inline int __vlan_get_tag(const struct 
-sk_buff *skb, u16 *vlan_tci)
-         struct vlan_ethhdr *veth = skb_vlan_eth_hdr(skb);
+@Dexuan WDYT?
 
-         if (!eth_type_vlan(veth->h_vlan_proto))
--               return -EINVAL;
-+               return -ENODATA;
-
-         *vlan_tci = ntohs(veth->h_vlan_TCI);
-         return 0;
-@@ -561,7 +561,7 @@ static inline int __vlan_hwaccel_get_tag(const 
-struct sk_buff *skb,
-                 return 0;
-         } else {
-                 *vlan_tci = 0;
--               return -EINVAL;
-+               return -ENODATA;
-         }
-  }
-
-
-
->> +	if (err)
->> +		return err;
->> +
->> +	*vlan_proto = skb->vlan_proto;
->> +	return err;
->> +}
->> +
->> +static int veth_xdp_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
->> +{
->> +	struct veth_xdp_buff *_ctx = (void *)ctx;
->> +	struct sk_buff *skb = _ctx->skb;
->> +
->> +	if (!skb)
->> +		return -ENODATA;
->> +
->> +	if (skb->ip_summed == CHECKSUM_UNNECESSARY)
->> +		*csum_level = skb->csum_level;
->> +	else if (skb->ip_summed == CHECKSUM_PARTIAL &&
->> +		 skb_checksum_start_offset(skb) == skb_transport_offset(skb) ||
->> +		 skb->csum_valid)
->> +		*csum_level = 0;
->> +	else
->> +		return -ENODATA;
->> +
->> +	return 0;
->> +}
->> +
-[...]
+Thanks,
+Stefano
 
 
