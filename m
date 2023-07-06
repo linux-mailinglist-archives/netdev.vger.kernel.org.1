@@ -1,142 +1,139 @@
-Return-Path: <netdev+bounces-15925-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15926-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 86C4674A723
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 00:41:35 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6A2D574A77E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 01:18:02 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ABF871C20EC9
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 22:41:34 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1B2291C20EC9
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 23:18:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 748B515AF2;
-	Thu,  6 Jul 2023 22:41:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id CF2AB1642F;
+	Thu,  6 Jul 2023 23:17:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 634EBC2CF
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 22:41:32 +0000 (UTC)
-Received: from mail-vs1-xe30.google.com (mail-vs1-xe30.google.com [IPv6:2607:f8b0:4864:20::e30])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD1C21723;
-	Thu,  6 Jul 2023 15:41:29 -0700 (PDT)
-Received: by mail-vs1-xe30.google.com with SMTP id ada2fe7eead31-440b54708f2so516692137.0;
-        Thu, 06 Jul 2023 15:41:29 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688683289; x=1691275289;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=aTdMw3U8BFFOt8MvAKiw/gzh8jNiphNZNfXymWqvTuk=;
-        b=ILPQtduyeC9q2XK3+eksLVJDW/FwkgBS06MwLrr02VqB+BM4pm1jrcYvFASCd84UrV
-         xbHm7SkMPgt35Vm6Z/OBsTK/NwM0reX6XJKIRIJjqrQy/E2ysBCzBto4EN62gUi+QnzV
-         Sk9DeMslwnoIOMy3DNGnxd6LezTrF7QrJWTn3I0w6guIowqJ7yeDjMJra6gwTK9Lwzl0
-         XkoWcL5BFZiOkcmnvUigP45I29zcDJhJ7MznVHuJL8TOJshTeJLhsg8IhSd6VCTNoC2I
-         4aJy5vP6gbHp4KDzcuqlUm2zbv4S77xD275RicrabKMThqly8DlHafbdD458yiJu/LRT
-         VrUA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688683289; x=1691275289;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=aTdMw3U8BFFOt8MvAKiw/gzh8jNiphNZNfXymWqvTuk=;
-        b=ZTi07JslytGQvwtyTBu0kDjXyfRlG8aiE1sVFRau9ZoRfJQS3sGpRunHVgkkEbrFW7
-         NUiN2a3gKsMzTE71Gjvsgq2H5xKOxXLm6rMf/8Hg9Ryx/p6wvngzobyz4oQnANUYxDTT
-         MBY23IYdx85RJxsaFc/rRCP1AuA05kTy3o7l/qnKZNDXMFkLTuxS9YffidpUXYSyArzy
-         1RKf17OFTsbTGX8L1KpH6GBOTDcPKlYD5OOpWXPVkRfcAoGT43YHV05xTFa0CPJkLAM4
-         b7ht1euDHWsvVR+fyBQgLMFSmFXP8q4VwPxi06JmuET6h7lm5BUf0X/E0TUeO62sd/fo
-         bS0w==
-X-Gm-Message-State: ABy/qLYDnw0ElnLmidUrnJw3IC/Bqsf7hHdUouLULgQ15BA6FMtLfDoS
-	l1QdQn3yQYI3uBSjj7NrcHbDzGlqZF+kRLmBB/w=
-X-Google-Smtp-Source: APBJJlFWJdnvIGxW1yz69F4Wz6zWB/6GqSmKeTa56imfQj63pHpVZUTVNV+VjYTOZq/SMs6YSRSQpB/Z68pv8seWOwI=
-X-Received: by 2002:a67:e21a:0:b0:440:ab90:7c95 with SMTP id
- g26-20020a67e21a000000b00440ab907c95mr2813497vsa.9.1688683288738; Thu, 06 Jul
- 2023 15:41:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1DB263BA
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 23:17:58 +0000 (UTC)
+Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2076.outbound.protection.outlook.com [40.107.94.76])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2D5EC1BC2;
+	Thu,  6 Jul 2023 16:17:55 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=Lpo6ykLbcjcm3MZr/TBgYGZp9rzFInHL74JPqAUwnPM+E44z3uyT3qBDDZqNomqq9X1V0LqrOB3UpbTTBzsF8OWob/OIMhtPK3ftqHnad1mvFOwz4lX/5hveviYvyBpwvXxzgjyl+N59WHGatSE24Fd+Jh4sWlj4XzC2NAXqZgo6cbFLvF5NzCeyfH3y4Up+5nsVUPqAtlhG0xtCBmjaR9AdN1WM5i5NnELxIqbfq5Fm39pQ8fVxL8IrM3iPDv3jdZ/1ajWRlzrHtCz7tdCdcIWsAyPYKKIQdGukbeUpy5ON25Z/B3xbc2UzGZQWcOvqmUMKdPxFMuqaHS+8HGbKTA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=Z2uR+tZYMebNpdyh3FCWJEs8zmJnm06UK/gcEuzaNWU=;
+ b=I5kgH6PzUUTccQgHNjwhlae8i2lp1mTBrjNHhMQUfA+zeoeEDk5V8cpHlIPqpLuiwKHL4iP+Y7pNF5H1Iwxfyb4v5YxD1ddZRa8IzO8WkiR+LTsAsZpKp6hi14hSNYiTMYBRoCm4PakvSJUfSnPYSZyblGNkCoZpEZtP+m4DQYhRckXL+u9dcqJ5z+2ubMnlnlTgUYVDA6Hqq9CcL7FgbntghAzHGAbDQsKZihXxlbGQFhaNmv6dwrpqRZGAE0w6swX5/JJAQz8xVlQPVnNa0pywUP1ExrzJ6otUTbaIxeZKGDXH3umnZjI7DRTdYuhg3kMDHUxCNiQ6xnevt3kulg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass (sender ip is
+ 165.204.84.17) smtp.rcpttodomain=infradead.org smtp.mailfrom=amd.com;
+ dmarc=pass (p=quarantine sp=quarantine pct=100) action=none
+ header.from=amd.com; dkim=none (message not signed); arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=Z2uR+tZYMebNpdyh3FCWJEs8zmJnm06UK/gcEuzaNWU=;
+ b=NSReKHlbX4hPfg3Eys2UqLHXhv3J+RjjxSBPDWPmL2CQxhiSf23b2eBnbKEBttPNxg+vbNlkCh6YhURqjgtkkrKGnMSyfdvfJfocIxRjYKazm0wE8fNFaHGOjujduAYWlNSLKGQksc+t0F2nnQ+Dtn7Am514ovtAbyDz68wvyS4=
+Received: from MW4PR03CA0337.namprd03.prod.outlook.com (2603:10b6:303:dc::12)
+ by SJ0PR12MB5456.namprd12.prod.outlook.com (2603:10b6:a03:3ae::12) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
+ 2023 23:17:52 +0000
+Received: from CO1NAM11FT015.eop-nam11.prod.protection.outlook.com
+ (2603:10b6:303:dc:cafe::9e) by MW4PR03CA0337.outlook.office365.com
+ (2603:10b6:303:dc::12) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.24 via Frontend
+ Transport; Thu, 6 Jul 2023 23:17:52 +0000
+X-MS-Exchange-Authentication-Results: spf=pass (sender IP is 165.204.84.17)
+ smtp.mailfrom=amd.com; dkim=none (message not signed)
+ header.d=none;dmarc=pass action=none header.from=amd.com;
+Received-SPF: Pass (protection.outlook.com: domain of amd.com designates
+ 165.204.84.17 as permitted sender) receiver=protection.outlook.com;
+ client-ip=165.204.84.17; helo=SATLEXMB04.amd.com; pr=C
+Received: from SATLEXMB04.amd.com (165.204.84.17) by
+ CO1NAM11FT015.mail.protection.outlook.com (10.13.175.130) with Microsoft SMTP
+ Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.20.6521.45 via Frontend Transport; Thu, 6 Jul 2023 23:17:52 +0000
+Received: from driver-dev1.pensando.io (10.180.168.240) by SATLEXMB04.amd.com
+ (10.181.40.145) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.23; Thu, 6 Jul
+ 2023 18:17:50 -0500
+From: Shannon Nelson <shannon.nelson@amd.com>
+To: <rdunlap@infradead.org>, <jasowang@redhat.com>, <mst@redhat.com>,
+	<virtualization@lists.linux-foundation.org>, <shannon.nelson@amd.com>,
+	<brett.creeley@amd.com>
+CC: <netdev@vger.kernel.org>, <drivers@pensando.io>, <sfr@canb.auug.org.au>,
+	<linux-next@vger.kernel.org>, <linux-kernel@vger.kernel.org>
+Subject: [PATCH virtio] pds_vdpa: protect Makefile from unconfigured debugfs
+Date: Thu, 6 Jul 2023 16:17:18 -0700
+Message-ID: <20230706231718.54198-1-shannon.nelson@amd.com>
+X-Mailer: git-send-email 2.17.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
- <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
- <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com> <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
- <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com> <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
- <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
- <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
- <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
- <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
- <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
- <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
- <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
- <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
- <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
- <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
- <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
- <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com>
- <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
- <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
- <CAA85sZs_H3Dc-mYnj8J5VBEwUJwbHUupP+U-4eG20nfAHBtv4w@mail.gmail.com>
- <92a4d42491a2c219192ae86fa04b579ea3676d8c.camel@redhat.com>
- <CAA85sZvtspqfep+6rH8re98-A6rHNNWECvwqVaM=r=0NSSsGzA@mail.gmail.com>
- <dfbbe91a9c0abe8aba2c00afd3b7f7d6af801d8e.camel@redhat.com>
- <CAA85sZuQh0FMoGDFVyOad6G1UB9keodd3OCZ4d4r+xgXDArcVA@mail.gmail.com>
- <062061fc4d4d3476e3b0255803b726956686eb19.camel@redhat.com>
- <CAA85sZv9KCmw8mAzK4T-ORXB48wuLF+YXTYSWxkBhv3k_-wzcA@mail.gmail.com>
- <CAA85sZt6ssXRaZyq4awM0yTLFk62Gxbgw-0+bTKWsHwQvVzZXQ@mail.gmail.com>
- <d9bf21296a4691ac5aca11ccd832765b262f7088.camel@redhat.com>
- <CAA85sZsidN4ig=RaQ34PYFjnZGU-=zqR=r-5za=G4oeAtxDA7g@mail.gmail.com>
- <14cd6a50bd5de13825017b75c98cb3115e84acc1.camel@redhat.com>
- <CAA85sZuZLg+L7Sr51PPaOkPKbbiywXbbKzhTyjaw12_S6CsZHQ@mail.gmail.com>
- <c6cf7b4c0a561700d2015c970d52fc9d92b114c7.camel@redhat.com>
- <CAA85sZvZ_X=TqCXaPui0PDLq2pp5dw_uhga+wcXgBqudrLP9bQ@mail.gmail.com>
- <67ff0f7901e66d1c0d418c48c9a071068b32a77d.camel@redhat.com>
- <CANn89i+F=R71refT8K_8hPaP+uWn15GeHz+FTMYU=VPTG24WFA@mail.gmail.com>
- <c4e40b45b41d0476afd8989d31e6bab74c51a72a.camel@redhat.com>
- <CAA85sZs_R3W42m8YmXO-k08bPow7zKj_eOxceEB_3MJveGMZ7A@mail.gmail.com>
- <a46bb3de011002c2446a6d836aaddc9f6bce71bc.camel@redhat.com> <CAA85sZsHKb3Wtsa5ktSAPJsjLrcmahtgaemPhN5dTeTxEBWaqw@mail.gmail.com>
-In-Reply-To: <CAA85sZsHKb3Wtsa5ktSAPJsjLrcmahtgaemPhN5dTeTxEBWaqw@mail.gmail.com>
-From: Ian Kumlien <ian.kumlien@gmail.com>
-Date: Fri, 7 Jul 2023 00:41:17 +0200
-Message-ID: <CAA85sZtAixvRQnzs5+nad_pFsN9VZ67a2_CLCPFrHfieijn18A@mail.gmail.com>
-Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
-To: Paolo Abeni <pabeni@redhat.com>
-Cc: Eric Dumazet <edumazet@google.com>, Willem de Bruijn <willemb@google.com>, 
-	Alexander Lobakin <aleksander.lobakin@intel.com>, 
-	intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski <kuba@kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: text/plain
+X-Originating-IP: [10.180.168.240]
+X-ClientProxiedBy: SATLEXMB04.amd.com (10.181.40.145) To SATLEXMB04.amd.com
+ (10.181.40.145)
+X-EOPAttributedMessage: 0
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: CO1NAM11FT015:EE_|SJ0PR12MB5456:EE_
+X-MS-Office365-Filtering-Correlation-Id: 776f3dd4-f7fe-42ab-5b1e-08db7e7738cf
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	Zvf2U5vb6YJG0t2a0j2qWAOzMUS6rsU93U8Esr3lcg91P+DGwOJgGOLjbcnJuZxa5n+StmIc6VYWmCosaY9DMfpQveltVMB33/0wXZwlGvsCiqHVevmsLMX+ZvO8tupBUfc8As+JaZpgQBxF6F0sT5Z6OgV77RikvB5N965GC3tAjLdsjfVGuXeH9wfsAXdill2DgDaqV66uVfXIS7gYlP9Jgn1a6hQF08zPh8WXz6Py1v5CAkEL6VXs1BLhFC8wN4RMeJDfeSUPBLHns8n93eGsRuHhA+fJnN8eETKn9ob8qhAPCPoOxY/5mN4D2U4Hdw7+/tAive0ZYXKxwbpf2BwYiTkfD+AICW0/Q35fg420YRPTamFzPxoG+++RLjK2G1mKRofaDCr0eiTTUNHpCb3zDeVhiMMkRVFgPipth50sq17UPqHmvMSqa3Wexd8RyPeggUsu60tplVEkhD7Hn3fazSp8tKkH6gbD29xvefVpV7zAsqoLwn8gHJQ/QmXzALgvviKvyfHg+VDErXzWm3vs9L0FsI2zclYXce0ZQD0J/9qe2701gwZZLLxMDZrxdAdXTv4T8xwVc2I5R6C6FKgCo7IMK8l3UTO4XsKybzxPfOXH12EPfjyJIcmS3YKiTbL7Et9xJpWvrCEyo49mQpAZbnwVl7Va0J6Z6F5PomEE/zI2fZSobEz4kHdyJ8gsoTI9Vp1+uZDCRlOVL0gtCFFnWJoBtMMA0ZznonWau6y8atnxRAEtrD1N64y3EcLz
+X-Forefront-Antispam-Report:
+	CIP:165.204.84.17;CTRY:US;LANG:en;SCL:1;SRV:;IPV:CAL;SFV:NSPM;H:SATLEXMB04.amd.com;PTR:InfoDomainNonexistent;CAT:NONE;SFS:(13230028)(4636009)(376002)(136003)(346002)(396003)(39860400002)(451199021)(36840700001)(40470700004)(46966006)(36756003)(4744005)(5660300002)(44832011)(86362001)(2906002)(82310400005)(40460700003)(40480700001)(16526019)(966005)(47076005)(186003)(336012)(426003)(36860700001)(83380400001)(26005)(1076003)(81166007)(82740400003)(356005)(110136005)(54906003)(70206006)(70586007)(316002)(2616005)(8936002)(6636002)(8676002)(478600001)(6666004)(4326008)(41300700001)(36900700001);DIR:OUT;SFP:1101;
+X-OriginatorOrg: amd.com
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 23:17:52.0659
+ (UTC)
+X-MS-Exchange-CrossTenant-Network-Message-Id: 776f3dd4-f7fe-42ab-5b1e-08db7e7738cf
+X-MS-Exchange-CrossTenant-Id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-OriginalAttributedTenantConnectingIp: TenantId=3dd8961f-e488-4e60-8e11-a82d994e183d;Ip=[165.204.84.17];Helo=[SATLEXMB04.amd.com]
+X-MS-Exchange-CrossTenant-AuthSource:
+	CO1NAM11FT015.eop-nam11.prod.protection.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Anonymous
+X-MS-Exchange-CrossTenant-FromEntityHeader: HybridOnPrem
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: SJ0PR12MB5456
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 7, 2023 at 12:32=E2=80=AFAM Ian Kumlien <ian.kumlien@gmail.com>=
- wrote:
-> On Thu, Jul 6, 2023 at 7:10=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
-ote:
-> > Let me try to clarify: I hope/think that this chunk alone:
-> >
-> > +       /* later code will clear the gso area in the shared info */
-> > +       err =3D skb_header_unclone(skb, GFP_ATOMIC);
-> > +       if (err)
-> > +               goto err_linearize;
-> > +
-> >         skb_shinfo(skb)->frag_list =3D NULL;
-> >
-> >         while (list_skb) {
-> >
-> > does the magic/avoids the skb corruptions -> it everything goes well,
-> > you should not see any warnings at all. Running 'nstat' in the DUT
-> > should give some hints about reaching the relevant code paths.
+debugfs.h protects itself from an undefined DEBUG_FS, so it is
+not necessary to check it in the driver code or the Makefile.
+The driver code had been updated for this, but the Makefile had
+missed the update.
 
-Ah yeah... I'm a bit tired atm - I see your point -  with moving it up a bi=
-t.
+Link: https://lore.kernel.org/linux-next/fec68c3c-8249-7af4-5390-0495386a76f9@infradead.org/
+Fixes: a16291b5bcbb ("pds_vdpa: Add new vDPA driver for AMD/Pensando DSC")
+Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
+---
+ drivers/vdpa/pds/Makefile | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-So anyway, Tested-by: ian.kumlien@gmail.com etc =3D)
+diff --git a/drivers/vdpa/pds/Makefile b/drivers/vdpa/pds/Makefile
+index 2e22418e3ab3..c2d314d4614d 100644
+--- a/drivers/vdpa/pds/Makefile
++++ b/drivers/vdpa/pds/Makefile
+@@ -5,6 +5,5 @@ obj-$(CONFIG_PDS_VDPA) := pds_vdpa.o
+ 
+ pds_vdpa-y := aux_drv.o \
+ 	      cmds.o \
++	      debugfs.o \
+ 	      vdpa_dev.o
+-
+-pds_vdpa-$(CONFIG_DEBUG_FS) += debugfs.o
+-- 
+2.17.1
+
 
