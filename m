@@ -1,113 +1,278 @@
-Return-Path: <netdev+bounces-15747-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15748-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9CA1B7497D7
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:01:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 17CBF7497E9
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:05:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9FB111C20C99
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:01:53 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4900F1C20C8F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:05:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8A8571FBA;
-	Thu,  6 Jul 2023 09:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E71B55255;
+	Thu,  6 Jul 2023 09:04:55 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 79B301309F
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:01:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D0C714A3B
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:04:55 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2933F1BCE
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:01:50 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 19D0B1990
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:04:54 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688634109;
+	s=mimecast20190719; t=1688634293;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=Qi7u0r6BcPK/thgcy9NPn79CF3hPv/q0g1w/o2j+xHE=;
-	b=iEc4p4Edj6EaaJSBaDglr3FBzHGf9rBR9fSEbBzL8CbZX2Gxqjisdov/8XA4gpCFAhRew2
-	vT4qPFYCKU1vBVV2ZdcjYItqVUYmcupkE46BKtsLuuxUYDTQ64YgUqfPo3JD+0vmPRbRO0
-	wpqQc2iR9eUgDsUz1/8SJ7dUScsZspw=
-Received: from mail-qv1-f70.google.com (mail-qv1-f70.google.com
- [209.85.219.70]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=JRgRsp2FWtM1ajDRcR2lcgfKwwSkmw5MTCctZvf1Vww=;
+	b=FhWXxMFLdH2VHYst23wq/5rDmB553z2kXjS4KfOs9LeDO41PDPNkgpXiy7idVNEQgxpJfS
+	2bKmvCAZoWyf6ijGRtFPfa2ANxL/Lry4ZYvVbAW+AW9duCVLIJ+fMStINFbBd/a+0T/e48
+	W7mXpsDYYgFLPNZlr+Q+lPcSPMMti1U=
+Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
+ [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-110-FY25iL0hNBi3S-1G-fthSQ-1; Thu, 06 Jul 2023 05:01:48 -0400
-X-MC-Unique: FY25iL0hNBi3S-1G-fthSQ-1
-Received: by mail-qv1-f70.google.com with SMTP id 6a1803df08f44-635e2618aaeso1343496d6.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 02:01:48 -0700 (PDT)
+ us-mta-612-Y196Gm38NeWKb_PFvEKh7g-1; Thu, 06 Jul 2023 05:04:52 -0400
+X-MC-Unique: Y196Gm38NeWKb_PFvEKh7g-1
+Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-989249538a1so34263166b.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 02:04:52 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688634107; x=1691226107;
-        h=mime-version:user-agent:content-transfer-encoding:references
-         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=Qi7u0r6BcPK/thgcy9NPn79CF3hPv/q0g1w/o2j+xHE=;
-        b=GrV4/zh7YBWzl97Z26yOmsymYKdPMtxVyrZX1NRHQNc8SFiGzhpL7qsiJMEZr1t5Q0
-         iLB6Yr54ruSmINCC19dk1eYPrOEIGWhpPZwBDPo5DUzmC/pMIlaa2bbAgHY73YIBE/x+
-         fx+sbsTQPee7KOyae2SXrOxmfs/KmiW33harLUbTX0xbcxLwAfOYLUKiFhxlXSOkLnyY
-         0V1PW9KVLZ2MBdjsfiVnHuA7blnqUhrXjGkRFE3aW+saKDVqGY8zWfembeEDZtj/yH7a
-         eTMORbpaIk+CSprgrEbW+GGRG7VL0zGohMyp60GrAn7pfOXJHO+EjC26likPwoDINcPN
-         jREA==
-X-Gm-Message-State: ABy/qLaAEGZfPQcECZ8pwceU4KR74Vw88CDJCFLBs2PGm2PmNNfp8t/A
-	PgtGg5BQXVxJyUr2uMSb+CjWcdY/0nJnWs5+m/HhEGS4vuAVzM7Th547sSiVS+CljB+0lxA7HnL
-	Z9zKzLkzPyRBWtDMd
-X-Received: by 2002:a05:6214:5298:b0:635:ec47:bfa4 with SMTP id kj24-20020a056214529800b00635ec47bfa4mr1161164qvb.4.1688634107645;
-        Thu, 06 Jul 2023 02:01:47 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGtWnu41mn5Ponn3JjXVBuIzv07N/hyizwAr6C422tUw/GBlo7Epua+9aJP5n1D7Em8tWJ66A==
-X-Received: by 2002:a05:6214:5298:b0:635:ec47:bfa4 with SMTP id kj24-20020a056214529800b00635ec47bfa4mr1161142qvb.4.1688634107320;
-        Thu, 06 Jul 2023 02:01:47 -0700 (PDT)
-Received: from gerbillo.redhat.com (host-95-248-55-118.retail.telecomitalia.it. [95.248.55.118])
-        by smtp.gmail.com with ESMTPSA id f1-20020a0ccc81000000b0062ffcda34c6sm618257qvl.137.2023.07.06.02.01.44
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 02:01:46 -0700 (PDT)
-Message-ID: <8c98394f6d399b4e725521f8d9fe9788f7fe3784.camel@redhat.com>
-Subject: Re: [PATCH net 1/6] netfilter: nf_tables: report use refcount
- overflow
-From: Paolo Abeni <pabeni@redhat.com>
-To: Pablo Neira Ayuso <pablo@netfilter.org>, netfilter-devel@vger.kernel.org
-Cc: davem@davemloft.net, netdev@vger.kernel.org, kuba@kernel.org, 
-	edumazet@google.com
-Date: Thu, 06 Jul 2023 11:01:42 +0200
-In-Reply-To: <20230705230406.52201-2-pablo@netfilter.org>
-References: <20230705230406.52201-1-pablo@netfilter.org>
-	 <20230705230406.52201-2-pablo@netfilter.org>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
+        d=1e100.net; s=20221208; t=1688634291; x=1691226291;
+        h=content-transfer-encoding:in-reply-to:references:to
+         :content-language:subject:cc:user-agent:mime-version:date:message-id
+         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=JRgRsp2FWtM1ajDRcR2lcgfKwwSkmw5MTCctZvf1Vww=;
+        b=gRRBrTL/KooTGLw0wHiOiP9sEgm68rzmyfmPQR74YWd/u3V3NNOHD6zXceIqM3gfVH
+         oZ4BMzXiIX1OjsEzvNW0vWrPDPigv2HwkMclUur4IhqDsNZDSYfrjVOFdunmBAO/UVak
+         hZmP4kG6cRn8du1wHpvMqjfw2ZNM+xSHkD9wAxj1Oi4zeptUZwLjUQpWRRr8YjCAqJV1
+         6ZsSskGd5I/PSovf8pmErwrxEfHz3eeLRewZG9VftfKujFBg6Gm6PLqp2NNkgU7imyQG
+         Esb8O781u6grcgOKXJQW2+86Qlqog6jRoBTExA35GpR0yHFdVipwUIM4ppOggJ0dv5Lb
+         WoSw==
+X-Gm-Message-State: ABy/qLaKxex9rirtYcQI/k/Ol2Wf/KdmajUZoagrz1UxFxVNmz3RJsax
+	ivRCmbBa23p9OINiHg6/ybvxH0DzjQgRDQCW+l6uv1rxuypx2i1Ea+ckxDtYOUqvQyPFNntRiEu
+	4Cp1JjO9//Zo8pzpU
+X-Received: by 2002:a17:906:8f:b0:971:484:6391 with SMTP id 15-20020a170906008f00b0097104846391mr936589ejc.20.1688634291257;
+        Thu, 06 Jul 2023 02:04:51 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlF8QrUyIfcWvQEKTibW2aZLt9dHEJ0HZEw3k4yx3jJ5selC58HHjh6xvrPIEGa3dNa3lU7qBA==
+X-Received: by 2002:a17:906:8f:b0:971:484:6391 with SMTP id 15-20020a170906008f00b0097104846391mr936566ejc.20.1688634290906;
+        Thu, 06 Jul 2023 02:04:50 -0700 (PDT)
+Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
+        by smtp.gmail.com with ESMTPSA id s24-20020a170906169800b0096f7500502csm531220ejd.199.2023.07.06.02.04.49
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Thu, 06 Jul 2023 02:04:50 -0700 (PDT)
+From: Jesper Dangaard Brouer <jbrouer@redhat.com>
+X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
+Message-ID: <3cc1d2ba-e084-8fc4-aa31-856bc532d1a7@redhat.com>
+Date: Thu, 6 Jul 2023 11:04:49 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: brouer@redhat.com, bpf@vger.kernel.org, ast@kernel.org,
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org, yhs@fb.com, kpsingh@kernel.org, sdf@google.com,
+ haoluo@google.com, jolsa@kernel.org, David Ahern <dsahern@gmail.com>,
+ Jakub Kicinski <kuba@kernel.org>, Willem de Bruijn <willemb@google.com>,
+ Anatoly Burakov <anatoly.burakov@intel.com>,
+ Alexander Lobakin <alexandr.lobakin@intel.com>,
+ Magnus Karlsson <magnus.karlsson@gmail.com>,
+ Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
+ netdev@vger.kernel.org, "David S. Miller" <davem@davemloft.net>,
+ Alexander Duyck <alexander.duyck@gmail.com>
+Subject: Re: [xdp-hints] Re: [PATCH bpf-next v2 12/20] xdp: Add checksum level
+ hint
+Content-Language: en-US
+To: John Fastabend <john.fastabend@gmail.com>,
+ Larysa Zaremba <larysa.zaremba@intel.com>,
+ Jesper Dangaard Brouer <jbrouer@redhat.com>
+References: <20230703181226.19380-1-larysa.zaremba@intel.com>
+ <20230703181226.19380-13-larysa.zaremba@intel.com>
+ <64a331c338a5a_628d3208cb@john.notmuch> <ZKPlZ6Z8ni5+ZJCK@lincoln>
+ <9cd44759-416c-7274-f805-ee9d756f15b1@redhat.com> <ZKQAPBcIE/iCkiX2@lincoln>
+ <64a656273ee15_b20ce2087a@john.notmuch>
+In-Reply-To: <64a656273ee15_b20ce2087a@john.notmuch>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, 2023-07-06 at 01:04 +0200, Pablo Neira Ayuso wrote:
-> Overflow use refcount checks are not complete.
->=20
-> Add helper function to deal with object reference counter tracking.
-> Report -EMFILE in case UINT_MAX is reached.
->=20
-> nft_use_dec() splats in case that reference counter underflows,
-> which should not ever happen.
 
-For the records, I also once had the need for an non atomic reference
-counters implementing sanity checks on underflows/overflows. I resorted
-to use plain refcount_t, since the atomic op overhead was not
-noticeable in my use-case.
 
-[not blocking this series, just thinking aloud] I'm wondering if a
-generic, non-atomic refcounter infra could be useful?
+On 06/07/2023 07.50, John Fastabend wrote:
+> Larysa Zaremba wrote:
+>> On Tue, Jul 04, 2023 at 12:39:06PM +0200, Jesper Dangaard Brouer wrote:
+>>> Cc. DaveM+Alex Duyck, as I value your insights on checksums.
+>>>
+>>> On 04/07/2023 11.24, Larysa Zaremba wrote:
+>>>> On Mon, Jul 03, 2023 at 01:38:27PM -0700, John Fastabend wrote:
+>>>>> Larysa Zaremba wrote:
+>>>>>> Implement functionality that enables drivers to expose to XDP code,
+>>>>>> whether checksums was checked and on what level.
+>>>>>>
+>>>>>> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+>>>>>> ---
+>>>>>>    Documentation/networking/xdp-rx-metadata.rst |  3 +++
+>>>>>>    include/linux/netdevice.h                    |  1 +
+>>>>>>    include/net/xdp.h                            |  2 ++
+>>>>>>    kernel/bpf/offload.c                         |  2 ++
+>>>>>>    net/core/xdp.c                               | 21 ++++++++++++++++++++
+>>>>>>    5 files changed, 29 insertions(+)
+>>>>>>
+>>>>>> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+>>>>>> index ea6dd79a21d3..4ec6ddfd2a52 100644
+>>>>>> --- a/Documentation/networking/xdp-rx-metadata.rst
+>>>>>> +++ b/Documentation/networking/xdp-rx-metadata.rst
+>>>>>> @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
+>>>>>>    .. kernel-doc:: net/core/xdp.c
+>>>>>>       :identifiers: bpf_xdp_metadata_rx_vlan_tag
+>>>>>> +.. kernel-doc:: net/core/xdp.c
+>>>>>> +   :identifiers: bpf_xdp_metadata_rx_csum_lvl
+>>>>>> +
+>>>>>>    An XDP program can use these kfuncs to read the metadata into stack
+>>>>>>    variables for its own consumption. Or, to pass the metadata on to other
+>>>>>>    consumers, an XDP program can store it into the metadata area carried
+>>>>>> diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+>>>>>> index 4fa4380e6d89..569563687172 100644
+>>>>>> --- a/include/linux/netdevice.h
+>>>>>> +++ b/include/linux/netdevice.h
+>>>>>> @@ -1660,6 +1660,7 @@ struct xdp_metadata_ops {
+>>>>>>    			       enum xdp_rss_hash_type *rss_type);
+>>>>>>    	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tag,
+>>>>>>    				   __be16 *vlan_proto);
+>>>>>> +	int	(*xmo_rx_csum_lvl)(const struct xdp_md *ctx, u8 *csum_level);
+>>>>>>    };
+>>>>>>    /**
+>>>>>> diff --git a/include/net/xdp.h b/include/net/xdp.h
+>>>>>> index 89c58f56ffc6..61ed38fa79d1 100644
+>>>>>> --- a/include/net/xdp.h
+>>>>>> +++ b/include/net/xdp.h
+>>>>>> @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
+>>>>>>    			   bpf_xdp_metadata_rx_hash) \
+>>>>>>    	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
+>>>>>>    			   bpf_xdp_metadata_rx_vlan_tag) \
+>>>>>> +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM_LVL, \
+>>>>>> +			   bpf_xdp_metadata_rx_csum_lvl) \
+>>>>>>    enum {
+>>>>>>    #define XDP_METADATA_KFUNC(name, _) name,
+>>>>>> diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+>>>>>> index 986e7becfd42..a133fb775f49 100644
+>>>>>> --- a/kernel/bpf/offload.c
+>>>>>> +++ b/kernel/bpf/offload.c
+>>>>>> @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
+>>>>>>    		p = ops->xmo_rx_hash;
+>>>>>>    	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
+>>>>>>    		p = ops->xmo_rx_vlan_tag;
+>>>>>> +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM_LVL))
+>>>>>> +		p = ops->xmo_rx_csum_lvl;
+>>>>>>    out:
+>>>>>>    	up_read(&bpf_devs_lock);
+>>>>>> diff --git a/net/core/xdp.c b/net/core/xdp.c
+>>>>>> index f6262c90e45f..c666d3e0a26c 100644
+>>>>>> --- a/net/core/xdp.c
+>>>>>> +++ b/net/core/xdp.c
+>>>>>> @@ -758,6 +758,27 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan
+>>>>>>    	return -EOPNOTSUPP;
+>>>>>>    }
+>>>>>> +/**
+>>>>>> + * bpf_xdp_metadata_rx_csum_lvl - Get depth at which HW has checked the checksum.
+>>>>>> + * @ctx: XDP context pointer.
+>>>>>> + * @csum_level: Return value pointer.
+>>>>>> + *
+>>>>>> + * In case of success, csum_level contains depth of the last verified checksum.
+>>>>>> + * If only the outermost checksum was verified, csum_level is 0, if both
+>>>>>> + * encapsulation and inner transport checksums were verified, csum_level is 1,
+>>>>>> + * and so on.
+>>>>>> + * For more details, refer to csum_level field in sk_buff.
+>>>>>> + *
+>>>>>> + * Return:
+>>>>>> + * * Returns 0 on success or ``-errno`` on error.
+>>>>>> + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
+>>>>>> + * * ``-ENODATA``    : Checksum was not validated
+>>>>>> + */
+>>>>>> +__bpf_kfunc int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
+>>>>>
+>>>>> Istead of ENODATA should we return what would be put in the ip_summed field
+>>>>> CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}? Then sig would be,
+>>>
+>>> I was thinking the same, what about checksum "type".
+>>>
+>>>>>
+>>>>>    bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *type, u8 *lvl);
+>>>>>
+>>>>> or something like that? Or is the thought that its not really necessary?
+>>>>> I don't have a strong preference but figured it was worth asking.
+>>>>>
+>>>>
+>>>> I see no value in returning CHECKSUM_COMPLETE without the actual checksum value.
+>>>> Same with CHECKSUM_PARTIAL and csum_start. Returning those values too would
+>>>> overcomplicate the function signature.
+>>>
+>>> So, this kfunc bpf_xdp_metadata_rx_csum_lvl() success is it equivilent to
+>>> CHECKSUM_UNNECESSARY?
+>>
+>> This is 100% true for physical NICs, it's more complicated for veth, bacause it
+>> often receives CHECKSUM_PARTIAL, which shouldn't normally apprear on RX, but is
+>> treated by the network stack as a validated checksum, because there is no way
+>> internally generated packet could be messed up. I would be grateful if you could
+>> look at the veth patch and share your opinion about this.
+>>
+>>>
+>>> Looking at documentation[1] (generated from skbuff.h):
+>>>   [1] https://kernel.org/doc/html/latest/networking/skbuff.html#checksumming-of-received-packets-by-device
+>>>
+>>> Is the idea that we can add another kfunc (new signature) than can deal
+>>> with the other types of checksums (in a later kernel release)?
+>>>
+>>
+>> Yes, that is the idea.
+> 
+> If we think there is a chance we might need another kfunc we should add it
+> in the same kfunc. It would be unfortunate to have to do two kfuncs when
+> one would work. It shouldn't cost much/anything(?) to hardcode the type for
+> most cases? I think if we need it later I would advocate for updating this
+> kfunc to support it. Of course then userspace will have to swivel on the
+> kfunc signature.
+> 
 
-Cheers,
+I think it might make sense to have 3 kfuncs for checksumming.
+As this would allow BPF-prog to focus on CHECKSUM_UNNECESSARY, and then
+only call additional kfunc for extracting e.g csum_start  + csum_offset
+when type is CHECKSUM_PARTIAL.
 
-Paolo
+We could extend bpf_xdp_metadata_rx_csum_lvl() to give the csum_type
+CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}.
+
+  int bpf_xdp_metadata_rx_csum_lvl(*ctx, u8 *csum_level, u8 *csum_type)
+
+And then add two kfunc e.g.
+  (1) bpf_xdp_metadata_rx_csum_partial(ctx, start, offset)
+  (2) bpf_xdp_metadata_rx_csum_complete(ctx, csum)
+
+Pseudo BPF-prog code:
+
+  err = bpf_xdp_metadata_rx_csum_lvl(ctx, level, type);
+  if (!err && type != CHECKSUM_UNNECESSARY) {
+      if (type == CHECKSUM_PARTIAL)
+          err = bpf_xdp_metadata_rx_csum_partial(ctx, start, offset);
+      if (type == CHECKSUM_COMPLETE)
+          err = bpf_xdp_metadata_rx_csum_complete(ctx, csum);
+  }
+
+Looking at code, I feel we could rename [...]_csum_lvl to csum_type.
+E.g. bpf_xdp_metadata_rx_csum_type.
+
+Feel free to disagree,
+--Jesper
 
 
