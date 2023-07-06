@@ -1,340 +1,174 @@
-Return-Path: <netdev+bounces-15755-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15756-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 598A77498A4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:39:20 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7CD5F7498BD
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 11:52:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 689021C20CCD
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:39:19 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AF07E1C20CC5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 09:52:18 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BF6007483;
-	Thu,  6 Jul 2023 09:39:16 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6EA147490;
+	Thu,  6 Jul 2023 09:52:16 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A9BC31859
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:39:16 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5737BCE
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:39:14 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688636353;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=j4dnnxZ1wSmFozKRBQ7ttfuc4yJgvWqhe2F7b5ZZXtc=;
-	b=GuzFCH/VIzhpPOTyzq1KeOWf/Cdx+m/BBgNogDLToYxOZjahRT8qTTVA/y9/rEmLjjlqix
-	iaBTGCdPtsUUB5OpJCf6jvIAbR7y90o/XCuXxlxNMFIEbuAo9Npy+0BAd5fdcFBU0yVP2m
-	u6i69TKzP96If6aV6ux2durk6Jrq1+k=
-Received: from mail-yw1-f198.google.com (mail-yw1-f198.google.com
- [209.85.128.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-610-6A0MPk8HMP6TXd2MWuyuGg-1; Thu, 06 Jul 2023 05:39:12 -0400
-X-MC-Unique: 6A0MPk8HMP6TXd2MWuyuGg-1
-Received: by mail-yw1-f198.google.com with SMTP id 00721157ae682-56ff81be091so6085067b3.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 02:39:12 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688636352; x=1691228352;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=j4dnnxZ1wSmFozKRBQ7ttfuc4yJgvWqhe2F7b5ZZXtc=;
-        b=epP3N3Xob4YB/QRim+B5GfP5Lbq5YU6kMCSXaiV64JSIevuyYqEFUNMbLJ/HAy+MIp
-         pfZRbHZ9z3AyWN9Pgq7ZKOuUpWqyPrUF3vNPHzolC4YS1LX2d83PSjwmLHXR4pAR8842
-         hkfjcThkd3w02flVG+CH66FAN/5NaE9uE/RgvcjONimxdSVxpKkn/k5HmS49+9dN1j5P
-         7k+mdkBVYQtP6CKTd+PtkMzok03zwQ+hjF3oiggldBX7nS3sl3lQrg0mzmL1dtLD1/6v
-         zb5Rdl3IvMJ3pzMR4UQiUN6b9dwfYQ//QJHYopW6haRM0AYNcdVnPqkCbVDr5YgJEZuv
-         pBtg==
-X-Gm-Message-State: ABy/qLZOTbzGx2ZUHCxoz1dv7Mf4p9hi4yJO87nEFiX1/hSOdsMRpnDG
-	IzYTlqVGtzLi7bMVbT1YClMDHzkfPXaiEqTEV9ZtW4Mtl10XRLklHIparjE3EwFjdWbcSj7Wa0A
-	rby9fq/Y8bbGdkfagHGgm8pmd8vkppr7z
-X-Received: by 2002:a25:188a:0:b0:c12:29ac:1d36 with SMTP id 132-20020a25188a000000b00c1229ac1d36mr1239713yby.7.1688636351761;
-        Thu, 06 Jul 2023 02:39:11 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFLmSB+47+YgPFGZvl3utGSzBgIYnM3OoeQdVfI97xUZpVcffiQ8VZrTdjYJj0NYJSVjYHab0HWtwwnXx6rFx0=
-X-Received: by 2002:a25:188a:0:b0:c12:29ac:1d36 with SMTP id
- 132-20020a25188a000000b00c1229ac1d36mr1239701yby.7.1688636351465; Thu, 06 Jul
- 2023 02:39:11 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E3754A3B
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:52:16 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BC3DD1727;
+	Thu,  6 Jul 2023 02:52:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688637134; x=1720173134;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=TuaL61Rr1LwOCbAzGctfz83bu/4r7AGdAJsgKbZbnn0=;
+  b=gUvxqzVV6pu5MDlFiM3Ng34OfO4+Vg8OdAeSlLov2zwp69031R/b9eAY
+   psDJ7Jxo0H9vpkzRd4k0A4NllS9RSlo9dOkxU8lWtbShXYJDkd3LqBS1s
+   NehlIQZKcPiOygPDZGfZKJlR+njcwp2miWXyQll/BxBGIhV+607kfBj2g
+   BluYqoCVWNWrlN/bFs2JLDZJmDba6OfuD3OiSX0LjwRJaE7YfVo8fFfTV
+   5Q9DvtqQp31FHR37emC9dGKogvJmP2IQNsCYrneJU9IekEWhca9WFiwhc
+   J6XoTp29vg+vCjilSO6v2JkB+Iw3jZIg6EZ+3/8t2Mg4zZ23MLOPlV/Da
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="429603151"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="429603151"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 02:52:14 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="754706560"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="754706560"
+Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
+  by orsmga001.jf.intel.com with ESMTP; 06 Jul 2023 02:52:13 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 6 Jul 2023 02:52:13 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 02:52:13 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.49) by
+ edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 6 Jul 2023 02:52:12 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=cpAluPL3eftgS1UzRVVz2IiNVoOQbDPDocbq7CuMumw3N1Kuc5QLq2gindr867YgzjK+kHtqjSSCzfZMdGyK3vyKxl6ohq/NC3SZ56jlgbukuT+aFxWWLyWW9FXaKycLauLEmKkL6fgigG5BqciRSQEGTeyi4E+cn4lcfLrX4qt1fdZ+QA3wkkIrGBOZHK7wNPGuQ5itgPWYlqprfALurTdh86ehKKWbjMfaCSHzZU4+bynKdurtE2cvVjBpv1uIZA0u2goqcSlbOy72ji3EGkATSsSSpmMFTEK8ACRuDDm5tyTIwR41CUN19zSJSn6Ls2KSgxRvITHPms0Tt4uTjQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zx0XQyvVlzL3ri4wiesV59Cc5nx/34Ccv/mCDej+CRU=;
+ b=KmRNhVsUv5ZbKCaxvUSEF9I1Dw/ssA9J0z8z40Z0sxkBj3Jp/LmCWtQmEpiW/88wHcfeFbEZ+ngqFGQ/9C0ryxLKDaF1XDZUyhdETStH4czCxYaXSTh/+TPLqwM49a0EAUzHvOoeakozCQgPxKtdhR+vUBk4/rwkDlPWm4u2R3zZhcM89VbN+TR21oCUSLIf0vd/QPICTWgNknmu96ZKwF3eHlI2Dp0lThNfGjNl/UaLTbWl9F/Gvy9+g3bvvpE597Mycuy8bP2z/nqMeuwx0BCGFQO5+bBM4CmCGPcdb5EfbApK6U2c7BwjHQgaEDFhyEWEVw6YSvZcr3MZMl7Z1w==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from DM6PR11MB2937.namprd11.prod.outlook.com (2603:10b6:5:62::13) by
+ BN9PR11MB5241.namprd11.prod.outlook.com (2603:10b6:408:132::9) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6565.17; Thu, 6 Jul 2023 09:52:06 +0000
+Received: from DM6PR11MB2937.namprd11.prod.outlook.com
+ ([fe80::a5d6:4952:530c:f01f]) by DM6PR11MB2937.namprd11.prod.outlook.com
+ ([fe80::a5d6:4952:530c:f01f%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 09:52:05 +0000
+Date: Thu, 6 Jul 2023 11:51:59 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Ratheesh Kannoth <rkannoth@marvell.com>
+CC: <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
+	<sgoutham@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <sbhatta@marvell.com>,
+	<gakula@marvell.com>, <schalla@marvell.com>, <hkelam@marvell.com>
+Subject: Re: [PATCH net v1] octeontx2-af: Promisc enable/disable through mbox
+Message-ID: <ZKaOv6t8+9epGWra@localhost.localdomain>
+References: <20230706042705.3235990-1-rkannoth@marvell.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230706042705.3235990-1-rkannoth@marvell.com>
+X-ClientProxiedBy: FR0P281CA0264.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:b5::19) To DM6PR11MB2937.namprd11.prod.outlook.com
+ (2603:10b6:5:62::13)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
- <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
- <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com> <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com>
-In-Reply-To: <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Thu, 6 Jul 2023 11:38:35 +0200
-Message-ID: <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: DM6PR11MB2937:EE_|BN9PR11MB5241:EE_
+X-MS-Office365-Filtering-Correlation-Id: 61770922-9df7-485d-2bf6-08db7e06a7ee
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: BelN5h5LgyTfspdnaZbuzztNV1EY+tCgTGMsCmceptNF9qud51Hxc36omtNjB6S4YWLKL9xKwmOTAhstJH9gaoSABAmtll9O6krrr5GxWhs3j/0OmVjw8O8duKvt13EeH4PRUut+b5gmWH3elc+dFygh4dyEE9vhfjh2c00vLvIhSNoPZElHkiM+rZ7GpiYWUe0vEa3MuSQWKaFIVDrZdL3AcLqb0Nnmo1s3jJrJt+VoNZWsPnXdD36hBpQRt904nNCfkAhrvQ05MquBgMCfaNDg7hUMN7j5C20/XthA5TOy/mBSMo1geZuaYmSLV74S3NqWAMwhfU8zeZFc9pP8B0WNTYLTv60+mq3mI7mf/qPZDmN7AZiNL12jyzPbC2xp3P1ro+QYhDivff9+On+YbgyLDgP4zoSHkNyi6eHjn76UR0oRhum9HuZhJ1+3BxOC/dv0cZ8yjMNlCVjd3tUHgkWVVbxAhR+KQtN2s/sB/eHFwJ3S7I1B2PRDpI5dYQGgWceL9x4eKVTTzoS9QfNqT6Bt8T/Fh8MCyQbkmxMKxgib68s7qNNoINZmK1I8R4mf2xDSQEf8QVzS3DOTG8JgAFFj4oz8kVjbxJ10h641zaM=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR11MB2937.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(376002)(39860400002)(136003)(346002)(396003)(366004)(451199021)(44832011)(4744005)(5660300002)(8676002)(8936002)(316002)(2906002)(83380400001)(7416002)(41300700001)(82960400001)(66556008)(4326008)(66476007)(66946007)(9686003)(6916009)(38100700002)(86362001)(186003)(6666004)(26005)(6506007)(478600001)(6512007)(6486002)(67856001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?/rq+7CZ3rNEIlotBboiX5edg01g3BnpafyMHUywwUhueZmt5pWwrTLFTP5MB?=
+ =?us-ascii?Q?lR7KCDryS2a+34rDGYGOHvbaCvKn+ZvGNR2mFNqcSDNmo0x9PFzl/PSf3JKb?=
+ =?us-ascii?Q?cFC9Xp2lFK0jBIBhUe5XufZxFr/ATKpzAhPAUqVK/LCNKoeDiTrqdKuu+Tm1?=
+ =?us-ascii?Q?OK/D/pev0y140MDrjBcHufd2fWGo4UwiKgXjfvVBOJFQxR+dxshSY8SW8T33?=
+ =?us-ascii?Q?wEfjhB9a/CpEDhZwK86gFh/csICe69TIJ0O0vuXJwmGNViAdZyXOy9Ko+W0a?=
+ =?us-ascii?Q?cPjmkzBf9Rdztmh9zn35baKnR+aPMeUBI81AfEniqENksLtMdzCgFMlVew4D?=
+ =?us-ascii?Q?FRBiewW0Yhyh8bM4EPecYHjfdTUdhcbhiBpqW1KeyKjJxPGIx4rT/GxZJmlx?=
+ =?us-ascii?Q?5YxCDk+jq6ipEoIWXqRbxeaHCcrlto65KFlc9wBsDidBHbFxYoC5xTh8fou1?=
+ =?us-ascii?Q?Wv2G8e4KTuNAljqHYdLdTu1fOjcj02duQhLdKzT6PqoJnfbqPC3iERY2Ljij?=
+ =?us-ascii?Q?PESv2WXZHsgnwPyIfrERuS6uU2Nmx+3mPbTMvbZToJ399Hrdd1ZQ1lmCnh16?=
+ =?us-ascii?Q?WEo1vrMaPtMuH6JewlLawURPewiNn4WgOZs6rS4tw6DA4rjQFfMFjgrsK+Z5?=
+ =?us-ascii?Q?qVpvjI0pMT2iSQziAOnLMsz8KJq4CyRqSI3/Hq0QZL+yZFuNKwy9LCpxkSq1?=
+ =?us-ascii?Q?jhv73oHVMxXw07/YITJqKOXXLOSnQhtG5BRD5qRtpYOINY8Ex8o3qAreIzuU?=
+ =?us-ascii?Q?Gi44MO+fbfKj3oIaQclY9KMZ8DIgrTKDDWQ/ZLVg7+xUAkk66yuIRyeQCkA+?=
+ =?us-ascii?Q?uGKDrsoDdt6cCZF+0tCkHyjbNfkPZvD+ftZeL98SvGMc4ZhblggIta0+PIFl?=
+ =?us-ascii?Q?FaaqnQAia1tbJTGaEP+5+2CWfm1qajGV4YKmcrejt5fglnPgEWr9JF53EdxO?=
+ =?us-ascii?Q?mKrTQ4dQLw/CHqEbP1puMxLvb/2alEKU+AyEpybOI5qNRrpxrvgnBz+wXfrN?=
+ =?us-ascii?Q?i1xIYGMPHO/OM/BoWWSnJnDPKeUNAfUnSmw+UKYez6VAxKEdWNVfLxVlcG2d?=
+ =?us-ascii?Q?dP4KuTOvTzMjXNqSEnygVETmSFA6jgcFIU1gWWyG+Fg2ASNONziz9Tq22kW9?=
+ =?us-ascii?Q?LLF0OL8aCZWPTT1eobZQ4CjCGClR018t5t8XOpPhTFOD6PrT2wVScPJ3bS/A?=
+ =?us-ascii?Q?M7sLbpkhOHsvTjxFcJbs/RqBdtfwnUBOHv/6qnL6LpkMyJAQCkDUD6DJsZE7?=
+ =?us-ascii?Q?bBWv2m/vYmkGvL4hEYJzFqkSE1/cWz6Lr/ApxB7oEuUU3GZ0Tr0r6KT3XJZ0?=
+ =?us-ascii?Q?a/BStkelDcdQZUuGmXX7jZz2Y61Q/ozIAdSNPOZrtMOAQjTuQqTxIOy40UbA?=
+ =?us-ascii?Q?n8Rv41bYofS/DwL2dRVZuYDPIST3iJ/0281k8hoHBo9SjXyn9iSStqt/bweu?=
+ =?us-ascii?Q?yP+oJftc13EavOpMPwrIp5cvYlYVRmYrBTc2ksvcQ1C/KYw4EyKZdviGbb6T?=
+ =?us-ascii?Q?+jrNpa8I+gf5ok2Wy7tvrV8GDzLmbxaQTT7qYy4AZs7cjEAF7Tgl8u36Yez4?=
+ =?us-ascii?Q?i71qoev0g2xeSlaOtCYxhCrFvED9uzlMYIu0tRGK8/buTb/4RLnJGMsgR0W5?=
+ =?us-ascii?Q?2w=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 61770922-9df7-485d-2bf6-08db7e06a7ee
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR11MB2937.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 09:52:05.7714
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: jhKpgOIwUrvWw+m2ZJzWRwbj+qgTu1jy3rKA+lXs9V0xS7zBatxTSSqdIIIS+y4QQpttZcZoox51cBgWgyv99w==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BN9PR11MB5241
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> wr=
-ote:
->
-> On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.com> w=
-rote:
-> >
-> > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperezma@r=
-edhat.com> wrote:
-> > >
-> > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.co=
-m> wrote:
-> > > >
-> > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@redh=
-at.com> wrote:
-> > > > >
-> > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <mst=
-@redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Marti=
-n wrote:
-> > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirkin =
-<mst@redhat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez M=
-artin wrote:
-> > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsirk=
-in <mst@redhat.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=
-=C3=A9rez wrote:
-> > > > > > > > > > > > With the current code it is accepted as long as use=
-rland send it.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Although userland should not set a feature flag tha=
-t has not been
-> > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, the =
-current code will not
-> > > > > > > > > > > > complain for it.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Since there is no specific reason for any parent to=
- reject that backend
-> > > > > > > > > > > > feature bit when it has been proposed, let's contro=
-l it at vdpa frontend
-> > > > > > > > > > > > level. Future patches may move this control to the =
-parent driver.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_F_=
-ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redhat.=
-com>
-> > > > > > > > > > >
-> > > > > > > > > > > Please do send v3. And again, I don't want to send "a=
-fter driver ok" hack
-> > > > > > > > > > > upstream at all, I merged it in next just to give it =
-some testing.
-> > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > Current devices do not support that semantic.
-> > > > > > > > >
-> > > > > > > > > Which devices specifically access the ring after DRIVER_O=
-K but before
-> > > > > > > > > a kick?
-> > > > > > > > >
-> > > > > > > >
-> > > > > > > > Previous versions of the QEMU LM series did a spurious kick=
- to start
-> > > > > > > > traffic at the LM destination [1]. When it was proposed, th=
-at spurious
-> > > > > > > > kick was removed from the series because to check for descr=
-iptors
-> > > > > > > > after driver_ok, even without a kick, was considered work o=
-f the
-> > > > > > > > parent driver.
-> > > > > > > >
-> > > > > > > > I'm ok to go back to this spurious kick, but I'm not sure i=
-f the hw
-> > > > > > > > will read the ring before the kick actually. I can ask.
-> > > > > > > >
-> > > > > > > > Thanks!
-> > > > > > > >
-> > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023-0=
-1/msg02775.html
-> > > > > > >
-> > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK t=
-oo, no?
-> > > > > >
-> > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seems
-> > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > > > >
-> > > > > > But this reminds me one thing, as the thread is going too long,=
- I
-> > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RESET=
- is
-> > > > > > supported?
-> > > > > >
-> > > > > > Thanks
-> > > > >
-> > > > > I don't see what does one have to do with another ...
-> > > > >
-> > > > > I think with RING_RESET we had another solution, enable rings
-> > > > > mapping them to a zero page, then reset and re-enable later.
-> > > >
-> > > > As discussed before, this seems to have some problems:
-> > > >
-> > > > 1) The behaviour is not clarified in the document
-> > > > 2) zero is a valid IOVA
-> > > >
-> > >
-> > > I think we're not on the same page here.
-> > >
-> > > As I understood, rings mapped to a zero page means essentially an
-> > > avail ring whose avail_idx is always 0, offered to the device instead
-> > > of the guest's ring. Once all CVQ commands are processed, we use
-> > > RING_RESET to switch to the right ring, being guest's or SVQ vring.
-> >
-> > I get this. This seems more complicated in the destination: shadow vq +=
- ASID?
->
-> So it's something like:
->
-> 1) set all vq ASID to shadow virtqueue
-> 2) do not add any bufs to data qp (stick 0 as avail index)
-> 3) start to restore states via cvq
-> 4) ring_rest for dataqp
-> 5) set_vq_state for dataqp
-> 6) re-initialize dataqp address etc
-> 7) set data QP ASID to guest
-> 8) set queue_enable
->
-> ?
->
+On Thu, Jul 06, 2023 at 09:57:05AM +0530, Ratheesh Kannoth wrote:
+> In legacy silicon, promiscuous mode is only modified
+> through CGX mbox messages. In CN10KB silicon, it is modified
+> from CGX mbox and NIX. This breaks legacy application
+> behaviour. Fix this by removing call from NIX.
+> 
+> Fixes: d6c9784baf59 ("octeontx2-af: Invoke exact match functions if supported")
+> Signed-off-by: Ratheesh Kannoth <rkannoth@marvell.com>
+> 
+> ---
+> ChangeLog
+> 
+> v0 -> v1: Fix 80 lines checkpatch warnings
 
-I think the change of ASID is not needed, as the guest cannot access
-the device in that timeframe anyway. Moreover, it may require HW
-support. So steps 1 and 7 are not needed.
+Thanks for fixing this!
 
-Apart from that, the process is right.
-
-
-> Thanks
->
-> >
-> > Thanks
-> >
-> > >
-> > >
-> > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > >
-> > > > > > > > > > My plan was to convert
-> > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa ops=
-. Sorry if I
-> > > > > > > > > > was not explicit enough.
-> > > > > > > > > >
-> > > > > > > > > > The only solution I can see to that is to trap & emulat=
-e in the vdpa
-> > > > > > > > > > (parent?) driver, as talked in virtio-comment. But that=
- complicates
-> > > > > > > > > > the architecture:
-> > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > > > * Store vq enable state separately, at
-> > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit that=
- enable to hw
-> > > > > > > > > > * Store the doorbell state separately, but do not confi=
-gure it to the
-> > > > > > > > > > device directly.
-> > > > > > > > > >
-> > > > > > > > > > But how to recover if the device cannot configure them =
-at kick time,
-> > > > > > > > > > for example?
-> > > > > > > > > >
-> > > > > > > > > > Maybe we can just fail if the parent driver does not su=
-pport enabling
-> > > > > > > > > > the vq after DRIVER_OK? That way no new feature flag is=
- needed.
-> > > > > > > > > >
-> > > > > > > > > > Thanks!
-> > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > > ---
-> > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/pub=
-/scm/linux/kernel/git/mst
-> > > > > > > > > > > > commit. Please let me know if I should send a v3 of=
- [1] instead.
-> > > > > > > > > > > >
-> > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-mut=
-t-send-email-mst@kernel.org/T/
-> > > > > > > > > > > > ---
-> > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > > > > >
-> > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost/v=
-dpa.c
-> > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlock=
-ed_ioctl(struct file *filep,
-> > > > > > > > > > > >  {
-> > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_data;
-> > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vdpa=
-->config;
-> > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > > > > -     u64 features;
-> > > > > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > > > > >       long r =3D 0;
-> > > > > > > > > > > >
-> > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) {
-> > > > > > > > > > > >               if (copy_from_user(&features, feature=
-p, sizeof(features)))
-> > > > > > > > > > > >                       return -EFAULT;
-> > > > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > > > +                     parent_features =3D ops->get_=
-backend_features(v->vdpa);
-> > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND_F=
-EATURES |
-> > > > > > > > > > > >                                BIT_ULL(VHOST_BACKEN=
-D_F_SUSPEND) |
-> > > > > > > > > > > >                                BIT_ULL(VHOST_BACKEN=
-D_F_RESUME) |
-> > > > > > > > > > > > -                              BIT_ULL(VHOST_BACKEN=
-D_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > > > +                              parent_features))
-> > > > > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKEND=
-_F_SUSPEND)) &&
-> > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > > > --
-> > > > > > > > > > > > 2.39.3
-> > > > > > > > > > >
-> > > > > > > > >
-> > > > > > >
-> > > > >
-> > > >
-> > >
->
-
+Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
 
