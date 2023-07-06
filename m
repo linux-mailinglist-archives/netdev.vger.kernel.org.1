@@ -1,188 +1,259 @@
-Return-Path: <netdev+bounces-15718-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15724-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id A3F8F74956F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:15:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id A010C7495E4
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 08:47:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5EF8B281210
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:15:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 56CAB2810F5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 06:47:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 97CD410F8;
-	Thu,  6 Jul 2023 06:14:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 70DD7110C;
+	Thu,  6 Jul 2023 06:47:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 821EB10EF;
-	Thu,  6 Jul 2023 06:14:58 +0000 (UTC)
-Received: from EUR04-DB3-obe.outbound.protection.outlook.com (mail-db3eur04on2047.outbound.protection.outlook.com [40.107.6.47])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE0661982;
-	Wed,  5 Jul 2023 23:14:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=H2hDph98htjtxT2RHHolSz3gXDBcNF4cbTbLuzdO+wzzFNfh/5MGh8jn3JBJ1pYCsMLygXi2t/lGsgtTRdS58E0CS4ecniqsUPXrR7AVxitieo95SI/xO0tYN/qj12bQR8fLYFoee/0qR8o9bWtkQiFDEllmQEO42TmIyjqrndVQCF8QppyReLfDSUdajm6oeAr0P4Wty8/OB0dorv3yJwP2v8OyM3ndQf7XB8rz/A6VQoKIVtsDrK1K45EwBA5vWt201Q9m6qIsIYVamusjysnSA+SEV4CB8ozhi21Ry1FURbShwEyOQAVYwMWMylZhDPLDwSzcMze2HBdpPU0o3w==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=UIaphD7QBEncZNX1foqFdtBIqoEvLfrepsPhfqPXsdo=;
- b=V2lAwtd6aB3L/J9KZQiJo91B/Sz5Xd6ugeD5dbX8a5ua63yPQiVDAVW6Tk6NzCvwKIuFK/bBAHKqZ4xQuX9lNIQfRSR9bOKGpxWWl7YdJX0LAK7OCHjAcR3CazxYzkFWmzQsqIv966MFRqa+0Cic1eyl3vFdU204U1uwT2eQHanRpFsUU/TXmRxLnHeqTe+d4LmM0zWy4plIG48Ygn1uv05aYtbKfrmCuraKYZglSCTZIXxk7YPrurjMpqp2MG1no0nhBHYxGcRuNpFvRP7tva61AEklintr/wHpY54j5/enTdn9uO1fM2jgFF0UjXtTwgKwhPsOfIEwmHHcpOUt+A==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nxp.com; dmarc=pass action=none header.from=nxp.com; dkim=pass
- header.d=nxp.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=nxp.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=UIaphD7QBEncZNX1foqFdtBIqoEvLfrepsPhfqPXsdo=;
- b=C4F+XPOLbdFqXxqpfK2NxZLxanrcF0K5CtYIWdB/0JixgPNj35FFzf8qRSmLPCGmvPPsVRUX5Xp95kE8XDXTNfFYjoKX86hFxVWJQHGN6RkHEAljCAH5FTeq4eOVlWq5TA2HeBrtWTn7Pshsld7IewDxPfRie1UJQfAqvtWzWt0=
-Received: from AM5PR04MB3139.eurprd04.prod.outlook.com (2603:10a6:206:8::20)
- by DB9PR04MB8377.eurprd04.prod.outlook.com (2603:10a6:10:25c::5) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
- 2023 06:14:54 +0000
-Received: from AM5PR04MB3139.eurprd04.prod.outlook.com
- ([fe80::1edd:68cb:85d0:29e0]) by AM5PR04MB3139.eurprd04.prod.outlook.com
- ([fe80::1edd:68cb:85d0:29e0%7]) with mapi id 15.20.6544.024; Thu, 6 Jul 2023
- 06:14:54 +0000
-From: Wei Fang <wei.fang@nxp.com>
-To: Jakub Kicinski <kuba@kernel.org>
-CC: Andrew Lunn <andrew@lunn.ch>, "davem@davemloft.net" <davem@davemloft.net>,
-	"edumazet@google.com" <edumazet@google.com>, "pabeni@redhat.com"
-	<pabeni@redhat.com>, "ast@kernel.org" <ast@kernel.org>,
-	"daniel@iogearbox.net" <daniel@iogearbox.net>, "hawk@kernel.org"
-	<hawk@kernel.org>, "john.fastabend@gmail.com" <john.fastabend@gmail.com>,
-	Shenwei Wang <shenwei.wang@nxp.com>, Clark Wang <xiaoning.wang@nxp.com>,
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, dl-linux-imx
-	<linux-imx@nxp.com>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "bpf@vger.kernel.org" <bpf@vger.kernel.org>
-Subject: RE: [PATCH net 3/3] net: fec: increase the size of tx ring and update
- thresholds of tx ring
-Thread-Topic: [PATCH net 3/3] net: fec: increase the size of tx ring and
- update thresholds of tx ring
-Thread-Index:
- AQHZrlKWMcGquWZZ5UGq1vf9jWNReK+qUaEAgAAZ9TCAAQ/2gIAAetPwgAAcN4CAAA6X4A==
-Date: Thu, 6 Jul 2023 06:14:54 +0000
-Message-ID:
- <AM5PR04MB3139A8B6B107F372A5D8A7D0882CA@AM5PR04MB3139.eurprd04.prod.outlook.com>
-References: <20230704082916.2135501-1-wei.fang@nxp.com>
-	<20230704082916.2135501-4-wei.fang@nxp.com>
-	<0443a057-767f-4f9c-afd2-37d26b606d74@lunn.ch>
-	<AM5PR04MB3139789F6CCA4BEC8A871C1D882FA@AM5PR04MB3139.eurprd04.prod.outlook.com>
-	<20230705111119.07c3dee3@kernel.org>
-	<AM5PR04MB3139ED2B0F74BBD00B85A448882CA@AM5PR04MB3139.eurprd04.prod.outlook.com>
- <20230705201155.5a05bf18@kernel.org>
-In-Reply-To: <20230705201155.5a05bf18@kernel.org>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nxp.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: AM5PR04MB3139:EE_|DB9PR04MB8377:EE_
-x-ms-office365-filtering-correlation-id: 516d4d1a-dba2-4180-8390-08db7de850c3
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- VaTNi0WoiG6Xi8kjdGDqizHDHyU5AVCkc8JVn+dqa747fOQ7vXs7aZXtYD6I4wHJbHqpoAFg8MRUux9Y7FN7C2trytRhN2fmWKCAhOsO4POCCnqwHlDX7EeAGoLoMVYYc6eGRvKarVj4KpfdLfK/2E1tneE8NhoxWG76FkbUqtu3Tu+oN84nfyuvjHNadwTUIWZKRpq9lhzuwJdb8TaQj7su/QwRrN1OvGSSbd/JqMp5ruwoGrOnWj2SaQY03FcfSm6NnPkz8HPI6i+y2AWpQxoND+A/vO8lILAMuJ/gCTQbpEqM6Z6YTsg3HtDhO9JLwhKPxPODhVHUPRqrXES6mLjKqug5EEOGB2J0QdcZnjUKL10ga1uwzSjONfGV6m1EZ6LmPkafZhqa29c4QaDfrw6LQx8N/l2QtXNi4JJM+4hSiBvQts/WTu2ilYA734FSnOPIExRDKehgXI9qQP1ggNJsBhUEm+0UAKQUgvpjQKOhclnFp5O3bXZBE4bbl4ZtsvvETQasgd0cyKG5G3gs/PdNtdI3o4oSYeJwIXwfay7bsnSRXHVuBVbDR5Fu0oRdtiVHv876d3C+3FD6G7o9PaQrWzqmB1a7S3GvgPpaxh2x2Ssmv9xfPVBxgsI1MT1t
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:AM5PR04MB3139.eurprd04.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(136003)(376002)(39860400002)(346002)(366004)(451199021)(66556008)(66946007)(66446008)(6916009)(4326008)(76116006)(64756008)(316002)(66476007)(38100700002)(122000001)(55016003)(38070700005)(26005)(6506007)(86362001)(478600001)(54906003)(9686003)(33656002)(186003)(53546011)(8936002)(8676002)(15650500001)(44832011)(5660300002)(52536014)(7416002)(7696005)(2906002)(83380400001)(71200400001)(41300700001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?OW11QUlqR1pmWEZXRTJWUGFkenBTSStvTUphVGwyU29UUmd0aThDekhRY051?=
- =?gb2312?B?L2RDczUzZEFEMUM5dy9DSmdoeXlta1ZENjBhZ0xSQnBuUVJ5Nlg3bHVHUGlH?=
- =?gb2312?B?YlFZd3hJNEx2bWVqdnYvb2JyTi9tRWxxMDk3Mm43eTFFcFNkVFZMYWxJNlNV?=
- =?gb2312?B?eGpTUWhoZEQza280dnlFWlpaQUFQajNCYSswT1RTZlV3MDltWVlhVTF4cERC?=
- =?gb2312?B?QWM3NnNLU3JzT0NFTnBtWVkrNjFYVVB4Yy9GSmhmaGRzMlF3SHRhN0YzV2xH?=
- =?gb2312?B?Nk9RT0d6UTJWYVZnWDFFbWdPd0ZDMjFMeDNWbDI2Ylo5cWZDYmY0Tng0TS9n?=
- =?gb2312?B?QlJZWGMvSnlkbmswK3Nrd2pyclE4WTV6OFNoSVpIM3FaZURtWnVtQ3FKMlRn?=
- =?gb2312?B?aTFEM3lBcmpGWWdRRVoreXo0NWtwYk42Zmp6ZERzNFAwOXppOHU5N0RsQWto?=
- =?gb2312?B?bGxJb2liZVM5OWU1MnhLMndTbmtPeVdtOXp6dkRoSVpTU3RNRVczQlFSRFF3?=
- =?gb2312?B?c2xjbkJnL002YXJENmhVaFp4WVFONW5UYzlIUURGK0YwaEVGelZ0VFlOZGJj?=
- =?gb2312?B?cllBR3dJTE82aFpsMTBnN1NaRG44bTdOcElwclkyUEFER21ER2NRMnhjVzBJ?=
- =?gb2312?B?TWxaR2ZRU01ydnpER3psMmx3akxXa2lwbnN5ZUEyT0l6eWdEV3hXUzNid294?=
- =?gb2312?B?ZC9BMEJrWEtBUHNpSGsrMGNwL0pWS0F5L2RSK3p2MS9TWjNnalhtcVcvUWl2?=
- =?gb2312?B?TGpnYlA3ditWcHlRTTlMSEZrNUVKTWhudXpQYnVpSnJOYkdkUHNmREY4QW1P?=
- =?gb2312?B?VU5vdDlyZ3VrVDhxanNHbTE3eE5UVWRUWnB4cUdIb0tDNmpjR3NGTDUyYXEz?=
- =?gb2312?B?U29VK3R6WWNGaGY5L1FyNmFGOXpWOFg3V0VKcTZxWStYMGQyK1pnZEVUaE02?=
- =?gb2312?B?MGNjNTFSMlNISnBTNUxMRnRxcmRWRjVHZ3pidElDZGNBSkNaWkJiYjRFdGlJ?=
- =?gb2312?B?aHhjSkRrdnBjRXZucXFZNDcvSlpsYUNPOWVCOWMwa2pNblphZ0tvako5Mm5Q?=
- =?gb2312?B?NmFMUUVadHp4azgvU2pKVGpUUmJCeTVPTTJHOE5sU3FQZzNGWHphRXRmZTJD?=
- =?gb2312?B?R2U3aEY1NjBTSjUrb0ZiaHhxaTlORm1PQThoVHZrQURkRnppWkNWY3FHQjBh?=
- =?gb2312?B?aDBuLzlNNGMwR21LQkRUZkZqWTkxV0Nwb1EzNS9tU2QzaENGSUs1R3kvZmVQ?=
- =?gb2312?B?MjU3RE5kcVdoM0E1TWdoMUtPM0F0b3JFQ2wyblM4NHRJWXBMUXN0L2cxUVZV?=
- =?gb2312?B?TjJBclBDZjNYSFUrZjlpSHFkdnRTVURkazV6V2tlSmxyZmNlazZsVUlRUzdJ?=
- =?gb2312?B?cnBrVzdVdm9YV1pFYU5GRU0rZ1VMaTY3TWp0QXdlakNWbVpValJHNzY4djYw?=
- =?gb2312?B?QWEyTXU1cHhzWWdobng1NXFKK3kyc3BETU4yZWp0akNUNlh2NnJUNmJyTm5W?=
- =?gb2312?B?S1R2RHYvSEdxcDNmT093V1ZlM1RMU3R6dVN1OHJqd0F1SndQUGVDYXFqeUdl?=
- =?gb2312?B?UVo2aWFlN2d1N2h1RzkxVHdMbkM1WHhNUnFaM1FFRzNCaFpzTGlQcXUyR2hD?=
- =?gb2312?B?cXd5NXBtZTY1V2tmNXkxMHVyWkJTaFE4UEFNQUpKblFjN1hpUlA5OTByVHY5?=
- =?gb2312?B?dzFoYXRUU2taZ1liMk5idWp0WnAvTVFDdHg1N3JnNzFQSzlhMTZOaHg1RElX?=
- =?gb2312?B?Tk83Q0lzL2dqVzRxY1pQVDV4ZUhIRmJKSzc3WTdSZG5rUkFZQ3J1QjFlb1l1?=
- =?gb2312?B?RElnT2RqOERoYnpTNkhLWkJkdFFabStkMHdGQXI2MS9KejZtTVhpSUI4Mnls?=
- =?gb2312?B?MXhKa2NER2o4ZVpFVlNQVEwvcVd3MThQUnJsU013ZzRRL0cwbzduYTFRM3Az?=
- =?gb2312?B?ZWRtSlo0MnFDMlpzV0pyRHNnMlJyY1FtL1o0ZWgra1FvblhsSS9SUnpqZ20v?=
- =?gb2312?B?am1MZmowRWdBVUdzUTNhSEV1ZUwyOEhyQ2ZnSGJEWC81KzNNNTZWaXhvZHdu?=
- =?gb2312?B?dWd6cHZTWlZiQjdva2RGSVhiWWs4UW4xNGdPYm1rTHV6QzloVEU4ckhZTXg0?=
- =?gb2312?Q?xGgQ=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5EB7B1102
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:47:30 +0000 (UTC)
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id BF4E910E
+	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 23:47:28 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688626048; x=1720162048;
+  h=from:to:cc:subject:date:message-id:mime-version:
+   content-transfer-encoding;
+  bh=Qdzaoh9oxOhM+jyehcrD+LoVPzNTSDRo3q8tULyb0Rw=;
+  b=jArkmVxMsxbw7jzgvrtRjD/QUipQ8rhUb/yy8UDlU98TZSRSqqLXEVLh
+   slI2lSNjsaanFMiPer3PYlZkiz1WmRhB6PaGiIgvDRkaAaIL8srreugyJ
+   AOrapQHNiTyTOyMqrpZuEsscYY8tfKUaP0iZBi/cxI37h/uuVckHuzfHQ
+   1vkgAiWavF83L/jd9xNNX8KxDDtCekasoRPHK7aSvHcwtTh8jBf4XKHmu
+   0aR7GEa8PrFD06KF4uohasfRsj9cS3DkibYC1X9ncpABbxUXbb1DAhaRz
+   I0kY/z3qeKMgl4x2ZIVypIUFsKYJI2y2vwjBm/KZwwJQP4NQ/48Ip33PW
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="343115432"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="343115432"
+Received: from fmsmga006.fm.intel.com ([10.253.24.20])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 05 Jul 2023 23:47:27 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="966103988"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="966103988"
+Received: from wasp.igk.intel.com ([10.102.20.192])
+  by fmsmga006.fm.intel.com with ESMTP; 05 Jul 2023 23:47:25 -0700
+From: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+To: intel-wired-lan@lists.osuosl.org
+Cc: netdev@vger.kernel.org,
+	piotr.raczynski@intel.com,
+	aleksander.lobakin@intel.com,
+	pmenzel@molgen.mpg.de,
+	Michal Swiatkowski <michal.swiatkowski@linux.intel.com>,
+	Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Subject: [PATCH iwl-net v3] ice: prevent NULL pointer deref during reload
+Date: Thu,  6 Jul 2023 08:25:51 +0200
+Message-ID: <20230706062551.2261312-1-michal.swiatkowski@linux.intel.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: nxp.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: AM5PR04MB3139.eurprd04.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 516d4d1a-dba2-4180-8390-08db7de850c3
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 06:14:54.3645
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 686ea1d3-bc2b-4c6f-a92c-d99c5c301635
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: jJ6G94oZGbo1eTa+r780wRvtpPLH05QpVt4/Uc7wzOam71dlu4inQFjGz873D3ZvfsRjTdO+Xuh9B4dFeyfDgw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB9PR04MB8377
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,SPF_HELO_PASS,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PiAtLS0tLU9yaWdpbmFsIE1lc3NhZ2UtLS0tLQ0KPiBGcm9tOiBKYWt1YiBLaWNpbnNraSA8a3Vi
-YUBrZXJuZWwub3JnPg0KPiBTZW50OiAyMDIzxOo31MI2yNUgMTE6MTINCj4gVG86IFdlaSBGYW5n
-IDx3ZWkuZmFuZ0BueHAuY29tPg0KPiBDYzogQW5kcmV3IEx1bm4gPGFuZHJld0BsdW5uLmNoPjsg
-ZGF2ZW1AZGF2ZW1sb2Z0Lm5ldDsNCj4gZWR1bWF6ZXRAZ29vZ2xlLmNvbTsgcGFiZW5pQHJlZGhh
-dC5jb207IGFzdEBrZXJuZWwub3JnOw0KPiBkYW5pZWxAaW9nZWFyYm94Lm5ldDsgaGF3a0BrZXJu
-ZWwub3JnOyBqb2huLmZhc3RhYmVuZEBnbWFpbC5jb207DQo+IFNoZW53ZWkgV2FuZyA8c2hlbndl
-aS53YW5nQG54cC5jb20+OyBDbGFyayBXYW5nDQo+IDx4aWFvbmluZy53YW5nQG54cC5jb20+OyBu
-ZXRkZXZAdmdlci5rZXJuZWwub3JnOyBkbC1saW51eC1pbXgNCj4gPGxpbnV4LWlteEBueHAuY29t
-PjsgbGludXgta2VybmVsQHZnZXIua2VybmVsLm9yZzsgYnBmQHZnZXIua2VybmVsLm9yZw0KPiBT
-dWJqZWN0OiBSZTogW1BBVENIIG5ldCAzLzNdIG5ldDogZmVjOiBpbmNyZWFzZSB0aGUgc2l6ZSBv
-ZiB0eCByaW5nIGFuZCB1cGRhdGUNCj4gdGhyZXNob2xkcyBvZiB0eCByaW5nDQo+IA0KPiBPbiBU
-aHUsIDYgSnVsIDIwMjMgMDE6NDQ6NDkgKzAwMDAgV2VpIEZhbmcgd3JvdGU6DQo+ID4gPiBCdXQg
-eW91IHNob3VsZG4ndCByZXN0YXJ0IHRoZSBxdWV1ZSBmb3IgYSBzaW5nbGUgcGFja2V0IGVpdGhl
-ci4NCj4gPiA+IFJlc3RhcnRpbmcgZm9yIGEgc2luZ2xlIHBhY2tldCB3YXN0ZXMgQ1BVIGN5Y2xl
-cyBhcyB0aGVyZSB3aWxsIGJlDQo+ID4gPiBtdWNoIG1vcmUgc3RvcCAvIHN0YXJ0IG9wZXJhdGlv
-bnMuIFR3byBsYXJnZSBwYWNrZXRzIHNlZW0gbGlrZSB0aGUNCj4gPiA+IGFic29sdXRlIG1pbmlt
-dW0gcmVhc29uYWJsZSB3YWtlIHRocmVzaG9sZC4NCj4gPiA+DQo+ID4gPiBTZXR0aW5nIHR4X3N0
-b3BfdGhyZXNob2xkIHRvIE1BWF9TS0JfRlJBR1MgZG9lc24ndCBzZWVtIHJpZ2h0DQo+ID4gPiBl
-aXRoZXIsIGFzIHlvdSB3b24ndCBiZSBhYmxlIHRvIGFjY2VwdCBhIGZ1bGwgVFNPIGZyYW1lLg0K
-PiA+ID4NCj4gPiBNYXliZSBJIHNob3VsZCBrZWVwIHRoZSB0eF9zdG9wX3RocmVzaG9sZCB1bmNo
-YW5nZWQsIHNvIHRoYXQgdGhlIHF1ZXVlDQo+ID4gaXMgdG8gYmUgc3RvcHBlZCBpZiB0aGUgYXZh
-aWxhYmxlIEJEcyBpcyBub3QgZW5vdWdoIGZvciBhIGZ1bGwgVFNPIGZyYW1lIHRvIGJlDQo+IGF0
-dGFjaGVkLg0KPiA+IEFuZCB0aGVuIGp1c3QgY2hhbmdlIHR4X3dha2VfdGhyZXNob2xkIHRvIHR4
-X3N0b3BfdGhyZXNob2xkICsgMSwgd2hpY2gNCj4gPiBJIHRoaW5rIGl0J3MgbW9yZSByZWFzb25h
-YmxlLg0KPiANCj4gSG93IGFib3V0IGF0IGxlYXN0IHR4X3N0b3BfdGhyZXNob2xkICsgMiAqIE1B
-WF9TS0JfRlJBR1MgPw0KSXQncyBva2F5LiBUaGUgaXBlcmYgcGVyZm9ybWFuY2UgaXMgd2VsbCBh
-cyBiZWZvcmUuDQoNCj4gSWYgYSBxdWV1ZSBvZiBodW5kcmVkcyBvZiBlbnRyaWVzIGlzIG92ZXJm
-bG93aW5nLCB3ZSBzaG91bGQgYmUgYWJsZSB0byBhcHBseSBhDQo+IGh5c3RlcmVzaXMgb2YgYSBm
-ZXcgdGVucyBvZiBlbnRyaWVzLiBEbyB5b3Ugc2VlIGEgZGlmZmVyZW5jZSBpbiBkcm9wcz8gVGhl
-DQpJIGRpZG4ndCBzZWUgdGhlcmUgd2FzIGFueSBwYWNrZXQgbG9zcy4NCg0KPiBwYWNrZXRzIGZy
-b20gdGhlIHN0YWNrIHNob3VsZCBwcmVmZXJhYmx5IHN0YXkgaW4gdGhlIHFkaXNjcyBpbnN0ZWFk
-IG9mIHRoZSBkcml2ZXINCj4gcXVldWUsIHdoZXJlIEFRTSBhbmQgc2NoZWR1bGluZyBjYW4gYmUg
-YXBwbGllZC4NCg==
+Calling ethtool during reload can lead to call trace, because VSI isn't
+configured for some time, but netdev is alive.
+
+To fix it add rtnl lock for VSI deconfig and config. Set ::num_q_vectors
+to 0 after freeing and add a check for ::tx/rx_rings in ring related
+ethtool ops.
+
+Add proper unroll of filters in ice_start_eth().
+
+Reproduction:
+$watch -n 0.1 -d 'ethtool -g enp24s0f0np0'
+$devlink dev reload pci/0000:18:00.0 action driver_reinit
+
+Call trace before fix:
+[66303.926205] BUG: kernel NULL pointer dereference, address: 0000000000000000
+[66303.926259] #PF: supervisor read access in kernel mode
+[66303.926286] #PF: error_code(0x0000) - not-present page
+[66303.926311] PGD 0 P4D 0
+[66303.926332] Oops: 0000 [#1] PREEMPT SMP PTI
+[66303.926358] CPU: 4 PID: 933821 Comm: ethtool Kdump: loaded Tainted: G           OE      6.4.0-rc5+ #1
+[66303.926400] Hardware name: Intel Corporation S2600WFT/S2600WFT, BIOS SE5C620.86B.00.01.0014.070920180847 07/09/2018
+[66303.926446] RIP: 0010:ice_get_ringparam+0x22/0x50 [ice]
+[66303.926649] Code: 90 90 90 90 90 90 90 90 f3 0f 1e fa 0f 1f 44 00 00 48 8b 87 c0 09 00 00 c7 46 04 e0 1f 00 00 c7 46 10 e0 1f 00 00 48 8b 50 20 <48> 8b 12 0f b7 52 3a 89 56 14 48 8b 40 28 48 8b 00 0f b7 40 58 48
+[66303.926722] RSP: 0018:ffffad40472f39c8 EFLAGS: 00010246
+[66303.926749] RAX: ffff98a8ada05828 RBX: ffff98a8c46dd060 RCX: ffffad40472f3b48
+[66303.926781] RDX: 0000000000000000 RSI: ffff98a8c46dd068 RDI: ffff98a8b23c4000
+[66303.926811] RBP: ffffad40472f3b48 R08: 00000000000337b0 R09: 0000000000000000
+[66303.926843] R10: 0000000000000001 R11: 0000000000000100 R12: ffff98a8b23c4000
+[66303.926874] R13: ffff98a8c46dd060 R14: 000000000000000f R15: ffffad40472f3a50
+[66303.926906] FS:  00007f6397966740(0000) GS:ffff98b390900000(0000) knlGS:0000000000000000
+[66303.926941] CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+[66303.926967] CR2: 0000000000000000 CR3: 000000011ac20002 CR4: 00000000007706e0
+[66303.926999] DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+[66303.927029] DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+[66303.927060] PKRU: 55555554
+[66303.927075] Call Trace:
+[66303.927094]  <TASK>
+[66303.927111]  ? __die+0x23/0x70
+[66303.927140]  ? page_fault_oops+0x171/0x4e0
+[66303.927176]  ? exc_page_fault+0x7f/0x180
+[66303.927209]  ? asm_exc_page_fault+0x26/0x30
+[66303.927244]  ? ice_get_ringparam+0x22/0x50 [ice]
+[66303.927433]  rings_prepare_data+0x62/0x80
+[66303.927469]  ethnl_default_doit+0xe2/0x350
+[66303.927501]  genl_family_rcv_msg_doit.isra.0+0xe3/0x140
+[66303.927538]  genl_rcv_msg+0x1b1/0x2c0
+[66303.927561]  ? __pfx_ethnl_default_doit+0x10/0x10
+[66303.927590]  ? __pfx_genl_rcv_msg+0x10/0x10
+[66303.927615]  netlink_rcv_skb+0x58/0x110
+[66303.927644]  genl_rcv+0x28/0x40
+[66303.927665]  netlink_unicast+0x19e/0x290
+[66303.927691]  netlink_sendmsg+0x254/0x4d0
+[66303.927717]  sock_sendmsg+0x93/0xa0
+[66303.927743]  __sys_sendto+0x126/0x170
+[66303.927780]  __x64_sys_sendto+0x24/0x30
+[66303.928593]  do_syscall_64+0x5d/0x90
+[66303.929370]  ? __count_memcg_events+0x60/0xa0
+[66303.930146]  ? count_memcg_events.constprop.0+0x1a/0x30
+[66303.930920]  ? handle_mm_fault+0x9e/0x350
+[66303.931688]  ? do_user_addr_fault+0x258/0x740
+[66303.932452]  ? exc_page_fault+0x7f/0x180
+[66303.933193]  entry_SYSCALL_64_after_hwframe+0x72/0xdc
+
+Fixes: 5b246e533d01 ("ice: split probe into smaller functions")
+Reviewed-by: Przemek Kitszel <przemyslaw.kitszel@intel.com>
+Signed-off-by: Michal Swiatkowski <michal.swiatkowski@linux.intel.com>
+---
+v2 --> v1 [1] pointed by Paul:
+ * change the title to more specific
+v1 --> v2 [2] pointed by Olek:
+ * Remove not useful part of call trace from commit message
+ * Reword comment about no rings
+ * Unroll adding filters in ice_start_eth()
+ * Proper lock in ice_load() also in unroll path
+
+[1] https://lore.kernel.org/netdev/20230705040510.906029-1-michal.swiatkowski@linux.intel.com/
+[2] https://lore.kernel.org/netdev/20230703103215.54570-1-michal.swiatkowski@linux.intel.com/T/#t
+---
+ drivers/net/ethernet/intel/ice/ice_base.c    |  2 ++
+ drivers/net/ethernet/intel/ice/ice_ethtool.c | 13 +++++++++++--
+ drivers/net/ethernet/intel/ice/ice_main.c    | 10 ++++++++--
+ 3 files changed, 21 insertions(+), 4 deletions(-)
+
+diff --git a/drivers/net/ethernet/intel/ice/ice_base.c b/drivers/net/ethernet/intel/ice/ice_base.c
+index 1911d644dfa8..619cb07a4069 100644
+--- a/drivers/net/ethernet/intel/ice/ice_base.c
++++ b/drivers/net/ethernet/intel/ice/ice_base.c
+@@ -758,6 +758,8 @@ void ice_vsi_free_q_vectors(struct ice_vsi *vsi)
+ 
+ 	ice_for_each_q_vector(vsi, v_idx)
+ 		ice_free_q_vector(vsi, v_idx);
++
++	vsi->num_q_vectors = 0;
+ }
+ 
+ /**
+diff --git a/drivers/net/ethernet/intel/ice/ice_ethtool.c b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+index f86e814354a3..ec4138e684bd 100644
+--- a/drivers/net/ethernet/intel/ice/ice_ethtool.c
++++ b/drivers/net/ethernet/intel/ice/ice_ethtool.c
+@@ -2920,8 +2920,13 @@ ice_get_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
+ 
+ 	ring->rx_max_pending = ICE_MAX_NUM_DESC;
+ 	ring->tx_max_pending = ICE_MAX_NUM_DESC;
+-	ring->rx_pending = vsi->rx_rings[0]->count;
+-	ring->tx_pending = vsi->tx_rings[0]->count;
++	if (vsi->tx_rings && vsi->rx_rings) {
++		ring->rx_pending = vsi->rx_rings[0]->count;
++		ring->tx_pending = vsi->tx_rings[0]->count;
++	} else {
++		ring->rx_pending = 0;
++		ring->tx_pending = 0;
++	}
+ 
+ 	/* Rx mini and jumbo rings are not supported */
+ 	ring->rx_mini_max_pending = 0;
+@@ -2955,6 +2960,10 @@ ice_set_ringparam(struct net_device *netdev, struct ethtool_ringparam *ring,
+ 		return -EINVAL;
+ 	}
+ 
++	/* Return if there is no rings (device is reloading) */
++	if (!vsi->tx_rings || !vsi->rx_rings)
++		return -EBUSY;
++
+ 	new_tx_cnt = ALIGN(ring->tx_pending, ICE_REQ_DESC_MULTIPLE);
+ 	if (new_tx_cnt != ring->tx_pending)
+ 		netdev_info(netdev, "Requested Tx descriptor count rounded up to %d\n",
+diff --git a/drivers/net/ethernet/intel/ice/ice_main.c b/drivers/net/ethernet/intel/ice/ice_main.c
+index 0d8b8c6f9bd3..9168feda2c19 100644
+--- a/drivers/net/ethernet/intel/ice/ice_main.c
++++ b/drivers/net/ethernet/intel/ice/ice_main.c
+@@ -4634,9 +4634,9 @@ static int ice_start_eth(struct ice_vsi *vsi)
+ 	if (err)
+ 		return err;
+ 
+-	rtnl_lock();
+ 	err = ice_vsi_open(vsi);
+-	rtnl_unlock();
++	if (err)
++		ice_fltr_remove_all(vsi);
+ 
+ 	return err;
+ }
+@@ -5099,6 +5099,7 @@ int ice_load(struct ice_pf *pf)
+ 	params = ice_vsi_to_params(vsi);
+ 	params.flags = ICE_VSI_FLAG_INIT;
+ 
++	rtnl_lock();
+ 	err = ice_vsi_cfg(vsi, &params);
+ 	if (err)
+ 		goto err_vsi_cfg;
+@@ -5106,6 +5107,7 @@ int ice_load(struct ice_pf *pf)
+ 	err = ice_start_eth(ice_get_main_vsi(pf));
+ 	if (err)
+ 		goto err_start_eth;
++	rtnl_unlock();
+ 
+ 	err = ice_init_rdma(pf);
+ 	if (err)
+@@ -5120,9 +5122,11 @@ int ice_load(struct ice_pf *pf)
+ 
+ err_init_rdma:
+ 	ice_vsi_close(ice_get_main_vsi(pf));
++	rtnl_lock();
+ err_start_eth:
+ 	ice_vsi_decfg(ice_get_main_vsi(pf));
+ err_vsi_cfg:
++	rtnl_unlock();
+ 	ice_deinit_dev(pf);
+ 	return err;
+ }
+@@ -5135,8 +5139,10 @@ void ice_unload(struct ice_pf *pf)
+ {
+ 	ice_deinit_features(pf);
+ 	ice_deinit_rdma(pf);
++	rtnl_lock();
+ 	ice_stop_eth(ice_get_main_vsi(pf));
+ 	ice_vsi_decfg(ice_get_main_vsi(pf));
++	rtnl_unlock();
+ 	ice_deinit_dev(pf);
+ }
+ 
+-- 
+2.41.0
+
 
