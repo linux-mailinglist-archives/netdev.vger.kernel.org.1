@@ -1,279 +1,235 @@
-Return-Path: <netdev+bounces-15685-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15686-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2B30974938B
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 04:11:38 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B034F7493EF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 04:59:03 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 006DA1C20C6C
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 02:11:32 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2E10281183
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 02:59:01 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 039AFA40;
-	Thu,  6 Jul 2023 02:11:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD45FA56;
+	Thu,  6 Jul 2023 02:58:59 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E20F67F
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:11:29 +0000 (UTC)
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2127.outbound.protection.outlook.com [40.107.255.127])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CD6CC19A9;
-	Wed,  5 Jul 2023 19:11:27 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1EE7E9
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:58:59 +0000 (UTC)
+Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70F81BCB;
+	Wed,  5 Jul 2023 19:58:56 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=HqyDwqrJDcpO5AaCSOlkBWDQbbIPNpxs3im2cIZKDeB4ZYKgzi6pPEM4OJSv/LinCUs8aPXJlAcBHH22I0lZBN0ImHkRu9YI8WSG9cQNNck/xlYFCq6MUJzVkI+3XpdJkrkkDMe8aPvnPrCxjZpCB1QMWuPnv+2fBaXBOE8Mxh0FL43m+OdCaC3d1/u3/KV/TAQ99FYWWYA7N4hUlo8n/SCdj6st4X1S2lTrjbYBlf5F6hk2dmSCbWHRBUbp0p3TybgRuPukvFo9f9U1qWBWvVUj0DSsojxeJmBGF60FAYxAGSuVDP9OUjFjfRiCOtgN/cu1WTf4l1oT9bcZ8wLXpw==
+ b=PC6P3qVfQoYj2TXJRf1xp7xn4Qb9FTuZbwss/jXfRFsc1iB5BlM2gJnIYI8n0NOVzmqkGjQm7cLghZ6l8DjVkFv7lQpYg4WJ/mIwaQI+d5/6mxD3lnqj1JaUdFaXv0NGWt3I6VlcK1KOpwwGoNJOZl8n8NHE8C7qgkE0c2YwoZo7ZNUi3y7hZt2Q3bh2JmMWOqUggvlkGcdscHcLxzdizc9UA4uNM4ii/KstEMV0nBDTCuSnpV8dlrQBY6NjZVag86LKsoXDAYxZnyTEgPuYk8ZpUhJglc0+jucO+SiUTal415JHT6JvdHksnWBx0VnmImARo73Ha07yquKlj9echQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=1ugY+1ShlS7IIZZCnoXdEsWUabJWbbkhTdKnJL8m15c=;
- b=OJ8KBxvMceNIaQszYil5561rmue0YqEr6Q0wQxocBCdio2HinpMY0/7qX1A2qMvIEGya72KzNewrNzOu38Dax5Kv5FZrDzWeiGK8yeWgVagdncQzAbL0vlTecun1Uvzu1nA2+RIJ6mpQ2fRF664r9wn8qm5TW2LEtmUpdo0jQNpYrc+WGtGwLtEtw9/T5MbilYsUbeTfc78zg/xWbLkTwh3bnG68c4uIjgUt36mGiE71QVCE47W8n5ZUtb3px5YkVXgk8vCFX/2+vaGTsLwpYJY4e/1LwEiloUPDLX77124cSYLzLDKwW5kDdQXmluvQIZFTZbL3oKBzkg2bt3pLGQ==
+ bh=3nzMFBeX37sOBYyC2WXcj6qtKPd9NPPMmNhFjOnO9S4=;
+ b=UrAaFeEjr+l3aYR6oDlTTNxUmctHXRG+Aw8brqA211Nf/3c+3/q7kGPio46s2wgTefGLGpeCjVvVkQhMxzSntvH6quL8MkDbkuzeoitOCFbkdpg64CNw22pKqOfg/ZcWdw+8n/q1J21HBpwwYE/f1cVYU0zkvxivn2AJDa2msP6+/z9VJKk1tTvLWGIkF3UU4/8FFTzdN8oBZERtLjQmwpVea3BOhvA3V/5M9Cxl8tMCMmI2oQAXJpmlGniX0jzBIfO7ZEgrU7awp0H0xjm3YaGwuSoKQNErAHYiICRpwQdYyYVzteUdIB2GDMECluEGHE5TAQsN142SiLnG5lLnWA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
+ header.d=amd.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=1ugY+1ShlS7IIZZCnoXdEsWUabJWbbkhTdKnJL8m15c=;
- b=FCsCO8RVzaJtXdkGzix83nnuP4AvSBPhVJsvN/cq+fdD7qet47XH9TFRA3wh5WBe51uhIniuSX13mh0wNiwAN8NCw33vnQZHuUzXT4q7+YM4/EX9ZqnK4TJy+3KTGZnfIL/p+/qrnyWGN1RRD5yZarvvOAJJmxJYRefXp/pj5sbmpL8isrQqNPx7Y3tOuo/0/RKmmn6X9wWX8UWJuUqiJH4nvytAQyoXn3JnzdUjcygeRe6CEI6mjdwfTFXdaURVGoD0Pv5Kg53718TlciEOFHabqW/zrXGYt+mQWJ9Iz2Q8aXhWp1ibWCzQ3KHltXCPLR/zAlTUnpnphxlMXEoigg==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-Received: from SEYPR06MB6615.apcprd06.prod.outlook.com (2603:1096:101:172::11)
- by SEZPR06MB6206.apcprd06.prod.outlook.com (2603:1096:101:e8::14) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
- 2023 02:11:24 +0000
-Received: from SEYPR06MB6615.apcprd06.prod.outlook.com
- ([fe80::c817:d237:dc0d:576]) by SEYPR06MB6615.apcprd06.prod.outlook.com
- ([fe80::c817:d237:dc0d:576%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 02:11:24 +0000
-From: Yang Rong <yangrong@vivo.com>
-To: Harry Wentland <harry.wentland@amd.com>,
-	Leo Li <sunpeng.li@amd.com>,
-	Rodrigo Siqueira <Rodrigo.Siqueira@amd.com>,
-	Alex Deucher <alexander.deucher@amd.com>,
-	=?UTF-8?q?Christian=20K=C3=B6nig?= <christian.koenig@amd.com>,
-	"Pan, Xinhui" <Xinhui.Pan@amd.com>,
-	David Airlie <airlied@gmail.com>,
-	Daniel Vetter <daniel@ffwll.ch>,
-	"Michael S. Tsirkin" <mst@redhat.com>,
-	Jason Wang <jasowang@redhat.com>,
-	Xuan Zhuo <xuanzhuo@linux.alibaba.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>,
-	Jens Axboe <axboe@kernel.dk>,
-	Pavel Begunkov <asml.silence@gmail.com>,
-	Alvin Lee <Alvin.Lee2@amd.com>,
-	Jun Lei <Jun.Lei@amd.com>,
-	Qingqing Zhuo <qingqing.zhuo@amd.com>,
-	Max Tseng <Max.Tseng@amd.com>,
-	Josip Pavic <Josip.Pavic@amd.com>,
-	Cruise Hung <cruise.hung@amd.com>,
-	amd-gfx@lists.freedesktop.org (open list:AMD DISPLAY CORE),
-	dri-devel@lists.freedesktop.org (open list:DRM DRIVERS),
-	linux-kernel@vger.kernel.org (open list),
-	virtualization@lists.linux-foundation.org (open list:VIRTIO CORE AND NET DRIVERS),
-	netdev@vger.kernel.org (open list:NETWORKING DRIVERS),
-	io-uring@vger.kernel.org (open list:IO_URING)
-Cc: opensource.kernel@vivo.com,
-	luhongfei@vivo.com,
-	Yang Rong <yangrong@vivo.com>
-Subject: [PATCH] Fix max/min warnings in virtio_net, amd/display, and io_uring
-Date: Thu,  6 Jul 2023 10:06:16 +0800
-Message-ID: <20230706021102.2066-1-yangrong@vivo.com>
-X-Mailer: git-send-email 2.41.0.windows.1
+ bh=3nzMFBeX37sOBYyC2WXcj6qtKPd9NPPMmNhFjOnO9S4=;
+ b=CAchPgZF0sloAFj7WYJlii2aGSZ0nQJ+eH+CvexZvdBBxZhuEtDknUUUq0A7P6eK6lk3GQYqxb9ymYFGxHjkIrrgKssqn+HZwjeEhOP6tgbMukTMBH9ThnCgMJwf/8tPAyBSdgmQt5d+DnahT+OVxZwfL2RNlfVAv3gQuIr3U9U=
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com (2603:10b6:5:45::18) by
+ CYYPR12MB8729.namprd12.prod.outlook.com (2603:10b6:930:c2::5) with Microsoft
+ SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.20.6565.17; Thu, 6 Jul 2023 02:58:54 +0000
+Received: from DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::3bef:2463:a3e0:e51c]) by DM6PR12MB2619.namprd12.prod.outlook.com
+ ([fe80::3bef:2463:a3e0:e51c%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 02:58:54 +0000
+From: "Quan, Evan" <Evan.Quan@amd.com>
+To: Andrew Lunn <andrew@lunn.ch>
+CC: "rafael@kernel.org" <rafael@kernel.org>, "lenb@kernel.org"
+	<lenb@kernel.org>, "Deucher, Alexander" <Alexander.Deucher@amd.com>, "Koenig,
+ Christian" <Christian.Koenig@amd.com>, "Pan, Xinhui" <Xinhui.Pan@amd.com>,
+	"airlied@gmail.com" <airlied@gmail.com>, "daniel@ffwll.ch" <daniel@ffwll.ch>,
+	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
+	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
+	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
+	"pabeni@redhat.com" <pabeni@redhat.com>, "Limonciello, Mario"
+	<Mario.Limonciello@amd.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
+	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
+	"tzimmermann@suse.de" <tzimmermann@suse.de>, "hdegoede@redhat.com"
+	<hdegoede@redhat.com>, "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
+	"Lazar, Lijo" <Lijo.Lazar@amd.com>, "jim.cromie@gmail.com"
+	<jim.cromie@gmail.com>, "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
+	"andrealmeid@igalia.com" <andrealmeid@igalia.com>, "trix@redhat.com"
+	<trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de"
+	<arnd@arndb.de>, "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org"
+	<linux-acpi@vger.kernel.org>, "amd-gfx@lists.freedesktop.org"
+	<amd-gfx@lists.freedesktop.org>, "dri-devel@lists.freedesktop.org"
+	<dri-devel@lists.freedesktop.org>, "linux-wireless@vger.kernel.org"
+	<linux-wireless@vger.kernel.org>, "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>
+Subject: RE: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Thread-Topic: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
+ mitigations
+Thread-Index: AQHZqz5nCvlP5HKi7kqHZhT1UyZB3K+kDOyAgATrEhCAAKJtgIACaF9A
+Date: Thu, 6 Jul 2023 02:58:53 +0000
+Message-ID:
+ <DM6PR12MB26198720EBBAAB8C989F8D4BE42CA@DM6PR12MB2619.namprd12.prod.outlook.com>
+References: <20230630103240.1557100-1-evan.quan@amd.com>
+ <20230630103240.1557100-2-evan.quan@amd.com>
+ <7e7db6eb-4f46-407a-8d1f-16688554ad80@lunn.ch>
+ <DM6PR12MB2619591A7706A30362E11DC5E42EA@DM6PR12MB2619.namprd12.prod.outlook.com>
+ <18dfe989-2610-4234-ade2-ffbc2f233c19@lunn.ch>
+In-Reply-To: <18dfe989-2610-4234-ade2-ffbc2f233c19@lunn.ch>
+Accept-Language: en-US, zh-CN
+Content-Language: en-US
+X-MS-Has-Attach:
+X-MS-TNEF-Correlator:
+msip_labels:
+ MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=e4b0b34c-4fda-4a3d-9f25-1d15a394cbbc;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=0;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2023-07-06T01:53:19Z;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
+authentication-results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=amd.com;
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: DM6PR12MB2619:EE_|CYYPR12MB8729:EE_
+x-ms-office365-filtering-correlation-id: 742f7eae-7400-416d-3f71-08db7dcceebd
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info:
+ ugh975M4mkJTtmcRsZz7kRBE9awXV/qMW24NoPvganV7xs3AXvgmmUfY3/2ihPJflP0YQzX7TG9cv1BmYhix2rfSJdj0kjW7VyEfrTdhF/iL9F7N618fNjgc4+HIlnxm1hX1HtjvsXrJUQvl1K6TYVnSsLkO1uoOGb/sSJR+snKqRuY/mPFCp+QO1BMTfxrCw0YOQ1PITyFe1f6zxOwHDqGGBBhC9jGoQ4JG5YJe4IditVgkrRQeKYmnOH0R1teeIso/tMtU6KqlekybmWFUHWoN3PlMd8WjNGGM4EVuFY/jRvObXhTW2L6esd+2fdXEjg238G8QD9T+FkjG/mkZkHDxvEFclad5NVEOUDQq7JxsxgmjRz9RpnK92X9XVAxjVAFuOMZpUe+sqTE7rpwuI7rFKaKqZRADBwUJ2me9fX2XlS/B2mhzLQrtNqOol2M04XYwrJA3K0Ga5o1rwf56XHZaXZ1kdG+jxk9qSfi78SiE7+nqbj07H/+EneS42PEXzgeBI5BWPZmleCAN1nO5woJncQqODMN9p+hsDpzmQBm61gg8xsbpWhTgAwWqvEcYi9xKOzfM8gj7OPmsuqVs99XXpftJDLrlP6QA+8TvaAQb+Htwn94AU7yob3zMSmBX
+x-forefront-antispam-report:
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2619.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(376002)(366004)(346002)(396003)(451199021)(66446008)(8676002)(8936002)(2906002)(55016003)(5660300002)(52536014)(26005)(53546011)(7416002)(6506007)(186003)(66556008)(64756008)(41300700001)(7696005)(122000001)(71200400001)(66476007)(76116006)(4326008)(316002)(33656002)(83380400001)(6916009)(66946007)(54906003)(478600001)(38070700005)(9686003)(38100700002)(86362001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0:
+ =?us-ascii?Q?Xzb67GpqRNMbkw4nkpJSD2GNZIFycPiS+PBLtthdg0buE1P+cLWrEX1/pWEl?=
+ =?us-ascii?Q?F7c5wSOW10K8roNpqhWlqfo8fp7Z83GyyZUbFrBwdgmzD2q2aHAuFQnR79fO?=
+ =?us-ascii?Q?+fXsUeS7i8KRwtAwO2qONuuLNo1ZHTqCVF+2Ed87egHmXIvEjU5hmXY36TOT?=
+ =?us-ascii?Q?L6Lxbr2lAl9w2vbfKuR3bIHjevrzmi8TwSy+j4G2DxWDO9ThjdfxVgU2KyNe?=
+ =?us-ascii?Q?rUvIuOaA8Lzn0tM+fzgxbUFabuRDaFIwJn055r3IcCrtiX509NZN2POG/QrZ?=
+ =?us-ascii?Q?mPCifJafP+WfQXEGzZF5x3RmtyB8uYcxLhjGoPc74HoDjaYUgza7e/O0DHOd?=
+ =?us-ascii?Q?IBY3RicGD17cNCfr1hoDrH/iTc+NOM6NETRt7LugqUZ9ykEELiQ2xsO6MBmj?=
+ =?us-ascii?Q?pzulffV7YRTgwYSRSqHMAZmt91sqkeRDElJCmnUjxve81gcIMtBh2TBGGwpL?=
+ =?us-ascii?Q?mTXwF5dPbmRm9GjdK998i9FvycxDmps5BPkdke8+xoy0zfrvXo8T7524Tcqp?=
+ =?us-ascii?Q?m3grpvlW+8xpsKBeHc1bJUxQpsfmJDzQ3b1/4g4SZbON7MNXBNNZ4Z2a9gcU?=
+ =?us-ascii?Q?OuIYVDNS89uNEpBuI/1cTQGIFi8z/eZ26+oEyuvCPzLmRjLAXnAy9YJzAO3t?=
+ =?us-ascii?Q?bV16PcSGYq8XdGfDBStEel1a41KabeK18J41A0Yx75+WCHg0pCeaVVAj6mhV?=
+ =?us-ascii?Q?qu7cMiOdaDhMX3H5yXjc0IlzaTXZVAzYO4vnhV7H33pbEk82DQN40MPGZj13?=
+ =?us-ascii?Q?YA3RNwx631dDe7YUbIBRcSzRMNa0zpbFQ08wbPPjGAtFv+Yw0Tbnx3J8sGp3?=
+ =?us-ascii?Q?AksDO1PCJ7UoefI45D8QKpnurYd0gHj36JzfgFlcm6cUldazx8iXL9qf8EM7?=
+ =?us-ascii?Q?eqxdK+g/jZFdR8Ue1/JDKHzKp+ZH/NIsL8Ew/Z5rBmALlZsj8Aakz4o0/Fag?=
+ =?us-ascii?Q?OGhmDkZwokX2s6CeaLE4W5j+9kdzj2U8neRcI/yfEZaxr16VoyxVEZolDSQk?=
+ =?us-ascii?Q?GV5wqbeUhR/+3K5nG8N/c1AXoq/n0+2eo90GmWUG1l/oT+9E6OPqEBan8yp/?=
+ =?us-ascii?Q?RByAIDxEJrmcBrz6rivaqwrFx8Grtavw28tij4l8+gm6L7w4F3+UqhYT8I0B?=
+ =?us-ascii?Q?DxTTY9qwf8rAlfGhariUEEOqvwC5dxorf3CDAVeqUbTlhN3Wj/HwdjFFxOMp?=
+ =?us-ascii?Q?B3AmGJg/Q4cbukd+0Kp8gjNfDUu9EcZYlunaWGAZ6ZEwN6dlgu6cN+RsJc98?=
+ =?us-ascii?Q?zcERYioOY60kW5EUpaf4UbNppOTPixr7m44YEXuJCD0l1Of5GIC2yazRl7aZ?=
+ =?us-ascii?Q?i6oJN8T2VT78KvVTU29IbNoMzNsi++hvCN9sDG7mhc8zzW4tWKt9TDv05+MC?=
+ =?us-ascii?Q?9ljuHQ9Bf3Pss1OAxZzpUsJfQo3nURGFqan0aJvLsf4Rlo9mxPRFNKaSpBIQ?=
+ =?us-ascii?Q?N/cthY8T2esfKu4puDPGoALmEvY3sjoqFFTx92famZTqmLxb/Kt8RTNOl9jf?=
+ =?us-ascii?Q?bZE3yBb3KWg1GcFVA6doYsklXSjPzOl4Fu8LJpUw6Rjc+9HMjL2/nJcStJFW?=
+ =?us-ascii?Q?EoDH5PglSWFSJsIwbr0=3D?=
+Content-Type: text/plain; charset="us-ascii"
 Content-Transfer-Encoding: quoted-printable
-Content-Type: text/plain; charset="utf-8"
-X-ClientProxiedBy: TYWPR01CA0021.jpnprd01.prod.outlook.com
- (2603:1096:400:aa::8) To SEYPR06MB6615.apcprd06.prod.outlook.com
- (2603:1096:101:172::11)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SEYPR06MB6615:EE_|SEZPR06MB6206:EE_
-X-MS-Office365-Filtering-Correlation-Id: 0665b1c4-1ffd-4c98-ffd7-08db7dc64be3
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	9h/oybtn2Ol+7Afg+l2R70jkdGdhTrOmwcUg/Pyf+2hmB0lH/VB4ff/AHFCRwRKOypVC4beBOUr8BMTZGB1H2y8d8qQfFhWoVZekrXeI6OtZGkG748KUYtNicKuUS22gbrIeU5CIB1meeA4McOx8urqbnY1SvtCoo8AYPMuV4si0Z/XlId1OET/WnPZ+tNX9ikI/+BMkmYtge5qXKQJDaJuP3n1XUIfAINQsgrlTkxO75LqAxZgAVM9rpvV9N11ssd7ul2BNQ/FzGLChk0mENozAtgx1elD0oNKvNNPiVMYqGh+k4wi7k+Zw3xltAZM1dlP0wvfwzgbhXJ7CbNMrblZvmFd49F+I06InV151OLT6DUuTLRudKZbYhSFtjTtBYNDFKzKl8Zh/sTTZ08DQmC4Fr+e9W2Iot7M5j7T+rccva8XYMeuDgu9QIEMbjg9dGX1TTqbt6/WsgLVIt9vu9/yU0y86PPWwIjz1RUq7FOiNwJWSljiooYkX9zNs6qwMf2uXOj4Anw7SR3+aiGFj7qRnTaVn7Q4NTc6bdtQWZG5X1q3z/LzbPXvqjjTBTkmfty8HUCtw6NEN8CiXmSZO1d8O6XmfD6K7UqaCMwC6rKk93C1L14mh7FaV3QuQ6ZOGwP2zR0h7WX7v9nupFXtEqQ==
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEYPR06MB6615.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(346002)(366004)(376002)(136003)(39860400002)(396003)(451199021)(110136005)(921005)(6486002)(52116002)(6666004)(478600001)(41300700001)(8936002)(8676002)(38100700002)(38350700002)(2616005)(4326008)(66556008)(66476007)(316002)(66946007)(186003)(83380400001)(6512007)(107886003)(26005)(1076003)(6506007)(86362001)(5660300002)(7416002)(2906002)(36756003);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?xThDpyZ962z9nuD5jE8UpZfDeGujqMBlH9gr+d3+F9bgOytALtIh5DwMpdP3?=
- =?us-ascii?Q?QwZJQ75hMZNZxZ4IVQlXHzvyHfyXJNXGry3I/0BYsnz7rz9+o02Blh11CBc2?=
- =?us-ascii?Q?FPyvt4PRrV03GxTVKAlyFv70JDdgBavfHyvgPvqCEUy37UzelH7CdzHkJuEq?=
- =?us-ascii?Q?5P3Utd9Kt01n5k4tK8mcOQJbeY610uKvj7UOXPLOXQSMWPwETblN2FUbahSp?=
- =?us-ascii?Q?LL8spaUiZpepkCg+lWSPV3AtJ3nYrdSY/t3nDnXEBFUBfn/VaW/yT9o++hFX?=
- =?us-ascii?Q?iOFS2Oa9XSjHiyX2r9KHeKSBDFaVdqtWUl7+WgfECxTb/YK7ymHupwshGzTL?=
- =?us-ascii?Q?OpW45BpucGkbC43cCkQwQY2SkLpdcIKHuNGq+u+prnXTojXQSHgPfTxIyr+K?=
- =?us-ascii?Q?Y78EALA2bVNA7tZuCfub86g8Vt5ssCZUY/RD3b8MtnHDG53SGeMaER46Pump?=
- =?us-ascii?Q?kHHQw5Tv3ghBHpLTbWaRbo47pQLs3IlNsWeaaT4CVbCDtlSPBJgb9Baa9TEz?=
- =?us-ascii?Q?+sBBGITuKLIg/Htg/ShfIsh98BVZLqoiG8wXHERxNMBTWE6TINXquw6usFLx?=
- =?us-ascii?Q?QHHKtCwpttSA6vap69uBhSPCN0MqvlvSpRg7NEhOMS1HboVQIvRAjczkG0I2?=
- =?us-ascii?Q?JgovUP0KfJYratEwsWZDkiOsy28eTlO58af32JktwA4fvyKkPS2G7Rm3L0Fm?=
- =?us-ascii?Q?0CvifsRzawl14ThcQsQSdvUCfxSy5+dC+0ctI3GmukSdcoNFf08E+N/kMoC0?=
- =?us-ascii?Q?iS6absxos4Ve6W8a8qYfwhlvt69sdWq/BtQV6SQLOOOF3UXlg6echoKvzVGi?=
- =?us-ascii?Q?Q+FtxFQ9OGF5K13XEwDemVmz5VFYdrwY/srVzjbhs+3Thc/Bk9lh/UUNRaAm?=
- =?us-ascii?Q?PWg2KLY95152V8iutmb9rC6iKe8nzN9Uf2gYnMJl0p6tE3u3H8QguscUNh2N?=
- =?us-ascii?Q?zd1z3CyS7UimSF99SeRyQ0sz7BW3RiCp20/v9N+0CTUc63vC2hMqtaMpz2W5?=
- =?us-ascii?Q?CZGMPhtBrXl6XKEj0vipbUB7STtsJDsgSE+XRVZph18jVcbP+XK/TK+Ky5NW?=
- =?us-ascii?Q?faa4B5qzMlGV4yzn9EJDxZgoRT0RNwKiti9QeXl+o+unbN0wOybM+2J2KSG8?=
- =?us-ascii?Q?lD/+5TI3wrNB7107G7rWhSYP55AaFdBcgW6r87Rb7jgsPELhjfCz12APns8W?=
- =?us-ascii?Q?DXeFxQIt4c9lYkYrsEN1rGzraMokPefvqBUfNCJ4N6UOPDGgVjr6Jy+50pvL?=
- =?us-ascii?Q?4pfH3HF/M7aTvkStud0VOh+s3m7suZ1/nij+tHuKvnB+vFm88Ea9+SorSPbU?=
- =?us-ascii?Q?ugKBSrwOTWPQXaeaLaG6s4tMiTkTQYt5TjADTMPGugm3dIwFcvUg1RS45QGH?=
- =?us-ascii?Q?9kBIWHwxjdSCVtaS0g9WTjIx4NEuhrmLCc1CBouuGHMejP0gpz4CW5DJ1Ze0?=
- =?us-ascii?Q?5Xw0CZEfCGIHa/C87g4IZVs16dyZuhNxqvv8+Gp10im5Se6r86kMX6ro7xY9?=
- =?us-ascii?Q?/fb/bxa296mJM0ftUmUIgjOoPmIvuaR1KWLPWvGAyOT0/v8hZOE6i9/gj+F9?=
- =?us-ascii?Q?wPCWUaxa7+/0E+z1CsJklibbfaFF6OMsH3/Iv2GY?=
-X-OriginatorOrg: vivo.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 0665b1c4-1ffd-4c98-ffd7-08db7dc64be3
-X-MS-Exchange-CrossTenant-AuthSource: SEYPR06MB6615.apcprd06.prod.outlook.com
+X-OriginatorOrg: amd.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 02:11:23.7184
+X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2619.namprd12.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 742f7eae-7400-416d-3f71-08db7dcceebd
+X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 02:58:53.4911
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: 60ruQpxSbu1kpyIyypa5KYoL9pBgwWl8keuWbdOtE66ykcEqGnufZHlrr1yY4R/hYyHB4ymcM0zidWvjEz6Yuw==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB6206
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: LxB84/e1OdUEVY41H7G1+FOJlC6EQqJdU9beL4Lv1jLQGAZTYewN5SuEhtl7COs8
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8729
+X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-The files drivers/net/virtio_net.c, drivers/gpu/drm/amd/display/dc/dc_dmub_=
-srv.c, and io_uring/io_uring.c were modified to fix warnings.
-Specifically, the opportunities for max() and min() were utilized to addres=
-s the warnings.
+[AMD Official Use Only - General]
 
-Signed-off-by: Yang Rong <yangrong@vivo.com>
----
- drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c | 6 +++---
- drivers/net/virtio_net.c                     | 3 ++-
- io_uring/io_uring.c                          | 3 ++-
- 3 files changed, 7 insertions(+), 5 deletions(-)
+Hi Andrew,
 
-diff --git a/drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c b/drivers/gpu/drm=
-/amd/display/dc/dc_dmub_srv.c
-index c753c6f30dd7..df79aea49a3c 100644
---- a/drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c
-+++ b/drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c
-@@ -22,7 +22,7 @@
-  * Authors: AMD
-  *
-  */
--
-+#include <linux/minmax.h>
- #include "dc.h"
- #include "dc_dmub_srv.h"
- #include "../dmub/dmub_srv.h"
-@@ -481,7 +481,7 @@ static void populate_subvp_cmd_drr_info(struct dc *dc,
-        max_drr_vblank_us =3D div64_u64((subvp_active_us - prefetch_us -
-                        dc->caps.subvp_fw_processing_delay_us - drr_active_=
-us), 2) + drr_active_us;
-        max_drr_mallregion_us =3D subvp_active_us - prefetch_us - mall_regi=
-on_us - dc->caps.subvp_fw_processing_delay_us;
--       max_drr_supported_us =3D max_drr_vblank_us > max_drr_mallregion_us =
-? max_drr_vblank_us : max_drr_mallregion_us;
-+       max_drr_supported_us =3D max(max_drr_vblank_us, max_drr_mallregion_=
-us);
-        max_vtotal_supported =3D div64_u64(((uint64_t)drr_timing->pix_clk_1=
-00hz * 100 * max_drr_supported_us),
-                        (((uint64_t)drr_timing->h_total * 1000000)));
+I discussed with Mario about your proposal/concerns here.
+We believe some changes below might address your concerns.
+- place/move the wbrf_supported_producer check inside acpi_amd_wbrf_add_exc=
+lusion and acpi_amd_wbrf_add_exclusion
+- place the wbrf_supported_consumer check inside acpi_amd_wbrf_retrieve_exc=
+lusions
+So that the wbrf_supported_producer and wbrf_supported_consumer can be drop=
+ped.
+We made some prototypes and even performed some tests which showed technica=
+lly it is absolutely practicable.
 
-@@ -771,7 +771,7 @@ void dc_dmub_setup_subvp_dmub_command(struct dc *dc,
-                wm_val_refclk =3D context->bw_ctx.bw.dcn.watermarks.a.cstat=
-e_pstate.pstate_change_ns *
-                                (dc->res_pool->ref_clocks.dchub_ref_clock_i=
-nKhz / 1000) / 1000;
+However, we found several issues with that.
+- The overhead caused by the extra _producer/_consumer check on every calli=
+ng of wbrf_add/remove/retrieve_ecxclusion.
+  Especially when you consider there might be multiple producers and consum=
+ers in the system at the same time. And some of
+  them might do in-use band/frequency switching frequently.
+- Some extra costs caused by the "know it only at the last minute". For exa=
+mple, to support WBRF, amdgpu driver needs some preparations: install the n=
+otification hander,
+  setup the delay workqueue(to handle possible events flooding) and even no=
+tify firmware engine to be ready. However, only on the 1st notification rec=
+eiving,
+  it is realized(reported by wbrf_supported_consumer check) the WBRF featur=
+e is actually not supported. All those extra costs can be actually avoided =
+if we can know the WBRF is not supported at first.
+  This could happen to other consumers and producers too.
 
--               cmd.fw_assisted_mclk_switch_v2.config_data.watermark_a_cach=
-e =3D wm_val_refclk < 0xFFFF ? wm_val_refclk : 0xFFFF;
-+               cmd.fw_assisted_mclk_switch_v2.config_data.watermark_a_cach=
-e =3D min(wm_val_refclk, 0xFFFF);
-        }
+After a careful consideration, we think the changes do not benefit us much.=
+ It does not deserve us to spend extra efforts.
+Thus we would like to stick with original implementations. That is to have =
+wbrf_supported_producer and wbrf_supported_consumer interfaces exposed.
+Then other drivers/subsystems can do necessary wbrf support check in advanc=
+e and coordinate their actions accordingly.
+Please let us know your thoughts.
 
-        dm_execute_dmub_cmd(dc->ctx, &cmd, DM_DMUB_WAIT_TYPE_WAIT);
-diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
-index 9b3721424e71..5bb7da885f00 100644
---- a/drivers/net/virtio_net.c
-+++ b/drivers/net/virtio_net.c
-@@ -22,6 +22,7 @@
- #include <net/route.h>
- #include <net/xdp.h>
- #include <net/net_failover.h>
-+#include <linux/minmax.h>
+BR,
+Evan
+> -----Original Message-----
+> From: Andrew Lunn <andrew@lunn.ch>
+> Sent: Tuesday, July 4, 2023 9:07 PM
+> To: Quan, Evan <Evan.Quan@amd.com>
+> Cc: rafael@kernel.org; lenb@kernel.org; Deucher, Alexander
+> <Alexander.Deucher@amd.com>; Koenig, Christian
+> <Christian.Koenig@amd.com>; Pan, Xinhui <Xinhui.Pan@amd.com>;
+> airlied@gmail.com; daniel@ffwll.ch; johannes@sipsolutions.net;
+> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
+> pabeni@redhat.com; Limonciello, Mario <Mario.Limonciello@amd.com>;
+> mdaenzer@redhat.com; maarten.lankhorst@linux.intel.com;
+> tzimmermann@suse.de; hdegoede@redhat.com; jingyuwang_vip@163.com;
+> Lazar, Lijo <Lijo.Lazar@amd.com>; jim.cromie@gmail.com;
+> bellosilicio@gmail.com; andrealmeid@igalia.com; trix@redhat.com;
+> jsg@jsg.id.au; arnd@arndb.de; linux-kernel@vger.kernel.org; linux-
+> acpi@vger.kernel.org; amd-gfx@lists.freedesktop.org; dri-
+> devel@lists.freedesktop.org; linux-wireless@vger.kernel.org;
+> netdev@vger.kernel.org
+> Subject: Re: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
+> mitigations
+>
+> > > What is the purpose of this stage? Why would it not be supported for
+> > > this device?
+> > This is needed for wbrf support via ACPI mechanism. If BIOS(AML code)
+> > does not support the wbrf adding/removing for some device, it should
+> speak that out so that the device can be aware of that.
+>
+> How much overhead is this adding? How deep do you need to go to find the
+> BIOS does not support it? And how often is this called?
+>
+> Where do we want to add complexity? In the generic API? Or maybe a little
+> deeper in the ACPI specific code?
+>
+>        Andrew
 
- static int napi_weight =3D NAPI_POLL_WEIGHT;
- module_param(napi_weight, int, 0444);
-@@ -1291,7 +1292,7 @@ static struct sk_buff *build_skb_from_xdp_buff(struct=
- net_device *dev,
-        __skb_put(skb, data_len);
-
-        metasize =3D xdp->data - xdp->data_meta;
--       metasize =3D metasize > 0 ? metasize : 0;
-+       metasize =3D max(metasize, 0);
-        if (metasize)
-                skb_metadata_set(skb, metasize);
-
-diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
-index e8096d502a7c..875ca657227d 100644
---- a/io_uring/io_uring.c
-+++ b/io_uring/io_uring.c
-@@ -47,6 +47,7 @@
- #include <linux/refcount.h>
- #include <linux/uio.h>
- #include <linux/bits.h>
-+#include <linux/minmax.h>
-
- #include <linux/sched/signal.h>
- #include <linux/fs.h>
-@@ -2660,7 +2661,7 @@ static void *__io_uaddr_map(struct page ***pages, uns=
-igned short *npages,
-                                        page_array);
-        if (ret !=3D nr_pages) {
- err:
--               io_pages_free(&page_array, ret > 0 ? ret : 0);
-+               io_pages_free(&page_array, max(ret, 0));
-                return ret < 0 ? ERR_PTR(ret) : ERR_PTR(-EFAULT);
-        }
-        /*
---
-2.35.3
-
-
-________________________________
-=E6=9C=AC=E9=82=AE=E4=BB=B6=E5=8F=8A=E5=85=B6=E9=99=84=E4=BB=B6=E5=86=85=E5=
-=AE=B9=E5=8F=AF=E8=83=BD=E5=90=AB=E6=9C=89=E6=9C=BA=E5=AF=86=E5=92=8C/=E6=
-=88=96=E9=9A=90=E7=A7=81=E4=BF=A1=E6=81=AF=EF=BC=8C=E4=BB=85=E4=BE=9B=E6=8C=
-=87=E5=AE=9A=E4=B8=AA=E4=BA=BA=E6=88=96=E6=9C=BA=E6=9E=84=E4=BD=BF=E7=94=A8=
-=E3=80=82=E8=8B=A5=E6=82=A8=E9=9D=9E=E5=8F=91=E4=BB=B6=E4=BA=BA=E6=8C=87=E5=
-=AE=9A=E6=94=B6=E4=BB=B6=E4=BA=BA=E6=88=96=E5=85=B6=E4=BB=A3=E7=90=86=E4=BA=
-=BA=EF=BC=8C=E8=AF=B7=E5=8B=BF=E4=BD=BF=E7=94=A8=E3=80=81=E4=BC=A0=E6=92=AD=
-=E3=80=81=E5=A4=8D=E5=88=B6=E6=88=96=E5=AD=98=E5=82=A8=E6=AD=A4=E9=82=AE=E4=
-=BB=B6=E4=B9=8B=E4=BB=BB=E4=BD=95=E5=86=85=E5=AE=B9=E6=88=96=E5=85=B6=E9=99=
-=84=E4=BB=B6=E3=80=82=E5=A6=82=E6=82=A8=E8=AF=AF=E6=94=B6=E6=9C=AC=E9=82=AE=
-=E4=BB=B6=EF=BC=8C=E8=AF=B7=E5=8D=B3=E4=BB=A5=E5=9B=9E=E5=A4=8D=E6=88=96=E7=
-=94=B5=E8=AF=9D=E6=96=B9=E5=BC=8F=E9=80=9A=E7=9F=A5=E5=8F=91=E4=BB=B6=E4=BA=
-=BA=EF=BC=8C=E5=B9=B6=E5=B0=86=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6=E3=80=81=
-=E9=99=84=E4=BB=B6=E5=8F=8A=E5=85=B6=E6=89=80=E6=9C=89=E5=A4=8D=E6=9C=AC=E5=
-=88=A0=E9=99=A4=E3=80=82=E8=B0=A2=E8=B0=A2=E3=80=82
-The contents of this message and any attachments may contain confidential a=
-nd/or privileged information and are intended exclusively for the addressee=
-(s). If you are not the intended recipient of this message or their agent, =
-please note that any use, dissemination, copying, or storage of this messag=
-e or its attachments is not allowed. If you receive this message in error, =
-please notify the sender by reply the message or phone and delete this mess=
-age, any attachments and any copies immediately.
-Thank you
 
