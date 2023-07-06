@@ -1,78 +1,78 @@
-Return-Path: <netdev+bounces-15874-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15876-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8420474A353
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:43:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3C1F674A363
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 19:46:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 352712813CC
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:43:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 234511C20D37
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 17:46:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 640C6BE64;
-	Thu,  6 Jul 2023 17:43:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 20690BE67;
+	Thu,  6 Jul 2023 17:46:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 55C839460
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:43:24 +0000 (UTC)
-Received: from mail-pg1-x549.google.com (mail-pg1-x549.google.com [IPv6:2607:f8b0:4864:20::549])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2B47E10F5
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:43:23 -0700 (PDT)
-Received: by mail-pg1-x549.google.com with SMTP id 41be03b00d2f7-55bbb6f6219so1104005a12.1
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 10:43:23 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 12DA08F40
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 17:46:30 +0000 (UTC)
+Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A1F3610C
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 10:46:29 -0700 (PDT)
+Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b89712d613so10377205ad.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 10:46:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688665402; x=1691257402;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=1d4dS5X4mOcUFqaYDlBqbPGHvZ0D/b2hFGAQQIE5nj4=;
-        b=qBMQrikKzv0sgqQtu4U3ru5ROt77wCDN7HJEZJa19Gr7iEbUYlkyaTDviExKB0UHdJ
-         o8SZrncT/4Uh/QZofWLym0VhhIvwk7iCm0OHZzjGgIptK/+C16IrLhqmdpR608pOjO2s
-         imRyIHcisSWW9tFuIX84DCMAm+bfe2wY6XfvMUw9DJPCor8GkdDjvnxDg1faT2FoozqQ
-         duvBAwgcF6O0mdLk4YsKJz7rvXsg+t3pDveBxFZKHpnX1HH4gKlX9ASkX3wOBzj5YI+1
-         dWsFKjNR59WvizNN48l3ImzUobgQu/31P0lObaK219TvUeVWuQ69zLBm7oRu/0T/NXZc
-         bv8g==
+        d=google.com; s=20221208; t=1688665589; x=1691257589;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=iYwswXlV1/1qc1QMb8XdbUm0VHdqMuEGHLDmXeCI7tw=;
+        b=JADhELCXVgoD7i7cWTwhQRh73F5YhFYDBv94oM/8VxQQoeG0PhxyPIPeAt5smzYLDQ
+         2VFXs6FDTv58B0PombJgnTJb6SyHVgNKljVNLKJw3EBZa3IM+rDpks3+Z8C/xYtcpoxb
+         LbU/vFpSAvnQ+5Dl4V1lvy11cPRh6gO9C/KaYNRuo5YkMRA5ChZ+B6QR3eNwDAJNHhEv
+         28/VzsSQuyF3hQ7p9xa/+eE3S/Swa0foXq4eOKi4DtfGVPSsoyFlkW+OKOkQEV9Hjwha
+         r2lQN4ScFg+aAQmNbKsoXLuiVXMfbKyZj9wiemASlejBWpa5SFm0+xS1wTFJAhLizRvw
+         VrwQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688665402; x=1691257402;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=1d4dS5X4mOcUFqaYDlBqbPGHvZ0D/b2hFGAQQIE5nj4=;
-        b=Cio0XyAYPfADlmig4Ye9sgaABxdU07OUEe3q6mGWGhiwEo84EW6M4nn8Uz5wnFzzZl
-         sVdveb1TIgk9nBPV6omuacQy0Q1zUqIkZ5/Pv2aY23wVIN6rFDqnfGS6iY6A+aCQMEH/
-         V+VhC55GkPRIevpqTmFSdDrRmLUdbVEeYBBX4+1NxnH7yw0rezgfbB0M+2HrYnX/fDog
-         BX5P+78QvpsN7Wx1fL6gqYG7Zxp/ORl4AzPXeVDudOjeupcLdDNYxcqw6Qamds5XxMXY
-         RGZEQI+SmLJoBfyZVbvd8pSx78JROQlTzlE6YZ0Xlzo3ryisgMTucnuzddG4+beofkov
-         8ydQ==
-X-Gm-Message-State: ABy/qLaFBQo//fMTMxE5S+fA+iJutWf2zZ2VCy5S3+qr30hvqi/olI/u
-	4gjzYqu+QXF9I75MvK9DSl4oKkU=
-X-Google-Smtp-Source: APBJJlGkIfRcijMErYmInxuXIeVJi6aEOdV8m3eTn5zkrPOLieSc1smcx8jcixd6s751dvsotnCJYF0=
+        d=1e100.net; s=20221208; t=1688665589; x=1691257589;
+        h=content-transfer-encoding:cc:to:from:subject:message-id:references
+         :mime-version:in-reply-to:date:x-gm-message-state:from:to:cc:subject
+         :date:message-id:reply-to;
+        bh=iYwswXlV1/1qc1QMb8XdbUm0VHdqMuEGHLDmXeCI7tw=;
+        b=VHnHozYsRvJ5JoNr+Cs2d78ncEtfAlZaNtrhIezphUCZ3odJzvlWewjhtHfTepAEtd
+         KazHwjMnraAaIdRdTCYyUjVXBEPn7DGf3QXpwENuzA5C5XMEeeiqpxmLFMViXztoJPEC
+         uJrDb4kPL6CCjpBOPrM8y4ICWFycbD2tCdtHlhObaDm1l1oYtqFfGfzzkBFlv6bZ3Cr3
+         4wVmcKtCoU9vr173vpu+9W3dPbV6QQs+gRzIT06ptVEjMYC9EoKhTUtgV+B+an3iZZJd
+         ZMsp0yugrRoH0bQCb10Ot9j+yrJevRS8gSXTcHtTRRgOrvlDokAekJfCabiZPywaJp+F
+         +fFA==
+X-Gm-Message-State: ABy/qLZFd6ciiGDI9qczoAqrMOvsl65duoC6rxkfoINAQS4vbzcDtTvP
+	SCbDMxw/X9kRdsF1JvTu9/RxTv4=
+X-Google-Smtp-Source: APBJJlFpjvWRD+oH7cEr3v6mp6VT3nmUJ2yl68awyDOvDt3JNKrMgENCDlaLreMNh3hWPwDXBQWJuWE=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a63:705e:0:b0:55b:da1f:7e03 with SMTP id
- a30-20020a63705e000000b0055bda1f7e03mr1537469pgn.3.1688665402568; Thu, 06 Jul
- 2023 10:43:22 -0700 (PDT)
-Date: Thu, 6 Jul 2023 10:43:21 -0700
-In-Reply-To: <20230706100243.318109-1-liuxin350@huawei.com>
+ (user=sdf job=sendgmr) by 2002:a17:902:7085:b0:1b7:eecd:9dae with SMTP id
+ z5-20020a170902708500b001b7eecd9daemr1936538plk.9.1688665589079; Thu, 06 Jul
+ 2023 10:46:29 -0700 (PDT)
+Date: Thu, 6 Jul 2023 10:46:27 -0700
+In-Reply-To: <20230706142228.1128452-1-bjorn@kernel.org>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
-References: <20230706100243.318109-1-liuxin350@huawei.com>
-Message-ID: <ZKb9ObvvhOaKXJcp@google.com>
-Subject: Re: [PATCH bpf-next] bpf, sockops: Enhance the return capability of sockops
+References: <20230706142228.1128452-1-bjorn@kernel.org>
+Message-ID: <ZKb986L59CTFITjP@google.com>
+Subject: Re: [PATCH bpf-next] selftests/bpf: Bump and validate MAX_SYMS
 From: Stanislav Fomichev <sdf@google.com>
-To: Xin Liu <liuxin350@huawei.com>
-Cc: daniel@iogearbox.net, andrii@kernel.org, ast@kernel.org, 
-	bpf@vger.kernel.org, davem@davemloft.net, edumazet@google.com, 
-	hsinweih@uci.edu, jakub@cloudflare.com, john.fastabend@gmail.com, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, netdev@vger.kernel.org, 
-	pabeni@redhat.com, syzbot+49f6cef45247ff249498@syzkaller.appspotmail.com, 
-	syzkaller-bugs@googlegroups.com, yanan@huawei.com, wuchangye@huawei.com, 
-	xiesongyang@huawei.com, kongweibin2@huawei.com, zhangmingyi5@huawei.com
+To: "=?utf-8?B?QmrDtnJuIFTDtnBlbA==?=" <bjorn@kernel.org>
+Cc: Andrii Nakryiko <andrii@kernel.org>, Mykola Lysenko <mykolal@fb.com>, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org, "=?utf-8?B?QmrDtnJuIFTDtnBlbA==?=" <bjorn@rivosinc.com>, 
+	Alexei Starovoitov <ast@kernel.org>, Daniel Borkmann <daniel@iogearbox.net>, linux-kselftest@vger.kernel.org, 
+	linux-kernel@vger.kernel.org
 Content-Type: text/plain; charset="utf-8"
+Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
@@ -80,35 +80,54 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 07/06, Xin Liu wrote:
-> Since commit 2585cd62f098 ("bpf: Only reply field should be writeable"),
-> sockops is not allowd to modify the replylong field except replylong[0].
-> The reason is that the replylong[1] to replylong[3] field is not used
-> at that time.
-> 
-> But in actual use, we can call `BPF_CGROUP_RUN_PROG_SOCK_OPS` in the
-> kernel modules and expect sockops to return some useful data.
-> 
-> The design comment about bpf_sock_ops::replylong in 
-> include/uapi/linux/bpf.h is described as follows:
-> 
-> ```
->   struct bpf_sock_ops {
-> 	__u32 op;
-> 	union {
-> 		__u32 args[4];		/* Optionally passed to bpf program */
-> 		__u32 reply;		/* Returned by bpf program	    */
-> 		__u32 replylong[4];	/* Optioznally returned by bpf prog  */
-> 	};
->   ...
-> ```
-> 
-> It seems to contradict the purpose for which the field was originally
-> designed. Let's remove this restriction.
-> 
-> Fixes: 2585cd62f098 ("bpf: Only reply field should be writeable")
+On 07/06, Bj=C3=B6rn T=C3=B6pel wrote:
+> From: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
+>=20
+> BPF tests that load /proc/kallsyms, e.g. bpf_cookie, will perform a
+> buffer overrun if the number of syms on the system is larger than
+> MAX_SYMS.
+>=20
+> Bump the MAX_SYMS to 400000, and add a runtime check that bails out if
+> the maximum is reached.
+>=20
+> Signed-off-by: Bj=C3=B6rn T=C3=B6pel <bjorn@rivosinc.com>
 
-The commit you reference explicitly says that there is no reason to allow
-replylong[1..3] because there is no use for them. Has something changed
-since it was added? Any reason to expose those fields?
+Acked-by: Stanislav Fomichev <sdf@google.com>
+
+OTOH, should be easy to convert this to malloc/realloc? That should fix
+it once and for all and avoid future need to bump the limit?
+
+> ---
+>  tools/testing/selftests/bpf/trace_helpers.c | 5 ++++-
+>  1 file changed, 4 insertions(+), 1 deletion(-)
+>=20
+> diff --git a/tools/testing/selftests/bpf/trace_helpers.c b/tools/testing/=
+selftests/bpf/trace_helpers.c
+> index 9b070cdf44ac..f83d9f65c65b 100644
+> --- a/tools/testing/selftests/bpf/trace_helpers.c
+> +++ b/tools/testing/selftests/bpf/trace_helpers.c
+> @@ -18,7 +18,7 @@
+>  #define TRACEFS_PIPE	"/sys/kernel/tracing/trace_pipe"
+>  #define DEBUGFS_PIPE	"/sys/kernel/debug/tracing/trace_pipe"
+> =20
+> -#define MAX_SYMS 300000
+> +#define MAX_SYMS 400000
+>  static struct ksym syms[MAX_SYMS];
+>  static int sym_cnt;
+> =20
+> @@ -46,6 +46,9 @@ int load_kallsyms_refresh(void)
+>  			break;
+>  		if (!addr)
+>  			continue;
+> +		if (i >=3D MAX_SYMS)
+> +			return -EFBIG;
+> +
+>  		syms[i].addr =3D (long) addr;
+>  		syms[i].name =3D strdup(func);
+>  		i++;
+>=20
+> base-commit: fd283ab196a867f8f65f36913e0fadd031fcb823
+> --=20
+> 2.39.2
+>=20
 
