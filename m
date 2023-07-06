@@ -1,255 +1,226 @@
-Return-Path: <netdev+bounces-15804-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15805-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 82E9B749E51
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 15:57:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id F3F83749E54
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 15:58:42 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id AFBF51C20D94
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 13:57:47 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DC79B1C20D91
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 13:58:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5E819454;
-	Thu,  6 Jul 2023 13:57:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F07C09456;
+	Thu,  6 Jul 2023 13:58:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 990E19440
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 13:57:45 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E6F9719A0
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 06:57:41 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688651861;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l2/hSy5ZM7Wjruypisau1DYXSkpwtmVU+hr94w/HV64=;
-	b=SCqDpwrJ6BShu+8qAv05xH1fc48dH7jA9Ys80T0smDa4+7clpUqtyO4hvjx9xIB04KQOgY
-	gpo0v4YKx33q0U7UP+kVR+u4YcMHmK2d7/EKg+wsQInTnLUTwAA0pAR+LulQ4w5srm9rgy
-	HU21L0rRMSOJMgE0nI1zedAs2IqcinI=
-Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
- [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- us-mta-456-ojAsLhDvONOluPIdONoTdQ-1; Thu, 06 Jul 2023 09:57:36 -0400
-X-MC-Unique: ojAsLhDvONOluPIdONoTdQ-1
-Received: from smtp.corp.redhat.com (int-mx10.intmail.prod.int.rdu2.redhat.com [10.11.54.10])
-	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
-	(No client certificate requested)
-	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 06682800C7F;
-	Thu,  6 Jul 2023 13:57:36 +0000 (UTC)
-Received: from localhost (unknown [10.22.17.2])
-	by smtp.corp.redhat.com (Postfix) with ESMTP id C1656492C13;
-	Thu,  6 Jul 2023 13:57:35 +0000 (UTC)
-Date: Thu, 6 Jul 2023 09:57:34 -0400
-From: Eric Garver <eric@garver.life>
-To: Aaron Conole <aconole@redhat.com>
-Cc: netdev@vger.kernel.org, dev@openvswitch.org,
-	Ilya Maximets <i.maximets@ovn.org>
-Subject: Re: [ovs-dev] [PATCH net-next 2/2] net: openvswitch: add drop action
-Message-ID: <ZKbITj-FWGqRkwtr@egarver-thinkpadt14sgen1.remote.csb>
-Mail-Followup-To: Eric Garver <eric@garver.life>,
-	Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
-	dev@openvswitch.org, Ilya Maximets <i.maximets@ovn.org>
-References: <20230629203005.2137107-1-eric@garver.life>
- <20230629203005.2137107-3-eric@garver.life>
- <f7tr0plgpzb.fsf@redhat.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF12F15CE
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 13:58:39 +0000 (UTC)
+Received: from mail-oi1-x22b.google.com (mail-oi1-x22b.google.com [IPv6:2607:f8b0:4864:20::22b])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5F51219A0;
+	Thu,  6 Jul 2023 06:58:38 -0700 (PDT)
+Received: by mail-oi1-x22b.google.com with SMTP id 5614622812f47-3a3b7fafd61so751370b6e.2;
+        Thu, 06 Jul 2023 06:58:38 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688651917; x=1691243917;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=5Hp8tU9cWu6R6f3sn+8A1XNNoAmV3ki5dbuL76Q7q/g=;
+        b=jW8fZyoU3DO00/VknLBRC1h6kBMu8XI1LsUcKUKbG7uS5K1zHOZBpp0CDxgpvDTFKw
+         +5FkbPG7Q9BwXmE1ZYHxTwB7BM4JadMfceYFtCn07I0gnGEOHbDw3Y4g3euxTJn17A6G
+         NmkXaQsNHQ20wcd9dWE9ayH70yxcuwfl3TonKln0gWcCqgO3A7voL187FesbmfRYIg1b
+         WIQvbCmy5b2Lo2HrqAjcbhWboCl225wSoQ+oL8U5+yMAKgb5dagv5oGgo7zCR0T9aWKy
+         jRrdwXUITSOIUq9BgJvgnuKEX8bW1agbSp6/6Og0vPnJD79JI5iigu9n5yVyvcg3sRv9
+         BPOA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688651917; x=1691243917;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=5Hp8tU9cWu6R6f3sn+8A1XNNoAmV3ki5dbuL76Q7q/g=;
+        b=WwJlLRH4b5DOpdnarwMiQki5B5/LlfdLLhIeHYQ+vFmqOUV/cVwI+4OLssoyUT8x3S
+         B2i0SJ/qGAGpC39641l8t+Tb399ZYXSpIVON1h8Bnct3cYcac9+AvybeoUi+nt9PSV4h
+         l8NRsnVtaK/sy08ry6VoGOaHV3UqmYLwdl3M16cT3AGdI9Ga12+GXlCqJTYXZ3AoXMb5
+         w8ygIOiUjvuf78GxZ4oBcI2ch/OcJOoQPBr6z2Y93oO63Jr22he8b0oE0Ls+/c9ZeK+R
+         8iPDEKKoXKIMM0wYHVTxp9VhY+uWXOwH5bTZJV+G9H4ykbQzAIrkLFqgWaDYlgCKIFm6
+         8zMQ==
+X-Gm-Message-State: ABy/qLb8Wgcx/s7ckV/YbdyxSZinxaMaIOjRHNdsQ1lEtLKJZMue3YQh
+	nHdD29JAD7um9hYRI1qFKa4yjHNE67+YlswDfGo=
+X-Google-Smtp-Source: APBJJlHwWrHIAzdFBa636bFDMNRZF9RFGE1HyH/tDHgJxsmdjuaeJ2kJEJRRwYbbDY70pb0vxaKHA7rj0kFXbVJUIRU=
+X-Received: by 2002:a05:6808:1d6:b0:3a0:4dc3:25ff with SMTP id
+ x22-20020a05680801d600b003a04dc325ffmr2199089oic.7.1688651917567; Thu, 06 Jul
+ 2023 06:58:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <f7tr0plgpzb.fsf@redhat.com>
-X-Scanned-By: MIMEDefang 3.1 on 10.11.54.10
-X-Spam-Status: No, score=-1.5 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_EF,FROM_SUSPICIOUS_NTLD,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,
-	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+References: <20230706021102.2066-1-yangrong@vivo.com>
+In-Reply-To: <20230706021102.2066-1-yangrong@vivo.com>
+From: Alex Deucher <alexdeucher@gmail.com>
+Date: Thu, 6 Jul 2023 09:58:26 -0400
+Message-ID: <CADnq5_MSkJf=-QMPYNQp03=6mbb+OEHnPFW0=WKiS0VMc6ricQ@mail.gmail.com>
+Subject: Re: [PATCH] Fix max/min warnings in virtio_net, amd/display, and io_uring
+To: Yang Rong <yangrong@vivo.com>
+Cc: Harry Wentland <harry.wentland@amd.com>, Leo Li <sunpeng.li@amd.com>, 
+	Rodrigo Siqueira <Rodrigo.Siqueira@amd.com>, Alex Deucher <alexander.deucher@amd.com>, 
+	=?UTF-8?Q?Christian_K=C3=B6nig?= <christian.koenig@amd.com>, 
+	"Pan, Xinhui" <Xinhui.Pan@amd.com>, David Airlie <airlied@gmail.com>, Daniel Vetter <daniel@ffwll.ch>, 
+	"Michael S. Tsirkin" <mst@redhat.com>, Jason Wang <jasowang@redhat.com>, 
+	Xuan Zhuo <xuanzhuo@linux.alibaba.com>, "David S. Miller" <davem@davemloft.net>, 
+	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>, 
+	Jens Axboe <axboe@kernel.dk>, Pavel Begunkov <asml.silence@gmail.com>, Alvin Lee <Alvin.Lee2@amd.com>, 
+	Jun Lei <Jun.Lei@amd.com>, Qingqing Zhuo <qingqing.zhuo@amd.com>, Max Tseng <Max.Tseng@amd.com>, 
+	Josip Pavic <Josip.Pavic@amd.com>, Cruise Hung <cruise.hung@amd.com>, 
+	"open list:AMD DISPLAY CORE" <amd-gfx@lists.freedesktop.org>, 
+	"open list:DRM DRIVERS" <dri-devel@lists.freedesktop.org>, open list <linux-kernel@vger.kernel.org>, 
+	"open list:VIRTIO CORE AND NET DRIVERS" <virtualization@lists.linux-foundation.org>, 
+	"open list:NETWORKING DRIVERS" <netdev@vger.kernel.org>, "open list:IO_URING" <io-uring@vger.kernel.org>, 
+	opensource.kernel@vivo.com, luhongfei@vivo.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 06, 2023 at 08:54:16AM -0400, Aaron Conole wrote:
-> Eric Garver <eric@garver.life> writes:
-> 
-> > This adds an explicit drop action. This is used by OVS to drop packets
-> > for which it cannot determine what to do. An explicit action in the
-> > kernel allows passing the reason _why_ the packet is being dropped. We
-> > can then use perf tracing to match on the drop reason.
-> >
-> > e.g. trace all OVS dropped skbs
-> >
-> >  # perf trace -e skb:kfree_skb --filter="reason >= 0x30000"
-> >  [..]
-> >  106.023 ping/2465 skb:kfree_skb(skbaddr: 0xffffa0e8765f2000, \
-> >   location:0xffffffffc0d9b462, protocol: 2048, reason: 196610)
-> >
-> > reason: 196610 --> 0x30002 (OVS_XLATE_RECURSION_TOO_DEEP)
-> >
-> > Signed-off-by: Eric Garver <eric@garver.life>
-> > ---
-> >  include/uapi/linux/openvswitch.h                    |  2 ++
-> >  net/openvswitch/actions.c                           | 13 +++++++++++++
-> >  net/openvswitch/flow_netlink.c                      | 12 +++++++++++-
-> >  .../testing/selftests/net/openvswitch/ovs-dpctl.py  |  3 +++
-> >  4 files changed, 29 insertions(+), 1 deletion(-)
-> >
-> > diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
-> > index e94870e77ee9..a967dbca3574 100644
-> > --- a/include/uapi/linux/openvswitch.h
-> > +++ b/include/uapi/linux/openvswitch.h
-> > @@ -965,6 +965,7 @@ struct check_pkt_len_arg {
-> >   * start of the packet or at the start of the l3 header depending on the value
-> >   * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
-> >   * argument.
-> > + * @OVS_ACTION_ATTR_DROP: Explicit drop action.
-> >   *
-> >   * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  Not all
-> >   * fields within a header are modifiable, e.g. the IPv4 protocol and fragment
-> > @@ -1002,6 +1003,7 @@ enum ovs_action_attr {
-> >  	OVS_ACTION_ATTR_CHECK_PKT_LEN, /* Nested OVS_CHECK_PKT_LEN_ATTR_*. */
-> >  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
-> >  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
-> > +	OVS_ACTION_ATTR_DROP,         /* u32 xlate_error. */
-> >  
-> >  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
-> >  				       * from userspace. */
-> > diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
-> > index cab1e02b63e0..4ad9a45dc042 100644
-> > --- a/net/openvswitch/actions.c
-> > +++ b/net/openvswitch/actions.c
-> > @@ -32,6 +32,7 @@
-> >  #include "vport.h"
-> >  #include "flow_netlink.h"
-> >  #include "openvswitch_trace.h"
-> > +#include "drop.h"
-> >  
-> >  struct deferred_action {
-> >  	struct sk_buff *skb;
-> > @@ -1477,6 +1478,18 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
-> >  				return dec_ttl_exception_handler(dp, skb,
-> >  								 key, a);
-> >  			break;
-> > +
-> > +		case OVS_ACTION_ATTR_DROP:
-> > +			u32 reason = nla_get_u32(a);
-> > +
-> > +			reason |= SKB_DROP_REASON_SUBSYS_OPENVSWITCH <<
-> > +					SKB_DROP_REASON_SUBSYS_SHIFT;
-> > +
-> > +			if (reason == OVS_XLATE_OK)
-> > +				break;
-> > +
-> > +			kfree_skb_reason(skb, reason);
-> > +			return 0;
-> >  		}
-> >  
-> >  		if (unlikely(err)) {
-> > diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
-> > index 41116361433d..23d39eae9a0d 100644
-> > --- a/net/openvswitch/flow_netlink.c
-> > +++ b/net/openvswitch/flow_netlink.c
-> > @@ -39,6 +39,7 @@
-> >  #include <net/erspan.h>
-> >  
-> >  #include "flow_netlink.h"
-> > +#include "drop.h"
-> >  
-> >  struct ovs_len_tbl {
-> >  	int len;
-> > @@ -61,6 +62,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
-> >  		case OVS_ACTION_ATTR_RECIRC:
-> >  		case OVS_ACTION_ATTR_TRUNC:
-> >  		case OVS_ACTION_ATTR_USERSPACE:
-> > +		case OVS_ACTION_ATTR_DROP:
-> >  			break;
-> >  
-> >  		case OVS_ACTION_ATTR_CT:
-> > @@ -2394,7 +2396,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
-> >  	/* Whenever new actions are added, the need to update this
-> >  	 * function should be considered.
-> >  	 */
-> > -	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 23);
-> > +	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
-> >  
-> >  	if (!actions)
-> >  		return;
-> > @@ -3182,6 +3184,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
-> >  			[OVS_ACTION_ATTR_CHECK_PKT_LEN] = (u32)-1,
-> >  			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
-> >  			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
-> > +			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
-> >  		};
-> >  		const struct ovs_action_push_vlan *vlan;
-> >  		int type = nla_type(a);
-> > @@ -3453,6 +3456,13 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
-> >  			skip_copy = true;
-> >  			break;
-> >  
-> > +		case OVS_ACTION_ATTR_DROP:
-> > +			if (nla_get_u32(a) >=
-> > +			    u32_get_bits(OVS_XLATE_MAX,
-> > +					 ~SKB_DROP_REASON_SUBSYS_MASK))
-> > +				return -EINVAL;
-> > +			break;
-> > +
-> 
-> If there's a case where the userspace sends a drop reason that isn't
-> known to the kernel, we will reject the flow, and the only "close" drop
-> will be OVS_XLATE_OK, which would be wrong.  Is there a reason to do
-> this?  For example, userspace might get new support for some kind of
-> flows and during that time might have a new xlate drop reason.  Maybe we
-> can have a reason code that OVS knows will exist, so that if this fails,
-> it can at least fall back to that?
+On Thu, Jul 6, 2023 at 3:37=E2=80=AFAM Yang Rong <yangrong@vivo.com> wrote:
+>
+> The files drivers/net/virtio_net.c, drivers/gpu/drm/amd/display/dc/dc_dmu=
+b_srv.c, and io_uring/io_uring.c were modified to fix warnings.
+> Specifically, the opportunities for max() and min() were utilized to addr=
+ess the warnings.
 
-You're correct. It will reject the flow.
+Please split this into 3 patches, one for each component.
 
-Maybe we clamp the value to OVS_XLATE_MAX if it's unknown. That makes
-the skb drop reason less helpful, but no less helpful than today ;). At
-least we won't reject the flow.
+Alex
 
-We could alias OVS_XLATE_MAX to OVS_XLATE_UNKNOWN. I prefer an explicit
-value for OVS_XLATE_UNKNOWN, e.g. (u16)-1.
-
-> >  		default:
-> >  			OVS_NLERR(log, "Unknown Action type %d", type);
-> >  			return -EINVAL;
-> > diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> > index 1c8b36bc15d4..526ebad7d514 100644
-> > --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> > +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
-> > @@ -115,6 +115,7 @@ class ovsactions(nla):
-> >          ("OVS_ACTION_ATTR_CHECK_PKT_LEN", "none"),
-> >          ("OVS_ACTION_ATTR_ADD_MPLS", "none"),
-> >          ("OVS_ACTION_ATTR_DEC_TTL", "none"),
-> > +        ("OVS_ACTION_ATTR_DROP", "uint32"),
-> >      )
-> >  
-> >      class ctact(nla):
-> > @@ -261,6 +262,8 @@ class ovsactions(nla):
-> >                      print_str += "recirc(0x%x)" % int(self.get_attr(field[0]))
-> >                  elif field[0] == "OVS_ACTION_ATTR_TRUNC":
-> >                      print_str += "trunc(%d)" % int(self.get_attr(field[0]))
-> > +                elif field[0] == "OVS_ACTION_ATTR_DROP":
-> > +                    print_str += "drop"
-> 
-> Can we also include the reason here?
-
-It could. This mimics dpctl output, which does currently not include the
-reason. So I went with parity.
-
-I have proposed adding the reason to all dpctl "drop" output, but was
-planning on that being a follow up to this work.
-
-> >              elif field[1] == "flag":
-> >                  if field[0] == "OVS_ACTION_ATTR_CT_CLEAR":
-> >                      print_str += "ct_clear"
-> 
-> 
-
+>
+> Signed-off-by: Yang Rong <yangrong@vivo.com>
+> ---
+>  drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c | 6 +++---
+>  drivers/net/virtio_net.c                     | 3 ++-
+>  io_uring/io_uring.c                          | 3 ++-
+>  3 files changed, 7 insertions(+), 5 deletions(-)
+>
+> diff --git a/drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c b/drivers/gpu/d=
+rm/amd/display/dc/dc_dmub_srv.c
+> index c753c6f30dd7..df79aea49a3c 100644
+> --- a/drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c
+> +++ b/drivers/gpu/drm/amd/display/dc/dc_dmub_srv.c
+> @@ -22,7 +22,7 @@
+>   * Authors: AMD
+>   *
+>   */
+> -
+> +#include <linux/minmax.h>
+>  #include "dc.h"
+>  #include "dc_dmub_srv.h"
+>  #include "../dmub/dmub_srv.h"
+> @@ -481,7 +481,7 @@ static void populate_subvp_cmd_drr_info(struct dc *dc=
+,
+>         max_drr_vblank_us =3D div64_u64((subvp_active_us - prefetch_us -
+>                         dc->caps.subvp_fw_processing_delay_us - drr_activ=
+e_us), 2) + drr_active_us;
+>         max_drr_mallregion_us =3D subvp_active_us - prefetch_us - mall_re=
+gion_us - dc->caps.subvp_fw_processing_delay_us;
+> -       max_drr_supported_us =3D max_drr_vblank_us > max_drr_mallregion_u=
+s ? max_drr_vblank_us : max_drr_mallregion_us;
+> +       max_drr_supported_us =3D max(max_drr_vblank_us, max_drr_mallregio=
+n_us);
+>         max_vtotal_supported =3D div64_u64(((uint64_t)drr_timing->pix_clk=
+_100hz * 100 * max_drr_supported_us),
+>                         (((uint64_t)drr_timing->h_total * 1000000)));
+>
+> @@ -771,7 +771,7 @@ void dc_dmub_setup_subvp_dmub_command(struct dc *dc,
+>                 wm_val_refclk =3D context->bw_ctx.bw.dcn.watermarks.a.cst=
+ate_pstate.pstate_change_ns *
+>                                 (dc->res_pool->ref_clocks.dchub_ref_clock=
+_inKhz / 1000) / 1000;
+>
+> -               cmd.fw_assisted_mclk_switch_v2.config_data.watermark_a_ca=
+che =3D wm_val_refclk < 0xFFFF ? wm_val_refclk : 0xFFFF;
+> +               cmd.fw_assisted_mclk_switch_v2.config_data.watermark_a_ca=
+che =3D min(wm_val_refclk, 0xFFFF);
+>         }
+>
+>         dm_execute_dmub_cmd(dc->ctx, &cmd, DM_DMUB_WAIT_TYPE_WAIT);
+> diff --git a/drivers/net/virtio_net.c b/drivers/net/virtio_net.c
+> index 9b3721424e71..5bb7da885f00 100644
+> --- a/drivers/net/virtio_net.c
+> +++ b/drivers/net/virtio_net.c
+> @@ -22,6 +22,7 @@
+>  #include <net/route.h>
+>  #include <net/xdp.h>
+>  #include <net/net_failover.h>
+> +#include <linux/minmax.h>
+>
+>  static int napi_weight =3D NAPI_POLL_WEIGHT;
+>  module_param(napi_weight, int, 0444);
+> @@ -1291,7 +1292,7 @@ static struct sk_buff *build_skb_from_xdp_buff(stru=
+ct net_device *dev,
+>         __skb_put(skb, data_len);
+>
+>         metasize =3D xdp->data - xdp->data_meta;
+> -       metasize =3D metasize > 0 ? metasize : 0;
+> +       metasize =3D max(metasize, 0);
+>         if (metasize)
+>                 skb_metadata_set(skb, metasize);
+>
+> diff --git a/io_uring/io_uring.c b/io_uring/io_uring.c
+> index e8096d502a7c..875ca657227d 100644
+> --- a/io_uring/io_uring.c
+> +++ b/io_uring/io_uring.c
+> @@ -47,6 +47,7 @@
+>  #include <linux/refcount.h>
+>  #include <linux/uio.h>
+>  #include <linux/bits.h>
+> +#include <linux/minmax.h>
+>
+>  #include <linux/sched/signal.h>
+>  #include <linux/fs.h>
+> @@ -2660,7 +2661,7 @@ static void *__io_uaddr_map(struct page ***pages, u=
+nsigned short *npages,
+>                                         page_array);
+>         if (ret !=3D nr_pages) {
+>  err:
+> -               io_pages_free(&page_array, ret > 0 ? ret : 0);
+> +               io_pages_free(&page_array, max(ret, 0));
+>                 return ret < 0 ? ERR_PTR(ret) : ERR_PTR(-EFAULT);
+>         }
+>         /*
+> --
+> 2.35.3
+>
+>
+> ________________________________
+> =E6=9C=AC=E9=82=AE=E4=BB=B6=E5=8F=8A=E5=85=B6=E9=99=84=E4=BB=B6=E5=86=85=
+=E5=AE=B9=E5=8F=AF=E8=83=BD=E5=90=AB=E6=9C=89=E6=9C=BA=E5=AF=86=E5=92=8C/=
+=E6=88=96=E9=9A=90=E7=A7=81=E4=BF=A1=E6=81=AF=EF=BC=8C=E4=BB=85=E4=BE=9B=E6=
+=8C=87=E5=AE=9A=E4=B8=AA=E4=BA=BA=E6=88=96=E6=9C=BA=E6=9E=84=E4=BD=BF=E7=94=
+=A8=E3=80=82=E8=8B=A5=E6=82=A8=E9=9D=9E=E5=8F=91=E4=BB=B6=E4=BA=BA=E6=8C=87=
+=E5=AE=9A=E6=94=B6=E4=BB=B6=E4=BA=BA=E6=88=96=E5=85=B6=E4=BB=A3=E7=90=86=E4=
+=BA=BA=EF=BC=8C=E8=AF=B7=E5=8B=BF=E4=BD=BF=E7=94=A8=E3=80=81=E4=BC=A0=E6=92=
+=AD=E3=80=81=E5=A4=8D=E5=88=B6=E6=88=96=E5=AD=98=E5=82=A8=E6=AD=A4=E9=82=AE=
+=E4=BB=B6=E4=B9=8B=E4=BB=BB=E4=BD=95=E5=86=85=E5=AE=B9=E6=88=96=E5=85=B6=E9=
+=99=84=E4=BB=B6=E3=80=82=E5=A6=82=E6=82=A8=E8=AF=AF=E6=94=B6=E6=9C=AC=E9=82=
+=AE=E4=BB=B6=EF=BC=8C=E8=AF=B7=E5=8D=B3=E4=BB=A5=E5=9B=9E=E5=A4=8D=E6=88=96=
+=E7=94=B5=E8=AF=9D=E6=96=B9=E5=BC=8F=E9=80=9A=E7=9F=A5=E5=8F=91=E4=BB=B6=E4=
+=BA=BA=EF=BC=8C=E5=B9=B6=E5=B0=86=E5=8E=9F=E5=A7=8B=E9=82=AE=E4=BB=B6=E3=80=
+=81=E9=99=84=E4=BB=B6=E5=8F=8A=E5=85=B6=E6=89=80=E6=9C=89=E5=A4=8D=E6=9C=AC=
+=E5=88=A0=E9=99=A4=E3=80=82=E8=B0=A2=E8=B0=A2=E3=80=82
+> The contents of this message and any attachments may contain confidential=
+ and/or privileged information and are intended exclusively for the address=
+ee(s). If you are not the intended recipient of this message or their agent=
+, please note that any use, dissemination, copying, or storage of this mess=
+age or its attachments is not allowed. If you receive this message in error=
+, please notify the sender by reply the message or phone and delete this me=
+ssage, any attachments and any copies immediately.
+> Thank you
 
