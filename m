@@ -1,189 +1,381 @@
-Return-Path: <netdev+bounces-15787-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15788-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 24DCD749BDE
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:34:46 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id CB2D6749C0F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:42:45 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CEE51C20D4E
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:34:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A06A01C20D75
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:42:44 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id E88708BE1;
-	Thu,  6 Jul 2023 12:34:42 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E19758F59;
+	Thu,  6 Jul 2023 12:42:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D594833E2
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 12:34:42 +0000 (UTC)
-Received: from APC01-PSA-obe.outbound.protection.outlook.com (mail-psaapc01on2122.outbound.protection.outlook.com [40.107.255.122])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E30FD171A;
-	Thu,  6 Jul 2023 05:34:37 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1EB513086;
+	Thu,  6 Jul 2023 12:42:39 +0000 (UTC)
+Received: from mga03.intel.com (mga03.intel.com [134.134.136.65])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 98950171D;
+	Thu,  6 Jul 2023 05:42:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688647357; x=1720183357;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=dcqITd1FT/YToV04kKsN6SHpZazkz0zC/GYQ6GRqNM4=;
+  b=kJP0XRxCO50vacazXO45ZAtweSB4XgttpKRUITAkJRNeHz/bEGosyFfU
+   E3Eg1YsHWWBRO4JgHCbbvkpI2hVF4IXbXsXmEorcx6giVLoQWPJbZKy1g
+   8Z3NlzlDft9GLqh9AUzPadfp/+7DjYk7AECeR2Ka/sIMSA150W0QId4Fu
+   aZSCaM6w/1+HML18caBWcrOWk16yoBVkkOdZuxlJ/Gns2JRJBoSfy8s8s
+   lhAVRNWL2tHknlVOlCKPAx6joLrClMk7jzYoPVJOlxCLCsI4kNXA+STaC
+   GgPqhHWoY3pygOZIpGh4Tdm7d49t3VMuc/GPslxXwOAzP5HwWrOxi1nHt
+   A==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="367082196"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="367082196"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by orsmga103.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 05:42:37 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="832926733"
+X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
+   d="scan'208";a="832926733"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga002.fm.intel.com with ESMTP; 06 Jul 2023 05:42:36 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Thu, 6 Jul 2023 05:42:36 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 05:42:36 -0700
+Received: from NAM12-MW2-obe.outbound.protection.outlook.com (104.47.66.43) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Thu, 6 Jul 2023 05:42:35 -0700
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=OWNNStij9pMkm/aaZp+8DzGxDKadqF2T5InKQbIJt+dQLobFt6TRfgWXuNK3tubzGKC2g4HmSEFD4UH3MgEHs3+diEsx4j9nlLwg5MpIDoiY+KYOPywF5lVb8P3js9Z6RCFjGtGr4LKYSZsGAa3pvYjv1Z9Xq5GyPxbRXwcaCMIYy/mvx66CvttMvMlwKb53WwcwccHNONWVIInHvB8PdlEvx+WnThE2DaJttL+V9fmVjcp7qSPIckkaULFBdDoVKcTEFfGMIzL5sVYWNl5oGsTVODZ6c0ZUG2YhG31qBjhk4fsKpFnAqIf8RDj7AmoSswur9Kp3CaL1TzS4Ofn/hg==
+ b=dU/S69rwjEK1doLLi6KmGfIn0Gr+jMNrLunDEZdFZnLvxINbWv2fQYQl9BKVlJhKsrGjGlXjKrFgNcoDuQvYKdiSqTKsULwoSzO1abTpe0gpmuhpK461XSc3h1LvnT78grjQpPPpQcewd4f3LuP+xg51f2fsSIwounEzOUG9q53ak9FV3RsrkCfISddErJuSFGKU/cChBnghAZ/d4Dh/fVpPbnawh+2biyytwS4ATNUdO6S9ycp25h/arxjetlSaAhAmkt2VVJqPQeiY8GJLOV2OkerFIGR6FiHxYXTql83ZSd6GJVkthlAEIskWU6eMbjXlJf7tD4tEy8NsZpxHLQ==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=+AQ4KCCzbG0SLnzvf1guATMrLZGEwKRK9nPIP8cKRd8=;
- b=CHPGtYW8h9mGl7GBJfrTkFgF772gHH7fcBI+xdFoYdEZlKrkIGiYxUE+2MWheL3ed3y30l6cHgclGcwLbbEt/ArzsHCZD23141WbdD6yKBeBvdbOnRnFlxOVhpnbMwtZKJ3lD8/M9iWzxWZNMW7GHmk6F7GhL9MyIpYbWaBh3Fa7QQwHbdjxNKfaCBp/MxIE+lZgabGHANYcCL9Aaj+6MRDO4gxL08C7KvGH7Nr+BcLKmV687mEXXTCX9PSkttIHvJAwIz6JgTDPtQpDVw9OKThWg7nXo/6l83XJzQ7H4HvuW8xupZRFOAsFVh3c5G0gEMHqGo1zo83GjCNTP1EPZg==
+ bh=itJtzNeQUiYmM6oAMWPI5MmiHNmH7T9Q/8NsftK3+ik=;
+ b=Q3wJUaO4ON/1SGdf+cAWu/kOi5bXN9EUAabZXTw9bJAgZ6v0mCbAbgrJUP1Y6WCBdtulzDhpAU5VOElLZwx5C8D3+D2TMQwLR3TXZku+bKgJwPphE3wEFkq1rrJdv5nTJwrgf/Ro20fHvOf2J1QlOgoIZdxzzsy2kHREypNs0P/0I77j1+hMdqVV8XdelFo2yIGnYPG8Efsm/RrVIlPJt8nfdBxcUicwXAUshZp6i5YiA2uvRKS2K6OCd6Rk8j1Wd19FYFAM9AI6oTPFs3KDERIbdYoswx8AHhBfHP7e1erR/oAWMnzwbdEmMfIKc2pMXbIyOGDkCAsRRq9+5tXDKg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
- dkim=pass header.d=vivo.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=+AQ4KCCzbG0SLnzvf1guATMrLZGEwKRK9nPIP8cKRd8=;
- b=blVjJUhx9/vG97EFq/O5dcSdofIFpiWm2kW1ycKXjQeCb47Hrddc/jTTs4wzfxNtj6OOoWeEXdePEIX+XhGQWMJTzMe1+qEW85hI5N4rP4VwxR5TF+9mcM9S/wbj+qBwXw7ff2j0cyU4Fx4XPMVLZSevpUl5xm0ULOaKBF2ZpxccncG0noyeT1qcM6BE+TCqARt984Skdo7Nhn6TIGncMIZUZxvxXOO6Z9UiuvuCiCJGvO3skNPCTavMI8DVfHoSq0in3hG+PC/ABxS5+N+VRzAzy5ilpewdNXCO07vKDMjPrxQWNHFw1dLlfd7qrHi6AesLiZPRKqiP6GZokhxvEw==
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com (2603:1096:4:d0::18) by
- SEZPR06MB5558.apcprd06.prod.outlook.com (2603:1096:101:cc::12) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6565.17; Thu, 6 Jul 2023 12:34:34 +0000
-Received: from SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c]) by SG2PR06MB3743.apcprd06.prod.outlook.com
- ([fe80::2a86:a42:b60a:470c%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 12:34:34 +0000
-From: =?gb2312?B?zfXD9y3I7bz+tdey47y8yvWyvw==?= <machel@vivo.com>
-To: Leon Romanovsky <leon@kernel.org>
-CC: Sunil Goutham <sgoutham@marvell.com>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
-	"linux-arm-kernel@lists.infradead.org"
-	<linux-arm-kernel@lists.infradead.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>, LKML <linux-kernel@vger.kernel.org>,
-	opensource.kernel <opensource.kernel@vivo.com>
-Subject:
- =?gb2312?B?u9i4tDogW1BBVENIIG5ldCB2Ml0gbmV0OnRodW5kZXJ4OkZpeCByZXNvdXJj?=
- =?gb2312?B?ZSBsZWFrcyBpbiBkZXZpY2VfZm9yX2VhY2hfY2hpbGRfbm9kZSgpIGxvb3Bz?=
-Thread-Topic: [PATCH net v2] net:thunderx:Fix resource leaks in
- device_for_each_child_node() loops
-Thread-Index: AQHZr03sKVk7ictFTkqaLcdv6ppXfa+rihwAgAEjRYA=
-Date: Thu, 6 Jul 2023 12:34:34 +0000
-Message-ID:
- <SG2PR06MB374377F784F3D314DCAF1AA6BD2CA@SG2PR06MB3743.apcprd06.prod.outlook.com>
-References: <20230705143507.4120-1-machel@vivo.com>
- <20230705191028.GP6455@unreal>
-In-Reply-To: <20230705191028.GP6455@unreal>
-Accept-Language: zh-CN, en-US
-Content-Language: zh-CN
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=vivo.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: SG2PR06MB3743:EE_|SEZPR06MB5558:EE_
-x-ms-office365-filtering-correlation-id: b49bbe6e-395f-4c66-be94-08db7e1d5aa8
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 9VaeonMPRjpFzUb1Z1dlDyF/ghFZkbBYtQ/0N4QlZrKy2ol/t/qVh9SqemMFX+sdqExEt5cFRNBacWZcqtTsoq+etC05lXoqMMK8HzGvgA2voMAG/XEVWMqXJ1RluT/4gQNmcAxbH0mAk97Sn9QXIdIaSQek78whJlggEZxiLG7ZBnUKGoxoacvPHibb3JJK2AUKAweRPAZxW2qhmEpPN+kEb3SlNg7LWuyXg2uZcQ7SnXjCTULGPfGwLH3HPObflwORrtfIN4LmI02TmLs7dHQu88fTqz5wK38P8kYvafJ0/SauPCsKW6GbeHenVNo3eDa8U29d2Xki1s/MwSwhk9ixcAPsq5OVW3fOC7dUjfX4Jd8UxwSj4K+vIVLGD47blNJj+6uTo6drtwTBGRQlW4kDYq4uQpK4ftZyokeEG4hHSR+c8cpjMpf/5l6W4APgQJfgSkMvWZKHbKwtXgWWCkTWxTMxDJOKJV0q+ZO6PXeqyTQOXEcDrE9tDFI+saBY2sDRumHA2jfPXTAiVzCPoS+ziGP4/8IpPlwIqdOqO+80RGovXUs/7RdTumUjwOAVCxtJ884ywfLS/kqZ2fyz6uldhvlA2mtkHqhOyDK2m174175rd96AQDl2opeIXylX
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SG2PR06MB3743.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(136003)(396003)(376002)(366004)(346002)(451199021)(316002)(66446008)(5660300002)(8936002)(55016003)(86362001)(83380400001)(122000001)(224303003)(38100700002)(38070700005)(66476007)(41300700001)(66946007)(6916009)(85182001)(4326008)(64756008)(76116006)(66556008)(6506007)(9686003)(186003)(33656002)(966005)(107886003)(26005)(478600001)(7696005)(54906003)(71200400001)(2906002)(52536014);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?gb2312?B?cE55VFgyQTRtVHd6SEdDZmplZVlyclVvSzJKbWIrNzhkSlNLN3NjYzlOQXNj?=
- =?gb2312?B?NlRXSjhFdUlic0h3WWxLVlNoSXRiWkRBbldWb3pQejViWm51T0tFQU1GVC8z?=
- =?gb2312?B?bG9lM3Z0NHg2MXBPcGI2cXZ1Ti8rSncxajloSnhMbGhNZFpGSWtnQXM4WjEy?=
- =?gb2312?B?TFR1WmVJemZwWkwyTHFOY0JYYmJEVGJNNE1hVHlKRzZTTlp1Y1BqV1ErNlhW?=
- =?gb2312?B?U21lWkI4YWpmUi9GTGhVRnRyUkRYTFRSMXg0UnkxL2p5ek5yUDhUeWQ2aWRT?=
- =?gb2312?B?aTJQaVZRL0lhMVFBeDNtNXFNTUlCYklpaS9aWTJxMFNHcDdjOHU0b0duenRz?=
- =?gb2312?B?ZkpFV3IxZlhjSEhJNTNvdnJDMThvT3VGZmFSYXBlT09EZjFIeE1meHZybXVL?=
- =?gb2312?B?Mm10LzhmTm54QnIyTTlldGFtTERqbC84UDdmemdGdUtBVkJXRTkvRHh2R1c5?=
- =?gb2312?B?Q2ZXblE1eDdZR1NONkJyUHFXZ1hKU2dXcER4L2s1UjBoMkhNVGxrTlpjbWR3?=
- =?gb2312?B?ZVNjQWVnbGQ5c2w2SmhaRk9xTlJvdGY0T0s0dXp4WllmeDh3dHh5S1gwam9v?=
- =?gb2312?B?VjdnaE9IbXAyeUx6bzZYTkdZNVNqNWdHNjhaL3A3UGZzSlpNS08rMU8zQVBj?=
- =?gb2312?B?V21sbngvd3doTDIyTVFnbExuREQ2S3FrY0FEVVRSWmxLZC9IU1NQUnYwNUtE?=
- =?gb2312?B?QjNXMFZBeTVEbCt5aUZkdE1tQVhNa0Zpam9OdkpOclF3K1IvenF5ZkZCdExw?=
- =?gb2312?B?cDUwb3VsS1dXTkFTTmsvNnlGQUdVYkNEalZ1MGxTMnpzM25CNDR4M0JBQUdm?=
- =?gb2312?B?L1lwc2I1ckZmUG1wb1pJSUpOUHVZZm9Cei9nODhTUUNsSWtRQUt0WVlFVGVa?=
- =?gb2312?B?NVkzQk02WXpnQUVQV0Y0N0dzRzhKQzR1UEtlL3dSQUV3cWs1UGU1Uld3ZW13?=
- =?gb2312?B?SDBUSTFkTUg3MVFSNnFOOHpYSlAxamI1MFJpWCszUXZIS2ZKZS9yd1IyUXQ0?=
- =?gb2312?B?WU9yYUpTbVBkOTJ3YVN5UEJ2SjVxV2V2WWdGRHlmYmRrMTlqQ2NvNnBvbHBU?=
- =?gb2312?B?NWlZM1pDWHErclpLYmlPVE9QMnNLOVdCTXlmR0VLQXh0c0hVUVh4S3Y4M2ZI?=
- =?gb2312?B?NlpRbEdjME5uU2hhMnYxZmplNkQ1WXVKemxUcEhLUjhBZStuUGtzQkY5dzkv?=
- =?gb2312?B?ckx0WnlUdlk3Q1FFanNjRktoZEpBL0NlaFdjQmpwSVBvbEtqNTJZNE5lZExo?=
- =?gb2312?B?MDBvYnczZERKTElCS09Qc2cvTVViSnRKS2tYaWZOTzZMZzNzNDVnR2ovREpS?=
- =?gb2312?B?M3Fvcm5zb3pRNTBGNDFRemJwYXgvUlRFV0hPRHp4cjVEZHJFR3BkUU1pdGxZ?=
- =?gb2312?B?ZVQxdHZHZEJlbVg5U3d0Vk8rMkszNmFPQlBrQTNxc0pLUjRIUzhodmh1czNP?=
- =?gb2312?B?NURFa2xHcW1BQkVlSTFoSDFYSWJ3KzA4bHV6R3p5RVBjRkJ6N0FCT2s5b1dQ?=
- =?gb2312?B?RlJmS2xQM3hxV1l3SkZaLzVPbzVielB3MDdkSHVEN0t6MjVIdGxQVStQTTVH?=
- =?gb2312?B?SWFiOTNOQ0xYSU1PSDhzU2M2Z29XM0c0cEE5aDNCeHpXUjc2c1FRMklmM1F2?=
- =?gb2312?B?TGVzMGRsUjg3NzJaYUo5UTJIQUlmTjhCYlJYSVFjeGlwUFpxeklSb2lvbmJE?=
- =?gb2312?B?WmNvV3F4M0dTVWJlR1ZvSGZxSkpCa0lEMDA1ckJIN1JubmFIaUhnZDI4aEIv?=
- =?gb2312?B?RkFFUVlTRGsxbERJZGhaZkpEM3dqdjZ2RzVoaFVlcGN4YXFsdm9nWmVvVEgv?=
- =?gb2312?B?cUVISGJDUE1jY3htank2MlFuM1hoSWQyejVvd3VWRWptRU8xOG9qVDYzeGNp?=
- =?gb2312?B?dmtQU2p5aWhBVU0rSzA3UXZYdlJjalNlbTVnbWI3NGpUVE1qWnZIZ2RMMkw3?=
- =?gb2312?B?cjQyUUZ2ZXNCcnpsVjRCYmNPSXhZZThucjczSUJZVUl6M20vSitiaFhEY3A0?=
- =?gb2312?B?dlRWVlB0VUhtYW1pci91R2I5YnRtSnFVZ1UrQ3BwMENqOW80UTlUNnd4WVUx?=
- =?gb2312?B?U3dVZUxxRk9GSnRpMmcvUGIzQitzZi8velBmQUlwWXhvcmJGdTdGMzQ1QWNL?=
- =?gb2312?Q?D6pw=3D?=
-Content-Type: text/plain; charset="gb2312"
-Content-Transfer-Encoding: base64
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
+ by CY5PR11MB6138.namprd11.prod.outlook.com (2603:10b6:930:2a::11) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.24; Thu, 6 Jul
+ 2023 12:42:33 +0000
+Received: from SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::9376:9c9d:424a:a0fe]) by SN7PR11MB7540.namprd11.prod.outlook.com
+ ([fe80::9376:9c9d:424a:a0fe%6]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 12:42:33 +0000
+Date: Thu, 6 Jul 2023 14:38:33 +0200
+From: Larysa Zaremba <larysa.zaremba@intel.com>
+To: Jesper Dangaard Brouer <jbrouer@redhat.com>
+CC: John Fastabend <john.fastabend@gmail.com>, <brouer@redhat.com>,
+	<bpf@vger.kernel.org>, <ast@kernel.org>, <daniel@iogearbox.net>,
+	<andrii@kernel.org>, <martin.lau@linux.dev>, <song@kernel.org>, <yhs@fb.com>,
+	<kpsingh@kernel.org>, <sdf@google.com>, <haoluo@google.com>,
+	<jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski
+	<kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, Anatoly Burakov
+	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
+	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
+	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>,
+	"David S. Miller" <davem@davemloft.net>, Alexander Duyck
+	<alexander.duyck@gmail.com>
+Subject: Re: [xdp-hints] Re: [PATCH bpf-next v2 12/20] xdp: Add checksum
+ level hint
+Message-ID: <ZKa1ydBpmDCw4Ejp@lincoln>
+References: <20230703181226.19380-1-larysa.zaremba@intel.com>
+ <20230703181226.19380-13-larysa.zaremba@intel.com>
+ <64a331c338a5a_628d3208cb@john.notmuch>
+ <ZKPlZ6Z8ni5+ZJCK@lincoln>
+ <9cd44759-416c-7274-f805-ee9d756f15b1@redhat.com>
+ <ZKQAPBcIE/iCkiX2@lincoln>
+ <64a656273ee15_b20ce2087a@john.notmuch>
+ <3cc1d2ba-e084-8fc4-aa31-856bc532d1a7@redhat.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <3cc1d2ba-e084-8fc4-aa31-856bc532d1a7@redhat.com>
+X-ClientProxiedBy: FR3P281CA0202.DEUP281.PROD.OUTLOOK.COM
+ (2603:10a6:d10:a5::6) To SN7PR11MB7540.namprd11.prod.outlook.com
+ (2603:10b6:806:340::7)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: vivo.com
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|CY5PR11MB6138:EE_
+X-MS-Office365-Filtering-Correlation-Id: 03062b66-a080-44fa-2487-08db7e1e775f
+X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 45E3aL6TznJamS0i8zLOp3VOj2s2wYtlpPTihUR4fKum127HCo8mzlC9D5qESlAT4rYinqNY7lz5kasBp49aCj2QvjetoI+RHeQrAfR8FjeDfQTziELb/hMMArjHurTbcBMNdPEREQ2LFZ09WHli1kvmtxl/iocI/cngAAeKHRQ1mN9Arzeaabokoosonx5m/ybPKNkBB/yDaYld8QVFCij81a8My8+EaTmnUCd+JYw8azyNH+uUMGW+GuPx3x/AOG3hhJ5sNkmute1L9LeU/VdE+jyX2lQVBbkt7g72IrmZU73W9PTpYg0ZdMYa0fKmHXPY9a6Tdrt6z2bl/qHAujxQKJSZrqkecz9lClqE6Sjt7BN1n5CV+C55Ql/rBk13gredbxpT242C7Zt8AmKhJcALlU1jNWa3Ibq1/InKnIDnqIgDaJ9YKDe6qx6p5m58RUipUz+1ptckg+ODs/GybMUE1l/hq/JfivACpQNbuwQZrlE9clF5L4FQixH+9jk+qPD6UJ7Q801n2kjQKPXN+qGWKCl4y3o4DDa5WrucHYg=
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(376002)(39860400002)(396003)(136003)(346002)(451199021)(478600001)(38100700002)(9686003)(6486002)(26005)(6512007)(186003)(6506007)(82960400001)(966005)(54906003)(66946007)(4326008)(83380400001)(316002)(44832011)(6916009)(66476007)(66556008)(5660300002)(2906002)(7416002)(86362001)(66899021)(8676002)(41300700001)(8936002)(33716001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?J4HeXhO20FSfjasHyUvKyg74vRJm0hlGzZ4ESYMDJExUmQc4pikXy4czQNus?=
+ =?us-ascii?Q?+KZ4cRW09V0vo7rluqhZqa3HHFY6gZ+J398dGu037pmBvY33K8IG6XXiCUu+?=
+ =?us-ascii?Q?8kpKixFZlvwFLYg8P4HOrZzvepvvgX0VA5MxMF5fVHQHg3J6sNdQbik0ddHm?=
+ =?us-ascii?Q?vDWef1dvufzHYLohS3V6ZYhbNnMhdU+sPSxoo3vIy6vkiWDgIaoAl8CkaTwt?=
+ =?us-ascii?Q?N5dx8DWfP7Dqm52i76zUBsbuPvrw6PHubUcLH6dv2WN96MlZocUWmZbGNG1/?=
+ =?us-ascii?Q?vbca9DWcUdhTBV0KarLQkvKOSKAWY1OHbhTu4HplhBxgz6GkVxqCssZR69Uy?=
+ =?us-ascii?Q?U4ENMJQV0hurHVE1cNe4+jJ8MoY4BogazIKwISXr/FPecI1P1TdCi4vkDlXp?=
+ =?us-ascii?Q?olToyMSFDnYssLw9tHbB1Y2f4E9ELkERjSOHbm74JFIEX5RpmUG555aVQ/mS?=
+ =?us-ascii?Q?qUKuPuGmZzMZugA6Ay7ccB51ieglHnaKVRTJknn315WUTG70BxHKTwDGrTXg?=
+ =?us-ascii?Q?He9kLPppJYAeo/NmLE26SmlVlr2FUrb64qIujd11TkdqGDuricBrIiltb4cs?=
+ =?us-ascii?Q?6LKGGYPjTSfisSenOKqpf7o/UuBhGbZX1hKUjMGnE5P/QMj47fSPBVXZZqT1?=
+ =?us-ascii?Q?DaBJOp8XGlaT2IRQoqthK7LZ+qVCyj5t8VkMvGcnsJSh0Dz9WGK+wDZ0fTcO?=
+ =?us-ascii?Q?+cMraz6j4oNh9oSfldrkdSp+Yn8qRB4ezXzxIB4cr48vUB5Uaakry6IyZqcN?=
+ =?us-ascii?Q?IO7EwxJ0sLJtzdqH1AGSeT16x51WKChQiwTdAwNttN70utIXYM7Znb05woIV?=
+ =?us-ascii?Q?dIPM/BUdruaZPokTIzwkMjVd/IuQ/uAmrUAJaxhIb+335zvm1vio/jy5955m?=
+ =?us-ascii?Q?SBpoao4bW4WqXICRAl47AQYJD5JX3wyLmBaT2csnvUgzNMuVx3pnQaDN6gwv?=
+ =?us-ascii?Q?3i3C/MBHT3t17o0/Qqd2LpbaQqqPKI+MvLWZDqsyU5hXbXYraVwhKIYZMZsZ?=
+ =?us-ascii?Q?tGQPaECVTtpTb3xud4NQwzfIF4vnDK1tusHbsinrfTd1p6CBusIdzNPlrJjh?=
+ =?us-ascii?Q?FLwvcRm+pFYUPY1PXul69/43hYg65D+nb77D2krN7rZzwpSuvZvW1Wy9WHvq?=
+ =?us-ascii?Q?+P/U7yfiDfnkeXjt/LuXyfOXIoWbi7mZ7EegzXj+zX7aBkCUTDNOPwHOGbNk?=
+ =?us-ascii?Q?yq9QZLc19RsaHjG/7JTQPtJKgJ2wXIw3vdmsqN8G+KX3GGMQz547s2yASWOh?=
+ =?us-ascii?Q?LSt63+LkS3xCF07/7MVQvc2m3YhWfKkgrlt4noYkFsDf3Xc6eYFCCWhjxlDm?=
+ =?us-ascii?Q?urF7x7HmD+UJPG5ZakbkofWAJXFkT4chPNLEB6JPAebwLPo1yJ29gLUqnRcx?=
+ =?us-ascii?Q?dIZKXSc5TheKB91jI8eNGOU2RsDELXpCHF5cNBjCKNAPv4b5NH307a6HI/8R?=
+ =?us-ascii?Q?IBe8PW1Zi+ULmONzBIhevyzRlPJoHZ/PpRQ+lV6M/FTmYR07QoX6VxKm7JYK?=
+ =?us-ascii?Q?QroMEftd84kumY0Z6XIkHCOQD8vM3fqSJKI0YtQ+epiLJo/dj/cCYOZfNz5O?=
+ =?us-ascii?Q?fM1lO1iS1rWV1CsZSB1jjxDL/43rH8xVzvujf9Cuk+E3eSya6miMabFojGKG?=
+ =?us-ascii?Q?zQ=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 03062b66-a080-44fa-2487-08db7e1e775f
+X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: SG2PR06MB3743.apcprd06.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b49bbe6e-395f-4c66-be94-08db7e1d5aa8
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 12:34:34.2783
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 12:42:32.4144
  (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: QXvo9XkYgtteiIsDud7PInax4Qsx5TKN3nl66GbOa74CzMpPQMQnTBADoZYxciwBzY/JoLNZMhbI39I1MRMr2g==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: SEZPR06MB5558
-X-Spam-Status: No, score=-0.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,RCVD_IN_VALIDITY_RPBL,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: 1b/cjvgRDPAIRj4FJXYo730O3B+CKq53wmTGWxDUwjxuI/xcluCV74n1Pjb+u1LJnPl1nrDa70q+jjfRECBeEeyz78i2pa2MfeSnd+UxClI=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY5PR11MB6138
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-SGkNClNvcnJ5LCBJIHJlc3VibWl0dGVkLCBidXQgZm9yZ290IGFib3V0IHlvdXIgcG9pbnQuIERv
-ZXMgdGhpcyBhZmZlY3QgcGF0Y2g/DQoNCi0tLS0t08q8/tStvP4tLS0tLQ0Kt6K8/sjLOiBMZW9u
-IFJvbWFub3Zza3kgPGxlb25Aa2VybmVsLm9yZz4gDQq3osvNyrG85DogMjAyM8TqN9TCNsjVIDM6
-MTANCsrVvP7IyzogzfXD9y3I7bz+tdey47y8yvWyvyA8bWFjaGVsQHZpdm8uY29tPg0Ks63LzTog
-U3VuaWwgR291dGhhbSA8c2dvdXRoYW1AbWFydmVsbC5jb20+OyBEYXZpZCBTLiBNaWxsZXIgPGRh
-dmVtQGRhdmVtbG9mdC5uZXQ+OyBFcmljIER1bWF6ZXQgPGVkdW1hemV0QGdvb2dsZS5jb20+OyBK
-YWt1YiBLaWNpbnNraSA8a3ViYUBrZXJuZWwub3JnPjsgUGFvbG8gQWJlbmkgPHBhYmVuaUByZWRo
-YXQuY29tPjsgbGludXgtYXJtLWtlcm5lbEBsaXN0cy5pbmZyYWRlYWQub3JnOyBuZXRkZXZAdmdl
-ci5rZXJuZWwub3JnOyBsaW51eC1rZXJuZWxAdmdlci5rZXJuZWwub3JnOyBvcGVuc291cmNlLmtl
-cm5lbCA8b3BlbnNvdXJjZS5rZXJuZWxAdml2by5jb20+DQrW98ziOiBSZTogW1BBVENIIG5ldCB2
-Ml0gbmV0OnRodW5kZXJ4OkZpeCByZXNvdXJjZSBsZWFrcyBpbiBkZXZpY2VfZm9yX2VhY2hfY2hp
-bGRfbm9kZSgpIGxvb3BzDQoNCltTb21lIHBlb3BsZSB3aG8gcmVjZWl2ZWQgdGhpcyBtZXNzYWdl
-IGRvbid0IG9mdGVuIGdldCBlbWFpbCBmcm9tIGxlb25Aa2VybmVsLm9yZy4gTGVhcm4gd2h5IHRo
-aXMgaXMgaW1wb3J0YW50IGF0IGh0dHBzOi8vYWthLm1zL0xlYXJuQWJvdXRTZW5kZXJJZGVudGlm
-aWNhdGlvbiBdDQoNCk9uIFdlZCwgSnVsIDA1LCAyMDIzIGF0IDEwOjM0OjU2UE0gKzA4MDAsIFdh
-bmcgTWluZyB3cm90ZToNCj4gVGhlIGRldmljZV9mb3JfZWFjaF9jaGlsZF9ub2RlKCkgbG9vcCBp
-bg0KPiBiZ3hfaW5pdF9vZl9waHkoKSBmdW5jdGlvbiBzaG91bGQgaGF2ZQ0KPiB3bm9kZV9oYW5k
-bGVfcHV0KCkgYmVmb3JlIGJyZWFrDQo+IHdoaWNoIGNvdWxkIGF2b2lkIHJlc291cmNlIGxlYWtz
-Lg0KPiBUaGlzIHBhdGNoIGNvdWxkIGZpeCB0aGlzIGJ1Zy4NCg0KSXQgaXMgdmVyeSBzdHJhbmdl
-IHR5cG9ncmFwaGljLiBZb3UgaGF2ZSB+ODAgY2hhcnMgcGVyLWxpbmUsIHdoaWxlIHlvdXIgbG9u
-Z2VzdCBsaW5lIGlzIDQwIGNoYXJzIG9ubHkuDQoNCj4NCj4gU2lnbmVkLW9mZi1ieTogV2FuZyBN
-aW5nIDxtYWNoZWxAdml2by5jb20+DQo+IC0tLQ0KPiAgZHJpdmVycy9uZXQvZXRoZXJuZXQvY2F2
-aXVtL3RodW5kZXIvdGh1bmRlcl9iZ3guYyB8IDUgKysrKy0NCj4gIDEgZmlsZSBjaGFuZ2VkLCA0
-IGluc2VydGlvbnMoKyksIDEgZGVsZXRpb24oLSkNCj4NCj4gZGlmZiAtLWdpdCBhL2RyaXZlcnMv
-bmV0L2V0aGVybmV0L2Nhdml1bS90aHVuZGVyL3RodW5kZXJfYmd4LmMgDQo+IGIvZHJpdmVycy9u
-ZXQvZXRoZXJuZXQvY2F2aXVtL3RodW5kZXIvdGh1bmRlcl9iZ3guYw0KPiBpbmRleCBhMzE3ZmVi
-OGRlY2IuLmRhZDMyZDM2YTAxNSAxMDA2NDQNCj4gLS0tIGEvZHJpdmVycy9uZXQvZXRoZXJuZXQv
-Y2F2aXVtL3RodW5kZXIvdGh1bmRlcl9iZ3guYw0KPiArKysgYi9kcml2ZXJzL25ldC9ldGhlcm5l
-dC9jYXZpdW0vdGh1bmRlci90aHVuZGVyX2JneC5jDQo+IEBAIC0xNDc4LDggKzE0NzgsMTAgQEAg
-c3RhdGljIGludCBiZ3hfaW5pdF9vZl9waHkoc3RydWN0IGJneCAqYmd4KQ0KPiAgICAgICAgICAg
-ICAgICAqIGNhbm5vdCBoYW5kbGUgaXQsIHNvIGV4aXQgdGhlIGxvb3AuDQo+ICAgICAgICAgICAg
-ICAgICovDQo+ICAgICAgICAgICAgICAgbm9kZSA9IHRvX29mX25vZGUoZnduKTsNCj4gLSAgICAg
-ICAgICAgICBpZiAoIW5vZGUpDQo+ICsgICAgICAgICAgICAgaWYgKCFub2RlKSB7DQo+ICsgICAg
-ICAgICAgICAgICAgICAgICBmd25vZGVfaGFuZGxlX3B1dChmd24pOw0KPiAgICAgICAgICAgICAg
-ICAgICAgICAgYnJlYWs7DQo+ICsgICAgICAgICAgICAgfQ0KPg0KPiAgICAgICAgICAgICAgIG9m
-X2dldF9tYWNfYWRkcmVzcyhub2RlLCBiZ3gtPmxtYWNbbG1hY10ubWFjKTsNCj4NCj4gQEAgLTE1
-MDMsNiArMTUwNSw3IEBAIHN0YXRpYyBpbnQgYmd4X2luaXRfb2ZfcGh5KHN0cnVjdCBiZ3ggKmJn
-eCkNCj4gICAgICAgICAgICAgICBsbWFjKys7DQo+ICAgICAgICAgICAgICAgaWYgKGxtYWMgPT0g
-Ymd4LT5tYXhfbG1hYykgew0KPiAgICAgICAgICAgICAgICAgICAgICAgb2Zfbm9kZV9wdXQobm9k
-ZSk7DQo+ICsgICAgICAgICAgICAgICAgICAgICBmd25vZGVfaGFuZGxlX3B1dChmd24pOw0KPiAg
-ICAgICAgICAgICAgICAgICAgICAgYnJlYWs7DQo+ICAgICAgICAgICAgICAgfQ0KPiAgICAgICB9
-DQo+IC0tDQo+IDIuMjUuMQ0KPg0KPg0K
+On Thu, Jul 06, 2023 at 11:04:49AM +0200, Jesper Dangaard Brouer wrote:
+> 
+> 
+> On 06/07/2023 07.50, John Fastabend wrote:
+> > Larysa Zaremba wrote:
+> > > On Tue, Jul 04, 2023 at 12:39:06PM +0200, Jesper Dangaard Brouer wrote:
+> > > > Cc. DaveM+Alex Duyck, as I value your insights on checksums.
+> > > > 
+> > > > On 04/07/2023 11.24, Larysa Zaremba wrote:
+> > > > > On Mon, Jul 03, 2023 at 01:38:27PM -0700, John Fastabend wrote:
+> > > > > > Larysa Zaremba wrote:
+> > > > > > > Implement functionality that enables drivers to expose to XDP code,
+> > > > > > > whether checksums was checked and on what level.
+> > > > > > > 
+> > > > > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > > > > > ---
+> > > > > > >    Documentation/networking/xdp-rx-metadata.rst |  3 +++
+> > > > > > >    include/linux/netdevice.h                    |  1 +
+> > > > > > >    include/net/xdp.h                            |  2 ++
+> > > > > > >    kernel/bpf/offload.c                         |  2 ++
+> > > > > > >    net/core/xdp.c                               | 21 ++++++++++++++++++++
+> > > > > > >    5 files changed, 29 insertions(+)
+> > > > > > > 
+> > > > > > > diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+> > > > > > > index ea6dd79a21d3..4ec6ddfd2a52 100644
+> > > > > > > --- a/Documentation/networking/xdp-rx-metadata.rst
+> > > > > > > +++ b/Documentation/networking/xdp-rx-metadata.rst
+> > > > > > > @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
+> > > > > > >    .. kernel-doc:: net/core/xdp.c
+> > > > > > >       :identifiers: bpf_xdp_metadata_rx_vlan_tag
+> > > > > > > +.. kernel-doc:: net/core/xdp.c
+> > > > > > > +   :identifiers: bpf_xdp_metadata_rx_csum_lvl
+> > > > > > > +
+> > > > > > >    An XDP program can use these kfuncs to read the metadata into stack
+> > > > > > >    variables for its own consumption. Or, to pass the metadata on to other
+> > > > > > >    consumers, an XDP program can store it into the metadata area carried
+> > > > > > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > > > > > index 4fa4380e6d89..569563687172 100644
+> > > > > > > --- a/include/linux/netdevice.h
+> > > > > > > +++ b/include/linux/netdevice.h
+> > > > > > > @@ -1660,6 +1660,7 @@ struct xdp_metadata_ops {
+> > > > > > >    			       enum xdp_rss_hash_type *rss_type);
+> > > > > > >    	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tag,
+> > > > > > >    				   __be16 *vlan_proto);
+> > > > > > > +	int	(*xmo_rx_csum_lvl)(const struct xdp_md *ctx, u8 *csum_level);
+> > > > > > >    };
+> > > > > > >    /**
+> > > > > > > diff --git a/include/net/xdp.h b/include/net/xdp.h
+> > > > > > > index 89c58f56ffc6..61ed38fa79d1 100644
+> > > > > > > --- a/include/net/xdp.h
+> > > > > > > +++ b/include/net/xdp.h
+> > > > > > > @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
+> > > > > > >    			   bpf_xdp_metadata_rx_hash) \
+> > > > > > >    	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
+> > > > > > >    			   bpf_xdp_metadata_rx_vlan_tag) \
+> > > > > > > +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM_LVL, \
+> > > > > > > +			   bpf_xdp_metadata_rx_csum_lvl) \
+> > > > > > >    enum {
+> > > > > > >    #define XDP_METADATA_KFUNC(name, _) name,
+> > > > > > > diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+> > > > > > > index 986e7becfd42..a133fb775f49 100644
+> > > > > > > --- a/kernel/bpf/offload.c
+> > > > > > > +++ b/kernel/bpf/offload.c
+> > > > > > > @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
+> > > > > > >    		p = ops->xmo_rx_hash;
+> > > > > > >    	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
+> > > > > > >    		p = ops->xmo_rx_vlan_tag;
+> > > > > > > +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM_LVL))
+> > > > > > > +		p = ops->xmo_rx_csum_lvl;
+> > > > > > >    out:
+> > > > > > >    	up_read(&bpf_devs_lock);
+> > > > > > > diff --git a/net/core/xdp.c b/net/core/xdp.c
+> > > > > > > index f6262c90e45f..c666d3e0a26c 100644
+> > > > > > > --- a/net/core/xdp.c
+> > > > > > > +++ b/net/core/xdp.c
+> > > > > > > @@ -758,6 +758,27 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan
+> > > > > > >    	return -EOPNOTSUPP;
+> > > > > > >    }
+> > > > > > > +/**
+> > > > > > > + * bpf_xdp_metadata_rx_csum_lvl - Get depth at which HW has checked the checksum.
+> > > > > > > + * @ctx: XDP context pointer.
+> > > > > > > + * @csum_level: Return value pointer.
+> > > > > > > + *
+> > > > > > > + * In case of success, csum_level contains depth of the last verified checksum.
+> > > > > > > + * If only the outermost checksum was verified, csum_level is 0, if both
+> > > > > > > + * encapsulation and inner transport checksums were verified, csum_level is 1,
+> > > > > > > + * and so on.
+> > > > > > > + * For more details, refer to csum_level field in sk_buff.
+> > > > > > > + *
+> > > > > > > + * Return:
+> > > > > > > + * * Returns 0 on success or ``-errno`` on error.
+> > > > > > > + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
+> > > > > > > + * * ``-ENODATA``    : Checksum was not validated
+> > > > > > > + */
+> > > > > > > +__bpf_kfunc int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
+> > > > > > 
+> > > > > > Istead of ENODATA should we return what would be put in the ip_summed field
+> > > > > > CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}? Then sig would be,
+> > > > 
+> > > > I was thinking the same, what about checksum "type".
+> > > > 
+> > > > > > 
+> > > > > >    bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *type, u8 *lvl);
+> > > > > > 
+> > > > > > or something like that? Or is the thought that its not really necessary?
+> > > > > > I don't have a strong preference but figured it was worth asking.
+> > > > > > 
+> > > > > 
+> > > > > I see no value in returning CHECKSUM_COMPLETE without the actual checksum value.
+> > > > > Same with CHECKSUM_PARTIAL and csum_start. Returning those values too would
+> > > > > overcomplicate the function signature.
+> > > > 
+> > > > So, this kfunc bpf_xdp_metadata_rx_csum_lvl() success is it equivilent to
+> > > > CHECKSUM_UNNECESSARY?
+> > > 
+> > > This is 100% true for physical NICs, it's more complicated for veth, bacause it
+> > > often receives CHECKSUM_PARTIAL, which shouldn't normally apprear on RX, but is
+> > > treated by the network stack as a validated checksum, because there is no way
+> > > internally generated packet could be messed up. I would be grateful if you could
+> > > look at the veth patch and share your opinion about this.
+> > > 
+> > > > 
+> > > > Looking at documentation[1] (generated from skbuff.h):
+> > > >   [1] https://kernel.org/doc/html/latest/networking/skbuff.html#checksumming-of-received-packets-by-device
+> > > > 
+> > > > Is the idea that we can add another kfunc (new signature) than can deal
+> > > > with the other types of checksums (in a later kernel release)?
+> > > > 
+> > > 
+> > > Yes, that is the idea.
+> > 
+> > If we think there is a chance we might need another kfunc we should add it
+> > in the same kfunc. It would be unfortunate to have to do two kfuncs when
+> > one would work. It shouldn't cost much/anything(?) to hardcode the type for
+> > most cases? I think if we need it later I would advocate for updating this
+> > kfunc to support it. Of course then userspace will have to swivel on the
+> > kfunc signature.
+> > 
+> 
+> I think it might make sense to have 3 kfuncs for checksumming.
+> As this would allow BPF-prog to focus on CHECKSUM_UNNECESSARY, and then
+> only call additional kfunc for extracting e.g csum_start  + csum_offset
+> when type is CHECKSUM_PARTIAL.
+> 
+> We could extend bpf_xdp_metadata_rx_csum_lvl() to give the csum_type
+> CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}.
+> 
+>  int bpf_xdp_metadata_rx_csum_lvl(*ctx, u8 *csum_level, u8 *csum_type)
+> 
+> And then add two kfunc e.g.
+>  (1) bpf_xdp_metadata_rx_csum_partial(ctx, start, offset)
+>  (2) bpf_xdp_metadata_rx_csum_complete(ctx, csum)
+> 
+> Pseudo BPF-prog code:
+> 
+>  err = bpf_xdp_metadata_rx_csum_lvl(ctx, level, type);
+>  if (!err && type != CHECKSUM_UNNECESSARY) {
+>      if (type == CHECKSUM_PARTIAL)
+>          err = bpf_xdp_metadata_rx_csum_partial(ctx, start, offset);
+>      if (type == CHECKSUM_COMPLETE)
+>          err = bpf_xdp_metadata_rx_csum_complete(ctx, csum);
+>  }
+> 
+> Looking at code, I feel we could rename [...]_csum_lvl to csum_type.
+> E.g. bpf_xdp_metadata_rx_csum_type.
+>
+
+What about:
+
+union csum_info {
+	struct {
+		u16 csum_start;
+		u16 csum_offset;
+	};
+	u32 checksum;
+	u8 checksum_level;
+};
+
+bpf_xdp_metadata_rx_csum(*ctx, u8 *csum_status, union csum_info *info);
+
+One thing that is worth considering in my opinion is whether some hardware can 
+provide both CHECKSUM_UNNECESSARY and CHECKSUM_COMPLETE. Judging by [0], this 
+does occur. I such cases using an enum to represent the checksum status would 
+artificially limit the capabilities. Now, imagine the situation:
+
+- You want to use your XDP program with 2 different NICs
+
+[...]
+
+err = bpf_xdp_metadata_rx_csum(*ctx, &status, &info);
+if (!err && status == CHECKSUM_UNNECESSARY)
+	/* Do stuff */
+
+[...]
+- One NIC can both calculate CHECKSUM_COMPLETE and parse headers, another one 
+  is only able to parse headers. Those can be very similar NICs from different 
+  generation.
+- You test your program on the simpler NIC, program works fine.
+- You tests your program on the more advanced one and suddenly you need an 
+  'else if' case with some additional calculations.
+
+Please write, whether this makes sense :D and if so, we can work out a solution.
+
+> Feel free to disagree,
+> --Jesper
+> 
+> 
 
