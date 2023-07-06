@@ -1,67 +1,67 @@
-Return-Path: <netdev+bounces-15852-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15853-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 60D4974A295
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:55:20 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 93B0974A298
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:55:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E392528109D
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:55:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C5FDD2813A5
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:55:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4AEDFBA25;
-	Thu,  6 Jul 2023 16:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 07DFABA28;
+	Thu,  6 Jul 2023 16:55:29 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3E8B3BA23
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 16:55:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EDBE7BA23
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 16:55:28 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 689421BE3
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:55:09 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E62D01986
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:55:21 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688662508;
+	s=mimecast20190719; t=1688662520;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 in-reply-to:in-reply-to:references:references;
-	bh=78X1P2RbA2naQ6uRnxp6k32HKAIUnBp53PzVIigmGLg=;
-	b=KE+98sW5HUo9y6qy3S42o6Q/92kmS0eiW1Ugg3eIuicm1eEMq//f8ZiXeYuM3EGnJOAor2
-	mt5HXn6wDxJJgHv7Q6Gncuxe7dHxEQo2qX6+sTgTcP6AKXDJhMFn+CnFZ4kPY2VvpvJg1S
-	y218uq3yME4sX3u68ZSw/1tEwr8BliI=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
+	bh=wsYIzXoEJlWb8NyyL4GSQKwnf6b27lly+h6hlBtZZFs=;
+	b=DltiuwmjNVpOwioKT0lnA0kc5c1RjjRB/kLmODFfMh+pc/jB3OlgsxGr2Vey7u/egaq3gz
+	+gadSB44iugrH67MqU29HBpAq0+2oBufXBXigK/QIDh/SytxDfn0K3ybfjO9I7UxWhKSUW
+	Xjb2cDYP9Gjfww8Nve4PgBfigM//s1E=
+Received: from mail-ej1-f69.google.com (mail-ej1-f69.google.com
+ [209.85.218.69]) by relay.mimecast.com with ESMTP with STARTTLS
  (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-246-uiF7Poa0NeGQ1jPZPqzyKQ-1; Thu, 06 Jul 2023 12:55:07 -0400
-X-MC-Unique: uiF7Poa0NeGQ1jPZPqzyKQ-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-94a355cf318so69156966b.2
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 09:55:07 -0700 (PDT)
+ us-mta-650-azRm-YyBPsSP0u6e3oSCcA-1; Thu, 06 Jul 2023 12:55:17 -0400
+X-MC-Unique: azRm-YyBPsSP0u6e3oSCcA-1
+Received: by mail-ej1-f69.google.com with SMTP id a640c23a62f3a-978a991c3f5so69749766b.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 09:55:17 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688662506; x=1691254506;
+        d=1e100.net; s=20221208; t=1688662516; x=1691254516;
         h=in-reply-to:content-disposition:mime-version:references:message-id
          :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=78X1P2RbA2naQ6uRnxp6k32HKAIUnBp53PzVIigmGLg=;
-        b=VOAuJMm7QRs/+PHZln+dQrlTWX+yx/6TPVkS/XeSVx4mcozrAxcuDjAm6ZkhRo3PwZ
-         W6FJdLGF/WkpFYRGbhtcomX7543wU9lIN/EnCA+Az5wiVud0Nhqdw4kSPwGjwOXPK7x7
-         09DzqLx3GDeVjRdy9j6rwyrUbNYoGWWkY21flRFr0g4wYreEzHGRI7UqNYKKBAGRt3CT
-         28/RqADN9H6H6tRkBaTMsbqiH+MAHmp0gepDKO9K9b4MMxMHS4ZrtmG/Yycknrl8G/Fw
-         LzHQ146SgFvfbg7aqYXjyfeQVPeKYoLq5u9yeY7CrUTSRfENuRsJ/acScbuD8qPJ2PaU
-         BafQ==
-X-Gm-Message-State: ABy/qLZz8bVp21kZxO4OuQPnSMZNiDvbQW8hhEo99zBaCXMkEDWlacDR
-	82mMZ5f97fTb5BuC40ifW/5WWkCssMZ6Imr5gzO1qEkskaMK0G5mLugrrUTpmdD2KFXx+OhSg9J
-	8zAROfilFZJj2c7az
-X-Received: by 2002:a17:906:5185:b0:992:a9c3:244f with SMTP id y5-20020a170906518500b00992a9c3244fmr1583453ejk.4.1688662506005;
-        Thu, 06 Jul 2023 09:55:06 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFnbcCuNIs/OppuWQYxPKp5Z8HDqdwHBAM1xNlziO52ksP44T7cMIPX6GA9m+5cSy54n0kP6Q==
-X-Received: by 2002:a17:906:5185:b0:992:a9c3:244f with SMTP id y5-20020a170906518500b00992a9c3244fmr1583447ejk.4.1688662505832;
-        Thu, 06 Jul 2023 09:55:05 -0700 (PDT)
+        bh=wsYIzXoEJlWb8NyyL4GSQKwnf6b27lly+h6hlBtZZFs=;
+        b=aGxnOAIQmQmqkYHvj/2kz3cIbvmu9zkQaEdnlOMy1BMY1LTLYvYruBEEM3/PnkDJfo
+         qQwXhzdtLBKmi5TfkuRsFexzchussaOWT1Nxl23eabU8ucrSUVZ4K8tD9N93cBQzcp3V
+         6T8PubxLHl+MA7uFKiQ5Lz6NPSKcBe2/x3O7ghmuFkRjk17MfPSo1F3J/Mgn8Z4n9bWo
+         qUBfp8i0kblPQiWfRuh+EkXQuYevj181TbB+9u4Gh88G1m/fNW76ci4finSNVWIoooTV
+         X1hskhms8KgcpRhRHaXROoGOyGdNOpIrOiOTz5EXB/SbnbSphgbroNDyOcIBX961rTTf
+         WDLA==
+X-Gm-Message-State: ABy/qLagyQqjsGmHKRQf6NFoiI2mUgJSjT2uUGHkc+0AX9RsoGWBS4xd
+	mq01fnlxDBSX0QhpKnF1LgDZZgSeX4WkP/KWSIP7pXUU6uX04mgwMNUrzEywmr69MyGNeJyEx+h
+	9Z1V++KXq+/F8fftr
+X-Received: by 2002:a17:906:2ca:b0:979:65f0:cced with SMTP id 10-20020a17090602ca00b0097965f0ccedmr1934022ejk.17.1688662516700;
+        Thu, 06 Jul 2023 09:55:16 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlEkD0rlqSdTev+Q2IqNmZT5B5F3idaEZ37dXEcrn3WdUID6ErjT2MTHmJfkU0j9eSLaJFZ9qQ==
+X-Received: by 2002:a17:906:2ca:b0:979:65f0:cced with SMTP id 10-20020a17090602ca00b0097965f0ccedmr1934002ejk.17.1688662516511;
+        Thu, 06 Jul 2023 09:55:16 -0700 (PDT)
 Received: from sgarzare-redhat (host-79-46-200-163.retail.telecomitalia.it. [79.46.200.163])
-        by smtp.gmail.com with ESMTPSA id hk15-20020a170906c9cf00b00991bba473e1sm1041884ejb.3.2023.07.06.09.55.04
+        by smtp.gmail.com with ESMTPSA id mb8-20020a170906eb0800b009737b8d47b6sm1023809ejb.203.2023.07.06.09.55.15
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 09:55:05 -0700 (PDT)
-Date: Thu, 6 Jul 2023 18:55:03 +0200
+        Thu, 06 Jul 2023 09:55:16 -0700 (PDT)
+Date: Thu, 6 Jul 2023 18:55:13 +0200
 From: Stefano Garzarella <sgarzare@redhat.com>
 To: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 Cc: Stefan Hajnoczi <stefanha@redhat.com>, 
@@ -71,11 +71,10 @@ Cc: Stefan Hajnoczi <stefanha@redhat.com>,
 	Bobby Eshleman <bobby.eshleman@bytedance.com>, kvm@vger.kernel.org, virtualization@lists.linux-foundation.org, 
 	netdev@vger.kernel.org, linux-kernel@vger.kernel.org, kernel@sberdevices.ru, 
 	oxffffaa@gmail.com
-Subject: Re: [RFC PATCH v5 08/17] vsock: check for MSG_ZEROCOPY support on
- send
-Message-ID: <xpc5urpiwj5adhqqtiumlnxwnljuv3jtepkzn6owju5quzuojh@m2bbycr6bnnj>
+Subject: Re: [RFC PATCH v5 09/17] vsock: enable SOCK_SUPPORT_ZC bit
+Message-ID: <vaknax5rfvbb3ymylshak4cih2ddhsfhiq5dualh5frbedczmw@zduzizg2g6pa>
 References: <20230701063947.3422088-1-AVKrasnov@sberdevices.ru>
- <20230701063947.3422088-9-AVKrasnov@sberdevices.ru>
+ <20230701063947.3422088-10-AVKrasnov@sberdevices.ru>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -84,7 +83,7 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Type: text/plain; charset=us-ascii; format=flowed
 Content-Disposition: inline
-In-Reply-To: <20230701063947.3422088-9-AVKrasnov@sberdevices.ru>
+In-Reply-To: <20230701063947.3422088-10-AVKrasnov@sberdevices.ru>
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
@@ -93,59 +92,44 @@ X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Sat, Jul 01, 2023 at 09:39:38AM +0300, Arseniy Krasnov wrote:
->This feature totally depends on transport, so if transport doesn't
->support it, return error.
+On Sat, Jul 01, 2023 at 09:39:39AM +0300, Arseniy Krasnov wrote:
+>This bit is used by io_uring in case of zerocopy tx mode. io_uring code
+>checks, that socket has this feature. This patch sets it in two places:
+>1) For socket in 'connect()' call.
+>2) For new socket which is returned by 'accept()' call.
 >
 >Signed-off-by: Arseniy Krasnov <AVKrasnov@sberdevices.ru>
 >---
-> include/net/af_vsock.h   | 7 +++++++
 > net/vmw_vsock/af_vsock.c | 6 ++++++
-> 2 files changed, 13 insertions(+)
+> 1 file changed, 6 insertions(+)
 
 Reviewed-by: Stefano Garzarella <sgarzare@redhat.com>
 
 >
->diff --git a/include/net/af_vsock.h b/include/net/af_vsock.h
->index 0e7504a42925..ec09edc5f3a0 100644
->--- a/include/net/af_vsock.h
->+++ b/include/net/af_vsock.h
->@@ -177,6 +177,9 @@ struct vsock_transport {
->
-> 	/* Read a single skb */
-> 	int (*read_skb)(struct vsock_sock *, skb_read_actor_t);
->+
->+	/* Zero-copy. */
->+	bool (*msgzerocopy_allow)(void);
-> };
->
-> /**** CORE ****/
->@@ -243,4 +246,8 @@ static inline void __init vsock_bpf_build_proto(void)
-> {}
-> #endif
->
->+static inline bool vsock_msgzerocopy_allow(const struct vsock_transport *t)
->+{
->+	return t->msgzerocopy_allow && t->msgzerocopy_allow();
->+}
-> #endif /* __AF_VSOCK_H__ */
 >diff --git a/net/vmw_vsock/af_vsock.c b/net/vmw_vsock/af_vsock.c
->index 07803d9fbf6d..033006e1b5ad 100644
+>index 033006e1b5ad..da22ae0ef477 100644
 >--- a/net/vmw_vsock/af_vsock.c
 >+++ b/net/vmw_vsock/af_vsock.c
->@@ -1824,6 +1824,12 @@ static int vsock_connectible_sendmsg(struct socket *sock, struct msghdr *msg,
-> 		goto out;
-> 	}
+>@@ -1406,6 +1406,9 @@ static int vsock_connect(struct socket *sock, struct sockaddr *addr,
+> 			goto out;
+> 		}
 >
->+	if (msg->msg_flags & MSG_ZEROCOPY &&
->+	    !vsock_msgzerocopy_allow(transport)) {
->+		err = -EOPNOTSUPP;
->+		goto out;
->+	}
+>+		if (vsock_msgzerocopy_allow(transport))
+>+			set_bit(SOCK_SUPPORT_ZC, &sk->sk_socket->flags);
 >+
-> 	/* Wait for room in the produce queue to enqueue our user's data. */
-> 	timeout = sock_sndtimeo(sk, msg->msg_flags & MSG_DONTWAIT);
+> 		err = vsock_auto_bind(vsk);
+> 		if (err)
+> 			goto out;
+>@@ -1560,6 +1563,9 @@ static int vsock_accept(struct socket *sock, struct socket *newsock, int flags,
+> 		} else {
+> 			newsock->state = SS_CONNECTED;
+> 			sock_graft(connected, newsock);
+>+			if (vsock_msgzerocopy_allow(vconnected->transport))
+>+				set_bit(SOCK_SUPPORT_ZC,
+>+					&connected->sk_socket->flags);
+> 		}
 >
+> 		release_sock(connected);
 >-- 
 >2.25.1
 >
