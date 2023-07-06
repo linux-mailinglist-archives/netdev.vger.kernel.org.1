@@ -1,111 +1,70 @@
-Return-Path: <netdev+bounces-15779-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15780-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 19536749B57
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:06:14 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60DE8749B63
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 14:09:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 3AE851C20D64
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:06:13 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 135E328127F
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 12:09:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7E3B48F4B;
-	Thu,  6 Jul 2023 12:06:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 326088F4E;
+	Thu,  6 Jul 2023 12:09:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5E1AC8F42;
-	Thu,  6 Jul 2023 12:06:08 +0000 (UTC)
-Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17F9E10F7;
-	Thu,  6 Jul 2023 05:06:07 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688645167; x=1720181167;
-  h=date:from:to:cc:subject:message-id:references:
-   in-reply-to:mime-version;
-  bh=F7mJtOnOCj5Y4V22tVM5iUeytiAQYiX6kkpuJpAe2PE=;
-  b=h1WdMYAEVAXxZMq8eU+wVr2BO9255yZEuhlcXd25RmbWdGhGTZKDUvms
-   b7yrHmRjkdWHgKKLVHQ1xBI8hKVHP5uz5fL78H9x6473Mw3/iPu5sRt/P
-   RQsZFoNG1Kc5MjYURl4P4lrA/xJisIrba4bhjWWmYKIoJMdIknx/8cCi8
-   awCHxJ2UHIJ6yKwMq4s+4FAJUJAOIe8lB2In34FA7G8sUhTQotCRjBHIx
-   JLLZIx8RKne0Yboztt6322LuCKJil5jwiCmwg5Et8as3BLSln4NT0Ucu+
-   2xqh4m8IKxCWop8dvmW5aOpawHILb7lofmfUHKDEkI0yM61LyaVzMnLNe
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="343174272"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="343174272"
-Received: from fmsmga007.fm.intel.com ([10.253.24.52])
-  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 05:06:06 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10762"; a="722766831"
-X-IronPort-AV: E=Sophos;i="6.01,185,1684825200"; 
-   d="scan'208";a="722766831"
-Received: from fmsmsx603.amr.corp.intel.com ([10.18.126.83])
-  by fmsmga007.fm.intel.com with ESMTP; 06 Jul 2023 05:06:06 -0700
-Received: from fmsmsx611.amr.corp.intel.com (10.18.126.91) by
- fmsmsx603.amr.corp.intel.com (10.18.126.83) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:06:06 -0700
-Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
- fmsmsx611.amr.corp.intel.com (10.18.126.91) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:06:05 -0700
-Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
- fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27 via Frontend Transport; Thu, 6 Jul 2023 05:06:05 -0700
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (104.47.59.177)
- by edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.1.2507.27; Thu, 6 Jul 2023 05:06:05 -0700
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1BBDD8F42
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 12:09:06 +0000 (UTC)
+Received: from APC01-SG2-obe.outbound.protection.outlook.com (mail-sgaapc01on2107.outbound.protection.outlook.com [40.107.215.107])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A180171A;
+	Thu,  6 Jul 2023 05:09:05 -0700 (PDT)
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=kNkKIA+Elq8s4JtGhVaYdI7bv5Aw0QcfXIoFvdys8J2uNj0QpR44RAUegp2iIib3fiCNxsbHg2x6CVlgcPQdYNI041+ZTcgrkvjWLnjySdHwsZnTitp2UfWNjjFUH3Rcu+crEidn8xUu/19oNoXcDLJynqOR7Lz59nJqniNHkcPSSK7cgyrPM49I8p4BCAGt/60pnNpFYptGLSs6+kA+i2uUhruOX4v16B8RdlGuh2Ymz6AOa9Q8thc/ZhLOw2SG5opqPEeNnemFclyq8hkhnvZoEvm6z1BANFoDl4Pq2A3ALjHltYaohfp+9eH039l6E0RrbvZEheqL6TA5yzWZ+A==
+ b=ZA2RCWLuzV3lLr7GMQ0I1/0tMKMlKyJ2TbD41Z0zwiOcIQ7xmdYplIW5i9BReoseI8ksqLJFR7YidOyMwt3tOL86kPPR8xlAC9I7BbS5yUIagY3qNJ27RT2U53cYWePfj96x5BvjtwjYf7lBej2F2d4LmQKUkZcGMri79EK8JgXOQ/7rcFSbwIWRYb24U4LU9rH8vouGF/7GpFjg26wRG0UjhPkbWIHTvjfceaG78AlE+j8a8TWjklWaK8jTEivpUalA/UDmCWYlJRQBEiIGM0Xlqcn+WpywLbZ/LbaMSzhtzUlnUrUv7qk3cVFKxxwTvTVfn7teMDSvujYqcmSXHw==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=cgOAVpOeEXM8sr9DyNJY1AdYjXXOqry624BnT5LG+uc=;
- b=gQZ0KxR3Tbzdjyj0C9rtypFr2o1Z+qbQW3lvk7pt/Pz5J/s+Dg1ilQS+mk7pOe97p4lB1vqlQhA1fKjBGudy/jeQkCf4AoY3TaNI+9UcN1uLfT9OShjRaqd/XNPNQNuaOGhNTLeXF8R0KHyoL561ZOzLHT+KUvxqg7r1V3Jwdi/m+A3NRk3es0UhjQCfdmp2k5Lrg3Ra2CAkZK6Z5xQLVXoNX7o7PSQmVedSt2XAqNERZs4cAA81p+F4Y3sPwnr4jwUqHRKTq5uwAjpG+PiabLf3B6e0FC22SrfEoXBNKoyJcwZj8ttEie+5S0blJff+saDcFOt10j0StQNQFZ0oxg==
+ bh=RIQFtyrZI7r77TsQYgyiBaI6pBVrzhHfNhyoBtEs3u0=;
+ b=hzYMMPZBYDB9ChOwSID3e7TX5FJo1K3aeA/KVspk0ys2buLcu5GPaAtHsyCtcFp5ytnXgtIEGFq0uCnuwKJqgjtBOxlkagDzUXUsa1Hnz72K6ycvKNxna+YrE+8YUPMssJ64ZSqXjnDnD5MGHKfO+1ws2OmMVD0mETwvD8TKzkEbJnaWEaaW9O5/3kPtuiXeDbpro2E7BM79733Nlw9n/8yMuZB08msaVQR9PNN1QxmQ7s8wHxhrsF40xrpEafsE7h6BjJ/H1T9NC4m3vE4U17pYEmuWc9cHyQZvs3NlxPYComRLPXJnVY7hkYEae9MKYJMHYPGAPFgA8fdyAPE7jA==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
- dkim=pass header.d=intel.com; arc=none
+ smtp.mailfrom=vivo.com; dmarc=pass action=none header.from=vivo.com;
+ dkim=pass header.d=vivo.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=vivo.com; s=selector2;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=RIQFtyrZI7r77TsQYgyiBaI6pBVrzhHfNhyoBtEs3u0=;
+ b=JFu0CWLFPrttmzpEFcYXtlolfGd5+HHClZTb81Y+TBysErwQBGPaDCVT3GO14x7zzBHUnEcbEHCK310ua3KJ8DEm3Xsk1SQeuqLomDZutsrok9NM9yQoMRn3yFL19znjd69tTs97sClexcG0c2MCZm0WQOxA/hML1QFcw+NxrfE9rGkedaBjdjVULa5Q2y3Nz5eg14Om8XfPoEArT3xOzEq3lHjL5EnNowYBJSPINlkaOoRG1AW4mDM6l0O5GK6JR0yOOH4J756/D5kntwp/up+vs+/xCmvxkShE8gHfFm8Gqo1pF4Wzzl8au5jv0dcNrYZhaoWDb2bKGBcBfdiS0A==
 Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=intel.com;
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com (2603:10b6:806:340::7)
- by PH8PR11MB7022.namprd11.prod.outlook.com (2603:10b6:510:222::15) with
+ header.d=none;dmarc=none action=none header.from=vivo.com;
+Received: from SEZPR06MB5269.apcprd06.prod.outlook.com (2603:1096:101:78::6)
+ by TY0PR06MB5634.apcprd06.prod.outlook.com (2603:1096:400:278::13) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Thu, 6 Jul
- 2023 12:06:01 +0000
-Received: from SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe]) by SN7PR11MB7540.namprd11.prod.outlook.com
- ([fe80::9376:9c9d:424a:a0fe%6]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 12:06:01 +0000
-Date: Thu, 6 Jul 2023 14:02:00 +0200
-From: Larysa Zaremba <larysa.zaremba@intel.com>
-To: Jesper Dangaard Brouer <jbrouer@redhat.com>
-CC: <bpf@vger.kernel.org>, <brouer@redhat.com>, <ast@kernel.org>,
-	<daniel@iogearbox.net>, <andrii@kernel.org>, <martin.lau@linux.dev>,
-	<song@kernel.org>, <yhs@fb.com>, <john.fastabend@gmail.com>,
-	<kpsingh@kernel.org>, <sdf@google.com>, <haoluo@google.com>,
-	<jolsa@kernel.org>, David Ahern <dsahern@gmail.com>, Jakub Kicinski
-	<kuba@kernel.org>, Willem de Bruijn <willemb@google.com>, Anatoly Burakov
-	<anatoly.burakov@intel.com>, Alexander Lobakin <alexandr.lobakin@intel.com>,
-	Magnus Karlsson <magnus.karlsson@gmail.com>, Maryam Tahhan
-	<mtahhan@redhat.com>, <xdp-hints@xdp-project.net>, <netdev@vger.kernel.org>
-Subject: Re: [PATCH bpf-next v2 20/20] selftests/bpf: check checksum level in
- xdp_metadata
-Message-ID: <ZKatOMUMTfbhd5Y0@lincoln>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-21-larysa.zaremba@intel.com>
- <cb8f65a9-30ac-ee6e-3368-e653a72dfaaf@redhat.com>
-Content-Type: text/plain; charset="us-ascii"
-Content-Disposition: inline
-In-Reply-To: <cb8f65a9-30ac-ee6e-3368-e653a72dfaaf@redhat.com>
-X-ClientProxiedBy: BE1P281CA0289.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:b10:8a::16) To SN7PR11MB7540.namprd11.prod.outlook.com
- (2603:10b6:806:340::7)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Thu, 6 Jul
+ 2023 12:09:01 +0000
+Received: from SEZPR06MB5269.apcprd06.prod.outlook.com
+ ([fe80::fa0e:6c06:7474:285c]) by SEZPR06MB5269.apcprd06.prod.outlook.com
+ ([fe80::fa0e:6c06:7474:285c%5]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
+ 12:09:01 +0000
+From: Yangtao Li <frank.li@vivo.com>
+To: "David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Michal Simek <michal.simek@amd.com>
+Cc: Yangtao Li <frank.li@vivo.com>,
+	netdev@vger.kernel.org,
+	linux-arm-kernel@lists.infradead.org,
+	linux-kernel@vger.kernel.org
+Subject: [PATCH 1/4] net: emaclite: Use devm_platform_get_and_ioremap_resource()
+Date: Thu,  6 Jul 2023 20:08:47 +0800
+Message-Id: <20230706120850.11026-1-frank.li@vivo.com>
+X-Mailer: git-send-email 2.39.0
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-ClientProxiedBy: SI2PR04CA0004.apcprd04.prod.outlook.com
+ (2603:1096:4:197::22) To SEZPR06MB5269.apcprd06.prod.outlook.com
+ (2603:1096:101:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
@@ -113,139 +72,86 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN7PR11MB7540:EE_|PH8PR11MB7022:EE_
-X-MS-Office365-Filtering-Correlation-Id: 7ee354fe-7dfc-472e-ae21-08db7e195c99
-X-LD-Processed: 46c98d88-e344-4ed4-8496-4ed7712e255d,ExtAddr
+X-MS-TrafficTypeDiagnostic: SEZPR06MB5269:EE_|TY0PR06MB5634:EE_
+X-MS-Office365-Filtering-Correlation-Id: e814c854-0180-4c4b-75aa-08db7e19c875
 X-MS-Exchange-SenderADCheck: 1
 X-MS-Exchange-AntiSpam-Relay: 0
 X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: FTEyHhi7FDYTa1Ne/zRpL8jt/TTxDFU61F7MW12eeVgJo9TJofPGB/FnbeIMS6yfdq+TE3n91fq9e+MxnX9hGOzOp4aJBmxu0rwCNf1fCpTTVATOrOQzlgXNXzN8cdPM2QZOCCVLJueS7D92imSVpqiC8Da4xZhrCwQ9/rkzB3YHWXEoSIFWWROkS1GufphGUEaWKctKB3aaiBtfA3didk24cHlRuGTcRa78nHN/YmA84YlDFSmA0sheXape/DmNVpAoiDPK/XrKqcGnxvsLaB1K2bSgZpSaMEKm+1RqZkrwYn7Ei0mFUcL1Cq3oswjHZyY6FhV3BYTOMj6nJEHLxDjB66gV9d3IAe4WPwwTyIm0lNJ6KbkK+1VwkdDHnL2YG8B5xFgraV7o5hi++NjptS+6ndMXoSAYT0BjkS0ZNAeoCKt4uSSkbvecjnGgiSPVbIIECxdeHDjDXZjUUdy3uq4vDtgxMCdl3VLIP7JTj+e2Vus0RNVIxMWquK9pa/dw02l73BXaRK7/zMxlReX2lqMTyb00OmvTAjE7tcS4WFQqdFMyJvlRMW5sMpLh7yOZ
-X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN7PR11MB7540.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(39860400002)(396003)(376002)(136003)(346002)(451199021)(33716001)(2906002)(41300700001)(7416002)(44832011)(8936002)(8676002)(186003)(6506007)(478600001)(5660300002)(26005)(6512007)(9686003)(82960400001)(86362001)(6486002)(316002)(4326008)(6916009)(66946007)(66556008)(38100700002)(66476007)(54906003)(83380400001);DIR:OUT;SFP:1102;
+X-Microsoft-Antispam-Message-Info:
+	1G37IJmceuO6UMQin1Aj0oKjw8UO/yFZ6EnIePBJYrHtn0Kb0cEO4hZUNG9Ih8nN99addgEHNUwEmAsnieFm2NwD6hZrL+zKvViSggP+CMaHU+2kJfvPuQXUjIhX3lA6/SkdHmHU4nTUD7ucTD84nQK4nrRb/lSGjlEKAm3ZnOt5ZPVIZdIqKY2Np1J+i50168NA0z4iaj+LZmivFicruqpRruRRuie6a+gUuxlGfVVyoFMLKht0No78lFJt0q4+hfXx9CTxu4srHY8zKQlTILFGfAAJhCM19GTnZhZESKABzWJ0a2AIfyZA05A+lkw74RcJK/Io1lpcoz/h44pNrmwJfWWuXrVzmSjOfuDMJObXgmMq8k1fYZXxoAqjIHhe91ViZrAy2TC4RRJPdYfVNawTg1p6hM7X4kds5b1Ma0cISZQWIWIqj1rKou66bRdTEEYQ943MvzbLVadflnwh8SvXgmfaRTAkzSga9TghlzC4hD5bzzqIe1qXY+O4tfP2mSZTJQRKIqQNw0VDM1lKM8J4mG3grRjz5nySlYNaxz+6liSkvrh+gYKxNdiksNHvXvZvieGCFFwpQbdWFK4r0R1Y2VJXNiX0pSG/nxI8owr5WygDzQnbmhD0MVVwGlFh
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SEZPR06MB5269.apcprd06.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39860400002)(366004)(376002)(346002)(136003)(396003)(451199021)(6486002)(52116002)(478600001)(6666004)(110136005)(83380400001)(86362001)(2616005)(36756003)(4744005)(2906002)(66946007)(6506007)(1076003)(26005)(6512007)(186003)(38350700002)(38100700002)(8676002)(316002)(66476007)(66556008)(4326008)(41300700001)(8936002)(5660300002);DIR:OUT;SFP:1102;
 X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?bqKCKiyfkxkmcmGvHIkn/TfU2Z0FLhQ3UnWLTrrXAXgFhf/g0gRTkHyKuSS4?=
- =?us-ascii?Q?QB5ZYCJ7yWB9sSJgcLhM18ALtKAG8JocgBsKTmnwhSmTDxvtKqilUDP/ykl+?=
- =?us-ascii?Q?pZW8qEAJzuGCZEeyWAWl6g3a8pFrjRp1CBaDlCjQ0N08oEtHLtioUWKf1g43?=
- =?us-ascii?Q?fnJw9qkKwkI6UZ+pEwkDJFUhZyZ4W4BGEcbyic0L1X0bRhzW0XXTKaQHmBRg?=
- =?us-ascii?Q?6dhPOFtukmXFabigO5MamN/Gy8UA732CWye+maes6lbfZAHfsflNEnyTgyuc?=
- =?us-ascii?Q?Uiy/b2SVwHcPOWLW5FgQv1q5Kc22slzfyFIFKDCJhrNhtR7iYm0jb/Hr93IU?=
- =?us-ascii?Q?SblLZ4nmD6v55v8LOruSUeWiArFODSsg6arOVWXV1K3QWddjFs+tw9DaepHI?=
- =?us-ascii?Q?xwROrttqF/d5b+FzFp0W0RKO6U8vxoqM0jrzyZrYtIeG6pHoN2Ezyh+uHIrD?=
- =?us-ascii?Q?OCTdcqpyZ2yxF35xo0GmHlw+WOTM752M/rHFmOQBSUuxqMsG1QFBzu0atMJJ?=
- =?us-ascii?Q?zRWZwfT0gRJZ6lAeJloHDYKAA/8kzkt/pa5iZTFAnl+vzIpkMlfdJ+DfPpqT?=
- =?us-ascii?Q?JbDw86amtwkSND6zzOOG2BwJIDTeA1KNAntmugnI5l4Kis9ylJxneGe4fssl?=
- =?us-ascii?Q?Oxcym52Gbj3XtJB9vMidEL+YERBoG/VbRPFiVUcj2wTL4BPpPd1lycU9Oc59?=
- =?us-ascii?Q?kju6RiSxmV/RWBuJQo0qp505i/ne5jfwiebgZOWhR6IZWFbDtWM/i/560CEp?=
- =?us-ascii?Q?+UEGk6BlwAZVotV9P99Jwr0a+ggO3UNT1bstDPvu26dsr1px2OJQ71IcqHyU?=
- =?us-ascii?Q?i6Wbz91evvp1lSUC17RRjSDcmnBP36MCJ9eb2dJUdCl2wXYkgZSifflkua/P?=
- =?us-ascii?Q?TXrYfLjCwpzGc/SPpLfHB0mGL1RZXLUFjenhLfG/gMpaO2Ksm7u0OZ00qFz4?=
- =?us-ascii?Q?57z+AXEqHpvQP3vrENDKr3lGDNoe5xYUjE5Lr/Z/sEaLyiAazAgV4wc4yNIe?=
- =?us-ascii?Q?ftmcGVFqKLyuoh02f4umBOtHmKFUoPyqqRwj8RS3pJiVx+eojec693LsNDvo?=
- =?us-ascii?Q?Z0F5xkvmixv817U834xAHX06d1kJhxkbZiAJ99Do79Svn+oNya2Gj1Q96c2l?=
- =?us-ascii?Q?IWEoEKTyBBD5M3mUr8KzszpYOhEyeD6rPuxngI/rEu6ocuhT2SK0+d5LQRkM?=
- =?us-ascii?Q?i2h5QGJ5wRmuWJ4W7wydrVWE5Eb1enxidmtqLgUqLBii3Xgeu32uD1g84SbL?=
- =?us-ascii?Q?YfJ1g6hg96vHdzKTk3LgxvkOXJQDBUb1eJ9G4pK+YMK0oYr9CHo2XBISS1FG?=
- =?us-ascii?Q?6g3B+Ydgoh7GlVuYwZtV6Wkx0Wt8Z4W6e0vUMVOEyAvZdXYzVXXg6YravERg?=
- =?us-ascii?Q?1XTrOO5Y9XJuI4Jrho7Feyy8/jM54dwMXCsejxbYSns64Rqy8W46lcJuUhGN?=
- =?us-ascii?Q?Tk0oQdJuZ8AqOfk4g5Vd0LxBcEfIoRKybEd93bZEaVUcqDjJdtU5fMJ3LwLt?=
- =?us-ascii?Q?Es3UaJ9jiL/kQu0uwPs/dBs82EWbPBeMuzYLMIP6KwAErtrWFTUKg5/ilg5D?=
- =?us-ascii?Q?zOZHadpPVzbaXwqllk76sVAPcngfyLFEsnNcRsnnP2ORoezNC1Ub7CUF70zh?=
- =?us-ascii?Q?QA=3D=3D?=
-X-MS-Exchange-CrossTenant-Network-Message-Id: 7ee354fe-7dfc-472e-ae21-08db7e195c99
-X-MS-Exchange-CrossTenant-AuthSource: SN7PR11MB7540.namprd11.prod.outlook.com
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?z7JNU+QfwV7I3Me6vjEXua/CPLJjT6TE7mF7mMHaaoGl2cHeiph/fgQ407OW?=
+ =?us-ascii?Q?qLIJarOn58XJ4l5tqfvSad58ZkY4ZyRqNztehQHjfA8SltvucC/Ilay13kcw?=
+ =?us-ascii?Q?3+AHdBWLr544aaTBnus7AgyS8UipsW07Zh/eo3zF1VbFq9nQRCqyDDQdL/e5?=
+ =?us-ascii?Q?+iAzUz+Td7jxHsy/ZAEynDdaWbMnmRESa/HGYGJygm5e36EIropGQbfU2iOY?=
+ =?us-ascii?Q?c/21I8ioWA3vmf3CeSxiI1D0NxRgx9Z8BlVQMzQHH/MM+ApUGmTNOn9RvRrH?=
+ =?us-ascii?Q?dHeuFJu1jbx2NHDUBSy8AlSzwLe9zkJa9r49aDIAMg7LvIsMsAqUtk2YgI7c?=
+ =?us-ascii?Q?VFo0Xdw4oeADQtdteFF9xd99BedjyyhSbXX8j0xwThGuHTffEEpbIuVNkfa7?=
+ =?us-ascii?Q?k8rChLC5F1CbaddtIuZtQJm5xYbBhX1FsVJYx+KEP55xpbGIsPm2J1YAPR0c?=
+ =?us-ascii?Q?20sBwo8DOTqH2vmppMuszi23KTCuAUe/P4JyXB2oCNsjs7lqO/h2b3QE8AFD?=
+ =?us-ascii?Q?p81kQNGEK/vqJN9NZRgVKa8NnweIXKBC6LAYDvpfT47Q+a/NVWfVKidBnUiS?=
+ =?us-ascii?Q?kbaCVDz+mqf/Y3liT0N5LIkjG5YSvztCisDqiXukfr2CsRV38RaOAy4Kvgxu?=
+ =?us-ascii?Q?9GBbAMvGBziV8uWZDL5RNxU7DaJ6DtI2lwBUlVUNmROtDCf6XFrtLiwG4CIZ?=
+ =?us-ascii?Q?T06McJedK9PKtUjha4fD7qJmukIiEXe/IJxCimt/VPGn05Rp6C+CIxmpzgEU?=
+ =?us-ascii?Q?EQdk5Fp6i2UQxD56k8IiZsFpHIat3VdAJK3fBkQQRTsMS7EBkgdcD7Dt5hnO?=
+ =?us-ascii?Q?2qPdqWOhpb4SgNUUUTRDRLNHa4kOfx3O7xjaOT6cAFPcYLnj0/78pDbRAbAI?=
+ =?us-ascii?Q?QKk4Zz1V3APVETbS0XgRjheDicMNmifpv1f84PZO6fcXjGz+Bav69T72sOyP?=
+ =?us-ascii?Q?cejgzkcLdrT8fOwN42FtKWPUIv6UDnQW3jUzRcdMYhgnlpgWiLd7khxvadSM?=
+ =?us-ascii?Q?v/RthOA4DRhFnuLm6fG+jt/vHtHhsDpFCn41EtgM2m1bM/3vX9OhSIswODgq?=
+ =?us-ascii?Q?HkCOYTTICj01Cr+PyfsPI1K4qfI9f3Y5P9ttA3jccebAdoY9oYQUJRAFtume?=
+ =?us-ascii?Q?fJzcFnrZ6ZhAV07S31+0wbosmE5qkYMhh3rMul/cGh++rSJZu4Iz8c6PHoco?=
+ =?us-ascii?Q?HSCyeOtBI7RmI47y/fasuqnniP94dnHaIJN7inHqKvSBKDYOcEkAVe6fgr2x?=
+ =?us-ascii?Q?f/eNKOdATyXjrmeFUWFsnBYhyfU3au05f165yp/ulQ1mmgF045s/Iz2mczmW?=
+ =?us-ascii?Q?82D33p2TaklX23SVzeHFXeRgIDyMmACzp8CEK16AvwTz7su6lFVIHT4VV+4L?=
+ =?us-ascii?Q?taNI3jqHcSXRq1q61F3lNbW7lc+WjfIb1OPHMzT6B3sOIxReX6htxfjjIgK8?=
+ =?us-ascii?Q?uIBdXK9vllg9OPPfoLrY5UXgkhyRqQwxQaPGi5Da0HcqQJjkyRpI1VZFCReD?=
+ =?us-ascii?Q?5wIGkTabCk4JkL8fUAulfJMSuP4vWXDzPTmkI0FmkXHtesGkB0C9Ib6jINVm?=
+ =?us-ascii?Q?/569RjqxbxT2t1TN0+bfoZl10QT56z9VE56cs1bT?=
+X-OriginatorOrg: vivo.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: e814c854-0180-4c4b-75aa-08db7e19c875
+X-MS-Exchange-CrossTenant-AuthSource: SEZPR06MB5269.apcprd06.prod.outlook.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 12:06:00.5609
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 06 Jul 2023 12:09:00.8447
  (UTC)
 X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-Id: 923e42dc-48d5-4cbe-b582-1a797a6412ed
 X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: c/XPLeTZRXeVuKacuk4Hpj59fZNQeYgpH16iDo/5Uk5XeWyih7L3E0sUBVZThLzpOXkmU42uBdDXzlfUsqVIUAnuU87aPEYGrkq6lnouwJo=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH8PR11MB7022
-X-OriginatorOrg: intel.com
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-MS-Exchange-CrossTenant-UserPrincipalName: VIBl3Uz8EISM/ZRnvpLNsqo25KU9/YymQCoxEp334lxXfo8EWY8zJQAN+ZGbyTIM7WIl6YuiBJEzqqA5OJlEPw==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: TY0PR06MB5634
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 06, 2023 at 12:25:10PM +0200, Jesper Dangaard Brouer wrote:
-> 
-> 
-> On 03/07/2023 20.12, Larysa Zaremba wrote:
-> > Verify, whether kfunc in xdp_metadata test correctly returns checksum level
-> > of zero.
-> > 
-> > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
-> > ---
-> >   tools/testing/selftests/bpf/prog_tests/xdp_metadata.c | 3 +++
-> >   tools/testing/selftests/bpf/progs/xdp_metadata.c      | 7 +++++++
-> >   2 files changed, 10 insertions(+)
-> > 
-> > diff --git a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> > index 50ac9f570bc5..6c71d712932e 100644
-> > --- a/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> > +++ b/tools/testing/selftests/bpf/prog_tests/xdp_metadata.c
-> > @@ -228,6 +228,9 @@ static int verify_xsk_metadata(struct xsk *xsk)
-> >   	if (!ASSERT_EQ(meta->rx_vlan_proto, VLAN_PID, "rx_vlan_proto"))
-> >   		return -1;
-> > +	if (!ASSERT_NEQ(meta->rx_csum_lvl, 0, "rx_csum_lvl"))
-> > +		return -1;
-> 
-> Not-equal ("NEQ") to 0 feels weird here.
-> Below you set meta->rx_csum_lvl=1 in case meta->rx_csum_lvl==0.
-> 
-> Thus, test can pass if meta->rx_csum_lvl happens to be a random value.
-> We could set meta->rx_csum_lvl to 42 in case meta->rx_csum_lvl==0, and
-> then use a ASSERT_EQ==42 to be more certain of the case we are testing are
-> fulfilled.
->
+Convert platform_get_resource(), devm_ioremap_resource() to a single
+call to devm_platform_get_and_ioremap_resource(), as this is exactly
+what this function does.
 
-I just copied the approach used for timestamp. I think you are right and I 
-should have make the new code better.
+Signed-off-by: Yangtao Li <frank.li@vivo.com>
+---
+ drivers/net/ethernet/xilinx/xilinx_emaclite.c | 3 +--
+ 1 file changed, 1 insertion(+), 2 deletions(-)
 
-ASSERT_NEQ(0) is also used for rx_hash. It would be a good idea to go and fix 
-those too, but the patchset has already ballooned too much for me, so I would 
-leave it for later.
-
-With ASSERT_EQ for checksum level, I think comparing it to "1" should be enough. 
-Do I guess correctly, the main problem with ASSERT_NEQ is uninitialized memory?
+diff --git a/drivers/net/ethernet/xilinx/xilinx_emaclite.c b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
+index ad2c30d9a482..3cba947e4cbd 100644
+--- a/drivers/net/ethernet/xilinx/xilinx_emaclite.c
++++ b/drivers/net/ethernet/xilinx/xilinx_emaclite.c
+@@ -1114,8 +1114,7 @@ static int xemaclite_of_probe(struct platform_device *ofdev)
  
-Another value that is less magical than 42 would be "4", because csum_level 
-takes 2 bits, so it is the smallest value that does not correspod to 
-any valid checksum level.
+ 	ndev->irq = rc;
  
-> 
-> > +
-> >   	xsk_ring_cons__release(&xsk->rx, 1);
-> >   	refill_rx(xsk, comp_addr);
-> > diff --git a/tools/testing/selftests/bpf/progs/xdp_metadata.c b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> > index 382984a5d1c9..6f7223d581b7 100644
-> > --- a/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> > +++ b/tools/testing/selftests/bpf/progs/xdp_metadata.c
-> > @@ -26,6 +26,8 @@ extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
-> >   extern int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx,
-> >   					__u16 *vlan_tag,
-> >   					__be16 *vlan_proto) __ksym;
-> > +extern int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx,
-> > +					__u8 *csum_level) __ksym;
-> >   SEC("xdp")
-> >   int rx(struct xdp_md *ctx)
-> > @@ -62,6 +64,11 @@ int rx(struct xdp_md *ctx)
-> >   	bpf_xdp_metadata_rx_hash(ctx, &meta->rx_hash, &meta->rx_hash_type);
-> >   	bpf_xdp_metadata_rx_vlan_tag(ctx, &meta->rx_vlan_tag, &meta->rx_vlan_proto);
-> > +	/* Same as with timestamp, zero is expected */
-> > +	ret = bpf_xdp_metadata_rx_csum_lvl(ctx, &meta->rx_csum_lvl);
-> > +	if (!ret && meta->rx_csum_lvl == 0)
-> > +		meta->rx_csum_lvl = 1;
-> > +
-> 
-> IMHO it is more human-readable-code to rename "ret" variable "err".
-> 
-> I know you are just reusing variable "ret", so it's not really your fault.
-> 
-> 
-> 
-> >   	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
-> >   }
-> 
+-	res = platform_get_resource(ofdev, IORESOURCE_MEM, 0);
+-	lp->base_addr = devm_ioremap_resource(&ofdev->dev, res);
++	lp->base_addr = devm_platform_get_and_ioremap_resource(ofdev, 0, &res);
+ 	if (IS_ERR(lp->base_addr)) {
+ 		rc = PTR_ERR(lp->base_addr);
+ 		goto error;
+-- 
+2.39.0
+
 
