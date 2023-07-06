@@ -1,181 +1,245 @@
-Return-Path: <netdev+bounces-15713-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15714-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 5D70E749505
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:36:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C82B6749513
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 07:50:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8BD6C1C20CE3
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 05:36:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B4DEF2811BA
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 05:50:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 434F2A47;
-	Thu,  6 Jul 2023 05:36:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B393610F1;
+	Thu,  6 Jul 2023 05:50:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30BDFEDD
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 05:36:07 +0000 (UTC)
-Received: from mail-pf1-f207.google.com (mail-pf1-f207.google.com [209.85.210.207])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 260911BF9
-	for <netdev@vger.kernel.org>; Wed,  5 Jul 2023 22:35:59 -0700 (PDT)
-Received: by mail-pf1-f207.google.com with SMTP id d2e1a72fcca58-66872e30de9so634690b3a.3
-        for <netdev@vger.kernel.org>; Wed, 05 Jul 2023 22:35:59 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E993A47;
+	Thu,  6 Jul 2023 05:50:35 +0000 (UTC)
+Received: from mail-pf1-x432.google.com (mail-pf1-x432.google.com [IPv6:2607:f8b0:4864:20::432])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id AF986110;
+	Wed,  5 Jul 2023 22:50:33 -0700 (PDT)
+Received: by mail-pf1-x432.google.com with SMTP id d2e1a72fcca58-666ed230c81so375114b3a.0;
+        Wed, 05 Jul 2023 22:50:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688622633; x=1691214633;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=6KqsODTKbZmN8UTNNadCpXQZDsIrjIswwPW+/1H0i60=;
+        b=pkM3d8a2FY2p6XIJSq3BsHN/NilulK+jKTWoe15XMGMBpPQa2rSLATnNv+JmTyVoqN
+         wkRZWagfLr7x8JSNUSRM8IFXmaAm4xnmtRGxsvsr7s95JDJoHKqDZyDThqG4MHrGXj7i
+         NNQbZZhDZ+ILBscYtcrg0F7c+RneNX38uhQXNCWA6OygspHLe4ffh9eaqFqUxe4JkDyF
+         b3w8LKFdPigvyal38RHfCfHQN2xmNkbzF8QvaWI4DUMBWDfVe5ctm23gPRGqzf8fWl8D
+         o/NSI2RNaxMuQ8IuLIL4hD8zAcoj0tX60x9dpyqhTu4SgrlWUNvo8B7cPpaXSyV79yev
+         GGqw==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688621758; x=1691213758;
-        h=content-transfer-encoding:to:from:subject:message-id:date
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=M8IG/7a1r+lbg72l7T26yvBl01awCMA71YiK77chGGY=;
-        b=QxKpkHxfL2RsXcOGVfjRPL3pqsL8kVItBOzVwGEwqit8X/KDOgLV8+PBtUbpCC6161
-         OHFu3ZHlxpRST82NuO/zgi+Xg2SN9gFS1+VZsKAufezbbzVRFhHRjZ+eaPB/sQeLMUpP
-         UjfHULwSzfdJ0xYzRLotsNcCTpmUVOPzapFpt0LCz2RD8QkLM4hHZZVjTKSZDUsRcrpM
-         ToTLXENBcbz/dhJp3sEx8//o24BUq1C0FUSi+E8bCl9TLmySNgtvij3q1bB3GffshG7d
-         GGybn1FgaCMcN+0r9JlMJSIhQy9vFg764cMHsiUBzc5lcfsdOyMBfvXNyAwJURsCUgqP
-         WDVg==
-X-Gm-Message-State: ABy/qLYnQrJ2af/83LRPPxQ7i/g+T8DbGp4zT0Cc9myNaWisei0htAyX
-	7tXNRd3jvPwI975ozcPaZ7SNeIX7nTnMh1LtX/oabPY8588S
-X-Google-Smtp-Source: APBJJlHZV14xswxelXjf2gNMVwi7ttbcjOZU6bY8KMzghjNPkZhZ4HCiV3TXsEZ54Vyvhpc7pg50NtR8npI/+S5dYgQVOThu6sJn
+        d=1e100.net; s=20221208; t=1688622633; x=1691214633;
+        h=content-transfer-encoding:mime-version:subject:references
+         :in-reply-to:message-id:cc:to:from:date:x-gm-message-state:from:to
+         :cc:subject:date:message-id:reply-to;
+        bh=6KqsODTKbZmN8UTNNadCpXQZDsIrjIswwPW+/1H0i60=;
+        b=FTt7G91QTKN7Xaxm0SIEGbgisGEKNKIwHDvcxCm1XNLMRWTwYPXdiZmkFAJPlS7hxj
+         Fpc02SlNU++6ZPucpIeWU+VrJfJ42VnLLCxDr3AqkA5hPVpVLI3aUPQYcSSe4xIm1el4
+         XU8ITFduu1uuHdOOVOMrKrGd+3seJhRw4Iq1INot1SiYK0WpQEI7HqYtuhSeFB/+mqDH
+         J4GVz+9bz9g7Tj66cdoFW7Ex2GI+1eSJtCwnkk+SwCiQCXtuMEsRhYj/yD5gqMwtRzzi
+         MTWa7daEn+zH094ewh9bH7/kjwshF/GLHpk2jTMhHM8pc2flOvusfdEVVwsEN+ycVpua
+         oFPA==
+X-Gm-Message-State: ABy/qLbuI3/bzEQ9AtpgrhOfuqbFQ5EovxH3qoq7+tLWkUdNI2R5tqwd
+	i/jzixK8bArmi4xqR/XSQ6s=
+X-Google-Smtp-Source: APBJJlEktT3qq0Z6n8MOrcFoLqPhNIKKDhh5jX78z9X5sh0L4KFZern6+qAEVmsmYveHjKrFdtC3NA==
+X-Received: by 2002:a05:6a00:1a8a:b0:668:79d6:34df with SMTP id e10-20020a056a001a8a00b0066879d634dfmr1012583pfv.23.1688622632998;
+        Wed, 05 Jul 2023 22:50:32 -0700 (PDT)
+Received: from localhost ([2605:59c8:148:ba10::41f])
+        by smtp.gmail.com with ESMTPSA id ey2-20020a056a0038c200b006828a3c259fsm449353pfb.104.2023.07.05.22.50.32
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Wed, 05 Jul 2023 22:50:32 -0700 (PDT)
+Date: Wed, 05 Jul 2023 22:50:31 -0700
+From: John Fastabend <john.fastabend@gmail.com>
+To: Larysa Zaremba <larysa.zaremba@intel.com>, 
+ Jesper Dangaard Brouer <jbrouer@redhat.com>
+Cc: John Fastabend <john.fastabend@gmail.com>, 
+ brouer@redhat.com, 
+ bpf@vger.kernel.org, 
+ ast@kernel.org, 
+ daniel@iogearbox.net, 
+ andrii@kernel.org, 
+ martin.lau@linux.dev, 
+ song@kernel.org, 
+ yhs@fb.com, 
+ kpsingh@kernel.org, 
+ sdf@google.com, 
+ haoluo@google.com, 
+ jolsa@kernel.org, 
+ David Ahern <dsahern@gmail.com>, 
+ Jakub Kicinski <kuba@kernel.org>, 
+ Willem de Bruijn <willemb@google.com>, 
+ Anatoly Burakov <anatoly.burakov@intel.com>, 
+ Alexander Lobakin <alexandr.lobakin@intel.com>, 
+ Magnus Karlsson <magnus.karlsson@gmail.com>, 
+ Maryam Tahhan <mtahhan@redhat.com>, 
+ xdp-hints@xdp-project.net, 
+ netdev@vger.kernel.org, 
+ "David S. Miller" <davem@davemloft.net>, 
+ Alexander Duyck <alexander.duyck@gmail.com>
+Message-ID: <64a656273ee15_b20ce2087a@john.notmuch>
+In-Reply-To: <ZKQAPBcIE/iCkiX2@lincoln>
+References: <20230703181226.19380-1-larysa.zaremba@intel.com>
+ <20230703181226.19380-13-larysa.zaremba@intel.com>
+ <64a331c338a5a_628d3208cb@john.notmuch>
+ <ZKPlZ6Z8ni5+ZJCK@lincoln>
+ <9cd44759-416c-7274-f805-ee9d756f15b1@redhat.com>
+ <ZKQAPBcIE/iCkiX2@lincoln>
+Subject: Re: [PATCH bpf-next v2 12/20] xdp: Add checksum level hint
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:2d16:b0:677:c9da:14b6 with SMTP id
- fa22-20020a056a002d1600b00677c9da14b6mr1140786pfb.4.1688621758557; Wed, 05
- Jul 2023 22:35:58 -0700 (PDT)
-Date: Wed, 05 Jul 2023 22:35:58 -0700
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <0000000000001432c105ffcae455@google.com>
-Subject: [syzbot] [wireless?] WARNING in restore_regulatory_settings (2)
-From: syzbot <syzbot+dfe2fbeb4e710bbaddf9@syzkaller.appspotmail.com>
-To: axboe@kernel.dk, brauner@kernel.org, davem@davemloft.net, 
-	edumazet@google.com, hare@suse.de, hch@lst.de, johannes@sipsolutions.net, 
-	kuba@kernel.org, linux-kernel@vger.kernel.org, linux-wireless@vger.kernel.org, 
-	netdev@vger.kernel.org, pabeni@redhat.com, syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+Content-Type: text/plain;
+ charset=utf-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello,
+Larysa Zaremba wrote:
+> On Tue, Jul 04, 2023 at 12:39:06PM +0200, Jesper Dangaard Brouer wrote:
+> > Cc. DaveM+Alex Duyck, as I value your insights on checksums.
+> > 
+> > On 04/07/2023 11.24, Larysa Zaremba wrote:
+> > > On Mon, Jul 03, 2023 at 01:38:27PM -0700, John Fastabend wrote:
+> > > > Larysa Zaremba wrote:
+> > > > > Implement functionality that enables drivers to expose to XDP code,
+> > > > > whether checksums was checked and on what level.
+> > > > > 
+> > > > > Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
+> > > > > ---
+> > > > >   Documentation/networking/xdp-rx-metadata.rst |  3 +++
+> > > > >   include/linux/netdevice.h                    |  1 +
+> > > > >   include/net/xdp.h                            |  2 ++
+> > > > >   kernel/bpf/offload.c                         |  2 ++
+> > > > >   net/core/xdp.c                               | 21 ++++++++++++++++++++
+> > > > >   5 files changed, 29 insertions(+)
+> > > > > 
+> > > > > diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
+> > > > > index ea6dd79a21d3..4ec6ddfd2a52 100644
+> > > > > --- a/Documentation/networking/xdp-rx-metadata.rst
+> > > > > +++ b/Documentation/networking/xdp-rx-metadata.rst
+> > > > > @@ -26,6 +26,9 @@ metadata is supported, this set will grow:
+> > > > >   .. kernel-doc:: net/core/xdp.c
+> > > > >      :identifiers: bpf_xdp_metadata_rx_vlan_tag
+> > > > > +.. kernel-doc:: net/core/xdp.c
+> > > > > +   :identifiers: bpf_xdp_metadata_rx_csum_lvl
+> > > > > +
+> > > > >   An XDP program can use these kfuncs to read the metadata into stack
+> > > > >   variables for its own consumption. Or, to pass the metadata on to other
+> > > > >   consumers, an XDP program can store it into the metadata area carried
+> > > > > diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
+> > > > > index 4fa4380e6d89..569563687172 100644
+> > > > > --- a/include/linux/netdevice.h
+> > > > > +++ b/include/linux/netdevice.h
+> > > > > @@ -1660,6 +1660,7 @@ struct xdp_metadata_ops {
+> > > > >   			       enum xdp_rss_hash_type *rss_type);
+> > > > >   	int	(*xmo_rx_vlan_tag)(const struct xdp_md *ctx, u16 *vlan_tag,
+> > > > >   				   __be16 *vlan_proto);
+> > > > > +	int	(*xmo_rx_csum_lvl)(const struct xdp_md *ctx, u8 *csum_level);
+> > > > >   };
+> > > > >   /**
+> > > > > diff --git a/include/net/xdp.h b/include/net/xdp.h
+> > > > > index 89c58f56ffc6..61ed38fa79d1 100644
+> > > > > --- a/include/net/xdp.h
+> > > > > +++ b/include/net/xdp.h
+> > > > > @@ -391,6 +391,8 @@ void xdp_attachment_setup(struct xdp_attachment_info *info,
+> > > > >   			   bpf_xdp_metadata_rx_hash) \
+> > > > >   	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_VLAN_TAG, \
+> > > > >   			   bpf_xdp_metadata_rx_vlan_tag) \
+> > > > > +	XDP_METADATA_KFUNC(XDP_METADATA_KFUNC_RX_CSUM_LVL, \
+> > > > > +			   bpf_xdp_metadata_rx_csum_lvl) \
+> > > > >   enum {
+> > > > >   #define XDP_METADATA_KFUNC(name, _) name,
+> > > > > diff --git a/kernel/bpf/offload.c b/kernel/bpf/offload.c
+> > > > > index 986e7becfd42..a133fb775f49 100644
+> > > > > --- a/kernel/bpf/offload.c
+> > > > > +++ b/kernel/bpf/offload.c
+> > > > > @@ -850,6 +850,8 @@ void *bpf_dev_bound_resolve_kfunc(struct bpf_prog *prog, u32 func_id)
+> > > > >   		p = ops->xmo_rx_hash;
+> > > > >   	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_VLAN_TAG))
+> > > > >   		p = ops->xmo_rx_vlan_tag;
+> > > > > +	else if (func_id == bpf_xdp_metadata_kfunc_id(XDP_METADATA_KFUNC_RX_CSUM_LVL))
+> > > > > +		p = ops->xmo_rx_csum_lvl;
+> > > > >   out:
+> > > > >   	up_read(&bpf_devs_lock);
+> > > > > diff --git a/net/core/xdp.c b/net/core/xdp.c
+> > > > > index f6262c90e45f..c666d3e0a26c 100644
+> > > > > --- a/net/core/xdp.c
+> > > > > +++ b/net/core/xdp.c
+> > > > > @@ -758,6 +758,27 @@ __bpf_kfunc int bpf_xdp_metadata_rx_vlan_tag(const struct xdp_md *ctx, u16 *vlan
+> > > > >   	return -EOPNOTSUPP;
+> > > > >   }
+> > > > > +/**
+> > > > > + * bpf_xdp_metadata_rx_csum_lvl - Get depth at which HW has checked the checksum.
+> > > > > + * @ctx: XDP context pointer.
+> > > > > + * @csum_level: Return value pointer.
+> > > > > + *
+> > > > > + * In case of success, csum_level contains depth of the last verified checksum.
+> > > > > + * If only the outermost checksum was verified, csum_level is 0, if both
+> > > > > + * encapsulation and inner transport checksums were verified, csum_level is 1,
+> > > > > + * and so on.
+> > > > > + * For more details, refer to csum_level field in sk_buff.
+> > > > > + *
+> > > > > + * Return:
+> > > > > + * * Returns 0 on success or ``-errno`` on error.
+> > > > > + * * ``-EOPNOTSUPP`` : device driver doesn't implement kfunc
+> > > > > + * * ``-ENODATA``    : Checksum was not validated
+> > > > > + */
+> > > > > +__bpf_kfunc int bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *csum_level)
+> > > > 
+> > > > Istead of ENODATA should we return what would be put in the ip_summed field
+> > > > CHECKSUM_{NONE, UNNECESSARY, COMPLETE, PARTIAL}? Then sig would be,
+> > 
+> > I was thinking the same, what about checksum "type".
+> > 
+> > > > 
+> > > >   bpf_xdp_metadata_rx_csum_lvl(const struct xdp_md *ctx, u8 *type, u8 *lvl);
+> > > > 
+> > > > or something like that? Or is the thought that its not really necessary?
+> > > > I don't have a strong preference but figured it was worth asking.
+> > > > 
+> > > 
+> > > I see no value in returning CHECKSUM_COMPLETE without the actual checksum value.
+> > > Same with CHECKSUM_PARTIAL and csum_start. Returning those values too would
+> > > overcomplicate the function signature.
+> > 
+> > So, this kfunc bpf_xdp_metadata_rx_csum_lvl() success is it equivilent to
+> > CHECKSUM_UNNECESSARY?
+> 
+> This is 100% true for physical NICs, it's more complicated for veth, bacause it 
+> often receives CHECKSUM_PARTIAL, which shouldn't normally apprear on RX, but is 
+> treated by the network stack as a validated checksum, because there is no way 
+> internally generated packet could be messed up. I would be grateful if you could 
+> look at the veth patch and share your opinion about this.
+> 
+> > 
+> > Looking at documentation[1] (generated from skbuff.h):
+> >  [1] https://kernel.org/doc/html/latest/networking/skbuff.html#checksumming-of-received-packets-by-device
+> > 
+> > Is the idea that we can add another kfunc (new signature) than can deal
+> > with the other types of checksums (in a later kernel release)?
+> >
+> 
+> Yes, that is the idea.
 
-syzbot found the following issue on:
-
-HEAD commit:    6352a698ca5b Add linux-next specific files for 20230630
-git tree:       linux-next
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D11f564a4a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=3D39b764f3018462f=
-e
-dashboard link: https://syzkaller.appspot.com/bug?extid=3Ddfe2fbeb4e710bbad=
-df9
-compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils=
- for Debian) 2.35.2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=3D1640f4a0a8000=
-0
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=3D11a10c40a80000
-
-Downloadable assets:
-disk image: https://storage.googleapis.com/syzbot-assets/55254daea013/disk-=
-6352a698.raw.xz
-vmlinux: https://storage.googleapis.com/syzbot-assets/cb343779c938/vmlinux-=
-6352a698.xz
-kernel image: https://storage.googleapis.com/syzbot-assets/3d451333dab6/bzI=
-mage-6352a698.xz
-
-The issue was bisected to:
-
-commit ae220766d87cd6799dbf918fea10613ae14c0654
-Author: Christoph Hellwig <hch@lst.de>
-Date:   Thu Jun 8 11:02:37 2023 +0000
-
-    block: remove the unused mode argument to ->release
-
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=3D1340a3f0a800=
-00
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=3D10c0a3f0a800=
-00
-console output: https://syzkaller.appspot.com/x/log.txt?x=3D1740a3f0a80000
-
-IMPORTANT: if you fix the issue, please add the following tag to the commit=
-:
-Reported-by: syzbot+dfe2fbeb4e710bbaddf9@syzkaller.appspotmail.com
-Fixes: ae220766d87c ("block: remove the unused mode argument to ->release")
-
-------------[ cut here ]------------
-Unexpected user alpha2: =EF=BF=BDI
-WARNING: CPU: 0 PID: 9 at net/wireless/reg.c:438 is_user_regdom_saved net/w=
-ireless/reg.c:438 [inline]
-WARNING: CPU: 0 PID: 9 at net/wireless/reg.c:438 restore_alpha2 net/wireles=
-s/reg.c:3399 [inline]
-WARNING: CPU: 0 PID: 9 at net/wireless/reg.c:438 restore_regulatory_setting=
-s+0x210/0x1760 net/wireless/reg.c:3491
-Modules linked in:
-CPU: 0 PID: 9 Comm: kworker/0:1 Not tainted 6.4.0-next-20230630-syzkaller #=
-0
-Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Goo=
-gle 05/27/2023
-Workqueue: events_power_efficient crda_timeout_work
-RIP: 0010:is_user_regdom_saved net/wireless/reg.c:438 [inline]
-RIP: 0010:restore_alpha2 net/wireless/reg.c:3399 [inline]
-RIP: 0010:restore_regulatory_settings+0x210/0x1760 net/wireless/reg.c:3491
-Code: e6 03 44 89 f6 e8 50 d7 09 f8 45 84 f6 0f 85 7a 07 00 00 e8 62 db 09 =
-f8 44 89 e2 44 89 ee 48 c7 c7 20 bc 9f 8b e8 c0 2b d1 f7 <0f> 0b e8 49 db 0=
-9 f8 48 8b 1d d2 80 f8 04 48 b8 00 00 00 00 00 fc
-RSP: 0018:ffffc900000e7c30 EFLAGS: 00010282
-RAX: 0000000000000000 RBX: 00000000000000bf RCX: 0000000000000000
-RDX: ffff888016a68000 RSI: ffffffff814c65a7 RDI: 0000000000000001
-RBP: 0000000000000001 R08: 0000000000000001 R09: 0000000000000000
-R10: 0000000000000001 R11: 0000000000000001 R12: 0000000000000049
-R13: 00000000000000bf R14: 0000000000000000 R15: ffff8880b983bb80
-FS:  0000000000000000(0000) GS:ffff8880b9800000(0000) knlGS:000000000000000=
-0
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000020000140 CR3: 0000000073e5d000 CR4: 00000000003506f0
-DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
-DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
-Call Trace:
- <TASK>
- crda_timeout_work+0x28/0x50 net/wireless/reg.c:540
- process_one_work+0xa34/0x16f0 kernel/workqueue.c:2597
- worker_thread+0x67d/0x10c0 kernel/workqueue.c:2748
- kthread+0x344/0x440 kernel/kthread.c:389
- ret_from_fork+0x1f/0x30 arch/x86/entry/entry_64.S:308
- </TASK>
-
-
----
-This report is generated by a bot. It may contain errors.
-See https://goo.gl/tpsmEJ for more information about syzbot.
-syzbot engineers can be reached at syzkaller@googlegroups.com.
-
-syzbot will keep track of this issue. See:
-https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
-For information about bisection process see: https://goo.gl/tpsmEJ#bisectio=
-n
-
-If the bug is already fixed, let syzbot know by replying with:
-#syz fix: exact-commit-title
-
-If you want syzbot to run the reproducer, reply with:
-#syz test: git://repo/address.git branch-or-commit-hash
-If you attach or paste a git patch, syzbot will apply it before testing.
-
-If you want to change bug's subsystems, reply with:
-#syz set subsystems: new-subsystem
-(See the list of subsystem names on the web dashboard)
-
-If the bug is a duplicate of another bug, reply with:
-#syz dup: exact-subject-of-another-report
-
-If you want to undo deduplication, reply with:
-#syz undup
+If we think there is a chance we might need another kfunc we should add it
+in the same kfunc. It would be unfortunate to have to do two kfuncs when
+one would work. It shouldn't cost much/anything(?) to hardcode the type for
+most cases? I think if we need it later I would advocate for updating this
+kfunc to support it. Of course then userspace will have to swivel on the
+kfunc signature.
 
