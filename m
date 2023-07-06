@@ -1,268 +1,206 @@
-Return-Path: <netdev+bounces-15836-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15837-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D5A0A74A1D4
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:09:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 4A4FB74A1FE
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 18:15:26 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6807328134F
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:09:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 0585C28137D
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 16:15:25 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8D403AD46;
-	Thu,  6 Jul 2023 16:09:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9B3AFAD4A;
+	Thu,  6 Jul 2023 16:15:20 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 819868C17
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 16:09:47 +0000 (UTC)
-Received: from smtp-8faf.mail.infomaniak.ch (smtp-8faf.mail.infomaniak.ch [IPv6:2001:1600:3:17::8faf])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7F744DC
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 09:09:44 -0700 (PDT)
-Received: from smtp-3-0001.mail.infomaniak.ch (unknown [10.4.36.108])
-	by smtp-2-3000.mail.infomaniak.ch (Postfix) with ESMTPS id 4QxhLZ1FhlzMq7xl;
-	Thu,  6 Jul 2023 16:09:42 +0000 (UTC)
-Received: from unknown by smtp-3-0001.mail.infomaniak.ch (Postfix) with ESMTPA id 4QxhLY2C42zMpqbm;
-	Thu,  6 Jul 2023 18:09:40 +0200 (CEST)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=digikod.net;
-	s=20191114; t=1688659782;
-	bh=1Zjmn502HPA+0yvPQbN3DQQjsYS0yUUpJ6D6akr8vTE=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To:From;
-	b=TqTrUFllyne62XCaJ9huvbxg57tqATZsADdh39mJkoTyvCqbdCDgMOdZuGEtkidoH
-	 v8ucgPwko2t0iuipLitxAeC290bd2AO4oamru8X6yup5sqArRcKilbOpeN646gs7ET
-	 JeLoVd3HcGbM48GNOd2Y5GNfeUqMumh/gIsfvR5o=
-Message-ID: <3cd233b9-3cee-ec37-d16a-8dbb13cfd41a@digikod.net>
-Date: Thu, 6 Jul 2023 18:09:25 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DF89C9444;
+	Thu,  6 Jul 2023 16:15:18 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4AD63C433C7;
+	Thu,  6 Jul 2023 16:15:00 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688660118;
+	bh=r5Eqjb/koo4X65bgDBYxDesIkgsRAdhnfATQ4gt2Esk=;
+	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
+	b=uOgU9evq5o16T6L6tpJH1n8YSQl4p50BjR5wiJPLoKkMzHgO7DWjFII6ePLp5KpdE
+	 3SlBOVBQ0Ayb1Ck5njyhQkfK/lBmsjOnzq7A/dE1stN3VqJX7pH6IQsgFKtN1DalJo
+	 E+zh6oq4S0OPw7rIh8zXpFwi+8/fexgoqLXDvhFUUOG0TWnPj5LM1mmg7dIC7PaCB3
+	 IOEyQDVn/tGwcs+s3mZaJELn1kEqbOemjyG66rmihhs9u/EaGnd4WvmH/942idbgOQ
+	 fgiPtHR0C+lrv0o8CzKEzOTX/CaJMpmdnCKaL0ZpaSmvJsFgbp9PEliTkXRbGZddzd
+	 Fm4yxVau37qTQ==
+Message-ID: <3948ae7653d1cb7c51febcca26a35775e71a53b4.camel@kernel.org>
+Subject: Re: [PATCH v2 00/89] fs: new accessors for inode->i_ctime
+From: Jeff Layton <jlayton@kernel.org>
+To: "Eric W. Biederman" <ebiederm@xmission.com>
+Cc: jk@ozlabs.org, arnd@arndb.de, mpe@ellerman.id.au, npiggin@gmail.com, 
+ christophe.leroy@csgroup.eu, hca@linux.ibm.com, gor@linux.ibm.com, 
+ agordeev@linux.ibm.com, borntraeger@linux.ibm.com, svens@linux.ibm.com, 
+ gregkh@linuxfoundation.org, arve@android.com, tkjos@android.com,
+ maco@android.com,  joel@joelfernandes.org, brauner@kernel.org,
+ cmllamas@google.com, surenb@google.com, 
+ dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca, leon@kernel.org, 
+ bwarrum@linux.ibm.com, rituagar@linux.ibm.com, ericvh@kernel.org,
+ lucho@ionkov.net,  asmadeus@codewreck.org, linux_oss@crudebyte.com,
+ dsterba@suse.com,  dhowells@redhat.com, marc.dionne@auristor.com,
+ viro@zeniv.linux.org.uk,  raven@themaw.net, luisbg@kernel.org,
+ salah.triki@gmail.com,  aivazian.tigran@gmail.com, keescook@chromium.org,
+ clm@fb.com, josef@toxicpanda.com,  xiubli@redhat.com, idryomov@gmail.com,
+ jaharkes@cs.cmu.edu, coda@cs.cmu.edu,  jlbec@evilplan.org, hch@lst.de,
+ nico@fluxnic.net, rafael@kernel.org,  code@tyhicks.com, ardb@kernel.org,
+ xiang@kernel.org, chao@kernel.org,  huyue2@coolpad.com,
+ jefflexu@linux.alibaba.com, linkinjeon@kernel.org,  sj1557.seo@samsung.com,
+ jack@suse.com, tytso@mit.edu, adilger.kernel@dilger.ca, 
+ jaegeuk@kernel.org, hirofumi@mail.parknet.co.jp, miklos@szeredi.hu, 
+ rpeterso@redhat.com, agruenba@redhat.com, richard@nod.at, 
+ anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net, 
+ mikulas@artax.karlin.mff.cuni.cz, mike.kravetz@oracle.com,
+ muchun.song@linux.dev,  dwmw2@infradead.org, shaggy@kernel.org,
+ tj@kernel.org,  trond.myklebust@hammerspace.com, anna@kernel.org,
+ chuck.lever@oracle.com,  neilb@suse.de, kolga@netapp.com,
+ Dai.Ngo@oracle.com, tom@talpey.com,  konishi.ryusuke@gmail.com,
+ anton@tuxera.com,  almaz.alexandrovich@paragon-software.com,
+ mark@fasheh.com,  joseph.qi@linux.alibaba.com, me@bobcopeland.com,
+ hubcap@omnibond.com,  martin@omnibond.com, amir73il@gmail.com,
+ mcgrof@kernel.org, yzaikin@google.com,  tony.luck@intel.com,
+ gpiccoli@igalia.com, al@alarsen.net, sfrench@samba.org,  pc@manguebit.com,
+ lsahlber@redhat.com, sprasad@microsoft.com,  senozhatsky@chromium.org,
+ phillip@squashfs.org.uk, rostedt@goodmis.org,  mhiramat@kernel.org,
+ dushistov@mail.ru, hdegoede@redhat.com, djwong@kernel.org, 
+ dlemoal@kernel.org, naohiro.aota@wdc.com, jth@kernel.org, ast@kernel.org, 
+ daniel@iogearbox.net, andrii@kernel.org, martin.lau@linux.dev,
+ song@kernel.org,  yhs@fb.com, john.fastabend@gmail.com, kpsingh@kernel.org,
+ sdf@google.com,  haoluo@google.com, jolsa@kernel.org, hughd@google.com,
+ akpm@linux-foundation.org,  davem@davemloft.net, edumazet@google.com,
+ kuba@kernel.org, pabeni@redhat.com,  john.johansen@canonical.com,
+ paul@paul-moore.com, jmorris@namei.org,  serge@hallyn.com,
+ stephen.smalley.work@gmail.com, eparis@parisplace.org,  jgross@suse.com,
+ stern@rowland.harvard.edu, lrh2000@pku.edu.cn, 
+ sebastian.reichel@collabora.com, wsa+renesas@sang-engineering.com, 
+ quic_ugoswami@quicinc.com, quic_linyyuan@quicinc.com, john@keeping.me.uk, 
+ error27@gmail.com, quic_uaggarwa@quicinc.com, hayama@lineo.co.jp,
+ jomajm@gmail.com,  axboe@kernel.dk, dhavale@google.com,
+ dchinner@redhat.com, hannes@cmpxchg.org,  zhangpeng362@huawei.com,
+ slava@dubeyko.com, gargaditya08@live.com, 
+ penguin-kernel@I-love.SAKURA.ne.jp, yifeliu@cs.stonybrook.edu, 
+ madkar@cs.stonybrook.edu, ezk@cs.stonybrook.edu, yuzhe@nfschina.com, 
+ willy@infradead.org, okanatov@gmail.com, jeffxu@chromium.org,
+ linux@treblig.org,  mirimmad17@gmail.com, yijiangshan@kylinos.cn,
+ yang.yang29@zte.com.cn,  xu.xin16@zte.com.cn, chengzhihao1@huawei.com,
+ shr@devkernel.io,  Liam.Howlett@Oracle.com, adobriyan@gmail.com,
+ chi.minghao@zte.com.cn,  roberto.sassu@huawei.com, linuszeng@tencent.com,
+ bvanassche@acm.org,  zohar@linux.ibm.com, yi.zhang@huawei.com,
+ trix@redhat.com, fmdefrancesco@gmail.com,  ebiggers@google.com,
+ princekumarmaurya06@gmail.com, chenzhongjin@huawei.com,  riel@surriel.com,
+ shaozhengchao@huawei.com, jingyuwang_vip@163.com, 
+ linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
+ linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, 
+ linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
+ linux-fsdevel@vger.kernel.org,  linux-afs@lists.infradead.org,
+ autofs@vger.kernel.org, linux-mm@kvack.org,  linux-btrfs@vger.kernel.org,
+ ceph-devel@vger.kernel.org,  codalist@coda.cs.cmu.edu,
+ ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org, 
+ linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
+ linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com, 
+ linux-um@lists.infradead.org, linux-mtd@lists.infradead.org, 
+ jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org, 
+ linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net, 
+ ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
+ linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org, 
+ linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org, 
+ reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
+ samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org, 
+ linux-xfs@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
+ apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
+ selinux@vger.kernel.org
+Date: Thu, 06 Jul 2023 12:14:58 -0400
+In-Reply-To: <87ilaxgjek.fsf@email.froward.int.ebiederm.org>
+References: <20230705185812.579118-1-jlayton@kernel.org>
+	 <a4e6cfec345487fc9ac8ab814a817c79a61b123a.camel@kernel.org>
+	 <87ilaxgjek.fsf@email.froward.int.ebiederm.org>
+Content-Type: text/plain; charset="ISO-8859-15"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent:
-Subject: Re: [PATCH v11.1] selftests/landlock: Add 11 new test suites
- dedicated to network
-To: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-Cc: artem.kuzin@huawei.com, gnoack3000@gmail.com,
- willemdebruijn.kernel@gmail.com, yusongping@huawei.com,
- linux-security-module@vger.kernel.org, netdev@vger.kernel.org,
- netfilter-devel@vger.kernel.org
-References: <20230515161339.631577-11-konstantin.meskhidze@huawei.com>
- <20230706145543.1284007-1-mic@digikod.net>
-Content-Language: en-US
-From: =?UTF-8?Q?Micka=c3=abl_Sala=c3=bcn?= <mic@digikod.net>
-In-Reply-To: <20230706145543.1284007-1-mic@digikod.net>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Infomaniak-Routing: alpha
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
-	version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
 
+On Thu, 2023-07-06 at 10:16 -0500, Eric W. Biederman wrote:
+> Jeff Layton <jlayton@kernel.org> writes:
+>=20
+> > On Wed, 2023-07-05 at 14:58 -0400, Jeff Layton wrote:
+> > > v2:
+> > > - prepend patches to add missing ctime updates
+> > > - add simple_rename_timestamp helper function
+> > > - rename ctime accessor functions as inode_get_ctime/inode_set_ctime_=
+*
+> > > - drop individual inode_ctime_set_{sec,nsec} helpers
+> > >=20
+> > > I've been working on a patchset to change how the inode->i_ctime is
+> > > accessed in order to give us conditional, high-res timestamps for the
+> > > ctime and mtime. struct timespec64 has unused bits in it that we can =
+use
+> > > to implement this. In order to do that however, we need to wrap all
+> > > accesses of inode->i_ctime to ensure that bits used as flags are
+> > > appropriately handled.
+> > >=20
+> > > The patchset starts with reposts of some missing ctime updates that I
+> > > spotted in the tree. It then adds a new helper function for updating =
+the
+> > > timestamp after a successful rename, and new ctime accessor
+> > > infrastructure.
+> > >=20
+> > > The bulk of the patchset is individual conversions of different
+> > > subsysteme to use the new infrastructure. Finally, the patchset renam=
+es
+> > > the i_ctime field to __i_ctime to help ensure that I didn't miss
+> > > anything.
+> > >=20
+> > > This should apply cleanly to linux-next as of this morning.
+> > >=20
+> > > Most of this conversion was done via 5 different coccinelle scripts, =
+run
+> > > in succession, with a large swath of by-hand conversions to clean up =
+the
+> > > remainder.
+> > >=20
+> >=20
+> > A couple of other things I should note:
+> >=20
+> > If you sent me an Acked-by or Reviewed-by in the previous set, then I
+> > tried to keep it on the patch here, since the respun patches are mostly
+> > just renaming stuff from v1. Let me know if I've missed any.
+> >=20
+> > I've also pushed the pile to my tree as this tag:
+> >=20
+> >     https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git/t=
+ag/?h=3Dctime.20230705
+> >=20
+> > In case that's easier to work with.
+>=20
+> Are there any preliminary patches showing what you want your introduced
+> accessors to turn into?  It is hard to judge the sanity of the
+> introduction of wrappers without seeing what the wrappers are ultimately
+> going to do.
+>=20
+> Eric
 
-On 06/07/2023 16:55, Mickaël Salaün wrote:
-> From: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> 
-> This patch is a revamp of the v11 tests [1] with new tests (see the
-> "Changes since v11" description).  I (Mickaël) only added the following
-> todo list and the "Changes since v11" sections in this commit message.
-> I think this patch is good but it would appreciate reviews.
-> You can find the diff of my changes here but it is not really readable:
-> https://git.kernel.org/mic/c/78edf722fba5 (landlock-net-v11 branch)
-> [1] https://lore.kernel.org/all/20230515161339.631577-11-konstantin.meskhidze@huawei.com/
-> TODO:
-> - Rename all "net_service" to "net_port".
-> - Fix the two kernel bugs found with the new tests.
-> - Update this commit message with a small description of all tests.
-> 
-> These test suites try to check edge cases for TCP sockets
-> bind() and connect() actions.
-> 
-> inet:
-> * bind: Tests with non-landlocked/landlocked ipv4 and ipv6 sockets.
-> * connect: Tests with non-landlocked/landlocked ipv4 and ipv6 sockets.
-> * bind_afunspec: Tests with non-landlocked/landlocked restrictions
-> for bind action with AF_UNSPEC socket family.
-> * connect_afunspec: Tests with non-landlocked/landlocked restrictions
-> for connect action with AF_UNSPEC socket family.
-> * ruleset_overlap: Tests with overlapping rules for one port.
-> * ruleset_expanding: Tests with expanding rulesets in which rules are
-> gradually added one by one, restricting sockets' connections.
-> * inval_port_format: Tests with wrong port format for ipv4/ipv6 sockets
-> and with port values more than U16_MAX.
-> 
-> port:
-> * inval: Tests with invalid user space supplied data:
->      - out of range ruleset attribute;
->      - unhandled allowed access;
->      - zero port value;
->      - zero access value;
->      - legitimate access values;
-> * bind_connect_inval_addrlen: Tests with invalid address length.
-> * bind_connect_unix_*_socket: Tests to make sure unix sockets' actions
-> are not restricted by Landlock rules applied to TCP ones.
-> 
-> layout1:
-> * with_net: Tests with network bind() socket action within
-> filesystem directory access test.
-> 
-> Test coverage for security/landlock is 94.8% of 934 lines according
-> to gcc/gcov-11.
-> 
-> Signed-off-by: Konstantin Meskhidze <konstantin.meskhidze@huawei.com>
-> Co-developed-by: Mickaël Salaün <mic@digikod.net>
-> Signed-off-by: Mickaël Salaün <mic@digikod.net>
-> ---
-> 
-> Changes since v11 (from Mickaël Salaün):
-> - Add ipv4.from_unix_to_tcp test suite to check that socket family is
->    the same between a socket and a sockaddr by trying to connect/bind on
->    a unix socket (stream or dgram) using an inet family.  Landlock should
->    not change the error code.  This found a bug (which needs to be fixed)
->    with the TCP restriction.
-> - Revamp the inet.{bind,connect} tests into protocol.{bind,connect}:
->    - Merge bind_connect_unix_dgram_socket, bind_connect_unix_dgram_socket
->      and bind_connect_inval_addrlen into it: add a full test matrix of
->      IPv4/TCP, IPv6/TCP, IPv4/UDP, IPv6/UDP, unix/stream, unix/dgram, all
->      of them with or without sandboxing. This improve coverage and it
->      enables to check that a TCP restriction work as expected but doesn't
->      restrict other stream or datagram protocols. This also enables to
->      check consistency of the network stack with or without Landlock.
->      We now have 76 test suites for the network.
->    - Add full send/recv checks.
->    - Make a generic framework that will be ready for future
->      protocol supports.
-> - Replace most ASSERT with EXPECT according to the criticity of an
->    action: if we can get more meaningful information with following
->    checks.  For instance, failure to create a kernel object (e.g.
->    socket(), accept() or fork() call) is critical if it is used by
->    following checks. For Landlock ruleset building, the following checks
->    don't make sense if the sandbox is not complete.  However, it doesn't
->    make sense to continue a FIXTURE_SETUP() if any check failed.
-> - Add a new unspec fixture to replace inet.bind_afunspec with
->    unspec.bind and inet.connect_afunspec with unspec.connect, factoring
->    and simplifying code.
-> - Replace inet.bind_afunspec with protocol.bind_unspec, and
->    inet.connect_afunspec with protocol.connect_unspec.  Extend these
->    tests with the matrix of all "protocol" variants.  Don't test connect
->    with the same socket which is already binded/listening (I guess this
->    was an copy-paste error).  The protocol.bind_unspec tests found a bug
->    (which needs to be fixed).
-> - Add and use set_service() and setup_loopback() helpers to configure
->    network services.  Add and use and test_bind_and_connect() to factor
->    out a lot of checks.
-> - Add new types (protocol_variant, service_fixture) and update related
->    helpers to get more generic test code.
-> - Replace static (port) arrays with service_fixture variables.
-> - Add new helpers: {bind,connect}_variant_addrlen() and get_addrlen() to
->    cover all protocols with previous bind_connect_inval_addrlen tests.
->    Make them return -errno in case of error.
-> - Switch from a unix socket path address to an abstract one. This
->    enables to avoid file cleanup in test teardowns.
-> - Close all rulesets after enforcement.
-> - Remove the duplicate "empty access" test.
-> - Replace inet.ruleset_overlay with tcp_layers.ruleset_overlap and
->    simplify test:
->    - Always run sandbox tests because test were always run sandboxed and
->      it doesn't give more guarantees to do it not sandboxed.
->    - Rewrite test with variant->num_layers to make it simpler and
->      configurable.
->    - Add another test layer to tcp_layers used for ruleset_overlap and
->      test without sandbox.
->    - Leverage test_bind_and_connect() and avoid using SO_REUSEADDR
->      because the socket was not listened to, and don't use the same
->      socket/FD for server and client.
->    - Replace inet.ruleset_expanding with tcp_layers.ruleset_expand.
-> - Drop capabilities in all FIXTURE_SETUP().
-> - Change test ports to cover more ranges.
-> - Add "mini" tests:
->    - Replace the invalid ruleset attribute test from port.inval with
->      mini.unknow_access_rights.
->    - Simplify port.inval and move some code to other mini.* tests.
->    - Add new mini.network_access_rights test.
-> - Rewrite inet.inval_port_format into mini.tcp_port_overflow:
->    - Remove useless is_sandbox checks.
->    - Extend tests with bind/connect checks.
->    - Interleave valid requests with invalid ones.
-> - Add two_srv.port_endianness test, extracted and extended from
->    inet.inval_port_format .
-> - Add Microsoft copyright.
-> - Rename some variables to make them easier to read.
-> - Constify variables.
-> - Add minimal logs to help debug test failures.
-> ---
->   tools/testing/selftests/landlock/config     |    4 +
->   tools/testing/selftests/landlock/fs_test.c  |   64 +
->   tools/testing/selftests/landlock/net_test.c | 1439 +++++++++++++++++++
->   3 files changed, 1507 insertions(+)
->   create mode 100644 tools/testing/selftests/landlock/net_test.c
+I have a draft version of the multigrain patches on top of the wrapper
+conversion I've already posted in my "mgctime-experimental" branch:
 
+    https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git/log/?=
+h=3Dmgctime-experimental
 
-[...]
+The rationale is best explained in this changelog:
 
-> +
-> +FIXTURE(inet)
-> +{
-> +	struct service_fixture srv0, srv1;
-> +};
-> +
-> +FIXTURE_VARIANT(inet)
-> +{
-> +	const bool is_sandboxed;
+    https://git.kernel.org/pub/scm/linux/kernel/git/jlayton/linux.git/commi=
+t/?h=3Dmgctime-experimental&id=3Dface437a144d3375afb7f70c233b0644b4edccba
 
-Well, this "is_sandboxed" variable can now be removed, and the variants 
-updated accordingly.
-
-> +	const struct protocol_variant prot;
-> +};
-> +
-> +/* clang-format off */
-
-Rename to ipv4 and same for the ipv6 variants.
-
-> +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv4) {
-> +	/* clang-format on */
-> +	.is_sandboxed = false,
-> +	.prot = {
-> +		.domain = AF_INET,
-> +		.type = SOCK_STREAM,
-> +	},
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv4) {
-> +	/* clang-format on */
-> +	.is_sandboxed = true,
-> +	.prot = {
-> +		.domain = AF_INET,
-> +		.type = SOCK_STREAM,
-> +	},
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(inet, no_sandbox_with_ipv6) {
-> +	/* clang-format on */
-> +	.is_sandboxed = false,
-> +	.prot = {
-> +		.domain = AF_INET6,
-> +		.type = SOCK_STREAM,
-> +	},
-> +};
-> +
-> +/* clang-format off */
-> +FIXTURE_VARIANT_ADD(inet, sandbox_with_ipv6) {
-> +	/* clang-format on */
-> +	.is_sandboxed = true,
-> +	.prot = {
-> +		.domain = AF_INET6,
-> +		.type = SOCK_STREAM,
-> +	},
-> +};
-> +
->
+The idea will be to enable this on a per-fs basis.
+--=20
+Jeff Layton <jlayton@kernel.org>
 
