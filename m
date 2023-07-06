@@ -1,235 +1,132 @@
-Return-Path: <netdev+bounces-15686-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15687-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B034F7493EF
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 04:59:03 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E2F2D74940A
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 05:08:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C2E10281183
-	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 02:59:01 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9DF682811AF
+	for <lists+netdev@lfdr.de>; Thu,  6 Jul 2023 03:08:32 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id AD45FA56;
-	Thu,  6 Jul 2023 02:58:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 737FAA5F;
+	Thu,  6 Jul 2023 03:08:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9B1EE7E9
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 02:58:59 +0000 (UTC)
-Received: from NAM12-DM6-obe.outbound.protection.outlook.com (mail-dm6nam12on2056.outbound.protection.outlook.com [40.107.243.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C70F81BCB;
-	Wed,  5 Jul 2023 19:58:56 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PC6P3qVfQoYj2TXJRf1xp7xn4Qb9FTuZbwss/jXfRFsc1iB5BlM2gJnIYI8n0NOVzmqkGjQm7cLghZ6l8DjVkFv7lQpYg4WJ/mIwaQI+d5/6mxD3lnqj1JaUdFaXv0NGWt3I6VlcK1KOpwwGoNJOZl8n8NHE8C7qgkE0c2YwoZo7ZNUi3y7hZt2Q3bh2JmMWOqUggvlkGcdscHcLxzdizc9UA4uNM4ii/KstEMV0nBDTCuSnpV8dlrQBY6NjZVag86LKsoXDAYxZnyTEgPuYk8ZpUhJglc0+jucO+SiUTal415JHT6JvdHksnWBx0VnmImARo73Ha07yquKlj9echQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=3nzMFBeX37sOBYyC2WXcj6qtKPd9NPPMmNhFjOnO9S4=;
- b=UrAaFeEjr+l3aYR6oDlTTNxUmctHXRG+Aw8brqA211Nf/3c+3/q7kGPio46s2wgTefGLGpeCjVvVkQhMxzSntvH6quL8MkDbkuzeoitOCFbkdpg64CNw22pKqOfg/ZcWdw+8n/q1J21HBpwwYE/f1cVYU0zkvxivn2AJDa2msP6+/z9VJKk1tTvLWGIkF3UU4/8FFTzdN8oBZERtLjQmwpVea3BOhvA3V/5M9Cxl8tMCMmI2oQAXJpmlGniX0jzBIfO7ZEgrU7awp0H0xjm3YaGwuSoKQNErAHYiICRpwQdYyYVzteUdIB2GDMECluEGHE5TAQsN142SiLnG5lLnWA==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=amd.com; dmarc=pass action=none header.from=amd.com; dkim=pass
- header.d=amd.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=amd.com; s=selector1;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=3nzMFBeX37sOBYyC2WXcj6qtKPd9NPPMmNhFjOnO9S4=;
- b=CAchPgZF0sloAFj7WYJlii2aGSZ0nQJ+eH+CvexZvdBBxZhuEtDknUUUq0A7P6eK6lk3GQYqxb9ymYFGxHjkIrrgKssqn+HZwjeEhOP6tgbMukTMBH9ThnCgMJwf/8tPAyBSdgmQt5d+DnahT+OVxZwfL2RNlfVAv3gQuIr3U9U=
-Received: from DM6PR12MB2619.namprd12.prod.outlook.com (2603:10b6:5:45::18) by
- CYYPR12MB8729.namprd12.prod.outlook.com (2603:10b6:930:c2::5) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6565.17; Thu, 6 Jul 2023 02:58:54 +0000
-Received: from DM6PR12MB2619.namprd12.prod.outlook.com
- ([fe80::3bef:2463:a3e0:e51c]) by DM6PR12MB2619.namprd12.prod.outlook.com
- ([fe80::3bef:2463:a3e0:e51c%4]) with mapi id 15.20.6565.016; Thu, 6 Jul 2023
- 02:58:54 +0000
-From: "Quan, Evan" <Evan.Quan@amd.com>
-To: Andrew Lunn <andrew@lunn.ch>
-CC: "rafael@kernel.org" <rafael@kernel.org>, "lenb@kernel.org"
-	<lenb@kernel.org>, "Deucher, Alexander" <Alexander.Deucher@amd.com>, "Koenig,
- Christian" <Christian.Koenig@amd.com>, "Pan, Xinhui" <Xinhui.Pan@amd.com>,
-	"airlied@gmail.com" <airlied@gmail.com>, "daniel@ffwll.ch" <daniel@ffwll.ch>,
-	"johannes@sipsolutions.net" <johannes@sipsolutions.net>,
-	"davem@davemloft.net" <davem@davemloft.net>, "edumazet@google.com"
-	<edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>,
-	"pabeni@redhat.com" <pabeni@redhat.com>, "Limonciello, Mario"
-	<Mario.Limonciello@amd.com>, "mdaenzer@redhat.com" <mdaenzer@redhat.com>,
-	"maarten.lankhorst@linux.intel.com" <maarten.lankhorst@linux.intel.com>,
-	"tzimmermann@suse.de" <tzimmermann@suse.de>, "hdegoede@redhat.com"
-	<hdegoede@redhat.com>, "jingyuwang_vip@163.com" <jingyuwang_vip@163.com>,
-	"Lazar, Lijo" <Lijo.Lazar@amd.com>, "jim.cromie@gmail.com"
-	<jim.cromie@gmail.com>, "bellosilicio@gmail.com" <bellosilicio@gmail.com>,
-	"andrealmeid@igalia.com" <andrealmeid@igalia.com>, "trix@redhat.com"
-	<trix@redhat.com>, "jsg@jsg.id.au" <jsg@jsg.id.au>, "arnd@arndb.de"
-	<arnd@arndb.de>, "linux-kernel@vger.kernel.org"
-	<linux-kernel@vger.kernel.org>, "linux-acpi@vger.kernel.org"
-	<linux-acpi@vger.kernel.org>, "amd-gfx@lists.freedesktop.org"
-	<amd-gfx@lists.freedesktop.org>, "dri-devel@lists.freedesktop.org"
-	<dri-devel@lists.freedesktop.org>, "linux-wireless@vger.kernel.org"
-	<linux-wireless@vger.kernel.org>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-Subject: RE: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
- mitigations
-Thread-Topic: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
- mitigations
-Thread-Index: AQHZqz5nCvlP5HKi7kqHZhT1UyZB3K+kDOyAgATrEhCAAKJtgIACaF9A
-Date: Thu, 6 Jul 2023 02:58:53 +0000
-Message-ID:
- <DM6PR12MB26198720EBBAAB8C989F8D4BE42CA@DM6PR12MB2619.namprd12.prod.outlook.com>
-References: <20230630103240.1557100-1-evan.quan@amd.com>
- <20230630103240.1557100-2-evan.quan@amd.com>
- <7e7db6eb-4f46-407a-8d1f-16688554ad80@lunn.ch>
- <DM6PR12MB2619591A7706A30362E11DC5E42EA@DM6PR12MB2619.namprd12.prod.outlook.com>
- <18dfe989-2610-4234-ade2-ffbc2f233c19@lunn.ch>
-In-Reply-To: <18dfe989-2610-4234-ade2-ffbc2f233c19@lunn.ch>
-Accept-Language: en-US, zh-CN
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-msip_labels:
- MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ActionId=e4b0b34c-4fda-4a3d-9f25-1d15a394cbbc;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_ContentBits=0;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Enabled=true;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Method=Standard;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_Name=General;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SetDate=2023-07-06T01:53:19Z;MSIP_Label_4342314e-0df4-4b58-84bf-38bed6170a0f_SiteId=3dd8961f-e488-4e60-8e11-a82d994e183d;
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=amd.com;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DM6PR12MB2619:EE_|CYYPR12MB8729:EE_
-x-ms-office365-filtering-correlation-id: 742f7eae-7400-416d-3f71-08db7dcceebd
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- ugh975M4mkJTtmcRsZz7kRBE9awXV/qMW24NoPvganV7xs3AXvgmmUfY3/2ihPJflP0YQzX7TG9cv1BmYhix2rfSJdj0kjW7VyEfrTdhF/iL9F7N618fNjgc4+HIlnxm1hX1HtjvsXrJUQvl1K6TYVnSsLkO1uoOGb/sSJR+snKqRuY/mPFCp+QO1BMTfxrCw0YOQ1PITyFe1f6zxOwHDqGGBBhC9jGoQ4JG5YJe4IditVgkrRQeKYmnOH0R1teeIso/tMtU6KqlekybmWFUHWoN3PlMd8WjNGGM4EVuFY/jRvObXhTW2L6esd+2fdXEjg238G8QD9T+FkjG/mkZkHDxvEFclad5NVEOUDQq7JxsxgmjRz9RpnK92X9XVAxjVAFuOMZpUe+sqTE7rpwuI7rFKaKqZRADBwUJ2me9fX2XlS/B2mhzLQrtNqOol2M04XYwrJA3K0Ga5o1rwf56XHZaXZ1kdG+jxk9qSfi78SiE7+nqbj07H/+EneS42PEXzgeBI5BWPZmleCAN1nO5woJncQqODMN9p+hsDpzmQBm61gg8xsbpWhTgAwWqvEcYi9xKOzfM8gj7OPmsuqVs99XXpftJDLrlP6QA+8TvaAQb+Htwn94AU7yob3zMSmBX
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DM6PR12MB2619.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(39860400002)(376002)(366004)(346002)(396003)(451199021)(66446008)(8676002)(8936002)(2906002)(55016003)(5660300002)(52536014)(26005)(53546011)(7416002)(6506007)(186003)(66556008)(64756008)(41300700001)(7696005)(122000001)(71200400001)(66476007)(76116006)(4326008)(316002)(33656002)(83380400001)(6916009)(66946007)(54906003)(478600001)(38070700005)(9686003)(38100700002)(86362001);DIR:OUT;SFP:1101;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?us-ascii?Q?Xzb67GpqRNMbkw4nkpJSD2GNZIFycPiS+PBLtthdg0buE1P+cLWrEX1/pWEl?=
- =?us-ascii?Q?F7c5wSOW10K8roNpqhWlqfo8fp7Z83GyyZUbFrBwdgmzD2q2aHAuFQnR79fO?=
- =?us-ascii?Q?+fXsUeS7i8KRwtAwO2qONuuLNo1ZHTqCVF+2Ed87egHmXIvEjU5hmXY36TOT?=
- =?us-ascii?Q?L6Lxbr2lAl9w2vbfKuR3bIHjevrzmi8TwSy+j4G2DxWDO9ThjdfxVgU2KyNe?=
- =?us-ascii?Q?rUvIuOaA8Lzn0tM+fzgxbUFabuRDaFIwJn055r3IcCrtiX509NZN2POG/QrZ?=
- =?us-ascii?Q?mPCifJafP+WfQXEGzZF5x3RmtyB8uYcxLhjGoPc74HoDjaYUgza7e/O0DHOd?=
- =?us-ascii?Q?IBY3RicGD17cNCfr1hoDrH/iTc+NOM6NETRt7LugqUZ9ykEELiQ2xsO6MBmj?=
- =?us-ascii?Q?pzulffV7YRTgwYSRSqHMAZmt91sqkeRDElJCmnUjxve81gcIMtBh2TBGGwpL?=
- =?us-ascii?Q?mTXwF5dPbmRm9GjdK998i9FvycxDmps5BPkdke8+xoy0zfrvXo8T7524Tcqp?=
- =?us-ascii?Q?m3grpvlW+8xpsKBeHc1bJUxQpsfmJDzQ3b1/4g4SZbON7MNXBNNZ4Z2a9gcU?=
- =?us-ascii?Q?OuIYVDNS89uNEpBuI/1cTQGIFi8z/eZ26+oEyuvCPzLmRjLAXnAy9YJzAO3t?=
- =?us-ascii?Q?bV16PcSGYq8XdGfDBStEel1a41KabeK18J41A0Yx75+WCHg0pCeaVVAj6mhV?=
- =?us-ascii?Q?qu7cMiOdaDhMX3H5yXjc0IlzaTXZVAzYO4vnhV7H33pbEk82DQN40MPGZj13?=
- =?us-ascii?Q?YA3RNwx631dDe7YUbIBRcSzRMNa0zpbFQ08wbPPjGAtFv+Yw0Tbnx3J8sGp3?=
- =?us-ascii?Q?AksDO1PCJ7UoefI45D8QKpnurYd0gHj36JzfgFlcm6cUldazx8iXL9qf8EM7?=
- =?us-ascii?Q?eqxdK+g/jZFdR8Ue1/JDKHzKp+ZH/NIsL8Ew/Z5rBmALlZsj8Aakz4o0/Fag?=
- =?us-ascii?Q?OGhmDkZwokX2s6CeaLE4W5j+9kdzj2U8neRcI/yfEZaxr16VoyxVEZolDSQk?=
- =?us-ascii?Q?GV5wqbeUhR/+3K5nG8N/c1AXoq/n0+2eo90GmWUG1l/oT+9E6OPqEBan8yp/?=
- =?us-ascii?Q?RByAIDxEJrmcBrz6rivaqwrFx8Grtavw28tij4l8+gm6L7w4F3+UqhYT8I0B?=
- =?us-ascii?Q?DxTTY9qwf8rAlfGhariUEEOqvwC5dxorf3CDAVeqUbTlhN3Wj/HwdjFFxOMp?=
- =?us-ascii?Q?B3AmGJg/Q4cbukd+0Kp8gjNfDUu9EcZYlunaWGAZ6ZEwN6dlgu6cN+RsJc98?=
- =?us-ascii?Q?zcERYioOY60kW5EUpaf4UbNppOTPixr7m44YEXuJCD0l1Of5GIC2yazRl7aZ?=
- =?us-ascii?Q?i6oJN8T2VT78KvVTU29IbNoMzNsi++hvCN9sDG7mhc8zzW4tWKt9TDv05+MC?=
- =?us-ascii?Q?9ljuHQ9Bf3Pss1OAxZzpUsJfQo3nURGFqan0aJvLsf4Rlo9mxPRFNKaSpBIQ?=
- =?us-ascii?Q?N/cthY8T2esfKu4puDPGoALmEvY3sjoqFFTx92famZTqmLxb/Kt8RTNOl9jf?=
- =?us-ascii?Q?bZE3yBb3KWg1GcFVA6doYsklXSjPzOl4Fu8LJpUw6Rjc+9HMjL2/nJcStJFW?=
- =?us-ascii?Q?EoDH5PglSWFSJsIwbr0=3D?=
-Content-Type: text/plain; charset="us-ascii"
-Content-Transfer-Encoding: quoted-printable
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 64B8EA5A
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 03:08:30 +0000 (UTC)
+Received: from mail-pg1-x536.google.com (mail-pg1-x536.google.com [IPv6:2607:f8b0:4864:20::536])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 247CF1BF7;
+	Wed,  5 Jul 2023 20:08:29 -0700 (PDT)
+Received: by mail-pg1-x536.google.com with SMTP id 41be03b00d2f7-517ab9a4a13so209948a12.1;
+        Wed, 05 Jul 2023 20:08:29 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688612908; x=1691204908;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=qkswXhgVYLum5NAuYw9zYKn7kb93ZCamEnpThtSqHNc=;
+        b=S3is4OStCcuBp9VXOE2UDwGY1EdZNPtDBNIShgNjO2ImugFGUKpwVRwPpSRa0+C6ee
+         lvANFsMxW1CNYqXS0/WWuK7Y5+aiH4ZURb5ItUIinZOMeL4QgqyRlPCF9GuoIHmiIscu
+         XPKcSvn6XDiu98lirHCA1rWuWmpdA07TLqsXU9tTYjunKKR6ArzdVNy+zjB584hwsTt3
+         GUfD99svNOngxdn/SYf+WHgvY5io9RbYmwKo5RXDnZN3M+DHCx1+Y8mDPXQhVzqLBqmM
+         5Fat7gJD0npAwHt3alPSauqFApN6RqU86demE4lm2grNV1dI8amc9YXEBSMlxM1koPSN
+         PZjQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688612908; x=1691204908;
+        h=content-transfer-encoding:in-reply-to:references:cc:to:from
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=qkswXhgVYLum5NAuYw9zYKn7kb93ZCamEnpThtSqHNc=;
+        b=XKUdROJChHPnIxPHTUaM9ncCAdxqq6UHOTalGEWr7cUD5rzIkh9duLg7qio04fMLdV
+         rPG3NX3UGO7KrTbtJ1gsHr8csoHDKjl/jNbMZ6ta2JRytzeDd00NPzXfUJHVJE8aYhMV
+         B6GEMKdFzZFOiN7h/QydwL3h1/ZwW6+MuLviQz2x1UiiHwWKEwl1fbROtOJxaa/7ppr+
+         NURfWzJibkBYKvwN0I2bSTButCTm8z1zaZBlKtGPVKsgcFeGfL7M+1GkQGT3mVSe0eLu
+         MKPUy02vQy9wI/xpFcWNgTMryAxdrLHQdzgxLK2AY3xTVcwqzXMO/Gwy25BuUWwPypp8
+         TY8g==
+X-Gm-Message-State: ABy/qLaaSTBDDOERFBGU8rzs9Tmal8Rc8ZqtvSq89BUb4Dv3D5OUxOkb
+	f9y1Um/8QDNZGZNECs6rOAxsHUn6HPLMwho7
+X-Google-Smtp-Source: APBJJlGylu/y1J6UmD5L0LCkDB3980SfnVTwY5UUOgqM0SRWc727bzWb5tomce3Ltd6cmX+TmhrHew==
+X-Received: by 2002:a05:6a20:13d9:b0:12d:d379:6e6c with SMTP id ho25-20020a056a2013d900b0012dd3796e6cmr681861pzc.11.1688612908443;
+        Wed, 05 Jul 2023 20:08:28 -0700 (PDT)
+Received: from [192.168.0.103] ([103.131.18.64])
+        by smtp.gmail.com with ESMTPSA id x23-20020aa793b7000000b00673e652985esm220170pff.44.2023.07.05.20.08.25
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Wed, 05 Jul 2023 20:08:27 -0700 (PDT)
+Message-ID: <50f4c10d-260c-cb98-e7d2-124f5519fa68@gmail.com>
+Date: Thu, 6 Jul 2023 10:08:20 +0700
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: amd.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DM6PR12MB2619.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 742f7eae-7400-416d-3f71-08db7dcceebd
-X-MS-Exchange-CrossTenant-originalarrivaltime: 06 Jul 2023 02:58:53.4911
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 3dd8961f-e488-4e60-8e11-a82d994e183d
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: LxB84/e1OdUEVY41H7G1+FOJlC6EQqJdU9beL4Lv1jLQGAZTYewN5SuEhtl7COs8
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CYYPR12MB8729
-X-Spam-Status: No, score=-1.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: Fwd: 3 more broken Zaurii - SL-5600, A300, C700
+Content-Language: en-US
+From: Bagas Sanjaya <bagasdotme@gmail.com>
+To: Dave Jones <davej@redhat.com>, "David S. Miller" <davem@davemloft.net>,
+ Ross Maynard <bids.7405@bigpond.com>,
+ "Linux regression tracking (Thorsten Leemhuis)" <regressions@leemhuis.info>
+Cc: Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux USB <linux-usb@vger.kernel.org>
+References: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
+In-Reply-To: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-[AMD Official Use Only - General]
+On 7/5/23 09:09, Bagas Sanjaya wrote:
+> Hi,
+> 
+> I notice a regression report on Bugzilla [1]. Quoting from it:
+> 
+>> The following patch broke support of 3 more Zaurus models: SL-5600, A300 and C700
+>>
+>> [16adf5d07987d93675945f3cecf0e33706566005] usbnet: Remove over-broad module alias from zaurus
+>>
+>> dmesg and lsusb output attached.
+> 
+> Because the description above was vague, I asked the clarification.
+> The reporter replied:
+> 
+>> The problem is that networking to SL-5600 / A300 / C700 devices does not 
+>> work. I cannot ping the devices.
+>>
+>> The error is occurring in zaurus.c. dmesg is missing the following line:
+>>
+>> zaurus 2-2:1.0 usb0: register 'zaurus' at usb-0000:00:1d.0-2, 
+>> pseudo-MDLM (BLAN) device, 2a:01:39:93:bc:1a
+>>
+>> A patch was created in 2022 to fix the same problem with the SL-6000:
+>>
+>> USB: zaurus: support another broken Zaurus - 
+>> [6605cc67ca18b9d583eb96e18a20f5f4e726103c]
+>>
+>> Could you please create another patch for the 3 devices: SL-5600 / A300 
+>> / C700?
+> 
+> See Bugzilla for the full thread and attached dmesg and lsusb.
+> 
+> Dave: The reporter asked to write the quirk for affected devices.
+> Would you like to create it?
+> 
 
-Hi Andrew,
+Thorsten: Email to the culprit author (Dave) bounced. What can
+I do in this case? Should I start adding get_maintainer.pl output?
 
-I discussed with Mario about your proposal/concerns here.
-We believe some changes below might address your concerns.
-- place/move the wbrf_supported_producer check inside acpi_amd_wbrf_add_exc=
-lusion and acpi_amd_wbrf_add_exclusion
-- place the wbrf_supported_consumer check inside acpi_amd_wbrf_retrieve_exc=
-lusions
-So that the wbrf_supported_producer and wbrf_supported_consumer can be drop=
-ped.
-We made some prototypes and even performed some tests which showed technica=
-lly it is absolutely practicable.
-
-However, we found several issues with that.
-- The overhead caused by the extra _producer/_consumer check on every calli=
-ng of wbrf_add/remove/retrieve_ecxclusion.
-  Especially when you consider there might be multiple producers and consum=
-ers in the system at the same time. And some of
-  them might do in-use band/frequency switching frequently.
-- Some extra costs caused by the "know it only at the last minute". For exa=
-mple, to support WBRF, amdgpu driver needs some preparations: install the n=
-otification hander,
-  setup the delay workqueue(to handle possible events flooding) and even no=
-tify firmware engine to be ready. However, only on the 1st notification rec=
-eiving,
-  it is realized(reported by wbrf_supported_consumer check) the WBRF featur=
-e is actually not supported. All those extra costs can be actually avoided =
-if we can know the WBRF is not supported at first.
-  This could happen to other consumers and producers too.
-
-After a careful consideration, we think the changes do not benefit us much.=
- It does not deserve us to spend extra efforts.
-Thus we would like to stick with original implementations. That is to have =
-wbrf_supported_producer and wbrf_supported_consumer interfaces exposed.
-Then other drivers/subsystems can do necessary wbrf support check in advanc=
-e and coordinate their actions accordingly.
-Please let us know your thoughts.
-
-BR,
-Evan
-> -----Original Message-----
-> From: Andrew Lunn <andrew@lunn.ch>
-> Sent: Tuesday, July 4, 2023 9:07 PM
-> To: Quan, Evan <Evan.Quan@amd.com>
-> Cc: rafael@kernel.org; lenb@kernel.org; Deucher, Alexander
-> <Alexander.Deucher@amd.com>; Koenig, Christian
-> <Christian.Koenig@amd.com>; Pan, Xinhui <Xinhui.Pan@amd.com>;
-> airlied@gmail.com; daniel@ffwll.ch; johannes@sipsolutions.net;
-> davem@davemloft.net; edumazet@google.com; kuba@kernel.org;
-> pabeni@redhat.com; Limonciello, Mario <Mario.Limonciello@amd.com>;
-> mdaenzer@redhat.com; maarten.lankhorst@linux.intel.com;
-> tzimmermann@suse.de; hdegoede@redhat.com; jingyuwang_vip@163.com;
-> Lazar, Lijo <Lijo.Lazar@amd.com>; jim.cromie@gmail.com;
-> bellosilicio@gmail.com; andrealmeid@igalia.com; trix@redhat.com;
-> jsg@jsg.id.au; arnd@arndb.de; linux-kernel@vger.kernel.org; linux-
-> acpi@vger.kernel.org; amd-gfx@lists.freedesktop.org; dri-
-> devel@lists.freedesktop.org; linux-wireless@vger.kernel.org;
-> netdev@vger.kernel.org
-> Subject: Re: [PATCH V5 1/9] drivers core: Add support for Wifi band RF
-> mitigations
->
-> > > What is the purpose of this stage? Why would it not be supported for
-> > > this device?
-> > This is needed for wbrf support via ACPI mechanism. If BIOS(AML code)
-> > does not support the wbrf adding/removing for some device, it should
-> speak that out so that the device can be aware of that.
->
-> How much overhead is this adding? How deep do you need to go to find the
-> BIOS does not support it? And how often is this called?
->
-> Where do we want to add complexity? In the generic API? Or maybe a little
-> deeper in the ACPI specific code?
->
->        Andrew
+-- 
+An old man doll... just what I always wanted! - Clara
 
 
