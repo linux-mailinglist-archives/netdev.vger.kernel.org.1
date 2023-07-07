@@ -1,140 +1,138 @@
-Return-Path: <netdev+bounces-16015-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16016-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8C2ED74AF24
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:55:28 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5CF8274AF2C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:56:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B246E281749
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:55:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5AD3C1C20F8A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:56:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0816FBE7D;
-	Fri,  7 Jul 2023 10:55:25 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 57E61C128;
+	Fri,  7 Jul 2023 10:56:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC32BA47
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:55:24 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319AF19A5;
-	Fri,  7 Jul 2023 03:55:23 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qHj7N-00011c-O6; Fri, 07 Jul 2023 12:55:17 +0200
-Message-ID: <a4265090-d6b8-b185-a400-b09b27a347cc@leemhuis.info>
-Date: Fri, 7 Jul 2023 12:55:14 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BE5C23BD
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:56:35 +0000 (UTC)
+Received: from mx0a-001b2d01.pphosted.com (mx0a-001b2d01.pphosted.com [148.163.156.1])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6C80F1BE1;
+	Fri,  7 Jul 2023 03:56:31 -0700 (PDT)
+Received: from pps.filterd (m0360083.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367AiOqu009053;
+	Fri, 7 Jul 2023 10:56:30 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : mime-version : content-transfer-encoding; s=pp1;
+ bh=YpkU4DETyxze9YQ5B6pozKdSgx24FBvCZkjftOAClB4=;
+ b=I5vphQjF1NBjdXo/8Z7mxYOQpfei5s5BVnJ49ZeglGOScTVwixDgwWtvCUyZbTrr0Ewv
+ je8V1YVODNrMnouasa+151NsgKYEvptYGDWvWI6jN1Z08WPw85utXQiVlKmwiKacFT11
+ 8oN1ubLrwrKFlDsgVgrdc2YUYO1VfajBa/H4bjj5QH5IjylvWQGyZlfymYQvi1sIodDA
+ vwp11CK+G8nynaGgUBkZ5xahUuxnKhEyj25wtw0G+b36Dj+WeM3kKnsyIyb2N/Xnl4GJ
+ DnWMmpWMrVLnn5P4hoMQKV+Mt9bNHE4S0IA7fY2972sYSZwvXdnf4ihrsQqdSd0FDT88 SA== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rph76883q-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 10:56:30 +0000
+Received: from m0360083.ppops.net (m0360083.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 367AlxAh018828;
+	Fri, 7 Jul 2023 10:56:29 GMT
+Received: from ppma03fra.de.ibm.com (6b.4a.5195.ip4.static.sl-reverse.com [149.81.74.107])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rph76882r-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 10:56:29 +0000
+Received: from pps.filterd (ppma03fra.de.ibm.com [127.0.0.1])
+	by ppma03fra.de.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3677TDri007387;
+	Fri, 7 Jul 2023 10:56:27 GMT
+Received: from smtprelay02.fra02v.mail.ibm.com ([9.218.2.226])
+	by ppma03fra.de.ibm.com (PPS) with ESMTPS id 3rjbs4tvs3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 10:56:27 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay02.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 367AuNvr27656852
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 7 Jul 2023 10:56:23 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 88B2A20040;
+	Fri,  7 Jul 2023 10:56:23 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 355382004B;
+	Fri,  7 Jul 2023 10:56:23 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  7 Jul 2023 10:56:23 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Paolo Abeni <pabeni@redhat.com>, Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>,
+        Stefan Raspl <raspl@linux.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH net v2 0/3] s390/ism: Fixes to client handling
+Date: Fri,  7 Jul 2023 12:56:19 +0200
+Message-Id: <20230707105622.3332261-1-schnelle@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [Regression][BISECTED] kernel boot hang after 19898ce9cf8a
- ("wifi: iwlwifi: split 22000.c into multiple files")
-To: "Zhang, Rui" <rui.zhang@intel.com>,
- "Greenman, Gregory" <gregory.greenman@intel.com>,
- "Berg, Johannes" <johannes.berg@intel.com>
-Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
- "Baruch, Yaara" <yaara.baruch@intel.com>,
- "Ben Ami, Golan" <golan.ben.ami@intel.com>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Sisodiya, Mukesh" <mukesh.sisodiya@intel.com>,
- Linus Torvalds <torvalds@linux-foundation.org>,
- Johannes Berg <johannes.berg@intel.com>, Kalle Valo <kvalo@kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>,
- Linux kernel regressions list <regressions@lists.linux.dev>,
- Jakub Kicinski <kuba@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>
-References: <b533071f38804247f06da9e52a04f15cce7a3836.camel@intel.com>
-Content-Language: en-US, de-DE
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <b533071f38804247f06da9e52a04f15cce7a3836.camel@intel.com>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688727323;ee51f3a8;
-X-HE-SMSGID: 1qHj7N-00011c-O6
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: LOu2cITEhNnJDZxzXtNwP9WGU21Im7yM
+X-Proofpoint-GUID: ry0gpWASMMY4oGaPGLwfOKojkb9VBgQH
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-07_06,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 phishscore=0 adultscore=0
+ malwarescore=0 impostorscore=0 mlxscore=0 bulkscore=0 spamscore=0
+ priorityscore=1501 clxscore=1015 mlxlogscore=716 suspectscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307070097
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-[CCing the regression list, netdev, the net maintainers, and Linus;
-Johannes and Kalle as well, but just for the record, they afaik are
-unavailable]
+Hi networking developers,
 
-Hi, Thorsten here, the Linux kernel's regression tracker.
+This is v2 of the patch previously titled "s390/ism: Detangle ISM client
+IRQ and event forwarding". As suggested by Paolo Abeni I split the patch
+up. While doing so I noticed another problem that was fixed by this patch
+concerning the way the workqueues access the client structs. This means the
+second patch turning the workqueues into simple direct calls also fixes
+a problem. Finally I split off a third patch just for fixing
+ism_unregister_client()s error path.
 
-On 07.07.23 10:25, Zhang, Rui wrote:
-> 
-> I run into a NULL pointer dereference and kernel boot hang after
-> switching to latest upstream kernel, and git bisect shows that below
-> commit is the first offending commit, and I have confirmed that commit
-> 19898ce9cf8a has the issue while 19898ce9cf8a~1 does not.
+The code after these 3 patches is identical to the result of the v1 patch
+except that I also turned the dev_err() for still registered DMBs into
+a WARN().
 
-FWIW, this is the fourth such report about this that I'm aware of.
+Thanks,
+Niklas
 
-The first is this one (with two affected users afaics):
-https://bugzilla.kernel.org/show_bug.cgi?id=217622
+Changes since v1:
+- Split into three patches (Paolo Abeni)
+- Turned the dev_err() in ism_unregsiter_client() on still registered DMBs
+  into a WARN() as it should only happen due to client bugs.
 
-The second is this one:
-https://lore.kernel.org/all/CAAJw_Zug6VCS5ZqTWaFSr9sd85k%3DtyPm9DEE%2BmV%3DAKoECZM%2BsQ@mail.gmail.com/
+Niklas Schnelle (3):
+  s390/ism: Fix locking for forwarding of IRQs and events to clients
+  s390/ism: Fix and simplify add()/remove() callback handling
+  s390/ism: Do not unregister clients with registered DMBs
 
-The third:
-https://lore.kernel.org/all/9274d9bd3d080a457649ff5addcc1726f08ef5b2.camel@xry111.site/
+ drivers/s390/net/ism_drv.c | 153 ++++++++++++++++++-------------------
+ include/linux/ism.h        |   7 +-
+ 2 files changed, 74 insertions(+), 86 deletions(-)
 
-And in the past few days two people from Fedora land talked to me on IRC
-with problems that in retrospective might be caused by this as well.
 
-This many reports about a problem at this stage of the cycle makes me
-suspect we'll see a lot more once -rc1 is out. That's why I raising the
-awareness of this. Sadly a simple revert of just this commit is not
-possible. :-/
+base-commit: d528014517f2b0531862c02865b9d4c908019dc4
+-- 
+2.39.2
 
-Ciao, Thorsten
-
-> commit 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 (refs/bisect/bad)
-> Author:     Johannes Berg <johannes.berg@intel.com>
-> AuthorDate: Wed Jun 21 13:12:07 2023 +0300
-> Commit:     Johannes Berg <johannes.berg@intel.com>
-> CommitDate: Wed Jun 21 14:07:00 2023 +0200
-> 
->     wifi: iwlwifi: split 22000.c into multiple files
->     
->     Split the configuration list in 22000.c into four new files,
->     per new device family, so we don't have this huge unusable
->     file. Yes, this duplicates a few small things, but that's
->     still much better than what we have now.
->     
->     Signed-off-by: Johannes Berg <johannes.berg@intel.com>
->     Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
->     Link:
-> https://lore.kernel.org/r/20230621130443.7543603b2ee7.Ia8dd54216d341ef1ddc0531f2c9aa30d30536a5d@changeid
->     Signed-off-by: Johannes Berg <johannes.berg@intel.com>
-> 
-> I have some screenshots which show that RIP points to iwl_mem_free_skb,
-> I can create a kernel bugzilla and attach the screenshots there if
-> needed.
-> 
-> BTW, lspci output of the wifi device and git bisect log attached.
-> 
-> If any other information needed, please let me know.
-
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
-
-P.S.: for regzbot
-
-#regzbot ^introduced 19898ce9cf8a
-#regzbot dup-of:
-https://lore.kernel.org/all/a5cdc7f8-b340-d372-2971-0d24b01de217@gmail.com/
 
