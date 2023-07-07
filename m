@@ -1,165 +1,371 @@
-Return-Path: <netdev+bounces-16005-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16006-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 139C574AEB2
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:25:57 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C815774AEB5
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:26:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 3A44F281723
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:25:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8C0281718
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:26:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 26336BE69;
-	Fri,  7 Jul 2023 10:25:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4C3BE6C;
+	Fri,  7 Jul 2023 10:26:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 15B25BE5A
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:25:52 +0000 (UTC)
-Received: from EUR01-VE1-obe.outbound.protection.outlook.com (mail-ve1eur01on2125.outbound.protection.outlook.com [40.107.14.125])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9ABC7128
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 03:25:48 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=EmpEAeWtljqOig4vc6ym1O/Eo4QE+exU14f2NaN183z0W2QljZz35MiqXiaO3R6cuJKry8v18voDzZPYeEuJpA3q7QezbJsKiMHKqzDduS9apK7RnDOUQAqlDwU03A3Stjd4GkyIYZgRvqGtF8O8n09lO1Plon2VUrJlQjmE9vBYVX55qWhmiegDCEHCZYsCKqxp7KnMCHWI6r2GUA1ocPLb/AZBd7/3QklYXXjNBg8nFVgWjmE7FGLNyU8ZJvu4srcyOpbFucBp+C4MUZx20N/RX595ffuGVmPKe7xjkVJkMABEgOppvMs5frXijsgwIx1l6V6jqNz56HCMChjvsQ==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=teoVn7Olpc+W+IJTjcwIyxS/a44sDoQToQY5JPFg9ic=;
- b=bNSupwwjtCQeEUZjmyfS1Ww0rD1117i0Sga/9TwLg3ax2+2/JtUlqi52b2mj4SdjloFbaJz3E62XY9x7cKPhmmCTKInM7df1heM7+0q6YbAOs5fwC786YGCXNKEJJGuonOivx+77OXemd2cRDVtqNPm90U8MxkmxMEb4toP7ua0P9kJ2C612eb1yWfYq08TPdF9KEQJhxmeZ/K2ld9VdiNGhfb0rsWK1J5qk9FS4TYcjUuliPsZT1O4Mzg0yZI7Md2gT8U2jZEeJIi9jpd9LsG7z57kUysj5yrTjFGH8ldoGXXvRVp+jVv6NduGUwa+0DNNpY/dfwPe9haKaLL/7cQ==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=dektech.com.au; dmarc=pass action=none
- header.from=dektech.com.au; dkim=pass header.d=dektech.com.au; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dektech.com.au;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=teoVn7Olpc+W+IJTjcwIyxS/a44sDoQToQY5JPFg9ic=;
- b=FREfCKF3apa2HeeIP/PtrrpEBdw4h/6wWNz3mgPrHm1mihtu91T+VGkQ9pMPvTtoMIcL9PHc+A0EsdOvWZtQQSXEJL6LMinKOFNVbnmOVYRbHBe/c+06c6ZSaXVAltjDn7pW4tyOh/mXAsGxiIO7/C7HN0BeNI/UGQQrTtCDmPA=
-Received: from DB9PR05MB9078.eurprd05.prod.outlook.com (2603:10a6:10:36a::7)
- by PAWPR05MB10735.eurprd05.prod.outlook.com (2603:10a6:102:366::13) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.25; Fri, 7 Jul
- 2023 10:25:44 +0000
-Received: from DB9PR05MB9078.eurprd05.prod.outlook.com
- ([fe80::e2bd:186:9dfe:1fc3]) by DB9PR05MB9078.eurprd05.prod.outlook.com
- ([fe80::e2bd:186:9dfe:1fc3%7]) with mapi id 15.20.6565.016; Fri, 7 Jul 2023
- 10:25:44 +0000
-From: Tung Quang Nguyen <tung.q.nguyen@dektech.com.au>
-To: =?utf-8?B?546L5piOLei9r+S7tuW6leWxguaKgOacr+mDqA==?= <machel@vivo.com>,
-	"tipc-discussion@lists.sourceforge.net"
-	<tipc-discussion@lists.sourceforge.net>, "netdev@vger.kernel.org"
-	<netdev@vger.kernel.org>
-CC: Dan Carpenter <dan.carpenter@linaro.org>, "David S. Miller"
-	<davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>, Jon Maloy <jmaloy@redhat.com>, Paolo Abeni
-	<pabeni@redhat.com>, Ying Xue <ying.xue@windriver.com>, Markus Elfring
-	<Markus.Elfring@web.de>, Christophe Jaillet <christophe.jaillet@wanadoo.fr>,
-	"opensource.kernel@vivo.com" <opensource.kernel@vivo.com>
-Subject:
- =?utf-8?B?UkU6IG5ldDogdGlwYzogUmVtb3ZlIHJlcGVhdGVkIOKAnGluaXRpYWxpemF0?=
- =?utf-8?B?aW9u4oCdIGluIHRpcGNfZ3JvdXBfYWRkX3RvX3RyZWUoKQ==?=
-Thread-Topic:
- =?utf-8?B?bmV0OiB0aXBjOiBSZW1vdmUgcmVwZWF0ZWQg4oCcaW5pdGlhbGl6YXRpb24=?=
- =?utf-8?B?4oCdIGluIHRpcGNfZ3JvdXBfYWRkX3RvX3RyZWUoKQ==?=
-Thread-Index: AQHZsJ5ohQVoT0JekUGd1UBvwf3Q76+uGGNg
-Date: Fri, 7 Jul 2023 10:25:44 +0000
-Message-ID:
- <DB9PR05MB9078EB4E9C1DA0C69182D80E882DA@DB9PR05MB9078.eurprd05.prod.outlook.com>
-References: <0d8a89fb-b1ef-9a15-8731-4160b1287e14@wanadoo.fr>
- <4aed7411-a567-c6dd-3ff1-3622b7eb7369@web.de>
-In-Reply-To: <4aed7411-a567-c6dd-3ff1-3622b7eb7369@web.de>
-Accept-Language: en-US
-Content-Language: en-US
-X-MS-Has-Attach:
-X-MS-TNEF-Correlator:
-authentication-results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=dektech.com.au;
-x-ms-publictraffictype: Email
-x-ms-traffictypediagnostic: DB9PR05MB9078:EE_|PAWPR05MB10735:EE_
-x-ms-office365-filtering-correlation-id: 31ef6d1e-5a19-43cb-5e37-08db7ed485cc
-x-ms-exchange-senderadcheck: 1
-x-ms-exchange-antispam-relay: 0
-x-microsoft-antispam: BCL:0;
-x-microsoft-antispam-message-info:
- 2s2SiOhEA29f0W3OkcLUgKpyCdfQEDjVJD6Ocrdlb5Vx3JZM2Rf588T578Mcj9V2VAHYD/Bmt8lGgoYCY3Ng9+m78P55spk9JO5wrjk23Xz90gJoZwNsEuI0IQf7E8qmtDGHWxVoqeWum6lJsmZMMdpExihJk2Wx4WYvn63dttnEe4QiHXvxfvb/x6FtGbO/U7GXUoUyd/lum1ee7nGcscb8NE6MN/VMzmYBEzjvvaEh2k5sOTiRo6lcRRUj921MT3TgSXTv5q/E5uukOthPUMuW9/h7vZCQc2TPs/mEijBvB3IghuiO+QNNYHWo+6w0Vocx/JyAv87LGaFVvW/hN57lOyr2FFs7N9DyzFJEEe8xAx+KUTBIODgOk3vyE+ZzBDAXto91Xa8ReKuOS66lkyoVClrMciMNYC4Dj4BroGdLj3iABTgNZxlaaV7bL2KVFUOOisA8hCNk5V/ZQUBWh7mC/SxgdtfzlEnRibnr4R4/bBmeWpcDWGhJqh6NOhQWnu0M6YfXlrvQ7m8O4/9NQE39FFxEj8Rtbplm9xbgu39oFN8u3kvZhKAaXwrS+w8dPq2sOB6yphKjn8qzSOcVgrUvWinjRZHo8D+G3V4/HjFd9ZS1eCsdlObcrYP2a7sU
-x-forefront-antispam-report:
- CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DB9PR05MB9078.eurprd05.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(136003)(366004)(346002)(39840400004)(396003)(376002)(451199021)(122000001)(38100700002)(86362001)(38070700005)(33656002)(55016003)(8936002)(41300700001)(9686003)(52536014)(26005)(5660300002)(71200400001)(7416002)(6506007)(186003)(4744005)(2906002)(316002)(66946007)(76116006)(478600001)(7696005)(110136005)(54906003)(66446008)(66556008)(4326008)(66476007)(64756008);DIR:OUT;SFP:1102;
-x-ms-exchange-antispam-messagedata-chunkcount: 1
-x-ms-exchange-antispam-messagedata-0:
- =?utf-8?B?VXdvSWFDMXJScHRCMmc5NWpMTFB0SXp6eTEwUmZKVHRvM29kKy9LTzFabGdo?=
- =?utf-8?B?YnpZWVFVVTlVcSt0MGFZaHlObVhCSExWRFFLUytuSG1HR1ZWaGJWWHliOU9o?=
- =?utf-8?B?RnRpTm93cUJtNTFqMzFqK0RGd0hxVkJsdkJRVGZIbkI3MHE0dE5QOExydUIz?=
- =?utf-8?B?MG1DRFJBcXRlWmMwVU9paWY3MTFYU0d6Q2l6L3FOLzFCRFNBelZNNzF0dVZ5?=
- =?utf-8?B?UDVKNzBza1FwYlI1ZVJpNXEwU1dIdVZ3RVFFWkFCdjd4alQrdmYzQUhTRHhD?=
- =?utf-8?B?SG1ITFZCSWFINXp0WG01TmRxWXpNK1BuMDJnK3FVM2dleDZuQTNKenJEeTRn?=
- =?utf-8?B?VjJqOU9PbU9JelJ3TlFqRmVia1VhV09nYjYyZ1BSS1I3SHlDRCtPeUM4Mm5J?=
- =?utf-8?B?S0N3dUtBemFzMGR5STJQTU9yK3VmclJ0L0trei94UEVvZ050RTlXVXk1a0lv?=
- =?utf-8?B?aVBzRmNtRDgvREk0eS9UWEpybHJIR0dYVDY2N1VraFVlZytlaTQ2ZXE4dy9I?=
- =?utf-8?B?R0RGV0tOMGxyZEVSOFNVOVJuZ1BvMStMWG9pL1V2Ni9tTXJET3pEaVl0QWFr?=
- =?utf-8?B?WXJqYkJnWTRDSVlKOWVuWC9CQ2pIL0VpZzdLZVVlRFhyUHp3V1lYd2ZiVVBZ?=
- =?utf-8?B?dTgxRkxsckliRzh1M3h3eFg5aGJLRzVvVmtHK1BmOEM2TWZETkxmeC9KOTlC?=
- =?utf-8?B?SDJHbUZId0ZPOFV0eSsycW5rRUlCRjlLMjNzeFlkVEwxRlY1WnhQektBVVBj?=
- =?utf-8?B?RkdtOUJKeTBGL0tLMDI0VnQ2OHhwbDNydzU4dkVQMkJsNFZ6VUNWTktCV0RL?=
- =?utf-8?B?NzF3ZklUZG4rVllNd2hzbUl2U3RMQzE0dUw4QTFnUTZEVTJQRWtDZEpqUkVv?=
- =?utf-8?B?TmVvZXd2WE1wVWZsTHpMd2tqM3ppVjRBeXU3Zmk0eVdFMGZ0aVpEdEpZUllX?=
- =?utf-8?B?Z0RNTTMvWmtvbGxxMmd6emQ4Mis0emJ2SmVKR0VRdk5ydGh0MGhVUUFkR1Yv?=
- =?utf-8?B?MGd3NTdMRnRyUE9mQ1VPZFlFR3JkWXQ1azlKV1NtT3lRdVB2L2xRcWE5RFY2?=
- =?utf-8?B?SU1JUEFPOU9zeDF6WVdVN3RDRHFyMmVvWGQ4ZkZ2dkFkUU9BdGtsUitZRFd0?=
- =?utf-8?B?eHlqSU5TU2U2NmhaYWZiT0U2WUJEWHpRWmVqM25VWmlGZGhKZm1OeHl3RWRC?=
- =?utf-8?B?SE1RdHhQaWVNaXc3QVErbisxU09OVTRBNEhZWjJpV0JCdEplWGc3RmM1dU4w?=
- =?utf-8?B?VWoxYjNZN3RRZTM4VjVMMm1tdlMreCtUc2o1allyUkNJWTM0V3RQQzh2ZHpO?=
- =?utf-8?B?RHFxSitwckZpMjVQcURzTHRBY1prUlM1QU51dTlmS01qdmpQUUZxd3B0SHZR?=
- =?utf-8?B?ZXp5N0sxVjEzc2tkVlIxQVdCZlVPT202b1QvRkZ1c2ZCeUVJWEJPSmpVRGZs?=
- =?utf-8?B?cU5LQnZVTlBZUjZNMWRkNUJRb29OQXhSWlVnSk9FcG1PbFpSU2hFVEtEQUkv?=
- =?utf-8?B?Sk5KLzdmUUl4MnMwZmhKU2ovZExRRnFmYjRJaEYzeU9lYzBpRytmNVZ2YzM5?=
- =?utf-8?B?Sjg2ZkVqUzFUckY4WmZxLzZsemVwNC9Ib29Gak1CMHdGanF4dzFHVE4rWm1n?=
- =?utf-8?B?QldLOEtiWkFFYjR0d0RZenpCbjRITVlPY3RXbVpicnQ0R3JpaTRrTXBqTlVZ?=
- =?utf-8?B?dE1UdzQwM2pjY0daSjNsYmRRQTIvNWNHZHQydnovWURLUXFHeDVHL1hIaThk?=
- =?utf-8?B?RmNaMDVDbjhwSFhlNTlTWEl4OUN0N2VMeDRCaEZGclFjc2xJTTFTMjFGcTM5?=
- =?utf-8?B?eTh1QjhVTjArSDlGMUdqbkRjRDhybFBaUVNLdWNod3dLaytiUjZmUW84K2dq?=
- =?utf-8?B?aUFhNHBZR3F0RS83QXZ2b2lVTWJRdzRzQ0Q4dW1zTDV0ZGtnRE5yY3JsOEJ0?=
- =?utf-8?B?RnpmcG1tTEJhUFBmTnVzYUNpZEJ1OXpsWHl4WW4rZjlCeDVqcTVBUkVVdWo5?=
- =?utf-8?B?R0o2N1hmb29ZVVBqaURmamxpcWJkWTZXaUlWem9jdWtoN3NSVkoxZTk4bjZv?=
- =?utf-8?B?S1h2MVN6VDdYUWs1NXhKMlVxN0dZSWRRQ1Vwc3Jtb1BlOGZRUDZNS0RvdzRT?=
- =?utf-8?B?bjlMZHZsNEZLVVJyK0JNbzFiMDdaWWoxRHhLMDJ3Zk9ZQ3kzaHYrUmU2QnBk?=
- =?utf-8?B?Q0E9PQ==?=
-Content-Type: text/plain; charset="utf-8"
-Content-Transfer-Encoding: base64
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D38B20E0
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:26:35 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6244518E
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 03:26:33 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688725592;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=l9uA3+6C8czFWrHbeU5PWZu0llUuglU6MsiOJc1L2uI=;
+	b=JTycZVgWH69HY2zFJYNhVf5cGVmwmagKK7gbgaSB6OCjsLR2UK4BQKhs6eOu8QUfhAeyLy
+	ASr1ce/JhBOS1LvG5RiZQDCoz7iSmbAho24ZDSichavgChI58AlUeVE38dG6iVA968FvfN
+	s09hJwyNxfk0F/tBZ8ycUFeQQJ/kLuo=
+Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
+ [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-258-W1BzUoFYP9O2sjPABSahYg-1; Fri, 07 Jul 2023 06:26:31 -0400
+X-MC-Unique: W1BzUoFYP9O2sjPABSahYg-1
+Received: by mail-yb1-f198.google.com with SMTP id 3f1490d57ef6-c5f4d445190so1743440276.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 03:26:31 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688725591; x=1691317591;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=l9uA3+6C8czFWrHbeU5PWZu0llUuglU6MsiOJc1L2uI=;
+        b=JrHX+mH9F9sZtcxBxrzdbOpwZJC27X30dOSz0UhaT9P/uGoeOZZ9RuV8BYt53Fvgr8
+         sPlH/GWANGBFjLIztl1fDzUyXZt719pAbd17XVOhVcKmFiZiQgRZZeaR+PZAKJZS148b
+         Ji2yB3HnVpS5m1oqQoGzwYAsmmC5S9ZG0fylOmyc2gySIEeQUNzgUFOc5bDdbOTej2QD
+         n3f2ikaUWky40pWTrl5P/N7JPRf31mvxDj6CiFHZsZgqKKr5VYW5DRHrjJa7XlFvZ1DH
+         WSSwUWsEeovroEDXl6AJtlKo6/AkXUIgsrOnJF9vKS4+VQRLnLYuhVfkAknk4OGDHWET
+         Qmpg==
+X-Gm-Message-State: ABy/qLZLXN4V9G53aN+b9KJ3Qf+mE1yfGoUguE16qinPf2+CY4uPc5O/
+	r2+jwdC0thy7s/TXyqE7F7Y/pFHD7rvtMBZ/TLzK1dpuJQE7cmfFByM7GtcO1SU4M6AapmTBFky
+	o8SBK3Z4ZnjaSv7reRf38ApZZWsNP+kTQC9Dwkr+M
+X-Received: by 2002:a25:9d0d:0:b0:c5e:168c:72f8 with SMTP id i13-20020a259d0d000000b00c5e168c72f8mr3816547ybp.31.1688725590997;
+        Fri, 07 Jul 2023 03:26:30 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlHFfR+HB16RaNn8E06+qB/HUi3xKPCzbR0jJx4SJpdKzJsTRsNQo/dOxZKtprgsX1KxB9yKeDaDkO95DqxRmpI=
+X-Received: by 2002:a25:9d0d:0:b0:c5e:168c:72f8 with SMTP id
+ i13-20020a259d0d000000b00c5e168c72f8mr3816533ybp.31.1688725590714; Fri, 07
+ Jul 2023 03:26:30 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-OriginatorOrg: dektech.com.au
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-AuthSource: DB9PR05MB9078.eurprd05.prod.outlook.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 31ef6d1e-5a19-43cb-5e37-08db7ed485cc
-X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2023 10:25:44.5833
- (UTC)
-X-MS-Exchange-CrossTenant-fromentityheader: Hosted
-X-MS-Exchange-CrossTenant-id: 1957ea50-0dd8-4360-8db0-c9530df996b2
-X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
-X-MS-Exchange-CrossTenant-userprincipalname: lLn/3RI3Z2McjWeIQXNK9HV40NunN5S/TRXHu6XgFkQpI8oCtXgv/l9CEIpTW+85iN98uu1EoOdPxNvzWGzt0SKE3UoYccet+rKn4RpMK/I=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PAWPR05MB10735
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+ <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
+ <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
+ <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com>
+ <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com> <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
+In-Reply-To: <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
+From: Eugenio Perez Martin <eperezma@redhat.com>
+Date: Fri, 7 Jul 2023 12:25:54 +0200
+Message-ID: <CAJaqyWfLFGGZa2Ue=n4cD3z329_z1p8Vr9X_ceBn+eBQ6LyjQw@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To: Jason Wang <jasowang@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-PiAtICAgICAgICAgICAgICAgcGFyZW50ID0gKm47DQo+IC0gICAgICAgICAgICAgICB0bXAgPSBj
-b250YWluZXJfb2YocGFyZW50LCBzdHJ1Y3QgdGlwY19tZW1iZXIsIHRyZWVfbm9kZSk7DQo+ICAg
-ICAgICAgICAgICAgICBua2V5ID0gKHU2NCl0bXAtPm5vZGUgPDwgMzIgfCB0bXAtPnBvcnQ7DQo+
-ICAgICAgICAgICAgICAgICBpZiAoa2V5IDwgbmtleSkNCj4gICAgICAgICAgICAgICAgICAgICAg
-ICAgbiA9ICYoKm4pLT5yYl9sZWZ0Ow0KW1JFU0VORF0NCllvdXIgcGF0Y2ggYnJlYWtzIG15IHRl
-c3Qgc3VpdGUuIFlvdSBpbnRyb2R1Y2VkIGEgbmV3IGJ1ZyB3aGljaCB3YXMgcG9pbnRlZCBvdXQg
-YnkgQ2hyaXN0b3BoZS4NCkl0IGlzIGEgcmVkdW5kYW50IGFzc2lnbm1lbnQgdG8gdmFyaWFibGUg
-dG1wIGFzIHlvdSBwb2ludGVkIG91dC4NCkkgc3VnZ2VzdCB0aGF0IHlvdSByZXBvc3QgdGhpcyBj
-bGVhbnVwIHRvZ2V0aGVyIHdpdGggb3RoZXIgcGF0Y2hlcyB0aGF0IHlvdSBzZWUgbmVlZCB0byBi
-ZSByZWZhY3RvcmVkIChJIGJlbGlldmUgdGhlcmUgYXJlIHN0aWxsIG1hbnkgdGhpbmdzIGxpa2Ug
-dGhpcyBpbiBUSVBDKSBpbiB0aGUgZnV0dXJlLCBvciBJIGNhbiBkbyB3aGF0IHlvdSBzdWdnZXN0
-ZWQgaW4gbXkgZnV0dXJlIGNsZWFudXAuDQo=
+On Fri, Jul 7, 2023 at 9:57=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
+te:
+>
+> On Thu, Jul 6, 2023 at 5:39=E2=80=AFPM Eugenio Perez Martin <eperezma@red=
+hat.com> wrote:
+> >
+> > On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com=
+> wrote:
+> > >
+> > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.co=
+m> wrote:
+> > > >
+> > > > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperez=
+ma@redhat.com> wrote:
+> > > > >
+> > > > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redha=
+t.com> wrote:
+> > > > > >
+> > > > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@=
+redhat.com> wrote:
+> > > > > > >
+> > > > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
+> > > > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin =
+<mst@redhat.com> wrote:
+> > > > > > > > >
+> > > > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez M=
+artin wrote:
+> > > > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsir=
+kin <mst@redhat.com> wrote:
+> > > > > > > > > > >
+> > > > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Per=
+ez Martin wrote:
+> > > > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. T=
+sirkin <mst@redhat.com> wrote:
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio=
+ P=C3=A9rez wrote:
+> > > > > > > > > > > > > > With the current code it is accepted as long as=
+ userland send it.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > Although userland should not set a feature flag=
+ that has not been
+> > > > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, =
+the current code will not
+> > > > > > > > > > > > > > complain for it.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > Since there is no specific reason for any paren=
+t to reject that backend
+> > > > > > > > > > > > > > feature bit when it has been proposed, let's co=
+ntrol it at vdpa frontend
+> > > > > > > > > > > > > > level. Future patches may move this control to =
+the parent driver.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEN=
+D_F_ENABLE_AFTER_DRIVER_OK backend feature")
+> > > > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@red=
+hat.com>
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Please do send v3. And again, I don't want to sen=
+d "after driver ok" hack
+> > > > > > > > > > > > > upstream at all, I merged it in next just to give=
+ it some testing.
+> > > > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > Current devices do not support that semantic.
+> > > > > > > > > > >
+> > > > > > > > > > > Which devices specifically access the ring after DRIV=
+ER_OK but before
+> > > > > > > > > > > a kick?
+> > > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > > > > Previous versions of the QEMU LM series did a spurious =
+kick to start
+> > > > > > > > > > traffic at the LM destination [1]. When it was proposed=
+, that spurious
+> > > > > > > > > > kick was removed from the series because to check for d=
+escriptors
+> > > > > > > > > > after driver_ok, even without a kick, was considered wo=
+rk of the
+> > > > > > > > > > parent driver.
+> > > > > > > > > >
+> > > > > > > > > > I'm ok to go back to this spurious kick, but I'm not su=
+re if the hw
+> > > > > > > > > > will read the ring before the kick actually. I can ask.
+> > > > > > > > > >
+> > > > > > > > > > Thanks!
+> > > > > > > > > >
+> > > > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/20=
+23-01/msg02775.html
+> > > > > > > > >
+> > > > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_=
+OK too, no?
+> > > > > > > >
+> > > > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This se=
+ems
+> > > > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > > > > > > >
+> > > > > > > > But this reminds me one thing, as the thread is going too l=
+ong, I
+> > > > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_R=
+ESET is
+> > > > > > > > supported?
+> > > > > > > >
+> > > > > > > > Thanks
+> > > > > > >
+> > > > > > > I don't see what does one have to do with another ...
+> > > > > > >
+> > > > > > > I think with RING_RESET we had another solution, enable rings
+> > > > > > > mapping them to a zero page, then reset and re-enable later.
+> > > > > >
+> > > > > > As discussed before, this seems to have some problems:
+> > > > > >
+> > > > > > 1) The behaviour is not clarified in the document
+> > > > > > 2) zero is a valid IOVA
+> > > > > >
+> > > > >
+> > > > > I think we're not on the same page here.
+> > > > >
+> > > > > As I understood, rings mapped to a zero page means essentially an
+> > > > > avail ring whose avail_idx is always 0, offered to the device ins=
+tead
+> > > > > of the guest's ring. Once all CVQ commands are processed, we use
+> > > > > RING_RESET to switch to the right ring, being guest's or SVQ vrin=
+g.
+> > > >
+> > > > I get this. This seems more complicated in the destination: shadow =
+vq + ASID?
+> > >
+> > > So it's something like:
+> > >
+> > > 1) set all vq ASID to shadow virtqueue
+> > > 2) do not add any bufs to data qp (stick 0 as avail index)
+> > > 3) start to restore states via cvq
+> > > 4) ring_rest for dataqp
+> > > 5) set_vq_state for dataqp
+> > > 6) re-initialize dataqp address etc
+> > > 7) set data QP ASID to guest
+> > > 8) set queue_enable
+> > >
+> > > ?
+> > >
+> >
+> > I think the change of ASID is not needed, as the guest cannot access
+> > the device in that timeframe anyway.
+>
+> Yes but after the restore, we still want to shadow cvq, so ASID is still =
+needed?
+>
+
+Device or parent driver support for ASID is needed to shadow only CVQ.
+Bue the device may not support the switch of ASID after DRIVER_OK.
+
+Since dataplane can go in passthrough ASID all the time, we don't need
+to switch it after DRIVER_OK.
+
+> Thanks
+>
+> > Moreover, it may require HW
+> > support. So steps 1 and 7 are not needed.
+> >
+> > Apart from that, the process is right.
+> >
+> >
+> > > Thanks
+> > >
+> > > >
+> > > > Thanks
+> > > >
+> > > > >
+> > > > >
+> > > > >
+> > > > > > Thanks
+> > > > > >
+> > > > > > >
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > > > > My plan was to convert
+> > > > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa=
+ ops. Sorry if I
+> > > > > > > > > > > > was not explicit enough.
+> > > > > > > > > > > >
+> > > > > > > > > > > > The only solution I can see to that is to trap & em=
+ulate in the vdpa
+> > > > > > > > > > > > (parent?) driver, as talked in virtio-comment. But =
+that complicates
+> > > > > > > > > > > > the architecture:
+> > > > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > > > > > > > * Store vq enable state separately, at
+> > > > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit =
+that enable to hw
+> > > > > > > > > > > > * Store the doorbell state separately, but do not c=
+onfigure it to the
+> > > > > > > > > > > > device directly.
+> > > > > > > > > > > >
+> > > > > > > > > > > > But how to recover if the device cannot configure t=
+hem at kick time,
+> > > > > > > > > > > > for example?
+> > > > > > > > > > > >
+> > > > > > > > > > > > Maybe we can just fail if the parent driver does no=
+t support enabling
+> > > > > > > > > > > > the vq after DRIVER_OK? That way no new feature fla=
+g is needed.
+> > > > > > > > > > > >
+> > > > > > > > > > > > Thanks!
+> > > > > > > > > > > >
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > > ---
+> > > > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org=
+/pub/scm/linux/kernel/git/mst
+> > > > > > > > > > > > > > commit. Please let me know if I should send a v=
+3 of [1] instead.
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244=
+-mutt-send-email-mst@kernel.org/T/
+> > > > > > > > > > > > > > ---
+> > > > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-=
+)
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vho=
+st/vdpa.c
+> > > > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_un=
+locked_ioctl(struct file *filep,
+> > > > > > > > > > > > > >  {
+> > > > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_d=
+ata;
+> > > > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
+> > > > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->=
+vdpa->config;
+> > > > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
+> > > > > > > > > > > > > >       u64 __user *featurep =3D argp;
+> > > > > > > > > > > > > > -     u64 features;
+> > > > > > > > > > > > > > +     u64 features, parent_features =3D 0;
+> > > > > > > > > > > > > >       long r =3D 0;
+> > > > > > > > > > > > > >
+> > > > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES=
+) {
+> > > > > > > > > > > > > >               if (copy_from_user(&features, fea=
+turep, sizeof(features)))
+> > > > > > > > > > > > > >                       return -EFAULT;
+> > > > > > > > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > > > > > > > +                     parent_features =3D ops->=
+get_backend_features(v->vdpa);
+> > > > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKE=
+ND_FEATURES |
+> > > > > > > > > > > > > >                                BIT_ULL(VHOST_BA=
+CKEND_F_SUSPEND) |
+> > > > > > > > > > > > > >                                BIT_ULL(VHOST_BA=
+CKEND_F_RESUME) |
+> > > > > > > > > > > > > > -                              BIT_ULL(VHOST_BA=
+CKEND_F_ENABLE_AFTER_DRIVER_OK)))
+> > > > > > > > > > > > > > +                              parent_features)=
+)
+> > > > > > > > > > > > > >                       return -EOPNOTSUPP;
+> > > > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BAC=
+KEND_F_SUSPEND)) &&
+> > > > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > > > > > > > > > --
+> > > > > > > > > > > > > > 2.39.3
+> > > > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > >
+> > > > > > >
+> > > > > >
+> > > > >
+> > >
+> >
+>
+
 
