@@ -1,243 +1,226 @@
-Return-Path: <netdev+bounces-16034-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16038-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0005874B0B2
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:26:44 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D99FF74B140
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:47:30 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB4931C20F93
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:26:43 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBD471C20F8E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:47:29 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D5BACC2FA;
-	Fri,  7 Jul 2023 12:26:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86243C2EA;
+	Fri,  7 Jul 2023 12:47:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C910BBE45
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:26:41 +0000 (UTC)
-Received: from mail-wm1-x32c.google.com (mail-wm1-x32c.google.com [IPv6:2a00:1450:4864:20::32c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id F25FC1FEA;
-	Fri,  7 Jul 2023 05:26:39 -0700 (PDT)
-Received: by mail-wm1-x32c.google.com with SMTP id 5b1f17b1804b1-3fbc656873eso23014105e9.1;
-        Fri, 07 Jul 2023 05:26:39 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688732798; x=1691324798;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:to:from:date:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=bklyYiP/IhxeYjsLbgb+f+L9NtgpRzAgyHR6T9K9BbM=;
-        b=sUEPF7CpHwBz6vjelHaHjXAqGKvaLXbaMuzOdBmX+LCOt2ExjEtZMW5dZSSRVnR8j9
-         xBTD7abRZljt5XD0reFOvz/nSQOiA0Yx3Fhz1h7qEDCC3AN5E9NlswMjkHbH1KpEc6tw
-         cQHMnbQNMJmZM0lufQnkKQyGERwt1ALNnlKCZW8/1V5hsdz5+vYfYfs3hhOiSKqBqVp/
-         9cMiF/LlXXVLEEUI8v8F684bPYkWV93YF1faBlwil1RJLFtd9KV25g8317jy7Cj0CI1k
-         6sAwvYEjWOh1syIKkmmwcz2k37kg24NrHznZVhYJeH6gEGyFNpwOd3e17D5kf9JSd7Uv
-         PIrA==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688732798; x=1691324798;
-        h=user-agent:in-reply-to:content-disposition:mime-version:references
-         :message-id:subject:to:from:date:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=bklyYiP/IhxeYjsLbgb+f+L9NtgpRzAgyHR6T9K9BbM=;
-        b=AxBloCPUvi5lhkVy19Y+Bg52fQFW1p/0nAr82crsr6XZzO3XcndVCVVScgfJRjQ5EW
-         KB+5wVNSbT3lJC6dcTaNYdVLgkWg6nVVAyPHl1lnB5ZhCvs90EodjzlezpDoeUZCOf9O
-         Xfgtyldh88nXLzWvC7p3AXqUWWZS182bI8W8zuguUsKYOAlcZge9p+XbY9r5kn2CR4vx
-         dReXUUfdTP8mmYIaWD6GI/F6UdbtFm0arQZ6NyqGlr+SeKJW05OgGAKDX7LOGIHZNm57
-         1X93t/1dXhlFzLSCi6fP9RBD+ecIiM7O5MXNYI8bcJBhOet6GChvbiIo0R2M4H2W9YSk
-         JrZQ==
-X-Gm-Message-State: ABy/qLYWweabasKNVFb+J1AcPXl0RNdQKr6rTGi+sA0tEW4rw10tkMF6
-	L7Z9MulyTUF1EScw7xqq7l0U2dIQRbc=
-X-Google-Smtp-Source: APBJJlES8G4cbYSQkVhST6V2w2AQCskZzOoGPHOC21woukenHiDmLxsfKOsLGEDpiH8nNSHbs9T3HQ==
-X-Received: by 2002:a05:600c:247:b0:3fc:65:8dff with SMTP id 7-20020a05600c024700b003fc00658dffmr1502438wmj.4.1688732798311;
-        Fri, 07 Jul 2023 05:26:38 -0700 (PDT)
-Received: from debian ([89.238.191.199])
-        by smtp.gmail.com with ESMTPSA id e4-20020a5d5004000000b0030fb4b55c13sm4307150wrt.96.2023.07.07.05.26.35
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 05:26:38 -0700 (PDT)
-Date: Fri, 7 Jul 2023 14:26:28 +0200
-From: Richard Gobert <richardbgobert@gmail.com>
-To: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
-	pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
-	dsahern@kernel.org, tom@herbertland.com, netdev@vger.kernel.org,
-	linux-kernel@vger.kernel.org, gal@nvidia.com
-Subject: [PATCH 1/1] net: gro: fix misuse of CB in udp socket lookup
-Message-ID: <20230707122627.GA17845@debian>
-References: <20230707121650.GA17677@debian>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78245C2CD
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:47:27 +0000 (UTC)
+X-Greylist: delayed 1149 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 07 Jul 2023 05:47:25 PDT
+Received: from exhmta09.bpe.bigpond.com (exhmta09.bpe.bigpond.com [203.42.40.153])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0A311B;
+	Fri,  7 Jul 2023 05:47:25 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
+	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:From:To:Subject;
+	bh=vzhRXbz2UpgobFDiFaVPq9YFwfbsEXh4XG75B7YpJXc=; b=qTv3AgblbGiUrJdMGQ8MOG0c6b
+	EhUB3ISV1ZC4ytcVyJuawAcbHzlrbOBco+B9TwHa4XOAUS4ExfOAO3JC8lqXGkx9MgOxDxJ+G6H0i
+	teztreZRKnIvIUUx0Qo+7QTIHCDyxt7LbZUCrewfILxmZzJ9343bybxayeeD1dTpOjEqgen59OTrt
+	Z5BdzY3b/1apJ5KKP44EUDArYXr6FxftPCYHBzOXQCps5hajpSCY6kKPsLOgJrwqSy8gDIj3FtaPi
+	SJDNJqRyPp+RogcmYj2l1IIFBNfpA1uXe1Jg6HirCQHNdiwz3yN0YevAk25DHQ6e5wkgYeoyNjybe
+	5c9aJtsw==;
+Received: from exhprdcmr02
+	 by exhprdomr09 with esmtp
+	 (envelope-from <bids.7405@bigpond.com>)
+	 id 1qHkZK-0003Kj-1l
+	 for ;
+	Fri, 07 Jul 2023 22:28:14 +1000
+Received: from [101.191.138.223] (helo=[10.0.0.38])
+	 by exhprdcmr02 with esmtpa
+	(envelope-from <bids.7405@bigpond.com>)
+	id 1qHkZL-000H1k-2K;
+	Fri, 07 Jul 2023 22:28:14 +1000
+Subject: Re: Fwd: 3 more broken Zaurii - SL-5600, A300, C700
+To: Dave Jones <davej@codemonkey.org.uk>,
+ Thorsten Leemhuis <regressions@leemhuis.info>,
+ Bagas Sanjaya <bagasdotme@gmail.com>, "David S. Miller"
+ <davem@davemloft.net>,
+ Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
+ Linux Regressions <regressions@lists.linux.dev>,
+ Linux Networking <netdev@vger.kernel.org>,
+ Linux USB <linux-usb@vger.kernel.org>, Oliver Neukum <oneukum@suse.com>
+References: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
+ <50f4c10d-260c-cb98-e7d2-124f5519fa68@gmail.com>
+ <e1fdc435-089c-8ce7-d536-ce3780a4ba95@leemhuis.info>
+ <ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
+From: Ross Maynard <bids.7405@bigpond.com>
+Message-ID: <62a9e058-c853-1fcd-5663-e2e001f881e9@bigpond.com>
+Date: Fri, 7 Jul 2023 22:28:11 +1000
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
+ Thunderbird/68.4.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230707121650.GA17677@debian>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+In-Reply-To: <ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
+Content-Type: multipart/mixed;
+ boundary="------------8628B942F2195D19390C676E"
+Content-Language: en-US
+X-tce-id: bids.7405@bigpond.com
+X-tce-ares-id: e{4a9eb6c6-2d9a-4e3c-8cca-a779deb79200}1
+X-tce-spam-action: no action
+X-tce-spam-score: 0.0
+X-Cm-Analysis: v=2.4 cv=Cvt5MF0D c=1 sm=1 tr=0 ts=64a804de a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=ws7JD89P4LkA:10 a=r77TgQKjGQsHNAKrUKIA:9 a=gj2XTu5y7l5qDgVZD0wA:9 a=QEXdDO2ut3YA:10 a=TILydWMaAdQ53EHaNYoA:9 a=B2y7HmGcmWMA:10
+X-Cm-Envelope: MS4xfIoILScwK33rbupbBpEtbV4ZzqANKCuQY393vXbD0WiKc6WXcEatxhUr19gldVyCIEfV2DKcKRv2Z7ovSbONdF4nJBhsrNEgtMrgj2J1dXVInPA/Hpo7 Q57QrzVo5S4Nu+gvGM7E12lHSLJySTo4GYPCPEoucFsk3tuFV3a8iUq/bpOTsQPJUGF4cWeZV0jyNA==
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This patch fixes a misuse of IP{6}CB(skb) in GRO, while calling to
-`udp6_lib_lookup2` when handling udp tunnels. `udp6_lib_lookup2` fetch the
-device from CB. The fix changes it to fetch the device from `skb->dev`.
-l3mdev case requires special attention since it has a master and a slave
-device.
+This is a multi-part message in MIME format.
+--------------8628B942F2195D19390C676E
+Content-Type: text/plain; charset=utf-8; format=flowed
+Content-Transfer-Encoding: 7bit
 
-Fixes: a6024562ffd7 ("udp: Add GRO functions to UDP socket")
-Reported-by: Gal Pressman <gal@nvidia.com>
-Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
----
- include/net/udp.h      |  2 ++
- net/ipv4/udp.c         | 21 +++++++++++++++++++--
- net/ipv4/udp_offload.c |  7 +++++--
- net/ipv6/udp.c         | 21 +++++++++++++++++++--
- net/ipv6/udp_offload.c |  7 +++++--
- 5 files changed, 50 insertions(+), 8 deletions(-)
+Hi,
 
-diff --git a/include/net/udp.h b/include/net/udp.h
-index 4d13424f8f72..48af1479882f 100644
---- a/include/net/udp.h
-+++ b/include/net/udp.h
-@@ -299,6 +299,7 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
- int udp_lib_setsockopt(struct sock *sk, int level, int optname,
- 		       sockptr_t optval, unsigned int optlen,
- 		       int (*push_pending_frames)(struct sock *));
-+void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
- struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
- 			     __be32 daddr, __be16 dport, int dif);
- struct sock *__udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
-@@ -310,6 +311,7 @@ struct sock *udp6_lib_lookup(struct net *net,
- 			     const struct in6_addr *saddr, __be16 sport,
- 			     const struct in6_addr *daddr, __be16 dport,
- 			     int dif);
-+void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
- struct sock *__udp6_lib_lookup(struct net *net,
- 			       const struct in6_addr *saddr, __be16 sport,
- 			       const struct in6_addr *daddr, __be16 dport,
-diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-index 42a96b3547c9..0581ab184afd 100644
---- a/net/ipv4/udp.c
-+++ b/net/ipv4/udp.c
-@@ -550,15 +550,32 @@ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
- 				 inet_sdif(skb), udptable, skb);
- }
+I am not a kernel developer, but I think the attached patch would work.
 
-+void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
-+{
-+	*iif = inet_iif(skb) || skb->dev->ifindex;
-+	*sdif = 0;
-+
-+#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
-+	if (netif_is_l3_slave(skb->dev)) {
-+		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
-+		*sdif = *iif;
-+		*iif = master ? master->ifindex : 0;
-+	}
-+#endif
-+}
-+
- struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
- 				 __be16 sport, __be16 dport)
- {
- 	const struct iphdr *iph = ip_hdr(skb);
- 	struct net *net = dev_net(skb->dev);
-+	int iif, sdif;
-+
-+	udp4_get_iif_sdif(skb, &iif, &sdif);
+Ross
 
- 	return __udp4_lib_lookup(net, iph->saddr, sport,
--				 iph->daddr, dport, inet_iif(skb),
--				 inet_sdif(skb), net->ipv4.udp_table, NULL);
-+				 iph->daddr, dport, iif,
-+				 sdif, net->ipv4.udp_table, NULL);
- }
+On 7/7/23 2:41 am, Dave Jones wrote:
+> On Thu, Jul 06, 2023 at 01:45:57PM +0200, Thorsten Leemhuis wrote:
+>   > On 06.07.23 05:08, Bagas Sanjaya wrote:
+>   > >>
+>   > >> I notice a regression report on Bugzilla [1]. Quoting from it:
+>   > >>
+>   > >>> The following patch broke support of 3 more Zaurus models: SL-5600, A300 and C700
+>   > >>>
+>   > >>> [16adf5d07987d93675945f3cecf0e33706566005] usbnet: Remove over-broad module alias from zaurus
+>   >
+>   > ...
+>   > He sometimes shows up on Linux kernel lists, but I doubt he cares about
+>   > that change after all these years. And I would not blame him at all.
+>
+> That's about the size of it.  This is pretty near the bottom of my ever-shrinking
+> list of kernel drivers I care about.
+>
+>   > Yes, we have the "no regressions" rule, but contributing a change to the
+>   > kernel OTOH should not mean that you are responsible for all regressions
+>   > it causes for your whole life. :-)
+>
+> That said, 12 years later, 16adf5d07987d93675945f3cecf0e33706566005
+> is still the right thing to do. Adding actual matches for the devices
+> rather than matching by class will prevent this getting loaded where it
+> doesn't need to be.
+>
+> If someone actually cares to get this working, cargo-culting Oliver's
+> change to add the extra id is likely the way forward.
+>
+> 	Dave
+>
 
- /* Must be called under rcu_read_lock().
-diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-index 75aa4de5b731..70d760b271db 100644
---- a/net/ipv4/udp_offload.c
-+++ b/net/ipv4/udp_offload.c
-@@ -603,10 +603,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
- {
- 	const struct iphdr *iph = skb_gro_network_header(skb);
- 	struct net *net = dev_net(skb->dev);
-+	int iif, sdif;
-+
-+	udp4_get_iif_sdif(skb, &iif, &sdif);
+--------------8628B942F2195D19390C676E
+Content-Type: text/x-patch; charset=UTF-8;
+ name="3-zaurii-patch.patch"
+Content-Transfer-Encoding: 7bit
+Content-Disposition: attachment;
+ filename="3-zaurii-patch.patch"
 
- 	return __udp4_lib_lookup(net, iph->saddr, sport,
--				 iph->daddr, dport, inet_iif(skb),
--				 inet_sdif(skb), net->ipv4.udp_table, NULL);
-+				 iph->daddr, dport, iif,
-+				 sdif, net->ipv4.udp_table, NULL);
- }
+diff -urpN a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
+--- a/drivers/net/usb/cdc_ether.c	2023-07-07 17:48:27.991833366 +1000
++++ b/drivers/net/usb/cdc_ether.c	2023-07-07 21:53:11.556198087 +1000
+@@ -616,6 +616,13 @@ static const struct usb_device_id	produc
+ }, {
+ 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
++    .idVendor		= 0x04DD,
++    .idProduct		= 0x8005,   /* A-300 */
++    ZAURUS_FAKE_INTERFACE,
++    .driver_info        = 0,
++}, {
++    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
+ 	ZAURUS_MASTER_INTERFACE,
+@@ -623,12 +630,26 @@ static const struct usb_device_id	produc
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
++    .idVendor		= 0x04DD,
++    .idProduct		= 0x8006,   /* B-500/SL-5600 */
++    ZAURUS_FAKE_INTERFACE,
++    .driver_info        = 0,
++}, {
++    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8007,	/* C-700 */
+ 	ZAURUS_MASTER_INTERFACE,
+ 	.driver_info		= 0,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++    .idVendor		= 0x04DD,
++    .idProduct		= 0x8007,   /* C-700 */
++    ZAURUS_FAKE_INTERFACE,
++    .driver_info        = 0,
++}, {
++    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 		 | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor               = 0x04DD,
+ 	.idProduct              = 0x9031,	/* C-750 C-760 */
+Binary files a/drivers/net/usb/.cdc_ether.c.swp and b/drivers/net/usb/.cdc_ether.c.swp differ
+diff -urpN a/drivers/net/usb/zaurus.c b/drivers/net/usb/zaurus.c
+--- a/drivers/net/usb/zaurus.c	2023-07-07 17:48:28.043849110 +1000
++++ b/drivers/net/usb/zaurus.c	2023-07-07 22:06:49.267699853 +1000
+@@ -289,11 +289,25 @@ static const struct usb_device_id	produc
+ 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
+ 			  | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
++	.idProduct		= 0x8005,	/* A-300 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long) &bogus_mdlm_info,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
+ 	ZAURUS_MASTER_INTERFACE,
+ 	.driver_info = ZAURUS_PXA_INFO,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8006,	/* B-500/SL-5600 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long) &bogus_mdlm_info,
++}, {
++	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 	          | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor		= 0x04DD,
+ 	.idProduct		= 0x8007,	/* C-700 */
+@@ -301,6 +315,13 @@ static const struct usb_device_id	produc
+ 	.driver_info = ZAURUS_PXA_INFO,
+ }, {
+ 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
++			  | USB_DEVICE_ID_MATCH_DEVICE,
++	.idVendor		= 0x04DD,
++	.idProduct		= 0x8007,	/* C-700 */
++	ZAURUS_FAKE_INTERFACE,
++	.driver_info = (unsigned long) &bogus_mdlm_info,
++}, {
++        .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
+ 		 | USB_DEVICE_ID_MATCH_DEVICE,
+ 	.idVendor               = 0x04DD,
+ 	.idProduct              = 0x9031,	/* C-750 C-760 */
 
- INDIRECT_CALLABLE_SCOPE
-diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-index 317b01c9bc39..aac9b20d67e4 100644
---- a/net/ipv6/udp.c
-+++ b/net/ipv6/udp.c
-@@ -294,15 +294,32 @@ static struct sock *__udp6_lib_lookup_skb(struct sk_buff *skb,
- 				 inet6_sdif(skb), udptable, skb);
- }
-
-+void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
-+{
-+	*iif = skb->dev->ifindex;
-+	*sdif = 0;
-+
-+#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
-+	if (netif_is_l3_slave(skb->dev)) {
-+		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
-+		*sdif = *iif;
-+		*iif = master ? master->ifindex : 0;
-+	}
-+#endif
-+}
-+
- struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
- 				 __be16 sport, __be16 dport)
- {
- 	const struct ipv6hdr *iph = ipv6_hdr(skb);
- 	struct net *net = dev_net(skb->dev);
-+	int iif, sdif;
-+
-+	udp6_get_iif_sdif(skb, &iif, &sdif);
-
- 	return __udp6_lib_lookup(net, &iph->saddr, sport,
--				 &iph->daddr, dport, inet6_iif(skb),
--				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
-+				 &iph->daddr, dport, iif,
-+				 sdif, net->ipv4.udp_table, NULL);
- }
-
- /* Must be called under rcu_read_lock().
-diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-index ad3b8726873e..88191d79002e 100644
---- a/net/ipv6/udp_offload.c
-+++ b/net/ipv6/udp_offload.c
-@@ -119,10 +119,13 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
- {
- 	const struct ipv6hdr *iph = skb_gro_network_header(skb);
- 	struct net *net = dev_net(skb->dev);
-+	int iif, sdif;
-+
-+	udp6_get_iif_sdif(skb, &iif, &sdif);
-
- 	return __udp6_lib_lookup(net, &iph->saddr, sport,
--				 &iph->daddr, dport, inet6_iif(skb),
--				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
-+				 &iph->daddr, dport, iif,
-+				 sdif, net->ipv4.udp_table, NULL);
- }
-
- INDIRECT_CALLABLE_SCOPE
---
-2.36.1
-
+--------------8628B942F2195D19390C676E--
 
