@@ -1,248 +1,204 @@
-Return-Path: <netdev+bounces-16113-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16114-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 253F374B691
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:44:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 47EEC74B6D8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:03:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D5003281923
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:43:59 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03F4F281895
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 19:03:57 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8E31171AB;
-	Fri,  7 Jul 2023 18:42:28 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F210F171C3;
+	Fri,  7 Jul 2023 19:03:54 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9A4FD5381
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:42:28 +0000 (UTC)
-Received: from smtp-fw-80009.amazon.com (smtp-fw-80009.amazon.com [99.78.197.220])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 10CA71BF4;
-	Fri,  7 Jul 2023 11:42:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1688755347; x=1720291347;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=7L26AVxMyRhx/91V3GVReGBwPcjkEqdQUUcuaP0rAuk=;
-  b=PO4c4Qiv9Qc2HQDx3E5vqhvhdvoF4l2c6RjcY9uDzIqDF7thVl5H4IoS
-   8tukc9Wr/4uJwj66DPU2RsrMMBodx0pmCQ1774WkHtEcPA3QLIV+b8Cep
-   xtA5KxrKGG21TAZm7sqRLVLHl71DfGajSnOOc7Q1IbQ5EPizlFYhyMYpt
-   c=;
-X-IronPort-AV: E=Sophos;i="6.01,189,1684800000"; 
-   d="scan'208";a="14911140"
-Received: from pdx4-co-svc-p1-lb2-vlan3.amazon.com (HELO email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com) ([10.25.36.214])
-  by smtp-border-fw-80009.pdx80.corp.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 18:42:24 +0000
-Received: from EX19MTAUWC001.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-2a-m6i4x-3ef535ca.us-west-2.amazon.com (Postfix) with ESMTPS id 203F560DD8;
-	Fri,  7 Jul 2023 18:42:24 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWC001.ant.amazon.com (10.250.64.174) with Microsoft SMTP Server
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DBA6A5381
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 19:03:54 +0000 (UTC)
+Received: from mga12.intel.com (mga12.intel.com [192.55.52.136])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8FE11271E;
+	Fri,  7 Jul 2023 12:03:20 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688756600; x=1720292600;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=GRnVQoXcjvhm5OoSQ63fEQ9Cu5kAM+1gtkx5DRojiKw=;
+  b=bEAi2Ykyv9w/jK/nKC/+NN/KW6TgGt7E17Yz9UZoYMu4d1PlSpd3cdr7
+   sr6AeMxzqXGh46pqiYKV2FK+A7sC5yN0YvEl2XDksNDaELoYeumIZWVpc
+   wY9KxTck22W4sK3t8CBGsGoVoveZQLimkpZBwOV8pNEdTXWOckd868sgo
+   8OE+LHGsAjjwfkYRQGARgjU2vvJKwZJw2NSeEd5TOXvyU7xrk6pKyxxCe
+   TcPn3m4yvvL6WHCDPW1kADJpoWLAQ7A6SMqLECrNz3L8RJ3DTHXF/UkUb
+   dob1DQTwosCUmErwquW4Gd+oCSwEOKwOoIiMAXuQJA6nZxodmLopEmwE3
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="343550628"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="343550628"
+Received: from fmsmga002.fm.intel.com ([10.253.24.26])
+  by fmsmga106.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 12:02:02 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="833503955"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="833503955"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by fmsmga002.fm.intel.com with ESMTP; 07 Jul 2023 12:02:02 -0700
+Received: from fmsmsx612.amr.corp.intel.com (10.18.126.92) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 7 Jul 2023 12:02:02 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx612.amr.corp.intel.com (10.18.126.92) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 7 Jul 2023 12:02:02 -0700
+Received: from fmsedg602.ED.cps.intel.com (10.1.192.136) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 7 Jul 2023 12:02:02 -0700
+Received: from NAM11-BN8-obe.outbound.protection.outlook.com (104.47.58.168)
+ by edgegateway.intel.com (192.55.55.71) with Microsoft SMTP Server
  (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 7 Jul 2023 18:42:23 +0000
-Received: from 88665a182662.ant.amazon.com.com (10.187.170.9) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Fri, 7 Jul 2023 18:42:20 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: <richardbgobert@gmail.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <edumazet@google.com>,
-	<gal@nvidia.com>, <kuba@kernel.org>, <linux-kernel@vger.kernel.org>,
-	<netdev@vger.kernel.org>, <pabeni@redhat.com>, <tom@herbertland.com>,
-	<willemdebruijn.kernel@gmail.com>, <kuniyu@amazon.com>
-Subject: Re: [PATCH 1/1] net: gro: fix misuse of CB in udp socket lookup
-Date: Fri, 7 Jul 2023 11:42:12 -0700
-Message-ID: <20230707184212.23411-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
-In-Reply-To: <20230707122627.GA17845@debian>
-References: <20230707122627.GA17845@debian>
+ 15.1.2507.27; Fri, 7 Jul 2023 12:01:57 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=GtWVZRsEJEMFFKlSg2vW3v7mpvhdVcujXxb73jAFTfKTTPfNGul4MwgLe1Bsq+dbqUik7k+aPaGsNiGSYotq309v+zmHdllCoB7zmmAnTTYEz1eMH0L3fPqU+FjY17JgkAQqBdVrbTizPUmj/lxzYU87qZnCOiBttt0Z8qddmJVXnYT08HQQJXMUcozl0oz5uRNKZaPsrERiYA44laCSHsdHS0ZuY+yyFm3zf7TAj5wp4IrH2aaDkVt1qMZGD4XY2T/Hik6Y50qdb/nC/D8eDgPxBMhmNhPMDwJKjs8rlVCW8+E21YOZ2AYKwdaoMLIhJ49py3WcR/yzlmkPcDHZZw==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=y5Qa+3SVT1A2lUD3BJg0eIkoNQKhiXSBV6FAU4HXrL4=;
+ b=bvQdmymrNR+3fpa3+SDErNtf1K7cv/SvyqsnW8NQJGDUkiBgXv3FM5mOYQSZWPrROy8tLWAKdIIBEeJvlyQ/QX66DzPaJGGHVKCbObwdrh0b5N6cQ5tl/mBD41lU2EfoyqmipUP6XorRihOlgR+eBDj5vid4ZfAZ+X48NRfcJk4I0b6PKpA6HQQdSKZ6jKSdGjRX5tA5xmUgnLFAHyj9dpNjc2283CAoUbHE/V9MH7hODmy/2LmV9Ep08qS6U6euUS8g23BjCMAoB9Z3bJqZ03VrPP+ICPN2TB3jUssP1jHAoEbAlUhUTKxFHr8WnrX/qxzPUwExg+kLlh/aMYLFig==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN6PR11MB2943.namprd11.prod.outlook.com (2603:10b6:805:d3::26)
+ by CH0PR11MB5236.namprd11.prod.outlook.com (2603:10b6:610:e3::10) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.25; Fri, 7 Jul
+ 2023 19:01:55 +0000
+Received: from SN6PR11MB2943.namprd11.prod.outlook.com
+ ([fe80::af65:2282:23bf:d2d3]) by SN6PR11MB2943.namprd11.prod.outlook.com
+ ([fe80::af65:2282:23bf:d2d3%7]) with mapi id 15.20.6565.016; Fri, 7 Jul 2023
+ 19:01:54 +0000
+Date: Fri, 7 Jul 2023 21:01:41 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Suman Ghosh <sumang@marvell.com>
+CC: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
+	<hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
+	<kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
+	<linux-kernel@vger.kernel.org>
+Subject: Re: [net PATCH V4] octeontx2-pf: Add additional check for MCAM rules
+Message-ID: <ZKhhFeKmxlN3hFYD@localhost.localdomain>
+References: <20230707035321.2227742-1-sumang@marvell.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230707035321.2227742-1-sumang@marvell.com>
+X-ClientProxiedBy: DUZPR01CA0296.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:4b7::25) To SN6PR11MB2943.namprd11.prod.outlook.com
+ (2603:10b6:805:d3::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.9]
-X-ClientProxiedBy: EX19D031UWC003.ant.amazon.com (10.13.139.252) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-2.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR autolearn=ham autolearn_force=no
-	version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR11MB2943:EE_|CH0PR11MB5236:EE_
+X-MS-Office365-Filtering-Correlation-Id: 3459bc1e-3c8f-4751-97ea-08db7f1ca169
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: s5tyu/LwLMUU4chVfwscnOLTgdv/7XdNfNBlco1fie/MSjJVNsHm+1VlxNPjja/AdCHF0Ujevk/6xb0fHiwnunsXJVO2zyMaKmYFK5HpKBW9WCiUC9FrzYiTQpHkA4ggGVb8ykj+RGrgtTd99cMu/noaxjut3pM7peNxFGNEMJZQbvilIv0wm3hIogOu9WYqOG2eH3deGAwuoNrAh+4vo58zlMU64X8f/kPhj9tpU1JHZlt6mgJpEWOUF71tsfrOrcFn5jkRg3gC2TZfmaqQAkZV453NpP6l65Jhvdu6Ts2N5QuNNh7ovZpernRo08ITeiVuz0hXBkzkZBST5bNrYGkTan2XqZMoGGIzBE0GRR99z5Di4FFiq/I6kwqJaom9LhJPtGvUg+Q4uEwOUf0x2LiZJTmmwio2ZBqwfkfdTbZUcUAJkt3RoOmbGRjDQ5kXhys0BUMdWrX593UEqdHjWs5xcI55XiWScn3LTulHH9m9hUvixn/pFTiEgXFfAskkGCmxt1ePtGho5pErD1u6xTeIpaPK+dLvy+R4kaDpPaTgHshP0E1gIMMpuu+TToyu
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB2943.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(396003)(376002)(366004)(346002)(136003)(39860400002)(451199021)(66946007)(66556008)(66476007)(6916009)(4326008)(38100700002)(186003)(86362001)(26005)(6506007)(6666004)(82960400001)(83380400001)(9686003)(6512007)(478600001)(6486002)(41300700001)(7416002)(5660300002)(44832011)(8936002)(8676002)(2906002)(316002);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?VqOM/3rkca4UsdLSkwvl22yZkUQuUv3ntvLRvrc7DH/uqbD1jv2Q3sCtaZUC?=
+ =?us-ascii?Q?CoZxZVAVr4jUqezONOlRNLchDM8sZ2FqturWNzdxMWNChFnKK2wEFUTI+Q6c?=
+ =?us-ascii?Q?sDmYQU11ZMKXYuXCfueQVYvlDEPIDR+pzZL7jDbjZTUBmJuAV3MNpccqWqD2?=
+ =?us-ascii?Q?wwBj6EORgzHSip3OPGZKaEiY1tCbaQovhVTW5+qUngIyOiciJQDkzlnH5pwn?=
+ =?us-ascii?Q?1ruGlgPy01m38Grkgqk8nMT0KeWZJ7ZSgXRVrgqoTngFtnaFfBGi7wXWwkg4?=
+ =?us-ascii?Q?+nqMMyFY52siEyDpMrA/uC2PgrBE+ZW8nkMcJdGtDw7HEx9EPCwYJKP22b8O?=
+ =?us-ascii?Q?+F+48kHXFGxnvf+Bogk897ubRwhvsSRQ8i0tBG9ysSzC7kXVvi93Hoa5w9zF?=
+ =?us-ascii?Q?ImwnTfGRUY9Hok4M9TP0oLzYoy7ic+nbBGrXrj577/U8iqtdKjdEJ6jAwhY8?=
+ =?us-ascii?Q?a88n2y9zMQ7mcEGSDoMiDnXcMvP052f7x9JgBD5ViihTpb/X5pE90WaH8HlK?=
+ =?us-ascii?Q?MJp7P6VCe6ZcGARlX62msW516TifrrIl4wGsE43pH4VN8ps2pRuBse6aCS6H?=
+ =?us-ascii?Q?ZjI6WVSwsiOvLVFswEYAdFDtt/oeSltOmup7CgYPEy9AVs0Ov4Nf737cicWI?=
+ =?us-ascii?Q?iZXXtGLy3pNoE/WK9yAnh8Zm9+WmhdRleTIZLwE3y8C/Qafz4TLqAtckE8ql?=
+ =?us-ascii?Q?HWjipKabwEPz0z17Ah98X20fE6o7XWFI51FTFqgv+MxgyhjiPN0I1BBAAZIL?=
+ =?us-ascii?Q?1jK1ZvQRaONbXyi20haVuD/dHu7EfqM6XoMkw3srri8Qt2nM+MGfjfL8giWK?=
+ =?us-ascii?Q?As180J/hQF6yKJnjiFdnfBVlcR49+DF7935dQZW3spZk/0WuxeRDTI5oxIIZ?=
+ =?us-ascii?Q?2dNc5ShvNM04uaYdtgpWKlfwejbDMfOLk/WY7djBfXXM5ylE19Yu8+k+sqki?=
+ =?us-ascii?Q?QVbIpHqA2att5zyF3Yv0u17HyFWFGXiEew48nS8Hf+3fu1XUCn6Cq2CLVG09?=
+ =?us-ascii?Q?d2lovbAt2n+fP6FoS3vUM7yJ/hsbab9vtSgbq3mnQkpzg0fwbjkJihG5hXY5?=
+ =?us-ascii?Q?aOsGdgZKvq9F57YYWIZjb3BmjbLTt4AEahGiB3gQ78taoBJlCBnp62cmakc9?=
+ =?us-ascii?Q?27/SAz1JBEAH6mSO+9fDatu3T235RDOWkAbcd3d9Z7a8Rxaj+Nlro8bNpCSR?=
+ =?us-ascii?Q?c4ZxYXEYhSpH4H7bMVsNMzaobM2orZUQ+N+QtzTSCyB1loHyG8Eku/0o5VZR?=
+ =?us-ascii?Q?d7mmYH3YV/4E15w+dz0cOSIMC0IJxisi6HrXLQZJ+ScKl3pYV7Nal1CWyUYI?=
+ =?us-ascii?Q?LpE3bNqYLhssu2DwvqLI75lLlBX9fP/yfzWJEXauCHJsPkNUv3r6u1roA8UK?=
+ =?us-ascii?Q?XyvwvgYd7pYpnEMalfZG7mZ31H8h1Ctf7Rr+5Tpobs0jLfmrIclKxgAdezMm?=
+ =?us-ascii?Q?IppP+u553Hd/PlRXzgVer7uAOn1xhxc9yY4BqFNW6pXXi9+fKBzygkHpd/mq?=
+ =?us-ascii?Q?qN1TRtNHviMtQ/8ChPiEjSsuXOYokF9d0v8XleecdHguwkzUeBfrqTi1zf55?=
+ =?us-ascii?Q?/8zz4jm0ijiwF3fAPUz4YZCaPAhVR21+njAKXGhuc3AJDnwFw5/uyHYWnWyo?=
+ =?us-ascii?Q?Dw=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: 3459bc1e-3c8f-4751-97ea-08db7f1ca169
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB2943.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2023 19:01:54.8856
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: k2isGb4VMN1/Oczs+zy6XHzmgiMRvqRSojbURfm37TTwWLowOg1YHFiKrsMSnD4Ocom2RQVOGlStkvZWLXo0zA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: CH0PR11MB5236
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_PASS,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Richard Gobert <richardbgobert@gmail.com>
-Date: Fri, 7 Jul 2023 14:26:28 +0200
-> This patch fixes a misuse of IP{6}CB(skb) in GRO, while calling to
-> `udp6_lib_lookup2` when handling udp tunnels. `udp6_lib_lookup2` fetch the
-> device from CB. The fix changes it to fetch the device from `skb->dev`.
-> l3mdev case requires special attention since it has a master and a slave
-> device.
+On Fri, Jul 07, 2023 at 09:23:21AM +0530, Suman Ghosh wrote:
+> Due to hardware limitation, MCAM drop rule with
+> ether_type == 802.1Q and vlan_id == 0 is not supported. Hence rejecting
+> such rules.
 > 
-> Fixes: a6024562ffd7 ("udp: Add GRO functions to UDP socket")
-> Reported-by: Gal Pressman <gal@nvidia.com>
-> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
-> ---
->  include/net/udp.h      |  2 ++
->  net/ipv4/udp.c         | 21 +++++++++++++++++++--
->  net/ipv4/udp_offload.c |  7 +++++--
->  net/ipv6/udp.c         | 21 +++++++++++++++++++--
->  net/ipv6/udp_offload.c |  7 +++++--
->  5 files changed, 50 insertions(+), 8 deletions(-)
-> 
-> diff --git a/include/net/udp.h b/include/net/udp.h
-> index 4d13424f8f72..48af1479882f 100644
-> --- a/include/net/udp.h
-> +++ b/include/net/udp.h
-> @@ -299,6 +299,7 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
->  int udp_lib_setsockopt(struct sock *sk, int level, int optname,
->  		       sockptr_t optval, unsigned int optlen,
->  		       int (*push_pending_frames)(struct sock *));
-> +void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
->  struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
->  			     __be32 daddr, __be16 dport, int dif);
->  struct sock *__udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
-> @@ -310,6 +311,7 @@ struct sock *udp6_lib_lookup(struct net *net,
->  			     const struct in6_addr *saddr, __be16 sport,
->  			     const struct in6_addr *daddr, __be16 dport,
->  			     int dif);
-> +void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
->  struct sock *__udp6_lib_lookup(struct net *net,
->  			       const struct in6_addr *saddr, __be16 sport,
->  			       const struct in6_addr *daddr, __be16 dport,
-> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
-> index 42a96b3547c9..0581ab184afd 100644
-> --- a/net/ipv4/udp.c
-> +++ b/net/ipv4/udp.c
-> @@ -550,15 +550,32 @@ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
->  				 inet_sdif(skb), udptable, skb);
->  }
-> 
-> +void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
-> +{
-> +	*iif = inet_iif(skb) || skb->dev->ifindex;
-> +	*sdif = 0;
-> +
-> +#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
-> +	if (netif_is_l3_slave(skb->dev)) {
-> +		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
+> Fixes: dce677da57c0 ("octeontx2-pf: Add vlan-etype to ntuple filters")
+> Signed-off-by: Suman Ghosh <sumang@marvell.com>
 
-nit: blank line here for checkpatch.
+(...)
 
+> --- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+> +++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
+> @@ -604,6 +604,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
+>  			return -EOPNOTSUPP;
+>  		}
+>  
+> +		if (!match.mask->vlan_id) {
+> +			struct flow_action_entry *act;
+> +			int i;
+> +
+> +			flow_action_for_each(i, act, &rule->action) {
+> +				if (act->id == FLOW_ACTION_DROP) {
+> +					netdev_err(nic->netdev, "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
+> +						   ntohs(match.key->vlan_tpid), match.key->vlan_id);
+> +					return -EOPNOTSUPP;
 
-> +		*sdif = *iif;
-> +		*iif = master ? master->ifindex : 0;
-> +	}
-> +#endif
-> +}
-> +
->  struct sock *udp4_lib_lookup_skb(const struct sk_buff *skb,
->  				 __be16 sport, __be16 dport)
->  {
->  	const struct iphdr *iph = ip_hdr(skb);
->  	struct net *net = dev_net(skb->dev);
-> +	int iif, sdif;
-> +
-> +	udp4_get_iif_sdif(skb, &iif, &sdif);
-> 
->  	return __udp4_lib_lookup(net, iph->saddr, sport,
-> -				 iph->daddr, dport, inet_iif(skb),
-> -				 inet_sdif(skb), net->ipv4.udp_table, NULL);
-> +				 iph->daddr, dport, iif,
-> +				 sdif, net->ipv4.udp_table, NULL);
->  }
-> 
->  /* Must be called under rcu_read_lock().
-> diff --git a/net/ipv4/udp_offload.c b/net/ipv4/udp_offload.c
-> index 75aa4de5b731..70d760b271db 100644
-> --- a/net/ipv4/udp_offload.c
-> +++ b/net/ipv4/udp_offload.c
-> @@ -603,10 +603,13 @@ static struct sock *udp4_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
->  {
->  	const struct iphdr *iph = skb_gro_network_header(skb);
->  	struct net *net = dev_net(skb->dev);
-> +	int iif, sdif;
-> +
-> +	udp4_get_iif_sdif(skb, &iif, &sdif);
-> 
->  	return __udp4_lib_lookup(net, iph->saddr, sport,
-> -				 iph->daddr, dport, inet_iif(skb),
-> -				 inet_sdif(skb), net->ipv4.udp_table, NULL);
-> +				 iph->daddr, dport, iif,
-> +				 sdif, net->ipv4.udp_table, NULL);
->  }
-> 
->  INDIRECT_CALLABLE_SCOPE
-> diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
-> index 317b01c9bc39..aac9b20d67e4 100644
-> --- a/net/ipv6/udp.c
-> +++ b/net/ipv6/udp.c
-> @@ -294,15 +294,32 @@ static struct sock *__udp6_lib_lookup_skb(struct sk_buff *skb,
->  				 inet6_sdif(skb), udptable, skb);
->  }
-> 
-> +void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
-> +{
-> +	*iif = skb->dev->ifindex;
-> +	*sdif = 0;
-> +
-> +#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
-> +	if (netif_is_l3_slave(skb->dev)) {
-> +		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
+The code got very nested here.
+Please consider moving the above check to a separate helper function,
+or at least reformatting the error log to fix the checkpatch warning about
+80 chars, for example:
 
-Same here.
+			flow_action_for_each(i, act, &rule->action) {
+				if (act->id == FLOW_ACTION_DROP) {
+					netdev_err(nic->netdev,
+						   "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
+						   ntohs(match.key->vlan_tpid),
+						   match.key->vlan_id);
+					return -EOPNOTSUPP;
+				}
 
-
-> +		*sdif = *iif;
-> +		*iif = master ? master->ifindex : 0;
-> +	}
-> +#endif
-> +}
-> +
->  struct sock *udp6_lib_lookup_skb(const struct sk_buff *skb,
->  				 __be16 sport, __be16 dport)
->  {
->  	const struct ipv6hdr *iph = ipv6_hdr(skb);
->  	struct net *net = dev_net(skb->dev);
-> +	int iif, sdif;
-> +
-> +	udp6_get_iif_sdif(skb, &iif, &sdif);
-> 
->  	return __udp6_lib_lookup(net, &iph->saddr, sport,
-> -				 &iph->daddr, dport, inet6_iif(skb),
-> -				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
-> +				 &iph->daddr, dport, iif,
-> +				 sdif, net->ipv4.udp_table, NULL);
->  }
-> 
->  /* Must be called under rcu_read_lock().
-> diff --git a/net/ipv6/udp_offload.c b/net/ipv6/udp_offload.c
-> index ad3b8726873e..88191d79002e 100644
-> --- a/net/ipv6/udp_offload.c
-> +++ b/net/ipv6/udp_offload.c
-> @@ -119,10 +119,13 @@ static struct sock *udp6_gro_lookup_skb(struct sk_buff *skb, __be16 sport,
->  {
->  	const struct ipv6hdr *iph = skb_gro_network_header(skb);
->  	struct net *net = dev_net(skb->dev);
-> +	int iif, sdif;
-> +
-> +	udp6_get_iif_sdif(skb, &iif, &sdif);
-> 
->  	return __udp6_lib_lookup(net, &iph->saddr, sport,
-> -				 &iph->daddr, dport, inet6_iif(skb),
-> -				 inet6_sdif(skb), net->ipv4.udp_table, NULL);
-> +				 &iph->daddr, dport, iif,
-> +				 sdif, net->ipv4.udp_table, NULL);
->  }
-> 
->  INDIRECT_CALLABLE_SCOPE
-> --
-> 2.36.1
+Thanks,
+Michal
 
