@@ -1,307 +1,1067 @@
-Return-Path: <netdev+bounces-16144-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16145-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id E779474B858
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 22:48:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8E3C574B8A7
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 23:27:15 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CDEF21C210FB
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:48:23 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5DFFC1C210A7
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:27:14 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1DCFA17AAE;
-	Fri,  7 Jul 2023 20:47:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F115917AAE;
+	Fri,  7 Jul 2023 21:27:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 123F517AA0
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 20:47:49 +0000 (UTC)
-Received: from fllv0016.ext.ti.com (fllv0016.ext.ti.com [198.47.19.142])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 575132126;
-	Fri,  7 Jul 2023 13:47:47 -0700 (PDT)
-Received: from fllv0035.itg.ti.com ([10.64.41.0])
-	by fllv0016.ext.ti.com (8.15.2/8.15.2) with ESMTP id 367KlF2f079098;
-	Fri, 7 Jul 2023 15:47:15 -0500
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ti.com;
-	s=ti-com-17Q1; t=1688762835;
-	bh=6XNBOWyCYroFVU/kQFgGIWpsad1FR8EJK557udjXj/o=;
-	h=From:To:CC:Subject:Date:In-Reply-To:References;
-	b=hjG+1znsjLNtLPo1Ya64KHMm0lx/fAexfmuzox+jPf9jYXFo5ZW8bXgAvLf8PVejs
-	 LbBU6VtMK6iTKmxhKduF94SqlI2aOrHG58uwQLpxEi0BzfySyfKH+WaTxZTGyFkiLy
-	 0nT6YPvI0u0xZ1ifumVKVbJyJf5S7lqd4NfsHor0=
-Received: from DLEE103.ent.ti.com (dlee103.ent.ti.com [157.170.170.33])
-	by fllv0035.itg.ti.com (8.15.2/8.15.2) with ESMTPS id 367KlFTM115222
-	(version=TLSv1.2 cipher=AES256-GCM-SHA384 bits=256 verify=FAIL);
-	Fri, 7 Jul 2023 15:47:15 -0500
-Received: from DLEE106.ent.ti.com (157.170.170.36) by DLEE103.ent.ti.com
- (157.170.170.33) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23; Fri, 7
- Jul 2023 15:47:14 -0500
-Received: from lelv0327.itg.ti.com (10.180.67.183) by DLEE106.ent.ti.com
- (157.170.170.36) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_CBC_SHA256_P256) id 15.1.2507.23 via
- Frontend Transport; Fri, 7 Jul 2023 15:47:14 -0500
-Received: from uda0498204.dhcp.ti.com (ileaxei01-snat.itg.ti.com [10.180.69.5])
-	by lelv0327.itg.ti.com (8.15.2/8.15.2) with ESMTP id 367KlE9L115786;
-	Fri, 7 Jul 2023 15:47:14 -0500
-From: Judith Mendez <jm@ti.com>
-To: Chandrasekar Ramakrishnan <rcsekar@samsung.com>,
-        Marc Kleine-Budde
-	<mkl@pengutronix.de>
-CC: Wolfgang Grandegger <wg@grandegger.com>,
-        "David S . Miller"
-	<davem@davemloft.net>,
-        Eric Dumazet <edumazet@google.com>, Jakub Kicinski
-	<kuba@kernel.org>,
-        Paolo Abeni <pabeni@redhat.com>, <linux-can@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-kernel@vger.kernel.org>,
-        Schuyler Patton <spatton@ti.com>, Tero Kristo
-	<kristo@kernel.org>,
-        Rob Herring <robh+dt@kernel.org>,
-        Krzysztof Kozlowski
-	<krzysztof.kozlowski+dt@linaro.org>,
-        <devicetree@vger.kernel.org>,
-        Oliver
- Hartkopp <socketcan@hartkopp.net>,
-        Simon Horman <simon.horman@corigine.com>
-Subject: [PATCH v10 2/2] can: m_can: Add hrtimer to generate software interrupt
-Date: Fri, 7 Jul 2023 15:47:14 -0500
-Message-ID: <20230707204714.62964-3-jm@ti.com>
-X-Mailer: git-send-email 2.34.1
-In-Reply-To: <20230707204714.62964-1-jm@ti.com>
-References: <20230707204714.62964-1-jm@ti.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DD3DD17AA5
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 21:27:11 +0000 (UTC)
+Received: from mail-pg1-x54a.google.com (mail-pg1-x54a.google.com [IPv6:2607:f8b0:4864:20::54a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7C2051FC7
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:27:08 -0700 (PDT)
+Received: by mail-pg1-x54a.google.com with SMTP id 41be03b00d2f7-53425d37f33so2853845a12.3
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 14:27:08 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688765228; x=1691357228;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:from:to:cc:subject:date:message-id:reply-to;
+        bh=tz6nXVmq7hTlEFdwdD4i8MVaY3WFFFh085CmC8nmfoA=;
+        b=zMMPUghRnXYy0x5tdZb2z+cIyIyEDDLRakT4l2wG7hK9UM/tHZKTrC4wEQW4dTJVKt
+         pitBdHyu50DRoQ833+Cfh+0u1vXwt4XZV+fI3F3nFhrm/XJsZTBA3XUPmDCkZ1q5/36Q
+         ZiM157XJ6mQ/22iCEd5mb/XHxOUrng1t0n8a5QpnHp6VbqnmiOhmgRXcMogdGRGOcZjk
+         CNvQ7bC9P8IVU/u+jF4VWNEq6cgDQg8tkdUvxnqFOKGXNAw0UOUCyNnr2uIFFGiYa1iW
+         Fs0YIKnx1yD2x+tGckP7qTfx2n0IFNDAQWk2B+k2dBG4Hyik57pp3FUoP2eWN+oiLTSu
+         nuPw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688765228; x=1691357228;
+        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
+         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=tz6nXVmq7hTlEFdwdD4i8MVaY3WFFFh085CmC8nmfoA=;
+        b=eQD3hXk1BPxEAN1JSZAY52ECc/SLFxkafblzu111FO8OIk2dH3+V5b2A7G2mV5/UFO
+         WFzQlW+WqawARx6yeGPPHRX4mK0LR4whvUpMbPsm7NG+ybbEiezFJ3xYF4FKbcigrMN0
+         4vNDx5ppnC9mGigAgLPgoln4rNXBNbUWPU46ZuBgRRJgez4hWFuGhOC7YvVX1wUpQJ/q
+         adHUL/1KF/7ocRufBrttHoDopVfw0IX5ZkbBmnQuCUdyVCBq5VJwaX5E3mjcoieC0A43
+         XQXu8NrJj4SBEtctTBncdD1hGZDZXz1JmMISWl7ipSDU3CK2C7au6zyPC8IvL73vtYRR
+         V8aA==
+X-Gm-Message-State: ABy/qLaMQt3LAhdyWwkuAK3fNNCA7V6Qb0TBRU7VBib46NAecWtVGuIn
+	VCngGFk0FFN4V+6sRnwK5Kc5TbM=
+X-Google-Smtp-Source: APBJJlEE/ffvcFumHVee2Js9kwhwchgdoX0hYWPAYKYBoLJPqqVMiaOFrHi2Bt55udwsqagCm5vxzm4=
+X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
+ (user=sdf job=sendgmr) by 2002:a63:1556:0:b0:553:828e:b3e8 with SMTP id
+ 22-20020a631556000000b00553828eb3e8mr4263530pgv.3.1688765227858; Fri, 07 Jul
+ 2023 14:27:07 -0700 (PDT)
+Date: Fri, 7 Jul 2023 14:27:06 -0700
+In-Reply-To: <20230707172455.7634-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-EXCLAIMER-MD-CONFIG: e1e8a2fd-e40a-4ac6-ac9b-f7e9cc9ee180
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+Mime-Version: 1.0
+References: <20230707172455.7634-1-daniel@iogearbox.net> <20230707172455.7634-2-daniel@iogearbox.net>
+Message-ID: <ZKiDKuoovyikz8Mm@google.com>
+Subject: Re: [PATCH bpf-next v3 1/8] bpf: Add generic attach/detach/query API
+ for multi-progs
+From: Stanislav Fomichev <sdf@google.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, 
+	razor@blackwall.org, john.fastabend@gmail.com, kuba@kernel.org, dxu@dxuuu.xyz, 
+	joe@cilium.io, toke@kernel.org, davem@davemloft.net, bpf@vger.kernel.org, 
+	netdev@vger.kernel.org
+Content-Type: text/plain; charset="utf-8"
+X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED,
+	USER_IN_DEF_DKIM_WL autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Introduce timer polling method to MCAN since some SoCs may not
-have M_CAN interrupt routed to A53 Linux and do not have
-interrupt property in device tree M_CAN node.
+On 07/07, Daniel Borkmann wrote:
+> This adds a generic layer called bpf_mprog which can be reused by different
+> attachment layers to enable multi-program attachment and dependency resolution.
+> In-kernel users of the bpf_mprog don't need to care about the dependency
+> resolution internals, they can just consume it with few API calls.
+> 
+> The initial idea of having a generic API sparked out of discussion [0] from an
+> earlier revision of this work where tc's priority was reused and exposed via
+> BPF uapi as a way to coordinate dependencies among tc BPF programs, similar
+> as-is for classic tc BPF. The feedback was that priority provides a bad user
+> experience and is hard to use [1], e.g.:
+> 
+>   I cannot help but feel that priority logic copy-paste from old tc, netfilter
+>   and friends is done because "that's how things were done in the past". [...]
+>   Priority gets exposed everywhere in uapi all the way to bpftool when it's
+>   right there for users to understand. And that's the main problem with it.
+> 
+>   The user don't want to and don't need to be aware of it, but uapi forces them
+>   to pick the priority. [...] Your cover letter [0] example proves that in
+>   real life different service pick the same priority. They simply don't know
+>   any better. Priority is an unnecessary magic that apps _have_ to pick, so
+>   they just copy-paste and everyone ends up using the same.
+> 
+> The course of the discussion showed more and more the need for a generic,
+> reusable API where the "same look and feel" can be applied for various other
+> program types beyond just tc BPF, for example XDP today does not have multi-
+> program support in kernel, but also there was interest around this API for
+> improving management of cgroup program types. Such common multi-program
+> management concept is useful for BPF management daemons or user space BPF
+> applications coordinating internally about their attachments.
+> 
+> Both from Cilium and Meta side [2], we've collected the following requirements
+> for a generic attach/detach/query API for multi-progs which has been implemented
+> as part of this work:
+> 
+>   - Support prog-based attach/detach and link API
+>   - Dependency directives (can also be combined):
+>     - BPF_F_{BEFORE,AFTER} with relative_{fd,id} which can be {prog,link,none}
+>       - BPF_F_ID flag as {fd,id} toggle; the rationale for id is so that user
+>         space application does not need CAP_SYS_ADMIN to retrieve foreign fds
+>         via bpf_*_get_fd_by_id()
+>       - BPF_F_LINK flag as {prog,link} toggle
+>       - If relative_{fd,id} is none, then BPF_F_BEFORE will just prepend, and
+>         BPF_F_AFTER will just append for attaching
+>       - Enforced only at attach time
+>     - BPF_F_REPLACE with replace_bpf_fd which can be prog, links have their
+>       own infra for replacing their internal prog
+>     - If no flags are set, then it's default append behavior for attaching
+>   - Internal revision counter and optionally being able to pass expected_revision
+>   - User space application can query current state with revision, and pass it
+>     along for attachment to assert current state before doing updates
+>   - Query also gets extension for link_ids array and link_attach_flags:
+>     - prog_ids are always filled with program IDs
+>     - link_ids are filled with link IDs when link was used, otherwise 0
+>     - {prog,link}_attach_flags for holding {prog,link}-specific flags
+>   - Must be easy to integrate/reuse for in-kernel users
+> 
+> The uapi-side changes needed for supporting bpf_mprog are rather minimal,
+> consisting of the additions of the attachment flags, revision counter, and
+> expanding existing union with relative_{fd,id} member.
+> 
+> The bpf_mprog framework consists of an bpf_mprog_entry object which holds
+> an array of bpf_mprog_fp (fast-path structure). The bpf_mprog_cp (control-path
+> structure) is part of bpf_mprog_bundle. Both have been separated, so that
+> fast-path gets efficient packing of bpf_prog pointers for maximum cache
+> efficiency. Also, array has been chosen instead of linked list or other
+> structures to remove unnecessary indirections for a fast point-to-entry in
+> tc for BPF.
+> 
+> The bpf_mprog_entry comes as a pair via bpf_mprog_bundle so that in case of
+> updates the peer bpf_mprog_entry is populated and then just swapped which
+> avoids additional allocations that could otherwise fail, for example, in
+> detach case. bpf_mprog_{fp,cp} arrays are currently static, but they could
+> be converted to dynamic allocation if necessary at a point in future.
+> Locking is deferred to the in-kernel user of bpf_mprog, for example, in case
+> of tcx which uses this API in the next patch, it piggybacks on rtnl.
+> 
+> An extensive test suite for checking all aspects of this API for prog-based
+> attach/detach and link API comes as BPF selftests in this series.
+> 
+> Kudos also to Andrii Nakryiko for API discussions wrt Meta's BPF management.
+> 
+>   [0] https://lore.kernel.org/bpf/20221004231143.19190-1-daniel@iogearbox.net
+>   [1] https://lore.kernel.org/bpf/CAADnVQ+gEY3FjCR=+DmjDR4gp5bOYZUFJQXj4agKFHT9CQPZBw@mail.gmail.com
+>   [2] http://vger.kernel.org/bpfconf2023_material/tcx_meta_netdev_borkmann.pdf
+> 
+> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> ---
+>  MAINTAINERS                    |   1 +
+>  include/linux/bpf_mprog.h      | 233 ++++++++++++++++++
+>  include/uapi/linux/bpf.h       |  36 ++-
+>  kernel/bpf/Makefile            |   2 +-
+>  kernel/bpf/mprog.c             | 429 +++++++++++++++++++++++++++++++++
+>  tools/include/uapi/linux/bpf.h |  36 ++-
+>  6 files changed, 720 insertions(+), 17 deletions(-)
+>  create mode 100644 include/linux/bpf_mprog.h
+>  create mode 100644 kernel/bpf/mprog.c
+> 
+> diff --git a/MAINTAINERS b/MAINTAINERS
+> index acbe54087d1c..7e5ba799d1c5 100644
+> --- a/MAINTAINERS
+> +++ b/MAINTAINERS
+> @@ -3736,6 +3736,7 @@ F:	include/linux/filter.h
+>  F:	include/linux/tnum.h
+>  F:	kernel/bpf/core.c
+>  F:	kernel/bpf/dispatcher.c
+> +F:	kernel/bpf/mprog.c
+>  F:	kernel/bpf/syscall.c
+>  F:	kernel/bpf/tnum.c
+>  F:	kernel/bpf/trampoline.c
+> diff --git a/include/linux/bpf_mprog.h b/include/linux/bpf_mprog.h
+> new file mode 100644
+> index 000000000000..a7a9b98df1ef
+> --- /dev/null
+> +++ b/include/linux/bpf_mprog.h
+> @@ -0,0 +1,233 @@
+> +/* SPDX-License-Identifier: GPL-2.0 */
+> +/* Copyright (c) 2023 Isovalent */
+> +#ifndef __BPF_MPROG_H
+> +#define __BPF_MPROG_H
+> +
+> +#include <linux/bpf.h>
+> +
+> +#define BPF_MPROG_KEEP	0
+> +#define BPF_MPROG_SWAP	1
+> +#define BPF_MPROG_FREE	2
+> +
+> +#define BPF_MPROG_MAX	64
+> +
+> +#define bpf_mprog_foreach_tuple(entry, fp, cp, t)			\
+> +	for (fp = &entry->fp_items[0], cp = &entry->parent->cp_items[0];\
+> +	     ({								\
+> +		t.prog = READ_ONCE(fp->prog);				\
+> +		t.link = cp->link;					\
+> +		t.prog;							\
+> +	      });							\
+> +	     fp++, cp++)
+> +
+> +#define bpf_mprog_foreach_prog(entry, fp, p)				\
+> +	for (fp = &entry->fp_items[0];					\
+> +	     (p = READ_ONCE(fp->prog));					\
+> +	     fp++)
+> +
+> +struct bpf_mprog_fp {
+> +	struct bpf_prog *prog;
+> +};
+> +
+> +struct bpf_mprog_cp {
+> +	struct bpf_link *link;
+> +};
+> +
+> +struct bpf_mprog_entry {
+> +	struct bpf_mprog_fp fp_items[BPF_MPROG_MAX];
+> +	struct bpf_mprog_bundle *parent;
+> +};
+> +
+> +struct bpf_mprog_bundle {
+> +	struct bpf_mprog_entry a;
+> +	struct bpf_mprog_entry b;
+> +	struct bpf_mprog_cp cp_items[BPF_MPROG_MAX];
+> +	struct rcu_head rcu;
+> +	struct bpf_prog *ref;
+> +	atomic64_t revision;
+> +	off_t off;
+> +	u32 count;
+> +};
+> +
+> +struct bpf_tuple {
+> +	struct bpf_prog *prog;
+> +	struct bpf_link *link;
+> +};
+> +
+> +static inline struct bpf_mprog_entry *
+> +bpf_mprog_peer(const struct bpf_mprog_entry *entry)
+> +{
+> +	if (entry == &entry->parent->a)
+> +		return &entry->parent->b;
+> +	else
+> +		return &entry->parent->a;
+> +}
+> +
 
-On AM62x SoC, MCANs on MCU domain do not have hardware interrupt
-routed to A53 Linux, instead they will use timer polling method.
+[..]
 
-Add an hrtimer to MCAN class device. Each MCAN will have its own
-hrtimer instantiated if there is no hardware interrupt found in
-device tree M_CAN node. The timer will generate a software
-interrupt every 1 ms. In hrtimer callback, we check if there is
-a transaction pending by reading a register, then process by
-calling the isr if there is.
+> +static inline struct bpf_mprog_entry *
+> +bpf_mprog_create(const size_t size, const off_t off)
+> +{
+> +	struct bpf_mprog_bundle *bundle;
+> +	void *ptr;
+> +
+> +	BUILD_BUG_ON(size < sizeof(*bundle) + off);
+> +	BUILD_BUG_ON(sizeof(bundle->a.fp_items[0]) > sizeof(u64));
+> +	BUILD_BUG_ON(ARRAY_SIZE(bundle->a.fp_items) !=
+> +		     ARRAY_SIZE(bundle->cp_items));
+> +
+> +	ptr = kzalloc(size, GFP_KERNEL);
+> +	if (ptr) {
+> +		bundle = ptr + off;
+> +		atomic64_set(&bundle->revision, 1);
+> +		bundle->off = off;
+> +		bundle->a.parent = bundle;
+> +		bundle->b.parent = bundle;
+> +		return &bundle->a;
+> +	}
+> +	return NULL;
+> +}
+> +
+> +void bpf_mprog_free_rcu(struct rcu_head *rcu);
+> +
+> +static inline void bpf_mprog_free(struct bpf_mprog_entry *entry)
+> +{
+> +	struct bpf_mprog_bundle *bundle = entry->parent;
+> +
+> +	call_rcu(&bundle->rcu, bpf_mprog_free_rcu);
+> +}
 
-Tested-by: Hiago De Franco <hiago.franco@toradex.com> # Toradex Verdin AM62
-Reviewed-by: Tony Lindgren <tony@atomide.com>
-Signed-off-by: Judith Mendez <jm@ti.com>
----
-Changelog:
-v10:
-- set irq=0 during declaration
-- return irq error value instead of -EINVAL;
-v9:
-- Change add MS to HRTIMER_POLL_INTERVAL
-- Change syntax from "= 0" to "!"
-v8:
-- Cancel hrtimer after interrupts in m_can_stop
-- Move assignment of hrtimer_callback to m_can_class_register()
-- Initialize irq = 0 if polling mode is used
-- Add reson for polling mode in commit msg
-- Remove unrelated change
-- Remove polling flag
-v7:
-- Clean up m_can_platform.c if/else section after removing poll-interval
-- Remove poll-interval from patch description
-v6:
-- Move hrtimer stop/start function calls to m_can_open and m_can_close to
-support power suspend/resume
-v5:
-- Change dev_dbg to dev_info if hardware interrupt exists and polling
-is enabled
-v4:
-- No changes
-v3:
-- Create a define for 1 ms polling interval
-- Change plarform_get_irq to optional to not print error msg
-v2:
-- Add functionality to check for 'poll-interval' property in MCAN node 
-- Add 'polling' flag in driver to check if device is using polling method
-- Check for timer polling and hardware interrupt cases, default to
-hardware interrupt method
-- Change ns_to_ktime() to ms_to_ktime()
----
- drivers/net/can/m_can/m_can.c          | 32 +++++++++++++++++++++++++-
- drivers/net/can/m_can/m_can.h          |  3 +++
- drivers/net/can/m_can/m_can_platform.c | 21 +++++++++++++----
- 3 files changed, 51 insertions(+), 5 deletions(-)
+Any reason we're doing allocation here? Why not do 
+bpf_mprog_init(struct bpf_mprog_bundle *) instead that simply initializes
+the fields? Then we can move allocation/free part to the caller (tcx) along
+with rcu_head.
+Feels like it would be a bit more conventional/readable? bpf_mprog_free{,_rcu}
+will also become tcx_free{,_rcu}..
 
-diff --git a/drivers/net/can/m_can/m_can.c b/drivers/net/can/m_can/m_can.c
-index c5af92bcc9c9..13fd84b2e2dd 100644
---- a/drivers/net/can/m_can/m_can.c
-+++ b/drivers/net/can/m_can/m_can.c
-@@ -11,6 +11,7 @@
- #include <linux/bitfield.h>
- #include <linux/can/dev.h>
- #include <linux/ethtool.h>
-+#include <linux/hrtimer.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/iopoll.h>
-@@ -308,6 +309,9 @@ enum m_can_reg {
- #define TX_EVENT_MM_MASK	GENMASK(31, 24)
- #define TX_EVENT_TXTS_MASK	GENMASK(15, 0)
- 
-+/* Hrtimer polling interval */
-+#define HRTIMER_POLL_INTERVAL_MS		1
-+
- /* The ID and DLC registers are adjacent in M_CAN FIFO memory,
-  * and we can save a (potentially slow) bus round trip by combining
-  * reads and writes to them.
-@@ -1414,6 +1418,12 @@ static int m_can_start(struct net_device *dev)
- 
- 	m_can_enable_all_interrupts(cdev);
- 
-+	if (!dev->irq) {
-+		dev_dbg(cdev->dev, "Start hrtimer\n");
-+		hrtimer_start(&cdev->hrtimer, ms_to_ktime(HRTIMER_POLL_INTERVAL_MS),
-+			      HRTIMER_MODE_REL_PINNED);
-+	}
-+
- 	return 0;
- }
- 
-@@ -1568,6 +1578,11 @@ static void m_can_stop(struct net_device *dev)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
- 
-+	if (!dev->irq) {
-+		dev_dbg(cdev->dev, "Stop hrtimer\n");
-+		hrtimer_cancel(&cdev->hrtimer);
-+	}
-+
- 	/* disable all interrupts */
- 	m_can_disable_all_interrupts(cdev);
- 
-@@ -1793,6 +1808,18 @@ static netdev_tx_t m_can_start_xmit(struct sk_buff *skb,
- 	return NETDEV_TX_OK;
- }
- 
-+static enum hrtimer_restart hrtimer_callback(struct hrtimer *timer)
-+{
-+	struct m_can_classdev *cdev = container_of(timer, struct
-+						   m_can_classdev, hrtimer);
-+
-+	m_can_isr(0, cdev->net);
-+
-+	hrtimer_forward_now(timer, ms_to_ktime(HRTIMER_POLL_INTERVAL_MS));
-+
-+	return HRTIMER_RESTART;
-+}
-+
- static int m_can_open(struct net_device *dev)
- {
- 	struct m_can_classdev *cdev = netdev_priv(dev);
-@@ -1831,7 +1858,7 @@ static int m_can_open(struct net_device *dev)
- 		err = request_threaded_irq(dev->irq, NULL, m_can_isr,
- 					   IRQF_ONESHOT,
- 					   dev->name, dev);
--	} else {
-+	} else if (dev->irq) {
- 		err = request_irq(dev->irq, m_can_isr, IRQF_SHARED, dev->name,
- 				  dev);
- 	}
-@@ -2027,6 +2054,9 @@ int m_can_class_register(struct m_can_classdev *cdev)
- 			goto clk_disable;
- 	}
- 
-+	if (!cdev->net->irq)
-+		cdev->hrtimer.function = &hrtimer_callback;
-+
- 	ret = m_can_dev_setup(cdev);
- 	if (ret)
- 		goto rx_offload_del;
-diff --git a/drivers/net/can/m_can/m_can.h b/drivers/net/can/m_can/m_can.h
-index a839dc71dc9b..2ac18ac867a4 100644
---- a/drivers/net/can/m_can/m_can.h
-+++ b/drivers/net/can/m_can/m_can.h
-@@ -15,6 +15,7 @@
- #include <linux/device.h>
- #include <linux/dma-mapping.h>
- #include <linux/freezer.h>
-+#include <linux/hrtimer.h>
- #include <linux/interrupt.h>
- #include <linux/io.h>
- #include <linux/iopoll.h>
-@@ -93,6 +94,8 @@ struct m_can_classdev {
- 	int is_peripheral;
- 
- 	struct mram_cfg mcfg[MRAM_CFG_NUM];
-+
-+	struct hrtimer hrtimer;
- };
- 
- struct m_can_classdev *m_can_class_allocate_dev(struct device *dev, int sizeof_priv);
-diff --git a/drivers/net/can/m_can/m_can_platform.c b/drivers/net/can/m_can/m_can_platform.c
-index 94dc82644113..cdb28d6a092c 100644
---- a/drivers/net/can/m_can/m_can_platform.c
-+++ b/drivers/net/can/m_can/m_can_platform.c
-@@ -5,6 +5,7 @@
- //
- // Copyright (C) 2018-19 Texas Instruments Incorporated - http://www.ti.com/
- 
-+#include <linux/hrtimer.h>
- #include <linux/phy/phy.h>
- #include <linux/platform_device.h>
- 
-@@ -82,7 +83,7 @@ static int m_can_plat_probe(struct platform_device *pdev)
- 	void __iomem *addr;
- 	void __iomem *mram_addr;
- 	struct phy *transceiver;
--	int irq, ret = 0;
-+	int irq = 0, ret = 0;
- 
- 	mcan_class = m_can_class_allocate_dev(&pdev->dev,
- 					      sizeof(struct m_can_plat_priv));
-@@ -96,12 +97,24 @@ static int m_can_plat_probe(struct platform_device *pdev)
- 		goto probe_fail;
- 
- 	addr = devm_platform_ioremap_resource_byname(pdev, "m_can");
--	irq = platform_get_irq_byname(pdev, "int0");
--	if (IS_ERR(addr) || irq < 0) {
--		ret = -EINVAL;
-+	if (IS_ERR(addr)) {
-+		ret = PTR_ERR(addr);
- 		goto probe_fail;
- 	}
- 
-+	if (device_property_present(mcan_class->dev, "interrupts") ||
-+	    device_property_present(mcan_class->dev, "interrupt-names")) {
-+		irq = platform_get_irq_byname(pdev, "int0");
-+		if (irq < 0) {
-+			ret = irq;
-+			goto probe_fail;
-+		}
-+	} else {
-+		dev_dbg(mcan_class->dev, "Polling enabled, initialize hrtimer");
-+		hrtimer_init(&mcan_class->hrtimer, CLOCK_MONOTONIC,
-+			     HRTIMER_MODE_REL_PINNED);
-+	}
-+
- 	/* message ram could be shared */
- 	res = platform_get_resource_byname(pdev, IORESOURCE_MEM, "message_ram");
- 	if (!res) {
--- 
-2.34.1
+I guess current approach works, but it took me awhile to figure it out..
+(maybe it's just me)
 
+> +static inline void bpf_mprog_mark_ref(struct bpf_mprog_entry *entry,
+> +				      struct bpf_tuple *tuple)
+> +{
+> +	WARN_ON_ONCE(entry->parent->ref);
+> +	if (!tuple->link)
+> +		entry->parent->ref = tuple->prog;
+> +}
+> +
+> +static inline void bpf_mprog_inc(struct bpf_mprog_entry *entry)
+> +{
+> +	entry->parent->count++;
+> +}
+> +
+> +static inline void bpf_mprog_dec(struct bpf_mprog_entry *entry)
+> +{
+> +	entry->parent->count--;
+> +}
+> +
+> +static inline int bpf_mprog_max(void)
+> +{
+> +	return ARRAY_SIZE(((struct bpf_mprog_entry *)NULL)->fp_items) - 1;
+> +}
+> +
+> +static inline int bpf_mprog_total(struct bpf_mprog_entry *entry)
+> +{
+> +	int total = entry->parent->count;
+> +
+> +	WARN_ON_ONCE(total > bpf_mprog_max());
+> +	return total;
+> +}
+> +
+> +static inline bool bpf_mprog_exists(struct bpf_mprog_entry *entry,
+> +				    struct bpf_prog *prog)
+> +{
+> +	const struct bpf_mprog_fp *fp;
+> +	const struct bpf_prog *tmp;
+> +
+> +	bpf_mprog_foreach_prog(entry, fp, tmp) {
+> +		if (tmp == prog)
+> +			return true;
+> +	}
+> +	return false;
+> +}
+> +
+> +static inline bool bpf_mprog_swap_entries(const int code)
+> +{
+> +	return code == BPF_MPROG_SWAP ||
+> +	       code == BPF_MPROG_FREE;
+> +}
+> +
+> +static inline void bpf_mprog_commit(struct bpf_mprog_entry *entry)
+> +{
+> +	atomic64_inc(&entry->parent->revision);
+> +	synchronize_rcu();
+
+Maybe add a comment on why we need to synchronize_rcu here? In general,
+I don't think I have a good grasp of that ->ref member.
+
+> +	if (entry->parent->ref) {
+> +		bpf_prog_put(entry->parent->ref);
+> +		entry->parent->ref = NULL;
+> +	}
+> +}
+> +
+> +static inline u64 bpf_mprog_revision(struct bpf_mprog_entry *entry)
+> +{
+> +	return atomic64_read(&entry->parent->revision);
+> +}
+> +
+> +static inline void bpf_mprog_entry_clear(struct bpf_mprog_entry *entry)
+> +{
+> +	memset(entry->fp_items, 0, sizeof(entry->fp_items));
+> +}
+> +
+> +static inline void bpf_mprog_commit_cp(struct bpf_mprog_entry *entry,
+> +				       struct bpf_mprog_cp *cp_items)
+> +{
+> +	memcpy(entry->parent->cp_items, cp_items,
+> +	       sizeof(entry->parent->cp_items));
+> +}
+> +
+> +static inline void bpf_mprog_read_fp(struct bpf_mprog_entry *entry, u32 idx,
+> +				     struct bpf_mprog_fp **fp)
+> +{
+> +	*fp = &entry->fp_items[idx];
+> +}
+> +
+> +static inline void bpf_mprog_read_cp(struct bpf_mprog_entry *entry, u32 idx,
+> +				     struct bpf_mprog_cp **cp)
+> +{
+> +	*cp = &entry->parent->cp_items[idx];
+> +}
+> +
+> +static inline void bpf_mprog_read(struct bpf_mprog_entry *entry, u32 idx,
+> +				  struct bpf_mprog_fp **fp,
+> +				  struct bpf_mprog_cp **cp)
+> +{
+> +	bpf_mprog_read_fp(entry, idx, fp);
+> +	bpf_mprog_read_cp(entry, idx, cp);
+> +}
+> +
+> +static inline void bpf_mprog_write_fp(struct bpf_mprog_fp *fp,
+> +				      struct bpf_tuple *tuple)
+> +{
+> +	WRITE_ONCE(fp->prog, tuple->prog);
+> +}
+> +
+> +static inline void bpf_mprog_write_cp(struct bpf_mprog_cp *cp,
+> +				      struct bpf_tuple *tuple)
+> +{
+> +	cp->link = tuple->link;
+> +}
+> +
+> +static inline void bpf_mprog_write(struct bpf_mprog_fp *fp,
+> +				   struct bpf_mprog_cp *cp,
+> +				   struct bpf_tuple *tuple)
+> +{
+> +	bpf_mprog_write_fp(fp, tuple);
+> +	bpf_mprog_write_cp(cp, tuple);
+> +}
+> +
+> +static inline void bpf_mprog_copy(struct bpf_mprog_fp *fp_dst,
+> +				  struct bpf_mprog_cp *cp_dst,
+> +				  struct bpf_mprog_fp *fp_src,
+> +				  struct bpf_mprog_cp *cp_src)
+> +{
+> +	WRITE_ONCE(fp_dst->prog, READ_ONCE(fp_src->prog));
+> +	memcpy(cp_dst, cp_src, sizeof(*cp_src));
+> +}
+> +
+> +int bpf_mprog_attach(struct bpf_mprog_entry *entry, struct bpf_prog *prog_new,
+> +		     struct bpf_link *link, struct bpf_prog *prog_old,
+> +		     u32 flags, u32 object, u64 revision);
+> +int bpf_mprog_detach(struct bpf_mprog_entry *entry, struct bpf_prog *prog,
+> +		     struct bpf_link *link, u32 flags, u32 object, u64 revision);
+> +
+> +int bpf_mprog_query(const union bpf_attr *attr, union bpf_attr __user *uattr,
+> +		    struct bpf_mprog_entry *entry);
+> +
+> +#endif /* __BPF_MPROG_H */
+> diff --git a/include/uapi/linux/bpf.h b/include/uapi/linux/bpf.h
+> index 60a9d59beeab..74879c538f2b 100644
+> --- a/include/uapi/linux/bpf.h
+> +++ b/include/uapi/linux/bpf.h
+> @@ -1103,7 +1103,12 @@ enum bpf_link_type {
+>   */
+>  #define BPF_F_ALLOW_OVERRIDE	(1U << 0)
+>  #define BPF_F_ALLOW_MULTI	(1U << 1)
+> +/* Generic attachment flags. */
+>  #define BPF_F_REPLACE		(1U << 2)
+> +#define BPF_F_BEFORE		(1U << 3)
+> +#define BPF_F_AFTER		(1U << 4)
+> +#define BPF_F_ID		(1U << 5)
+> +#define BPF_F_LINK		BPF_F_LINK /* 1 << 13 */
+>  
+>  /* If BPF_F_STRICT_ALIGNMENT is used in BPF_PROG_LOAD command, the
+>   * verifier will perform strict alignment checking as if the kernel
+> @@ -1434,14 +1439,19 @@ union bpf_attr {
+>  	};
+>  
+>  	struct { /* anonymous struct used by BPF_PROG_ATTACH/DETACH commands */
+> -		__u32		target_fd;	/* container object to attach to */
+> -		__u32		attach_bpf_fd;	/* eBPF program to attach */
+> +		union {
+> +			__u32	target_fd;	/* target object to attach to or ... */
+> +			__u32	target_ifindex;	/* target ifindex */
+> +		};
+> +		__u32		attach_bpf_fd;
+>  		__u32		attach_type;
+>  		__u32		attach_flags;
+> -		__u32		replace_bpf_fd;	/* previously attached eBPF
+> -						 * program to replace if
+> -						 * BPF_F_REPLACE is used
+> -						 */
+> +		__u32		replace_bpf_fd;
+> +		union {
+> +			__u32	relative_fd;
+> +			__u32	relative_id;
+> +		};
+> +		__u64		expected_revision;
+>  	};
+>  
+>  	struct { /* anonymous struct used by BPF_PROG_TEST_RUN command */
+> @@ -1487,16 +1497,26 @@ union bpf_attr {
+>  	} info;
+>  
+>  	struct { /* anonymous struct used by BPF_PROG_QUERY command */
+> -		__u32		target_fd;	/* container object to query */
+> +		union {
+> +			__u32	target_fd;	/* target object to query or ... */
+> +			__u32	target_ifindex;	/* target ifindex */
+> +		};
+>  		__u32		attach_type;
+>  		__u32		query_flags;
+>  		__u32		attach_flags;
+>  		__aligned_u64	prog_ids;
+> -		__u32		prog_cnt;
+> +		union {
+> +			__u32	prog_cnt;
+> +			__u32	count;
+> +		};
+> +		__u32		:32;
+>  		/* output: per-program attach_flags.
+>  		 * not allowed to be set during effective query.
+>  		 */
+>  		__aligned_u64	prog_attach_flags;
+> +		__aligned_u64	link_ids;
+> +		__aligned_u64	link_attach_flags;
+> +		__u64		revision;
+>  	} query;
+>  
+>  	struct { /* anonymous struct used by BPF_RAW_TRACEPOINT_OPEN command */
+> diff --git a/kernel/bpf/Makefile b/kernel/bpf/Makefile
+> index 1d3892168d32..1bea2eb912cd 100644
+> --- a/kernel/bpf/Makefile
+> +++ b/kernel/bpf/Makefile
+> @@ -12,7 +12,7 @@ obj-$(CONFIG_BPF_SYSCALL) += hashtab.o arraymap.o percpu_freelist.o bpf_lru_list
+>  obj-$(CONFIG_BPF_SYSCALL) += local_storage.o queue_stack_maps.o ringbuf.o
+>  obj-$(CONFIG_BPF_SYSCALL) += bpf_local_storage.o bpf_task_storage.o
+>  obj-${CONFIG_BPF_LSM}	  += bpf_inode_storage.o
+> -obj-$(CONFIG_BPF_SYSCALL) += disasm.o
+> +obj-$(CONFIG_BPF_SYSCALL) += disasm.o mprog.o
+>  obj-$(CONFIG_BPF_JIT) += trampoline.o
+>  obj-$(CONFIG_BPF_SYSCALL) += btf.o memalloc.o
+>  obj-$(CONFIG_BPF_JIT) += dispatcher.o
+> diff --git a/kernel/bpf/mprog.c b/kernel/bpf/mprog.c
+> new file mode 100644
+> index 000000000000..8795dab5237a
+> --- /dev/null
+> +++ b/kernel/bpf/mprog.c
+> @@ -0,0 +1,429 @@
+> +// SPDX-License-Identifier: GPL-2.0
+> +/* Copyright (c) 2023 Isovalent */
+> +
+> +#include <linux/bpf.h>
+> +#include <linux/bpf_mprog.h>
+> +
+> +static int bpf_mprog_link(struct bpf_tuple *tuple,
+> +			  u32 object, u32 flags,
+> +			  enum bpf_prog_type type)
+> +{
+> +	bool id = flags & BPF_F_ID;
+> +	struct bpf_link *link;
+> +
+> +	if (id)
+> +		link = bpf_link_by_id(object);
+> +	else
+> +		link = bpf_link_get_from_fd(object);
+> +	if (IS_ERR(link))
+> +		return PTR_ERR(link);
+> +	if (type && link->prog->type != type) {
+> +		bpf_link_put(link);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tuple->link = link;
+> +	tuple->prog = link->prog;
+> +	return 0;
+> +}
+> +
+> +static int bpf_mprog_prog(struct bpf_tuple *tuple,
+> +			  u32 object, u32 flags,
+> +			  enum bpf_prog_type type)
+> +{
+> +	bool id = flags & BPF_F_ID;
+> +	struct bpf_prog *prog;
+> +
+> +	if (id)
+> +		prog = bpf_prog_by_id(object);
+> +	else
+> +		prog = bpf_prog_get(object);
+> +	if (IS_ERR(prog)) {
+
+[..]
+
+> +		if (!object && !id)
+> +			return 0;
+
+What's the reason behind this?
+
+> +		return PTR_ERR(prog);
+> +	}
+> +	if (type && prog->type != type) {
+> +		bpf_prog_put(prog);
+> +		return -EINVAL;
+> +	}
+> +
+> +	tuple->link = NULL;
+> +	tuple->prog = prog;
+> +	return 0;
+> +}
+> +
+> +static int bpf_mprog_tuple_relative(struct bpf_tuple *tuple,
+> +				    u32 object, u32 flags,
+> +				    enum bpf_prog_type type)
+> +{
+> +	memset(tuple, 0, sizeof(*tuple));
+> +	if (flags & BPF_F_LINK)
+> +		return bpf_mprog_link(tuple, object, flags, type);
+> +	return bpf_mprog_prog(tuple, object, flags, type);
+> +}
+> +
+> +static void bpf_mprog_tuple_put(struct bpf_tuple *tuple)
+> +{
+> +	if (tuple->link)
+> +		bpf_link_put(tuple->link);
+> +	else if (tuple->prog)
+> +		bpf_prog_put(tuple->prog);
+> +}
+> +
+> +static int bpf_mprog_replace(struct bpf_mprog_entry *entry,
+> +			     struct bpf_tuple *ntuple, int idx)
+> +{
+> +	struct bpf_mprog_fp *fp;
+> +	struct bpf_mprog_cp *cp;
+> +	struct bpf_prog *oprog;
+> +
+> +	bpf_mprog_read(entry, idx, &fp, &cp);
+> +	oprog = READ_ONCE(fp->prog);
+> +	bpf_mprog_write(fp, cp, ntuple);
+> +	if (!ntuple->link) {
+> +		WARN_ON_ONCE(cp->link);
+> +		bpf_prog_put(oprog);
+> +	}
+> +	return BPF_MPROG_KEEP;
+> +}
+> +
+> +static int bpf_mprog_insert(struct bpf_mprog_entry *entry,
+> +			    struct bpf_tuple *ntuple, int idx, u32 flags)
+> +{
+> +	int i, j = 0, total = bpf_mprog_total(entry);
+> +	struct bpf_mprog_cp *cp, cpp[BPF_MPROG_MAX] = {};
+> +	struct bpf_mprog_fp *fp, *fpp;
+> +	struct bpf_mprog_entry *peer;
+> +
+> +	peer = bpf_mprog_peer(entry);
+> +	bpf_mprog_entry_clear(peer);
+> +	if (idx < 0) {
+> +		bpf_mprog_read_fp(peer, j, &fpp);
+> +		bpf_mprog_write_fp(fpp, ntuple);
+> +		bpf_mprog_write_cp(&cpp[j], ntuple);
+> +		j++;
+> +	}
+> +	for (i = 0; i <= total; i++) {
+> +		bpf_mprog_read_fp(peer, j, &fpp);
+> +		if (idx == i && (flags & BPF_F_AFTER)) {
+> +			bpf_mprog_write(fpp, &cpp[j], ntuple);
+> +			j++;
+> +			bpf_mprog_read_fp(peer, j, &fpp);
+> +		}
+> +		if (i < total) {
+> +			bpf_mprog_read(entry, i, &fp, &cp);
+> +			bpf_mprog_copy(fpp, &cpp[j], fp, cp);
+> +			j++;
+> +		}
+> +		if (idx == i && (flags & BPF_F_BEFORE)) {
+> +			bpf_mprog_read_fp(peer, j, &fpp);
+> +			bpf_mprog_write(fpp, &cpp[j], ntuple);
+> +			j++;
+> +		}
+> +	}
+> +	bpf_mprog_commit_cp(peer, cpp);
+> +	bpf_mprog_inc(peer);
+> +	return BPF_MPROG_SWAP;
+> +}
+> +
+> +static int bpf_mprog_tuple_confirm(struct bpf_mprog_entry *entry,
+> +				   struct bpf_tuple *dtuple, int idx)
+> +{
+> +	int first = 0, last = bpf_mprog_total(entry) - 1;
+> +	struct bpf_mprog_cp *cp;
+> +	struct bpf_mprog_fp *fp;
+> +	struct bpf_prog *prog;
+> +	struct bpf_link *link;
+> +
+> +	if (idx <= first)
+> +		bpf_mprog_read(entry, first, &fp, &cp);
+> +	else if (idx >= last)
+> +		bpf_mprog_read(entry, last, &fp, &cp);
+> +	else
+> +		bpf_mprog_read(entry, idx, &fp, &cp);
+> +
+> +	prog = READ_ONCE(fp->prog);
+> +	link = cp->link;
+> +	if (!dtuple->link && link)
+> +		return -EBUSY;
+> +
+> +	WARN_ON_ONCE(dtuple->prog && dtuple->prog != prog);
+> +	WARN_ON_ONCE(dtuple->link && dtuple->link != link);
+> +
+> +	dtuple->prog = prog;
+> +	dtuple->link = link;
+> +	return 0;
+> +}
+> +
+> +static int bpf_mprog_delete(struct bpf_mprog_entry *entry,
+> +			    struct bpf_tuple *dtuple, int idx)
+> +{
+> +	int i = 0, j, ret, total = bpf_mprog_total(entry);
+> +	struct bpf_mprog_cp *cp, cpp[BPF_MPROG_MAX] = {};
+> +	struct bpf_mprog_fp *fp, *fpp;
+> +	struct bpf_mprog_entry *peer;
+> +
+> +	ret = bpf_mprog_tuple_confirm(entry, dtuple, idx);
+> +	if (ret)
+> +		return ret;
+> +	peer = bpf_mprog_peer(entry);
+> +	bpf_mprog_entry_clear(peer);
+> +	if (idx < 0)
+> +		i++;
+> +	if (idx == total)
+> +		total--;
+> +	for (j = 0; i < total; i++) {
+> +		if (idx == i)
+> +			continue;
+> +		bpf_mprog_read_fp(peer, j, &fpp);
+> +		bpf_mprog_read(entry, i, &fp, &cp);
+> +		bpf_mprog_copy(fpp, &cpp[j], fp, cp);
+> +		j++;
+> +	}
+> +	bpf_mprog_commit_cp(peer, cpp);
+> +	bpf_mprog_dec(peer);
+> +	bpf_mprog_mark_ref(peer, dtuple);
+> +	return bpf_mprog_total(peer) ?
+> +	       BPF_MPROG_SWAP : BPF_MPROG_FREE;
+> +}
+> +
+> +static int bpf_mprog_pos_exact(struct bpf_mprog_entry *entry,
+> +			       struct bpf_tuple *tuple)
+> +{
+> +	struct bpf_mprog_fp *fp;
+> +	struct bpf_mprog_cp *cp;
+> +	int i;
+> +
+> +	for (i = 0; i < bpf_mprog_total(entry); i++) {
+> +		bpf_mprog_read(entry, i, &fp, &cp);
+> +		if (tuple->prog == READ_ONCE(fp->prog))
+> +			return tuple->link == cp->link ? i : -EBUSY;
+> +	}
+> +	return -ENOENT;
+> +}
+> +
+> +static int bpf_mprog_pos_before(struct bpf_mprog_entry *entry,
+> +				struct bpf_tuple *tuple)
+> +{
+> +	struct bpf_mprog_fp *fp;
+> +	struct bpf_mprog_cp *cp;
+> +	int i;
+> +
+> +	for (i = 0; i < bpf_mprog_total(entry); i++) {
+> +		bpf_mprog_read(entry, i, &fp, &cp);
+> +		if (tuple->prog == READ_ONCE(fp->prog) &&
+
+Both attach/detach happen under rtnl, why do need READ_ONCE? I'm assuming
+even going forwrad, attach/detach from non-tcx places will happen
+under lock?
+
+(same for bpf_mprog_pos_before/bpf_mprog_pos_after)
+
+Feels like the only place where we need WRITE_ONCE is the replace (in-place)
+and READ_ONCE during fast-path. Why do we need the rest?
+
+
+> +		    (!tuple->link || tuple->link == cp->link))
+> +			return i - 1;
+> +	}
+> +	return tuple->prog ? -ENOENT : -1;
+> +}
+> +
+> +static int bpf_mprog_pos_after(struct bpf_mprog_entry *entry,
+> +			       struct bpf_tuple *tuple)
+> +{
+> +	struct bpf_mprog_fp *fp;
+> +	struct bpf_mprog_cp *cp;
+> +	int i;
+> +
+> +	for (i = 0; i < bpf_mprog_total(entry); i++) {
+> +		bpf_mprog_read(entry, i, &fp, &cp);
+> +		if (tuple->prog == READ_ONCE(fp->prog) &&
+> +		    (!tuple->link || tuple->link == cp->link))
+> +			return i + 1;
+> +	}
+> +	return tuple->prog ? -ENOENT : bpf_mprog_total(entry);
+> +}
+> +
+> +int bpf_mprog_attach(struct bpf_mprog_entry *entry, struct bpf_prog *prog_new,
+> +		     struct bpf_link *link, struct bpf_prog *prog_old,
+> +		     u32 flags, u32 object, u64 revision)
+> +{
+> +	struct bpf_tuple rtuple, ntuple = {
+> +		.prog = prog_new,
+> +		.link = link,
+> +	}, otuple = {
+> +		.prog = prog_old,
+> +		.link = link,
+> +	};
+> +	int ret, idx = -2, tidx;
+> +
+> +	if (revision && revision != bpf_mprog_revision(entry))
+> +		return -ESTALE;
+> +	if (bpf_mprog_exists(entry, prog_new))
+> +		return -EEXIST;
+> +	ret = bpf_mprog_tuple_relative(&rtuple, object,
+> +				       flags & ~BPF_F_REPLACE,
+> +				       prog_new->type);
+> +	if (ret)
+> +		return ret;
+> +	if (flags & BPF_F_REPLACE) {
+> +		tidx = bpf_mprog_pos_exact(entry, &otuple);
+> +		if (tidx < 0) {
+> +			ret = tidx;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+
+[..]
+
+> +	if (flags & BPF_F_BEFORE) {
+> +		tidx = bpf_mprog_pos_before(entry, &rtuple);
+> +		if (tidx < -1 || (idx >= -1 && tidx != idx)) {
+> +			ret = tidx < -1 ? tidx : -EDOM;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+> +	if (flags & BPF_F_AFTER) {
+> +		tidx = bpf_mprog_pos_after(entry, &rtuple);
+> +		if (tidx < 0 || (idx >= -1 && tidx != idx)) {
+> +			ret = tidx < 0 ? tidx : -EDOM;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+
+There still seems to be some inter-dependency between F_BEFORE and F_AFTER?
+IOW, looks like I can pass F_BEFORE|F_AFTER|F_REPLACE. Do we need that?
+Why not exclusive cases?
+
+> +	if (idx < -1) {
+> +		if (rtuple.prog || flags) {
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +		idx = bpf_mprog_total(entry);
+> +		flags = BPF_F_AFTER;
+> +	}
+> +	if (idx >= bpf_mprog_max()) {
+> +		ret = -EDOM;
+> +		goto out;
+> +	}
+> +	if (flags & BPF_F_REPLACE)
+> +		ret = bpf_mprog_replace(entry, &ntuple, idx);
+> +	else
+> +		ret = bpf_mprog_insert(entry, &ntuple, idx, flags);
+> +out:
+> +	bpf_mprog_tuple_put(&rtuple);
+> +	return ret;
+> +}
+> +
+> +int bpf_mprog_detach(struct bpf_mprog_entry *entry, struct bpf_prog *prog,
+> +		     struct bpf_link *link, u32 flags, u32 object, u64 revision)
+> +{
+> +	struct bpf_tuple rtuple, dtuple = {
+> +		.prog = prog,
+> +		.link = link,
+> +	};
+> +	int ret, idx = -2, tidx;
+> +
+> +	if (flags & BPF_F_REPLACE)
+> +		return -EINVAL;
+> +	if (revision && revision != bpf_mprog_revision(entry))
+> +		return -ESTALE;
+> +	ret = bpf_mprog_tuple_relative(&rtuple, object, flags,
+> +				       prog ? prog->type :
+> +				       BPF_PROG_TYPE_UNSPEC);
+> +	if (ret)
+> +		return ret;
+> +	if (dtuple.prog) {
+> +		tidx = bpf_mprog_pos_exact(entry, &dtuple);
+> +		if (tidx < 0) {
+> +			ret = tidx;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+> +	if (flags & BPF_F_BEFORE) {
+> +		tidx = bpf_mprog_pos_before(entry, &rtuple);
+> +		if (tidx < -1 || (idx >= -1 && tidx != idx)) {
+> +			ret = tidx < -1 ? tidx : -EDOM;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+> +	if (flags & BPF_F_AFTER) {
+> +		tidx = bpf_mprog_pos_after(entry, &rtuple);
+> +		if (tidx < 0 || (idx >= -1 && tidx != idx)) {
+> +			ret = tidx < 0 ? tidx : -EDOM;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+> +	if (idx < -1) {
+> +		if (rtuple.prog || flags) {
+> +			ret = -EINVAL;
+> +			goto out;
+> +		}
+> +		idx = bpf_mprog_total(entry);
+> +		flags = BPF_F_AFTER;
+> +	}
+> +	if (idx >= bpf_mprog_max()) {
+> +		ret = -EDOM;
+> +		goto out;
+> +	}
+> +	ret = bpf_mprog_delete(entry, &dtuple, idx);
+> +out:
+> +	bpf_mprog_tuple_put(&rtuple);
+> +	return ret;
+> +}
+> +
+> +int bpf_mprog_query(const union bpf_attr *attr, union bpf_attr __user *uattr,
+> +		    struct bpf_mprog_entry *entry)
+> +{
+> +	u32 __user *uprog_flags, *ulink_flags;
+> +	u32 __user *uprog_id, *ulink_id;
+> +	struct bpf_mprog_fp *fp;
+> +	struct bpf_mprog_cp *cp;
+> +	struct bpf_prog *prog;
+> +	const u32 flags = 0;
+> +	int i, ret = 0;
+> +	u32 id, count;
+> +	u64 revision;
+> +
+> +	if (attr->query.query_flags || attr->query.attach_flags)
+> +		return -EINVAL;
+> +	revision = bpf_mprog_revision(entry);
+> +	count = bpf_mprog_total(entry);
+> +	if (copy_to_user(&uattr->query.attach_flags, &flags, sizeof(flags)))
+> +		return -EFAULT;
+> +	if (copy_to_user(&uattr->query.revision, &revision, sizeof(revision)))
+> +		return -EFAULT;
+> +	if (copy_to_user(&uattr->query.count, &count, sizeof(count)))
+> +		return -EFAULT;
+> +	uprog_id = u64_to_user_ptr(attr->query.prog_ids);
+> +	uprog_flags = u64_to_user_ptr(attr->query.prog_attach_flags);
+> +	ulink_id = u64_to_user_ptr(attr->query.link_ids);
+> +	ulink_flags = u64_to_user_ptr(attr->query.link_attach_flags);
+> +	if (attr->query.count == 0 || !uprog_id || !count)
+> +		return 0;
+> +	if (attr->query.count < count) {
+> +		count = attr->query.count;
+> +		ret = -ENOSPC;
+> +	}
+> +	for (i = 0; i < bpf_mprog_max(); i++) {
+> +		bpf_mprog_read(entry, i, &fp, &cp);
+> +		prog = READ_ONCE(fp->prog);
+> +		if (!prog)
+> +			break;
+> +		id = prog->aux->id;
+> +		if (copy_to_user(uprog_id + i, &id, sizeof(id)))
+> +			return -EFAULT;
+> +		if (uprog_flags &&
+> +		    copy_to_user(uprog_flags + i, &flags, sizeof(flags)))
+> +			return -EFAULT;
+> +		id = cp->link ? cp->link->id : 0;
+> +		if (ulink_id &&
+> +		    copy_to_user(ulink_id + i, &id, sizeof(id)))
+> +			return -EFAULT;
+> +		if (ulink_flags &&
+> +		    copy_to_user(ulink_flags + i, &flags, sizeof(flags)))
+> +			return -EFAULT;
+> +		if (i + 1 == count)
+> +			break;
+> +	}
+> +	return ret;
+> +}
+> +
+> +void bpf_mprog_free_rcu(struct rcu_head *rcu)
+> +{
+> +	struct bpf_mprog_bundle *bundle =
+> +		container_of(rcu, struct bpf_mprog_bundle, rcu);
+> +	void *ptr = (void *)bundle - bundle->off;
+> +
+> +	kfree(ptr);
+> +}
+> diff --git a/tools/include/uapi/linux/bpf.h b/tools/include/uapi/linux/bpf.h
+> index 60a9d59beeab..74879c538f2b 100644
+> --- a/tools/include/uapi/linux/bpf.h
+> +++ b/tools/include/uapi/linux/bpf.h
+> @@ -1103,7 +1103,12 @@ enum bpf_link_type {
+>   */
+>  #define BPF_F_ALLOW_OVERRIDE	(1U << 0)
+>  #define BPF_F_ALLOW_MULTI	(1U << 1)
+> +/* Generic attachment flags. */
+>  #define BPF_F_REPLACE		(1U << 2)
+> +#define BPF_F_BEFORE		(1U << 3)
+> +#define BPF_F_AFTER		(1U << 4)
+> +#define BPF_F_ID		(1U << 5)
+> +#define BPF_F_LINK		BPF_F_LINK /* 1 << 13 */
+>  
+>  /* If BPF_F_STRICT_ALIGNMENT is used in BPF_PROG_LOAD command, the
+>   * verifier will perform strict alignment checking as if the kernel
+> @@ -1434,14 +1439,19 @@ union bpf_attr {
+>  	};
+>  
+>  	struct { /* anonymous struct used by BPF_PROG_ATTACH/DETACH commands */
+> -		__u32		target_fd;	/* container object to attach to */
+> -		__u32		attach_bpf_fd;	/* eBPF program to attach */
+> +		union {
+> +			__u32	target_fd;	/* target object to attach to or ... */
+> +			__u32	target_ifindex;	/* target ifindex */
+> +		};
+> +		__u32		attach_bpf_fd;
+>  		__u32		attach_type;
+>  		__u32		attach_flags;
+> -		__u32		replace_bpf_fd;	/* previously attached eBPF
+> -						 * program to replace if
+> -						 * BPF_F_REPLACE is used
+> -						 */
+> +		__u32		replace_bpf_fd;
+> +		union {
+> +			__u32	relative_fd;
+> +			__u32	relative_id;
+> +		};
+> +		__u64		expected_revision;
+>  	};
+>  
+>  	struct { /* anonymous struct used by BPF_PROG_TEST_RUN command */
+> @@ -1487,16 +1497,26 @@ union bpf_attr {
+>  	} info;
+>  
+>  	struct { /* anonymous struct used by BPF_PROG_QUERY command */
+> -		__u32		target_fd;	/* container object to query */
+> +		union {
+> +			__u32	target_fd;	/* target object to query or ... */
+> +			__u32	target_ifindex;	/* target ifindex */
+> +		};
+>  		__u32		attach_type;
+>  		__u32		query_flags;
+>  		__u32		attach_flags;
+>  		__aligned_u64	prog_ids;
+> -		__u32		prog_cnt;
+> +		union {
+> +			__u32	prog_cnt;
+> +			__u32	count;
+> +		};
+> +		__u32		:32;
+>  		/* output: per-program attach_flags.
+>  		 * not allowed to be set during effective query.
+>  		 */
+>  		__aligned_u64	prog_attach_flags;
+> +		__aligned_u64	link_ids;
+> +		__aligned_u64	link_attach_flags;
+> +		__u64		revision;
+>  	} query;
+>  
+>  	struct { /* anonymous struct used by BPF_RAW_TRACEPOINT_OPEN command */
+> -- 
+> 2.34.1
+> 
 
