@@ -1,130 +1,124 @@
-Return-Path: <netdev+bounces-16146-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16147-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id B54D974B8AD
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 23:31:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B609674B8BE
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 23:40:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9DC841C210E3
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:31:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC8951C210D6
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:40:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4C63C17AB5;
-	Fri,  7 Jul 2023 21:31:38 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A830517ABC;
+	Fri,  7 Jul 2023 21:40:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3B33A171C7
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 21:31:38 +0000 (UTC)
-Received: from mail-yb1-xb4a.google.com (mail-yb1-xb4a.google.com [IPv6:2607:f8b0:4864:20::b4a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B015D1FC7
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:31:36 -0700 (PDT)
-Received: by mail-yb1-xb4a.google.com with SMTP id 3f1490d57ef6-c6db61f7f64so1194271276.0
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 14:31:36 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688765496; x=1691357496;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=OJ0V6nTCT3uhCFN1topUMvhFZXj9rVKOhLzdkHpftz0=;
-        b=24sULn6kf5C5W/Bkr7e9WCPY9mGtl2MjHFjUDcCRFUrhvghKimVrn1gGOTr1IpP2Bv
-         2WZbXfeAPhw/k3UZ1dUQX3PjIWoNugj4R1w8I93otGCSXaIoxtpIRgsu1rbRcwEmSfUz
-         8cEaPn2mwvCruzA73/wXx/mxeX+g/uBRdsGdgYaaljW/xCYBcCeptqLaAYt43oZUO97r
-         +/HWCa0mM7OYEqTvNJZ+r2CvguxYW5tFub3lAAPUXehDHqexmytnyC6AHyPebVBAT1DU
-         EYEFx6YoWLvfCEEQt1SAJSW3m9CbSiChdoZQJVv5hK8cOPi1CnLStzfBeEMkir+ej57B
-         GYsg==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688765496; x=1691357496;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=OJ0V6nTCT3uhCFN1topUMvhFZXj9rVKOhLzdkHpftz0=;
-        b=JmvYRQRuKDjM0k7rzDFCNE1qrP+VB7JIhLsSsNjyjLgzP/B7ZHmY8IQiTdUn4R+UBg
-         WyWjO9uBjL22dldWpcG+OQKVBmBqTCfxXSdYej7Am8MFCBld2YG549akFovfP7iaXGIv
-         oraQFDzqv6fdJO74Q1naorfkEKBKdaUb04m5i8PDQ04kXRH0hY52iZT6WHhPWEDxKNhM
-         Ee8AHDUC5LVv4FowvvB4MWXXkBWcGSy3tJnQcDwDS+fFb/DXU9SrX+vxJozWJw8LDRpL
-         jS/IvgnJDNrnQXx5yyec6ffaz8IZiB2z0ufnutAcGOvzYYFN9KCZRsvLNr1FdZyeLrpa
-         BJxQ==
-X-Gm-Message-State: ABy/qLb7uyV+sSTeFJyzXhlYMjqcpff6FE5DEnCvOi72JWMCehNfZf2y
-	vvAQqEGfpzNDXGSOIXfaAVK9zzs=
-X-Google-Smtp-Source: APBJJlFd3Qc3wQdr2oOvoo3uIQJmzqQOXvUZpIs44I78A48eurS/bLtmO1mVOhJ+R3Bcyc8Oi4qw1wE=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a25:bb08:0:b0:bff:4ed0:63f6 with SMTP id
- z8-20020a25bb08000000b00bff4ed063f6mr63264ybg.7.1688765495890; Fri, 07 Jul
- 2023 14:31:35 -0700 (PDT)
-Date: Fri, 7 Jul 2023 14:31:34 -0700
-In-Reply-To: <20230707172455.7634-7-daniel@iogearbox.net>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 07A5D171C7
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 21:40:26 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id C0304C433C7;
+	Fri,  7 Jul 2023 21:40:25 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688766026;
+	bh=UE8yy9+73KRh9TGbYeib3LOt6Js9O/ptX9xjt1QIl6A=;
+	h=Date:Subject:To:References:From:In-Reply-To:From;
+	b=UvRvZvtW4CtpZGZ346KE75kMolCnJXeyJApIijyoycXgLHMPEX/VJyDVcKWELJlEV
+	 FPWVXWXh9qWVarP+4FbXpssAqKCQg7nNPCBFs7ad+8yh3C6LnqrjrmIgkueFEqPWMl
+	 2y4ON101XYy0FN3dKmNV4N0sHTdQLgXWlXDwaGl5avPmlBlFCVnDVB7uZaJgs+L6XS
+	 DXKvdU7y645uNPyl+saDpzovCp/w/uDuhzXyk88nL401sb68ibSX7w5U63uNgwqPx+
+	 MnpkEOnBw6OPWExe7pxSvwwoZEYziCEd3G0peBo4hGT6tYHsXpX8YE1RrnFcRrpdXZ
+	 G74/lKMcoTTYw==
+Message-ID: <1340947f-2f66-e93d-9dab-055e40e1f9f9@kernel.org>
+Date: Fri, 7 Jul 2023 15:40:24 -0600
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230707172455.7634-1-daniel@iogearbox.net> <20230707172455.7634-7-daniel@iogearbox.net>
-Message-ID: <ZKiENoYiElPyQqrL@google.com>
-Subject: Re: [PATCH bpf-next v3 6/8] bpftool: Extend net dump with tcx progs
-From: Stanislav Fomichev <sdf@google.com>
-To: Daniel Borkmann <daniel@iogearbox.net>
-Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev, 
-	razor@blackwall.org, john.fastabend@gmail.com, kuba@kernel.org, dxu@dxuuu.xyz, 
-	joe@cilium.io, toke@kernel.org, davem@davemloft.net, bpf@vger.kernel.org, 
-	netdev@vger.kernel.org
-Content-Type: text/plain; charset="utf-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (Macintosh; Intel Mac OS X 10.15; rv:102.0)
+ Gecko/20100101 Thunderbird/102.12.0
+Subject: Re: [PATCH 1/1] net: gro: fix misuse of CB in udp socket lookup
+Content-Language: en-US
+To: Richard Gobert <richardbgobert@gmail.com>, davem@davemloft.net,
+ edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+ willemdebruijn.kernel@gmail.com, tom@herbertland.com,
+ netdev@vger.kernel.org, linux-kernel@vger.kernel.org, gal@nvidia.com
+References: <20230707121650.GA17677@debian> <20230707122627.GA17845@debian>
+From: David Ahern <dsahern@kernel.org>
+In-Reply-To: <20230707122627.GA17845@debian>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
 
-On 07/07, Daniel Borkmann wrote:
-> Add support to dump fd-based attach types via bpftool. This includes both
-> the tc BPF link and attach ops programs. Dumped information contain the
-> attach location, function entry name, program ID and link ID when applicable.
+On 7/7/23 6:26 AM, Richard Gobert wrote:
+> This patch fixes a misuse of IP{6}CB(skb) in GRO, while calling to
+> `udp6_lib_lookup2` when handling udp tunnels. `udp6_lib_lookup2` fetch the
+> device from CB. The fix changes it to fetch the device from `skb->dev`.
+> l3mdev case requires special attention since it has a master and a slave
+> device.
+
+put your cover letter details in here; no need for a cover letter for a
+single patch.
+
 > 
-> Example with tc BPF link:
-> 
->   # ./bpftool net
->   xdp:
-> 
->   tc:
->   bond0(4) bpf/ingress cil_from_netdev prog id 784 link id 10
->   bond0(4) bpf/egress cil_to_netdev prog id 804 link id 11
-> 
->   flow_dissector:
-> 
->   netfilter:
-> 
-> Example with tc BPF attach ops:
-> 
->   # ./bpftool net
->   xdp:
-> 
->   tc:
->   bond0(4) bpf/ingress cil_from_netdev prog id 654
->   bond0(4) bpf/egress cil_to_netdev prog id 672
-> 
->   flow_dissector:
-> 
->   netfilter:
-> 
-> Signed-off-by: Daniel Borkmann <daniel@iogearbox.net>
+> Fixes: a6024562ffd7 ("udp: Add GRO functions to UDP socket")
+> Reported-by: Gal Pressman <gal@nvidia.com>
+> Signed-off-by: Richard Gobert <richardbgobert@gmail.com>
 > ---
->  tools/bpf/bpftool/net.c | 86 +++++++++++++++++++++++++++++++++++++++--
->  1 file changed, 82 insertions(+), 4 deletions(-)
+>  include/net/udp.h      |  2 ++
+>  net/ipv4/udp.c         | 21 +++++++++++++++++++--
+>  net/ipv4/udp_offload.c |  7 +++++--
+>  net/ipv6/udp.c         | 21 +++++++++++++++++++--
+>  net/ipv6/udp_offload.c |  7 +++++--
+>  5 files changed, 50 insertions(+), 8 deletions(-)
 > 
-> diff --git a/tools/bpf/bpftool/net.c b/tools/bpf/bpftool/net.c
-> index 26a49965bf71..1ef1e880de61 100644
-> --- a/tools/bpf/bpftool/net.c
-> +++ b/tools/bpf/bpftool/net.c
-> @@ -76,6 +76,11 @@ static const char * const attach_type_strings[] = {
->  	[NET_ATTACH_TYPE_XDP_OFFLOAD]	= "xdpoffload",
->  };
->  
-> +static const char * const attach_loc_strings[] = {
-> +	[BPF_TCX_INGRESS]		= "bpf/ingress",
-> +	[BPF_TCX_EGRESS]		= "bpf/egress",
+> diff --git a/include/net/udp.h b/include/net/udp.h
+> index 4d13424f8f72..48af1479882f 100644
+> --- a/include/net/udp.h
+> +++ b/include/net/udp.h
+> @@ -299,6 +299,7 @@ int udp_lib_getsockopt(struct sock *sk, int level, int optname,
+>  int udp_lib_setsockopt(struct sock *sk, int level, int optname,
+>  		       sockptr_t optval, unsigned int optlen,
+>  		       int (*push_pending_frames)(struct sock *));
+> +void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
+>  struct sock *udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
+>  			     __be32 daddr, __be16 dport, int dif);
+>  struct sock *__udp4_lib_lookup(struct net *net, __be32 saddr, __be16 sport,
+> @@ -310,6 +311,7 @@ struct sock *udp6_lib_lookup(struct net *net,
+>  			     const struct in6_addr *saddr, __be16 sport,
+>  			     const struct in6_addr *daddr, __be16 dport,
+>  			     int dif);
+> +void udp6_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif);
+>  struct sock *__udp6_lib_lookup(struct net *net,
+>  			       const struct in6_addr *saddr, __be16 sport,
+>  			       const struct in6_addr *daddr, __be16 dport,
+> diff --git a/net/ipv4/udp.c b/net/ipv4/udp.c
+> index 42a96b3547c9..0581ab184afd 100644
+> --- a/net/ipv4/udp.c
+> +++ b/net/ipv4/udp.c
+> @@ -550,15 +550,32 @@ static inline struct sock *__udp4_lib_lookup_skb(struct sk_buff *skb,
+>  				 inet_sdif(skb), udptable, skb);
+>  }
+> 
+> +void udp4_get_iif_sdif(const struct sk_buff *skb, int *iif, int *sdif)
+> +{
+> +	*iif = inet_iif(skb) || skb->dev->ifindex;
+> +	*sdif = 0;
+> +
+> +#if IS_ENABLED(CONFIG_NET_L3_MASTER_DEV)
+> +	if (netif_is_l3_slave(skb->dev)) {
+> +		struct net_device *master = netdev_master_upper_dev_get_rcu(skb->dev);
+> +		*sdif = *iif;
+> +		*iif = master ? master->ifindex : 0;
+> +	}
+> +#endif
+> +}
 
-Any reason we are not doing tcx/ingress & egress? To match the section
-names.
+there are existing iif and sdif lookup functions. I believe this gro
+path needs a different version, but it should have a comment of when it
+can be used vs the existing ones. Also, it is small enough to be an
+inline like the existing ones. e.g., see inet_sdif
+
 
