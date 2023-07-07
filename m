@@ -1,203 +1,70 @@
-Return-Path: <netdev+bounces-16157-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16158-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id BE6C274B977
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 00:22:43 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3981C74B984
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 00:28:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E96151C210EA
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 22:22:42 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 230291C2107A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 22:28:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21B117FE7;
-	Fri,  7 Jul 2023 22:22:30 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E21D317FE3;
+	Fri,  7 Jul 2023 22:28:36 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E0617ACA
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 22:22:30 +0000 (UTC)
-Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537062125
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:22:27 -0700 (PDT)
-Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b708e49059so34584551fa.3
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 15:22:27 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=joelfernandes.org; s=google; t=1688768545; x=1691360545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=00HfUo8YcXDv95ABX4BX2QfGk15awNjnmrspcBnuyYI=;
-        b=S1i7GsgZS6/9vByJU1h9vaPxX6EfILktPvazZWP5Wsw3CH9mTfB2qSik2nthVCjVcH
-         dhKZHhoDxrcL3PiB9drM2KpAFU2A0aXDLxFLU1aTmDKKzbg6lZjFobaP2dcbg7nPvqgq
-         BkHbFpM4arUw2jbAEns8E4g+OGETlDhouCwVE=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688768545; x=1691360545;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=00HfUo8YcXDv95ABX4BX2QfGk15awNjnmrspcBnuyYI=;
-        b=gisW7b28DIL7aCndPS2TV58qbh+WJjVgHzF8fhlzr6HKUCB3Pi8NcCr1xHZXhBFjgl
-         H0FjaTqi0Px+6uYXIP4VusAm/x4zdHiPcryJSq1/nFmn3bxrI5+XzDgKaPC1d2+DalvB
-         4T/GoxCB/2eNf882JCPwwH6LwVZC59FQoy19rfaTQz0PgqEsZfblDhp5mG13e/PlNtT9
-         gDXbM1SEG2bXywa90IzF8+atgvAY1wtA94170sZQ2aXLzbk7g4NPLDwd45E0jzmYChVf
-         CeG55Ls9yrXRceY2FMVNDxtBSQB+WBXJilorLD/wiV8jPbTsQuCGBc9WMeJ8QLTU4Q3p
-         yHrQ==
-X-Gm-Message-State: ABy/qLb/m0H+9rQah9XNjRFYntVm47n0nGnifUildA01y/8AJUDa3bSD
-	JC0d5IKjCkpiUWLDjJWpTYu02BuNIo43IfXaVDwVdg==
-X-Google-Smtp-Source: APBJJlGTfh3AMzN+1kdBePEo+sjnOFVyLZ+VfqZo0TJaDLXkoafqQ6YreSHG/oLP8hvr6qZ9xVkcY4QZq4PnYX82CO4=
-X-Received: by 2002:a2e:9d16:0:b0:2b6:e2cd:20f5 with SMTP id
- t22-20020a2e9d16000000b002b6e2cd20f5mr4795299lji.9.1688768545324; Fri, 07 Jul
- 2023 15:22:25 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 71E4C17ABD
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 22:28:35 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 9EBCCC433C7;
+	Fri,  7 Jul 2023 22:28:34 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688768914;
+	bh=MduY+tIX+QMFF8HieEVAgRXxkIT6ZWa7h0RPBNfHhso=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=hsbSty28tuWmACNvrydN+PN8/q4RBnBQSw+jTNr15MnWiZZq4cLafvKG5IFBNwXfk
+	 KdcnVt9sXypbz4MUOj0wPxZi8foP4sNkfI8PI/ayHOQnsCGxjAvj64Ukc4KnI0JbXA
+	 2SOTPDfjLrldBPO+jPtpssoIPacHAxAUXwSIp7CeqB4A4AbADmOxwKkJraZikwu1aJ
+	 xSOXIQ6dVjSKj4Se12lMUe0MLAhnYT9HuHxcxtXZGI/Qle2CWql2XJ3WNMuXbaj2m2
+	 P/Ujl/+WPH0BMTo3P8oqtglKgL+YzyA6wN4vy7P7b2ZGXmjk/7vXHl8jzOFg2bhWRP
+	 1lTcj0WQ1o+sw==
+Date: Fri, 7 Jul 2023 15:28:33 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Mina Almasry <almasrymina@google.com>
+Cc: netdev@vger.kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org,
+ edumazet@google.com, dsahern@gmail.com, michael.chan@broadcom.com,
+ willemb@google.com
+Subject: Re: [RFC 06/12] net: page_pool: create hooks for custom page
+ providers
+Message-ID: <20230707152833.670edcde@kernel.org>
+In-Reply-To: <CAHS8izM+o3m_h1SU8D-1XmDVsfqTwWmpcPpsp2Xh-0vVdOo=ew@mail.gmail.com>
+References: <20230707183935.997267-1-kuba@kernel.org>
+	<20230707183935.997267-7-kuba@kernel.org>
+	<CAHS8izM+o3m_h1SU8D-1XmDVsfqTwWmpcPpsp2Xh-0vVdOo=ew@mail.gmail.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
- <20230706033447.54696-10-alexei.starovoitov@gmail.com> <fe733a7b-3775-947a-23c0-0dadacabdca2@huaweicloud.com>
- <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
- <4e0765b7-9054-a33d-8b1e-c986df353848@huaweicloud.com> <CAADnVQJhrbTtuBfexE6NPA6q=cdh1vVxfVQ73ZR2u8ZZWRb+wA@mail.gmail.com>
- <224322d6-28d3-f3b7-fcac-463e5329a082@huaweicloud.com> <CAADnVQL5O5uzy=sewNJ=NFSGV7JTb3ONHR=V2kWiT1YdN=ax8g@mail.gmail.com>
- <3f72c4e7-340f-4374-9ebe-f9bffd08c755@paulmck-laptop>
-In-Reply-To: <3f72c4e7-340f-4374-9ebe-f9bffd08c755@paulmck-laptop>
-From: Joel Fernandes <joel@joelfernandes.org>
-Date: Fri, 7 Jul 2023 18:22:13 -0400
-Message-ID: <CAEXW_YRzJQvX+GVR0+jSDiL9phNgf1-NzH+B7UaCVtGBVT18Yg@mail.gmail.com>
-Subject: Re: [PATCH v4 bpf-next 09/14] bpf: Allow reuse from
- waiting_for_gp_ttrace list.
-To: paulmck@kernel.org
-Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Hou Tao <houtao@huaweicloud.com>, 
-	Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org, 
-	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
-	Kernel Team <kernel-team@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, 
-	Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=unavailable autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-On Fri, Jul 7, 2023 at 1:47=E2=80=AFPM Paul E. McKenney <paulmck@kernel.org=
-> wrote:
->
-> On Fri, Jul 07, 2023 at 09:11:22AM -0700, Alexei Starovoitov wrote:
-> > On Thu, Jul 6, 2023 at 9:37=E2=80=AFPM Hou Tao <houtao@huaweicloud.com>=
- wrote:
-> > >
-> > > Hi,
-> > >
-> > > On 7/7/2023 12:16 PM, Alexei Starovoitov wrote:
-> > > > On Thu, Jul 6, 2023 at 8:39=E2=80=AFPM Hou Tao <houtao@huaweicloud.=
-com> wrote:
-> > > >> Hi,
-> > > >>
-> > > >> On 7/7/2023 10:12 AM, Alexei Starovoitov wrote:
-> > > >>> On Thu, Jul 6, 2023 at 7:07=E2=80=AFPM Hou Tao <houtao@huaweiclou=
-d.com> wrote:
-> > > >>>> Hi,
-> > > >>>>
-> > > >>>> On 7/6/2023 11:34 AM, Alexei Starovoitov wrote:
-> > > >>>>
-> > > SNIP
-> > > >>> and it's not just waiting_for_gp_ttrace. free_by_rcu_ttrace is si=
-milar.
-> > > >> I think free_by_rcu_ttrace is different, because the reuse is only
-> > > >> possible after one tasks trace RCU grace period as shown below, an=
-d the
-> > > >> concurrent llist_del_first() must have been completed when the hea=
-d is
-> > > >> reused and re-added into free_by_rcu_ttrace again.
-> > > >>
-> > > >> // c0->free_by_rcu_ttrace
-> > > >> A -> B -> C -> nil
-> > > >>
-> > > >> P1:
-> > > >> alloc_bulk()
-> > > >>     llist_del_first(&c->free_by_rcu_ttrace)
-> > > >>         entry =3D A
-> > > >>         next =3D B
-> > > >>
-> > > >> P2:
-> > > >> do_call_rcu_ttrace()
-> > > >>     // c->free_by_rcu_ttrace->first =3D NULL
-> > > >>     llist_del_all(&c->free_by_rcu_ttrace)
-> > > >>         move to c->waiting_for_gp_ttrace
-> > > >>
-> > > >> P1:
-> > > >> llist_del_first()
-> > > >>     return NULL
-> > > >>
-> > > >> // A is only reusable after one task trace RCU grace
-> > > >> // llist_del_first() must have been completed
-> > > > "must have been completed" ?
-> > > >
-> > > > I guess you're assuming that alloc_bulk() from irq_work
-> > > > is running within rcu_tasks_trace critical section,
-> > > > so __free_rcu_tasks_trace() callback will execute after
-> > > > irq work completed?
-> > > > I don't think that's the case.
-> > >
-> > > Yes. The following is my original thoughts. Correct me if I was wrong=
-:
-> > >
-> > > 1. llist_del_first() must be running concurrently with llist_del_all(=
-).
-> > > If llist_del_first() runs after llist_del_all(), it will return NULL
-> > > directly.
-> > > 2. call_rcu_tasks_trace() must happen after llist_del_all(), else the
-> > > elements in free_by_rcu_ttrace will not be freed back to slab.
-> > > 3. call_rcu_tasks_trace() will wait for one tasks trace RCU grace per=
-iod
-> > > to call __free_rcu_tasks_trace()
-> > > 4. llist_del_first() in running in an context with irq-disabled, so t=
-he
-> > > tasks trace RCU grace period will wait for the end of llist_del_first=
-()
-> > >
-> > > It seems you thought step 4) is not true, right ?
-> >
-> > Yes. I think so. For two reasons:
-> >
-> > 1.
-> > I believe irq disabled region isn't considered equivalent
-> > to rcu_read_lock_trace() region.
-> >
-> > Paul,
-> > could you clarify ?
->
-> You are correct, Alexei.  Unlike vanilla RCU, RCU Tasks Trace does not
-> count irq-disabled regions of code as readers.
->
-> But why not just put an rcu_read_lock_trace() and a matching
-> rcu_read_unlock_trace() within that irq-disabled region of code?
->
-> For completeness, if it were not for CONFIG_TASKS_TRACE_RCU_READ_MB,
-> Hou Tao would be correct from a strict current-implementation
-> viewpoint.  The reason is that, given the current implementation in
-> CONFIG_TASKS_TRACE_RCU_READ_MB=3Dn kernels, a task must either block or
-> take an IPI in order for the grace-period machinery to realize that this
-> task is done with all prior readers.
->
-> However, we need to account for the possibility of IPI-free
-> implementations, for example, if the real-time guys decide to start
-> making heavy use of BPF sleepable programs.  They would then insist on
-> getting rid of those IPIs for CONFIG_PREEMPT_RT=3Dy kernels.  At which
-> point, irq-disabled regions of code will absolutely not act as
-> RCU tasks trace readers.
->
-> Again, why not just put an rcu_read_lock_trace() and a matching
-> rcu_read_unlock_trace() within that irq-disabled region of code?
+On Fri, 7 Jul 2023 12:50:51 -0700 Mina Almasry wrote:
+> > -       put_page(page);
+> > +       if (put)
+> > +               put_page(page);  
+> 
+> +1 to giving memory providers the option to replace put_page() with a
+> custom release function. In your original proposal, the put_page() was
+> intact, and I thought it was some requirement from you that pages must
+> be freed with put_page(). I made my code with/around that, but I think
+> it's nice to give future memory providers the option to replace this.
 
-If I remember correctly, the general guidance is to always put an
-explicit marker if it is in an RCU-reader, instead of relying on
-implementation details. So the suggestion to put the marker instead of
-relying on IRQ disabling does align with that.
-
-Thanks.
+I was kinda trying to pretend there is a reason, so that I could
+justify the second callback - hoping it could be useful for the
+device / user memory cases. But the way I was using it was racy
+so I dropped it for now.
 
