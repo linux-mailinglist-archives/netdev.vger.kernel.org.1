@@ -1,356 +1,139 @@
-Return-Path: <netdev+bounces-15979-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15980-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 12B1274AC59
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:57:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6CE9274AC7B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:07:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6985A281695
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:57:49 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9D5EE1C20E63
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:07:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A897484;
-	Fri,  7 Jul 2023 07:57:47 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A6C1279C6;
+	Fri,  7 Jul 2023 08:07:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621BD538A
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:57:47 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3621FCE
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 00:57:44 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 977D97469
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 08:07:03 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D9C8B19BD
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 01:07:01 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688716663;
+	s=mimecast20190719; t=1688717221;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=mEpZPyCmaGemnrfXXAJXbPLd9RqjcNfujXNkxU7uJgg=;
-	b=IBhYLDDzQRub0whU6+OBnu4vczD9vw8FjIcDqLmhA6B6zDU/f+co3vuf063kGsWJ5cV9eB
-	JA6NnKU5jezL1sK06asTagjJwGv293g/xOmnPqW6ZduSBcJX6bHLbHxR2UU4gB7IEJVY3J
-	uNo3bbtlZsYch/38HbeFpa7ezHNdCCo=
-Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
- [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-130-v0RQNbL0PkSAO4L9HuWn6g-1; Fri, 07 Jul 2023 03:57:42 -0400
-X-MC-Unique: v0RQNbL0PkSAO4L9HuWn6g-1
-Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b70bfc97e4so6634901fa.2
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 00:57:42 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688716660; x=1691308660;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mEpZPyCmaGemnrfXXAJXbPLd9RqjcNfujXNkxU7uJgg=;
-        b=VjaUOZkPHkif01zFYXLJmyEjy1NIi2IehftWKb7prIACc+ybe77ktLDpW6nqNE8jrN
-         M4zDk3FAx2H5lFDGvB+iCoFyf9bmiEkxaIhBKv1a0QhVNjS8hbagRT8jY24gkDN3qEYt
-         ZMp2PGy0ZpCEUQUdpF4MWISdYpa4pkcaQRQykj0q/pBjSoAoKjUoL2K3sFhb+5LYyjjE
-         px5Kqsgu544uF+8UUfaN7tQxeXgpAyjk6Re2tWcdCf93ndzGcpl+LRH7uVaJslv/rXLO
-         vuGnyi93jGlPp35jYM3EwtX+P33BSjeONbg5BtXkVyIR+jLx7KG0nOpIzpOoNEZ+4uyF
-         PU4g==
-X-Gm-Message-State: ABy/qLaugTIapZL67Ioh0tdO579YyfXj8PCyk1aiQZ9pe5RdI6lIRFuY
-	uTRlIkN1Rqjhjzp7KnctwD3Hrn5ZNbOyhUN9IIkN+vuLhJxnkQNqhaHz2hq/J20TSUnMrfFuBKp
-	Z2BUlx4YdLNoIi+i0TOo+JduGMHF7/YS6TuKvTJoO1uU=
-X-Received: by 2002:a2e:b44f:0:b0:2b6:f1ad:d535 with SMTP id o15-20020a2eb44f000000b002b6f1add535mr2897783ljm.14.1688716660601;
-        Fri, 07 Jul 2023 00:57:40 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlGG1fs3IIGzeB+qQfUMI3hhjxPEwbtguF4w2sYwc43PKBLjt1WFHJckiuIlLy+s/ff9+yqeexlrDuimTasM8Xc=
-X-Received: by 2002:a2e:b44f:0:b0:2b6:f1ad:d535 with SMTP id
- o15-20020a2eb44f000000b002b6f1add535mr2897771ljm.14.1688716660214; Fri, 07
- Jul 2023 00:57:40 -0700 (PDT)
+	bh=aT1O9BlEBxtT7uHpuo6KAf/C4BqVJdHsv1uVQtgiXH4=;
+	b=KEnB3AyUaF8N03SyXjCm/3lSHrSSLG5zTMnPJO5HtzcufGbBhRKwdMd/iNX244U/nu79Qs
+	3Ac5JUpoARLM9yOTMCxP/qnRBlk90vejhN9ds1BBOAM47zigD8FfJRVjxc43oKWkOOHAm7
+	CLZCsnYYzdr9f6sAUrc/hhqQmOML2MI=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-395-awU6C2hJPu-5QVduIKa6ZA-1; Fri, 07 Jul 2023 04:06:57 -0400
+X-MC-Unique: awU6C2hJPu-5QVduIKa6ZA-1
+Received: from smtp.corp.redhat.com (int-mx03.intmail.prod.int.rdu2.redhat.com [10.11.54.3])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 2D46A10504AA;
+	Fri,  7 Jul 2023 08:06:57 +0000 (UTC)
+Received: from warthog.procyon.org.uk (unknown [10.42.28.195])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 257FE1121330;
+	Fri,  7 Jul 2023 08:06:55 +0000 (UTC)
+Organization: Red Hat UK Ltd. Registered Address: Red Hat UK Ltd, Amberley
+	Place, 107-111 Peascod Street, Windsor, Berkshire, SI4 1TE, United
+	Kingdom.
+	Registered in England and Wales under Company Registration No. 3798903
+From: David Howells <dhowells@redhat.com>
+In-Reply-To: <000000000000554b8205ffdea64e@google.com>
+References: <000000000000554b8205ffdea64e@google.com>
+To: syzbot <syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com>
+Cc: dhowells@redhat.com, adilger.kernel@dilger.ca, boqun.feng@gmail.com,
+    herbert@gondor.apana.org.au, kuba@kernel.org,
+    linux-ext4@vger.kernel.org, linux-fsdevel@vger.kernel.org,
+    linux-kernel@vger.kernel.org, longman@redhat.com, mingo@redhat.com,
+    netdev@vger.kernel.org, peterz@infradead.org,
+    syzkaller-bugs@googlegroups.com, tytso@mit.edu, will@kernel.org
+Subject: Re: [syzbot] [ext4?] general protection fault in ext4_finish_bio
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
- <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
- <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
- <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com> <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
-In-Reply-To: <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 7 Jul 2023 15:57:28 +0800
-Message-ID: <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To: Eugenio Perez Martin <eperezma@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
+Content-Type: text/plain; charset="us-ascii"
+Content-ID: <2224783.1688717214.1@warthog.procyon.org.uk>
 Content-Transfer-Encoding: quoted-printable
+Date: Fri, 07 Jul 2023 09:06:54 +0100
+Message-ID: <2224784.1688717214@warthog.procyon.org.uk>
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.3
 X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
 	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
 	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
 	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 6, 2023 at 5:39=E2=80=AFPM Eugenio Perez Martin <eperezma@redha=
-t.com> wrote:
->
-> On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
-wrote:
-> >
-> > On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.com>=
- wrote:
-> > >
-> > > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperezma=
-@redhat.com> wrote:
-> > > >
-> > > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.=
-com> wrote:
-> > > > >
-> > > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@re=
-dhat.com> wrote:
-> > > > > >
-> > > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <m=
-st@redhat.com> wrote:
-> > > > > > > >
-> > > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Mar=
-tin wrote:
-> > > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirki=
-n <mst@redhat.com> wrote:
-> > > > > > > > > >
-> > > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez=
- Martin wrote:
-> > > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsi=
-rkin <mst@redhat.com> wrote:
-> > > > > > > > > > > >
-> > > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=
-=C3=A9rez wrote:
-> > > > > > > > > > > > > With the current code it is accepted as long as u=
-serland send it.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Although userland should not set a feature flag t=
-hat has not been
-> > > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, th=
-e current code will not
-> > > > > > > > > > > > > complain for it.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Since there is no specific reason for any parent =
-to reject that backend
-> > > > > > > > > > > > > feature bit when it has been proposed, let's cont=
-rol it at vdpa frontend
-> > > > > > > > > > > > > level. Future patches may move this control to th=
-e parent driver.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_=
-F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redha=
-t.com>
-> > > > > > > > > > > >
-> > > > > > > > > > > > Please do send v3. And again, I don't want to send =
-"after driver ok" hack
-> > > > > > > > > > > > upstream at all, I merged it in next just to give i=
-t some testing.
-> > > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > > > > Current devices do not support that semantic.
-> > > > > > > > > >
-> > > > > > > > > > Which devices specifically access the ring after DRIVER=
-_OK but before
-> > > > > > > > > > a kick?
-> > > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > Previous versions of the QEMU LM series did a spurious ki=
-ck to start
-> > > > > > > > > traffic at the LM destination [1]. When it was proposed, =
-that spurious
-> > > > > > > > > kick was removed from the series because to check for des=
-criptors
-> > > > > > > > > after driver_ok, even without a kick, was considered work=
- of the
-> > > > > > > > > parent driver.
-> > > > > > > > >
-> > > > > > > > > I'm ok to go back to this spurious kick, but I'm not sure=
- if the hw
-> > > > > > > > > will read the ring before the kick actually. I can ask.
-> > > > > > > > >
-> > > > > > > > > Thanks!
-> > > > > > > > >
-> > > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023=
--01/msg02775.html
-> > > > > > > >
-> > > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK=
- too, no?
-> > > > > > >
-> > > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seem=
-s
-> > > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > > > > >
-> > > > > > > But this reminds me one thing, as the thread is going too lon=
-g, I
-> > > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RES=
-ET is
-> > > > > > > supported?
-> > > > > > >
-> > > > > > > Thanks
-> > > > > >
-> > > > > > I don't see what does one have to do with another ...
-> > > > > >
-> > > > > > I think with RING_RESET we had another solution, enable rings
-> > > > > > mapping them to a zero page, then reset and re-enable later.
-> > > > >
-> > > > > As discussed before, this seems to have some problems:
-> > > > >
-> > > > > 1) The behaviour is not clarified in the document
-> > > > > 2) zero is a valid IOVA
-> > > > >
-> > > >
-> > > > I think we're not on the same page here.
-> > > >
-> > > > As I understood, rings mapped to a zero page means essentially an
-> > > > avail ring whose avail_idx is always 0, offered to the device inste=
-ad
-> > > > of the guest's ring. Once all CVQ commands are processed, we use
-> > > > RING_RESET to switch to the right ring, being guest's or SVQ vring.
-> > >
-> > > I get this. This seems more complicated in the destination: shadow vq=
- + ASID?
-> >
-> > So it's something like:
-> >
-> > 1) set all vq ASID to shadow virtqueue
-> > 2) do not add any bufs to data qp (stick 0 as avail index)
-> > 3) start to restore states via cvq
-> > 4) ring_rest for dataqp
-> > 5) set_vq_state for dataqp
-> > 6) re-initialize dataqp address etc
-> > 7) set data QP ASID to guest
-> > 8) set queue_enable
-> >
-> > ?
-> >
->
-> I think the change of ASID is not needed, as the guest cannot access
-> the device in that timeframe anyway.
+#syz test: git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.gi=
+t main
 
-Yes but after the restore, we still want to shadow cvq, so ASID is still ne=
-eded?
+    crypto: algif/hash: Fix race between MORE and non-MORE sends
+    =
 
-Thanks
+    The 'MSG_MORE' state of the previous sendmsg() is fetched without the
+    socket lock held, so two sendmsg calls can race.  This can be seen wit=
+h a
+    large sendfile() as that now does a series of sendmsg() calls, and if =
+a
+    write() comes in on the same socket at an inopportune time, it can fli=
+p the
+    state.
+    =
 
-> Moreover, it may require HW
-> support. So steps 1 and 7 are not needed.
->
-> Apart from that, the process is right.
->
->
-> > Thanks
-> >
-> > >
-> > > Thanks
-> > >
-> > > >
-> > > >
-> > > >
-> > > > > Thanks
-> > > > >
-> > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > >
-> > > > > > > > > > > My plan was to convert
-> > > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa o=
-ps. Sorry if I
-> > > > > > > > > > > was not explicit enough.
-> > > > > > > > > > >
-> > > > > > > > > > > The only solution I can see to that is to trap & emul=
-ate in the vdpa
-> > > > > > > > > > > (parent?) driver, as talked in virtio-comment. But th=
-at complicates
-> > > > > > > > > > > the architecture:
-> > > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > > > > * Store vq enable state separately, at
-> > > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit th=
-at enable to hw
-> > > > > > > > > > > * Store the doorbell state separately, but do not con=
-figure it to the
-> > > > > > > > > > > device directly.
-> > > > > > > > > > >
-> > > > > > > > > > > But how to recover if the device cannot configure the=
-m at kick time,
-> > > > > > > > > > > for example?
-> > > > > > > > > > >
-> > > > > > > > > > > Maybe we can just fail if the parent driver does not =
-support enabling
-> > > > > > > > > > > the vq after DRIVER_OK? That way no new feature flag =
-is needed.
-> > > > > > > > > > >
-> > > > > > > > > > > Thanks!
-> > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > > ---
-> > > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/p=
-ub/scm/linux/kernel/git/mst
-> > > > > > > > > > > > > commit. Please let me know if I should send a v3 =
-of [1] instead.
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-m=
-utt-send-email-mst@kernel.org/T/
-> > > > > > > > > > > > > ---
-> > > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost=
-/vdpa.c
-> > > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlo=
-cked_ioctl(struct file *filep,
-> > > > > > > > > > > > >  {
-> > > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_dat=
-a;
-> > > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vd=
-pa->config;
-> > > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > > > > > -     u64 features;
-> > > > > > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > > > > > >       long r =3D 0;
-> > > > > > > > > > > > >
-> > > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) =
-{
-> > > > > > > > > > > > >               if (copy_from_user(&features, featu=
-rep, sizeof(features)))
-> > > > > > > > > > > > >                       return -EFAULT;
-> > > > > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > > > > +                     parent_features =3D ops->ge=
-t_backend_features(v->vdpa);
-> > > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND=
-_FEATURES |
-> > > > > > > > > > > > >                                BIT_ULL(VHOST_BACK=
-END_F_SUSPEND) |
-> > > > > > > > > > > > >                                BIT_ULL(VHOST_BACK=
-END_F_RESUME) |
-> > > > > > > > > > > > > -                              BIT_ULL(VHOST_BACK=
-END_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > > > > +                              parent_features))
-> > > > > > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKE=
-ND_F_SUSPEND)) &&
-> > > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > > > > --
-> > > > > > > > > > > > > 2.39.3
-> > > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > >
-> > > > > >
-> > > > >
-> > > >
-> >
->
+    Fix this by moving the fetch of ctx->more inside the socket lock.
+    =
+
+    Fixes: c662b043cdca ("crypto: af_alg/hash: Support MSG_SPLICE_PAGES")
+    Reported-by: syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com
+    Link: https://lore.kernel.org/r/000000000000554b8205ffdea64e@google.co=
+m/
+    Signed-off-by: David Howells <dhowells@redhat.com>
+    cc: Herbert Xu <herbert@gondor.apana.org.au>
+    cc: Paolo Abeni <pabeni@redhat.com>
+    cc: "David S. Miller" <davem@davemloft.net>
+    cc: Eric Dumazet <edumazet@google.com>
+    cc: Jakub Kicinski <kuba@kernel.org>
+    cc: linux-crypto@vger.kernel.org
+    cc: netdev@vger.kernel.org
+
+diff --git a/crypto/algif_hash.c b/crypto/algif_hash.c
+index 0ab43e149f0e..82c44d4899b9 100644
+--- a/crypto/algif_hash.c
++++ b/crypto/algif_hash.c
+@@ -68,13 +68,15 @@ static int hash_sendmsg(struct socket *sock, struct ms=
+ghdr *msg,
+ 	struct hash_ctx *ctx =3D ask->private;
+ 	ssize_t copied =3D 0;
+ 	size_t len, max_pages, npages;
+-	bool continuing =3D ctx->more, need_init =3D false;
++	bool continuing, need_init =3D false;
+ 	int err;
+ =
+
+ 	max_pages =3D min_t(size_t, ALG_MAX_PAGES,
+ 			  DIV_ROUND_UP(sk->sk_sndbuf, PAGE_SIZE));
+ =
+
+ 	lock_sock(sk);
++	continuing =3D ctx->more;
++
+ 	if (!continuing) {
+ 		/* Discard a previous request that wasn't marked MSG_MORE. */
+ 		hash_free_result(sk, ctx);
 
 
