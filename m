@@ -1,296 +1,356 @@
-Return-Path: <netdev+bounces-15978-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15979-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6D34C74AC50
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:53:59 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 12B1274AC59
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:57:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9977F1C20F5D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:53:58 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6985A281695
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:57:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9047469;
-	Fri,  7 Jul 2023 07:53:56 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 73A897484;
+	Fri,  7 Jul 2023 07:57:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393FA15CE
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:53:55 +0000 (UTC)
-Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EB7A2;
-	Fri,  7 Jul 2023 00:53:52 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
-	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Qy5FL3brXzPjw8;
-	Fri,  7 Jul 2023 15:51:34 +0800 (CST)
-Received: from localhost.localdomain (10.175.104.82) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Fri, 7 Jul 2023 15:53:48 +0800
-From: Ziyang Xuan <william.xuanziyang@huawei.com>
-To: <socketcan@hartkopp.net>, <mkl@pengutronix.de>, <davem@davemloft.net>,
-	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
-	<penguin-kernel@I-love.SAKURA.ne.jp>
-Subject: [PATCH net v2] can: raw: fix receiver memory leak
-Date: Fri, 7 Jul 2023 15:53:42 +0800
-Message-ID: <20230707075342.2463015-1-william.xuanziyang@huawei.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 621BD538A
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:57:47 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A3621FCE
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 00:57:44 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688716663;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=mEpZPyCmaGemnrfXXAJXbPLd9RqjcNfujXNkxU7uJgg=;
+	b=IBhYLDDzQRub0whU6+OBnu4vczD9vw8FjIcDqLmhA6B6zDU/f+co3vuf063kGsWJ5cV9eB
+	JA6NnKU5jezL1sK06asTagjJwGv293g/xOmnPqW6ZduSBcJX6bHLbHxR2UU4gB7IEJVY3J
+	uNo3bbtlZsYch/38HbeFpa7ezHNdCCo=
+Received: from mail-lj1-f198.google.com (mail-lj1-f198.google.com
+ [209.85.208.198]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-130-v0RQNbL0PkSAO4L9HuWn6g-1; Fri, 07 Jul 2023 03:57:42 -0400
+X-MC-Unique: v0RQNbL0PkSAO4L9HuWn6g-1
+Received: by mail-lj1-f198.google.com with SMTP id 38308e7fff4ca-2b70bfc97e4so6634901fa.2
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 00:57:42 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688716660; x=1691308660;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=mEpZPyCmaGemnrfXXAJXbPLd9RqjcNfujXNkxU7uJgg=;
+        b=VjaUOZkPHkif01zFYXLJmyEjy1NIi2IehftWKb7prIACc+ybe77ktLDpW6nqNE8jrN
+         M4zDk3FAx2H5lFDGvB+iCoFyf9bmiEkxaIhBKv1a0QhVNjS8hbagRT8jY24gkDN3qEYt
+         ZMp2PGy0ZpCEUQUdpF4MWISdYpa4pkcaQRQykj0q/pBjSoAoKjUoL2K3sFhb+5LYyjjE
+         px5Kqsgu544uF+8UUfaN7tQxeXgpAyjk6Re2tWcdCf93ndzGcpl+LRH7uVaJslv/rXLO
+         vuGnyi93jGlPp35jYM3EwtX+P33BSjeONbg5BtXkVyIR+jLx7KG0nOpIzpOoNEZ+4uyF
+         PU4g==
+X-Gm-Message-State: ABy/qLaugTIapZL67Ioh0tdO579YyfXj8PCyk1aiQZ9pe5RdI6lIRFuY
+	uTRlIkN1Rqjhjzp7KnctwD3Hrn5ZNbOyhUN9IIkN+vuLhJxnkQNqhaHz2hq/J20TSUnMrfFuBKp
+	Z2BUlx4YdLNoIi+i0TOo+JduGMHF7/YS6TuKvTJoO1uU=
+X-Received: by 2002:a2e:b44f:0:b0:2b6:f1ad:d535 with SMTP id o15-20020a2eb44f000000b002b6f1add535mr2897783ljm.14.1688716660601;
+        Fri, 07 Jul 2023 00:57:40 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlGG1fs3IIGzeB+qQfUMI3hhjxPEwbtguF4w2sYwc43PKBLjt1WFHJckiuIlLy+s/ff9+yqeexlrDuimTasM8Xc=
+X-Received: by 2002:a2e:b44f:0:b0:2b6:f1ad:d535 with SMTP id
+ o15-20020a2eb44f000000b002b6f1add535mr2897771ljm.14.1688716660214; Fri, 07
+ Jul 2023 00:57:40 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.175.104.82]
-X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
+ <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
+ <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
+ <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
+ <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
+ <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
+ <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
+ <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com> <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
+In-Reply-To: <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com>
+From: Jason Wang <jasowang@redhat.com>
+Date: Fri, 7 Jul 2023 15:57:28 +0800
+Message-ID: <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
+Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
+ support it
+To: Eugenio Perez Martin <eperezma@redhat.com>
+Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
+	kvm@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Got kmemleak errors with the following ltp can_filter testcase:
+On Thu, Jul 6, 2023 at 5:39=E2=80=AFPM Eugenio Perez Martin <eperezma@redha=
+t.com> wrote:
+>
+> On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com> =
+wrote:
+> >
+> > On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.com>=
+ wrote:
+> > >
+> > > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperezma=
+@redhat.com> wrote:
+> > > >
+> > > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redhat.=
+com> wrote:
+> > > > >
+> > > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@re=
+dhat.com> wrote:
+> > > > > >
+> > > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
+> > > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin <m=
+st@redhat.com> wrote:
+> > > > > > > >
+> > > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez Mar=
+tin wrote:
+> > > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsirki=
+n <mst@redhat.com> wrote:
+> > > > > > > > > >
+> > > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Perez=
+ Martin wrote:
+> > > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. Tsi=
+rkin <mst@redhat.com> wrote:
+> > > > > > > > > > > >
+> > > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio P=
+=C3=A9rez wrote:
+> > > > > > > > > > > > > With the current code it is accepted as long as u=
+serland send it.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Although userland should not set a feature flag t=
+hat has not been
+> > > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, th=
+e current code will not
+> > > > > > > > > > > > > complain for it.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Since there is no specific reason for any parent =
+to reject that backend
+> > > > > > > > > > > > > feature bit when it has been proposed, let's cont=
+rol it at vdpa frontend
+> > > > > > > > > > > > > level. Future patches may move this control to th=
+e parent driver.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEND_=
+F_ENABLE_AFTER_DRIVER_OK backend feature")
+> > > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@redha=
+t.com>
+> > > > > > > > > > > >
+> > > > > > > > > > > > Please do send v3. And again, I don't want to send =
+"after driver ok" hack
+> > > > > > > > > > > > upstream at all, I merged it in next just to give i=
+t some testing.
+> > > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
+> > > > > > > > > > > >
+> > > > > > > > > > >
+> > > > > > > > > > > Current devices do not support that semantic.
+> > > > > > > > > >
+> > > > > > > > > > Which devices specifically access the ring after DRIVER=
+_OK but before
+> > > > > > > > > > a kick?
+> > > > > > > > > >
+> > > > > > > > >
+> > > > > > > > > Previous versions of the QEMU LM series did a spurious ki=
+ck to start
+> > > > > > > > > traffic at the LM destination [1]. When it was proposed, =
+that spurious
+> > > > > > > > > kick was removed from the series because to check for des=
+criptors
+> > > > > > > > > after driver_ok, even without a kick, was considered work=
+ of the
+> > > > > > > > > parent driver.
+> > > > > > > > >
+> > > > > > > > > I'm ok to go back to this spurious kick, but I'm not sure=
+ if the hw
+> > > > > > > > > will read the ring before the kick actually. I can ask.
+> > > > > > > > >
+> > > > > > > > > Thanks!
+> > > > > > > > >
+> > > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/2023=
+-01/msg02775.html
+> > > > > > > >
+> > > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_OK=
+ too, no?
+> > > > > > >
+> > > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This seem=
+s
+> > > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
+> > > > > > >
+> > > > > > > But this reminds me one thing, as the thread is going too lon=
+g, I
+> > > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_RES=
+ET is
+> > > > > > > supported?
+> > > > > > >
+> > > > > > > Thanks
+> > > > > >
+> > > > > > I don't see what does one have to do with another ...
+> > > > > >
+> > > > > > I think with RING_RESET we had another solution, enable rings
+> > > > > > mapping them to a zero page, then reset and re-enable later.
+> > > > >
+> > > > > As discussed before, this seems to have some problems:
+> > > > >
+> > > > > 1) The behaviour is not clarified in the document
+> > > > > 2) zero is a valid IOVA
+> > > > >
+> > > >
+> > > > I think we're not on the same page here.
+> > > >
+> > > > As I understood, rings mapped to a zero page means essentially an
+> > > > avail ring whose avail_idx is always 0, offered to the device inste=
+ad
+> > > > of the guest's ring. Once all CVQ commands are processed, we use
+> > > > RING_RESET to switch to the right ring, being guest's or SVQ vring.
+> > >
+> > > I get this. This seems more complicated in the destination: shadow vq=
+ + ASID?
+> >
+> > So it's something like:
+> >
+> > 1) set all vq ASID to shadow virtqueue
+> > 2) do not add any bufs to data qp (stick 0 as avail index)
+> > 3) start to restore states via cvq
+> > 4) ring_rest for dataqp
+> > 5) set_vq_state for dataqp
+> > 6) re-initialize dataqp address etc
+> > 7) set data QP ASID to guest
+> > 8) set queue_enable
+> >
+> > ?
+> >
+>
+> I think the change of ASID is not needed, as the guest cannot access
+> the device in that timeframe anyway.
 
-for ((i=1; i<=100; i++))
-do
-        ./can_filter &
-        sleep 0.1
-done
+Yes but after the restore, we still want to shadow cvq, so ASID is still ne=
+eded?
 
-==============================================================
-[<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
-[<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
-[<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
-[<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
-[<00000000fd468496>] do_syscall_64+0x33/0x40
-[<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
+Thanks
 
-It's a bug in the concurrent scenario of unregister_netdevice_many()
-and raw_release() as following:
-
-             cpu0                                        cpu1
-unregister_netdevice_many(can_dev)
-  unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
-  net_set_todo(can_dev)
-						raw_release(can_socket)
-						  dev = dev_get_by_index(, ro->ifindex); // dev == NULL
-						  if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
-						    raw_disable_allfilters(, dev, );
-						    dev_put(dev);
-						  }
-						...
-						ro->bound = 0;
-						...
-
-call_netdevice_notifiers(NETDEV_UNREGISTER, )
-  raw_notify(, NETDEV_UNREGISTER, )
-    if (ro->bound) // invalid because ro->bound has been set 0
-      raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
-
-Add a net_device pointer member in struct raw_sock to record bound can_dev,
-and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
-raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
-dev_rcv_lists.
-
-Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
-Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
----
-v2:
-  - Fix the case for a bound socket for "all" CAN interfaces (ifindex == 0) in raw_bind().
----
- net/can/raw.c | 61 ++++++++++++++++++++++-----------------------------
- 1 file changed, 26 insertions(+), 35 deletions(-)
-
-diff --git a/net/can/raw.c b/net/can/raw.c
-index 15c79b079184..7078821f35e0 100644
---- a/net/can/raw.c
-+++ b/net/can/raw.c
-@@ -84,6 +84,7 @@ struct raw_sock {
- 	struct sock sk;
- 	int bound;
- 	int ifindex;
-+	struct net_device *dev;
- 	struct list_head notifier;
- 	int loopback;
- 	int recv_own_msgs;
-@@ -277,7 +278,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
- 	if (!net_eq(dev_net(dev), sock_net(sk)))
- 		return;
- 
--	if (ro->ifindex != dev->ifindex)
-+	if (ro->dev != dev)
- 		return;
- 
- 	switch (msg) {
-@@ -292,6 +293,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
- 
- 		ro->ifindex = 0;
- 		ro->bound = 0;
-+		ro->dev = NULL;
- 		ro->count = 0;
- 		release_sock(sk);
- 
-@@ -337,6 +339,7 @@ static int raw_init(struct sock *sk)
- 
- 	ro->bound            = 0;
- 	ro->ifindex          = 0;
-+	ro->dev              = NULL;
- 
- 	/* set default filter to single entry dfilter */
- 	ro->dfilter.can_id   = 0;
-@@ -385,19 +388,13 @@ static int raw_release(struct socket *sock)
- 
- 	lock_sock(sk);
- 
-+	rtnl_lock();
- 	/* remove current filters & unregister */
- 	if (ro->bound) {
--		if (ro->ifindex) {
--			struct net_device *dev;
--
--			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
--			if (dev) {
--				raw_disable_allfilters(dev_net(dev), dev, sk);
--				dev_put(dev);
--			}
--		} else {
-+		if (ro->dev)
-+			raw_disable_allfilters(dev_net(ro->dev), ro->dev, sk);
-+		else
- 			raw_disable_allfilters(sock_net(sk), NULL, sk);
--		}
- 	}
- 
- 	if (ro->count > 1)
-@@ -405,8 +402,10 @@ static int raw_release(struct socket *sock)
- 
- 	ro->ifindex = 0;
- 	ro->bound = 0;
-+	ro->dev = NULL;
- 	ro->count = 0;
- 	free_percpu(ro->uniq);
-+	rtnl_unlock();
- 
- 	sock_orphan(sk);
- 	sock->sk = NULL;
-@@ -422,6 +421,7 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
- 	struct sockaddr_can *addr = (struct sockaddr_can *)uaddr;
- 	struct sock *sk = sock->sk;
- 	struct raw_sock *ro = raw_sk(sk);
-+	struct net_device *dev = NULL;
- 	int ifindex;
- 	int err = 0;
- 	int notify_enetdown = 0;
-@@ -431,14 +431,13 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
- 	if (addr->can_family != AF_CAN)
- 		return -EINVAL;
- 
-+	rtnl_lock();
- 	lock_sock(sk);
- 
- 	if (ro->bound && addr->can_ifindex == ro->ifindex)
- 		goto out;
- 
- 	if (addr->can_ifindex) {
--		struct net_device *dev;
--
- 		dev = dev_get_by_index(sock_net(sk), addr->can_ifindex);
- 		if (!dev) {
- 			err = -ENODEV;
-@@ -465,28 +464,23 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
- 	}
- 
- 	if (!err) {
-+		/* unregister old filters */
- 		if (ro->bound) {
--			/* unregister old filters */
--			if (ro->ifindex) {
--				struct net_device *dev;
--
--				dev = dev_get_by_index(sock_net(sk),
--						       ro->ifindex);
--				if (dev) {
--					raw_disable_allfilters(dev_net(dev),
--							       dev, sk);
--					dev_put(dev);
--				}
--			} else {
-+			if (ro->dev)
-+				raw_disable_allfilters(dev_net(ro->dev),
-+						       ro->dev, sk);
-+			else
- 				raw_disable_allfilters(sock_net(sk), NULL, sk);
--			}
- 		}
- 		ro->ifindex = ifindex;
-+
- 		ro->bound = 1;
-+		ro->dev = dev;
- 	}
- 
-  out:
- 	release_sock(sk);
-+	rtnl_unlock();
- 
- 	if (notify_enetdown) {
- 		sk->sk_err = ENETDOWN;
-@@ -553,9 +547,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
- 		rtnl_lock();
- 		lock_sock(sk);
- 
--		if (ro->bound && ro->ifindex) {
--			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
--			if (!dev) {
-+		dev = ro->dev;
-+		if (ro->bound && dev) {
-+			if (dev->reg_state != NETREG_REGISTERED) {
- 				if (count > 1)
- 					kfree(filter);
- 				err = -ENODEV;
-@@ -596,7 +590,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
- 		ro->count  = count;
- 
-  out_fil:
--		dev_put(dev);
- 		release_sock(sk);
- 		rtnl_unlock();
- 
-@@ -614,9 +607,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
- 		rtnl_lock();
- 		lock_sock(sk);
- 
--		if (ro->bound && ro->ifindex) {
--			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
--			if (!dev) {
-+		dev = ro->dev;
-+		if (ro->bound && dev) {
-+			if (dev->reg_state != NETREG_REGISTERED) {
- 				err = -ENODEV;
- 				goto out_err;
- 			}
-@@ -627,7 +620,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
- 			/* (try to) register the new err_mask */
- 			err = raw_enable_errfilter(sock_net(sk), dev, sk,
- 						   err_mask);
--
- 			if (err)
- 				goto out_err;
- 
-@@ -640,7 +632,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
- 		ro->err_mask = err_mask;
- 
-  out_err:
--		dev_put(dev);
- 		release_sock(sk);
- 		rtnl_unlock();
- 
--- 
-2.25.1
+> Moreover, it may require HW
+> support. So steps 1 and 7 are not needed.
+>
+> Apart from that, the process is right.
+>
+>
+> > Thanks
+> >
+> > >
+> > > Thanks
+> > >
+> > > >
+> > > >
+> > > >
+> > > > > Thanks
+> > > > >
+> > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > >
+> > > > > > > > > > > My plan was to convert
+> > > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa o=
+ps. Sorry if I
+> > > > > > > > > > > was not explicit enough.
+> > > > > > > > > > >
+> > > > > > > > > > > The only solution I can see to that is to trap & emul=
+ate in the vdpa
+> > > > > > > > > > > (parent?) driver, as talked in virtio-comment. But th=
+at complicates
+> > > > > > > > > > > the architecture:
+> > > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
+> > > > > > > > > > > * Store vq enable state separately, at
+> > > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit th=
+at enable to hw
+> > > > > > > > > > > * Store the doorbell state separately, but do not con=
+figure it to the
+> > > > > > > > > > > device directly.
+> > > > > > > > > > >
+> > > > > > > > > > > But how to recover if the device cannot configure the=
+m at kick time,
+> > > > > > > > > > > for example?
+> > > > > > > > > > >
+> > > > > > > > > > > Maybe we can just fail if the parent driver does not =
+support enabling
+> > > > > > > > > > > the vq after DRIVER_OK? That way no new feature flag =
+is needed.
+> > > > > > > > > > >
+> > > > > > > > > > > Thanks!
+> > > > > > > > > > >
+> > > > > > > > > > > >
+> > > > > > > > > > > > > ---
+> > > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org/p=
+ub/scm/linux/kernel/git/mst
+> > > > > > > > > > > > > commit. Please let me know if I should send a v3 =
+of [1] instead.
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244-m=
+utt-send-email-mst@kernel.org/T/
+> > > > > > > > > > > > > ---
+> > > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
+> > > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-)
+> > > > > > > > > > > > >
+> > > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vhost=
+/vdpa.c
+> > > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
+> > > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
+> > > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
+> > > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_unlo=
+cked_ioctl(struct file *filep,
+> > > > > > > > > > > > >  {
+> > > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_dat=
+a;
+> > > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
+> > > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->vd=
+pa->config;
+> > > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
+> > > > > > > > > > > > >       u64 __user *featurep =3D argp;
+> > > > > > > > > > > > > -     u64 features;
+> > > > > > > > > > > > > +     u64 features, parent_features =3D 0;
+> > > > > > > > > > > > >       long r =3D 0;
+> > > > > > > > > > > > >
+> > > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES) =
+{
+> > > > > > > > > > > > >               if (copy_from_user(&features, featu=
+rep, sizeof(features)))
+> > > > > > > > > > > > >                       return -EFAULT;
+> > > > > > > > > > > > > +             if (ops->get_backend_features)
+> > > > > > > > > > > > > +                     parent_features =3D ops->ge=
+t_backend_features(v->vdpa);
+> > > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKEND=
+_FEATURES |
+> > > > > > > > > > > > >                                BIT_ULL(VHOST_BACK=
+END_F_SUSPEND) |
+> > > > > > > > > > > > >                                BIT_ULL(VHOST_BACK=
+END_F_RESUME) |
+> > > > > > > > > > > > > -                              BIT_ULL(VHOST_BACK=
+END_F_ENABLE_AFTER_DRIVER_OK)))
+> > > > > > > > > > > > > +                              parent_features))
+> > > > > > > > > > > > >                       return -EOPNOTSUPP;
+> > > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BACKE=
+ND_F_SUSPEND)) &&
+> > > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
+> > > > > > > > > > > > > --
+> > > > > > > > > > > > > 2.39.3
+> > > > > > > > > > > >
+> > > > > > > > > >
+> > > > > > > >
+> > > > > >
+> > > > >
+> > > >
+> >
+>
 
 
