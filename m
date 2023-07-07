@@ -1,277 +1,171 @@
-Return-Path: <netdev+bounces-16063-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16064-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id B6FD074B3E5
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 17:12:29 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4507074B409
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 17:21:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D9E8A1C20FD1
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:12:28 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2D92B1C20FE8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:21:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC634D523;
-	Fri,  7 Jul 2023 15:12:26 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1E1B1D531;
+	Fri,  7 Jul 2023 15:21:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AC03BC8F6
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:12:26 +0000 (UTC)
-Received: from mga04.intel.com (mga04.intel.com [192.55.52.120])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A2F1C2123;
-	Fri,  7 Jul 2023 08:12:15 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688742735; x=1720278735;
-  h=date:from:to:cc:subject:message-id;
-  bh=jn3qdIaoQnAQpWPE9kq0rlginNfQvB8QhEeTHfRq8NQ=;
-  b=LlBZQwBjUbfPDI3FtIwiqbgznF4YJVIzroaBUzOfICgFhZgc5N8WJLGe
-   6npvSo/qcaIkzWb1Ca69EpOAZHG0Dw1aXmL62bUKu6BMZRD3+QyDJ/wL5
-   XRrKFhMlaVhBvBTpZlsFPDRU031NOC/0mPAbfZydePNOPfI46gJ6JxoFo
-   FCjs86VMqE4qr66jIGARVDBtleRbqH+oYnIQWKnOGHATCoAKlMNgHAUa0
-   nSjAfdZLKZvNk5wo3uTu1M7uPSTHj8rBxaoW5bt/1dPuWDzE7AtMhLMEK
-   0RFtGxMw7Bb7T8VBDV4FBPeQEPQSmkameBNPcnG4dNETwtfAtwgAqOh4Y
-   A==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="362775482"
-X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="362775482"
-Received: from fmsmga001.fm.intel.com ([10.253.24.23])
-  by fmsmga104.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 08:12:04 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="864584020"
-X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="864584020"
-Received: from lkp-server01.sh.intel.com (HELO c544d7fc5005) ([10.239.97.150])
-  by fmsmga001.fm.intel.com with ESMTP; 07 Jul 2023 08:12:01 -0700
-Received: from kbuild by c544d7fc5005 with local (Exim 4.96)
-	(envelope-from <lkp@intel.com>)
-	id 1qHn7o-00023A-2q;
-	Fri, 07 Jul 2023 15:12:00 +0000
-Date: Fri, 07 Jul 2023 23:11:41 +0800
-From: kernel test robot <lkp@intel.com>
-To: Andrew Morton <akpm@linux-foundation.org>
-Cc: Linux Memory Management List <linux-mm@kvack.org>,
- kunit-dev@googlegroups.com, linux-kselftest@vger.kernel.org,
- linux-parisc@vger.kernel.org, linux-trace-kernel@vger.kernel.org,
- netdev@vger.kernel.org
-Subject: [linux-next:master] BUILD REGRESSION
- 123212f53f3e394c1ae69a58c05dfdda56fec8c6
-Message-ID: <202307072334.fuhKXXFM-lkp@intel.com>
-User-Agent: s-nail v14.9.24
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0B536C123
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:21:04 +0000 (UTC)
+Received: from mail-il1-f178.google.com (mail-il1-f178.google.com [209.85.166.178])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 7A919210C;
+	Fri,  7 Jul 2023 08:21:03 -0700 (PDT)
+Received: by mail-il1-f178.google.com with SMTP id e9e14a558f8ab-345df4e68afso7703565ab.0;
+        Fri, 07 Jul 2023 08:21:03 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688743263; x=1691335263;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=rL/IqSliQWE/k5qHxsNvvh1YZrhQdGRZyr99h97/eUY=;
+        b=E2nSI/axcs0M60YqqOxVH8oRkVpkVwbT+5hjzMehkLKHrK+bZ+p23K9gM7+1bZIMf3
+         rBXIGR6m23cyd1eQ2D0sByKEdj5uN+HczqjaNcSQm5wdcbMmKgUXkDBelzcEhpCuCwbn
+         AHMe0NdruynllpxclexBLbZKxBYJAndUjWf65GnUelZ9ftEKJTaaGufgHWhsDGbjc4mU
+         +3gag5AvYc9Q5IPmHHiKJZzM8+/KteQCKNPH83wTjy+AI26qRGac4K6e6Zr+46iwhnms
+         xyXP1EiQG8RgkvD1V+c8Ci0XzkGDKN3E1nd/HQPsSt0/rS+JVyY1KvodF3qRyEDKIQeT
+         4Jyw==
+X-Gm-Message-State: ABy/qLbzd1Q2WovAocVSZRxxGm0i3kgW2OPgnExyul2Q1WXwLKZzthpy
+	eOoIjGUlxR7bjCxyQ60tcw==
+X-Google-Smtp-Source: APBJJlFyYg4jsqLMtrZwdHhLv4pwfC6duMAPrAIt71GIj1jKSnKNUViqYaVUZmofZqUjjxCTBsm9Mg==
+X-Received: by 2002:a92:de12:0:b0:346:b85:5f2 with SMTP id x18-20020a92de12000000b003460b8505f2mr5198421ilm.23.1688743262706;
+        Fri, 07 Jul 2023 08:21:02 -0700 (PDT)
+Received: from robh_at_kernel.org ([64.188.179.250])
+        by smtp.gmail.com with ESMTPSA id b11-20020a92dccb000000b00325e56c1cdcsm1386377ilr.49.2023.07.07.08.20.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jul 2023 08:21:01 -0700 (PDT)
+Received: (nullmailer pid 327561 invoked by uid 1000);
+	Fri, 07 Jul 2023 15:20:56 -0000
+Date: Fri, 7 Jul 2023 09:20:56 -0600
+From: Rob Herring <robh@kernel.org>
+To: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+Cc: Oleksii_Moisieiev@epam.com, gregkh@linuxfoundation.org, 
+	herbert@gondor.apana.org.au, davem@davemloft.net, 
+	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org, 
+	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org, 
+	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com, mchehab@kernel.org, 
+	fabrice.gasnier@foss.st.com, andi.shyti@kernel.org, ulf.hansson@linaro.org, 
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com, 
+	hugues.fruchet@foss.st.com, lee@kernel.org, will@kernel.org, 
+	catalin.marinas@arm.com, arnd@kernel.org, richardcochran@gmail.com, 
+	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org, 
+	linux-stm32@st-md-mailman.stormreply.com, 
+	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org, 
+	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org, 
+	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org, 
+	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org, 
+	netdev@vger.kernel.org, linux-phy@lists.infradead.org, 
+	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org, 
+	linux-usb@vger.kernel.org
+Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
+ description in binding files
+Message-ID: <20230707152056.GA317056-robh@kernel.org>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
+ <20230706145108.GA3858320-robh@kernel.org>
+ <0aaace47-1bb4-82c5-57a5-6f5d27eb4d45@foss.st.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
+MIME-Version: 1.0
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <0aaace47-1bb4-82c5-57a5-6f5d27eb4d45@foss.st.com>
+X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
+	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-tree/branch: https://git.kernel.org/pub/scm/linux/kernel/git/next/linux-next.git master
-branch HEAD: 123212f53f3e394c1ae69a58c05dfdda56fec8c6  Add linux-next specific files for 20230707
+On Fri, Jul 07, 2023 at 02:28:28PM +0200, Gatien CHEVALLIER wrote:
+> Hello Rob,
+> 
+> On 7/6/23 16:51, Rob Herring wrote:
+> > On Wed, Jul 05, 2023 at 07:27:53PM +0200, Gatien Chevallier wrote:
+> > > feature-domains is an optional property that allows a peripheral to
+> > > refer to one or more feature domain controller(s).
+> > > 
+> > > Description of this property is added to all peripheral binding files of
+> > > the peripheral under the STM32 firewall controllers. It allows an accurate
+> > > representation of the hardware, where various peripherals are connected
+> > > to this firewall bus. The firewall can then check the peripheral accesses
+> > > before allowing it to probe.
+> > > 
+> > > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+> > > ---
+> > > 
+> > > Disclaimer: Some error with dtbs_check will be observed as I've
+> > > considered the property to be generic, as Rob asked
+> > > 
+> > >   Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
+> > >   Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
+> > >   Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
+> > >   Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
+> > >   Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
+> > >   .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
+> > >   Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
+> > >   .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
+> > >   Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
+> > >   .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
+> > >   Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
+> > >   Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
+> > >   Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
+> > >   Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
+> > >   Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
+> > >   .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
+> > >   Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
+> > >   Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
+> > >   Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
+> > >   Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
+> > >   .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
+> > >   Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
+> > >   Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
+> > >   Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
+> > >   24 files changed, 97 insertions(+)
+> > > 
+> > > diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> > > index b767ec72a999..daf8dcaef627 100644
+> > > --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> > > +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> > > @@ -50,6 +50,10 @@ properties:
+> > >     power-domains:
+> > >       maxItems: 1
+> > > +  feature-domains:
+> > > +    minItems: 1
+> > > +    maxItems: 3
+> > 
+> > What are the 3 entries?
+> > 
+> > Rob
+> 
+> I thought I was benefiting from the description of the pattern-property in
+> the RIFSC YAML file. But yes anyway, it seems like it needs some description
+> here as the dependency does not appear in this file.
 
-Error/Warning reports:
+Humm, that should limit the maximum entries to 2, so 3 would never work 
+(if RIFSC is the parent). 
 
-https://lore.kernel.org/oe-kbuild-all/202306122223.HHER4zOo-lkp@intel.com
-https://lore.kernel.org/oe-kbuild-all/202306240021.qNRc4iHW-lkp@intel.com
+> I picked 3 as a maxItems for our ST needs, I'll give it some more thought
+> when coming back with something clearer.
 
-Error/Warning: (recently discovered and may have been fixed)
+I'd expect you have 1 entry for register bus and 1 entry for DMA bus if 
+there is one. It's block specific for how many entries, so the RIFSC 
+schema should not be setting that. You could possibly say that 
+'feature-domains' is required for all the child nodes though.
 
-arch/arm64/kernel/entry-ftrace.S:59: Error: undefined symbol FTRACE_OPS_DIRECT_CALL used as an immediate value
-arch/parisc/kernel/pdt.c:67:6: warning: no previous prototype for 'arch_report_meminfo' [-Wmissing-prototypes]
-drivers/net/arcnet/arc-rimi.c:107:4: error: incompatible integer to pointer conversion assigning to 'void *' from 'int' [-Wint-conversion]
-drivers/net/arcnet/arc-rimi.c:107:6: error: call to undeclared function 'ioremap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/net/arcnet/arc-rimi.c:113:3: error: call to undeclared function 'iounmap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/pcmcia/cistpl.c:103:15: error: incompatible integer to pointer conversion assigning to 'void *' from 'int' [-Wint-conversion]
-drivers/pcmcia/cistpl.c:103:17: error: call to undeclared function 'ioremap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/pcmcia/cistpl.c:72:3: error: call to undeclared function 'iounmap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/tty/ipwireless/main.c:115:21: error: incompatible integer to pointer conversion assigning to 'void *' from 'int' [-Wint-conversion]
-drivers/tty/ipwireless/main.c:115:23: error: call to undeclared function 'ioremap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-drivers/tty/ipwireless/main.c:155:2: error: call to undeclared function 'iounmap'; ISO C99 and later do not support implicit function declarations [-Wimplicit-function-declaration]
-lib/kunit/executor_test.c:138:4: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
-lib/kunit/test.c:775:38: warning: cast from 'void (*)(const void *)' to 'kunit_action_t *' (aka 'void (*)(void *)') converts to incompatible function type [-Wcast-function-type-strict]
-
-Unverified Error/Warning (likely false positive, please contact us if interested):
-
-{standard input}: Error: local label `"2" (instance number 9 of a fb label)' is not defined
-
-Error/Warning ids grouped by kconfigs:
-
-gcc_recent_errors
-|-- arm64-randconfig-r034-20230707
-|   `-- arch-arm64-kernel-entry-ftrace.S:Error:undefined-symbol-FTRACE_OPS_DIRECT_CALL-used-as-an-immediate-value
-|-- parisc-randconfig-r034-20230707
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-|-- parisc-randconfig-r081-20230703
-|   `-- arch-parisc-kernel-pdt.c:warning:no-previous-prototype-for-arch_report_meminfo
-`-- sh-allmodconfig
-    `-- standard-input:Error:local-label-(instance-number-of-a-fb-label)-is-not-defined
-clang_recent_errors
-|-- arm-randconfig-r036-20230707
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|-- hexagon-randconfig-r041-20230707
-|   |-- lib-kunit-executor_test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-|   `-- lib-kunit-test.c:warning:cast-from-void-(-)(const-void-)-to-kunit_action_t-(aka-void-(-)(void-)-)-converts-to-incompatible-function-type
-`-- s390-randconfig-r013-20230707
-    |-- drivers-net-arcnet-arc-rimi.c:error:call-to-undeclared-function-ioremap-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-net-arcnet-arc-rimi.c:error:call-to-undeclared-function-iounmap-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-net-arcnet-arc-rimi.c:error:incompatible-integer-to-pointer-conversion-assigning-to-void-from-int
-    |-- drivers-pcmcia-cistpl.c:error:call-to-undeclared-function-ioremap-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-pcmcia-cistpl.c:error:call-to-undeclared-function-iounmap-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-pcmcia-cistpl.c:error:incompatible-integer-to-pointer-conversion-assigning-to-void-from-int
-    |-- drivers-tty-ipwireless-main.c:error:call-to-undeclared-function-ioremap-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    |-- drivers-tty-ipwireless-main.c:error:call-to-undeclared-function-iounmap-ISO-C99-and-later-do-not-support-implicit-function-declarations
-    `-- drivers-tty-ipwireless-main.c:error:incompatible-integer-to-pointer-conversion-assigning-to-void-from-int
-
-elapsed time: 737m
-
-configs tested: 137
-configs skipped: 5
-
-tested configs:
-alpha                            alldefconfig   gcc  
-alpha                            allyesconfig   gcc  
-alpha                               defconfig   gcc  
-alpha                randconfig-r036-20230707   gcc  
-arc                              allyesconfig   gcc  
-arc                          axs103_defconfig   gcc  
-arc                                 defconfig   gcc  
-arc                  randconfig-r035-20230707   gcc  
-arc                  randconfig-r043-20230707   gcc  
-arm                              allmodconfig   gcc  
-arm                              allyesconfig   gcc  
-arm                         assabet_defconfig   gcc  
-arm                                 defconfig   gcc  
-arm                           h3600_defconfig   gcc  
-arm                      integrator_defconfig   gcc  
-arm                  randconfig-r021-20230707   gcc  
-arm                  randconfig-r036-20230707   clang
-arm                  randconfig-r046-20230707   gcc  
-arm64                            allyesconfig   gcc  
-arm64                               defconfig   gcc  
-arm64                randconfig-r023-20230707   clang
-arm64                randconfig-r034-20230707   gcc  
-csky                                defconfig   gcc  
-csky                 randconfig-r002-20230707   gcc  
-csky                 randconfig-r003-20230707   gcc  
-csky                 randconfig-r032-20230707   gcc  
-csky                 randconfig-r033-20230707   gcc  
-hexagon              randconfig-r041-20230707   clang
-hexagon              randconfig-r045-20230707   clang
-i386                             allyesconfig   gcc  
-i386         buildonly-randconfig-r004-20230707   gcc  
-i386         buildonly-randconfig-r005-20230707   gcc  
-i386         buildonly-randconfig-r006-20230707   gcc  
-i386                              debian-10.3   gcc  
-i386                                defconfig   gcc  
-i386                 randconfig-i001-20230707   gcc  
-i386                 randconfig-i002-20230707   gcc  
-i386                 randconfig-i003-20230707   gcc  
-i386                 randconfig-i004-20230707   gcc  
-i386                 randconfig-i005-20230707   gcc  
-i386                 randconfig-i006-20230707   gcc  
-i386                 randconfig-i011-20230707   clang
-i386                 randconfig-i012-20230707   clang
-i386                 randconfig-i013-20230707   clang
-i386                 randconfig-i014-20230707   clang
-i386                 randconfig-i015-20230707   clang
-i386                 randconfig-i016-20230707   clang
-loongarch                        allmodconfig   gcc  
-loongarch                         allnoconfig   gcc  
-loongarch                           defconfig   gcc  
-loongarch                 loongson3_defconfig   gcc  
-m68k                             allmodconfig   gcc  
-m68k                             allyesconfig   gcc  
-m68k                         amcore_defconfig   gcc  
-m68k                                defconfig   gcc  
-m68k                 randconfig-r015-20230707   gcc  
-microblaze           randconfig-r024-20230707   gcc  
-mips                             allmodconfig   gcc  
-mips                             allyesconfig   gcc  
-mips                            ar7_defconfig   gcc  
-mips                           ip22_defconfig   clang
-mips                           ip28_defconfig   clang
-mips                          malta_defconfig   clang
-mips                       rbtx49xx_defconfig   clang
-nios2                               defconfig   gcc  
-openrisc                            defconfig   gcc  
-openrisc             randconfig-r011-20230707   gcc  
-openrisc             randconfig-r035-20230707   gcc  
-parisc                           allyesconfig   gcc  
-parisc                              defconfig   gcc  
-parisc               randconfig-r034-20230707   gcc  
-parisc64                            defconfig   gcc  
-powerpc                          allmodconfig   gcc  
-powerpc                           allnoconfig   gcc  
-powerpc                      chrp32_defconfig   gcc  
-powerpc                      ep88xc_defconfig   gcc  
-powerpc                        fsp2_defconfig   clang
-powerpc                   motionpro_defconfig   gcc  
-powerpc                     ppa8548_defconfig   clang
-powerpc              randconfig-r031-20230707   gcc  
-powerpc                  storcenter_defconfig   gcc  
-powerpc                        warp_defconfig   gcc  
-riscv                            allmodconfig   gcc  
-riscv                             allnoconfig   gcc  
-riscv                            allyesconfig   gcc  
-riscv                               defconfig   gcc  
-riscv                randconfig-r005-20230707   gcc  
-riscv                randconfig-r042-20230707   clang
-riscv                          rv32_defconfig   gcc  
-s390                             allmodconfig   gcc  
-s390                             allyesconfig   gcc  
-s390                                defconfig   gcc  
-s390                 randconfig-r013-20230707   clang
-s390                 randconfig-r014-20230707   clang
-s390                 randconfig-r022-20230707   clang
-s390                 randconfig-r033-20230707   gcc  
-s390                 randconfig-r044-20230707   clang
-sh                               allmodconfig   gcc  
-sh                                  defconfig   gcc  
-sh                   randconfig-r006-20230707   gcc  
-sh                   randconfig-r026-20230707   gcc  
-sh                   randconfig-r031-20230707   gcc  
-sparc                            allyesconfig   gcc  
-sparc                               defconfig   gcc  
-sparc                randconfig-r001-20230707   gcc  
-sparc                       sparc32_defconfig   gcc  
-sparc64              randconfig-r025-20230707   gcc  
-um                               allmodconfig   clang
-um                                allnoconfig   clang
-um                               allyesconfig   clang
-um                                  defconfig   gcc  
-um                             i386_defconfig   gcc  
-um                   randconfig-r032-20230707   clang
-um                           x86_64_defconfig   gcc  
-x86_64                           allyesconfig   gcc  
-x86_64       buildonly-randconfig-r001-20230707   gcc  
-x86_64       buildonly-randconfig-r002-20230707   gcc  
-x86_64       buildonly-randconfig-r003-20230707   gcc  
-x86_64                              defconfig   gcc  
-x86_64                                  kexec   gcc  
-x86_64               randconfig-x001-20230707   clang
-x86_64               randconfig-x002-20230707   clang
-x86_64               randconfig-x003-20230707   clang
-x86_64               randconfig-x004-20230707   clang
-x86_64               randconfig-x005-20230707   clang
-x86_64               randconfig-x006-20230707   clang
-x86_64               randconfig-x011-20230707   gcc  
-x86_64               randconfig-x012-20230707   gcc  
-x86_64               randconfig-x013-20230707   gcc  
-x86_64               randconfig-x014-20230707   gcc  
-x86_64               randconfig-x015-20230707   gcc  
-x86_64               randconfig-x016-20230707   gcc  
-x86_64                          rhel-8.3-rust   clang
-x86_64                               rhel-8.3   gcc  
-xtensa                           alldefconfig   gcc  
-xtensa               randconfig-r016-20230707   gcc  
-xtensa                    smp_lx200_defconfig   gcc  
-
--- 
-0-DAY CI Kernel Test Service
-https://github.com/intel/lkp-tests/wiki
+Rob
 
