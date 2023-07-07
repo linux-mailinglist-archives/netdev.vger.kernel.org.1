@@ -1,109 +1,128 @@
-Return-Path: <netdev+bounces-15969-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15970-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A7C8B74AB46
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:43:56 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D669C74AB6A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:54:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id DB3C61C20F48
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:43:55 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8816E281687
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:54:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CE9A51FCA;
-	Fri,  7 Jul 2023 06:43:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC8E210F;
+	Fri,  7 Jul 2023 06:53:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C0F9E15CE
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 06:43:53 +0000 (UTC)
-Received: from mout.web.de (mout.web.de [212.227.15.14])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 17D24C9;
-	Thu,  6 Jul 2023 23:43:51 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=web.de;
- s=s29768273; t=1688712189; x=1689316989; i=markus.elfring@web.de;
- bh=jTIP9I6rWbUs/Hss3zABBVYfjElJVbGQrPrUHvE9qqI=;
- h=X-UI-Sender-Class:Date:To:Cc:References:Subject:From:In-Reply-To;
- b=Ec7KoXvKhidJ0YFi0thyHVHR2+0YEtgfHQhmNPIyVq19siSl9+NRjRsHzFfyupFMB3vSx7R
- isn99VpC07NPE6L4gILNEJ1C5IfRugp65rmzQGkL+yRiqPmnEy/lq6kWkNDChhKgHtQW6eIpv
- hQYQqsHoKywdiFJk/h2OfPNDbAZOyR/uwLUBQYv72LGuEOs1uPosS6g2lXFDnRRoIv392eaSt
- JQHtJptZLNlhtJimWx3r7T4gQw/T0Rdc29ZAAHgAqe9LIgxxdShLf4Y2WkNW24fOU84d8hU9C
- 21QvMHIEZQewT+3xYAAwDFd1+z+w23H982HgYEeY4zgem2cYe69w==
-X-UI-Sender-Class: 814a7b36-bfc1-4dae-8640-3722d8ec6cd6
-Received: from [192.168.178.21] ([94.31.90.83]) by smtp.web.de (mrweb005
- [213.165.67.108]) with ESMTPSA (Nemesis) id 1MGQGH-1qE34C2Ueb-00Gagi; Fri, 07
- Jul 2023 08:43:09 +0200
-Message-ID: <4aed7411-a567-c6dd-3ff1-3622b7eb7369@web.de>
-Date: Fri, 7 Jul 2023 08:42:59 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6321FB7
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 06:53:58 +0000 (UTC)
+Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180CD1FDB
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 23:53:53 -0700 (PDT)
+Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f96d680399so2157011e87.0
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 23:53:53 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688712831; x=1691304831;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=je3l1UGSXl3qbNk8Y0jwMEy8+l5L27PFDjg5qrG9/VM=;
+        b=OlmknxXpH0FpY4ZDFqL4X7a4ktDxUvlKBybAH2assHjilZkF0Ohr5mcW1awAYieTtn
+         Uu043FkOEkIJvbXUh3YUbf4Mtu3xbh02q3sXocl2245ioES9IO2UKJ1oZW0CcAAGLlgV
+         fRuAcYZ7ou4yoJUWYpqw+cLvhug+aBZzeD+xdO5AI+U8NN3Vwd3HAdL3UN1WNBSV8gcp
+         hJJByFlqSqwVHGDH9uty6mKeheZKEhYVDafoiMa4uox/9yUfEjLZhqf+1OvDCCm1mUAq
+         GuTDpET0dr2eWV0wnqixBR+O9WduDZoXR1joMuCyzz+2WPrUK4e4VAxRST8qhueLZj/V
+         YIlA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688712831; x=1691304831;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=je3l1UGSXl3qbNk8Y0jwMEy8+l5L27PFDjg5qrG9/VM=;
+        b=Ua0dPXxryw5RZcd+lT/OCyeg0nJS2U2iDH9QVXVj6OIa4YEiAIk0hAxd/fvrZIV5Aj
+         vc+ddJSsOPSeLs4dibebvhluXKTvi3/5Mjvfr6lqSGF97HwaXgBXVlsUE8rKms5iLrst
+         alKXmRfZSZmAi3ZyrgLkefAC8dnjGBhKvhKEvmsdZfOieXjdIoKQPcyhnX+aJqFlCWF1
+         NOm6CvLi3v17Yd4KgXbMSAJYrPwXzJSPqNbD68ZwRIMqggvUoQCGhJeBAYRMlklFR4lG
+         9xSaXRgwZTpBxQj6ksp3VS71uFjQHc9Ef9z/AjTXn5ygbBJ6HOVCHEFzgBzr+lNcxsWI
+         ITXg==
+X-Gm-Message-State: ABy/qLYsaF574pvKaSCMF36AA6iS8I2O9v8FRk9oDeAvXqniB/WTgutH
+	ZMkSsxjQYooilGpBvDfMOUQ=
+X-Google-Smtp-Source: APBJJlFWeXBGagh4fLzcU7Cue0vPz8agr+CvVj1bBSq48hgce233y9prLE6813udH1l35DWMCmcOEg==
+X-Received: by 2002:a19:3819:0:b0:4f8:631b:bf77 with SMTP id f25-20020a193819000000b004f8631bbf77mr3785907lfa.22.1688712830733;
+        Thu, 06 Jul 2023 23:53:50 -0700 (PDT)
+Received: from localhost.lan (031011218106.poznan.vectranet.pl. [31.11.218.106])
+        by smtp.gmail.com with ESMTPSA id er23-20020a05651248d700b004fba6f38f87sm558121lfb.24.2023.07.06.23.53.49
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 23:53:50 -0700 (PDT)
+From: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>
+To: "David S . Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>
+Cc: Florian Fainelli <f.fainelli@gmail.com>,
+	netdev@vger.kernel.org,
+	bcm-kernel-feedback-list@broadcom.com,
+	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
+Subject: [PATCH net.git] net: bgmac: postpone turning IRQs off to avoid SoC hangs
+Date: Fri,  7 Jul 2023 08:53:25 +0200
+Message-Id: <20230707065325.11765-1-zajec5@gmail.com>
+X-Mailer: git-send-email 2.35.3
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-To: Christophe Jaillet <christophe.jaillet@wanadoo.fr>,
- =?UTF-8?B?546L5piOLei9r+S7tuW6leWxguaKgOacr+mDqA==?= <machel@vivo.com>,
- opensource.kernel@vivo.com, tipc-discussion@lists.sourceforge.net,
- netdev@vger.kernel.org, kernel-janitors@vger.kernel.org
-Cc: LKML <linux-kernel@vger.kernel.org>,
- Dan Carpenter <dan.carpenter@linaro.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Jakub Kicinski <kuba@kernel.org>, Jon Maloy <jmaloy@redhat.com>,
- Paolo Abeni <pabeni@redhat.com>, Ying Xue <ying.xue@windriver.com>
-References: <0d8a89fb-b1ef-9a15-8731-4160b1287e14@wanadoo.fr>
-Subject: =?UTF-8?Q?Re=3a_net=3a_tipc=3a_Remove_repeated_=e2=80=9cinitializat?=
- =?UTF-8?B?aW9u4oCdIGluIHRpcGNfZ3JvdXBfYWRkX3RvX3RyZWUoKQ==?=
-Content-Language: en-GB
-From: Markus Elfring <Markus.Elfring@web.de>
-In-Reply-To: <0d8a89fb-b1ef-9a15-8731-4160b1287e14@wanadoo.fr>
 Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: quoted-printable
-X-Provags-ID: V03:K1:CAMlEzw4KfK4fr0NozUWhSQRSCgVIti5cxrCWPNRVCmGzr5KAHm
- cOpEiVpasved9LnwvZujNVIxmjjHRqbE/xbnygZy27yH8gWBa9T26C89lq0DauJ1H4sCN7m
- IMoFvxlKbbVhVHQX2O4g4G9OO4Ul/anj9Oa31EJjlXsknfPmBAtIQhMsMbrkT7mZB+C8VTw
- K508qccRoeQvtlgAYVr1g==
-UI-OutboundReport: notjunk:1;M01:P0:7kUolwNMoHg=;0AkHhZ8zOLFJP4VIutaSsLCNI70
- Ym085t+P/RUhbvOk+a4sN+NxOC3DRUPTm+feksOM4WxqGheiMxla5lb1k9EtoyXdK6uJDDp7w
- dtmlgHIpv+yNRByUzNn1M7GEzkMHuSIDCR7WYI0auYtFh2/16A5B+fbG0TVtXbiKaa5wDNWHD
- 9eI1AmPUPlPH+O7CXxwIXMQwFfXf3fyUg+tFL8oNLZhUcFU65nvNqFj1KBKDDN9ofqZ5Ss780
- h2xgSpQFOGclCMLDrRQv/4JiOw20O4S6K0tBf4cOtv9vzUFzVRgGou3uDR0CUIYjRuLLUyRgM
- /zorLPhb8fKTrfpJ6F3uZpZPsrvk1Fs0PZqeoUeAyeVcLQUvHHJgvsJr3c837KopY+S9XGbYo
- eYjtJLJRxHauFCIkJQkHakvpeLlkEbbZ/zT+MPjFL4PHxI5pjxPz4cN/WcHtr0beVvw5ZmE08
- wIr7Kuwze/9BXLVHkwRg9bp6ZcSpXoTx9u17wkQ67Lutbeo/0EeyYD/+JX0fFVtB0RgFK43NA
- TVYKD0MYgrgCunIsdN0PV58UWYGoo5emby4Zp1EPXsUd5o+HYlTPs68P9jFpd+0y5bJVDbdbC
- poe7wNK/ZgIqlpcFrHpei7zwpL2vTIUL+hdaNjxGmLtBwkdx087jIIsw+iKuFGkS92lc66L1H
- ZJyBUzNe574Fyqt2OH7Hv8WS06F07kKBHHgxIMRj/A3Cy8XSji0uKr1iHyW+QjakXBXIIpzoz
- CbcRhuyrSbRrkIMVwiFpt6JYPY+FkqZKEfnf33Y0NIvpYy4dchAbBw+o0ZtaigIHKs6qBZXaO
- 9cYc9PQ/eHqoaTAAAPi4M2MPhiwPIs4ggCycBWD6CnRNX/jn28Xi6mfB+dPmTfpMl+6gnedLG
- rohM2zWQ2qwJjXDBSxAl6qsyygp0L4lJxDIDjgEdctiRM+yJLqIFEm7s3SUFqDOiNBzFsr7fe
- CDLCng==
-X-Spam-Status: No, score=-2.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,NICE_REPLY_A,
-	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> The risk of breaking code (as you un-intentionally did) is higher than
-> the value of removing a redundant initialization.
+From: Rafał Miłecki <rafal@milecki.pl>
 
-I find that it would be nicer to perform only required data processing ste=
-ps.
-The application of variable assignments can occasionally be improved furth=
-er.
+Turning IRQs off is done by accessing Ethernet controller registers.
+That can't be done until device's clock is enabled. It results in a SoC
+hang otherwise.
 
-The corresponding efforts grow for proper code review.
+This bug remained unnoticed for years as most bootloaders keep all
+Ethernet interfaces turned on. It seems to only affect a niche SoC
+family BCM47189. It has two Ethernet controllers but CFE bootloader uses
+only the first one.
 
-The discussed change possibilities might belong to the adjustment category
-=E2=80=9Ccode cleanup=E2=80=9D.
-Some contributors have got difficulties to integrate presented ideas.
-Thus it seems that more attractive incentives need to be offered
-for potentially desirable software updates.
+Fixes: 34322615cbaa ("net: bgmac: Mask interrupts during probe")
+Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
+---
+ drivers/net/ethernet/broadcom/bgmac.c | 4 ++--
+ 1 file changed, 2 insertions(+), 2 deletions(-)
 
-Regards,
-Markus
+diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
+index 1761df8fb7f9..10c7c232cc4e 100644
+--- a/drivers/net/ethernet/broadcom/bgmac.c
++++ b/drivers/net/ethernet/broadcom/bgmac.c
+@@ -1492,8 +1492,6 @@ int bgmac_enet_probe(struct bgmac *bgmac)
+ 
+ 	bgmac->in_init = true;
+ 
+-	bgmac_chip_intrs_off(bgmac);
+-
+ 	net_dev->irq = bgmac->irq;
+ 	SET_NETDEV_DEV(net_dev, bgmac->dev);
+ 	dev_set_drvdata(bgmac->dev, bgmac);
+@@ -1511,6 +1509,8 @@ int bgmac_enet_probe(struct bgmac *bgmac)
+ 	 */
+ 	bgmac_clk_enable(bgmac, 0);
+ 
++	bgmac_chip_intrs_off(bgmac);
++
+ 	/* This seems to be fixing IRQ by assigning OOB #6 to the core */
+ 	if (!(bgmac->feature_flags & BGMAC_FEAT_IDM_MASK)) {
+ 		if (bgmac->feature_flags & BGMAC_FEAT_IRQ_ID_OOB_6)
+-- 
+2.35.3
+
 
