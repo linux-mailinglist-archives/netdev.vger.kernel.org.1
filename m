@@ -1,187 +1,306 @@
-Return-Path: <netdev+bounces-16021-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16009-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8F97D74AFA3
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 13:24:53 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B66DE74AEE1
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:44:16 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id BC6211C20CB6
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 11:24:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E6BAF1C20F8A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:44:15 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id BC755C142;
-	Fri,  7 Jul 2023 11:24:50 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BEFC99469;
+	Fri,  7 Jul 2023 10:44:13 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 205A4BA4C
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 11:24:48 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 5956EC433C7;
-	Fri,  7 Jul 2023 11:24:45 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=linuxfoundation.org;
-	s=korg; t=1688729088;
-	bh=LOgGo2S8J0W/3urW+Ti0fTdtCUZF8vgQbegkxehA2Nw=;
-	h=Date:From:To:Cc:Subject:References:In-Reply-To:From;
-	b=V6pm8aS+Hqo30H+UfcDWPK9FUel6+CEaeLnbsqjg5FNFn7kS9vpsV/yUffNtNtN4r
-	 eYj8wPa9jFaESU9qYfLPXkEq1P+y26NKM033eo6Tum/YGx4QnFqAodrRTvrUgwxjd+
-	 Hb0ygjCLtz/yNG4DLd9KU6K45+rum5O927EybD2I=
-Date: Fri, 7 Jul 2023 11:37:39 +0100
-From: Greg KH <gregkh@linuxfoundation.org>
-To: Gatien Chevallier <gatien.chevallier@foss.st.com>
-Cc: Oleksii_Moisieiev@epam.com, herbert@gondor.apana.org.au,
-	davem@davemloft.net, robh+dt@kernel.org,
-	krzysztof.kozlowski+dt@linaro.org, conor+dt@kernel.org,
-	alexandre.torgue@foss.st.com, vkoul@kernel.org, jic23@kernel.org,
-	olivier.moysan@foss.st.com, arnaud.pouliquen@foss.st.com,
-	mchehab@kernel.org, fabrice.gasnier@foss.st.com,
-	andi.shyti@kernel.org, ulf.hansson@linaro.org, edumazet@google.com,
-	kuba@kernel.org, pabeni@redhat.com, hugues.fruchet@foss.st.com,
-	lee@kernel.org, will@kernel.org, catalin.marinas@arm.com,
-	arnd@kernel.org, richardcochran@gmail.com,
-	linux-crypto@vger.kernel.org, devicetree@vger.kernel.org,
-	linux-stm32@st-md-mailman.stormreply.com,
-	linux-arm-kernel@lists.infradead.org, linux-kernel@vger.kernel.org,
-	dmaengine@vger.kernel.org, linux-i2c@vger.kernel.org,
-	linux-iio@vger.kernel.org, alsa-devel@alsa-project.org,
-	linux-media@vger.kernel.org, linux-mmc@vger.kernel.org,
-	netdev@vger.kernel.org, linux-phy@lists.infradead.org,
-	linux-serial@vger.kernel.org, linux-spi@vger.kernel.org,
-	linux-usb@vger.kernel.org
-Subject: Re: [PATCH 05/10] firewall: introduce stm32_firewall framework
-Message-ID: <2023070748-false-enroll-e5dc@gregkh>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF49720E0
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:44:13 +0000 (UTC)
+Received: from mx0b-001b2d01.pphosted.com (mx0b-001b2d01.pphosted.com [148.163.158.5])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5A8AA172B;
+	Fri,  7 Jul 2023 03:44:11 -0700 (PDT)
+Received: from pps.filterd (m0353725.ppops.net [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367Afqua023791;
+	Fri, 7 Jul 2023 10:44:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=ibm.com; h=from : to : cc : subject
+ : date : message-id : in-reply-to : references : mime-version :
+ content-transfer-encoding; s=pp1;
+ bh=FiXmI2k/9244Z9oQXE/8cOVrPyhmB3N3R1TpxJXn6ew=;
+ b=qVKbP9Pxvzsg652hqOib9ebKCJ4pyPPWi2N4Ra+sMvp67ymvlgYVg1DAEg3AHjosFagH
+ OICXqgBmOF0XYr2WMJ7IcjCGI9hGicW+rJc/qNL2KbNdGuprVbIuhbmB612gy0PloRgq
+ 7R6YFcH7ffgHb09ZPLat07BCHEbw/Y8ADCDiNQ0uxGirctI1xspn5b+n7aHWpWwVWKfY
+ ZZlc8wLJ9hRbB6lJz+UOMPAlBVqVN9LRiT1bZtN7CKANXAWNtJ8jr5giKS+XIvg8rhgV
+ 7mb+oWCnuWa+iHGYA8f4Q+1vp/k3aKfBRBnNyz9ycsdLPeOH3TE9dTGwAWyKa7phlUzu 0A== 
+Received: from pps.reinject (localhost [127.0.0.1])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpgu3rc9y-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 10:44:08 +0000
+Received: from m0353725.ppops.net (m0353725.ppops.net [127.0.0.1])
+	by pps.reinject (8.17.1.5/8.17.1.5) with ESMTP id 367Afw2s023990;
+	Fri, 7 Jul 2023 10:44:07 GMT
+Received: from ppma03ams.nl.ibm.com (62.31.33a9.ip4.static.sl-reverse.com [169.51.49.98])
+	by mx0a-001b2d01.pphosted.com (PPS) with ESMTPS id 3rpgu3rc9a-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 10:44:07 +0000
+Received: from pps.filterd (ppma03ams.nl.ibm.com [127.0.0.1])
+	by ppma03ams.nl.ibm.com (8.17.1.19/8.17.1.19) with ESMTP id 3673KxD1020329;
+	Fri, 7 Jul 2023 10:44:05 GMT
+Received: from smtprelay04.fra02v.mail.ibm.com ([9.218.2.228])
+	by ppma03ams.nl.ibm.com (PPS) with ESMTPS id 3rjbs4uy42-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 10:44:05 +0000
+Received: from smtpav02.fra02v.mail.ibm.com (smtpav02.fra02v.mail.ibm.com [10.20.54.101])
+	by smtprelay04.fra02v.mail.ibm.com (8.14.9/8.14.9/NCO v10.0) with ESMTP id 367Ai0QJ43451048
+	(version=TLSv1/SSLv3 cipher=DHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 7 Jul 2023 10:44:00 GMT
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id BB82120040;
+	Fri,  7 Jul 2023 10:44:00 +0000 (GMT)
+Received: from smtpav02.fra02v.mail.ibm.com (unknown [127.0.0.1])
+	by IMSVA (Postfix) with ESMTP id 3ED762005A;
+	Fri,  7 Jul 2023 10:44:00 +0000 (GMT)
+Received: from tuxmaker.boeblingen.de.ibm.com (unknown [9.152.85.9])
+	by smtpav02.fra02v.mail.ibm.com (Postfix) with ESMTP;
+	Fri,  7 Jul 2023 10:44:00 +0000 (GMT)
+From: Niklas Schnelle <schnelle@linux.ibm.com>
+To: Paolo Abeni <pabeni@redhat.com>, Alexandra Winter <wintera@linux.ibm.com>,
+        Wenjia Zhang <wenjia@linux.ibm.com>,
+        Heiko Carstens <hca@linux.ibm.com>, Vasily Gorbik <gor@linux.ibm.com>,
+        Alexander Gordeev <agordeev@linux.ibm.com>,
+        Christian Borntraeger <borntraeger@linux.ibm.com>,
+        Sven Schnelle <svens@linux.ibm.com>,
+        "David S. Miller" <davem@davemloft.net>,
+        Stefan Raspl <raspl@linux.ibm.com>, Jan Karcher <jaka@linux.ibm.com>
+Cc: linux-s390@vger.kernel.org, netdev@vger.kernel.org,
+        linux-kernel@vger.kernel.org
+Subject: [PATCH net v2 1/3] s390/ism: Fix locking for forwarding of IRQs and events to clients
+Date: Fri,  7 Jul 2023 12:43:57 +0200
+Message-Id: <20230707104359.3324039-2-schnelle@linux.ibm.com>
+X-Mailer: git-send-email 2.39.2
+In-Reply-To: <20230707104359.3324039-1-schnelle@linux.ibm.com>
+References: <20230707104359.3324039-1-schnelle@linux.ibm.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
+Content-Transfer-Encoding: 8bit
+X-TM-AS-GCONF: 00
+X-Proofpoint-ORIG-GUID: ComVDJxSxacbzW_OLn79l4BaJ_GuzV1z
+X-Proofpoint-GUID: rW-lHT37QAAq0u_DLXGZTBgK5EUXHcWP
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-07_06,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ priorityscore=1501 malwarescore=0 clxscore=1015 phishscore=0 adultscore=0
+ spamscore=0 impostorscore=0 mlxlogscore=869 mlxscore=0 bulkscore=0
+ lowpriorityscore=0 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307070097
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Wed, Jul 05, 2023 at 07:27:54PM +0200, Gatien Chevallier wrote:
-> Introduce a firewall framework that offers to firewall consumers different
-> firewall services such as the ability to check their access rights against
-> their firewall controller(s).
-> 
-> The firewall framework offers a generic API that is defined in firewall
-> controllers drivers to best fit the specificity of each firewall.
+The clients array references all registered clients and is protected by
+the clients_lock. Besides its use as general list of clients the clients
+array is accessed in ism_handle_irq() to forward ISM device events to
+clients.
 
-But you aren't defining a "generic" api here, you are defining a
-specific one for your specific hardware.
+While the clients_lock is taken in the IRQ handler when calling
+handle_event() it is however incorrectly not held during the
+client->handle_irq() call and for the preceding clients[] access leaving
+it unprotected against concurrent client (un-)registration.
 
-Or am I missing something?
+Furthermore the accesses to ism->sba_client_arr[] in ism_register_dmb()
+and ism_unregister_dmb() are not protected by any lock. This is
+especially problematic as the client ID from the ism->sba_client_arr[]
+is not checked against NO_CLIENT and neither is the client pointer
+checked.
 
-> 
-> There are various types of firewalls:
-> -Peripheral firewalls that filter accesses to peripherals
-> -Memory firewalls that filter accesses to memories or memory regions
-> -Resource firewalls that filter accesses to internal resources such as
-> reset and clock controllers
-> 
-> A firewall controller must be probed at arch_initcall level and register
-> to the framework so that consumers can use their services.
+Instead of expanding the use of the clients_lock further add a separate
+array in struct ism_dev which references clients subscribed to the
+device's events and IRQs. This array is protected by ism->lock which is
+already taken in ism_handle_irq() and can be taken outside the IRQ
+handler when adding/removing subscribers or the accessing
+ism->sba_client_arr[]. This also means that the clients_lock is no
+longer taken in IRQ context.
 
-Why must it happen at arch_initcall?  So it can never be a module?  That
-feels wrong.
+Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
+Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+---
+ drivers/s390/net/ism_drv.c | 44 +++++++++++++++++++++++++++++++-------
+ include/linux/ism.h        |  1 +
+ 2 files changed, 37 insertions(+), 8 deletions(-)
 
-> 
-> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> ---
->  MAINTAINERS                               |   5 +
->  arch/arm64/Kconfig.platforms              |   1 +
->  drivers/bus/Kconfig                       |  10 +
->  drivers/bus/Makefile                      |   1 +
->  drivers/bus/stm32_firewall.c              | 252 ++++++++++++++++++++++
->  drivers/bus/stm32_firewall.h              |  83 +++++++
->  include/linux/bus/stm32_firewall_device.h | 134 ++++++++++++
->  7 files changed, 486 insertions(+)
->  create mode 100644 drivers/bus/stm32_firewall.c
->  create mode 100644 drivers/bus/stm32_firewall.h
->  create mode 100644 include/linux/bus/stm32_firewall_device.h
-> 
-> diff --git a/MAINTAINERS b/MAINTAINERS
-> index 41385f01fa98..fabf95ba9b86 100644
-> --- a/MAINTAINERS
-> +++ b/MAINTAINERS
-> @@ -20123,6 +20123,11 @@ T:	git git://linuxtv.org/media_tree.git
->  F:	Documentation/devicetree/bindings/media/i2c/st,st-mipid02.yaml
->  F:	drivers/media/i2c/st-mipid02.c
->  
-> +ST STM32 FIREWALL
-> +M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
-> +S:	Maintained
-> +F:	drivers/bus/stm32_firewall.c
-> +
->  ST STM32 I2C/SMBUS DRIVER
->  M:	Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>
->  M:	Alain Volmat <alain.volmat@foss.st.com>
-> diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
-> index 6069120199bb..5a46e90f1e4e 100644
-> --- a/arch/arm64/Kconfig.platforms
-> +++ b/arch/arm64/Kconfig.platforms
-> @@ -293,6 +293,7 @@ config ARCH_STM32
->  	select ARM_SMC_MBOX
->  	select ARM_SCMI_PROTOCOL
->  	select COMMON_CLK_SCMI
-> +	select STM32_FIREWALL
->  	help
->  	  This enables support for ARMv8 based STMicroelectronics
->  	  STM32 family, including:
-> diff --git a/drivers/bus/Kconfig b/drivers/bus/Kconfig
-> index fcfa280df98a..4d54a7ea52b2 100644
-> --- a/drivers/bus/Kconfig
-> +++ b/drivers/bus/Kconfig
-> @@ -163,6 +163,16 @@ config QCOM_SSC_BLOCK_BUS
->  	  i2c/spi/uart controllers, a hexagon core, and a clock controller
->  	  which provides clocks for the above.
->  
-> +config STM32_FIREWALL
-> +	bool "STM32 Firewall framework"
-> +	depends on ARCH_STM32
+diff --git a/drivers/s390/net/ism_drv.c b/drivers/s390/net/ism_drv.c
+index 9b5fccdbc7d6..b664e4a08645 100644
+--- a/drivers/s390/net/ism_drv.c
++++ b/drivers/s390/net/ism_drv.c
+@@ -47,6 +47,15 @@ static struct ism_dev_list ism_dev_list = {
+ 	.mutex = __MUTEX_INITIALIZER(ism_dev_list.mutex),
+ };
+ 
++static void ism_setup_forwarding(struct ism_client *client, struct ism_dev *ism)
++{
++	unsigned long flags;
++
++	spin_lock_irqsave(&ism->lock, flags);
++	ism->subs[client->id] = client;
++	spin_unlock_irqrestore(&ism->lock, flags);
++}
++
+ int ism_register_client(struct ism_client *client)
+ {
+ 	struct ism_dev *ism;
+@@ -71,6 +80,7 @@ int ism_register_client(struct ism_client *client)
+ 		list_for_each_entry(ism, &ism_dev_list.list, list) {
+ 			ism->priv[i] = NULL;
+ 			client->add(ism);
++			ism_setup_forwarding(client, ism);
+ 		}
+ 	}
+ 	mutex_unlock(&ism_dev_list.mutex);
+@@ -92,6 +102,9 @@ int ism_unregister_client(struct ism_client *client)
+ 		max_client--;
+ 	spin_unlock_irqrestore(&clients_lock, flags);
+ 	list_for_each_entry(ism, &ism_dev_list.list, list) {
++		spin_lock_irqsave(&ism->lock, flags);
++		/* Stop forwarding IRQs and events */
++		ism->subs[client->id] = NULL;
+ 		for (int i = 0; i < ISM_NR_DMBS; ++i) {
+ 			if (ism->sba_client_arr[i] == client->id) {
+ 				pr_err("%s: attempt to unregister client '%s'"
+@@ -101,6 +114,7 @@ int ism_unregister_client(struct ism_client *client)
+ 				goto out;
+ 			}
+ 		}
++		spin_unlock_irqrestore(&ism->lock, flags);
+ 	}
+ out:
+ 	mutex_unlock(&ism_dev_list.mutex);
+@@ -328,6 +342,7 @@ int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
+ 		     struct ism_client *client)
+ {
+ 	union ism_reg_dmb cmd;
++	unsigned long flags;
+ 	int ret;
+ 
+ 	ret = ism_alloc_dmb(ism, dmb);
+@@ -351,7 +366,9 @@ int ism_register_dmb(struct ism_dev *ism, struct ism_dmb *dmb,
+ 		goto out;
+ 	}
+ 	dmb->dmb_tok = cmd.response.dmb_tok;
++	spin_lock_irqsave(&ism->lock, flags);
+ 	ism->sba_client_arr[dmb->sba_idx - ISM_DMB_BIT_OFFSET] = client->id;
++	spin_unlock_irqrestore(&ism->lock, flags);
+ out:
+ 	return ret;
+ }
+@@ -360,6 +377,7 @@ EXPORT_SYMBOL_GPL(ism_register_dmb);
+ int ism_unregister_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ {
+ 	union ism_unreg_dmb cmd;
++	unsigned long flags;
+ 	int ret;
+ 
+ 	memset(&cmd, 0, sizeof(cmd));
+@@ -368,7 +386,9 @@ int ism_unregister_dmb(struct ism_dev *ism, struct ism_dmb *dmb)
+ 
+ 	cmd.request.dmb_tok = dmb->dmb_tok;
+ 
++	spin_lock_irqsave(&ism->lock, flags);
+ 	ism->sba_client_arr[dmb->sba_idx - ISM_DMB_BIT_OFFSET] = NO_CLIENT;
++	spin_unlock_irqrestore(&ism->lock, flags);
+ 
+ 	ret = ism_cmd(ism, &cmd);
+ 	if (ret && ret != ISM_ERROR)
+@@ -491,6 +511,7 @@ static u16 ism_get_chid(struct ism_dev *ism)
+ static void ism_handle_event(struct ism_dev *ism)
+ {
+ 	struct ism_event *entry;
++	struct ism_client *clt;
+ 	int i;
+ 
+ 	while ((ism->ieq_idx + 1) != READ_ONCE(ism->ieq->header.idx)) {
+@@ -499,21 +520,21 @@ static void ism_handle_event(struct ism_dev *ism)
+ 
+ 		entry = &ism->ieq->entry[ism->ieq_idx];
+ 		debug_event(ism_debug_info, 2, entry, sizeof(*entry));
+-		spin_lock(&clients_lock);
+-		for (i = 0; i < max_client; ++i)
+-			if (clients[i])
+-				clients[i]->handle_event(ism, entry);
+-		spin_unlock(&clients_lock);
++		for (i = 0; i < max_client; ++i) {
++			clt = ism->subs[i];
++			if (clt)
++				clt->handle_event(ism, entry);
++		}
+ 	}
+ }
+ 
+ static irqreturn_t ism_handle_irq(int irq, void *data)
+ {
+ 	struct ism_dev *ism = data;
+-	struct ism_client *clt;
+ 	unsigned long bit, end;
+ 	unsigned long *bv;
+ 	u16 dmbemask;
++	u8 client_id;
+ 
+ 	bv = (void *) &ism->sba->dmb_bits[ISM_DMB_WORD_OFFSET];
+ 	end = sizeof(ism->sba->dmb_bits) * BITS_PER_BYTE - ISM_DMB_BIT_OFFSET;
+@@ -530,8 +551,10 @@ static irqreturn_t ism_handle_irq(int irq, void *data)
+ 		dmbemask = ism->sba->dmbe_mask[bit + ISM_DMB_BIT_OFFSET];
+ 		ism->sba->dmbe_mask[bit + ISM_DMB_BIT_OFFSET] = 0;
+ 		barrier();
+-		clt = clients[ism->sba_client_arr[bit]];
+-		clt->handle_irq(ism, bit + ISM_DMB_BIT_OFFSET, dmbemask);
++		client_id = ism->sba_client_arr[bit];
++		if (unlikely(client_id == NO_CLIENT || !ism->subs[client_id]))
++			continue;
++		ism->subs[client_id]->handle_irq(ism, bit + ISM_DMB_BIT_OFFSET, dmbemask);
+ 	}
+ 
+ 	if (ism->sba->e) {
+@@ -554,6 +577,7 @@ static void ism_dev_add_work_func(struct work_struct *work)
+ 						 add_work);
+ 
+ 	client->add(client->tgt_ism);
++	ism_setup_forwarding(client, client->tgt_ism);
+ 	atomic_dec(&client->tgt_ism->add_dev_cnt);
+ 	wake_up(&client->tgt_ism->waitq);
+ }
+@@ -691,7 +715,11 @@ static void ism_dev_remove_work_func(struct work_struct *work)
+ {
+ 	struct ism_client *client = container_of(work, struct ism_client,
+ 						 remove_work);
++	unsigned long flags;
+ 
++	spin_lock_irqsave(&client->tgt_ism->lock, flags);
++	client->tgt_ism->subs[client->id] = NULL;
++	spin_unlock_irqrestore(&client->tgt_ism->lock, flags);
+ 	client->remove(client->tgt_ism);
+ 	atomic_dec(&client->tgt_ism->free_clients_cnt);
+ 	wake_up(&client->tgt_ism->waitq);
+diff --git a/include/linux/ism.h b/include/linux/ism.h
+index ea2bcdae7401..5160d47e5ea9 100644
+--- a/include/linux/ism.h
++++ b/include/linux/ism.h
+@@ -44,6 +44,7 @@ struct ism_dev {
+ 	u64 local_gid;
+ 	int ieq_idx;
+ 
++	struct ism_client *subs[MAX_CLIENTS];
+ 	atomic_t free_clients_cnt;
+ 	atomic_t add_dev_cnt;
+ 	wait_queue_head_t waitq;
+-- 
+2.39.2
 
-Why this dependency?
-
-> +	default MACH_STM32MP157 || MACH_STM32MP13 || MACH_STM32MP25
-> +	help
-> +	  Say y to enable firewall framework and its services. Firewall
-> +	  controllers will be able to register to the framework. Firewall
-> +	  controllers must be initialized and register to the firewall framework
-> +	  at arch_initcall level.
-
-This needs better wording saying it is only for stm32 devices.
-
-> +
->  config SUN50I_DE2_BUS
->  	bool "Allwinner A64 DE2 Bus Driver"
->  	  default ARM64
-> diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
-> index d90eed189a65..fc0511450ec2 100644
-> --- a/drivers/bus/Makefile
-> +++ b/drivers/bus/Makefile
-> @@ -26,6 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
->  obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
->  obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
->  obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
-> +obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o
->  obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
->  obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
->  obj-$(CONFIG_OF)		+= simple-pm-bus.o
-> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
-> new file mode 100644
-> index 000000000000..510db5bc6eaf
-> --- /dev/null
-> +++ b/drivers/bus/stm32_firewall.c
-> @@ -0,0 +1,252 @@
-> +// SPDX-License-Identifier: GPL-2.0-or-later
-
-Are you _SURE_ this needs to be "or later"?  Sorry, I have to ask.
-
-thanks,
-
-greg k-h
 
