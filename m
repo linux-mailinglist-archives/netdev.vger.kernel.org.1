@@ -1,138 +1,124 @@
-Return-Path: <netdev+bounces-15955-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15956-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0690974A97E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 05:53:46 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 2C30C74A9A3
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:05:33 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 369071C20F2F
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 03:53:45 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id B74851C20E3B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 04:05:31 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 032AC1878;
-	Fri,  7 Jul 2023 03:53:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 68177187D;
+	Fri,  7 Jul 2023 04:05:27 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EAE511876
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 03:53:42 +0000 (UTC)
-Received: from mx0b-0016f401.pphosted.com (mx0a-0016f401.pphosted.com [67.231.148.174])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 88BA11FC9;
-	Thu,  6 Jul 2023 20:53:41 -0700 (PDT)
-Received: from pps.filterd (m0045849.ppops.net [127.0.0.1])
-	by mx0a-0016f401.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 366GpMW8030462;
-	Thu, 6 Jul 2023 20:53:29 -0700
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=marvell.com; h=from : to : cc :
- subject : date : message-id : mime-version : content-transfer-encoding :
- content-type; s=pfpt0220; bh=IPtGxkbPmFGDLM3aZoleuH6KTP7fOT7Q4al0VCaPr1Y=;
- b=j0V0pNHURZavUJzej5Ty4OHZUmqdTbAMUBxEftSyP6WoOJ8UIpSTnMzr7pDGlWatMEzW
- ZsXxKKos7lxJMZ/WW8/0RkIve4zhAPMUmYVTL5Oxw+bmDL9nkN3cIyBHyRE0f4Fnns4o
- BCUpuLNFnnyaclJ2nMAnuDodwH3hzzfPIVjmPowjPGU6Pl0/r03/19BLX3FXhfBaX3iv
- CuFcpthw1kqS3yKNeZtpWPA4AMRUkMXbm2IMvKm1VEVg0cjnQpcRRaa8vipidpLfTYIx
- QfsOR8dNxXnFCb/v4XzZCL8AIopv18xN+of3/jPoycsSikgQf6zbuR0I3tsqdEXXXJIo Gg== 
-Received: from dc5-exch01.marvell.com ([199.233.59.181])
-	by mx0a-0016f401.pphosted.com (PPS) with ESMTPS id 3rn3v98cyk-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-SHA384 bits=256 verify=NOT);
-	Thu, 06 Jul 2023 20:53:29 -0700
-Received: from DC5-EXCH02.marvell.com (10.69.176.39) by DC5-EXCH01.marvell.com
- (10.69.176.38) with Microsoft SMTP Server (TLS) id 15.0.1497.48; Thu, 6 Jul
- 2023 20:53:27 -0700
-Received: from maili.marvell.com (10.69.176.80) by DC5-EXCH02.marvell.com
- (10.69.176.39) with Microsoft SMTP Server id 15.0.1497.48 via Frontend
- Transport; Thu, 6 Jul 2023 20:53:27 -0700
-Received: from localhost.localdomain (unknown [10.28.36.166])
-	by maili.marvell.com (Postfix) with ESMTP id 406193F7075;
-	Thu,  6 Jul 2023 20:53:24 -0700 (PDT)
-From: Suman Ghosh <sumang@marvell.com>
-To: <sgoutham@marvell.com>, <gakula@marvell.com>, <sbhatta@marvell.com>,
-        <hkelam@marvell.com>, <davem@davemloft.net>, <edumazet@google.com>,
-        <kuba@kernel.org>, <pabeni@redhat.com>, <netdev@vger.kernel.org>,
-        <linux-kernel@vger.kernel.org>
-CC: Suman Ghosh <sumang@marvell.com>
-Subject: [net PATCH V4] octeontx2-pf: Add additional check for MCAM rules
-Date: Fri, 7 Jul 2023 09:23:21 +0530
-Message-ID: <20230707035321.2227742-1-sumang@marvell.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43BFA1876;
+	Fri,  7 Jul 2023 04:05:26 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1C0DB1FD7;
+	Thu,  6 Jul 2023 21:05:25 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qy0DJ5ssxz4f3pGC;
+	Fri,  7 Jul 2023 12:05:20 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP1 (Coremail) with SMTP id cCh0CgB3CDP+jqdkAuKtMg--.32213S2;
+	Fri, 07 Jul 2023 12:05:21 +0800 (CST)
+Subject: Re: [PATCH v4 bpf-next 12/14] bpf: Introduce bpf_mem_free_rcu()
+ similar to kfree_rcu().
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org,
+ Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ Kernel Team <kernel-team@fb.com>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>
+References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
+ <20230706033447.54696-13-alexei.starovoitov@gmail.com>
+ <2c09b7d7-b91c-c561-3fd6-b8483aab01dc@huaweicloud.com>
+ <CAADnVQKea47Q1WPtmVrHEZijb=Ms8QzufVj8eds5HmNXGxSRug@mail.gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <205ac9e9-ef8c-2b39-8d76-a937d6fc72d5@huaweicloud.com>
+Date: Fri, 7 Jul 2023 12:05:18 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAADnVQKea47Q1WPtmVrHEZijb=Ms8QzufVj8eds5HmNXGxSRug@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Proofpoint-GUID: myUSop_FmLnLVxA8c_tsIDxrzwAaKoh4
-X-Proofpoint-ORIG-GUID: myUSop_FmLnLVxA8c_tsIDxrzwAaKoh4
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-07_01,2023-07-06_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+Content-Language: en-US
+X-CM-TRANSID:cCh0CgB3CDP+jqdkAuKtMg--.32213S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7tryUXr45Cr18uFyfCFykKrg_yoW8Ar1fpF
+	WxtFyUua1kAr4ft3sFqw4xCFyvvrs2grnxWa90qrW7trsIvr90gF1Ikry5uF93Kwn29342
+	qr4DXr9ayw1kZa7anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvab4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrJr0_WFyUJwCI42IY6I8E87Iv
+	67AKxVWUJVW8JwCI42IY6I8E87Iv6xkF7I0E14v26r4j6r4UJbIYCTnIWIevJa73UjIFyT
+	uYvjxUrR6zUUUUU
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Due to hardware limitation, MCAM drop rule with
-ether_type == 802.1Q and vlan_id == 0 is not supported. Hence rejecting
-such rules.
+Hi,
 
-Fixes: dce677da57c0 ("octeontx2-pf: Add vlan-etype to ntuple filters")
-Signed-off-by: Suman Ghosh <sumang@marvell.com>
----
-Changes since v3:
-- moved assignment of vlan_etype before the if check
-  
- .../net/ethernet/marvell/octeontx2/nic/otx2_flows.c |  8 ++++++++
- .../net/ethernet/marvell/octeontx2/nic/otx2_tc.c    | 13 +++++++++++++
- 2 files changed, 21 insertions(+)
+On 7/7/2023 10:10 AM, Alexei Starovoitov wrote:
+> On Thu, Jul 6, 2023 at 6:45 PM Hou Tao <houtao@huaweicloud.com> wrote:
+>>
+>>
+>> On 7/6/2023 11:34 AM, Alexei Starovoitov wrote:
+>>> From: Alexei Starovoitov <ast@kernel.org>
+>>>
+>>> Introduce bpf_mem_[cache_]free_rcu() similar to kfree_rcu().
+>>> Unlike bpf_mem_[cache_]free() that links objects for immediate reuse into
+>>> per-cpu free list the _rcu() flavor waits for RCU grace period and then moves
+>>> objects into free_by_rcu_ttrace list where they are waiting for RCU
+>>> task trace grace period to be freed into slab.
+>>>
+>>> The life cycle of objects:
+>>> alloc: dequeue free_llist
+>>> free: enqeueu free_llist
+>>> free_rcu: enqueue free_by_rcu -> waiting_for_gp
+>>> free_llist above high watermark -> free_by_rcu_ttrace
+>>> after RCU GP waiting_for_gp -> free_by_rcu_ttrace
+>>> free_by_rcu_ttrace -> waiting_for_gp_ttrace -> slab
+>>>
+>>> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+>> Acked-by: Hou Tao <houtao1@huawei.com>
+> Thank you very much for code reviews and feedback.
 
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-index 10e11262d48a..2d7713a1a153 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_flows.c
-@@ -872,6 +872,14 @@ static int otx2_prepare_flow_request(struct ethtool_rx_flow_spec *fsp,
- 				return -EINVAL;
- 
- 			vlan_etype = be16_to_cpu(fsp->h_ext.vlan_etype);
-+
-+			/* Drop rule with vlan_etype == 802.1Q
-+			 * and vlan_id == 0 is not supported
-+			 */
-+			if (vlan_etype == ETH_P_8021Q && !fsp->m_ext.vlan_tci &&
-+			    fsp->ring_cookie == RX_CLS_FLOW_DISC)
-+				return -EINVAL;
-+
- 			/* Only ETH_P_8021Q and ETH_P_802AD types supported */
- 			if (vlan_etype != ETH_P_8021Q &&
- 			    vlan_etype != ETH_P_8021AD)
-diff --git a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-index 044cc211424e..6c0fdc2bad73 100644
---- a/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-+++ b/drivers/net/ethernet/marvell/octeontx2/nic/otx2_tc.c
-@@ -604,6 +604,19 @@ static int otx2_tc_prepare_flow(struct otx2_nic *nic, struct otx2_tc_flow *node,
- 			return -EOPNOTSUPP;
- 		}
- 
-+		if (!match.mask->vlan_id) {
-+			struct flow_action_entry *act;
-+			int i;
-+
-+			flow_action_for_each(i, act, &rule->action) {
-+				if (act->id == FLOW_ACTION_DROP) {
-+					netdev_err(nic->netdev, "vlan tpid 0x%x with vlan_id %d is not supported for DROP rule.\n",
-+						   ntohs(match.key->vlan_tpid), match.key->vlan_id);
-+					return -EOPNOTSUPP;
-+				}
-+			}
-+		}
-+
- 		if (match.mask->vlan_id ||
- 		    match.mask->vlan_dei ||
- 		    match.mask->vlan_priority) {
--- 
-2.25.1
+You are welcome. I also learn a lot from this great patch set.
+
+>
+> btw I still believe that ABA is a non issue and prefer to keep the code as-is,
+> but for the sake of experiment I've converted it to spin_lock
+> (see attached patch which I think uglifies the code)
+> and performance across bench htab-mem and map_perf_test
+> seems to be about the same.
+> Which was a bit surprising to me.
+> Could you please benchmark it on your system?
+
+Will do that later. It seems if there is no cross-CPU allocation and
+free, the only possible contention is between __free_rcu() on CPU x and
+alloc_bulk()/free_bulk() on a different CPU.
 
 
