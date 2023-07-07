@@ -1,220 +1,296 @@
-Return-Path: <netdev+bounces-15977-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15978-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4013E74AC25
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:45:22 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D34C74AC50
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:53:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id EF69E2816AB
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:45:20 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 9977F1C20F5D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:53:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 16EE56FCC;
-	Fri,  7 Jul 2023 07:45:19 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4D9047469;
+	Fri,  7 Jul 2023 07:53:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 012216FA3
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:45:18 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9C50211D
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 00:45:05 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688715904;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=OvFopdVMX2fOx14kZcV5OzI3C0A2yd85C4HgqlgQUC4=;
-	b=PwlSMmV/6cEnO+qum2ZczZC7arlqPrsghQv6seHEx/sAPxFjqmS6Gaz8IfL0P7YYqU9lBd
-	P2It128J/xsgpMdZ14z0KF2TJbSXLAfJ5tzb/oHxcuu2YkxFvZrIx8i3Sj0za1omJBNHDf
-	eXGckMdD0P3+qxtoG+j4FrzsA/VKq3g=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-348-bv8BRfrOMqiJMzlPApeqlg-1; Fri, 07 Jul 2023 03:44:58 -0400
-X-MC-Unique: bv8BRfrOMqiJMzlPApeqlg-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b707829eb9so15833151fa.3
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 00:44:58 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688715897; x=1691307897;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=OvFopdVMX2fOx14kZcV5OzI3C0A2yd85C4HgqlgQUC4=;
-        b=FrGHDyuI2PIiRXjVrLIiTSiy9FQVvN3vkaJNctT7HFJfQ61Thf18ni8Vvh7yYUC+kA
-         MaN+sKFZpSWYXHWCfvV0lk8E/20v7Qj5/ed+M1gzTjZWPTycDZg213TvAO5JaQ6VeD9S
-         Jk7oiRQmOaAJxwOkJZJryJdDPuJPRCFtAeufeLUcrYQsA3V2QWVuB4KhLrf06sXLhen0
-         3tRL22YVWo0VF33MHnOPECCcRWEY+EM1L+mvOvrfsv50ZsJUajX/0m8a1kdrC/oNmp4r
-         POYrpdXHlphcWnBCrorKUog8nzKI7t0JhnM0RTJJuU4vOle7pKIQ9dP1/DH7F75CMP/l
-         lDHA==
-X-Gm-Message-State: ABy/qLZTLJTQIPVm+xv9PlWiRUhWWjm7TqEO3hJaZhbU/atmmPvNrMZu
-	BxfqX7WsJn+pOCSizr8Gao01pmSRxCstBa7VuTmd5JqIlaANq3LJUaHOidtGz9FU2zLnh8wj9Yv
-	P2QoizW3VxQAXb5UaOqBT2vFyklE4Pt3X
-X-Received: by 2002:a2e:83d5:0:b0:2b6:9f1e:12c1 with SMTP id s21-20020a2e83d5000000b002b69f1e12c1mr4035889ljh.3.1688715897296;
-        Fri, 07 Jul 2023 00:44:57 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHU/nRDUHuYhFgse/jwYSAFRpY3tbiByilN09qGXhk1ws184RfXzxkxYMNviVf6GL/qykSZdeC91pKlPYfdWtk=
-X-Received: by 2002:a2e:83d5:0:b0:2b6:9f1e:12c1 with SMTP id
- s21-20020a2e83d5000000b002b69f1e12c1mr4035877ljh.3.1688715896991; Fri, 07 Jul
- 2023 00:44:56 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 393FA15CE
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:53:55 +0000 (UTC)
+Received: from szxga03-in.huawei.com (szxga03-in.huawei.com [45.249.212.189])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id B5EB7A2;
+	Fri,  7 Jul 2023 00:53:52 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.55])
+	by szxga03-in.huawei.com (SkyGuard) with ESMTP id 4Qy5FL3brXzPjw8;
+	Fri,  7 Jul 2023 15:51:34 +0800 (CST)
+Received: from localhost.localdomain (10.175.104.82) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 7 Jul 2023 15:53:48 +0800
+From: Ziyang Xuan <william.xuanziyang@huawei.com>
+To: <socketcan@hartkopp.net>, <mkl@pengutronix.de>, <davem@davemloft.net>,
+	<edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+	<linux-can@vger.kernel.org>, <netdev@vger.kernel.org>,
+	<penguin-kernel@I-love.SAKURA.ne.jp>
+Subject: [PATCH net v2] can: raw: fix receiver memory leak
+Date: Fri, 7 Jul 2023 15:53:42 +0800
+Message-ID: <20230707075342.2463015-1-william.xuanziyang@huawei.com>
+X-Mailer: git-send-email 2.25.1
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230630003609.28527-1-shannon.nelson@amd.com> <20230630003609.28527-3-shannon.nelson@amd.com>
-In-Reply-To: <20230630003609.28527-3-shannon.nelson@amd.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 7 Jul 2023 15:44:46 +0800
-Message-ID: <CACGkMEvszXdPy9esfXLNsgjE8OQMX8UQ9HNQ2JVT87xwuOH+LQ@mail.gmail.com>
-Subject: Re: [PATCH virtio 2/4] pds_vdpa: always allow offering VIRTIO_NET_F_MAC
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: mst@redhat.com, virtualization@lists.linux-foundation.org, 
-	brett.creeley@amd.com, netdev@vger.kernel.org, drivers@pensando.io
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+Content-Type: text/plain
+X-Originating-IP: [10.175.104.82]
+X-ClientProxiedBy: dggems706-chm.china.huawei.com (10.3.19.183) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 8:36=E2=80=AFAM Shannon Nelson <shannon.nelson@amd.=
-com> wrote:
->
-> Our driver sets a mac if the HW is 00:..:00 so we need to be sure to
-> advertise VIRTIO_NET_F_MAC even if the HW doesn't.  We also need to be
-> sure that virtio_net sees the VIRTIO_NET_F_MAC and doesn't rewrite the
-> mac address that a user may have set with the vdpa utility.
->
-> After reading the hw_feature bits, add the VIRTIO_NET_F_MAC to the driver=
-'s
-> supported_features and use that for reporting what is available.  If the
-> HW is not advertising it, be sure to strip the VIRTIO_NET_F_MAC before
-> finishing the feature negotiation.  If the user specifies a device_featur=
-es
-> bitpattern in the vdpa utility without the VIRTIO_NET_F_MAC set, then
-> don't set the mac.
->
-> Fixes: 151cc834f3dd ("pds_vdpa: add support for vdpa and vdpamgmt interfa=
-ces")
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-> ---
->  drivers/vdpa/pds/vdpa_dev.c | 25 +++++++++++++++++++------
->  1 file changed, 19 insertions(+), 6 deletions(-)
->
-> diff --git a/drivers/vdpa/pds/vdpa_dev.c b/drivers/vdpa/pds/vdpa_dev.c
-> index e2e99bb0be2b..5e761d625ef3 100644
-> --- a/drivers/vdpa/pds/vdpa_dev.c
-> +++ b/drivers/vdpa/pds/vdpa_dev.c
-> @@ -316,6 +316,7 @@ static int pds_vdpa_set_driver_features(struct vdpa_d=
-evice *vdpa_dev, u64 featur
->  {
->         struct pds_vdpa_device *pdsv =3D vdpa_to_pdsv(vdpa_dev);
->         struct device *dev =3D &pdsv->vdpa_dev.dev;
-> +       u64 requested_features;
->         u64 driver_features;
->         u64 nego_features;
->         u64 missing;
-> @@ -325,18 +326,24 @@ static int pds_vdpa_set_driver_features(struct vdpa=
-_device *vdpa_dev, u64 featur
->                 return -EOPNOTSUPP;
->         }
->
-> +       /* save original request for debugfs */
->         pdsv->req_features =3D features;
-> +       requested_features =3D features;
-> +
-> +       /* if we're faking the F_MAC, strip it from features to be negoti=
-ated */
-> +       driver_features =3D pds_vdpa_get_driver_features(vdpa_dev);
-> +       if (!(driver_features & BIT_ULL(VIRTIO_NET_F_MAC)))
-> +               requested_features &=3D ~BIT_ULL(VIRTIO_NET_F_MAC);
+Got kmemleak errors with the following ltp can_filter testcase:
 
-I'm not sure I understand here, assuming we are doing feature
-negotiation here. In this case driver_features we read should be zero?
-Or did you actually mean device_features here?
+for ((i=1; i<=100; i++))
+do
+        ./can_filter &
+        sleep 0.1
+done
 
-Thanks
+==============================================================
+[<00000000db4a4943>] can_rx_register+0x147/0x360 [can]
+[<00000000a289549d>] raw_setsockopt+0x5ef/0x853 [can_raw]
+[<000000006d3d9ebd>] __sys_setsockopt+0x173/0x2c0
+[<00000000407dbfec>] __x64_sys_setsockopt+0x61/0x70
+[<00000000fd468496>] do_syscall_64+0x33/0x40
+[<00000000b7e47d51>] entry_SYSCALL_64_after_hwframe+0x61/0xc6
 
->
->         /* Check for valid feature bits */
-> -       nego_features =3D features & le64_to_cpu(pdsv->vdpa_aux->ident.hw=
-_features);
-> -       missing =3D pdsv->req_features & ~nego_features;
-> +       nego_features =3D requested_features & le64_to_cpu(pdsv->vdpa_aux=
-->ident.hw_features);
-> +       missing =3D requested_features & ~nego_features;
->         if (missing) {
->                 dev_err(dev, "Can't support all requested features in %#l=
-lx, missing %#llx features\n",
->                         pdsv->req_features, missing);
->                 return -EOPNOTSUPP;
->         }
->
-> -       driver_features =3D pds_vdpa_get_driver_features(vdpa_dev);
->         dev_dbg(dev, "%s: %#llx =3D> %#llx\n",
->                 __func__, driver_features, nego_features);
->
-> @@ -564,7 +571,7 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mde=
-v, const char *name,
->
->         if (add_config->mask & BIT_ULL(VDPA_ATTR_DEV_FEATURES)) {
->                 u64 unsupp_features =3D
-> -                       add_config->device_features & ~mgmt->supported_fe=
-atures;
-> +                       add_config->device_features & ~pdsv->supported_fe=
-atures;
->
->                 if (unsupp_features) {
->                         dev_err(dev, "Unsupported features: %#llx\n", uns=
-upp_features);
-> @@ -615,7 +622,8 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mde=
-v, const char *name,
->         }
->
->         /* Set a mac, either from the user config if provided
-> -        * or set a random mac if default is 00:..:00
-> +        * or use the device's mac if not 00:..:00
-> +        * or set a random mac
->          */
->         if (add_config->mask & BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
->                 ether_addr_copy(pdsv->mac, add_config->net.mac);
-> @@ -624,7 +632,8 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mde=
-v, const char *name,
->
->                 vc =3D pdsv->vdpa_aux->vd_mdev.device;
->                 memcpy_fromio(pdsv->mac, vc->mac, sizeof(pdsv->mac));
-> -               if (is_zero_ether_addr(pdsv->mac)) {
-> +               if (is_zero_ether_addr(pdsv->mac) &&
-> +                   (pdsv->supported_features & BIT_ULL(VIRTIO_NET_F_MAC)=
-)) {
->                         eth_random_addr(pdsv->mac);
->                         dev_info(dev, "setting random mac %pM\n", pdsv->m=
-ac);
->                 }
-> @@ -752,6 +761,10 @@ int pds_vdpa_get_mgmt_info(struct pds_vdpa_aux *vdpa=
-_aux)
->         mgmt->id_table =3D pds_vdpa_id_table;
->         mgmt->device =3D dev;
->         mgmt->supported_features =3D le64_to_cpu(vdpa_aux->ident.hw_featu=
-res);
-> +
-> +       /* advertise F_MAC even if the device doesn't */
-> +       mgmt->supported_features |=3D BIT_ULL(VIRTIO_NET_F_MAC);
-> +
->         mgmt->config_attr_mask =3D BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR)=
-;
->         mgmt->config_attr_mask |=3D BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MAX_VQP=
-);
->         mgmt->config_attr_mask |=3D BIT_ULL(VDPA_ATTR_DEV_FEATURES);
-> --
-> 2.17.1
->
+It's a bug in the concurrent scenario of unregister_netdevice_many()
+and raw_release() as following:
+
+             cpu0                                        cpu1
+unregister_netdevice_many(can_dev)
+  unlist_netdevice(can_dev) // dev_get_by_index() return NULL after this
+  net_set_todo(can_dev)
+						raw_release(can_socket)
+						  dev = dev_get_by_index(, ro->ifindex); // dev == NULL
+						  if (dev) { // receivers in dev_rcv_lists not free because dev is NULL
+						    raw_disable_allfilters(, dev, );
+						    dev_put(dev);
+						  }
+						...
+						ro->bound = 0;
+						...
+
+call_netdevice_notifiers(NETDEV_UNREGISTER, )
+  raw_notify(, NETDEV_UNREGISTER, )
+    if (ro->bound) // invalid because ro->bound has been set 0
+      raw_disable_allfilters(, dev, ); // receivers in dev_rcv_lists will never be freed
+
+Add a net_device pointer member in struct raw_sock to record bound can_dev,
+and use rtnl_lock to serialize raw_socket members between raw_bind(), raw_release(),
+raw_setsockopt() and raw_notify(). Use ro->dev to decide whether to free receivers in
+dev_rcv_lists.
+
+Fixes: 8d0caedb7596 ("can: bcm/raw/isotp: use per module netdevice notifier")
+Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+---
+v2:
+  - Fix the case for a bound socket for "all" CAN interfaces (ifindex == 0) in raw_bind().
+---
+ net/can/raw.c | 61 ++++++++++++++++++++++-----------------------------
+ 1 file changed, 26 insertions(+), 35 deletions(-)
+
+diff --git a/net/can/raw.c b/net/can/raw.c
+index 15c79b079184..7078821f35e0 100644
+--- a/net/can/raw.c
++++ b/net/can/raw.c
+@@ -84,6 +84,7 @@ struct raw_sock {
+ 	struct sock sk;
+ 	int bound;
+ 	int ifindex;
++	struct net_device *dev;
+ 	struct list_head notifier;
+ 	int loopback;
+ 	int recv_own_msgs;
+@@ -277,7 +278,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
+ 	if (!net_eq(dev_net(dev), sock_net(sk)))
+ 		return;
+ 
+-	if (ro->ifindex != dev->ifindex)
++	if (ro->dev != dev)
+ 		return;
+ 
+ 	switch (msg) {
+@@ -292,6 +293,7 @@ static void raw_notify(struct raw_sock *ro, unsigned long msg,
+ 
+ 		ro->ifindex = 0;
+ 		ro->bound = 0;
++		ro->dev = NULL;
+ 		ro->count = 0;
+ 		release_sock(sk);
+ 
+@@ -337,6 +339,7 @@ static int raw_init(struct sock *sk)
+ 
+ 	ro->bound            = 0;
+ 	ro->ifindex          = 0;
++	ro->dev              = NULL;
+ 
+ 	/* set default filter to single entry dfilter */
+ 	ro->dfilter.can_id   = 0;
+@@ -385,19 +388,13 @@ static int raw_release(struct socket *sock)
+ 
+ 	lock_sock(sk);
+ 
++	rtnl_lock();
+ 	/* remove current filters & unregister */
+ 	if (ro->bound) {
+-		if (ro->ifindex) {
+-			struct net_device *dev;
+-
+-			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
+-			if (dev) {
+-				raw_disable_allfilters(dev_net(dev), dev, sk);
+-				dev_put(dev);
+-			}
+-		} else {
++		if (ro->dev)
++			raw_disable_allfilters(dev_net(ro->dev), ro->dev, sk);
++		else
+ 			raw_disable_allfilters(sock_net(sk), NULL, sk);
+-		}
+ 	}
+ 
+ 	if (ro->count > 1)
+@@ -405,8 +402,10 @@ static int raw_release(struct socket *sock)
+ 
+ 	ro->ifindex = 0;
+ 	ro->bound = 0;
++	ro->dev = NULL;
+ 	ro->count = 0;
+ 	free_percpu(ro->uniq);
++	rtnl_unlock();
+ 
+ 	sock_orphan(sk);
+ 	sock->sk = NULL;
+@@ -422,6 +421,7 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+ 	struct sockaddr_can *addr = (struct sockaddr_can *)uaddr;
+ 	struct sock *sk = sock->sk;
+ 	struct raw_sock *ro = raw_sk(sk);
++	struct net_device *dev = NULL;
+ 	int ifindex;
+ 	int err = 0;
+ 	int notify_enetdown = 0;
+@@ -431,14 +431,13 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+ 	if (addr->can_family != AF_CAN)
+ 		return -EINVAL;
+ 
++	rtnl_lock();
+ 	lock_sock(sk);
+ 
+ 	if (ro->bound && addr->can_ifindex == ro->ifindex)
+ 		goto out;
+ 
+ 	if (addr->can_ifindex) {
+-		struct net_device *dev;
+-
+ 		dev = dev_get_by_index(sock_net(sk), addr->can_ifindex);
+ 		if (!dev) {
+ 			err = -ENODEV;
+@@ -465,28 +464,23 @@ static int raw_bind(struct socket *sock, struct sockaddr *uaddr, int len)
+ 	}
+ 
+ 	if (!err) {
++		/* unregister old filters */
+ 		if (ro->bound) {
+-			/* unregister old filters */
+-			if (ro->ifindex) {
+-				struct net_device *dev;
+-
+-				dev = dev_get_by_index(sock_net(sk),
+-						       ro->ifindex);
+-				if (dev) {
+-					raw_disable_allfilters(dev_net(dev),
+-							       dev, sk);
+-					dev_put(dev);
+-				}
+-			} else {
++			if (ro->dev)
++				raw_disable_allfilters(dev_net(ro->dev),
++						       ro->dev, sk);
++			else
+ 				raw_disable_allfilters(sock_net(sk), NULL, sk);
+-			}
+ 		}
+ 		ro->ifindex = ifindex;
++
+ 		ro->bound = 1;
++		ro->dev = dev;
+ 	}
+ 
+  out:
+ 	release_sock(sk);
++	rtnl_unlock();
+ 
+ 	if (notify_enetdown) {
+ 		sk->sk_err = ENETDOWN;
+@@ -553,9 +547,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+ 		rtnl_lock();
+ 		lock_sock(sk);
+ 
+-		if (ro->bound && ro->ifindex) {
+-			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
+-			if (!dev) {
++		dev = ro->dev;
++		if (ro->bound && dev) {
++			if (dev->reg_state != NETREG_REGISTERED) {
+ 				if (count > 1)
+ 					kfree(filter);
+ 				err = -ENODEV;
+@@ -596,7 +590,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+ 		ro->count  = count;
+ 
+  out_fil:
+-		dev_put(dev);
+ 		release_sock(sk);
+ 		rtnl_unlock();
+ 
+@@ -614,9 +607,9 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+ 		rtnl_lock();
+ 		lock_sock(sk);
+ 
+-		if (ro->bound && ro->ifindex) {
+-			dev = dev_get_by_index(sock_net(sk), ro->ifindex);
+-			if (!dev) {
++		dev = ro->dev;
++		if (ro->bound && dev) {
++			if (dev->reg_state != NETREG_REGISTERED) {
+ 				err = -ENODEV;
+ 				goto out_err;
+ 			}
+@@ -627,7 +620,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+ 			/* (try to) register the new err_mask */
+ 			err = raw_enable_errfilter(sock_net(sk), dev, sk,
+ 						   err_mask);
+-
+ 			if (err)
+ 				goto out_err;
+ 
+@@ -640,7 +632,6 @@ static int raw_setsockopt(struct socket *sock, int level, int optname,
+ 		ro->err_mask = err_mask;
+ 
+  out_err:
+-		dev_put(dev);
+ 		release_sock(sk);
+ 		rtnl_unlock();
+ 
+-- 
+2.25.1
 
 
