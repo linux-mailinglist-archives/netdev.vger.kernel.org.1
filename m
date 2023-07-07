@@ -1,183 +1,92 @@
-Return-Path: <netdev+bounces-16066-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16067-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 0954074B43C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 17:27:40 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D5D7174B446
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 17:28:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 39CA31C20FEA
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:27:39 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 412142813EE
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:28:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D8A3AD539;
-	Fri,  7 Jul 2023 15:27:32 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 72BA3D53A;
+	Fri,  7 Jul 2023 15:28:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CA6C1BE60
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:27:32 +0000 (UTC)
-Received: from mail-il1-f169.google.com (mail-il1-f169.google.com [209.85.166.169])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94BA62695;
-	Fri,  7 Jul 2023 08:27:30 -0700 (PDT)
-Received: by mail-il1-f169.google.com with SMTP id e9e14a558f8ab-3464c774f23so1059095ab.1;
-        Fri, 07 Jul 2023 08:27:30 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688743649; x=1691335649;
-        h=in-reply-to:content-disposition:mime-version:references:message-id
-         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=iSMX3fbwS3ZdQ14KbIA9PVvNgGYdtwwGwe8Mi8kgYeU=;
-        b=EYdHMusEeHXVsH+mdtqPRDbZm3oh153aO23Ej6SfCO0Qz+ww8sbLAOX5CBPwylFWrR
-         RT22WT+jxy+xBM5avAhrSFmgGThZ717vhOT55JHPKwbMb3MQdfBPHoc6tlOAuobnwGP8
-         azql/ZOSIR9Fj/3wMufgQJWpVU8K6LMLutcj4t2VxN9pEKQhmhCe5BpYofmGeC8w7S7F
-         GYMlpL9OYV1xAkLoo/O5s6XuHjB/I1SK10S+jU1Q4CvyrMzPPfe8AqvHvI/ivyo4tf61
-         rRm3oI3SwuUD9DYBAXXwP5Dv/4GpcHygWPfR3+3ok3u6hskNHOTqPpv2Tt/oHGYDOrbH
-         O+6g==
-X-Gm-Message-State: ABy/qLYyUursuKJvkS/IrwuVaXOjsI1dBsI3MSWKLF10sCV2aev6bkw4
-	xIrOdysTCe67y++X8b8IGQ==
-X-Google-Smtp-Source: APBJJlGQb/+NSo1YY2XQiOfry0niDhsIK8kPOwBt3oTrgIhTVOV41ugAIwkpb1OfmPqwJ646BYkBgA==
-X-Received: by 2002:a92:c70f:0:b0:345:c11e:d1ad with SMTP id a15-20020a92c70f000000b00345c11ed1admr5255201ilp.26.1688743649601;
-        Fri, 07 Jul 2023 08:27:29 -0700 (PDT)
-Received: from robh_at_kernel.org ([64.188.179.250])
-        by smtp.gmail.com with ESMTPSA id ee17-20020a056638293100b0042b37080b23sm1279795jab.73.2023.07.07.08.27.25
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Fri, 07 Jul 2023 08:27:28 -0700 (PDT)
-Received: (nullmailer pid 334293 invoked by uid 1000);
-	Fri, 07 Jul 2023 15:27:24 -0000
-Date: Fri, 7 Jul 2023 09:27:24 -0600
-From: Rob Herring <robh@kernel.org>
-To: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
-Cc: Gatien Chevallier <gatien.chevallier@foss.st.com>, 
-	"gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>, 
-	"herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>, "davem@davemloft.net" <davem@davemloft.net>, 
-	"krzysztof.kozlowski+dt@linaro.org" <krzysztof.kozlowski+dt@linaro.org>, 
-	"conor+dt@kernel.org" <conor+dt@kernel.org>, 
-	"alexandre.torgue@foss.st.com" <alexandre.torgue@foss.st.com>, "vkoul@kernel.org" <vkoul@kernel.org>, 
-	"jic23@kernel.org" <jic23@kernel.org>, 
-	"olivier.moysan@foss.st.com" <olivier.moysan@foss.st.com>, 
-	"arnaud.pouliquen@foss.st.com" <arnaud.pouliquen@foss.st.com>, "mchehab@kernel.org" <mchehab@kernel.org>, 
-	"fabrice.gasnier@foss.st.com" <fabrice.gasnier@foss.st.com>, 
-	"andi.shyti@kernel.org" <andi.shyti@kernel.org>, "ulf.hansson@linaro.org" <ulf.hansson@linaro.org>, 
-	"edumazet@google.com" <edumazet@google.com>, "kuba@kernel.org" <kuba@kernel.org>, 
-	"pabeni@redhat.com" <pabeni@redhat.com>, 
-	"hugues.fruchet@foss.st.com" <hugues.fruchet@foss.st.com>, "lee@kernel.org" <lee@kernel.org>, 
-	"will@kernel.org" <will@kernel.org>, "catalin.marinas@arm.com" <catalin.marinas@arm.com>, 
-	"arnd@kernel.org" <arnd@kernel.org>, "richardcochran@gmail.com" <richardcochran@gmail.com>, 
-	"linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>, 
-	"devicetree@vger.kernel.org" <devicetree@vger.kernel.org>, 
-	"linux-stm32@st-md-mailman.stormreply.com" <linux-stm32@st-md-mailman.stormreply.com>, 
-	"linux-arm-kernel@lists.infradead.org" <linux-arm-kernel@lists.infradead.org>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"dmaengine@vger.kernel.org" <dmaengine@vger.kernel.org>, 
-	"linux-i2c@vger.kernel.org" <linux-i2c@vger.kernel.org>, 
-	"linux-iio@vger.kernel.org" <linux-iio@vger.kernel.org>, 
-	"alsa-devel@alsa-project.org" <alsa-devel@alsa-project.org>, 
-	"linux-media@vger.kernel.org" <linux-media@vger.kernel.org>, 
-	"linux-mmc@vger.kernel.org" <linux-mmc@vger.kernel.org>, 
-	"netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
-	"linux-phy@lists.infradead.org" <linux-phy@lists.infradead.org>, 
-	"linux-serial@vger.kernel.org" <linux-serial@vger.kernel.org>, 
-	"linux-spi@vger.kernel.org" <linux-spi@vger.kernel.org>, 
-	"linux-usb@vger.kernel.org" <linux-usb@vger.kernel.org>
-Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
- description in binding files
-Message-ID: <20230707152724.GA329615-robh@kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
- <875y6vzuga.fsf@epam.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 67E65D2F1
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:28:28 +0000 (UTC)
+Received: from relay2-d.mail.gandi.net (relay2-d.mail.gandi.net [IPv6:2001:4b98:dc4:8::222])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EE90F26A8
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 08:28:18 -0700 (PDT)
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 4D5E74000A;
+	Fri,  7 Jul 2023 15:28:15 +0000 (UTC)
+Message-ID: <eb01326d-5b30-2d58-f814-45cd436c581a@ovn.org>
+Date: Fri, 7 Jul 2023 17:29:02 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <875y6vzuga.fsf@epam.com>
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,
-	FREEMAIL_ENVFROM_END_DIGIT,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
-	autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: i.maximets@ovn.org, Eric Garver <eric@garver.life>,
+ Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org,
+ dev@openvswitch.org, Paolo Abeni <pabeni@redhat.com>,
+ Eric Dumazet <edumazet@google.com>, "David S. Miller" <davem@davemloft.net>,
+ Adrian Moreno <amorenoz@redhat.com>, Eelco Chaudron <echaudro@redhat.com>
+Content-Language: en-US
+To: Jakub Kicinski <kuba@kernel.org>
+References: <20230629203005.2137107-1-eric@garver.life>
+ <20230629203005.2137107-3-eric@garver.life> <f7tr0plgpzb.fsf@redhat.com>
+ <ZKbITj-FWGqRkwtr@egarver-thinkpadt14sgen1.remote.csb>
+ <6060b37e-579a-76cb-b853-023cb1a25861@ovn.org>
+ <20230707080025.7739e499@kernel.org>
+From: Ilya Maximets <i.maximets@ovn.org>
+Subject: Re: [ovs-dev] [PATCH net-next 2/2] net: openvswitch: add drop action
+In-Reply-To: <20230707080025.7739e499@kernel.org>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_NEUTRAL,T_SCC_BODY_TEXT_LINE
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 07, 2023 at 02:07:18PM +0000, Oleksii Moisieiev wrote:
+On 7/7/23 17:00, Jakub Kicinski wrote:
+> On Fri, 7 Jul 2023 12:30:38 +0200 Ilya Maximets wrote:
+>> A wild idea:  How about we do not define actual reasons?  i.e. define a
+>> subsystem and just call kfree_skb_reason(skb, SUBSYSTEM | value), where
+>> 'value' is whatever userspace gives as long as it is within a subsystem
+>> range?
 > 
-> Gatien Chevallier <gatien.chevallier@foss.st.com> writes:
-> 
-> > feature-domains is an optional property that allows a peripheral to
-> > refer to one or more feature domain controller(s).
-> >
-> > Description of this property is added to all peripheral binding files of
-> > the peripheral under the STM32 firewall controllers. It allows an accurate
-> > representation of the hardware, where various peripherals are connected
-> > to this firewall bus. The firewall can then check the peripheral accesses
-> > before allowing it to probe.
-> >
-> > Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
-> > ---
-> >
-> > Disclaimer: Some error with dtbs_check will be observed as I've
-> > considered the property to be generic, as Rob asked
-> >
-> >  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
-> >  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
-> >  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
-> >  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
-> >  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
-> >  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
-> >  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
-> >  .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
-> >  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
-> >  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
-> >  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
-> >  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
-> >  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
-> >  Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
-> >  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
-> >  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
-> >  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
-> >  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
-> >  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
-> >  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
-> >  .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
-> >  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
-> >  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
-> >  Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
-> >  24 files changed, 97 insertions(+)
-> >
-> > diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> > index b767ec72a999..daf8dcaef627 100644
-> > --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> > +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
-> > @@ -50,6 +50,10 @@ properties:
-> >    power-domains:
-> >      maxItems: 1
-> >  
-> > +  feature-domains:
-> > +    minItems: 1
-> > +    maxItems: 3
-> > +
-> 
-> I beliewe feature-domains is generic binding. This means that maxItems
-> can be implementation dependend. I would rather drop maxItems so the
-> following format will be possible:
-> 
->           feature-domains = <&etzpc 1>, <&etzpc 2>, <&some_other_domain 1 2 3 4>
->           feature-domain-names = "firewall 1", "firewall 2", "other_domain"
+> That already exists, right? Johannes added it in the last release for WiFi.
 
-The above already allows this (not -names, but the number of entries).
-> 
-> Also I beliewe driver will handle feature-domain-names property so it
-> will parse feature-domains only related to the firewall.
+I'm not sure.  The SKB_DROP_REASON_SUBSYS_MAC80211_UNUSABLE behaves similarly
+to that on a surface.  However, looking closer, any value that can be passed
+into ieee80211_rx_handlers_result() and ends up in the kfree_skb_reason() is
+kind of defined in net/mac80211/drop.h, unless I'm missing something (very
+possible, because I don't really know wifi code).
 
-Now I'm curious. What's an example that's not a firewall?
+The difference, I guess, is that for openvswitch values will be provided by
+the userpsace application via netlink interface.  It'll be just a number not
+defined anywhere in the kernel.  Only the subsystem itself will be defined
+in order to occupy the range.  Garbage in, same garbage out, from the kernel's
+perspective.
 
-(Note I'm still not happy with the naming of 'feature' as anything is a 
-feature, but that's the least of the issues really.)
-
-Rob
+Best regards, Ilya Maximets.
 
