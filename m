@@ -1,479 +1,662 @@
-Return-Path: <netdev+bounces-16050-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16051-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C6CA274B2AD
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:06:56 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3949A74B2C1
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:09:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FF81C20DAB
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:06:55 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0D9941C20FAF
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:09:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76AA5D2F7;
-	Fri,  7 Jul 2023 14:06:53 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9DE64D2FA;
+	Fri,  7 Jul 2023 14:09:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4EAC8E6
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:06:53 +0000 (UTC)
-Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5312D5E;
-	Fri,  7 Jul 2023 07:06:23 -0700 (PDT)
-Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
-	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367Cx1hU023983;
-	Fri, 7 Jul 2023 14:05:08 GMT
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
- : subject : message-id : references : content-type : in-reply-to :
- mime-version; s=corp-2023-03-30;
- bh=zOuXbhuGOp5uXOOxQd3RK1JehGaS+kIeLNtyckcS3Uk=;
- b=zqGpaOp475pZt42e7pHEa6mihH6E3FoglTXggk44i+FpcbQjeWH5mCY80v9UtVYj4LsU
- 03U1kBSW0+Ld9Ioj2WzGEwSB/+AIW2oyvtr542p949O4UFzvUuEF6LhDewDL1h93VTw8
- 2AT0SVlCbVVhUeloDqBuEwV9A2SuU6cBWoPqYpnkE91XaMmjkMnDR2SlNKtbA0uatYs7
- EtLAtIiIet6Dyqq1CVzEG8KxTJd8W1Z1hNk40GhLpc2a/x9qq/9j1w6iTb4KpbdZ7iuU
- sbCYKfh+mBSizKqU3EqhJRHwVTk6GEVCyDVgPMcGB2QG1KG21ArGQkoEXK/MDMVQ3Y4H 4Q== 
-Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
-	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rpfhprggy-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Jul 2023 14:05:08 +0000
-Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 367DZcSU013508;
-	Fri, 7 Jul 2023 14:05:06 GMT
-Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
-	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3rjak8gt10-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
-	Fri, 07 Jul 2023 14:05:06 +0000
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 83A09D2F7
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:09:10 +0000 (UTC)
+Received: from mx0b-0039f301.pphosted.com (mx0b-0039f301.pphosted.com [148.163.137.242])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0BFB31B6;
+	Fri,  7 Jul 2023 07:08:45 -0700 (PDT)
+Received: from pps.filterd (m0174683.ppops.net [127.0.0.1])
+	by mx0b-0039f301.pphosted.com (8.17.1.5/8.17.1.5) with ESMTP id 367DXiLN016062;
+	Fri, 7 Jul 2023 14:07:23 GMT
+Received: from eur05-vi1-obe.outbound.protection.outlook.com (mail-vi1eur05lp2177.outbound.protection.outlook.com [104.47.17.177])
+	by mx0b-0039f301.pphosted.com (PPS) with ESMTPS id 3rp6btajr3-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 14:07:22 +0000
 ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=PNYyiL/dX00dDp/n9DmBHnT5hEsRg7NlrqpD8Uf5yrlc1RXdpTbUqSKOtNEhRBvMS/cslzbOVsEQfp11ZGSpZJun0Epvdt5l79w+N5qKphMOVq2LK0s+kKxzkJWv73EObfzjF7kpnoU/PBiBrL4zoukm/fRfqNNi8ArQK0vyEwAB2Oxdto6/9lszV0eldW2Pkf64Sl+Vuc5iKhJ9PqEChVCjhV0wdM51qwu/XIkudXojHkj1o0GHzo9la6x/Xm/QNWZNB7IArU45Cp7YWXRSlZNTBj08HnL1O9oZ3o9P1PJESnErt72s8lrmrEfHWX0wegbQ0dTD/GHqoxrSBdiXfQ==
+ b=bYkCzo8ox33LvNF4Fes34m82K+kDO5Z94XKB0NLYMsMMvRhZkIdj4KN8KIMimI/DY0BDM67eup8aY0GYVBbBmQcbpziW+b1PLL2dzUoEzgohNzb0Yq5kPdMEeh7F73XSNAMol9worHpAoXGVih1x8sKYJWqt7MRNZu6GnKQFf/obANfJi5nWlZkUT7011zeRIL8t7rv8GmDguAs1zOyrkEXeIIiiJIHzQ3esbLG6ybNa7U3lD64Mki2+Pdb8+OgossY+bVf9aXToQg8hV8usFoPAei8MSAhtty90bWWDnPe9VtrSEmLxsWlbqiepW+sgMs2riabXvz7xPUT4DVXBVA==
 ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
  s=arcselector9901;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=zOuXbhuGOp5uXOOxQd3RK1JehGaS+kIeLNtyckcS3Uk=;
- b=m9fgmMNGkcwT1AkChNFdCRpcGzeLLmIsSEgBVwyUCO80RT6w4mLNy2H9qCT0POfeWaiGzXXfNlF6d+gAzOQQuddeAjRnGT9USVR1WGAsP0ekHi5wuhaKymFX2hSQN91v1frNK1vAx1pmIo2EoFAaJqxWfWXh4qeEW0dVE+tbtcHp946MdgGr7PeP2rdZI0agnqklKYO5VD7DE5gXw5QRDgShsPEpmwhctI/fk8gOogoigRpK82ixD8hMXtLwL/+ehXsidpMpfGC2KmnUAVZyiPRR6kyXfCUuphwoHIOjRZP0WDcXZmVt1v2HDWIzuKXIr8ynLb+35rS1quh8fHwMQA==
+ bh=p7RAFKyB6UWMECxf9DHX7j/mCri3Vyxj1E0OTRJlBVo=;
+ b=MiW+LtaVgLOYtb9u1IU2npxhzn+cSpBSlb9gOVm1RqJdJEa8ROyR2kc5M84Yr5F7jsx9f7WLo/pxEbnKciusizy7zg0FVFo092e5LC2WLfHHxEhAuK2DBhcso1/Qnv0zw4PngCKycTV8uOmy6AXqdcZzhS4zn6u7qtw3Zb+2W0hWyvPwtCYGHp02vwCk5KdIQUKli216x4LmSEZj2LZCTx+l2uPrCG17bHWIEs5k9JyVHOui6hdNZfRFosbkgTJ4FiEkm++TWA4OOjfTtcldOXciwjoLBGiYnn7drH+rwGOdNXHq58j0FXqRc7Ymb7Pnocyj/59Plm06Ab/uIVzmZg==
 ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
- dkim=pass header.d=oracle.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ smtp.mailfrom=epam.com; dmarc=pass action=none header.from=epam.com;
+ dkim=pass header.d=epam.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=epam.com; s=selector2;
  h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=zOuXbhuGOp5uXOOxQd3RK1JehGaS+kIeLNtyckcS3Uk=;
- b=z4DRrAu1MYlBkVa63JFB69mH440/VOPosoQEI6gCRD8qqga3fvQp5eMuk5uUHkQKK/UoWg0aAO4OEDTZXEVg1msD3Nw93meUrFupwnejYcVOUO0UIIGFMG2ub8wWrHptoWQ7F49TmuP20iXH7fXtTDkOHzbzbDaOhi2J0hNcZ3c=
-Received: from SN6PR10MB3022.namprd10.prod.outlook.com (2603:10b6:805:d8::25)
- by BLAPR10MB4836.namprd10.prod.outlook.com (2603:10b6:208:326::17) with
+ bh=p7RAFKyB6UWMECxf9DHX7j/mCri3Vyxj1E0OTRJlBVo=;
+ b=mNTTJmUx41MdfUEpn8YavzAUQGMG4XyteTjZHQxiQl4joBqnkfKYXrUOKiM0IqZgWtQ3+ZoqO8DmM35reFAUdel6S6Zj7jcOJZrWFM/L4axVA/BOws/GsJnDSeLujf52p1L0NPijbcr7wDuCuB1u0RxiDy0AYUPSgjVfKYEcUSQ/Or40mcuVLdXZu/ZfZHrwBPK2CTsdYNlE3alnbeHDKGngSGVlyEJxnI5d9vATGbpfeDJMoY1fLvhkcRNao+Keq0NUI8OUDTecWXfxj3B6t93xe6E+7WQaYyDzwfO+fz8xJvZ+kSgsh4qPzTynrd6LnRXrMh92epvN87r61AKODQ==
+Received: from PA4PR03MB7136.eurprd03.prod.outlook.com (2603:10a6:102:ea::23)
+ by DB4PR03MB8513.eurprd03.prod.outlook.com (2603:10a6:10:37a::22) with
  Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.25; Fri, 7 Jul
- 2023 14:05:03 +0000
-Received: from SN6PR10MB3022.namprd10.prod.outlook.com
- ([fe80::998f:d221:5fb6:c67d]) by SN6PR10MB3022.namprd10.prod.outlook.com
- ([fe80::998f:d221:5fb6:c67d%7]) with mapi id 15.20.6565.019; Fri, 7 Jul 2023
- 14:05:03 +0000
-Date: Fri, 7 Jul 2023 10:04:59 -0400
-From: "Liam R. Howlett" <Liam.Howlett@Oracle.com>
-To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
-Cc: davem@davemloft.net, david@fries.net, edumazet@google.com, kuba@kernel.org,
-        pabeni@redhat.com, zbr@ioremap.net, brauner@kernel.org,
-        johannes@sipsolutions.net, ecree.xilinx@gmail.com, leon@kernel.org,
-        keescook@chromium.org, socketcan@hartkopp.net, petrm@nvidia.com,
-        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
-Subject: Re: [PATCH v7 3/6] connector/cn_proc: Add filtering to fix some bugs
-Message-ID: <20230707140459.qsyjw5i6chpbzqwj@revolver>
-References: <20230704001136.2301645-1-anjali.k.kulkarni@oracle.com>
- <20230704001136.2301645-4-anjali.k.kulkarni@oracle.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230704001136.2301645-4-anjali.k.kulkarni@oracle.com>
-User-Agent: NeoMutt/20220429
-X-ClientProxiedBy: YT4PR01CA0187.CANPRD01.PROD.OUTLOOK.COM
- (2603:10b6:b01:110::27) To SN6PR10MB3022.namprd10.prod.outlook.com
- (2603:10b6:805:d8::25)
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.17; Fri, 7 Jul
+ 2023 14:07:18 +0000
+Received: from PA4PR03MB7136.eurprd03.prod.outlook.com
+ ([fe80::528d:e0b6:ecc6:25e5]) by PA4PR03MB7136.eurprd03.prod.outlook.com
+ ([fe80::528d:e0b6:ecc6:25e5%4]) with mapi id 15.20.6565.016; Fri, 7 Jul 2023
+ 14:07:18 +0000
+From: Oleksii Moisieiev <Oleksii_Moisieiev@epam.com>
+To: Gatien Chevallier <gatien.chevallier@foss.st.com>
+CC: "gregkh@linuxfoundation.org" <gregkh@linuxfoundation.org>,
+        "herbert@gondor.apana.org.au" <herbert@gondor.apana.org.au>,
+        "davem@davemloft.net" <davem@davemloft.net>,
+        "robh+dt@kernel.org"
+	<robh+dt@kernel.org>,
+        "krzysztof.kozlowski+dt@linaro.org"
+	<krzysztof.kozlowski+dt@linaro.org>,
+        "conor+dt@kernel.org"
+	<conor+dt@kernel.org>,
+        "alexandre.torgue@foss.st.com"
+	<alexandre.torgue@foss.st.com>,
+        "vkoul@kernel.org" <vkoul@kernel.org>,
+        "jic23@kernel.org" <jic23@kernel.org>,
+        "olivier.moysan@foss.st.com"
+	<olivier.moysan@foss.st.com>,
+        "arnaud.pouliquen@foss.st.com"
+	<arnaud.pouliquen@foss.st.com>,
+        "mchehab@kernel.org" <mchehab@kernel.org>,
+        "fabrice.gasnier@foss.st.com" <fabrice.gasnier@foss.st.com>,
+        "andi.shyti@kernel.org" <andi.shyti@kernel.org>,
+        "ulf.hansson@linaro.org"
+	<ulf.hansson@linaro.org>,
+        "edumazet@google.com" <edumazet@google.com>,
+        "kuba@kernel.org" <kuba@kernel.org>,
+        "pabeni@redhat.com" <pabeni@redhat.com>,
+        "hugues.fruchet@foss.st.com" <hugues.fruchet@foss.st.com>,
+        "lee@kernel.org"
+	<lee@kernel.org>,
+        "will@kernel.org" <will@kernel.org>,
+        "catalin.marinas@arm.com" <catalin.marinas@arm.com>,
+        "arnd@kernel.org"
+	<arnd@kernel.org>,
+        "richardcochran@gmail.com" <richardcochran@gmail.com>,
+        "linux-crypto@vger.kernel.org" <linux-crypto@vger.kernel.org>,
+        "devicetree@vger.kernel.org" <devicetree@vger.kernel.org>,
+        "linux-stm32@st-md-mailman.stormreply.com"
+	<linux-stm32@st-md-mailman.stormreply.com>,
+        "linux-arm-kernel@lists.infradead.org"
+	<linux-arm-kernel@lists.infradead.org>,
+        "linux-kernel@vger.kernel.org"
+	<linux-kernel@vger.kernel.org>,
+        "dmaengine@vger.kernel.org"
+	<dmaengine@vger.kernel.org>,
+        "linux-i2c@vger.kernel.org"
+	<linux-i2c@vger.kernel.org>,
+        "linux-iio@vger.kernel.org"
+	<linux-iio@vger.kernel.org>,
+        "alsa-devel@alsa-project.org"
+	<alsa-devel@alsa-project.org>,
+        "linux-media@vger.kernel.org"
+	<linux-media@vger.kernel.org>,
+        "linux-mmc@vger.kernel.org"
+	<linux-mmc@vger.kernel.org>,
+        "netdev@vger.kernel.org"
+	<netdev@vger.kernel.org>,
+        "linux-phy@lists.infradead.org"
+	<linux-phy@lists.infradead.org>,
+        "linux-serial@vger.kernel.org"
+	<linux-serial@vger.kernel.org>,
+        "linux-spi@vger.kernel.org"
+	<linux-spi@vger.kernel.org>,
+        "linux-usb@vger.kernel.org"
+	<linux-usb@vger.kernel.org>
+Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
+ description in binding files
+Thread-Topic: [PATCH 04/10] dt-bindings: treewide: add feature-domains
+ description in binding files
+Thread-Index: AQHZr2YotROcBsXjd02uJm3g7CUa76+uVu0A
+Date: Fri, 7 Jul 2023 14:07:18 +0000
+Message-ID: <875y6vzuga.fsf@epam.com>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
+In-Reply-To: <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
+Accept-Language: en-US
+Content-Language: en-US
+X-MS-Has-Attach: 
+X-MS-TNEF-Correlator: 
+x-ms-publictraffictype: Email
+x-ms-traffictypediagnostic: PA4PR03MB7136:EE_|DB4PR03MB8513:EE_
+x-ms-office365-filtering-correlation-id: 914d4b39-a27c-4aef-e913-08db7ef379bc
+x-ms-exchange-senderadcheck: 1
+x-ms-exchange-antispam-relay: 0
+x-microsoft-antispam: BCL:0;
+x-microsoft-antispam-message-info: 
+ ZkQPjUW+z7PUr/baDHK7d3PxL9LtIlpTAwKyUDJhGet2l5Ge2x5hu23QetHHkowfK+mLvX1Kbxh+g7udl3Nv23crjztvf9LaF2t+oS+mSesIbBAbjHT7nnzw6Kzl7zw+CeIYYwybgcAyZjxoDxGD4k2/aNGp/pH++0eeAwO1eKxeAV3mA7Uk01k1vY9mbwCzfdQxHJHswd6idLPy/tHdxb4sgne3g0hnZY8XjzRai8c9IZt4OuVcZIV62IoYolwE8cK3U51u9NdrtUYQxDaLxDjX6VdFa6j/qwzUFBJa3f7nTeb+Hwr48ItTgYA8eDwhziSmTvmLaVUsYVIfS6Xu5R7W1Od4XuZ+9XpkxKoVRsYNPoKXLwVrDZaATJA/63gbuhVqOC25AeLaYPWshUHvr9HtJKCephUFYEDQVWcygzW6DqidCgOUjGmzl+dAFDCnbG6cenNfmupF8UvoD1KI3Meza/pHXQDE9MsO/7YryuU8A941P6WYutI1oHMl14OZGua23ruCsaWI/3yLw/okeTKZMGIuquXomettYytzqs7exKExmjbxGGB8fIn8HLKUqHZAoerFRedKCh2XYeKCpK/HOapnrRmRZDwHAkHBGWT19zcSyFJjd6W4r4nnGDh+
+x-forefront-antispam-report: 
+ CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PA4PR03MB7136.eurprd03.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(396003)(39860400002)(366004)(136003)(346002)(451199021)(36756003)(7406005)(30864003)(86362001)(7416002)(2906002)(5660300002)(38070700005)(38100700002)(186003)(6512007)(55236004)(83380400001)(6506007)(91956017)(26005)(4326008)(6486002)(122000001)(54906003)(2616005)(66556008)(66446008)(64756008)(316002)(66476007)(6916009)(478600001)(71200400001)(8676002)(66946007)(8936002)(76116006)(41300700001);DIR:OUT;SFP:1101;
+x-ms-exchange-antispam-messagedata-chunkcount: 1
+x-ms-exchange-antispam-messagedata-0: 
+ =?iso-8859-1?Q?+u9Zpz2YSA6W9hMF6Y7/yLOShXXmDGwOaHlUfBwWYqmj7BwDqsjEPQV6Sq?=
+ =?iso-8859-1?Q?8HK//Tvj9UphnEw16WLzk2ck0vI8CpVxUIMAfChnXUf+GSrgbhSkF+jqcz?=
+ =?iso-8859-1?Q?+BBwbgsQruvd901+nYZOEguMs9SOmNRbf1N3H3vSquezHKBuFuAbq1tmcj?=
+ =?iso-8859-1?Q?70WQm/erAii5hMsmV3cPhkSzUZq+UyNEf8y0ciAcSBGQfYtCVskZaij5cQ?=
+ =?iso-8859-1?Q?lGbSIa39bfcGGJssKYNzzV3DY0FWhEf0WIHsFeBvRlf+wII//Te9zvPcz2?=
+ =?iso-8859-1?Q?54nZ3DxyfUY0Z3TSGqWnyD1Fc49qqEGYPeNC6dE/sGKAyp9EjdIqa578iN?=
+ =?iso-8859-1?Q?/cwQc1Ylb3V/qBcS9dYU2HapJ5WW5ZtanuLwXUwaYOSTZCjtR7piiU8QkM?=
+ =?iso-8859-1?Q?IJy1cz1SHzPsjxISumd+hGIXDpoiK1WX9RArQVVSNG+eAFp3Ob0/Z6RlGS?=
+ =?iso-8859-1?Q?bcpMzxvYR0jcmyC6tXhYGCUcWJqtYuLias9eOSyxCorPldHGMD5qMewEAm?=
+ =?iso-8859-1?Q?qVMGDoBh/h+lzfoArGAkzaGp/ypEvLMxQY92sSTNtGqBUs88LH0mEyZq/S?=
+ =?iso-8859-1?Q?RzkvhnXLLzQ1pKX0S0YHcECRTJtOd+NqcHSZkj8KZJuVgfQjNFinTT5MJq?=
+ =?iso-8859-1?Q?GW49PHCfW2YO/7MyTJoPkzmtiV9WNV9WGWEyCZs56BaV5RDoVgpcSMno/K?=
+ =?iso-8859-1?Q?fu7uJ8NuIy/LnkYrsKiQp3QKaOfK6wevUgSvdIzLMPWBZuPFYdQFKNwR9j?=
+ =?iso-8859-1?Q?y6i2aw5/SDScqtlkNFyQcBr/XymGZ8o5cNdE45myJMXpBTo/gpT+HpfaHR?=
+ =?iso-8859-1?Q?XsfX7d64wHcJs4S5sR2s/y4dlenFFtL8gGQlCV7vMNIT9D9mycn+04X7BZ?=
+ =?iso-8859-1?Q?27w01ij26zhBIX7wMeElPOHKFF02xUocDBkX8mnRl53uobQte6UJU76VeF?=
+ =?iso-8859-1?Q?M7Vwpd8yUpQKo44iF5bpdFGbNEZaLgDO35p2EDMkmYSN4MP/QidxLwfFW4?=
+ =?iso-8859-1?Q?ObFJan623onWrUb79VqKCR98JheVxxsy35B0rFeuXAKOOc2osiIBPYh1pN?=
+ =?iso-8859-1?Q?sShrK3NmRKYwEAXjhlr7WpNftcwHflhkiMSu+qYK4EgHHa0UPoFOoEBArT?=
+ =?iso-8859-1?Q?8R3dDdg2efNBd8j4gZIwq+lKOkdN1Dmt5BUNAyW2agmyUL3+3+bzDdOvDw?=
+ =?iso-8859-1?Q?IripcfS6OglF+1NZWY4av/Q2LlIkEV41fDrB8lF8rlCKtS4qxbsbwfwKKj?=
+ =?iso-8859-1?Q?GdvPAlCkj/q36EEFngevkUwqMfTs/JE0FVLr7aBVIzHFSdzrGVpY+Ugfu3?=
+ =?iso-8859-1?Q?Rvkgvagr86yiLFnYf4vT0ilEh49ygkCbYUnsmifZEI09kpYjXrNuqJAisE?=
+ =?iso-8859-1?Q?erEsEAFtsNwZxlF3/LfkErqPAYNLFpTncpu66na0/+otiEWvFM60Fxmh3U?=
+ =?iso-8859-1?Q?MwIRf1X7lHPC2VIRWamrhqAdPbsB1rsLJM73tEkCLOlDqsEcXkJSci72kO?=
+ =?iso-8859-1?Q?yvNvyJDqCT+rLF+m11EBnuM7D2+6S/iYdVdv/uIuulP2vXNm34lOQG8GjC?=
+ =?iso-8859-1?Q?XqCjmH4AaITVTmsIgs7zDNHALjWfiMWlzqnrn2ECJqKiTQS79fhpdFODwZ?=
+ =?iso-8859-1?Q?ELhMxOK4Qq5RUcgiDvGgo47Qcdijkdd5RRoWVpVnGsiprWIHeuPjKc9w?=
+ =?iso-8859-1?Q?=3D=3D?=
+Content-Type: text/plain; charset="iso-8859-1"
+Content-Transfer-Encoding: quoted-printable
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: SN6PR10MB3022:EE_|BLAPR10MB4836:EE_
-X-MS-Office365-Filtering-Correlation-Id: b6064b02-7345-4ed8-1e79-08db7ef32879
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info: 
-	QcYpqnmGiWWSHDVLb+dDQ/gMlrS0V1uqdSMGg0SosEoNTSwIOsNpoY9Psmc7ItAcnDMfOewWSqoD95+Cs6qN/EEB8NClufZ+/ujho1eME7sO9dcPF1N94jg3aLh1/LRoz1v2aIBwzp9KnFNNY3EHsk+FTo0LAz2Tr2An68YoeVB/kEkWNrOG/DoTBB3D+79xFpv2Vc7HIPeAMACOpbYfsosyqaw/tpcqj+7IRN58jM31d2lmvfdyN7T4nI4YYFkxr/j8w2LyUpwKp8QU3i5fBnkM2WPP/Ueq6xWbUNJY/29rgKC6RQt55/lBVHec7HELV0PY/zv7powshoQhQfnTQXHooFh5Vi/A8CSzBIs66Zo1Ues2gAncUpG4x6fmJkZjL3ecEb3gbtZFEoB8CAvxPUdPavPVgsn79aHSFtb40r4Q72Sr+ua/HR53q30qIAEwuHsDTidetSs5jDM07Cf9Rr6e0MeVpV8HYp3QXHXcRitESTUq42gmkP2Ykpn5UK2HQ/pm6DNdm3YaCl/zR3ZZx5Onaj88exSOV2tLXfXuHm/eQ6J4LI55RVius3g4tPjh
-X-Forefront-Antispam-Report: 
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3022.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(396003)(376002)(136003)(346002)(39860400002)(451199021)(33716001)(2906002)(478600001)(6666004)(6486002)(8676002)(7416002)(41300700001)(8936002)(4326008)(6636002)(316002)(66476007)(66556008)(66946007)(83380400001)(38100700002)(6512007)(5660300002)(6506007)(1076003)(6862004)(86362001)(26005)(186003)(9686003);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0: 
-	=?us-ascii?Q?intFEJXnGz+o23wlttqSqvrApTF1C8SA8NffVe4K7fXcexDq9M3HrV0hcDNc?=
- =?us-ascii?Q?E6rnUZ1k5Pp1lqlhA/pBRdfARkI/XO81Ch9d0szapJacEOuCfpNzVt7cD/tK?=
- =?us-ascii?Q?bijdRCZlhA2xKHY887CO/K7qvkv8eP4rJb9gI1rTRjKxo5K1/CQB5RUNBn6k?=
- =?us-ascii?Q?nGhYb7fzIQ/bF3F01+mLdKRn18XEjjfCH/d4DNpeprNMEmVncYn7hRMJ4x63?=
- =?us-ascii?Q?T6mtLFWL322v0sAlp3CXHCPxaclAegVwj1bbvFAw4gBS3dKBi3Tw/1VJMfq7?=
- =?us-ascii?Q?mMqlvvcL+SVlf7y87fwGohlIWfyqJOdX6V9CyDWfuUzEaQj5Rq/4L5Odw0Ha?=
- =?us-ascii?Q?CbmlRZ+Xj+aOToUV+93lqkDyRWBOXlzjSbvR7cZbLV4bhJjGHpNqstgoBwPD?=
- =?us-ascii?Q?SIHUbKjJFFnmr3orLEU620figrta7mC1iEyOM/bXNgJarOLO9rjEIccyPra4?=
- =?us-ascii?Q?83NSzoxYI6qapNJe1jqXt41UO6ngQ0GQXO9DMTfjWEhTE76CxNDnH4XtzWQa?=
- =?us-ascii?Q?+z53adJd1RfURIjo7qkozjN9Cmpj/j+1UT+1AibGrLVYLr31BWc7ZZmX3sLw?=
- =?us-ascii?Q?z9aulXN2rGwiIv8Xn5u+3J8aAv2hINJnKIvYlRzwVRyg6WfmfKafejRnOkUG?=
- =?us-ascii?Q?XhQmpxUfW6e38zeMXm5TaN6eG2wYDwKwZFZ79J43rgQgRyfM8gqjMKQ+1Upb?=
- =?us-ascii?Q?04X01w4gBOtq/DdOwhuSmfP612Lxht4wZJBF/WaTZ220aCuD5DSW2ZJtKvzB?=
- =?us-ascii?Q?5XDr0jhpn9HT3p682HPdgOBjjpKn44aPakFkLa/6vmbBAG3vJSQLNAHcA+Po?=
- =?us-ascii?Q?QGjoLWwOc6tFHR5fscJiZ8Xv/UPZnWNUmE/MdAyHNBQnfxhNXoY5SsiIQDYQ?=
- =?us-ascii?Q?RR9qCgxRDL9YQNSHyhC1nmhjwfzlO/Kb1WF87KlCv4T3kQN2oHvpMVVGX4bo?=
- =?us-ascii?Q?nb0A5fCiaD46ZgTZ3grLBaqCAyyU+5g/aNz6bW8uXMmNYGkHr2a5BKrRborE?=
- =?us-ascii?Q?nc3Gy0G2CsF2n45+4xSnb3mKp7U0CTfcAjbGlBmzVpEznrF9O29WwWewCl5P?=
- =?us-ascii?Q?aUuL+UnOuqijgMoutLzT9Q3A5G67/JBuPeEZ2AGCD7FG1QDmwqqZ4Glg8xzB?=
- =?us-ascii?Q?5szI8cQv7+mYzR+oXMVUP4grXbR/V/sy5sSupWiqKr1vPLuIFO148csiZa82?=
- =?us-ascii?Q?pCy9RU62UUW6pH+ueY6u4Ha8ML8bQen8DJFwGYxXOvzyiNcY1y9Khu+4H9FK?=
- =?us-ascii?Q?5YI04IbH4+b7C5GS750OSpUADf5a/SHblXP1yn6khP+CBdkmsF++/IA+VjL/?=
- =?us-ascii?Q?aQRFdXLg8pndPAlnHX3k9fn7IaJ1H6WDYjNRzk0KEdoqIkawb1nF09t6UacC?=
- =?us-ascii?Q?IWWa8nkil+F/CG5b6ANW8am4pLnSKQzHF86/T/mnsDUkrhgCjEjgdvap9EUT?=
- =?us-ascii?Q?o/7WDR6q3SQ91aSLgC8A/8WcC6SjnCfAM5IeV1qWPj6a/RDxDuAa0Inlkovr?=
- =?us-ascii?Q?452h6NvTOtS8wcWPmpFoxF0ozEN+IfgKbovNmZpoJ5Fj7PbIk5m2ZMZyDikl?=
- =?us-ascii?Q?iuijjN+M+ssBe0FbQa1MtXDNwQ6JcUXBnmUJ3YkgRMVMTH6r56T3D0Gep5UY?=
- =?us-ascii?Q?ZA=3D=3D?=
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
-	=?us-ascii?Q?bpnbklY/5s6uEYBRUOAJ+4Hh/av532slTrO38sGC3Tb7c6Nnw3h2l1QzWHRz?=
- =?us-ascii?Q?4K9rIkHA52bKPKGNPT4edK0ta1KFSlp5fXppGr7wi/kL7KlWO/NLTBbkYgdU?=
- =?us-ascii?Q?oFADbLrqGcAfVmF+qbyH7wSirEh8UnwtFtm9MobqQ3OblhKJ5VTONNDTujtg?=
- =?us-ascii?Q?/T5WN87zzbU1XH5FlqyJZjS8W8Ovp/K4rxnZgvLWqBhMp8tp7W2mqXI/bNhP?=
- =?us-ascii?Q?ekj68hhzUJa74RZqbomFWE6ZCY9Q4kVZ6CFYVd+dW0SYzA1WJwN7ExChm8ry?=
- =?us-ascii?Q?VGmplA7QPso0uhx5ErLyI/Yj+lXvc7toLOyhW4ieNEKM+1DdzwKql6TC/C+r?=
- =?us-ascii?Q?epPbOryVV9MqXDPi1srYp9Oh8x5vENNLZbPN+lwJW+gMy+XDkHbRPKSaw31v?=
- =?us-ascii?Q?yy1op+S5P691zXJG67GYOa6cD6DP8S0wRxMhSQkHwl/efd7NZMv64+wCv6tW?=
- =?us-ascii?Q?miIV6tr48bfMD511/8Q3UE3IyVIA/FBrnXFtXhKz4EFqWXkqEsxCaWNcaCbs?=
- =?us-ascii?Q?kyiVum87CvzKSoNRphO5xcJ3Ke58TxFWI6LYqDyMMbArQhKgtY+MT/B1Ry/R?=
- =?us-ascii?Q?81LPjG+YVjSbTPGNvjHnD6ncJWvNkWULUWPWGgwaFW7eje/yI5r1UN6ofFrM?=
- =?us-ascii?Q?Qf2y/ZSPrT+EOIeDY/5PadLJXq6APID7SLKBdPMBdrppH6RYz0R5dTVSlwx9?=
- =?us-ascii?Q?hPILqwOvU4EH8b1UUkXBqOdqGH4jqZfr142RiPGjt+O2o4MGytPoLtUSa90a?=
- =?us-ascii?Q?QbowJ+5fYkrV4XA5g95Q4WNW5znhI22zxtZWZBsaypUc5vj+LERRQpHWxCFk?=
- =?us-ascii?Q?YE6IjR/sdyNwf8oJHbRM5E5BT7iK+OPmylhZn9FnU/Z31+jZPo0RsYN3SrT9?=
- =?us-ascii?Q?RwxoKWlxxAcvSc/aI7D8iRoEueYllWXb52cB5DaE4b9NJD1h9TpM/asMR/wU?=
- =?us-ascii?Q?q/0NBjboB+IkcbY2ACqsieY4AXewIgQrQ7ZX1cLoRNiDikwvL1+qamoTB2t4?=
- =?us-ascii?Q?XrfyXSXmozdUlE1OajrdsOjqLcWzKpKVda4+OesxrNZnaHNI0b9tr4wn+uKV?=
- =?us-ascii?Q?J+lmoaqIpfBo4Eq11EI9CyWeX/ETkeBuHOp+xwA4fo4FfBtgWqs=3D?=
-X-OriginatorOrg: oracle.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: b6064b02-7345-4ed8-1e79-08db7ef32879
-X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3022.namprd10.prod.outlook.com
+X-OriginatorOrg: epam.com
 X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2023 14:05:03.3070
+X-MS-Exchange-CrossTenant-AuthSource: PA4PR03MB7136.eurprd03.prod.outlook.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: 914d4b39-a27c-4aef-e913-08db7ef379bc
+X-MS-Exchange-CrossTenant-originalarrivaltime: 07 Jul 2023 14:07:18.7433
  (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: RC6wn4fVNYOfNYdVx15cdeRijmneFhrT/qvrzWVue4WiGutibUmGZgnv/ranTNpBT9bxfwS4UuKHNpHoNcZt1A==
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB4836
+X-MS-Exchange-CrossTenant-fromentityheader: Hosted
+X-MS-Exchange-CrossTenant-id: b41b72d0-4e9f-4c26-8a69-f949f367c91d
+X-MS-Exchange-CrossTenant-mailboxtype: HOSTED
+X-MS-Exchange-CrossTenant-userprincipalname: VAYW4bySiSe6rUF1Uy0+2qlvEouk0DZLtEERTvVzmRgWWAzjnLD1BMnYWRcjo+4q7fuEWsIvfaKiOXBrzjtQb9daudQz3A8Z6n2Z1xnBQGQ=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DB4PR03MB8513
+X-Proofpoint-GUID: sFNslrQw9zL_iYUZ8YjwX5x0kG6zqUjg
+X-Proofpoint-ORIG-GUID: sFNslrQw9zL_iYUZ8YjwX5x0kG6zqUjg
 X-Proofpoint-Virus-Version: vendor=baseguard
  engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
  definitions=2023-07-07_10,2023-07-06_02,2023-05-22_02
-X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 bulkscore=0
- malwarescore=0 mlxlogscore=999 adultscore=0 spamscore=0 mlxscore=0
- classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
- definitions=main-2307070130
-X-Proofpoint-GUID: 4E2kmAW3vmtJ3mKZtohPae929xWjDqi3
-X-Proofpoint-ORIG-GUID: 4E2kmAW3vmtJ3mKZtohPae929xWjDqi3
+X-Proofpoint-Spam-Details: rule=outbound_notspam policy=outbound score=0 suspectscore=0
+ impostorscore=0 adultscore=0 lowpriorityscore=0 spamscore=0 bulkscore=0
+ malwarescore=0 phishscore=0 priorityscore=1501 clxscore=1015 mlxscore=0
+ mlxlogscore=999 classifier=spam adjust=0 reason=mlx scancount=1
+ engine=8.12.0-2305260000 definitions=main-2307070129
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
-	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-* Anjali Kulkarni <anjali.k.kulkarni@oracle.com> [691231 23:00]:
-> The current proc connector code has the foll. bugs - if there are more
-> than one listeners for the proc connector messages, and one of them
-> deregisters for listening using PROC_CN_MCAST_IGNORE, they will still get
-> all proc connector messages, as long as there is another listener.
-> 
-> Another issue is if one client calls PROC_CN_MCAST_LISTEN, and another one
-> calls PROC_CN_MCAST_IGNORE, then both will end up not getting any messages.
-> 
-> This patch adds filtering and drops packet if client has sent
-> PROC_CN_MCAST_IGNORE. This data is stored in the client socket's
-> sk_user_data. In addition, we only increment or decrement
-> proc_event_num_listeners once per client. This fixes the above issues.
-> 
-> cn_release is the release function added for NETLINK_CONNECTOR. It uses
-> the newly added netlink_release function added to netlink_sock. It will
-> free sk_user_data.
-> 
-> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
 
-Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
+Gatien Chevallier <gatien.chevallier@foss.st.com> writes:
 
+> feature-domains is an optional property that allows a peripheral to
+> refer to one or more feature domain controller(s).
+>
+> Description of this property is added to all peripheral binding files of
+> the peripheral under the STM32 firewall controllers. It allows an accurat=
+e
+> representation of the hardware, where various peripherals are connected
+> to this firewall bus. The firewall can then check the peripheral accesses
+> before allowing it to probe.
+>
+> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
 > ---
->  drivers/connector/cn_proc.c   | 57 +++++++++++++++++++++++++++++------
->  drivers/connector/connector.c | 21 ++++++++++---
->  drivers/w1/w1_netlink.c       |  6 ++--
->  include/linux/connector.h     |  8 ++++-
->  include/uapi/linux/cn_proc.h  | 43 +++++++++++++++-----------
->  5 files changed, 100 insertions(+), 35 deletions(-)
-> 
-> diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
-> index ccac1c453080..1ba288ed2bf7 100644
-> --- a/drivers/connector/cn_proc.c
-> +++ b/drivers/connector/cn_proc.c
-> @@ -48,6 +48,21 @@ static DEFINE_PER_CPU(struct local_event, local_event) = {
->  	.lock = INIT_LOCAL_LOCK(lock),
->  };
->  
-> +static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
-> +{
-> +	enum proc_cn_mcast_op mc_op;
+>
+> Disclaimer: Some error with dtbs_check will be observed as I've
+> considered the property to be generic, as Rob asked
+>
+>  Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
+>  Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
+>  .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
+>  .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
+>  .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
+>  Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
+>  Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
+>  Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
+>  .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
+>  Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
+>  .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
+>  Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
+>  Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
+>  24 files changed, 97 insertions(+)
+>
+> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml =
+b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> index b767ec72a999..daf8dcaef627 100644
+> --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+> @@ -50,6 +50,10 @@ properties:
+>    power-domains:
+>      maxItems: 1
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +	if (!dsk)
-> +		return 0;
+
+I beliewe feature-domains is generic binding. This means that maxItems
+can be implementation dependend. I would rather drop maxItems so the
+following format will be possible:
+
+          feature-domains =3D <&etzpc 1>, <&etzpc 2>, <&some_other_domain 1=
+ 2 3 4>
+          feature-domain-names =3D "firewall 1", "firewall 2", "other_domai=
+n"
+
+Also I beliewe driver will handle feature-domain-names property so it
+will parse feature-domains only related to the firewall.
+
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml b/Do=
+cumentation/devicetree/bindings/dma/st,stm32-dma.yaml
+> index 329847ef096a..2236ac95574b 100644
+> --- a/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml
+> +++ b/Documentation/devicetree/bindings/dma/st,stm32-dma.yaml
+> @@ -82,6 +82,10 @@ properties:
+>      description: if defined, it indicates that the controller
+>        supports memory-to-memory transfer
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +	mc_op = ((struct proc_input *)(dsk->sk_user_data))->mcast_op;
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml b=
+/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
+> index e722fbcd8a5f..47ae890f5bd9 100644
+> --- a/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
+> +++ b/Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml
+> @@ -28,6 +28,10 @@ properties:
+>    resets:
+>      maxItems: 1
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +	if (mc_op == PROC_CN_MCAST_IGNORE)
-> +		return 1;
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml b/Do=
+cumentation/devicetree/bindings/i2c/st,stm32-i2c.yaml
+> index 94b75d9f66cd..326a96741f50 100644
+> --- a/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml
+> +++ b/Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml
+> @@ -99,6 +99,10 @@ properties:
+> =20
+>    wakeup-source: true
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +	return 0;
-> +}
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml =
+b/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml
+> index 995cbf8cefc6..3eb20d67f0fc 100644
+> --- a/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml
+> +++ b/Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml
+> @@ -93,6 +93,10 @@ properties:
+>    '#size-cells':
+>      const: 0
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
->  static inline void send_msg(struct cn_msg *msg)
->  {
->  	local_lock(&local_event.lock);
-> @@ -61,7 +76,8 @@ static inline void send_msg(struct cn_msg *msg)
->  	 *
->  	 * If cn_netlink_send() fails, the data is not sent.
->  	 */
-> -	cn_netlink_send(msg, 0, CN_IDX_PROC, GFP_NOWAIT);
-> +	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
-> +			     cn_filter, NULL);
->  
->  	local_unlock(&local_event.lock);
->  }
-> @@ -346,11 +362,9 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
->  static void cn_proc_mcast_ctl(struct cn_msg *msg,
->  			      struct netlink_skb_parms *nsp)
->  {
-> -	enum proc_cn_mcast_op *mc_op = NULL;
-> -	int err = 0;
-> -
-> -	if (msg->len != sizeof(*mc_op))
-> -		return;
-> +	enum proc_cn_mcast_op mc_op = 0, prev_mc_op = 0;
-> +	int err = 1, initial = 0;
-> +	struct sock *sk = NULL;
->  
->  	/* 
->  	 * Events are reported with respect to the initial pid
-> @@ -367,13 +381,36 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
->  		goto out;
->  	}
->  
-> -	mc_op = (enum proc_cn_mcast_op *)msg->data;
-> -	switch (*mc_op) {
-> +	if (msg->len == sizeof(mc_op))
-> +		mc_op = *((enum proc_cn_mcast_op *)msg->data);
-> +	else
-> +		return;
+>  allOf:
+>    - if:
+>        properties:
+> diff --git a/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc=
+.yaml b/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml
+> index 1970503389aa..bc34ae172417 100644
+> --- a/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml
+> +++ b/Documentation/devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml
+> @@ -59,6 +59,10 @@ properties:
+>        If not, SPI CLKOUT frequency will not be accurate.
+>      maximum: 20000000
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +	if (nsp->sk) {
-> +		sk = nsp->sk;
-> +		if (sk->sk_user_data == NULL) {
-> +			sk->sk_user_data = kzalloc(sizeof(struct proc_input),
-> +						   GFP_KERNEL);
-> +			if (sk->sk_user_data == NULL) {
-> +				err = ENOMEM;
-> +				goto out;
-> +			}
-> +			initial = 1;
-> +		} else {
-> +			prev_mc_op =
-> +			((struct proc_input *)(sk->sk_user_data))->mcast_op;
-> +		}
-> +		((struct proc_input *)(sk->sk_user_data))->mcast_op = mc_op;
-> +	}
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml =
+b/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml
+> index 04045b932bd2..90d35a2a6504 100644
+> --- a/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml
+> +++ b/Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml
+> @@ -45,6 +45,10 @@ properties:
+>    '#size-cells':
+>      const: 0
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +	switch (mc_op) {
->  	case PROC_CN_MCAST_LISTEN:
-> -		atomic_inc(&proc_event_num_listeners);
-> +		if (initial || (prev_mc_op != PROC_CN_MCAST_LISTEN))
-> +			atomic_inc(&proc_event_num_listeners);
->  		break;
->  	case PROC_CN_MCAST_IGNORE:
-> -		atomic_dec(&proc_event_num_listeners);
-> +		if (!initial && (prev_mc_op != PROC_CN_MCAST_IGNORE))
-> +			atomic_dec(&proc_event_num_listeners);
->  		break;
->  	default:
->  		err = EINVAL;
-> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
-> index 48ec7ce6ecac..d1179df2b0ba 100644
-> --- a/drivers/connector/connector.c
-> +++ b/drivers/connector/connector.c
-> @@ -59,7 +59,9 @@ static int cn_already_initialized;
->   * both, or if both are zero then the group is looked up and sent there.
->   */
->  int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
-> -	gfp_t gfp_mask)
-> +	gfp_t gfp_mask,
-> +	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
-> +	void *filter_data)
->  {
->  	struct cn_callback_entry *__cbq;
->  	unsigned int size;
-> @@ -110,8 +112,9 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
->  	NETLINK_CB(skb).dst_group = group;
->  
->  	if (group)
-> -		return netlink_broadcast(dev->nls, skb, portid, group,
-> -					 gfp_mask);
-> +		return netlink_broadcast_filtered(dev->nls, skb, portid, group,
-> +						  gfp_mask, filter,
-> +						  (void *)filter_data);
->  	return netlink_unicast(dev->nls, skb, portid,
->  			!gfpflags_allow_blocking(gfp_mask));
->  }
-> @@ -121,7 +124,8 @@ EXPORT_SYMBOL_GPL(cn_netlink_send_mult);
->  int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
->  	gfp_t gfp_mask)
->  {
-> -	return cn_netlink_send_mult(msg, msg->len, portid, __group, gfp_mask);
-> +	return cn_netlink_send_mult(msg, msg->len, portid, __group, gfp_mask,
-> +				    NULL, NULL);
->  }
->  EXPORT_SYMBOL_GPL(cn_netlink_send);
->  
-> @@ -162,6 +166,14 @@ static int cn_call_callback(struct sk_buff *skb)
->  	return err;
->  }
->  
-> +static void cn_release(struct sock *sk, unsigned long *groups)
-> +{
-> +	if (groups && test_bit(CN_IDX_PROC - 1, groups)) {
-> +		kfree(sk->sk_user_data);
-> +		sk->sk_user_data = NULL;
-> +	}
-> +}
+>  additionalProperties: false
+> =20
+>  required:
+> diff --git a/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yam=
+l b/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml
+> index 2314a9a14650..f88e3c0e6175 100644
+> --- a/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml
+> +++ b/Documentation/devicetree/bindings/media/cec/st,stm32-cec.yaml
+> @@ -29,6 +29,10 @@ properties:
+>        - const: cec
+>        - const: hdmi-cec
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
->  /*
->   * Main netlink receiving function.
->   *
-> @@ -249,6 +261,7 @@ static int cn_init(void)
->  	struct netlink_kernel_cfg cfg = {
->  		.groups	= CN_NETLINK_USERS + 0xf,
->  		.input	= cn_rx_skb,
-> +		.release = cn_release,
->  	};
->  
->  	dev->nls = netlink_kernel_create(&init_net, NETLINK_CONNECTOR, &cfg);
-> diff --git a/drivers/w1/w1_netlink.c b/drivers/w1/w1_netlink.c
-> index db110cc442b1..691978cddab7 100644
-> --- a/drivers/w1/w1_netlink.c
-> +++ b/drivers/w1/w1_netlink.c
-> @@ -65,7 +65,8 @@ static void w1_unref_block(struct w1_cb_block *block)
->  		u16 len = w1_reply_len(block);
->  		if (len) {
->  			cn_netlink_send_mult(block->first_cn, len,
-> -				block->portid, 0, GFP_KERNEL);
-> +					     block->portid, 0,
-> +					     GFP_KERNEL, NULL, NULL);
->  		}
->  		kfree(block);
->  	}
-> @@ -83,7 +84,8 @@ static void w1_reply_make_space(struct w1_cb_block *block, u16 space)
->  {
->  	u16 len = w1_reply_len(block);
->  	if (len + space >= block->maxlen) {
-> -		cn_netlink_send_mult(block->first_cn, len, block->portid, 0, GFP_KERNEL);
-> +		cn_netlink_send_mult(block->first_cn, len, block->portid,
-> +				     0, GFP_KERNEL, NULL, NULL);
->  		block->first_cn->len = 0;
->  		block->cn = NULL;
->  		block->msg = NULL;
-> diff --git a/include/linux/connector.h b/include/linux/connector.h
-> index 487350bb19c3..cec2d99ae902 100644
-> --- a/include/linux/connector.h
-> +++ b/include/linux/connector.h
-> @@ -90,13 +90,19 @@ void cn_del_callback(const struct cb_id *id);
->   *		If @group is not zero, then message will be delivered
->   *		to the specified group.
->   * @gfp_mask:	GFP mask.
-> + * @filter:     Filter function to be used at netlink layer.
-> + * @filter_data:Filter data to be supplied to the filter function
->   *
->   * It can be safely called from softirq context, but may silently
->   * fail under strong memory pressure.
->   *
->   * If there are no listeners for given group %-ESRCH can be returned.
->   */
-> -int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 group, gfp_t gfp_mask);
-> +int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
-> +			 u32 group, gfp_t gfp_mask,
-> +			 int (*filter)(struct sock *dsk, struct sk_buff *skb,
-> +				       void *data),
-> +			 void *filter_data);
->  
->  /**
->   * cn_netlink_send - Sends message to the specified groups.
-> diff --git a/include/uapi/linux/cn_proc.h b/include/uapi/linux/cn_proc.h
-> index db210625cee8..6a06fb424313 100644
-> --- a/include/uapi/linux/cn_proc.h
-> +++ b/include/uapi/linux/cn_proc.h
-> @@ -30,6 +30,30 @@ enum proc_cn_mcast_op {
->  	PROC_CN_MCAST_IGNORE = 2
->  };
->  
-> +enum proc_cn_event {
-> +	/* Use successive bits so the enums can be used to record
-> +	 * sets of events as well
-> +	 */
-> +	PROC_EVENT_NONE = 0x00000000,
-> +	PROC_EVENT_FORK = 0x00000001,
-> +	PROC_EVENT_EXEC = 0x00000002,
-> +	PROC_EVENT_UID  = 0x00000004,
-> +	PROC_EVENT_GID  = 0x00000040,
-> +	PROC_EVENT_SID  = 0x00000080,
-> +	PROC_EVENT_PTRACE = 0x00000100,
-> +	PROC_EVENT_COMM = 0x00000200,
-> +	/* "next" should be 0x00000400 */
-> +	/* "last" is the last process event: exit,
-> +	 * while "next to last" is coredumping event
-> +	 */
-> +	PROC_EVENT_COREDUMP = 0x40000000,
-> +	PROC_EVENT_EXIT = 0x80000000
-> +};
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml b=
+/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml
+> index 6b3e413cedb2..4fa1d14910df 100644
+> --- a/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml
+> +++ b/Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml
+> @@ -36,6 +36,10 @@ properties:
+>    resets:
+>      maxItems: 1
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
-> +struct proc_input {
-> +	enum proc_cn_mcast_op mcast_op;
-> +};
+>    port:
+>      $ref: /schemas/graph.yaml#/$defs/port-base
+>      unevaluatedProperties: false
+> diff --git a/Documentation/devicetree/bindings/memory-controllers/st,stm3=
+2-fmc2-ebi.yaml b/Documentation/devicetree/bindings/memory-controllers/st,s=
+tm32-fmc2-ebi.yaml
+> index 14f1833d37c9..63b3d012147b 100644
+> --- a/Documentation/devicetree/bindings/memory-controllers/st,stm32-fmc2-=
+ebi.yaml
+> +++ b/Documentation/devicetree/bindings/memory-controllers/st,stm32-fmc2-=
+ebi.yaml
+> @@ -45,6 +45,10 @@ properties:
+>        Reflects the memory layout with four integer values per bank. Form=
+at:
+>        <bank-number> 0 <address of the bank> <size>
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
 > +
->  /*
->   * From the user's point of view, the process
->   * ID is the thread group ID and thread ID is the internal
-> @@ -44,24 +68,7 @@ enum proc_cn_mcast_op {
->   */
->  
->  struct proc_event {
-> -	enum what {
-> -		/* Use successive bits so the enums can be used to record
-> -		 * sets of events as well
-> -		 */
-> -		PROC_EVENT_NONE = 0x00000000,
-> -		PROC_EVENT_FORK = 0x00000001,
-> -		PROC_EVENT_EXEC = 0x00000002,
-> -		PROC_EVENT_UID  = 0x00000004,
-> -		PROC_EVENT_GID  = 0x00000040,
-> -		PROC_EVENT_SID  = 0x00000080,
-> -		PROC_EVENT_PTRACE = 0x00000100,
-> -		PROC_EVENT_COMM = 0x00000200,
-> -		/* "next" should be 0x00000400 */
-> -		/* "last" is the last process event: exit,
-> -		 * while "next to last" is coredumping event */
-> -		PROC_EVENT_COREDUMP = 0x40000000,
-> -		PROC_EVENT_EXIT = 0x80000000
-> -	} what;
-> +	enum proc_cn_event what;
->  	__u32 cpu;
->  	__u64 __attribute__((aligned(8))) timestamp_ns;
->  		/* Number of nano seconds since system boot */
-> -- 
-> 2.41.0
-> 
+>  patternProperties:
+>    "^.*@[0-4],[a-f0-9]+$":
+>      additionalProperties: true
+> diff --git a/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml =
+b/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml
+> index 27329c5dc38e..59d770544950 100644
+> --- a/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml
+> @@ -44,6 +44,10 @@ properties:
+> =20
+>    wakeup-source: true
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>    pwm:
+>      type: object
+>      additionalProperties: false
+> diff --git a/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml b=
+/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
+> index f84e09a5743b..d5ad097e94ec 100644
+> --- a/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
+> +++ b/Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml
+> @@ -67,6 +67,11 @@ properties:
+>    "#size-cells":
+>      const: 0
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+> +
+>    pwm:
+>      type: object
+>      additionalProperties: false
+> diff --git a/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml b/Docum=
+entation/devicetree/bindings/mmc/arm,pl18x.yaml
+> index 2459a55ed540..6ebedee65153 100644
+> --- a/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml
+> +++ b/Documentation/devicetree/bindings/mmc/arm,pl18x.yaml
+> @@ -79,6 +79,10 @@ properties:
+>            - const: rx
+>            - const: tx
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>    power-domains: true
+> =20
+>    resets:
+> diff --git a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml b/Doc=
+umentation/devicetree/bindings/net/stm32-dwmac.yaml
+> index fc8c96b08d7d..0e408dc85c13 100644
+> --- a/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> +++ b/Documentation/devicetree/bindings/net/stm32-dwmac.yaml
+> @@ -93,6 +93,10 @@ properties:
+>        select RCC clock instead of ETH_REF_CLK.
+>      type: boolean
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - clocks
+> diff --git a/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml=
+ b/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml
+> index 24a3dbde223b..b9ac20c8bf05 100644
+> --- a/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml
+> +++ b/Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml
+> @@ -55,6 +55,10 @@ properties:
+>      description: number of clock cells for ck_usbo_48m consumer
+>      const: 0
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  # Required child nodes:
+> =20
+>  patternProperties:
+> diff --git a/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf=
+.yaml b/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
+> index 05f4ad2c7d3a..02cefe4ef42b 100644
+> --- a/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
+> +++ b/Documentation/devicetree/bindings/regulator/st,stm32-vrefbuf.yaml
+> @@ -30,6 +30,10 @@ properties:
+>    vdda-supply:
+>      description: phandle to the vdda input analog voltage.
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml b/Do=
+cumentation/devicetree/bindings/rng/st,stm32-rng.yaml
+> index 187b172d0cca..79eb5f5bd252 100644
+> --- a/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+> +++ b/Documentation/devicetree/bindings/rng/st,stm32-rng.yaml
+> @@ -30,6 +30,10 @@ properties:
+>      type: boolean
+>      description: If set enable the clock detection management
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml =
+b/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml
+> index 1df8ffe95fc6..893978e7170f 100644
+> --- a/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml
+> +++ b/Documentation/devicetree/bindings/serial/st,stm32-uart.yaml
+> @@ -70,6 +70,10 @@ properties:
+>      enum: [1, 2, 4, 8, 12, 14, 16]
+>      default: 8
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  allOf:
+>    - $ref: rs485.yaml#
+>    - $ref: serial.yaml#
+> diff --git a/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml b/=
+Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml
+> index b9111d375b93..64c5898e51f8 100644
+> --- a/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml
+> +++ b/Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml
+> @@ -65,6 +65,10 @@ properties:
+>      $ref: audio-graph-port.yaml#
+>      unevaluatedProperties: false
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - "#sound-dai-cells"
+> diff --git a/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml b/=
+Documentation/devicetree/bindings/sound/st,stm32-sai.yaml
+> index 56d206f97a96..9bc08b7645dc 100644
+> --- a/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml
+> +++ b/Documentation/devicetree/bindings/sound/st,stm32-sai.yaml
+> @@ -48,6 +48,10 @@ properties:
+>    clock-names:
+>      maxItems: 3
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yam=
+l b/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml
+> index bc48151b9adb..f00e5db9ee3b 100644
+> --- a/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml
+> +++ b/Documentation/devicetree/bindings/sound/st,stm32-spdifrx.yaml
+> @@ -50,6 +50,10 @@ properties:
+>    resets:
+>      maxItems: 1
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - "#sound-dai-cells"
+> diff --git a/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml b/D=
+ocumentation/devicetree/bindings/spi/st,stm32-qspi.yaml
+> index 8bba965a9ae6..2ac136802467 100644
+> --- a/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml
+> +++ b/Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml
+> @@ -46,6 +46,10 @@ properties:
+>        - const: tx
+>        - const: rx
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  required:
+>    - compatible
+>    - reg
+> diff --git a/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml b/Do=
+cumentation/devicetree/bindings/spi/st,stm32-spi.yaml
+> index 9ca1a843c820..725c26daabe4 100644
+> --- a/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml
+> +++ b/Documentation/devicetree/bindings/spi/st,stm32-spi.yaml
+> @@ -59,6 +59,10 @@ properties:
+>        - const: rx
+>        - const: tx
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  patternProperties:
+>    "^[a-zA-Z][a-zA-Z0-9,+\\-._]{0,63}@[0-9a-f]+$":
+>      type: object
+> diff --git a/Documentation/devicetree/bindings/usb/dwc2.yaml b/Documentat=
+ion/devicetree/bindings/usb/dwc2.yaml
+> index d3506090f8b1..c372caf154fc 100644
+> --- a/Documentation/devicetree/bindings/usb/dwc2.yaml
+> +++ b/Documentation/devicetree/bindings/usb/dwc2.yaml
+> @@ -171,6 +171,10 @@ properties:
+> =20
+>    tpl-support: true
+> =20
+> +  feature-domains:
+> +    minItems: 1
+> +    maxItems: 3
+> +
+>  dependencies:
+>    port: [ usb-role-switch ]
+>    role-switch-default-mode: [ usb-role-switch ]
+
+
+--=20
+Thanks,
+Oleksii=
 
