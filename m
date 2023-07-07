@@ -1,84 +1,88 @@
-Return-Path: <netdev+bounces-15988-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15990-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id F33DA74ACB0
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:20:31 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3E54874ACC2
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:21:21 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id AC7712816DC
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:20:30 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E82E52816C8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:21:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBCF1A925;
-	Fri,  7 Jul 2023 08:20:22 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D39268C1F;
+	Fri,  7 Jul 2023 08:20:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4224E8836
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 08:20:21 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id D3F3EC433CA;
-	Fri,  7 Jul 2023 08:20:20 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688718020;
-	bh=dcFwVT6awVtN3kz0ZqEErQqasS4zVzfMUWn04fZgPTU=;
-	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=DL9K3X6IKXpDAlUHzYKUzv0IcFTupBd/YUpTLKDAgyf3acXFBQiShxYdjyIceFimE
-	 WwPKjrZPrPOshnRwGuy1H/EoZpjfn8mZl5SN7Gx2S6gaSy/3PD5UQgKD32zrD0u/DB
-	 ZDBGtGPNzlwTsHSplmD8CZSHpZZy6ps6Y5TMoaUC391/OTBHraEPiKIMqIK8uSQ9DF
-	 ION3SE+uzpAVKk61wa9vcudR4myItxbMA4iPRhK6G/YRnh/zaVfGZ7cB3qbDTaY7if
-	 CbH6dOZrsd6QIIS7WqNusvVYKcYPHrnc4pv4Rn+G8hfWPbf3lzL9n0WvN6EcR4PerN
-	 kERQjtIPekYAA==
-Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id B3F8FC4167B;
-	Fri,  7 Jul 2023 08:20:20 +0000 (UTC)
-Content-Type: text/plain; charset="utf-8"
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C6C62BA44
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 08:20:30 +0000 (UTC)
+Received: from mail-pj1-f71.google.com (mail-pj1-f71.google.com [209.85.216.71])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2FEBC1FCE
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 01:20:29 -0700 (PDT)
+Received: by mail-pj1-f71.google.com with SMTP id 98e67ed59e1d1-262d8c40189so2264710a91.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 01:20:29 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688718028; x=1691310028;
+        h=to:from:subject:message-id:in-reply-to:date:mime-version
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=uN1UEoiyjNN/U7zWTps4glZc/qi7ZNLVVS2aoUJ2q4A=;
+        b=g8wS3TRKdDIMp80ZD8wtF4c5kFw897yw9hkrJZ6Dp8UzfkFYHuNzpHRWt6SPQggZFl
+         W0XjYlTZsFZyc/8jSxdxvGwNedJ2mMelI0KTkK6+JbtMoqZ8AmBayyhEgmGCH1Ag8xlu
+         ER9C7EFFg6p7JoV4axnVwBktrJF4tChuuyyaOpAA+xSHehwCYQg57np0oWif+Y+NAH0h
+         3BuU7GlizFrR8DksdzJ0WrnTDlb6estavcSu8tXHXyI2jUQAYvFwRa5KQqv47sMkxpc4
+         YTasB3DCstD17+r9yeINV/EwJslHOHHLG01ujTCZU+wquq0U5URB2kt0Sq3kS+NYpZxh
+         LYYw==
+X-Gm-Message-State: ABy/qLYNLajrjUJcJBIdp6toIuYKScL7WMkWxXxhdv3qg9UxUfdntgzw
+	8sSCD1WkP5dF1NRNDDTLEVWFFq/ukkHM1pHEhfyHwjVhQdGD
+X-Google-Smtp-Source: APBJJlE53elBOc0PVBkPt5sMuDbxYXfNijnU6gTgY9iSg9CUfuKQG7NUjF7iYEWUsnBRxcEyGfvev30rDbJTXm2Ub6F9tIUO/Zk8
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH v2] udp6: add a missing call into udp_fail_queue_rcv_skb
- tracepoint
-From: patchwork-bot+netdevbpf@kernel.org
-Message-Id: 
- <168871802073.22009.17793808873391205698.git-patchwork-notify@kernel.org>
-Date: Fri, 07 Jul 2023 08:20:20 +0000
-References: <20230707043923.35578-1-ivan@cloudflare.com>
-In-Reply-To: <20230707043923.35578-1-ivan@cloudflare.com>
-To: Ivan Babrou <ivan@cloudflare.com>
-Cc: netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
- kernel-team@cloudflare.com, davem@davemloft.net, edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com, willemdebruijn.kernel@gmail.com,
- dsahern@kernel.org, peilin.ye@bytedance.com, rostedt@goodmis.org,
- petrm@nvidia.com, nhorman@tuxdriver.com, satoru.moriya@hds.com
+X-Received: by 2002:a17:90a:ce8f:b0:262:e5e2:e5af with SMTP id
+ g15-20020a17090ace8f00b00262e5e2e5afmr3633167pju.5.1688718028524; Fri, 07 Jul
+ 2023 01:20:28 -0700 (PDT)
+Date: Fri, 07 Jul 2023 01:20:28 -0700
+In-Reply-To: <2224784.1688717214@warthog.procyon.org.uk>
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000037530605ffe14e41@google.com>
+Subject: Re: [syzbot] [ext4?] general protection fault in ext4_finish_bio
+From: syzbot <syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com>
+To: adilger.kernel@dilger.ca, boqun.feng@gmail.com, dhowells@redhat.com, 
+	herbert@gondor.apana.org.au, kuba@kernel.org, linux-ext4@vger.kernel.org, 
+	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
+	longman@redhat.com, mingo@redhat.com, netdev@vger.kernel.org, 
+	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu, 
+	will@kernel.org
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
+	version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-Hello:
+Hello,
 
-This patch was applied to netdev/net.git (main)
-by David S. Miller <davem@davemloft.net>:
+syzbot tried to test the proposed patch but the build/boot failed:
 
-On Thu,  6 Jul 2023 21:39:20 -0700 you wrote:
-> The tracepoint has existed for 12 years, but it only covered udp
-> over the legacy IPv4 protocol. Having it enabled for udp6 removes
-> the unnecessary difference in error visibility.
-> 
-> Signed-off-by: Ivan Babrou <ivan@cloudflare.com>
-> Fixes: 296f7ea75b45 ("udp: add tracepoints for queueing skb to rcvbuf")
-> 
-> [...]
+failed to checkout kernel repo git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git/main: failed to run ["git" "fetch" "--force" "f569e972c8e9057ee9c286220c83a480ebf30cc5" "main"]: exit status 128
+fatal: couldn't find remote ref main
 
-Here is the summary with links:
-  - [v2] udp6: add a missing call into udp_fail_queue_rcv_skb tracepoint
-    https://git.kernel.org/netdev/net/c/8139dccd464a
 
-You are awesome, thank you!
--- 
-Deet-doot-dot, I am a bot.
-https://korg.docs.kernel.org/patchwork/pwbot.html
 
+Tested on:
+
+commit:         [unknown 
+git tree:       git://git.kernel.org/pub/scm/linux/kernel/git/torvalds/linux.git main
+dashboard link: https://syzkaller.appspot.com/bug?extid=689ec3afb1ef07b766b2
+compiler:       
+patch:          https://syzkaller.appspot.com/x/patch.diff?x=136ff1b4a80000
 
 
