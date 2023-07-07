@@ -1,196 +1,151 @@
-Return-Path: <netdev+bounces-15953-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15954-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16D1B74A916
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 04:44:27 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 6D9EC74A965
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 05:39:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0540C1C20F24
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 02:44:26 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A4EA928162C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 03:39:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id B59F8622;
-	Fri,  7 Jul 2023 02:44:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id C63141878;
+	Fri,  7 Jul 2023 03:39:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A4358EA1
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 02:44:23 +0000 (UTC)
-Received: from mga09.intel.com (mga09.intel.com [134.134.136.24])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ED62319A0
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 19:44:21 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688697862; x=1720233862;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=1IFcivcHpFq0KbmofHi9BI8xCPhUs4p14U9Fp9XGVuY=;
-  b=ar7IoijFYwuhyAySFC0akrbbDsqet/6y7D/D5rfQ1wOpHGE0HMs3/W0E
-   T7A/EM2BXz4lWaZx76SsCjtS50zWqB8aAbyn5rWJY8H5tm3mGCDc6TdT4
-   uJRznfppSBxEYpqkmtrt72NsVXyH7yJNZ2/L575jRue5RTF5ro3aaUfif
-   BSXqjW06PleStGPZwi3rAw/iEYtyF6egf6ONvU74YWRkvNdXjG3vPfUUs
-   KJ7vZ4uhTVTRnHrydV3vfq78ls9goFrSeAxZmb5ATIZk1DJ6keectcoM5
-   yonjSjpa9mw2YRCpFEiWR8Xe8VBNNzgMhvZKeU15bwc02NIMGVR6gvbEb
-   Q==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="366367328"
-X-IronPort-AV: E=Sophos;i="6.01,187,1684825200"; 
-   d="scan'208";a="366367328"
-Received: from orsmga001.jf.intel.com ([10.7.209.18])
-  by orsmga102.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 06 Jul 2023 19:44:21 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10763"; a="754981654"
-X-IronPort-AV: E=Sophos;i="6.01,187,1684825200"; 
-   d="scan'208";a="754981654"
-Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
-  by orsmga001.jf.intel.com with ESMTP; 06 Jul 2023 19:44:17 -0700
-From: Junfeng Guo <junfeng.guo@intel.com>
-To: netdev@vger.kernel.org
-Cc: jeroendb@google.com,
-	pkaligineedi@google.com,
-	shailend@google.com,
-	haiyue.wang@intel.com,
-	kuba@kernel.org,
-	awogbemila@google.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	yangchun@google.com,
-	edumazet@google.com,
-	Junfeng Guo <junfeng.guo@intel.com>
-Subject: [PATCH net-next] gve: enhance driver name usage
-Date: Fri,  7 Jul 2023 10:44:05 +0800
-Message-Id: <20230707024405.3653316-1-junfeng.guo@intel.com>
-X-Mailer: git-send-email 2.25.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id AF81B1309D;
+	Fri,  7 Jul 2023 03:39:01 +0000 (UTC)
+Received: from dggsgout11.his.huawei.com (dggsgout11.his.huawei.com [45.249.212.51])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3F47E1FC9;
+	Thu,  6 Jul 2023 20:38:59 -0700 (PDT)
+Received: from mail02.huawei.com (unknown [172.30.67.143])
+	by dggsgout11.his.huawei.com (SkyGuard) with ESMTP id 4Qxzdq542zz4f4NVR;
+	Fri,  7 Jul 2023 11:38:55 +0800 (CST)
+Received: from [10.174.176.117] (unknown [10.174.176.117])
+	by APP4 (Coremail) with SMTP id gCh0CgC3Z6vMiKdkRJSONQ--.29906S2;
+	Fri, 07 Jul 2023 11:38:56 +0800 (CST)
+Subject: Re: [PATCH v4 bpf-next 09/14] bpf: Allow reuse from
+ waiting_for_gp_ttrace list.
+To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+Cc: Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org,
+ Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
+ Kernel Team <kernel-team@fb.com>, Daniel Borkmann <daniel@iogearbox.net>,
+ Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>,
+ "Paul E. McKenney" <paulmck@kernel.org>
+References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
+ <20230706033447.54696-10-alexei.starovoitov@gmail.com>
+ <fe733a7b-3775-947a-23c0-0dadacabdca2@huaweicloud.com>
+ <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
+From: Hou Tao <houtao@huaweicloud.com>
+Message-ID: <4e0765b7-9054-a33d-8b1e-c986df353848@huaweicloud.com>
+Date: Fri, 7 Jul 2023 11:38:52 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.6.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
+Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+Content-Language: en-US
+X-CM-TRANSID:gCh0CgC3Z6vMiKdkRJSONQ--.29906S2
+X-Coremail-Antispam: 1UD129KBjvJXoW7ZFW5Xw4fAr43Kr45Zr48tFb_yoW8tw17pF
+	4fJFy5XFyUZF4Sy342qr48Gasavw47t347KayUWasIkr15Xrn0gryfWry5urn5A397A34a
+	yr1v9rySya1Y937anT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
+	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
+	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
+	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Ar0_tr1l84ACjcxK6xIIjxv20xvEc7Cj
+	xVAFwI0_Gr1j6F4UJwA2z4x0Y4vEx4A2jsIE14v26rxl6s0DM28EF7xvwVC2z280aVCY1x
+	0267AKxVW0oVCq3wAS0I0E0xvYzxvE52x082IY62kv0487Mc02F40EFcxC0VAKzVAqx4xG
+	6I80ewAv7VC0I7IYx2IY67AKxVWUJVWUGwAv7VC2z280aVAFwI0_Jr0_Gr1lOx8S6xCaFV
+	Cjc4AY6r1j6r4UM4x0Y48IcVAKI48JM4IIrI8v6xkF7I0E8cxan2IY04v7Mxk0xIA0c2IE
+	e2xFo4CEbIxvr21l42xK82IYc2Ij64vIr41l4I8I3I0E4IkC6x0Yz7v_Jr0_Gr1lx2IqxV
+	Aqx4xG67AKxVWUJVWUGwC20s026x8GjcxK67AKxVWUGVWUWwC2zVAF1VAY17CE14v26r1q
+	6r43MIIYrxkI7VAKI48JMIIF0xvE2Ix0cI8IcVAFwI0_Jr0_JF4lIxAIcVC0I7IYx2IY6x
+	kF7I0E14v26r1j6r4UMIIF0xvE42xK8VAvwI8IcIk0rVWrZr1j6s0DMIIF0xvEx4A2jsIE
+	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
+	9x07UWE__UUUUU=
+X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Current codebase contained the usage of two different names for this
-driver (i.e., `gvnic` and `gve`), which is quite unfriendly for users
-to use, especially when trying to bind or unbind the driver manually.
-The corresponding kernel module is registered with the name of `gve`.
-It's more reasonable to align the name of the driver with the module.
+Hi,
 
-Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
----
- drivers/net/ethernet/google/gve/gve.h         |  1 +
- drivers/net/ethernet/google/gve/gve_adminq.c  | 10 +++++-----
- drivers/net/ethernet/google/gve/gve_ethtool.c |  2 +-
- drivers/net/ethernet/google/gve/gve_main.c    | 11 ++++++-----
- 4 files changed, 13 insertions(+), 11 deletions(-)
+On 7/7/2023 10:12 AM, Alexei Starovoitov wrote:
+> On Thu, Jul 6, 2023 at 7:07 PM Hou Tao <houtao@huaweicloud.com> wrote:
+>> Hi,
+>>
+>> On 7/6/2023 11:34 AM, Alexei Starovoitov wrote:
+>>> From: Alexei Starovoitov <ast@kernel.org>
+>>>
+>>> alloc_bulk() can reuse elements from free_by_rcu_ttrace.
+>>> Let it reuse from waiting_for_gp_ttrace as well to avoid unnecessary kmalloc().
+>>>
+>>> Signed-off-by: Alexei Starovoitov <ast@kernel.org>
+>>> ---
+>>>  kernel/bpf/memalloc.c | 16 ++++++++++------
+>>>  1 file changed, 10 insertions(+), 6 deletions(-)
+>>>
+>>> diff --git a/kernel/bpf/memalloc.c b/kernel/bpf/memalloc.c
+>>> index 9986c6b7df4d..e5a87f6cf2cc 100644
+>>> --- a/kernel/bpf/memalloc.c
+>>> +++ b/kernel/bpf/memalloc.c
+>>> @@ -212,6 +212,15 @@ static void alloc_bulk(struct bpf_mem_cache *c, int cnt, int node)
+>>>       if (i >= cnt)
+>>>               return;
+>>>
+>>> +     for (; i < cnt; i++) {
+>>> +             obj = llist_del_first(&c->waiting_for_gp_ttrace);
+>>> +             if (!obj)
+>>> +                     break;
+>>> +             add_obj_to_free_list(c, obj);
+>>> +     }
+>>> +     if (i >= cnt)
+>>> +             return;
+>> I still think using llist_del_first() here is not safe as reported in
+>> [1]. Not sure whether or not invoking enque_to_free() firstly for
+>> free_llist_extra will close the race completely. Will check later.
+> lol. see my reply a second ago in the other thread.
+>
+> and it's not just waiting_for_gp_ttrace. free_by_rcu_ttrace is similar.
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 98eb78d98e9f..4b425bf71ede 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -964,5 +964,6 @@ void gve_handle_report_stats(struct gve_priv *priv);
- /* exported by ethtool.c */
- extern const struct ethtool_ops gve_ethtool_ops;
- /* needed by ethtool */
-+extern char gve_driver_name[];
- extern const char gve_version_str[];
- #endif /* _GVE_H_ */
-diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-index 252974202a3f..ae8f8c935bbe 100644
---- a/drivers/net/ethernet/google/gve/gve_adminq.c
-+++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-@@ -899,7 +899,7 @@ int gve_adminq_verify_driver_compatibility(struct gve_priv *priv,
- 
- int gve_adminq_report_link_speed(struct gve_priv *priv)
- {
--	union gve_adminq_command gvnic_cmd;
-+	union gve_adminq_command gve_cmd;
- 	dma_addr_t link_speed_region_bus;
- 	__be64 *link_speed_region;
- 	int err;
-@@ -911,12 +911,12 @@ int gve_adminq_report_link_speed(struct gve_priv *priv)
- 	if (!link_speed_region)
- 		return -ENOMEM;
- 
--	memset(&gvnic_cmd, 0, sizeof(gvnic_cmd));
--	gvnic_cmd.opcode = cpu_to_be32(GVE_ADMINQ_REPORT_LINK_SPEED);
--	gvnic_cmd.report_link_speed.link_speed_address =
-+	memset(&gve_cmd, 0, sizeof(gve_cmd));
-+	gve_cmd.opcode = cpu_to_be32(GVE_ADMINQ_REPORT_LINK_SPEED);
-+	gve_cmd.report_link_speed.link_speed_address =
- 		cpu_to_be64(link_speed_region_bus);
- 
--	err = gve_adminq_execute_cmd(priv, &gvnic_cmd);
-+	err = gve_adminq_execute_cmd(priv, &gve_cmd);
- 
- 	priv->link_speed = be64_to_cpu(*link_speed_region);
- 	dma_free_coherent(&priv->pdev->dev, sizeof(*link_speed_region), link_speed_region,
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index 50162ec9424d..233e5946905e 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -15,7 +15,7 @@ static void gve_get_drvinfo(struct net_device *netdev,
- {
- 	struct gve_priv *priv = netdev_priv(netdev);
- 
--	strscpy(info->driver, "gve", sizeof(info->driver));
-+	strscpy(info->driver, gve_driver_name, sizeof(info->driver));
- 	strscpy(info->version, gve_version_str, sizeof(info->version));
- 	strscpy(info->bus_info, pci_name(priv->pdev), sizeof(info->bus_info));
- }
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 8fb70db63b8b..e6f1711d9be0 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -33,6 +33,7 @@
- #define MIN_TX_TIMEOUT_GAP (1000 * 10)
- #define DQO_TX_MAX	0x3FFFF
- 
-+char gve_driver_name[] = "gve";
- const char gve_version_str[] = GVE_VERSION;
- static const char gve_version_prefix[] = GVE_VERSION_PREFIX;
- 
-@@ -2200,7 +2201,7 @@ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (err)
- 		return err;
- 
--	err = pci_request_regions(pdev, "gvnic-cfg");
-+	err = pci_request_regions(pdev, gve_driver_name);
- 	if (err)
- 		goto abort_with_enabled;
- 
-@@ -2393,8 +2394,8 @@ static const struct pci_device_id gve_id_table[] = {
- 	{ }
- };
- 
--static struct pci_driver gvnic_driver = {
--	.name		= "gvnic",
-+static struct pci_driver gve_driver = {
-+	.name		= gve_driver_name,
- 	.id_table	= gve_id_table,
- 	.probe		= gve_probe,
- 	.remove		= gve_remove,
-@@ -2405,10 +2406,10 @@ static struct pci_driver gvnic_driver = {
- #endif
- };
- 
--module_pci_driver(gvnic_driver);
-+module_pci_driver(gve_driver);
- 
- MODULE_DEVICE_TABLE(pci, gve_id_table);
- MODULE_AUTHOR("Google, Inc.");
--MODULE_DESCRIPTION("gVNIC Driver");
-+MODULE_DESCRIPTION("Google Virtual NIC Driver");
- MODULE_LICENSE("Dual MIT/GPL");
- MODULE_VERSION(GVE_VERSION);
--- 
-2.25.1
+I think free_by_rcu_ttrace is different, because the reuse is only
+possible after one tasks trace RCU grace period as shown below, and the
+concurrent llist_del_first() must have been completed when the head is
+reused and re-added into free_by_rcu_ttrace again.
+
+// c0->free_by_rcu_ttrace
+A -> B -> C -> nil
+   
+P1:
+alloc_bulk()
+    llist_del_first(&c->free_by_rcu_ttrace)
+        entry = A
+        next = B
+
+P2:
+do_call_rcu_ttrace()
+    // c->free_by_rcu_ttrace->first = NULL
+    llist_del_all(&c->free_by_rcu_ttrace)
+        move to c->waiting_for_gp_ttrace
+
+P1:
+llist_del_first()
+    return NULL
+
+// A is only reusable after one task trace RCU grace
+// llist_del_first() must have been completed
+__free_rcu_tasks_trace
+    free_all(llist_del_all(&c->waiting_for_gp_ttrace))
 
 
