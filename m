@@ -1,212 +1,182 @@
-Return-Path: <netdev+bounces-16097-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16098-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 366BA74B615
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:07:54 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 53E3D74B63B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:27:13 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E40A4281891
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:07:52 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 844BC1C20FE8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:27:12 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5C206171B9;
-	Fri,  7 Jul 2023 18:07:51 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6CF2B171C3;
+	Fri,  7 Jul 2023 18:27:10 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4DA02171B3
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:07:51 +0000 (UTC)
-Received: from mail-oa1-x35.google.com (mail-oa1-x35.google.com [IPv6:2001:4860:4864:20::35])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 4E2AE1737;
-	Fri,  7 Jul 2023 11:07:49 -0700 (PDT)
-Received: by mail-oa1-x35.google.com with SMTP id 586e51a60fabf-1a1fa977667so2140947fac.1;
-        Fri, 07 Jul 2023 11:07:49 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688753268; x=1691345268;
-        h=in-reply-to:from:references:cc:to:content-language:subject
-         :user-agent:mime-version:date:message-id:sender:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=MNLF+fuq4TwaQ32ICM7m5ZBV/Z5mA1VvoEw8wI2AGyA=;
-        b=SqRz5j/2lsoKMcuriLUbAQ498kgk2U4b4mn+RiYqlCYGCZOfshyAZDDshjsBRX3KPb
-         N1cYVcM6TdijsWv5Z6F/2X4YNDzlVMPH4BkdH/px3uxUb8n7wH37QD41rfpr6VZ2Yx9/
-         J91ruoPGL7vmQY9Wvnh5EDcz1Kv75NA0235ags9TcWwBqMtjBtOjyFEQjjVPyocRW5ZO
-         uFUgVCPJAsCRfvsGF48hekjP7XtYZGHTFGuaZ/NRKeYMXwwvXp+WdiE9mvZGU1TB429n
-         vcYbwGWc6FCp1uYNLKqxL3bAs5zYLqoz6vNtcBaXYCO8eLAQkfuTtbIVQB79iAGmcb+Q
-         Ezvw==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688753268; x=1691345268;
-        h=in-reply-to:from:references:cc:to:content-language:subject
-         :user-agent:mime-version:date:message-id:sender:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=MNLF+fuq4TwaQ32ICM7m5ZBV/Z5mA1VvoEw8wI2AGyA=;
-        b=W9lLdReyHCanNbUfK8OivXDi8O5zscIDthzUpXtryS1Pgm1hLMdZ8QUYbPEeWR60Ad
-         YfMEz17r49dWfy3hZxRe27oR3Wn21viHFjTM+JbrVNfRgunN5Ad+KB3P75SarEZMnmLG
-         kLvPzNKA12B+pPEG2f6hmqIQXYnu9jS8Ot9IKdPZX/mctKy4e07oBAJdxulB1IDuv5fb
-         hcu9+xVDqZEl5I2pqlgKBS2zpyQ9zHtu50HZk4HYNCJB+oa+JqyXLr01FVnliKtu+f19
-         pTqdr69MlKwCGI9E6SSCeZEIHj1O6rgGGAUZPLxUlX2j8EHO8gbLZEf8wuQzP+QO5niY
-         qTDw==
-X-Gm-Message-State: ABy/qLbXHqvbG/GNOC8f13cjUJO5IsTY01gx1ml8S4n6lyhS6Cy/VKWS
-	KrhHyBmLbpTKY3x0HSjmAyc=
-X-Google-Smtp-Source: APBJJlEylm+KgLskpWfNy37k0fc95tNPJc/nhbkPj/QWCNzxSdVHOzh/vo3l2BXudUBAImvMQkq8+w==
-X-Received: by 2002:a05:6870:3912:b0:1a3:2447:7f4a with SMTP id b18-20020a056870391200b001a324477f4amr7987499oap.32.1688753268411;
-        Fri, 07 Jul 2023 11:07:48 -0700 (PDT)
-Received: from [192.168.1.205] ([216.130.59.33])
-        by smtp.gmail.com with ESMTPSA id dx26-20020a056870769a00b001a68feb9440sm2034955oab.9.2023.07.07.11.07.46
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jul 2023 11:07:47 -0700 (PDT)
-Sender: Larry Finger <larry.finger@gmail.com>
-Content-Type: multipart/mixed; boundary="------------C6f4cDILumD0bj2hMiJ0eR6O"
-Message-ID: <0068af47-e475-7e8d-e476-c374e90dff5f@lwfinger.net>
-Date: Fri, 7 Jul 2023 13:07:45 -0500
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 57FC2171B9
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:27:10 +0000 (UTC)
+Received: from mga07.intel.com (mga07.intel.com [134.134.136.100])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D3289268A
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 11:27:04 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
+  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
+  t=1688754424; x=1720290424;
+  h=date:from:to:cc:subject:message-id:references:
+   in-reply-to:mime-version;
+  bh=D97uzIVkYR8iWF2sZCecZICt5m+Ih6GRVCRjy85cTIc=;
+  b=H5w1Z4Hr7P9V7d3hb5mfp2Fn52hA0Bb3v98juz+AVTgtFf0vC1ZIvdTa
+   D3IhIub4UsUXP9obRG7Al70PSGnI69sjBwCzDiKbXXkOUpogwU/vWAkT3
+   O+sitw8fBE6BKk5amS/2aa8yUqqHY05jKfeLq8pwOypKGIskRDQlg0Vg7
+   Bhe9RxqoO/lrycriFUSJ592Xeh27evwDxcOhOGcpUJOtnpoEg6MUTUQox
+   LPECHZosUEB8HeqOa3Dz2qyjaq4q5eJ4anjyrNze/p4UWDy1/gya6rVPr
+   rP8kMahRLmlmevb6dlGSQCFVmPJDE1McZXguiX6e2XlSVmQrPeh1K6XUk
+   w==;
+X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="430017756"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="430017756"
+Received: from orsmga001.jf.intel.com ([10.7.209.18])
+  by orsmga105.jf.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 11:27:04 -0700
+X-ExtLoop1: 1
+X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="755268485"
+X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
+   d="scan'208";a="755268485"
+Received: from fmsmsx602.amr.corp.intel.com ([10.18.126.82])
+  by orsmga001.jf.intel.com with ESMTP; 07 Jul 2023 11:27:02 -0700
+Received: from fmsmsx610.amr.corp.intel.com (10.18.126.90) by
+ fmsmsx602.amr.corp.intel.com (10.18.126.82) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 7 Jul 2023 11:27:01 -0700
+Received: from fmsmsx601.amr.corp.intel.com (10.18.126.81) by
+ fmsmsx610.amr.corp.intel.com (10.18.126.90) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Fri, 7 Jul 2023 11:27:01 -0700
+Received: from fmsedg601.ED.cps.intel.com (10.1.192.135) by
+ fmsmsx601.amr.corp.intel.com (10.18.126.81) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27 via Frontend Transport; Fri, 7 Jul 2023 11:27:01 -0700
+Received: from NAM02-BN1-obe.outbound.protection.outlook.com (104.47.51.40) by
+ edgegateway.intel.com (192.55.55.70) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ 15.1.2507.27; Fri, 7 Jul 2023 11:27:01 -0700
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=kypVJmjOtuh3OVJBiOV4DF8N7hvW2eqHxT3XVasmXbQo0dYDShtH9oufKwpWBKhQw0UBpzAQsqxs0sP62sdzY9pI2Em6Ci3vLdooefD3k77ulwJaMFaucxgW8n8HVo5d4Eot/wJNcd+98TJ9PwadOeYRjvdOEACIys37O7XRKPfNgl3NMH+IZpiJrLcX2XWxkYZChFi4Vgdy51k1/yOKtjcv0/4C8Uhv1ncCb1452IdZbCyQV/mnpsblwO/5RuJ4H8Rdq/SoxevfW4VMxdeWYK5wjIyJKjJYLp1UvIogpZ6DCUvfOIIZCvTX/sl54sRN92nrytYmV1oDGKxj7Tb2yg==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=iFl2Q/4ArjCjEfTuHxE0ATwJfJVHtwYQitru6XmU77E=;
+ b=BU9r+coVkVh1O3wm1rvv47Aut0bjd/j0tNP1uNRl1jjVJShPONJxAsHBeZFAWdg/YpiwSD8LH/NAQvZdkP0g4zS+Iej++5HN3JyDuiv9/Hk44GfKnm56IwZr9na4nlacK9A2U0m6XKJmDsGk8aXfUWM+6ybRdlhSC/KSd9ZOv/dXfejc8OOHF49W200cGqc2D5d/pOoWj+wPDTtRYZQMxkirthklOgT3bPseSnS5O4iZyG31bHC2g632uFTxVhpJOmWbgu3FcL85WVJf8ScHuqachVh5pJbWx5eEbFQHM2JyAFw+zk1JHIGYEsiy3H47okI+5i/Gk0Aym0mTsN6Ghg==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=intel.com; dmarc=pass action=none header.from=intel.com;
+ dkim=pass header.d=intel.com; arc=none
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=intel.com;
+Received: from SN6PR11MB2943.namprd11.prod.outlook.com (2603:10b6:805:d3::26)
+ by DS0PR11MB8135.namprd11.prod.outlook.com (2603:10b6:8:155::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Fri, 7 Jul
+ 2023 18:26:59 +0000
+Received: from SN6PR11MB2943.namprd11.prod.outlook.com
+ ([fe80::af65:2282:23bf:d2d3]) by SN6PR11MB2943.namprd11.prod.outlook.com
+ ([fe80::af65:2282:23bf:d2d3%7]) with mapi id 15.20.6565.016; Fri, 7 Jul 2023
+ 18:26:58 +0000
+Date: Fri, 7 Jul 2023 20:26:45 +0200
+From: Michal Kubiak <michal.kubiak@intel.com>
+To: Junfeng Guo <junfeng.guo@intel.com>
+CC: <netdev@vger.kernel.org>, <jeroendb@google.com>,
+	<pkaligineedi@google.com>, <shailend@google.com>, <haiyue.wang@intel.com>,
+	<kuba@kernel.org>, <awogbemila@google.com>, <davem@davemloft.net>,
+	<pabeni@redhat.com>, <yangchun@google.com>, <edumazet@google.com>,
+	<csully@google.com>
+Subject: Re: [PATCH net] gve: unify driver name usage
+Message-ID: <ZKhY5Y0C5ySmkp1w@localhost.localdomain>
+References: <20230707103710.3946651-1-junfeng.guo@intel.com>
+Content-Type: text/plain; charset="us-ascii"
+Content-Disposition: inline
+In-Reply-To: <20230707103710.3946651-1-junfeng.guo@intel.com>
+X-ClientProxiedBy: DUZPR01CA0033.eurprd01.prod.exchangelabs.com
+ (2603:10a6:10:468::8) To SN6PR11MB2943.namprd11.prod.outlook.com
+ (2603:10b6:805:d3::26)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Linux-6.5 iwlwifi crash
-Content-Language: en-US
-To: Linux regressions mailing list <regressions@lists.linux.dev>,
- Jeff Chua <jeff.chua.linux@gmail.com>
-Cc: lkml <linux-kernel@vger.kernel.org>,
- Gregory Greenman <gregory.greenman@intel.com>, Kalle Valo
- <kvalo@kernel.org>, "David S. Miller" <davem@davemloft.net>,
- Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
- Paolo Abeni <pabeni@redhat.com>,
- Linux Wireless <linux-wireless@vger.kernel.org>,
- Linux Networking <netdev@vger.kernel.org>,
- Bagas Sanjaya <bagasdotme@gmail.com>, Johannes Berg <johannes.berg@intel.com>
-References: <20230429020951.082353595@lindbergh.monkeyblade.net>
- <CAAJw_ZueYAHQtM++4259TXcxQ_btcRQKiX93u85WEs2b2p19wA@mail.gmail.com>
- <ZE0kndhsXNBIb1g7@debian.me> <b9ab37d2-42bf-cc31-a2c0-a9b604e95530@gmail.com>
- <CAAJw_Zug6VCS5ZqTWaFSr9sd85k=tyPm9DEE+mV=AKoECZM+sQ@mail.gmail.com>
- <7fee3284-b9ba-58f4-8118-fe0b99ae6bf7@leemhuis.info>
- <CAAJw_Zu=MPtGPARgCB2fteP+7F793YDFXE9RuzSH8EqYBS-OOw@mail.gmail.com>
- <64b8732f-6319-9f10-b82a-b4a3dd8d4b8e@lwfinger.net>
- <CAAJw_ZvZNQzrFyQizJnKe5PerqqAUOmPYd6cnjAcvs68xNdwSA@mail.gmail.com>
- <ff646259-8ce1-f1fe-4627-cdf99321dba8@leemhuis.info>
-From: Larry Finger <Larry.Finger@lwfinger.net>
-In-Reply-To: <ff646259-8ce1-f1fe-4627-cdf99321dba8@leemhuis.info>
-X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
-	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no
-	autolearn_force=no version=3.4.6
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR11MB2943:EE_|DS0PR11MB8135:EE_
+X-MS-Office365-Filtering-Correlation-Id: ac5d755e-c114-4ed9-ea4f-08db7f17c003
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 2F/4SagMs0W467Ukusspf64B2CL7uc9Po7xe8MhbMD5SsUO2/4kiUKl2hzNkt+rQTEv1Aef6OH3UFSpitXN9ooAHj7qEqdvxNMEdsDGTgj+oCKiOftDpM3AEhirQ2RTaQQqcbP+d1Y1t2kNX87tMjgsemPXOlWJIChL5YNfe7YjkF1ctGaZYUgNkmOhtyUokaGPn+1zY2alIGBIWu/+4GfgzKd9kgT0wIiv2jCQZasurjLEQk43tDJGFaumkvJLTJFXNuX5ehzwKhJpa9fFALQerjT2VBvFTwUGD+Gyh6IjQgaJT01IQWxZJ00b6Ala2FoXZpd8iJBGOniqmoesMN5IRgeRZmyESL+FarKgrReXP6y/bcQIIwdA1ExvpS4mD0k2AhC868gF6c8/b9iP1Oj0KZUS8gQwk3291lVt0XFqLMaK9t35VtX89byko6SVQBo47exOcd6ANjkr9Ld/RUTKaJkqnqP2b/lNT5Ihyq3WWP8MqEFymgEc+XvwIJ5Kw1TU4aau2tQaut0nTLzR4EXpMixlBW78nsIs3x+ZS6PWEu1t6lObTKJnWBJYdr1zn
+X-Forefront-Antispam-Report: CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR11MB2943.namprd11.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(136003)(376002)(346002)(39860400002)(366004)(396003)(451199021)(41300700001)(44832011)(8676002)(316002)(4326008)(6636002)(5660300002)(6862004)(2906002)(4744005)(66556008)(66476007)(66946007)(478600001)(7416002)(8936002)(6666004)(9686003)(6512007)(6486002)(6506007)(186003)(26005)(38100700002)(82960400001)(86362001);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: =?us-ascii?Q?QONCkDZmBCT/8OXnCzRH/tl/6et5Cdx2s4R48EoU5ziW/e4MF/9LN3gqQPMj?=
+ =?us-ascii?Q?Mp/7mvxwPi8xNUitrcDS8rQM1HCwlAF1NQifHeHct4JjOsqb6nA+vWjeFmgN?=
+ =?us-ascii?Q?fDR4xEbqUhYo/DMOWzxyDBmx4tn6g/XB/X95nxdBsba9YfZWPIsgSjsVuMd2?=
+ =?us-ascii?Q?wQrP/hTBqwhXY5IKnobzn8HwCmv3LH65MsxzuppA12DN6WR/ncBOegzRwZNY?=
+ =?us-ascii?Q?/RUyB6mWr9l2njUqiLAfOIt4VhWNNGoVzU29sptS+sqt4+kUwt5lauBa2En3?=
+ =?us-ascii?Q?WogtvMRE+413def8P5UpbHNyu6aol11nkKMQyDAGHonZHyoQc1A0ACxcO/Ca?=
+ =?us-ascii?Q?Mo/H+J6DcgNHU93zDam/tmbbeqoRZs/4dNOjgu0MA6e+6FTAe5hNpRk92wgk?=
+ =?us-ascii?Q?7GbLiI9VuLQM5bbYKMVSvQ39uMhR5Xc+ILVMXHlNbZzWxG2s1wYVvMefXzEs?=
+ =?us-ascii?Q?7buLv/+mcAvvCIc5ltyv7iRb4Kc2mP8v9NNx5FFh48ONc/fAdUfK70MQkCxF?=
+ =?us-ascii?Q?UfbR7ZrJwoydJj/WOEabtsJF/AiZC6eEczK25vs4o9MafZJb4ygT1YNt89Jk?=
+ =?us-ascii?Q?Qz2XBsNORu5tb6bbJRN9aUrvDrFcPP9hGfGhHS8RgWYutUulnN2J+79ivgjA?=
+ =?us-ascii?Q?jPa/usTNTmxIBApML7MhXiiH0bB89+Ycit2B+kJnFAfdy3ocNS0EejuQFyPG?=
+ =?us-ascii?Q?q/EJ8FOlwSRoufAB1Na5iHEH534Lql7J+FxPBfj4IUorcgQIaLBfon9SFIeJ?=
+ =?us-ascii?Q?rNWNuoRFtde/w0PsK5CK8TeN7SaKhTNI/RhdrrSXnwWdsDCZSq1+DLreGNVK?=
+ =?us-ascii?Q?6hFBardKLskFbkvHy7vGXQ9ZPeFdNNTnpbxfm8dvaXpVwyP+39hqveiRXA/H?=
+ =?us-ascii?Q?dj1JRsbqdAhymN3LhTc1Od6+HHE+tqX30r6uLIMSLfjbsB+D63/Tj4CfFZDI?=
+ =?us-ascii?Q?UJu8pNMxVg+nIU7NjrnY1F82bq4UT6BTGR3l5UQs6X3rC0N5OeZsPN+sphaq?=
+ =?us-ascii?Q?iBw/es9DpMBNBt5AdMQNoM/jZZwy39G+XIbg8H8gLFw0Vd0c2v0G0AkQVTuY?=
+ =?us-ascii?Q?1AzupuhqzZvFrpUCra0/cSxTvciCiIe++v/Bj2P+FilQIRymBvqZDOBDupu5?=
+ =?us-ascii?Q?5Hjr3qjZqduh0WFj5faCYF4vfc3A79jRMT6+ugTXR5Gemnq6WEd73/MT8T6Z?=
+ =?us-ascii?Q?tVzC0Iyq5+550hQtB1/f4qRew92WCmcU/lNXUVWcd4tFazZreAFX8sh0uJtM?=
+ =?us-ascii?Q?53lfr5c9pZ2dE7VVIWdJ774RwIn/AFnPx1Qxpkxpuz1VpURzMAcVQ17JDZue?=
+ =?us-ascii?Q?DdICbBBL4CUcCkbS+PHd1Op/rXcwAmPBPupUYW/Tc0mplQOb1QpWjicqpdbQ?=
+ =?us-ascii?Q?q2EMFt07yMyY+sFwwfvwP5tJ7SyDx0Ngefpu7WYJPOOSVHKosECjdMQUmWEe?=
+ =?us-ascii?Q?u1fGfAOiuYawlf4h18XLn8L9Kx6qAH/ZMmqFcQCGKeL0Q09BxqXotowG8LZP?=
+ =?us-ascii?Q?TX4GddTRGdKIlfEYm+3Cg/to40DeciMM3eJJb0ijzvoWDxY9ypRkDjtESW4o?=
+ =?us-ascii?Q?qMXSlCCoibhADdQDHYQrOH73sXwdGqs1xSsvX1ZWvB7y3HKBNXn1QXjmafJg?=
+ =?us-ascii?Q?/Q=3D=3D?=
+X-MS-Exchange-CrossTenant-Network-Message-Id: ac5d755e-c114-4ed9-ea4f-08db7f17c003
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR11MB2943.namprd11.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2023 18:26:58.9111
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 46c98d88-e344-4ed4-8496-4ed7712e255d
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: T1Si8FY+95vBlmrxgtBDmUpc7kxfL3S05cksigJPoU2amjqLSRSPl3xrFG+gOoSlTQwcnaXnT80N6EKvOKn/mA==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: DS0PR11MB8135
+X-OriginatorOrg: intel.com
+X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a multi-part message in MIME format.
---------------C6f4cDILumD0bj2hMiJ0eR6O
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-On 7/7/23 03:43, Linux regression tracking (Thorsten Leemhuis) wrote:
-> Hi, Thorsten here, the Linux kernel's regression tracker. Top-posting
-> for once, to make this easily accessible to everyone.
+On Fri, Jul 07, 2023 at 06:37:10PM +0800, Junfeng Guo wrote:
+> Current codebase contained the usage of two different names for this
+> driver (i.e., `gvnic` and `gve`), which is quite unfriendly for users
+> to use, especially when trying to bind or unbind the driver manually.
+> The corresponding kernel module is registered with the name of `gve`.
+> It's more reasonable to align the name of the driver with the module.
 > 
-> Jeff, thx for bisecting. Johannes afaik is unavailable for a while
-> (CCing him nevertheless), hence:
-> 
-> Gregory, could you please take a look at this? And maybe provide a few
-> hints for Jeff how to generate more data that allows us to find the root
-> of the problem?
-> 
-> Jeff, btw, the iwlwifi bug reporting guide (
-> https://wireless.wiki.kernel.org/en/users/drivers/iwlwifi/debugging
-> ) says to file a bugs in http://bugzilla.kernel.org/ Might be wise to do
-> this in case Gregory is also unavailable, but instructed someone to keep
-> an eye on things there.
-> 
-> Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
-> --
-> Everything you wanna know about Linux kernel regression tracking:
-> https://linux-regtracking.leemhuis.info/about/#tldr
-> If I did something stupid, please tell me, as explained on that page.
-> 
-> On 07.07.23 03:56, Jeff Chua wrote:
->> On Thu, Jul 6, 2023 at 2:11 AM Larry Finger <Larry.Finger@lwfinger.net> wrote:
->>
->>> Fow what it is worth, my 6.4-git (6.5-rc0?) commit d528014517f2 (pulled today)
->>> is working OK with iwlmvm. Lspci says my device is
->>>
->>> 04:00.0 Network controller [0280]: Intel Corporation Wireless 7260 [8086:08b1]
->>> (rev 73)
->>>
->>> I think you do need to do a bisection.
->>> Larry
->>
->>
->> Larry,
->>
->> I did a bisect and here's what it came up with ... reverted the
->> following and iwlwiifi worked again.
->>
->>
->> 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 is the first bad commit
->> commit 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2
->> Author: Johannes Berg <johannes.berg@intel.com>
->> Date:   Wed Jun 21 13:12:07 2023 +0300
->>
->>      wifi: iwlwifi: split 22000.c into multiple files
->>
->>      Split the configuration list in 22000.c into four new files,
->>      per new device family, so we don't have this huge unusable
->>      file. Yes, this duplicates a few small things, but that's
->>      still much better than what we have now.
->>
->>      Signed-off-by: Johannes Berg <johannes.berg@intel.com>
->>      Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
->>      Link: https://lore.kernel.org/r/20230621130443.7543603b2ee7.Ia8dd54216d341ef1ddc0531f2c9aa30d30536a5d@changeid
->>      Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> Fixes: 893ce44df565 ("gve: Add basic driver framework for Compute Engine Virtual NIC")
+> Cc: csully@google.com
+> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+> ---
+>
 
-Jeff,
+The patch makes the driver strings much more consistent.
+Looks good to me.
 
-I am certainly no expert on iwlwifi, but this change looks suspicious:
+Thanks,
+Reviewed-by: Michal Kubiak <michal.kubiak@intel.com>
 
-@@ -10,8 +10,7 @@
-  #include "fw/api/txq.h"
-
-  /* Highest firmware API version supported */
--#define IWL_22000_UCODE_API_MAX        81
--#define IWL_22500_UCODE_API_MAX        77
-+#define IWL_22000_UCODE_API_MAX        77
-
-  /* Lowest firmware API version supported */
-
-The parameter that was originally set to 81 is now set to 77.
-
-Please try the attached patch.
-
-Larry
-
---------------C6f4cDILumD0bj2hMiJ0eR6O
-Content-Type: text/x-patch; charset=UTF-8; name="test_iwlwifi.patch"
-Content-Disposition: attachment; filename="test_iwlwifi.patch"
-Content-Transfer-Encoding: base64
-
-ZGlmZiAtLWdpdCBhL2RyaXZlcnMvbmV0L3dpcmVsZXNzL2Npc2NvL2Fpcm8uYyBiL2RyaXZl
-cnMvbmV0L3dpcmVsZXNzL2Npc2NvL2Fpcm8uYwppbmRleCBiZWVlMDlkZDk1OGMuLjRjYTZh
-MWJhNzhlOCAxMDA2NDQKLS0tIGEvZHJpdmVycy9uZXQvd2lyZWxlc3MvY2lzY28vYWlyby5j
-CisrKyBiL2RyaXZlcnMvbmV0L3dpcmVsZXNzL2Npc2NvL2Fpcm8uYwpAQCAtNjE1Niw3ICs2
-MTU2LDcgQEAgc3RhdGljIGludCBhaXJvX2dldF9yYXRlKHN0cnVjdCBuZXRfZGV2aWNlICpk
-ZXYsCiB7CiAJc3RydWN0IGl3X3BhcmFtICp2d3JxID0gJndycXUtPmJpdHJhdGU7CiAJc3Ry
-dWN0IGFpcm9faW5mbyAqbG9jYWwgPSBkZXYtPm1sX3ByaXY7Ci0JU3RhdHVzUmlkIHN0YXR1
-c19yaWQ7CQkvKiBDYXJkIHN0YXR1cyBpbmZvICovCisJU3RhdHVzUmlkIHN0YXR1c19yaWQg
-PSB7fTsJCS8qIENhcmQgc3RhdHVzIGluZm8gKi8KIAogCXJlYWRTdGF0dXNSaWQobG9jYWws
-ICZzdGF0dXNfcmlkLCAxKTsKIApkaWZmIC0tZ2l0IGEvZHJpdmVycy9uZXQvd2lyZWxlc3Mv
-aW50ZWwvaXdsd2lmaS9jZmcvMjIwMDAuYyBiL2RyaXZlcnMvbmV0L3dpcmVsZXNzL2ludGVs
-L2l3bHdpZmkvY2ZnLzIyMDAwLmMKaW5kZXggYWE0MzIwY2E0YzMwLi5kM2U3MGMzM2ZiY2Yg
-MTAwNjQ0Ci0tLSBhL2RyaXZlcnMvbmV0L3dpcmVsZXNzL2ludGVsL2l3bHdpZmkvY2ZnLzIy
-MDAwLmMKKysrIGIvZHJpdmVycy9uZXQvd2lyZWxlc3MvaW50ZWwvaXdsd2lmaS9jZmcvMjIw
-MDAuYwpAQCAtMTAsNyArMTAsNyBAQAogI2luY2x1ZGUgImZ3L2FwaS90eHEuaCIKIAogLyog
-SGlnaGVzdCBmaXJtd2FyZSBBUEkgdmVyc2lvbiBzdXBwb3J0ZWQgKi8KLSNkZWZpbmUgSVdM
-XzIyMDAwX1VDT0RFX0FQSV9NQVgJNzcKKyNkZWZpbmUgSVdMXzIyMDAwX1VDT0RFX0FQSV9N
-QVgJODEKIAogLyogTG93ZXN0IGZpcm13YXJlIEFQSSB2ZXJzaW9uIHN1cHBvcnRlZCAqLwog
-I2RlZmluZSBJV0xfMjIwMDBfVUNPREVfQVBJX01JTgk1MAo=
-
---------------C6f4cDILumD0bj2hMiJ0eR6O--
 
