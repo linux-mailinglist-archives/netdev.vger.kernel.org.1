@@ -1,125 +1,133 @@
-Return-Path: <netdev+bounces-16099-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16100-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9569C74B64D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:30:50 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 5721D74B66D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:39:49 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 48EAD2818A0
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:30:49 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id ABD422818BF
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:39:47 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 527ED10794;
-	Fri,  7 Jul 2023 18:30:45 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8C93915AC1;
+	Fri,  7 Jul 2023 18:39:45 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 3EBB1174D7;
-	Fri,  7 Jul 2023 18:30:45 +0000 (UTC)
-Received: from mail-wr1-x435.google.com (mail-wr1-x435.google.com [IPv6:2a00:1450:4864:20::435])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 95CB61FEF;
-	Fri,  7 Jul 2023 11:30:43 -0700 (PDT)
-Received: by mail-wr1-x435.google.com with SMTP id ffacd0b85a97d-3090d3e9c92so2484162f8f.2;
-        Fri, 07 Jul 2023 11:30:43 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688754642; x=1691346642;
-        h=cc:to:subject:message-id:date:from:mime-version:from:to:cc:subject
-         :date:message-id:reply-to;
-        bh=SlBWN7OWhVhMUExcQDaNyIzjddy3YXTYXrq90Ko+2bQ=;
-        b=N3FN7yhlv8Gf0kscvoYkADwR3f9G3QscUkPMVUfCbhsDyPzs/Hp5KLLXo5Uk58EvzW
-         1VRl5hN3PrCX0BMSqswFhMz46NY+8P4w1UBR+GxyGEZecYaBPEu3HTOpPIn7gT50vUNS
-         r9MxTgmqFX9V6mhdo9ud1YuoKuMatRNOIoiMjyRbguf52lmqUKL+kQgzmXxIoHAWD9Tz
-         9z+nL6BmdUux+N2dROm/Tw706I/BkYQPvK/p37YnQ0Fw9/k7Fho0ttueoADoW0vGryac
-         obCOUr31FD411wUarAP0VUU9lDRXsWCideOfalcoq5CdFbROq7TOH1eudfipz977SS5f
-         OTwQ==
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688754642; x=1691346642;
-        h=cc:to:subject:message-id:date:from:mime-version:x-gm-message-state
-         :from:to:cc:subject:date:message-id:reply-to;
-        bh=SlBWN7OWhVhMUExcQDaNyIzjddy3YXTYXrq90Ko+2bQ=;
-        b=JAi891keKzT4jgn22h9G+jA3YXtTAybACpNMKP0pYXOQt6uu1Iu3l/l4MgEyhwfxjv
-         za7BbtOFPUUMcIH4m3z+Iw2nPFadop03AhHt7SAS3J37UdoT0jSFyEx/VymxCHUaMfnd
-         xh6GSc2wE+1HpCPfjm61yQG5FBccZUAhtr7FkjG8rTZXYOtzYcTr1yQdliPLW13u/Wv7
-         jRkBFQoNRLegX9mMBoHa3R8s6zAnOkG9OpwlClwxoOjjwG6hi5TJWHv8BbtOaeKEQr+M
-         Pqo+bs38gP5jq8mOz3LLF2hji/og3Czfxy8DPn2gAVcuz7QEDBzIRCf6xIWrWpwciSeG
-         he1Q==
-X-Gm-Message-State: ABy/qLan3QLlswSQS/8nELKmt5lF7uO8oynmefFp4WX/8iL3PeFAMEsz
-	RHSlWESMGxNQjVM8eoBAjQcU5MBtcQIuGA+EH54OTESnd2Z4eg==
-X-Google-Smtp-Source: APBJJlEHG0upgfWb1orepVX1HxskKJh2rtr2cGcEnpEabwRyA/6clKJk3DtW95xdhJ2WKQyHAEW/XD8Jcc4HmUYOFQY=
-X-Received: by 2002:adf:fec7:0:b0:313:f7de:6356 with SMTP id
- q7-20020adffec7000000b00313f7de6356mr6401559wrs.15.1688754641841; Fri, 07 Jul
- 2023 11:30:41 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E477F1852
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:39:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1CC4DC433C7;
+	Fri,  7 Jul 2023 18:39:43 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688755183;
+	bh=W+uxIvnlk5gJmqhAI2jml15L57OjIYxyYaYlLjH9cW8=;
+	h=From:To:Cc:Subject:Date:From;
+	b=jlN7xg+Gu+DXpfjIrka6BpGZSFVzSqZ1KVM3EbCbWJXvFRcVNoL0qz2VTW5KyIV81
+	 MrotqEbyCFfgilVvC+M/N/RKhcbtVm6USwedlK2XAQzbuzA9mLtZgQcwyDPOK1jNej
+	 /asL7bJABvcJHIL/vfx5vaTPnkdvejXSjRWGwWCajaWN0Y363BnKho18ZI3ppezwBU
+	 KpfB+aMpUiTeckxiOuHVVEjJctkR7N4UlQ5/z1abUTiduikTWHwvlRb/T6I7EDJF6j
+	 gfxr7nRlZKM40h6f5he2GBS0uzEz9pMTP4tfDUnzkoe9CAtU9M7LxIsQRagPEmDgPO
+	 BvWsAEfBMg3QQ==
+From: Jakub Kicinski <kuba@kernel.org>
+To: netdev@vger.kernel.org
+Cc: almasrymina@google.com,
+	hawk@kernel.org,
+	ilias.apalodimas@linaro.org,
+	edumazet@google.com,
+	dsahern@gmail.com,
+	michael.chan@broadcom.com,
+	willemb@google.com,
+	Jakub Kicinski <kuba@kernel.org>
+Subject: [RFC 00/12] net: huge page backed page_pool
+Date: Fri,  7 Jul 2023 11:39:23 -0700
+Message-ID: <20230707183935.997267-1-kuba@kernel.org>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-From: Andrii Nakryiko <andrii.nakryiko@gmail.com>
-Date: Fri, 7 Jul 2023 11:30:30 -0700
-Message-ID: <CAEf4BzYMAAhwscTWWTenvyr-PQ7E5tMg_iqXsPj_dyZEMVCrKg@mail.gmail.com>
-Subject: Sockmap's parser/verdict programs and epoll notifications
-To: john fastabend <john.fastabend@gmail.com>, bpf <bpf@vger.kernel.org>, 
-	Networking <netdev@vger.kernel.org>
-Cc: "davidhwei@meta.com" <davidhwei@meta.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Transfer-Encoding: 8bit
 
-Hey John,
+Hi!
 
-We've been recently experimenting with using BPF_SK_SKB_STREAM_PARSER
-and BPF_SK_SKB_STREAM_VERDICT with sockmap/sockhash to perform
-in-kernel parsing of RSocket frames. A very simple format ([0]) where
-the first 3 bytes specify the size of the frame payload. The idea was
-to collect the entire frame in the kernel before notifying user-space
-that data is available. This is meant to minimize unnecessary wakeups
-due to incomplete logical frames, saving CPU.
+This is an "early PoC" at best. It seems to work for a basic
+traffic test but there's no uAPI and a lot more general polish
+is needed.
 
-You can find the BPF source code I've used at [1], it has lots of
-extra logging and stuff, but the idea is to read the first 3 bytes of
-each logical frame, and return the expected full frame size from the
-parser program. The verdict program always just returns SK_PASS.
+The problem we're seeing is that performance of some older NICs
+degrades quite a bit when IOMMU is used (in non-passthru mode).
+There is a long tail of old NICs deployed, especially in PoPs/
+/on edge. From a conversation I had with Eric a few months
+ago it sounded like others may have similar issues. So I thought
+I'd take a swing at getting page pool to feed drivers huge pages.
+1G pages require hooking into early init via CMA but it works
+just fine.
 
-This seems to work exactly as expected in manual simulations of
-various packet size distributions, and even for a bunch of
-ping/pong-like benchmark (which are very sensitive to correct frame
-length determination, so I'm reasonably confident we don't screw that
-up much). And yet, when benchmarking sending multiple logical RPC
-streams over the same single socket (so many interleaving RSocket
-frames on single socket, but in terms of logical frames nothing should
-change), we often see that while full frame hasn't been accumulated in
-socket receive buffer yet, epoll_wait() for that socket would return
-with success notifying user space that there is data on socket.
-Subsequent recvfrom() call would immediately return -EAGAIN and no
-data, and our benchmark would go on this loop of useless
-epoll_wait()+recvfrom() calls back to back, many times over.
+I haven't tested this with a real workload, because I'm still
+waiting to get my hands on the right machine. But the experiment
+with bnxt shows a ~90% reduction in IOTLB misses (670k -> 70k).
 
-So I have a few questions:
-  - is the above use case something that was meant to be handled by
-sockmap+parser/verdict?
-  - is it correct to assume that epoll won't wake up until amount of
-bytes requested by parser program is accumulated (this seems to be the
-case from manually experimenting with various "packet delays");
-  - is there some known bug or race in how sockmap and strparser
-framework interacts with epoll subsystem that could cause this weird
-epoll_wait() behavior?
+In terms of the missing parts - uAPI is definitely needed.
+The rough plan would be to add memory config via the netdev
+genl family. Should fit nicely there. Have the config stored
+in struct netdevice. When page pool is created get to the netdev
+and automatically select the provider without the driver even
+knowing. Two problems with that are - 1) if the driver follows
+the recommended flow of allocating new queues before freeing
+old ones we will have page pools created before the old ones
+are gone, which means we'd need to reserve 2x the number of
+1G pages; 2) there's no callback to the driver to say "I did
+something behind your back, don't worry about it, but recreate
+your queues, please" so the change will not take effect until
+some unrelated change like installing XDP. Which may be fine
+in practice but is a bit odd.
 
-It does seem like some sort of timing issue, but I couldn't pin down
-exactly what are the conditions that this happens in. But it's quite
-reproducible with a pretty high frequency using our internal benchmark
-when multiple logical streams are involved.
+Then we get into hand-wavy stuff like - if we can link page
+pools to netdevs, we should also be able to export the page pool
+stats via the netdev family instead doing it the ethtool -S.. ekhm..
+"way". And if we start storing configs behind driver's back why
+don't we also store other params, like ring size and queue count...
+A lot of potential improvements as we iron out a new API...
 
-Any thoughts or suggestions?
+Live tree: https://github.com/kuba-moo/linux/tree/pp-providers
 
-  [0] https://rsocket.io/about/protocol/#framing-format
-  [1] https://github.com/anakryiko/libbpf-bootstrap/blob/thrift-coalesce-rcvlowat/examples/c/bootstrap.bpf.c
+Jakub Kicinski (12):
+  net: hack together some page sharing
+  net: create a 1G-huge-page-backed allocator
+  net: page_pool: hide page_pool_release_page()
+  net: page_pool: merge page_pool_release_page() with
+    page_pool_return_page()
+  net: page_pool: factor out releasing DMA from releasing the page
+  net: page_pool: create hooks for custom page providers
+  net: page_pool: add huge page backed memory providers
+  eth: bnxt: let the page pool manage the DMA mapping
+  eth: bnxt: use the page pool for data pages
+  eth: bnxt: make sure we make for recycle skbs before freeing them
+  eth: bnxt: wrap coherent allocations into helpers
+  eth: bnxt: hack in the use of MEP
 
--- Andrii
+ Documentation/networking/page_pool.rst        |  10 +-
+ arch/x86/kernel/setup.c                       |   6 +-
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 154 +++--
+ drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   5 +
+ drivers/net/ethernet/engleder/tsnep_main.c    |   2 +-
+ .../net/ethernet/stmicro/stmmac/stmmac_main.c |   4 +-
+ include/net/dcalloc.h                         |  28 +
+ include/net/page_pool.h                       |  36 +-
+ net/core/Makefile                             |   2 +-
+ net/core/dcalloc.c                            | 615 +++++++++++++++++
+ net/core/dcalloc.h                            |  96 +++
+ net/core/page_pool.c                          | 625 +++++++++++++++++-
+ 12 files changed, 1478 insertions(+), 105 deletions(-)
+ create mode 100644 include/net/dcalloc.h
+ create mode 100644 net/core/dcalloc.c
+ create mode 100644 net/core/dcalloc.h
+
+-- 
+2.41.0
+
 
