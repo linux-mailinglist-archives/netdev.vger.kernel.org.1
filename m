@@ -1,93 +1,161 @@
-Return-Path: <netdev+bounces-15964-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15965-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D30D174AA32
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:10:30 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 27D5874AA65
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:24:50 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 48A2A1C20F2C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 05:10:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 06DAF1C20E41
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 05:24:49 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3B89E1847;
-	Fri,  7 Jul 2023 05:10:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A20761FB2;
+	Fri,  7 Jul 2023 05:24:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2E9A91FAB
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 05:10:26 +0000 (UTC)
-Received: from mail-pl1-f200.google.com (mail-pl1-f200.google.com [209.85.214.200])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 68CCF19B2
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 22:10:22 -0700 (PDT)
-Received: by mail-pl1-f200.google.com with SMTP id d9443c01a7336-1b895a08e3aso21332435ad.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 22:10:22 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688706622; x=1691298622;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=3odBP2k8JVrJYy1wa0Wfn0VRWmDTDDoVrfM0d6n+ayY=;
-        b=Fx5kEBwj/mQzf4b972L+paRvrXMAiV+ViVgDIBZd3xxUyOP7eDjRsLWj/3pcPyAnK8
-         jHMIoNyu8RMVp9axtNxBQbIU4uaL+4/uQr+sbyNRC6DwmBgPaeZpDAGIM+o2S0BYuamb
-         8Cp445bJF4aJCzHMskEagCPimx4un3/cdtsK83oDGkcKwJT7HrpZMgBdY4ZCjPN9cKPP
-         rzOoNp0ukXMH/MC5CjzGicvg7S2DH0SORY9AHFf3QMx6+IyeW5JR67/A+PabE+0A7C+D
-         PI5Si/10b2fN3FwwBVcUGQht9iAbmggauXwq7hmkfosRlTLWpVElgGM+ufCmrFUhGHGS
-         Dwxg==
-X-Gm-Message-State: ABy/qLbbSzBuEVmXhuDt1FhEe7CjXvjFojBwsf9bn3cPBOssA2SEmfhn
-	DnRvV3T1g8QdrNQJ7ho/Bqz0bkl1V9IOlKQ68oVtKsLrYsAv
-X-Google-Smtp-Source: APBJJlFPEIIvaQ5FzGgKwrTTH+IL4zi+h8xLaZxAtxA/83enB/W2VDTaFHWmkb5XXkGxd63ab2vboDyFilTDCFmVWY2UF8XrN5eI
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8CB431847
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 05:24:46 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-29.smtpout.orange.fr [80.12.242.29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 582801BF4
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 22:24:44 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id HdxOqZv2Mv997HdxPqkQHT; Fri, 07 Jul 2023 07:24:41 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1688707481;
+	bh=7lGGdENEqz/j3hddOtM6jrD7+VEvkBHFSPUjfBz4mYM=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=Rk/nNfxq9oTImDfxt0Dt9F7Yh/cc+d1SM7h5jRNEWD/5vXMidEWBxAKbf5DI5Pc3y
+	 fPV4W9FBe+r/0KKpxmqpNgFeGYM8FVU5oY+n0tbn1eAxRpwllFQC8BI9Frf5llqwwW
+	 Zm3qTLqIe6gYfwvxoRaZFNyWYjYxbcXwcW9pfcV/8dq96xDoVMS3QETZjuNY0Ovvun
+	 +qc4RyuMp3I+8UkXTwragu9B06J6eRVMPnXcpA3CAxcnZTqAnwij+A5OO4KzRNClGI
+	 pJtnzeeLAihu7gBnUVvm9lVjp74YBl2GgJHKxDyIRRSMRLOBmjLnReysB6JRxnLkOQ
+	 FKuUddqdZc5bw==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Fri, 07 Jul 2023 07:24:41 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <0d8a89fb-b1ef-9a15-8731-4160b1287e14@wanadoo.fr>
+Date: Fri, 7 Jul 2023 07:24:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a17:902:e549:b0:1b7:f5be:c934 with SMTP id
- n9-20020a170902e54900b001b7f5bec934mr4087715plf.9.1688706621980; Thu, 06 Jul
- 2023 22:10:21 -0700 (PDT)
-Date: Thu, 06 Jul 2023 22:10:21 -0700
-In-Reply-To: <000000000000a557cb05ff9ed03b@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000554b8205ffdea64e@google.com>
-Subject: Re: [syzbot] [ext4?] general protection fault in ext4_finish_bio
-From: syzbot <syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com>
-To: adilger.kernel@dilger.ca, boqun.feng@gmail.com, dhowells@redhat.com, 
-	herbert@gondor.apana.org.au, kuba@kernel.org, linux-ext4@vger.kernel.org, 
-	linux-fsdevel@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	longman@redhat.com, mingo@redhat.com, netdev@vger.kernel.org, 
-	peterz@infradead.org, syzkaller-bugs@googlegroups.com, tytso@mit.edu, 
-	will@kernel.org
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: =?UTF-8?B?UmU6IOWbnuWkjTogW1BBVENIIHYxXSBuZXQ6dGlwYzpSZW1vdmUgcmVw?=
+ =?UTF-8?Q?eated_initialization?=
+To: =?UTF-8?B?546L5piOLei9r+S7tuW6leWxguaKgOacr+mDqA==?= <machel@vivo.com>
+Cc: Jon Maloy <jmaloy@redhat.com>, Ying Xue <ying.xue@windriver.com>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "tipc-discussion@lists.sourceforge.net"
+ <tipc-discussion@lists.sourceforge.net>, LKML
+ <linux-kernel@vger.kernel.org>,
+ "opensource.kernel" <opensource.kernel@vivo.com>,
+ Jakub Kicinski <kuba@kernel.org>
+References: <20230706134226.9119-1-machel@vivo.com>
+ <20230706084729.12ed5725@kernel.org>
+ <a409e348-0d15-e7f6-5d97-1ebe8341027a@wanadoo.fr>
+ <SG2PR06MB3743FFC941CC9B242113A8A4BD2DA@SG2PR06MB3743.apcprd06.prod.outlook.com>
+Content-Language: fr, en-GB
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <SG2PR06MB3743FFC941CC9B242113A8A4BD2DA@SG2PR06MB3743.apcprd06.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot has bisected this issue to:
+Le 07/07/2023 à 03:24, 王明-软件底层技术部 a écrit :
+> Hi CJ
+> : )
+> So what you're saying is there's no repeat initialization problem here.
 
-commit b6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
-Author: David Howells <dhowells@redhat.com>
-Date:   Fri Jun 16 11:10:32 2023 +0000
+Hi,
 
-    crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+First, top posting is usually not the better way to answer email.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=17e4fa88a80000
-start commit:   ae230642190a Merge branch 'af_unix-followup-fixes-for-so_p..
-git tree:       net-next
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=1414fa88a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=1014fa88a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c9bf1936936ca698
-dashboard link: https://syzkaller.appspot.com/bug?extid=689ec3afb1ef07b766b2
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=136b9d48a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=10223cb8a80000
 
-Reported-by: syzbot+689ec3afb1ef07b766b2@syzkaller.appspotmail.com
-Fixes: b6d972f68983 ("crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)")
+Anyway, in your patch, you have:
+  	n = &grp->members.rb_node;
+  	while (*n) {
+  		tmp = container_of(*n, struct tipc_member, tree_node);
+-		parent = *n;
+-		tmp = container_of(parent, struct tipc_member, tree_node);
+  		nkey = (u64)tmp->node << 32 | tmp->port;
+  		if (key < nkey)
+  			n = &(*n)->rb_left;
 
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+You are right, 'tmp' is initialized twice. It is even initialized twice, 
+with the same walue.
+
+But in your patch, you also remove "parent = *n;"
+So now, 'parent' is never updated in the function, and when 
+rb_link_node() is called after the while loop, it is NULL.
+
+So your patch changed the behaviour of the code and looks broken.
+
+Something like:
+  	while (*n) {
+  		tmp = container_of(*n, struct tipc_member, tree_node);
+		parent = *n;
+-		tmp = container_of(parent, struct tipc_member, tree_node);
+  		nkey = (u64)tmp->node << 32 | tmp->port;
+  		if (key < nkey)
+  			n = &(*n)->rb_left;
+
+would look good to me but, as said by Jakub in the thread, is really 
+unlikely to be applied.
+
+The risk of breaking code (as you un-intentionally did) is higher than 
+the value of removing a redundant initialization.
+
+Reviewing such patches also consume maintainers' time to check for such 
+potential errors and sometimes it is safer to leave things as-is in 
+order not to waste time and avoid potential troubles.
+
+CJ
+
+
+> 
+> -----邮件原件-----
+> 发件人: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+> 发送时间: 2023年7月7日 1:14
+> 收件人: 王明-软件底层技术部 <machel@vivo.com>
+> 抄送: Jon Maloy <jmaloy@redhat.com>; Ying Xue <ying.xue@windriver.com>; David S. Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>; Paolo Abeni <pabeni@redhat.com>; netdev@vger.kernel.org; tipc-discussion@lists.sourceforge.net; linux-kernel@vger.kernel.org; opensource.kernel <opensource.kernel@vivo.com>; Jakub Kicinski <kuba@kernel.org>
+> 主题: Re: [PATCH v1] net:tipc:Remove repeated initialization
+> 
+> [你通常不会收到来自 christophe.jaillet@wanadoo.fr 的电子邮件。请访问 https://aka.ms/LearnAboutSenderIdentification，以了解这一点为什么很重要]
+> 
+> Le 06/07/2023 à 17:47, Jakub Kicinski a écrit :
+>> On Thu,  6 Jul 2023 21:42:09 +0800 Wang Ming wrote:
+>>> The original code initializes 'tmp' twice, which causes duplicate
+>>> initialization issue.
+>>> To fix this, we remove the second initialization of 'tmp' and use
+>>> 'parent' directly forsubsequent operations.
+>>>
+>>> Signed-off-by: Wang Ming <machel@vivo.com>
+>>
+>> Please stop sending the "remove repeated initialization" patches to
+>> networking, thanks.
+>>
+>>
+> 
+> The patch also looks just bogus, as 'parent' is now always NULL when:
+>      rb_link_node(&m->tree_node, parent, n);
+> 
+> is called after the while loop.
+> 
+> CJ
+
 
