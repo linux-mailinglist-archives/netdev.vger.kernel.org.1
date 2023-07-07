@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-16101-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16104-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 6571174B66E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:40:08 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D2D2774B67C
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:40:57 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 868981C2103D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:40:07 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EF5C2818C1
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:40:56 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 537C7171CB;
-	Fri,  7 Jul 2023 18:39:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6A017726;
+	Fri,  7 Jul 2023 18:39:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4BF8310952
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1241097B
 	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:39:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 8D704C433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D62C433CC;
 	Fri,  7 Jul 2023 18:39:43 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688755183;
-	bh=JhnNxV3xLZg2lEqAzbRF2RmDGouOVFVS1lFMBF2icmw=;
+	s=k20201202; t=1688755184;
+	bh=K/6WjbGLzAz6fxxlm8D2hh+6PXiKhDpzDvJqdlNHyRA=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=kfQwHlfRy92F5W1sQUgNIpzPJYAWI4Yf14kLc9TSQdf7ifJJkOmfLzm+/GXH0mdF5
-	 jKRKiMZb70LxafKLXPdUiJYKq1ZGXaSqprih1c461Krf/KWH7lTbJmQhacJcesMq58
-	 ++vqhFr8EGK4xEZTs3ubrLo/FZ8x3lcdXZrcQsW0XzjZuTtVcifG+XMXSMM1+cdHhY
-	 5gbtrvS5swWZH08KKMMowG6eka1k31PmFtpNIy9E6sJU4YCAwImDJTI49NopQPEuzH
-	 78trm8XnMAdgai9sidwG3rj16xL0FUrEO0XJsbcrYNrArGUe8z/Lpp6RhdayX7sYio
-	 x7oJsGSoSoe8A==
+	b=nmWrQRhLg3pAvgptGqF3h2ORa56MyFDwFdMeJZ4VU95HUHyB0pNUPVYaw7r/ytRUP
+	 7Pw1g46UacQHcYUhkodbLlyw0riynB2j2KAQRJhhHuVe2zL9BPO8vnvzYzVCTsFvKk
+	 ZnpYF2riO3/cCZACZVuXzCQecIeXDPS4nqCEXlWQ3Pg2LrQCOMrhu01RqhNrEOvo16
+	 e+LIU+WQCAA0RrFxcLl0uAm6NeT+CFWsOMsnHCZiWeYtAJNiH+UchQBXfODk4CjdUS
+	 3KjEaSoJRt92D7xbojLHEiHa2JAL0Q640AQYnbG/8RO2XJSIqIaI5rK/HatVJoaxu/
+	 frUgR0oNMqrbw==
 From: Jakub Kicinski <kuba@kernel.org>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com,
@@ -40,9 +40,9 @@ Cc: almasrymina@google.com,
 	michael.chan@broadcom.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC 01/12] net: hack together some page sharing
-Date: Fri,  7 Jul 2023 11:39:24 -0700
-Message-ID: <20230707183935.997267-2-kuba@kernel.org>
+Subject: [RFC 02/12] net: create a 1G-huge-page-backed allocator
+Date: Fri,  7 Jul 2023 11:39:25 -0700
+Message-ID: <20230707183935.997267-3-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230707183935.997267-1-kuba@kernel.org>
 References: <20230707183935.997267-1-kuba@kernel.org>
@@ -54,563 +54,318 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Implement a simple buddy allocator with a fallback. It will be
-used to split huge pages into smaller pools. And fallback to
-alloc_pages() if huge pages are exhausted.
+Get 1G pages from CMA, driver will be able to sub-allocate from
+those for individual queues. Each Rx queue (taking recycling into
+account) needs 32MB - 128MB of memory. With 32 active queues even
+with 2MB pages we'll end up using a lot of IOTLB entries.
 
-This code will be used exclusively on slow paths and is generally
-"not great" but it doesn't seem to immediately crash which is
-good enough for now?
+There are some workarounds for 2MB pages like trying to sort
+the buffers (i.e. making sure that the buffers used by the NIC
+at any time belong to as few 2MB pages as possible). But 1G pages
+seem so much simpler.
 
-This patch contains a basic "coherent allocator" which splits 2M
-coherently mapped pages into smaller chunks. Certian drivers
-appear to allocate a few MB in single coherent pages which is not
-great for IOTLB pressure (simple iperf test on bnxt with Rx backed
-by huge pages goes from 170k IOTLB misses to 60k when using this).
+Grab 4 pages for now, the real thing will probably need some
+Kconfigs and command line params. And a lot more uAPI in general.
+
+Also IDK how to hook this properly into early init :(
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- include/net/dcalloc.h |  18 ++
- net/core/Makefile     |   2 +-
- net/core/dcalloc.c    | 390 ++++++++++++++++++++++++++++++++++++++++++
- net/core/dcalloc.h    |  93 ++++++++++
- 4 files changed, 502 insertions(+), 1 deletion(-)
- create mode 100644 include/net/dcalloc.h
- create mode 100644 net/core/dcalloc.c
- create mode 100644 net/core/dcalloc.h
+ arch/x86/kernel/setup.c |   6 +-
+ include/net/dcalloc.h   |  10 ++
+ net/core/dcalloc.c      | 225 ++++++++++++++++++++++++++++++++++++++++
+ net/core/dcalloc.h      |   3 +
+ 4 files changed, 243 insertions(+), 1 deletion(-)
 
+diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
+index fd975a4a5200..cc6acd1fa67a 100644
+--- a/arch/x86/kernel/setup.c
++++ b/arch/x86/kernel/setup.c
+@@ -843,6 +843,8 @@ static void __init x86_report_nx(void)
+ 	}
+ }
+ 
++int __init mep_cma_init(void);
++
+ /*
+  * Determine if we were loaded by an EFI loader.  If so, then we have also been
+  * passed the efi memmap, systab, etc., so we should use these data structures
+@@ -1223,8 +1225,10 @@ void __init setup_arch(char **cmdline_p)
+ 	initmem_init();
+ 	dma_contiguous_reserve(max_pfn_mapped << PAGE_SHIFT);
+ 
+-	if (boot_cpu_has(X86_FEATURE_GBPAGES))
++	if (boot_cpu_has(X86_FEATURE_GBPAGES)) {
+ 		hugetlb_cma_reserve(PUD_SHIFT - PAGE_SHIFT);
++		mep_cma_init();
++	}
+ 
+ 	/*
+ 	 * Reserve memory for crash kernel after SRAT is parsed so that it
 diff --git a/include/net/dcalloc.h b/include/net/dcalloc.h
-new file mode 100644
-index 000000000000..a85c59d7f844
---- /dev/null
+index a85c59d7f844..21c0fcaaa163 100644
+--- a/include/net/dcalloc.h
 +++ b/include/net/dcalloc.h
-@@ -0,0 +1,18 @@
-+#ifndef __NET_DCALLOC_H
-+#define __NET_DCALLOC_H
-+
-+#include <linux/types.h>
-+
-+struct device;
-+
-+struct dma_cocoa;
-+
-+struct dma_cocoa *dma_cocoa_create(struct device *dev, gfp_t gfp);
-+void dma_cocoa_destroy(struct dma_cocoa *cocoa);
-+
-+void *dma_cocoa_alloc(struct dma_cocoa *cocoa, unsigned long size,
-+		      dma_addr_t *dma, gfp_t gfp);
-+void dma_cocoa_free(struct dma_cocoa *cocoa, unsigned long size, void *addr,
-+		    dma_addr_t dma);
-+
-+#endif
-diff --git a/net/core/Makefile b/net/core/Makefile
-index 731db2eaa610..3a98ad5d2b49 100644
---- a/net/core/Makefile
-+++ b/net/core/Makefile
-@@ -13,7 +13,7 @@ obj-y		     += dev.o dev_addr_lists.o dst.o netevent.o \
- 			neighbour.o rtnetlink.o utils.o link_watch.o filter.o \
- 			sock_diag.o dev_ioctl.o tso.o sock_reuseport.o \
- 			fib_notifier.o xdp.o flow_offload.o gro.o \
--			netdev-genl.o netdev-genl-gen.o gso.o
-+			netdev-genl.o netdev-genl-gen.o gso.o dcalloc.o
+@@ -15,4 +15,14 @@ void *dma_cocoa_alloc(struct dma_cocoa *cocoa, unsigned long size,
+ void dma_cocoa_free(struct dma_cocoa *cocoa, unsigned long size, void *addr,
+ 		    dma_addr_t dma);
  
- obj-$(CONFIG_NETDEV_ADDR_LIST_TEST) += dev_addr_lists_test.o
- 
++struct mem_provider;
++
++struct mem_provider *mep_create(struct device *dev);
++void mep_destroy(struct mem_provider *mep);
++
++struct page *mep_alloc(struct mem_provider *mep, unsigned int order,
++		       dma_addr_t *dma, gfp_t gfp);
++void mep_free(struct mem_provider *mep, struct page *page,
++	      unsigned int order, dma_addr_t dma);
++
+ #endif
 diff --git a/net/core/dcalloc.c b/net/core/dcalloc.c
-new file mode 100644
-index 000000000000..af9029018353
---- /dev/null
+index af9029018353..821b9dbfb655 100644
+--- a/net/core/dcalloc.c
 +++ b/net/core/dcalloc.c
-@@ -0,0 +1,390 @@
-+#include "dcalloc.h"
-+
-+#include <linux/dma-mapping.h>
-+#include <linux/sizes.h>
-+#include <linux/slab.h>
-+
-+static bool dma_sal_in_use(struct dma_slow_allocator *sal)
-+{
-+	return refcount_read(&sal->user_cnt);
-+}
-+
-+int dma_slow_huge_init(struct dma_slow_huge *shu, void *addr,
-+		       unsigned int size, dma_addr_t dma, gfp_t gfp)
-+{
-+	struct dma_slow_buddy *bud;
-+
-+	bud = kzalloc(sizeof(*bud), gfp);
-+	if (!bud)
-+		return -ENOMEM;
-+
-+	shu->addr = addr;
-+	shu->size = size;
-+	shu->dma = dma;
-+
-+	INIT_LIST_HEAD(&shu->buddy_list);
-+
-+	bud->size = size;
-+	bud->free = true;
-+	list_add(&bud->list, &shu->buddy_list);
-+
-+	return 0;
-+}
-+
-+static struct dma_slow_buddy *
-+dma_slow_bud_split(struct dma_slow_buddy *bud, gfp_t gfp)
-+{
-+	struct dma_slow_buddy *right;
-+
-+	right = kzalloc(sizeof(*bud), gfp);
-+	if (!right)
-+		return NULL;
-+
-+	bud->size /= 2;
-+
-+	right->offset = bud->offset + bud->size;
-+	right->size = bud->size;
-+	right->free = true;
-+
-+	list_add(&right->list, &bud->list);
-+
-+	return bud;
-+}
-+
-+static bool dma_slow_bud_coalesce(struct dma_slow_huge *shu)
-+{
-+	struct dma_slow_buddy *bud, *left = NULL, *right = NULL;
-+
-+	list_for_each_entry(bud, &shu->buddy_list, list) {
-+		if (left && bud &&
-+		    left->free && bud->free &&
-+		    left->size == bud->size &&
-+		    (left->offset & bud->offset) == left->offset) {
-+			right = bud;
-+			break;
-+		}
-+		left = bud;
-+	}
-+
-+	if (!right)
-+		return false;
-+
-+	left->size *= 2;
-+	list_del(&right->list);
-+	kfree(right);
-+	return true;
-+}
-+
-+static void *
-+__dma_sal_alloc_buddy(struct dma_slow_allocator *sal, struct dma_slow_huge *shu,
-+		      unsigned int size, dma_addr_t *dma, gfp_t gfp)
-+{
-+	struct dma_slow_buddy *small_fit = NULL;
-+	struct dma_slow_buddy *bud;
-+
-+	if (shu->size < size)
-+		return NULL;
-+
-+	list_for_each_entry(bud, &shu->buddy_list, list) {
-+		if (!bud->free || bud->size < size)
-+			continue;
-+
-+		if (!small_fit || small_fit->size > bud->size)
-+			small_fit = bud;
-+		if (bud->size == size)
-+			break;
-+	}
-+	if (!small_fit)
-+		return NULL;
-+	bud = small_fit;
-+
-+	while (bud->size >= size * 2) {
-+		bud = dma_slow_bud_split(bud, gfp);
-+		if (!bud)
-+			return NULL;
-+	}
-+
-+	bud->free = false;
-+	*dma = shu->dma + bud->offset;
-+	return shu->addr + (bud->offset >> sal->ops->ptr_shf);
-+}
-+
-+static void *
-+dma_sal_alloc_buddy(struct dma_slow_allocator *sal, unsigned int size,
-+		    dma_addr_t *dma, gfp_t gfp)
-+{
-+	struct dma_slow_huge *shu;
-+	void *addr;
-+
-+	list_for_each_entry(shu, &sal->huge, huge) {
-+		addr = __dma_sal_alloc_buddy(sal, shu, size, dma, gfp);
-+		if (addr)
-+			return addr;
-+	}
-+
-+	if (!sal->ops->alloc_huge)
-+		return NULL;
-+
-+	shu = kzalloc(sizeof(*shu), gfp);
-+	if (!shu)
-+		return NULL;
-+	if (sal->ops->alloc_huge(sal, shu, size, gfp)) {
-+		kfree(shu);
-+		return NULL;
-+	}
-+	list_add(&shu->huge, &sal->huge);
-+
-+	return __dma_sal_alloc_buddy(sal, shu, size, dma, gfp);
-+}
-+
-+static bool
-+__dma_sal_free_buddy(struct dma_slow_allocator *sal, struct dma_slow_huge *shu,
-+		     void *addr, unsigned int size, dma_addr_t dma)
-+{
-+	struct dma_slow_buddy *bud;
-+	dma_addr_t exp_dma;
-+	void *exp_addr;
-+
-+	list_for_each_entry(bud, &shu->buddy_list, list) {
-+		exp_dma = shu->dma + bud->offset;
-+		exp_addr = shu->addr + (bud->offset >> sal->ops->ptr_shf);
-+
-+		if (exp_addr != addr)
-+			continue;
-+
-+		if (exp_dma != dma || bud->size != size)
-+			pr_warn("mep param mismatch: %u %u, %lu %lu\n",
-+				bud->size, size, (ulong)exp_dma, (ulong)dma);
-+		if (bud->free)
-+			pr_warn("double free: %d %lu\n", size, (ulong)dma);
-+		bud->free = true;
-+		return true;
-+	}
-+
-+	return false;
-+}
-+
-+static void
-+dma_slow_maybe_free_huge(struct dma_slow_allocator *sal,
-+			 struct dma_slow_huge *shu)
-+{
-+	struct dma_slow_buddy *bud;
-+
-+	bud = list_first_entry(&shu->buddy_list, typeof(*bud), list);
-+	if (!bud->free || bud->size != shu->size)
-+		return;
-+
-+	if (!sal->ops->alloc_huge)
-+		return;
-+
-+	kfree(bud);
-+
-+	sal->ops->free_huge(sal, shu);
-+	list_del(&shu->huge);
-+	kfree(shu);
-+}
-+
-+static bool
-+dma_sal_free_buddy(struct dma_slow_allocator *sal, void *addr,
-+		   unsigned int order, dma_addr_t dma)
-+{
-+	struct dma_slow_huge *shu;
-+	bool freed = false;
-+
-+	list_for_each_entry(shu, &sal->huge, huge) {
-+		freed = __dma_sal_free_buddy(sal, shu, addr, order, dma);
-+		if (freed)
-+			break;
-+	}
-+	if (freed) {
-+		while (dma_slow_bud_coalesce(shu))
-+			/* I know, it's not efficient.
-+			 * But all of SAL is on the config path.
-+			 */;
-+		dma_slow_maybe_free_huge(sal, shu);
-+	}
-+	return freed;
-+}
-+
-+static void *
-+dma_sal_alloc_fb(struct dma_slow_allocator *sal, unsigned int size,
-+		 dma_addr_t *dma, gfp_t gfp)
-+{
-+	struct dma_slow_fall *fb;
-+
-+	fb = kzalloc(sizeof(*fb), gfp);
-+	if (!fb)
-+		return NULL;
-+	fb->size = size;
-+
-+	if (sal->ops->alloc_fall(sal, fb, size, gfp)) {
-+		kfree(fb);
-+		return NULL;
-+	}
-+	list_add(&fb->fb, &sal->fallback);
-+
-+	*dma = fb->dma;
-+	return fb->addr;
-+}
-+
-+static bool dma_sal_free_fb(struct dma_slow_allocator *sal, void *addr,
-+			    unsigned int size, dma_addr_t dma)
-+{
-+	struct dma_slow_fall *fb, *pos;
-+
-+	fb = NULL;
-+	list_for_each_entry(pos, &sal->fallback, fb)
-+		if (pos->addr == addr) {
-+			fb = pos;
-+			break;
-+		}
-+
-+	if (!fb) {
-+		pr_warn("free: address %px not found\n", addr);
-+		return false;
-+	}
-+
-+	if (fb->size != size || fb->dma != dma)
-+		pr_warn("free: param mismatch: %u %u, %lu %lu\n",
-+			fb->size, size, (ulong)fb->dma, (ulong)dma);
-+
-+	list_del(&fb->fb);
-+	sal->ops->free_fall(sal, fb);
-+	kfree(fb);
-+	return true;
-+}
-+
-+void *dma_sal_alloc(struct dma_slow_allocator *sal, unsigned int size,
-+		    dma_addr_t *dma, gfp_t gfp)
-+{
-+	void *ret;
-+
-+	ret = dma_sal_alloc_buddy(sal, size, dma, gfp);
-+	if (!ret)
-+		ret = dma_sal_alloc_fb(sal, size, dma, gfp);
-+	if (!ret)
-+		return NULL;
-+
-+	dma_slow_get(sal);
-+	return ret;
-+}
-+
-+void dma_sal_free(struct dma_slow_allocator *sal, void *addr,
-+		  unsigned int size, dma_addr_t dma)
-+{
-+	if (!dma_sal_free_buddy(sal, addr, size, dma) &&
-+	    !dma_sal_free_fb(sal, addr, size, dma))
-+		return;
-+
-+	dma_slow_put(sal);
-+}
-+
-+void dma_sal_init(struct dma_slow_allocator *sal,
-+		  const struct dma_slow_allocator_ops *ops,
-+		  struct device *dev)
-+{
-+	sal->ops = ops;
-+	sal->dev = dev;
-+
-+	INIT_LIST_HEAD(&sal->huge);
-+	INIT_LIST_HEAD(&sal->fallback);
-+
-+	refcount_set(&sal->user_cnt, 1);
-+}
+@@ -388,3 +388,228 @@ void dma_cocoa_free(struct dma_cocoa *cocoa, unsigned long size, void *addr,
+ 	size = roundup_pow_of_two(size);
+ 	return dma_sal_free(&cocoa->sal, addr, size, dma);
+ }
 +
 +/*****************************
-+ ***  DMA COCOA allocator  ***
++ ***   DMA MEP allocator   ***
 + *****************************/
-+static int
-+dma_cocoa_alloc_huge(struct dma_slow_allocator *sal, struct dma_slow_huge *shu,
-+		     unsigned int size, gfp_t gfp)
++
++#include <linux/cma.h>
++
++static struct cma *mep_cma;
++static int mep_err;
++
++int __init mep_cma_init(void);
++int __init mep_cma_init(void)
 +{
-+	if (size >= SZ_2M)
-+		return -ENOMEM;
++	int order_per_bit;
 +
-+	shu->addr = dma_alloc_coherent(sal->dev, SZ_2M, &shu->dma, gfp);
-+	if (!shu->addr)
-+		return -ENOMEM;
++	order_per_bit = min(30 - PAGE_SHIFT, MAX_ORDER - 1);
++	order_per_bit = min(order_per_bit, HUGETLB_PAGE_ORDER);
 +
-+	if (dma_slow_huge_init(shu, shu->addr, SZ_2M, shu->dma, gfp))
-+		goto err_free_dma;
++	mep_err = cma_declare_contiguous_nid(0,		/* base */
++					     SZ_4G,	/* size */
++					     0,		/* limit */
++					     SZ_1G,	/* alignment */
++					     order_per_bit,  /* order_per_bit */
++					     false,	/* fixed */
++					     "net_mep",	/* name */
++					     &mep_cma,	/* res_cma */
++					     NUMA_NO_NODE);  /* nid */
++	if (mep_err)
++		pr_warn("Net MEP init failed: %d\n", mep_err);
++	else
++		pr_info("Net MEP reserved 4G of memory\n");
 +
 +	return 0;
-+
-+err_free_dma:
-+	dma_free_coherent(sal->dev, SZ_2M, shu->addr, shu->dma);
-+	return -ENOMEM;
 +}
 +
-+static void
-+dma_cocoa_free_huge(struct dma_slow_allocator *sal, struct dma_slow_huge *shu)
++/** ----- MEP (slow / ctrl) allocator ----- */
++
++void mp_huge_split(struct page *page, unsigned int order)
 +{
-+	dma_free_coherent(sal->dev, SZ_2M, shu->addr, shu->dma);
++	int i;
++
++	split_page(page, order);
++	/* The subsequent pages have a poisoned next, and since we only
++	 * OR in the PP_SIGNATURE this will mess up PP detection.
++	 */
++	for (i = 0; i < (1 << order); i++)
++		page[i].pp_magic &= 3UL;
 +}
++
++struct mem_provider {
++	struct dma_slow_allocator sal;
++
++	struct work_struct work;
++};
 +
 +static int
-+dma_cocoa_alloc_fall(struct dma_slow_allocator *sal, struct dma_slow_fall *fb,
-+		     unsigned int size, gfp_t gfp)
++dma_mep_alloc_fall(struct dma_slow_allocator *sal, struct dma_slow_fall *fb,
++		   unsigned int size, gfp_t gfp)
 +{
-+	fb->addr = dma_alloc_coherent(sal->dev, size, &fb->dma, gfp);
++	int order = get_order(size);
++
++	fb->addr = alloc_pages(gfp, order);
 +	if (!fb->addr)
 +		return -ENOMEM;
++
++	fb->dma = dma_map_page_attrs(sal->dev, fb->addr, 0, size,
++				     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
++	if (dma_mapping_error(sal->dev, fb->dma)) {
++		put_page(fb->addr);
++		return -ENOMEM;
++	}
++
++	mp_huge_split(fb->addr, order);
 +	return 0;
 +}
 +
 +static void
-+dma_cocoa_free_fall(struct dma_slow_allocator *sal, struct dma_slow_fall *fb)
++dma_mep_free_fall(struct dma_slow_allocator *sal, struct dma_slow_fall *fb)
 +{
-+	dma_free_coherent(sal->dev, fb->size, fb->addr, fb->dma);
++	int order = get_order(fb->size);
++	struct page *page;
++	int i;
++
++	page = fb->addr;
++	dma_unmap_page_attrs(sal->dev, fb->dma, fb->size,
++			     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
++	for (i = 0; i < (1 << order); i++)
++		put_page(page + i);
 +}
 +
-+struct dma_slow_allocator_ops dma_cocoa_ops = {
-+	.alloc_huge	= dma_cocoa_alloc_huge,
-+	.free_huge	= dma_cocoa_free_huge,
-+	.alloc_fall	= dma_cocoa_alloc_fall,
-+	.free_fall	= dma_cocoa_free_fall,
++static void mep_release_work(struct work_struct *work)
++{
++	struct mem_provider *mep;
++
++	mep = container_of(work, struct mem_provider, work);
++
++	while (!list_empty(&mep->sal.huge)) {
++		struct dma_slow_buddy *bud;
++		struct dma_slow_huge *shu;
++
++		shu = list_first_entry(&mep->sal.huge, typeof(*shu), huge);
++
++		dma_unmap_page_attrs(mep->sal.dev, shu->dma, SZ_1G,
++				     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
++		cma_release(mep_cma, shu->addr, SZ_1G / PAGE_SIZE);
++
++		bud = list_first_entry_or_null(&shu->buddy_list,
++					       typeof(*bud), list);
++		if (WARN_ON(!bud || bud->size != SZ_1G))
++			continue;
++		kfree(bud);
++
++		list_del(&shu->huge);
++		kfree(shu);
++	}
++	put_device(mep->sal.dev);
++	kfree(mep);
++}
++
++static void dma_mep_release(struct dma_slow_allocator *sal)
++{
++	struct mem_provider *mep;
++
++	mep = container_of(sal, struct mem_provider, sal);
++
++	INIT_WORK(&mep->work, mep_release_work);
++	schedule_work(&mep->work);
++}
++
++struct dma_slow_allocator_ops dma_mep_ops = {
++	.ptr_shf	= PAGE_SHIFT - order_base_2(sizeof(struct page)),
++
++	.alloc_fall	= dma_mep_alloc_fall,
++	.free_fall	= dma_mep_free_fall,
++
++	.release	= dma_mep_release,
 +};
 +
-+struct dma_cocoa {
-+	struct dma_slow_allocator sal;
-+};
-+
-+struct dma_cocoa *dma_cocoa_create(struct device *dev, gfp_t gfp)
++struct mem_provider *mep_create(struct device *dev)
 +{
-+	struct dma_cocoa *cocoa;
++	struct mem_provider *mep;
++	int i;
 +
-+	cocoa = kzalloc(sizeof(*cocoa), gfp);
-+	if (!cocoa)
++	mep = kzalloc(sizeof(*mep), GFP_KERNEL);
++	if (!mep)
 +		return NULL;
 +
-+	dma_sal_init(&cocoa->sal, &dma_cocoa_ops, dev);
++	dma_sal_init(&mep->sal, &dma_mep_ops, dev);
++	get_device(mep->sal.dev);
 +
-+	return cocoa;
++	if (mep_err)
++		goto done;
++
++	/* Hardcoded for now */
++	for (i = 0; i < 2; i++) {
++		const unsigned int order = 30 - PAGE_SHIFT; /* 1G */
++		struct dma_slow_huge *shu;
++		struct page *page;
++
++		shu = kzalloc(sizeof(*shu), GFP_KERNEL);
++		if (!shu)
++			break;
++
++		page = cma_alloc(mep_cma, SZ_1G / PAGE_SIZE, order, false);
++		if (!page) {
++			pr_err("mep: CMA alloc failed\n");
++			goto err_free_shu;
++		}
++
++		shu->dma = dma_map_page_attrs(mep->sal.dev, page, 0,
++					      PAGE_SIZE << order,
++					      DMA_BIDIRECTIONAL,
++					      DMA_ATTR_SKIP_CPU_SYNC);
++		if (dma_mapping_error(mep->sal.dev, shu->dma)) {
++			pr_err("mep: DMA map failed\n");
++			goto err_free_page;
++		}
++
++		if (dma_slow_huge_init(shu, page, SZ_1G, shu->dma,
++				       GFP_KERNEL)) {
++			pr_err("mep: shu init failed\n");
++			goto err_unmap;
++		}
++
++		mp_huge_split(page, 30 - PAGE_SHIFT);
++
++		list_add(&shu->huge, &mep->sal.huge);
++		continue;
++
++err_unmap:
++		dma_unmap_page_attrs(mep->sal.dev, shu->dma, SZ_1G,
++				     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
++err_free_page:
++		put_page(page);
++err_free_shu:
++		kfree(shu);
++		break;
++	}
++done:
++	if (list_empty(&mep->sal.huge))
++		pr_warn("mep: no huge pages acquired\n");
++
++	return mep;
 +}
++EXPORT_SYMBOL_GPL(mep_create);
 +
-+void dma_cocoa_destroy(struct dma_cocoa *cocoa)
++void mep_destroy(struct mem_provider *mep)
 +{
-+	dma_slow_put(&cocoa->sal);
-+	WARN_ON(dma_sal_in_use(&cocoa->sal));
-+	kfree(cocoa);
++	dma_slow_put(&mep->sal);
 +}
++EXPORT_SYMBOL_GPL(mep_destroy);
 +
-+void *dma_cocoa_alloc(struct dma_cocoa *cocoa, unsigned long size,
-+		      dma_addr_t *dma, gfp_t gfp)
++struct page *mep_alloc(struct mem_provider *mep, unsigned int order,
++		       dma_addr_t *dma, gfp_t gfp)
 +{
-+	void *addr;
-+
-+	size = roundup_pow_of_two(size);
-+	addr = dma_sal_alloc(&cocoa->sal, size, dma, gfp);
-+	if (!addr)
-+		return NULL;
-+	memset(addr, 0, size);
-+	return addr;
++	return dma_sal_alloc(&mep->sal, PAGE_SIZE << order, dma, gfp);
 +}
++EXPORT_SYMBOL_GPL(mep_alloc);
 +
-+void dma_cocoa_free(struct dma_cocoa *cocoa, unsigned long size, void *addr,
-+		    dma_addr_t dma)
++void mep_free(struct mem_provider *mep, struct page *page,
++	      unsigned int order, dma_addr_t dma)
 +{
-+	size = roundup_pow_of_two(size);
-+	return dma_sal_free(&cocoa->sal, addr, size, dma);
++	dma_sal_free(&mep->sal, page, PAGE_SIZE << order, dma);
 +}
++EXPORT_SYMBOL_GPL(mep_free);
 diff --git a/net/core/dcalloc.h b/net/core/dcalloc.h
-new file mode 100644
-index 000000000000..c7e75ef0cb81
---- /dev/null
+index c7e75ef0cb81..2664f933c8e1 100644
+--- a/net/core/dcalloc.h
 +++ b/net/core/dcalloc.h
-@@ -0,0 +1,93 @@
-+#ifndef __DCALLOC_H
-+#define __DCALLOC_H
+@@ -90,4 +90,7 @@ static inline void dma_slow_put(struct dma_slow_allocator *sal)
+ 		sal->ops->release(sal);
+ }
+ 
++/* misc */
++void mp_huge_split(struct page *page, unsigned int order);
 +
-+#include <linux/dma-mapping.h>
-+#include <net/dcalloc.h>
-+
-+struct device;
-+
-+/* struct dma_slow_huge - AKA @shu, large block which will get chopped up */
-+struct dma_slow_huge {
-+	void *addr;
-+	unsigned int size;
-+	dma_addr_t dma;
-+
-+	struct list_head huge;
-+	struct list_head buddy_list;	/* struct dma_slow_buddy */
-+};
-+
-+/* Single allocation piece */
-+struct dma_slow_buddy {
-+	unsigned int offset;
-+	unsigned int size;
-+
-+	bool free;
-+
-+	struct list_head list;
-+};
-+
-+/* struct dma_slow_fall - AKA @fb, fallback when huge can't be allocated */
-+struct dma_slow_fall {
-+	void *addr;
-+	unsigned int size;
-+	dma_addr_t dma;
-+
-+	struct list_head fb;
-+};
-+
-+/* struct dma_slow_allocator - AKA @sal, per device allocator */
-+struct dma_slow_allocator {
-+	const struct dma_slow_allocator_ops *ops;
-+	struct device *dev;
-+
-+	unsigned int ptr_shf;
-+	refcount_t user_cnt;
-+
-+	struct list_head huge;		/* struct dma_slow_huge */
-+	struct list_head fallback;	/* struct dma_slow_fall */
-+};
-+
-+struct dma_slow_allocator_ops {
-+	u8	ptr_shf;
-+
-+	int (*alloc_huge)(struct dma_slow_allocator *sal,
-+			  struct dma_slow_huge *shu,
-+			  unsigned int size, gfp_t gfp);
-+	void (*free_huge)(struct dma_slow_allocator *sal,
-+			  struct dma_slow_huge *fb);
-+	int (*alloc_fall)(struct dma_slow_allocator *sal,
-+			  struct dma_slow_fall *fb,
-+			  unsigned int size, gfp_t gfp);
-+	void (*free_fall)(struct dma_slow_allocator *sal,
-+			  struct dma_slow_fall *fb);
-+
-+	void (*release)(struct dma_slow_allocator *sal);
-+};
-+
-+int dma_slow_huge_init(struct dma_slow_huge *shu, void *addr,
-+		       unsigned int size, dma_addr_t dma, gfp_t gfp);
-+
-+void dma_sal_init(struct dma_slow_allocator *sal,
-+		  const struct dma_slow_allocator_ops *ops,
-+		  struct device *dev);
-+
-+void *dma_sal_alloc(struct dma_slow_allocator *sal, unsigned int size,
-+		    dma_addr_t *dma, gfp_t gfp);
-+void dma_sal_free(struct dma_slow_allocator *sal, void *addr,
-+		  unsigned int size, dma_addr_t dma);
-+
-+static inline void dma_slow_get(struct dma_slow_allocator *sal)
-+{
-+	refcount_inc(&sal->user_cnt);
-+}
-+
-+static inline void dma_slow_put(struct dma_slow_allocator *sal)
-+{
-+	if (!refcount_dec_and_test(&sal->user_cnt))
-+		return;
-+
-+	if (sal->ops->release)
-+		sal->ops->release(sal);
-+}
-+
-+#endif
+ #endif
 -- 
 2.41.0
 
