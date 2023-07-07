@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-16108-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16109-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8E5A474B685
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:42:12 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id D09EA74B687
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:42:41 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A75D51C2108B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:42:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0CECC1C2105E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:42:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 2CE8717AB5;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id BA23F1773B;
 	Fri,  7 Jul 2023 18:39:49 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C36511773B
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:39:47 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 3E23AC433AD;
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 4EDB917737
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:39:48 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id BD2CAC433CA;
 	Fri,  7 Jul 2023 18:39:47 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688755187;
-	bh=oOZK2/uAWawUFNipirfKJhooZ2GGqhhTHhAfBQDVBDQ=;
+	s=k20201202; t=1688755188;
+	bh=SwrfaqmlgyimknjnFhBznwhIH7sKLYoZRHbAnHiddUs=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=ph+qKNmWRFyi5n5qqpLUDUsX+5oKVz7AUnR0LHEMZBsnQLywim6kD2lU5jevTNKOX
-	 f6X+twYiKgDaG9myiMWJrxyjOMSLl9rSBARUjRYoU1/jmXHvSWUDiUF6EhFZDb9ZDd
-	 n3WR26AIYI1fBIzw0Mr5TcIyvOXnH1Srop+aGdJ0MNXcKl6ADOFYu3jqGw6zROWzFH
-	 ep+dnQOEXQ45q7bEUc78zwCTTnuGvOJayumjEZ2NqU48/vl7VK21/cTFi6FtMq48PU
-	 6eRGSMx7uQceWrEZBQ4sd1Ou6IuQwfsB0ibMSjyiCHt8PTy7bjLzPk2Dm2n9D+KcUd
-	 DnhnPmOvpM8PA==
+	b=lXF61LL9jpC9i7zQ38ccRho7hc+wOp/Ey15mJgWS/ZMDmTpmZGo3BaK3yGsWONnTU
+	 pTZH7Y/J9eZ6A5YNd+v5DLUxZAE3d496RNMLqfMPfjjD2XntspMFWkeXErAX91Seip
+	 2c3+JkbDzfYfrgP59KL5zUMMP/PFizSInrDAt7+iHWzBvX512FkSVmQAG/4/WavEjU
+	 LMnzoSRgSjFPHH1AeeB41HOdQoEG9GwFAWDxa6m/uYWsU4IAZHHjGBbwVBOqFWkveg
+	 W4n7xmbvsAZibLENTA+yOp1oUkH+3+bGh5Z1ffCTIW5k8HMvcLw2SBXlKNlizRmhHy
+	 LxHEh/dRcVr5A==
 From: Jakub Kicinski <kuba@kernel.org>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com,
@@ -40,9 +40,9 @@ Cc: almasrymina@google.com,
 	michael.chan@broadcom.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC 09/12] eth: bnxt: use the page pool for data pages
-Date: Fri,  7 Jul 2023 11:39:32 -0700
-Message-ID: <20230707183935.997267-10-kuba@kernel.org>
+Subject: [RFC 10/12] eth: bnxt: make sure we make for recycle skbs before freeing them
+Date: Fri,  7 Jul 2023 11:39:33 -0700
+Message-ID: <20230707183935.997267-11-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230707183935.997267-1-kuba@kernel.org>
 References: <20230707183935.997267-1-kuba@kernel.org>
@@ -54,106 +54,51 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-To benefit from page recycling allocate the agg pages (used by HW-GRO
-and jumbo) from the page pool.
+Just in case the skbs we allocated have any PP pages attached
+or head is PP backed - make sure we mark the for recycle before
+dropping.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- drivers/net/ethernet/broadcom/bnxt/bnxt.c | 43 ++++++++++++-----------
- 1 file changed, 22 insertions(+), 21 deletions(-)
+ drivers/net/ethernet/broadcom/bnxt/bnxt.c | 4 ++++
+ 1 file changed, 4 insertions(+)
 
 diff --git a/drivers/net/ethernet/broadcom/bnxt/bnxt.c b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-index 6512514cd498..734c2c6cad69 100644
+index 734c2c6cad69..679a28c038a2 100644
 --- a/drivers/net/ethernet/broadcom/bnxt/bnxt.c
 +++ b/drivers/net/ethernet/broadcom/bnxt/bnxt.c
-@@ -811,33 +811,27 @@ static inline int bnxt_alloc_rx_page(struct bnxt *bp,
- 	u16 sw_prod = rxr->rx_sw_agg_prod;
- 	unsigned int offset = 0;
- 
--	if (BNXT_RX_PAGE_MODE(bp)) {
-+	if (PAGE_SIZE <= BNXT_RX_PAGE_SIZE || BNXT_RX_PAGE_MODE(bp)) {
- 		page = __bnxt_alloc_rx_page(bp, &mapping, rxr, gfp);
- 
- 		if (!page)
- 			return -ENOMEM;
- 
- 	} else {
--		if (PAGE_SIZE > BNXT_RX_PAGE_SIZE) {
--			page = rxr->rx_page;
--			if (!page) {
--				page = alloc_page(gfp);
--				if (!page)
--					return -ENOMEM;
--				rxr->rx_page = page;
--				rxr->rx_page_offset = 0;
--			}
--			offset = rxr->rx_page_offset;
--			rxr->rx_page_offset += BNXT_RX_PAGE_SIZE;
--			if (rxr->rx_page_offset == PAGE_SIZE)
--				rxr->rx_page = NULL;
--			else
--				get_page(page);
--		} else {
-+		page = rxr->rx_page;
-+		if (!page) {
- 			page = alloc_page(gfp);
- 			if (!page)
- 				return -ENOMEM;
-+			rxr->rx_page = page;
-+			rxr->rx_page_offset = 0;
- 		}
-+		offset = rxr->rx_page_offset;
-+		rxr->rx_page_offset += BNXT_RX_PAGE_SIZE;
-+		if (rxr->rx_page_offset == PAGE_SIZE)
-+			rxr->rx_page = NULL;
-+		else
-+			get_page(page);
- 
- 		mapping = dma_map_page_attrs(&pdev->dev, page, offset,
- 					     BNXT_RX_PAGE_SIZE, DMA_FROM_DEVICE,
-@@ -1046,6 +1040,8 @@ static struct sk_buff *bnxt_rx_skb(struct bnxt *bp,
- 
- 	skb_reserve(skb, bp->rx_offset);
- 	skb_put(skb, offset_and_len & 0xffff);
-+	skb_mark_for_recycle(skb);
-+
- 	return skb;
- }
- 
-@@ -1110,9 +1106,13 @@ static u32 __bnxt_rx_agg_pages(struct bnxt *bp,
- 			return 0;
- 		}
- 
--		dma_unmap_page_attrs(&pdev->dev, mapping, BNXT_RX_PAGE_SIZE,
--				     bp->rx_dir,
--				     DMA_ATTR_WEAK_ORDERING);
-+		if (PAGE_SIZE > BNXT_RX_PAGE_SIZE)
-+			dma_unmap_page_attrs(&pdev->dev, mapping,
-+					     BNXT_RX_PAGE_SIZE, bp->rx_dir,
-+					     DMA_ATTR_WEAK_ORDERING);
-+		else
-+			dma_sync_single_for_cpu(&pdev->dev, mapping,
-+						PAGE_SIZE, DMA_BIDIRECTIONAL);
- 
- 		total_frag_len += frag_len;
- 		prod = NEXT_RX_AGG(prod);
-@@ -1754,6 +1754,7 @@ static void bnxt_deliver_skb(struct bnxt *bp, struct bnxt_napi *bnapi,
- 		return;
+@@ -1132,6 +1132,7 @@ static struct sk_buff *bnxt_rx_agg_pages_skb(struct bnxt *bp,
+ 	total_frag_len = __bnxt_rx_agg_pages(bp, cpr, shinfo, idx,
+ 					     agg_bufs, tpa, NULL);
+ 	if (!total_frag_len) {
++		skb_mark_for_recycle(skb);
+ 		dev_kfree_skb(skb);
+ 		return NULL;
  	}
- 	skb_record_rx_queue(skb, bnapi->index);
-+	skb_mark_for_recycle(skb);
- 	napi_gro_receive(&bnapi->napi, skb);
- }
- 
-@@ -2960,7 +2961,7 @@ static void bnxt_free_one_rx_ring_skbs(struct bnxt *bp, int ring_nr)
- 		if (!page)
- 			continue;
- 
--		if (BNXT_RX_PAGE_MODE(bp)) {
-+		if (PAGE_SIZE <= BNXT_RX_PAGE_SIZE || BNXT_RX_PAGE_MODE(bp)) {
- 			rx_agg_buf->page = NULL;
- 			__clear_bit(i, rxr->rx_agg_bmap);
- 
+@@ -1535,6 +1536,7 @@ static struct sk_buff *bnxt_gro_func_5730x(struct bnxt_tpa_info *tpa_info,
+ 		th = tcp_hdr(skb);
+ 		th->check = ~tcp_v6_check(len, &iph->saddr, &iph->daddr, 0);
+ 	} else {
++		skb_mark_for_recycle(skb);
+ 		dev_kfree_skb_any(skb);
+ 		return NULL;
+ 	}
+@@ -1715,6 +1717,7 @@ static inline struct sk_buff *bnxt_tpa_end(struct bnxt *bp,
+ 		if (eth_type_vlan(vlan_proto)) {
+ 			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
+ 		} else {
++			skb_mark_for_recycle(skb);
+ 			dev_kfree_skb(skb);
+ 			return NULL;
+ 		}
+@@ -1987,6 +1990,7 @@ static int bnxt_rx_pkt(struct bnxt *bp, struct bnxt_cp_ring_info *cpr,
+ 		if (eth_type_vlan(vlan_proto)) {
+ 			__vlan_hwaccel_put_tag(skb, vlan_proto, vtag);
+ 		} else {
++			skb_mark_for_recycle(skb);
+ 			dev_kfree_skb(skb);
+ 			goto next_rx;
+ 		}
 -- 
 2.41.0
 
