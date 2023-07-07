@@ -1,754 +1,202 @@
-Return-Path: <netdev+bounces-16130-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16131-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E1E5074B73A
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:37:19 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id D405974B773
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:45:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 97271280C39
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 19:37:18 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 5D5C72817AB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 19:45:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C1FF318AF9;
-	Fri,  7 Jul 2023 19:30:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5EEB6174F6;
+	Fri,  7 Jul 2023 19:45:40 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id B07A718AF1
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 19:30:43 +0000 (UTC)
-Received: from mail-yw1-x114a.google.com (mail-yw1-x114a.google.com [IPv6:2607:f8b0:4864:20::114a])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B9082139
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:30:34 -0700 (PDT)
-Received: by mail-yw1-x114a.google.com with SMTP id 00721157ae682-57320c10635so24584077b3.3
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 12:30:34 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5196223C7
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 19:45:40 +0000 (UTC)
+Received: from mail-ua1-x92c.google.com (mail-ua1-x92c.google.com [IPv6:2607:f8b0:4864:20::92c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A44DA129
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:45:38 -0700 (PDT)
+Received: by mail-ua1-x92c.google.com with SMTP id a1e0cc1a2514c-7948540a736so860914241.1
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 12:45:38 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688758234; x=1691350234;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=CQ9AaI5NbcA/oN/ecuTimulSkDUKAiNeCXSYKFyoRpE=;
-        b=pslXxhAl7Db8eW1923SaM9dPTzDYvuWeKvr+XMkN2/fSIGzCIQaX7EojfQQmY3p37L
-         iBcy1ejUEDWx0nH5eChAogJGsfgH9/6u/0Qzcz9G1Bk9OqD0O08KxlS5V09XUJJfSbDg
-         651PYELf0ontFLIypcuyrf0oDvjHdX/LDo7/QxTAgtRju/Zy8fjvM+Tdab8MisY9dSMn
-         tif63CoWcqNVOkrlnz+yOo3rMn7XeXAi4WyA2xmxrbutPrbQWJcp9FhOYm/Vox7QPYXL
-         uewRrYlkq0SmpbixuNV45nSeiRqmOxjuR9J+LFt6EFmrCLjD+eXVSbcFtQIyNR0wb56t
-         DSQQ==
+        d=google.com; s=20221208; t=1688759138; x=1691351138;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=iU2u6jyjsL+K9jRMpPQU8uNMvx+83bRPl0/OY8W41Ck=;
+        b=ONUHyKJSr5rwLEbX/VUpM7nu/9iVjO6CRm4RmJbOsqchMYK7CAwJ/TW61GlqN/EJZ6
+         B0p/ia6TmDJHlMaEjcjEOLD+XUFAN7vUgtKebnR4Be8bCCbptIP63NEP8W1PRrdmStcx
+         1/o6l05JxY7pLXZJo+KMUynOLGPbmke480cqLCeEzuA8As6hd7gLbizWYqeKV10uz3Fj
+         jqguCqlfO2y1OdQCvmnAfAw3Li7lFw1/wVFIfnihPoKYtAe/uz+OLoWxJRs4GYPlTQ/q
+         hFP8bfrrKj66fCAjlSvYCxVmD6sNuEXeV+DWvh5XwfW4yggNFOHbavpZ7wOjnK9WiltE
+         b5Pg==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688758234; x=1691350234;
-        h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
-         :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=CQ9AaI5NbcA/oN/ecuTimulSkDUKAiNeCXSYKFyoRpE=;
-        b=GPs15CVOk0hKrNTzq1ClfhlCmVs/NmJViF4gubyWwzcAnI7KvtGfL6wsi0eigmMGuR
-         IXvwDDzo11AhAowJwgUioHDrQjMGiWYDI5R5FD3ENOKwi3tZ5VJuiMsfCKjtkg2Cj7j4
-         BYseuAX51MJ6VuDifSalXlEgCPgVbf6f1yYZWJO1+Fep1FPXQ8DPXAXjKl0JUsuzLv3s
-         akIxKaIvAOuGtM1jbBKLLn3PqatIfRe0sbw+AJ0bbEckkf4M2VNvoK0+8Rve3uIpqtT5
-         4FS5WRkS6QzT39yHMpx5FxBA+46oKU9R6bx8dqVDu1BQK6pitA8aL2XNHFy7BN8y0gjr
-         95cQ==
-X-Gm-Message-State: ABy/qLZR6q/mTouH2PR7O3gYGUNv8dwg92ITh2Bd8iRLNI+TzxdoT2gO
-	JaheiBZjAhV/OKqONxMkgPFSfFg=
-X-Google-Smtp-Source: APBJJlGLjtZ1dAHoOjapPUfeQVnKhDOKJVvr+sIHAeYapEY5d0/pspClotBqzxOvQA7fjJhAoYM1KDw=
-X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a81:d305:0:b0:56d:2a88:49e5 with SMTP id
- y5-20020a81d305000000b0056d2a8849e5mr41186ywi.2.1688758233839; Fri, 07 Jul
- 2023 12:30:33 -0700 (PDT)
-Date: Fri,  7 Jul 2023 12:30:06 -0700
-In-Reply-To: <20230707193006.1309662-1-sdf@google.com>
+        d=1e100.net; s=20221208; t=1688759138; x=1691351138;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=iU2u6jyjsL+K9jRMpPQU8uNMvx+83bRPl0/OY8W41Ck=;
+        b=XAzvTnQ1118Sv8nGQJ5OOkdj90RI3PmCW6btfQZFCF7nBgLRFHBCn0eXuFqHxVX4LJ
+         p3eiIt0hZRFU2WKJjIE1qsnPwb0Tn16uvZo5ef1FOqL8ru6NbvIrmoZW8K2srnmLhxIK
+         JnaiQKO0kX1yrDqAyfc39aKkPUajyv3Sg1mmf2lpBJwmBfjrlJlHjqGvvZh/tqIQp7LY
+         iaHWV6j5/NaIgS+2pQgw6Ii36GSJOnNWUdeBa0DTV4ez5tK3S3IDHtUYo/yVmmoRCNwS
+         HXQfCtaFVCkFTFpNmUV6gMcnchUFRbuztfRzRhlowQwrjeIY7fZ3HMAA5qh4K0+R/FsW
+         Vviw==
+X-Gm-Message-State: ABy/qLY3uKhMI0UBKeiGk3AmYa6PcUi9eaWUCuPjfBw/uo0dkWWefAPK
+	UuwXPKGdfcgnZemKhJFWdNjZdW6Il25/1fuptyTtGw==
+X-Google-Smtp-Source: APBJJlESBgtVzbJOXeynclCqwvVJo/4AFuM0/HtqVuysmj6VyinZbhYdaNQ5lKrwtTjS48pikdO03dQcoWq4zforvLg=
+X-Received: by 2002:a67:f103:0:b0:445:3e5:1f6a with SMTP id
+ n3-20020a67f103000000b0044503e51f6amr4857805vsk.34.1688759137551; Fri, 07 Jul
+ 2023 12:45:37 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
-Mime-Version: 1.0
-References: <20230707193006.1309662-1-sdf@google.com>
-X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230707193006.1309662-15-sdf@google.com>
-Subject: [RFC bpf-next v3 14/14] selftests/bpf: Extend xdp_hw_metadata with
- devtx kfuncs
-From: Stanislav Fomichev <sdf@google.com>
-To: bpf@vger.kernel.org
-Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
-	martin.lau@linux.dev, song@kernel.org, yhs@fb.com, john.fastabend@gmail.com, 
-	kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org, 
-	kuba@kernel.org, toke@kernel.org, willemb@google.com, dsahern@kernel.org, 
-	magnus.karlsson@intel.com, bjorn@kernel.org, maciej.fijalkowski@intel.com, 
-	hawk@kernel.org, netdev@vger.kernel.org, xdp-hints@xdp-project.net
+MIME-Version: 1.0
+References: <20230707183935.997267-1-kuba@kernel.org>
+In-Reply-To: <20230707183935.997267-1-kuba@kernel.org>
+From: Mina Almasry <almasrymina@google.com>
+Date: Fri, 7 Jul 2023 12:45:26 -0700
+Message-ID: <CAHS8izPmQRuBfBB2ddna-RHvorvJs7VtVUqCW80MaxPLUtDHGA@mail.gmail.com>
+Subject: Re: [RFC 00/12] net: huge page backed page_pool
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: netdev@vger.kernel.org, hawk@kernel.org, ilias.apalodimas@linaro.org, 
+	edumazet@google.com, dsahern@gmail.com, michael.chan@broadcom.com, 
+	willemb@google.com
 Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
 	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-When we get packets on port 9091, we swap src/dst and send it out.
-At this point, we also request the timestamp and plumb it back
-to the userspace. The userspace simply prints the timestamp.
+On Fri, Jul 7, 2023 at 11:39=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
+ote:
+>
+> Hi!
+>
+> This is an "early PoC" at best. It seems to work for a basic
+> traffic test but there's no uAPI and a lot more general polish
+> is needed.
+>
+> The problem we're seeing is that performance of some older NICs
+> degrades quite a bit when IOMMU is used (in non-passthru mode).
+> There is a long tail of old NICs deployed, especially in PoPs/
+> /on edge. From a conversation I had with Eric a few months
+> ago it sounded like others may have similar issues. So I thought
+> I'd take a swing at getting page pool to feed drivers huge pages.
+> 1G pages require hooking into early init via CMA but it works
+> just fine.
+>
+> I haven't tested this with a real workload, because I'm still
+> waiting to get my hands on the right machine. But the experiment
+> with bnxt shows a ~90% reduction in IOTLB misses (670k -> 70k).
+>
 
-Also print current UDP checksum, rewrite it with the pseudo-header
-checksum and offload TX checksum calculation to devtx. Upon
-completion, report TX checksum back (mlx5 doesn't put it back, so
-I've used tcpdump to confirm that the checksum is correct).
+Thanks for CCing me Jakub. I'm working on a proposal for device memory
+TCP, and I recently migrated it to be on top of your pp-provider idea
+and I think I can share my test results as well. I had my code working
+on top of your slightly older API I found here a few days ago:
+https://github.com/kuba-moo/linux/tree/pp-providers
 
-Some other related changes:
-- switched to zerocopy mode by default; new flag can be used to force
-  old behavior
-- request fixed TX_METADAT_LEN headroom
-- some other small fixes (umem size, fill idx+i, etc)
+On top of the old API I had something with all my functionality tests
+passing and performance benchmarking hitting ~96.5% line rate (with
+all data going straight to the device - GPU - memory, which is the
+point of the proposal). Of course, when you look at the code you may
+not like the approach and I may need to try something else, which is
+perfectly fine, but my current implementation is pp-provider based.
 
-mvbz3:~# ./xdp_hw_metadata eth3 -c mlx5e_devtx_complete_xdp -s mlx5e_devtx_submit_xd
-attach rx bpf program...
-poll: 0 (0) skip=1/0 redir=0 ring_full=0 rx_fail=0 tx_fail=0 l4_csum_fail=0
-...
-xsk_ring_cons__peek: 1
-0xeb4cb8: rx_desc[0]->addr=80100 addr=80100 comp_addr=80100
-rx_hash: 0x6A1A897A with RSS type:0x2A
-rx_timestamp:  1688749963628930772 (sec:1688749963.6289)
-XDP RX-time:   1688749963901850574 (sec:1688749963.9019) delta sec:0.2729 (272919.802 usec)
-AF_XDP time:   1688749963901967812 (sec:1688749963.9020) delta sec:0.0001 (117.238 usec)
-0xeb4cb8: ping_pong with csum=8e3b (want 4b0b)
-0xeb4cb8: complete tx idx=0 addr=8
-got tx sample: tx_err 0 hw_timestamp 1688749963859814790 sw_timestamp 1688749963902297286 csum 8e3b
-0xeb4cb8: complete rx idx=128 addr=80100
-poll: 0 (0) skip=7/0 redir=1 ring_full=0 rx_fail=0 tx_fail=0 l4_csum_fail=0
+I'll look into rebasing my changes on top of this RFC and retesting,
+but I should share my RFC either way sometime next week maybe. I took
+a quick look at the changes you made here, and I don't think you
+changed anything that would break my use case.
 
-mvbz4:~# nc  -Nu -q1 ${MVBZ3_LINK_LOCAL_IP}%eth3 9091
+> In terms of the missing parts - uAPI is definitely needed.
+> The rough plan would be to add memory config via the netdev
+> genl family. Should fit nicely there. Have the config stored
+> in struct netdevice. When page pool is created get to the netdev
+> and automatically select the provider without the driver even
+> knowing.
 
-mvbz4:~# tcpdump -vvx -i eth3 udp
-tcpdump: listening on eth3, link-type EN10MB (Ethernet), snapshot length 262144 bytes
-10:12:43.901436 IP6 (flowlabel 0x7a5d2, hlim 127, next-header UDP (17) payload length: 11) fe80::1270:fdff:fe48:1087.44339 > fe80::1270:fdff:fe48:1077.9091: [bad udp cksum 0x3b8e -> 0x0b4b!] UDP, length 3
-        0x0000:  6007 a5d2 000b 117f fe80 0000 0000 0000
-        0x0010:  1270 fdff fe48 1087 fe80 0000 0000 0000
-        0x0020:  1270 fdff fe48 1077 ad33 2383 000b 3b8e
-        0x0030:  7864 70
-10:12:43.902125 IP6 (flowlabel 0x7a5d2, hlim 127, next-header UDP (17) payload length: 11) fe80::1270:fdff:fe48:1077.9091 > fe80::1270:fdff:fe48:1087.44339: [udp sum ok] UDP, length 3
-        0x0000:  6007 a5d2 000b 117f fe80 0000 0000 0000
-        0x0010:  1270 fdff fe48 1077 fe80 0000 0000 0000
-        0x0020:  1270 fdff fe48 1087 2383 ad33 000b 0b4b
-        0x0030:  7864 70
+I guess I misunderstood the intent behind the original patches. I
+thought you wanted the user to tell the driver what memory provider to
+use, and the driver to recreate the page pool with that provider. What
+you're saying here sounds much better, and less changes to the driver.
 
-Signed-off-by: Stanislav Fomichev <sdf@google.com>
----
- .../selftests/bpf/progs/xdp_hw_metadata.c     | 173 +++++++++++
- tools/testing/selftests/bpf/xdp_hw_metadata.c | 269 +++++++++++++++++-
- 2 files changed, 427 insertions(+), 15 deletions(-)
+>  Two problems with that are - 1) if the driver follows
+> the recommended flow of allocating new queues before freeing
+> old ones we will have page pools created before the old ones
+> are gone, which means we'd need to reserve 2x the number of
+> 1G pages; 2) there's no callback to the driver to say "I did
+> something behind your back, don't worry about it, but recreate
+> your queues, please" so the change will not take effect until
+> some unrelated change like installing XDP. Which may be fine
+> in practice but is a bit odd.
+>
 
-diff --git a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-index b2dfd7066c6e..2049bfa70ea9 100644
---- a/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/progs/xdp_hw_metadata.c
-@@ -4,6 +4,7 @@
- #include "xdp_metadata.h"
- #include <bpf/bpf_helpers.h>
- #include <bpf/bpf_endian.h>
-+#include <bpf/bpf_tracing.h>
- 
- struct {
- 	__uint(type, BPF_MAP_TYPE_XSKMAP);
-@@ -12,14 +13,30 @@ struct {
- 	__type(value, __u32);
- } xsk SEC(".maps");
- 
-+struct {
-+	__uint(type, BPF_MAP_TYPE_RINGBUF);
-+	__uint(max_entries, 4096);
-+} tx_compl_buf SEC(".maps");
-+
- __u64 pkts_skip = 0;
-+__u64 pkts_tx_skip = 0;
- __u64 pkts_fail = 0;
- __u64 pkts_redir = 0;
-+__u64 pkts_fail_tx = 0;
-+__u64 pkts_fail_l4_csum = 0;
-+__u64 pkts_ringbuf_full = 0;
-+
-+int ifindex = -1;
-+__u64 net_cookie = -1;
- 
- extern int bpf_xdp_metadata_rx_timestamp(const struct xdp_md *ctx,
- 					 __u64 *timestamp) __ksym;
- extern int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, __u32 *hash,
- 				    enum xdp_rss_hash_type *rss_type) __ksym;
-+extern int bpf_devtx_request_tx_timestamp(const struct devtx_ctx *ctx) __ksym;
-+extern int bpf_devtx_tx_timestamp(const struct devtx_ctx *ctx, __u64 *timestamp) __ksym;
-+extern int bpf_devtx_request_l4_csum(const struct devtx_ctx *ctx,
-+				     u16 csum_start, u16 csum_offset) __ksym;
- 
- SEC("xdp")
- int rx(struct xdp_md *ctx)
-@@ -90,4 +107,160 @@ int rx(struct xdp_md *ctx)
- 	return bpf_redirect_map(&xsk, ctx->rx_queue_index, XDP_PASS);
- }
- 
-+/* This is not strictly required; only to showcase how to access the payload. */
-+static __always_inline bool tx_filter(const struct devtx_ctx *devtx,
-+				      const void *data, __be16 *proto)
-+{
-+	int port_offset = sizeof(struct ethhdr) + offsetof(struct udphdr, source);
-+	struct ethhdr eth = {};
-+	struct udphdr udp = {};
-+
-+	bpf_probe_read_kernel(&eth.h_proto, sizeof(eth.h_proto),
-+			      data + offsetof(struct ethhdr, h_proto));
-+
-+	*proto = eth.h_proto;
-+	if (eth.h_proto == bpf_htons(ETH_P_IP)) {
-+		port_offset += sizeof(struct iphdr);
-+	} else if (eth.h_proto == bpf_htons(ETH_P_IPV6)) {
-+		port_offset += sizeof(struct ipv6hdr);
-+	} else {
-+		__sync_add_and_fetch(&pkts_tx_skip, 1);
-+		return false;
-+	}
-+
-+	bpf_probe_read_kernel(&udp.source, sizeof(udp.source), data + port_offset);
-+
-+	/* Replies to UDP:9091 */
-+	if (udp.source != bpf_htons(9091)) {
-+		__sync_add_and_fetch(&pkts_tx_skip, 1);
-+		return false;
-+	}
-+
-+	return true;
-+}
-+
-+static inline bool my_netdev(const struct devtx_ctx *devtx)
-+{
-+	static struct net_device *netdev;
-+
-+	if (netdev)
-+		return netdev == devtx->netdev;
-+
-+	if (devtx->netdev->ifindex != ifindex)
-+		return false;
-+	if (devtx->netdev->nd_net.net->net_cookie != net_cookie)
-+		return false;
-+
-+	netdev = devtx->netdev;
-+	return true;
-+}
-+
-+static inline int udpoff(__be16 proto)
-+{
-+	if (proto == bpf_htons(ETH_P_IP))
-+		return sizeof(struct ethhdr) + sizeof(struct iphdr);
-+	else if (proto == bpf_htons(ETH_P_IPV6))
-+		return sizeof(struct ethhdr) + sizeof(struct ipv6hdr);
-+	else
-+		return 0;
-+}
-+
-+static inline int tx_submit(const struct devtx_ctx *devtx, const void *data, u8 meta_len)
-+{
-+	struct xdp_tx_meta meta = {};
-+	__be16 proto = 0;
-+	int off, ret;
-+
-+	if (!my_netdev(devtx))
-+		return 0;
-+	if (meta_len != TX_META_LEN)
-+		return 0;
-+
-+	bpf_probe_read_kernel(&meta, sizeof(meta), data - TX_META_LEN);
-+	if (!meta.request_timestamp)
-+		return 0;
-+
-+	if (!tx_filter(devtx, data, &proto))
-+		return 0;
-+
-+	ret = bpf_devtx_request_tx_timestamp(devtx);
-+	if (ret < 0)
-+		__sync_add_and_fetch(&pkts_fail_tx, 1);
-+
-+	off = udpoff(proto);
-+	if (!off)
-+		return 0;
-+
-+	ret = bpf_devtx_request_l4_csum(devtx, off, off + offsetof(struct udphdr, check));
-+	if (ret < 0)
-+		__sync_add_and_fetch(&pkts_fail_l4_csum, 1);
-+
-+	return 0;
-+}
-+
-+SEC("?fentry")
-+int BPF_PROG(tx_submit_xdp, const struct devtx_ctx *devtx, const struct xdp_frame *xdpf)
-+{
-+	return tx_submit(devtx, xdpf->data, xdpf->metasize);
-+}
-+
-+SEC("?fentry")
-+int BPF_PROG(tx_submit_skb, const struct devtx_ctx *devtx, const struct sk_buff *skb)
-+{
-+	return tx_submit(devtx, skb->data, devtx->sinfo->meta_len);
-+}
-+
-+static inline int tx_complete(const struct devtx_ctx *devtx, const void *data, u8 meta_len)
-+{
-+	struct xdp_tx_meta meta = {};
-+	struct devtx_sample *sample;
-+	struct udphdr udph;
-+	__be16 proto = 0;
-+	int off;
-+
-+	if (!my_netdev(devtx))
-+		return 0;
-+	if (meta_len != TX_META_LEN)
-+		return 0;
-+
-+	bpf_probe_read_kernel(&meta, sizeof(meta), data - TX_META_LEN);
-+	if (!meta.request_timestamp)
-+		return 0;
-+
-+	if (!tx_filter(devtx, data, &proto))
-+		return 0;
-+
-+	off = udpoff(proto);
-+	if (!off)
-+		return 0;
-+
-+	bpf_probe_read_kernel(&udph, sizeof(udph), data + off);
-+
-+	sample = bpf_ringbuf_reserve(&tx_compl_buf, sizeof(*sample), 0);
-+	if (!sample) {
-+		__sync_add_and_fetch(&pkts_ringbuf_full, 1);
-+		return 0;
-+	}
-+
-+	sample->timestamp_retval = bpf_devtx_tx_timestamp(devtx, &sample->hw_timestamp);
-+	sample->sw_complete_timestamp = bpf_ktime_get_tai_ns();
-+	sample->tx_csum = udph.check;
-+
-+	bpf_ringbuf_submit(sample, 0);
-+
-+	return 0;
-+}
-+
-+SEC("?fentry")
-+int BPF_PROG(tx_complete_xdp, const struct devtx_ctx *devtx, const struct xdp_frame *xdpf)
-+{
-+	return tx_complete(devtx, xdpf->data, xdpf->metasize);
-+}
-+
-+SEC("?fentry")
-+int BPF_PROG(tx_complete_skb, const struct devtx_ctx *devtx, const struct sk_buff *skb)
-+{
-+	return tx_complete(devtx, skb->data, devtx->sinfo->meta_len);
-+}
-+
- char _license[] SEC("license") = "GPL";
-diff --git a/tools/testing/selftests/bpf/xdp_hw_metadata.c b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-index 613321eb84c1..3f9c47ad5cfa 100644
---- a/tools/testing/selftests/bpf/xdp_hw_metadata.c
-+++ b/tools/testing/selftests/bpf/xdp_hw_metadata.c
-@@ -10,7 +10,9 @@
-  *   - rx_hash
-  *
-  * TX:
-- * - TBD
-+ * - UDP 9091 packets trigger TX reply
-+ * - TX HW timestamp is requested and reported back upon completion
-+ * - TX checksum is requested
-  */
- 
- #include <test_progs.h>
-@@ -28,10 +30,12 @@
- #include <net/if.h>
- #include <poll.h>
- #include <time.h>
-+#include <unistd.h>
-+#include <libgen.h>
- 
- #include "xdp_metadata.h"
- 
--#define UMEM_NUM 16
-+#define UMEM_NUM 256
- #define UMEM_FRAME_SIZE XSK_UMEM__DEFAULT_FRAME_SIZE
- #define UMEM_SIZE (UMEM_FRAME_SIZE * UMEM_NUM)
- #define XDP_FLAGS (XDP_FLAGS_DRV_MODE | XDP_FLAGS_REPLACE)
-@@ -49,24 +53,27 @@ struct xsk {
- struct xdp_hw_metadata *bpf_obj;
- struct xsk *rx_xsk;
- const char *ifname;
-+char *tx_complete;
-+char *tx_submit;
- int ifindex;
- int rxq;
- 
- void test__fail(void) { /* for network_helpers.c */ }
- 
--static int open_xsk(int ifindex, struct xsk *xsk, __u32 queue_id)
-+static int open_xsk(int ifindex, struct xsk *xsk, __u32 queue_id, int flags)
- {
- 	int mmap_flags = MAP_PRIVATE | MAP_ANONYMOUS | MAP_NORESERVE;
- 	const struct xsk_socket_config socket_config = {
- 		.rx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS,
- 		.tx_size = XSK_RING_PROD__DEFAULT_NUM_DESCS,
--		.bind_flags = XDP_COPY,
-+		.bind_flags = flags,
-+		.tx_metadata_len = TX_META_LEN,
- 	};
- 	const struct xsk_umem_config umem_config = {
- 		.fill_size = XSK_RING_PROD__DEFAULT_NUM_DESCS,
- 		.comp_size = XSK_RING_CONS__DEFAULT_NUM_DESCS,
- 		.frame_size = XSK_UMEM__DEFAULT_FRAME_SIZE,
--		.flags = XDP_UMEM_UNALIGNED_CHUNK_FLAG,
-+		.flags = XSK_UMEM__DEFAULT_FLAGS,
- 	};
- 	__u32 idx;
- 	u64 addr;
-@@ -108,7 +115,7 @@ static int open_xsk(int ifindex, struct xsk *xsk, __u32 queue_id)
- 	for (i = 0; i < UMEM_NUM / 2; i++) {
- 		addr = (UMEM_NUM / 2 + i) * UMEM_FRAME_SIZE;
- 		printf("%p: rx_desc[%d] -> %lx\n", xsk, i, addr);
--		*xsk_ring_prod__fill_addr(&xsk->fill, i) = addr;
-+		*xsk_ring_prod__fill_addr(&xsk->fill, idx + i) = addr;
- 	}
- 	xsk_ring_prod__submit(&xsk->fill, ret);
- 
-@@ -129,12 +136,22 @@ static void refill_rx(struct xsk *xsk, __u64 addr)
- 	__u32 idx;
- 
- 	if (xsk_ring_prod__reserve(&xsk->fill, 1, &idx) == 1) {
--		printf("%p: complete idx=%u addr=%llx\n", xsk, idx, addr);
-+		printf("%p: complete rx idx=%u addr=%llx\n", xsk, idx, addr);
- 		*xsk_ring_prod__fill_addr(&xsk->fill, idx) = addr;
- 		xsk_ring_prod__submit(&xsk->fill, 1);
- 	}
- }
- 
-+static int kick_tx(struct xsk *xsk)
-+{
-+	return sendto(xsk_socket__fd(xsk->socket), NULL, 0, MSG_DONTWAIT, NULL, 0);
-+}
-+
-+static int kick_rx(struct xsk *xsk)
-+{
-+	return recvfrom(xsk_socket__fd(xsk->socket), NULL, 0, MSG_DONTWAIT, NULL, NULL);
-+}
-+
- #define NANOSEC_PER_SEC 1000000000 /* 10^9 */
- static __u64 gettime(clockid_t clock_id)
- {
-@@ -228,7 +245,102 @@ static void verify_skb_metadata(int fd)
- 	printf("skb hwtstamp is not found!\n");
- }
- 
--static int verify_metadata(struct xsk *rx_xsk, int rxq, int server_fd, clockid_t clock_id)
-+static bool complete_tx(struct xsk *xsk, struct ring_buffer *ringbuf)
-+{
-+	__u32 idx;
-+	__u64 addr;
-+
-+	if (!xsk_ring_cons__peek(&xsk->comp, 1, &idx))
-+		return false;
-+
-+	addr = *xsk_ring_cons__comp_addr(&xsk->comp, idx);
-+
-+	printf("%p: complete tx idx=%u addr=%llx\n", xsk, idx, addr);
-+	xsk_ring_cons__release(&xsk->comp, 1);
-+
-+	return true;
-+}
-+
-+#define swap(a, b, len) do { \
-+	for (int i = 0; i < len; i++) { \
-+		__u8 tmp = ((__u8 *)a)[i]; \
-+		((__u8 *)a)[i] = ((__u8 *)b)[i]; \
-+		((__u8 *)b)[i] = tmp; \
-+	} \
-+} while (0)
-+
-+static void ping_pong(struct xsk *xsk, void *rx_packet)
-+{
-+	struct ipv6hdr *ip6h = NULL;
-+	struct iphdr *iph = NULL;
-+	struct xdp_tx_meta *meta;
-+	struct xdp_desc *tx_desc;
-+	struct udphdr *udph;
-+	struct ethhdr *eth;
-+	__sum16 want_csum;
-+	void *data;
-+	__u32 idx;
-+	int ret;
-+	int len;
-+
-+	ret = xsk_ring_prod__reserve(&xsk->tx, 1, &idx);
-+	if (ret != 1) {
-+		printf("%p: failed to reserve tx slot\n", xsk);
-+		return;
-+	}
-+
-+	tx_desc = xsk_ring_prod__tx_desc(&xsk->tx, idx);
-+	tx_desc->addr = idx % (UMEM_NUM / 2) * UMEM_FRAME_SIZE + TX_META_LEN;
-+	data = xsk_umem__get_data(xsk->umem_area, tx_desc->addr);
-+
-+	meta = data - TX_META_LEN;
-+	meta->request_timestamp = 1;
-+
-+	eth = rx_packet;
-+
-+	if (eth->h_proto == htons(ETH_P_IP)) {
-+		iph = (void *)(eth + 1);
-+		udph = (void *)(iph + 1);
-+	} else if (eth->h_proto == htons(ETH_P_IPV6)) {
-+		ip6h = (void *)(eth + 1);
-+		udph = (void *)(ip6h + 1);
-+	} else {
-+		printf("%p: failed to detect IP version for ping pong %04x\n", xsk, eth->h_proto);
-+		xsk_ring_prod__cancel(&xsk->tx, 1);
-+		return;
-+	}
-+
-+	len = ETH_HLEN;
-+	if (ip6h)
-+		len += sizeof(*ip6h) + ntohs(ip6h->payload_len);
-+	if (iph)
-+		len += ntohs(iph->tot_len);
-+
-+	swap(eth->h_dest, eth->h_source, ETH_ALEN);
-+	if (iph)
-+		swap(&iph->saddr, &iph->daddr, 4);
-+	else
-+		swap(&ip6h->saddr, &ip6h->daddr, 16);
-+	swap(&udph->source, &udph->dest, 2);
-+
-+	want_csum = udph->check;
-+	if (iph)
-+		udph->check = ~csum_tcpudp_magic(iph->saddr, iph->daddr,
-+						 ntohs(udph->len), IPPROTO_UDP, 0);
-+	else
-+		udph->check = ~csum_ipv6_magic(&ip6h->saddr, &ip6h->daddr,
-+					       ntohs(udph->len), IPPROTO_UDP, 0);
-+
-+	printf("%p: ping-pong with csum=%04x (want %04x)\n", xsk, udph->check, want_csum);
-+
-+	memcpy(data, rx_packet, len); /* don't share umem chunk for simplicity */
-+	tx_desc->len = len;
-+
-+	xsk_ring_prod__submit(&xsk->tx, 1);
-+}
-+
-+static int verify_metadata(struct xsk *rx_xsk, int rxq, int server_fd, clockid_t clock_id,
-+			   struct ring_buffer *ringbuf)
- {
- 	const struct xdp_desc *rx_desc;
- 	struct pollfd fds[rxq + 1];
-@@ -250,10 +362,22 @@ static int verify_metadata(struct xsk *rx_xsk, int rxq, int server_fd, clockid_t
- 
- 	while (true) {
- 		errno = 0;
-+
-+		for (i = 0; i < rxq; i++) {
-+			ret = kick_rx(&rx_xsk[i]);
-+			if (ret)
-+				printf("kick_rx ret=%d\n", ret);
-+		}
-+
- 		ret = poll(fds, rxq + 1, 1000);
--		printf("poll: %d (%d) skip=%llu fail=%llu redir=%llu\n",
-+		printf("poll: %d (%d) skip=%llu/%llu redir=%llu ring_full=%llu rx_fail=%llu tx_fail=%llu l4_csum_fail=%llu\n",
- 		       ret, errno, bpf_obj->bss->pkts_skip,
--		       bpf_obj->bss->pkts_fail, bpf_obj->bss->pkts_redir);
-+		       bpf_obj->bss->pkts_tx_skip,
-+		       bpf_obj->bss->pkts_redir,
-+		       bpf_obj->bss->pkts_ringbuf_full,
-+		       bpf_obj->bss->pkts_fail,
-+		       bpf_obj->bss->pkts_fail_tx,
-+		       bpf_obj->bss->pkts_fail_l4_csum);
- 		if (ret < 0)
- 			break;
- 		if (ret == 0)
-@@ -280,6 +404,24 @@ static int verify_metadata(struct xsk *rx_xsk, int rxq, int server_fd, clockid_t
- 			       xsk, idx, rx_desc->addr, addr, comp_addr);
- 			verify_xdp_metadata(xsk_umem__get_data(xsk->umem_area, addr),
- 					    clock_id);
-+
-+			if (tx_submit && tx_complete) {
-+				/* mirror the packet back */
-+				ping_pong(xsk, xsk_umem__get_data(xsk->umem_area, addr));
-+
-+				ret = kick_tx(xsk);
-+				if (ret)
-+					printf("kick_tx ret=%d\n", ret);
-+
-+				for (int j = 0; j < 500; j++) {
-+					if (complete_tx(xsk, ringbuf))
-+						break;
-+					usleep(10*1000);
-+				}
-+
-+				ring_buffer__poll(ringbuf, 1000);
-+			}
-+
- 			xsk_ring_cons__release(&xsk->rx, 1);
- 			refill_rx(xsk, comp_addr);
- 		}
-@@ -404,21 +546,69 @@ static void timestamping_enable(int fd, int val)
- 		error(1, errno, "setsockopt(SO_TIMESTAMPING)");
- }
- 
-+static int process_sample(void *ctx, void *data, size_t len)
-+{
-+	struct devtx_sample *sample = data;
-+
-+	printf("got tx sample: tx_err %u hw_timestamp %llu sw_timestamp %llu csum %04x\n",
-+	       sample->timestamp_retval, sample->hw_timestamp,
-+	       sample->sw_complete_timestamp,
-+	       sample->tx_csum);
-+
-+	return 0;
-+}
-+
-+static void usage(const char *prog)
-+{
-+	fprintf(stderr,
-+		"usage: %s [OPTS] <ifname>\n"
-+		"OPTS:\n"
-+		"    -s    symbol name for tx_submit\n"
-+		"    -c    symbol name for tx_complete\n"
-+		"    -Z    run in copy mode\n",
-+		prog);
-+}
-+
- int main(int argc, char *argv[])
- {
-+	int bind_flags =  XDP_USE_NEED_WAKEUP | XDP_ZEROCOPY;
-+	struct ring_buffer *tx_compl_ringbuf = NULL;
- 	clockid_t clock_id = CLOCK_TAI;
- 	int server_fd = -1;
-+	int opt;
- 	int ret;
- 	int i;
- 
- 	struct bpf_program *prog;
- 
--	if (argc != 2) {
-+	while ((opt = getopt(argc, argv, "s:c:Z")) != -1) {
-+		switch (opt) {
-+		case 's':
-+			tx_submit = optarg;
-+			break;
-+		case 'c':
-+			tx_complete = optarg;
-+			break;
-+		case 'Z':
-+			bind_flags = XDP_USE_NEED_WAKEUP | XDP_COPY;
-+			break;
-+		default:
-+			usage(basename(argv[0]));
-+			return 1;
-+		}
-+	}
-+
-+	if (argc < 2) {
- 		fprintf(stderr, "pass device name\n");
- 		return -1;
- 	}
- 
--	ifname = argv[1];
-+	if (optind >= argc) {
-+		usage(basename(argv[0]));
-+		return 1;
-+	}
-+
-+	ifname = argv[optind];
- 	ifindex = if_nametoindex(ifname);
- 	rxq = rxq_num(ifname);
- 
-@@ -432,7 +622,7 @@ int main(int argc, char *argv[])
- 
- 	for (i = 0; i < rxq; i++) {
- 		printf("open_xsk(%s, %p, %d)\n", ifname, &rx_xsk[i], i);
--		ret = open_xsk(ifindex, &rx_xsk[i], i);
-+		ret = open_xsk(ifindex, &rx_xsk[i], i, bind_flags);
- 		if (ret)
- 			error(1, -ret, "open_xsk");
- 
-@@ -444,15 +634,64 @@ int main(int argc, char *argv[])
- 	if (libbpf_get_error(bpf_obj))
- 		error(1, libbpf_get_error(bpf_obj), "xdp_hw_metadata__open");
- 
-+	bpf_obj->data->ifindex = ifindex;
-+	bpf_obj->data->net_cookie = get_net_cookie();
-+
- 	prog = bpf_object__find_program_by_name(bpf_obj->obj, "rx");
- 	bpf_program__set_ifindex(prog, ifindex);
- 	bpf_program__set_flags(prog, BPF_F_XDP_DEV_BOUND_ONLY);
- 
-+	prog = bpf_object__find_program_by_name(bpf_obj->obj,
-+						bind_flags & XDP_COPY ?
-+						"tx_submit_skb" :
-+						"tx_submit_xdp");
-+	bpf_program__set_ifindex(prog, ifindex);
-+	bpf_program__set_flags(prog, BPF_F_XDP_DEV_BOUND_ONLY);
-+	if (tx_submit) {
-+		printf("attaching devtx submit program to %s\n", tx_submit);
-+		ret = bpf_program__set_attach_target(prog, 0, tx_submit);
-+		if (ret)
-+			printf("failed to attach submit program to %s, ret=%d\n",
-+			       tx_submit, ret);
-+		bpf_program__set_autoattach(prog, true);
-+		bpf_program__set_autoload(prog, true);
-+	} else {
-+		printf("skipping devtx submit program\n");
-+	}
-+
-+	prog = bpf_object__find_program_by_name(bpf_obj->obj,
-+						bind_flags & XDP_COPY ?
-+						"tx_complete_skb" :
-+						"tx_complete_xdp");
-+	bpf_program__set_ifindex(prog, ifindex);
-+	bpf_program__set_flags(prog, BPF_F_XDP_DEV_BOUND_ONLY);
-+	if (tx_complete) {
-+		printf("attaching devtx complete program to %s\n", tx_complete);
-+		ret = bpf_program__set_attach_target(prog, 0, tx_complete);
-+		if (ret)
-+			printf("failed to attach complete program to %s, ret=%d\n",
-+			       tx_complete, ret);
-+		bpf_program__set_autoattach(prog, true);
-+		bpf_program__set_autoload(prog, true);
-+	} else {
-+		printf("skipping devtx complete program\n");
-+	}
-+
- 	printf("load bpf program...\n");
- 	ret = xdp_hw_metadata__load(bpf_obj);
- 	if (ret)
- 		error(1, -ret, "xdp_hw_metadata__load");
- 
-+	printf("attach devts bpf programs...\n");
-+	ret = xdp_hw_metadata__attach(bpf_obj);
-+	if (ret)
-+		error(1, -ret, "xdp_hw_metadata__attach");
-+
-+	tx_compl_ringbuf = ring_buffer__new(bpf_map__fd(bpf_obj->maps.tx_compl_buf),
-+					    process_sample, NULL, NULL);
-+	if (libbpf_get_error(tx_compl_ringbuf))
-+		error(1, -libbpf_get_error(tx_compl_ringbuf), "ring_buffer__new");
-+
- 	printf("prepare skb endpoint...\n");
- 	server_fd = start_server(AF_INET6, SOCK_DGRAM, NULL, 9092, 1000);
- 	if (server_fd < 0)
-@@ -472,7 +711,7 @@ int main(int argc, char *argv[])
- 			error(1, -ret, "bpf_map_update_elem");
- 	}
- 
--	printf("attach bpf program...\n");
-+	printf("attach rx bpf program...\n");
- 	ret = bpf_xdp_attach(ifindex,
- 			     bpf_program__fd(bpf_obj->progs.rx),
- 			     XDP_FLAGS, NULL);
-@@ -480,7 +719,7 @@ int main(int argc, char *argv[])
- 		error(1, -ret, "bpf_xdp_attach");
- 
- 	signal(SIGINT, handle_signal);
--	ret = verify_metadata(rx_xsk, rxq, server_fd, clock_id);
-+	ret = verify_metadata(rx_xsk, rxq, server_fd, clock_id, tx_compl_ringbuf);
- 	close(server_fd);
- 	cleanup();
- 	if (ret)
--- 
-2.41.0.255.g8b1d071c50-goog
+I have the same problem with device memory TCP. I solved it in a
+similar way, doing something else in the driver that triggers
+gve_close() & gve_open(). I wonder if the cleanest way to do this is
+calling ethtool_ops->reset() or something like that? That was my idea
+at least. I haven't tested it, but from reading the code it should do
+a gve_close() + gve_open() like I want.
 
+> Then we get into hand-wavy stuff like - if we can link page
+> pools to netdevs, we should also be able to export the page pool
+> stats via the netdev family instead doing it the ethtool -S.. ekhm..
+> "way". And if we start storing configs behind driver's back why
+> don't we also store other params, like ring size and queue count...
+> A lot of potential improvements as we iron out a new API...
+>
+> Live tree: https://github.com/kuba-moo/linux/tree/pp-providers
+>
+> Jakub Kicinski (12):
+>   net: hack together some page sharing
+>   net: create a 1G-huge-page-backed allocator
+>   net: page_pool: hide page_pool_release_page()
+>   net: page_pool: merge page_pool_release_page() with
+>     page_pool_return_page()
+>   net: page_pool: factor out releasing DMA from releasing the page
+>   net: page_pool: create hooks for custom page providers
+>   net: page_pool: add huge page backed memory providers
+>   eth: bnxt: let the page pool manage the DMA mapping
+>   eth: bnxt: use the page pool for data pages
+>   eth: bnxt: make sure we make for recycle skbs before freeing them
+>   eth: bnxt: wrap coherent allocations into helpers
+>   eth: bnxt: hack in the use of MEP
+>
+>  Documentation/networking/page_pool.rst        |  10 +-
+>  arch/x86/kernel/setup.c                       |   6 +-
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.c     | 154 +++--
+>  drivers/net/ethernet/broadcom/bnxt/bnxt.h     |   5 +
+>  drivers/net/ethernet/engleder/tsnep_main.c    |   2 +-
+>  .../net/ethernet/stmicro/stmmac/stmmac_main.c |   4 +-
+>  include/net/dcalloc.h                         |  28 +
+>  include/net/page_pool.h                       |  36 +-
+>  net/core/Makefile                             |   2 +-
+>  net/core/dcalloc.c                            | 615 +++++++++++++++++
+>  net/core/dcalloc.h                            |  96 +++
+>  net/core/page_pool.c                          | 625 +++++++++++++++++-
+>  12 files changed, 1478 insertions(+), 105 deletions(-)
+>  create mode 100644 include/net/dcalloc.h
+>  create mode 100644 net/core/dcalloc.c
+>  create mode 100644 net/core/dcalloc.h
+>
+> --
+> 2.41.0
+>
+
+
+--=20
+Thanks,
+Mina
 
