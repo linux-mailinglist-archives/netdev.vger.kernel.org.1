@@ -1,128 +1,328 @@
-Return-Path: <netdev+bounces-15970-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15971-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D669C74AB6A
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:54:01 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E664474AB6E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 08:55:22 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8816E281687
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:54:00 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 9D7D62814AA
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:55:21 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DBC8E210F;
-	Fri,  7 Jul 2023 06:53:58 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 95BC2538F;
+	Fri,  7 Jul 2023 06:55:19 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC6321FB7
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 06:53:58 +0000 (UTC)
-Received: from mail-lf1-x12c.google.com (mail-lf1-x12c.google.com [IPv6:2a00:1450:4864:20::12c])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 180CD1FDB
-	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 23:53:53 -0700 (PDT)
-Received: by mail-lf1-x12c.google.com with SMTP id 2adb3069b0e04-4f96d680399so2157011e87.0
-        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 23:53:53 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=gmail.com; s=20221208; t=1688712831; x=1691304831;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:from:to:cc:subject:date:message-id:reply-to;
-        bh=je3l1UGSXl3qbNk8Y0jwMEy8+l5L27PFDjg5qrG9/VM=;
-        b=OlmknxXpH0FpY4ZDFqL4X7a4ktDxUvlKBybAH2assHjilZkF0Ohr5mcW1awAYieTtn
-         Uu043FkOEkIJvbXUh3YUbf4Mtu3xbh02q3sXocl2245ioES9IO2UKJ1oZW0CcAAGLlgV
-         fRuAcYZ7ou4yoJUWYpqw+cLvhug+aBZzeD+xdO5AI+U8NN3Vwd3HAdL3UN1WNBSV8gcp
-         hJJByFlqSqwVHGDH9uty6mKeheZKEhYVDafoiMa4uox/9yUfEjLZhqf+1OvDCCm1mUAq
-         GuTDpET0dr2eWV0wnqixBR+O9WduDZoXR1joMuCyzz+2WPrUK4e4VAxRST8qhueLZj/V
-         YIlA==
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 81BBC15CE
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 06:55:19 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 445E01FD8
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 23:55:14 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688712913;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=AiuIFdEbuG/V7vt0go6BhvTNeG2l7bZFx0tKuvLez8w=;
+	b=Harerm3Ce4XUELpj3dIoJdwxzw1IX7ZBRDwT9CjskID9pbucdAMX1bILhmplz59vlkhgfJ
+	Iz8shqj8pDmdRLzKcXh4maTI+0ilOrY4M2nUkg+YholOV8QksLW8OyjlRaf6sKF0NJgAaT
+	zClihjj+lRRi9DvIzjyaKiBnmyiKa7c=
+Received: from mail-qk1-f197.google.com (mail-qk1-f197.google.com
+ [209.85.222.197]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-370-g_bi-vEOPPeZlVL7WdaMhw-1; Fri, 07 Jul 2023 02:55:12 -0400
+X-MC-Unique: g_bi-vEOPPeZlVL7WdaMhw-1
+Received: by mail-qk1-f197.google.com with SMTP id af79cd13be357-765ad67e690so36111285a.1
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 23:55:12 -0700 (PDT)
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688712831; x=1691304831;
-        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
-         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=je3l1UGSXl3qbNk8Y0jwMEy8+l5L27PFDjg5qrG9/VM=;
-        b=Ua0dPXxryw5RZcd+lT/OCyeg0nJS2U2iDH9QVXVj6OIa4YEiAIk0hAxd/fvrZIV5Aj
-         vc+ddJSsOPSeLs4dibebvhluXKTvi3/5Mjvfr6lqSGF97HwaXgBXVlsUE8rKms5iLrst
-         alKXmRfZSZmAi3ZyrgLkefAC8dnjGBhKvhKEvmsdZfOieXjdIoKQPcyhnX+aJqFlCWF1
-         NOm6CvLi3v17Yd4KgXbMSAJYrPwXzJSPqNbD68ZwRIMqggvUoQCGhJeBAYRMlklFR4lG
-         9xSaXRgwZTpBxQj6ksp3VS71uFjQHc9Ef9z/AjTXn5ygbBJ6HOVCHEFzgBzr+lNcxsWI
-         ITXg==
-X-Gm-Message-State: ABy/qLYsaF574pvKaSCMF36AA6iS8I2O9v8FRk9oDeAvXqniB/WTgutH
-	ZMkSsxjQYooilGpBvDfMOUQ=
-X-Google-Smtp-Source: APBJJlFWeXBGagh4fLzcU7Cue0vPz8agr+CvVj1bBSq48hgce233y9prLE6813udH1l35DWMCmcOEg==
-X-Received: by 2002:a19:3819:0:b0:4f8:631b:bf77 with SMTP id f25-20020a193819000000b004f8631bbf77mr3785907lfa.22.1688712830733;
-        Thu, 06 Jul 2023 23:53:50 -0700 (PDT)
-Received: from localhost.lan (031011218106.poznan.vectranet.pl. [31.11.218.106])
-        by smtp.gmail.com with ESMTPSA id er23-20020a05651248d700b004fba6f38f87sm558121lfb.24.2023.07.06.23.53.49
+        d=1e100.net; s=20221208; t=1688712911; x=1691304911;
+        h=mime-version:user-agent:content-transfer-encoding:references
+         :in-reply-to:date:cc:to:from:subject:message-id:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=AiuIFdEbuG/V7vt0go6BhvTNeG2l7bZFx0tKuvLez8w=;
+        b=iU4gGkM3VfTUFTRUwHaOMs+kjT/OOs6bN5LA1oYhMQsxHlPqRqpG2hJDtmMcS79j6H
+         bVc9JdDQsADVC2sH+LrywWGgSdiOZ5LvNRJ/0TOBYXkkJFZWooN1uOysEfAXYk9Q0jCz
+         X3eNI91IPXn2M2iXbPWelribIY3T5ABoUcU86tnibmm8PCogomQJCMHtcakzepToKmWx
+         DZYX92nUBfWuMlDfgWA+4LWEh6drlMBnFjChI2OHQaq+G2cUeGJ4oNG7/d9eDRxyJcK4
+         vG4+4MlQGun8z38S4+XJ5jQbEckr7L2c5AGIZFdxPf2epFxaUROW/M19uGCQOP7xcWsO
+         dnOQ==
+X-Gm-Message-State: ABy/qLZodJ60auJlKjCTur4XSUo+41b1lNACxGOacl0znSxbo8H58fJV
+	6HDDkSf+EiYPCeObFPUrg6bmEv16cnTQG/F+w9Frkn+/KAjnP04Ys65Q/P/CyN94JGzaUuI2N/p
+	5xO6weinLUsIDUZF2
+X-Received: by 2002:a05:620a:244a:b0:767:170d:887a with SMTP id h10-20020a05620a244a00b00767170d887amr5365470qkn.2.1688712911556;
+        Thu, 06 Jul 2023 23:55:11 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlE1hIX2H/C32J0vYUFsa3n7kXbchn8wnbtPcqrhcTOHsi1P4Q9291eV8i6EzR3Hfc5vN2z5zw==
+X-Received: by 2002:a05:620a:244a:b0:767:170d:887a with SMTP id h10-20020a05620a244a00b00767170d887amr5365455qkn.2.1688712911174;
+        Thu, 06 Jul 2023 23:55:11 -0700 (PDT)
+Received: from gerbillo.redhat.com (146-241-240-43.dyn.eolo.it. [146.241.240.43])
+        by smtp.gmail.com with ESMTPSA id x1-20020a05620a12a100b00767177a5bebsm1550954qki.56.2023.07.06.23.55.09
         (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Thu, 06 Jul 2023 23:53:50 -0700 (PDT)
-From: =?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <zajec5@gmail.com>
-To: "David S . Miller" <davem@davemloft.net>,
-	Eric Dumazet <edumazet@google.com>,
-	Jakub Kicinski <kuba@kernel.org>,
-	Paolo Abeni <pabeni@redhat.com>
-Cc: Florian Fainelli <f.fainelli@gmail.com>,
-	netdev@vger.kernel.org,
-	bcm-kernel-feedback-list@broadcom.com,
-	=?UTF-8?q?Rafa=C5=82=20Mi=C5=82ecki?= <rafal@milecki.pl>
-Subject: [PATCH net.git] net: bgmac: postpone turning IRQs off to avoid SoC hangs
-Date: Fri,  7 Jul 2023 08:53:25 +0200
-Message-Id: <20230707065325.11765-1-zajec5@gmail.com>
-X-Mailer: git-send-email 2.35.3
+        Thu, 06 Jul 2023 23:55:10 -0700 (PDT)
+Message-ID: <c21f6cc32ac9d1ee78d60452e52b62654152ae69.camel@redhat.com>
+Subject: Re: [Intel-wired-lan] bug with rx-udp-gro-forwarding offloading?
+From: Paolo Abeni <pabeni@redhat.com>
+To: Ian Kumlien <ian.kumlien@gmail.com>
+Cc: Eric Dumazet <edumazet@google.com>, Willem de Bruijn
+ <willemb@google.com>,  Alexander Lobakin <aleksander.lobakin@intel.com>,
+ intel-wired-lan <intel-wired-lan@lists.osuosl.org>, Jakub Kicinski
+ <kuba@kernel.org>, "netdev@vger.kernel.org" <netdev@vger.kernel.org>, 
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>
+Date: Fri, 07 Jul 2023 08:55:07 +0200
+In-Reply-To: <CAA85sZsHKb3Wtsa5ktSAPJsjLrcmahtgaemPhN5dTeTxEBWaqw@mail.gmail.com>
+References: 
+	<CAA85sZukiFq4A+b9+en_G85eVDNXMQsnGc4o-4NZ9SfWKqaULA@mail.gmail.com>
+	 <CAA85sZvm1dL3oGO85k4R+TaqBiJsggUTpZmGpH1+dqdC+U_s1w@mail.gmail.com>
+	 <e7e49ed5-09e2-da48-002d-c7eccc9f9451@intel.com>
+	 <CAA85sZtyM+X_oHcpOBNSgF=kmB6k32bpB8FCJN5cVE14YCba+A@mail.gmail.com>
+	 <22aad588-47d6-6441-45b2-0e685ed84c8d@intel.com>
+	 <CAA85sZti1=ET=Tc3MoqCX0FqthHLf6MSxGNAhJUNiMms1TfoKA@mail.gmail.com>
+	 <CAA85sZvn04k7=oiTQ=4_C8x7pNEXRWzeEStcaXvi3v63ah7OUQ@mail.gmail.com>
+	 <ffb554bfa4739381d928406ad24697a4dbbbe4a2.camel@redhat.com>
+	 <CAA85sZunA=tf0FgLH=MNVYq3Edewb1j58oBAoXE1Tyuy3GJObg@mail.gmail.com>
+	 <CAA85sZsH1tMwLtL=VDa5=GBdVNWgifvhK+eG-hQg69PeSxBWkg@mail.gmail.com>
+	 <CAA85sZu=CzJx9QD87-vehOStzO9qHUSWk6DXZg3TzJeqOV5-aw@mail.gmail.com>
+	 <0a040331995c072c56fce58794848f5e9853c44f.camel@redhat.com>
+	 <CAA85sZuuwxtAQcMe3LHpFVeF7y-bVoHtO1nukAa2+NyJw3zcyg@mail.gmail.com>
+	 <CAA85sZurk7-_0XGmoCEM93vu3vbqRgPTH4QVymPR5BeeFw6iFg@mail.gmail.com>
+	 <486ae2687cd2e2624c0db1ea1f3d6ca36db15411.camel@redhat.com>
+	 <CAA85sZsJEZK0g0fGfH+toiHm_o4pdN+Wo0Wq9fgsUjHXGxgxQA@mail.gmail.com>
+	 <CAA85sZs4KkfVojx=vxbDaWhWRpxiHc-RCc2OLD2c+VefRjpTfw@mail.gmail.com>
+	 <5688456234f5d15ea9ca0f000350c28610ed2639.camel@redhat.com>
+	 <CAA85sZvT-vAHQooy8+i0-bTxgv4JjkqMorLL1HjkXK6XDKX41w@mail.gmail.com>
+	 <CAA85sZs2biYueZsbDqdrMyYfaqH6hnSMpymgbsk=b3W1B7TNRA@mail.gmail.com>
+	 <CAA85sZs_H3Dc-mYnj8J5VBEwUJwbHUupP+U-4eG20nfAHBtv4w@mail.gmail.com>
+	 <92a4d42491a2c219192ae86fa04b579ea3676d8c.camel@redhat.com>
+	 <CAA85sZvtspqfep+6rH8re98-A6rHNNWECvwqVaM=r=0NSSsGzA@mail.gmail.com>
+	 <dfbbe91a9c0abe8aba2c00afd3b7f7d6af801d8e.camel@redhat.com>
+	 <CAA85sZuQh0FMoGDFVyOad6G1UB9keodd3OCZ4d4r+xgXDArcVA@mail.gmail.com>
+	 <062061fc4d4d3476e3b0255803b726956686eb19.camel@redhat.com>
+	 <CAA85sZv9KCmw8mAzK4T-ORXB48wuLF+YXTYSWxkBhv3k_-wzcA@mail.gmail.com>
+	 <CAA85sZt6ssXRaZyq4awM0yTLFk62Gxbgw-0+bTKWsHwQvVzZXQ@mail.gmail.com>
+	 <d9bf21296a4691ac5aca11ccd832765b262f7088.camel@redhat.com>
+	 <CAA85sZsidN4ig=RaQ34PYFjnZGU-=zqR=r-5za=G4oeAtxDA7g@mail.gmail.com>
+	 <14cd6a50bd5de13825017b75c98cb3115e84acc1.camel@redhat.com>
+	 <CAA85sZuZLg+L7Sr51PPaOkPKbbiywXbbKzhTyjaw12_S6CsZHQ@mail.gmail.com>
+	 <c6cf7b4c0a561700d2015c970d52fc9d92b114c7.camel@redhat.com>
+	 <CAA85sZvZ_X=TqCXaPui0PDLq2pp5dw_uhga+wcXgBqudrLP9bQ@mail.gmail.com>
+	 <67ff0f7901e66d1c0d418c48c9a071068b32a77d.camel@redhat.com>
+	 <CANn89i+F=R71refT8K_8hPaP+uWn15GeHz+FTMYU=VPTG24WFA@mail.gmail.com>
+	 <c4e40b45b41d0476afd8989d31e6bab74c51a72a.camel@redhat.com>
+	 <CAA85sZs_R3W42m8YmXO-k08bPow7zKj_eOxceEB_3MJveGMZ7A@mail.gmail.com>
+	 <a46bb3de011002c2446a6d836aaddc9f6bce71bc.camel@redhat.com>
+	 <CAA85sZsHKb3Wtsa5ktSAPJsjLrcmahtgaemPhN5dTeTxEBWaqw@mail.gmail.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+User-Agent: Evolution 3.46.4 (3.46.4-1.fc37) 
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=unavailable autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-From: Rafał Miłecki <rafal@milecki.pl>
+On Fri, 2023-07-07 at 00:32 +0200, Ian Kumlien wrote:
+> On Thu, Jul 6, 2023 at 7:10=E2=80=AFPM Paolo Abeni <pabeni@redhat.com> wr=
+ote:
+> > On Thu, 2023-07-06 at 18:17 +0200, Ian Kumlien wrote:
+> > > On Thu, Jul 6, 2023 at 4:04=E2=80=AFPM Paolo Abeni <pabeni@redhat.com=
+> wrote:
+> > > >=20
+> > > > On Thu, 2023-07-06 at 15:56 +0200, Eric Dumazet wrote:
+> > > > > On Thu, Jul 6, 2023 at 3:02=E2=80=AFPM Paolo Abeni <pabeni@redhat=
+.com> wrote:
+> > > > > >=20
+> > > > > > On Thu, 2023-07-06 at 13:27 +0200, Ian Kumlien wrote:
+> > > > > > > On Thu, Jul 6, 2023 at 10:42=E2=80=AFAM Paolo Abeni <pabeni@r=
+edhat.com> wrote:
+> > > > > > > > On Wed, 2023-07-05 at 15:58 +0200, Ian Kumlien wrote:
+> > > > > > > > > On Wed, Jul 5, 2023 at 3:29=E2=80=AFPM Paolo Abeni <paben=
+i@redhat.com> wrote:
+> > > > > > > > > >=20
+> > > > > > > > > > On Wed, 2023-07-05 at 13:32 +0200, Ian Kumlien wrote:
+> > > > > > > > > > > On Wed, Jul 5, 2023 at 12:28=E2=80=AFPM Paolo Abeni <=
+pabeni@redhat.com> wrote:
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > On Tue, 2023-07-04 at 16:27 +0200, Ian Kumlien wrot=
+e:
+> > > > > > > > > > > > > More stacktraces.. =3D)
+> > > > > > > > > > > > >=20
+> > > > > > > > > > > > > cat bug.txt | ./scripts/decode_stacktrace.sh vmli=
+nux
+> > > > > > > > > > > > > [  411.413767] ------------[ cut here ]----------=
+--
+> > > > > > > > > > > > > [  411.413792] WARNING: CPU: 9 PID: 942 at includ=
+e/net/ud     p.h:509
+> > > > > > > > > > > > > udpv6_queue_rcv_skb (./include/net/udp.h:509 net/=
+ipv6/udp.c:800
+> > > > > > > > > > > > > net/ipv6/udp.c:787)
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > I'm really running out of ideas here...
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > This is:
+> > > > > > > > > > > >=20
+> > > > > > > > > > > >         WARN_ON_ONCE(UDP_SKB_CB(skb)->partial_cov);
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > sort of hint skb being shared (skb->users > 1) whil=
+e enqueued in
+> > > > > > > > > > > > multiple places (bridge local input and br forward/=
+flood to tun
+> > > > > > > > > > > > device). I audited the bridge mc flooding code, and=
+ I could not find
+> > > > > > > > > > > > how a shared skb could land into the local input pa=
+th.
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > Anyway the other splats reported here and in later =
+emails are
+> > > > > > > > > > > > compatible with shared skbs.
+> > > > > > > > > > > >=20
+> > > > > > > > > > > > The above leads to another bunch of questions:
+> > > > > > > > > > > > * can you reproduce the issue after disabling 'rx-g=
+ro-list' on the
+> > > > > > > > > > > > ingress device? (while keeping 'rx-udp-gro-forwardi=
+ng' on).
+> > > > > > > > > > >=20
+> > > > > > > > > > > With rx-gro-list off, as in never turned on, everythi=
+ng seems to run fine
+> > > > > > > > > > >=20
+> > > > > > > > > > > > * do you have by chance qdiscs on top of the VM tun=
+ devices?
+> > > > > > > > > > >=20
+> > > > > > > > > > > default qdisc is fq
+> > > > > > > > > >=20
+> > > > > > > > > > IIRC libvirt could reset the qdisc to noqueue for the o=
+wned tun
+> > > > > > > > > > devices.
+> > > > > > > > > >=20
+> > > > > > > > > > Could you please report the output of:
+> > > > > > > > > >=20
+> > > > > > > > > > tc -d -s qdisc show dev <tun dev name>
+> > > > > > > > >=20
+> > > > > > > > > I don't have these set:
+> > > > > > > > > CONFIG_NET_SCH_INGRESS
+> > > > > > > > > CONFIG_NET_SCHED
+> > > > > > > > >=20
+> > > > > > > > > so tc just gives an error...
+> > > > > > > >=20
+> > > > > > > > The above is confusing. AS CONFIG_NET_SCH_DEFAULT depends o=
+n
+> > > > > > > > CONFIG_NET_SCHED, you should not have a default qdisc, too =
+;)
+> > > > > > >=20
+> > > > > > > Well it's still set in sysctl - dunno if it fails
+> > > > > > >=20
+> > > > > > > > Could you please share your kernel config?
+> > > > > > >=20
+> > > > > > > Sure...
+> > > > > > >=20
+> > > > > > > As a side note, it hasn't crashed - no traces since we did th=
+e last change
+> > > > > >=20
+> > > > > > It sounds like an encouraging sing! (last famous words...). I'l=
+l wait 1
+> > > > > > more day, than I'll submit formally...
+> > > > > >=20
+> > > > > > > For reference, this is git diff on the running kernels source=
+ tree:
+> > > > > > > diff --git a/net/core/skbuff.c b/net/core/skbuff.c
+> > > > > > > index cea28d30abb5..1b2394ebaf33 100644
+> > > > > > > --- a/net/core/skbuff.c
+> > > > > > > +++ b/net/core/skbuff.c
+> > > > > > > @@ -4270,6 +4270,17 @@ struct sk_buff *skb_segment_list(struc=
+t sk_buff *skb,
+> > > > > > >=20
+> > > > > > >         skb_push(skb, -skb_network_offset(skb) + offset);
+> > > > > > >=20
+> > > > > > > +       if (WARN_ON_ONCE(skb_shared(skb))) {
+> > > > > > > +               skb =3D skb_share_check(skb, GFP_ATOMIC);
+> > > > > > > +               if (!skb)
+> > > > > > > +                       goto err_linearize;
+> > > > > > > +       }
+> > > > > > > +
+> > > > > > > +       /* later code will clear the gso area in the shared i=
+nfo */
+> > > > > > > +       err =3D skb_header_unclone(skb, GFP_ATOMIC);
+> > > > > > > +       if (err)
+> > > > > > > +               goto err_linearize;
+> > > > > > > +
+> > > > > > >         skb_shinfo(skb)->frag_list =3D NULL;
+> > > > > > >=20
+> > > > > > >         while (list_skb) {
+> > > > > >=20
+> > > > > > ...the above check only, as the other 2 should only catch-up si=
+de
+> > > > > > effects of lack of this one. In any case the above address a re=
+al
+> > > > > > issue, so we likely want it no-matter-what.
+> > > > > >=20
+> > > > >=20
+> > > > > Interesting, I wonder if this could also fix some syzbot reports
+> > > > > Willem and I are investigating.
+> > > > >=20
+> > > > > Any idea of when the bug was 'added' or 'revealed' ?
+> > > >=20
+> > > > The issue specifically addressed above should be present since
+> > > > frag_list introduction commit 3a1296a38d0c ("net: Support GRO/GSO
+> > > > fraglist chaining."). AFAICS triggering it requires non trivial set=
+up -
+> > > > mcast rx on bridge with frag-list enabled and forwarding to multipl=
+e
+> > > > ports - so perhaps syzkaller found it later due to improvements on =
+its
+> > > > side ?!?
+> > >=20
+> > > I'm also a bit afraid that we just haven't triggered it - i don't see
+> > > any warnings or anything... :/
+> >=20
+> > Let me try to clarify: I hope/think that this chunk alone:
+> >=20
+> > +       /* later code will clear the gso area in the shared info */
+> > +       err =3D skb_header_unclone(skb, GFP_ATOMIC);
+> > +       if (err)
+> > +               goto err_linearize;
+> > +
+> >         skb_shinfo(skb)->frag_list =3D NULL;
+> >=20
+> >         while (list_skb) {
+> >=20
+> > does the magic/avoids the skb corruptions -> it everything goes well,
+> > you should not see any warnings at all. Running 'nstat' in the DUT
+> > should give some hints about reaching the relevant code paths.
+>=20
+> Sorry about the html mail... but...
+>=20
+> I was fully expecting a warning from:
+>  if (WARN_ON_ONCE(skb_shared(skb))) {
+>=20
+> But I could be completely wrong and things =3D)
+>=20
+> Which fields would i be looking at in nstat
+[...]
+> UdpInDatagrams                  4893               0.0
+[...]
+> Ip6InMcastPkts                  7146               0.0
+[...]
+> Ip6InMcastOctets                1061292            0.0
 
-Turning IRQs off is done by accessing Ethernet controller registers.
-That can't be done until device's clock is enabled. It results in a SoC
-hang otherwise.
+The above ones. We have ingress mcast traffic, but the figures are
+inconclusive about GRO aggregation taking place (Ip6InMcastOctets /
+Ip6InMcastPkts > MTU would prove that). Similar thing for IPv4 mcast.
 
-This bug remained unnoticed for years as most bootloaders keep all
-Ethernet interfaces turned on. It seems to only affect a niche SoC
-family BCM47189. It has two Ethernet controllers but CFE bootloader uses
-only the first one.
+Still the change look sane, the alive time encouraging. I'll submit it
+formally with your reported/tested-by tags.
 
-Fixes: 34322615cbaa ("net: bgmac: Mask interrupts during probe")
-Signed-off-by: Rafał Miłecki <rafal@milecki.pl>
----
- drivers/net/ethernet/broadcom/bgmac.c | 4 ++--
- 1 file changed, 2 insertions(+), 2 deletions(-)
+Many thanks for all the debugging effort!
 
-diff --git a/drivers/net/ethernet/broadcom/bgmac.c b/drivers/net/ethernet/broadcom/bgmac.c
-index 1761df8fb7f9..10c7c232cc4e 100644
---- a/drivers/net/ethernet/broadcom/bgmac.c
-+++ b/drivers/net/ethernet/broadcom/bgmac.c
-@@ -1492,8 +1492,6 @@ int bgmac_enet_probe(struct bgmac *bgmac)
- 
- 	bgmac->in_init = true;
- 
--	bgmac_chip_intrs_off(bgmac);
--
- 	net_dev->irq = bgmac->irq;
- 	SET_NETDEV_DEV(net_dev, bgmac->dev);
- 	dev_set_drvdata(bgmac->dev, bgmac);
-@@ -1511,6 +1509,8 @@ int bgmac_enet_probe(struct bgmac *bgmac)
- 	 */
- 	bgmac_clk_enable(bgmac, 0);
- 
-+	bgmac_chip_intrs_off(bgmac);
-+
- 	/* This seems to be fixing IRQ by assigning OOB #6 to the core */
- 	if (!(bgmac->feature_flags & BGMAC_FEAT_IDM_MASK)) {
- 		if (bgmac->feature_flags & BGMAC_FEAT_IRQ_ID_OOB_6)
--- 
-2.35.3
+Paolo
 
 
