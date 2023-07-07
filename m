@@ -1,182 +1,133 @@
-Return-Path: <netdev+bounces-15972-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15973-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4C1BD74ABF7
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:33:27 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 558DB74ABFC
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 09:34:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 03A5328168A
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:33:26 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8C6BE1C20F64
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 07:34:33 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 113636D1B;
-	Fri,  7 Jul 2023 07:33:24 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 8F2506D24;
+	Fri,  7 Jul 2023 07:34:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F003263D4
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:33:23 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9B0E81FCE
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 00:33:22 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688715201;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=mBBSIXu/59mCKHbbL4NSJH2aQXfaKqVLtFEbdlv5kp4=;
-	b=LW5BV6vyqsd62xu1x44wcpc1dR6ZYAu7vDu+wcKpr9+xC/cV5f9oSb8cSXE200Gp8L7qd5
-	WZ47AZb6bJ7cB1yPP2/De/CpE4YSoCP6afiACsFwO/FY0nbDY0SbZpo8ZAmnxJFLqqHdoe
-	oumZLUoxSOU3hToJBDuVSa3lug+6kQI=
-Received: from mail-lj1-f199.google.com (mail-lj1-f199.google.com
- [209.85.208.199]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-656-phzkopgaM_uORkqwpKfazA-1; Fri, 07 Jul 2023 03:33:19 -0400
-X-MC-Unique: phzkopgaM_uORkqwpKfazA-1
-Received: by mail-lj1-f199.google.com with SMTP id 38308e7fff4ca-2b6ef65eaadso15899321fa.2
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 00:33:19 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688715198; x=1691307198;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=mBBSIXu/59mCKHbbL4NSJH2aQXfaKqVLtFEbdlv5kp4=;
-        b=JzZ+JhnrvFmPrmSeWWjOgJyQ3vtvtd7iVnBxmn1zRuT0RzVrF9dgvda/xK67Jd/8QX
-         ckIgqStCian1cNe2W30p8/GgAyHBs4eVepc4vdDC5vQDnRAqIFQrlkCxztnfst82HmdA
-         6yetOqmok85b2k6qg1Y+lQVv3gG9iA5fFfdTWEby2Sa6yLHdVhs0dElC4AcRKsVSgHKi
-         kMvp0Kf28BHnSEO1bWPppsxpNf1cs/Rd7SIsFqad23CdzDp8XTK+JUTOAVzLXtWKX4RS
-         X+Z584BLyVfO+w/mC/0575dq5zUjZ1aIAv+D1+xYRCvUF5/oHu3wWaSEOu21YX2V1dIM
-         pvuQ==
-X-Gm-Message-State: ABy/qLZwWHs6ZhD/WdNZMonUpgIUxs9daO4fz9nsmp577e3j/1PsUojR
-	gd0Gr83Y8Tf+0491G6zS373Rxh2wuS+t/hv646Z85auJpT3xEmmNCwhfsCZUHv8BhEoBYpXH8kO
-	C5zWhjMkMAhnQFjv7XfxlZ7xBrepIKGw/
-X-Received: by 2002:a2e:9dd5:0:b0:2b6:f8d0:7d3d with SMTP id x21-20020a2e9dd5000000b002b6f8d07d3dmr2923024ljj.49.1688715198287;
-        Fri, 07 Jul 2023 00:33:18 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlFc7+bDcK9CkHA3vwuGskq3KTXhAS0ZYBULb6dWTJWaOzgypugPYLY4/k0fkoqOomqoBd5x0bMGXnSIa4BDfiY=
-X-Received: by 2002:a2e:9dd5:0:b0:2b6:f8d0:7d3d with SMTP id
- x21-20020a2e9dd5000000b002b6f8d07d3dmr2923012ljj.49.1688715197962; Fri, 07
- Jul 2023 00:33:17 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 805B015CE
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:34:31 +0000 (UTC)
+Received: from metis.ext.pengutronix.de (metis.ext.pengutronix.de [IPv6:2001:67c:670:201:290:27ff:fe1d:cc33])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 189201FD9
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 00:34:30 -0700 (PDT)
+Received: from moin.white.stw.pengutronix.de ([2a0a:edc0:0:b01:1d::7b] helo=bjornoya.blackshift.org)
+	by metis.ext.pengutronix.de with esmtps (TLS1.3:ECDHE_RSA_AES_256_GCM_SHA384:256)
+	(Exim 4.92)
+	(envelope-from <mkl@pengutronix.de>)
+	id 1qHfyq-0003Q6-E7; Fri, 07 Jul 2023 09:34:16 +0200
+Received: from pengutronix.de (unknown [172.20.34.65])
+	(using TLSv1.3 with cipher TLS_AES_256_GCM_SHA384 (256/256 bits)
+	 key-exchange ECDHE (prime256v1) server-signature RSA-PSS (4096 bits) server-digest SHA256)
+	(Client did not present a certificate)
+	(Authenticated sender: mkl-all@blackshift.org)
+	by smtp.blackshift.org (Postfix) with ESMTPSA id D3E421EAE26;
+	Fri,  7 Jul 2023 07:34:14 +0000 (UTC)
+Date: Fri, 7 Jul 2023 09:34:14 +0200
+From: Marc Kleine-Budde <mkl@pengutronix.de>
+To: Kumari Pallavi <kumari.pallavi@intel.com>
+Cc: "rcsekar@samsung.com" <rcsekar@samsung.com>,
+	"Sangannavar, Mallikarjunappa" <mallikarjunappa.sangannavar@intel.com>,
+	"Nikula, Jarkko" <jarkko.nikula@intel.com>,
+	"linux-can@vger.kernel.org" <linux-can@vger.kernel.org>,
+	"netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+	"Thokala, Srikanth" <srikanth.thokala@intel.com>
+Subject: Re: RE: [RESEND] [PATCH 1/1] can: m_can: Control tx and rx flow to
+ avoid communication stall
+Message-ID: <20230707-breeder-shaft-61b826633b7e-mkl@pengutronix.de>
+References: <20230623085920.12904-1-kumari.pallavi@intel.com>
+ <20230705-return-slogan-36c499673bb6-mkl@pengutronix.de>
+ <SJ1PR11MB608478D62EDFAEDDBE8C0890872DA@SJ1PR11MB6084.namprd11.prod.outlook.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230630003609.28527-1-shannon.nelson@amd.com> <20230630003609.28527-2-shannon.nelson@amd.com>
-In-Reply-To: <20230630003609.28527-2-shannon.nelson@amd.com>
-From: Jason Wang <jasowang@redhat.com>
-Date: Fri, 7 Jul 2023 15:33:07 +0800
-Message-ID: <CACGkMEthwPRtawkpJMZ5o+H=pOxGszaxOsmKuRH4LkPXrfzRoA@mail.gmail.com>
-Subject: Re: [PATCH virtio 1/4] pds_vdpa: reset to vdpa specified mac
-To: Shannon Nelson <shannon.nelson@amd.com>
-Cc: mst@redhat.com, virtualization@lists.linux-foundation.org, 
-	brett.creeley@amd.com, netdev@vger.kernel.org, drivers@pensando.io, 
-	Allen Hubbe <allen.hubbe@amd.com>
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+Content-Type: multipart/signed; micalg=pgp-sha512;
+	protocol="application/pgp-signature"; boundary="dxld4druqcvwrqfa"
+Content-Disposition: inline
+In-Reply-To: <SJ1PR11MB608478D62EDFAEDDBE8C0890872DA@SJ1PR11MB6084.namprd11.prod.outlook.com>
+X-SA-Exim-Connect-IP: 2a0a:edc0:0:b01:1d::7b
+X-SA-Exim-Mail-From: mkl@pengutronix.de
+X-SA-Exim-Scanned: No (on metis.ext.pengutronix.de); SAEximRunCond expanded to false
+X-PTX-Original-Recipient: netdev@vger.kernel.org
+X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jun 30, 2023 at 8:36=E2=80=AFAM Shannon Nelson <shannon.nelson@amd.=
-com> wrote:
->
-> From: Allen Hubbe <allen.hubbe@amd.com>
->
-> When the vdpa device is reset, also reinitialize it with the mac address
-> that was assigned when the device was added.
->
-> Fixes: 151cc834f3dd ("pds_vdpa: add support for vdpa and vdpamgmt interfa=
-ces")
-> Signed-off-by: Allen Hubbe <allen.hubbe@amd.com>
-> Signed-off-by: Shannon Nelson <shannon.nelson@amd.com>
-> Reviewed-by: Brett Creeley <brett.creeley@amd.com>
-> ---
->  drivers/vdpa/pds/vdpa_dev.c | 16 ++++++++--------
->  drivers/vdpa/pds/vdpa_dev.h |  1 +
->  2 files changed, 9 insertions(+), 8 deletions(-)
->
-> diff --git a/drivers/vdpa/pds/vdpa_dev.c b/drivers/vdpa/pds/vdpa_dev.c
-> index 5071a4d58f8d..e2e99bb0be2b 100644
-> --- a/drivers/vdpa/pds/vdpa_dev.c
-> +++ b/drivers/vdpa/pds/vdpa_dev.c
-> @@ -409,6 +409,8 @@ static void pds_vdpa_set_status(struct vdpa_device *v=
-dpa_dev, u8 status)
->                         pdsv->vqs[i].avail_idx =3D 0;
->                         pdsv->vqs[i].used_idx =3D 0;
->                 }
-> +
-> +               pds_vdpa_cmd_set_mac(pdsv, pdsv->mac);
 
-So this is not necessarily called during reset. So I think we need to
-move it to pds_vdpa_reset()?
+--dxld4druqcvwrqfa
+Content-Type: text/plain; charset=utf-8
+Content-Disposition: inline
+Content-Transfer-Encoding: quoted-printable
 
-The rest looks good.
+On 07.07.2023 05:38:09, Kumari Pallavi wrote:
+> > >  			if (netif_queue_stopped(dev) &&
+> > >  			    !m_can_tx_fifo_full(cdev))
+> > >  				netif_wake_queue(dev);
+> > > @@ -1787,6 +1787,7 @@ static netdev_tx_t m_can_start_xmit(struct sk_b=
+uff
+> > *skb,
+> > >  		}
+> > >  	} else {
+> > >  		cdev->tx_skb =3D skb;
+> > > +		m_can_write(cdev, M_CAN_IE, IR_ALL_INT & (IR_TEFN));
+> >=20
+> > - What's the purpose of  "()" around IR_TEFN?
+> > - "IR_ALL_INT & (IR_TEFN)" is equal to IR_TEFN, isn't it?
+> > - This basically disables all other interrupts, is this what you want to
+> >   do?
+> > - What happens if the bus is busy with high prio CAN frames and you want
+> >   to send low prio ones? You will not get any RX-IRQ, this doesn't look
+> >   correct to me.
+> >=20
+>=20
+> Even though the RX interrupt is disabled (in IE), if there is an TX
+> interrupt and the RF0N bit is set (in IR), the RX packet will still be
+> serviced because the TX and RX share the same IRQ handler.
 
-Thanks
+If the bus is busy with high prio CAN frames and the m_can wants to send
+a low prio frame, the m_can will not be able to send it's CAN frame,
+there will be not TX interrupt. If there are enough high prio CAN frames
+the RX buffer will overflow.
 
->         }
->
->         if (status & ~old_status & VIRTIO_CONFIG_S_FEATURES_OK) {
-> @@ -532,7 +534,6 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *mde=
-v, const char *name,
->         struct device *dma_dev;
->         struct pci_dev *pdev;
->         struct device *dev;
-> -       u8 mac[ETH_ALEN];
->         int err;
->         int i;
->
-> @@ -617,19 +618,18 @@ static int pds_vdpa_dev_add(struct vdpa_mgmt_dev *m=
-dev, const char *name,
->          * or set a random mac if default is 00:..:00
->          */
->         if (add_config->mask & BIT_ULL(VDPA_ATTR_DEV_NET_CFG_MACADDR)) {
-> -               ether_addr_copy(mac, add_config->net.mac);
-> -               pds_vdpa_cmd_set_mac(pdsv, mac);
-> +               ether_addr_copy(pdsv->mac, add_config->net.mac);
->         } else {
->                 struct virtio_net_config __iomem *vc;
->
->                 vc =3D pdsv->vdpa_aux->vd_mdev.device;
-> -               memcpy_fromio(mac, vc->mac, sizeof(mac));
-> -               if (is_zero_ether_addr(mac)) {
-> -                       eth_random_addr(mac);
-> -                       dev_info(dev, "setting random mac %pM\n", mac);
-> -                       pds_vdpa_cmd_set_mac(pdsv, mac);
-> +               memcpy_fromio(pdsv->mac, vc->mac, sizeof(pdsv->mac));
-> +               if (is_zero_ether_addr(pdsv->mac)) {
-> +                       eth_random_addr(pdsv->mac);
-> +                       dev_info(dev, "setting random mac %pM\n", pdsv->m=
-ac);
->                 }
->         }
-> +       pds_vdpa_cmd_set_mac(pdsv, pdsv->mac);
->
->         for (i =3D 0; i < pdsv->num_vqs; i++) {
->                 pdsv->vqs[i].qid =3D i;
-> diff --git a/drivers/vdpa/pds/vdpa_dev.h b/drivers/vdpa/pds/vdpa_dev.h
-> index a1bc37de9537..cf02df287fc4 100644
-> --- a/drivers/vdpa/pds/vdpa_dev.h
-> +++ b/drivers/vdpa/pds/vdpa_dev.h
-> @@ -39,6 +39,7 @@ struct pds_vdpa_device {
->         u64 req_features;               /* features requested by vdpa */
->         u8 vdpa_index;                  /* rsvd for future subdevice use =
-*/
->         u8 num_vqs;                     /* num vqs in use */
-> +       u8 mac[ETH_ALEN];               /* mac selected when the device w=
-as added */
->         struct vdpa_callback config_cb;
->         struct notifier_block nb;
->  };
-> --
-> 2.17.1
->
+regards,
+Marc
 
+--=20
+Pengutronix e.K.                 | Marc Kleine-Budde          |
+Embedded Linux                   | https://www.pengutronix.de |
+Vertretung N=C3=BCrnberg              | Phone: +49-5121-206917-129 |
+Amtsgericht Hildesheim, HRA 2686 | Fax:   +49-5121-206917-9   |
+
+--dxld4druqcvwrqfa
+Content-Type: application/pgp-signature; name="signature.asc"
+
+-----BEGIN PGP SIGNATURE-----
+
+iQEzBAABCgAdFiEEDs2BvajyNKlf9TJQvlAcSiqKBOgFAmSnv/MACgkQvlAcSiqK
+BOjdRAf/ev2175DU15TwDRx6naSR7QltyRAabcBHohWJrGf/oDogSB3PYo3V6wFY
+fRtr7Dy0JRw2p2jm1oTL+UzfB45Ap3Kp8x6DDA4+4Ca2eok+aK6r7jDE1rWKfod/
+iBjQt6x0Plk5PT4ph7M1f1ukGUsJERyFoAQsR1rZQv2n+eT0pqGJZwpWofNtppG5
+AQw04M1keRRE6LeMk1aeMdHi3fGiZT8QEJom0i1UEOiERIARuVsL5B3NDFEYkxVF
+FXSX8YPH6QZS6hNAbY7x79qEB0qRRX52Uj2FklIsYnl8YeXnFUe7ISp+n+9bFERs
+NcnMQ/tGrFAUHZc8ln6jnQOE5jtk0g==
+=dHVD
+-----END PGP SIGNATURE-----
+
+--dxld4druqcvwrqfa--
 
