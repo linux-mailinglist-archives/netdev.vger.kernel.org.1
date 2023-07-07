@@ -1,124 +1,103 @@
-Return-Path: <netdev+bounces-16070-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16069-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 67C8E74B48B
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 17:45:19 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A4D574B47E
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 17:45:01 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A22C31C20FA6
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:45:18 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 6A54D1C20FF8
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:45:00 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C93F710797;
-	Fri,  7 Jul 2023 15:45:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3279E10795;
+	Fri,  7 Jul 2023 15:44:58 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB86710795
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:45:08 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx08-00178001.pphosted.com [91.207.212.93])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3859F173B;
-	Fri,  7 Jul 2023 08:45:07 -0700 (PDT)
-Received: from pps.filterd (m0046661.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367CH9mW027393;
-	Fri, 7 Jul 2023 17:44:37 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=UirHfJWJ0M0c3P66CSNWUmzBZIs0e0lzSHowOTIQOxY=;
- b=R077onV69jpX15gfnwED6gCxOl6yExQaqxA53M7kAUStTuqI6BK8nT5z07EXtUEmHolY
- riyqdNY+iqw2vdORFsm8Ff3OR9V6cs5mzg/rbN1iDNyCpDtaXAmAKIeIylrkc1PkUjmO
- hchsdwamHlynmEL1RY40fiFNk47LZKTBA5P1Qhnz+JMV18+Ew+dTtXCkzH1eRGffvA8x
- wlSz5XaqZE2Y2se0KTE7WNPLGB6T8d3cDevC2/gA7JAHKnptpGkPK72PlMBcPaae7E88
- vBYPyaIvZL1KHTdsxqUau3JWVd60dpGsiUNHy8ji7tFOVFiy85DSPwi1zOkp0W8r83d2 SA== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rpjjtsepn-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jul 2023 17:44:37 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 39181100050;
-	Fri,  7 Jul 2023 17:44:36 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0FC1C22A6F1;
-	Fri,  7 Jul 2023 17:44:36 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Fri, 7 Jul
- 2023 17:44:34 +0200
-Message-ID: <c6533f17-6100-5901-7281-256bff5db773@foss.st.com>
-Date: Fri, 7 Jul 2023 17:44:34 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 22F03C123
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:44:57 +0000 (UTC)
+Received: from mail-qt1-x836.google.com (mail-qt1-x836.google.com [IPv6:2607:f8b0:4864:20::836])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C52F1173B
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 08:44:56 -0700 (PDT)
+Received: by mail-qt1-x836.google.com with SMTP id d75a77b69052e-401d1d967beso336631cf.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 08:44:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=google.com; s=20221208; t=1688744696; x=1691336696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=RlgengT9aAUSDCSQdfdVcjavg+ikjdd9vhZv6EODEuE=;
+        b=NjS1x/b0fmLihlzYoavyXYbgBgclV6WvI+vCN8PpUFtK8PeAyUuQVytwUeg/vTub8z
+         r3wqdbRgPYCAALlrh+sKsBeB0Cqp2zJDhwUvSN1Q9juTqRAKmL12WhwLVTQZqbdbae1L
+         ePlPnnxmzM7q6UntmYjaydKQ4554HtH1YowyUn8SEFCqjTYqDsOZV06SBaqndKnGh37z
+         H9+iV2DnoiIHPejCuDLZn/cu2ngwj4At1AFji3xDVA0C5US6Vi6/zTVli+SLJ72mzF0x
+         2BT7BHW4VZviqep2cXB77xOgT9KMMHvSIwMNsZXXZhOABDgJafqqgHlilNAzK7JC5CKV
+         //Tw==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688744696; x=1691336696;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=RlgengT9aAUSDCSQdfdVcjavg+ikjdd9vhZv6EODEuE=;
+        b=bG6Up1Kyg3yvH+5eqJLM/XqqJXmKddn3OBpMUvjKXpNg+gDNRX2cqbZ2+deh9N1VIt
+         YC8eRkvv6XNXgJrrm2dLofvfmiBhv12R8/9zK7VdZd4OtAbt9VSt0g+L3e60uJ5P/G06
+         xHFZgKfDi85l5/+/LshQYzrheCg3vvGZLVoI3N7yWBCbIoYot1PInIBITaHAWACVxVwP
+         4TcnyxZKyocj5G3q75YIgeXUwd1OCWt59ehIWDfnLQUFMcwDm2ER8fE1Dstv64QHHrPB
+         +Ahis0E2ywF63r8Z1a6AaF1kbiObavPxRQj1SKo6T5Yt+dzGQ8TVyqj6nEuTtfVgkxOW
+         RRTg==
+X-Gm-Message-State: ABy/qLblIyLDoJfrpcNmxO6jEdyOPRTyxEeSaXb2FaSbXJp9JDlOnhiG
+	xl+9a2eihtLLGKcyxtYAv1Pos72ezxAND7nFAemGKQ==
+X-Google-Smtp-Source: APBJJlGVqhZT0XzeXUaZFLXoagNunWsFBAbhlb1W2YjWYdhXaqoASCAAa5Mkb/yUEJtYmVHGXUUym5QFA+ohkI+7zMo=
+X-Received: by 2002:a05:622a:89:b0:3f8:5b2:aef0 with SMTP id
+ o9-20020a05622a008900b003f805b2aef0mr236394qtw.24.1688744695640; Fri, 07 Jul
+ 2023 08:44:55 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 05/10] firewall: introduce stm32_firewall framework
-Content-Language: en-US
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <Oleksii_Moisieiev@epam.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
- <2023070748-false-enroll-e5dc@gregkh>
- <febd65e1-68c7-f9d8-c8a4-3c3e88f15f3e@foss.st.com>
- <2023070744-superjet-slum-1772@gregkh>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <2023070744-superjet-slum-1772@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
-X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-07_10,2023-07-06_02,2023-05-22_02
-X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+References: <20230616193427.3908429-1-arjunroy.kdev@gmail.com> <ZKcZZPB7jaDlasdR@casper.infradead.org>
+In-Reply-To: <ZKcZZPB7jaDlasdR@casper.infradead.org>
+From: Eric Dumazet <edumazet@google.com>
+Date: Fri, 7 Jul 2023 17:44:44 +0200
+Message-ID: <CANn89iK3WkWZPJqD2=bVczPJ615zL1HHuDQ1VDXyw8AB2hyeJQ@mail.gmail.com>
+Subject: Re: [net-next,v2] tcp: Use per-vma locking for receive zerocopy
+To: Matthew Wilcox <willy@infradead.org>
+Cc: Arjun Roy <arjunroy.kdev@gmail.com>, netdev@vger.kernel.org, arjunroy@google.com, 
+	soheil@google.com, kuba@kernel.org, akpm@linux-foundation.org, 
+	dsahern@kernel.org, davem@davemloft.net, linux-mm@kvack.org, 
+	pabeni@redhat.com
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,
+	ENV_AND_HDR_SPF_MATCH,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,USER_IN_DEF_DKIM_WL,USER_IN_DEF_SPF_WL
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On Thu, Jul 6, 2023 at 9:43=E2=80=AFPM Matthew Wilcox <willy@infradead.org>=
+ wrote:
+>
+> On Fri, Jun 16, 2023 at 12:34:27PM -0700, Arjun Roy wrote:
+> > However, with per-vma locking, both of these problems can be avoided.
+>
+> I appreciate your enthusiasm for this.  However, applying this patch
+> completely wrecks my patch series to push per-vma locking down for
+> file-backed mappings.  It would be helpful if we can back this out
+> for now and then apply it after that patch series.
+>
+> Would it make life hard for this patch to go through the mm tree?
+>
 
+No worries, can you send a formal revert then ?
 
-On 7/7/23 17:10, Greg KH wrote:
-> On Fri, Jul 07, 2023 at 04:00:23PM +0200, Gatien CHEVALLIER wrote:
->> I'll change to (GPL-2.0-only OR BSD-3-Clause) :)
-> 
-> If you do that, I'll require a lawyer to sign off on it to verify that
-> you all know EXACTLY the work involved in dealing with dual-licensed
-> kernel code.  Sorry, licenses aren't jokes.
+(With some details, because I do not see why you can not simply add
+the revert in front of your series ?)
 
-I was worried about the interactions with software running on BSD
-license, hence my (poorly written) proposal. Looking back at it
-there's no good reason to use a dual-license here.
-GPL-2.0-only is fine.
-
-> 
-> thanks,
-> 
-> greg k-h
+Thanks.
 
