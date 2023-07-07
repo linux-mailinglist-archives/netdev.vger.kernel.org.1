@@ -1,277 +1,140 @@
-Return-Path: <netdev+bounces-16012-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16015-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id D608A74AEFC
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:51:07 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8C2ED74AF24
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:55:28 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EDD6281710
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:51:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B246E281749
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:55:26 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 30629BE77;
-	Fri,  7 Jul 2023 10:51:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0816FBE7D;
+	Fri,  7 Jul 2023 10:55:25 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9E3FB23BD;
-	Fri,  7 Jul 2023 10:51:00 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 1904CC433C7;
-	Fri,  7 Jul 2023 10:50:42 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688727060;
-	bh=YY2+JZ9K159BEA5iSbeX62sRGYZcpbUaLjQvLugmLbE=;
-	h=Subject:From:To:Cc:Date:In-Reply-To:References:From;
-	b=jXdQbiZ5Du/aIdze7VeTdm89AeKeYW1m4/7P1K420P54fp2uTq7aOaGBMwqlLnw11
-	 5T+jXE1w9xr2TFIydSymIs59E5/D60tiQwOrG5t4hwTmZ4+DNTLa0LgW/JlS7C6Rg0
-	 Mzl7zZGaHcBNbE8fs+RYzBh/pLfQTiwpAzbqUwnaVBq4Wks4CGEmJGniuijWbkznN9
-	 yKSAP4Wd0VGwzQyH6kGj1b/zaEVMosXLl47jzHBi50p2AWNvdkuhe4kCPVw/2GfwLp
-	 PcUD4QVeNETkqKyUuCjgzrA8gjstIliNy9GhxSwhdsoWExJoMegiOtBnIsuS31XbZX
-	 flM91ZzrsjFeA==
-Message-ID: <ff1f471a9d33ae01ad570644273e4e579204a3b6.camel@kernel.org>
-Subject: Re: [apparmor] [PATCH v2 08/92] fs: new helper:
- simple_rename_timestamp
-From: Jeff Layton <jlayton@kernel.org>
-To: Seth Arnold <seth.arnold@canonical.com>
-Cc: Damien Le Moal <dlemoal@kernel.org>, jk@ozlabs.org, arnd@arndb.de, 
- mpe@ellerman.id.au, npiggin@gmail.com, christophe.leroy@csgroup.eu, 
- hca@linux.ibm.com, gor@linux.ibm.com, agordeev@linux.ibm.com, 
- borntraeger@linux.ibm.com, svens@linux.ibm.com, gregkh@linuxfoundation.org,
-  arve@android.com, tkjos@android.com, maco@android.com,
- joel@joelfernandes.org,  brauner@kernel.org, cmllamas@google.com,
- surenb@google.com,  dennis.dalessandro@cornelisnetworks.com, jgg@ziepe.ca,
- leon@kernel.org,  bwarrum@linux.ibm.com, rituagar@linux.ibm.com,
- ericvh@kernel.org, lucho@ionkov.net,  asmadeus@codewreck.org,
- linux_oss@crudebyte.com, dsterba@suse.com,  dhowells@redhat.com,
- marc.dionne@auristor.com, viro@zeniv.linux.org.uk,  raven@themaw.net,
- luisbg@kernel.org, salah.triki@gmail.com,  aivazian.tigran@gmail.com,
- ebiederm@xmission.com, keescook@chromium.org,  clm@fb.com,
- josef@toxicpanda.com, xiubli@redhat.com, idryomov@gmail.com, 
- jaharkes@cs.cmu.edu, coda@cs.cmu.edu, jlbec@evilplan.org, hch@lst.de, 
- nico@fluxnic.net, rafael@kernel.org, code@tyhicks.com, ardb@kernel.org, 
- xiang@kernel.org, chao@kernel.org, huyue2@coolpad.com,
- jefflexu@linux.alibaba.com,  linkinjeon@kernel.org, sj1557.seo@samsung.com,
- jack@suse.com, tytso@mit.edu,  adilger.kernel@dilger.ca,
- jaegeuk@kernel.org, hirofumi@mail.parknet.co.jp,  miklos@szeredi.hu,
- rpeterso@redhat.com, agruenba@redhat.com, richard@nod.at, 
- anton.ivanov@cambridgegreys.com, johannes@sipsolutions.net, 
- mikulas@artax.karlin.mff.cuni.cz, mike.kravetz@oracle.com,
- muchun.song@linux.dev,  dwmw2@infradead.org, shaggy@kernel.org,
- tj@kernel.org,  trond.myklebust@hammerspace.com, anna@kernel.org,
- chuck.lever@oracle.com,  neilb@suse.de, kolga@netapp.com,
- Dai.Ngo@oracle.com, tom@talpey.com,  konishi.ryusuke@gmail.com,
- anton@tuxera.com,  almaz.alexandrovich@paragon-software.com,
- mark@fasheh.com,  joseph.qi@linux.alibaba.com, me@bobcopeland.com,
- hubcap@omnibond.com,  martin@omnibond.com, amir73il@gmail.com,
- mcgrof@kernel.org, yzaikin@google.com,  tony.luck@intel.com,
- gpiccoli@igalia.com, al@alarsen.net, sfrench@samba.org,  pc@manguebit.com,
- lsahlber@redhat.com, sprasad@microsoft.com,  senozhatsky@chromium.org,
- phillip@squashfs.org.uk, rostedt@goodmis.org,  mhiramat@kernel.org,
- dushistov@mail.ru, hdegoede@redhat.com, djwong@kernel.org, 
- naohiro.aota@wdc.com, jth@kernel.org, ast@kernel.org, daniel@iogearbox.net,
-  andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com, 
- john.fastabend@gmail.com, kpsingh@kernel.org, sdf@google.com,
- haoluo@google.com,  jolsa@kernel.org, hughd@google.com,
- akpm@linux-foundation.org, davem@davemloft.net,  edumazet@google.com,
- kuba@kernel.org, pabeni@redhat.com,  john.johansen@canonical.com,
- paul@paul-moore.com, jmorris@namei.org,  serge@hallyn.com,
- stephen.smalley.work@gmail.com, eparis@parisplace.org,  jgross@suse.com,
- stern@rowland.harvard.edu, lrh2000@pku.edu.cn, 
- sebastian.reichel@collabora.com, wsa+renesas@sang-engineering.com, 
- quic_ugoswami@quicinc.com, quic_linyyuan@quicinc.com, john@keeping.me.uk, 
- error27@gmail.com, quic_uaggarwa@quicinc.com, hayama@lineo.co.jp,
- jomajm@gmail.com,  axboe@kernel.dk, dhavale@google.com,
- dchinner@redhat.com, hannes@cmpxchg.org,  zhangpeng362@huawei.com,
- slava@dubeyko.com, gargaditya08@live.com, 
- penguin-kernel@I-love.SAKURA.ne.jp, yifeliu@cs.stonybrook.edu, 
- madkar@cs.stonybrook.edu, ezk@cs.stonybrook.edu, yuzhe@nfschina.com, 
- willy@infradead.org, okanatov@gmail.com, jeffxu@chromium.org,
- linux@treblig.org,  mirimmad17@gmail.com, yijiangshan@kylinos.cn,
- yang.yang29@zte.com.cn,  xu.xin16@zte.com.cn, chengzhihao1@huawei.com,
- shr@devkernel.io,  Liam.Howlett@Oracle.com, adobriyan@gmail.com,
- chi.minghao@zte.com.cn,  roberto.sassu@huawei.com, linuszeng@tencent.com,
- bvanassche@acm.org,  zohar@linux.ibm.com, yi.zhang@huawei.com,
- trix@redhat.com, fmdefrancesco@gmail.com,  ebiggers@google.com,
- princekumarmaurya06@gmail.com, chenzhongjin@huawei.com,  riel@surriel.com,
- shaozhengchao@huawei.com, jingyuwang_vip@163.com, 
- linuxppc-dev@lists.ozlabs.org, linux-kernel@vger.kernel.org, 
- linux-s390@vger.kernel.org, linux-rdma@vger.kernel.org, 
- linux-usb@vger.kernel.org, v9fs@lists.linux.dev,
- linux-fsdevel@vger.kernel.org,  linux-afs@lists.infradead.org,
- autofs@vger.kernel.org, linux-mm@kvack.org,  linux-btrfs@vger.kernel.org,
- ceph-devel@vger.kernel.org,  codalist@coda.cs.cmu.edu,
- ecryptfs@vger.kernel.org, linux-efi@vger.kernel.org, 
- linux-erofs@lists.ozlabs.org, linux-ext4@vger.kernel.org, 
- linux-f2fs-devel@lists.sourceforge.net, cluster-devel@redhat.com, 
- linux-um@lists.infradead.org, linux-mtd@lists.infradead.org, 
- jfs-discussion@lists.sourceforge.net, linux-nfs@vger.kernel.org, 
- linux-nilfs@vger.kernel.org, linux-ntfs-dev@lists.sourceforge.net, 
- ntfs3@lists.linux.dev, ocfs2-devel@lists.linux.dev, 
- linux-karma-devel@lists.sourceforge.net, devel@lists.orangefs.org, 
- linux-unionfs@vger.kernel.org, linux-hardening@vger.kernel.org, 
- reiserfs-devel@vger.kernel.org, linux-cifs@vger.kernel.org, 
- samba-technical@lists.samba.org, linux-trace-kernel@vger.kernel.org, 
- linux-xfs@vger.kernel.org, bpf@vger.kernel.org, netdev@vger.kernel.org, 
- apparmor@lists.ubuntu.com, linux-security-module@vger.kernel.org, 
- selinux@vger.kernel.org
-Date: Fri, 07 Jul 2023 06:50:40 -0400
-In-Reply-To: <20230706210236.GB3244704@millbarge>
-References: <20230705185812.579118-1-jlayton@kernel.org>
-	 <20230705185812.579118-3-jlayton@kernel.org>
-	 <3b403ef1-22e6-0220-6c9c-435e3444b4d3@kernel.org>
-	 <7c783969641b67d6ffdfb10e509f382d083c5291.camel@kernel.org>
-	 <20230706210236.GB3244704@millbarge>
-Content-Type: text/plain; charset="ISO-8859-15"
-Content-Transfer-Encoding: quoted-printable
-User-Agent: Evolution 3.48.4 (3.48.4-1.fc38) 
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EEC32BA47
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:55:24 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 319AF19A5;
+	Fri,  7 Jul 2023 03:55:23 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qHj7N-00011c-O6; Fri, 07 Jul 2023 12:55:17 +0200
+Message-ID: <a4265090-d6b8-b185-a400-b09b27a347cc@leemhuis.info>
+Date: Fri, 7 Jul 2023 12:55:14 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [Regression][BISECTED] kernel boot hang after 19898ce9cf8a
+ ("wifi: iwlwifi: split 22000.c into multiple files")
+To: "Zhang, Rui" <rui.zhang@intel.com>,
+ "Greenman, Gregory" <gregory.greenman@intel.com>,
+ "Berg, Johannes" <johannes.berg@intel.com>
+Cc: "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+ "Baruch, Yaara" <yaara.baruch@intel.com>,
+ "Ben Ami, Golan" <golan.ben.ami@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Sisodiya, Mukesh" <mukesh.sisodiya@intel.com>,
+ Linus Torvalds <torvalds@linux-foundation.org>,
+ Johannes Berg <johannes.berg@intel.com>, Kalle Valo <kvalo@kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>,
+ Linux kernel regressions list <regressions@lists.linux.dev>,
+ Jakub Kicinski <kuba@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>
+References: <b533071f38804247f06da9e52a04f15cce7a3836.camel@intel.com>
+Content-Language: en-US, de-DE
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <b533071f38804247f06da9e52a04f15cce7a3836.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688727323;ee51f3a8;
+X-HE-SMSGID: 1qHj7N-00011c-O6
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Thu, 2023-07-06 at 21:02 +0000, Seth Arnold wrote:
-> On Wed, Jul 05, 2023 at 08:04:41PM -0400, Jeff Layton wrote:
-> >=20
-> > I don't believe it's an issue. I've seen nothing in the POSIX spec that
-> > mandates that timestamp updates to different inodes involved in an
-> > operation be set to the _same_ value. It just says they must be updated=
-.
-> >=20
-> > It's also hard to believe that any software would depend on this either=
-,
-> > given that it's very inconsistent across filesystems today. AFAICT, thi=
-s
-> > was mostly done in the past just as a matter of convenience.
->=20
-> I've seen this assumption in several programs:
->=20
+[CCing the regression list, netdev, the net maintainers, and Linus;
+Johannes and Kalle as well, but just for the record, they afaik are
+unavailable]
 
-Thanks for looking into this!
+Hi, Thorsten here, the Linux kernel's regression tracker.
 
-To be clear, POSIX doesn't require that _different_ inodes ever be set
-to the same timestamp value. IOW, it certainly doesn't require that the
-source and target directories on a rename() end up with the exact same
-timestamp value.
+On 07.07.23 10:25, Zhang, Rui wrote:
+> 
+> I run into a NULL pointer dereference and kernel boot hang after
+> switching to latest upstream kernel, and git bisect shows that below
+> commit is the first offending commit, and I have confirmed that commit
+> 19898ce9cf8a has the issue while 19898ce9cf8a~1 does not.
 
-Granted, POSIX is rather vague on timestamps in general, but most of the
-examples below involve comparing different timestamps on the _same_
-inode.
+FWIW, this is the fourth such report about this that I'm aware of.
 
+The first is this one (with two affected users afaics):
+https://bugzilla.kernel.org/show_bug.cgi?id=217622
 
-> mutt buffy.c
-> https://sources.debian.org/src/mutt/2.2.9-1/buffy.c/?hl=3D625#L625
->=20
->   if (mailbox->newly_created &&
->       (sb->st_ctime !=3D sb->st_mtime || sb->st_ctime !=3D sb->st_atime))
->     mailbox->newly_created =3D 0;
->=20
+The second is this one:
+https://lore.kernel.org/all/CAAJw_Zug6VCS5ZqTWaFSr9sd85k%3DtyPm9DEE%2BmV%3DAKoECZM%2BsQ@mail.gmail.com/
 
-This should be fine with this patchset. Note that this is comparing
-a/c/mtime on the same inode, and our usual pattern on inode
-instantiation is:
+The third:
+https://lore.kernel.org/all/9274d9bd3d080a457649ff5addcc1726f08ef5b2.camel@xry111.site/
 
-    inode->i_atime =3D inode->i_mtime =3D inode_set_ctime_current(inode);
+And in the past few days two people from Fedora land talked to me on IRC
+with problems that in retrospective might be caused by this as well.
 
-...which should result in all of inode's timestamps being synchronized.
+This many reports about a problem at this stage of the cycle makes me
+suspect we'll see a lot more once -rc1 is out. That's why I raising the
+awareness of this. Sadly a simple revert of just this commit is not
+possible. :-/
 
->=20
-> neomutt mbox/mbox.c
-> https://sources.debian.org/src/neomutt/20220429+dfsg1-4.1/mbox/mbox.c/?hl=
-=3D1820#L1820
->=20
->   if (m->newly_created && ((st.st_ctime !=3D st.st_mtime) || (st.st_ctime=
- !=3D st.st_atime)))
->     m->newly_created =3D false;
->=20
+Ciao, Thorsten
 
-Ditto here.
+> commit 19898ce9cf8a33e0ac35cb4c7f68de297cc93cb2 (refs/bisect/bad)
+> Author:     Johannes Berg <johannes.berg@intel.com>
+> AuthorDate: Wed Jun 21 13:12:07 2023 +0300
+> Commit:     Johannes Berg <johannes.berg@intel.com>
+> CommitDate: Wed Jun 21 14:07:00 2023 +0200
+> 
+>     wifi: iwlwifi: split 22000.c into multiple files
+>     
+>     Split the configuration list in 22000.c into four new files,
+>     per new device family, so we don't have this huge unusable
+>     file. Yes, this duplicates a few small things, but that's
+>     still much better than what we have now.
+>     
+>     Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+>     Signed-off-by: Gregory Greenman <gregory.greenman@intel.com>
+>     Link:
+> https://lore.kernel.org/r/20230621130443.7543603b2ee7.Ia8dd54216d341ef1ddc0531f2c9aa30d30536a5d@changeid
+>     Signed-off-by: Johannes Berg <johannes.berg@intel.com>
+> 
+> I have some screenshots which show that RIP points to iwl_mem_free_skb,
+> I can create a kernel bugzilla and attach the screenshots there if
+> needed.
+> 
+> BTW, lspci output of the wifi device and git bisect log attached.
+> 
+> If any other information needed, please let me know.
 
->=20
-> screen logfile.c
-> https://sources.debian.org/src/screen/4.9.0-4/logfile.c/?hl=3D130#L130
->=20
->   if ((!s->st_dev && !s->st_ino) ||             /* stat failed, that's ne=
-w! */
->       !s->st_nlink ||                           /* red alert: file unlink=
-ed */
->       (s->st_size < o.st_size) ||               /*           file truncat=
-ed */
->       (s->st_mtime !=3D o.st_mtime) ||            /*            file modi=
-fied */
->       ((s->st_ctime !=3D o.st_ctime) &&           /*     file changed (mo=
-ved) */
->        !(s->st_mtime =3D=3D s->st_ctime &&          /*  and it was not a =
-change */
->          o.st_ctime < s->st_ctime)))            /* due to delayed nfs wri=
-te */
->   {
->=20
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
 
-This one is really weird. You have two different struct stat's, "o" and
-"s". I assume though that these should be stat values from the same
-inode, because otherwise this comparison would make no sense:
+P.S.: for regzbot
 
-      ((s->st_ctime !=3D o.st_ctime) &&           /*     file changed (move=
-d) */
-
-In general, we can never contrive to ensure that the ctime of two
-different inodes are the same, since that is always set by the kernel to
-the current time, and you'd have to ensure that they were created within
-the same jiffy (at least with today's code).
-
-> nemo libnemo-private/nemo-vfs-file.c
-> https://sources.debian.org/src/nemo/5.6.5-1/libnemo-private/nemo-vfs-file=
-.c/?hl=3D344#L344
->=20
-> 		/* mtime is when the contents changed; ctime is when the
-> 		 * contents or the permissions (inc. owner/group) changed.
-> 		 * So we can only know when the permissions changed if mtime
-> 		 * and ctime are different.
-> 		 */
-> 		if (file->details->mtime =3D=3D file->details->ctime) {
-> 			return FALSE;
-> 		}
->=20
-
-Ditto here with the first examples. This involves comparing timestamps
-on the same inode, which should be fine.
-
->=20
-> While looking for more examples, I found a perl test that seems to sugges=
-t
-> that at least Solaris, AFS, AmigaOS, DragonFly BSD do as you suggest:
-> https://sources.debian.org/src/perl/5.36.0-7/t/op/stat.t/?hl=3D158#L140
->=20
-
-(I kinda miss Perl. I wrote a bunch of stuff in it in the 90's and early
-naughties)
-
-I think this test is supposed to be testing whether the mtime changes on
-link() ?
-
------------------8<----------------
-    my($nlink, $mtime, $ctime) =3D (stat($tmpfile))[$NLINK, $MTIME, $CTIME]=
-;
-
-[...]
-
-
-        skip "Solaris tmpfs has different mtime/ctime link semantics", 2
-                                     if $Is_Solaris and $cwd =3D~ m#^/tmp# =
-and
-                                        $mtime && $mtime =3D=3D $ctime;
------------------8<----------------
-
-...again, I think this would be ok too since it's just comparing the
-mtime and ctime of the same inode. Granted this is a Solaris-specific
-test, but Linux would be fine here too.
-
-So in conclusion, I don't think this patchset will cause problems with
-any of the above code.
---=20
-Jeff Layton <jlayton@kernel.org>
+#regzbot ^introduced 19898ce9cf8a
+#regzbot dup-of:
+https://lore.kernel.org/all/a5cdc7f8-b340-d372-2971-0d24b01de217@gmail.com/
 
