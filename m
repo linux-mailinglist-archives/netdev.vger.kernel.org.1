@@ -1,163 +1,137 @@
-Return-Path: <netdev+bounces-15958-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15959-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9198074A9F8
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:37:51 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 0814D74A9FE
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 06:39:47 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 28DDF28166E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 04:37:50 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B49BA281637
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 04:39:45 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D4A11847;
-	Fri,  7 Jul 2023 04:37:46 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 43D8F13078;
+	Fri,  7 Jul 2023 04:39:42 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 27161EA0;
-	Fri,  7 Jul 2023 04:37:45 +0000 (UTC)
-Received: from dggsgout12.his.huawei.com (dggsgout12.his.huawei.com [45.249.212.56])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 124C41BD2;
-	Thu,  6 Jul 2023 21:37:44 -0700 (PDT)
-Received: from mail02.huawei.com (unknown [172.30.67.143])
-	by dggsgout12.his.huawei.com (SkyGuard) with ESMTP id 4Qy0xZ06Ggz4f3khH;
-	Fri,  7 Jul 2023 12:37:38 +0800 (CST)
-Received: from [10.174.176.117] (unknown [10.174.176.117])
-	by APP1 (Coremail) with SMTP id cCh0CgCH8iyQlqdkl4WvMg--.65529S2;
-	Fri, 07 Jul 2023 12:37:40 +0800 (CST)
-Subject: Re: [PATCH v4 bpf-next 09/14] bpf: Allow reuse from
- waiting_for_gp_ttrace list.
-To: Alexei Starovoitov <alexei.starovoitov@gmail.com>
-Cc: Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org,
- Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>,
- Kernel Team <kernel-team@fb.com>, Daniel Borkmann <daniel@iogearbox.net>,
- Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>,
- "Paul E. McKenney" <paulmck@kernel.org>
-References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
- <20230706033447.54696-10-alexei.starovoitov@gmail.com>
- <fe733a7b-3775-947a-23c0-0dadacabdca2@huaweicloud.com>
- <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
- <4e0765b7-9054-a33d-8b1e-c986df353848@huaweicloud.com>
- <CAADnVQJhrbTtuBfexE6NPA6q=cdh1vVxfVQ73ZR2u8ZZWRb+wA@mail.gmail.com>
-From: Hou Tao <houtao@huaweicloud.com>
-Message-ID: <224322d6-28d3-f3b7-fcac-463e5329a082@huaweicloud.com>
-Date: Fri, 7 Jul 2023 12:37:36 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.6.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 37D75EA0
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 04:39:42 +0000 (UTC)
+Received: from mail-oa1-x29.google.com (mail-oa1-x29.google.com [IPv6:2001:4860:4864:20::29])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 94EAA1BF4
+	for <netdev@vger.kernel.org>; Thu,  6 Jul 2023 21:39:40 -0700 (PDT)
+Received: by mail-oa1-x29.google.com with SMTP id 586e51a60fabf-1b05d63080cso1450164fac.2
+        for <netdev@vger.kernel.org>; Thu, 06 Jul 2023 21:39:40 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=cloudflare.com; s=google; t=1688704779; x=1691296779;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=9UWYQqOrYqkxR5XpwKp6R22GVBVnnsxJZJsmiNrkFSw=;
+        b=W0t5g/B1oy0yWoS9I4G0cGXHdlj4SznvVg7lqL2NZauZ7JCHiUBrbWDFm5zuVLIBct
+         NYyiqasx+mGmFapxdlx7IvBBfH+l0yeOsdcDVTQc6r8ykfBeseb8UeARhrrX4JEAGV6Y
+         GMr4VR8b6MIs9LYlKiMoNmSb6/eCC4N5QZG3E=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688704779; x=1691296779;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=9UWYQqOrYqkxR5XpwKp6R22GVBVnnsxJZJsmiNrkFSw=;
+        b=j5BNG/cBHltTxlSK8fWyK6W/4h1BdlSDWoFRdLXpjngu8KOv21MaA1+ykp4sH07CwU
+         ppABNZAly6et65lYi+Y1TMT/pYgXuDOeZ5tNd+mBDuSvlYH+YaV/7FZZEDKcsA2pKtc7
+         az0Qk54dSLrx2w1Ysl+ycutZ6U/jPA+SfZueYe5f51b0MU4YE23Rv3N6Kv3N5MZeL1Td
+         K5I8orYHZllftCsQRspoEVDkkQrgA+cCc4dGVUvIB6UwUb6Riojw8+CnUsimCJV46KKQ
+         YE5DHKNCZCEwlpKjBupCAyzjlIMpJD4GdNZ+GWdc5+Z5VdEY4NeJ8y9bQWEwm7aG4fNe
+         lcoQ==
+X-Gm-Message-State: ABy/qLZnARO+t9Fi/2hDbNcRJO7rs+YmecePCAv9Hy0GeGtIZkj599Hr
+	MS5Fe611qLCES1ivqrjOGh2UTG85/PJ1iWAOhPfBcg==
+X-Google-Smtp-Source: APBJJlFmgPUvYnZf5B/mqoJrxp5s/bQoPHgPHPa3ft527lToxgI0pMs4rl3RBhthX5RmGK/P+cVJuw==
+X-Received: by 2002:a05:6870:2215:b0:1b0:3637:2bbe with SMTP id i21-20020a056870221500b001b036372bbemr4848122oaf.54.1688704779673;
+        Thu, 06 Jul 2023 21:39:39 -0700 (PDT)
+Received: from localhost ([2601:644:200:aea:502d:5846:fd1f:55e7])
+        by smtp.gmail.com with ESMTPSA id n2-20020a17090a670200b0025c1cfdb93esm576569pjj.13.2023.07.06.21.39.39
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Thu, 06 Jul 2023 21:39:39 -0700 (PDT)
+From: Ivan Babrou <ivan@cloudflare.com>
+To: netdev@vger.kernel.org
+Cc: linux-kernel@vger.kernel.org,
+	kernel-team@cloudflare.com,
+	Ivan Babrou <ivan@cloudflare.com>,
+	"David S. Miller" <davem@davemloft.net>,
+	Eric Dumazet <edumazet@google.com>,
+	Jakub Kicinski <kuba@kernel.org>,
+	Paolo Abeni <pabeni@redhat.com>,
+	Willem de Bruijn <willemdebruijn.kernel@gmail.com>,
+	David Ahern <dsahern@kernel.org>,
+	Peilin Ye <peilin.ye@bytedance.com>,
+	"Steven Rostedt (Google)" <rostedt@goodmis.org>,
+	Petr Machata <petrm@nvidia.com>,
+	Neil Horman <nhorman@tuxdriver.com>,
+	Satoru Moriya <satoru.moriya@hds.com>
+Subject: [PATCH v2] udp6: add a missing call into udp_fail_queue_rcv_skb tracepoint
+Date: Thu,  6 Jul 2023 21:39:20 -0700
+Message-ID: <20230707043923.35578-1-ivan@cloudflare.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CAADnVQJhrbTtuBfexE6NPA6q=cdh1vVxfVQ73ZR2u8ZZWRb+wA@mail.gmail.com>
-Content-Type: text/plain; charset=utf-8
 Content-Transfer-Encoding: 8bit
-Content-Language: en-US
-X-CM-TRANSID:cCh0CgCH8iyQlqdkl4WvMg--.65529S2
-X-Coremail-Antispam: 1UD129KBjvJXoWxWw1UCF4ruF4DurWxAw15twb_yoW5XF15pF
-	WrCF98WF1UAF4Sy3Wvqr48Gws2vrsIy347tay5GFnakr15W3s0qFW7Kry5CFn5Cws7Aasx
-	tryq9a4xJF1Yv3JanT9S1TB71UUUUUUqnTZGkaVYY2UrUUUUjbIjqfuFe4nvWSU5nxnvy2
-	9KBjDU0xBIdaVrnRJUUUvIb4IE77IF4wAFF20E14v26r4j6ryUM7CY07I20VC2zVCF04k2
-	6cxKx2IYs7xG6rWj6s0DM7CIcVAFz4kK6r1j6r18M28lY4IEw2IIxxk0rwA2F7IY1VAKz4
-	vEj48ve4kI8wA2z4x0Y4vE2Ix0cI8IcVAFwI0_Xr0_Ar1l84ACjcxK6xIIjxv20xvEc7Cj
-	xVAFwI0_Cr0_Gr1UM28EF7xvwVC2z280aVAFwI0_GcCE3s1l84ACjcxK6I8E87Iv6xkF7I
-	0E14v26rxl6s0DM2AIxVAIcxkEcVAq07x20xvEncxIr21l5I8CrVACY4xI64kE6c02F40E
-	x7xfMcIj6xIIjxv20xvE14v26r1j6r18McIj6I8E87Iv67AKxVWUJVW8JwAm72CE4IkC6x
-	0Yz7v_Jr0_Gr1lF7xvr2IY64vIr41lFIxGxcIEc7CjxVA2Y2ka0xkIwI1lc7I2V7IY0VAS
-	07AlzVAYIcxG8wCF04k20xvY0x0EwIxGrwCFx2IqxVCFs4IE7xkEbVWUJVW8JwC20s026c
-	02F40E14v26r1j6r18MI8I3I0E7480Y4vE14v26r106r1rMI8E67AF67kF1VAFwI0_Jw0_
-	GFylIxkGc2Ij64vIr41lIxAIcVC0I7IYx2IY67AKxVWUJVWUCwCI42IY6xIIjxv20xvEc7
-	CjxVAFwI0_Jr0_Gr1lIxAIcVCF04k26cxKx2IYs7xG6rWUJVWrZr1UMIIF0xvEx4A2jsIE
-	14v26r1j6r4UMIIF0xvEx4A2jsIEc7CjxVAFwI0_Gr0_Gr1UYxBIdaVFxhVjvjDU0xZFpf
-	9x07UWE__UUUUU=
-X-CM-SenderInfo: xkrx3t3r6k3tpzhluzxrxghudrp/
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=ham
-	autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hi,
+The tracepoint has existed for 12 years, but it only covered udp
+over the legacy IPv4 protocol. Having it enabled for udp6 removes
+the unnecessary difference in error visibility.
 
-On 7/7/2023 12:16 PM, Alexei Starovoitov wrote:
-> On Thu, Jul 6, 2023 at 8:39 PM Hou Tao <houtao@huaweicloud.com> wrote:
->> Hi,
->>
->> On 7/7/2023 10:12 AM, Alexei Starovoitov wrote:
->>> On Thu, Jul 6, 2023 at 7:07 PM Hou Tao <houtao@huaweicloud.com> wrote:
->>>> Hi,
->>>>
->>>> On 7/6/2023 11:34 AM, Alexei Starovoitov wrote:
->>>>
-SNIP
->>> and it's not just waiting_for_gp_ttrace. free_by_rcu_ttrace is similar.
->> I think free_by_rcu_ttrace is different, because the reuse is only
->> possible after one tasks trace RCU grace period as shown below, and the
->> concurrent llist_del_first() must have been completed when the head is
->> reused and re-added into free_by_rcu_ttrace again.
->>
->> // c0->free_by_rcu_ttrace
->> A -> B -> C -> nil
->>
->> P1:
->> alloc_bulk()
->>     llist_del_first(&c->free_by_rcu_ttrace)
->>         entry = A
->>         next = B
->>
->> P2:
->> do_call_rcu_ttrace()
->>     // c->free_by_rcu_ttrace->first = NULL
->>     llist_del_all(&c->free_by_rcu_ttrace)
->>         move to c->waiting_for_gp_ttrace
->>
->> P1:
->> llist_del_first()
->>     return NULL
->>
->> // A is only reusable after one task trace RCU grace
->> // llist_del_first() must have been completed
-> "must have been completed" ?
->
-> I guess you're assuming that alloc_bulk() from irq_work
-> is running within rcu_tasks_trace critical section,
-> so __free_rcu_tasks_trace() callback will execute after
-> irq work completed?
-> I don't think that's the case.
+Signed-off-by: Ivan Babrou <ivan@cloudflare.com>
+Fixes: 296f7ea75b45 ("udp: add tracepoints for queueing skb to rcvbuf")
 
-Yes. The following is my original thoughts. Correct me if I was wrong:
+---
+v2: added tracepoint export to make it build with IPV6=m (thanks Jakub!)
+---
+ net/core/net-traces.c | 2 ++
+ net/ipv6/udp.c        | 2 ++
+ 2 files changed, 4 insertions(+)
 
-1. llist_del_first() must be running concurrently with llist_del_all().
-If llist_del_first() runs after llist_del_all(), it will return NULL
-directly.
-2. call_rcu_tasks_trace() must happen after llist_del_all(), else the
-elements in free_by_rcu_ttrace will not be freed back to slab.
-3. call_rcu_tasks_trace() will wait for one tasks trace RCU grace period
-to call __free_rcu_tasks_trace()
-4. llist_del_first() in running in an context with irq-disabled, so the
-tasks trace RCU grace period will wait for the end of llist_del_first()
-
-It seems you thought step 4) is not true, right ?
-> In vCPU P1 is stopped for looong time by host,
-> P2 can execute __free_rcu_tasks_trace (or P3, since
-> tasks trace callbacks execute in a kthread that is not bound
-> to any cpu).
-> __free_rcu_tasks_trace() will free it into slab.
-> Then kmalloc the same obj and eventually put it back into
-> free_by_rcu_ttrace.
->
-> Since you believe that waiting_for_gp_ttrace ABA is possible
-> here it's the same probability. imo both lower than a bit flip due
-> to cosmic rays which is actually observable in practice.
->
->> __free_rcu_tasks_trace
->>     free_all(llist_del_all(&c->waiting_for_gp_ttrace))
->>
->>
-> .
+diff --git a/net/core/net-traces.c b/net/core/net-traces.c
+index 805b7385dd8d..6aef976bc1da 100644
+--- a/net/core/net-traces.c
++++ b/net/core/net-traces.c
+@@ -63,4 +63,6 @@ EXPORT_TRACEPOINT_SYMBOL_GPL(napi_poll);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(tcp_send_reset);
+ EXPORT_TRACEPOINT_SYMBOL_GPL(tcp_bad_csum);
+ 
++EXPORT_TRACEPOINT_SYMBOL_GPL(udp_fail_queue_rcv_skb);
++
+ EXPORT_TRACEPOINT_SYMBOL_GPL(sk_data_ready);
+diff --git a/net/ipv6/udp.c b/net/ipv6/udp.c
+index e5a337e6b970..debb98fb23c0 100644
+--- a/net/ipv6/udp.c
++++ b/net/ipv6/udp.c
+@@ -45,6 +45,7 @@
+ #include <net/tcp_states.h>
+ #include <net/ip6_checksum.h>
+ #include <net/ip6_tunnel.h>
++#include <trace/events/udp.h>
+ #include <net/xfrm.h>
+ #include <net/inet_hashtables.h>
+ #include <net/inet6_hashtables.h>
+@@ -680,6 +681,7 @@ static int __udpv6_queue_rcv_skb(struct sock *sk, struct sk_buff *skb)
+ 		}
+ 		UDP6_INC_STATS(sock_net(sk), UDP_MIB_INERRORS, is_udplite);
+ 		kfree_skb_reason(skb, drop_reason);
++		trace_udp_fail_queue_rcv_skb(rc, sk);
+ 		return -1;
+ 	}
+ 
+-- 
+2.41.0
 
 
