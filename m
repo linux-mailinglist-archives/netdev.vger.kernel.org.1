@@ -1,226 +1,176 @@
-Return-Path: <netdev+bounces-16038-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16035-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id D99FF74B140
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:47:30 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id C310F74B0D0
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:29:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CBD471C20F8E
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:47:29 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7650C2816FB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:29:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 86243C2EA;
-	Fri,  7 Jul 2023 12:47:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A1B67C8C2;
+	Fri,  7 Jul 2023 12:29:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 78245C2CD
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:47:27 +0000 (UTC)
-X-Greylist: delayed 1149 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Fri, 07 Jul 2023 05:47:25 PDT
-Received: from exhmta09.bpe.bigpond.com (exhmta09.bpe.bigpond.com [203.42.40.153])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E0A311B;
-	Fri,  7 Jul 2023 05:47:25 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
-	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:From:To:Subject;
-	bh=vzhRXbz2UpgobFDiFaVPq9YFwfbsEXh4XG75B7YpJXc=; b=qTv3AgblbGiUrJdMGQ8MOG0c6b
-	EhUB3ISV1ZC4ytcVyJuawAcbHzlrbOBco+B9TwHa4XOAUS4ExfOAO3JC8lqXGkx9MgOxDxJ+G6H0i
-	teztreZRKnIvIUUx0Qo+7QTIHCDyxt7LbZUCrewfILxmZzJ9343bybxayeeD1dTpOjEqgen59OTrt
-	Z5BdzY3b/1apJ5KKP44EUDArYXr6FxftPCYHBzOXQCps5hajpSCY6kKPsLOgJrwqSy8gDIj3FtaPi
-	SJDNJqRyPp+RogcmYj2l1IIFBNfpA1uXe1Jg6HirCQHNdiwz3yN0YevAk25DHQ6e5wkgYeoyNjybe
-	5c9aJtsw==;
-Received: from exhprdcmr02
-	 by exhprdomr09 with esmtp
-	 (envelope-from <bids.7405@bigpond.com>)
-	 id 1qHkZK-0003Kj-1l
-	 for ;
-	Fri, 07 Jul 2023 22:28:14 +1000
-Received: from [101.191.138.223] (helo=[10.0.0.38])
-	 by exhprdcmr02 with esmtpa
-	(envelope-from <bids.7405@bigpond.com>)
-	id 1qHkZL-000H1k-2K;
-	Fri, 07 Jul 2023 22:28:14 +1000
-Subject: Re: Fwd: 3 more broken Zaurii - SL-5600, A300, C700
-To: Dave Jones <davej@codemonkey.org.uk>,
- Thorsten Leemhuis <regressions@leemhuis.info>,
- Bagas Sanjaya <bagasdotme@gmail.com>, "David S. Miller"
- <davem@davemloft.net>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux USB <linux-usb@vger.kernel.org>, Oliver Neukum <oneukum@suse.com>
-References: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
- <50f4c10d-260c-cb98-e7d2-124f5519fa68@gmail.com>
- <e1fdc435-089c-8ce7-d536-ce3780a4ba95@leemhuis.info>
- <ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
-From: Ross Maynard <bids.7405@bigpond.com>
-Message-ID: <62a9e058-c853-1fcd-5663-e2e001f881e9@bigpond.com>
-Date: Fri, 7 Jul 2023 22:28:11 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 907D2C2CF
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:29:53 +0000 (UTC)
+Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C9BFA172B;
+	Fri,  7 Jul 2023 05:29:51 -0700 (PDT)
+Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
+	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 3678vO65029918;
+	Fri, 7 Jul 2023 14:29:06 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
+ mime-version : subject : to : cc : references : from : in-reply-to :
+ content-type : content-transfer-encoding; s=selector1;
+ bh=qa/ZpaXlILgzVxoBJk7a+24v02/Sfx+AkZW9A3Vu/hY=;
+ b=rbbDWdcKpSJfL7g40hrtk6xrxyf9fm7MqRL0m1shu10ursGy1PNvchOYCcGi7eBcmhjm
+ 9b2stLFV5Oz1RNlDPUdNijZEaCmV+xVhuWf51KUv7dzMcV1Q8FTz8Tt89DWlbI3zdE7N
+ bbWPYU5XTOCjJaEhTsAncS+5swNkppzt/GfyIbVcL/USpQhANMRrTsATDqVMuvOqqVvI
+ 1w7CzK9vNNva+g9ef0U5FOq1R7ClSlh2nARm66N2eTV+1xTx4UpqAb+mmZebicRhNO97
+ I0FI6yrb78IW0IAapw+FegssrAqoorMfu4VOqSrLEdwpB2jazpwAYSYeIY08P1q5AsRe rA== 
+Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
+	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rpfnchkmr-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
+	Fri, 07 Jul 2023 14:29:06 +0200
+Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
+	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id C2685100050;
+	Fri,  7 Jul 2023 14:29:03 +0200 (CEST)
+Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
+	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 643ED21F14B;
+	Fri,  7 Jul 2023 14:29:03 +0200 (CEST)
+Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
+ (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Fri, 7 Jul
+ 2023 14:29:00 +0200
+Message-ID: <0aaace47-1bb4-82c5-57a5-6f5d27eb4d45@foss.st.com>
+Date: Fri, 7 Jul 2023 14:28:28 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
-Content-Type: multipart/mixed;
- boundary="------------8628B942F2195D19390C676E"
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: [PATCH 04/10] dt-bindings: treewide: add feature-domains
+ description in binding files
 Content-Language: en-US
-X-tce-id: bids.7405@bigpond.com
-X-tce-ares-id: e{4a9eb6c6-2d9a-4e3c-8cca-a779deb79200}1
-X-tce-spam-action: no action
-X-tce-spam-score: 0.0
-X-Cm-Analysis: v=2.4 cv=Cvt5MF0D c=1 sm=1 tr=0 ts=64a804de a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=ws7JD89P4LkA:10 a=r77TgQKjGQsHNAKrUKIA:9 a=gj2XTu5y7l5qDgVZD0wA:9 a=QEXdDO2ut3YA:10 a=TILydWMaAdQ53EHaNYoA:9 a=B2y7HmGcmWMA:10
-X-Cm-Envelope: MS4xfIoILScwK33rbupbBpEtbV4ZzqANKCuQY393vXbD0WiKc6WXcEatxhUr19gldVyCIEfV2DKcKRv2Z7ovSbONdF4nJBhsrNEgtMrgj2J1dXVInPA/Hpo7 Q57QrzVo5S4Nu+gvGM7E12lHSLJySTo4GYPCPEoucFsk3tuFV3a8iUq/bpOTsQPJUGF4cWeZV0jyNA==
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+To: Rob Herring <robh@kernel.org>
+CC: <Oleksii_Moisieiev@epam.com>, <gregkh@linuxfoundation.org>,
+        <herbert@gondor.apana.org.au>, <davem@davemloft.net>,
+        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
+        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
+        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
+        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
+        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
+        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
+        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
+        <catalin.marinas@arm.com>, <arnd@kernel.org>,
+        <richardcochran@gmail.com>, <linux-crypto@vger.kernel.org>,
+        <devicetree@vger.kernel.org>,
+        <linux-stm32@st-md-mailman.stormreply.com>,
+        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
+        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
+        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
+        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
+        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
+        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
+        <linux-usb@vger.kernel.org>
+References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
+ <20230705172759.1610753-5-gatien.chevallier@foss.st.com>
+ <20230706145108.GA3858320-robh@kernel.org>
+From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
+In-Reply-To: <20230706145108.GA3858320-robh@kernel.org>
+Content-Type: text/plain; charset="UTF-8"; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Originating-IP: [10.201.21.121]
+X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
+ (10.75.129.69)
+X-Proofpoint-Virus-Version: vendor=baseguard
+ engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-07_08,2023-07-06_02,2023-05-22_02
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a multi-part message in MIME format.
---------------8628B942F2195D19390C676E
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 7bit
+Hello Rob,
 
-Hi,
+On 7/6/23 16:51, Rob Herring wrote:
+> On Wed, Jul 05, 2023 at 07:27:53PM +0200, Gatien Chevallier wrote:
+>> feature-domains is an optional property that allows a peripheral to
+>> refer to one or more feature domain controller(s).
+>>
+>> Description of this property is added to all peripheral binding files of
+>> the peripheral under the STM32 firewall controllers. It allows an accurate
+>> representation of the hardware, where various peripherals are connected
+>> to this firewall bus. The firewall can then check the peripheral accesses
+>> before allowing it to probe.
+>>
+>> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
+>> ---
+>>
+>> Disclaimer: Some error with dtbs_check will be observed as I've
+>> considered the property to be generic, as Rob asked
+>>
+>>   Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml  | 4 ++++
+>>   Documentation/devicetree/bindings/dma/st,stm32-dma.yaml      | 4 ++++
+>>   Documentation/devicetree/bindings/dma/st,stm32-dmamux.yaml   | 4 ++++
+>>   Documentation/devicetree/bindings/i2c/st,stm32-i2c.yaml      | 4 ++++
+>>   Documentation/devicetree/bindings/iio/adc/st,stm32-adc.yaml  | 4 ++++
+>>   .../devicetree/bindings/iio/adc/st,stm32-dfsdm-adc.yaml      | 4 ++++
+>>   Documentation/devicetree/bindings/iio/dac/st,stm32-dac.yaml  | 4 ++++
+>>   .../devicetree/bindings/media/cec/st,stm32-cec.yaml          | 4 ++++
+>>   Documentation/devicetree/bindings/media/st,stm32-dcmi.yaml   | 4 ++++
+>>   .../bindings/memory-controllers/st,stm32-fmc2-ebi.yaml       | 4 ++++
+>>   Documentation/devicetree/bindings/mfd/st,stm32-lptimer.yaml  | 4 ++++
+>>   Documentation/devicetree/bindings/mfd/st,stm32-timers.yaml   | 5 +++++
+>>   Documentation/devicetree/bindings/mmc/arm,pl18x.yaml         | 4 ++++
+>>   Documentation/devicetree/bindings/net/stm32-dwmac.yaml       | 4 ++++
+>>   Documentation/devicetree/bindings/phy/phy-stm32-usbphyc.yaml | 4 ++++
+>>   .../devicetree/bindings/regulator/st,stm32-vrefbuf.yaml      | 4 ++++
+>>   Documentation/devicetree/bindings/rng/st,stm32-rng.yaml      | 4 ++++
+>>   Documentation/devicetree/bindings/serial/st,stm32-uart.yaml  | 4 ++++
+>>   Documentation/devicetree/bindings/sound/st,stm32-i2s.yaml    | 4 ++++
+>>   Documentation/devicetree/bindings/sound/st,stm32-sai.yaml    | 4 ++++
+>>   .../devicetree/bindings/sound/st,stm32-spdifrx.yaml          | 4 ++++
+>>   Documentation/devicetree/bindings/spi/st,stm32-qspi.yaml     | 4 ++++
+>>   Documentation/devicetree/bindings/spi/st,stm32-spi.yaml      | 4 ++++
+>>   Documentation/devicetree/bindings/usb/dwc2.yaml              | 4 ++++
+>>   24 files changed, 97 insertions(+)
+>>
+>> diff --git a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+>> index b767ec72a999..daf8dcaef627 100644
+>> --- a/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+>> +++ b/Documentation/devicetree/bindings/crypto/st,stm32-hash.yaml
+>> @@ -50,6 +50,10 @@ properties:
+>>     power-domains:
+>>       maxItems: 1
+>>   
+>> +  feature-domains:
+>> +    minItems: 1
+>> +    maxItems: 3
+> 
+> What are the 3 entries?
+> 
+> Rob
 
-I am not a kernel developer, but I think the attached patch would work.
+I thought I was benefiting from the description of the pattern-property 
+in the RIFSC YAML file. But yes anyway, it seems like it needs some 
+description here as the dependency does not appear in this file.
 
-Ross
+I picked 3 as a maxItems for our ST needs, I'll give it some more 
+thought when coming back with something clearer.
 
-On 7/7/23 2:41 am, Dave Jones wrote:
-> On Thu, Jul 06, 2023 at 01:45:57PM +0200, Thorsten Leemhuis wrote:
->   > On 06.07.23 05:08, Bagas Sanjaya wrote:
->   > >>
->   > >> I notice a regression report on Bugzilla [1]. Quoting from it:
->   > >>
->   > >>> The following patch broke support of 3 more Zaurus models: SL-5600, A300 and C700
->   > >>>
->   > >>> [16adf5d07987d93675945f3cecf0e33706566005] usbnet: Remove over-broad module alias from zaurus
->   >
->   > ...
->   > He sometimes shows up on Linux kernel lists, but I doubt he cares about
->   > that change after all these years. And I would not blame him at all.
->
-> That's about the size of it.  This is pretty near the bottom of my ever-shrinking
-> list of kernel drivers I care about.
->
->   > Yes, we have the "no regressions" rule, but contributing a change to the
->   > kernel OTOH should not mean that you are responsible for all regressions
->   > it causes for your whole life. :-)
->
-> That said, 12 years later, 16adf5d07987d93675945f3cecf0e33706566005
-> is still the right thing to do. Adding actual matches for the devices
-> rather than matching by class will prevent this getting loaded where it
-> doesn't need to be.
->
-> If someone actually cares to get this working, cargo-culting Oliver's
-> change to add the extra id is likely the way forward.
->
-> 	Dave
->
+I will change that in V2, thank you for pointing that out.
 
---------------8628B942F2195D19390C676E
-Content-Type: text/x-patch; charset=UTF-8;
- name="3-zaurii-patch.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="3-zaurii-patch.patch"
-
-diff -urpN a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
---- a/drivers/net/usb/cdc_ether.c	2023-07-07 17:48:27.991833366 +1000
-+++ b/drivers/net/usb/cdc_ether.c	2023-07-07 21:53:11.556198087 +1000
-@@ -616,6 +616,13 @@ static const struct usb_device_id	produc
- }, {
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+    .idVendor		= 0x04DD,
-+    .idProduct		= 0x8005,   /* A-300 */
-+    ZAURUS_FAKE_INTERFACE,
-+    .driver_info        = 0,
-+}, {
-+    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
-@@ -623,12 +630,26 @@ static const struct usb_device_id	produc
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+    .idVendor		= 0x04DD,
-+    .idProduct		= 0x8006,   /* B-500/SL-5600 */
-+    ZAURUS_FAKE_INTERFACE,
-+    .driver_info        = 0,
-+}, {
-+    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8007,	/* C-700 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info		= 0,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+    .idVendor		= 0x04DD,
-+    .idProduct		= 0x8007,   /* C-700 */
-+    ZAURUS_FAKE_INTERFACE,
-+    .driver_info        = 0,
-+}, {
-+    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
-Binary files a/drivers/net/usb/.cdc_ether.c.swp and b/drivers/net/usb/.cdc_ether.c.swp differ
-diff -urpN a/drivers/net/usb/zaurus.c b/drivers/net/usb/zaurus.c
---- a/drivers/net/usb/zaurus.c	2023-07-07 17:48:28.043849110 +1000
-+++ b/drivers/net/usb/zaurus.c	2023-07-07 22:06:49.267699853 +1000
-@@ -289,11 +289,25 @@ static const struct usb_device_id	produc
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8005,	/* A-300 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long) &bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info = ZAURUS_PXA_INFO,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8006,	/* B-500/SL-5600 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long) &bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 	          | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8007,	/* C-700 */
-@@ -301,6 +315,13 @@ static const struct usb_device_id	produc
- 	.driver_info = ZAURUS_PXA_INFO,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8007,	/* C-700 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long) &bogus_mdlm_info,
-+}, {
-+        .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
-
---------------8628B942F2195D19390C676E--
+Best regards,
+Gatien
 
