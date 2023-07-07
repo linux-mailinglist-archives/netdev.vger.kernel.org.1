@@ -1,35 +1,35 @@
-Return-Path: <netdev+bounces-16104-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16103-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id D2D2774B67C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:40:57 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 3403374B677
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 20:40:39 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8EF5C2818C1
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:40:56 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E345F2818C1
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:40:37 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F6A017726;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 27E3D174F5;
 	Fri,  7 Jul 2023 18:39:47 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id EA1241097B
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 452D0111A3
 	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 18:39:44 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 05D62C433CC;
-	Fri,  7 Jul 2023 18:39:43 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7F2E7C433CA;
+	Fri,  7 Jul 2023 18:39:44 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1688755184;
-	bh=K/6WjbGLzAz6fxxlm8D2hh+6PXiKhDpzDvJqdlNHyRA=;
+	bh=n+65Wj5tL4XJZD/gRp1P8D4Py6j7kL4Yh7I5FEseZMU=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=nmWrQRhLg3pAvgptGqF3h2ORa56MyFDwFdMeJZ4VU95HUHyB0pNUPVYaw7r/ytRUP
-	 7Pw1g46UacQHcYUhkodbLlyw0riynB2j2KAQRJhhHuVe2zL9BPO8vnvzYzVCTsFvKk
-	 ZnpYF2riO3/cCZACZVuXzCQecIeXDPS4nqCEXlWQ3Pg2LrQCOMrhu01RqhNrEOvo16
-	 e+LIU+WQCAA0RrFxcLl0uAm6NeT+CFWsOMsnHCZiWeYtAJNiH+UchQBXfODk4CjdUS
-	 3KjEaSoJRt92D7xbojLHEiHa2JAL0Q640AQYnbG/8RO2XJSIqIaI5rK/HatVJoaxu/
-	 frUgR0oNMqrbw==
+	b=IGst/kGIh1JVzkkv4R0jhVWpLykdJYwwiN/XvhA+mdkZP27K9FZHd1LKW7a64Chxo
+	 HdNHZRml0pLOcfgNBse98wVr0LnJuSeyvUMdDMGIu3Gg9Jj3ba2Xn1wd/puTLZj+UA
+	 UDe5pnSZ8JWVmvR55ZK4+66l9ryrCBJiVW1WTrotHNfEjMR3CrvQHhWNl1oKHHY9FN
+	 30b7CMDXoQLY319h9amwqkhICIna2hRWFLg6OyBl+jRmPdyajK1ofz2DDtVe7l+Qm+
+	 sc4DfuuBV9ociGMBt0cbajqBCQxsLPovxEKiLQ9apv9djV1z1rCtR9Jny07ZkCz5sr
+	 1p8SZTwTecfhQ==
 From: Jakub Kicinski <kuba@kernel.org>
 To: netdev@vger.kernel.org
 Cc: almasrymina@google.com,
@@ -40,9 +40,9 @@ Cc: almasrymina@google.com,
 	michael.chan@broadcom.com,
 	willemb@google.com,
 	Jakub Kicinski <kuba@kernel.org>
-Subject: [RFC 02/12] net: create a 1G-huge-page-backed allocator
-Date: Fri,  7 Jul 2023 11:39:25 -0700
-Message-ID: <20230707183935.997267-3-kuba@kernel.org>
+Subject: [RFC 03/12] net: page_pool: hide page_pool_release_page()
+Date: Fri,  7 Jul 2023 11:39:26 -0700
+Message-ID: <20230707183935.997267-4-kuba@kernel.org>
 X-Mailer: git-send-email 2.41.0
 In-Reply-To: <20230707183935.997267-1-kuba@kernel.org>
 References: <20230707183935.997267-1-kuba@kernel.org>
@@ -54,318 +54,146 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
 
-Get 1G pages from CMA, driver will be able to sub-allocate from
-those for individual queues. Each Rx queue (taking recycling into
-account) needs 32MB - 128MB of memory. With 32 active queues even
-with 2MB pages we'll end up using a lot of IOTLB entries.
-
-There are some workarounds for 2MB pages like trying to sort
-the buffers (i.e. making sure that the buffers used by the NIC
-at any time belong to as few 2MB pages as possible). But 1G pages
-seem so much simpler.
-
-Grab 4 pages for now, the real thing will probably need some
-Kconfigs and command line params. And a lot more uAPI in general.
-
-Also IDK how to hook this properly into early init :(
+There seems to be no user calling page_pool_release_page()
+for legit reasons, all the users simply haven't been converted
+to skb-based recycling, yet. Convert them, update the docs,
+and unexport the function.
 
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 ---
- arch/x86/kernel/setup.c |   6 +-
- include/net/dcalloc.h   |  10 ++
- net/core/dcalloc.c      | 225 ++++++++++++++++++++++++++++++++++++++++
- net/core/dcalloc.h      |   3 +
- 4 files changed, 243 insertions(+), 1 deletion(-)
+ Documentation/networking/page_pool.rst            | 10 +++-------
+ drivers/net/ethernet/engleder/tsnep_main.c        |  2 +-
+ drivers/net/ethernet/stmicro/stmmac/stmmac_main.c |  4 ++--
+ include/net/page_pool.h                           | 10 ++--------
+ net/core/page_pool.c                              |  3 +--
+ 5 files changed, 9 insertions(+), 20 deletions(-)
 
-diff --git a/arch/x86/kernel/setup.c b/arch/x86/kernel/setup.c
-index fd975a4a5200..cc6acd1fa67a 100644
---- a/arch/x86/kernel/setup.c
-+++ b/arch/x86/kernel/setup.c
-@@ -843,6 +843,8 @@ static void __init x86_report_nx(void)
- 	}
+diff --git a/Documentation/networking/page_pool.rst b/Documentation/networking/page_pool.rst
+index 873efd97f822..e4506c1aeac4 100644
+--- a/Documentation/networking/page_pool.rst
++++ b/Documentation/networking/page_pool.rst
+@@ -13,9 +13,8 @@ replacing dev_alloc_pages().
+ 
+ API keeps track of in-flight pages, in order to let API user know
+ when it is safe to free a page_pool object.  Thus, API users
+-must run page_pool_release_page() when a page is leaving the page_pool or
+-call page_pool_put_page() where appropriate in order to maintain correct
+-accounting.
++must call page_pool_put_page() where appropiate and only attach
++the page to a page_pool-aware objects, like skbs.
+ 
+ API user must call page_pool_put_page() once on a page, as it
+ will either recycle the page, or in case of refcnt > 1, it will
+@@ -87,9 +86,6 @@ a page will cause no race conditions is enough.
+   must guarantee safe context (e.g NAPI), since it will recycle the page
+   directly into the pool fast cache.
+ 
+-* page_pool_release_page(): Unmap the page (if mapped) and account for it on
+-  in-flight counters.
+-
+ * page_pool_dev_alloc_pages(): Get a page from the page allocator or page_pool
+   caches.
+ 
+@@ -194,7 +190,7 @@ NAPI poller
+             if XDP_DROP:
+                 page_pool_recycle_direct(page_pool, page);
+         } else (packet_is_skb) {
+-            page_pool_release_page(page_pool, page);
++            skb_mark_for_recycle(skb);
+             new_page = page_pool_dev_alloc_pages(page_pool);
+         }
+     }
+diff --git a/drivers/net/ethernet/engleder/tsnep_main.c b/drivers/net/ethernet/engleder/tsnep_main.c
+index 84751bb303a6..079f9f6ae21a 100644
+--- a/drivers/net/ethernet/engleder/tsnep_main.c
++++ b/drivers/net/ethernet/engleder/tsnep_main.c
+@@ -1333,7 +1333,7 @@ static void tsnep_rx_page(struct tsnep_rx *rx, struct napi_struct *napi,
+ 
+ 	skb = tsnep_build_skb(rx, page, length);
+ 	if (skb) {
+-		page_pool_release_page(rx->page_pool, page);
++		skb_mark_for_recycle(skb);
+ 
+ 		rx->packets++;
+ 		rx->bytes += length;
+diff --git a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+index 4727f7be4f86..3a6cd2b73aea 100644
+--- a/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
++++ b/drivers/net/ethernet/stmicro/stmmac/stmmac_main.c
+@@ -5413,7 +5413,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 					priv->dma_conf.dma_buf_sz);
+ 
+ 			/* Data payload appended into SKB */
+-			page_pool_release_page(rx_q->page_pool, buf->page);
++			skb_mark_for_recycle(skb);
+ 			buf->page = NULL;
+ 		}
+ 
+@@ -5425,7 +5425,7 @@ static int stmmac_rx(struct stmmac_priv *priv, int limit, u32 queue)
+ 					priv->dma_conf.dma_buf_sz);
+ 
+ 			/* Data payload appended into SKB */
+-			page_pool_release_page(rx_q->page_pool, buf->sec_page);
++			skb_mark_for_recycle(skb);
+ 			buf->sec_page = NULL;
+ 		}
+ 
+diff --git a/include/net/page_pool.h b/include/net/page_pool.h
+index 126f9e294389..b082c9118f05 100644
+--- a/include/net/page_pool.h
++++ b/include/net/page_pool.h
+@@ -18,9 +18,8 @@
+  *
+  * API keeps track of in-flight pages, in-order to let API user know
+  * when it is safe to dealloactor page_pool object.  Thus, API users
+- * must make sure to call page_pool_release_page() when a page is
+- * "leaving" the page_pool.  Or call page_pool_put_page() where
+- * appropiate.  For maintaining correct accounting.
++ * must call page_pool_put_page() where appropiate and only attach
++ * the page to a page_pool-aware objects, like skbs.
+  *
+  * API user must only call page_pool_put_page() once on a page, as it
+  * will either recycle the page, or in case of elevated refcnt, it
+@@ -251,7 +250,6 @@ void page_pool_unlink_napi(struct page_pool *pool);
+ void page_pool_destroy(struct page_pool *pool);
+ void page_pool_use_xdp_mem(struct page_pool *pool, void (*disconnect)(void *),
+ 			   struct xdp_mem_info *mem);
+-void page_pool_release_page(struct page_pool *pool, struct page *page);
+ void page_pool_put_page_bulk(struct page_pool *pool, void **data,
+ 			     int count);
+ #else
+@@ -268,10 +266,6 @@ static inline void page_pool_use_xdp_mem(struct page_pool *pool,
+ 					 struct xdp_mem_info *mem)
+ {
  }
+-static inline void page_pool_release_page(struct page_pool *pool,
+-					  struct page *page)
+-{
+-}
  
-+int __init mep_cma_init(void);
-+
- /*
-  * Determine if we were loaded by an EFI loader.  If so, then we have also been
-  * passed the efi memmap, systab, etc., so we should use these data structures
-@@ -1223,8 +1225,10 @@ void __init setup_arch(char **cmdline_p)
- 	initmem_init();
- 	dma_contiguous_reserve(max_pfn_mapped << PAGE_SHIFT);
- 
--	if (boot_cpu_has(X86_FEATURE_GBPAGES))
-+	if (boot_cpu_has(X86_FEATURE_GBPAGES)) {
- 		hugetlb_cma_reserve(PUD_SHIFT - PAGE_SHIFT);
-+		mep_cma_init();
-+	}
- 
- 	/*
- 	 * Reserve memory for crash kernel after SRAT is parsed so that it
-diff --git a/include/net/dcalloc.h b/include/net/dcalloc.h
-index a85c59d7f844..21c0fcaaa163 100644
---- a/include/net/dcalloc.h
-+++ b/include/net/dcalloc.h
-@@ -15,4 +15,14 @@ void *dma_cocoa_alloc(struct dma_cocoa *cocoa, unsigned long size,
- void dma_cocoa_free(struct dma_cocoa *cocoa, unsigned long size, void *addr,
- 		    dma_addr_t dma);
- 
-+struct mem_provider;
-+
-+struct mem_provider *mep_create(struct device *dev);
-+void mep_destroy(struct mem_provider *mep);
-+
-+struct page *mep_alloc(struct mem_provider *mep, unsigned int order,
-+		       dma_addr_t *dma, gfp_t gfp);
-+void mep_free(struct mem_provider *mep, struct page *page,
-+	      unsigned int order, dma_addr_t dma);
-+
- #endif
-diff --git a/net/core/dcalloc.c b/net/core/dcalloc.c
-index af9029018353..821b9dbfb655 100644
---- a/net/core/dcalloc.c
-+++ b/net/core/dcalloc.c
-@@ -388,3 +388,228 @@ void dma_cocoa_free(struct dma_cocoa *cocoa, unsigned long size, void *addr,
- 	size = roundup_pow_of_two(size);
- 	return dma_sal_free(&cocoa->sal, addr, size, dma);
+ static inline void page_pool_put_page_bulk(struct page_pool *pool, void **data,
+ 					   int count)
+diff --git a/net/core/page_pool.c b/net/core/page_pool.c
+index a3e12a61d456..2c7cf5f2bcb8 100644
+--- a/net/core/page_pool.c
++++ b/net/core/page_pool.c
+@@ -492,7 +492,7 @@ static s32 page_pool_inflight(struct page_pool *pool)
+  * a regular page (that will eventually be returned to the normal
+  * page-allocator via put_page).
+  */
+-void page_pool_release_page(struct page_pool *pool, struct page *page)
++static void page_pool_release_page(struct page_pool *pool, struct page *page)
+ {
+ 	dma_addr_t dma;
+ 	int count;
+@@ -519,7 +519,6 @@ void page_pool_release_page(struct page_pool *pool, struct page *page)
+ 	count = atomic_inc_return_relaxed(&pool->pages_state_release_cnt);
+ 	trace_page_pool_state_release(pool, page, count);
  }
-+
-+/*****************************
-+ ***   DMA MEP allocator   ***
-+ *****************************/
-+
-+#include <linux/cma.h>
-+
-+static struct cma *mep_cma;
-+static int mep_err;
-+
-+int __init mep_cma_init(void);
-+int __init mep_cma_init(void)
-+{
-+	int order_per_bit;
-+
-+	order_per_bit = min(30 - PAGE_SHIFT, MAX_ORDER - 1);
-+	order_per_bit = min(order_per_bit, HUGETLB_PAGE_ORDER);
-+
-+	mep_err = cma_declare_contiguous_nid(0,		/* base */
-+					     SZ_4G,	/* size */
-+					     0,		/* limit */
-+					     SZ_1G,	/* alignment */
-+					     order_per_bit,  /* order_per_bit */
-+					     false,	/* fixed */
-+					     "net_mep",	/* name */
-+					     &mep_cma,	/* res_cma */
-+					     NUMA_NO_NODE);  /* nid */
-+	if (mep_err)
-+		pr_warn("Net MEP init failed: %d\n", mep_err);
-+	else
-+		pr_info("Net MEP reserved 4G of memory\n");
-+
-+	return 0;
-+}
-+
-+/** ----- MEP (slow / ctrl) allocator ----- */
-+
-+void mp_huge_split(struct page *page, unsigned int order)
-+{
-+	int i;
-+
-+	split_page(page, order);
-+	/* The subsequent pages have a poisoned next, and since we only
-+	 * OR in the PP_SIGNATURE this will mess up PP detection.
-+	 */
-+	for (i = 0; i < (1 << order); i++)
-+		page[i].pp_magic &= 3UL;
-+}
-+
-+struct mem_provider {
-+	struct dma_slow_allocator sal;
-+
-+	struct work_struct work;
-+};
-+
-+static int
-+dma_mep_alloc_fall(struct dma_slow_allocator *sal, struct dma_slow_fall *fb,
-+		   unsigned int size, gfp_t gfp)
-+{
-+	int order = get_order(size);
-+
-+	fb->addr = alloc_pages(gfp, order);
-+	if (!fb->addr)
-+		return -ENOMEM;
-+
-+	fb->dma = dma_map_page_attrs(sal->dev, fb->addr, 0, size,
-+				     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
-+	if (dma_mapping_error(sal->dev, fb->dma)) {
-+		put_page(fb->addr);
-+		return -ENOMEM;
-+	}
-+
-+	mp_huge_split(fb->addr, order);
-+	return 0;
-+}
-+
-+static void
-+dma_mep_free_fall(struct dma_slow_allocator *sal, struct dma_slow_fall *fb)
-+{
-+	int order = get_order(fb->size);
-+	struct page *page;
-+	int i;
-+
-+	page = fb->addr;
-+	dma_unmap_page_attrs(sal->dev, fb->dma, fb->size,
-+			     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
-+	for (i = 0; i < (1 << order); i++)
-+		put_page(page + i);
-+}
-+
-+static void mep_release_work(struct work_struct *work)
-+{
-+	struct mem_provider *mep;
-+
-+	mep = container_of(work, struct mem_provider, work);
-+
-+	while (!list_empty(&mep->sal.huge)) {
-+		struct dma_slow_buddy *bud;
-+		struct dma_slow_huge *shu;
-+
-+		shu = list_first_entry(&mep->sal.huge, typeof(*shu), huge);
-+
-+		dma_unmap_page_attrs(mep->sal.dev, shu->dma, SZ_1G,
-+				     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
-+		cma_release(mep_cma, shu->addr, SZ_1G / PAGE_SIZE);
-+
-+		bud = list_first_entry_or_null(&shu->buddy_list,
-+					       typeof(*bud), list);
-+		if (WARN_ON(!bud || bud->size != SZ_1G))
-+			continue;
-+		kfree(bud);
-+
-+		list_del(&shu->huge);
-+		kfree(shu);
-+	}
-+	put_device(mep->sal.dev);
-+	kfree(mep);
-+}
-+
-+static void dma_mep_release(struct dma_slow_allocator *sal)
-+{
-+	struct mem_provider *mep;
-+
-+	mep = container_of(sal, struct mem_provider, sal);
-+
-+	INIT_WORK(&mep->work, mep_release_work);
-+	schedule_work(&mep->work);
-+}
-+
-+struct dma_slow_allocator_ops dma_mep_ops = {
-+	.ptr_shf	= PAGE_SHIFT - order_base_2(sizeof(struct page)),
-+
-+	.alloc_fall	= dma_mep_alloc_fall,
-+	.free_fall	= dma_mep_free_fall,
-+
-+	.release	= dma_mep_release,
-+};
-+
-+struct mem_provider *mep_create(struct device *dev)
-+{
-+	struct mem_provider *mep;
-+	int i;
-+
-+	mep = kzalloc(sizeof(*mep), GFP_KERNEL);
-+	if (!mep)
-+		return NULL;
-+
-+	dma_sal_init(&mep->sal, &dma_mep_ops, dev);
-+	get_device(mep->sal.dev);
-+
-+	if (mep_err)
-+		goto done;
-+
-+	/* Hardcoded for now */
-+	for (i = 0; i < 2; i++) {
-+		const unsigned int order = 30 - PAGE_SHIFT; /* 1G */
-+		struct dma_slow_huge *shu;
-+		struct page *page;
-+
-+		shu = kzalloc(sizeof(*shu), GFP_KERNEL);
-+		if (!shu)
-+			break;
-+
-+		page = cma_alloc(mep_cma, SZ_1G / PAGE_SIZE, order, false);
-+		if (!page) {
-+			pr_err("mep: CMA alloc failed\n");
-+			goto err_free_shu;
-+		}
-+
-+		shu->dma = dma_map_page_attrs(mep->sal.dev, page, 0,
-+					      PAGE_SIZE << order,
-+					      DMA_BIDIRECTIONAL,
-+					      DMA_ATTR_SKIP_CPU_SYNC);
-+		if (dma_mapping_error(mep->sal.dev, shu->dma)) {
-+			pr_err("mep: DMA map failed\n");
-+			goto err_free_page;
-+		}
-+
-+		if (dma_slow_huge_init(shu, page, SZ_1G, shu->dma,
-+				       GFP_KERNEL)) {
-+			pr_err("mep: shu init failed\n");
-+			goto err_unmap;
-+		}
-+
-+		mp_huge_split(page, 30 - PAGE_SHIFT);
-+
-+		list_add(&shu->huge, &mep->sal.huge);
-+		continue;
-+
-+err_unmap:
-+		dma_unmap_page_attrs(mep->sal.dev, shu->dma, SZ_1G,
-+				     DMA_BIDIRECTIONAL, DMA_ATTR_SKIP_CPU_SYNC);
-+err_free_page:
-+		put_page(page);
-+err_free_shu:
-+		kfree(shu);
-+		break;
-+	}
-+done:
-+	if (list_empty(&mep->sal.huge))
-+		pr_warn("mep: no huge pages acquired\n");
-+
-+	return mep;
-+}
-+EXPORT_SYMBOL_GPL(mep_create);
-+
-+void mep_destroy(struct mem_provider *mep)
-+{
-+	dma_slow_put(&mep->sal);
-+}
-+EXPORT_SYMBOL_GPL(mep_destroy);
-+
-+struct page *mep_alloc(struct mem_provider *mep, unsigned int order,
-+		       dma_addr_t *dma, gfp_t gfp)
-+{
-+	return dma_sal_alloc(&mep->sal, PAGE_SIZE << order, dma, gfp);
-+}
-+EXPORT_SYMBOL_GPL(mep_alloc);
-+
-+void mep_free(struct mem_provider *mep, struct page *page,
-+	      unsigned int order, dma_addr_t dma)
-+{
-+	dma_sal_free(&mep->sal, page, PAGE_SIZE << order, dma);
-+}
-+EXPORT_SYMBOL_GPL(mep_free);
-diff --git a/net/core/dcalloc.h b/net/core/dcalloc.h
-index c7e75ef0cb81..2664f933c8e1 100644
---- a/net/core/dcalloc.h
-+++ b/net/core/dcalloc.h
-@@ -90,4 +90,7 @@ static inline void dma_slow_put(struct dma_slow_allocator *sal)
- 		sal->ops->release(sal);
- }
+-EXPORT_SYMBOL(page_pool_release_page);
  
-+/* misc */
-+void mp_huge_split(struct page *page, unsigned int order);
-+
- #endif
+ /* Return a page to the page allocator, cleaning up our state */
+ static void page_pool_return_page(struct page_pool *pool, struct page *page)
 -- 
 2.41.0
 
