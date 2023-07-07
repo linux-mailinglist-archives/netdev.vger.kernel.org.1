@@ -1,58 +1,58 @@
-Return-Path: <netdev+bounces-16123-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16124-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id EB38D74B728
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:33:51 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id B57D174B72A
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 21:34:20 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id A2C13281917
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 19:33:50 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E0EBF1C2107D
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 19:34:19 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 333C517FFC;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id DCEE2174C5;
 	Fri,  7 Jul 2023 19:30:35 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 294D817FF3
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id D2A7B17FEF
 	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 19:30:35 +0000 (UTC)
-Received: from mail-pl1-x649.google.com (mail-pl1-x649.google.com [IPv6:2607:f8b0:4864:20::649])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 722442D6B
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:30:21 -0700 (PDT)
-Received: by mail-pl1-x649.google.com with SMTP id d9443c01a7336-1b8a4e947a1so47791055ad.1
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 12:30:21 -0700 (PDT)
+Received: from mail-pf1-x449.google.com (mail-pf1-x449.google.com [IPv6:2607:f8b0:4864:20::449])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D6BB22D71
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 12:30:22 -0700 (PDT)
+Received: by mail-pf1-x449.google.com with SMTP id d2e1a72fcca58-666ecb21fb8so3605350b3a.1
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 12:30:22 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688758221; x=1691350221;
+        d=google.com; s=20221208; t=1688758222; x=1691350222;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:from:to:cc:subject:date:message-id:reply-to;
-        bh=t8deO8YK9QH1JyxmBLifMsUSraGfEWt+GK3LbNEDBRc=;
-        b=vVc7haj5CuY5xwGeuuKW7XMtVU6n0Gal3hAnUKhqyLbsNiD3yqBTgzjSxXC8eONZNY
-         qz8diAF0WdtSD1L1na+e3+6Z2UHaa5HfH4w9q5jGkrP+NeCQjNOGWwJr1I/JM5SxtJdV
-         g8L0perqeh/rce+xOmT9yzep67oeqIP3ftYRSFb1zb64IdSHj+E8a4Ir+ULrfj1DOJLt
-         y1U/rqmUJtfA4VmJoDHYEjysC8LMkNw9NCvtVo6eXxtvt0oK0BjAhWz4nNiZ1RtLzchB
-         SVBgKaFo0FSjp44ePSIEsxkACcCHD4u+KDS7Mh7+edqvnjZgxoDQthTHlOwvZCLCLMK/
-         vA/Q==
+        bh=2BGiqgbrDyKLhwoMHCwnPJoUQz2wNa2y6goRcd3J+cs=;
+        b=yhEMjNagmmrLmOyJIXf+GcVs/r/FLDht6NRolf4Io140nmc1zROztzx7zC6soHLmur
+         QttelemzHbtFZS5G4ZUAcAPJrij8o23uNOzqZIiwF5PgBmio2S9yDnQkt/vgT9mNr2/o
+         RJXkN1+K4nPSh14wkBaXxorFzvG7PYBJ/4kn8cHBUKz9Y359oKKCAodqg9iJDPHqIasc
+         dDjo39FWkFej4GN9Q5YuGs03IGD2oflAHB2TaWVy/iKxhVn5uW0cCie0ly+nkJbEohGp
+         ZEvGH8Rn2cpIS3mzniLZFDN5mV0ApFOm8GA+8B1fX0XL9WeHQna5yBUAMSYoK8Z14mTr
+         mr0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688758221; x=1691350221;
+        d=1e100.net; s=20221208; t=1688758222; x=1691350222;
         h=cc:to:from:subject:message-id:references:mime-version:in-reply-to
          :date:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=t8deO8YK9QH1JyxmBLifMsUSraGfEWt+GK3LbNEDBRc=;
-        b=WshBcE2SpRvQ+dkgW4wXncoI8TimHZ9uFHddOthOq+eGV6Ijc7i304mFI8Sj3W/iay
-         bq2Q3+axvOZKuKEzaaauxKk3XhbkGFSrGIdgHHb3p6mxmDYgvjJys8x6NMyqUdtJcEn9
-         ixaTcJcTcXwOOQhuHbdkYToHSZ6Rf3BqOQt0OadM5Tjgl3PR6heK0GujK/OSXTchACkY
-         dVpwAlHNj+F6NpPoG7q89AFZ8VemXyiEKp2Tk8W7PlXE4nRQSJAXAqUnQ9Fw4st1EnUY
-         Qk4PI6Vyy1Mnt3UTB80eoJY8HazCk0trtat+C2lkoyN1x7rzfiAv5ZFQqLGDDs0MHTcX
-         Vqdw==
-X-Gm-Message-State: ABy/qLbu5Jh8qaVNtt+maIbeP0qglNzxKLwq6VaS2ZgLnWn6XVWGpDOO
-	MuBea47NdTGZziIrZMBJezZh2xs=
-X-Google-Smtp-Source: APBJJlHXBiX0HUdUvRUVZbgJrogX4uLuV9nnqFz6lq3o9UNjG7zRePCrTBStAIhguoDyo5W5TPAUMn8=
+        bh=2BGiqgbrDyKLhwoMHCwnPJoUQz2wNa2y6goRcd3J+cs=;
+        b=FMSTueKajuYKBTEUfpp3QvqFkKbO5aguVyn5r+w7908xukr28k/72uSWIgF8zHWhH2
+         uqbuTaB/ZyLc6mUBWC2HsGgc+UL2879A8WRCo4FZaU7g+pyFFu0FLMyZ/0bgC52kHQxn
+         nq62Sx+ZP0TsbgVCpigHLWS3CVozdl5yrzcBV1ucOusqhWb8whK+/tEo0yWyFTHkcAsV
+         hXEPIFBvStC3F6Ks+5ooS85gKg6ziztm/XuYHaDJoWMWkrIXrGll7NSk0YmeUv5Z/yB6
+         zLcsgdluBEPG/Jo0U8FRCR6t/z+7aUb5gqWZfrERuGHQA+i0KMUBQjsHhcOGs7BAyI8T
+         b2xw==
+X-Gm-Message-State: ABy/qLZfhqSWHZ38OXodAaD/hBBSE9uQSJ9p/GVCkLkOHvW53DaRCAF8
+	UcqXVtP3OdyTpUda7ykXs5A0GHo=
+X-Google-Smtp-Source: APBJJlE1V2C1sYD7EMBUp/7vClIOTGCd6NsbSDTFDjXHYOlh+hp5b0zqxGQgzgcVakjTeyFl2UQG+e0=
 X-Received: from sdf.c.googlers.com ([fda3:e722:ac3:cc00:7f:e700:c0a8:5935])
- (user=sdf job=sendgmr) by 2002:a17:902:8f83:b0:1b5:2607:3256 with SMTP id
- z3-20020a1709028f8300b001b526073256mr5121265plo.6.1688758220937; Fri, 07 Jul
- 2023 12:30:20 -0700 (PDT)
-Date: Fri,  7 Jul 2023 12:29:59 -0700
+ (user=sdf job=sendgmr) by 2002:a05:6a00:b51:b0:66e:4df5:6c15 with SMTP id
+ p17-20020a056a000b5100b0066e4df56c15mr8488242pfo.4.1688758222376; Fri, 07 Jul
+ 2023 12:30:22 -0700 (PDT)
+Date: Fri,  7 Jul 2023 12:30:00 -0700
 In-Reply-To: <20230707193006.1309662-1-sdf@google.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
@@ -62,8 +62,8 @@ List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 Mime-Version: 1.0
 References: <20230707193006.1309662-1-sdf@google.com>
 X-Mailer: git-send-email 2.41.0.255.g8b1d071c50-goog
-Message-ID: <20230707193006.1309662-8-sdf@google.com>
-Subject: [RFC bpf-next v3 07/14] bpf: Introduce tx checksum devtx kfuncs
+Message-ID: <20230707193006.1309662-9-sdf@google.com>
+Subject: [RFC bpf-next v3 08/14] net: veth: Implement devtx tx checksum
 From: Stanislav Fomichev <sdf@google.com>
 To: bpf@vger.kernel.org
 Cc: ast@kernel.org, daniel@iogearbox.net, andrii@kernel.org, 
@@ -80,75 +80,65 @@ X-Spam-Status: No, score=-9.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Add new kfunc that will be used for tx checksum offloading.
-The API mirrors existing one from sk_buff:
-- csum_start - checksum the packet starting from this position
-- csum_offset - put checksum at this offset
+Implement tx checksum kfunc for veth by checksumming the packet
+in software (since there is nothing to offload). The change mostly
+exists to make it possible to have software-based selftest.
+
+Probably should instead set csum_start/csum_offset on the skb
+itself?
 
 Signed-off-by: Stanislav Fomichev <sdf@google.com>
 ---
- include/linux/netdevice.h |  2 ++
- include/net/offload.h     |  5 ++++-
- net/core/devtx.c          | 17 +++++++++++++++++
- 3 files changed, 23 insertions(+), 1 deletion(-)
+ drivers/net/veth.c | 29 +++++++++++++++++++++++++++++
+ 1 file changed, 29 insertions(+)
 
-diff --git a/include/linux/netdevice.h b/include/linux/netdevice.h
-index 5be6649ea3fa..aeb1fa024d65 100644
---- a/include/linux/netdevice.h
-+++ b/include/linux/netdevice.h
-@@ -1662,6 +1662,8 @@ struct xdp_metadata_ops {
- 			       enum xdp_rss_hash_type *rss_type);
- 	int	(*xmo_request_tx_timestamp)(const struct devtx_ctx *ctx);
- 	int	(*xmo_tx_timestamp)(const struct devtx_ctx *ctx, u64 *timestamp);
-+	int	(*xmo_request_l4_checksum)(const struct devtx_ctx *ctx,
-+					   u16 csum_start, u16 csum_offset);
- };
- 
- /**
-diff --git a/include/net/offload.h b/include/net/offload.h
-index 7e2c19c5aaef..d8f908af9e59 100644
---- a/include/net/offload.h
-+++ b/include/net/offload.h
-@@ -15,7 +15,10 @@
- #define DEVTX_SUBMIT_KFUNC_xxx	\
- 	NETDEV_METADATA_KFUNC(DEVTX_KFUNC_REQUEST_TX_TIMESTAMP, \
- 			      bpf_devtx_request_tx_timestamp, \
--			      xmo_request_tx_timestamp)
-+			      xmo_request_tx_timestamp) \
-+	NETDEV_METADATA_KFUNC(DEVTX_KFUNC_REQUEST_L4_CHECKSUM, \
-+			      bpf_devtx_request_l4_csum, \
-+			      xmo_request_l4_checksum)
- 
- #define DEVTX_COMPLETE_KFUNC_xxx	\
- 	NETDEV_METADATA_KFUNC(DEVTX_KFUNC_TX_TIMESTAMP, \
-diff --git a/net/core/devtx.c b/net/core/devtx.c
-index 991a52fe81a3..fd8a9ea125db 100644
---- a/net/core/devtx.c
-+++ b/net/core/devtx.c
-@@ -106,6 +106,23 @@ __bpf_kfunc int bpf_devtx_tx_timestamp(const struct devtx_ctx *ctx, __u64 *times
- 	return -EOPNOTSUPP;
+diff --git a/drivers/net/veth.c b/drivers/net/veth.c
+index 5af4b15e107c..6f97511a545b 100644
+--- a/drivers/net/veth.c
++++ b/drivers/net/veth.c
+@@ -1814,6 +1814,34 @@ static int veth_devtx_tx_timestamp(const struct devtx_ctx *_ctx, u64 *timestamp)
+ 	return 0;
  }
  
-+/**
-+ * bpf_devtx_request_l4_csum - Request TX checksum offload on the packet.
-+ * Callable only from the devtx-submit hook.
-+ * @ctx: devtx context pointer.
-+ * @csum_start: start checksumming from given position
-+ * @csum_offset: add resulting checksum at given offset
-+ *
-+ * Note, this checksum offload doesn't calculate pseudo-header part.
-+ *
-+ * Returns 0 on success or ``-errno`` on error.
-+ */
-+__bpf_kfunc int bpf_devtx_request_l4_csum(const struct devtx_ctx *ctx,
-+					  u16 csum_start, u16 csum_offset)
++static int veth_devtx_request_l4_csum(const struct devtx_ctx *_ctx,
++				      u16 csum_start, u16 csum_offset)
 +{
-+	return -EOPNOTSUPP;
++	struct veth_devtx_ctx *ctx = (struct veth_devtx_ctx *)_ctx;
++	struct sk_buff *skb = ctx->skb;
++	__wsum csum;
++	int ret;
++
++	if (!skb)
++		return -EINVAL;
++
++	if (skb_transport_header_was_set(skb))
++		return -EINVAL;
++
++	if (csum_start >= skb->len)
++		return -EINVAL;
++
++	ret = skb_ensure_writable(skb, csum_offset + sizeof(__sum16));
++	if (ret)
++		return ret;
++
++	csum = csum_partial(skb->data + csum_start, skb->len - csum_start, 0);
++	*(__sum16 *)(skb->data + csum_offset) = csum_fold(csum) ?: CSUM_MANGLED_0;
++	skb->ip_summed = CHECKSUM_UNNECESSARY;
++
++	return 0;
 +}
 +
- __diag_pop();
+ static const struct net_device_ops veth_netdev_ops = {
+ 	.ndo_init            = veth_dev_init,
+ 	.ndo_open            = veth_open,
+@@ -1840,6 +1868,7 @@ static const struct xdp_metadata_ops veth_xdp_metadata_ops = {
+ 	.xmo_rx_hash			= veth_xdp_rx_hash,
+ 	.xmo_request_tx_timestamp	= veth_devtx_request_tx_timestamp,
+ 	.xmo_tx_timestamp		= veth_devtx_tx_timestamp,
++	.xmo_request_l4_checksum	= veth_devtx_request_l4_csum,
+ };
  
- BTF_SET8_START(devtx_sb_kfunc_ids)
+ #define VETH_FEATURES (NETIF_F_SG | NETIF_F_FRAGLIST | NETIF_F_HW_CSUM | \
 -- 
 2.41.0.255.g8b1d071c50-goog
 
