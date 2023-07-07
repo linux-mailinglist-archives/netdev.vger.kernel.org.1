@@ -1,37 +1,37 @@
-Return-Path: <netdev+bounces-15950-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-15949-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CC27974A8E2
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 04:21:11 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 016BE74A8E1
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 04:21:06 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D18081C20EF6
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 02:21:10 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 96695280DEB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 02:21:04 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 214332107;
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 118B77F;
 	Fri,  7 Jul 2023 02:20:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 2748015C2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 1A80A15A4
 	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 02:20:24 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPS id 8075BC433C9;
+Received: by smtp.kernel.org (Postfix) with ESMTPS id 90E4CC43391;
 	Fri,  7 Jul 2023 02:20:24 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
 	s=k20201202; t=1688696424;
-	bh=QX8ydS+01RAznifunMEpbyUhZSB5I5EmS3nsZGI1KWI=;
+	bh=v/sxdOUwnWXS1LagMLEUTFH7mjuxEv0dF05FFKvTtVc=;
 	h=Subject:From:Date:References:In-Reply-To:To:Cc:From;
-	b=CBU+Pjs/FGudG/pjhRZwN4Fcmjq/H0/IWM0KmFKskPrJW1SC9cuboyRy0BLBZP92v
-	 32hOr747366R93tRGfR5FqbMELzo/ZSvG8QWmCEvqu11JnMqiACmjjduZ03rlyNey/
-	 BHeseK0Evvmhc0Xog/YVJgsKaCVve1zTTY+B/WSaOBjsDPoBhBvPzYyd3HofqRfbuf
-	 MDkst9NkfvFRma8QQ/vr9keeN5SGygyAFq+68YvZJs6MrEREYQAy2/0/UGYuZZv+dB
-	 SJWAgANmxM4u/fF2e+Xf83CymCQLkeAtrr5CzBxLvp6uEH2ZC0gaK87qyoA0YJdDD1
-	 0L2WlxxqJzsiA==
+	b=kDQcmkvRwTkhyCkT7FYSzx0TpO9x+pVS3Se25rVBZbzxfxX91X2hWVAniP5UkMqRj
+	 twp138yKUYCvKJgCEXlvbVkzK3hC8TwlYny2bNDYqecrPnangsNtPK9hYciZRDI3fu
+	 aDxF2+rF4TdCdRoLSjTCg6P1VeBOcfBirO8dM4Ob2MXVFXEjMP0UT+yIjJyDMhPsUv
+	 Y0U8fVwzVnFPHHl9EMOgfosRHl7Sngx49DgxV22J6ALWfuB9EwPgk5M158n3QJYjP0
+	 7VFOZ2JqH0rO0sqm095mLB6lgLrePLyKLhF78hLCAsGbOMWq2uodJwoT/TyFactcgT
+	 2SkqnB8g1vdGA==
 Received: from aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (localhost.localdomain [127.0.0.1])
-	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 5E17FC73FEB;
+	by aws-us-west-2-korg-oddjob-1.ci.codeaurora.org (Postfix) with ESMTP id 6FE69C74002;
 	Fri,  7 Jul 2023 02:20:24 +0000 (UTC)
 Content-Type: text/plain; charset="utf-8"
 Precedence: bulk
@@ -41,43 +41,35 @@ List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
 Content-Transfer-Encoding: 8bit
-Subject: Re: [PATCH net 0/3] Fix dropping of oversize preemptible frames with
- felix DSA driver
+Subject: Re: [PATCH net] gve: Set default duplex configuration to full
 From: patchwork-bot+netdevbpf@kernel.org
 Message-Id: 
- <168869642438.27656.6734580798991464812.git-patchwork-notify@kernel.org>
+ <168869642445.27656.733398020265898815.git-patchwork-notify@kernel.org>
 Date: Fri, 07 Jul 2023 02:20:24 +0000
-References: <20230705104422.49025-1-vladimir.oltean@nxp.com>
-In-Reply-To: <20230705104422.49025-1-vladimir.oltean@nxp.com>
-To: Vladimir Oltean <vladimir.oltean@nxp.com>
-Cc: netdev@vger.kernel.org, andrew@lunn.ch, f.fainelli@gmail.com,
- davem@davemloft.net, edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
- claudiu.manoil@nxp.com, alexandre.belloni@bootlin.com,
- UNGLinuxDriver@microchip.com, xiaoliang.yang_1@nxp.com,
- linux-kernel@vger.kernel.org
+References: <20230706044128.2726747-1-junfeng.guo@intel.com>
+In-Reply-To: <20230706044128.2726747-1-junfeng.guo@intel.com>
+To: Junfeng Guo <junfeng.guo@intel.com>
+Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
+ shailend@google.com, haiyue.wang@intel.com
 
 Hello:
 
-This series was applied to netdev/net.git (main)
+This patch was applied to netdev/net.git (main)
 by Jakub Kicinski <kuba@kernel.org>:
 
-On Wed,  5 Jul 2023 13:44:19 +0300 you wrote:
-> It has been reported that preemptible traffic doesn't completely behave
-> as expected. Namely, large packets should be able to be squeezed
-> (through fragmentation) through taprio time slots smaller than the
-> transmission time of the full frame. That does not happen due to logic
-> in the driver (for oversize frame dropping with taprio) that was not
-> updated in order for this use case to work.
+On Thu,  6 Jul 2023 12:41:28 +0800 you wrote:
+> Current duplex mode was unset in the driver, resulting in the default
+> parameter being set to 0, which corresponds to half duplex. It might
+> mislead users to have incorrect expectation about the driver's
+> transmission capabilities.
+> Set the default duplex configuration to full, as the driver runs in
+> full duplex mode at this point.
 > 
 > [...]
 
 Here is the summary with links:
-  - [net,1/3] net: mscc: ocelot: extend ocelot->fwd_domain_lock to cover ocelot->tas_lock
-    https://git.kernel.org/netdev/net/c/009d30f1a777
-  - [net,2/3] net: dsa: felix: make vsc9959_tas_guard_bands_update() visible to ocelot->ops
-    https://git.kernel.org/netdev/net/c/c60819149b63
-  - [net,3/3] net: mscc: ocelot: fix oversize frame dropping for preemptible TCs
-    https://git.kernel.org/netdev/net/c/c6efb4ae387c
+  - [net] gve: Set default duplex configuration to full
+    https://git.kernel.org/netdev/net/c/0503efeadbf6
 
 You are awesome, thank you!
 -- 
