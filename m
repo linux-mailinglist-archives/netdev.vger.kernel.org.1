@@ -1,109 +1,251 @@
-Return-Path: <netdev+bounces-16077-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16079-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BC3FA74B546
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:50:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 60B6D74B553
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 18:51:40 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id ECAF31C20998
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:50:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 8FFE31C2100B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:51:39 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 0AF5F107BF;
-	Fri,  7 Jul 2023 16:50:36 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64E9B11196;
+	Fri,  7 Jul 2023 16:51:07 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id F1C8F10795
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 16:50:35 +0000 (UTC)
-Received: from mail-lf1-x134.google.com (mail-lf1-x134.google.com [IPv6:2a00:1450:4864:20::134])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5DF991FEF
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 09:50:32 -0700 (PDT)
-Received: by mail-lf1-x134.google.com with SMTP id 2adb3069b0e04-4fb9ae4cef6so3400773e87.3
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 09:50:32 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linuxtx.org; s=google; t=1688748630; x=1691340630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:sender:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=zLXZgXJ3+fhscV17K2fnf26FIQt2ef2bWf/PY4eWVh0=;
-        b=hyHMpsodfUphxMQtvgZcrCErIt/draEzO+5GgYcb0UWo1tfECJI4gic4qNSFPBY/My
-         MFsCGsK8prgsg4QEU5R7K7nEywcIJizxTK0jK4QjHBJpY7cJKsIypFy9aa+qZANusALM
-         qk6shmdJQOrZ29FsBJqbmvp8GRYu45TXnDVls=
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688748630; x=1691340630;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:sender:x-gm-message-state:from
-         :to:cc:subject:date:message-id:reply-to;
-        bh=zLXZgXJ3+fhscV17K2fnf26FIQt2ef2bWf/PY4eWVh0=;
-        b=CUgarKHmqvhNqw1sKRyduXT06gZFyA2R/95tUywKkWObhaYZ+gqJG1RscuROyTytqL
-         GHA+dPLfvX8Rp497KFUCaUVLrssCkzV/wQrzDgz1MRqSoiRn7E2ocF/hv5zuKUr/eA1u
-         /mJXI6Vnjh+dxWk4UbwlfRk8yveApWhlsSUMjU08GvcbTTPkxU+C22LHpbafa3vDryQf
-         qbx51kqcArg0NYlqsiLHqbtdT0XtedYMoGBjy6lGK6r9dShIJkhwNFWAHTuUIFtb1Kbb
-         Xu1QShc/xvMLmvQp5p+HcnJkYnptr/Xl4en4MEK3GDGCmcx/GVAYnP0yfuN/m0XQhbP/
-         IAGA==
-X-Gm-Message-State: ABy/qLZWGdWOEWMWQhupOJTsaBLhHXrvG597/cUwspHVL25aqWviZoh0
-	awu3VNL/sTCRwzETFmPA/aov93O88QEXTgU5duV5wrNi
-X-Google-Smtp-Source: APBJJlEXfAYNH15dK3AV5eI09WPbZQg+IHwGbyW73ycGwv0cxtUWa/Gf/y2pDT6aOhKxMtHo1C5Acg==
-X-Received: by 2002:a05:6512:32d0:b0:4f8:6dfd:faa0 with SMTP id f16-20020a05651232d000b004f86dfdfaa0mr4176574lfg.2.1688748629854;
-        Fri, 07 Jul 2023 09:50:29 -0700 (PDT)
-Received: from mail-lf1-f44.google.com (mail-lf1-f44.google.com. [209.85.167.44])
-        by smtp.gmail.com with ESMTPSA id z12-20020ac24f8c000000b004fbab1f023csm742346lfs.138.2023.07.07.09.50.28
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jul 2023 09:50:28 -0700 (PDT)
-Sender: Justin Forbes <jmforbes@linuxtx.org>
-Received: by mail-lf1-f44.google.com with SMTP id 2adb3069b0e04-4fb9ae4cef6so3400725e87.3
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 09:50:28 -0700 (PDT)
-X-Received: by 2002:a05:6512:2141:b0:4f6:2e4e:e425 with SMTP id
- s1-20020a056512214100b004f62e4ee425mr3732573lfr.50.1688748628215; Fri, 07 Jul
- 2023 09:50:28 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 496171118E;
+	Fri,  7 Jul 2023 16:51:07 +0000 (UTC)
+Received: from wout3-smtp.messagingengine.com (wout3-smtp.messagingengine.com [64.147.123.19])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 9120B210C;
+	Fri,  7 Jul 2023 09:51:05 -0700 (PDT)
+Received: from compute2.internal (compute2.nyi.internal [10.202.2.46])
+	by mailout.west.internal (Postfix) with ESMTP id DC9EB320015C;
+	Fri,  7 Jul 2023 12:51:03 -0400 (EDT)
+Received: from mailfrontend2 ([10.202.2.163])
+  by compute2.internal (MEProxy); Fri, 07 Jul 2023 12:51:05 -0400
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=dxuuu.xyz; h=cc
+	:cc:content-transfer-encoding:content-type:date:date:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:sender:subject:subject:to:to; s=fm1; t=1688748663; x=
+	1688835063; bh=50Mq7yDH4SaalwjOr9VWbgSV3HaqQVn5wwG7OgrzEBE=; b=O
+	fqFSHotl5MPw+omR7FqaSYyuuht7W7DDKg+v2/eHGO1wiruemdRLo1MTeEaSxivu
+	s0RqOqhl4TFy4MgwyB4y9pfFdIHne6J062sLfU9D9ZnbB8TpHa13+MCwHJTNR3Pd
+	ziLU2yztrAr5IEK8z4JTnpozUddATvo+j/auSNyRTkzoeM2lPRp6Peun6mMavK6y
+	197s9men4fwMgPuiWCLujuhJ4L7PDLsyZKK5ZxqoyvkRAQuHUwLLfkwONCmcu6qJ
+	k7m9G86SQbFaB8Y95lt7N2uu88MhVOKWEBERHBWC3bVK5dEOFAylvWalPVSpmXBd
+	blu7/MSzz303GiEMx0ioA==
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=
+	messagingengine.com; h=cc:cc:content-transfer-encoding
+	:content-type:date:date:feedback-id:feedback-id:from:from
+	:in-reply-to:in-reply-to:message-id:mime-version:references
+	:reply-to:sender:subject:subject:to:to:x-me-proxy:x-me-proxy
+	:x-me-sender:x-me-sender:x-sasl-enc; s=fm2; t=1688748663; x=
+	1688835063; bh=50Mq7yDH4SaalwjOr9VWbgSV3HaqQVn5wwG7OgrzEBE=; b=D
+	Np3goPrOcaNvkVar8Cni9qJJJxRiaNmv68DIU97gBo83H1Shc3FaPPL9oTLGfT7w
+	dScyySdJRWCiMJJ9bge8rxrHAamfreAqNRiLBCFxBCPWuFw4cmpOFSN6xw4JHGmw
+	XOBKoAzWz9QJ3NSbvWsbw6lxVKgEcUYX9Uk0WCzPapCEj4ZXro8wKYdYDCKyibh5
+	5d0zn8nCfiNT2q1GIo6msaVFV8uxw9iROpCVRmGKNZ/QoveToLk4v4svwTSiSfu0
+	rtES0SaHXVtkEKv+EPPQUmX/pXX+GZBKLQosL6RIIJwu1uTt/DwdjX1Y0Km+h21b
+	+dXMHUSiB7lnsy9SNntdg==
+X-ME-Sender: <xms:d0KoZIbcf7VMeTd2CDLCkkaU6jPxCYJGVu_qAVQmjARkOtrHYRyOBA>
+    <xme:d0KoZDZlD--WTCl-pKmqvP0vxUIoOS67QTxBo30sEofGd93VDYiHa3pOUIluWksyT
+    9NgrVsmIf7bJJgsjA>
+X-ME-Received: <xmr:d0KoZC_0pLdD57MCh5ExBGkW8wu6arg5Fcnahjo0n1e5sW-Kr3TSwh08EQSHNd0JkwzxCwC1I0hAN73S6x6l808-fbHJ5Mcv-NtTy9i9nyw>
+X-ME-Proxy-Cause: gggruggvucftvghtrhhoucdtuddrgedviedrvddugddutdehucetufdoteggodetrfdotf
+    fvucfrrhhofhhilhgvmecuhfgrshhtofgrihhlpdfqfgfvpdfurfetoffkrfgpnffqhgen
+    uceurghilhhouhhtmecufedttdenucgfrhhlucfvnfffucdljedtmdenucfjughrpefhvf
+    evufffkffojghfggfgsedtkeertdertddtnecuhfhrohhmpeffrghnihgvlhcuighuuceo
+    ugiguhesugiguhhuuhdrgiihiieqnecuggftrfgrthhtvghrnhepgfefgfegjefhudeike
+    dvueetffelieefuedvhfehjeeljeejkefgffeghfdttdetnecuvehluhhsthgvrhfuihii
+    vgeptdenucfrrghrrghmpehmrghilhhfrhhomhepugiguhesugiguhhuuhdrgiihii
+X-ME-Proxy: <xmx:d0KoZCqe1Ybln4f3wJ4BvVDyxgxV_OrKQfgbE0WrspwgqIMG_2FL9Q>
+    <xmx:d0KoZDrYCczugKjErchDBjf8PttVu2vh_wsoPoRET51LyGpqk5-9KA>
+    <xmx:d0KoZATJ09rnpyiok0PiDn5882OlnZd4XYnoWElGl1D-u1Urtp4sew>
+    <xmx:d0KoZBhDeJo_fN0BrKphHTOroXT-zf2KYxXER2m9RjLPMhXgHw1RfQ>
+Feedback-ID: i6a694271:Fastmail
+Received: by mail.messagingengine.com (Postfix) with ESMTPA; Fri,
+ 7 Jul 2023 12:51:02 -0400 (EDT)
+From: Daniel Xu <dxu@dxuuu.xyz>
+To: pablo@netfilter.org,
+	kuba@kernel.org,
+	edumazet@google.com,
+	davem@davemloft.net,
+	kadlec@netfilter.org,
+	pabeni@redhat.com,
+	dsahern@kernel.org,
+	fw@strlen.de,
+	daniel@iogearbox.net
+Cc: netfilter-devel@vger.kernel.org,
+	coreteam@netfilter.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org,
+	bpf@vger.kernel.org
+Subject: [PATCH bpf-next v3 1/6] netfilter: defrag: Add glue hooks for enabling/disabling defrag
+Date: Fri,  7 Jul 2023 10:50:16 -0600
+Message-ID: <8a20b0a3fff75bce1bed207631fe4f56abc3e99d.1688748455.git.dxu@dxuuu.xyz>
+X-Mailer: git-send-email 2.41.0
+In-Reply-To: <cover.1688748455.git.dxu@dxuuu.xyz>
+References: <cover.1688748455.git.dxu@dxuuu.xyz>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230706145154.2517870-1-jforbes@fedoraproject.org> <20230706084433.5fa44d4c@kernel.org>
-In-Reply-To: <20230706084433.5fa44d4c@kernel.org>
-From: Justin Forbes <jforbes@fedoraproject.org>
-Date: Fri, 7 Jul 2023 11:50:16 -0500
-X-Gmail-Original-Message-ID: <CAFbkSA0wW-tQ_b_GF3z2JqtO4hc0c+1gcbcyTcgjYbQBsEYLyA@mail.gmail.com>
-Message-ID: <CAFbkSA0wW-tQ_b_GF3z2JqtO4hc0c+1gcbcyTcgjYbQBsEYLyA@mail.gmail.com>
-Subject: Re: [PATCH] Move rmnet out of NET_VENDOR_QUALCOMM dependency
-To: Jakub Kicinski <kuba@kernel.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>, 
-	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	jmforbes@linuxtx.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_EF,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=no autolearn_force=no version=3.4.6
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Thu, Jul 6, 2023 at 10:44=E2=80=AFAM Jakub Kicinski <kuba@kernel.org> wr=
-ote:
->
-> On Thu,  6 Jul 2023 09:51:52 -0500 Justin M. Forbes wrote:
-> > The rmnet driver is useful for chipsets that are not hidden behind
-> > NET_VENDOR_QUALCOMM.  Move sourcing the rmnet Kconfig outside of the if
-> > NET_VENDOR_QUALCOMM as there is no dependency here.
-> >
-> > Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
->
-> Examples of the chipsets you're talking about would be great to have in
-> the commit message.
+We want to be able to enable/disable IP packet defrag from core
+bpf/netfilter code. In other words, execute code from core that could
+possibly be built as a module.
 
-The user in the Fedora bug was using mhi_net with qmi_wwan.
+To help avoid symbol resolution errors, use glue hooks that the modules
+will register callbacks with during module init.
 
-Justin
+Signed-off-by: Daniel Xu <dxu@dxuuu.xyz>
+---
+ include/linux/netfilter.h                 | 12 ++++++++++++
+ net/ipv4/netfilter/nf_defrag_ipv4.c       | 16 +++++++++++++++-
+ net/ipv6/netfilter/nf_defrag_ipv6_hooks.c | 10 ++++++++++
+ net/netfilter/core.c                      |  6 ++++++
+ 4 files changed, 43 insertions(+), 1 deletion(-)
 
-> pw-bot: cr
->
+diff --git a/include/linux/netfilter.h b/include/linux/netfilter.h
+index d4fed4c508ca..77a637b681f2 100644
+--- a/include/linux/netfilter.h
++++ b/include/linux/netfilter.h
+@@ -481,6 +481,18 @@ struct nfnl_ct_hook {
+ };
+ extern const struct nfnl_ct_hook __rcu *nfnl_ct_hook;
+ 
++struct nf_defrag_v4_hook {
++	int (*enable)(struct net *net);
++	void (*disable)(struct net *net);
++};
++extern const struct nf_defrag_v4_hook __rcu *nf_defrag_v4_hook;
++
++struct nf_defrag_v6_hook {
++	int (*enable)(struct net *net);
++	void (*disable)(struct net *net);
++};
++extern const struct nf_defrag_v6_hook __rcu *nf_defrag_v6_hook;
++
+ /*
+  * nf_skb_duplicated - TEE target has sent a packet
+  *
+diff --git a/net/ipv4/netfilter/nf_defrag_ipv4.c b/net/ipv4/netfilter/nf_defrag_ipv4.c
+index e61ea428ea18..1f3e0e893b7a 100644
+--- a/net/ipv4/netfilter/nf_defrag_ipv4.c
++++ b/net/ipv4/netfilter/nf_defrag_ipv4.c
+@@ -7,6 +7,7 @@
+ #include <linux/ip.h>
+ #include <linux/netfilter.h>
+ #include <linux/module.h>
++#include <linux/rcupdate.h>
+ #include <linux/skbuff.h>
+ #include <net/netns/generic.h>
+ #include <net/route.h>
+@@ -113,17 +114,30 @@ static void __net_exit defrag4_net_exit(struct net *net)
+ 	}
+ }
+ 
++static const struct nf_defrag_v4_hook defrag_hook = {
++	.enable = nf_defrag_ipv4_enable,
++	.disable = nf_defrag_ipv4_disable,
++};
++
+ static struct pernet_operations defrag4_net_ops = {
+ 	.exit = defrag4_net_exit,
+ };
+ 
+ static int __init nf_defrag_init(void)
+ {
+-	return register_pernet_subsys(&defrag4_net_ops);
++	int err;
++
++	err = register_pernet_subsys(&defrag4_net_ops);
++	if (err)
++		return err;
++
++	rcu_assign_pointer(nf_defrag_v4_hook, &defrag_hook);
++	return err;
+ }
+ 
+ static void __exit nf_defrag_fini(void)
+ {
++	rcu_assign_pointer(nf_defrag_v4_hook, NULL);
+ 	unregister_pernet_subsys(&defrag4_net_ops);
+ }
+ 
+diff --git a/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c b/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c
+index cb4eb1d2c620..f7c7ee31c472 100644
+--- a/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c
++++ b/net/ipv6/netfilter/nf_defrag_ipv6_hooks.c
+@@ -10,6 +10,7 @@
+ #include <linux/module.h>
+ #include <linux/skbuff.h>
+ #include <linux/icmp.h>
++#include <linux/rcupdate.h>
+ #include <linux/sysctl.h>
+ #include <net/ipv6_frag.h>
+ 
+@@ -96,6 +97,11 @@ static void __net_exit defrag6_net_exit(struct net *net)
+ 	}
+ }
+ 
++static const struct nf_defrag_v6_hook defrag_hook = {
++	.enable = nf_defrag_ipv6_enable,
++	.disable = nf_defrag_ipv6_disable,
++};
++
+ static struct pernet_operations defrag6_net_ops = {
+ 	.exit = defrag6_net_exit,
+ };
+@@ -114,6 +120,9 @@ static int __init nf_defrag_init(void)
+ 		pr_err("nf_defrag_ipv6: can't register pernet ops\n");
+ 		goto cleanup_frag6;
+ 	}
++
++	rcu_assign_pointer(nf_defrag_v6_hook, &defrag_hook);
++
+ 	return ret;
+ 
+ cleanup_frag6:
+@@ -124,6 +133,7 @@ static int __init nf_defrag_init(void)
+ 
+ static void __exit nf_defrag_fini(void)
+ {
++	rcu_assign_pointer(nf_defrag_v6_hook, NULL);
+ 	unregister_pernet_subsys(&defrag6_net_ops);
+ 	nf_ct_frag6_cleanup();
+ }
+diff --git a/net/netfilter/core.c b/net/netfilter/core.c
+index 5f76ae86a656..34845155bb85 100644
+--- a/net/netfilter/core.c
++++ b/net/netfilter/core.c
+@@ -680,6 +680,12 @@ EXPORT_SYMBOL_GPL(nfnl_ct_hook);
+ const struct nf_ct_hook __rcu *nf_ct_hook __read_mostly;
+ EXPORT_SYMBOL_GPL(nf_ct_hook);
+ 
++const struct nf_defrag_v4_hook __rcu *nf_defrag_v4_hook __read_mostly;
++EXPORT_SYMBOL_GPL(nf_defrag_v4_hook);
++
++const struct nf_defrag_v6_hook __rcu *nf_defrag_v6_hook __read_mostly;
++EXPORT_SYMBOL_GPL(nf_defrag_v6_hook);
++
+ #if IS_ENABLED(CONFIG_NF_CONNTRACK)
+ u8 nf_ctnetlink_has_listener;
+ EXPORT_SYMBOL_GPL(nf_ctnetlink_has_listener);
+-- 
+2.41.0
+
 
