@@ -1,84 +1,283 @@
-Return-Path: <netdev+bounces-16001-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16002-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id CFCAE74AE88
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:09:48 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D36D974AE95
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:13:19 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 07FB71C20FC0
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:09:48 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E3C5D1C20F7B
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:13:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DD061BE50;
-	Fri,  7 Jul 2023 10:09:43 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 93D77BE50;
+	Fri,  7 Jul 2023 10:13:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C428920E0;
-	Fri,  7 Jul 2023 10:09:43 +0000 (UTC)
-Received: from Chamillionaire.breakpoint.cc (Chamillionaire.breakpoint.cc [IPv6:2a0a:51c0:0:237:300::1])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id D220A90;
-	Fri,  7 Jul 2023 03:09:41 -0700 (PDT)
-Received: from fw by Chamillionaire.breakpoint.cc with local (Exim 4.92)
-	(envelope-from <fw@strlen.de>)
-	id 1qHiP2-00033x-Dk; Fri, 07 Jul 2023 12:09:28 +0200
-Date: Fri, 7 Jul 2023 12:09:28 +0200
-From: Florian Westphal <fw@strlen.de>
-To: Daniel Xu <dxu@dxuuu.xyz>
-Cc: pabeni@redhat.com, edumazet@google.com, kuba@kernel.org, fw@strlen.de,
-	davem@davemloft.net, pablo@netfilter.org, kadlec@netfilter.org,
-	dsahern@kernel.org, daniel@iogearbox.net,
-	netfilter-devel@vger.kernel.org, coreteam@netfilter.org,
-	linux-kernel@vger.kernel.org, netdev@vger.kernel.org,
-	bpf@vger.kernel.org
-Subject: Re: [PATCH bpf-next v2 3/6] netfilter: bpf: Prevent defrag module
- unload while link active
-Message-ID: <20230707100928.GA11622@breakpoint.cc>
-References: <cover.1688685338.git.dxu@dxuuu.xyz>
- <81ede90e3f1468763ea5b0b6ec2971b7b1b870c1.1688685338.git.dxu@dxuuu.xyz>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 7DDD063C9
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:13:10 +0000 (UTC)
+Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E704E268B
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 03:12:56 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
+	s=mimecast20190719; t=1688724775;
+	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
+	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
+	 content-transfer-encoding:content-transfer-encoding:
+	 in-reply-to:in-reply-to:references:references;
+	bh=q0BiGIj/vOnPlIoZUpDP1153XdGlvd4F5wc78L4ppkE=;
+	b=f+j46EApKBZupF8d6nlbxv+Q29bNt9WrNAPyJScLuBjPlp51+2DOd48GxJZHfLvKOVJoke
+	bL/H5egGNasSb7RVSexicDPYAayH1IX7JOUMIQ7i1fI4VmK9nIWA/OoLJ/0PZsFLgBnGyq
+	ZZDZphyTxC8a2Y7oJq3xeURb6f4zBRA=
+Received: from mail-ua1-f69.google.com (mail-ua1-f69.google.com
+ [209.85.222.69]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
+ us-mta-21-Z4M8iPPyP2aKXzO99DHKFg-1; Fri, 07 Jul 2023 06:12:54 -0400
+X-MC-Unique: Z4M8iPPyP2aKXzO99DHKFg-1
+Received: by mail-ua1-f69.google.com with SMTP id a1e0cc1a2514c-7940ffbfc8fso320877241.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 03:12:54 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688724774; x=1691316774;
+        h=content-transfer-encoding:in-reply-to:from:references:cc:to
+         :content-language:subject:user-agent:mime-version:date:message-id
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=q0BiGIj/vOnPlIoZUpDP1153XdGlvd4F5wc78L4ppkE=;
+        b=F8EhFUbWc2FdjMfLZkEYN4FWGZHNqGd5/dcXJq0SDu1xZKZCptL7HdSgoNSzZ5DQgJ
+         5nOYhvGUkJWzIwq0+zKcW3q7Y+H1vJ8xdPB1DkIL9t/qZ1TFPSD4RGPK78Kj7dZ4VrGG
+         XcoJ7dNbV9mDcGJgCpg9oTzrsMbZMzBuGnq4Kgj4q6xhnlc9Pn3cJLIDGfl/GyE750Gr
+         ow41r5M6vtc5qQ5N1j154yQe2ryyAyFw+DPuhLiEvAsXFp69vO6cClUY0EdS+At/5y/C
+         NGbLJhr6JZ50VZ8cYInM+Eorpg5oz+zzj/qSwxBqUpp4IUoEg//TBOWbLM6cpCnKy9VN
+         c4BQ==
+X-Gm-Message-State: ABy/qLalkpfsIdRH6uHm7JBN0r/EClgBr4BMkNMz50F7OWSUPgbK/daE
+	LOF+LfSG+fv5mdaCHBFiibZ/HioT2eItWkX4+WVmjKFzalFaUcUpZKREhj6BgzopJWlUqgVTqly
+	bq28EbTCnVpBZt+N9
+X-Received: by 2002:a67:f7ca:0:b0:443:6afe:902b with SMTP id a10-20020a67f7ca000000b004436afe902bmr2491147vsp.24.1688724774267;
+        Fri, 07 Jul 2023 03:12:54 -0700 (PDT)
+X-Google-Smtp-Source: APBJJlFmyHu68CqaecsSfpulT3FPFhmvTkYR/gPf8w8gCLr6dxZvGJH8O3NYxGMAY5RArCHWk4IcoQ==
+X-Received: by 2002:a67:f7ca:0:b0:443:6afe:902b with SMTP id a10-20020a67f7ca000000b004436afe902bmr2491137vsp.24.1688724773943;
+        Fri, 07 Jul 2023 03:12:53 -0700 (PDT)
+Received: from [192.168.0.136] ([139.47.72.15])
+        by smtp.gmail.com with ESMTPSA id e16-20020a05620a12d000b007339c5114a9sm1669120qkl.103.2023.07.07.03.12.52
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Fri, 07 Jul 2023 03:12:53 -0700 (PDT)
+Message-ID: <43015bcd-46a0-432c-a181-6d29c49f2513@redhat.com>
+Date: Fri, 7 Jul 2023 12:12:51 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <81ede90e3f1468763ea5b0b6ec2971b7b1b870c1.1688685338.git.dxu@dxuuu.xyz>
-User-Agent: Mutt/1.10.1 (2018-07-13)
-X-Spam-Status: No, score=-4.2 required=5.0 tests=BAYES_00,RCVD_IN_DNSWL_MED,
-	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [ovs-dev] [PATCH net-next 4/4] selftests: openvswitch: add ct-nat
+ test case with ipv4
+Content-Language: en-US
+To: Aaron Conole <aconole@redhat.com>, netdev@vger.kernel.org
+Cc: dev@openvswitch.org, Ilya Maximets <i.maximets@ovn.org>,
+ Eric Dumazet <edumazet@google.com>, linux-kselftest@vger.kernel.org,
+ Jakub Kicinski <kuba@kernel.org>, Paolo Abeni <pabeni@redhat.com>,
+ shuah@kernel.org, "David S. Miller" <davem@davemloft.net>
+References: <20230628162714.392047-1-aconole@redhat.com>
+ <20230628162714.392047-5-aconole@redhat.com>
+From: Adrian Moreno <amorenoz@redhat.com>
+In-Reply-To: <20230628162714.392047-5-aconole@redhat.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=unavailable
 	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Daniel Xu <dxu@dxuuu.xyz> wrote:
-> +		/* Prevent defrag module from going away while in use */
-> +		if (!try_module_get(v4_hook->owner)) {
-> +			err = -ENOENT;
-> +			goto out_v4;
-> +		}
-> +
->  		err = v4_hook->enable(link->net);
->  out_v4:
->  		rcu_read_unlock();
-> @@ -79,6 +86,12 @@ static int bpf_nf_enable_defrag(struct bpf_nf_link *link)
->  			}
->  		}
->  
-> +		/* Prevent defrag module from going away while in use */
-> +		if (!try_module_get(v6_hook->owner)) {
-> +			err = -ENOENT;
-> +			goto out_v6;
-> +		}
-> +
->  		err = v6_hook->enable(link->net);
->  out_v6:
->  		rcu_read_unlock();
 
-This needs module_put() calls in case ->enable() returns an error, no?
 
-Other than this this series LGTM, thanks!
+On 6/28/23 18:27, Aaron Conole wrote:
+> Building on the previous work, add a very simplistic NAT case
+> using ipv4.  This just tests dnat transformation
+> 
+> Signed-off-by: Aaron Conole <aconole@redhat.com>
+
+Hi Aaron,
+
+I know that the goal is not to support the full syntax, and that nat is a 
+specially convoluted action, so I'm just commenting on the low-hanging fruits 
+(see below).
+
+> ---
+>   .../selftests/net/openvswitch/openvswitch.sh  | 64 +++++++++++++++++++
+>   .../selftests/net/openvswitch/ovs-dpctl.py    | 60 +++++++++++++++++
+>   2 files changed, 124 insertions(+)
+> 
+> diff --git a/tools/testing/selftests/net/openvswitch/openvswitch.sh b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> index 40a66c72af0f0..dced4f612a78c 100755
+> --- a/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> +++ b/tools/testing/selftests/net/openvswitch/openvswitch.sh
+> @@ -14,6 +14,7 @@ tests="
+>   	arp_ping				eth-arp: Basic arp ping between two NS
+>   	ct_connect_v4				ip4-ct-xon: Basic ipv4 tcp connection using ct
+>   	connect_v4				ip4-xon: Basic ipv4 ping between two NS
+> +	nat_connect_v4				ip4-nat-xon: Basic ipv4 tcp connection via NAT
+>   	netlink_checks				ovsnl: validate netlink attrs and settings
+>   	upcall_interfaces			ovs: test the upcall interfaces"
+>   
+> @@ -300,6 +301,69 @@ test_connect_v4 () {
+>   	return 0
+>   }
+>   
+> +# nat_connect_v4 test
+> +#  - client has 1500 byte MTU
+> +#  - server has 1500 byte MTU
+> +#  - use ICMP to ping in each direction
+> +#  - only allow CT state stuff to pass through new in c -> s
+> +test_nat_connect_v4 () {
+> +	which nc >/dev/null 2>/dev/null || return $ksft_skip
+> +
+> +	sbx_add "test_nat_connect_v4" || return $?
+> +
+> +	ovs_add_dp "test_nat_connect_v4" nat4 || return 1
+> +	info "create namespaces"
+> +	for ns in client server; do
+> +		ovs_add_netns_and_veths "test_nat_connect_v4" "nat4" "$ns" \
+> +		    "${ns:0:1}0" "${ns:0:1}1" || return 1
+> +	done
+> +
+> +	ip netns exec client ip addr add 172.31.110.10/24 dev c1
+> +	ip netns exec client ip link set c1 up
+> +	ip netns exec server ip addr add 172.31.110.20/24 dev s1
+> +	ip netns exec server ip link set s1 up
+> +
+> +	ip netns exec client ip route add default via 172.31.110.20
+> +
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		'in_port(1),eth(),eth_type(0x0806),arp()' '2' || return 1
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		'in_port(2),eth(),eth_type(0x0806),arp()' '1' || return 1
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"ct_state(-trk),in_port(1),eth(),eth_type(0x0800),ipv4(dst=192.168.0.20)" \
+> +		"ct(commit,nat(dst=172.31.110.20)),recirc(0x1)"
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"ct_state(-trk),in_port(2),eth(),eth_type(0x0800),ipv4()" \
+> +		"ct(commit,nat),recirc(0x2)"
+> +
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"recirc_id(0x1),ct_state(+trk-inv),in_port(1),eth(),eth_type(0x0800),ipv4()" "2"
+> +	ovs_add_flow "test_nat_connect_v4" nat4 \
+> +		"recirc_id(0x2),ct_state(+trk-inv),in_port(2),eth(),eth_type(0x0800),ipv4()" "1"
+> +
+> +	# do a ping
+> +	ovs_sbx "test_nat_connect_v4" ip netns exec client ping 192.168.0.20 -c 3 || return 1
+> +
+> +	# create an echo server in 'server'
+> +	echo "server" | \
+> +		ovs_netns_spawn_daemon "test_nat_connect_v4" "server" \
+> +				nc -lvnp 4443
+> +	ovs_sbx "test_nat_connect_v4" ip netns exec client nc -i 1 -zv 192.168.0.20 4443 || return 1
+> +
+> +	# Now test in the other direction (should fail)
+> +	echo "client" | \
+> +		ovs_netns_spawn_daemon "test_nat_connect_v4" "client" \
+> +				nc -lvnp 4443
+> +	ovs_sbx "test_nat_connect_v4" ip netns exec client nc -i 1 -zv 172.31.110.10 4443
+> +	if [ $? == 0 ]; then
+> +	   info "connect to client was successful"
+> +	   return 1
+> +	fi
+> +
+> +	info "done..."
+> +	return 0
+> +}
+> +
+>   # netlink_validation
+>   # - Create a dp
+>   # - check no warning with "old version" simulation
+> diff --git a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> index 704cb4adf79a9..12ba5265b88fb 100644
+> --- a/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> +++ b/tools/testing/selftests/net/openvswitch/ovs-dpctl.py
+> @@ -511,6 +511,66 @@ class ovsactions(nla):
+>                           else:
+>                               ctact["attrs"].append([scan[1], None])
+>                           actstr = actstr[strspn(actstr, ", ") :]
+> +                    # it seems strange to put this here, but nat() is a complex
+> +                    # sub-action and this lets it sit anywhere in the ct() action
+> +                    if actstr.startswith("nat"):
+> +                        actstr = actstr[3:]
+> +                        natact = ovsactions.ctact.natattr()
+> +
+> +                        if actstr.startswith("("):
+> +                            t = None
+> +                            actstr = actstr[1:]
+> +                            if actstr.startswith("src"):
+> +                                t = "OVS_NAT_ATTR_SRC"
+> +                                actstr = actstr[3:]
+> +                            elif actstr.startswith("dst"):
+> +                                t = "OVS_NAT_ATTR_DST"
+> +                                actstr = actstr[3:]
+> +
+> +                            actstr, ip_block_min = parse_extract_field(
+> +                                actstr, "=", "([0-9a-fA-F:\.]+)", str, False
+> +                            )
+> +                            actstr, ip_block_max = parse_extract_field(
+> +                                actstr, "-", "([0-9a-fA-F:\.]+)", str, False
+> +                            )
+
+Having the ":" character here makes this line parse the port as well (i.e: 
+1.1.1.1:6789 as ip_block_max) which then makes ip address parsing fail.
+
+
+> +                            actstr, proto_min = parse_extract_field(
+> +                                actstr, ":", "(\d+)", int, False
+> +                            )
+> +                            actstr, proto_max = parse_extract_field(
+> +                                actstr, "-", "(\d+)", int, False
+> +                            )
+> +                            if t is not None:
+> +                                natact["attrs"].append([t, None])
+> +
+> +                                if ip_block_min is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_IP_MIN", ip_block_min]
+> +                                    )
+> +                                if ip_block_max is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_IP_MAX", ip_block_max]
+> +                                    )
+> +                                if proto_min is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_PROTO_MIN", proto_min]
+> +                                    )
+> +                                if proto_max is not None:
+> +                                    natact["attrs"].append(
+> +                                        ["OVS_NAT_ATTR_PROTO_MAX", proto_max]
+> +                                    )
+> +
+> +                            for natscan in (
+> +                                ("persist", "OVS_NAT_ATTR_PERSISTENT"),
+> +                                ("hash", "OVS_NAT_ATTR_PROTO_HASH"),
+> +                                ("random", "OVS_NAT_ATTR_PROTO_RANDOM"),
+> +                            ):
+
+I think this is not taking into account the comma that separates ip:port from 
+these keywords. A possible solution would be to add it to the natscan (e.g: 
+s/persist/,persist/).
+
+> +                                if actstr.startswith(natscan[0]):
+> +                                    actstr = actstr[len(natscan[0]) :]
+> +                                    natact["attrs"].append([natscan[1], None])
+> +                                    actstr = actstr[strspn(actstr, ", ") :]
+> +
+> +                        ctact["attrs"].append(["OVS_CT_ATTR_NAT", natact])
+> +                        actstr = actstr[strspn(actstr, ",) ") :]
+>   
+>                   self["attrs"].append(["OVS_ACTION_ATTR_CT", ctact])
+>                   actstr = actstr[strspn(actstr, "), ") :]
+
+-- 
+Adrián Moreno
+
 
