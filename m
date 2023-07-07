@@ -1,371 +1,229 @@
-Return-Path: <netdev+bounces-16006-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16007-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C815774AEB5
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:26:38 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 50C0674AEBC
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 12:29:59 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7E8C0281718
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:26:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 81CDD1C20E38
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 10:29:58 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6E4C3BE6C;
-	Fri,  7 Jul 2023 10:26:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 64458BE77;
+	Fri,  7 Jul 2023 10:29:56 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5D38B20E0
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:26:35 +0000 (UTC)
-Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.133.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 6244518E
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 03:26:33 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688725592;
-	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
-	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
-	 content-transfer-encoding:content-transfer-encoding:
-	 in-reply-to:in-reply-to:references:references;
-	bh=l9uA3+6C8czFWrHbeU5PWZu0llUuglU6MsiOJc1L2uI=;
-	b=JTycZVgWH69HY2zFJYNhVf5cGVmwmagKK7gbgaSB6OCjsLR2UK4BQKhs6eOu8QUfhAeyLy
-	ASr1ce/JhBOS1LvG5RiZQDCoz7iSmbAho24ZDSichavgChI58AlUeVE38dG6iVA968FvfN
-	s09hJwyNxfk0F/tBZ8ycUFeQQJ/kLuo=
-Received: from mail-yb1-f198.google.com (mail-yb1-f198.google.com
- [209.85.219.198]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-258-W1BzUoFYP9O2sjPABSahYg-1; Fri, 07 Jul 2023 06:26:31 -0400
-X-MC-Unique: W1BzUoFYP9O2sjPABSahYg-1
-Received: by mail-yb1-f198.google.com with SMTP id 3f1490d57ef6-c5f4d445190so1743440276.0
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 03:26:31 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688725591; x=1691317591;
-        h=content-transfer-encoding:cc:to:subject:message-id:date:from
-         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=l9uA3+6C8czFWrHbeU5PWZu0llUuglU6MsiOJc1L2uI=;
-        b=JrHX+mH9F9sZtcxBxrzdbOpwZJC27X30dOSz0UhaT9P/uGoeOZZ9RuV8BYt53Fvgr8
-         sPlH/GWANGBFjLIztl1fDzUyXZt719pAbd17XVOhVcKmFiZiQgRZZeaR+PZAKJZS148b
-         Ji2yB3HnVpS5m1oqQoGzwYAsmmC5S9ZG0fylOmyc2gySIEeQUNzgUFOc5bDdbOTej2QD
-         n3f2ikaUWky40pWTrl5P/N7JPRf31mvxDj6CiFHZsZgqKKr5VYW5DRHrjJa7XlFvZ1DH
-         WSSwUWsEeovroEDXl6AJtlKo6/AkXUIgsrOnJF9vKS4+VQRLnLYuhVfkAknk4OGDHWET
-         Qmpg==
-X-Gm-Message-State: ABy/qLZLXN4V9G53aN+b9KJ3Qf+mE1yfGoUguE16qinPf2+CY4uPc5O/
-	r2+jwdC0thy7s/TXyqE7F7Y/pFHD7rvtMBZ/TLzK1dpuJQE7cmfFByM7GtcO1SU4M6AapmTBFky
-	o8SBK3Z4ZnjaSv7reRf38ApZZWsNP+kTQC9Dwkr+M
-X-Received: by 2002:a25:9d0d:0:b0:c5e:168c:72f8 with SMTP id i13-20020a259d0d000000b00c5e168c72f8mr3816547ybp.31.1688725590997;
-        Fri, 07 Jul 2023 03:26:30 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHFfR+HB16RaNn8E06+qB/HUi3xKPCzbR0jJx4SJpdKzJsTRsNQo/dOxZKtprgsX1KxB9yKeDaDkO95DqxRmpI=
-X-Received: by 2002:a25:9d0d:0:b0:c5e:168c:72f8 with SMTP id
- i13-20020a259d0d000000b00c5e168c72f8mr3816533ybp.31.1688725590714; Fri, 07
- Jul 2023 03:26:30 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 56B37BA2F
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 10:29:56 +0000 (UTC)
+Received: from relay3-d.mail.gandi.net (relay3-d.mail.gandi.net [217.70.183.195])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 013B5128
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 03:29:53 -0700 (PDT)
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+X-GND-Sasl: i.maximets@ovn.org
+Received: by mail.gandi.net (Postfix) with ESMTPSA id 718F660004;
+	Fri,  7 Jul 2023 10:29:50 +0000 (UTC)
+Message-ID: <6060b37e-579a-76cb-b853-023cb1a25861@ovn.org>
+Date: Fri, 7 Jul 2023 12:30:38 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230703142218.362549-1-eperezma@redhat.com> <20230703105022-mutt-send-email-mst@kernel.org>
- <CAJaqyWf2F_yBLBjj1RiPeJ92_zfq8BSMz8Pak2Vg6QinN8jS1Q@mail.gmail.com>
- <20230704063646-mutt-send-email-mst@kernel.org> <CAJaqyWfdPpkD5pY4tfzQdOscLBcrDBhBqzWjMbY_ZKsoyiqGdA@mail.gmail.com>
- <20230704114159-mutt-send-email-mst@kernel.org> <CACGkMEtWjOMtsbgQ2sx=e1BkuRSyDmVfXDccCm-QSiSbacQyCA@mail.gmail.com>
- <20230705043940-mutt-send-email-mst@kernel.org> <CACGkMEufNZGvWMN9Shh6NPOZOe-vf0RomfS1DX6DtxJjvO7fNA@mail.gmail.com>
- <CAJaqyWcqNkzJXxsoz_Lk_X0CvNW24Ay2Ki6q02EB8iR=qpwsfg@mail.gmail.com>
- <CACGkMEvDsZcyTDBhS8ekXHyv-kiipyHizewpM2+=0XgSYMsmbw@mail.gmail.com>
- <CACGkMEuKNXCSWWqDTZQpogHqT1K=rsQMFAYxL6OC8OL=XeU3-g@mail.gmail.com>
- <CAJaqyWdv_DFdxghHQPoUE4KZ7pqmaR__=JyHFONRuard3KBtSQ@mail.gmail.com> <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
-In-Reply-To: <CACGkMEsv3vyupAbmiq=MtQozq_7O=JKok9sB-Ka9A2PdEgNLag@mail.gmail.com>
-From: Eugenio Perez Martin <eperezma@redhat.com>
-Date: Fri, 7 Jul 2023 12:25:54 +0200
-Message-ID: <CAJaqyWfLFGGZa2Ue=n4cD3z329_z1p8Vr9X_ceBn+eBQ6LyjQw@mail.gmail.com>
-Subject: Re: [PATCH] vdpa: reject F_ENABLE_AFTER_DRIVER_OK if backend does not
- support it
-To: Jason Wang <jasowang@redhat.com>
-Cc: "Michael S. Tsirkin" <mst@redhat.com>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org, 
-	Shannon Nelson <shannon.nelson@amd.com>, virtualization@lists.linux-foundation.org, 
-	kvm@vger.kernel.org
-Content-Type: text/plain; charset="UTF-8"
-Content-Transfer-Encoding: quoted-printable
-X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.10.0
+Cc: i.maximets@ovn.org, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>, Eric Dumazet <edumazet@google.com>,
+ "David S. Miller" <davem@davemloft.net>, Adrian Moreno
+ <amorenoz@redhat.com>, Eelco Chaudron <echaudro@redhat.com>
+Content-Language: en-US
+To: Eric Garver <eric@garver.life>, Aaron Conole <aconole@redhat.com>,
+ netdev@vger.kernel.org, dev@openvswitch.org
+References: <20230629203005.2137107-1-eric@garver.life>
+ <20230629203005.2137107-3-eric@garver.life> <f7tr0plgpzb.fsf@redhat.com>
+ <ZKbITj-FWGqRkwtr@egarver-thinkpadt14sgen1.remote.csb>
+From: Ilya Maximets <i.maximets@ovn.org>
+Subject: Re: [ovs-dev] [PATCH net-next 2/2] net: openvswitch: add drop action
+In-Reply-To: <ZKbITj-FWGqRkwtr@egarver-thinkpadt14sgen1.remote.csb>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_LOW,RCVD_IN_MSPIKE_H3,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 7, 2023 at 9:57=E2=80=AFAM Jason Wang <jasowang@redhat.com> wro=
-te:
->
-> On Thu, Jul 6, 2023 at 5:39=E2=80=AFPM Eugenio Perez Martin <eperezma@red=
-hat.com> wrote:
-> >
-> > On Thu, Jul 6, 2023 at 10:03=E2=80=AFAM Jason Wang <jasowang@redhat.com=
-> wrote:
-> > >
-> > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFPM Jason Wang <jasowang@redhat.co=
-m> wrote:
-> > > >
-> > > > On Thu, Jul 6, 2023 at 3:06=E2=80=AFPM Eugenio Perez Martin <eperez=
-ma@redhat.com> wrote:
-> > > > >
-> > > > > On Thu, Jul 6, 2023 at 3:55=E2=80=AFAM Jason Wang <jasowang@redha=
-t.com> wrote:
-> > > > > >
-> > > > > > On Wed, Jul 5, 2023 at 4:41=E2=80=AFPM Michael S. Tsirkin <mst@=
-redhat.com> wrote:
-> > > > > > >
-> > > > > > > On Wed, Jul 05, 2023 at 03:49:58PM +0800, Jason Wang wrote:
-> > > > > > > > On Tue, Jul 4, 2023 at 11:45=E2=80=AFPM Michael S. Tsirkin =
-<mst@redhat.com> wrote:
-> > > > > > > > >
-> > > > > > > > > On Tue, Jul 04, 2023 at 01:36:11PM +0200, Eugenio Perez M=
-artin wrote:
-> > > > > > > > > > On Tue, Jul 4, 2023 at 12:38=E2=80=AFPM Michael S. Tsir=
-kin <mst@redhat.com> wrote:
-> > > > > > > > > > >
-> > > > > > > > > > > On Tue, Jul 04, 2023 at 12:25:32PM +0200, Eugenio Per=
-ez Martin wrote:
-> > > > > > > > > > > > On Mon, Jul 3, 2023 at 4:52=E2=80=AFPM Michael S. T=
-sirkin <mst@redhat.com> wrote:
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > On Mon, Jul 03, 2023 at 04:22:18PM +0200, Eugenio=
- P=C3=A9rez wrote:
-> > > > > > > > > > > > > > With the current code it is accepted as long as=
- userland send it.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Although userland should not set a feature flag=
- that has not been
-> > > > > > > > > > > > > > offered to it with VHOST_GET_BACKEND_FEATURES, =
-the current code will not
-> > > > > > > > > > > > > > complain for it.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Since there is no specific reason for any paren=
-t to reject that backend
-> > > > > > > > > > > > > > feature bit when it has been proposed, let's co=
-ntrol it at vdpa frontend
-> > > > > > > > > > > > > > level. Future patches may move this control to =
-the parent driver.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > Fixes: 967800d2d52e ("vdpa: accept VHOST_BACKEN=
-D_F_ENABLE_AFTER_DRIVER_OK backend feature")
-> > > > > > > > > > > > > > Signed-off-by: Eugenio P=C3=A9rez <eperezma@red=
-hat.com>
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > Please do send v3. And again, I don't want to sen=
-d "after driver ok" hack
-> > > > > > > > > > > > > upstream at all, I merged it in next just to give=
- it some testing.
-> > > > > > > > > > > > > We want RING_ACCESS_AFTER_KICK or some such.
-> > > > > > > > > > > > >
-> > > > > > > > > > > >
-> > > > > > > > > > > > Current devices do not support that semantic.
-> > > > > > > > > > >
-> > > > > > > > > > > Which devices specifically access the ring after DRIV=
-ER_OK but before
-> > > > > > > > > > > a kick?
-> > > > > > > > > > >
-> > > > > > > > > >
-> > > > > > > > > > Previous versions of the QEMU LM series did a spurious =
-kick to start
-> > > > > > > > > > traffic at the LM destination [1]. When it was proposed=
-, that spurious
-> > > > > > > > > > kick was removed from the series because to check for d=
-escriptors
-> > > > > > > > > > after driver_ok, even without a kick, was considered wo=
-rk of the
-> > > > > > > > > > parent driver.
-> > > > > > > > > >
-> > > > > > > > > > I'm ok to go back to this spurious kick, but I'm not su=
-re if the hw
-> > > > > > > > > > will read the ring before the kick actually. I can ask.
-> > > > > > > > > >
-> > > > > > > > > > Thanks!
-> > > > > > > > > >
-> > > > > > > > > > [1] https://lists.nongnu.org/archive/html/qemu-devel/20=
-23-01/msg02775.html
-> > > > > > > > >
-> > > > > > > > > Let's find out. We need to check for ENABLE_AFTER_DRIVER_=
-OK too, no?
-> > > > > > > >
-> > > > > > > > My understanding is [1] assuming ACCESS_AFTER_KICK. This se=
-ems
-> > > > > > > > sub-optimal than assuming ENABLE_AFTER_DRIVER_OK.
-> > > > > > > >
-> > > > > > > > But this reminds me one thing, as the thread is going too l=
-ong, I
-> > > > > > > > wonder if we simply assume ENABLE_AFTER_DRIVER_OK if RING_R=
-ESET is
-> > > > > > > > supported?
-> > > > > > > >
-> > > > > > > > Thanks
-> > > > > > >
-> > > > > > > I don't see what does one have to do with another ...
-> > > > > > >
-> > > > > > > I think with RING_RESET we had another solution, enable rings
-> > > > > > > mapping them to a zero page, then reset and re-enable later.
-> > > > > >
-> > > > > > As discussed before, this seems to have some problems:
-> > > > > >
-> > > > > > 1) The behaviour is not clarified in the document
-> > > > > > 2) zero is a valid IOVA
-> > > > > >
-> > > > >
-> > > > > I think we're not on the same page here.
-> > > > >
-> > > > > As I understood, rings mapped to a zero page means essentially an
-> > > > > avail ring whose avail_idx is always 0, offered to the device ins=
-tead
-> > > > > of the guest's ring. Once all CVQ commands are processed, we use
-> > > > > RING_RESET to switch to the right ring, being guest's or SVQ vrin=
-g.
-> > > >
-> > > > I get this. This seems more complicated in the destination: shadow =
-vq + ASID?
-> > >
-> > > So it's something like:
-> > >
-> > > 1) set all vq ASID to shadow virtqueue
-> > > 2) do not add any bufs to data qp (stick 0 as avail index)
-> > > 3) start to restore states via cvq
-> > > 4) ring_rest for dataqp
-> > > 5) set_vq_state for dataqp
-> > > 6) re-initialize dataqp address etc
-> > > 7) set data QP ASID to guest
-> > > 8) set queue_enable
-> > >
-> > > ?
-> > >
-> >
-> > I think the change of ASID is not needed, as the guest cannot access
-> > the device in that timeframe anyway.
->
-> Yes but after the restore, we still want to shadow cvq, so ASID is still =
-needed?
->
+On 7/6/23 15:57, Eric Garver wrote:
+> On Thu, Jul 06, 2023 at 08:54:16AM -0400, Aaron Conole wrote:
+>> Eric Garver <eric@garver.life> writes:
+>>
+>>> This adds an explicit drop action. This is used by OVS to drop packets
+>>> for which it cannot determine what to do. An explicit action in the
+>>> kernel allows passing the reason _why_ the packet is being dropped. We
+>>> can then use perf tracing to match on the drop reason.
+>>>
+>>> e.g. trace all OVS dropped skbs
+>>>
+>>>  # perf trace -e skb:kfree_skb --filter="reason >= 0x30000"
+>>>  [..]
+>>>  106.023 ping/2465 skb:kfree_skb(skbaddr: 0xffffa0e8765f2000, \
+>>>   location:0xffffffffc0d9b462, protocol: 2048, reason: 196610)
+>>>
+>>> reason: 196610 --> 0x30002 (OVS_XLATE_RECURSION_TOO_DEEP)
+>>>
+>>> Signed-off-by: Eric Garver <eric@garver.life>
+>>> ---
+>>>  include/uapi/linux/openvswitch.h                    |  2 ++
+>>>  net/openvswitch/actions.c                           | 13 +++++++++++++
+>>>  net/openvswitch/flow_netlink.c                      | 12 +++++++++++-
+>>>  .../testing/selftests/net/openvswitch/ovs-dpctl.py  |  3 +++
+>>>  4 files changed, 29 insertions(+), 1 deletion(-)
+>>>
+>>> diff --git a/include/uapi/linux/openvswitch.h b/include/uapi/linux/openvswitch.h
+>>> index e94870e77ee9..a967dbca3574 100644
+>>> --- a/include/uapi/linux/openvswitch.h
+>>> +++ b/include/uapi/linux/openvswitch.h
+>>> @@ -965,6 +965,7 @@ struct check_pkt_len_arg {
+>>>   * start of the packet or at the start of the l3 header depending on the value
+>>>   * of l3 tunnel flag in the tun_flags field of OVS_ACTION_ATTR_ADD_MPLS
+>>>   * argument.
+>>> + * @OVS_ACTION_ATTR_DROP: Explicit drop action.
+>>>   *
+>>>   * Only a single header can be set with a single %OVS_ACTION_ATTR_SET.  Not all
+>>>   * fields within a header are modifiable, e.g. the IPv4 protocol and fragment
+>>> @@ -1002,6 +1003,7 @@ enum ovs_action_attr {
+>>>  	OVS_ACTION_ATTR_CHECK_PKT_LEN, /* Nested OVS_CHECK_PKT_LEN_ATTR_*. */
+>>>  	OVS_ACTION_ATTR_ADD_MPLS,     /* struct ovs_action_add_mpls. */
+>>>  	OVS_ACTION_ATTR_DEC_TTL,      /* Nested OVS_DEC_TTL_ATTR_*. */
+>>> +	OVS_ACTION_ATTR_DROP,         /* u32 xlate_error. */
+>>>  
+>>>  	__OVS_ACTION_ATTR_MAX,	      /* Nothing past this will be accepted
+>>>  				       * from userspace. */
+>>> diff --git a/net/openvswitch/actions.c b/net/openvswitch/actions.c
+>>> index cab1e02b63e0..4ad9a45dc042 100644
+>>> --- a/net/openvswitch/actions.c
+>>> +++ b/net/openvswitch/actions.c
+>>> @@ -32,6 +32,7 @@
+>>>  #include "vport.h"
+>>>  #include "flow_netlink.h"
+>>>  #include "openvswitch_trace.h"
+>>> +#include "drop.h"
+>>>  
+>>>  struct deferred_action {
+>>>  	struct sk_buff *skb;
+>>> @@ -1477,6 +1478,18 @@ static int do_execute_actions(struct datapath *dp, struct sk_buff *skb,
+>>>  				return dec_ttl_exception_handler(dp, skb,
+>>>  								 key, a);
+>>>  			break;
+>>> +
+>>> +		case OVS_ACTION_ATTR_DROP:
+>>> +			u32 reason = nla_get_u32(a);
+>>> +
+>>> +			reason |= SKB_DROP_REASON_SUBSYS_OPENVSWITCH <<
+>>> +					SKB_DROP_REASON_SUBSYS_SHIFT;
+>>> +
+>>> +			if (reason == OVS_XLATE_OK)
+>>> +				break;
+>>> +
+>>> +			kfree_skb_reason(skb, reason);
+>>> +			return 0;
+>>>  		}
+>>>  
+>>>  		if (unlikely(err)) {
+>>> diff --git a/net/openvswitch/flow_netlink.c b/net/openvswitch/flow_netlink.c
+>>> index 41116361433d..23d39eae9a0d 100644
+>>> --- a/net/openvswitch/flow_netlink.c
+>>> +++ b/net/openvswitch/flow_netlink.c
+>>> @@ -39,6 +39,7 @@
+>>>  #include <net/erspan.h>
+>>>  
+>>>  #include "flow_netlink.h"
+>>> +#include "drop.h"
+>>>  
+>>>  struct ovs_len_tbl {
+>>>  	int len;
+>>> @@ -61,6 +62,7 @@ static bool actions_may_change_flow(const struct nlattr *actions)
+>>>  		case OVS_ACTION_ATTR_RECIRC:
+>>>  		case OVS_ACTION_ATTR_TRUNC:
+>>>  		case OVS_ACTION_ATTR_USERSPACE:
+>>> +		case OVS_ACTION_ATTR_DROP:
+>>>  			break;
+>>>  
+>>>  		case OVS_ACTION_ATTR_CT:
+>>> @@ -2394,7 +2396,7 @@ static void ovs_nla_free_nested_actions(const struct nlattr *actions, int len)
+>>>  	/* Whenever new actions are added, the need to update this
+>>>  	 * function should be considered.
+>>>  	 */
+>>> -	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 23);
+>>> +	BUILD_BUG_ON(OVS_ACTION_ATTR_MAX != 24);
+>>>  
+>>>  	if (!actions)
+>>>  		return;
+>>> @@ -3182,6 +3184,7 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+>>>  			[OVS_ACTION_ATTR_CHECK_PKT_LEN] = (u32)-1,
+>>>  			[OVS_ACTION_ATTR_ADD_MPLS] = sizeof(struct ovs_action_add_mpls),
+>>>  			[OVS_ACTION_ATTR_DEC_TTL] = (u32)-1,
+>>> +			[OVS_ACTION_ATTR_DROP] = sizeof(u32),
+>>>  		};
+>>>  		const struct ovs_action_push_vlan *vlan;
+>>>  		int type = nla_type(a);
+>>> @@ -3453,6 +3456,13 @@ static int __ovs_nla_copy_actions(struct net *net, const struct nlattr *attr,
+>>>  			skip_copy = true;
+>>>  			break;
+>>>  
+>>> +		case OVS_ACTION_ATTR_DROP:
+>>> +			if (nla_get_u32(a) >=
+>>> +			    u32_get_bits(OVS_XLATE_MAX,
+>>> +					 ~SKB_DROP_REASON_SUBSYS_MASK))
+>>> +				return -EINVAL;
+>>> +			break;
+>>> +
+>>
+>> If there's a case where the userspace sends a drop reason that isn't
+>> known to the kernel, we will reject the flow, and the only "close" drop
+>> will be OVS_XLATE_OK, which would be wrong.  Is there a reason to do
+>> this?  For example, userspace might get new support for some kind of
+>> flows and during that time might have a new xlate drop reason.  Maybe we
+>> can have a reason code that OVS knows will exist, so that if this fails,
+>> it can at least fall back to that?
+> 
+> You're correct. It will reject the flow.
+> 
+> Maybe we clamp the value to OVS_XLATE_MAX if it's unknown. That makes
+> the skb drop reason less helpful, but no less helpful than today ;). At
+> least we won't reject the flow.
+> 
+> We could alias OVS_XLATE_MAX to OVS_XLATE_UNKNOWN. I prefer an explicit
+> value for OVS_XLATE_UNKNOWN, e.g. (u16)-1.
 
-Device or parent driver support for ASID is needed to shadow only CVQ.
-Bue the device may not support the switch of ASID after DRIVER_OK.
+A wild idea:  How about we do not define actual reasons?  i.e. define a
+subsystem and just call kfree_skb_reason(skb, SUBSYSTEM | value), where
+'value' is whatever userspace gives as long as it is within a subsystem
+range?
 
-Since dataplane can go in passthrough ASID all the time, we don't need
-to switch it after DRIVER_OK.
+The point is: drop reasons are not part of the uAPI, but by defining drop
+reasons for openvswitch we're making this subset of drop reasons part of
+the uAPI.  And that seems a bit shady.  Users can't really rely on
+actual values of drop reasons anyway, because the subsystem offset will
+not be part of the uAPI.  And it doesn't matter if they need to get them
+from the kernel binary or from the userspace OVS binary.
 
-> Thanks
->
-> > Moreover, it may require HW
-> > support. So steps 1 and 7 are not needed.
-> >
-> > Apart from that, the process is right.
-> >
-> >
-> > > Thanks
-> > >
-> > > >
-> > > > Thanks
-> > > >
-> > > > >
-> > > > >
-> > > > >
-> > > > > > Thanks
-> > > > > >
-> > > > > > >
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > >
-> > > > > > > > > > > > My plan was to convert
-> > > > > > > > > > > > it in vp_vdpa if needed, and reuse the current vdpa=
- ops. Sorry if I
-> > > > > > > > > > > > was not explicit enough.
-> > > > > > > > > > > >
-> > > > > > > > > > > > The only solution I can see to that is to trap & em=
-ulate in the vdpa
-> > > > > > > > > > > > (parent?) driver, as talked in virtio-comment. But =
-that complicates
-> > > > > > > > > > > > the architecture:
-> > > > > > > > > > > > * Offer VHOST_BACKEND_F_RING_ACCESS_AFTER_KICK
-> > > > > > > > > > > > * Store vq enable state separately, at
-> > > > > > > > > > > > vdpa->config->set_vq_ready(true), but not transmit =
-that enable to hw
-> > > > > > > > > > > > * Store the doorbell state separately, but do not c=
-onfigure it to the
-> > > > > > > > > > > > device directly.
-> > > > > > > > > > > >
-> > > > > > > > > > > > But how to recover if the device cannot configure t=
-hem at kick time,
-> > > > > > > > > > > > for example?
-> > > > > > > > > > > >
-> > > > > > > > > > > > Maybe we can just fail if the parent driver does no=
-t support enabling
-> > > > > > > > > > > > the vq after DRIVER_OK? That way no new feature fla=
-g is needed.
-> > > > > > > > > > > >
-> > > > > > > > > > > > Thanks!
-> > > > > > > > > > > >
-> > > > > > > > > > > > >
-> > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > > Sent with Fixes: tag pointing to git.kernel.org=
-/pub/scm/linux/kernel/git/mst
-> > > > > > > > > > > > > > commit. Please let me know if I should send a v=
-3 of [1] instead.
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > [1] https://lore.kernel.org/lkml/20230609121244=
--mutt-send-email-mst@kernel.org/T/
-> > > > > > > > > > > > > > ---
-> > > > > > > > > > > > > >  drivers/vhost/vdpa.c | 7 +++++--
-> > > > > > > > > > > > > >  1 file changed, 5 insertions(+), 2 deletions(-=
-)
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > > diff --git a/drivers/vhost/vdpa.c b/drivers/vho=
-st/vdpa.c
-> > > > > > > > > > > > > > index e1abf29fed5b..a7e554352351 100644
-> > > > > > > > > > > > > > --- a/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > > +++ b/drivers/vhost/vdpa.c
-> > > > > > > > > > > > > > @@ -681,18 +681,21 @@ static long vhost_vdpa_un=
-locked_ioctl(struct file *filep,
-> > > > > > > > > > > > > >  {
-> > > > > > > > > > > > > >       struct vhost_vdpa *v =3D filep->private_d=
-ata;
-> > > > > > > > > > > > > >       struct vhost_dev *d =3D &v->vdev;
-> > > > > > > > > > > > > > +     const struct vdpa_config_ops *ops =3D v->=
-vdpa->config;
-> > > > > > > > > > > > > >       void __user *argp =3D (void __user *)arg;
-> > > > > > > > > > > > > >       u64 __user *featurep =3D argp;
-> > > > > > > > > > > > > > -     u64 features;
-> > > > > > > > > > > > > > +     u64 features, parent_features =3D 0;
-> > > > > > > > > > > > > >       long r =3D 0;
-> > > > > > > > > > > > > >
-> > > > > > > > > > > > > >       if (cmd =3D=3D VHOST_SET_BACKEND_FEATURES=
-) {
-> > > > > > > > > > > > > >               if (copy_from_user(&features, fea=
-turep, sizeof(features)))
-> > > > > > > > > > > > > >                       return -EFAULT;
-> > > > > > > > > > > > > > +             if (ops->get_backend_features)
-> > > > > > > > > > > > > > +                     parent_features =3D ops->=
-get_backend_features(v->vdpa);
-> > > > > > > > > > > > > >               if (features & ~(VHOST_VDPA_BACKE=
-ND_FEATURES |
-> > > > > > > > > > > > > >                                BIT_ULL(VHOST_BA=
-CKEND_F_SUSPEND) |
-> > > > > > > > > > > > > >                                BIT_ULL(VHOST_BA=
-CKEND_F_RESUME) |
-> > > > > > > > > > > > > > -                              BIT_ULL(VHOST_BA=
-CKEND_F_ENABLE_AFTER_DRIVER_OK)))
-> > > > > > > > > > > > > > +                              parent_features)=
-)
-> > > > > > > > > > > > > >                       return -EOPNOTSUPP;
-> > > > > > > > > > > > > >               if ((features & BIT_ULL(VHOST_BAC=
-KEND_F_SUSPEND)) &&
-> > > > > > > > > > > > > >                    !vhost_vdpa_can_suspend(v))
-> > > > > > > > > > > > > > --
-> > > > > > > > > > > > > > 2.39.3
-> > > > > > > > > > > > >
-> > > > > > > > > > >
-> > > > > > > > >
-> > > > > > >
-> > > > > >
-> > > > >
-> > >
-> >
->
+So, it might be cleaner to not define them in the first place.  Thoughts?
 
+CC: kernel maintainers
+
+Best regards, Ilya Maximets.
 
