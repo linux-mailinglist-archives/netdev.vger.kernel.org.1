@@ -1,95 +1,106 @@
-Return-Path: <netdev+bounces-16160-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16161-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3233B74B9CE
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 01:10:58 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 85DB174B9FB
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 01:19:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 1299128195C
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 23:10:56 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 424BC1C210DA
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 23:19:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 37FED17ADB;
-	Fri,  7 Jul 2023 23:10:54 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 1F3F317FE5;
+	Fri,  7 Jul 2023 23:19:28 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 43CCF17AD3
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 23:10:51 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 65D18C433C8;
-	Fri,  7 Jul 2023 23:10:51 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688771451;
-	bh=epNAr2DDyGPShAjRJk+xhNsNY5DucIhhIQhO0oT11n4=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=YOzvootFxD46KcjzgYrtI2oxMbaSldAb75HMTQdUCLpDzul5OTrFWcH1CGmcfMwBZ
-	 pbZeyIc4tkoY4udUKoiIop3n+IDcu23uzomggPH8iypEASs8GGNDc49LwAQcqpkKM8
-	 JtUUXhU7QsMuvPokTSfZC3iegHb/9l2EAAml232xt1rZuqHg6E1LppiKm3ZrWivA3m
-	 6hIHpF1F9sux+gOVX8BlTagqYkOUPl4ZLwoKiy583hM6eu4M+VsVt9Cp49f9D4Z1m2
-	 oVXmTvzq6qG7C6ui8Iih9aWdTpmemfvTrrq6iJBx/vGJsQp1ts+F2ZpeIaGxrD2GSj
-	 YOviVzQzXjLFg==
-Date: Fri, 7 Jul 2023 16:10:50 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Breno Leitao <leitao@debian.org>
-Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet
- <edumazet@google.com>, Paolo Abeni <pabeni@redhat.com>, Jonathan Corbet
- <corbet@lwn.net>, sergey.senozhatsky@gmail.com, pmladek@suse.com,
- tj@kernel.org, stephen@networkplumber.org, Dave Jones
- <davej@codemonkey.org.uk>, netdev@vger.kernel.org (open list:NETWORKING
- [GENERAL]), linux-doc@vger.kernel.org (open list:DOCUMENTATION),
- linux-kernel@vger.kernel.org (open list)
-Subject: Re: [PATCH v2] netconsole: Append kernel version to message
-Message-ID: <20230707161050.61ec46a8@kernel.org>
-In-Reply-To: <20230707132911.2033870-1-leitao@debian.org>
-References: <20230707132911.2033870-1-leitao@debian.org>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09BF92F28
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 23:19:27 +0000 (UTC)
+Received: from mail-pf1-f169.google.com (mail-pf1-f169.google.com [209.85.210.169])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1726C1FF9
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 16:19:24 -0700 (PDT)
+Received: by mail-pf1-f169.google.com with SMTP id d2e1a72fcca58-6686708c986so1989033b3a.0
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 16:19:24 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688771964; x=1691363964;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=9Q03hEYj8PS8pSjA/d96lqRNMExS5ZCZbqQ5e1bfGn0=;
+        b=N+Vpy9C4+uwbgiaT/HRh2W9Y4Hm1/hm8UM1FClMW/3eJXo89rY5rE0Ke/wCCxCdmYO
+         IwQ3NTv7mh/dCA3ZOlr1rxEiT8zPFdZYubddlR7EXa9jTxSaVKieTVU1Vw8NZl8u0EFJ
+         dtUK1ER1UYz3rNy2Al6iavTjgIOfFjdQUASEIFO90JIGERndoWkq+QvTlBdM9CBtz7Ja
+         JtjLgjJyP6Y5dE9CtX++XIF/qm4ewI9ZxuoKMV6PzTB6bQHmSNzzdXBEcz8m+lZVW1wH
+         YYj+1Gi5i+EGqcZbnQv4gl42f/f8+MIAiJgiOJTK+49mYluCG6OkeMXJXXIiY6m5H51n
+         yFpg==
+X-Gm-Message-State: ABy/qLbr9oFh2JJHYi/2IVbL0RU0hYDPU87KIlPKC+PnUbzR9L9HSpCn
+	DhIsKp0xWceTyDjT5jwr+twXaNs/WFBZpehCOdir0w==
+X-Google-Smtp-Source: APBJJlHdtp0F7BvrZimD7Rod63Rgcvus89CJl1q4+GwzKoN7cYejUG6CpdeRXXxEI4oWSn7ZA2W4KII/6SyPcZpOPUk=
+X-Received: by 2002:a05:6a00:2307:b0:67e:18c6:d2c6 with SMTP id
+ h7-20020a056a00230700b0067e18c6d2c6mr7621889pfh.5.1688771964092; Fri, 07 Jul
+ 2023 16:19:24 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230706145154.2517870-1-jforbes@fedoraproject.org>
+ <20230706084433.5fa44d4c@kernel.org> <CAFbkSA0wW-tQ_b_GF3z2JqtO4hc0c+1gcbcyTcgjYbQBsEYLyA@mail.gmail.com>
+ <20230707151206.137d3a94@kernel.org>
+In-Reply-To: <20230707151206.137d3a94@kernel.org>
+From: Justin Forbes <jforbes@fedoraproject.org>
+Date: Fri, 7 Jul 2023 17:19:12 -0600
+Message-ID: <CAFxkdApnEo8RPOQ3zVjAZBeTtH2UbaT2798gQ5w0SA5e-dtZng@mail.gmail.com>
+Subject: Re: [PATCH] Move rmnet out of NET_VENDOR_QUALCOMM dependency
+To: Jakub Kicinski <kuba@kernel.org>
+Cc: "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
+	Paolo Abeni <pabeni@redhat.com>, Jacob Keller <jacob.e.keller@intel.com>, 
+	Andrew Lunn <andrew@lunn.ch>, netdev@vger.kernel.org, linux-kernel@vger.kernel.org
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-1.7 required=5.0 tests=BAYES_00,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
+	autolearn=no autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri,  7 Jul 2023 06:29:11 -0700 Breno Leitao wrote:
-> Create a new netconsole runtime option that prepends the kernel version in
-> the netconsole message. This is useful to map kernel messages to kernel
-> version in a simple way, i.e., without checking somewhere which kernel
-> version the host that sent the message is using.
-> 
-> If this option is selected, then the "<release>," is prepended before the
-> netconsole message. This is an example of a netconsole output, with
-> release feature enabled:
-> 
-> 	6.4.0-01762-ga1ba2ffe946e;12,426,112883998,-;this is a test
-> 
-> Calvin Owens send a RFC about this problem in 2016[1], but his
-> approach was a bit more intrusive, changing the printk subsystem. This
-> approach is lighter, and just append the information in the last mile,
-> just before netconsole push the message to netpoll.
-> 
-> [1] Link: https://lore.kernel.org/all/51047c0f6e86abcb9ee13f60653b6946f8fcfc99.1463172791.git.calvinowens@fb.com/
-> 
-> Cc: Dave Jones <davej@codemonkey.org.uk>
-> Signed-off-by: Breno Leitao <leitao@debian.org>
+On Fri, Jul 7, 2023 at 4:12=E2=80=AFPM Jakub Kicinski <kuba@kernel.org> wro=
+te:
+>
+> On Fri, 7 Jul 2023 11:50:16 -0500 Justin Forbes wrote:
+> > > On Thu,  6 Jul 2023 09:51:52 -0500 Justin M. Forbes wrote:
+> > > > The rmnet driver is useful for chipsets that are not hidden behind
+> > > > NET_VENDOR_QUALCOMM.  Move sourcing the rmnet Kconfig outside of th=
+e if
+> > > > NET_VENDOR_QUALCOMM as there is no dependency here.
+> > > >
+> > > > Signed-off-by: Justin M. Forbes <jforbes@fedoraproject.org>
+> > >
+> > > Examples of the chipsets you're talking about would be great to have =
+in
+> > > the commit message.
+> >
+> > The user in the Fedora bug was using mhi_net with qmi_wwan.
+>
+> Hm, if anything mhi_net should not be sitting directly in drivers/net/
+>
+> I don't think this is a change in the right direction, just enable
+> VENDOR_QUALCOMM? Or am I missing something?
 
-Looks good! net-next is closed for the duration of the merge window 
-so you'll need to repost next week, and please put [PATCH net-next v3]
-as the subject prefix while at it.
+Enabling it is not a problem, but it seems that if devices not hidden
+behind VENDOR_QUALCOMM are able to use rmnet, then it is incorrect for
+rmnet to be hidden behind VENDOR_QUALCOMM. I have already enabled
+everything for Fedora users, so I am not worried about how to support
+my users, just a matter of correctness, and the fact that Kconfig deps
+are more difficult for people to understand in general.   Someone
+reading online hears they need to turn on rmnet, so they add an entry
+for it, and don't realize that the entry is ignored because
+VENDOR_QUALCOMM is not enabled.  Either all devices capable of using
+rmnet should be hidden behind VENDOR_QUALCOMM or rmnet should not be.
 
-> @@ -332,6 +350,11 @@ static ssize_t enabled_store(struct config_item *item,
->  	}
->  
->  	if (enabled) {	/* true */
-> +		if (nt->release && !nt->extended) {
-> +			pr_err("release feature requires extended log message\n");
-> +			goto out_unlock;
-> +		}
-
-This is the only bit that gave me pause - when parsing the command line
-you ignore release if extended is not set (with an error/warning).
-Does it make sense to be consistent and do the same thing here? 
-Or enabling at runtime is fundamentally different?
+Justin
 
