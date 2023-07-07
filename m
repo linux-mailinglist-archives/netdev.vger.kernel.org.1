@@ -1,110 +1,203 @@
-Return-Path: <netdev+bounces-16156-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16157-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 734AC74B975
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 00:20:31 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id BE6C274B977
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 00:22:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id BE96B2817CA
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 22:20:29 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E96151C210EA
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 22:22:42 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id C5FAE17ADF;
-	Fri,  7 Jul 2023 22:20:27 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F21B117FE7;
+	Fri,  7 Jul 2023 22:22:30 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
+Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 273CC17ACF
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 22:20:25 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id 4007EC433C7;
-	Fri,  7 Jul 2023 22:20:25 +0000 (UTC)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688768425;
-	bh=V6mWHSuijLWaOg8M372s0HWlisfuFF180RFFb2O8Bt8=;
-	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
-	b=UbgFK85PCU+dfkK2T34t+04/xA+3Z7+9buUHlgKST7gMun7AFrtafCIuvWNJ5vunb
-	 Z/NX2uc/a1452Yrd0NJn+O0zCtd/zLLw11tACZl6HGjh52gSfVYhTh3DoN+rHMKS3h
-	 /usl3glPlvcQpube8L2UbVHXllxfGFbGEx1i8WLbrD3XskMKgbar9SHCYruzJQGQCf
-	 CNa9RThNvx9gr8g9eiNIdBq+ILO0nLfd8X9IGrglXZj8wQfG8X01zbvYmy8a6wQwqv
-	 zl3CZDINXBJTjKC5PSSWgZSr1ijq0dqGl+u5WSftfh0G1pOJ3mg9ZsN1ntpB7JZYe7
-	 MREWILO0YBTvg==
-Date: Fri, 7 Jul 2023 15:20:24 -0700
-From: Jakub Kicinski <kuba@kernel.org>
-To: Junfeng Guo <junfeng.guo@intel.com>
-Cc: netdev@vger.kernel.org, jeroendb@google.com, pkaligineedi@google.com,
- shailend@google.com, haiyue.wang@intel.com, awogbemila@google.com,
- davem@davemloft.net, pabeni@redhat.com, yangchun@google.com,
- edumazet@google.com, csully@google.com
-Subject: Re: [PATCH net] gve: unify driver name usage
-Message-ID: <20230707152024.0807c5ba@kernel.org>
-In-Reply-To: <20230707103710.3946651-1-junfeng.guo@intel.com>
-References: <20230707103710.3946651-1-junfeng.guo@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E4E0617ACA
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 22:22:30 +0000 (UTC)
+Received: from mail-lj1-x231.google.com (mail-lj1-x231.google.com [IPv6:2a00:1450:4864:20::231])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 537062125
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 15:22:27 -0700 (PDT)
+Received: by mail-lj1-x231.google.com with SMTP id 38308e7fff4ca-2b708e49059so34584551fa.3
+        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 15:22:27 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=joelfernandes.org; s=google; t=1688768545; x=1691360545;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=00HfUo8YcXDv95ABX4BX2QfGk15awNjnmrspcBnuyYI=;
+        b=S1i7GsgZS6/9vByJU1h9vaPxX6EfILktPvazZWP5Wsw3CH9mTfB2qSik2nthVCjVcH
+         dhKZHhoDxrcL3PiB9drM2KpAFU2A0aXDLxFLU1aTmDKKzbg6lZjFobaP2dcbg7nPvqgq
+         BkHbFpM4arUw2jbAEns8E4g+OGETlDhouCwVE=
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688768545; x=1691360545;
+        h=content-transfer-encoding:cc:to:subject:message-id:date:from
+         :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=00HfUo8YcXDv95ABX4BX2QfGk15awNjnmrspcBnuyYI=;
+        b=gisW7b28DIL7aCndPS2TV58qbh+WJjVgHzF8fhlzr6HKUCB3Pi8NcCr1xHZXhBFjgl
+         H0FjaTqi0Px+6uYXIP4VusAm/x4zdHiPcryJSq1/nFmn3bxrI5+XzDgKaPC1d2+DalvB
+         4T/GoxCB/2eNf882JCPwwH6LwVZC59FQoy19rfaTQz0PgqEsZfblDhp5mG13e/PlNtT9
+         gDXbM1SEG2bXywa90IzF8+atgvAY1wtA94170sZQ2aXLzbk7g4NPLDwd45E0jzmYChVf
+         CeG55Ls9yrXRceY2FMVNDxtBSQB+WBXJilorLD/wiV8jPbTsQuCGBc9WMeJ8QLTU4Q3p
+         yHrQ==
+X-Gm-Message-State: ABy/qLb/m0H+9rQah9XNjRFYntVm47n0nGnifUildA01y/8AJUDa3bSD
+	JC0d5IKjCkpiUWLDjJWpTYu02BuNIo43IfXaVDwVdg==
+X-Google-Smtp-Source: APBJJlGTfh3AMzN+1kdBePEo+sjnOFVyLZ+VfqZo0TJaDLXkoafqQ6YreSHG/oLP8hvr6qZ9xVkcY4QZq4PnYX82CO4=
+X-Received: by 2002:a2e:9d16:0:b0:2b6:e2cd:20f5 with SMTP id
+ t22-20020a2e9d16000000b002b6e2cd20f5mr4795299lji.9.1688768545324; Fri, 07 Jul
+ 2023 15:22:25 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Type: text/plain; charset=US-ASCII
-Content-Transfer-Encoding: 7bit
+References: <20230706033447.54696-1-alexei.starovoitov@gmail.com>
+ <20230706033447.54696-10-alexei.starovoitov@gmail.com> <fe733a7b-3775-947a-23c0-0dadacabdca2@huaweicloud.com>
+ <CAADnVQJ3mNnzKEohRhYfAhBtB6R2Gh9dHAyqSJ5BU5ke+NTVuw@mail.gmail.com>
+ <4e0765b7-9054-a33d-8b1e-c986df353848@huaweicloud.com> <CAADnVQJhrbTtuBfexE6NPA6q=cdh1vVxfVQ73ZR2u8ZZWRb+wA@mail.gmail.com>
+ <224322d6-28d3-f3b7-fcac-463e5329a082@huaweicloud.com> <CAADnVQL5O5uzy=sewNJ=NFSGV7JTb3ONHR=V2kWiT1YdN=ax8g@mail.gmail.com>
+ <3f72c4e7-340f-4374-9ebe-f9bffd08c755@paulmck-laptop>
+In-Reply-To: <3f72c4e7-340f-4374-9ebe-f9bffd08c755@paulmck-laptop>
+From: Joel Fernandes <joel@joelfernandes.org>
+Date: Fri, 7 Jul 2023 18:22:13 -0400
+Message-ID: <CAEXW_YRzJQvX+GVR0+jSDiL9phNgf1-NzH+B7UaCVtGBVT18Yg@mail.gmail.com>
+Subject: Re: [PATCH v4 bpf-next 09/14] bpf: Allow reuse from
+ waiting_for_gp_ttrace list.
+To: paulmck@kernel.org
+Cc: Alexei Starovoitov <alexei.starovoitov@gmail.com>, Hou Tao <houtao@huaweicloud.com>, 
+	Tejun Heo <tj@kernel.org>, rcu@vger.kernel.org, 
+	Network Development <netdev@vger.kernel.org>, bpf <bpf@vger.kernel.org>, 
+	Kernel Team <kernel-team@fb.com>, Daniel Borkmann <daniel@iogearbox.net>, 
+	Andrii Nakryiko <andrii@kernel.org>, David Vernet <void@manifault.com>
+Content-Type: text/plain; charset="UTF-8"
+Content-Transfer-Encoding: quoted-printable
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=unavailable autolearn_force=no version=3.4.6
+X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
+	lindbergh.monkeyblade.net
 
-On Fri,  7 Jul 2023 18:37:10 +0800 Junfeng Guo wrote:
-> Current codebase contained the usage of two different names for this
-> driver (i.e., `gvnic` and `gve`), which is quite unfriendly for users
-> to use, especially when trying to bind or unbind the driver manually.
-> The corresponding kernel module is registered with the name of `gve`.
-> It's more reasonable to align the name of the driver with the module.
-> 
-> Fixes: 893ce44df565 ("gve: Add basic driver framework for Compute Engine Virtual NIC")
-> Cc: csully@google.com
-> Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
+On Fri, Jul 7, 2023 at 1:47=E2=80=AFPM Paul E. McKenney <paulmck@kernel.org=
+> wrote:
+>
+> On Fri, Jul 07, 2023 at 09:11:22AM -0700, Alexei Starovoitov wrote:
+> > On Thu, Jul 6, 2023 at 9:37=E2=80=AFPM Hou Tao <houtao@huaweicloud.com>=
+ wrote:
+> > >
+> > > Hi,
+> > >
+> > > On 7/7/2023 12:16 PM, Alexei Starovoitov wrote:
+> > > > On Thu, Jul 6, 2023 at 8:39=E2=80=AFPM Hou Tao <houtao@huaweicloud.=
+com> wrote:
+> > > >> Hi,
+> > > >>
+> > > >> On 7/7/2023 10:12 AM, Alexei Starovoitov wrote:
+> > > >>> On Thu, Jul 6, 2023 at 7:07=E2=80=AFPM Hou Tao <houtao@huaweiclou=
+d.com> wrote:
+> > > >>>> Hi,
+> > > >>>>
+> > > >>>> On 7/6/2023 11:34 AM, Alexei Starovoitov wrote:
+> > > >>>>
+> > > SNIP
+> > > >>> and it's not just waiting_for_gp_ttrace. free_by_rcu_ttrace is si=
+milar.
+> > > >> I think free_by_rcu_ttrace is different, because the reuse is only
+> > > >> possible after one tasks trace RCU grace period as shown below, an=
+d the
+> > > >> concurrent llist_del_first() must have been completed when the hea=
+d is
+> > > >> reused and re-added into free_by_rcu_ttrace again.
+> > > >>
+> > > >> // c0->free_by_rcu_ttrace
+> > > >> A -> B -> C -> nil
+> > > >>
+> > > >> P1:
+> > > >> alloc_bulk()
+> > > >>     llist_del_first(&c->free_by_rcu_ttrace)
+> > > >>         entry =3D A
+> > > >>         next =3D B
+> > > >>
+> > > >> P2:
+> > > >> do_call_rcu_ttrace()
+> > > >>     // c->free_by_rcu_ttrace->first =3D NULL
+> > > >>     llist_del_all(&c->free_by_rcu_ttrace)
+> > > >>         move to c->waiting_for_gp_ttrace
+> > > >>
+> > > >> P1:
+> > > >> llist_del_first()
+> > > >>     return NULL
+> > > >>
+> > > >> // A is only reusable after one task trace RCU grace
+> > > >> // llist_del_first() must have been completed
+> > > > "must have been completed" ?
+> > > >
+> > > > I guess you're assuming that alloc_bulk() from irq_work
+> > > > is running within rcu_tasks_trace critical section,
+> > > > so __free_rcu_tasks_trace() callback will execute after
+> > > > irq work completed?
+> > > > I don't think that's the case.
+> > >
+> > > Yes. The following is my original thoughts. Correct me if I was wrong=
+:
+> > >
+> > > 1. llist_del_first() must be running concurrently with llist_del_all(=
+).
+> > > If llist_del_first() runs after llist_del_all(), it will return NULL
+> > > directly.
+> > > 2. call_rcu_tasks_trace() must happen after llist_del_all(), else the
+> > > elements in free_by_rcu_ttrace will not be freed back to slab.
+> > > 3. call_rcu_tasks_trace() will wait for one tasks trace RCU grace per=
+iod
+> > > to call __free_rcu_tasks_trace()
+> > > 4. llist_del_first() in running in an context with irq-disabled, so t=
+he
+> > > tasks trace RCU grace period will wait for the end of llist_del_first=
+()
+> > >
+> > > It seems you thought step 4) is not true, right ?
+> >
+> > Yes. I think so. For two reasons:
+> >
+> > 1.
+> > I believe irq disabled region isn't considered equivalent
+> > to rcu_read_lock_trace() region.
+> >
+> > Paul,
+> > could you clarify ?
+>
+> You are correct, Alexei.  Unlike vanilla RCU, RCU Tasks Trace does not
+> count irq-disabled regions of code as readers.
+>
+> But why not just put an rcu_read_lock_trace() and a matching
+> rcu_read_unlock_trace() within that irq-disabled region of code?
+>
+> For completeness, if it were not for CONFIG_TASKS_TRACE_RCU_READ_MB,
+> Hou Tao would be correct from a strict current-implementation
+> viewpoint.  The reason is that, given the current implementation in
+> CONFIG_TASKS_TRACE_RCU_READ_MB=3Dn kernels, a task must either block or
+> take an IPI in order for the grace-period machinery to realize that this
+> task is done with all prior readers.
+>
+> However, we need to account for the possibility of IPI-free
+> implementations, for example, if the real-time guys decide to start
+> making heavy use of BPF sleepable programs.  They would then insist on
+> getting rid of those IPIs for CONFIG_PREEMPT_RT=3Dy kernels.  At which
+> point, irq-disabled regions of code will absolutely not act as
+> RCU tasks trace readers.
+>
+> Again, why not just put an rcu_read_lock_trace() and a matching
+> rcu_read_unlock_trace() within that irq-disabled region of code?
 
-Google's maintainers definitely need to agree to this, because it's 
-a user visible change. It can very well break someone's scripts.
+If I remember correctly, the general guidance is to always put an
+explicit marker if it is in an RCU-reader, instead of relying on
+implementation details. So the suggestion to put the marker instead of
+relying on IRQ disabling does align with that.
 
-> diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-> index 98eb78d98e9f..4b425bf71ede 100644
-> --- a/drivers/net/ethernet/google/gve/gve.h
-> +++ b/drivers/net/ethernet/google/gve/gve.h
-> @@ -964,5 +964,6 @@ void gve_handle_report_stats(struct gve_priv *priv);
->  /* exported by ethtool.c */
->  extern const struct ethtool_ops gve_ethtool_ops;
->  /* needed by ethtool */
-> +extern char gve_driver_name[];
->  extern const char gve_version_str[];
->  #endif /* _GVE_H_ */
-> diff --git a/drivers/net/ethernet/google/gve/gve_adminq.c b/drivers/net/ethernet/google/gve/gve_adminq.c
-> index 252974202a3f..ae8f8c935bbe 100644
-> --- a/drivers/net/ethernet/google/gve/gve_adminq.c
-> +++ b/drivers/net/ethernet/google/gve/gve_adminq.c
-> @@ -899,7 +899,7 @@ int gve_adminq_verify_driver_compatibility(struct gve_priv *priv,
->  
->  int gve_adminq_report_link_speed(struct gve_priv *priv)
->  {
-> -	union gve_adminq_command gvnic_cmd;
-> +	union gve_adminq_command gve_cmd;
->  	dma_addr_t link_speed_region_bus;
->  	__be64 *link_speed_region;
->  	int err;
-> @@ -911,12 +911,12 @@ int gve_adminq_report_link_speed(struct gve_priv *priv)
->  	if (!link_speed_region)
->  		return -ENOMEM;
->  
-> -	memset(&gvnic_cmd, 0, sizeof(gvnic_cmd));
-> -	gvnic_cmd.opcode = cpu_to_be32(GVE_ADMINQ_REPORT_LINK_SPEED);
-> -	gvnic_cmd.report_link_speed.link_speed_address =
-> +	memset(&gve_cmd, 0, sizeof(gve_cmd));
-> +	gve_cmd.opcode = cpu_to_be32(GVE_ADMINQ_REPORT_LINK_SPEED);
-> +	gve_cmd.report_link_speed.link_speed_address =
->  		cpu_to_be64(link_speed_region_bus);
->  
-> -	err = gve_adminq_execute_cmd(priv, &gvnic_cmd);
-> +	err = gve_adminq_execute_cmd(priv, &gve_cmd);
-
-What's the problem with the variable being called gvnic_cmd ?
-Please limit renames, if you want this to be a fix.
--- 
-pw-bot: cr
+Thanks.
 
