@@ -1,247 +1,479 @@
-Return-Path: <netdev+bounces-16049-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16050-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 9572874B261
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:01:26 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C6CA274B2AD
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:06:56 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7D9D61C20FD3
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:01:25 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id E8FF81C20DAB
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:06:55 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3ED67D2EF;
-	Fri,  7 Jul 2023 14:01:23 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 76AA5D2F7;
+	Fri,  7 Jul 2023 14:06:53 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 30B77D2EB
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:01:23 +0000 (UTC)
-Received: from mx07-00178001.pphosted.com (mx07-00178001.pphosted.com [185.132.182.106])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id E5DB61FEF;
-	Fri,  7 Jul 2023 07:01:11 -0700 (PDT)
-Received: from pps.filterd (m0241204.ppops.net [127.0.0.1])
-	by mx07-00178001.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367D5JPm029918;
-	Fri, 7 Jul 2023 16:00:31 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=foss.st.com; h=message-id : date :
- mime-version : subject : to : cc : references : from : in-reply-to :
- content-type : content-transfer-encoding; s=selector1;
- bh=geb7y3s4woJ3gVvgbLEepweyY2vxzrtl4SkK7CXSDOM=;
- b=XImO+YhUaKoxthCWbN1dHrm9EWgj7Ol4QnI642tf/UuBsjrjg4RCxEX18++7YVWQRjMe
- 2gClSEn5DCM70KR0iBJxU1HCp4pq8VdtPqncnsahJDTG8LO8pnkGuZiFjSAUUHyn2qOO
- 87w5QQQVhOAohte/TMzbFUUj8Kv+0O6f2AFZfmeMFCsQWaC7u4cHeJ6leZ/cXPKJ8H/p
- RDvCSFE7xdtBOmzK6K/w8vqYYtB/ofpAbZsVZPlmaJmO2Iy7eN4Mr8JYQdhkh9U9TQyH
- lz8ho3clWXCOZVYuJNs4Hc8eIbNm29P+xV/I9xFqDEXYwpI5NLsnRpuH5kNVbX77ZWzr CA== 
-Received: from beta.dmz-eu.st.com (beta.dmz-eu.st.com [164.129.1.35])
-	by mx07-00178001.pphosted.com (PPS) with ESMTPS id 3rpfncj7rs-1
-	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=NOT);
-	Fri, 07 Jul 2023 16:00:31 +0200
-Received: from euls16034.sgp.st.com (euls16034.sgp.st.com [10.75.44.20])
-	by beta.dmz-eu.st.com (STMicroelectronics) with ESMTP id 582A2100050;
-	Fri,  7 Jul 2023 16:00:25 +0200 (CEST)
-Received: from Webmail-eu.st.com (shfdag1node1.st.com [10.75.129.69])
-	by euls16034.sgp.st.com (STMicroelectronics) with ESMTP id 0E4CF2278A4;
-	Fri,  7 Jul 2023 16:00:25 +0200 (CEST)
-Received: from [10.201.21.121] (10.201.21.121) by SHFDAG1NODE1.st.com
- (10.75.129.69) with Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id 15.1.2507.21; Fri, 7 Jul
- 2023 16:00:23 +0200
-Message-ID: <febd65e1-68c7-f9d8-c8a4-3c3e88f15f3e@foss.st.com>
-Date: Fri, 7 Jul 2023 16:00:23 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 5F4EAC8E6
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:06:53 +0000 (UTC)
+Received: from mx0a-00069f02.pphosted.com (mx0a-00069f02.pphosted.com [205.220.165.32])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8F5312D5E;
+	Fri,  7 Jul 2023 07:06:23 -0700 (PDT)
+Received: from pps.filterd (m0246617.ppops.net [127.0.0.1])
+	by mx0b-00069f02.pphosted.com (8.17.1.19/8.17.1.19) with ESMTP id 367Cx1hU023983;
+	Fri, 7 Jul 2023 14:05:08 GMT
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=oracle.com; h=date : from : to : cc
+ : subject : message-id : references : content-type : in-reply-to :
+ mime-version; s=corp-2023-03-30;
+ bh=zOuXbhuGOp5uXOOxQd3RK1JehGaS+kIeLNtyckcS3Uk=;
+ b=zqGpaOp475pZt42e7pHEa6mihH6E3FoglTXggk44i+FpcbQjeWH5mCY80v9UtVYj4LsU
+ 03U1kBSW0+Ld9Ioj2WzGEwSB/+AIW2oyvtr542p949O4UFzvUuEF6LhDewDL1h93VTw8
+ 2AT0SVlCbVVhUeloDqBuEwV9A2SuU6cBWoPqYpnkE91XaMmjkMnDR2SlNKtbA0uatYs7
+ EtLAtIiIet6Dyqq1CVzEG8KxTJd8W1Z1hNk40GhLpc2a/x9qq/9j1w6iTb4KpbdZ7iuU
+ sbCYKfh+mBSizKqU3EqhJRHwVTk6GEVCyDVgPMcGB2QG1KG21ArGQkoEXK/MDMVQ3Y4H 4Q== 
+Received: from iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (iadpaimrmta03.appoci.oracle.com [130.35.103.27])
+	by mx0b-00069f02.pphosted.com (PPS) with ESMTPS id 3rpfhprggy-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Jul 2023 14:05:08 +0000
+Received: from pps.filterd (iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com [127.0.0.1])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (8.17.1.19/8.17.1.19) with ESMTP id 367DZcSU013508;
+	Fri, 7 Jul 2023 14:05:06 GMT
+Received: from nam12-mw2-obe.outbound.protection.outlook.com (mail-mw2nam12lp2041.outbound.protection.outlook.com [104.47.66.41])
+	by iadpaimrmta03.imrmtpd1.prodappiadaev1.oraclevcn.com (PPS) with ESMTPS id 3rjak8gt10-1
+	(version=TLSv1.2 cipher=ECDHE-RSA-AES256-GCM-SHA384 bits=256 verify=OK);
+	Fri, 07 Jul 2023 14:05:06 +0000
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=PNYyiL/dX00dDp/n9DmBHnT5hEsRg7NlrqpD8Uf5yrlc1RXdpTbUqSKOtNEhRBvMS/cslzbOVsEQfp11ZGSpZJun0Epvdt5l79w+N5qKphMOVq2LK0s+kKxzkJWv73EObfzjF7kpnoU/PBiBrL4zoukm/fRfqNNi8ArQK0vyEwAB2Oxdto6/9lszV0eldW2Pkf64Sl+Vuc5iKhJ9PqEChVCjhV0wdM51qwu/XIkudXojHkj1o0GHzo9la6x/Xm/QNWZNB7IArU45Cp7YWXRSlZNTBj08HnL1O9oZ3o9P1PJESnErt72s8lrmrEfHWX0wegbQ0dTD/GHqoxrSBdiXfQ==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=zOuXbhuGOp5uXOOxQd3RK1JehGaS+kIeLNtyckcS3Uk=;
+ b=m9fgmMNGkcwT1AkChNFdCRpcGzeLLmIsSEgBVwyUCO80RT6w4mLNy2H9qCT0POfeWaiGzXXfNlF6d+gAzOQQuddeAjRnGT9USVR1WGAsP0ekHi5wuhaKymFX2hSQN91v1frNK1vAx1pmIo2EoFAaJqxWfWXh4qeEW0dVE+tbtcHp946MdgGr7PeP2rdZI0agnqklKYO5VD7DE5gXw5QRDgShsPEpmwhctI/fk8gOogoigRpK82ixD8hMXtLwL/+ehXsidpMpfGC2KmnUAVZyiPRR6kyXfCUuphwoHIOjRZP0WDcXZmVt1v2HDWIzuKXIr8ynLb+35rS1quh8fHwMQA==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=oracle.com; dmarc=pass action=none header.from=oracle.com;
+ dkim=pass header.d=oracle.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=oracle.onmicrosoft.com; s=selector2-oracle-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=zOuXbhuGOp5uXOOxQd3RK1JehGaS+kIeLNtyckcS3Uk=;
+ b=z4DRrAu1MYlBkVa63JFB69mH440/VOPosoQEI6gCRD8qqga3fvQp5eMuk5uUHkQKK/UoWg0aAO4OEDTZXEVg1msD3Nw93meUrFupwnejYcVOUO0UIIGFMG2ub8wWrHptoWQ7F49TmuP20iXH7fXtTDkOHzbzbDaOhi2J0hNcZ3c=
+Received: from SN6PR10MB3022.namprd10.prod.outlook.com (2603:10b6:805:d8::25)
+ by BLAPR10MB4836.namprd10.prod.outlook.com (2603:10b6:208:326::17) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.25; Fri, 7 Jul
+ 2023 14:05:03 +0000
+Received: from SN6PR10MB3022.namprd10.prod.outlook.com
+ ([fe80::998f:d221:5fb6:c67d]) by SN6PR10MB3022.namprd10.prod.outlook.com
+ ([fe80::998f:d221:5fb6:c67d%7]) with mapi id 15.20.6565.019; Fri, 7 Jul 2023
+ 14:05:03 +0000
+Date: Fri, 7 Jul 2023 10:04:59 -0400
+From: "Liam R. Howlett" <Liam.Howlett@Oracle.com>
+To: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
+Cc: davem@davemloft.net, david@fries.net, edumazet@google.com, kuba@kernel.org,
+        pabeni@redhat.com, zbr@ioremap.net, brauner@kernel.org,
+        johannes@sipsolutions.net, ecree.xilinx@gmail.com, leon@kernel.org,
+        keescook@chromium.org, socketcan@hartkopp.net, petrm@nvidia.com,
+        linux-kernel@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH v7 3/6] connector/cn_proc: Add filtering to fix some bugs
+Message-ID: <20230707140459.qsyjw5i6chpbzqwj@revolver>
+References: <20230704001136.2301645-1-anjali.k.kulkarni@oracle.com>
+ <20230704001136.2301645-4-anjali.k.kulkarni@oracle.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230704001136.2301645-4-anjali.k.kulkarni@oracle.com>
+User-Agent: NeoMutt/20220429
+X-ClientProxiedBy: YT4PR01CA0187.CANPRD01.PROD.OUTLOOK.COM
+ (2603:10b6:b01:110::27) To SN6PR10MB3022.namprd10.prod.outlook.com
+ (2603:10b6:805:d8::25)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: [PATCH 05/10] firewall: introduce stm32_firewall framework
-Content-Language: en-US
-To: Greg KH <gregkh@linuxfoundation.org>
-CC: <Oleksii_Moisieiev@epam.com>, <herbert@gondor.apana.org.au>,
-        <davem@davemloft.net>, <robh+dt@kernel.org>,
-        <krzysztof.kozlowski+dt@linaro.org>, <conor+dt@kernel.org>,
-        <alexandre.torgue@foss.st.com>, <vkoul@kernel.org>, <jic23@kernel.org>,
-        <olivier.moysan@foss.st.com>, <arnaud.pouliquen@foss.st.com>,
-        <mchehab@kernel.org>, <fabrice.gasnier@foss.st.com>,
-        <andi.shyti@kernel.org>, <ulf.hansson@linaro.org>,
-        <edumazet@google.com>, <kuba@kernel.org>, <pabeni@redhat.com>,
-        <hugues.fruchet@foss.st.com>, <lee@kernel.org>, <will@kernel.org>,
-        <catalin.marinas@arm.com>, <arnd@kernel.org>,
-        <richardcochran@gmail.com>, <linux-crypto@vger.kernel.org>,
-        <devicetree@vger.kernel.org>,
-        <linux-stm32@st-md-mailman.stormreply.com>,
-        <linux-arm-kernel@lists.infradead.org>, <linux-kernel@vger.kernel.org>,
-        <dmaengine@vger.kernel.org>, <linux-i2c@vger.kernel.org>,
-        <linux-iio@vger.kernel.org>, <alsa-devel@alsa-project.org>,
-        <linux-media@vger.kernel.org>, <linux-mmc@vger.kernel.org>,
-        <netdev@vger.kernel.org>, <linux-phy@lists.infradead.org>,
-        <linux-serial@vger.kernel.org>, <linux-spi@vger.kernel.org>,
-        <linux-usb@vger.kernel.org>
-References: <20230705172759.1610753-1-gatien.chevallier@foss.st.com>
- <20230705172759.1610753-6-gatien.chevallier@foss.st.com>
- <2023070748-false-enroll-e5dc@gregkh>
-From: Gatien CHEVALLIER <gatien.chevallier@foss.st.com>
-In-Reply-To: <2023070748-false-enroll-e5dc@gregkh>
-Content-Type: text/plain; charset="UTF-8"; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Originating-IP: [10.201.21.121]
-X-ClientProxiedBy: SHFCAS1NODE1.st.com (10.75.129.72) To SHFDAG1NODE1.st.com
- (10.75.129.69)
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: SN6PR10MB3022:EE_|BLAPR10MB4836:EE_
+X-MS-Office365-Filtering-Correlation-Id: b6064b02-7345-4ed8-1e79-08db7ef32879
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info: 
+	QcYpqnmGiWWSHDVLb+dDQ/gMlrS0V1uqdSMGg0SosEoNTSwIOsNpoY9Psmc7ItAcnDMfOewWSqoD95+Cs6qN/EEB8NClufZ+/ujho1eME7sO9dcPF1N94jg3aLh1/LRoz1v2aIBwzp9KnFNNY3EHsk+FTo0LAz2Tr2An68YoeVB/kEkWNrOG/DoTBB3D+79xFpv2Vc7HIPeAMACOpbYfsosyqaw/tpcqj+7IRN58jM31d2lmvfdyN7T4nI4YYFkxr/j8w2LyUpwKp8QU3i5fBnkM2WPP/Ueq6xWbUNJY/29rgKC6RQt55/lBVHec7HELV0PY/zv7powshoQhQfnTQXHooFh5Vi/A8CSzBIs66Zo1Ues2gAncUpG4x6fmJkZjL3ecEb3gbtZFEoB8CAvxPUdPavPVgsn79aHSFtb40r4Q72Sr+ua/HR53q30qIAEwuHsDTidetSs5jDM07Cf9Rr6e0MeVpV8HYp3QXHXcRitESTUq42gmkP2Ykpn5UK2HQ/pm6DNdm3YaCl/zR3ZZx5Onaj88exSOV2tLXfXuHm/eQ6J4LI55RVius3g4tPjh
+X-Forefront-Antispam-Report: 
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:SN6PR10MB3022.namprd10.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(7916004)(366004)(396003)(376002)(136003)(346002)(39860400002)(451199021)(33716001)(2906002)(478600001)(6666004)(6486002)(8676002)(7416002)(41300700001)(8936002)(4326008)(6636002)(316002)(66476007)(66556008)(66946007)(83380400001)(38100700002)(6512007)(5660300002)(6506007)(1076003)(6862004)(86362001)(26005)(186003)(9686003);DIR:OUT;SFP:1101;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0: 
+	=?us-ascii?Q?intFEJXnGz+o23wlttqSqvrApTF1C8SA8NffVe4K7fXcexDq9M3HrV0hcDNc?=
+ =?us-ascii?Q?E6rnUZ1k5Pp1lqlhA/pBRdfARkI/XO81Ch9d0szapJacEOuCfpNzVt7cD/tK?=
+ =?us-ascii?Q?bijdRCZlhA2xKHY887CO/K7qvkv8eP4rJb9gI1rTRjKxo5K1/CQB5RUNBn6k?=
+ =?us-ascii?Q?nGhYb7fzIQ/bF3F01+mLdKRn18XEjjfCH/d4DNpeprNMEmVncYn7hRMJ4x63?=
+ =?us-ascii?Q?T6mtLFWL322v0sAlp3CXHCPxaclAegVwj1bbvFAw4gBS3dKBi3Tw/1VJMfq7?=
+ =?us-ascii?Q?mMqlvvcL+SVlf7y87fwGohlIWfyqJOdX6V9CyDWfuUzEaQj5Rq/4L5Odw0Ha?=
+ =?us-ascii?Q?CbmlRZ+Xj+aOToUV+93lqkDyRWBOXlzjSbvR7cZbLV4bhJjGHpNqstgoBwPD?=
+ =?us-ascii?Q?SIHUbKjJFFnmr3orLEU620figrta7mC1iEyOM/bXNgJarOLO9rjEIccyPra4?=
+ =?us-ascii?Q?83NSzoxYI6qapNJe1jqXt41UO6ngQ0GQXO9DMTfjWEhTE76CxNDnH4XtzWQa?=
+ =?us-ascii?Q?+z53adJd1RfURIjo7qkozjN9Cmpj/j+1UT+1AibGrLVYLr31BWc7ZZmX3sLw?=
+ =?us-ascii?Q?z9aulXN2rGwiIv8Xn5u+3J8aAv2hINJnKIvYlRzwVRyg6WfmfKafejRnOkUG?=
+ =?us-ascii?Q?XhQmpxUfW6e38zeMXm5TaN6eG2wYDwKwZFZ79J43rgQgRyfM8gqjMKQ+1Upb?=
+ =?us-ascii?Q?04X01w4gBOtq/DdOwhuSmfP612Lxht4wZJBF/WaTZ220aCuD5DSW2ZJtKvzB?=
+ =?us-ascii?Q?5XDr0jhpn9HT3p682HPdgOBjjpKn44aPakFkLa/6vmbBAG3vJSQLNAHcA+Po?=
+ =?us-ascii?Q?QGjoLWwOc6tFHR5fscJiZ8Xv/UPZnWNUmE/MdAyHNBQnfxhNXoY5SsiIQDYQ?=
+ =?us-ascii?Q?RR9qCgxRDL9YQNSHyhC1nmhjwfzlO/Kb1WF87KlCv4T3kQN2oHvpMVVGX4bo?=
+ =?us-ascii?Q?nb0A5fCiaD46ZgTZ3grLBaqCAyyU+5g/aNz6bW8uXMmNYGkHr2a5BKrRborE?=
+ =?us-ascii?Q?nc3Gy0G2CsF2n45+4xSnb3mKp7U0CTfcAjbGlBmzVpEznrF9O29WwWewCl5P?=
+ =?us-ascii?Q?aUuL+UnOuqijgMoutLzT9Q3A5G67/JBuPeEZ2AGCD7FG1QDmwqqZ4Glg8xzB?=
+ =?us-ascii?Q?5szI8cQv7+mYzR+oXMVUP4grXbR/V/sy5sSupWiqKr1vPLuIFO148csiZa82?=
+ =?us-ascii?Q?pCy9RU62UUW6pH+ueY6u4Ha8ML8bQen8DJFwGYxXOvzyiNcY1y9Khu+4H9FK?=
+ =?us-ascii?Q?5YI04IbH4+b7C5GS750OSpUADf5a/SHblXP1yn6khP+CBdkmsF++/IA+VjL/?=
+ =?us-ascii?Q?aQRFdXLg8pndPAlnHX3k9fn7IaJ1H6WDYjNRzk0KEdoqIkawb1nF09t6UacC?=
+ =?us-ascii?Q?IWWa8nkil+F/CG5b6ANW8am4pLnSKQzHF86/T/mnsDUkrhgCjEjgdvap9EUT?=
+ =?us-ascii?Q?o/7WDR6q3SQ91aSLgC8A/8WcC6SjnCfAM5IeV1qWPj6a/RDxDuAa0Inlkovr?=
+ =?us-ascii?Q?452h6NvTOtS8wcWPmpFoxF0ozEN+IfgKbovNmZpoJ5Fj7PbIk5m2ZMZyDikl?=
+ =?us-ascii?Q?iuijjN+M+ssBe0FbQa1MtXDNwQ6JcUXBnmUJ3YkgRMVMTH6r56T3D0Gep5UY?=
+ =?us-ascii?Q?ZA=3D=3D?=
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-ExternalHop-MessageData-0: 
+	=?us-ascii?Q?bpnbklY/5s6uEYBRUOAJ+4Hh/av532slTrO38sGC3Tb7c6Nnw3h2l1QzWHRz?=
+ =?us-ascii?Q?4K9rIkHA52bKPKGNPT4edK0ta1KFSlp5fXppGr7wi/kL7KlWO/NLTBbkYgdU?=
+ =?us-ascii?Q?oFADbLrqGcAfVmF+qbyH7wSirEh8UnwtFtm9MobqQ3OblhKJ5VTONNDTujtg?=
+ =?us-ascii?Q?/T5WN87zzbU1XH5FlqyJZjS8W8Ovp/K4rxnZgvLWqBhMp8tp7W2mqXI/bNhP?=
+ =?us-ascii?Q?ekj68hhzUJa74RZqbomFWE6ZCY9Q4kVZ6CFYVd+dW0SYzA1WJwN7ExChm8ry?=
+ =?us-ascii?Q?VGmplA7QPso0uhx5ErLyI/Yj+lXvc7toLOyhW4ieNEKM+1DdzwKql6TC/C+r?=
+ =?us-ascii?Q?epPbOryVV9MqXDPi1srYp9Oh8x5vENNLZbPN+lwJW+gMy+XDkHbRPKSaw31v?=
+ =?us-ascii?Q?yy1op+S5P691zXJG67GYOa6cD6DP8S0wRxMhSQkHwl/efd7NZMv64+wCv6tW?=
+ =?us-ascii?Q?miIV6tr48bfMD511/8Q3UE3IyVIA/FBrnXFtXhKz4EFqWXkqEsxCaWNcaCbs?=
+ =?us-ascii?Q?kyiVum87CvzKSoNRphO5xcJ3Ke58TxFWI6LYqDyMMbArQhKgtY+MT/B1Ry/R?=
+ =?us-ascii?Q?81LPjG+YVjSbTPGNvjHnD6ncJWvNkWULUWPWGgwaFW7eje/yI5r1UN6ofFrM?=
+ =?us-ascii?Q?Qf2y/ZSPrT+EOIeDY/5PadLJXq6APID7SLKBdPMBdrppH6RYz0R5dTVSlwx9?=
+ =?us-ascii?Q?hPILqwOvU4EH8b1UUkXBqOdqGH4jqZfr142RiPGjt+O2o4MGytPoLtUSa90a?=
+ =?us-ascii?Q?QbowJ+5fYkrV4XA5g95Q4WNW5znhI22zxtZWZBsaypUc5vj+LERRQpHWxCFk?=
+ =?us-ascii?Q?YE6IjR/sdyNwf8oJHbRM5E5BT7iK+OPmylhZn9FnU/Z31+jZPo0RsYN3SrT9?=
+ =?us-ascii?Q?RwxoKWlxxAcvSc/aI7D8iRoEueYllWXb52cB5DaE4b9NJD1h9TpM/asMR/wU?=
+ =?us-ascii?Q?q/0NBjboB+IkcbY2ACqsieY4AXewIgQrQ7ZX1cLoRNiDikwvL1+qamoTB2t4?=
+ =?us-ascii?Q?XrfyXSXmozdUlE1OajrdsOjqLcWzKpKVda4+OesxrNZnaHNI0b9tr4wn+uKV?=
+ =?us-ascii?Q?J+lmoaqIpfBo4Eq11EI9CyWeX/ETkeBuHOp+xwA4fo4FfBtgWqs=3D?=
+X-OriginatorOrg: oracle.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: b6064b02-7345-4ed8-1e79-08db7ef32879
+X-MS-Exchange-CrossTenant-AuthSource: SN6PR10MB3022.namprd10.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 07 Jul 2023 14:05:03.3070
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: 4e2c6054-71cb-48f1-bd6c-3a9705aca71b
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: RC6wn4fVNYOfNYdVx15cdeRijmneFhrT/qvrzWVue4WiGutibUmGZgnv/ranTNpBT9bxfwS4UuKHNpHoNcZt1A==
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: BLAPR10MB4836
 X-Proofpoint-Virus-Version: vendor=baseguard
- engine=ICAP:2.0.205,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
- definitions=2023-07-07_09,2023-07-06_02,2023-05-22_02
+ engine=ICAP:2.0.254,Aquarius:18.0.957,Hydra:6.0.591,FMLib:17.11.176.26
+ definitions=2023-07-07_10,2023-07-06_02,2023-05-22_02
+X-Proofpoint-Spam-Details: rule=notspam policy=default score=0 suspectscore=0 phishscore=0 bulkscore=0
+ malwarescore=0 mlxlogscore=999 adultscore=0 spamscore=0 mlxscore=0
+ classifier=spam adjust=0 reason=mlx scancount=1 engine=8.12.0-2305260000
+ definitions=main-2307070130
+X-Proofpoint-GUID: 4E2kmAW3vmtJ3mKZtohPae929xWjDqi3
+X-Proofpoint-ORIG-GUID: 4E2kmAW3vmtJ3mKZtohPae929xWjDqi3
 X-Spam-Status: No, score=-2.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_LOW,
+	RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Hello Greg,
+* Anjali Kulkarni <anjali.k.kulkarni@oracle.com> [691231 23:00]:
+> The current proc connector code has the foll. bugs - if there are more
+> than one listeners for the proc connector messages, and one of them
+> deregisters for listening using PROC_CN_MCAST_IGNORE, they will still get
+> all proc connector messages, as long as there is another listener.
+> 
+> Another issue is if one client calls PROC_CN_MCAST_LISTEN, and another one
+> calls PROC_CN_MCAST_IGNORE, then both will end up not getting any messages.
+> 
+> This patch adds filtering and drops packet if client has sent
+> PROC_CN_MCAST_IGNORE. This data is stored in the client socket's
+> sk_user_data. In addition, we only increment or decrement
+> proc_event_num_listeners once per client. This fixes the above issues.
+> 
+> cn_release is the release function added for NETLINK_CONNECTOR. It uses
+> the newly added netlink_release function added to netlink_sock. It will
+> free sk_user_data.
+> 
+> Signed-off-by: Anjali Kulkarni <anjali.k.kulkarni@oracle.com>
 
-On 7/7/23 12:37, Greg KH wrote:
-> On Wed, Jul 05, 2023 at 07:27:54PM +0200, Gatien Chevallier wrote:
->> Introduce a firewall framework that offers to firewall consumers different
->> firewall services such as the ability to check their access rights against
->> their firewall controller(s).
->>
->> The firewall framework offers a generic API that is defined in firewall
->> controllers drivers to best fit the specificity of each firewall.
-> 
-> But you aren't defining a "generic" api here, you are defining a
-> specific one for your specific hardware.
-> 
-> Or am I missing something?
-> 
+Reviewed-by: Liam R. Howlett <Liam.Howlett@oracle.com>
 
-This framework is indeed ST-oriented, I should have specified :
-"...offers a generic API for STM32 firewall controllers that is defined
-in their drivers...". Will change in V2
-
->>
->> There are various types of firewalls:
->> -Peripheral firewalls that filter accesses to peripherals
->> -Memory firewalls that filter accesses to memories or memory regions
->> -Resource firewalls that filter accesses to internal resources such as
->> reset and clock controllers
->>
->> A firewall controller must be probed at arch_initcall level and register
->> to the framework so that consumers can use their services.
+> ---
+>  drivers/connector/cn_proc.c   | 57 +++++++++++++++++++++++++++++------
+>  drivers/connector/connector.c | 21 ++++++++++---
+>  drivers/w1/w1_netlink.c       |  6 ++--
+>  include/linux/connector.h     |  8 ++++-
+>  include/uapi/linux/cn_proc.h  | 43 +++++++++++++++-----------
+>  5 files changed, 100 insertions(+), 35 deletions(-)
 > 
-> Why must it happen at arch_initcall?  So it can never be a module?  That
-> feels wrong.
+> diff --git a/drivers/connector/cn_proc.c b/drivers/connector/cn_proc.c
+> index ccac1c453080..1ba288ed2bf7 100644
+> --- a/drivers/connector/cn_proc.c
+> +++ b/drivers/connector/cn_proc.c
+> @@ -48,6 +48,21 @@ static DEFINE_PER_CPU(struct local_event, local_event) = {
+>  	.lock = INIT_LOCAL_LOCK(lock),
+>  };
+>  
+> +static int cn_filter(struct sock *dsk, struct sk_buff *skb, void *data)
+> +{
+> +	enum proc_cn_mcast_op mc_op;
+> +
+> +	if (!dsk)
+> +		return 0;
+> +
+> +	mc_op = ((struct proc_input *)(dsk->sk_user_data))->mcast_op;
+> +
+> +	if (mc_op == PROC_CN_MCAST_IGNORE)
+> +		return 1;
+> +
+> +	return 0;
+> +}
+> +
+>  static inline void send_msg(struct cn_msg *msg)
+>  {
+>  	local_lock(&local_event.lock);
+> @@ -61,7 +76,8 @@ static inline void send_msg(struct cn_msg *msg)
+>  	 *
+>  	 * If cn_netlink_send() fails, the data is not sent.
+>  	 */
+> -	cn_netlink_send(msg, 0, CN_IDX_PROC, GFP_NOWAIT);
+> +	cn_netlink_send_mult(msg, msg->len, 0, CN_IDX_PROC, GFP_NOWAIT,
+> +			     cn_filter, NULL);
+>  
+>  	local_unlock(&local_event.lock);
+>  }
+> @@ -346,11 +362,9 @@ static void cn_proc_ack(int err, int rcvd_seq, int rcvd_ack)
+>  static void cn_proc_mcast_ctl(struct cn_msg *msg,
+>  			      struct netlink_skb_parms *nsp)
+>  {
+> -	enum proc_cn_mcast_op *mc_op = NULL;
+> -	int err = 0;
+> -
+> -	if (msg->len != sizeof(*mc_op))
+> -		return;
+> +	enum proc_cn_mcast_op mc_op = 0, prev_mc_op = 0;
+> +	int err = 1, initial = 0;
+> +	struct sock *sk = NULL;
+>  
+>  	/* 
+>  	 * Events are reported with respect to the initial pid
+> @@ -367,13 +381,36 @@ static void cn_proc_mcast_ctl(struct cn_msg *msg,
+>  		goto out;
+>  	}
+>  
+> -	mc_op = (enum proc_cn_mcast_op *)msg->data;
+> -	switch (*mc_op) {
+> +	if (msg->len == sizeof(mc_op))
+> +		mc_op = *((enum proc_cn_mcast_op *)msg->data);
+> +	else
+> +		return;
+> +
+> +	if (nsp->sk) {
+> +		sk = nsp->sk;
+> +		if (sk->sk_user_data == NULL) {
+> +			sk->sk_user_data = kzalloc(sizeof(struct proc_input),
+> +						   GFP_KERNEL);
+> +			if (sk->sk_user_data == NULL) {
+> +				err = ENOMEM;
+> +				goto out;
+> +			}
+> +			initial = 1;
+> +		} else {
+> +			prev_mc_op =
+> +			((struct proc_input *)(sk->sk_user_data))->mcast_op;
+> +		}
+> +		((struct proc_input *)(sk->sk_user_data))->mcast_op = mc_op;
+> +	}
+> +
+> +	switch (mc_op) {
+>  	case PROC_CN_MCAST_LISTEN:
+> -		atomic_inc(&proc_event_num_listeners);
+> +		if (initial || (prev_mc_op != PROC_CN_MCAST_LISTEN))
+> +			atomic_inc(&proc_event_num_listeners);
+>  		break;
+>  	case PROC_CN_MCAST_IGNORE:
+> -		atomic_dec(&proc_event_num_listeners);
+> +		if (!initial && (prev_mc_op != PROC_CN_MCAST_IGNORE))
+> +			atomic_dec(&proc_event_num_listeners);
+>  		break;
+>  	default:
+>  		err = EINVAL;
+> diff --git a/drivers/connector/connector.c b/drivers/connector/connector.c
+> index 48ec7ce6ecac..d1179df2b0ba 100644
+> --- a/drivers/connector/connector.c
+> +++ b/drivers/connector/connector.c
+> @@ -59,7 +59,9 @@ static int cn_already_initialized;
+>   * both, or if both are zero then the group is looked up and sent there.
+>   */
+>  int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
+> -	gfp_t gfp_mask)
+> +	gfp_t gfp_mask,
+> +	int (*filter)(struct sock *dsk, struct sk_buff *skb, void *data),
+> +	void *filter_data)
+>  {
+>  	struct cn_callback_entry *__cbq;
+>  	unsigned int size;
+> @@ -110,8 +112,9 @@ int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 __group,
+>  	NETLINK_CB(skb).dst_group = group;
+>  
+>  	if (group)
+> -		return netlink_broadcast(dev->nls, skb, portid, group,
+> -					 gfp_mask);
+> +		return netlink_broadcast_filtered(dev->nls, skb, portid, group,
+> +						  gfp_mask, filter,
+> +						  (void *)filter_data);
+>  	return netlink_unicast(dev->nls, skb, portid,
+>  			!gfpflags_allow_blocking(gfp_mask));
+>  }
+> @@ -121,7 +124,8 @@ EXPORT_SYMBOL_GPL(cn_netlink_send_mult);
+>  int cn_netlink_send(struct cn_msg *msg, u32 portid, u32 __group,
+>  	gfp_t gfp_mask)
+>  {
+> -	return cn_netlink_send_mult(msg, msg->len, portid, __group, gfp_mask);
+> +	return cn_netlink_send_mult(msg, msg->len, portid, __group, gfp_mask,
+> +				    NULL, NULL);
+>  }
+>  EXPORT_SYMBOL_GPL(cn_netlink_send);
+>  
+> @@ -162,6 +166,14 @@ static int cn_call_callback(struct sk_buff *skb)
+>  	return err;
+>  }
+>  
+> +static void cn_release(struct sock *sk, unsigned long *groups)
+> +{
+> +	if (groups && test_bit(CN_IDX_PROC - 1, groups)) {
+> +		kfree(sk->sk_user_data);
+> +		sk->sk_user_data = NULL;
+> +	}
+> +}
+> +
+>  /*
+>   * Main netlink receiving function.
+>   *
+> @@ -249,6 +261,7 @@ static int cn_init(void)
+>  	struct netlink_kernel_cfg cfg = {
+>  		.groups	= CN_NETLINK_USERS + 0xf,
+>  		.input	= cn_rx_skb,
+> +		.release = cn_release,
+>  	};
+>  
+>  	dev->nls = netlink_kernel_create(&init_net, NETLINK_CONNECTOR, &cfg);
+> diff --git a/drivers/w1/w1_netlink.c b/drivers/w1/w1_netlink.c
+> index db110cc442b1..691978cddab7 100644
+> --- a/drivers/w1/w1_netlink.c
+> +++ b/drivers/w1/w1_netlink.c
+> @@ -65,7 +65,8 @@ static void w1_unref_block(struct w1_cb_block *block)
+>  		u16 len = w1_reply_len(block);
+>  		if (len) {
+>  			cn_netlink_send_mult(block->first_cn, len,
+> -				block->portid, 0, GFP_KERNEL);
+> +					     block->portid, 0,
+> +					     GFP_KERNEL, NULL, NULL);
+>  		}
+>  		kfree(block);
+>  	}
+> @@ -83,7 +84,8 @@ static void w1_reply_make_space(struct w1_cb_block *block, u16 space)
+>  {
+>  	u16 len = w1_reply_len(block);
+>  	if (len + space >= block->maxlen) {
+> -		cn_netlink_send_mult(block->first_cn, len, block->portid, 0, GFP_KERNEL);
+> +		cn_netlink_send_mult(block->first_cn, len, block->portid,
+> +				     0, GFP_KERNEL, NULL, NULL);
+>  		block->first_cn->len = 0;
+>  		block->cn = NULL;
+>  		block->msg = NULL;
+> diff --git a/include/linux/connector.h b/include/linux/connector.h
+> index 487350bb19c3..cec2d99ae902 100644
+> --- a/include/linux/connector.h
+> +++ b/include/linux/connector.h
+> @@ -90,13 +90,19 @@ void cn_del_callback(const struct cb_id *id);
+>   *		If @group is not zero, then message will be delivered
+>   *		to the specified group.
+>   * @gfp_mask:	GFP mask.
+> + * @filter:     Filter function to be used at netlink layer.
+> + * @filter_data:Filter data to be supplied to the filter function
+>   *
+>   * It can be safely called from softirq context, but may silently
+>   * fail under strong memory pressure.
+>   *
+>   * If there are no listeners for given group %-ESRCH can be returned.
+>   */
+> -int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid, u32 group, gfp_t gfp_mask);
+> +int cn_netlink_send_mult(struct cn_msg *msg, u16 len, u32 portid,
+> +			 u32 group, gfp_t gfp_mask,
+> +			 int (*filter)(struct sock *dsk, struct sk_buff *skb,
+> +				       void *data),
+> +			 void *filter_data);
+>  
+>  /**
+>   * cn_netlink_send - Sends message to the specified groups.
+> diff --git a/include/uapi/linux/cn_proc.h b/include/uapi/linux/cn_proc.h
+> index db210625cee8..6a06fb424313 100644
+> --- a/include/uapi/linux/cn_proc.h
+> +++ b/include/uapi/linux/cn_proc.h
+> @@ -30,6 +30,30 @@ enum proc_cn_mcast_op {
+>  	PROC_CN_MCAST_IGNORE = 2
+>  };
+>  
+> +enum proc_cn_event {
+> +	/* Use successive bits so the enums can be used to record
+> +	 * sets of events as well
+> +	 */
+> +	PROC_EVENT_NONE = 0x00000000,
+> +	PROC_EVENT_FORK = 0x00000001,
+> +	PROC_EVENT_EXEC = 0x00000002,
+> +	PROC_EVENT_UID  = 0x00000004,
+> +	PROC_EVENT_GID  = 0x00000040,
+> +	PROC_EVENT_SID  = 0x00000080,
+> +	PROC_EVENT_PTRACE = 0x00000100,
+> +	PROC_EVENT_COMM = 0x00000200,
+> +	/* "next" should be 0x00000400 */
+> +	/* "last" is the last process event: exit,
+> +	 * while "next to last" is coredumping event
+> +	 */
+> +	PROC_EVENT_COREDUMP = 0x40000000,
+> +	PROC_EVENT_EXIT = 0x80000000
+> +};
+> +
+> +struct proc_input {
+> +	enum proc_cn_mcast_op mcast_op;
+> +};
+> +
+>  /*
+>   * From the user's point of view, the process
+>   * ID is the thread group ID and thread ID is the internal
+> @@ -44,24 +68,7 @@ enum proc_cn_mcast_op {
+>   */
+>  
+>  struct proc_event {
+> -	enum what {
+> -		/* Use successive bits so the enums can be used to record
+> -		 * sets of events as well
+> -		 */
+> -		PROC_EVENT_NONE = 0x00000000,
+> -		PROC_EVENT_FORK = 0x00000001,
+> -		PROC_EVENT_EXEC = 0x00000002,
+> -		PROC_EVENT_UID  = 0x00000004,
+> -		PROC_EVENT_GID  = 0x00000040,
+> -		PROC_EVENT_SID  = 0x00000080,
+> -		PROC_EVENT_PTRACE = 0x00000100,
+> -		PROC_EVENT_COMM = 0x00000200,
+> -		/* "next" should be 0x00000400 */
+> -		/* "last" is the last process event: exit,
+> -		 * while "next to last" is coredumping event */
+> -		PROC_EVENT_COREDUMP = 0x40000000,
+> -		PROC_EVENT_EXIT = 0x80000000
+> -	} what;
+> +	enum proc_cn_event what;
+>  	__u32 cpu;
+>  	__u64 __attribute__((aligned(8))) timestamp_ns;
+>  		/* Number of nano seconds since system boot */
+> -- 
+> 2.41.0
 > 
-
-Rob asked the same question.
-
-I responded under his comment, I'm not quite sure how to handle it with
-fw_devlink for dependencies with drivers that are probed at early init
-levels.
-
->>
->> Signed-off-by: Gatien Chevallier <gatien.chevallier@foss.st.com>
->> ---
->>   MAINTAINERS                               |   5 +
->>   arch/arm64/Kconfig.platforms              |   1 +
->>   drivers/bus/Kconfig                       |  10 +
->>   drivers/bus/Makefile                      |   1 +
->>   drivers/bus/stm32_firewall.c              | 252 ++++++++++++++++++++++
->>   drivers/bus/stm32_firewall.h              |  83 +++++++
->>   include/linux/bus/stm32_firewall_device.h | 134 ++++++++++++
->>   7 files changed, 486 insertions(+)
->>   create mode 100644 drivers/bus/stm32_firewall.c
->>   create mode 100644 drivers/bus/stm32_firewall.h
->>   create mode 100644 include/linux/bus/stm32_firewall_device.h
->>
->> diff --git a/MAINTAINERS b/MAINTAINERS
->> index 41385f01fa98..fabf95ba9b86 100644
->> --- a/MAINTAINERS
->> +++ b/MAINTAINERS
->> @@ -20123,6 +20123,11 @@ T:	git git://linuxtv.org/media_tree.git
->>   F:	Documentation/devicetree/bindings/media/i2c/st,st-mipid02.yaml
->>   F:	drivers/media/i2c/st-mipid02.c
->>   
->> +ST STM32 FIREWALL
->> +M:	Gatien Chevallier <gatien.chevallier@foss.st.com>
->> +S:	Maintained
->> +F:	drivers/bus/stm32_firewall.c
->> +
->>   ST STM32 I2C/SMBUS DRIVER
->>   M:	Pierre-Yves MORDRET <pierre-yves.mordret@foss.st.com>
->>   M:	Alain Volmat <alain.volmat@foss.st.com>
->> diff --git a/arch/arm64/Kconfig.platforms b/arch/arm64/Kconfig.platforms
->> index 6069120199bb..5a46e90f1e4e 100644
->> --- a/arch/arm64/Kconfig.platforms
->> +++ b/arch/arm64/Kconfig.platforms
->> @@ -293,6 +293,7 @@ config ARCH_STM32
->>   	select ARM_SMC_MBOX
->>   	select ARM_SCMI_PROTOCOL
->>   	select COMMON_CLK_SCMI
->> +	select STM32_FIREWALL
->>   	help
->>   	  This enables support for ARMv8 based STMicroelectronics
->>   	  STM32 family, including:
->> diff --git a/drivers/bus/Kconfig b/drivers/bus/Kconfig
->> index fcfa280df98a..4d54a7ea52b2 100644
->> --- a/drivers/bus/Kconfig
->> +++ b/drivers/bus/Kconfig
->> @@ -163,6 +163,16 @@ config QCOM_SSC_BLOCK_BUS
->>   	  i2c/spi/uart controllers, a hexagon core, and a clock controller
->>   	  which provides clocks for the above.
->>   
->> +config STM32_FIREWALL
->> +	bool "STM32 Firewall framework"
->> +	depends on ARCH_STM32
-> 
-> Why this dependency?
-> 
->> +	default MACH_STM32MP157 || MACH_STM32MP13 || MACH_STM32MP25
->> +	help
->> +	  Say y to enable firewall framework and its services. Firewall
->> +	  controllers will be able to register to the framework. Firewall
->> +	  controllers must be initialized and register to the firewall framework
->> +	  at arch_initcall level.
-> 
-> This needs better wording saying it is only for stm32 devices.
-> 
-
-Ack, will change in V2.
-
->> +
->>   config SUN50I_DE2_BUS
->>   	bool "Allwinner A64 DE2 Bus Driver"
->>   	  default ARM64
->> diff --git a/drivers/bus/Makefile b/drivers/bus/Makefile
->> index d90eed189a65..fc0511450ec2 100644
->> --- a/drivers/bus/Makefile
->> +++ b/drivers/bus/Makefile
->> @@ -26,6 +26,7 @@ obj-$(CONFIG_OMAP_INTERCONNECT)	+= omap_l3_smx.o omap_l3_noc.o
->>   obj-$(CONFIG_OMAP_OCP2SCP)	+= omap-ocp2scp.o
->>   obj-$(CONFIG_QCOM_EBI2)		+= qcom-ebi2.o
->>   obj-$(CONFIG_QCOM_SSC_BLOCK_BUS)	+= qcom-ssc-block-bus.o
->> +obj-$(CONFIG_STM32_FIREWALL)	+= stm32_firewall.o
->>   obj-$(CONFIG_SUN50I_DE2_BUS)	+= sun50i-de2.o
->>   obj-$(CONFIG_SUNXI_RSB)		+= sunxi-rsb.o
->>   obj-$(CONFIG_OF)		+= simple-pm-bus.o
->> diff --git a/drivers/bus/stm32_firewall.c b/drivers/bus/stm32_firewall.c
->> new file mode 100644
->> index 000000000000..510db5bc6eaf
->> --- /dev/null
->> +++ b/drivers/bus/stm32_firewall.c
->> @@ -0,0 +1,252 @@
->> +// SPDX-License-Identifier: GPL-2.0-or-later
-> 
-> Are you _SURE_ this needs to be "or later"?  Sorry, I have to ask.
-> 
-> thanks,
-> 
-> greg k-h
-
-I'll change to (GPL-2.0-only OR BSD-3-Clause) :)
-
-Best regards,
-Gatien
 
