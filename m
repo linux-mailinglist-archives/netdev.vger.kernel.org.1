@@ -1,317 +1,139 @@
-Return-Path: <netdev+bounces-16045-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16047-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A09E874B24D
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 15:57:24 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id D6B6474B259
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 16:00:34 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id D2C43281756
-	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 13:57:22 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 1279D1C20FDD
+	for <lists+netdev@lfdr.de>; Fri,  7 Jul 2023 14:00:34 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CD4FAD2E3;
-	Fri,  7 Jul 2023 13:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id EF606D2E9;
+	Fri,  7 Jul 2023 14:00:31 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB226BA3A
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 13:57:20 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E3291C135
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 14:00:31 +0000 (UTC)
 Received: from us-smtp-delivery-124.mimecast.com (us-smtp-delivery-124.mimecast.com [170.10.129.124])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1E8191FC7
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 06:57:18 -0700 (PDT)
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id EAD2E1FE6
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 07:00:29 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=redhat.com;
-	s=mimecast20190719; t=1688738237;
+	s=mimecast20190719; t=1688738429;
 	h=from:from:reply-to:subject:subject:date:date:message-id:message-id:
 	 to:to:cc:cc:mime-version:mime-version:content-type:content-type:
 	 content-transfer-encoding:content-transfer-encoding:
 	 in-reply-to:in-reply-to:references:references;
-	bh=II7D4UkorrIlx/YRRKom6yRl+Wlp37yJA4ro88dBbCU=;
-	b=UTdUiXY3qxYAe8D3gXPBAkqWEReXuI7hT2EZ9RbExp+oxU75FLZtJWTzNT1IYafBjiqshU
-	i3qA+4dMJGzDatn/Ir0PLueQGWg4cnpcGeBTFfg2V4kfJ+ENV2QVeUAsVHadVDqq8R7OUb
-	GBH9+pNDndvpCMBcAhTBKG78rBKsZmY=
-Received: from mail-ej1-f72.google.com (mail-ej1-f72.google.com
- [209.85.218.72]) by relay.mimecast.com with ESMTP with STARTTLS
- (version=TLSv1.3, cipher=TLS_AES_256_GCM_SHA384) id
- us-mta-439-sAkgLOntOty0euKcz66lfw-1; Fri, 07 Jul 2023 09:57:16 -0400
-X-MC-Unique: sAkgLOntOty0euKcz66lfw-1
-Received: by mail-ej1-f72.google.com with SMTP id a640c23a62f3a-977e6c94186so141198266b.1
-        for <netdev@vger.kernel.org>; Fri, 07 Jul 2023 06:57:15 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688738235; x=1691330235;
-        h=content-transfer-encoding:in-reply-to:references:to
-         :content-language:subject:cc:user-agent:mime-version:date:message-id
-         :from:x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=II7D4UkorrIlx/YRRKom6yRl+Wlp37yJA4ro88dBbCU=;
-        b=kXrHwV7CTg38J877bnipoAbwciTqOiZDbfGsxdvphsYRUIMgRoKe4VZ9WDYfg38Bnd
-         6qJ7u48X7GKNF4cslWEtMYrAYRsAkNb3sToZnGEu01Q+b23ejYmZKn99wktBJ5tcXMIy
-         KM1Y4wUmZZfqNedG0KsYSM/39fjshm/i3EVLFqYR6PTdsbhJjSR/9DrDXGb4l+YTF5mt
-         o2WQEyorml6Q3eg8IgAGKFVZPCrVmHi1oTWLlnUx9ixIMH92c6C2ARmy7giAF8FnGW2Q
-         mqicfPRlsH2oiK2HFqbomLiXIdo71ZTKqzI55e6DPFiw5eOEhrtqXqOdltvdXZv9/zCF
-         SDgA==
-X-Gm-Message-State: ABy/qLbBJ6pZ0Zgu7nuhXm7h3gsWM9qkW9T7ft4FtxC5HjsmSV9vO3/v
-	al7QSGKTmU9BwkNwgWBsfizqZ1wldvEsQ52ts3LVyblnglGvRHo2tKpJm57Ie2i/fd2nDWDP0C3
-	2n2fj/P3etcWGDEZA
-X-Received: by 2002:a17:906:300b:b0:98e:1deb:cb03 with SMTP id 11-20020a170906300b00b0098e1debcb03mr3768358ejz.56.1688738235001;
-        Fri, 07 Jul 2023 06:57:15 -0700 (PDT)
-X-Google-Smtp-Source: APBJJlHa25BG2ejW+MgDXRT8DkWP17AYGNeGsrzkiOYO45jZiMUQuJvuW/992KFBYVq4l+5cpvFQcw==
-X-Received: by 2002:a17:906:300b:b0:98e:1deb:cb03 with SMTP id 11-20020a170906300b00b0098e1debcb03mr3768339ejz.56.1688738234636;
-        Fri, 07 Jul 2023 06:57:14 -0700 (PDT)
-Received: from [192.168.42.100] (194-45-78-10.static.kviknet.net. [194.45.78.10])
-        by smtp.gmail.com with ESMTPSA id c25-20020a170906341900b0098d2f703408sm2220608ejb.118.2023.07.07.06.57.13
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Fri, 07 Jul 2023 06:57:14 -0700 (PDT)
-From: Jesper Dangaard Brouer <jbrouer@redhat.com>
-X-Google-Original-From: Jesper Dangaard Brouer <brouer@redhat.com>
-Message-ID: <bb8e2be1-4df9-8b26-468e-4d5d13e006c1@redhat.com>
-Date: Fri, 7 Jul 2023 15:57:13 +0200
+	bh=tw4V2NfImeC5GfdO0ctBGdDxwJlMQmkR6fz8vyJ73Zo=;
+	b=Ah6bZaw8+YzP88nZEJpShZQWy0LBJDP5ZlN5f9uJ1rQMQvVJdOgd9/LtVftZgmntbhkcVz
+	SHUXPRDsdMyx+CesHRlYKaaWF6Kw3Nc1q+QKV664LPCRuDruLHdBZMeTCHCIyYNn5DnoaM
+	pM/0zW0uJix0mlxXSG60oDtDN+7ve4w=
+Received: from mimecast-mx02.redhat.com (mimecast-mx02.redhat.com
+ [66.187.233.88]) by relay.mimecast.com with ESMTP with STARTTLS
+ (version=TLSv1.2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
+ us-mta-625-GcVuy2HmPeOr0kuq4Z8fqQ-1; Fri, 07 Jul 2023 10:00:25 -0400
+X-MC-Unique: GcVuy2HmPeOr0kuq4Z8fqQ-1
+Received: from smtp.corp.redhat.com (int-mx06.intmail.prod.int.rdu2.redhat.com [10.11.54.6])
+	(using TLSv1.2 with cipher AECDH-AES256-SHA (256/256 bits))
+	(No client certificate requested)
+	by mimecast-mx02.redhat.com (Postfix) with ESMTPS id 1BDDC88D543;
+	Fri,  7 Jul 2023 14:00:23 +0000 (UTC)
+Received: from MiWiFi-R3L-srv.redhat.com (ovpn-12-39.pek2.redhat.com [10.72.12.39])
+	by smtp.corp.redhat.com (Postfix) with ESMTP id 594D02166B26;
+	Fri,  7 Jul 2023 14:00:08 +0000 (UTC)
+From: Baoquan He <bhe@redhat.com>
+To: linux-kernel@vger.kernel.org
+Cc: akpm@linux-foundation.org,
+	linux-mm@kvack.org,
+	schnelle@linux.ibm.com,
+	vkoul@kernel.org,
+	eli.billauer@gmail.com,
+	arnd@arndb.de,
+	gregkh@linuxfoundation.org,
+	derek.kiernan@amd.com,
+	dragan.cvetic@amd.com,
+	linux@dominikbrodowski.net,
+	Jonathan.Cameron@huawei.com,
+	linus.walleij@linaro.org,
+	tsbogend@alpha.franken.de,
+	joyce.ooi@intel.com,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	tglx@linutronix.de,
+	maz@kernel.org,
+	mturquette@baylibre.com,
+	sboyd@kernel.org,
+	robh+dt@kernel.org,
+	frowand.list@gmail.com,
+	Baoquan He <bhe@redhat.com>,
+	kernel test robot <lkp@intel.com>,
+	netdev@vger.kernel.org
+Subject: [PATCH 5/8] net: altera-tse: make ALTERA_TSE depend on HAS_IOMEM
+Date: Fri,  7 Jul 2023 21:58:49 +0800
+Message-Id: <20230707135852.24292-6-bhe@redhat.com>
+In-Reply-To: <20230707135852.24292-1-bhe@redhat.com>
+References: <20230707135852.24292-1-bhe@redhat.com>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.10.0
-Cc: brouer@redhat.com, John Fastabend <john.fastabend@gmail.com>,
- bpf@vger.kernel.org, ast@kernel.org, daniel@iogearbox.net,
- andrii@kernel.org, martin.lau@linux.dev, song@kernel.org, yhs@fb.com,
- kpsingh@kernel.org, sdf@google.com, haoluo@google.com, jolsa@kernel.org,
- David Ahern <dsahern@gmail.com>, Jakub Kicinski <kuba@kernel.org>,
- Willem de Bruijn <willemb@google.com>,
- Anatoly Burakov <anatoly.burakov@intel.com>,
- Alexander Lobakin <alexandr.lobakin@intel.com>,
- Magnus Karlsson <magnus.karlsson@gmail.com>,
- Maryam Tahhan <mtahhan@redhat.com>, xdp-hints@xdp-project.net,
- netdev@vger.kernel.org, Andrew Lunn <andrew@lunn.ch>
-Subject: Re: [PATCH bpf-next v2 09/20] xdp: Add VLAN tag hint
-Content-Language: en-US
-To: Larysa Zaremba <larysa.zaremba@intel.com>,
- Jesper Dangaard Brouer <jbrouer@redhat.com>
-References: <20230703181226.19380-1-larysa.zaremba@intel.com>
- <20230703181226.19380-10-larysa.zaremba@intel.com>
- <64a32c661648e_628d32085f@john.notmuch> <ZKPW6azl0Ak27wSO@lincoln>
- <f7aa7eb6-4600-cebf-bd09-d05fc627fd0d@redhat.com> <ZKP8KRy04IqyHXuI@lincoln>
- <e0050610-ee6f-7c3c-a303-7cddc73cff7c@redhat.com> <ZKbTxDKCRlnJxyf0@lincoln>
-In-Reply-To: <ZKbTxDKCRlnJxyf0@lincoln>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 7bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
+Content-type: text/plain
+Content-Transfer-Encoding: 8bit
+X-Scanned-By: MIMEDefang 3.1 on 10.11.54.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
+	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,SPF_NONE,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
+On s390 systems (aka mainframes), it has classic channel devices for
+networking and permanent storage that are currently even more common
+than PCI devices. Hence it could have a fully functional s390 kernel
+with CONFIG_PCI=n, then the relevant iomem mapping functions
+[including ioremap(), devm_ioremap(), etc.] are not available.
 
+Here let ALTERA_TSE depend on HAS_IOMEM so that it won't be built
+to cause below compiling error if PCI is unset:
 
-On 06/07/2023 16.46, Larysa Zaremba wrote:
-> On Tue, Jul 04, 2023 at 04:18:04PM +0200, Jesper Dangaard Brouer wrote:
->>
->>
->> On 04/07/2023 13.02, Larysa Zaremba wrote:
->>> On Tue, Jul 04, 2023 at 12:23:45PM +0200, Jesper Dangaard Brouer wrote:
->>>>
->>>> On 04/07/2023 10.23, Larysa Zaremba wrote:
->>>>> On Mon, Jul 03, 2023 at 01:15:34PM -0700, John Fastabend wrote:
->>>>>> Larysa Zaremba wrote:
->>>>>>> Implement functionality that enables drivers to expose VLAN tag
->>>>>>> to XDP code.
->>>>>>>
->>>>>>> Signed-off-by: Larysa Zaremba <larysa.zaremba@intel.com>
->>>>>>> ---
->>>>>>>     Documentation/networking/xdp-rx-metadata.rst |  8 +++++++-
->>>>>>>     include/linux/netdevice.h                    |  2 ++
->>>>>>>     include/net/xdp.h                            |  2 ++
->>>>>>>     kernel/bpf/offload.c                         |  2 ++
->>>>>>>     net/core/xdp.c                               | 20 ++++++++++++++++++++
->>>>>>>     5 files changed, 33 insertions(+), 1 deletion(-)
->>>>>>>
->>>>>>> diff --git a/Documentation/networking/xdp-rx-metadata.rst b/Documentation/networking/xdp-rx-metadata.rst
->>>>>>> index 25ce72af81c2..ea6dd79a21d3 100644
->>>>>>> --- a/Documentation/networking/xdp-rx-metadata.rst
->>>>>>> +++ b/Documentation/networking/xdp-rx-metadata.rst
->>>>>>> @@ -18,7 +18,13 @@ Currently, the following kfuncs are supported. In the future, as more
->>>>>>>     metadata is supported, this set will grow:
->>>>>>>     .. kernel-doc:: net/core/xdp.c
->>>>>>> -   :identifiers: bpf_xdp_metadata_rx_timestamp bpf_xdp_metadata_rx_hash
->>>>>>> +   :identifiers: bpf_xdp_metadata_rx_timestamp
->>>>>>> +
->>>>>>> +.. kernel-doc:: net/core/xdp.c
->>>>>>> +   :identifiers: bpf_xdp_metadata_rx_hash
->>>>>>> +
->>>>>>> +.. kernel-doc:: net/core/xdp.c
->>>>>>> +   :identifiers: bpf_xdp_metadata_rx_vlan_tag
->>>>>>>     An XDP program can use these kfuncs to read the metadata into stack
->>>>>>>     variables for its own consumption. Or, to pass the metadata on to other
->>>> [...]
->>>>>>> diff --git a/net/core/xdp.c b/net/core/xdp.c
->>>>>>> index 41e5ca8643ec..f6262c90e45f 100644
->>>>>>> --- a/net/core/xdp.c
->>>>>>> +++ b/net/core/xdp.c
->>>>>>> @@ -738,6 +738,26 @@ __bpf_kfunc int bpf_xdp_metadata_rx_hash(const struct xdp_md *ctx, u32 *hash,
->>>>>>>     	return -EOPNOTSUPP;
->>>>>>>     }
->>>>>>> +/**
->>>>>>> + * bpf_xdp_metadata_rx_vlan_tag - Get XDP packet outermost VLAN tag with protocol
->>>>>>> + * @ctx: XDP context pointer.
->>>>>>> + * @vlan_tag: Destination pointer for VLAN tag
->>>>>>> + * @vlan_proto: Destination pointer for VLAN protocol identifier in network byte order.
->>>>>>> + *
->>>>>>> + * In case of success, vlan_tag contains VLAN tag, including 12 least significant bytes
->>>>>>> + * containing VLAN ID, vlan_proto contains protocol identifier.
->>>>>>
->>>>>> Above is a bit confusing to me at least.
->>>>>>
->>>>>> The vlan tag would be both the 16bit TPID and 16bit TCI. What fields
->>>>>> are to be included here? The VlanID or the full 16bit TCI meaning the
->>>>>> PCP+DEI+VID?
->>>>>
->>>>> It contains PCP+DEI+VID, in patch 16 ("selftests/bpf: Add flags and new hints to
->>>>> xdp_hw_metadata") this is more clear, because the tag is parsed.
->>>>>
->>>>
->>>> Do we really care about the "EtherType" proto (in VLAN speak TPID = Tag
->>>> Protocol IDentifier)?
->>>> I mean, it can basically only have two values[1], and we just wanted to
->>>> know if it is a VLAN (that hardware offloaded/removed for us):
->>>
->>> If we assume everyone follows the standard, this would be correct.
->>> But apparently, some applications use some ambiguous value as a TPID [0].
->>>
->>> So it is not hard to imagine, some NICs could alllow you to configure your
->>> custom TPID. I am not sure if any in-tree drivers actually do this, but I think
->>> it's nice to provide some flexibility on XDP level, especially considering
->>> network stack stores full vlan_proto.
->>>
->>
->> I'm buying your argument, and agree it makes sense to provide TPID in
->> the call signature.  Given weird hardware exists that allow people to
->> configure custom TPID.
->>
->> Looking through kernel defines (in uapi/linux/if_ether.h) I see evidence
->> that funky QinQ EtherTypes have been used in the past:
->>
->>   #define ETH_P_QINQ1	0x9100		/* deprecated QinQ VLAN [ NOT AN OFFICIALLY
->> REGISTERED ID ] */
->>   #define ETH_P_QINQ2	0x9200		/* deprecated QinQ VLAN [ NOT AN OFFICIALLY
->> REGISTERED ID ] */
->>   #define ETH_P_QINQ3	0x9300		/* deprecated QinQ VLAN [ NOT AN OFFICIALLY
->> REGISTERED ID ] */
->>
->>
->>> [0]
->>> https://techhub.hpe.com/eginfolib/networking/docs/switches/7500/5200-1938a_l2-lan_cg/content/495503472.htm
->>>
->>>>
->>>>    static __always_inline int proto_is_vlan(__u16 h_proto)
->>>>    {
->>>> 	return !!(h_proto == bpf_htons(ETH_P_8021Q) ||
->>>> 		  h_proto == bpf_htons(ETH_P_8021AD));
->>>>    }
->>>>
->>>> [1] https://github.com/xdp-project/bpf-examples/blob/master/include/xdp/parsing_helpers.h#L75-L79
->>>>
->>>> Cc. Andrew Lunn, as I notice DSA have a fake VLAN define ETH_P_DSA_8021Q
->>>> (in file include/uapi/linux/if_ether.h)
->>>> Is this actually in use?
->>>> Maybe some hardware can "VLAN" offload this?
->>>>
->>>>
->>>>> What about rephrasing it this way:
->>>>>
->>>>> In case of success, vlan_proto contains VLAN protocol identifier (TPID),
->>>>> vlan_tag contains the remaining 16 bits of a 802.1Q tag (PCP+DEI+VID).
->>>>>
->>>>
->>>> Hmm, I think we can improve this further. This text becomes part of the
->>>> documentation for end-users (target audience).  Thus, I think it is
->>>> worth being more verbose and even mention the existing defines that we
->>>> are expecting end-users to take advantage of.
->>>>
->>>> What about:
->>>>
->>>> In case of success. The VLAN EtherType is stored in vlan_proto (usually
->>>> either ETH_P_8021Q or ETH_P_8021AD) also known as TPID (Tag Protocol
->>>> IDentifier). The VLAN tag is stored in vlan_tag, which is a 16-bit field
->>>> containing sub-fields (PCP+DEI+VID). The VLAN ID (VID) is 12-bits
->>>> commonly extracted using mask VLAN_VID_MASK (0x0fff).  For the meaning
->>>> of the sub-fields Priority Code Point (PCP) and Drop Eligible Indicator
->>>> (DEI) (formerly CFI) please reference other documentation. Remember
->>>> these 16-bit fields are stored in network-byte. Thus, transformation
->>>> with byte-order helper functions like bpf_ntohs() are needed.
->>>>
->>>
->>> AFAIK, vlan_tag is stored in host byte order, this is how it is in skb.
->>
->> I'm not sure we should follow SKB storage scheme for XDP.
->>
-> 
-> I think following SKB convention is a good idea in this particular case. As I
-> have mentioned below, in ice VLAN TCI in descriptor already comes in LE, so no
-> point in converting it into BE, so somebody would use bpf_ntohs() later anyway.
-> We are not the only manufacturer that does this.
-> 
+------
+ERROR: modpost: "devm_ioremap" [drivers/net/ethernet/altera/altera_tse.ko] undefined!
+------
 
-As long as other NIC hardware does the same this seems okay.
+Reported-by: kernel test robot <lkp@intel.com>
+Closes: https://lore.kernel.org/oe-kbuild-all/202306211329.ticOJCSv-lkp@intel.com/
+Signed-off-by: Baoquan He <bhe@redhat.com>
+Cc: Joyce Ooi <joyce.ooi@intel.com>
+Cc: "David S. Miller" <davem@davemloft.net>
+Cc: Eric Dumazet <edumazet@google.com>
+Cc: Jakub Kicinski <kuba@kernel.org>
+Cc: Paolo Abeni <pabeni@redhat.com>
+Cc: netdev@vger.kernel.org
 
+---
+ drivers/net/ethernet/altera/Kconfig | 1 +
+ 1 file changed, 1 insertion(+)
 
->>> In ice, we receive VLAN tag in descriptor already in LE.
->>> Only protocol is BE (network byte order). So I would replace the last 2
->>> sentences with the following:
->>>
->>> vlan_tag is stored in host byte order, so no byte order conversion is needed.
->>
->> Yikes, that was unexpected.  This needs to be heavily documented in docs.
-> 
-> You mean the motivation, why it is so and not the other way around?
-> 
-
-No, I don't mean the motivation.
-I simply mean write it in *bold*.
-
-Look at the description for bpf_xdp_metadata_rx_hash, how it gets
-rendered [1] and how the code comments look [2].
-
-  [1] 
-https://kernel.org/doc/html/latest/networking/xdp-rx-metadata.html#general-design
-  [2] https://elixir.bootlin.com/linux/v6.4/source/net/core/xdp.c#L724
-
-To save you some time compiling htmldocs target:
-
-  make SPHINXDIRS="networking" V=1  htmldocs
-
->>
->> When parsing packets, it is in network-byte-order, else my code is wrong
->> here[1]:
->>
->>    [1] https://github.com/xdp-project/bpf-examples/blob/master/include/xdp/parsing_helpers.h#L122
->>
->> I'm accessing the skb->vlan_tci here [2], and I notice I don't do any
->> byte-order conversions, so fortunately I didn't make a code mistake.
->>
->>    [2] https://github.com/xdp-project/bpf-examples/blob/master/traffic-pacing-edt/edt_pacer_vlan.c#L215
->>
-> 
-> In raw packet, VLAN TCI is in network byte order, but skb requires NIC/driver
-> to convert it into host byte order before putting it into skb.
->
-
-I'm interested in if *most* NIC hardware will deliver this in LE
-(Little-Endian) which is host-byte order on x86 ?
-
-
->>> vlan_proto is stored in network byte order, the suggested way to use this value:
->>>
->>> vlan_proto == bpf_htons(ETH_P_8021Q)
->>>
->>>>
->>>>
->>
->> --Jesper
->>
-> 
+diff --git a/drivers/net/ethernet/altera/Kconfig b/drivers/net/ethernet/altera/Kconfig
+index 17985319088c..4ef819a9a1ad 100644
+--- a/drivers/net/ethernet/altera/Kconfig
++++ b/drivers/net/ethernet/altera/Kconfig
+@@ -2,6 +2,7 @@
+ config ALTERA_TSE
+ 	tristate "Altera Triple-Speed Ethernet MAC support"
+ 	depends on HAS_DMA
++	depends on HAS_IOMEM
+ 	select PHYLIB
+ 	select PHYLINK
+ 	select PCS_LYNX
+-- 
+2.34.1
 
 
