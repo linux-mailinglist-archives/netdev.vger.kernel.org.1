@@ -1,91 +1,97 @@
-Return-Path: <netdev+bounces-16222-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16223-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 8697374BEA8
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 19:53:39 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 5B2E974BEB3
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 20:25:43 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 95ED1281256
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 17:53:37 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F20181C208D8
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 18:25:41 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 745638493;
-	Sat,  8 Jul 2023 17:53:35 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id D77B68838;
+	Sat,  8 Jul 2023 18:25:39 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 639BD1851
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 17:53:35 +0000 (UTC)
-Received: from mail-pf1-f199.google.com (mail-pf1-f199.google.com [209.85.210.199])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 55A6110CE
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 10:53:33 -0700 (PDT)
-Received: by mail-pf1-f199.google.com with SMTP id d2e1a72fcca58-666ecb21f16so4944624b3a.2
-        for <netdev@vger.kernel.org>; Sat, 08 Jul 2023 10:53:33 -0700 (PDT)
-X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688838812; x=1691430812;
-        h=to:from:subject:message-id:in-reply-to:date:mime-version
-         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
-        bh=KgUpKTeGPzi/nNVifJ5WyvHuZtEbyrg/rprJfjMZE9E=;
-        b=YaKrdeK2FHcFe2hdCjOJVkfeYRL2wKZY3HA3+nrpzGiuVc/og+0iHA6yZw89RW6ghL
-         3qVVYJ/U9O0ApQQ4zdxE+3ZQKQtF/Ompy46BAVbvbYTOoqMDP+i70PcneOSuxJxQxXmf
-         uHBR2g5p1nlZ6BU5cEi/Nn0A60To93toiU59LlZGXLTR86RonUVkZqMSyMkFvmJCPloB
-         XkK+AyGq41+dBArXCVi6nbjeSSbPRtQx/UwszNCYpI5F5VF5s43ZslGDR8mfzUSIiyN+
-         Ry4tlt/XsKly262M5puN3qEONiKD5/v4h8tdwQOJMzwo+i0CJ3c8PD/QicuGgYMFkHa9
-         Q/Lw==
-X-Gm-Message-State: ABy/qLaXlLQwDORhHsiRvsBshcTKUwe97mQmknopCAYzopoGTr8FhRgx
-	d3/2HJyaiEzQ+jQ3TUdRj98q48kdXDL6vSDhniguiheiBQuV
-X-Google-Smtp-Source: APBJJlHbGeKU/oHF+i4JDiNs+OLRa+VkY0mxtGbwG4jhPYI5mf54+xRP/IBFTXmemnbvKYxRxTqAKT9fBMziZomVR1z8FcMjVMW4
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C95062584
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 18:25:39 +0000 (UTC)
+Received: from vps0.lunn.ch (vps0.lunn.ch [156.67.10.101])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id DA894130;
+	Sat,  8 Jul 2023 11:25:37 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=lunn.ch;
+	s=20171124; h=In-Reply-To:Content-Disposition:Content-Type:MIME-Version:
+	References:Message-ID:Subject:Cc:To:From:Date:From:Sender:Reply-To:Subject:
+	Date:Message-ID:To:Cc:MIME-Version:Content-Type:Content-Transfer-Encoding:
+	Content-ID:Content-Description:Content-Disposition:In-Reply-To:References;
+	bh=nnJMw55VwH7NjHH7fwFNTj7b36AqghDRMQwGYCDAQiI=; b=o4KZ7nD2f6HsB+kpF8ZSPDf4wB
+	9e4dRDr4Rw5WmePuMVFe8lyYtRmycO3eQ3JAP0JkCGRm2of4fQhiBVIYFze7CZxGpq9LpwdNLYitw
+	hTrL2fNzPp0FpE6hGIOUfyKFrcsLFccwPkp80W6W6U1LAaYgfVvh1KqoDo73jrjJbNyc=;
+Received: from andrew by vps0.lunn.ch with local (Exim 4.94.2)
+	(envelope-from <andrew@lunn.ch>)
+	id 1qICcd-000pKH-Nf; Sat, 08 Jul 2023 20:25:31 +0200
+Date: Sat, 8 Jul 2023 20:25:31 +0200
+From: Andrew Lunn <andrew@lunn.ch>
+To: Alexandru Ardelean <alex@shruggie.ro>
+Cc: netdev@vger.kernel.org, devicetree@vger.kernel.org,
+	linux-kernel@vger.kernel.org, davem@davemloft.net,
+	edumazet@google.com, kuba@kernel.org, pabeni@redhat.com,
+	robh+dt@kernel.org, krzysztof.kozlowski+dt@linaro.org,
+	conor+dt@kernel.org, hkallweit1@gmail.com, linux@armlinux.org.uk,
+	olteanv@gmail.com, marius.muresan@mxt.ro
+Subject: Re: [PATCH 2/2] dt-bindings: net: phy: vsc8531: document
+ 'vsc8531,clkout-freq-mhz' property
+Message-ID: <9c37e2d5-a430-4a0f-b6b9-5de0dc14033f@lunn.ch>
+References: <20230706081554.1616839-1-alex@shruggie.ro>
+ <20230706081554.1616839-2-alex@shruggie.ro>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-Received: by 2002:a05:6a00:2d95:b0:668:9181:8e20 with SMTP id
- fb21-20020a056a002d9500b0066891818e20mr11799357pfb.1.1688838812689; Sat, 08
- Jul 2023 10:53:32 -0700 (PDT)
-Date: Sat, 08 Jul 2023 10:53:32 -0700
-In-Reply-To: <000000000000d97d9305ff9f6e87@google.com>
-X-Google-Appengine-App-Id: s~syzkaller
-X-Google-Appengine-App-Id-Alias: syzkaller
-Message-ID: <000000000000836b2805fffd6d7e@google.com>
-Subject: Re: [syzbot] [block?] KASAN: slab-out-of-bounds Read in bio_split_rw
-From: syzbot <syzbot+6f66f3e78821b0fff882@syzkaller.appspotmail.com>
-To: akpm@linux-foundation.org, axboe@kernel.dk, dhowells@redhat.com, 
-	herbert@gondor.apana.org.au, kuba@kernel.org, linux-block@vger.kernel.org, 
-	linux-kernel@vger.kernel.org, linux-mm@kvack.org, netdev@vger.kernel.org, 
-	syzkaller-bugs@googlegroups.com
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
-	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H3,
-	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=no autolearn_force=no
-	version=3.4.6
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230706081554.1616839-2-alex@shruggie.ro>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_PASS,SPF_PASS,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-syzbot has bisected this issue to:
+On Thu, Jul 06, 2023 at 11:15:54AM +0300, Alexandru Ardelean wrote:
+> For VSC8351 and similar PHYs, a new property was added to generate a clock
+> signal on the CLKOUT pin.
+> This change documents the change in the device-tree bindings doc.
+> 
+> Signed-off-by: Alexandru Ardelean <alex@shruggie.ro>
+> ---
+>  Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt | 5 +++++
+>  1 file changed, 5 insertions(+)
+> 
+> diff --git a/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt b/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
+> index 0a3647fe331b..133bdd644618 100644
+> --- a/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
+> +++ b/Documentation/devicetree/bindings/net/mscc-phy-vsc8531.txt
+> @@ -31,6 +31,10 @@ Optional properties:
+>  			  VSC8531_LINK_100_ACTIVITY (2),
+>  			  VSC8531_LINK_ACTIVITY (0) and
+>  			  VSC8531_DUPLEX_COLLISION (8).
+> +- vsc8531,clkout-freq-mhz : For VSC8531 and similar PHYs, this will output
+> +			  a clock signal on the CLKOUT pin of the chip.
+> +			  The supported values are 25, 50 & 125 Mhz.
+> +			  Default value is no clock signal on the CLKOUT pin.
 
-commit b6d972f6898308fbe7e693bf8d44ebfdb1cd2dc4
-Author: David Howells <dhowells@redhat.com>
-Date:   Fri Jun 16 11:10:32 2023 +0000
+It is possible this could cause regressions. The bootloader could
+turned the clock on, and then Linux leaves it alone. Now, it will get
+turned off unless a DT property is added.
 
-    crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)
+I prefer to explicitly have the property, so there is no dependency on
+the bootloader, so lets leave it like this. But if we do get
+regressions reported, this might need to change.
 
-bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=15763ae8a80000
-start commit:   3674fbf0451d Merge git://git.kernel.org/pub/scm/linux/kern..
-git tree:       net
-final oops:     https://syzkaller.appspot.com/x/report.txt?x=17763ae8a80000
-console output: https://syzkaller.appspot.com/x/log.txt?x=13763ae8a80000
-kernel config:  https://syzkaller.appspot.com/x/.config?x=c9bf1936936ca698
-dashboard link: https://syzkaller.appspot.com/bug?extid=6f66f3e78821b0fff882
-syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=16223cb8a80000
-C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=13f13920a80000
-
-Reported-by: syzbot+6f66f3e78821b0fff882@syzkaller.appspotmail.com
-Fixes: b6d972f68983 ("crypto: af_alg/hash: Fix recvmsg() after sendmsg(MSG_MORE)")
-
-For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+   Andrew
 
