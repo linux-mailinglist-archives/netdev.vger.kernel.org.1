@@ -1,269 +1,140 @@
-Return-Path: <netdev+bounces-16212-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16213-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 3764874BD74
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 14:34:03 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 51D5D74BD96
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 15:16:07 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 0A05B1C20BBC
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 12:34:02 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC3AD1C2094B
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 13:16:05 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D770A53B5;
-	Sat,  8 Jul 2023 12:33:59 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B806ADF;
+	Sat,  8 Jul 2023 13:16:03 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CC07A3C04
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 12:33:59 +0000 (UTC)
-X-Greylist: delayed 1004 seconds by postgrey-1.37 at lindbergh.monkeyblade.net; Sat, 08 Jul 2023 05:33:57 PDT
-Received: from clamta04.bpe.bigpond.com (clamta04.bpe.bigpond.com [203.42.22.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A7FA410FF;
-	Sat,  8 Jul 2023 05:33:57 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; q=dns/txt; c=relaxed/relaxed; d=bigpond.com
-	; s=202303; h=Content-Type:MIME-Version:Date:Message-ID:To:From:Subject;
-	bh=KN8MhbogqqPfZzXWzBOKTuoSCrY8y/cA4YjxC6ozIg0=; b=JasHz1iTcPBpEv5Vhl5QEY2XGI
-	3ZKrvr4au6i1HyCOy+wCmR53swbwcy0PpVe8K5YhbGT1jEGkue8Og+7k+bKmijNiI4rV6GthKucSS
-	CUl0HLb6Q+rfOPTvonKpYfPRZEWA7MQBjR5cdm4OJJrmWV+e6EVmgO3hEWFerjAXGsZK1G0o1T8MQ
-	Wu8psrUqtjcxd7g5rup4duN453Py82ppnHwwieNP4RhVXlleWTekhmieGHrJbWqLQN+YvyQ5PVLjD
-	U4JrvX5KJLk9Z9QI7dswOaUb1kGk0G7jIiWRxX0G6SSOIqvgcTefPUQLJ6w5YqU9jgW6CYun02X70
-	ITbjUYaA==;
-Received: from claprdcmr09
-	 by claprdomr04 with esmtp
-	 (envelope-from <bids.7405@bigpond.com>)
-	 id 1qI6sB-0000XG-1S
-	 for ;
-	Sat, 08 Jul 2023 22:17:11 +1000
-Received: from [101.191.138.223] (helo=[10.0.0.38])
-	 by claprdcmr09 with esmtpa
-	(envelope-from <bids.7405@bigpond.com>)
-	id 1qI6sC-000BnE-20;
-	Sat, 08 Jul 2023 22:17:11 +1000
-Subject: Re: Fwd: 3 more broken Zaurii - SL-5600, A300, C700
-From: Ross Maynard <bids.7405@bigpond.com>
-To: Dave Jones <davej@codemonkey.org.uk>,
- Thorsten Leemhuis <regressions@leemhuis.info>,
- Bagas Sanjaya <bagasdotme@gmail.com>, "David S. Miller"
- <davem@davemloft.net>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux USB <linux-usb@vger.kernel.org>, Oliver Neukum <oneukum@suse.com>
-References: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
- <50f4c10d-260c-cb98-e7d2-124f5519fa68@gmail.com>
- <e1fdc435-089c-8ce7-d536-ce3780a4ba95@leemhuis.info>
- <ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
- <62a9e058-c853-1fcd-5663-e2e001f881e9@bigpond.com>
-Message-ID: <14fd48c8-3955-c933-ab6f-329e54da090f@bigpond.com>
-Date: Sat, 8 Jul 2023 22:17:07 +1000
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:68.0) Gecko/20100101
- Thunderbird/68.4.1
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729D9524E
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 13:16:03 +0000 (UTC)
+Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 465A91994
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 06:16:01 -0700 (PDT)
+Received: from [192.168.1.18] ([86.243.2.178])
+	by smtp.orange.fr with ESMTPA
+	id I7mwqrPmVn02aI7mwqEG5C; Sat, 08 Jul 2023 15:15:58 +0200
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
+	s=t20230301; t=1688822158;
+	bh=MtFS4H/mvjYBQ6kD2sk3yhpdjTWzlyIwy/D4XqevP4Y=;
+	h=Date:Subject:To:Cc:References:From:In-Reply-To;
+	b=HeBBJKpw7QjGeqAKXjtW9K+A/j1qxIyP4Z1zGSbXu9RowIPmKLtfnvwiQ4OA7fYT+
+	 ynZxJA4onQ2YKhyb2xx+aT2meliqLoHnzUUHi5QZy3USNLU9R9p0vcxkFUeAdvycj7
+	 NvZqTPJS+7tvbnFvywGvWqICUwGihsuOJc5m2FeqkJQdL5mdY1hW20VbH5uiZlYlyV
+	 0Alv1EguSOV8CKnXcxwzuD8C3uFNV5vXWtKm8l93lwbM2U3FJQEQxrWiR3syveFvca
+	 2+5Jt9+YuYoMUgm9iQ6y8Kol3EeLVXZzA1UVQz36sGSJeraBfjmFBNYGehCksSPzlB
+	 jCdWdxt20YoTg==
+X-ME-Helo: [192.168.1.18]
+X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
+X-ME-Date: Sat, 08 Jul 2023 15:15:58 +0200
+X-ME-IP: 86.243.2.178
+Message-ID: <19369234-8785-575b-ff24-9a21a9e82f0e@wanadoo.fr>
+Date: Sat, 8 Jul 2023 15:15:50 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <62a9e058-c853-1fcd-5663-e2e001f881e9@bigpond.com>
-Content-Type: multipart/mixed;
- boundary="------------C1A5963CB6D1F125BFE1F795"
-Content-Language: en-US
-X-tce-id: bids.7405@bigpond.com
-X-tce-ares-id: e{89e004cc-fe21-4cc7-8a77-995180f13b8a}1
-X-tce-spam-action: no action
-X-tce-spam-score: 0.0
-X-Cm-Analysis: v=2.4 cv=Sp1WqtC0 c=1 sm=1 tr=0 ts=64a953c7 a=I+ymoOSk5yzZBOYXmf4WnA==:117 a=I+ymoOSk5yzZBOYXmf4WnA==:17 a=ws7JD89P4LkA:10 a=r77TgQKjGQsHNAKrUKIA:9 a=PhF-ru6i4W658Il2ksoA:9 a=QEXdDO2ut3YA:10 a=TILydWMaAdQ53EHaNYoA:9 a=B2y7HmGcmWMA:10
-X-Cm-Envelope: MS4xfEP+jWftDyT9rMny2iy5Mx7ZeuwancAs7J/BAKAxx03PgemRlo0FDVenJrwyvfKGGl4UNvgCCdwHAc/S+BnsMrRDiGYqeSyXvpAhkUZhRwpe4zr6MSRy ca038Doqsd1li7cOiI0oYMa5UGA324kfxipQzohn3hTTH7IUNWuEcj8VbNXWb5lZIXqtuX8Lzs+6Jw==
-X-Spam-Status: No, score=-2.7 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
-	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_LOW,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED autolearn=ham autolearn_force=no
-	version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.11.0
+Subject: Re: RE: [PATCH net v2 1/2] net: ll_temac: Fix DMA resources leak
+To: "Katakam, Harini" <harini.katakam@amd.com>,
+ Jakub Kicinski <kuba@kernel.org>, Jonas Suhr Christensen <jsc@umbraculum.org>
+Cc: Paolo Abeni <pabeni@redhat.com>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
+ Michal Simek <michal.simek@xilinx.com>, Haoyue Xu <xuhaoyue1@hisilicon.com>,
+ huangjunxian <huangjunxian6@hisilicon.com>, Wang Qing <wangqing@vivo.com>,
+ Yang Yingliang <yangyingliang@huawei.com>, Esben Haabendal
+ <esben@geanix.com>,
+ "linux-arm-kernel@lists.infradead.org"
+ <linux-arm-kernel@lists.infradead.org>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "Neeli, Srinivas" <srinivas.neeli@amd.com>
+References: <20230205201130.11303-1-jsc@umbraculum.org>
+ <20230205201130.11303-2-jsc@umbraculum.org>
+ <5314e0ba3a728787299ca46a60b0a2da5e8ab23a.camel@redhat.com>
+ <135b671b1b76978fb147d5fee1e1b922e2c61f26.camel@redhat.com>
+ <20230207104204.200da48a@kernel.org>
+ <bd639016-8a9c-4479-83b4-32306ad734ac@app.fastmail.com>
+ <20230313114858.54828dda@kernel.org>
+ <BYAPR12MB47736214A6B4AAF524752A8B9EBE9@BYAPR12MB4773.namprd12.prod.outlook.com>
+Content-Language: fr, en-GB
+From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
+In-Reply-To: <BYAPR12MB47736214A6B4AAF524752A8B9EBE9@BYAPR12MB4773.namprd12.prod.outlook.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 8bit
+X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
+	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-This is a multi-part message in MIME format.
---------------C1A5963CB6D1F125BFE1F795
-Content-Type: text/plain; charset=utf-8; format=flowed
-Content-Transfer-Encoding: 8bit
-
-I applied my patch then recompiled the kernel, and the 3 devices can now 
-connect via USB:
-
-[  268.872485] usb 3-2: New USB device found, idVendor=04dd, 
-idProduct=8005, bcdDevice= 0.00
-[  268.872498] usb 3-2: New USB device strings: Mfr=1, Product=2, 
-SerialNumber=0
-[  268.872502] usb 3-2: Product: SL-A300
-[  268.872505] usb 3-2: Manufacturer: Sharp
-[  268.876526] zaurus 3-2:1.0 usb0: register 'zaurus' at 
-usb-0000:00:14.0-2, pseudo-MDLM (BLAN) device, fa:0f:0f:08:2b:59
-
-[  595.541549] usb 3-2: New USB device found, idVendor=04dd, 
-idProduct=8006, bcdDevice= 0.00
-[  595.541562] usb 3-2: New USB device strings: Mfr=1, Product=2, 
-SerialNumber=0
-[  595.541566] usb 3-2: Product: SL-5600
-[  595.541569] usb 3-2: Manufacturer: Sharp
-[  595.545148] zaurus 3-2:1.0 usb0: register 'zaurus' at 
-usb-0000:00:14.0-2, pseudo-MDLM (BLAN) device, fa:0f:0f:08:2b:59
-
-[  446.954583] usb 3-2: New USB device found, idVendor=04dd, 
-idProduct=8007, bcdDevice= 0.00
-[  446.954596] usb 3-2: New USB device strings: Mfr=1, Product=2, 
-SerialNumber=0
-[  446.954600] usb 3-2: Product: SL-C700
-[  446.954603] usb 3-2: Manufacturer: Sharp
-[  446.957871] zaurus 3-2:1.0 usb0: register 'zaurus' at 
-usb-0000:00:14.0-2, pseudo-MDLM (BLAN) device, fa:0f:0f:08:2b:59
-
-Could someone please submit the patch for me?
-
-Thanks.
-
-Ross
-
-On 7/7/23 10:28 pm, Ross Maynard wrote:
-> Hi,
->
-> I am not a kernel developer, but I think the attached patch would work.
->
-> Ross
->
-> On 7/7/23 2:41 am, Dave Jones wrote:
->> On Thu, Jul 06, 2023 at 01:45:57PM +0200, Thorsten Leemhuis wrote:
->>   > On 06.07.23 05:08, Bagas Sanjaya wrote:
->>   > >>
->>   > >> I notice a regression report on Bugzilla [1]. Quoting from it:
->>   > >>
->>   > >>> The following patch broke support of 3 more Zaurus models: 
->> SL-5600, A300 and C700
->>   > >>>
->>   > >>> [16adf5d07987d93675945f3cecf0e33706566005] usbnet: Remove 
->> over-broad module alias from zaurus
->>   >
->>   > ...
->>   > He sometimes shows up on Linux kernel lists, but I doubt he cares 
->> about
->>   > that change after all these years. And I would not blame him at all.
+Le 14/03/2023 à 06:15, Katakam, Harini a écrit :
+> Hi Jakub, Jonas,
+> 
+>> -----Original Message-----
+>> From: Jakub Kicinski <kuba@kernel.org>
+>> Sent: Tuesday, March 14, 2023 12:19 AM
+>> To: Jonas Suhr Christensen <jsc@umbraculum.org>; Katakam, Harini
+>> <harini.katakam@amd.com>
+>> Cc: Paolo Abeni <pabeni@redhat.com>; netdev@vger.kernel.org; David S.
+>> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
+>> Michal Simek <michal.simek@xilinx.com>; Haoyue Xu
+>> <xuhaoyue1@hisilicon.com>; huangjunxian <huangjunxian6@hisilicon.com>;
+>> Wang Qing <wangqing@vivo.com>; Yang Yingliang
+>> <yangyingliang@huawei.com>; Esben Haabendal <esben@geanix.com>;
+>> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org
+>> Subject: Re: [PATCH net v2 1/2] net: ll_temac: Fix DMA resources leak
 >>
->> That's about the size of it.  This is pretty near the bottom of my 
->> ever-shrinking
->> list of kernel drivers I care about.
+>> On Mon, 13 Mar 2023 19:37:00 +0100 Jonas Suhr Christensen wrote:
+>>> On Tue, Feb 7, 2023, at 19:42, Jakub Kicinski wrote:
+>>>> On Tue, 07 Feb 2023 12:36:11 +0100 Paolo Abeni wrote:
+>>>>> You can either try change to phys type to __be32 (likely not
+>>>>> suitable for -net and possibly can introduce even more warnings
+>>>>> elsewhere)
+>>>>
+>>>> FWIW that seems like the best option to me as well. Let's ignore the
+>>>> sparse warning for v3 and try to switch phys to __be32 in a separate
+>>>> patch for net-next. No point adding force casts just to have to
+>>>> remove them a week later, given how prevalent the problem is.
+>>>>
+>>>>> or explicitly cast the argument.
+>>>
+>>> I no longer have access to the hardware, so I'm not rewriting the
+>>> batch. Feel free to take ownership of it and fix what's needed.
 >>
->>   > Yes, we have the "no regressions" rule, but contributing a change 
->> to the
->>   > kernel OTOH should not mean that you are responsible for all 
->> regressions
->>   > it causes for your whole life. :-)
+>> Ack.
 >>
->> That said, 12 years later, 16adf5d07987d93675945f3cecf0e33706566005
->> is still the right thing to do. Adding actual matches for the devices
->> rather than matching by class will prevent this getting loaded where it
->> doesn't need to be.
->>
->> If someone actually cares to get this working, cargo-culting Oliver's
->> change to add the extra id is likely the way forward.
->>
->>     Dave
->>
+>> Harini, are you the designated maintainer for this driver? Could you add a
+>> MAINTAINERS entry for it? I don't see one right now.
+>> And possibly pick up these patches / fix the problem, if you have the cycles?
+> 
+> Sure, Srinivas (cced) will pick up this series and send a v3.
+> I'll get back on the state of this IP/driver for the maintainers list. Will include
+> that patch in the beginning of the series as well.
+> 
+> Regards,
+> Harini
+> 
 
---------------C1A5963CB6D1F125BFE1F795
-Content-Type: text/x-patch; charset=UTF-8;
- name="3-zaurii-patch.patch"
-Content-Transfer-Encoding: 7bit
-Content-Disposition: attachment;
- filename="3-zaurii-patch.patch"
+Hi,
 
-diff -urpN a/drivers/net/usb/cdc_ether.c b/drivers/net/usb/cdc_ether.c
---- a/drivers/net/usb/cdc_ether.c	2023-07-07 17:48:27.991833366 +1000
-+++ b/drivers/net/usb/cdc_ether.c	2023-07-07 21:53:11.556198087 +1000
-@@ -616,6 +616,13 @@ static const struct usb_device_id	produc
- }, {
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+    .idVendor		= 0x04DD,
-+    .idProduct		= 0x8005,   /* A-300 */
-+    ZAURUS_FAKE_INTERFACE,
-+    .driver_info        = 0,
-+}, {
-+    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
-@@ -623,12 +630,26 @@ static const struct usb_device_id	produc
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
-+    .idVendor		= 0x04DD,
-+    .idProduct		= 0x8006,   /* B-500/SL-5600 */
-+    ZAURUS_FAKE_INTERFACE,
-+    .driver_info        = 0,
-+}, {
-+    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8007,	/* C-700 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info		= 0,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+    .idVendor		= 0x04DD,
-+    .idProduct		= 0x8007,   /* C-700 */
-+    ZAURUS_FAKE_INTERFACE,
-+    .driver_info        = 0,
-+}, {
-+    .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
-diff -urpN a/drivers/net/usb/zaurus.c b/drivers/net/usb/zaurus.c
---- a/drivers/net/usb/zaurus.c	2023-07-07 17:48:28.043849110 +1000
-+++ b/drivers/net/usb/zaurus.c	2023-07-07 22:06:49.267699853 +1000
-@@ -289,11 +289,25 @@ static const struct usb_device_id	produc
- 	.match_flags	=   USB_DEVICE_ID_MATCH_INT_INFO
- 			  | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8005,	/* A-300 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long) &bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8006,	/* B-500/SL-5600 */
- 	ZAURUS_MASTER_INTERFACE,
- 	.driver_info = ZAURUS_PXA_INFO,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8006,	/* B-500/SL-5600 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long) &bogus_mdlm_info,
-+}, {
-+	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 	          | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor		= 0x04DD,
- 	.idProduct		= 0x8007,	/* C-700 */
-@@ -301,6 +315,13 @@ static const struct usb_device_id	produc
- 	.driver_info = ZAURUS_PXA_INFO,
- }, {
- 	.match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
-+			  | USB_DEVICE_ID_MATCH_DEVICE,
-+	.idVendor		= 0x04DD,
-+	.idProduct		= 0x8007,	/* C-700 */
-+	ZAURUS_FAKE_INTERFACE,
-+	.driver_info = (unsigned long) &bogus_mdlm_info,
-+}, {
-+        .match_flags    =   USB_DEVICE_ID_MATCH_INT_INFO
- 		 | USB_DEVICE_ID_MATCH_DEVICE,
- 	.idVendor               = 0x04DD,
- 	.idProduct              = 0x9031,	/* C-750 C-760 */
+this patch, or an updated version, has not reached -next yet.
 
---------------C1A5963CB6D1F125BFE1F795--
+Does someone still working on it, or did it got lost?
+
+CJ
 
