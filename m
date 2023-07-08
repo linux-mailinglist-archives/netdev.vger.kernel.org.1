@@ -1,176 +1,123 @@
-Return-Path: <netdev+bounces-16192-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16193-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id C63CC74BB89
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 05:15:08 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id E455574BB94
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 05:31:37 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id E0A5B2819AE
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 03:15:06 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A0B12819DA
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 03:31:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CC0C71389;
-	Sat,  8 Jul 2023 03:15:04 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26B115A3;
+	Sat,  8 Jul 2023 03:31:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BC6D67E2
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 03:15:03 +0000 (UTC)
-Received: from mga14.intel.com (mga14.intel.com [192.55.52.115])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 1A9DF19A5
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 20:15:01 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple;
-  d=intel.com; i=@intel.com; q=dns/txt; s=Intel;
-  t=1688786101; x=1720322101;
-  h=from:to:cc:subject:date:message-id:in-reply-to:
-   references:mime-version:content-transfer-encoding;
-  bh=MO9zHqtEJSOy1QnzmMEbn53Kz5WBsnoOv7sSozaWsL0=;
-  b=P6CzlSphQexoCEEPGLz2oZQ/MwEnzE7Kll0LGOeH4CMhFOlZJcN0qm9Y
-   QD2pmD6Ej7WmQp4qRUwsCh5vYUhB6Zru0byeesGN6pshyWnvO0MR6hsSQ
-   Ee6Es3VJYrK8QDw5aK6o06oz0o+NZ0VgGybjDzotBK0tEYYeBZ62ibKAl
-   Njhpb0hS50eyP9/EKREhhbvU6SZ9C7X9E2tUj3/aZOwvvDjWQl0kI1/Go
-   E9RhkB9wCSXCyMlcCJ2ebT0Mzobyke8fIOa05uFT53LDzCC2GV56RFD+s
-   jgAyUp1ErVW0/EYZJwxpPhUJsF2HeDmso8KvTa6ztb4eD+YfMbEov3MA6
-   w==;
-X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="364062783"
-X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="364062783"
-Received: from fmsmga006.fm.intel.com ([10.253.24.20])
-  by fmsmga103.fm.intel.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 07 Jul 2023 20:15:00 -0700
-X-ExtLoop1: 1
-X-IronPort-AV: E=McAfee;i="6600,9927,10764"; a="966818969"
-X-IronPort-AV: E=Sophos;i="6.01,189,1684825200"; 
-   d="scan'208";a="966818969"
-Received: from dpdk-jf-ntb-v2.sh.intel.com ([10.67.119.19])
-  by fmsmga006.fm.intel.com with ESMTP; 07 Jul 2023 20:14:56 -0700
-From: Junfeng Guo <junfeng.guo@intel.com>
-To: netdev@vger.kernel.org
-Cc: jeroendb@google.com,
-	pkaligineedi@google.com,
-	shailend@google.com,
-	haiyue.wang@intel.com,
-	kuba@kernel.org,
-	awogbemila@google.com,
-	davem@davemloft.net,
-	pabeni@redhat.com,
-	yangchun@google.com,
-	edumazet@google.com,
-	sagis@google.com,
-	willemb@google.com,
-	lrizzo@google.com,
-	michal.kubiak@intel.com,
-	Junfeng Guo <junfeng.guo@intel.com>,
-	csully@google.com
-Subject: [PATCH net v2] gve: unify driver name usage
-Date: Sat,  8 Jul 2023 11:14:51 +0800
-Message-Id: <20230708031451.461738-1-junfeng.guo@intel.com>
-X-Mailer: git-send-email 2.25.1
-In-Reply-To: <20230707103710.3946651-1-junfeng.guo@intel.com>
-References: <20230707103710.3946651-1-junfeng.guo@intel.com>
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F657E2
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 03:31:34 +0000 (UTC)
+Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CD1211F
+	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 20:31:29 -0700 (PDT)
+Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
+	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QybPR3KyFzTjvh;
+	Sat,  8 Jul 2023 11:30:19 +0800 (CST)
+Received: from [10.174.179.200] (10.174.179.200) by
+ canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
+ (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
+ 15.1.2507.27; Sat, 8 Jul 2023 11:31:25 +0800
+Subject: Re: [PATCH net] ipv6/addrconf: fix a potential refcount underflow for
+ idev
+To: Eric Dumazet <edumazet@google.com>
+CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
+	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <hannes@stressinduktion.org>,
+	<fbl@redhat.com>
+References: <20230707101701.2474499-1-william.xuanziyang@huawei.com>
+ <CANn89i+qfg_PHT7gPfEMwwZcxx-P7bB8ShYrYZM7exvBYHwSQw@mail.gmail.com>
+From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
+Message-ID: <9e42c8c2-32c1-d2ef-34ce-f239a45005e4@huawei.com>
+Date: Sat, 8 Jul 2023 11:31:25 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.11.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
+In-Reply-To: <CANn89i+qfg_PHT7gPfEMwwZcxx-P7bB8ShYrYZM7exvBYHwSQw@mail.gmail.com>
+Content-Type: text/plain; charset="utf-8"
+Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-4.4 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,RCVD_IN_DNSWL_MED,
-	SPF_HELO_NONE,SPF_NONE,T_SCC_BODY_TEXT_LINE,URIBL_BLOCKED
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Originating-IP: [10.174.179.200]
+X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
+ canpemm500006.china.huawei.com (7.192.105.130)
+X-CFilter-Loop: Reflected
+X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
+	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
+	version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Current codebase contained the usage of two different names for this
-driver (i.e., `gvnic` and `gve`), which is quite unfriendly for users
-to use, especially when trying to bind or unbind the driver manually.
-The corresponding kernel module is registered with the name of `gve`.
-It's more reasonable to align the name of the driver with the module.
+> On Fri, Jul 7, 2023 at 12:17 PM Ziyang Xuan
+> <william.xuanziyang@huawei.com> wrote:
+>>
+>> Now in addrconf_mod_rs_timer(), reference idev depends on whether
+>> rs_timer is not pending. Then modify rs_timer timeout.
+>>
+>> There is a time gap in [1], during which if the pending rs_timer
+>> becomes not pending. It will miss to hold idev, but the rs_timer
+>> is activated. Thus rs_timer callback function addrconf_rs_timer()
+>> will be executed and put idev later without holding idev. A refcount
+>> underflow issue for idev can be caused by this.
+>>
+>>         if (!timer_pending(&idev->rs_timer))
+>>                 in6_dev_hold(idev);
+>>                   <--------------[1]
+>>         mod_timer(&idev->rs_timer, jiffies + when);
+>>
+>> Hold idev anyway firstly. Then call mod_timer() for rs_timer, put
+>> idev if mod_timer() return 1. This modification takes into account
+>> the case where "when" is 0.
+>>
+>> Fixes: b7b1bfce0bb6 ("ipv6: split duplicate address detection and router solicitation timer")
+>> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
+>> ---
+>>  net/ipv6/addrconf.c | 6 +++---
+>>  1 file changed, 3 insertions(+), 3 deletions(-)
+>>
+>> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
+>> index 5479da08ef40..d36e6c5e3081 100644
+>> --- a/net/ipv6/addrconf.c
+>> +++ b/net/ipv6/addrconf.c
+>> @@ -318,9 +318,9 @@ static void addrconf_del_dad_work(struct inet6_ifaddr *ifp)
+>>  static void addrconf_mod_rs_timer(struct inet6_dev *idev,
+>>                                   unsigned long when)
+>>  {
+>> -       if (!timer_pending(&idev->rs_timer))
+>> -               in6_dev_hold(idev);
+>> -       mod_timer(&idev->rs_timer, jiffies + when);
+>> +       in6_dev_hold(idev);
+>> +       if (mod_timer(&idev->rs_timer, jiffies + when))
+>> +               in6_dev_put(idev);
+>>  }
+>>
+> 
+> 
+> All callers own an implicit or explicit reference to idev, so you can
+> use the traditional
 
-Fixes: 893ce44df565 ("gve: Add basic driver framework for Compute Engine Virtual NIC")
-Cc: csully@google.com
-Signed-off-by: Junfeng Guo <junfeng.guo@intel.com>
----
-v2:
-- Remove un-related variable name chang, just keep it as it is.
----
- drivers/net/ethernet/google/gve/gve.h         |  1 +
- drivers/net/ethernet/google/gve/gve_ethtool.c |  2 +-
- drivers/net/ethernet/google/gve/gve_main.c    | 11 ++++++-----
- 3 files changed, 8 insertions(+), 6 deletions(-)
+Yes, thank you for your comment.
 
-diff --git a/drivers/net/ethernet/google/gve/gve.h b/drivers/net/ethernet/google/gve/gve.h
-index 98eb78d98e9f..4b425bf71ede 100644
---- a/drivers/net/ethernet/google/gve/gve.h
-+++ b/drivers/net/ethernet/google/gve/gve.h
-@@ -964,5 +964,6 @@ void gve_handle_report_stats(struct gve_priv *priv);
- /* exported by ethtool.c */
- extern const struct ethtool_ops gve_ethtool_ops;
- /* needed by ethtool */
-+extern char gve_driver_name[];
- extern const char gve_version_str[];
- #endif /* _GVE_H_ */
-diff --git a/drivers/net/ethernet/google/gve/gve_ethtool.c b/drivers/net/ethernet/google/gve/gve_ethtool.c
-index 50162ec9424d..233e5946905e 100644
---- a/drivers/net/ethernet/google/gve/gve_ethtool.c
-+++ b/drivers/net/ethernet/google/gve/gve_ethtool.c
-@@ -15,7 +15,7 @@ static void gve_get_drvinfo(struct net_device *netdev,
- {
- 	struct gve_priv *priv = netdev_priv(netdev);
- 
--	strscpy(info->driver, "gve", sizeof(info->driver));
-+	strscpy(info->driver, gve_driver_name, sizeof(info->driver));
- 	strscpy(info->version, gve_version_str, sizeof(info->version));
- 	strscpy(info->bus_info, pci_name(priv->pdev), sizeof(info->bus_info));
- }
-diff --git a/drivers/net/ethernet/google/gve/gve_main.c b/drivers/net/ethernet/google/gve/gve_main.c
-index 8fb70db63b8b..e6f1711d9be0 100644
---- a/drivers/net/ethernet/google/gve/gve_main.c
-+++ b/drivers/net/ethernet/google/gve/gve_main.c
-@@ -33,6 +33,7 @@
- #define MIN_TX_TIMEOUT_GAP (1000 * 10)
- #define DQO_TX_MAX	0x3FFFF
- 
-+char gve_driver_name[] = "gve";
- const char gve_version_str[] = GVE_VERSION;
- static const char gve_version_prefix[] = GVE_VERSION_PREFIX;
- 
-@@ -2200,7 +2201,7 @@ static int gve_probe(struct pci_dev *pdev, const struct pci_device_id *ent)
- 	if (err)
- 		return err;
- 
--	err = pci_request_regions(pdev, "gvnic-cfg");
-+	err = pci_request_regions(pdev, gve_driver_name);
- 	if (err)
- 		goto abort_with_enabled;
- 
-@@ -2393,8 +2394,8 @@ static const struct pci_device_id gve_id_table[] = {
- 	{ }
- };
- 
--static struct pci_driver gvnic_driver = {
--	.name		= "gvnic",
-+static struct pci_driver gve_driver = {
-+	.name		= gve_driver_name,
- 	.id_table	= gve_id_table,
- 	.probe		= gve_probe,
- 	.remove		= gve_remove,
-@@ -2405,10 +2406,10 @@ static struct pci_driver gvnic_driver = {
- #endif
- };
- 
--module_pci_driver(gvnic_driver);
-+module_pci_driver(gve_driver);
- 
- MODULE_DEVICE_TABLE(pci, gve_id_table);
- MODULE_AUTHOR("Google, Inc.");
--MODULE_DESCRIPTION("gVNIC Driver");
-+MODULE_DESCRIPTION("Google Virtual NIC Driver");
- MODULE_LICENSE("Dual MIT/GPL");
- MODULE_VERSION(GVE_VERSION);
--- 
-2.25.1
+Thanks,
+William Xuan
 
+> 
+> if (!mod_timer(&idev->rs_timer, jiffies + when))
+>      in6_dev_hold(idev);
+> .
+> 
 
