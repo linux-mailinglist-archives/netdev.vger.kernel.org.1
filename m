@@ -1,218 +1,120 @@
-Return-Path: <netdev+bounces-16169-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16170-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E8FFF74BA83
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 02:22:05 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C5CBE74BAE2
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 03:09:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 50682280DC5
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 00:22:04 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 7F69E1C2110C
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 01:09:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 6441B19A;
-	Sat,  8 Jul 2023 00:22:02 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 4892310EB;
+	Sat,  8 Jul 2023 01:09:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 53CEB197
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 00:22:02 +0000 (UTC)
-Received: from smtp-fw-33001.amazon.com (smtp-fw-33001.amazon.com [207.171.190.10])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 5ED51C9
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 17:22:00 -0700 (PDT)
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-  d=amazon.com; i=@amazon.com; q=dns/txt; s=amazon201209;
-  t=1688775721; x=1720311721;
-  h=from:to:cc:subject:date:message-id:mime-version:
-   content-transfer-encoding;
-  bh=pdGqE7rFronMHTEQSyi/HoWRMS8OH2lLi2CO8VUy7Qs=;
-  b=jNZxAKjGCvHWP6DW0fm2Yr50AUAK+U1KS6msi/yOXIJ4rpL6+SDDog1t
-   rpE3SGPS1iIU13oJgywvVC2ftV2xNpJyGggwfgqg3ORL7fFsyU8zwVSMh
-   FZMA7cgLwNpwxobfqJDNQl7meukeZ64KibnPe8bJpeOdw4CoDgAsBT1XA
-   U=;
-X-IronPort-AV: E=Sophos;i="6.01,189,1684800000"; 
-   d="scan'208";a="294635869"
-Received: from iad12-co-svc-p1-lb1-vlan3.amazon.com (HELO email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com) ([10.43.8.6])
-  by smtp-border-fw-33001.sea14.amazon.com with ESMTP/TLS/ECDHE-RSA-AES256-GCM-SHA384; 08 Jul 2023 00:21:59 +0000
-Received: from EX19MTAUWB002.ant.amazon.com (pdx1-ws-svc-p6-lb9-vlan3.pdx.amazon.com [10.236.137.198])
-	by email-inbound-relay-pdx-1box-2bm6-32cf6363.us-west-2.amazon.com (Postfix) with ESMTPS id 49C3780510;
-	Sat,  8 Jul 2023 00:21:57 +0000 (UTC)
-Received: from EX19D004ANA001.ant.amazon.com (10.37.240.138) by
- EX19MTAUWB002.ant.amazon.com (10.250.64.231) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 8 Jul 2023 00:21:56 +0000
-Received: from 88665a182662.ant.amazon.com (10.187.170.9) by
- EX19D004ANA001.ant.amazon.com (10.37.240.138) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.2.1118.30; Sat, 8 Jul 2023 00:21:53 +0000
-From: Kuniyuki Iwashima <kuniyu@amazon.com>
-To: "David S. Miller" <davem@davemloft.net>, David Ahern <dsahern@kernel.org>,
-	Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, "Paolo
- Abeni" <pabeni@redhat.com>
-CC: Kuniyuki Iwashima <kuniyu@amazon.com>, Kuniyuki Iwashima
-	<kuni1840@gmail.com>, <netdev@vger.kernel.org>, Wang Yufen
-	<wangyufen@huawei.com>
-Subject: [PATCH v2 net] icmp6: Fix null-ptr-deref of ip6_null_entry->rt6i_idev in icmp6_dev().
-Date: Fri, 7 Jul 2023 17:21:45 -0700
-Message-ID: <20230708002145.64069-1-kuniyu@amazon.com>
-X-Mailer: git-send-email 2.30.2
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BB6F17F
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 01:09:03 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id D605AC433C7;
+	Sat,  8 Jul 2023 01:09:02 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688778543;
+	bh=Xc/GyF8wG7SCEWxNkNX0FKLBYnK3yRSwOwLPvedznMk=;
+	h=Date:From:To:Cc:Subject:In-Reply-To:References:From;
+	b=LmN557GgBdTaDYb0Nkbeg+p31t3jotwq4Y7pO0i/83nvKs5gk0DPsVwKm//Emd3Ii
+	 ujBsk5qs/5oWKHc11vkhenpo7GG2a0obheK/AMi2oF3yIede/HqNAxs0MvAx6rq2x2
+	 DX56d1GNhAqOWu52pwYRoZxkx6TnI4+/Nmk8Zb6XKKPKVFqGh92fU4c5SIpQ5VCkDg
+	 jN1V4ZCPFFyltqpZIawFORJDKyoxuqofIVX2Oa8CQ1PK5AtPaBFDmNZHEycKpu28I/
+	 ZHX4xvAmj7A/AduakTOgdPyAhYS5lb5y5QaTOL52HaKHcPvA6ru6G3y5JhtyP3vt3q
+	 cJ8VIE7b8LBog==
+Date: Fri, 7 Jul 2023 18:09:01 -0700
+From: Jakub Kicinski <kuba@kernel.org>
+To: Tetsuo Handa <penguin-kernel@I-love.SAKURA.ne.jp>
+Cc: David Howells <dhowells@redhat.com>, David Ahern <dsahern@kernel.org>,
+ Jens Axboe <axboe@kernel.dk>, Matthew Wilcox <willy@infradead.org>, Network
+ Development <netdev@vger.kernel.org>
+Subject: Re: [possible regression in 6.5-rc1] sendmsg()/splice() returns
+ EBADMSG
+Message-ID: <20230707180901.34c17465@kernel.org>
+In-Reply-To: <b9b17f87-007f-3ef9-d9e3-3080749cf01f@I-love.SAKURA.ne.jp>
+References: <b9b17f87-007f-3ef9-d9e3-3080749cf01f@I-love.SAKURA.ne.jp>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-Content-Type: text/plain
-X-Originating-IP: [10.187.170.9]
-X-ClientProxiedBy: EX19D033UWC004.ant.amazon.com (10.13.139.225) To
- EX19D004ANA001.ant.amazon.com (10.37.240.138)
-Precedence: Bulk
-X-Spam-Status: No, score=-4.0 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	T_SCC_BODY_TEXT_LINE,T_SPF_PERMERROR,URIBL_BLOCKED autolearn=ham
-	autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Content-Type: text/plain; charset=US-ASCII
+Content-Transfer-Encoding: 7bit
 
-With some IPv6 Ext Hdr (RPL, SRv6, etc.), we can send a packet that
-has the link-local address as src and dst IP and will be forwarded to
-an external IP in the IPv6 Ext Hdr.
+On Sat, 8 Jul 2023 08:45:50 +0900 Tetsuo Handa wrote:
+> (Branched from https://lkml.kernel.org/r/63006262-f808-50ab-97b8-c2193c7a9ba1@I-love.SAKURA.ne.jp .)
+> 
+> I found that the following program started returning EBADMSG. Bisection for sendmsg() reached
+> commit c5c37af6ecad ("tcp: Convert do_tcp_sendpages() to use MSG_SPLICE_PAGES") and bisection
+> for splice() reached commit 2dc334f1a63a ("splice, net: Use sendmsg(MSG_SPLICE_PAGES) rather
+> than ->sendpage()"). Is this program doing something wrong?
+> 
+>   6.4.0-rc5-00892-g2dc334f1a63a-dirty    argc==1 ? splice()=EBADMSG, sendmsg()=EBADMSG : sendmsg()=success, splice()=EBADMSG
+>   6.4.0-rc5-00891-g81840b3b91aa-dirty    argc==1 ? splice()=success, sendmsg()=EBADMSG : sendmsg()=success, splice()=success
+> 
+>   6.4.0-rc2-00520-gc5c37af6ecad-dirty    argc==1 ? splice()=success, sendmsg()=EBADMSG : sendmsg()=success, splice()=success
+>   6.4.0-rc2-00519-g270a1c3de47e-dirty    argc==1 ? splice()=success, sendmsg()=success : sendmsg()=success, splice()=success
 
-For example, the script below generates a SRv6 packet whose src IP is
-the link-local address and dst is updated to 11::.
+> 	setsockopt(fd, SOL_TCP, TCP_REPAIR, &one, sizeof(one));
 
-  # for f in $(find /proc/sys/net/ -name *seg6_enabled*); do echo 1 > $f; done
-  # python3
-  >>> from socket import *
-  >>> from scapy.all import *
-  >>>
-  >>> SRC_ADDR = DST_ADDR = "fe80::5054:ff:fe12:3456"
-  >>>
-  >>> pkt = IPv6(src=SRC_ADDR, dst=DST_ADDR)
-  >>> pkt /= IPv6ExtHdrSegmentRouting(type=4, addresses=["11::", "22::"], segleft=1)
-  >>>
-  >>> sk = socket(AF_INET6, SOCK_RAW, IPPROTO_RAW)
-  >>> sk.sendto(bytes(pkt), (DST_ADDR, 0))
+I think it's just because the repro puts the socket in repair mode, 
+and the current code doesn't want to play with repair mode as nicely.
 
-For such a packet, we call ip6_route_input() to look up a route for the
-next destination in these three functions depending on the header type.
+I added:
+	// needs #include <linux/tcp.h>
+        int val = TCP_SEND_QUEUE;                                                   
+        setsockopt(fd, SOL_TCP, TCP_REPAIR_QUEUE, &val, sizeof(val)); 
 
-  * ipv6_rthdr_rcv()
-  * ipv6_rpl_srh_rcv()
-  * ipv6_srh_rcv()
+here (i.e. after putting the socket in repair mode), and I don't get 
+the EBADMSG any more. Both sendmsg and splice succeed.
 
-If no route is found, ip6_null_entry is set to skb, and the following
-dst_input(skb) calls ip6_pkt_drop().
+Can you check if we're back to the KMSAN problem with those lines added?
 
-Finally, in icmp6_dev(), we dereference skb_rt6_info(skb)->rt6i_idev->dev
-as the input device is the loopback interface.  Then, we have to check if
-skb_rt6_info(skb)->rt6i_idev is NULL or not to avoid NULL pointer deref
-for ip6_null_entry.
 
-BUG: kernel NULL pointer dereference, address: 0000000000000000
- PF: supervisor read access in kernel mode
- PF: error_code(0x0000) - not-present page
-PGD 0 P4D 0
-Oops: 0000 [#1] PREEMPT SMP PTI
-CPU: 0 PID: 157 Comm: python3 Not tainted 6.4.0-11996-gb121d614371c #35
-Hardware name: QEMU Standard PC (i440FX + PIIX, 1996), BIOS rel-1.16.0-0-gd239552ce722-prebuilt.qemu.org 04/01/2014
-RIP: 0010:icmp6_send (net/ipv6/icmp.c:436 net/ipv6/icmp.c:503)
-Code: fe ff ff 48 c7 40 30 c0 86 5d 83 e8 c6 44 1c 00 e9 c8 fc ff ff 49 8b 46 58 48 83 e0 fe 0f 84 4a fb ff ff 48 8b 80 d0 00 00 00 <48> 8b 00 44 8b 88 e0 00 00 00 e9 34 fb ff ff 4d 85 ed 0f 85 69 01
-RSP: 0018:ffffc90000003c70 EFLAGS: 00000286
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 00000000000000e0
-RDX: 0000000000000021 RSI: 0000000000000000 RDI: ffff888006d72a18
-RBP: ffffc90000003d80 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffc90000003d98 R11: 0000000000000040 R12: ffff888006d72a10
-R13: 0000000000000000 R14: ffff8880057fb800 R15: ffffffff835d86c0
-FS:  00007f9dc72ee740(0000) GS:ffff88807dc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000057b2000 CR4: 00000000007506f0
-PKRU: 55555554
-Call Trace:
- <IRQ>
- ip6_pkt_drop (net/ipv6/route.c:4513)
- ipv6_rthdr_rcv (net/ipv6/exthdrs.c:640 net/ipv6/exthdrs.c:686)
- ip6_protocol_deliver_rcu (net/ipv6/ip6_input.c:437 (discriminator 5))
- ip6_input_finish (./include/linux/rcupdate.h:781 net/ipv6/ip6_input.c:483)
- __netif_receive_skb_one_core (net/core/dev.c:5455)
- process_backlog (./include/linux/rcupdate.h:781 net/core/dev.c:5895)
- __napi_poll (net/core/dev.c:6460)
- net_rx_action (net/core/dev.c:6529 net/core/dev.c:6660)
- __do_softirq (./arch/x86/include/asm/jump_label.h:27 ./include/linux/jump_label.h:207 ./include/trace/events/irq.h:142 kernel/softirq.c:554)
- do_softirq (kernel/softirq.c:454 kernel/softirq.c:441)
- </IRQ>
- <TASK>
- __local_bh_enable_ip (kernel/softirq.c:381)
- __dev_queue_xmit (net/core/dev.c:4231)
- ip6_finish_output2 (./include/net/neighbour.h:544 net/ipv6/ip6_output.c:135)
- rawv6_sendmsg (./include/net/dst.h:458 ./include/linux/netfilter.h:303 net/ipv6/raw.c:656 net/ipv6/raw.c:914)
- sock_sendmsg (net/socket.c:725 net/socket.c:748)
- __sys_sendto (net/socket.c:2134)
- __x64_sys_sendto (net/socket.c:2146 net/socket.c:2142 net/socket.c:2142)
- do_syscall_64 (arch/x86/entry/common.c:50 arch/x86/entry/common.c:80)
- entry_SYSCALL_64_after_hwframe (arch/x86/entry/entry_64.S:120)
-RIP: 0033:0x7f9dc751baea
-Code: d8 64 89 02 48 c7 c0 ff ff ff ff eb b8 0f 1f 00 f3 0f 1e fa 41 89 ca 64 8b 04 25 18 00 00 00 85 c0 75 15 b8 2c 00 00 00 0f 05 <48> 3d 00 f0 ff ff 77 7e c3 0f 1f 44 00 00 41 54 48 83 ec 30 44 89
-RSP: 002b:00007ffe98712c38 EFLAGS: 00000246 ORIG_RAX: 000000000000002c
-RAX: ffffffffffffffda RBX: 00007ffe98712cf8 RCX: 00007f9dc751baea
-RDX: 0000000000000060 RSI: 00007f9dc6460b90 RDI: 0000000000000003
-RBP: 00007f9dc56e8be0 R08: 00007ffe98712d70 R09: 000000000000001c
-R10: 0000000000000000 R11: 0000000000000246 R12: 0000000000000000
-R13: ffffffffc4653600 R14: 0000000000000001 R15: 00007f9dc6af5d1b
- </TASK>
-Modules linked in:
-CR2: 0000000000000000
- ---[ end trace 0000000000000000 ]---
-RIP: 0010:icmp6_send (net/ipv6/icmp.c:436 net/ipv6/icmp.c:503)
-Code: fe ff ff 48 c7 40 30 c0 86 5d 83 e8 c6 44 1c 00 e9 c8 fc ff ff 49 8b 46 58 48 83 e0 fe 0f 84 4a fb ff ff 48 8b 80 d0 00 00 00 <48> 8b 00 44 8b 88 e0 00 00 00 e9 34 fb ff ff 4d 85 ed 0f 85 69 01
-RSP: 0018:ffffc90000003c70 EFLAGS: 00000286
-RAX: 0000000000000000 RBX: 0000000000000001 RCX: 00000000000000e0
-RDX: 0000000000000021 RSI: 0000000000000000 RDI: ffff888006d72a18
-RBP: ffffc90000003d80 R08: 0000000000000000 R09: 0000000000000001
-R10: ffffc90000003d98 R11: 0000000000000040 R12: ffff888006d72a10
-R13: 0000000000000000 R14: ffff8880057fb800 R15: ffffffff835d86c0
-FS:  00007f9dc72ee740(0000) GS:ffff88807dc00000(0000) knlGS:0000000000000000
-CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
-CR2: 0000000000000000 CR3: 00000000057b2000 CR4: 00000000007506f0
-PKRU: 55555554
-Kernel panic - not syncing: Fatal exception in interrupt
-Kernel Offset: disabled
+FWIW you can also try to repro with real tls sockets (not in repair
+mode) by adding cases to tools/testing/selftests/net/tls.c for example:
 
-Fixes: 4832c30d5458 ("net: ipv6: put host and anycast routes on device with address")
-Reported-by: Wang Yufen <wangyufen@huawei.com>
-Closes: https://lore.kernel.org/netdev/1ddf7fc8-bcb3-ab48-4894-24158e8a9d0f@huawei.com/
-Signed-off-by: Kuniyuki Iwashima <kuniyu@amazon.com>
-Reviewed-by: David Ahern <dsahern@kernel.org>
----
-v2:
-  * Add Reviewed-by
-  * s/fib6_null_entry/ip6_null_entry/
+TEST_F(tls, bla_bla)
+{
+	struct iovec iov = {
+		.iov_base = "@@@@@@@@@@@@@@@@",
+		.iov_len = 16
+	};
+	struct msghdr hdr = {
+		.msg_iov = &iov,
+		.msg_iovlen = 1,
+		.msg_flags = MSG_FASTOPEN
+	};
+	int pipe_fds[2] = { -1, -1 };
+	static char buf[32768] = { };
+	int ret;
 
-v1: https://lore.kernel.org/netdev/20230706233024.63730-1-kuniyu@amazon.com/
----
- net/ipv6/icmp.c | 5 ++++-
- 1 file changed, 4 insertions(+), 1 deletion(-)
+	ret = pipe(pipe_fds);
+	ASSERT_EQ(ret, 0);
 
-diff --git a/net/ipv6/icmp.c b/net/ipv6/icmp.c
-index 9edf1f45b1ed..65fa5014bc85 100644
---- a/net/ipv6/icmp.c
-+++ b/net/ipv6/icmp.c
-@@ -424,7 +424,10 @@ static struct net_device *icmp6_dev(const struct sk_buff *skb)
- 	if (unlikely(dev->ifindex == LOOPBACK_IFINDEX || netif_is_l3_master(skb->dev))) {
- 		const struct rt6_info *rt6 = skb_rt6_info(skb);
- 
--		if (rt6)
-+		/* The destination could be an external IP in Ext Hdr (SRv6, RPL, etc.),
-+		 * and ip6_null_entry could be set to skb if no route is found.
-+		 */
-+		if (rt6 && rt6->rt6i_idev)
- 			dev = rt6->rt6i_idev->dev;
- 	}
- 
--- 
-2.30.2
+	EXPECT_EQ(write(pipe_fds[1], buf, 2432), 2432);
+	EXPECT_EQ(write(pipe_fds[1], buf, 10676), 10676);
+	EXPECT_EQ(write(pipe_fds[1], buf, 17996), 17996);
 
+	EXPECT_EQ(splice(pipe_fds[0], NULL, self->fd, NULL, 1048576,
+			 SPLICE_F_MORE), 17996 + 10676 + 2432);
+	EXPECT_EQ(sendmsg(self->fd, &hdr, MSG_DONTWAIT | MSG_MORE), 16);
+}
+
+Then compiling:
+
+make -C tools/testing/selftests/net/
+
+And running:
+
+tools/testing/selftests/net/tls -r tls.13_aes_gcm_256.bla_bla
 
