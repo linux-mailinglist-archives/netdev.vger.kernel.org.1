@@ -1,76 +1,76 @@
-Return-Path: <netdev+bounces-16204-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16205-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 16F4374BCC5
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 10:10:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id C202074BCC8
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 10:15:08 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 2149E1C21144
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 08:10:15 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id F2A531C21136
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 08:15:07 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id CB8E51FD0;
-	Sat,  8 Jul 2023 08:10:12 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A5DE91FDC;
+	Sat,  8 Jul 2023 08:15:05 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id BA4931FA1
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 08:10:12 +0000 (UTC)
-Received: from mail-qt1-x82b.google.com (mail-qt1-x82b.google.com [IPv6:2607:f8b0:4864:20::82b])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A40C71FEC
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 01:10:10 -0700 (PDT)
-Received: by mail-qt1-x82b.google.com with SMTP id d75a77b69052e-401f4408955so72461cf.1
-        for <netdev@vger.kernel.org>; Sat, 08 Jul 2023 01:10:10 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 99AF615BF
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 08:15:05 +0000 (UTC)
+Received: from mail-il1-x12a.google.com (mail-il1-x12a.google.com [IPv6:2607:f8b0:4864:20::12a])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 07D7CE46
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 01:15:04 -0700 (PDT)
+Received: by mail-il1-x12a.google.com with SMTP id e9e14a558f8ab-345bc4a438fso48855ab.1
+        for <netdev@vger.kernel.org>; Sat, 08 Jul 2023 01:15:04 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=google.com; s=20221208; t=1688803810; x=1691395810;
+        d=google.com; s=20221208; t=1688804103; x=1691396103;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:from:to:cc:subject:date
          :message-id:reply-to;
-        bh=2R5OHE2Pj5QFma/bZRlsHFlvV/PIKSgmhFXgTYCpZJA=;
-        b=NBhjU0INhfllVxiFlH2/14S8EfhLJDUL75/xmjB+54rCDViFH5JbFzXzLdgBMN11yi
-         9ldgxYMlCrQlwVXTMjoEHZeEqtTgD7a3Ui8tF2NkKpYh5rxvH6h8G6Qe1t/IVwQIbwor
-         byEvaTSYL4IkonyAJYPmAb3q4LGuaP2Jk2N8Lk1jQaBCBf0nXbedjpa9D8Cv9b+wT+83
-         eCFfSyS5PMrujaUjSuIOCVrW7EO4272DhpGbJIAGuBqgOdbiBXl1T6Y8WztrXyCyVflZ
-         9z8ddNsI/1xE20VZ6kuDir9dprFwbnpZKFPklwfY3XMwjplo59qrCjydmDOz+sBPdNcy
-         R2rg==
+        bh=ptNjjKXGcwZToYdhG5E+R3gTYS7XOojk1RxLpM+iNoU=;
+        b=SsKP+n2usM6BSpSS0v4T5jxv53YUoGnKD4IWnoGFscHZjs2z4mkURqQcT5nsAFhhnT
+         rIOQJ5LB3k3mkJ+Wuk9D4MWu57ys1bK889+b4gaJlVez+31zX2TX4+rsSzH3ptXZBa5/
+         FPgPTfhNDHwZWIBs3blZnft8cq6mtzRGEco9LnQSza9YapY0o8O/cSZ5QF595whI7zSn
+         2YEADBpqqsMyDt94FihTWrlW6QFAuaO32omIUKNEFdfsj59DPOw/6cZqxqQLa/4wYxcf
+         ZpjF3pMfSR+BgmQ5rEpWjWqkKlRBQMK0W+xQhz5bh3Wk8hH/m996LO5VOdeGs8UOhbR4
+         8AIQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688803810; x=1691395810;
+        d=1e100.net; s=20221208; t=1688804103; x=1691396103;
         h=content-transfer-encoding:cc:to:subject:message-id:date:from
          :in-reply-to:references:mime-version:x-gm-message-state:from:to:cc
          :subject:date:message-id:reply-to;
-        bh=2R5OHE2Pj5QFma/bZRlsHFlvV/PIKSgmhFXgTYCpZJA=;
-        b=C6amXJMfSSw7s2Rsf6T9ef9EN1ESW5g99yT+ZlVqJbpoCAyWSsMTgfCPp4Ll/XY6aj
-         tG3fFtMWMmfGgYlOvmMu5MXPJAuFWHGnJb4mxKTUhifM38pyyjPbZ3yW3CKGvT0g8kwt
-         pv7Ubw7zws9YAX0KTf9NAYsy9ezd13cGXZOr/F8rPAmcWJGZRtHiLIc7TzcMgxUP/ZLs
-         IxBDnIGOI7QtmEduAoS5Sixt+8cjViPLstsepEAatth+RIjYNrDLwBk9haZ+3zw2YKDU
-         7dy6RwB8uD6mp2+8WsmLcbk+DZ+Yvymmg/q7Gys0cCdVxBIB95zZ3ZfYcFQe9tqIO8cl
-         r/CQ==
-X-Gm-Message-State: ABy/qLbLWLpju4jtVvdOev24h4SahWuxTJDPJCstyVfSMqO1RHaNYB84
-	zBVyjJNVv6Y+gogDU8w0g5qaoHnZLk4SPArifaDK6Q==
-X-Google-Smtp-Source: APBJJlG7sK5ypM7d/hL6hWAya4DxaATro6/s7nZAWIOXFEZ5mlG4wMw7T3g3UODhgPY1YwrHX+qY3GpIVbxgxJhyR6w=
-X-Received: by 2002:ac8:5b09:0:b0:3f8:8c06:c53b with SMTP id
- m9-20020ac85b09000000b003f88c06c53bmr126030qtw.0.1688803809412; Sat, 08 Jul
- 2023 01:10:09 -0700 (PDT)
+        bh=ptNjjKXGcwZToYdhG5E+R3gTYS7XOojk1RxLpM+iNoU=;
+        b=NyovjtCc0Ye26Vn2syZ4SmbKwqtuFs3bJyVJSTYqwg6ykibWNkzcOCQPQ6d1wQ0kq6
+         AoRof3zTUzEJgLRo6uEWqlpRKC8uIaN/7M4VJ8Su1P7yoJVB0Gto80nS4q0nMOhP3OIU
+         GRTxtbufyTQWs8/dGMTr68VYtaUsq77fQvpBYxqxA/uGSTfZo3ewZ3J6edQCmLvPzhUn
+         qs2DPViSg2GY6LnsN+kQ2FCn3ucQfl6UC69+hmA8x9P+dHp5Ric/c5bYsso4rslTKps/
+         lffRIAl+Ohr4cwUz/3cex4+grAYFkPfC88HAk8ITxtf0hbqDPxrUYclTMHMYeqW9PXSS
+         1sFQ==
+X-Gm-Message-State: ABy/qLarbxg5BssJILtcydl0F3P/ipqvieb+P3TPvhKs9ARm4bDaEsK9
+	YWfB9oZV6fpZzNRCxPfdZx9oEYQlbNL4oadyot6LX26XT1JgnUAGwODCzg==
+X-Google-Smtp-Source: APBJJlELP4TCw4+VSXJ+gXqjgfDM1XkeqbGZYLVk5wEBZEx10U9fDLLiNYQXYfOM6yBFzp2eJmNZgFKMvVGpRYlvIYs=
+X-Received: by 2002:a05:6e02:1ca2:b0:331:aabc:c8b7 with SMTP id
+ x2-20020a056e021ca200b00331aabcc8b7mr141547ill.10.1688804103180; Sat, 08 Jul
+ 2023 01:15:03 -0700 (PDT)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <20230707220000.461410-1-pctammela@mojatatu.com> <20230707220000.461410-4-pctammela@mojatatu.com>
-In-Reply-To: <20230707220000.461410-4-pctammela@mojatatu.com>
+References: <20230707220000.461410-1-pctammela@mojatatu.com> <20230707220000.461410-2-pctammela@mojatatu.com>
+In-Reply-To: <20230707220000.461410-2-pctammela@mojatatu.com>
 From: Eric Dumazet <edumazet@google.com>
-Date: Sat, 8 Jul 2023 10:09:58 +0200
-Message-ID: <CANn89i+fBupepzT1=-BRNVqX+iciiTmg5CZL8CZYbqk8188MUA@mail.gmail.com>
-Subject: Re: [PATCH net v2 3/4] net/sched: sch_qfq: account for stab overhead
- in qfq_enqueue
+Date: Sat, 8 Jul 2023 10:14:51 +0200
+Message-ID: <CANn89iJoJO5VtaJ-2=_d2aOQhb0Xw8iBT_Cxqp2HyuS-zj6azw@mail.gmail.com>
+Subject: Re: [PATCH net v2 1/4] net/sched: sch_qfq: reintroduce lmax bound
+ check for MTU
 To: Pedro Tammela <pctammela@mojatatu.com>
 Cc: netdev@vger.kernel.org, jhs@mojatatu.com, xiyou.wangcong@gmail.com, 
 	jiri@resnulli.us, davem@davemloft.net, kuba@kernel.org, pabeni@redhat.com, 
 	shuah@kernel.org, shaozhengchao@huawei.com, victor@mojatatu.com, 
-	simon.horman@corigine.com, paolo.valente@unimore.it, Lion <nnamrec@gmail.com>
+	simon.horman@corigine.com, paolo.valente@unimore.it
 Content-Type: text/plain; charset="UTF-8"
 Content-Transfer-Encoding: quoted-printable
 X-Spam-Status: No, score=-17.6 required=5.0 tests=BAYES_00,DKIMWL_WL_MED,
@@ -84,64 +84,66 @@ X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 On Sat, Jul 8, 2023 at 12:01=E2=80=AFAM Pedro Tammela <pctammela@mojatatu.c=
 om> wrote:
 >
-> Lion says:
-> -------
-> In the QFQ scheduler a similar issue to CVE-2023-31436
-> persists.
+> 25369891fcef deletes a check for the case where no 'lmax' is
+> specified which 3037933448f6 previously fixed as 'lmax'
+> could be set to the device's MTU without any bound checking
+> for QFQ_LMAX_MIN and QFQ_LMAX_MAX. Therefore, reintroduce the check.
 >
-> Consider the following code in net/sched/sch_qfq.c:
->
-> static int qfq_enqueue(struct sk_buff *skb, struct Qdisc *sch,
->                 struct sk_buff **to_free)
-> {
->      unsigned int len =3D qdisc_pkt_len(skb), gso_segs;
->
->     // ...
->
->      if (unlikely(cl->agg->lmax < len)) {
->          pr_debug("qfq: increasing maxpkt from %u to %u for class %u",
->               cl->agg->lmax, len, cl->common.classid);
->          err =3D qfq_change_agg(sch, cl, cl->agg->class_weight, len);
->          if (err) {
->              cl->qstats.drops++;
->              return qdisc_drop(skb, sch, to_free);
->          }
->
->     // ...
->
->      }
->
-
-> This is caused by incorrectly assuming that qdisc_pkt_len() returns a
-> length within the QFQ_MIN_LMAX < len < QFQ_MAX_LMAX.
->
-> Fixes: 462dbc9101ac ("pkt_sched: QFQ Plus: fair-queueing service at DRR c=
-ost")
-> Reported-by: Lion <nnamrec@gmail.com>
-> Signed-off-by: Jamal Hadi Salim <jhs@mojatatu.com>
+> Fixes: 25369891fcef ("net/sched: sch_qfq: refactor parsing of netlink par=
+ameters")
+> Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
 > Signed-off-by: Pedro Tammela <pctammela@mojatatu.com>
 > ---
->  net/sched/sch_qfq.c | 7 ++++++-
->  1 file changed, 6 insertions(+), 1 deletion(-)
+>  net/sched/sch_qfq.c | 11 +++++++++--
+>  1 file changed, 9 insertions(+), 2 deletions(-)
 >
 > diff --git a/net/sched/sch_qfq.c b/net/sched/sch_qfq.c
-> index 63a5b277c117..befaf74b33ca 100644
+> index dfd9a99e6257..63a5b277c117 100644
 > --- a/net/sched/sch_qfq.c
 > +++ b/net/sched/sch_qfq.c
-> @@ -381,8 +381,13 @@ static int qfq_change_agg(struct Qdisc *sch, struct =
-qfq_class *cl, u32 weight,
->                            u32 lmax)
->  {
->         struct qfq_sched *q =3D qdisc_priv(sch);
-> -       struct qfq_aggregate *new_agg =3D qfq_find_agg(q, lmax, weight);
-> +       struct qfq_aggregate *new_agg;
+> @@ -423,10 +423,17 @@ static int qfq_change_class(struct Qdisc *sch, u32 =
+classid, u32 parentid,
+>         else
+>                 weight =3D 1;
 >
-> +       /* 'lmax' can range from [QFQ_MIN_LMAX, pktlen + stab overhead] *=
-/
-> +       if (lmax > QFQ_MAX_LMAX)
-> +               return -EINVAL;
-> +
-> +       new_agg =3D qfq_find_agg(q, lmax, weight);
+> -       if (tb[TCA_QFQ_LMAX])
+> +       if (tb[TCA_QFQ_LMAX]) {
+>                 lmax =3D nla_get_u32(tb[TCA_QFQ_LMAX]);
+> -       else
+> +       } else {
+> +               /* MTU size is user controlled */
+>                 lmax =3D psched_mtu(qdisc_dev(sch));
+> +               if (lmax < QFQ_MIN_LMAX || lmax > QFQ_MAX_LMAX) {
+> +                       NL_SET_ERR_MSG_MOD(extack,
+> +                                          "MTU size out of bounds for qf=
+q");
+> +                       return -EINVAL;
+> +               }
+> +       }
+>
 
 Reviewed-by: Eric Dumazet <edumazet@google.com>
+
+Speaking of psched_mtu(), I see that net/sched/sch_pie.c is using it
+without holding RTNL,
+so dev->mtu can be changed underneath. KCSAN could issue a warning.
+
+Feel free to submit this fix (I am currently traveling)
+
+diff --git a/include/net/pkt_sched.h b/include/net/pkt_sched.h
+index e98aac9d5ad5737592ab7cd409c174707cd68681..15960564e0c364ef430f1e3fcdd=
+0e835c2f94a77
+100644
+--- a/include/net/pkt_sched.h
++++ b/include/net/pkt_sched.h
+@@ -134,7 +134,7 @@ extern const struct nla_policy rtm_tca_policy[TCA_MAX +=
+ 1];
+  */
+ static inline unsigned int psched_mtu(const struct net_device *dev)
+ {
+-       return dev->mtu + dev->hard_header_len;
++       return READ_ONCE(dev->mtu) + dev->hard_header_len;
+ }
+
+ static inline struct net *qdisc_net(struct Qdisc *q)
 
