@@ -1,208 +1,114 @@
-Return-Path: <netdev+bounces-16215-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16216-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id C07BD74BDA8
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 15:37:16 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4AF0774BDB0
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 16:01:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C75FB281455
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 13:37:14 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0331C20933
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 14:01:11 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 21F386FB4;
-	Sat,  8 Jul 2023 13:37:13 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EC5746B;
+	Sat,  8 Jul 2023 14:01:08 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 0A687524E
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 13:37:12 +0000 (UTC)
-Received: from NAM10-MW2-obe.outbound.protection.outlook.com (mail-mw2nam10on2123.outbound.protection.outlook.com [40.107.94.123])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id ADD24EB;
-	Sat,  8 Jul 2023 06:37:09 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=A3PV6ultnDNA98LLTbVj0DiImqOz9HZfa5b5jQ0vSBQJRXCk1shNE03po7f0iWPcm0Q8tr/l4E74V2fxJ4m9ANC28/yWGNZMmaWgx6L1VwZNUL5kGi/IJLUKRF/xnS1KCBQiPE/9lWLdbZVDjdCpIy7nkY934/5Ng/U5Dv49UsUCph6+ZBZHuc2n63S8arhSBx1zDJWbL9t3APJgaAql6G/9TuDGmfecNtvEUj6jqd01DWfPqagihisvZgd/XcP5MvzQz7rK8RXoE3/5E/Cp9W9/0xmwiJYJr7y6QP+/OK5MyPzKbuJgzdzuHMxhkRKHg5b1rybBp/Bvy0RlXUajcw==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=V+YJZiI/230AT9dDKfzD+qahnAtBDF5YY4cjusG3m5k=;
- b=C4TQH7FS6v1C6W74NuB5twDuBFnEbMZyEJHhqP9GKOCtAvCs4S8+d3I9A5ZXIOnkO73K50DwIzDDq/k605JHl2WtCaFXUscTdln0+gj1jn/wBMZlBsBDFLlgjKv6yICZuTXv91loNHWwItj38VoS+IMM0UOfDsDNtwbbRKSOfsC5nHquaROZlrfVKHro9Ujj/pX0tQ0OJuGznTqajiDxa6AsJ1/t/FcNikMQsZvpJPx5yVuCVTkcnaJgM+WeCSsaZks/BtQPnHj9+EJtRSv44DTqO/ugOFvzhO3dK1mMcgli+CtkEKJJX+kP+ICjqQSkGpcxbP4XGuqcqGh33WUHyg==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
- dkim=pass header.d=corigine.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
- d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=V+YJZiI/230AT9dDKfzD+qahnAtBDF5YY4cjusG3m5k=;
- b=IoXsjfOtRZXL0B6J/X0qOR7oiu7AlpzqeIshuRaYNUoKibPAkRq9ZoK3b030JXthSqo7V7UMwWdGuPQLO9F43xwh0pb5Bi3B3sfYRx2jIUj7k3khU4ab8HUC7mTCiP0qhpoHkrs6RSsnC1lhWIkw+iiLvz5PHCxocYeUjnTQ4ug=
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=corigine.com;
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
- by PH7PR13MB5985.namprd13.prod.outlook.com (2603:10b6:510:12c::19) with
- Microsoft SMTP Server (version=TLS1_2,
- cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6565.26; Sat, 8 Jul
- 2023 13:37:04 +0000
-Received: from PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
- ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6565.026; Sat, 8 Jul 2023
- 13:37:04 +0000
-Date: Sat, 8 Jul 2023 14:36:56 +0100
-From: Simon Horman <simon.horman@corigine.com>
-To: Niklas Schnelle <schnelle@linux.ibm.com>
-Cc: Paolo Abeni <pabeni@redhat.com>,
-	Alexandra Winter <wintera@linux.ibm.com>,
-	Wenjia Zhang <wenjia@linux.ibm.com>,
-	Heiko Carstens <hca@linux.ibm.com>,
-	Vasily Gorbik <gor@linux.ibm.com>,
-	Alexander Gordeev <agordeev@linux.ibm.com>,
-	Christian Borntraeger <borntraeger@linux.ibm.com>,
-	Sven Schnelle <svens@linux.ibm.com>,
-	"David S. Miller" <davem@davemloft.net>,
-	Stefan Raspl <raspl@linux.ibm.com>,
-	Jan Karcher <jaka@linux.ibm.com>, linux-s390@vger.kernel.org,
-	netdev@vger.kernel.org, linux-kernel@vger.kernel.org
-Subject: Re: [PATCH net v2 1/3] s390/ism: Fix locking for forwarding of IRQs
- and events to clients
-Message-ID: <ZKlmeDUEZf7F8+HW@corigine.com>
-References: <20230707104359.3324039-1-schnelle@linux.ibm.com>
- <20230707104359.3324039-2-schnelle@linux.ibm.com>
-Content-Type: text/plain; charset=us-ascii
-Content-Disposition: inline
-In-Reply-To: <20230707104359.3324039-2-schnelle@linux.ibm.com>
-X-ClientProxiedBy: LO4P123CA0311.GBRP123.PROD.OUTLOOK.COM
- (2603:10a6:600:197::10) To PH0PR13MB4842.namprd13.prod.outlook.com
- (2603:10b6:510:78::6)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13696FB6
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 14:01:08 +0000 (UTC)
+Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C357610EA
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 07:01:06 -0700 (PDT)
+Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
+	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
+	id 1qI8Uj-00032Y-5B; Sat, 08 Jul 2023 16:01:05 +0200
+Message-ID: <ac2efb70-aa19-41d3-ac57-8aaaf39c620b@leemhuis.info>
+Date: Sat, 8 Jul 2023 16:01:04 +0200
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB5985:EE_
-X-MS-Office365-Filtering-Correlation-Id: 9506ae66-5cea-4354-2c5d-08db7fb86a33
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	mz4ZWaTNti8GvSPhmu5tuwbl4SGGhLVp9kgAzZvno3bM7+hZYIK2M/4wWFjTE2/zeFRk3CH69YAgDUqOSoZiUVMGVW6h+jf/VX6tr6pwV4hwGdm1P4L2gLW+134Nxr4fNIW2FwMjMznj2sJa61eRAfuj1Tgt2bTgG4r4jLiHsu1GASaWZ2+22i28hs+Myt7g6J9VPm8SK6TwBdF5VxH4TC5PJEazOYTDnP1WReBU8FMaK/FOj31kymfAqlOr1xj8hsxbtF2RLNu+o5+d25eOcXrO3fss346E7SXgWvgk2futI9IkBvmwir9zCdrlNDi+5mvJIIqyFZHhQv4dclFEpR5VRs/NSpqcCHBYpe8N9SLEBTgJx/TzCCW8l9242aE/nMM38Ohik1wC8tBDKQiHzL1AZCx1vaGzGu1yx0pJ1HSnceZVMJ4mF16/efl1pA0e6hKaiDmB67Ul65jdpwxUnSiduVLvLAm7CDmltxZ8gTFgQMtHirM0eiELGI2kYrp3nKcW45OYnJMa6xp11mCmsfRzMEcyxYav6prcXMRfLoau9bwunmIio+dLpSGweX4tq1+vqn3FTYzxeoP+yNIlyxMcRsqcSV22ek179Kl7qI48rg+qdzCnZ66gzbIhQyY7bCeZuTOsyaL+VzUN95I8lSRAo9nzYMSYTjs+oCZaLPc=
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(39830400003)(396003)(366004)(376002)(346002)(136003)(451199021)(4326008)(6916009)(66946007)(66556008)(66476007)(38100700002)(2616005)(86362001)(186003)(6506007)(26005)(83380400001)(36756003)(478600001)(6512007)(6666004)(6486002)(54906003)(44832011)(41300700001)(7416002)(5660300002)(8676002)(8936002)(2906002)(316002)(67856001);DIR:OUT;SFP:1102;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?us-ascii?Q?rCTtjhx8tY0KVaoeEBJyrGACQZIt2LsG1mWxMpBUKmpTIBEP6lbuylYVH99U?=
- =?us-ascii?Q?qNNK1debnoxE02rrTi8ZFopFKtBQSL3IOvcKb/otoXQ6Owwl9qV3cyaWu0mF?=
- =?us-ascii?Q?CsfCDCJpKbA+1AcaWHR8nPcV4ebBhScY43MjPPJXjlxygScxcsSJ4RcKBuZj?=
- =?us-ascii?Q?avUdGKJid9WHJCqq/0gIN2SiiW8sjeOmYdKBTXvHfnnUQGc0k1MEHtAtvBzL?=
- =?us-ascii?Q?ju8MLNQxLxTGVA2hneLzC3ufrcoGoS3kEMFqhHdDPo+KOxKCrq04bI5gNOcC?=
- =?us-ascii?Q?ZKl10hTwNEIFEDmbCb1+cjHywmHRBAvjyx3uPAUWA3rKvXfwZH9tEW8fAHtD?=
- =?us-ascii?Q?tiLe04vazCSLobPaRZK8XiFK6Nl3MklqFRua6+Wwi3S4Zc+85KRLbcdYw/Ka?=
- =?us-ascii?Q?SAlD0gPufFzIrMRaZ5TL7mEbMa4xNhUhzr7YViowyzz3gdJKn+nAxP6lNC8N?=
- =?us-ascii?Q?hWNKlV8ldM3Sa0WLlo7wA5YtDdz59to425Xz7Ht7isYtdGHW6r6JQwKXnsp9?=
- =?us-ascii?Q?zxtR9RQsbdAUrrZEq8llH/d9C1lUdL6lFXjle667JQIdMoJVp5qfI6LDIsRL?=
- =?us-ascii?Q?M2J8A2Qbxc4QKY8I1fajWxoZ5yDHXoORS7VNsKseleMAIPirZhFIVim7UC7a?=
- =?us-ascii?Q?vNoPQuaB0sv8sSogxrIRbpnti44FHejlMzUOMV1wMtK8l82l3KO6YO2TPkpJ?=
- =?us-ascii?Q?DUoDRWGEwIQOBBmOBQbmye/eacWdViPQGhElCw+mr+JuCHpSe0+L9QUaaLWz?=
- =?us-ascii?Q?f4oJ/3EgxOv+p8MrnotERuQRTxHqXr7STf+MziUtf3XAd7lqLCfuEL6HFWeN?=
- =?us-ascii?Q?1U2oveRH+z91PAGvC7Dh1wdE70bU7B0nPrFt+JaNAVQ41wcHvQ9+OTcnAHct?=
- =?us-ascii?Q?y9t2S47fhkUrOH6Xf5NrTaolsgnxdHugYGPzKpfit++9zP7AJtkXKOCzsiKZ?=
- =?us-ascii?Q?NX749Kzq+Tnao9Cw1CdNXas5Aa7myHTNHakkCP58zmEnuFmA4THMEgFFyGzC?=
- =?us-ascii?Q?zLhbSdbOr/FzpvMUgswOqPIAZnhGtraI2eQE4VPoTPJO4ozNpkBFRuD74Lpo?=
- =?us-ascii?Q?hZMtfKMqAvICJy04DvOSt6VWjQxImFLfkg9FlWkQYpzfYyxUrI7SlYy016Jy?=
- =?us-ascii?Q?Vwu8UqlJ3gMeHl4PvEe+b8a4MbME09tA9IADxjtrtyVr2Za0+D/1wCScvY5X?=
- =?us-ascii?Q?JHJBHGo/G0pCfAi2dlKVtWhCrZ/GwKf1IbDOHJ4dHJiw7zyTH9Eq43Es/NkW?=
- =?us-ascii?Q?p5sijN/sbaTFSHqpFYuiTcxDl9bU1Toay8OHdVUdh39bMfRD+t9oSM2mrxBs?=
- =?us-ascii?Q?2yoo3A7ztdb632JhGbNdG3HT9fMC4v4VpMdoXcIN5xhvQQRuF/5gxt8FxcdA?=
- =?us-ascii?Q?wCAUDqacc119CHvl0NHIWfqCDEOWJozIuso6fpIBVb6mgM9TjxfIcc6a90mS?=
- =?us-ascii?Q?HUBUqWA4BDcy82s2xzwO6yJdd8MNn8t5uWBhp2wNUcsXuPTq8SK8F3XdIWyo?=
- =?us-ascii?Q?nFpVS4fw2CveAUVz170UKn3KnFxTwQVuGtaR5VY7YiYq2TmEJl7zlP6SzEcs?=
- =?us-ascii?Q?L0tmhtMMDqQ7OdLVZytvRiHjUcQkPUf2fOyq/wx+35dqFVhdpqQZPtmXcoGt?=
- =?us-ascii?Q?dQ=3D=3D?=
-X-OriginatorOrg: corigine.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 9506ae66-5cea-4354-2c5d-08db7fb86a33
-X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2023 13:37:03.8392
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: m/wWsTLpdc2bsBIiARXJ2eC+RwdrH5pAAb7exSG6Vz03/BDJEyXpuuwoDaxADKM28Hk32Q8nA+TdGb53KSbeJKeyC0x39zjGy/aiWLk4gWc=
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB5985
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: Regression: supported_interfaces filling enforcement
+Content-Language: en-US, de-DE
+To: Sergei Antonov <saproj@gmail.com>, netdev@vger.kernel.org,
+ Vladimir Oltean <olteanv@gmail.com>, rmk+kernel@armlinux.org.uk
+References: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
+From: "Linux regression tracking (Thorsten Leemhuis)"
+ <regressions@leemhuis.info>
+Cc: Linux kernel regressions list <regressions@lists.linux.dev>
+Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
+In-Reply-To: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 7bit
+X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688824866;9b4fe350;
+X-HE-SMSGID: 1qI8Uj-00032Y-5B
+X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
+	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
+	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, Jul 07, 2023 at 12:43:57PM +0200, Niklas Schnelle wrote:
-> The clients array references all registered clients and is protected by
-> the clients_lock. Besides its use as general list of clients the clients
-> array is accessed in ism_handle_irq() to forward ISM device events to
-> clients.
+[CCing the regression list, as it should be in the loop for regressions:
+https://docs.kernel.org/admin-guide/reporting-regressions.html]
+
+[TLDR: I'm adding this report to the list of tracked Linux kernel
+regressions; the text you find below is based on a few templates
+paragraphs you might have encountered already in similar form.
+See link in footer if these mails annoy you.]
+
+On 04.07.23 16:28, Sergei Antonov wrote:
+> Hello!
+> This commit seems to break the mv88e6060 dsa driver:
+> de5c9bf40c4582729f64f66d9cf4920d50beb897    "net: phylink: require
+> supported_interfaces to be filled"
 > 
-> While the clients_lock is taken in the IRQ handler when calling
-> handle_event() it is however incorrectly not held during the
-> client->handle_irq() call and for the preceding clients[] access leaving
-> it unprotected against concurrent client (un-)registration.
+> The driver does not fill 'supported_interfaces'. What is the proper
+> way to fix it? I managed to fix it by the following quick code.
+> Comments? Recommendations?
 > 
-> Furthermore the accesses to ism->sba_client_arr[] in ism_register_dmb()
-> and ism_unregister_dmb() are not protected by any lock. This is
-> especially problematic as the client ID from the ism->sba_client_arr[]
-> is not checked against NO_CLIENT and neither is the client pointer
-> checked.
-> 
-> Instead of expanding the use of the clients_lock further add a separate
-> array in struct ism_dev which references clients subscribed to the
-> device's events and IRQs. This array is protected by ism->lock which is
-> already taken in ism_handle_irq() and can be taken outside the IRQ
-> handler when adding/removing subscribers or the accessing
-> ism->sba_client_arr[]. This also means that the clients_lock is no
-> longer taken in IRQ context.
-> 
-> Fixes: 89e7d2ba61b7 ("net/ism: Add new API for client registration")
-> Signed-off-by: Niklas Schnelle <schnelle@linux.ibm.com>
+> +static void mv88e6060_get_caps(struct dsa_switch *ds, int port,
+> +                              struct phylink_config *config)
+> +{
+> +       __set_bit(PHY_INTERFACE_MODE_INTERNAL, config->supported_interfaces);
+> +       __set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
+> +}
+> +
+>  static const struct dsa_switch_ops mv88e6060_switch_ops = {
+>         .get_tag_protocol = mv88e6060_get_tag_protocol,
+>         .setup          = mv88e6060_setup,
+>         .phy_read       = mv88e6060_phy_read,
+>         .phy_write      = mv88e6060_phy_write,
+> +       .phylink_get_caps = mv88e6060_get_caps
+>  };
 
-...
+Thanks for the report. To be sure the issue doesn't fall through the
+cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
+tracking bot:
 
-> @@ -71,6 +80,7 @@ int ism_register_client(struct ism_client *client)
->  		list_for_each_entry(ism, &ism_dev_list.list, list) {
->  			ism->priv[i] = NULL;
->  			client->add(ism);
-> +			ism_setup_forwarding(client, ism);
->  		}
->  	}
->  	mutex_unlock(&ism_dev_list.mutex);
+#regzbot ^introduced de5c9bf40c4582729f6
+#regzbot title net: phylink: mv88e6060 dsa driver broken
+#regzbot ignore-activity
 
-...
+This isn't a regression? This issue or a fix for it are already
+discussed somewhere else? It was fixed already? You want to clarify when
+the regression started to happen? Or point out I got the title or
+something else totally wrong? Then just reply and tell me -- ideally
+while also telling regzbot about it, as explained by the page listed in
+the footer of this mail.
 
-> @@ -92,6 +102,9 @@ int ism_unregister_client(struct ism_client *client)
->  		max_client--;
->  	spin_unlock_irqrestore(&clients_lock, flags);
->  	list_for_each_entry(ism, &ism_dev_list.list, list) {
-> +		spin_lock_irqsave(&ism->lock, flags);
+Developers: When fixing the issue, remember to add 'Link:' tags pointing
+to the report (the parent of this mail). See page linked in footer for
+details.
 
-Hi Niklas,
-
-The lock is taken here.
-
-> +		/* Stop forwarding IRQs and events */
-> +		ism->subs[client->id] = NULL;
->  		for (int i = 0; i < ISM_NR_DMBS; ++i) {
->  			if (ism->sba_client_arr[i] == client->id) {
->  				pr_err("%s: attempt to unregister client '%s'"
-> @@ -101,6 +114,7 @@ int ism_unregister_client(struct ism_client *client)
->  				goto out;
-
-But it does not appear to be released
-(by the call to spin_unlock_irqrestore() below)
-if goto out is called here.
-
->  			}
->  		}
-> +		spin_unlock_irqrestore(&ism->lock, flags);
->  	}
->  out:
->  	mutex_unlock(&ism_dev_list.mutex);
+Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
+--
+Everything you wanna know about Linux kernel regression tracking:
+https://linux-regtracking.leemhuis.info/about/#tldr
+That page also explains what to do if mails like this annoy you.
 
