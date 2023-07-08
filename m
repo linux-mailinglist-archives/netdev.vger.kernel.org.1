@@ -1,114 +1,89 @@
-Return-Path: <netdev+bounces-16216-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16217-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 4AF0774BDB0
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 16:01:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 229D474BDB5
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 16:06:48 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 5C0331C20933
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 14:01:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 2247128140B
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 14:06:46 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id F1EC5746B;
-	Sat,  8 Jul 2023 14:01:08 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 7EFF7746B;
+	Sat,  8 Jul 2023 14:06:44 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
-Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
+Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id E13696FB6
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 14:01:08 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id C357610EA
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 07:01:06 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qI8Uj-00032Y-5B; Sat, 08 Jul 2023 16:01:05 +0200
-Message-ID: <ac2efb70-aa19-41d3-ac57-8aaaf39c620b@leemhuis.info>
-Date: Sat, 8 Jul 2023 16:01:04 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 09AB03C04
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 14:06:42 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id A6834C433C7;
+	Sat,  8 Jul 2023 14:06:40 +0000 (UTC)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
+	s=k20201202; t=1688825202;
+	bh=GemB8oDF11KrRtnmNhpuuDODQkHivxkHcWaUZbHnVPw=;
+	h=From:Date:Subject:To:Cc:From;
+	b=fxlV24v+e+/KiTmdjNI23U7pH4XQNhA0g0GbWnwBNK6HJnGw/W2qdn0LMRg6/3+cW
+	 U3kkZ7KDrFx2UgsPKLJ6jGzMnKRYj6PfWpf13QtcOdYFO4YPVnBI2rS8AW9gy11xpb
+	 dhnhQ+oyiEI2Mt0d46FcfDb916BIGAHZdPX+vWC5ZMuGnTQLvCtY8F/xDAirqgZRaj
+	 2YaGewMGs+eGem7q5fkO2z/vdGrbGT4ssXnJJzziSDY0eziFzITFCVXvZ/odvP4wEA
+	 pXWkkVN14zP8ronpp6C492y+PfcOqF+jEnswf4jMjjXy76YV5XaTsNNWgaOI3fWOu+
+	 VrHOGkR7yqArA==
+From: Simon Horman <horms@kernel.org>
+Date: Sat, 08 Jul 2023 15:06:25 +0100
+Subject: [PATCH net] net: lan743x: select FIXED_PHY
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Regression: supported_interfaces filling enforcement
-Content-Language: en-US, de-DE
-To: Sergei Antonov <saproj@gmail.com>, netdev@vger.kernel.org,
- Vladimir Oltean <olteanv@gmail.com>, rmk+kernel@armlinux.org.uk
-References: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Cc: Linux kernel regressions list <regressions@lists.linux.dev>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <CABikg9wM0f5cjYY0EV_i3cMT2JcUT1bSe_kkiYk0wFwMrTo8=w@mail.gmail.com>
-Content-Type: text/plain; charset=UTF-8
+Content-Type: text/plain; charset="utf-8"
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688824866;9b4fe350;
-X-HE-SMSGID: 1qI8Uj-00032Y-5B
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE,
-	URIBL_BLOCKED autolearn=ham autolearn_force=no version=3.4.6
-X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
-	lindbergh.monkeyblade.net
+Message-Id: <20230708-lan743x-fixed-phy-v1-1-3fd19580546c@kernel.org>
+X-B4-Tracking: v=1; b=H4sIAGBtqWQC/xXN0QrCMAyF4VcZuTZQ27GqryJeZGu0gRJHO2Uy9
+ u5ml/+Bj7NB4yrc4NZtUPkrTd5qcT51MGXSF6Mka/DOBxfdBQtp7MOKT1k54Zx/GHwcfOqvaaA
+ A5kZqjGMlnbJJ/ZRi41z5EMfRHZQXeOz7H5vZ7Dh9AAAA
+To: "David S. Miller" <davem@davemloft.net>, 
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>, 
+ Paolo Abeni <pabeni@redhat.com>
+Cc: Pavithra Sathyanarayanan <Pavithra.Sathyanarayanan@microchip.com>, 
+ Randy Dunlap <rdunlap@infradead.org>, stable@vger.kernel.org, 
+ netdev@vger.kernel.org
+X-Mailer: b4 0.12.2
 
-[CCing the regression list, as it should be in the loop for regressions:
-https://docs.kernel.org/admin-guide/reporting-regressions.html]
+The blamed commit introduces usage of fixed_phy_register() but
+not a corresponding dependency on FIXED_PHY.
 
-[TLDR: I'm adding this report to the list of tracked Linux kernel
-regressions; the text you find below is based on a few templates
-paragraphs you might have encountered already in similar form.
-See link in footer if these mails annoy you.]
+This can result in a build failure.
 
-On 04.07.23 16:28, Sergei Antonov wrote:
-> Hello!
-> This commit seems to break the mv88e6060 dsa driver:
-> de5c9bf40c4582729f64f66d9cf4920d50beb897    "net: phylink: require
-> supported_interfaces to be filled"
-> 
-> The driver does not fill 'supported_interfaces'. What is the proper
-> way to fix it? I managed to fix it by the following quick code.
-> Comments? Recommendations?
-> 
-> +static void mv88e6060_get_caps(struct dsa_switch *ds, int port,
-> +                              struct phylink_config *config)
-> +{
-> +       __set_bit(PHY_INTERFACE_MODE_INTERNAL, config->supported_interfaces);
-> +       __set_bit(PHY_INTERFACE_MODE_GMII, config->supported_interfaces);
-> +}
-> +
->  static const struct dsa_switch_ops mv88e6060_switch_ops = {
->         .get_tag_protocol = mv88e6060_get_tag_protocol,
->         .setup          = mv88e6060_setup,
->         .phy_read       = mv88e6060_phy_read,
->         .phy_write      = mv88e6060_phy_write,
-> +       .phylink_get_caps = mv88e6060_get_caps
->  };
+ s390-linux-ld: drivers/net/ethernet/microchip/lan743x_main.o: in function `lan743x_phy_open':
+ drivers/net/ethernet/microchip/lan743x_main.c:1514: undefined reference to `fixed_phy_register'
 
-Thanks for the report. To be sure the issue doesn't fall through the
-cracks unnoticed, I'm adding it to regzbot, the Linux kernel regression
-tracking bot:
+Fixes: 624864fbff92 ("net: lan743x: add fixed phy support for LAN7431 device")
+Cc: stable@vger.kernel.org
+Reported-by: Randy Dunlap <rdunlap@infradead.org>
+Closes: https://lore.kernel.org/netdev/725bf1c5-b252-7d19-7582-a6809716c7d6@infradead.org/
+Reviewed-by: Randy Dunlap <rdunlap@infradead.org>
+Tested-by: Randy Dunlap <rdunlap@infradead.org> # build-tested
+Signed-off-by: Simon Horman <horms@kernel.org>
+---
+ drivers/net/ethernet/microchip/Kconfig | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
 
-#regzbot ^introduced de5c9bf40c4582729f6
-#regzbot title net: phylink: mv88e6060 dsa driver broken
-#regzbot ignore-activity
+diff --git a/drivers/net/ethernet/microchip/Kconfig b/drivers/net/ethernet/microchip/Kconfig
+index 24c994baad13..329e374b9539 100644
+--- a/drivers/net/ethernet/microchip/Kconfig
++++ b/drivers/net/ethernet/microchip/Kconfig
+@@ -46,7 +46,7 @@ config LAN743X
+ 	tristate "LAN743x support"
+ 	depends on PCI
+ 	depends on PTP_1588_CLOCK_OPTIONAL
+-	select PHYLIB
++	select FIXED_PHY
+ 	select CRC16
+ 	select CRC32
+ 	help
 
-This isn't a regression? This issue or a fix for it are already
-discussed somewhere else? It was fixed already? You want to clarify when
-the regression started to happen? Or point out I got the title or
-something else totally wrong? Then just reply and tell me -- ideally
-while also telling regzbot about it, as explained by the page listed in
-the footer of this mail.
-
-Developers: When fixing the issue, remember to add 'Link:' tags pointing
-to the report (the parent of this mail). See page linked in footer for
-details.
-
-Ciao, Thorsten (wearing his 'the Linux kernel's regression tracker' hat)
---
-Everything you wanna know about Linux kernel regression tracking:
-https://linux-regtracking.leemhuis.info/about/#tldr
-That page also explains what to do if mails like this annoy you.
 
