@@ -1,140 +1,177 @@
-Return-Path: <netdev+bounces-16213-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16214-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 51D5D74BD96
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 15:16:07 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id B561674BDA2
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 15:31:14 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id CC3AD1C2094B
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 13:16:05 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id A49971C20954
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 13:31:13 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 83B806ADF;
-	Sat,  8 Jul 2023 13:16:03 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5F41E6FAC;
+	Sat,  8 Jul 2023 13:31:11 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 729D9524E
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 13:16:03 +0000 (UTC)
-Received: from smtp.smtpout.orange.fr (smtp-20.smtpout.orange.fr [80.12.242.20])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 465A91994
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 06:16:01 -0700 (PDT)
-Received: from [192.168.1.18] ([86.243.2.178])
-	by smtp.orange.fr with ESMTPA
-	id I7mwqrPmVn02aI7mwqEG5C; Sat, 08 Jul 2023 15:15:58 +0200
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=wanadoo.fr;
-	s=t20230301; t=1688822158;
-	bh=MtFS4H/mvjYBQ6kD2sk3yhpdjTWzlyIwy/D4XqevP4Y=;
-	h=Date:Subject:To:Cc:References:From:In-Reply-To;
-	b=HeBBJKpw7QjGeqAKXjtW9K+A/j1qxIyP4Z1zGSbXu9RowIPmKLtfnvwiQ4OA7fYT+
-	 ynZxJA4onQ2YKhyb2xx+aT2meliqLoHnzUUHi5QZy3USNLU9R9p0vcxkFUeAdvycj7
-	 NvZqTPJS+7tvbnFvywGvWqICUwGihsuOJc5m2FeqkJQdL5mdY1hW20VbH5uiZlYlyV
-	 0Alv1EguSOV8CKnXcxwzuD8C3uFNV5vXWtKm8l93lwbM2U3FJQEQxrWiR3syveFvca
-	 2+5Jt9+YuYoMUgm9iQ6y8Kol3EeLVXZzA1UVQz36sGSJeraBfjmFBNYGehCksSPzlB
-	 jCdWdxt20YoTg==
-X-ME-Helo: [192.168.1.18]
-X-ME-Auth: Y2hyaXN0b3BoZS5qYWlsbGV0QHdhbmFkb28uZnI=
-X-ME-Date: Sat, 08 Jul 2023 15:15:58 +0200
-X-ME-IP: 86.243.2.178
-Message-ID: <19369234-8785-575b-ff24-9a21a9e82f0e@wanadoo.fr>
-Date: Sat, 8 Jul 2023 15:15:50 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 45C1653B5
+	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 13:31:10 +0000 (UTC)
+Received: from NAM12-BN8-obe.outbound.protection.outlook.com (mail-bn8nam12on2131.outbound.protection.outlook.com [40.107.237.131])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 2C377102;
+	Sat,  8 Jul 2023 06:31:09 -0700 (PDT)
+ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
+ b=BCNVXJ2KGxA/mM9KlbS5vFF+9wQbCaj+uZxryNN/9QJ6XdGLtRY2TyShy3Q0URBdYhdSzcGnZhlOeSMp7pkFX62LvpTeXqXG32t3rajLixSVkpGZzSRqxabz8bUV7S4sdR/4aUruBINFQprVVv0egsE5khtY9tYcV+pKfac6zcqJgkNjAO8mQGk3LQJKGpaz6t+cefYVVvATXAA63gohmmLLsKtVPlbRgti+WQpIKg4ggG0SmhHVDE7F81iujPQ41c7edsNaFZv2JD77Ikxjbxs1XwjBnedkOer4t4RKPgKNr2jXJNYXoftgfN495HEEiWo6msvEa6/6txZ4SGBFxA==
+ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
+ s=arcselector9901;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
+ bh=mU0xSFHxoU3hix1B2fhewV8JVnzD/rFvILzxWUbbsbY=;
+ b=MTZlAS7S/Uy79KmcPP1+KsskWodatEJjtzn0oCZN8Wa+wvrD29ACyJy7anAMxjsPlcgSmxQY0tg8otMf5peRMeR04T3MqFVzZi0Z/wmrzG2jyBP1J5TtBQ468YKCF/+C4Vgf3YxzYUSpZxBC/NOa9bmJ+txe+6ffbAokrde2K8bW58LS4ZG/mvVIfDWafm2ZWJZoLurnbu/xhEPrh24ZhD8dd9cneyRLZo+bTRIwwkOEmF/rdA8I+Qs54jl8oltUzRm7w2udQsQHs/NqoS/fcylnA5f8ZHCPp5UB308Ko8XEVSM/3d4QYLjJjsT51tpJm4CA9quHQiSUeZYMAY5S0g==
+ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
+ smtp.mailfrom=corigine.com; dmarc=pass action=none header.from=corigine.com;
+ dkim=pass header.d=corigine.com; arc=none
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+ d=corigine.onmicrosoft.com; s=selector2-corigine-onmicrosoft-com;
+ h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
+ bh=mU0xSFHxoU3hix1B2fhewV8JVnzD/rFvILzxWUbbsbY=;
+ b=MSLGqfOWOL5FeCBOlzye6+EXLkyVo069n4cmn03MFGi3+88ynpjvv2yLDVQ7HPkwhkZf8LTKvjmuRR8wzDRAd0Hl4rsmPuM7NDWJ4CyRtI1piWq+5pySvwlUPdPSsae34iJKGH1Dtg17pW+8WVv316Q/d1S/lYdmryScQSXyDZ4=
+Authentication-Results: dkim=none (message not signed)
+ header.d=none;dmarc=none action=none header.from=corigine.com;
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com (2603:10b6:510:78::6)
+ by PH7PR13MB6266.namprd13.prod.outlook.com (2603:10b6:510:24d::22) with
+ Microsoft SMTP Server (version=TLS1_2,
+ cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id 15.20.6544.24; Sat, 8 Jul
+ 2023 13:31:05 +0000
+Received: from PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470]) by PH0PR13MB4842.namprd13.prod.outlook.com
+ ([fe80::d23a:8c12:d561:470%6]) with mapi id 15.20.6565.026; Sat, 8 Jul 2023
+ 13:31:05 +0000
+Date: Sat, 8 Jul 2023 14:30:55 +0100
+From: Simon Horman <simon.horman@corigine.com>
+To: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+Cc: kys@microsoft.com, haiyangz@microsoft.com, wei.liu@kernel.org,
+	decui@microsoft.com, davem@davemloft.net, edumazet@google.com,
+	kuba@kernel.org, pabeni@redhat.com, longli@microsoft.com,
+	sharmaajay@microsoft.com, leon@kernel.org, cai.huoqing@linux.dev,
+	ssengar@linux.microsoft.com, vkuznets@redhat.com,
+	tglx@linutronix.de, linux-hyperv@vger.kernel.org,
+	netdev@vger.kernel.org, linux-kernel@vger.kernel.org,
+	linux-rdma@vger.kernel.org, stable@vger.kernel.org,
+	schakrabarti@microsoft.com
+Subject: Re: [PATCH V2 net] net: mana: Configure hwc timeout from hardware
+Message-ID: <ZKllD71/JLDreFKI@corigine.com>
+References: <1688723128-14878-1-git-send-email-schakrabarti@linux.microsoft.com>
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <1688723128-14878-1-git-send-email-schakrabarti@linux.microsoft.com>
+X-ClientProxiedBy: LO2P265CA0257.GBRP265.PROD.OUTLOOK.COM
+ (2603:10a6:600:8a::29) To PH0PR13MB4842.namprd13.prod.outlook.com
+ (2603:10b6:510:78::6)
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.11.0
-Subject: Re: RE: [PATCH net v2 1/2] net: ll_temac: Fix DMA resources leak
-To: "Katakam, Harini" <harini.katakam@amd.com>,
- Jakub Kicinski <kuba@kernel.org>, Jonas Suhr Christensen <jsc@umbraculum.org>
-Cc: Paolo Abeni <pabeni@redhat.com>,
- "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
- "David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>,
- Michal Simek <michal.simek@xilinx.com>, Haoyue Xu <xuhaoyue1@hisilicon.com>,
- huangjunxian <huangjunxian6@hisilicon.com>, Wang Qing <wangqing@vivo.com>,
- Yang Yingliang <yangyingliang@huawei.com>, Esben Haabendal
- <esben@geanix.com>,
- "linux-arm-kernel@lists.infradead.org"
- <linux-arm-kernel@lists.infradead.org>,
- "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
- "Neeli, Srinivas" <srinivas.neeli@amd.com>
-References: <20230205201130.11303-1-jsc@umbraculum.org>
- <20230205201130.11303-2-jsc@umbraculum.org>
- <5314e0ba3a728787299ca46a60b0a2da5e8ab23a.camel@redhat.com>
- <135b671b1b76978fb147d5fee1e1b922e2c61f26.camel@redhat.com>
- <20230207104204.200da48a@kernel.org>
- <bd639016-8a9c-4479-83b4-32306ad734ac@app.fastmail.com>
- <20230313114858.54828dda@kernel.org>
- <BYAPR12MB47736214A6B4AAF524752A8B9EBE9@BYAPR12MB4773.namprd12.prod.outlook.com>
-Content-Language: fr, en-GB
-From: Christophe JAILLET <christophe.jaillet@wanadoo.fr>
-In-Reply-To: <BYAPR12MB47736214A6B4AAF524752A8B9EBE9@BYAPR12MB4773.namprd12.prod.outlook.com>
-Content-Type: text/plain; charset=UTF-8; format=flowed
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-2.2 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,
-	RCVD_IN_MSPIKE_H4,RCVD_IN_MSPIKE_WL,SPF_HELO_PASS,SPF_PASS,
+X-MS-PublicTrafficType: Email
+X-MS-TrafficTypeDiagnostic: PH0PR13MB4842:EE_|PH7PR13MB6266:EE_
+X-MS-Office365-Filtering-Correlation-Id: a13eb260-8780-4988-33a6-08db7fb793ea
+X-MS-Exchange-SenderADCheck: 1
+X-MS-Exchange-AntiSpam-Relay: 0
+X-Microsoft-Antispam: BCL:0;
+X-Microsoft-Antispam-Message-Info:
+	NilZaf2ZYxB7aMUgagh3dnwGFJMWNmnNEm7frv4wNHZ/KuN6HfNlT6lx7R7XrIAEma5p1qj8lyRaP6Fdp6j2R+jXpOttGRdMUh5APYNjSkXfMZbHrzQIUptyrayFYVYrGb43tQiTupnJW46yo7e+f5Q/PEm+HvscpjxY7DzTFlrhDs09Jh4zXwDk+7mKtbM3xMwqjz9nFdg4sqKtqVPgO8vcDS0RJyBqtMQFAnGiNjgdQ8vptRptPSnuFj+XWv/7xad6Mzihe7tKs1UAMmRPlMVBnmz9luCGgOvhlMUB/5ACv9UyIRAeF3DjYJb1rnMl2qb45aVH9Ixis4sT9m9uXMCdtlCfy1ISO8c640KetVRX2wrsG9elkcC6X26Cc11iINERu5YGqLe6Pn9XbMLL+wiUc/gKT70FVSFez5RbmYsQMpuw1wQyTWPzPRENrMY9wF/Mbij+06EeUSRxaGAkFZi+1uxAbFLZFm+Km/EX0H1Mc54saG52ygN7w2/szft0a0PNK0xFeQJB716+paFuRUCQBlD/4F2Cc6OAGoXH0yxOTOg5X3RKI5IPGwVH8CwW0v7NMGBCgDyRRYmE5YWZnxBWUeqDjkowSmSl5UdYtr4=
+X-Forefront-Antispam-Report:
+	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:PH0PR13MB4842.namprd13.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(396003)(366004)(136003)(39830400003)(376002)(346002)(451199021)(4326008)(44832011)(7416002)(66476007)(2906002)(66556008)(478600001)(36756003)(316002)(66946007)(6916009)(8676002)(8936002)(5660300002)(41300700001)(6512007)(86362001)(38100700002)(186003)(45080400002)(6666004)(83380400001)(6506007)(26005)(6486002)(2616005);DIR:OUT;SFP:1102;
+X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
+X-MS-Exchange-AntiSpam-MessageData-0:
+	=?us-ascii?Q?NWweubc046I03eOd7w1TVYwefxtmpAm7N80eOC8whx9KT9OyI8JaijvnmZyM?=
+ =?us-ascii?Q?Ks/lhFaavb+oFPsOHNb5GT1aRv8gbw/jnD6aIku7G/hTltpHqbMTrCcxQpWd?=
+ =?us-ascii?Q?JhHuDmKOOfyBTzEL+BAGzMpukd1WHvi9G70QNsQ5ESMomckiHtaUGT5JiDCq?=
+ =?us-ascii?Q?KS+TZPAXb1/igPkc7FL3+zgFTH9SIva6Lnm5SrvbPW24qD6kjgfjC66HbQL4?=
+ =?us-ascii?Q?V7xGUr6PuKJnxvXx3a7NDFTI4Sv+YZslpjQK9X0ADewKChaQrTsjcNlr1sO3?=
+ =?us-ascii?Q?+qtWyQvOVqizKdGj+GRllKgGF7RWR5MT6/a1OV170Vr+bDgAebQgam6hWKua?=
+ =?us-ascii?Q?JXSD+soU6D5edAnlyXkIfgw2uI1zbkAaGAR0BNa116nEdyqv7RU1eDKwI4Ri?=
+ =?us-ascii?Q?VG1rINGoIJTQuZqclW6q0p2CrhACe2921h8+CT7vxlzpBJRULEKKYG1sqoIy?=
+ =?us-ascii?Q?iVWc9twxDs5GsvM5jHUDTgTRSH937Vpl85YY+baO+vFgW1kUWrjfhpSzTZlD?=
+ =?us-ascii?Q?nIi7tAkwjwBsCbetXaqlQXtSr1KixAlxcIhqUa+ITAP0KmpBbd1AYXyLPPtY?=
+ =?us-ascii?Q?ofBcbeTs2TVTJVpalHlqimAsnRBLjTGvFYrFSi1llo8GHB8m5XkiyCLTiXEY?=
+ =?us-ascii?Q?qDRUUJrPh3HiW4oviIFL8hJaOInzDbbDiHGVw5hY2k6vvq1bDnLI4IdPMlBy?=
+ =?us-ascii?Q?cpJ8CrhuU5Me1BDRmlrqcwIaIHg4lcZVxymsfA6vOoFr6Wm5aoJ3KFNpyRx1?=
+ =?us-ascii?Q?VQxnPrX2pXPo6fZIor6aR5YTem2NUPVb4Ljht3nCNoHKVSiOKsD2lY53kaq9?=
+ =?us-ascii?Q?G3oax6a/CK3w1EkCyFUnubXX3ro6ILEgpG2MrY/jC4WeCiDZJ4RcqsduL8Qq?=
+ =?us-ascii?Q?LvWCltV1Rz9tJU712umlTGPGZYlSRhvxFQMkNs6o54EES4ZO8NqDx4frdtSI?=
+ =?us-ascii?Q?BdWK1Kbrj4IVCA3t+4ISJNqjJDweY3+oVmJ2daYIWQ8Fqjc9h6g2RhwhRcN/?=
+ =?us-ascii?Q?ITmIcjFvtI1eG8y8CwTj08uJ/5s7lmxgsiSxIvwUHwIzGmwrbGProP4LVPNz?=
+ =?us-ascii?Q?pKHWkVFneE/Su3kfpkKU8FEU8MHcFRNfKfZppX8k2g6WVD/ywIoiOGq6Pvjo?=
+ =?us-ascii?Q?Hb8rrbYk7vvjFWeXnoh0zn1daWhWPKU/EWOdLqFp4SnPVCRZrmZW5gzhVwWl?=
+ =?us-ascii?Q?5lAWhw0FrfCVplUtCURl8fT26dv/6ff992/i4esBrEkCrgDlRu1I67Q1eAZa?=
+ =?us-ascii?Q?TxAyQ1hLTnEyF0PFPZB4mByYN1xmSiuCb1yJDyShL3HR8MKBZ+YVJ2qc+bkO?=
+ =?us-ascii?Q?hgy7f8yTQD6qAmLeeyciFa3OAdBssKpmB0vtw3ERgT48X3fTiEbZQN3wB720?=
+ =?us-ascii?Q?PHMeQq2r662qOHX6L0r2jIw5swOgf9QOX8fiIfY9JLItHaRVhRglavFDjmsr?=
+ =?us-ascii?Q?nE453as+jjBH0OTae3O7lcFAG/aWonBj781VJC0KcO7uUkpJt1YGftg6w8ZP?=
+ =?us-ascii?Q?F/PHD0FO4VJ3ETTiouLW5Z65lVwzL3sjDZ39NN3jDgooKnWZZ1XVJzeODCcD?=
+ =?us-ascii?Q?QRRmxU1UESVEZYppl+PtW/HfLXqn9SiFX857K0gzcj/5zm+DcyoxbfJ1O763?=
+ =?us-ascii?Q?PQ=3D=3D?=
+X-OriginatorOrg: corigine.com
+X-MS-Exchange-CrossTenant-Network-Message-Id: a13eb260-8780-4988-33a6-08db7fb793ea
+X-MS-Exchange-CrossTenant-AuthSource: PH0PR13MB4842.namprd13.prod.outlook.com
+X-MS-Exchange-CrossTenant-AuthAs: Internal
+X-MS-Exchange-CrossTenant-OriginalArrivalTime: 08 Jul 2023 13:31:04.6686
+ (UTC)
+X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
+X-MS-Exchange-CrossTenant-Id: fe128f2c-073b-4c20-818e-7246a585940c
+X-MS-Exchange-CrossTenant-MailboxType: HOSTED
+X-MS-Exchange-CrossTenant-UserPrincipalName: tl/4BAaZT5B23IkhJx38JxfVfdYm+ijcPDcAsxwNhwqyjKURXHcyS357ffkcUGT+Cacg5xGA1OkLKXGb/bc8VRzNbNP/7z97BZ8MV6FeItM=
+X-MS-Exchange-Transport-CrossTenantHeadersStamped: PH7PR13MB6266
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,SPF_PASS,
 	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-Le 14/03/2023 à 06:15, Katakam, Harini a écrit :
-> Hi Jakub, Jonas,
+On Fri, Jul 07, 2023 at 02:45:28AM -0700, Souradeep Chakrabarti wrote:
+> At present hwc timeout value is a fixed value.
+> This patch sets the hwc timeout from the hardware.
 > 
->> -----Original Message-----
->> From: Jakub Kicinski <kuba@kernel.org>
->> Sent: Tuesday, March 14, 2023 12:19 AM
->> To: Jonas Suhr Christensen <jsc@umbraculum.org>; Katakam, Harini
->> <harini.katakam@amd.com>
->> Cc: Paolo Abeni <pabeni@redhat.com>; netdev@vger.kernel.org; David S.
->> Miller <davem@davemloft.net>; Eric Dumazet <edumazet@google.com>;
->> Michal Simek <michal.simek@xilinx.com>; Haoyue Xu
->> <xuhaoyue1@hisilicon.com>; huangjunxian <huangjunxian6@hisilicon.com>;
->> Wang Qing <wangqing@vivo.com>; Yang Yingliang
->> <yangyingliang@huawei.com>; Esben Haabendal <esben@geanix.com>;
->> linux-arm-kernel@lists.infradead.org; linux-kernel@vger.kernel.org
->> Subject: Re: [PATCH net v2 1/2] net: ll_temac: Fix DMA resources leak
->>
->> On Mon, 13 Mar 2023 19:37:00 +0100 Jonas Suhr Christensen wrote:
->>> On Tue, Feb 7, 2023, at 19:42, Jakub Kicinski wrote:
->>>> On Tue, 07 Feb 2023 12:36:11 +0100 Paolo Abeni wrote:
->>>>> You can either try change to phys type to __be32 (likely not
->>>>> suitable for -net and possibly can introduce even more warnings
->>>>> elsewhere)
->>>>
->>>> FWIW that seems like the best option to me as well. Let's ignore the
->>>> sparse warning for v3 and try to switch phys to __be32 in a separate
->>>> patch for net-next. No point adding force casts just to have to
->>>> remove them a week later, given how prevalent the problem is.
->>>>
->>>>> or explicitly cast the argument.
->>>
->>> I no longer have access to the hardware, so I'm not rewriting the
->>> batch. Feel free to take ownership of it and fix what's needed.
->>
->> Ack.
->>
->> Harini, are you the designated maintainer for this driver? Could you add a
->> MAINTAINERS entry for it? I don't see one right now.
->> And possibly pick up these patches / fix the problem, if you have the cycles?
+> Signed-off-by: Souradeep Chakrabarti <schakrabarti@linux.microsoft.com>
+> ---
+> V1 -> V2:
+> * Added return check for mana_gd_query_hwc_timeout
+> * Removed dev_err from mana_gd_query_hwc_timeout
+> ---
+>  .../net/ethernet/microsoft/mana/gdma_main.c   | 30 ++++++++++++++++++-
+>  .../net/ethernet/microsoft/mana/hw_channel.c  | 25 +++++++++++++++-
+>  include/net/mana/gdma.h                       | 20 ++++++++++++-
+>  include/net/mana/hw_channel.h                 |  5 ++++
+>  4 files changed, 77 insertions(+), 3 deletions(-)
 > 
-> Sure, Srinivas (cced) will pick up this series and send a v3.
-> I'll get back on the state of this IP/driver for the maintainers list. Will include
-> that patch in the beginning of the series as well.
-> 
-> Regards,
-> Harini
-> 
+> diff --git a/drivers/net/ethernet/microsoft/mana/gdma_main.c b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> index 8f3f78b68592..949c927c3a7e 100644
+> --- a/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> +++ b/drivers/net/ethernet/microsoft/mana/gdma_main.c
+> @@ -106,6 +106,27 @@ static int mana_gd_query_max_resources(struct pci_dev *pdev)
+>  	return 0;
+>  }
+>  
+> +static int mana_gd_query_hwc_timeout(struct pci_dev *pdev, u32 *timeout_val)
+> +{
+> +	struct gdma_context *gc = pci_get_drvdata(pdev);
+> +	struct gdma_query_hwc_timeout_req req = {};
+> +	struct gdma_query_hwc_timeout_resp resp = {};
 
-Hi,
+Please use reverse xmas tree - longest line to shortest - for local
+variables in Networking code.
 
-this patch, or an updated version, has not reached -next yet.
+...
 
-Does someone still working on it, or did it got lost?
+> @@ -879,6 +900,7 @@ int mana_gd_verify_vf_version(struct pci_dev *pdev)
+>  	struct gdma_context *gc = pci_get_drvdata(pdev);
+>  	struct gdma_verify_ver_resp resp = {};
+>  	struct gdma_verify_ver_req req = {};
+> +	struct hw_channel_context *hwc = gc->hwc.driver_data;
+>  	int err;
 
-CJ
+Ditto.
 
