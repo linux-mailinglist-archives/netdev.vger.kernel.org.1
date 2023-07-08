@@ -1,123 +1,123 @@
-Return-Path: <netdev+bounces-16193-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16194-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id E455574BB94
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 05:31:37 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 142C774BBAC
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 06:08:12 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7A0B12819DA
-	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 03:31:36 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id C38C42819E3
+	for <lists+netdev@lfdr.de>; Sat,  8 Jul 2023 04:08:10 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id A26B115A3;
-	Sat,  8 Jul 2023 03:31:34 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id A8CA515C4;
+	Sat,  8 Jul 2023 04:08:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 92F657E2
-	for <netdev@vger.kernel.org>; Sat,  8 Jul 2023 03:31:34 +0000 (UTC)
-Received: from szxga02-in.huawei.com (szxga02-in.huawei.com [45.249.212.188])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 56CD1211F
-	for <netdev@vger.kernel.org>; Fri,  7 Jul 2023 20:31:29 -0700 (PDT)
-Received: from canpemm500006.china.huawei.com (unknown [172.30.72.53])
-	by szxga02-in.huawei.com (SkyGuard) with ESMTP id 4QybPR3KyFzTjvh;
-	Sat,  8 Jul 2023 11:30:19 +0800 (CST)
-Received: from [10.174.179.200] (10.174.179.200) by
- canpemm500006.china.huawei.com (7.192.105.130) with Microsoft SMTP Server
- (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256) id
- 15.1.2507.27; Sat, 8 Jul 2023 11:31:25 +0800
-Subject: Re: [PATCH net] ipv6/addrconf: fix a potential refcount underflow for
- idev
-To: Eric Dumazet <edumazet@google.com>
-CC: <davem@davemloft.net>, <dsahern@kernel.org>, <kuba@kernel.org>,
-	<pabeni@redhat.com>, <netdev@vger.kernel.org>, <hannes@stressinduktion.org>,
-	<fbl@redhat.com>
-References: <20230707101701.2474499-1-william.xuanziyang@huawei.com>
- <CANn89i+qfg_PHT7gPfEMwwZcxx-P7bB8ShYrYZM7exvBYHwSQw@mail.gmail.com>
-From: "Ziyang Xuan (William)" <william.xuanziyang@huawei.com>
-Message-ID: <9e42c8c2-32c1-d2ef-34ce-f239a45005e4@huawei.com>
-Date: Sat, 8 Jul 2023 11:31:25 +0800
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
- Thunderbird/78.11.0
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 9347315B2;
+	Sat,  8 Jul 2023 04:08:06 +0000 (UTC)
+Received: from mail-pf1-x431.google.com (mail-pf1-x431.google.com [IPv6:2607:f8b0:4864:20::431])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id CBB941FEA;
+	Fri,  7 Jul 2023 21:08:03 -0700 (PDT)
+Received: by mail-pf1-x431.google.com with SMTP id d2e1a72fcca58-666ed230c81so2067584b3a.0;
+        Fri, 07 Jul 2023 21:08:03 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688789283; x=1691381283;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:from:to:cc:subject:date:message-id:reply-to;
+        bh=2Yy1JRt4lb2N3jcvs0LbXzQbfHhvx8PThG5Z3vH/Cno=;
+        b=LF5EumU+6t7+ldfB+bh9erO4HumB1Hqzm/l8XhSaGipSfCnzFc9jB4KCzjGJX+6sbR
+         frsrThSyBJxm8dKiIdtESQ2qLaxdnIaaJJaD7WyEagg0LwX/lg0nqwAOYmGaVP7AxUmN
+         K5fHRBPBqbxwVp9b7FPL65SqVn/BBmxf58t2x9EGuEa4MrheVB2xmaF1GjVVkiUYYBH2
+         4+CBkwE4IGrx/wfFywjcNyH0bBRHtRsiOr3ZqjgXaYRqu5IHjrLlD+aVxAkyOcvTltJB
+         fn2gMcKukY/HyPdEBHDCLlRUqSUhcyl+zyg0ZsrgekGkyMvjyD/KlFVFeJFeyU0q3+hQ
+         QfwA==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688789283; x=1691381283;
+        h=content-transfer-encoding:mime-version:message-id:date:subject:cc
+         :to:from:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=2Yy1JRt4lb2N3jcvs0LbXzQbfHhvx8PThG5Z3vH/Cno=;
+        b=DOaPcplz6uH74FkF0pCacVoVxxw8MCqu+QDD86emGVlUsiyorJlQs/tnWvBigH0auh
+         6bSnlkpUsNNUvVYOsqVTLzh/9WseimLxKqFIHnacXEz4wqBDvVZwAKAgix24vGhYdloh
+         7amp3VQmu69nz0Ss8FENdT2DzWUyzwNIHurjdaWCwfGK9l5zos43GcNHHiN+NXfJfsMB
+         r7+YTi2wG+WGvwkiEJyAMgtnBJ/6oppZjZw+8X9RBCb4lAfKJASzTyePjjpHNe768sTu
+         xU1dHwfM2cUOCfOhCFLlLM/cNioqcLw40ZdFY8QQDSgSvTutqEm1ngoQ+tfZCEtYRpDl
+         VNcw==
+X-Gm-Message-State: ABy/qLYc7wgA3H7/Q9WDmTMt//VVrWc28RIfoo6SuwGkMYXg2W5fCO00
+	5BUnjFBkyc4uBwPQD3cxTR8=
+X-Google-Smtp-Source: APBJJlEXvxpqetJRRU0d7H6q2LfafOX2fM7Ctm5Y04yJrvisoNQPKQ7vV7fWg7HDN5cCvCljlWx3eA==
+X-Received: by 2002:a05:6a00:1803:b0:666:ae6b:c484 with SMTP id y3-20020a056a00180300b00666ae6bc484mr9067406pfa.13.1688789283143;
+        Fri, 07 Jul 2023 21:08:03 -0700 (PDT)
+Received: from localhost.localdomain (bb219-74-209-211.singnet.com.sg. [219.74.209.211])
+        by smtp.gmail.com with ESMTPSA id v12-20020a62a50c000000b00640f51801e6sm3507814pfm.159.2023.07.07.21.07.58
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Fri, 07 Jul 2023 21:08:02 -0700 (PDT)
+From: Leon Hwang <hffilwlqm@gmail.com>
+To: ast@kernel.org
+Cc: daniel@iogearbox.net,
+	john.fastabend@gmail.com,
+	andrii@kernel.org,
+	martin.lau@linux.dev,
+	song@kernel.org,
+	yhs@fb.com,
+	kpsingh@kernel.org,
+	sdf@google.com,
+	haoluo@google.com,
+	jolsa@kernel.org,
+	davem@davemloft.net,
+	edumazet@google.com,
+	kuba@kernel.org,
+	pabeni@redhat.com,
+	hawk@kernel.org,
+	hffilwlqm@gmail.com,
+	tangyeechou@gmail.com,
+	kernel-patches-bot@fb.com,
+	bpf@vger.kernel.org,
+	linux-kernel@vger.kernel.org,
+	netdev@vger.kernel.org
+Subject: [PATCH bpf-next v2 0/2] bpf: Introduce user log
+Date: Sat,  8 Jul 2023 12:07:48 +0800
+Message-ID: <20230708040750.72570-1-hffilwlqm@gmail.com>
+X-Mailer: git-send-email 2.41.0
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-In-Reply-To: <CANn89i+qfg_PHT7gPfEMwwZcxx-P7bB8ShYrYZM7exvBYHwSQw@mail.gmail.com>
-Content-Type: text/plain; charset="utf-8"
-Content-Language: en-US
 Content-Transfer-Encoding: 8bit
-X-Originating-IP: [10.174.179.200]
-X-ClientProxiedBy: dggems701-chm.china.huawei.com (10.3.19.178) To
- canpemm500006.china.huawei.com (7.192.105.130)
-X-CFilter-Loop: Reflected
-X-Spam-Status: No, score=-4.3 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_MED,RCVD_IN_MSPIKE_H5,RCVD_IN_MSPIKE_WL,SPF_HELO_NONE,
-	SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no
-	version=3.4.6
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,HK_RANDOM_ENVFROM,
+	HK_RANDOM_FROM,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-> On Fri, Jul 7, 2023 at 12:17 PM Ziyang Xuan
-> <william.xuanziyang@huawei.com> wrote:
->>
->> Now in addrconf_mod_rs_timer(), reference idev depends on whether
->> rs_timer is not pending. Then modify rs_timer timeout.
->>
->> There is a time gap in [1], during which if the pending rs_timer
->> becomes not pending. It will miss to hold idev, but the rs_timer
->> is activated. Thus rs_timer callback function addrconf_rs_timer()
->> will be executed and put idev later without holding idev. A refcount
->> underflow issue for idev can be caused by this.
->>
->>         if (!timer_pending(&idev->rs_timer))
->>                 in6_dev_hold(idev);
->>                   <--------------[1]
->>         mod_timer(&idev->rs_timer, jiffies + when);
->>
->> Hold idev anyway firstly. Then call mod_timer() for rs_timer, put
->> idev if mod_timer() return 1. This modification takes into account
->> the case where "when" is 0.
->>
->> Fixes: b7b1bfce0bb6 ("ipv6: split duplicate address detection and router solicitation timer")
->> Signed-off-by: Ziyang Xuan <william.xuanziyang@huawei.com>
->> ---
->>  net/ipv6/addrconf.c | 6 +++---
->>  1 file changed, 3 insertions(+), 3 deletions(-)
->>
->> diff --git a/net/ipv6/addrconf.c b/net/ipv6/addrconf.c
->> index 5479da08ef40..d36e6c5e3081 100644
->> --- a/net/ipv6/addrconf.c
->> +++ b/net/ipv6/addrconf.c
->> @@ -318,9 +318,9 @@ static void addrconf_del_dad_work(struct inet6_ifaddr *ifp)
->>  static void addrconf_mod_rs_timer(struct inet6_dev *idev,
->>                                   unsigned long when)
->>  {
->> -       if (!timer_pending(&idev->rs_timer))
->> -               in6_dev_hold(idev);
->> -       mod_timer(&idev->rs_timer, jiffies + when);
->> +       in6_dev_hold(idev);
->> +       if (mod_timer(&idev->rs_timer, jiffies + when))
->> +               in6_dev_put(idev);
->>  }
->>
-> 
-> 
-> All callers own an implicit or explicit reference to idev, so you can
-> use the traditional
+This series introduces bpf user log to transfer error message from
+kernel space to user space when users provide buffer to receive the
+error message.
 
-Yes, thank you for your comment.
+Especially, when to attach XDP to device, it can transfer the error
+message along with errno from dev_xdp_attach() to user space, if error
+happens in dev_xdp_attach().
 
-Thanks,
-William Xuan
+Leon Hwang (2):
+  bpf: Introduce bpf generic log
+  bpf: Introduce bpf user log
 
-> 
-> if (!mod_timer(&idev->rs_timer, jiffies + when))
->      in6_dev_hold(idev);
-> .
-> 
+ include/linux/bpf.h            |  3 ++
+ include/uapi/linux/bpf.h       |  8 ++++++
+ kernel/bpf/log.c               | 52 ++++++++++++++++++++++++++++++++++
+ net/core/dev.c                 |  4 ++-
+ tools/include/uapi/linux/bpf.h |  8 ++++++
+ 5 files changed, 74 insertions(+), 1 deletion(-)
+
+
+base-commit: 622f876ab3ced325fe3c2363c6e9c128b7e6c73a
+-- 
+2.41.0
+
 
