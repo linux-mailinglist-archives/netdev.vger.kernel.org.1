@@ -1,130 +1,152 @@
-Return-Path: <netdev+bounces-16293-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16294-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id A8A4374C66E
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 18:32:12 +0200 (CEST)
+Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
+	by mail.lfdr.de (Postfix) with ESMTPS id 3A74674C68B
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 19:17:38 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 4B215280A03
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 16:32:11 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 7818728102E
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:17:36 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 84DB879DE;
-	Sun,  9 Jul 2023 16:32:09 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 9E476C8F9;
+	Sun,  9 Jul 2023 17:17:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 74B91FBE2
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 16:32:08 +0000 (UTC)
-Received: from mail-ej1-x630.google.com (mail-ej1-x630.google.com [IPv6:2a00:1450:4864:20::630])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 06D80101
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 09:32:07 -0700 (PDT)
-Received: by mail-ej1-x630.google.com with SMTP id a640c23a62f3a-9926623e367so473323166b.0
-        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 09:32:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 8C0B979E6;
+	Sun,  9 Jul 2023 17:17:34 +0000 (UTC)
+Received: from mail-pl1-x62c.google.com (mail-pl1-x62c.google.com [IPv6:2607:f8b0:4864:20::62c])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 16CA412A;
+	Sun,  9 Jul 2023 10:17:33 -0700 (PDT)
+Received: by mail-pl1-x62c.google.com with SMTP id d9443c01a7336-1b8baa836a5so27876055ad.1;
+        Sun, 09 Jul 2023 10:17:33 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=linux-foundation.org; s=google; t=1688920325; x=1691512325;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:from:to:cc:subject:date:message-id:reply-to;
-        bh=t6q+aOy2r+flgQCJZwvu7LKyLs8yIYN/+XSC8dA1GdM=;
-        b=gAn+QFrFr5ulawjYCYTO7VmTQzHU5lgWSC5NEnzugmdYhNVwnmToW+MQ4reDvuq6l7
-         PzP2nnDKMv8tyPbAMBaFVMjpeYKtX/i/KRcWvIp4fd9RpwmjkD31sHkkt+5HXaKSjBzT
-         4EDltBMvryK/qN2k9UurMRUANtYKeMK9ETJQ8=
+        d=gmail.com; s=20221208; t=1688923052; x=1691515052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:from:to:cc:subject:date:message-id:reply-to;
+        bh=Z6Hs9ebDPWkVgkL2jmocwHG7j2woEA29Xy0SFxzTKyg=;
+        b=lRWtbrlQpBSF2sBDLc4d8sZx1ebTrHJAZuWV6+HgwmzJx/8ESfjDO2VZQAsiVYt+1r
+         Ocgj9YmhyWMRW8bfmYB5raxnyfwWah/CDZnWuvGE4wiOnonaJW3Vkcy0VQidGMETFERG
+         DDEGll+NIkwdpI3QNHQrA5Ev2AaOEr7kpTg5OAaWqZzsFSgK+QjSF9FJiSMXS6avLK8o
+         bvQljKcXpaZZWlh0h8CJb8REKy5zmuVYezVRefJCiqI9CFbFalqpw4Dsamb+BqvRZiQs
+         iXeXEi6X0v7wOJs2YbAyXXlaOXG/NrrIvB0p4DU3l2EItqyC3H9QMK43HM6cYl5TaRuQ
+         f0CQ==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688920325; x=1691512325;
-        h=cc:to:subject:message-id:date:from:in-reply-to:references
-         :mime-version:x-gm-message-state:from:to:cc:subject:date:message-id
-         :reply-to;
-        bh=t6q+aOy2r+flgQCJZwvu7LKyLs8yIYN/+XSC8dA1GdM=;
-        b=bwbEkBOKebUboNLBGNfcwGEoaoEs/dOGilnpz3lwu9/C8LSp8Z1cVsowf9de8dC+cW
-         YBpRZWbV7koj2AUNRxpHY5gPNpbCJLR32uy+d+oCJqtxVDZsK+3aAFANPpCikP4/cvwM
-         7Zj4v8P8tzBvvbclDXsV5QQ5gNZk2Bw7BzVWNOuvyQV3evi8zEVVLQ0AqqsHJoGieGC+
-         5Rsk7mSGh+c/mmjdI9HdNcmUSJlsPpwhM/Y5SDBUoxRS4O0liHJ3cIRjxfak/0F//Axl
-         hR2MzNHvpw3rSwQEkVwrbMhAICUbLh59swSmoNbDGRYGayy/lXF3HWzOTQ2x0/pP5q69
-         +PTw==
-X-Gm-Message-State: ABy/qLYNLzbdqQE/LiSnNvfB8gx4tOjX0OGkri7SZKmrseCpmDEuhxfg
-	ghZ0ZhYzyM6dTZkUuktWLLmkXJJvMYVe12r1BQlM8GqG
-X-Google-Smtp-Source: APBJJlGz6L26DWtfVApHkFIB8r2ITRiGjEpOdC5ORmFw3QyrU/CBQ80/ALjkgk+GWRQvqP+Qu97c1g==
-X-Received: by 2002:a17:906:2205:b0:973:ff8d:2a46 with SMTP id s5-20020a170906220500b00973ff8d2a46mr9912571ejs.3.1688920325194;
-        Sun, 09 Jul 2023 09:32:05 -0700 (PDT)
-Received: from mail-wm1-f45.google.com (mail-wm1-f45.google.com. [209.85.128.45])
-        by smtp.gmail.com with ESMTPSA id e25-20020a1709067e1900b0098de7d28c34sm4941027ejr.193.2023.07.09.09.32.04
-        for <netdev@vger.kernel.org>
-        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
-        Sun, 09 Jul 2023 09:32:04 -0700 (PDT)
-Received: by mail-wm1-f45.google.com with SMTP id 5b1f17b1804b1-3fbf1b82d9cso38571285e9.2
-        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 09:32:04 -0700 (PDT)
-X-Received: by 2002:a5d:54c2:0:b0:313:f22c:7549 with SMTP id
- x2-20020a5d54c2000000b00313f22c7549mr8377726wrv.66.1688920324114; Sun, 09 Jul
- 2023 09:32:04 -0700 (PDT)
+        d=1e100.net; s=20221208; t=1688923052; x=1691515052;
+        h=in-reply-to:content-disposition:mime-version:references:message-id
+         :subject:cc:to:from:date:x-gm-message-state:from:to:cc:subject:date
+         :message-id:reply-to;
+        bh=Z6Hs9ebDPWkVgkL2jmocwHG7j2woEA29Xy0SFxzTKyg=;
+        b=IwFbZkn0oLkdesj0uaXgFJ9erkoxYlBGCBbXEB6TaP+whDCdn8wUQ19/haFgwHvwyX
+         Rh2CVwoHEGWEoZINO9G5WgtQJLH49eYukpwbkyag/EBbxASbQiv9i1e7qZWxYKZscqZs
+         c97BKIVTlk67YkSPld1oyu170sdctU+ZlGDwJ30Sj83m819uhp8uJ8Oo8eRn4pmrbRdZ
+         FVPFpF+g78kyWAmaKjS8dBV7vGyFcCnyLdDviuDJvSaykqfUkn4JvUY9lfdGAfMZeBS+
+         dPLXRB+0CXnlg9buiaBPAaKHvo+qjpd9NP16PgTvmytBIl8LwC/Quvr++qLbgmvdpGnp
+         8WsQ==
+X-Gm-Message-State: ABy/qLaO98a57DEdh29Dpz+O4CknxhVNjAy5q7WXgopgaxYiFZCnUK3e
+	cbIljZpvCRK+TH0Pu5hf0DI=
+X-Google-Smtp-Source: APBJJlFYK1AsT6jGfXAeUi6syRGRWAdqK7mlwZ84SlpCOH9XivYMheD1R38LM45EWKtLy1dscQALzA==
+X-Received: by 2002:a17:902:ce91:b0:1b9:e23a:f761 with SMTP id f17-20020a170902ce9100b001b9e23af761mr482790plg.63.1688923052439;
+        Sun, 09 Jul 2023 10:17:32 -0700 (PDT)
+Received: from MacBook-Pro-8.local ([2620:10d:c090:400::5:9b44])
+        by smtp.gmail.com with ESMTPSA id 24-20020a17090a035800b0025be7b69d73sm5104935pjf.12.2023.07.09.10.17.30
+        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
+        Sun, 09 Jul 2023 10:17:31 -0700 (PDT)
+Date: Sun, 9 Jul 2023 10:17:28 -0700
+From: Alexei Starovoitov <alexei.starovoitov@gmail.com>
+To: Daniel Borkmann <daniel@iogearbox.net>
+Cc: ast@kernel.org, andrii@kernel.org, martin.lau@linux.dev,
+	razor@blackwall.org, sdf@google.com, john.fastabend@gmail.com,
+	kuba@kernel.org, dxu@dxuuu.xyz, joe@cilium.io, toke@kernel.org,
+	davem@davemloft.net, bpf@vger.kernel.org, netdev@vger.kernel.org
+Subject: Re: [PATCH bpf-next v3 1/8] bpf: Add generic attach/detach/query API
+ for multi-progs
+Message-ID: <20230709171728.gonedzieinilrvra@MacBook-Pro-8.local>
+References: <20230707172455.7634-1-daniel@iogearbox.net>
+ <20230707172455.7634-2-daniel@iogearbox.net>
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-References: <b533071f38804247f06da9e52a04f15cce7a3836.camel@intel.com> <a4265090-d6b8-b185-a400-b09b27a347cc@leemhuis.info>
-In-Reply-To: <a4265090-d6b8-b185-a400-b09b27a347cc@leemhuis.info>
-From: Linus Torvalds <torvalds@linux-foundation.org>
-Date: Sun, 9 Jul 2023 09:31:46 -0700
-X-Gmail-Original-Message-ID: <CAHk-=wg23SdKRcn2W+BWWEfJ2Efp0sreJx9=iw0AsUPjW3qznw@mail.gmail.com>
-Message-ID: <CAHk-=wg23SdKRcn2W+BWWEfJ2Efp0sreJx9=iw0AsUPjW3qznw@mail.gmail.com>
-Subject: Re: [Regression][BISECTED] kernel boot hang after 19898ce9cf8a
- ("wifi: iwlwifi: split 22000.c into multiple files")
-To: Linux regressions mailing list <regressions@lists.linux.dev>
-Cc: "Zhang, Rui" <rui.zhang@intel.com>, "Greenman, Gregory" <gregory.greenman@intel.com>, 
-	"Berg, Johannes" <johannes.berg@intel.com>, 
-	"linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>, "Baruch, Yaara" <yaara.baruch@intel.com>, 
-	"Ben Ami, Golan" <golan.ben.ami@intel.com>, 
-	"linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>, 
-	"Sisodiya, Mukesh" <mukesh.sisodiya@intel.com>, Kalle Valo <kvalo@kernel.org>, 
-	"David S. Miller" <davem@davemloft.net>, Eric Dumazet <edumazet@google.com>, 
-	Paolo Abeni <pabeni@redhat.com>, netdev <netdev@vger.kernel.org>, 
-	Jakub Kicinski <kuba@kernel.org>, Bagas Sanjaya <bagasdotme@gmail.com>
-Content-Type: text/plain; charset="UTF-8"
-X-Spam-Status: No, score=-1.8 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,DKIM_VALID_AU,HEADER_FROM_DIFFERENT_DOMAINS,
+Content-Type: text/plain; charset=us-ascii
+Content-Disposition: inline
+In-Reply-To: <20230707172455.7634-2-daniel@iogearbox.net>
+X-Spam-Status: No, score=-2.1 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_FROM,
 	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=no autolearn_force=no version=3.4.6
+	autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On Fri, 7 Jul 2023 at 03:55, Linux regression tracking (Thorsten
-Leemhuis) <regressions@leemhuis.info> wrote:
->
-> [CCing the regression list, netdev, the net maintainers, and Linus;
-> Johannes and Kalle as well, but just for the record, they afaik are
-> unavailable]
+On Fri, Jul 07, 2023 at 07:24:48PM +0200, Daniel Borkmann wrote:
+> +
+> +#define BPF_MPROG_KEEP	0
+> +#define BPF_MPROG_SWAP	1
+> +#define BPF_MPROG_FREE	2
 
-So I will release rc1 with this issue, but remind me - if it hasn't
-had any traction next week and the radio silence continues, I'll just
-revert it all.
+Please document how this is suppose to be used.
+Patch 2 is using BPF_MPROG_FREE in tcx_entry_needs_release().
+Where most of the code treats BPF_MPROG_SWAP and BPF_MPROG_FREE as equivalent.
+I can guess what it's for, but a comment would help.
 
-From a quick look, "revert it all" ends up being
+> +
+> +#define BPF_MPROG_MAX	64
 
-  fd006d60e833: "wifi: iwlwifi: remove support of A0 version of FM RF"
-  a701177bd4bc: "wifi: iwlwifi: cfg: clean up Bz module firmware lines"
-  f4daceae4087: "wifi: iwlwifi: pcie: add device id 51F1 for killer 1675"
-  399762de769c: "wifi: iwlwifi: bump FW API to 83 for AX/BZ/SC devices"
-  31aeae2446d5: "wifi: iwlwifi: cfg: remove trailing dash from FW_PRE constants"
-  ecf11f4e4950: "wifi: iwlwifi: also unify Ma device configurations"
-  bfed356b4fc4: "wifi: iwlwifi: also unify Sc device configurations"
-  3fd31289d5de: "wifi: iwlwifi: unify Bz/Gl device configurations"
-  e3597e28a2fa: "wifi: iwlwifi: pcie: also drop jacket from info macro"
-  0f21d7d56083: "wifi: iwlwifi: remove support for *nJ devices"
-  c648e926d021: "wifi: iwlwifi: don't load old firmware for 22000"
-  a7de384c9399: "wifi: iwlwifi: don't load old firmware for ax210"
-  a13707f7c845: "wifi: iwlwifi: don't load old firmware for Bz"
-  508b4a1baeb3: "wifi: iwlwifi: don't load old firmware for Sc"
-  5afe98b2e299: "wifi: iwlwifi: give Sc devices their own family"
-  19898ce9cf8a: "wifi: iwlwifi: split 22000.c into multiple files"
+we've seen buggy user space attaching thousands of tc progs to the same netdev.
+I suspect 64 limit will be hit much sooner than expected.
 
-since clearly nothing seems to be happening on this front, and summer
-vacations are only going to get worse.
+> +
+> +#define bpf_mprog_foreach_tuple(entry, fp, cp, t)			\
+> +	for (fp = &entry->fp_items[0], cp = &entry->parent->cp_items[0];\
+> +	     ({								\
+> +		t.prog = READ_ONCE(fp->prog);				\
+> +		t.link = cp->link;					\
+> +		t.prog;							\
+> +	      });							\
+> +	     fp++, cp++)
+> +
+> +#define bpf_mprog_foreach_prog(entry, fp, p)				\
+> +	for (fp = &entry->fp_items[0];					\
+> +	     (p = READ_ONCE(fp->prog));					\
+> +	     fp++)
 
-But we'll give it another week. In August huge chunks of Europe will
-go on vacation.
+I have similar questions to Stanislav.
+Looks like update/delete/query of bpf_prog should be protected by an external lock
+(like RTNL in case of tcx),
+but what are the life time rules for 'entry'?
+Looking at patch 2 sch_handle_ingress():
+struct bpf_mprog_entry *entry = rcu_dereference_bh(skb->dev->tcx_ingress);
+I suspect the assumption is that bpf_mprog_entry object should be accessed within
+RCU critical section. Since tc/tcx and XDP run in napi we have RCU protection there.
+In the future, for cgroups, bpf_prog_run_array_cg() will keep explicit rcu_read_lock()
+before accessing bpf_mprog_entry, right?
+And bpf_mprog_commit() assumes that RCU protection.
+All fine, but we need to document that mprog mechanism is not suitable for sleepable progs.
 
-                    Linus
+> +	if (flags & BPF_F_BEFORE) {
+> +		tidx = bpf_mprog_pos_before(entry, &rtuple);
+> +		if (tidx < -1 || (idx >= -1 && tidx != idx)) {
+> +			ret = tidx < -1 ? tidx : -EDOM;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
+> +	if (flags & BPF_F_AFTER) {
+> +		tidx = bpf_mprog_pos_after(entry, &rtuple);
+> +		if (tidx < 0 || (idx >= -1 && tidx != idx)) {
+
+tidx < 0 vs tidx < -1 for _after vs _before.
+Does it have to have this subtle difference?
+Can _after and _before have the same semantics for return value?
+
+> +			ret = tidx < 0 ? tidx : -EDOM;
+> +			goto out;
+> +		}
+> +		idx = tidx;
+> +	}
 
