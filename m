@@ -1,158 +1,208 @@
-Return-Path: <netdev+bounces-16242-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16243-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
-	by mail.lfdr.de (Postfix) with ESMTPS id 2ED6974C158
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 08:55:34 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [IPv6:2604:1380:45d1:ec00::1])
+	by mail.lfdr.de (Postfix) with ESMTPS id 4390C74C187
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 10:08:05 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 4FE5C1C20949
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 06:55:33 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 892C61C2095A
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 08:08:03 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 3D9E0EBE;
-	Sun,  9 Jul 2023 06:55:31 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5B44B23BC;
+	Sun,  9 Jul 2023 08:08:01 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 274B017CE
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 06:55:30 +0000 (UTC)
-Received: from NAM12-MW2-obe.outbound.protection.outlook.com (mail-mw2nam12on2075.outbound.protection.outlook.com [40.107.244.75])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 8C918194;
-	Sat,  8 Jul 2023 23:55:28 -0700 (PDT)
-ARC-Seal: i=1; a=rsa-sha256; s=arcselector9901; d=microsoft.com; cv=none;
- b=idY14xEhjcipGa7mjtjvvZhszCDLD5EQESB4/SjLgV1CzDFJnU0h7VSIoc1ySObnErAsCf+uIAYtKk94WmvhdfAOWrKAFu53JJXD6XmrEn835Z3c4pumqzERi7e9LUyqvzsvC251854qQNyMfdc0rYa/Hza0r24MY2oxedlqUrgcxcZ2Y4aTGjVYI4BWHe/IaUut2t+4wyYryzjVDiBW9t1P2nvdnDypoW4fIRJ4aqotM9J7vcoAcGgBQK59yimXHU5kY9SctVKYVdx+Pgs6BcefTqPZOA1zXOMX5H2tD7fSPZW9+HmM1RD8b2ihePjrWhDQrqH0pOrfdBUsx6DshA==
-ARC-Message-Signature: i=1; a=rsa-sha256; c=relaxed/relaxed; d=microsoft.com;
- s=arcselector9901;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-AntiSpam-MessageData-ChunkCount:X-MS-Exchange-AntiSpam-MessageData-0:X-MS-Exchange-AntiSpam-MessageData-1;
- bh=gulbSHJqQkGk63iPT/OtrA8Zsa/TWfB7F5qJzoy+M5M=;
- b=n9r0a/3yopOsD+Hlj887XE1+rx2GNwj57iW6xUjZm4BLRzgGoxrKjX+4Y16yBPXcyvNv/Sck16SaBqsRGBp+RXK/ovVhv3WnqWZMhklrSwGNovIZB6WuIr+e/8FZTyGSFNbxf7zTF//QM3eHSpd4YjqR5IXXn/iw38COVXWuRQ7l12qN4Q1BctNURsaa767bauEhFSbv08jUlTrnOixRqulOK2GLOYYB+g1Dw3j34oW04lBQu1e3pghkyz7xKo5XyK3iNHMcgZuRE7eF4FJt8uy4A3BnuaPKQyREzEE6XfQQtequLesmCVXYvr718RdF9dAJrePYFB6TK0UKWujI8Q==
-ARC-Authentication-Results: i=1; mx.microsoft.com 1; spf=pass
- smtp.mailfrom=nvidia.com; dmarc=pass action=none header.from=nvidia.com;
- dkim=pass header.d=nvidia.com; arc=none
-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed; d=Nvidia.com;
- s=selector2;
- h=From:Date:Subject:Message-ID:Content-Type:MIME-Version:X-MS-Exchange-SenderADCheck;
- bh=gulbSHJqQkGk63iPT/OtrA8Zsa/TWfB7F5qJzoy+M5M=;
- b=muzKiztD/USXYz+Sq18h4nmQ9sQhefkvdtS4L8qdSKXUCtIdBKkZ082rzM77TCSmGilG+4jL/YmUqNJWVmi7Zmdy2DhVQGZj/sDmzc21U99QxFDrrybQafxhPmP27jd7xys56mWihtC0yxOdAJL+n+r/k85nd7dZZCgVTVIIM457Jz+KGcgB0inVIHFk9epKf+1kiWKFF4fbegHrAYIXtAjQm7ah4/d74/nh948dxaVoADg8MVsW6k6XOlElhJT7LuAlklwmsNwac2hRf6uknzdsRDE1rW6QYsaPPoM4N6MMJ0+fOJMifun+rLkJmOJIYI8x2oIeEOVxDtl3xwSi9w==
-Authentication-Results: dkim=none (message not signed)
- header.d=none;dmarc=none action=none header.from=nvidia.com;
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com (2603:10b6:8:93::7) by
- CY8PR12MB7315.namprd12.prod.outlook.com (2603:10b6:930:51::21) with Microsoft
- SMTP Server (version=TLS1_2, cipher=TLS_ECDHE_RSA_WITH_AES_256_GCM_SHA384) id
- 15.20.6565.26; Sun, 9 Jul 2023 06:55:26 +0000
-Received: from DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::55cf:c134:4296:5ec1]) by DS7PR12MB6288.namprd12.prod.outlook.com
- ([fe80::55cf:c134:4296:5ec1%4]) with mapi id 15.20.6565.026; Sun, 9 Jul 2023
- 06:55:25 +0000
-Message-ID: <550ff93d-72bb-06d5-2a2f-92d3d37c83af@nvidia.com>
-Date: Sun, 9 Jul 2023 09:55:16 +0300
-User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: [PATCH v3 1/1] gro: decrease size of CB
-To: Richard Gobert <richardbgobert@gmail.com>
-Cc: davem@davemloft.net, edumazet@google.com, kuba@kernel.org,
- pabeni@redhat.com, aleksander.lobakin@intel.com, lixiaoyan@google.com,
- lucien.xin@gmail.com, alexanderduyck@fb.com, netdev@vger.kernel.org,
- linux-kernel@vger.kernel.org
-References: <20230601160924.GA9194@debian> <20230601161407.GA9253@debian>
- <f83d79d6-f8d7-a229-941a-7d7427975160@nvidia.com>
- <20230629123559.GA12573@debian>
- <431d8445-9593-73df-d431-d5e76c9085cf@nvidia.com>
- <20230630153923.GA18237@debian>
- <fdc1d609-5604-f372-6e64-1ea971fabe84@nvidia.com>
- <50181937-19ea-ccca-057c-eb6931f4b2da@nvidia.com>
- <20230703142314.GA27131@debian> <20230707123147.GB17845@debian>
-Content-Language: en-US
-From: Gal Pressman <gal@nvidia.com>
-In-Reply-To: <20230707123147.GB17845@debian>
-Content-Type: text/plain; charset=UTF-8
-Content-Transfer-Encoding: 7bit
-X-ClientProxiedBy: FR2P281CA0009.DEUP281.PROD.OUTLOOK.COM
- (2603:10a6:d10:a::19) To DS7PR12MB6288.namprd12.prod.outlook.com
- (2603:10b6:8:93::7)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 49DDA23B4
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 08:08:01 +0000 (UTC)
+Received: from mail-pl1-f206.google.com (mail-pl1-f206.google.com [209.85.214.206])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 45D53194
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 01:07:59 -0700 (PDT)
+Received: by mail-pl1-f206.google.com with SMTP id d9443c01a7336-1b9de8fbfc9so931875ad.1
+        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 01:07:59 -0700 (PDT)
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688890079; x=1691482079;
+        h=to:from:subject:message-id:date:mime-version:x-gm-message-state
+         :from:to:cc:subject:date:message-id:reply-to;
+        bh=nd3uSjNKuE7BWMfjfmt+wKYq5hLbp7/q30OF1Uv44do=;
+        b=YcJ/5WASI01g+LDq4wbl1fLYja3YLAG1DcViKb1aol5qi0ZddCABtPxQdJrTQziiTL
+         DjxdOzMV/wZmQ8d2nRxypqsp4bzHwWt36RX/mBVhSLBwkisu6S94r7TJ5SZW2ZwMMfpg
+         D1sRce0OSQmxZTm6yRDobZJTeHr9xrw4WLZBy/QdO8vSGrP53yDKARCMek0UTY1I9cxa
+         ms4uAs6vppJupU2M9APooT2rUdsIjeuiwAUnb5GKSyYnmTSMYb34mNBtIAksBGNJmATb
+         ZooRZopPDiXt2YDczHRUHBHupUAmewFRFvUZ6CADD6hg6ypncmMODkMpkZKTYpnUNFWH
+         4kWg==
+X-Gm-Message-State: ABy/qLZV79qVSFLD0pGDxpEqypGE8E9Ax/rq4ORm8HpePZ39kjISLkoh
+	qHTai9WCLCyJ4in8auUyRW5a6HPUzsFCXjz9EQdXJDXJ0VKi
+X-Google-Smtp-Source: APBJJlHvtG6yW7gnsh0O+fH2j8v4XKhFwUYPFJEgZPdnZxHuMlqfwdNc6ZomHWvmNDj+aO633qoc8G73f3teVBeay/jCXuq7qmCO
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-X-MS-PublicTrafficType: Email
-X-MS-TrafficTypeDiagnostic: DS7PR12MB6288:EE_|CY8PR12MB7315:EE_
-X-MS-Office365-Filtering-Correlation-Id: 56a53ad2-0d64-449d-fc3d-08db804978d9
-X-MS-Exchange-SenderADCheck: 1
-X-MS-Exchange-AntiSpam-Relay: 0
-X-Microsoft-Antispam: BCL:0;
-X-Microsoft-Antispam-Message-Info:
-	dD1JqJZxwOVW52q5pjZ3Sfse58miBgmOnkXSdwZyUL0JBnnFq05JVvMZVAIPXqfYENnX2reTcdN8IkcePucZWCyrUKqidzlMKLldTDPETn5bHVR6kFsYGQ2DUgKy+uDGFVnoJi7E2zwGesCiflH1ZnrFlNrlBMvgtYZJI2Q5HFZI5IgyDL+QYbkzrPzitNskkteqIiS3xZzY49hKpqHXzvLGc5ZduoJpwifgH8h61lAJgf3KGs7JatMZ3VejOK9pQnhGx0Yf+It/5WDP7+kUo2EvxMEvph032zgD3Up5/FrByqJ1nr1+k3VD4niGGpGXOMbbo6CqJCCBM6WSkIYTlZ8vC7UMBWzebAm48TW5DnfB9XigYrTmuTJ0G8XOhTU81r7Ah2/CiTdsDuNwwoRJHqRepIQZxBQoU8iGiB5pHxiFqYZJ4/+U5pRW5oP0l5MyguuxIBLLtg32HKpMkWGZc777oRAXSiHorUlFoEkfg4FTrivQ9Rh0Zk4DKl819+42w0zuG05cgAivFseWz7dab0zXxbgvKziHpreAqyNC17hZfwVA2gTqlhRBjEO5bOM0hALGKBLtmeUNT3v9U5A/y7FN1z1e8dG2iAo0u5rZ5/v2zLMICpyPqj3Npa+MHMTqjZw4HeB4LF8l4Y+pY5Tiu09FGQHorXV6gpKqywOnCaxFmXJTKhrxvL+N56Ckmk5A
-X-Forefront-Antispam-Report:
-	CIP:255.255.255.255;CTRY:;LANG:en;SCL:1;SRV:;IPV:NLI;SFV:NSPM;H:DS7PR12MB6288.namprd12.prod.outlook.com;PTR:;CAT:NONE;SFS:(13230028)(4636009)(376002)(39860400002)(366004)(136003)(346002)(396003)(451199021)(31686004)(6666004)(478600001)(6486002)(83380400001)(2616005)(86362001)(36756003)(31696002)(4744005)(2906002)(186003)(6506007)(26005)(6512007)(966005)(38100700002)(66556008)(66476007)(4326008)(8936002)(41300700001)(7416002)(316002)(66946007)(8676002)(5660300002)(53546011)(6916009)(43740500002)(45980500001);DIR:OUT;SFP:1101;
-X-MS-Exchange-AntiSpam-MessageData-ChunkCount: 1
-X-MS-Exchange-AntiSpam-MessageData-0:
-	=?utf-8?B?aXc2SVJYQXg1OUMyWjlXdzk5ZmhNTGQxcUtrbkJFbDJUMThxamovbTBYMXVU?=
- =?utf-8?B?b2lpNFlYVzF5VHgzZlFpSjZRZXNTTGNmYkRpQ3Y0UUFpdjludE5ldUtkMVpD?=
- =?utf-8?B?NHJrMWxVS3VCNVJQbDhKTGFxd2xydGhPYzVvL3lhcEdvOUYzYlJGSVU1bXJh?=
- =?utf-8?B?VngxenBQMFBZNDZmY0tteEsyMUdRNmp0cGZ1Y1pReUM3NzF5dzM0VERBNXFu?=
- =?utf-8?B?VkxBeW5HeUNRRmlWb0JNSmZpVTVZdkYrUU1lcjlxTVluM3NaMldteTBhak5P?=
- =?utf-8?B?YTZvNkV5LzZRMnUxRTlsNStIdExqY09uSkdacFFESHIvUkc3eFRic0J0aCtY?=
- =?utf-8?B?ZU1sUHRiL3kyVHR0MXlSN3VUY1E2MjJHYkZEc3ZYU216TklOMUpCRU55NHFu?=
- =?utf-8?B?YzNYdFEyM0lWWHdwY0NvTmNYVllKTmhqSDRscmdhZldZbGZsdktrQm45LytM?=
- =?utf-8?B?bEd3Vkx5THg1REo3WU5SVHlxdkFnZC9aLy9aaVF0Zm92bHFvNHRnVEp3ZGVN?=
- =?utf-8?B?S2psamk2d08zQUt6WFJ0TFAzdjM1dkFwR1hjejZBWDU0YTJvZWd4aEFqWkJW?=
- =?utf-8?B?aVFDQ05ab0lPays4VXkwRWdrVjB2UnZ2MlJVVm1JbFo5M1pJWjk1V243NUhT?=
- =?utf-8?B?am1FVllhM1Vneno4KzZNeGFBb1RxbXZUeDJ6Ris5cktGcUJaeDZlWnk5YmxU?=
- =?utf-8?B?c004czVyeDl2bXNDYlFIdVhaMUM0RCtrR2VVZUV0c1ZLVFRvMEx0d2loUUdw?=
- =?utf-8?B?QXJuaVVBcjZVRkN3aDQzZ0FIR0FkTks3REtIeE45cHZmamN6OE8rT256Qnha?=
- =?utf-8?B?d2lGWS9QR2FYRFJ3REcyY3h0cG5NdVJHMVJNdDZGRGNvV1VFdFd4VWI1V0xX?=
- =?utf-8?B?N1cvbFMrajVzRDBxbWxOQ1JxMGh2b2xVZnRJaUlXNy82RndwNitHbTM1R1hS?=
- =?utf-8?B?QlRGbmhiRUhuM3lvZGIrM3EyVU5NUmRrTklpVnN4bFNnQWhiZmJoMGJ1SmpS?=
- =?utf-8?B?MnArZkIzUGM2U0NSdlFSclYydUtBUVRYMFpUdXQ0aU5sL2h0MnZBWHd3VkhC?=
- =?utf-8?B?VG9rd2c1Umt6d3lYWnZsQTVpUWhBSEVuVkxzN0tzSnRFWmRzenJHTE1mSzdK?=
- =?utf-8?B?ejJwVS95MnN2L3hXZ3lYRkkrcDNIRTV3ZnVMRHdnR2VBMU1QbGQvaDBrN1ps?=
- =?utf-8?B?V25taE9KQ0phM1FLM3A4OUVlcm5HMWFVcWlKUURDaTdodzZuTXI1cUJmek9h?=
- =?utf-8?B?NzJSQnF0a1djWU1KOFpzb1BBMkJPMDlRTW1XcGdKcm1yb2Zybi9zUzN3Qlg0?=
- =?utf-8?B?QlM3Q2hlcHJtWjJzSVp2QWlqZ0ZtQlliNThmeGxUak15LzdQakszTjI2aUV5?=
- =?utf-8?B?eW5KcDgwY0tYUGxNZUVwd0JzNkNDOGNoREd3ZjVXa1FlYnFQU2NxNVNiY2k1?=
- =?utf-8?B?MFlteGhIeEl1NDJQbXFkdUtiU0NNcVVIdXVJUnpaU2ZJQWw5MUZOeFM1UFUv?=
- =?utf-8?B?OHQvbm11aS9MMVJITm5meTVJbmZ6Y1E5T1d0aXpMNFhMRTEzRjNEUm1OWTR4?=
- =?utf-8?B?WEllU1lmMUJhT0pBdHBLZHBwMUVoRlMrdjRpSi9wcUdBcVBqV2hTNlk4K2d0?=
- =?utf-8?B?WFhjTWZQTFZ6Q3p1aXgxcUIxK1l2SkM0eXdKSXZhYzBicC9TTjVhc1YzM29a?=
- =?utf-8?B?MTdVNzlqVzd1bWF0cXd3S0N0RFBJRTZjYkM3b2g5K1A3QVllKytPa3FRdnpS?=
- =?utf-8?B?VFZUalJjVHhrK2YwL05xVGlOMmh3eGwySmw1R0RROE5KeUdhek11Z3dycngw?=
- =?utf-8?B?eHVmZEdaWTcvZXlwcFBSVmRzbitTbmVWcFdFb2QyV2RqUGVEYkV5dk81d3lZ?=
- =?utf-8?B?ZlFPcUovQ2ZlajA1WHJNcExxREdBK3Y2d052TkszbDNGQXdrd3ZIaGtRTXUw?=
- =?utf-8?B?bkxSZVhZVUdiRXk3R0NvRVdLTnBROFF5S0kycUhrV0tYbDhPWHBvRDZCUWtt?=
- =?utf-8?B?WDZGQnltaWJ6dGRrdjVxVlZOVDhFOTlweXNTL2RlK1hBZEFMQ01aQ21UWERk?=
- =?utf-8?B?bFZCallEa0VRWUcweG03VEdEUGx6SjUrRHBZa2JKMUdHazFrUnBMc1BqcFUr?=
- =?utf-8?Q?+gNfC1Y3EL8Q3O/ytBWJB4Kvl?=
-X-OriginatorOrg: Nvidia.com
-X-MS-Exchange-CrossTenant-Network-Message-Id: 56a53ad2-0d64-449d-fc3d-08db804978d9
-X-MS-Exchange-CrossTenant-AuthSource: DS7PR12MB6288.namprd12.prod.outlook.com
-X-MS-Exchange-CrossTenant-AuthAs: Internal
-X-MS-Exchange-CrossTenant-OriginalArrivalTime: 09 Jul 2023 06:55:25.3897
- (UTC)
-X-MS-Exchange-CrossTenant-FromEntityHeader: Hosted
-X-MS-Exchange-CrossTenant-Id: 43083d15-7273-40c1-b7db-39efd9ccc17a
-X-MS-Exchange-CrossTenant-MailboxType: HOSTED
-X-MS-Exchange-CrossTenant-UserPrincipalName: TUiHtsdAGCRryapnuWoXNmFRWO7TTHBWN0gTDT3zmzr01uls9XZqKFFhrGIUpD3c
-X-MS-Exchange-Transport-CrossTenantHeadersStamped: CY8PR12MB7315
-X-Spam-Status: No, score=-1.2 required=5.0 tests=BAYES_00,DKIMWL_WL_HIGH,
-	DKIM_SIGNED,DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FORGED_SPF_HELO,
-	NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,RCVD_IN_MSPIKE_H2,SPF_HELO_PASS,
-	SPF_NONE,T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no
-	version=3.4.6
+X-Received: by 2002:a17:902:d312:b0:1b8:8b6e:6431 with SMTP id
+ b18-20020a170902d31200b001b88b6e6431mr8349288plc.12.1688890078835; Sun, 09
+ Jul 2023 01:07:58 -0700 (PDT)
+Date: Sun, 09 Jul 2023 01:07:58 -0700
+X-Google-Appengine-App-Id: s~syzkaller
+X-Google-Appengine-App-Id-Alias: syzkaller
+Message-ID: <00000000000036b9590600095d33@google.com>
+Subject: [syzbot] [bluetooth?] general protection fault in sco_conn_add
+From: syzbot <syzbot+37acd5d80d00d609d233@syzkaller.appspotmail.com>
+To: davem@davemloft.net, edumazet@google.com, johan.hedberg@gmail.com, 
+	kuba@kernel.org, linux-bluetooth@vger.kernel.org, 
+	linux-kernel@vger.kernel.org, luiz.dentz@gmail.com, luiz.von.dentz@intel.com, 
+	marcel@holtmann.org, netdev@vger.kernel.org, pabeni@redhat.com, 
+	syzkaller-bugs@googlegroups.com
+Content-Type: text/plain; charset="UTF-8"
+X-Spam-Status: No, score=0.8 required=5.0 tests=BAYES_00,FROM_LOCAL_HEX,
+	HEADER_FROM_DIFFERENT_DOMAINS,RCVD_IN_DNSWL_NONE,RCVD_IN_MSPIKE_H3,
+	RCVD_IN_MSPIKE_WL,SORTED_RECIPS,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=no autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 07/07/2023 15:31, Richard Gobert wrote:
-> I managed to reproduce it and found the bug that explains the problem
-> you're experiencing.
-> I submitted a bugfix here: https://lore.kernel.org/netdev/20230707121650.GA17677@debian/
-> Thanks!
+Hello,
 
-Thanks Richard!
-Will test it and update.
+syzbot found the following issue on:
 
-BTW, did you manage to reproduce the issue with veth?
+HEAD commit:    3674fbf0451d Merge git://git.kernel.org/pub/scm/linux/kern..
+git tree:       net
+console+strace: https://syzkaller.appspot.com/x/log.txt?x=13ab3f4f280000
+kernel config:  https://syzkaller.appspot.com/x/.config?x=c9bf1936936ca698
+dashboard link: https://syzkaller.appspot.com/bug?extid=37acd5d80d00d609d233
+compiler:       gcc (Debian 10.2.1-6) 10.2.1 20210110, GNU ld (GNU Binutils for Debian) 2.35.2
+syz repro:      https://syzkaller.appspot.com/x/repro.syz?x=1049b4e2a80000
+C reproducer:   https://syzkaller.appspot.com/x/repro.c?x=171aa228a80000
+
+Downloadable assets:
+disk image: https://storage.googleapis.com/syzbot-assets/42ed556782c3/disk-3674fbf0.raw.xz
+vmlinux: https://storage.googleapis.com/syzbot-assets/1913e16e8565/vmlinux-3674fbf0.xz
+kernel image: https://storage.googleapis.com/syzbot-assets/469804b58a7c/bzImage-3674fbf0.xz
+
+The issue was bisected to:
+
+commit 06149746e7203d5ffe2d6faf9799ee36203aa8b8
+Author: Luiz Augusto von Dentz <luiz.von.dentz@intel.com>
+Date:   Tue Apr 11 23:02:22 2023 +0000
+
+    Bluetooth: hci_conn: Add support for linking multiple hcon
+
+bisection log:  https://syzkaller.appspot.com/x/bisect.txt?x=148e6b08a80000
+final oops:     https://syzkaller.appspot.com/x/report.txt?x=168e6b08a80000
+console output: https://syzkaller.appspot.com/x/log.txt?x=128e6b08a80000
+
+IMPORTANT: if you fix the issue, please add the following tag to the commit:
+Reported-by: syzbot+37acd5d80d00d609d233@syzkaller.appspotmail.com
+Fixes: 06149746e720 ("Bluetooth: hci_conn: Add support for linking multiple hcon")
+
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f09bc777879
+RDX: 0000000000000008 RSI: 0000000020000200 RDI: 0000000000000004
+RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000800000015
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000555555a6d2b8
+R13: 00007ffe17db6850 R14: 0000000000000072 R15: 00007ffe17db6860
+ </TASK>
+general protection fault, probably for non-canonical address 0xdffffc000000013b: 0000 [#1] PREEMPT SMP KASAN
+KASAN: null-ptr-deref in range [0x00000000000009d8-0x00000000000009df]
+CPU: 1 PID: 5013 Comm: syz-executor238 Not tainted 6.4.0-rc7-syzkaller-01944-g3674fbf0451d #0
+Hardware name: Google Google Compute Engine/Google Compute Engine, BIOS Google 05/27/2023
+RIP: 0010:sco_conn_add+0x2a/0x330 net/bluetooth/sco.c:127
+Code: 41 57 41 56 41 55 49 89 fd 41 54 55 49 8d ad d8 09 00 00 53 e8 b7 f1 5a f8 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 8b 02 00 00 4d 8b a5 d8 09 00 00 4d 85 e4 74 13
+RSP: 0018:ffffc90003a8fd50 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: ffff888028830000 RCX: 0000000000000000
+RDX: 000000000000013b RSI: ffffffff892957a9 RDI: 0000000000000000
+RBP: 00000000000009d8 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000010 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000000 R14: ffff8880203cf540 R15: ffff888028830010
+FS:  0000555555a6d300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00007f09bc7db6e3 CR3: 0000000025e98000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+Call Trace:
+ <TASK>
+ sco_connect net/bluetooth/sco.c:274 [inline]
+ sco_sock_connect+0x321/0xae0 net/bluetooth/sco.c:610
+ __sys_connect_file+0x153/0x1a0 net/socket.c:1991
+ __sys_connect+0x165/0x1a0 net/socket.c:2008
+ __do_sys_connect net/socket.c:2018 [inline]
+ __se_sys_connect net/socket.c:2015 [inline]
+ __x64_sys_connect+0x73/0xb0 net/socket.c:2015
+ do_syscall_x64 arch/x86/entry/common.c:50 [inline]
+ do_syscall_64+0x39/0xb0 arch/x86/entry/common.c:80
+ entry_SYSCALL_64_after_hwframe+0x63/0xcd
+RIP: 0033:0x7f09bc777879
+Code: 28 00 00 00 75 05 48 83 c4 28 c3 e8 c1 18 00 00 90 48 89 f8 48 89 f7 48 89 d6 48 89 ca 4d 89 c2 4d 89 c8 4c 8b 4c 24 08 0f 05 <48> 3d 01 f0 ff ff 73 01 c3 48 c7 c1 b8 ff ff ff f7 d8 64 89 01 48
+RSP: 002b:00007ffe17db67f8 EFLAGS: 00000246 ORIG_RAX: 000000000000002a
+RAX: ffffffffffffffda RBX: 0000000000000003 RCX: 00007f09bc777879
+RDX: 0000000000000008 RSI: 0000000020000200 RDI: 0000000000000004
+RBP: 0000000000000003 R08: 0000000000000001 R09: 0000000800000015
+R10: 0000000000000000 R11: 0000000000000246 R12: 0000555555a6d2b8
+R13: 00007ffe17db6850 R14: 0000000000000072 R15: 00007ffe17db6860
+ </TASK>
+Modules linked in:
+---[ end trace 0000000000000000 ]---
+RIP: 0010:sco_conn_add+0x2a/0x330 net/bluetooth/sco.c:127
+Code: 41 57 41 56 41 55 49 89 fd 41 54 55 49 8d ad d8 09 00 00 53 e8 b7 f1 5a f8 48 89 ea 48 b8 00 00 00 00 00 fc ff df 48 c1 ea 03 <80> 3c 02 00 0f 85 8b 02 00 00 4d 8b a5 d8 09 00 00 4d 85 e4 74 13
+RSP: 0018:ffffc90003a8fd50 EFLAGS: 00010202
+RAX: dffffc0000000000 RBX: ffff888028830000 RCX: 0000000000000000
+RDX: 000000000000013b RSI: ffffffff892957a9 RDI: 0000000000000000
+RBP: 00000000000009d8 R08: 0000000000000005 R09: 0000000000000000
+R10: 0000000000000010 R11: 0000000000000001 R12: 0000000000000000
+R13: 0000000000000000 R14: ffff8880203cf540 R15: ffff888028830010
+FS:  0000555555a6d300(0000) GS:ffff8880b9900000(0000) knlGS:0000000000000000
+CS:  0010 DS: 0000 ES: 0000 CR0: 0000000080050033
+CR2: 00005653cab3d008 CR3: 0000000025e98000 CR4: 00000000003506e0
+DR0: 0000000000000000 DR1: 0000000000000000 DR2: 0000000000000000
+DR3: 0000000000000000 DR6: 00000000fffe0ff0 DR7: 0000000000000400
+----------------
+Code disassembly (best guess):
+   0:	41 57                	push   %r15
+   2:	41 56                	push   %r14
+   4:	41 55                	push   %r13
+   6:	49 89 fd             	mov    %rdi,%r13
+   9:	41 54                	push   %r12
+   b:	55                   	push   %rbp
+   c:	49 8d ad d8 09 00 00 	lea    0x9d8(%r13),%rbp
+  13:	53                   	push   %rbx
+  14:	e8 b7 f1 5a f8       	callq  0xf85af1d0
+  19:	48 89 ea             	mov    %rbp,%rdx
+  1c:	48 b8 00 00 00 00 00 	movabs $0xdffffc0000000000,%rax
+  23:	fc ff df
+  26:	48 c1 ea 03          	shr    $0x3,%rdx
+* 2a:	80 3c 02 00          	cmpb   $0x0,(%rdx,%rax,1) <-- trapping instruction
+  2e:	0f 85 8b 02 00 00    	jne    0x2bf
+  34:	4d 8b a5 d8 09 00 00 	mov    0x9d8(%r13),%r12
+  3b:	4d 85 e4             	test   %r12,%r12
+  3e:	74 13                	je     0x53
+
+
+---
+This report is generated by a bot. It may contain errors.
+See https://goo.gl/tpsmEJ for more information about syzbot.
+syzbot engineers can be reached at syzkaller@googlegroups.com.
+
+syzbot will keep track of this issue. See:
+https://goo.gl/tpsmEJ#status for how to communicate with syzbot.
+For information about bisection process see: https://goo.gl/tpsmEJ#bisection
+
+If the bug is already fixed, let syzbot know by replying with:
+#syz fix: exact-commit-title
+
+If you want syzbot to run the reproducer, reply with:
+#syz test: git://repo/address.git branch-or-commit-hash
+If you attach or paste a git patch, syzbot will apply it before testing.
+
+If you want to change bug's subsystems, reply with:
+#syz set subsystems: new-subsystem
+(See the list of subsystem names on the web dashboard)
+
+If the bug is a duplicate of another bug, reply with:
+#syz dup: exact-subject-of-another-report
+
+If you want to undo deduplication, reply with:
+#syz undup
 
