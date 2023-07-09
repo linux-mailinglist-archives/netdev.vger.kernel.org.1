@@ -1,85 +1,205 @@
-Return-Path: <netdev+bounces-16238-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16239-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
 Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id 26B3374C0F1
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 06:36:45 +0200 (CEST)
+	by mail.lfdr.de (Postfix) with ESMTPS id 7A36974C111
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 07:16:51 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7DC9281231
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 04:36:43 +0000 (UTC)
+	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 8897F2810DA
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 05:16:48 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id D2009E546;
-	Sun,  9 Jul 2023 04:36:41 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id B55B71FA0;
+	Sun,  9 Jul 2023 05:16:46 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id C1080E544
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 04:36:41 +0000 (UTC)
-Received: from wp530.webpack.hosteurope.de (wp530.webpack.hosteurope.de [80.237.130.52])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id A3EF61B1;
-	Sat,  8 Jul 2023 21:36:39 -0700 (PDT)
-Received: from [2a02:8108:8980:2478:8cde:aa2c:f324:937e]; authenticated
-	by wp530.webpack.hosteurope.de running ExIM with esmtpsa (TLS1.3:ECDHE_RSA_AES_128_GCM_SHA256:128)
-	id 1qIM9x-0002mt-1c; Sun, 09 Jul 2023 06:36:33 +0200
-Message-ID: <ac957af4-f265-3ba0-0373-3a71d134a57e@leemhuis.info>
-Date: Sun, 9 Jul 2023 06:36:32 +0200
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id A55EB1C06
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 05:16:46 +0000 (UTC)
+Received: from mail-pf1-x441.google.com (mail-pf1-x441.google.com [IPv6:2607:f8b0:4864:20::441])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 0FC84E40;
+	Sat,  8 Jul 2023 22:16:45 -0700 (PDT)
+Received: by mail-pf1-x441.google.com with SMTP id d2e1a72fcca58-666ecf9a081so2840212b3a.2;
+        Sat, 08 Jul 2023 22:16:45 -0700 (PDT)
+DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=gmail.com; s=20221208; t=1688879804; x=1691471804;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject:from:to:cc
+         :subject:date:message-id:reply-to;
+        bh=Ztnp1qTer1IaWaOObtyfdo8muim3ULQZOmol0cBsgFo=;
+        b=IsgnDEPrWv2qRNJgNRsVo8hNkyVbhR4y/lQoM5aXev+JVsfWrzOlmuqSFm45QBgJ8R
+         6tkBuQZRIooyMTUjcoEjpg7QgA8qgnth8KEaXac8CIVHISlQqaJHMSE+eUB3cuP/MW6Q
+         aDK7U9HJHKaztcZa0wu0XWkyNSR3vEbtAZfH07pzExxQD+2AfL/pNPCQrFZRk+yB2P/K
+         k2RSyMaC5n1SIx1fvr9sE9VvPDivv2AfEfA5sZuVwvq5GaJYnIE4I52sNLmVawpLK4iu
+         XibGU11vQEo9T1aMS7xj6lou+AeoQMlIfzf1THbJWKm0plNF5GUYez1Wpr51kxLybivP
+         MrbQ==
+X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
+        d=1e100.net; s=20221208; t=1688879804; x=1691471804;
+        h=content-transfer-encoding:content-language:in-reply-to:mime-version
+         :user-agent:date:message-id:from:references:cc:to:subject
+         :x-gm-message-state:from:to:cc:subject:date:message-id:reply-to;
+        bh=Ztnp1qTer1IaWaOObtyfdo8muim3ULQZOmol0cBsgFo=;
+        b=ObV0O+6P0Q/6VdCglXYV9H+05ZkJ+q6TNuu/E8ihM9xlEXPGYRsIfpfE47IMDg27oz
+         3CiD7OrriV2/H085R9eKnLH69ddeOdlXLYQPuFMfVFT49arYpzpptY1j/afyL9rDGjfm
+         xN4+ONbj+dXEAMpvDyOFpyVXg6AXZQ9pvCD7qyFnjaODQrayullL3vW6Rvi0YG50j7oM
+         UD6h+quedWDrk866+Sy1P6XXcfpqVIf8cprRG9blCW1aJOGksvaztoGbjmtUiPuYkEWv
+         ozjI1YQdaOAMI0HyuZsWKODVwZU6V8S8646E4Bu9i7S/HvXSPmE4O28k5AH1ASPNzXLI
+         bp4w==
+X-Gm-Message-State: ABy/qLZ8hFMbgt1Et6YduHLv66xXrTG5EzPk9YRpnm9oaYq7uPnL6Rfx
+	42Wt9O/+fGtNF70FzVJM8rMqJpWUcWrr9fRzCG0=
+X-Google-Smtp-Source: APBJJlGdQ+mZwEX7hoR7kwbuM2LjVWZ2BiFPsOtvISNt912jjNntEHQo8YA+l89fvmmiQE4Ea48isQ==
+X-Received: by 2002:a05:6a20:3d85:b0:12c:9100:362f with SMTP id s5-20020a056a203d8500b0012c9100362fmr12083123pzi.4.1688879804232;
+        Sat, 08 Jul 2023 22:16:44 -0700 (PDT)
+Received: from ?IPv6:2409:8a55:301b:e120:1523:3ecb:e154:8f22? ([2409:8a55:301b:e120:1523:3ecb:e154:8f22])
+        by smtp.gmail.com with ESMTPSA id b18-20020aa78712000000b0066684d8115bsm5134939pfo.178.2023.07.08.22.16.40
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sat, 08 Jul 2023 22:16:43 -0700 (PDT)
+Subject: Re: [PATCH RFC net-next v4 5/9] libie: add Rx buffer management (via
+ Page Pool)
+To: Alexander Lobakin <aleksander.lobakin@intel.com>,
+ Yunsheng Lin <linyunsheng@huawei.com>
+Cc: "David S. Miller" <davem@davemloft.net>,
+ Eric Dumazet <edumazet@google.com>, Jakub Kicinski <kuba@kernel.org>,
+ Paolo Abeni <pabeni@redhat.com>,
+ Maciej Fijalkowski <maciej.fijalkowski@intel.com>,
+ Michal Kubiak <michal.kubiak@intel.com>,
+ Larysa Zaremba <larysa.zaremba@intel.com>,
+ Alexander Duyck <alexanderduyck@fb.com>,
+ David Christensen <drc@linux.vnet.ibm.com>,
+ Jesper Dangaard Brouer <hawk@kernel.org>,
+ Ilias Apalodimas <ilias.apalodimas@linaro.org>,
+ Paul Menzel <pmenzel@molgen.mpg.de>, netdev@vger.kernel.org,
+ intel-wired-lan@lists.osuosl.org, linux-kernel@vger.kernel.org
+References: <20230705155551.1317583-1-aleksander.lobakin@intel.com>
+ <20230705155551.1317583-6-aleksander.lobakin@intel.com>
+ <138b94a7-c186-bdd9-e073-2794760c9454@huawei.com>
+ <09a9a9ef-cf77-3b60-2845-94595a42cf3e@intel.com>
+From: Yunsheng Lin <yunshenglin0825@gmail.com>
+Message-ID: <71a8bab4-1a1d-cb1a-d75c-585a14c6fb2e@gmail.com>
+Date: Sun, 9 Jul 2023 13:16:33 +0800
+User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:78.0) Gecko/20100101
+ Thunderbird/78.10.2
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
- Thunderbird/102.12.0
-Subject: Re: Fwd: 3 more broken Zaurii - SL-5600, A300, C700
-Content-Language: en-US, de-DE
-To: Andrew Lunn <andrew@lunn.ch>, Ross Maynard <bids.7405@bigpond.com>
-Cc: Dave Jones <davej@codemonkey.org.uk>, Bagas Sanjaya
- <bagasdotme@gmail.com>, "David S. Miller" <davem@davemloft.net>,
- Linux Kernel Mailing List <linux-kernel@vger.kernel.org>,
- Linux Regressions <regressions@lists.linux.dev>,
- Linux Networking <netdev@vger.kernel.org>,
- Linux USB <linux-usb@vger.kernel.org>, Oliver Neukum <oneukum@suse.com>
-References: <7ea9abd8-c35d-d329-f0d4-c8bd220cf691@gmail.com>
- <50f4c10d-260c-cb98-e7d2-124f5519fa68@gmail.com>
- <e1fdc435-089c-8ce7-d536-ce3780a4ba95@leemhuis.info>
- <ZKbuoRBi50i8OZ9d@codemonkey.org.uk>
- <62a9e058-c853-1fcd-5663-e2e001f881e9@bigpond.com>
- <14fd48c8-3955-c933-ab6f-329e54da090f@bigpond.com>
- <05a229e8-b0b6-4d29-8561-70d02f6dc31b@lunn.ch>
-From: "Linux regression tracking (Thorsten Leemhuis)"
- <regressions@leemhuis.info>
-Reply-To: Linux regressions mailing list <regressions@lists.linux.dev>
-In-Reply-To: <05a229e8-b0b6-4d29-8561-70d02f6dc31b@lunn.ch>
-Content-Type: text/plain; charset=UTF-8
+In-Reply-To: <09a9a9ef-cf77-3b60-2845-94595a42cf3e@intel.com>
+Content-Type: text/plain; charset=utf-8
+Content-Language: en-GB
 Content-Transfer-Encoding: 7bit
-X-bounce-key: webpack.hosteurope.de;regressions@leemhuis.info;1688877399;eabebbaa;
-X-HE-SMSGID: 1qIM9x-0002mt-1c
-X-Spam-Status: No, score=-2.0 required=5.0 tests=BAYES_00,NICE_REPLY_A,
-	RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE
-	autolearn=ham autolearn_force=no version=3.4.6
+X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_AU,DKIM_VALID_EF,FREEMAIL_ENVFROM_END_DIGIT,
+	FREEMAIL_FROM,NICE_REPLY_A,RCVD_IN_DNSWL_NONE,SPF_HELO_NONE,SPF_PASS,
+	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-On 08.07.23 22:49, Andrew Lunn wrote:
->> Could someone please submit the patch for me?
+On 2023/7/7 0:28, Alexander Lobakin wrote:
+> From: Yunsheng Lin <linyunsheng@huawei.com>
+> Date: Thu, 6 Jul 2023 20:47:28 +0800
 > 
-> You are not far from it yourself.
+>> On 2023/7/5 23:55, Alexander Lobakin wrote:
+>>
+>>> +/**
+>>> + * libie_rx_page_pool_create - create a PP with the default libie settings
+>>> + * @napi: &napi_struct covering this PP (no usage outside its poll loops)
+>>> + * @size: size of the PP, usually simply Rx queue len
+>>> + *
+>>> + * Returns &page_pool on success, casted -errno on failure.
+>>> + */
+>>> +struct page_pool *libie_rx_page_pool_create(struct napi_struct *napi,
+>>> +					    u32 size)
+>>> +{
+>>> +	struct page_pool_params pp = {
+>>> +		.flags		= PP_FLAG_DMA_MAP | PP_FLAG_DMA_SYNC_DEV,
+>>> +		.order		= LIBIE_RX_PAGE_ORDER,
+>>> +		.pool_size	= size,
+>>> +		.nid		= NUMA_NO_NODE,
+>>> +		.dev		= napi->dev->dev.parent,
+>>> +		.napi		= napi,
+>>> +		.dma_dir	= DMA_FROM_DEVICE,
+>>> +		.offset		= LIBIE_SKB_HEADROOM,
+>>
+>> I think it worth mentioning that the '.offset' is not really accurate
+>> when the page is split, as we do not really know what is the offset of
+>> the frag of a page except for the first frag.
 > 
-> I've not followed the history here. Did it never work, or has it
-> worked in the past, and then at some point broke?
-> 
-> If it never worked, this would be classed as new development, and so
-> the patch should be for net-next. If it did work, but at some point in
-> time it stopped working, then it is for net.
-> [...]
+> Yeah, this is read as "offset from the start of the page or frag to the
+> actual frame start, i.e. its Ethernet header" or "this is just
+> xdp->data - xdp->data_hard_start".
 
-To chime in here: I most agree, but FWIW, it broke more than a decade
-ago in v3.0, so maybe this is better suited for net-next. But of course
-that up to the -net maintainers.
+So the problem seems to be if most of drivers have a similar reading as
+libie does here, as .offset seems to have a clear semantics which is used
+to skip dma sync operation for buffer range that is not touched by the
+dma operation. Even if it happens to have the same value of "offset from
+the start of the page or frag to the actual frame start", I am not sure
+it is future-proofing to reuse it.
 
-Ciao, Thorsten
+When page frag is added, I didn't really give much thought about that as
+we use it in a cache coherent system.
+It seems we might need to extend or update that semantics if we really want
+to skip dma sync operation for all the buffer ranges that are not touched
+by the dma operation for page split case.
+Or Skipping dma sync operation for all untouched ranges might not be worth
+the effort, because it might need a per frag dma sync operation, which is
+more costly than a batched per page dma sync operation. If it is true, page
+pool already support that currently as my understanding, because the dma
+sync operation is only done when the last frag is released/freed.
+
+> 
+>>
+>>> +	};
+>>> +	size_t truesize;
+>>> +
+>>> +	pp.max_len = libie_rx_sync_len(napi->dev, pp.offset);
+
+As mentioned above, if we depend on the last released/freed frag to do the
+dma sync, the pp.max_len might need to cover all the frag.
+
+>>> +
+>>> +	/* "Wanted" truesize, passed to page_pool_dev_alloc() */
+>>> +	truesize = roundup_pow_of_two(SKB_HEAD_ALIGN(pp.offset + pp.max_len));
+>>> +	pp.init_arg = (void *)truesize;
+>>
+>> I am not sure if it is correct to use pp.init_arg here, as it is supposed to
+>> be used along with init_callback. And if we want to change the implemetation
+> 
+> I know. I abused it to save 1 function argument :p It's safe since I
+> don't use init_callback (not an argument).
+> I was thinking also of having a union in PP params or even a new field
+> like "wanted true size", so that your function could even take values
+> from there in certain cases (e.g. if I pass 0 as parameter).
+> 
+>> of init_callback, we may stuck with it as the driver is using it very
+>> differently here.
+>>
+>> Is it possible to pass the 'wanted true size' by adding a parameter for
+>> libie_rx_alloc()?
+> 
+> Yes, or I could store it somewhere on the ring, but looks uglier =\ This
+> one does as well to some degree, but at least hidden in the library and
+> doesn't show up in the drivers :D
+
+It seems most hw driver know the size of memory it needs when creating
+the ring/queue, setting the frag size and deciding how many is a page
+split into before allocation seems like a possible future optimization.
+
+For now, it would be better to add helper to acess pp.init_arg at least
+instead of acess pp.init_arg directly to make it more obvious and make
+the future optimization more easier.
+
+> 
+>>
+>>> +
+>>> +	return page_pool_create(&pp);
+>>> +}
+>>> +EXPORT_SYMBOL_NS_GPL(libie_rx_page_pool_create, LIBIE);
+> 
+> Thanks,
+> Olek
+
 
