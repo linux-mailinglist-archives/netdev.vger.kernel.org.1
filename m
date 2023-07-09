@@ -1,49 +1,53 @@
-Return-Path: <netdev+bounces-16253-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16254-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [139.178.88.99])
-	by mail.lfdr.de (Postfix) with ESMTPS id 1003B74C519
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:14:13 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id F36D174C525
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 17:14:31 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id B7522281025
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:14:11 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id D4BB21C20938
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 15:14:30 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id 5AC0CC12B;
-	Sun,  9 Jul 2023 15:13:17 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id 657B98BEA;
+	Sun,  9 Jul 2023 15:13:34 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from smtp.kernel.org (aws-us-west-2-korg-mail-1.web.codeaurora.org [10.30.226.201])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 29698AD4B
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:13:16 +0000 (UTC)
-Received: by smtp.kernel.org (Postfix) with ESMTPSA id B21C9C611B7;
-	Sun,  9 Jul 2023 15:13:14 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id 159F68820
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 15:13:33 +0000 (UTC)
+Received: by smtp.kernel.org (Postfix) with ESMTPSA id 7A6A1C433CD;
+	Sun,  9 Jul 2023 15:13:31 +0000 (UTC)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/simple; d=kernel.org;
-	s=k20201202; t=1688915595;
-	bh=tPlnrUOB44ixW+YBquQhtPmxhbOHRKsLyCXO3Ctx5n8=;
+	s=k20201202; t=1688915612;
+	bh=xbH6wIwOZG5M2DaP0ZJgalD+ZaD9fshGC5PX0Sdww5I=;
 	h=From:To:Cc:Subject:Date:In-Reply-To:References:From;
-	b=WnzdxPuwXCns771s1GEMFAk+ro0/IfZlf2O1hsC2DMU6N7DJTbyAFGOZb0VSD5VKI
-	 +2V1k07kSvzNZIhY4MrrSuXQa+KLKI1UiPN1aeWhKGALyTFqL3LN4/IV94IettZok7
-	 QGNxW3WuennZC97dXraVHc3tIwVa+0xcQOtJkKVSU6wbazUI1OyEV5d1N/odVISl0E
-	 3pbnpxcjX3OdF0uKBzDUn8O5CcyCdiPJ/tSaL9cht46zGkCdW49UmZPbRfgOWVHfiN
-	 KKVB6WMDEpXVOMBl88yV7/3JDrlB3+9pce3THJDVHscYcaGkBxHedBHg5e99GMsTf1
-	 Vpm2/sJ362nLg==
+	b=tNymb0P0AGiSeunM3eJkn9ZXzWXvHAR/MerJC1ktxyYQjiQxG+2EUY+VegixKfxLu
+	 YggQ8+tg+hkddBgHq/8QlLA30L9kgTG0V7MhxQjJH+dm/SH1b2AL2Au4KPxusFV8Ue
+	 5iDWLmXq1JlNy2srRSJURxJFjPWq3GusZQ1oDz9+k6i7U20bwAvcmyBocdf1PBen2C
+	 /IDmjWoQdJmlL3HRVDEyxBD2jPqcf/TKse0FpvJasX80TQg0S+kK+gaBs9zEaCJ10R
+	 jZNXYykYm0vE85cRuI06AdUmCvFE1e+FovsEU5w+pQgsVQrPdvZqteeL/L0J8cxCqc
+	 o8E2TUQhVaQXw==
 From: Sasha Levin <sashal@kernel.org>
 To: linux-kernel@vger.kernel.org,
 	stable@vger.kernel.org
-Cc: Jakub Kicinski <kuba@kernel.org>,
-	Jiri Pirko <jiri@nvidia.com>,
+Cc: Jisheng Zhang <jszhang@kernel.org>,
+	Simon Horman <simon.horman@corigine.com>,
+	Gabriel Somlo <gsomlo@gmail.com>,
+	Jakub Kicinski <kuba@kernel.org>,
 	Sasha Levin <sashal@kernel.org>,
-	jiri@resnulli.us,
 	davem@davemloft.net,
 	edumazet@google.com,
 	pabeni@redhat.com,
+	kgugala@antmicro.com,
+	mholenko@antmicro.com,
+	joel@jms.id.au,
 	netdev@vger.kernel.org
-Subject: [PATCH AUTOSEL 6.4 11/26] devlink: make health report on unregistered instance warn just once
-Date: Sun,  9 Jul 2023 11:12:40 -0400
-Message-Id: <20230709151255.512931-11-sashal@kernel.org>
+Subject: [PATCH AUTOSEL 6.4 18/26] net: ethernet: litex: add support for 64 bit stats
+Date: Sun,  9 Jul 2023 11:12:47 -0400
+Message-Id: <20230709151255.512931-18-sashal@kernel.org>
 X-Mailer: git-send-email 2.39.2
 In-Reply-To: <20230709151255.512931-1-sashal@kernel.org>
 References: <20230709151255.512931-1-sashal@kernel.org>
@@ -58,41 +62,80 @@ X-Patchwork-Hint: Ignore
 X-stable-base: Linux 6.4.2
 Content-Transfer-Encoding: 8bit
 
-From: Jakub Kicinski <kuba@kernel.org>
+From: Jisheng Zhang <jszhang@kernel.org>
 
-[ Upstream commit 6f4b98147b8dfcabacb19b5c6abd087af66d0049 ]
+[ Upstream commit 18da174d865a87d47d2f33f5b0a322efcf067728 ]
 
-Devlink health is involved in error recovery. Machines in bad
-state tend to be fairly unreliable, and occasionally get stuck
-in error loops. Even with a reasonable grace period devlink health
-may get a thousand reports in an hour.
+Implement 64 bit per cpu stats to fix the overflow of netdev->stats
+on 32 bit platforms. To simplify the code, we use net core
+pcpu_sw_netstats infrastructure. One small drawback is some memory
+overhead because litex uses just one queue, but we allocate the
+counters per cpu.
 
-In case of reporting on an unregistered devlink instance
-the subsequent reports don't add much value. Switch to
-WARN_ON_ONCE() to avoid flooding dmesg and fleet monitoring
-dashboards.
-
-Reviewed-by: Jiri Pirko <jiri@nvidia.com>
-Link: https://lore.kernel.org/r/20230531015523.48961-1-kuba@kernel.org
+Signed-off-by: Jisheng Zhang <jszhang@kernel.org>
+Reviewed-by: Simon Horman <simon.horman@corigine.com>
+Acked-by: Gabriel Somlo <gsomlo@gmail.com>
+Link: https://lore.kernel.org/r/20230614162035.300-1-jszhang@kernel.org
 Signed-off-by: Jakub Kicinski <kuba@kernel.org>
 Signed-off-by: Sasha Levin <sashal@kernel.org>
 ---
- net/devlink/health.c | 2 +-
- 1 file changed, 1 insertion(+), 1 deletion(-)
+ drivers/net/ethernet/litex/litex_liteeth.c | 19 +++++++++++++++----
+ 1 file changed, 15 insertions(+), 4 deletions(-)
 
-diff --git a/net/devlink/health.c b/net/devlink/health.c
-index 0839706d5741a..194340a8bb863 100644
---- a/net/devlink/health.c
-+++ b/net/devlink/health.c
-@@ -480,7 +480,7 @@ static void devlink_recover_notify(struct devlink_health_reporter *reporter,
- 	int err;
+diff --git a/drivers/net/ethernet/litex/litex_liteeth.c b/drivers/net/ethernet/litex/litex_liteeth.c
+index 35f24e0f09349..ffa96059079c6 100644
+--- a/drivers/net/ethernet/litex/litex_liteeth.c
++++ b/drivers/net/ethernet/litex/litex_liteeth.c
+@@ -78,8 +78,7 @@ static int liteeth_rx(struct net_device *netdev)
+ 	memcpy_fromio(data, priv->rx_base + rx_slot * priv->slot_size, len);
+ 	skb->protocol = eth_type_trans(skb, netdev);
  
- 	WARN_ON(cmd != DEVLINK_CMD_HEALTH_REPORTER_RECOVER);
--	WARN_ON(!xa_get_mark(&devlinks, devlink->index, DEVLINK_REGISTERED));
-+	ASSERT_DEVLINK_REGISTERED(devlink);
+-	netdev->stats.rx_packets++;
+-	netdev->stats.rx_bytes += len;
++	dev_sw_netstats_rx_add(netdev, len);
  
- 	msg = nlmsg_new(NLMSG_DEFAULT_SIZE, GFP_KERNEL);
- 	if (!msg)
+ 	return netif_rx(skb);
+ 
+@@ -185,8 +184,7 @@ static netdev_tx_t liteeth_start_xmit(struct sk_buff *skb,
+ 	litex_write16(priv->base + LITEETH_READER_LENGTH, skb->len);
+ 	litex_write8(priv->base + LITEETH_READER_START, 1);
+ 
+-	netdev->stats.tx_bytes += skb->len;
+-	netdev->stats.tx_packets++;
++	dev_sw_netstats_tx_add(netdev, 1, skb->len);
+ 
+ 	priv->tx_slot = (priv->tx_slot + 1) % priv->num_tx_slots;
+ 	dev_kfree_skb_any(skb);
+@@ -194,9 +192,17 @@ static netdev_tx_t liteeth_start_xmit(struct sk_buff *skb,
+ 	return NETDEV_TX_OK;
+ }
+ 
++static void
++liteeth_get_stats64(struct net_device *netdev, struct rtnl_link_stats64 *stats)
++{
++	netdev_stats_to_stats64(stats, &netdev->stats);
++	dev_fetch_sw_netstats(stats, netdev->tstats);
++}
++
+ static const struct net_device_ops liteeth_netdev_ops = {
+ 	.ndo_open		= liteeth_open,
+ 	.ndo_stop		= liteeth_stop,
++	.ndo_get_stats64	= liteeth_get_stats64,
+ 	.ndo_start_xmit         = liteeth_start_xmit,
+ };
+ 
+@@ -242,6 +248,11 @@ static int liteeth_probe(struct platform_device *pdev)
+ 	priv->netdev = netdev;
+ 	priv->dev = &pdev->dev;
+ 
++	netdev->tstats = devm_netdev_alloc_pcpu_stats(&pdev->dev,
++						      struct pcpu_sw_netstats);
++	if (!netdev->tstats)
++		return -ENOMEM;
++
+ 	irq = platform_get_irq(pdev, 0);
+ 	if (irq < 0)
+ 		return irq;
 -- 
 2.39.2
 
