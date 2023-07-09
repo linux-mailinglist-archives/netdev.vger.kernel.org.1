@@ -1,240 +1,156 @@
-Return-Path: <netdev+bounces-16291-lists+netdev=lfdr.de@vger.kernel.org>
+Return-Path: <netdev+bounces-16292-lists+netdev=lfdr.de@vger.kernel.org>
 X-Original-To: lists+netdev@lfdr.de
 Delivered-To: lists+netdev@lfdr.de
-Received: from sv.mirrors.kernel.org (sv.mirrors.kernel.org [IPv6:2604:1380:45e3:2400::1])
-	by mail.lfdr.de (Postfix) with ESMTPS id BBA3A74C662
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 18:14:42 +0200 (CEST)
+Received: from ny.mirrors.kernel.org (ny.mirrors.kernel.org [147.75.199.223])
+	by mail.lfdr.de (Postfix) with ESMTPS id 8086674C66A
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 18:28:10 +0200 (CEST)
 Received: from smtp.subspace.kernel.org (wormhole.subspace.kernel.org [52.25.139.140])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by sv.mirrors.kernel.org (Postfix) with ESMTPS id 6B6F42810EF
-	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 16:14:41 +0000 (UTC)
+	by ny.mirrors.kernel.org (Postfix) with ESMTPS id 17DFE1C2094D
+	for <lists+netdev@lfdr.de>; Sun,  9 Jul 2023 16:28:09 +0000 (UTC)
 Received: from localhost.localdomain (localhost.localdomain [127.0.0.1])
-	by smtp.subspace.kernel.org (Postfix) with ESMTP id DC167C8D8;
-	Sun,  9 Jul 2023 16:14:07 +0000 (UTC)
+	by smtp.subspace.kernel.org (Postfix) with ESMTP id E96E1C2F1;
+	Sun,  9 Jul 2023 16:28:06 +0000 (UTC)
 X-Original-To: netdev@vger.kernel.org
 Received: from lindbergh.monkeyblade.net (lindbergh.monkeyblade.net [23.128.96.19])
 	(using TLSv1.2 with cipher ECDHE-RSA-AES256-GCM-SHA384 (256/256 bits))
 	(No client certificate requested)
-	by smtp.subspace.kernel.org (Postfix) with ESMTPS id CFB61E570
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 16:14:07 +0000 (UTC)
-Received: from mail-oi1-x234.google.com (mail-oi1-x234.google.com [IPv6:2607:f8b0:4864:20::234])
-	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 82A12FD
-	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 09:14:06 -0700 (PDT)
-Received: by mail-oi1-x234.google.com with SMTP id 5614622812f47-3a3b7f992e7so2556900b6e.2
-        for <netdev@vger.kernel.org>; Sun, 09 Jul 2023 09:14:06 -0700 (PDT)
+	by smtp.subspace.kernel.org (Postfix) with ESMTPS id DCA16C157
+	for <netdev@vger.kernel.org>; Sun,  9 Jul 2023 16:28:06 +0000 (UTC)
+Received: from mail-oo1-xc35.google.com (mail-oo1-xc35.google.com [IPv6:2607:f8b0:4864:20::c35])
+	by lindbergh.monkeyblade.net (Postfix) with ESMTPS id 3E5B2A8;
+	Sun,  9 Jul 2023 09:28:05 -0700 (PDT)
+Received: by mail-oo1-xc35.google.com with SMTP id 006d021491bc7-5634db21a78so2678409eaf.0;
+        Sun, 09 Jul 2023 09:28:05 -0700 (PDT)
 DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=mojatatu-com.20221208.gappssmtp.com; s=20221208; t=1688919245; x=1691511245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:from:to:cc:subject:date
-         :message-id:reply-to;
-        bh=ROiy2swWI51OFRxPVukylUmtOl8kXv5G8fgZkxcUvKE=;
-        b=SgCimg1EJVK1ByVg+YYBaSd315KEcVjY6PHWi7lJoA2GDAfSt0S2pEkP1v4yWBS6NO
-         92eN3kpUX2qiVxUfneXVSQNztFkHQNk2GEZYOhfVmJvT247zJtRthqoC4J5z6WsFS6yB
-         wFU9b8pTHCYsYFfWs0YWTP7i8+DqaZFE+nJQ4AeoeBurmAt33XSPo1cGA/kr3m0URNem
-         vEB+rHkRiNR5u4DjzgRZCqk+NmOB5WubHbS1CWxgTZhQs5+j18m4SvpjXjVzCKE7uoNl
-         aY5P5Bt28EDuriM1MGIIty1K7LdLJlid5bxdbluKEPtUdYiAl92N7ihluMTnl1PfDJ/o
-         jplA==
+        d=gmail.com; s=20221208; t=1688920084; x=1691512084;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:from:to:cc:subject:date:message-id:reply-to;
+        bh=Mnp7Gx1O4lBi6RB6np/kLFboJ0ahJMfnsN6pSM7+9k4=;
+        b=C3Z8Rw5eHLgZLt/1ByF8+nxD3uvgzIOCbeyD6rfZNLgsRMPLgEexhGgcnFPbQyoWGj
+         74ImKO3YsvkZWRNVmzLcacKTxJV6nV7KsBeEtOC1BKWbHH86F1mJOGgbAV459dfl/FJu
+         XCevRxYtHvMp4XASirzqqS2qF7pTeDqdiTaLpj106T/gzelDXnvnkLOjmjBb6o//AOZH
+         tlEA7j0fgMYsdlLibdsah5rlxd+qVHwDj4I+hYcOXU8l58HHRk2O5InJCRhk6VpW8t43
+         gEgCi1VhGtk0YgXXtzYSioCp237OKLhuxeKxNP67W21scEUsDzxjr99/QQNo9lTTK5np
+         bG0g==
 X-Google-DKIM-Signature: v=1; a=rsa-sha256; c=relaxed/relaxed;
-        d=1e100.net; s=20221208; t=1688919245; x=1691511245;
-        h=content-transfer-encoding:mime-version:references:in-reply-to
-         :message-id:date:subject:cc:to:from:x-gm-message-state:from:to:cc
-         :subject:date:message-id:reply-to;
-        bh=ROiy2swWI51OFRxPVukylUmtOl8kXv5G8fgZkxcUvKE=;
-        b=F0+uaC/gTEXydgiwzz+1QWoyuTISGmRdNQ4a/yaBOvkPJdxDzfxj1dSkDVor8W0YE/
-         1t/Hhif5GMCPD0+ryHennljEU/7xV66tuPB/gqqsEHLCYJTYlz08AznrKcgiyJNDzgtf
-         LNaTw7RhtZx9zv0GCK4+hZS32TaBY/Onn0CEynFeywedTGS69GfgPJeu1spv8VZ+ZUZ8
-         walMgssN54d5aLznQl70v+tu3fJDUl9uSlMV4WvvBo2+6Rk2vqUegNmraER3n8m2BM46
-         oSBf9NUHyCaQKAqLeuvoF08Pretbr4PuYyh7hqoCc8z4F5p9kFHdRW3Ahnv55OwgI4eQ
-         6WYg==
-X-Gm-Message-State: ABy/qLZbq+SLVFc2OoXN9UsfUgKiUuynfrz34v/GXiakOfow8C17TcsD
-	rMj31u4N/imrSE451amSdHOnN40gF0m2S2c2AJA=
-X-Google-Smtp-Source: APBJJlF1XoOS226218jedMxSdhWRLjPfFo84Oz+S8Fk+zrEia26JhrX0ip2ruMHITg2jSG9Adq53/g==
-X-Received: by 2002:aca:110d:0:b0:3a3:7c33:9a0d with SMTP id 13-20020aca110d000000b003a37c339a0dmr8017366oir.48.1688919245747;
-        Sun, 09 Jul 2023 09:14:05 -0700 (PDT)
-Received: from localhost.localdomain ([2804:7f1:e2c1:1622:34af:d3bb:8e9a:95c5])
-        by smtp.gmail.com with ESMTPSA id w14-20020a056808140e00b003a1efec1a6esm3391617oiv.46.2023.07.09.09.14.02
-        (version=TLS1_3 cipher=TLS_AES_256_GCM_SHA384 bits=256/256);
-        Sun, 09 Jul 2023 09:14:05 -0700 (PDT)
-From: Victor Nogueira <victor@mojatatu.com>
-To: netdev@vger.kernel.org
-Cc: jhs@mojatatu.com,
-	xiyou.wangcong@gmail.com,
-	jiri@resnulli.us,
-	davem@davemloft.net,
-	edumazet@google.com,
-	kuba@kernel.org,
-	pabeni@redhat.com,
-	pctammela@mojatatu.com,
-	simon.horman@corigine.com,
-	kernel@mojatatu.com
-Subject: [PATCH net v3 2/2] net: sched: cls_flower: Undo tcf_bind_filter if fl_set_key fails
-Date: Sun,  9 Jul 2023 13:13:50 -0300
-Message-Id: <20230709161350.347064-3-victor@mojatatu.com>
-X-Mailer: git-send-email 2.40.1
-In-Reply-To: <20230709161350.347064-1-victor@mojatatu.com>
-References: <20230709161350.347064-1-victor@mojatatu.com>
+        d=1e100.net; s=20221208; t=1688920084; x=1691512084;
+        h=content-transfer-encoding:in-reply-to:from:content-language
+         :references:cc:to:subject:user-agent:mime-version:date:message-id
+         :sender:x-gm-message-state:from:to:cc:subject:date:message-id
+         :reply-to;
+        bh=Mnp7Gx1O4lBi6RB6np/kLFboJ0ahJMfnsN6pSM7+9k4=;
+        b=HRRbPPrdzS6qQaAf6kUq+cnDGWP6eFLRrpmHJ76RDFN5FnsVc+S089Bod6FJyzwiUL
+         9/uVjq5eOnjMbSt5+ADoJRF27Bi22mZHeQvRHS2LKi/RgKz9wX0bm+qdL8Pm3wNlzH4T
+         V8uFqKFzCOSTWv7EqniG/am9kV/GMWfzgnNpiXRcQPjc7ehtsPYk6t6/ZqU3h7CZFwGf
+         dP09D85g4WGZxF36Tsus6M6InNl1dvaRSOCLw/5nbz9VTLuJcna7AsuMV35VMWBcQxwc
+         czvtlFIQiqXIWvOQOhIDPdAh0AE0vBcnLZ7Cg0PNCC7MUeIS63AOh8ZAakBn1IyUUXgJ
+         ndsg==
+X-Gm-Message-State: ABy/qLbjXSmG9wljqTMauu5+4d1k6/RJDuMaLfwfvxeO9E2M9UNewmJ2
+	kwd+tSlXL7UIzxflILQQNhc=
+X-Google-Smtp-Source: APBJJlE60avBl+3E9vLwVQj9Z7ucwDB15X967F/kv0vGm7ovzn82ucw0rFV/AvNaXRSZZAkAskZtJQ==
+X-Received: by 2002:a05:6808:1a81:b0:3a3:6536:dd89 with SMTP id bm1-20020a0568081a8100b003a36536dd89mr9022353oib.49.1688920084438;
+        Sun, 09 Jul 2023 09:28:04 -0700 (PDT)
+Received: from [192.168.1.119] ([216.130.59.33])
+        by smtp.gmail.com with ESMTPSA id n5-20020aca2405000000b003a1f444307esm3367199oic.58.2023.07.09.09.28.03
+        (version=TLS1_3 cipher=TLS_AES_128_GCM_SHA256 bits=128/128);
+        Sun, 09 Jul 2023 09:28:03 -0700 (PDT)
+Sender: Larry Finger <larry.finger@gmail.com>
+Message-ID: <b4063a55-be7c-8f3a-2529-e1211080d323@lwfinger.net>
+Date: Sun, 9 Jul 2023 11:28:02 -0500
 Precedence: bulk
 X-Mailing-List: netdev@vger.kernel.org
 List-Id: <netdev.vger.kernel.org>
 List-Subscribe: <mailto:netdev+subscribe@vger.kernel.org>
 List-Unsubscribe: <mailto:netdev+unsubscribe@vger.kernel.org>
 MIME-Version: 1.0
-Content-Transfer-Encoding: 8bit
-X-Spam-Status: No, score=-1.9 required=5.0 tests=BAYES_00,DKIM_SIGNED,
-	DKIM_VALID,RCVD_IN_DNSWL_BLOCKED,SPF_HELO_NONE,SPF_NONE,
-	T_SCC_BODY_TEXT_LINE autolearn=ham autolearn_force=no version=3.4.6
+User-Agent: Mozilla/5.0 (X11; Linux x86_64; rv:102.0) Gecko/20100101
+ Thunderbird/102.12.0
+Subject: Re: [Regression][BISECTED] kernel boot hang after 19898ce9cf8a
+ ("wifi: iwlwifi: split 22000.c into multiple files")
+To: "Zhang, Rui" <rui.zhang@intel.com>,
+ "Greenman, Gregory" <gregory.greenman@intel.com>,
+ "Berg, Johannes" <johannes.berg@intel.com>,
+ "regressions@lists.linux.dev" <regressions@lists.linux.dev>
+Cc: "bagasdotme@gmail.com" <bagasdotme@gmail.com>,
+ "davem@davemloft.net" <davem@davemloft.net>,
+ "netdev@vger.kernel.org" <netdev@vger.kernel.org>,
+ "kvalo@kernel.org" <kvalo@kernel.org>, "Baruch, Yaara"
+ <yaara.baruch@intel.com>,
+ "linux-kernel@vger.kernel.org" <linux-kernel@vger.kernel.org>,
+ "linux-wireless@vger.kernel.org" <linux-wireless@vger.kernel.org>,
+ "Torvalds, Linus" <torvalds@linux-foundation.org>,
+ "Ben Ami, Golan" <golan.ben.ami@intel.com>,
+ "edumazet@google.com" <edumazet@google.com>,
+ "Sisodiya, Mukesh" <mukesh.sisodiya@intel.com>,
+ "kuba@kernel.org" <kuba@kernel.org>, "pabeni@redhat.com" <pabeni@redhat.com>
+References: <b533071f38804247f06da9e52a04f15cce7a3836.camel@intel.com>
+ <a4265090-d6b8-b185-a400-b09b27a347cc@leemhuis.info>
+ <c65d0837-5e64-bec7-9e56-04aa91148d05@leemhuis.info>
+ <4153ce0aac6dc760a3a9c7204c5c9141b60839a4.camel@intel.com>
+Content-Language: en-US
+From: Larry Finger <Larry.Finger@lwfinger.net>
+In-Reply-To: <4153ce0aac6dc760a3a9c7204c5c9141b60839a4.camel@intel.com>
+Content-Type: text/plain; charset=UTF-8; format=flowed
+Content-Transfer-Encoding: 7bit
+X-Spam-Status: No, score=-1.6 required=5.0 tests=BAYES_00,DKIM_SIGNED,
+	DKIM_VALID,DKIM_VALID_EF,FREEMAIL_FORGED_FROMDOMAIN,FREEMAIL_FROM,
+	HEADER_FROM_DIFFERENT_DOMAINS,NICE_REPLY_A,RCVD_IN_DNSWL_BLOCKED,
+	SPF_HELO_NONE,SPF_PASS,T_SCC_BODY_TEXT_LINE autolearn=no
+	autolearn_force=no version=3.4.6
 X-Spam-Checker-Version: SpamAssassin 3.4.6 (2021-04-09) on
 	lindbergh.monkeyblade.net
 
-If TCA_FLOWER_CLASSID is specified in the netlink message, the code will
-call tcf_bind_filter. However, if any error occurs after that, the code
-should undo this by calling tcf_unbind_filter.
+On 7/9/23 08:27, Zhang, Rui wrote:
+> On Sat, 2023-07-08 at 16:17 +0200, Thorsten Leemhuis wrote:
+>> On 07.07.23 12:55, Linux regression tracking (Thorsten Leemhuis)
+>> wrote:
+>>> On 07.07.23 10:25, Zhang, Rui wrote:
+>>>>
+>>>> I run into a NULL pointer dereference and kernel boot hang after
+>>>> switching to latest upstream kernel, and git bisect shows that
+>>>> below
+>>>> commit is the first offending commit, and I have confirmed that
+>>>> commit
+>>>> 19898ce9cf8a has the issue while 19898ce9cf8a~1 does not.
+>>>
+>>> FWIW, this is the fourth such report about this that I'm aware of.
+>>>
+>>> The first is this one (with two affected users afaics):
+>>> https://bugzilla.kernel.org/show_bug.cgi?id=217622
+>>>
+>>> The second is this one:
+>>> https://lore.kernel.org/all/CAAJw_Zug6VCS5ZqTWaFSr9sd85k%3DtyPm9DEE%2BmV%3DAKoECZM%2BsQ@mail.gmail.com/
+>>>
+>>> The third:
+>>> https://lore.kernel.org/all/9274d9bd3d080a457649ff5addcc1726f08ef5b2.camel@xry111.site/
+>>>
+>>> And in the past few days two people from Fedora land talked to me
+>>> on IRC
+>>> with problems that in retrospective might be caused by this as
+>>> well.
+>>
+>> I got confirmation: one of those cases is also caused by 19898ce9cf8a
+>> But I write for a different reason:
+>>
+>> Larry (now CCed) looked at the culprit and spotted something that
+>> looked
+>> suspicious to him; he posted a patch and looks for testers:
+>> https://lore.kernel.org/all/0068af47-e475-7e8d-e476-c374e90dff5f@lwfinger.net/
+> 
+> I applied this patch but the problem still exists.
+> 
+> thanks,
+> rui
 
-Fixes: 77b9900ef53a ("tc: introduce Flower classifier")
-Signed-off-by: Victor Nogueira <victor@mojatatu.com>
-Acked-by: Jamal Hadi Salim <jhs@mojatatu.com>
-Reviewed-by: Pedro Tammela <pctammela@mojatatu.com>
----
- net/sched/cls_flower.c | 99 ++++++++++++++++++++----------------------
- 1 file changed, 47 insertions(+), 52 deletions(-)
+Rui,
 
-diff --git a/net/sched/cls_flower.c b/net/sched/cls_flower.c
-index 56065cc5a661..9a40010ccb9f 100644
---- a/net/sched/cls_flower.c
-+++ b/net/sched/cls_flower.c
-@@ -2163,53 +2163,6 @@ static bool fl_needs_tc_skb_ext(const struct fl_flow_key *mask)
- 	return mask->meta.l2_miss;
- }
- 
--static int fl_set_parms(struct net *net, struct tcf_proto *tp,
--			struct cls_fl_filter *f, struct fl_flow_mask *mask,
--			unsigned long base, struct nlattr **tb,
--			struct nlattr *est,
--			struct fl_flow_tmplt *tmplt,
--			u32 flags, u32 fl_flags,
--			struct netlink_ext_ack *extack)
--{
--	int err;
--
--	err = tcf_exts_validate_ex(net, tp, tb, est, &f->exts, flags,
--				   fl_flags, extack);
--	if (err < 0)
--		return err;
--
--	if (tb[TCA_FLOWER_CLASSID]) {
--		f->res.classid = nla_get_u32(tb[TCA_FLOWER_CLASSID]);
--		if (flags & TCA_ACT_FLAGS_NO_RTNL)
--			rtnl_lock();
--		tcf_bind_filter(tp, &f->res, base);
--		if (flags & TCA_ACT_FLAGS_NO_RTNL)
--			rtnl_unlock();
--	}
--
--	err = fl_set_key(net, tb, &f->key, &mask->key, extack);
--	if (err)
--		return err;
--
--	fl_mask_update_range(mask);
--	fl_set_masked_key(&f->mkey, &f->key, mask);
--
--	if (!fl_mask_fits_tmplt(tmplt, mask)) {
--		NL_SET_ERR_MSG_MOD(extack, "Mask does not fit the template");
--		return -EINVAL;
--	}
--
--	/* Enable tc skb extension if filter matches on data extracted from
--	 * this extension.
--	 */
--	if (fl_needs_tc_skb_ext(&mask->key)) {
--		f->needs_tc_skb_ext = 1;
--		tc_skb_ext_tc_enable();
--	}
--
--	return 0;
--}
--
- static int fl_ht_insert_unique(struct cls_fl_filter *fnew,
- 			       struct cls_fl_filter *fold,
- 			       bool *in_ht)
-@@ -2241,6 +2194,7 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	struct cls_fl_head *head = fl_head_dereference(tp);
- 	bool rtnl_held = !(flags & TCA_ACT_FLAGS_NO_RTNL);
- 	struct cls_fl_filter *fold = *arg;
-+	bool bound_to_filter = false;
- 	struct cls_fl_filter *fnew;
- 	struct fl_flow_mask *mask;
- 	struct nlattr **tb;
-@@ -2325,15 +2279,46 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 	if (err < 0)
- 		goto errout_idr;
- 
--	err = fl_set_parms(net, tp, fnew, mask, base, tb, tca[TCA_RATE],
--			   tp->chain->tmplt_priv, flags, fnew->flags,
--			   extack);
--	if (err)
-+	err = tcf_exts_validate_ex(net, tp, tb, tca[TCA_RATE],
-+				   &fnew->exts, flags, fnew->flags,
-+				   extack);
-+	if (err < 0)
- 		goto errout_idr;
- 
-+	if (tb[TCA_FLOWER_CLASSID]) {
-+		fnew->res.classid = nla_get_u32(tb[TCA_FLOWER_CLASSID]);
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_lock();
-+		tcf_bind_filter(tp, &fnew->res, base);
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_unlock();
-+		bound_to_filter = true;
-+	}
-+
-+	err = fl_set_key(net, tb, &fnew->key, &mask->key, extack);
-+	if (err)
-+		goto unbind_filter;
-+
-+	fl_mask_update_range(mask);
-+	fl_set_masked_key(&fnew->mkey, &fnew->key, mask);
-+
-+	if (!fl_mask_fits_tmplt(tp->chain->tmplt_priv, mask)) {
-+		NL_SET_ERR_MSG_MOD(extack, "Mask does not fit the template");
-+		err = -EINVAL;
-+		goto unbind_filter;
-+	}
-+
-+	/* Enable tc skb extension if filter matches on data extracted from
-+	 * this extension.
-+	 */
-+	if (fl_needs_tc_skb_ext(&mask->key)) {
-+		fnew->needs_tc_skb_ext = 1;
-+		tc_skb_ext_tc_enable();
-+	}
-+
- 	err = fl_check_assign_mask(head, fnew, fold, mask);
- 	if (err)
--		goto errout_idr;
-+		goto unbind_filter;
- 
- 	err = fl_ht_insert_unique(fnew, fold, &in_ht);
- 	if (err)
-@@ -2424,6 +2409,16 @@ static int fl_change(struct net *net, struct sk_buff *in_skb,
- 				       fnew->mask->filter_ht_params);
- errout_mask:
- 	fl_mask_put(head, fnew->mask);
-+
-+unbind_filter:
-+	if (bound_to_filter) {
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_lock();
-+		tcf_unbind_filter(tp, &fnew->res);
-+		if (flags & TCA_ACT_FLAGS_NO_RTNL)
-+			rtnl_unlock();
-+	}
-+
- errout_idr:
- 	if (!fold)
- 		idr_remove(&head->handle_idr, fnew->handle);
--- 
-2.25.1
+I am not surprised that the patch did not help. I guess you will need to stay 
+with kernel 6.3.X until the Intel developers return from their summer break.
+
+Larry
+
 
 
